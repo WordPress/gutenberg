@@ -2,9 +2,8 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Fragment } from '@wordpress/element';
 import { toggleFormat } from '@wordpress/rich-text';
-import { RichTextShortcut, UnstableRichTextInputEvent } from '@wordpress/block-editor';
+import { RichTextShortcut, __unstableRichTextInputEvent } from '@wordpress/block-editor';
 
 const name = 'core/underline';
 
@@ -28,17 +27,17 @@ export const underline = {
 		};
 
 		return (
-			<Fragment>
+			<>
 				<RichTextShortcut
 					type="primary"
 					character="u"
 					onUse={ onToggle }
 				/>
-				<UnstableRichTextInputEvent
+				<__unstableRichTextInputEvent
 					inputType="formatUnderline"
 					onInput={ onToggle }
 				/>
-			</Fragment>
+			</>
 		);
 	},
 };

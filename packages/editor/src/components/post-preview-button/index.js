@@ -215,6 +215,7 @@ export default compose( [
 
 		const previewLink = getEditedPostPreviewLink();
 		const postType = getPostType( getEditedPostAttribute( 'type' ) );
+
 		return {
 			postId: getCurrentPostId(),
 			currentPostLink: getCurrentPostAttribute( 'link' ),

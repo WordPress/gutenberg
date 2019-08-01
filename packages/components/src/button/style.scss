@@ -40,7 +40,8 @@
 			border-color: #999;
 			box-shadow:
 				inset 0 -1px 0 #999,
-				0 0 0 2px $blue-medium-200;
+				0 0 0 1px $white,
+				0 0 0 3px $blue-medium-focus;
 			text-decoration: none;
 
 		}
@@ -59,6 +60,7 @@
 			box-shadow: none;
 			text-shadow: 0 1px 0 #fff;
 			transform: none;
+			opacity: 1;
 		}
 	}
 
@@ -88,7 +90,8 @@
 		&:focus:enabled {
 			box-shadow:
 				inset 0 -1px 0 color(theme(button) shade(50%)),
-				0 0 0 2px $blue-medium-200;
+				0 0 0 1px $white,
+				0 0 0 3px color(theme(button) shade(5%));
 		}
 
 		&:active:enabled {
@@ -99,12 +102,31 @@
 		}
 
 		&:disabled,
-		&[aria-disabled="true"] {
-			color: color(theme(button) tint(30%));
-			background: color(theme(button) shade(30%));
-			border-color: color(theme(button) shade(20%));
+		&:disabled:active:enabled,
+		&[aria-disabled="true"],
+		&[aria-disabled="true"]:active:enabled {
+			color: color(theme(button) tint(40%));
+			background: color(theme(button));
+			border-color: color(theme(button) shade(7%));
 			box-shadow: none;
-			text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.1);
+			text-shadow: none;
+			opacity: 1;
+
+			// This specificity is needed to override alternate color schemes in WP-Admin.
+			&.is-button,
+			&.is-button:hover,
+			&:active:enabled {
+				box-shadow: none;
+				text-shadow: none;
+			}
+
+			&:focus:enabled {
+				color: color(theme(button) tint(40%));
+				border-color: color(theme(button) shade(7%));
+				box-shadow:
+					0 0 0 1px $white,
+					0 0 0 3px $blue-medium-focus;
+			}
 		}
 
 		&.is-busy,
@@ -142,6 +164,7 @@
 		transition-property: border, background, color;
 		transition-duration: 0.05s;
 		transition-timing-function: ease-in-out;
+		@include reduce-motion("transition");
 
 		&:hover,
 		&:active {
@@ -162,7 +185,7 @@
 	}
 
 	&:active {
-		color: currentColor;
+		color: inherit;
 	}
 
 	&:disabled,
@@ -171,11 +194,14 @@
 		opacity: 0.3;
 	}
 
-	&:focus:enabled {
+	&:focus:not(:disabled) {
 		@include button-style__focus-active;
 	}
 
-	&.is-busy {
+	&.is-busy,
+	&.is-default.is-busy,
+	&.is-default.is-busy:disabled,
+	&.is-default.is-busy[aria-disabled="true"] {
 		animation: components-button__busy-animation 2500ms infinite linear;
 		background-size: 100px 100%;
 		background-image: repeating-linear-gradient(-45deg, $light-gray-500, $white 11px, $white 10px, $light-gray-500 20px);

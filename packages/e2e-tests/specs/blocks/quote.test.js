@@ -68,7 +68,7 @@ describe( 'Quote', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	describe( 'can be converted to paragraphs', async () => {
+	describe( 'can be converted to paragraphs', () => {
 		it( 'and renders one paragraph block per <p> within quote', async () => {
 			await insertBlock( 'Quote' );
 			await page.keyboard.type( 'one' );

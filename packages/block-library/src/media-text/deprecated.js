@@ -12,10 +12,7 @@ import {
 	getColorClassName,
 } from '@wordpress/block-editor';
 
-/**
- * Internal dependencies
- */
-import { DEFAULT_MEDIA_WIDTH } from './index';
+const DEFAULT_MEDIA_WIDTH = 50;
 
 export default [
 	{

@@ -1,10 +1,10 @@
-
 .wp-block-media-text {
 	display: grid;
 	grid-template-rows: auto;
 	align-items: center;
 	grid-template-areas: "media-text-media media-text-content";
 	grid-template-columns: 50% auto;
+
 	&.has-media-on-the-right {
 		grid-template-areas: "media-text-content media-text-media";
 		grid-template-columns: auto 50%;

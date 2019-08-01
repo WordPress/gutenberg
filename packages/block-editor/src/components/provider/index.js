@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { DropZoneProvider, SlotFillProvider } from '@wordpress/components';
 import { withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
@@ -35,10 +34,21 @@ class BlockEditorProvider extends Component {
 			this.attachChangeObserver( registry );
 		}
 
-		if ( this.isSyncingOutcomingValue ) {
-			this.isSyncingOutcomingValue = false;
+		if ( this.isSyncingOutcomingValue !== null && this.isSyncingOutcomingValue === value ) {
+			// Skip block reset if the value matches expected outbound sync
+			// triggered by this component by a preceding change detection.
+			// Only skip if the value matches expectation, since a reset should
+			// still occur if the value is modified (not equal by reference),
+			// to allow that the consumer may apply modifications to reflect
+			// back on the editor.
+			this.isSyncingOutcomingValue = null;
 		} else if ( value !== prevProps.value ) {
-			this.isSyncingIncomingValue = true;
+			// Reset changing value in all other cases than the sync described
+			// above. Since this can be reached in an update following an out-
+			// bound sync, unset the outbound value to avoid considering it in
+			// subsequent renders.
+			this.isSyncingOutcomingValue = null;
+			this.isSyncingIncomingValue = value;
 			resetBlocks( value );
 		}
 	}
@@ -69,6 +79,7 @@ class BlockEditorProvider extends Component {
 		const {
 			getBlocks,
 			isLastBlockChangePersistent,
+			__unstableIsLastBlockChangeIgnored,
 		} = registry.select( 'core/block-editor' );
 
 		let blocks = getBlocks();
@@ -79,10 +90,17 @@ class BlockEditorProvider extends Component {
 				onChange,
 				onInput,
 			} = this.props;
+
 			const newBlocks = getBlocks();
 			const newIsPersistent = isLastBlockChangePersistent();
-			if ( newBlocks !== blocks && this.isSyncingIncomingValue ) {
-				this.isSyncingIncomingValue = false;
+
+			if (
+				newBlocks !== blocks && (
+					this.isSyncingIncomingValue ||
+					__unstableIsLastBlockChangeIgnored()
+				)
+			) {
+				this.isSyncingIncomingValue = null;
 				blocks = newBlocks;
 				isPersistent = newIsPersistent;
 				return;
@@ -93,10 +111,15 @@ class BlockEditorProvider extends Component {
 				// This happens when a previous input is explicitely marked as persistent.
 				( newIsPersistent && ! isPersistent )
 			) {
+				// When knowing the blocks value is changing, assign instance
+				// value to skip reset in subsequent `componentDidUpdate`.
+				if ( newBlocks !== blocks ) {
+					this.isSyncingOutcomingValue = newBlocks;
+				}
+
 				blocks = newBlocks;
 				isPersistent = newIsPersistent;
 
-				this.isSyncingOutcomingValue = true;
 				if ( isPersistent ) {
 					onChange( blocks );
 				} else {
@@ -109,13 +132,7 @@ class BlockEditorProvider extends Component {
 	render() {
 		const { children } = this.props;
 
-		return (
-			<SlotFillProvider>
-				<DropZoneProvider>
-					{ children }
-				</DropZoneProvider>
-			</SlotFillProvider>
-		);
+		return children;
 	}
 }
 

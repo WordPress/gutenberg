@@ -14,13 +14,15 @@ import deprecated from '@wordpress/deprecated';
  */
 import {
 	receiveUserQuery,
+	receiveCurrentUser,
 	receiveEntityRecords,
 	receiveThemeSupports,
 	receiveEmbedPreview,
 	receiveUserPermission,
+	receiveAutosaves,
 } from './actions';
 import { getKindEntities } from './entities';
-import { apiFetch } from './controls';
+import { apiFetch, resolveSelect } from './controls';
 
 /**
  * Requests authors from the REST API.
@@ -28,6 +30,14 @@ import { apiFetch } from './controls';
 export function* getAuthors() {
 	const users = yield apiFetch( { path: '/wp/v2/users/?who=authors&per_page=-1' } );
 	yield receiveUserQuery( 'authors', users );
+}
+
+/**
+ * Requests the current user from the REST API.
+ */
+export function* getCurrentUser() {
+	const currentUser = yield apiFetch( { path: '/wp/v2/users/me' } );
+	yield receiveCurrentUser( currentUser );
 }
 
 /**
@@ -168,4 +178,32 @@ export function* canUser( action, resource, id ) {
 	const key = compact( [ action, resource, id ] ).join( '/' );
 	const isAllowed = includes( allowHeader, method );
 	yield receiveUserPermission( key, isAllowed );
+}
+
+/**
+ * Request autosave data from the REST API.
+ *
+ * @param {string} postType The type of the parent post.
+ * @param {number} postId   The id of the parent post.
+ */
+export function* getAutosaves( postType, postId ) {
+	const { rest_base: restBase } = yield resolveSelect( 'getPostType', postType );
+	const autosaves = yield apiFetch( { path: `/wp/v2/${ restBase }/${ postId }/autosaves?context=edit` } );
+
+	if ( autosaves && autosaves.length ) {
+		yield receiveAutosaves( postId, autosaves );
+	}
+}
+
+/**
+ * Request autosave data from the REST API.
+ *
+ * This resolver exists to ensure the underlying autosaves are fetched via
+ * `getAutosaves` when a call to the `getAutosave` selector is made.
+ *
+ * @param {string} postType The type of the parent post.
+ * @param {number} postId   The id of the parent post.
+ */
+export function* getAutosave( postType, postId ) {
+	yield resolveSelect( 'getAutosaves', postType, postId );
 }

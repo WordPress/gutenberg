@@ -7,7 +7,7 @@ import { find } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component, Fragment } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { withSpokenMessages } from '@wordpress/components';
 import { RichTextToolbarButton } from '@wordpress/block-editor';
 import {
@@ -106,7 +106,7 @@ export const link = {
 			const linkSelection = this.getLinkSelection();
 
 			return (
-				<Fragment>
+				<>
 					<ModalLinkUI
 						isVisible={ this.state.addingLink }
 						isActive={ isActive }
@@ -125,7 +125,7 @@ export const link = {
 						shortcutType="primary"
 						shortcutCharacter="k"
 					/>
-				</Fragment>
+				</>
 			);
 		}
 	} ),

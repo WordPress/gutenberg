@@ -14,7 +14,7 @@ exports[`templates Using a CPT with a predefined template Should add a custom po
 <!-- /wp:quote -->
 
 <!-- wp:columns -->
-<div class=\\"wp-block-columns has-2-columns\\"><!-- wp:column -->
+<div class=\\"wp-block-columns\\"><!-- wp:column -->
 <div class=\\"wp-block-column\\"><!-- wp:image -->
 <figure class=\\"wp-block-image\\"><img alt=\\"\\"/></figure>
 <!-- /wp:image --></div>
@@ -40,7 +40,7 @@ exports[`templates Using a CPT with a predefined template Should respect user ed
 <!-- /wp:quote -->
 
 <!-- wp:columns -->
-<div class=\\"wp-block-columns has-2-columns\\"><!-- wp:column -->
+<div class=\\"wp-block-columns\\"><!-- wp:column -->
 <div class=\\"wp-block-column\\"><!-- wp:image -->
 <figure class=\\"wp-block-image\\"><img alt=\\"\\"/></figure>
 <!-- /wp:image --></div>

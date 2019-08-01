@@ -36,6 +36,8 @@ add_action( 'init', 'myguten_block_init' );
 
 In your code, you can include the i18n functions. The most common function is **__** (a double underscore) which provides translation of a simple string. Here is a basic static block example, this is in a file called `block.js`:
 
+{% codetabs %}
+{% ES5 %}
 ```js
 const { __ } = wp.i18n;
 const el = wp.element.createElement;
@@ -62,6 +64,33 @@ registerBlockType( 'myguten/simple', {
 	}
 });
 ```
+{% ESNext %}
+```js
+const { __ } = wp.i18n;
+const { registerBlockType } = wp.blocks;
+
+registerBlockType( 'myguten/simple', {
+	title: __('Simple Block', 'myguten'),
+	category: 'widgets',
+
+	edit: () => {
+		return (
+			<p style="color:red">
+				{ __('Hello World', 'myguten') }
+			</p>
+		);
+	},
+
+	save: () => {
+		return (
+			<p style="color:red">
+				{ __('Hello World', 'myguten') }
+			</p>
+		);
+	}
+});
+```
+{% end %}
 
 In the above example, the function will use the first argument for the string to be translated. The second argument is the text domain which must match the text domain slug specified by your plugin.
 
@@ -176,31 +205,32 @@ msgid "Hello World"
 msgstr "Saltuon mundo"
 ```
 
-The last step to create the translation file is to convert the `myguten-eo.po` to the JSON format needed. For this, you can use the [po2json utility](https://github.com/mikeedwards/po2json) which you install using npm. It might be easiest to install globally using: `npm install -g po2json`. Once installed, use the following command to convert to JED format:
+The last step to create the translation file is to convert the `myguten-eo.po` to the JSON format needed. For this, you can use WP-CLI's [`wp i18n make-json` command](https://developer.wordpress.org/cli/commands/i18n/make-json/), which requires WP-CLI v2.2.0 and later.
 
 ```
-po2json myguten-eo.po myguten-eo.json -f jed
+wp i18n make-json myguten-eo.po --no-purge
 ```
 
-This will generate the JSON file `myguten-eo.json` which looks like:
+This will generate the JSON file `myguten-eo-[md5].json` with the contents:
 
 ```json
 {
+  "translation-revision-date": "2019-04-26T13:30:11-07:00",
+  "generator": "WP-CLI/2.2.0",
+  "source": "block.js",
   "domain": "messages",
   "locale_data": {
     "messages": {
       "": {
         "domain": "messages",
-        "lang": "eo"
+        "lang": "eo",
+        "plural-forms": "nplurals=2; plural=(n != 1);"
       },
-      "Scratch Plugin": [
-        "Scratch kromprogrameto"
-      ],
       "Simple Block": [
-        "Simpla bloko"
+        "Simpla Bloko"
       ],
       "Hello World": [
-        "Saltuon mundo"
+        "Salunton mondo"
       ]
     }
   }
@@ -222,7 +252,7 @@ The final part is to tell WordPress where it can look to find the translation fi
 
 WordPress will check for a file in that path with the format `${domain}-${locale}-${handle}.json` as the source of translations. Alternatively, instead of the registered handle you can use the md5 hash of the relative path of the file, `${domain}-${locale} in the form of ${domain}-${locale}-${md5}.json.`
 
-This example uses the handle, rename the `myguten-eo.json` file to `myguten-eo-myguten-script.json`.
+Using `make-json` automatically names the file with the md5 hash, so it is ready as-is. You could rename the file to use the handle instead, in which case the file name would be `myguten-eo-myguten-script.json`.
 
 ### Test Translations
 

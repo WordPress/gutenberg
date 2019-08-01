@@ -8,53 +8,56 @@ import { last } from 'lodash';
  */
 import { withSelect } from '@wordpress/data';
 import { getDefaultBlockName } from '@wordpress/blocks';
-import { __ } from '@wordpress/i18n';
-import { IconButton } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import IgnoreNestedEvents from '../ignore-nested-events';
 import DefaultBlockAppender from '../default-block-appender';
-import Inserter from '../inserter';
+import ButtonBlockAppender from '../button-block-appender';
 
 function BlockListAppender( {
 	blockClientIds,
 	rootClientId,
 	canInsertDefaultBlock,
 	isLocked,
+	renderAppender: CustomAppender,
 } ) {
 	if ( isLocked ) {
 		return null;
 	}
 
-	if ( canInsertDefaultBlock ) {
+	// A render prop has been provided, use it to render the appender.
+	if ( CustomAppender ) {
 		return (
-			<IgnoreNestedEvents childHandledEvents={ [ 'onFocus', 'onClick', 'onKeyDown' ] }>
-				<DefaultBlockAppender
-					rootClientId={ rootClientId }
-					lastBlockClientId={ last( blockClientIds ) }
-				/>
-			</IgnoreNestedEvents>
+			<div className="block-list-appender">
+				<CustomAppender />
+			</div>
 		);
 	}
 
+	// Render the default block appender when renderAppender has not been
+	// provided and the context supports use of the default appender.
+	if ( canInsertDefaultBlock ) {
+		return (
+			<div className="block-list-appender">
+				<IgnoreNestedEvents childHandledEvents={ [ 'onFocus', 'onClick', 'onKeyDown' ] }>
+					<DefaultBlockAppender
+						rootClientId={ rootClientId }
+						lastBlockClientId={ last( blockClientIds ) }
+					/>
+				</IgnoreNestedEvents>
+			</div>
+		);
+	}
+
+	// Fallback in the case no renderAppender has been provided and the
+	// default block can't be inserted.
 	return (
 		<div className="block-list-appender">
-			<Inserter
+			<ButtonBlockAppender
 				rootClientId={ rootClientId }
-				renderToggle={ ( { onToggle, disabled, isOpen } ) => (
-					<IconButton
-						label={ __( 'Add block' ) }
-						icon="insert"
-						onClick={ onToggle }
-						className="block-list-appender__toggle"
-						aria-haspopup="true"
-						aria-expanded={ isOpen }
-						disabled={ disabled }
-					/>
-				) }
-				isAppender
+				className="block-list-appender__toggle"
 			/>
 		</div>
 	);

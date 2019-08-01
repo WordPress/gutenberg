@@ -219,6 +219,12 @@ _Related_
 
 -   <https://reactjs.org/docs/react-api.html#reactlazy>
 
+<a name="memo" href="#memo">#</a> **memo**
+
+_Related_
+
+-   <https://reactjs.org/docs/react-api.html#reactmemo>
+
 <a name="RawHTML" href="#RawHTML">#</a> **RawHTML**
 
 Component used as equivalent of Fragment with unescaped HTML, in cases where

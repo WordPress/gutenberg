@@ -7,6 +7,7 @@ import { getFormatType } from './get-format-type';
 import {
 	LINE_SEPARATOR,
 	OBJECT_REPLACEMENT_CHARACTER,
+	ZWNBSP,
 } from './special-characters';
 
 /**
@@ -69,14 +70,6 @@ function fromFormat( { type, attributes, unregisteredAttributes, object, boundar
 	};
 }
 
-const padding = {
-	type: 'br',
-	attributes: {
-		'data-rich-text-padding': 'true',
-	},
-	object: true,
-};
-
 export function toTree( {
 	value,
 	multilineTag,
@@ -91,6 +84,7 @@ export function toTree( {
 	onStartIndex,
 	onEndIndex,
 	isEditableTree,
+	placeholder,
 } ) {
 	const { formats, replacements, text, start, end } = value;
 	const formatsLength = formats.length + 1;
@@ -145,8 +139,7 @@ export function toTree( {
 				node = getLastChild( node );
 			}
 
-			append( getParent( node ), padding );
-			append( getParent( node ), '' );
+			append( getParent( node ), ZWNBSP );
 		}
 
 		// Set selection for the start of line.
@@ -255,7 +248,16 @@ export function toTree( {
 		}
 
 		if ( shouldInsertPadding && i === text.length ) {
-			append( getParent( pointer ), padding );
+			append( getParent( pointer ), ZWNBSP );
+
+			if ( placeholder && text.length === 0 ) {
+				append( getParent( pointer ), {
+					type: 'span',
+					attributes: {
+						'data-rich-text-placeholder': placeholder,
+					},
+				} );
+			}
 		}
 
 		lastCharacterFormats = characterFormats;

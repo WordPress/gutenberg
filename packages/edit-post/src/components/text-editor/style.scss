@@ -30,7 +30,7 @@
 	.editor-post-title__block {
 		textarea {
 			border: $border-width solid $light-gray-500;
-			margin-bottom: 4px;
+			margin-bottom: $block-spacing;
 			padding: $block-padding;
 
 			&:focus {

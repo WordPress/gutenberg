@@ -18,10 +18,6 @@ npm install @wordpress/dom --save
 
 Get the rectangle for the selection in a container.
 
-_Parameters_
-
--   _container_ `Element`: Editable container.
-
 _Returns_
 
 -   `?DOMRect`: The rectangle.

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/npm-package-json-lint-config",
-	"version": "1.2.0",
+	"version": "2.0.0",
 	"description": "WordPress npm-package-json-lint shareable configuration.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -21,6 +21,9 @@
 	"engines": {
 		"node": ">=8"
 	},
+	"files": [
+		"index.js"
+	],
 	"main": "index.js",
 	"peerDependencies": {
 		"npm-package-json-lint": ">=3.6.0"

@@ -191,6 +191,18 @@ describe( 'List', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
+	it( 'should split into two ordered lists with paragraph', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '1. one' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'two' );
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
 	it( 'should split indented list item', async () => {
 		await insertBlock( 'List' );
 		await page.keyboard.type( 'one' );
@@ -345,5 +357,18 @@ describe( 'List', () => {
 
 		// That's 9 key presses to create the list, and 9 key presses to remove
 		// the list. ;)
+	} );
+
+	it( 'should place the caret in the right place with nested list', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '* 1' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( ' a' );
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.press( 'Enter' );
+		// The caret should land in the second item.
+		await page.keyboard.type( '2' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );

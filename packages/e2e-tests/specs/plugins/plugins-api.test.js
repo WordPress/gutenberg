@@ -76,4 +76,12 @@ describe( 'Using Plugins API', () => {
 			expect( pluginSidebarClosed ).toBeNull();
 		} );
 	} );
+
+	describe( 'Document Setting Custom Panel', () => {
+		it( 'Should render a custom panel inside Document Setting sidebar', async () => {
+			await openDocumentSettingsSidebar();
+			const pluginDocumentSettingsText = await page.$eval( '.edit-post-sidebar .my-document-setting-plugin', ( el ) => el.innerText );
+			expect( pluginDocumentSettingsText ).toMatchSnapshot();
+		} );
+	} );
 } );

@@ -231,4 +231,3 @@ export function metaBoxUpdatesSuccess() {
 		type: 'META_BOX_UPDATES_SUCCESS',
 	};
 }
-

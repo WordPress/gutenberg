@@ -266,7 +266,6 @@ describe( 'Links', () => {
 	};
 
 	// Test for regressions of https://github.com/WordPress/gutenberg/issues/10496.
-	// Disabled until improved as it wasn't reliable enough.
 	it.skip( 'allows autocomplete suggestions to be selected with the mouse', async () => {
 		// First create a post that we can search for using the link autocompletion.
 		const titleText = 'Test post mouse';
@@ -284,11 +283,12 @@ describe( 'Links', () => {
 		await waitForAutoFocus();
 
 		await page.keyboard.type( titleText );
-		await page.waitForSelector( '.block-editor-url-input__suggestion' );
-		const autocompleteSuggestions = await page.$x( `//*[contains(@class, "block-editor-url-input__suggestion")]//button[contains(text(), '${ titleText }')]` );
+		const suggestionXPath = `//*[contains(@class, "block-editor-url-input__suggestion")]//button[contains(text(), '${ titleText }')]`;
+		await page.waitForXPath( suggestionXPath );
+		const autocompleteSuggestions = await page.$x( suggestionXPath );
 
 		// Expect there to be some autocomplete suggestions.
-		expect( autocompleteSuggestions.length ).toBeGreaterThan( 0 );
+		expect( autocompleteSuggestions ).toHaveLength( 1 );
 
 		const firstSuggestion = autocompleteSuggestions[ 0 ];
 
@@ -308,7 +308,9 @@ describe( 'Links', () => {
 	} );
 
 	// Test for regressions of https://github.com/WordPress/gutenberg/issues/10496.
-	it( 'allows autocomplete suggestions to be navigated with the keyboard', async () => {
+	// This test isn't reliable on Travis and fails from time to time.
+	// See: https://github.com/WordPress/gutenberg/pull/15211.
+	it.skip( 'allows autocomplete suggestions to be navigated with the keyboard', async () => {
 		const titleText = 'Test post keyboard';
 		const postURL = await createPostWithTitle( titleText );
 
@@ -330,7 +332,7 @@ describe( 'Links', () => {
 		const autocompleteSuggestions = await page.$x( `//*[contains(@class, "block-editor-url-input__suggestion")]//button[contains(text(), '${ titleText }')]` );
 
 		// Expect there to be some autocomplete suggestions.
-		expect( autocompleteSuggestions.length ).toBeGreaterThan( 0 );
+		expect( autocompleteSuggestions ).toHaveLength( 1 );
 
 		// Expect the the first suggestion to be selected when pressing the down arrow.
 		await page.keyboard.press( 'ArrowDown' );
@@ -499,6 +501,49 @@ describe( 'Links', () => {
 		await page.keyboard.press( 'Tab' );
 		// Submit the form.
 		await page.keyboard.press( 'Enter' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		// Regression Test: This verifies that the UI is updated according to
+		// the expected changed values, where previously the value could have
+		// fallen out of sync with how the UI is displayed (specifically for
+		// collapsed selections).
+		//
+		// See: https://github.com/WordPress/gutenberg/pull/15573
+
+		// Collapse selection.
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'ArrowRight' );
+		// Edit link.
+		await pressKeyWithModifier( 'primary', 'k' );
+		await waitForAutoFocus();
+		await pressKeyWithModifier( 'primary', 'a' );
+		await page.keyboard.type( 'wordpress.org' );
+		// Navigate to the settings toggle.
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Tab' );
+		// Open settings.
+		await page.keyboard.press( 'Space' );
+		// Navigate to the "Open in New Tab" checkbox.
+		await page.keyboard.press( 'Tab' );
+		// Uncheck the checkbox.
+		await page.keyboard.press( 'Space' );
+		// Navigate back to the input field.
+		await page.keyboard.press( 'Tab' );
+		// Submit the form.
+		await page.keyboard.press( 'Enter' );
+
+		// Navigate back to inputs to verify appears as changed.
+		await pressKeyWithModifier( 'primary', 'k' );
+		await waitForAutoFocus();
+		const link = await page.evaluate( () => document.activeElement.value );
+		expect( link ).toBe( 'http://wordpress.org' );
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Space' );
+		await page.keyboard.press( 'Tab' );
+		const isChecked = await page.evaluate( () => document.activeElement.checked );
+		expect( isChecked ).toBe( false );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );

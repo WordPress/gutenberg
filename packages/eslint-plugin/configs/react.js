@@ -9,8 +9,12 @@ module.exports = {
 	},
 	plugins: [
 		'react',
+		'react-hooks',
 	],
 	rules: {
+		'@wordpress/no-unused-vars-before-return': [ 'error', {
+			excludePattern: '^use',
+		} ],
 		'react/display-name': 'off',
 		'react/jsx-curly-spacing': [ 'error', {
 			when: 'always',
@@ -24,5 +28,6 @@ module.exports = {
 		'react/no-children-prop': 'off',
 		'react/prop-types': 'off',
 		'react/react-in-jsx-scope': 'off',
+		'react-hooks/rules-of-hooks': 'error',
 	},
 };

@@ -1,166 +1,37 @@
 /**
- * External dependencies
- */
-import { omit } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	createBlock,
-	getPhrasingContentSchema,
-	getBlockAttributes,
-} from '@wordpress/blocks';
-import { RichText } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
+import deprecated from './deprecated';
 import edit from './edit';
-import icon from './icon';
 import metadata from './block.json';
+import save from './save';
+import transforms from './transforms';
 
-const { name, attributes: schema } = metadata;
+const { name } = metadata;
 
 export { metadata, name };
 
-/**
- * Given a node name string for a heading node, returns its numeric level.
- *
- * @param {string} nodeName Heading node name.
- *
- * @return {number} Heading level.
- */
-export function getLevelFromHeadingNodeName( nodeName ) {
-	return Number( nodeName.substr( 1 ) );
-}
-
-const supports = {
-	className: false,
-	anchor: true,
-};
-
 export const settings = {
 	title: __( 'Heading' ),
-
 	description: __( 'Introduce new sections and organize content to help visitors (and search engines) understand the structure of your content.' ),
-
-	icon,
-
+	icon: 'heading',
 	keywords: [ __( 'title' ), __( 'subtitle' ) ],
-
-	supports,
-
-	transforms: {
-		from: [
-			{
-				type: 'block',
-				blocks: [ 'core/paragraph' ],
-				transform: ( { content } ) => {
-					return createBlock( 'core/heading', {
-						content,
-					} );
-				},
-			},
-			{
-				type: 'raw',
-				selector: 'h1,h2,h3,h4,h5,h6',
-				schema: {
-					h1: { children: getPhrasingContentSchema() },
-					h2: { children: getPhrasingContentSchema() },
-					h3: { children: getPhrasingContentSchema() },
-					h4: { children: getPhrasingContentSchema() },
-					h5: { children: getPhrasingContentSchema() },
-					h6: { children: getPhrasingContentSchema() },
-				},
-				transform( node ) {
-					return createBlock( 'core/heading', {
-						...getBlockAttributes(
-							'core/heading',
-							node.outerHTML
-						),
-						level: getLevelFromHeadingNodeName( node.nodeName ),
-					} );
-				},
-			},
-			...[ 2, 3, 4, 5, 6 ].map( ( level ) => ( {
-				type: 'prefix',
-				prefix: Array( level + 1 ).join( '#' ),
-				transform( content ) {
-					return createBlock( 'core/heading', {
-						level,
-						content,
-					} );
-				},
-			} ) ),
-		],
-		to: [
-			{
-				type: 'block',
-				blocks: [ 'core/paragraph' ],
-				transform: ( { content } ) => {
-					return createBlock( 'core/paragraph', {
-						content,
-					} );
-				},
-			},
-		],
+	supports: {
+		className: false,
+		anchor: true,
 	},
-
-	deprecated: [
-		{
-			supports,
-			attributes: {
-				...omit( schema, [ 'level' ] ),
-				nodeName: {
-					type: 'string',
-					source: 'property',
-					selector: 'h1,h2,h3,h4,h5,h6',
-					property: 'nodeName',
-					default: 'H2',
-				},
-			},
-			migrate( attributes ) {
-				const { nodeName, ...migratedAttributes } = attributes;
-
-				return {
-					...migratedAttributes,
-					level: getLevelFromHeadingNodeName( nodeName ),
-				};
-			},
-			save( { attributes } ) {
-				const { align, nodeName, content } = attributes;
-
-				return (
-					<RichText.Content
-						tagName={ nodeName.toLowerCase() }
-						style={ { textAlign: align } }
-						value={ content }
-					/>
-				);
-			},
-		},
-	],
-
+	transforms,
+	deprecated,
 	merge( attributes, attributesToMerge ) {
 		return {
 			content: ( attributes.content || '' ) + ( attributesToMerge.content || '' ),
 		};
 	},
-
 	edit,
-
-	save( { attributes } ) {
-		const { align, level, content } = attributes;
-		const tagName = 'h' + level;
-
-		return (
-			<RichText.Content
-				tagName={ tagName }
-				style={ { textAlign: align } }
-				value={ content }
-			/>
-		);
-	},
+	save,
 };

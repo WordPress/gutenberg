@@ -1,5 +1,26 @@
 # Git Workflow
 
+A good workflow for new contributors to follow is listed below:
+- Fork Gutenberg repository
+- Clone forked repository
+- Create a new branch
+- Make code changes
+- Commit code changes within the newly created branch
+- Push branch to forked repository
+- Submit Pull Request to Gutenberg repository
+
+Ideally name your branches with prefixes and descriptions, like this: `[type]/[change]`. A good prefix would be:
+
+- `add/` = add a new feature
+- `try/` = experimental feature, "tentatively add"
+- `update/` = update an existing feature
+
+For example, `add/gallery-block` means you're working on adding a new gallery block.
+
+You can pick among all the <a href="https://github.com/WordPress/gutenberg/issues">tickets</a>, or some of the ones labelled <a href="https://github.com/WordPress/gutenberg/labels/Good%20First%20Issue">Good First Issue</a>.
+
+The workflow is documented in greater detail in the [repository management](/docs/contributors/repository-management.md) document.
+
 ## Keeping Your Branch Up To Date
 
 When many different people are working on a project simultaneously, pull requests can go stale quickly. A "stale" pull request is one that is no longer up to date with the main line of development, and it needs to be updated before it can be merged into the project.

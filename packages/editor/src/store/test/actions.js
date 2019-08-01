@@ -4,10 +4,14 @@
 import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
 
 /**
+ * WordPress dependencies
+ */
+import { select, dispatch, apiFetch } from '@wordpress/data-controls';
+
+/**
  * Internal dependencies
  */
 import * as actions from '../actions';
-import { select, dispatch, apiFetch, resolveSelect } from '../controls';
 import {
 	STORE_KEY,
 	SAVE_POST_NOTICE_ID,
@@ -15,22 +19,19 @@ import {
 	POST_UPDATE_TRANSACTION_ID,
 } from '../constants';
 
-jest.mock( '../controls' );
+jest.mock( '@wordpress/data-controls' );
+jest.mock( '../block-sources' );
 
 select.mockImplementation( ( ...args ) => {
-	const { select: actualSelect } = jest.requireActual( '../controls' );
+	const { select: actualSelect } = jest
+		.requireActual( '@wordpress/data-controls' );
 	return actualSelect( ...args );
 } );
 
 dispatch.mockImplementation( ( ...args ) => {
-	const { dispatch: actualDispatch } = jest.requireActual( '../controls' );
+	const { dispatch: actualDispatch } = jest
+		.requireActual( '@wordpress/data-controls' );
 	return actualDispatch( ...args );
-} );
-
-resolveSelect.mockImplementation( ( ...args ) => {
-	const { resolveSelect: selectResolver } = jest
-		.requireActual( '../controls' );
-	return selectResolver( ...args );
 } );
 
 const apiFetchThrowError = ( error ) => {
@@ -43,7 +44,8 @@ const apiFetchThrowError = ( error ) => {
 const apiFetchDoActual = () => {
 	apiFetch.mockClear();
 	apiFetch.mockImplementation( ( ...args ) => {
-		const { apiFetch: fetch } = jest.requireActual( '../controls' );
+		const { apiFetch: fetch } = jest
+			.requireActual( '@wordpress/data-controls' );
 		return fetch( ...args );
 	} );
 };
@@ -55,7 +57,9 @@ const postType = {
 		item_published: 'Post published',
 	},
 };
+const postId = 44;
 const postTypeSlug = 'post';
+const userId = 1;
 
 describe( 'Post generator actions', () => {
 	describe( 'savePost()', () => {
@@ -63,6 +67,7 @@ describe( 'Post generator actions', () => {
 			edits,
 			currentPost,
 			currentPostStatus,
+			currentUser,
 			editPostToSendOptimistic,
 			autoSavePost,
 			autoSavePostToSend,
@@ -85,12 +90,14 @@ describe( 'Post generator actions', () => {
 				return postObject;
 			};
 			currentPost = () => ( {
-				id: 44,
+				id: postId,
+				type: postTypeSlug,
 				title: 'bar',
 				content: 'bar',
 				excerpt: 'crackers',
 				status: currentPostStatus,
 			} );
+			currentUser = { id: userId };
 			editPostToSendOptimistic = () => {
 				const postObject = {
 					...edits(),
@@ -106,13 +113,7 @@ describe( 'Post generator actions', () => {
 				return postObject;
 			};
 			autoSavePost = { status: 'autosave', bar: 'foo' };
-			autoSavePostToSend = () => (
-				{
-					...editPostToSendOptimistic(),
-					bar: 'foo',
-					status: 'autosave',
-				}
-			);
+			autoSavePostToSend = () => editPostToSendOptimistic();
 			savedPost = () => (
 				{
 					...currentPost(),
@@ -138,6 +139,7 @@ describe( 'Post generator actions', () => {
 			fulfillment.next( postType );
 			fulfillment.next();
 			if ( isAutosaving ) {
+				fulfillment.next( currentUser );
 				fulfillment.next();
 			} else {
 				fulfillment.next();
@@ -212,7 +214,7 @@ describe( 'Post generator actions', () => {
 				() => {
 					const { value } = fulfillment.next( postTypeSlug );
 					expect( value ).toEqual(
-						resolveSelect( 'core', 'getPostType', postTypeSlug )
+						select( 'core', 'getPostType', postTypeSlug )
 					);
 				},
 			],
@@ -273,14 +275,27 @@ describe( 'Post generator actions', () => {
 				},
 			],
 			[
-				'yield action for selecting the autoSavePost',
+				'yields action for selecting the currentUser',
 				( isAutosaving ) => isAutosaving,
 				() => {
 					const { value } = fulfillment.next();
 					expect( value ).toEqual(
+						select( 'core', 'getCurrentUser' )
+					);
+				},
+			],
+			[
+				'yields action for selecting the autosavePost',
+				( isAutosaving ) => isAutosaving,
+				() => {
+					const { value } = fulfillment.next( currentUser );
+					expect( value ).toEqual(
 						select(
-							STORE_KEY,
-							'getAutosave'
+							'core',
+							'getAutosave',
+							postTypeSlug,
+							postId,
+							userId
 						)
 					);
 				},
@@ -323,7 +338,7 @@ describe( 'Post generator actions', () => {
 						dispatch(
 							'core/notices',
 							'createErrorNotice',
-							...[ 'Updating failed', { id: 'SAVE_POST_NOTICE_ID' } ]
+							...[ 'Updating failed.', { id: 'SAVE_POST_NOTICE_ID' } ]
 						)
 					);
 				},
@@ -357,13 +372,12 @@ describe( 'Post generator actions', () => {
 				'yields action for dispatch the appropriate reset action',
 				() => {
 					const { value } = fulfillment.next( savedPost() );
-					expect( value ).toEqual(
-						dispatch(
-							STORE_KEY,
-							isAutosave ? 'resetAutosave' : 'resetPost',
-							savedPost()
-						)
-					);
+
+					if ( isAutosave ) {
+						expect( value ).toEqual( dispatch( 'core', 'receiveAutosaves', postId, savedPost() ) );
+					} else {
+						expect( value ).toEqual( dispatch( STORE_KEY, 'resetPost', savedPost() ) );
+					}
 				},
 			],
 			[
@@ -396,7 +410,7 @@ describe( 'Post generator actions', () => {
 							'createSuccessNotice',
 							...[
 								savedPostMessage,
-								{ actions: [], id: 'SAVE_POST_NOTICE_ID' },
+								{ actions: [], id: 'SAVE_POST_NOTICE_ID', type: 'snackbar' },
 							]
 						);
 					expect( value ).toEqual( expected );
@@ -521,7 +535,7 @@ describe( 'Post generator actions', () => {
 		);
 		it( 'yields expected action for selecting the post type object', () => {
 			const { value } = fulfillment.next( postTypeSlug );
-			expect( value ).toEqual( resolveSelect(
+			expect( value ).toEqual( select(
 				'core',
 				'getPostType',
 				postTypeSlug
@@ -599,7 +613,7 @@ describe( 'Post generator actions', () => {
 		} );
 		it( 'yields expected action for selecting the post type object', () => {
 			const { value } = fulfillment.next( postTypeSlug );
-			expect( value ).toEqual( resolveSelect(
+			expect( value ).toEqual( select(
 				'core',
 				'getPostType',
 				postTypeSlug
@@ -627,15 +641,24 @@ describe( 'Post generator actions', () => {
 
 describe( 'Editor actions', () => {
 	describe( 'setupEditor()', () => {
+		const post = { content: { raw: '' }, status: 'publish' };
+
 		let fulfillment;
-		const reset = ( post, edits, template ) => fulfillment = actions
+		const reset = ( edits, template ) => fulfillment = actions
 			.setupEditor(
 				post,
 				edits,
 				template,
 			);
+		beforeAll( () => {
+			reset();
+		} );
+
+		it( 'should yield action object for resetPost', () => {
+			const { value } = fulfillment.next();
+			expect( value ).toEqual( actions.resetPost( post ) );
+		} );
 		it( 'should yield the SETUP_EDITOR action', () => {
-			reset( { content: { raw: '' }, status: 'publish' } );
 			const { value } = fulfillment.next();
 			expect( value ).toEqual( {
 				type: 'SETUP_EDITOR',
@@ -662,17 +685,6 @@ describe( 'Editor actions', () => {
 			const result = actions.resetPost( post );
 			expect( result ).toEqual( {
 				type: 'RESET_POST',
-				post,
-			} );
-		} );
-	} );
-
-	describe( 'resetAutosave', () => {
-		it( 'should return the RESET_AUTOSAVE action', () => {
-			const post = {};
-			const result = actions.resetAutosave( post );
-			expect( result ).toEqual( {
-				type: 'RESET_AUTOSAVE',
 				post,
 			} );
 		} );

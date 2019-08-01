@@ -12,11 +12,27 @@ import * as plugins from './plugins';
 export { default as withSelect } from './components/with-select';
 export { default as withDispatch } from './components/with-dispatch';
 export { default as withRegistry } from './components/with-registry';
-export { default as RegistryProvider, RegistryConsumer } from './components/registry-provider';
-export { default as __experimentalAsyncModeProvider } from './components/async-mode-provider';
+export {
+	RegistryProvider,
+	RegistryConsumer,
+	useRegistry,
+} from './components/registry-provider';
+export { default as useSelect } from './components/use-select';
+export { useDispatch } from './components/use-dispatch';
+export {
+	AsyncModeProvider as __experimentalAsyncModeProvider,
+} from './components/async-mode-provider';
 export { createRegistry } from './registry';
-export { plugins };
 export { createRegistrySelector, createRegistryControl } from './factory';
+
+/**
+ * Object of available plugins to use with a registry.
+ *
+ * @see [use](#use)
+ *
+ * @type {Object}
+ */
+export { plugins };
 
 /**
  * The combineReducers helper function turns an object whose values are different
@@ -79,6 +95,9 @@ export const select = defaultRegistry.select;
  * Given the name of a registered store, returns an object of the store's action creators.
  * Calling an action creator will cause it to be dispatched, updating the state value accordingly.
  *
+ * Note: Action creators returned by the dispatch will return a promise when
+ * they are called.
+ *
  * @param {string} name Store name
  *
  * @example
@@ -130,4 +149,12 @@ export const registerGenericStore = defaultRegistry.registerGenericStore;
  * @return {Object} Registered store object.
  */
 export const registerStore = defaultRegistry.registerStore;
+
+/**
+ * Extends a registry to inherit functionality provided by a given plugin. A
+ * plugin is an object with properties aligning to that of a registry, merged
+ * to extend the default registry behavior.
+ *
+ * @param {Object} plugin Plugin object.
+ */
 export const use = defaultRegistry.use;

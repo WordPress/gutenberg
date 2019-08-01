@@ -199,6 +199,9 @@ class ObserveTyping extends Component {
 	}
 }
 
+/**
+ * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/observe-typing/README.md
+ */
 export default compose( [
 	withSelect( ( select ) => {
 		const { isTyping } = select( 'core/block-editor' );

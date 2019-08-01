@@ -107,9 +107,8 @@ const getWrapperForProps = ( propOverrides ) => {
 
 const initializeMenuDefaultStateAndReturnElement = ( propOverrides ) => {
 	const wrapper = getWrapperForProps( propOverrides );
-	/* eslint-disable react/no-find-dom-node */
+	// eslint-disable-next-line react/no-find-dom-node
 	return ReactDOM.findDOMNode( wrapper );
-	/* eslint-enable react/no-find-dom-node */
 };
 
 const initializeAllClosedMenuStateAndReturnElement = ( propOverrides ) => {

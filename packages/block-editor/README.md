@@ -16,7 +16,7 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 
 ```js
 import {
-	BlockEditorProvider
+	BlockEditorProvider,
 	BlockList
 } from '@wordpress/block-editor';
 import { useState } from '@wordpress/element';
@@ -56,7 +56,7 @@ In the example above, there's no registered block type, in order to use the bloc
 ```js
 import { registerCoreBlocks } from '@wordpress/block-library';
 
-registerCoreBlockTypes();
+registerCoreBlocks();
 
 // Make sure to load the block stylesheets too
 // import '@wordpress/block-library/build-style/style.css';
@@ -74,7 +74,9 @@ Undocumented declaration.
 
 <a name="Autocomplete" href="#Autocomplete">#</a> **Autocomplete**
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/autocomplete/README.md>
 
 <a name="BlockAlignmentToolbar" href="#BlockAlignmentToolbar">#</a> **BlockAlignmentToolbar**
 
@@ -138,7 +140,15 @@ Undocumented declaration.
 
 <a name="BlockVerticalAlignmentToolbar" href="#BlockVerticalAlignmentToolbar">#</a> **BlockVerticalAlignmentToolbar**
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/block-vertical-alignment-toolbar/README.md>
+
+<a name="ButtonBlockerAppender" href="#ButtonBlockerAppender">#</a> **ButtonBlockerAppender**
+
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/button-block-appender/README.md>
 
 <a name="ColorPalette" href="#ColorPalette">#</a> **ColorPalette**
 
@@ -198,7 +208,7 @@ _Parameters_
 
 _Returns_
 
--   `string`: String with the class corresponding to the color in the provided context.
+-   `?string`: String with the class corresponding to the color in the provided context. Returns undefined if either colorContextName or colorSlug are not provided.
 
 <a name="getColorObjectByAttributeValues" href="#getColorObjectByAttributeValues">#</a> **getColorObjectByAttributeValues**
 
@@ -213,7 +223,7 @@ _Parameters_
 
 _Returns_
 
--   `?string`: If definedColor is passed and the name is found in colors, the color object exactly as set by the theme or editor defaults is returned. Otherwise, an object that just sets the color is defined.
+-   `?Object`: If definedColor is passed and the name is found in colors, the color object exactly as set by the theme or editor defaults is returned. Otherwise, an object that just sets the color is defined.
 
 <a name="getColorObjectByColorValue" href="#getColorObjectByColorValue">#</a> **getColorObjectByColorValue**
 
@@ -226,7 +236,7 @@ _Parameters_
 
 _Returns_
 
--   `?string`: Returns the color object included in the colors array whose color property equals colorValue. Returns undefined if no color object matches this requirement.
+-   `?Object`: Color object included in the colors array whose color property equals colorValue. Returns undefined if no color object matches this requirement.
 
 <a name="getFontSize" href="#getFontSize">#</a> **getFontSize**
 
@@ -257,7 +267,9 @@ _Returns_
 
 <a name="InnerBlocks" href="#InnerBlocks">#</a> **InnerBlocks**
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/inner-blocks/README.md>
 
 <a name="Inserter" href="#Inserter">#</a> **Inserter**
 
@@ -269,19 +281,27 @@ Undocumented declaration.
 
 <a name="InspectorControls" href="#InspectorControls">#</a> **InspectorControls**
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/inspector-controls/README.md>
 
 <a name="MediaPlaceholder" href="#MediaPlaceholder">#</a> **MediaPlaceholder**
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/media-placeholder/README.md>
 
 <a name="MediaUpload" href="#MediaUpload">#</a> **MediaUpload**
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/media-upload/README.md>
 
 <a name="MediaUploadCheck" href="#MediaUploadCheck">#</a> **MediaUploadCheck**
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/media-upload/README.md>
 
 <a name="MultiBlocksSwitcher" href="#MultiBlocksSwitcher">#</a> **MultiBlocksSwitcher**
 
@@ -297,7 +317,9 @@ Undocumented declaration.
 
 <a name="ObserveTyping" href="#ObserveTyping">#</a> **ObserveTyping**
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/observe-typing/README.md>
 
 <a name="PanelColorSettings" href="#PanelColorSettings">#</a> **PanelColorSettings**
 
@@ -305,7 +327,9 @@ Undocumented declaration.
 
 <a name="PlainText" href="#PlainText">#</a> **PlainText**
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/plain-text/README.md>
 
 <a name="PreserveScrollInReorder" href="#PreserveScrollInReorder">#</a> **PreserveScrollInReorder**
 
@@ -313,7 +337,9 @@ Undocumented declaration.
 
 <a name="RichText" href="#RichText">#</a> **RichText**
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/rich-text/README.md>
 
 <a name="RichTextShortcut" href="#RichTextShortcut">#</a> **RichTextShortcut**
 
@@ -327,38 +353,71 @@ Undocumented declaration.
 
 The default editor settings
 
- alignWide                     boolean       Enable/Disable Wide/Full Alignments
- availableLegacyWidgets        Array         Array of objects representing the legacy widgets available.
- colors                        Array         Palette colors
- disableCustomColors           boolean       Whether or not the custom colors are disabled
- fontSizes                     Array         Available font sizes
- disableCustomFontSizes        boolean       Whether or not the custom font sizes are disabled
- imageSizes                    Array         Available image sizes
- maxWidth                      number        Max width to constraint resizing
- allowedBlockTypes             boolean|Array Allowed block types
- hasFixedToolbar               boolean       Whether or not the editor toolbar is fixed
- hasPermissionsToManageWidgets boolean       Whether or not the user is able to manage widgets.
- focusMode                     boolean       Whether the focus mode is enabled or not
- styles                        Array         Editor Styles
- isRTL                         boolean       Whether the editor is in RTL mode
- bodyPlaceholder               string        Empty post placeholder
- titlePlaceholder              string        Empty title placeholder
+ alignWide                              boolean       Enable/Disable Wide/Full Alignments
+ availableLegacyWidgets                 Array         Array of objects representing the legacy widgets available.
+ colors                                 Array         Palette colors
+ disableCustomColors                    boolean       Whether or not the custom colors are disabled
+ fontSizes                              Array         Available font sizes
+ disableCustomFontSizes                 boolean       Whether or not the custom font sizes are disabled
+ imageSizes                             Array         Available image sizes
+ maxWidth                               number        Max width to constraint resizing
+ allowedBlockTypes                      boolean|Array Allowed block types
+ hasFixedToolbar                        boolean       Whether or not the editor toolbar is fixed
+ hasPermissionsToManageWidgets          boolean       Whether or not the user is able to manage widgets.
+ focusMode                              boolean       Whether the focus mode is enabled or not
+ styles                                 Array         Editor Styles
+ isRTL                                  boolean       Whether the editor is in RTL mode
+ bodyPlaceholder                        string        Empty post placeholder
+ titlePlaceholder                       string        Empty title placeholder
+ codeEditingEnabled                     string        Whether or not the user can switch to the code editor
+ \_\_experimentalCanUserUseUnfilteredHTML string        Whether the user should be able to use unfiltered HTML or the HTML should be filtered e.g., to remove elements considered insecure like iframes.
 
 <a name="SkipToSelectedBlock" href="#SkipToSelectedBlock">#</a> **SkipToSelectedBlock**
 
 Undocumented declaration.
 
+<a name="storeConfig" href="#storeConfig">#</a> **storeConfig**
+
+Block editor data store configuration.
+
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#registerStore>
+
+_Type_
+
+-   `Object` 
+
+<a name="transformStyles" href="#transformStyles">#</a> **transformStyles**
+
+Applies a series of CSS rule transforms to wrap selectors inside a given class and/or rewrite URLs depending on the parameters passed.
+
+_Parameters_
+
+-   _styles_ `Array`: CSS rules.
+-   _wrapperClassName_ `string`: Wrapper Class Name.
+
+_Returns_
+
+-   `Array`: converted rules.
+
 <a name="URLInput" href="#URLInput">#</a> **URLInput**
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/url-input/README.md>
 
 <a name="URLInputButton" href="#URLInputButton">#</a> **URLInputButton**
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/url-input/README.md>
 
 <a name="URLPopover" href="#URLPopover">#</a> **URLPopover**
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/url-popover/README.md>
 
 <a name="Warning" href="#Warning">#</a> **Warning**
 

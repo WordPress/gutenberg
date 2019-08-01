@@ -1,5 +1,7 @@
 .block-editor-block-list__block[data-type="core/nextpage"] {
 	max-width: 100%;
+	margin-top: $default-block-margin;
+	margin-bottom: $default-block-margin;
 }
 
 .wp-block-nextpage {

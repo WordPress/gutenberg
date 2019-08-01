@@ -1,14 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { IconButton, ResizableBox, Toolbar } from '@wordpress/components';
+import { IconButton, ResizableBox, Toolbar, withNotices } from '@wordpress/components';
 import {
 	BlockControls,
 	BlockIcon,
 	MediaPlaceholder,
 	MediaUpload,
 } from '@wordpress/block-editor';
-import { Component, Fragment } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -31,6 +31,17 @@ export function imageFillStyles( url, focalPoint ) {
 }
 
 class MediaContainer extends Component {
+	constructor() {
+		super( ...arguments );
+		this.onUploadError = this.onUploadError.bind( this );
+	}
+
+	onUploadError( message ) {
+		const { noticeOperations } = this.props;
+		noticeOperations.removeAllNotices();
+		noticeOperations.createErrorNotice( message );
+	}
+
 	renderToolbarEditButton() {
 		const { mediaId, onSelectMedia } = this.props;
 		return (
@@ -58,29 +69,29 @@ class MediaContainer extends Component {
 		const { mediaAlt, mediaUrl, className, imageFill, focalPoint } = this.props;
 		const backgroundStyles = imageFill ? imageFillStyles( mediaUrl, focalPoint ) : {};
 		return (
-			<Fragment>
+			<>
 				{ this.renderToolbarEditButton() }
 				<figure className={ className } style={ backgroundStyles }>
 					<img src={ mediaUrl } alt={ mediaAlt } />
 				</figure>
-			</Fragment>
+			</>
 		);
 	}
 
 	renderVideo() {
 		const { mediaUrl, className } = this.props;
 		return (
-			<Fragment>
+			<>
 				{ this.renderToolbarEditButton() }
 				<figure className={ className }>
 					<video controls src={ mediaUrl } />
 				</figure>
-			</Fragment>
+			</>
 		);
 	}
 
 	renderPlaceholder() {
-		const { onSelectMedia, className } = this.props;
+		const { onSelectMedia, className, noticeUI } = this.props;
 		return (
 			<MediaPlaceholder
 				icon={ <BlockIcon icon={ icon } /> }
@@ -91,6 +102,8 @@ class MediaContainer extends Component {
 				onSelect={ onSelectMedia }
 				accept="image/*,video/*"
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
+				notices={ noticeUI }
+				onError={ this.onUploadError }
 			/>
 		);
 	}
@@ -137,4 +150,4 @@ class MediaContainer extends Component {
 	}
 }
 
-export default MediaContainer;
+export default withNotices( MediaContainer );

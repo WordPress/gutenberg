@@ -100,7 +100,7 @@ describe( 'Preview', () => {
 
 		// When autosave completes for a new post, the URL of the editor should
 		// update to include the ID. Use this to assert on preview URL.
-		const [ , postId ] = await( await editorPage.waitForFunction( () => {
+		const [ , postId ] = await ( await editorPage.waitForFunction( () => {
 			return window.location.search.match( /[\?&]post=(\d+)/ );
 		} ) ).jsonValue();
 
@@ -199,7 +199,7 @@ describe( 'Preview', () => {
 	} );
 } );
 
-describe( 'Preview with Custom Fields enabled', async () => {
+describe( 'Preview with Custom Fields enabled', () => {
 	beforeEach( async () => {
 		await createNewPost();
 		await toggleCustomFieldsOption( true );
@@ -217,6 +217,11 @@ describe( 'Preview with Custom Fields enabled', async () => {
 		await editorPage.type( '.editor-post-title__input', 'title 1' );
 		await editorPage.keyboard.press( 'Tab' );
 		await editorPage.keyboard.type( 'content 1' );
+
+		// Publish the post and then close the publish panel.
+		await publishPost();
+		await page.waitForSelector( '.editor-post-publish-panel' );
+		await page.click( '.editor-post-publish-panel__header button' );
 
 		// Open the preview page.
 		const previewPage = await openPreviewPage( editorPage );

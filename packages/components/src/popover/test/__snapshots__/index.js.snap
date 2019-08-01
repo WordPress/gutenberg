@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Popover #render() should pass additional props to portaled element 1`] = `
+exports[`Popover should pass additional props to portaled element 1`] = `
 <span>
   <div
     tabindex="-1"
@@ -23,7 +23,7 @@ exports[`Popover #render() should pass additional props to portaled element 1`] 
 </span>
 `;
 
-exports[`Popover #render() should render content 1`] = `
+exports[`Popover should render content 1`] = `
 <span>
   <div
     tabindex="-1"

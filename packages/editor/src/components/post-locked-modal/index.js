@@ -121,9 +121,13 @@ class PostLockedModal extends Component {
 		data.append( 'post_ID', postId );
 		data.append( 'active_post_lock', activePostLock );
 
-		const xhr = new window.XMLHttpRequest();
-		xhr.open( 'POST', postLockUtils.ajaxUrl, false );
-		xhr.send( data );
+		if ( window.navigator.sendBeacon ) {
+			window.navigator.sendBeacon( postLockUtils.ajaxUrl, data );
+		} else {
+			const xhr = new window.XMLHttpRequest();
+			xhr.open( 'POST', postLockUtils.ajaxUrl, false );
+			xhr.send( data );
+		}
 	}
 
 	render() {

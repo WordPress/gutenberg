@@ -24,11 +24,17 @@ import * as metadataSelectors from './metadata/selectors';
 import * as metadataActions from './metadata/actions';
 
 /**
+ * @typedef {import('../registry').WPDataRegistry} WPDataRegistry
+ */
+
+/**
  * Creates a namespace object with a store derived from the reducer given.
  *
- * @param {string} key              Identifying string used for namespace and redex dev tools.
- * @param {Object} options          Contains reducer, actions, selectors, and resolvers.
- * @param {Object} registry         Registry reference.
+ * @param {string}         key      Unique namespace identifier.
+ * @param {Object}         options  Registered store options, with properties
+ *                                  describing reducer, actions, selectors, and
+ *                                  resolvers.
+ * @param {WPDataRegistry} registry Registry reference.
  *
  * @return {Object} Store Object.
  */
@@ -45,16 +51,12 @@ export default function createNamespace( key, options, registry ) {
 		...mapValues( metadataSelectors, ( selector ) => ( state, ...args ) => selector( state.metadata, ...args ) ),
 		...mapValues( options.selectors, ( selector ) => {
 			if ( selector.isRegistrySelector ) {
-				const mappedSelector = ( reg ) => ( state, ...args ) => {
-					return selector( reg )( state.root, ...args );
-				};
-				mappedSelector.isRegistrySelector = selector.isRegistrySelector;
-				return mappedSelector;
+				selector.registry = registry;
 			}
 
 			return ( state, ...args ) => selector( state.root, ...args );
 		} ),
-	}, store, registry );
+	}, store );
 	if ( options.resolvers ) {
 		const result = mapResolvers( options.resolvers, selectors, store );
 		resolvers = result.resolvers;
@@ -102,10 +104,11 @@ export default function createNamespace( key, options, registry ) {
 /**
  * Creates a redux store for a namespace.
  *
- * @param {string} key      Part of the state shape to register the
- *                          selectors for.
- * @param {Object} options  Registered store options.
- * @param {Object} registry Registry reference, for resolver enhancer support.
+ * @param {string}         key      Unique namespace identifier.
+ * @param {Object}         options  Registered store options, with properties
+ *                                  describing reducer, actions, selectors, and
+ *                                  resolvers.
+ * @param {WPDataRegistry} registry Registry reference.
  *
  * @return {Object} Newly created redux store.
  */
@@ -143,21 +146,18 @@ function createReduxStore( key, options, registry ) {
 }
 
 /**
- * Maps selectors to a redux store.
+ * Maps selectors to a store.
  *
- * @param {Object} selectors  Selectors to register. Keys will be used as the
- *                            public facing API. Selectors will get passed the
- *                            state as first argument.
- * @param {Object} store      The redux store to which the selectors should be mapped.
- * @param {Object} registry   Registry reference.
+ * @param {Object} selectors Selectors to register. Keys will be used as the
+ *                           public facing API. Selectors will get passed the
+ *                           state as first argument.
+ * @param {Object} store     The store to which the selectors should be mapped.
  *
- * @return {Object}           Selectors mapped to the redux store provided.
+ * @return {Object} Selectors mapped to the provided store.
  */
-function mapSelectors( selectors, store, registry ) {
-	const createStateSelector = ( registeredSelector ) => {
-		const selector = registeredSelector.isRegistrySelector ? registeredSelector( registry.select ) : registeredSelector;
-
-		return function runSelector() {
+function mapSelectors( selectors, store ) {
+	const createStateSelector = ( registrySelector ) => {
+		const selector = function runSelector() {
 			// This function is an optimized implementation of:
 			//
 			//   selector( store.getState(), ...arguments )
@@ -172,8 +172,10 @@ function mapSelectors( selectors, store, registry ) {
 				args[ i + 1 ] = arguments[ i ];
 			}
 
-			return selector( ...args );
+			return registrySelector( ...args );
 		};
+		selector.hasResolver = false;
+		return selector;
 	};
 
 	return mapValues( selectors, createStateSelector );
@@ -188,7 +190,7 @@ function mapSelectors( selectors, store, registry ) {
  */
 function mapActions( actions, store ) {
 	const createBoundAction = ( action ) => ( ...args ) => {
-		store.dispatch( action( ...args ) );
+		return Promise.resolve( store.dispatch( action( ...args ) ) );
 	};
 
 	return mapValues( actions, createBoundAction );
@@ -213,10 +215,11 @@ function mapResolvers( resolvers, selectors, store ) {
 	const mapSelector = ( selector, selectorName ) => {
 		const resolver = resolvers[ selectorName ];
 		if ( ! resolver ) {
+			selector.hasResolver = false;
 			return selector;
 		}
 
-		return ( ...args ) => {
+		const selectorResolver = ( ...args ) => {
 			async function fulfillSelector() {
 				const state = store.getState();
 				if ( typeof resolver.isFulfilled === 'function' && resolver.isFulfilled( state, ...args ) ) {
@@ -236,6 +239,8 @@ function mapResolvers( resolvers, selectors, store ) {
 			fulfillSelector( ...args );
 			return selector( ...args );
 		};
+		selectorResolver.hasResolver = true;
+		return selectorResolver;
 	};
 
 	return {

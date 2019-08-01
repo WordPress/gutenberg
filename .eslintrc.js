@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-const { escapeRegExp, map } = require( 'lodash' );
+const { escapeRegExp } = require( 'lodash' );
 
 /**
  * Internal dependencies
@@ -34,41 +34,32 @@ module.exports = {
 				message: 'Path access on WordPress dependencies is not allowed.',
 			},
 			{
+				selector: 'ImportDeclaration[source.value=/^react-spring(?!\\u002Fweb\.cjs)/]',
+				message: 'The react-spring dependency must specify CommonJS bundle: react-spring/web.cjs',
+			},
+			{
 				selector: 'CallExpression[callee.name="deprecated"] Property[key.name="version"][value.value=/' + majorMinorRegExp + '/]',
 				message: 'Deprecated functions must be removed before releasing this version.',
 			},
 			{
-				// Builds a selector which handles CallExpression with path
-				// argument at varied position by function.
-				//
-				// See: https://github.com/WordPress/gutenberg/pull/9615
-				selector: map( {
-					1: [
-						'property',
-						'matchesProperty',
-						'path',
-					],
-					2: [
-						'invokeMap',
-						'get',
-						'has',
-						'hasIn',
-						'invoke',
-						'result',
-						'set',
-						'setWith',
-						'unset',
-						'update',
-						'updateWith',
-					],
-				}, ( functionNames, argPosition ) => (
-					`CallExpression[callee.name=/^(${ functionNames.join( '|' ) })$/] > Literal:nth-child(${ argPosition })`
-				) ).join( ',' ),
-				message: 'Always pass an array as the path argument',
+				selector: 'CallExpression[callee.name=/^(__|_n|_nx|_x)$/]:not([arguments.0.type=/^Literal|BinaryExpression$/])',
+				message: 'Translate function arguments must be string literals.',
+			},
+			{
+				selector: 'CallExpression[callee.name=/^(_n|_nx|_x)$/]:not([arguments.1.type=/^Literal|BinaryExpression$/])',
+				message: 'Translate function arguments must be string literals.',
+			},
+			{
+				selector: 'CallExpression[callee.name=_nx]:not([arguments.3.type=/^Literal|BinaryExpression$/])',
+				message: 'Translate function arguments must be string literals.',
 			},
 			{
 				selector: 'CallExpression[callee.name=/^(__|_x|_n|_nx)$/] Literal[value=/\\.{3}/]',
 				message: 'Use ellipsis character (…) in place of three dots',
+			},
+			{
+				selector: 'ImportDeclaration[source.value="redux"] Identifier.imported[name="combineReducers"]',
+				message: 'Use `combineReducers` from `@wordpress/data`',
 			},
 			{
 				selector: 'ImportDeclaration[source.value="lodash"] Identifier.imported[name="memoize"]',

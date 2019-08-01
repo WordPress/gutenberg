@@ -464,6 +464,38 @@ describe( 'createRegistry', () => {
 
 			expect( registry.select( 'reducer2' ).selector2() ).toEqual( 'result1' );
 		} );
+
+		it( 'should run the registry selector from a non-registry selector', () => {
+			const selector1 = () => 'result1';
+			const selector2 = createRegistrySelector( ( select ) => () =>
+				select( 'reducer1' ).selector1()
+			);
+			const selector3 = () => selector2();
+			registry.registerStore( 'reducer1', {
+				reducer: () => 'state1',
+				selectors: {
+					selector1,
+				},
+			} );
+			registry.registerStore( 'reducer2', {
+				reducer: () => 'state1',
+				selectors: {
+					selector2,
+					selector3,
+				},
+			} );
+
+			expect( registry.select( 'reducer2' ).selector3() ).toEqual( 'result1' );
+		} );
+
+		it( 'gracefully stubs select on selector calls', () => {
+			const selector = createRegistrySelector( ( select ) => () => select );
+
+			const maybeSelect = selector();
+
+			expect( maybeSelect ).toEqual( expect.any( Function ) );
+			expect( maybeSelect() ).toEqual( expect.any( Object ) );
+		} );
 	} );
 
 	describe( 'subscribe', () => {
@@ -541,7 +573,7 @@ describe( 'createRegistry', () => {
 	} );
 
 	describe( 'dispatch', () => {
-		it( 'registers actions to the public API', () => {
+		it( 'registers actions to the public API', async () => {
 			const increment = ( count = 1 ) => ( { type: 'increment', count } );
 			const store = registry.registerStore( 'counter', {
 				reducer: ( state = 0, action ) => {
@@ -554,9 +586,14 @@ describe( 'createRegistry', () => {
 					increment,
 				},
 			} );
-
-			const dispatchResult = registry.dispatch( 'counter' ).increment(); // state = 1
-			expect( dispatchResult ).toBe( undefined ); // Actions are implementation detail.
+			// state = 1
+			const dispatchResult = await registry.dispatch( 'counter' ).increment();
+			await expect( dispatchResult ).toEqual(
+				{
+					type: 'increment',
+					count: 1,
+				}
+			);
 			registry.dispatch( 'counter' ).increment( 4 ); // state = 5
 			expect( store.getState() ).toBe( 5 );
 		} );

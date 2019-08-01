@@ -10,7 +10,6 @@ import { __ } from '@wordpress/i18n';
 import { getBlockType, getUnregisteredTypeHandlerName } from '@wordpress/blocks';
 import { PanelBody } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
-import { Fragment } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -21,8 +20,14 @@ import InspectorControls from '../inspector-controls';
 import InspectorAdvancedControls from '../inspector-advanced-controls';
 import BlockStyles from '../block-styles';
 import MultiSelectionInspector from '../multi-selection-inspector';
-
-const BlockInspector = ( { selectedBlockClientId, selectedBlockName, blockType, count, hasBlockStyles } ) => {
+const BlockInspector = ( {
+	blockType,
+	count,
+	hasBlockStyles,
+	selectedBlockClientId,
+	selectedBlockName,
+	showNoBlockSelectedMessage = true,
+} ) => {
 	if ( count > 1 ) {
 		return <MultiSelectionInspector />;
 	}
@@ -34,11 +39,18 @@ const BlockInspector = ( { selectedBlockClientId, selectedBlockName, blockType, 
 	 * because we want the user to focus on the unregistered block warning, not block settings.
 	 */
 	if ( ! blockType || ! selectedBlockClientId || isSelectedBlockUnregistered ) {
-		return <span className="editor-block-inspector__no-blocks block-editor-block-inspector__no-blocks">{ __( 'No block selected.' ) }</span>;
+		if ( showNoBlockSelectedMessage ) {
+			return (
+				<span className="editor-block-inspector__no-blocks block-editor-block-inspector__no-blocks">
+					{ __( 'No block selected.' ) }
+				</span>
+			);
+		}
+		return null;
 	}
 
 	return (
-		<Fragment>
+		<>
 			<div className="editor-block-inspector__card block-editor-block-inspector__card">
 				<BlockIcon icon={ blockType.icon } showColors />
 				<div className="editor-block-inspector__card-content block-editor-block-inspector__card-content">
@@ -73,7 +85,7 @@ const BlockInspector = ( { selectedBlockClientId, selectedBlockName, blockType, 
 				</InspectorAdvancedControls.Slot>
 			</div>
 			<SkipToSelectedBlock key="back" />
-		</Fragment>
+		</>
 	);
 };
 

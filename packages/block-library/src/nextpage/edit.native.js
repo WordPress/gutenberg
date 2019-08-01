@@ -7,26 +7,35 @@ import Hr from 'react-native-hr';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import styles from './editor.scss';
 
-export default function NextPageEdit( { attributes } ) {
+export default function NextPageEdit( { attributes, isSelected, onFocus } ) {
 	const { customText = __( 'Page break' ) } = attributes;
-	// Setting the font here to keep the CSS linter happy, it was demanding a syntax
-	// that React Native wasn't able to handle (adding a fallback generic font family).
-	const textStyle = {
-		...styles[ 'block-library-nextpage__text' ],
-		fontFamily: 'System',
-	};
+	const accessibilityTitle = attributes.customText || '';
+	const accessibilityState = isSelected ? [ 'selected' ] : [];
 
 	return (
-		<View style={ styles[ 'block-library-nextpage__container' ] }>
+		<View
+			accessible
+			accessibilityLabel={
+				sprintf(
+					/* translators: accessibility text. %s: Page break text. */
+					__( 'Page break block. %s' ),
+					accessibilityTitle
+				)
+			}
+			accessibilityStates={ accessibilityState }
+			onAccessibilityTap={ onFocus }
+		>
 			<Hr text={ customText }
-				textStyle={ textStyle }
+				marginLeft={ 0 }
+				marginRight={ 0 }
+				textStyle={ styles[ 'block-library-nextpage__text' ] }
 				lineStyle={ styles[ 'block-library-nextpage__line' ] } />
 		</View>
 	);

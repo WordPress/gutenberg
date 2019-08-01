@@ -1,0 +1,37 @@
+{
+	"name": "@wordpress/server-side-render",
+	"version": "1.0.0",
+	"description": "The component used with WordPress to server-side render a preview of dynamic blocks to display in the editor.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"server-side",
+		"render"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/server-side-render/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/server-side-render"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"react-native": "src/index",
+	"dependencies": {
+		"@babel/runtime": "^7.4.4",
+		"@wordpress/api-fetch": "file:../api-fetch",
+		"@wordpress/components": "file:../components",
+		"@wordpress/data": "file:../data",
+		"@wordpress/element": "file:../element",
+		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/url": "file:../url",
+		"lodash": "^4.17.14"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

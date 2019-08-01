@@ -27,15 +27,6 @@ describe( 'RichText', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	it( 'should apply formatting with access shortcut', async () => {
-		await clickBlockAppender();
-		await page.keyboard.type( 'test' );
-		await pressKeyWithModifier( 'primary', 'a' );
-		await pressKeyWithModifier( 'access', 'd' );
-
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-	} );
-
 	it( 'should apply formatting with primary shortcut', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'test' );
@@ -205,6 +196,21 @@ describe( 'RichText', () => {
 		// There should be no selection. The following should insert "-" without
 		// deleting the numbers.
 		await page.keyboard.type( '-' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should handle Home and End keys', async () => {
+		await page.keyboard.press( 'Enter' );
+
+		await pressKeyWithModifier( 'primary', 'b' );
+		await page.keyboard.type( '12' );
+		await pressKeyWithModifier( 'primary', 'b' );
+
+		await page.keyboard.press( 'Home' );
+		await page.keyboard.type( '-' );
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( '+' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );

@@ -2,7 +2,6 @@ $blocks-button__height: 56px;
 
 .wp-block-button {
 	color: $white;
-	margin-bottom: 1.5em;
 
 	&.aligncenter {
 		text-align: center;
@@ -27,7 +26,6 @@ $blocks-button__height: 56px;
 	padding: 12px 24px;
 	text-align: center;
 	text-decoration: none;
-	white-space: normal;
 	overflow-wrap: break-word;
 
 	&:hover,
@@ -47,6 +45,6 @@ $blocks-button__height: 56px;
 
 	.wp-block-button__link {
 		background-color: transparent;
-		border: 2px solid currentcolor;
+		border: 2px solid;
 	}
 }

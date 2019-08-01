@@ -1,0 +1,33 @@
+.block-editor-button-block-appender {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: $block-padding*1.5;
+	outline: $border-width dashed $dark-gray-150;
+	width: 100%;
+	color: $dark-gray-500;
+	background: $light-opacity-background-fill;
+
+	&:hover,
+	&:focus {
+		outline: $border-width dashed $dark-gray-500;
+		color: $dark-gray-900;
+	}
+
+	&:active {
+		outline: $border-width dashed $dark-gray-900;
+		color: $dark-gray-900;
+	}
+
+	// Use opacity to work in various editor styles
+	.is-dark-theme & {
+		background: $dark-opacity-background-fill;
+		color: $light-gray-100;
+
+		&:hover,
+		&:focus {
+			outline: $border-width dashed $white;
+		}
+	}
+}

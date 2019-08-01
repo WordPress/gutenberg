@@ -14,4 +14,7 @@ const InspectorControls = ifBlockEditSelected( Fill );
 
 InspectorControls.Slot = Slot;
 
+/**
+ * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/inspector-controls/README.md
+ */
 export default InspectorControls;

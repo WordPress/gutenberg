@@ -123,6 +123,13 @@ Opt-in prop to show popovers fullscreen on mobile, pass `false` in this prop to 
  - Required: No
  - Default: `false`
 
+### anchorRect
+
+A custom `DOMRect` object at which to position the popover.
+
+- Type: `DOMRect`
+- Required: No
+
 ## Methods
 
 ### refresh

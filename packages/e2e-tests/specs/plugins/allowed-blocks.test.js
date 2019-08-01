@@ -24,13 +24,18 @@ describe( 'Allowed Blocks Filter', () => {
 	it( 'should restrict the allowed blocks in the inserter', async () => {
 		// The paragraph block is available.
 		await searchForBlock( 'Paragraph' );
-		const paragraphBlock = await page.$( `button[aria-label="Paragraph"]` );
-		expect( paragraphBlock ).not.toBeNull();
-		await paragraphBlock.click();
+		const paragraphBlockButton = ( await page.$x(
+			`//button//span[contains(text(), 'Paragraph')]`
+		) )[ 0 ];
+		expect( paragraphBlockButton ).not.toBeNull();
+		await paragraphBlockButton.click();
 
 		// The gallery block is not available.
 		await searchForBlock( 'Gallery' );
-		const galleryBlock = await page.$( `button[aria-label="Gallery"]` );
-		expect( galleryBlock ).toBeNull();
+
+		const galleryBlockButton = ( await page.$x(
+			`//button//span[contains(text(), 'Gallery')]`
+		) )[ 0 ];
+		expect( galleryBlockButton ).toBeUndefined();
 	} );
 } );

@@ -6,18 +6,19 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Fragment } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/block-editor';
 import { BaseControl, PanelBody, ResizableBox } from '@wordpress/components';
 import { withInstanceId } from '@wordpress/compose';
 
-const SpacerEdit = ( { attributes, isSelected, setAttributes, toggleSelection, instanceId } ) => {
+const SpacerEdit = ( { attributes, isSelected, setAttributes, instanceId } ) => {
 	const { height } = attributes;
 	const id = `block-spacer-height-input-${ instanceId }`;
+	const [ inputHeightValue, setInputHeightValue ] = useState( height );
 
 	return (
-		<Fragment>
+		<>
 			<ResizableBox
 				className={ classnames(
 					'block-library-spacer__resize-container',
@@ -38,13 +39,11 @@ const SpacerEdit = ( { attributes, isSelected, setAttributes, toggleSelection, i
 					topLeft: false,
 				} }
 				onResizeStop={ ( event, direction, elt, delta ) => {
+					const spacerHeight = parseInt( height + delta.height, 10 );
 					setAttributes( {
-						height: parseInt( height + delta.height, 10 ),
+						height: spacerHeight,
 					} );
-					toggleSelection( true );
-				} }
-				onResizeStart={ () => {
-					toggleSelection( false );
+					setInputHeightValue( spacerHeight );
 				} }
 			/>
 			<InspectorControls>
@@ -54,18 +53,28 @@ const SpacerEdit = ( { attributes, isSelected, setAttributes, toggleSelection, i
 							type="number"
 							id={ id }
 							onChange={ ( event ) => {
+								let spacerHeight = parseInt( event.target.value, 10 );
+								setInputHeightValue( spacerHeight );
+								if ( isNaN( spacerHeight ) ) {
+									// Set spacer height to default size and input box to empty string
+									setInputHeightValue( '' );
+									spacerHeight = 100;
+								} else if ( spacerHeight < 20 ) {
+									// Set spacer height to minimum size
+									spacerHeight = 20;
+								}
 								setAttributes( {
-									height: parseInt( event.target.value, 10 ),
+									height: spacerHeight,
 								} );
 							} }
-							value={ height }
+							value={ inputHeightValue }
 							min="20"
 							step="10"
 						/>
 					</BaseControl>
 				</PanelBody>
 			</InspectorControls>
-		</Fragment>
+		</>
 	);
 };
 

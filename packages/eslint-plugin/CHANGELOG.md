@@ -1,8 +1,32 @@
-## x.x.x (Unreleased)
+## Master
+
+### Breaking Changes
+
+- The [`@wordpress/no-unused-vars-before-return` rule](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/no-unused-vars-before-return.md) has been improved to exempt object destructuring only if destructuring to more than one property.
+
+### New Features
+
+- [`@wordpress/no-unused-vars-before-return`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/no-unused-vars-before-return.md) now supports an `excludePattern` option to exempt function calls by name.
+- New Rule: [`@wordpress/no-unguarded-get-range-at`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/no-unguarded-get-range-at.md)
+
+### Improvements
+
+- The recommended `react` configuration specifies an option to [`@wordpress/no-unused-vars-before-return`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/no-unused-vars-before-return.md) to exempt React hooks usage, by convention of hooks beginning with "use" prefix.
+
+## 2.3.0 (2019-06-12)
+
+### Bug Fix
+
+- Fixed custom regular expression for the `no-restricted-syntax` rule enforcing translate function arguments. [#15839](https://github.com/WordPress/gutenberg/pull/15839).
+- Fixed arguments checking of `_nx` for the `no-restricted-syntax` rule enforcing translate function arguments. [#15839](https://github.com/WordPress/gutenberg/pull/15839).
+- Fixed false positive with `react-no-unsafe-timeout` which would wrongly flag errors when assigning `setTimeout` result to a variable (for example, in a `useEffect` hook).
+
+## 2.2.0 (2019-05-21)
 
 ### New Features
 
 - New Rule: [`@wordpress/react-no-unsafe-timeout`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/react-no-unsafe-timeout.md)
+- Add [React Hooks Rules](https://reactjs.org/docs/hooks-rules.html) config.
 
 ## 2.1.0 (2019-03-20)
 
@@ -24,6 +48,7 @@
 - New Rule: [`@wordpress/dependency-group`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/dependency-group.md)
 - New Rule: [`@wordpress/valid-sprintf`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/valid-sprintf.md)
 - New Rule: [`@wordpress/gutenberg-phase`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/gutenberg-phase.md)
+- New Rule: [`@wordpress/no-base-control-with-label-without-id`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/no-base-control-with-label-without-id.md)
 
 ## 1.0.0 (2018-12-12)
 

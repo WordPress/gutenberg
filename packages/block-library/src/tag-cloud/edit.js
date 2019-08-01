@@ -6,7 +6,7 @@ import { map, filter } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, Fragment } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import {
 	PanelBody,
 	ToggleControl,
@@ -34,6 +34,7 @@ class TagCloudEdit extends Component {
 		const selectOption = {
 			label: __( '- Select -' ),
 			value: '',
+			disabled: true,
 		};
 		const taxonomyOptions = map( taxonomies, ( taxonomy ) => {
 			return {
@@ -82,14 +83,14 @@ class TagCloudEdit extends Component {
 		);
 
 		return (
-			<Fragment>
+			<>
 				{ inspectorControls }
 				<ServerSideRender
 					key="tag-cloud"
 					block="core/tag-cloud"
 					attributes={ attributes }
 				/>
-			</Fragment>
+			</>
 		);
 	}
 }

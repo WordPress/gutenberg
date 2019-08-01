@@ -69,8 +69,7 @@ class EmbedPreview extends Component {
 		// Disabled because the overlay div doesn't actually have a role or functionality
 		// as far as the user is concerned. We're just catching the first click so that
 		// the block can be selected without interacting with the embed preview that the overlay covers.
-		/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
-		/* eslint-disable jsx-a11y/no-static-element-interactions */
+		/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/no-static-element-interactions */
 		const embedWrapper = 'wp-embed' === type ? (
 			<WpEmbedPreview
 				html={ html }
@@ -89,8 +88,7 @@ class EmbedPreview extends Component {
 					onMouseUp={ this.hideOverlay } /> }
 			</div>
 		);
-		/* eslint-enable jsx-a11y/no-static-element-interactions */
-		/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
+		/* eslint-enable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/no-static-element-interactions */
 
 		return (
 			<figure className={ classnames( className, 'wp-block-embed', { 'is-type-video': 'video' === type } ) }>

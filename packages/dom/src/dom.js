@@ -93,24 +93,37 @@ function isEdge( container, isReverse, onlyVertical ) {
 		return false;
 	}
 
-	const rangeRect = getRectangleFromRange( selection.getRangeAt( 0 ) );
+	const range = selection.getRangeAt( 0 ).cloneRange();
+	const isForward = isSelectionForward( selection );
+	const isCollapsed = selection.isCollapsed;
+
+	// Collapse in direction of selection.
+	if ( ! isCollapsed ) {
+		range.collapse( ! isForward );
+	}
+
+	const rangeRect = getRectangleFromRange( range );
 
 	if ( ! rangeRect ) {
 		return false;
 	}
 
 	const computedStyle = window.getComputedStyle( container );
-	const lineHeight = parseInt( computedStyle.lineHeight, 10 );
+	const lineHeight = parseInt( computedStyle.lineHeight, 10 ) || 0;
 
 	// Only consider the multiline selection at the edge if the direction is
 	// towards the edge.
 	if (
-		! selection.isCollapsed &&
+		! isCollapsed &&
 		rangeRect.height > lineHeight &&
-		isSelectionForward( selection ) === isReverse
+		isForward === isReverse
 	) {
 		return false;
 	}
+
+	const padding = parseInt( computedStyle[
+		`padding${ isReverse ? 'Top' : 'Bottom' }`
+	], 10 ) || 0;
 
 	// Calculate a buffer that is half the line height. In some browsers, the
 	// selection rectangle may not fill the entire height of the line, so we add
@@ -119,8 +132,8 @@ function isEdge( container, isReverse, onlyVertical ) {
 	const buffer = 3 * parseInt( lineHeight, 10 ) / 4;
 	const containerRect = container.getBoundingClientRect();
 	const verticalEdge = isReverse ?
-		containerRect.top > rangeRect.top - buffer :
-		containerRect.bottom < rangeRect.bottom + buffer;
+		containerRect.top + padding > rangeRect.top - buffer :
+		containerRect.bottom - padding < rangeRect.bottom + buffer;
 
 	if ( ! verticalEdge ) {
 		return false;
@@ -130,12 +143,16 @@ function isEdge( container, isReverse, onlyVertical ) {
 		return true;
 	}
 
+	// In the case of RTL scripts, the horizontal edge is at the opposite side.
+	const { direction } = computedStyle;
+	const isReverseDir = direction === 'rtl' ? ( ! isReverse ) : isReverse;
+
 	// To calculate the horizontal position, we insert a test range and see if
 	// this test range has the same horizontal position. This method proves to
 	// be better than a DOM-based calculation, because it ignores empty text
 	// nodes and a trailing line break element. In other words, we need to check
 	// visual positioning, not DOM positioning.
-	const x = isReverse ? containerRect.left + 1 : containerRect.right - 1;
+	const x = isReverseDir ? containerRect.left + 1 : containerRect.right - 1;
 	const y = isReverse ? containerRect.top + buffer : containerRect.bottom - buffer;
 	const testRange = hiddenCaretRangeFromPoint( document, x, y, container );
 
@@ -143,7 +160,7 @@ function isEdge( container, isReverse, onlyVertical ) {
 		return false;
 	}
 
-	const side = isReverse ? 'left' : 'right';
+	const side = isReverseDir ? 'left' : 'right';
 	const testRect = getRectangleFromRange( testRange );
 
 	return Math.round( testRect[ side ] ) === Math.round( rangeRect[ side ] );
@@ -209,6 +226,8 @@ export function getRectangleFromRange( range ) {
 	// See: https://stackoverflow.com/a/6847328/995445
 	if ( ! rect ) {
 		const padNode = document.createTextNode( '\u200b' );
+		// Do not modify the live range.
+		range = range.cloneRange();
 		range.insertNode( padNode );
 		rect = range.getClientRects()[ 0 ];
 		padNode.parentNode.removeChild( padNode );
@@ -220,15 +239,9 @@ export function getRectangleFromRange( range ) {
 /**
  * Get the rectangle for the selection in a container.
  *
- * @param {Element} container Editable container.
- *
  * @return {?DOMRect} The rectangle.
  */
-export function computeCaretRect( container ) {
-	if ( ! container.isContentEditable ) {
-		return;
-	}
-
+export function computeCaretRect() {
 	const selection = window.getSelection();
 	const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
 
@@ -377,7 +390,7 @@ export function placeCaretAtVerticalEdge( container, isReverse, rect, mayUseScro
 	const x = rect.left;
 	const y = isReverse ? ( editableRect.bottom - buffer ) : ( editableRect.top + buffer );
 
-	let range = hiddenCaretRangeFromPoint( document, x, y, container );
+	const range = hiddenCaretRangeFromPoint( document, x, y, container );
 
 	if ( ! range || ! container.contains( range.startContainer ) ) {
 		if ( mayUseScroll && (
@@ -392,20 +405,6 @@ export function placeCaretAtVerticalEdge( container, isReverse, rect, mayUseScro
 
 		placeCaretAtHorizontalEdge( container, isReverse );
 		return;
-	}
-
-	// Check if the closest text node is actually further away.
-	// If so, attempt to get the range again with the y position adjusted to get the right offset.
-	if ( range.startContainer.nodeType === TEXT_NODE ) {
-		const parentNode = range.startContainer.parentNode;
-		const parentRect = parentNode.getBoundingClientRect();
-		const side = isReverse ? 'bottom' : 'top';
-		const padding = parseInt( getComputedStyle( parentNode ).getPropertyValue( `padding-${ side }` ), 10 ) || 0;
-		const actualY = isReverse ? ( parentRect.bottom - padding - buffer ) : ( parentRect.top + padding + buffer );
-
-		if ( y !== actualY ) {
-			range = hiddenCaretRangeFromPoint( document, x, actualY, container );
-		}
 	}
 
 	const selection = window.getSelection();

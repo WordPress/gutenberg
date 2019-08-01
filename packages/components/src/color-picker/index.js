@@ -43,30 +43,150 @@ import Alpha from './alpha';
 import Hue from './hue';
 import Inputs from './inputs';
 import Saturation from './saturation';
-import { colorToState, simpleCheckForValidColor } from './utils';
+import { colorToState, simpleCheckForValidColor, isValidHex } from './utils';
+
+const toLowerCase = ( value ) => String( value ).toLowerCase();
+const isValueEmpty = ( data ) => {
+	if ( data.source === 'hex' && ! data.hex ) {
+		return true;
+	} else if ( data.source === 'hsl' && ( ! data.h || ! data.s || ! data.l ) ) {
+		return true;
+	} else if ( data.source === 'rgb' && (
+		( ! data.r || ! data.g || ! data.b ) &&
+		( ! data.h || ! data.s || ! data.v || ! data.a ) &&
+		( ! data.h || ! data.s || ! data.l || ! data.a )
+	) ) {
+		return true;
+	}
+	return false;
+};
+const isValidColor = ( colors ) => colors.hex ?
+	isValidHex( colors.hex ) :
+	simpleCheckForValidColor( colors );
+
+/**
+ * Function that creates the new color object
+ * from old data and the new value.
+ *
+ * @param {Object} oldColors The old color object.
+ * @param {string} oldColors.hex
+ * @param {Object} oldColors.rgb
+ * @param {number} oldColors.rgb.r
+ * @param {number} oldColors.rgb.g
+ * @param {number} oldColors.rgb.b
+ * @param {number} oldColors.rgb.a
+ * @param {Object} oldColors.hsl
+ * @param {number} oldColors.hsl.h
+ * @param {number} oldColors.hsl.s
+ * @param {number} oldColors.hsl.l
+ * @param {number} oldColors.hsl.a
+ * @param {string} oldColors.draftHex Same format as oldColors.hex
+ * @param {Object} oldColors.draftRgb Same format as oldColors.rgb
+ * @param {Object} oldColors.draftHsl Same format as oldColors.hsl
+ * @param {Object} data Data containing the new value to update.
+ * @param {Object} data.source One of `hex`, `rgb`, `hsl`.
+ * @param {string\number} data.value Value to update.
+ * @param {string} data.valueKey Depends on `data.source` values:
+ *   - when source = `rgb`, valuKey can be `r`, `g`, `b`, or `a`.
+ *   - when source = `hsl`, valuKey can be `h`, `s`, `l`, or `a`.
+ * @return {Object} A new color object for a specific source. For example:
+ * { source: 'rgb', r: 1, g: 2, b:3, a:0 }
+ */
+const dataToColors = ( oldColors, { source, valueKey, value } ) => {
+	if ( source === 'hex' ) {
+		return {
+			source,
+			[ source ]: value,
+		};
+	}
+	return {
+		source,
+		...{ ...oldColors[ source ], ...{ [ valueKey ]: value } },
+	};
+};
 
 export default class ColorPicker extends Component {
 	constructor( { color = '0071a1' } ) {
 		super( ...arguments );
-		this.state = colorToState( color );
-		this.handleChange = this.handleChange.bind( this );
+		const colors = colorToState( color );
+		this.state = {
+			...colors,
+			draftHex: toLowerCase( colors.hex ),
+			draftRgb: colors.rgb,
+			draftHsl: colors.hsl,
+		};
+		this.commitValues = this.commitValues.bind( this );
+		this.setDraftValues = this.setDraftValues.bind( this );
+		this.resetDraftValues = this.resetDraftValues.bind( this );
+		this.handleInputChange = this.handleInputChange.bind( this );
 	}
 
-	handleChange( data ) {
+	commitValues( data ) {
 		const { oldHue, onChangeComplete = noop } = this.props;
-		const isValidColor = simpleCheckForValidColor( data );
-		if ( isValidColor ) {
+
+		if ( isValidColor( data ) ) {
 			const colors = colorToState( data, data.h || oldHue );
-			this.setState(
-				colors,
-				debounce( partial( onChangeComplete, colors ), 100 )
+			this.setState( {
+				...colors,
+				draftHex: toLowerCase( colors.hex ),
+				draftHsl: colors.hsl,
+				draftRgb: colors.rgb,
+			},
+			debounce( partial( onChangeComplete, colors ), 100 )
 			);
+		}
+	}
+
+	resetDraftValues() {
+		this.setState( {
+			draftHex: this.state.hex,
+			draftHsl: this.state.hsl,
+			draftRgb: this.state.rgb,
+		} );
+	}
+
+	setDraftValues( data ) {
+		switch ( data.source ) {
+			case 'hex':
+				this.setState( { draftHex: toLowerCase( data.hex ) } );
+				break;
+			case 'rgb':
+				this.setState( { draftRgb: data } );
+				break;
+			case 'hsl':
+				this.setState( { draftHsl: data } );
+				break;
+		}
+	}
+
+	handleInputChange( data ) {
+		switch ( data.state ) {
+			case 'reset':
+				this.resetDraftValues();
+				break;
+			case 'commit':
+				const colors = dataToColors( this.state, data );
+				if ( ! isValueEmpty( colors ) ) {
+					this.commitValues( colors );
+				}
+				break;
+			case 'draft':
+				this.setDraftValues( dataToColors( this.state, data ) );
+				break;
 		}
 	}
 
 	render() {
 		const { className, disableAlpha } = this.props;
-		const { color, hex, hsl, hsv, rgb } = this.state;
+		const {
+			color,
+			hsl,
+			hsv,
+			rgb,
+			draftHex,
+			draftHsl,
+			draftRgb,
+		} = this.state;
 		const classes = classnames( className, {
 			'components-color-picker': true,
 			'is-alpha-disabled': disableAlpha,
@@ -79,7 +199,7 @@ export default class ColorPicker extends Component {
 					<Saturation
 						hsl={ hsl }
 						hsv={ hsv }
-						onChange={ this.handleChange }
+						onChange={ this.commitValues }
 					/>
 				</div>
 
@@ -95,22 +215,22 @@ export default class ColorPicker extends Component {
 						</div>
 
 						<div className="components-color-picker__toggles">
-							<Hue hsl={ hsl } onChange={ this.handleChange } />
+							<Hue hsl={ hsl } onChange={ this.commitValues } />
 							{ disableAlpha ? null : (
 								<Alpha
 									rgb={ rgb }
 									hsl={ hsl }
-									onChange={ this.handleChange }
+									onChange={ this.commitValues }
 								/>
 							) }
 						</div>
 					</div>
 
 					<Inputs
-						rgb={ rgb }
-						hsl={ hsl }
-						hex={ hex }
-						onChange={ this.handleChange }
+						rgb={ draftRgb }
+						hsl={ draftHsl }
+						hex={ draftHex }
+						onChange={ this.handleInputChange }
 						disableAlpha={ disableAlpha }
 					/>
 				</div>

@@ -75,4 +75,7 @@ class URLInputButton extends Component {
 	}
 }
 
+/**
+ * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/url-input/README.md
+ */
 export default URLInputButton;

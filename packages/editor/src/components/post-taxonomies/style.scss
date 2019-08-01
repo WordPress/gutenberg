@@ -1,6 +1,9 @@
 .editor-post-taxonomies__hierarchical-terms-list {
 	max-height: 14em;
 	overflow: auto;
+
+	// Extra left padding prevents checkbox focus borders from being cut off.
+	padding-left: 2px;
 }
 
 .editor-post-taxonomies__hierarchical-terms-choice {

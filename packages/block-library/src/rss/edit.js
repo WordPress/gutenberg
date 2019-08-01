@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Component, Fragment } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import {
 	Button,
 	Disabled,
@@ -107,7 +107,7 @@ class RSSEdit extends Component {
 		];
 
 		return (
-			<Fragment>
+			<>
 				<BlockControls>
 					<Toolbar controls={ toolbarControls } />
 				</BlockControls>
@@ -164,7 +164,7 @@ class RSSEdit extends Component {
 						attributes={ this.props.attributes }
 					/>
 				</Disabled>
-			</Fragment>
+			</>
 		);
 	}
 }

@@ -6,7 +6,6 @@
 	background-position: center center;
 	min-height: 430px;
 	width: 100%;
-	margin: 0 0 1.5em 0;
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -61,6 +60,11 @@
 		// See also https://stackoverflow.com/questions/24154666/background-size-cover-not-working-on-ios
 		// Chrome on Android does not appear to support the attachment at all: https://issuetracker.google.com/issues/36908439
 		@supports (-webkit-overflow-scrolling: touch) {
+			background-attachment: scroll;
+		}
+
+		// Remove the appearance of scrolling based on OS-level animation preferences.
+		@media (prefers-reduced-motion: reduce) {
 			background-attachment: scroll;
 		}
 	}

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/is-shallow-equal",
-	"version": "1.2.0",
+	"version": "1.4.0",
 	"description": "Test for shallow equality between two objects or arrays.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -21,11 +21,12 @@
 	},
 	"files": [
 		"arrays.js",
+		"index.js",
 		"objects.js"
 	],
 	"main": "index.js",
 	"dependencies": {
-		"@babel/runtime": "^7.3.1"
+		"@babel/runtime": "^7.4.4"
 	},
 	"publishConfig": {
 		"access": "public"

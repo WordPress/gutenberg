@@ -1,8 +1,8 @@
 /**
  * Internal dependencies
  */
-import { getEntityRecord, getEntityRecords, getEmbedPreview, canUser } from '../resolvers';
-import { receiveEntityRecords, receiveEmbedPreview, receiveUserPermission } from '../actions';
+import { getEntityRecord, getEntityRecords, getEmbedPreview, canUser, getAutosaves, getCurrentUser } from '../resolvers';
+import { receiveEntityRecords, receiveEmbedPreview, receiveUserPermission, receiveAutosaves, receiveCurrentUser } from '../actions';
 import { apiFetch } from '../controls';
 
 describe( 'getEntityRecord', () => {
@@ -157,5 +157,70 @@ describe( 'canUser', () => {
 		received = generator.next();
 		expect( received.done ).toBe( true );
 		expect( received.value ).toBeUndefined();
+	} );
+} );
+
+describe( 'getAutosaves', () => {
+	const SUCCESSFUL_RESPONSE = [ {
+		title: 'test title',
+		excerpt: 'test excerpt',
+		content: 'test content',
+	} ];
+
+	it( 'yields with fetched autosaves', async () => {
+		const postType = 'post';
+		const postId = 1;
+		const restBase = 'posts';
+		const postEntity = { rest_base: restBase };
+		const fulfillment = getAutosaves( postType, postId );
+
+		// Trigger generator
+		fulfillment.next();
+
+		// Trigger generator with the postEntity and assert that correct path is formed
+		// in the apiFetch request.
+		const { value: apiFetchAction } = fulfillment.next( postEntity );
+		expect( apiFetchAction.request ).toEqual( { path: `/wp/v2/${ restBase }/${ postId }/autosaves?context=edit` } );
+
+		// Provide apiFetch response and trigger Action
+		const received = ( await fulfillment.next( SUCCESSFUL_RESPONSE ) ).value;
+		expect( received ).toEqual( receiveAutosaves( 1, SUCCESSFUL_RESPONSE ) );
+	} );
+
+	it( ' yields undefined if no autosaves exist for the post', async () => {
+		const postType = 'post';
+		const postId = 1;
+		const restBase = 'posts';
+		const postEntity = { rest_base: restBase };
+		const fulfillment = getAutosaves( postType, postId );
+
+		// Trigger generator
+		fulfillment.next();
+
+		// Trigger generator with the postEntity and assert that correct path is formed
+		// in the apiFetch request.
+		const { value: apiFetchAction } = fulfillment.next( postEntity );
+		expect( apiFetchAction.request ).toEqual( { path: `/wp/v2/${ restBase }/${ postId }/autosaves?context=edit` } );
+
+		// Provide apiFetch response and trigger Action
+		const received = ( await fulfillment.next( [] ) ).value;
+		expect( received ).toBeUndefined();
+	} );
+} );
+
+describe( 'getCurrentUser', () => {
+	const SUCCESSFUL_RESPONSE = {
+		id: 1,
+	};
+
+	it( 'yields with fetched user', async () => {
+		const fulfillment = getCurrentUser();
+
+		// Trigger generator
+		fulfillment.next();
+
+		// Provide apiFetch response and trigger Action
+		const received = ( await fulfillment.next( SUCCESSFUL_RESPONSE ) ).value;
+		expect( received ).toEqual( receiveCurrentUser( SUCCESSFUL_RESPONSE ) );
 	} );
 } );
