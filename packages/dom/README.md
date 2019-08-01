@@ -154,10 +154,7 @@ _Parameters_
 
 -   _container_ `Element`: Focusable element.
 -   _isReverse_ `boolean`: True for end, false for start.
--   _options_ `Object`: options for configuring this behavior. 
- 
- Current options:
- -`{ focusOptions: { preventScroll: true } }` - prevents the browser to scroll the element into view at focus.
+-   _options_ `Object`: options for configuring this behavior.
 
 <a name="placeCaretAtVerticalEdge" href="#placeCaretAtVerticalEdge">#</a> **placeCaretAtVerticalEdge**
 
