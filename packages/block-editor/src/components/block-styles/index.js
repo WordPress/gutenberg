@@ -128,6 +128,7 @@ function BlockStyles( {
 								} ) }
 								srcWidth={ 400 }
 								srcHeight={ 300 }
+								scaleFactor={ 0.6 }
 
 							/>
 						</div>
