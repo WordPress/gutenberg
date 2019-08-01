@@ -66,7 +66,7 @@ export class PostPublishPanel extends Component {
 		const isPrePublish = ! isPublishedOrScheduled && ! isSaving;
 		const isPostPublish = isPublishedOrScheduled && ! isSaving;
 		return (
-			<div className="editor-post-publish-panel" { ...propsForPanel }>
+			<div className="editor-post-publish-panel block-editor-styles-reset" { ...propsForPanel }>
 				<div className="editor-post-publish-panel__header">
 					{ isPostPublish ? (
 						<div className="editor-post-publish-panel__header-published">

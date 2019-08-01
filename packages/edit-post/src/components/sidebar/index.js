@@ -20,7 +20,7 @@ const { Fill, Slot } = createSlotFill( 'Sidebar' );
 function Sidebar( { children, label, className } ) {
 	return (
 		<div
-			className={ classnames( 'edit-post-sidebar', className ) }
+			className={ classnames( 'edit-post-sidebar block-editor-styles-reset', className ) }
 			role="region"
 			aria-label={ label }
 			tabIndex="-1"

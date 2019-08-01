@@ -2,7 +2,7 @@
 
 exports[`PostPublishPanel should render the post-publish panel if the post is published 1`] = `
 <div
-  className="editor-post-publish-panel"
+  className="editor-post-publish-panel block-editor-styles-reset"
 >
   <div
     className="editor-post-publish-panel__header"
@@ -37,7 +37,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
 
 exports[`PostPublishPanel should render the post-publish panel if the post is scheduled 1`] = `
 <div
-  className="editor-post-publish-panel"
+  className="editor-post-publish-panel block-editor-styles-reset"
 >
   <div
     className="editor-post-publish-panel__header"
@@ -72,7 +72,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
 
 exports[`PostPublishPanel should render the pre-publish panel if post status is scheduled but date is before now 1`] = `
 <div
-  className="editor-post-publish-panel"
+  className="editor-post-publish-panel block-editor-styles-reset"
 >
   <div
     className="editor-post-publish-panel__header"
@@ -111,7 +111,7 @@ exports[`PostPublishPanel should render the pre-publish panel if post status is 
 
 exports[`PostPublishPanel should render the pre-publish panel if the post is not saving, published or scheduled 1`] = `
 <div
-  className="editor-post-publish-panel"
+  className="editor-post-publish-panel block-editor-styles-reset"
 >
   <div
     className="editor-post-publish-panel__header"
@@ -150,7 +150,7 @@ exports[`PostPublishPanel should render the pre-publish panel if the post is not
 
 exports[`PostPublishPanel should render the spinner if the post is being saved 1`] = `
 <div
-  className="editor-post-publish-panel"
+  className="editor-post-publish-panel block-editor-styles-reset"
 >
   <div
     className="editor-post-publish-panel__header"

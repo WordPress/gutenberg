@@ -61,9 +61,8 @@ body.block-editor-page {
 	@include wp-admin-reset( ".block-editor" );
 }
 
-.block-editor,
-// The modals are shown outside the .block-editor wrapper, they need these styles
-.components-modal__frame {
+// Target the editor UI but exclude the metaboxes and custom fields areas.
+.block-editor-styles-reset {
 	@include reset;
 }
 

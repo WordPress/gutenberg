@@ -321,7 +321,7 @@ const Popover = ( {
 	const animateXAxis = xAxisMapping[ popoverPosition.xAxis ] || 'center';
 
 	const classes = classnames(
-		'components-popover',
+		'components-popover block-editor-styles-reset',
 		className,
 		'is-' + popoverPosition.yAxis,
 		'is-' + popoverPosition.xAxis,
