@@ -30,12 +30,12 @@ function BlockPreview( props ) {
 	return (
 		<div className="editor-block-preview block-editor-block-preview">
 			<div className="editor-block-preview__title block-editor-block-preview__title">{ __( 'Preview' ) }</div>
-			<BlockPreviewContent { ...props } srcWidth={ 560 } srcHeight={ 700 } />
+			<BlockPreviewContent { ...props } srcWidth={ 560 } srcHeight={ 700 } scaleToFit={ true } />
 		</div>
 	);
 }
 
-export function BlockPreviewContent( { blocks, settings, srcWidth = 400, srcHeight = 300 } ) {
+export function BlockPreviewContent( { blocks, settings, srcWidth = 400, srcHeight = 300, scaleToFit = false } ) {
 	if ( ! blocks ) {
 		return null;
 	}
@@ -62,6 +62,9 @@ export function BlockPreviewContent( { blocks, settings, srcWidth = 400, srcHeig
 
 	// Dynamically calculate the scale factor
 	useLayoutEffect( () => {
+		if ( ! scaleToFit ) {
+			return;
+		}
 		// Retrieve the actual width of the element which wraps the preview
 		// note: this is not the preview itself, but the wrapper element
 		const destWidth = previewRef.current.offsetWidth;
