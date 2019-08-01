@@ -38,7 +38,6 @@ import { addQueryArgs } from '@wordpress/url';
  * Internal dependencies
  */
 import BlockPreview from '../block-preview';
-import BlockPreviewDropdownWrapper from '../block-preview/dropdown-wrapper';
 import BlockTypesList from '../block-types-list';
 import ChildBlocks from './child-blocks';
 
@@ -352,11 +351,13 @@ export class InserterMenu extends Component {
 				</div>
 
 				{ hoveredItem && isReusableBlock( hoveredItem ) &&
-					<BlockPreviewDropdownWrapper>
+					<div className="block-editor-inserter__preview">
+						<div className="block-editor-inserter__preview-title">{ __( 'Preview' ) }</div>
 						<BlockPreview
+							className="block-editor-inserter__preview-content"
 							blocks={ createBlock( hoveredItem.name, hoveredItem.initialAttributes ) }
 						/>
-					</BlockPreviewDropdownWrapper>
+					</div>
 				}
 			</div>
 		);
