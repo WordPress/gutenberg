@@ -19,8 +19,9 @@ import { decodeEntities } from '@wordpress/html-entities';
 /**
  * Internal dependencies
  */
-import { getSaveContent } from './serializer';
-import { normalizeBlockType } from './utils';
+import logger from './logger';
+import { getSaveContent } from '../serializer';
+import { normalizeBlockType } from '../utils';
 
 /**
  * Globally matches any consecutive whitespace
@@ -243,38 +244,6 @@ export class DecodeEntityParser {
 }
 
 /**
- * Object of logger functions.
- */
-const log = ( () => {
-	/**
-	 * Creates a logger with block validation prefix.
-	 *
-	 * @param {Function} logger Original logger function.
-	 *
-	 * @return {Function} Augmented logger function.
-	 */
-	function createLogger( logger ) {
-		// In test environments, pre-process the sprintf message to improve
-		// readability of error messages. We'd prefer to avoid pulling in this
-		// dependency in runtime environments, and it can be dropped by a combo
-		// of Webpack env substitution + UglifyJS dead code elimination.
-		if ( process.env.NODE_ENV === 'test' ) {
-			// eslint-disable-next-line import/no-extraneous-dependencies
-			return ( ...args ) => logger( require( 'sprintf-js' ).sprintf( ...args ) );
-		}
-
-		return ( message, ...args ) => logger( 'Block validation: ' + message, ...args );
-	}
-
-	return {
-		/* eslint-disable no-console */
-		error: createLogger( console.error ),
-		warning: createLogger( console.warn ),
-		/* eslint-enable no-console */
-	};
-} )();
-
-/**
  * Given a specified string, returns an array of strings split by consecutive
  * whitespace, ignoring leading or trailing whitespace.
  *
@@ -352,7 +321,7 @@ export function isEquivalentTextTokens( actual, expected ) {
 		}
 	}
 
-	log.warning( 'Expected text `%s`, saw `%s`.', expected.chars, actual.chars );
+	logger.warning( 'Expected text `%s`, saw `%s`.', expected.chars, actual.chars );
 
 	return false;
 }
@@ -432,7 +401,7 @@ export function isEqualTagAttributePairs( actual, expected ) {
 	// avoids us needing to check both attributes sets, since if A has any keys
 	// which do not exist in B, we know the sets to be different.
 	if ( actual.length !== expected.length ) {
-		log.warning( 'Expected attributes %j, instead saw %j.', expected, actual );
+		logger.warning( 'Expected attributes %o, instead saw %o.', expected, actual );
 		return false;
 	}
 
@@ -442,7 +411,7 @@ export function isEqualTagAttributePairs( actual, expected ) {
 	for ( const name in actualAttributes ) {
 		// As noted above, if missing member in B, assume different
 		if ( ! expectedAttributes.hasOwnProperty( name ) ) {
-			log.warning( 'Encountered unexpected attribute `%s`.', name );
+			logger.warning( 'Encountered unexpected attribute `%s`.', name );
 			return false;
 		}
 
@@ -453,12 +422,12 @@ export function isEqualTagAttributePairs( actual, expected ) {
 		if ( isEqualAttributes ) {
 			// Defer custom attribute equality handling
 			if ( ! isEqualAttributes( actualValue, expectedValue ) ) {
-				log.warning( 'Expected attribute `%s` of value `%s`, saw `%s`.', name, expectedValue, actualValue );
+				logger.warning( 'Expected attribute `%s` of value `%s`, saw `%s`.', name, expectedValue, actualValue );
 				return false;
 			}
 		} else if ( actualValue !== expectedValue ) {
 			// Otherwise strict inequality should bail
-			log.warning( 'Expected attribute `%s` of value `%s`, saw `%s`.', name, expectedValue, actualValue );
+			logger.warning( 'Expected attribute `%s` of value `%s`, saw `%s`.', name, expectedValue, actualValue );
 			return false;
 		}
 	}
@@ -474,7 +443,7 @@ export function isEqualTagAttributePairs( actual, expected ) {
 export const isEqualTokensOfType = {
 	StartTag: ( actual, expected ) => {
 		if ( actual.tagName !== expected.tagName ) {
-			log.warning( 'Expected tag name `%s`, instead saw `%s`.', expected.tagName, actual.tagName );
+			logger.warning( 'Expected tag name `%s`, instead saw `%s`.', expected.tagName, actual.tagName );
 			return false;
 		}
 
@@ -521,7 +490,7 @@ function getHTMLTokens( html ) {
 	try {
 		return new Tokenizer( new DecodeEntityParser() ).tokenize( html );
 	} catch ( e ) {
-		log.warning( 'Malformed HTML detected: %s', html );
+		logger.warning( 'Malformed HTML detected: %s', html );
 	}
 
 	return null;
@@ -574,13 +543,13 @@ export function isEquivalentHTML( actual, expected ) {
 
 		// Inequal if exhausted all expected tokens
 		if ( ! expectedToken ) {
-			log.warning( 'Expected end of content, instead saw %j.', actualToken );
+			logger.warning( 'Expected end of content, instead saw %o.', actualToken );
 			return false;
 		}
 
 		// Inequal if next non-whitespace token of each set are not same type
 		if ( actualToken.type !== expectedToken.type ) {
-			log.warning( 'Expected token of type `%s` (%j), instead saw `%s` (%j).', expectedToken.type, expectedToken, actualToken.type, actualToken );
+			logger.warning( 'Expected token of type `%s` (%o), instead saw `%s` (%o).', expectedToken.type, expectedToken, actualToken.type, actualToken );
 			return false;
 		}
 
@@ -607,7 +576,7 @@ export function isEquivalentHTML( actual, expected ) {
 	if ( ( expectedToken = getNextNonWhitespaceToken( expectedTokens ) ) ) {
 		// If any non-whitespace tokens remain in expected token set, this
 		// indicates inequality
-		log.warning( 'Expected %j, instead saw end of content.', expectedToken );
+		logger.warning( 'Expected %o, instead saw end of content.', expectedToken );
 		return false;
 	}
 
@@ -633,13 +602,13 @@ export function isValidBlockContent( blockTypeOrName, attributes, originalBlockC
 	try {
 		generatedBlockContent = getSaveContent( blockType, attributes );
 	} catch ( error ) {
-		log.error( 'Block validation failed because an error occurred while generating block content:\n\n%s', error.toString() );
+		logger.error( 'Block validation failed because an error occurred while generating block content:\n\n%s', error.toString() );
 		return false;
 	}
 
 	const isValid = isEquivalentHTML( originalBlockContent, generatedBlockContent );
 	if ( ! isValid ) {
-		log.error(
+		logger.error(
 			'Block validation failed for `%s` (%o).\n\nContent generated by `save` function:\n\n%s\n\nContent retrieved from post body:\n\n%s',
 			blockType.name,
 			blockType,
@@ -650,3 +619,5 @@ export function isValidBlockContent( blockTypeOrName, attributes, originalBlockC
 
 	return isValid;
 }
+
+export { logger };

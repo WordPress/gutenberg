@@ -753,8 +753,7 @@ describe( 'block parser', () => {
 			expect( block.name ).toEqual( 'core/test-block' );
 			expect( block.attributes ).toEqual( { fruit: 'Big Bananas' } );
 			expect( block.isValid ).toBe( true );
-			expect( console ).toHaveErrored();
-			expect( console ).toHaveWarned();
+			expect( console ).toHaveInformed();
 		} );
 	} );
 
