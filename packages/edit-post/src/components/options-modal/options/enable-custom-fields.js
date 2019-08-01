@@ -29,7 +29,7 @@ export function CustomFieldsConfirmation( { nextState } ) {
 					document.getElementById( 'toggle-custom-fields-form' ).submit();
 				} }
 			>
-				{ nextState === true ? __( 'Enable & Reload' ) : __( 'Disable & Reload' ) }
+				{ nextState ? __( 'Enable & Reload' ) : __( 'Disable & Reload' ) }
 			</Button>
 		</>
 	);
