@@ -49,7 +49,7 @@ function gutenberg_initialize_experiments_settings() {
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => 'Enable Widgets Screen and Legacy Widget Block',
+			'label' => __( 'Enable Widgets Screen and Legacy Widget Block', 'gutenberg' ),
 			'id'    => 'gutenberg-widget-experiments',
 		)
 	);
@@ -60,7 +60,7 @@ function gutenberg_initialize_experiments_settings() {
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => 'Enable Navigation Menu Block',
+			'label' => __( 'Enable Navigation Menu Block', 'gutenberg' ),
 			'id'    => 'gutenberg-menu-block',
 		)
 	);
@@ -97,7 +97,8 @@ function gutenberg_display_experiment_field( $args ) {
  */
 function gutenberg_display_experiment_section() {
 	?>
-	<p><?php echo __( 'Gutenberg has some experimental features you can turn on. Simply select each you would like to use.', 'gutenberg' ); ?></p>
+	<p><?php echo __( 'Gutenberg has some experimental features you can turn on. Simply select each you would like to use. These features are likely to change so it is inadvisable to use them in production.', 'gutenberg' ); ?></p>
+
 	<?php
 }
 
@@ -109,9 +110,10 @@ function gutenberg_display_experiment_section() {
  * @return array Filtered editor settings.
  */
 function gutenberg_experiments_editor_settings( $settings ) {
+	$experiments_exist = get_option( 'gutenberg-experiments' );
 	return array(
-		'__experimentalEnableLegacyWidgetBlock' => array_key_exists( 'gutenberg-widget-experiments', get_option( 'gutenberg-experiments' ) ),
-		'__experimentalEnableMenuBlock'         => array_key_exists( 'gutenberg-menu-block', get_option( 'gutenberg-experiments' ) ),
+		'__experimentalEnableLegacyWidgetBlock' => $experiments_exist ? array_key_exists( 'gutenberg-widget-experiments', get_option( 'gutenberg-experiments' ) ) : false,
+		'__experimentalEnableMenuBlock'         => $experiments_exist ? array_key_exists( 'gutenberg-menu-block', get_option( 'gutenberg-experiments' ) ) : false,
 	);
 }
 add_filter( 'block_editor_settings', 'gutenberg_experiments_editor_settings' );

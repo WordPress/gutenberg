@@ -3,7 +3,7 @@
  */
 import '@wordpress/notices';
 import { render } from '@wordpress/element';
-import { registerCoreBlocks } from '@wordpress/block-library';
+import { registerCoreBlocks, registerExperimentalCoreBlocks } from '@wordpress/block-library';
 
 /**
  * Internal dependencies
@@ -21,6 +21,7 @@ import CustomizerEditWidgetsInitializer from './components/customizer-edit-widge
  */
 export function initialize( id, settings ) {
 	registerCoreBlocks();
+	registerExperimentalCoreBlocks( settings );
 	render(
 		<EditWidgetsInitializer
 			settings={ settings }

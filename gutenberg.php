@@ -43,7 +43,7 @@ function gutenberg_menu() {
 		'gutenberg'
 	);
 
-	if ( array_key_exists( 'gutenberg-widget-experiments', get_option( 'gutenberg-experiments' ) ) ) {
+	if ( get_option( 'gutenberg-experiments' ) && array_key_exists( 'gutenberg-widget-experiments', get_option( 'gutenberg-experiments' ) ) ) {
 		add_submenu_page(
 			'gutenberg',
 			__( 'Widgets (beta)', 'gutenberg' ),

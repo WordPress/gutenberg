@@ -7,7 +7,7 @@ import '@wordpress/editor';
 import '@wordpress/nux';
 import '@wordpress/viewport';
 import '@wordpress/notices';
-import { registerCoreBlocks } from '@wordpress/block-library';
+import { registerCoreBlocks, registerExperimentalCoreBlocks } from '@wordpress/block-library';
 import { render, unmountComponentAtNode } from '@wordpress/element';
 
 /**
@@ -65,9 +65,8 @@ export function reinitializeEditor( postType, postId, target, settings, initialE
 export function initializeEditor( id, postType, postId, settings, initialEdits ) {
 	const target = document.getElementById( id );
 	const reboot = reinitializeEditor.bind( null, postType, postId, target, settings, initialEdits );
-	const enableLegacyWidgets = settings.__experimentalEnableLegacyWidgetBlock;
-	const enableMenu = settings.__experimentalEnableMenuBlock;
-	registerCoreBlocks( enableLegacyWidgets, enableMenu );
+	registerCoreBlocks();
+	registerExperimentalCoreBlocks( settings );
 
 	// Show a console log warning if the browser is not in Standards rendering mode.
 	const documentMode = document.compatMode === 'CSS1Compat' ? 'Standards' : 'Quirks';

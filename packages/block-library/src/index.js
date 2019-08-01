@@ -63,6 +63,23 @@ import * as tagCloud from './tag-cloud';
 import * as classic from './classic';
 
 /**
+ * Function to register an individual block.
+ *
+ * @param {Object} block    The block to be registered.
+ *
+ */
+const registerBlock = ( block ) => {
+	if ( ! block ) {
+		return;
+	}
+	const { metadata, settings, name } = block;
+	if ( metadata ) {
+		unstable__bootstrapServerSideBlockDefinitions( { [ name ]: metadata } ); // eslint-disable-line camelcase
+	}
+	registerBlockType( name, settings );
+};
+
+/**
  * Function to register core blocks provided by the block editor.
  *
  * @param {boolean} enableLegacyWidgets     Optional. Editor setting to enable Legacy Widget Block.
@@ -75,7 +92,7 @@ import * as classic from './classic';
  * registerCoreBlocks();
  * ```
  */
-export const registerCoreBlocks = ( enableLegacyWidgets, enableMenu ) => {
+export const registerCoreBlocks = () => {
 	[
 		// Common blocks are grouped at the top to prioritize their display
 		// in various contexts — like the inserter and auto-complete components.
@@ -107,11 +124,8 @@ export const registerCoreBlocks = ( enableLegacyWidgets, enableMenu ) => {
 		mediaText,
 		latestComments,
 		latestPosts,
-		enableLegacyWidgets ? legacyWidget : null,
 		missing,
 		more,
-		enableMenu ? navigationMenu : null,
-		enableMenu ? navigationMenuItem : null,
 		nextpage,
 		preformatted,
 		pullquote,
@@ -128,14 +142,7 @@ export const registerCoreBlocks = ( enableLegacyWidgets, enableMenu ) => {
 		verse,
 		video,
 	].forEach( ( block ) => {
-		if ( ! block ) {
-			return;
-		}
-		const { metadata, settings, name } = block;
-		if ( metadata ) {
-			unstable__bootstrapServerSideBlockDefinitions( { [ name ]: metadata } ); // eslint-disable-line camelcase
-		}
-		registerBlockType( name, settings );
+		registerBlock( block );
 	} );
 
 	setDefaultBlockName( paragraph.name );
@@ -147,4 +154,41 @@ export const registerCoreBlocks = ( enableLegacyWidgets, enableMenu ) => {
 	if ( group ) {
 		setGroupingBlockName( group.name );
 	}
+};
+
+/**
+ * Check conditions to register an experimental block.
+ *
+ * @param {boolean} setting    The editor setting for the block.
+ *
+ * @return {boolean} if all conditions allow block to be registered.
+ */
+const checkExperimentalBlockConditions = ( setting ) => {
+	const isSecondPhase = process.env.GUTENBERG_PHASE === 2 ? true : false;
+	const isTestEnvironment = process.env.NODE_ENV === 'test';
+	return ( isSecondPhase && setting ) || isTestEnvironment;
+};
+
+/**
+ * Function to register experimental core blocks depending on editor settings.
+ *
+ * @param {Object} settings     Editor settings.
+ *
+ * @example
+ * ```js
+ * import { registerExperimentalCoreBlocks } from '@wordpress/block-library';
+ *
+ * registerExperimentalCoreBlocks( settings );
+ * ```
+ */
+export const registerExperimentalCoreBlocks = ( settings ) => {
+	const { __experimentalEnableLegacyWidgetBlock, __experimentalEnableMenuBlock } = settings;
+
+	[
+		checkExperimentalBlockConditions( __experimentalEnableLegacyWidgetBlock ) ? legacyWidget : null,
+		checkExperimentalBlockConditions( __experimentalEnableMenuBlock ) ? navigationMenu : null,
+		checkExperimentalBlockConditions( __experimentalEnableMenuBlock ) ? navigationMenuItem : null,
+	].forEach( ( block ) => {
+		registerBlock( block );
+	} );
 };
