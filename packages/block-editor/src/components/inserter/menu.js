@@ -26,6 +26,7 @@ import {
 	PanelBody,
 	ToggleControl,
 	withSpokenMessages,
+	Notice,
 } from '@wordpress/components';
 import {
 	getCategories,
@@ -136,10 +137,15 @@ export class InserterMenu extends Component {
 	onToggleHelpPanel() {
 		this.setState( ( state ) => ( {
 			showHelpPanel: ! state.showHelpPanel,
+			hoveredItem: null,
 		} ) );
 	}
 
 	onHover( item ) {
+		if ( ! item ) {
+			return;
+		}
+
 		this.setState( {
 			hoveredItem: item,
 		} );
@@ -372,19 +378,36 @@ export class InserterMenu extends Component {
 					/>
 				</div>
 
-				{ showHelpPanel && hoveredItem && (
+				{ showHelpPanel && (
 					<div className="block-editor-inserter__menu-help-panel">
-						<BlockCard blockType={ getBlockType( hoveredItem.name ) } />
-						{
-							isReusableBlock( hoveredItem ) &&
-							<div className="block-editor-inserter__preview">
-								<div className="block-editor-inserter__preview-title">{ __( 'Preview' ) }</div>
-								<BlockPreview
-									className="block-editor-inserter__preview-content"
-									blocks={ createBlock( hoveredItem.name, hoveredItem.initialAttributes ) }
-								/>
+						{ hoveredItem && (
+							<>
+								<BlockCard blockType={ getBlockType( hoveredItem.name ) } />
+								{ isReusableBlock( hoveredItem ) && (
+									<div className="block-editor-inserter__preview">
+										<div className="block-editor-inserter__preview-title">{ __( 'Preview' ) }</div>
+										<BlockPreview
+											className="block-editor-inserter__preview-content"
+											blocks={ createBlock( hoveredItem.name, hoveredItem.initialAttributes ) }
+										/>
+									</div>
+								) }
+							</>
+						) }
+						{ ! hoveredItem && (
+							<div className="block-editor-inserter__menu-help-panel-no-block">
+								<h4>Tip</h4>
+								<Notice isDismissible={ false }>
+									{ __(
+										'Blocks are the basis of all content within the editor.' +
+										'This library contains blocks for text, headings, images, lists and more!'
+									) }
+								</Notice>
+								<div className="block-editor-inserter__menu-help-panel-hover-area">
+									{ __( 'Hover over a block in the inserter for more details.' ) }
+								</div>
 							</div>
-						}
+						) }
 					</div>
 				) }
 			</div>
