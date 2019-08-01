@@ -18,7 +18,7 @@ import { useLayoutEffect, useState, useRef } from '@wordpress/element';
 import BlockEditorProvider from '../provider';
 import BlockList from '../block-list';
 
-export function BlockPreview( { blocks, settings, srcWidth = 400, srcHeight = 300, scaleToFit = false } ) {
+export function BlockPreview( { blocks, settings, srcWidth = 400, srcHeight = 300, scaleFactor = 0.9, scaleToFit = false } ) {
 	if ( ! blocks ) {
 		return null;
 	}
@@ -27,7 +27,7 @@ export function BlockPreview( { blocks, settings, srcWidth = 400, srcHeight = 30
 	// which wraps the preview
 	const previewRef = useRef( null );
 
-	const [ previewScale, setPreviewScale ] = useState( 1 );
+	const [ previewScale, setPreviewScale ] = useState( scaleFactor );
 
 	// We use a top-padding to create a responsively sized element with the same aspect ratio as the preview.
 	// The preview is then absolutely positioned on top of this, creating a visual unit.
