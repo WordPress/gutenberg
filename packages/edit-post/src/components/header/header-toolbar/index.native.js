@@ -21,13 +21,6 @@ import { Toolbar, ToolbarButton } from '@wordpress/components';
  */
 import styles from './style.scss';
 
-const hideKeyboard = () => {
-	if ( Platform.OS === 'android' ) {
-		// Avoiding extra blur calls on iOS but still needed for android.
-		Keyboard.dismiss();
-	}
-};
-
 function HeaderToolbar( {
 	hasFixedToolbar,
 	hasRedo,
@@ -36,7 +29,16 @@ function HeaderToolbar( {
 	undo,
 	showInserter,
 	showKeyboardHideButton,
+	clearSelectedBlock,
 } ) {
+	const hideKeyboard = () => {
+		clearSelectedBlock();
+		if ( Platform.OS === 'android' ) {
+			// Avoiding extra blur calls on iOS but still needed for android.
+			Keyboard.dismiss();
+		}
+	};
+
 	return (
 		<View style={ styles.container }>
 			<ScrollView
