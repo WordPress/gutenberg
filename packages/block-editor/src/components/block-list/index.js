@@ -205,6 +205,7 @@ class BlockList extends Component {
 			hasMultiSelection,
 			renderAppender,
 			enableAnimation,
+			showAppender = true,
 		} = this.props;
 
 		return (
@@ -237,10 +238,13 @@ class BlockList extends Component {
 					);
 				} ) }
 
-				<BlockListAppender
-					rootClientId={ rootClientId }
-					renderAppender={ renderAppender }
-				/>
+				{ showAppender && (
+
+					<BlockListAppender
+						rootClientId={ rootClientId }
+						renderAppender={ renderAppender }
+					/>
+				) }
 			</div>
 		);
 	}
