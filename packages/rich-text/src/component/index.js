@@ -303,7 +303,7 @@ class RichText extends Component {
 
 		// Update selection as soon as possible, which is at the next animation
 		// frame. The event listener for selection changes may be added too late
-		// at this point, but this focus event is still too early to calcutate
+		// at this point, but this focus event is still too early to calculate
 		// the selection.
 		this.rafId = window.requestAnimationFrame( this.onSelectionChange );
 
