@@ -52,7 +52,7 @@ export function BlockPreview( { blocks, settings, scaleToFit = true } ) {
 			const previewContainerWidth = refNode.offsetWidth;
 
 			// Adjust the final computed scale if it's desired.
-			const scaleAdjustment = 0.5;
+			const scaleAdjustment = 0.9;
 
 			const comparisonBlockWidth = blockClientIds.reduce( ( acc, currClientId ) => {
 				// Selector scoped to `refNode` to avoid global selector being ambiguous in the case
