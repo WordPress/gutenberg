@@ -16,13 +16,6 @@ import { withSelect } from '@wordpress/data';
 import BlockEditorProvider from '../provider';
 import BlockList from '../block-list';
 
-/**
- * Block Preview Component: It renders a preview given a block name and attributes.
- *
- * @param {Object} props Component props.
- *
- * @return {WPElement} Rendered element.
- */
 export function BlockPreview( { blocks, settings, className, isScaled } ) {
 	if ( ! blocks ) {
 		return null;
@@ -51,6 +44,13 @@ export function BlockPreview( { blocks, settings, className, isScaled } ) {
 	);
 }
 
+/**
+ * BlockPreview renders a preview given an array of blocks.
+ *
+ * @param {Object} props Component props.
+ *
+ * @return {WPElement} Rendered element.
+ */
 export default withSelect( ( select ) => {
 	return {
 		settings: select( 'core/block-editor' ).getSettings(),

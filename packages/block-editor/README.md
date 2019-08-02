@@ -124,7 +124,15 @@ Undocumented declaration.
 
 <a name="BlockPreview" href="#BlockPreview">#</a> **BlockPreview**
 
-Undocumented declaration.
+BlockPreview renders a preview given an array of blocks.
+
+_Parameters_
+
+-   _props_ `Object`: Component props.
+
+_Returns_
+
+-   `WPElement`: Rendered element.
 
 <a name="BlockSelectionClearer" href="#BlockSelectionClearer">#</a> **BlockSelectionClearer**
 
