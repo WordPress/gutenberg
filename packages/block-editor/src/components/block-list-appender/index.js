@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { last } from 'lodash';
+import { last, isNull } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -27,8 +27,10 @@ function BlockListAppender( {
 		return null;
 	}
 
-	// A render prop has been provided, use it to render the appender.
-	if ( CustomAppender ) {
+	// A render prop has been provided
+	// and it is not a component that return `null`
+	// then use it to render the appender.
+	if ( CustomAppender && ! isNull( CustomAppender ) ) {
 		return (
 			<div className="block-list-appender">
 				<CustomAppender />
