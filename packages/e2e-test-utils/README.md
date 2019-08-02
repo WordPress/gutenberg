@@ -137,6 +137,14 @@ _Parameters_
 
 -   _slug_ `string`: Plugin slug.
 
+<a name="disableNavigationMode" href="#disableNavigationMode">#</a> **disableNavigationMode**
+
+Triggers edit mode if not already active.
+
+_Returns_
+
+-   `Promise`: Promise resolving after enabling the keyboard edit mode.
+
 <a name="disablePrePublishChecks" href="#disablePrePublishChecks">#</a> **disablePrePublishChecks**
 
 Disables Pre-publish checks.
@@ -458,14 +466,6 @@ Switches editor mode.
 _Parameters_
 
 -   _mode_ `string`: String editor mode.
-
-<a name="disableNavigationMode" href="#disableNavigationMode">#</a> **disableNavigationMode**
-
-Triggers edit mode if not already active.
-
-_Returns_
-
--   `Promise`: Promise resolving after enabling the keyboard edit mode.
 
 <a name="switchUserToAdmin" href="#switchUserToAdmin">#</a> **switchUserToAdmin**
 

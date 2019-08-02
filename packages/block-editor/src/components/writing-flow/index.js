@@ -78,9 +78,8 @@ class WritingFlow extends Component {
 
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.bindContainer = this.bindContainer.bind( this );
-		this.clearVerticalRect = this.clearVerticalRect.bind( this );
+		this.onMouseDown = this.onMouseDown.bind( this );
 		this.focusLastTextField = this.focusLastTextField.bind( this );
-		this.disableNavigationMode = this.disableNavigationMode.bind( this );
 
 		/**
 		 * Here a rectangle is stored while moving the caret vertically so
@@ -99,20 +98,13 @@ class WritingFlow extends Component {
 		this.appender = createRef();
 	}
 
-	componentDidMount() {
-		window.addEventListener( 'mousedown', this.disableNavigationMode );
-	}
-
-	componentWillUnmount() {
-		window.removeEventListener( 'mousedown', this.disableNavigationMode );
-	}
-
 	bindContainer( ref ) {
 		this.container = ref;
 	}
 
-	clearVerticalRect() {
+	onMouseDown() {
 		this.verticalRect = null;
+		this.disableNavigationMode();
 	}
 
 	disableNavigationMode() {
@@ -403,7 +395,7 @@ class WritingFlow extends Component {
 				<div
 					ref={ this.bindContainer }
 					onKeyDown={ this.onKeyDown }
-					onMouseDown={ this.clearVerticalRect }
+					onMouseDown={ this.onMouseDown }
 				>
 					{ children }
 				</div>

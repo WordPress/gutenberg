@@ -1083,6 +1083,18 @@ _Parameters_
 
 -   _clientId_ `string`: Block client ID.
 
+<a name="setNavigationMode" href="#setNavigationMode">#</a> **setNavigationMode**
+
+Returns an action object used to enable or disable the navigation mode.
+
+_Parameters_
+
+-   _isNavigationMode_ `string`: Enable/Disable navigation mode.
+
+_Returns_
+
+-   `Object`: Action object
+
 <a name="setTemplateValidity" href="#setTemplateValidity">#</a> **setTemplateValidity**
 
 Returns an action object resetting the template validity.
@@ -1161,18 +1173,6 @@ _Parameters_
 _Returns_
 
 -   `Object`: Action object.
-
-<a name="setNavigationMode" href="#setNavigationMode">#</a> **setNavigationMode**
-
-Returns an action object used to enable or disable the navigation mode.
-
-_Parameters_
-
--   _isNavigationMode_ `string`: Enable/Disable navigation mode.
-
-_Returns_
-
--   `Object`: Action object
 
 <a name="toggleSelection" href="#toggleSelection">#</a> **toggleSelection**
 
