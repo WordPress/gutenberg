@@ -64,8 +64,23 @@
 	max-width: 100vw;
 	z-index: z-index(".components-notice-list");
 
+	// Use different margin and line height here to ensure that these are
+	// the same height, regardless of whether or not they have action buttons.
 	.components-notice__content {
 		margin-top: 1em;
 		margin-bottom: 1em;
+		line-height: $grid-size-large + ($grid-size-small * 1.5);
+	}
+
+	// Move the dismiss button to account for the extra line height.
+	.components-notice__dismiss {
+		top: 2px;
+	}
+
+	// Adjust button size/position to better fit with the new line height.
+	.components-notice__action.components-button {
+		margin-top: -3px;
+		margin-bottom: -3px;
+		height: $grid-size-large + ($grid-size-small / 2);
 	}
 }
