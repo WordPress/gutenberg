@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { getAssociatedGuide, isTipVisible, areTipsEnabled } from '../selectors';
+import { getAssociatedGuide, isTipVisible, areTipsEnabled, hasDismissedAnyTips } from '../selectors';
 
 describe( 'selectors', () => {
 	describe( 'getAssociatedGuide', () => {
@@ -143,6 +143,30 @@ describe( 'selectors', () => {
 				},
 			};
 			expect( areTipsEnabled( state ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'hasDismissedAnyTips', () => {
+		it( 'should return true if a tip has been dismissed', () => {
+			const state = {
+				guides: [],
+				preferences: {
+					dismissedTips: {
+						'test/tip': true,
+					},
+				},
+			};
+			expect( hasDismissedAnyTips( state ) ).toBe( true );
+		} );
+
+		it( 'should return false if tips are disabled', () => {
+			const state = {
+				guides: [],
+				preferences: {
+					dismissedTips: {},
+				},
+			};
+			expect( hasDismissedAnyTips( state ) ).toBe( false );
 		} );
 	} );
 } );

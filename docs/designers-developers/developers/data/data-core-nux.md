@@ -32,6 +32,18 @@ _Returns_
 
 -   `?NUX.GuideInfo`: Information about the associated guide.
 
+<a name="hasDismissedAnyTips" href="#hasDismissedAnyTips">#</a> **hasDismissedAnyTips**
+
+Returns whether or not any tips have been dismissed.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `boolean`: Whether any tips have been dismissed.
+
 <a name="isTipVisible" href="#isTipVisible">#</a> **isTipVisible**
 
 Determines whether or not the given tip is showing. Tips are hidden if they

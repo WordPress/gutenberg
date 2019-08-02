@@ -15,21 +15,31 @@ import { __ } from '@wordpress/i18n';
 export function InlineTip( {
 	children,
 	className,
+	hasDismissedAnyTips,
 	isTipVisible,
 	onDisableTips,
 	onDismissTip,
 } ) {
 	const [ isConfirmationVisible, setIsConfirmationVisible ] = useState( false );
 
-	const openConfirmation = () => setIsConfirmationVisible( true );
-	const closeConfirmation = () => setIsConfirmationVisible( false );
+	const dismissNotice = () => {
+		if ( hasDismissedAnyTips ) {
+			onDismissTip();
+		} else {
+			setIsConfirmationVisible( true );
+		}
+	};
 
-	const dismissTip = () => {
+	const closeConfirmation = () => {
+		setIsConfirmationVisible( false );
+	};
+
+	const dismissConfirmation = () => {
 		onDismissTip();
 		closeConfirmation();
 	};
 
-	const disableTips = () => {
+	const acceptConfirmation = () => {
 		onDisableTips();
 		closeConfirmation();
 	};
@@ -39,7 +49,7 @@ export function InlineTip( {
 			{ isTipVisible && (
 				<Notice
 					className={ classnames( 'nux-inline-tip', className ) }
-					onRemove={ openConfirmation }
+					onRemove={ dismissNotice }
 				>
 					{ children }
 				</Notice>
@@ -53,10 +63,10 @@ export function InlineTip( {
 				>
 					{ __( 'Would you like to disable tips like these in the future?' ) }
 					<div className="nux-hide-tips-confirmation__buttons">
-						<Button isDefault isLarge onClick={ dismissTip }>
+						<Button isDefault isLarge onClick={ dismissConfirmation }>
 							{ __( 'No' ) }
 						</Button>
-						<Button isPrimary isLarge onClick={ disableTips }>
+						<Button isPrimary isLarge onClick={ acceptConfirmation }>
 							{ __( 'Disable Tips' ) }
 						</Button>
 					</div>
@@ -67,9 +77,13 @@ export function InlineTip( {
 }
 
 export default compose(
-	withSelect( ( select, { tipId } ) => ( {
-		isTipVisible: select( 'core/nux' ).isTipVisible( tipId ),
-	} ) ),
+	withSelect( ( select, { tipId } ) => {
+		const { isTipVisible, hasDismissedAnyTips } = select( 'core/nux' );
+		return {
+			isTipVisible: isTipVisible( tipId ),
+			hasDismissedAnyTips: hasDismissedAnyTips(),
+		};
+	} ),
 	withDispatch( ( dispatch, { tipId } ) => {
 		const { disableTips, dismissTip } = dispatch( 'core/nux' );
 		return {

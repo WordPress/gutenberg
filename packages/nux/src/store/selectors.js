@@ -2,7 +2,7 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import { includes, difference, keys, has } from 'lodash';
+import { includes, difference, keys, has, isEmpty } from 'lodash';
 
 /**
  * An object containing information about a guide.
@@ -76,4 +76,15 @@ export function isTipVisible( state, tipId ) {
  */
 export function areTipsEnabled( state ) {
 	return state.preferences.areTipsEnabled;
+}
+
+/**
+ * Returns whether or not any tips have been dismissed.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether any tips have been dismissed.
+ */
+export function hasDismissedAnyTips( state ) {
+	return ! isEmpty( state.preferences.dismissedTips );
 }
