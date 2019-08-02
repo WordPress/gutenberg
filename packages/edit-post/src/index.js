@@ -66,7 +66,9 @@ export function initializeEditor( id, postType, postId, settings, initialEdits )
 	const target = document.getElementById( id );
 	const reboot = reinitializeEditor.bind( null, postType, postId, target, settings, initialEdits );
 	registerCoreBlocks();
-	registerExperimentalCoreBlocks( settings );
+	if ( process.env.GUTENBERG_PHASE === 2 ) {
+		registerExperimentalCoreBlocks( settings );
+	}
 
 	// Show a console log warning if the browser is not in Standards rendering mode.
 	const documentMode = document.compatMode === 'CSS1Compat' ? 'Standards' : 'Quirks';

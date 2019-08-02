@@ -52,7 +52,9 @@ describe( 'full post content fixture', () => {
 		// Load all hooks that modify blocks
 		require( '../../../packages/editor/src/hooks' );
 		registerCoreBlocks();
-		registerExperimentalCoreBlocks( settings );
+		if ( process.env.GUTENBERG_PHASE === 2 ) {
+			registerExperimentalCoreBlocks( settings );
+		}
 	} );
 
 	blockBasenames.forEach( ( basename ) => {

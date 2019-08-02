@@ -164,9 +164,8 @@ export const registerCoreBlocks = () => {
  * @return {boolean} if all conditions allow block to be registered.
  */
 const checkExperimentalBlockConditions = ( setting ) => {
-	const isSecondPhase = process.env.GUTENBERG_PHASE === 2 ? true : false;
 	const isTestEnvironment = process.env.NODE_ENV === 'test';
-	return ( isSecondPhase && setting ) || isTestEnvironment;
+	return setting || isTestEnvironment;
 };
 
 /**
@@ -181,7 +180,7 @@ const checkExperimentalBlockConditions = ( setting ) => {
  * registerExperimentalCoreBlocks( settings );
  * ```
  */
-export const registerExperimentalCoreBlocks = ( settings ) => {
+export const registerExperimentalCoreBlocks = process.env.GUTENBERG_PHASE === 2 ? ( settings ) => {
 	const { __experimentalEnableLegacyWidgetBlock, __experimentalEnableMenuBlock } = settings;
 
 	[
@@ -191,4 +190,4 @@ export const registerExperimentalCoreBlocks = ( settings ) => {
 	].forEach( ( block ) => {
 		registerBlock( block );
 	} );
-};
+} : undefined;
