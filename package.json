@@ -126,6 +126,7 @@
 		"phpegjs": "1.0.0-beta7",
 		"postcss": "7.0.13",
 		"progress": "2.0.3",
+		"puppeteer": "1.19.0",
 		"react": "16.8.4",
 		"react-dom": "16.8.4",
 		"react-native": "0.60.0",
