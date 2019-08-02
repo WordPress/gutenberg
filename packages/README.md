@@ -1,6 +1,6 @@
 ## Managing Packages
 
-This repository uses [lerna] to manage Gutenberg modules and publish them as packages to [npm].
+This repository uses [lerna] to manage WordPress modules and publish them as packages to [npm].
 
 ### Creating a New Package
 
@@ -47,6 +47,34 @@ When creating a new package, you need to provide at least the following:
 	- Installation details
 	- Usage example
 	- `Code is Poetry` logo (`<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>`)
+
+### Adding New Dependencies
+
+There are two types of dependencies that you might want to add to one of the existing WordPress package.
+
+#### Production Dependencies
+
+Production dependencies are stored in the `dependencies` section of `package.json` file of the package's folder. The simplest way to add such dependency to one of the packages is to run a very convenient [lerna add](https://github.com/lerna/lerna/tree/master/commands/add#readme) command from the root of the project.
+
+_Example:_
+
+```bash
+lerna add lodash packages/a11y
+```
+
+This command adds the latest version of `lodash` as a dependency to the `@wordpress/a11y` package which is located in `packages/a11y` folder.
+
+#### Development Dependencies
+
+In contrast to production dependencies, development dependencies shouldn't be stored in individual WordPress packages. Instead they should be installed in the project's `package.json` file using the usual `npm install` command. In effect, all development tools are configured to work with every package at the same time to ensure they share the same characteristics and integrate correctly with each other.
+
+_Example:_
+
+```bash
+npm install glob --save-dev
+```
+
+This commands adds the latest version of `glob` as a development dependency to the `package.json` file. It has to be executed from the root of the project.
 
 ### Maintaining Changelogs
 
