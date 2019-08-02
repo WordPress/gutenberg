@@ -45,6 +45,7 @@ export { default as BlockEditorKeyboardShortcuts } from './block-editor-keyboard
 export { default as BlockInspector } from './block-inspector';
 export { default as BlockList } from './block-list';
 export { default as BlockMover } from './block-mover';
+export { default as BlockPreview } from './block-preview';
 export { default as BlockSelectionClearer } from './block-selection-clearer';
 export { default as BlockSettingsMenu } from './block-settings-menu';
 export { default as BlockTitle } from './block-title';
