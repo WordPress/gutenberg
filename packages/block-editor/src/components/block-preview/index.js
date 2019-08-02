@@ -2,11 +2,11 @@
  * External dependencies
  */
 import { castArray } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import { Disabled } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 
@@ -23,22 +23,24 @@ import BlockList from '../block-list';
  *
  * @return {WPElement} Rendered element.
  */
-function BlockPreview( props ) {
-	return (
-		<div className="editor-block-preview block-editor-block-preview">
-			<div className="editor-block-preview__title block-editor-block-preview__title">{ __( 'Preview' ) }</div>
-			<BlockPreviewContent { ...props } />
-		</div>
-	);
-}
-
-export function BlockPreviewContent( { blocks, settings } ) {
+function BlockPreview( { blocks, settings, className, isScaled } ) {
 	if ( ! blocks ) {
 		return null;
 	}
-
 	return (
-		<Disabled className="editor-block-preview__content block-editor-block-preview__content editor-styles-wrapper" aria-hidden>
+		<Disabled
+			aria-hidden
+			className={
+				classnames(
+					className,
+					'block-editor-block-preview',
+					'editor-styles-wrapper',
+					{
+						'is-scaled': isScaled,
+					}
+				)
+			}
+		>
 			<BlockEditorProvider
 				value={ castArray( blocks ) }
 				settings={ settings }
