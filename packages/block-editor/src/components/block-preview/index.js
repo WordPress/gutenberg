@@ -62,7 +62,7 @@ export function BlockPreview( {
 				return acc;
 			}, 0 );
 
-			const scale = ( previewContainerWidth / comparisonBlockWidth || 1 ) * scaleAdjustment;
+			const scale = previewContainerWidth / comparisonBlockWidth || 1;
 
 			setPreviewScale( scale );
 			setVisibility( 'visible' );
@@ -81,7 +81,7 @@ export function BlockPreview( {
 	}
 
 	const previewStyles = {
-		transform: `scale(${ previewScale }) translate(-50%, -50%)`,
+		transform: `scale(${ previewScale * scaleAdjustment }) translate(-50%, -50%)`,
 		visibility,
 	};
 
