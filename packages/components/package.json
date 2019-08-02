@@ -24,6 +24,7 @@
 		"@babel/runtime": "^7.4.4",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/compose": "file:../compose",
+		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/dom": "file:../dom",
 		"@wordpress/element": "file:../element",
 		"@wordpress/hooks": "file:../hooks",

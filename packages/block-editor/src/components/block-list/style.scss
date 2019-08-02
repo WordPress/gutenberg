@@ -146,10 +146,19 @@
 				}
 			}
 		}
+
+		&.is-navigate-mode > .block-editor-block-list__block-edit::before {
+			border-color: $blue-medium-focus;
+			box-shadow: inset $block-left-border-width 0 0 0 $blue-medium-focus;
+
+			@include break-small() {
+				box-shadow: -$block-left-border-width 0 0 0 $blue-medium-focus;
+			}
+		}
 	}
 
 	// Hover style.
-	&.is-hovered > .block-editor-block-list__block-edit::before {
+	&.is-hovered:not(.is-navigate-mode) > .block-editor-block-list__block-edit::before {
 		box-shadow: -$block-left-border-width 0 0 0 $dark-opacity-light-500;
 
 		.is-dark-theme & {
@@ -473,8 +482,9 @@
 		}
 
 		// Align block toolbar to floated content.
+		// Extra specificity is needed to avoid applying this to innerblocks.
 		@include break-mobile() {
-			.block-editor-block-toolbar {
+			> .editor-block-list__block-edit > .block-editor-block-contextual-toolbar > .block-editor-block-toolbar {
 				/*!rtl:begin:ignore*/
 				left: $block-side-ui-width * 3 + ($grid-size-small * 1.5);
 				/*!rtl:end:ignore*/
@@ -482,7 +492,7 @@
 		}
 
 		@include break-xlarge() {
-			.block-editor-block-toolbar {
+			> .editor-block-list__block-edit > .block-editor-block-contextual-toolbar > .block-editor-block-toolbar {
 				/*!rtl:begin:ignore*/
 				left: $block-padding;
 				/*!rtl:end:ignore*/
@@ -1062,16 +1072,18 @@
 		padding: 4px 4px;
 		background: $light-gray-500;
 		color: $dark-gray-900;
+		transition: box-shadow 0.1s linear;
+		@include reduce-motion("transition");
+
+		.components-button {
+			font-size: inherit;
+			line-height: inherit;
+			padding: 0;
+		}
 
 		.is-dark-theme & {
 			background: $dark-gray-600;
 			color: $white;
-		}
-
-		// Animate in
-		.block-editor-block-list__block:hover & {
-			opacity: 0;
-			@include edit-post__fade-in-animation(60ms, 0.5s);
 		}
 	}
 
@@ -1084,6 +1096,38 @@
 	[data-align="right"] & {
 		left: auto;
 		right: 0;
+	}
+
+	// In navigation mode, this should appear similarly to the block toolbar.
+	.is-navigate-mode & {
+
+		// Position in the top left of the border.
+		left: -$block-padding;
+		top: -$block-toolbar-height - $block-padding;
+
+		.components-toolbar {
+			background: $white;
+			border: $border-width solid $blue-medium-focus;
+			border-left: none;
+			box-shadow: inset $block-left-border-width 0 0 0 $blue-medium-focus;
+			height: $block-toolbar-height + $border-width;
+			font-size: $default-font-size;
+			line-height: $block-toolbar-height - $grid-size;
+			padding-left: $grid-size;
+			padding-right: $grid-size;
+
+			.components-button {
+				box-shadow: none;
+			}
+
+			.is-dark-theme & {
+				border-color: $light-opacity-light-800;
+			}
+
+			@include break-small() {
+				box-shadow: -$block-left-border-width 0 0 0 $blue-medium-focus;
+			}
+		}
 	}
 }
 

@@ -109,9 +109,9 @@
 .edit-post-manage-blocks-modal__results {
 	height: 100%;
 	overflow: auto;
-	margin-left: -1 * $grid-size-large;
-	margin-right: -1 * $grid-size-large;
-	padding-left: $grid-size-large;
-	padding-right: $grid-size-large;
+	margin-left: -$grid-size-xlarge;
+	margin-right: -$grid-size-xlarge;
+	padding-left: $grid-size-xlarge;
+	padding-right: $grid-size-xlarge;
 	border-top: $border-width solid $light-gray-500;
 }

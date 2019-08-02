@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { cond, matchesProperty, omit } from 'lodash';
+import { omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -9,24 +9,13 @@ import { cond, matchesProperty, omit } from 'lodash';
 import { NavigableMenu, KeyboardShortcuts } from '@wordpress/components';
 import { Component, createRef } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
-import { ESCAPE } from '@wordpress/keycodes';
-
-/**
- * Browser dependencies
- */
-
-const { Node, getSelection } = window;
 
 class NavigableToolbar extends Component {
 	constructor() {
 		super( ...arguments );
 
 		this.focusToolbar = this.focusToolbar.bind( this );
-		this.focusSelection = this.focusSelection.bind( this );
 
-		this.switchOnKeyDown = cond( [
-			[ matchesProperty( [ 'keyCode' ], ESCAPE ), this.focusSelection ],
-		] );
 		this.toolbar = createRef();
 	}
 
@@ -34,30 +23,6 @@ class NavigableToolbar extends Component {
 		const tabbables = focus.tabbable.find( this.toolbar.current );
 		if ( tabbables.length ) {
 			tabbables[ 0 ].focus();
-		}
-	}
-
-	/**
-	 * Programmatically shifts focus to the element where the current selection
-	 * exists, if there is a selection.
-	 */
-	focusSelection() {
-		// Ensure that a selection exists.
-		const selection = getSelection();
-		if ( ! selection ) {
-			return;
-		}
-
-		// Focus node may be a text node, which cannot be focused directly.
-		// Find its parent element instead.
-		const { focusNode } = selection;
-		let focusElement = focusNode;
-		if ( focusElement.nodeType !== Node.ELEMENT_NODE ) {
-			focusElement = focusElement.parentElement;
-		}
-
-		if ( focusElement ) {
-			focusElement.focus();
 		}
 	}
 

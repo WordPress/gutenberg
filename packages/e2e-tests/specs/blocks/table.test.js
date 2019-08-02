@@ -7,13 +7,14 @@ import { capitalize } from 'lodash';
  * WordPress dependencies
  */
 import {
+	clickButton,
 	clickBlockToolbarButton,
 	createNewPost,
 	getEditedPostContent,
 	insertBlock,
 } from '@wordpress/e2e-test-utils';
 
-const createButtonSelector = "//div[@data-type='core/table']//button[text()='Create Table']";
+const createButtonLabel = 'Create Table';
 
 /**
  * Utility function for changing the selected cell alignment.
@@ -22,8 +23,7 @@ const createButtonSelector = "//div[@data-type='core/table']//button[text()='Cre
  */
 async function changeCellAlignment( align ) {
 	await clickBlockToolbarButton( 'Change column alignment' );
-	const alignButton = await page.$x( `//button[text()='Align Column ${ capitalize( align ) }']` );
-	await alignButton[ 0 ].click();
+	await clickButton( `Align Column ${ capitalize( align ) }` );
 }
 
 describe( 'Table', () => {
@@ -57,8 +57,7 @@ describe( 'Table', () => {
 		await page.keyboard.type( '10' );
 
 		// Create the table.
-		const createButton = await page.$x( createButtonSelector );
-		await createButton[ 0 ].click();
+		await clickButton( createButtonLabel );
 
 		// Expect the post content to have a correctly sized table.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -68,8 +67,7 @@ describe( 'Table', () => {
 		await insertBlock( 'Table' );
 
 		// Create the table.
-		const createButton = await page.$x( createButtonSelector );
-		await createButton[ 0 ].click();
+		await clickButton( createButtonLabel );
 
 		// Click the first cell and add some text.
 		await page.click( '.wp-block-table__cell-content' );
@@ -104,8 +102,7 @@ describe( 'Table', () => {
 		expect( footerSwitch ).toHaveLength( 0 );
 
 		// Create the table.
-		const createButton = await page.$x( createButtonSelector );
-		await createButton[ 0 ].click();
+		await clickButton( createButtonLabel );
 
 		// Expect the header and footer switches to be present now that the table has been created.
 		headerSwitch = await page.$x( headerSwitchSelector );
@@ -141,8 +138,7 @@ describe( 'Table', () => {
 		await insertBlock( 'Table' );
 
 		// Create the table.
-		const createButton = await page.$x( createButtonSelector );
-		await createButton[ 0 ].click();
+		await clickButton( createButtonLabel );
 
 		// Toggle on the switches and add some content.
 		const headerSwitch = await page.$x( "//label[text()='Header section']" );
@@ -154,8 +150,7 @@ describe( 'Table', () => {
 
 		// Add a column.
 		await clickBlockToolbarButton( 'Edit table' );
-		const addColumnAfterButton = await page.$x( "//button[text()='Add Column After']" );
-		await addColumnAfterButton[ 0 ].click();
+		await clickButton( 'Add Column After' );
 
 		// Expect the table to have 3 columns across the header, body and footer.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -164,8 +159,7 @@ describe( 'Table', () => {
 
 		// Delete a column.
 		await clickBlockToolbarButton( 'Edit table' );
-		const deleteColumnButton = await page.$x( "//button[text()='Delete Column']" );
-		await deleteColumnButton[ 0 ].click();
+		await clickButton( 'Delete Column' );
 
 		// Expect the table to have 2 columns across the header, body and footer.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -180,8 +174,7 @@ describe( 'Table', () => {
 		await page.keyboard.type( '4' );
 
 		// Create the table.
-		const [ createButton ] = await page.$x( createButtonSelector );
-		await createButton.click();
+		await clickButton( createButtonLabel );
 
 		// Click the first cell and add some text. Don't align.
 		const cells = await page.$$( '.wp-block-table__cell-content' );
@@ -212,23 +205,20 @@ describe( 'Table', () => {
 		await insertBlock( 'Table' );
 
 		// Create the table.
-		const createButton = await page.$x( createButtonSelector );
-		await createButton[ 0 ].click();
+		await clickButton( createButtonLabel );
 
 		// Enable fixed width as it exascerbates the amount of empty space around the RichText.
-		const fixedWidthSwitch = await page.$x( "//label[text()='Fixed width table cells']" );
-		await fixedWidthSwitch[ 0 ].click();
+		const [ fixedWidthSwitch ] = await page.$x( "//label[text()='Fixed width table cells']" );
+		await fixedWidthSwitch.click();
 
-		// Add lots of text to the first cell.
+		// Add multiple new lines to the first cell to make it taller.
 		await page.click( '.wp-block-table__cell-content' );
-		await page.keyboard.type(
-			`Some long text that will wrap onto multiple lines.`
-		);
+		await page.keyboard.type( '\n\n\n\n' );
 
 		// Get the bounding client rect for the second cell.
 		const { x: secondCellX, y: secondCellY } = await page.evaluate( () => {
 			const secondCell = document.querySelectorAll( '.wp-block-table td' )[ 1 ];
-			// Page.evaluate can only return a non-serializable value to the
+			// Page.evaluate can only return a serializable value to the
 			// parent process, so destructure and restructure the result
 			// into an object.
 			const { x, y } = secondCell.getBoundingClientRect();
@@ -237,7 +227,7 @@ describe( 'Table', () => {
 
 		// Click in the top left corner of the second cell and type some text.
 		await page.mouse.click( secondCellX, secondCellY );
-		await page.keyboard.type( 'This content is in the second cell.' );
+		await page.keyboard.type( 'Second cell.' );
 
 		// Expect that the snapshot shows the text in the second cell.
 		expect( await getEditedPostContent() ).toMatchSnapshot();

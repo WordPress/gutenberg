@@ -10,7 +10,7 @@ import {
 	insertBlock,
 } from '@wordpress/e2e-test-utils';
 
-describe( 'adding blocks', () => {
+describe( 'Writing Flow', () => {
 	beforeEach( async () => {
 		await createNewPost();
 	} );
