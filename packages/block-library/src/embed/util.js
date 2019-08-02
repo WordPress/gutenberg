@@ -68,7 +68,7 @@ export const getPhotoHtml = ( photo ) => {
  * versions, so we require that these are generated separately.
  * See `getAttributesFromPreview` in the generated embed edit component.
  *
- * @param {Object} props The block's props.
+ * @param {Object} props                  The block's props.
  * @param {Object} attributesFromPreview  Attributes generated from the block's most up to date preview.
  * @return {Object|undefined} A more suitable embed block if one exists.
  */

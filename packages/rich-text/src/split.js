@@ -9,12 +9,12 @@ import { replace } from './replace';
  * split at the given separator. This is similar to `String.prototype.split`.
  * Indices are retrieved from the selection if none are provided.
  *
- * @param {Object}        richText
- * @param {Object[]}      richText.formats
- * @param {Object[]}      richText.replacements
- * @param {string}        richText.text
- * @param {number}        richText.start
- * @param {number}        richText.end
+ * @param {Object}        value
+ * @param {Object[]}      value.formats
+ * @param {Object[]}      value.replacements
+ * @param {string}        value.text
+ * @param {number}        value.start
+ * @param {number}        value.end
  * @param {number|string} [string] Start index, or string at which to split.
  *
  * @return {Array} An array of new values.

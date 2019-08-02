@@ -302,12 +302,12 @@ Indices are retrieved from the selection if none are provided.
 
 _Parameters_
 
--   _richText_ `Object`: 
--   _richText.formats_ `Array<Object>`: 
--   _richText.replacements_ `Array<Object>`: 
--   _richText.text_ `string`: 
--   _richText.start_ `number`: 
--   _richText.end_ `number`: 
+-   _value_ `Object`: 
+-   _value.formats_ `Array<Object>`: 
+-   _value.replacements_ `Array<Object>`: 
+-   _value.text_ `string`: 
+-   _value.start_ `number`: 
+-   _value.end_ `number`: 
 -   _string_ `[(number|string)]`: Start index, or string at which to split.
 
 _Returns_
