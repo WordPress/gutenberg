@@ -45,7 +45,7 @@ function BlockPreview( { blocks, settings, className, isScaled } ) {
 				value={ castArray( blocks ) }
 				settings={ settings }
 			>
-				<BlockList />
+				<BlockList renderAppender={ false } />
 			</BlockEditorProvider>
 		</Disabled>
 	);
