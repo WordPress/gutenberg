@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-
 import { castArray } from 'lodash';
 import classnames from 'classnames';
 
