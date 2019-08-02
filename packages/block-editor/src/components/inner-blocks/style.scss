@@ -1,15 +1,11 @@
-// Add clickable overlay to blocks with nesting.
-// This makes it easy to select all layers of the block.
-.block-editor-inner-blocks.has-overlay {
-	&::after {
-		content: "";
-		position: absolute;
-		top: -$block-padding;
-		right: -$block-padding;
-		bottom: -$block-padding;
-		left: -$block-padding;
-		z-index: z-index(".block-editor-inner-blocks.has-overlay::after");
-	}
+.block-editor-inner-blocks.has-overlay::after {
+	content: "";
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	z-index: z-index(".block-editor-inner-blocks__small-screen-overlay:after");
 }
 
 // On fullwide blocks, don't go beyond the canvas.

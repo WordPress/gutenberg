@@ -23,7 +23,6 @@ import { compose } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import BlockAsyncModeProvider from './block-async-mode-provider';
 import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
 import { getBlockDOMNode } from '../../utils/dom';
@@ -215,10 +214,9 @@ class BlockList extends Component {
 						selectedBlockClientId === clientId;
 
 					return (
-						<BlockAsyncModeProvider
+						<AsyncModeProvider
 							key={ 'block-' + clientId }
-							clientId={ clientId }
-							isBlockInSelection={ isBlockInSelection }
+							value={ ! isBlockInSelection }
 						>
 							<BlockListBlock
 								rootClientId={ rootClientId }
@@ -233,7 +231,7 @@ class BlockList extends Component {
 								animateOnChange={ blockClientIds }
 								enableAnimation={ enableAnimation }
 							/>
-						</BlockAsyncModeProvider>
+						</AsyncModeProvider>
 					);
 				} ) }
 
