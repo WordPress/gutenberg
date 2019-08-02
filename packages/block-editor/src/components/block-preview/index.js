@@ -20,6 +20,8 @@ import BlockList from '../block-list';
 import { getBlockPreviewContainerDOMNode } from '../../utils/dom';
 
 export function BlockPreview( { blocks, settings } ) {
+	blocks = castArray( blocks );
+
 	const previewRef = useRef( null );
 
 	const [ previewScale, setPreviewScale ] = useState( 1 );
@@ -27,7 +29,7 @@ export function BlockPreview( { blocks, settings } ) {
 
 	// Dynamically calculate the scale factor
 	useLayoutEffect( () => {
-		const { clientId } = blocks;
+		const blockClientIds = blocks.map( ( block ) => block.clientId );
 
 		// Timer - required to account for async render of `BlockEditorProvider`
 		const timerId = setTimeout( () => {
@@ -46,11 +48,16 @@ export function BlockPreview( { blocks, settings } ) {
 			// Determine the rendered width of the container
 			const previewContainerWidth = refNode.offsetWidth - previewContentOffset;
 
-			// Attempt to get a handle on the DOM node that represents the _visual_ portion of the Block's
-			// content.
-			const previewDomElements = getBlockPreviewContainerDOMNode( clientId );
-			const previewBlocksWidth = previewDomElements ? previewDomElements.offsetWidth : previewContainerWidth;
-			const scale = Math.min( previewContainerWidth / previewBlocksWidth ) || 1;
+			const comparisonBlockWidth = blockClientIds.reduce( ( acc, currClientId ) => {
+				const previewDomElement = getBlockPreviewContainerDOMNode( currClientId );
+
+				if ( previewDomElement && previewDomElement.offsetWidth > acc ) {
+					acc = previewDomElement.offsetWidth;
+				}
+				return acc;
+			}, previewContainerWidth );
+
+			const scale = Math.min( previewContainerWidth / comparisonBlockWidth ) || 1;
 
 			setPreviewScale( scale );
 			setVisibility( 'visible' );
@@ -81,7 +88,7 @@ export function BlockPreview( { blocks, settings } ) {
 		<div ref={ previewRef } className="editor-block-preview__container" aria-hidden>
 			<Disabled style={ previewStyles } className={ contentClassNames }>
 				<BlockEditorProvider
-					value={ castArray( blocks ) }
+					value={ blocks }
 					settings={ settings }
 				>
 					<BlockList />
