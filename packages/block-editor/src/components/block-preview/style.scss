@@ -32,10 +32,6 @@
 	// The preview component measures the pixel width of this item, so as to calculate the scale factor.
 	// But without this baseline width, it collapses to 0.
 	width: 100%;
-
-	// This ensures that content evne if it overlaps the preview container is properly clipped.
-	// This is mostly for previews that include arbitrary content.
-	overflow: hidden;
 }
 
 .block-editor-block-preview__content {
@@ -44,8 +40,8 @@
 
 	// Position above the padding.
 	position: absolute;
-	top: 0;
-	left: 0;
+	top: $block-padding;
+	left: $block-padding;
 
 	// Important to set the origin.
 	transform-origin: top left;
@@ -53,7 +49,6 @@
 	// Resetting paddings, margins, and other.
 	text-align: initial;
 	margin: 0;
-	padding: $block-padding;
 	overflow: visible;
 	min-height: auto;
 

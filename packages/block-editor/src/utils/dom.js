@@ -11,6 +11,15 @@ export function getBlockDOMNode( clientId ) {
 	return document.querySelector( '[data-block="' + clientId + '"]' );
 }
 
+export function getClockPreviewContainerDOMNode( clientId ) {
+	const domNode = getBlockDOMNode( clientId );
+	if ( ! domNode ) {
+		return;
+	}
+
+	return domNode.querySelector( '.wp-block-preview-container' );
+}
+
 /**
  * Given a block client ID, returns the corresponding DOM node for the block
  * focusable wrapper, if exists. As much as possible, this helper should be

@@ -122,16 +122,7 @@ function BlockStyles( {
 						aria-label={ style.label || style.name }
 					>
 						<div className="editor-block-styles__item-preview block-editor-block-styles__item-preview">
-							<BlockPreview
-								isScaled
-								blocks={ cloneBlock( block, {
-									className: styleClassName,
-								} ) }
-								srcWidth={ 400 }
-								srcHeight={ 300 }
-								scaleFactor={ 0.6 }
-
-							/>
+							<BlockPreview blocks={ cloneBlock( block, { className: styleClassName } ) } />
 						</div>
 						<div className="editor-block-styles__item-label block-editor-block-styles__item-label">
 							{ style.label || style.name }

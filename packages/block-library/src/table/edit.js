@@ -591,7 +591,7 @@ export class TableEdit extends Component {
 						] }
 					/>
 				</InspectorControls>
-				<figure className={ className }>
+				<figure className={ classnames( className, 'wp-block-preview-container' ) }>
 					<table className={ tableClasses }>
 						<Section name="head" rows={ head } />
 						<Section name="body" rows={ body } />

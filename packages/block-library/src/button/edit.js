@@ -117,6 +117,7 @@ class ButtonEdit extends Component {
 					onChange={ ( value ) => setAttributes( { text: value } ) }
 					withoutInteractiveFormatting
 					className={ classnames(
+						'wp-block-preview-container',
 						'wp-block-button__link', {
 							'has-background': backgroundColor.color,
 							[ backgroundColor.class ]: backgroundColor.class,
