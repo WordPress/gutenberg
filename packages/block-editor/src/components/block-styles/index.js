@@ -17,7 +17,7 @@ import { getBlockType, cloneBlock } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import { BlockPreviewContent } from '../block-preview';
+import BlockPreview from '../block-preview';
 
 /**
  * Returns the active style from the given className.
@@ -122,7 +122,8 @@ function BlockStyles( {
 						aria-label={ style.label || style.name }
 					>
 						<div className="editor-block-styles__item-preview block-editor-block-styles__item-preview">
-							<BlockPreviewContent
+							<BlockPreview
+								isScaled
 								blocks={ cloneBlock( block, {
 									className: styleClassName,
 								} ) }

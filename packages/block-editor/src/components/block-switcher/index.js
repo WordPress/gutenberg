@@ -160,14 +160,17 @@ export class BlockSwitcher extends Component {
 						}
 
 						{ ( hoveredClassName !== null ) &&
-							<BlockPreview
-								blocks={
-									cloneBlock( blocks[ 0 ], {
-										className: hoveredClassName,
-									} )
-								}
-
-							/>
+							<div className="block-editor-block-switcher__preview">
+								<div className="block-editor-block-switcher__preview-title">{ __( 'Preview' ) }</div>
+								<BlockPreview
+									className="block-editor-block-switcher__preview-content"
+									blocks={
+										cloneBlock( blocks[ 0 ], {
+											className: hoveredClassName,
+										} )
+									}
+								/>
+							</div>
 						}
 					</>
 				) }
