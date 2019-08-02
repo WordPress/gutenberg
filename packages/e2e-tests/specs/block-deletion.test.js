@@ -10,12 +10,10 @@ import {
 	pressKeyWithModifier,
 	pressKeyTimes,
 	insertBlock,
-	disableNavigationMode,
 } from '@wordpress/e2e-test-utils';
 
 const addThreeParagraphsToNewPost = async () => {
 	await createNewPost();
-	await disableNavigationMode();
 
 	// Add demo content
 	await clickBlockAppender();
@@ -148,7 +146,6 @@ describe( 'block deletion -', () => {
 describe( 'deleting all blocks', () => {
 	beforeEach( async () => {
 		await createNewPost();
-		await disableNavigationMode();
 	} );
 
 	it( 'results in the default block getting selected', async () => {

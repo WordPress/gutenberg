@@ -6,13 +6,11 @@ import {
 	clickBlockToolbarButton,
 	createNewPost,
 	switchEditorModeTo,
-	disableNavigationMode,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Editing modes (visual/HTML)', () => {
 	beforeEach( async () => {
 		await createNewPost();
-		await disableNavigationMode();
 		await clickBlockAppender();
 		await page.keyboard.type( 'Hello world!' );
 	} );

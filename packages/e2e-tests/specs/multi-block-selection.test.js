@@ -8,13 +8,11 @@ import {
 	pressKeyWithModifier,
 	pressKeyTimes,
 	getEditedPostContent,
-	disableNavigationMode,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Multi-block selection', () => {
 	beforeEach( async () => {
 		await createNewPost();
-		await disableNavigationMode();
 	} );
 
 	it( 'Should select/unselect multiple blocks', async () => {

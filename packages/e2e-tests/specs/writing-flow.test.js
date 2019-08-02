@@ -8,13 +8,11 @@ import {
 	pressKeyTimes,
 	pressKeyWithModifier,
 	insertBlock,
-	disableNavigationMode,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Writing Flow', () => {
 	beforeEach( async () => {
 		await createNewPost();
-		await disableNavigationMode();
 	} );
 
 	it( 'Should navigate inner blocks with arrow keys', async () => {

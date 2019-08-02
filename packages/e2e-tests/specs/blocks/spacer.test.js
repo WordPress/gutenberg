@@ -6,13 +6,11 @@ import {
 	getEditedPostContent,
 	createNewPost,
 	dragAndResize,
-	disableNavigationMode,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Spacer', () => {
 	beforeEach( async () => {
 		await createNewPost();
-		await disableNavigationMode();
 	} );
 
 	it( 'can be created by typing "/spacer"', async () => {

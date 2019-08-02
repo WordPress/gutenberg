@@ -6,7 +6,7 @@ import { forEach } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { createNewPost, pressKeyWithModifier, disableNavigationMode } from '@wordpress/e2e-test-utils';
+import { createNewPost, pressKeyWithModifier } from '@wordpress/e2e-test-utils';
 
 describe( 'block toolbar', () => {
 	forEach( {
@@ -23,8 +23,6 @@ describe( 'block toolbar', () => {
 					dispatch( 'core/edit-post' ).toggleFeature( 'fixedToolbar' );
 				}
 			}, isUnifiedToolbar );
-
-			await disableNavigationMode();
 		} );
 
 		const isInBlockToolbar = () => page.evaluate( () => (

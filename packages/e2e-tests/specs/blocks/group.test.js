@@ -6,7 +6,6 @@ import {
 	searchForBlock,
 	getEditedPostContent,
 	createNewPost,
-	disableNavigationMode,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Group', () => {
@@ -22,7 +21,6 @@ describe( 'Group', () => {
 	} );
 
 	it( 'can be created using the slash inserter', async () => {
-		await disableNavigationMode();
 		await clickBlockAppender();
 		await page.keyboard.type( '/group' );
 		await page.keyboard.press( 'Enter' );

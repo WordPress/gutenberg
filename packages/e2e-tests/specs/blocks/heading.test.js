@@ -6,7 +6,6 @@ import {
 	createNewPost,
 	getEditedPostContent,
 	pressKeyWithModifier,
-	disableNavigationMode,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Heading', () => {
@@ -19,7 +18,6 @@ describe( 'Heading', () => {
 
 	beforeEach( async () => {
 		await createNewPost();
-		await disableNavigationMode();
 	} );
 
 	it( 'can be created by prefixing number sign and a space', async () => {

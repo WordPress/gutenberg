@@ -83,7 +83,6 @@ async function toggleCustomFieldsOption( shouldBeChecked ) {
 describe( 'Preview', () => {
 	beforeEach( async () => {
 		await createNewPost();
-		await disableNavigationMode();
 	} );
 
 	it( 'should open a preview window for a new post', async () => {

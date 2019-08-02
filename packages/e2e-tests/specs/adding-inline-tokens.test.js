@@ -15,13 +15,11 @@ import {
 	createNewPost,
 	clickBlockToolbarButton,
 	clickButton,
-	disableNavigationMode,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'adding inline tokens', () => {
 	beforeEach( async () => {
 		await createNewPost();
-		await disableNavigationMode();
 	} );
 
 	it( 'should insert inline image', async () => {

@@ -8,7 +8,6 @@ import {
 	pressKeyWithModifier,
 	searchForBlock,
 	getEditedPostContent,
-	disableNavigationMode,
 } from '@wordpress/e2e-test-utils';
 
 function waitForAndAcceptDialog() {
@@ -20,7 +19,6 @@ function waitForAndAcceptDialog() {
 describe( 'Reusable Blocks', () => {
 	beforeAll( async () => {
 		await createNewPost();
-		await disableNavigationMode();
 	} );
 
 	beforeEach( async () => {

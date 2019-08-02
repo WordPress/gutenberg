@@ -7,13 +7,11 @@ import {
 	createNewPost,
 	insertBlock,
 	clickButton,
-	disableNavigationMode,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Preformatted', () => {
 	beforeEach( async () => {
 		await createNewPost();
-		await disableNavigationMode();
 	} );
 
 	it( 'should preserve character newlines', async () => {

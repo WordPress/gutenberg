@@ -22,7 +22,6 @@ import {
 	setPostContent,
 	selectBlockByClientId,
 	transformBlockTo,
-	disableNavigationMode,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -101,7 +100,6 @@ describe( 'Block transforms', () => {
 	const transformStructure = {};
 	beforeAll( async () => {
 		await createNewPost();
-		await disableNavigationMode();
 
 		for ( const fileBase of fileBasenames ) {
 			const structure = await getTransformStructureFromFile(
@@ -137,7 +135,6 @@ describe( 'Block transforms', () => {
 		} );
 
 		beforeEach( async () => {
-			await disableNavigationMode();
 			await setPostContent( '' );
 			await page.click( '.editor-post-title .editor-post-title__block' );
 		} );

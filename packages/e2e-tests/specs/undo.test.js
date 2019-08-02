@@ -15,7 +15,6 @@ import {
 describe( 'undo', () => {
 	beforeEach( async () => {
 		await createNewPost();
-		await disableNavigationMode();
 	} );
 
 	it( 'should undo typing after a pause', async () => {

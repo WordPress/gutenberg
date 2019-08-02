@@ -5,13 +5,11 @@ import {
 	clickBlockAppender,
 	getEditedPostContent,
 	createNewPost,
-	disableNavigationMode,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'HTML block', () => {
 	beforeEach( async () => {
 		await createNewPost();
-		await disableNavigationMode();
 	} );
 
 	it( 'can be created by typing "/html"', async () => {

@@ -8,7 +8,6 @@ import {
 	createNewPost,
 	pressKeyWithModifier,
 	insertBlock,
-	disableNavigationMode,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -20,7 +19,6 @@ import {
 describe( 'Links', () => {
 	beforeEach( async () => {
 		await createNewPost();
-		await disableNavigationMode();
 	} );
 
 	const waitForAutoFocus = async () => {

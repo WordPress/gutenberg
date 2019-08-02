@@ -7,7 +7,6 @@ import {
 	createNewPost,
 	deactivatePlugin,
 	getEditedPostContent,
-	disableNavigationMode,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Using Hooks API', () => {
@@ -30,7 +29,6 @@ describe( 'Using Hooks API', () => {
 	} );
 
 	it( 'Pressing reset block button resets the block', async () => {
-		await disableNavigationMode();
 		await clickBlockAppender();
 		await page.keyboard.type( 'First paragraph' );
 		const paragraphContent = await page.$eval( 'div[data-type="core/paragraph"] p', ( element ) => element.textContent );

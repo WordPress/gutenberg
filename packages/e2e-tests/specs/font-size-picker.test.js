@@ -6,13 +6,11 @@ import {
 	getEditedPostContent,
 	createNewPost,
 	pressKeyTimes,
-	disableNavigationMode,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Font Size Picker', () => {
 	beforeEach( async () => {
 		await createNewPost();
-		await disableNavigationMode();
 	} );
 
 	it( 'should apply a named font size using the font size buttons', async () => {
