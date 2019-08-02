@@ -72,6 +72,11 @@ export const SETTINGS_DEFAULTS = {
 			color: '#0693e3',
 		},
 		{
+			name: __( 'Vivid purple' ),
+			slug: 'vivid-purple',
+			color: '#9b51e0',
+		},
+		{
 			name: __( 'Very light gray' ),
 			slug: 'very-light-gray',
 			color: '#eeeeee',

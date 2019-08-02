@@ -7,6 +7,7 @@ import { withInstanceId } from '@wordpress/compose';
  * Internal dependencies
  */
 import BaseControl from '../base-control';
+import Dashicon from '../dashicon';
 
 function CheckboxControl( { label, className, heading, checked, help, instanceId, onChange, ...props } ) {
 	const id = `inspector-checkbox-control-${ instanceId }`;
@@ -25,6 +26,7 @@ function CheckboxControl( { label, className, heading, checked, help, instanceId
 				{ ...props }
 			/>
 			<label className="components-checkbox-control__label" htmlFor={ id }>
+				{ checked ? <Dashicon icon="yes" className="components-checkbox-control__checked" role="presentation" /> : null }
 				{ label }
 			</label>
 		</BaseControl>

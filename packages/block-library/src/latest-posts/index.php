@@ -67,7 +67,7 @@ function render_block_core_latest_posts( $attributes ) {
 				$list_items_markup .= sprintf(
 					'<a href="%1$s">%2$s</a></div>',
 					esc_url( get_permalink( $post ) ),
-					__( 'Read More' )
+					__( 'Read more' )
 				);
 			} else {
 				$list_items_markup .= sprintf(
