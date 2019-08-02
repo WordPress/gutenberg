@@ -11,7 +11,7 @@ export function getBlockDOMNode( clientId ) {
 	return document.querySelector( '[data-block="' + clientId + '"]' );
 }
 
-export function getClockPreviewContainerDOMNode( clientId ) {
+export function getBlockPreviewContainerDOMNode( clientId ) {
 	const domNode = getBlockDOMNode( clientId );
 	if ( ! domNode ) {
 		return;

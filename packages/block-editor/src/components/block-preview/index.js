@@ -17,7 +17,7 @@ import { useLayoutEffect, useState, useRef, useEffect } from '@wordpress/element
  */
 import BlockEditorProvider from '../provider';
 import BlockList from '../block-list';
-import { getClockPreviewContainerDOMNode } from '../../utils/dom';
+import { getBlockPreviewContainerDOMNode } from '../../utils/dom';
 
 export function BlockPreview( { blocks, settings } ) {
 	const previewRef = useRef( null );
@@ -34,7 +34,7 @@ export function BlockPreview( { blocks, settings } ) {
 			const refNode = previewRef.current;
 			const containerWidth = refNode.offsetWidth - ( 14 * 2 );
 
-			const previewDomElements = getClockPreviewContainerDOMNode( clientId );
+			const previewDomElements = getBlockPreviewContainerDOMNode( clientId );
 			const previewBlocksWidth = previewDomElements ? previewDomElements.offsetWidth : containerWidth;
 			const scale = Math.min( containerWidth / previewBlocksWidth ) || 1;
 
