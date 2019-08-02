@@ -25,6 +25,9 @@ import {
 	ExternalLink,
 	FocalPointPicker,
 } from '@wordpress/components';
+import { compose } from '@wordpress/compose';
+import { withSelect } from '@wordpress/data';
+
 /**
  * Internal dependencies
  */
@@ -125,6 +128,7 @@ class MediaTextEdit extends Component {
 			isSelected,
 			setAttributes,
 			setBackgroundColor,
+			innerBlockCount,
 		} = this.props;
 		const {
 			isStackedOnMobile,
@@ -232,7 +236,7 @@ class MediaTextEdit extends Component {
 				<div className={ classNames } style={ style } >
 					{ this.renderMediaArea() }
 					<InnerBlocks
-						template={ TEMPLATE }
+						template={ innerBlockCount === 0 ? TEMPLATE : null }
 						templateInsertUpdatesSelection={ false }
 					/>
 				</div>
@@ -241,4 +245,9 @@ class MediaTextEdit extends Component {
 	}
 }
 
-export default withColors( 'backgroundColor' )( MediaTextEdit );
+export default compose( [
+	withColors( 'backgroundColor' ),
+	withSelect( ( select, { clientId } ) => ( {
+		innerBlockCount: select( 'core/block-editor' ).getBlockCount( clientId ),
+	} ) ),
+] )( MediaTextEdit );

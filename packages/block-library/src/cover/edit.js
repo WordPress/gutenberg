@@ -31,6 +31,7 @@ import {
 } from '@wordpress/block-editor';
 import { Component, createRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -96,6 +97,7 @@ class CoverEdit extends Component {
 			noticeUI,
 			overlayColor,
 			setOverlayColor,
+			innerBlockCount,
 		} = this.props;
 		const {
 			backgroundType,
@@ -297,7 +299,7 @@ class CoverEdit extends Component {
 					) }
 					<div className="wp-block-cover__inner-container">
 						<InnerBlocks
-							template={ INNER_BLOCKS_TEMPLATE }
+							template={ innerBlockCount === 0 ? INNER_BLOCKS_TEMPLATE : null }
 						/>
 					</div>
 				</div>
@@ -372,4 +374,7 @@ class CoverEdit extends Component {
 export default compose( [
 	withColors( { overlayColor: 'background-color' } ),
 	withNotices,
+	withSelect( ( select, { clientId } ) => ( {
+		innerBlockCount: select( 'core/block-editor' ).getBlockCount( clientId ),
+	} ) ),
 ] )( CoverEdit );
