@@ -13,7 +13,7 @@ import {
 	AlignmentToolbar,
 } from '@wordpress/block-editor';
 
-export default function VerseEdit( { attributes, setAttributes, className, mergeBlocks } ) {
+export default function VerseEdit( { attributes, setAttributes, className, mergeBlocks, onReplace } ) {
 	const { textAlign, content } = attributes;
 
 	return (
@@ -40,6 +40,7 @@ export default function VerseEdit( { attributes, setAttributes, className, merge
 					[ `has-text-align-${ textAlign }` ]: textAlign,
 				} ) }
 				onMerge={ mergeBlocks }
+				onReplace={ onReplace }
 			/>
 		</>
 	);

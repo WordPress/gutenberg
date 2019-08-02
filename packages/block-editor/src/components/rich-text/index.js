@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { omit } from 'lodash';
+import { castArray, omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -64,9 +64,10 @@ class RichTextWrapper extends Component {
 			} );
 
 			if ( transformation ) {
-				onReplace( [
+				onReplace( castArray(
 					transformation.transform( { content: value.text } ),
-				] );
+				) );
+				return;
 			}
 		}
 
