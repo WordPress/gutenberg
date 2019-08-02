@@ -20,9 +20,9 @@
 			display: flex;
 			margin: 0;
 			svg.dashicon.components-checkbox-control__checked {
-				bottom: 0;
+				bottom: 3px;
 				@include break-small() {
-					bottom: 5px;
+					bottom: 8px;
 				}
 			}
 		}
@@ -34,6 +34,7 @@
 		.components-checkbox-control__label {
 			flex-grow: 1;
 			padding: 0.6rem 0 0.6rem 10px;
+			height: 38px;
 		}
 	}
 }

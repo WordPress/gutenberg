@@ -54,7 +54,7 @@
 	top: 0;
 	padding: $panel-padding 0;
 	background-color: $white;
-	z-index: 1;
+	z-index: z-index(".edit-post-manage-blocks-modal__category-title");
 
 	.components-base-control__field {
 		margin-bottom: 0;

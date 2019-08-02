@@ -44,8 +44,7 @@
 
 .components-checkbox-control__label {
 	position: relative;
-	vertical-align: middle;
-	line-height: 1;
+	max-height: 42px;
 }
 
 svg.dashicon.components-checkbox-control__checked {
