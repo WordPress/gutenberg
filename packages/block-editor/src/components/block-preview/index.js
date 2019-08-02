@@ -59,7 +59,7 @@ export function BlockPreview( { blocks, settings, scaleToFit = true } ) {
 					acc = previewDomElement.offsetWidth;
 				}
 				return acc;
-			}, previewContainerWidth );
+			}, 0 );
 
 			const scale = Math.min( previewContainerWidth / comparisonBlockWidth ) || 1;
 
