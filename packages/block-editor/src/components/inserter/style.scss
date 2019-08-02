@@ -163,6 +163,14 @@ $block-inserter-search-height: 38px;
 	height: 100%;
 	flex-direction: column;
 
+	.block-editor-inserter__menu-help-panel-no-block-text {
+		flex-grow: 1;
+
+		h4 {
+			font-size: $big-font-size;
+		}
+	}
+
 	.components-notice {
 		margin: 0;
 	}
