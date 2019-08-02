@@ -61,7 +61,7 @@ export function BlockPreview( { blocks, settings, scaleToFit = true } ) {
 				return acc;
 			}, 0 );
 
-			const scale = Math.min( previewContainerWidth / comparisonBlockWidth ) || 1;
+			const scale = previewContainerWidth / comparisonBlockWidth || 1;
 
 			setPreviewScale( scale );
 			setVisibility( 'visible' );
