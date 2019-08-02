@@ -13,11 +13,12 @@ export function getBlockDOMNode( clientId ) {
 
 export function getBlockPreviewContainerDOMNode( clientId ) {
 	const domNode = getBlockDOMNode( clientId );
+
 	if ( ! domNode ) {
 		return;
 	}
 
-	return domNode.querySelector( '.wp-block-preview-container' );
+	return domNode.firstChild || domNode;
 }
 
 /**
