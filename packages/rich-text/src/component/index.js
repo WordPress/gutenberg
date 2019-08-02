@@ -386,8 +386,17 @@ class RichText extends Component {
 
 	/**
 	 * Handles the `selectionchange` event: sync the selection to local state.
+	 *
+	 * @param {Event} event `selectionchange` event.
 	 */
-	onSelectionChange() {
+	onSelectionChange( event ) {
+		if (
+			event.type !== 'selectionchange' &&
+			! this.props.__unstableIsSelected
+		) {
+			return;
+		}
+
 		const { start, end } = this.createRecord();
 		const value = this.getRecord();
 
