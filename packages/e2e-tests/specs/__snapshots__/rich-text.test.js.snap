@@ -65,3 +65,9 @@ exports[`RichText should transform backtick to code 2`] = `
 <p>A \`backtick\`</p>
 <!-- /wp:paragraph -->"
 `;
+
+exports[`RichText should update internal selection after fresh focus 1`] = `
+"<!-- wp:paragraph -->
+<p>1<strong>2</strong></p>
+<!-- /wp:paragraph -->"
+`;
