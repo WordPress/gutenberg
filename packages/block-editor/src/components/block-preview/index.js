@@ -18,7 +18,7 @@ import BlockEditorProvider from '../provider';
 import BlockList from '../block-list';
 import { getBlockPreviewContainerDOMNode } from '../../utils/dom';
 
-export function BlockPreview( { blocks, settings } ) {
+export function BlockPreview( { blocks, settings, scaleToFit = true } ) {
 	blocks = castArray( blocks );
 
 	const previewRef = useRef( null );
@@ -28,6 +28,9 @@ export function BlockPreview( { blocks, settings } ) {
 
 	// Dynamically calculate the scale factor
 	useLayoutEffect( () => {
+		if ( ! scaleToFit ) {
+			return;
+		}
 		const blockClientIds = blocks.map( ( block ) => block.clientId );
 
 		// Timer - required to account for async render of `BlockEditorProvider`
