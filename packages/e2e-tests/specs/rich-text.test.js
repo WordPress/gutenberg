@@ -229,12 +229,6 @@ describe( 'RichText', () => {
 		} );
 		// Focus the rich text instance again (not at the start).
 		await page.click( '.wp-block-paragraph', { button: 'middle' } );
-		// Wait for animation frame.
-		await page.evaluate( async () => {
-			await new Promise( ( resolve ) => {
-				window.requestAnimationFrame( resolve );
-			} );
-		} );
 		// Should internally set bold at selection.
 		await pressKeyWithModifier( 'primary', 'b' );
 		// "2" should be bold.
