@@ -48,3 +48,11 @@ $blocks-button__height: 56px;
 		border: 2px solid;
 	}
 }
+
+.wp-block-button-wrapper {
+	display: table;
+}
+
+.block-editor-block-list__block.is-selected .wp-block-button-wrapper {
+	width: 100%;
+}
