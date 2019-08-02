@@ -43,7 +43,7 @@ export function BlockPreviewContent( { blocks, settings } ) {
 				value={ castArray( blocks ) }
 				settings={ settings }
 			>
-				<BlockList />
+				<BlockList renderAppender={ () => null } />
 			</BlockEditorProvider>
 		</Disabled>
 	);
