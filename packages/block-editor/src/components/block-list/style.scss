@@ -174,18 +174,31 @@
 
 		> .block-editor-block-list__block-edit::before {
 			border: $border-width dashed $dark-opacity-light-600;
+
+			.is-dark-theme & {
+				border-color: $light-opacity-light-500;
+			}
 		}
 
 		> .block-editor-block-list__block-edit > [data-block] > div > .block-editor-inner-blocks > .block-editor-block-list__layout > .block-editor-block-list__block:not(.is-selected) > .block-editor-block-list__block-edit::before,
 		> .block-editor-block-list__block-edit > [data-block] > div > .wp-block-cover__inner-container > .block-editor-inner-blocks > .block-editor-block-list__layout > .block-editor-block-list__block:not(.is-selected) > .block-editor-block-list__block-edit::before,
 		> .block-editor-block-list__block-edit > [data-block] > div > .wp-block-group__inner-container > .block-editor-inner-blocks > .block-editor-block-list__layout > .block-editor-block-list__block:not(.is-selected) > .block-editor-block-list__block-edit::before {
 			border: $border-width dashed $dark-opacity-light-600;
+
+			.is-dark-theme & {
+				border-color: $light-opacity-light-500;
+			}
 		}
 
 		&.is-hovered > .block-editor-block-list__block-edit::before {
 			border-style: solid;
 			border-color: $dark-opacity-light-500;
 			border-left-color: transparent;
+
+			.is-dark-theme & {
+				border-color: $light-opacity-light-400;
+				border-left-color: transparent;
+			}
 		}
 	}
 
@@ -198,12 +211,21 @@
 
 			> .block-editor-block-list__block-edit::before {
 				border: $border-width dashed $dark-opacity-light-600;
+
+				.is-dark-theme & {
+					border-color: $light-opacity-light-500;
+				}
 			}
 
 			&.is-hovered > .block-editor-block-list__block-edit::before {
 				border-style: solid;
 				border-color: $dark-opacity-light-500;
 				border-left-color: transparent;
+
+				.is-dark-theme & {
+					border-color: $light-opacity-light-400;
+					border-left-color: transparent;
+				}
 			}
 		}
 	}
