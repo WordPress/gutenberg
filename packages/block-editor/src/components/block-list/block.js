@@ -261,7 +261,11 @@ function BlockListBlock( {
 	}, [ isFirstMultiSelected ] );
 
 	// Block Reordering animation
-	const animationStyle = useMovingAnimation( wrapper, isSelected || isPartOfMultiSelection, enableAnimation, animateOnChange );
+	// useMovingAnimation uses hooks and requires being called even with disabled animations.
+	let animationStyle = useMovingAnimation( wrapper, isSelected || isPartOfMultiSelection, enableAnimation, animateOnChange );
+
+	// Dismiss animation style if animations are disabled.
+	animationStyle = enableAnimation ? animationStyle : {};
 
 	// Focus the breadcrumb if the wrapper is focused on navigation mode.
 	// Focus the first editable or the wrapper if edit mode.
