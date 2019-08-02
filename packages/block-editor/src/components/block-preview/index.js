@@ -49,7 +49,9 @@ export function BlockPreview( { blocks, settings } ) {
 			const previewContainerWidth = refNode.offsetWidth - previewContentOffset;
 
 			const comparisonBlockWidth = blockClientIds.reduce( ( acc, currClientId ) => {
-				const previewDomElement = getBlockPreviewContainerDOMNode( currClientId );
+				// Selector scoped to `refNode` to avoid global selector being ambiguous in the case
+				// of multiple previews on the same view
+				const previewDomElement = getBlockPreviewContainerDOMNode( currClientId, refNode );
 
 				if ( previewDomElement && previewDomElement.offsetWidth > acc ) {
 					acc = previewDomElement.offsetWidth;
