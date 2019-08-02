@@ -99,7 +99,8 @@
 		border-bottom: $border-width solid $light-gray-500;
 	}
 
-	.components-menu-item__button {
+	.components-menu-item__button,
+	.components-menu-item__button.components-icon-button {
 		padding-left: 2rem;
 
 		&.has-icon {
