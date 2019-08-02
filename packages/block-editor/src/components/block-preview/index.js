@@ -10,7 +10,7 @@ import classnames from 'classnames';
  */
 import { Disabled } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
-import { useLayoutEffect, useState, useRef, useEffect } from '@wordpress/element';
+import { useLayoutEffect, useState, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -25,14 +25,17 @@ export function BlockPreview( { blocks, settings } ) {
 	const [ previewScale, setPreviewScale ] = useState( 1 );
 	const [ visibility, setVisibility ] = useState( 'hidden' );
 
-	let timerId;
-
 	// Dynamically calculate the scale factor
 	useLayoutEffect( () => {
 		const { clientId } = blocks;
-		timerId = setTimeout( () => {
+
+		// this.props.setTimeout( () => {
+		// Timer - required to account for async render of `BlockEditorProvider`
+		const timerId = setTimeout( () => {
+			window.clearTimeout( timerId );
 			const refNode = previewRef.current;
-			const containerWidth = refNode.offsetWidth - ( 14 * 2 );
+			const blockHozPadding = ( 14 * 2 ); // Todo - use getComputedStyle to grab the real dimensions!
+			const containerWidth = refNode.offsetWidth - blockHozPadding;
 
 			const previewDomElements = getBlockPreviewContainerDOMNode( clientId );
 			const previewBlocksWidth = previewDomElements ? previewDomElements.offsetWidth : containerWidth;
@@ -41,10 +44,13 @@ export function BlockPreview( { blocks, settings } ) {
 			setPreviewScale( scale );
 			setVisibility( 'visible' );
 		}, 10 );
-	} );
 
-	useEffect( () => {
-		return () => window.clearTimeout( timerId );
+		// Cleanup
+		return () => {
+			if ( timerId ) {
+				window.clearTimeout( timerId );
+			}
+		};
 	} );
 
 	if ( ! blocks ) {
