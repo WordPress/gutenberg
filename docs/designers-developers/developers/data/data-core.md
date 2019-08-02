@@ -74,7 +74,10 @@ _Returns_
 <a name="getCurrentUndoOffset" href="#getCurrentUndoOffset">#</a> **getCurrentUndoOffset**
 
 Returns the current undo offset for the
-entity records edits history.
+entity records edits history. The offset
+represents how many items from the end
+of the history stack we are at. 0 is the
+last edit, -1 is the second last, and so on.
 
 _Parameters_
 
