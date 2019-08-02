@@ -25,10 +25,6 @@ describe( 'block toolbar', () => {
 			}, isUnifiedToolbar );
 		} );
 
-		const isInRichTextEditable = () => page.evaluate( () => (
-			document.activeElement.contentEditable === 'true'
-		) );
-
 		const isInBlockToolbar = () => page.evaluate( () => (
 			!! document.activeElement.closest( '.block-editor-block-toolbar' )
 		) );
@@ -46,10 +42,6 @@ describe( 'block toolbar', () => {
 				// Upward
 				await pressKeyWithModifier( 'alt', 'F10' );
 				expect( await isInBlockToolbar() ).toBe( true );
-
-				// Downward
-				await page.keyboard.press( 'Escape' );
-				expect( await isInRichTextEditable() ).toBe( true );
 			} );
 		} );
 	} );

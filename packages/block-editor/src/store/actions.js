@@ -705,3 +705,16 @@ export function __unstableMarkLastChangeAsPersistent() {
 	return { type: 'MARK_LAST_CHANGE_AS_PERSISTENT' };
 }
 
+/**
+ * Returns an action object used to enable or disable the navigation mode.
+ *
+ * @param {string} isNavigationMode Enable/Disable navigation mode.
+ *
+ * @return {Object} Action object
+ */
+export function setNavigationMode( isNavigationMode = true ) {
+	return {
+		type: 'SET_NAVIGATION_MODE',
+		isNavigationMode,
+	};
+}
