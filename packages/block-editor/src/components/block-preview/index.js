@@ -29,17 +29,28 @@ export function BlockPreview( { blocks, settings } ) {
 	useLayoutEffect( () => {
 		const { clientId } = blocks;
 
-		// this.props.setTimeout( () => {
 		// Timer - required to account for async render of `BlockEditorProvider`
 		const timerId = setTimeout( () => {
 			window.clearTimeout( timerId );
 			const refNode = previewRef.current;
-			const blockHozPadding = ( 14 * 2 ); // Todo - use getComputedStyle to grab the real dimensions!
-			const containerWidth = refNode.offsetWidth - blockHozPadding;
 
+			if ( ! refNode ) {
+				return;
+			}
+
+			// Detect any offset on the preview content as we will need to account for that in the "width"
+			// calcultions below
+			const previewContentComputed = window.getComputedStyle( refNode.firstChild );
+			const previewContentOffset = parseFloat( previewContentComputed.top ) + parseFloat( previewContentComputed.left );
+
+			// Determine the rendered width of the container
+			const previewContainerWidth = refNode.offsetWidth - previewContentOffset;
+
+			// Attempt to get a handle on the DOM node that represents the _visual_ portion of the Block's
+			// content.
 			const previewDomElements = getBlockPreviewContainerDOMNode( clientId );
-			const previewBlocksWidth = previewDomElements ? previewDomElements.offsetWidth : containerWidth;
-			const scale = Math.min( containerWidth / previewBlocksWidth ) || 1;
+			const previewBlocksWidth = previewDomElements ? previewDomElements.offsetWidth : previewContainerWidth;
+			const scale = Math.min( previewContainerWidth / previewBlocksWidth ) || 1;
 
 			setPreviewScale( scale );
 			setVisibility( 'visible' );
