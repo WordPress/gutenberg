@@ -190,7 +190,10 @@
 			}
 		}
 
-		&.is-hovered > .block-editor-block-list__block-edit::before {
+		&.is-hovered > .block-editor-block-list__block-edit::before,
+		> .block-editor-block-list__block-edit > [data-block] > div > .block-editor-inner-blocks > .block-editor-block-list__layout > .block-editor-block-list__block.is-hovered:not(.is-selected) > .block-editor-block-list__block-edit::before,
+		> .block-editor-block-list__block-edit > [data-block] > div > .wp-block-cover__inner-container > .block-editor-inner-blocks > .block-editor-block-list__layout > .block-editor-block-list__block.is-hovered:not(.is-selected) > .block-editor-block-list__block-edit::before,
+		> .block-editor-block-list__block-edit > [data-block] > div > .wp-block-group__inner-container > .block-editor-inner-blocks > .block-editor-block-list__layout > .block-editor-block-list__block.is-hovered:not(.is-selected) > .block-editor-block-list__block-edit::before {
 			border-style: solid;
 			border-color: $dark-opacity-light-500;
 			border-left-color: transparent;
