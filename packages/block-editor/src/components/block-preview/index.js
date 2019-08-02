@@ -36,28 +36,22 @@ export function BlockPreview( { blocks, settings, scaleToFit = true } ) {
 		// Timer - required to account for async render of `BlockEditorProvider`
 		const timerId = setTimeout( () => {
 			window.clearTimeout( timerId );
-			const refNode = previewRef.current;
+			const previewContainerDomElement = previewRef.current;
 
-			if ( ! refNode ) {
+			if ( ! previewContainerDomElement ) {
 				return;
 			}
 
-			// Detect any offset on the preview content as we will need
-			// to account for that in the "width" calculations below
-			// const previewContentComputed = window.getComputedStyle( refNode.firstChild );
-			// const previewContentOffset = parseFloat( previewContentComputed.top ) + parseFloat( previewContentComputed.left );
-
 			// Determine the rendered width of the container
-			// const previewContainerWidth = refNode.offsetWidth - previewContentOffset;
-			const previewContainerWidth = refNode.offsetWidth;
+			const previewContainerWidth = previewContainerDomElement.offsetWidth;
 
 			// Adjust the final computed scale if it's desired.
 			const scaleAdjustment = 0.9;
 
 			const comparisonBlockWidth = blockClientIds.reduce( ( acc, currClientId ) => {
-				// Selector scoped to `refNode` to avoid global selector being ambiguous in the case
+				// Selector scoped to `previewContainerDomElement` to avoid global selector being ambiguous in the case
 				// of multiple previews on the same view
-				const previewDomElement = getBlockPreviewContainerDOMNode( currClientId, refNode );
+				const previewDomElement = getBlockPreviewContainerDOMNode( currClientId, previewContainerDomElement );
 
 				if ( previewDomElement && previewDomElement.offsetWidth > acc ) {
 					acc = previewDomElement.offsetWidth;
