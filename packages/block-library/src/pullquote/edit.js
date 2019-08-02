@@ -75,7 +75,6 @@ class PullQuoteEdit extends Component {
 		return (
 			<>
 				<figure style={ figureStyle } className={ classnames(
-					'wp-block-preview-container',
 					className, {
 						[ mainColor.class ]: isSolidColorStyle && mainColor.class,
 					} ) }>
