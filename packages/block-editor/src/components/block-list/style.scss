@@ -473,8 +473,9 @@
 		}
 
 		// Align block toolbar to floated content.
+		// Extra specificity is needed to avoid applying this to innerblocks.
 		@include break-mobile() {
-			.block-editor-block-toolbar {
+			> .editor-block-list__block-edit > .block-editor-block-contextual-toolbar > .block-editor-block-toolbar {
 				/*!rtl:begin:ignore*/
 				left: $block-side-ui-width * 3 + ($grid-size-small * 1.5);
 				/*!rtl:end:ignore*/
@@ -482,7 +483,7 @@
 		}
 
 		@include break-xlarge() {
-			.block-editor-block-toolbar {
+			> .editor-block-list__block-edit > .block-editor-block-contextual-toolbar > .block-editor-block-toolbar {
 				/*!rtl:begin:ignore*/
 				left: $block-padding;
 				/*!rtl:end:ignore*/
