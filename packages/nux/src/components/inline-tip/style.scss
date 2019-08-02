@@ -1,0 +1,13 @@
+.nux-hide-tips-confirmation .components-modal__header {
+	border-bottom: none;
+	margin-bottom: 0;
+}
+
+.nux-hide-tips-confirmation__buttons {
+	margin-top: 2rem;
+	text-align: right;
+
+	.components-button {
+		margin-left: 10px;
+	}
+}

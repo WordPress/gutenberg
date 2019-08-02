@@ -1,12 +1,7 @@
 /**
  * External dependencies
  */
-import TestRenderer from 'react-test-renderer';
-
-/**
- * WordPress dependencies
- */
-import { Notice } from '@wordpress/components';
+import { shallow, mount } from 'enzyme';
 
 /**
  * Internal dependencies
@@ -15,31 +10,44 @@ import { InlineTip } from '../';
 
 describe( 'InlineTip', () => {
 	it( 'should not render anything if invisible', () => {
-		const renderer = TestRenderer.create(
-			<InlineTip isVisible={ false }>
+		const wrapper = shallow(
+			<InlineTip isTipVisible={ false }>
 				It looks like you’re writing a letter. Would you like help?
 			</InlineTip>
 		);
-		expect( renderer.root.children ).toHaveLength( 0 );
+		expect( wrapper.children() ).toHaveLength( 0 );
 	} );
 
 	it( 'should render correctly', () => {
-		const renderer = TestRenderer.create(
-			<InlineTip isVisible>
+		const wrapper = shallow(
+			<InlineTip isTipVisible>
 				It looks like you’re writing a letter. Would you like help?
 			</InlineTip>
 		);
-		expect( renderer ).toMatchSnapshot();
+		expect( wrapper ).toMatchSnapshot();
 	} );
 
-	it( 'calls `onRemove` when the rendered notice is dismissed', () => {
-		const onRemove = jest.fn();
-		const renderer = TestRenderer.create(
-			<InlineTip isVisible onRemove={ onRemove }>
+	it( 'calls `onDismissTip` when the tip and confirmation are dismissed', () => {
+		const onDismissTip = jest.fn();
+		const wrapper = mount(
+			<InlineTip isTipVisible onDismissTip={ onDismissTip }>
 				It looks like you’re writing a letter. Would you like help?
 			</InlineTip>
 		);
-		renderer.root.findByType( Notice ).props.onRemove();
-		expect( onRemove ).toHaveBeenCalled();
+		wrapper.find( 'button[aria-label="Dismiss this notice"]' ).simulate( 'click' );
+		wrapper.find( 'button' ).find( { children: 'No' } ).simulate( 'click' );
+		expect( onDismissTip ).toHaveBeenCalled();
+	} );
+
+	it( 'calls `onDisableTips` when the tip is dismissed and the confirmation is accepted', () => {
+		const onDisableTips = jest.fn();
+		const wrapper = mount(
+			<InlineTip isTipVisible onDisableTips={ onDisableTips }>
+				It looks like you’re writing a letter. Would you like help?
+			</InlineTip>
+		);
+		wrapper.find( 'button[aria-label="Dismiss this notice"]' ).simulate( 'click' );
+		wrapper.find( 'button' ).find( { children: 'Disable Tips' } ).simulate( 'click' );
+		expect( onDisableTips ).toHaveBeenCalled();
 	} );
 } );

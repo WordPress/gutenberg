@@ -24,9 +24,14 @@ function Notice( {
 	actions = [],
 	__unstableHTML,
 } ) {
-	const classes = classnames( className, 'components-notice', 'is-' + status, {
-		'is-dismissible': isDismissible,
-	} );
+	const classes = classnames(
+		className,
+		'components-notice',
+		status ? 'is-' + status : undefined,
+		{
+			'is-dismissible': isDismissible,
+		}
+	);
 
 	if ( __unstableHTML ) {
 		children = <RawHTML>{ children }</RawHTML>;

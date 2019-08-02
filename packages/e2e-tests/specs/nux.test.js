@@ -40,22 +40,16 @@ describe( 'New User Experience (NUX)', () => {
 		expect( blockInspectorTip ).not.toBeNull();
 	} );
 
-	it( 'should dismiss a single tip if X button is clicked and dialog is dismissed', async () => {
-		// We need to *dismiss* the upcoming confirm() dialog, so let's temporarily
-		// remove the listener that was added in by enablePageDialogAccept().
-		const listeners = page.rawListeners( 'dialog' );
-		page.removeAllListeners( 'dialog' );
-
+	it( 'should dismiss a single tip if X button is clicked and confirmation is dismissed', async () => {
 		// Open up the inserter.
 		await openGlobalBlockInserter();
 
-		// Dismiss the upcoming confirm() dialog.
-		page.once( 'dialog', async ( dialog ) => {
-			await dialog.dismiss();
-		} );
-
 		// Click the tip's X button.
 		await page.click( '.block-editor-inserter__tip button[aria-label="Dismiss this notice"]' );
+
+		// Dismiss the confirmation modal.
+		const [ noButton ] = await page.$x( '//*[contains(@class, "nux-hide-tips-confirmation")]//button[text()="No"]' );
+		await noButton.click();
 
 		// The tip should be gone.
 		const inserterTip = await page.$( '.block-editor-inserter__tip' );
@@ -63,19 +57,18 @@ describe( 'New User Experience (NUX)', () => {
 
 		// Tips should still be enabled.
 		expect( await areTipsEnabled() ).toBe( true );
-
-		// Restore the listeners that we removed above.
-		for ( const listener of listeners ) {
-			page.addListener( 'dialog', listener );
-		}
 	} );
 
-	it( 'should disable all tips if X button is clicked and dialog is confirmed', async () => {
+	it( 'should disable all tips if X button is clicked and confirmation is confirmed', async () => {
 		// Open up the inserter.
 		await openGlobalBlockInserter();
 
-		// Dismiss the tip. (The confirm() dialog will automatically be accepted.)
+		// Click the tip's X button.
 		await page.click( '.block-editor-inserter__tip button[aria-label="Dismiss this notice"]' );
+
+		// Accept the confirmation modal.
+		const [ disableTipsButton ] = await page.$x( '//*[contains(@class, "nux-hide-tips-confirmation")]//button[text()="Disable Tips"]' );
+		await disableTipsButton.click();
 
 		// The tip should be gone.
 		const inserterTip = await page.$( '.block-editor-inserter__tip' );
