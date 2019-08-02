@@ -12,6 +12,9 @@
 	.block-editor-block-preview__content {
 		font-family: $editor-font;
 
+		// Vertical alignment.
+		margin-top: 50%;
+
 		> div {
 			font-family: $editor-font;
 		}
@@ -40,8 +43,10 @@
 
 	// Position above the padding.
 	position: absolute;
-	top: $block-padding;
-	left: $block-padding;
+
+	// Vertical alignment. It works with the transform: translate(-50%, -50%)`,
+	top: 50%;
+	left: 50%;
 
 	// Important to set the origin.
 	transform-origin: top left;

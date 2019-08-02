@@ -42,13 +42,17 @@ export function BlockPreview( { blocks, settings, scaleToFit = true } ) {
 				return;
 			}
 
-			// Detect any offset on the preview content as we will need to account for that in the "width"
-			// calcultions below
-			const previewContentComputed = window.getComputedStyle( refNode.firstChild );
-			const previewContentOffset = parseFloat( previewContentComputed.top ) + parseFloat( previewContentComputed.left );
+			// Detect any offset on the preview content as we will need
+			// to account for that in the "width" calculations below
+			// const previewContentComputed = window.getComputedStyle( refNode.firstChild );
+			// const previewContentOffset = parseFloat( previewContentComputed.top ) + parseFloat( previewContentComputed.left );
 
 			// Determine the rendered width of the container
-			const previewContainerWidth = refNode.offsetWidth - previewContentOffset;
+			// const previewContainerWidth = refNode.offsetWidth - previewContentOffset;
+			const previewContainerWidth = refNode.offsetWidth;
+
+			// Adjust the final computed scale if it's desired.
+			const scaleAdjustment = 0.5;
 
 			const comparisonBlockWidth = blockClientIds.reduce( ( acc, currClientId ) => {
 				// Selector scoped to `refNode` to avoid global selector being ambiguous in the case
@@ -61,7 +65,7 @@ export function BlockPreview( { blocks, settings, scaleToFit = true } ) {
 				return acc;
 			}, 0 );
 
-			const scale = previewContainerWidth / comparisonBlockWidth || 1;
+			const scale = ( previewContainerWidth / comparisonBlockWidth || 1 ) * scaleAdjustment;
 
 			setPreviewScale( scale );
 			setVisibility( 'visible' );
@@ -80,7 +84,7 @@ export function BlockPreview( { blocks, settings, scaleToFit = true } ) {
 	}
 
 	const previewStyles = {
-		transform: `scale(${ previewScale })`,
+		transform: `scale(${ previewScale }) translate(-50%, -50%)`,
 		visibility,
 	};
 

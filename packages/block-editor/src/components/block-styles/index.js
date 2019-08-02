@@ -116,7 +116,7 @@ function BlockStyles( {
 							}
 						} }
 						onMouseEnter={ () => onHoverClassName( styleClassName ) }
-						onMouseLeave={ () => onHoverClassName( null ) }
+						// onMouseLeave={ () => onHoverClassName( null ) }
 						role="button"
 						tabIndex="0"
 						aria-label={ style.label || style.name }
