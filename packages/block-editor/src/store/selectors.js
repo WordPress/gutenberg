@@ -1405,3 +1405,14 @@ export function __experimentalGetLastBlockAttributeChanges( state ) {
 function getReusableBlocks( state ) {
 	return get( state, [ 'settings', '__experimentalReusableBlocks' ], EMPTY_ARRAY );
 }
+
+/**
+ * Returns whether the navigation mode is enabled.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {boolean}     Is navigation mode enabled.
+ */
+export function isNavigationMode( state ) {
+	return state.isNavigationMode;
+}
