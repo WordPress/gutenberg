@@ -203,7 +203,7 @@ on each call
 _Parameters_
 
 -   _state_ `Object`: Editor state.
--   _rootClientId_ `?String`: Optional root client ID of block list.
+-   _rootClientId_ `?string`: Optional root client ID of block list.
 
 _Returns_
 
@@ -299,7 +299,7 @@ The number returned includes nested blocks.
 _Parameters_
 
 -   _state_ `Object`: Global application state.
--   _blockName_ `?String`: Optional block name, if specified only blocks of that type will be counted.
+-   _blockName_ `?string`: Optional block name, if specified only blocks of that type will be counted.
 
 _Returns_
 

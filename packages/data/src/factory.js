@@ -10,9 +10,9 @@ import defaultRegistry from './default-registry';
 /**
  * Mark a selector as a registry selector.
  *
- * @param {function} registrySelector Function receiving a registry object and returning a state selector.
+ * @param {Function} registrySelector Function receiving a registry object and returning a state selector.
  *
- * @return {function} marked registry selector.
+ * @return {Function} marked registry selector.
  */
 export function createRegistrySelector( registrySelector ) {
 	const selector = ( ...args ) => registrySelector( selector.registry.select )( ...args );
@@ -39,9 +39,9 @@ export function createRegistrySelector( registrySelector ) {
 /**
  * Mark a control as a registry control.
  *
- * @param {function} registryControl Function receiving a registry object and returning a control.
+ * @param {Function} registryControl Function receiving a registry object and returning a control.
  *
- * @return {function} marked registry control.
+ * @return {Function} marked registry control.
  */
 export function createRegistryControl( registryControl ) {
 	registryControl.isRegistryControl = true;

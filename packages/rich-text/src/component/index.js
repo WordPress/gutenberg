@@ -839,11 +839,11 @@ class RichText extends Component {
 	}
 
 	/**
-     * Converts the internal value to the external data format.
-     *
-     * @param {Object} value The internal rich-text value.
-     * @return {*} The external data format, data type depends on props.
-     */
+	 * Converts the internal value to the external data format.
+	 *
+	 * @param {Object} value The internal rich-text value.
+	 * @return {*} The external data format, data type depends on props.
+	 */
 	valueToFormat( value ) {
 		value = this.removeEditorOnlyFormats( value );
 

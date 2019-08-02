@@ -105,19 +105,19 @@ function setupWPTimezone() {
 /**
  * Number of seconds in one minute.
  *
- * @type {Number}
+ * @type {number}
  */
 const MINUTE_IN_SECONDS = 60;
 /**
  * Number of minutes in one hour.
  *
- * @type {Number}
+ * @type {number}
  */
 const HOUR_IN_MINUTES = 60;
 /**
  * Number of seconds in one hour.
  *
- * @type {Number}
+ * @type {number}
  */
 const HOUR_IN_SECONDS = 60 * MINUTE_IN_SECONDS;
 

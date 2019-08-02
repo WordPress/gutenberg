@@ -13,9 +13,7 @@ import createNamespace from './namespace-store';
 import createCoreDataStore from './store';
 
 /**
- * An isolated orchestrator of store registrations.
- *
- * @typedef {Object} WPDataRegistry
+ * @typedef {Object} WPDataRegistry An isolated orchestrator of store registrations.
  *
  * @property {Function} registerGenericStore Given a namespace key and settings
  *                                           object, registers a new generic
@@ -35,9 +33,7 @@ import createCoreDataStore from './store';
  */
 
 /**
- * An object of registry function overrides.
- *
- * @typedef {WPDataPlugin}
+ * @typedef {Object} WPDataPlugin An object of registry function overrides.
  */
 
 /**

@@ -444,7 +444,7 @@ export default compose(
 
 _Parameters_
 
--   _colorTypes_ `...(object|string)`: The arguments can be strings or objects. If the argument is an object, it should contain the color attribute name as key and the color context as value. If the argument is a string the value should be the color attribute name, the color context is computed by applying a kebab case transform to the value. Color context represents the context/place where the color is going to be used. The class name of the color is generated using 'has' followed by the color name and ending with the color context all in kebab case e.g: has-green-background-color.
+-   _colorTypes_ `...(Object|string)`: The arguments can be strings or objects. If the argument is an object, it should contain the color attribute name as key and the color context as value. If the argument is a string the value should be the color attribute name, the color context is computed by applying a kebab case transform to the value. Color context represents the context/place where the color is going to be used. The class name of the color is generated using 'has' followed by the color name and ending with the color context all in kebab case e.g: has-green-background-color.
 
 _Returns_
 
@@ -457,7 +457,7 @@ font size value retrieval, and font size change handling.
 
 _Parameters_
 
--   _args_ `...(object|string)`: The arguments should all be strings Each string contains the font size attribute name e.g: 'fontSize'.
+-   _fontSizeNames_ `...(Object|string)`: The arguments should all be strings. Each string contains the font size attribute name e.g: 'fontSize'.
 
 _Returns_
 

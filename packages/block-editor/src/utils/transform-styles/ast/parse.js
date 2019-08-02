@@ -11,15 +11,15 @@ export default function( css, options ) {
 	options = options || {};
 
 	/**
-   * Positional.
-   */
+	 * Positional.
+	 */
 
 	let lineno = 1;
 	let column = 1;
 
 	/**
-   * Update lineno and column based on `str`.
-   */
+	 * Update lineno and column based on `str`.
+	 */
 
 	function updatePosition( str ) {
 		const lines = str.match( /\n/g );
@@ -32,8 +32,8 @@ export default function( css, options ) {
 	}
 
 	/**
-   * Mark position and patch `node.position`.
-   */
+	 * Mark position and patch `node.position`.
+	 */
 
 	function position() {
 		const start = { line: lineno, column };
@@ -45,8 +45,8 @@ export default function( css, options ) {
 	}
 
 	/**
-   * Store position information for a node
-   */
+	 * Store position information for a node
+	 */
 
 	function Position( start ) {
 		this.start = start;
@@ -55,14 +55,14 @@ export default function( css, options ) {
 	}
 
 	/**
-   * Non-enumerable source string
-   */
+	 * Non-enumerable source string
+	 */
 
 	Position.prototype.content = css;
 
 	/**
-   * Error `msg`.
-   */
+	 * Error `msg`.
+	 */
 
 	const errorsList = [];
 
@@ -82,8 +82,8 @@ export default function( css, options ) {
 	}
 
 	/**
-   * Parse stylesheet.
-   */
+	 * Parse stylesheet.
+	 */
 
 	function stylesheet() {
 		const rulesList = rules();
@@ -99,24 +99,24 @@ export default function( css, options ) {
 	}
 
 	/**
-   * Opening brace.
-   */
+	 * Opening brace.
+	 */
 
 	function open() {
 		return match( /^{\s*/ );
 	}
 
 	/**
-   * Closing brace.
-   */
+	 * Closing brace.
+	 */
 
 	function close() {
 		return match( /^}/ );
 	}
 
 	/**
-   * Parse ruleset.
-   */
+	 * Parse ruleset.
+	 */
 
 	function rules() {
 		let node;
@@ -133,8 +133,8 @@ export default function( css, options ) {
 	}
 
 	/**
-   * Match `re` and return captures.
-   */
+	 * Match `re` and return captures.
+	 */
 
 	function match( re ) {
 		const m = re.exec( css );
@@ -148,16 +148,16 @@ export default function( css, options ) {
 	}
 
 	/**
-   * Parse whitespace.
-   */
+	 * Parse whitespace.
+	 */
 
 	function whitespace() {
 		match( /^\s*/ );
 	}
 
 	/**
-   * Parse comments;
-   */
+	 * Parse comments;
+	 */
 
 	function comments( accumulator ) {
 		let c;
@@ -172,8 +172,8 @@ export default function( css, options ) {
 	}
 
 	/**
-   * Parse comment.
-   */
+	 * Parse comment.
+	 */
 
 	function comment() {
 		const pos = position();
@@ -204,16 +204,15 @@ export default function( css, options ) {
 	}
 
 	/**
-   * Parse selector.
-   */
+	 * Parse selector.
+	 */
 
 	function selector() {
 		const m = match( /^([^{]+)/ );
 		if ( ! m ) {
 			return;
 		}
-		/* @fix Remove all comments from selectors
-     * http://ostermiller.org/findcomment.html */
+		// FIXME: Remove all comments from selectors http://ostermiller.org/findcomment.html
 		return trim( m[ 0 ] )
 			.replace( /\/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*\/+/g, '' )
 			.replace( /"(?:\\"|[^"])*"|'(?:\\'|[^'])*'/g, function( matched ) {
@@ -226,8 +225,8 @@ export default function( css, options ) {
 	}
 
 	/**
-   * Parse declaration.
-   */
+	 * Parse declaration.
+	 */
 
 	function declaration() {
 		const pos = position();
@@ -260,8 +259,8 @@ export default function( css, options ) {
 	}
 
 	/**
-   * Parse declarations.
-   */
+	 * Parse declarations.
+	 */
 
 	function declarations() {
 		const decls = [];
@@ -288,8 +287,8 @@ export default function( css, options ) {
 	}
 
 	/**
-   * Parse keyframe.
-   */
+	 * Parse keyframe.
+	 */
 
 	function keyframe() {
 		let m;
@@ -314,8 +313,8 @@ export default function( css, options ) {
 	}
 
 	/**
-   * Parse keyframes.
-   */
+	 * Parse keyframes.
+	 */
 
 	function atkeyframes() {
 		const pos = position();
@@ -358,8 +357,8 @@ export default function( css, options ) {
 	}
 
 	/**
-   * Parse supports.
-   */
+	 * Parse supports.
+	 */
 
 	function atsupports() {
 		const pos = position();
@@ -388,8 +387,8 @@ export default function( css, options ) {
 	}
 
 	/**
-   * Parse host.
-   */
+	 * Parse host.
+	 */
 
 	function athost() {
 		const pos = position();
@@ -416,8 +415,8 @@ export default function( css, options ) {
 	}
 
 	/**
-   * Parse media.
-   */
+	 * Parse media.
+	 */
 
 	function atmedia() {
 		const pos = position();
@@ -446,8 +445,8 @@ export default function( css, options ) {
 	}
 
 	/**
-   * Parse custom-media.
-   */
+	 * Parse custom-media.
+	 */
 
 	function atcustommedia() {
 		const pos = position();
@@ -464,8 +463,8 @@ export default function( css, options ) {
 	}
 
 	/**
-   * Parse paged media.
-   */
+	 * Parse paged media.
+	 */
 
 	function atpage() {
 		const pos = position();
@@ -501,8 +500,8 @@ export default function( css, options ) {
 	}
 
 	/**
-   * Parse document.
-   */
+	 * Parse document.
+	 */
 
 	function atdocument() {
 		const pos = position();
@@ -533,8 +532,8 @@ export default function( css, options ) {
 	}
 
 	/**
-   * Parse font-face.
-   */
+	 * Parse font-face.
+	 */
 
 	function atfontface() {
 		const pos = position();
@@ -567,26 +566,26 @@ export default function( css, options ) {
 	}
 
 	/**
-   * Parse import
-   */
+	 * Parse import
+	 */
 
 	const atimport = _compileAtrule( 'import' );
 
 	/**
-   * Parse charset
-   */
+	 * Parse charset
+	 */
 
 	const atcharset = _compileAtrule( 'charset' );
 
 	/**
-   * Parse namespace
-   */
+	 * Parse namespace
+	 */
 
 	const atnamespace = _compileAtrule( 'namespace' );
 
 	/**
-   * Parse non-block at-rules
-   */
+	 * Parse non-block at-rules
+	 */
 
 	function _compileAtrule( name ) {
 		const re = new RegExp( '^@' + name + '\\s*([^;]+);' );
@@ -603,8 +602,8 @@ export default function( css, options ) {
 	}
 
 	/**
-   * Parse at rule.
-   */
+	 * Parse at rule.
+	 */
 
 	function atrule() {
 		if ( css[ 0 ] !== '@' ) {
@@ -625,8 +624,8 @@ export default function( css, options ) {
 	}
 
 	/**
-   * Parse rule.
-   */
+	 * Parse rule.
+	 */
 
 	function rule() {
 		const pos = position();
