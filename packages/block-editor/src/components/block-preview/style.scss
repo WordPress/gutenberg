@@ -1,9 +1,11 @@
 // This is the preview that shows up to the right of the thumbnail when hovering.
-.block-editor-block-preview {
+.block-editor-block-switcher__preview {
 	padding: $block-padding;
 	font-family: $editor-font;
 	overflow: hidden;
 	width: 100%;
+	pointer-events: none;
+	display: none;
 
 	@include break-medium {
 		display: block;
@@ -72,7 +74,7 @@
 
 	&.is-scaled {
 		> div {
-			transform: scale(0.9);
+			transform: scale(0.3);
 			transform-origin: center top;
 		}
 	}

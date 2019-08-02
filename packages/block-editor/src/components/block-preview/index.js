@@ -18,7 +18,13 @@ import BlockEditorProvider from '../provider';
 import BlockList from '../block-list';
 import { getBlockPreviewContainerDOMNode } from '../../utils/dom';
 
-export function BlockPreview( { blocks, settings, scaleToFit = true } ) {
+export function BlockPreview( {
+	blocks,
+	settings,
+	scaleToFit = true,
+	scaleAdjustment = 1,
+	isScaled = true,
+} ) {
 	blocks = castArray( blocks );
 
 	const previewRef = useRef( null );
@@ -44,9 +50,6 @@ export function BlockPreview( { blocks, settings, scaleToFit = true } ) {
 
 			// Determine the rendered width of the container
 			const previewContainerWidth = previewContainerDomElement.offsetWidth;
-
-			// Adjust the final computed scale if it's desired.
-			const scaleAdjustment = 0.9;
 
 			const comparisonBlockWidth = blockClientIds.reduce( ( acc, currClientId ) => {
 				// Selector scoped to `previewContainerDomElement` to avoid global selector being ambiguous in the case
@@ -83,7 +86,7 @@ export function BlockPreview( { blocks, settings, scaleToFit = true } ) {
 	};
 
 	const contentClassNames = classnames( 'editor-block-preview__content block-editor-block-preview__content editor-styles-wrapper', {
-		'is-scaled': previewScale !== 1,
+		'is-scaled': isScaled,
 	} );
 
 	return (
