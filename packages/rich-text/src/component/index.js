@@ -132,6 +132,7 @@ class RichText extends Component {
 
 	componentWillUnmount() {
 		document.removeEventListener( 'selectionchange', this.onSelectionChange );
+		window.cancelAnimationFrame( this.rafId );
 	}
 
 	setRef( node ) {
@@ -287,7 +288,7 @@ class RichText extends Component {
 		this.recalculateBoundaryStyle();
 
 		// We know for certain that on focus, the old selection is invalid. It
-		// will be recalculated on `selectionchange`.
+		// will be recalculated on the next animation frame.
 		const index = undefined;
 		const activeFormats = undefined;
 
@@ -299,6 +300,12 @@ class RichText extends Component {
 		};
 		this.props.onSelectionChange( index, index );
 		this.setState( { activeFormats } );
+
+		// Update selection as soon as possible, which is at the next animation
+		// frame. The event listener for selection changes may be added too late
+		// at this point, but this focus event is still too early to calculate
+		// the selection.
+		this.rafId = window.requestAnimationFrame( this.onSelectionChange );
 
 		document.addEventListener( 'selectionchange', this.onSelectionChange );
 	}
