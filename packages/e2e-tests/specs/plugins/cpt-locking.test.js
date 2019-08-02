@@ -10,7 +10,7 @@ import {
 	insertBlock,
 	pressKeyTimes,
 	setPostContent,
-	switchToEditMode,
+	disableNavigationMode,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'cpt locking', () => {
@@ -49,7 +49,7 @@ describe( 'cpt locking', () => {
 	describe( 'template_lock all', () => {
 		beforeEach( async () => {
 			await createNewPost( { postType: 'locked-all-post' } );
-			await switchToEditMode();
+			await disableNavigationMode();
 		} );
 
 		it( 'should remove the inserter', shouldRemoveTheInserter );
@@ -89,7 +89,7 @@ describe( 'cpt locking', () => {
 	describe( 'template_lock insert', () => {
 		beforeEach( async () => {
 			await createNewPost( { postType: 'locked-insert-post' } );
-			await switchToEditMode();
+			await disableNavigationMode();
 		} );
 
 		it( 'should remove the inserter', shouldRemoveTheInserter );
@@ -102,7 +102,7 @@ describe( 'cpt locking', () => {
 	describe( 'template_lock false', () => {
 		beforeEach( async () => {
 			await createNewPost( { postType: 'not-locked-post' } );
-			await switchToEditMode();
+			await disableNavigationMode();
 		} );
 
 		it( 'should allow blocks to be inserted', async () => {

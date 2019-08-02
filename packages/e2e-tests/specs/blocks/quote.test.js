@@ -8,13 +8,13 @@ import {
 	pressKeyTimes,
 	transformBlockTo,
 	insertBlock,
-	switchToEditMode,
+	disableNavigationMode,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Quote', () => {
 	beforeEach( async () => {
 		await createNewPost();
-		await switchToEditMode();
+		await disableNavigationMode();
 	} );
 
 	it( 'can be created by using > at the start of a paragraph block', async () => {

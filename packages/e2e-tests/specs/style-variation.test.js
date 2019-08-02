@@ -6,13 +6,13 @@ import {
 	clickBlockToolbarButton,
 	insertBlock,
 	getEditedPostContent,
-	switchToEditMode,
+	disableNavigationMode,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'adding blocks', () => {
 	beforeAll( async () => {
 		await createNewPost();
-		await switchToEditMode();
+		await disableNavigationMode();
 	} );
 
 	it( 'Should switch the style of the quote block', async () => {

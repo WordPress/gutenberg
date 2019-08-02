@@ -22,7 +22,7 @@ import {
 	setPostContent,
 	selectBlockByClientId,
 	transformBlockTo,
-	switchToEditMode,
+	disableNavigationMode,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -101,7 +101,7 @@ describe( 'Block transforms', () => {
 	const transformStructure = {};
 	beforeAll( async () => {
 		await createNewPost();
-		await switchToEditMode();
+		await disableNavigationMode();
 
 		for ( const fileBase of fileBasenames ) {
 			const structure = await getTransformStructureFromFile(
@@ -137,7 +137,7 @@ describe( 'Block transforms', () => {
 		} );
 
 		beforeEach( async () => {
-			await switchToEditMode();
+			await disableNavigationMode();
 			await setPostContent( '' );
 			await page.click( '.editor-post-title .editor-post-title__block' );
 		} );

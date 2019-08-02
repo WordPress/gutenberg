@@ -701,7 +701,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 		mergeBlocks,
 		replaceBlocks,
 		toggleSelection,
-		toggleNavigationMode,
+		setNavigationMode,
 	} = dispatch( 'core/block-editor' );
 
 	return {
@@ -776,7 +776,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 			toggleSelection( selectionEnabled );
 		},
 		enableNavigationMode() {
-			toggleNavigationMode( true );
+			setNavigationMode( true );
 		},
 	};
 } );

@@ -459,7 +459,7 @@ _Parameters_
 
 -   _mode_ `string`: String editor mode.
 
-<a name="switchToEditMode" href="#switchToEditMode">#</a> **switchToEditMode**
+<a name="disableNavigationMode" href="#disableNavigationMode">#</a> **disableNavigationMode**
 
 Triggers edit mode if not already active.
 

@@ -5,13 +5,13 @@ import {
 	clickBlockAppender,
 	getEditedPostContent,
 	createNewPost,
-	switchToEditMode,
+	disableNavigationMode,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Code', () => {
 	beforeEach( async () => {
 		await createNewPost();
-		await switchToEditMode();
+		await disableNavigationMode();
 	} );
 
 	it( 'can be created by three backticks and enter', async () => {

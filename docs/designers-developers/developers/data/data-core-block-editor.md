@@ -1162,7 +1162,7 @@ _Returns_
 
 -   `Object`: Action object.
 
-<a name="toggleNavigationMode" href="#toggleNavigationMode">#</a> **toggleNavigationMode**
+<a name="setNavigationMode" href="#setNavigationMode">#</a> **setNavigationMode**
 
 Returns an action object used to enable or disable the navigation mode.
 

@@ -7,7 +7,7 @@ import {
 	clickOnMoreMenuItem,
 	createNewPost,
 	deactivatePlugin,
-	switchToEditMode,
+	disableNavigationMode,
 } from '@wordpress/e2e-test-utils';
 
 const clickOnBlockSettingsMenuItem = async ( buttonLabel ) => {
@@ -29,7 +29,7 @@ describe( 'Using Plugins API', () => {
 
 	beforeEach( async () => {
 		await createNewPost();
-		await switchToEditMode();
+		await disableNavigationMode();
 	} );
 
 	/**

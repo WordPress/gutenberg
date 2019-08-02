@@ -12,7 +12,7 @@ import {
 	clickButton,
 	insertBlock,
 	publishPost,
-	switchToEditMode,
+	disableNavigationMode,
 } from '@wordpress/e2e-test-utils';
 
 const MOCK_EMBED_WORDPRESS_SUCCESS_RESPONSE = {
@@ -189,7 +189,7 @@ describe( 'Embedding content', () => {
 	beforeEach( async () => {
 		await setUpResponseMocking( MOCK_RESPONSES );
 		await createNewPost();
-		await switchToEditMode();
+		await disableNavigationMode();
 	} );
 
 	it( 'should render embeds in the correct state', async () => {
@@ -264,7 +264,7 @@ describe( 'Embedding content', () => {
 
 		// Start a new post, embed the previous post.
 		await createNewPost();
-		await switchToEditMode();
+		await disableNavigationMode();
 		await clickBlockAppender();
 		await page.keyboard.type( '/embed' );
 		await page.keyboard.press( 'Enter' );

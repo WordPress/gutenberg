@@ -80,7 +80,7 @@ class WritingFlow extends Component {
 		this.bindContainer = this.bindContainer.bind( this );
 		this.clearVerticalRect = this.clearVerticalRect.bind( this );
 		this.focusLastTextField = this.focusLastTextField.bind( this );
-		this.switchToEditMode = this.switchToEditMode.bind( this );
+		this.disableNavigationMode = this.disableNavigationMode.bind( this );
 
 		/**
 		 * Here a rectangle is stored while moving the caret vertically so
@@ -100,11 +100,11 @@ class WritingFlow extends Component {
 	}
 
 	componentDidMount() {
-		window.addEventListener( 'mousedown', this.switchToEditMode );
+		window.addEventListener( 'mousedown', this.disableNavigationMode );
 	}
 
 	componentWillUnmount() {
-		window.removeEventListener( 'mousedown', this.switchToEditMode );
+		window.removeEventListener( 'mousedown', this.disableNavigationMode );
 	}
 
 	bindContainer( ref ) {
@@ -115,7 +115,7 @@ class WritingFlow extends Component {
 		this.verticalRect = null;
 	}
 
-	switchToEditMode() {
+	disableNavigationMode() {
 		if ( this.props.isNavigationMode ) {
 			this.props.disableNavigationMode();
 		}
@@ -452,11 +452,11 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { multiSelect, selectBlock, toggleNavigationMode, clearSelectedBlock } = dispatch( 'core/block-editor' );
+		const { multiSelect, selectBlock, setNavigationMode, clearSelectedBlock } = dispatch( 'core/block-editor' );
 		return {
 			onMultiSelect: multiSelect,
 			onSelectBlock: selectBlock,
-			disableNavigationMode: () => toggleNavigationMode( false ),
+			disableNavigationMode: () => setNavigationMode( false ),
 			clearSelectedBlock,
 		};
 	} ),

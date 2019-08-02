@@ -7,13 +7,13 @@ import {
 	insertBlock,
 	clickBlockAppender,
 	pressKeyWithModifier,
-	switchToEditMode,
+	disableNavigationMode,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'RichText', () => {
 	beforeEach( async () => {
 		await createNewPost();
-		await switchToEditMode();
+		await disableNavigationMode();
 	} );
 
 	it( 'should handle change in tag name gracefully', async () => {

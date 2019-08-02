@@ -712,9 +712,9 @@ export function __unstableMarkLastChangeAsPersistent() {
  *
  * @return {Object} Action object
  */
-export function toggleNavigationMode( isNavigationMode = true ) {
+export function setNavigationMode( isNavigationMode = true ) {
 	return {
-		type: 'TOGGLE_NAVIGATION_MODE',
+		type: 'SET_NAVIGATION_MODE',
 		isNavigationMode,
 	};
 }

@@ -8,7 +8,7 @@ import {
 	getEditedPostContent,
 	pressKeyTimes,
 	pressKeyWithModifier,
-	switchToEditMode,
+	disableNavigationMode,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'splitting and merging blocks', () => {
@@ -205,7 +205,7 @@ describe( 'splitting and merging blocks', () => {
 	} );
 
 	it( 'should undo split in one go', async () => {
-		await switchToEditMode();
+		await disableNavigationMode();
 
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '12' );
