@@ -3,10 +3,10 @@
  */
 import { Button } from '@wordpress/components';
 
-function DownloadableBlocks( { onSelect } ) {
+function DownloadableBlocks( { onSelect, filterValue } ) {
 	return (
 		<div>
-			Hello from the other side.
+			{ filterValue }
 			<Button
 				isDefault
 				onClick={ ( event ) => {

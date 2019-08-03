@@ -43,7 +43,6 @@ import { addQueryArgs } from '@wordpress/url';
 import BlockPreview from '../block-preview';
 import BlockTypesList from '../block-types-list';
 import ChildBlocks from './child-blocks';
-import DiscoverBlocksPanel from '../discover-blocks-panel';
 import __experimentalInserterMenuExtension from '../inserter-menu-extension';
 
 const MAX_SUGGESTED_ITEMS = 9;
@@ -335,6 +334,7 @@ export class InserterMenu extends Component {
 			suggestedItems,
 		} = this.state;
 		const isPanelOpen = ( panel ) => openPanels.indexOf( panel ) !== -1;
+		const isMenuEmpty = isEmpty( suggestedItems ) && isEmpty( reusableItems ) && isEmpty( itemsPerCategory );
 
 		// Disable reason (no-autofocus): The inserter menu is a modal display, not one which
 		// is always visible, and one which already incurs this behavior of autoFocus via
@@ -423,14 +423,21 @@ export class InserterMenu extends Component {
 							</a>
 						</PanelBody>
 					) }
-					{ isEmpty( suggestedItems ) && isEmpty( reusableItems ) && isEmpty( itemsPerCategory ) && (
-						isDownloadableBlocksEnabled ?
-							(
-								<DiscoverBlocksPanel onSelect={ onSelect } onHover={ this.onHover } filterValue={ this.state.debouncedFilterValue } />
-							) :
-							( <p className="editor-inserter__no-results block-editor-inserter__no-results">{ __( 'No blocks found.' ) }</p> )
-					) }
-					<__experimentalInserterMenuExtension.Slot />
+					{
+						! isDownloadableBlocksEnabled && isMenuEmpty && (
+							<p className="editor-inserter__no-results block-editor-inserter__no-results">{ __( 'No blocks found.' ) }</p>
+						)
+					}
+					{
+						<__experimentalInserterMenuExtension.Slot
+							fillProps={ {
+								onSelect,
+								onHover: this.onHover,
+								filterValue: this.state.filterValue,
+								isMenuEmpty,
+							} }
+						/>
+					}
 				</div>
 
 				{ hoveredItem && isReusableBlock( hoveredItem ) &&

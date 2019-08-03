@@ -11,11 +11,10 @@ import { compose } from '@wordpress/compose';
 import { Component } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { BlockEditorProvider, transformStyles, __experimentalInserterMenuExtension } from '@wordpress/block-editor';
+import { BlockEditorProvider, transformStyles } from '@wordpress/block-editor';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
-import DownloadableBlocks from '@wordpress/downloadable-blocks';
 
 /**
  * Internal dependencies
@@ -24,6 +23,7 @@ import withRegistryProvider from './with-registry-provider';
 import { mediaUpload } from '../../utils';
 import ReusableBlocksButtons from '../reusable-blocks-buttons';
 import ConvertToGroupButtons from '../convert-to-group-buttons';
+import InserterMenuDownloadableBlocksPanel from '../inserter-menu-downloadable-blocks-panel';
 
 const fetchLinkSuggestions = async ( search ) => {
 	const posts = await apiFetch( {
@@ -172,9 +172,7 @@ class EditorProvider extends Component {
 				{ children }
 				<ReusableBlocksButtons />
 				<ConvertToGroupButtons />
-				<__experimentalInserterMenuExtension>
-					<DownloadableBlocks />
-				</__experimentalInserterMenuExtension>
+				<InserterMenuDownloadableBlocksPanel />
 			</BlockEditorProvider>
 		);
 	}
