@@ -478,6 +478,11 @@ export default compose(
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {
+		const { clientId, destinationRootClientId, isAppender } = ownProps;
+		const {
+			getInsertionIndex,
+		} = select( 'core/block-editor' );
+
 		const {
 			showInsertionPoint,
 			hideInsertionPoint,
@@ -488,38 +493,10 @@ export default compose(
 			__experimentalFetchReusableBlocks: fetchReusableBlocks,
 		} = dispatch( 'core/editor' );
 
-		// To avoid duplication, getInsertionIndex is extracted and used in two event handlers
-		// This breaks the withDispatch not containing any logic rule.
-		// Since it's a function only called when the event handlers are called,
-		// it's fine to extract it.
-		// eslint-disable-next-line no-restricted-syntax
-		function getInsertionIndex() {
-			const {
-				getBlockIndex,
-				getBlockSelectionEnd,
-				getBlockOrder,
-			} = select( 'core/block-editor' );
-			const { clientId, destinationRootClientId, isAppender } = ownProps;
-
-			// If the clientId is defined, we insert at the position of the block.
-			if ( clientId ) {
-				return getBlockIndex( clientId, destinationRootClientId );
-			}
-
-			// If there a selected block, we insert after the selected block.
-			const end = getBlockSelectionEnd();
-			if ( ! isAppender && end ) {
-				return getBlockIndex( end, destinationRootClientId ) + 1;
-			}
-
-			// Otherwise, we insert at the end of the current rootClientId
-			return getBlockOrder( destinationRootClientId ).length;
-		}
-
 		return {
 			fetchReusableBlocks,
 			showInsertionPoint() {
-				const index = getInsertionIndex();
+				const index = getInsertionIndex( clientId, destinationRootClientId, isAppender );
 				showInsertionPoint( ownProps.destinationRootClientId, index );
 			},
 			hideInsertionPoint,
@@ -531,7 +508,6 @@ export default compose(
 				const {
 					getSelectedBlock,
 				} = select( 'core/block-editor' );
-				const { isAppender } = ownProps;
 				const { name, initialAttributes } = item;
 				const selectedBlock = getSelectedBlock();
 				const insertedBlock = createBlock( name, initialAttributes );

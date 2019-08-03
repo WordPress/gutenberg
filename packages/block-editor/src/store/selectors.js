@@ -1291,21 +1291,30 @@ export const hasInserterItems = createSelector(
  *
  * @return {boolean} True if there is one item available, false if zero or more than one.
  */
-export const hasOneAllowedItem = createSelector(
-	( state, rootClientId = null ) => {
-		if ( rootClientId ) {
-			const parentBlockListSettings = getBlockListSettings( state, rootClientId );
-			return ( !! get( parentBlockListSettings, [ 'allowedBlocks' ] ) &&
-				get( parentBlockListSettings, [ 'allowedBlocks' ] ).length === 1 );
-		}
+export const hasOneAllowedItem = ( state, rootClientId = null ) => {
+	if ( rootClientId ) {
+		const parentBlockListSettings = getBlockListSettings( state, rootClientId );
+		return get( parentBlockListSettings, [ 'allowedBlocks', 'length' ], 0 ) === 1;
+	}
 
-		return false;
-	},
-	( state, rootClientId ) => [
-		state,
-		rootClientId,
-	],
-);
+	return false;
+};
+
+export function getInsertionIndex( state, clientId, destinationRootClientId, isAppender ) {
+	// If the clientId is defined, we insert at the position of the block.
+	if ( clientId ) {
+		return getBlockIndex( state, clientId, destinationRootClientId );
+	}
+
+	// If there a selected block, we insert after the selected block.
+	const end = getBlockSelectionEnd( state );
+	if ( ! isAppender && end ) {
+		return getBlockIndex( state, end, destinationRootClientId ) + 1;
+	}
+
+	// Otherwise, we insert at the end of the current rootClientId
+	return getBlockOrder( state, destinationRootClientId ).length;
+}
 
 /**
  * Returns the Block List settings of a block, if any exist.

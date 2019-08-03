@@ -140,47 +140,31 @@ export default compose( [
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {
 		// eslint-disable-next-line no-restricted-syntax
-		function getInsertionIndex() {
-			const {
-				getBlockIndex,
-				getBlockSelectionEnd,
-				getBlockOrder,
-			} = select( 'core/block-editor' );
-			const { clientId, destinationRootClientId, isAppender } = ownProps;
-
-			// If the clientId is defined, we insert at the position of the block.
-			if ( clientId ) {
-				return getBlockIndex( clientId, destinationRootClientId );
-			}
-
-			// If there a selected block, we insert after the selected block.
-			const end = getBlockSelectionEnd();
-			if ( ! isAppender && end ) {
-				return getBlockIndex( end, destinationRootClientId ) + 1;
-			}
-
-			// Otherwise, we insert at the end of the current rootClientId
-			return getBlockOrder( destinationRootClientId ).length;
-		}
-		const { rootClientId } = ownProps;
-
-		// eslint-disable-next-line no-restricted-syntax
-		function createIfOne( ) {
-			const {
-				insertBlock,
-			} = dispatch( 'core/block-editor' );
+		function createIfOne() {
+			const { rootClientId, clientId, destinationRootClientId, isAppender } = ownProps;
 			const {
 				getBlockListSettings,
 			} = select( 'core/block-editor' );
 			const parentBlockListSettings = getBlockListSettings( rootClientId );
-			const parentAllowedBlocks = get( parentBlockListSettings, [ 'allowedBlocks' ] );
-			if ( parentAllowedBlocks.length > 1 ) {
+			const isOnlyOneAllowedBlock = get( parentBlockListSettings, [ 'allowedBlocks', 'length' ], 0 ) === 1;
+
+			if ( ! isOnlyOneAllowedBlock ) {
 				return false;
 			}
+
+			const parentAllowedBlocks = get( parentBlockListSettings, [ 'allowedBlocks' ] );
+
+			const {
+				getInsertionIndex,
+			} = select( 'core/block-editor' );
+
+			const {
+				insertBlock,
+			} = dispatch( 'core/block-editor' );
 			const insertedBlock = createBlock( parentAllowedBlocks[ 0 ] );
 			insertBlock(
 				insertedBlock,
-				getInsertionIndex(),
+				getInsertionIndex( clientId, destinationRootClientId, isAppender ),
 				rootClientId
 			);
 		}
