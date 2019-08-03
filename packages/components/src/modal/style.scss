@@ -15,10 +15,22 @@
 	}
 }
 
+// These are two divs rendered by Higher-order components
+// We need their height to be 100% for the verticalcentering
+// of the modal.
+.components-modal__screen-overlay > div,
+.components-modal__screen-overlay > div > div {
+	height: 100%;
+}
+
 // The modal window element.
 .components-modal__frame {
 	max-width: 800px;
+	min-height: 100%;
 	margin: auto;
+	display: grid;
+	align-items: center;
+
 	// Animate the modal frame/contents appearing on the page.
 	transform-origin: top center;
 	animation: components-modal__appear-animation 0.2s forwards;
