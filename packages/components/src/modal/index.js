@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { Component, createPortal } from '@wordpress/element';
@@ -102,6 +107,7 @@ class Modal extends Component {
 	 */
 	render() {
 		const {
+			overlayClassName,
 			onRequestClose,
 			title,
 			icon,
@@ -109,6 +115,7 @@ class Modal extends Component {
 			children,
 			aria,
 			instanceId,
+			isFullscreen,
 			isDismissible,
 			isDismissable, //Deprecated
 			// Many of the documented props for Modal are passed straight through
@@ -134,9 +141,17 @@ class Modal extends Component {
 					labelledby: title ? headingId : null,
 					describedby: aria.describedby,
 				} }
+				overlayClassName={ classnames(
+					'components-modal__screen-overlay',
+					overlayClassName,
+					{
+						'is-dialog': ! isFullscreen,
+						'is-full-screen': isFullscreen,
+					}
+				) }
 				{ ...otherProps }
 			>
-				<div className={ 'components-modal__content' } role="document">
+				<div className="components-modal__content" role="document">
 					<ModalHeader
 						closeLabel={ closeButtonLabel }
 						headingId={ headingId }

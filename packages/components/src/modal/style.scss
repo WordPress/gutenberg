@@ -5,15 +5,49 @@
 	right: 0;
 	bottom: 0;
 	left: 0;
-	background-color: rgba($black, 0.35);
 	z-index: z-index(".components-modal__screen-overlay");
 
-	// This animates the appearance of the white background.
-	@include edit-post__fade-in-animation();
+	&.is-full-screen {
+		padding: 20px;
+		background: $white;
+		overflow: auto;
+
+		@include break-small() {
+			padding: 100px;
+		}
+
+		// These are two divs rendered by Higher-order components
+		// We need their height to be 100% for the verticalcentering
+		// of the modal.
+		& > div,
+		& > div > div {
+			height: 100%;
+		}
+	}
+
+	&.is-dialog {
+		// This animates the appearance of the background.
+		@include edit-post__fade-in-animation();
+
+		background-color: rgba($black, 0.7);
+	}
 }
 
 // The modal window element.
-.components-modal__frame {
+.components-modal__screen-overlay.is-full-screen .components-modal__frame {
+	max-width: 800px;
+	min-height: 100%;
+	margin: auto;
+	display: grid;
+	align-items: center;
+
+	// Animate the modal frame/contents appearing on the page.
+	transform-origin: top center;
+	animation: components-modal__appear-scale-animation 0.2s forwards;
+	@include reduce-motion("animation");
+}
+
+.components-modal__screen-overlay.is-dialog .components-modal__frame {
 	// On small screens the content needs to be full width because of limited
 	// space.
 	position: absolute;
@@ -38,20 +72,10 @@
 		max-width: calc(100% - #{ $grid-unit-20 } - #{ $grid-unit-20 });
 		max-height: 90%;
 		transform: translate(-50%, -50%);
-
 		// Animate the modal frame/contents appearing on the page.
-		animation: components-modal__appear-animation 0.1s ease-out;
+		animation: components-modal__appear-slide-animation 0.1s ease-out;
 		animation-fill-mode: forwards;
 		@include reduce-motion("animation");
-	}
-}
-
-@keyframes components-modal__appear-animation {
-	from {
-		margin-top: $grid-unit-40;
-	}
-	to {
-		margin-top: 0;
 	}
 }
 
@@ -60,34 +84,31 @@
 // modal screen).
 .components-modal__header {
 	box-sizing: border-box;
-	border-bottom: $border-width solid $gray-300;
-	padding: 0 $grid-unit-30;
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
 	background: $white;
 	align-items: center;
 	height: $header-height;
-	z-index: z-index(".components-modal__header");
-	// For z-index to take effect, the element must be positioned. A "sticky"
-	// element is positioned, but since this is not supported in IE11,
-	// "relative" is used as a fallback.
-	position: relative;
-	position: sticky;
-	top: 0;
-	margin: 0 -#{$grid-unit-30} $grid-unit-30;
+	margin-bottom: 2 * $grid-unit-30;
 
-	// Rules inside this query are only run by Microsoft Edge.
-	// Edge has bugs around position: sticky;, so it needs a separate top rule.
-	// See also https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/17555420/.
-	@supports (-ms-ime-align:auto) {
-		position: fixed;
-		width: 100%;
-	}
+	.components-modal__screen-overlay.is-dialog & {
+		border-bottom: $border-width solid $gray-300;
+		padding: 0 $grid-unit-30;
 
-	.components-modal__header-heading {
-		font-size: 1rem;
-		font-weight: 600;
+		position: relative;
+		position: sticky;
+		top: 0;
+		z-index: z-index(".components-modal__header");
+		margin: 0 -#{$grid-unit-30} $grid-unit-30;
+
+		// Rules inside this query are only run by Microsoft Edge.
+		// Edge has bugs around position: sticky;, so it needs a separate top rule.
+		// See also https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/17555420/.
+		@supports (-ms-ime-align:auto) {
+			position: fixed;
+			width: 100%;
+		}
 	}
 
 	h1 {
@@ -99,6 +120,16 @@
 		position: relative;
 		left: $grid-unit-10;
 	}
+}
+
+.components-modal__screen-overlay.is-dialog .components-modal__header-heading {
+	font-size: 1rem;
+	font-weight: 600;
+}
+
+.components-modal__screen-overlay.is-full-screen .components-modal__header-heading {
+	font-size: 2rem;
+	font-weight: 300;
 }
 
 .components-modal__header-heading-container {
@@ -122,12 +153,37 @@
 // Modal contents.
 .components-modal__content {
 	box-sizing: border-box;
-	height: 100%;
 	padding: 0 $grid-unit-30 $grid-unit-30;
 
-	// Rules inside this query are only run by Microsoft Edge.
-	// This is a companion top padding to the fixed rule in line 77.
-	@supports (-ms-ime-align:auto) {
-		padding-top: $header-height;
+	.components-modal__screen-overlay.is-dialog & {
+		height: 100%;
+
+		// Rules inside this query are only run by Microsoft Edge.
+		// This is a companion top padding to the fixed rule in line 77.
+		@supports (-ms-ime-align:auto) {
+			padding-top: $header-height;
+		}
+	}
+}
+
+.components-modal__screen-overlay.is-full-screen .components-modal-header__close svg {
+	transform: scale(1.5);
+}
+
+@keyframes components-modal__appear-scale-animation {
+	from {
+		transform: scale(0.1);
+	}
+	to {
+		transform: scale(1);
+	}
+}
+
+@keyframes components-modal__appear-slide-animation {
+	from {
+		margin-top: $grid-unit-40;
+	}
+	to {
+		margin-top: 0;
 	}
 }

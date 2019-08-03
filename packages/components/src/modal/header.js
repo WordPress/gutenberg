@@ -40,7 +40,12 @@ const ModalHeader = ( {
 				) }
 			</div>
 			{ isDismissible && (
-				<Button onClick={ onClose } icon={ close } label={ label } />
+				<Button
+					className="components-modal-header__close"
+					onClick={ onClose }
+					icon={ close }
+					label={ label }
+				/>
 			) }
 		</div>
 	);
