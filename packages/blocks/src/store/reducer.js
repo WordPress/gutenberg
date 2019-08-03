@@ -102,7 +102,7 @@ export function blockStyles( state = {}, action ) {
  *
  * @param {string} setActionType  Action type.
  *
- * @return {function} Reducer.
+ * @return {Function} Reducer.
  */
 export function createBlockNameSetterReducer( setActionType ) {
 	return ( state = null, action ) => {

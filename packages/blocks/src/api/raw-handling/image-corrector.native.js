@@ -5,7 +5,7 @@
  * @param {Node} node The node to check.
  *
  * @return {void}
-*/
+ */
 export default function( node ) {
 	if ( node.nodeName !== 'IMG' ) {
 		return;

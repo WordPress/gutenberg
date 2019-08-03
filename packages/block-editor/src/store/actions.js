@@ -208,7 +208,7 @@ export function clearSelectedBlock() {
  *
  * @param {boolean} [isSelectionEnabled=true] Whether block selection should
  *                                            be enabled.
-
+ *
  * @return {Object} Action object.
  */
 export function toggleSelection( isSelectionEnabled = true ) {
@@ -227,7 +227,7 @@ export function toggleSelection( isSelectionEnabled = true ) {
  * @param {number}            indexToSelect Index of replacement block to
  *                                          select.
  *
- * @yields {Object} Action object.
+ * @yield {Object} Action object.
  */
 export function* replaceBlocks( clientIds, blocks, indexToSelect ) {
 	clientIds = castArray( clientIds );
@@ -303,7 +303,7 @@ export const moveBlocksUp = createOnMove( 'MOVE_BLOCKS_UP' );
  * @param  {?string} toRootClientId   Root client ID destination.
  * @param  {number}  index            The index to move the block into.
  *
- * @yields {Object} Action object.
+ * @yield {Object} Action object.
  */
 export function* moveBlockToPosition( clientId, fromRootClientId = '', toRootClientId = '', index ) {
 	const templateLock = yield select(

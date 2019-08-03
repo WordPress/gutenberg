@@ -9,10 +9,6 @@ export default Compiler;
 
 /**
  * Initialize a compiler.
- *
- * @param {Type} name
- * @return {Type}
- * @api public
  */
 
 function Compiler( opts ) {

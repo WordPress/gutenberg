@@ -57,7 +57,7 @@ async function askForConfirmationToContinue( message, isDefault = true, abortMes
  *
  * @param {string} name         Step name.
  * @param {string} abortMessage Abort message.
- * @param {function} handler    Step logic.
+ * @param {Function} handler    Step logic.
  */
 async function runStep( name, abortMessage, handler ) {
 	try {
