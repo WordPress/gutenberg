@@ -59,8 +59,9 @@ import * as textColumns from './text-columns';
 import * as verse from './verse';
 import * as video from './video';
 import * as tagCloud from './tag-cloud';
-
 import * as classic from './classic';
+import * as socialLinks from './social-links';
+import * as socialLink from './social-links/social-link';
 
 /**
  * Function to register an individual block.
@@ -130,6 +131,8 @@ export const registerCoreBlocks = () => {
 		search,
 		separator,
 		reusableBlock,
+		socialLinks,
+		socialLink,
 		spacer,
 		subhead,
 		table,
