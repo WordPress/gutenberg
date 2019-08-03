@@ -50,11 +50,11 @@ When creating a new package, you need to provide at least the following:
 
 ### Adding New Dependencies
 
-There are two types of dependencies that you might want to add to one of the existing WordPress package.
+There are two types of dependencies that you might want to add to one of the existing WordPress packages.
 
 #### Production Dependencies
 
-Production dependencies are stored in the `dependencies` section of `package.json` file of the package's folder. The simplest way to add such dependency to one of the packages is to run a very convenient [lerna add](https://github.com/lerna/lerna/tree/master/commands/add#readme) command from the root of the project.
+Production dependencies are stored in the `dependencies` section of the package’s `package.json` file. The simplest way to add such a dependency to one of the packages is to run a very convenient [lerna add](https://github.com/lerna/lerna/tree/master/commands/add#readme) command from the root of the project.
 
 _Example:_
 
@@ -62,7 +62,7 @@ _Example:_
 lerna add lodash packages/a11y
 ```
 
-This command adds the latest version of `lodash` as a dependency to the `@wordpress/a11y` package which is located in `packages/a11y` folder.
+This command adds the latest version of `lodash` as a dependency to the `@wordpress/a11y` package, which is located in `packages/a11y` folder.
 
 #### Development Dependencies
 
