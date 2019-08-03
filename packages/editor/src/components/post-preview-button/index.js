@@ -83,7 +83,7 @@ function writeInterstitialMessage( targetDocument ) {
 	/**
 	 * Filters the interstitial message shown when generating previews.
 	 *
-	 * @param {String} markup The preview interstitial markup.
+	 * @param {string} markup The preview interstitial markup.
 	 */
 	markup = applyFilters( 'editor.PostPreview.interstitialMarkup', markup );
 

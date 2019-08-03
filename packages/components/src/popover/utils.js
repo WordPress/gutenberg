@@ -13,7 +13,6 @@ const isRTL = () => document.documentElement.dir === 'rtl';
  * @param {Object} contentSize      Content Size.
  * @param {string} xAxis            Desired xAxis.
  * @param {string} chosenYAxis      yAxis to be used.
- * @param {boolean} expandOnMobile  Whether to expand the popover on mobile or not.
  *
  * @return {Object} Popover xAxis position and constraints.
  */
@@ -83,7 +82,6 @@ export function computePopoverXAxisPosition( anchorRect, contentSize, xAxis, cho
  * @param {Object} anchorRect       Anchor Rect.
  * @param {Object} contentSize      Content Size.
  * @param {string} yAxis            Desired yAxis.
- * @param {boolean} expandOnMobile  Whether to expand the popover on mobile or not.
  *
  * @return {Object} Popover xAxis position and constraints.
  */
