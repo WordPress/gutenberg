@@ -1194,6 +1194,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/downloadable-blocks",
+		"slug": "packages-downloadable-blocks",
+		"markdown_source": "../packages/downloadable-blocks/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/e2e-test-utils",
 		"slug": "packages-e2e-test-utils",
 		"markdown_source": "../packages/e2e-test-utils/README.md",
