@@ -142,7 +142,7 @@ class Modal extends Component {
 					} }
 					{ ...otherProps }
 				>
-					<div className={ 'components-modal__content' } tabIndex="0">
+					<div className="components-modal__content" tabIndex="0">
 						<ModalHeader
 							closeLabel={ closeButtonLabel }
 							headingId={ headingId }

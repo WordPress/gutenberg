@@ -5,53 +5,32 @@
 	right: 0;
 	bottom: 0;
 	left: 0;
-	background-color: rgba($black, 0.7);
+	padding: 100px;
+	background: $white;
 	z-index: z-index(".components-modal__screen-overlay");
-
-	// This animates the appearance of the white background.
-	@include edit-post__fade-in-animation();
+	overflow: auto;
 }
 
 // The modal window element.
 .components-modal__frame {
-	// On small screens the content needs to be full width because of limited
-	// space.
-	position: absolute;
-	top: 0;
-	right: 0;
-	bottom: 0;
-	left: 0;
-	box-sizing: border-box;
-	margin: 0;
-	border: $border-width solid $light-gray-500;
-	background: $white;
-	box-shadow: $shadow-modal;
-	overflow: auto;
+	max-width: 800px;
+	margin: auto;
 
-	// Show a centered modal on bigger screens.
+	// Animate the modal on bigger screens
 	@include break-small() {
-		top: 50%;
-		right: auto;
-		bottom: auto;
-		left: 50%;
-		min-width: $modal-min-width;
-		max-width: calc(100% - #{ $grid-size-large } - #{ $grid-size-large });
-		max-height: calc(100% - #{ $header-height } - #{ $header-height });
-		transform: translate(-50%, -50%);
-
 		// Animate the modal frame/contents appearing on the page.
-		animation: components-modal__appear-animation 0.1s ease-out;
-		animation-fill-mode: forwards;
+		transform-origin: top center;
+		animation: components-modal__appear-animation 0.2s forwards;
 		@include reduce-motion("animation");
 	}
 }
 
 @keyframes components-modal__appear-animation {
-	from {
-		margin-top: $grid-size * 4;
+	0% {
+		transform: scale(0.1);
 	}
-	to {
-		margin-top: 0;
+	100% {
+		transform: scale(1);
 	}
 }
 
@@ -60,30 +39,17 @@
 // modal screen).
 .components-modal__header {
 	box-sizing: border-box;
-	border-bottom: $border-width solid $light-gray-500;
-	padding: 0 $grid-size-xlarge;
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
 	background: $white;
 	align-items: center;
 	height: $header-height;
-	position: sticky;
-	top: 0;
-	z-index: z-index(".components-modal__header");
-	margin: 0 -#{$grid-size-xlarge} $grid-size-xlarge;
-
-	// Rules inside this query are only run by Microsoft Edge.
-	// Edge has bugs around position: sticky;, so it needs a separate top rule.
-	// See also https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/17555420/.
-	@supports (-ms-ime-align:auto) {
-		position: fixed;
-		width: 100%;
-	}
+	margin-bottom: 2 * $grid-size-xlarge;
 
 	.components-modal__header-heading {
-		font-size: 1rem;
-		font-weight: 600;
+		font-size: 2rem;
+		font-weight: 300;
 	}
 
 	h1 {
@@ -113,12 +79,5 @@
 // Modal contents.
 .components-modal__content {
 	box-sizing: border-box;
-	height: 100%;
 	padding: 0 $grid-size-xlarge $grid-size-xlarge;
-
-	// Rules inside this query are only run by Microsoft Edge.
-	// This is a companion top padding to the fixed rule in line 77.
-	@supports (-ms-ime-align:auto) {
-		padding-top: $header-height;
-	}
 }
