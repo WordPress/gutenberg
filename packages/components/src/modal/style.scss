@@ -5,24 +5,24 @@
 	right: 0;
 	bottom: 0;
 	left: 0;
-	padding: 100px;
+	padding: 20px;
 	background: $white;
 	z-index: z-index(".components-modal__screen-overlay");
 	overflow: auto;
+
+	@include break-small() {
+		padding: 100px;
+	}
 }
 
 // The modal window element.
 .components-modal__frame {
 	max-width: 800px;
 	margin: auto;
-
-	// Animate the modal on bigger screens
-	@include break-small() {
-		// Animate the modal frame/contents appearing on the page.
-		transform-origin: top center;
-		animation: components-modal__appear-animation 0.2s forwards;
-		@include reduce-motion("animation");
-	}
+	// Animate the modal frame/contents appearing on the page.
+	transform-origin: top center;
+	animation: components-modal__appear-animation 0.2s forwards;
+	@include reduce-motion("animation");
 }
 
 @keyframes components-modal__appear-animation {
