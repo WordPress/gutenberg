@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
 import {
 	get,
 } from 'lodash';
@@ -9,7 +8,7 @@ import {
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Dropdown, IconButton, Button, Icon } from '@wordpress/components';
+import { Dropdown, IconButton } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, ifCondition } from '@wordpress/compose';
@@ -66,8 +65,14 @@ class Inserter extends Component {
 	renderToggle( { onToggle, isOpen } ) {
 		const {
 			disabled,
+			hasOneAllowedItem,
+			createIfOne,
 			renderToggle = defaultRenderToggle,
 		} = this.props;
+
+		if ( hasOneAllowedItem ) {
+			onToggle = createIfOne;
+		}
 
 		return renderToggle( { onToggle, isOpen, disabled } );
 	}
@@ -96,23 +101,8 @@ class Inserter extends Component {
 	}
 
 	render() {
-		const { position, hasOneAllowedItem, createIfOne } = this.props;
-		let toggle = null;
-		if ( hasOneAllowedItem ) {
-			toggle = () => {
-				return (
-					<Button
-						className={ classnames( 'block-editor-button-block-appender' ) }
-						onClick={ createIfOne }
-					>
-						<span className="screen-reader-text">{ __( 'Add Block' ) }</span>
-						<Icon icon="insert" />
-					</Button>
-				);
-			};
-		} else {
-			toggle = this.renderToggle;
-		}
+		const { position } = this.props;
+		const toggle = this.renderToggle;
 
 		return (
 			<Dropdown
