@@ -1405,6 +1405,7 @@ export function __experimentalGetLastBlockAttributeChanges( state ) {
 function getReusableBlocks( state ) {
 	return get( state, [ 'settings', '__experimentalReusableBlocks' ], EMPTY_ARRAY );
 }
+
 /**
  * Returns true if application is requesting for discover blocks.
  *
@@ -1440,4 +1441,15 @@ export function getDiscoverBlocks( state, filterValue ) {
  */
 export function hasInstallBlocksPermission( state ) {
 	return state.discoverBlocks.hasPermission;
+}
+
+/**
+ * Returns true if the block editor can search and install uninstalled blocks.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether the downloadable blocks feature is enabled.
+ */
+export function getIsDownloadableBlocksEnabled( state ) {
+	return get( state, [ 'settings', '__experimentalIsDownloadableBlocksEnabled' ], false );
 }

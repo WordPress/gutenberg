@@ -44,9 +44,9 @@ import BlockPreview from '../block-preview';
 import BlockTypesList from '../block-types-list';
 import ChildBlocks from './child-blocks';
 import DiscoverBlocksPanel from '../discover-blocks-panel';
+import __experimentalInserterMenuExtension from '../inserter-menu-extension';
 
 const MAX_SUGGESTED_ITEMS = 9;
-const SHOW_DISCOVER_BLOCKS = true;
 
 const stopKeyPropagation = ( event ) => event.stopPropagation();
 
@@ -324,7 +324,8 @@ export class InserterMenu extends Component {
 	}
 
 	render() {
-		const { instanceId, onSelect, rootClientId } = this.props;
+		const { instanceId, onSelect, rootClientId, isDownloadableBlocksEnabled } = this.props;
+
 		const {
 			childItems,
 			hoveredItem,
@@ -423,12 +424,13 @@ export class InserterMenu extends Component {
 						</PanelBody>
 					) }
 					{ isEmpty( suggestedItems ) && isEmpty( reusableItems ) && isEmpty( itemsPerCategory ) && (
-						SHOW_DISCOVER_BLOCKS ?
+						isDownloadableBlocksEnabled ?
 							(
 								<DiscoverBlocksPanel onSelect={ onSelect } onHover={ this.onHover } filterValue={ this.state.debouncedFilterValue } />
 							) :
 							( <p className="editor-inserter__no-results block-editor-inserter__no-results">{ __( 'No blocks found.' ) }</p> )
 					) }
+					<__experimentalInserterMenuExtension.Slot />
 				</div>
 
 				{ hoveredItem && isReusableBlock( hoveredItem ) &&
@@ -447,6 +449,7 @@ export default compose(
 			getBlockName,
 			getBlockRootClientId,
 			getBlockSelectionEnd,
+			getIsDownloadableBlocksEnabled,
 		} = select( 'core/block-editor' );
 		const {
 			getChildBlockNames,
@@ -467,6 +470,7 @@ export default compose(
 			rootChildBlocks: getChildBlockNames( destinationRootBlockName ),
 			items,
 			destinationRootClientId,
+			isDownloadableBlocksEnabled: getIsDownloadableBlocksEnabled(),
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {

@@ -1,0 +1,27 @@
+{
+	"name": "@wordpress/downloadable-blocks",
+	"version": "1.0.0",
+	"description": "Extend block editor to download and install blocks directly.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"downloadable blocks"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/downloadable-blocks/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/downloadable-blocks"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"dependencies": {
+		"@wordpress/components": "file:../components"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}
