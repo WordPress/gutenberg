@@ -30,14 +30,14 @@ const FocusManaged = withConstrainedTabbing( withFocusReturn( ( { children } ) =
 /**
  * Name of slot in which popover should fill.
  *
- * @type {String}
+ * @type {string}
  */
 const SLOT_NAME = 'Popover';
 
 /**
  * Hook used trigger an event handler once the window is resized or scrolled.
  *
- * @param {function} handler              Event handler.
+ * @param {Function} handler              Event handler.
  * @param {Object}   ignoredScrollalbeRef scroll events inside this element are ignored.
  */
 function useThrottledWindowScrollOrResize( handler, ignoredScrollalbeRef ) {

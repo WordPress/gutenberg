@@ -82,7 +82,7 @@ _Parameters_
 
 _Returns_
 
--   `function`: Function that determines if a request is for the embed API, embedding a specific URL.
+-   `Function`: Function that determines if a request is for the embed API, embedding a specific URL.
 
 <a name="createJSONResponse" href="#createJSONResponse">#</a> **createJSONResponse**
 
@@ -127,7 +127,7 @@ _Parameters_
 
 _Returns_
 
--   `function`: Function that determines if a request's URL contains substring.
+-   `Function`: Function that determines if a request's URL contains substring.
 
 <a name="deactivatePlugin" href="#deactivatePlugin">#</a> **deactivatePlugin**
 
@@ -315,9 +315,9 @@ deserialised JSON response for the request.
 
 _Parameters_
 
--   _mockCheck_ `function`: function that returns true if the request should be mocked.
+-   _mockCheck_ `Function`: function that returns true if the request should be mocked.
 -   _mock_ `Object`: A mock object to wrap in a JSON response, if the request should be mocked.
--   _responseObjectTransform_ `(function|undefined)`: An optional function that transforms the response's object before the response is used.
+-   _responseObjectTransform_ `(Function|undefined)`: An optional function that transforms the response's object before the response is used.
 
 _Returns_
 
