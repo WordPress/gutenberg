@@ -1300,6 +1300,38 @@ export const hasOneAllowedItem = ( state, rootClientId = null ) => {
 	return false;
 };
 
+/**
+ * Determines whether there is only one item that may be inserted.
+ * @param {Object}  state        Editor state.
+ * @param {?string} rootClientId Optional root client ID of block list.
+ *
+ * @return {string} The name of the allowed block.
+ */
+export const getOneAllowedItemName = ( state, rootClientId = null ) => {
+	if ( rootClientId ) {
+		const parentBlockListSettings = getBlockListSettings( state, rootClientId );
+
+		if ( get( parentBlockListSettings, [ 'allowedBlocks', 'length' ], 0 ) === 1 ) {
+			let name = get( parentBlockListSettings, [ 'allowedBlocks' ] )[ 0 ];
+			name = name.split( '/' )[ 1 ].replace( '-', ' ' );
+			return name;
+		}
+
+		return false;
+	}
+
+	return false;
+};
+
+/**
+ * Determines whether there is only one item that may be inserted.
+ * @param {Object}  state           		Editor state.
+ * @param {?string} clientId 				Block client ID.
+ * @param {?string} destinationRootClientId Root client ID of block list.
+ * @param {boolean} isAppender 	    		Determines if the block is added to a set of existing
+ * 											blocks in a list.
+ * @return {number} The insertion index.
+ */
 export function getInsertionIndex( state, clientId, destinationRootClientId, isAppender ) {
 	// If the clientId is defined, we insert at the position of the block.
 	if ( clientId ) {

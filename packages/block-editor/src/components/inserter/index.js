@@ -21,18 +21,21 @@ import {
  */
 import InserterMenu from './menu';
 
-const defaultRenderToggle = ( { onToggle, disabled, isOpen } ) => (
-	<IconButton
-		icon="insert"
-		label={ __( 'Add block' ) }
-		labelPosition="bottom"
-		onClick={ onToggle }
-		className="editor-inserter__toggle block-editor-inserter__toggle"
-		aria-haspopup="true"
-		aria-expanded={ isOpen }
-		disabled={ disabled }
-	/>
-);
+const defaultRenderToggle = ( { onToggle, disabled, isOpen, blockName = 'block' } ) => {
+	const label = `${ __( 'Add' ) } ${ blockName }`;
+	return (
+		<IconButton
+			icon="insert"
+			label={ label }
+			labelPosition="bottom"
+			onClick={ onToggle }
+			className="editor-inserter__toggle block-editor-inserter__toggle"
+			aria-haspopup="true"
+			aria-expanded={ isOpen }
+			disabled={ disabled }
+		/>
+	);
+};
 
 class Inserter extends Component {
 	constructor() {
@@ -66,6 +69,7 @@ class Inserter extends Component {
 		const {
 			disabled,
 			hasOneAllowedItem,
+			blockName,
 			createIfOne,
 			renderToggle = defaultRenderToggle,
 		} = this.props;
@@ -74,7 +78,7 @@ class Inserter extends Component {
 			onToggle = createIfOne;
 		}
 
-		return renderToggle( { onToggle, isOpen, disabled } );
+		return renderToggle( { onToggle, isOpen, disabled, blockName } );
 	}
 
 	/**
@@ -121,11 +125,12 @@ class Inserter extends Component {
 
 export default compose( [
 	withSelect( ( select, { rootClientId } ) => {
-		const { hasInserterItems, hasOneAllowedItem } = select( 'core/block-editor' );
+		const { hasInserterItems, hasOneAllowedItem, getOneAllowedItemName } = select( 'core/block-editor' );
 
 		return {
 			hasItems: hasInserterItems( rootClientId ),
 			hasOneAllowedItem: hasOneAllowedItem( rootClientId ),
+			blockName: getOneAllowedItemName( rootClientId ),
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {
