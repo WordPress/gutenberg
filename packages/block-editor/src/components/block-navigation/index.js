@@ -46,6 +46,7 @@ function BlockNavigationList( {
 							>
 								<BlockIcon icon={ blockType.icon } showColors />
 								{ blockType.title }
+								{ block.attributes.anchor && <span className="block-editor-block-navigation__item-anchor-name">{ block.attributes.anchor }</span> }
 								{ isSelected && <span className="screen-reader-text">{ __( '(selected block)' ) }</span> }
 							</Button>
 						</div>

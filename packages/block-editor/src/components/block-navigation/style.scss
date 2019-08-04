@@ -71,6 +71,20 @@ $tree-item-height: 36px;
 		margin-right: 6px;
 	}
 
+	& > .block-editor-block-navigation__item-anchor-name {
+		margin-left: auto;
+		font-style: italic;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		max-width: 8em;
+		padding-right: 6px;
+
+		&::before {
+			content: "#";
+		}
+	}
+
 	&:hover:not(:disabled):not([aria-disabled="true"]) {
 		@include menu-style__hover;
 	}
