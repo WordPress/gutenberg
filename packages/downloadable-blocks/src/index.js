@@ -1,21 +1,16 @@
 /**
- * WordPress dependencies
+ * Internal dependencies
  */
-import { Button } from '@wordpress/components';
+import DiscoverBlocksPanel from './components/discover-blocks-panel';
 
 function DownloadableBlocks( { onSelect, filterValue } ) {
 	return (
 		<div>
 			{ filterValue }
-			<Button
-				isDefault
-				onClick={ ( event ) => {
-					event.preventDefault();
-					onSelect( {} );
-				} }
-			>
-				Add
-			</Button>
+			<DiscoverBlocksPanel
+				onSelect={ onSelect }
+				filterValue={ filterValue }
+			/>
 		</div>
 	);
 }
