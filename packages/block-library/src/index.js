@@ -157,18 +157,6 @@ export const registerCoreBlocks = () => {
 };
 
 /**
- * Check conditions to register an experimental block.
- *
- * @param {boolean} setting    The editor setting for the block.
- *
- * @return {boolean} if all conditions allow block to be registered.
- */
-const checkExperimentalBlockConditions = ( setting ) => {
-	const isTestEnvironment = process.env.NODE_ENV === 'test';
-	return setting || isTestEnvironment;
-};
-
-/**
  * Function to register experimental core blocks depending on editor settings.
  *
  * @param {Object} settings     Editor settings.
@@ -184,9 +172,9 @@ export const registerExperimentalCoreBlocks = process.env.GUTENBERG_PHASE === 2 
 	const { __experimentalEnableLegacyWidgetBlock, __experimentalEnableMenuBlock } = settings;
 
 	[
-		checkExperimentalBlockConditions( __experimentalEnableLegacyWidgetBlock ) ? legacyWidget : null,
-		checkExperimentalBlockConditions( __experimentalEnableMenuBlock ) ? navigationMenu : null,
-		checkExperimentalBlockConditions( __experimentalEnableMenuBlock ) ? navigationMenuItem : null,
+		__experimentalEnableLegacyWidgetBlock ? legacyWidget : null,
+		__experimentalEnableMenuBlock ? navigationMenu : null,
+		__experimentalEnableMenuBlock ? navigationMenuItem : null,
 	].forEach( ( block ) => {
 		registerBlock( block );
 	} );
