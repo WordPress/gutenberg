@@ -279,8 +279,8 @@ const swipeUp = async ( driver: wd.PromiseChainWebdriver, element: wd.PromiseCha
 
 // Starts from the middle of the screen and swipes downwards
 const swipeDown = async ( driver: wd.PromiseChainWebdriver ) => {
-	let size = await driver.getWindowSize();
-	let y = 0;
+	const size = await driver.getWindowSize();
+	const y = 0;
 
 	const startX = size.width / 2;
 	const startY = y + ( size.height / 3 );
