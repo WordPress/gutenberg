@@ -118,6 +118,8 @@ class NativeEditorProvider extends Component {
 		const { mode, switchMode } = this.props;
 		// refresh html content first
 		this.serializeToNativeAction();
+		// make sure to blur the selected block and dismiss the keyboard
+		this.props.clearSelectedBlock();
 		switchMode( mode === 'visual' ? 'text' : 'visual' );
 	}
 
@@ -162,10 +164,14 @@ export default compose( [
 			resetEditorBlocks,
 		} = dispatch( 'core/editor' );
 		const {
+			clearSelectedBlock,
+		} = dispatch( 'core/block-editor' );
+		const {
 			switchEditorMode,
 		} = dispatch( 'core/edit-post' );
 
 		return {
+			clearSelectedBlock,
 			editTitle( title ) {
 				editPost( { title } );
 			},
