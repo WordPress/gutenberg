@@ -250,7 +250,7 @@ export function getLastEntitySaveError( state, kind, name, recordId ) {
  *
  * @return {number} The current undo offset.
  */
-export function getCurrentUndoOffset( state ) {
+function getCurrentUndoOffset( state ) {
 	return state.undo.offset;
 }
 

@@ -71,22 +71,6 @@ _Returns_
 
 -   `?Array`: An array of autosaves for the post, or undefined if there is none.
 
-<a name="getCurrentUndoOffset" href="#getCurrentUndoOffset">#</a> **getCurrentUndoOffset**
-
-Returns the current undo offset for the
-entity records edits history. The offset
-represents how many items from the end
-of the history stack we are at. 0 is the
-last edit, -1 is the second last, and so on.
-
-_Parameters_
-
--   _state_ `Object`: State tree.
-
-_Returns_
-
--   `number`: The current undo offset.
-
 <a name="getCurrentUser" href="#getCurrentUser">#</a> **getCurrentUser**
 
 Returns the current user.
