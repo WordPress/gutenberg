@@ -65,7 +65,7 @@
 	}
 
 	.editor-block-list__block-edit [data-block] {
-		margin-top: 0;
+		margin: 0;
 	}
 
 	> div section {
@@ -79,6 +79,7 @@
 		}
 	}
 
+	.block-editor-block-drop-zone,
 	.reusable-block-indicator,
 	.block-list-appender {
 		display: none;
