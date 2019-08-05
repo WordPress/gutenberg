@@ -45,9 +45,8 @@ async function openPreviewPage( editorPage ) {
  * @return {Promise} Promise resolving once navigation completes.
  */
 async function waitForPreviewNavigation( previewPage ) {
-	const navigationCompleted = previewPage.waitForNavigation();
 	await page.click( '.editor-post-preview' );
-	return navigationCompleted;
+	return previewPage.waitForNavigation();
 }
 
 /**
