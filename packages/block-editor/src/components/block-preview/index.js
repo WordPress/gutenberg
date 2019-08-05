@@ -35,6 +35,7 @@ export function BlockPreview( {
 	// Dynamically calculate the scale factor
 	useLayoutEffect( () => {
 		if ( ! scaleToFit ) {
+			setVisibility( 'visible' );
 			return;
 		}
 		const blockClientIds = blocks.map( ( block ) => block.clientId );
