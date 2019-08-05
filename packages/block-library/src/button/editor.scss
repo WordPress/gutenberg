@@ -78,9 +78,11 @@
 
 // Tweak styles for the Preview.
 .block-editor-block-preview__content {
-	.wp-block-button-wrapper,
+	//.wp-block-button-wrapper {
+	//}
+
 	.wp-block-button {
-		display: block;
+		display: table;
 	}
 
 	.wp-block-button {
@@ -88,10 +90,7 @@
 	}
 
 	[data-type="core/button"].wp-block {
-		//max-width: 150px;
-		//width: auto;
 		height: auto;
-		//width: 100%;
 
 		> .block-editor-block-list__block-edit {
 			float: none;
@@ -116,5 +115,24 @@
 		// the `edit` function.
 		white-space: nowrap !important;
 		text-overflow: ellipsis;
+	}
+}
+
+// Preview Thumbnail.
+.block-editor-block-styles__item .block-editor-block-preview__content {
+	.block-editor-rich-text__editable {
+		white-space: nowrap !important;
+	}
+
+	[data-type="core/button"].wp-block {
+		//width: calc(3.5 * (100vw / 12));
+		width: auto;
+	}
+}
+
+// Right Popover preview.
+.block-editor-block-switcher__preview .block-editor-block-preview__content {
+	[data-type="core/button"].wp-block {
+		width: auto;
 	}
 }
