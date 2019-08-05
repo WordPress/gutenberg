@@ -277,6 +277,24 @@ const swipeUp = async ( driver: wd.PromiseChainWebdriver, element: wd.PromiseCha
 	await action.perform();
 };
 
+// Starts from the middle of the screen and swipes downwards
+const swipeDown = async ( driver: wd.PromiseChainWebdriver ) => {
+	let size = await driver.getWindowSize();
+	let y = 0;
+
+	const startX = size.width / 2;
+	const startY = y + ( size.height / 3 );
+	const endX = startX;
+	const endY = startY - ( startY * -1 * 0.5 );
+
+	const action = await new wd.TouchAction( driver );
+	action.press( { x: startX, y: startY } );
+	action.wait( 3000 );
+	action.moveTo( { x: endX, y: endY } );
+	action.release();
+	await action.perform();
+};
+
 const toggleHtmlMode = async ( driver: wd.PromiseChainWebdriver, toggleOn: boolean ) => {
 	if ( isAndroid() ) {
 		// Hit the "Menu" key
@@ -324,6 +342,7 @@ module.exports = {
 	tapSelectAllAboveElement,
 	tapCopyAboveElement,
 	tapPasteAboveElement,
+	swipeDown,
 	swipeUp,
 	stopDriver,
 	toggleHtmlMode,
