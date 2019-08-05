@@ -88,8 +88,10 @@
 	}
 
 	[data-type="core/button"].wp-block {
-		max-width: 150px;
+		//max-width: 150px;
+		//width: auto;
 		height: auto;
+		//width: 100%;
 
 		> .block-editor-block-list__block-edit {
 			float: none;
@@ -114,5 +116,19 @@
 		// the `edit` function.
 		white-space: nowrap !important;
 		text-overflow: ellipsis;
+	}
+}
+
+// Preview Thumbnail.
+.block-editor-block-styles__item .block-editor-block-preview__content {
+	[data-type="core/button"].wp-block {
+		max-width: 150px;
+	}
+}
+
+// Right Popover preview.
+.block-editor-block-switcher__preview .block-editor-block-preview__content {
+	[data-type="core/button"].wp-block {
+		width: auto;
 	}
 }

@@ -1,3 +1,15 @@
 .wp-block-quote__citation {
 	font-size: $default-font-size;
 }
+
+// Tweak Preview styles in the Styles.
+.block-editor-block-preview__content {
+	.wp-block-quote {
+		display: block;
+		margin: 0;
+	}
+
+	[data-type="core/quote"].wp-block {
+		max-width: 300px;
+	}
+}
