@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { keyBy, map, flowRight } from 'lodash';
+import { map, flowRight } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -12,6 +12,7 @@ import { combineReducers } from '@wordpress/data';
  * Internal dependencies
  */
 import {
+	conservativeMapItem,
 	ifMatchingAction,
 	replaceAction,
 	onSubKey,
@@ -70,9 +71,14 @@ export function getMergedItemIds( itemIds, nextItemIds, page, perPage ) {
 function items( state = {}, action ) {
 	switch ( action.type ) {
 		case 'RECEIVE_ITEMS':
+			const key = action.key || DEFAULT_ENTITY_KEY;
 			return {
 				...state,
-				...keyBy( action.items, action.key || DEFAULT_ENTITY_KEY ),
+				...action.items.reduce( ( acc, value ) => {
+					const itemId = value[ key ];
+					acc[ itemId ] = conservativeMapItem( state[ itemId ], value );
+					return acc;
+				}, {} ),
 			};
 	}
 
