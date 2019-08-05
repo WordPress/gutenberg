@@ -160,10 +160,12 @@ export default compose( [
 	} ),
 	withDispatch( ( dispatch ) => {
 		const {
-			clearSelectedBlock,
 			editPost,
 			resetEditorBlocks,
 		} = dispatch( 'core/editor' );
+		const {
+			clearSelectedBlock,
+		} = dispatch( 'core/block-editor' );
 		const {
 			switchEditorMode,
 		} = dispatch( 'core/edit-post' );
