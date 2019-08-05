@@ -118,17 +118,3 @@
 		text-overflow: ellipsis;
 	}
 }
-
-// Preview Thumbnail.
-.block-editor-block-styles__item .block-editor-block-preview__content {
-	[data-type="core/button"].wp-block {
-		max-width: 150px;
-	}
-}
-
-// Right Popover preview.
-.block-editor-block-switcher__preview .block-editor-block-preview__content {
-	[data-type="core/button"].wp-block {
-		width: auto;
-	}
-}
