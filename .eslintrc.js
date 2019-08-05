@@ -22,6 +22,9 @@ module.exports = {
 		'plugin:@wordpress/eslint-plugin/recommended',
 		'plugin:jest/recommended',
 	],
+	globals: {
+		wp: 'off',
+	},
 	rules: {
 		'@wordpress/react-no-unsafe-timeout': 'error',
 		'no-restricted-syntax': [
@@ -112,9 +115,9 @@ module.exports = {
 				browser: true,
 			},
 			globals: {
-				browser: true,
-				page: true,
-				wp: true,
+				browser: 'readonly',
+				page: 'readonly',
+				wp: 'readonly',
 			},
 		},
 	],
