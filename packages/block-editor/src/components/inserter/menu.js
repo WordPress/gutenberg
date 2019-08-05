@@ -15,7 +15,6 @@ import {
 	includes,
 	deburr,
 	forEach,
-	debounce,
 } from 'lodash';
 import scrollIntoView from 'dom-scroll-into-view';
 
@@ -172,13 +171,11 @@ export class InserterMenu extends Component {
 			reusableItems: [],
 			itemsPerCategory: {},
 			openPanels: [ 'suggested' ],
-			debouncedFilterValue: '',
 		};
 		this.onChangeSearchInput = this.onChangeSearchInput.bind( this );
 		this.onHover = this.onHover.bind( this );
 		this.panels = {};
 		this.inserterResults = createRef();
-		this.debouncedSetState = debounce( this.setState, 400 );
 	}
 
 	componentDidMount() {
@@ -194,9 +191,6 @@ export class InserterMenu extends Component {
 	}
 
 	onChangeSearchInput( event ) {
-		this.debouncedSetState( {
-			debouncedFilterValue: event.target.value,
-		} );
 		this.filter( event.target.value );
 	}
 
