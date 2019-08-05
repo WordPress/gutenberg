@@ -331,6 +331,12 @@ export function* moveBlockToPosition( clientId, fromRootClientId = '', toRootCli
 		return;
 	}
 
+	// If templateLock is insert we can not remove the block from the parent.
+	// Given that here we know that we are moving the block to a different parent, the move should not be possible if the condition is true.
+	if ( templateLock === 'insert' ) {
+		return;
+	}
+
 	const blockName = yield select(
 		'core/block-editor',
 		'getBlockName',
