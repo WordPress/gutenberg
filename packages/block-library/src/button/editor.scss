@@ -39,22 +39,6 @@
 	[data-rich-text-placeholder]::after {
 		opacity: 0.8;
 	}
-
-	// Don't let the placeholder text wrap in the variation preview.
-	.block-editor-block-preview__content & {
-		max-width: 100%;
-
-		.wp-block-button__link {
-			max-width: 100%;
-			overflow: hidden;
-			// Override is allowed here only because the rich text instance in
-			// a preview is not editable.
-			// To do: use the `save` function to preview a block transform, not
-			// the `edit` function.
-			white-space: nowrap !important;
-			text-overflow: ellipsis;
-		}
-	}
 }
 
 .wp-block-button__inline-link {
@@ -89,5 +73,46 @@
 		height: auto;
 		overflow: visible;
 		margin-top: $grid-size-large;
+	}
+}
+
+// Tweak styles for the Preview.
+.block-editor-block-preview__content {
+	.wp-block-button-wrapper,
+	.wp-block-button {
+		display: table;
+	}
+
+	.wp-block-button {
+		text-align: left;
+	}
+
+	[data-type="core/button"].wp-block {
+		width: auto;
+		height: auto;
+
+		> .block-editor-block-list__block-edit {
+			float: none;
+			margin: 0;
+		}
+	}
+
+	.editor-styles-wrapper [data-block] {
+		margin: 0;
+	}
+
+	.block-editor-block-list__insertion-point {
+		display: none;
+	}
+
+	.block-editor-block-preview__content & {
+		max-width: 100%;
+		overflow: hidden;
+		// Override is allowed here only because the rich text instance in
+		// a preview is not editable.
+		// To do: use the `save` function to preview a block transform, not
+		// the `edit` function.
+		white-space: nowrap !important;
+		text-overflow: ellipsis;
 	}
 }

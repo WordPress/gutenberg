@@ -48,34 +48,3 @@ $blocks-button__height: 56px;
 		border: 2px solid;
 	}
 }
-
-// Tweak styles for the Preview.
-.editor-block-preview__container {
-	.wp-block-button-wrapper,
-	.wp-block-button {
-		display: table;
-	}
-
-	.wp-block-button {
-		text-align: justify;
-	}
-
-	[data-type="core/button"].wp-block {
-		width: auto;
-		height: auto;
-
-		> .block-editor-block-list__block-edit {
-			float: none;
-			margin: 0;
-		}
-	}
-
-	.editor-styles-wrapper [data-block] {
-		margin: 0;
-	}
-
-	.block-editor-block-list__insertion-point,
-	.wp-block-button__inline-link {
-		display: none;
-	}
-}
