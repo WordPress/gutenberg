@@ -11,6 +11,7 @@ import {
 
 async function openBlockNavigator() {
 	await pressKeyWithModifier( 'access', 'o' );
+	await page.waitForSelector( '.block-editor-block-navigation__item-button.is-selected' );
 }
 
 describe( 'Navigating the block hierarchy', () => {
@@ -90,6 +91,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await openBlockNavigator();
 		await pressKeyTimes( 'Tab', 4 );
 		await page.keyboard.press( 'Enter' );
+		await page.waitForSelector( '.is-selected[data-type="core/column"]' );
 
 		// Insert text in the last column block
 		await pressKeyTimes( 'Tab', 3 ); // Tab to inserter.
@@ -116,7 +118,6 @@ describe( 'Navigating the block hierarchy', () => {
 
 		// Return to first block.
 		await openBlockNavigator();
-		await page.waitForSelector( '.editor-block-navigation__container' );
 		await page.keyboard.press( 'Space' );
 
 		// Replace its content.
