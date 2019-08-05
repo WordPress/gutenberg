@@ -88,7 +88,7 @@ export default compose( [
 	withDispatch( ( dispatch ) => ( {
 		redo: dispatch( 'core/editor' ).redo,
 		undo: dispatch( 'core/editor' ).undo,
-		clearSelectedBlock: dispatch( 'core/editor' ).clearSelectedBlock,
+		clearSelectedBlock: dispatch( 'core/block-editor' ).clearSelectedBlock,
 	} ) ),
 	withViewportMatch( { isLargeViewport: 'medium' } ),
 ] )( HeaderToolbar );
