@@ -1,59 +1,30 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
-import { Fragment } from '@wordpress/element';
-import { withDispatch } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { URLInput } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 
-const SocialLinkEdit = ( { attributes, setUrl, isSelected } ) => {
-	const { url } = attributes;
-
-	const getDashiconsIconName = () => {
-		const isFacebook = url.includes( 'fb.com' ) || url.includes( 'facebook.com' );
-
-		if ( isFacebook ) {
-			return 'facebook';
-		}
-	};
-
-	const dashiconsIconName = getDashiconsIconName();
+const SocialLinkEdit = ( { attributes, setAttributes, className, isSelected } ) => {
+	const { icon, url } = attributes;
 
 	return (
-		<Fragment>
-			<div className={ `dashicons-before dashicons-${ dashiconsIconName }` } />
-
+		<>
+			<span className={ className }>
+				{ icon } Icon
+			</span>
 			{
 				isSelected && (
-					<form >
-						<input
-							type="url"
-							value={ ( attributes && url ) || '' }
-							onChange={ ( event ) => setUrl( event.target.value ) }
-							placeholder={ __( 'example.com/username' ) }
-						/>
-					</form>
+					<URLInput
+						value={ url }
+						onChange={ ( value ) => setAttributes( { url: value } ) }
+					/>
 				)
 			}
-
-			{ ! isSelected && url }
-		</Fragment>
+		</>
 	);
 };
 
-export default compose(
-	withDispatch( ( _, ownProps ) => {
-		return {
-			setUrl( url ) {
-				const { setAttributes } = ownProps;
-
-				setAttributes( { url } );
-			},
-		};
-	} )
-)( SocialLinkEdit );
-
+export default SocialLinkEdit;

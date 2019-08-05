@@ -1,22 +1,13 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
-import { InnerBlocks } from '@wordpress/block-editor';
 
-export default function save( { attributes } ) {
-	const { verticalAlignment } = attributes;
-	const wrapperClasses = classnames( {
-		[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
-	} );
+export default function save( { attributes, className } ) {
+	const { icon, url } = attributes;
 
 	return (
-		<div className={ wrapperClasses }>
-			<InnerBlocks.Content />
+		<div className={ className }>
+			<a href={ url }> { icon } Icon </a>
 		</div>
 	);
 }

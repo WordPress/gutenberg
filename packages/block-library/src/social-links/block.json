@@ -1,10 +1,5 @@
 {
 	"name": "core/social-links",
 	"category": "widgets",
-	"attributes": {
-		"columns": {
-			"type": "number",
-			"default": 2
-		}
-	}
+	"attributes": {}
 }

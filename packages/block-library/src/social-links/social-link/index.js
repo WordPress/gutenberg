@@ -7,7 +7,6 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import edit from './edit';
-import icon from './icon';
 import metadata from './block.json';
 import save from './save';
 
@@ -16,10 +15,10 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Social links' ),
+	title: __( 'Social link' ),
 	parent: [ 'core/social-links' ],
-	icon,
-	description: __( 'Display a row of icons of your social media accounts.' ),
+	icon: 'share',
+	description: __( 'A social media or external link.' ),
 	supports: {
 		inserter: false,
 		reusable: false,

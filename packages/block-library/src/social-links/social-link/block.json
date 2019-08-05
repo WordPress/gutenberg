@@ -4,6 +4,10 @@
 	"attributes": {
 		"url": {
 			"type": "string"
+		},
+		"icon": {
+			"type": "string",
+			"default": "share"
 		}
 	}
 }

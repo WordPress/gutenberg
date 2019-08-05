@@ -1,22 +1,11 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { InnerBlocks } from '@wordpress/block-editor';
 
-export default function save( { attributes } ) {
-	const { columns, verticalAlignment } = attributes;
-
-	const wrapperClasses = classnames( `has-${ columns }-columns`, {
-		[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
-	} );
-
+export default function save( { className, align } ) {
 	return (
-		<div className={ wrapperClasses }>
+		<div className={ className } style={ { textAlign: align } }>
 			<InnerBlocks.Content />
 		</div>
 	);
