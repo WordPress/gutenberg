@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, merge, isEqual, find } from 'lodash';
+import { castArray, get, merge, isEqual, find } from 'lodash';
 
 /**
  * Internal dependencies
@@ -127,7 +127,11 @@ export function receiveEmbedPreview( url, preview ) {
  * @return {Object} Action object.
  */
 export function* editEntityRecord( kind, name, recordId, edits ) {
-	const { transientEdits = {}, mergedEdits = {} } = yield select( 'getEntity', kind, name );
+	const { transientEdits = {}, mergedEdits = {} } = yield select(
+		'getEntity',
+		kind,
+		name
+	);
 	const record = yield select( 'getEntityRecord', kind, name, recordId );
 	const editedRecord = yield select(
 		'getEditedEntityRecord',
@@ -143,10 +147,11 @@ export function* editEntityRecord( kind, name, recordId, edits ) {
 		// Clear edits when they are equal to their persisted counterparts
 		// so that the property is not considered dirty.
 		edits: Object.keys( edits ).reduce( ( acc, key ) => {
+			const recordValue = get( record[ key ], 'raw', record[ key ] );
 			const value = mergedEdits[ key ] ?
-				merge( record[ key ], edits[ key ] ) :
+				merge( recordValue, edits[ key ] ) :
 				edits[ key ];
-			acc[ key ] = isEqual( record[ key ], value ) ? undefined : value;
+			acc[ key ] = isEqual( recordValue, value ) ? undefined : value;
 			return acc;
 		}, {} ),
 		transientEdits,
@@ -209,29 +214,73 @@ export function* redo() {
  * @param {string} kind    Kind of the received entity.
  * @param {string} name    Name of the received entity.
  * @param {Object} record  Record to be saved.
+ * @param {Object} options Saving options.
  */
-export function* saveEntityRecord( kind, name, record ) {
+export function* saveEntityRecord(
+	kind,
+	name,
+	record,
+	{ isAutosave = false } = { isAutosave: false }
+) {
 	const entities = yield getKindEntities( kind );
 	const entity = find( entities, { kind, name } );
 	if ( ! entity ) {
 		return;
 	}
-	const key = entity.key || DEFAULT_ENTITY_KEY;
-	const recordId = record[ key ];
+	const entityIdKey = entity.key || DEFAULT_ENTITY_KEY;
+	const recordId = record[ entityIdKey ];
 
-	yield { type: 'SAVE_ENTITY_RECORD_START', kind, name, recordId };
+	yield { type: 'SAVE_ENTITY_RECORD_START', kind, name, recordId, isAutosave };
 	let error;
 	try {
-		const updatedRecord = yield apiFetch( {
-			path: `${ entity.baseURL }${ recordId ? '/' + recordId : '' }`,
-			method: recordId ? 'PUT' : 'POST',
-			data: record,
-		} );
-		yield receiveEntityRecords( kind, name, updatedRecord, undefined, true );
+		const path = `${ entity.baseURL }${ recordId ? '/' + recordId : '' }`;
+		if ( isAutosave ) {
+			const persistedRecord = yield select(
+				'getEntityRecord',
+				kind,
+				name,
+				recordId
+			);
+			const currentUser = yield select( 'getCurrentUser' );
+			const currentUserId = currentUser ? currentUser.id : undefined;
+			const autosavePost = yield select(
+				'getAutosave',
+				persistedRecord.type,
+				persistedRecord.id,
+				currentUserId
+			);
+			let data = { ...persistedRecord, ...autosavePost, ...record };
+			data = Object.keys( data ).reduce( ( acc, key ) => {
+				if ( key in [ 'title', 'excerpt', 'content' ] ) {
+					acc[ key ] = get( data[ key ], 'raw', data[ key ] );
+				}
+				return acc;
+			}, {} );
+			const autosave = yield apiFetch( {
+				path: `${ path }/autosaves`,
+				method: 'POST',
+				data,
+			} );
+			yield receiveAutosaves( persistedRecord.id, autosave );
+		} else {
+			const updatedRecord = yield apiFetch( {
+				path,
+				method: recordId ? 'PUT' : 'POST',
+				data: record,
+			} );
+			yield receiveEntityRecords( kind, name, updatedRecord, undefined, true );
+		}
 	} catch ( _error ) {
 		error = _error;
 	}
-	yield { type: 'SAVE_ENTITY_RECORD_FINISH', kind, name, recordId, error };
+	yield {
+		type: 'SAVE_ENTITY_RECORD_FINISH',
+		kind,
+		name,
+		recordId,
+		error,
+		isAutosave,
+	};
 }
 
 /**
@@ -240,8 +289,9 @@ export function* saveEntityRecord( kind, name, record ) {
  * @param {string} kind     Kind of the entity.
  * @param {string} name     Name of the entity.
  * @param {Object} recordId ID of the record.
+ * @param {Object} options  Saving options.
  */
-export function* saveEditedEntityRecord( kind, name, recordId ) {
+export function* saveEditedEntityRecord( kind, name, recordId, options ) {
 	if ( ! ( yield select( 'hasEditsForEntityRecord', kind, name, recordId ) ) ) {
 		return;
 	}
@@ -252,7 +302,7 @@ export function* saveEditedEntityRecord( kind, name, recordId ) {
 		recordId
 	);
 	const record = { id: recordId, ...edits };
-	yield* saveEntityRecord( kind, name, record );
+	yield* saveEntityRecord( kind, name, record, options );
 }
 
 /**

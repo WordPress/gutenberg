@@ -208,6 +208,25 @@ export const getEditedEntityRecord = createSelector(
 );
 
 /**
+ * Returns true if the specified entity record is autosaving, and false otherwise.
+ *
+ * @param {Object} state    State tree.
+ * @param {string} kind     Entity kind.
+ * @param {string} name     Entity name.
+ * @param {number} recordId Record ID.
+ *
+ * @return {boolean} Whether the entity record is autosaving or not.
+ */
+export function isAutosavingEntityRecord( state, kind, name, recordId ) {
+	const { pending, isAutosave } = get(
+		state.entities.data,
+		[ kind, name, 'saving', recordId ],
+		{}
+	);
+	return Boolean( pending && isAutosave );
+}
+
+/**
  * Returns true if the specified entity record is saving, and false otherwise.
  *
  * @param {Object} state    State tree.
@@ -215,14 +234,15 @@ export const getEditedEntityRecord = createSelector(
  * @param {string} name     Entity name.
  * @param {number} recordId Record ID.
  *
- * @return {Object?} Whether the entity record is saving or not.
+ * @return {boolean} Whether the entity record is saving or not.
  */
 export function isSavingEntityRecord( state, kind, name, recordId ) {
-	return get(
+	const { pending, isAutosave } = get(
 		state.entities.data,
-		[ kind, name, 'saving', recordId, 'pending' ],
-		false
+		[ kind, name, 'saving', recordId ],
+		{}
 	);
+	return Boolean( pending && ! isAutosave );
 }
 
 /**
