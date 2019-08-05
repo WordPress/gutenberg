@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { ScrollView, Keyboard, Platform, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -31,14 +31,6 @@ function HeaderToolbar( {
 	showKeyboardHideButton,
 	clearSelectedBlock,
 } ) {
-	const hideKeyboard = () => {
-		clearSelectedBlock();
-		if ( Platform.OS === 'android' ) {
-			// Avoiding extra blur calls on iOS but still needed for android.
-			Keyboard.dismiss();
-		}
-	};
-
 	return (
 		<View style={ styles.container }>
 			<ScrollView
@@ -75,7 +67,7 @@ function HeaderToolbar( {
 					<ToolbarButton
 						title={ __( 'Hide keyboard' ) }
 						icon="keyboard-hide"
-						onClick={ hideKeyboard }
+						onClick={ clearSelectedBlock }
 						extraProps={ { hint: __( 'Tap to hide the keyboard' ) } }
 					/>
 				</Toolbar>
@@ -96,7 +88,7 @@ export default compose( [
 	withDispatch( ( dispatch ) => ( {
 		redo: dispatch( 'core/editor' ).redo,
 		undo: dispatch( 'core/editor' ).undo,
-		clearSelectedBlock: dispatch( 'core/editor' ).clearSelectedBlock,
+		clearSelectedBlock: dispatch( 'core/block-editor' ).clearSelectedBlock,
 	} ) ),
 	withViewportMatch( { isLargeViewport: 'medium' } ),
 ] )( HeaderToolbar );
