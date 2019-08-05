@@ -87,17 +87,9 @@
 		align-items: center;
 		display: flex;
 		margin: 0;
-		svg.dashicon.components-checkbox-control__checked {
-			bottom: 5px;
-			left: -37px;
-			@include break-small() {
-				bottom: 10px;
-				left: -27px;
-			}
-		}
 	}
 
-	.components-modal__content & input[type="checkbox"] {
+	.components-modal__content &.components-checkbox-control__input-container {
 		margin: 0 $grid-size;
 	}
 
