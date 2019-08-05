@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isString, pick } from 'lodash';
+import { isString } from 'lodash';
 import { Image, View } from 'react-native';
 
 /**
@@ -21,7 +21,7 @@ const { Consumer, Provider } = createContext( {} );
 
 class HTMLElementContainer extends Component {
 	createCSSNode( tagName, className, siblingPosition, siblingCount ) {
-		return pick( props, CSS_NODE_PROPS );
+		return { tagName, className, siblingPosition, siblingCount };
 	}
 
 	createCSSPath( ancestorPath = [], tagName, className, siblingPosition, siblingCount ) {
