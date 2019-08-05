@@ -1,4 +1,4 @@
-## Master (unreleased)
+## 2.7.0 (2019-08-05)
 
 ### Bug Fixes
 
