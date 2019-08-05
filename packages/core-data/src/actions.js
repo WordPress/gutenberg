@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, find } from 'lodash';
+import { castArray, merge, isEqual, find } from 'lodash';
 
 /**
  * Internal dependencies
@@ -11,7 +11,7 @@ import {
 	receiveQueriedItems,
 } from './queried-data';
 import { getKindEntities, DEFAULT_ENTITY_KEY } from './entities';
-import { apiFetch } from './controls';
+import { select, apiFetch } from './controls';
 
 /**
  * Returns an action object used in signalling that authors have been received.
@@ -116,13 +116,99 @@ export function receiveEmbedPreview( url, preview ) {
 }
 
 /**
+ * Returns an action object that triggers an
+ * edit to an entity record.
+ *
+ * @param {string} kind           Kind of the edited entity record.
+ * @param {string} name           Name of the edited entity record.
+ * @param {number} recordId       Record ID of the edited entity record.
+ * @param {Object} edits          The edits.
+ *
+ * @return {Object} Action object.
+ */
+export function* editEntityRecord( kind, name, recordId, edits ) {
+	const { transientEdits = {}, mergedEdits = {} } = yield select( 'getEntity', kind, name );
+	const record = yield select( 'getEntityRecord', kind, name, recordId );
+	const editedRecord = yield select(
+		'getEditedEntityRecord',
+		kind,
+		name,
+		recordId
+	);
+
+	const edit = {
+		kind,
+		name,
+		recordId,
+		// Clear edits when they are equal to their persisted counterparts
+		// so that the property is not considered dirty.
+		edits: Object.keys( edits ).reduce( ( acc, key ) => {
+			const value = mergedEdits[ key ] ?
+				merge( record[ key ], edits[ key ] ) :
+				edits[ key ];
+			acc[ key ] = isEqual( record[ key ], value ) ? undefined : value;
+			return acc;
+		}, {} ),
+		transientEdits,
+	};
+	return {
+		type: 'EDIT_ENTITY_RECORD',
+		...edit,
+		meta: {
+			undo: {
+				...edit,
+				// Send the current values for things like the first undo stack entry.
+				edits: Object.keys( edits ).reduce( ( acc, key ) => {
+					acc[ key ] = editedRecord[ key ];
+					return acc;
+				}, {} ),
+			},
+		},
+	};
+}
+
+/**
+ * Action triggered to undo the last edit to
+ * an entity record, if any.
+ */
+export function* undo() {
+	const undoEdit = yield select( 'getUndoEdit' );
+	if ( ! undoEdit ) {
+		return;
+	}
+	yield {
+		type: 'EDIT_ENTITY_RECORD',
+		...undoEdit,
+		meta: {
+			isUndo: true,
+		},
+	};
+}
+
+/**
+ * Action triggered to redo the last undoed
+ * edit to an entity record, if any.
+ */
+export function* redo() {
+	const redoEdit = yield select( 'getRedoEdit' );
+	if ( ! redoEdit ) {
+		return;
+	}
+	yield {
+		type: 'EDIT_ENTITY_RECORD',
+		...redoEdit,
+		meta: {
+			isRedo: true,
+		},
+	};
+}
+
+/**
  * Action triggered to save an entity record.
  *
  * @param {string} kind    Kind of the received entity.
  * @param {string} name    Name of the received entity.
  * @param {Object} record  Record to be saved.
- *
- * @return {Object} Updated record.
  */
 export function* saveEntityRecord( kind, name, record ) {
 	const entities = yield getKindEntities( kind );
@@ -132,14 +218,41 @@ export function* saveEntityRecord( kind, name, record ) {
 	}
 	const key = entity.key || DEFAULT_ENTITY_KEY;
 	const recordId = record[ key ];
-	const updatedRecord = yield apiFetch( {
-		path: `${ entity.baseURL }${ recordId ? '/' + recordId : '' }`,
-		method: recordId ? 'PUT' : 'POST',
-		data: record,
-	} );
-	yield receiveEntityRecords( kind, name, updatedRecord, undefined, true );
 
-	return updatedRecord;
+	yield { type: 'SAVE_ENTITY_RECORD_START', kind, name, recordId };
+	let error;
+	try {
+		const updatedRecord = yield apiFetch( {
+			path: `${ entity.baseURL }${ recordId ? '/' + recordId : '' }`,
+			method: recordId ? 'PUT' : 'POST',
+			data: record,
+		} );
+		yield receiveEntityRecords( kind, name, updatedRecord, undefined, true );
+	} catch ( _error ) {
+		error = _error;
+	}
+	yield { type: 'SAVE_ENTITY_RECORD_FINISH', kind, name, recordId, error };
+}
+
+/**
+ * Action triggered to save an entity record's edits.
+ *
+ * @param {string} kind     Kind of the entity.
+ * @param {string} name     Name of the entity.
+ * @param {Object} recordId ID of the record.
+ */
+export function* saveEditedEntityRecord( kind, name, recordId ) {
+	if ( ! ( yield select( 'hasEditsForEntityRecord', kind, name, recordId ) ) ) {
+		return;
+	}
+	const edits = yield select(
+		'getEntityRecordNonTransientEdits',
+		kind,
+		name,
+		recordId
+	);
+	const record = { id: recordId, ...edits };
+	yield* saveEntityRecord( kind, name, record );
 }
 
 /**
