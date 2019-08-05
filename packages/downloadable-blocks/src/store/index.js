@@ -7,15 +7,15 @@ import { registerStore } from '@wordpress/data';
  * Internal dependencies
  */
 import reducer from './reducer';
-import applyMiddlewares from './middlewares';
 import * as selectors from './selectors';
 import * as actions from './actions';
+import resolvers from './resolvers';
 import controls from './controls';
 
 /**
  * Module Constants
  */
-const MODULE_KEY = 'core/block-editor';
+const MODULE_KEY = 'core/download-blocks';
 
 /**
  * Block editor data store configuration.
@@ -29,12 +29,12 @@ export const storeConfig = {
 	selectors,
 	actions,
 	controls,
+	resolvers,
 };
 
 const store = registerStore( MODULE_KEY, {
 	...storeConfig,
 	persist: [ 'preferences' ],
 } );
-applyMiddlewares( store );
 
 export default store;

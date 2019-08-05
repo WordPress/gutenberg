@@ -55,7 +55,7 @@ export default compose( [
 			getDiscoverBlocks,
 			hasInstallBlocksPermission,
 			isRequestingDiscoverBlocks,
-		} = select( 'core/block-editor' );
+		} = select( 'core/download-blocks' );
 
 		const discoverItems = getDiscoverBlocks( filterValue );
 		const hasPermission = hasInstallBlocksPermission();

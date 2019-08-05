@@ -1,6 +1,7 @@
 /**
  * Internal dependencies
  */
+import './store';
 import DiscoverBlocksPanel from './components/discover-blocks-panel';
 
 function DownloadableBlocks( { onSelect, filterValue } ) {

@@ -58,7 +58,7 @@ function DiscoverBlockHeader( { slug, icon, title, rating, ratingCount, onClick,
 
 export default compose(
 	withDispatch( ( dispatch ) => {
-		const { installBlock } = dispatch( 'core/block-editor' );
+		const { installBlock } = dispatch( 'core/download-blocks' );
 		const { removeNotice } = dispatch( 'core/notices' );
 
 		return {
