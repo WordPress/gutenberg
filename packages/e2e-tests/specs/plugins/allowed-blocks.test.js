@@ -38,4 +38,29 @@ describe( 'Allowed Blocks Filter', () => {
 		) )[ 0 ];
 		expect( galleryBlockButton ).toBeUndefined();
 	} );
+
+	it( 'should remove not allowed blocks from the block manager', async () => {
+		const BLOCK_LABEL_SELECTOR = '.edit-post-manage-blocks-modal__checklist-item .components-checkbox-control__label';
+		await page.click(
+			'.edit-post-more-menu [aria-label="More tools & options"]'
+		);
+		const [ button ] = await page.$x(
+			`//button[contains(text(), 'Block Manager')]`
+		);
+		await button.click( 'button' );
+
+		await page.waitForSelector( BLOCK_LABEL_SELECTOR );
+		const blocks = await page.evaluate(
+			( selector ) => {
+				return Array.from( document.querySelectorAll( selector ) ).map(
+					( element ) => ( ( element.innerText || '' ).trim() )
+				).sort();
+			},
+			BLOCK_LABEL_SELECTOR
+		);
+		expect( blocks ).toEqual( [
+			'Image',
+			'Paragraph',
+		] );
+	} );
 } );
