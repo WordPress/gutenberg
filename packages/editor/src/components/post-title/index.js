@@ -136,7 +136,7 @@ class PostTitle extends Component {
 									right away, without needing to click anything.
 								*/
 								/* eslint-disable jsx-a11y/no-autofocus */
-								autoFocus={ isCleanNewPost }
+								autoFocus={ document.body === document.activeElement && isCleanNewPost }
 								/* eslint-enable jsx-a11y/no-autofocus */
 							/>
 						</KeyboardShortcuts>
