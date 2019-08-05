@@ -216,24 +216,4 @@ describe( 'RichText', () => {
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
-
-	it( 'should update internal selection after fresh focus', async () => {
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( '1' );
-		// Focus the address bar (move focus out of the window).
-		await pressKeyWithModifier( 'primary', 'l' );
-		// Ensure the element lost focus.
-		// Stangely enough, this is not needed when testing manually.
-		await page.evaluate( () => {
-			document.querySelector( '.wp-block-paragraph' ).blur();
-		} );
-		// Focus the rich text instance again (not at the start).
-		await page.click( '.wp-block-paragraph', { button: 'middle' } );
-		// Should internally set bold at selection.
-		await pressKeyWithModifier( 'primary', 'b' );
-		// "2" should be bold.
-		await page.keyboard.type( '2' );
-
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-	} );
 } );
