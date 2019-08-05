@@ -80,7 +80,7 @@
 .block-editor-block-preview__content {
 	.wp-block-button-wrapper,
 	.wp-block-button {
-		display: table;
+		display: block;
 	}
 
 	.wp-block-button {
@@ -88,7 +88,7 @@
 	}
 
 	[data-type="core/button"].wp-block {
-		width: auto;
+		max-width: 150px;
 		height: auto;
 
 		> .block-editor-block-list__block-edit {
