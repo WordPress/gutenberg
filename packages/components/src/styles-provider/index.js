@@ -4,26 +4,25 @@
 import { Component, createContext, forwardRef } from '@wordpress/element';
 import { createHigherOrderComponent } from '@wordpress/compose';
 
-const { Consumer, Provider } = createContext( {} );
+const { Consumer, Provider } = createContext( [] );
 
 export class StylesheetProvider extends Component {
-	mergeStylesheets( parentStylesheet, styleseheet ) {
-		return {
-			...parentStylesheet,
-			...styleseheet,
-		};
-	}
-
 	render() {
-		const { stylesheet, children } = this.props;
+		const { stylesheets, children } = this.props;
+		const rawStylesheet = stylesheets.reduce(
+			( memo, stylesheet ) => memo.concat( stylesheet.__rawStyles ),
+			[]
+		)
 
 		return (
 			<Consumer>
-				{ ( parentStylesheet ) => (
-					<Provider value={ this.mergeStylesheets( parentStylesheet, stylesheet ) }>
-						{ children }
-					</Provider>
-				) }
+				{ ( parentStylesheet ) => {
+					return (
+						<Provider value={ parentStylesheet.concat( rawStylesheet ) }>
+							{ children }
+						</Provider>
+					);
+				} }
 			</Consumer>
 		);
 	}
@@ -33,7 +32,7 @@ StylesheetProvider.Consumer = Consumer;
 
 export const withStylesheets = ( stylesheets ) => createHigherOrderComponent( ( OriginalComponent ) => {
 	return ( props ) => (
-		<StylesheetProvider stylesheet={ Object.assign( {}, ...stylesheets ) }>
+		<StylesheetProvider stylesheets={ stylesheets }>
 			<OriginalComponent { ...props } />
 		</StylesheetProvider>
 	);
