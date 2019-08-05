@@ -13,6 +13,11 @@
 					"selector": "img",
 					"attribute": "src"
 				},
+				"fullUrl": {
+					"source": "attribute",
+					"selector": "img",
+					"attribute": "data-full-url"
+				},
 				"link": {
 					"source": "attribute",
 					"selector": "img",
