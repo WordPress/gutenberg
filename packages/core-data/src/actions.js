@@ -249,6 +249,10 @@ export function* saveEntityRecord(
 				persistedRecord.id,
 				currentUserId
 			);
+			// Autosaves need all expected fields to be present.
+			// So we fallback to the previous autosave and then
+			// to the actual persisted entity if the edits don't
+			// have a value.
 			let data = { ...persistedRecord, ...autosavePost, ...record };
 			data = Object.keys( data ).reduce( ( acc, key ) => {
 				if ( key in [ 'title', 'excerpt', 'content' ] ) {
