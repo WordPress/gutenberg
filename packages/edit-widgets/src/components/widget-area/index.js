@@ -84,7 +84,9 @@ function WidgetArea( {
 					</Sidebar.Inspector>
 					<WritingFlow>
 						<ObserveTyping>
-							<BlockList />
+							<BlockList
+								className="edit-widgets-main-block-list"
+							/>
 						</ObserveTyping>
 					</WritingFlow>
 				</BlockEditorProvider>
