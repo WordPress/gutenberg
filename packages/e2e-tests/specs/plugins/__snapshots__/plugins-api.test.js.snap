@@ -1,8 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Using Plugins API Document Setting Custom Panel Should render a custom panel inside Document Setting sidebar 1`] = `
-"
-My Custom Panel
+"My Custom Panel
 "
 `;
 
