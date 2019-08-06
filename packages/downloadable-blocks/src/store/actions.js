@@ -2,11 +2,12 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { getBlockTypes } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
-import { dispatch, apiFetch } from './controls';
+import { dispatch, apiFetch, loadAssets } from './controls';
 
 /** Returns an action object used in signalling that the discover blocks have been requested and is loading.
  *
@@ -33,6 +34,46 @@ export function receiveDiscoverBlocks( discoverBlocks, filterValue ) {
 */
 export function setInstallBlocksPermission( hasPermission ) {
 	return { type: 'SET_INSTALL_BLOCKS_PERMISSION', hasPermission };
+}
+
+/**
+ * Action triggered to load assets for a downloadable block.
+ *
+ * @param {Object} item The selected block item
+ * @param {Function} onSelect The callback function when the assets are loaded.
+ */
+export function* handleDownloadableBlock( item, onSelect ) {
+	const {
+		createErrorNotice,
+		removeNotice,
+	} = dispatch( 'core/notices' );
+
+	let scriptsCount = 0;
+	const onLoad = () => {
+		scriptsCount--;
+		if ( scriptsCount > 0 ) {
+			return;
+		}
+		const registeredBlocks = getBlockTypes();
+		if ( registeredBlocks.length ) {
+			onSelect( item );
+		}
+	};
+	const onError = () => {
+		createErrorNotice( __( 'Block previews can\'t load.' ), {
+			id: 'block-preview-error',
+			actions: [
+				{
+					label: __( 'Retry' ),
+					onClick: () => {
+						removeNotice( 'block-preview-error' );
+						scriptsCount = loadAssets( item.assets, onLoad, onError );
+					},
+				},
+			],
+		} );
+	};
+	scriptsCount = yield loadAssets( item.assets, onLoad, onError );
 }
 
 /** Action triggered to install a block plugin

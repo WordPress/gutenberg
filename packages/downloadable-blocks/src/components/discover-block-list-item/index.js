@@ -10,7 +10,6 @@ function DiscoverBlockListItem( {
 	onClick,
 } ) {
 	const {
-		id,
 		icon,
 		title,
 		description,
@@ -26,7 +25,6 @@ function DiscoverBlockListItem( {
 			<div className="block-editor-discover-block-list-item__panel">
 				<div className="block-editor-discover-block-list-item__header">
 					<DiscoverBlockHeader
-						slug={ id }
 						icon={ icon }
 						onClick={ onClick }
 						title={ title }
