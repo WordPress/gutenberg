@@ -33,31 +33,12 @@ export class BlockList extends Component {
 		this.renderDefaultBlockAppender = this.renderDefaultBlockAppender.bind( this );
 		this.onCaretVerticalPositionChange = this.onCaretVerticalPositionChange.bind( this );
 		this.scrollViewInnerRef = this.scrollViewInnerRef.bind( this );
-		this.getNewBlockInsertionIndex = this.getNewBlockInsertionIndex.bind( this );
+		this.addBlockToEndOfPost = this.addBlockToEndOfPost.bind( this );
 		this.shouldFlatListPreventAutomaticScroll = this.shouldFlatListPreventAutomaticScroll.bind( this );
 	}
 
-	finishBlockAppendingOrReplacing( newBlock ) {
-		// now determine whether we need to replace the currently selected block (if it's empty)
-		// or just add a new block as usual
-		if ( this.isReplaceable( this.props.selectedBlock ) ) {
-			// do replace here
-			this.props.replaceBlock( this.props.selectedBlockClientId, newBlock );
-		} else {
-			this.props.insertBlock( newBlock, this.getNewBlockInsertionIndex() );
-		}
-	}
-
-	getNewBlockInsertionIndex() {
-		if ( this.props.isPostTitleSelected ) {
-			// if post title selected, insert at top of post
-			return 0;
-		} else if ( this.props.selectedBlockIndex === -1 ) {
-			// if no block selected, insert at end of post
-			return this.props.blockCount;
-		}
-		// insert after selected block
-		return this.props.selectedBlockIndex + 1;
+	addBlockToEndOfPost( newBlock ) {
+		this.props.insertBlock( newBlock, this.props.blockCount );
 	}
 
 	blockHolderBorderStyle() {
@@ -162,7 +143,7 @@ export class BlockList extends Component {
 		const paragraphBlock = createBlock( 'core/paragraph' );
 		return (
 			<TouchableWithoutFeedback onPress={ () => {
-				this.finishBlockAppendingOrReplacing( paragraphBlock );
+				this.addBlockToEndOfPost( paragraphBlock );
 			} } >
 				<View style={ styles.blockListFooter } />
 			</TouchableWithoutFeedback>
@@ -174,10 +155,8 @@ export default compose( [
 	withSelect( ( select, { rootClientId } ) => {
 		const {
 			getBlockCount,
-			getBlockName,
 			getBlockIndex,
 			getBlockOrder,
-			getSelectedBlock,
 			getSelectedBlockClientId,
 			getBlockInsertionPoint,
 			isBlockInsertionPointVisible,
@@ -210,13 +189,10 @@ export default compose( [
 		return {
 			blockClientIds,
 			blockCount: getBlockCount( rootClientId ),
-			getBlockName,
 			isBlockInsertionPointVisible: isBlockInsertionPointVisible(),
 			shouldShowBlockAtIndex,
 			shouldShowInsertionPoint,
-			selectedBlock: getSelectedBlock(),
 			selectedBlockClientId,
-			selectedBlockIndex,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
