@@ -29,6 +29,7 @@ export function BlockPreview( {
 
 	const previewRef = useRef( null );
 
+	const [ isTallPreview, setIsTallPreview ] = useState( false );
 	const [ previewScale, setPreviewScale ] = useState( 1 );
 	const [ visibility, setVisibility ] = useState( 'hidden' );
 
@@ -43,28 +44,31 @@ export function BlockPreview( {
 		// Timer - required to account for async render of `BlockEditorProvider`
 		const timerId = setTimeout( () => {
 			window.clearTimeout( timerId );
-			const previewContainerDomElement = previewRef.current;
+			const previewContainer = previewRef.current;
 
-			if ( ! previewContainerDomElement ) {
+			if ( ! previewContainer ) {
 				return;
 			}
 
-			// Determine the rendered width of the container
-			const previewContainerWidth = previewContainerDomElement.offsetWidth;
-
-			const comparisonBlockWidth = blockClientIds.reduce( ( acc, currClientId ) => {
+			const comparisonBlock = blockClientIds.reduce( ( acc, currClientId ) => {
 				// Selector scoped to `previewContainerDomElement` to avoid global selector being ambiguous in the case
 				// of multiple previews on the same view
-				const previewDomElement = getBlockPreviewContainerDOMNode( currClientId, previewContainerDomElement );
+				const previewDomElement = getBlockPreviewContainerDOMNode( currClientId, previewContainer );
 
-				if ( previewDomElement && previewDomElement.offsetWidth > acc ) {
-					acc = previewDomElement.offsetWidth;
+				if ( previewDomElement ) {
+					acc.height += previewDomElement.offsetHeight;
+
+					if ( previewDomElement.offsetWidth > acc.width ) {
+						acc.width = previewDomElement.offsetWidth;
+					}
 				}
+
 				return acc;
-			}, 0 );
+			}, { height: 0, width: 0 } );
 
-			const scale = previewContainerWidth / comparisonBlockWidth || 1;
+			const scale = previewContainer.offsetWidth / comparisonBlock.width || 1;
 
+			setIsTallPreview( comparisonBlock.height > previewContainer.offsetHeight );
 			setPreviewScale( scale );
 			setVisibility( 'visible' );
 		}, 10 );
@@ -86,8 +90,13 @@ export function BlockPreview( {
 		visibility,
 	};
 
+	if ( isTallPreview ) {
+		previewStyles.transform = `scale(${ previewScale * scaleAdjustment }) translate(-50%, 0)`;
+	}
+
 	const contentClassNames = classnames( 'editor-block-preview__content block-editor-block-preview__content editor-styles-wrapper', {
 		'is-scaled': isScaled,
+		'is-tall-preview': isTallPreview,
 	} );
 
 	return (

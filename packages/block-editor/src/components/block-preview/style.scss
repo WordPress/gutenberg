@@ -14,11 +14,13 @@
 	.editor-block-preview__content {
 		font-family: $editor-font;
 
-		// Vertical alignment.
-		margin-top: 50%;
-
 		> div {
 			font-family: $editor-font;
+		}
+
+		&:not(.is-tall-preview) {
+			// Vertical alignment.
+			margin-top: 50%;
 		}
 	}
 
@@ -77,6 +79,10 @@
 			transform: scale(0.9);
 			transform-origin: center top;
 		}
+	}
+
+	&.is-tall-preview {
+		top: 4px;
 	}
 
 	.block-editor-block-drop-zone,
