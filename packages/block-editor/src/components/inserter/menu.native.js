@@ -101,7 +101,6 @@ export class InserterMenu extends Component {
 				/>
 			</BottomSheet>
 		);
-		/* eslint-enable jsx-a11y/no-autofocus, jsx-a11y/no-noninteractive-element-interactions */
 	}
 }
 

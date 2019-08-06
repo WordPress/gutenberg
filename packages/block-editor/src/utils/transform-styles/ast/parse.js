@@ -684,3 +684,5 @@ function addParent( obj, parent ) {
 
 	return obj;
 }
+
+/* eslint-enable @wordpress/no-unused-vars-before-return */

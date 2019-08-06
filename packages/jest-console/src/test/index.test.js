@@ -76,3 +76,5 @@ describe( 'jest-console', () => {
 		}
 	);
 } );
+
+/* eslint-enable no-console */

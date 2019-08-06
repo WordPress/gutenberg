@@ -12,8 +12,7 @@ process.on( 'unhandledRejection', ( err ) => {
 /**
  * External dependencies
  */
-/* eslint-disable jest/no-jest-import */
-const jest = require( 'jest' );
+const jest = require( 'jest' ); // eslint-disable-line jest/no-jest-import
 
 /**
  * Internal dependencies

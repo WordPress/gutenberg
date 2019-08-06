@@ -360,7 +360,7 @@ export class InserterMenu extends Component {
 				}
 			</div>
 		);
-		/* eslint-enable jsx-a11y/no-autofocus, jsx-a11y/no-noninteractive-element-interactions */
+		/* eslint-enable jsx-a11y/no-autofocus, jsx-a11y/no-static-element-interactions */
 	}
 }
 
