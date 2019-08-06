@@ -114,7 +114,7 @@
 
 // Preview Thumbnail.
 .block-editor-block-styles__item .block-editor-block-preview__content {
-	.block-editor-rich-text__editable {
+	.wp-block-button .block-editor-rich-text__editable {
 		white-space: nowrap !important;
 		margin-top: 6px;
 	}
@@ -126,10 +126,6 @@
 
 // Preview Popover.
 .block-editor-block-switcher__preview .block-editor-block-preview__content {
-	.block-editor-rich-text__editable {
-		white-space: nowrap !important;
-	}
-
 	[data-type="core/button"].wp-block {
 		width: auto;
 	}

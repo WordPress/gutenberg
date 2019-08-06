@@ -10,6 +10,6 @@
 	}
 
 	[data-type="core/quote"].wp-block {
-		max-width: 300px;
+		width: calc(4 * (100vw / 12));
 	}
 }
