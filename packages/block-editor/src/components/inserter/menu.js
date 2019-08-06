@@ -14,7 +14,6 @@ import {
 	without,
 	includes,
 	deburr,
-	forEach,
 } from 'lodash';
 import scrollIntoView from 'dom-scroll-into-view';
 
@@ -29,7 +28,6 @@ import {
 	isReusableBlock,
 	createBlock,
 	isUnmodifiedDefaultBlock,
-	getBlockTypes,
 } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withInstanceId, compose, withSafeTimeout } from '@wordpress/compose';
@@ -92,72 +90,6 @@ export const normalizeTerm = ( term ) => {
 	term = term.trim();
 
 	return term;
-};
-
-/**
- * Dynamically loads script
- *
- * @param {Object} asset The asset object as described in block.json.
- * @param {Function} onLoad The callback function when script is loaded.
- * @param {Function} onError The callback function when script is error loading.
- */
-const loadScipt = ( asset, onLoad, onError ) => {
-	if ( ! asset ) {
-		return;
-	}
-	const existing = document.querySelector( `script[src="${ asset.src }"]` );
-	if ( existing ) {
-		existing.parentNode.removeChild( existing );
-	}
-	const script = document.createElement( 'script' );
-	script.src = typeof asset === 'string' ? asset : asset.src;
-	script.onload = onLoad;
-	script.onerror = onError;
-	document.body.appendChild( script );
-};
-
-/**
- * Dynamically loads stylesheets
- *
- * @param {Object} asset The asset object as described in block.json.
- */
-const loadStyle = ( asset ) => {
-	if ( ! asset ) {
-		return;
-	}
-	const link = document.createElement( 'link' );
-	link.rel = 'stylesheet';
-	link.href = typeof asset === 'string' ? asset : asset.src;
-	document.body.appendChild( link );
-};
-
-/**
- * Loads block's assets
- *
- * @param {Object|Array} assets The asset object as described in block.json or array of URL of the
- * @param {Function} onLoad The callback function when script is loaded.
- * @param {Function} onError The callback function when script is error loading.
-  *
- * @return {number} The number of scripts loaded.
- */
-const handleBlockAssets = ( assets, onLoad, onError ) => {
-	let scriptsCount = 0;
-	if ( typeof assets === 'object' && assets.constructor === Array ) {
-		forEach( assets, ( asset ) => {
-			if ( asset.match( /\.js$/ ) !== null ) {
-				scriptsCount++;
-				onLoad.bind( scriptsCount );
-				loadScipt( asset, onLoad, onError, scriptsCount );
-			} else {
-				loadStyle( asset );
-			}
-		} );
-	} else {
-		scriptsCount++;
-		loadScipt( assets.editor_script, onLoad, onError );
-		loadStyle( assets.style );
-	}
-	return scriptsCount;
 };
 
 export class InserterMenu extends Component {
@@ -526,59 +458,23 @@ export default compose(
 					insertBlock,
 				} = dispatch( 'core/block-editor' );
 				const {
-					createErrorNotice,
-					removeNotice,
-				} = dispatch( 'core/notices' );
-				const {
 					getSelectedBlock,
 				} = select( 'core/block-editor' );
 				const { isAppender } = ownProps;
 				const { name, initialAttributes } = item;
+				const selectedBlock = getSelectedBlock();
+				const insertedBlock = createBlock( name, initialAttributes );
 
-				const handleInsertBlock = ( insertedBlock ) => {
-					const selectedBlock = getSelectedBlock();
-					if ( ! isAppender && selectedBlock && isUnmodifiedDefaultBlock( selectedBlock ) ) {
-						replaceBlocks( selectedBlock.clientId, insertedBlock );
-					} else {
-						insertBlock(
-							insertedBlock,
-							getInsertionIndex(),
-							ownProps.destinationRootClientId
-						);
-					}
-				};
+				//load block asssets if isDownloadableBlockEnabled.
 
-				if ( item.assets ) {
-					let scriptsCount = 0;
-					const onLoad = () => {
-						scriptsCount--;
-						if ( scriptsCount > 0 ) {
-							return;
-						}
-						const registeredBlocks = getBlockTypes();
-						if ( registeredBlocks.length ) {
-							const block = createBlock( item.name );
-							handleInsertBlock( block );
-						}
-					};
-					const onError = () => {
-						createErrorNotice( __( 'Block previews can\'t load.' ), {
-							id: 'block-preview-error',
-							actions: [
-								{
-									label: __( 'Retry' ),
-									onClick: () => {
-										removeNotice( 'block-preview-error' );
-										scriptsCount = handleBlockAssets( item.assets, onLoad, onError );
-									},
-								},
-							],
-						} );
-					};
-					scriptsCount = handleBlockAssets( item.assets, onLoad, onError );
+				if ( ! isAppender && selectedBlock && isUnmodifiedDefaultBlock( selectedBlock ) ) {
+					replaceBlocks( selectedBlock.clientId, insertedBlock );
 				} else {
-					const insertedBlock = createBlock( name, initialAttributes );
-					handleInsertBlock( insertedBlock );
+					insertBlock(
+						insertedBlock,
+						getInsertionIndex(),
+						ownProps.destinationRootClientId
+					);
 				}
 
 				ownProps.onSelect();

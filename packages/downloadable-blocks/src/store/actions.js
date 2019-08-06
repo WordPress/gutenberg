@@ -77,4 +77,3 @@ export function* installBlock( slug, retry, remove ) {
 		);
 	}
 }
-
