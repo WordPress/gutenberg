@@ -65,7 +65,7 @@ import * as classic from './classic';
 /**
  * Function to register an individual block.
  *
- * @param {Object} block    The block to be registered.
+ * @param {Object} block The block to be registered.
  *
  */
 const registerBlock = ( block ) => {
@@ -154,7 +154,7 @@ export const registerCoreBlocks = () => {
 /**
  * Function to register experimental core blocks depending on editor settings.
  *
- * @param {Object} settings     Editor settings.
+ * @param {Object} settings Editor settings.
  *
  * @example
  * ```js
