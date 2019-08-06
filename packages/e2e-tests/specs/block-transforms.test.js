@@ -19,6 +19,7 @@ import {
 	getEditedPostContent,
 	hasBlockSwitcher,
 	createNewPost,
+	enableExperimentalFeatures,
 	setPostContent,
 	selectBlockByClientId,
 	transformBlockTo,
@@ -99,6 +100,7 @@ describe( 'Block transforms', () => {
 
 	const transformStructure = {};
 	beforeAll( async () => {
+		await enableExperimentalFeatures( [ '#gutenberg-widget-experiments', '#gutenberg-menu-block' ] );
 		await createNewPost();
 
 		for ( const fileBase of fileBasenames ) {
