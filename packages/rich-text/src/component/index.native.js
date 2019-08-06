@@ -346,7 +346,6 @@ export class RichText extends Component {
 		this.lastAztecEventType = 'content size change';
 	}
 
-	// eslint-disable-next-line no-unused-vars
 	onEnter( event ) {
 		if ( this.props.onEnter ) {
 			this.props.onEnter();
@@ -385,7 +384,6 @@ export class RichText extends Component {
 		this.lastAztecEventType = 'input';
 	}
 
-	// eslint-disable-next-line no-unused-vars
 	onBackspace( event ) {
 		const {
 			__unstableOnMerge: onMerge,

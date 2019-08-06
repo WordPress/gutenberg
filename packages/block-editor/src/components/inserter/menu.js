@@ -161,7 +161,6 @@ export class InserterMenu extends Component {
 
 				this.props.setTimeout( () => {
 					// We need a generic way to access the panel's container
-					// eslint-disable-next-line react/no-find-dom-node
 					scrollIntoView( this.panels[ panel ], this.inserterResults.current, {
 						alignWithTop: true,
 					} );

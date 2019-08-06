@@ -8,7 +8,6 @@ import {
 	isEmpty,
 	map,
 	last,
-	omit,
 	pick,
 } from 'lodash';
 
@@ -296,6 +295,7 @@ export class ImageEdit extends Component {
 			attributes,
 			mediaUpload,
 			noticeOperations,
+			setAttributes,
 		} = this.props;
 		const { id, url = '' } = attributes;
 
@@ -306,7 +306,7 @@ export class ImageEdit extends Component {
 				mediaUpload( {
 					filesList: [ file ],
 					onFileChange: ( [ image ] ) => {
-						this.onSelectImage( image );
+						setAttributes( pickRelevantMediaFiles( image ) );
 					},
 					allowedTypes: ALLOWED_MEDIA_TYPES,
 					onError: ( message ) => {
@@ -357,21 +357,7 @@ export class ImageEdit extends Component {
 			isEditing: false,
 		} );
 
-		const { id, url, alt, caption } = this.props.attributes;
-
-		let mediaAttributes = pickRelevantMediaFiles( media );
-
-		// If the current image is temporary but an alt or caption text was meanwhile written by the user,
-		// make sure the text is not overwritten.
-		if ( isTemporaryImage( id, url ) ) {
-			if ( alt ) {
-				mediaAttributes = omit( mediaAttributes, [ 'alt' ] );
-			}
-			if ( caption ) {
-				mediaAttributes = omit( mediaAttributes, [ 'caption' ] );
-			}
-		}
-
+		const { id, url } = this.props.attributes;
 		let additionalAttributes;
 		// Reset the dimension attributes if changing to a different image.
 		if ( ! media.id || media.id !== id ) {
@@ -386,7 +372,7 @@ export class ImageEdit extends Component {
 		}
 
 		this.props.setAttributes( {
-			...mediaAttributes,
+			...pickRelevantMediaFiles( media ),
 			...additionalAttributes,
 		} );
 	}
@@ -778,7 +764,7 @@ export class ImageEdit extends Component {
 		);
 
 		// Disable reason: Each block can be selected by clicking on it
-		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
+		/* eslint-disable jsx-a11y/click-events-have-key-events */
 		return (
 			<>
 				{ controls }
@@ -924,7 +910,7 @@ export class ImageEdit extends Component {
 				{ mediaPlaceholder }
 			</>
 		);
-		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
+		/* eslint-enable jsx-a11y/click-events-have-key-events */
 	}
 }
 
