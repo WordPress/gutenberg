@@ -99,6 +99,8 @@ class EditorProvider extends Component {
 				'template',
 				'templateLock',
 				'titlePlaceholder',
+				'__experimentalEnableLegacyWidgetBlock',
+				'__experimentalEnableMenuBlock',
 			] ),
 			__experimentalReusableBlocks: reusableBlocks,
 			__experimentalMediaUpload: hasUploadPermissions ? mediaUpload : undefined,
