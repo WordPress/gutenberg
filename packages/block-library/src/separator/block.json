@@ -7,6 +7,15 @@
 		},
 		"customColor": {
 			"type": "string"
+		},
+		"dotSize": {
+			"type": "number"
+		},
+		"dotSpacing": {
+			"type": "number"
+		},
+		"lineThickness": {
+			"type": "number"
 		}
 	}
 }
