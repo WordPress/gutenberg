@@ -130,6 +130,7 @@ export const isEditedPostDirty = createRegistrySelector( ( select ) => ( state )
 	if ( select( 'core' ).hasEditsForEntityRecord( 'postType', postType, postId ) ) {
 		return true;
 	}
+	return false;
 } );
 
 /**
@@ -401,15 +402,19 @@ export function isCurrentPostPending( state ) {
 /**
  * Return true if the current post has already been published.
  *
- * @param {Object} state Global application state.
+ * @param {Object}  state       Global application state.
+ * @param {Object?} currentPost Explicit current post for bypassing registry selector.
  *
  * @return {boolean} Whether the post has been published.
  */
-export function isCurrentPostPublished( state ) {
-	const post = getCurrentPost( state );
+export function isCurrentPostPublished( state, currentPost ) {
+	const post = currentPost || getCurrentPost( state );
 
-	return [ 'publish', 'private' ].indexOf( post.status ) !== -1 ||
-		( post.status === 'future' && ! isInTheFuture( new Date( Number( getDate( post.date ) ) - ONE_MINUTE_IN_MS ) ) );
+	return (
+		[ 'publish', 'private' ].indexOf( post.status ) !== -1 ||
+		( post.status === 'future' &&
+			! isInTheFuture( new Date( Number( getDate( post.date ) ) - ONE_MINUTE_IN_MS ) ) )
+	);
 }
 
 /**
@@ -965,7 +970,10 @@ export function isPublishingPost( state ) {
 
 	// Consider as publishing when current post prior to request was not
 	// considered published
-	return !! stateBeforeRequest && ! isCurrentPostPublished( stateBeforeRequest );
+	return (
+		!! stateBeforeRequest &&
+		! isCurrentPostPublished( null, stateBeforeRequest.currentPost )
+	);
 }
 
 /**

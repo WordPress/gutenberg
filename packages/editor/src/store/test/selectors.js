@@ -20,10 +20,111 @@ import { RawHTML } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import * as selectors from '../selectors';
+import { serializeBlocks } from '../actions';
+import * as _selectors from '../selectors';
 import { PREFERENCES_DEFAULTS } from '../defaults';
 import { POST_UPDATE_TRANSACTION_ID } from '../constants';
 
+const selectors = { ..._selectors };
+const selectorNames = Object.keys( selectors );
+selectorNames.forEach( ( name ) => {
+	selectors[ name ] = ( state, ...args ) => {
+		const select = () => ( {
+			getEntityRecord() {
+				return state.currentPost;
+			},
+
+			getEntityRecordEdits() {
+				const present = state.editor && state.editor.present;
+				let edits = present && present.edits;
+
+				if ( state.initialEdits ) {
+					edits = {
+						...state.initialEdits,
+						...edits,
+					};
+				}
+
+				const { value: blocks, isDirty } = ( present && present.blocks ) || {};
+				if ( blocks && isDirty !== false ) {
+					edits = {
+						...edits,
+						blocks,
+					};
+				}
+
+				return edits;
+			},
+
+			hasEditsForEntityRecord() {
+				return Object.keys( this.getEntityRecordEdits() ).length > 0;
+			},
+
+			getEditedEntityRecord() {
+				let edits = this.getEntityRecordEdits();
+				if ( edits.content === undefined && edits.blocks ) {
+					edits = {
+						...edits,
+						content: serializeBlocks( edits.blocks ),
+					};
+				}
+				return {
+					...this.getEntityRecord(),
+					...edits,
+				};
+			},
+
+			isSavingEntityRecord() {
+				return state.saving && state.saving.requesting;
+			},
+
+			getLastEntitySaveError() {
+				const saving = state.saving;
+				const successful = saving && saving.successful;
+				const error = saving && saving.error;
+				return successful === undefined ? error : ! successful;
+			},
+
+			hasUndo() {
+				return Boolean(
+					state.editor && state.editor.past && state.editor.past.length
+				);
+			},
+
+			hasRedo() {
+				return Boolean(
+					state.editor && state.editor.future && state.editor.future.length
+				);
+			},
+
+			getCurrentUser() {
+				return state.getCurrentUser && state.getCurrentUser();
+			},
+
+			hasFetchedAutosaves() {
+				return state.hasFetchedAutosaves && state.hasFetchedAutosaves();
+			},
+
+			getAutosave() {
+				return state.getAutosave && state.getAutosave();
+			},
+		} );
+
+		selectorNames.forEach( ( otherName ) => {
+			if ( _selectors[ otherName ].isRegistrySelector ) {
+				_selectors[ otherName ].registry = { select };
+			}
+		} );
+
+		return _selectors[ name ]( state, ...args );
+	};
+	selectors[ name ].isRegistrySelector = _selectors[ name ].isRegistrySelector;
+	if ( selectors[ name ].isRegistrySelector ) {
+		selectors[ name ].registry = {
+			select: () => _selectors[ name ].registry.select(),
+		};
+	}
+} );
 const {
 	hasEditorUndo,
 	hasEditorRedo,
@@ -44,7 +145,7 @@ const {
 	isCurrentPostScheduled,
 	isEditedPostPublishable,
 	isEditedPostSaveable,
-	isEditedPostAutosaveable: _isEditedPostAutosaveableRegistrySelector,
+	isEditedPostAutosaveable,
 	isEditedPostEmpty,
 	isEditedPostBeingScheduled,
 	isEditedPostDateFloating,
@@ -71,14 +172,9 @@ const {
 
 describe( 'selectors', () => {
 	let cachedSelectors;
-	let isEditedPostAutosaveableRegistrySelector;
 
 	beforeAll( () => {
 		cachedSelectors = filter( selectors, ( selector ) => selector.clear );
-		isEditedPostAutosaveableRegistrySelector = ( select ) => {
-			_isEditedPostAutosaveableRegistrySelector.registry = { select };
-			return _isEditedPostAutosaveableRegistrySelector;
-		};
 	} );
 
 	beforeEach( () => {
@@ -354,37 +450,6 @@ describe( 'selectors', () => {
 
 			expect( isEditedPostDirty( state ) ).toBe( true );
 		} );
-
-		it( 'should return true if pending transaction with dirty state', () => {
-			const state = {
-				optimist: [
-					{
-						beforeState: {
-							editor: {
-								present: {
-									blocks: {
-										isDirty: true,
-										value: [],
-									},
-									edits: {},
-								},
-							},
-						},
-					},
-				],
-				editor: {
-					present: {
-						blocks: {
-							isDirty: false,
-							value: [],
-						},
-						edits: {},
-					},
-				},
-			};
-
-			expect( isEditedPostDirty( state ) ).toBe( true );
-		} );
 	} );
 
 	describe( 'isCleanNewPost', () => {
@@ -471,7 +536,7 @@ describe( 'selectors', () => {
 	describe( 'getCurrentPostId', () => {
 		it( 'should return null if the post has not yet been saved', () => {
 			const state = {
-				currentPost: {},
+				postId: null,
 			};
 
 			expect( getCurrentPostId( state ) ).toBeNull();
@@ -479,7 +544,7 @@ describe( 'selectors', () => {
 
 		it( 'should return the current post ID', () => {
 			const state = {
-				currentPost: { id: 1 },
+				postId: 1,
 			};
 
 			expect( getCurrentPostId( state ) ).toBe( 1 );
@@ -673,9 +738,7 @@ describe( 'selectors', () => {
 	describe( 'getCurrentPostType', () => {
 		it( 'should return the post type', () => {
 			const state = {
-				currentPost: {
-					type: 'post',
-				},
+				postType: 'post',
 			};
 
 			expect( getCurrentPostType( state ) ).toBe( 'post' );
@@ -1272,7 +1335,22 @@ describe( 'selectors', () => {
 
 	describe( 'isEditedPostAutosaveable', () => {
 		it( 'should return false if existing autosaves have not yet been fetched', () => {
-			const isEditedPostAutosaveable = isEditedPostAutosaveableRegistrySelector( () => ( {
+			const state = {
+				editor: {
+					present: {
+						blocks: {
+							value: [],
+						},
+						edits: {},
+					},
+				},
+				initialEdits: {},
+				currentPost: {
+					title: 'sassel',
+				},
+				saving: {
+					requesting: true,
+				},
 				getCurrentUser() {},
 				hasFetchedAutosaves() {
 					return false;
@@ -1282,8 +1360,12 @@ describe( 'selectors', () => {
 						title: 'sassel',
 					};
 				},
-			} ) );
+			};
 
+			expect( isEditedPostAutosaveable( state ) ).toBe( false );
+		} );
+
+		it( 'should return false if the post is not saveable', () => {
 			const state = {
 				editor: {
 					present: {
@@ -1300,13 +1382,6 @@ describe( 'selectors', () => {
 				saving: {
 					requesting: true,
 				},
-			};
-
-			expect( isEditedPostAutosaveable( state ) ).toBe( false );
-		} );
-
-		it( 'should return false if the post is not saveable', () => {
-			const isEditedPostAutosaveable = isEditedPostAutosaveableRegistrySelector( () => ( {
 				getCurrentUser() {},
 				hasFetchedAutosaves() {
 					return true;
@@ -1316,38 +1391,12 @@ describe( 'selectors', () => {
 						title: 'sassel',
 					};
 				},
-			} ) );
-
-			const state = {
-				editor: {
-					present: {
-						blocks: {
-							value: [],
-						},
-						edits: {},
-					},
-				},
-				initialEdits: {},
-				currentPost: {
-					title: 'sassel',
-				},
-				saving: {
-					requesting: true,
-				},
 			};
 
 			expect( isEditedPostAutosaveable( state ) ).toBe( false );
 		} );
 
 		it( 'should return true if there is no autosave', () => {
-			const isEditedPostAutosaveable = isEditedPostAutosaveableRegistrySelector( () => ( {
-				getCurrentUser() {},
-				hasFetchedAutosaves() {
-					return true;
-				},
-				getAutosave() {},
-			} ) );
-
 			const state = {
 				editor: {
 					present: {
@@ -1362,25 +1411,17 @@ describe( 'selectors', () => {
 					title: 'sassel',
 				},
 				saving: {},
+				getCurrentUser() {},
+				hasFetchedAutosaves() {
+					return true;
+				},
+				getAutosave() {},
 			};
 
 			expect( isEditedPostAutosaveable( state ) ).toBe( true );
 		} );
 
 		it( 'should return false if none of title, excerpt, or content have changed', () => {
-			const isEditedPostAutosaveable = isEditedPostAutosaveableRegistrySelector( () => ( {
-				getCurrentUser() {},
-				hasFetchedAutosaves() {
-					return true;
-				},
-				getAutosave() {
-					return {
-						title: 'foo',
-						excerpt: 'foo',
-					};
-				},
-			} ) );
-
 			const state = {
 				editor: {
 					present: {
@@ -1397,13 +1438,6 @@ describe( 'selectors', () => {
 					excerpt: 'foo',
 				},
 				saving: {},
-			};
-
-			expect( isEditedPostAutosaveable( state ) ).toBe( false );
-		} );
-
-		it( 'should return true if content has changes', () => {
-			const isEditedPostAutosaveable = isEditedPostAutosaveableRegistrySelector( () => ( {
 				getCurrentUser() {},
 				hasFetchedAutosaves() {
 					return true;
@@ -1414,8 +1448,12 @@ describe( 'selectors', () => {
 						excerpt: 'foo',
 					};
 				},
-			} ) );
+			};
 
+			expect( isEditedPostAutosaveable( state ) ).toBe( false );
+		} );
+
+		it( 'should return true if content has changes', () => {
 			const state = {
 				editor: {
 					present: {
@@ -1431,6 +1469,16 @@ describe( 'selectors', () => {
 					excerpt: 'foo',
 				},
 				saving: {},
+				getCurrentUser() {},
+				hasFetchedAutosaves() {
+					return true;
+				},
+				getAutosave() {
+					return {
+						title: 'foo',
+						excerpt: 'foo',
+					};
+				},
 			};
 
 			expect( isEditedPostAutosaveable( state ) ).toBe( true );
@@ -1439,19 +1487,6 @@ describe( 'selectors', () => {
 		it( 'should return true if title or excerpt have changed', () => {
 			for ( const variantField of [ 'title', 'excerpt' ] ) {
 				for ( const constantField of without( [ 'title', 'excerpt' ], variantField ) ) {
-					const isEditedPostAutosaveable = isEditedPostAutosaveableRegistrySelector( () => ( {
-						getCurrentUser() {},
-						hasFetchedAutosaves() {
-							return true;
-						},
-						getAutosave() {
-							return {
-								[ constantField ]: 'foo',
-								[ variantField ]: 'bar',
-							};
-						},
-					} ) );
-
 					const state = {
 						editor: {
 							present: {
@@ -1468,6 +1503,16 @@ describe( 'selectors', () => {
 							content: 'foo',
 						},
 						saving: {},
+						getCurrentUser() {},
+						hasFetchedAutosaves() {
+							return true;
+						},
+						getAutosave() {
+							return {
+								[ constantField ]: 'foo',
+								[ variantField ]: 'bar',
+							};
+						},
 					};
 
 					expect( isEditedPostAutosaveable( state ) ).toBe( true );
