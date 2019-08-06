@@ -82,9 +82,6 @@ const registerBlock = ( block ) => {
 /**
  * Function to register core blocks provided by the block editor.
  *
- * @param {boolean} enableLegacyWidgets     Optional. Editor setting to enable Legacy Widget Block.
- * @param {boolean} enableMenu              Optional. Editor setting to enable Menu Block.
- *
  * @example
  * ```js
  * import { registerCoreBlocks } from '@wordpress/block-library';

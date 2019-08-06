@@ -8,7 +8,7 @@
 /**
  * The main entry point for the Gutenberg experiments page.
  *
- * @since 5.2.3
+ * @since 6.3.0
  *
  * @param string $page The page name the function is being called for, `'gutenberg_customizer'` for the Customizer.
  */
@@ -32,7 +32,7 @@ function the_gutenberg_experiments( $page = 'gutenberg_page_gutenberg-experiment
 /**
  * Set up the experiments settings.
  *
- * @since 5.2.3
+ * @since 6.3.0
  */
 function gutenberg_initialize_experiments_settings() {
 	add_settings_section(
@@ -75,7 +75,7 @@ add_action( 'admin_init', 'gutenberg_initialize_experiments_settings' );
 /**
  * Display a checkbox field for a Gutenberg experiment.
  *
- * @since 5.2.3
+ * @since 6.3.0
  *
  * @param array $args ( $label, $id ).
  */
@@ -93,7 +93,7 @@ function gutenberg_display_experiment_field( $args ) {
 /**
  * Display the experiments section.
  *
- * @since 5.2.3
+ * @since 6.3.0
  */
 function gutenberg_display_experiment_section() {
 	?>
