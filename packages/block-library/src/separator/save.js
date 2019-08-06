@@ -9,6 +9,11 @@ import classnames from 'classnames';
 import {
 	getColorClassName,
 } from '@wordpress/block-editor';
+/**
+ * Internal dependencies
+ */
+import getActiveStyle from './getActiveStyle';
+import { settings } from './index';
 
 export default function separatorSave( { attributes } ) {
 	const {
@@ -17,7 +22,14 @@ export default function separatorSave( { attributes } ) {
 		dotSize,
 		dotSpacing,
 		lineThickness,
+		className,
 	} = attributes;
+	let { isDots, isLine } = false;
+	if ( className ) {
+		const currentStyle = getActiveStyle( settings.styles, className ).name;
+		isDots = currentStyle === 'dots';
+		isLine = currentStyle === 'wide' || currentStyle === 'default';
+	}
 
 	// the hr support changing color using border-color, since border-color
 	// is not yet supported in the color palette, we use background-color
@@ -37,9 +49,9 @@ export default function separatorSave( { attributes } ) {
 		color: colorClass ? undefined : customColor,
 		fontSize: dotSize || undefined,
 		letterSpacing: dotSpacing || dotSize,
-		paddingLeft: dotSpacing || dotSize,
+		paddingLeft: ( isDots ? ( dotSpacing || dotSize ) : undefined ),
 		borderWidth: lineThickness,
-		height: lineThickness,
+		height: isLine ? lineThickness : undefined,
 	};
 
 	return ( <hr

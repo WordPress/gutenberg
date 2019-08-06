@@ -39,9 +39,9 @@ function SeparatorEdit( { color, setColor, className, attributes, setAttributes 
 					color: color.color,
 					fontSize: dotSize,
 					letterSpacing: dotSpacing || dotSize,
-					paddingLeft: ( isDots ? ( dotSpacing || dotSize ) : '' ),
+					paddingLeft: ( isDots ? ( dotSpacing || dotSize ) : undefined ),
 					borderWidth: lineThickness,
-					height: lineThickness,
+					height: isLine ? lineThickness : undefined,
 				} }
 			/>
 			<InspectorControls>
