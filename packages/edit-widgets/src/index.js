@@ -3,7 +3,7 @@
  */
 import '@wordpress/notices';
 import { render } from '@wordpress/element';
-import { registerCoreBlocks, registerExperimentalCoreBlocks } from '@wordpress/block-library';
+import { registerCoreBlocks, __experimentalRegisterExperimentalCoreBlocks } from '@wordpress/block-library';
 
 /**
  * Internal dependencies
@@ -22,7 +22,7 @@ import CustomizerEditWidgetsInitializer from './components/customizer-edit-widge
 export function initialize( id, settings ) {
 	registerCoreBlocks();
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
-		registerExperimentalCoreBlocks( settings );
+		__experimentalRegisterExperimentalCoreBlocks( settings );
 	}
 	render(
 		<EditWidgetsInitializer

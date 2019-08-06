@@ -158,12 +158,12 @@ export const registerCoreBlocks = () => {
  *
  * @example
  * ```js
- * import { registerExperimentalCoreBlocks } from '@wordpress/block-library';
+ * import { __experimentalRegisterExperimentalCoreBlocks } from '@wordpress/block-library';
  *
- * registerExperimentalCoreBlocks( settings );
+ * __experimentalRegisterExperimentalCoreBlocks( settings );
  * ```
  */
-export const registerExperimentalCoreBlocks = process.env.GUTENBERG_PHASE === 2 ? ( settings ) => {
+export const __experimentalRegisterExperimentalCoreBlocks = process.env.GUTENBERG_PHASE === 2 ? ( settings ) => {
 	const { __experimentalEnableLegacyWidgetBlock, __experimentalEnableMenuBlock } = settings;
 
 	[

@@ -7,7 +7,7 @@ import '@wordpress/editor';
 import '@wordpress/nux';
 import '@wordpress/viewport';
 import '@wordpress/notices';
-import { registerCoreBlocks, registerExperimentalCoreBlocks } from '@wordpress/block-library';
+import { registerCoreBlocks, __experimentalRegisterExperimentalCoreBlocks } from '@wordpress/block-library';
 import { render, unmountComponentAtNode } from '@wordpress/element';
 
 /**
@@ -67,7 +67,7 @@ export function initializeEditor( id, postType, postId, settings, initialEdits )
 	const reboot = reinitializeEditor.bind( null, postType, postId, target, settings, initialEdits );
 	registerCoreBlocks();
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
-		registerExperimentalCoreBlocks( settings );
+		__experimentalRegisterExperimentalCoreBlocks( settings );
 	}
 
 	// Show a console log warning if the browser is not in Standards rendering mode.
