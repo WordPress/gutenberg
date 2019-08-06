@@ -78,22 +78,15 @@
 
 // Tweak styles for the Preview.
 .block-editor-block-preview__content {
-	//.wp-block-button-wrapper {
-	//}
 
 	.wp-block-button {
-		display: table;
-	}
-
-	.wp-block-button {
-		text-align: left;
+		display: block;
 	}
 
 	[data-type="core/button"].wp-block {
 		height: auto;
 
 		> .block-editor-block-list__block-edit {
-			float: none;
 			margin: 0;
 		}
 	}
@@ -102,6 +95,7 @@
 		margin: 0;
 	}
 
+	.wp-block-button__inline-link,
 	.block-editor-block-list__insertion-point {
 		display: none;
 	}
@@ -122,16 +116,20 @@
 .block-editor-block-styles__item .block-editor-block-preview__content {
 	.block-editor-rich-text__editable {
 		white-space: nowrap !important;
+		margin-top: 6px;
 	}
 
 	[data-type="core/button"].wp-block {
-		//width: calc(3.5 * (100vw / 12));
 		width: auto;
 	}
 }
 
-// Right Popover preview.
+// Preview Popover.
 .block-editor-block-switcher__preview .block-editor-block-preview__content {
+	.block-editor-rich-text__editable {
+		white-space: nowrap !important;
+	}
+
 	[data-type="core/button"].wp-block {
 		width: auto;
 	}
