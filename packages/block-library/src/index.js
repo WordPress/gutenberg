@@ -141,9 +141,7 @@ export const registerCoreBlocks = () => {
 		textColumns,
 		verse,
 		video,
-	].forEach( ( block ) => {
-		registerBlock( block );
-	} );
+	].forEach( registerBlock );
 
 	setDefaultBlockName( paragraph.name );
 	if ( window.wp && window.wp.oldEditor ) {
@@ -175,7 +173,5 @@ export const registerExperimentalCoreBlocks = process.env.GUTENBERG_PHASE === 2 
 		__experimentalEnableLegacyWidgetBlock ? legacyWidget : null,
 		__experimentalEnableMenuBlock ? navigationMenu : null,
 		__experimentalEnableMenuBlock ? navigationMenuItem : null,
-	].forEach( ( block ) => {
-		registerBlock( block );
-	} );
+	].forEach( registerBlock );
 } : undefined;
