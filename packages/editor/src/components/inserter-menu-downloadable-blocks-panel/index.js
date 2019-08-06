@@ -7,7 +7,7 @@ import { debounce } from 'lodash';
  * WordPress dependencies
  */
 import { __experimentalInserterMenuExtension } from '@wordpress/block-editor';
-import DownloadableBlocks from '@wordpress/downloadable-blocks';
+import DownloadableBlocks from '@wordpress/block-directory';
 import { useState } from '@wordpress/element';
 
 function InserterMenuDownloadableBlocksPanel() {

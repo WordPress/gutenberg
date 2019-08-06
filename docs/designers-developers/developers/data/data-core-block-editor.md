@@ -278,19 +278,6 @@ _Returns_
 
 -   `Array`: ids of top-level and descendant blocks.
 
-<a name="getDiscoverBlocks" href="#getDiscoverBlocks">#</a> **getDiscoverBlocks**
-
-Returns the available uninstalled blocks
-
-_Parameters_
-
--   _state_ `Object`: Global application state.
--   _filterValue_ `string`: Search string.
-
-_Returns_
-
--   `Array`: Discoverable blocks
-
 <a name="getFirstMultiSelectedBlockClientId" href="#getFirstMultiSelectedBlockClientId">#</a> **getFirstMultiSelectedBlockClientId**
 
 Returns the client ID of the first block in the multi-selection set, or null
@@ -606,18 +593,6 @@ _Returns_
 
 -   `boolean`: Items that appear in inserter.
 
-<a name="hasInstallBlocksPermission" href="#hasInstallBlocksPermission">#</a> **hasInstallBlocksPermission**
-
-Returns true if user has permission to install blocks.
-
-_Parameters_
-
--   _state_ `Object`: Global application state.
-
-_Returns_
-
--   `boolean`: User has permission to install blocks.
-
 <a name="hasMultiSelection" href="#hasMultiSelection">#</a> **hasMultiSelection**
 
 Returns true if a multi-selection has been made, or false otherwise.
@@ -798,18 +773,6 @@ _Returns_
 
 -   `boolean`: True if multi-selecting, false if not.
 
-<a name="isRequestingDiscoverBlocks" href="#isRequestingDiscoverBlocks">#</a> **isRequestingDiscoverBlocks**
-
-Returns true if application is requesting for discover blocks.
-
-_Parameters_
-
--   _state_ `Object`: Global application state.
-
-_Returns_
-
--   `Array`: Discoverable blocks
-
 <a name="isSelectionEnabled" href="#isSelectionEnabled">#</a> **isSelectionEnabled**
 
 Selector that returns if multi-selection is enabled or not.
@@ -877,10 +840,6 @@ _Returns_
 
 -   `Object`: Action object.
 
-<a name="fetchDiscoverBlocks" href="#fetchDiscoverBlocks">#</a> **fetchDiscoverBlocks**
-
-Undocumented declaration.
-
 <a name="hideInsertionPoint" href="#hideInsertionPoint">#</a> **hideInsertionPoint**
 
 Returns an action object hiding the insertion point.
@@ -935,10 +894,6 @@ _Parameters_
 _Returns_
 
 -   `Object`: Action object
-
-<a name="installBlock" href="#installBlock">#</a> **installBlock**
-
-Undocumented declaration.
 
 <a name="mergeBlocks" href="#mergeBlocks">#</a> **mergeBlocks**
 
@@ -999,10 +954,6 @@ _Parameters_
 _Returns_
 
 -   `Object`: Action object.
-
-<a name="receiveDiscoverBlocks" href="#receiveDiscoverBlocks">#</a> **receiveDiscoverBlocks**
-
-Undocumented declaration.
 
 <a name="removeBlock" href="#removeBlock">#</a> **removeBlock**
 
@@ -1131,10 +1082,6 @@ clientId should be selected.
 _Parameters_
 
 -   _clientId_ `string`: Block client ID.
-
-<a name="setInstallBlocksPermission" href="#setInstallBlocksPermission">#</a> **setInstallBlocksPermission**
-
-Undocumented declaration.
 
 <a name="setTemplateValidity" href="#setTemplateValidity">#</a> **setTemplateValidity**
 

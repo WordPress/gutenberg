@@ -37,7 +37,7 @@
 		"@wordpress/deprecated": "file:packages/deprecated",
 		"@wordpress/dom": "file:packages/dom",
 		"@wordpress/dom-ready": "file:packages/dom-ready",
-		"@wordpress/downloadable-blocks": "file:packages/downloadable-blocks",
+		"@wordpress/block-directory": "file:packages/block-directory",
 		"@wordpress/edit-post": "file:packages/edit-post",
 		"@wordpress/edit-widgets": "file:packages/edit-widgets",
 		"@wordpress/editor": "file:packages/editor",
