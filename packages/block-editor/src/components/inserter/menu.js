@@ -464,9 +464,6 @@ export default compose(
 				const { name, initialAttributes } = item;
 				const selectedBlock = getSelectedBlock();
 				const insertedBlock = createBlock( name, initialAttributes );
-
-				//load block asssets if isDownloadableBlockEnabled.
-
 				if ( ! isAppender && selectedBlock && isUnmodifiedDefaultBlock( selectedBlock ) ) {
 					replaceBlocks( selectedBlock.clientId, insertedBlock );
 				} else {
