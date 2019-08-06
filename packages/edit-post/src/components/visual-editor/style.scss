@@ -1,6 +1,6 @@
 .edit-post-visual-editor {
 	position: relative;
-	padding: 50px 0;
+	padding-top: 50px;
 
 	& .components-button {
 		font-family: $default-font;
@@ -8,11 +8,9 @@
 }
 
 .edit-post-visual-editor .block-editor-writing-flow__click-redirect {
-	// Collapse to minimum height of 50px, to fully occupy editor bottom pad.
-	height: 50px;
+	// Allow the page to be scrolled with the last block in the middle.
+	height: 50vh;
 	width: 100%;
-	// Offset for: Visual editor padding, block (default appender) margin.
-	margin: #{ -1 * $block-spacing } auto -50px;
 }
 
 // The base width of blocks

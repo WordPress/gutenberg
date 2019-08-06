@@ -420,6 +420,11 @@ _Returns_
 
 -   `Array`: converted rules.
 
+<a name="Typewriter" href="#Typewriter">#</a> **Typewriter**
+
+Ensures that the text selection keeps the same vertical distance from the
+viewport during keyboard events within this component.
+
 <a name="URLInput" href="#URLInput">#</a> **URLInput**
 
 _Related_

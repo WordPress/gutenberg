@@ -422,4 +422,46 @@ describe( 'Writing Flow', () => {
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	it( 'should maintain caret position', async () => {
+		// Create first block.
+		await page.keyboard.press( 'Enter' );
+
+		// Create blocks until the page is scrollable.
+		while ( await page.evaluate( () =>
+			! wp.dom.getScrollContainer( document.activeElement )
+		) ) {
+			await page.keyboard.press( 'Enter' );
+		}
+
+		const initialPosition = await page.evaluate( () =>
+			wp.dom.computeCaretRect().y
+		);
+
+		await page.keyboard.press( 'Enter' );
+
+		expect( await page.evaluate( () =>
+			wp.dom.computeCaretRect().y
+		) ).toBe( initialPosition );
+
+		// Type until the text wraps.
+		while ( await page.evaluate( () =>
+			document.activeElement.clientHeight <=
+			parseInt( getComputedStyle( document.activeElement ).lineHeight, 10 )
+		) ) {
+			await page.keyboard.type( 'a' );
+		}
+
+		expect( await page.evaluate( () =>
+			wp.dom.computeCaretRect().y
+		) ).toBe( initialPosition );
+
+		// Pressing backspace will reposition the caret to the previous line.
+		// Scroll position should be adjusted again.
+		await page.keyboard.press( 'Backspace' );
+
+		expect( await page.evaluate( () =>
+			wp.dom.computeCaretRect().y
+		) ).toBe( initialPosition );
+	} );
 } );
