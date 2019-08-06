@@ -25,7 +25,7 @@ import { Component, createRef } from '@wordpress/element';
 import {
 	PanelBody,
 	withSpokenMessages,
-	Notice,
+	Tip,
 } from '@wordpress/components';
 import {
 	getCategories,
@@ -395,11 +395,11 @@ export class InserterMenu extends Component {
 										) }
 									</p>
 								</div>
-								<Notice isDismissible={ false }>
+								<Tip>
 									{ __(
 										'While writing, you can press "/" to quickly insert new blocks.'
 									) }
-								</Notice>
+								</Tip>
 							</div>
 						) }
 					</div>
