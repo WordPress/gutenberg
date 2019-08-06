@@ -7,6 +7,9 @@
 		},
 		"customColor": {
 			"type": "string"
+		},
+		"width": {
+			"type": "number"
 		}
 	}
 }
