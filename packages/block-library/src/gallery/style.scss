@@ -4,7 +4,7 @@
 	list-style-type: none;
 	padding: 0;
 
-	.blocks-gallery-image,
+	// .blocks-gallery-image,
 	.blocks-gallery-item {
 		// Add space between thumbnails, and unset right most thumbnails later.
 		margin: 0 $grid-size-large $grid-size-large 0;
@@ -27,7 +27,7 @@
 		}
 
 		img {
-			display: block;
+			// display: block;
 			max-width: 100%;
 			height: auto;
 		}
@@ -52,7 +52,7 @@
 			color: $white;
 			text-align: center;
 			font-size: $default-font-size;
-			background: linear-gradient(0deg, rgba($color: $black, $alpha: 0.7) 0, rgba($color: $black, $alpha: 0.3) 70%, transparent);
+			// background: linear-gradient(0deg, rgba($color: $black, $alpha: 0.7) 0, rgba($color: $black, $alpha: 0.3) 70%, transparent);
 
 			img {
 				display: inline;
@@ -81,7 +81,7 @@
 	// On mobile and responsive viewports, we allow only 1 or 2 columns at the most.
 	& .blocks-gallery-image,
 	& .blocks-gallery-item {
-		width: calc((100% - #{ $grid-size-large }) / 2);
+		// width: calc((100% - #{ $grid-size-large }) / 2);
 
 		&:nth-of-type(even) {
 			margin-right: 0;
