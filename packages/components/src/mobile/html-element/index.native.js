@@ -1,8 +1,9 @@
 /**
  * External dependencies
  */
-import { isString } from 'lodash';
+import { drop, every, head, isEqual, isString, flatMap, pick, some } from 'lodash';
 import { Image, View } from 'react-native';
+import { CssSelectorParser } from 'css-selector-parser';
 
 /**
  * WordPress dependencies
@@ -19,24 +20,131 @@ const CSS_NODE_PROPS = [ 'tagName', 'className', 'siblingPosition', 'siblingCoun
 
 const { Consumer, Provider } = createContext( {} );
 
+const parser = new CssSelectorParser();
+
+const parseSelectorRules = ( css ) => {
+    const parsedRules = parser.parse( css );
+    if ( parsedRules.type === 'ruleSet' ) {
+        return [ parsedRules.rule ];
+    } else if ( parsedRules.type === 'selectors' ) {
+        return parsedRules.selectors.map( ruleSet => ruleSet.rule );
+    } else {
+        throw new Error( `Unexpected selector type ${ parsedRules.type }`);
+    }
+}
+
+
+const reverseRule = ( rule, parent ) => {
+    const currentRule = pick( rule, [ 'tagName', 'classNames', 'pseudos' ] );
+
+    if ( parent !== undefined ) {
+        currentRule.parent = parent;
+    }
+
+    if ( rule.rule === undefined ) {
+        return currentRule;
+    } else {
+		const { nestingOperator, ...childRule } = rule.rule;
+        const parent = {
+            nestingOperator,
+            rule: currentRule,
+        }
+        return reverseRule( childRule, parent );
+    }
+}
+
+const matchTagName = ( { tagName: selector }, { tagName: nodeTagName } ) => {
+	return selector === undefined
+		|| selector === '*'
+		|| selector === nodeTagName;
+}
+
+const matchClassNames = ( rule, node ) => {
+	const { classNames: ruleClassNames } = rule;
+	const { classNames: nodeClassNames } = node;
+	return every( ruleClassNames, className => nodeClassNames.includes( className ) );
+}
+
+const matchPseudos = ( rule, node ) => {
+	if ( rule.pseudos !== undefined ) {
+		// We don't support pseudos yet
+		return false;
+	}
+}
+
+const matchId = ( rule, node ) => {
+	if ( rule.id !== undefined ) {
+		// We don't support IDs yet
+		return false;
+	}
+}
+
+const matchNode = ( rule, node ) => matchTagName( rule, node )
+	&& matchClassNames( rule, node);
+
+const matchParent = ( rule, path ) => {
+	const { parent } = rule;
+	if ( parent === undefined ) {
+		return true;
+	}
+
+	const { rule: parentRule, nestingOperator } = parent;
+	if ( !! nestingOperator ) {
+		// Only descendant operator suported for now
+		return false;
+	}
+
+	let parentPath = path;
+	while ( ( parentPath = drop( parentPath) ) && parentPath.length > 0 ) {
+		if ( matchCSSPathWithRule( parentPath, parentRule ) ) {
+			return true;
+		}
+	}
+
+	return false
+};
+
+const matchCSSPathWithRule = ( path, rule ) => {
+	const node = head( path );
+
+	if ( node === undefined ) {
+		return;
+	}
+
+	return matchNode( rule, node ) && matchParent( rule, path );
+}
+
+const matchCSSPathWithSelector = ( path, selector ) => {
+	try {
+		const rules = parseSelectorRules( selector )
+			.map( rule => reverseRule( rule ) );
+
+		return some( rules, rule => matchCSSPathWithRule( path, rule ) );
+	} catch ( error ) {
+		debugger;
+		console.warn( `Error parsing CSS selector (${ selector }):`, error );
+	}
+}
+
 class HTMLElementContainer extends Component {
 	createCSSNode( tagName, className, siblingPosition, siblingCount ) {
-		return { tagName, className, siblingPosition, siblingCount };
+		const classNames = className ? className.split( ' ' ) : [];
+		return { tagName, classNames, siblingPosition, siblingCount };
 	}
 
 	createCSSPath( ancestorPath = [], tagName, className, siblingPosition, siblingCount ) {
 		const node = this.createCSSNode( tagName, className, siblingPosition, siblingCount );
-		return [ ...ancestorPath, node ];
+		return [ node, ...ancestorPath ];
 	}
 
 	cssPathToString( path ) {
-		return path.map( this.cssNodeToString ).join( '>' );
+		return path.reverse().map( this.cssNodeToString ).join( '>' );
 	}
 
 	cssNodeToString( node ) {
-		const { tagName, className, siblingPosition, siblingCount } = node;
-		const classNamesJoined = className ?
-			className.split( ' ' ).map( ( cls ) => '.' + cls ).join( '' ) :
+		const { tagName, classNames, siblingPosition, siblingCount } = node;
+		const classNamesJoined = classNames ?
+			classNames.map( ( cls ) => '.' + cls ).join( '' ) :
 			'';
 		return `${ tagName }(${ siblingPosition }/${ siblingCount })${ classNamesJoined }`;
 	}
@@ -85,9 +193,30 @@ class HTMLElementContainer extends Component {
 		} );
 	}
 
+	computeStyle( path, stylesheet ) {
+		if ( stylesheet === undefined ) {
+			return {};
+		}
+
+		const matchingRules = stylesheet.filter( rule => {
+			// Each rule can have multiple selectors
+			// Check that at least one of them matches
+			return some( rule.selectors, selector => matchCSSPathWithSelector( path, selector ) );
+		} );
+
+		const matchingDeclarations = flatMap( matchingRules, rule => rule.declarations );
+
+		return matchingDeclarations.reduce( ( result, declaration ) => {
+			return {
+				...result,
+				...declaration
+			}
+		}, {});
+	}
+
 	render() {
 		const { tagName, stylesheet, children, ...otherProps } = this.props;
-		const { className } = otherProps;
+		const { className, style } = otherProps;
 
 		const NativeComponent = this.nativeComponent( tagName );
 		const nativeProps = this.nativeProps( tagName, otherProps );
@@ -97,6 +226,7 @@ class HTMLElementContainer extends Component {
 				{ ( { ancestorPath, siblingPosition = 1, siblingCount = 1 } ) => {
 					const path = this.createCSSPath( ancestorPath, tagName, className, siblingPosition, siblingCount );
 					// TODO: calculate native style from stylesheet + path
+					const computedStyle = this.computeStyle( path, stylesheet );
 
 					const childrenCount = Children.count( children );
 
@@ -104,7 +234,11 @@ class HTMLElementContainer extends Component {
 					const cssPath = __DEV__ ? this.cssPathToString( path ) : undefined;
 
 					return (
-						<NativeComponent { ...nativeProps } cssPath={ cssPath }>
+						<NativeComponent
+							{ ...nativeProps }
+							cssPath={ cssPath }
+							style={ { ...computedStyle, ...style } }
+						>
 							{ Children.map( children, ( child, siblingPosition ) => {
 								const childContext = {
 									ancestorPath: path,

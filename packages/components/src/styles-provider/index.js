@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { isArray } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { Component, createContext, forwardRef } from '@wordpress/element';
@@ -41,13 +46,20 @@ export const withStylesheets = ( stylesheets ) => createHigherOrderComponent( ( 
 export const withStyles = createHigherOrderComponent( ( OriginalComponent ) => {
 	return forwardRef( ( props, ref ) => (
 		<Consumer>
-			{ ( stylesheet ) => (
-				<OriginalComponent
-					ref={ ref }
-					{ ...props }
-					stylesheet={ stylesheet }
-				/>
-			) }
+			{ ( stylesheet ) => {
+				if ( ! isArray( stylesheet ) ) {
+					// FIXME: the serializer passes the wrong context to the consumer when called before a provider
+					// Let's ignore the value for now
+					stylesheet = undefined;
+				}
+				return (
+					<OriginalComponent
+						ref={ ref }
+						{ ...props }
+						stylesheet={ stylesheet }
+					/>
+				);
+			} }
 		</Consumer>
 	) );
 }, 'withStyles' );
