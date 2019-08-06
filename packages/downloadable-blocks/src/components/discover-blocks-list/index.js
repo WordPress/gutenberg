@@ -8,7 +8,8 @@ import { forEach } from 'lodash';
  */
 import { getBlockMenuDefaultClassName, getBlockTypes } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
-import { dispatch } from '@wordpress/data';
+import { dispatch, withDispatch } from '@wordpress/data';
+import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -121,7 +122,7 @@ const handleDownloadableBlock = ( item, onSelect ) => {
 	scriptsCount = loadAssets( item.assets, onLoad, onError );
 };
 
-function DiscoverBlocksList( { items, onSelect, onHover = () => {}, children } ) {
+function DiscoverBlocksList( { items, onSelect, onHover = () => {}, children, installBlock } ) {
 	return (
 		/*
 		 * Disable reason: The `list` ARIA role is redundant but
@@ -136,6 +137,7 @@ function DiscoverBlocksList( { items, onSelect, onHover = () => {}, children } )
 					icons={ item.icons }
 					onClick={ () => {
 						handleDownloadableBlock( item, onSelect );
+						installBlock( item.id );
 						onHover( null );
 					} }
 					onFocus={ () => onHover( item ) }
@@ -152,4 +154,26 @@ function DiscoverBlocksList( { items, onSelect, onHover = () => {}, children } )
 	);
 }
 
-export default DiscoverBlocksList;
+export default compose(
+	withDispatch( ( ownDispatch ) => {
+		const { installBlock } = ownDispatch( 'core/download-blocks' );
+		const { removeNotice } = ownDispatch( 'core/notices' );
+
+		const retryIfFailed = ( slug ) => {
+			removeNotice( 'block-install-error' );
+			installBlock( slug, retryIfFailed, removeIfFailed );
+		};
+
+		const removeIfFailed = () => {
+			removeNotice( 'block-install-error' );
+			//TODO: remove block and unregister block type from editor;
+		};
+
+		return {
+			installBlock: ( slug ) => {
+				installBlock( slug, retryIfFailed, removeIfFailed );
+			},
+			removeNotice,
+		};
+	} ),
+)( DiscoverBlocksList );

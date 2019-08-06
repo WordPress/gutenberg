@@ -4,8 +4,6 @@
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { Fragment } from '@wordpress/element';
-import { withDispatch } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -13,17 +11,7 @@ import { compose } from '@wordpress/compose';
 import { BlockIcon } from '@wordpress/block-editor';
 import BlockRatings from '../block-ratings';
 
-function DiscoverBlockHeader( { slug, icon, title, rating, ratingCount, onClick, installBlock, removeNotice } ) {
-	const retryIfFailed = () => {
-		removeNotice( 'block-install-error' );
-		installBlock( slug, retryIfFailed, removeIfFailed );
-	};
-
-	const removeIfFailed = () => {
-		removeNotice( 'block-install-error' );
-		//TODO: remove block and unregister block type from editor;
-	};
-
+function DiscoverBlockHeader( { icon, title, rating, ratingCount, onClick } ) {
 	return (
 		<Fragment>
 			<div className="block-editor-discover-block-header__row">
@@ -45,7 +33,6 @@ function DiscoverBlockHeader( { slug, icon, title, rating, ratingCount, onClick,
 					isDefault
 					onClick={ ( event ) => {
 						event.preventDefault();
-						installBlock( slug, retryIfFailed, removeIfFailed );
 						onClick();
 					} }
 				>
@@ -56,14 +43,4 @@ function DiscoverBlockHeader( { slug, icon, title, rating, ratingCount, onClick,
 	);
 }
 
-export default compose(
-	withDispatch( ( dispatch ) => {
-		const { installBlock } = dispatch( 'core/download-blocks' );
-		const { removeNotice } = dispatch( 'core/notices' );
-
-		return {
-			installBlock,
-			removeNotice,
-		};
-	} ),
-)( DiscoverBlockHeader );
+export default DiscoverBlockHeader;
