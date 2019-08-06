@@ -31,6 +31,7 @@ export function BlockPreview( {
 	const [ isTallPreview, setIsTallPreview ] = useState( false );
 	const [ previewScale, setPreviewScale ] = useState( 1 );
 	const [ visibility, setVisibility ] = useState( 'hidden' );
+	const [ xPosition, setXPosition ] = useState( 0 );
 
 	// Dynamically calculate the scale factor
 	useLayoutEffect( () => {
@@ -42,24 +43,33 @@ export function BlockPreview( {
 		// Timer - required to account for async render of `BlockEditorProvider`
 		const timerId = setTimeout( () => {
 			window.clearTimeout( timerId );
-			const previewContainer = previewRef.current;
+			const containerElement = previewRef.current;
 
-			if ( ! previewContainer ) {
+			if ( ! containerElement ) {
 				return;
 			}
 
 			// comparisonBlock
 			const block = blocks[ 0 ];
-			const previewElement = getBlockPreviewContainerDOMNode( block.clientId, previewContainer );
+			const previewElement = getBlockPreviewContainerDOMNode( block.clientId, containerElement );
+
 			if ( previewElement ) {
-				const containerElementWidth = previewContainer.offsetWidth;
+				// Get dimensions.
+				const containerElementWidth = containerElement.offsetWidth;
+				const containerElementHeight = containerElement.offsetHeight;
 				const previewElementHeight = previewElement.offsetHeight;
 				const previewElementWidth = previewElement.offsetWidth;
 
 				const scale = containerElementWidth / previewElementWidth || 1;
 
-				setIsTallPreview( previewElementHeight > previewElementHeight );
+				// Compute left position.
+				const scaledElementRect = previewElement.getBoundingClientRect();
+				const containerElementRect = containerElement.getBoundingClientRect();
+				const offsetX = scaledElementRect.left - containerElementRect.left;
+
+				setIsTallPreview( previewElementHeight > containerElementHeight );
 				setPreviewScale( scale );
+				// setXPosition( offsetX );
 				setVisibility( 'visible' );
 			}
 		}, 10 );
@@ -79,6 +89,7 @@ export function BlockPreview( {
 	const previewStyles = {
 		transform: `scale(${ previewScale }) translate(-50%, -50%)`,
 		visibility,
+		// left: xPosition,
 	};
 
 	if ( isTallPreview ) {
