@@ -63,6 +63,23 @@ import * as tagCloud from './tag-cloud';
 import * as classic from './classic';
 
 /**
+ * Function to register an individual block.
+ *
+ * @param {Object} block The block to be registered.
+ *
+ */
+const registerBlock = ( block ) => {
+	if ( ! block ) {
+		return;
+	}
+	const { metadata, settings, name } = block;
+	if ( metadata ) {
+		unstable__bootstrapServerSideBlockDefinitions( { [ name ]: metadata } ); // eslint-disable-line camelcase
+	}
+	registerBlockType( name, settings );
+};
+
+/**
  * Function to register core blocks provided by the block editor.
  *
  * @example
@@ -104,11 +121,8 @@ export const registerCoreBlocks = () => {
 		mediaText,
 		latestComments,
 		latestPosts,
-		process.env.GUTENBERG_PHASE === 2 ? legacyWidget : null,
 		missing,
 		more,
-		process.env.GUTENBERG_PHASE === 2 ? navigationMenu : null,
-		process.env.GUTENBERG_PHASE === 2 ? navigationMenuItem : null,
 		nextpage,
 		preformatted,
 		pullquote,
@@ -124,16 +138,7 @@ export const registerCoreBlocks = () => {
 		textColumns,
 		verse,
 		video,
-	].forEach( ( block ) => {
-		if ( ! block ) {
-			return;
-		}
-		const { metadata, settings, name } = block;
-		if ( metadata ) {
-			unstable__bootstrapServerSideBlockDefinitions( { [ name ]: metadata } ); // eslint-disable-line camelcase
-		}
-		registerBlockType( name, settings );
-	} );
+	].forEach( registerBlock );
 
 	setDefaultBlockName( paragraph.name );
 	if ( window.wp && window.wp.oldEditor ) {
@@ -145,3 +150,25 @@ export const registerCoreBlocks = () => {
 		setGroupingBlockName( group.name );
 	}
 };
+
+/**
+ * Function to register experimental core blocks depending on editor settings.
+ *
+ * @param {Object} settings Editor settings.
+ *
+ * @example
+ * ```js
+ * import { __experimentalRegisterExperimentalCoreBlocks } from '@wordpress/block-library';
+ *
+ * __experimentalRegisterExperimentalCoreBlocks( settings );
+ * ```
+ */
+export const __experimentalRegisterExperimentalCoreBlocks = process.env.GUTENBERG_PHASE === 2 ? ( settings ) => {
+	const { __experimentalEnableLegacyWidgetBlock, __experimentalEnableMenuBlock } = settings;
+
+	[
+		__experimentalEnableLegacyWidgetBlock ? legacyWidget : null,
+		__experimentalEnableMenuBlock ? navigationMenu : null,
+		__experimentalEnableMenuBlock ? navigationMenuItem : null,
+	].forEach( registerBlock );
+} : undefined;
