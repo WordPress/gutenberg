@@ -228,4 +228,21 @@ describe( 'RichText', () => {
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	it( 'should keep internal selection after blur', async () => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '1' );
+		// Simulate moving focus to a different app, then moving focus back,
+		// without selection being changed.
+		await page.evaluate( () => {
+			const activeElement = document.activeElement;
+			activeElement.blur();
+			activeElement.focus();
+		} );
+		await pressKeyWithModifier( 'primary', 'b' );
+		await page.keyboard.type( '2' );
+		await pressKeyWithModifier( 'primary', 'b' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );
