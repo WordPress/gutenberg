@@ -22,7 +22,6 @@ export function BlockPreview( {
 	blocks,
 	settings,
 	scaleToFit = true,
-	scaleAdjustment = 1,
 	isScaled = true,
 } ) {
 	blocks = castArray( blocks );
@@ -86,12 +85,12 @@ export function BlockPreview( {
 	}
 
 	const previewStyles = {
-		transform: `scale(${ previewScale * scaleAdjustment }) translate(-50%, -50%)`,
+		transform: `scale(${ previewScale }) translate(-50%, -50%)`,
 		visibility,
 	};
 
 	if ( isTallPreview ) {
-		previewStyles.transform = `scale(${ previewScale * scaleAdjustment }) translate(-50%, 0)`;
+		previewStyles.transform = `scale(${ previewScale }) translate(-50%, 0)`;
 	}
 
 	const contentClassNames = classnames( 'editor-block-preview__content block-editor-block-preview__content editor-styles-wrapper', {
