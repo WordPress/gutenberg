@@ -25,10 +25,10 @@
 		box-sizing: border-box;
 		margin: 0 0 5px;
 		padding: 6px 12px;
-		min-height: $panel-header-height;
+		min-height: $header-height + $grid-size-small;
 
 		.components-notice__dismiss {
-			margin: 10px 5px;
+			margin: 5px -5px 5px 5px;
 		}
 	}
 }
