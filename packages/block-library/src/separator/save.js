@@ -14,6 +14,9 @@ export default function separatorSave( { attributes } ) {
 	const {
 		color,
 		customColor,
+		dotSize,
+		dotSpacing,
+		lineThickness,
 	} = attributes;
 
 	// the hr support changing color using border-color, since border-color
@@ -32,6 +35,11 @@ export default function separatorSave( { attributes } ) {
 	const separatorStyle = {
 		backgroundColor: backgroundClass ? undefined : customColor,
 		color: colorClass ? undefined : customColor,
+		fontSize: dotSize || undefined,
+		letterSpacing: dotSpacing || dotSize,
+		paddingLeft: dotSpacing || dotSize,
+		borderWidth: lineThickness,
+		height: lineThickness,
 	};
 
 	return ( <hr
