@@ -132,7 +132,6 @@ class RichText extends Component {
 
 	componentWillUnmount() {
 		document.removeEventListener( 'selectionchange', this.onSelectionChange );
-		window.cancelAnimationFrame( this.rafId );
 	}
 
 	setRef( node ) {
