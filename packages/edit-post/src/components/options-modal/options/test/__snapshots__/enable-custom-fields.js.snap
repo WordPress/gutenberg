@@ -21,7 +21,22 @@ exports[`EnableCustomFieldsOption renders a checked checkbox and a confirmation 
       <label
         className="components-checkbox-control__label"
         htmlFor="inspector-checkbox-control-3"
-      />
+      >
+        <svg
+          aria-hidden="true"
+          className="dashicon dashicons-yes components-checkbox-control__checked"
+          focusable="false"
+          height={20}
+          role="img"
+          viewBox="0 0 20 20"
+          width={20}
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M14.83 4.89l1.34.94-5.81 8.38H9.02L5.78 9.67l1.34-1.25 2.57 2.4z"
+          />
+        </svg>
+      </label>
     </div>
   </div>
   <p
@@ -61,7 +76,22 @@ exports[`EnableCustomFieldsOption renders a checked checkbox when custom fields 
       <label
         className="components-checkbox-control__label"
         htmlFor="inspector-checkbox-control-0"
-      />
+      >
+        <svg
+          aria-hidden="true"
+          className="dashicon dashicons-yes components-checkbox-control__checked"
+          focusable="false"
+          height={20}
+          role="img"
+          viewBox="0 0 20 20"
+          width={20}
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M14.83 4.89l1.34.94-5.81 8.38H9.02L5.78 9.67l1.34-1.25 2.57 2.4z"
+          />
+        </svg>
+      </label>
     </div>
   </div>
 </div>
