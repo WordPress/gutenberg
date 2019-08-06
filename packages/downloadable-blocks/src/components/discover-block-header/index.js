@@ -10,7 +10,7 @@ import { compose } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import BlockIcon from '../block-icon';
+import { BlockIcon } from '@wordpress/block-editor';
 import BlockRatings from '../block-ratings';
 
 function DiscoverBlockHeader( { slug, icon, title, rating, ratingCount, onClick, installBlock, removeNotice } ) {
