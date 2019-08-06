@@ -97,6 +97,7 @@ export function BlockPreview( {
 	const contentClassNames = classnames( 'editor-block-preview__content block-editor-block-preview__content editor-styles-wrapper', {
 		'is-scaled': isScaled,
 		'is-tall-preview': isTallPreview,
+		'is-scaled-auto': visibility === 'visible',
 	} );
 
 	return (

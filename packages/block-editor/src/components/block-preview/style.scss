@@ -61,6 +61,9 @@
 	overflow: visible;
 	min-height: auto;
 
+	// Width of the canvas before scaling
+	width: 700px;
+
 	.block-editor-block-list__layout,
 	.block-editor-block-list__block {
 		padding: 0;
@@ -72,6 +75,10 @@
 
 	> div section {
 		height: auto;
+	}
+
+	&.is-scaled-auto {
+		width: auto;
 	}
 
 	&.is-scaled {
