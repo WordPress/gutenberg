@@ -36,7 +36,7 @@ describe( 'controls', () => {
 			} );
 
 			registry.dispatch( 'store2' ).action2();
-			expect( action1 ).toHaveBeeenCalled();
+			expect( action1 ).toHaveBeenCalled();
 		} );
 	} );
 
