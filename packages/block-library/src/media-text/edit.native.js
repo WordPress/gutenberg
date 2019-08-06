@@ -130,8 +130,9 @@ class MediaTextEdit extends Component {
 		const containerStyles = {
 			...styles[ 'wp-block-media-text' ],
 			...styles[ `is-vertically-aligned-${ verticalAlignment }` ],
-			...( isStackedOnMobile ? styles[ 'is-stacked-on-mobile' ] : {} ),
 			...( mediaPosition === 'right' ? styles[ 'has-media-on-the-right' ] : {} ),
+			...( isStackedOnMobile ? styles[ 'is-stacked-on-mobile' ] : {} ),
+			...( isStackedOnMobile && mediaPosition === 'right' ? styles[ 'is-stacked-on-mobile.has-media-on-the-right' ] : {} ),
 			backgroundColor: backgroundColor.color,
 		};
 		const innerBlockWidth = 100 - temporaryMediaWidth;
@@ -162,6 +163,7 @@ class MediaTextEdit extends Component {
 					<BlockVerticalAlignmentToolbar
 						onChange={ onVerticalAlignmentChange }
 						value={ verticalAlignment }
+						isCollapsed={ false }
 					/>
 				</BlockControls>
 				<View style={ containerStyles }>

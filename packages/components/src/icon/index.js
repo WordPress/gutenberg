@@ -17,6 +17,10 @@ function Icon( { icon = null, size, ...additionalProps } ) {
 		return <Dashicon icon={ icon } size={ iconSize } { ...additionalProps } />;
 	}
 
+	if ( Dashicon === icon.type ) {
+		return icon;
+	}
+
 	// Any other icons should be 24x24 by default
 	iconSize = size || 24;
 
