@@ -112,7 +112,7 @@
 		"jest-junit": "6.4.0",
 		"jest-serializer-enzyme": "1.0.0",
 		"jsdom": "11.12.0",
-		"lerna": "3.14.1",
+		"lerna": "3.16.4",
 		"lint-staged": "8.1.5",
 		"lodash": "4.17.14",
 		"make-dir": "3.0.0",
