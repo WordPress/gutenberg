@@ -1,11 +1,9 @@
 # Resources
 
 ## Figma
+The [WordPress Design team](https://make.wordpress.org/design/) uses [Figma](https://www.figma.com/) to collaborate and share work. If you'd like to contribute, join the [#design channel](https://app.slack.com/client/T024MFP4J/C024MFP4Q) in [Slack](https://make.wordpress.org/chat/) and ask the team to set you up with a free Figma account. This will give you access to a helpful library of components used in WordPress. They are stable, fully supported, up to date, and ready for use in designs and prototypes. 
 
-[Figma](https://www.figma.com/) includes a library of [Gutenberg UI components](https://www.figma.com/file/ZtN5xslEVYgzU7Dd5CxgGZwq/WordPress-Components?node-id=491%3A3280) found in the `@wordpress/components` npm package, or “WordPress Components”. They are stable, fully supported, up to date, and ready for use in designs and prototypes. `@wordpress/components` is an npm package that is published via the Gutenberg repo. 
-
-### How to get access
-To join the WordPress.org Figma team, ping in #design on chat.wordpress.org and let us know whether you need view-only or edit access. A Figma admin will contact you for your email address to set up your account.
+### How to contribute
 
 ### Resources for learning how to use Figma
 [Getting started with Figma](https://help.figma.com/category/9-getting-started)
@@ -49,14 +47,5 @@ To join the WordPress.org Figma team, ping in #design on chat.wordpress.org and 
 
 WordPress components in Figma mirror the live React components. Documentation for how to refine or contribute to WordPress components in React coming soon.
 
-## Sketch
-
-If you prefer to use [Sketch](https://www.sketch.com/), the [SketchPress](https://github.com/10up/SketchPress) project includes a library of Gutenberg design components helpful for designing and prototyping:
-
-[Download Sketch mockups & patterns files](https://github.com/10up/SketchPress)
-
-These components are built to be used in [Sketch](https://www.sketchapp.com) for Mac. Users on other platforms may have luck importing the file to [Figma](https://www.figma.com) (Mac/Windows/Linux) or [Lunacy](https://icons8.com/lunacy) (Windows).
-
-Please note that these are mockups, so they may not be 1:1 accurate. It is also possible that the Sketch files aren’t up to date with the latest version of Gutenberg itself, as development sometimes moves faster than the Sketch updates.
 
 If you have questions, please don’t hesitate to ask in the #design channel on the WordPress community Slack.
