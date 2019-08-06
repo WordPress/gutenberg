@@ -386,7 +386,7 @@ export class InserterMenu extends Component {
 									</p>
 									<p>
 										{ __(
-											'There are blocks available for all kinds of content: you can insert text, headings, images, lists, videos, tables, and lots more!'
+											'There are blocks available for all kinds of content: insert text, headings, images, lists, videos, tables, and lots more.'
 										) }
 									</p>
 									<p>
