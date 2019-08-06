@@ -15,7 +15,7 @@ import controls from './controls';
 /**
  * Module Constants
  */
-const MODULE_KEY = 'core/download-blocks';
+const MODULE_KEY = 'core/block-directory';
 
 /**
  * Block editor data store configuration.

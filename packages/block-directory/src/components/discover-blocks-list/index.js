@@ -44,7 +44,7 @@ function DiscoverBlocksList( { items, onHover = () => {}, children, handleDownlo
 
 export default compose(
 	withDispatch( ( ownDispatch, props ) => {
-		const { installBlock, handleDownloadableBlock } = ownDispatch( 'core/download-blocks' );
+		const { installBlock, handleDownloadableBlock } = ownDispatch( 'core/block-directory' );
 		const { removeNotice } = ownDispatch( 'core/notices' );
 		const { onSelect } = props;
 
