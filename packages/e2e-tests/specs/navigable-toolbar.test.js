@@ -8,11 +8,9 @@ import { forEach } from 'lodash';
  */
 import { createNewPost, pressKeyWithModifier } from '@wordpress/e2e-test-utils';
 
-describe( 'block toolbar', () => {
-	forEach( {
-		unified: true,
-		contextual: false,
-	}, ( isUnifiedToolbar, label ) => {
+describe.each( [ [ 'unified', true ], [ 'contextual', false ] ] )(
+	'block toolbar (%s: %p)',
+	( label, isUnifiedToolbar ) => {
 		beforeEach( async () => {
 			await createNewPost();
 
@@ -44,5 +42,6 @@ describe( 'block toolbar', () => {
 				expect( await isInBlockToolbar() ).toBe( true );
 			} );
 		} );
-	} );
-} );
+	}
+);
+
