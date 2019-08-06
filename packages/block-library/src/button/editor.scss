@@ -76,6 +76,20 @@
 	}
 }
 
-.wp-block-button-wrapper {
-	display: table;
+// Tweak styles for the Preview.
+.block-editor-block-preview__content {
+	.wp-block-button-wrapper {
+		display: table;
+		margin: 0 auto;
+		text-align: center;
+	}
+
+	.block-editor-block-list__layout .block-editor-block-list__block[data-align] .block-editor-block-list__block-edit {
+		float: none;
+		margin: 0;
+	}
+
+	[data-type="core/button"].wp-block {
+		height: auto;
+	}
 }
