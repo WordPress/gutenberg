@@ -1,0 +1,30 @@
+{
+	"name": "@wordpress/styelint-plugin",
+	"version": "1.0.0",
+	"description": "Stylelint plugin for WordPress development.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"stylelint"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/stylelint-plugin/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/stylelint-plugin"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"files": [
+		"index.js"
+	],
+	"main": "index.js",
+	"publishConfig": {
+		"access": "public"
+	},
+	"dependencies": {
+		"stylelint-declaration-strict-value": "^1.1.3"
+	}
+}

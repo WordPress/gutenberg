@@ -79,6 +79,7 @@
 		"@wordpress/e2e-test-utils": "file:packages/e2e-test-utils",
 		"@wordpress/e2e-tests": "file:packages/e2e-tests",
 		"@wordpress/eslint-plugin": "file:packages/eslint-plugin",
+		"@wordpress/stylelint-plugin": "file:packages/stylelint-plugin",
 		"@wordpress/jest-console": "file:packages/jest-console",
 		"@wordpress/jest-preset-default": "file:packages/jest-preset-default",
 		"@wordpress/jest-puppeteer-axe": "file:packages/jest-puppeteer-axe",
