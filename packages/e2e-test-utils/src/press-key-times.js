@@ -5,7 +5,7 @@
  * @param {number} count Number of times to press.
  */
 export async function pressKeyTimes( key, count ) {
-	for ( let i = 0; i < count; i++ ) {
+	while ( count-- ) {
 		await page.keyboard.press( key );
 	}
 }
