@@ -38,7 +38,6 @@ export function BlockPreview( {
 			setVisibility( 'visible' );
 			return;
 		}
-		const blockClientIds = blocks.map( ( block ) => block.clientId );
 
 		// Timer - required to account for async render of `BlockEditorProvider`
 		const timerId = setTimeout( () => {
@@ -49,27 +48,20 @@ export function BlockPreview( {
 				return;
 			}
 
-			const comparisonBlock = blockClientIds.reduce( ( acc, currClientId ) => {
-				// Selector scoped to `previewContainerDomElement` to avoid global selector being ambiguous in the case
-				// of multiple previews on the same view
-				const previewDomElement = getBlockPreviewContainerDOMNode( currClientId, previewContainer );
+			// comparisonBlock
+			const block = blocks[ 0 ];
+			const previewElement = getBlockPreviewContainerDOMNode( block.clientId, previewContainer );
+			if ( previewElement ) {
+				const containerElementWidth = previewContainer.offsetWidth;
+				const previewElementHeight = previewElement.offsetHeight;
+				const previewElementWidth = previewElement.offsetWidth;
 
-				if ( previewDomElement ) {
-					acc.height += previewDomElement.offsetHeight;
+				const scale = containerElementWidth / previewElementWidth || 1;
 
-					if ( previewDomElement.offsetWidth > acc.width ) {
-						acc.width = previewDomElement.offsetWidth;
-					}
-				}
-
-				return acc;
-			}, { height: 0, width: 0 } );
-
-			const scale = previewContainer.offsetWidth / comparisonBlock.width || 1;
-
-			setIsTallPreview( comparisonBlock.height > previewContainer.offsetHeight );
-			setPreviewScale( scale );
-			setVisibility( 'visible' );
+				setIsTallPreview( previewElementHeight > previewElementHeight );
+				setPreviewScale( scale );
+				setVisibility( 'visible' );
+			}
 		}, 10 );
 
 		// Cleanup
