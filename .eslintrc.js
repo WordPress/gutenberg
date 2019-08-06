@@ -104,6 +104,7 @@ module.exports = {
 				};
 			} ),
 		} ],
+		'jest/valid-describe': 'off',
 	},
 	overrides: [
 		{

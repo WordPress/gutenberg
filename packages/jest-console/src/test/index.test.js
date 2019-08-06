@@ -33,7 +33,7 @@ describe( 'jest-console', () => {
 					expect( console ).not[ matcherName ]();
 					expect(
 						() => expect( console )[ matcherName ]()
-					).toThrowError( 'Expected mock function to be called.' );
+					).toThrow( 'Expected mock function to be called.' );
 				} );
 
 				test( `${ matcherNameWith } works with arguments that match`, () => {
@@ -46,7 +46,7 @@ describe( 'jest-console', () => {
 					expect( console ).not[ matcherNameWith ]( message );
 					expect(
 						() => expect( console )[ matcherNameWith ]( message )
-					).toThrowError( /Expected mock function to be called with:.*but it was called with:/s );
+					).toThrow( /Expected mock function to be called with:.*but it was called with:/s );
 				} );
 
 				test( `${ matcherNameWith } works with many arguments that do not match`, () => {
@@ -56,7 +56,7 @@ describe( 'jest-console', () => {
 					expect( console ).not[ matcherNameWith ]( message );
 					expect(
 						() => expect( console )[ matcherNameWith ]( message )
-					).toThrowError( /Expected mock function to be called with:.*but it was called with:.*Unknown param./s );
+					).toThrow( /Expected mock function to be called with:.*but it was called with:.*Unknown param./s );
 				} );
 
 				test( 'assertions number gets incremented after every matcher call', () => {
