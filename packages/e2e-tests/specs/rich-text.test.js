@@ -216,4 +216,16 @@ describe( 'RichText', () => {
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	it( 'should update internal selection after fresh focus', async () => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '1' );
+		await page.keyboard.press( 'Tab' );
+		await pressKeyWithModifier( 'shift', 'Tab' );
+		await pressKeyWithModifier( 'primary', 'b' );
+		await page.keyboard.type( '2' );
+		await pressKeyWithModifier( 'primary', 'b' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );
