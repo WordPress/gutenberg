@@ -11,7 +11,7 @@ import { registerCoreBlocks } from '@wordpress/block-library';
 /**
  * Internal dependencies
  */
-import { BlockPreviewContent } from '../index';
+import { BlockPreview } from '../index';
 
 describe( 'BlockPreviewContent', () => {
 	beforeAll( () => {
@@ -19,20 +19,15 @@ describe( 'BlockPreviewContent', () => {
 	} );
 
 	it( 'renders a preview with suitable default dimensions', () => {
-		const wrapper = shallow( <BlockPreviewContent
+		const wrapper = shallow( <BlockPreview
 			name="core/paragraph"
 		/> );
 
 		wrapper.update();
 
-		const previewAspectRatioStyle = wrapper.find( '.editor-block-preview__container' ).first().prop( 'style' );
 		const previewTransform = wrapper.find( '.editor-block-preview__content' ).first().prop( 'style' ).transform;
 		const previewScale = parseInt( previewTransform.match( /\d/ )[ 0 ], 10 );
 
 		expect( previewScale ).toEqual( 1 );
-
-		expect( previewAspectRatioStyle ).toEqual( {
-			paddingTop: '75%',
-		} );
 	} );
 } );
