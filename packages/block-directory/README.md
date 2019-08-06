@@ -1,6 +1,6 @@
-# Downloadable Blocks
+# Block directory
 
-Package used to extend block editor to download and install blocks directly.
+Package used to extend editor with block directory features to search and install blocks.
 
 > This package is meant to be used only with WordPress core. Feel free to use it in your own project but please keep in mind that it might never get fully documented.
 
