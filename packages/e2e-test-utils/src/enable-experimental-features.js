@@ -21,7 +21,14 @@ export async function enableExperimentalFeatures( features ) {
 
 	await Promise.all( features.map( async ( feature ) => {
 		await page.waitForSelector( feature );
-		await page.click( feature );
-		await page.click( '#submit' );
+		const checkedSelector = `${ feature }[checked=checked]`;
+		const isChecked = !! ( await page.$( checkedSelector ) );
+		if ( ! isChecked ) {
+			await page.click( feature );
+		}
 	} ) );
+	await Promise.all( [
+		page.waitForNavigation( { waitUntil: 'networkidle0' } ),
+		page.click( '#submit' ),
+	] );
 }
