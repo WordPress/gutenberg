@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { forEach } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { createNewPost, pressKeyWithModifier } from '@wordpress/e2e-test-utils';
