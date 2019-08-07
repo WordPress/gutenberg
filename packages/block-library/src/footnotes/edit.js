@@ -11,6 +11,7 @@ import { IconButton, Toolbar, Slot } from '@wordpress/components';
 import { useRef } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { withSafeTimeout } from '@wordpress/compose';
+import { RichText } from '@wordpress/rich-text';
 
 function Edit( { attributes, setAttributes, className, setTimeout } ) {
 	const { footnotes } = attributes;
@@ -67,10 +68,9 @@ function Edit( { attributes, setAttributes, className, setTimeout } ) {
 							↑
 						</a>
 						{ ' ' }
-						<input
-							aria-label={ __( 'Note' ) }
+						<RichText
 							value={ text }
-							onChange={ ( event ) => {
+							onChange={ ( value ) => {
 								setAttributes( {
 									footnotes: footnotes.map( ( footnote, i ) => {
 										if ( i !== index ) {
@@ -79,7 +79,7 @@ function Edit( { attributes, setAttributes, className, setTimeout } ) {
 
 										return {
 											...footnote,
-											text: event.target.value,
+											text: value,
 										};
 									} ),
 								} );
