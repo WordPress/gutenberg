@@ -60,6 +60,16 @@
 	}
 }
 
+// This negates the animation above, and is used on child elements that don't require animation.
+@keyframes edit-post__inner-blocks-padding-negative-animation {
+	from {
+		transform: scale(0.99);
+	}
+	to {
+		transform: scale(1);
+	}
+}
+
 // In order to use mix-blend-mode, this element needs to have an explicitly set background-color
 // We scope it to .wp-toolbar to be wp-admin only, to prevent bleed into other implementations
 html.wp-toolbar {

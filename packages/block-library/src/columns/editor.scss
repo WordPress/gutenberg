@@ -197,4 +197,10 @@ div.block-core-columns.is-vertically-aligned-bottom {
 		margin: -$block-padding;
 		width: calc(100% + #{$block-padding * 2});
 	}
+
+	// Negate the animation for the appender and placeholders.
+	> .block-editor-block-list__layout > .block-list-appender,
+	> .components-placeholder {
+		@include edit-post__inner-blocks-padding-negative-animation();
+	}
 }

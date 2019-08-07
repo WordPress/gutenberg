@@ -93,6 +93,11 @@
 	> .wp-block-group__inner-container > .block-editor-inner-blocks {
 		padding: $block-padding;
 		@include edit-post__inner-blocks-padding-animation();
+
+		// Negate the animation for the appender.
+		> .block-editor-block-list__layout > .block-list-appender {
+			@include edit-post__inner-blocks-padding-negative-animation();
+		}
 	}
 
 	&:not(.has-background) > .wp-block-group__inner-container > .block-editor-inner-blocks > .block-editor-block-list__layout {
