@@ -15,6 +15,7 @@ import {
 	insertObject,
 	applyFormat,
 } from '@wordpress/rich-text';
+import { Fill, IconButton } from '@wordpress/components';
 
 const name = 'core/footnote';
 const title = __( 'Footnote' );
@@ -62,12 +63,19 @@ function Edit( { value, onChange, isActive } ) {
 	};
 
 	return (
-		<RichTextToolbarButton
-			icon="editor-ol"
-			title={ title }
-			onClick={ isActive ? remove : add }
-			isActive={ isActive }
-		/>
+		<>
+			<RichTextToolbarButton
+				icon="editor-ol"
+				title={ title }
+				onClick={ isActive ? remove : add }
+				isActive={ isActive }
+			/>
+			<Fill name="__unstable-footnote-controls">
+				<IconButton icon="trash" onClick={ remove }>
+					Remove Footnote
+				</IconButton>
+			</Fill>
+		</>
 	);
 }
 

@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { IconButton, Toolbar } from '@wordpress/components';
+import { IconButton, Toolbar, Slot } from '@wordpress/components';
 import { useRef } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { withSafeTimeout } from '@wordpress/compose';
@@ -45,9 +45,7 @@ function Edit( { attributes, setAttributes, className, setTimeout } ) {
 					<IconButton icon="editor-ol" onClick={ viewAll }>
 						View all Footnotes
 					</IconButton>
-					<IconButton icon="trash">
-						Remove Footnote
-					</IconButton>
+					<Slot name="__unstable-footnote-controls" />
 				</Toolbar>
 			}
 			<ol>
