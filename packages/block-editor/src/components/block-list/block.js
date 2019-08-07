@@ -486,7 +486,7 @@ function BlockListBlock( {
 	//  jsx-a11y/no-static-element-interactions:
 	//   - Each block can be selected by clicking on it
 
-	/* eslint-disable jsx-a11y/mouse-events-have-key-events, jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
+	/* eslint-disable jsx-a11y/mouse-events-have-key-events, jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
 
 	return (
 		<IgnoreNestedEvents
@@ -618,7 +618,7 @@ function BlockListBlock( {
 			) }
 		</IgnoreNestedEvents>
 	);
-	/* eslint-enable jsx-a11y/mouse-events-have-key-events, jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
+	/* eslint-enable jsx-a11y/mouse-events-have-key-events, jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
 }
 
 const applyWithSelect = withSelect(

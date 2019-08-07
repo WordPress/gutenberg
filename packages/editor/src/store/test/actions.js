@@ -436,8 +436,7 @@ describe( 'Post generator actions', () => {
 			} );
 		};
 
-		describe( 'yields with expected responses when edited post is not ' +
-			'saveable', () => {
+		describe( 'yields with expected responses when edited post is not saveable', () => {
 			it( 'yields action for selecting if edited post is saveable', () => {
 				reset( false );
 				const { value } = fulfillment.next();
@@ -451,8 +450,7 @@ describe( 'Post generator actions', () => {
 				expect( value ).toBeUndefined();
 			} );
 		} );
-		describe( 'yields with expected responses for when not autosaving ' +
-			'and edited post is new', () => {
+		describe( 'yields with expected responses for when not autosaving and edited post is new', () => {
 			beforeEach( () => {
 				isAutosave = false;
 				isEditedPostNew = true;
@@ -469,8 +467,7 @@ describe( 'Post generator actions', () => {
 			} );
 		} );
 
-		describe( 'yields with expected responses for when not autosaving ' +
-			'and edited post is not new', () => {
+		describe( 'yields with expected responses for when not autosaving and edited post is not new', () => {
 			beforeEach( () => {
 				isAutosave = false;
 				isEditedPostNew = false;
@@ -486,8 +483,7 @@ describe( 'Post generator actions', () => {
 				fetchSuccessConditions.forEach( testRunRoutine );
 			} );
 		} );
-		describe( 'yields with expected responses for when autosaving is true ' +
-			'and edited post is not new', () => {
+		describe( 'yields with expected responses for when autosaving is true and edited post is not new', () => {
 			beforeEach( () => {
 				isAutosave = true;
 				isEditedPostNew = false;
