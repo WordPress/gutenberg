@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { debounce } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
@@ -17,7 +12,6 @@ class Edit extends Component {
 	constructor() {
 		super( ...arguments );
 		this.updateList = this.updateList.bind( this );
-		this.debouncedUpdateList = debounce( this.updateList.bind( this ), 100 );
 		this.getAttributes = this.getAttributes.bind( this );
 		this.setAttributes = this.setAttributes.bind( this );
 		this.state = {
@@ -27,15 +21,8 @@ class Edit extends Component {
 	}
 
 	componentDidMount() {
-		// Hack: need to wait for selection to be stored in editor store.
-		document.addEventListener( 'selectionchange', this.debouncedUpdateList );
-
 		// Wait for the DOM to update.
 		this.props.setTimeout( this.updateList );
-	}
-
-	componentWillUnmount() {
-		document.removeEventListener( 'selectionchange', this.debouncedUpdateList );
 	}
 
 	componentDidUpdate( prevProps ) {
