@@ -43,13 +43,27 @@ Button text should also be quickly scannable — avoid unnecessary words and art
 
 Link buttons have low emphasis. They don’t stand out much on the page, so they’re used for less-important actions. What’s less important can vary based on context, but it’s usually a supplementary action to the main action we want someone to take. Link buttons are also useful when you don’t want to distract from the content.
 
-![Link button](https://make.wordpress.org/design/files/2019/03/link-button.png)
+
+<!-- wp:handbook/example -->
+```jsx
+<Button href="#">
+	Add new category
+</Button>
+```
+<!-- /wp:handbook/example -->
 
 #### Default button
 
 Default buttons have medium emphasis. The button appearance helps differentiate them from the page background, so they’re useful when you want more emphasis than a link button offers.
 
-![Default button](https://make.wordpress.org/design/files/2019/03/default-button.png)
+
+<!-- wp:handbook/example -->
+```jsx
+<Button isDefault>
+	Preview
+</Button>
+```
+<!-- /wp:handbook/example -->
 
 #### Primary button
 
@@ -57,7 +71,13 @@ Primary buttons have high emphasis. Their color fill and shadow means they pop o
 
 Since a high-emphasis button commands the most attention, a layout should contain a single primary button. This makes it clear that other buttons have less importance and helps users understand when an action requires their attention.
 
-![Primary button](https://make.wordpress.org/design/files/2019/03/primary-button.png)
+<!-- wp:handbook/example -->
+```jsx
+<Button isPrimary>
+	Publish
+</Button>
+```
+<!-- /wp:handbook/example -->
 
 #### Text label
 
@@ -110,13 +130,15 @@ Renders a button with default style.
 
 ```jsx
 import { Button } from "@wordpress/components";
-
-const MyButton = () => (
-	<Button isDefault>
-		Click me!
-	</Button>
-);
 ```
+
+<!-- wp:handbook/example -->
+```jsx
+<Button isDefault>
+	Click me!
+</Button>
+```
+<!-- /wp:handbook/example -->
 
 ### Props
 
