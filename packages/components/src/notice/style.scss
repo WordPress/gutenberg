@@ -52,7 +52,7 @@
 	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover,
 	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):active,
 	&:not(:disabled):not([aria-disabled="true"]):focus {
-		color: $alert-red;
+		color: $dark-gray-900;
 		background-color: transparent;
 	}
 

@@ -45,9 +45,8 @@ async function openPreviewPage( editorPage ) {
  * @return {Promise} Promise resolving once navigation completes.
  */
 async function waitForPreviewNavigation( previewPage ) {
-	const navigationCompleted = previewPage.waitForNavigation();
 	await page.click( '.editor-post-preview' );
-	return navigationCompleted;
+	return previewPage.waitForNavigation();
 }
 
 /**
@@ -71,8 +70,10 @@ async function toggleCustomFieldsOption( shouldBeChecked ) {
 	);
 
 	if ( isChecked !== shouldBeChecked ) {
-		const navigationCompleted = page.waitForNavigation();
 		await checkboxHandle.click();
+		const [ saveButton ] = await page.$x( shouldBeChecked ? '//button[text()="Enable & Reload"]' : '//button[text()="Disable & Reload"]' );
+		const navigationCompleted = page.waitForNavigation();
+		saveButton.click();
 		await navigationCompleted;
 		return;
 	}

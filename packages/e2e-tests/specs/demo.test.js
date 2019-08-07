@@ -1,7 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { visitAdminPage, createURLMatcher, setUpResponseMocking, mockOrTransform } from '@wordpress/e2e-test-utils';
+import {
+	createEmbeddingMatcher,
+	createJSONResponse,
+	setUpResponseMocking,
+	visitAdminPage,
+} from '@wordpress/e2e-test-utils';
 
 const MOCK_VIMEO_RESPONSE = {
 	url: 'https://vimeo.com/22439234',
@@ -12,20 +17,12 @@ const MOCK_VIMEO_RESPONSE = {
 	version: '1.0',
 };
 
-const couldNotBePreviewed = ( embedObject ) => {
-	return 'Embed Handler' === embedObject.provider_name;
-};
-
-const stripIframeFromEmbed = ( embedObject ) => {
-	return { ...embedObject, html: embedObject.html.replace( /src=[^\s]+/, '' ) };
-};
-
 describe( 'new editor state', () => {
 	beforeAll( async () => {
 		await setUpResponseMocking( [
 			{
-				match: createURLMatcher( 'oembed%2F1.0%2Fproxy' ),
-				onRequestMatch: mockOrTransform( couldNotBePreviewed, MOCK_VIMEO_RESPONSE, stripIframeFromEmbed ),
+				match: createEmbeddingMatcher( 'https://vimeo.com/22439234' ),
+				onRequestMatch: createJSONResponse( MOCK_VIMEO_RESPONSE ),
 			},
 		] );
 		await visitAdminPage( 'post-new.php', 'gutenberg-demo' );

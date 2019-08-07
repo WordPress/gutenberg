@@ -90,6 +90,11 @@
 		line-height: 1;
 		margin: 0;
 	}
+
+	.components-icon-button {
+		position: relative;
+		left: $grid-size;
+	}
 }
 
 .components-modal__header-heading-container {

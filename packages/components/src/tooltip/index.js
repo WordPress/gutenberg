@@ -22,7 +22,7 @@ import Shortcut from '../shortcut';
 /**
  * Time over children to wait before showing tooltip
  *
- * @type {Number}
+ * @type {number}
  */
 const TOOLTIP_DELAY = 700;
 

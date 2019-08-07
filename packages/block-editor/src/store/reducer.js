@@ -581,7 +581,7 @@ const withSaveReusableBlock = ( reducer ) => ( state, action ) => {
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
  *
- * @returns {Object} Updated state.
+ * @return {Object} Updated state.
  */
 export const blocks = flow(
 	combineReducers,
