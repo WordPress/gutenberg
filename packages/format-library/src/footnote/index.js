@@ -14,6 +14,8 @@ import {
 	isCollapsed,
 	insertObject,
 	applyFormat,
+	getActiveObject,
+	remove,
 } from '@wordpress/rich-text';
 import { Fill, IconButton } from '@wordpress/components';
 
@@ -45,6 +47,16 @@ const addFootnote = ( value ) => {
 	return newValue;
 };
 
+const removeFootnote = ( value ) => {
+	const activeObject = getActiveObject( value );
+
+	if ( activeObject && activeObject.type === name ) {
+		return remove( value );
+	}
+
+	return removeFormat( value, name );
+};
+
 function Edit( { value, onChange, isActive } ) {
 	const blockType = useSelect( ( select ) =>
 		select( 'core/blocks' ).getBlockType( 'core/footnotes' )
@@ -58,8 +70,8 @@ function Edit( { value, onChange, isActive } ) {
 	const add = () => {
 		onChange( addFootnote( value ) );
 	};
-	const remove = () => {
-		onChange( removeFormat( value, name ) );
+	const rm = () => {
+		onChange( removeFootnote( value ) );
 	};
 
 	return (
@@ -67,11 +79,11 @@ function Edit( { value, onChange, isActive } ) {
 			<RichTextToolbarButton
 				icon="editor-ol"
 				title={ title }
-				onClick={ isActive ? remove : add }
+				onClick={ isActive ? rm : add }
 				isActive={ isActive }
 			/>
 			<Fill name="__unstable-footnote-controls">
-				<IconButton icon="trash" onClick={ remove }>
+				<IconButton icon="trash" onClick={ rm }>
 					Remove Footnote
 				</IconButton>
 			</Fill>
