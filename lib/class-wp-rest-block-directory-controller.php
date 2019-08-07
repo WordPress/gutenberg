@@ -14,7 +14,7 @@
  *
  * @see WP_REST_Controller
  */
-class WP_REST_Blocks_Search_Controller extends WP_REST_Controller {
+class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 
 	/**
 	 * Constructs the controller.

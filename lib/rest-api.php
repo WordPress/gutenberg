@@ -83,8 +83,8 @@ add_action( 'rest_api_init', 'gutenberg_register_rest_widget_areas' );
  */
 
 
-function gutenberg_register_rest_blocks_search() {
-	$blocks_search_controller = new WP_REST_Blocks_Search_Controller();
-	$blocks_search_controller->register_routes();
+function gutenberg_register_rest_block_directory() {
+	$block_directory_controller = new WP_REST_Block_Directory_Controller();
+	$block_directory_controller->register_routes();
 }
-add_filter( 'rest_api_init', 'gutenberg_register_rest_blocks_search' ); 
+add_filter( 'rest_api_init', 'gutenberg_register_rest_block_directory' ); 
