@@ -72,6 +72,7 @@ $tree-item-height: 36px;
 	}
 
 	& > .block-editor-block-navigation__item-anchor-name {
+		color: $blue-medium-600;
 		margin-left: auto;
 		font-style: italic;
 		white-space: nowrap;
