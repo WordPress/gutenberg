@@ -310,8 +310,8 @@ export function undo( state = UNDO_INITIAL_STATE, action ) {
 			}
 
 			// Transient edits don't create an undo level, but are
-			// reachable in the next meaningful edit to which they
-			// are merged. They are defined in the entity's config.
+			// added to the last level right before a new level
+			// is added.
 			if ( ! Object.keys( action.edits ).some( ( key ) => ! action.transientEdits[ key ] ) ) {
 				const nextState = [ ...state ];
 				nextState.flattenedUndo = { ...state.flattenedUndo, ...action.edits };
@@ -333,7 +333,10 @@ export function undo( state = UNDO_INITIAL_STATE, action ) {
 			} else {
 				// Clear potential redos, because this only supports linear history.
 				nextState = state.slice( 0, state.offset || undefined );
-				nextState.flattenedUndo = state.flattenedUndo;
+				const lastItem = nextState[ nextState.length - 1 ];
+				if ( lastItem ) {
+					lastItem.edits = { ...lastItem.edits, ...state.flattenedUndo };
+				}
 			}
 			nextState.offset = 0;
 
@@ -341,7 +344,7 @@ export function undo( state = UNDO_INITIAL_STATE, action ) {
 				kind: action.kind,
 				name: action.name,
 				recordId: action.recordId,
-				edits: { ...nextState.flattenedUndo, ...action.edits },
+				edits: action.edits,
 			} );
 
 			return nextState;

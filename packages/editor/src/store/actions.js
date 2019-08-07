@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { has, castArray } from 'lodash';
+import memoize from 'memize';
 
 /**
  * WordPress dependencies
@@ -716,30 +717,33 @@ export function unlockPostSaving( lockName ) {
  *
  * @return {string} The blocks serialization.
  */
-export function serializeBlocks( blocksForSerialization ) {
-	// A single unmodified default block is assumed to
-	// be equivalent to an empty post.
-	if (
-		blocksForSerialization.length === 1 &&
-		isUnmodifiedDefaultBlock( blocksForSerialization[ 0 ] )
-	) {
-		blocksForSerialization = [];
-	}
+export const serializeBlocks = memoize(
+	( blocksForSerialization ) => {
+		// A single unmodified default block is assumed to
+		// be equivalent to an empty post.
+		if (
+			blocksForSerialization.length === 1 &&
+			isUnmodifiedDefaultBlock( blocksForSerialization[ 0 ] )
+		) {
+			blocksForSerialization = [];
+		}
 
-	let content = serialize( blocksForSerialization );
+		let content = serialize( blocksForSerialization );
 
-	// For compatibility, treat a post consisting of a
-	// single freeform block as legacy content and apply
-	// pre-block-editor removep'd content formatting.
-	if (
-		blocksForSerialization.length === 1 &&
-		blocksForSerialization[ 0 ].name === getFreeformContentHandlerName()
-	) {
-		content = removep( content );
-	}
+		// For compatibility, treat a post consisting of a
+		// single freeform block as legacy content and apply
+		// pre-block-editor removep'd content formatting.
+		if (
+			blocksForSerialization.length === 1 &&
+			blocksForSerialization[ 0 ].name === getFreeformContentHandlerName()
+		) {
+			content = removep( content );
+		}
 
-	return content;
-}
+		return content;
+	},
+	{ maxSize: 1 }
+);
 
 /**
  * Returns an action object used to signal that the blocks have been updated.

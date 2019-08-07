@@ -37,6 +37,7 @@ import {
 	AUTOSAVE_PROPERTIES,
 } from './constants';
 import { getPostRawValue } from './reducer';
+import { serializeBlocks } from './actions';
 
 /**
  * Shared reference to an empty object for cases where it is important to avoid
@@ -839,8 +840,7 @@ export function getBlocksForSerialization( state ) {
 }
 
 /**
- * Returns the content of the post being edited, preferring raw string edit
- * before falling back to serialization of block state.
+ * Returns the content of the post being edited.
  *
  * @param {Object} state Global application state.
  *
@@ -849,8 +849,15 @@ export function getBlocksForSerialization( state ) {
 export const getEditedPostContent = createRegistrySelector( ( select ) => ( state ) => {
 	const postId = getCurrentPostId( state );
 	const postType = getCurrentPostType( state );
-	const record = select( 'core' ).getEditedEntityRecord( 'postType', postType, postId );
-	return record ? record.content : '';
+	const record = select( 'core' ).getEditedEntityRecord(
+		'postType',
+		postType,
+		postId
+	);
+	if ( record ) {
+		return record.blocks ? serializeBlocks( record.blocks ) : record.content || '';
+	}
+	return '';
 } );
 
 /**
