@@ -17,7 +17,7 @@ function DiscoverBlocksList( { items, onHover = () => {}, children, handleDownlo
 		 * Safari+VoiceOver won't announce the list otherwise.
 		 */
 		/* eslint-disable jsx-a11y/no-redundant-roles */
-		<ul role="list" className="block-editor-discover-blocks-list">
+		<ul role="list" className="block-directory-downloadable-blocks-list">
 			{ items && items.map( ( item ) =>
 				<DiscoverBlockListItem
 					key={ item.id }

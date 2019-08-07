@@ -124,7 +124,7 @@ const initializeAllClosedMenuStateAndReturnElement = ( propOverrides ) => {
 
 const assertNoResultsMessageToBePresent = ( element ) => {
 	const noResultsMessage = element.querySelector(
-		'.block-editor-discover-blocks-panel__description.has-no-results'
+		'.block-directory-downloadable-blocks-panel__description.has-no-results'
 	);
 	expect( noResultsMessage.textContent ).toContain( 'No blocks found' );
 };

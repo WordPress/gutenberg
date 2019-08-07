@@ -15,7 +15,7 @@ import DiscoverBlocksList from '../discover-blocks-list';
 function DiscoverBlocksPanel( { discoverItems, onSelect, onHover, hasPermission, isLoading } ) {
 	if ( isLoading ) {
 		return (
-			<p className="block-editor-discover-blocks-panel__description has-no-results">
+			<p className="block-directory-downloadable-blocks-panel__description has-no-results">
 				<Spinner />
 			</p>
 		);
@@ -23,7 +23,7 @@ function DiscoverBlocksPanel( { discoverItems, onSelect, onHover, hasPermission,
 
 	if ( ! hasPermission ) {
 		return (
-			<p className="block-editor-discover-blocks-panel__description has-no-results">
+			<p className="block-directory-downloadable-blocks-panel__description has-no-results">
 				{ __( 'No blocks found in your library.' ) }
 				<br />
 				{ __( 'Please contact your site administrator to install new blocks.' ) }
@@ -33,7 +33,7 @@ function DiscoverBlocksPanel( { discoverItems, onSelect, onHover, hasPermission,
 
 	if ( ! discoverItems.length ) {
 		return (
-			<p className="block-editor-discover-blocks-panel__description has-no-results">
+			<p className="block-directory-downloadable-blocks-panel__description has-no-results">
 				{ __( 'No blocks found in your library.' ) }
 			</p>
 		);
@@ -41,7 +41,7 @@ function DiscoverBlocksPanel( { discoverItems, onSelect, onHover, hasPermission,
 
 	return (
 		<Fragment>
-			<p className="block-editor-discover-blocks-panel__description">
+			<p className="block-directory-downloadable-blocks-panel__description">
 				{ __( 'No blocks found in your library. We did find these blocks available for download:' ) }
 			</p>
 			<DiscoverBlocksList items={ discoverItems } onSelect={ onSelect } onHover={ onHover } />
