@@ -3,4 +3,4 @@
  */
 import './store';
 
-export { default as DiscoverBlocksPanel } from './components/discover-blocks-panel';
+export { default as DownloadableBlocksPanel } from './components/downloadable-blocks-panel';

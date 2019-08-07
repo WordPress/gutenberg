@@ -5,7 +5,7 @@ import { Fragment } from '@wordpress/element';
 import { Icon } from '@wordpress/components';
 import { _n, sprintf } from '@wordpress/i18n';
 
-function DiscoverBlockInfo( { description, activeInstalls, humanizedUpdated } ) {
+function DownloadableBlockInfo( { description, activeInstalls, humanizedUpdated } ) {
 	return (
 		<Fragment>
 			<span className="block-directory-downloadable-block-info__content">
@@ -23,4 +23,4 @@ function DiscoverBlockInfo( { description, activeInstalls, humanizedUpdated } ) 
 	);
 }
 
-export default DiscoverBlockInfo;
+export default DownloadableBlockInfo;

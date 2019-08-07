@@ -10,9 +10,9 @@ import { Spinner } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import DiscoverBlocksList from '../discover-blocks-list';
+import DownloadableBlocksList from '../downloadable-blocks-list';
 
-function DiscoverBlocksPanel( { discoverItems, onSelect, onHover, hasPermission, isLoading } ) {
+function DownloadableBlocksPanel( { discoverItems, onSelect, onHover, hasPermission, isLoading } ) {
 	if ( isLoading ) {
 		return (
 			<p className="block-directory-downloadable-blocks-panel__description has-no-results">
@@ -44,7 +44,7 @@ function DiscoverBlocksPanel( { discoverItems, onSelect, onHover, hasPermission,
 			<p className="block-directory-downloadable-blocks-panel__description">
 				{ __( 'No blocks found in your library. We did find these blocks available for download:' ) }
 			</p>
-			<DiscoverBlocksList items={ discoverItems } onSelect={ onSelect } onHover={ onHover } />
+			<DownloadableBlocksList items={ discoverItems } onSelect={ onSelect } onHover={ onHover } />
 		</Fragment>
 	);
 }
@@ -52,14 +52,14 @@ function DiscoverBlocksPanel( { discoverItems, onSelect, onHover, hasPermission,
 export default compose( [
 	withSelect( ( select, { filterValue } ) => {
 		const {
-			getDiscoverBlocks,
+			getDownloadableBlocks,
 			hasInstallBlocksPermission,
-			isRequestingDiscoverBlocks,
+			isRequestingDownloadableBlocks,
 		} = select( 'core/block-directory' );
 
-		const discoverItems = getDiscoverBlocks( filterValue );
+		const discoverItems = getDownloadableBlocks( filterValue );
 		const hasPermission = hasInstallBlocksPermission();
-		const isLoading = isRequestingDiscoverBlocks();
+		const isLoading = isRequestingDownloadableBlocks();
 
 		return {
 			discoverItems,
@@ -67,4 +67,4 @@ export default compose( [
 			isLoading,
 		};
 	} ),
-] )( DiscoverBlocksPanel );
+] )( DownloadableBlocksPanel );

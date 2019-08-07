@@ -13,7 +13,7 @@ import { dispatch, apiFetch, loadAssets } from './controls';
  *
  * @return {Object} Action object.
  */
-export function fetchDiscoverBlocks() {
+export function fetchDownloadableBlocks() {
 	return { type: 'FETCH_DISCOVER_BLOCKS' };
 }
 
@@ -23,7 +23,7 @@ export function fetchDiscoverBlocks() {
  *
  * @return {Object} Action object.
  */
-export function receiveDiscoverBlocks( discoverBlocks, filterValue ) {
+export function receiveDownloadableBlocks( discoverBlocks, filterValue ) {
 	return { type: 'RECEIVE_DISCOVER_BLOCKS', discoverBlocks, filterValue };
 }
 

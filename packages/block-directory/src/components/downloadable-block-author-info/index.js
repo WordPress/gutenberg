@@ -3,7 +3,7 @@
  */
 import { Fragment } from '@wordpress/element';
 
-function DiscoverBlockAuthorInfo( { author } ) {
+function DownloadableBlockAuthorInfo( { author } ) {
 	return (
 		<Fragment>
 			<span className="block-directory-downloadable-block-author-info__content-author">
@@ -19,4 +19,4 @@ function DiscoverBlockAuthorInfo( { author } ) {
 	);
 }
 
-export default DiscoverBlockAuthorInfo;
+export default DownloadableBlockAuthorInfo;

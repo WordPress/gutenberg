@@ -1,11 +1,11 @@
 /**
  * Internal dependencies
  */
-import DiscoverBlockHeader from '../discover-block-header';
-import DiscoverBlockAuthorInfo from '../discover-block-author-info';
-import DiscoverBlockInfo from '../discover-block-info';
+import DownloadableBlockHeader from '../downloadable-block-header';
+import DownloadableBlockAuthorInfo from '../downloadable-block-author-info';
+import DownloadableBlockInfo from '../downloadable-block-info';
 
-function DiscoverBlockListItem( {
+function DownloadableBlockListItem( {
 	item,
 	onClick,
 } ) {
@@ -24,7 +24,7 @@ function DiscoverBlockListItem( {
 		<li className="block-directory-downloadable-block-list-item">
 			<div className="block-directory-downloadable-block-list-item__panel">
 				<div className="block-directory-downloadable-block-list-item__header">
-					<DiscoverBlockHeader
+					<DownloadableBlockHeader
 						icon={ icon }
 						onClick={ onClick }
 						title={ title }
@@ -33,14 +33,14 @@ function DiscoverBlockListItem( {
 					/>
 				</div>
 				<div className="block-directory-downloadable-block-list-item__body">
-					<DiscoverBlockInfo
+					<DownloadableBlockInfo
 						activeInstalls={ activeInstalls }
 						description={ description }
 						humanizedUpdated={ humanizedUpdated }
 					/>
 				</div>
 				<div className="block-directory-downloadable-block-list-item__footer">
-					<DiscoverBlockAuthorInfo
+					<DownloadableBlockAuthorInfo
 						author={ author }
 					/>
 				</div>
@@ -49,4 +49,4 @@ function DiscoverBlockListItem( {
 	);
 }
 
-export default DiscoverBlockListItem;
+export default DownloadableBlockListItem;

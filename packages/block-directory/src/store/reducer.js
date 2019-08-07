@@ -11,12 +11,12 @@ import { combineReducers } from '@wordpress/data';
  *
  * @return {Object} Updated state.
  */
-export const discoverBlocks = ( state = { results: {}, hasPermission: undefined, filterValue: undefined, isRequestingDiscoverBlocks: true }, action ) => {
+export const discoverBlocks = ( state = { results: {}, hasPermission: undefined, filterValue: undefined, isRequestingDownloadableBlocks: true }, action ) => {
 	switch ( action.type ) {
 		case 'FETCH_DISCOVER_BLOCKS' :
 			return {
 				...state,
-				isRequestingDiscoverBlocks: true,
+				isRequestingDownloadableBlocks: true,
 			};
 		case 'RECEIVE_DISCOVER_BLOCKS' :
 			return {
@@ -25,14 +25,14 @@ export const discoverBlocks = ( state = { results: {}, hasPermission: undefined,
 					[ action.filterValue ]: action.discoverBlocks,
 				} ),
 				hasPermission: true,
-				isRequestingDiscoverBlocks: false,
+				isRequestingDownloadableBlocks: false,
 			};
 		case 'SET_INSTALL_BLOCKS_PERMISSION' :
 			return {
 				...state,
 				items: action.hasPermission ? state.items : [],
 				hasPermission: action.hasPermission,
-				isRequestingDiscoverBlocks: false,
+				isRequestingDownloadableBlocks: false,
 			};
 	}
 	return state;

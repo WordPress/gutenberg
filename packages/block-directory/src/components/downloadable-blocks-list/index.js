@@ -8,9 +8,9 @@ import { compose } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import DiscoverBlockListItem from '../discover-block-list-item';
+import DownloadableBlockListItem from '../downloadable-block-list-item';
 
-function DiscoverBlocksList( { items, onHover = () => {}, children, handleDownloadableBlock, installBlock } ) {
+function DownloadableBlocksList( { items, onHover = () => {}, children, handleDownloadableBlock, installBlock } ) {
 	return (
 		/*
 		 * Disable reason: The `list` ARIA role is redundant but
@@ -19,7 +19,7 @@ function DiscoverBlocksList( { items, onHover = () => {}, children, handleDownlo
 		/* eslint-disable jsx-a11y/no-redundant-roles */
 		<ul role="list" className="block-directory-downloadable-blocks-list">
 			{ items && items.map( ( item ) =>
-				<DiscoverBlockListItem
+				<DownloadableBlockListItem
 					key={ item.id }
 					className={ getBlockMenuDefaultClassName( item.id ) }
 					icons={ item.icons }
@@ -68,4 +68,4 @@ export default compose(
 			removeNotice,
 		};
 	} ),
-)( DiscoverBlocksList );
+)( DownloadableBlocksList );

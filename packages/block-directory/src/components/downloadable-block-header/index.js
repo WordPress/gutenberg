@@ -11,7 +11,7 @@ import { Fragment } from '@wordpress/element';
 import { BlockIcon } from '@wordpress/block-editor';
 import BlockRatings from '../block-ratings';
 
-function DiscoverBlockHeader( { icon, title, rating, ratingCount, onClick } ) {
+function DownloadableBlockHeader( { icon, title, rating, ratingCount, onClick } ) {
 	return (
 		<Fragment>
 			<div className="block-directory-downloadable-block-header__row">
@@ -43,4 +43,4 @@ function DiscoverBlockHeader( { icon, title, rating, ratingCount, onClick } ) {
 	);
 }
 
-export default DiscoverBlockHeader;
+export default DownloadableBlockHeader;

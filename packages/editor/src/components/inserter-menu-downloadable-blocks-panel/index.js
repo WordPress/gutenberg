@@ -7,7 +7,7 @@ import { debounce } from 'lodash';
  * WordPress dependencies
  */
 import { __experimentalInserterMenuExtension } from '@wordpress/block-editor';
-import { DiscoverBlocksPanel } from '@wordpress/block-directory';
+import { DownloadableBlocksPanel } from '@wordpress/block-directory';
 import { useState } from '@wordpress/element';
 
 function InserterMenuDownloadableBlocksPanel() {
@@ -32,7 +32,7 @@ function InserterMenuDownloadableBlocksPanel() {
 					}
 
 					return (
-						<DiscoverBlocksPanel
+						<DownloadableBlocksPanel
 							onSelect={ onSelect }
 							onHover={ onHover }
 							filterValue={ state.debouncedFilterValue }

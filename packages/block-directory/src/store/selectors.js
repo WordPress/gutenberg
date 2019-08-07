@@ -10,8 +10,8 @@ import { get } from 'lodash';
  *
  * @return {Array} Discoverable blocks
  */
-export function isRequestingDiscoverBlocks( state ) {
-	return state.discoverBlocks.isRequestingDiscoverBlocks;
+export function isRequestingDownloadableBlocks( state ) {
+	return state.discoverBlocks.isRequestingDownloadableBlocks;
 }
 
 /**
@@ -22,7 +22,7 @@ export function isRequestingDiscoverBlocks( state ) {
  *
  * @return {Array} Discoverable blocks
  */
-export function getDiscoverBlocks( state, filterValue ) {
+export function getDownloadableBlocks( state, filterValue ) {
 	if ( ! state.discoverBlocks.results[ filterValue ] ) {
 		return [];
 	}
