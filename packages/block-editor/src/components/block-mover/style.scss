@@ -5,16 +5,6 @@
 	&.is-visible {
 		@include edit-post__fade-in-animation;
 	}
-
-	// 24px is the smallest size of a good pressable button.
-	// With 3 pieces of side UI, that comes to a total of 72px.
-	// To vertically center against a 56px paragraph, move upwards 72px - 56px / 2.
-	// Don't do this for wide, fullwide, or mobile.
-	@include break-small() {
-		.block-editor-block-list__block:not([data-align="wide"]):not([data-align="full"]) & {
-			margin-top: -$grid-size;
-		}
-	}
 }
 
 // Mover icon buttons.
@@ -24,6 +14,9 @@
 	justify-content: center;
 	cursor: pointer;
 	padding: 0;
+	border-radius: 0;
+	transition: background-color 0.1s ease-out;
+	@include reduce-motion("transition");
 
 	// Carefully adjust the size of the side UI to fit one paragraph of text (56px).
 	width: $block-side-ui-width;
@@ -36,21 +29,49 @@
 	}
 
 	// Use opacity to work in various editor styles
+	background-color: $dark-opacity-light-500;
 	color: $dark-opacity-300;
 
 	.is-dark-theme & {
-		color: $light-opacity-300;
+		background-color: $light-opacity-light-400;
+		color: $light-opacity-900;
 	}
 
-	// Nested movers have a background, so don't invert the colors there.
-	.is-dark-theme .wp-block .wp-block &,
-	.wp-block .is-dark-theme .wp-block & {
-		color: $dark-opacity-300;
+	.is-selected & {
+		background-color: $dark-gray-500;
+		color: $light-gray-500;
+
+		.is-dark-theme & {
+			background-color: $light-opacity-light-400;
+			color: $light-opacity-400;
+		}
+	}
+
+	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover,
+	&:focus:not(:disabled) {
+		background-color: $dark-opacity-light-500;
+		box-shadow: none;
+
+		.is-selected & {
+			background-color: $dark-gray-500;
+			color: $white;
+		}
+
+		.is-dark-theme & {
+			background-color: $light-opacity-light-400;
+			color: $white;
+		}
+
+		.is-dark-theme .is-selected & {
+			background-color: $light-gray-600;
+			color: $dark-gray-900;
+		}
 	}
 
 	&[aria-disabled="true"] {
 		cursor: default;
 		pointer-events: none;
+		opacity: 1;
 		color: $dark-opacity-light-300; // Use opacity to work in various editor styles.
 
 		.is-dark-theme & {
@@ -63,7 +84,7 @@
 	cursor: move; // Fallback for IE/Edge < 14
 	cursor: grab;
 	fill: currentColor;
-	border-radius: $radius-round-rectangle;
+	border-radius: 0;
 
 	&,
 	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover,
@@ -72,11 +93,13 @@
 		box-shadow: none;
 		background: none;
 
-		// Use opacity to work in various editor styles.
-		color: $dark-opacity-500;
+		// Use opacity to work in various editor styles
+		background-color: $dark-opacity-light-500;
+		color: $dark-opacity-300;
 
 		.is-dark-theme & {
-			color: $light-opacity-500;
+			background-color: $light-opacity-light-400;
+			color: $light-opacity-900;
 		}
 
 		// Nested movers have a background, so don't invert the colors there.
