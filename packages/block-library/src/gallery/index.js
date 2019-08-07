@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -25,6 +25,10 @@ export const settings = {
 	supports: {
 		align: true,
 	},
+	styles: [
+		{ name: 'default', label: _x( 'Default', 'block style' ), isDefault: true },
+		{ name: 'rounded-corners', label: _x( 'Rounded Corners', 'block style' ) },
+	],
 	transforms,
 	edit,
 	save,

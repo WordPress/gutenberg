@@ -147,4 +147,17 @@
 			justify-content: center;
 		}
 	}
+
+	// Rounded corners block style
+	&.is-style-rounded-corners {
+
+		img {
+			border-radius: $grid-size;
+		}
+
+		figcaption {
+			border-bottom-right-radius: $grid-size;
+			border-bottom-left-radius: $grid-size;
+		}
+	}
 }
