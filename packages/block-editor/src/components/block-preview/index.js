@@ -98,9 +98,8 @@ function ScaledBlockPreview( { blocks } ) {
 
 export function BlockPreview( { blocks, settings } ) {
 	const renderedBlocks = useMemo( () => castArray( blocks ), [ blocks ] );
-	const [ recompute, triggerRecompute ] = useReducer( ( state ) => state + 1 );
+	const [ recompute, triggerRecompute ] = useReducer( ( state ) => state + 1, 0 );
 	useLayoutEffect( triggerRecompute, [ blocks ] );
-
 	return (
 		<BlockEditorProvider
 			value={ renderedBlocks }
