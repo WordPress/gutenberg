@@ -9,7 +9,7 @@ import classnames from 'classnames';
  */
 import { withSelect, withDispatch } from '@wordpress/data';
 import { Button, NavigableMenu } from '@wordpress/components';
-import { getBlockType } from '@wordpress/blocks';
+import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
 import { compose } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 
@@ -34,6 +34,7 @@ function BlockNavigationList( {
 			{ map( blocks, ( block ) => {
 				const blockType = getBlockType( block.name );
 				const isSelected = block.clientId === selectedBlockClientId;
+				const hasAnchor = hasBlockSupport( block.name, 'anchor' );
 
 				return (
 					<li key={ block.clientId }>
@@ -46,7 +47,7 @@ function BlockNavigationList( {
 							>
 								<BlockIcon icon={ blockType.icon } showColors />
 								{ blockType.title }
-								{ block.attributes.anchor && <span className="block-editor-block-navigation__item-anchor-name">{ block.attributes.anchor }</span> }
+								{ hasAnchor && <span className="block-editor-block-navigation__item-anchor-name">{ block.attributes.anchor }</span> }
 								{ isSelected && <span className="screen-reader-text">{ __( '(selected block)' ) }</span> }
 							</Button>
 						</div>
