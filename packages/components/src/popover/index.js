@@ -321,10 +321,10 @@ const Popover = ( {
 		// both `onFocusOutside` and `onClickOutside` are unspecified. Doing so
 		// assures backwards-compatibility for prior `onClickOutside` default.
 		if ( onFocusOutside ) {
-			//onFocusOutside( event );
+			onFocusOutside( event );
 			return;
 		} else if ( ! onClickOutside ) {
-			//onClose();
+			onClose();
 			return;
 		}
 
