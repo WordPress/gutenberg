@@ -438,10 +438,10 @@ describe( 'createRegistry', () => {
 			} );
 
 			expect( registry.select( 'reducer1' ).selector1() ).toEqual( 'result1' );
-			expect( selector1 ).toBeCalledWith( store.getState() );
+			expect( selector1 ).toHaveBeenCalledWith( store.getState() );
 
 			expect( registry.select( 'reducer1' ).selector2() ).toEqual( 'result2' );
-			expect( selector2 ).toBeCalledWith( store.getState() );
+			expect( selector2 ).toHaveBeenCalledWith( store.getState() );
 		} );
 
 		it( 'should run the registry selectors properly', () => {

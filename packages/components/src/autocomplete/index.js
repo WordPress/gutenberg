@@ -446,7 +446,7 @@ export class Autocomplete extends Component {
 		const activeId = isExpanded ? `components-autocomplete-item-${ instanceId }-${ selectedKey }` : null;
 
 		// Disable reason: Clicking the editor should reset the autocomplete when the menu is suppressed
-		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
+		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
 		return (
 			<div
 				ref={ this.bindNode }
@@ -487,7 +487,7 @@ export class Autocomplete extends Component {
 				) }
 			</div>
 		);
-		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
+		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
 	}
 }
 
