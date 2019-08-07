@@ -1,3 +1,10 @@
+## Master
+
+### New Features
+
+- The bundled `puppeteer` dependency has been updated from requiring `1.6.1` to requiring `^1.19.0` ([#16875](https://github.com/WordPress/gutenberg/pull/16875)). It uses Chromium v77 instead of Chromium v69.
+- The bundled `jest-puppeteer` dependency has been updated from requiring `^4.0.0` to requiring `^4.3.0` ([#16875](https://github.com/WordPress/gutenberg/pull/16875)).
+
 ## 3.4.0 (2019-08-05)
 
 ### New Features
