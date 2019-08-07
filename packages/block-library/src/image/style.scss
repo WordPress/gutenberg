@@ -58,4 +58,8 @@
 		margin-left: auto;
 		margin-right: auto;
 	}
+
+	&.is-style-rounded-corners img {
+		border-radius: $grid-size;
+	}
 }
