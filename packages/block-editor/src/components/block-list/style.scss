@@ -495,7 +495,7 @@
 		&.is-multi-selected > .block-editor-block-mover,
 		> .block-editor-block-list__block-edit > .block-editor-block-mover {
 			// This moves the menu up by the height of the button + border + padding.
-			top: -$block-side-ui-width - $block-padding - $block-side-ui-clearance;
+			top: -$block-side-ui-width - $block-padding + $border-width;
 			bottom: auto;
 			min-height: 0;
 			height: auto;
@@ -548,7 +548,7 @@
 		// Position mover
 		&.is-multi-selected > .block-editor-block-mover,
 		> .block-editor-block-list__block-edit > .block-editor-block-mover {
-			left: -$block-padding + $border-width;
+			left: -$block-padding - $block-left-border-width;
 		}
 	}
 
