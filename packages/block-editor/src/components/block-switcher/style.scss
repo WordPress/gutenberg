@@ -94,15 +94,12 @@
 	min-width: 300px;
 	max-width: calc(340px * 2);
 	display: flex;
-	// we need to differ those styles to popover__container so we reset them here
-	box-shadow: none;
-	background: none;
+	background: $white;
+	box-shadow: $shadow-popover;
 }
 
 .block-editor-block-switcher__popover .components-popover__content {
 	.block-editor-block-switcher__container {
-		box-shadow: $shadow-popover;
-		background: $white;
 		min-width: 300px;
 		max-width: 340px;
 		width: 50%;
