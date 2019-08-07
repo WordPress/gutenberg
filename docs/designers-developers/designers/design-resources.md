@@ -45,7 +45,7 @@ The [WordPress Design team](https://make.wordpress.org/design/) uses [Figma](htt
 
 **How to refine or contribute to the WordPress components React library _(Coming soon)_**
 
-WordPress components in Figma mirror the live React components. Documentation for how to refine or contribute to WordPress components in React coming soon.
+WordPress components in Figma mirror the live React components. Documentation for how to refine or contribute to WordPress components in React is coming soon.
 
 
 If you have questions, please don’t hesitate to ask in the #design channel on the WordPress community Slack.
