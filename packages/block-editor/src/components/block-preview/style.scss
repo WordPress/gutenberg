@@ -11,7 +11,7 @@
 		display: block;
 	}
 
-	.editor-block-preview__content {
+	.block-editor-block-preview__content {
 		font-family: $editor-font;
 
 		> div {
@@ -31,7 +31,7 @@
 }
 
 // These rules ensure the preview scales smoothly regardless of the container size.
-.editor-block-preview__container {
+.block-editor-block-preview__container {
 	// In the component, a top padding is provided as an inline style to provid an aspect-ratio.
 	// This positioning enables the content to sit on top of that padding to fit.
 	position: relative;
@@ -41,7 +41,7 @@
 	width: 100%;
 }
 
-.editor-block-preview__content {
+.block-editor-block-preview__content {
 	// This element receives inline styles for width, height, and transform-scale.
 	// Those inline styles are calculated to fit a perfect thumbnail.
 
@@ -49,8 +49,8 @@
 	position: absolute;
 
 	// Vertical alignment. It works with the transform: translate(-50%, -50%)`,
-	top: 50%;
-	left: 50%;
+	top: 0;
+	left: 0;
 
 	// Important to set the origin.
 	transform-origin: top left;
@@ -60,9 +60,6 @@
 	margin: 0;
 	overflow: visible;
 	min-height: auto;
-
-	// Width of the canvas before scaling
-	width: 700px;
 
 	.block-editor-block-list__layout,
 	.block-editor-block-list__block {
@@ -75,17 +72,6 @@
 
 	> div section {
 		height: auto;
-	}
-
-	&.is-scaled-auto {
-		width: auto;
-	}
-
-	&.is-scaled {
-		> div {
-			transform: scale(0.9);
-			transform-origin: center top;
-		}
 	}
 
 	&.is-tall-preview {

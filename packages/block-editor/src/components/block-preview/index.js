@@ -9,7 +9,7 @@ import classnames from 'classnames';
  */
 import { Disabled } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
-import { useLayoutEffect, useState, useRef } from '@wordpress/element';
+import { useEffect, useState, useRef, useReducer, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -18,61 +18,63 @@ import BlockEditorProvider from '../provider';
 import BlockList from '../block-list';
 import { getBlockPreviewContainerDOMNode } from '../../utils/dom';
 
+const PREVIEW_CONTAINER_WIDTH = 700;
+
 export function BlockPreview( {
 	blocks,
 	settings,
-	scaleToFit = true,
-	isScaled = true,
 } ) {
-	blocks = castArray( blocks );
-
+	const renderedBlocks = useMemo( () => castArray( blocks ), [ blocks ] );
 	const previewRef = useRef( null );
 
 	const [ isTallPreview, setIsTallPreview ] = useState( false );
+	const [ isReady, setIsReady ] = useState( false );
 	const [ previewScale, setPreviewScale ] = useState( 1 );
-	const [ visibility, setVisibility ] = useState( 'hidden' );
 	const [ xPosition, setXPosition ] = useState( 0 );
 
-	// Dynamically calculate the scale factor
-	useLayoutEffect( () => {
-		if ( ! scaleToFit ) {
-			setVisibility( 'visible' );
-			return;
-		}
+	const [ recompute, triggerRecompute ] = useReducer( ( state ) => state + 1 );
+	useEffect( () => {
+		setIsReady( false );
+		setPreviewScale( 1 );
+		setXPosition( 0 );
+		setIsTallPreview( false );
+		triggerRecompute();
+	}, [ blocks ] );
 
+	// Dynamically calculate the scale factor
+	useEffect( () => {
 		// Timer - required to account for async render of `BlockEditorProvider`
 		const timerId = setTimeout( () => {
-			window.clearTimeout( timerId );
 			const containerElement = previewRef.current;
-
 			if ( ! containerElement ) {
 				return;
 			}
 
-			// comparisonBlock
-			const block = blocks[ 0 ];
-			const previewElement = getBlockPreviewContainerDOMNode( block.clientId, containerElement );
+			// If we're previewing a single block, scale the preview to fit it.
+			if ( renderedBlocks.length === 1 ) {
+				const block = renderedBlocks[ 0 ];
+				const previewElement = getBlockPreviewContainerDOMNode( block.clientId, containerElement );
+				if ( ! previewElement ) {
+					return;
+				}
 
-			if ( previewElement ) {
-				// Get dimensions.
-				const containerElementWidth = containerElement.offsetWidth;
-				const containerElementHeight = containerElement.offsetHeight;
-				const previewElementHeight = previewElement.offsetHeight;
-				const previewElementWidth = previewElement.offsetWidth;
-
-				const scale = containerElementWidth / previewElementWidth || 1;
-
-				// Compute left position.
-				const scaledElementRect = previewElement.getBoundingClientRect();
 				const containerElementRect = containerElement.getBoundingClientRect();
+				const scaledElementRect = previewElement.getBoundingClientRect();
+
+				const scale = containerElementRect.width / scaledElementRect.width || 1;
 				const offsetX = scaledElementRect.left - containerElementRect.left;
 
-				setIsTallPreview( previewElementHeight > containerElementHeight );
+				setIsTallPreview( scaledElementRect.height * scale > containerElementRect.height );
 				setPreviewScale( scale );
-				// setXPosition( offsetX );
-				setVisibility( 'visible' );
+				setXPosition( offsetX * scale );
+			} else {
+				const containerElementRect = containerElement.getBoundingClientRect();
+				setPreviewScale( containerElementRect.width / PREVIEW_CONTAINER_WIDTH );
+				setIsTallPreview( true );
 			}
-		}, 10 );
+
+			setIsReady( true );
+		}, 100 );
 
 		// Cleanup
 		return () => {
@@ -80,33 +82,29 @@ export function BlockPreview( {
 				window.clearTimeout( timerId );
 			}
 		};
-	} );
+	}, [ recompute ] );
 
-	if ( ! blocks ) {
+	if ( ! renderedBlocks || renderedBlocks.length === 0 ) {
 		return null;
 	}
 
 	const previewStyles = {
-		transform: `scale(${ previewScale }) translate(-50%, -50%)`,
-		visibility,
-		// left: xPosition,
+		transform: `scale(${ previewScale })`,
+		visibility: isReady ? 'visible' : 'hidden',
+		left: -xPosition,
+		width: PREVIEW_CONTAINER_WIDTH,
 	};
 
-	if ( isTallPreview ) {
-		previewStyles.transform = `scale(${ previewScale }) translate(-50%, 0)`;
-	}
-
-	const contentClassNames = classnames( 'editor-block-preview__content block-editor-block-preview__content editor-styles-wrapper', {
-		'is-scaled': isScaled,
+	const contentClassNames = classnames( 'block-editor-block-preview__content editor-styles-wrapper', {
 		'is-tall-preview': isTallPreview,
-		'is-scaled-auto': visibility === 'visible',
+		'is-ready': isReady,
 	} );
 
 	return (
-		<div ref={ previewRef } className="editor-block-preview__container" aria-hidden>
+		<div ref={ previewRef } className="block-editor-block-preview__container" aria-hidden>
 			<Disabled style={ previewStyles } className={ contentClassNames }>
 				<BlockEditorProvider
-					value={ blocks }
+					value={ renderedBlocks }
 					settings={ settings }
 				>
 					<BlockList />
