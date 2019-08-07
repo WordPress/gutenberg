@@ -1,0 +1,15 @@
+// Ideally, this should be the post wrapper element. So `.post` or similar.
+body {
+	counter-reset: footnotes;
+}
+
+.footnote-anchor {
+	counter-increment: footnotes;
+}
+
+.footnote-anchor::after {
+	margin-left: 2px;
+	content: "[" counter(footnotes) "]";
+	vertical-align: super;
+	font-size: smaller;
+}

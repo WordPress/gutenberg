@@ -58,7 +58,10 @@ const FormatEdit = ( {
 		const activeFormat = getActiveFormat( value, name );
 		const isActive = activeFormat !== undefined;
 		const activeObject = getActiveObject( value );
-		const isObjectActive = activeObject !== undefined;
+		const isObjectActive = (
+			activeObject !== undefined &&
+			activeObject.type === name
+		);
 
 		return (
 			<Edit

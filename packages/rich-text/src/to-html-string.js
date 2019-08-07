@@ -86,7 +86,7 @@ function remove( object ) {
 	return object;
 }
 
-function createElementHTML( { type, attributes, object, children } ) {
+function createElementHTML( { type, attributes, selfClosing, children } ) {
 	let attributeString = '';
 
 	for ( const key in attributes ) {
@@ -97,7 +97,7 @@ function createElementHTML( { type, attributes, object, children } ) {
 		attributeString += ` ${ key }="${ escapeAttribute( attributes[ key ] ) }"`;
 	}
 
-	if ( object ) {
+	if ( selfClosing ) {
 		return `<${ type }${ attributeString }>`;
 	}
 

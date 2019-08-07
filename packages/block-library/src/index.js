@@ -32,6 +32,7 @@ import * as column from './column';
 import * as cover from './cover';
 import * as embed from './embed';
 import * as file from './file';
+import * as footnotes from './footnotes';
 import * as html from './html';
 import * as mediaText from './media-text';
 import * as navigationMenu from './navigation-menu';
@@ -115,6 +116,7 @@ export const registerCoreBlocks = () => {
 		...embed.common,
 		...embed.others,
 		file,
+		footnotes,
 		group,
 		window.wp && window.wp.oldEditor ? classic : null, // Only add the classic block in WP Context
 		html,

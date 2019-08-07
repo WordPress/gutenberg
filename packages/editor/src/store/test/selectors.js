@@ -1109,6 +1109,7 @@ describe( 'selectors', () => {
 					present: {
 						blocks: {
 							value: [],
+							footnotes: {},
 						},
 						edits: {},
 					},
@@ -1228,6 +1229,7 @@ describe( 'selectors', () => {
 									},
 								},
 							],
+							footnotes: {},
 						},
 						edits: {},
 					},
@@ -1483,6 +1485,7 @@ describe( 'selectors', () => {
 					present: {
 						blocks: {
 							value: [],
+							footnotes: {},
 						},
 						edits: {},
 					},
@@ -1535,6 +1538,7 @@ describe( 'selectors', () => {
 									modified: false,
 								},
 							} ],
+							footnotes: {},
 						},
 						edits: {},
 					},
@@ -1580,6 +1584,7 @@ describe( 'selectors', () => {
 					present: {
 						blocks: {
 							value: [],
+							footnotes: {},
 						},
 						edits: {},
 					},
@@ -1625,6 +1630,7 @@ describe( 'selectors', () => {
 									content: '',
 								},
 							} ],
+							footnotes: {},
 						},
 						edits: {},
 					},
@@ -1649,6 +1655,7 @@ describe( 'selectors', () => {
 									content: '',
 								},
 							} ],
+							footnotes: {},
 						},
 						edits: {},
 					},
@@ -1675,6 +1682,7 @@ describe( 'selectors', () => {
 									content: 'Test Data',
 								},
 							} ],
+							footnotes: {},
 						},
 						edits: {},
 					},
@@ -2133,6 +2141,7 @@ describe( 'selectors', () => {
 					present: {
 						blocks: {
 							value: [ block ],
+							footnotes: {},
 						},
 						edits: {},
 					},
@@ -2155,6 +2164,7 @@ describe( 'selectors', () => {
 					present: {
 						blocks: {
 							value: [ unknownBlock ],
+							footnotes: {},
 						},
 						edits: {},
 					},
@@ -2180,6 +2190,7 @@ describe( 'selectors', () => {
 					present: {
 						blocks: {
 							value: [ firstUnknown, secondUnknown ],
+							footnotes: {},
 						},
 						edits: {},
 					},
@@ -2200,6 +2211,7 @@ describe( 'selectors', () => {
 					present: {
 						blocks: {
 							value: [ defaultBlock ],
+							footnotes: {},
 						},
 						edits: {},
 					},
@@ -2226,6 +2238,7 @@ describe( 'selectors', () => {
 									modified: true,
 								},
 							} ],
+							footnotes: {},
 						},
 						edits: {},
 					},

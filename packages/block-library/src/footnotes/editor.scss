@@ -1,0 +1,36 @@
+@keyframes slide-in-note {
+	from {
+		transform: translateY(100%);
+	}
+
+	to {
+		transform: translateY(0);
+	}
+}
+
+.editor-styles-wrapper .wp-block-footnotes {
+	margin: 0;
+	padding: 10px 10px 10px 40px;
+
+	&.is-selected {
+		background: #fff;
+		position: sticky;
+		bottom: 0;
+		z-index: 1000;
+		animation-duration: 0.2s;
+		animation-name: slide-in-note;
+		animation-timing-function: ease;
+		box-shadow: -3px 0 0 0 #555d66;
+		margin: 0 1px;
+	}
+
+	input {
+		display: inline-block;
+		font-size: inherit;
+		border: none;
+		outline: none;
+		padding: 0;
+		margin: 0;
+		width: 95%;
+	}
+}

@@ -1,0 +1,17 @@
+[
+    {
+        "clientId": "_clientId_0",
+        "name": "core/footnotes",
+        "isValid": true,
+        "attributes": {
+            "footnotes": [
+                {
+                    "id": "0",
+                    "text": "test"
+                }
+            ]
+        },
+        "innerBlocks": [],
+        "originalContent": "<ol class=\"wp-block-footnotes\"><li><a id=\"0\" href=\"#0-anchor\" aria-label=\"Back to content\">↑</a> test</li></ol>"
+    }
+]

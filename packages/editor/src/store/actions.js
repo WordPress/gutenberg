@@ -12,6 +12,7 @@ import { dispatch, select, apiFetch } from '@wordpress/data-controls';
 import {
 	parse,
 	synchronizeBlocksWithTemplate,
+	getBlockTypes,
 } from '@wordpress/blocks';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 
@@ -167,7 +168,27 @@ export function* setupEditor( post, edits, template ) {
 		content = post.content.raw;
 	}
 
-	let blocks = parse( content );
+	const footnoteBlockNames = new Set( getBlockTypes().reduce(
+		( accumulator, { name, category } ) => {
+			if ( category === 'footnotes' ) {
+				accumulator.push( name );
+			}
+
+			return accumulator;
+		}, [] )
+	);
+
+	const footnotes = {};
+	let blocks = parse( content ).filter( ( { name, attributes } ) => {
+		if ( footnoteBlockNames.has( name ) ) {
+			attributes.footnotes.forEach( ( { id, text } ) => {
+				footnotes[ id ] = text;
+			} );
+			return false;
+		}
+
+		return true;
+	} );
 
 	// Apply a template for new posts only, if exists.
 	const isNewPost = post.status === 'auto-draft';
@@ -184,6 +205,7 @@ export function* setupEditor( post, edits, template ) {
 		template,
 	};
 	yield resetEditorBlocks( blocks );
+	yield updateFootnotes( footnotes );
 	yield setupEditorState( post );
 	yield* __experimentalSubscribeSources();
 }
@@ -1003,6 +1025,20 @@ export function updateEditorSettings( settings ) {
 	return {
 		type: 'UPDATE_EDITOR_SETTINGS',
 		settings,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the footnotes should be updated.
+ *
+ * @param {Object} footnotes The footnotes.
+ *
+ * @return {Object} Action object.
+ */
+export function updateFootnotes( footnotes ) {
+	return {
+		type: 'UPDATE_FOOTNOTES',
+		footnotes,
 	};
 }
 

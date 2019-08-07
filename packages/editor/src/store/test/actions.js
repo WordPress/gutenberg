@@ -665,6 +665,10 @@ describe( 'Editor actions', () => {
 			const { value } = fulfillment.next();
 			expect( value ).toEqual( actions.resetEditorBlocks( [] ) );
 		} );
+		it( 'should yield action object for updateFootnotes', () => {
+			const { value } = fulfillment.next();
+			expect( value ).toEqual( actions.updateFootnotes( {} ) );
+		} );
 		it( 'should yield action object for setupEditorState', () => {
 			const { value } = fulfillment.next();
 			expect( value ).toEqual(

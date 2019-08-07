@@ -376,6 +376,18 @@ _Related_
 
 -   getFirstMultiSelectedBlockClientId in core/block-editor store.
 
+<a name="getFootnotes" href="#getFootnotes">#</a> **getFootnotes**
+
+Returns the post footnotes.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+
+_Returns_
+
+-   `Object`: The footnotes.
+
 <a name="getGlobalBlockCount" href="#getGlobalBlockCount">#</a> **getGlobalBlockCount**
 
 _Related_
@@ -1399,6 +1411,18 @@ _Related_
 <a name="updateEditorSettings" href="#updateEditorSettings">#</a> **updateEditorSettings**
 
 Undocumented declaration.
+
+<a name="updateFootnotes" href="#updateFootnotes">#</a> **updateFootnotes**
+
+Returns an action object used in signalling that the footnotes should be updated.
+
+_Parameters_
+
+-   _footnotes_ `Object`: The footnotes.
+
+_Returns_
+
+-   `Object`: Action object.
 
 <a name="updatePost" href="#updatePost">#</a> **updatePost**
 

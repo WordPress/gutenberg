@@ -150,6 +150,12 @@ export const EXPECTED_TRANSFORMS = {
 			'Group',
 		],
 	},
+	core__footnotes: {
+		originalBlock: 'Footnotes',
+		availableTransforms: [
+			'Group',
+		],
+	},
 	core__gallery: {
 		originalBlock: 'Gallery',
 		availableTransforms: [

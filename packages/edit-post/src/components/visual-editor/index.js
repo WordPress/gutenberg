@@ -4,6 +4,7 @@
 import {
 	PostTitle,
 	VisualEditorGlobalKeyboardShortcuts,
+	Footnotes,
 } from '@wordpress/editor';
 import {
 	WritingFlow,
@@ -33,7 +34,9 @@ function VisualEditor() {
 					<ObserveTyping>
 						<CopyHandler>
 							<PostTitle />
-							<BlockList />
+							<BlockList>
+								<Footnotes />
+							</BlockList>
 						</CopyHandler>
 					</ObserveTyping>
 				</WritingFlow>

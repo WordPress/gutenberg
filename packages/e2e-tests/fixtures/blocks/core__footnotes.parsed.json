@@ -1,0 +1,27 @@
+[
+    {
+        "blockName": "core/footnotes",
+        "attrs": {
+            "footnotes": [
+                {
+                    "id": "0",
+                    "text": "test"
+                }
+            ]
+        },
+        "innerBlocks": [],
+        "innerHTML": "\n<ol class=\"wp-block-footnotes\"><li><a id=\"0\" href=\"#0-anchor\" aria-label=\"Back to content\">↑</a> test</li></ol>\n",
+        "innerContent": [
+            "\n<ol class=\"wp-block-footnotes\"><li><a id=\"0\" href=\"#0-anchor\" aria-label=\"Back to content\">↑</a> test</li></ol>\n"
+        ]
+    },
+    {
+        "blockName": null,
+        "attrs": {},
+        "innerBlocks": [],
+        "innerHTML": "\n",
+        "innerContent": [
+            "\n"
+        ]
+    }
+]

@@ -118,3 +118,23 @@ function enqueue_editor_block_styles_assets() {
 	wp_enqueue_script( 'wp-block-styles' );
 }
 add_action( 'enqueue_block_editor_assets', 'enqueue_editor_block_styles_assets' );
+
+/**
+ * Adds the `footnotes` block category.
+ *
+ * @param string $categories The categories to filter.
+ *
+ * @return string The filtered categories.
+ */
+function gutenberg_add_block_categories( $categories ) {
+	array_push(
+		$categories,
+		array(
+			'slug'  => 'footnotes',
+			'title' => __( 'Footnotes', 'gutenberg' ),
+		)
+	);
+
+	return $categories;
+}
+add_filter( 'block_categories', 'gutenberg_add_block_categories' );

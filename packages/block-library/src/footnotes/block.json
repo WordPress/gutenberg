@@ -1,0 +1,9 @@
+{
+	"name": "core/footnotes",
+	"category": "footnotes",
+	"attributes": {
+		"footnotes": {
+			"type": "array"
+		}
+	}
+}

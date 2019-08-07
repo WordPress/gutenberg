@@ -20,6 +20,8 @@ import {
 	getFreeformContentHandlerName,
 	getDefaultBlockName,
 	isUnmodifiedDefaultBlock,
+	createBlock,
+	getBlockTypes,
 } from '@wordpress/blocks';
 import { isInTheFuture, getDate } from '@wordpress/date';
 import { removep } from '@wordpress/autop';
@@ -816,7 +818,55 @@ export const getEditedPostContent = createSelector(
 		}
 
 		const blocks = getBlocksForSerialization( state );
-		const content = serialize( blocks );
+		const unorderedFootnotes = getFootnotes( state );
+		const hasFootnotes = Object.keys( unorderedFootnotes ).length;
+
+		let content;
+
+		if ( hasFootnotes ) {
+			// Footnotes must be generated at the end of each page.
+			// The footnote order can only de deduced from the serialised HTML.
+			content = blocks.reduce( ( acc, block ) => {
+				if ( block.name === 'core/nextpage' ) {
+					acc.push( [] );
+				}
+
+				acc[ acc.length - 1 ].push( block );
+
+				return acc;
+			}, [ [] ] ).map( ( group ) => {
+				const html = serialize( group );
+				return getBlockTypes().reduce( ( accumulator, { category, name } ) => {
+					if ( category !== 'footnotes' ) {
+						return accumulator;
+					}
+
+					const attributePart = name.replace( '/', '-' );
+
+					const footnotes = [];
+					const regExp = new RegExp( `data-${ attributePart }-id="([a-z0-9-]+)"`, 'g' );
+					let result;
+
+					while ( ( result = regExp.exec( html ) ) !== null ) {
+						const id = result[ 1 ];
+						const text = unorderedFootnotes[ id ];
+						footnotes.push( { id, text } );
+					}
+
+					if ( ! footnotes.length ) {
+						return accumulator;
+					}
+
+					const block = createBlock( name, { footnotes } );
+
+					accumulator.push( serialize( block ) );
+
+					return accumulator;
+				}, [ html ] ).join( '\n\n' );
+			} ).join( '\n\n' );
+		} else {
+			content = serialize( blocks );
+		}
 
 		// For compatibility purposes, treat a post consisting of a single
 		// freeform block as legacy content and downgrade to a pre-block-editor
@@ -834,6 +884,7 @@ export const getEditedPostContent = createSelector(
 	},
 	( state ) => [
 		state.editor.present.blocks.value,
+		state.editor.present.blocks.footnotes,
 		state.editor.present.edits.content,
 		state.initialEdits.content,
 	],
@@ -1152,6 +1203,17 @@ export function __unstableIsEditorReady( state ) {
  */
 export function getEditorSettings( state ) {
 	return state.editorSettings;
+}
+
+/**
+ * Returns the post footnotes.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {Object} The footnotes.
+ */
+export function getFootnotes( state ) {
+	return state.editor.present.blocks.footnotes;
 }
 
 /*

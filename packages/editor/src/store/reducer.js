@@ -142,18 +142,34 @@ export const editor = flow( [
 ] )( {
 	// Track whether changes exist, resetting at each post save. Relies on
 	// editor initialization firing post reset as an effect.
-	blocks: withChangeDetection( {
-		resetTypes: [ 'SETUP_EDITOR_STATE', 'REQUEST_POST_UPDATE_START' ],
-	} )( ( state = { value: [] }, action ) => {
-		switch ( action.type ) {
-			case 'RESET_EDITOR_BLOCKS':
-				if ( action.blocks === state.value ) {
-					return state;
-				}
-				return { value: action.blocks };
-		}
+	blocks: flow( [
+		combineReducers,
+		withChangeDetection( {
+			resetTypes: [ 'SETUP_EDITOR_STATE', 'REQUEST_POST_UPDATE_START' ],
+		} ),
+	] )( {
+		value( state = [], action ) {
+			switch ( action.type ) {
+				case 'RESET_EDITOR_BLOCKS':
+					if ( action.blocks === state ) {
+						return state;
+					}
+					return action.blocks;
+			}
 
-		return state;
+			return state;
+		},
+		footnotes( state = {}, action ) {
+			switch ( action.type ) {
+				case 'UPDATE_FOOTNOTES':
+					if ( action.footnotes === state ) {
+						return state;
+					}
+					return action.footnotes;
+			}
+
+			return state;
+		},
 	} ),
 	edits( state = {}, action ) {
 		switch ( action.type ) {

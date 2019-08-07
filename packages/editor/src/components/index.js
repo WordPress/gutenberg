@@ -14,6 +14,7 @@ export { default as EditorHistoryRedo } from './editor-history/redo';
 export { default as EditorHistoryUndo } from './editor-history/undo';
 export { default as EditorNotices } from './editor-notices';
 export { default as ErrorBoundary } from './error-boundary';
+export { default as Footnotes } from './footnotes';
 export { default as PageAttributesCheck } from './page-attributes/check';
 export { default as PageAttributesOrder } from './page-attributes/order';
 export { default as PageAttributesParent } from './page-attributes/parent';
