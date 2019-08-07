@@ -56,36 +56,39 @@ function Edit( { attributes, setAttributes, className, setTimeout } ) {
 						id={ id }
 						className={ classnames( { 'is-selected': isSelected } ) }
 					>
-						<a
-							href={ `#${ id }-anchor` }
-							aria-label={ __( 'Back to content' ) }
-							onClick={ () => {
-								// This is a hack to get the target to focus.
-								// The attribute will later be removed when selection is set.
-								document.getElementById( `${ id }-anchor` ).contentEditable = 'false';
-							} }
-						>
-							↑
-						</a>
-						{ ' ' }
-						<RichText
-							value={ text }
-							onChange={ ( value ) => {
-								setAttributes( {
-									footnotes: footnotes.map( ( footnote, i ) => {
-										if ( i !== index ) {
-											return footnote;
-										}
+						{ /* Needed for alignment. */ }
+						<div>
+							<a
+								href={ `#${ id }-anchor` }
+								aria-label={ __( 'Back to content' ) }
+								onClick={ () => {
+									// This is a hack to get the target to focus.
+									// The attribute will later be removed when selection is set.
+									document.getElementById( `${ id }-anchor` ).contentEditable = 'false';
+								} }
+							>
+								↑
+							</a>
+							{ ' ' }
+							<RichText
+								value={ text }
+								onChange={ ( value ) => {
+									setAttributes( {
+										footnotes: footnotes.map( ( footnote, i ) => {
+											if ( i !== index ) {
+												return footnote;
+											}
 
-										return {
-											...footnote,
-											text: value,
-										};
-									} ),
-								} );
-							} }
-							placeholder={ __( 'Footnote' ) }
-						/>
+											return {
+												...footnote,
+												text: value,
+											};
+										} ),
+									} );
+								} }
+								placeholder={ __( 'Footnote' ) }
+							/>
+						</div>
 					</li>
 				) }
 			</ol>

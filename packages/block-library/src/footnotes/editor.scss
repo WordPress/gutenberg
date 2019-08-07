@@ -47,8 +47,8 @@
 		}
 	}
 
-	div[contenteditable] {
-		display: inline-block;
-		width: 95%;
+	li > div > a {
+		float: left;
+		margin-right: 5px;
 	}
 }
