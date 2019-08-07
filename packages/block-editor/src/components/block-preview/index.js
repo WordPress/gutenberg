@@ -26,7 +26,7 @@ function ScaledBlockPreview( { blocks } ) {
 	const [ isTallPreview, setIsTallPreview ] = useState( false );
 	const [ isReady, setIsReady ] = useState( false );
 	const [ previewScale, setPreviewScale ] = useState( 1 );
-	const [ xPosition, setXPosition ] = useState( 0 );
+	const [ { x, y }, setPosition ] = useState( { x: 0, y: 0 } );
 
 	// Dynamically calculate the scale factor
 	useLayoutEffect( () => {
@@ -50,10 +50,15 @@ function ScaledBlockPreview( { blocks } ) {
 
 				const scale = containerElementRect.width / scaledElementRect.width || 1;
 				const offsetX = scaledElementRect.left - containerElementRect.left;
+				const offsetY = ( containerElementRect.height > scaledElementRect.height * scale ) ?
+					( containerElementRect.height - ( scaledElementRect.height * scale ) ) / 2 : 0;
 
 				setIsTallPreview( scaledElementRect.height * scale > containerElementRect.height );
 				setPreviewScale( scale );
-				setXPosition( offsetX * scale );
+				setPosition( { x: offsetX * scale, y: offsetY } );
+
+				// Hack: we need  to reset the scaled elements margins
+				previewElement.style.marginTop = '0';
 			} else {
 				const containerElementRect = containerElement.getBoundingClientRect();
 				setPreviewScale( containerElementRect.width / PREVIEW_CONTAINER_WIDTH );
@@ -78,7 +83,8 @@ function ScaledBlockPreview( { blocks } ) {
 	const previewStyles = {
 		transform: `scale(${ previewScale })`,
 		visibility: isReady ? 'visible' : 'hidden',
-		left: -xPosition,
+		left: -x,
+		top: y,
 		width: PREVIEW_CONTAINER_WIDTH,
 	};
 
