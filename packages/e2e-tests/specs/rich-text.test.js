@@ -239,6 +239,7 @@ describe( 'RichText', () => {
 			activeElement.blur();
 			activeElement.focus();
 		} );
+		await page.evaluate( () => new Promise( window.requestAnimationFrame ) );
 		await pressKeyWithModifier( 'primary', 'b' );
 		await page.keyboard.type( '2' );
 		await pressKeyWithModifier( 'primary', 'b' );
