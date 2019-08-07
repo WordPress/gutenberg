@@ -215,7 +215,7 @@ function parse_block_metadata( $plugin ) {
 	$block->title = reset( $plugin[ 'blocks' ] )[ 'title' ];
 
 	// AMBIGUOUS: Plugin's description, not description in block.json
-	$block->description = wp_strip_all_tags( $plugin[ 'description' ] );
+	$block->description = wp_trim_words( wp_strip_all_tags( $plugin[ 'description' ] ), 30, '...' );
 
 	$block->rating         = $plugin[ 'rating' ];
 	$block->rating_count    = $plugin[ 'num_ratings' ];
