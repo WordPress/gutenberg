@@ -59,9 +59,8 @@ class Edit extends Component {
 			const id = ( element.getAttribute( 'href' ) || '' ).slice( 1 );
 
 			if (
-				document.activeElement.isContentEditable &&
-				document.activeElement.contains( element ) &&
-				!! element.getAttribute( 'data-rich-text-format-boundary' )
+				element.getAttribute( 'data-rich-text-format-boundary' ) !== null &&
+				element.closest( '.is-selected[contenteditable="true"]' ) !== null
 			) {
 				selectedId = id;
 			}
