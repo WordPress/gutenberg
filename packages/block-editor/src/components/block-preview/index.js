@@ -9,7 +9,7 @@ import classnames from 'classnames';
  */
 import { Disabled } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
-import { useEffect, useState, useRef, useReducer, useMemo } from '@wordpress/element';
+import { useLayoutEffect, useState, useRef, useReducer, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -20,11 +20,7 @@ import { getBlockPreviewContainerDOMNode } from '../../utils/dom';
 
 const PREVIEW_CONTAINER_WIDTH = 700;
 
-export function BlockPreview( {
-	blocks,
-	settings,
-} ) {
-	const renderedBlocks = useMemo( () => castArray( blocks ), [ blocks ] );
+function ScaledBlockPreview( { blocks } ) {
 	const previewRef = useRef( null );
 
 	const [ isTallPreview, setIsTallPreview ] = useState( false );
@@ -32,17 +28,8 @@ export function BlockPreview( {
 	const [ previewScale, setPreviewScale ] = useState( 1 );
 	const [ xPosition, setXPosition ] = useState( 0 );
 
-	const [ recompute, triggerRecompute ] = useReducer( ( state ) => state + 1 );
-	useEffect( () => {
-		setIsReady( false );
-		setPreviewScale( 1 );
-		setXPosition( 0 );
-		setIsTallPreview( false );
-		triggerRecompute();
-	}, [ blocks ] );
-
 	// Dynamically calculate the scale factor
-	useEffect( () => {
+	useLayoutEffect( () => {
 		// Timer - required to account for async render of `BlockEditorProvider`
 		const timerId = setTimeout( () => {
 			const containerElement = previewRef.current;
@@ -51,8 +38,8 @@ export function BlockPreview( {
 			}
 
 			// If we're previewing a single block, scale the preview to fit it.
-			if ( renderedBlocks.length === 1 ) {
-				const block = renderedBlocks[ 0 ];
+			if ( ! blocks.length !== 1 ) {
+				const block = blocks[ 0 ];
 				const previewElement = getBlockPreviewContainerDOMNode( block.clientId, containerElement );
 				if ( ! previewElement ) {
 					return;
@@ -82,9 +69,9 @@ export function BlockPreview( {
 				window.clearTimeout( timerId );
 			}
 		};
-	}, [ recompute ] );
+	}, [] );
 
-	if ( ! renderedBlocks || renderedBlocks.length === 0 ) {
+	if ( ! blocks || blocks.length === 0 ) {
 		return null;
 	}
 
@@ -103,14 +90,31 @@ export function BlockPreview( {
 	return (
 		<div ref={ previewRef } className="block-editor-block-preview__container" aria-hidden>
 			<Disabled style={ previewStyles } className={ contentClassNames }>
-				<BlockEditorProvider
-					value={ renderedBlocks }
-					settings={ settings }
-				>
-					<BlockList />
-				</BlockEditorProvider>
+				<BlockList />
 			</Disabled>
 		</div>
+	);
+}
+
+export function BlockPreview( { blocks, settings } ) {
+	const renderedBlocks = useMemo( () => castArray( blocks ), [ blocks ] );
+	const [ recompute, triggerRecompute ] = useReducer( ( state ) => state + 1 );
+	useLayoutEffect( triggerRecompute, [ blocks ] );
+
+	return (
+		<BlockEditorProvider
+			value={ renderedBlocks }
+			settings={ settings }
+		>
+			{
+				/*
+				 * The key prop is used to force recomputing the preview
+				 * by remounting the component, ScaledBlockPreview is not meant to
+				 * be rerendered.
+				 */
+			}
+			<ScaledBlockPreview key={ recompute } blocks={ renderedBlocks } />
+		</BlockEditorProvider>
 	);
 }
 
