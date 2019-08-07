@@ -5,7 +5,7 @@
 	"scripts": {
 		"prestart": "npm run build:docs",
 		"start": "concurrently 'npm run watch:docs' 'npm run start:server' 'npm run start:app'",
-		"start:app": "react-scripts start",
+		"start:app": "PORT=4700 react-scripts start",
 		"start:server": "node server.js",
 		"build": "npm run build:docs && npm run build:app",
 		"build:app": "react-scripts build",

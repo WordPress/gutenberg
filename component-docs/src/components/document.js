@@ -27,15 +27,15 @@ export default function Document( props ) {
 
 	return (
 		<>
-			{ blocks.map( ( blockObject ) => {
+			{ blocks.map( ( blockObject, index ) => {
 				if ( ! blockObject.blockName ) {
-					return <div dangerouslySetInnerHTML={ { __html: blockObject.innerHTML } } />;
+					return <div key={ index } dangerouslySetInnerHTML={ { __html: blockObject.innerHTML } } />;
 				}
 				const blockType = getBlockType( blockObject.blockName );
 
 				if ( ! blockType ) {
 					return (
-						<div className="handbook-content">
+						<div key={ index }>
 							<Notice status="warning" isDismissible={ false }>
 								No block found matching name { blockObject.blockName }.
 							</Notice>
@@ -43,10 +43,14 @@ export default function Document( props ) {
 						</div>
 					);
 				}
-				return getSaveElement(
-					blockObject.blockName,
-					getBlockAttributes( blockType, blockObject.innerHTML, blockObject.attrs ),
-					blockObject.innerBlocks
+				return (
+					<div key={ index }>
+						{ getSaveElement(
+							blockObject.blockName,
+							getBlockAttributes( blockType, blockObject.innerHTML, blockObject.attrs ),
+							blockObject.innerBlocks
+						) }
+					</div>
 				);
 			} ) }
 		</>

@@ -7,7 +7,7 @@ import * as WPComponents from '@wordpress/components';
 /**
  * External dependencies
  */
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { LiveProvider, LiveEditor, LiveError, LivePreview } from 'react-live';
 import githubTheme from 'prism-react-renderer/themes/github';
 import styled from '@emotion/styled';
@@ -16,6 +16,8 @@ import styled from '@emotion/styled';
  * Internal dependencies
  */
 import Card from '../components/card';
+
+const { Button, ClipboardButton } = WPComponents;
 
 registerBlockType( 'handbook/example', {
 	title: 'Example: Live',
@@ -32,36 +34,75 @@ registerBlockType( 'handbook/example', {
 		const {
 			attributes: { code },
 		} = props;
-		const scope = { ...WPComponents };
 
-		return (
-			<Card>
-				<LiveProvider code={ code } scope={ scope } theme={ githubTheme }>
-					<PreviewUI>
-						<LivePreview />
-					</PreviewUI>
-					<EditorUI>
-						<LiveEditor />
-					</EditorUI>
-					<div className="handbook-card__errors">
-						<LiveError />
-					</div>
-				</LiveProvider>
-			</Card>
-		);
+		return <ExampleBlock code={ code } />;
 	},
 } );
 
-export const PreviewUI = styled( 'div' )`
+function ExampleBlock( props ) {
+	const { code } = props;
+	const [ exampleCode, setExampleCode ] = useState( code );
+	const [ copyText, setCopyText ] = useState( 'Copy' );
+	const scope = { ...WPComponents };
+	let copyTimeout;
+
+	const isModified = code !== exampleCode;
+
+	useEffect( () => {
+		return () => {
+			clearTimeout( copyTimeout );
+		};
+	}, [ copyTimeout ] );
+
+	function handleReset() {
+		setExampleCode( code );
+	}
+
+	function handleOnCopy() {
+		setCopyText( 'Copied!' );
+		copyTimeout = setTimeout( () => {
+			setCopyText( 'Copy' );
+		}, 1500 );
+	}
+
+	return (
+		<Card>
+			<LiveProvider code={ exampleCode } scope={ scope } theme={ githubTheme }>
+				<PreviewUI>
+					<LivePreview />
+				</PreviewUI>
+				<EditorUI>
+					<EditorActionsUI>
+						{ isModified && (
+							<Button isDefault isSmall onClick={ handleReset }>
+								Reset
+							</Button>
+						) }
+						<ClipboardButton isDefault isSmall text={ exampleCode } onCopy={ handleOnCopy }>
+							{ copyText }
+						</ClipboardButton>
+					</EditorActionsUI>
+					<LiveEditor onValueChange={ setExampleCode } />
+				</EditorUI>
+				<div className="handbook-card__errors">
+					<LiveError />
+				</div>
+			</LiveProvider>
+		</Card>
+	);
+}
+
+const PreviewUI = styled( 'div' )`
 	padding: 20px;
 	min-height: 100px;
 	display: flex;
 	align-items: center;
 `;
 
-export const EditorUI = styled( 'div' )`
+const EditorUI = styled( 'div' )`
 	border-top: 1px solid #ddd;
 	font-size: 14px;
+	position: relative;
 
 	& > * {
 		border-bottom-left-radius: 4px;
@@ -78,5 +119,18 @@ export const EditorUI = styled( 'div' )`
 		&:focus {
 			outline: none;
 		}
+	}
+`;
+
+const EditorActionsUI = styled( 'div' )`
+	position: absolute;
+	z-index: 2;
+	top: 4px;
+	right: 4px;
+	display: flex;
+	align-items: center;
+
+	> * {
+		margin-left: 4px;
 	}
 `;

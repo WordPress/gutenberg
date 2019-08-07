@@ -29,27 +29,27 @@ const Typography = styled( 'div' )`
 
 	h2 {
 		font-size: 2.25em;
-		margin-top: 3em;
 		font-weight: normal;
-
-		&:first-child {
-			margin-top: 0;
-		}
 	}
 
 	h3 {
 		font-size: 1.6em;
 	}
 
+	h2,
 	h3,
 	h4,
 	h5,
 	h6 {
-		margin-top: 2em;
+		margin-top: 3em;
+	}
 
-		&:first-child {
-			margin-top: 0;
-		}
+	h1 + h2 {
+		margin-top: 0;
+	}
+	h2 + h3,
+	h3 + h4 {
+		margin-top: 1.5em;
 	}
 
 	p {
