@@ -45,12 +45,12 @@
 	position: absolute;
 	top: 0;
 	right: 0;
-	color: $dark-gray-300;
+	color: $dark-gray-500;
 
 	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover,
 	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):active,
 	&:not(:disabled):not([aria-disabled="true"]):focus {
-		color: $alert-red;
+		color: $dark-gray-900;
 		background-color: transparent;
 	}
 
@@ -65,7 +65,7 @@
 	z-index: z-index(".components-notice-list");
 
 	.components-notice__content {
-		margin-top: $grid-size;
-		margin-bottom: $grid-size;
+		margin-top: 1em;
+		margin-bottom: 1em;
 	}
 }

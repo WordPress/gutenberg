@@ -22,6 +22,7 @@
 .components-editor-notices__dismissible,
 .components-editor-notices__pinned {
 	.components-notice {
+		box-sizing: border-box;
 		margin: 0 0 5px;
 		padding: 6px 12px;
 		min-height: $panel-header-height;

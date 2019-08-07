@@ -104,6 +104,7 @@ class ButtonEdit extends Component {
 			title,
 			linkTarget,
 			rel,
+			placeholder,
 		} = attributes;
 
 		const linkId = `wp-block-button__inline-link-${ instanceId }`;
@@ -111,7 +112,7 @@ class ButtonEdit extends Component {
 		return (
 			<div className={ className } title={ title } ref={ this.bindRef }>
 				<RichText
-					placeholder={ __( 'Add text…' ) }
+					placeholder={ placeholder || __( 'Add text…' ) }
 					value={ text }
 					onChange={ ( value ) => setAttributes( { text: value } ) }
 					withoutInteractiveFormatting

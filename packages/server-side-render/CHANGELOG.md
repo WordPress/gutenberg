@@ -1,5 +1,5 @@
-## Unreleased
+## 1.0.0 (2019-06-12)
 
-### Enhancements
+### Initial Release
 
 - Extracted the package from `@wordpress/components` and `@wordpress/editor`;

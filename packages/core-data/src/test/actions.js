@@ -11,7 +11,10 @@ describe( 'saveEntityRecord', () => {
 		// Trigger generator
 		fulfillment.next();
 		// Provide entities and trigger apiFetch
-		const { value: apiFetchAction } = fulfillment.next( entities );
+		expect( fulfillment.next( entities ).value.type ).toBe(
+			'SAVE_ENTITY_RECORD_START'
+		);
+		const { value: apiFetchAction } = fulfillment.next();
 		expect( apiFetchAction.request ).toEqual( {
 			path: '/wp/v2/posts',
 			method: 'POST',
@@ -20,6 +23,7 @@ describe( 'saveEntityRecord', () => {
 		// Provide response and trigger action
 		const { value: received } = fulfillment.next( { ...post, id: 10 } );
 		expect( received ).toEqual( receiveEntityRecords( 'postType', 'post', { ...post, id: 10 }, undefined, true ) );
+		expect( fulfillment.next().value.type ).toBe( 'SAVE_ENTITY_RECORD_FINISH' );
 	} );
 
 	it( 'triggers a PUT request for an existing record', async () => {
@@ -29,7 +33,10 @@ describe( 'saveEntityRecord', () => {
 		// Trigger generator
 		fulfillment.next();
 		// Provide entities and trigger apiFetch
-		const { value: apiFetchAction } = fulfillment.next( entities );
+		expect( fulfillment.next( entities ).value.type ).toBe(
+			'SAVE_ENTITY_RECORD_START'
+		);
+		const { value: apiFetchAction } = fulfillment.next();
 		expect( apiFetchAction.request ).toEqual( {
 			path: '/wp/v2/posts/10',
 			method: 'PUT',
@@ -38,6 +45,7 @@ describe( 'saveEntityRecord', () => {
 		// Provide response and trigger action
 		const { value: received } = fulfillment.next( post );
 		expect( received ).toEqual( receiveEntityRecords( 'postType', 'post', post, undefined, true ) );
+		expect( fulfillment.next().value.type ).toBe( 'SAVE_ENTITY_RECORD_FINISH' );
 	} );
 
 	it( 'triggers a PUT request for an existing record with a custom key', async () => {
@@ -47,7 +55,10 @@ describe( 'saveEntityRecord', () => {
 		// Trigger generator
 		fulfillment.next();
 		// Provide entities and trigger apiFetch
-		const { value: apiFetchAction } = fulfillment.next( entities );
+		expect( fulfillment.next( entities ).value.type ).toBe(
+			'SAVE_ENTITY_RECORD_START'
+		);
+		const { value: apiFetchAction } = fulfillment.next();
 		expect( apiFetchAction.request ).toEqual( {
 			path: '/wp/v2/types/page',
 			method: 'PUT',
@@ -56,6 +67,7 @@ describe( 'saveEntityRecord', () => {
 		// Provide response and trigger action
 		const { value: received } = fulfillment.next( postType );
 		expect( received ).toEqual( receiveEntityRecords( 'root', 'postType', postType, undefined, true ) );
+		expect( fulfillment.next().value.type ).toBe( 'SAVE_ENTITY_RECORD_FINISH' );
 	} );
 } );
 

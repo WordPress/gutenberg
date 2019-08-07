@@ -30,34 +30,35 @@ import withSpokenMessages from '../higher-order/with-spoken-messages';
 
 /**
  * A raw completer option.
+ *
  * @typedef {*} CompleterOption
  */
 
 /**
  * @callback FnGetOptions
  *
- * @returns {(CompleterOption[]|Promise.<CompleterOption[]>)} The completer options or a promise for them.
+ * @return {(CompleterOption[]|Promise.<CompleterOption[]>)} The completer options or a promise for them.
  */
 
 /**
  * @callback FnGetOptionKeywords
  * @param {CompleterOption} option a completer option.
  *
- * @returns {string[]} list of key words to search.
+ * @return {string[]} list of key words to search.
  */
 
 /**
  * @callback FnIsOptionDisabled
  * @param {CompleterOption} option a completer option.
  *
- * @returns {string[]} whether or not the given option is disabled.
+ * @return {string[]} whether or not the given option is disabled.
  */
 
 /**
  * @callback FnGetOptionLabel
  * @param {CompleterOption} option a completer option.
  *
- * @returns {(string|Array.<(string|Component)>)} list of react components to render.
+ * @return {(string|Array.<(string|Component)>)} list of react components to render.
  */
 
 /**
@@ -65,35 +66,36 @@ import withSpokenMessages from '../higher-order/with-spoken-messages';
  * @param {string} before the string before the auto complete trigger and query.
  * @param {string} after  the string after the autocomplete trigger and query.
  *
- * @returns {boolean} true if the completer can handle.
+ * @return {boolean} true if the completer can handle.
  */
 
 /**
  * @typedef {Object} OptionCompletion
- * @property {('insert-at-caret', 'replace')} action the intended placement of the completion.
+ * @property {'insert-at-caret'|'replace'} action the intended placement of the completion.
  * @property {OptionCompletionValue} value the completion value.
  */
 
 /**
  * A completion value.
- * @typedef {(String|WPElement|Object)} OptionCompletionValue
+ *
+ * @typedef {(string|WPElement|Object)} OptionCompletionValue
  */
 
 /**
  * @callback FnGetOptionCompletion
  * @param {CompleterOption} value the value of the completer option.
- * @param {String} query the text value of the autocomplete query.
+ * @param {string} query the text value of the autocomplete query.
  *
- * @returns {(OptionCompletion|OptionCompletionValue)} the completion for the given option. If an
+ * @return {(OptionCompletion|OptionCompletionValue)} the completion for the given option. If an
  * 													   OptionCompletionValue is returned, the
  * 													   completion action defaults to `insert-at-caret`.
  */
 
 /**
  * @typedef {Object} Completer
- * @property {String} name a way to identify a completer, useful for selective overriding.
- * @property {?String} className A class to apply to the popup menu.
- * @property {String} triggerPrefix the prefix that will display the menu.
+ * @property {string} name a way to identify a completer, useful for selective overriding.
+ * @property {?string} className A class to apply to the popup menu.
+ * @property {string} triggerPrefix the prefix that will display the menu.
  * @property {(CompleterOption[]|FnGetOptions)} options the completer options or a function to get them.
  * @property {?FnGetOptionKeywords} getOptionKeywords get the keywords for a given option.
  * @property {?FnIsOptionDisabled} isOptionDisabled get whether or not the given option is disabled.
@@ -130,7 +132,8 @@ function filterOptions( search, options = [], maxResults = 10 ) {
 }
 
 function getCaretRect() {
-	const range = window.getSelection().getRangeAt( 0 );
+	const selection = window.getSelection();
+	const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
 
 	if ( range ) {
 		return getRectangleFromRange( range );

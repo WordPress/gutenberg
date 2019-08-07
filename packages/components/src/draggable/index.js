@@ -66,8 +66,6 @@ class Draggable extends Component {
 	 * - Adds dragover listener.
 	 *
 	 * @param  {Object} event The non-custom DragEvent.
-	 * @param  {string} elementId The HTML id of the element to be dragged.
-	 * @param  {Object} transferData The data to be set to the event's dataTransfer - to be accessible in any later drop logic.
 	 */
 	onDragStart( event ) {
 		const { elementId, transferData, onDragStart = noop } = this.props;

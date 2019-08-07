@@ -57,7 +57,7 @@ async function askForConfirmationToContinue( message, isDefault = true, abortMes
  *
  * @param {string} name         Step name.
  * @param {string} abortMessage Abort message.
- * @param {function} handler    Step logic.
+ * @param {Function} handler    Step logic.
  */
 async function runStep( name, abortMessage, handler ) {
 	try {
@@ -122,7 +122,7 @@ async function runSvnRepositoryCloneStep( abortMessage ) {
 }
 
 /**
- * Updates and commits the content of the SVN repo using the new plugin zip.
+ * Updates and commits the content of the SVN repo using the new plugin ZIP.
  *
  * @param {string} version      Version.
  * @param {string} changelog    Changelog.
@@ -131,12 +131,12 @@ async function runSvnRepositoryCloneStep( abortMessage ) {
 async function runUpdateTrunkContentStep( version, changelog, abortMessage ) {
 	// Updating the content of the svn
 	await runStep( 'Updating trunk content', abortMessage, async () => {
-		console.log( '>> Replacing trunk content using the new plugin zip' );
+		console.log( '>> Replacing trunk content using the new plugin ZIP' );
 
 		// Delete everything except readme.txt and changelog.txt
 		runShellScript( 'find . -maxdepth 1 -not -name "changelog.txt" -not -name "readme.txt" -not -name ".svn" -not -name "." -not -name ".." -exec rm -rf {} +', svnWorkingDirectoryPath );
 
-		// Update the content using the plugin zip
+		// Update the content using the plugin ZIP
 		const gutenbergZipPath = gitWorkingDirectoryPath + '/gutenberg.zip';
 		runShellScript( 'unzip ' + gutenbergZipPath + ' -d ' + svnWorkingDirectoryPath );
 
@@ -385,13 +385,13 @@ async function runPluginZIPCreationStep( abortMessage ) {
 	await runStep( 'Plugin ZIP creation', abortMessage, async () => {
 		const gutenbergZipPath = gitWorkingDirectoryPath + '/gutenberg.zip';
 		await askForConfirmationToContinue(
-			'Proceed and build the plugin zip? (It takes a few minutes)',
+			'Proceed and build the plugin ZIP? (It takes a few minutes)',
 			true,
 			abortMessage
 		);
 		runShellScript( '/bin/bash bin/build-plugin-zip.sh', gitWorkingDirectoryPath );
 
-		console.log( '>> The plugin zip has been built successfully. Path: ' + success( gutenbergZipPath ) );
+		console.log( '>> The plugin ZIP has been built successfully. Path: ' + success( gutenbergZipPath ) );
 	} );
 }
 
@@ -483,7 +483,7 @@ async function runGithubReleaseStep( version, versionLabel, isPrerelease, abortM
 	abortMessage = abortMessage + ' Make sure to remove the the GitHub release as well.';
 
 	// Uploading the Gutenberg Zip to the release
-	await runStep( 'Uploading the plugin zip', abortMessage, async () => {
+	await runStep( 'Uploading the plugin ZIP', abortMessage, async () => {
 		const gutenbergZipPath = gitWorkingDirectoryPath + '/gutenberg.zip';
 		const filestats = fs.statSync( gutenbergZipPath );
 		await octokit.repos.uploadReleaseAsset( {
@@ -495,10 +495,10 @@ async function runGithubReleaseStep( version, versionLabel, isPrerelease, abortM
 			name: 'gutenberg.zip',
 			file: fs.createReadStream( gutenbergZipPath ),
 		} );
-		console.log( '>> The plugin zip has been successfully uploaded.' );
+		console.log( '>> The plugin ZIP has been successfully uploaded.' );
 	} );
 
-	console.log( '>> The Github release is available here: ' + success( release.html_url ) );
+	console.log( '>> The GitHub release is available here: ' + success( release.html_url ) );
 
 	return release;
 }
@@ -570,9 +570,9 @@ async function releasePlugin( isRC = true ) {
 	await runCherrypickBumpCommitIntoMasterStep( commitHash, abortMessage );
 
 	if ( ! isRC ) {
-		abortMessage = 'Aborting! The Github release is done. Make sure to perform the SVN release manually.';
+		abortMessage = 'Aborting! The GitHub release is done. Make sure to perform the SVN release manually.';
 
-		await askForConfirmationToContinue( 'The Gihub release is complete. Proceed with the SVN release? ', abortMessage );
+		await askForConfirmationToContinue( 'The GitHub release is complete. Proceed with the SVN release? ', abortMessage );
 
 		// Fetching the SVN repository
 		await runSvnRepositoryCloneStep( abortMessage );
@@ -580,10 +580,10 @@ async function releasePlugin( isRC = true ) {
 		// Updating the SVN trunk content
 		await runUpdateTrunkContentStep( version, release.body, abortMessage );
 
-		abortMessage = 'Aborting! The Github release is done, SVN trunk updated. Make sure to create the SVN tag and update the stable version manually.';
+		abortMessage = 'Aborting! The GitHub release is done, SVN trunk updated. Make sure to create the SVN tag and update the stable version manually.';
 		await runSvnTagStep( version, abortMessage );
 
-		abortMessage = 'Aborting! The Github release is done, SVN tagged. Make sure to update the stable version manually.';
+		abortMessage = 'Aborting! The GitHub release is done, SVN tagged. Make sure to update the stable version manually.';
 		await updateThePluginStableVersion( version, abortMessage );
 	}
 
@@ -601,15 +601,15 @@ program
 		console.log(
 			chalk.bold( '💃 Time to release Gutenberg 🕺\n\n' ),
 			'Welcome! This tool is going to help you release a new RC version of the Gutenberg Plugin.\n',
-			'It goes throught different steps : creating the release branch, bumping the plugin version, tagging and creating the github release, building the zip...\n',
+			'It goes through different steps : creating the release branch, bumping the plugin version, tagging and creating the GitHub release, building the ZIP...\n',
 			'To perform a release you\'ll have to be a member of the Gutenberg Core Team.\n'
 		);
 
 		const release = await releasePlugin( true );
 
 		console.log(
-			'\n>> 🎉 The Gutenberg ' + success( release.name ) + ' has been successfully released.\n',
-			'You can access the Github release here: ' + success( release.html_url ) + '\n',
+			'\n>> 🎉 The Gutenberg version ' + success( release.name ) + ' has been successfully released.\n',
+			'You can access the GitHub release here: ' + success( release.html_url ) + '\n',
 			'Thanks for performing the release!'
 		);
 	} );
@@ -622,7 +622,7 @@ program
 		console.log(
 			chalk.bold( '💃 Time to release Gutenberg 🕺\n\n' ),
 			'Welcome! This tool is going to help you release a new stable version of the Gutenberg Plugin.\n',
-			'It goes throught different steps : bumping the plugin version, tagging and creating the github release, building the zip, pushing the release to the SVN repository...\n',
+			'It goes through different steps : bumping the plugin version, tagging and creating the GitHub release, building the ZIP, pushing the release to the SVN repository...\n',
 			'To perform a release you\'ll have to be a member of the Gutenberg Core Team.\n'
 		);
 
@@ -630,8 +630,8 @@ program
 
 		console.log(
 			'\n>> 🎉 The Gutenberg ' + success( release.name ) + ' has been successfully released.\n',
-			'You can access the Github release here: ' + success( release.html_url ) + '\n',
-			'In a few seconds, you\'ll be able to update the plugin from the WordPress repository.\n',
+			'You can access the GitHub release here: ' + success( release.html_url ) + '\n',
+			'In a few minutes, you\'ll be able to update the plugin from the WordPress repository.\n',
 			'Thanks for performing the release! and don\'t forget to publish the release post.'
 		);
 	} );

@@ -51,16 +51,12 @@ export default function createNamespace( key, options, registry ) {
 		...mapValues( metadataSelectors, ( selector ) => ( state, ...args ) => selector( state.metadata, ...args ) ),
 		...mapValues( options.selectors, ( selector ) => {
 			if ( selector.isRegistrySelector ) {
-				const mappedSelector = ( reg ) => ( state, ...args ) => {
-					return selector( reg )( state.root, ...args );
-				};
-				mappedSelector.isRegistrySelector = selector.isRegistrySelector;
-				return mappedSelector;
+				selector.registry = registry;
 			}
 
 			return ( state, ...args ) => selector( state.root, ...args );
 		} ),
-	}, store, registry );
+	}, store );
 	if ( options.resolvers ) {
 		const result = mapResolvers( options.resolvers, selectors, store );
 		resolvers = result.resolvers;
@@ -152,21 +148,15 @@ function createReduxStore( key, options, registry ) {
 /**
  * Maps selectors to a store.
  *
- * @param {Object}         selectors Selectors to register. Keys will be used as
- *                                   the public facing API. Selectors will get
- *                                   passed the state as first argument.
- * @param {Object}         store     The store to which the selectors should be
- *                                   mapped.
- * @param {WPDataRegistry} registry  Registry reference.
+ * @param {Object} selectors Selectors to register. Keys will be used as the
+ *                           public facing API. Selectors will get passed the
+ *                           state as first argument.
+ * @param {Object} store     The store to which the selectors should be mapped.
  *
  * @return {Object} Selectors mapped to the provided store.
  */
-function mapSelectors( selectors, store, registry ) {
-	const createStateSelector = ( registeredSelector ) => {
-		const registrySelector = registeredSelector.isRegistrySelector ?
-			registeredSelector( registry.select ) :
-			registeredSelector;
-
+function mapSelectors( selectors, store ) {
+	const createStateSelector = ( registrySelector ) => {
 		const selector = function runSelector() {
 			// This function is an optimized implementation of:
 			//

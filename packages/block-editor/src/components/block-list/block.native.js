@@ -118,8 +118,6 @@ class BlockListBlock extends Component {
 		const accessibilityLabel = this.getAccessibilityLabel();
 
 		return (
-			// accessible prop needs to be false to access children
-			// https://facebook.github.io/react-native/docs/accessibility#accessible-ios-android
 			<TouchableWithoutFeedback
 				onPress={ this.onFocus }
 				accessible={ ! isSelected }
@@ -138,7 +136,6 @@ class BlockListBlock extends Component {
 					</View>
 					{ isSelected && <BlockMobileToolbar clientId={ clientId } /> }
 				</View>
-
 			</TouchableWithoutFeedback>
 		);
 	}

@@ -208,7 +208,7 @@ export function clearSelectedBlock() {
  *
  * @param {boolean} [isSelectionEnabled=true] Whether block selection should
  *                                            be enabled.
-
+ *
  * @return {Object} Action object.
  */
 export function toggleSelection( isSelectionEnabled = true ) {
@@ -227,7 +227,7 @@ export function toggleSelection( isSelectionEnabled = true ) {
  * @param {number}            indexToSelect Index of replacement block to
  *                                          select.
  *
- * @yields {Object} Action object.
+ * @yield {Object} Action object.
  */
 export function* replaceBlocks( clientIds, blocks, indexToSelect ) {
 	clientIds = castArray( clientIds );
@@ -303,7 +303,7 @@ export const moveBlocksUp = createOnMove( 'MOVE_BLOCKS_UP' );
  * @param  {?string} toRootClientId   Root client ID destination.
  * @param  {number}  index            The index to move the block into.
  *
- * @yields {Object} Action object.
+ * @yield {Object} Action object.
  */
 export function* moveBlockToPosition( clientId, fromRootClientId = '', toRootClientId = '', index ) {
 	const templateLock = yield select(
@@ -328,6 +328,12 @@ export function* moveBlockToPosition( clientId, fromRootClientId = '', toRootCli
 	// If moving inside the same root block the move is always possible.
 	if ( fromRootClientId === toRootClientId ) {
 		yield action;
+		return;
+	}
+
+	// If templateLock is insert we can not remove the block from the parent.
+	// Given that here we know that we are moving the block to a different parent, the move should not be possible if the condition is true.
+	if ( templateLock === 'insert' ) {
 		return;
 	}
 
@@ -705,3 +711,16 @@ export function __unstableMarkLastChangeAsPersistent() {
 	return { type: 'MARK_LAST_CHANGE_AS_PERSISTENT' };
 }
 
+/**
+ * Returns an action object used to enable or disable the navigation mode.
+ *
+ * @param {string} isNavigationMode Enable/Disable navigation mode.
+ *
+ * @return {Object} Action object
+ */
+export function setNavigationMode( isNavigationMode = true ) {
+	return {
+		type: 'SET_NAVIGATION_MODE',
+		isNavigationMode,
+	};
+}

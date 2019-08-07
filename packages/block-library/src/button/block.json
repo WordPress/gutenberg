@@ -42,6 +42,9 @@
 			"source": "attribute",
 			"selector": "a",
 			"attribute": "rel"
+		},
+		"placeholder": {
+			"type": "string"
 		}
 	}
 }

@@ -22,7 +22,7 @@ import Shortcut from '../shortcut';
 /**
  * Time over children to wait before showing tooltip
  *
- * @type {Number}
+ * @type {number}
  */
 const TOOLTIP_DELAY = 700;
 
@@ -35,6 +35,22 @@ class Tooltip extends Component {
 			TOOLTIP_DELAY
 		);
 
+		/**
+		 * Prebound `isInMouseDown` handler, created as a constant reference to
+		 * assure ability to remove in component unmount.
+		 *
+		 * @type {Function}
+		 */
+		this.cancelIsMouseDown = this.createSetIsMouseDown( false );
+
+		/**
+		 * Whether a the mouse is currently pressed, used in determining whether
+		 * to handle a focus event as displaying the tooltip immediately.
+		 *
+		 * @type {boolean}
+		 */
+		this.isInMouseDown = false;
+
 		this.state = {
 			isOver: false,
 		};
@@ -42,6 +58,8 @@ class Tooltip extends Component {
 
 	componentWillUnmount() {
 		this.delayedSetIsOver.cancel();
+
+		document.removeEventListener( 'mouseup', this.cancelIsMouseDown );
 	}
 
 	emitToChild( eventName, event ) {
@@ -71,6 +89,13 @@ class Tooltip extends Component {
 				return;
 			}
 
+			// A focus event will occur as a result of a mouse click, but it
+			// should be disambiguated between interacting with the button and
+			// using an explicit focus shift as a cue to display the tooltip.
+			if ( 'focus' === event.type && this.isInMouseDown ) {
+				return;
+			}
+
 			// Needed in case unsetting is over while delayed set pending, i.e.
 			// quickly blur/mouseleave before delayedSetIsOver is called
 			this.delayedSetIsOver.cancel();
@@ -85,6 +110,34 @@ class Tooltip extends Component {
 			} else {
 				this.setState( { isOver } );
 			}
+		};
+	}
+
+	/**
+	 * Creates an event callback to handle assignment of the `isInMouseDown`
+	 * instance property in response to a `mousedown` or `mouseup` event.
+	 *
+	 * @param {booelan} isMouseDown Whether handler is to be created for the
+	 *                              `mousedown` event, as opposed to `mouseup`.
+	 *
+	 * @return {Function} Event callback handler.
+	 */
+	createSetIsMouseDown( isMouseDown ) {
+		return ( event ) => {
+			// Preserve original child callback behavior
+			this.emitToChild( isMouseDown ? 'onMouseDown' : 'onMouseUp', event );
+
+			// On mouse down, the next `mouseup` should revert the value of the
+			// instance property and remove its own event handler. The bind is
+			// made on the document since the `mouseup` might not occur within
+			// the bounds of the element.
+			document[
+				isMouseDown ?
+					'addEventListener' :
+					'removeEventListener'
+			]( 'mouseup', this.cancelIsMouseDown );
+
+			this.isInMouseDown = isMouseDown;
 		};
 	}
 
@@ -107,6 +160,7 @@ class Tooltip extends Component {
 			onClick: this.createToggleIsOver( 'onClick' ),
 			onFocus: this.createToggleIsOver( 'onFocus' ),
 			onBlur: this.createToggleIsOver( 'onBlur' ),
+			onMouseDown: this.createSetIsMouseDown( true ),
 			children: concatChildren(
 				child.props.children,
 				isOver && (

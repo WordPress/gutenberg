@@ -2,3 +2,6 @@
 	max-width: $content-width;
 	margin: 0 auto 30px;
 }
+.edit-widgets-main-block-list {
+	padding-top: $block-toolbar-height + 2 * $grid-size;
+}
