@@ -1,4 +1,4 @@
-.block-editor-discover-block-list-item {
+.block-directory-downloadable-block-list-item {
 	width: 100%;
 	padding: 0;
 	margin: 0 0 12px;
@@ -18,31 +18,31 @@
 	text-align: left;
 }
 
-.block-editor-discover-block-list-item__panel {
+.block-directory-downloadable-block-list-item__panel {
 	display: flex;
 	flex-grow: 1;
 	flex-direction: column;
 }
 
-.block-editor-discover-block-list-item__header {
+.block-directory-downloadable-block-list-item__header {
 	display: flex;
 	flex-direction: column;
 	padding: 12px 12px 0;
 }
 
-.block-editor-discover-block-list-item__body {
+.block-directory-downloadable-block-list-item__body {
 	display: flex;
 	flex-direction: column;
 	padding: 12px;
 }
 
-.block-editor-discover-block-list-item__footer {
+.block-directory-downloadable-block-list-item__footer {
 	display: flex;
 	flex-direction: column;
 	padding: 12px;
 	background-color: $light-gray-500;
 }
 
-.block-editor-discover-block-list-item__content {
+.block-directory-downloadable-block-list-item__content {
 	color: $dark-gray-400;
 }

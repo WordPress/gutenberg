@@ -21,9 +21,9 @@ function DiscoverBlockListItem( {
 	} = item;
 
 	return (
-		<li className="block-editor-discover-block-list-item">
-			<div className="block-editor-discover-block-list-item__panel">
-				<div className="block-editor-discover-block-list-item__header">
+		<li className="block-directory-downloadable-block-list-item">
+			<div className="block-directory-downloadable-block-list-item__panel">
+				<div className="block-directory-downloadable-block-list-item__header">
 					<DiscoverBlockHeader
 						icon={ icon }
 						onClick={ onClick }
@@ -32,14 +32,14 @@ function DiscoverBlockListItem( {
 						ratingCount={ ratingCount }
 					/>
 				</div>
-				<div className="block-editor-discover-block-list-item__body">
+				<div className="block-directory-downloadable-block-list-item__body">
 					<DiscoverBlockInfo
 						activeInstalls={ activeInstalls }
 						description={ description }
 						humanizedUpdated={ humanizedUpdated }
 					/>
 				</div>
-				<div className="block-editor-discover-block-list-item__footer">
+				<div className="block-directory-downloadable-block-list-item__footer">
 					<DiscoverBlockAuthorInfo
 						author={ author }
 					/>

@@ -1,4 +1,4 @@
-.block-editor-discover-block-header__row {
+.block-directory-downloadable-block-header__row {
 	display: flex;
 	flex-grow: 1;
 
@@ -14,11 +14,11 @@
 		height: 36px;
 	}
 
-	.block-editor-discover-block-header__column {
+	.block-directory-downloadable-block-header__column {
 		display: flex;
 		flex-direction: column;
 		flex-grow: 1;
-		.block-editor-discover-block-header__title {
+		.block-directory-downloadable-block-header__title {
 			font-weight: 600;
 			margin-left: 12px;
 		}

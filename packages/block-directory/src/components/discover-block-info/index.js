@@ -8,14 +8,14 @@ import { _n, sprintf } from '@wordpress/i18n';
 function DiscoverBlockInfo( { description, activeInstalls, humanizedUpdated } ) {
 	return (
 		<Fragment>
-			<span className="block-editor-discover-block-info__content">
+			<span className="block-directory-downloadable-block-info__content">
 				{ description }
 			</span>
-			<div className="block-editor-discover-block-info__row">
-				<div className="block-editor-discover-block-info__column">
+			<div className="block-directory-downloadable-block-info__row">
+				<div className="block-directory-downloadable-block-info__column">
 					<Icon icon="chart-line"></Icon>{ sprintf( _n( '%d active installation', '%d active installations', activeInstalls ), activeInstalls ) }
 				</div>
-				<div className="block-editor-discover-block-info__column">
+				<div className="block-directory-downloadable-block-info__column">
 					<Icon icon="update"></Icon>{ humanizedUpdated }
 				</div>
 			</div>

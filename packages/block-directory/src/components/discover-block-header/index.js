@@ -14,7 +14,7 @@ import BlockRatings from '../block-ratings';
 function DiscoverBlockHeader( { icon, title, rating, ratingCount, onClick } ) {
 	return (
 		<Fragment>
-			<div className="block-editor-discover-block-header__row">
+			<div className="block-directory-downloadable-block-header__row">
 				{
 					icon.match( /\.(jpeg|jpg|gif|png)/ ) !== null ?
 						<img src={ icon } alt="block icon" /> :
@@ -23,8 +23,8 @@ function DiscoverBlockHeader( { icon, title, rating, ratingCount, onClick } ) {
 						</span>
 				}
 
-				<div className="block-editor-discover-block-header__column">
-					<span className="block-editor-discover-block-header__title">
+				<div className="block-directory-downloadable-block-header__column">
+					<span className="block-directory-downloadable-block-header__title">
 						{ title }
 					</span>
 					<BlockRatings rating={ rating } ratingCount={ ratingCount } />
