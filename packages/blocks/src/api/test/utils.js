@@ -1,5 +1,3 @@
-/* eslint-disable react/forbid-elements2 */
-
 /**
  * External dependencies
  */

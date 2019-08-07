@@ -100,7 +100,7 @@
 		"deep-freeze": "0.0.1",
 		"doctrine": "2.1.0",
 		"enzyme": "3.9.0",
-		"eslint-plugin-jest": "21.5.0",
+		"eslint-plugin-jest": "22.14.1",
 		"espree": "4.0.0",
 		"fast-glob": "2.2.7",
 		"fbjs": "0.8.17",

@@ -35,7 +35,7 @@ describe( 'withDispatch', () => {
 			return {
 				increment: () => {
 					const actionReturnedFromDispatch = Promise.resolve( _dispatch( 'counter' ).increment( count ) );
-					expect( actionReturnedFromDispatch ).resolves.toEqual(
+					return expect( actionReturnedFromDispatch ).resolves.toEqual(
 						{
 							type: 'increment',
 							count,
@@ -166,7 +166,7 @@ describe( 'withDispatch', () => {
 					const actionReturnedFromDispatch = Promise.resolve(
 						_dispatch( 'counter' ).update( innerCount + 1 )
 					);
-					expect( actionReturnedFromDispatch ).resolves.toEqual( {
+					return expect( actionReturnedFromDispatch ).resolves.toEqual( {
 						type: 'update',
 						count: innerCount + 1,
 					} );
