@@ -316,7 +316,6 @@ describe( 'Writing Flow', () => {
 	it( 'should navigate empty paragraph', async () => {
 		await clickBlockAppender();
 		await page.keyboard.press( 'Enter' );
-		await page.waitForFunction( () => document.activeElement.isContentEditable );
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'ArrowRight' );

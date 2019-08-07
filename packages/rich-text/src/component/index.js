@@ -288,7 +288,7 @@ class RichText extends Component {
 		this.recalculateBoundaryStyle();
 
 		// We know for certain that on focus, the old selection is invalid. It
-		// will be recalculated on the next animation frame.
+		// will be recalculated on the next mouseup, keyup, or touchend event.
 		const index = undefined;
 		const activeFormats = undefined;
 
@@ -392,8 +392,17 @@ class RichText extends Component {
 
 	/**
 	 * Handles the `selectionchange` event: sync the selection to local state.
+	 *
+	 * @param {Event} event `selectionchange` event.
 	 */
-	onSelectionChange() {
+	onSelectionChange( event ) {
+		if (
+			event.type !== 'selectionchange' &&
+			! this.props.__unstableIsSelected
+		) {
+			return;
+		}
+
 		const { start, end } = this.createRecord();
 		const value = this.getRecord();
 
@@ -911,6 +920,13 @@ class RichText extends Component {
 					onMouseDown={ this.onPointerDown }
 					onTouchStart={ this.onPointerDown }
 					setRef={ this.setRef }
+					// Selection updates must be done at these events as they
+					// happen before the `selectionchange` event. In some cases,
+					// the `selectionchange` event may not even fire, for
+					// example when the window receives focus again on click.
+					onKeyUp={ this.onSelectionChange }
+					onMouseUp={ this.onSelectionChange }
+					onTouchEnd={ this.onSelectionChange }
 				/>
 				{ isSelected && <FormatEdit
 					allowedFormats={ allowedFormats }
