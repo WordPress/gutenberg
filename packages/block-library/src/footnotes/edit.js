@@ -7,18 +7,49 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { IconButton, Toolbar } from '@wordpress/components';
+import { useRef } from '@wordpress/element';
+import { useDispatch } from '@wordpress/data';
+import { withSafeTimeout } from '@wordpress/compose';
 
-export default function Edit( { attributes, setAttributes, className } ) {
+function Edit( { attributes, setAttributes, className, setTimeout } ) {
 	const { footnotes } = attributes;
+	const ref = useRef( null );
+	const { clearSelectedBlock } = useDispatch( 'core/block-editor' );
 
 	if ( ! footnotes.length ) {
 		return null;
 	}
 
+	const hasSelection = footnotes.some( ( { isSelected } ) => isSelected );
+	const viewAll = () => {
+		ref.current.focus();
+		clearSelectedBlock();
+		// Wait for footnotes to be recalculated after the DOM change.
+		setTimeout( () =>
+			// Wait for DOM to update.
+			setTimeout( () => ref.current.scrollIntoView() )
+		);
+	};
+
 	return (
-		<div className={ classnames( 'wp-block block-library-list', className, {
-			'is-selected': footnotes.some( ( { isSelected } ) => isSelected ),
-		} ) }>
+		<div
+			className={ classnames( 'wp-block block-library-list', className, {
+				'is-selected': hasSelection,
+			} ) }
+			tabIndex="0"
+			ref={ ref }
+		>
+			{ hasSelection &&
+				<Toolbar>
+					<IconButton icon="editor-ol" onClick={ viewAll }>
+						View all Footnotes
+					</IconButton>
+					<IconButton icon="trash">
+						Remove Footnote
+					</IconButton>
+				</Toolbar>
+			}
 			<ol>
 				{ footnotes.map( ( { id, text, isSelected }, index ) =>
 					<li
@@ -63,3 +94,5 @@ export default function Edit( { attributes, setAttributes, className } ) {
 		</div>
 	);
 }
+
+export default withSafeTimeout( Edit );

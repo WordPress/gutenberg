@@ -39,7 +39,10 @@ class Edit extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
-		if ( this.props.contentRef === prevProps.contentRef ) {
+		if (
+			this.props.contentRef === prevProps.contentRef &&
+			this.props.selectionStart === prevProps.selectionStart
+		) {
 			return;
 		}
 
@@ -111,9 +114,11 @@ export default compose( [
 	withSafeTimeout,
 	withSelect( ( select ) => {
 		const { getEditorBlocks, getFootnotes } = select( 'core/editor' );
+		const { getSelectionStart } = select( 'core/block-editor' );
 		return {
 			contentRef: getEditorBlocks(),
 			footnotes: getFootnotes(),
+			selectionStart: getSelectionStart(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

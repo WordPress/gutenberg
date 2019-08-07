@@ -11,6 +11,11 @@
 .editor-styles-wrapper .wp-block-footnotes {
 	margin: 0;
 
+	.components-toolbar {
+		border: none;
+		padding: 10px;
+	}
+
 	&.is-selected {
 		background: #fff;
 		position: sticky;
@@ -21,6 +26,25 @@
 		animation-timing-function: ease;
 		box-shadow: -3px 0 0 0 #555d66;
 		margin: 0 1px;
+		border-top: 1px solid rgba(66, 88, 99, 0.4);
+
+		// Vertically center the single list item.
+		ol {
+			margin-top: 0;
+			margin-bottom: 0;
+			padding-bottom: 10px;
+		}
+
+		// We cannot use display as it will affect the numbering.
+		li {
+			visibility: hidden;
+			height: 0;
+		}
+
+		li.is-selected {
+			visibility: visible;
+			height: auto;
+		}
 	}
 
 	input {
