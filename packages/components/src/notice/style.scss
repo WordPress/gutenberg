@@ -45,12 +45,12 @@
 	position: absolute;
 	top: 0;
 	right: 0;
-	color: $dark-gray-300;
+	color: $dark-gray-500;
 
 	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover,
 	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):active,
 	&:not(:disabled):not([aria-disabled="true"]):focus {
-		color: $alert-red;
+		color: $dark-gray-900;
 		background-color: transparent;
 	}
 
