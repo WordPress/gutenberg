@@ -1,0 +1,58 @@
+{
+	"name": "@wordpress/components-docsite",
+	"version": "0.1.0",
+	"private": true,
+	"scripts": {
+		"prestart": "npm run build:docs",
+		"start": "concurrently 'npm run watch:docs' 'npm run start:server' 'npm run start:app'",
+		"start:app": "react-scripts start",
+		"start:server": "node server.js",
+		"build": "npm run build:docs && npm run build:app",
+		"build:app": "react-scripts build",
+		"build:docs": "npm run clean:docs && npm run generate:docs",
+		"clean:docs": "rm -rf public/_data",
+		"generate:docs": "node ./scripts/generate-docs.js",
+		"generate:nav": "node ./scripts/generate-nav.js",
+		"watch:docs": "node ./scripts/watch-transform-data.js"
+	},
+	"dependencies": {
+		"@emotion/core": "10.0.15",
+		"@emotion/styled": "10.0.15",
+		"@wordpress/block-serialization-default-parser": "3.3.0",
+		"@wordpress/blocks": "6.5.0",
+		"@wordpress/components": "8.1.0",
+		"axios": "0.19.0",
+		"marked": "0.7.0",
+		"prism-react-renderer": "0.1.7",
+		"react": "^16.8.6",
+		"react-dom": "^16.8.6",
+		"react-live": "2.1.2",
+		"react-router": "5.0.1",
+		"react-router-dom": "5.0.1",
+		"react-scripts": "3.0.1"
+	},
+	"devDependencies": {
+		"chokidar": "3.0.2",
+		"concurrently": "4.1.1",
+		"express": "4.17.1",
+		"glob": "7.1.4",
+		"lodash.orderby": "4.6.0",
+		"mkdirp": "0.5.1",
+		"remark": "11.0.1",
+		"remark-parse": "7.0.1",
+		"unified": "8.3.2",
+		"unist-util-visit": "2.0.0"
+	},
+	"browserslist": {
+		"production": [
+			">0.2%",
+			"not dead",
+			"not op_mini all"
+		],
+		"development": [
+			"last 1 chrome version",
+			"last 1 firefox version",
+			"last 1 safari version"
+		]
+	}
+}
