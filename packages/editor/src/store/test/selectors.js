@@ -1591,7 +1591,7 @@ describe( 'selectors', () => {
 			expect( isEditedPostEmpty( state ) ).toBe( true );
 		} );
 
-		it( 'should return true if blocks, but empty content edit', () => {
+		it( 'should return false if blocks, but empty content edit', () => {
 			const state = {
 				editor: {
 					present: {
@@ -1616,7 +1616,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( isEditedPostEmpty( state ) ).toBe( true );
+			expect( isEditedPostEmpty( state ) ).toBe( false );
 		} );
 
 		it( 'should return true if the post has an empty content property', () => {
@@ -1638,7 +1638,7 @@ describe( 'selectors', () => {
 			expect( isEditedPostEmpty( state ) ).toBe( true );
 		} );
 
-		it( 'should return false if edits include a non-empty content property', () => {
+		it( 'should return true if edits include a non-empty content property, but blocks are empty', () => {
 			const state = {
 				editor: {
 					present: {
@@ -1654,7 +1654,7 @@ describe( 'selectors', () => {
 				currentPost: {},
 			};
 
-			expect( isEditedPostEmpty( state ) ).toBe( false );
+			expect( isEditedPostEmpty( state ) ).toBe( true );
 		} );
 
 		it( 'should return true if empty classic block', () => {
@@ -2147,7 +2147,7 @@ describe( 'selectors', () => {
 			} );
 		} );
 
-		it( 'defers to returning an edited post attribute', () => {
+		it( 'serializes blocks, if any', () => {
 			const block = createBlock( 'core/block' );
 
 			const state = {
@@ -2167,7 +2167,7 @@ describe( 'selectors', () => {
 
 			const content = getEditedPostContent( state );
 
-			expect( content ).toBe( 'custom edit' );
+			expect( content ).toBe( '<!-- wp:block /-->' );
 		} );
 
 		it( 'returns serialization of blocks', () => {
