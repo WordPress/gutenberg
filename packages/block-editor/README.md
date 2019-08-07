@@ -124,11 +124,16 @@ Undocumented declaration.
 
 <a name="BlockPreview" href="#BlockPreview">#</a> **BlockPreview**
 
-BlockPreview renders a preview given an array of blocks.
+BlockPreview renders a preview of a block or array of blocks.
+
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/block-preview/README.md>
 
 _Parameters_
 
--   _props_ `Object`: Component props.
+-   _blocks_ `(Array|Object)`: A block instance (object) or an array of blocks to be previewed.
+-   _viewportWidth_ `number`: Width of the preview container in pixels. Controls at what size the blocks will be rendered inside the preview. Default: 700.
 
 _Returns_
 

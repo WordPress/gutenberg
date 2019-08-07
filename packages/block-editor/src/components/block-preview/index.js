@@ -126,10 +126,12 @@ export function BlockPreview( { blocks, viewportWidth = 700, settings } ) {
 }
 
 /**
- * BlockPreview renders a preview given an array of blocks.
+ * BlockPreview renders a preview of a block or array of blocks.
  *
- * @param {Object} props Component props.
+ * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/block-preview/README.md
  *
+ * @param {Array|Object} blocks A block instance (object) or an array of blocks to be previewed.
+ * @param {number} viewportWidth Width of the preview container in pixels. Controls at what size the blocks will be rendered inside the preview. Default: 700.
  * @return {WPElement} Rendered element.
  */
 export default withSelect( ( select ) => {
