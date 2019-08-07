@@ -18,9 +18,7 @@ import BlockEditorProvider from '../provider';
 import BlockList from '../block-list';
 import { getBlockPreviewContainerDOMNode } from '../../utils/dom';
 
-const PREVIEW_CONTAINER_WIDTH = 700;
-
-function ScaledBlockPreview( { blocks } ) {
+function ScaledBlockPreview( { blocks, viewportWidth } ) {
 	const previewRef = useRef( null );
 
 	const [ isTallPreview, setIsTallPreview ] = useState( false );
@@ -61,7 +59,7 @@ function ScaledBlockPreview( { blocks } ) {
 				previewElement.style.marginTop = '0';
 			} else {
 				const containerElementRect = containerElement.getBoundingClientRect();
-				setPreviewScale( containerElementRect.width / PREVIEW_CONTAINER_WIDTH );
+				setPreviewScale( containerElementRect.width / viewportWidth );
 				setIsTallPreview( true );
 			}
 
@@ -85,7 +83,7 @@ function ScaledBlockPreview( { blocks } ) {
 		visibility: isReady ? 'visible' : 'hidden',
 		left: -x,
 		top: y,
-		width: PREVIEW_CONTAINER_WIDTH,
+		width: viewportWidth,
 	};
 
 	const contentClassNames = classnames( 'block-editor-block-preview__content editor-styles-wrapper', {
@@ -102,7 +100,7 @@ function ScaledBlockPreview( { blocks } ) {
 	);
 }
 
-export function BlockPreview( { blocks, settings } ) {
+export function BlockPreview( { blocks, viewportWidth = 700, settings } ) {
 	const renderedBlocks = useMemo( () => castArray( blocks ), [ blocks ] );
 	const [ recompute, triggerRecompute ] = useReducer( ( state ) => state + 1, 0 );
 	useLayoutEffect( triggerRecompute, [ blocks ] );
@@ -118,7 +116,11 @@ export function BlockPreview( { blocks, settings } ) {
 				 * be rerendered.
 				 */
 			}
-			<ScaledBlockPreview key={ recompute } blocks={ renderedBlocks } />
+			<ScaledBlockPreview
+				key={ recompute }
+				blocks={ renderedBlocks }
+				viewportWidth={ viewportWidth }
+			/>
 		</BlockEditorProvider>
 	);
 }
