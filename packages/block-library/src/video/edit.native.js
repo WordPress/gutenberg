@@ -155,8 +155,8 @@ class VideoEdit extends React.Component {
 	}
 
 	render() {
-		const { attributes, isSelected, setAttributes } = this.props;
-		const { caption, id, src } = attributes;
+		const { attributes, isSelected } = this.props;
+		const { id, src } = attributes;
 		const { videoContainerHeight } = this.state;
 
 		const toolbarEditButton = (
@@ -251,10 +251,8 @@ class VideoEdit extends React.Component {
 						} }
 					/>
 					<Caption
-						text={ caption }
-						isParentSelected={ isSelected }
+						clientId={ this.props.clientId }
 						isSelected={ this.state.isCaptionSelected }
-						onChange={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
 						onFocus={ this.onFocusCaption }
 						onBlur={ this.props.onBlur } // always assign onBlur as props
 					/>

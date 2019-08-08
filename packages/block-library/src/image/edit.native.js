@@ -200,8 +200,8 @@ class ImageEdit extends React.Component {
 	}
 
 	render() {
-		const { attributes, isSelected, setAttributes } = this.props;
-		const { url, caption, height, width, alt, href, id } = attributes;
+		const { attributes, isSelected } = this.props;
+		const { url, height, width, alt, href, id } = attributes;
 
 		const onImageSettingsButtonPressed = () => {
 			this.setState( { showSettings: true } );
@@ -338,11 +338,10 @@ class ImageEdit extends React.Component {
 						} }
 					/>
 					<Caption
-						text={ caption }
-						isParentSelected={ isSelected }
+						clientId={ this.props.clientId }
 						isSelected={ this.state.isCaptionSelected }
 						accessible={ true }
-						accessibilityLabel={
+						accessibilityLabelCreator={ ( caption ) =>
 							isEmpty( caption ) ?
 							/* translators: accessibility text. Empty image caption. */
 								( 'Image caption. Empty' ) :
@@ -351,7 +350,6 @@ class ImageEdit extends React.Component {
 									__( 'Image caption. %s' ),
 									caption )
 						}
-						onChange={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
 						onFocus={ this.onFocusCaption }
 						onBlur={ this.props.onBlur } // always assign onBlur as props
 					/>
