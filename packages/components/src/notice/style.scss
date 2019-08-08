@@ -46,6 +46,8 @@
 
 .components-notice__dismiss {
 	color: $dark-gray-300;
+
+	// Place the dismiss button at the top of the container, even when text wraps onto two lines.
 	align-self: flex-start;
 	flex-shrink: 0;
 
@@ -72,6 +74,7 @@
 		line-height: 1.6;
 	}
 
+	// Reduce margins on inline buttons so that they don't add too much extra line-height.
 	.components-notice__action.components-button {
 		margin-top: -2px;
 		margin-bottom: -2px;
