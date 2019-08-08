@@ -44,13 +44,18 @@
 		"@wordpress/viewport": "file:../viewport",
 		"@wordpress/wordcount": "file:../wordcount",
 		"classnames": "^2.2.5",
+		"diff": "^3.5.0",
 		"dom-scroll-into-view": "^1.2.1",
+		"inherits": "^2.0.3",
 		"lodash": "^4.17.10",
+		"memize": "^1.0.5",
+		"react-autosize-textarea": "^3.0.2",
 		"react-spring": "^8.0.19",
 		"redux-multi": "^0.1.12",
 		"refx": "^3.0.0",
 		"rememo": "^3.0.0",
-		"tinycolor2": "^1.4.1"
+		"tinycolor2": "^1.4.1",
+		"traverse": "^0.6.6"
 	},
 	"publishConfig": {
 		"access": "public"

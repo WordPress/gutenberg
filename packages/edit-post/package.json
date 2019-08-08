@@ -44,7 +44,9 @@
 		"@wordpress/viewport": "file:../viewport",
 		"classnames": "^2.2.5",
 		"lodash": "^4.17.14",
-		"refx": "^3.0.0"
+		"memize": "^1.0.5",
+		"refx": "^3.0.0",
+		"rememo": "^3.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

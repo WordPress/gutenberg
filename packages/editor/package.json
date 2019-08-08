@@ -48,14 +48,12 @@
 		"@wordpress/viewport": "file:../viewport",
 		"@wordpress/wordcount": "file:../wordcount",
 		"classnames": "^2.2.5",
-		"inherits": "^2.0.3",
 		"lodash": "^4.17.14",
 		"memize": "^1.0.5",
 		"react-autosize-textarea": "^3.0.2",
 		"redux-optimist": "^1.0.0",
 		"refx": "^3.0.0",
-		"rememo": "^3.0.0",
-		"traverse": "^0.6.6"
+		"rememo": "^3.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

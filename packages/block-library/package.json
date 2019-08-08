@@ -47,6 +47,8 @@
 		"fast-average-color": "4.3.0",
 		"lodash": "^4.17.14",
 		"memize": "^1.0.5",
+		"moment": "^2.22.1",
+		"tinycolor2": "^1.4.1",
 		"url": "^0.11.0"
 	},
 	"publishConfig": {
