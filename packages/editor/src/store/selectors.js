@@ -347,12 +347,7 @@ export function getEditedPostAttribute( state, attributeName ) {
  * @return {*} Autosave attribute value.
  */
 export const getAutosaveAttribute = createRegistrySelector( ( select ) => ( state, attributeName ) => {
-	deprecated( '`wp.data.select( \'core/editor\' ).getAutosaveAttribute( attributeName )`', {
-		alternative: '`wp.data.select( \'core\' ).getAutosave( postType, postId, userId )`',
-		plugin: 'Gutenberg',
-	} );
-
-	if ( ! includes( AUTOSAVE_PROPERTIES, attributeName ) ) {
+	if ( ! includes( AUTOSAVE_PROPERTIES, attributeName ) && attributeName !== 'preview_link' ) {
 		return;
 	}
 
@@ -747,7 +742,7 @@ export function getEditedPostPreviewLink( state ) {
 		return;
 	}
 
-	let previewLink = getEditedPostAttribute( state, 'preview_link' );
+	let previewLink = getAutosaveAttribute( state, 'preview_link' );
 	if ( ! previewLink ) {
 		previewLink = getEditedPostAttribute( state, 'link' );
 		if ( previewLink ) {
