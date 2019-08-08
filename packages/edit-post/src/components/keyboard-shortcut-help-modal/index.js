@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { castArray } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -64,11 +65,13 @@ const ShortcutList = ( { shortcuts } ) => (
 	</ul>
 );
 
-const ShortcutSection = ( { title, shortcuts } ) => (
-	<section className="edit-post-keyboard-shortcut-help__section">
-		<h2 className="edit-post-keyboard-shortcut-help__section-title">
-			{ title }
-		</h2>
+const ShortcutSection = ( { title, shortcuts, className } ) => (
+	<section className={ classnames( 'edit-post-keyboard-shortcut-help__section', className ) }>
+		{ !! title && (
+			<h2 className="edit-post-keyboard-shortcut-help__section-title">
+				{ title }
+			</h2>
+		) }
 		<ShortcutList shortcuts={ shortcuts } />
 	</section>
 );
