@@ -112,7 +112,10 @@ $z-layers: (
 
 	// Make sure corner handles are above side handles for ResizableBox component
 	".components-resizable-box__side-handle": 1,
-	".components-resizable-box__corner-handle": 2
+	".components-resizable-box__corner-handle": 2,
+
+	// Make sure block manager sticky category titles appear above the options
+	".edit-post-manage-blocks-modal__category-title": 1
 );
 
 @function z-index( $key ) {
