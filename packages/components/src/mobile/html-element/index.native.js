@@ -103,6 +103,8 @@ class HTMLElementContainer extends Component {
 
 					const childrenCount = Children.count( children );
 
+					// See https://github.com/WordPress/gutenberg/issues/16418
+					// eslint-disable-next-line @wordpress/no-unused-vars-before-return
 					const NativeComponent = this.nativeComponent( tagName );
 					const nativeProps = this.nativeProps( tagName, otherProps );
 
