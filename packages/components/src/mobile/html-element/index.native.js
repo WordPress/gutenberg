@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import { drop, every, head, isEqual, isString, flatMap, pick, some } from 'lodash';
+import { isString, flatMap, some } from 'lodash';
 import { Image, View } from 'react-native';
 import {
 	Element as CSSElement,
 	matchCSSPathWithSelectorString,
-	Path as CSSPath
+	Path as CSSPath,
 } from 'css-match';
 
 /**
@@ -72,28 +72,26 @@ class HTMLElementContainer extends Component {
 			return {};
 		}
 
-		const matchingRules = stylesheet.filter( rule => {
+		const matchingRules = stylesheet.filter( ( rule ) => {
 			// Each rule can have multiple selectors
 			// Check that at least one of them matches
-			return some( rule.selectors, selector => matchCSSPathWithSelectorString( path, selector ) );
+			return some( rule.selectors, ( selector ) => matchCSSPathWithSelectorString( path, selector ) );
 		} );
 
-		const matchingDeclarations = flatMap( matchingRules, rule => rule.declarations );
+		const matchingDeclarations = flatMap( matchingRules, ( rule ) => rule.declarations );
 
 		return matchingDeclarations.reduce( ( result, declaration ) => {
 			return {
 				...result,
-				...declaration
-			}
-		}, {});
+				...declaration,
+			};
+		}, {} );
 	}
 
 	render() {
 		const { tagName, stylesheet, children, ...otherProps } = this.props;
 		const { className, style } = otherProps;
 
-		const NativeComponent = this.nativeComponent( tagName );
-		const nativeProps = this.nativeProps( tagName, otherProps );
 
 		return (
 			<Consumer>
@@ -107,6 +105,8 @@ class HTMLElementContainer extends Component {
 
 					// We only add the cssPath as a prop to help with debugging
 					const cssPath = __DEV__ ? path.inspect() : undefined;
+					const NativeComponent = this.nativeComponent( tagName );
+					const nativeProps = this.nativeProps( tagName, otherProps );
 
 					return (
 						<NativeComponent
@@ -114,10 +114,10 @@ class HTMLElementContainer extends Component {
 							cssPath={ cssPath }
 							style={ { ...computedStyle, ...style } }
 						>
-							{ Children.map( children, ( child, siblingPosition ) => {
+							{ Children.map( children, ( child, childrenPosition ) => {
 								const childContext = {
 									ancestorPath: path,
-									siblingPosition,
+									siblingPosition: childrenPosition,
 									siblingCount: childrenCount,
 								};
 								return (

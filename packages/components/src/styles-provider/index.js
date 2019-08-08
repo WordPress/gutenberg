@@ -17,7 +17,7 @@ export class StylesheetProvider extends Component {
 		const rawStylesheet = stylesheets.reduce(
 			( memo, stylesheet ) => memo.concat( stylesheet.__rawStyles ),
 			[]
-		)
+		);
 
 		return (
 			<Consumer>
