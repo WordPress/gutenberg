@@ -104,7 +104,20 @@ export function getEntity( state, kind, name ) {
  * @return {Object?} Record.
  */
 export function getEntityRecord( state, kind, name, key ) {
-	return get( state.entities.data, [ kind, name, 'queriedData', 'items', key ] );
+	const record = get( state.entities.data, [
+		kind,
+		name,
+		'queriedData',
+		'items',
+		key,
+	] );
+	return (
+		record &&
+		Object.keys( record ).reduce( ( acc, _key ) => {
+			acc[ _key ] = get( record[ _key ], 'raw', record[ _key ] );
+			return acc;
+		}, {} )
+	);
 }
 
 /**
@@ -193,16 +206,10 @@ export function hasEditsForEntityRecord( state, kind, name, recordId ) {
  * @return {Object?} The entity record, merged with its edits.
  */
 export const getEditedEntityRecord = createSelector(
-	( state, kind, name, recordId ) => {
-		const record = getEntityRecord( state, kind, name, recordId );
-		return {
-			...Object.keys( record ).reduce( ( acc, key ) => {
-				acc[ key ] = get( record[ key ], 'raw', record[ key ] );
-				return acc;
-			}, {} ),
-			...getEntityRecordEdits( state, kind, name, recordId ),
-		};
-	},
+	( state, kind, name, recordId ) => ( {
+		...getEntityRecord( state, kind, name, recordId ),
+		...getEntityRecordEdits( state, kind, name, recordId ),
+	} ),
 	( state ) => [ state.entities.data ]
 );
 

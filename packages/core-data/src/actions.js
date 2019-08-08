@@ -4,6 +4,11 @@
 import { castArray, get, merge, isEqual, find } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import { dispatch } from '@wordpress/data-controls';
+
+/**
  * Internal dependencies
  */
 import {
@@ -147,7 +152,7 @@ export function* editEntityRecord( kind, name, recordId, edits ) {
 		// Clear edits when they are equal to their persisted counterparts
 		// so that the property is not considered dirty.
 		edits: Object.keys( edits ).reduce( ( acc, key ) => {
-			const recordValue = get( record[ key ], 'raw', record[ key ] );
+			const recordValue = record[ key ];
 			const value = mergedEdits[ key ] ?
 				merge( recordValue, edits[ key ] ) :
 				edits[ key ];
@@ -220,7 +225,7 @@ export function* saveEntityRecord(
 	kind,
 	name,
 	record,
-	{ isAutosave = false } = { isAutosave: false }
+	{ isAutosave = false, getNoticeActionArgs } = { isAutosave: false }
 ) {
 	const entities = yield getKindEntities( kind );
 	const entity = find( entities, { kind, name } );
@@ -235,13 +240,13 @@ export function* saveEntityRecord(
 	let error;
 	try {
 		const path = `${ entity.baseURL }${ recordId ? '/' + recordId : '' }`;
+		let persistedRecord;
+		let updatedRecord;
+		if ( isAutosave || getNoticeActionArgs ) {
+			persistedRecord = yield select( 'getEntityRecord', kind, name, recordId );
+		}
+
 		if ( isAutosave ) {
-			const persistedRecord = yield select(
-				'getEntityRecord',
-				kind,
-				name,
-				recordId
-			);
 			const currentUser = yield select( 'getCurrentUser' );
 			const currentUserId = currentUser ? currentUser.id : undefined;
 			const autosavePost = yield select(
@@ -274,6 +279,16 @@ export function* saveEntityRecord(
 				data: record,
 			} );
 			yield receiveEntityRecords( kind, name, updatedRecord, undefined, true );
+		}
+
+		if ( getNoticeActionArgs ) {
+			yield dispatch(
+				...getNoticeActionArgs(
+					persistedRecord,
+					updatedRecord,
+					yield select( 'getPostType', updatedRecord.type )
+				)
+			);
 		}
 	} catch ( _error ) {
 		error = _error;

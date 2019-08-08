@@ -75,10 +75,31 @@ describe( 'Post generator actions', () => {
 		);
 		const testConditions = [
 			[
-				'yields an action for signalling that an update to the post started',
+				'yields an action for selecting the current edited post content',
 				() => true,
 				() => {
 					reset( isAutosave );
+					const { value } = fulfillment.next();
+					expect( value ).toEqual(
+						select( STORE_KEY, 'getEditedPostContent' )
+					);
+				},
+			],
+			[
+				"yields an action for editing the post entity's content",
+				() => true,
+				() => {
+					const edits = { content: currentPost().content };
+					const { value } = fulfillment.next( edits.content );
+					expect( value ).toEqual(
+						dispatch( STORE_KEY, 'editPost', edits )
+					);
+				},
+			],
+			[
+				'yields an action for signalling that an update to the post started',
+				() => true,
+				() => {
 					const { value } = fulfillment.next();
 					expect( value ).toEqual( {
 						type: 'REQUEST_POST_UPDATE_START',
@@ -111,6 +132,7 @@ describe( 'Post generator actions', () => {
 				() => true,
 				() => {
 					const { value } = fulfillment.next( currentPost().id );
+					value.args[ 3 ] = { ...value.args[ 3 ], getNoticeActionArgs: 'getNoticeActionArgs' };
 					expect( value ).toEqual(
 						dispatch(
 							'core',
@@ -118,7 +140,7 @@ describe( 'Post generator actions', () => {
 							'postType',
 							currentPost().type,
 							currentPost().id,
-							{ isAutosave }
+							{ isAutosave, getNoticeActionArgs: 'getNoticeActionArgs' }
 						)
 					);
 				},
@@ -144,8 +166,7 @@ describe( 'Post generator actions', () => {
 			}
 		};
 
-		describe( 'yields with expected responses for when not autosaving ' +
-			'and edited post is new', () => {
+		describe( 'yields with expected responses for when not autosaving and edited post is new', () => {
 			beforeEach( () => {
 				isAutosave = false;
 				currentPostStatus = 'draft';
@@ -305,7 +326,7 @@ describe( 'Post generator actions', () => {
 
 describe( 'Editor actions', () => {
 	describe( 'setupEditor()', () => {
-		const post = { content: { raw: '' }, status: 'publish' };
+		const post = { content: '', status: 'publish' };
 
 		let fulfillment;
 		const reset = ( edits, template ) => fulfillment = actions
@@ -326,7 +347,7 @@ describe( 'Editor actions', () => {
 			const { value } = fulfillment.next();
 			expect( value ).toEqual( {
 				type: 'SETUP_EDITOR',
-				post: { content: { raw: '' }, status: 'publish' },
+				post: { content: '', status: 'publish' },
 			} );
 		} );
 		it( 'should yield action object for resetEditorBlocks', () => {
@@ -337,7 +358,7 @@ describe( 'Editor actions', () => {
 			const { value } = fulfillment.next();
 			expect( value ).toEqual(
 				actions.setupEditorState(
-					{ content: { raw: '' }, status: 'publish' }
+					{ content: '', status: 'publish' }
 				)
 			);
 		} );
