@@ -54,11 +54,11 @@ else:
 <!-- /wp:paragraph -->
 
 <!-- wp:image {"id":97629,"align":"full"} -->
-<figure class="wp-block-image alignfull"><img src="https://wordpress.org/gutenberg/files/2018/07/Screenshot-4-1.png" alt="" class="wp-image-97629"/></figure>
+<figure class="wp-block-image alignfull"><img src="https://wordpress.org/gutenberg/files/2018/07/Screenshot-4-1.png" alt="" class="wp-image-97629"/><figcaption><em>Gutenberg</em> on web</figcaption></figure>
 <!-- /wp:image -->
 
 <!-- wp:video {"id":683} -->
-<figure class="wp-block-video"><video controls src="https://i.cloudup.com/YtZFJbuQCE.mov"></video></figure>
+<figure class="wp-block-video"><video controls src="https://i.cloudup.com/YtZFJbuQCE.mov"></video><figcaption>Videos too!</figcaption></figure>
 <!-- /wp:video -->
 
 <!-- wp:paragraph {"align":"left"} -->
