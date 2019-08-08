@@ -14,7 +14,7 @@ import DownloadableBlockListItem from '../downloadable-block-list-item';
 const DOWNLOAD_ERROR_NOTICE_ID = 'block-download-error';
 const INSTALL_ERROR_NOTICE_ID = 'block-install-error';
 
-function DownloadableBlocksList( { items, onHover = () => {}, children, handleDownloadableBlock, installBlock } ) {
+function DownloadableBlocksList( { items, onHover = () => {}, children, downloadBlock, installBlock } ) {
 	return (
 		/*
 		 * Disable reason: The `list` ARIA role is redundant but
@@ -28,7 +28,7 @@ function DownloadableBlocksList( { items, onHover = () => {}, children, handleDo
 					className={ getBlockMenuDefaultClassName( item.id ) }
 					icons={ item.icons }
 					onClick={ () => {
-						handleDownloadableBlock( item );
+						downloadBlock( item );
 						installBlock( item.id );
 						onHover( null );
 					} }
