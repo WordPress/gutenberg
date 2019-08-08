@@ -58,14 +58,18 @@ export default compose(
 			//TODO: remove block and unregister block type from editor;
 		};
 
+		const retryDownloadIfFailed = ( item ) => {
+			removeNotice( 'block-preview-error' );
+			handleDownloadableBlock( item, onSelect, retryDownloadIfFailed );
+		};
+
 		return {
 			installBlock: ( slug ) => {
 				installBlock( slug, retryIfFailed, removeIfFailed );
 			},
 			handleDownloadableBlock: ( item ) => {
-				handleDownloadableBlock( item, onSelect );
+				handleDownloadableBlock( item, onSelect, retryDownloadIfFailed );
 			},
-			removeNotice,
 		};
 	} ),
 )( DownloadableBlocksList );

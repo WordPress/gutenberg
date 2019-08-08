@@ -41,39 +41,38 @@ export function setInstallBlocksPermission( hasPermission ) {
  *
  * @param {Object} item The selected block item
  * @param {Function} onSelect The callback function when the assets are loaded.
+ * @param {Function} retry The callback function when the user clicks retry on error notice.
  */
-export function* handleDownloadableBlock( item, onSelect ) {
-	const {
-		createErrorNotice,
-		removeNotice,
-	} = dispatch( 'core/notices' );
-
-	let scriptsCount = 0;
+export function* handleDownloadableBlock( item, onSelect, retry ) {
 	const onLoad = () => {
-		scriptsCount--;
-		if ( scriptsCount > 0 ) {
-			return;
-		}
 		const registeredBlocks = getBlockTypes();
 		if ( registeredBlocks.length ) {
 			onSelect( item );
 		}
 	};
-	const onError = () => {
-		createErrorNotice( __( 'Block previews can\'t load.' ), {
-			id: 'block-preview-error',
-			actions: [
-				{
-					label: __( 'Retry' ),
-					onClick: () => {
-						removeNotice( 'block-preview-error' );
-						scriptsCount = loadAssets( item.assets, onLoad, onError );
+	function* onError() {
+		yield dispatch(
+			'core/notices',
+			'createErrorNotice',
+			__( 'Block previews can\'t load.' ),
+			{
+				id: 'block-preview-error',
+				actions: [
+					{
+						label: __( 'Retry' ),
+						onClick: () => {
+							retry( item );
+						},
 					},
-				},
-			],
-		} );
-	};
-	scriptsCount = yield loadAssets( item.assets, onLoad, onError );
+				],
+			} );
+	}
+	try {
+		yield loadAssets( item.assets );
+		onLoad();
+	} catch {
+		yield onError();
+	}
 }
 
 /** Action triggered to install a block plugin
@@ -99,7 +98,8 @@ export function* installBlock( slug, retry, remove ) {
 			'core/notices',
 			'createErrorNotice',
 			__( 'Block previews can\'t install.' ),
-			{ id: 'block-install-error',
+			{
+				id: 'block-install-error',
 				actions: [
 					{
 						label: 'Retry',

@@ -119,23 +119,30 @@ const controls = {
 	API_FETCH( { request } ) {
 		return wpApiFetch( { ... request } );
 	},
-	LOAD_ASSETS( { assets, onLoad, onError } ) {
-		let scriptsCount = 0;
-		if ( typeof assets === 'object' && assets.constructor === Array ) {
-			forEach( assets, ( asset ) => {
-				if ( asset.match( /\.js$/ ) !== null ) {
-					scriptsCount++;
-					loadScript( asset, onLoad, onError );
-				} else {
-					loadStyle( asset );
-				}
-			} );
-		} else {
-			scriptsCount++;
-			loadScript( assets.editor_script, onLoad, onError );
-			loadStyle( assets.style );
-		}
-		return scriptsCount;
+	LOAD_ASSETS( { assets } ) {
+		return new Promise( ( resolve, reject ) => {
+			if ( typeof assets === 'object' && assets.constructor === Array ) {
+				let scriptsCount = 0;
+				forEach( assets, ( asset ) => {
+					if ( asset.match( /\.js$/ ) !== null ) {
+						scriptsCount++;
+						loadScript( asset, () => {
+							scriptsCount--;
+							if ( scriptsCount === 0 ) {
+								return resolve( scriptsCount );
+							}
+						}, reject );
+					} else {
+						loadStyle( asset );
+					}
+				} );
+			} else {
+				loadScript( assets.editor_script, () => {
+					return resolve( 0 );
+				}, reject );
+				loadStyle( assets.style );
+			}
+		} );
 	},
 };
 
