@@ -116,12 +116,16 @@ export function shouldOverwriteState( action, previousAction ) {
 
 /**
  * Undoable reducer returning the editor post state, including blocks parsed
- * from current HTML markup.
+ * from current HTML markup, and including selection. It is important to store
+ * selection in this reducer so it can be restored when undoing or redoing
+ * changes.
  *
  * Handles the following state keys:
  *  - edits: an object describing changes to be made to the current post, in
  *           the format accepted by the WP REST API
  *  - blocks: post content blocks
+ *  - selectionStart: start of the post content blocks selection
+ *  - selectionEnd: end of the post content blocks selection
  *
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
