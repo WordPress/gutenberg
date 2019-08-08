@@ -55,7 +55,7 @@ export default compose(
 			installBlock: ( slug ) => {
 				const retryIfFailed = () => {
 					removeNotice( INSTALL_ERROR_NOTICE_ID );
-					installBlock( slug, retryIfFailed, removeIfFailed );
+					installBlock( slug, () => {}, onError );
 				};
 
 				const removeIfFailed = () => {
