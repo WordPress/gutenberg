@@ -11,7 +11,7 @@ import { IconButton, Toolbar, Slot } from '@wordpress/components';
 import { useRef } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { withSafeTimeout } from '@wordpress/compose';
-import { RichText } from '@wordpress/rich-text';
+import { RichText, BlockFormatControls } from '@wordpress/block-editor';
 
 function Edit( { attributes, setAttributes, className, setTimeout } ) {
 	const { footnotes } = attributes;
@@ -42,12 +42,15 @@ function Edit( { attributes, setAttributes, className, setTimeout } ) {
 			ref={ ref }
 		>
 			{ hasSelection &&
-				<Toolbar>
-					<IconButton icon="editor-ol" onClick={ viewAll }>
-						View all Footnotes
-					</IconButton>
-					<Slot name="__unstable-footnote-controls" />
-				</Toolbar>
+				<>
+					<Toolbar>
+						<IconButton icon="editor-ol" onClick={ viewAll }>
+							View all Footnotes
+						</IconButton>
+						<Slot name="__unstable-footnote-controls" />
+					</Toolbar>
+					<BlockFormatControls.Slot />
+				</>
 			}
 			<ol>
 				{ footnotes.map( ( { id, text, isSelected }, index ) =>
@@ -70,7 +73,7 @@ function Edit( { attributes, setAttributes, className, setTimeout } ) {
 								↑
 							</a>
 							{ ' ' }
-							<RichText
+							<RichText.Bare
 								value={ text }
 								onChange={ ( value ) => {
 									setAttributes( {

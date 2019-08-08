@@ -509,6 +509,8 @@ RichTextContainer.Content.defaultProps = {
 	value: '',
 };
 
+RichTextContainer.Bare = RichTextWrapper;
+
 /**
  * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/rich-text/README.md
  */
