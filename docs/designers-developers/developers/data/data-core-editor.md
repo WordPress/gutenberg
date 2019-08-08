@@ -311,8 +311,7 @@ _Returns_
 
 <a name="getEditedPostContent" href="#getEditedPostContent">#</a> **getEditedPostContent**
 
-Returns the content of the post being edited, preferring raw string edit
-before falling back to serialization of block state.
+Returns the content of the post being edited.
 
 _Parameters_
 
@@ -742,6 +741,7 @@ Return true if the current post has already been published.
 _Parameters_
 
 -   _state_ `Object`: Global application state.
+-   _currentPost_ `?Object`: Explicit current post for bypassing registry selector.
 
 _Returns_
 
@@ -1260,6 +1260,18 @@ _Parameters_
 _Related_
 
 -   selectBlock in core/block-editor store.
+
+<a name="serializeBlocks" href="#serializeBlocks">#</a> **serializeBlocks**
+
+Serializes blocks following backwards compatibility conventions.
+
+_Parameters_
+
+-   _blocksForSerialization_ `Array`: The blocks to serialize.
+
+_Returns_
+
+-   `string`: The blocks serialization.
 
 <a name="setTemplateValidity" href="#setTemplateValidity">#</a> **setTemplateValidity**
 

@@ -28,6 +28,7 @@ import {
 	TRASH_POST_NOTICE_ID,
 } from './constants';
 import {
+	getNotificationArgumentsForSaveSuccess,
 	getNotificationArgumentsForTrashFail,
 } from './utils/notice-builder';
 import { awaitNextStateChange, getRegistry } from './controls';
@@ -161,7 +162,7 @@ export function* setupEditor( post, edits, template ) {
 	if ( has( edits, [ 'content' ] ) ) {
 		content = edits.content;
 	} else {
-		content = post.content.raw;
+		content = post.content;
 	}
 
 	let blocks = parse( content );
@@ -182,6 +183,9 @@ export function* setupEditor( post, edits, template ) {
 	};
 	yield resetEditorBlocks( blocks, { __unstableShouldCreateUndoLevel: false } );
 	yield setupEditorState( post );
+	if ( edits ) {
+		yield editPost( edits );
+	}
 	yield* __experimentalSubscribeSources();
 }
 
@@ -239,7 +243,7 @@ export function* __experimentalSubscribeSources() {
 		}
 
 		if ( reset ) {
-			yield resetEditorBlocks( yield select( 'core/editor', 'getEditorBlocks' ) );
+			yield resetEditorBlocks( yield select( 'core/editor', 'getEditorBlocks' ), { __unstableShouldCreateUndoLevel: false } );
 		}
 	}
 }
@@ -360,6 +364,9 @@ export function __experimentalOptimisticUpdatePost( edits ) {
  * @param {Object} options
  */
 export function* savePost( options = {} ) {
+	yield dispatch( STORE_KEY, 'editPost', {
+		content: yield select( 'core/editor', 'getEditedPostContent' ),
+	} );
 	yield __experimentalRequestPostUpdateStart( options );
 	const postType = yield select( 'core/editor', 'getCurrentPostType' );
 	const postId = yield select( 'core/editor', 'getCurrentPostId' );
@@ -369,7 +376,19 @@ export function* savePost( options = {} ) {
 		'postType',
 		postType,
 		postId,
-		options
+		{
+			...options,
+			getNoticeActionArgs: ( previousEntity, entity, type ) => [
+				'core/notices',
+				'createSuccessNotice',
+				...getNotificationArgumentsForSaveSuccess( {
+					previousPost: previousEntity,
+					post: entity,
+					postType: type,
+					options,
+				} ),
+			],
+		}
 	);
 }
 
