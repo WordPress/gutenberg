@@ -146,6 +146,17 @@ describe( 'Post generator actions', () => {
 				},
 			],
 			[
+				'yields an action for signalling that an update to the post finished',
+				() => true,
+				() => {
+					const { value } = fulfillment.next();
+					expect( value ).toEqual( {
+						type: 'REQUEST_POST_UPDATE_FINISH',
+						options: { isAutosave },
+					} );
+				},
+			],
+			[
 				'implicitly returns undefined',
 				() => true,
 				() => {

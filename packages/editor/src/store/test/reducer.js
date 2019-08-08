@@ -15,7 +15,6 @@ import {
 	saving,
 	reusableBlocks,
 	postSavingLock,
-	previewLink,
 } from '../reducer';
 
 describe( 'state', () => {
@@ -187,6 +186,7 @@ describe( 'state', () => {
 				options: { isAutosave: true },
 			} );
 			expect( state ).toEqual( {
+				pending: true,
 				options: { isAutosave: true },
 			} );
 		} );
@@ -487,71 +487,6 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toEqual( {} );
-		} );
-	} );
-
-	describe( 'previewLink', () => {
-		it( 'returns null by default', () => {
-			const state = previewLink( undefined, {} );
-
-			expect( state ).toBe( null );
-		} );
-
-		it( 'returns preview link from save success', () => {
-			const state = previewLink( null, {
-				type: 'REQUEST_POST_UPDATE_SUCCESS',
-				post: {
-					preview_link: 'https://example.com/?p=2611&preview=true',
-				},
-			} );
-
-			expect( state ).toBe( 'https://example.com/?p=2611&preview=true' );
-		} );
-
-		it( 'returns post link with query arg from save success if no preview link', () => {
-			const state = previewLink( null, {
-				type: 'REQUEST_POST_UPDATE_SUCCESS',
-				post: {
-					link: 'https://example.com/sample-post/',
-				},
-			} );
-
-			expect( state ).toBe( 'https://example.com/sample-post/?preview=true' );
-		} );
-
-		it( 'returns same state if save success without preview link or post link', () => {
-			// Bug: This can occur for post types which are defined as
-			// `publicly_queryable => false` (non-viewable).
-			//
-			// See: https://github.com/WordPress/gutenberg/issues/12677
-			const state = previewLink( null, {
-				type: 'REQUEST_POST_UPDATE_SUCCESS',
-				post: {
-					preview_link: '',
-				},
-			} );
-
-			expect( state ).toBe( null );
-		} );
-
-		it( 'returns resets on preview start', () => {
-			const state = previewLink( 'https://example.com/sample-post/', {
-				type: 'REQUEST_POST_UPDATE_START',
-				options: {
-					isPreview: true,
-				},
-			} );
-
-			expect( state ).toBe( null );
-		} );
-
-		it( 'returns state on non-preview save start', () => {
-			const state = previewLink( 'https://example.com/sample-post/', {
-				type: 'REQUEST_POST_UPDATE_START',
-				options: {},
-			} );
-
-			expect( state ).toBe( 'https://example.com/sample-post/' );
 		} );
 	} );
 } );

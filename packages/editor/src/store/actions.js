@@ -287,7 +287,7 @@ export function* resetAutosave( newAutosave ) {
 }
 
 /**
- * Optimistic action for dispatching that a post update request has started.
+ * Action for dispatching that a post update request has started.
  *
  * @param {Object} options
  *
@@ -296,6 +296,20 @@ export function* resetAutosave( newAutosave ) {
 export function __experimentalRequestPostUpdateStart( options = {} ) {
 	return {
 		type: 'REQUEST_POST_UPDATE_START',
+		options,
+	};
+}
+
+/**
+ * Action for dispatching that a post update request has finished.
+ *
+ * @param {Object} options
+ *
+ * @return {Object} An action object
+ */
+export function __experimentalRequestPostUpdateFinish( options = {} ) {
+	return {
+		type: 'REQUEST_POST_UPDATE_FINISH',
 		options,
 	};
 }
@@ -378,18 +392,20 @@ export function* savePost( options = {} ) {
 		postId,
 		{
 			...options,
-			getNoticeActionArgs: ( previousEntity, entity, type ) => [
-				'core/notices',
-				'createSuccessNotice',
-				...getNotificationArgumentsForSaveSuccess( {
+			getNoticeActionArgs: ( previousEntity, entity, type ) => {
+				const args = getNotificationArgumentsForSaveSuccess( {
 					previousPost: previousEntity,
 					post: entity,
 					postType: type,
 					options,
-				} ),
-			],
+				} );
+				if ( args && args.length ) {
+					return [ 'core/notices', 'createSuccessNotice', ...args ];
+				}
+			},
 		}
 	);
+	yield __experimentalRequestPostUpdateFinish( options );
 }
 
 /**
