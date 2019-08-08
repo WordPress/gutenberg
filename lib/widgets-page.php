@@ -69,12 +69,16 @@ function gutenberg_widgets_init( $hook ) {
 		);
 	}
 
+	$experiments_exist        = get_option( 'gutenberg-experiments' );
+	$legacy_widget_experiment = $experiments_exist ? array_key_exists( 'gutenberg-widget-experiments', get_option( 'gutenberg-experiments' ) ) : false;
+
 	$settings = array_merge(
 		array(
-			'disableCustomColors'    => get_theme_support( 'disable-custom-colors' ),
-			'disableCustomFontSizes' => get_theme_support( 'disable-custom-font-sizes' ),
-			'imageSizes'             => $available_image_sizes,
-			'maxUploadFileSize'      => $max_upload_size,
+			'disableCustomColors'                   => get_theme_support( 'disable-custom-colors' ),
+			'disableCustomFontSizes'                => get_theme_support( 'disable-custom-font-sizes' ),
+			'imageSizes'                            => $available_image_sizes,
+			'maxUploadFileSize'                     => $max_upload_size,
+			'__experimentalEnableLegacyWidgetBlock' => $legacy_widget_experiment,
 		),
 		gutenberg_get_legacy_widget_settings()
 	);
