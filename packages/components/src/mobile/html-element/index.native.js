@@ -103,15 +103,12 @@ class HTMLElementContainer extends Component {
 
 					const childrenCount = Children.count( children );
 
-					// We only add the cssPath as a prop to help with debugging
-					const cssPath = __DEV__ ? path.inspect() : undefined;
 					const NativeComponent = this.nativeComponent( tagName );
 					const nativeProps = this.nativeProps( tagName, otherProps );
 
 					return (
 						<NativeComponent
 							{ ...nativeProps }
-							cssPath={ cssPath }
 							style={ { ...computedStyle, ...style } }
 						>
 							{ Children.map( children, ( child, childrenPosition ) => {
