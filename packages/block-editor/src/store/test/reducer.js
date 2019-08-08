@@ -1826,15 +1826,62 @@ describe( 'state', () => {
 				start: 'ribs',
 				end: 'chicken',
 			};
-			const start = selectionStart( undefined, action );
-			const end = selectionEnd( undefined, action );
+			const state1 = selectionStart( undefined, action );
+			const state2 = selectionEnd( undefined, action );
 
-			expect( start ).toEqual( { clientId: 'ribs' } );
-			expect( end ).toEqual( { clientId: 'chicken' } );
+			expect( state1 ).toEqual( { clientId: 'ribs' } );
+			expect( state2 ).toEqual( { clientId: 'chicken' } );
+		} );
+
+		it( 'should reset selection', () => {
+			const start = { clientId: 'a' };
+			const end = { clientId: 'b' };
+			const action = {
+				type: 'RESET_SELECTION',
+				selectionStart: start,
+				selectionEnd: end,
+			};
+			const state1 = selectionStart( undefined, action );
+			const state2 = selectionEnd( undefined, action );
+
+			expect( state1 ).toEqual( start );
+			expect( state2 ).toEqual( end );
+		} );
+
+		it( 'should change selection', () => {
+			const action = {
+				type: 'SELECTION_CHANGE',
+				clientId: 'a',
+				attributeKey: 'content',
+				startOffset: 1,
+				endOffset: 2,
+			};
+			const state1 = selectionStart( undefined, action );
+			const state2 = selectionEnd( undefined, action );
+
+			expect( state1 ).toEqual( {
+				clientId: 'a',
+				attributeKey: 'content',
+				offset: 1,
+			} );
+			expect( state2 ).toEqual( {
+				clientId: 'a',
+				attributeKey: 'content',
+				offset: 2,
+			} );
 		} );
 	} );
 
 	describe( 'selection()', () => {
+		it( 'should clear selection when resetting blocks', () => {
+			const original = deepFreeze( { clientId: 'a' } );
+			const state = selection( original, {
+				type: 'RESET_BLOCKS',
+			} );
+
+			expect( state ).toEqual( {} );
+		} );
+
 		it( 'should return with block clientId as selected', () => {
 			const state = selection( undefined, {
 				type: 'SELECT_BLOCK',
