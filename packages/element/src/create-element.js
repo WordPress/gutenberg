@@ -17,4 +17,4 @@ import {
  *
  * @return {WPElement} Element.
  */
-export createElement;
+export default createElement;

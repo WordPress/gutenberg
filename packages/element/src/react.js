@@ -28,6 +28,11 @@ import {
 import { isString } from 'lodash';
 
 /**
+ * Internal dependencies
+ */
+import createElement from './create-element';
+
+/**
  * Object that provides utilities for dealing with React children.
  */
 export { Children };
