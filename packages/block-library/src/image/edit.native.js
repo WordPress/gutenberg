@@ -353,6 +353,7 @@ class ImageEdit extends React.Component {
 						}
 						onChange={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
 						onFocus={ this.onFocusCaption }
+						onBlur={ this.props.onBlur } // always assign onBlur as props
 					/>
 				</View>
 			</TouchableWithoutFeedback>

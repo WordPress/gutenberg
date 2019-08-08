@@ -256,6 +256,7 @@ class VideoEdit extends React.Component {
 						isSelected={ this.state.isCaptionSelected }
 						onChange={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
 						onFocus={ this.onFocusCaption }
+						onBlur={ this.props.onBlur } // always assign onBlur as props
 					/>
 				</View>
 			</TouchableWithoutFeedback>
