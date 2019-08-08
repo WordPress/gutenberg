@@ -58,6 +58,7 @@ export default function NavigableTable( { children, className, tableState, selec
 
 		const { keyCode, target } = event;
 
+		//
 		if ( ! isTextField( target ) ) {
 			return;
 		}
@@ -70,7 +71,14 @@ export default function NavigableTable( { children, className, tableState, selec
 		const isVertical = isUp || isDown;
 		const isNav = isHorizontal || isVertical;
 
+		// The user hasn't pressed a navigation key, abort early.
 		if ( ! isNav ) {
+			return;
+		}
+
+		// Abort if navigation has already been handled (e.g. RichText inline
+		// boundaries).
+		if ( event.nativeEvent.defaultPrevented ) {
 			return;
 		}
 
