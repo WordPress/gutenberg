@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { noop } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { getBlockMenuDefaultClassName } from '@wordpress/blocks';
@@ -80,7 +85,7 @@ export default compose(
 									label: __( 'Retry' ),
 									onClick: () => {
 										removeNotice( INSTALL_ERROR_NOTICE_ID );
-										installBlock( item.id, () => {}, onInstallBlockError );
+										installBlock( item.id, noop, onInstallBlockError );
 									},
 								},
 								{
@@ -94,10 +99,12 @@ export default compose(
 					);
 				};
 
-				downloadBlock( item, () => {
-					onSelect();
-					installBlock( item.id, () => {}, onInstallBlockError );
-				}, onDownloadError );
+				const onSuccess = () => {
+					onSelect( item );
+					installBlock( item.id, noop, onInstallBlockError );
+				};
+
+				downloadBlock( item, onSuccess, onDownloadError );
 			},
 		};
 	} ),
