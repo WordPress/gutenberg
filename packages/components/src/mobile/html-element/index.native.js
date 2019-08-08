@@ -93,7 +93,6 @@ class HTMLElementContainer extends Component {
 		const { tagName, stylesheet, children, ...otherProps } = this.props;
 		const { className, style } = otherProps;
 
-
 		return (
 			<Consumer>
 				{ ( { ancestorPath, siblingPosition = 1, siblingCount = 1 } ) => {
@@ -149,6 +148,8 @@ const HTMLElement = compose( [
 	withStyles,
 ] )( HTMLElementContainer );
 
+HTMLElement.displayName = 'HTMLElement';
+
 HTMLElement.supportedTags = [
 	'div',
 	'figure',
@@ -169,6 +170,14 @@ HTMLElement.withTagName = ( tagName ) => {
 	return compose(
 		withTagName( tagName )
 	)( HTMLElement );
+};
+
+HTMLElement.serialize = ( props ) => {
+	const { tagName: nativeComponent, ...nativeProps } = props;
+	return {
+		nativeComponent,
+		nativeProps,
+	};
 };
 
 function createElementFilter( type, ...otherArguments ) {

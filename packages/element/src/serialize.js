@@ -413,19 +413,11 @@ export function renderElement( element, context, legacyContext = {} ) {
 
 		case ForwardRef.$$typeof:
 		{
-			if ( type.displayName === 'View' && props.hasOwnProperty( 'tagName' ) ) {
-				const tagName = props.tagName;
-				const otherProps = omit( props, 'tagName' );
-				return renderNativeComponent( tagName, otherProps, context, legacyContext );
+			if ( type.displayName === 'HTMLElement' ) {
+				const { nativeComponent, nativeProps } = type.serialize( props );
+				return renderNativeComponent( nativeComponent, nativeProps, context, legacyContext );
 			} else if ( type.displayName === 'Text' ) {
 				throw new Error( 'text' );
-			} else if ( type.displayName === 'Image' ) {
-				const src = props.source && props.source.uri;
-				const otherProps = {
-					...omit( props, 'source' ),
-					src,
-				};
-				return renderNativeComponent( 'img', otherProps, context, legacyContext );
 			} else {
 				return renderElement( type.render( props ), context, legacyContext );
 			}

@@ -627,7 +627,6 @@ export function isEquivalentHTML( actual, expected ) {
  * @return {boolean} Whether block is valid.
  */
 export function isValidBlockContent( blockTypeOrName, attributes, originalBlockContent ) {
-	return true;
 	const blockType = normalizeBlockType( blockTypeOrName );
 	let generatedBlockContent;
 	try {
