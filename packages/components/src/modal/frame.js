@@ -7,13 +7,9 @@ import { focus } from '@wordpress/dom';
 import { withGlobalEvents, compose } from '@wordpress/compose';
 
 /**
- * External dependencies
- */
-import clickOutside from 'react-click-outside';
-
-/**
  * Internal dependencies
  */
+import withFocusOutside from '../higher-order/with-focus-outside';
 import withFocusReturn from '../higher-order/with-focus-return';
 import withConstrainedTabbing from '../higher-order/with-constrained-tabbing';
 
@@ -23,7 +19,7 @@ class ModalFrame extends Component {
 
 		this.containerRef = createRef();
 		this.handleKeyDown = this.handleKeyDown.bind( this );
-		this.handleClickOutside = this.handleClickOutside.bind( this );
+		this.handleFocusOutside = this.handleFocusOutside.bind( this );
 		this.focusFirstTabbable = this.focusFirstTabbable.bind( this );
 	}
 
@@ -52,7 +48,7 @@ class ModalFrame extends Component {
 	 *
 	 * @param {Object} event Mouse click event.
 	 */
-	handleClickOutside( event ) {
+	handleFocusOutside( event ) {
 		if ( this.props.shouldCloseOnClickOutside ) {
 			this.onRequestClose( event );
 		}
@@ -133,7 +129,7 @@ class ModalFrame extends Component {
 export default compose( [
 	withFocusReturn,
 	withConstrainedTabbing,
-	clickOutside,
+	withFocusOutside,
 	withGlobalEvents( {
 		keydown: 'handleKeyDown',
 	} ),

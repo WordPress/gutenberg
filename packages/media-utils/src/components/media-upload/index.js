@@ -18,7 +18,7 @@ const getGalleryDetailsMediaFrame = () => {
 	 *
 	 * @see https://github.com/xwp/wp-core-media-widgets/blob/905edbccfc2a623b73a93dac803c5335519d7837/wp-admin/js/widgets/media-gallery-widget.js
 	 * @class GalleryDetailsMediaFrame
-	 * @constructor
+	 * @class
 	 */
 	return wp.media.view.MediaFrame.Post.extend( {
 

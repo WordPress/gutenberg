@@ -39,22 +39,6 @@
 	[data-rich-text-placeholder]::after {
 		opacity: 0.8;
 	}
-
-	// Don't let the placeholder text wrap in the variation preview.
-	.block-editor-block-preview__content & {
-		max-width: 100%;
-
-		.wp-block-button__link {
-			max-width: 100%;
-			overflow: hidden;
-			// Override is allowed here only because the rich text instance in
-			// a preview is not editable.
-			// To do: use the `save` function to preview a block transform, not
-			// the `edit` function.
-			white-space: nowrap !important;
-			text-overflow: ellipsis;
-		}
-	}
 }
 
 .wp-block-button__inline-link {
@@ -90,4 +74,8 @@
 		overflow: visible;
 		margin-top: $grid-size-large;
 	}
+}
+
+.wp-block-button-wrapper {
+	display: table;
 }

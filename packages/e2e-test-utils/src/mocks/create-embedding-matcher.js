@@ -8,7 +8,7 @@ import { createURLMatcher } from './create-url-matcher';
  *
  * @param {string} parameterName The query parameter to check.
  * @param {string} value The value to check for.
- * @return {function} Function that determines if a request's query parameter is the specified value.
+ * @return {Function} Function that determines if a request's query parameter is the specified value.
  */
 function parameterEquals( parameterName, value ) {
 	return ( request ) => {
@@ -25,7 +25,7 @@ function parameterEquals( parameterName, value ) {
  * Creates a function to determine if a request is embedding a certain URL.
  *
  * @param {string} url The URL to check against a request.
- * @return {function} Function that determines if a request is for the embed API, embedding a specific URL.
+ * @return {Function} Function that determines if a request is for the embed API, embedding a specific URL.
  */
 export function createEmbeddingMatcher( url ) {
 	return ( request ) =>

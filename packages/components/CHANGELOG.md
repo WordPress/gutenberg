@@ -1,4 +1,4 @@
-## Master
+## 8.1.0 (2019-08-05)
 
 ### New Features
 
@@ -17,6 +17,7 @@
 
 - The `Dropdown` component has been refactored to focus changes using the `Popover` component's `onFocusOutside` prop.
 - The `MenuItem` component will now always use an `IconButton`. This prevents a focus loss when clicking a menu item.
+- Package no longer depends on external `react-click-outside` library.
 
 ## 8.0.0 (2019-06-12)
 

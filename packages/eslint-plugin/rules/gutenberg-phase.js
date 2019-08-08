@@ -3,7 +3,7 @@
  * the predicate returns a truthy value for.
  *
  * @param {Object}   sourceNode The AST node to search from.
- * @param {function} predicate  A predicate invoked for each parent.
+ * @param {Function} predicate  A predicate invoked for each parent.
  *
  * @return {?Object } The first encountered parent node where the predicate
  *                    returns a truthy value.

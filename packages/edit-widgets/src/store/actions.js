@@ -15,7 +15,7 @@ const WIDGET_AREAS_SAVE_NOTICE_ID = 'WIDGET_AREAS_SAVE_NOTICE_ID';
 /**
  * Yields an action object that setups the widget areas.
  *
- * @yields {Object} Action object.
+ * @yield {Object} Action object.
  */
 export function* setupWidgetAreas() {
 	const widgetAreas = yield select(
@@ -54,7 +54,7 @@ export function updateBlocksInWidgetArea( widgetAreaId, blocks = [] ) {
 /**
  * Action that performs the logic to save widget areas.
  *
- * @yields {Object} Action object.
+ * @yield {Object} Action object.
  */
 export function* saveWidgetAreas() {
 	const widgetAreas = yield select(
