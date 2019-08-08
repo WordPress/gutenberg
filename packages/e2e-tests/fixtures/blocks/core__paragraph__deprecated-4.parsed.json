@@ -5,9 +5,9 @@
             "align": "right"
         },
         "innerBlocks": [],
-        "innerHTML": "\n<p class=\"has-text-align-right\">... like this one, which is separate from the above and right aligned.</p>\n",
+        "innerHTML": "\n<p style=\"text-align:right;\">... like this one, which is separate from the above and right aligned.</p>\n",
         "innerContent": [
-            "\n<p class=\"has-text-align-right\">... like this one, which is separate from the above and right aligned.</p>\n"
+            "\n<p style=\"text-align:right;\">... like this one, which is separate from the above and right aligned.</p>\n"
         ]
     },
     {
