@@ -10,20 +10,22 @@ Render the component passing in the required props:
 ```jsx
 <BlockPreview
 	blocks={ blocks }
-	isScaled={ false }
+	viewportWidth={ 800 }
 />
 ```
 
 ## Props
 
 ### `blocks`
-* **Type:** `array|object`
+* **Type:** `Array|Object`
 * **Default:** `undefined`
 
 A block instance (object) or a blocks array you would like to render a preview.
 
-### `isScaled`
-* **Type:** `Boolean`
-* **Default:** `false`
+### `viewportWidth`
+* **Type:** `Int`
+* **Default:** `700`
 
-Use this if you need to render previews in smaller areas, like block thumbnails.
+Width of the preview container in pixels. Controls at what size the blocks will be rendered inside the preview.
+
+`viewportWidth` can be used to simulate how blocks look on different device sizes or to make sure make sure multiple previews will be rendered with the same scale, regardless of their content.

@@ -9,6 +9,6 @@
             "dropCap": false
         },
         "innerBlocks": [],
-        "originalContent": "<p class=\"has-text-align-right\">... like this one, which is separate from the above and right aligned.</p>"
+        "originalContent": "<p style=\"text-align:right;\">... like this one, which is separate from the above and right aligned.</p>"
     }
 ]
