@@ -110,7 +110,12 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 		$skin     = new WP_Ajax_Upgrader_Skin();
 		$upgrader = new Plugin_Upgrader( $skin );
 
-		//TODO: Handle if FS_METHOD is not direct. file.php is trying to display FTP credentials modal dialog as part of the request, causing malformed JSON.
+		$filesystem_method = get_filesystem_method();
+
+		if ( $filesystem_method !== 'direct' ) {
+			return WP_Error( null, 'Only direct FS_METHOD is supported.' );
+		}
+
 		$result   = $upgrader->install( $api->download_link );
 
 		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
