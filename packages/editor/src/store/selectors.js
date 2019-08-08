@@ -743,8 +743,19 @@ export function isPreviewingPost( state ) {
  * @return {string?} Preview Link.
  */
 export function getEditedPostPreviewLink( state ) {
+	if ( state.saving.pending || isSavingPost( state ) ) {
+		return;
+	}
+
+	let previewLink = getEditedPostAttribute( state, 'preview_link' );
+	if ( ! previewLink ) {
+		previewLink = getEditedPostAttribute( state, 'link' );
+		if ( previewLink ) {
+			previewLink = addQueryArgs( previewLink, { preview: true } );
+		}
+	}
 	const featuredImageId = getEditedPostAttribute( state, 'featured_media' );
-	const previewLink = state.previewLink;
+
 	if ( previewLink && featuredImageId ) {
 		return addQueryArgs( previewLink, { _thumbnail_id: featuredImageId } );
 	}

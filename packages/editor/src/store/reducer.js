@@ -8,7 +8,6 @@ import { reduce, omit, keys, isEqual } from 'lodash';
  * WordPress dependencies
  */
 import { combineReducers } from '@wordpress/data';
-import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -180,7 +179,9 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 export function saving( state = {}, action ) {
 	switch ( action.type ) {
 		case 'REQUEST_POST_UPDATE_START':
+		case 'REQUEST_POST_UPDATE_FINISH':
 			return {
+				pending: action.type === 'REQUEST_POST_UPDATE_START',
 				options: action.options || {},
 			};
 	}
@@ -340,36 +341,6 @@ export const reusableBlocks = combineReducers( {
 } );
 
 /**
- * Reducer returning the post preview link.
- *
- * @param {string?} state  The preview link.
- * @param {Object}  action Dispatched action.
- *
- * @return {string?} Updated state.
- */
-export function previewLink( state = null, action ) {
-	switch ( action.type ) {
-		case 'REQUEST_POST_UPDATE_SUCCESS':
-			if ( action.post.preview_link ) {
-				return action.post.preview_link;
-			} else if ( action.post.link ) {
-				return addQueryArgs( action.post.link, { preview: true } );
-			}
-
-			return state;
-
-		case 'REQUEST_POST_UPDATE_START':
-			// Invalidate known preview link when autosave starts.
-			if ( state && action.options.isPreview ) {
-				return null;
-			}
-			break;
-	}
-
-	return state;
-}
-
-/**
  * Reducer returning whether the editor is ready to be rendered.
  * The editor is considered ready to be rendered once
  * the post object is loaded properly and the initial blocks parsed.
@@ -419,7 +390,6 @@ export default optimist( combineReducers( {
 	postLock,
 	reusableBlocks,
 	template,
-	previewLink,
 	postSavingLock,
 	isReady,
 	editorSettings,

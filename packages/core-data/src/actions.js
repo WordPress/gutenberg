@@ -281,13 +281,16 @@ export function* saveEntityRecord(
 		}
 
 		if ( getNoticeActionArgs ) {
-			yield dispatch(
-				...getNoticeActionArgs(
-					persistedRecord,
-					updatedRecord,
-					yield select( 'getPostType', updatedRecord.type )
-				)
+			const args = getNoticeActionArgs(
+				persistedRecord,
+				updatedRecord,
+				yield select( 'getPostType', updatedRecord.type )
 			);
+			if ( args && args.length ) {
+				yield dispatch(
+					...args
+				);
+			}
 		}
 	} catch ( _error ) {
 		error = _error;
