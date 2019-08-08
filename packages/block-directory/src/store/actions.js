@@ -44,6 +44,10 @@ export function setInstallBlocksPermission( hasPermission ) {
  */
 export function* downloadBlock( item, onSuccess, onError ) {
 	try {
+		if ( ! item.assets.length ) {
+			throw new Error( 'Block has no assets' );
+		}
+
 		yield loadAssets( item.assets );
 		const registeredBlocks = getBlockTypes();
 		if ( registeredBlocks.length ) {
