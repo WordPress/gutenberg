@@ -260,7 +260,7 @@ export function* saveEntityRecord(
 			// have a value.
 			let data = { ...persistedRecord, ...autosavePost, ...record };
 			data = Object.keys( data ).reduce( ( acc, key ) => {
-				if ( key in [ 'title', 'excerpt', 'content' ] ) {
+				if ( [ 'title', 'excerpt', 'content' ].includes( key ) ) {
 					acc[ key ] = get( data[ key ], 'raw', data[ key ] );
 				}
 				return acc;
@@ -281,10 +281,11 @@ export function* saveEntityRecord(
 		}
 
 		if ( getNoticeActionArgs ) {
-			const args = getNoticeActionArgs(
+			const postType = updatedRecord.type || persistedRecord.type;
+			const args = postType && getNoticeActionArgs(
 				persistedRecord,
 				updatedRecord,
-				yield select( 'getPostType', updatedRecord.type )
+				yield select( 'getPostType', postType )
 			);
 			if ( args && args.length ) {
 				yield dispatch(
