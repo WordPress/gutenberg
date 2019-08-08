@@ -60,17 +60,17 @@ function gutenberg_customize_register( $wp_customize ) {
 			'gutenberg_widget_blocks',
 			array( 'title' => __( 'Widget Blocks (Experimental)', 'gutenberg' ) )
 		);
-	}
-	$wp_customize->add_control(
-		new WP_Customize_Widget_Blocks_Control(
-			$wp_customize,
-			'gutenberg_widget_blocks',
-			array(
-				'section'  => 'gutenberg_widget_blocks',
-				'settings' => 'gutenberg_widget_blocks',
+		$wp_customize->add_control(
+			new WP_Customize_Widget_Blocks_Control(
+				$wp_customize,
+				'gutenberg_widget_blocks',
+				array(
+					'section'  => 'gutenberg_widget_blocks',
+					'settings' => 'gutenberg_widget_blocks',
+				)
 			)
-		)
-	);
+		);
+	}
 }
 add_action( 'customize_register', 'gutenberg_customize_register' );
 
