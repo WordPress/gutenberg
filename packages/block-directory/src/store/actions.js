@@ -1,13 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import { getBlockTypes } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
-import { dispatch, apiFetch, loadAssets } from './controls';
+import { apiFetch, loadAssets } from './controls';
 
 /** Returns an action object used in signalling that the discover blocks have been requested and is loading.
  *
@@ -37,51 +36,33 @@ export function setInstallBlocksPermission( hasPermission ) {
 }
 
 /**
- * Action triggered to load assets for a downloadable block.
+ * Action triggered to download block assets.
  *
  * @param {Object} item The selected block item
- * @param {Function} onSelect The callback function when the assets are loaded.
- * @param {Function} retry The callback function when the user clicks retry on error notice.
+ * @param {Function} onSuccess The callback function when the action has succeeded.
+ * @param {Function} onError The callback function when the action has failed.
  */
-export function* handleDownloadableBlock( item, onSelect, retry ) {
-	const onLoad = () => {
-		const registeredBlocks = getBlockTypes();
-		if ( registeredBlocks.length ) {
-			onSelect( item );
-		}
-	};
-	function* onError() {
-		yield dispatch(
-			'core/notices',
-			'createErrorNotice',
-			__( 'Block previews can\'t load.' ),
-			{
-				id: 'block-preview-error',
-				actions: [
-					{
-						label: __( 'Retry' ),
-						onClick: () => {
-							retry( item );
-						},
-					},
-				],
-			} );
-	}
+export function* downloadBlock( item, onSuccess, onError ) {
 	try {
 		yield loadAssets( item.assets );
-		onLoad();
-	} catch {
-		yield onError();
+		const registeredBlocks = getBlockTypes();
+		if ( registeredBlocks.length ) {
+			onSuccess( item );
+		} else {
+			throw new Error( 'Unable to get block types' );
+		}
+	} catch ( error ) {
+		yield onError( error );
 	}
 }
 
-/** Action triggered to install a block plugin
+/** Action triggered to install a block plugin.
 * @param {string} slug The plugin slug for block.
-* @param {function} retry The callback function when user clicks Retry button on error notice.
-* @param {function} remove The callback function when user clicks Remove button on error notice.
+* @param {Function} onSuccess The callback function when the action has succeeded.
+* @param {Function} onError The callback function when the action has failed.
 *
  */
-export function* installBlock( slug, retry, remove ) {
+export function* installBlock( slug, onSuccess, onError ) {
 	try {
 		const response = yield apiFetch( {
 			path: '__experimental/blocks/install',
@@ -93,28 +74,8 @@ export function* installBlock( slug, retry, remove ) {
 		if ( response.success === false ) {
 			throw new Error( response.errorMessage );
 		}
+		onSuccess();
 	} catch ( error ) {
-		yield dispatch(
-			'core/notices',
-			'createErrorNotice',
-			__( 'Block previews can\'t install.' ),
-			{
-				id: 'block-install-error',
-				actions: [
-					{
-						label: 'Retry',
-						onClick: () => {
-							retry();
-						},
-					},
-					{
-						label: 'Remove',
-						onClick: () => {
-							remove();
-						},
-					},
-				],
-			}
-		);
+		onError( error );
 	}
 }

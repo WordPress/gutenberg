@@ -4,11 +4,15 @@
 import { getBlockMenuDefaultClassName } from '@wordpress/blocks';
 import { withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import DownloadableBlockListItem from '../downloadable-block-list-item';
+
+const DOWNLOAD_ERROR_NOTICE_ID = 'block-download-error';
+const INSTALL_ERROR_NOTICE_ID = 'block-install-error';
 
 function DownloadableBlocksList( { items, onHover = () => {}, children, handleDownloadableBlock, installBlock } ) {
 	return (
@@ -44,31 +48,63 @@ function DownloadableBlocksList( { items, onHover = () => {}, children, handleDo
 
 export default compose(
 	withDispatch( ( ownDispatch, props ) => {
-		const { installBlock, handleDownloadableBlock } = ownDispatch( 'core/block-directory' );
-		const { removeNotice } = ownDispatch( 'core/notices' );
+		const { installBlock, downloadBlock } = ownDispatch( 'core/block-directory' );
+		const { createErrorNotice, removeNotice } = ownDispatch( 'core/notices' );
 		const { onSelect } = props;
-
-		const retryIfFailed = ( slug ) => {
-			removeNotice( 'block-install-error' );
-			installBlock( slug, retryIfFailed, removeIfFailed );
-		};
-
-		const removeIfFailed = () => {
-			removeNotice( 'block-install-error' );
-			//TODO: remove block and unregister block type from editor;
-		};
-
-		const retryDownloadIfFailed = ( item ) => {
-			removeNotice( 'block-preview-error' );
-			handleDownloadableBlock( item, onSelect, retryDownloadIfFailed );
-		};
-
 		return {
 			installBlock: ( slug ) => {
-				installBlock( slug, retryIfFailed, removeIfFailed );
+				const retryIfFailed = () => {
+					removeNotice( INSTALL_ERROR_NOTICE_ID );
+					installBlock( slug, retryIfFailed, removeIfFailed );
+				};
+
+				const removeIfFailed = () => {
+					removeNotice( INSTALL_ERROR_NOTICE_ID );
+					//TODO: remove block and unregister block type from editor;
+				};
+
+				const onError = () => {
+					createErrorNotice(
+						__( 'Block previews can\'t install.' ),
+						{
+							id: INSTALL_ERROR_NOTICE_ID,
+							actions: [
+								{
+									label: __( 'Retry' ),
+									onClick: () => {
+										retryIfFailed();
+									},
+								},
+								{
+									label: __( 'Remove' ),
+									onClick: () => {
+										removeIfFailed();
+									},
+								},
+							],
+						}
+					);
+				};
+				installBlock( slug, () => {}, onError );
 			},
-			handleDownloadableBlock: ( item ) => {
-				handleDownloadableBlock( item, onSelect, retryDownloadIfFailed );
+			downloadBlock: ( item ) => {
+				const onError = () => {
+					createErrorNotice(
+						__( 'Block previews can\'t load.' ),
+						{
+							id: DOWNLOAD_ERROR_NOTICE_ID,
+							actions: [
+								{
+									label: __( 'Retry' ),
+									onClick: () => {
+										removeNotice( DOWNLOAD_ERROR_NOTICE_ID );
+										downloadBlock( item, onSelect, onError );
+									},
+								},
+							],
+						} );
+				};
+				downloadBlock( item, onSelect, onError );
 			},
 		};
 	} ),
