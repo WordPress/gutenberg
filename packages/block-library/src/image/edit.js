@@ -8,6 +8,7 @@ import {
 	isEmpty,
 	map,
 	last,
+	omit,
 	pick,
 } from 'lodash';
 
@@ -295,7 +296,6 @@ export class ImageEdit extends Component {
 			attributes,
 			mediaUpload,
 			noticeOperations,
-			setAttributes,
 		} = this.props;
 		const { id, url = '' } = attributes;
 
@@ -306,7 +306,7 @@ export class ImageEdit extends Component {
 				mediaUpload( {
 					filesList: [ file ],
 					onFileChange: ( [ image ] ) => {
-						setAttributes( pickRelevantMediaFiles( image ) );
+						this.onSelectImage( image );
 					},
 					allowedTypes: ALLOWED_MEDIA_TYPES,
 					onError: ( message ) => {
@@ -357,7 +357,21 @@ export class ImageEdit extends Component {
 			isEditing: false,
 		} );
 
-		const { id, url } = this.props.attributes;
+		const { id, url, alt, caption } = this.props.attributes;
+
+		let mediaAttributes = pickRelevantMediaFiles( media );
+
+		// If the current image is temporary but an alt or caption text was meanwhile written by the user,
+		// make sure the text is not overwritten.
+		if ( isTemporaryImage( id, url ) ) {
+			if ( alt ) {
+				mediaAttributes = omit( mediaAttributes, [ 'alt' ] );
+			}
+			if ( caption ) {
+				mediaAttributes = omit( mediaAttributes, [ 'caption' ] );
+			}
+		}
+
 		let additionalAttributes;
 		// Reset the dimension attributes if changing to a different image.
 		if ( ! media.id || media.id !== id ) {
@@ -372,7 +386,7 @@ export class ImageEdit extends Component {
 		}
 
 		this.props.setAttributes( {
-			...pickRelevantMediaFiles( media ),
+			...mediaAttributes,
 			...additionalAttributes,
 		} );
 	}
