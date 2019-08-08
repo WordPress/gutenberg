@@ -6,6 +6,7 @@ import {
 	cloneElement,
 	Component,
 	createContext,
+	createElement as createReactElement,
 	createRef,
 	forwardRef,
 	Fragment,
@@ -28,9 +29,9 @@ import {
 import { isString } from 'lodash';
 
 /**
- * Internal dependencies
+ * WordPress dependencies
  */
-import createElement from './create-element';
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Object that provides utilities for dealing with React children.
@@ -60,6 +61,25 @@ export { Component };
  * @return {Object} Context object.
  */
 export { createContext };
+
+/**
+ * Returns a new element of given type. Type can be either a string tag name or
+ * another function which itself returns an element.
+ *
+ * @param {?(string|Function)} type     Tag name or element creator
+ * @param {Object}             props    Element properties, either attribute
+ *                                       set to apply to DOM node or values to
+ *                                       pass through to element creator
+ * @param {...WPElement}       children Descendant elements
+ *
+ * @return {WPElement} Element.
+ */
+export function createElement() {
+	return createReactElement( ...applyFilters(
+		'element.createElement',
+		...arguments
+	) );
+}
 
 /**
  * Returns an object tracking a reference to a rendered element via its

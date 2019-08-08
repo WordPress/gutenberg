@@ -14,6 +14,7 @@ import {
  */
 import { compose, createHigherOrderComponent } from '@wordpress/compose';
 import { createContext, cloneElement, Children, Component, forwardRef } from '@wordpress/element';
+import { addFilter } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -169,5 +170,19 @@ HTMLElement.withTagName = ( tagName ) => {
 		withTagName( tagName )
 	)( HTMLElement );
 };
+
+function createElementFilter( type, ...otherArguments ) {
+	if ( HTMLElement.supportsType( type ) ) {
+		const Element = HTMLElement.withTagName( type );
+		return [ Element, ...otherArguments ];
+	}
+	return arguments;
+}
+
+addFilter(
+	'element.createElement',
+	'core/components/mobile/html-element',
+	createElementFilter
+);
 
 export default HTMLElement;
