@@ -11,7 +11,8 @@ import {
 	RawHTML,
 } from '@wordpress/element';
 import {
-	getColorClassName, getFontSizeClass,
+	getColorClassName,
+	getFontSizeClass,
 	RichText,
 } from '@wordpress/block-editor';
 
