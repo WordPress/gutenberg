@@ -225,6 +225,17 @@ const withBlockCache = ( reducer ) => ( state = {}, action ) => {
 	}
 	newState.cache = state.cache ? state.cache : {};
 
+	/**
+	 * For each clientId provided, traverses up parents, adding the provided clientIds
+	 * and each parent's clientId to the returned array.
+	 *
+	 * When calling this function consider that it uses the old state, so any state
+	 * modifications made by the `reducer` will not be present.
+	 *
+	 * @param {Array} clientIds an Array of block clientIds.
+	 *
+	 * @return {Array} The provided clientIds and all of their parent clientIds.
+	 */
 	const getBlocksWithParentsClientIds = ( clientIds ) => {
 		return clientIds.reduce( ( result, clientId ) => {
 			let current = clientId;
@@ -264,11 +275,12 @@ const withBlockCache = ( reducer ) => ( state = {}, action ) => {
 			};
 			break;
 		case 'REPLACE_BLOCKS_AUGMENTED_WITH_CHILDREN':
+			const parentClientIds = fillKeysWithEmptyObject( getBlocksWithParentsClientIds( action.replacedClientIds ) );
+
 			newState.cache = {
 				...omit( newState.cache, action.replacedClientIds ),
-				...fillKeysWithEmptyObject(
-					getBlocksWithParentsClientIds( keys( flattenBlocks( action.blocks ) ) ),
-				),
+				...omit( parentClientIds, action.replacedClientIds ),
+				...fillKeysWithEmptyObject( keys( flattenBlocks( action.blocks ) ) ),
 			};
 			break;
 		case 'REMOVE_BLOCKS_AUGMENTED_WITH_CHILDREN':
@@ -569,7 +581,7 @@ const withSaveReusableBlock = ( reducer ) => ( state, action ) => {
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
  *
- * @returns {Object} Updated state.
+ * @return {Object} Updated state.
  */
 export const blocks = flow(
 	combineReducers,
@@ -1196,6 +1208,22 @@ export const blockListSettings = ( state = {}, action ) => {
 };
 
 /**
+ * Reducer returning whether the navigation mode is enabled or not.
+ *
+ * @param {string} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {string} Updated state.
+ */
+export function isNavigationMode( state = true, action ) {
+	if ( action.type === 'SET_NAVIGATION_MODE' ) {
+		return action.isNavigationMode;
+	}
+
+	return state;
+}
+
+/**
  * Reducer return an updated state representing the most recent block attribute
  * update. The state is structured as an object where the keys represent the
  * client IDs of blocks, the values a subset of attributes from the most recent
@@ -1235,4 +1263,5 @@ export default combineReducers( {
 	settings,
 	preferences,
 	lastBlockAttributesChange,
+	isNavigationMode,
 } );

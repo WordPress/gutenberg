@@ -1,3 +1,72 @@
 .components-checkbox-control__input[type="checkbox"] {
-	margin-top: 0;
+	border: 1px solid #b4b9be;
+	background: #fff;
+	color: #555;
+	clear: none;
+	cursor: pointer;
+	display: inline-block;
+	line-height: 0;
+	height: 16px;
+	margin: 0 4px 0 0;
+	outline: 0;
+	padding: 0 !important;
+	text-align: center;
+	vertical-align: middle;
+	width: 16px;
+	min-width: 16px;
+	-webkit-appearance: none;
+	box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+	transition: 0.05s border-color ease-in-out;
+
+	&:focus {
+		border-color: #5b9dd9;
+		box-shadow: 0 0 2px rgba(30, 140, 190, 0.8);
+		// Only visible in Windows High Contrast mode.
+		outline: 2px solid transparent;
+	}
+
+	&:checked {
+		background: #11a0d2;
+		border-color: #11a0d2;
+	}
+
+	&:focus:checked {
+		border: none;
+	}
+
+	&:checked::before {
+		content: none;
+	}
+}
+
+.components-checkbox-control__label {
+	position: relative;
+	vertical-align: middle;
+	line-height: 1;
+}
+
+svg.dashicon.components-checkbox-control__checked {
+	width: 21px;
+	height: 21px;
+	fill: #fff;
+	cursor: pointer;
+	position: absolute;
+	left: -31px;
+	bottom: -3px;
+	user-select: none;
+	pointer-events: none;
+}
+
+@media screen and ( max-width: 728px ) {
+	.components-checkbox-control__input[type="checkbox"] {
+		width: 25px;
+		height: 25px;
+	}
+
+	svg.dashicon.components-checkbox-control__checked {
+		width: 31px;
+		height: 31px;
+		left: -41px;
+		bottom: -9px;
+	}
 }

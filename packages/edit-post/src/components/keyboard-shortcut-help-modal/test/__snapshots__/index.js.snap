@@ -17,11 +17,12 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
     title="Keyboard Shortcuts"
   >
     <ShortcutSection
+      className="edit-post-keyboard-shortcut-help__main-shortcuts"
       key="0"
       shortcuts={
         Array [
           Object {
-            "description": "Display this help.",
+            "description": "Display these keyboard shortcuts.",
             "keyCombination": Array [
               "Shift",
               "+",
@@ -30,6 +31,13 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
               "H",
             ],
           },
+        ]
+      }
+    />
+    <ShortcutSection
+      key="1"
+      shortcuts={
+        Array [
           Object {
             "description": "Save your changes.",
             "keyCombination": Array [
@@ -142,7 +150,7 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
       title="Global shortcuts"
     />
     <ShortcutSection
-      key="1"
+      key="2"
       shortcuts={
         Array [
           Object {
@@ -163,7 +171,7 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
       title="Selection shortcuts"
     />
     <ShortcutSection
-      key="2"
+      key="3"
       shortcuts={
         Array [
           Object {
@@ -216,7 +224,7 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
       title="Block shortcuts"
     />
     <ShortcutSection
-      key="3"
+      key="4"
       shortcuts={
         Array [
           Object {

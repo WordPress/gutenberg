@@ -312,11 +312,11 @@ Mark a control as a registry control.
 
 _Parameters_
 
--   _registryControl_ `function`: Function receiving a registry object and returning a control.
+-   _registryControl_ `Function`: Function receiving a registry object and returning a control.
 
 _Returns_
 
--   `function`: marked registry control.
+-   `Function`: marked registry control.
 
 <a name="createRegistrySelector" href="#createRegistrySelector">#</a> **createRegistrySelector**
 
@@ -324,11 +324,11 @@ Mark a selector as a registry selector.
 
 _Parameters_
 
--   _registrySelector_ `function`: Function receiving a registry object and returning a state selector.
+-   _registrySelector_ `Function`: Function receiving a registry object and returning a state selector.
 
 _Returns_
 
--   `function`: marked registry selector.
+-   `Function`: marked registry selector.
 
 <a name="dispatch" href="#dispatch">#</a> **dispatch**
 

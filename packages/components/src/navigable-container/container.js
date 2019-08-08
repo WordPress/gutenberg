@@ -30,6 +30,21 @@ class NavigableContainer extends Component {
 		this.getFocusableIndex = this.getFocusableIndex.bind( this );
 	}
 
+	componentDidMount() {
+		// We use DOM event listeners instead of React event listeners
+		// because we want to catch events from the underlying DOM tree
+		// The React Tree can be different from the DOM tree when using
+		// portals. Block Toolbars for instance are rendered in a separate
+		// React Trees.
+		this.container.addEventListener( 'keydown', this.onKeyDown );
+		this.container.addEventListener( 'focus', this.onFocus );
+	}
+
+	componentWillUnmount() {
+		this.container.removeEventListener( 'keydown', this.onKeyDown );
+		this.container.removeEventListener( 'focus', this.onFocus );
+	}
+
 	bindContainer( ref ) {
 		const { forwardedRef } = this.props;
 		this.container = ref;
@@ -73,15 +88,13 @@ class NavigableContainer extends Component {
 		// eventToOffset returns undefined if the event is not handled by the component
 		if ( offset !== undefined && stopNavigationEvents ) {
 			// Prevents arrow key handlers bound to the document directly interfering
-			event.nativeEvent.stopImmediatePropagation();
+			event.stopImmediatePropagation();
 
 			// When navigating a collection of items, prevent scroll containers
 			// from scrolling.
 			if ( event.target.getAttribute( 'role' ) === 'menuitem' ) {
 				event.preventDefault();
 			}
-
-			event.stopPropagation();
 		}
 
 		if ( ! offset ) {
@@ -115,8 +128,7 @@ class NavigableContainer extends Component {
 					'onlyBrowserTabstops',
 					'forwardedRef',
 				] ) }
-				onKeyDown={ this.onKeyDown }
-				onFocus={ this.onFocus }>
+			>
 				{ children }
 			</div>
 		);

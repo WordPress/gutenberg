@@ -1,12 +1,23 @@
-## Master
+## 8.1.0 (2019-08-05)
 
 ### New Features
 
 - Added a new `popoverProps` prop to the `Dropdown` component which allows users of the `Dropdown` component to pass props directly to the `PopOver` component.
+- Added and documented `hideLabelFromVision` prop to `BaseControl` used by `SelectControl`, `TextControl`, and `TextareaControl`.
 
 ### Bug Fixes
 
 - The `Button` component will no longer assign default styling (`is-default` class) when explicitly assigned as primary (the `isPrimary` prop). This should resolve potential conflicts affecting a combination of `isPrimary`, `isDefault`, and `isLarge` / `isSmall`, where the busy animation would appear with incorrect coloring.
+
+### Deprecations
+
+- The `Popover` component `onClickOutside` prop has been deprecated. Use `onFocusOutside` instead.
+
+### Internal
+
+- The `Dropdown` component has been refactored to focus changes using the `Popover` component's `onFocusOutside` prop.
+- The `MenuItem` component will now always use an `IconButton`. This prevents a focus loss when clicking a menu item.
+- Package no longer depends on external `react-click-outside` library.
 
 ## 8.0.0 (2019-06-12)
 

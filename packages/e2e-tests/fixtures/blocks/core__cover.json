@@ -22,7 +22,7 @@
                     "fontSize": "large"
                 },
                 "innerBlocks": [],
-                "originalContent": "<p style=\"text-align:center\" class=\"has-large-font-size\">\n\t\t\tGuten Berg!\n\t\t</p>"
+                "originalContent": "<p class=\"has-text-align-center has-large-font-size\">\n\t\t\tGuten Berg!\n\t\t</p>"
             }
         ],
         "originalContent": "<div\n\tclass=\"wp-block-cover has-background-dim-40 has-background-dim\"\n\tstyle=\"background-image:url(data:image/jpeg;base64,/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=)\"\n>\n\t<div class=\"wp-block-cover__inner-container\">\n\t\t\n\t</div>\n</div>"

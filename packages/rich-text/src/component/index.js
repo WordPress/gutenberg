@@ -132,6 +132,7 @@ class RichText extends Component {
 
 	componentWillUnmount() {
 		document.removeEventListener( 'selectionchange', this.onSelectionChange );
+		window.cancelAnimationFrame( this.rafId );
 	}
 
 	setRef( node ) {
@@ -181,6 +182,7 @@ class RichText extends Component {
 			multilineWrapperTags: this.multilineWrapperTags,
 			prepareEditableTree: createPrepareEditableTree( this.props, 'format_prepare_functions' ),
 			__unstableDomOnly: domOnly,
+			placeholder: this.props.placeholder,
 		} );
 	}
 
@@ -286,7 +288,7 @@ class RichText extends Component {
 		this.recalculateBoundaryStyle();
 
 		// We know for certain that on focus, the old selection is invalid. It
-		// will be recalculated on `selectionchange`.
+		// will be recalculated on the next mouseup, keyup, or touchend event.
 		const index = undefined;
 		const activeFormats = undefined;
 
@@ -298,6 +300,12 @@ class RichText extends Component {
 		};
 		this.props.onSelectionChange( index, index );
 		this.setState( { activeFormats } );
+
+		// Update selection as soon as possible, which is at the next animation
+		// frame. The event listener for selection changes may be added too late
+		// at this point, but this focus event is still too early to calculate
+		// the selection.
+		this.rafId = window.requestAnimationFrame( this.onSelectionChange );
 
 		document.addEventListener( 'selectionchange', this.onSelectionChange );
 	}
@@ -384,8 +392,17 @@ class RichText extends Component {
 
 	/**
 	 * Handles the `selectionchange` event: sync the selection to local state.
+	 *
+	 * @param {Event} event `selectionchange` event.
 	 */
-	onSelectionChange() {
+	onSelectionChange( event ) {
+		if (
+			event.type !== 'selectionchange' &&
+			! this.props.__unstableIsSelected
+		) {
+			return;
+		}
+
 		const { start, end } = this.createRecord();
 		const value = this.getRecord();
 
@@ -725,6 +742,7 @@ class RichText extends Component {
 			value,
 			selectionStart,
 			selectionEnd,
+			placeholder,
 			__unstableIsSelected: isSelected,
 		} = this.props;
 
@@ -751,6 +769,10 @@ class RichText extends Component {
 		// Check if any format props changed.
 		shouldReapply = shouldReapply ||
 			! isShallowEqual( prepareProps, prevPrepareProps );
+
+		// Rerender if the placeholder changed.
+		shouldReapply = shouldReapply ||
+			placeholder !== prevProps.placeholder;
 
 		const { activeFormats = [] } = this.record;
 
@@ -808,6 +830,7 @@ class RichText extends Component {
 			value,
 			multilineTag: this.multilineTag,
 			prepareEditableTree: createPrepareEditableTree( this.props, 'format_prepare_functions' ),
+			placeholder: this.props.placeholder,
 		} ).body.innerHTML;
 	}
 
@@ -832,11 +855,11 @@ class RichText extends Component {
 	}
 
 	/**
-     * Converts the internal value to the external data format.
-     *
-     * @param {Object} value The internal rich-text value.
-     * @return {*} The external data format, data type depends on props.
-     */
+	 * Converts the internal value to the external data format.
+	 *
+	 * @param {Object} value The internal rich-text value.
+	 * @return {*} The external data format, data type depends on props.
+	 */
 	valueToFormat( value ) {
 		value = this.removeEditorOnlyFormats( value );
 
@@ -857,23 +880,22 @@ class RichText extends Component {
 			wrapperClassName,
 			className,
 			placeholder,
-			keepPlaceholderOnFocus = false,
 			__unstableIsSelected: isSelected,
 			children,
 			// To do: move autocompletion logic to rich-text.
 			__unstableAutocompleters: autocompleters,
 			__unstableAutocomplete: Autocomplete = ( { children: ch } ) => ch( {} ),
 			__unstableOnReplace: onReplace,
+			allowedFormats,
+			withoutInteractiveFormatting,
 		} = this.props;
 
 		// Generating a key that includes `tagName` ensures that if the tag
 		// changes, we replace the relevant element. This is needed because we
 		// prevent Editable component updates.
 		const key = Tagname;
-		const MultilineTag = this.multilineTag;
 		const ariaProps = pickAriaProps( this.props );
 		const record = this.getRecord();
-		const isPlaceholderVisible = placeholder && ( ! isSelected || keepPlaceholderOnFocus ) && isEmpty( record );
 
 		const autoCompleteContent = ( { listBoxId, activeId } ) => (
 			<>
@@ -882,7 +904,6 @@ class RichText extends Component {
 					style={ style }
 					record={ record }
 					valueToEditableHTML={ this.valueToEditableHTML }
-					isPlaceholderVisible={ isPlaceholderVisible }
 					aria-label={ placeholder }
 					aria-autocomplete={ listBoxId ? 'list' : undefined }
 					aria-owns={ listBoxId }
@@ -899,16 +920,20 @@ class RichText extends Component {
 					onMouseDown={ this.onPointerDown }
 					onTouchStart={ this.onPointerDown }
 					setRef={ this.setRef }
+					// Selection updates must be done at these events as they
+					// happen before the `selectionchange` event. In some cases,
+					// the `selectionchange` event may not even fire, for
+					// example when the window receives focus again on click.
+					onKeyUp={ this.onSelectionChange }
+					onMouseUp={ this.onSelectionChange }
+					onTouchEnd={ this.onSelectionChange }
 				/>
-				{ isPlaceholderVisible &&
-					<Tagname
-						className={ classnames( 'rich-text', className ) }
-						style={ style }
-					>
-						{ MultilineTag ? <MultilineTag>{ placeholder }</MultilineTag> : placeholder }
-					</Tagname>
-				}
-				{ isSelected && <FormatEdit value={ record } onChange={ this.onChange } /> }
+				{ isSelected && <FormatEdit
+					allowedFormats={ allowedFormats }
+					withoutInteractiveFormatting={ withoutInteractiveFormatting }
+					value={ record }
+					onChange={ this.onChange }
+				/> }
 			</>
 		);
 

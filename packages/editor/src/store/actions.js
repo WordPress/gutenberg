@@ -55,6 +55,11 @@ const lastBlockSourceDependenciesByRegistry = new WeakMap;
  */
 function* getBlocksWithSourcedAttributes( blocks ) {
 	const registry = yield getRegistry();
+	if ( ! lastBlockSourceDependenciesByRegistry.has( registry ) ) {
+		return blocks;
+	}
+
+	const blockSourceDependencies = lastBlockSourceDependenciesByRegistry.get( registry );
 
 	let workingBlocks = blocks;
 	for ( let i = 0; i < blocks.length; i++ ) {
@@ -66,11 +71,6 @@ function* getBlocksWithSourcedAttributes( blocks ) {
 				continue;
 			}
 
-			if ( ! lastBlockSourceDependenciesByRegistry.has( registry ) ) {
-				continue;
-			}
-
-			const blockSourceDependencies = lastBlockSourceDependenciesByRegistry.get( registry );
 			if ( ! blockSourceDependencies.has( sources[ schema.source ] ) ) {
 				continue;
 			}
@@ -136,13 +136,13 @@ function* resetLastBlockSourceDependencies( sourcesToUpdate = Object.values( sou
 	}
 
 	const registry = yield getRegistry();
+	if ( ! lastBlockSourceDependenciesByRegistry.has( registry ) ) {
+		lastBlockSourceDependenciesByRegistry.set( registry, new WeakMap );
+	}
+
+	const lastBlockSourceDependencies = lastBlockSourceDependenciesByRegistry.get( registry );
 
 	for ( const source of sourcesToUpdate ) {
-		if ( ! lastBlockSourceDependenciesByRegistry.has( registry ) ) {
-			lastBlockSourceDependenciesByRegistry.set( registry, new WeakMap );
-		}
-
-		const lastBlockSourceDependencies = lastBlockSourceDependenciesByRegistry.get( registry );
 		const dependencies = yield* source.getDependencies();
 		lastBlockSourceDependencies.set( source, dependencies );
 	}

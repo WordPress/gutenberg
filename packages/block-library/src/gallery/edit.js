@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { every, filter, forEach, map } from 'lodash';
+import { filter, forEach, map, find, every } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -63,6 +63,7 @@ class GalleryEdit extends Component {
 
 		this.state = {
 			selectedImage: null,
+			attachmentCaptions: null,
 		};
 	}
 
@@ -129,11 +130,46 @@ class GalleryEdit extends Component {
 		};
 	}
 
-	onSelectImages( images ) {
-		const { columns } = this.props.attributes;
+	selectCaption( newImage, images, attachmentCaptions ) {
+		const currentImage = find(
+			images, { id: newImage.id }
+		);
+
+		const currentImageCaption = currentImage ? currentImage.caption : newImage.caption;
+
+		if ( ! attachmentCaptions ) {
+			return currentImageCaption;
+		}
+
+		const attachment = find(
+			attachmentCaptions, { id: newImage.id }
+		);
+
+		// if the attachment caption is updated
+		if ( attachment && ( attachment.caption !== newImage.caption ) ) {
+			return newImage.caption;
+		}
+
+		return currentImageCaption;
+	}
+
+	onSelectImages( newImages ) {
+		const { columns, images } = this.props.attributes;
+		const { attachmentCaptions } = this.state;
+		this.setState(
+			{
+				attachmentCaptions: newImages.map( ( newImage ) => ( {
+					id: newImage.id,
+					caption: newImage.caption,
+				} ) ),
+			}
+		);
 		this.setAttributes( {
-			images: images.map( ( image ) => pickRelevantMediaFiles( image ) ),
-			columns: columns ? Math.min( images.length, columns ) : columns,
+			images: newImages.map( ( newImage ) => ( {
+				...pickRelevantMediaFiles( newImage ),
+				caption: this.selectCaption( newImage, images, attachmentCaptions ),
+			} ) ),
+			columns: columns ? Math.min( newImages.length, columns ) : columns,
 		} );
 	}
 

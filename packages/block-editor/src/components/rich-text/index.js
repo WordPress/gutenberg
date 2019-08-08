@@ -27,6 +27,7 @@ import {
 } from '@wordpress/rich-text';
 import { withFilters, IsolatedEventContainer } from '@wordpress/components';
 import { createBlobURL } from '@wordpress/blob';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -253,6 +254,24 @@ class RichTextWrapper extends Component {
 		onReplace( [ block ] );
 	}
 
+	getAllowedFormats() {
+		const { allowedFormats, formattingControls } = this.props;
+
+		if ( ! allowedFormats && ! formattingControls ) {
+			return;
+		}
+
+		if ( allowedFormats ) {
+			return allowedFormats;
+		}
+
+		deprecated( 'wp.blockEditor.RichText formattingControls prop', {
+			alternative: 'allowedFormats',
+		} );
+
+		return formattingControls.map( ( name ) => `core/${ name }` );
+	}
+
 	render() {
 		const {
 			tagName,
@@ -274,7 +293,9 @@ class RichTextWrapper extends Component {
 			isSelected: originalIsSelected,
 			onCreateUndoLevel,
 			placeholder,
-			keepPlaceholderOnFocus,
+			// eslint-disable-next-line no-unused-vars
+			allowedFormats,
+			withoutInteractiveFormatting,
 			// eslint-disable-next-line no-unused-vars
 			onRemove,
 			// eslint-disable-next-line no-unused-vars
@@ -293,6 +314,8 @@ class RichTextWrapper extends Component {
 			...experimentalProps
 		} = this.props;
 
+		const adjustedAllowedFormats = this.getAllowedFormats();
+		const hasFormats = ! adjustedAllowedFormats || adjustedAllowedFormats.length > 0;
 		let adjustedValue = originalValue;
 		let adjustedOnChange = originalOnChange;
 
@@ -314,9 +337,10 @@ class RichTextWrapper extends Component {
 				onSelectionChange={ onSelectionChange }
 				tagName={ tagName }
 				wrapperClassName={ classnames( wrapperClasses, wrapperClassName ) }
-				className={ classnames( classes, className ) }
+				className={ classnames( classes, className, { 'is-selected': originalIsSelected } ) }
 				placeholder={ placeholder }
-				keepPlaceholderOnFocus={ keepPlaceholderOnFocus }
+				allowedFormats={ adjustedAllowedFormats }
+				withoutInteractiveFormatting={ withoutInteractiveFormatting }
 				onEnter={ this.onEnter }
 				onDelete={ this.onDelete }
 				onPaste={ this.onPaste }
@@ -341,12 +365,12 @@ class RichTextWrapper extends Component {
 								onChange={ onChange }
 							/>
 						) }
-						{ isSelected && ! inlineToolbar && (
+						{ isSelected && ! inlineToolbar && hasFormats && (
 							<BlockFormatControls>
 								<FormatToolbar />
 							</BlockFormatControls>
 						) }
-						{ isSelected && inlineToolbar && (
+						{ isSelected && inlineToolbar && hasFormats && (
 							<IsolatedEventContainer
 								className="editor-rich-text__inline-toolbar block-editor-rich-text__inline-toolbar"
 							>

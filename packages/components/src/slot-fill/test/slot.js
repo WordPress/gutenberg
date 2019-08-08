@@ -210,8 +210,9 @@ describe( 'Slot', () => {
 		expect( testRenderer.toJSON() ).toMatchSnapshot();
 	} );
 
-	[ false, true ].forEach( ( bubblesVirtually ) => {
-		describe( 'bubblesVirtually ' + bubblesVirtually, () => {
+	describe.each( [ false, true ] )(
+		'bubblesVirtually %p',
+		( bubblesVirtually ) => {
 			it( 'should subsume another slot by the same name', () => {
 				const testRenderer = ReactTestRenderer.create(
 					<Provider>
@@ -251,6 +252,6 @@ describe( 'Slot', () => {
 
 				expect( testRenderer.getInstance().slots ).toHaveProperty( 'egg' );
 			} );
-		} );
-	} );
+		}
+	);
 } );

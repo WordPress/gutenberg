@@ -133,11 +133,11 @@ export const dispatch = defaultRegistry.dispatch;
 export const subscribe = defaultRegistry.subscribe;
 
 /**
-* Registers a generic store.
-*
-* @param {string} key    Store registry key.
-* @param {Object} config Configuration (getSelectors, getActions, subscribe).
-*/
+ * Registers a generic store.
+ *
+ * @param {string} key    Store registry key.
+ * @param {Object} config Configuration (getSelectors, getActions, subscribe).
+ */
 export const registerGenericStore = defaultRegistry.registerGenericStore;
 
 /**

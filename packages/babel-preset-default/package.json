@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/babel-preset-default",
-	"version": "4.3.0",
+	"version": "4.4.0",
 	"description": "Default Babel preset for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -35,7 +35,8 @@
 		"@babel/preset-env": "^7.4.4",
 		"@babel/runtime": "^7.4.4",
 		"@wordpress/babel-plugin-import-jsx-pragma": "file:../babel-plugin-import-jsx-pragma",
-		"@wordpress/browserslist-config": "file:../browserslist-config"
+		"@wordpress/browserslist-config": "file:../browserslist-config",
+		"core-js": "^3.1.4"
 	},
 	"peerDependencies": {
 		"@babel/core": "^7.0.0"

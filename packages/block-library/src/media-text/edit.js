@@ -33,7 +33,6 @@ import MediaContainer from './media-container';
 /**
  * Constants
  */
-const ALLOWED_BLOCKS = [ 'core/button', 'core/paragraph', 'core/heading', 'core/list' ];
 const TEMPLATE = [
 	[ 'core/paragraph', { fontSize: 'large', placeholder: _x( 'Content…', 'content placeholder' ) } ],
 ];
@@ -233,7 +232,6 @@ class MediaTextEdit extends Component {
 				<div className={ classNames } style={ style } >
 					{ this.renderMediaArea() }
 					<InnerBlocks
-						allowedBlocks={ ALLOWED_BLOCKS }
 						template={ TEMPLATE }
 						templateInsertUpdatesSelection={ false }
 					/>

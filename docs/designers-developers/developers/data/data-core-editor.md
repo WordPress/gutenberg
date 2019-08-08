@@ -118,12 +118,6 @@ _Related_
 
 -   getBlockCount in core/block-editor store.
 
-<a name="getBlockDependantsCacheBust" href="#getBlockDependantsCacheBust">#</a> **getBlockDependantsCacheBust**
-
-_Related_
-
--   getBlockDependantsCacheBust in core/block-editor store.
-
 <a name="getBlockHierarchyRootClientId" href="#getBlockHierarchyRootClientId">#</a> **getBlockHierarchyRootClientId**
 
 _Related_
