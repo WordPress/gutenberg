@@ -1,0 +1,24 @@
+name: CI Workflow
+on: [push]
+
+jobs:
+  lint:
+    name: Lint on node ${{ matrix.node_version }} and ${{ matrix.os }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node_version: [10]
+        os: [ubuntu-latest]
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Use Node.js ${{ matrix.node_version }}
+      uses: actions/setup-node@v1
+      with:
+        version: ${{ matrix.node_version }}
+
+    - name: npm instal and lint
+      run: |
+        npm ci
+        npm run lint
