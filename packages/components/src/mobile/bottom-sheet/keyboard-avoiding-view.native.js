@@ -2,7 +2,6 @@
 /**
  * External dependencies
  */
-import React from 'react';
 import {
 	Keyboard,
 	LayoutAnimation,
@@ -13,13 +12,18 @@ import {
 } from 'react-native';
 
 /**
+ * WordPress dependencies
+ */
+import { Component } from '@wordpress/element';
+
+/**
  * This is a simplified version of Facebook's KeyboardAvoidingView.
  * It's meant to work specifically with BottomSheets.
  * This fixes an issue in the bottom padding calculation, when the
  * BottomSheet was presented on Landscape, with the keyboard already present,
  * and a TextField on Autofocus (situation present on Links UI)
  */
-class KeyboardAvoidingView extends React.Component {
+class KeyboardAvoidingView extends Component {
 	constructor() {
 		super( ...arguments );
 

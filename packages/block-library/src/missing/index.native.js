@@ -1,12 +1,8 @@
 /**
- * WordPress dependencies
- */
-import { coreBlocks } from '@wordpress/block-library';
-
-/**
  * Internal dependencies
  */
 import { settings as webSettings } from './index.js';
+import { coreBlocks } from '../';
 
 export { metadata, name } from './index.js';
 

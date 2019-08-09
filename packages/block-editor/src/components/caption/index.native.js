@@ -6,10 +6,14 @@ import { View } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { RichText } from '@wordpress/block-editor';
 import { compose } from '@wordpress/compose';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import RichText from '../rich-text';
 
 const Caption = ( { accessible, accessibilityLabel, onBlur, onChange, onFocus, isSelected, shouldDisplay, text } ) => (
 	<View style={ {	padding: 12, flex: 1, display: shouldDisplay ? 'flex' : 'none' } }

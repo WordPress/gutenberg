@@ -7,7 +7,6 @@ import { TouchableWithoutFeedback, View } from 'react-native';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { RichText } from '@wordpress/block-editor';
 import { compose } from '@wordpress/compose';
 import { decodeEntities } from '@wordpress/html-entities';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -17,6 +16,7 @@ import { getDefaultBlockName } from '@wordpress/blocks';
  * Internal dependencies
  */
 import styles from './style.scss';
+import RichText from '../rich-text';
 
 export function DefaultBlockAppender( {
 	isLocked,

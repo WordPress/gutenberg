@@ -7,7 +7,6 @@ import { isEmpty } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Dashicon } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { withPreferredColorScheme } from '@wordpress/compose';
@@ -17,6 +16,7 @@ import { withPreferredColorScheme } from '@wordpress/compose';
  */
 import styles from './styles.scss';
 import platformStyles from './cellStyles.scss';
+import Dashicon from '../../dashicon';
 
 class BottomSheetCell extends Component {
 	constructor( props ) {

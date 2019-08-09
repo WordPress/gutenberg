@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { useRef } from 'react';
 import { ScrollView, View } from 'react-native';
 
 /**
@@ -9,6 +8,7 @@ import { ScrollView, View } from 'react-native';
  */
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
+import { useRef } from '@wordpress/element';
 import { withViewportMatch } from '@wordpress/viewport';
 import { __ } from '@wordpress/i18n';
 import {

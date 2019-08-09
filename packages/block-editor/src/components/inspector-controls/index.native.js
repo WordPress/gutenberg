@@ -1,12 +1,8 @@
 /**
- * External dependencies
- */
-import React from 'react';
-
-/**
  * WordPress dependencies
  */
 import { createSlotFill } from '@wordpress/components';
+import { Children } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -20,7 +16,7 @@ const FillWithSettingsButton = ( { children, ...props } ) => {
 	return (
 		<>
 			<Fill { ...props }>{ children }</Fill>
-			{ React.Children.count( children ) > 0 && ( <BlockSettingsButton /> ) }
+			{ Children.count( children ) > 0 && ( <BlockSettingsButton /> ) }
 		</>
 	);
 };

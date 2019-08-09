@@ -8,7 +8,6 @@ import { View, Text } from 'react-native';
  */
 import { Icon } from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
-import { coreBlocks } from '@wordpress/block-library';
 import { normalizeIconObject } from '@wordpress/blocks';
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -17,6 +16,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import styles from './style.scss';
+import { coreBlocks } from '../';
 
 export class UnsupportedBlockEdit extends Component {
 	render() {

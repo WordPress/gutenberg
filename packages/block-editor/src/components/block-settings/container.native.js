@@ -4,12 +4,12 @@
 import { BottomSheet } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { InspectorControls } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import styles from './container.native.scss';
+import InspectorControls from '../inspector-controls';
 
 function BottomSheetSettings( { editorSidebarOpened, closeGeneralSidebar, ...props } ) {
 	return (

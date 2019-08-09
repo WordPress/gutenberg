@@ -24,7 +24,8 @@
 	"dependencies": {
 		"@babel/runtime": "^7.4.4",
 		"@wordpress/i18n": "file:../i18n",
-		"lodash": "^4.17.15"
+		"lodash": "^4.17.15",
+		"react-native": "0.60.0"
 	},
 	"publishConfig": {
 		"access": "public"

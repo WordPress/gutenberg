@@ -33,6 +33,7 @@
 		"classnames": "^2.2.5",
 		"lodash": "^4.17.15",
 		"memize": "^1.0.5",
+		"react-native": "0.60.0",
 		"rememo": "^3.0.0"
 	},
 	"publishConfig": {

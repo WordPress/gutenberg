@@ -41,6 +41,7 @@
 		"mousetrap": "^1.6.2",
 		"re-resizable": "^6.0.0",
 		"react-dates": "^17.1.1",
+		"react-native": "0.60.0",
 		"react-spring": "^8.0.20",
 		"rememo": "^3.0.0",
 		"tinycolor2": "^1.4.1",

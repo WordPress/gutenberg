@@ -37,6 +37,7 @@
 		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/editor": "file:../editor",
 		"@wordpress/element": "file:../element",
+		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
 		"@wordpress/keycodes": "file:../keycodes",
@@ -49,6 +50,7 @@
 		"lodash": "^4.17.15",
 		"memize": "^1.0.5",
 		"moment": "^2.22.1",
+		"react-native": "0.60.0",
 		"tinycolor2": "^1.4.1",
 		"url": "^0.11.0"
 	},

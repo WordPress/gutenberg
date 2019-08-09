@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import React from 'react';
 import { View, ImageBackground, Text, TouchableWithoutFeedback, Dimensions } from 'react-native';
 import {
 	requestMediaImport,
@@ -14,6 +13,7 @@ import { isEmpty, map } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { Component } from '@wordpress/element';
 import {
 	TextControl,
 	ToggleControl,
@@ -24,7 +24,6 @@ import {
 	PanelBody,
 	PanelActions,
 } from '@wordpress/components';
-
 import {
 	Caption,
 	MediaPlaceholder,
@@ -68,7 +67,7 @@ const sizeOptions = map( sizeOptionLabels, ( label, option ) => ( { value: optio
 // Default Image ratio 4:3
 const IMAGE_ASPECT_RATIO = 4 / 3;
 
-export class ImageEdit extends React.Component {
+export class ImageEdit extends Component {
 	constructor( props ) {
 		super( props );
 

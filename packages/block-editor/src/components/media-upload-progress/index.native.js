@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import React from 'react';
 import { View } from 'react-native';
 import {
 	subscribeMediaUpload,
@@ -13,6 +12,7 @@ import {
 import {
 	Spinner,
 } from '@wordpress/components';
+import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -26,7 +26,7 @@ export const MEDIA_UPLOAD_STATE_SUCCEEDED = 2;
 export const MEDIA_UPLOAD_STATE_FAILED = 3;
 export const MEDIA_UPLOAD_STATE_RESET = 4;
 
-export class MediaUploadProgress extends React.Component {
+export class MediaUploadProgress extends Component {
 	constructor( props ) {
 		super( props );
 

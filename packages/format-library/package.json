@@ -31,7 +31,8 @@
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/rich-text": "file:../rich-text",
 		"@wordpress/url": "file:../url",
-		"lodash": "^4.17.15"
+		"lodash": "^4.17.15",
+		"react-native": "0.60.0"
 	},
 	"publishConfig": {
 		"access": "public"

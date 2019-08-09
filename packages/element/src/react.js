@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+/* eslint-disable no-restricted-imports */
 import {
 	Children,
 	cloneElement,
@@ -26,6 +27,7 @@ import {
 	lazy,
 	Suspense,
 } from 'react';
+/* eslint-enable no-restricted-imports */
 import { isString } from 'lodash';
 
 /**

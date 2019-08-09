@@ -118,9 +118,16 @@ module.exports = {
 			files: [ 'packages/**/*.js' ],
 			rules: {
 				'import/no-extraneous-dependencies': 'error',
+				'no-restricted-imports': [ 'error', {
+					paths: [
+						{
+							name: 'react',
+							message: 'Please use @wordpress/element instead.',
+						},
+					],
+				} ],
 			},
 			excludedFiles: [
-				'**/*.@(android|ios|native).js',
 				'**/benchmark/**/*.js',
 				'**/@(__mocks__|__tests__|test)/**/*.js',
 				'**/@(storybook|stories)/**/*.js',

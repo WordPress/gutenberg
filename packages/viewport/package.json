@@ -24,7 +24,8 @@
 		"@babel/runtime": "^7.4.4",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/data": "file:../data",
-		"lodash": "^4.17.15"
+		"lodash": "^4.17.15",
+		"react-native": "0.60.0"
 	},
 	"publishConfig": {
 		"access": "public"

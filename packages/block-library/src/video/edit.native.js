@@ -1,11 +1,7 @@
 /**
  * External dependencies
  */
-import React from 'react';
 import { View, TouchableWithoutFeedback, Text } from 'react-native';
-/**
- * Internal dependencies
- */
 import {
 	mediaUploadSync,
 	requestImageFailedRetryDialog,
@@ -31,6 +27,7 @@ import {
 	VIDEO_ASPECT_RATIO,
 	VideoPlayer,
 } from '@wordpress/block-editor';
+import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { isURL } from '@wordpress/url';
 import { doAction, hasAction } from '@wordpress/hooks';
@@ -42,7 +39,7 @@ import style from './style.scss';
 import SvgIcon from './icon';
 import SvgIconRetry from './icon-retry';
 
-class VideoEdit extends React.Component {
+class VideoEdit extends Component {
 	constructor( props ) {
 		super( props );
 

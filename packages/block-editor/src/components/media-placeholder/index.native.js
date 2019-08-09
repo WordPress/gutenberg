@@ -7,11 +7,6 @@ import { View, Text, TouchableWithoutFeedback } from 'react-native';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import {
-	MediaUpload,
-	MEDIA_TYPE_IMAGE,
-	MEDIA_TYPE_VIDEO,
-} from '@wordpress/block-editor';
 import { Dashicon } from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
 
@@ -19,6 +14,10 @@ import { withPreferredColorScheme } from '@wordpress/compose';
  * Internal dependencies
  */
 import styles from './styles.scss';
+import MediaUpload, {
+	MEDIA_TYPE_IMAGE,
+	MEDIA_TYPE_VIDEO,
+} from '../media-upload';
 
 function MediaPlaceholder( props ) {
 	const {

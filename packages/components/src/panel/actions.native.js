@@ -4,16 +4,10 @@
 import { View } from 'react-native';
 
 /**
- * WordPress dependencies
- */
-import {
-	TextControl,
-} from '@wordpress/components';
-
-/**
  * Internal dependencies
  */
 import styles from './actions.scss';
+import TextControl from '../text-control';
 
 function PanelActions( { actions } ) {
 	return (
