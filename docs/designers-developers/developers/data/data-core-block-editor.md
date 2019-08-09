@@ -337,7 +337,7 @@ _Returns_
 
 <a name="getIsDownloadableBlocksEnabled" href="#getIsDownloadableBlocksEnabled">#</a> **getIsDownloadableBlocksEnabled**
 
-Returns true if the block editor can search and install uninstalled blocks.
+Returns whether block editor can search and install uninstalled blocks.
 
 _Parameters_
 
