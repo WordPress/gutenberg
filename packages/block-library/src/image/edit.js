@@ -778,7 +778,7 @@ export class ImageEdit extends Component {
 		);
 
 		// Disable reason: Each block can be selected by clicking on it
-		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
+		/* eslint-disable jsx-a11y/click-events-have-key-events */
 		return (
 			<>
 				{ controls }
@@ -924,7 +924,7 @@ export class ImageEdit extends Component {
 				{ mediaPlaceholder }
 			</>
 		);
-		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
+		/* eslint-enable jsx-a11y/click-events-have-key-events */
 	}
 }
 
