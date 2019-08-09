@@ -6,7 +6,7 @@
 			"type": "array",
 			"default": [ ],
 			"source": "query",
-			"selector": "ul.wp-block-gallery .blocks-gallery-item",
+			"selector": ".wp-block-gallery .blocks-gallery-item",
 			"query": {
 				"url": {
 					"source": "attribute",
@@ -47,6 +47,11 @@
 		},
 		"columns": {
 			"type": "number"
+		},
+		"galleryCaption": {
+			"type": "string",
+			"source": "html",
+			"selector": "figcaption"
 		},
 		"imageCrop": {
 			"type": "boolean",

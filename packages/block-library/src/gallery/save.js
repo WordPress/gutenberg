@@ -9,9 +9,10 @@ import { RichText } from '@wordpress/block-editor';
 import { defaultColumnsNumber } from './shared';
 
 export default function save( { attributes } ) {
-	const { images, columns = defaultColumnsNumber( attributes ), imageCrop, linkTo } = attributes;
-	return (
-		<ul className={ `columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` } >
+	const { images, columns = defaultColumnsNumber( attributes ), imageCrop, galleryCaption, linkTo } = attributes;
+
+	const baseGallery = (
+		<ul className={ `blocks-gallery-grid columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` } >
 			{ images.map( ( image ) => {
 				let href;
 
@@ -48,4 +49,14 @@ export default function save( { attributes } ) {
 			} ) }
 		</ul>
 	);
+
+	if ( galleryCaption ) {
+		return (
+			<figure>
+				{ baseGallery }
+				{ <RichText.Content tagName="figcaption" value={ galleryCaption } /> }
+			</figure>
+		);
+	}
+	return baseGallery;
 }
