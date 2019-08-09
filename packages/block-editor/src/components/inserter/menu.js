@@ -16,6 +16,7 @@ import {
 	deburr,
 } from 'lodash';
 import scrollIntoView from 'dom-scroll-into-view';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -275,88 +276,92 @@ export class InserterMenu extends Component {
 		/* eslint-disable jsx-a11y/no-autofocus, jsx-a11y/no-static-element-interactions */
 		return (
 			<div
-				className="editor-inserter__menu block-editor-inserter__menu"
+				className={ classnames( 'editor-inserter__menu block-editor-inserter__menu', {
+					'has-help-panel': showInserterHelpPanel,
+				} ) }
 				onKeyPress={ stopKeyPropagation }
 				onKeyDown={ this.onKeyDown }
 			>
-				<label htmlFor={ `block-editor-inserter__search-${ instanceId }` } className="screen-reader-text">
-					{ __( 'Search for a block' ) }
-				</label>
-				<input
-					id={ `block-editor-inserter__search-${ instanceId }` }
-					type="search"
-					placeholder={ __( 'Search for a block' ) }
-					className="editor-inserter__search block-editor-inserter__search"
-					autoFocus
-					onChange={ this.onChangeSearchInput }
-				/>
-
-				<div
-					className="editor-inserter__results block-editor-inserter__results"
-					ref={ this.inserterResults }
-					tabIndex="0"
-					role="region"
-					aria-label={ __( 'Available block types' ) }
-				>
-
-					<ChildBlocks
-						rootClientId={ rootClientId }
-						items={ childItems }
-						onSelect={ onSelect }
-						onHover={ this.onHover }
+				<div className="block-editor-inserter__main-area">
+					<label htmlFor={ `block-editor-inserter__search-${ instanceId }` } className="screen-reader-text">
+						{ __( 'Search for a block' ) }
+					</label>
+					<input
+						id={ `block-editor-inserter__search-${ instanceId }` }
+						type="search"
+						placeholder={ __( 'Search for a block' ) }
+						className="editor-inserter__search block-editor-inserter__search"
+						autoFocus
+						onChange={ this.onChangeSearchInput }
 					/>
 
-					{ !! suggestedItems.length &&
-						<PanelBody
-							title={ _x( 'Most Used', 'blocks' ) }
-							opened={ isPanelOpen( 'suggested' ) }
-							onToggle={ this.onTogglePanel( 'suggested' ) }
-							ref={ this.bindPanel( 'suggested' ) }
-						>
-							<BlockTypesList items={ suggestedItems } onSelect={ onSelect } onHover={ this.onHover } />
-						</PanelBody>
-					}
+					<div
+						className="editor-inserter__results block-editor-inserter__results"
+						ref={ this.inserterResults }
+						tabIndex="0"
+						role="region"
+						aria-label={ __( 'Available block types' ) }
+					>
 
-					{ map( getCategories(), ( category ) => {
-						const categoryItems = itemsPerCategory[ category.slug ];
-						if ( ! categoryItems || ! categoryItems.length ) {
-							return null;
-						}
-						return (
+						<ChildBlocks
+							rootClientId={ rootClientId }
+							items={ childItems }
+							onSelect={ onSelect }
+							onHover={ this.onHover }
+						/>
+
+						{ !! suggestedItems.length &&
 							<PanelBody
-								key={ category.slug }
-								title={ category.title }
-								icon={ category.icon }
-								opened={ isPanelOpen( category.slug ) }
-								onToggle={ this.onTogglePanel( category.slug ) }
-								ref={ this.bindPanel( category.slug ) }
+								title={ _x( 'Most Used', 'blocks' ) }
+								opened={ isPanelOpen( 'suggested' ) }
+								onToggle={ this.onTogglePanel( 'suggested' ) }
+								ref={ this.bindPanel( 'suggested' ) }
 							>
-								<BlockTypesList items={ categoryItems } onSelect={ onSelect } onHover={ this.onHover } />
+								<BlockTypesList items={ suggestedItems } onSelect={ onSelect } onHover={ this.onHover } />
 							</PanelBody>
-						);
-					} ) }
+						}
 
-					{ !! reusableItems.length && (
-						<PanelBody
-							className="editor-inserter__reusable-blocks-panel block-editor-inserter__reusable-blocks-panel"
-							title={ __( 'Reusable' ) }
-							opened={ isPanelOpen( 'reusable' ) }
-							onToggle={ this.onTogglePanel( 'reusable' ) }
-							icon="controls-repeat"
-							ref={ this.bindPanel( 'reusable' ) }
-						>
-							<BlockTypesList items={ reusableItems } onSelect={ onSelect } onHover={ this.onHover } />
-							<a
-								className="editor-inserter__manage-reusable-blocks block-editor-inserter__manage-reusable-blocks"
-								href={ addQueryArgs( 'edit.php', { post_type: 'wp_block' } ) }
+						{ map( getCategories(), ( category ) => {
+							const categoryItems = itemsPerCategory[ category.slug ];
+							if ( ! categoryItems || ! categoryItems.length ) {
+								return null;
+							}
+							return (
+								<PanelBody
+									key={ category.slug }
+									title={ category.title }
+									icon={ category.icon }
+									opened={ isPanelOpen( category.slug ) }
+									onToggle={ this.onTogglePanel( category.slug ) }
+									ref={ this.bindPanel( category.slug ) }
+								>
+									<BlockTypesList items={ categoryItems } onSelect={ onSelect } onHover={ this.onHover } />
+								</PanelBody>
+							);
+						} ) }
+
+						{ !! reusableItems.length && (
+							<PanelBody
+								className="editor-inserter__reusable-blocks-panel block-editor-inserter__reusable-blocks-panel"
+								title={ __( 'Reusable' ) }
+								opened={ isPanelOpen( 'reusable' ) }
+								onToggle={ this.onTogglePanel( 'reusable' ) }
+								icon="controls-repeat"
+								ref={ this.bindPanel( 'reusable' ) }
 							>
-								{ __( 'Manage All Reusable Blocks' ) }
-							</a>
-						</PanelBody>
-					) }
-					{ isEmpty( suggestedItems ) && isEmpty( reusableItems ) && isEmpty( itemsPerCategory ) && (
-						<p className="editor-inserter__no-results block-editor-inserter__no-results">{ __( 'No blocks found.' ) }</p>
-					) }
+								<BlockTypesList items={ reusableItems } onSelect={ onSelect } onHover={ this.onHover } />
+								<a
+									className="editor-inserter__manage-reusable-blocks block-editor-inserter__manage-reusable-blocks"
+									href={ addQueryArgs( 'edit.php', { post_type: 'wp_block' } ) }
+								>
+									{ __( 'Manage All Reusable Blocks' ) }
+								</a>
+							</PanelBody>
+						) }
+						{ isEmpty( suggestedItems ) && isEmpty( reusableItems ) && isEmpty( itemsPerCategory ) && (
+							<p className="editor-inserter__no-results block-editor-inserter__no-results">{ __( 'No blocks found.' ) }</p>
+						) }
+					</div>
 				</div>
 
 				{ showInserterHelpPanel && (
