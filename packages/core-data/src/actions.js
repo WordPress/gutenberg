@@ -154,7 +154,7 @@ export function* editEntityRecord( kind, name, recordId, edits ) {
 		edits: Object.keys( edits ).reduce( ( acc, key ) => {
 			const recordValue = record[ key ];
 			const value = mergedEdits[ key ] ?
-				merge( recordValue, edits[ key ] ) :
+				merge( {}, recordValue, edits[ key ] ) :
 				edits[ key ];
 			acc[ key ] = isEqual( recordValue, value ) ? undefined : value;
 			return acc;
