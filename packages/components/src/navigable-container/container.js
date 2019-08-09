@@ -116,8 +116,6 @@ class NavigableContainer extends Component {
 
 	render() {
 		const { children, ...props } = this.props;
-		// Disable reason: Assumed role is applied by parent via props spread.
-		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		return (
 			<div ref={ this.bindContainer }
 				{ ...omit( props, [
@@ -132,7 +130,6 @@ class NavigableContainer extends Component {
 				{ children }
 			</div>
 		);
-		/* eslint-enable jsx-a11y/no-static-element-interactions */
 	}
 }
 

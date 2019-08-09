@@ -198,7 +198,6 @@ class VideoEdit extends Component {
 		}
 		const videoPosterDescription = `video-block__poster-image-description-${ instanceId }`;
 
-		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
 		return (
 			<>
 				<BlockControls>
@@ -314,7 +313,6 @@ class VideoEdit extends Component {
 				</figure>
 			</>
 		);
-		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
 	}
 }
 
