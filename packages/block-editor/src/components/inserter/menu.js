@@ -133,10 +133,6 @@ export class InserterMenu extends Component {
 	}
 
 	onHover( item ) {
-		if ( ! item ) {
-			return;
-		}
-
 		this.setState( {
 			hoveredItem: item,
 		} );
