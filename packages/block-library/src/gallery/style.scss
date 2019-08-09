@@ -3,6 +3,7 @@
 	flex-wrap: wrap;
 	list-style-type: none;
 	padding: 0;
+	margin-bottom: 0;
 
 	.blocks-gallery-image,
 	.blocks-gallery-item {
@@ -146,5 +147,12 @@
 		.blocks-gallery-item figure {
 			justify-content: center;
 		}
+	}
+
+	+ figcaption {
+		margin-top: -$grid-size;
+		font-size: $editor-font-size;
+		font-family: $default-font;
+		color: $dark-gray-500;
 	}
 }
