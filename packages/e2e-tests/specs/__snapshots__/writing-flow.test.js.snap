@@ -166,6 +166,20 @@ exports[`Writing Flow should navigate empty paragraph 1`] = `
 <!-- /wp:paragraph -->"
 `;
 
+exports[`Writing Flow should navigate empty paragraphs 1`] = `
+"<!-- wp:paragraph -->
+<p>1</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>3</p>
+<!-- /wp:paragraph -->"
+`;
+
 exports[`Writing Flow should not create extra line breaks in multiline value 1`] = `
 "<!-- wp:quote -->
 <blockquote class=\\"wp-block-quote\\"><p></p></blockquote>
