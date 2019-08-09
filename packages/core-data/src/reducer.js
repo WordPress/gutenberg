@@ -330,21 +330,19 @@ export function undo( state = UNDO_INITIAL_STATE, action ) {
 						edits: { ...state.flattenedUndo, ...action.meta.undo.edits },
 					},
 				];
-			} else {
-				// Clear potential redos, because this only supports linear history.
-				nextState = state.slice( 0, state.offset || undefined );
-				const lastItem = nextState[ nextState.length - 1 ];
-				if ( lastItem ) {
-					lastItem.edits = { ...lastItem.edits, ...state.flattenedUndo };
-				}
+				nextState.offset = 0;
+				return nextState;
 			}
+
+			// Clear potential redos, because this only supports linear history.
+			nextState = state.slice( 0, state.offset || undefined );
 			nextState.offset = 0;
 
 			nextState.push( {
 				kind: action.kind,
 				name: action.name,
 				recordId: action.recordId,
-				edits: action.edits,
+				edits: { ...action.edits, ...state.flattenedUndo },
 			} );
 
 			return nextState;
