@@ -24,7 +24,6 @@
 		"@babel/runtime": "^7.4.4",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/data": "file:../data",
-		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/dom": "file:../dom",
 		"@wordpress/element": "file:../element",
 		"@wordpress/escape-html": "file:../escape-html",

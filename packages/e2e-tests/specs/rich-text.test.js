@@ -239,6 +239,9 @@ describe( 'RichText', () => {
 			activeElement.blur();
 			activeElement.focus();
 		} );
+		// Wait for the next animation frame, see the focus event listener in
+		// RichText.
+		await page.evaluate( () => new Promise( window.requestAnimationFrame ) );
 		await pressKeyWithModifier( 'primary', 'b' );
 		await page.keyboard.type( '2' );
 		await pressKeyWithModifier( 'primary', 'b' );

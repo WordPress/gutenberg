@@ -108,6 +108,7 @@ class Layout extends Component {
 			...styles.toolbarKeyboardAvoidingView,
 			left: this.state.safeAreaInsets.left,
 			right: this.state.safeAreaInsets.right,
+			bottom: this.state.safeAreaInsets.bottom,
 		};
 
 		return (
