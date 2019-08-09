@@ -636,7 +636,6 @@ export function isValidBlockContent( blockTypeOrName, attributes, originalBlockC
 		log.error( 'Block validation failed because an error occurred while generating block content:\n\n%s', error.toString() );
 		return false;
 	}
-
 	const isValid = isEquivalentHTML( originalBlockContent, generatedBlockContent );
 	if ( ! isValid ) {
 		log.error(
