@@ -581,7 +581,7 @@ const withSaveReusableBlock = ( reducer ) => ( state, action ) => {
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
  *
- * @returns {Object} Updated state.
+ * @return {Object} Updated state.
  */
 export const blocks = flow(
 	combineReducers,
@@ -1247,6 +1247,22 @@ export const blockListSettings = ( state = {}, action ) => {
 };
 
 /**
+ * Reducer returning whether the navigation mode is enabled or not.
+ *
+ * @param {string} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {string} Updated state.
+ */
+export function isNavigationMode( state = true, action ) {
+	if ( action.type === 'SET_NAVIGATION_MODE' ) {
+		return action.isNavigationMode;
+	}
+
+	return state;
+}
+
+/**
  * Reducer return an updated state representing the most recent block attribute
  * update. The state is structured as an object where the keys represent the
  * client IDs of blocks, the values a subset of attributes from the most recent
@@ -1286,4 +1302,5 @@ export default combineReducers( {
 	settings,
 	preferences,
 	lastBlockAttributesChange,
+	isNavigationMode,
 } );

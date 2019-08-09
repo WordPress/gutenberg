@@ -32,7 +32,15 @@ export function BlockSettingsMenu( { clientIds } ) {
 
 	return (
 		<BlockActions clientIds={ clientIds }>
-			{ ( { onDuplicate, onRemove, onInsertAfter, onInsertBefore, canDuplicate, isLocked } ) => (
+			{ ( {
+				canDuplicate,
+				canInsertDefaultBlock,
+				isLocked,
+				onDuplicate,
+				onInsertAfter,
+				onInsertBefore,
+				onRemove,
+			} ) => (
 				<Toolbar>
 					<DropdownMenu
 						icon="ellipsis"
@@ -69,7 +77,7 @@ export function BlockSettingsMenu( { clientIds } ) {
 											{ __( 'Duplicate' ) }
 										</MenuItem>
 									) }
-									{ ! isLocked && (
+									{ canInsertDefaultBlock && (
 										<>
 											<MenuItem
 												className="editor-block-settings-menu__control block-editor-block-settings-menu__control"

@@ -132,6 +132,7 @@ class RichText extends Component {
 
 	componentWillUnmount() {
 		document.removeEventListener( 'selectionchange', this.onSelectionChange );
+		window.cancelAnimationFrame( this.rafId );
 	}
 
 	setRef( node ) {
@@ -287,7 +288,7 @@ class RichText extends Component {
 		this.recalculateBoundaryStyle();
 
 		// We know for certain that on focus, the old selection is invalid. It
-		// will be recalculated on `selectionchange`.
+		// will be recalculated on the next mouseup, keyup, or touchend event.
 		const index = undefined;
 		const activeFormats = undefined;
 
@@ -299,6 +300,12 @@ class RichText extends Component {
 		};
 		this.props.onSelectionChange( index, index );
 		this.setState( { activeFormats } );
+
+		// Update selection as soon as possible, which is at the next animation
+		// frame. The event listener for selection changes may be added too late
+		// at this point, but this focus event is still too early to calculate
+		// the selection.
+		this.rafId = window.requestAnimationFrame( this.onSelectionChange );
 
 		document.addEventListener( 'selectionchange', this.onSelectionChange );
 	}
@@ -385,8 +392,17 @@ class RichText extends Component {
 
 	/**
 	 * Handles the `selectionchange` event: sync the selection to local state.
+	 *
+	 * @param {Event} event `selectionchange` event.
 	 */
-	onSelectionChange() {
+	onSelectionChange( event ) {
+		if (
+			event.type !== 'selectionchange' &&
+			! this.props.__unstableIsSelected
+		) {
+			return;
+		}
+
 		const { start, end } = this.createRecord();
 		const value = this.getRecord();
 
@@ -839,11 +855,11 @@ class RichText extends Component {
 	}
 
 	/**
-     * Converts the internal value to the external data format.
-     *
-     * @param {Object} value The internal rich-text value.
-     * @return {*} The external data format, data type depends on props.
-     */
+	 * Converts the internal value to the external data format.
+	 *
+	 * @param {Object} value The internal rich-text value.
+	 * @return {*} The external data format, data type depends on props.
+	 */
 	valueToFormat( value ) {
 		value = this.removeEditorOnlyFormats( value );
 
@@ -904,6 +920,13 @@ class RichText extends Component {
 					onMouseDown={ this.onPointerDown }
 					onTouchStart={ this.onPointerDown }
 					setRef={ this.setRef }
+					// Selection updates must be done at these events as they
+					// happen before the `selectionchange` event. In some cases,
+					// the `selectionchange` event may not even fire, for
+					// example when the window receives focus again on click.
+					onKeyUp={ this.onSelectionChange }
+					onMouseUp={ this.onSelectionChange }
+					onTouchEnd={ this.onSelectionChange }
 				/>
 				{ isSelected && <FormatEdit
 					allowedFormats={ allowedFormats }

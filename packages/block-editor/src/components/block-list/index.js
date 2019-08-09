@@ -8,6 +8,7 @@ import {
 	sortBy,
 	throttle,
 } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -87,8 +88,6 @@ class BlockList extends Component {
 	 * multi-selection.
 	 *
 	 * @param {MouseEvent} event A mousemove event object.
-	 *
-	 * @return {void}
 	 */
 	onPointerMove( { clientY } ) {
 		// We don't start multi-selection until the mouse starts moving, so as
@@ -116,8 +115,6 @@ class BlockList extends Component {
 	 * in response to a mousedown event occurring in a rendered block.
 	 *
 	 * @param {string} clientId Client ID of block where mousedown occurred.
-	 *
-	 * @return {void}
 	 */
 	onSelectionStart( clientId ) {
 		if ( ! this.props.isSelectionEnabled ) {
@@ -173,8 +170,6 @@ class BlockList extends Component {
 
 	/**
 	 * Handles a mouseup event to end the current cursor multi-selection.
-	 *
-	 * @return {void}
 	 */
 	onSelectionEnd() {
 		// Cancel throttled calls.
@@ -197,6 +192,7 @@ class BlockList extends Component {
 
 	render() {
 		const {
+			className,
 			blockClientIds,
 			rootClientId,
 			isDraggable,
@@ -208,7 +204,12 @@ class BlockList extends Component {
 		} = this.props;
 
 		return (
-			<div className="editor-block-list__layout block-editor-block-list__layout">
+			<div className={
+				classnames(
+					'editor-block-list__layout block-editor-block-list__layout',
+					className
+				)
+			}>
 				{ blockClientIds.map( ( clientId ) => {
 					const isBlockInSelection = hasMultiSelection ?
 						multiSelectedBlockClientIds.includes( clientId ) :

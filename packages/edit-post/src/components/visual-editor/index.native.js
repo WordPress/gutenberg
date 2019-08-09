@@ -5,7 +5,7 @@ import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { BlockEditorProvider, BlockList } from '@wordpress/block-editor';
+import { BlockList } from '@wordpress/block-editor';
 import { PostTitle } from '@wordpress/editor';
 import { ReadableContentView } from '@wordpress/components';
 
@@ -43,30 +43,16 @@ class VisualEditor extends Component {
 
 	render() {
 		const {
-			blocks,
 			isFullyBordered,
-			resetEditorBlocks,
-			resetEditorBlocksWithoutUndoLevel,
-			rootViewHeight,
 			safeAreaBottomInset,
 		} = this.props;
 
 		return (
-			<BlockEditorProvider
-				value={ blocks }
-				onInput={ resetEditorBlocksWithoutUndoLevel }
-				onChange={ resetEditorBlocks }
-				settings={ null }
-			>
-				<BlockList
-					header={ this.renderHeader() }
-					isFullyBordered={ isFullyBordered }
-					rootViewHeight={ rootViewHeight }
-					safeAreaBottomInset={ safeAreaBottomInset }
-					isPostTitleSelected={ this.props.isPostTitleSelected }
-					onBlockTypeSelected={ this.onPostTitleUnselect }
-				/>
-			</BlockEditorProvider>
+			<BlockList
+				header={ this.renderHeader() }
+				isFullyBordered={ isFullyBordered }
+				safeAreaBottomInset={ safeAreaBottomInset }
+			/>
 		);
 	}
 }
@@ -74,21 +60,16 @@ class VisualEditor extends Component {
 export default compose( [
 	withSelect( ( select ) => {
 		const {
-			getEditorBlocks,
 			getEditedPostAttribute,
-			isPostTitleSelected,
 		} = select( 'core/editor' );
 
 		return {
-			blocks: getEditorBlocks(),
 			title: getEditedPostAttribute( 'title' ),
-			isPostTitleSelected: isPostTitleSelected(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
 		const {
 			editPost,
-			resetEditorBlocks,
 		} = dispatch( 'core/editor' );
 
 		const { clearSelectedBlock } = dispatch( 'core/block-editor' );
@@ -97,12 +78,6 @@ export default compose( [
 			clearSelectedBlock,
 			editTitle( title ) {
 				editPost( { title } );
-			},
-			resetEditorBlocks,
-			resetEditorBlocksWithoutUndoLevel( blocks ) {
-				resetEditorBlocks( blocks, {
-					__unstableShouldCreateUndoLevel: false,
-				} );
 			},
 		};
 	} ),

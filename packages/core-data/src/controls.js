@@ -19,6 +19,7 @@ export function apiFetch( request ) {
 
 /**
  * Calls a selector using the current state.
+ *
  * @param {string} selectorName Selector name.
  * @param  {Array} args         Selector arguments.
  *

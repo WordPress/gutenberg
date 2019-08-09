@@ -104,7 +104,7 @@ export function getEntity( state, kind, name ) {
  * @return {Object?} Record.
  */
 export function getEntityRecord( state, kind, name, key ) {
-	return get( state.entities.data, [ kind, name, 'items', key ] );
+	return get( state.entities.data, [ kind, name, 'queriedData', 'items', key ] );
 }
 
 /**
@@ -118,11 +118,208 @@ export function getEntityRecord( state, kind, name, key ) {
  * @return {Array} Records.
  */
 export function getEntityRecords( state, kind, name, query ) {
-	const queriedState = get( state.entities.data, [ kind, name ] );
+	const queriedState = get( state.entities.data, [ kind, name, 'queriedData' ] );
 	if ( ! queriedState ) {
 		return [];
 	}
 	return getQueriedItems( queriedState, query );
+}
+
+/**
+ * Returns the specified entity record's edits.
+ *
+ * @param {Object} state    State tree.
+ * @param {string} kind     Entity kind.
+ * @param {string} name     Entity name.
+ * @param {number} recordId Record ID.
+ *
+ * @return {Object?} The entity record's edits.
+ */
+export function getEntityRecordEdits( state, kind, name, recordId ) {
+	return get( state.entities.data, [ kind, name, 'edits', recordId ] );
+}
+
+/**
+ * Returns the specified entity record's non transient edits.
+ *
+ * Transient edits don't create an undo level, and
+ * are not considered for change detection.
+ * They are defined in the entity's config.
+ *
+ * @param {Object} state    State tree.
+ * @param {string} kind     Entity kind.
+ * @param {string} name     Entity name.
+ * @param {number} recordId Record ID.
+ *
+ * @return {Object?} The entity record's non transient edits.
+ */
+export const getEntityRecordNonTransientEdits = createSelector(
+	( state, kind, name, recordId ) => {
+		const { transientEdits = {} } = getEntity( state, kind, name );
+		const edits =
+							getEntityRecordEdits( state, kind, name, recordId ) || [];
+		return Object.keys( edits ).reduce( ( acc, key ) => {
+			if ( ! transientEdits[ key ] ) {
+				acc[ key ] = edits[ key ];
+			}
+			return acc;
+		}, {} );
+	},
+	( state ) => [ state.entities.config, state.entities.data ]
+);
+
+/**
+ * Returns true if the specified entity record has edits,
+ * and false otherwise.
+ *
+ * @param {Object} state    State tree.
+ * @param {string} kind     Entity kind.
+ * @param {string} name     Entity name.
+ * @param {number} recordId Record ID.
+ *
+ * @return {boolean} Whether the entity record has edits or not.
+ */
+export function hasEditsForEntityRecord( state, kind, name, recordId ) {
+	return Object.keys( getEntityRecordNonTransientEdits( state, kind, name, recordId ) ).length > 0;
+}
+
+/**
+ * Returns the specified entity record, merged with its edits.
+ *
+ * @param {Object} state    State tree.
+ * @param {string} kind     Entity kind.
+ * @param {string} name     Entity name.
+ * @param {number} recordId Record ID.
+ *
+ * @return {Object?} The entity record, merged with its edits.
+ */
+export const getEditedEntityRecord = createSelector(
+	( state, kind, name, recordId ) => {
+		const record = getEntityRecord( state, kind, name, recordId );
+		return {
+			...Object.keys( record ).reduce( ( acc, key ) => {
+				acc[ key ] = get( record[ key ], 'raw', record[ key ] );
+				return acc;
+			}, {} ),
+			...getEntityRecordEdits( state, kind, name, recordId ),
+		};
+	},
+	( state ) => [ state.entities.data ]
+);
+
+/**
+ * Returns true if the specified entity record is autosaving, and false otherwise.
+ *
+ * @param {Object} state    State tree.
+ * @param {string} kind     Entity kind.
+ * @param {string} name     Entity name.
+ * @param {number} recordId Record ID.
+ *
+ * @return {boolean} Whether the entity record is autosaving or not.
+ */
+export function isAutosavingEntityRecord( state, kind, name, recordId ) {
+	const { pending, isAutosave } = get(
+		state.entities.data,
+		[ kind, name, 'saving', recordId ],
+		{}
+	);
+	return Boolean( pending && isAutosave );
+}
+
+/**
+ * Returns true if the specified entity record is saving, and false otherwise.
+ *
+ * @param {Object} state    State tree.
+ * @param {string} kind     Entity kind.
+ * @param {string} name     Entity name.
+ * @param {number} recordId Record ID.
+ *
+ * @return {boolean} Whether the entity record is saving or not.
+ */
+export function isSavingEntityRecord( state, kind, name, recordId ) {
+	const { pending, isAutosave } = get(
+		state.entities.data,
+		[ kind, name, 'saving', recordId ],
+		{}
+	);
+	return Boolean( pending && ! isAutosave );
+}
+
+/**
+ * Returns the specified entity record's last save error.
+ *
+ * @param {Object} state    State tree.
+ * @param {string} kind     Entity kind.
+ * @param {string} name     Entity name.
+ * @param {number} recordId Record ID.
+ *
+ * @return {Object?} The entity record's save error.
+ */
+export function getLastEntitySaveError( state, kind, name, recordId ) {
+	return get( state.entities.data, [ kind, name, 'saving', recordId, 'error' ] );
+}
+
+/**
+ * Returns the current undo offset for the
+ * entity records edits history. The offset
+ * represents how many items from the end
+ * of the history stack we are at. 0 is the
+ * last edit, -1 is the second last, and so on.
+ *
+ * @param {Object} state State tree.
+ *
+ * @return {number} The current undo offset.
+ */
+function getCurrentUndoOffset( state ) {
+	return state.undo.offset;
+}
+
+/**
+ * Returns the previous edit from the current undo offset
+ * for the entity records edits history, if any.
+ *
+ * @param {Object} state State tree.
+ *
+ * @return {Object?} The edit.
+ */
+export function getUndoEdit( state ) {
+	return state.undo[ state.undo.length - 2 + getCurrentUndoOffset( state ) ];
+}
+
+/**
+ * Returns the next edit from the current undo offset
+ * for the entity records edits history, if any.
+ *
+ * @param {Object} state State tree.
+ *
+ * @return {Object?} The edit.
+ */
+export function getRedoEdit( state ) {
+	return state.undo[ state.undo.length + getCurrentUndoOffset( state ) ];
+}
+
+/**
+ * Returns true if there is a previous edit from the current undo offset
+ * for the entity records edits history, and false otherwise.
+ *
+ * @param {Object} state State tree.
+ *
+ * @return {boolean} Whether there is a previous edit or not.
+ */
+export function hasUndo( state ) {
+	return Boolean( getUndoEdit( state ) );
+}
+
+/**
+ * Returns true if there is a next edit from the current undo offset
+ * for the entity records edits history, and false otherwise.
+ *
+ * @param {Object} state State tree.
+ *
+ * @return {boolean} Whether there is a next edit or not.
+ */
+export function hasRedo( state ) {
+	return Boolean( getRedoEdit( state ) );
 }
 
 /**

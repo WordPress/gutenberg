@@ -10,7 +10,7 @@ import {
 	insertBlock,
 } from '@wordpress/e2e-test-utils';
 
-describe( 'adding blocks', () => {
+describe( 'Writing Flow', () => {
 	beforeEach( async () => {
 		await createNewPost();
 	} );
@@ -316,7 +316,6 @@ describe( 'adding blocks', () => {
 	it( 'should navigate empty paragraph', async () => {
 		await clickBlockAppender();
 		await page.keyboard.press( 'Enter' );
-		await page.waitForFunction( () => document.activeElement.isContentEditable );
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'ArrowRight' );
