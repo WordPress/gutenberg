@@ -18,7 +18,7 @@ import {
 	isEmptyTableSection,
 	isEmptyRow,
 	isCellSelected,
-	updateSelectedCell,
+	updateSelectedCellAttributes,
 	getCellAbove,
 	getCellBelow,
 	getCellToLeft,
@@ -1213,21 +1213,21 @@ describe( 'isCellSelected', () => {
 	} );
 } );
 
-describe( 'updateSelectedCell', () => {
+describe( 'updateSelectedCellAttributes', () => {
 	it( 'returns an unchanged table state if there is no selection', () => {
-		const updated = updateSelectedCell( table, undefined, ( cell ) => ( { ...cell, content: 'test' } ) );
+		const updated = updateSelectedCellAttributes( table, undefined, ( cell ) => ( { ...cell, content: 'test' } ) );
 		expect( table ).toEqual( updated );
 	} );
 
 	it( 'returns an unchanged table state if the selection is outside the bounds of the table', () => {
 		const cellSelection = { type: 'cell', sectionName: 'body', rowIndex: 100, columnIndex: 100 };
-		const updated = updateSelectedCell( table, cellSelection, ( cell ) => ( { ...cell, content: 'test' } ) );
+		const updated = updateSelectedCellAttributes( table, cellSelection, ( cell ) => ( { ...cell, content: 'test' } ) );
 		expect( table ).toEqual( updated );
 	} );
 
 	it( 'updates only the individual cell when the selection type is `cell`', () => {
 		const cellSelection = { type: 'cell', sectionName: 'body', rowIndex: 0, columnIndex: 0 };
-		const updated = updateSelectedCell( table, cellSelection, ( cell ) => ( { ...cell, content: 'test' } ) );
+		const updated = updateSelectedCellAttributes( table, cellSelection, ( cell ) => ( { ...cell, content: 'test' } ) );
 
 		expect( updated ).toEqual( {
 			body: [
@@ -1247,7 +1247,7 @@ describe( 'updateSelectedCell', () => {
 
 	it( 'updates every cell in the column when the selection type is `column`', () => {
 		const cellSelection = { type: 'column', columnIndex: 1 };
-		const updated = updateSelectedCell( table, cellSelection, ( cell ) => ( { ...cell, content: 'test' } ) );
+		const updated = updateSelectedCellAttributes( table, cellSelection, ( cell ) => ( { ...cell, content: 'test' } ) );
 
 		expect( updated ).toEqual( {
 			body: [

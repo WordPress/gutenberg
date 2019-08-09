@@ -32,7 +32,7 @@ import {
  */
 import {
 	createTable,
-	updateSelectedCell,
+	updateSelectedCellAttributes,
 	getCellAttribute,
 	insertRow,
 	deleteRow,
@@ -182,7 +182,7 @@ export class TableEdit extends Component {
 
 		const { attributes, setAttributes } = this.props;
 
-		setAttributes( updateSelectedCell(
+		setAttributes( updateSelectedCellAttributes(
 			attributes,
 			selectedCell,
 			( cellAttributes ) => ( { ...cellAttributes, content } ),
@@ -209,7 +209,7 @@ export class TableEdit extends Component {
 		};
 
 		const { attributes, setAttributes } = this.props;
-		const newAttributes = updateSelectedCell(
+		const newAttributes = updateSelectedCellAttributes(
 			attributes,
 			columnSelection,
 			( cellAttributes ) => ( { ...cellAttributes, align } ),
@@ -599,7 +599,6 @@ export class TableEdit extends Component {
 						className={ tableClasses }
 						tableState={ attributes }
 						selectedCell={ selectedCell }
-						onNavigation={ ( cellLocation ) => this.updateSelectedCell( cellLocation ) }
 					>
 						<Section name="head" rows={ head } />
 						<Section name="body" rows={ body } />

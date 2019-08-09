@@ -111,7 +111,7 @@ export function getCellAttribute( state, cellLocation, attributeName ) {
  *
  * @return {Object} New table state including the updated cells.
  */
-export function updateSelectedCell( state, selection, updateCell ) {
+export function updateSelectedCellAttributes( state, selection, updateCell ) {
 	if ( ! selection ) {
 		return state;
 	}

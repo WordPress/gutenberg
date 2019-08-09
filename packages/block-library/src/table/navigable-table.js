@@ -82,7 +82,7 @@ function getCellContentEditableElement( tableElement, { sectionName, rowIndex, c
 	return rowElement.querySelectorAll( '*[contenteditable="true"]' )[ columnIndex ];
 }
 
-export default function NavigableTable( { children, className, tableState, selectedCell, onNavigation } ) {
+export default function NavigableTable( { children, className, tableState, selectedCell } ) {
 	const tableRef = useRef();
 
 	const handleKeyDown = ( event ) => {
@@ -143,7 +143,6 @@ export default function NavigableTable( { children, className, tableState, selec
 		}
 
 		placeCaretAtHorizontalEdge( contentEditableElement, isReverse );
-		onNavigation( nextCellLocation );
 	};
 
 	// Disable reason: Wrapper itself is non-interactive, but must capture
