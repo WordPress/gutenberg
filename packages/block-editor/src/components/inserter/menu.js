@@ -475,6 +475,7 @@ export default compose(
 				}
 
 				ownProps.onSelect();
+				return insertedBlock;
 			},
 		};
 	} ),

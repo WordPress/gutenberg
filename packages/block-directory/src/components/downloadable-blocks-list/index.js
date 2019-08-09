@@ -6,7 +6,7 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { getBlockMenuDefaultClassName } from '@wordpress/blocks';
+import { getBlockMenuDefaultClassName, unregisterBlockType } from '@wordpress/blocks';
 import { withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
@@ -51,9 +51,10 @@ function DownloadableBlocksList( { items, onHover = () => {}, children, download
 }
 
 export default compose(
-	withDispatch( ( ownDispatch, props ) => {
-		const { installBlock, downloadBlock } = ownDispatch( 'core/block-directory' );
-		const { createErrorNotice, removeNotice } = ownDispatch( 'core/notices' );
+	withDispatch( ( dispatch, props ) => {
+		const { installBlock, downloadBlock } = dispatch( 'core/block-directory' );
+		const { createErrorNotice, removeNotice } = dispatch( 'core/notices' );
+		const { removeBlocks } = dispatch( 'core/block-editor' );
 		const { onSelect } = props;
 
 		return {
@@ -68,39 +69,42 @@ export default compose(
 									label: __( 'Retry' ),
 									onClick: () => {
 										removeNotice( DOWNLOAD_ERROR_NOTICE_ID );
-										downloadBlock( item, onSelect, onDownloadError );
+										downloadBlock( item, onSuccess, onDownloadError );
 									},
 								},
 							],
 						} );
 				};
 
-				const onInstallBlockError = () => {
-					createErrorNotice(
-						__( 'Block previews can\'t install.' ),
-						{
-							id: INSTALL_ERROR_NOTICE_ID,
-							actions: [
-								{
-									label: __( 'Retry' ),
-									onClick: () => {
-										removeNotice( INSTALL_ERROR_NOTICE_ID );
-										installBlock( item.id, noop, onInstallBlockError );
-									},
-								},
-								{
-									label: __( 'Remove' ),
-									onClick: () => {
-										removeNotice( INSTALL_ERROR_NOTICE_ID );
-									},
-								},
-							],
-						}
-					);
-				};
-
 				const onSuccess = () => {
-					onSelect( item );
+					const createdBlock = onSelect( item );
+
+					const onInstallBlockError = () => {
+						createErrorNotice(
+							__( 'Block previews can\'t install.' ),
+							{
+								id: INSTALL_ERROR_NOTICE_ID,
+								actions: [
+									{
+										label: __( 'Retry' ),
+										onClick: () => {
+											removeNotice( INSTALL_ERROR_NOTICE_ID );
+											installBlock( item.id, noop, onInstallBlockError );
+										},
+									},
+									{
+										label: __( 'Remove' ),
+										onClick: () => {
+											removeNotice( INSTALL_ERROR_NOTICE_ID );
+											removeBlocks( createdBlock.clientId );
+											unregisterBlockType( item.name );
+										},
+									},
+								],
+							}
+						);
+					};
+
 					installBlock( item.id, noop, onInstallBlockError );
 				};
 
