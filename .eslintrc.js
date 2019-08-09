@@ -21,6 +21,7 @@ module.exports = {
 	extends: [
 		'plugin:@wordpress/eslint-plugin/recommended',
 		'plugin:jest/recommended',
+		'plugin:eslint-comments/recommended',
 	],
 	plugins: [
 		'import',

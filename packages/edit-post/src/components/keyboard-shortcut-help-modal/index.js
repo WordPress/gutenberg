@@ -63,6 +63,7 @@ const ShortcutList = ( { shortcuts } ) => (
 			</li>
 		) ) }
 	</ul>
+	/* eslint-enable jsx-a11y/no-redundant-roles */
 );
 
 const ShortcutSection = ( { title, shortcuts, className } ) => (

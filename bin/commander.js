@@ -637,3 +637,5 @@ program
 	} );
 
 program.parse( process.argv );
+
+/* eslint-enable no-console */
