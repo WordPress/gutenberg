@@ -65,7 +65,7 @@ function getCellContentEditableElement( tableElement, { sectionName, rowIndex, c
 		return;
 	}
 
-	return rowElement.querySelectorAll( 'tr,td *[contenteditable="true"]' )[ columnIndex ];
+	return rowElement.querySelectorAll( '*[contenteditable="true"]' )[ columnIndex ];
 }
 
 export default function NavigableTable( { children, className, tableState, selectedCell, onNavigation } ) {

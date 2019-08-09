@@ -347,7 +347,7 @@ export function getCellAbove( state, cellLocation ) {
 		const lastRowOfPreviousSection = previousSection.length - 1;
 
 		return {
-			section: previousSectionName,
+			sectionName: previousSectionName,
 			rowIndex: lastRowOfPreviousSection,
 			columnIndex,
 		};
@@ -396,7 +396,7 @@ export function getCellBelow( state, cellLocation ) {
 		}
 
 		return {
-			section: nextSectionName,
+			sectionName: nextSectionName,
 			rowIndex: 0,
 			columnIndex,
 		};
