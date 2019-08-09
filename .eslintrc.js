@@ -22,6 +22,9 @@ module.exports = {
 		'plugin:@wordpress/eslint-plugin/recommended',
 		'plugin:jest/recommended',
 	],
+	plugins: [
+		'import',
+	],
 	rules: {
 		'@wordpress/react-no-unsafe-timeout': 'error',
 		'no-restricted-syntax': [
@@ -106,6 +109,16 @@ module.exports = {
 		} ],
 	},
 	overrides: [
+		{
+			files: [ 'packages/**/*.js' ],
+			rules: {
+				'import/no-extraneous-dependencies': 'error',
+			},
+			excludedFiles: [
+				'**/*.@(android|ios|native).js',
+				'**/@(benchmark|test|__tests__)/**/*.js',
+			],
+		},
 		{
 			files: [ 'packages/e2e-test*/**/*.js' ],
 			env: {

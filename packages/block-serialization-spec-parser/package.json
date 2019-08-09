@@ -21,7 +21,8 @@
 	},
 	"main": "parser.js",
 	"dependencies": {
-		"pegjs": "^0.10.0"
+		"pegjs": "^0.10.0",
+		"phpegjs": "^1.0.0-beta7"
 	},
 	"publishConfig": {
 		"access": "public"
