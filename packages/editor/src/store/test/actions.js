@@ -97,10 +97,20 @@ describe( 'Post generator actions', () => {
 				},
 			],
 			[
-				'yields an action for signalling that an update to the post started',
+				'yields an action for checking if the post is saveable',
 				() => true,
 				() => {
 					const { value } = fulfillment.next();
+					expect( value ).toEqual(
+						select( STORE_KEY, 'isEditedPostSaveable' )
+					);
+				},
+			],
+			[
+				'yields an action for signalling that an update to the post started',
+				() => true,
+				() => {
+					const { value } = fulfillment.next( true );
 					expect( value ).toEqual( {
 						type: 'REQUEST_POST_UPDATE_START',
 						options: { isAutosave },
