@@ -699,8 +699,8 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 		updateBlockAttributes,
 		selectBlock,
 		multiSelect,
-		addBlockToMultiSelection,
-		removeBlockFromMultiSelection,
+		addBlockSelection,
+		removeBlockSelection,
 		insertBlocks,
 		insertDefaultBlock,
 		removeBlock,
@@ -720,9 +720,9 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 		},
 		onMultiSelect( clientId = ownProps.clientId ) {
 			if ( ownProps.isPartOfMultiSelection ) {
-				removeBlockFromMultiSelection( clientId );
+				removeBlockSelection( clientId );
 			} else {
-				addBlockToMultiSelection( clientId );
+				addBlockSelection( clientId );
 			}
 		},
 		onInsertBlocks( blocks, index ) {

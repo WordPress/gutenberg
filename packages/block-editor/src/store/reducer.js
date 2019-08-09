@@ -922,12 +922,9 @@ export function isCaretWithinFormattedText( state = false, action ) {
 	return state;
 }
 
-const BLOCK_SELECTION_EMPTY_OBJECT = {};
 const BLOCK_SELECTION_EMPTY_ARRAY = [];
 const BLOCK_SELECTION_INITIAL_STATE = {
-	start: BLOCK_SELECTION_EMPTY_OBJECT,
-	end: BLOCK_SELECTION_EMPTY_OBJECT,
-	clientIds: BLOCK_SELECTION_EMPTY_ARRAY,
+	selections: BLOCK_SELECTION_EMPTY_ARRAY,
 	isMultiSelecting: false,
 	isEnabled: true,
 	initialPosition: null,
@@ -953,7 +950,6 @@ export function blockSelection( state = BLOCK_SELECTION_INITIAL_STATE, action ) 
 			return {
 				...state,
 				isMultiSelecting: true,
-				initialPosition: null,
 			};
 		case 'STOP_MULTI_SELECT':
 			if ( ! state.isMultiSelecting ) {
@@ -963,71 +959,66 @@ export function blockSelection( state = BLOCK_SELECTION_INITIAL_STATE, action ) 
 			return {
 				...state,
 				isMultiSelecting: false,
-				initialPosition: null,
 			};
 		case 'MULTI_SELECT':
 			return {
 				...BLOCK_SELECTION_INITIAL_STATE,
 				isMultiSelecting: state.isMultiSelecting,
-				clientIds: [ ...action.clientIds ],
+				selections: action.clientIds.map( ( clientId ) => ( { clientId } ) ),
 			};
 		case 'SELECT_BLOCK':
-			if (
-				action.clientId === state.start.clientId &&
-				action.clientId === state.end.clientId
-			) {
+			if ( state.selections.find( ( { clientId } ) => clientId === action.clientId ) ) {
 				return state;
 			}
 
 			return {
 				...BLOCK_SELECTION_INITIAL_STATE,
-				initialPosition: action.initialPosition,
-				start: { clientId: action.clientId },
-				end: { clientId: action.clientId },
-				clientIds: [ action.clientId ],
+				selections: [
+					{
+						clientId: action.clientId,
+						initialPosition: action.initialPosition,
+					},
+				],
 			};
-		case 'ADD_BLOCK_TO_MULTI_SELECTION':
-			if ( state.clientIds.includes( action.clientId ) ) {
+		case 'ADD_BLOCK_SELECTION':
+			if ( state.selections.find( ( { clientId } ) => clientId === action.clientId ) ) {
 				return state;
 			}
 
 			return {
 				...BLOCK_SELECTION_INITIAL_STATE,
 				isMultiSelecting: true,
-				clientIds: [ ...state.clientIds, action.clientId ],
+				selections: [
+					...state.selections,
+					{
+						clientId: action.clientId,
+					},
+				],
 			};
 
-		case 'REMOVE_BLOCK_FROM_MULTI_SELECTION':
-
-			if ( ! state.clientIds.includes( action.clientId ) ) {
+		case 'REMOVE_BLOCK_SELECTION':
+			if ( ! state.selections.find( ( { clientId } ) => clientId === action.clientId ) ) {
 				return state;
 			}
 
-			const clientIds = [ ...state.clientIds ];
-			clientIds.splice( clientIds.indexOf( action.clientId ), 1 );
-
-			if ( clientIds.length === 1 ) {
-				return {
-					...BLOCK_SELECTION_INITIAL_STATE,
-					start: { clientId: clientIds[ 0 ] },
-					end: { clientId: clientIds[ 0 ] },
-					clientIds,
-				};
-			}
+			const selections = state.selections.filter( ( { clientId } ) => clientId !== action.clientId );
 
 			return {
 				...BLOCK_SELECTION_INITIAL_STATE,
-				isMultiSelecting: true,
-				clientIds,
+				isMultiSelecting: selections.length > 1,
+				selections,
 			};
+
 		case 'REPLACE_INNER_BLOCKS': // REPLACE_INNER_BLOCKS and INSERT_BLOCKS should follow the same logic.
 		case 'INSERT_BLOCKS': {
 			if ( action.updateSelection ) {
 				return {
 					...BLOCK_SELECTION_INITIAL_STATE,
-					start: { clientId: action.blocks[ 0 ].clientId },
-					end: { clientId: action.blocks[ 0 ].clientId },
-					clientIds: [ action.blocks[ 0 ].clientId ],
+					selections: [
+						{
+							clientId: action.blocks[ 0 ].clientId,
+						},
+					],
 				};
 			}
 
@@ -1037,14 +1028,14 @@ export function blockSelection( state = BLOCK_SELECTION_INITIAL_STATE, action ) 
 			if (
 				! action.clientIds ||
 				! action.clientIds.length ||
-				! action.clientIds.every( ( clientId ) => state.clientIds.indexOf( clientId ) !== -1 )
+				! action.clientIds.every( ( clientIdToRemove ) => state.selections.find( ( { clientId } ) => clientId === clientIdToRemove ) )
 			) {
 				return state;
 			}
 
 			return BLOCK_SELECTION_INITIAL_STATE;
 		case 'REPLACE_BLOCKS': {
-			if ( ! action.clientIds.every( ( clientId ) => state.clientIds.indexOf( clientId ) !== -1 ) ) {
+			if ( ! action.clientIds.every( ( clientIdToReplace ) => state.selections.find( ( { clientId } ) => clientId === clientIdToReplace ) ) ) {
 				return state;
 			}
 
@@ -1055,18 +1046,17 @@ export function blockSelection( state = BLOCK_SELECTION_INITIAL_STATE, action ) 
 				return BLOCK_SELECTION_INITIAL_STATE;
 			}
 
-			if (
-				blockToSelect.clientId === state.start.clientId &&
-				blockToSelect.clientId === state.end.clientId
-			) {
+			if ( state.selections.find( ( { clientId } ) => clientId === blockToSelect.clientId ) ) {
 				return state;
 			}
 
 			return {
 				...BLOCK_SELECTION_INITIAL_STATE,
-				start: { clientId: blockToSelect.clientId },
-				end: { clientId: blockToSelect.clientId },
-				clientIds: [ blockToSelect.clientId ],
+				selections: [
+					{
+						clientId: blockToSelect.clientId,
+					},
+				],
 			};
 		}
 		case 'TOGGLE_SELECTION':
@@ -1077,17 +1067,27 @@ export function blockSelection( state = BLOCK_SELECTION_INITIAL_STATE, action ) 
 		case 'SELECTION_CHANGE':
 			return {
 				...BLOCK_SELECTION_INITIAL_STATE,
-				start: {
-					clientId: action.clientId,
-					attributeKey: action.attributeKey,
-					offset: action.startOffset,
-				},
-				end: {
-					clientId: action.clientId,
-					attributeKey: action.attributeKey,
-					offset: action.endOffset,
-				},
-				clientIds: [ action.clientId ],
+				selections: [
+					{
+						clientId: action.clientId,
+						attributeKey: action.attributeKey,
+						startOffset: action.startOffset,
+						endOffset: action.endOffset,
+					},
+				],
+			};
+		case 'ADD_SELECTION':
+			return {
+				...BLOCK_SELECTION_INITIAL_STATE,
+				selections: [
+					...state.selections,
+					{
+						clientId: action.clientId,
+						attributeKey: action.attributeKey,
+						startOffset: action.startOffset,
+						endOffset: action.endOffset,
+					},
+				],
 			};
 	}
 

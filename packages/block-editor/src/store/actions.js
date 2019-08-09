@@ -126,9 +126,9 @@ export function selectBlock( clientId, initialPosition = null ) {
  *
  * @return {Object} Action object.
  */
-export function addBlockToMultiSelection( clientId ) {
+export function addBlockSelection( clientId ) {
 	return {
-		type: 'ADD_BLOCK_TO_MULTI_SELECTION',
+		type: 'ADD_BLOCK_SELECTION',
 		clientId,
 	};
 }
@@ -141,9 +141,9 @@ export function addBlockToMultiSelection( clientId ) {
  *
  * @return {Object} Action object.
  */
-export function removeBlockFromMultiSelection( clientId ) {
+export function removeBlockSelection( clientId ) {
 	return {
-		type: 'REMOVE_BLOCK_FROM_MULTI_SELECTION',
+		type: 'REMOVE_BLOCK_SELECTION',
 		clientId,
 	};
 }
@@ -679,6 +679,16 @@ export function exitFormattedText() {
 export function selectionChange( clientId, attributeKey, startOffset, endOffset ) {
 	return {
 		type: 'SELECTION_CHANGE',
+		clientId,
+		attributeKey,
+		startOffset,
+		endOffset,
+	};
+}
+
+export function addSelection( clientId, attributeKey, startOffset, endOffset ) {
+	return {
+		type: 'ADD_SELECTION',
 		clientId,
 		attributeKey,
 		startOffset,
