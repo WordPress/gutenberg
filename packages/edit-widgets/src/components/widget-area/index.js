@@ -17,6 +17,7 @@ import {
 	Inserter as BlockInserter,
 	WritingFlow,
 	ObserveTyping,
+	BlockEditorKeyboardShortcuts,
 } from '@wordpress/block-editor';
 import { withDispatch, withSelect } from '@wordpress/data';
 
@@ -71,9 +72,12 @@ function WidgetArea( {
 					settings={ settings }
 				>
 					{ isSelectedArea && (
-						<Inserter>
-							<BlockInserter />
-						</Inserter>
+						<>
+							<Inserter>
+								<BlockInserter />
+							</Inserter>
+							<BlockEditorKeyboardShortcuts />
+						</>
 					) }
 					<SelectionObserver
 						isSelectedArea={ isSelectedArea }
