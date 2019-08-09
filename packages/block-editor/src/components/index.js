@@ -53,6 +53,7 @@ export { default as BlockSettingsMenu } from './block-settings-menu';
 export { default as BlockTitle } from './block-title';
 export { default as BlockToolbar } from './block-toolbar';
 export { default as CopyHandler } from './copy-handler';
+export { default as HistoryHandler } from './history-handler';
 export { default as DefaultBlockAppender } from './default-block-appender';
 export { default as Inserter } from './inserter';
 export { default as MultiBlocksSwitcher } from './block-switcher/multi-blocks-switcher';
