@@ -26,6 +26,7 @@ import {
 	BlockIcon,
 	MediaPlaceholder,
 	InspectorControls,
+	RichText,
 } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
@@ -63,8 +64,10 @@ class GalleryEdit extends Component {
 		this.onUploadError = this.onUploadError.bind( this );
 		this.setImageAttributes = this.setImageAttributes.bind( this );
 		this.setAttributes = this.setAttributes.bind( this );
+		this.onFocusGalleryCaption = this.onFocusGalleryCaption.bind( this );
 
 		this.state = {
+			galleryCaptionFocused: false,
 			selectedImage: null,
 			attachmentCaptions: null,
 		};
@@ -81,7 +84,6 @@ class GalleryEdit extends Component {
 				ids: map( attributes.images, 'id' ),
 			};
 		}
-
 		this.props.setAttributes( attributes );
 	}
 
@@ -198,6 +200,14 @@ class GalleryEdit extends Component {
 		return checked ? __( 'Thumbnails are cropped to align.' ) : __( 'Thumbnails are not cropped.' );
 	}
 
+	onFocusGalleryCaption() {
+		if ( ! this.state.galleryCaptionFocused ) {
+			this.setState( {
+				galleryCaptionFocused: true,
+			} );
+		}
+	}
+
 	setImageAttributes( index, attributes ) {
 		const { attributes: { images } } = this.props;
 		const { setAttributes } = this;
@@ -238,6 +248,11 @@ class GalleryEdit extends Component {
 				captionSelected: false,
 			} );
 		}
+		if ( ! this.props.isSelected && prevProps.isSelected && this.state.galleryCaptionFocused ) {
+			this.setState( {
+				galleryCaptionFocused: false,
+			} );
+		}
 	}
 
 	render() {
@@ -246,10 +261,12 @@ class GalleryEdit extends Component {
 			className,
 			isSelected,
 			noticeUI,
+			setAttributes,
 		} = this.props;
 		const {
 			align,
 			columns = defaultColumnsNumber( attributes ),
+			galleryCaption,
 			imageCrop,
 			images,
 			linkTo,
@@ -310,42 +327,55 @@ class GalleryEdit extends Component {
 					</PanelBody>
 				</InspectorControls>
 				{ noticeUI }
-				<ul
-					className={ classnames(
-						className,
-						{
-							[ `align${ align }` ]: align,
-							[ `columns-${ columns }` ]: columns,
-							'is-cropped': imageCrop,
-						}
-					) }
-				>
-					{ images.map( ( img, index ) => {
+				<figure className={ className } >
+					<ul
+						className={ classnames(
+							'blocks-gallery-grid',
+							{
+								[ `align${ align }` ]: align,
+								[ `columns-${ columns }` ]: columns,
+								'is-cropped': imageCrop,
+							}
+						) }
+					>
+						{ images.map( ( img, index ) => {
 						/* translators: %1$d is the order number of the image, %2$d is the total number of images. */
-						const ariaLabel = sprintf( __( 'image %1$d of %2$d in gallery' ), ( index + 1 ), images.length );
+							const ariaLabel = sprintf( __( 'image %1$d of %2$d in gallery' ), ( index + 1 ), images.length );
 
-						return (
-							<li className="blocks-gallery-item" key={ img.id || img.url }>
-								<GalleryImage
-									url={ img.url }
-									alt={ img.alt }
-									id={ img.id }
-									isFirstItem={ index === 0 }
-									isLastItem={ ( index + 1 ) === images.length }
-									isSelected={ isSelected && this.state.selectedImage === index }
-									onMoveBackward={ this.onMoveBackward( index ) }
-									onMoveForward={ this.onMoveForward( index ) }
-									onRemove={ this.onRemoveImage( index ) }
-									onSelect={ this.onSelectImage( index ) }
-									setAttributes={ ( attrs ) => this.setImageAttributes( index, attrs ) }
-									caption={ img.caption }
-									aria-label={ ariaLabel }
-								/>
-							</li>
-						);
-					} ) }
-				</ul>
-				{ mediaPlaceholder }
+							return (
+								<li className="blocks-gallery-item" key={ img.id || img.url }>
+									<GalleryImage
+										url={ img.url }
+										alt={ img.alt }
+										id={ img.id }
+										isFirstItem={ index === 0 }
+										isLastItem={ ( index + 1 ) === images.length }
+										isSelected={ isSelected && this.state.selectedImage === index }
+										onMoveBackward={ this.onMoveBackward( index ) }
+										onMoveForward={ this.onMoveForward( index ) }
+										onRemove={ this.onRemoveImage( index ) }
+										onSelect={ this.onSelectImage( index ) }
+										setAttributes={ ( attrs ) => this.setImageAttributes( index, attrs ) }
+										caption={ img.caption }
+										aria-label={ ariaLabel }
+									/>
+								</li>
+							);
+						} ) }
+					</ul>
+					{ mediaPlaceholder }
+					{ ( ! RichText.isEmpty( galleryCaption ) || isSelected ) && (
+						<RichText
+							tagName="figcaption"
+							placeholder={ __( 'Write gallery caption…' ) }
+							value={ galleryCaption }
+							unstableOnFocus={ this.onFocusGalleryCaption }
+							onChange={ ( value ) => setAttributes( { galleryCaption: value } ) }
+							isSelected={ this.state.galleryCaptionFocused }
+							inlineToolbar
+						/>
+					) }
+				</figure>
 			</>
 		);
 	}
