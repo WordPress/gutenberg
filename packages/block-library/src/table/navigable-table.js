@@ -8,7 +8,7 @@ import {
 	placeCaretAtHorizontalEdge,
 } from '@wordpress/dom';
 import { useRef } from '@wordpress/element';
-import { UP, DOWN, LEFT, RIGHT, isKeyboardModifierEvent } from '@wordpress/keycodes';
+import { UP, DOWN, LEFT, RIGHT, HOME, END, isKeyboardModifierEvent } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -22,9 +22,11 @@ import {
 	getLastCellInColumn,
 	getFirstCellInRow,
 	getLastCellInRow,
+	getFirstCellInTable,
+	getLastCellInTable,
 } from './state';
 
-function getNextCellLocation( tableState, selectedCell, { isPrimary, isUp, isDown, isLeft, isRight } ) {
+function getNextCellLocation( tableState, selectedCell, { isPrimary, isUp, isDown, isLeft, isRight, isHome, isEnd } ) {
 	if ( isUp ) {
 		if ( isPrimary ) {
 			return getFirstCellInColumn( tableState, selectedCell );
@@ -52,6 +54,18 @@ function getNextCellLocation( tableState, selectedCell, { isPrimary, isUp, isDow
 		}
 
 		return getCellToRight( tableState, selectedCell );
+	}
+	if ( isHome ) {
+		if ( isPrimary ) {
+			return getFirstCellInTable( tableState );
+		}
+		return getFirstCellInRow( selectedCell );
+	}
+	if ( isEnd ) {
+		if ( isPrimary ) {
+			return getLastCellInTable( tableState );
+		}
+		return getLastCellInRow( tableState, selectedCell );
 	}
 }
 
@@ -87,7 +101,9 @@ export default function NavigableTable( { children, className, tableState, selec
 		const isDown = keyCode === DOWN;
 		const isLeft = keyCode === LEFT;
 		const isRight = keyCode === RIGHT;
-		const isHorizontal = isLeft || isRight;
+		const isHome = keyCode === HOME;
+		const isEnd = keyCode === END;
+		const isHorizontal = isLeft || isRight || isHome || isEnd;
 		const isVertical = isUp || isDown;
 		const isNav = isHorizontal || isVertical;
 
@@ -103,7 +119,7 @@ export default function NavigableTable( { children, className, tableState, selec
 		}
 
 		const isAtEdge = isVertical ? isVerticalEdge : isHorizontalEdge;
-		const isReverse = isUp || isLeft;
+		const isReverse = isUp || isLeft || isHome;
 		const isCaretAtEdgeOfField = isAtEdge( target, isReverse );
 
 		if ( ! isCaretAtEdgeOfField ) {
@@ -114,7 +130,7 @@ export default function NavigableTable( { children, className, tableState, selec
 		event.preventDefault();
 
 		const isPrimary = isKeyboardModifierEvent.primary( event );
-		const nextCellLocation = getNextCellLocation( tableState, selectedCell, { isPrimary, isUp, isDown, isLeft, isRight } );
+		const nextCellLocation = getNextCellLocation( tableState, selectedCell, { isPrimary, isUp, isDown, isLeft, isRight, isHome, isEnd } );
 
 		if ( ! nextCellLocation ) {
 			return;

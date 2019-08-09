@@ -19,6 +19,10 @@ import {
 	isEmptyRow,
 	isCellSelected,
 	updateSelectedCell,
+	getCellAbove,
+	getCellBelow,
+	getCellToLeft,
+	getCellToRight,
 } from '../state';
 
 const table = deepFreeze( {
@@ -69,6 +73,63 @@ const tableWithFoot = deepFreeze( {
 			cells: [
 				{
 					content: 'test',
+					tag: 'td',
+				},
+			],
+		},
+	],
+} );
+
+const tableWithHeadAndFoot = deepFreeze( {
+	head: [
+		{
+			cells: [
+				{
+					content: '',
+					tag: 'th',
+				},
+				{
+					content: '',
+					tag: 'th',
+				},
+			],
+		},
+	],
+	body: [
+		{
+			cells: [
+				{
+					content: '',
+					tag: 'td',
+				},
+				{
+					content: '',
+					tag: 'td',
+				},
+			],
+		},
+		{
+			cells: [
+				{
+					content: '',
+					tag: 'td',
+				},
+				{
+					content: '',
+					tag: 'td',
+				},
+			],
+		},
+	],
+	foot: [
+		{
+			cells: [
+				{
+					content: '',
+					tag: 'td',
+				},
+				{
+					content: '',
 					tag: 'td',
 				},
 			],
@@ -1209,6 +1270,114 @@ describe( 'updateSelectedCell', () => {
 					],
 				},
 			],
+		} );
+	} );
+} );
+
+describe( 'getCellAbove', () => {
+	it( `returns undefined for the first row of 'head' section`, () => {
+		const cellLocation = { sectionName: 'head', rowIndex: 0, columnIndex: 0 };
+		expect( getCellAbove( tableWithHeadAndFoot, cellLocation ) ).toBeUndefined();
+	} );
+
+	it( `returns undefined for the first row of 'body' section if the 'head' section is empty`, () => {
+		const cellLocation = { sectionName: 'body', rowIndex: 0, columnIndex: 0 };
+		expect( getCellAbove( table, cellLocation ) ).toBeUndefined();
+	} );
+
+	it( `returns undefined if the row above does not have as many cells`, () => {
+		const cellLocation = { sectionName: 'body', rowIndex: 1, columnIndex: 2 };
+		expect( getCellAbove( table, cellLocation ) ).toBeUndefined();
+	} );
+
+	it( `returns the location for the row above in the same section when that row exists`, () => {
+		const cellLocation = { sectionName: 'body', rowIndex: 1, columnIndex: 0 };
+		expect( getCellAbove( table, cellLocation ) ).toEqual( { section: 'body', rowIndex: 0, columnIndex: 0 } );
+	} );
+
+	it( `returns the location for the row above in the previous section when that row exists`, () => {
+		const bodyCellLocation = { sectionName: 'body', rowIndex: 0, columnIndex: 0 };
+		const footCellLocation = { sectionName: 'foot', rowIndex: 0, columnIndex: 0 };
+
+		expect( getCellAbove( tableWithHeadAndFoot, bodyCellLocation ) ).toEqual( {
+			sectionName: 'head',
+			rowIndex: 0,
+			columnIndex: 0,
+		} );
+		expect( getCellAbove( tableWithHeadAndFoot, footCellLocation ) ).toEqual( {
+			sectionName: 'body',
+			rowIndex: 1,
+			columnIndex: 0,
+		} );
+	} );
+} );
+
+describe( 'getCellBelow', () => {
+	it( `returns undefined for the last row of 'foot' section`, () => {
+		const cellLocation = { sectionName: 'foot', rowIndex: 0, columnIndex: 0 };
+		expect( getCellBelow( tableWithHeadAndFoot, cellLocation ) ).toBeUndefined();
+	} );
+
+	it( `returns undefined for the last row of 'body' section if the 'foot' section is empty`, () => {
+		const cellLocation = { sectionName: 'body', rowIndex: 1, columnIndex: 0 };
+		expect( getCellBelow( table, cellLocation ) ).toBeUndefined();
+	} );
+
+	it( `returns undefined if the row below does not have as many cells`, () => {
+		const cellLocation = { sectionName: 'body', rowIndex: 0, columnIndex: 2 };
+		expect( getCellBelow( table, cellLocation ) ).toBeUndefined();
+	} );
+
+	it( `returns the location for the row below in the same section when that row exists`, () => {
+		const cellLocation = { sectionName: 'body', rowIndex: 0, columnIndex: 0 };
+		expect( getCellBelow( table, cellLocation ) ).toEqual( { section: 'body', rowIndex: 1, columnIndex: 0 } );
+	} );
+
+	it( `returns the location for the row below in the next section when that row exists`, () => {
+		const bodyCellLocation = { sectionName: 'head', rowIndex: 0, columnIndex: 0 };
+		expect( getCellBelow( tableWithHeadAndFoot, bodyCellLocation ) ).toEqual( {
+			section: 'body',
+			rowIndex: 0,
+			columnIndex: 0,
+		} );
+
+		const footCellLocation = { sectionName: 'body', rowIndex: 1, columnIndex: 0 };
+		expect( getCellBelow( tableWithHeadAndFoot, footCellLocation ) ).toEqual( {
+			section: 'foot',
+			rowIndex: 0,
+			columnIndex: 0,
+		} );
+	} );
+} );
+
+describe( 'getCellToRight', () => {
+	it( 'returns undefined if there is no cell to the right', () => {
+		const cellLocation = { sectionName: 'body', rowIndex: 0, columnIndex: 1 };
+		expect( getCellToRight( table, cellLocation ) ).toBeUndefined();
+	} );
+
+	it( 'returns the location of the cell to the right if it exists', () => {
+		const cellLocation = { sectionName: 'body', rowIndex: 0, columnIndex: 0 };
+		expect( getCellToRight( table, cellLocation ) ).toEqual( {
+			section: 'body',
+			rowIndex: 0,
+			columnIndex: 1,
+		} );
+	} );
+} );
+
+describe( 'getCellToLeft', () => {
+	it( 'returns undefined if there is no cell to the left', () => {
+		const cellLocation = { sectionName: 'body', rowIndex: 0, columnIndex: 0 };
+		expect( getCellToLeft( cellLocation ) ).toBeUndefined();
+	} );
+
+	it( 'returns the location of the cell to the left if it exists', () => {
+		const cellLocation = { sectionName: 'body', rowIndex: 0, columnIndex: 1 };
+		expect( getCellToLeft( cellLocation ) ).toEqual( {
+			section: 'body',
+			rowIndex: 0,
+			columnIndex: 0,
 		} );
 	} );
 } );

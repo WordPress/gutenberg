@@ -80,6 +80,10 @@ _Type_
 
 Keycode for DOWN key.
 
+<a name="END" href="#END">#</a> **END**
+
+Keycode for SPACE key.
+
 <a name="ENTER" href="#ENTER">#</a> **ENTER**
 
 Keycode for ENTER key.
@@ -91,6 +95,10 @@ Keycode for ESCAPE key.
 <a name="F10" href="#F10">#</a> **F10**
 
 Keycode for F10 key.
+
+<a name="HOME" href="#HOME">#</a> **HOME**
+
+Keycode for SPACE key.
 
 <a name="isKeyboardEvent" href="#isKeyboardEvent">#</a> **isKeyboardEvent**
 

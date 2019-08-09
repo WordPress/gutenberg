@@ -45,6 +45,14 @@ export const ESCAPE = 27;
  */
 export const SPACE = 32;
 /**
+ * Keycode for SPACE key.
+ */
+export const END = 35;
+/**
+ * Keycode for SPACE key.
+ */
+export const HOME = 36;
+/**
  * Keycode for LEFT key.
  */
 export const LEFT = 37;

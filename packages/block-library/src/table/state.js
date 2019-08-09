@@ -28,6 +28,14 @@ export function createTable( {
 	};
 }
 
+export function getRow( state, { sectionName, rowIndex } ) {
+	return get( state, [ sectionName, rowIndex ] );
+}
+
+export function getCell( state, { sectionName, rowIndex, columnIndex } ) {
+	return get( state, [ sectionName, rowIndex, 'cells', columnIndex ] );
+}
+
 /**
  * Returns the first row in the table.
  *
@@ -35,16 +43,45 @@ export function createTable( {
  *
  * @return {Object} The first table row.
  */
-export function getFirstRow( state ) {
+export function getFirstRowLocation( state ) {
+	let firstSectionName;
+
 	if ( ! isEmptyTableSection( state.head ) ) {
-		return state.head[ 0 ];
+		firstSectionName = 'head';
+	} else if ( ! isEmptyTableSection( state.body ) ) {
+		firstSectionName = 'body';
+	} else if ( ! isEmptyTableSection( state.foot ) ) {
+		firstSectionName = 'foot';
 	}
-	if ( ! isEmptyTableSection( state.body ) ) {
-		return state.body[ 0 ];
-	}
+
+	return {
+		sectionName: firstSectionName,
+		rowIndex: 0,
+	};
+}
+
+/**
+ * Returns the first row in the table.
+ *
+ * @param {Object} state Current table state.
+ *
+ * @return {Object} The first table row.
+ */
+export function getLastRowLocation( state ) {
+	let lastSectionName;
+
 	if ( ! isEmptyTableSection( state.foot ) ) {
-		return state.foot[ 0 ];
+		lastSectionName = 'foot';
+	} else if ( ! isEmptyTableSection( state.body ) ) {
+		lastSectionName = 'body';
+	} else if ( ! isEmptyTableSection( state.head ) ) {
+		lastSectionName = 'head';
 	}
+
+	return {
+		sectionName: lastSectionName,
+		rowIndex: state[ lastSectionName ].length - 1,
+	};
 }
 
 /**
@@ -153,7 +190,7 @@ export function insertRow( state, {
 	rowIndex,
 	columnCount,
 } ) {
-	const firstRow = getFirstRow( state );
+	const firstRow = getRow( state, getFirstRowLocation( state ) );
 	const cellCount = columnCount === undefined ? get( firstRow, [ 'cells', 'length' ] ) : columnCount;
 
 	// Bail early if the function cannot determine how many cells to add.
@@ -447,37 +484,23 @@ export function getCellToLeft( cellLocation ) {
 	} : undefined;
 }
 
-export function getFirstCellInColumn( state, cellLocation ) {
-	let firstSectionName;
-	if ( ! isEmptyTableSection( state.head ) ) {
-		firstSectionName = 'head';
-	} else if ( ! isEmptyTableSection( state.body ) ) {
-		firstSectionName = 'body';
-	} else if ( ! isEmptyTableSection( state.foot ) ) {
-		firstSectionName = 'foot';
-	}
+export function getFirstCellInColumn( state, { columnIndex } ) {
+	const { sectionName, rowIndex } = getFirstRowLocation( state );
 
 	return {
-		...cellLocation,
-		sectionName: firstSectionName,
-		rowIndex: 0,
+		sectionName,
+		rowIndex,
+		columnIndex,
 	};
 }
 
-export function getLastCellInColumn( state, cellLocation ) {
-	let lastSectionName;
-	if ( ! isEmptyTableSection( state.foot ) ) {
-		lastSectionName = 'foot';
-	} else if ( ! isEmptyTableSection( state.body ) ) {
-		lastSectionName = 'body';
-	} else if ( ! isEmptyTableSection( state.head ) ) {
-		lastSectionName = 'head';
-	}
+export function getLastCellInColumn( state, { columnIndex } ) {
+	const { sectionName, rowIndex } = getLastRowLocation( state );
 
 	return {
-		...cellLocation,
-		sectionName: lastSectionName,
-		rowIndex: state[ lastSectionName ].length - 1,
+		sectionName,
+		rowIndex,
+		columnIndex,
 	};
 }
 
@@ -500,4 +523,24 @@ export function getLastCellInRow( state, cellLocation ) {
 		...cellLocation,
 		columnIndex: columnCount - 1,
 	} : undefined;
+}
+
+export function getFirstCellInTable( state ) {
+	const { sectionName, rowIndex } = getFirstRowLocation( state );
+
+	return {
+		sectionName,
+		rowIndex,
+		columnIndex: 0,
+	};
+}
+
+export function getLastCellInTable( state ) {
+	const { sectionName, rowIndex } = getLastRowLocation( state );
+
+	return {
+		sectionName,
+		rowIndex,
+		columnIndex: get( state, [ sectionName, rowIndex, 'cells', 'length' ] ) - 1,
+	};
 }
