@@ -745,7 +745,12 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 			}
 		},
 		onReplace( blocks, indexToSelect ) {
-			__unstableMarkLastChangeAsPersistent();
+			if (
+				blocks.length &&
+				! isUnmodifiedDefaultBlock( blocks[ blocks.length - 1 ] )
+			) {
+				__unstableMarkLastChangeAsPersistent();
+			}
 			replaceBlocks( [ ownProps.clientId ], blocks, indexToSelect );
 		},
 		onShiftSelection() {
