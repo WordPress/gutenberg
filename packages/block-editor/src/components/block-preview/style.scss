@@ -7,6 +7,11 @@
 	// The preview component measures the pixel width of this item, so as to calculate the scale factor.
 	// But without this baseline width, it collapses to 0.
 	width: 100%;
+
+	overflow: hidden;
+	&.is-ready {
+		overflow: visible;
+	}
 }
 
 .block-editor-block-preview__content {
@@ -40,10 +45,6 @@
 
 	> div section {
 		height: auto;
-	}
-
-	&.is-tall-preview {
-		top: 4px;
 	}
 
 	.block-editor-block-list__insertion-point,
