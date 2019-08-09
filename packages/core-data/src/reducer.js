@@ -310,8 +310,8 @@ export function undo( state = UNDO_INITIAL_STATE, action ) {
 			}
 
 			// Transient edits don't create an undo level, but are
-			// added to the last level right before a new level
-			// is added.
+			// reachable in the next meaningful edit to which they
+			// are merged. They are defined in the entity's config.
 			if ( ! Object.keys( action.edits ).some( ( key ) => ! action.transientEdits[ key ] ) ) {
 				const nextState = [ ...state ];
 				nextState.flattenedUndo = { ...state.flattenedUndo, ...action.edits };
