@@ -128,3 +128,11 @@ function gutenberg_pre_init() {
 
 	require_once dirname( __FILE__ ) . '/lib/load.php';
 }
+
+/**
+ * Outputs a WP REST API nonce.
+ */
+function gutenberg_rest_nonce() {
+	exit( wp_create_nonce( 'wp_rest' ) );
+}
+add_action( 'wp_ajax_gutenberg_rest_nonce', 'gutenberg_rest_nonce' );
