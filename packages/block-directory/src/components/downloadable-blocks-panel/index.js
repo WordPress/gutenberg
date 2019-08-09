@@ -13,20 +13,20 @@ import { Spinner } from '@wordpress/components';
 import DownloadableBlocksList from '../downloadable-blocks-list';
 
 function DownloadableBlocksPanel( { discoverItems, onSelect, onHover, hasPermission, isLoading } ) {
-	if ( isLoading ) {
-		return (
-			<p className="block-directory-downloadable-blocks-panel__description has-no-results">
-				<Spinner />
-			</p>
-		);
-	}
-
 	if ( ! hasPermission ) {
 		return (
 			<p className="block-directory-downloadable-blocks-panel__description has-no-results">
 				{ __( 'No blocks found in your library.' ) }
 				<br />
 				{ __( 'Please contact your site administrator to install new blocks.' ) }
+			</p>
+		);
+	}
+
+	if ( isLoading ) {
+		return (
+			<p className="block-directory-downloadable-blocks-panel__description has-no-results">
+				<Spinner />
 			</p>
 		);
 	}
@@ -57,9 +57,9 @@ export default compose( [
 			isRequestingDownloadableBlocks,
 		} = select( 'core/block-directory' );
 
-		const discoverItems = getDownloadableBlocks( filterValue );
 		const hasPermission = hasInstallBlocksPermission();
-		const isLoading = isRequestingDownloadableBlocks();
+		const discoverItems = hasPermission ? getDownloadableBlocks( filterValue ) : [];
+		const isLoading = hasPermission ? isRequestingDownloadableBlocks() : false;
 
 		return {
 			discoverItems,

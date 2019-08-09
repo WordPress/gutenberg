@@ -31,4 +31,16 @@ export default {
 			}
 		}
 	},
+	* hasInstallBlocksPermission() {
+		try {
+			yield apiFetch( {
+				path: `__experimental/blocks?search=${ '' }`,
+			} );
+			yield setInstallBlocksPermission( true );
+		} catch ( error ) {
+			if ( error.code === 'rest_user_cannot_view' ) {
+				yield setInstallBlocksPermission( false );
+			}
+		}
+	},
 };
