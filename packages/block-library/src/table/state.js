@@ -446,3 +446,58 @@ export function getCellToLeft( cellLocation ) {
 		columnIndex: columnIndex - 1,
 	} : undefined;
 }
+
+export function getFirstCellInColumn( state, cellLocation ) {
+	let firstSectionName;
+	if ( ! isEmptyTableSection( state.head ) ) {
+		firstSectionName = 'head';
+	} else if ( ! isEmptyTableSection( state.body ) ) {
+		firstSectionName = 'body';
+	} else if ( ! isEmptyTableSection( state.foot ) ) {
+		firstSectionName = 'foot';
+	}
+
+	return {
+		...cellLocation,
+		sectionName: firstSectionName,
+		rowIndex: 0,
+	};
+}
+
+export function getLastCellInColumn( state, cellLocation ) {
+	let lastSectionName;
+	if ( ! isEmptyTableSection( state.foot ) ) {
+		lastSectionName = 'foot';
+	} else if ( ! isEmptyTableSection( state.body ) ) {
+		lastSectionName = 'body';
+	} else if ( ! isEmptyTableSection( state.head ) ) {
+		lastSectionName = 'head';
+	}
+
+	return {
+		...cellLocation,
+		sectionName: lastSectionName,
+		rowIndex: state[ lastSectionName ].length - 1,
+	};
+}
+
+export function getFirstCellInRow( cellLocation ) {
+	const { columnIndex } = cellLocation;
+	const hasCellsToLeft = columnIndex > 0;
+
+	return hasCellsToLeft ? {
+		...cellLocation,
+		columnIndex: 0,
+	} : undefined;
+}
+
+export function getLastCellInRow( state, cellLocation ) {
+	const { sectionName, rowIndex, columnIndex } = cellLocation;
+	const columnCount = get( state, [ sectionName, rowIndex, 'cells', 'length' ] );
+	const hasCellsToRight = columnIndex < columnCount - 1;
+
+	return hasCellsToRight ? {
+		...cellLocation,
+		columnIndex: columnCount - 1,
+	} : undefined;
+}

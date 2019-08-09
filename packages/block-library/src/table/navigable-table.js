@@ -8,7 +8,7 @@ import {
 	placeCaretAtHorizontalEdge,
 } from '@wordpress/dom';
 import { useRef } from '@wordpress/element';
-import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
+import { UP, DOWN, LEFT, RIGHT, isKeyboardModifierEvent } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -18,19 +18,39 @@ import {
 	getCellBelow,
 	getCellToLeft,
 	getCellToRight,
+	getFirstCellInColumn,
+	getLastCellInColumn,
+	getFirstCellInRow,
+	getLastCellInRow,
 } from './state';
 
-function getNextCellLocation( tableState, selectedCell, { isUp, isDown, isLeft, isRight } ) {
+function getNextCellLocation( tableState, selectedCell, { isPrimary, isUp, isDown, isLeft, isRight } ) {
 	if ( isUp ) {
+		if ( isPrimary ) {
+			return getFirstCellInColumn( tableState, selectedCell );
+		}
+
 		return getCellAbove( tableState, selectedCell );
 	}
 	if ( isDown ) {
+		if ( isPrimary ) {
+			return getLastCellInColumn( tableState, selectedCell );
+		}
+
 		return getCellBelow( tableState, selectedCell );
 	}
 	if ( isLeft ) {
+		if ( isPrimary ) {
+			return getFirstCellInRow( selectedCell );
+		}
+
 		return getCellToLeft( selectedCell );
 	}
 	if ( isRight ) {
+		if ( isPrimary ) {
+			return getLastCellInRow( tableState, selectedCell );
+		}
+
 		return getCellToRight( tableState, selectedCell );
 	}
 }
@@ -92,7 +112,9 @@ export default function NavigableTable( { children, className, tableState, selec
 
 		event.stopPropagation();
 		event.preventDefault();
-		const nextCellLocation = getNextCellLocation( tableState, selectedCell, { isUp, isDown, isLeft, isRight } );
+
+		const isPrimary = isKeyboardModifierEvent.primary( event );
+		const nextCellLocation = getNextCellLocation( tableState, selectedCell, { isPrimary, isUp, isDown, isLeft, isRight } );
 
 		if ( ! nextCellLocation ) {
 			return;

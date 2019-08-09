@@ -103,6 +103,17 @@ _Type_
 
 -   `Object` Keyed map of functions to match events.
 
+<a name="isKeyboardModifierEvent" href="#isKeyboardModifierEvent">#</a> **isKeyboardModifierEvent**
+
+An object that contains functions to check if a keyboard event involves a
+particular modifier key being pressed.
+E.g. isKeyboardEvent.primary( event ) will return true if the event
+signals pressing ⌘ on a Mac.
+
+_Type_
+
+-   `Object` Keyed map of functions to match events.
+
 <a name="LEFT" href="#LEFT">#</a> **LEFT**
 
 Keycode for LEFT key.

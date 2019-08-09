@@ -194,6 +194,22 @@ export const shortcutAriaLabel = mapValues( modifiers, ( modifier ) => {
 } );
 
 /**
+ * An object that contains functions to check if a keyboard event involves a
+ * particular modifier key being pressed.
+ * E.g. isKeyboardEvent.primary( event ) will return true if the event
+ * signals pressing ⌘ on a Mac.
+ *
+ * @type {Object} Keyed map of functions to match events.
+ */
+export const isKeyboardModifierEvent = mapValues( modifiers, ( getModifiers ) => {
+	return ( event, _isApple = isAppleOS ) => {
+		const mods = getModifiers( _isApple );
+
+		return mods.every( ( key ) => event[ `${ key }Key` ] );
+	};
+} );
+
+/**
  * An object that contains functions to check if a keyboard event matches a
  * predefined shortcut combination.
  * E.g. isKeyboardEvent.primary( event, 'm' ) will return true if the event
@@ -216,3 +232,4 @@ export const isKeyboardEvent = mapValues( modifiers, ( getModifiers ) => {
 		return event.key === character;
 	};
 } );
+
