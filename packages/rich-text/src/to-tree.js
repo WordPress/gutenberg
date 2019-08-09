@@ -255,6 +255,9 @@ export function toTree( {
 					type: 'span',
 					attributes: {
 						'data-rich-text-placeholder': placeholder,
+						// Necessary to prevent the placeholder from catching
+						// selection. The placeholder is also not editable after
+						// all.
 						contenteditable: 'false',
 					},
 				} );
