@@ -402,12 +402,12 @@ function gutenberg_register_vendor_scripts() {
 
 	gutenberg_register_vendor_script(
 		'react',
-		'https://unpkg.com/react@16.8.4/umd/react' . $react_suffix . '.js',
+		'https://unpkg.com/react@16.9.0/umd/react' . $react_suffix . '.js',
 		array( 'wp-polyfill' )
 	);
 	gutenberg_register_vendor_script(
 		'react-dom',
-		'https://unpkg.com/react-dom@16.8.4/umd/react-dom' . $react_suffix . '.js',
+		'https://unpkg.com/react-dom@16.9.0/umd/react-dom' . $react_suffix . '.js',
 		array( 'react' )
 	);
 
