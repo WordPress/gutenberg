@@ -142,7 +142,11 @@ describe( 'Post generator actions', () => {
 				() => true,
 				() => {
 					const { value } = fulfillment.next( currentPost().id );
-					value.args[ 3 ] = { ...value.args[ 3 ], getNoticeActionArgs: 'getNoticeActionArgs' };
+					value.args[ 3 ] = {
+						...value.args[ 3 ],
+						getSuccessNoticeActionArgs: 'getSuccessNoticeActionArgs',
+						getFailureNoticeActionArgs: 'getFailureNoticeActionArgs',
+					};
 					expect( value ).toEqual(
 						dispatch(
 							'core',
@@ -150,7 +154,13 @@ describe( 'Post generator actions', () => {
 							'postType',
 							currentPost().type,
 							currentPost().id,
-							{ isAutosave, getNoticeActionArgs: 'getNoticeActionArgs' }
+							{
+								isAutosave,
+								getSuccessNoticeActionArgs:
+									'getSuccessNoticeActionArgs',
+								getFailureNoticeActionArgs:
+									'getFailureNoticeActionArgs',
+							}
 						)
 					);
 				},
