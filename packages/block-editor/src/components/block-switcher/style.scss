@@ -88,15 +88,38 @@
 		@include formatting-button-style__focus();
 	}
 }
-
+// we double the max-width for it to fit both the preview & content
+// but we keep the min width the same for the border to work.
 .components-popover:not(.is-mobile).block-editor-block-switcher__popover .components-popover__content {
 	min-width: 300px;
-	max-width: 340px;
+	max-width: calc(340px * 2);
+	display: flex;
+	background: $white;
+	box-shadow: $shadow-popover;
 }
 
 .block-editor-block-switcher__popover .components-popover__content {
+	.block-editor-block-switcher__container {
+		min-width: 300px;
+		max-width: 340px;
+		width: 50%;
+	}
+
 	@include break-medium {
 		position: relative;
+
+		.block-editor-block-switcher__preview {
+			border-left: $border-width solid $light-gray-500;
+			box-shadow: $shadow-popover;
+			background: $white;
+			width: 300px;
+			height: auto;
+			// sticky helps us keep the preview at the top when scrolling
+			position: sticky;
+			align-self: stretch;
+			// for sticky to work we need top
+			top: 0;
+		}
 	}
 
 	// Hide the bottom border on the last panel so it stacks with the popover.
@@ -113,35 +136,12 @@
 	}
 }
 
-.block-editor-block-switcher__popover:not(.is-mobile) > .components-popover__content {
-	// Reset overflow to allow showing the preview on the left once an item is hovered.
-	overflow-y: visible;
-}
-
 .block-editor-block-switcher__popover .block-editor-block-styles {
 	margin: 0 -3px; // Remove the panel body padding while keeping it for the title.
 }
 
 .block-editor-block-switcher__popover .block-editor-block-types-list {
 	margin: 8px -8px -8px;
-}
-
-.block-editor-block-switcher__preview {
-	border: $border-width solid $light-gray-500;
-	box-shadow: $shadow-popover;
-	background: $white;
-	position: absolute;
-	left: 100%;
-	top: -1px;
-	bottom: -1px;
-	width: 300px;
-	height: auto;
-	padding: 10px;
-	display: none;
-
-	@include break-medium {
-		display: block;
-	}
 }
 
 .block-editor-block-switcher__preview-title {
