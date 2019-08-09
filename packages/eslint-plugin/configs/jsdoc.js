@@ -18,7 +18,6 @@ const typescriptUtilityTypes = [
 	'Pick',
 	'PromiseLike',
 	'Readonly',
-	'Readonly',
 	'ReadonlyArray',
 	'ReadonlyMap',
 	'ReadonlySet',
