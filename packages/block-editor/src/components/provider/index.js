@@ -53,7 +53,10 @@ class BlockEditorProvider extends Component {
 			this.isSyncingOutcomingValue = null;
 			this.isSyncingIncomingValue = value;
 			resetBlocks( value );
-			resetSelection( selectionStart, selectionEnd );
+
+			if ( selectionStart && selectionEnd ) {
+				resetSelection( selectionStart, selectionEnd );
+			}
 		}
 	}
 
