@@ -417,10 +417,10 @@ export function renderElement( element, context, legacyContext = {} ) {
 				const { nativeComponent, nativeProps } = type.serialize( props );
 				return renderNativeComponent( nativeComponent, nativeProps, context, legacyContext );
 			} else if ( type.displayName === 'Text' ) {
-				throw new Error( 'text' );
-			} else {
-				return renderElement( type.render( props ), context, legacyContext );
+				return props.children;
 			}
+
+			return renderElement( type.render( props ), context, legacyContext );
 		}
 	}
 

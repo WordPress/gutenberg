@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { isString, flatMap, some } from 'lodash';
-import { Image, View } from 'react-native';
+import { Image, Text, View } from 'react-native';
 import {
 	Element as CSSElement,
 	matchCSSPathWithSelectorString,
@@ -179,11 +179,15 @@ HTMLElement.serialize = ( props ) => {
 	};
 };
 
-function createElementFilter( type, ...otherArguments ) {
+function createElementFilter( type, props, ...children ) {
 	if ( HTMLElement.supportsType( type ) ) {
 		const Element = HTMLElement.withTagName( type );
-		return [ Element, ...otherArguments ];
+		return [ Element, props, ...children ];
 	}
+	if ( children && children.length === 1 && isString( children[ 0 ] ) ) {
+		return [ Text, {}, children[ 0 ] ];
+	}
+
 	return arguments;
 }
 
