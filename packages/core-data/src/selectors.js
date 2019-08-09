@@ -243,12 +243,11 @@ export function isAutosavingEntityRecord( state, kind, name, recordId ) {
  * @return {boolean} Whether the entity record is saving or not.
  */
 export function isSavingEntityRecord( state, kind, name, recordId ) {
-	const { pending, isAutosave } = get(
+	return get(
 		state.entities.data,
-		[ kind, name, 'saving', recordId ],
-		{}
+		[ kind, name, 'saving', recordId, 'pending' ],
+		false
 	);
-	return Boolean( pending && ! isAutosave );
 }
 
 /**

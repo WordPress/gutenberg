@@ -151,6 +151,7 @@ describe( 'Change detection', () => {
 
 	it( 'Should prompt if content added without save', async () => {
 		await clickBlockAppender();
+		await page.keyboard.type( 'Paragraph' );
 
 		await assertIsDirty( true );
 	} );
@@ -223,9 +224,9 @@ describe( 'Change detection', () => {
 		// Keyboard shortcut Ctrl+S save.
 		await pressKeyWithModifier( 'primary', 'S' );
 
-		await releaseSaveIntercept();
-
 		await assertIsDirty( true );
+
+		await releaseSaveIntercept();
 	} );
 
 	it( 'Should prompt if changes made while save is in-flight', async () => {
@@ -240,6 +241,7 @@ describe( 'Change detection', () => {
 		await pressKeyWithModifier( 'primary', 'S' );
 
 		await page.type( '.editor-post-title__input', '!' );
+		await page.waitForSelector( '.editor-post-save-draft' );
 
 		await releaseSaveIntercept();
 
@@ -279,6 +281,7 @@ describe( 'Change detection', () => {
 		await pressKeyWithModifier( 'primary', 'S' );
 
 		await clickBlockAppender();
+		await page.keyboard.type( 'Paragraph' );
 
 		// Allow save to complete. Disabling interception flushes pending.
 		await Promise.all( [

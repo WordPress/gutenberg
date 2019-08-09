@@ -29,6 +29,7 @@ import {
 } from './constants';
 import {
 	getNotificationArgumentsForSaveSuccess,
+	getNotificationArgumentsForSaveFail,
 	getNotificationArgumentsForTrashFail,
 } from './utils/notice-builder';
 import { awaitNextStateChange, getRegistry } from './controls';
@@ -397,7 +398,7 @@ export function* savePost( options = {} ) {
 		postId,
 		{
 			...options,
-			getNoticeActionArgs: ( previousEntity, entity, type ) => {
+			getSuccessNoticeActionArgs: ( previousEntity, entity, type ) => {
 				const args = getNotificationArgumentsForSaveSuccess( {
 					previousPost: previousEntity,
 					post: entity,
@@ -406,6 +407,16 @@ export function* savePost( options = {} ) {
 				} );
 				if ( args && args.length ) {
 					return [ 'core/notices', 'createSuccessNotice', ...args ];
+				}
+			},
+			getFailureNoticeActionArgs: ( previousEntity, edits, error ) => {
+				const args = getNotificationArgumentsForSaveFail( {
+					post: previousEntity,
+					edits,
+					error,
+				} );
+				if ( args && args.length ) {
+					return [ 'core/notices', 'createErrorNotice', ...args ];
 				}
 			},
 		}

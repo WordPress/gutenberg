@@ -713,7 +713,7 @@ export function isAutosavingPost( state ) {
 	if ( ! isSavingPost( state ) ) {
 		return false;
 	}
-	return !! state.saving.options.isAutosave;
+	return !! get( state.saving, [ 'options', 'isAutosave' ] );
 }
 
 /**
