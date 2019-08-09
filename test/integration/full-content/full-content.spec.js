@@ -14,7 +14,7 @@ import {
 	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
 } from '@wordpress/blocks';
 import { parse as grammarParse } from '@wordpress/block-serialization-default-parser';
-import { registerCoreBlocks } from '@wordpress/block-library';
+import { registerCoreBlocks, __experimentalRegisterExperimentalCoreBlocks } from '@wordpress/block-library';
 import { //eslint-disable-line no-restricted-syntax
 	blockNameToFixtureBasename,
 	getAvailableBlockFixturesBasenames,
@@ -48,10 +48,13 @@ function normalizeParsedBlocks( blocks ) {
 describe( 'full post content fixture', () => {
 	beforeAll( () => {
 		unstable__bootstrapServerSideBlockDefinitions( require( './server-registered.json' ) );
-
+		const settings = { __experimentalEnableLegacyWidgetBlock: true, __experimentalEnableMenuBlock: true };
 		// Load all hooks that modify blocks
 		require( '../../../packages/editor/src/hooks' );
 		registerCoreBlocks();
+		if ( process.env.GUTENBERG_PHASE === 2 ) {
+			__experimentalRegisterExperimentalCoreBlocks( settings );
+		}
 	} );
 
 	blockBasenames.forEach( ( basename ) => {

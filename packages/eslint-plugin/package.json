@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/eslint-plugin",
-	"version": "2.3.0",
+	"version": "2.4.0",
 	"description": "ESLint plugin for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -24,10 +24,12 @@
 	],
 	"main": "index.js",
 	"dependencies": {
-		"babel-eslint": "^10.0.1",
-		"eslint-plugin-jsx-a11y": "^6.2.1",
-		"eslint-plugin-react": "^7.12.4",
-		"eslint-plugin-react-hooks": "^1.6.0",
+		"babel-eslint": "^10.0.2",
+		"eslint-plugin-jsdoc": "^15.8.0",
+		"eslint-plugin-jsx-a11y": "^6.2.3",
+		"eslint-plugin-react": "^7.14.3",
+		"eslint-plugin-react-hooks": "^1.6.1",
+		"globals": "^12.0.0",
 		"requireindex": "^1.2.0"
 	},
 	"publishConfig": {

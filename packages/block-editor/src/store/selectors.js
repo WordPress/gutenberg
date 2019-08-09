@@ -169,7 +169,7 @@ export const __unstableGetBlockWithoutInnerBlocks = createSelector(
  * on each call
  *
  * @param {Object}  state        Editor state.
- * @param {?String} rootClientId Optional root client ID of block list.
+ * @param {?string} rootClientId Optional root client ID of block list.
  *
  * @return {Object[]} Post blocks.
  */
@@ -224,7 +224,7 @@ export const getClientIdsWithDescendants = createSelector(
  * The number returned includes nested blocks.
  *
  * @param {Object}  state     Global application state.
- * @param {?String} blockName Optional block name, if specified only blocks of that type will be counted.
+ * @param {?string} blockName Optional block name, if specified only blocks of that type will be counted.
  *
  * @return {number} Number of blocks in the post, or number of blocks with name equal to blockName.
  */
@@ -1297,6 +1297,7 @@ export const getInserterItems = createSelector(
 
 /**
  * Determines whether there are items to show in the inserter.
+ *
  * @param {Object}  state        Editor state.
  * @param {?string} rootClientId Optional root client ID of block list.
  *
@@ -1407,11 +1408,22 @@ function getReusableBlocks( state ) {
 }
 
 /**
- * Returns true if the block editor can search and install uninstalled blocks.
+ * Returns whether the navigation mode is enabled.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {boolean}     Is navigation mode enabled.
+ */
+export function isNavigationMode( state ) {
+	return state.isNavigationMode;
+}
+
+/**
+ * Returns whether block editor can search and install uninstalled blocks.
  *
  * @param {Object} state Global application state.
  *
- * @return {boolean} Whether the downloadable blocks feature is enabled.
+ * @return {boolean}     Whether the downloadable blocks feature is enabled.
  */
 export function getIsDownloadableBlocksEnabled( state ) {
 	return get( state, [ 'settings', '__experimentalIsDownloadableBlocksEnabled' ], false );

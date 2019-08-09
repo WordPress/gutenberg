@@ -74,7 +74,7 @@ class InlineLinkUI extends Component {
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.onChangeInputValue = this.onChangeInputValue.bind( this );
 		this.setLinkTarget = this.setLinkTarget.bind( this );
-		this.onClickOutside = this.onClickOutside.bind( this );
+		this.onFocusOutside = this.onFocusOutside.bind( this );
 		this.resetState = this.resetState.bind( this );
 		this.autocompleteRef = createRef();
 
@@ -165,13 +165,13 @@ class InlineLinkUI extends Component {
 		}
 	}
 
-	onClickOutside( event ) {
+	onFocusOutside() {
 		// The autocomplete suggestions list renders in a separate popover (in a portal),
-		// so onClickOutside fails to detect that a click on a suggestion occurred in the
+		// so onFocusOutside fails to detect that a click on a suggestion occurred in the
 		// LinkContainer. Detect clicks on autocomplete suggestions using a ref here, and
 		// return to avoid the popover being closed.
 		const autocompleteElement = this.autocompleteRef.current;
-		if ( autocompleteElement && autocompleteElement.contains( event.target ) ) {
+		if ( autocompleteElement && autocompleteElement.contains( document.activeElement ) ) {
 			return;
 		}
 
@@ -198,7 +198,7 @@ class InlineLinkUI extends Component {
 				value={ value }
 				isActive={ isActive }
 				addingLink={ addingLink }
-				onClickOutside={ this.onClickOutside }
+				onFocusOutside={ this.onFocusOutside }
 				onClose={ this.resetState }
 				focusOnMount={ showInput ? 'firstElement' : false }
 				renderSettings={ () => (

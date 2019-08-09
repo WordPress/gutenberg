@@ -34,7 +34,7 @@ describe( 'entities', () => {
 	it( 'returns the default state for all defined entities', () => {
 		const state = entities( undefined, {} );
 
-		expect( state.data.root.postType ).toEqual( { items: {}, queries: {} } );
+		expect( state.data.root.postType.queriedData ).toEqual( { items: {}, queries: {} } );
 	} );
 
 	it( 'returns with received post types by slug', () => {
@@ -46,7 +46,7 @@ describe( 'entities', () => {
 			name: 'postType',
 		} );
 
-		expect( state.data.root.postType ).toEqual( {
+		expect( state.data.root.postType.queriedData ).toEqual( {
 			items: {
 				b: { slug: 'b', title: 'beach' },
 				s: { slug: 's', title: 'sun' },
@@ -60,10 +60,12 @@ describe( 'entities', () => {
 			data: {
 				root: {
 					postType: {
-						items: {
-							w: { slug: 'w', title: 'water' },
+						queriedData: {
+							items: {
+								w: { slug: 'w', title: 'water' },
+							},
+							queries: {},
 						},
-						queries: {},
 					},
 				},
 			},
@@ -75,7 +77,7 @@ describe( 'entities', () => {
 			name: 'postType',
 		} );
 
-		expect( state.data.root.postType ).toEqual( {
+		expect( state.data.root.postType.queriedData ).toEqual( {
 			items: {
 				w: { slug: 'w', title: 'water' },
 				b: { slug: 'b', title: 'beach' },

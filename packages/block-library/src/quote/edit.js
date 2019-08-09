@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -7,6 +12,7 @@ import { BlockQuotation } from '@wordpress/components';
 
 export default function QuoteEdit( { attributes, setAttributes, isSelected, mergeBlocks, onReplace, className } ) {
 	const { align, value, citation } = attributes;
+
 	return (
 		<>
 			<BlockControls>
@@ -17,7 +23,11 @@ export default function QuoteEdit( { attributes, setAttributes, isSelected, merg
 					} }
 				/>
 			</BlockControls>
-			<BlockQuotation className={ className } style={ { textAlign: align } }>
+			<BlockQuotation
+				className={ classnames( className, {
+					[ `has-text-align-${ align }` ]: align,
+				} ) }
+			>
 				<RichText
 					identifier="value"
 					multiline

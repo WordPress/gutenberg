@@ -9,7 +9,9 @@ import { createElement } from './react';
  * To preserve additional props, a `div` wrapper _will_ be created if any props
  * aside from `children` are passed.
  *
+ * @param {Object} props
  * @param {string} props.children HTML to render.
+ * @param {Object} props.props    Any additonal props to be set on the containing div.
  *
  * @return {WPElement} Dangerously-rendering element.
  */

@@ -203,7 +203,7 @@ on each call
 _Parameters_
 
 -   _state_ `Object`: Editor state.
--   _rootClientId_ `?String`: Optional root client ID of block list.
+-   _rootClientId_ `?string`: Optional root client ID of block list.
 
 _Returns_
 
@@ -299,7 +299,7 @@ The number returned includes nested blocks.
 _Parameters_
 
 -   _state_ `Object`: Global application state.
--   _blockName_ `?String`: Optional block name, if specified only blocks of that type will be counted.
+-   _blockName_ `?string`: Optional block name, if specified only blocks of that type will be counted.
 
 _Returns_
 
@@ -773,6 +773,18 @@ _Returns_
 
 -   `boolean`: True if multi-selecting, false if not.
 
+<a name="isNavigationMode" href="#isNavigationMode">#</a> **isNavigationMode**
+
+Returns whether the navigation mode is enabled.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+
+_Returns_
+
+-   `boolean`: Is navigation mode enabled.
+
 <a name="isSelectionEnabled" href="#isSelectionEnabled">#</a> **isSelectionEnabled**
 
 Selector that returns if multi-selection is enabled or not.
@@ -1082,6 +1094,18 @@ clientId should be selected.
 _Parameters_
 
 -   _clientId_ `string`: Block client ID.
+
+<a name="setNavigationMode" href="#setNavigationMode">#</a> **setNavigationMode**
+
+Returns an action object used to enable or disable the navigation mode.
+
+_Parameters_
+
+-   _isNavigationMode_ `string`: Enable/Disable navigation mode.
+
+_Returns_
+
+-   `Object`: Action object
 
 <a name="setTemplateValidity" href="#setTemplateValidity">#</a> **setTemplateValidity**
 

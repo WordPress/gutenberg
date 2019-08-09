@@ -75,23 +75,26 @@ function useMovingAnimation( ref, isSelected, enableAnimation, triggerAnimationO
 		immediate: prefersReducedMotion,
 	} );
 
-	return {
-		transformOrigin: 'center',
-		transform: interpolate(
-			[
-				animationProps.x,
-				animationProps.y,
-			],
-			( x, y ) => x === 0 && y === 0 ? undefined : `translate3d(${ x }px,${ y }px,0)`
-		),
-		zIndex: interpolate(
-			[
-				animationProps.x,
-				animationProps.y,
-			],
-			( x, y ) => ! isSelected || ( x === 0 && y === 0 ) ? undefined : `1`
-		),
-	};
+	// Dismiss animations if disabled.
+	return prefersReducedMotion ?
+		{} :
+		{
+			transformOrigin: 'center',
+			transform: interpolate(
+				[
+					animationProps.x,
+					animationProps.y,
+				],
+				( x, y ) => x === 0 && y === 0 ? undefined : `translate3d(${ x }px,${ y }px,0)`
+			),
+			zIndex: interpolate(
+				[
+					animationProps.x,
+					animationProps.y,
+				],
+				( x, y ) => ! isSelected || ( x === 0 && y === 0 ) ? undefined : `1`
+			),
+		};
 }
 
 export default useMovingAnimation;

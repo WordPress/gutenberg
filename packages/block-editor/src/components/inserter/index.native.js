@@ -1,12 +1,8 @@
 /**
- * External dependencies
- */
-import { FlatList, Text, TouchableHighlight, View } from 'react-native';
-
-/**
  * WordPress dependencies
  */
-import { BottomSheet, Icon } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
+import { Dropdown, ToolbarButton, Dashicon } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
@@ -16,58 +12,85 @@ import { getUnregisteredTypeHandlerName } from '@wordpress/blocks';
  * Internal dependencies
  */
 import styles from './style.scss';
+import InserterMenu from './menu';
+
+const defaultRenderToggle = ( { onToggle, disabled } ) => (
+	<ToolbarButton
+		title={ __( 'Add block' ) }
+		icon={ ( <Dashicon icon="plus-alt" style={ styles.addBlockButton } color={ styles.addBlockButton.color } /> ) }
+		onClick={ onToggle }
+		extraProps={ { hint: __( 'Double tap to add a block' ) } }
+		isDisabled={ disabled }
+	/>
+);
 
 class Inserter extends Component {
-	calculateNumberOfColumns() {
-		const bottomSheetWidth = BottomSheet.getWidth();
-		const { paddingLeft: itemPaddingLeft, paddingRight: itemPaddingRight } = styles.modalItem;
-		const { paddingLeft: containerPaddingLeft, paddingRight: containerPaddingRight } = styles.content;
-		const { width: itemWidth } = styles.modalIconWrapper;
-		const itemTotalWidth = itemWidth + itemPaddingLeft + itemPaddingRight;
-		const containerTotalWidth = bottomSheetWidth - ( containerPaddingLeft + containerPaddingRight );
-		return Math.floor( containerTotalWidth / itemTotalWidth );
+	constructor() {
+		super( ...arguments );
+
+		this.onToggle = this.onToggle.bind( this );
+		this.renderToggle = this.renderToggle.bind( this );
+		this.renderContent = this.renderContent.bind( this );
+	}
+
+	onToggle( isOpen ) {
+		const { onToggle } = this.props;
+
+		// Surface toggle callback to parent component
+		if ( onToggle ) {
+			onToggle( isOpen );
+		}
+	}
+
+	/**
+	 * Render callback to display Dropdown toggle element.
+	 *
+	 * @param {Function} options.onToggle Callback to invoke when toggle is
+	 *                                    pressed.
+	 * @param {boolean}  options.isOpen   Whether dropdown is currently open.
+	 *
+	 * @return {WPElement} Dropdown toggle element.
+	 */
+	renderToggle( { onToggle, isOpen } ) {
+		const {
+			disabled,
+			renderToggle = defaultRenderToggle,
+		} = this.props;
+
+		return renderToggle( { onToggle, isOpen, disabled } );
+	}
+
+	/**
+	 * Render callback to display Dropdown content element.
+	 *
+	 * @param {Function} options.onClose Callback to invoke when dropdown is
+	 *                                   closed.
+	 *
+	 * @return {WPElement} Dropdown content element.
+	 */
+	renderContent( { onClose, isOpen } ) {
+		const { rootClientId, clientId, isAppender } = this.props;
+
+		return (
+			<InserterMenu
+				isOpen={ isOpen }
+				onSelect={ onClose }
+				onDismiss={ onClose }
+				rootClientId={ rootClientId }
+				clientId={ clientId }
+				isAppender={ isAppender }
+			/>
+		);
 	}
 
 	render() {
-		const numberOfColumns = this.calculateNumberOfColumns();
-		const bottomPadding = this.props.addExtraBottomPadding && styles.contentBottomPadding;
-
 		return (
-			<BottomSheet
-				isVisible={ true }
-				onClose={ this.props.onDismiss }
-				contentStyle={ [ styles.content, bottomPadding ] }
-				hideHeader
-			>
-				<FlatList
-					scrollEnabled={ false }
-					key={ `InserterUI-${ numberOfColumns }` } //re-render when numberOfColumns changes
-					keyboardShouldPersistTaps="always"
-					numColumns={ numberOfColumns }
-					data={ this.props.items }
-					ItemSeparatorComponent={ () =>
-						<View style={ styles.rowSeparator } />
-					}
-					keyExtractor={ ( item ) => item.name }
-					renderItem={ ( { item } ) =>
-						<TouchableHighlight
-							style={ styles.touchableArea }
-							underlayColor="transparent"
-							activeOpacity={ .5 }
-							accessibilityLabel={ item.title }
-							onPress={ () => this.props.onValueSelected( item.name ) }>
-							<View style={ styles.modalItem }>
-								<View style={ styles.modalIconWrapper }>
-									<View style={ styles.modalIcon }>
-										<Icon icon={ item.icon.src } fill={ styles.modalIcon.fill } size={ styles.modalIcon.width } />
-									</View>
-								</View>
-								<Text style={ styles.modalItemLabel }>{ item.title }</Text>
-							</View>
-						</TouchableHighlight>
-					}
-				/>
-			</BottomSheet>
+			<Dropdown
+				onToggle={ this.onToggle }
+				headerTitle={ __( 'Add a block' ) }
+				renderToggle={ this.renderToggle }
+				renderContent={ this.renderContent }
+			/>
 		);
 	}
 }

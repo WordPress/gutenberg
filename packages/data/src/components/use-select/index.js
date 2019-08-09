@@ -10,7 +10,7 @@ import {
 	useEffect,
 	useReducer,
 } from '@wordpress/element';
-import { isShallowEqualObjects } from '@wordpress/is-shallow-equal';
+import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
  * Internal dependencies
@@ -90,16 +90,15 @@ export default function useSelect( _mapSelect, deps ) {
 	let mapOutput;
 
 	try {
-		if (
-			latestMapSelect.current !== mapSelect ||
-			latestMapOutputError.current
-		) {
+		if ( latestMapSelect.current !== mapSelect || latestMapOutputError.current ) {
 			mapOutput = mapSelect( registry.select, registry );
 		} else {
 			mapOutput = latestMapOutput.current;
 		}
 	} catch ( error ) {
-		let errorMessage = `An error occurred while running 'mapSelect': ${ error.message }`;
+		let errorMessage = `An error occurred while running 'mapSelect': ${
+			error.message
+		}`;
 
 		if ( latestMapOutputError.current ) {
 			errorMessage += `\nThe error may be correlated with this previous error:\n`;
@@ -129,7 +128,7 @@ export default function useSelect( _mapSelect, deps ) {
 						registry.select,
 						registry
 					);
-					if ( isShallowEqualObjects( latestMapOutput.current, newMapOutput ) ) {
+					if ( isShallowEqual( latestMapOutput.current, newMapOutput ) ) {
 						return;
 					}
 					latestMapOutput.current = newMapOutput;

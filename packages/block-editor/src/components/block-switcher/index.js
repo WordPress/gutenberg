@@ -8,7 +8,7 @@ import { castArray, filter, first, mapKeys, orderBy, uniq, map } from 'lodash';
  */
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { Dropdown, IconButton, Toolbar, PanelBody, Path, SVG } from '@wordpress/components';
-import { getBlockType, getPossibleBlockTransformations, switchToBlockType, hasChildBlocksWithInserterSupport } from '@wordpress/blocks';
+import { getBlockType, getPossibleBlockTransformations, switchToBlockType, hasChildBlocksWithInserterSupport, cloneBlock } from '@wordpress/blocks';
 import { Component } from '@wordpress/element';
 import { DOWN } from '@wordpress/keycodes';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -160,11 +160,17 @@ export class BlockSwitcher extends Component {
 						}
 
 						{ ( hoveredClassName !== null ) &&
-							<BlockPreview
-								name={ blocks[ 0 ].name }
-								attributes={ { ...blocks[ 0 ].attributes, className: hoveredClassName } }
-								innerBlocks={ blocks[ 0 ].innerBlocks }
-							/>
+							<div className="block-editor-block-switcher__preview">
+								<div className="block-editor-block-switcher__preview-title">{ __( 'Preview' ) }</div>
+								<BlockPreview
+									className="block-editor-block-switcher__preview-content"
+									blocks={
+										cloneBlock( blocks[ 0 ], {
+											className: hoveredClassName,
+										} )
+									}
+								/>
+							</div>
 						}
 					</>
 				) }

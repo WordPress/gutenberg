@@ -1,3 +1,4 @@
+
 .container {
 	height: 44px;
 	flex-direction: row;
@@ -17,11 +18,4 @@
 	width: 44px;
 	justify-content: center;
 	align-items: center;
-}
-
-.addBlockButton {
-	color: $blue-wordpress;
-	border: 2px;
-	border-radius: 10px;
-	border-color: $blue-wordpress;
 }
