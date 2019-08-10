@@ -53,6 +53,64 @@ wp.domReady( function() {
 } );
 ```
 
+### Server-side registration helper
+
+While the samples provided full allow full control of the style registration client-side scripts, and its enqueuing, they require a considerable amount of code to register a block style.
+
+To simplify the process of registering/unregistering block styles, two server-side functions were implemented: `register_block_style`, and `unregister_block_style`.
+
+#### register_block_style
+
+The `register_block_style` function receives the identifier of the block as the first argument and an array describing properties of the style as the second argument.
+The properties of the style array must include `name` and `label`: 
+ - `name`: The identifier of the style used to compute a CSS class.
+ - `label`: A human-readable label for the style.
+
+Besides the two mandatory properties, the styles properties array  should include a `inline_style`  or a `style_handle` property:
+ - `inline_style`: Contains inline CSS code that registers the CSS class required for the style.
+ - `style_handle`: Contains the handle to an already registered style that should be enqueued in places where block styles are needed.
+
+The following code sample registers a style for the quote block named "Blue Quote", and enqueues an inline style that makes quote blocks with the "Blue Quote" style have blue color:
+
+```php
+register_block_style(
+    'core/quote',
+    array(
+        'name'         => 'blue-quote',
+        'label'        => __( 'Blue Quote' ),
+        'inline_style' => '.wp-block-quote.is-style-blue-quote { color: blue; }',
+    )
+);
+```
+
+Alternatively, if the styles were already registered it is possible to just pass its handle and `register_block_style` function will make sure they are enqued. The following code sample provides an example of this use case:
+
+```php
+(...)
+wp_register_style( 'myguten-style', get_template_directory_uri() . '/custom-style.css' );
+(...)
+
+register_block_style(
+    'core/quote',
+    array(
+        'name'         => 'fancy-quote',
+        'label'        => 'Fancy Quote',
+        'style_handle' => 'myguten-style',
+    )
+);
+```
+#### unregister_block_style
+
+`unregister_block_style` allows unregistering a block style previously registered on the server using `register_block_style`.
+The function registers as the first argument the identifier/name of the block and as second argument the identifier/name of the style.
+
+The following code sample unregisteres the style named 'fancy-quote'  from the quote block:
+```php
+unregister_block_style( 'core/quote', 'fancy-quote' );
+```
+
+**Important:** The function `unregister_block_style`only unregisters styles that were registered on the server using a `register_block_style`. The function does not generate client-side code to unregister a style registered using client-side code.
+
 ### Filters
 
 Extending blocks can involve more than just providing alternative styles, in this case, you can use one of the following filters to extend the block settings.
