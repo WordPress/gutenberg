@@ -14,6 +14,8 @@ import { Component } from '@wordpress/element';
 import Edit from './edit';
 import { BlockEditContextProvider } from './context';
 
+export { withBlockEditContext } from './context';
+
 class BlockEdit extends Component {
 	constructor() {
 		super( ...arguments );

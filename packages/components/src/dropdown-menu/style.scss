@@ -34,6 +34,21 @@
 		.components-dropdown-menu__indicator::after {
 			@include dropdown-arrow();
 		}
+
+		// Subscript for numbered icon buttons, like headings
+		&[data-subscript]::after {
+			content: attr(data-subscript);
+			font-family: $default-font;
+			font-size: $default-font-size;
+			font-weight: 600;
+			position: absolute;
+			left: 20px;
+			bottom: 4px;
+		}
+
+		&:not(:disabled).is-active[data-subscript]::after {
+			color: $white;
+		}
 	}
 }
 
@@ -47,6 +62,7 @@
 	font-family: $default-font;
 	font-size: $default-font-size;
 	line-height: $default-line-height;
+	position: relative;
 
 	.components-dropdown-menu__menu-item,
 	.components-menu-item {
@@ -55,6 +71,7 @@
 		outline: none;
 		cursor: pointer;
 		margin-bottom: $grid-size-small;
+		position: relative;
 
 		&.has-separator {
 			margin-top: 6px;
@@ -80,19 +97,46 @@
 		}
 
 		// Formatting buttons
-		> svg {
+		& > svg {
+			padding: 5px;
 			border-radius: $radius-round-rectangle;
+			height: 30px;
+			width: 30px;
+		}
 
-			// This assumes 20x20px dashicons.
-			padding: 2px;
-			width: $icon-button-size-small;
-			height: $icon-button-size-small;
-			margin: -1px $grid-size -1px 0;
+		&[data-subscript] svg {
+			padding: 5px 10px 5px 0;
+		}
+
+		// Subscript for numbered icon buttons, like headings
+		&[data-subscript]::after {
+			content: attr(data-subscript);
+			font-family: $default-font;
+			font-size: $default-font-size;
+			font-weight: 600;
+			position: absolute;
+			left: 23px;
+			bottom: 11px;
+		}
+
+		&:not(:disabled).is-active[data-subscript]::after {
+			color: $white;
+		}
+
+		&:not(:disabled).is-active > svg,
+		&:not(:disabled):hover > svg {
+			@include formatting-button-style__hover;
+		}
+
+		// Active & toggled style
+		&:not(:disabled).is-active > svg {
+			@include formatting-button-style__active;
 		}
 
 		&:not(:disabled):not([aria-disabled="true"]):not(.is-default).is-active > svg {
 			@include formatting-button-style__active();
 		}
+
 	}
 
 	.components-menu-group:not(:last-child) {
