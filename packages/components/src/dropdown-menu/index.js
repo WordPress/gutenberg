@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { flatMap, isEmpty, isFunction } from 'lodash';
+import { find, flatMap, isEmpty, isFunction } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -75,6 +75,13 @@ function DropdownMenu( {
 		position,
 	}, popoverProps );
 
+	let activeControl = false;
+	flatMap( controlSets, ( controlSet ) => {
+		activeControl = find( controlSet, ( control ) => {
+			return control.isActive === true;
+		} );
+	} );
+
 	return (
 		<Dropdown
 			className={ classnames( 'components-dropdown-menu', className ) }
@@ -102,6 +109,7 @@ function DropdownMenu( {
 						onKeyDown={ openOnArrowDown }
 						aria-haspopup="true"
 						aria-expanded={ isOpen }
+						data-subscript={ activeControl ? activeControl.subscript : '' }
 						label={ label }
 					>
 						{ ( ! icon || hasArrowIndicator ) && <span className="components-dropdown-menu__indicator" /> }
@@ -125,30 +133,33 @@ function DropdownMenu( {
 								null
 						}
 						{ flatMap( controlSets, ( controlSet, indexOfSet ) => (
-							controlSet.map( ( control, indexOfControl ) => (
-								<IconButton
-									key={ [ indexOfSet, indexOfControl ].join() }
-									onClick={ ( event ) => {
-										event.stopPropagation();
-										props.onClose();
-										if ( control.onClick ) {
-											control.onClick();
-										}
-									} }
-									className={ classnames(
-										'components-dropdown-menu__menu-item',
-										{
-											'has-separator': indexOfSet > 0 && indexOfControl === 0,
-											'is-active': control.isActive,
-										},
-									) }
-									icon={ control.icon }
-									role="menuitem"
-									disabled={ control.isDisabled }
-								>
-									{ control.title }
-								</IconButton>
-							) )
+							controlSet.map( ( control, indexOfControl ) => {
+								return (
+									<IconButton
+										key={ [ indexOfSet, indexOfControl ].join() }
+										onClick={ ( event ) => {
+											event.stopPropagation();
+											props.onClose();
+											if ( control.onClick ) {
+												control.onClick();
+											}
+										} }
+										className={ classnames(
+											'components-dropdown-menu__menu-item',
+											{
+												'has-separator': indexOfSet > 0 && indexOfControl === 0,
+												'is-active': control.isActive,
+											},
+										) }
+										icon={ control.icon }
+										data-subscript={ control.subscript }
+										role="menuitem"
+										disabled={ control.isDisabled }
+									>
+										{ control.title }
+									</IconButton>
+								);
+							} )
 						) ) }
 					</NavigableMenu>
 				);
