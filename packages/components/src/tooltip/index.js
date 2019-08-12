@@ -117,7 +117,7 @@ class Tooltip extends Component {
 	 * Creates an event callback to handle assignment of the `isInMouseDown`
 	 * instance property in response to a `mousedown` or `mouseup` event.
 	 *
-	 * @param {booelan} isMouseDown Whether handler is to be created for the
+	 * @param {boolean} isMouseDown Whether handler is to be created for the
 	 *                              `mousedown` event, as opposed to `mouseup`.
 	 *
 	 * @return {Function} Event callback handler.
