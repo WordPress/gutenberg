@@ -17,7 +17,7 @@ import IconButton from '../icon-button';
 import Dropdown from '../dropdown';
 import { NavigableMenu } from '../navigable-container';
 
-function mergeProps( props = {}, defaultProps = {} ) {
+function mergeProps( defaultProps = {}, props = {} ) {
 	const mergedProps = {
 		...defaultProps,
 		...props,
@@ -70,10 +70,10 @@ function DropdownMenu( {
 			controlSets = [ controlSets ];
 		}
 	}
-	const mergedPopoverProps = mergeProps( popoverProps, {
+	const mergedPopoverProps = mergeProps( {
 		className: 'components-dropdown-menu__popover',
 		position,
-	} );
+	}, popoverProps );
 
 	return (
 		<Dropdown
@@ -87,12 +87,12 @@ function DropdownMenu( {
 						onToggle();
 					}
 				};
-				const mergedToggleProps = mergeProps( toggleProps, {
+				const mergedToggleProps = mergeProps( {
 					className: classnames( 'components-dropdown-menu__toggle', {
 						'is-opened': isOpen,
 					} ),
 					tooltip: label,
-				} );
+				}, toggleProps );
 
 				return (
 					<IconButton
@@ -109,10 +109,10 @@ function DropdownMenu( {
 				);
 			} }
 			renderContent={ ( props ) => {
-				const mergedMenuProps = mergeProps( menuProps, {
+				const mergedMenuProps = mergeProps( {
 					'aria-label': menuLabel || label,
 					className: 'components-dropdown-menu__menu',
-				} );
+				}, menuProps );
 
 				return (
 					<NavigableMenu
