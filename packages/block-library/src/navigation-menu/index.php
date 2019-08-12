@@ -14,8 +14,8 @@
  *
  * @return string Returns the post content with the legacy widget added.
  */
-function render_block_navigation_menu( $attributes, $content ) {
-	return "Content";
+function render_block_navigation_menu( $attributes, $content, $block ) {
+	return sprintf( 'Navigation menu with %d items', count( $block['innerBlocks'] ) );
 }
 
 /**
@@ -30,13 +30,6 @@ function register_block_core_navigation_menu() {
 				'automaticallyAdd' => array(
 					'type'    => 'boolean',
 					'default' => 'false',
-				),
-				'hierarchy'        => array(
-					'type'    => 'array',
-					'default' => array(),
-					'items'   => array(
-						'type' => 'object',
-					),
 				),
 			),
 			'render_callback' => 'render_block_navigation_menu',

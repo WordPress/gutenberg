@@ -58,3 +58,47 @@ function gutenberg_filter_wp_insert_post_data( $data, $postarr ) {
 	return $data;
 }
 add_filter( 'wp_insert_post_data', 'gutenberg_filter_wp_insert_post_data', 10, 2 );
+
+
+/**
+ * Shim that hooks into `pre_render_block` so as to override `render_block`
+ * with a function that passes `render_callback` the block object as the
+ * argument.
+ *
+ * @param array $block A single parsed block object.
+ * @return string String of rendered HTML.
+ */
+function gutenberg_provide_render_callback_with_block_object( $pre_render, $block ) {
+	global $post;
+
+	$source_block = $block;
+
+	/** This filter is documented in src/wp-includes/blocks.php */
+	$block = apply_filters( 'render_block_data', $block, $source_block );
+
+	$block_type    = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
+	$is_dynamic    = $block['blockName'] && null !== $block_type && $block_type->is_dynamic();
+	$block_content = '';
+	$index         = 0;
+
+	foreach ( $block['innerContent'] as $chunk ) {
+		$block_content .= is_string( $chunk ) ? $chunk : render_block( $block['innerBlocks'][ $index++ ] );
+	}
+
+	if ( ! is_array( $block['attrs'] ) ) {
+		$block['attrs'] = array();
+	}
+
+	if ( $is_dynamic ) {
+		$global_post = $post;
+
+		$block_type->prepare_attributes_for_render( $block['attrs'] );
+		$block_content = (string) call_user_func( $block_type->render_callback, $block['attrs'], $block_content, $block );
+
+		$post = $global_post;
+	}
+
+	/** This filter is documented in src/wp-includes/blocks.php */
+	return apply_filters( 'render_block', $block_content, $block );
+}
+add_filter( 'pre_render_block', 'gutenberg_provide_render_callback_with_block_object', 10, 2 );
