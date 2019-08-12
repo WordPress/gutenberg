@@ -87,3 +87,4 @@ export { default as WritingFlow } from './writing-flow';
  */
 
 export { default as BlockEditorProvider } from './provider';
+export { default as __experimentalSimulateMediaQuery } from './simulate-media-query';
