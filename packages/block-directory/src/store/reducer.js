@@ -49,7 +49,7 @@ export const discoverBlocks = ( state = {
 		case 'REMOVE_INSTALLED_BLOCK_TYPE' :
 			return {
 				...state,
-				installedBlockTypes: state.installedBlockTypes.filter( ( blockType ) => blockType.name === action.item.name ),
+				installedBlockTypes: state.installedBlockTypes.filter( ( blockType ) => blockType.name !== action.item.name ),
 			};
 	}
 	return state;
