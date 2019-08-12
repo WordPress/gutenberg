@@ -72,7 +72,7 @@ Besides the two mandatory properties, the styles properties array should also in
  - `inline_style`: Contains inline CSS code that registers the CSS class required for the style.
  - `style_handle`: Contains the handle to an already registered style that should be enqueued in places where block styles are needed.
 
-The following code sample registers a style for the quote block named "Blue Quote", and enqueues an inline style that makes quote blocks with the "Blue Quote" style have blue color:
+The following code sample registers a style for the quote block named "Blue Quote", and provides an inline style that makes quote blocks with the "Blue Quote" style have blue color:
 
 ```php
 register_block_style(
