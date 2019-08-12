@@ -23,6 +23,7 @@ import {
  */
 import Section from './section';
 import {
+	EnablePluginDocumentSettingPanelOption,
 	EnablePublishSidebarOption,
 	EnableTipsOption,
 	EnablePanelOption,
@@ -48,6 +49,7 @@ export function OptionsModal( { isModalActive, isViewable, closeModal } ) {
 				<EnableTipsOption label={ __( 'Enable Tips' ) } />
 			</Section>
 			<Section title={ __( 'Document Panels' ) }>
+				<EnablePluginDocumentSettingPanelOption.Slot />
 				{ isViewable && (
 					<EnablePanelOption label={ __( 'Permalink' ) } panelName="post-link" />
 				) }
