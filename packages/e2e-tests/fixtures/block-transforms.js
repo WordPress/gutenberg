@@ -157,6 +157,13 @@ export const EXPECTED_TRANSFORMS = {
 			'Image',
 		],
 	},
+	'core__gallery-with-caption': {
+		originalBlock: 'Gallery',
+		availableTransforms: [
+			'Group',
+			'Image',
+		],
+	},
 	core__gallery__columns: {
 		originalBlock: 'Gallery',
 		availableTransforms: [
