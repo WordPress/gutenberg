@@ -142,7 +142,7 @@ function gutenberg_get_legacy_widget_settings() {
 	$settings['hasPermissionsToManageWidgets'] = $has_permissions_to_manage_widgets;
 	$settings['availableLegacyWidgets']        = $available_legacy_widgets;
 
-	return $settings;
+	return gutenberg_experiments_editor_settings( $settings );
 }
 
 /**

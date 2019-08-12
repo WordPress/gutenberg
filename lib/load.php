@@ -33,7 +33,9 @@ require dirname( __FILE__ ) . '/class-wp-block-styles-registry.php';
 require dirname( __FILE__ ) . '/blocks.php';
 require dirname( __FILE__ ) . '/client-assets.php';
 require dirname( __FILE__ ) . '/demo.php';
+// experiments-page eeeds to be required before widgets, widgets-page, and customizer.
+require dirname( __FILE__ ) . '/experiments-page.php';
 require dirname( __FILE__ ) . '/widgets.php';
 require dirname( __FILE__ ) . '/widgets-page.php';
-require dirname( __FILE__ ) . '/experiments-page.php';
+
 require dirname( __FILE__ ) . '/customizer.php';
