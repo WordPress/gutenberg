@@ -104,7 +104,8 @@ register_block_style(
 #### unregister_block_style
 
 `unregister_block_style` allows unregistering a block style previously registered on the server using `register_block_style`.
-The function registers as the first argument the identifier/name of the block and as second argument the identifier/name of the style.
+
+The function's first argument is the registered name of the block, and the name of the style as the second argument.
 
 The following code sample unregisteres the style named 'fancy-quote'  from the quote block:
 
