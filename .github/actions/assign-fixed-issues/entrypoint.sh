@@ -15,7 +15,7 @@ issues=$(
 
 if [ -z "$issues" ]; then
 	echo "Pull request does not 'fix' any issues. Aborting."
-	exit 78
+	exit 0
 fi
 
 # 2. Grab the author of the PR.
