@@ -67,7 +67,7 @@ The properties of the style array must include `name` and `label`:
  - `name`: The identifier of the style used to compute a CSS class.
  - `label`: A human-readable label for the style.
 
-Besides the two mandatory properties, the styles properties array  should include a `inline_style`  or a `style_handle` property:
+Besides the two mandatory properties, the styles properties array should also include an `inline_style`  or a `style_handle` property:
 
  - `inline_style`: Contains inline CSS code that registers the CSS class required for the style.
  - `style_handle`: Contains the handle to an already registered style that should be enqueued in places where block styles are needed.
