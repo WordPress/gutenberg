@@ -107,6 +107,7 @@ register_block_style(
 The function registers as the first argument the identifier/name of the block and as second argument the identifier/name of the style.
 
 The following code sample unregisteres the style named 'fancy-quote'  from the quote block:
+
 ```php
 unregister_block_style( 'core/quote', 'fancy-quote' );
 ```
