@@ -8,7 +8,6 @@ import {
 	PanelBody,
 	Placeholder,
 	RangeControl,
-	ServerSideRender,
 	TextControl,
 	ToggleControl,
 	Toolbar,
@@ -18,6 +17,7 @@ import {
 	BlockControls,
 	InspectorControls,
 } from '@wordpress/block-editor';
+import ServerSideRender from '@wordpress/server-side-render';
 
 const DEFAULT_MIN_ITEMS = 1;
 const DEFAULT_MAX_ITEMS = 10;
