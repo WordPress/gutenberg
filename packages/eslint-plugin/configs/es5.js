@@ -1,4 +1,7 @@
 module.exports = {
+	extends: [
+		require.resolve( './jsdoc.js' ),
+	],
 	rules: {
 		'array-bracket-spacing': [ 'error', 'always' ],
 		'array-callback-return': 'error',
