@@ -584,7 +584,7 @@ _Parameters_
 
 _Returns_
 
--   `booleans`: Is the preview for the URL an oEmbed link fallback.
+-   `boolean`: Is the preview for the URL an oEmbed link fallback.
 
 <a name="isRequestingEmbedPreview" href="#isRequestingEmbedPreview">#</a> **isRequestingEmbedPreview**
 

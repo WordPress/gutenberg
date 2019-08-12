@@ -355,7 +355,7 @@ export function getEmbedPreview( state, url ) {
  * @param {Object} state    Data state.
  * @param {string} url      Embedded URL.
  *
- * @return {booleans} Is the preview for the URL an oEmbed link fallback.
+ * @return {boolean} Is the preview for the URL an oEmbed link fallback.
  */
 export function isPreviewEmbedFallback( state, url ) {
 	const preview = state.embedPreviews[ url ];
