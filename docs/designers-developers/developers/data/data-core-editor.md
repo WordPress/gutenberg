@@ -1100,6 +1100,41 @@ _Related_
 
 Returns an action object used to signal that post saving is locked.
 
+_Usage_
+
+    const { subscribe } = wp.data;
+
+    const initialPostStatus = wp.data.select( 'core/editor' ).getEditedPostAttribute( 'status' );
+
+    // Only allow publishing posts that are set to a future date.
+    if ( 'publish' !== initialPostStatus ) {
+
+    	// Track locking.
+    	let locked = false;
+
+    	// Watch for the publish event.
+    	let unssubscribe = subscribe( () => {
+    		const currentPostStatus = wp.data.select( 'core/editor' ).getEditedPostAttribute( 'status' );
+    		if ( 'publish' !== currentPostStatus ) {
+
+    			// Compare the post date to the current date, lock the post if the date isn't in the future.
+    			const postDate = new Date( wp.data.select( 'core/editor' ).getEditedPostAttribute( 'date' ) );
+    			const currentDate = new Date();
+    			if ( postDate.getTime() <= currentDate.getTime() ) {
+    				if ( ! locked ) {
+    					locked = true;
+    					wp.data.dispatch( 'core/editor' ).lockPostSaving( 'futurelock' );
+    				}
+    			} else {
+    				if ( locked ) {
+    					locked = false;
+    					wp.data.dispatch( 'core/editor' ).unlockPostSaving( 'futurelock' );
+    				}
+    			}
+    		}
+    	} );
+    }
+
 _Parameters_
 
 -   _lockName_ `string`: The lock name.
@@ -1335,6 +1370,11 @@ _Returns_
 <a name="unlockPostSaving" href="#unlockPostSaving">#</a> **unlockPostSaving**
 
 Returns an action object used to signal that post saving is unlocked.
+
+_Usage_
+
+    // Unlock post saving with the lock key `mylock`:
+    wp.data.dispatch( 'core/editor' ).unlockPostSaving( 'mylock' );
 
 _Parameters_
 
