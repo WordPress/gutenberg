@@ -127,38 +127,41 @@ export class BlockSwitcher extends Component {
 				} }
 				renderContent={ ( { onClose } ) => (
 					<>
-						{ hasBlockStyles &&
-							<PanelBody
-								title={ __( 'Block Styles' ) }
-								initialOpen
-							>
-								<BlockStyles
-									clientId={ blocks[ 0 ].clientId }
-									onSwitch={ onClose }
-									onHoverClassName={ this.onHoverClassName }
-								/>
-							</PanelBody>
+						{ ( hasBlockStyles || possibleBlockTransformations.length !== 0 ) &&
+							<div className="block-editor-block-switcher__container">
+								{ hasBlockStyles &&
+									<PanelBody
+										title={ __( 'Block Styles' ) }
+										initialOpen
+									>
+										<BlockStyles
+											clientId={ blocks[ 0 ].clientId }
+											onSwitch={ onClose }
+											onHoverClassName={ this.onHoverClassName }
+										/>
+									</PanelBody>
+								}
+								{ possibleBlockTransformations.length !== 0 &&
+									<PanelBody
+										title={ __( 'Transform To:' ) }
+										initialOpen
+									>
+										<BlockTypesList
+											items={ possibleBlockTransformations.map( ( destinationBlockType ) => ( {
+												id: destinationBlockType.name,
+												icon: destinationBlockType.icon,
+												title: destinationBlockType.title,
+												hasChildBlocksWithInserterSupport: hasChildBlocksWithInserterSupport( destinationBlockType.name ),
+											} ) ) }
+											onSelect={ ( item ) => {
+												onTransform( blocks, item.id );
+												onClose();
+											} }
+										/>
+									</PanelBody>
+								}
+							</div>
 						}
-						{ possibleBlockTransformations.length !== 0 &&
-							<PanelBody
-								title={ __( 'Transform To:' ) }
-								initialOpen
-							>
-								<BlockTypesList
-									items={ possibleBlockTransformations.map( ( destinationBlockType ) => ( {
-										id: destinationBlockType.name,
-										icon: destinationBlockType.icon,
-										title: destinationBlockType.title,
-										hasChildBlocksWithInserterSupport: hasChildBlocksWithInserterSupport( destinationBlockType.name ),
-									} ) ) }
-									onSelect={ ( item ) => {
-										onTransform( blocks, item.id );
-										onClose();
-									} }
-								/>
-							</PanelBody>
-						}
-
 						{ ( hoveredClassName !== null ) &&
 							<div className="block-editor-block-switcher__preview">
 								<div className="block-editor-block-switcher__preview-title">{ __( 'Preview' ) }</div>
