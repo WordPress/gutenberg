@@ -378,7 +378,6 @@ const Popover = ( {
 	// Disable reason: We care to capture the _bubbled_ events from inputs
 	// within popover as inferring close intent.
 
-	/* eslint-disable jsx-a11y/no-static-element-interactions */
 	let content = (
 		<PopoverDetectOutside onFocusOutside={ handleOnFocusOutside }>
 			<Animate
@@ -420,7 +419,6 @@ const Popover = ( {
 			</Animate>
 		</PopoverDetectOutside>
 	);
-	/* eslint-enable jsx-a11y/no-static-element-interactions */
 
 	// Apply focus to element as long as focusOnMount is truthy; false is
 	// the only "disabled" value.

@@ -246,25 +246,11 @@ function gutenberg_register_scripts_and_styles() {
 	wp_add_inline_script(
 		'wp-api-fetch',
 		sprintf(
-			implode(
-				"\n",
-				array(
-					'( function() {',
-					'	var nonceMiddleware = wp.apiFetch.createNonceMiddleware( "%s" );',
-					'	wp.apiFetch.use( nonceMiddleware );',
-					'	wp.hooks.addAction(',
-					'		"heartbeat.tick",',
-					'		"core/api-fetch/create-nonce-middleware",',
-					'		function( response ) {',
-					'			if ( response[ "rest_nonce" ] ) {',
-					'				nonceMiddleware.nonce = response[ "rest_nonce" ];',
-					'			}',
-					'		}',
-					'	)',
-					'} )();',
-				)
-			),
-			( wp_installing() && ! is_multisite() ) ? '' : wp_create_nonce( 'wp_rest' )
+			'wp.apiFetch.nonceMiddleware = wp.apiFetch.createNonceMiddleware( "%s" );' .
+			'wp.apiFetch.use( wp.apiFetch.nonceMiddleware );' .
+			'wp.apiFetch.nonceEndpoint = "%s";',
+			( wp_installing() && ! is_multisite() ) ? '' : wp_create_nonce( 'wp_rest' ),
+			admin_url( 'admin-ajax.php?action=gutenberg_rest_nonce' )
 		),
 		'after'
 	);
