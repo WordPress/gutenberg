@@ -52,6 +52,16 @@ exports[`Block transforms correctly transform block Gallery in fixture core__gal
 <!-- /wp:image -->"
 `;
 
+exports[`Block transforms correctly transform block Gallery in fixture core__gallery-with-caption into the Image block 1`] = `
+"<!-- wp:image -->
+<figure class=\\"wp-block-image\\"><img src=\\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\\" alt=\\"title\\"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:image -->
+<figure class=\\"wp-block-image\\"><img src=\\"data:image/jpeg;base64,/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=\\" alt=\\"title\\"/></figure>
+<!-- /wp:image -->"
+`;
+
 exports[`Block transforms correctly transform block Heading in fixture core__heading__h2 into the Paragraph block 1`] = `
 "<!-- wp:paragraph -->
 <p>A picture is worth a thousand words, or so the saying goes</p>
