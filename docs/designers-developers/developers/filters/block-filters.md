@@ -61,7 +61,7 @@ To simplify the process of registering and unregistering block styles, two serve
 
 #### register_block_style
 
-The `register_block_style` function receives the identifier of the block as the first argument and an array describing properties of the style as the second argument.
+The `register_block_style` function receives the name of the block as the first argument and an array describing properties of the style as the second argument.
 
 The properties of the style array must include `name` and `label`: 
  - `name`: The identifier of the style used to compute a CSS class.
