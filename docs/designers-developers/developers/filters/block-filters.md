@@ -89,7 +89,8 @@ Alternatively, if the styles were already registered it is possible to just pass
 
 ```php
 wp_register_style( 'myguten-style', get_template_directory_uri() . '/custom-style.css' );
-(...)
+
+// ...
 
 register_block_style(
     'core/quote',
