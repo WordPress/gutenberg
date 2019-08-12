@@ -275,29 +275,6 @@ function gutenberg_register_scripts_and_styles() {
 		)
 	);
 
-	// Add back compatibility for calls to wp.components.ServerSideRender.
-	wp_add_inline_script(
-		'wp-server-side-render',
-		implode(
-			"\n",
-			array(
-				'( function() {',
-				'	if ( wp && wp.components && wp.serverSideRender ) {',
-				'		wp.components.ServerSideRender = wp.element.forwardRef( function( props, ref ) {',
-				'			wp.deprecated( \'wp.components.ServerSideRender\', {',
-				'				alternative: \'wp.serverSideRender\',',
-				'			} );',
-				'			return wp.element.createElement(',
-				'				wp.serverSideRender,',
-				'				Object.assign( { ref: ref }, props )',
-				'			);',
-				'		} );',
-				'	}',
-				'} )();',
-			)
-		)
-	);
-
 	// Editor Styles.
 	// This empty stylesheet is defined to ensure backward compatibility.
 	gutenberg_override_style( 'wp-blocks', false );
