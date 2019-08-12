@@ -41,6 +41,7 @@ const socialList = {
 	lastfm: [ 'last.fm' ],
 	linkedin: [ 'linkedin.com' ],
 	mail: [ 'mailto:' ],
+	mastodon: [ 'mastodon' ],
 	meetup: [ 'meetup.com' ],
 	medium: [ 'medium.com' ],
 	pinterest: [ 'pinterest.com' ],

@@ -3,9 +3,9 @@
  */
 import { InnerBlocks } from '@wordpress/block-editor';
 
-export default function save( { className, align } ) {
+export default function save( { className } ) {
 	return (
-		<div className={ className } style={ { textAlign: align } }>
+		<div className={ className }>
 			<InnerBlocks.Content />
 		</div>
 	);

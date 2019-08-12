@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -18,14 +18,6 @@ export const settings = {
 	title: __( 'Social links' ),
 	icon: 'share',
 	description: __( 'Create a block of links to your social media or external sites' ),
-	styles: [
-		{ name: 'regular', label: _x( 'Regular', 'block style' ), isDefault: true },
-		{ name: 'filled', label: __( 'Filled' ) },
-	],
-	supports: {
-		align: [ 'wide', 'full' ],
-		html: false,
-	},
 	edit,
 	save,
 };

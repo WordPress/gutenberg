@@ -7,9 +7,7 @@ import {
 } from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
 import {
-	AlignmentToolbar,
 	InnerBlocks,
-	BlockControls,
 } from '@wordpress/block-editor';
 import { dispatch } from '@wordpress/data';
 
@@ -28,16 +26,10 @@ import { dispatch } from '@wordpress/data';
 */
 const ALLOWED_BLOCKS = [ 'core/social-link' ];
 
-export const SocialLinksEdit = function( { align, setAttributes, className, clientId } ) {
+export const SocialLinksEdit = function( { className, clientId } ) {
 	return (
 		<>
-			<BlockControls>
-				<AlignmentToolbar
-					value={ align }
-					onChange={ ( nextAlign ) => setAttributes( { align: nextAlign } ) }
-				/>
-			</BlockControls>
-			<div className={ className } style={ { textAlign: align } }>
+			<div className={ className }>
 				<InnerBlocks
 					allowedBlocks={ ALLOWED_BLOCKS }
 					renderAppender={ () => (
