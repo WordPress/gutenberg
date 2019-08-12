@@ -111,7 +111,7 @@ The following code sample unregisteres the style named 'fancy-quote'  from the q
 unregister_block_style( 'core/quote', 'fancy-quote' );
 ```
 
-**Important:** The function `unregister_block_style`only unregisters styles that were registered on the server using a `register_block_style`. The function does not generate client-side code to unregister a style registered using client-side code.
+**Important:** The function `unregister_block_style` only unregisters styles that were registered on the server using `register_block_style`. The function does not unregister a style registered using client-side code.
 
 ### Filters
 
