@@ -98,10 +98,6 @@ Undocumented declaration.
 
 Undocumented declaration.
 
-<a name="BlockExpandToolbar" href="#BlockExpandToolbar">#</a> **BlockExpandToolbar**
-
-Undocumented declaration.
-
 <a name="BlockFormatControls" href="#BlockFormatControls">#</a> **BlockFormatControls**
 
 Undocumented declaration.

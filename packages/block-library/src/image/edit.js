@@ -48,7 +48,6 @@ import {
 import { withSelect, withDispatch } from '@wordpress/data';
 import {
 	BlockAlignmentToolbar,
-	BlockExpandToolbar,
 	BlockControls,
 	BlockIcon,
 	InspectorControls,
@@ -609,11 +608,6 @@ export class ImageEdit extends Component {
 				<BlockAlignmentToolbar
 					value={ align }
 					onChange={ this.updateAlignment }
-				/>
-
-				<BlockExpandToolbar
-					value={ expand }
-					onChange={ this.updateExpansion }
 				/>
 
 				{ url && (
