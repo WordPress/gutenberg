@@ -129,10 +129,6 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 
 		$result   = $upgrader->install( $api->download_link );
 
-		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-			$status[ 'debug' ] = $skin->get_upgrade_messages();
-		}
-
 		if ( is_wp_error( $result ) ) {
 			return WP_Error( $result->get_error_code(), $result->get_error_message() );
 		} 
@@ -156,9 +152,13 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 
 		$install_status = install_plugin_install_status( $api );
 
-		activate_plugin( $install_status['file'] );
+		$activate_result = activate_plugin( $install_status['file'] );
 
-		return rest_ensure_response( $status );
+		if ( is_wp_error( $activate_result ) ) {
+			return WP_Error( $activate_result->get_error_code(), $activate_result->get_error_message() );
+		}
+
+		return rest_ensure_response( true );
 	}
 
 	/**
@@ -192,11 +192,19 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 
 		$install_status = install_plugin_install_status( $api );
 
-		deactivate_plugins( $install_status['file'] );
+		$deactivate_result = deactivate_plugins( $install_status['file'] );
 
-		delete_plugins( array( $install_status['file'] ) );
+		if ( is_wp_error( $deactivate_result ) ) {
+			return WP_Error( $deactivate_result->get_error_code(), $deactivate_result->get_error_message() );
+		}
 
-		return rest_ensure_response( $api );
+		$delete_result = delete_plugins( array( $install_status['file'] ) );
+
+		if ( is_wp_error( $delete_result ) ) {
+			return WP_Error( $delete_result->get_error_code(), $delete_result->get_error_message() );
+		}
+
+		return rest_ensure_response( true );
 	}
 
 	/**
