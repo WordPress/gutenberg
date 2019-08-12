@@ -100,7 +100,6 @@ register_block_style(
         'style_handle' => 'myguten-style',
     )
 );
-```
 #### unregister_block_style
 
 `unregister_block_style` allows unregistering a block style previously registered on the server using `register_block_style`.
