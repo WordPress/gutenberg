@@ -88,7 +88,6 @@ register_block_style(
 Alternatively, if the styles were already registered it is possible to just pass its handle and `register_block_style` function will make sure they are enqued. The following code sample provides an example of this use case:
 
 ```php
-(...)
 wp_register_style( 'myguten-style', get_template_directory_uri() . '/custom-style.css' );
 (...)
 
