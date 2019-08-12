@@ -55,7 +55,7 @@ wp.domReady( function() {
 
 ### Server-side registration helper
 
-While the samples provided full allow full control of the style registration client-side scripts, and its enqueuing, they require a considerable amount of code to register a block style.
+While the samples provided do allow full control of block styles, they do require a considerable amount of code.
 
 To simplify the process of registering/unregistering block styles, two server-side functions were implemented: `register_block_style`, and `unregister_block_style`.
 
