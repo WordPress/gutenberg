@@ -27,15 +27,6 @@ describe( 'RichText', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	it( 'should apply formatting with access shortcut', async () => {
-		await clickBlockAppender();
-		await page.keyboard.type( 'test' );
-		await pressKeyWithModifier( 'primary', 'a' );
-		await pressKeyWithModifier( 'access', 'd' );
-
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-	} );
-
 	it( 'should apply formatting with primary shortcut', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'test' );
@@ -89,10 +80,12 @@ describe( 'RichText', () => {
 	it( 'should return focus when pressing formatting button', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'Some ' );
-		await page.keyboard.press( 'Escape' );
+		await page.mouse.move( 0, 0 );
+		await page.mouse.move( 10, 10 );
 		await page.click( '[aria-label="Bold"]' );
 		await page.keyboard.type( 'bold' );
-		await page.keyboard.press( 'Escape' );
+		await page.mouse.move( 0, 0 );
+		await page.mouse.move( 10, 10 );
 		await page.click( '[aria-label="Bold"]' );
 		await page.keyboard.type( '.' );
 
@@ -205,6 +198,53 @@ describe( 'RichText', () => {
 		// There should be no selection. The following should insert "-" without
 		// deleting the numbers.
 		await page.keyboard.type( '-' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should handle Home and End keys', async () => {
+		await page.keyboard.press( 'Enter' );
+
+		await pressKeyWithModifier( 'primary', 'b' );
+		await page.keyboard.type( '12' );
+		await pressKeyWithModifier( 'primary', 'b' );
+
+		await page.keyboard.press( 'Home' );
+		await page.keyboard.type( '-' );
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( '+' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should update internal selection after fresh focus', async () => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '1' );
+		await page.keyboard.press( 'Tab' );
+		await pressKeyWithModifier( 'shift', 'Tab' );
+		await pressKeyWithModifier( 'primary', 'b' );
+		await page.keyboard.type( '2' );
+		await pressKeyWithModifier( 'primary', 'b' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should keep internal selection after blur', async () => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '1' );
+		// Simulate moving focus to a different app, then moving focus back,
+		// without selection being changed.
+		await page.evaluate( () => {
+			const activeElement = document.activeElement;
+			activeElement.blur();
+			activeElement.focus();
+		} );
+		// Wait for the next animation frame, see the focus event listener in
+		// RichText.
+		await page.evaluate( () => new Promise( window.requestAnimationFrame ) );
+		await pressKeyWithModifier( 'primary', 'b' );
+		await page.keyboard.type( '2' );
+		await pressKeyWithModifier( 'primary', 'b' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );

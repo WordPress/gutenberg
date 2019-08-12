@@ -1,4 +1,4 @@
-# Contributors Guide
+# Contributor Documentation
 
 Welcome to the Gutenberg Project Contributors Guide.
 

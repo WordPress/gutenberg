@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-const { escapeRegExp, map } = require( 'lodash' );
+const { escapeRegExp } = require( 'lodash' );
 
 /**
  * Internal dependencies
@@ -21,7 +21,14 @@ module.exports = {
 	extends: [
 		'plugin:@wordpress/eslint-plugin/recommended',
 		'plugin:jest/recommended',
+		'plugin:eslint-comments/recommended',
 	],
+	plugins: [
+		'import',
+	],
+	globals: {
+		wp: 'off',
+	},
 	rules: {
 		'@wordpress/react-no-unsafe-timeout': 'error',
 		'no-restricted-syntax': [
@@ -34,12 +41,32 @@ module.exports = {
 				message: 'Path access on WordPress dependencies is not allowed.',
 			},
 			{
+				selector: 'ImportDeclaration[source.value=/^react-spring(?!\\u002Fweb\.cjs)/]',
+				message: 'The react-spring dependency must specify CommonJS bundle: react-spring/web.cjs',
+			},
+			{
 				selector: 'CallExpression[callee.name="deprecated"] Property[key.name="version"][value.value=/' + majorMinorRegExp + '/]',
 				message: 'Deprecated functions must be removed before releasing this version.',
 			},
 			{
+				selector: 'CallExpression[callee.name=/^(__|_n|_nx|_x)$/]:not([arguments.0.type=/^Literal|BinaryExpression$/])',
+				message: 'Translate function arguments must be string literals.',
+			},
+			{
+				selector: 'CallExpression[callee.name=/^(_n|_nx|_x)$/]:not([arguments.1.type=/^Literal|BinaryExpression$/])',
+				message: 'Translate function arguments must be string literals.',
+			},
+			{
+				selector: 'CallExpression[callee.name=_nx]:not([arguments.3.type=/^Literal|BinaryExpression$/])',
+				message: 'Translate function arguments must be string literals.',
+			},
+			{
 				selector: 'CallExpression[callee.name=/^(__|_x|_n|_nx)$/] Literal[value=/\\.{3}/]',
 				message: 'Use ellipsis character (…) in place of three dots',
+			},
+			{
+				selector: 'ImportDeclaration[source.value="redux"] Identifier.imported[name="combineReducers"]',
+				message: 'Use `combineReducers` from `@wordpress/data`',
 			},
 			{
 				selector: 'ImportDeclaration[source.value="lodash"] Identifier.imported[name="memoize"]',
@@ -87,14 +114,24 @@ module.exports = {
 	},
 	overrides: [
 		{
+			files: [ 'packages/**/*.js' ],
+			rules: {
+				'import/no-extraneous-dependencies': 'error',
+			},
+			excludedFiles: [
+				'**/*.@(android|ios|native).js',
+				'**/@(benchmark|test|__tests__)/**/*.js',
+			],
+		},
+		{
 			files: [ 'packages/e2e-test*/**/*.js' ],
 			env: {
 				browser: true,
 			},
 			globals: {
-				browser: true,
-				page: true,
-				wp: true,
+				browser: 'readonly',
+				page: 'readonly',
+				wp: 'readonly',
 			},
 		},
 	],

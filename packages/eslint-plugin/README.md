@@ -55,6 +55,7 @@ Rule|Description|Recommended
 [react-no-unsafe-timeout](/packages/eslint-plugin/docs/rules/react-no-unsafe-timeout.md)|Disallow unsafe `setTimeout` in component|
 [valid-sprintf](/packages/eslint-plugin/docs/rules/valid-sprintf.md)|Enforce valid sprintf usage|✓
 [no-base-control-with-label-without-id](/packages/eslint-plugin/docs/rules/no-base-control-with-label-without-id.md)| Disallow the usage of BaseControl component with a label prop set but omitting the id property|✓
+[no-unguarded-get-range-at](/packages/eslint-plugin/docs/rules/no-unguarded-get-range-at.md)| Disallow the usage of unguarded `getRangeAt` calls|✓
 
 ### Legacy
 

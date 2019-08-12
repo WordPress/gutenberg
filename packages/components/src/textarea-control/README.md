@@ -6,9 +6,9 @@ TextareaControls are TextControls that allow for multiple lines of text, and wra
 
 ## Table of contents
 
-1. [Design guidelines](http://#design-guidelines)
-2. [Development guidelines](http://#development-guidelines)
-3. [Related components](http://#related-components)
+1. [Design guidelines](#design-guidelines)
+2. [Development guidelines](#development-guidelines)
+3. [Related components](#related-components)
 
 ## Design guidelines
 
@@ -102,6 +102,13 @@ Props not included in this set will be applied to the textarea element.
 If this property is added, a label will be generated using label property as the content.
 
 - Type: `String`
+- Required: No
+
+#### hideLabelFromVision
+
+If true, the label will only be visible to screen readers.
+
+- Type: `Boolean`
 - Required: No
 
 #### help

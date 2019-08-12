@@ -1,0 +1,8 @@
+.edit-widgets-notices__snackbar {
+	position: fixed;
+	right: 0;
+	bottom: 20px;
+	padding-left: 16px;
+	padding-right: 16px;
+}
+@include editor-left(".edit-widgets-notices__snackbar");

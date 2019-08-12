@@ -138,6 +138,17 @@ export function matcher( selector ) {
 	};
 }
 
+/**
+ * Object of utility functions used in managing block attribute values of
+ * source `children`.
+ *
+ * @see https://github.com/WordPress/gutenberg/pull/10439
+ *
+ * @deprecated since 4.0. The `children` source should not be used, and can be
+ *             replaced by the `html` source.
+ *
+ * @private
+ */
 export default {
 	concat,
 	getChildrenArray,

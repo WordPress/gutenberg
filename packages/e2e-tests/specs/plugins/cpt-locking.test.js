@@ -9,6 +9,7 @@ import {
 	getEditedPostContent,
 	insertBlock,
 	pressKeyTimes,
+	setPostContent,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'cpt locking', () => {
@@ -66,6 +67,20 @@ describe( 'cpt locking', () => {
 			await page.keyboard.type( 'Paragraph' );
 			await pressKeyTimes( 'Backspace', textToType.length + 1 );
 			expect( await getEditedPostContent() ).toMatchSnapshot();
+		} );
+
+		it( 'should show invalid template notice if the blocks do not match the templte', async () => {
+			const content = await getEditedPostContent();
+			const [ , contentWithoutImage ] = content.split( '<!-- /wp:image -->' );
+			await setPostContent( contentWithoutImage );
+			const VALIDATION_PARAGRAPH_SELECTOR = '.editor-template-validation-notice .components-notice__content p';
+			await page.waitForSelector( VALIDATION_PARAGRAPH_SELECTOR );
+			expect(
+				await page.evaluate(
+					( element ) => element.textContent,
+					await page.$( VALIDATION_PARAGRAPH_SELECTOR )
+				)
+			).toEqual( 'The content of your post doesn’t match the template assigned to your post type.' );
 		} );
 	} );
 

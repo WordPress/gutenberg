@@ -273,6 +273,11 @@ _Returns_
 
 -   `Object`: A new value with replacements applied.
 
+<a name="RichText" href="#RichText">#</a> **RichText**
+
+Renders a rich content input, providing users with the option to format the
+content.
+
 <a name="slice" href="#slice">#</a> **slice**
 
 Slice a Rich Text value from `startIndex` to `endIndex`. Indices are
@@ -297,9 +302,13 @@ Indices are retrieved from the selection if none are provided.
 
 _Parameters_
 
--   _value_ `Object`: Value to modify.
+-   _value_ `Object`: 
+-   _value.formats_ `Array<Object>`: 
+-   _value.replacements_ `Array<Object>`: 
+-   _value.text_ `string`: 
+-   _value.start_ `number`: 
+-   _value.end_ `number`: 
 -   _string_ `[(number|string)]`: Start index, or string at which to split.
--   _endStr_ `[number]`: End index.
 
 _Returns_
 

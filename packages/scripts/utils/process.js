@@ -1,4 +1,4 @@
-const getCliArgs = ( excludePrefixes ) => {
+const getArgsFromCLI = ( excludePrefixes ) => {
 	const args = process.argv.slice( 2 );
 	if ( excludePrefixes ) {
 		return args.filter( ( arg ) => {
@@ -10,6 +10,6 @@ const getCliArgs = ( excludePrefixes ) => {
 
 module.exports = {
 	exit: process.exit,
-	getCliArgs,
+	getArgsFromCLI,
 	getCurrentWorkingDirectory: process.cwd,
 };

@@ -22,6 +22,10 @@
 	}
 }
 
+.components-range-control__reset {
+	margin-left: $grid-size;
+}
+
 // creating mixin because we can't do multiline variables, and we can't comma-group the selectors for styling the range slider
 @mixin range-thumb() {
 	height: 18px;

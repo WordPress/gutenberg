@@ -40,13 +40,22 @@ export default function save( { attributes } ) {
 			<Tag>
 				{ rows.map( ( { cells }, rowIndex ) => (
 					<tr key={ rowIndex }>
-						{ cells.map( ( { content, tag }, cellIndex ) =>
-							<RichText.Content
-								tagName={ tag }
-								value={ content }
-								key={ cellIndex }
-							/>
-						) }
+						{ cells.map( ( { content, tag, scope, align }, cellIndex ) => {
+							const cellClasses = classnames( {
+								[ `has-text-align-${ align }` ]: align,
+							} );
+
+							return (
+								<RichText.Content
+									className={ cellClasses ? cellClasses : undefined }
+									data-align={ align }
+									tagName={ tag }
+									value={ content }
+									key={ cellIndex }
+									scope={ tag === 'th' ? scope : undefined }
+								/>
+							);
+						} ) }
 					</tr>
 				) ) }
 			</Tag>
@@ -54,10 +63,12 @@ export default function save( { attributes } ) {
 	};
 
 	return (
-		<table className={ classes }>
-			<Section type="head" rows={ head } />
-			<Section type="body" rows={ body } />
-			<Section type="foot" rows={ foot } />
-		</table>
+		<figure>
+			<table className={ classes }>
+				<Section type="head" rows={ head } />
+				<Section type="body" rows={ body } />
+				<Section type="foot" rows={ foot } />
+			</table>
+		</figure>
 	);
 }

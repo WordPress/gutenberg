@@ -133,6 +133,7 @@ export const saveReusableBlocks = async ( action, store ) => {
 		const message = isTemporary ? __( 'Block created.' ) : __( 'Block updated.' );
 		dataDispatch( 'core/notices' ).createSuccessNotice( message, {
 			id: REUSABLE_BLOCK_NOTICE_ID,
+			type: 'snackbar',
 		} );
 
 		dataDispatch( 'core/block-editor' ).__unstableSaveReusableBlock( id, updatedReusableBlock.id );
@@ -199,6 +200,7 @@ export const deleteReusableBlocks = async ( action, store ) => {
 		const message = __( 'Block deleted.' );
 		dataDispatch( 'core/notices' ).createSuccessNotice( message, {
 			id: REUSABLE_BLOCK_NOTICE_ID,
+			type: 'snackbar',
 		} );
 	} catch ( error ) {
 		dispatch( {

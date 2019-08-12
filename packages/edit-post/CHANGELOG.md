@@ -1,9 +1,18 @@
-## V.V.V (Unreleased)
+## 3.6.0 (2019-08-05)
 
-### New Features
+### Refactor
+
+- Create EditorInitializer component and implement for various things to initialize as the editor is loaded. This replaces the `__unstableInitialize` refactor done in #14740. ([#15444](https://github.com/WordPress/gutenberg/pull/15444))
+
+## 3.4.0 (2019-05-21)
+
+### New Feature
 
 - Implement the `addToGallery` option in the `MediaUpload` hook. The option allows users to open the media modal in the `gallery-library`instead of `gallery-edit` state.
 
+### Refactor
+
+- convert `INIT` effect to controls & actions [#14740](https://github.com/WordPress/gutenberg/pull/14740)
 
 ## 3.2.0 (2019-03-06)
 

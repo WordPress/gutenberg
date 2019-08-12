@@ -108,7 +108,7 @@ export function toggleEditorPanelEnabled( panelName ) {
  * @param {string} panelName A string that identifies the panel to open or close.
  *
  * @return {Object} Action object.
-*/
+ */
 export function toggleEditorPanelOpened( panelName ) {
 	return {
 		type: 'TOGGLE_PANEL_OPENED',
@@ -231,4 +231,3 @@ export function metaBoxUpdatesSuccess() {
 		type: 'META_BOX_UPDATES_SUCCESS',
 	};
 }
-

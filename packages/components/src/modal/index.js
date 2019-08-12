@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -126,7 +125,6 @@ class Modal extends Component {
 
 		// Disable reason: this stops mouse events from triggering tooltips and
 		// other elements underneath the modal overlay.
-		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		return createPortal(
 			<IsolatedEventContainer
 				className={ classnames( 'components-modal__screen-overlay', overlayClassName ) }
@@ -158,7 +156,6 @@ class Modal extends Component {
 			</IsolatedEventContainer>,
 			this.node
 		);
-		/* eslint-enable jsx-a11y/no-static-element-interactions */
 	}
 }
 
@@ -166,7 +163,6 @@ Modal.defaultProps = {
 	bodyOpenClassName: 'modal-open',
 	role: 'dialog',
 	title: null,
-	onRequestClose: noop,
 	focusOnMount: true,
 	shouldCloseOnEsc: true,
 	shouldCloseOnClickOutside: true,

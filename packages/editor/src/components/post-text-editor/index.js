@@ -7,7 +7,7 @@ import Textarea from 'react-autosize-textarea';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component, Fragment } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { parse } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { withInstanceId, compose } from '@wordpress/compose';
@@ -66,7 +66,7 @@ export class PostTextEditor extends Component {
 		const { value } = this.state;
 		const { instanceId } = this.props;
 		return (
-			<Fragment>
+			<>
 				<label htmlFor={ `post-content-${ instanceId }` } className="screen-reader-text">
 					{ __( 'Type text or HTML' ) }
 				</label>
@@ -80,7 +80,7 @@ export class PostTextEditor extends Component {
 					id={ `post-content-${ instanceId }` }
 					placeholder={ __( 'Start writing with text or HTML' ) }
 				/>
-			</Fragment>
+			</>
 		);
 	}
 }

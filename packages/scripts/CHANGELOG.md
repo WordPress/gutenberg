@@ -1,6 +1,33 @@
-## Unreleased
+## Master
 
-### New Feature
+### New Features
+
+- The bundled `puppeteer` dependency has been updated from requiring `1.6.1` to requiring `^1.19.0` ([#16875](https://github.com/WordPress/gutenberg/pull/16875)). It uses Chromium v77 instead of Chromium v69.
+- The bundled `jest-puppeteer` dependency has been updated from requiring `^4.0.0` to requiring `^4.3.0` ([#16875](https://github.com/WordPress/gutenberg/pull/16875)).
+- The bundled `eslint` dependency has been updated from requiring `^5.16.0` to requiring `^6.1.0`.
+
+## 3.4.0 (2019-08-05)
+
+### New Features
+
+- The `build` and `start` commands supports simplified syntax for multiple entry points: `wp-scripts build entry-one.js entry-two.js` ([15982](https://github.com/WordPress/gutenberg/pull/15982)).
+
+### Bug Fix
+
+- Added missing [babel-jest](https://www.npmjs.com/package/babel-jest) dependency ([#16259](https://github.com/WordPress/gutenberg/pull/16259)).
+
+## 3.3.0 (2019-06-12)
+
+### New Features
+
+- The `lint-js` command lints now JS files in the entire project's directories by default ([15890](https://github.com/WordPress/gutenberg/pull/15890)).
+- The `lint-pkg-json` command lints now `package.json` files in the entire project's directories by default ([15890](https://github.com/WordPress/gutenberg/pull/15890)).
+- The `lint-style` command lints now CSS and SCSS files in the entire project's directories by default ([15890](https://github.com/WordPress/gutenberg/pull/15890)).
+- The `lint-js`, `lint-pkg-json` and `lint-style` commands ignore now files located in `build` and `node_modules` folders by default ([15977](https://github.com/WordPress/gutenberg/pull/15977)).
+
+## 3.2.0 (2019-05-21)
+
+### New Features
 
 - Leverage `@wordpress/dependency-extraction-webpack-plugin` plugin to extract WordPress
   dependencies.

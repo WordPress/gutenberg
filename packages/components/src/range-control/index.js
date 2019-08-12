@@ -98,11 +98,17 @@ function RangeControl( {
 				onBlur={ resetCurrentInput }
 				{ ...props }
 			/>
-			{ allowReset &&
-				<Button onClick={ resetValue } disabled={ value === undefined }>
+			{ allowReset && (
+				<Button
+					onClick={ resetValue }
+					disabled={ value === undefined }
+					isSmall
+					isDefault
+					className="components-range-control__reset"
+				>
 					{ __( 'Reset' ) }
 				</Button>
-			}
+			) }
 		</BaseControl>
 	);
 }

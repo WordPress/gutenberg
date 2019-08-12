@@ -5,7 +5,7 @@
  */
 export async function switchEditorModeTo( mode ) {
 	await page.click(
-		'.edit-post-more-menu [aria-label="Show more tools & options"]'
+		'.edit-post-more-menu [aria-label="More tools & options"]'
 	);
 	const [ button ] = await page.$x(
 		`//button[contains(text(), '${ mode } Editor')]`

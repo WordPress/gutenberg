@@ -4,7 +4,7 @@
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	background-color: #e9eff3;
+	background-color: $gray-light;
 	padding-left: 12;
 	padding-right: 12;
 	padding-top: 12;
@@ -21,7 +21,15 @@
 
 .emptyStateDescription {
 	text-align: center;
-	color: #0087be;
+	color: $blue-wordpress;
 	font-size: 14;
 	font-weight: 500;
+}
+
+.modalIcon {
+	width: 24px;
+	height: 24px;
+	justify-content: center;
+	align-items: center;
+	fill: $gray-dark;
 }

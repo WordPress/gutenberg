@@ -4,7 +4,6 @@
 
 import { Toolbar } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
-import { Fragment } from '@wordpress/element';
 import {
 	__unstableIndentListItems as indentListItems,
 	__unstableOutdentListItems as outdentListItems,
@@ -26,7 +25,7 @@ export const ListEdit = ( {
 	value,
 	onChange,
 } ) => (
-	<Fragment>
+	<>
 		<RichTextShortcut
 			type="primary"
 			character="["
@@ -101,5 +100,5 @@ export const ListEdit = ( {
 				].filter( Boolean ) }
 			/>
 		</BlockFormatControls>
-	</Fragment>
+	</>
 );

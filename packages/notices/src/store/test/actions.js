@@ -34,6 +34,7 @@ describe( 'actions', () => {
 					isDismissible: true,
 					id: expect.any( String ),
 					actions: [],
+					type: 'default',
 				},
 			} );
 		} );
@@ -55,6 +56,7 @@ describe( 'actions', () => {
 					isDismissible: true,
 					id: expect.any( String ),
 					actions: [],
+					type: 'default',
 				},
 			} );
 		} );
@@ -83,6 +85,7 @@ describe( 'actions', () => {
 					content,
 					isDismissible: false,
 					actions: [],
+					type: 'default',
 				},
 			} );
 		} );
@@ -109,6 +112,7 @@ describe( 'actions', () => {
 					__unstableHTML: true,
 					isDismissible: false,
 					actions: [],
+					type: 'default',
 				},
 			} );
 		} );
@@ -133,6 +137,7 @@ describe( 'actions', () => {
 					content,
 					isDismissible: true,
 					id: expect.any( String ),
+					type: 'default',
 				},
 			} );
 		} );
@@ -157,6 +162,7 @@ describe( 'actions', () => {
 					content,
 					isDismissible: true,
 					id: expect.any( String ),
+					type: 'default',
 				},
 			} );
 		} );
@@ -181,6 +187,7 @@ describe( 'actions', () => {
 					content,
 					isDismissible: true,
 					id: expect.any( String ),
+					type: 'default',
 				},
 			} );
 		} );
@@ -205,6 +212,7 @@ describe( 'actions', () => {
 					content,
 					isDismissible: true,
 					id: expect.any( String ),
+					type: 'default',
 				},
 			} );
 		} );

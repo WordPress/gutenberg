@@ -18,11 +18,6 @@ import {
 	EditorHistoryUndo,
 } from '@wordpress/editor';
 
-/**
- * Internal dependencies
- */
-import FullscreenModeClose from '../fullscreen-mode-close';
-
 function HeaderToolbar( { hasFixedToolbar, isLargeViewport, showInserter, isTextModeEnabled } ) {
 	const toolbarAriaLabel = hasFixedToolbar ?
 		/* translators: accessibility text for the editor toolbar when Top Toolbar is on */
@@ -35,7 +30,6 @@ function HeaderToolbar( { hasFixedToolbar, isLargeViewport, showInserter, isText
 			className="edit-post-header-toolbar"
 			aria-label={ toolbarAriaLabel }
 		>
-			<FullscreenModeClose />
 			<div>
 				<Inserter disabled={ ! showInserter } position="bottom right" />
 				<DotTip tipId="core/editor.inserter">

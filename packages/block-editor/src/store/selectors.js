@@ -27,13 +27,28 @@ import {
 	hasChildBlocksWithInserterSupport,
 } from '@wordpress/blocks';
 
-/***
- * Module constants
+// Module constants
+
+/**
+ * @private
  */
 export const INSERTER_UTILITY_HIGH = 3;
+
+/**
+ * @private
+ */
 export const INSERTER_UTILITY_MEDIUM = 2;
+
+/**
+ * @private
+ */
 export const INSERTER_UTILITY_LOW = 1;
+
+/**
+ * @private
+ */
 export const INSERTER_UTILITY_NONE = 0;
+
 const MILLISECONDS_PER_HOUR = 3600 * 1000;
 const MILLISECONDS_PER_DAY = 24 * 3600 * 1000;
 const MILLISECONDS_PER_WEEK = 7 * 24 * 3600 * 1000;
@@ -48,36 +63,6 @@ const MILLISECONDS_PER_WEEK = 7 * 24 * 3600 * 1000;
  * @type {Array}
  */
 const EMPTY_ARRAY = [];
-
-/**
- * Shared reference to an empty object for cases where it is important to avoid
- * returning a new object reference on every invocation.
- *
- * @type {Object}
- */
-const EMPTY_OBJECT = {};
-
-/**
- * Returns a new reference when the inner blocks of a given block client ID
- * change. This is used exclusively as a memoized selector dependant, relying
- * on this selector's shared return value and recursively those of its inner
- * blocks defined as dependencies. This abuses mechanics of the selector
- * memoization to return from the original selector function only when
- * dependants change.
- *
- * @param {Object} state    Editor state.
- * @param {string} clientId Block client ID.
- *
- * @return {*} A value whose reference will change only when inner blocks of
- *             the given block client ID change.
- */
-export const getBlockDependantsCacheBust = createSelector(
-	() => [],
-	( state, clientId ) => map(
-		getBlockOrder( state, clientId ),
-		( innerBlockClientId ) => getBlock( state, innerBlockClientId ),
-	),
-);
 
 /**
  * Returns a block's name given its client ID, or null if no block exists with
@@ -115,42 +100,14 @@ export function isBlockValid( state, clientId ) {
  *
  * @return {Object?} Block attributes.
  */
-export const getBlockAttributes = createSelector(
-	( state, clientId ) => {
-		const block = state.blocks.byClientId[ clientId ];
-		if ( ! block ) {
-			return null;
-		}
+export function getBlockAttributes( state, clientId ) {
+	const block = state.blocks.byClientId[ clientId ];
+	if ( ! block ) {
+		return null;
+	}
 
-		let attributes = state.blocks.attributes[ clientId ];
-
-		// Inject custom source attribute values.
-		//
-		// TODO: Create generic external sourcing pattern, not explicitly
-		// targeting meta attributes.
-		const type = getBlockType( block.name );
-		if ( type ) {
-			attributes = reduce( type.attributes, ( result, value, key ) => {
-				if ( value.source === 'meta' ) {
-					if ( result === attributes ) {
-						result = { ...result };
-					}
-
-					result[ key ] = getPostMeta( state, value.meta );
-				}
-
-				return result;
-			}, attributes );
-		}
-
-		return attributes;
-	},
-	( state, clientId ) => [
-		state.blocks.byClientId[ clientId ],
-		state.blocks.attributes[ clientId ],
-		getPostMeta( state ),
-	]
-);
+	return state.blocks.attributes[ clientId ];
+}
 
 /**
  * Returns a block given its client ID. This is a parsed copy of the block,
@@ -177,8 +134,12 @@ export const getBlock = createSelector(
 		};
 	},
 	( state, clientId ) => [
-		...getBlockAttributes.getDependants( state, clientId ),
-		getBlockDependantsCacheBust( state, clientId ),
+		// Normally, we'd have both  `getBlockAttributes` dependancies and
+		// `getBlocks` (children) dependancies here but for performance reasons
+		// we use a denormalized cache key computed in the reducer that takes both
+		// the attributes and inner blocks into account. The value of the cache key
+		// is being changed whenever one of these dependencies is out of date.
+		state.blocks.cache[ clientId ],
 	]
 );
 
@@ -196,7 +157,7 @@ export const __unstableGetBlockWithoutInnerBlocks = createSelector(
 	},
 	( state, clientId ) => [
 		state.blocks.byClientId[ clientId ],
-		...getBlockAttributes.getDependants( state, clientId ),
+		state.blocks.attributes[ clientId ],
 	]
 );
 
@@ -208,7 +169,7 @@ export const __unstableGetBlockWithoutInnerBlocks = createSelector(
  * on each call
  *
  * @param {Object}  state        Editor state.
- * @param {?String} rootClientId Optional root client ID of block list.
+ * @param {?string} rootClientId Optional root client ID of block list.
  *
  * @return {Object[]} Post blocks.
  */
@@ -263,7 +224,7 @@ export const getClientIdsWithDescendants = createSelector(
  * The number returned includes nested blocks.
  *
  * @param {Object}  state     Global application state.
- * @param {?String} blockName Optional block name, if specified only blocks of that type will be counted.
+ * @param {?string} blockName Optional block name, if specified only blocks of that type will be counted.
  *
  * @return {number} Number of blocks in the post, or number of blocks with name equal to blockName.
  */
@@ -299,7 +260,6 @@ export const getBlocksByClientId = createSelector(
 		( clientId ) => getBlock( state, clientId )
 	),
 	( state ) => [
-		getPostMeta( state ),
 		state.blocks.byClientId,
 		state.blocks.order,
 		state.blocks.attributes,
@@ -443,22 +403,11 @@ export function getSelectedBlock( state ) {
  *
  * @return {?string} Root client ID, if exists
  */
-export const getBlockRootClientId = createSelector(
-	( state, clientId ) => {
-		const { order } = state.blocks;
-
-		for ( const rootClientId in order ) {
-			if ( includes( order[ rootClientId ], clientId ) ) {
-				return rootClientId;
-			}
-		}
-
-		return null;
-	},
-	( state ) => [
-		state.blocks.order,
-	]
-);
+export function getBlockRootClientId( state, clientId ) {
+	return state.blocks.parents[ clientId ] !== undefined ?
+		state.blocks.parents[ clientId ] :
+		null;
+}
 
 /**
  * Given a block client ID, returns the root of the hierarchy from which the block is nested, return the block itself for root level blocks.
@@ -468,21 +417,15 @@ export const getBlockRootClientId = createSelector(
  *
  * @return {string} Root client ID
  */
-export const getBlockHierarchyRootClientId = createSelector(
-	( state, clientId ) => {
-		let rootClientId = clientId;
-		let current = clientId;
-		while ( rootClientId ) {
-			current = rootClientId;
-			rootClientId = getBlockRootClientId( state, current );
-		}
-
-		return current;
-	},
-	( state ) => [
-		state.blocks.order,
-	]
-);
+export function getBlockHierarchyRootClientId( state, clientId ) {
+	let current = clientId;
+	let parent;
+	do {
+		parent = current;
+		current = state.blocks.parents[ current ];
+	} while ( current );
+	return parent;
+}
 
 /**
  * Returns the client ID of the block adjacent one at the given reference
@@ -676,7 +619,6 @@ export const getMultiSelectedBlocks = createSelector(
 		state.blocks.byClientId,
 		state.blocks.order,
 		state.blocks.attributes,
-		getPostMeta( state ),
 	]
 );
 
@@ -1355,6 +1297,7 @@ export const getInserterItems = createSelector(
 
 /**
  * Determines whether there are items to show in the inserter.
+ *
  * @param {Object}  state        Editor state.
  * @param {?string} rootClientId Optional root client ID of block list.
  *
@@ -1441,19 +1384,16 @@ export function __unstableIsLastBlockChangeIgnored( state ) {
 }
 
 /**
- * Returns the value of a post meta from the editor settings.
+ * Returns the block attributes changed as a result of the last dispatched
+ * action.
  *
- * @param {Object} state Global application state.
- * @param {string} key   Meta Key to retrieve
+ * @param {Object} state Block editor state.
  *
- * @return {*} Meta value
+ * @return {Object<string,Object>} Subsets of block attributes changed, keyed
+ *                                 by block client ID.
  */
-function getPostMeta( state, key ) {
-	if ( key === undefined ) {
-		return get( state, [ 'settings', '__experimentalMetaSource', 'value' ], EMPTY_OBJECT );
-	}
-
-	return get( state, [ 'settings', '__experimentalMetaSource', 'value', key ] );
+export function __experimentalGetLastBlockAttributeChanges( state ) {
+	return state.lastBlockAttributesChange;
 }
 
 /**
@@ -1465,4 +1405,15 @@ function getPostMeta( state, key ) {
  */
 function getReusableBlocks( state ) {
 	return get( state, [ 'settings', '__experimentalReusableBlocks' ], EMPTY_ARRAY );
+}
+
+/**
+ * Returns whether the navigation mode is enabled.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {boolean}     Is navigation mode enabled.
+ */
+export function isNavigationMode( state ) {
+	return state.isNavigationMode;
 }

@@ -104,9 +104,8 @@ class DependencyExtractionWebpackPlugin {
 
 				// Determine a filename for the `[entrypoint].deps.json` file.
 				const [ filename, query ] = entrypointName.split( '?', 2 );
-				const depsFilename = compilation.getPath(
-					outputFilename.replace( /\.js$/i, '.deps.json' ),
-					{
+				const depsFilename = compilation
+					.getPath( outputFilename, {
 						chunk: entrypoint.getRuntimeChunk(),
 						filename,
 						query,
@@ -114,8 +113,8 @@ class DependencyExtractionWebpackPlugin {
 						contentHash: createHash( 'md4' )
 							.update( depsString )
 							.digest( 'hex' ),
-					}
-				);
+					} )
+					.replace( /\.js$/i, '.deps.json' );
 
 				// Add source and file into compilation for webpack to output.
 				compilation.assets[ depsFilename ] = new RawSource( depsString );

@@ -1,0 +1,23 @@
+[
+    {
+        "blockName": "core/cover-image",
+        "attrs": {
+            "url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==",
+            "id": 34
+        },
+        "innerBlocks": [],
+        "innerHTML": "\n<section class=\"wp-block-cover-image has-background-dim\" style=\"background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==)\"><h2><strong>Cover Image</strong></h2></section>\n",
+        "innerContent": [
+            "\n<section class=\"wp-block-cover-image has-background-dim\" style=\"background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==)\"><h2><strong>Cover Image</strong></h2></section>\n"
+        ]
+    },
+    {
+        "blockName": null,
+        "attrs": {},
+        "innerBlocks": [],
+        "innerHTML": "\n",
+        "innerContent": [
+            "\n"
+        ]
+    }
+]

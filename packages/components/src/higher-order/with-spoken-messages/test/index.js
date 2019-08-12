@@ -21,7 +21,7 @@ describe( 'withSpokenMessages', () => {
 		render( <DumpComponent /> );
 
 		// Unrendered element.
-		expect( testSpeak ).toBeCalledWith( true );
-		expect( testDebouncedSpeak ).toBeCalledWith( true );
+		expect( testSpeak ).toHaveBeenCalledWith( true );
+		expect( testDebouncedSpeak ).toHaveBeenCalledWith( true );
 	} );
 } );

@@ -22,7 +22,7 @@
 	}
 
 	// Make placeholder text white unless custom colors or outline versions are chosen.
-	&:not(.has-text-color):not(.is-style-outline) .block-editor-rich-text__editable[data-is-placeholder-visible="true"] + .block-editor-rich-text__editable {
+	&:not(.has-text-color):not(.is-style-outline) [data-rich-text-placeholder]::after {
 		color: $white;
 	}
 
@@ -36,86 +36,46 @@
 	}
 
 	// Increase placeholder opacity to meet contrast ratios.
-	.block-editor-rich-text__editable[data-is-placeholder-visible="true"] + .block-editor-rich-text__editable {
+	[data-rich-text-placeholder]::after {
 		opacity: 0.8;
-	}
-
-	// Make placeholder disappear on focus to make focus-state visible.
-	.block-editor-rich-text__editable[data-is-placeholder-visible="true"]:focus + .block-editor-rich-text__editable {
-		opacity: 0;
-	}
-
-	// Align cursor to left when placeholder is active.
-	.block-editor-rich-text__editable[data-is-placeholder-visible="true"] {
-		text-align: left;
-	}
-
-	// Don't let the placeholder text wrap in the variation preview.
-	.block-editor-block-preview__content & {
-		max-width: 100%;
-
-		// Polish the empty placeholder text for the button in variation previews.
-		.block-editor-rich-text__editable[data-is-placeholder-visible="true"] {
-			height: auto;
-		}
-
-		.wp-block-button__link {
-			max-width: 100%;
-			overflow: hidden;
-			// Override is allowed here only because the rich text instance in
-			// a preview is not editable.
-			// To do: use the `save` function to preview a block transform, not
-			// the `edit` function.
-			white-space: nowrap !important;
-			text-overflow: ellipsis;
-		}
 	}
 }
 
-.block-library-button__inline-link {
-	background: $white;
-	display: flex;
-	flex-wrap: wrap;
-	align-items: center;
-	font-family: $default-font;
-	font-size: $default-font-size;
-	line-height: $default-line-height;
+.wp-block-button__inline-link {
+	color: $dark-gray-500;
+	height: 0;
+	overflow: hidden;
+	max-width: 290px;
 
-	// The width of input box plus padding plus two icon buttons.
-	$blocks-button__link-input-width: 300px + 2px + 2 * $icon-button-size;
-	width: $blocks-button__link-input-width;
-
-	// Move it down by 2px so that it doesn't overlap the button focus outline.
-	margin-top: 2px;
-
-	.block-editor-url-input {
-		width: auto;
+	&-input__suggestions {
+		max-width: 290px;
 	}
 
-	.block-editor-url-input__suggestions {
-		width: $blocks-button__link-input-width - $icon-button-size - $icon-button-size;
-		z-index: z-index(".block-library-button__inline-link .block-editor-url-input__suggestions");
+	@media (min-width: #{ ($break-medium) }) {
+		max-width: 260px;
+
+		&-input__suggestions {
+			max-width: 260px;
+		}
+
+	}
+	@media (min-width: #{ ($break-large) }) {
+		max-width: 290px;
+
+		&-input__suggestions {
+			max-width: 290px;
+		}
+
 	}
 
-	> .dashicon {
-		width: $icon-button-size;
+	.is-selected &,
+	.is-typing & {
+		height: auto;
+		overflow: visible;
+		margin-top: $grid-size-large;
 	}
+}
 
-	.dashicon {
-		color: $dark-gray-100;
-	}
-
-	.block-editor-url-input input[type="text"]::placeholder {
-		color: $dark-gray-100;
-	}
-
-	[data-align="center"] & {
-		margin-left: auto;
-		margin-right: auto;
-	}
-
-	[data-align="right"] & {
-		margin-left: auto;
-		margin-right: 0;
-	}
+.wp-block-button-wrapper {
+	display: table;
 }

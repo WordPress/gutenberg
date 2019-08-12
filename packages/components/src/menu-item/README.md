@@ -32,8 +32,6 @@ MenuItem supports the following props. Any additional props are passed through t
 
 Element to render as child of button.
 
-Element
-
 ### `info`
 
 - Type: `string`
@@ -49,6 +47,13 @@ Refer to documentation for [`label`](#label).
 - Required: No
 
 Refer to documentation for [IconButton's `icon` prop](/packages/components/src/icon-button/README.md#icon).
+
+### `isSelected`
+
+- Type: `boolean`
+- Required: No
+
+Whether or not the menu item is currently selected.
 
 ### `shortcut`
 

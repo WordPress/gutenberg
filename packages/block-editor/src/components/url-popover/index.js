@@ -4,9 +4,15 @@
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import {
-	Popover,
 	IconButton,
+	Popover,
 } from '@wordpress/components';
+
+/**
+ * Internal dependencies
+ */
+import LinkViewer from './link-viewer';
+import LinkEditor from './link-editor';
 
 class URLPopover extends Component {
 	constructor() {
@@ -27,6 +33,7 @@ class URLPopover extends Component {
 
 	render() {
 		const {
+			additionalControls,
 			children,
 			renderSettings,
 			position = 'bottom center',
@@ -47,27 +54,40 @@ class URLPopover extends Component {
 				position={ position }
 				{ ...popoverProps }
 			>
-				<div className="editor-url-popover__row block-editor-url-popover__row">
-					{ children }
-					{ !! renderSettings && (
-						<IconButton
-							className="editor-url-popover__settings-toggle block-editor-url-popover__settings-toggle"
-							icon="arrow-down-alt2"
-							label={ __( 'Link Settings' ) }
-							onClick={ this.toggleSettingsVisibility }
-							aria-expanded={ isSettingsExpanded }
-						/>
+				<div className="block-editor-url-popover__input-container">
+					<div className="editor-url-popover__row block-editor-url-popover__row">
+						{ children }
+						{ !! renderSettings && (
+							<IconButton
+								className="editor-url-popover__settings-toggle block-editor-url-popover__settings-toggle"
+								icon="arrow-down-alt2"
+								label={ __( 'Link Settings' ) }
+								onClick={ this.toggleSettingsVisibility }
+								aria-expanded={ isSettingsExpanded }
+							/>
+						) }
+					</div>
+					{ showSettings && (
+						<div className="editor-url-popover__row block-editor-url-popover__row editor-url-popover__settings block-editor-url-popover__settings">
+							{ renderSettings() }
+						</div>
 					) }
 				</div>
-				{ showSettings && (
-					<div className="editor-url-popover__row block-editor-url-popover__row editor-url-popover__settings block-editor-url-popover__settings">
-						{ renderSettings() }
+				{ additionalControls && ! showSettings && (
+					<div
+						className="block-editor-url-popover__additional-controls"
+					>
+						{ additionalControls }
 					</div>
 				) }
 			</Popover>
 		);
 	}
 }
+
+URLPopover.LinkEditor = LinkEditor;
+
+URLPopover.LinkViewer = LinkViewer;
 
 /**
  * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/url-popover/README.md

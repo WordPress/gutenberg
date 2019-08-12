@@ -108,6 +108,22 @@ export function setUnregisteredFallbackBlockName( name ) {
 }
 
 /**
+ * Returns an action object used to set the name of the block used
+ * when grouping other blocks
+ * eg: in "Group/Ungroup" interactions
+ *
+ * @param {string} name Block name.
+ *
+ * @return {Object} Action object.
+ */
+export function setGroupingBlockName( name ) {
+	return {
+		type: 'SET_GROUPING_BLOCK_NAME',
+		name,
+	};
+}
+
+/**
  * Returns an action object used to set block categories.
  *
  * @param {Object[]} categories Block categories.

@@ -29,6 +29,35 @@ Array [
 ]
 `;
 
+exports[`Webpack \`function-output-filename\` should produce expected output: Dependencies JSON should match snapshot 1`] = `
+Array [
+  "lodash",
+  "wp-blob",
+]
+`;
+
+exports[`Webpack \`function-output-filename\` should produce expected output: External modules should match snapshot 1`] = `
+Array [
+  Object {
+    "externalType": "this",
+    "request": Object {
+      "this": Array [
+        "wp",
+        "blob",
+      ],
+    },
+    "userRequest": "@wordpress/blob",
+  },
+  Object {
+    "externalType": "this",
+    "request": Object {
+      "this": "lodash",
+    },
+    "userRequest": "lodash",
+  },
+]
+`;
+
 exports[`Webpack \`no-default\` should produce expected output: Dependencies JSON should match snapshot 1`] = `Array []`;
 
 exports[`Webpack \`no-default\` should produce expected output: External modules should match snapshot 1`] = `Array []`;

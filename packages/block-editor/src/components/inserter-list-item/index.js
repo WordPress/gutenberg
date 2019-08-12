@@ -43,7 +43,6 @@ function InserterListItem( {
 					onClick();
 				} }
 				disabled={ isDisabled }
-				aria-label={ title } // Fix for IE11 and JAWS 2018.
 				{ ...props }
 			>
 				<span

@@ -35,6 +35,8 @@ export {
 	getUnregisteredTypeHandlerName,
 	setDefaultBlockName,
 	getDefaultBlockName,
+	setGroupingBlockName,
+	getGroupingBlockName,
 	getBlockType,
 	getBlockTypes,
 	getBlockSupport,

@@ -1,4 +1,7 @@
-const getTagsByName = ( tags, ...names ) => tags.filter( ( tag ) => names.some( ( name ) => name === tag.title ) );
+/**
+ * Internal dependencies
+ */
+const getSymbolTagsByName = require( '../get-symbol-tags-by-name' );
 
 const cleanSpaces = ( paragraph ) =>
 	paragraph ?
@@ -57,7 +60,7 @@ const getSymbolHeading = ( text ) => {
 };
 
 module.exports = function( rootDir, docPath, symbols, headingTitle, headingStartIndex ) {
-	const docs = [ ];
+	const docs = [];
 	let headingIndex = headingStartIndex || 1;
 	if ( headingTitle ) {
 		docs.push( getHeading( headingIndex, `${ headingTitle }` ) );
@@ -79,30 +82,30 @@ module.exports = function( rootDir, docPath, symbols, headingTitle, headingStart
 	if ( symbols && symbols.length > 0 ) {
 		symbols.forEach( ( symbol ) => {
 			docs.push( getSymbolHeading( symbol.name ) );
-			formatDeprecated( getTagsByName( symbol.tags, 'deprecated' ), docs );
+			formatDeprecated( getSymbolTagsByName( symbol, 'deprecated' ), docs );
 			formatDescription( symbol.description, docs );
 			formatTag(
 				'Related',
-				getTagsByName( symbol.tags, 'see', 'link' ),
+				getSymbolTagsByName( symbol, 'see', 'link' ),
 				( tag ) => `\n- ${ tag.description }`,
 				docs
 			);
-			formatExamples( getTagsByName( symbol.tags, 'example' ), docs );
+			formatExamples( getSymbolTagsByName( symbol, 'example' ), docs );
 			formatTag(
 				'Type',
-				getTagsByName( symbol.tags, 'type' ),
+				getSymbolTagsByName( symbol, 'type' ),
 				( tag ) => `\n- \`${ tag.type }\` ${ cleanSpaces( tag.description ) }`,
 				docs
 			);
 			formatTag(
 				'Parameters',
-				getTagsByName( symbol.tags, 'param' ),
+				getSymbolTagsByName( symbol, 'param' ),
 				( tag ) => `\n- *${ tag.name }* \`${ tag.type }\`: ${ cleanSpaces( tag.description ) }`,
 				docs
 			);
 			formatTag(
 				'Returns',
-				getTagsByName( symbol.tags, 'return' ),
+				getSymbolTagsByName( symbol, 'return' ),
 				( tag ) => `\n- \`${ tag.type }\`: ${ cleanSpaces( tag.description ) }`,
 				docs
 			);

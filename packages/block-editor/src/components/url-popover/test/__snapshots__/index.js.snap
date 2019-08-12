@@ -4,22 +4,25 @@ exports[`URLPopover matches the snapshot in its default state 1`] = `
 <Popover
   className="editor-url-popover block-editor-url-popover"
   focusOnMount="firstElement"
-  noArrow={false}
   position="bottom center"
 >
   <div
-    className="editor-url-popover__row block-editor-url-popover__row"
+    className="block-editor-url-popover__input-container"
   >
-    <div>
-      Editor
+    <div
+      className="editor-url-popover__row block-editor-url-popover__row"
+    >
+      <div>
+        Editor
+      </div>
+      <ForwardRef(IconButton)
+        aria-expanded={false}
+        className="editor-url-popover__settings-toggle block-editor-url-popover__settings-toggle"
+        icon="arrow-down-alt2"
+        label="Link Settings"
+        onClick={[Function]}
+      />
     </div>
-    <ForwardRef(IconButton)
-      aria-expanded={false}
-      className="editor-url-popover__settings-toggle block-editor-url-popover__settings-toggle"
-      icon="arrow-down-alt2"
-      label="Link Settings"
-      onClick={[Function]}
-    />
   </div>
 </Popover>
 `;
@@ -28,28 +31,31 @@ exports[`URLPopover matches the snapshot when the settings are toggled open 1`] 
 <Popover
   className="editor-url-popover block-editor-url-popover"
   focusOnMount="firstElement"
-  noArrow={false}
   position="bottom center"
 >
   <div
-    className="editor-url-popover__row block-editor-url-popover__row"
+    className="block-editor-url-popover__input-container"
   >
-    <div>
-      Editor
+    <div
+      className="editor-url-popover__row block-editor-url-popover__row"
+    >
+      <div>
+        Editor
+      </div>
+      <ForwardRef(IconButton)
+        aria-expanded={true}
+        className="editor-url-popover__settings-toggle block-editor-url-popover__settings-toggle"
+        icon="arrow-down-alt2"
+        label="Link Settings"
+        onClick={[Function]}
+      />
     </div>
-    <ForwardRef(IconButton)
-      aria-expanded={true}
-      className="editor-url-popover__settings-toggle block-editor-url-popover__settings-toggle"
-      icon="arrow-down-alt2"
-      label="Link Settings"
-      onClick={[Function]}
-    />
-  </div>
-  <div
-    className="editor-url-popover__row block-editor-url-popover__row editor-url-popover__settings block-editor-url-popover__settings"
-  >
-    <div>
-      Settings
+    <div
+      className="editor-url-popover__row block-editor-url-popover__row editor-url-popover__settings block-editor-url-popover__settings"
+    >
+      <div>
+        Settings
+      </div>
     </div>
   </div>
 </Popover>
@@ -59,14 +65,17 @@ exports[`URLPopover matches the snapshot when there are no settings 1`] = `
 <Popover
   className="editor-url-popover block-editor-url-popover"
   focusOnMount="firstElement"
-  noArrow={false}
   position="bottom center"
 >
   <div
-    className="editor-url-popover__row block-editor-url-popover__row"
+    className="block-editor-url-popover__input-container"
   >
-    <div>
-      Editor
+    <div
+      className="editor-url-popover__row block-editor-url-popover__row"
+    >
+      <div>
+        Editor
+      </div>
     </div>
   </div>
 </Popover>
