@@ -89,7 +89,7 @@ export default compose(
 										label: __( 'Retry' ),
 										onClick: () => {
 											removeNotice( INSTALL_ERROR_NOTICE_ID );
-											installBlock( item.id, noop, onInstallBlockError );
+											installBlock( item, noop, onInstallBlockError );
 										},
 									},
 									{
@@ -105,7 +105,7 @@ export default compose(
 						);
 					};
 
-					installBlock( item.id, noop, onInstallBlockError );
+					installBlock( item, noop, onInstallBlockError );
 				};
 
 				downloadBlock( item, onSuccess, onDownloadError );

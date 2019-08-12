@@ -11,7 +11,13 @@ import { combineReducers } from '@wordpress/data';
  *
  * @return {Object} Updated state.
  */
-export const discoverBlocks = ( state = { results: {}, hasPermission: undefined, filterValue: undefined, isRequestingDownloadableBlocks: true }, action ) => {
+export const discoverBlocks = ( state = {
+	results: {},
+	hasPermission: undefined,
+	filterValue: undefined,
+	isRequestingDownloadableBlocks: true,
+	installedBlockTypes: [],
+}, action ) => {
 	switch ( action.type ) {
 		case 'FETCH_DISCOVER_BLOCKS' :
 			return {
@@ -33,6 +39,17 @@ export const discoverBlocks = ( state = { results: {}, hasPermission: undefined,
 				items: action.hasPermission ? state.items : [],
 				hasPermission: action.hasPermission,
 				isRequestingDownloadableBlocks: false,
+			};
+		case 'ADD_INSTALLED_BLOCK_TYPE' :
+			return {
+				...state,
+				installedBlockTypes: [ ...state.installedBlockTypes, action.item ],
+			};
+
+		case 'REMOVE_INSTALLED_BLOCK_TYPE' :
+			return {
+				...state,
+				installedBlockTypes: state.installedBlockTypes.filter( ( blockType ) => blockType.name === action.item.name ),
 			};
 	}
 	return state;

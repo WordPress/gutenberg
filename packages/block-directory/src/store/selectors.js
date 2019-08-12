@@ -50,3 +50,14 @@ export function hasInstallBlocksPermission( state ) {
 export function getIsDownloadableBlocksEnabled( state ) {
 	return get( state, [ 'settings', '__experimentalIsDownloadableBlocksEnabled' ], false );
 }
+
+/**
+ * Returns the block types that have been installed on the server.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Array} Block type items.
+ */
+export function getInstalledBlockTypes( state ) {
+	return get( state, [ 'discoverBlocks', 'installedBlockTypes' ], [] );
+}

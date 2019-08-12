@@ -56,6 +56,18 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 				'schema' => array( $this, 'get_item_schema' ),
 			)
 		);
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/uninstall',
+			array(
+				array(
+					'methods'             => WP_REST_Server::DELETABLE,
+					'callback'            => array( $this, 'uninstall_block' ),
+					'permission_callback' => array( $this, 'get_items_permissions_check' ),
+				),
+				'schema' => array( $this, 'get_item_schema' ),
+			)
+		);
 	}
 
 	/**
@@ -78,7 +90,7 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Install and activate a plugin
+	 * Installs and activates a plugin
 	 *
 	 * @since 5.7.0
 	 *
@@ -105,7 +117,6 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 		if ( is_wp_error( $api ) ) {
 			return WP_Error( $api->get_error_code(), $api->get_error_message() );
 		}
-		$status['pluginName'] = $api->name;
 
 		$skin     = new WP_Ajax_Upgrader_Skin();
 		$upgrader = new Plugin_Upgrader( $skin );
@@ -119,7 +130,7 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 		$result   = $upgrader->install( $api->download_link );
 
 		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-			$status['debug'] = $skin->get_upgrade_messages();
+			$status[ 'debug' ] = $skin->get_upgrade_messages();
 		}
 
 		if ( is_wp_error( $result ) ) {
@@ -148,6 +159,44 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 		activate_plugin( $install_status['file'] );
 
 		return rest_ensure_response( $status );
+	}
+
+	/**
+	 * Deactivates and deletes a plugin
+	 *
+	 * @since 5.7.0
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return WP_Error|WP_REST_Response Response object on success, or WP_Error object on failure.
+	 */
+	public function uninstall_block( $request ) {
+
+		include_once( ABSPATH . 'wp-admin/includes/file.php' );
+		include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+		include_once( ABSPATH . 'wp-admin/includes/class-wp-upgrader.php' );
+		include_once( ABSPATH . 'wp-admin/includes/plugin-install.php' );
+
+		$api = plugins_api(
+			'plugin_information',
+			array(
+				'slug'   => $request->get_param( 'slug' ),
+				'fields' => array(
+					'sections' => false,
+				),
+			)
+		);
+
+		if ( is_wp_error( $api ) ) {
+			return WP_Error( $api->get_error_code(), $api->get_error_message() );
+		}
+
+		$install_status = install_plugin_install_status( $api );
+
+		deactivate_plugins( $install_status['file'] );
+
+		delete_plugins( array( $install_status['file'] ) );
+
+		return rest_ensure_response( $api );
 	}
 
 	/**
