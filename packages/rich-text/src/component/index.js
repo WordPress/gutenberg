@@ -888,6 +888,7 @@ class RichText extends Component {
 			__unstableOnReplace: onReplace,
 			allowedFormats,
 			withoutInteractiveFormatting,
+			tabIndex,
 		} = this.props;
 
 		// Generating a key that includes `tagName` ensures that if the tag
@@ -904,6 +905,7 @@ class RichText extends Component {
 					style={ style }
 					record={ record }
 					valueToEditableHTML={ this.valueToEditableHTML }
+					tabIndex={ tabIndex }
 					aria-label={ placeholder }
 					aria-autocomplete={ listBoxId ? 'list' : undefined }
 					aria-owns={ listBoxId }

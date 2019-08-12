@@ -265,7 +265,6 @@ export class TableEdit extends Component {
 		const { attributes, setAttributes } = this.props;
 		const { sectionName, rowIndex } = selectedCell;
 
-		this.setState( { selectedCell: null } );
 		setAttributes( insertRow( attributes, {
 			sectionName,
 			rowIndex: rowIndex + delta,
@@ -299,7 +298,6 @@ export class TableEdit extends Component {
 		const { attributes, setAttributes } = this.props;
 		const { sectionName, rowIndex } = selectedCell;
 
-		this.setState( { selectedCell: null } );
 		setAttributes( deleteRow( attributes, { sectionName, rowIndex } ) );
 	}
 
@@ -318,7 +316,6 @@ export class TableEdit extends Component {
 		const { attributes, setAttributes } = this.props;
 		const { columnIndex } = selectedCell;
 
-		this.setState( { selectedCell: null } );
 		setAttributes( insertColumn( attributes, {
 			columnIndex: columnIndex + delta,
 		} ) );
@@ -351,7 +348,6 @@ export class TableEdit extends Component {
 		const { attributes, setAttributes } = this.props;
 		const { sectionName, columnIndex } = selectedCell;
 
-		this.setState( { selectedCell: null } );
 		setAttributes( deleteColumn( attributes, { sectionName, columnIndex } ) );
 	}
 
@@ -469,6 +465,7 @@ export class TableEdit extends Component {
 								>
 									<RichText
 										className={ richTextClassName }
+										tabIndex={ isSelected ? 0 : -1 }
 										value={ content }
 										onChange={ this.onChange }
 										unstableOnFocus={ () => this.updateSelectedCell( cellLocation ) }
@@ -480,15 +477,6 @@ export class TableEdit extends Component {
 				) ) }
 			</Tag>
 		);
-	}
-
-	componentDidUpdate() {
-		const { isSelected } = this.props;
-		const { selectedCell } = this.state;
-
-		if ( ! isSelected && selectedCell ) {
-			this.setState( { selectedCell: null } );
-		}
 	}
 
 	render() {
