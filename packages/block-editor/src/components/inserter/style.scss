@@ -161,6 +161,7 @@ $block-inserter-search-height: 38px;
 		padding-bottom: 20px;
 		margin-bottom: 10px;
 		border-bottom: $border-width solid $light-gray-500;
+		@include edit-post__fade-in-animation();
 	}
 }
 
@@ -172,6 +173,7 @@ $block-inserter-search-height: 38px;
 	display: flex;
 	height: 100%;
 	flex-direction: column;
+	@include edit-post__fade-in-animation();
 
 	.block-editor-inserter__menu-help-panel-no-block-text {
 		flex-grow: 1;
