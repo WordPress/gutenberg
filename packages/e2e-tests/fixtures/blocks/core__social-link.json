@@ -1,0 +1,13 @@
+[
+    {
+        "clientId": "_clientId_0",
+        "name": "core/social-link",
+        "isValid": true,
+        "attributes": {
+            "url": "https://mastodon.social/marcuskaz",
+            "icon": "mastodon"
+        },
+        "innerBlocks": [],
+        "originalContent": "<span class=\"wp-block-social-link\"><a href=\"https://mastodon.social/marcuskaz\"><span class=\"wp-social-icon wp-social-icon-mastodon\"></span></a></span>"
+    }
+]

@@ -1,0 +1,23 @@
+[
+    {
+        "blockName": "core/social-link",
+        "attrs": {
+            "url": "https://mastodon.social/marcuskaz",
+            "icon": "mastodon"
+        },
+        "innerBlocks": [],
+        "innerHTML": "\n<span class=\"wp-block-social-link\"><a href=\"https://mastodon.social/marcuskaz\"><span class=\"wp-social-icon wp-social-icon-mastodon\"></span></a></span>\n",
+        "innerContent": [
+            "\n<span class=\"wp-block-social-link\"><a href=\"https://mastodon.social/marcuskaz\"><span class=\"wp-social-icon wp-social-icon-mastodon\"></span></a></span>\n"
+        ]
+    },
+    {
+        "blockName": null,
+        "attrs": {},
+        "innerBlocks": [],
+        "innerHTML": "\n",
+        "innerContent": [
+            "\n"
+        ]
+    }
+]
