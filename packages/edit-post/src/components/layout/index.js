@@ -128,7 +128,7 @@ function Layout( {
 					}
 				</>
 			) }
-			<Popover.Slot />
+			<Popover.Slot className="edit-post-popover-slot" />
 			<PluginArea />
 		</FocusReturnProvider>
 	);

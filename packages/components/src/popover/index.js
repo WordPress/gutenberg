@@ -448,6 +448,6 @@ const Popover = ( {
 
 const PopoverContainer = Popover;
 
-PopoverContainer.Slot = () => <Slot bubblesVirtually name={ SLOT_NAME } />;
+PopoverContainer.Slot = ( { className } ) => <Slot className={ className } bubblesVirtually name={ SLOT_NAME } />;
 
 export default PopoverContainer;

@@ -43,7 +43,7 @@
 
 // Quick shortcuts, left and right.
 .block-editor-block-list__empty-block-inserter, // Empty paragraph
-.block-editor-default-block-appender .block-editor-inserter, // Empty appender
+.block-editor-block-list__layout .wp-block.block-editor-default-block-appender .block-editor-inserter, // Empty appender
 .block-editor-inserter-with-shortcuts { // Right side quick shortcuts
 	position: absolute;
 	top: 0;

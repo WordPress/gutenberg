@@ -97,7 +97,7 @@ describe( 'Publishing', () => {
 			} );
 
 			afterEach( async () => {
-				await setBrowserViewport( 'large' );
+				await setBrowserViewport( 'wide' );
 				if ( werePrePublishChecksEnabled ) {
 					await enablePrePublishChecks();
 				}

@@ -32,7 +32,7 @@ function Layout( { blockEditorSettings } ) {
 					blockEditorSettings={ blockEditorSettings }
 				/>
 			</div>
-			<Popover.Slot />
+			<Popover.Slot className="edit-widgets-popover-slot" />
 		</SlotFillProvider>
 	);
 }

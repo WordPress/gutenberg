@@ -105,7 +105,6 @@
 	}
 
 	@include break-medium {
-		position: relative;
 
 		.block-editor-block-switcher__preview {
 			border-left: $border-width solid $light-gray-500;

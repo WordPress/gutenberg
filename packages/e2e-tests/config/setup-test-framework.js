@@ -46,7 +46,7 @@ jest.setTimeout( PUPPETEER_TIMEOUT || 100000 );
 
 async function setupBrowser() {
 	await clearLocalStorage();
-	await setBrowserViewport( 'large' );
+	await setBrowserViewport( 'wide' );
 }
 
 /**

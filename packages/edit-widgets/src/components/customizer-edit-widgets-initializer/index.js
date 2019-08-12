@@ -26,7 +26,7 @@ function CustomizerEditWidgetsInitializer( { settings } ) {
 			>
 				<WidgetAreas blockEditorSettings={ settings } />
 			</div>
-			<Popover.Slot />
+			<Popover.Slot className="edit-widgets-popover-slot" />
 		</SlotFillProvider>
 	);
 }

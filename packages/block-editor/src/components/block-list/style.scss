@@ -47,7 +47,9 @@
 	}
 
 	// Don't add side padding for nested blocks.
-	.block-editor-block-list__block & {
+	// When the previous breakpoint is converted into an element query its specificity increases.
+	// We need hight specificity selector to make sure the rule applies
+	.block-editor-block-list__block.block-editor-block-list__block.block-editor-block-list__block.block-editor-block-list__block & {
 		// Compensate for side UI.
 		padding-left: 0;
 		padding-right: 0;

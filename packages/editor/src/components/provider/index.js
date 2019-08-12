@@ -11,7 +11,11 @@ import { compose } from '@wordpress/compose';
 import { Component } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { BlockEditorProvider, transformStyles } from '@wordpress/block-editor';
+import {
+	BlockEditorProvider,
+	transformMediaQueries,
+	transformStyles,
+} from '@wordpress/block-editor';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -116,6 +120,17 @@ class EditorProvider extends Component {
 			return;
 		}
 
+		// Todo: The partial paths should be a setting that includes styles added by the plugins.
+		transformMediaQueries( [
+			'.editor-styles-wrapper',
+			'.edit-post-popover-slot',
+		], [
+			'block-editor/style.css',
+			'block-library/style.css',
+			'block-library/theme.css',
+			'block-library/editor.css',
+			'format-library/style.css',
+		] );
 		const updatedStyles = transformStyles( this.props.settings.styles, '.editor-styles-wrapper' );
 
 		map( updatedStyles, ( updatedCSS ) => {

@@ -8,7 +8,7 @@ import {
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Post visibility', () => {
-	[ 'large', 'small' ].forEach( ( viewport ) => {
+	[ 'wide', 'large', 'small' ].forEach( ( viewport ) => {
 		it( `can be changed when the viewport is ${ viewport }`, async () => {
 			await setBrowserViewport( viewport );
 

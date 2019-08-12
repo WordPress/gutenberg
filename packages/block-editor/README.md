@@ -407,6 +407,16 @@ _Type_
 
 -   `Object` 
 
+<a name="transformMediaQueries" href="#transformMediaQueries">#</a> **transformMediaQueries**
+
+Applies a series of CSS rule transforms to convert simple media queries into element queries handled by css-element-queries package.
+Initializes css-element-queries mechanism.
+
+_Parameters_
+
+-   _elementQuerySelectors_ `Array`: CSS selector whose element query dimensions will depend on.
+-   _partialPaths_ `Array`: CSS rules.
+
 <a name="transformStyles" href="#transformStyles">#</a> **transformStyles**
 
 Applies a series of CSS rule transforms to wrap selectors inside a given class and/or rewrite URLs depending on the parameters passed.

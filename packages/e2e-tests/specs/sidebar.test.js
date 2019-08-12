@@ -20,7 +20,7 @@ describe( 'Sidebar', () => {
 	} );
 
 	it( 'should have sidebar visible at the start with document sidebar active on desktop', async () => {
-		await setBrowserViewport( 'large' );
+		await setBrowserViewport( 'wide' );
 		await createNewPost();
 		const { nodesCount, content, height, width } = await page.$$eval( ACTIVE_SIDEBAR_TAB_SELECTOR, ( nodes ) => {
 			const firstNode = nodes[ 0 ];
@@ -51,7 +51,7 @@ describe( 'Sidebar', () => {
 	} );
 
 	it( 'should close the sidebar when resizing from desktop to mobile', async () => {
-		await setBrowserViewport( 'large' );
+		await setBrowserViewport( 'wide' );
 		await createNewPost();
 
 		const sidebars = await page.$$( SIDEBAR_SELECTOR );
@@ -65,14 +65,14 @@ describe( 'Sidebar', () => {
 	} );
 
 	it( 'should reopen sidebar the sidebar when resizing from mobile to desktop if the sidebar was closed automatically', async () => {
-		await setBrowserViewport( 'large' );
+		await setBrowserViewport( 'wide' );
 		await createNewPost();
 		await setBrowserViewport( 'small' );
 
 		const sidebarsMobile = await page.$$( SIDEBAR_SELECTOR );
 		expect( sidebarsMobile ).toHaveLength( 0 );
 
-		await setBrowserViewport( 'large' );
+		await setBrowserViewport( 'wide' );
 
 		const sidebarsDesktop = await page.$$( SIDEBAR_SELECTOR );
 		expect( sidebarsDesktop ).toHaveLength( 1 );
