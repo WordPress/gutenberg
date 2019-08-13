@@ -28,62 +28,6 @@ export function createTable( {
 	};
 }
 
-export function getRow( state, { sectionName, rowIndex } ) {
-	return get( state, [ sectionName, rowIndex ] );
-}
-
-export function getCell( state, { sectionName, rowIndex, columnIndex } ) {
-	return get( state, [ sectionName, rowIndex, 'cells', columnIndex ] );
-}
-
-/**
- * Returns the first row in the table.
- *
- * @param {Object} state Current table state.
- *
- * @return {Object} The first table row.
- */
-export function getFirstRowLocation( state ) {
-	let firstSectionName;
-
-	if ( ! isEmptyTableSection( state.head ) ) {
-		firstSectionName = 'head';
-	} else if ( ! isEmptyTableSection( state.body ) ) {
-		firstSectionName = 'body';
-	} else if ( ! isEmptyTableSection( state.foot ) ) {
-		firstSectionName = 'foot';
-	}
-
-	return {
-		sectionName: firstSectionName,
-		rowIndex: 0,
-	};
-}
-
-/**
- * Returns the first row in the table.
- *
- * @param {Object} state Current table state.
- *
- * @return {Object} The first table row.
- */
-export function getLastRowLocation( state ) {
-	let lastSectionName;
-
-	if ( ! isEmptyTableSection( state.foot ) ) {
-		lastSectionName = 'foot';
-	} else if ( ! isEmptyTableSection( state.body ) ) {
-		lastSectionName = 'body';
-	} else if ( ! isEmptyTableSection( state.head ) ) {
-		lastSectionName = 'head';
-	}
-
-	return {
-		sectionName: lastSectionName,
-		rowIndex: state[ lastSectionName ].length - 1,
-	};
-}
-
 /**
  * Gets an attribute for a cell.
  *
@@ -190,7 +134,7 @@ export function insertRow( state, {
 	rowIndex,
 	columnCount,
 } ) {
-	const firstRow = getRow( state, getFirstRowLocation( state ) );
+	const firstRow = getRow( state, getLocationOfFirstRow( state ) );
 	const cellCount = columnCount === undefined ? get( firstRow, [ 'cells', 'length' ] ) : columnCount;
 
 	// Bail early if the function cannot determine how many cells to add.
@@ -348,16 +292,79 @@ export function isEmptyRow( row ) {
 }
 
 /**
+ * Return the row referenced by the location object.
+ *
+ * @param {Object} state 				   The table state.
+ * @param {Object} rowLocation 			   The row location.
+ * @param {string} rowLocation.sectionName The table section that the row belongs to.
+ * @param {number} rowLocation.rowIndex    The index of the row within the section.
+ *
+ * @return {?Object} The row object.
+ */
+export function getRow( state, { sectionName, rowIndex } ) {
+	return get( state, [ sectionName, rowIndex ] );
+}
+
+/**
+ * Returns the location of the first row in the table.
+ *
+ * @param {Object} state Current table state.
+ *
+ * @return {Object} The location of the first table row.
+ */
+export function getLocationOfFirstRow( state ) {
+	let firstSectionName;
+
+	if ( ! isEmptyTableSection( state.head ) ) {
+		firstSectionName = 'head';
+	} else if ( ! isEmptyTableSection( state.body ) ) {
+		firstSectionName = 'body';
+	} else if ( ! isEmptyTableSection( state.foot ) ) {
+		firstSectionName = 'foot';
+	}
+
+	return {
+		sectionName: firstSectionName,
+		rowIndex: 0,
+	};
+}
+
+/**
+ * Returns the location of the last row in the table.
+ *
+ * @param {Object} state Current table state.
+ *
+ * @return {Object} The location of the last table row.
+ */
+export function getLocationOfLastRow( state ) {
+	let lastSectionName;
+
+	if ( ! isEmptyTableSection( state.foot ) ) {
+		lastSectionName = 'foot';
+	} else if ( ! isEmptyTableSection( state.body ) ) {
+		lastSectionName = 'body';
+	} else if ( ! isEmptyTableSection( state.head ) ) {
+		lastSectionName = 'head';
+	}
+
+	return {
+		sectionName: lastSectionName,
+		rowIndex: state[ lastSectionName ].length - 1,
+	};
+}
+
+/**
  * Returns the location of the cell above.
  *
- * @param {Object} state        The table state.
- * @param {Object} cellLocation The cell location (section, rowIndex, columnIndex).
+ * @param {Object} state        			The table state.
+ * @param {Object} cellLocation 			The cell location.
+ * @param {string} cellLocation.sectionName The table section that the cell belongs to.
+ * @param {number} cellLocation.rowIndex    The row index for the cell within the section.
+ * @param {number} cellLocation.columnIndex The column index for the cell.
  *
- * @return {?Object} The location of the cell above this one or undefined
- *                   if this cell is at the table perimeter.
+ * @return {?Object} The location of the cell above or `undefined` if there isn't one.
  */
-export function getCellAbove( state, cellLocation ) {
-	const { sectionName, rowIndex, columnIndex } = cellLocation;
+export function getLocationOfCellAbove( state, { sectionName, rowIndex, columnIndex } ) {
 	const isFirstRow = rowIndex === 0;
 
 	// This is the first row of the first section, return undefined early.
@@ -365,7 +372,7 @@ export function getCellAbove( state, cellLocation ) {
 		return;
 	}
 
-	// Handle getting the cell from the next section.
+	// Handle getting the last cell from the previous section.
 	if ( isFirstRow ) {
 		const previousSectionName = sectionName === 'foot' ? 'body' : 'head';
 		const previousSection = state[ previousSectionName ];
@@ -390,23 +397,29 @@ export function getCellAbove( state, cellLocation ) {
 		};
 	}
 
-	return {
-		...cellLocation,
-		rowIndex: rowIndex - 1,
-	};
+	const previousRowIndex = rowIndex - 1;
+	const columnCount = get( state, [ sectionName, previousRowIndex, 'cells', 'length' ], 0 );
+	const hasCellAbove = columnIndex < columnCount;
+
+	return hasCellAbove ? {
+		sectionName,
+		columnIndex,
+		rowIndex: previousRowIndex,
+	} : undefined;
 }
 
 /**
  * Returns the location of the cell below.
  *
- * @param {Object} state        The table state.
- * @param {Object} cellLocation The cell location (section, rowIndex, columnIndex).
+ * @param {Object} state        			The table state.
+ * @param {Object} cellLocation 			The cell location.
+ * @param {string} cellLocation.sectionName The table section that the cell belongs to.
+ * @param {number} cellLocation.rowIndex    The row index for the cell within the section.
+ * @param {number} cellLocation.columnIndex The column index for the cell.
  *
- * @return {?Object} The location of the cell below this one or undefined
- *                   if this cell is at the table perimeter.
+ * @return {?Object} The location of the cell below or `undefined` if there isn't one.
  */
-export function getCellBelow( state, cellLocation ) {
-	const { sectionName, rowIndex, columnIndex } = cellLocation;
+export function getLocationOfCellBelow( state, { sectionName, rowIndex, columnIndex } ) {
 	const section = state[ sectionName ];
 	const rowCount = section.length;
 	const isLastRow = rowIndex === rowCount - 1;
@@ -416,7 +429,7 @@ export function getCellBelow( state, cellLocation ) {
 		return;
 	}
 
-	// Handle getting the cell from the next section.
+	// Handle getting the first cell from the next section.
 	if ( isLastRow ) {
 		const nextSectionName = sectionName === 'head' ? 'body' : 'foot';
 		const nextSection = state[ nextSectionName ];
@@ -439,29 +452,36 @@ export function getCellBelow( state, cellLocation ) {
 		};
 	}
 
-	return {
-		...cellLocation,
+	const nextRowIndex = rowIndex + 1;
+	const columnCount = get( state, [ sectionName, nextRowIndex, 'cells', 'length' ], 0 );
+	const hasCellBelow = columnIndex < columnCount;
+
+	return hasCellBelow ? {
+		sectionName,
+		columnIndex,
 		rowIndex: rowIndex + 1,
-	};
+	} : undefined;
 }
 
 /**
  * Returns the location of the cell to the right.
  *
- * @param {Object} state        The table state.
- * @param {Object} cellLocation The cell location (section, rowIndex, columnIndex).
+ * @param {Object} state        			The table state.
+ * @param {Object} cellLocation 			The cell location.
+ * @param {string} cellLocation.sectionName The table section that the cell belongs to.
+ * @param {number} cellLocation.rowIndex    The row index for the cell within the section.
+ * @param {number} cellLocation.columnIndex The column index for the cell.
  *
- * @return {?Object} The location of the cell to the right of this one or undefined
- *                   if this cell is at the table perimeter.
+ * @return {?Object} The location of the cell to the right or `undefined` if there isn't one.
  */
-export function getCellToRight( state, cellLocation ) {
-	const { sectionName, rowIndex, columnIndex } = cellLocation;
+export function getLocationOfCellToRight( state, { sectionName, rowIndex, columnIndex } ) {
 	const section = state[ sectionName ];
 	const columnCount = section[ rowIndex ].cells.length;
 	const hasCellToRight = columnIndex < columnCount - 1;
 
 	return hasCellToRight ? {
-		...cellLocation,
+		sectionName,
+		rowIndex,
 		columnIndex: columnIndex + 1,
 	} : undefined;
 }
@@ -469,12 +489,14 @@ export function getCellToRight( state, cellLocation ) {
 /**
  * Returns the location of the cell to the left.
  *
- * @param {Object} cellLocation The cell location (section, rowIndex, columnIndex).
+ * @param {Object} cellLocation 			The cell location.
+ * @param {string} cellLocation.sectionName The table section that the cell belongs to.
+ * @param {number} cellLocation.rowIndex    The row index for the cell within the section.
+ * @param {number} cellLocation.columnIndex The column index for the cell.
  *
- * @return {?Object} The location of the cell to the left of this one or undefined
- *                   if this cell is at the table perimeter.
+ * @return {?Object} The location of the cell to the left or `undefined` if there isn't one.
  */
-export function getCellToLeft( cellLocation ) {
+export function getLocationOfCellToLeft( cellLocation ) {
 	const { columnIndex } = cellLocation;
 	const hasCellToLeft = columnIndex > 0;
 
@@ -484,49 +506,94 @@ export function getCellToLeft( cellLocation ) {
 	} : undefined;
 }
 
-export function getFirstCellInColumn( state, { columnIndex } ) {
-	const { sectionName, rowIndex } = getFirstRowLocation( state );
+/**
+ * Returns the location of the first cell in the column.
+ *
+ * @param {Object} state        			The table state.
+ * @param {Object} cellLocation 			The cell location.
+ * @param {number} cellLocation.columnIndex The column index for the cell.
+ *
+ * @return {?Object} The location of the first cell in the column or `undefined` if there isn't one.
+ */
+export function getLocationOfFirstCellInColumn( state, { columnIndex } ) {
+	const { sectionName, rowIndex } = getLocationOfFirstRow( state );
+	const columnCount = get( state, [ sectionName, rowIndex, 'cells', 'length' ], 0 );
+	const hasCellAtStartOfColumn = columnIndex < columnCount;
 
-	return {
+	return hasCellAtStartOfColumn ? {
 		sectionName,
 		rowIndex,
 		columnIndex,
-	};
-}
-
-export function getLastCellInColumn( state, { columnIndex } ) {
-	const { sectionName, rowIndex } = getLastRowLocation( state );
-
-	return {
-		sectionName,
-		rowIndex,
-		columnIndex,
-	};
-}
-
-export function getFirstCellInRow( cellLocation ) {
-	const { columnIndex } = cellLocation;
-	const hasCellsToLeft = columnIndex > 0;
-
-	return hasCellsToLeft ? {
-		...cellLocation,
-		columnIndex: 0,
 	} : undefined;
 }
 
-export function getLastCellInRow( state, cellLocation ) {
-	const { sectionName, rowIndex, columnIndex } = cellLocation;
+/**
+ * Returns the location of the last cell in the column.
+ *
+ * @param {Object} state        			The table state.
+ * @param {Object} cellLocation 			The cell location.
+ * @param {number} cellLocation.columnIndex The column index for the cell.
+ *
+ * @return {?Object} The location of the last cell in the column or `undefined` if there isn't one.
+ */
+export function getLocationOfLastCellInColumn( state, { columnIndex } ) {
+	const { sectionName, rowIndex } = getLocationOfLastRow( state );
 	const columnCount = get( state, [ sectionName, rowIndex, 'cells', 'length' ] );
-	const hasCellsToRight = columnIndex < columnCount - 1;
+	const hasCellAtEndOfColumn = !! columnCount && columnIndex < columnCount;
 
-	return hasCellsToRight ? {
-		...cellLocation,
-		columnIndex: columnCount - 1,
+	return hasCellAtEndOfColumn ? {
+		sectionName,
+		rowIndex,
+		columnIndex,
 	} : undefined;
 }
 
-export function getFirstCellInTable( state ) {
-	const { sectionName, rowIndex } = getFirstRowLocation( state );
+/**
+ * Returns the location of the first cell in the row.
+ *
+ * @param {Object} cellLocation 			The cell location.
+ * @param {string} cellLocation.sectionName The table section that the cell belongs to.
+ * @param {number} cellLocation.rowIndex    The row index for the cell within the section.
+ *
+ * @return {?Object} The location of the first cell in the row or `undefined` if there isn't one.
+ */
+export function getLocationOfFirstCellInRow( { sectionName, rowIndex } ) {
+	return {
+		sectionName,
+		rowIndex,
+		columnIndex: 0,
+	};
+}
+
+/**
+ * Returns the location of the last cell in the row.
+ *
+ * @param {Object} state        			The table state.
+ * @param {Object} cellLocation 			The cell location.
+ * @param {string} cellLocation.sectionName The table section that the cell belongs to.
+ * @param {number} cellLocation.rowIndex    The row index for the cell within the section.
+ *
+ * @return {?Object} The location of the last cell in the row or `undefined` if there isn't one.
+ */
+export function getLocationOfLastCellInRow( state, { sectionName, rowIndex } ) {
+	const columnCount = get( state, [ sectionName, rowIndex, 'cells', 'length' ] );
+
+	return {
+		sectionName,
+		rowIndex,
+		columnIndex: columnCount - 1,
+	};
+}
+
+/**
+ * Returns the location of the first cell in the table.
+ *
+ * @param {Object} state The table state.
+ *
+ * @return {Object} The location of the first cell in table.
+ */
+export function getLocationOfFirstCellInTable( state ) {
+	const { sectionName, rowIndex } = getLocationOfFirstRow( state );
 
 	return {
 		sectionName,
@@ -535,8 +602,15 @@ export function getFirstCellInTable( state ) {
 	};
 }
 
-export function getLastCellInTable( state ) {
-	const { sectionName, rowIndex } = getLastRowLocation( state );
+/**
+ * Returns the location of the last cell in the table.
+ *
+ * @param {Object} state The table state.
+ *
+ * @return {Object} The location of the last cell in table.
+ */
+export function getLocationOfLastCellInTable( state ) {
+	const { sectionName, rowIndex } = getLocationOfLastRow( state );
 
 	return {
 		sectionName,

@@ -14,58 +14,58 @@ import { UP, DOWN, LEFT, RIGHT, HOME, END, isKeyboardModifierEvent } from '@word
  * Internal dependencies
  */
 import {
-	getCellAbove,
-	getCellBelow,
-	getCellToLeft,
-	getCellToRight,
-	getFirstCellInColumn,
-	getLastCellInColumn,
-	getFirstCellInRow,
-	getLastCellInRow,
-	getFirstCellInTable,
-	getLastCellInTable,
+	getLocationOfCellAbove,
+	getLocationOfCellBelow,
+	getLocationOfCellToLeft,
+	getLocationOfCellToRight,
+	getLocationOfFirstCellInColumn,
+	getLocationOfLastCellInColumn,
+	getLocationOfFirstCellInRow,
+	getLocationOfLastCellInRow,
+	getLocationOfFirstCellInTable,
+	getLocationOfLastCellInTable,
 } from './state';
 
 function getNextCellLocation( tableState, selectedCell, { isPrimary, isUp, isDown, isLeft, isRight, isHome, isEnd } ) {
 	if ( isUp ) {
 		if ( isPrimary ) {
-			return getFirstCellInColumn( tableState, selectedCell );
+			return getLocationOfFirstCellInColumn( tableState, selectedCell );
 		}
 
-		return getCellAbove( tableState, selectedCell );
+		return getLocationOfCellAbove( tableState, selectedCell );
 	}
 	if ( isDown ) {
 		if ( isPrimary ) {
-			return getLastCellInColumn( tableState, selectedCell );
+			return getLocationOfLastCellInColumn( tableState, selectedCell );
 		}
 
-		return getCellBelow( tableState, selectedCell );
+		return getLocationOfCellBelow( tableState, selectedCell );
 	}
 	if ( isLeft ) {
 		if ( isPrimary ) {
-			return getFirstCellInRow( selectedCell );
+			return getLocationOfFirstCellInRow( selectedCell );
 		}
 
-		return getCellToLeft( selectedCell );
+		return getLocationOfCellToLeft( selectedCell );
 	}
 	if ( isRight ) {
 		if ( isPrimary ) {
-			return getLastCellInRow( tableState, selectedCell );
+			return getLocationOfLastCellInRow( tableState, selectedCell );
 		}
 
-		return getCellToRight( tableState, selectedCell );
+		return getLocationOfCellToRight( tableState, selectedCell );
 	}
 	if ( isHome ) {
 		if ( isPrimary ) {
-			return getFirstCellInTable( tableState );
+			return getLocationOfFirstCellInTable( tableState );
 		}
-		return getFirstCellInRow( selectedCell );
+		return getLocationOfFirstCellInRow( selectedCell );
 	}
 	if ( isEnd ) {
 		if ( isPrimary ) {
-			return getLastCellInTable( tableState );
+			return getLocationOfLastCellInTable( tableState );
 		}
-		return getLastCellInRow( tableState, selectedCell );
+		return getLocationOfLastCellInRow( tableState, selectedCell );
 	}
 }
 
