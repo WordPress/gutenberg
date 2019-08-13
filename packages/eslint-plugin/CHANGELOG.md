@@ -10,6 +10,10 @@
 - New Rule: [`@wordpress/no-unguarded-get-range-at`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/no-unguarded-get-range-at.md)
 - Enable `wp` global by default in the `recommended` config.
 
+### Enhancements
+
+- Remove `@wordpress/dependency-group` and `@wordpress/gutenberg-phase` rules from the `custom` and `recommended` configs and leave them as opt-in features.
+
 ## 2.4.0 (2019-08-05)
 
 ### New Features

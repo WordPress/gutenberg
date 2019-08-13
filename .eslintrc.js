@@ -30,6 +30,8 @@ module.exports = {
 		wp: 'off',
 	},
 	rules: {
+		'@wordpress/dependency-group': 'error',
+		'@wordpress/gutenberg-phase': 'error',
 		'@wordpress/react-no-unsafe-timeout': 'error',
 		'no-restricted-syntax': [
 			'error',
