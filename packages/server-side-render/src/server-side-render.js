@@ -83,33 +83,14 @@ export class ServerSideRender extends Component {
 
 	render() {
 		const response = this.state.response;
-		const { className, onEmptyResponse, onErrorResponse, onNullResponse } = this.props;
+		const { className, EmptyResponsePlaceholder, ErrorResponsePlaceholder, NullResponsePlaceholder } = this.props;
+
 		if ( response === '' ) {
-			return !! onEmptyResponse ? onEmptyResponse( this ) : (
-				<Placeholder
-					className={ className }
-				>
-					{ __( 'Block rendered as empty.' ) }
-				</Placeholder>
-			);
+			return EmptyResponsePlaceholder( this.props, response );
 		} else if ( ! response ) {
-			return !! onNullResponse ? onNullResponse( this ) : (
-				<Placeholder
-					className={ className }
-				>
-					<Spinner />
-				</Placeholder>
-			);
+			return NullResponsePlaceholder( this.props, response );
 		} else if ( response.error ) {
-			// translators: %s: error message describing the problem
-			const errorMessage = sprintf( __( 'Error loading block: %s' ), response.errorMsg );
-			return !! onErrorResponse ? onErrorResponse( this, errorMessage ) : (
-				<Placeholder
-					className={ className }
-				>
-					{ errorMessage }
-				</Placeholder>
-			);
+			return ErrorResponsePlaceholder( this.props, response );
 		}
 
 		return (
@@ -122,5 +103,40 @@ export class ServerSideRender extends Component {
 		);
 	}
 }
+
+ServerSideRender.defaultProps = {
+	EmptyResponsePlaceholder: ( props ) => {
+		const { className } = props;
+		return (
+			<Placeholder
+				className={ className }
+			>
+				{ __( 'Block rendered as empty.' ) }
+			</Placeholder>
+		);
+	},
+	ErrorResponsePlaceholder: ( props, response ) => {
+		// translators: %s: error message describing the problem
+		const errorMessage = sprintf( __( 'Error loading block: %s' ), response.errorMsg );
+		const { className } = props;
+		return (
+			<Placeholder
+				className={ className }
+			>
+				{ errorMessage }
+			</Placeholder>
+		);
+	},
+	NullResponsePlaceholder: ( props ) => {
+		const { className } = props;
+		return (
+			<Placeholder
+				className={ className }
+			>
+				<Spinner />
+			</Placeholder>
+		);
+	},
+};
 
 export default ServerSideRender;
