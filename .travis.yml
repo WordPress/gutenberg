@@ -36,7 +36,7 @@ before_install:
       git clone git://develop.git.wordpress.org/ wordpress
       cd wordpress
 
-      # Install WordPress
+      # Configure WordPress
       npm ci
       npm run env:start
       npm run build:dev
@@ -47,15 +47,17 @@ before_install:
 install:
   - npm ci
   - |
+    if [[ "$COMPOSER" = "true" ]]; then
+      composer --version
+      pwd
+      ls -lah
+      travis_retry composer install
+    fi
+  - |
     if [[ "$WORDPRESS" = "true" ]]; then
       # Add Gutenberg to the WordPress local environment
       export WP_DEVELOP_DIR=./wordpress
       npm run env:config
-    fi
-  - |
-    if [[ "$COMPOSER" = "true" ]]; then
-      composer --version
-      travis_retry composer install
     fi
 
 env: PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
