@@ -41,6 +41,9 @@ env: PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 jobs:
   include:
     - name: Lint
+      before_install:
+        - composer --version
+        - travis_retry composer install
       install:
         - npm ci
       script:

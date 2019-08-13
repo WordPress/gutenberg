@@ -195,7 +195,7 @@
 		"lint": "concurrently \"npm run lint-js\" \"npm run lint-pkg-json\" \"npm run lint-css\" \"npm run lint-types\"",
 		"lint-js": "wp-scripts lint-js",
 		"lint-js:fix": "npm run lint-js -- --fix",
-		"lint-php": "node bin/docker.js run --rm composer run-script lint",
+		"lint-php": "composer run-script lint",
 		"lint-pkg-json": "wp-scripts lint-pkg-json ./packages",
 		"lint-css": "wp-scripts lint-style '**/*.scss'",
 		"lint-css:fix": "npm run lint-css -- --fix",
