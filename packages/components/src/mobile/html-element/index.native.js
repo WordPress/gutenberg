@@ -159,7 +159,8 @@ HTMLElement.serialize = ( props ) => {
 	};
 };
 
-function createElementFilter( type, props, ...children ) {
+function createElementFilter( args ) {
+	const [ type, props, ...children ] = args;
 	if ( HTMLElement.supportsType( type ) ) {
 		const Element = HTMLElement.withTagName( type );
 		return [ Element, props, ...children ];
@@ -168,7 +169,7 @@ function createElementFilter( type, props, ...children ) {
 		return [ Text, {}, children[ 0 ] ];
 	}
 
-	return arguments;
+	return args;
 }
 
 addFilter(

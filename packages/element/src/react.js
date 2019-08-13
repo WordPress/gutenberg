@@ -75,10 +75,11 @@ export { createContext };
  * @return {WPElement} Element.
  */
 export function createElement() {
-	return createReactElement( ...applyFilters(
+	const filteredArguments = applyFilters(
 		'element.createElement',
-		...arguments
-	) );
+		arguments
+	);
+	return createReactElement( ...filteredArguments );
 }
 
 /**
