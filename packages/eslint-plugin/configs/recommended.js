@@ -10,8 +10,28 @@ module.exports = {
 		node: true,
 	},
 	globals: {
-		window: true,
-		document: true,
+		window: 'readonly',
+		document: 'readonly',
 		wp: 'readonly',
 	},
+	overrides: [
+		{
+			files: [
+				'**/@(test|__tests__)/**/*.js',
+				'**/?(*.)test.js',
+			],
+			extends: [
+				require.resolve( './test-unit.js' ),
+			],
+		},
+		{
+			files: [
+				'**/specs/**/*.js',
+				'**/?(*.)spec.js',
+			],
+			extends: [
+				require.resolve( './test-e2e.js' ),
+			],
+		},
+	],
 };

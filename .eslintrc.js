@@ -20,7 +20,6 @@ module.exports = {
 	root: true,
 	extends: [
 		'plugin:@wordpress/eslint-plugin/recommended',
-		'plugin:jest/recommended',
 		'plugin:eslint-comments/recommended',
 	],
 	plugins: [
@@ -126,15 +125,19 @@ module.exports = {
 			],
 		},
 		{
+			files: [
+				'packages/block-serialization-spec-parser/shared-tests.js',
+				'packages/jest*/**/*.js',
+			],
+			extends: [
+				'plugin:@wordpress/eslint-plugin/test-unit',
+			],
+		},
+		{
 			files: [ 'packages/e2e-test*/**/*.js' ],
-			env: {
-				browser: true,
-			},
-			globals: {
-				browser: 'readonly',
-				page: 'readonly',
-				wp: 'readonly',
-			},
+			extends: [
+				'plugin:@wordpress/eslint-plugin/test-e2e',
+			],
 		},
 	],
 };
