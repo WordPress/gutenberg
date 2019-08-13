@@ -24,26 +24,6 @@ import { withStyles } from '../../styles-provider';
 const { Consumer, Provider } = createContext( {} );
 
 class HTMLElementContainer extends Component {
-	renderImage( childProps ) {
-		const { src: uri, ...otherProps } = childProps;
-		const props = {
-			...otherProps,
-			source: {
-				uri,
-			},
-		};
-
-		return (
-			<Image { ...props } />
-		);
-	}
-
-	renderView( childProps ) {
-		return (
-			<View { ...childProps } />
-		);
-	}
-
 	nativeComponent( tagName ) {
 		return tagName === 'img' ? Image : View;
 	}
