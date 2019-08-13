@@ -75,7 +75,7 @@ services.forEach( ( service ) => {
 	if ( index > -1 ) {
 		compose.services[ service ].volumes[ index ] = gutenbergVolume;
 	} else {
-		compose.services[ service ].volumes.append( gutenbergVolume );
+		compose.services[ service ].volumes.push( gutenbergVolume );
 	}
 
 	if ( service === 'wordpress-develop' || service === 'php' ) {
@@ -88,7 +88,7 @@ services.forEach( ( service ) => {
 		if ( testPluginsIndex > -1 ) {
 			compose.services[ service ].volumes[ testPluginsIndex ] = testPluginsVolume;
 		} else {
-			compose.services[ service ].volumes.append( testPluginsVolume );
+			compose.services[ service ].volumes.push( testPluginsVolume );
 		}
 
 		const muPluginsIndex = compose.services[ service ].volumes.findIndex( ( volume ) => {
@@ -100,7 +100,7 @@ services.forEach( ( service ) => {
 		if ( muPluginsIndex > -1 ) {
 			compose.services[ service ].volumes[ muPluginsIndex ] = muPluginsVolume;
 		} else {
-			compose.services[ service ].volumes.append( muPluginsVolume );
+			compose.services[ service ].volumes.push( muPluginsVolume );
 		}
 	}
 } );
