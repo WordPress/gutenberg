@@ -28,6 +28,7 @@ before_install:
     if [[ "$WORDPRESS" = "true" ]]; then
       git clone git://develop.git.wordpress.org/ wordpress
       cd wordpress
+      npm install
       npm run env:start
       npm run env:build
       npm run env:install
