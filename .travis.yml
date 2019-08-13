@@ -39,7 +39,7 @@ before_install:
       # Install WordPress
       npm install
       npm run env:start
-      npm run env:build
+      npm run build:dev
       npm run env:install
       cd ..
 
