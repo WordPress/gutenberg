@@ -51,7 +51,7 @@
 		max-width: 290px;
 	}
 
-	@media (min-width: #{ ($break-medium) }) {
+	@include break-medium() {
 		max-width: 260px;
 
 		&-input__suggestions {
@@ -59,7 +59,7 @@
 		}
 
 	}
-	@media (min-width: #{ ($break-large) }) {
+	@include break-large() {
 		max-width: 290px;
 
 		&-input__suggestions {
