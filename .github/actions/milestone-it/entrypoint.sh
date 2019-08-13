@@ -7,21 +7,21 @@ action=$(jq -r '.action' $GITHUB_EVENT_PATH)
 
 if [ "$action" != 'closed' ]; then
 	echo "Action '$action' not a close action. Aborting."
-	exit 78;
+	exit 0;
 fi
 
 merged=$(jq -r '.pull_request.merged' $GITHUB_EVENT_PATH)
 
 if [ "$merged" != 'true' ]; then
 	echo "Pull request closed without merge. Aborting."
-	exit 78;
+	exit 0;
 fi
 
 base=$(jq -r '.pull_request.base.ref' $GITHUB_EVENT_PATH)
 
 if [ "$base" != 'master' ]; then
 	echo 'Milestones apply only to master merge. Aborting.'
-	exit 78;
+	exit 0;
 fi
 
 # 2. Determine if milestone already exists (don't replace one which has already
@@ -39,7 +39,7 @@ current_milestone=$(
 
 if [ "$current_milestone" != 'null' ]; then
 	echo 'Milestone already applied. Aborting.'
-	exit 78;
+	exit 0;
 fi
 
 # 3. Read current version.
