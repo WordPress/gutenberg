@@ -83,12 +83,12 @@ export class ServerSideRender extends Component {
 
 	render() {
 		const response = this.state.response;
-		const { className, EmptyResponsePlaceholder, ErrorResponsePlaceholder, NullResponsePlaceholder } = this.props;
+		const { className, EmptyResponsePlaceholder, ErrorResponsePlaceholder, LoadingResponsePlaceholder } = this.props;
 
 		if ( response === '' ) {
 			return EmptyResponsePlaceholder( this.props, response );
 		} else if ( ! response ) {
-			return NullResponsePlaceholder( this.props, response );
+			return LoadingResponsePlaceholder( this.props, response );
 		} else if ( response.error ) {
 			return ErrorResponsePlaceholder( this.props, response );
 		}
@@ -127,7 +127,7 @@ ServerSideRender.defaultProps = {
 			</Placeholder>
 		);
 	},
-	NullResponsePlaceholder: ( props ) => {
+	LoadingResponsePlaceholder: ( props ) => {
 		const { className } = props;
 		return (
 			<Placeholder
