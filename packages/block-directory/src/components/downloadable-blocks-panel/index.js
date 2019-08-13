@@ -59,7 +59,7 @@ export default compose( [
 
 		const hasPermission = hasInstallBlocksPermission();
 		const discoverItems = hasPermission ? getDownloadableBlocks( filterValue ) : [];
-		const isLoading = hasPermission ? isRequestingDownloadableBlocks() : false;
+		const isLoading = isRequestingDownloadableBlocks();
 
 		return {
 			discoverItems,
