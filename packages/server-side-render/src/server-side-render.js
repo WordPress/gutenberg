@@ -59,7 +59,7 @@ export class ServerSideRender extends Component {
 		if ( null !== this.state.response ) {
 			this.setState( { response: null } );
 		}
-		const { block, attributes = null, urlQueryArgs = {} } = props;
+		const { block, attributes = null, urlQueryArgs = {}, fetchComplete } = props;
 
 		const path = rendererPath( block, attributes, urlQueryArgs );
 		// Store the latest fetch request so that when we process it, we can
@@ -77,6 +77,9 @@ export class ServerSideRender extends Component {
 						errorMsg: error.message,
 					} } );
 				}
+			} )
+			.finally( () => {
+				fetchComplete( this );
 			} );
 		return fetchRequest;
 	}
@@ -137,6 +140,7 @@ ServerSideRender.defaultProps = {
 			</Placeholder>
 		);
 	},
+	fetchComplete: () => {},
 };
 
 export default ServerSideRender;
