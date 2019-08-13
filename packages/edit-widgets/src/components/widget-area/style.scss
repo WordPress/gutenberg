@@ -17,3 +17,10 @@
 .edit-widgets-main-block-list {
 	padding-top: $block-toolbar-height + 2 * $grid-size;
 }
+
+.edit-widgets-main-block-list > .block-list-appender {
+	padding-top: $panel-padding;
+	// Add a margin equivalent to block side UI so the appender is aligned with the blocks.
+	margin-left: $block-side-ui-width;
+	margin-right: $block-side-ui-width;
+}
