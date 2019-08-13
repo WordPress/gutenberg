@@ -9,9 +9,13 @@ import memize from 'memize';
  */
 import { compose } from '@wordpress/compose';
 import { Component } from '@wordpress/element';
-import { withDispatch, withSelect } from '@wordpress/data';
+import { RegistryProvider, withSelect, withDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { BlockEditorProvider, transformStyles } from '@wordpress/block-editor';
+import {
+	transformStyles,
+	InnerBlocks,
+	BlockEditorProvider,
+} from '@wordpress/block-editor';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -148,10 +152,40 @@ class EditorProvider extends Component {
 			reusableBlocks,
 			resetEditorBlocksWithoutUndoLevel,
 			hasUploadPermissions,
+			topLevelRegistry,
 		} = this.props;
 
 		if ( ! isReady ) {
 			return null;
+		}
+
+		// This indicates that this provider is nested in another.
+		// When this is the case, we want child blocks to sync to
+		// this provider's entity and to the top level's entity, as
+		// inner blocks. The `handles` prop of each provider will
+		// determine which properties, including the actual serialized
+		// content, get synced and persisted, or delegated to a parent provider.
+		if ( topLevelRegistry ) {
+			return (
+				<>
+					{ /* Explicit children components need this provider's entity. */ }
+					{ children }
+					{ /*
+						Inner blocks need the top level registry's block-editor store,
+						but we provide props to sync with this provider's entity. Just
+						like how the block-editor store syncs with the editor store.
+					*/ }
+					<RegistryProvider value={ topLevelRegistry }>
+						<InnerBlocks
+							blocks={ blocks }
+							resetEditorBlocks={ resetEditorBlocks }
+							resetEditorBlocksWithoutUndoLevel={
+								resetEditorBlocksWithoutUndoLevel
+							}
+						/>
+					</RegistryProvider>
+				</>
+			);
 		}
 
 		const editorSettings = this.getBlockEditorSettings(

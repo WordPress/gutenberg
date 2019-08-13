@@ -1,0 +1,9 @@
+{
+	"name": "core/post",
+	"category": "theme",
+	"attributes": {
+		"postId": {
+			"type": "number"
+		}
+	}
+}

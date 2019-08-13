@@ -44,7 +44,8 @@ class InnerBlocks extends Component {
 	}
 
 	componentDidMount() {
-		const { innerBlocks } = this.props.block;
+		const { block, blocks, replaceInnerBlocks } = this.props;
+		const { innerBlocks } = block;
 		// only synchronize innerBlocks with template if innerBlocks are empty or a locking all exists
 		if ( innerBlocks.length === 0 || this.getTemplateLock() === 'all' ) {
 			this.synchronizeBlocksWithTemplate();
@@ -55,10 +56,23 @@ class InnerBlocks extends Component {
 				templateInProcess: false,
 			} );
 		}
+
+		// Set controlled blocks value from parent, if any.
+		if ( blocks ) {
+			replaceInnerBlocks( blocks );
+		}
 	}
 
 	componentDidUpdate( prevProps ) {
-		const { template, block } = this.props;
+		const {
+			block,
+			template,
+			isLastBlockChangePersistent,
+			resetEditorBlocks,
+			resetEditorBlocksWithoutUndoLevel,
+			blocks,
+			replaceInnerBlocks,
+		} = this.props;
 		const { innerBlocks } = block;
 
 		this.updateNestedSettings();
@@ -68,6 +82,28 @@ class InnerBlocks extends Component {
 			if ( hasTemplateChanged ) {
 				this.synchronizeBlocksWithTemplate();
 			}
+		}
+
+		// Sync with controlled blocks value from parent, if possible.
+		if (
+			resetEditorBlocks &&
+			resetEditorBlocksWithoutUndoLevel &&
+			prevProps.block.innerBlocks !== innerBlocks
+		) {
+			this.isSyncingBlocks = innerBlocks;
+			if ( isLastBlockChangePersistent ) {
+				resetEditorBlocks( innerBlocks );
+			} else {
+				resetEditorBlocksWithoutUndoLevel( innerBlocks );
+			}
+		}
+
+		// Accept changes to controlled blocks value from parent after a sync, if any.
+		if ( this.isSyncingBlocks === blocks ) {
+			this.isSyncingBlocks = null;
+		} else if ( prevProps.blocks !== blocks ) {
+			this.isSyncingBlocks = null;
+			replaceInnerBlocks( blocks );
 		}
 	}
 
@@ -151,6 +187,7 @@ InnerBlocks = compose( [
 			getBlockListSettings,
 			getBlockRootClientId,
 			getTemplateLock,
+			isLastBlockChangePersistent,
 		} = select( 'core/block-editor' );
 		const { clientId } = ownProps;
 		const block = getBlock( clientId );
@@ -161,6 +198,7 @@ InnerBlocks = compose( [
 			blockListSettings: getBlockListSettings( clientId ),
 			hasOverlay: block.name !== 'core/template' && ! isBlockSelected( clientId ) && ! hasSelectedInnerBlock( clientId, true ),
 			parentLock: getTemplateLock( rootClientId ),
+			isLastBlockChangePersistent: isLastBlockChangePersistent(),
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => {
