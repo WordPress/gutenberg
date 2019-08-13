@@ -30,9 +30,24 @@ if ( existsSync( composeFile ) ) {
 	}
 }
 
+const coreComposeFile = normalize( `${ env.WP_DEVELOP_DIR }/docker-compose.yml` );
+if ( ! existsSync( coreComposeFile ) ) {
+	console.log( "docker-compose.yml doesn't seem to exist. Are you sure WP_DEVELOP_DIR is a WordPress source directory?" );
+	return;
+}
+
+let coreCompose = {};
+try {
+	coreCompose = yaml.safeLoad( readFileSync( coreComposeFile, 'utf8' ) );
+} catch ( e ) {
+	console.log( 'There was an error loading your docker-compose.yml in your WordPress directory. Please revert any  changes to it, and try again.' );
+	console.log( e );
+	return;
+}
+
 console.log( 'Updating docker-compose.override.yml...' );
 
-compose.version = '3.7';
+compose.version = coreCompose.version;
 
 if ( ! compose.services ) {
 	compose.services = {};
