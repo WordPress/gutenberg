@@ -52,7 +52,7 @@ We commit to keeping the breaking changes minimal so you can upgrade `@wordpress
 
 ### `build`
 
-Transforms your code according the configuration provided so it's ready for production and optimized for the best performance. The entry point for your project's code should be located in `src/index.js`. The output generated will be written to `build/index.js`. This script exits after producing a single build. For incremental builds, better suited for development, see the [start](#start) script.
+Transforms your code according the configuration provided so it’s ready for production and optimized for the best performance. The entry point for your project’s code should be located in `src/index.js`. The output generated will be written to `build/index.js`. This script exits after producing a single build. For incremental builds, better suited for development, see the [start](#start) script.
 
 _Example:_
 
@@ -72,7 +72,7 @@ This is how you execute the script with presented setup:
 
 #### Advanced information
 
-This script uses [webpack](https://webpack.js.org/) behind the scenes. It'll look for a webpack config in the top-level directory of your package and will use it if it finds one. If none is found, it'll use the default config provided by `@wordpress/scripts` packages. Learn more in the [Advanced Usage](#advanced-usage) section.
+This script uses [webpack](https://webpack.js.org/) behind the scenes. It’ll look for a webpack config in the top-level directory of your package and will use it if it finds one. If none is found, it’ll use the default config provided by `@wordpress/scripts` packages. Learn more in the [Advanced Usage](#advanced-usage) section.
 
 ### `check-engines`
 
@@ -98,7 +98,7 @@ It uses [check-node-version](https://www.npmjs.com/package/check-node-version) b
 
 ### `check-licenses`
 
-Validates that all dependencies of a project are compatible with the project's own license.
+Validates that all dependencies of a project are compatible with the project’s own license.
 
 _Example:_
 
@@ -115,7 +115,7 @@ _Flags_:
 - `--prod` (or `--production`): When present, validates only `dependencies` and not `devDependencies`
 - `--dev` (or `--development`): When present, validates only `devDependencies` and not `dependencies`
 - `--gpl2`: Validates against [GPLv2 license compatibility](https://www.gnu.org/licenses/license-list.en.html)
-- `--ignore=a,b,c`: A comma-separated set of package names to ignore for validation. This is intended to be used primarily in cases where a dependency's `license` field is malformed. It's assumed that any `ignored` package argument would be manually vetted for compatibility by the project owner.
+- `--ignore=a,b,c`: A comma-separated set of package names to ignore for validation. This is intended to be used primarily in cases where a dependency’s `license` field is malformed. It’s assumed that any `ignored` package argument would be manually vetted for compatibility by the project owner.
 
 ### `lint-js`
 
@@ -134,8 +134,8 @@ _Example:_
 
 This is how you execute the script with presented setup:
 
-* `npm run lint:js` - lints JavaScript files in the entire project's directories.
-* `npm run lint:js:src` - lints JavaScript files in the project's `src` subfolder's directories.
+* `npm run lint:js` - lints JavaScript files in the entire project’s directories.
+* `npm run lint:js:src` - lints JavaScript files in the project’s `src` subfolder’s directories.
 
 When you run commands similar to the `npm run lint:js:src` example above, you can provide a file, a directory, or `glob` syntax or any combination of them. See [more examples](https://eslint.org/docs/user-guide/command-line-interface).
 
@@ -162,8 +162,8 @@ _Example:_
 
 This is how you execute those scripts using the presented setup:
 
-* `npm run lint:pkg-json` - lints `package.json` file in the entire project's directories.
-* `npm run lint:pkg-json:src` - lints `package.json` file in the project's `src` subfolder's directories.
+* `npm run lint:pkg-json` - lints `package.json` file in the entire project’s directories.
+* `npm run lint:pkg-json:src` - lints `package.json` file in the project’s `src` subfolder’s directories.
 
 When you run commands similar to the `npm run lint:pkg-json:src` example above, you can provide one or multiple directories to scan as well. See [more examples](https://github.com/tclindner/npm-package-json-lint/blob/HEAD/README.md#examples).
 
@@ -190,8 +190,8 @@ _Example:_
 
 This is how you execute the script with presented setup:
 
-* `npm run lint:style` - lints CSS and SCSS files in the entire project's directories.
-* `npm run lint:css:src` - lints only CSS files in the project's `src` subfolder's directories.
+* `npm run lint:style` - lints CSS and SCSS files in the entire project’s directories.
+* `npm run lint:css:src` - lints only CSS files in the project’s `src` subfolder’s directories.
 
 When you run commands similar to the `npm run lint:css:src` example above, be sure to include the quotation marks around file globs. This ensures that you can use the powers of [globby](https://github.com/sindresorhus/globby) (like the `**` globstar) regardless of your shell. See [more examples](https://github.com/stylelint/stylelint/blob/HEAD/docs/user-guide/cli.md#examples).
 
@@ -203,7 +203,7 @@ It uses [stylelint](https://github.com/stylelint/stylelint) with the [stylelint-
 
 ### `start`
 
-Transforms your code according the configuration provided so it's ready for development. The script will automatically rebuild if you make changes to the code, and you will see the build errors in the console. The entry point for your project's code should be located in `src/index.js`. The output generated will be written to `build/index.js`. For single builds, better suited for production, see the [build](#build) script.
+Transforms your code according the configuration provided so it’s ready for development. The script will automatically rebuild if you make changes to the code, and you will see the build errors in the console. The entry point for your project’s code should be located in `src/index.js`. The output generated will be written to `build/index.js`. For single builds, better suited for production, see the [build](#build) script.
 
 _Example:_
 
@@ -223,7 +223,7 @@ This is how you execute the script with presented setup:
 
 #### Advanced information
 
-This script uses [webpack](https://webpack.js.org/) behind the scenes. It'll look for a webpack config in the top-level directory of your package and will use it if it finds one. If none is found, it'll use the default config provided by `@wordpress/scripts` packages. Learn more in the [Advanced Usage](#advanced-usage) section.
+This script uses [webpack](https://webpack.js.org/) behind the scenes. It’ll look for a webpack config in the top-level directory of your package and will use it if it finds one. If none is found, it’ll use the default config provided by `@wordpress/scripts` packages. Learn more in the [Advanced Usage](#advanced-usage) section.
 
 ### `test-e2e`
 
@@ -338,5 +338,5 @@ module.exports = {
   }
 };
 ```
-If you follow this approach, please, be aware that future versions of this package may change what webpack and Babel plugins we bundle, default configs, etc. Should those changes be necessary, they will be registered in the [package's CHANGELOG](https://github.com/WordPress/gutenberg/blob/master/packages/scripts/CHANGELOG.md), so make sure to read it before upgrading.
+If you follow this approach, please, be aware that future versions of this package may change what webpack and Babel plugins we bundle, default configs, etc. Should those changes be necessary, they will be registered in the [package’s CHANGELOG](https://github.com/WordPress/gutenberg/blob/master/packages/scripts/CHANGELOG.md), so make sure to read it before upgrading.
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
