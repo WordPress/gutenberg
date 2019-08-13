@@ -16,8 +16,6 @@ export { metadata, name };
 
 export const settings = {
 	title: __( 'Social link' ),
-	parent: [ 'core/social-links' ],
-	icon: 'share',
 	description: __( 'A social media or external link.' ),
 	supports: {
 		inserter: false,

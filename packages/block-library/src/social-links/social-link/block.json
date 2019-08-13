@@ -1,6 +1,8 @@
 {
 	"name": "core/social-link",
 	"category": "widgets",
+	"parent": [ "core/social-links" ],
+	"icon": "share",
 	"attributes": {
 		"url": {
 			"type": "string"
