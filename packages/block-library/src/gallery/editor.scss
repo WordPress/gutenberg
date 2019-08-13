@@ -1,6 +1,4 @@
 .wp-block-gallery {
-	display: block;
-
 	// Override the default list style type _only in the editor_
 	// to avoid :not() selector specificity issues.
 	// See https://github.com/WordPress/gutenberg/pull/10358
@@ -12,6 +10,16 @@
 	.is-selected & {
 		margin-bottom: 0;
 	}
+
+	// Targets gallery caption.
+	> .block-editor-rich-text {
+		text-align: center;
+	}
+}
+
+figure.wp-block-gallery {
+	display: block;
+	margin-left: 0;
 }
 
 .blocks-gallery-item {
