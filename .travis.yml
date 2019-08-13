@@ -47,10 +47,8 @@ before_install:
 install:
   - npm ci
   - |
-    if [[ "$COMPOSER" = "true" ]]; then
+    if [[ "$COMPOSER_INSTALL" = "true" ]]; then
       composer --version
-      pwd
-      ls -lah
       travis_retry composer install
     fi
   - |
@@ -65,7 +63,7 @@ env: PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 jobs:
   include:
     - name: Lint
-      env: COMPOSER=true
+      env: COMPOSER_INSTALL=true
       script:
         - npm run lint
 
@@ -100,12 +98,12 @@ jobs:
         - npm run test-unit:native -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
 
     - name: PHP unit tests
-      env: WORDPRESS=true COMPOSER=true
+      env: WORDPRESS=true COMPOSER_INSTALL=true
       script:
         - npm run test-php && npm run test-unit-php-multisite
 
     - name: PHP unit tests (PHP 5.6)
-      env: WORDPRESS=true COMPOSER=true LOCAL_PHP=5.6-fpm
+      env: WORDPRESS=true COMPOSER_INSTALL=true LOCAL_PHP=5.6-fpm
       script:
         - npm run test-php && npm run test-unit-php-multisite
       if: branch = master and type != "pull_request"
