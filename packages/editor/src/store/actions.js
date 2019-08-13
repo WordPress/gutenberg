@@ -2,21 +2,13 @@
  * External dependencies
  */
 import { has, castArray } from 'lodash';
-import memoize from 'memize';
 
 /**
  * WordPress dependencies
  */
 import deprecated from '@wordpress/deprecated';
 import { dispatch, select, apiFetch } from '@wordpress/data-controls';
-import {
-	parse,
-	synchronizeBlocksWithTemplate,
-	serialize,
-	isUnmodifiedDefaultBlock,
-	getFreeformContentHandlerName,
-} from '@wordpress/blocks';
-import { removep } from '@wordpress/autop';
+import { parse, synchronizeBlocksWithTemplate } from '@wordpress/blocks';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
@@ -32,6 +24,7 @@ import {
 	getNotificationArgumentsForSaveFail,
 	getNotificationArgumentsForTrashFail,
 } from './utils/notice-builder';
+import serializeBlocks from './utils/serialize-blocks';
 import { awaitNextStateChange, getRegistry } from './controls';
 import * as sources from './block-sources';
 
@@ -760,41 +753,6 @@ export function unlockPostSaving( lockName ) {
 		lockName,
 	};
 }
-
-/**
- * Serializes blocks following backwards compatibility conventions.
- *
- * @param {Array} blocksForSerialization The blocks to serialize.
- *
- * @return {string} The blocks serialization.
- */
-export const serializeBlocks = memoize(
-	( blocksForSerialization ) => {
-		// A single unmodified default block is assumed to
-		// be equivalent to an empty post.
-		if (
-			blocksForSerialization.length === 1 &&
-			isUnmodifiedDefaultBlock( blocksForSerialization[ 0 ] )
-		) {
-			blocksForSerialization = [];
-		}
-
-		let content = serialize( blocksForSerialization );
-
-		// For compatibility, treat a post consisting of a
-		// single freeform block as legacy content and apply
-		// pre-block-editor removep'd content formatting.
-		if (
-			blocksForSerialization.length === 1 &&
-			blocksForSerialization[ 0 ].name === getFreeformContentHandlerName()
-		) {
-			content = removep( content );
-		}
-
-		return content;
-	},
-	{ maxSize: 1 }
-);
 
 /**
  * Returns an action object used to signal that the blocks have been updated.
