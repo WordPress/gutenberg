@@ -34,6 +34,7 @@
 		"@wordpress/data": "file:../data",
 		"@wordpress/date": "file:../date",
 		"@wordpress/deprecated": "file:../deprecated",
+		"@wordpress/dom": "file:../dom",
 		"@wordpress/editor": "file:../editor",
 		"@wordpress/element": "file:../element",
 		"@wordpress/i18n": "file:../i18n",
