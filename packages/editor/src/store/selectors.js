@@ -37,7 +37,7 @@ import {
 	AUTOSAVE_PROPERTIES,
 } from './constants';
 import { getPostRawValue } from './reducer';
-import { serializeBlocks } from './actions';
+import serializeBlocks from './utils/serialize-blocks';
 
 /**
  * Shared reference to an empty object for cases where it is important to avoid

@@ -20,10 +20,10 @@ import { RawHTML } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { serializeBlocks } from '../actions';
 import * as _selectors from '../selectors';
 import { PREFERENCES_DEFAULTS } from '../defaults';
 import { POST_UPDATE_TRANSACTION_ID } from '../constants';
+import serializeBlocks from '../utils/serialize-blocks';
 
 const selectors = { ..._selectors };
 const selectorNames = Object.keys( selectors );

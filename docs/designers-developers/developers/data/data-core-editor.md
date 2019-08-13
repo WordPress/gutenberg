@@ -1261,18 +1261,6 @@ _Related_
 
 -   selectBlock in core/block-editor store.
 
-<a name="serializeBlocks" href="#serializeBlocks">#</a> **serializeBlocks**
-
-Serializes blocks following backwards compatibility conventions.
-
-_Parameters_
-
--   _blocksForSerialization_ `Array`: The blocks to serialize.
-
-_Returns_
-
--   `string`: The blocks serialization.
-
 <a name="setTemplateValidity" href="#setTemplateValidity">#</a> **setTemplateValidity**
 
 _Related_
