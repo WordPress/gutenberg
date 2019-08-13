@@ -39,7 +39,7 @@
 		"memize": "^1.0.5",
 		"moment": "^2.22.1",
 		"mousetrap": "^1.6.2",
-		"re-resizable": "^5.0.1",
+		"re-resizable": "^6.0.0",
 		"react-dates": "^17.1.1",
 		"react-spring": "^8.0.20",
 		"rememo": "^3.0.0",
