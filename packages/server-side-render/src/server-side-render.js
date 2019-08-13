@@ -83,14 +83,14 @@ export class ServerSideRender extends Component {
 
 	render() {
 		const response = this.state.response;
-		const { className, EmptyResponsePlaceholder, ErrorResponsePlaceholder, LoadingResponsePlaceholder } = this.props;
+		const { className, emptyResponsePlaceholder, errorResponsePlaceholder, loadingResponsePlaceholder } = this.props;
 
 		if ( response === '' ) {
-			return EmptyResponsePlaceholder( this.props, response );
+			return emptyResponsePlaceholder( this.props, response );
 		} else if ( ! response ) {
-			return LoadingResponsePlaceholder( this.props, response );
+			return loadingResponsePlaceholder( this.props, response );
 		} else if ( response.error ) {
-			return ErrorResponsePlaceholder( this.props, response );
+			return errorResponsePlaceholder( this.props, response );
 		}
 
 		return (
@@ -105,7 +105,7 @@ export class ServerSideRender extends Component {
 }
 
 ServerSideRender.defaultProps = {
-	EmptyResponsePlaceholder: ( props ) => {
+	emptyResponsePlaceholder: ( props ) => {
 		const { className } = props;
 		return (
 			<Placeholder
@@ -115,7 +115,7 @@ ServerSideRender.defaultProps = {
 			</Placeholder>
 		);
 	},
-	ErrorResponsePlaceholder: ( props, response ) => {
+	errorResponsePlaceholder: ( props, response ) => {
 		// translators: %s: error message describing the problem
 		const errorMessage = sprintf( __( 'Error loading block: %s' ), response.errorMsg );
 		const { className } = props;
@@ -127,7 +127,7 @@ ServerSideRender.defaultProps = {
 			</Placeholder>
 		);
 	},
-	LoadingResponsePlaceholder: ( props ) => {
+	loadingResponsePlaceholder: ( props ) => {
 		const { className } = props;
 		return (
 			<Placeholder
