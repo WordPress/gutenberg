@@ -1,7 +1,16 @@
 #!/bin/bash
 set -e
 
-# 1. Find the issues that this PR 'fixes'.
+# 1. Proceed only when acting on an opened pull request.
+
+action=$(jq -r '.action' $GITHUB_EVENT_PATH)
+
+if [ "$action" != 'closed' ]; then
+	echo "Action '$action' not a close action. Aborting."
+	exit 0;
+fi
+
+# 2. Find the issues that this PR 'fixes'.
 
 issues=$(
 	jq -r '.pull_request.body' $GITHUB_EVENT_PATH | perl -nle 'print $1 while /
@@ -18,15 +27,15 @@ if [ -z "$issues" ]; then
 	exit 0
 fi
 
-# 2. Grab the author of the PR.
+# 3. Grab the author of the PR.
 
 author=$(jq -r '.pull_request.user.login' $GITHUB_EVENT_PATH)
 
-# 3. Loop through each 'fixed' issue.
+# 4. Loop through each 'fixed' issue.
 
 for issue in $issues; do
 
-	# 3a. Add the author as an asignee to the issue. This fails if the author is
+	# 4a. Add the author as an asignee to the issue. This fails if the author is
 	#     already assigned, which is expected and ignored.
 
 	curl \
