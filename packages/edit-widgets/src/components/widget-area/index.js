@@ -86,13 +86,15 @@ function WidgetArea( {
 					<Sidebar.Inspector>
 						<BlockInspector showNoBlockSelectedMessage={ false } />
 					</Sidebar.Inspector>
-					<WritingFlow>
-						<ObserveTyping>
-							<BlockList
-								className="edit-widgets-main-block-list"
-							/>
-						</ObserveTyping>
-					</WritingFlow>
+					<div className="editor-styles-wrapper">
+						<WritingFlow>
+							<ObserveTyping>
+								<BlockList
+									className="edit-widgets-main-block-list"
+								/>
+							</ObserveTyping>
+						</WritingFlow>
+					</div>
 				</BlockEditorProvider>
 			</PanelBody>
 		</Panel>
