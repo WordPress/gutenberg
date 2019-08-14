@@ -34,6 +34,7 @@ before_install:
 
       # Check out WordPress
       git clone git://develop.git.wordpress.org/ wordpress
+
       cd wordpress
 
       # Configure WordPress
@@ -41,6 +42,10 @@ before_install:
       npm run env:start
       npm run build
       npm run env:install
+
+      mkdir -p build/wp-content/uploads
+      chmod 767 build/wp-content/uploads
+
       cd ..
     fi
 
