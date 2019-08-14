@@ -58,7 +58,7 @@ install:
       export WP_DEVELOP_DIR=./wordpress
       npm run env:config
 
-      node bin/docker.js run --rm cli plugin activate gutenberg
+      node bin/docker.js run --rm cli plugin activate gutenberg --path=build
     fi
 
 env: PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
