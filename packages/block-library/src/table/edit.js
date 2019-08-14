@@ -449,6 +449,18 @@ export class TableEdit extends Component {
 							} );
 							const richTextClassName = 'wp-block-table__cell-content';
 
+							// Table implements a roving tabIndex. If there are no selected cells,
+							// don't set a tabIndex so that table can be tabbed into normally.
+							// If there is a selected cell, only that cell has is tabbable so that
+							// the user can easily navigate in and out of a table and maintain
+							// cell selection when navigating to the toolbar.
+							// For more info see:
+							// https://www.w3.org/TR/wai-aria-practices/examples/grid/dataGrids.html
+							let tabIndex;
+							if ( selectedCell ) {
+								tabIndex = isSelected ? 0 : -1;
+							}
+
 							return (
 								<CellTag
 									key={ columnIndex }
@@ -465,7 +477,7 @@ export class TableEdit extends Component {
 								>
 									<RichText
 										className={ richTextClassName }
-										tabIndex={ isSelected ? 0 : -1 }
+										tabIndex={ tabIndex }
 										value={ content }
 										onChange={ this.onChange }
 										unstableOnFocus={ () => this.updateSelectedCell( cellLocation ) }
