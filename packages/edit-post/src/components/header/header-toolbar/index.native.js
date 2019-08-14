@@ -14,7 +14,7 @@ import {
 	Inserter,
 	BlockToolbar,
 } from '@wordpress/block-editor';
-import { Toolbar, ToolbarButton } from '@wordpress/components';
+import { Toolbar, ToolbarButton, useStyle } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -32,7 +32,7 @@ function HeaderToolbar( {
 	clearSelectedBlock,
 } ) {
 	return (
-		<View style={ styles.container }>
+		<View style={ useStyle( styles.container, styles.containerDark ) }>
 			<ScrollView
 				horizontal={ true }
 				showsHorizontalScrollIndicator={ false }

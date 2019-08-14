@@ -20,6 +20,7 @@ import { childrenBlock } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/html-entities';
 import { BACKSPACE } from '@wordpress/keycodes';
 import { isURL } from '@wordpress/url';
+import { useStyle, DarkMode } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -72,6 +73,8 @@ const gutenbergFormatNamesToAztec = {
 };
 
 export class RichText extends Component {
+	static contextType = DarkMode.Context;
+
 	constructor( { value, __unstableMultiline: multiline, selectionStart, selectionEnd } ) {
 		super( ...arguments );
 
@@ -777,7 +780,7 @@ export class RichText extends Component {
 		const record = this.getRecord();
 		const html = this.getHtmlToRender( record, tagName );
 
-		let minHeight = styles[ 'rich-text' ].minHeight;
+		let minHeight = styles.richText.minHeight;
 		if ( style && style.minHeight ) {
 			minHeight = style.minHeight;
 		}
@@ -790,7 +793,7 @@ export class RichText extends Component {
 			color: defaultColor,
 			textDecorationColor: defaultTextDecorationColor,
 			fontFamily: defaultFontFamily,
-		} = styles[ 'rich-text' ];
+		} = useStyle( styles.richText, styles.richTextDark, this.context );
 
 		let selection = null;
 		if ( this.needsSelectionUpdate ) {
@@ -819,6 +822,8 @@ export class RichText extends Component {
 			this.firedAfterTextChanged = false;
 		}
 
+		const dynamicStyle = useStyle( style, styles.richTextDark );
+
 		return (
 			<View>
 				{ children && children( {
@@ -835,7 +840,7 @@ export class RichText extends Component {
 						}
 					} }
 					style={ {
-						...style,
+						...dynamicStyle,
 						minHeight: Math.max( minHeight, this.state.height ),
 					} }
 					text={ { text: html, eventCount: this.lastEventCount, selection } }

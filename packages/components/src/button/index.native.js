@@ -3,6 +3,11 @@
  */
 import { StyleSheet, TouchableOpacity, Text, View, Platform } from 'react-native';
 
+/**
+ * WordPress dependencies
+ */
+import { useStyle } from '@wordpress/components';
+
 const isAndroid = Platform.OS === 'android';
 const marginBottom = isAndroid ? -0.5 : 0;
 const marginLeft = -3;
@@ -21,6 +26,9 @@ const styles = StyleSheet.create( {
 		alignItems: 'center',
 		aspectRatio: 1,
 		backgroundColor: 'white',
+	},
+	buttonInactiveDark: {
+		backgroundColor: 'black',
 	},
 	buttonActive: {
 		flex: 1,
@@ -63,9 +71,11 @@ export default function Button( props ) {
 	} = props;
 
 	const isDisabled = ariaDisabled || disabled;
+	const buttonInactiveStyle = useStyle( styles.buttonInactive, styles.buttonInactiveDark );
+
 	const buttonViewStyle = {
 		opacity: isDisabled ? 0.2 : 1,
-		...( ariaPressed ? styles.buttonActive : styles.buttonInactive ),
+		...( ariaPressed ? styles.buttonActive : buttonInactiveStyle ),
 	};
 
 	const states = [];

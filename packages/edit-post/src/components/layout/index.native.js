@@ -11,7 +11,7 @@ import { sendNativeEditorDidLayout } from 'react-native-gutenberg-bridge';
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { HTMLTextInput, KeyboardAvoidingView, ReadableContentView } from '@wordpress/components';
+import { HTMLTextInput, KeyboardAvoidingView, ReadableContentView, useStyle, DarkMode } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -22,6 +22,8 @@ import Header from '../header';
 import VisualEditor from '../visual-editor';
 
 class Layout extends Component {
+	static contextType = DarkMode.Context;
+
 	constructor() {
 		super( ...arguments );
 
@@ -112,7 +114,7 @@ class Layout extends Component {
 		};
 
 		return (
-			<SafeAreaView style={ styles.container } onLayout={ this.onRootViewLayout }>
+			<SafeAreaView style={ useStyle( styles.container, styles.containerDark ) } onLayout={ this.onRootViewLayout }>
 				<View style={ { flex: 1 } }>
 					{ mode === 'text' ? this.renderHTML() : this.renderVisual() }
 				</View>

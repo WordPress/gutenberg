@@ -7,6 +7,11 @@
 	border-top-width: 1px;
 }
 
+.containerDark {
+	background-color: #000;
+	border-top-color: #3a3a3c;
+}
+
 .scrollableContent {
 	flex-grow: 1; // Fixes RTL issue on Android.
 }
