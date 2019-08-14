@@ -61,7 +61,7 @@ import * as video from './video';
 import * as tagCloud from './tag-cloud';
 import * as classic from './classic';
 import * as socialLinks from './social-links';
-import * as socialLink from './social-links/social-link';
+import * as socialLink from './social-link';
 
 /**
  * Function to register an individual block.

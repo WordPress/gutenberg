@@ -14,7 +14,7 @@ import {
 /**
  * Internal dependencies
  */
-import socialList from '../social-list';
+import socialList from './social-list';
 import IconPicker from './icon-picker';
 
 // Receives an URL and tries to match to return an icon.
