@@ -15,7 +15,7 @@ import Dashicon from '../dashicon';
  * @param  {Object} props The component props.
  * @return {Object}       The rendered placeholder.
  */
-function Placeholder( { icon, children, label, instructions, className, notices, preview, isColumnLayout, ...additionalProps } ) {
+function Placeholder( { icon, children, label, instructions, className, notices, preview, isColumnLayout, append, ...additionalProps } ) {
 	const classes = classnames( 'components-placeholder', className );
 	const fieldsetClasses = classnames( 'components-placeholder__fieldset', { 'is-column-layout': isColumnLayout } );
 	return (
@@ -34,6 +34,7 @@ function Placeholder( { icon, children, label, instructions, className, notices,
 			<div className={ fieldsetClasses }>
 				{ children }
 			</div>
+			{ !! append && <div className="components-placeholder__append">{ append }</div> }
 		</div>
 	);
 }
