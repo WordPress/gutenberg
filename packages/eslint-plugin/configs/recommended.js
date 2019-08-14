@@ -10,12 +10,13 @@ module.exports = {
 		node: true,
 	},
 	globals: {
-		window: 'readonly',
-		document: 'readonly',
+		window: true,
+		document: true,
 		wp: 'readonly',
 	},
 	overrides: [
 		{
+			// Unit test files and their helpers only.
 			files: [
 				'**/@(test|__tests__)/**/*.js',
 				'**/?(*.)test.js',
@@ -25,6 +26,7 @@ module.exports = {
 			],
 		},
 		{
+			// End-to-end test files and their helpers only.
 			files: [
 				'**/specs/**/*.js',
 				'**/?(*.)spec.js',

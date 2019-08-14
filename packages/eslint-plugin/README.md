@@ -28,10 +28,15 @@ The `recommended` preset will include rules governing an ES2015+ environment, an
 
 Alternatively, you can opt-in to only the more granular rulesets offered by the plugin. These include:
 
+- `custom`
 - `es5`
 - `esnext`
+- `jsdoc`
+- `jshint` (legacy)
 - `jsx-a11y`
 - `react`
+- `test-e2e`
+- `test-unit`
 
 For example, if your project does not use React, you could consider extending including only the ESNext rules in your project using the following `extends` definition:
 

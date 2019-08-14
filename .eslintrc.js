@@ -126,7 +126,6 @@ module.exports = {
 		},
 		{
 			files: [
-				'packages/block-serialization-spec-parser/shared-tests.js',
 				'packages/jest*/**/*.js',
 			],
 			extends: [
