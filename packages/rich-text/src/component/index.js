@@ -391,14 +391,25 @@ class RichText extends Component {
 	}
 
 	/**
-	 * Handles the `selectionchange` event: sync the selection to local state.
+	 * Syncs the selection to local state. A callback for the `selectionchange`
+	 * native events, `keyup`, `mouseup` and `touchend` synthetic events, and
+	 * animation frames after the `focus` event.
 	 *
-	 * @param {Event} event `selectionchange` event.
+	 * @param {Event|SyntheticEvent|DOMHighResTimeStamp} event
 	 */
 	onSelectionChange( event ) {
 		if (
 			event.type !== 'selectionchange' &&
 			! this.props.__unstableIsSelected
+		) {
+			return;
+		}
+
+		// In case of a keyboard event, ignore selection changes during
+		// composition.
+		if (
+			event.nativeEvent &&
+			event.nativeEvent.isComposing
 		) {
 			return;
 		}
