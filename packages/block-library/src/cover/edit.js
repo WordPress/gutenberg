@@ -18,6 +18,7 @@ import {
 	withNotices,
 	ResizableBox,
 	BaseControl,
+	ColorPalette,
 } from '@wordpress/components';
 import { compose, withInstanceId } from '@wordpress/compose';
 import {
@@ -33,6 +34,7 @@ import {
 } from '@wordpress/block-editor';
 import { Component, createRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -172,7 +174,7 @@ class CoverEdit extends Component {
 		const controls = (
 			<>
 				<BlockControls>
-					{ !! url && (
+					{ !! ( url || overlayColor.color ) && (
 						<>
 							<MediaUploadCheck>
 								<Toolbar>
@@ -183,7 +185,7 @@ class CoverEdit extends Component {
 										render={ ( { open } ) => (
 											<IconButton
 												className="components-toolbar__control"
-												label={ __( 'Edit media' ) }
+												label={ __( 'Edit' ) }
 												icon="edit"
 												onClick={ open }
 											/>
@@ -194,17 +196,17 @@ class CoverEdit extends Component {
 						</>
 					) }
 				</BlockControls>
-				{ !! url && (
+				{ !! ( url || overlayColor.color ) && (
 					<InspectorControls>
 						<PanelBody title={ __( 'Cover Settings' ) }>
-							{ IMAGE_BACKGROUND_TYPE === backgroundType && (
+							{ !! url && ( IMAGE_BACKGROUND_TYPE === backgroundType ) && (
 								<ToggleControl
 									label={ __( 'Fixed Background' ) }
 									checked={ hasParallax }
 									onChange={ toggleParallax }
 								/>
 							) }
-							{ IMAGE_BACKGROUND_TYPE === backgroundType && ! hasParallax && (
+							{ !! url && ( IMAGE_BACKGROUND_TYPE === backgroundType ) && ! hasParallax && (
 								<FocalPointPicker
 									label={ __( 'Focal Point Picker' ) }
 									url={ url }
@@ -243,15 +245,17 @@ class CoverEdit extends Component {
 									label: __( 'Overlay Color' ),
 								} ] }
 							>
-								<RangeControl
-									label={ __( 'Background Opacity' ) }
-									value={ dimRatio }
-									onChange={ setDimRatio }
-									min={ 0 }
-									max={ 100 }
-									step={ 10 }
-									required
-								/>
+								{ !! url && (
+									<RangeControl
+										label={ __( 'Background Opacity' ) }
+										value={ dimRatio }
+										onChange={ setDimRatio }
+										min={ 0 }
+										max={ 100 }
+										step={ 10 }
+										required
+									/>
+								) }
 							</PanelColorSettings>
 						</PanelBody>
 					</InspectorControls>
@@ -259,7 +263,21 @@ class CoverEdit extends Component {
 			</>
 		);
 
-		if ( ! url ) {
+		function StatefulColorPalette( props ) {
+			const settings = useSelect( ( select ) => {
+				return select( 'core/block-editor' ).getSettings();
+			} );
+			const colors = settings.colors;
+
+			return <ColorPalette
+				colors={ colors }
+				disableCustomColors={ true }
+				value={ overlayColor.color }
+				onChange={ setOverlayColor }
+				clearable={ false }
+				{ ...props } />;
+		}
+		if ( ! ( url || overlayColor.color ) ) {
 			const placeholderIcon = <BlockIcon icon={ icon } />;
 			const label = __( 'Cover' );
 
@@ -278,6 +296,7 @@ class CoverEdit extends Component {
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
 						notices={ noticeUI }
 						onError={ this.onUploadError }
+						append={ <StatefulColorPalette /> }
 					/>
 				</>
 			);
