@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useRegistry, useSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { InnerBlocks } from '@wordpress/block-editor';
 
 /**
@@ -11,7 +11,6 @@ import EditorProvider from '../provider';
 import PostSavedState from '../post-saved-state';
 
 export default function EntityHandlers( { entity, ...props } ) {
-	const registry = useRegistry();
 	const editorSettings = useSelect(
 		( select ) => select( 'core/editor' ).getEditorSettings(),
 		[]
@@ -23,7 +22,7 @@ export default function EntityHandlers( { entity, ...props } ) {
 	// seamless editing experience.
 	return (
 		<EditorProvider
-			topLevelRegistry={ registry }
+			noBlockEditorStore
 			settings={ editorSettings }
 			post={ entity }
 			{ ...props }

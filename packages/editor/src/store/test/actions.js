@@ -14,7 +14,6 @@ import {
 } from '../constants';
 
 jest.mock( '@wordpress/data-controls' );
-jest.mock( '../block-sources' );
 
 select.mockImplementation( ( ...args ) => {
 	const { select: actualSelect } = jest

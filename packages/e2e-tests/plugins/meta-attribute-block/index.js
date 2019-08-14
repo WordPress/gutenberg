@@ -7,25 +7,21 @@
 		icon: 'star',
 		category: 'common',
 
-		attributes: {
-			content: {
-				type: "string",
-				source: "meta",
-				meta: "my_meta",
-			},
-		},
-
 		edit: function( props ) {
-			return el(
-					'input',
-					{
-						className: 'my-meta-input',
-						value: props.attributes.content,
-						onChange: function( event ) {
-							props.setAttributes( { content: event.target.value } );
-						},
-					}
-			);
+			var editEntity = wp.data.useDispatch()( 'core/editor' ).editEntity;
+			return el( 'input', {
+				className: 'my-meta-input',
+				value: wp.data.useSelect(
+					( select ) =>
+						select( 'core/editor' ).getEditedEntityAttribute( 'meta' ).my_meta,
+					[]
+				),
+				onChange: function( event ) {
+					editEntity( {
+						meta: { my_meta: event.target.value },
+					} );
+				},
+			} );
 		},
 
 		save: function() {

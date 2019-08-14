@@ -14,16 +14,26 @@ import applyMiddlewares from '../../store/middlewares';
 
 const withRegistryProvider = createHigherOrderComponent(
 	( WrappedComponent ) => withRegistry( ( props ) => {
-		const { useSubRegistry = true, registry, ...additionalProps } = props;
+		const {
+			useSubRegistry = true,
+			noBlockEditorStore = false,
+			registry,
+			...additionalProps
+		} = props;
 		if ( ! useSubRegistry ) {
 			return <WrappedComponent { ...additionalProps } />;
 		}
 
 		const [ subRegistry, setSubRegistry ] = useState( null );
 		useEffect( () => {
-			const newRegistry = createRegistry( {
-				'core/block-editor': blockEditorStoreConfig,
-			}, registry );
+			const newRegistry = createRegistry(
+				noBlockEditorStore ?
+					{} :
+					{
+						'core/block-editor': blockEditorStoreConfig,
+					},
+				registry
+			);
 			const store = newRegistry.registerStore( 'core/editor', storeConfig );
 			// This should be removed after the refactoring of the effects to controls.
 			applyMiddlewares( store );
@@ -36,7 +46,7 @@ const withRegistryProvider = createHigherOrderComponent(
 
 		return (
 			<RegistryProvider value={ subRegistry }>
-				<WrappedComponent { ...additionalProps } />
+				<WrappedComponent noBlockEditorStore={ noBlockEditorStore } { ...additionalProps } />
 			</RegistryProvider>
 		);
 	} ),

@@ -85,24 +85,27 @@ class InnerBlocks extends Component {
 		}
 
 		// Sync with controlled blocks value from parent, if possible.
-		if (
-			resetEditorBlocks &&
-			resetEditorBlocksWithoutUndoLevel &&
-			prevProps.block.innerBlocks !== innerBlocks
-		) {
-			this.isSyncingBlocks = innerBlocks;
-			if ( isLastBlockChangePersistent ) {
-				resetEditorBlocks( innerBlocks );
-			} else {
-				resetEditorBlocksWithoutUndoLevel( innerBlocks );
+		if ( this.isSyncingIncomingBlocks === innerBlocks ) {
+			this.isSyncingIncomingBlocks = null;
+		} else if ( prevProps.block.innerBlocks !== innerBlocks ) {
+			this.isSyncingIncomingBlocks = null;
+
+			const resetFunc = isLastBlockChangePersistent ?
+				resetEditorBlocks :
+				resetEditorBlocksWithoutUndoLevel;
+			if ( resetFunc ) {
+				this.isSyncingOutcomingBlocks = innerBlocks;
+				resetFunc( innerBlocks );
 			}
 		}
 
 		// Accept changes to controlled blocks value from parent after a sync, if any.
-		if ( this.isSyncingBlocks === blocks ) {
-			this.isSyncingBlocks = null;
+		if ( this.isSyncingOutcomingBlocks === blocks ) {
+			this.isSyncingOutcomingBlocks = null;
 		} else if ( prevProps.blocks !== blocks ) {
-			this.isSyncingBlocks = null;
+			this.isSyncingOutcomingBlocks = null;
+
+			this.isSyncingIncomingBlocks = blocks;
 			replaceInnerBlocks( blocks );
 		}
 	}

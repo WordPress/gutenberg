@@ -355,20 +355,6 @@ describe( 'block parser', () => {
 			);
 			expect( value ).toBe( 'chicken' );
 		} );
-
-		it( 'should return undefined for meta attributes', () => {
-			const value = getBlockAttribute(
-				'content',
-				{
-					type: 'string',
-					source: 'meta',
-					meta: 'content',
-				},
-				'<div>chicken</div>',
-				{}
-			);
-			expect( value ).toBeUndefined();
-		} );
 	} );
 
 	describe( 'getBlockAttributes()', () => {

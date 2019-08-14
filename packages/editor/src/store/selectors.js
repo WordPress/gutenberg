@@ -280,6 +280,16 @@ export function getCurrentPostAttribute( state, attributeName ) {
 }
 
 /**
+ * Returns an attribute value of the saved entity.
+ *
+ * @param {Object} state         Global application state.
+ * @param {string} attributeName Entity attribute name.
+ *
+ * @return {*} Entity attribute value.
+ */
+export const getCurrentEntityAttribute = getCurrentPostAttribute;
+
+/**
  * Returns a single attribute of the post being edited, preferring the unsaved
  * edit if one exists, but merging with the attribute value for the last known
  * saved state of the post (this is needed for some nested attributes like meta).
@@ -332,6 +342,18 @@ export function getEditedPostAttribute( state, attributeName ) {
 
 	return edits[ attributeName ];
 }
+
+/**
+ * Returns a single attribute of the entity being edited, preferring the unsaved
+ * edit if one exists, but falling back to the attribute for the last known
+ * saved state of the entity.
+ *
+ * @param {Object} state         Global application state.
+ * @param {string} attributeName Entity attribute name.
+ *
+ * @return {*} Entity attribute value.
+ */
+export const getEditedEntityAttribute = getEditedPostAttribute;
 
 /**
  * Returns an attribute value of the current autosave revision for a post, or
