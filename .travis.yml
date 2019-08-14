@@ -12,7 +12,6 @@ notifications:
 
 cache:
   directories:
-    - $HOME/.composer/cache
     - $HOME/.jest-cache
     - $HOME/.npm
     - $HOME/.nvm/.cache
@@ -54,8 +53,7 @@ install:
   - npm run build
   - |
     if [[ "$COMPOSER_INSTALL" = "true" ]]; then
-      composer --version
-      travis_retry composer install
+      node bin/docker.js run -w /var/www/build/wp-content/plugins/gutenberg --rm php composer install
     fi
   - |
     if [[ "$WORDPRESS" = "true" ]]; then

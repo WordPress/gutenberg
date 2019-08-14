@@ -8,14 +8,12 @@ const yaml = require( 'js-yaml' );
  */
 const { existsSync, readFileSync, writeFileSync } = require( 'fs' );
 const { normalize } = require( 'path' );
-const { cwd, env } = require( 'process' );
+const { cwd, env, exit, stdout } = require( 'process' );
 const { execSync } = require( 'child_process' );
 
-/* eslint-disable no-console */
-
 if ( ! env.WP_DEVELOP_DIR ) {
-	console.log( 'Please ensure the WP_DEVELOP_DIR environment variable is set to your WordPress Development directory before running this script.' );
-	return;
+	stdout.write( 'Please ensure the WP_DEVELOP_DIR environment variable is set to your WordPress Development directory before running this script.' );
+	exit( 1 );
 }
 
 const composeFile = normalize( `${ env.WP_DEVELOP_DIR }/docker-compose.override.yml` );
@@ -24,28 +22,28 @@ if ( existsSync( composeFile ) ) {
 	try {
 		compose = yaml.safeLoad( readFileSync( composeFile, 'utf8' ) );
 	} catch ( e ) {
-		console.log( 'There was an error loading your docker-compose.override.yml file. Please fix or delete it, and try again.' );
-		console.log( e );
-		return;
+		stdout.write( 'There was an error loading your docker-compose.override.yml file. Please fix or delete it, and try again.' );
+		stdout.write( e );
+		exit( 1 );
 	}
 }
 
 const coreComposeFile = normalize( `${ env.WP_DEVELOP_DIR }/docker-compose.yml` );
 if ( ! existsSync( coreComposeFile ) ) {
-	console.log( "docker-compose.yml doesn't seem to exist. Are you sure WP_DEVELOP_DIR is a WordPress source directory?" );
-	return;
+	stdout.write( "docker-compose.yml doesn't seem to exist. Are you sure WP_DEVELOP_DIR is a WordPress source directory?" );
+	exit( 1 );
 }
 
 let coreCompose = {};
 try {
 	coreCompose = yaml.safeLoad( readFileSync( coreComposeFile, 'utf8' ) );
 } catch ( e ) {
-	console.log( 'There was an error loading your docker-compose.yml in your WordPress directory. Please revert any  changes to it, and try again.' );
-	console.log( e );
-	return;
+	stdout.write( 'There was an error loading your docker-compose.yml in your WordPress directory. Please revert any  changes to it, and try again.' );
+	stdout.write( e );
+	exit( 1 );
 }
 
-console.log( 'Updating docker-compose.override.yml...' );
+stdout.write( 'Updating docker-compose.override.yml...' );
 
 compose.version = coreCompose.version;
 
@@ -107,9 +105,7 @@ services.forEach( ( service ) => {
 
 writeFileSync( composeFile, yaml.safeDump( compose, { lineWidth: -1 } ) );
 
-console.log( 'Restarting the WordPress environment...' );
+stdout.write( 'Restarting the WordPress environment...' );
 
 execSync( 'npm run env:stop', { cwd: normalize( env.WP_DEVELOP_DIR ), stdio: 'inherit' } );
 execSync( 'npm run env:start', { cwd: normalize( env.WP_DEVELOP_DIR ), stdio: 'inherit' } );
-
-/* eslint-enable no-console */
