@@ -11,6 +11,7 @@ import {
 	BlockControls,
 	BlockIcon,
 	MediaPlaceholder,
+	MEDIA_TYPE_IMAGE,
 	MediaUpload,
 } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
@@ -150,7 +151,7 @@ class MediaContainer extends Component {
 	}
 
 	renderPlaceholder() {
-		const { onSelectMedia, noticeUI } = this.props;
+		const { onSelectMedia } = this.props;
 		return (
 			<MediaPlaceholder
 				icon={ <BlockIcon icon={ icon } /> }
@@ -158,10 +159,7 @@ class MediaContainer extends Component {
 					title: __( 'Media area' ),
 				} }
 				onSelect={ onSelectMedia }
-				accept="image/*,video/*"
-				allowedTypes={ ALLOWED_MEDIA_TYPES }
-				notices={ noticeUI }
-				onError={ this.onUploadError }
+				mediaType={ MEDIA_TYPE_IMAGE }
 				onFocus={ this.props.onFocus }
 			/>
 		);
