@@ -294,8 +294,8 @@ export function isEmptyRow( row ) {
 /**
  * Return the row referenced by the location object.
  *
- * @param {Object} state 				   The table state.
- * @param {Object} rowLocation 			   The row location.
+ * @param {Object} state                   The table state.
+ * @param {Object} rowLocation             The row location.
  * @param {string} rowLocation.sectionName The table section that the row belongs to.
  * @param {number} rowLocation.rowIndex    The index of the row within the section.
  *
@@ -356,8 +356,8 @@ export function getLocationOfLastRow( state ) {
 /**
  * Returns the location of the cell above.
  *
- * @param {Object} state        			The table state.
- * @param {Object} cellLocation 			The cell location.
+ * @param {Object} state                    The table state.
+ * @param {Object} cellLocation             The cell location.
  * @param {string} cellLocation.sectionName The table section that the cell belongs to.
  * @param {number} cellLocation.rowIndex    The row index for the cell within the section.
  * @param {number} cellLocation.columnIndex The column index for the cell.
@@ -411,8 +411,8 @@ export function getLocationOfCellAbove( state, { sectionName, rowIndex, columnIn
 /**
  * Returns the location of the cell below.
  *
- * @param {Object} state        			The table state.
- * @param {Object} cellLocation 			The cell location.
+ * @param {Object} state                    The table state.
+ * @param {Object} cellLocation             The cell location.
  * @param {string} cellLocation.sectionName The table section that the cell belongs to.
  * @param {number} cellLocation.rowIndex    The row index for the cell within the section.
  * @param {number} cellLocation.columnIndex The column index for the cell.
@@ -466,8 +466,8 @@ export function getLocationOfCellBelow( state, { sectionName, rowIndex, columnIn
 /**
  * Returns the location of the cell to the right.
  *
- * @param {Object} state        			The table state.
- * @param {Object} cellLocation 			The cell location.
+ * @param {Object} state                    The table state.
+ * @param {Object} cellLocation             The cell location.
  * @param {string} cellLocation.sectionName The table section that the cell belongs to.
  * @param {number} cellLocation.rowIndex    The row index for the cell within the section.
  * @param {number} cellLocation.columnIndex The column index for the cell.
@@ -489,7 +489,7 @@ export function getLocationOfCellToRight( state, { sectionName, rowIndex, column
 /**
  * Returns the location of the cell to the left.
  *
- * @param {Object} cellLocation 			The cell location.
+ * @param {Object} cellLocation             The cell location.
  * @param {string} cellLocation.sectionName The table section that the cell belongs to.
  * @param {number} cellLocation.rowIndex    The row index for the cell within the section.
  * @param {number} cellLocation.columnIndex The column index for the cell.
@@ -509,8 +509,8 @@ export function getLocationOfCellToLeft( cellLocation ) {
 /**
  * Returns the location of the first cell in the column.
  *
- * @param {Object} state        			The table state.
- * @param {Object} cellLocation 			The cell location.
+ * @param {Object} state                    The table state.
+ * @param {Object} cellLocation             The cell location.
  * @param {number} cellLocation.columnIndex The column index for the cell.
  *
  * @return {?Object} The location of the first cell in the column or `undefined` if there isn't one.
@@ -530,8 +530,8 @@ export function getLocationOfFirstCellInColumn( state, { columnIndex } ) {
 /**
  * Returns the location of the last cell in the column.
  *
- * @param {Object} state        			The table state.
- * @param {Object} cellLocation 			The cell location.
+ * @param {Object} state                    The table state.
+ * @param {Object} cellLocation             The cell location.
  * @param {number} cellLocation.columnIndex The column index for the cell.
  *
  * @return {?Object} The location of the last cell in the column or `undefined` if there isn't one.
@@ -551,7 +551,7 @@ export function getLocationOfLastCellInColumn( state, { columnIndex } ) {
 /**
  * Returns the location of the first cell in the row.
  *
- * @param {Object} cellLocation 			The cell location.
+ * @param {Object} cellLocation             The cell location.
  * @param {string} cellLocation.sectionName The table section that the cell belongs to.
  * @param {number} cellLocation.rowIndex    The row index for the cell within the section.
  *
@@ -568,8 +568,8 @@ export function getLocationOfFirstCellInRow( { sectionName, rowIndex } ) {
 /**
  * Returns the location of the last cell in the row.
  *
- * @param {Object} state        			The table state.
- * @param {Object} cellLocation 			The cell location.
+ * @param {Object} state                    The table state.
+ * @param {Object} cellLocation             The cell location.
  * @param {string} cellLocation.sectionName The table section that the cell belongs to.
  * @param {number} cellLocation.rowIndex    The row index for the cell within the section.
  *
