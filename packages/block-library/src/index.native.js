@@ -101,6 +101,23 @@ export const coreBlocks = [
 	return memo;
 }, {} );
 
+/**
+ * Function to register an individual block.
+ *
+ * @param {Object} block The block to be registered.
+ *
+ */
+const registerBlock = ( block ) => {
+	if ( ! block ) {
+		return;
+	}
+	const { metadata, settings, name } = block;
+	registerBlockType( name, {
+		...metadata,
+		...settings,
+	} );
+};
+
 export const registerCoreBlocks = () => {
 	[
 		paragraph,
@@ -116,13 +133,8 @@ export const registerCoreBlocks = () => {
 		quote,
 		// eslint-disable-next-line no-undef
 		typeof __DEV__ !== 'undefined' && __DEV__ ? mediaText : null,
-	].forEach( ( { metadata, name, settings } ) => {
-		registerBlockType( name, {
-			...metadata,
-			...settings,
-		} );
-	} );
-};
+	].forEach( registerBlock );
 
-setDefaultBlockName( paragraph.name );
-setUnregisteredTypeHandlerName( missing.name );
+	setDefaultBlockName( paragraph.name );
+	setUnregisteredTypeHandlerName( missing.name );
+};
