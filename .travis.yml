@@ -102,15 +102,14 @@ jobs:
         - npm run test-unit:native -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
 
     - name: PHP unit tests
-      env: WORDPRESS=true COMPOSER_INSTALL=true
+      env: WORDPRESS=true LOCAL_DIR=build COMPOSER_INSTALL=true
       script:
         - npm run test-php && npm run test-unit-php-multisite
 
     - name: PHP unit tests (PHP 5.6)
-      env: WORDPRESS=true COMPOSER_INSTALL=true LOCAL_PHP=5.6-fpm
+      env: WORDPRESS=true LOCAL_DIR=build COMPOSER_INSTALL=true LOCAL_PHP=5.6-fpm
       script:
         - npm run test-php && npm run test-unit-php-multisite
-      if: branch = master and type != "pull_request"
 
     - name: E2E tests (Admin) (1/4)
       env: WORDPRESS=true LOCAL_SCRIPT_DEBUG=false LOCAL_DIR=build FORCE_REDUCED_MOTION=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
