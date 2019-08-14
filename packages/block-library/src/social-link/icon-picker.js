@@ -18,8 +18,7 @@ const IconPicker = ( { icons, onClick } ) => {
 						<Button
 							key={ icon }
 							className={ classes }
-							data-icon={ icon }
-							onClick={ ( evt ) => onClick( evt.target.dataset.icon ) }
+							onClick={ () => onClick( icon ) }
 						></Button>
 					);
 				} )
