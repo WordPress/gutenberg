@@ -12,7 +12,7 @@ import { __ } from '@wordpress/i18n';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { createBlock, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
-import { KeyboardAwareFlatList, ReadableContentView } from '@wordpress/components';
+import { KeyboardAwareFlatList, ReadableContentView, useStyle, DarkMode } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -24,6 +24,8 @@ import DefaultBlockAppender from '../default-block-appender';
 const innerToolbarHeight = 44;
 
 export class BlockList extends Component {
+	static contextType = DarkMode.Context;
+
 	constructor() {
 		super( ...arguments );
 
@@ -103,7 +105,7 @@ export class BlockList extends Component {
 					innerRef={ this.scrollViewInnerRef }
 					extraScrollHeight={ innerToolbarHeight + 10 }
 					keyboardShouldPersistTaps="always"
-					style={ styles.list }
+					style={ useStyle( styles.list, styles.listDark, this.context ) }
 					data={ this.props.blockClientIds }
 					extraData={ [ this.props.isFullyBordered ] }
 					keyExtractor={ identity }

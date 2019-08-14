@@ -15,6 +15,7 @@ import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { getBlockType } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
+import { useStyle, DarkMode } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -25,6 +26,8 @@ import BlockInvalidWarning from './block-invalid-warning';
 import BlockMobileToolbar from './block-mobile-toolbar';
 
 class BlockListBlock extends Component {
+	static contextType = DarkMode.Context;
+
 	constructor() {
 		super( ...arguments );
 
@@ -113,6 +116,7 @@ class BlockListBlock extends Component {
 			title,
 		} = this.props;
 
+		const blockContainerStyle = useStyle( styles.blockContainer, styles.blockContainerDark );
 		const borderColor = isSelected ? focusedBorderColor : 'transparent';
 
 		const accessibilityLabel = this.getAccessibilityLabel();
@@ -127,7 +131,7 @@ class BlockListBlock extends Component {
 					{ showTitle && this.renderBlockTitle() }
 					<View
 						accessibilityLabel={ accessibilityLabel }
-						style={ [ ! isSelected && styles.blockContainer, isSelected && styles.blockContainerFocused ] }
+						style={ [ ! isSelected && blockContainerStyle, isSelected && styles.blockContainerFocused ] }
 					>
 						{ isValid && this.getBlockForType() }
 						{ ! isValid &&
