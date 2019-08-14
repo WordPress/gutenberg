@@ -250,7 +250,7 @@ class GalleryEdit extends Component {
 
 	render() {
 		const { attributes, isSelected, className, noticeUI, setAttributes } = this.props;
-		const { images, columns = defaultColumnsNumber( attributes ), align, galleryCaption, imageCrop, linkTo } = attributes;
+		const { images, columns = defaultColumnsNumber( attributes ), align, caption: galleryCaption, imageCrop, linkTo } = attributes;
 		const hasImages = !! images.length;
 
 		const mediaPlaceholder = (
