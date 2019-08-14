@@ -12,7 +12,7 @@ const jestE2EConfig = {
 	preset: 'jest-puppeteer',
 	testMatch: [
 		'**/specs/**/*.[jt]s',
-		'**/?(*.)+spec.[jt]s',
+		'**/?(*.)spec.[jt]s',
 	],
 };
 
