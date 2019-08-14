@@ -22,11 +22,6 @@ import { __ } from '@wordpress/i18n';
  */
 import icon from './media-container-icon';
 
-/**
- * Constants
- */
-const ALLOWED_MEDIA_TYPES = [ 'image', 'video' ];
-
 export function calculatePreferedImageSize( image, container ) {
 	const maxWidth = container.clientWidth;
 	const exceedMaxWidth = image.width > maxWidth;
@@ -42,6 +37,7 @@ class MediaContainer extends Component {
 		this.onUploadError = this.onUploadError.bind( this );
 		this.calculateSize = this.calculateSize.bind( this );
 		this.onLayout = this.onLayout.bind( this );
+		this.onSelectURL = this.onSelectURL.bind( this );
 
 		this.state = {
 			width: 0,
@@ -59,14 +55,24 @@ class MediaContainer extends Component {
 		noticeOperations.createErrorNotice( message );
 	}
 
+	onSelectURL( mediaId, mediaUrl ) {
+		const { onSelectMedia } = this.props;
+
+		onSelectMedia( {
+			media_type: 'image',
+			id: mediaId,
+			src: mediaUrl,
+		} );
+	}
+
 	renderToolbarEditButton() {
-		const { mediaId, onSelectMedia } = this.props;
+		const { mediaId } = this.props;
 		return (
 			<BlockControls>
 				<Toolbar>
 					<MediaUpload
-						onSelect={ onSelectMedia }
-						allowedTypes={ ALLOWED_MEDIA_TYPES }
+						onSelectURL={ this.onSelectURL }
+						mediaType={ MEDIA_TYPE_IMAGE }
 						value={ mediaId }
 						render={ ( { open } ) => (
 							<IconButton
@@ -151,14 +157,13 @@ class MediaContainer extends Component {
 	}
 
 	renderPlaceholder() {
-		const { onSelectMedia } = this.props;
 		return (
 			<MediaPlaceholder
 				icon={ <BlockIcon icon={ icon } /> }
 				labels={ {
 					title: __( 'Media area' ),
 				} }
-				onSelect={ onSelectMedia }
+				onSelectURL={ this.onSelectURL }
 				mediaType={ MEDIA_TYPE_IMAGE }
 				onFocus={ this.props.onFocus }
 			/>
