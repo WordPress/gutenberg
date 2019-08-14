@@ -1,0 +1,4 @@
+.blocks-gallery-grid + figcaption,
+.wp-block-gallery > .block-editor-rich-text {
+	@include caption-style-theme();
+}
