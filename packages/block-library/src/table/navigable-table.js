@@ -26,6 +26,15 @@ import {
 	getLocationOfLastCellInTable,
 } from './state';
 
+/**
+ * Given the table state, the selected cell, and the knowledged of the pressed keys, determine the next cell location.
+ *
+ * @param {Object} tableState     The table state.
+ * @param {Object} selectedCell   The selected cell.
+ * @param {Object} navigationKeys Object containing booleans for the pressed keys.
+ *
+ * @return {Object} The location of the cell to navigate to.
+ */
 function getNextCellLocation( tableState, selectedCell, { isPrimary, isUp, isDown, isLeft, isRight, isHome, isEnd } ) {
 	if ( isUp ) {
 		if ( isPrimary ) {
@@ -69,6 +78,18 @@ function getNextCellLocation( tableState, selectedCell, { isPrimary, isUp, isDow
 	}
 }
 
+/**
+ * Given a reference to the table element and the cell location, return the DOM element for the
+ * contenteditable at the cell location.
+ *
+ * @param {Element} tableElement 			 The DOM table element
+ * @param {Object}  cellLocation 			 The cell location.
+ * @param {Object}  cellLocation.sectionName The table section name that the cell is within.
+ * @param {Object}  cellLocation.rowIndex    The rowIndex for the cell.
+ * @param {Object}  cellLocation.columnIndex The columnIndex for the cell.
+ *
+ * @return {Element} The contenteditable DOM element.
+ */
 function getCellContentEditableElement( tableElement, { sectionName, rowIndex, columnIndex } ) {
 	if ( ! tableElement ) {
 		return;
@@ -92,7 +113,6 @@ export default function NavigableTable( { children, className, tableState, selec
 
 		const { keyCode, target } = event;
 
-		//
 		if ( ! isTextField( target ) ) {
 			return;
 		}
@@ -107,14 +127,9 @@ export default function NavigableTable( { children, className, tableState, selec
 		const isVertical = isUp || isDown;
 		const isNav = isHorizontal || isVertical;
 
-		// The user hasn't pressed a navigation key, abort early.
-		if ( ! isNav ) {
-			return;
-		}
-
-		// Abort if navigation has already been handled (e.g. RichText inline
-		// boundaries).
-		if ( event.nativeEvent.defaultPrevented ) {
+		// The user hasn't pressed a navigation key OR the event
+		// had been handled by RichText. Abort early.
+		if ( ! isNav || event.nativeEvent.defaultPrevented ) {
 			return;
 		}
 
@@ -122,13 +137,20 @@ export default function NavigableTable( { children, className, tableState, selec
 		const isReverse = isUp || isLeft || isHome;
 		const isCaretAtEdgeOfField = isAtEdge( target, isReverse );
 
+		// If the caret is still within a body of text, don't
+		// continue to handle the event, bail early.
 		if ( ! isCaretAtEdgeOfField ) {
 			return;
 		}
 
+		// Signal our intention to handle the event by disallowing any
+		// native or other event handling. Even if the next cell to
+		// navigate to can't be found, selection should still remain in
+		// the table block.
 		event.stopPropagation();
 		event.preventDefault();
 
+		// Get the next cell location using the table state.
 		const isPrimary = isKeyboardModifierEvent.primary( event );
 		const nextCellLocation = getNextCellLocation( tableState, selectedCell, { isPrimary, isUp, isDown, isLeft, isRight, isHome, isEnd } );
 
@@ -136,12 +158,14 @@ export default function NavigableTable( { children, className, tableState, selec
 			return;
 		}
 
+		// Find the cell location in the DOM.
 		const contentEditableElement = getCellContentEditableElement( tableRef.current, nextCellLocation );
 
 		if ( ! contentEditableElement ) {
 			return;
 		}
 
+		// Move the caret to the correct location.
 		placeCaretAtHorizontalEdge( contentEditableElement, isReverse );
 	};
 
