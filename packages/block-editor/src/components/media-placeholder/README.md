@@ -119,6 +119,13 @@ Media ID (or media IDs if multiple is true) to be selected by default when openi
 - Type: `Number|Array`
 - Required: No
 
+### append
+
+Components to render below the formfields, this property is passed to the placeholder component as `append`.
+
+- Type: `String|ReactElement`
+- Required: No
+
 
 ## Extend
 
