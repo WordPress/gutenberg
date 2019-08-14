@@ -111,7 +111,7 @@ export class TableEdit extends Component {
 		this.onToggleFooterSection = this.onToggleFooterSection.bind( this );
 		this.onChangeColumnAlignment = this.onChangeColumnAlignment.bind( this );
 		this.getCellAlignment = this.getCellAlignment.bind( this );
-		this.updateSelectedCell = this.updateSelectedCell.bind( this );
+		this.createOnFocus = this.createOnFocus.bind( this );
 
 		this.state = {
 			initialRowCount: 2,
@@ -352,18 +352,22 @@ export class TableEdit extends Component {
 	}
 
 	/**
-	 * Update the cell selection
+	 * Creates an onFocus handler for a specified cell.
 	 *
 	 * @param {Object} cellLocation Object with `section`, `rowIndex`, and
 	 *                              `columnIndex` properties.
+	 *
+	 * @return {Function} Function to call on focus.
 	 */
-	updateSelectedCell( cellLocation ) {
-		this.setState( {
-			selectedCell: {
-				...cellLocation,
-				type: 'cell',
-			},
-		} );
+	createOnFocus( cellLocation ) {
+		return () => {
+			this.setState( {
+				selectedCell: {
+					...cellLocation,
+					type: 'cell',
+				},
+			} );
+		};
 	}
 
 	/**
@@ -480,7 +484,7 @@ export class TableEdit extends Component {
 										tabIndex={ tabIndex }
 										value={ content }
 										onChange={ this.onChange }
-										unstableOnFocus={ () => this.updateSelectedCell( cellLocation ) }
+										unstableOnFocus={ this.createOnFocus( cellLocation ) }
 									/>
 								</CellTag>
 							);
