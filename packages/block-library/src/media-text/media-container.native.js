@@ -162,6 +162,7 @@ class MediaContainer extends Component {
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				notices={ noticeUI }
 				onError={ this.onUploadError }
+				onFocus={ this.props.onFocus }
 			/>
 		);
 	}
