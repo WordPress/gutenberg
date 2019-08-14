@@ -28,8 +28,12 @@ export default function ListEdit( {
 	const { ordered, values } = attributes;
 	const tagName = ordered ? 'ol' : 'ul';
 
-	const controls = ( { value, onChange } ) =>
-		<>
+	const controls = ( { value, onChange } ) => {
+		if ( value.start === undefined ) {
+			return;
+		}
+
+		return <>
 			<RichTextShortcut
 				type="primary"
 				character="["
@@ -105,6 +109,7 @@ export default function ListEdit( {
 				/>
 			</BlockControls>
 		</>;
+	};
 
 	return (
 		<RichText

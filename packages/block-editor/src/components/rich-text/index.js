@@ -375,7 +375,7 @@ class RichTextWrapper extends Component {
 			>
 				{ ( { isSelected, value, onChange, Editable } ) =>
 					<>
-						{ isSelected && children && children( { value, onChange } ) }
+						{ children && children( { value, onChange } ) }
 						{ isSelected && ! inlineToolbar && hasFormats && (
 							<BlockFormatControls>
 								<FormatToolbar />
