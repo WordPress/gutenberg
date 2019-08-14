@@ -149,11 +149,8 @@
 			justify-content: center;
 		}
 	}
-
-	+ figcaption {
-		margin-top: -$grid-size;
-		font-size: $editor-font-size;
-		font-family: $default-font;
-		color: $dark-gray-500;
-	}
+}
+figure.wp-block-gallery {
+	display: block;
+	margin: 0;
 }
