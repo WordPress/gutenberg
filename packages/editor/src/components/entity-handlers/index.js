@@ -1,7 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { useMemo } from '@wordpress/element';
 import { InnerBlocks } from '@wordpress/block-editor';
 
 /**
@@ -10,11 +11,16 @@ import { InnerBlocks } from '@wordpress/block-editor';
 import EditorProvider from '../provider';
 import PostSavedState from '../post-saved-state';
 
-export default function EntityHandlers( { entity, ...props } ) {
+export default function EntityHandlers( {
+	entity,
+	handles = { all: true },
+	...props
+} ) {
 	const editorSettings = useSelect(
 		( select ) => select( 'core/editor' ).getEditorSettings(),
 		[]
 	);
+	const parentDispatch = useDispatch();
 
 	// Using the provider like this will create a separate registry
 	// and store for the `entity`, while still syncing child blocks
@@ -23,7 +29,10 @@ export default function EntityHandlers( { entity, ...props } ) {
 	return (
 		<EditorProvider
 			noBlockEditorStore
-			settings={ editorSettings }
+			settings={ useMemo(
+				() => ( { ...editorSettings, handles, parentDispatch } ),
+				[ editorSettings, parentDispatch ]
+			) }
 			post={ entity }
 			{ ...props }
 		>

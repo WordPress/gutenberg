@@ -122,17 +122,15 @@ export function hasChangedContent( state ) {
  *
  * @return {boolean} Whether unsaved values exist.
  */
-export const isEditedPostDirty = createRegistrySelector( ( select ) => ( state ) => {
+export function isEditedPostDirty( state ) {
 	// Edits should contain only fields which differ from the saved post (reset
 	// at initial load and save complete). Thus, a non-empty edits state can be
 	// inferred to contain unsaved values.
-	const postType = getCurrentPostType( state );
-	const postId = getCurrentPostId( state );
-	if ( select( 'core' ).hasEditsForEntityRecord( 'postType', postType, postId ) ) {
+	if ( Object.keys( getHandlesFilteredEdits( state ).handled ).length ) {
 		return true;
 	}
 	return false;
-} );
+}
 
 /**
  * Returns true if there are no unsaved values for the current edit session and
@@ -1205,6 +1203,52 @@ export function __unstableIsEditorReady( state ) {
 export function getEditorSettings( state ) {
 	return state.editorSettings;
 }
+
+/**
+ * Returns an object with the edits broken down into a
+ * handled edits object, an edits object that should
+ * be delegated to a parent editor, and the parent's
+ * dispatching function, if any.
+ *
+ * @param {Object} state  Editor state.
+ * @param {Object} _edits The edits, defaults
+ *                         to all of the entity's current edits.
+ *
+ * @return {Object} The object with the grouped edits and the
+ *                   parent's dispatching function.
+ */
+export const getHandlesFilteredEdits = createRegistrySelector(
+	( select ) => ( state, edits ) => {
+		if ( ! edits ) {
+			const postId = getCurrentPostId( state );
+			const postType = getCurrentPostType( state );
+			edits = select( 'core' ).getEntityRecordNonTransientEdits(
+				'postType',
+				postType,
+				postId
+			);
+		}
+		const { handles = { all: true }, parentDispatch } = getEditorSettings( state );
+		return Object.keys( edits ).reduce(
+			( acc, key ) => {
+				// Handle edits if all attributes are implicitly
+				// handled and they are not explicitly not handled,
+				// or if they are explicitly handled.
+				if ( ( handles.all && handles[ key ] !== false ) || handles[ key ] ) {
+					acc.handled[ key ] = edits[ key ];
+				} else {
+					acc.forParent[ key ] = edits[ key ];
+				}
+				return acc;
+			},
+			{
+				handled: {},
+				forParent: {},
+				parentDispatch,
+			}
+		);
+	}
+);
 
 /*
  * Backward compatibility

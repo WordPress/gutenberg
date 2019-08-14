@@ -58,7 +58,11 @@ export default function PostEdit( { attributes: { postId }, setAttributes } ) {
 	}
 
 	return entity ? (
-		<EntityHandlers entity={ entity } />
+		<EntityHandlers
+			entity={ entity }
+			// Let content and blocks bubble up to a parent template entity.
+			handles={ { all: true, content: false, blocks: false } }
+		/>
 	) : (
 		<Placeholder>
 			<Spinner />

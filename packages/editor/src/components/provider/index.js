@@ -166,6 +166,21 @@ class EditorProvider extends Component {
 		// determine which properties, including the actual serialized
 		// content, get synced and persisted, or delegated to a parent provider.
 		if ( noBlockEditorStore ) {
+			// Handle content and blocks if all attributes are implicitly
+			// handled and they are not explicitly not handled, or if they
+			// are explicitly handled.
+			const innerBlocksProps =
+				settings.handles &&
+				( ( settings.handles.all &&
+					settings.handles.content !== false &&
+					settings.handles.blocks !== false ) ||
+					( settings.handles.content && settings.handles.blocks ) ) ?
+					{
+						blocks,
+						resetEditorBlocks,
+						resetEditorBlocksWithoutUndoLevel,
+					} :
+					{};
 			return (
 				<>
 					{ children }
@@ -174,13 +189,7 @@ class EditorProvider extends Component {
 						but we provide props to sync with this provider's entity. Just
 						like how the block-editor store syncs with the top level editor store.
 					*/ }
-					<InnerBlocks
-						blocks={ blocks }
-						resetEditorBlocks={ resetEditorBlocks }
-						resetEditorBlocksWithoutUndoLevel={
-							resetEditorBlocksWithoutUndoLevel
-						}
-					/>
+					<InnerBlocks { ...innerBlocksProps } />
 				</>
 			);
 		}

@@ -217,6 +217,19 @@ _Related_
 
 -   getClientIdsWithDescendants in core/block-editor store.
 
+<a name="getCurrentEntityAttribute" href="#getCurrentEntityAttribute">#</a> **getCurrentEntityAttribute**
+
+Returns an attribute value of the saved entity.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+-   _attributeName_ `string`: Entity attribute name.
+
+_Returns_
+
+-   `*`: Entity attribute value.
+
 <a name="getCurrentPost" href="#getCurrentPost">#</a> **getCurrentPost**
 
 Returns the post currently being edited in its last known saved state, not
@@ -293,6 +306,21 @@ _Parameters_
 _Returns_
 
 -   `string`: Post type.
+
+<a name="getEditedEntityAttribute" href="#getEditedEntityAttribute">#</a> **getEditedEntityAttribute**
+
+Returns a single attribute of the entity being edited, preferring the unsaved
+edit if one exists, but falling back to the attribute for the last known
+saved state of the entity.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+-   _attributeName_ `string`: Entity attribute name.
+
+_Returns_
+
+-   `*`: Entity attribute value.
 
 <a name="getEditedPostAttribute" href="#getEditedPostAttribute">#</a> **getEditedPostAttribute**
 
@@ -382,6 +410,22 @@ _Related_
 _Related_
 
 -   getGlobalBlockCount in core/block-editor store.
+
+<a name="getHandlesFilteredEdits" href="#getHandlesFilteredEdits">#</a> **getHandlesFilteredEdits**
+
+Returns an object with the edits broken down into a
+handled edits object, an edits object that should
+be delegated to a parent editor, and the parent's
+dispatching function, if any.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+-   _\_edits_ `Object`: The edits, defaults to all of the entity's current edits.
+
+_Returns_
+
+-   `Object`: The object with the grouped edits and the parent's dispatching function.
 
 <a name="getInserterItems" href="#getInserterItems">#</a> **getInserterItems**
 
@@ -1034,9 +1078,18 @@ _Returns_
 
 -   `Object`: Action object
 
+<a name="editEntity" href="#editEntity">#</a> **editEntity**
+
+Yields an action object used in signalling that attributes of the entity have
+been edited.
+
+_Parameters_
+
+-   _edits_ `Object`: Entity attributes to edit.
+
 <a name="editPost" href="#editPost">#</a> **editPost**
 
-Returns an action object used in signalling that attributes of the post have
+Yields an action object used in signalling that attributes of the post have
 been edited.
 
 _Parameters_

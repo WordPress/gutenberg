@@ -189,8 +189,20 @@ export function setupEditorState( post ) {
  * @yield {Object} Action object or control.
  */
 export function* editPost( edits ) {
-	const { id, type } = yield select( 'core/editor', 'getCurrentPost' );
-	yield dispatch( 'core', 'editEntityRecord', 'postType', type, id, edits );
+	const { handled, forParent, parentDispatch } = yield select(
+		STORE_KEY,
+		'getHandlesFilteredEdits',
+		edits
+	);
+
+	if ( Object.keys( handled ).length ) {
+		const { id, type } = yield select( 'core/editor', 'getCurrentPost' );
+		yield dispatch( 'core', 'editEntityRecord', 'postType', type, id, handled );
+	}
+
+	if ( parentDispatch && Object.keys( forParent ).length ) {
+		parentDispatch( 'core/editor' ).editPost( forParent );
+	}
 }
 
 /**
@@ -234,37 +246,32 @@ export function* savePost( options = {} ) {
 	yield __experimentalRequestPostUpdateStart( options );
 	const postType = yield select( 'core/editor', 'getCurrentPostType' );
 	const postId = yield select( 'core/editor', 'getCurrentPostId' );
-	yield dispatch(
-		'core',
-		'saveEditedEntityRecord',
-		'postType',
-		postType,
-		postId,
-		{
-			...options,
-			getSuccessNoticeActionArgs: ( previousEntity, entity, type ) => {
-				const args = getNotificationArgumentsForSaveSuccess( {
-					previousPost: previousEntity,
-					post: entity,
-					postType: type,
-					options,
-				} );
-				if ( args && args.length ) {
-					return [ 'core/notices', 'createSuccessNotice', ...args ];
-				}
-			},
-			getFailureNoticeActionArgs: ( previousEntity, edits, error ) => {
-				const args = getNotificationArgumentsForSaveFail( {
-					post: previousEntity,
-					edits,
-					error,
-				} );
-				if ( args && args.length ) {
-					return [ 'core/notices', 'createErrorNotice', ...args ];
-				}
-			},
-		}
-	);
+	const { handled } = yield select( STORE_KEY, 'getHandlesFilteredEdits' );
+	const record = { id: postId, ...handled };
+	yield dispatch( 'core', 'saveEntityRecord', 'postType', postType, record, {
+		...options,
+		getSuccessNoticeActionArgs: ( previousEntity, entity, type ) => {
+			const args = getNotificationArgumentsForSaveSuccess( {
+				previousPost: previousEntity,
+				post: entity,
+				postType: type,
+				options,
+			} );
+			if ( args && args.length ) {
+				return [ 'core/notices', 'createSuccessNotice', ...args ];
+			}
+		},
+		getFailureNoticeActionArgs: ( previousEntity, edits, error ) => {
+			const args = getNotificationArgumentsForSaveFail( {
+				post: previousEntity,
+				edits,
+				error,
+			} );
+			if ( args && args.length ) {
+				return [ 'core/notices', 'createErrorNotice', ...args ];
+			}
+		},
+	} );
 	yield __experimentalRequestPostUpdateFinish( options );
 }
 
