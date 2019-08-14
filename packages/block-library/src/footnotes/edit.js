@@ -8,7 +8,7 @@ import classnames from 'classnames';
  */
 import { __ } from '@wordpress/i18n';
 import { IconButton, Toolbar, Slot } from '@wordpress/components';
-import { useRef } from '@wordpress/element';
+import { useRef, useState } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { withSafeTimeout } from '@wordpress/compose';
 import { RichText, BlockFormatControls } from '@wordpress/block-editor';
@@ -17,6 +17,7 @@ function Edit( { attributes, setAttributes, className, setTimeout } ) {
 	const { footnotes } = attributes;
 	const ref = useRef( null );
 	const { clearSelectedBlock } = useDispatch( 'core/block-editor' );
+	const [ selected, select ] = useState( false );
 
 	if ( ! footnotes.length ) {
 		return null;
@@ -33,12 +34,23 @@ function Edit( { attributes, setAttributes, className, setTimeout } ) {
 		);
 	};
 
+	const onFocus = () => {
+		clearSelectedBlock();
+		select( true );
+	};
+
+	const onBlur = () => {
+		select( false );
+	};
+
 	return (
 		<div
 			className={ classnames( 'wp-block block-library-list', className, {
 				'is-selected': hasSelection,
 			} ) }
 			tabIndex="0"
+			onFocus={ onFocus }
+			onBlur={ onBlur }
 			ref={ ref }
 		>
 			{ hasSelection &&
@@ -49,7 +61,7 @@ function Edit( { attributes, setAttributes, className, setTimeout } ) {
 						</IconButton>
 						<Slot name="__unstable-footnote-controls" />
 					</Toolbar>
-					<BlockFormatControls.Slot />
+					{ selected && <BlockFormatControls.Slot /> }
 				</>
 			}
 			<ol>
