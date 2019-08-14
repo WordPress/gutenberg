@@ -12,6 +12,8 @@ import {
 	createNewPost,
 	getEditedPostContent,
 	insertBlock,
+	pressKeyTimes,
+	pressKeyWithModifier,
 } from '@wordpress/e2e-test-utils';
 
 const createButtonLabel = 'Create Table';
@@ -231,6 +233,83 @@ describe( 'Table', () => {
 		await page.keyboard.type( 'Second cell.' );
 
 		// Expect that the snapshot shows the text in the second cell.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'allows keyboard navigation between table cells using arrow keys', async () => {
+		await insertBlock( 'Table' );
+
+		// Modify the row and column count and create the table.
+		await pressKeyTimes( 'Tab', 5 );
+		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.type( '4' );
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.type( '4' );
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Space' );
+
+		// Tab into the first cell.
+		await page.keyboard.press( 'Tab' );
+
+		// Navigate and type spreadsheet-style cell locations.
+		// First use normal arrow keys in the middle of the table.
+		await pressKeyTimes( 'ArrowRight', 2 );
+		await page.keyboard.type( 'C1' );
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.type( 'C2' );
+		await pressKeyTimes( 'ArrowLeft', 3 );
+		await page.keyboard.type( 'B2' );
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.type( 'B1' );
+
+		// Next use Cmd/Ctrl with arrow keys to navigate to the corners of the table.
+		await pressKeyWithModifier( 'primary', 'ArrowRight' );
+		await page.keyboard.type( 'D1' );
+		await pressKeyWithModifier( 'primary', 'ArrowDown' );
+		await page.keyboard.type( 'D4' );
+		await pressKeyTimes( 'ArrowLeft', 2 );
+		await pressKeyWithModifier( 'primary', 'ArrowLeft' );
+		await page.keyboard.type( 'A4' );
+		await pressKeyWithModifier( 'primary', 'ArrowUp' );
+		await page.keyboard.type( 'A1' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'allows keyboard navigation between table cells using the HOME and END keys', async () => {
+		await insertBlock( 'Table' );
+
+		// Modify the row and column count and create the table.
+		await pressKeyTimes( 'Tab', 5 );
+		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.type( '4' );
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.type( '4' );
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Space' );
+
+		// Tab into the first cell.
+		await page.keyboard.press( 'Tab' );
+
+		// Navigate and type spreadsheet-style cell locations.
+		// Navigate to the start and end of the second row.
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.press( 'Home' );
+		await page.keyboard.type( 'A2' );
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( 'D2' );
+
+		// Move the caret to the start of the cell.
+		await pressKeyTimes( 'ArrowLeft', 2 );
+
+		// Navigate to the first and last cells in the table.
+		await pressKeyWithModifier( 'primary', 'Home' );
+		await page.keyboard.type( 'A1' );
+		await pressKeyWithModifier( 'primary', 'End' );
+		await page.keyboard.type( 'D4' );
+
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );

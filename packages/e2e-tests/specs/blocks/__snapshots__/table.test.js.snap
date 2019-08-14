@@ -36,6 +36,18 @@ exports[`Table allows header and footer rows to be switched on and off 2`] = `
 <!-- /wp:table -->"
 `;
 
+exports[`Table allows keyboard navigation between table cells using arrow keys 1`] = `
+"<!-- wp:table -->
+<figure class=\\"wp-block-table\\"><table class=\\"\\"><tbody><tr><td>A1</td><td>B1</td><td>C1</td><td>D1</td></tr><tr><td></td><td>B2</td><td>C2</td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr><tr><td>A4</td><td></td><td></td><td>D4</td></tr></tbody></table></figure>
+<!-- /wp:table -->"
+`;
+
+exports[`Table allows keyboard navigation between table cells using the HOME and END keys 1`] = `
+"<!-- wp:table -->
+<figure class=\\"wp-block-table\\"><table class=\\"\\"><tbody><tr><td>A1</td><td></td><td></td><td></td></tr><tr><td>A2</td><td></td><td></td><td>D2</td></tr><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td>D4</td></tr></tbody></table></figure>
+<!-- /wp:table -->"
+`;
+
 exports[`Table allows text to by typed into cells 1`] = `
 "<!-- wp:table -->
 <figure class=\\"wp-block-table\\"><table class=\\"\\"><tbody><tr><td>This</td><td>is</td></tr><tr><td>table</td><td>block</td></tr></tbody></table></figure>
