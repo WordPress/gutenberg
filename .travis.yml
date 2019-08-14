@@ -63,7 +63,7 @@ install:
   - |
     if [[ "$E2E_ROLE" = "author" ]]; then
       node bin/docker.js run --rm cli user create author author@example.com --role=author --user_pass=authpass --path=build
-      node bin/docker.js run --rm -u 33 $CLI post update 1 --post_author=2
+      node bin/docker.js run --rm cli post update 1 --post_author=2 --path=build
     fi
 
 env: PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
