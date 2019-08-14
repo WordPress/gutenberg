@@ -100,7 +100,7 @@ class RichTextWrapper extends Component {
 		}
 	}
 
-	onDelete( { isReverse, value } ) {
+	onDelete( { value, isReverse } ) {
 		const { onMerge, onRemove } = this.props;
 
 		if ( onMerge ) {
