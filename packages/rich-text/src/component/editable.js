@@ -116,7 +116,7 @@ export default class Editable extends Component {
 			this.editorNode.className = nextProps.className;
 		}
 
-		if ( ! isEqual( this.props.tabIndex, nextProps.tabIndex ) ) {
+		if ( this.props.tabIndex !== nextProps.tabIndex ) {
 			this.editorNode.tabIndex = nextProps.tabIndex;
 		}
 
