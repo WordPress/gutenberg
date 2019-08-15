@@ -12,7 +12,7 @@ Update `my-custom-format.js` with this new code:
 ( function( wp ) {
 	var MyCustomButton = function( props ) {
 		return wp.element.createElement(
-			wp.editor.RichTextToolbarButton, {
+			wp.blockEditor.RichTextToolbarButton, {
 				icon: 'editor-code',
 				title: 'Sample output',
 				onClick: function() {
