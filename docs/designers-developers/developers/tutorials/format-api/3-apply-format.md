@@ -63,6 +63,7 @@ registerFormatType(
 	}
 );
 ```
+{% end %}
 
 Now, let's check that is working as intended: reload the post/page, make a text selection, click the button, and then change to HTML view to confirm that the tag was effectively applied.
 
