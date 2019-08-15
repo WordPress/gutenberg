@@ -239,9 +239,14 @@ export function* savePost( options = {} ) {
 	if ( ! ( yield select( STORE_KEY, 'isEditedPostSaveable' ) ) ) {
 		return;
 	}
-	yield dispatch( STORE_KEY, 'editPost', {
-		content: yield select( 'core/editor', 'getEditedPostContent' ),
-	} );
+	const {
+		handled: { content: handlesContent },
+	} = yield select( STORE_KEY, 'getHandlesFilteredEdits', { content: true } );
+	if ( handlesContent ) {
+		yield dispatch( STORE_KEY, 'editPost', {
+			content: yield select( 'core/editor', 'getEditedPostContent' ),
+		} );
+	}
 
 	yield __experimentalRequestPostUpdateStart( options );
 	const postType = yield select( 'core/editor', 'getCurrentPostType' );

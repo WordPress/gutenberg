@@ -8,7 +8,7 @@
 		category: 'common',
 
 		edit: function( props ) {
-			var editEntity = wp.data.useDispatch()( 'core/editor' ).editEntity;
+			var dispatch = wp.data.useDispatch();
 			return el( 'input', {
 				className: 'my-meta-input',
 				value: wp.data.useSelect(
@@ -17,7 +17,7 @@
 					[]
 				),
 				onChange: function( event ) {
-					editEntity( {
+					dispatch( 'core/editor' ).editEntity( {
 						meta: { my_meta: event.target.value },
 					} );
 				},
