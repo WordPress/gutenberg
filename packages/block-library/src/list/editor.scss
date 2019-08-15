@@ -3,21 +3,3 @@
 	padding-left: 1.3em;
 	margin-left: 1.3em;
 }
-
-.editor-styles-wrapper .block-library-list ol {
-	&.ol-type-is-1 {
-		list-style: decimal;
-	}
-	&.ol-type-is-a {
-		list-style: lower-alpha;
-	}
-	&.ol-type-is-A {
-		list-style: upper-alpha;
-	}
-	&.ol-type-is-i {
-		list-style: lower-roman;
-	}
-	&.ol-type-is-I {
-		list-style: upper-roman;
-	}
-}

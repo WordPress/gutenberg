@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
@@ -19,7 +14,6 @@ import {
 	BaseControl,
 	PanelBody,
 	ToggleControl,
-	SelectControl,
 } from '@wordpress/components';
 import {
 	__unstableIndentListItems as indentListItems,
@@ -28,7 +22,6 @@ import {
 	__unstableIsListRootSelected as isListRootSelected,
 	__unstableIsActiveListType as isActiveListType,
 } from '@wordpress/rich-text';
-import { Fragment } from '@wordpress/element';
 import { withInstanceId } from '@wordpress/compose';
 
 /**
@@ -44,7 +37,7 @@ function ListEdit( {
 	className,
 	instanceId,
 } ) {
-	const { ordered, values, reversed, start, type } = attributes;
+	const { ordered, values, reversed, start } = attributes;
 	const tagName = ordered ? 'ol' : 'ul';
 	const startValueId = `block-list-startValue-input-${ instanceId }`;
 
@@ -148,28 +141,12 @@ function ListEdit( {
 			onRemove={ () => onReplace( [] ) }
 			start={ start }
 			reversed={ reversed }
-			type={ type }
 		>
 			{ controls }
 		</RichText>
-		{
-			ordered &&
+		{ ordered &&
 			<InspectorControls>
 				<PanelBody title={ __( 'Ordered List Settings' ) }>
-					<SelectControl
-						label={ __( 'List Type' ) }
-						value={ type ? type : '1' }
-						options={ [
-							{ label: 'Decimal', value: '1' },
-							{ label: 'Lower alpha', value: 'a' },
-							{ label: 'Upper alpha', value: 'A' },
-							{ label: 'Lower alpha', value: 'i' },
-							{ label: 'Upper alpha', value: 'I' },
-						] }
-						onChange={ ( nextType ) => {
-							setAttributes( { type: nextType } );
-						} }
-					/>
 					<BaseControl label={ __( 'Start Value' ) } id={ startValueId } >
 						<input
 							type="number"
@@ -194,6 +171,6 @@ function ListEdit( {
 			</InspectorControls>
 		}
 	</>;
-};
+}
 
 export default withInstanceId( ListEdit );

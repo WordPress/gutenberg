@@ -18,9 +18,6 @@
 		},
 		"reversed": {
 			"type": "boolean"
-		},
-		"type": {
-			"type": "string"
 		}
 	}
 }

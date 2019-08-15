@@ -124,10 +124,6 @@ export default class Editable extends Component {
 			this.editorNode.reversed = nextProps.reversed;
 		}
 
-		if ( this.props.type !== nextProps.type ) {
-			this.editorNode.type = nextProps.type;
-		}
-
 		const { removedKeys, updatedKeys } = diffAriaProps( this.props, nextProps );
 		removedKeys.forEach( ( key ) =>
 			this.editorNode.removeAttribute( key ) );

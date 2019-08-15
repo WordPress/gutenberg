@@ -334,7 +334,6 @@ class RichTextWrapper extends Component {
 			// To do: find a better way to implicitly inherit props.
 			start,
 			reversed,
-			type,
 			// From experimental filter. To do: pick props instead.
 			...experimentalProps
 		} = this.props;
@@ -406,7 +405,6 @@ class RichTextWrapper extends Component {
 									aria-activedescendant={ activeId }
 									start={ start }
 									reversed={ reversed }
-									type={ type }
 								/>
 							}
 						</Autocomplete>
