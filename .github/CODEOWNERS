@@ -46,7 +46,7 @@
 /packages/library-export-default-webpack-plugin @gziolo @ntwb @nerrad @ajitbohra
 /packages/npm-package-json-lint-config          @gziolo @ntwb @nerrad @ajitbohra
 /packages/postcss-themes                        @youknowriad @ntwb @nerrad @ajitbohra
-/packages/scripts                               @youknowriad @gziolo @ntwb @nerrad @ajitbohra @nosolosw
+/packages/scripts                               @youknowriad @gziolo @ntwb @nerrad @ajitbohra
 
 # UI Components
 /packages/components                            @youknowriad @gziolo @ajitbohra @jaymanpandya @jorgefilipecosta @talldan @chrisvanpatten
