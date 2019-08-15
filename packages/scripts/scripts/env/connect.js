@@ -11,11 +11,6 @@ const { normalize } = require( 'path' );
 const { cwd, env, exit, stdout } = require( 'process' );
 const { execSync } = require( 'child_process' );
 
-if ( ! env.WP_DEVELOP_DIR ) {
-	stdout.write( 'Please ensure the WP_DEVELOP_DIR environment variable is set to your WordPress Development directory before running this script.' );
-	exit( 1 );
-}
-
 const composeFile = normalize( `${ env.WP_DEVELOP_DIR }/docker-compose.override.yml` );
 let compose = {};
 if ( existsSync( composeFile ) ) {
@@ -23,7 +18,7 @@ if ( existsSync( composeFile ) ) {
 		compose = yaml.safeLoad( readFileSync( composeFile, 'utf8' ) );
 	} catch ( e ) {
 		stdout.write( 'There was an error loading your docker-compose.override.yml file. Please fix or delete it, and try again.' );
-		stdout.write( e );
+		stdout.write( e.toString() );
 		exit( 1 );
 	}
 }
@@ -39,7 +34,7 @@ try {
 	coreCompose = yaml.safeLoad( readFileSync( coreComposeFile, 'utf8' ) );
 } catch ( e ) {
 	stdout.write( 'There was an error loading your docker-compose.yml in your WordPress directory. Please revert any  changes to it, and try again.' );
-	stdout.write( e );
+	stdout.write( e.toString() );
 	exit( 1 );
 }
 

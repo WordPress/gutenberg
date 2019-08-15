@@ -53,20 +53,20 @@ install:
   - npm run build
   - |
     if [[ "$COMPOSER_INSTALL" = "true" ]]; then
-      node bin/docker.js run -w /var/www/build/wp-content/plugins/gutenberg --rm php composer install
+      npm run env docker-run -- php composer install
     fi
   - |
     if [[ "$WORDPRESS" = "true" ]]; then
       # Add Gutenberg to the WordPress local environment
       export WP_DEVELOP_DIR=./wordpress
-      npm run env:config
+      npm run env connect
 
-      node bin/docker.js run --rm cli plugin activate gutenberg --path=build
+      npm run env cli plugin activate gutenberg
     fi
   - |
     if [[ "$E2E_ROLE" = "author" ]]; then
-      node bin/docker.js run --rm cli user create author author@example.com --role=author --user_pass=authpass --path=build
-      node bin/docker.js run --rm cli post update 1 --post_author=2 --path=build
+      npm run env cli -- user create author author@example.com --role=author --user_pass=authpass --path=build
+      npm run env cli -- post update 1 --post_author=2 --path=build
     fi
 
 env: PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
