@@ -12,6 +12,7 @@ import {
 	parse,
 	serialize,
 	createBlock,
+	isReusableBlock,
 } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 // TODO: Ideally this would be the only dispatch in scope. This requires either
@@ -157,6 +158,10 @@ export const deleteReusableBlocks = async ( action, store ) => {
 	if ( ! reusableBlock || reusableBlock.isTemporary ) {
 		return;
 	}
+	// Remove any other blocks that reference this reusable block
+	const allBlocks = select( 'core/block-editor' ).getBlocks();
+	const associatedBlocks = allBlocks.filter( ( block ) => isReusableBlock( block ) && block.attributes.ref === id );
+	const associatedBlockClientIds = associatedBlocks.map( ( block ) => block.clientId );
 
 	const transactionId = uniqueId();
 
@@ -165,6 +170,11 @@ export const deleteReusableBlocks = async ( action, store ) => {
 		id,
 		optimist: { type: BEGIN, id: transactionId },
 	} );
+
+	// Remove the parsed block.
+	if ( associatedBlockClientIds.length ) {
+		dataDispatch( 'core/block-editor' ).removeBlocks( associatedBlockClientIds );
+	}
 
 	try {
 		await apiFetch( {

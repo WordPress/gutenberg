@@ -563,19 +563,14 @@ describe( 'state', () => {
 			const state = reusableBlocks( {}, {
 				type: 'RECEIVE_REUSABLE_BLOCKS',
 				results: [ {
-					reusableBlock: {
-						id: 123,
-						title: 'My cool block',
-					},
-					parsedBlock: {
-						clientId: 'foo',
-					},
+					id: 123,
+					title: 'My cool block',
 				} ],
 			} );
 
 			expect( state ).toEqual( {
 				data: {
-					123: { clientId: 'foo', title: 'My cool block' },
+					123: { id: 123, title: 'My cool block' },
 				},
 				isFetching: {},
 				isSaving: {},
@@ -592,9 +587,11 @@ describe( 'state', () => {
 			};
 
 			const state = reusableBlocks( initialState, {
-				type: 'UPDATE_REUSABLE_BLOCK_TITLE',
+				type: 'UPDATE_REUSABLE_BLOCK',
 				id: 123,
-				title: 'My block',
+				changes: {
+					title: 'My block',
+				},
 			} );
 
 			expect( state ).toEqual( {
@@ -609,7 +606,7 @@ describe( 'state', () => {
 		it( "should update the reusable block's id if it was temporary", () => {
 			const initialState = {
 				data: {
-					reusable1: { clientId: '', title: '' },
+					reusable1: { id: 'reusable1', title: '' },
 				},
 				isSaving: {},
 			};
@@ -622,7 +619,7 @@ describe( 'state', () => {
 
 			expect( state ).toEqual( {
 				data: {
-					123: { clientId: '', title: '' },
+					123: { id: 123, title: '' },
 				},
 				isFetching: {},
 				isSaving: {},
