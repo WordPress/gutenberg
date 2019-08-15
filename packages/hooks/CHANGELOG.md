@@ -1,4 +1,4 @@
-## 2.5.0 (2019-08-12)
+## Master
 
  - Enable an optional namespace parameter for `hasAction` & `hasFilter`. When checking if an action or filter exists, `hasAction` and `hasFilter` now accept an optional paramter to limit matches by namespace.
 
