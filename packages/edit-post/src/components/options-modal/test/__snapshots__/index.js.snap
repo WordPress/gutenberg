@@ -19,6 +19,7 @@ exports[`OptionsModal should match snapshot when the modal is active 1`] = `
   <Section
     title="Document Panels"
   >
+    <EnablePluginDocumentSettingPanelOptionSlot />
     <WithSelect(PostTaxonomies)
       taxonomyWrapper={[Function]}
     />

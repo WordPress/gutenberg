@@ -146,7 +146,7 @@ describe( 'Block Grouping', () => {
 		it( 'does not show group option in the options toolbar if Grouping block is disabled ', async () => {
 			await clickBlockToolbarButton( 'More options' );
 
-			const blockOptionsDropdownHTML = await page.evaluate( () => document.querySelector( '.block-editor-block-settings-menu__content' ).innerHTML );
+			const blockOptionsDropdownHTML = await page.evaluate( () => document.querySelector( '.block-editor-block-settings-menu__popover' ).innerHTML );
 
 			expect( blockOptionsDropdownHTML ).not.toContain( 'Group' );
 		} );

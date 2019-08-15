@@ -74,7 +74,7 @@ const registerBlock = ( block ) => {
 	}
 	const { metadata, settings, name } = block;
 	if ( metadata ) {
-		unstable__bootstrapServerSideBlockDefinitions( { [ name ]: metadata } ); // eslint-disable-line camelcase
+		unstable__bootstrapServerSideBlockDefinitions( { [ name ]: metadata } );
 	}
 	registerBlockType( name, settings );
 };

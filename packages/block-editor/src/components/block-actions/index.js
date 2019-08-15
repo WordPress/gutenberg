@@ -46,10 +46,15 @@ export default compose( [
 		const { getDefaultBlockName } = select( 'core/blocks' );
 
 		const blocks = getBlocksByClientId( props.clientIds );
-		const canDuplicate = every( blocks, ( block ) => {
-			return !! block && hasBlockSupport( block.name, 'multiple', true );
-		} );
 		const rootClientId = getBlockRootClientId( props.clientIds[ 0 ] );
+		const canDuplicate = every( blocks, ( block ) => {
+			return (
+				!! block &&
+				hasBlockSupport( block.name, 'multiple', true ) &&
+				canInsertBlockType( block.name, rootClientId )
+			);
+		} );
+
 		const canInsertDefaultBlock = canInsertBlockType(
 			getDefaultBlockName(),
 			rootClientId
@@ -83,7 +88,7 @@ export default compose( [
 
 		return {
 			onDuplicate() {
-				if ( isLocked || ! canDuplicate ) {
+				if ( ! canDuplicate ) {
 					return;
 				}
 
