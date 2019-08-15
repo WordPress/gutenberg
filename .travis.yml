@@ -32,7 +32,7 @@ before_install:
       sudo mv docker-compose /usr/local/bin
 
       # Check out WordPress
-      git clone git://develop.git.wordpress.org/ wordpress
+      git clone --depth=1 git://develop.git.wordpress.org/ wordpress
 
       cd wordpress
 
