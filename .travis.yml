@@ -21,6 +21,14 @@ branches:
   only:
     - master
 
+env:
+  global:
+    - PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: true
+    - LOCAL_DIR: build
+    - LOCAL_SCRIPT_DEBUG: false
+    - COMPOSER_INSTALL: false
+    - WORDPRESS: true
+
 before_install:
   - nvm install
   - |
@@ -69,16 +77,15 @@ install:
       npm run env cli -- post update 1 --post_author=2 --path=build
     fi
 
-env: PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
-
 jobs:
   include:
     - name: Lint
-      env: WORDPRESS=true COMPOSER_INSTALL=true
+      env: COMPOSER_INSTALL=true
       script:
         - npm run lint
 
     - name: Build artifacts
+      env: WORDPRESS=false
       install:
         # A "full" install is executed, since `npm ci` does not always exit
         # with an error status code if the lock file is inaccurate.
@@ -89,10 +96,12 @@ jobs:
         - npm run check-local-changes
 
     - name: License compatibility
+      env: WORDPRESS=false
       script:
         - npm run check-licenses
 
     - name: JavaScript unit tests
+      env: WORDPRESS=false
       script:
         # It's not necessary to run the full build, since Jest can interpret
         # source files with `babel-jest`. Some packages have their own custom
@@ -101,6 +110,7 @@ jobs:
         - npm run test-unit -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
 
     - name: JavaScript native mobile tests
+      env: WORDPRESS=false
       script:
         # It's not necessary to run the full build, since Jest can interpret
         # source files with `babel-jest`. Some packages have their own custom
@@ -109,59 +119,59 @@ jobs:
         - npm run test-unit:native -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
 
     - name: PHP unit tests
-      env: WORDPRESS=true LOCAL_DIR=build COMPOSER_INSTALL=true
+      env: COMPOSER_INSTALL=true
       script:
         - npm run test-php && npm run test-unit-php-multisite
 
     - name: PHP unit tests (PHP 5.6)
-      env: WORDPRESS=true LOCAL_DIR=build COMPOSER_INSTALL=true LOCAL_PHP=5.6-fpm
+      env: COMPOSER_INSTALL=true LOCAL_PHP=5.6-fpm
       script:
         - npm run test-php && npm run test-unit-php-multisite
 
     - name: E2E tests (Admin) (1/4)
-      env: WORDPRESS=true LOCAL_DIR=build FORCE_REDUCED_MOTION=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
+      env: FORCE_REDUCED_MOTION=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
       script:
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 0' < ~/.jest-e2e-tests )
 
     - name: E2E tests (Admin) (2/4)
-      env: WORDPRESS=true LOCAL_DIR=build FORCE_REDUCED_MOTION=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
+      env: FORCE_REDUCED_MOTION=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
       script:
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 1' < ~/.jest-e2e-tests )
 
     - name: E2E tests (Admin) (3/4)
-      env: WORDPRESS=true LOCAL_DIR=build FORCE_REDUCED_MOTION=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
+      env: FORCE_REDUCED_MOTION=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
       script:
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 2' < ~/.jest-e2e-tests )
 
     - name: E2E tests (Admin) (4/4)
-      env: WORDPRESS=true LOCAL_DIR=build FORCE_REDUCED_MOTION=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
+      env: FORCE_REDUCED_MOTION=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
       script:
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 3' < ~/.jest-e2e-tests )
 
     - name: E2E tests (Author) (1/4)
-      env: WORDPRESS=true E2E_ROLE=author LOCAL_DIR=build FORCE_REDUCED_MOTION=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
+      env: E2E_ROLE=author FORCE_REDUCED_MOTION=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
       script:
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 0' < ~/.jest-e2e-tests )
 
     - name: E2E tests (Author) (2/4)
-      env: WORDPRESS=true E2E_ROLE=author LOCAL_DIR=build FORCE_REDUCED_MOTION=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
+      env: E2E_ROLE=author FORCE_REDUCED_MOTION=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
       script:
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 1' < ~/.jest-e2e-tests )
 
     - name: E2E tests (Author) (3/4)
-      env: WORDPRESS=true E2E_ROLE=author LOCAL_DIR=build FORCE_REDUCED_MOTION=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
+      env: E2E_ROLE=author FORCE_REDUCED_MOTION=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
       script:
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 2' < ~/.jest-e2e-tests )
 
     - name: E2E tests (Author) (4/4)
-      env: WORDPRESS=true E2E_ROLE=author LOCAL_DIR=build FORCE_REDUCED_MOTION=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
+      env: E2E_ROLE=author FORCE_REDUCED_MOTION=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
       script:
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 3' < ~/.jest-e2e-tests )
