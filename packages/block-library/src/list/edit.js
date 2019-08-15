@@ -11,7 +11,7 @@ import {
 } from '@wordpress/block-editor';
 import {
 	Toolbar,
-	BaseControl,
+	TextControl,
 	PanelBody,
 	ToggleControl,
 } from '@wordpress/components';
@@ -22,24 +22,21 @@ import {
 	__unstableIsListRootSelected as isListRootSelected,
 	__unstableIsActiveListType as isActiveListType,
 } from '@wordpress/rich-text';
-import { withInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import { name } from './';
 
-function ListEdit( {
+export default function ListEdit( {
 	attributes,
 	setAttributes,
 	mergeBlocks,
 	onReplace,
 	className,
-	instanceId,
 } ) {
 	const { ordered, values, reversed, start } = attributes;
 	const tagName = ordered ? 'ol' : 'ul';
-	const startValueId = `block-list-startValue-input-${ instanceId }`;
 
 	const controls = ( { value, onChange } ) => {
 		if ( value.start === undefined ) {
@@ -147,19 +144,21 @@ function ListEdit( {
 		{ ordered &&
 			<InspectorControls>
 				<PanelBody title={ __( 'Ordered List Settings' ) }>
-					<BaseControl label={ __( 'Start Value' ) } id={ startValueId } >
-						<input
-							type="number"
-							onChange={ ( event ) => {
-								setAttributes( { start: parseInt( event.target.value, 10 ) } );
-								if ( isNaN( parseInt( event.target.value, 10 ) ) ) {
-									setAttributes( { start: null } );
-								}
-							} }
-							value={ start ? start : '' }
-							step="1"
-						/>
-					</BaseControl>
+					<TextControl
+						label={ __( 'Start Value' ) }
+						type="number"
+						onChange={ ( value ) => {
+							const int = parseInt( value, 10 );
+
+							setAttributes( {
+								// It should be possible to unset the value,
+								// e.g. with an empty string.
+								start: isNaN( int ) ? undefined : int,
+							} );
+						} }
+						value={ Number.isInteger( start ) ? start.toString( 10 ) : '' }
+						step="1"
+					/>
 					<ToggleControl
 						label={ __( 'Reverse List' ) }
 						checked={ reversed }
@@ -172,5 +171,3 @@ function ListEdit( {
 		}
 	</>;
 }
-
-export default withInstanceId( ListEdit );
