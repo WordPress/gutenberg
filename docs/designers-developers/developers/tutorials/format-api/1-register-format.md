@@ -52,6 +52,7 @@ registerFormatType(
 	}
 );
 ```
+{% end %}
 
 Make that plugin available in your WordPress setup and activate it. Then, load a new page/post.
 
