@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { noop } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
@@ -87,8 +92,8 @@ class BlockEditorProvider extends Component {
 
 		this.unsubscribe = registry.subscribe( () => {
 			const {
-				onChange,
-				onInput,
+				onChange = noop,
+				onInput = noop,
 			} = this.props;
 
 			const newBlocks = getBlocks();
