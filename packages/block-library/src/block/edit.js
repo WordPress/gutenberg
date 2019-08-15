@@ -11,16 +11,12 @@ import { Placeholder, Spinner, Disabled } from '@wordpress/components';
 import {
 	withSelect,
 	withDispatch,
-	withRegistry,
-	RegistryProvider,
-	createRegistry,
 } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import {
 	BlockEditorProvider,
 	BlockList,
 	WritingFlow,
-	storeConfig,
 } from '@wordpress/block-editor';
 import { compose } from '@wordpress/compose';
 import { parse, serialize } from '@wordpress/blocks';
@@ -32,7 +28,7 @@ import ReusableBlockEditPanel from './edit-panel';
 import ReusableBlockIndicator from './indicator';
 
 class ReusableBlockEdit extends Component {
-	constructor( { reusableBlock, registry } ) {
+	constructor( { reusableBlock } ) {
 		super( ...arguments );
 
 		this.startEditing = this.startEditing.bind( this );
@@ -56,8 +52,6 @@ class ReusableBlockEdit extends Component {
 				blocks: [],
 			};
 		}
-
-		this.registry = createRegistry( { 'core/block-editor': storeConfig }, registry );
 	}
 
 	componentDidMount() {
@@ -123,18 +117,16 @@ class ReusableBlockEdit extends Component {
 		}
 
 		let element = (
-			<RegistryProvider value={ this.registry }>
-				<BlockEditorProvider
-					settings={ settings }
-					value={ blocks }
-					onChange={ this.setBlocks }
-					onInput={ this.setBlocks }
-				>
-					<WritingFlow>
-						<BlockList />
-					</WritingFlow>
-				</BlockEditorProvider>
-			</RegistryProvider>
+			<BlockEditorProvider
+				settings={ settings }
+				value={ blocks }
+				onChange={ this.setBlocks }
+				onInput={ this.setBlocks }
+			>
+				<WritingFlow>
+					<BlockList />
+				</WritingFlow>
+			</BlockEditorProvider>
 		);
 
 		if ( ! isEditing ) {
@@ -200,5 +192,4 @@ export default compose( [
 			onSave: partial( saveReusableBlock, ref ),
 		};
 	} ),
-	withRegistry,
 ] )( ReusableBlockEdit );
