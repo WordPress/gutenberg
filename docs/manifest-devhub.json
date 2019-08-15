@@ -1326,6 +1326,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/icons",
+		"slug": "packages-icons",
+		"markdown_source": "../packages/icons/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/is-shallow-equal",
 		"slug": "packages-is-shallow-equal",
 		"markdown_source": "../packages/is-shallow-equal/README.md",
