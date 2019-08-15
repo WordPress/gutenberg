@@ -116,6 +116,18 @@ export default class Editable extends Component {
 			this.editorNode.className = nextProps.className;
 		}
 
+		if ( this.props.start !== nextProps.start ) {
+			this.editorNode.setAttribute( 'start', nextProps.start );
+		}
+
+		if ( this.props.reversed !== nextProps.reversed ) {
+			this.editorNode.reversed = nextProps.reversed;
+		}
+
+		if ( this.props.type !== nextProps.type ) {
+			this.editorNode.type = nextProps.type;
+		}
+
 		const { removedKeys, updatedKeys } = diffAriaProps( this.props, nextProps );
 		removedKeys.forEach( ( key ) =>
 			this.editorNode.removeAttribute( key ) );

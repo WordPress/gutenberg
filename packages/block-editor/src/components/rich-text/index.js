@@ -331,6 +331,10 @@ class RichTextWrapper extends Component {
 			identifier,
 			// eslint-disable-next-line no-unused-vars
 			instanceId,
+			// To do: find a better way to implicitly inherit props.
+			start,
+			reversed,
+			type,
 			// From experimental filter. To do: pick props instead.
 			...experimentalProps
 		} = this.props;
@@ -400,6 +404,9 @@ class RichTextWrapper extends Component {
 									aria-autocomplete={ listBoxId ? 'list' : undefined }
 									aria-owns={ listBoxId }
 									aria-activedescendant={ activeId }
+									start={ start }
+									reversed={ reversed }
+									type={ type }
 								/>
 							}
 						</Autocomplete>

@@ -1,10 +1,26 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
-import { RichText, BlockControls, RichTextShortcut } from '@wordpress/block-editor';
-import { Toolbar } from '@wordpress/components';
+import {
+	RichText,
+	BlockControls,
+	RichTextShortcut,
+	InspectorControls,
+} from '@wordpress/block-editor';
+import {
+	Toolbar,
+	BaseControl,
+	PanelBody,
+	ToggleControl,
+	SelectControl,
+} from '@wordpress/components';
 import {
 	__unstableIndentListItems as indentListItems,
 	__unstableOutdentListItems as outdentListItems,
@@ -12,21 +28,25 @@ import {
 	__unstableIsListRootSelected as isListRootSelected,
 	__unstableIsActiveListType as isActiveListType,
 } from '@wordpress/rich-text';
+import { Fragment } from '@wordpress/element';
+import { withInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import { name } from './';
 
-export default function ListEdit( {
+function ListEdit( {
 	attributes,
 	setAttributes,
 	mergeBlocks,
 	onReplace,
 	className,
+	instanceId,
 } ) {
-	const { ordered, values } = attributes;
+	const { ordered, values, reversed, start, type } = attributes;
 	const tagName = ordered ? 'ol' : 'ul';
+	const startValueId = `block-list-startValue-input-${ instanceId }`;
 
 	const controls = ( { value, onChange } ) => {
 		if ( value.start === undefined ) {
@@ -111,7 +131,7 @@ export default function ListEdit( {
 		</>;
 	};
 
-	return (
+	return <>
 		<RichText
 			identifier="values"
 			multiline="li"
@@ -126,8 +146,54 @@ export default function ListEdit( {
 			__unstableOnSplitMiddle={ () => createBlock( 'core/paragraph' ) }
 			onReplace={ onReplace }
 			onRemove={ () => onReplace( [] ) }
+			start={ start }
+			reversed={ reversed }
+			type={ type }
 		>
 			{ controls }
 		</RichText>
-	);
-}
+		{
+			ordered &&
+			<InspectorControls>
+				<PanelBody title={ __( 'Ordered List Settings' ) }>
+					<SelectControl
+						label={ __( 'List Type' ) }
+						value={ type ? type : '1' }
+						options={ [
+							{ label: 'Decimal', value: '1' },
+							{ label: 'Lower alpha', value: 'a' },
+							{ label: 'Upper alpha', value: 'A' },
+							{ label: 'Lower alpha', value: 'i' },
+							{ label: 'Upper alpha', value: 'I' },
+						] }
+						onChange={ ( nextType ) => {
+							setAttributes( { type: nextType } );
+						} }
+					/>
+					<BaseControl label={ __( 'Start Value' ) } id={ startValueId } >
+						<input
+							type="number"
+							onChange={ ( event ) => {
+								setAttributes( { start: parseInt( event.target.value, 10 ) } );
+								if ( isNaN( parseInt( event.target.value, 10 ) ) ) {
+									setAttributes( { start: null } );
+								}
+							} }
+							value={ start ? start : '' }
+							step="1"
+						/>
+					</BaseControl>
+					<ToggleControl
+						label={ __( 'Reverse List' ) }
+						checked={ reversed }
+						onChange={ ( ) => {
+							setAttributes( { reversed: ! reversed } );
+						} }
+					/>
+				</PanelBody>
+			</InspectorControls>
+		}
+	</>;
+};
+
+export default withInstanceId( ListEdit );

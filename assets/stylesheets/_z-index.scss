@@ -97,6 +97,7 @@ $z-layers: (
 	// Shows above edit post sidebar; Specificity needs to be higher than 3 classes.
 	".block-editor__container .components-popover.components-color-palette__picker.is-bottom": 100001,
 	".block-editor__container .components-popover.components-font-size-picker__dropdown-content.is-bottom": 100001,
+	".block-editor__container .components-popover.components-list-type-picker__dropdown-content.is-bottom": 100001,
 	".edit-post-post-visibility__dialog.components-popover.is-bottom": 100001,
 
 	".components-autocomplete__results": 1000000,
