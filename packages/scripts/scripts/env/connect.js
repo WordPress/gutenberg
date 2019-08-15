@@ -11,6 +11,11 @@ const { normalize } = require( 'path' );
 const { cwd, env, exit, stdout } = require( 'process' );
 const { execSync } = require( 'child_process' );
 
+/**
+ * Internal dependencies
+ */
+const { fromConfigRoot } = require( '../../utils' );
+
 const composeFile = normalize( `${ env.WP_DEVELOP_DIR }/docker-compose.override.yml` );
 let compose = {};
 if ( existsSync( composeFile ) ) {
@@ -33,70 +38,64 @@ let coreCompose = {};
 try {
 	coreCompose = yaml.safeLoad( readFileSync( coreComposeFile, 'utf8' ) );
 } catch ( e ) {
-	stdout.write( 'There was an error loading your docker-compose.yml in your WordPress directory. Please revert any  changes to it, and try again.' );
+	stdout.write( 'There was an error loading your docker-compose.yml in your WordPress directory. Please revert any changes to it, and try again.' );
 	stdout.write( e.toString() );
 	exit( 1 );
 }
+
+const pluginMountDir = normalize( cwd() );
+
+const composeTemplate = readFileSync( fromConfigRoot( 'docker-compose.override.yml.template' ), 'utf8' )
+	.replace( /%PLUGIN_MOUNT_DIR%/gi, pluginMountDir );
+
+const pluginCompose = yaml.safeLoad( composeTemplate );
 
 stdout.write( 'Updating docker-compose.override.yml...' );
 
 compose.version = coreCompose.version;
 
-if ( ! compose.services ) {
-	compose.services = {};
-}
-
-const services = [ 'wordpress-develop', 'php', 'cli', 'phpunit' ];
-
-services.forEach( ( service ) => {
-	if ( ! compose.services[ service ] ) {
-		compose.services[ service ] = {};
-	}
-
-	if ( ! compose.services[ service ].volumes ) {
-		compose.services[ service ].volumes = [];
-	}
-
-	const index = compose.services[ service ].volumes.findIndex( ( volume ) => {
-		return volume.endsWith( '/plugins/gutenberg' );
+/**
+ * Merges two YAML configs together.
+ *
+ * All new data from newConfig will be added to originalConfig. When arrays in newConfig look like lists of volume
+ * mount instructions, it will attempt to replace items that mount from the same location. This allows the config
+ * to be safely updated, and it'll be reflected in the updated config.
+ *
+ * @param {Object} originalConfig The original config object that we're overwriting.
+ * @param {Object} newConfig      A new config object to merge into originalConfig.
+ * @return {Object} The merged config object.
+ */
+function mergeConfigs( originalConfig, newConfig ) {
+	Object.keys( newConfig ).forEach( ( key ) => {
+		if ( ! originalConfig[ key ] ) {
+			originalConfig[ key ] = newConfig[ key ];
+		} else if ( newConfig[ key ] instanceof Array ) {
+			newConfig[ key ].forEach( ( element ) => {
+				if ( element.startsWith( pluginMountDir ) && element.includes( ':' ) ) {
+					const mountDir = element.split( ':' )[ 0 ];
+					const index = originalConfig[ key ].findIndex( ( volume ) => {
+						return volume.startsWith( `${ mountDir }:` );
+					} );
+					if ( index > -1 ) {
+						originalConfig[ key ][ index ] = element;
+					} else {
+						originalConfig[ key ].push( element );
+					}
+				}
+			} );
+		} else if ( newConfig[ key ] instanceof Object ) {
+			originalConfig[ key ] = mergeConfigs( originalConfig[ key ], newConfig[ key ] );
+		} else {
+			originalConfig[ key ] = newConfig[ key ];
+		}
 	} );
 
-	const gutenbergVolume = normalize( cwd() ) + ':/var/www/${LOCAL_DIR-src}/wp-content/plugins/gutenberg';
+	return originalConfig;
+}
 
-	if ( index > -1 ) {
-		compose.services[ service ].volumes[ index ] = gutenbergVolume;
-	} else {
-		compose.services[ service ].volumes.push( gutenbergVolume );
-	}
+const mergedCompose = mergeConfigs( compose, pluginCompose );
 
-	if ( service === 'wordpress-develop' || service === 'php' ) {
-		const testPluginsIndex = compose.services[ service ].volumes.findIndex( ( volume ) => {
-			return volume.endsWith( '/plugins/gutenberg-test-plugins' );
-		} );
-
-		const testPluginsVolume = normalize( cwd() + '/packages/e2e-tests/plugins' ) + ':/var/www/${LOCAL_DIR-src}/wp-content/plugins/gutenberg-test-plugins';
-
-		if ( testPluginsIndex > -1 ) {
-			compose.services[ service ].volumes[ testPluginsIndex ] = testPluginsVolume;
-		} else {
-			compose.services[ service ].volumes.push( testPluginsVolume );
-		}
-
-		const muPluginsIndex = compose.services[ service ].volumes.findIndex( ( volume ) => {
-			return volume.endsWith( '/mu-plugins' );
-		} );
-
-		const muPluginsVolume = normalize( cwd() + '/packages/e2e-tests/mu-plugins' ) + ':/var/www/${LOCAL_DIR-src}/wp-content/mu-plugins';
-
-		if ( muPluginsIndex > -1 ) {
-			compose.services[ service ].volumes[ muPluginsIndex ] = muPluginsVolume;
-		} else {
-			compose.services[ service ].volumes.push( muPluginsVolume );
-		}
-	}
-} );
-
-writeFileSync( composeFile, yaml.safeDump( compose, { lineWidth: -1 } ) );
+writeFileSync( composeFile, yaml.safeDump( mergedCompose, { lineWidth: -1 } ) );
 
 stdout.write( 'Restarting the WordPress environment...' );
 
