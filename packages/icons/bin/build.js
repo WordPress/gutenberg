@@ -18,6 +18,12 @@ const iconsObject = require( './icons-object.js' );
 fs.access( './src/index.js', ( error ) => {
 	if ( ! error ) {
 		fs.unlinkSync( './src/index.js' );
+	} else {
+		fs.writeFile( './src/index.js', '', ( err ) => {
+			if ( err ) {
+				throw err;
+			}
+		} );
 	}
 } );
 const stream = fs.createWriteStream( './src/index.js', { flags: 'a' } );

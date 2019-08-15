@@ -2,14 +2,12 @@
 /**
  * WordPress dependencies
  */
-import { primitives } from '@wordpress/components';
+import { Path, SVG } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import { getIconClassName } from '../icon-class';
-
-const { Path, SVG } = primitives;
 
 export default function ArrowRightAlt2( { size = 20, className, ariaPressed, ...props } ) {
 	const iconClass = getIconClassName( 'arrow-right-alt-2', className, ariaPressed );

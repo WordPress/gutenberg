@@ -2,14 +2,12 @@
 /**
  * WordPress dependencies
  */
-import { primitives } from '@wordpress/components';
+import { Path, SVG } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import { getIconClassName } from '../icon-class';
-
-const { Path, SVG } = primitives;
 
 export default function BuddiconsBuddypressLogo( { size = 20, className, ariaPressed, ...props } ) {
 	const iconClass = getIconClassName( 'buddicons-buddypress-logo', className, ariaPressed );
