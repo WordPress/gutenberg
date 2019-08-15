@@ -33,6 +33,10 @@ import {
 const { getComputedStyle } = window;
 
 const applyFallbackStyles = withFallbackStyles( ( node, ownProps ) => {
+	if ( node ) {
+		node.classList.add( 'wp-block-button-wrapper' );
+	}
+
 	const { textColor, backgroundColor } = ownProps;
 	const backgroundColorValue = backgroundColor && backgroundColor.color;
 	const textColorValue = textColor && textColor.color;
@@ -104,6 +108,7 @@ class ButtonEdit extends Component {
 			title,
 			linkTarget,
 			rel,
+			placeholder,
 		} = attributes;
 
 		const linkId = `wp-block-button__inline-link-${ instanceId }`;
@@ -111,10 +116,10 @@ class ButtonEdit extends Component {
 		return (
 			<div className={ className } title={ title } ref={ this.bindRef }>
 				<RichText
-					placeholder={ __( 'Add text…' ) }
+					placeholder={ placeholder || __( 'Add text…' ) }
 					value={ text }
 					onChange={ ( value ) => setAttributes( { text: value } ) }
-					formattingControls={ [ 'bold', 'italic', 'strikethrough' ] }
+					withoutInteractiveFormatting
 					className={ classnames(
 						'wp-block-button__link', {
 							'has-background': backgroundColor.color,
@@ -127,7 +132,6 @@ class ButtonEdit extends Component {
 						backgroundColor: backgroundColor.color,
 						color: textColor.color,
 					} }
-					keepPlaceholderOnFocus
 				/>
 				<BaseControl
 					label={ __( 'Link' ) }

@@ -82,7 +82,7 @@ _Parameters_
 
 _Returns_
 
--   `function`: Function that determines if a request is for the embed API, embedding a specific URL.
+-   `Function`: Function that determines if a request is for the embed API, embedding a specific URL.
 
 <a name="createJSONResponse" href="#createJSONResponse">#</a> **createJSONResponse**
 
@@ -127,7 +127,7 @@ _Parameters_
 
 _Returns_
 
--   `function`: Function that determines if a request's URL contains substring.
+-   `Function`: Function that determines if a request's URL contains substring.
 
 <a name="deactivatePlugin" href="#deactivatePlugin">#</a> **deactivatePlugin**
 
@@ -136,6 +136,14 @@ Deactivates an active plugin.
 _Parameters_
 
 -   _slug_ `string`: Plugin slug.
+
+<a name="disableNavigationMode" href="#disableNavigationMode">#</a> **disableNavigationMode**
+
+Triggers edit mode if not already active.
+
+_Returns_
+
+-   `Promise`: Promise resolving after enabling the keyboard edit mode.
 
 <a name="disablePrePublishChecks" href="#disablePrePublishChecks">#</a> **disablePrePublishChecks**
 
@@ -307,9 +315,9 @@ deserialised JSON response for the request.
 
 _Parameters_
 
--   _mockCheck_ `function`: function that returns true if the request should be mocked.
+-   _mockCheck_ `Function`: function that returns true if the request should be mocked.
 -   _mock_ `Object`: A mock object to wrap in a JSON response, if the request should be mocked.
--   _responseObjectTransform_ `(function|undefined)`: An optional function that transforms the response's object before the response is used.
+-   _responseObjectTransform_ `(Function|undefined)`: An optional function that transforms the response's object before the response is used.
 
 _Returns_
 
@@ -344,10 +352,6 @@ _Parameters_
 
 -   _key_ `string`: Key to press.
 -   _count_ `number`: Number of times to press.
-
-_Returns_
-
--   `Promise`: Promise resolving when key presses complete.
 
 <a name="pressKeyWithModifier" href="#pressKeyWithModifier">#</a> **pressKeyWithModifier**
 

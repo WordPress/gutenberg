@@ -4,12 +4,14 @@
 import { get } from 'lodash';
 
 /**
- * creates a middleware handling resolvers cache invalidation.
+ * Creates a middleware handling resolvers cache invalidation.
  *
- * @param {Object} registry
- * @param {string} reducerKey
+ * @param {WPDataRegistry} registry   The registry reference for which to create
+ *                                    the middleware.
+ * @param {string}         reducerKey The namespace for which to create the
+ *                                    middleware.
  *
- * @return {function} middleware
+ * @return {Function} Middleware function.
  */
 const createResolversCacheMiddleware = ( registry, reducerKey ) => () => ( next ) => ( action ) => {
 	const resolvers = registry.select( 'core/data' ).getCachedResolvers( reducerKey );

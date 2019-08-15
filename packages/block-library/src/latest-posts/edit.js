@@ -220,7 +220,7 @@ class LatestPostsEdit extends Component {
 										key="html"
 									>
 										{ excerptLength < excerpt.trim().split( ' ' ).length ?
-											excerpt.trim().split( ' ', excerptLength ).join( ' ' ) + ' ... <a href=' + post.link + 'target="_blank" rel="noopener noreferrer">Read More</a>' :
+											excerpt.trim().split( ' ', excerptLength ).join( ' ' ) + ' ... <a href=' + post.link + 'target="_blank" rel="noopener noreferrer">' + __( 'Read more' ) + '</a>' :
 											excerpt.trim().split( ' ', excerptLength ).join( ' ' ) }
 									</RawHTML>
 								</div>

@@ -18,7 +18,7 @@ import { onSubKey } from './utils';
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
  *
- * @returns {Object} Next state.
+ * @return {Object} Next state.
  */
 const subKeysIsResolved = flowRight( [
 	onSubKey( 'selectorName' ),

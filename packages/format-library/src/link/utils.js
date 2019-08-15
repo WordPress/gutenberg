@@ -83,9 +83,10 @@ export function isValidHref( href ) {
 /**
  * Generates the format object that will be applied to the link text.
  *
- * @param {string}  url              The href of the link.
- * @param {boolean} opensInNewWindow Whether this link will open in a new window.
- * @param {Object}  text             The text that is being hyperlinked.
+ * @param {Object}  options
+ * @param {string}  options.url              The href of the link.
+ * @param {boolean} options.opensInNewWindow Whether this link will open in a new window.
+ * @param {Object}  options.text             The text that is being hyperlinked.
  *
  * @return {Object} The final format object.
  */

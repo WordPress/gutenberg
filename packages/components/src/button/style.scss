@@ -60,6 +60,7 @@
 			box-shadow: none;
 			text-shadow: 0 1px 0 #fff;
 			transform: none;
+			opacity: 1;
 		}
 	}
 
@@ -109,6 +110,7 @@
 			border-color: color(theme(button) shade(7%));
 			box-shadow: none;
 			text-shadow: none;
+			opacity: 1;
 
 			// This specificity is needed to override alternate color schemes in WP-Admin.
 			&.is-button,
@@ -189,6 +191,7 @@
 	&:disabled,
 	&[aria-disabled="true"] {
 		cursor: default;
+		opacity: 0.3;
 	}
 
 	&:focus:not(:disabled) {

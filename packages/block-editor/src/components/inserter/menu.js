@@ -161,7 +161,6 @@ export class InserterMenu extends Component {
 
 				this.props.setTimeout( () => {
 					// We need a generic way to access the panel's container
-					// eslint-disable-next-line react/no-find-dom-node
 					scrollIntoView( this.panels[ panel ], this.inserterResults.current, {
 						alignWithTop: true,
 					} );
@@ -351,11 +350,17 @@ export class InserterMenu extends Component {
 				</div>
 
 				{ hoveredItem && isReusableBlock( hoveredItem ) &&
-					<BlockPreview name={ hoveredItem.name } attributes={ hoveredItem.initialAttributes } />
+					<div className="block-editor-inserter__preview">
+						<div className="block-editor-inserter__preview-title">{ __( 'Preview' ) }</div>
+						<BlockPreview
+							className="block-editor-inserter__preview-content"
+							blocks={ createBlock( hoveredItem.name, hoveredItem.initialAttributes ) }
+						/>
+					</div>
 				}
 			</div>
 		);
-		/* eslint-enable jsx-a11y/no-autofocus, jsx-a11y/no-noninteractive-element-interactions */
+		/* eslint-enable jsx-a11y/no-autofocus, jsx-a11y/no-static-element-interactions */
 	}
 }
 

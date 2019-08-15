@@ -1,7 +1,10 @@
-.block-editor-block-preview {
-	pointer-events: none;
-	padding: 10px;
+// This is the preview that shows up to the right of the thumbnail when hovering.
+.block-editor-block-switcher__preview {
+	padding: $block-padding;
+	font-family: $editor-font;
 	overflow: hidden;
+	width: 100%;
+	pointer-events: none;
 	display: none;
 
 	@include break-medium {
@@ -9,38 +12,76 @@
 	}
 
 	.block-editor-block-preview__content {
-		padding: $block-padding;
-		border: $border-width solid $light-gray-500;
 		font-family: $editor-font;
 
 		> div {
-			transform: scale(0.9);
-			transform-origin: center top;
 			font-family: $editor-font;
 		}
 
-		> div section {
-			height: auto;
+		&:not(.is-tall-preview) {
+			// Vertical alignment.
+			margin-top: 50%;
 		}
+	}
 
-		> .reusable-block-indicator {
-			display: none;
-		}
+	.block-editor-block-preview__title {
+		margin-bottom: 10px;
+		color: $dark-gray-300;
 	}
 }
 
+// These rules ensure the preview scales smoothly regardless of the container size.
+.block-editor-block-preview__container {
+	// In the component, a top padding is provided as an inline style to provid an aspect-ratio.
+	// This positioning enables the content to sit on top of that padding to fit.
+	position: relative;
+
+	// The preview component measures the pixel width of this item, so as to calculate the scale factor.
+	// But without this baseline width, it collapses to 0.
+	width: 100%;
+}
+
 .block-editor-block-preview__content {
-	// Resetting the block editor paddings and margins
+	// This element receives inline styles for width, height, and transform-scale.
+	// Those inline styles are calculated to fit a perfect thumbnail.
+
+	// Position above the padding.
+	position: absolute;
+
+	// Vertical alignment. It works with the transform: translate(-50%, -50%)`,
+	top: 0;
+	left: 0;
+
+	// Important to set the origin.
+	transform-origin: top left;
+
+	// Resetting paddings, margins, and other.
+	text-align: initial;
+	margin: 0;
+	overflow: visible;
+	min-height: auto;
+
 	.block-editor-block-list__layout,
 	.block-editor-block-list__block {
 		padding: 0;
 	}
-	.editor-block-list__block-edit [data-block] {
-		margin-top: 0;
-	}
-}
 
-.block-editor-block-preview__title {
-	margin-bottom: 10px;
-	color: $dark-gray-300;
+	.editor-block-list__block-edit [data-block] {
+		margin: 0;
+	}
+
+	> div section {
+		height: auto;
+	}
+
+	&.is-tall-preview {
+		top: 4px;
+	}
+
+	.block-editor-block-list__insertion-point,
+	.block-editor-block-drop-zone,
+	.reusable-block-indicator,
+	.block-list-appender {
+		display: none;
+	}
 }

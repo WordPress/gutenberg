@@ -46,11 +46,11 @@ export default function deprecated( feature, options = {} ) {
 	} = options;
 
 	const pluginMessage = plugin ? ` from ${ plugin }` : '';
-	const versionMessage = version ? `${ pluginMessage } in ${ version }` : '';
+	const versionMessage = version ? ` and will be removed${ pluginMessage } in version ${ version }` : '';
 	const useInsteadMessage = alternative ? ` Please use ${ alternative } instead.` : '';
 	const linkMessage = link ? ` See: ${ link }` : '';
 	const hintMessage = hint ? ` Note: ${ hint }` : '';
-	const message = `${ feature } is deprecated and will be removed${ versionMessage }.${ useInsteadMessage }${ linkMessage }${ hintMessage }`;
+	const message = `${ feature } is deprecated${ versionMessage }.${ useInsteadMessage }${ linkMessage }${ hintMessage }`;
 
 	// Skip if already logged.
 	if ( message in logged ) {

@@ -1,13 +1,27 @@
 #!/bin/bash
 set -e
 
-# 1. Proceed only when merge occurs to `master` base branch.
+# 1. Proceed only when acting on a merge action on the master branch.
+
+action=$(jq -r '.action' $GITHUB_EVENT_PATH)
+
+if [ "$action" != 'closed' ]; then
+	echo "Action '$action' not a close action. Aborting."
+	exit 0;
+fi
+
+merged=$(jq -r '.pull_request.merged' $GITHUB_EVENT_PATH)
+
+if [ "$merged" != 'true' ]; then
+	echo "Pull request closed without merge. Aborting."
+	exit 0;
+fi
 
 base=$(jq -r '.pull_request.base.ref' $GITHUB_EVENT_PATH)
 
 if [ "$base" != 'master' ]; then
 	echo 'Milestones apply only to master merge. Aborting.'
-	exit 78;
+	exit 0;
 fi
 
 # 2. Determine if milestone already exists (don't replace one which has already
@@ -25,7 +39,7 @@ current_milestone=$(
 
 if [ "$current_milestone" != 'null' ]; then
 	echo 'Milestone already applied. Aborting.'
-	exit 78;
+	exit 0;
 fi
 
 # 3. Read current version.
@@ -57,7 +71,7 @@ milestone="Gutenberg $major.$minor"
 
 reference_major=5
 reference_minor=0
-reference_date=1549238400
+reference_date=1564358400
 num_versions_elapsed=$(((major-reference_major)*10+(minor-reference_minor)))
 weeks=$((num_versions_elapsed*2))
 due=$(date -u --iso-8601=seconds -d "$(date -d @$(echo $reference_date)) + $(echo $weeks) weeks")
