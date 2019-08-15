@@ -79,7 +79,8 @@ export default createHigherOrderComponent(
 				}
 
 				this.blurCheckTimeout = setTimeout( () => {
-					if ( 'function' === typeof this.node.handleFocusOutside ) {
+					const eventTargetElIsWithinComponent = this.node.containerRef.current && this.node.containerRef.current.contains( event.target );
+					if ( 'function' === typeof this.node.handleFocusOutside && ! eventTargetElIsWithinComponent ) {
 						this.node.handleFocusOutside( event );
 					}
 				}, 0 );
