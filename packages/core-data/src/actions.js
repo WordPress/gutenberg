@@ -265,6 +265,7 @@ export function* saveEntityRecord(
 			let data = { ...persistedRecord, ...autosavePost, ...record };
 			data = Object.keys( data ).reduce( ( acc, key ) => {
 				if ( [ 'title', 'excerpt', 'content' ].includes( key ) ) {
+					// Edits should be the "raw" attribute values.
 					acc[ key ] = get( data[ key ], 'raw', data[ key ] );
 				}
 				return acc;

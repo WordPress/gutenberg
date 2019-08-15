@@ -167,6 +167,9 @@ function entity( entityConfig ) {
 								// If the edited value is still different to the persisted value,
 								// keep the edited value in edits.
 								if (
+									// Edits are the "raw" attribute values, but records may have
+									// objects with more properties, so we use `get` here for the
+									// comparison.
 									! isEqual( edits[ key ], get( record[ key ], 'raw', record[ key ] ) )
 								) {
 									acc[ key ] = edits[ key ];
