@@ -96,33 +96,31 @@ function DropdownMenu( {
 								null
 						}
 						{ flatMap( controlSets, ( controlSet, indexOfSet ) => (
-							controlSet.map( ( control, indexOfControl ) => {
-								return (
-									<IconButton
-										key={ [ indexOfSet, indexOfControl ].join() }
-										onClick={ ( event ) => {
-											event.stopPropagation();
-											props.onClose();
-											if ( control.onClick ) {
-												control.onClick();
-											}
-										} }
-										className={ classnames(
-											'components-dropdown-menu__menu-item',
-											{
-												'has-separator': indexOfSet > 0 && indexOfControl === 0,
-												'is-active': control.isActive,
-											},
-										) }
-										icon={ control.icon }
-										data-subscript={ control.subscript }
-										role="menuitem"
-										disabled={ control.isDisabled }
-									>
-										{ control.title }
-									</IconButton>
-								);
-							} )
+							controlSet.map( ( control, indexOfControl ) => (
+								<IconButton
+									key={ [ indexOfSet, indexOfControl ].join() }
+									onClick={ ( event ) => {
+										event.stopPropagation();
+										props.onClose();
+										if ( control.onClick ) {
+											control.onClick();
+										}
+									} }
+									className={ classnames(
+										'components-dropdown-menu__menu-item',
+										{
+											'has-separator': indexOfSet > 0 && indexOfControl === 0,
+											'is-active': control.isActive,
+										},
+									) }
+									icon={ control.icon }
+									data-subscript={ control.subscript }
+									role="menuitem"
+									disabled={ control.isDisabled }
+								>
+									{ control.title }
+								</IconButton>
+							) )
 						) ) }
 					</NavigableMenu>
 				);

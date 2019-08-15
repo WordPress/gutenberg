@@ -442,19 +442,6 @@ _Related_
 
 Undocumented declaration.
 
-<a name="withBlockEditContext" href="#withBlockEditContext">#</a> **withBlockEditContext**
-
-A Higher Order Component used to inject BlockEdit context to the
-wrapped component.
-
-_Parameters_
-
--   _mapContextToProps_ `Function`: Function called on every context change, expected to return object of props to merge with the component's own props.
-
-_Returns_
-
--   `Component`: Enhanced component with injected context as props.
-
 <a name="withColorContext" href="#withColorContext">#</a> **withColorContext**
 
 Undocumented declaration.
