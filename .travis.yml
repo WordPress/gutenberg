@@ -52,16 +52,16 @@ install:
   - npm ci
   - npm run build
   - |
-    if [[ "$COMPOSER_INSTALL" = "true" ]]; then
-      npm run env docker-run -- php composer install
-    fi
-  - |
     if [[ "$WORDPRESS" = "true" ]]; then
       # Add Gutenberg to the WordPress local environment
       export WP_DEVELOP_DIR=./wordpress
       npm run env connect
 
       npm run env cli plugin activate gutenberg
+    fi
+  - |
+    if [[ "$COMPOSER_INSTALL" = "true" ]]; then
+      npm run env docker-run -- php composer install
     fi
   - |
     if [[ "$E2E_ROLE" = "author" ]]; then
@@ -74,7 +74,7 @@ env: PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 jobs:
   include:
     - name: Lint
-      env: COMPOSER_INSTALL=true
+      env: WORDPRESS=true COMPOSER_INSTALL=true
       script:
         - npm run lint
 
