@@ -61,9 +61,7 @@ services.forEach( ( service ) => {
 		return volume.endsWith( '/plugins/gutenberg' );
 	} );
 
-	const gutenbergVolume = ( service === 'phpunit' ) ?
-		normalize( cwd() ) + ':/wordpress-develop/${LOCAL_DIR-src}/wp-content/plugins/gutenberg' :
-		normalize( cwd() ) + ':/var/www/${LOCAL_DIR-src}/wp-content/plugins/gutenberg';
+	const gutenbergVolume = normalize( cwd() ) + ':/var/www/${LOCAL_DIR-src}/wp-content/plugins/gutenberg';
 
 	if ( index > -1 ) {
 		compose.services[ service ].volumes[ index ] = gutenbergVolume;
