@@ -53,6 +53,7 @@ registerFormatType(
 	}
 );
 ```
+{% end %}
 
 **Important**: note that this code is using two new utilities (`wp.element.createElement`, and `wp.editor.RichTextToolbarButton`) so don't forget adding the corresponding `wp-element` and `wp-editor` packages to the dependencies array in the PHP file along with the existing `wp-rich-text`.
 
@@ -150,6 +151,7 @@ registerFormatType(
 	}
 );
 ```
+{% end %}
 
 Don't forget adding `wp-compose` and `wp-data` to the dependencies array in the PHP script.
 
