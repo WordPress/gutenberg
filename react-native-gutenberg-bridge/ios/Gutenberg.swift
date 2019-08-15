@@ -105,8 +105,12 @@ public class Gutenberg: NSObject {
         bridgeModule.sendEventIfNeeded(name: EventName.mediaUpload, body: data)
     }
 
-    public func appendMedia(id: Int32, url: URL) {
-        let data: [String: Any] = ["mediaId": id, "mediaUrl": url.absoluteString];
+    public func appendMedia(id: Int32, url: URL, type: MediaType) {
+        let data: [String: Any] = [
+            "mediaId"  : id,
+            "mediaUrl" : url.absoluteString,
+            "mediaType": type.rawValue,
+        ]
         bridgeModule.sendEventIfNeeded(name: EventName.mediaAppend, body: data)
     }
 
@@ -152,4 +156,11 @@ extension Gutenberg {
         case reset = 4
     }
     
+}
+
+extension Gutenberg {
+    public enum MediaType: String {
+        case image
+        case video
+    }
 }
