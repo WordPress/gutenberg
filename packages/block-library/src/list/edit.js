@@ -161,9 +161,12 @@ export default function ListEdit( {
 					/>
 					<ToggleControl
 						label={ __( 'Reverse List' ) }
-						checked={ reversed }
-						onChange={ ( ) => {
-							setAttributes( { reversed: ! reversed } );
+						checked={ reversed || false }
+						onChange={ ( value ) => {
+							setAttributes( {
+								// Unset the attribute if not reversed.
+								reversed: value || undefined,
+							} );
 						} }
 					/>
 				</PanelBody>
