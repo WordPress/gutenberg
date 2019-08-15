@@ -13,7 +13,10 @@ export { default as TextEditorGlobalKeyboardShortcuts } from './global-keyboard-
 export { default as EditorHistoryRedo } from './editor-history/redo';
 export { default as EditorHistoryUndo } from './editor-history/undo';
 export { default as EditorNotices } from './editor-notices';
-export { default as EntityHandlers } from './entity-handlers';
+export {
+	default as EntityHandlers,
+	entityProviderValue,
+} from './entity-handlers';
 export { default as ErrorBoundary } from './error-boundary';
 export { default as PageAttributesCheck } from './page-attributes/check';
 export { default as PageAttributesOrder } from './page-attributes/order';

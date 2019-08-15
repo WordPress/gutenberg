@@ -2,14 +2,32 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
+import { EntityProvider, InnerBlocks } from '@wordpress/block-editor';
 import { useMemo } from '@wordpress/element';
-import { InnerBlocks } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import EditorProvider from '../provider';
 import PostSavedState from '../post-saved-state';
+
+export const entityProviderValue = {
+	useCurrentEntityAttribute( attribute ) {
+		return useSelect(
+			( select ) => select( 'core/editor' ).getCurrentEntityAttribute( attribute ),
+			[]
+		);
+	},
+	useEditedEntityAttribute( attribute ) {
+		return useSelect(
+			( select ) => select( 'core/editor' ).getEditedEntityAttribute( attribute ),
+			[]
+		);
+	},
+	useEditEntity() {
+		return useDispatch()( 'core/editor' ).editEntity;
+	},
+};
 
 export default function EntityHandlers( {
 	entity,
@@ -27,17 +45,19 @@ export default function EntityHandlers( {
 	// to the top level registry as inner blocks to maintain a
 	// seamless editing experience.
 	return (
-		<EditorProvider
-			noBlockEditorStore
-			settings={ useMemo(
-				() => ( { ...editorSettings, handles, parentDispatch } ),
-				[ editorSettings, parentDispatch ]
-			) }
-			post={ entity }
-			{ ...props }
-		>
-			<PostSavedState />
-		</EditorProvider>
+		<EntityProvider value={ entityProviderValue }>
+			<EditorProvider
+				noBlockEditorStore
+				settings={ useMemo(
+					() => ( { ...editorSettings, handles, parentDispatch } ),
+					[ editorSettings, parentDispatch ]
+				) }
+				post={ entity }
+				{ ...props }
+			>
+				<PostSavedState />
+			</EditorProvider>
+		</EntityProvider>
 	);
 }
 

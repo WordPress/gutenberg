@@ -8,7 +8,13 @@ import { size, map, without } from 'lodash';
  * WordPress dependencies
  */
 import { withSelect } from '@wordpress/data';
-import { EditorProvider, ErrorBoundary, PostLockedModal } from '@wordpress/editor';
+import { EntityProvider } from '@wordpress/block-editor';
+import {
+	entityProviderValue,
+	EditorProvider,
+	ErrorBoundary,
+	PostLockedModal,
+} from '@wordpress/editor';
 import { StrictMode, Component } from '@wordpress/element';
 import {
 	KeyboardShortcuts,
@@ -97,20 +103,22 @@ class Editor extends Component {
 				<EditPostSettings.Provider value={ settings }>
 					<SlotFillProvider>
 						<DropZoneProvider>
-							<EditorProvider
-								settings={ editorSettings }
-								post={ post }
-								initialEdits={ initialEdits }
-								useSubRegistry={ false }
-								{ ...props }
-							>
-								<ErrorBoundary onError={ onError }>
-									<EditorInitialization postId={ postId } />
-									<Layout />
-									<KeyboardShortcuts shortcuts={ preventEventDiscovery } />
-								</ErrorBoundary>
-								<PostLockedModal />
-							</EditorProvider>
+							<EntityProvider value={ entityProviderValue }>
+								<EditorProvider
+									settings={ editorSettings }
+									post={ post }
+									initialEdits={ initialEdits }
+									useSubRegistry={ false }
+									{ ...props }
+								>
+									<ErrorBoundary onError={ onError }>
+										<EditorInitialization postId={ postId } />
+										<Layout />
+										<KeyboardShortcuts shortcuts={ preventEventDiscovery } />
+									</ErrorBoundary>
+									<PostLockedModal />
+								</EditorProvider>
+							</EntityProvider>
 						</DropZoneProvider>
 					</SlotFillProvider>
 				</EditPostSettings.Provider>

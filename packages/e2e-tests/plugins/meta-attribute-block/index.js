@@ -8,16 +8,12 @@
 		category: 'common',
 
 		edit: function( props ) {
-			var dispatch = wp.data.useDispatch();
+			var editEntity = wp.blockEditor.useEditEntity();
 			return el( 'input', {
 				className: 'my-meta-input',
-				value: wp.data.useSelect(
-					( select ) =>
-						select( 'core/editor' ).getEditedEntityAttribute( 'meta' ).my_meta,
-					[]
-				),
+				value: wp.blockEditor.useEditedEntityAttribute( 'meta' ).my_meta,
 				onChange: function( event ) {
-					dispatch( 'core/editor' ).editEntity( {
+					editEntity( {
 						meta: { my_meta: event.target.value },
 					} );
 				},

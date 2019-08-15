@@ -66,4 +66,6 @@ export { default as WritingFlow } from './writing-flow';
  * State Related Components
  */
 
+export * from './entity-provider';
+export { default as EntityProvider } from './entity-provider';
 export { default as BlockEditorProvider } from './provider';

@@ -210,6 +210,12 @@ _Returns_
 
 Undocumented declaration.
 
+<a name="EntityProvider" href="#EntityProvider">#</a> **EntityProvider**
+
+Context provider component for providing
+the implementations of the entity getter
+and setters.
+
 <a name="FontSizePicker" href="#FontSizePicker">#</a> **FontSizePicker**
 
 Undocumented declaration.
@@ -437,6 +443,62 @@ _Related_
 _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/url-popover/README.md>
+
+<a name="useCurrentEntityAttribute" href="#useCurrentEntityAttribute">#</a> **useCurrentEntityAttribute**
+
+Hook for getting the currently persisted value
+for an entity attribute.
+
+If there is no provider or it does not provide
+an implementation for the required hook,
+undefined is returned.
+
+_Parameters_
+
+-   _args_ `...*`: Any arguments the implementation might require.
+
+_Returns_
+
+-   `*`: The value.
+
+<a name="useEditedEntityAttribute" href="#useEditedEntityAttribute">#</a> **useEditedEntityAttribute**
+
+Hook for getting the edited value for an entity attribute,
+falling back to the persisted value if there isn't
+one.
+
+If there is no provider or it does not provide
+an implementation for the required hook,
+undefined is returned.
+
+_Parameters_
+
+-   _args_ `...*`: Any arguments the implementation might require.
+
+_Returns_
+
+-   `*`: The value.
+
+<a name="useEditEntity" href="#useEditEntity">#</a> **useEditEntity**
+
+Hook for accessing the entity's main edit function.
+
+If there is no provider or it does not provide
+an implementation for the required hook,
+a "noop" function is returned.
+
+_Returns_
+
+-   `Function`: The function or "noop".
+
+<a name="useEntity" href="#useEntity">#</a> **useEntity**
+
+Hook for accessing the entity getters and setters
+provided by the nearest parent entity provider.
+
+_Returns_
+
+-   `Object`: The object with getters and setters.
 
 <a name="Warning" href="#Warning">#</a> **Warning**
 
