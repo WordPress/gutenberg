@@ -160,7 +160,7 @@ export default function ListEdit( {
 						step="1"
 					/>
 					<ToggleControl
-						label={ __( 'Reverse List' ) }
+						label={ __( 'Reverse List Numbering' ) }
 						checked={ reversed || false }
 						onChange={ ( value ) => {
 							setAttributes( {
