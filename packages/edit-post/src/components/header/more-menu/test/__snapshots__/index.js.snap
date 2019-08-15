@@ -3,17 +3,29 @@
 exports[`MoreMenu should match snapshot 1`] = `
 <MoreMenu>
   <DropdownMenu
-    __unstableLabelPosition="bottom"
-    __unstablePopoverClassName="edit-post-more-menu__content"
     className="edit-post-more-menu"
     icon="ellipsis"
     label="More tools & options"
-    position="bottom left"
+    popoverProps={
+      Object {
+        "className": "edit-post-more-menu__content",
+        "position": "bottom left",
+      }
+    }
+    toggleProps={
+      Object {
+        "labelPosition": "bottom",
+      }
+    }
   >
     <Dropdown
       className="components-dropdown-menu edit-post-more-menu"
-      contentClassName="components-dropdown-menu__popover edit-post-more-menu__content"
-      position="bottom left"
+      popoverProps={
+        Object {
+          "className": "edit-post-more-menu__content components-dropdown-menu__popover",
+          "position": "bottom left",
+        }
+      }
       renderContent={[Function]}
       renderToggle={[Function]}
     >
@@ -44,6 +56,7 @@ exports[`MoreMenu should match snapshot 1`] = `
               onClick={[Function]}
               onFocus={[Function]}
               onKeyDown={[Function]}
+              onMouseDown={[Function]}
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
             >
@@ -56,6 +69,7 @@ exports[`MoreMenu should match snapshot 1`] = `
                 onClick={[Function]}
                 onFocus={[Function]}
                 onKeyDown={[Function]}
+                onMouseDown={[Function]}
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 type="button"

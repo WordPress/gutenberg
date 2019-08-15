@@ -33,6 +33,10 @@ import {
 const { getComputedStyle } = window;
 
 const applyFallbackStyles = withFallbackStyles( ( node, ownProps ) => {
+	if ( node ) {
+		node.classList.add( 'wp-block-button-wrapper' );
+	}
+
 	const { textColor, backgroundColor } = ownProps;
 	const backgroundColorValue = backgroundColor && backgroundColor.color;
 	const textColorValue = textColor && textColor.color;

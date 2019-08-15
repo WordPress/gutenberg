@@ -25,8 +25,6 @@ class MultiSelectScrollIntoView extends Component {
 	/**
 	 * Ensures that if a multi-selection exists, the extent of the selection is
 	 * visible within the nearest scrollable container.
-	 *
-	 * @return {void}
 	 */
 	scrollIntoView() {
 		const { extentClientId } = this.props;

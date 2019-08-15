@@ -175,3 +175,5 @@ stream
 	} ) )
 	.on( 'end', () => ended = true )
 	.resume();
+
+/* eslint-enable no-console */

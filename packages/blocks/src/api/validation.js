@@ -259,6 +259,7 @@ const log = ( () => {
 		// dependency in runtime environments, and it can be dropped by a combo
 		// of Webpack env substitution + UglifyJS dead code elimination.
 		if ( process.env.NODE_ENV === 'test' ) {
+			// eslint-disable-next-line import/no-extraneous-dependencies
 			return ( ...args ) => logger( require( 'sprintf-js' ).sprintf( ...args ) );
 		}
 

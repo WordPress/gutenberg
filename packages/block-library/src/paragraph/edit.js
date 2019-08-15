@@ -163,6 +163,7 @@ class ParagraphBlock extends Component {
 						'has-text-color': textColor.color,
 						'has-background': backgroundColor.color,
 						'has-drop-cap': dropCap,
+						[ `has-text-align-${ align }` ]: align,
 						[ backgroundColor.class ]: backgroundColor.class,
 						[ textColor.class ]: textColor.class,
 						[ fontSize.class ]: fontSize.class,
@@ -171,7 +172,6 @@ class ParagraphBlock extends Component {
 						backgroundColor: backgroundColor.color,
 						color: textColor.color,
 						fontSize: fontSize.size ? fontSize.size + 'px' : undefined,
-						textAlign: align,
 						direction,
 					} }
 					value={ content }

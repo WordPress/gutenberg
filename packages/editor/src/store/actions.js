@@ -55,6 +55,11 @@ const lastBlockSourceDependenciesByRegistry = new WeakMap;
  */
 function* getBlocksWithSourcedAttributes( blocks ) {
 	const registry = yield getRegistry();
+	if ( ! lastBlockSourceDependenciesByRegistry.has( registry ) ) {
+		return blocks;
+	}
+
+	const blockSourceDependencies = lastBlockSourceDependenciesByRegistry.get( registry );
 
 	let workingBlocks = blocks;
 	for ( let i = 0; i < blocks.length; i++ ) {
@@ -66,11 +71,6 @@ function* getBlocksWithSourcedAttributes( blocks ) {
 				continue;
 			}
 
-			if ( ! lastBlockSourceDependenciesByRegistry.has( registry ) ) {
-				continue;
-			}
-
-			const blockSourceDependencies = lastBlockSourceDependenciesByRegistry.get( registry );
 			if ( ! blockSourceDependencies.has( sources[ schema.source ] ) ) {
 				continue;
 			}
@@ -136,13 +136,13 @@ function* resetLastBlockSourceDependencies( sourcesToUpdate = Object.values( sou
 	}
 
 	const registry = yield getRegistry();
+	if ( ! lastBlockSourceDependenciesByRegistry.has( registry ) ) {
+		lastBlockSourceDependenciesByRegistry.set( registry, new WeakMap );
+	}
+
+	const lastBlockSourceDependencies = lastBlockSourceDependenciesByRegistry.get( registry );
 
 	for ( const source of sourcesToUpdate ) {
-		if ( ! lastBlockSourceDependenciesByRegistry.has( registry ) ) {
-			lastBlockSourceDependenciesByRegistry.set( registry, new WeakMap );
-		}
-
-		const lastBlockSourceDependencies = lastBlockSourceDependenciesByRegistry.get( registry );
 		const dependencies = yield* source.getDependencies();
 		lastBlockSourceDependencies.set( source, dependencies );
 	}
@@ -875,6 +875,42 @@ export function disablePublishSidebar() {
  *
  * @param  {string} lockName The lock name.
  *
+ * @example
+ * ```
+ * const { subscribe } = wp.data;
+
+ * const initialPostStatus = wp.data.select( 'core/editor' ).getEditedPostAttribute( 'status' );
+ *
+ * // Only allow publishing posts that are set to a future date.
+ * if ( 'publish' !== initialPostStatus ) {
+ *
+ * 	// Track locking.
+ * 	let locked = false;
+ *
+ * 	// Watch for the publish event.
+ * 	let unssubscribe = subscribe( () => {
+ * 		const currentPostStatus = wp.data.select( 'core/editor' ).getEditedPostAttribute( 'status' );
+ * 		if ( 'publish' !== currentPostStatus ) {
+ *
+ * 			// Compare the post date to the current date, lock the post if the date isn't in the future.
+ * 			const postDate = new Date( wp.data.select( 'core/editor' ).getEditedPostAttribute( 'date' ) );
+ * 			const currentDate = new Date();
+ * 			if ( postDate.getTime() <= currentDate.getTime() ) {
+ * 				if ( ! locked ) {
+ * 					locked = true;
+ * 					wp.data.dispatch( 'core/editor' ).lockPostSaving( 'futurelock' );
+ * 				}
+ * 			} else {
+ * 				if ( locked ) {
+ * 					locked = false;
+ * 					wp.data.dispatch( 'core/editor' ).unlockPostSaving( 'futurelock' );
+ * 				}
+ * 			}
+ * 		}
+ * 	} );
+ * }
+ * ```
+ *
  * @return {Object} Action object
  */
 export function lockPostSaving( lockName ) {
@@ -888,6 +924,12 @@ export function lockPostSaving( lockName ) {
  * Returns an action object used to signal that post saving is unlocked.
  *
  * @param  {string} lockName The lock name.
+ *
+ * @example
+ * ```
+ * // Unlock post saving with the lock key `mylock`:
+ * wp.data.dispatch( 'core/editor' ).unlockPostSaving( 'mylock' );
+ * ```
  *
  * @return {Object} Action object
  */
