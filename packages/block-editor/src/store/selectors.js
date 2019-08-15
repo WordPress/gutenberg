@@ -279,7 +279,7 @@ export function getBlockCount( state, rootClientId ) {
 }
 
 /**
- * @typedef {WPBlockSelection} A block selection object.
+ * @typedef {Object} WPBlockSelection A block selection object.
  *
  * @property {string} clientId     The selected block client ID.
  * @property {string} attributeKey The selected block attribute key.
