@@ -12,7 +12,7 @@ import { Spinner } from '@wordpress/components';
  */
 import DownloadableBlocksList from '../downloadable-blocks-list';
 
-function DownloadableBlocksPanel( { discoverItems, onSelect, onHover, hasPermission, isLoading } ) {
+function DownloadableBlocksPanel( { discoverItems, onSelect, onHover, hasPermission, isLoading, isWaiting } ) {
 	if ( ! hasPermission ) {
 		return (
 			<p className="block-directory-downloadable-blocks-panel__description has-no-results">
@@ -23,7 +23,7 @@ function DownloadableBlocksPanel( { discoverItems, onSelect, onHover, hasPermiss
 		);
 	}
 
-	if ( isLoading ) {
+	if ( isLoading || isWaiting ) {
 		return (
 			<p className="block-directory-downloadable-blocks-panel__description has-no-results">
 				<Spinner />

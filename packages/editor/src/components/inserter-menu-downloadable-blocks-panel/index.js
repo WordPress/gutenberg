@@ -11,11 +11,9 @@ import { DownloadableBlocksPanel } from '@wordpress/block-directory';
 import { useState } from '@wordpress/element';
 
 function InserterMenuDownloadableBlocksPanel() {
-	const [ state, setState ] = useState( {
-		debouncedFilterValue: '',
-	} );
+	const [ debouncedFilterValue, setFilterValue ] = useState( '' );
 
-	const debouncedSetState = debounce( setState, 400 );
+	const debouncedSetFilterValue = debounce( setFilterValue, 400 );
 
 	return (
 		<__experimentalInserterMenuExtension>
@@ -25,17 +23,16 @@ function InserterMenuDownloadableBlocksPanel() {
 						return null;
 					}
 
-					if ( state.debouncedFilterValue !== filterValue ) {
-						debouncedSetState( {
-							debouncedFilterValue: filterValue,
-						} );
+					if ( debouncedFilterValue !== filterValue ) {
+						debouncedSetFilterValue( filterValue );
 					}
 
 					return (
 						<DownloadableBlocksPanel
 							onSelect={ onSelect }
 							onHover={ onHover }
-							filterValue={ state.debouncedFilterValue }
+							filterValue={ debouncedFilterValue }
+							isWaiting={ filterValue !== debouncedFilterValue }
 						/>
 					);
 				}
