@@ -338,6 +338,10 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/observe-typing/README.md>
 
+<a name="OriginalMediaPlaceholder" href="#OriginalMediaPlaceholder">#</a> **OriginalMediaPlaceholder**
+
+Undocumented declaration.
+
 <a name="PanelColorSettings" href="#PanelColorSettings">#</a> **PanelColorSettings**
 
 Undocumented declaration.
