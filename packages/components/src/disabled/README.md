@@ -1,6 +1,8 @@
 # Disabled
 
-Disabled is a component which disables descendant tabbable elements and prevents pointer interaction.
+Disabled is a component which disables descendant tabbable form input elements and prevents pointer interaction.
+
+Note: by default this component does not prevent tabbing to anchor elements. If this is required then you may utilise the `onDisable` prop to manually disable individual elements on a per node basis.
 
 ## Usage
 
