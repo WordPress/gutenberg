@@ -18,6 +18,7 @@ import {
 } from '@wordpress/components';
 import { registerCoreBlocks } from '@wordpress/block-library';
 import '@wordpress/format-library';
+import { serialize } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -35,6 +36,8 @@ import '@wordpress/format-library/build-style/style.css';
 
 function App() {
 	const [ blocks, updateBlocks ] = useState( [] );
+
+	window._getContent = () => serialize( blocks );
 
 	return (
 		<Fragment>

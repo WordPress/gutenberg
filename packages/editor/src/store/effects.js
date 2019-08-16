@@ -12,7 +12,11 @@ import {
 
 export default {
 	FETCH_REUSABLE_BLOCKS: ( action, store ) => {
-		fetchReusableBlocks( action, store );
+		// To do: this shouldn't be necessary for loading the block editor out
+		// of WordPress context.
+		if ( window.wp !== undefined ) {
+			fetchReusableBlocks( action, store );
+		}
 	},
 	SAVE_REUSABLE_BLOCK: ( action, store ) => {
 		saveReusableBlocks( action, store );

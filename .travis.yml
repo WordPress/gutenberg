@@ -159,6 +159,13 @@ jobs:
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 3' < ~/.jest-e2e-tests )
 
+    - name: E2E tests (block editor)
+      env: SCRIPT_DEBUG=false PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
+      install:
+        - ./bin/setup-travis-e2e-tests-block-editor.sh
+      script:
+        - node ./bin/reset-local-e2e-tests-block-editor.js
+
   allow_failures:
     - name: JavaScript native mobile tests
     - name: PHP unit tests (PHP 5.3)

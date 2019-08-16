@@ -1200,6 +1200,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/e2e-tests-block-editor",
+		"slug": "packages-e2e-tests-block-editor",
+		"markdown_source": "../packages/e2e-tests-block-editor/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/e2e-tests",
 		"slug": "packages-e2e-tests",
 		"markdown_source": "../packages/e2e-tests/README.md",
