@@ -21,7 +21,7 @@ node_js:
 before_install:
   - npm install -g npm@latest
 
-script: npm run jest -- --runInBand
+script: npm test
 
 notifications:
   slack:
