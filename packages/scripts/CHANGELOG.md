@@ -8,7 +8,7 @@
 
 ### Bug Fix
 
-- Use the SCSS shared stylelint configuration so that both CSS and SCSS stylelint rules are used ([#](https://github.com/WordPress/gutenberg/pull/))
+- Use the SCSS shared `stylelint-config-wordpress` config so that both CSS and SCSS rules are used ([#17060](https://github.com/WordPress/gutenberg/pull/17060))
 
 ## 3.4.0 (2019-08-05)
 
