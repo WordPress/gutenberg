@@ -28,6 +28,7 @@ function gutenberg_reregister_core_block_types() {
 		'shortcode.php'       => 'core/shortcode',
 		'search.php'          => 'core/search',
 		'tag-cloud.php'       => 'core/tag-cloud',
+		'site-title.php'      => 'core/site-title',
 	);
 
 	$registry = WP_Block_Type_Registry::get_instance();
