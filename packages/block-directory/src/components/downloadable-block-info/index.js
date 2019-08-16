@@ -3,7 +3,7 @@
  */
 import { Fragment } from '@wordpress/element';
 import { Icon } from '@wordpress/components';
-import { _n, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 
 function DownloadableBlockInfo( { description, activeInstalls, humanizedUpdated } ) {
 	return (
@@ -16,7 +16,7 @@ function DownloadableBlockInfo( { description, activeInstalls, humanizedUpdated 
 					<Icon icon="chart-line"></Icon>{ sprintf( _n( '%d active installation', '%d active installations', activeInstalls ), activeInstalls ) }
 				</div>
 				<div className="block-directory-downloadable-block-info__column">
-					<Icon icon="update"></Icon>{ humanizedUpdated }
+					<Icon icon="update"></Icon><span aria-label={ sprintf( __( 'Updated %s' ), humanizedUpdated ) }>{ humanizedUpdated }</span>
 				</div>
 			</div>
 		</Fragment>

@@ -190,7 +190,7 @@ export class InserterMenu extends Component {
 	}
 
 	filter( filterValue = '' ) {
-		const { debouncedSpeak, items, rootChildBlocks } = this.props;
+		const { debouncedSpeak, items, rootChildBlocks, isDownloadableBlocksEnabled } = this.props;
 
 		const filteredItems = searchItems( items, filterValue );
 
@@ -237,7 +237,10 @@ export class InserterMenu extends Component {
 			resultCount
 		);
 
-		debouncedSpeak( resultsFoundMessage );
+		// Downloadable blocks will display more results from block directory if no results are found.
+		if ( ! isDownloadableBlocksEnabled ) {
+			debouncedSpeak( resultsFoundMessage );
+		}
 	}
 
 	onKeyDown( event ) {
