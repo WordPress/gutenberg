@@ -42,7 +42,7 @@
 	},
 	"devDependencies": {
 		"@commitlint/cli": "^8.0.0",
-		"@commitlint/config-conventional": "^7.5.0",
+		"@commitlint/config-conventional": "^8.0.0",
 		"@wordpress/npm-package-json-lint-config": "^2.0.0",
 		"eslint": "^5.16.0",
 		"eslint-plugin-jest": "^22.4.1",
