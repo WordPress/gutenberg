@@ -39,16 +39,8 @@ before_install:
       chmod +x docker-compose
       sudo mv docker-compose /usr/local/bin
 
-      # Check out WordPress
-      git clone --depth=1 git://develop.git.wordpress.org/ wordpress
-
-      cd wordpress
-
-      # Configure WordPress
-      npm ci
-      npm run env:start
-      npm run build
-      npm run env:install
+      # Install WordPress
+      npm run env install
 
       mkdir -p build/wp-content/uploads
       chmod 767 build/wp-content/uploads
@@ -62,7 +54,6 @@ install:
   - |
     if [[ "$WORDPRESS" = "true" ]]; then
       # Add Gutenberg to the WordPress local environment
-      export WP_DEVELOP_DIR=./wordpress
       npm run env connect
 
       npm run env cli plugin activate gutenberg

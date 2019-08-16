@@ -22,7 +22,7 @@ if ( existsSync( composeFile ) ) {
 	try {
 		compose = yaml.safeLoad( readFileSync( composeFile, 'utf8' ) );
 	} catch ( e ) {
-		stdout.write( 'There was an error loading your docker-compose.override.yml file. Please fix or delete it, and try again.' );
+		stdout.write( 'There was an error loading your docker-compose.override.yml file. Please fix or delete it, and try again.\n' );
 		stdout.write( e.toString() );
 		exit( 1 );
 	}
@@ -30,7 +30,7 @@ if ( existsSync( composeFile ) ) {
 
 const coreComposeFile = normalize( `${ env.WP_DEVELOP_DIR }/docker-compose.yml` );
 if ( ! existsSync( coreComposeFile ) ) {
-	stdout.write( "docker-compose.yml doesn't seem to exist. Are you sure WP_DEVELOP_DIR is a WordPress source directory?" );
+	stdout.write( "docker-compose.yml doesn't seem to exist. Are you sure WP_DEVELOP_DIR is a WordPress source directory?\n" );
 	exit( 1 );
 }
 
@@ -38,7 +38,7 @@ let coreCompose = {};
 try {
 	coreCompose = yaml.safeLoad( readFileSync( coreComposeFile, 'utf8' ) );
 } catch ( e ) {
-	stdout.write( 'There was an error loading your docker-compose.yml in your WordPress directory. Please revert any changes to it, and try again.' );
+	stdout.write( 'There was an error loading your docker-compose.yml in your WordPress directory. Please revert any changes to it, and try again.\n' );
 	stdout.write( e.toString() );
 	exit( 1 );
 }
@@ -50,7 +50,7 @@ const composeTemplate = readFileSync( fromConfigRoot( 'docker-compose.override.y
 
 const pluginCompose = yaml.safeLoad( composeTemplate );
 
-stdout.write( 'Updating docker-compose.override.yml...' );
+stdout.write( 'Updating docker-compose.override.yml...\n' );
 
 compose.version = coreCompose.version;
 
@@ -97,7 +97,7 @@ const mergedCompose = mergeConfigs( compose, pluginCompose );
 
 writeFileSync( composeFile, yaml.safeDump( mergedCompose, { lineWidth: -1 } ) );
 
-stdout.write( 'Restarting the WordPress environment...' );
+stdout.write( 'Restarting the WordPress environment...\n' );
 
 execSync( 'npm run env:stop', { cwd: normalize( env.WP_DEVELOP_DIR ), stdio: 'inherit' } );
 execSync( 'npm run env:start', { cwd: normalize( env.WP_DEVELOP_DIR ), stdio: 'inherit' } );
