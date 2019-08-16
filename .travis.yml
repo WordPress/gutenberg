@@ -42,22 +42,13 @@ before_install:
       # Install WordPress
       npm run env install
 
-      mkdir -p build/wp-content/uploads
-      chmod 767 build/wp-content/uploads
-
-      cd ..
+      mkdir -p wordpress/build/wp-content/uploads
+      chmod 767 wordpress/build/wp-content/uploads
     fi
 
 install:
   - npm ci
   - npm run build
-  - |
-    if [[ "$WORDPRESS" = "true" ]]; then
-      # Add Gutenberg to the WordPress local environment
-      npm run env connect
-
-      npm run env cli plugin activate gutenberg
-    fi
   - |
     if [[ "$COMPOSER_INSTALL" = "true" ]]; then
       npm run env docker-run -- php composer install
