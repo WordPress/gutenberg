@@ -275,6 +275,7 @@ class CoverEdit extends Component {
 				value={ overlayColor.color }
 				onChange={ setOverlayColor }
 				clearable={ false }
+				className="wp-block-cover__placeholder-color-palette"
 				{ ...props } />;
 		}
 		if ( ! ( url || overlayColor.color ) ) {
