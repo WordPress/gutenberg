@@ -3,7 +3,7 @@
  */
 import { AppRegistry, I18nManager, YellowBox } from 'react-native';
 import React from 'react';
-import { DarkModeProvider } from 'react-native-dark-mode'
+
 /**
  * WordPress dependencies
  */
@@ -66,13 +66,11 @@ export class RootComponent extends React.Component {
 		}
 		const Editor = require( '@wordpress/edit-post' ).Editor;
 		return (
-			<DarkModeProvider>
-				<Editor
-					initialHtml={ initialData }
-					initialHtmlModeEnabled={ initialHtmlModeEnabled }
-					initialTitle={ initialTitle }
-				/>
-			</DarkModeProvider>
+			<Editor
+				initialHtml={ initialData }
+				initialHtmlModeEnabled={ initialHtmlModeEnabled }
+				initialTitle={ initialTitle }
+			/>
 		);
 	}
 }
