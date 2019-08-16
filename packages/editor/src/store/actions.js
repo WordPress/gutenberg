@@ -51,7 +51,7 @@ export function* setupEditor( post, edits, template ) {
 		content = post.content;
 	}
 
-	let blocks = parse( content );
+	let blocks = content ? parse( content ) : [];
 
 	// Apply a template for new posts only, if exists.
 	const isNewPost = post.status === 'auto-draft';
@@ -70,7 +70,7 @@ export function* setupEditor( post, edits, template ) {
 	yield setupEditorState( post );
 	if ( edits ) {
 		const record = { ...post, ...edits };
-		yield dispatch( 'core', 'receiveEntityRecords', 'postType', post.type, record );
+		yield dispatch( 'core', 'receiveEntityRecords', post.kind, post.type, record );
 	}
 }
 
@@ -196,8 +196,8 @@ export function* editPost( edits ) {
 	);
 
 	if ( Object.keys( handled ).length ) {
-		const { id, type } = yield select( 'core/editor', 'getCurrentPost' );
-		yield dispatch( 'core', 'editEntityRecord', 'postType', type, id, handled );
+		const { kind, type, id } = yield select( 'core/editor', 'getCurrentPost' );
+		yield dispatch( 'core', 'editEntityRecord', kind, type, id, handled );
 	}
 
 	if ( parentDispatch && Object.keys( forParent ).length ) {
@@ -249,33 +249,39 @@ export function* savePost( options = {} ) {
 	}
 
 	yield __experimentalRequestPostUpdateStart( options );
+	const entityKind = yield select( STORE_KEY, 'getCurrentEntityKind' );
 	const postType = yield select( 'core/editor', 'getCurrentPostType' );
 	const postId = yield select( 'core/editor', 'getCurrentPostId' );
 	const { handled } = yield select( STORE_KEY, 'getHandlesFilteredEdits' );
 	const record = { id: postId, ...handled };
-	yield dispatch( 'core', 'saveEntityRecord', 'postType', postType, record, {
+	const isPost = entityKind === 'postType';
+	yield dispatch( 'core', 'saveEntityRecord', entityKind, postType, record, {
 		...options,
-		getSuccessNoticeActionArgs: ( previousEntity, entity, type ) => {
-			const args = getNotificationArgumentsForSaveSuccess( {
-				previousPost: previousEntity,
-				post: entity,
-				postType: type,
-				options,
-			} );
-			if ( args && args.length ) {
-				return [ 'core/notices', 'createSuccessNotice', ...args ];
-			}
-		},
-		getFailureNoticeActionArgs: ( previousEntity, edits, error ) => {
-			const args = getNotificationArgumentsForSaveFail( {
-				post: previousEntity,
-				edits,
-				error,
-			} );
-			if ( args && args.length ) {
-				return [ 'core/notices', 'createErrorNotice', ...args ];
-			}
-		},
+		getSuccessNoticeActionArgs:
+			isPost &&
+			( ( previousEntity, entity, type ) => {
+				const args = getNotificationArgumentsForSaveSuccess( {
+					previousPost: previousEntity,
+					post: entity,
+					postType: type,
+					options,
+				} );
+				if ( args && args.length ) {
+					return [ 'core/notices', 'createSuccessNotice', ...args ];
+				}
+			} ),
+		getFailureNoticeActionArgs:
+			isPost &&
+			( ( previousEntity, edits, error ) => {
+				const args = getNotificationArgumentsForSaveFail( {
+					post: previousEntity,
+					edits,
+					error,
+				} );
+				if ( args && args.length ) {
+					return [ 'core/notices', 'createErrorNotice', ...args ];
+				}
+			} ),
 	} );
 	yield __experimentalRequestPostUpdateFinish( options );
 }

@@ -32,6 +32,7 @@ export const entityProviderValue = {
 export default function EntityHandlers( {
 	entity,
 	handles = { all: true },
+	children,
 	...props
 } ) {
 	const editorSettings = useSelect(
@@ -56,6 +57,7 @@ export default function EntityHandlers( {
 				{ ...props }
 			>
 				<PostSavedState />
+				{ children }
 			</EditorProvider>
 		</EntityProvider>
 	);

@@ -99,7 +99,18 @@ export function shouldOverwriteState( action, previousAction ) {
 	return isUpdatingSamePostProperty( action, previousAction );
 }
 
-export function postId( state = null, action ) {
+export function entityKind( state = null, action ) {
+	switch ( action.type ) {
+		case 'SETUP_EDITOR_STATE':
+		case 'RESET_POST':
+		case 'UPDATE_POST':
+			return action.post.kind;
+	}
+
+	return state;
+}
+
+export function postId( state, action ) {
 	switch ( action.type ) {
 		case 'SETUP_EDITOR_STATE':
 		case 'RESET_POST':
@@ -383,6 +394,7 @@ export function editorSettings( state = EDITOR_SETTINGS_DEFAULTS, action ) {
 }
 
 export default optimist( combineReducers( {
+	entityKind,
 	postId,
 	postType,
 	preferences,

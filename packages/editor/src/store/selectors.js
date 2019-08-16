@@ -154,10 +154,11 @@ export function isCleanNewPost( state ) {
  * @return {Object} Post object.
  */
 export const getCurrentPost = createRegistrySelector( ( select ) => ( state ) => {
+	const entityKind = getCurrentEntityKind( state );
 	const postId = getCurrentPostId( state );
 	const postType = getCurrentPostType( state );
 
-	const post = select( 'core' ).getEntityRecord( 'postType', postType, postId );
+	const post = select( 'core' ).getEntityRecord( entityKind, postType, postId );
 	if ( post ) {
 		return post;
 	}
@@ -167,6 +168,18 @@ export const getCurrentPost = createRegistrySelector( ( select ) => ( state ) =>
 	// default empty object state.
 	return EMPTY_OBJECT;
 } );
+
+/**
+ * Returns the kind of the entity currently being edited, or null if the entity has
+ * not yet been saved.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {?string} The entity kind.
+ */
+export function getCurrentEntityKind( state ) {
+	return state.entityKind;
+}
 
 /**
  * Returns the post type of the post currently being edited.
@@ -180,7 +193,7 @@ export function getCurrentPostType( state ) {
 }
 
 /**
- * Returns the ID of the post currently being edited, or null if the post has
+ * Returns the ID of the post currently being edited, or undefined if the post has
  * not yet been saved.
  *
  * @param {Object} state Global application state.
@@ -223,9 +236,10 @@ export function getCurrentPostLastRevisionId( state ) {
  * @return {Object} Object of key value pairs comprising unsaved edits.
  */
 export const getPostEdits = createRegistrySelector( ( select ) => ( state ) => {
+	const entityKind = getCurrentEntityKind( state );
 	const postType = getCurrentPostType( state );
 	const postId = getCurrentPostId( state );
-	return select( 'core' ).getEntityRecordEdits( 'postType', postType, postId ) || EMPTY_OBJECT;
+	return select( 'core' ).getEntityRecordEdits( entityKind, postType, postId ) || EMPTY_OBJECT;
 } );
 
 /**
@@ -685,9 +699,10 @@ export function isEditedPostDateFloating( state ) {
  * @return {boolean} Whether post is being saved.
  */
 export const isSavingPost = createRegistrySelector( ( select ) => ( state ) => {
+	const entityKind = getCurrentEntityKind( state );
 	const postType = getCurrentPostType( state );
 	const postId = getCurrentPostId( state );
-	return select( 'core' ).isSavingEntityRecord( 'postType', postType, postId );
+	return select( 'core' ).isSavingEntityRecord( entityKind, postType, postId );
 } );
 
 /**
@@ -700,9 +715,10 @@ export const isSavingPost = createRegistrySelector( ( select ) => ( state ) => {
  */
 export const didPostSaveRequestSucceed = createRegistrySelector(
 	( select ) => ( state ) => {
+		const entityKind = getCurrentEntityKind( state );
 		const postType = getCurrentPostType( state );
 		const postId = getCurrentPostId( state );
-		return ! select( 'core' ).getLastEntitySaveError( 'postType', postType, postId );
+		return ! select( 'core' ).getLastEntitySaveError( entityKind, postType, postId );
 	}
 );
 
@@ -716,9 +732,10 @@ export const didPostSaveRequestSucceed = createRegistrySelector(
  */
 export const didPostSaveRequestFail = createRegistrySelector(
 	( select ) => ( state ) => {
+		const entityKind = getCurrentEntityKind( state );
 		const postType = getCurrentPostType( state );
 		const postId = getCurrentPostId( state );
-		return !! select( 'core' ).getLastEntitySaveError( 'postType', postType, postId );
+		return !! select( 'core' ).getLastEntitySaveError( entityKind, postType, postId );
 	}
 );
 
@@ -873,10 +890,11 @@ export function getBlocksForSerialization( state ) {
  * @return {string} Post content.
  */
 export const getEditedPostContent = createRegistrySelector( ( select ) => ( state ) => {
+	const entityKind = getCurrentEntityKind( state );
 	const postId = getCurrentPostId( state );
 	const postType = getCurrentPostType( state );
 	const record = select( 'core' ).getEditedEntityRecord(
-		'postType',
+		entityKind,
 		postType,
 		postId
 	);
@@ -1220,10 +1238,11 @@ export function getEditorSettings( state ) {
 export const getHandlesFilteredEdits = createRegistrySelector(
 	( select ) => ( state, edits ) => {
 		if ( ! edits ) {
+			const entityKind = getCurrentEntityKind( state );
 			const postId = getCurrentPostId( state );
 			const postType = getCurrentPostType( state );
 			edits = select( 'core' ).getEntityRecordNonTransientEdits(
-				'postType',
+				entityKind,
 				postType,
 				postId
 			);

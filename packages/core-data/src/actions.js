@@ -74,6 +74,15 @@ export function addEntities( entities ) {
  * @return {Object} Action object.
  */
 export function receiveEntityRecords( kind, name, records, query, invalidateCache = false ) {
+	// Ideally, the API should do this, but it doesn't
+	// for some entities, so we make sure these properties
+	// are set correctly here.
+	records = castArray( records ).map( ( record ) => {
+		record.kind = kind;
+		record.type = name;
+		return record;
+	} );
+
 	let action;
 	if ( query ) {
 		action = receiveQueriedItems( records, query );

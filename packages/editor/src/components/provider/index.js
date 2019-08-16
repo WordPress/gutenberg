@@ -153,6 +153,7 @@ class EditorProvider extends Component {
 			resetEditorBlocksWithoutUndoLevel,
 			hasUploadPermissions,
 			noBlockEditorStore,
+			noInnerBlocks,
 		} = this.props;
 
 		if ( ! isReady ) {
@@ -170,6 +171,7 @@ class EditorProvider extends Component {
 			// handled and they are not explicitly not handled, or if they
 			// are explicitly handled.
 			const innerBlocksProps =
+				! noInnerBlocks &&
 				settings.handles &&
 				( ( settings.handles.all &&
 					settings.handles.content !== false &&
@@ -189,7 +191,7 @@ class EditorProvider extends Component {
 						but we provide props to sync with this provider's entity. Just
 						like how the block-editor store syncs with the top level editor store.
 					*/ }
-					<InnerBlocks { ...innerBlocksProps } />
+					{ ! noInnerBlocks && <InnerBlocks { ...innerBlocksProps } /> }
 				</>
 			);
 		}

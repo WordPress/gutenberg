@@ -230,6 +230,19 @@ _Returns_
 
 -   `*`: Entity attribute value.
 
+<a name="getCurrentEntityKind" href="#getCurrentEntityKind">#</a> **getCurrentEntityKind**
+
+Returns the kind of the entity currently being edited, or null if the entity has
+not yet been saved.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `?string`: The entity kind.
+
 <a name="getCurrentPost" href="#getCurrentPost">#</a> **getCurrentPost**
 
 Returns the post currently being edited in its last known saved state, not
@@ -259,7 +272,7 @@ _Returns_
 
 <a name="getCurrentPostId" href="#getCurrentPostId">#</a> **getCurrentPostId**
 
-Returns the ID of the post currently being edited, or null if the post has
+Returns the ID of the post currently being edited, or undefined if the post has
 not yet been saved.
 
 _Parameters_
