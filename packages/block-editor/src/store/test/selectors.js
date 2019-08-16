@@ -32,6 +32,7 @@ const {
 	getBlockHierarchyRootClientId,
 	getGlobalBlockCount,
 	getSelectedBlockClientIds,
+	getSelectedBlockCount,
 	getMultiSelectedBlockClientIds,
 	getMultiSelectedBlocks,
 	getMultiSelectedBlocksStartClientId,
@@ -922,6 +923,113 @@ describe( 'selectors', () => {
 			};
 
 			expect( getSelectedBlockClientIds( state ) ).toEqual( [ 4, 3, 2 ] );
+		} );
+
+		it( 'should return selected block clientIds if there is multi-selection (nested context)', () => {
+			const state = {
+				blocks: {
+					order: {
+						'': [ 5, 4, 3, 2, 1 ],
+						4: [ 9, 8, 7, 6 ],
+					},
+					parents: {
+						1: '',
+						2: '',
+						3: '',
+						4: '',
+						5: '',
+						6: 4,
+						7: 4,
+						8: 4,
+						9: 4,
+					},
+				},
+				blockSelection: {
+					selections: [
+						{
+							start: { clientId: 7 },
+							end: { clientId: 9 },
+						},
+					],
+				},
+			};
+
+			expect( getSelectedBlockClientIds( state ) ).toEqual( [ 9, 8, 7 ] );
+		} );
+	} );
+
+	describe( 'getSelectedBlockCount', () => {
+		it( 'should return 0 if there is no selection', () => {
+			const state = {
+				blocks: {
+					order: {
+						'': [ 123, 23 ],
+					},
+					parents: {
+						123: '',
+						23: '',
+					},
+				},
+				blockSelection: {
+					selections: [],
+				},
+			};
+
+			expect( getSelectedBlockCount( state ) ).toBe( 0 );
+		} );
+
+		it( 'should return 1 if there is a single selection', () => {
+			const state = {
+				blocks: {
+					order: {
+						'': [ 5, 4, 3, 2, 1 ],
+					},
+					parents: {
+						1: '',
+						2: '',
+						3: '',
+						4: '',
+						5: '',
+					},
+				},
+				blockSelection: {
+					selections: [
+						{
+							start: { clientId: 2 },
+							end: { clientId: 2 },
+						},
+					],
+				},
+			};
+
+			expect( getSelectedBlockCount( state ) ).toBe( 1 );
+		} );
+
+		it( 'should return the correct count if there is a multi-selection', () => {
+			const state = {
+				blocks: {
+					order: {
+						'': [ 5, 4, 3, 2, 1 ],
+					},
+					parents: {
+						1: '',
+						2: '',
+						3: '',
+						4: '',
+						5: '',
+					},
+				},
+				blockSelection: {
+					selections: [
+						{
+							start: { clientId: 2 },
+							end: { clientId: 4 },
+						},
+					],
+				},
+			};
+
+			expect( getSelectedBlockCount( state ) ).toBe( 3 );
 		} );
 
 		it( 'should return selected block clientIds if there is multi-selection (nested context)', () => {

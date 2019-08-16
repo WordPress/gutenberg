@@ -366,7 +366,7 @@ export function getBlockSelectionEnd( state ) {
  * @return {number} Number of blocks selected in the post.
  */
 export function getSelectedBlockCount( state ) {
-	return state.blockSelection.selections.length;
+	return getSelectedBlockClientIds( state ).length;
 }
 
 /**
