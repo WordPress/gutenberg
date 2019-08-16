@@ -927,7 +927,6 @@ const BLOCK_SELECTION_INITIAL_STATE = {
 	selections: BLOCK_SELECTION_EMPTY_ARRAY,
 	isMultiSelecting: false,
 	isEnabled: true,
-	initialPosition: null,
 };
 
 /**
@@ -964,10 +963,15 @@ export function blockSelection( state = BLOCK_SELECTION_INITIAL_STATE, action ) 
 			return {
 				...BLOCK_SELECTION_INITIAL_STATE,
 				isMultiSelecting: state.isMultiSelecting,
-				selections: action.clientIds.map( ( clientId ) => ( { clientId } ) ),
+				selections: [
+					{
+						start: { clientId: action.start },
+						end: { clientId: action.end },
+					},
+				],
 			};
 		case 'SELECT_BLOCK':
-			if ( state.selections.find( ( { clientId } ) => clientId === action.clientId ) ) {
+			if ( state.selections.find( ( { start, end } ) => start.clientId === action.clientId || end.clientId === action.clientId ) ) {
 				return state;
 			}
 
@@ -975,38 +979,11 @@ export function blockSelection( state = BLOCK_SELECTION_INITIAL_STATE, action ) 
 				...BLOCK_SELECTION_INITIAL_STATE,
 				selections: [
 					{
-						clientId: action.clientId,
+						start: { clientId: action.clientId },
+						end: { clientId: action.clientId },
 						initialPosition: action.initialPosition,
 					},
 				],
-			};
-		case 'ADD_BLOCK_SELECTION':
-			if ( state.selections.find( ( { clientId } ) => clientId === action.clientId ) ) {
-				return state;
-			}
-
-			return {
-				...BLOCK_SELECTION_INITIAL_STATE,
-				isMultiSelecting: true,
-				selections: [
-					...state.selections,
-					{
-						clientId: action.clientId,
-					},
-				],
-			};
-
-		case 'REMOVE_BLOCK_SELECTION':
-			if ( ! state.selections.find( ( { clientId } ) => clientId === action.clientId ) ) {
-				return state;
-			}
-
-			const selections = state.selections.filter( ( { clientId } ) => clientId !== action.clientId );
-
-			return {
-				...BLOCK_SELECTION_INITIAL_STATE,
-				isMultiSelecting: selections.length > 1,
-				selections,
 			};
 
 		case 'REPLACE_INNER_BLOCKS': // REPLACE_INNER_BLOCKS and INSERT_BLOCKS should follow the same logic.
@@ -1016,7 +993,8 @@ export function blockSelection( state = BLOCK_SELECTION_INITIAL_STATE, action ) 
 					...BLOCK_SELECTION_INITIAL_STATE,
 					selections: [
 						{
-							clientId: action.blocks[ 0 ].clientId,
+							start: { clientId: action.blocks[ 0 ].clientId },
+							end: { clientId: action.blocks[ 0 ].clientId },
 						},
 					],
 				};
@@ -1028,14 +1006,14 @@ export function blockSelection( state = BLOCK_SELECTION_INITIAL_STATE, action ) 
 			if (
 				! action.clientIds ||
 				! action.clientIds.length ||
-				! action.clientIds.every( ( clientIdToRemove ) => state.selections.find( ( { clientId } ) => clientId === clientIdToRemove ) )
+				! action.clientIds.every( ( clientIdToRemove ) => state.selections.find( ( { start, end } ) => start.clientId === clientIdToRemove || end.clientId === clientIdToRemove ) )
 			) {
 				return state;
 			}
 
 			return BLOCK_SELECTION_INITIAL_STATE;
 		case 'REPLACE_BLOCKS': {
-			if ( ! action.clientIds.every( ( clientIdToReplace ) => state.selections.find( ( { clientId } ) => clientId === clientIdToReplace ) ) ) {
+			if ( ! action.clientIds.every( ( clientIdToReplace ) => state.selections.find( ( { start, end } ) => start.clientId === clientIdToReplace || end.clientId === clientIdToReplace ) ) ) {
 				return state;
 			}
 
@@ -1046,7 +1024,7 @@ export function blockSelection( state = BLOCK_SELECTION_INITIAL_STATE, action ) 
 				return BLOCK_SELECTION_INITIAL_STATE;
 			}
 
-			if ( state.selections.find( ( { clientId } ) => clientId === blockToSelect.clientId ) ) {
+			if ( state.selections.find( ( { start, end } ) => start.clientId === blockToSelect.clientId || end.clientId === blockToSelect.clientId ) ) {
 				return state;
 			}
 
@@ -1054,7 +1032,8 @@ export function blockSelection( state = BLOCK_SELECTION_INITIAL_STATE, action ) 
 				...BLOCK_SELECTION_INITIAL_STATE,
 				selections: [
 					{
-						clientId: blockToSelect.clientId,
+						start: { clientId: blockToSelect.clientId },
+						end: { clientId: blockToSelect.clientId },
 					},
 				],
 			};
@@ -1069,10 +1048,16 @@ export function blockSelection( state = BLOCK_SELECTION_INITIAL_STATE, action ) 
 				...BLOCK_SELECTION_INITIAL_STATE,
 				selections: [
 					{
-						clientId: action.clientId,
-						attributeKey: action.attributeKey,
-						startOffset: action.startOffset,
-						endOffset: action.endOffset,
+						start: {
+							clientId: action.clientId,
+							attributeKey: action.attributeKey,
+							offset: action.startOffset,
+						},
+						end: {
+							clientId: action.clientId,
+							attributeKey: action.attributeKey,
+							offset: action.endOffset,
+						},
 					},
 				],
 			};
@@ -1082,12 +1067,36 @@ export function blockSelection( state = BLOCK_SELECTION_INITIAL_STATE, action ) 
 				selections: [
 					...state.selections,
 					{
-						clientId: action.clientId,
-						attributeKey: action.attributeKey,
-						startOffset: action.startOffset,
-						endOffset: action.endOffset,
+						start: {
+							clientId: action.clientId,
+							attributeKey: action.attributeKey,
+							offset: action.startOffset,
+						},
+						end: {
+							clientId: action.clientId,
+							attributeKey: action.attributeKey,
+							offset: action.endOffset,
+						},
 					},
 				],
+			};
+		case 'REMOVE_SELECTION':
+			return {
+				...BLOCK_SELECTION_INITIAL_STATE,
+				selections: state.selections.filter( ( { start, end } ) => {
+					if (
+						start.clientId === action.clientId &&
+						end.clientId === action.clientId &&
+						start.attributeKey === action.attributeKey &&
+						end.attributeKey === action.attributeKey &&
+						start.offset === action.startOffset &&
+						end.offset === action.endOffset
+					) {
+						return false;
+					}
+
+					return true;
+				} ),
 			};
 	}
 

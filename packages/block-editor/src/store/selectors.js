@@ -302,9 +302,9 @@ export function getSelectionStart( state ) {
 	}
 
 	return {
-		clientId: selections[ 0 ].clientId,
-		attributeKey: selections[ 0 ].attributeKey,
-		offset: selections[ 0 ].startOffset,
+		clientId: selections[ 0 ].start.clientId,
+		attributeKey: selections[ 0 ].start.attributeKey,
+		offset: selections[ 0 ].start.offset,
 	};
 }
 
@@ -324,9 +324,9 @@ export function getSelectionEnd( state ) {
 	}
 
 	return {
-		clientId: selections[ 0 ].clientId,
-		attributeKey: selections[ 0 ].attributeKey,
-		offset: selections[ 0 ].endOffset,
+		clientId: selections[ 0 ].end.clientId,
+		attributeKey: selections[ 0 ].end.attributeKey,
+		offset: selections[ 0 ].end.offset,
 	};
 }
 
@@ -341,7 +341,7 @@ export function getSelectionEnd( state ) {
  */
 export function getBlockSelectionStart( state ) {
 	const { selections } = state.blockSelection;
-	return selections.length ? selections[ 0 ].clientId : null;
+	return selections.length ? selections[ 0 ].start.clientId : null;
 }
 
 /**
@@ -377,7 +377,13 @@ export function getSelectedBlockCount( state ) {
  * @return {boolean} Whether a single block is selected.
  */
 export function hasSelectedBlock( state ) {
-	return state.blockSelection.selections.length === 1;
+	const { selections } = state.blockSelection;
+
+	if ( selections.length !== 1 ) {
+		return false;
+	}
+
+	return selections[ 0 ].start.clientId === selections[ 0 ].end.clientId;
 }
 
 /**
@@ -395,10 +401,12 @@ export function getSelectedBlockClientId( state ) {
 		return null;
 	}
 
+	const { start, end } = selections[ 0 ];
+
 	// We need to check the block exists because the current blockSelection
 	// reducer doesn't take into account when blocks are reset via undo. To be
 	// removed when that's fixed.
-	return selections[ 0 ].clientId && !! state.blocks.byClientId[ selections[ 0 ].clientId ] ? selections[ 0 ].clientId : null;
+	return start.clientId === end.clientId && !! state.blocks.byClientId[ start.clientId ] ? start.clientId : null;
 }
 
 /**
@@ -556,7 +564,7 @@ export function getSelectedBlocksInitialCaretPosition( state ) {
 }
 
 /**
- * Returns the current selection set of block client IDs (multiselection or single selection).
+ * Returns the current selection set of block client IDs (multi-selection or single selection).
  *
  * @param {Object} state Editor state.
  *
@@ -570,12 +578,36 @@ export const getSelectedBlockClientIds = createSelector(
 			return EMPTY_ARRAY;
 		}
 
-		return selections.reduce( ( clientIds, { clientId } ) => {
-			if ( ! clientIds.includes( clientId ) ) {
-				clientIds.push( clientId );
+		return selections.map( ( { start, end } ) => {
+			if ( start.clientId === end.clientId ) {
+				return [ start.clientId ];
 			}
 
-			return clientIds;
+			// Retrieve root client ID to aid in retrieving relevant nested block
+			// order, being careful to allow the falsey empty string top-level root
+			// by explicitly testing against null.
+			const rootClientId = getBlockRootClientId( state, start.clientId );
+			if ( rootClientId === null ) {
+				return EMPTY_ARRAY;
+			}
+
+			const blockOrder = getBlockOrder( state, rootClientId );
+			const startIndex = blockOrder.indexOf( start.clientId );
+			const endIndex = blockOrder.indexOf( end.clientId );
+
+			if ( startIndex > endIndex ) {
+				return blockOrder.slice( endIndex, startIndex + 1 );
+			}
+
+			return blockOrder.slice( startIndex, endIndex + 1 );
+		} ).reduce( ( result, clientIds ) => {
+			for ( const clientId of clientIds ) {
+				if ( ! result.includes( clientId ) ) {
+					result.push( clientId );
+				}
+			}
+
+			return result;
 		}, [] );
 	},
 	( state ) => [
@@ -595,7 +627,11 @@ export const getSelectedBlockClientIds = createSelector(
 export function getMultiSelectedBlockClientIds( state ) {
 	const { selections } = state.blockSelection;
 
-	if ( selections.length <= 1 ) {
+	if ( selections.length === 0 ) {
+		return EMPTY_ARRAY;
+	}
+
+	if ( selections.length === 1 && selections[ 0 ].start.clientId === selections[ 0 ].end.clientId ) {
 		return EMPTY_ARRAY;
 	}
 
@@ -689,6 +725,20 @@ export function isFirstMultiSelectedBlock( state, clientId ) {
 }
 
 /**
+ * Returns true if a multi-selection exists, and the block corresponding to the
+ * specified client ID is the last block of the multi-selection set, or false
+ * otherwise.
+ *
+ * @param {Object} state    Editor state.
+ * @param {string} clientId Block client ID.
+ *
+ * @return {boolean} Whether block is last in multi-selection.
+ */
+export function isLastMultiSelectedBlock( state, clientId ) {
+	return getLastMultiSelectedBlockClientId( state ) === clientId;
+}
+
+/**
  * Returns true if the client ID occurs within the block multi-selection, or
  * false otherwise.
  *
@@ -738,15 +788,23 @@ export const isAncestorMultiSelected = createSelector(
  *
  * @return {?string} Client ID of block beginning multi-selection.
  */
-export function getMultiSelectedBlocksStartClientId( state ) {
-	const { selections } = state.blockSelection;
+export const getMultiSelectedBlocksStartClientId = createSelector(
+	( state ) => {
+		const clientIds = getMultiSelectedBlockClientIds( state );
 
-	if ( selections.length <= 1 ) {
-		return null;
-	}
+		if ( clientIds.length === 0 ) {
+			return null;
+		}
 
-	return selections[ 0 ].clientId;
-}
+		const blockOrder = getBlockOrder( state );
+		const sortedList = clientIds.sort( ( a, b ) => blockOrder.indexOf( a ) - blockOrder.indexOf( b ) );
+		return sortedList[ 0 ];
+	},
+	( state ) => [
+		state.blocks.order,
+		state.blockSelection.selections,
+	],
+);
 
 /**
  * Returns the client ID of the block which ends the multi-selection set, or
@@ -760,15 +818,23 @@ export function getMultiSelectedBlocksStartClientId( state ) {
  *
  * @return {?string} Client ID of block ending multi-selection.
  */
-export function getMultiSelectedBlocksEndClientId( state ) {
-	const { selections } = state.blockSelection;
+export const getMultiSelectedBlocksEndClientId = createSelector(
+	( state ) => {
+		const clientIds = getMultiSelectedBlockClientIds( state );
 
-	if ( selections.length <= 1 ) {
-		return null;
-	}
+		if ( clientIds.length === 0 ) {
+			return null;
+		}
 
-	return selections[ selections.length - 1 ];
-}
+		const blockOrder = getBlockOrder( state );
+		const sortedList = clientIds.sort( ( a, b ) => blockOrder.indexOf( a ) - blockOrder.indexOf( b ) );
+		return sortedList[ sortedList.length - 1 ];
+	},
+	( state ) => [
+		state.blocks.order,
+		state.blockSelection.selections,
+	],
+);
 
 /**
  * Returns an array containing all block client IDs in the editor in the order
@@ -814,7 +880,11 @@ export function isBlockSelected( state, clientId ) {
 		return false;
 	}
 
-	return selections[ 0 ].clientId === clientId;
+	if ( selections[ 0 ].start.clientId !== selections[ 0 ].end.clientId ) {
+		return false;
+	}
+
+	return selections[ 0 ].start.clientId === clientId;
 }
 
 /**
@@ -867,8 +937,9 @@ export function isBlockWithinSelection( state, clientId ) {
  * @return {boolean} Whether multi-selection has been made.
  */
 export function hasMultiSelection( state ) {
-	const { selections } = state.blockSelection;
-	return selections.length > 1;
+	const clientIds = getMultiSelectedBlockClientIds( state );
+
+	return clientIds.length > 1;
 }
 
 /**
@@ -943,15 +1014,17 @@ export function isCaretWithinFormattedText( state ) {
 export function getBlockInsertionPoint( state ) {
 	let rootClientId, index;
 
-	const { insertionPoint, blockSelection } = state;
+	const { insertionPoint } = state;
+
 	if ( insertionPoint !== null ) {
 		return insertionPoint;
 	}
 
-	const { selections } = blockSelection;
-	if ( selections.length ) {
-		rootClientId = getBlockRootClientId( state, selections[ selections.length - 1 ].clientId ) || undefined;
-		index = getBlockIndex( state, selections[ selections.length - 1 ].clientId, rootClientId ) + 1;
+	const selectedBlockClientId = getSelectedBlockClientId( state );
+
+	if ( selectedBlockClientId ) {
+		rootClientId = getBlockRootClientId( state, selectedBlockClientId ) || undefined;
+		index = getBlockIndex( state, selectedBlockClientId, rootClientId ) + 1;
 	} else {
 		index = getBlockOrder( state ).length;
 	}

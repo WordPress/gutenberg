@@ -1795,54 +1795,66 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toEqual( {
-				start: { clientId: 'kumquat' },
-				end: { clientId: 'kumquat' },
-				clientIds: [ 'kumquat' ],
-				initialPosition: -1,
+				selections: [
+					{
+						start: { clientId: 'kumquat' },
+						end: { clientId: 'kumquat' },
+						initialPosition: -1,
+					},
+				],
 				isMultiSelecting: false,
 				isEnabled: true,
 			} );
 		} );
 
-		it( 'should set multi selection', () => {
+		it( 'should set multi-selection', () => {
 			const original = deepFreeze( { isMultiSelecting: false } );
 			const state = blockSelection( original, {
 				type: 'MULTI_SELECT',
-				clientIds: [ 'ribs', 'chicken' ],
+				start: 'ribs',
+				end: 'chicken',
 			} );
 
 			expect( state ).toEqual( {
-				start: {},
-				end: {},
-				clientIds: [ 'ribs', 'chicken' ],
-				initialPosition: null,
+				selections: [
+					{
+						start: { clientId: 'ribs' },
+						end: { clientId: 'chicken' },
+					},
+				],
 				isMultiSelecting: false,
 				isEnabled: true,
 			} );
 		} );
 
-		it( 'should set continuous multi selection', () => {
+		it( 'should set continuous multi-selection', () => {
 			const original = deepFreeze( { isMultiSelecting: true } );
 			const state = blockSelection( original, {
 				type: 'MULTI_SELECT',
-				clientIds: [ 'ribs', 'chicken' ],
+				start: 'ribs',
+				end: 'chicken',
 			} );
 
 			expect( state ).toEqual( {
-				start: {},
-				end: {},
-				clientIds: [ 'ribs', 'chicken' ],
-				initialPosition: null,
+				selections: [
+					{
+						start: { clientId: 'ribs' },
+						end: { clientId: 'chicken' },
+					},
+				],
 				isMultiSelecting: true,
 				isEnabled: true,
 			} );
 		} );
 
-		it( 'should start multi selection', () => {
+		it( 'should start multi-selection', () => {
 			const original = deepFreeze( {
-				start: { clientId: 'ribs' },
-				end: { clientId: 'ribs' },
-				clientIds: [ 'ribs' ],
+				selections: [
+					{
+						start: { clientId: 'ribs' },
+						end: { clientId: 'ribs' },
+					},
+				],
 				isMultiSelecting: false,
 			} );
 			const state = blockSelection( original, {
@@ -1850,10 +1862,12 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toEqual( {
-				start: { clientId: 'ribs' },
-				end: { clientId: 'ribs' },
-				clientIds: [ 'ribs' ],
-				initialPosition: null,
+				selections: [
+					{
+						start: { clientId: 'ribs' },
+						end: { clientId: 'ribs' },
+					},
+				],
 				isMultiSelecting: true,
 			} );
 		} );
@@ -1867,22 +1881,25 @@ describe( 'state', () => {
 			expect( state ).toBe( original );
 		} );
 
-		it( 'should end multi selection with selection', () => {
-			const original = deepFreeze( { start: { clientId: 'ribs' }, end: { clientId: 'chicken' }, isMultiSelecting: true } );
+		it( 'should end multi-selection with selection', () => {
+			const original = deepFreeze( { selections: [ { start: { clientId: 'ribs' }, end: { clientId: 'chicken' } } ], isMultiSelecting: true } );
 			const state = blockSelection( original, {
 				type: 'STOP_MULTI_SELECT',
 			} );
 
 			expect( state ).toEqual( {
-				start: { clientId: 'ribs' },
-				end: { clientId: 'chicken' },
-				initialPosition: null,
+				selections: [
+					{
+						start: { clientId: 'ribs' },
+						end: { clientId: 'chicken' },
+					},
+				],
 				isMultiSelecting: false,
 			} );
 		} );
 
 		it( 'should return same reference if already ended multi-selecting', () => {
-			const original = deepFreeze( { start: { clientId: 'ribs' }, end: { clientId: 'chicken' }, isMultiSelecting: false } );
+			const original = deepFreeze( { selections: [ { start: { clientId: 'ribs' }, end: { clientId: 'chicken' } } ], isMultiSelecting: false } );
 			const state = blockSelection( original, {
 				type: 'STOP_MULTI_SELECT',
 			} );
@@ -1890,22 +1907,20 @@ describe( 'state', () => {
 			expect( state ).toBe( original );
 		} );
 
-		it( 'should end multi selection without selection', () => {
-			const original = deepFreeze( { start: { clientId: 'ribs' }, end: { clientId: 'ribs' }, isMultiSelecting: true } );
+		it( 'should end multi-selection without selection', () => {
+			const original = deepFreeze( { selections: [ { start: { clientId: 'ribs' }, end: { clientId: 'chicken' } } ], isMultiSelecting: true } );
 			const state = blockSelection( original, {
 				type: 'STOP_MULTI_SELECT',
 			} );
 
 			expect( state ).toEqual( {
-				start: { clientId: 'ribs' },
-				end: { clientId: 'ribs' },
-				initialPosition: null,
+				selections: [ { start: { clientId: 'ribs' }, end: { clientId: 'chicken' } } ],
 				isMultiSelecting: false,
 			} );
 		} );
 
 		it( 'should not update the state if the block is already selected', () => {
-			const original = deepFreeze( { start: { clientId: 'ribs' }, end: { clientId: 'ribs' } } );
+			const original = deepFreeze( { selections: [ { start: { clientId: 'ribs' }, end: { clientId: 'chicken' } } ] } );
 
 			const state1 = blockSelection( original, {
 				type: 'SELECT_BLOCK',
@@ -1915,7 +1930,7 @@ describe( 'state', () => {
 			expect( state1 ).toBe( original );
 		} );
 
-		it( 'should unset multi selection', () => {
+		it( 'should unset multi-selection', () => {
 			const original = deepFreeze( { start: { clientId: 'ribs' }, end: { clientId: 'chicken' } } );
 
 			const state1 = blockSelection( original, {
@@ -1923,10 +1938,7 @@ describe( 'state', () => {
 			} );
 
 			expect( state1 ).toEqual( {
-				start: {},
-				end: {},
-				clientIds: [],
-				initialPosition: null,
+				selections: [],
 				isMultiSelecting: false,
 				isEnabled: true,
 			} );
@@ -1943,7 +1955,12 @@ describe( 'state', () => {
 		} );
 
 		it( 'should select inserted block', () => {
-			const original = deepFreeze( { start: 'ribs', end: 'chicken', clientIds: [ 'ribs', 'chicken' ] } );
+			const original = deepFreeze( { selections: [
+				{
+					start: { clientId: 'ribs' },
+					end: { clientId: 'chicken' },
+				},
+			] } );
 
 			const state3 = blockSelection( original, {
 				type: 'INSERT_BLOCKS',
@@ -1955,17 +1972,24 @@ describe( 'state', () => {
 			} );
 
 			expect( state3 ).toEqual( {
-				start: { clientId: 'ribs' },
-				end: { clientId: 'ribs' },
-				clientIds: [ 'ribs' ],
-				initialPosition: null,
+				selections: [
+					{
+						start: { clientId: 'ribs' },
+						end: { clientId: 'ribs' },
+					},
+				],
 				isMultiSelecting: false,
 				isEnabled: true,
 			} );
 		} );
 
 		it( 'should not select inserted block if updateSelection flag is false', () => {
-			const original = deepFreeze( { start: { clientId: 'a' }, end: { clientId: 'b' }, clientIds: [ 'a', 'b' ] } );
+			const original = deepFreeze( { selections: [
+				{
+					start: { clientId: 'a' },
+					end: { clientId: 'b' },
+				},
+			] } );
 
 			const state3 = blockSelection( original, {
 				type: 'INSERT_BLOCKS',
@@ -1977,14 +2001,22 @@ describe( 'state', () => {
 			} );
 
 			expect( state3 ).toEqual( {
-				start: { clientId: 'a' },
-				end: { clientId: 'b' },
-				clientIds: [ 'a', 'b' ],
+				selections: [
+					{
+						start: { clientId: 'a' },
+						end: { clientId: 'b' },
+					},
+				],
 			} );
 		} );
 
 		it( 'should not update the state if the block moved is already selected', () => {
-			const original = deepFreeze( { start: { clientId: 'ribs' }, end: { clientId: 'ribs' }, clientIds: [ 'ribs' ] } );
+			const original = deepFreeze( { selections: [
+				{
+					start: { clientId: 'ribs' },
+					end: { clientId: 'ribs' },
+				},
+			] } );
 			const state = blockSelection( original, {
 				type: 'MOVE_BLOCKS_UP',
 				clientIds: [ 'ribs' ],
@@ -1994,7 +2026,7 @@ describe( 'state', () => {
 		} );
 
 		it( 'should replace the selected block', () => {
-			const original = deepFreeze( { start: { clientId: 'chicken' }, end: { clientId: 'chicken' }, clientIds: [ 'chicken' ] } );
+			const original = deepFreeze( { selections: [ { start: { clientId: 'chicken' }, end: { clientId: 'chicken' } } ] } );
 			const state = blockSelection( original, {
 				type: 'REPLACE_BLOCKS',
 				clientIds: [ 'chicken' ],
@@ -2005,17 +2037,19 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toEqual( {
-				start: { clientId: 'wings' },
-				end: { clientId: 'wings' },
-				clientIds: [ 'wings' ],
-				initialPosition: null,
+				selections: [
+					{
+						start: { clientId: 'wings' },
+						end: { clientId: 'wings' },
+					},
+				],
 				isEnabled: true,
 				isMultiSelecting: false,
 			} );
 		} );
 
 		it( 'should not replace the selected block if we keep it at the end when replacing blocks', () => {
-			const original = deepFreeze( { start: { clientId: 'wings' }, end: { clientId: 'wings' }, clientIds: [ 'chicken' ] } );
+			const original = deepFreeze( { selections: [ { start: { clientId: 'wings' }, end: { clientId: 'wings' } } ] } );
 			const state = blockSelection( original, {
 				type: 'REPLACE_BLOCKS',
 				clientIds: [ 'wings' ],
@@ -2034,7 +2068,7 @@ describe( 'state', () => {
 		} );
 
 		it( 'should replace the selected block if we keep it not at the end when replacing blocks', () => {
-			const original = deepFreeze( { start: { clientId: 'chicken' }, end: { clientId: 'chicken' }, clientIds: [ 'chicken' ] } );
+			const original = deepFreeze( { selections: [ { start: { clientId: 'wings' }, end: { clientId: 'wings' } } ], isMultiSelecting: false, isEnabled: true } );
 			const state = blockSelection( original, {
 				type: 'REPLACE_BLOCKS',
 				clientIds: [ 'chicken' ],
@@ -2050,17 +2084,14 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toEqual( {
-				start: { clientId: 'wings' },
-				end: { clientId: 'wings' },
-				clientIds: [ 'wings' ],
-				initialPosition: null,
+				selections: [ { start: { clientId: 'wings' }, end: { clientId: 'wings' } } ],
 				isMultiSelecting: false,
 				isEnabled: true,
 			} );
 		} );
 
 		it( 'should reset if replacing with empty set', () => {
-			const original = deepFreeze( { start: { clientId: 'chicken' }, end: { clientId: 'chicken' }, clientIds: [ 'chicken' ] } );
+			const original = deepFreeze( { selections: [ { start: { clientId: 'chicken' }, end: { clientId: 'chicken' } } ] } );
 			const state = blockSelection( original, {
 				type: 'REPLACE_BLOCKS',
 				clientIds: [ 'chicken' ],
@@ -2068,17 +2099,14 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toEqual( {
-				start: {},
-				end: {},
-				clientIds: [],
-				initialPosition: null,
+				selections: [],
 				isMultiSelecting: false,
 				isEnabled: true,
 			} );
 		} );
 
 		it( 'should keep the selected block', () => {
-			const original = deepFreeze( { start: { clientId: 'chicken' }, end: { clientId: 'chicken' }, clientIds: [ 'chicken' ] } );
+			const original = deepFreeze( { selections: [ { start: { clientId: 'chicken' }, end: { clientId: 'chicken' } } ] } );
 			const state = blockSelection( original, {
 				type: 'REPLACE_BLOCKS',
 				clientIds: [ 'ribs' ],
@@ -2092,23 +2120,14 @@ describe( 'state', () => {
 		} );
 
 		it( 'should remove the selection if we are removing the selected block', () => {
-			const original = deepFreeze( {
-				start: { clientId: 'chicken' },
-				end: { clientId: 'chicken' },
-				clientIds: [ 'chicken' ],
-				initialPosition: null,
-				isMultiSelecting: false,
-			} );
+			const original = deepFreeze( { selections: [ { start: { clientId: 'chicken' }, end: { clientId: 'chicken' } } ], isMultiSelecting: false } );
 			const state = blockSelection( original, {
 				type: 'REMOVE_BLOCKS',
 				clientIds: [ 'chicken' ],
 			} );
 
 			expect( state ).toEqual( {
-				start: {},
-				end: {},
-				clientIds: [],
-				initialPosition: null,
+				selections: [],
 				isMultiSelecting: false,
 				isEnabled: true,
 			} );
@@ -2116,10 +2135,12 @@ describe( 'state', () => {
 
 		it( 'should keep the selection if we are not removing the selected block', () => {
 			const original = deepFreeze( {
-				start: { clientId: 'chicken' },
-				end: { clientId: 'chicken' },
-				clientIds: [ 'chicken' ],
-				initialPosition: null,
+				selections: [
+					{
+						start: { clientId: 'chicken' },
+						end: { clientId: 'chicken' },
+					},
+				],
 				isMultiSelecting: false,
 			} );
 			const state = blockSelection( original, {
@@ -2132,10 +2153,12 @@ describe( 'state', () => {
 
 		it( 'should update the selection on inner blocks replace if updateSelection is true', () => {
 			const original = deepFreeze( {
-				start: { clientId: 'chicken' },
-				end: { clientId: 'chicken' },
-				clientIds: [ 'chicken' ],
-				initialPosition: null,
+				selections: [
+					{
+						start: { clientId: 'chicken' },
+						end: { clientId: 'chicken' },
+					},
+				],
 				isMultiSelecting: false,
 			} );
 			const newBlock = {
@@ -2151,10 +2174,12 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toEqual( {
-				start: { clientId: 'another-block' },
-				end: { clientId: 'another-block' },
-				clientIds: [ 'another-block' ],
-				initialPosition: null,
+				selections: [
+					{
+						start: { clientId: 'another-block' },
+						end: { clientId: 'another-block' },
+					},
+				],
 				isMultiSelecting: false,
 				isEnabled: true,
 			} );
@@ -2162,10 +2187,12 @@ describe( 'state', () => {
 
 		it( 'should not update the selection on inner blocks replace if updateSelection is false', () => {
 			const original = deepFreeze( {
-				start: { clientId: 'chicken' },
-				end: { clientId: 'chicken' },
-				clientIds: [ 'chicken' ],
-				initialPosition: null,
+				selections: [
+					{
+						start: { clientId: 'another-block' },
+						end: { clientId: 'another-block' },
+					},
+				],
 				isMultiSelecting: false,
 			} );
 			const newBlock = {

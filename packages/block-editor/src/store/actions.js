@@ -119,36 +119,6 @@ export function selectBlock( clientId, initialPosition = null ) {
 }
 
 /**
- * Returns an action object used in signalling that the block with the
- * specified client ID has been added to multi-selection.
- *
- * @param {string} clientId Block client ID.
- *
- * @return {Object} Action object.
- */
-export function addBlockSelection( clientId ) {
-	return {
-		type: 'ADD_BLOCK_SELECTION',
-		clientId,
-	};
-}
-
-/**
- * Returns an action object used in signalling that the block with the
- * specified client ID has been removed from multi-selection.
- *
- * @param {string} clientId Block client ID.
- *
- * @return {Object} Action object.
- */
-export function removeBlockSelection( clientId ) {
-	return {
-		type: 'REMOVE_BLOCK_SELECTION',
-		clientId,
-	};
-}
-
-/**
  * Yields action objects used in signalling that the block preceding the given
  * clientId should be selected.
  *
@@ -212,38 +182,13 @@ export function stopMultiSelect() {
  * @param {string} start First block of the multi-selection.
  * @param {string} end   Last block of the multi-selection.
  *
- * @yields {Object} Action object.
+ * @return {Object} Action object.
  */
-export function* multiSelect( start, end ) {
-	// Retrieve root client ID to aid in retrieving relevant nested block
-	// order, being careful to allow the falsey empty string top-level root
-	// by explicitly testing against null.
-	const rootClientId = yield select(
-		'core/block-editor',
-		'getBlockRootClientId',
-		start
-	);
-
-	const blockOrder = yield select(
-		'core/block-editor',
-		'getBlockOrder',
-		rootClientId
-	);
-
-	const startIndex = blockOrder.indexOf( start );
-	const endIndex = blockOrder.indexOf( end );
-
-	let clientIds = [];
-
-	if ( startIndex > endIndex ) {
-		clientIds = blockOrder.slice( endIndex, startIndex + 1 ).reverse();
-	} else {
-		clientIds = blockOrder.slice( startIndex, endIndex + 1 );
-	}
-
-	yield {
+export function multiSelect( start, end ) {
+	return {
 		type: 'MULTI_SELECT',
-		clientIds,
+		start,
+		end,
 	};
 }
 
@@ -686,9 +631,39 @@ export function selectionChange( clientId, attributeKey, startOffset, endOffset 
 	};
 }
 
+/**
+ * Returns an action object used in signalling that another selection has been made.
+ *
+ * @param {string} clientId     The selected block client ID.
+ * @param {string} attributeKey The selected block attribute key.
+ * @param {number} startOffset  The start offset.
+ * @param {number} endOffset    The end offset.
+ *
+ * @return {Object} Action object.
+ */
 export function addSelection( clientId, attributeKey, startOffset, endOffset ) {
 	return {
 		type: 'ADD_SELECTION',
+		clientId,
+		attributeKey,
+		startOffset,
+		endOffset,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that a selection has been undone.
+ *
+ * @param {string} clientId     The selected block client ID.
+ * @param {string} attributeKey The selected block attribute key.
+ * @param {number} startOffset  The start offset.
+ * @param {number} endOffset    The end offset.
+ *
+ * @return {Object} Action object.
+ */
+export function removeSelection( clientId, attributeKey, startOffset, endOffset ) {
+	return {
+		type: 'REMOVE_SELECTION',
 		clientId,
 		attributeKey,
 		startOffset,
