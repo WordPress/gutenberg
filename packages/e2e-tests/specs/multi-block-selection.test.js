@@ -245,16 +245,20 @@ describe( 'Multi-block selection', () => {
 		// Multi-select second block.
 		await page.keyboard.down( 'Meta' );
 		await page.click( secondBlockSelector );
+		await page.keyboard.up( 'Meta' );
 
 		// Verify selection of all blocks.
 		await expectMultiSelected( blocks, true );
 
 		// Unselect
+		await page.keyboard.down( 'Meta' );
 		await page.click( firstBlockSelector );
+		await page.keyboard.up( 'Meta' );
 
 		// Verify selection of blocks 2 and 3.
 		await expectMultiSelected( [ secondBlockSelector, thirdBlockSelector ], true );
 
+		await page.keyboard.down( 'Meta' );
 		await page.click( secondBlockSelector );
 		await page.keyboard.up( 'Meta' );
 
