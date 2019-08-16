@@ -25,7 +25,7 @@
 	},
 	"bugs": "https://github.com/WordPress-Coding-Standards/stylelint-config-wordpress/issues",
 	"engines": {
-		"node": ">=8.9.3"
+		"node": ">=10"
 	},
 	"files": [
 		"CHANGELOG.md",
