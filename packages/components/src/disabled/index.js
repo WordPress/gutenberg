@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { includes, debounce } from 'lodash';
+import { includes, debounce, noop } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -64,8 +64,15 @@ class Disabled extends Component {
 	}
 
 	disable() {
-		focus.focusable.find( this.node ).forEach( ( focusable ) => {
-			if ( includes( DISABLED_ELIGIBLE_NODE_NAMES, focusable.nodeName ) ) {
+		const {
+			onDisable = noop,
+			eligibleNodeNames = DISABLED_ELIGIBLE_NODE_NAMES,
+		} = this.props;
+
+		const focusableNodes = focus.focusable.find( this.node );
+
+		focusableNodes.forEach( ( focusable ) => {
+			if ( includes( eligibleNodeNames, focusable.nodeName ) ) {
 				focusable.setAttribute( 'disabled', '' );
 			}
 
@@ -77,6 +84,8 @@ class Disabled extends Component {
 				focusable.setAttribute( 'contenteditable', 'false' );
 			}
 		} );
+
+		onDisable( focusableNodes );
 	}
 
 	render() {
