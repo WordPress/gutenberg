@@ -38,17 +38,19 @@ before_install:
       curl -L https://github.com/docker/compose/releases/download/1.24.0/docker-compose-`uname -s`-`uname -m` > docker-compose
       chmod +x docker-compose
       sudo mv docker-compose /usr/local/bin
+    fi
 
+install:
+  - npm ci
+  - npm run build
+  - |
+    if [[ "$WORDPRESS" = "true" ]]; then
       # Install WordPress
       npm run env install
 
       mkdir -p wordpress/build/wp-content/uploads
       chmod 767 wordpress/build/wp-content/uploads
     fi
-
-install:
-  - npm ci
-  - npm run build
   - |
     if [[ "$COMPOSER_INSTALL" = "true" ]]; then
       npm run env docker-run -- php composer install
