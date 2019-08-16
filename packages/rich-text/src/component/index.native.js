@@ -20,7 +20,7 @@ import { childrenBlock } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/html-entities';
 import { BACKSPACE } from '@wordpress/keycodes';
 import { isURL } from '@wordpress/url';
-import { useStyle, DarkMode } from '@wordpress/components';
+import { useStyle, withTheme } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -73,8 +73,6 @@ const gutenbergFormatNamesToAztec = {
 };
 
 export class RichText extends Component {
-	static contextType = DarkMode.Context;
-
 	constructor( { value, __unstableMultiline: multiline, selectionStart, selectionEnd } ) {
 		super( ...arguments );
 
@@ -775,6 +773,7 @@ export class RichText extends Component {
 			style,
 			__unstableIsSelected: isSelected,
 			children,
+			theme,
 		} = this.props;
 
 		const record = this.getRecord();
@@ -793,7 +792,7 @@ export class RichText extends Component {
 			color: defaultColor,
 			textDecorationColor: defaultTextDecorationColor,
 			fontFamily: defaultFontFamily,
-		} = useStyle( styles.richText, styles.richTextDark, this.context );
+		} = useStyle( styles.richText, styles.richTextDark, theme );
 
 		let selection = null;
 		if ( this.needsSelectionUpdate ) {
@@ -822,7 +821,7 @@ export class RichText extends Component {
 			this.firedAfterTextChanged = false;
 		}
 
-		const dynamicStyle = useStyle( style, styles.richTextDark );
+		const dynamicStyle = useStyle( style, styles.richTextDark, theme );
 
 		return (
 			<View>
@@ -885,4 +884,5 @@ export default compose( [
 	withSelect( ( select ) => ( {
 		formatTypes: select( 'core/rich-text' ).getFormatTypes(),
 	} ) ),
+	withTheme,
 ] )( RichText );

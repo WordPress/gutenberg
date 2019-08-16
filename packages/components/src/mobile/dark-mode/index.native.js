@@ -1,22 +1,37 @@
 /**
  * External dependencies
  */
-import { eventEmitter, initialMode, DarkModeContext } from 'react-native-dark-mode';
+import { eventEmitter, initialMode } from 'react-native-dark-mode';
+import React from 'react';
 
-let mode = initialMode;
-
-eventEmitter.on( 'currentModeChanged', ( newMode ) => {
-	mode = newMode;
-} );
-
-export function useStyle( light, dark ) {
+export function useStyle( light, dark, theme ) {
 	const finalDark = {
 		...light,
 		...dark,
 	};
 
-	return mode === 'dark' ? finalDark : light;
+	return theme === 'dark' ? finalDark : light;
 }
 
-export const DarkMode = {};
-DarkMode.Context = DarkModeContext;
+// This function takes a component...
+export function withTheme( WrappedComponent ) {
+	return class extends React.Component {
+		constructor( props ) {
+			super( props );
+
+			this.state = {
+				mode: initialMode,
+			};
+		}
+
+		componentDidMount() {
+			eventEmitter.on( 'currentModeChanged', ( newMode ) => {
+				this.setState( { mode: newMode } );
+			} );
+		}
+
+		render() {
+			return <WrappedComponent theme={ this.state.mode } { ...this.props } />;
+		}
+	};
+}

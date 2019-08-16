@@ -14,7 +14,7 @@ import {
 	Inserter,
 	BlockToolbar,
 } from '@wordpress/block-editor';
-import { Toolbar, ToolbarButton, useStyle } from '@wordpress/components';
+import { Toolbar, ToolbarButton, useStyle, withTheme } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -30,9 +30,10 @@ function HeaderToolbar( {
 	showInserter,
 	showKeyboardHideButton,
 	clearSelectedBlock,
+	theme,
 } ) {
 	return (
-		<View style={ useStyle( styles.container, styles.containerDark ) }>
+		<View style={ useStyle( styles.container, styles.containerDark, theme ) }>
 			<ScrollView
 				horizontal={ true }
 				showsHorizontalScrollIndicator={ false }
@@ -91,4 +92,5 @@ export default compose( [
 		clearSelectedBlock: dispatch( 'core/block-editor' ).clearSelectedBlock,
 	} ) ),
 	withViewportMatch( { isLargeViewport: 'medium' } ),
+	withTheme,
 ] )( HeaderToolbar );

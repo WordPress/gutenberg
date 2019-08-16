@@ -12,7 +12,7 @@ import { __ } from '@wordpress/i18n';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { createBlock, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
-import { KeyboardAwareFlatList, ReadableContentView, useStyle, DarkMode } from '@wordpress/components';
+import { KeyboardAwareFlatList, ReadableContentView, useStyle, withTheme } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -24,8 +24,6 @@ import DefaultBlockAppender from '../default-block-appender';
 const innerToolbarHeight = 44;
 
 export class BlockList extends Component {
-	static contextType = DarkMode.Context;
-
 	constructor() {
 		super( ...arguments );
 
@@ -216,5 +214,6 @@ export default compose( [
 			replaceBlock,
 		};
 	} ),
+	withTheme,
 ] )( BlockList );
 
