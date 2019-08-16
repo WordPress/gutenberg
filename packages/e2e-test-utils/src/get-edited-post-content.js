@@ -17,7 +17,7 @@ export async function getEditedPostContent() {
 		return window._getContent();
 	} );
 
-	if ( content !== undefined ) {
+	if ( typeof content === 'string' ) {
 		return content;
 	}
 
