@@ -404,6 +404,18 @@ export const EXPECTED_TRANSFORMS = {
 			'Group',
 		],
 	},
+	'core__social-link': {
+		originalBlock: 'Social link',
+		availableTransforms: [
+			'Group',
+		],
+	},
+	'core__social-links': {
+		originalBlock: 'Social links',
+		availableTransforms: [
+			'Group',
+		],
+	},
 	core__spacer: {
 		originalBlock: 'Spacer',
 		availableTransforms: [
