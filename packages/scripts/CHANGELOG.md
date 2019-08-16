@@ -6,6 +6,10 @@
 - The bundled `jest-puppeteer` dependency has been updated from requiring `^4.0.0` to requiring `^4.3.0` ([#16875](https://github.com/WordPress/gutenberg/pull/16875)).
 - The bundled `eslint` dependency has been updated from requiring `^5.16.0` to requiring `^6.1.0`.
 
+### Bug Fix
+
+- Use the SCSS shared stylelint configuration so that both CSS and SCSS stylelint rules are used ([#](https://github.com/WordPress/gutenberg/pull/))
+
 ## 3.4.0 (2019-08-05)
 
 ### New Features
