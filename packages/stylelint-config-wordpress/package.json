@@ -2,7 +2,7 @@
 	"name": "stylelint-config-wordpress",
 	"version": "14.0.0",
 	"description": "WordPress shareable config for stylelint",
-	"author": "Stylelint",
+	"author": "stylelint",
 	"license": "MIT",
 	"keywords": [
 		"code",
