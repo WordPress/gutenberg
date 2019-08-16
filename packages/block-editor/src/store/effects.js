@@ -177,8 +177,8 @@ export default {
 		validateBlocksToTemplate,
 	],
 	MULTI_SELECT: announceSelectedBlockCount,
-	ADD_BLOCK_TO_MULTI_SELECTION: announceSelectedBlockCount,
-	REMOVE_BLOCK_FROM_MULTI_SELECTION: announceSelectedBlockCount,
+	ADD_SELECTION: announceSelectedBlockCount,
+	REMOVE_SELECTION: announceSelectedBlockCount,
 	SYNCHRONIZE_TEMPLATE( action, { getState } ) {
 		const state = getState();
 		const blocks = getBlocks( state );
