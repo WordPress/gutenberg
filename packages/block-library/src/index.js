@@ -66,6 +66,7 @@ import * as classic from './classic';
 import * as siteTitle from './site-title';
 import * as post from './post';
 import * as postTitle from './post-title';
+import * as postContent from './post-content';
 
 /**
  * Function to register an individual block.
@@ -148,6 +149,7 @@ export const registerCoreBlocks = () => {
 		siteTitle,
 		post,
 		postTitle,
+		postContent,
 	].forEach( registerBlock );
 
 	setDefaultBlockName( paragraph.name );

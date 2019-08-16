@@ -35,8 +35,11 @@ export default function EntityHandlers( {
 	children,
 	...props
 } ) {
-	const editorSettings = useSelect(
-		( select ) => select( 'core/editor' ).getEditorSettings(),
+	const { editorSettings, parentEntity } = useSelect(
+		( select ) => ( {
+			editorSettings: select( 'core/editor' ).getEditorSettings(),
+			parentEntity: select( 'core/editor' ).getCurrentPost(),
+		} ),
 		[]
 	);
 	const parentDispatch = useDispatch();
@@ -53,7 +56,7 @@ export default function EntityHandlers( {
 					() => ( { ...editorSettings, handles, parentDispatch } ),
 					[ editorSettings, parentDispatch ]
 				) }
-				post={ entity }
+				post={ entity || parentEntity }
 				{ ...props }
 			>
 				<PostSavedState />
