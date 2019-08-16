@@ -30,6 +30,7 @@ const ModalHeader = ( { icon, title, onClose, closeLabel, headingId, isDismissab
 			</div>
 			{ isDismissable &&
 				<IconButton
+					className="components-modal-header__close"
 					onClick={ onClose }
 					icon="no-alt"
 					label={ label }

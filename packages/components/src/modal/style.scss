@@ -5,26 +5,36 @@
 	right: 0;
 	bottom: 0;
 	left: 0;
-	padding: 20px;
-	background: $white;
 	z-index: z-index(".components-modal__screen-overlay");
-	overflow: auto;
 
-	@include break-small() {
-		padding: 100px;
+	&.is-full-screen {
+		padding: 20px;
+		background: $white;
+		overflow: auto;
+
+		@include break-small() {
+			padding: 100px;
+		}
+
+		// These are two divs rendered by Higher-order components
+		// We need their height to be 100% for the verticalcentering
+		// of the modal.
+		& > div,
+		& > div > div {
+			height: 100%;
+		}
+	}
+
+	&.is-dialog {
+		// This animates the appearance of the background.
+		@include edit-post__fade-in-animation();
+
+		background-color: rgba($black, 0.7);
 	}
 }
 
-// These are two divs rendered by Higher-order components
-// We need their height to be 100% for the verticalcentering
-// of the modal.
-.components-modal__screen-overlay > div,
-.components-modal__screen-overlay > div > div {
-	height: 100%;
-}
-
 // The modal window element.
-.components-modal__frame {
+.components-modal__screen-overlay.is-full-screen .components-modal__frame {
 	max-width: 800px;
 	min-height: 100%;
 	margin: auto;
@@ -33,16 +43,39 @@
 
 	// Animate the modal frame/contents appearing on the page.
 	transform-origin: top center;
-	animation: components-modal__appear-animation 0.2s forwards;
+	animation: components-modal__appear-scale-animation 0.2s forwards;
 	@include reduce-motion("animation");
 }
 
-@keyframes components-modal__appear-animation {
-	0% {
-		transform: scale(0.1);
-	}
-	100% {
-		transform: scale(1);
+.components-modal__screen-overlay.is-dialog .components-modal__frame {
+	// On small screens the content needs to be full width because of limited
+	// space.
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	box-sizing: border-box;
+	margin: 0;
+	border: $border-width solid $light-gray-500;
+	background: $white;
+	box-shadow: $shadow-modal;
+	overflow: auto;
+
+	// Show a centered modal on bigger screens.
+	@include break-small() {
+		top: 50%;
+		right: auto;
+		bottom: auto;
+		left: 50%;
+		min-width: $modal-min-width;
+		max-width: calc(100% - #{ $grid-size-large } - #{ $grid-size-large });
+		max-height: calc(100% - #{ $header-height } - #{ $header-height });
+		transform: translate(-50%, -50%);
+		// Animate the modal frame/contents appearing on the page.
+		animation: components-modal__appear-slide-animation 0.1s ease-out;
+		animation-fill-mode: forwards;
+		@include reduce-motion("animation");
 	}
 }
 
@@ -59,15 +92,38 @@
 	height: $header-height;
 	margin-bottom: 2 * $grid-size-xlarge;
 
-	.components-modal__header-heading {
-		font-size: 2rem;
-		font-weight: 300;
+	.components-modal__screen-overlay.is-dialog & {
+		border-bottom: $border-width solid $light-gray-500;
+		padding: 0 $grid-size-xlarge;
+
+		position: sticky;
+		top: 0;
+		z-index: z-index(".components-modal__header");
+		margin: 0 -#{$grid-size-xlarge} $grid-size-xlarge;
+
+		// Rules inside this query are only run by Microsoft Edge.
+		// Edge has bugs around position: sticky;, so it needs a separate top rule.
+		// See also https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/17555420/.
+		@supports (-ms-ime-align:auto) {
+			position: fixed;
+			width: 100%;
+		}
 	}
 
 	h1 {
 		line-height: 1;
 		margin: 0;
 	}
+}
+
+.components-modal__screen-overlay.is-dialog .components-modal__header-heading {
+	font-size: 1rem;
+	font-weight: 600;
+}
+
+.components-modal__screen-overlay.is-full-screen .components-modal__header-heading {
+	font-size: 2rem;
+	font-weight: 300;
 }
 
 .components-modal__header-heading-container {
@@ -92,4 +148,36 @@
 .components-modal__content {
 	box-sizing: border-box;
 	padding: 0 $grid-size-xlarge $grid-size-xlarge;
+
+	.components-modal__screen-overlay.is-dialog & {
+		height: 100%;
+
+		// Rules inside this query are only run by Microsoft Edge.
+		// This is a companion top padding to the fixed rule in line 77.
+		@supports (-ms-ime-align:auto) {
+			padding-top: $header-height;
+		}
+	}
+}
+
+.components-modal__screen-overlay.is-full-screen .components-modal-header__close svg {
+	transform: scale(1.5);
+}
+
+@keyframes components-modal__appear-scale-animation {
+	from {
+		transform: scale(0.1);
+	}
+	to {
+		transform: scale(1);
+	}
+}
+
+@keyframes components-modal__appear-slide-animation {
+	from {
+		margin-top: $grid-size * 4;
+	}
+	to {
+		margin-top: 0;
+	}
 }

@@ -88,6 +88,7 @@ export function KeyboardShortcutHelpModal( { isModalActive, toggleModal } ) {
 					title={ __( 'Keyboard Shortcuts' ) }
 					closeLabel={ __( 'Close' ) }
 					onRequestClose={ toggleModal }
+					isDialog
 				>
 					{ shortcutConfig.map( ( config, index ) => (
 						<ShortcutSection key={ index } { ...config } />

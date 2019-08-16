@@ -118,6 +118,7 @@ class Modal extends Component {
 			aria,
 			instanceId,
 			isDismissable,
+			isDialog,
 			...otherProps
 		} = this.props;
 
@@ -128,7 +129,10 @@ class Modal extends Component {
 		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		return createPortal(
 			<IsolatedEventContainer
-				className={ classnames( 'components-modal__screen-overlay', overlayClassName ) }
+				className={ classnames( 'components-modal__screen-overlay', overlayClassName, {
+					'is-dialog': isDialog,
+					'is-full-screen': ! isDialog,
+				} ) }
 			>
 				<ModalFrame
 					className={ classnames(
