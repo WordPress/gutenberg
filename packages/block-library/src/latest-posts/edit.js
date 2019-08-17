@@ -206,7 +206,7 @@ class LatestPostsEdit extends Component {
 											{ titleTrimmed }
 										</RawHTML>
 									) :
-										__( '(Untitled)' )
+										__( '(no title)' )
 									}
 								</a>
 								{ displayPostDate && post.date_gmt &&
