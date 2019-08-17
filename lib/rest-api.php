@@ -52,7 +52,79 @@ function gutenberg_filter_oembed_result( $response, $handler, $request ) {
 }
 add_filter( 'rest_request_after_callbacks', 'gutenberg_filter_oembed_result', 10, 3 );
 
+/**
+ * Adds the visibility property to the `publish` and `private` statuses.
+ *
+ * @since 6.x.x
+ *
+ * @param  array  $data      The status data.
+ * @param  string $attribute The REST field's name attribute.
+ * @return string            The label to use into the Block editor.
+ */
+function gutenberg_get_status_visibility_properties( $data, $attribute ) {
+	$value = new stdClass();
 
+	if ( 'visibility' !== $attribute || ! isset( $data['slug'] ) ) {
+		return $value;
+	}
+
+	if ( 'publish' === $data['slug'] ) {
+		$value->value = 'public';
+		$value->label = __( 'Public', 'gutenberg' );
+		$value->info  = __( 'Visible to everyone.', 'gutenberg' );
+	} elseif ( 'private' === $data['slug'] ) {
+		$value->value = 'private';
+		$value->label = __( 'Private', 'gutenberg' );
+		$value->info  = __( 'Only visible to site admins and editors.', 'gutenberg' );
+	} else {
+		$status_object = get_post_status_object( $data['slug'] );
+
+		if ( isset( $status_object->visibility ) ) {
+			$value = (object) $status_object->visibility;
+		}
+	}
+
+	return $value;
+}
+
+/**
+ * Registers a new property for the REST Status controller schema.
+ *
+ * @since 6.x.x
+ */
+function gutenberg_register_statuses_visibility_field() {
+	register_rest_field(
+		'status',
+		'visibility',
+		array(
+			'get_callback' => 'gutenberg_get_status_visibility_properties',
+			'schema'       => array(
+				'context'     => array( 'view', 'edit' ),
+				'description' => __( 'The visibility properties of the status.', 'gutenberg' ),
+				'type'        => 'object',
+				'readonly'    => true,
+			),
+		)
+	);
+
+	/**
+	 * Register a custom status for the password visibility. This is done within
+	 * the REST context to avoid any side effects on the classic editor.
+	 */
+	register_post_status(
+		'password',
+		array(
+			'label'      => _x( 'Password protected', 'post status', 'gutenberg' ),
+			'protected'  => true,
+			'visibility' => (object) array(
+				'value' => 'password',
+				'label' => __( 'Password Protected', 'gutenberg' ),
+				'info'  => __( 'Protected with a password you choose. Only those with the password can view this post.', 'gutenberg' ),
+			),
+		)
+	);
+}
+add_action( 'rest_api_init', 'gutenberg_register_statuses_visibility_field' );
 
 /**
  * Start: Include for phase 2

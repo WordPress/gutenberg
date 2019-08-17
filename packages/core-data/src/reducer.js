@@ -99,6 +99,22 @@ export function taxonomies( state = [], action ) {
 }
 
 /**
+ * Reducer managing statuses.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function statuses( state = [], action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_STATUSES':
+			return action.statuses;
+	}
+
+	return state;
+}
+/**
  * Reducer managing theme supports data.
  *
  * @param {Object} state  Current state.

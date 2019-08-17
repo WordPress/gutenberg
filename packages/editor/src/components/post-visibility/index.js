@@ -1,15 +1,15 @@
 /**
+ * External dependencies
+ */
+import { filter } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { withInstanceId, compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
-import { visibilityOptions } from './utils';
 
 export class PostVisibility extends Component {
 	constructor( props ) {
@@ -19,17 +19,19 @@ export class PostVisibility extends Component {
 		this.setPrivate = this.setPrivate.bind( this );
 		this.setPasswordProtected = this.setPasswordProtected.bind( this );
 		this.updatePassword = this.updatePassword.bind( this );
+		this.setCustomVisibility = this.setCustomVisibility.bind( this );
 
 		this.state = {
 			hasPassword: !! props.password,
+			currentVisibility: props.postVisibility,
 		};
 	}
 
 	setPublic() {
-		const { visibility, onUpdateVisibility, status } = this.props;
+		const { postVisibility, onUpdateVisibility } = this.props;
 
-		onUpdateVisibility( visibility === 'private' ? 'draft' : status );
-		this.setState( { hasPassword: false } );
+		onUpdateVisibility( postVisibility === 'private' ? 'draft' : 'publish' );
+		this.setState( { currentVisibility: 'public', hasPassword: false } );
 	}
 
 	setPrivate() {
@@ -40,15 +42,15 @@ export class PostVisibility extends Component {
 		const { onUpdateVisibility, onSave } = this.props;
 
 		onUpdateVisibility( 'private' );
-		this.setState( { hasPassword: false } );
+		this.setState( { currentVisibility: 'private', hasPassword: false } );
 		onSave();
 	}
 
 	setPasswordProtected() {
-		const { visibility, onUpdateVisibility, status, password } = this.props;
+		const { postVisibility, onUpdateVisibility, password } = this.props;
 
-		onUpdateVisibility( visibility === 'private' ? 'draft' : status, password || '' );
-		this.setState( { hasPassword: true } );
+		onUpdateVisibility( postVisibility === 'private' ? 'draft' : 'publish', password || '' );
+		this.setState( { currentVisibility: 'password', hasPassword: true } );
 	}
 
 	updatePassword( event ) {
@@ -56,17 +58,31 @@ export class PostVisibility extends Component {
 		onUpdateVisibility( status, event.target.value );
 	}
 
+	setCustomVisibility( event ) {
+		const { onUpdateVisibility } = this.props;
+
+		if ( event.target.value !== this.state.currentVisibility ) {
+			onUpdateVisibility( event.target.value );
+			this.setState( { currentVisibility: event.target.value, hasPassword: false } );
+		}
+	}
+
+	isChecked( statusVisibility ) {
+		return this.state.currentVisibility === statusVisibility;
+	}
+
 	render() {
-		const { visibility, password, instanceId } = this.props;
+		const { password, statuses, instanceId } = this.props;
+		const statusVisibilities = filter( statuses, ( status ) => status.visibility.value );
 
 		const visibilityHandlers = {
 			public: {
 				onSelect: this.setPublic,
-				checked: visibility === 'public' && ! this.state.hasPassword,
+				checked: this.state.currentVisibility === 'public' && ! this.state.hasPassword,
 			},
 			private: {
 				onSelect: this.setPrivate,
-				checked: visibility === 'private',
+				checked: this.state.currentVisibility === 'private',
 			},
 			password: {
 				onSelect: this.setPasswordProtected,
@@ -79,25 +95,25 @@ export class PostVisibility extends Component {
 				<legend className="editor-post-visibility__dialog-legend">
 					{ __( 'Post Visibility' ) }
 				</legend>
-				{ visibilityOptions.map( ( { value, label, info } ) => (
-					<div key={ value } className="editor-post-visibility__choice">
+				{ statusVisibilities.map( ( { visibility } ) => (
+					<div key={ visibility.value } className="editor-post-visibility__choice">
 						<input
 							type="radio"
 							name={ `editor-post-visibility__setting-${ instanceId }` }
-							value={ value }
-							onChange={ visibilityHandlers[ value ].onSelect }
-							checked={ visibilityHandlers[ value ].checked }
-							id={ `editor-post-${ value }-${ instanceId }` }
-							aria-describedby={ `editor-post-${ value }-${ instanceId }-description` }
+							value={ visibility.value }
+							onChange={ visibilityHandlers[ visibility.value ] ? visibilityHandlers[ visibility.value ].onSelect : this.setCustomVisibility }
+							checked={ visibilityHandlers[ visibility.value ] ? visibilityHandlers[ visibility.value ].checked : this.isChecked( visibility.value ) }
+							id={ `editor-post-${ visibility.value }-${ instanceId }` }
+							aria-describedby={ `editor-post-${ visibility.value }-${ instanceId }-description` }
 							className="editor-post-visibility__dialog-radio"
 						/>
 						<label
-							htmlFor={ `editor-post-${ value }-${ instanceId }` }
+							htmlFor={ `editor-post-${ visibility.value }-${ instanceId }` }
 							className="editor-post-visibility__dialog-label"
 						>
-							{ label }
+							{ visibility.label }
 						</label>
-						{ <p id={ `editor-post-${ value }-${ instanceId }-description` } className="editor-post-visibility__dialog-info">{ info }</p> }
+						{ <p id={ `editor-post-${ visibility.value }-${ instanceId }-description` } className="editor-post-visibility__dialog-info">{ visibility.info }</p> }
 					</div>
 				) ) }
 			</fieldset>,
@@ -131,8 +147,9 @@ export default compose( [
 		} = select( 'core/editor' );
 		return {
 			status: getEditedPostAttribute( 'status' ),
-			visibility: getEditedPostVisibility(),
+			postVisibility: getEditedPostVisibility(),
 			password: getEditedPostAttribute( 'password' ),
+			statuses: select( 'core' ).getStatuses(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
