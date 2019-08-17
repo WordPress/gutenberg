@@ -19,7 +19,10 @@ export { default as ContrastChecker } from './contrast-checker';
 export { default as InnerBlocks } from './inner-blocks';
 export { default as InspectorAdvancedControls } from './inspector-advanced-controls';
 export { default as InspectorControls } from './inspector-controls';
-export { default as MediaPlaceholder } from './media-placeholder';
+export {
+	default as MediaPlaceholder,
+	MediaPlaceholder as OriginalMediaPlaceholder,
+} from './media-placeholder';
 export { default as MediaUpload } from './media-upload';
 export { default as MediaUploadCheck } from './media-upload/check';
 export { default as PanelColorSettings } from './panel-color-settings';
