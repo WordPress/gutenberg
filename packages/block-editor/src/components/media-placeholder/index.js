@@ -286,7 +286,6 @@ export class MediaPlaceholder extends Component {
 			accept,
 			addToGallery,
 			allowedTypes = [],
-			disableDropZone,
 			isAppender,
 			mediaUpload,
 			multiple = false,
@@ -329,7 +328,7 @@ export class MediaPlaceholder extends Component {
 		if ( mediaUpload && isAppender ) {
 			return (
 				<>
-					{ ! disableDropZone && this.renderDropZone() }
+					{ this.renderDropZone() }
 					<FormFileUpload
 						onChange={ this.onUpload }
 						accept={ accept }
@@ -359,11 +358,10 @@ export class MediaPlaceholder extends Component {
 				</>
 			);
 		}
-
 		if ( mediaUpload ) {
 			const content = (
 				<>
-					{ ! disableDropZone && this.renderDropZone() }
+					{ this.renderDropZone() }
 					<FormFileUpload
 						isLarge
 						className={ classnames(
