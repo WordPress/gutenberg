@@ -1425,6 +1425,6 @@ export function isNavigationMode( state ) {
  *
  * @return {boolean}     Whether the downloadable blocks feature is enabled.
  */
-export function getIsDownloadableBlocksEnabled( state ) {
+export function isDownloadableBlocksEnabled( state ) {
 	return get( state, [ 'settings', '__experimentalIsDownloadableBlocksEnabled' ], false );
 }

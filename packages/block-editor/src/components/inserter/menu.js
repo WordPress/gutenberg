@@ -390,7 +390,7 @@ export default compose(
 			getBlockName,
 			getBlockRootClientId,
 			getBlockSelectionEnd,
-			getIsDownloadableBlocksEnabled,
+			isDownloadableBlocksEnabled,
 		} = select( 'core/block-editor' );
 		const {
 			getChildBlockNames,
@@ -411,7 +411,7 @@ export default compose(
 			rootChildBlocks: getChildBlockNames( destinationRootBlockName ),
 			items,
 			destinationRootClientId,
-			isDownloadableBlocksEnabled: getIsDownloadableBlocksEnabled(),
+			isDownloadableBlocksEnabled: isDownloadableBlocksEnabled(),
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {
