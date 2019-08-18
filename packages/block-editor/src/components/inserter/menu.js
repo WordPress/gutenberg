@@ -190,7 +190,7 @@ export class InserterMenu extends Component {
 	}
 
 	filter( filterValue = '' ) {
-		const { debouncedSpeak, items, rootChildBlocks, isDownloadableBlocksEnabled } = this.props;
+		const { debouncedSpeak, items, rootChildBlocks } = this.props;
 
 		const filteredItems = searchItems( items, filterValue );
 
@@ -236,11 +236,7 @@ export class InserterMenu extends Component {
 			_n( '%d result found.', '%d results found.', resultCount ),
 			resultCount
 		);
-
-		// Downloadable blocks will display more results from block directory if no results are found.
-		if ( ! isDownloadableBlocksEnabled ) {
-			debouncedSpeak( resultsFoundMessage );
-		}
+		debouncedSpeak( resultsFoundMessage );
 	}
 
 	onKeyDown( event ) {
@@ -251,7 +247,7 @@ export class InserterMenu extends Component {
 	}
 
 	render() {
-		const { instanceId, onSelect, rootClientId, isDownloadableBlocksEnabled } = this.props;
+		const { instanceId, onSelect, rootClientId } = this.props;
 
 		const {
 			childItems,
@@ -351,21 +347,28 @@ export class InserterMenu extends Component {
 							</a>
 						</PanelBody>
 					) }
-					{
-						! isDownloadableBlocksEnabled && isMenuEmpty && (
-							<p className="editor-inserter__no-results block-editor-inserter__no-results">{ __( 'No blocks found.' ) }</p>
-						)
-					}
-					{
-						<__experimentalInserterMenuExtension.Slot
-							fillProps={ {
-								onSelect,
-								onHover: this.onHover,
-								filterValue: this.state.filterValue,
-								isMenuEmpty,
-							} }
-						/>
-					}
+
+					<__experimentalInserterMenuExtension.Slot
+						fillProps={ {
+							onSelect,
+							onHover: this.onHover,
+							filterValue: this.state.filterValue,
+							isMenuEmpty,
+						} }
+					>
+						{ ( fills ) => {
+							// __experimentalInserterMenuExtension should also handle when isMenuEmpty is true ( no installed block type results are found ).
+							if ( fills.length ) {
+								return fills;
+							}
+							if ( isMenuEmpty ) {
+								return (
+									<p className="editor-inserter__no-results block-editor-inserter__no-results">{ __( 'No blocks found.' ) }</p>
+								);
+							}
+							return null;
+						} }
+					</__experimentalInserterMenuExtension.Slot>
 				</div>
 
 				{ hoveredItem && isReusableBlock( hoveredItem ) &&
@@ -390,7 +393,6 @@ export default compose(
 			getBlockName,
 			getBlockRootClientId,
 			getBlockSelectionEnd,
-			isDownloadableBlocksEnabled,
 		} = select( 'core/block-editor' );
 		const {
 			getChildBlockNames,
@@ -411,7 +413,6 @@ export default compose(
 			rootChildBlocks: getChildBlockNames( destinationRootBlockName ),
 			items,
 			destinationRootClientId,
-			isDownloadableBlocksEnabled: isDownloadableBlocksEnabled(),
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {

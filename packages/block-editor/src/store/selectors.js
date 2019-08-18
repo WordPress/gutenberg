@@ -1417,14 +1417,3 @@ function getReusableBlocks( state ) {
 export function isNavigationMode( state ) {
 	return state.isNavigationMode;
 }
-
-/**
- * Returns whether block editor can search and install uninstalled blocks.
- *
- * @param {Object} state Global application state.
- *
- * @return {boolean}     Whether the downloadable blocks feature is enabled.
- */
-export function isDownloadableBlocksEnabled( state ) {
-	return get( state, [ 'settings', '__experimentalIsDownloadableBlocksEnabled' ], false );
-}

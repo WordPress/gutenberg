@@ -41,17 +41,6 @@ export function hasInstallBlocksPermission( state ) {
 }
 
 /**
- * Returns true if the block editor can search and install uninstalled blocks.
- *
- * @param {Object} state Global application state.
- *
- * @return {boolean} Whether the downloadable blocks feature is enabled.
- */
-export function isDownloadableBlocksEnabled( state ) {
-	return get( state, [ 'settings', '__experimentalIsDownloadableBlocksEnabled' ], false );
-}
-
-/**
  * Returns the block types that have been installed on the server.
  *
  * @param {Object} state Global application state.

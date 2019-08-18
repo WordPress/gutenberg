@@ -110,7 +110,6 @@ class EditorProvider extends Component {
 			__experimentalMediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalFetchLinkSuggestions: fetchLinkSuggestions,
 			__experimentalCanUserUseUnfilteredHTML: canUserUseUnfilteredHTML,
-			__experimentalIsDownloadableBlocksEnabled: true,
 		};
 	}
 

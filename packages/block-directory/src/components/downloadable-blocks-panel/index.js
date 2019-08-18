@@ -14,7 +14,7 @@ import DownloadableBlocksList from '../downloadable-blocks-list';
 
 function DownloadableBlocksPanel( { discoverItems, onSelect, onHover, hasPermission, isLoading, isWaiting, debouncedSpeak } ) {
 	if ( ! hasPermission ) {
-		debouncedSpeak( __( 'No blocks found in your library. Please contact your site administrator to install new blocks.' ) );
+		debouncedSpeak( __( 'Please contact your site administrator to install new blocks.' ) );
 		return (
 			<p className="block-directory-downloadable-blocks-panel__description has-no-results">
 				{ __( 'No blocks found in your library.' ) }
@@ -33,7 +33,6 @@ function DownloadableBlocksPanel( { discoverItems, onSelect, onHover, hasPermiss
 	}
 
 	if ( ! discoverItems.length ) {
-		debouncedSpeak( __( 'No blocks found in your library.' ) );
 		return (
 			<p className="block-directory-downloadable-blocks-panel__description has-no-results">
 				{ __( 'No blocks found in your library.' ) }
@@ -42,7 +41,7 @@ function DownloadableBlocksPanel( { discoverItems, onSelect, onHover, hasPermiss
 	}
 
 	const resultsFoundMessage = sprintf(
-		_n( 'No blocks found in your library. We did find %d block available for download.', 'No blocks found in your library. We did find %d blocks available.', discoverItems.length ),
+		_n( 'We did find %d block available for download.', 'We did find %d blocks available.', discoverItems.length ),
 		discoverItems.length
 	);
 
