@@ -740,17 +740,15 @@ test( 'add multiple all actions and run it any hook to trigger them by priority'
 	expect( window.actionValue ).toBe( 'ba' );
 } );
 
-test( 'checking hasAction and hasFilter with named callbacks', () => {
-	// hasAction tests
+test( 'checking hasAction with named callbacks and removing', () => {
 	addAction( 'test.action', 'my_callback', () => {} );
 	expect( hasAction( 'test.action', 'not_my_callback' ) ).toBe( false );
 	expect( hasAction( 'test.action', 'my_callback' ) ).toBe( true );
-
-	// test removing
 	removeAction( 'test.action', 'my_callback' );
 	expect( hasAction( 'test.action', 'my_callback' ) ).toBe( false );
+} );
 
-	// test removeAll
+test( 'checking hasAction with named callbacks and removeAllActions', () => {
 	addAction( 'test.action', 'my_callback', () => {} );
 	addAction( 'test.action', 'my_second_callback', () => {} );
 	expect( hasAction( 'test.action', 'my_callback' ) ).toBe( true );
@@ -758,17 +756,17 @@ test( 'checking hasAction and hasFilter with named callbacks', () => {
 	removeAllActions( 'test.action' );
 	expect( hasAction( 'test.action', 'my_callback' ) ).toBe( false );
 	expect( hasAction( 'test.action', 'my_callback' ) ).toBe( false );
+} );
 
-	// hasFilter tests
+test( 'checking hasFilter with named callbacks and removing', () => {
 	addFilter( 'test.filter', 'my_callback', () => {} );
 	expect( hasFilter( 'test.filter', 'not_my_callback' ) ).toBe( false );
 	expect( hasFilter( 'test.filter', 'my_callback' ) ).toBe( true );
-
-	// test removing
 	removeFilter( 'test.filter', 'my_callback' );
 	expect( hasFilter( 'test.filter', 'my_callback' ) ).toBe( false );
+} );
 
-	// test removeAll
+test( 'checking hasFilter with named callbacks and removeAllActions', () => {
 	addFilter( 'test.filter', 'my_callback', () => {} );
 	addFilter( 'test.filter', 'my_second_callback', () => {} );
 	expect( hasFilter( 'test.filter', 'my_callback' ) ).toBe( true );
