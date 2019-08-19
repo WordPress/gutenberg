@@ -76,6 +76,11 @@ _Returns_
 
 -   `Function`: Higher-order component.
 
+<a name="ViewportMatchWidthProvider" href="#ViewportMatchWidthProvider">#</a> **ViewportMatchWidthProvider**
+
+Component that makes all withViewportMatch usages descendents of its children,
+evaluate as if the viewport had the width specific as a prop.
+
 <a name="withViewportMatch" href="#withViewportMatch">#</a> **withViewportMatch**
 
 Higher-order component creator, creating a new component which renders with
