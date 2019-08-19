@@ -68,7 +68,6 @@ class Disabled extends Component {
 	catchEvents( e ) {
 		if ( this.node && this.node.contains( e.target ) ) {
 			e.preventDefault();
-			e.stopPropagation();
 		}
 	}
 
