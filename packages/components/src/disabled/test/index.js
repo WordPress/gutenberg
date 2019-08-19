@@ -6,7 +6,7 @@ import TestUtils from 'react-dom/test-utils';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, Fragment } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -56,17 +56,27 @@ describe( 'Disabled', () => {
 		window.MutationObserver = MutationObserver;
 	} );
 
-	const Form = () => <form><input /><div contentEditable tabIndex="0" /></form>;
+	const ChildComponentStub = () => (
+		<Fragment>
+			<a href="https://wordpress.org">Link</a>
+			<iframe title="Dummy iframe" src="https://github.com/WordPress/gutenberg" />
+			<form><input /><div contentEditable tabIndex="0" /></form>
+		</Fragment>
+	);
 
-	it( 'will disable all fields', () => {
-		const wrapper = TestUtils.renderIntoDocument( <Disabled><Form /></Disabled> );
+	it( 'will disable all interactive elements', () => {
+		const wrapper = TestUtils.renderIntoDocument( <Disabled><ChildComponentStub /></Disabled> );
 
 		const input = TestUtils.findRenderedDOMComponentWithTag( wrapper, 'input' );
+		const anchorLink = TestUtils.findRenderedDOMComponentWithTag( wrapper, 'a' );
+		const iframe = TestUtils.findRenderedDOMComponentWithTag( wrapper, 'iframe' );
 		const div = TestUtils.scryRenderedDOMComponentsWithTag( wrapper, 'div' )[ 1 ];
 
 		expect( input.hasAttribute( 'disabled' ) ).toBe( true );
 		expect( div.getAttribute( 'contenteditable' ) ).toBe( 'false' );
-		expect( div.hasAttribute( 'tabindex' ) ).toBe( false );
+		expect( div.getAttribute( 'tabindex' ) ).toEqual( '-1' );
+		expect( iframe.getAttribute( 'tabindex' ) ).toEqual( '-1' );
+		expect( anchorLink.hasAttribute( 'href' ) ).toBe( false );
 		expect( div.hasAttribute( 'disabled' ) ).toBe( false );
 	} );
 
@@ -84,8 +94,8 @@ describe( 'Disabled', () => {
 
 			render() {
 				return this.state.isDisabled ?
-					<Disabled><Form /></Disabled> :
-					<Form />;
+					<Disabled><ChildComponentStub /></Disabled> :
+					<ChildComponentStub />;
 			}
 		}
 
@@ -94,10 +104,13 @@ describe( 'Disabled', () => {
 
 		const input = TestUtils.findRenderedDOMComponentWithTag( wrapper, 'input' );
 		const div = TestUtils.findRenderedDOMComponentWithTag( wrapper, 'div' );
+		const anchorLink = TestUtils.findRenderedDOMComponentWithTag( wrapper, 'a' );
 
 		expect( input.hasAttribute( 'disabled' ) ).toBe( false );
 		expect( div.getAttribute( 'contenteditable' ) ).toBe( 'true' );
 		expect( div.hasAttribute( 'tabindex' ) ).toBe( true );
+		expect( div.hasAttribute( 'tabindex' ) ).not.toEqual( '-1' );
+		expect( anchorLink.hasAttribute( 'href' ) ).toBe( true );
 	} );
 
 	// Ideally, we'd have two more test cases here:
