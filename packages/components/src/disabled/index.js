@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { includes, debounce, noop } from 'lodash';
+import { includes, debounce } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -76,7 +76,6 @@ class Disabled extends Component {
 
 	disable() {
 		const {
-			onDisable = noop,
 			eligibleNodeNames = DISABLED_ELIGIBLE_NODE_NAMES,
 		} = this.props;
 
@@ -99,8 +98,6 @@ class Disabled extends Component {
 			// Disable all nodes from being tabbable order
 			focusable.setAttribute( 'tabindex', '-1' );
 		} );
-
-		onDisable( focusableNodes );
 	}
 
 	render() {
