@@ -16,6 +16,7 @@ import { isEmpty } from 'lodash';
  */
 import {
 	BottomSheet,
+	ImageViewer,
 	Icon,
 	Toolbar,
 	ToolbarButton,
@@ -53,6 +54,7 @@ class ImageEdit extends React.Component {
 		this.state = {
 			showSettings: false,
 			isCaptionSelected: false,
+			showImageViewer: false,
 		};
 
 		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind( this );
@@ -117,6 +119,7 @@ class ImageEdit extends React.Component {
 
 		this.setState( {
 			isCaptionSelected: false,
+			showImageViewer: true,
 		} );
 	}
 
@@ -211,6 +214,10 @@ class ImageEdit extends React.Component {
 			this.setState( { showSettings: false } );
 		};
 
+		const onImageViewerClose = () => {
+			this.setState( { showImageViewer: false } );
+		};
+
 		const getToolbarEditButton = ( open ) => (
 			<BlockControls>
 				<Toolbar>
@@ -256,6 +263,14 @@ class ImageEdit extends React.Component {
 			</BottomSheet>
 		);
 
+		const getImageViewer = () => (
+			<ImageViewer
+				isVisible={ this.state.showSettings }
+				onClose={ onImageSettingsClose }
+				url ={ url }
+			/>
+		);
+
 		if ( ! url ) {
 			return (
 				<View style={ { flex: 1 } } >
@@ -279,6 +294,7 @@ class ImageEdit extends React.Component {
 			>
 				<View style={ { flex: 1 } }>
 					{ getInspectorControls() }
+					{ getImageViewer() }
 					{ getMediaOptions() }
 					{ ( ! this.state.isCaptionSelected ) &&
 						getToolbarEditButton( openMediaOptions )
