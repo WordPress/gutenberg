@@ -29,7 +29,7 @@ import {
 	withSelect,
 } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
-import { compose, pure } from '@wordpress/compose';
+import { compose, pure, ifCondition } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -775,5 +775,6 @@ export default compose(
 	withViewportMatch( { isLargeViewport: 'medium' } ),
 	applyWithSelect,
 	applyWithDispatch,
+	ifCondition( ( { block } ) => !! block ),
 	withFilters( 'editor.BlockListBlock' )
 )( BlockListBlock );
