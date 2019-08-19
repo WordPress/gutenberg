@@ -228,7 +228,8 @@ class Typewriter extends Component {
 
 /**
  * Ensures that the text selection keeps the same vertical distance from the
- * viewport during keyboard events within this component.
+ * viewport during keyboard events within this component. The vertical distance
+ * can vary. It is the last clicked or scrolled to position.
  */
 export default withSelect( ( select ) => {
 	const { getSelectedBlockClientId } = select( 'core/block-editor' );
