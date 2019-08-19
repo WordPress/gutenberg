@@ -50,10 +50,14 @@ if ( commandExistsSync( 'git' ) ) {
 function buildWordPress() {
 	execSync( 'npm install', { cwd: normalize( env.WP_DEVELOP_DIR ), stdio: 'inherit' } );
 	execSync( 'npm run env:start', { cwd: normalize( env.WP_DEVELOP_DIR ), stdio: 'inherit' } );
-	execSync( 'npm run build:dev', { cwd: normalize( env.WP_DEVELOP_DIR ), stdio: 'inherit' } );
+	if ( env.LOCAL_DIR === 'build' ) {
+		execSync( 'npm run build', { cwd: normalize( env.WP_DEVELOP_DIR ), stdio: 'inherit' } );
+	} else {
+		execSync( 'npm run build:dev', { cwd: normalize( env.WP_DEVELOP_DIR ), stdio: 'inherit' } );
+	}
 	execSync( 'npm run env:install', { cwd: normalize( env.WP_DEVELOP_DIR ), stdio: 'inherit' } );
 
 	// Mount Gutenberg into the WordPress install.
 	execSync( 'npm run env connect', { stdio: 'inherit' } );
-	execSync( `npm run env:cli plugin activate ${ env.npm_package_wp_env_plugin_dir }`, { cwd: normalize( env.WP_DEVELOP_DIR ), stdio: 'inherit' } );
+	execSync( `npm run env cli plugin activate ${ env.npm_package_wp_env_plugin_dir }`, { stdio: 'inherit' } );
 }
