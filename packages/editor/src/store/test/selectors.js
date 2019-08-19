@@ -30,7 +30,7 @@ const selectorNames = Object.keys( selectors );
 selectorNames.forEach( ( name ) => {
 	selectors[ name ] = ( state, ...args ) => {
 		const select = () => ( {
-			getEntityRecord() {
+			getRawEntityRecord() {
 				return state.currentPost;
 			},
 
@@ -69,7 +69,7 @@ selectorNames.forEach( ( name ) => {
 					};
 				}
 				return {
-					...this.getEntityRecord(),
+					...this.getRawEntityRecord(),
 					...edits,
 				};
 			},
