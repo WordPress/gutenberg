@@ -55,5 +55,5 @@ function buildWordPress() {
 
 	// Mount Gutenberg into the WordPress install.
 	execSync( 'npm run env connect', { stdio: 'inherit' } );
-	execSync( 'npm run env cli plugin activate gutenberg', { stdio: 'inherit' } );
+	execSync( `npm run env cli plugin activate ${ env.npm_package_wp_env_plugin_dir }`, { stdio: 'inherit' } );
 }

@@ -45,8 +45,11 @@ try {
 
 const pluginMountDir = normalize( cwd() );
 
-const composeTemplate = readFileSync( fromConfigRoot( 'docker-compose.override.yml.template' ), 'utf8' )
-	.replace( /%PLUGIN_MOUNT_DIR%/gi, pluginMountDir );
+const composeTemplateFile = env.npm_package_wp_env_docker_template ? normalize( cwd() + `/${ env.npm_package_wp_env_docker_template }` ) : fromConfigRoot( 'docker-compose.override.yml.template' );
+
+const composeTemplate = readFileSync( composeTemplateFile, 'utf8' )
+	.replace( /%PLUGIN_MOUNT_DIR%/gi, pluginMountDir )
+	.replace( /%PLUGIN_INSTALL_DIR%/gi, env.npm_package_wp_env_plugin_dir );
 
 const pluginCompose = yaml.safeLoad( composeTemplate );
 
