@@ -335,18 +335,6 @@ _Returns_
 
 -   `Array<Editor.InserterItem>`: Items that appear in inserter.
 
-<a name="getIsDownloadableBlocksEnabled" href="#getIsDownloadableBlocksEnabled">#</a> **getIsDownloadableBlocksEnabled**
-
-Returns whether block editor can search and install uninstalled blocks.
-
-_Parameters_
-
--   _state_ `Object`: Global application state.
-
-_Returns_
-
--   `boolean`: Whether the downloadable blocks feature is enabled.
-
 <a name="getLastMultiSelectedBlockClientId" href="#getLastMultiSelectedBlockClientId">#</a> **getLastMultiSelectedBlockClientId**
 
 Returns the client ID of the last block in the multi-selection set, or null
