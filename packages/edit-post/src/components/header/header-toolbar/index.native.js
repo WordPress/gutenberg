@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { useRef } from 'react';
 import { ScrollView, View } from 'react-native';
 
 /**
@@ -31,9 +32,16 @@ function HeaderToolbar( {
 	showKeyboardHideButton,
 	clearSelectedBlock,
 } ) {
+	const scrollViewRef = useRef( null );
+	const scrollToStart = () => {
+		scrollViewRef.current.scrollTo( { x: 0 } );
+	};
+
 	return (
 		<View style={ styles.container }>
 			<ScrollView
+				ref={ scrollViewRef }
+				onContentSizeChange={ scrollToStart }
 				horizontal={ true }
 				showsHorizontalScrollIndicator={ false }
 				keyboardShouldPersistTaps="always"

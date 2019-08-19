@@ -88,7 +88,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 	it( 'the code editor should unselect blocks and disable the inserter', async () => {
 		// The paragraph block should be selected
 		const title = await page.$eval(
-			'.block-editor-block-inspector__card-title',
+			'.block-editor-block-card__title',
 			( element ) => element.innerText
 		);
 		expect( title ).toBe( 'Paragraph' );

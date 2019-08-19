@@ -1,15 +1,11 @@
 on: pull_request
-name: Add the First-time Contributor label to PRs opened by first-time contributors
+name: Add the First-time Contributor label
 jobs:
   filterOpened:
     name: Filter opened
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
-    - name: Filter opened
-      uses: actions/bin/filter@0dbb077f64d0ec1068a644d25c71b1db66148a24
-      with:
-        args: action opened
     - name: First Time Contributor
       uses: ./.github/actions/first-time-contributor
       env:
