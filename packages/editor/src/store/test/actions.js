@@ -80,9 +80,7 @@ describe( 'Post generator actions', () => {
 				() => {
 					reset( isAutosave );
 					const { value } = fulfillment.next();
-					expect( value ).toEqual(
-						select( STORE_KEY, 'isEditedPostSaveable' )
-					);
+					expect( value ).toEqual( select( STORE_KEY, 'isEditedPostSaveable' ) );
 				},
 			],
 			[
@@ -90,9 +88,7 @@ describe( 'Post generator actions', () => {
 				() => true,
 				() => {
 					const { value } = fulfillment.next( true );
-					expect( value ).toEqual(
-						select( STORE_KEY, 'getEditedPostContent' )
-					);
+					expect( value ).toEqual( select( STORE_KEY, 'getEditedPostContent' ) );
 				},
 			],
 			[
@@ -101,9 +97,7 @@ describe( 'Post generator actions', () => {
 				() => {
 					const edits = { content: currentPost().content };
 					const { value } = fulfillment.next( edits.content );
-					expect( value ).toEqual(
-						dispatch( STORE_KEY, 'editPost', edits )
-					);
+					expect( value ).toEqual( dispatch( STORE_KEY, 'editPost', edits ) );
 				},
 			],
 			[
@@ -118,22 +112,27 @@ describe( 'Post generator actions', () => {
 				},
 			],
 			[
-				'yields an action for selecting the current post type',
+				'yields an action for selecting the current post',
 				() => true,
 				() => {
 					const { value } = fulfillment.next();
-					expect( value ).toEqual(
-						select( STORE_KEY, 'getCurrentPostType' )
-					);
+					expect( value ).toEqual( select( STORE_KEY, 'getCurrentPost' ) );
 				},
 			],
 			[
-				'yields an action for selecting the current post ID',
+				"yields an action for selecting the post entity's non transient edits",
 				() => true,
 				() => {
-					const { value } = fulfillment.next( currentPost().type );
+					const post = currentPost();
+					const { value } = fulfillment.next( post );
 					expect( value ).toEqual(
-						select( STORE_KEY, 'getCurrentPostId' )
+						select(
+							'core',
+							'getEntityRecordNonTransientEdits',
+							'postType',
+							post.type,
+							post.id
+						)
 					);
 				},
 			],
@@ -141,25 +140,17 @@ describe( 'Post generator actions', () => {
 				'yields an action for dispatching an update to the post entity',
 				() => true,
 				() => {
-					const { value } = fulfillment.next( currentPost().id );
-					value.args[ 3 ] = {
-						...value.args[ 3 ],
-						getSuccessNoticeActionArgs: 'getSuccessNoticeActionArgs',
-						getFailureNoticeActionArgs: 'getFailureNoticeActionArgs',
-					};
+					const post = currentPost();
+					const { value } = fulfillment.next( post );
 					expect( value ).toEqual(
 						dispatch(
 							'core',
-							'saveEditedEntityRecord',
+							'saveEntityRecord',
 							'postType',
-							currentPost().type,
-							currentPost().id,
+							post.type,
+							post,
 							{
 								isAutosave,
-								getSuccessNoticeActionArgs:
-									'getSuccessNoticeActionArgs',
-								getFailureNoticeActionArgs:
-									'getFailureNoticeActionArgs',
 							}
 						)
 					);
@@ -177,10 +168,68 @@ describe( 'Post generator actions', () => {
 				},
 			],
 			[
+				"yields an action for selecting the entity's save error",
+				() => true,
+				() => {
+					const post = currentPost();
+					const { value } = fulfillment.next();
+					expect( value ).toEqual(
+						select(
+							'core',
+							'getLastEntitySaveError',
+							'postType',
+							post.type,
+							post.id
+						)
+					);
+				},
+			],
+			[
+				'yields an action for selecting the current post',
+				() => true,
+				() => {
+					const { value } = fulfillment.next();
+					expect( value ).toEqual( select( STORE_KEY, 'getCurrentPost' ) );
+				},
+			],
+			[
+				'yields an action for selecting the current post type config',
+				() => true,
+				() => {
+					const post = currentPost();
+					const { value } = fulfillment.next( post );
+					expect( value ).toEqual( select( 'core', 'getPostType', post.type ) );
+				},
+			],
+			[
+				'yields an action for dispatching a success notice',
+				() => true,
+				() => {
+					if ( ! isAutosave && currentPostStatus === 'publish' ) {
+						const { value } = fulfillment.next( postType );
+						expect( value ).toEqual(
+							dispatch(
+								'core/notices',
+								'createSuccessNotice',
+								'Updated Post',
+								{
+									actions: [],
+									id: 'SAVE_POST_NOTICE_ID',
+									type: 'snackbar',
+								}
+							)
+						);
+					}
+				},
+			],
+			[
 				'implicitly returns undefined',
 				() => true,
 				() => {
-					expect( fulfillment.next() ).toEqual( { done: true, value: undefined } );
+					expect( fulfillment.next() ).toEqual( {
+						done: true,
+						value: undefined,
+					} );
 				},
 			],
 		];

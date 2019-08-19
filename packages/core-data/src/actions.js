@@ -4,11 +4,6 @@
 import { castArray, get, merge, isEqual, find } from 'lodash';
 
 /**
- * WordPress dependencies
- */
-import { dispatch } from '@wordpress/data-controls';
-
-/**
  * Internal dependencies
  */
 import {

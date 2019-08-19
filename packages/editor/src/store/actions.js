@@ -402,29 +402,33 @@ export function* savePost( options = {} ) {
 	);
 	yield __experimentalRequestPostUpdateFinish( options );
 
-	const error = yield select( 'core', 'getLastEntitySaveError' );
+	const error = yield select(
+		'core',
+		'getLastEntitySaveError',
+		'postType',
+		previousRecord.type,
+		previousRecord.id
+	);
 	if ( error ) {
-		yield dispatch(
-			'core/notices',
-			'createErrorNotice',
-			...getNotificationArgumentsForSaveFail( {
-				post: previousRecord,
-				edits,
-				error,
-			} )
-		);
+		const args = getNotificationArgumentsForSaveFail( {
+			post: previousRecord,
+			edits,
+			error,
+		} );
+		if ( args.length ) {
+			yield dispatch( 'core/notices', 'createErrorNotice', ...args );
+		}
 	} else {
 		const updatedRecord = yield select( STORE_KEY, 'getCurrentPost' );
-		yield dispatch(
-			'core/notices',
-			'createSuccessNotice',
-			...getNotificationArgumentsForSaveSuccess( {
-				previousPost: previousRecord,
-				post: updatedRecord,
-				postType: yield select( 'core', 'getPostType', updatedRecord.type ),
-				options,
-			} )
-		);
+		const args = getNotificationArgumentsForSaveSuccess( {
+			previousPost: previousRecord,
+			post: updatedRecord,
+			postType: yield select( 'core', 'getPostType', updatedRecord.type ),
+			options,
+		} );
+		if ( args.length ) {
+			yield dispatch( 'core/notices', 'createSuccessNotice', ...args );
+		}
 	}
 }
 
@@ -813,7 +817,8 @@ export function* resetEditorBlocks( blocks, options = {} ) {
 	const edits = { blocks: yield* getBlocksWithSourcedAttributes( blocks ) };
 
 	if ( options.__unstableShouldCreateUndoLevel !== false ) {
-		edits.content = serializeBlocks( edits.blocks );
+		edits.content = ( { blocks: blocksForSerialization = [] } ) =>
+			serializeBlocks( blocksForSerialization );
 	}
 
 	yield* editPost( edits );
