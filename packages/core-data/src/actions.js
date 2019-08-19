@@ -225,11 +225,7 @@ export function* saveEntityRecord(
 	kind,
 	name,
 	record,
-	{
-		isAutosave = false,
-		getSuccessNoticeActionArgs,
-		getFailureNoticeActionArgs,
-	} = { isAutosave: false }
+	{ isAutosave = false } = { isAutosave: false }
 ) {
 	const entities = yield getKindEntities( kind );
 	const entity = find( entities, { kind, name } );
@@ -241,15 +237,17 @@ export function* saveEntityRecord(
 
 	yield { type: 'SAVE_ENTITY_RECORD_START', kind, name, recordId, isAutosave };
 	let updatedRecord;
-	let persistedRecord;
-	if ( isAutosave || getSuccessNoticeActionArgs || getFailureNoticeActionArgs ) {
-		persistedRecord = yield select( 'getRawEntityRecord', kind, name, recordId );
-	}
 	let error;
 	try {
 		const path = `${ entity.baseURL }${ recordId ? '/' + recordId : '' }`;
 
 		if ( isAutosave ) {
+			const persistedRecord = yield select(
+				'getRawEntityRecord',
+				kind,
+				name,
+				recordId
+			);
 			const currentUser = yield select( 'getCurrentUser' );
 			const currentUserId = currentUser ? currentUser.id : undefined;
 			const autosavePost = yield select(
@@ -297,29 +295,8 @@ export function* saveEntityRecord(
 			} );
 			yield receiveEntityRecords( kind, name, updatedRecord, undefined, true );
 		}
-
-		if ( getSuccessNoticeActionArgs ) {
-			const postType = updatedRecord.type || persistedRecord.type;
-			const args =
-				postType &&
-				getSuccessNoticeActionArgs(
-					persistedRecord,
-					updatedRecord,
-					yield select( 'getPostType', postType )
-				);
-			if ( args && args.length ) {
-				yield dispatch( ...args );
-			}
-		}
 	} catch ( _error ) {
 		error = _error;
-
-		if ( getFailureNoticeActionArgs ) {
-			const args = getFailureNoticeActionArgs( persistedRecord, record, error );
-			if ( args && args.length ) {
-				yield dispatch( ...args );
-			}
-		}
 	}
 	yield {
 		type: 'SAVE_ENTITY_RECORD_FINISH',
