@@ -2,6 +2,10 @@
 
 Disabled is a component which disables interaction with descendant tabbable or focusable DOM elements. Pointer interaction, keyboard focus/tab and events are disabled.
 
+## A note on Accessibility
+
+Usage of this component should be implemented with caution. If the component being disabled is still intenteded to be perceivable then, when using this component, you must provide a suitable alternative presentation for users of assitive technologies.
+
 ## Usage
 
 Assuming you have a form component, you can disable all form inputs by wrapping the form with `<Disabled>`.
