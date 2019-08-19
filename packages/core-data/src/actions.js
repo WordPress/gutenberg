@@ -137,7 +137,7 @@ export function* editEntityRecord( kind, name, recordId, edits ) {
 		kind,
 		name
 	);
-	const record = yield select( 'getEntityRecord', kind, name, recordId );
+	const record = yield select( 'getRawEntityRecord', kind, name, recordId );
 	const editedRecord = yield select(
 		'getEditedEntityRecord',
 		kind,
@@ -243,7 +243,7 @@ export function* saveEntityRecord(
 	let updatedRecord;
 	let persistedRecord;
 	if ( isAutosave || getSuccessNoticeActionArgs || getFailureNoticeActionArgs ) {
-		persistedRecord = yield select( 'getEntityRecord', kind, name, recordId );
+		persistedRecord = yield select( 'getRawEntityRecord', kind, name, recordId );
 	}
 	let error;
 	try {

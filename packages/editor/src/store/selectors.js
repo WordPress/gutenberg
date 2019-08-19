@@ -159,7 +159,7 @@ export const getCurrentPost = createRegistrySelector( ( select ) => ( state ) =>
 	const postId = getCurrentPostId( state );
 	const postType = getCurrentPostType( state );
 
-	const post = select( 'core' ).getEntityRecord( 'postType', postType, postId );
+	const post = select( 'core' ).getRawEntityRecord( 'postType', postType, postId );
 	if ( post ) {
 		return post;
 	}
