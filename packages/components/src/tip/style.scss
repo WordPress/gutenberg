@@ -1,0 +1,15 @@
+.components-tip {
+	display: flex;
+	color: $dark-gray-500;
+
+	svg {
+		align-self: center;
+		fill: $alert-yellow;
+		flex-shrink: 0;
+		margin-right: $grid-size-large;
+	}
+
+	p {
+		margin: 0;
+	}
+}
