@@ -54,20 +54,22 @@ class Disabled extends Component {
 			subtree: true,
 		} );
 
-		this.node.addEventListener( 'click', this.catchEvents );
-		this.node.addEventListener( 'focus', this.catchEvents );
+		document.addEventListener( 'click', this.catchEvents );
+		document.addEventListener( 'focus', this.catchEvents, true );
 	}
 
 	componentWillUnmount() {
 		this.observer.disconnect();
 		this.debouncedDisable.cancel();
-		this.node.removeEventListener( 'click', this.catchEvents );
-		this.node.removeEventListener( 'focus', this.catchEvents );
+		document.removeEventListener( 'click', this.catchEvents );
+		document.removeEventListener( 'focus', this.catchEvents );
 	}
 
 	catchEvents( e ) {
-		e.preventDefault();
-		e.stopPropagation();
+		if ( this.node && this.node.contains( e.target ) ) {
+			e.preventDefault();
+			e.stopPropagation();
+		}
 	}
 
 	bindNode( node ) {
@@ -82,8 +84,11 @@ class Disabled extends Component {
 		const focusableNodes = focus.focusable.find( this.node );
 
 		focusableNodes.forEach( ( focusable ) => {
+			// Disable all nodes from being tabbable order
+			focusable.setAttribute( 'tabindex', '-1' );
+
 			if ( includes( eligibleNodeNames, focusable.nodeName ) ) {
-				focusable.setAttribute( 'disabled', '' );
+				focusable.setAttribute( 'disabled', 'true' );
 			}
 
 			if ( focusable.hasAttribute( 'contenteditable' ) ) {
@@ -94,10 +99,12 @@ class Disabled extends Component {
 			if ( focusable.hasAttribute( 'href' ) ) {
 				focusable.removeAttribute( 'href' );
 			}
-
-			// Disable all nodes from being tabbable order
-			focusable.setAttribute( 'tabindex', '-1' );
 		} );
+
+		// In FF the `<RichText>` node becomes focusable (presumanly via scripting).
+		// We manually disable this via tabindex also
+		const blockEditorEdgeCaseFocusable = '.block-editor-rich-text';
+		this.node.querySelectorAll( blockEditorEdgeCaseFocusable ).forEach( ( rc ) => rc.setAttribute( 'tabindex', '-1' ) );
 	}
 
 	render() {
