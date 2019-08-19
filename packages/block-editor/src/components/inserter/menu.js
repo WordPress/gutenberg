@@ -16,18 +16,24 @@ import {
 	deburr,
 } from 'lodash';
 import scrollIntoView from 'dom-scroll-into-view';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
 import { __, _n, _x, sprintf } from '@wordpress/i18n';
 import { Component, createRef } from '@wordpress/element';
-import { withSpokenMessages, PanelBody } from '@wordpress/components';
+import {
+	PanelBody,
+	withSpokenMessages,
+	Tip,
+} from '@wordpress/components';
 import {
 	getCategories,
 	isReusableBlock,
 	createBlock,
 	isUnmodifiedDefaultBlock,
+	getBlockType,
 } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withInstanceId, compose, withSafeTimeout } from '@wordpress/compose';
@@ -39,6 +45,7 @@ import { addQueryArgs } from '@wordpress/url';
  */
 import BlockPreview from '../block-preview';
 import BlockTypesList from '../block-types-list';
+import BlockCard from '../block-card';
 import ChildBlocks from './child-blocks';
 import __experimentalInserterMenuExtension from '../inserter-menu-extension';
 
@@ -247,8 +254,7 @@ export class InserterMenu extends Component {
 	}
 
 	render() {
-		const { instanceId, onSelect, rootClientId } = this.props;
-
+		const { instanceId, onSelect, rootClientId, showInserterHelpPanel } = this.props;
 		const {
 			childItems,
 			hoveredItem,
@@ -268,118 +274,157 @@ export class InserterMenu extends Component {
 		/* eslint-disable jsx-a11y/no-autofocus, jsx-a11y/no-static-element-interactions */
 		return (
 			<div
-				className="editor-inserter__menu block-editor-inserter__menu"
+				className={ classnames( 'editor-inserter__menu block-editor-inserter__menu', {
+					'has-help-panel': showInserterHelpPanel,
+				} ) }
 				onKeyPress={ stopKeyPropagation }
 				onKeyDown={ this.onKeyDown }
 			>
-				<label htmlFor={ `block-editor-inserter__search-${ instanceId }` } className="screen-reader-text">
-					{ __( 'Search for a block' ) }
-				</label>
-				<input
-					id={ `block-editor-inserter__search-${ instanceId }` }
-					type="search"
-					placeholder={ __( 'Search for a block' ) }
-					className="editor-inserter__search block-editor-inserter__search"
-					autoFocus
-					onChange={ this.onChangeSearchInput }
-				/>
-
-				<div
-					className="editor-inserter__results block-editor-inserter__results"
-					ref={ this.inserterResults }
-					tabIndex="0"
-					role="region"
-					aria-label={ __( 'Available block types' ) }
-				>
-
-					<ChildBlocks
-						rootClientId={ rootClientId }
-						items={ childItems }
-						onSelect={ onSelect }
-						onHover={ this.onHover }
+				<div className="block-editor-inserter__main-area">
+					<label htmlFor={ `block-editor-inserter__search-${ instanceId }` } className="screen-reader-text">
+						{ __( 'Search for a block' ) }
+					</label>
+					<input
+						id={ `block-editor-inserter__search-${ instanceId }` }
+						type="search"
+						placeholder={ __( 'Search for a block' ) }
+						className="editor-inserter__search block-editor-inserter__search"
+						autoFocus
+						onChange={ this.onChangeSearchInput }
 					/>
 
-					{ !! suggestedItems.length &&
-						<PanelBody
-							title={ _x( 'Most Used', 'blocks' ) }
-							opened={ isPanelOpen( 'suggested' ) }
-							onToggle={ this.onTogglePanel( 'suggested' ) }
-							ref={ this.bindPanel( 'suggested' ) }
-						>
-							<BlockTypesList items={ suggestedItems } onSelect={ onSelect } onHover={ this.onHover } />
-						</PanelBody>
-					}
-
-					{ map( getCategories(), ( category ) => {
-						const categoryItems = itemsPerCategory[ category.slug ];
-						if ( ! categoryItems || ! categoryItems.length ) {
-							return null;
-						}
-						return (
-							<PanelBody
-								key={ category.slug }
-								title={ category.title }
-								icon={ category.icon }
-								opened={ isPanelOpen( category.slug ) }
-								onToggle={ this.onTogglePanel( category.slug ) }
-								ref={ this.bindPanel( category.slug ) }
-							>
-								<BlockTypesList items={ categoryItems } onSelect={ onSelect } onHover={ this.onHover } />
-							</PanelBody>
-						);
-					} ) }
-
-					{ !! reusableItems.length && (
-						<PanelBody
-							className="editor-inserter__reusable-blocks-panel block-editor-inserter__reusable-blocks-panel"
-							title={ __( 'Reusable' ) }
-							opened={ isPanelOpen( 'reusable' ) }
-							onToggle={ this.onTogglePanel( 'reusable' ) }
-							icon="controls-repeat"
-							ref={ this.bindPanel( 'reusable' ) }
-						>
-							<BlockTypesList items={ reusableItems } onSelect={ onSelect } onHover={ this.onHover } />
-							<a
-								className="editor-inserter__manage-reusable-blocks block-editor-inserter__manage-reusable-blocks"
-								href={ addQueryArgs( 'edit.php', { post_type: 'wp_block' } ) }
-							>
-								{ __( 'Manage All Reusable Blocks' ) }
-							</a>
-						</PanelBody>
-					) }
-
-					<__experimentalInserterMenuExtension.Slot
-						fillProps={ {
-							onSelect,
-							onHover: this.onHover,
-							filterValue: this.state.filterValue,
-							isMenuEmpty,
-						} }
+					<div
+						className="editor-inserter__results block-editor-inserter__results"
+						ref={ this.inserterResults }
+						tabIndex="0"
+						role="region"
+						aria-label={ __( 'Available block types' ) }
 					>
-						{ ( fills ) => {
-							// __experimentalInserterMenuExtension should also handle when isMenuEmpty is true ( no installed block type results are found ).
-							if ( fills.length ) {
-								return fills;
+
+						<ChildBlocks
+							rootClientId={ rootClientId }
+							items={ childItems }
+							onSelect={ onSelect }
+							onHover={ this.onHover }
+						/>
+
+						{ !! suggestedItems.length &&
+							<PanelBody
+								title={ _x( 'Most Used', 'blocks' ) }
+								opened={ isPanelOpen( 'suggested' ) }
+								onToggle={ this.onTogglePanel( 'suggested' ) }
+								ref={ this.bindPanel( 'suggested' ) }
+							>
+								<BlockTypesList items={ suggestedItems } onSelect={ onSelect } onHover={ this.onHover } />
+							</PanelBody>
+						}
+
+						{ map( getCategories(), ( category ) => {
+							const categoryItems = itemsPerCategory[ category.slug ];
+							if ( ! categoryItems || ! categoryItems.length ) {
+								return null;
 							}
-							if ( isMenuEmpty ) {
-								return (
-									<p className="editor-inserter__no-results block-editor-inserter__no-results">{ __( 'No blocks found.' ) }</p>
-								);
-							}
-							return null;
-						} }
-					</__experimentalInserterMenuExtension.Slot>
+							return (
+								<PanelBody
+									key={ category.slug }
+									title={ category.title }
+									icon={ category.icon }
+									opened={ isPanelOpen( category.slug ) }
+									onToggle={ this.onTogglePanel( category.slug ) }
+									ref={ this.bindPanel( category.slug ) }
+								>
+									<BlockTypesList items={ categoryItems } onSelect={ onSelect } onHover={ this.onHover } />
+								</PanelBody>
+							);
+						} ) }
+
+						{ !! reusableItems.length && (
+							<PanelBody
+								className="editor-inserter__reusable-blocks-panel block-editor-inserter__reusable-blocks-panel"
+								title={ __( 'Reusable' ) }
+								opened={ isPanelOpen( 'reusable' ) }
+								onToggle={ this.onTogglePanel( 'reusable' ) }
+								icon="controls-repeat"
+								ref={ this.bindPanel( 'reusable' ) }
+							>
+								<BlockTypesList items={ reusableItems } onSelect={ onSelect } onHover={ this.onHover } />
+								<a
+									className="editor-inserter__manage-reusable-blocks block-editor-inserter__manage-reusable-blocks"
+									href={ addQueryArgs( 'edit.php', { post_type: 'wp_block' } ) }
+								>
+									{ __( 'Manage All Reusable Blocks' ) }
+								</a>
+							</PanelBody>
+						) }
+						<__experimentalInserterMenuExtension.Slot
+							fillProps={ {
+								onSelect,
+								onHover: this.onHover,
+								filterValue: this.state.filterValue,
+								isMenuEmpty,
+							} }
+						>
+							{ ( fills ) => {
+								// __experimentalInserterMenuExtension should also handle when isMenuEmpty is true ( no installed block type results are found ).
+								if ( fills.length ) {
+									return fills;
+								}
+								if ( isMenuEmpty ) {
+									return (
+										<p className="editor-inserter__no-results block-editor-inserter__no-results">{ __( 'No blocks found.' ) }</p>
+									);
+								}
+								return null;
+							} }
+						</__experimentalInserterMenuExtension.Slot>
+					</div>
 				</div>
 
-				{ hoveredItem && isReusableBlock( hoveredItem ) &&
-					<div className="block-editor-inserter__preview">
-						<div className="block-editor-inserter__preview-title">{ __( 'Preview' ) }</div>
-						<BlockPreview
-							className="block-editor-inserter__preview-content"
-							blocks={ createBlock( hoveredItem.name, hoveredItem.initialAttributes ) }
-						/>
+				{ showInserterHelpPanel && (
+					<div className="block-editor-inserter__menu-help-panel">
+						{ hoveredItem && (
+							<>
+								<BlockCard blockType={ getBlockType( hoveredItem.name ) } />
+								{ isReusableBlock( hoveredItem ) && (
+									<div className="block-editor-inserter__preview">
+										<div className="block-editor-inserter__preview-title">{ __( 'Preview' ) }</div>
+										<BlockPreview
+											className="block-editor-inserter__preview-content"
+											blocks={ createBlock( hoveredItem.name, hoveredItem.initialAttributes ) }
+										/>
+									</div>
+								) }
+							</>
+						) }
+						{ ! hoveredItem && (
+							<div className="block-editor-inserter__menu-help-panel-no-block">
+								<div className="block-editor-inserter__menu-help-panel-no-block-text">
+									<div className="block-editor-inserter__menu-help-panel-title">Content Blocks</div>
+									<p>
+										{ __(
+											'Welcome to the wonderful world of blocks! Blocks are the basis of all content within the editor. '
+										) }
+									</p>
+									<p>
+										{ __(
+											'There are blocks available for all kinds of content: insert text, headings, images, lists, videos, tables, and lots more.'
+										) }
+									</p>
+									<p>
+										{ __(
+											'Browse through the library to learn more about what each block does.'
+										) }
+									</p>
+								</div>
+								<Tip>
+									{ __(
+										'While writing, you can press "/" to quickly insert new blocks.'
+									) }
+								</Tip>
+							</div>
+						) }
 					</div>
-				}
+				) }
 			</div>
 		);
 		/* eslint-enable jsx-a11y/no-autofocus, jsx-a11y/no-static-element-interactions */
@@ -393,6 +438,7 @@ export default compose(
 			getBlockName,
 			getBlockRootClientId,
 			getBlockSelectionEnd,
+			getSettings,
 		} = select( 'core/block-editor' );
 		const {
 			getChildBlockNames,
@@ -407,11 +453,10 @@ export default compose(
 		}
 		const destinationRootBlockName = getBlockName( destinationRootClientId );
 
-		const items = getInserterItems( destinationRootClientId );
-
 		return {
 			rootChildBlocks: getChildBlockNames( destinationRootBlockName ),
-			items,
+			items: getInserterItems( destinationRootClientId ),
+			showInserterHelpPanel: getSettings().showInserterHelpPanel,
 			destinationRootClientId,
 		};
 	} ),

@@ -11,11 +11,11 @@ import {
 	PanelBody,
 	ToggleControl,
 	SelectControl,
-	ServerSideRender,
 } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/block-editor';
+import ServerSideRender from '@wordpress/server-side-render';
 
 class TagCloudEdit extends Component {
 	constructor() {

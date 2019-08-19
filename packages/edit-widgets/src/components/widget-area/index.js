@@ -18,6 +18,7 @@ import {
 	WritingFlow,
 	ObserveTyping,
 	BlockEditorKeyboardShortcuts,
+	ButtonBlockerAppender,
 } from '@wordpress/block-editor';
 import { withDispatch, withSelect } from '@wordpress/data';
 
@@ -86,13 +87,16 @@ function WidgetArea( {
 					<Sidebar.Inspector>
 						<BlockInspector showNoBlockSelectedMessage={ false } />
 					</Sidebar.Inspector>
-					<WritingFlow>
-						<ObserveTyping>
-							<BlockList
-								className="edit-widgets-main-block-list"
-							/>
-						</ObserveTyping>
-					</WritingFlow>
+					<div className="editor-styles-wrapper">
+						<WritingFlow>
+							<ObserveTyping>
+								<BlockList
+									className="edit-widgets-main-block-list"
+									renderAppender={ ButtonBlockerAppender }
+								/>
+							</ObserveTyping>
+						</WritingFlow>
+					</div>
 				</BlockEditorProvider>
 			</PanelBody>
 		</Panel>

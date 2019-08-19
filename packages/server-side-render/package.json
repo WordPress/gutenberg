@@ -26,6 +26,7 @@
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/components": "file:../components",
 		"@wordpress/data": "file:../data",
+		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/element": "file:../element",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/url": "file:../url",

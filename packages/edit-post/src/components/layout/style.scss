@@ -5,6 +5,7 @@
 
 .edit-post-layout {
 	position: relative;
+	box-sizing: border-box;
 
 	// Beyond the mobile breakpoint, the editor bar is fixed, so make room for it eabove the layout content.
 	@include break-small {
