@@ -79,8 +79,15 @@ export default createHigherOrderComponent(
 				}
 
 				this.blurCheckTimeout = setTimeout( () => {
-					const eventTargetElIsWithinComponent = this.node.containerRef.current && this.node.containerRef.current.contains( event.target );
-					if ( 'function' === typeof this.node.handleFocusOutside && ! eventTargetElIsWithinComponent ) {
+					// If document is not focused then focus should remain
+					// inside the wrapped component and therefore we cancel
+					// this blur event thereby leaving focus in place.
+					// https://developer.mozilla.org/en-US/docs/Web/API/Document/hasFocus.
+					if ( ! document.hasFocus() ) {
+						event.preventDefault();
+						return;
+					}
+					if ( 'function' === typeof this.node.handleFocusOutside ) {
 						this.node.handleFocusOutside( event );
 					}
 				}, 0 );
