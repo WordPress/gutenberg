@@ -76,6 +76,14 @@ class Typewriter extends Component {
 		);
 	}
 
+	isLastEditableNode() {
+		const editableNodes = this.ref.current.querySelectorAll(
+			'[contenteditable="true"]'
+		);
+		const lastEditableNode = editableNodes[ editableNodes.length - 1 ];
+		return lastEditableNode === document.activeElement;
+	}
+
 	/**
 	 * Maintains the scroll position after a selection change caused by a
 	 * keyboard event.
@@ -83,21 +91,6 @@ class Typewriter extends Component {
 	 * @param {SyntheticEvent} event Synthetic keyboard event.
 	 */
 	maintainCaretPosition( { keyCode } ) {
-		// If for some reason there is no position set to be scrolled to, let
-		// this be the position to be scrolled to in the future.
-		if ( ! this.caretRect ) {
-			this.computeCaretRect();
-			return;
-		}
-
-		// Even though enabling the typewriter effect for arrow keys results in
-		// a pleasant experience, it may not be the case for everyone, so, for
-		// now, let's disable it.
-		if ( arrowKeyCodes.has( keyCode ) ) {
-			this.computeCaretRect();
-			return;
-		}
-
 		if ( ! this.isSelectionEligibleForScroll() ) {
 			return;
 		}
@@ -105,6 +98,22 @@ class Typewriter extends Component {
 		const currentCaretRect = computeCaretRect();
 
 		if ( ! currentCaretRect ) {
+			return;
+		}
+
+		// If for some reason there is no position set to be scrolled to, let
+		// this be the position to be scrolled to in the future.
+		if ( ! this.caretRect ) {
+			this.caretRect = currentCaretRect;
+			return;
+		}
+
+		// Even though enabling the typewriter effect for arrow keys results in
+		// a pleasant experience, it may not be the case for everyone, so, for
+		// now, let's disable it.
+		if ( arrowKeyCodes.has( keyCode ) ) {
+			// Reset the caret position to maintain.
+			this.caretRect = currentCaretRect;
 			return;
 		}
 
@@ -121,63 +130,55 @@ class Typewriter extends Component {
 			return;
 		}
 
-		const editableNodes = this.ref.current.querySelectorAll( '[contenteditable="true"]' );
-		const lastEditableNode = editableNodes[ editableNodes.length - 1 ];
-		const isLastEditableNode = lastEditableNode === document.activeElement;
-		const scrollContainerRect = scrollContainer.getBoundingClientRect();
-		const relativeScrollPosition = (
-			( this.caretRect.y - scrollContainerRect.y ) /
-			( window.innerHeight - scrollContainerRect.y )
-		);
+		const windowScroll = scrollContainer === document.body;
+		const scrollY = windowScroll ?
+			window.scrollY :
+			scrollContainer.scrollTop;
+		const scrollContainerY = windowScroll ?
+			0 :
+			scrollContainer.getBoundingClientRect().y;
+		const relativeScrollPosition = windowScroll ?
+			this.caretRect.y / window.innerHeight :
+			( this.caretRect.y - scrollContainerY ) /
+			( window.innerHeight - scrollContainerY );
 
-		// The scroll container may be different depending on the viewport
-		// width.
-		// Nested condition: if the scroll position is at the start and the
-		// active editable element is the last one, do not scroll the page.
+		// If the scroll position is at the start, the active editable element
+		// is the last one, and the caret is positioned within the initial
+		// trigger percentage of the page, do not scroll the page.
 		// The typewriter effect should not kick in until an empty page has been
-		// filled or the user scrolls intentionally down.
-		if ( scrollContainer === document.body ) {
-			if (
-				isLastEditableNode &&
-				window.scrollY === 0 &&
-				relativeScrollPosition < initialTriggerPercentage
-			) {
-				this.caretRect = currentCaretRect;
-				return;
-			}
+		// filled with the initial trigger percentage or the user scrolls
+		// intentionally down.
+		if (
+			scrollY === 0 &&
+			relativeScrollPosition < initialTriggerPercentage &&
+			this.isLastEditableNode()
+		) {
+			// Reset the caret position to maintain.
+			this.caretRect = currentCaretRect;
+			return;
+		}
 
-			// Abort if the target scroll position would scroll the caret out of
-			// view.
-			if (
-				this.caretRect.y + this.caretRect.height > window.innerHeight ||
-				this.caretRect.y < 0
-			) {
-				this.caretRect = currentCaretRect;
-				return;
-			}
+		const scrollContainerHeight = windowScroll ?
+			window.innerHeight :
+			scrollContainer.clientHeight;
 
+		// Abort if the target scroll position would scroll the caret out of
+		// view.
+		if (
+			// The caret is under the lower fold.
+			this.caretRect.y + this.caretRect.height >
+				scrollContainerY + scrollContainerHeight ||
+			// The caret is above the upper fold.
+			this.caretRect.y < scrollContainerY
+		) {
+			// Reset the caret position to maintain.
+			this.caretRect = currentCaretRect;
+			return;
+		}
+
+		if ( windowScroll ) {
 			window.scrollBy( 0, diff );
 		} else {
-			if (
-				isLastEditableNode &&
-				scrollContainer.scrollTop === 0 &&
-				relativeScrollPosition < initialTriggerPercentage
-			) {
-				this.caretRect = currentCaretRect;
-				return;
-			}
-
-			// Abort if the target scroll position would scroll the caret out of
-			// view.
-			if (
-				this.caretRect.y + this.caretRect.height >
-					scrollContainerRect.y + scrollContainer.clientHeight ||
-				this.caretRect.y < scrollContainerRect.y
-			) {
-				this.caretRect = currentCaretRect;
-				return;
-			}
-
 			scrollContainer.scrollTop += diff;
 		}
 	}
