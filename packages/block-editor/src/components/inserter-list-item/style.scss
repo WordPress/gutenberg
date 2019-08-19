@@ -1,7 +1,7 @@
 .block-editor-block-types-list__list-item {
 	display: block;
 	width: 33.33%;
-	padding: 0 4px;
+	padding: 0;
 	margin: 0 0 12px;
 }
 
@@ -11,7 +11,7 @@
 	width: 100%;
 	font-size: $default-font-size;
 	color: $dark-gray-700;
-	padding: 0;
+	padding: 0 4px;
 	align-items: stretch;
 	justify-content: center;
 	cursor: pointer;

@@ -36,6 +36,7 @@ class Editor extends Component {
 	getEditorSettings(
 		settings,
 		hasFixedToolbar,
+		showInserterHelpPanel,
 		focusMode,
 		hiddenBlockTypes,
 		blockTypes,
@@ -44,6 +45,7 @@ class Editor extends Component {
 			...settings,
 			hasFixedToolbar,
 			focusMode,
+			showInserterHelpPanel,
 		};
 
 		// Omit hidden block types if exists and non-empty.
@@ -77,6 +79,7 @@ class Editor extends Component {
 			onError,
 			hiddenBlockTypes,
 			blockTypes,
+			showInserterHelpPanel,
 			...props
 		} = this.props;
 
@@ -87,6 +90,7 @@ class Editor extends Component {
 		const editorSettings = this.getEditorSettings(
 			settings,
 			hasFixedToolbar,
+			showInserterHelpPanel,
 			focusMode,
 			hiddenBlockTypes,
 			blockTypes,
@@ -125,6 +129,7 @@ export default withSelect( ( select, { postId, postType } ) => {
 	const { getBlockTypes } = select( 'core/blocks' );
 
 	return {
+		showInserterHelpPanel: isFeatureActive( 'showInserterHelpPanel' ),
 		hasFixedToolbar: isFeatureActive( 'fixedToolbar' ),
 		focusMode: isFeatureActive( 'focusMode' ),
 		post: getEntityRecord( 'postType', postType, postId ),
