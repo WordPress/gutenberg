@@ -37,6 +37,7 @@ class Disabled extends Component {
 
 		this.bindNode = this.bindNode.bind( this );
 		this.disable = this.disable.bind( this );
+		this.catchEvents = this.catchEvents.bind( this );
 
 		// Debounce re-disable since disabling process itself will incur
 		// additional mutations which should be ignored.
@@ -52,11 +53,21 @@ class Disabled extends Component {
 			attributes: true,
 			subtree: true,
 		} );
+
+		this.node.addEventListener( 'click', this.catchEvents );
+		this.node.addEventListener( 'focus', this.catchEvents );
 	}
 
 	componentWillUnmount() {
 		this.observer.disconnect();
 		this.debouncedDisable.cancel();
+		this.node.removeEventListener( 'click', this.catchEvents );
+		this.node.removeEventListener( 'focus', this.catchEvents );
+	}
+
+	catchEvents( e ) {
+		e.preventDefault();
+		e.stopPropagation();
 	}
 
 	bindNode( node ) {
@@ -76,13 +87,17 @@ class Disabled extends Component {
 				focusable.setAttribute( 'disabled', '' );
 			}
 
-			if ( focusable.hasAttribute( 'tabindex' ) ) {
-				focusable.removeAttribute( 'tabindex' );
-			}
-
 			if ( focusable.hasAttribute( 'contenteditable' ) ) {
 				focusable.setAttribute( 'contenteditable', 'false' );
 			}
+
+			// Make it impossible to focus or tab to `<a>` or `<area>` els
+			if ( focusable.hasAttribute( 'href' ) ) {
+				focusable.removeAttribute( 'href' );
+			}
+
+			// Disable all nodes from being tabbable order
+			focusable.setAttribute( 'tabindex', '-1' );
 		} );
 
 		onDisable( focusableNodes );
