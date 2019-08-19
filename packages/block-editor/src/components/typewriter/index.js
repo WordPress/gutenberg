@@ -135,9 +135,30 @@ class Typewriter extends Component {
 				return;
 			}
 
+			// Abort if the target scroll position would scroll the caret out of
+			// view.
+			if (
+				this.caretRect.y + this.caretRect.height > window.innerHeight ||
+				this.caretRect.y < 0
+			) {
+				return;
+			}
+
 			window.scrollBy( 0, diff );
 		} else {
 			if ( isLastEditableNode && scrollContainer.scrollTop === 0 ) {
+				return;
+			}
+
+			const scrollContainerRect = scrollContainer.getBoundingClientRect();
+
+			// Abort if the target scroll position would scroll the caret out of
+			// view.
+			if (
+				this.caretRect.y + this.caretRect.height >
+					scrollContainerRect.y + scrollContainer.clientHeight ||
+				this.caretRect.y < scrollContainerRect.y
+			) {
 				return;
 			}
 
