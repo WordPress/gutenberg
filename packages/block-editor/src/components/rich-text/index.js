@@ -9,7 +9,7 @@ import { omit } from 'lodash';
  */
 import { RawHTML, Component } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
-import { pasteHandler, children, getBlockTransforms, findTransform } from '@wordpress/blocks';
+import { pasteHandler, children as childrenSource, getBlockTransforms, findTransform } from '@wordpress/blocks';
 import { withInstanceId, compose } from '@wordpress/compose';
 import {
 	RichText,
@@ -36,11 +36,25 @@ import Autocomplete from '../autocomplete';
 import BlockFormatControls from '../block-format-controls';
 import FormatToolbar from './format-toolbar';
 import { withBlockEditContext } from '../block-edit/context';
-import { ListEdit } from './list-edit';
 import { RemoveBrowserShortcuts } from './remove-browser-shortcuts';
 
 const wrapperClasses = 'editor-rich-text block-editor-rich-text';
 const classes = 'editor-rich-text__editable block-editor-rich-text__editable';
+
+/**
+ * Get the multiline tag based on the multiline prop.
+ *
+ * @param {?(string|boolean)} multiline The multiline prop.
+ *
+ * @return {?string} The multiline tag.
+ */
+function getMultilineTag( multiline ) {
+	if ( multiline !== true && multiline !== 'p' && multiline !== 'li' ) {
+		return;
+	}
+
+	return multiline === true ? 'p' : multiline;
+}
 
 class RichTextWrapper extends Component {
 	constructor() {
@@ -102,7 +116,13 @@ class RichTextWrapper extends Component {
 	}
 
 	onPaste( { value, onChange, html, plainText, image } ) {
-		const { onReplace, onSplit, tagName, canUserUseUnfilteredHTML } = this.props;
+		const {
+			onReplace,
+			onSplit,
+			tagName,
+			canUserUseUnfilteredHTML,
+			multiline,
+		} = this.props;
 
 		if ( image && ! html ) {
 			const file = image.getAsFile ? image.getAsFile() : image;
@@ -149,7 +169,7 @@ class RichTextWrapper extends Component {
 
 			// If the content should be multiline, we should process text
 			// separated by a line break as separate lines.
-			if ( this.multilineTag ) {
+			if ( multiline ) {
 				valueToInsert = replace( valueToInsert, /\n+/g, LINE_SEPARATOR );
 			}
 
@@ -187,6 +207,7 @@ class RichTextWrapper extends Component {
 		const blocks = [];
 		const [ before, after ] = split( record );
 		const hasPastedBlocks = pastedBlocks.length > 0;
+		const multilineTag = getMultilineTag( multiline );
 
 		// Create a block with the content before the caret if there's no pasted
 		// blocks, or if there are pasted blocks and the value is not empty.
@@ -195,7 +216,7 @@ class RichTextWrapper extends Component {
 		if ( ! hasPastedBlocks || ! isEmpty( before ) ) {
 			blocks.push( onSplit( toHTMLString( {
 				value: before,
-				multilineTag: multiline,
+				multilineTag,
 			} ) ) );
 		}
 
@@ -212,7 +233,7 @@ class RichTextWrapper extends Component {
 		if ( hasPastedBlocks || ! onSplitMiddle || ! isEmpty( after ) ) {
 			blocks.push( onSplit( toHTMLString( {
 				value: after,
-				multilineTag: multiline,
+				multilineTag,
 			} ) ) );
 		}
 
@@ -274,6 +295,7 @@ class RichTextWrapper extends Component {
 
 	render() {
 		const {
+			children,
 			tagName,
 			value: originalValue,
 			onChange: originalOnChange,
@@ -281,7 +303,6 @@ class RichTextWrapper extends Component {
 			selectionEnd,
 			onSelectionChange,
 			multiline,
-			onTagNameChange,
 			inlineToolbar,
 			wrapperClassName,
 			className,
@@ -310,9 +331,13 @@ class RichTextWrapper extends Component {
 			identifier,
 			// eslint-disable-next-line no-unused-vars
 			instanceId,
+			// To do: find a better way to implicitly inherit props.
+			start,
+			reversed,
 			// From experimental filter. To do: pick props instead.
 			...experimentalProps
 		} = this.props;
+		const multilineTag = getMultilineTag( multiline );
 
 		const adjustedAllowedFormats = this.getAllowedFormats();
 		const hasFormats = ! adjustedAllowedFormats || adjustedAllowedFormats.length > 0;
@@ -321,13 +346,13 @@ class RichTextWrapper extends Component {
 
 		// Handle deprecated format.
 		if ( Array.isArray( originalValue ) ) {
-			adjustedValue = children.toHTML( originalValue );
-			adjustedOnChange = ( newValue ) => originalOnChange( children.fromDOM(
+			adjustedValue = childrenSource.toHTML( originalValue );
+			adjustedOnChange = ( newValue ) => originalOnChange( childrenSource.fromDOM(
 				__unstableCreateElement( document, newValue ).childNodes
 			) );
 		}
 
-		return (
+		const content = (
 			<RichText
 				{ ...experimentalProps }
 				value={ adjustedValue }
@@ -336,7 +361,6 @@ class RichTextWrapper extends Component {
 				selectionEnd={ selectionEnd }
 				onSelectionChange={ onSelectionChange }
 				tagName={ tagName }
-				wrapperClassName={ classnames( wrapperClasses, wrapperClassName ) }
 				className={ classnames( classes, className, { 'is-selected': originalIsSelected } ) }
 				placeholder={ placeholder }
 				allowedFormats={ adjustedAllowedFormats }
@@ -346,25 +370,15 @@ class RichTextWrapper extends Component {
 				onPaste={ this.onPaste }
 				__unstableIsSelected={ originalIsSelected }
 				__unstableInputRule={ this.inputRule }
-				__unstableAutocomplete={ Autocomplete }
-				__unstableAutocompleters={ autocompleters }
-				__unstableOnReplace={ onReplace }
-				__unstableMultiline={ multiline }
+				__unstableMultilineTag={ multilineTag }
 				__unstableIsCaretWithinFormattedText={ isCaretWithinFormattedText }
 				__unstableOnEnterFormattedText={ onEnterFormattedText }
 				__unstableOnExitFormattedText={ onExitFormattedText }
 				__unstableOnCreateUndoLevel={ onCreateUndoLevel }
 			>
-				{ ( { isSelected, value, onChange } ) =>
+				{ ( { isSelected, value, onChange, Editable } ) =>
 					<>
-						{ isSelected && multiline === 'li' && (
-							<ListEdit
-								onTagNameChange={ onTagNameChange }
-								tagName={ tagName }
-								value={ value }
-								onChange={ onChange }
-							/>
-						) }
+						{ children && children( { value, onChange } ) }
 						{ isSelected && ! inlineToolbar && hasFormats && (
 							<BlockFormatControls>
 								<FormatToolbar />
@@ -378,9 +392,31 @@ class RichTextWrapper extends Component {
 							</IsolatedEventContainer>
 						) }
 						{ isSelected && <RemoveBrowserShortcuts /> }
+						<Autocomplete
+							onReplace={ onReplace }
+							completers={ autocompleters }
+							record={ value }
+							onChange={ onChange }
+						>
+							{ ( { listBoxId, activeId } ) =>
+								<Editable
+									aria-autocomplete={ listBoxId ? 'list' : undefined }
+									aria-owns={ listBoxId }
+									aria-activedescendant={ activeId }
+									start={ start }
+									reversed={ reversed }
+								/>
+							}
+						</Autocomplete>
 					</>
 				}
 			</RichText>
+		);
+
+		return (
+			<div className={ classnames( wrapperClasses, wrapperClassName ) }>
+				{ content }
+			</div>
 		);
 	}
 }
@@ -444,23 +480,18 @@ const RichTextContainer = compose( [
 ] )( RichTextWrapper );
 
 RichTextContainer.Content = ( { value, tagName: Tag, multiline, ...props } ) => {
-	let html = value;
-	let MultilineTag;
-
-	if ( multiline === true || multiline === 'p' || multiline === 'li' ) {
-		MultilineTag = multiline === true ? 'p' : multiline;
-	}
-
 	// Handle deprecated `children` and `node` sources.
 	if ( Array.isArray( value ) ) {
-		html = children.toHTML( value );
+		value = childrenSource.toHTML( value );
 	}
 
-	if ( ! html && MultilineTag ) {
-		html = `<${ MultilineTag }></${ MultilineTag }>`;
+	const MultilineTag = getMultilineTag( multiline );
+
+	if ( ! value && MultilineTag ) {
+		value = `<${ MultilineTag }></${ MultilineTag }>`;
 	}
 
-	const content = <RawHTML>{ html }</RawHTML>;
+	const content = <RawHTML>{ value }</RawHTML>;
 
 	if ( Tag ) {
 		return <Tag { ...omit( props, [ 'format' ] ) }>{ content }</Tag>;
@@ -469,13 +500,8 @@ RichTextContainer.Content = ( { value, tagName: Tag, multiline, ...props } ) => 
 	return content;
 };
 
-RichTextContainer.isEmpty = ( value = '' ) => {
-	// Handle deprecated `children` and `node` sources.
-	if ( Array.isArray( value ) ) {
-		return ! value || value.length === 0;
-	}
-
-	return value.length === 0;
+RichTextContainer.isEmpty = ( value ) => {
+	return ! value || value.length === 0;
 };
 
 RichTextContainer.Content.defaultProps = {
