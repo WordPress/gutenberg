@@ -31,7 +31,7 @@
 
 	&:hover {
 		.block-editor-inserter-with-shortcuts {
-			@include edit-post__fade-in-animation;
+			@include fade-in-animation;
 		}
 	}
 
