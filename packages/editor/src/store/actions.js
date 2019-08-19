@@ -156,7 +156,7 @@ export function* setupEditor( post, edits, template ) {
 	if ( has( edits, [ 'content' ] ) ) {
 		content = edits.content;
 	} else {
-		content = post.content;
+		content = post.content.raw || post.content;
 	}
 
 	let blocks = parse( content );
@@ -381,40 +381,51 @@ export function* savePost( options = {} ) {
 	} );
 
 	yield __experimentalRequestPostUpdateStart( options );
-	const postType = yield select( 'core/editor', 'getCurrentPostType' );
-	const postId = yield select( 'core/editor', 'getCurrentPostId' );
+	const previousRecord = yield select( 'core/editor', 'getCurrentPost' );
+	const edits = {
+		id: previousRecord.id,
+		...( yield select(
+			'core',
+			'getEntityRecordNonTransientEdits',
+			'postType',
+			previousRecord.type,
+			previousRecord.id
+		) ),
+	};
 	yield dispatch(
 		'core',
-		'saveEditedEntityRecord',
+		'saveEntityRecord',
 		'postType',
-		postType,
-		postId,
-		{
-			...options,
-			getSuccessNoticeActionArgs: ( previousEntity, entity, type ) => {
-				const args = getNotificationArgumentsForSaveSuccess( {
-					previousPost: previousEntity,
-					post: entity,
-					postType: type,
-					options,
-				} );
-				if ( args && args.length ) {
-					return [ 'core/notices', 'createSuccessNotice', ...args ];
-				}
-			},
-			getFailureNoticeActionArgs: ( previousEntity, edits, error ) => {
-				const args = getNotificationArgumentsForSaveFail( {
-					post: previousEntity,
-					edits,
-					error,
-				} );
-				if ( args && args.length ) {
-					return [ 'core/notices', 'createErrorNotice', ...args ];
-				}
-			},
-		}
+		previousRecord.type,
+		edits,
+		options
 	);
 	yield __experimentalRequestPostUpdateFinish( options );
+
+	const error = yield select( 'core', 'getLastEntitySaveError' );
+	if ( error ) {
+		yield dispatch(
+			'core/notices',
+			'createErrorNotice',
+			...getNotificationArgumentsForSaveFail( {
+				post: previousRecord,
+				edits,
+				error,
+			} )
+		);
+	} else {
+		const updatedRecord = yield select( 'core/editor', 'getCurrentPost' );
+		yield dispatch(
+			'core/notices',
+			'createSuccessNotice',
+			...getNotificationArgumentsForSaveSuccess( {
+				previousPost: previousRecord,
+				post: updatedRecord,
+				postType: yield select( 'core', 'getPostType', updatedRecord.type ),
+				options,
+			} )
+		);
+	}
 }
 
 /**
@@ -692,7 +703,7 @@ export function disablePublishSidebar() {
  * @example
  * ```
  * const { subscribe } = wp.data;
-
+ *
  * const initialPostStatus = wp.data.select( 'core/editor' ).getEditedPostAttribute( 'status' );
  *
  * // Only allow publishing posts that are set to a future date.
