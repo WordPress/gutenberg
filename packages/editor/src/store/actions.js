@@ -206,7 +206,7 @@ export function* __experimentalSubscribeSources() {
 
 		// The bailout case: If the editor becomes unmounted, it will flag
 		// itself as non-ready. Effectively unsubscribes from the registry.
-		const isStillReady = yield select( 'core/editor', '__unstableIsEditorReady' );
+		const isStillReady = yield select( STORE_KEY, '__unstableIsEditorReady' );
 		if ( ! isStillReady ) {
 			break;
 		}
@@ -238,7 +238,7 @@ export function* __experimentalSubscribeSources() {
 		}
 
 		if ( reset ) {
-			yield resetEditorBlocks( yield select( 'core/editor', 'getEditorBlocks' ), { __unstableShouldCreateUndoLevel: false } );
+			yield resetEditorBlocks( yield select( STORE_KEY, 'getEditorBlocks' ), { __unstableShouldCreateUndoLevel: false } );
 		}
 	}
 }
@@ -348,7 +348,7 @@ export function setupEditorState( post ) {
  * @yield {Object} Action object or control.
  */
 export function* editPost( edits ) {
-	const { id, type } = yield select( 'core/editor', 'getCurrentPost' );
+	const { id, type } = yield select( STORE_KEY, 'getCurrentPost' );
 	yield dispatch( 'core', 'editEntityRecord', 'postType', type, id, edits );
 }
 
@@ -377,11 +377,11 @@ export function* savePost( options = {} ) {
 		return;
 	}
 	yield dispatch( STORE_KEY, 'editPost', {
-		content: yield select( 'core/editor', 'getEditedPostContent' ),
+		content: yield select( STORE_KEY, 'getEditedPostContent' ),
 	} );
 
 	yield __experimentalRequestPostUpdateStart( options );
-	const previousRecord = yield select( 'core/editor', 'getCurrentPost' );
+	const previousRecord = yield select( STORE_KEY, 'getCurrentPost' );
 	const edits = {
 		id: previousRecord.id,
 		...( yield select(
@@ -414,7 +414,7 @@ export function* savePost( options = {} ) {
 			} )
 		);
 	} else {
-		const updatedRecord = yield select( 'core/editor', 'getCurrentPost' );
+		const updatedRecord = yield select( STORE_KEY, 'getCurrentPost' );
 		yield dispatch(
 			'core/notices',
 			'createSuccessNotice',
