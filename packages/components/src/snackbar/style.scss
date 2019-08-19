@@ -41,6 +41,12 @@
 			text-decoration: none;
 		}
 	}
+
+	&:focus {
+		background-color: transparent;
+		box-shadow: none;
+		color: $white;
+	}
 }
 
 .components-snackbar__content {
