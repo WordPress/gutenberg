@@ -13,6 +13,7 @@ import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
 
 const isIE = window.navigator.userAgent.indexOf( 'Trident' ) !== -1;
 const arrowKeyCodes = new Set( [ UP, DOWN, LEFT, RIGHT ] );
+const initialTriggerPercentage = 0.75;
 
 class Typewriter extends Component {
 	constructor() {
@@ -123,6 +124,11 @@ class Typewriter extends Component {
 		const editableNodes = this.ref.current.querySelectorAll( '[contenteditable="true"]' );
 		const lastEditableNode = editableNodes[ editableNodes.length - 1 ];
 		const isLastEditableNode = lastEditableNode === document.activeElement;
+		const scrollContainerRect = scrollContainer.getBoundingClientRect();
+		const relativeScrollPosition = (
+			( this.caretRect.y - scrollContainerRect.y ) /
+			( window.innerHeight - scrollContainerRect.y )
+		);
 
 		// The scroll container may be different depending on the viewport
 		// width.
@@ -131,7 +137,11 @@ class Typewriter extends Component {
 		// The typewriter effect should not kick in until an empty page has been
 		// filled or the user scrolls intentionally down.
 		if ( scrollContainer === document.body ) {
-			if ( isLastEditableNode && window.scrollY === 0 ) {
+			if (
+				isLastEditableNode &&
+				window.scrollY === 0 &&
+				relativeScrollPosition < initialTriggerPercentage
+			) {
 				this.caretRect = currentCaretRect;
 				return;
 			}
@@ -148,12 +158,14 @@ class Typewriter extends Component {
 
 			window.scrollBy( 0, diff );
 		} else {
-			if ( isLastEditableNode && scrollContainer.scrollTop === 0 ) {
+			if (
+				isLastEditableNode &&
+				scrollContainer.scrollTop === 0 &&
+				relativeScrollPosition < initialTriggerPercentage
+			) {
 				this.caretRect = currentCaretRect;
 				return;
 			}
-
-			const scrollContainerRect = scrollContainer.getBoundingClientRect();
 
 			// Abort if the target scroll position would scroll the caret out of
 			// view.
