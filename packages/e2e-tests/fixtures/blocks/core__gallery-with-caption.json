@@ -20,7 +20,7 @@
                 null,
                 null
             ],
-            "galleryCaption": "Gallery caption.",
+            "caption": "Gallery caption.",
             "imageCrop": true,
             "linkTo": "none"
         },

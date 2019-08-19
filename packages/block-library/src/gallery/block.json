@@ -48,7 +48,7 @@
 		"columns": {
 			"type": "number"
 		},
-		"galleryCaption": {
+		"caption": {
 			"type": "string",
 			"source": "html",
 			"selector": "figcaption"
