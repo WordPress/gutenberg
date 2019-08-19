@@ -24,7 +24,6 @@ import {
 	getBlockType,
 	getBlockTypes,
 	hasBlockSupport,
-	hasChildBlocksWithInserterSupport,
 } from '@wordpress/blocks';
 
 // Module constants
@@ -1241,7 +1240,6 @@ export const getInserterItems = createSelector(
 				isDisabled,
 				utility: calculateUtility( blockType.category, count, isContextual ),
 				frecency: calculateFrecency( time, count ),
-				hasChildBlocksWithInserterSupport: hasChildBlocksWithInserterSupport( blockType.name ),
 			};
 		};
 
