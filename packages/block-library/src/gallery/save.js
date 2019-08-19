@@ -9,7 +9,7 @@ import { RichText } from '@wordpress/block-editor';
 import { defaultColumnsNumber } from './shared';
 
 export default function save( { attributes } ) {
-	const { images, columns = defaultColumnsNumber( attributes ), imageCrop, caption: galleryCaption, linkTo } = attributes;
+	const { images, columns = defaultColumnsNumber( attributes ), imageCrop, galleryCaption, linkTo } = attributes;
 	const baseGallery = (
 		<>
 			{ images.map( ( image ) => {
