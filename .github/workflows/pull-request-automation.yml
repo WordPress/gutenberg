@@ -1,0 +1,15 @@
+on: pull_request
+name: Pull request automation
+
+jobs:
+  pull-request-automation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - run: npm install
+        env:
+          PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: true
+      - run: npm run build:packages
+      - uses: ./packages/pull-request-automation
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}

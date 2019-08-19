@@ -1350,6 +1350,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/pull-request-automation",
+		"slug": "packages-pull-request-automation",
+		"markdown_source": "../packages/pull-request-automation/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/redux-routine",
 		"slug": "packages-redux-routine",
 		"markdown_source": "../packages/redux-routine/README.md",
