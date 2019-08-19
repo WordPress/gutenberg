@@ -23,7 +23,7 @@ import {
  * Internal dependencies
  */
 import { name } from './';
-import AdditionalSettings from './additional-settings';
+import OrderedListSettings from './ordered-list-settings';
 
 export default function ListEdit( {
 	attributes,
@@ -138,11 +138,12 @@ export default function ListEdit( {
 		>
 			{ controls }
 		</RichText>
-		<AdditionalSettings
-			setAttributes={ setAttributes }
-			ordered={ ordered }
-			reversed={ reversed }
-			start={ start }
-		/>
+		{ ordered && (
+			<OrderedListSettings
+				setAttributes={ setAttributes }
+				ordered={ ordered }
+				reversed={ reversed }
+				start={ start }
+			/> ) }
 	</>;
 }
