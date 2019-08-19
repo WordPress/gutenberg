@@ -132,6 +132,7 @@ class Typewriter extends Component {
 		// filled or the user scrolls intentionally down.
 		if ( scrollContainer === document.body ) {
 			if ( isLastEditableNode && window.scrollY === 0 ) {
+				this.caretRect = currentCaretRect;
 				return;
 			}
 
@@ -141,12 +142,14 @@ class Typewriter extends Component {
 				this.caretRect.y + this.caretRect.height > window.innerHeight ||
 				this.caretRect.y < 0
 			) {
+				this.caretRect = currentCaretRect;
 				return;
 			}
 
 			window.scrollBy( 0, diff );
 		} else {
 			if ( isLastEditableNode && scrollContainer.scrollTop === 0 ) {
+				this.caretRect = currentCaretRect;
 				return;
 			}
 
@@ -159,6 +162,7 @@ class Typewriter extends Component {
 					scrollContainerRect.y + scrollContainer.clientHeight ||
 				this.caretRect.y < scrollContainerRect.y
 			) {
+				this.caretRect = currentCaretRect;
 				return;
 			}
 
