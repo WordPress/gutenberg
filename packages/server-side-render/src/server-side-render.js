@@ -83,14 +83,20 @@ export class ServerSideRender extends Component {
 
 	render() {
 		const response = this.state.response;
-		const { className, emptyResponsePlaceholder, errorResponsePlaceholder, loadingResponsePlaceholder } = this.props;
+		const { className, EmptyResponsePlaceholder, ErrorResponsePlaceholder, LoadingResponsePlaceholder } = this.props;
 
 		if ( response === '' ) {
-			return emptyResponsePlaceholder( this.props, response );
+			return (
+				<EmptyResponsePlaceholder response={ response } { ...this.props } />
+			);
 		} else if ( ! response ) {
-			return loadingResponsePlaceholder( this.props, response );
+			return (
+				<LoadingResponsePlaceholder response={ response } { ...this.props } />
+			);
 		} else if ( response.error ) {
-			return errorResponsePlaceholder( this.props, response );
+			return (
+				<ErrorResponsePlaceholder response={ response } { ...this.props } />
+			);
 		}
 
 		return (
@@ -105,20 +111,16 @@ export class ServerSideRender extends Component {
 }
 
 ServerSideRender.defaultProps = {
-	emptyResponsePlaceholder: ( props ) => {
-		const { className } = props;
-		return (
-			<Placeholder
-				className={ className }
-			>
-				{ __( 'Block rendered as empty.' ) }
-			</Placeholder>
-		);
-	},
-	errorResponsePlaceholder: ( props, response ) => {
+	EmptyResponsePlaceholder: ( { className } ) => (
+		<Placeholder
+			className={ className }
+		>
+			{ __( 'Block rendered as empty.' ) + className }
+		</Placeholder>
+	),
+	ErrorResponsePlaceholder: ( { response, className } ) => {
 		// translators: %s: error message describing the problem
 		const errorMessage = sprintf( __( 'Error loading block: %s' ), response.errorMsg );
-		const { className } = props;
 		return (
 			<Placeholder
 				className={ className }
@@ -127,8 +129,7 @@ ServerSideRender.defaultProps = {
 			</Placeholder>
 		);
 	},
-	loadingResponsePlaceholder: ( props ) => {
-		const { className } = props;
+	LoadingResponsePlaceholder: ( { className } ) => {
 		return (
 			<Placeholder
 				className={ className }
