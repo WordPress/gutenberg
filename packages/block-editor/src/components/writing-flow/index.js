@@ -72,6 +72,28 @@ export function isNavigationCandidate( element, keyCode, hasModifier ) {
 	return tagName !== 'INPUT' && tagName !== 'TEXTAREA';
 }
 
+/**
+ * From the point determined by the x and y position, search using the increment until finding
+ * a tabbable text field or until the number of searches expires.
+ *
+ * @param {number} xPosition The horizontal starting position.
+ * @param {number} yPosition The vertical starting position.
+ * @param {number} increment The size of the increment from the starting position.
+ * @param {number} searches  The number of searches to perform.
+ */
+function searchVerticallyForTabbableTextField( xPosition, yPosition, increment = 5, searches = 10 ) {
+	if ( searches === 0 ) {
+		return;
+	}
+
+	const element = document.elementFromPoint( xPosition, yPosition );
+	if ( element && isTabbableTextField( element ) ) {
+		return element;
+	}
+
+	return searchVerticallyForTabbableTextField( xPosition, yPosition + increment, increment, searches - 1 );
+}
+
 class WritingFlow extends Component {
 	constructor() {
 		super( ...arguments );
@@ -123,7 +145,7 @@ class WritingFlow extends Component {
 	 *
 	 * @return {?Element} Optimal tab target, if one exists.
 	 */
-	getClosestTabbable( target, isReverse ) {
+	getClosestHorizontalTabbable( target, isReverse ) {
 		// Since the current focus target is not guaranteed to be a text field,
 		// find all focusables. Tabbability is considered later.
 		let focusableNodes = focus.focusable.find( this.container );
@@ -137,7 +159,7 @@ class WritingFlow extends Component {
 		// (on its keydown event), so no need to verify it exists in the set.
 		focusableNodes = focusableNodes.slice( focusableNodes.indexOf( target ) + 1 );
 
-		function isTabCandidate( node, i, array ) {
+		function isTabCandidate( node, nodeIndex, nodeArray ) {
 			// Not a candidate if the node is not tabbable.
 			if ( ! focus.tabbable.isTabbableIndex( node ) ) {
 				return false;
@@ -167,7 +189,7 @@ class WritingFlow extends Component {
 
 			// In case of block focus stop, check to see if there's a better
 			// text field candidate within.
-			for ( let offset = 1, nextNode; ( nextNode = array[ i + offset ] ); offset++ ) {
+			for ( let offset = 1, nextNode; ( nextNode = nodeArray[ nodeIndex + offset ] ); offset++ ) {
 				// Abort if no longer testing descendents of focus stop.
 				if ( ! node.contains( nextNode ) ) {
 					break;
@@ -176,7 +198,7 @@ class WritingFlow extends Component {
 				// Apply same tests by recursion. This is important to consider
 				// nestable blocks where we don't want to settle for the inner
 				// block focus stop.
-				if ( isTabCandidate( nextNode, i + offset, array ) ) {
+				if ( isTabCandidate( nextNode, nodeIndex + offset, nodeArray ) ) {
 					return false;
 				}
 			}
@@ -185,6 +207,47 @@ class WritingFlow extends Component {
 		}
 
 		return find( focusableNodes, isTabCandidate );
+	}
+
+	getClosestVerticalTabbable( target, isReverse ) {
+		let tabbable;
+
+		// Start searching from the caret position.
+		const caretRect = computeCaretRect();
+		const { left: xPosition } = caretRect || {};
+		const { top: targetTop, bottom: targetBottom, left: targetLeft, right: targetRight } = target.getBoundingClientRect();
+
+		// Search vertically in a 10px increment as most text fields should be taller than 10px.
+		const verticalIncrement = isReverse ? -10 : 10;
+		const startYPosition = ( isReverse ? targetTop : targetBottom ) + verticalIncrement;
+
+		// Make an initial vertical search from the caret's position.
+		tabbable = searchVerticallyForTabbableTextField( xPosition, startYPosition, verticalIncrement );
+		if ( tabbable ) {
+			return tabbable;
+		}
+
+		// Search around the caret, taking up to 10 steps in either direction horizontally before giving up.
+		const width = targetRight - targetLeft;
+		const horizontalIncrement = width / 10;
+
+		for ( let searches = 1; searches <= 10; searches++ ) {
+			const positionToRightOfCaret = xPosition + ( horizontalIncrement * searches );
+			if ( positionToRightOfCaret <= targetRight ) {
+				tabbable = searchVerticallyForTabbableTextField( positionToRightOfCaret, startYPosition, verticalIncrement );
+				if ( tabbable ) {
+					return tabbable;
+				}
+			}
+
+			const positionToLeftOfCaret = xPosition - ( horizontalIncrement * searches );
+			if ( positionToLeftOfCaret >= targetLeft ) {
+				tabbable = searchVerticallyForTabbableTextField( positionToLeftOfCaret, startYPosition, verticalIncrement );
+				if ( tabbable ) {
+					return tabbable;
+				}
+			}
+		}
 	}
 
 	expandSelection( isReverse ) {
@@ -229,7 +292,7 @@ class WritingFlow extends Component {
 	 * @return {boolean} Whether field is at edge for tab transition.
 	 */
 	isTabbableEdge( target, isReverse ) {
-		const closestTabbable = this.getClosestTabbable( target, isReverse );
+		const closestTabbable = this.getClosestHorizontalTabbable( target, isReverse );
 		return ! closestTabbable || ! isInSameBlock( target, closestTabbable );
 	}
 
@@ -335,7 +398,7 @@ class WritingFlow extends Component {
 		// In the case of RTL scripts, right means previous and left means next,
 		// which is the exact reverse of LTR.
 		const { direction } = getComputedStyle( target );
-		const isReverseDir = direction === 'rtl' ? ( ! isReverse ) : isReverse;
+		const isReverseDir = isHorizontal && direction === 'rtl' ? ! isReverse : isReverse;
 
 		if ( isShift ) {
 			if (
@@ -360,14 +423,14 @@ class WritingFlow extends Component {
 			this.moveSelection( isReverse );
 			event.preventDefault();
 		} else if ( isVertical && isVerticalEdge( target, isReverse ) ) {
-			const closestTabbable = this.getClosestTabbable( target, isReverse );
+			const closestTabbable = this.getClosestVerticalTabbable( target, isReverse );
 
 			if ( closestTabbable ) {
 				placeCaretAtVerticalEdge( closestTabbable, isReverse, this.verticalRect );
 				event.preventDefault();
 			}
 		} else if ( isHorizontal && getSelection().isCollapsed && isHorizontalEdge( target, isReverseDir ) ) {
-			const closestTabbable = this.getClosestTabbable( target, isReverseDir );
+			const closestTabbable = this.getClosestHorizontalTabbable( target, isReverseDir );
 			placeCaretAtHorizontalEdge( closestTabbable, isReverseDir );
 			event.preventDefault();
 		}
