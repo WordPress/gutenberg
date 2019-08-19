@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { registerStore } from '@wordpress/data';
-import { controls as dataControls } from '@wordpress/data-controls';
 
 /**
  * Internal dependencies
@@ -44,7 +43,7 @@ const entityActions = defaultEntities.reduce( ( result, entity ) => {
 
 registerStore( REDUCER_KEY, {
 	reducer,
-	controls: { ...dataControls, ...controls },
+	controls,
 	actions: { ...actions, ...entityActions },
 	selectors: { ...selectors, ...entitySelectors },
 	resolvers: { ...resolvers, ...entityResolvers },

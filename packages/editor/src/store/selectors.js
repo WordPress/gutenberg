@@ -490,7 +490,7 @@ export function isEditedPostEmpty( state ) {
 	// default logic.
 	const blocks = getEditorBlocks( state );
 
-	if ( blocks.length && ! ( 'content' in getPostEdits( state ) ) ) {
+	if ( blocks.length ) {
 		// Pierce the abstraction of the serializer in knowing that blocks are
 		// joined with with newlines such that even if every individual block
 		// produces an empty save result, the serialized content is non-empty.
@@ -861,7 +861,13 @@ export const getEditedPostContent = createRegistrySelector( ( select ) => ( stat
 		postId
 	);
 	if ( record ) {
-		return record.blocks ? serializeBlocks( record.blocks ) : record.content || '';
+		if ( typeof record.content === 'function' ) {
+			return record.content( record );
+		} else if ( record.blocks ) {
+			return serializeBlocks( record.blocks );
+		} else if ( record.content ) {
+			return record.content;
+		}
 	}
 	return '';
 } );

@@ -23,7 +23,6 @@ import { RawHTML } from '@wordpress/element';
 import * as _selectors from '../selectors';
 import { PREFERENCES_DEFAULTS } from '../defaults';
 import { POST_UPDATE_TRANSACTION_ID } from '../constants';
-import serializeBlocks from '../utils/serialize-blocks';
 
 const selectors = { ..._selectors };
 const selectorNames = Object.keys( selectors );
@@ -61,16 +60,9 @@ selectorNames.forEach( ( name ) => {
 			},
 
 			getEditedEntityRecord() {
-				let edits = this.getEntityRecordEdits();
-				if ( edits.content === undefined && edits.blocks ) {
-					edits = {
-						...edits,
-						content: serializeBlocks( edits.blocks ),
-					};
-				}
 				return {
 					...this.getRawEntityRecord(),
-					...edits,
+					...this.getEntityRecordEdits(),
 				};
 			},
 
