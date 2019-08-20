@@ -205,7 +205,7 @@ class Typewriter extends Component {
 		// There are some issues with Internet Explorer, which are probably not
 		// worth spending time on. Let's disable it.
 		if ( isIE ) {
-			return null;
+			return this.props.children;
 		}
 
 		// Disable reason: Wrapper itself is non-interactive, but must capture
