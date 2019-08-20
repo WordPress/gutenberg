@@ -10,8 +10,16 @@
 	justify-content: center;
 }
 
+.unsupportedBlockDark {
+	background-color: #1e2327;
+}
+
 .unsupportedBlockIcon {
 	color: $gray-dark;
+}
+
+.unsupportedBlockIconDark {
+	color: $white;
 }
 
 .unsupportedBlockMessage {
@@ -19,4 +27,8 @@
 	text-align: center;
 	color: $gray-dark;
 	font-size: 14;
+}
+
+.unsupportedBlockMessageDark {
+	color: $white;
 }
