@@ -3,14 +3,6 @@
  */
 import { StyleSheet, TouchableOpacity, Text, View, Platform } from 'react-native';
 
-/**
- * WordPress dependencies
- */
-/**
- * Internal dependencies
- */
-import { useStyle, withTheme } from '../mobile/dark-mode';
-
 const isAndroid = Platform.OS === 'android';
 const marginBottom = isAndroid ? -0.5 : 0;
 const marginLeft = -3;
@@ -28,10 +20,6 @@ const styles = StyleSheet.create( {
 		justifyContent: 'center',
 		alignItems: 'center',
 		aspectRatio: 1,
-		backgroundColor: 'white',
-	},
-	buttonInactiveDark: {
-		backgroundColor: 'black',
 	},
 	buttonActive: {
 		flex: 1,
@@ -61,7 +49,7 @@ const styles = StyleSheet.create( {
 	},
 } );
 
-export function Button( props ) {
+export default function Button( props ) {
 	const {
 		children,
 		onClick,
@@ -71,15 +59,13 @@ export function Button( props ) {
 		'aria-label': ariaLabel,
 		'aria-pressed': ariaPressed,
 		'data-subscript': subscript,
-		theme,
 	} = props;
 
 	const isDisabled = ariaDisabled || disabled;
-	const buttonInactiveStyle = useStyle( styles.buttonInactive, styles.buttonInactiveDark, theme );
 
 	const buttonViewStyle = {
 		opacity: isDisabled ? 0.2 : 1,
-		...( ariaPressed ? styles.buttonActive : buttonInactiveStyle ),
+		...( ariaPressed ? styles.buttonActive : styles.buttonInactive ),
 	};
 
 	const states = [];
@@ -112,5 +98,3 @@ export function Button( props ) {
 		</TouchableOpacity>
 	);
 }
-
-export default withTheme( Button );
