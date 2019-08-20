@@ -35,10 +35,6 @@ describe( 'TypeWriter', () => {
 			await page.keyboard.press( 'Enter' );
 		}
 
-		// Debounce time for the scroll event listener.
-		// eslint-disable-next-line no-restricted-syntax
-		await page.waitFor( 100 );
-
 		const newPosition = await getCaretPosition();
 
 		// Now the scroll position should be maintained.
@@ -82,10 +78,6 @@ describe( 'TypeWriter', () => {
 		await page.evaluate( () =>
 			wp.dom.getScrollContainer( document.activeElement ).scrollTop = 1
 		);
-
-		// Debounce time for the scroll event listener.
-		// eslint-disable-next-line no-restricted-syntax
-		await page.waitFor( 100 );
 
 		const initialPosition = await getCaretPosition();
 
@@ -137,10 +129,6 @@ describe( 'TypeWriter', () => {
 		// Should scroll the caret back into view (preserve browser behaviour).
 		await page.keyboard.type( 'a' );
 
-		// Debounce time for the scroll event listener.
-		// eslint-disable-next-line no-restricted-syntax
-		await page.waitFor( 100 );
-
 		const newBottomPosition = await getCaretPosition();
 
 		expect( newBottomPosition ).toBeLessThan( bottomPostition );
@@ -167,10 +155,6 @@ describe( 'TypeWriter', () => {
 
 		// Should scroll the caret back into view (preserve browser behaviour).
 		await page.keyboard.type( 'a' );
-
-		// Debounce time for the scroll event listener.
-		// eslint-disable-next-line no-restricted-syntax
-		await page.waitFor( 100 );
 
 		const newTopPosition = await getCaretPosition();
 

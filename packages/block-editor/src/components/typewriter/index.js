@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { debounce } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { Component, createRef } from '@wordpress/element';
@@ -25,23 +20,29 @@ class Typewriter extends Component {
 		this.computeCaretRectOnSelectionChange = this.computeCaretRectOnSelectionChange.bind( this );
 		this.maintainCaretPosition = this.maintainCaretPosition.bind( this );
 		this.computeCaretRect = this.computeCaretRect.bind( this );
-		this.debouncedComputeCaretRect = debounce( this.computeCaretRect, 100 );
+		this.onScrollResize = this.onScrollResize.bind( this );
 		this.isSelectionEligibleForScroll = this.isSelectionEligibleForScroll.bind( this );
 	}
 
 	componentDidMount() {
 		// When the user scrolls or resizes, the scroll position should be
 		// reset.
-		window.addEventListener( 'scroll', this.debouncedComputeCaretRect, true );
-		window.addEventListener( 'resize', this.debouncedComputeCaretRect, true );
+		window.addEventListener( 'scroll', this.onScrollResize, true );
+		window.addEventListener( 'resize', this.onScrollResize, true );
 	}
 
 	componentWillUnmount() {
-		window.removeEventListener( 'scroll', this.debouncedComputeCaretRect, true );
-		window.removeEventListener( 'resize', this.debouncedComputeCaretRect, true );
+		window.removeEventListener( 'scroll', this.onScrollResize, true );
+		window.removeEventListener( 'resize', this.onScrollResize, true );
 		document.removeEventListener( 'selectionchange', this.computeCaretRectOnSelectionChange );
-		window.cancelAnimationFrame( this.rafId );
-		this.debouncedComputeCaretRect.cancel();
+
+		if ( this.onScrollResize.rafId ) {
+			window.cancelAnimationFrame( this.onScrollResize.rafId );
+		}
+
+		if ( this.onKeyDown.rafId ) {
+			window.cancelAnimationFrame( this.onKeyDown.rafId );
+		}
 	}
 
 	/**
@@ -60,6 +61,17 @@ class Typewriter extends Component {
 	computeCaretRectOnSelectionChange() {
 		document.removeEventListener( 'selectionchange', this.computeCaretRectOnSelectionChange );
 		this.computeCaretRect();
+	}
+
+	onScrollResize() {
+		if ( this.onScrollResize.rafId ) {
+			return;
+		}
+
+		this.onScrollResize.rafId = window.requestAnimationFrame( () => {
+			this.computeCaretRect();
+			delete this.onScrollResize.rafId;
+		} );
 	}
 
 	/**
@@ -193,12 +205,17 @@ class Typewriter extends Component {
 
 	onKeyDown( event ) {
 		event.persist();
+
 		// Ensure the any remaining request is cancelled.
-		window.cancelAnimationFrame( this.rafId );
+		if ( this.onKeyDown.rafId ) {
+			window.cancelAnimationFrame( this.onKeyDown.rafId );
+		}
+
 		// Use an animation frame for a smooth result.
-		this.rafId = window.requestAnimationFrame( () =>
-			this.maintainCaretPosition( event )
-		);
+		this.onKeyDown.rafId = window.requestAnimationFrame( () => {
+			this.maintainCaretPosition( event );
+			delete this.onKeyDown.rafId;
+		} );
 	}
 
 	render() {
