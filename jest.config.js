@@ -33,7 +33,10 @@ module.exports = {
 		'/__device-tests__/',
 	],
 	testURL: 'http://localhost/',
-	modulePathIgnorePatterns: [ '<rootDir>/gutenberg/gutenberg-mobile', 'react-native-aztec-old-submodule' ],
+	modulePathIgnorePatterns: [
+		'<rootDir>/gutenberg/gutenberg-mobile',
+		'react-native-aztec-old-submodule',
+	],
 	moduleDirectories: [ 'node_modules', 'symlinked-packages' ],
 	moduleNameMapper: {
 		// Mock the CSS modules. See https://facebook.github.io/jest/docs/en/webpack.html#handling-static-assets
@@ -41,16 +44,9 @@ module.exports = {
 	},
 	haste: {
 		defaultPlatform: rnPlatform,
-		platforms: [
-			'android',
-			'ios',
-			'native',
-		],
+		platforms: [ 'android', 'ios', 'native' ],
 		hasteImplModulePath: '<rootDir>/node_modules/react-native/jest/hasteImpl.js',
-		providesModuleNodeModules: [
-			'react-native',
-			'react-native-svg',
-		],
+		providesModuleNodeModules: [ 'react-native', 'react-native-svg' ],
 	},
 	transformIgnorePatterns: [
 		// This is required for now to have jest transform some of our modules
@@ -59,8 +55,6 @@ module.exports = {
 		// https://github.com/facebook/react-native/blob/master/jest-preset.json#L20
 		'node_modules/(?!(simple-html-tokenizer|(jest-)?react-native|react-clone-referenced-element))',
 	],
-	snapshotSerializers: [
-		'enzyme-to-json/serializer',
-	],
+	snapshotSerializers: [ 'enzyme-to-json/serializer' ],
 	reporters: [ 'default', 'jest-junit' ],
 };
