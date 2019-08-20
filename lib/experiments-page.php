@@ -77,7 +77,7 @@ function gutenberg_initialize_experiments_settings() {
 	);
 	register_setting(
 		'gutenberg-experiments',
-		'gutenberg-experiments',
+		'gutenberg-experiments'
 	);
 }
 
