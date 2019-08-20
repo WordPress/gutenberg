@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { IconButton, ResizableBox, Toolbar, withNotices } from '@wordpress/components';
+import { IconButton, Image, ResizableBox, Toolbar, withNotices } from '@wordpress/components';
 import {
 	BlockControls,
 	BlockIcon,
@@ -72,7 +72,7 @@ class MediaContainer extends Component {
 			<>
 				{ this.renderToolbarEditButton() }
 				<figure className={ className } style={ backgroundStyles }>
-					<img src={ mediaUrl } alt={ mediaAlt } />
+					<Image src={ mediaUrl } alt={ mediaAlt } />
 				</figure>
 			</>
 		);
