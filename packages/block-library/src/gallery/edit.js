@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
 import { filter, forEach, map, find, every } from 'lodash';
 
 /**
@@ -12,6 +11,7 @@ import {
 	PanelBody,
 	RangeControl,
 	SelectControl,
+	Tiles,
 	ToggleControl,
 	withNotices,
 } from '@wordpress/components';
@@ -21,7 +21,7 @@ import {
 	InspectorControls,
 } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import { withSelect } from '@wordpress/data';
 
@@ -236,6 +236,7 @@ class GalleryEdit extends Component {
 	render() {
 		const { attributes, isSelected, className, noticeUI } = this.props;
 		const { images, columns = defaultColumnsNumber( attributes ), align, imageCrop, linkTo } = attributes;
+		const tilesProps = { images, columns, align, imageCrop };
 
 		const hasImages = !! images.length;
 
@@ -291,41 +292,29 @@ class GalleryEdit extends Component {
 					</PanelBody>
 				</InspectorControls>
 				{ noticeUI }
-				<ul
-					className={ classnames(
-						className,
-						{
-							[ `align${ align }` ]: align,
-							[ `columns-${ columns }` ]: columns,
-							'is-cropped': imageCrop,
-						}
-					) }
-				>
-					{ images.map( ( img, index ) => {
-						/* translators: %1$d is the order number of the image, %2$d is the total number of images. */
-						const ariaLabel = sprintf( __( 'image %1$d of %2$d in gallery' ), ( index + 1 ), images.length );
-
+				<Tiles
+					className={ className }
+					tilesProps={ tilesProps } >
+					{ ( { img, index, ariaLabel } ) => {
 						return (
-							<li className="blocks-gallery-item" key={ img.id || img.url }>
-								<GalleryImage
-									url={ img.url }
-									alt={ img.alt }
-									id={ img.id }
-									isFirstItem={ index === 0 }
-									isLastItem={ ( index + 1 ) === images.length }
-									isSelected={ isSelected && this.state.selectedImage === index }
-									onMoveBackward={ this.onMoveBackward( index ) }
-									onMoveForward={ this.onMoveForward( index ) }
-									onRemove={ this.onRemoveImage( index ) }
-									onSelect={ this.onSelectImage( index ) }
-									setAttributes={ ( attrs ) => this.setImageAttributes( index, attrs ) }
-									caption={ img.caption }
-									aria-label={ ariaLabel }
-								/>
-							</li>
+							<GalleryImage
+								url={ img.url }
+								alt={ img.alt }
+								id={ img.id }
+								isFirstItem={ index === 0 }
+								isLastItem={ ( index + 1 ) === images.length }
+								isSelected={ isSelected && this.state.selectedImage === index }
+								onMoveBackward={ this.onMoveBackward( index ) }
+								onMoveForward={ this.onMoveForward( index ) }
+								onRemove={ this.onRemoveImage( index ) }
+								onSelect={ this.onSelectImage( index ) }
+								setAttributes={ ( attrs ) => this.setImageAttributes( index, attrs ) }
+								caption={ img.caption }
+								aria-label={ ariaLabel }
+							/>
 						);
-					} ) }
-				</ul>
+					} }
+				</Tiles>
 				{ mediaPlaceholder }
 			</>
 		);
