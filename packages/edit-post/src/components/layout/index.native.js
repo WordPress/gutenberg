@@ -75,7 +75,7 @@ class Layout extends Component {
 
 	renderHTML() {
 		return (
-			<HTMLTextInput />
+			<HTMLTextInput parentHeight={ this.state.rootViewHeight } />
 		);
 	}
 
