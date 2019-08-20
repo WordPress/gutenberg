@@ -22,7 +22,10 @@ import {
 	withFilters,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
+import {
+	Component,
+	Fragment,
+} from '@wordpress/element';
 import { compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 
@@ -223,7 +226,12 @@ export class MediaPlaceholder extends Component {
 	}
 
 	renderDropZone() {
-		const { onHTMLDrop = noop } = this.props;
+		const { disableDropZone, onHTMLDrop = noop } = this.props;
+
+		if ( disableDropZone ) {
+			return <Fragment />;
+		}
+
 		return (
 			<DropZone
 				onFilesDrop={ this.onFilesUpload }
@@ -286,7 +294,6 @@ export class MediaPlaceholder extends Component {
 			accept,
 			addToGallery,
 			allowedTypes = [],
-			disableDropZone,
 			isAppender,
 			mediaUpload,
 			multiple = false,
@@ -329,7 +336,7 @@ export class MediaPlaceholder extends Component {
 		if ( mediaUpload && isAppender ) {
 			return (
 				<>
-					{ ! disableDropZone && this.renderDropZone() }
+					{ this.renderDropZone() }
 					<FormFileUpload
 						onChange={ this.onUpload }
 						accept={ accept }
@@ -363,7 +370,7 @@ export class MediaPlaceholder extends Component {
 		if ( mediaUpload ) {
 			const content = (
 				<>
-					{ ! disableDropZone && this.renderDropZone() }
+					{ this.renderDropZone() }
 					<FormFileUpload
 						isLarge
 						className={ classnames(
