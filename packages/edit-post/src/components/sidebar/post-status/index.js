@@ -4,7 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { PanelBody } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { compose, ifCondition } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -45,9 +45,14 @@ function PostStatus( { isOpened, onTogglePanel } ) {
 }
 
 export default compose( [
-	withSelect( ( select ) => ( {
-		isOpened: select( 'core/edit-post' ).isEditorPanelOpened( PANEL_NAME ),
-	} ) ),
+	withSelect( ( select ) => {
+		const { isEditorPanelEnabled, isEditorPanelOpened } = select( 'core/edit-post' );
+		return {
+			isEnabled: isEditorPanelEnabled( PANEL_NAME ),
+			isOpened: isEditorPanelOpened( PANEL_NAME ),
+		};
+	} ),
+	ifCondition( ( { isEnabled } ) => isEnabled ),
 	withDispatch( ( dispatch ) => ( {
 		onTogglePanel() {
 			return dispatch( 'core/edit-post' ).toggleEditorPanelOpened( PANEL_NAME );
