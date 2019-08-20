@@ -6,6 +6,12 @@
 	background-color: $gray-lighten-30;
 }
 
+.imageBorder {
+	border-color: $blue-medium;
+	border-width: 2px;
+	border-style: solid;
+}
+
 .uploadFailedText {
 	color: #fff;
 	font-size: 14;
