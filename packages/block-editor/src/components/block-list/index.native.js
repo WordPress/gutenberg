@@ -52,12 +52,12 @@ export class BlockList extends Component {
 		if ( this.props.isPostTitleSelected ) {
 			// if post title selected, insert at top of post
 			return 0;
-		} else if ( this.props.selectedBlockOrder === -1 ) {
+		} else if ( this.props.selectedBlockIndex === -1 ) {
 			// if no block selected, insert at end of post
 			return this.props.blockCount;
 		}
 		// insert after selected block
-		return this.props.selectedBlockOrder + 1;
+		return this.props.selectedBlockIndex + 1;
 	}
 
 	blockHolderBorderStyle() {
@@ -125,19 +125,21 @@ export class BlockList extends Component {
 		return isUnmodifiedDefaultBlock( block );
 	}
 
-	renderItem( { item: clientId } ) {
+	renderItem( { item: clientId, index } ) {
+		const { shouldShowBlockAtIndex, shouldShowInsertionPoint } = this.props;
 		return (
 			<ReadableContentView>
-				{ this.props.shouldShowInsertionPoint( clientId ) && this.renderAddBlockSeparator() }
-				<BlockListBlock
-					key={ clientId }
-					showTitle={ false }
-					clientId={ clientId }
-					rootClientId={ this.props.rootClientId }
-					onCaretVerticalPositionChange={ this.onCaretVerticalPositionChange }
-					borderStyle={ this.blockHolderBorderStyle() }
-					focusedBorderColor={ styles.blockHolderFocused.borderColor }
-				/>
+				{ shouldShowInsertionPoint( clientId ) && this.renderAddBlockSeparator() }
+				{ shouldShowBlockAtIndex( index ) && (
+					<BlockListBlock
+						key={ clientId }
+						showTitle={ false }
+						clientId={ clientId }
+						rootClientId={ this.props.rootClientId }
+						onCaretVerticalPositionChange={ this.onCaretVerticalPositionChange }
+						borderStyle={ this.blockHolderBorderStyle() }
+						focusedBorderColor={ styles.blockHolderFocused.borderColor }
+					/> ) }
 			</ReadableContentView>
 		);
 	}
@@ -173,7 +175,6 @@ export default compose( [
 			getBlockOrder,
 			getSelectedBlock,
 			getSelectedBlockClientId,
-			isBlockSelected,
 			getBlockInsertionPoint,
 			isBlockInsertionPointVisible,
 		} = select( 'core/block-editor' );
@@ -181,24 +182,37 @@ export default compose( [
 		const selectedBlockClientId = getSelectedBlockClientId();
 		const blockClientIds = getBlockOrder( rootClientId );
 		const insertionPoint = getBlockInsertionPoint();
+		const blockInsertionPointIsVisible = isBlockInsertionPointVisible();
 		const shouldShowInsertionPoint = ( clientId ) => {
 			return (
-				isBlockInsertionPointVisible() &&
+				blockInsertionPointIsVisible &&
 				insertionPoint.rootClientId === rootClientId &&
 				blockClientIds[ insertionPoint.index ] === clientId
 			);
+		};
+
+		const selectedBlockIndex = getBlockIndex( selectedBlockClientId );
+		const shouldShowBlockAtIndex = ( index ) => {
+			const shouldHideBlockAtIndex = (
+				blockInsertionPointIsVisible &&
+				// if `index` === `insertionPoint.index`, then block is replaceable
+				index === insertionPoint.index &&
+				// only hide selected block
+				index === selectedBlockIndex
+			);
+			return ! shouldHideBlockAtIndex;
 		};
 
 		return {
 			blockClientIds,
 			blockCount: getBlockCount( rootClientId ),
 			getBlockName,
-			isBlockSelected,
 			isBlockInsertionPointVisible: isBlockInsertionPointVisible(),
+			shouldShowBlockAtIndex,
 			shouldShowInsertionPoint,
 			selectedBlock: getSelectedBlock(),
 			selectedBlockClientId,
-			selectedBlockOrder: getBlockIndex( selectedBlockClientId ),
+			selectedBlockIndex,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
