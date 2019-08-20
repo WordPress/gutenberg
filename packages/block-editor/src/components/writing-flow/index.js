@@ -210,8 +210,6 @@ class WritingFlow extends Component {
 	}
 
 	getClosestVerticalTabbable( target, isReverse ) {
-		let tabbable;
-
 		// Start searching from the caret position.
 		const caretRect = computeCaretRect();
 		const { left: xPosition } = caretRect || {};
@@ -222,7 +220,7 @@ class WritingFlow extends Component {
 		const startYPosition = ( isReverse ? targetTop : targetBottom ) + verticalIncrement;
 
 		// Make an initial vertical search from the caret's position.
-		tabbable = searchVerticallyForTabbableTextField( xPosition, startYPosition, verticalIncrement );
+		let tabbable = searchVerticallyForTabbableTextField( xPosition, startYPosition, verticalIncrement );
 		if ( tabbable ) {
 			return tabbable;
 		}
