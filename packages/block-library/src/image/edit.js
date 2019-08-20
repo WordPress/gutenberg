@@ -21,6 +21,7 @@ import {
 	ButtonGroup,
 	ExternalLink,
 	IconButton,
+	Image,
 	MenuItem,
 	NavigableMenu,
 	PanelBody,
@@ -652,7 +653,7 @@ export class ImageEdit extends Component {
 			title: ! url ? __( 'Image' ) : __( 'Edit image' ),
 			instructions: __( 'Upload an image file, pick one from your media library, or add one with a URL.' ),
 		};
-		const mediaPreview = ( !! url && <img
+		const mediaPreview = ( !! url && <Image
 			alt={ __( 'Edit image' ) }
 			title={ __( 'Edit image' ) }
 			className={ 'edit-image-preview' }
@@ -807,7 +808,7 @@ export class ImageEdit extends Component {
 								// should direct focus to block.
 								/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 								<>
-									<img
+									<Image
 										src={ url }
 										alt={ defaultedAlt }
 										onDoubleClick={ this.toggleIsEditing }
