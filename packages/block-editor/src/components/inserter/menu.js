@@ -382,18 +382,18 @@ export class InserterMenu extends Component {
 									<div className="block-editor-inserter__menu-help-panel-title">Content Blocks</div>
 									<p>
 										{ __(
-											'Insert blocks for all kinds of content: text, images, videos, and lots more.'
+											'Add blocks for all kinds of content: text, images, videos, and lots more.'
 										) }
 									</p>
 									<p>
 										{ __(
-											'Browse the library to learn about what each block does.'
+											'Browse the library to learn what each block does.'
 										) }
 									</p>
 								</div>
 								<Tip>
 									{ __(
-										'While writing, you can press "/" to quickly insert new blocks.'
+										'While writing, you can press "/" to quickly add new blocks.'
 									) }
 								</Tip>
 							</div>
