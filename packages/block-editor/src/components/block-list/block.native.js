@@ -116,6 +116,8 @@ class BlockListBlock extends Component {
 		} = this.props;
 
 		const blockContainerStyle = useStyle( styles.blockContainer, styles.blockContainerDark, theme );
+		const blockContainerFocusedStyle = useStyle( styles.blockContainerFocused, styles.blockContainerFocusedDark, theme );
+
 		const borderColor = isSelected ? focusedBorderColor : 'transparent';
 
 		const accessibilityLabel = this.getAccessibilityLabel();
@@ -130,7 +132,7 @@ class BlockListBlock extends Component {
 					{ showTitle && this.renderBlockTitle() }
 					<View
 						accessibilityLabel={ accessibilityLabel }
-						style={ [ ! isSelected && blockContainerStyle, isSelected && styles.blockContainerFocused ] }
+						style={ [ ! isSelected && blockContainerStyle, isSelected && blockContainerFocusedStyle ] }
 					>
 						{ isValid && this.getBlockForType() }
 						{ ! isValid &&

@@ -11,7 +11,7 @@
 }
 
 .blockContainerDark {
-	background-color: #1c1c1e;
+	background-color: $black;
 }
 
 .blockContainerFocused {
@@ -20,6 +20,10 @@
 	padding-right: 16px;
 	padding-top: 12px;
 	padding-bottom: 0; // will be flushed into inline toolbar height
+}
+
+.blockContainerFocusedDark {
+	background-color: $black;
 }
 
 .blockTitle {
