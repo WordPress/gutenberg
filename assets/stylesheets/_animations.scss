@@ -2,29 +2,8 @@
 	animation: loading-fade-animation 1.6s ease-in-out infinite;
 }
 
-@keyframes loading-fade-animation {
-	0% {
-		opacity: 0.5;
-	}
-	50% {
-		opacity: 1;
-	}
-	100% {
-		opacity: 0.5;
-	}
-}
-
 @mixin fade-in-animation($speed: 0.2s, $delay: 0s) {
 	animation: fade-in-animation $speed ease-out $delay;
 	animation-fill-mode: forwards;
 	@include reduce-motion("animation");
-}
-
-@keyframes fade-in-animation {
-	from {
-		opacity: 0;
-	}
-	to {
-		opacity: 1;
-	}
 }
