@@ -156,7 +156,7 @@ export function* setupEditor( post, edits, template ) {
 	if ( has( edits, [ 'content' ] ) ) {
 		content = edits.content;
 	} else {
-		content = post.content.raw || post.content;
+		content = post.content.raw;
 	}
 
 	let blocks = parse( content );
