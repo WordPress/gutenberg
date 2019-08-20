@@ -2,11 +2,17 @@
  * External dependencies
  */
 import { shallow } from 'enzyme';
+import TestUtils from 'react-dom/test-utils';
+
+/**
+ * WordPress dependencies
+ */
+import { createRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import { Image } from '../';
+import ImageWithForwardedRef, { Image } from '../';
 
 describe( 'Image', () => {
 	it( 'renders nothing when src omitted', () => {
@@ -25,5 +31,12 @@ describe( 'Image', () => {
 		const image = shallow( <Image src="https://s.w.org/style/images/about/WordPress-logotype-wmark.png" alt="WordPress logo" data-id="123" /> );
 		expect( image.type() ).toBe( 'img' );
 		expect( image.prop( 'data-id' ) ).toBe( '123' );
+	} );
+
+	it( 'should enable access to DOM element', () => {
+		const ref = createRef();
+
+		TestUtils.renderIntoDocument( <ImageWithForwardedRef ref={ ref } src="https://s.w.org/style/images/about/WordPress-logotype-wmark.png" alt="WordPress logo" /> );
+		expect( ref.current ).toBeDefined();
 	} );
 } );
