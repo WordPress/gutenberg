@@ -406,7 +406,7 @@ describe( 'Post generator actions', () => {
 
 describe( 'Editor actions', () => {
 	describe( 'setupEditor()', () => {
-		const post = { content: '', status: 'publish' };
+		const post = { content: { raw: '' }, status: 'publish' };
 
 		let fulfillment;
 		const reset = ( edits, template ) => fulfillment = actions
@@ -427,7 +427,7 @@ describe( 'Editor actions', () => {
 			const { value } = fulfillment.next();
 			expect( value ).toEqual( {
 				type: 'SETUP_EDITOR',
-				post: { content: '', status: 'publish' },
+				post: { content: { raw: '' }, status: 'publish' },
 			} );
 		} );
 		it( 'should yield action object for resetEditorBlocks', () => {
@@ -437,9 +437,10 @@ describe( 'Editor actions', () => {
 		it( 'should yield action object for setupEditorState', () => {
 			const { value } = fulfillment.next();
 			expect( value ).toEqual(
-				actions.setupEditorState(
-					{ content: '', status: 'publish' }
-				)
+				actions.setupEditorState( {
+					content: { raw: '' },
+					status: 'publish',
+				} )
 			);
 		} );
 	} );
