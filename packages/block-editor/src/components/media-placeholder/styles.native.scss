@@ -33,3 +33,9 @@
 	align-items: center;
 	fill: $gray-dark;
 }
+
+.isAppender {
+	border: $border-width dashed $dark-gray-150;
+	background-color: $gray-light;
+	height: auto;
+}

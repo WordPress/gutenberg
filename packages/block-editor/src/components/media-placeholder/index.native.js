@@ -15,10 +15,10 @@ import { MediaUpload, MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO } from '@wordpress/bloc
 import styles from './styles.scss';
 
 function MediaPlaceholder( props ) {
-	const { mediaType, labels = {}, icon, onSelectURL } = props;
+	const { allowedTypes, labels = {}, icon, onSelect, isAppender } = props;
 
-	const isImage = MEDIA_TYPE_IMAGE === mediaType;
-	const isVideo = MEDIA_TYPE_VIDEO === mediaType;
+	const isImage = MEDIA_TYPE_IMAGE === allowedTypes[ 0 ];
+	const isVideo = MEDIA_TYPE_VIDEO === allowedTypes[ 0 ];
 
 	let placeholderTitle = labels.title;
 	if ( placeholderTitle === undefined ) {
@@ -65,7 +65,7 @@ function MediaPlaceholder( props ) {
 							open();
 						} }
 					>
-						<View style={ styles.emptyStateContainer }>
+						<View style={ [ styles.emptyStateContainer, isAppender && styles.isAppender ] }>
 							{ getMediaOptions() }
 							<View style={ styles.modalIcon }>
 								{ icon }
