@@ -25,7 +25,7 @@
 		"@wordpress/autop": "file:../autop",
 		"@wordpress/blob": "file:../blob",
 		"@wordpress/block-serialization-default-parser": "file:../block-serialization-default-parser",
-		"@wordpress/block-serialization-spec-parser": "file:../block-serialization-spec-parser",
+		"@wordpress/compose": "file:../compose",
 		"@wordpress/data": "file:../data",
 		"@wordpress/dom": "file:../dom",
 		"@wordpress/element": "file:../element",

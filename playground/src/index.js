@@ -5,6 +5,7 @@ import '@wordpress/editor'; // This shouldn't be necessary
 
 import { render, useState, Fragment } from '@wordpress/element';
 import {
+	BlockEditorKeyboardShortcuts,
 	BlockEditorProvider,
 	BlockList,
 	WritingFlow,
@@ -49,6 +50,7 @@ function App() {
 							onChange={ updateBlocks }
 						>
 							<div className="editor-styles-wrapper">
+								<BlockEditorKeyboardShortcuts />
 								<WritingFlow>
 									<ObserveTyping>
 										<BlockList />

@@ -21,7 +21,14 @@ module.exports = {
 	extends: [
 		'plugin:@wordpress/eslint-plugin/recommended',
 		'plugin:jest/recommended',
+		'plugin:eslint-comments/recommended',
 	],
+	plugins: [
+		'import',
+	],
+	globals: {
+		wp: 'off',
+	},
 	rules: {
 		'@wordpress/react-no-unsafe-timeout': 'error',
 		'no-restricted-syntax': [
@@ -107,14 +114,24 @@ module.exports = {
 	},
 	overrides: [
 		{
+			files: [ 'packages/**/*.js' ],
+			rules: {
+				'import/no-extraneous-dependencies': 'error',
+			},
+			excludedFiles: [
+				'**/*.@(android|ios|native).js',
+				'**/@(benchmark|test|__tests__)/**/*.js',
+			],
+		},
+		{
 			files: [ 'packages/e2e-test*/**/*.js' ],
 			env: {
 				browser: true,
 			},
 			globals: {
-				browser: true,
-				page: true,
-				wp: true,
+				browser: 'readonly',
+				page: 'readonly',
+				wp: 'readonly',
 			},
 		},
 	],

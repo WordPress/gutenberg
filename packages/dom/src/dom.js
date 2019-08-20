@@ -163,7 +163,8 @@ function isEdge( container, isReverse, onlyVertical ) {
 	const side = isReverseDir ? 'left' : 'right';
 	const testRect = getRectangleFromRange( testRange );
 
-	return Math.round( testRect[ side ] ) === Math.round( rangeRect[ side ] );
+	// Allow the position to be 1px off.
+	return Math.abs( testRect[ side ] - rangeRect[ side ] ) <= 1;
 }
 
 /**
@@ -352,11 +353,17 @@ function caretRangeFromPoint( doc, x, y ) {
  * @return {?Range} The best range for the given point.
  */
 function hiddenCaretRangeFromPoint( doc, x, y, container ) {
+	const originalZIndex = container.style.zIndex;
+	const originalPosition = container.style.position;
+
+	// A z-index only works if the element position is not static.
 	container.style.zIndex = '10000';
+	container.style.position = 'relative';
 
 	const range = caretRangeFromPoint( doc, x, y );
 
-	container.style.zIndex = null;
+	container.style.zIndex = originalZIndex;
+	container.style.position = originalPosition;
 
 	return range;
 }

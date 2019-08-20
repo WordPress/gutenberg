@@ -16,9 +16,9 @@
                     "fontSize": "large"
                 },
                 "innerBlocks": [],
-                "innerHTML": "\n\t\t<p style=\"text-align:right\" class=\"has-large-font-size\">My video</p>\n\t\t",
+                "innerHTML": "\n\t\t<p class=\"has-text-align-right has-large-font-size\">My video</p>\n\t\t",
                 "innerContent": [
-                    "\n\t\t<p style=\"text-align:right\" class=\"has-large-font-size\">My video</p>\n\t\t"
+                    "\n\t\t<p class=\"has-text-align-right has-large-font-size\">My video</p>\n\t\t"
                 ]
             }
         ],
