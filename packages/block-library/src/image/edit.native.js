@@ -338,6 +338,7 @@ export class ImageEdit extends React.Component {
 		};
 
 		const imageContainerHeight = Dimensions.get( 'window' ).width / IMAGE_ASPECT_RATIO;
+
 		const getImageComponent = ( openMediaOptions, getMediaOptions ) => (
 			<TouchableWithoutFeedback
 				accessible={ ! isSelected }
@@ -363,6 +364,7 @@ export class ImageEdit extends React.Component {
 						renderContent={ ( { isUploadInProgress, isUploadFailed, finalWidth, finalHeight, imageWidthWithinContainer, retryMessage } ) => {
 							const opacity = isUploadInProgress ? 0.3 : 1;
 							const icon = this.getIcon( isUploadFailed );
+							const imageBorderOnSelectedStyle = isSelected ? styles.imageBorder : '';
 
 							const iconContainer = (
 								<View style={ styles.modalIcon }>
@@ -382,7 +384,7 @@ export class ImageEdit extends React.Component {
 										accessibilityLabel={ alt }
 										accessibilityHint={ __( 'Double tap and hold to edit' ) }
 										accessibilityRole={ 'imagebutton' }
-										style={ { width: finalWidth, height: finalHeight, opacity } }
+										style={ [ imageBorderOnSelectedStyle, { width: finalWidth, height: finalHeight, opacity } ] }
 										resizeMethod="scale"
 										source={ { uri: url } }
 										key={ url }
