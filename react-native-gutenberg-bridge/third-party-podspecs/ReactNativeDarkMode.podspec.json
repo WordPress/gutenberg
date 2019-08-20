@@ -1,0 +1,23 @@
+{
+  "name": "ReactNativeDarkMode",
+  "version": "0.0.9",
+  "summary": "Detect dark mode in React Native",
+  "authors": "react-native-dark-mode",
+  "homepage": "https://github.com/codemotionapps/react-native-dark-mode",
+  "license": "MIT",
+  "platforms": {
+    "ios": "9.0"
+  },
+  "module_name": "ReactNativeDarkMode",
+  "source": {
+    "git": "https://github.com/codemotionapps/react-native-dark-mode.git",
+    "tag": "0.0.9"
+  },
+  "source_files": "library/ios/**/*.{h,m}",
+  "dependencies": {
+    "React": [
+
+    ]
+  },
+  "frameworks": "UIKit"
+}
