@@ -27,6 +27,7 @@ export { default as FormToggle } from './form-toggle';
 export { default as FormTokenField } from './form-token-field';
 export { default as Icon } from './icon';
 export { default as IconButton } from './icon-button';
+export { default as Image } from './image';
 export { default as KeyboardShortcuts } from './keyboard-shortcuts';
 export { default as MenuGroup } from './menu-group';
 export { default as MenuItem } from './menu-item';
