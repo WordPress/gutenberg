@@ -6,6 +6,15 @@
 }
 
 .containerDark {
+	background-color: $dark-background-elevated;
+}
+
+.background {
+	flex: 1;
+	background-color: $white;
+}
+
+.backgroundDark {
 	background-color: $black;
 }
 
