@@ -57,7 +57,7 @@ function Edit( { attributes, setAttributes, className, setTimeout } ) {
 				<>
 					<Toolbar>
 						<IconButton icon="editor-ol" onClick={ viewAll }>
-							View all Footnotes
+							__( 'View all Footnotes' )
 						</IconButton>
 						<Slot name="__unstable-footnote-controls" />
 					</Toolbar>
