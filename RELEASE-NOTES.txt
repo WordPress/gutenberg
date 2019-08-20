@@ -2,6 +2,7 @@
 ------
 * Add rich text styling to video captions
 * Prevent keyboard dismissal when switching between caption and text block on Android
+* Blocks that would be replaced are now hidden when add block bottom sheet displays
 
 1.11.0
 ------
