@@ -382,17 +382,12 @@ export class InserterMenu extends Component {
 									<div className="block-editor-inserter__menu-help-panel-title">Content Blocks</div>
 									<p>
 										{ __(
-											'Welcome to the wonderful world of blocks! Blocks are the basis of all content within the editor. '
+											'There are blocks for all sorts of content: insert text, images, videos, and lots more.'
 										) }
 									</p>
 									<p>
 										{ __(
-											'There are blocks available for all kinds of content: insert text, headings, images, lists, videos, tables, and lots more.'
-										) }
-									</p>
-									<p>
-										{ __(
-											'Browse through the library to learn more about what each block does.'
+											'Browse the library to learn about what each block does.'
 										) }
 									</p>
 								</div>
