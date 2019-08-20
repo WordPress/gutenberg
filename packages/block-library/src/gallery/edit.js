@@ -266,7 +266,7 @@ class GalleryEdit extends Component {
 		const {
 			align,
 			columns = defaultColumnsNumber( attributes ),
-			galleryCaption,
+			caption,
 			imageCrop,
 			images,
 			linkTo,
@@ -364,13 +364,13 @@ class GalleryEdit extends Component {
 						} ) }
 					</ul>
 					{ mediaPlaceholder }
-					{ ( ! RichText.isEmpty( galleryCaption ) || isSelected ) && (
+					{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
 						<RichText
 							tagName="figcaption"
 							placeholder={ __( 'Write gallery caption…' ) }
-							value={ galleryCaption }
+							value={ caption }
 							unstableOnFocus={ this.onFocusGalleryCaption }
-							onChange={ ( value ) => setAttributes( { galleryCaption: value } ) }
+							onChange={ ( value ) => setAttributes( { caption: value } ) }
 							isSelected={ this.state.galleryCaptionFocused }
 							inlineToolbar
 						/>
