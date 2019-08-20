@@ -99,14 +99,14 @@ function PostStatus( { isOpened, onTogglePanel } ) {
 
 There are currently seven available SlotFills in the `edit-post` package. Please refer to the individual items below for usage and example details:
 
-* [PluginBlockSettingsMenuItem](./plugin-block-settings-menu-item.md)
-* [PluginDocumentSettingPanel](./plugin-document-setting-panel.md)
-* [PluginMoreMenuItem](./plugin-more-menu-item.md)
-* [PluginPostPublishPanel](./plugin-post-publish-panel.md)
-* [PluginPostStatusInfo](./plugin-post-status-info.md)
-* [PluginPrePublishPanel](./plugin-pre-publish-panel.md)
-* [PluginSidebar](./plugin-sidebar.md)
-* [PluginSidebarMoreMenuItem](./plugin-sidebar-more-menu-item.md)
+* [PluginBlockSettingsMenuItem](./plugin-block-settings-menu-item)
+* [PluginDocumentSettingPanel](./plugin-document-setting-panel)
+* [PluginMoreMenuItem](./plugin-more-menu-item)
+* [PluginPostPublishPanel](./plugin-post-publish-panel)
+* [PluginPostStatusInfo](./plugin-post-status-info)
+* [PluginPrePublishPanel](./plugin-pre-publish-panel)
+* [PluginSidebar](./plugin-sidebar)
+* [PluginSidebarMoreMenuItem](./plugin-sidebar-more-menu-item)
 
 
 
