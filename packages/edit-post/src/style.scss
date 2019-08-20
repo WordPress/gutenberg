@@ -27,8 +27,8 @@
  */
 
 // These keyframes should not be part of the _animations.scss mixins file.
-// Because keyframe animations can't be defined as mixins properly, they are duplicated.
-// Since hey are intended only for the editor, we add them here instead.
+// That file is loaded in every stylesheet, which would create many duplicated declarations of these keyframes.
+// Instead, we're declaring them separately here.
 @keyframes edit-post__loading-fade-animation {
 	0% {
 		opacity: 0.5;
