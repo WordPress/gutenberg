@@ -29,7 +29,7 @@
 // These keyframes should not be part of the _animations.scss mixins file.
 // That file is loaded in every stylesheet, which would create many duplicated declarations of these keyframes.
 // Instead, we're declaring them separately here.
-@keyframes edit-post__loading-fade-animation {
+@keyframes loading-fade-animation {
 	0% {
 		opacity: 0.5;
 	}
@@ -41,7 +41,7 @@
 	}
 }
 
-@keyframes edit-post__fade-in-animation {
+@keyframes fade-in-animation {
 	from {
 		opacity: 0;
 	}
