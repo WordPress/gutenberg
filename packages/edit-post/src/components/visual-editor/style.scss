@@ -13,6 +13,11 @@
 	width: 100%;
 }
 
+// Hide the extra space when there are metaboxes.
+.has-metaboxes .edit-post-visual-editor .block-editor-writing-flow__click-redirect {
+	height: 0;
+}
+
 // The base width of blocks
 .edit-post-visual-editor .block-editor-block-list__block {
 	margin-left: auto;
