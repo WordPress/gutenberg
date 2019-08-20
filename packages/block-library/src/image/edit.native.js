@@ -265,8 +265,8 @@ class ImageEdit extends React.Component {
 
 		const getImageViewer = () => (
 			<ImageViewer
-				isVisible={ this.state.showSettings }
-				onClose={ onImageSettingsClose }
+				isVisible={ this.state.showImageViewer }
+				onClose={ onImageViewerClose }
 				url ={ url }
 			/>
 		);
