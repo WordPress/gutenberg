@@ -35,18 +35,11 @@ class InnerBlocks extends Component {
 		this.updateNestedSettings();
 	}
 
-	getTemplateLock() {
-		const {
-			templateLock,
-			parentLock,
-		} = this.props;
-		return templateLock === undefined ? parentLock : templateLock;
-	}
-
 	componentDidMount() {
-		const { innerBlocks } = this.props.block;
-		// only synchronize innerBlocks with template if innerBlocks are empty or a locking all exists
-		if ( innerBlocks.length === 0 || this.getTemplateLock() === 'all' ) {
+		const { templateLock, block } = this.props;
+		const { innerBlocks } = block;
+		// Only synchronize innerBlocks with template if innerBlocks are empty or a locking all exists directly on the block.
+		if ( innerBlocks.length === 0 || templateLock === 'all' ) {
 			this.synchronizeBlocksWithTemplate();
 		}
 
@@ -58,12 +51,12 @@ class InnerBlocks extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
-		const { template, block } = this.props;
+		const { template, block, templateLock } = this.props;
 		const { innerBlocks } = block;
 
 		this.updateNestedSettings();
-		// only synchronize innerBlocks with template if innerBlocks are empty or a locking all exists
-		if ( innerBlocks.length === 0 || this.getTemplateLock() === 'all' ) {
+		// Only synchronize innerBlocks with template if innerBlocks are empty or a locking all exists directly on the block.
+		if ( innerBlocks.length === 0 || templateLock === 'all' ) {
 			const hasTemplateChanged = ! isEqual( template, prevProps.template );
 			if ( hasTemplateChanged ) {
 				this.synchronizeBlocksWithTemplate();
@@ -92,11 +85,13 @@ class InnerBlocks extends Component {
 			blockListSettings,
 			allowedBlocks,
 			updateNestedSettings,
+			templateLock,
+			parentLock,
 		} = this.props;
 
 		const newSettings = {
 			allowedBlocks,
-			templateLock: this.getTemplateLock(),
+			templateLock: templateLock === undefined ? parentLock : templateLock,
 		};
 
 		if ( ! isShallowEqual( blockListSettings, newSettings ) ) {
