@@ -160,8 +160,8 @@ class VideoEdit extends React.Component {
 		const { videoContainerHeight } = this.state;
 
 		const toolbarEditButton = (
-			<MediaUpload mediaType={ MEDIA_TYPE_VIDEO }
-				onSelectURL={ this.onSelectMediaUploadOption }
+			<MediaUpload allowedTypes={ [ MEDIA_TYPE_VIDEO ] }
+				onSelect={ this.onSelectMediaUploadOption }
 				render={ ( { open, getMediaOptions } ) => {
 					return (
 						<Toolbar>

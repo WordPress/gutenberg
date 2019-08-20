@@ -26,7 +26,8 @@ export const OPTION_TAKE_PHOTO = __( 'Take a Photo' );
 
 export class MediaUpload extends React.Component {
 	getTakeMediaLabel() {
-		const { mediaType } = this.props;
+		const { allowedTypes } = this.props;
+		const mediaType = allowedTypes[ 0 ];
 
 		if ( mediaType === MEDIA_TYPE_IMAGE ) {
 			return OPTION_TAKE_PHOTO;
@@ -44,7 +45,8 @@ export class MediaUpload extends React.Component {
 	}
 
 	getChooseFromDeviceIcon() {
-		const { mediaType } = this.props;
+		const { allowedTypes } = this.props;
+		const mediaType = allowedTypes[ 0 ];
 
 		if ( mediaType === MEDIA_TYPE_IMAGE ) {
 			return 'format-image';
@@ -61,58 +63,44 @@ export class MediaUpload extends React.Component {
 		return 'wordpress-alt';
 	}
 
+	onPickerPresent = () => {
+		if ( this.picker ) {
+			this.picker.presentPicker();
+		}
+	};
+
+	onPickerSelect = ( requestFunction ) => {
+		const { allowedTypes, onSelect } = this.props;
+		requestFunction( allowedTypes, ( mediaId, mediaUrl ) => {
+			if ( mediaId ) {
+				onSelect( mediaId, mediaUrl );
+			}
+		} );
+	}
+
+	onPickerChange = ( value ) => {
+		if ( value === MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_CHOOSE_FROM_DEVICE ) {
+			this.onPickerSelect( requestMediaPickFromDeviceLibrary );
+		} else if ( value === MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_TAKE_MEDIA ) {
+			this.onPickerSelect( requestMediaPickFromDeviceCamera );
+		} else if ( value === MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY ) {
+			this.onPickerSelect( requestMediaPickFromMediaLibrary );
+		}
+	}
+
 	render() {
-		const { mediaType } = this.props;
-
-		const onMediaLibraryButtonPressed = () => {
-			requestMediaPickFromMediaLibrary( [ mediaType ], ( mediaId, mediaUrl ) => {
-				if ( mediaId ) {
-					this.props.onSelectURL( mediaId, mediaUrl );
-				}
-			} );
-		};
-
-		const onMediaUploadButtonPressed = () => {
-			requestMediaPickFromDeviceLibrary( [ mediaType ], ( mediaId, mediaUrl ) => {
-				if ( mediaId ) {
-					this.props.onSelectURL( mediaId, mediaUrl );
-				}
-			} );
-		};
-
-		const onMediaCaptureButtonPressed = () => {
-			requestMediaPickFromDeviceCamera( [ mediaType ], ( mediaId, mediaUrl ) => {
-				if ( mediaId ) {
-					this.props.onSelectURL( mediaId, mediaUrl );
-				}
-			} );
-		};
-
 		const mediaOptions = this.getMediaOptionsItems();
-
-		let picker;
-
-		const onPickerPresent = () => {
-			picker.presentPicker();
-		};
 
 		const getMediaOptions = () => (
 			<Picker
 				hideCancelButton={ true }
-				ref={ ( instance ) => picker = instance }
+				ref={ ( instance ) => this.picker = instance }
 				options={ mediaOptions }
-				onChange={ ( value ) => {
-					if ( value === MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_CHOOSE_FROM_DEVICE ) {
-						onMediaUploadButtonPressed();
-					} else if ( value === MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_TAKE_MEDIA ) {
-						onMediaCaptureButtonPressed();
-					} else if ( value === MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY ) {
-						onMediaLibraryButtonPressed();
-					}
-				} }
+				onChange={ this.onPickerChange }
 			/>
 		);
-		return this.props.render( { open: onPickerPresent, getMediaOptions } );
+
+		return this.props.render( { open: this.onPickerPresent, getMediaOptions } );
 	}
 }
 
