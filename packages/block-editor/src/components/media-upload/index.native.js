@@ -25,6 +25,12 @@ export const OPTION_TAKE_VIDEO = __( 'Take a Video' );
 export const OPTION_TAKE_PHOTO = __( 'Take a Photo' );
 
 export class MediaUpload extends React.Component {
+	constructor( props ) {
+		super( props );
+		this.onPickerPresent = this.onPickerPresent.bind( this );
+		this.onPickerChange = this.onPickerChange.bind( this );
+		this.onPickerSelect = this.onPickerSelect.bind( this );
+	}
 	getTakeMediaLabel() {
 		const { allowedTypes } = this.props;
 		const mediaType = allowedTypes[ 0 ];
@@ -63,13 +69,13 @@ export class MediaUpload extends React.Component {
 		return 'wordpress-alt';
 	}
 
-	onPickerPresent = () => {
+	onPickerPresent() {
 		if ( this.picker ) {
 			this.picker.presentPicker();
 		}
-	};
+	}
 
-	onPickerSelect = ( requestFunction ) => {
+	onPickerSelect( requestFunction ) {
 		const { allowedTypes, onSelect } = this.props;
 		requestFunction( allowedTypes, ( mediaId, mediaUrl ) => {
 			if ( mediaId ) {
@@ -78,7 +84,7 @@ export class MediaUpload extends React.Component {
 		} );
 	}
 
-	onPickerChange = ( value ) => {
+	onPickerChange( value ) {
 		if ( value === MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_CHOOSE_FROM_DEVICE ) {
 			this.onPickerSelect( requestMediaPickFromDeviceLibrary );
 		} else if ( value === MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_TAKE_MEDIA ) {
