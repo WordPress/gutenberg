@@ -90,24 +90,4 @@
 	.block-editor-block-list__layout > .block-editor-block-list__block[data-align="right"]:first-child {
 		margin-top: $block-padding + $block-spacing + $border-width + $border-width + $block-padding;
 	}
-
-	.block-editor-default-block-appender {
-		// Default to centered and content-width, like blocks
-		margin-left: auto;
-		margin-right: auto;
-		position: relative;
-
-		&[data-root-client-id=""] .block-editor-default-block-appender__content:hover {
-			// Outline on root-level default block appender is redundant with the
-			// WritingFlow click redirector.
-			outline: 1px solid transparent;
-		}
-	}
-
-	// Ensure that the height of the first appender, and the one between blocks, is the same as text.
-	.block-editor-block-list__block[data-type="core/paragraph"] p,
-	.block-editor-default-block-appender__content {
-		min-height: $empty-paragraph-height / 2;
-		line-height: $editor-line-height;
-	}
 }
