@@ -390,7 +390,8 @@ The default editor settings
  showInserterHelpPanel                  boolean       Whether or not the inserter help panel is shown
  **experimentalCanUserUseUnfilteredHTML string        Whether the user should be able to use unfiltered HTML or the HTML should be filtered e.g., to remove elements considered insecure like iframes.
  **experimentalEnableLegacyWidgetBlock  boolean       Whether the user has enabled the Legacy Widget Block
- \_\_experimentalEnableMenuBlock          boolean       Whether the user has enabled the Menu Block
+ **experimentalEnableMenuBlock          boolean       Whether the user has enabled the Menu Block
+ **experimentalBlockDirectory           boolean       Whether the user has enabled the Block Directory
 
 <a name="SkipToSelectedBlock" href="#SkipToSelectedBlock">#</a> **SkipToSelectedBlock**
 
