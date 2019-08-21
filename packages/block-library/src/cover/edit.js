@@ -185,7 +185,7 @@ class CoverEdit extends Component {
 										render={ ( { open } ) => (
 											<IconButton
 												className="components-toolbar__control"
-												label={ __( 'Edit' ) }
+												label={ __( 'Edit media' ) }
 												icon="edit"
 												onClick={ open }
 											/>
