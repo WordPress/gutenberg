@@ -200,6 +200,8 @@ exports[`List should not transform lines in block when transforming multiple blo
 <!-- /wp:list -->"
 `;
 
+exports[`List should not undo asterisk transform with backspace after selection change 1`] = `""`;
+
 exports[`List should not undo asterisk transform with backspace after typing 1`] = `""`;
 
 exports[`List should outdent with children 1`] = `
@@ -275,8 +277,6 @@ exports[`List should undo asterisk transform with backspace 1`] = `
 <p>* </p>
 <!-- /wp:paragraph -->"
 `;
-
-exports[`List should undo asterisk transform with backspace after selection change 1`] = `""`;
 
 exports[`List should undo asterisk transform with escape 1`] = `
 "<!-- wp:paragraph -->

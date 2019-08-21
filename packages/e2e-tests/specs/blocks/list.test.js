@@ -83,7 +83,7 @@ describe( 'List', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	it( 'should undo asterisk transform with backspace after selection change', async () => {
+	it( 'should not undo asterisk transform with backspace after selection change', async () => {
 		await clickBlockAppender();
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '* ' );
