@@ -368,7 +368,6 @@ export class InserterMenu extends Component {
 								<BlockCard blockType={ hoveredItemBlockType } />
 								{ ( isReusableBlock( hoveredItem ) || hoveredItemBlockType.example ) && (
 									<div className="block-editor-inserter__preview">
-										<div className="block-editor-inserter__preview-title">{ __( 'Preview' ) }</div>
 										<div className="block-editor-inserter__preview-content">
 											<BlockPreview
 												viewportWidth={ 500 }
