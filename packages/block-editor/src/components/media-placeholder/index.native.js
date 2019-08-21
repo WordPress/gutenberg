@@ -65,7 +65,7 @@ function MediaPlaceholder( props ) {
 							open();
 						} }
 					>
-						<View style={ [ styles.emptyStateContainer ] }>
+						<View style={ styles.emptyStateContainer }>
 							{ getMediaOptions() }
 							<View style={ styles.modalIcon }>
 								{ icon }
