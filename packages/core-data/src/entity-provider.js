@@ -54,8 +54,7 @@ export function useEntityProp( type, prop ) {
 			if ( ! id ) {
 				return;
 			}
-			const entity =
-				id && select( 'core' ).getEditedEntityRecord( kind, type, id )[ prop ];
+			const entity = select( 'core' ).getEditedEntityRecord( kind, type, id );
 			return entity && entity[ prop ];
 		},
 		[ kind, type, id, prop ]
@@ -63,10 +62,14 @@ export function useEntityProp( type, prop ) {
 
 	const { editEntityRecord } = useDispatch( 'core' );
 	const setValue = useCallback(
-		( newValue ) =>
+		( newValue ) => {
+			if ( ! id ) {
+				return;
+			}
 			editEntityRecord( kind, type, id, {
 				[ prop ]: newValue,
-			} ),
+			} );
+		},
 		[ kind, type, id, prop ]
 	);
 

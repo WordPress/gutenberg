@@ -63,6 +63,7 @@ import * as classic from './classic';
 
 // Custom Entity Blocks
 import * as post from './post';
+import * as postTitle from './post-title';
 
 /**
  * Function to register an individual block.
@@ -142,6 +143,7 @@ export const registerCoreBlocks = () => {
 
 		// Register Custom Entity Blocks.
 		post,
+		postTitle,
 	].forEach( registerBlock );
 
 	setDefaultBlockName( paragraph.name );
