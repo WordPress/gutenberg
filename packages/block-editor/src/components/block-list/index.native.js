@@ -126,6 +126,7 @@ export class BlockList extends Component {
 	}
 
 	renderItem( { item: clientId } ) {
+		const blockHolderFocusedStyle = useStyle( styles.blockHolderFocused, styles.blockHolderFocusedDark, this.props.theme );
 		return (
 			<ReadableContentView>
 				{ this.props.shouldShowInsertionPoint( clientId ) && this.renderAddBlockSeparator() }
@@ -136,7 +137,7 @@ export class BlockList extends Component {
 					rootClientId={ this.props.rootClientId }
 					onCaretVerticalPositionChange={ this.onCaretVerticalPositionChange }
 					borderStyle={ this.blockHolderBorderStyle() }
-					focusedBorderColor={ styles.blockHolderFocused.borderColor }
+					focusedBorderColor={ blockHolderFocusedStyle.borderColor }
 				/>
 			</ReadableContentView>
 		);

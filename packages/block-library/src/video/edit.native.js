@@ -20,7 +20,10 @@ import {
 	Icon,
 	Toolbar,
 	ToolbarButton,
+	withTheme,
+	useStyle,
 } from '@wordpress/components';
+
 import {
 	MediaPlaceholder,
 	MediaUpload,
@@ -127,11 +130,13 @@ class VideoEdit extends React.Component {
 	}
 
 	getIcon( isRetryIcon, isMediaPlaceholder ) {
+		const iconStyle = useStyle( style.icon, style.iconDark, this.props.theme );
+
 		if ( isRetryIcon ) {
 			return <Icon icon={ SvgIconRetry } { ...style.icon } />;
 		}
 
-		return <Icon icon={ SvgIcon } { ...( ! isMediaPlaceholder ? style.iconUploading : style.icon ) } />;
+		return <Icon icon={ SvgIcon } { ...( ! isMediaPlaceholder ? style.iconUploading : iconStyle ) } />;
 	}
 
 	render() {
@@ -249,4 +254,4 @@ class VideoEdit extends React.Component {
 	}
 }
 
-export default VideoEdit;
+export default withTheme( VideoEdit );
