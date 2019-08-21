@@ -206,7 +206,7 @@ describe( 'Quote', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	it( 'can be split in the middle', async () => {
+	it( 'can be split in the middle and merged back', async () => {
 		await insertBlock( 'Quote' );
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Enter' );
@@ -229,6 +229,13 @@ describe( 'Quote', () => {
 		await page.keyboard.press( 'Backspace' );
 
 		// Expect two quote blocks.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.press( 'Backspace' );
+
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );

@@ -102,7 +102,7 @@ exports[`Quote can be split at the end and merged back 3`] = `
 <!-- /wp:quote -->"
 `;
 
-exports[`Quote can be split in the middle 1`] = `
+exports[`Quote can be split in the middle and merged back 1`] = `
 "<!-- wp:quote -->
 <blockquote class=\\"wp-block-quote\\"><p>1</p><cite>c</cite></blockquote>
 <!-- /wp:quote -->
@@ -116,7 +116,7 @@ exports[`Quote can be split in the middle 1`] = `
 <!-- /wp:quote -->"
 `;
 
-exports[`Quote can be split in the middle 2`] = `
+exports[`Quote can be split in the middle and merged back 2`] = `
 "<!-- wp:quote -->
 <blockquote class=\\"wp-block-quote\\"><p>1</p><p></p><cite>c</cite></blockquote>
 <!-- /wp:quote -->
@@ -126,13 +126,19 @@ exports[`Quote can be split in the middle 2`] = `
 <!-- /wp:quote -->"
 `;
 
-exports[`Quote can be split in the middle 3`] = `
+exports[`Quote can be split in the middle and merged back 3`] = `
 "<!-- wp:quote -->
 <blockquote class=\\"wp-block-quote\\"><p>1</p><cite>c</cite></blockquote>
 <!-- /wp:quote -->
 
 <!-- wp:quote -->
 <blockquote class=\\"wp-block-quote\\"><p>2</p><cite>c</cite></blockquote>
+<!-- /wp:quote -->"
+`;
+
+exports[`Quote can be split in the middle and merged back 4`] = `
+"<!-- wp:quote -->
+<blockquote class=\\"wp-block-quote\\"><p>1</p><p>2</p><cite>c</cite></blockquote>
 <!-- /wp:quote -->"
 `;
 
