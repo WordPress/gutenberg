@@ -207,7 +207,7 @@ class FileEdit extends Component {
 						</Toolbar>
 					</MediaUploadCheck>
 				</BlockControls>
-				<Animate type={ animate && isBlobURL( href ) ? 'loading' : null }>
+				<Animate type={ isBlobURL( href ) ? 'loading' : null }>
 					{ ( { className: animateClassName } ) => (
 						<div className={ classnames( classes, animateClassName ) }>
 							<div className={ 'wp-block-file__content-wrapper' }>
