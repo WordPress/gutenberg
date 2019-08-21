@@ -15,7 +15,7 @@ import { MediaUpload, MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO } from '@wordpress/bloc
 import styles from './styles.scss';
 
 function MediaPlaceholder( props ) {
-	const { allowedTypes, labels = {}, icon, onSelect, isAppender } = props;
+	const { allowedTypes, labels = {}, icon, onSelect } = props;
 
 	const isImage = MEDIA_TYPE_IMAGE === allowedTypes[ 0 ];
 	const isVideo = MEDIA_TYPE_VIDEO === allowedTypes[ 0 ];
@@ -65,7 +65,7 @@ function MediaPlaceholder( props ) {
 							open();
 						} }
 					>
-						<View style={ [ styles.emptyStateContainer, isAppender && styles.isAppender ] }>
+						<View style={ [ styles.emptyStateContainer ] }>
 							{ getMediaOptions() }
 							<View style={ styles.modalIcon }>
 								{ icon }
