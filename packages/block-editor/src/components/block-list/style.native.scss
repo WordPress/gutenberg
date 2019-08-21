@@ -30,6 +30,10 @@
 	height: 2px;
 }
 
+.lineStyleAddHereDark {
+	background-color: $gray-50;
+}
+
 .labelStyleAddHere {
 	flex: 1;
 	text-align: center;
@@ -38,10 +42,13 @@
 	font-weight: bold;
 }
 
+.labelStyleAddHereDark {
+	color: $gray-20;
+}
+
 .containerStyleAddHere {
 	flex: 1;
 	flex-direction: row;
-	background-color: $white;
 }
 
 .blockHolderSemiBordered {

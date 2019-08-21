@@ -144,11 +144,13 @@ export class BlockList extends Component {
 	}
 
 	renderAddBlockSeparator() {
+		const lineStyle = useStyle( styles.lineStyleAddHere, styles.lineStyleAddHereDark, this.props.theme );
+		const labelStyle = useStyle( styles.labelStyleAddHere, styles.labelStyleAddHereDark, this.props.theme );
 		return (
 			<View style={ styles.containerStyleAddHere } >
-				<View style={ styles.lineStyleAddHere }></View>
-				<Text style={ styles.labelStyleAddHere } >{ __( 'ADD BLOCK HERE' ) }</Text>
-				<View style={ styles.lineStyleAddHere }></View>
+				<View style={ lineStyle }></View>
+				<Text style={ labelStyle } >{ __( 'ADD BLOCK HERE' ) }</Text>
+				<View style={ lineStyle }></View>
 			</View>
 		);
 	}
