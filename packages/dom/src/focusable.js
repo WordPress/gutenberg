@@ -17,7 +17,7 @@
  *  - https://w3c.github.io/html/editing.html#data-model
  */
 
-const SELECTOR = [
+const FOCUSABLE_SELECTORS = [
 	'[tabindex]',
 	'a[href]',
 	'button:not([disabled])',
@@ -77,9 +77,9 @@ function isValidFocusableArea( element ) {
 export function find( context, options = {
 	includeScrollable: false,
 } ) {
-	let focusable = [];
+	const elements = context.querySelectorAll( FOCUSABLE_SELECTORS );
 
-	const elements = context.querySelectorAll( SELECTOR );
+	let focusable = [];
 
 	focusable = [ ...elements ].filter( ( element ) => {
 		if ( ! isVisible( element ) ) {
@@ -96,12 +96,22 @@ export function find( context, options = {
 
 	// Firefox treats elements which create a scrollable region/container as
 	// "focusable". Detecting these is expensive, so this is an opt-in.
-	// see https://html.spec.whatwg.org/multipage/interaction.html#focusable-area
+	// You should exercise caution when setting this option as it is intensive
+	// and may result in poor performance.
+	// see https://html.spec.whatwg.org/multipage/interaction.html#focusable-area.
 	if ( options.includeScrollable ) {
 		const allChildren = context.querySelectorAll( '*' );
 		const scrollableContainers = [ ...allChildren ].filter( ( el ) => {
-			const hasValidOverflow = window.getComputedStyle( el ).overflow !== 'visible';
 			const hasScroll = el.clientHeight <= el.scrollHeight;
+
+			// Bale early as performance optimisation to avoid
+			// unecessary getComputedStyle
+			if ( ! hasScroll ) {
+				return false;
+			}
+
+			const hasValidOverflow = window.getComputedStyle( el ).overflow !== 'visible';
+
 			return hasValidOverflow && hasScroll;
 		} );
 
