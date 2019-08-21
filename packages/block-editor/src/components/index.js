@@ -5,6 +5,7 @@
 export * from './colors';
 export * from './gradients';
 export * from './font-sizes';
+export { default as __experimentalImageSizeControl } from './image-size-control';
 export { default as AlignmentToolbar } from './alignment-toolbar';
 export { default as Autocomplete } from './autocomplete';
 export { default as BlockAlignmentToolbar } from './block-alignment-toolbar';
