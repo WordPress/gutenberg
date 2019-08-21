@@ -2,7 +2,7 @@
  * External dependencies
  */
 import React from 'react';
-import { View, ImageBackground, Text, TouchableWithoutFeedback, Dimensions } from 'react-native';
+import { View, StyleSheet, Text, TouchableWithoutFeedback, Dimensions } from 'react-native';
 import {
 	requestMediaImport,
 	mediaUploadSync,
@@ -17,6 +17,7 @@ import { isEmpty } from 'lodash';
 import {
 	BottomSheet,
 	Icon,
+	Image,
 	Toolbar,
 	ToolbarButton,
 } from '@wordpress/components';
@@ -310,29 +311,33 @@ class ImageEdit extends React.Component {
 							);
 
 							return (
-								<View style={ { flex: 1 } } >
+								<View style={ { width: finalWidth, height: finalHeight, opacity } } >
 									{ ! imageWidthWithinContainer &&
 										<View style={ [ styles.imageContainer, { height: imageContainerHeight } ] } >
 											{ this.getIcon( false ) }
 										</View> }
-									<ImageBackground
+									<Image
 										accessible={ true }
 										disabled={ ! isSelected }
-										accessibilityLabel={ alt }
 										accessibilityHint={ __( 'Double tap and hold to edit' ) }
 										accessibilityRole={ 'imagebutton' }
-										style={ { width: finalWidth, height: finalHeight, opacity } }
-										resizeMethod="scale"
-										source={ { uri: url } }
-										key={ url }
-									>
-										{ isUploadFailed &&
-											<View style={ [ styles.imageContainer, { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.5)' } ] } >
-												{ iconContainer }
-												<Text style={ styles.uploadFailedText }>{ retryMessage }</Text>
-											</View>
+										style={
+											{
+												width: finalWidth,
+												height: finalHeight,
+											}
 										}
-									</ImageBackground>
+										resizeMethod="scale"
+										src={ url }
+										alt={ alt }
+										key={ url }
+									/>
+									{ isUploadFailed &&
+										<View style={ [ StyleSheet.absoluteFill, styles.imageContainer, { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.5)' } ] } >
+											{ iconContainer }
+											<Text style={ styles.uploadFailedText }>{ retryMessage }</Text>
+										</View>
+									}
 								</View>
 							);
 						} }
