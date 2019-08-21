@@ -320,19 +320,21 @@ class RichText extends Component {
 			return;
 		}
 
-		if ( event && event.nativeEvent.inputType ) {
-			const { inputType } = event.nativeEvent;
+		let inputType;
 
-			// The browser formatted something or tried to insert HTML.
-			// Overwrite it. It will be handled later by the format library if
-			// needed.
-			if (
-				inputType.indexOf( 'format' ) === 0 ||
-				INSERTION_INPUT_TYPES_TO_IGNORE.has( inputType )
-			) {
-				this.applyRecord( this.record );
-				return;
-			}
+		if ( event ) {
+			inputType = event.nativeEvent.inputType;
+		}
+
+		// The browser formatted something or tried to insert HTML.
+		// Overwrite it. It will be handled later by the format library if
+		// needed.
+		if ( inputType && (
+			inputType.indexOf( 'format' ) === 0 ||
+			INSERTION_INPUT_TYPES_TO_IGNORE.has( inputType )
+		) ) {
+			this.applyRecord( this.record );
+			return;
 		}
 
 		const value = this.createRecord();
@@ -348,7 +350,22 @@ class RichText extends Component {
 
 		this.onChange( change, { withoutHistory: true } );
 
-		const { __unstableInputRule: inputRule, formatTypes } = this.props;
+		const {
+			__unstableInputRule: inputRule,
+			__unstableMarkAutomaticChange: markAutomaticChange,
+			formatTypes,
+			setTimeout,
+			clearTimeout,
+		} = this.props;
+
+		// Create an undo level when input stops for over a second.
+		clearTimeout( this.onInput.timeout );
+		this.onInput.timeout = setTimeout( this.onCreateUndoLevel, 1000 );
+
+		// Only run input rules when inserting text.
+		if ( inputType !== 'insertText' ) {
+			return;
+		}
 
 		if ( inputRule ) {
 			inputRule( change, this.valueToFormat );
@@ -365,12 +382,8 @@ class RichText extends Component {
 		if ( transformed !== change ) {
 			this.onCreateUndoLevel();
 			this.onChange( { ...transformed, activeFormats } );
-			this.props.__unstableMarkAutomaticChange();
+			markAutomaticChange();
 		}
-
-		// Create an undo level when input stops for over a second.
-		this.props.clearTimeout( this.onInput.timeout );
-		this.onInput.timeout = this.props.setTimeout( this.onCreateUndoLevel, 1000 );
 	}
 
 	onCompositionEnd() {
