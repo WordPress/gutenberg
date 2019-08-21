@@ -133,7 +133,7 @@ class VideoEdit extends React.Component {
 		this.setState( { isUploadInProgress: false } );
 	}
 
-	onSelectMediaUploadOption( mediaId, mediaUrl ) {
+	onSelectMediaUploadOption( { mediaId, mediaUrl } ) {
 		const { setAttributes } = this.props;
 		setAttributes( { id: mediaId, src: mediaUrl } );
 	}

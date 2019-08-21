@@ -175,7 +175,7 @@ class ImageEdit extends React.Component {
 		} );
 	}
 
-	onSelectMediaUploadOption( mediaId, mediaUrl ) {
+	onSelectMediaUploadOption( { mediaId, mediaUrl } ) {
 		const { setAttributes } = this.props;
 		setAttributes( { url: mediaUrl, id: mediaId } );
 	}

@@ -87,10 +87,12 @@ describe( 'MediaUpload component', () => {
 				} } />
 		);
 		wrapper.find( 'Picker' ).simulate( 'change', option );
+		const media = { mediaId: MEDIA_ID, mediaUrl: MEDIA_URL };
+
 		expect( requestFunction ).toHaveBeenCalledTimes( 1 );
 
 		expect( onSelect ).toHaveBeenCalledTimes( 1 );
-		expect( onSelect ).toHaveBeenCalledWith( MEDIA_ID, MEDIA_URL );
+		expect( onSelect ).toHaveBeenCalledWith( media );
 	};
 
 	it( 'can select media from device library', () => {
