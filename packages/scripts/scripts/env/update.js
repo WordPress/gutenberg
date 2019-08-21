@@ -9,20 +9,15 @@ const DecompressZip = require( 'decompress-zip' );
  * Node dependencies.
  */
 const { execSync } = require( 'child_process' );
-const { env, exit, cwd, stdout } = require( 'process' );
+const { env, cwd, stdout } = require( 'process' );
 const { normalize } = require( 'path' );
-const { createWriteStream, existsSync } = require( 'fs' );
+const { createWriteStream } = require( 'fs' );
 const { tmpdir } = require( 'os' );
 
 env.WP_DEVELOP_DIR = cwd() + '/wordpress';
 
-if ( existsSync( normalize( cwd() + '/wordpress/wp-config-sample.php' ) ) ) {
-	stdout.write( 'It looks like WordPress is already installed, please delete the `wordpress` directory for a fresh install, or run `npm run env start` to start the existing environment.\n' );
-	exit( 1 );
-}
-
 if ( commandExistsSync( 'git' ) ) {
-	execSync( 'git clone --depth=1 git://develop.git.wordpress.org/ wordpress', { stdio: 'inherit' } );
+	execSync( 'git pull', { cwd: normalize( env.WP_DEVELOP_DIR ), stdio: 'inherit' } );
 	buildWordPress();
 } else {
 	stdout.write( "Git isn't availabe. Switching to downloading a zip version.\n" );
@@ -60,9 +55,7 @@ function buildWordPress() {
 	} else {
 		execSync( 'npm run build:dev', { cwd: normalize( env.WP_DEVELOP_DIR ), stdio: 'inherit' } );
 	}
-	execSync( 'npm run env:install', { cwd: normalize( env.WP_DEVELOP_DIR ), stdio: 'inherit' } );
 
-	// Mount the plugin into the WordPress install.
+	// Ensure the plugin is still mounted.
 	execSync( 'npm run env connect', { stdio: 'inherit' } );
-	execSync( `npm run env cli plugin activate ${ env.npm_package_wp_env_plugin_dir }`, { stdio: 'inherit' } );
 }
