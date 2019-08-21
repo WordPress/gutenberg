@@ -3,27 +3,17 @@
 }
 
 .blockContainer {
-	background-color: $white;
 	padding-left: 16px;
 	padding-right: 16px;
 	padding-top: 12px;
 	padding-bottom: 12px;
 }
 
-.blockContainerDark {
-	background-color: $black;
-}
-
 .blockContainerFocused {
-	background-color: $white;
 	padding-left: 16px;
 	padding-right: 16px;
 	padding-top: 12px;
 	padding-bottom: 0; // will be flushed into inline toolbar height
-}
-
-.blockContainerFocusedDark {
-	background-color: $black;
 }
 
 .blockTitle {

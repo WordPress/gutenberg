@@ -15,7 +15,6 @@ import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { getBlockType } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
-import { useStyle, withTheme } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -112,11 +111,7 @@ class BlockListBlock extends Component {
 			isValid,
 			showTitle,
 			title,
-			theme,
 		} = this.props;
-
-		const blockContainerStyle = useStyle( styles.blockContainer, styles.blockContainerDark, theme );
-		const blockContainerFocusedStyle = useStyle( styles.blockContainerFocused, styles.blockContainerFocusedDark, theme );
 
 		const borderColor = isSelected ? focusedBorderColor : 'transparent';
 
@@ -132,7 +127,7 @@ class BlockListBlock extends Component {
 					{ showTitle && this.renderBlockTitle() }
 					<View
 						accessibilityLabel={ accessibilityLabel }
-						style={ [ ! isSelected && blockContainerStyle, isSelected && blockContainerFocusedStyle ] }
+						style={ [ ! isSelected && styles.blockContainer, isSelected && styles.blockContainerFocused ] }
 					>
 						{ isValid && this.getBlockForType() }
 						{ ! isValid &&
@@ -222,5 +217,4 @@ export default compose( [
 			},
 		};
 	} ),
-	withTheme,
 ] )( BlockListBlock );
