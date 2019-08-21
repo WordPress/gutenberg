@@ -55,6 +55,47 @@ describe( 'List', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
+	it( 'should undo asterisk transform with backspace', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '* ' );
+		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
+		await page.keyboard.press( 'Backspace' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should undo asterisk transform with escape', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '* ' );
+		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
+		await page.keyboard.press( 'Escape' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should not undo asterisk transform with backspace after typing', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '* a' );
+		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
+		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.press( 'Backspace' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should undo asterisk transform with backspace after selection change', async () => {
+		await clickBlockAppender();
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '* ' );
+		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.press( 'Backspace' );
+
+		// Expect list to be deleted
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
 	it( 'can be created by typing "/list"', async () => {
 		// Create a list with the slash block shortcut.
 		await clickBlockAppender();

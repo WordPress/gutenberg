@@ -12,7 +12,7 @@ import {
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { BACKSPACE, DELETE, ENTER, LEFT, RIGHT, SPACE } from '@wordpress/keycodes';
+import { BACKSPACE, DELETE, ENTER, LEFT, RIGHT, SPACE, ESCAPE } from '@wordpress/keycodes';
 import { withSelect } from '@wordpress/data';
 import { withSafeTimeout, compose } from '@wordpress/compose';
 import isShallowEqual from '@wordpress/is-shallow-equal';
@@ -365,6 +365,7 @@ class RichText extends Component {
 		if ( transformed !== change ) {
 			this.onCreateUndoLevel();
 			this.onChange( { ...transformed, activeFormats } );
+			this.props.__unstableMarkAutomaticChange();
 		}
 
 		// Create an undo level when input stops for over a second.
@@ -518,7 +519,17 @@ class RichText extends Component {
 	handleDelete( event ) {
 		const { keyCode } = event;
 
-		if ( keyCode !== DELETE && keyCode !== BACKSPACE ) {
+		if ( keyCode !== DELETE && keyCode !== BACKSPACE && keyCode !== ESCAPE ) {
+			return;
+		}
+
+		if ( this.props.__unstableDidAutomaticChange ) {
+			event.preventDefault();
+			this.props.__unstableUndo();
+			return;
+		}
+
+		if ( keyCode === ESCAPE ) {
 			return;
 		}
 
