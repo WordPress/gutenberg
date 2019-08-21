@@ -178,8 +178,7 @@ export function* setupEditor( post, edits, template ) {
 	yield resetEditorBlocks( blocks, { __unstableShouldCreateUndoLevel: false } );
 	yield setupEditorState( post );
 	if ( edits ) {
-		const record = { ...post, ...edits };
-		yield dispatch( 'core', 'receiveEntityRecords', 'postType', post.type, record );
+		yield editPost( edits );
 	}
 	yield* __experimentalSubscribeSources();
 }

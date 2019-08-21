@@ -133,14 +133,14 @@ describe( 'Change detection', () => {
 		await assertIsDirty( false );
 	} );
 
-	it( 'Should not prompt to confirm unsaved changes for new post with initial edits', async () => {
+	it( 'Should prompt to confirm unsaved changes for new post with initial edits', async () => {
 		await createNewPost( {
 			title: 'My New Post',
 			content: 'My content',
 			excerpt: 'My excerpt',
 		} );
 
-		await assertIsDirty( false );
+		await assertIsDirty( true );
 	} );
 
 	it( 'Should prompt if property changed without save', async () => {
