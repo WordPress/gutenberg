@@ -207,3 +207,11 @@ $block-inserter-search-height: 38px;
 	font-weight: 600;
 	margin-bottom: 20px;
 }
+
+.block-editor-inserter__preview-content {
+	border: $border-width solid $light-gray-500;
+	border-radius: $radius-round-rectangle;
+	min-height: 150px;
+	padding: 10px;
+	display: grid;
+}

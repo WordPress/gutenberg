@@ -22,6 +22,12 @@ export const settings = {
 	description: __( 'Start with the building block of all narrative.' ),
 	icon,
 	keywords: [ __( 'text' ) ],
+	example: {
+		attributes: {
+			align: 'center',
+			content: __( 'Start writing, no matter what. The water does not flow until the faucet is turned on.' ),
+		},
+	},
 	supports: {
 		className: false,
 	},

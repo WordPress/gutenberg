@@ -263,6 +263,7 @@ export class InserterMenu extends Component {
 			suggestedItems,
 		} = this.state;
 		const isPanelOpen = ( panel ) => openPanels.indexOf( panel ) !== -1;
+		const hoveredItemBlockType = hoveredItem ? getBlockType( hoveredItem.name ) : null;
 
 		// Disable reason (no-autofocus): The inserter menu is a modal display, not one which
 		// is always visible, and one which already incurs this behavior of autoFocus via
@@ -364,14 +365,20 @@ export class InserterMenu extends Component {
 					<div className="block-editor-inserter__menu-help-panel">
 						{ hoveredItem && (
 							<>
-								<BlockCard blockType={ getBlockType( hoveredItem.name ) } />
-								{ isReusableBlock( hoveredItem ) && (
+								<BlockCard blockType={ hoveredItemBlockType } />
+								{ ( isReusableBlock( hoveredItem ) || hoveredItemBlockType.example ) && (
 									<div className="block-editor-inserter__preview">
 										<div className="block-editor-inserter__preview-title">{ __( 'Preview' ) }</div>
-										<BlockPreview
-											className="block-editor-inserter__preview-content"
-											blocks={ createBlock( hoveredItem.name, hoveredItem.initialAttributes ) }
-										/>
+										<div className="block-editor-inserter__preview-content">
+											<BlockPreview
+												viewportWidth={ 500 }
+												blocks={ createBlock(
+													hoveredItem.name,
+													hoveredItemBlockType.example ? hoveredItemBlockType.example.attributes : hoveredItem.initialAttributes,
+													hoveredItemBlockType.example ? hoveredItemBlockType.example.innerBlocks : undefined
+												) }
+											/>
+										</div>
 									</div>
 								) }
 							</>
