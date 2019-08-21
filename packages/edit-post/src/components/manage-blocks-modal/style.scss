@@ -45,6 +45,17 @@
 	}
 }
 
+.edit-post-manage-blocks-modal__disabled-blocks-count {
+	border-top: 1px solid $light-gray-500;
+	margin-left: -$grid-size-xlarge;
+	margin-right: -$grid-size-xlarge;
+	padding-top: 0.6rem;
+	padding-bottom: 0.6rem;
+	padding-left: $grid-size-xlarge;
+	padding-right: $grid-size-xlarge;
+	background-color: $light-gray-200;
+}
+
 .edit-post-manage-blocks-modal__category {
 	margin: 0 0 2rem 0;
 }
