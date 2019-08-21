@@ -9,6 +9,7 @@ import classnames from 'classnames';
  */
 import { Component, RawHTML } from '@wordpress/element';
 import {
+	BaseControl,
 	PanelBody,
 	Placeholder,
 	QueryControls,
@@ -22,7 +23,11 @@ import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import { __ } from '@wordpress/i18n';
 import { dateI18n, format, __experimentalGetSettings } from '@wordpress/date';
-import { InspectorControls, BlockControls } from '@wordpress/block-editor';
+import {
+	InspectorControls,
+	BlockAlignmentToolbar,
+	BlockControls,
+} from '@wordpress/block-editor';
 import { withSelect } from '@wordpress/data';
 
 /**
@@ -63,9 +68,15 @@ class LatestPostsEdit extends Component {
 	}
 
 	render() {
-		const { attributes, setAttributes, latestPosts } = this.props;
+		const {
+			attributes,
+			setAttributes,
+			getFeaturedMediaSourceUrl,
+			latestPosts,
+		} = this.props;
 		const { categoriesList } = this.state;
 		const {
+			displayFeaturedImage,
 			displayPostContentRadio,
 			displayPostContent,
 			displayPostDate,
@@ -76,6 +87,7 @@ class LatestPostsEdit extends Component {
 			categories,
 			postsToShow,
 			excerptLength,
+			imageAlign,
 		} = attributes;
 
 		const inspectorControls = (
@@ -128,6 +140,33 @@ class LatestPostsEdit extends Component {
 							setAttributes( { displayPostDate: value } )
 						}
 					/>
+				</PanelBody>
+
+				<PanelBody title={ __( 'Featured Image Settings' ) }>
+					<ToggleControl
+						label={ __( 'Disaply featured image' ) }
+						checked={ displayFeaturedImage }
+						onChange={ ( value ) =>
+							setAttributes( { displayFeaturedImage: value } )
+						}
+					/>
+					{ displayFeaturedImage && (
+						<>
+							<BaseControl>
+								<BaseControl.VisualLabel>
+									{ __( 'Image Alignment' ) }
+								</BaseControl.VisualLabel>
+								<BlockAlignmentToolbar
+									value={ imageAlign }
+									onChange={ ( value ) =>
+										setAttributes( { imageAlign: value } )
+									}
+									controls={ [ 'left', 'center', 'right' ] }
+									isCollapsed={ false }
+								/>
+							</BaseControl>
+						</>
+					) }
 				</PanelBody>
 
 				<PanelBody title={ __( 'Sorting and filtering' ) }>
@@ -236,12 +275,32 @@ class LatestPostsEdit extends Component {
 
 						const excerptElement = document.createElement( 'div' );
 						excerptElement.innerHTML = excerpt;
+
 						excerpt =
 							excerptElement.textContent ||
 							excerptElement.innerText ||
 							'';
+
+						const imageSourceUrl = getFeaturedMediaSourceUrl(
+							post.featured_media
+						);
+						const imageClasses = classnames( [
+							'wp-block-latest-posts__featured-image',
+							imageAlign && `align${ imageAlign }`,
+						] );
+
 						return (
 							<li key={ i }>
+								{ displayFeaturedImage && (
+									<div className={ imageClasses }>
+										{ imageSourceUrl && (
+											<img
+												src={ imageSourceUrl }
+												alt=""
+											/>
+										) }
+									</div>
+								) }
 								<a
 									href={ post.link }
 									target="_blank"
@@ -315,7 +374,7 @@ class LatestPostsEdit extends Component {
 
 export default withSelect( ( select, props ) => {
 	const { postsToShow, order, orderBy, categories } = props.attributes;
-	const { getEntityRecords } = select( 'core' );
+	const { getEntityRecords, getMedia } = select( 'core' );
 	const latestPostsQuery = pickBy(
 		{
 			categories,
@@ -326,6 +385,16 @@ export default withSelect( ( select, props ) => {
 		( value ) => ! isUndefined( value )
 	);
 	return {
+		// @todo get size dynamically based on size selected.
+		getFeaturedMediaSourceUrl( featuredImageId ) {
+			if ( featuredImageId ) {
+				const media = getMedia( featuredImageId );
+				if ( media ) {
+					return media.source_url;
+				}
+			}
+			return null;
+		},
 		latestPosts: getEntityRecords( 'postType', 'post', latestPostsQuery ),
 	};
 } )( LatestPostsEdit );

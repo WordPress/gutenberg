@@ -164,6 +164,14 @@ function register_block_core_latest_posts() {
 					'type'    => 'string',
 					'default' => 'date',
 				),
+				'displayFeaturedImage'    => array(
+					'type'    => 'boolean',
+					'default' => false,
+				),
+				'imageAlign'              => array(
+					'type'    => 'string',
+					'default' => false,
+				),
 			),
 			'render_callback' => 'render_block_core_latest_posts',
 		)
