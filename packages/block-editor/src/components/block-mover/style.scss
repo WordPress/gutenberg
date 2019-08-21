@@ -2,10 +2,6 @@
 	min-height: $empty-paragraph-height;
 	opacity: 0;
 
-	&.is-visible {
-		@include edit-post__fade-in-animation;
-	}
-
 	// 24px is the smallest size of a good pressable button.
 	// With 3 pieces of side UI, that comes to a total of 72px.
 	// To vertically center against a 56px paragraph, move upwards 72px - 56px / 2.

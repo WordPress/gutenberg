@@ -8,7 +8,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { IconButton } from '@wordpress/components';
+import { Animate, IconButton } from '@wordpress/components';
 import { getBlockType } from '@wordpress/blocks';
 import { Component } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -56,61 +56,65 @@ export class BlockMover extends Component {
 		// to an unfocused state (body as active element) without firing blur on,
 		// the rendering parent, leaving it unable to react to focus out.
 		return (
-			<div className={ classnames( 'editor-block-mover block-editor-block-mover', { 'is-visible': isFocused || ! isHidden } ) }>
-				<IconButton
-					className="editor-block-mover__control block-editor-block-mover__control"
-					onClick={ isFirst ? null : onMoveUp }
-					icon={ upArrow }
-					label={ __( 'Move up' ) }
-					aria-describedby={ `block-editor-block-mover__up-description-${ instanceId }` }
-					aria-disabled={ isFirst }
-					onFocus={ this.onFocus }
-					onBlur={ this.onBlur }
-				/>
-				<IconDragHandle
-					className="editor-block-mover__control block-editor-block-mover__control"
-					icon={ dragHandle }
-					clientId={ clientIds }
-					blockElementId={ blockElementId }
-					isVisible={ isDraggable }
-					onDragStart={ onDragStart }
-					onDragEnd={ onDragEnd }
-				/>
-				<IconButton
-					className="editor-block-mover__control block-editor-block-mover__control"
-					onClick={ isLast ? null : onMoveDown }
-					icon={ downArrow }
-					label={ __( 'Move down' ) }
-					aria-describedby={ `block-editor-block-mover__down-description-${ instanceId }` }
-					aria-disabled={ isLast }
-					onFocus={ this.onFocus }
-					onBlur={ this.onBlur }
-				/>
-				<span id={ `block-editor-block-mover__up-description-${ instanceId }` } className="editor-block-mover__description block-editor-block-mover__description">
-					{
-						getBlockMoverDescription(
-							blocksCount,
-							blockType && blockType.title,
-							firstIndex,
-							isFirst,
-							isLast,
-							-1,
-						)
-					}
-				</span>
-				<span id={ `block-editor-block-mover__down-description-${ instanceId }` } className="editor-block-mover__description block-editor-block-mover__description">
-					{
-						getBlockMoverDescription(
-							blocksCount,
-							blockType && blockType.title,
-							firstIndex,
-							isFirst,
-							isLast,
-							1,
-						)
-					}
-				</span>
-			</div>
+			<Animate type={ isFocused || ! isHidden ? 'fade-in' : null }>
+				{ ( { className: animateClassName } ) =>
+					<div className={ classnames( 'editor-block-mover block-editor-block-mover', { 'is-visible': isFocused || ! isHidden }, animateClassName ) }>
+						<IconButton
+							className="editor-block-mover__control block-editor-block-mover__control"
+							onClick={ isFirst ? null : onMoveUp }
+							icon={ upArrow }
+							label={ __( 'Move up' ) }
+							aria-describedby={ `block-editor-block-mover__up-description-${ instanceId }` }
+							aria-disabled={ isFirst }
+							onFocus={ this.onFocus }
+							onBlur={ this.onBlur }
+						/>
+						<IconDragHandle
+							className="editor-block-mover__control block-editor-block-mover__control"
+							icon={ dragHandle }
+							clientId={ clientIds }
+							blockElementId={ blockElementId }
+							isVisible={ isDraggable }
+							onDragStart={ onDragStart }
+							onDragEnd={ onDragEnd }
+						/>
+						<IconButton
+							className="editor-block-mover__control block-editor-block-mover__control"
+							onClick={ isLast ? null : onMoveDown }
+							icon={ downArrow }
+							label={ __( 'Move down' ) }
+							aria-describedby={ `block-editor-block-mover__down-description-${ instanceId }` }
+							aria-disabled={ isLast }
+							onFocus={ this.onFocus }
+							onBlur={ this.onBlur }
+						/>
+						<span id={ `block-editor-block-mover__up-description-${ instanceId }` } className="editor-block-mover__description block-editor-block-mover__description">
+							{
+								getBlockMoverDescription(
+									blocksCount,
+									blockType && blockType.title,
+									firstIndex,
+									isFirst,
+									isLast,
+									-1,
+								)
+							}
+						</span>
+						<span id={ `block-editor-block-mover__down-description-${ instanceId }` } className="editor-block-mover__description block-editor-block-mover__description">
+							{
+								getBlockMoverDescription(
+									blocksCount,
+									blockType && blockType.title,
+									firstIndex,
+									isFirst,
+									isLast,
+									1,
+								)
+							}
+						</span>
+					</div>
+				}
+			</Animate>
 		);
 	}
 }
