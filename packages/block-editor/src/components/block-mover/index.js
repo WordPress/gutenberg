@@ -57,7 +57,7 @@ export class BlockMover extends Component {
 		// the rendering parent, leaving it unable to react to focus out.
 		return (
 			<Animate type={ isFocused || ! isHidden ? 'fade-in' : null }>
-				{ ( { className: animateClassName } ) =>
+				{ ( { className: animateClassName } ) => (
 					<div className={ classnames( 'editor-block-mover block-editor-block-mover', { 'is-visible': isFocused || ! isHidden }, animateClassName ) }>
 						<IconButton
 							className="editor-block-mover__control block-editor-block-mover__control"
@@ -113,7 +113,7 @@ export class BlockMover extends Component {
 							}
 						</span>
 					</div>
-				}
+				) }
 			</Animate>
 		);
 	}
