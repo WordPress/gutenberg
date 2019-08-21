@@ -23,7 +23,7 @@ branches:
     - master
 
 before_install:
-  - nvm install 6.10.3
+  - nvm install 10.16.2
 
 env: PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
