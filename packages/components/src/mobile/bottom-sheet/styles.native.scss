@@ -21,6 +21,10 @@
 	width: 100%;
 }
 
+.separatorDark {
+	background-color: #3c434a;
+}
+
 .emptyHeaderSpace {
 	height: 14;
 }
@@ -32,6 +36,10 @@
 	width: 100%;
 	max-width: 512;
 	padding-bottom: 0;
+}
+
+.backgroundDark {
+	background-color: $dark-background-elevated;
 }
 
 .content {
@@ -86,6 +94,10 @@
 	width: 100%;
 }
 
+.cellSeparatorDark {
+	background-color: #3c434a;
+}
+
 .cellRowContainer {
 	flex-direction: row;
 	align-items: center;
@@ -113,6 +125,10 @@
 	color: #2e4453;
 	text-align: right;
 	flex: 1;
+}
+
+.cellTextDark {
+	color: $white;
 }
 
 .cellValueRTL {
