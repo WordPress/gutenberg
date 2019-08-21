@@ -78,9 +78,12 @@ class Disabled extends Component {
 	disable() {
 		const {
 			eligibleNodeNames = DISABLED_ELIGIBLE_NODE_NAMES,
+			includeScrollable = false,
 		} = this.props;
 
-		const focusableNodes = focus.focusable.find( this.node );
+		const focusableNodes = focus.focusable.find( this.node, {
+			includeScrollable, // opt in to find all focusable elements
+		} );
 
 		focusableNodes.forEach( ( focusable ) => {
 			// Disable all nodes from being tabbable order
@@ -98,12 +101,9 @@ class Disabled extends Component {
 			if ( focusable.hasAttribute( 'href' ) ) {
 				focusable.removeAttribute( 'href' );
 			}
-		} );
 
-		// In FF the `<RichText>` node becomes focusable (presumanly via scripting).
-		// We manually disable this via tabindex also
-		const blockEditorEdgeCaseFocusable = '.block-editor-rich-text';
-		this.node.querySelectorAll( blockEditorEdgeCaseFocusable ).forEach( ( rc ) => rc.setAttribute( 'tabindex', '-1' ) );
+			focusable.setAttribute( 'data-focus-removed', 'true' );
+		} );
 	}
 
 	render() {
