@@ -816,6 +816,9 @@ export function* resetEditorBlocks( blocks, options = {} ) {
 	const edits = { blocks: yield* getBlocksWithSourcedAttributes( blocks ) };
 
 	if ( options.__unstableShouldCreateUndoLevel !== false ) {
+		// We create a new function here on every persistent edit
+		// to make sure the edit makes the post dirty and creates
+		// a new undo level.
 		edits.content = ( { blocks: blocksForSerialization = [] } ) =>
 			serializeBlocks( blocksForSerialization );
 	}
