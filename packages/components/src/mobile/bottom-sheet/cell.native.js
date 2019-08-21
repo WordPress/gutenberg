@@ -123,7 +123,7 @@ class BottomSheetCell extends Component {
 				/>
 			) : (
 				<Text
-					style={ { ...styles.cellValue, ...valueStyle } }
+					style={ { ...cellValueStyle, ...valueStyle } }
 					numberOfLines={ 1 }
 					ellipsizeMode={ 'middle' }
 				>
