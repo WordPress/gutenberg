@@ -43,3 +43,18 @@
 		transform: translateX(0%);
 	}
 }
+
+.components-animate__fade-in {
+	animation: components-animate__fade-in 0.2s ease-out 0s;
+	animation-fill-mode: forwards;
+	@include reduce-motion("animation");
+}
+
+@keyframes components-animate__fade-in {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}

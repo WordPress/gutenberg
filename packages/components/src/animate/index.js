@@ -30,6 +30,14 @@ function Animate( { type, options = {}, children } ) {
 		} );
 	}
 
+	if ( type === 'fade-in' ) {
+		return children( {
+			className: classnames(
+				'components-animate__fade-in',
+			),
+		} );
+	}
+
 	return children( {} );
 }
 
