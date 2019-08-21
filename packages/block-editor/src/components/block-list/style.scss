@@ -351,10 +351,6 @@
 		animation: none;
 	}
 
-	.block-editor-block-list__side-inserter {
-		@include edit-post__fade-in-animation;
-	}
-
 	// Reusable blocks
 	&.is-reusable > .block-editor-block-list__block-edit::before {
 		border: $border-width dashed $dark-opacity-light-500;

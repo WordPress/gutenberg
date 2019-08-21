@@ -22,7 +22,7 @@ import {
 	isUnmodifiedDefaultBlock,
 	getUnregisteredTypeHandlerName,
 } from '@wordpress/blocks';
-import { KeyboardShortcuts, withFilters } from '@wordpress/components';
+import { Animate, KeyboardShortcuts, withFilters } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	withDispatch,
@@ -588,13 +588,17 @@ function BlockListBlock( {
 				</IgnoreNestedEvents>
 			</div>
 			{ showInserterShortcuts && (
-				<div className="editor-block-list__side-inserter block-editor-block-list__side-inserter">
-					<InserterWithShortcuts
-						clientId={ clientId }
-						rootClientId={ rootClientId }
-						onToggle={ selectOnOpen }
-					/>
-				</div>
+				<Animate type="fade-in">
+					{ ( { className: animateClassName } ) =>
+						<div className={ classnames( 'editor-block-list__side-inserter', 'block-editor-block-list__side-inserter', animateClassName ) }>
+							<InserterWithShortcuts
+								clientId={ clientId }
+								rootClientId={ rootClientId }
+								onToggle={ selectOnOpen }
+							/>
+						</div>
+					}
+				</Animate>
 			) }
 			{ showEmptyBlockSideInserter && (
 				<div className="editor-block-list__empty-block-inserter block-editor-block-list__empty-block-inserter">
