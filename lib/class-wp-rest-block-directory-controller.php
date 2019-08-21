@@ -123,16 +123,16 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 
 		$filesystem_method = get_filesystem_method();
 
-		if ( $filesystem_method !== 'direct' ) {
+		if ( 'direct' !== $filesystem_method ) {
 			return WP_Error( null, 'Only direct FS_METHOD is supported.' );
 		}
 
-		$result   = $upgrader->install( $api->download_link );
+		$result = $upgrader->install( $api->download_link );
 
 		if ( is_wp_error( $result ) ) {
 			return WP_Error( $result->get_error_code(), $result->get_error_message() );
-		} 
-		
+		}
+
 		if ( is_wp_error( $skin->result ) ) {
 			return WP_Error( $skin->$result->get_error_code(), $skin->$result->get_error_message() );
 		}
@@ -219,19 +219,19 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 
 		$search_string = $request->get_param( 'search' );
 
-		if ( empty( $search_string ) ){
+		if ( empty( $search_string ) ) {
 			return rest_ensure_response( array() );
 		}
 
 		include( ABSPATH . WPINC . '/version.php' );
 
-		$url = 'http://api.wordpress.org/plugins/info/1.2/';
-		$url = add_query_arg(
+		$url      = 'http://api.wordpress.org/plugins/info/1.2/';
+		$url      = add_query_arg(
 			array(
-				'action'  => 'query_plugins',
-				'request[block]' => $search_string,
+				'action'              => 'query_plugins',
+				'request[block]'      => $search_string,
 				'request[wp_version]' => '5.3',
-				'request[per_page]' => '3'
+				'request[per_page]'   => '3',
 			),
 			$url
 		);
@@ -248,15 +248,14 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 		$request  = wp_remote_get( $url, $http_args );
 		$response = json_decode( wp_remote_retrieve_body( $request ), true );
 
-
 		if ( ! function_exists( 'get_plugins' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/plugin.php';
 		}
 
 		$result = array();
 
-		foreach ( $response[ 'plugins' ] as $plugin ) {
-			$installed_plugins = get_plugins( '/' . $plugin[ 'slug' ] );
+		foreach ( $response['plugins'] as $plugin ) {
+			$installed_plugins = get_plugins( '/' . $plugin['slug'] );
 
 			// Only show uninstalled blocks.
 			if ( empty( $installed_plugins ) ) {
@@ -268,34 +267,52 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 	}
 }
 
+	/**
+	 * Parse block metadata for a block
+	 *
+	 * @since 5.7.0
+	 *
+	 * @param WP_Object $plugin The plugin metadata.
+	 * @return WP_Error|WP_REST_Response Response object on success, or WP_Error object on failure.
+	 */
 function parse_block_metadata( $plugin ) {
 	$block     = new stdClass();
-	$block->id = $plugin[ 'slug' ];
+	$block->id = $plugin['slug'];
 
-	// AMBIGUOUS: There might be multiple blocks. Only the first element in blocks is mapped
-	$block->name  = reset( $plugin[ 'blocks' ] )[ 'name' ];
-	$block->title = reset( $plugin[ 'blocks' ] )[ 'title' ];
+	// AMBIGUOUS: There might be multiple blocks. Only the first element in blocks is mapped.
+	$block->name  = reset( $plugin['blocks'] )['name'];
+	$block->title = reset( $plugin['blocks'] )['title'];
 
-	// AMBIGUOUS: Plugin's description, not description in block.json
-	$block->description = wp_trim_words( wp_strip_all_tags( $plugin[ 'description' ] ), 30, '...' );
+	// AMBIGUOUS: Plugin's description, not description in block.json.
+	$block->description = wp_trim_words( wp_strip_all_tags( $plugin['description'] ), 30, '...' );
 
-	$block->rating         = $plugin[ 'rating' ];
-	$block->rating_count    = $plugin[ 'num_ratings' ];
-	$block->active_installs = $plugin[ 'active_installs' ];
+	$block->rating          = $plugin['rating'];
+	$block->rating_count    = $plugin['num_ratings'];
+	$block->active_installs = $plugin['active_installs'];
 
-	// AMBIGUOUS: Plugin's author, not author in block.json
-	$block->author = wp_strip_all_tags( $plugin[ 'author' ] );
+	// AMBIGUOUS: Plugin's author, not author in block.json.
+	$block->author = wp_strip_all_tags( $plugin['author'] );
 
-	// AMBIGUOUS: Plugin's icons or icon in block.json
-	$block->icon = isset( $plugin[ 'icons' ][ '1x' ] ) ? $plugin[ 'icons' ][ '1x' ] : 'block-default';
+	// AMBIGUOUS: Plugin's icons or icon in block.json.
+	$block->icon = isset( $plugin['icons']['1x'] ) ? $plugin['icons']['1x'] : 'block-default';
 
-	$block->assets = array_map( function( $asset ) use ( $plugin ) { 
-		return 'https://plugins.svn.wordpress.org/' . $plugin[ 'slug' ] . $asset;
-	}, $plugin[ 'block_assets' ] );
+	/**
+	 * Get block asset url
+	 *
+	 * @since 5.7.0
+	 *
+	 * @param WP_Object $asset The plugin asset.
+	 * @return String The URL for the block asset.
+	 */
+	function get_block_asset_url( $asset ) {
+		return 'https://plugins.svn.wordpress.org/' . $plugin['slug'] . $asset;
+	}
 
-	$block->humanized_updated = human_time_diff( strtotime( $plugin[ 'last_updated' ] ), current_time( 'timestamp' ) ) . __( ' ago' );
+	$block->assets = array_map( 'get_block_asset_url', $plugin['block_assets'] );
 
-	// TODO: calculate these values
+	$block->humanized_updated = human_time_diff( strtotime( $plugin['last_updated'] ), current_time( 'timestamp' ) ) . __( ' ago' );
+
+	// TODO: calculate these values.
 	$block->author_average_rating = null;
 	$block->author_blocks_count   = null;
 	$block->author_support_time   = null;
