@@ -84,6 +84,7 @@ class GalleryEdit extends Component {
 				ids: map( attributes.images, 'id' ),
 			};
 		}
+
 		this.props.setAttributes( attributes );
 	}
 
@@ -327,17 +328,16 @@ class GalleryEdit extends Component {
 					</PanelBody>
 				</InspectorControls>
 				{ noticeUI }
-				<figure className={ className } >
-					<ul
-						className={ classnames(
-							'blocks-gallery-grid',
-							{
-								[ `align${ align }` ]: align,
-								[ `columns-${ columns }` ]: columns,
-								'is-cropped': imageCrop,
-							}
-						) }
-					>
+				<figure className={ classnames(
+					className,
+					{
+						[ `align${ align }` ]: align,
+						[ `columns-${ columns }` ]: columns,
+						'is-cropped': imageCrop,
+					}
+				) }
+				>
+					<ul className="blocks-gallery-grid">
 						{ images.map( ( img, index ) => {
 						/* translators: %1$d is the order number of the image, %2$d is the total number of images. */
 							const ariaLabel = sprintf( __( 'image %1$d of %2$d in gallery' ), ( index + 1 ), images.length );

@@ -12,8 +12,8 @@ export default function save( { attributes } ) {
 	const { images, columns = defaultColumnsNumber( attributes ), imageCrop, caption, linkTo } = attributes;
 
 	return (
-		<figure>
-			<ul className={ `blocks-gallery-grid columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` }>
+		<figure className={ `columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` }>
+			<ul className="blocks-gallery-grid">
 				{ images.map( ( image ) => {
 					let href;
 
@@ -41,7 +41,7 @@ export default function save( { attributes } ) {
 						<li key={ image.id || image.url } className="blocks-gallery-item">
 							<figure>
 								{ href ? <a href={ href }>{ img }</a> : img }
-								{ image.caption && image.caption.length > 0 && (
+								{ ! RichText.isEmpty( image.caption ) && (
 									<RichText.Content tagName="figcaption" value={ image.caption } />
 								) }
 							</figure>
@@ -49,8 +49,7 @@ export default function save( { attributes } ) {
 					);
 				} ) }
 			</ul>
-			{ caption && <RichText.Content tagName="figcaption" value={ caption } /> }
+			{ ! RichText.isEmpty( caption ) && <RichText.Content tagName="figcaption" value={ caption } /> }
 		</figure>
 	);
 }
-
