@@ -143,7 +143,6 @@ class FileEdit extends Component {
 			setAttributes,
 			noticeUI,
 			media,
-			animate = true,
 		} = this.props;
 		const {
 			fileName,
