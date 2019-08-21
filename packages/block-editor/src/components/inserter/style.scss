@@ -154,14 +154,20 @@ $block-inserter-search-height: 38px;
 	overflow-y: auto;
 
 	@include break-medium {
-		display: block;
+		display: flex;
+		flex-direction: column;
 	}
 
 	.block-editor-block-card {
 		padding-bottom: 20px;
-		margin-bottom: 10px;
+		margin-bottom: 20px;
 		border-bottom: $border-width solid $light-gray-500;
 		@include edit-post__fade-in-animation();
+	}
+
+	.block-editor-inserter__preview {
+		display: flex;
+		flex-grow: 2;
 	}
 }
 
@@ -210,4 +216,5 @@ $block-inserter-search-height: 38px;
 	min-height: 150px;
 	padding: 10px;
 	display: grid;
+	flex-grow: 2;
 }
