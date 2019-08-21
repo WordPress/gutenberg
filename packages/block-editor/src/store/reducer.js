@@ -1260,7 +1260,7 @@ export function lastBlockAttributesChange( state, action ) {
  * @return {boolean} Updated state.
  */
 export function didAutomaticChange( state, action ) {
-	return action.type === 'MARK_AUTOMATIC_CHANGE' ? true : false;
+	return action.type === 'MARK_AUTOMATIC_CHANGE';
 }
 
 export default combineReducers( {
