@@ -70,13 +70,18 @@ function isValidFocusableArea( element ) {
  * Returns all focusable elements within a given context.
  *
  * @param {Element} context Element in which to search.
+ * @param {Object} options additional configuration options
  *
  * @return {Element[]} Focusable elements.
  */
-export function find( context ) {
+export function find( context, options = {
+	includeScrollable: false,
+} ) {
+	let focusable = [];
+
 	const elements = context.querySelectorAll( SELECTOR );
 
-	return [ ...elements ].filter( ( element ) => {
+	focusable = [ ...elements ].filter( ( element ) => {
 		if ( ! isVisible( element ) ) {
 			return false;
 		}
@@ -88,4 +93,20 @@ export function find( context ) {
 
 		return true;
 	} );
+
+	// Firefox treats elements which create a scrollable region/container as
+	// "focusable". Detecting these is expensive, so this is an opt-in.
+	// see https://html.spec.whatwg.org/multipage/interaction.html#focusable-area
+	if ( options.includeScrollable ) {
+		const allChildren = context.querySelectorAll( '*' );
+		const scrollableContainers = [ ...allChildren ].filter( ( el ) => {
+			const hasValidOverflow = window.getComputedStyle( el ).overflow !== 'visible';
+			const hasScroll = el.clientHeight <= el.scrollHeight;
+			return hasValidOverflow && hasScroll;
+		} );
+
+		focusable = [ ...focusable, ...scrollableContainers ];
+	}
+
+	return focusable;
 }
