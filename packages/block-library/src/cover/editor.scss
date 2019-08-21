@@ -43,10 +43,15 @@
 	.wp-block-cover__placeholder-color-palette {
 		max-width: 300px;
 	}
+
 	// Apply max-width to floated items that have no intrinsic width
 	[data-align="left"] &,
 	[data-align="right"] & {
 		max-width: $content-width / 2;
 		width: 100%;
 	}
+}
+
+.wp-block-cover__reset-button {
+	margin-bottom: 1em;
 }

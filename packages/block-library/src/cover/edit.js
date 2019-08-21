@@ -12,6 +12,7 @@ import {
 	FocalPointPicker,
 	IconButton,
 	PanelBody,
+	PanelRow,
 	RangeControl,
 	ToggleControl,
 	Toolbar,
@@ -19,6 +20,7 @@ import {
 	ResizableBox,
 	BaseControl,
 	ColorPalette,
+	Button,
 } from '@wordpress/components';
 import { compose, withInstanceId } from '@wordpress/compose';
 import {
@@ -199,6 +201,21 @@ class CoverEdit extends Component {
 				{ !! ( url || overlayColor.color ) && (
 					<InspectorControls>
 						<PanelBody title={ __( 'Cover Settings' ) }>
+							{ !! ( url || id ) && (
+								<PanelRow>
+									<Button
+										isDefault
+										isSmall
+										className="wp-block-cover__reset-button"
+										onClick={ () => setAttributes( {
+											url: undefined,
+											id: undefined,
+										} ) }
+									>
+										{ __( 'Clear Background' ) }
+									</Button>
+								</PanelRow>
+							) }
 							{ !! url && ( IMAGE_BACKGROUND_TYPE === backgroundType ) && (
 								<ToggleControl
 									label={ __( 'Fixed Background' ) }
