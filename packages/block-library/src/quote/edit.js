@@ -9,6 +9,7 @@ import classnames from 'classnames';
 import { __ } from '@wordpress/i18n';
 import { AlignmentToolbar, BlockControls, RichText } from '@wordpress/block-editor';
 import { BlockQuotation } from '@wordpress/components';
+import { createBlock } from '@wordpress/blocks';
 
 export default function QuoteEdit( { attributes, setAttributes, isSelected, mergeBlocks, onReplace, className } ) {
 	const { align, value, citation } = attributes;
@@ -47,6 +48,16 @@ export default function QuoteEdit( { attributes, setAttributes, isSelected, merg
 					placeholder={
 						// translators: placeholder text used for the quote
 						__( 'Write quote…' )
+					}
+					onReplace={ onReplace }
+					onSplit={ ( piece ) =>
+						createBlock( 'core/quote', {
+							...attributes,
+							value: piece,
+						} )
+					}
+					__unstableOnSplitMiddle={ () =>
+						createBlock( 'core/paragraph' )
 					}
 				/>
 				{ ( ! RichText.isEmpty( citation ) || isSelected ) && (
