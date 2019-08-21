@@ -26,6 +26,7 @@
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/data": "file:../data",
 		"@wordpress/deprecated": "file:../deprecated",
+		"@wordpress/element": "file:../element",
 		"@wordpress/url": "file:../url",
 		"equivalent-key-map": "^0.2.2",
 		"lodash": "^4.17.14",
