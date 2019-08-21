@@ -62,6 +62,7 @@ import * as tagCloud from './tag-cloud';
 import * as classic from './classic';
 
 // Custom Entity Blocks
+import * as siteTitle from './site-title';
 import * as post from './post';
 import * as postTitle from './post-title';
 import * as postContent from './post-content';
@@ -143,6 +144,7 @@ export const registerCoreBlocks = () => {
 		video,
 
 		// Register Custom Entity Blocks.
+		siteTitle,
 		post,
 		postTitle,
 		postContent,
