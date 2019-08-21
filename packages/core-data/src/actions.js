@@ -256,13 +256,16 @@ export function* saveEntityRecord(
 			// to the actual persisted entity if the edits don't
 			// have a value.
 			let data = { ...persistedRecord, ...autosavePost, ...record };
-			data = Object.keys( data ).reduce( ( acc, key ) => {
-				if ( [ 'title', 'excerpt', 'content' ].includes( key ) ) {
-					// Edits should be the "raw" attribute values.
-					acc[ key ] = get( data[ key ], 'raw', data[ key ] );
-				}
-				return acc;
-			}, {} );
+			data = Object.keys( data ).reduce(
+				( acc, key ) => {
+					if ( [ 'title', 'excerpt', 'content' ].includes( key ) ) {
+						// Edits should be the "raw" attribute values.
+						acc[ key ] = get( data[ key ], 'raw', data[ key ] );
+					}
+					return acc;
+				},
+				{ status: data.status === 'auto-draft' ? 'draft' : data.status }
+			);
 			updatedRecord = yield apiFetch( {
 				path: `${ path }/autosaves`,
 				method: 'POST',
@@ -275,7 +278,7 @@ export function* saveEntityRecord(
 				yield receiveEntityRecords(
 					kind,
 					name,
-					{ ...persistedRecord, ...updatedRecord },
+					{ ...persistedRecord, ...data, ...updatedRecord },
 					undefined,
 					true
 				);
