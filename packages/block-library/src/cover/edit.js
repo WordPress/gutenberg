@@ -217,8 +217,16 @@ class CoverEdit extends Component {
 									type="number"
 									id={ inputId }
 									onChange={ ( event ) => {
-										const coverHeight = parseInt( event.target.value, 10 );
+										let coverHeight = parseInt( event.target.value, 10 );
 										setAttributes( { height: coverHeight } );
+										if ( isNaN( coverHeight ) ) {
+											// Set cover height to default size and input box to empty string
+											setAttributes( { height: '' } );
+											coverHeight = COVER_MIN_HEIGHT;
+										} else if ( coverHeight < COVER_MIN_HEIGHT ) {
+											// Set cover height to minimum size
+											coverHeight = COVER_MIN_HEIGHT;
+										}
 									} }
 									value={ height }
 									min={ COVER_MIN_HEIGHT }
