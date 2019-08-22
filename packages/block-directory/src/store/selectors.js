@@ -4,14 +4,14 @@
 import { get } from 'lodash';
 
 /**
- * Returns true if application is requesting for discover blocks.
+ * Returns true if application is requesting for downloable blocks.
  *
  * @param {Object} state       Global application state.
  *
- * @return {Array} Discoverable blocks
+ * @return {Array} Downloadable blocks
  */
 export function isRequestingDownloadableBlocks( state ) {
-	return state.discoverBlocks.isRequestingDownloadableBlocks;
+	return state.downloadableBlocks.isRequestingDownloadableBlocks;
 }
 
 /**
@@ -20,13 +20,13 @@ export function isRequestingDownloadableBlocks( state ) {
  * @param {Object} state       Global application state.
  * @param {string} filterValue Search string.
  *
- * @return {Array} Discoverable blocks
+ * @return {Array} Downloadable blocks
  */
 export function getDownloadableBlocks( state, filterValue ) {
-	if ( ! state.discoverBlocks.results[ filterValue ] ) {
+	if ( ! state.downloadableBlocks.results[ filterValue ] ) {
 		return [];
 	}
-	return state.discoverBlocks.results[ filterValue ];
+	return state.downloadableBlocks.results[ filterValue ];
 }
 
 /**
@@ -37,7 +37,7 @@ export function getDownloadableBlocks( state, filterValue ) {
  * @return {boolean} User has permission to install blocks.
  */
 export function hasInstallBlocksPermission( state ) {
-	return state.discoverBlocks.hasPermission;
+	return state.downloadableBlocks.hasPermission;
 }
 
 /**
@@ -48,5 +48,5 @@ export function hasInstallBlocksPermission( state ) {
  * @return {Array} Block type items.
  */
 export function getInstalledBlockTypes( state ) {
-	return get( state, [ 'discoverBlocks', 'installedBlockTypes' ], [] );
+	return get( state, [ 'downloadableBlocks', 'installedBlockTypes' ], [] );
 }

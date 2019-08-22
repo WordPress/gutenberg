@@ -4,14 +4,14 @@
 import { combineReducers } from '@wordpress/data';
 
 /**
- * Reducer returning an array of discover blocks.
+ * Reducer returning an array of downloadable blocks.
  *
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
  *
  * @return {Object} Updated state.
  */
-export const discoverBlocks = ( state = {
+export const downloadableBlocks = ( state = {
 	results: {},
 	hasPermission: true,
 	filterValue: undefined,
@@ -19,16 +19,16 @@ export const discoverBlocks = ( state = {
 	installedBlockTypes: [],
 }, action ) => {
 	switch ( action.type ) {
-		case 'FETCH_DISCOVER_BLOCKS' :
+		case 'FETCH_DOWNLOADABLE_BLOCKS' :
 			return {
 				...state,
 				isRequestingDownloadableBlocks: true,
 			};
-		case 'RECEIVE_DISCOVER_BLOCKS' :
+		case 'RECEIVE_DOWNLOADABLE_BLOCKS' :
 			return {
 				...state,
 				results: Object.assign( {}, state.results, {
-					[ action.filterValue ]: action.discoverBlocks,
+					[ action.filterValue ]: action.downloadableBlocks,
 				} ),
 				hasPermission: true,
 				isRequestingDownloadableBlocks: false,
@@ -55,5 +55,5 @@ export const discoverBlocks = ( state = {
 };
 
 export default combineReducers( {
-	discoverBlocks,
+	downloadableBlocks,
 } );

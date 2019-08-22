@@ -12,7 +12,7 @@ import { Spinner, withSpokenMessages } from '@wordpress/components';
  */
 import DownloadableBlocksList from '../downloadable-blocks-list';
 
-function DownloadableBlocksPanel( { discoverItems, onSelect, onHover, hasPermission, isLoading, isWaiting, debouncedSpeak } ) {
+function DownloadableBlocksPanel( { downloadableItems, onSelect, onHover, hasPermission, isLoading, isWaiting, debouncedSpeak } ) {
 	if ( ! hasPermission ) {
 		debouncedSpeak( __( 'Please contact your site administrator to install new blocks.' ) );
 		return (
@@ -32,7 +32,7 @@ function DownloadableBlocksPanel( { discoverItems, onSelect, onHover, hasPermiss
 		);
 	}
 
-	if ( ! discoverItems.length ) {
+	if ( ! downloadableItems.length ) {
 		return (
 			<p className="block-directory-downloadable-blocks-panel__description has-no-results">
 				{ __( 'No blocks found in your library.' ) }
@@ -41,8 +41,8 @@ function DownloadableBlocksPanel( { discoverItems, onSelect, onHover, hasPermiss
 	}
 
 	const resultsFoundMessage = sprintf(
-		_n( 'We did find %d block available for download.', 'We did find %d blocks available.', discoverItems.length ),
-		discoverItems.length
+		_n( 'We did find %d block available for download.', 'We did find %d blocks available.', downloadableItems.length ),
+		downloadableItems.length
 	);
 
 	debouncedSpeak( resultsFoundMessage );
@@ -51,7 +51,7 @@ function DownloadableBlocksPanel( { discoverItems, onSelect, onHover, hasPermiss
 			<p className="block-directory-downloadable-blocks-panel__description">
 				{ __( 'No blocks found in your library. We did find these blocks available for download:' ) }
 			</p>
-			<DownloadableBlocksList items={ discoverItems } onSelect={ onSelect } onHover={ onHover } />
+			<DownloadableBlocksList items={ downloadableItems } onSelect={ onSelect } onHover={ onHover } />
 		</Fragment>
 	);
 }
@@ -66,11 +66,11 @@ export default compose( [
 		} = select( 'core/block-directory' );
 
 		const hasPermission = hasInstallBlocksPermission();
-		const discoverItems = hasPermission ? getDownloadableBlocks( filterValue ) : [];
+		const downloadableItems = hasPermission ? getDownloadableBlocks( filterValue ) : [];
 		const isLoading = isRequestingDownloadableBlocks();
 
 		return {
-			discoverItems,
+			downloadableItems,
 			hasPermission,
 			isLoading,
 		};

@@ -9,24 +9,24 @@ import { getBlockTypes } from '@wordpress/blocks';
 import { apiFetch, loadAssets } from './controls';
 
 /**
- * Returns an action object used in signalling that the discover blocks have been requested and is loading.
+ * Returns an action object used in signalling that the downloadable blocks have been requested and is loading.
  *
  * @return {Object} Action object.
  */
 export function fetchDownloadableBlocks() {
-	return { type: 'FETCH_DISCOVER_BLOCKS' };
+	return { type: 'FETCH_DOWNLOADABLE_BLOCKS' };
 }
 
 /**
- * Returns an action object used in signalling that the discover blocks have been updated.
+ * Returns an action object used in signalling that the downloadable blocks have been updated.
  *
- * @param {Array} discoverBlocks Discoverable blocks.
+ * @param {Array} downloadableBlocks Downloadable blocks.
  * @param {string} filterValue Search string.
  *
  * @return {Object} Action object.
  */
-export function receiveDownloadableBlocks( discoverBlocks, filterValue ) {
-	return { type: 'RECEIVE_DISCOVER_BLOCKS', discoverBlocks, filterValue };
+export function receiveDownloadableBlocks( downloadableBlocks, filterValue ) {
+	return { type: 'RECEIVE_DOWNLOADABLE_BLOCKS', downloadableBlocks, filterValue };
 }
 
 /**
