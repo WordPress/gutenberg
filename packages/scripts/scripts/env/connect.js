@@ -51,7 +51,14 @@ const composeTemplate = readFileSync( composeTemplateFile, 'utf8' )
 	.replace( /%PLUGIN_MOUNT_DIR%/gi, pluginMountDir )
 	.replace( /%PLUGIN_INSTALL_DIR%/gi, env.npm_package_wp_env_plugin_dir );
 
-const pluginCompose = yaml.safeLoad( composeTemplate );
+let pluginCompose = {};
+try {
+	pluginCompose = yaml.safeLoad( composeTemplate );
+} catch ( e ) {
+	stdout.write( 'There was an error loading your docker-compose.override.yml.template file. Please revert any changes to it, and try again.\n' );
+	stdout.write( e.toString() );
+	exit( 1 );
+}
 
 stdout.write( 'Updating docker-compose.override.yml...\n' );
 
