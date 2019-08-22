@@ -865,7 +865,7 @@
 		background: $white;
 		height: $block-padding * 2;
 		width: $block-padding * 2;
-		padding: 4px;
+		padding: $grid-size-small;
 
 		&:not(:disabled):not([aria-disabled="true"]):hover {
 			box-shadow: none;
