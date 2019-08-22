@@ -25,7 +25,7 @@ if ( commandExistsSync( 'git' ) ) {
 	execSync( 'git clone --depth=1 git://develop.git.wordpress.org/ wordpress', { stdio: 'inherit' } );
 	buildWordPress();
 } else {
-	stdout.write( "Git isn't availabe. Switching to downloading a zip version.\n" );
+	stdout.write( "Git isn't available. Switching to downloading a zip version.\n" );
 	const tmpZip = normalize( tmpdir() + '/wordpress-develop.zip' );
 	const tmpZipWriter = createWriteStream( tmpZip );
 
@@ -35,10 +35,10 @@ if ( commandExistsSync( 'git' ) ) {
 
 		unzipper.on( 'extract', buildWordPress );
 
-		stdout.write( 'Extracing...\n' );
+		stdout.write( 'Extracting...\n' );
 
 		unzipper.extract( {
-			path: env.WP_DEVELOP_DIR,
+			path: normalize( env.WP_DEVELOP_DIR ),
 			strip: 1,
 			filter: ( file ) => file.type !== 'Directory',
 		} );

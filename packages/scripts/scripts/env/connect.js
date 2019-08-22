@@ -87,10 +87,12 @@ function mergeConfigs( originalConfig, newConfig ) {
 			// /path/to/local/dir:/path/to/container/dir:config:stuff
 			newConfig[ key ].forEach( ( element ) => {
 				// First, check if it's actually a volume config.
-				if ( element.startsWith( pluginMountDir ) && element.includes( ':' ) ) {
+				// Ignore the first few characters, so that we skip over Windows drive letters.
+				const colonPos = element.indexOf( ':', 3 );
+				if ( colonPos > -1 && element.startsWith( pluginMountDir ) ) {
 					// Get the local directory that's being mounted. This can either be the plugin
 					// base directory, or a subdirectory of it.
-					const mountDir = element.split( ':' )[ 0 ];
+					const mountDir = element.substring( 0, colonPos );
 					// See if this mountDir exists in the originalConfig.
 					const index = originalConfig[ key ].findIndex( ( volume ) => {
 						return volume.startsWith( `${ mountDir }:` );
