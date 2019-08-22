@@ -6,7 +6,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - run: cd packages/pull-request-automation && npm install
-      - uses: ./packages/pull-request-automation
+      - run: cd packages/project-management-automation && npm install
+      - uses: ./packages/project-management-automation
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}

@@ -1,7 +1,6 @@
-name: Gutenberg pull request automation
+name: Gutenberg project management automation
 description: >
-  Various automation to assist with managing pull requests in the Gutenberg
-  GitHub repository.
+  Various automation to assist with managing the Gutenberg GitHub repository.
 inputs:
   github_token:
     description: Secret GitHub API token to use for making API requests.

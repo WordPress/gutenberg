@@ -1350,9 +1350,9 @@
 		"parent": "packages"
 	},
 	{
-		"title": "@wordpress/pull-request-automation",
-		"slug": "packages-pull-request-automation",
-		"markdown_source": "../packages/pull-request-automation/README.md",
+		"title": "@wordpress/project-management-automation",
+		"slug": "packages-project-management-automation",
+		"markdown_source": "../packages/project-management-automation/README.md",
 		"parent": "packages"
 	},
 	{

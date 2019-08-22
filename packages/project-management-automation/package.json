@@ -1,22 +1,22 @@
 {
-	"name": "@wordpress/pull-request-automation",
+	"name": "@wordpress/project-management-automation",
 	"version": "1.0.0-beta.0",
-	"description": "GitHub Action that implements various automation to assist with managing pull requests in the Gutenberg GitHub repository.",
+	"description": "GitHub Action that implements various automation to assist with managing the Gutenberg GitHub repository.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/pull-request-automation/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/project-management-automation/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
-		"directory": "packages/pull-request-automation"
+		"directory": "packages/project-management-automation"
 	},
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
-	"main": "build/index.js",
+	"main": "lib/index.js",
 	"dependencies": {
 		"@actions/core": "^1.0.0",
 		"@actions/github": "^1.0.0",
