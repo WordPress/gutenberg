@@ -101,8 +101,10 @@ class Layout extends Component {
 			mode,
 		} = this.props;
 
+		const isHtmlView = mode === 'text';
+
 		// add a margin view at the bottom for the header
-		const marginBottom = Platform.OS === 'android' ? headerToolbarStyles.container.height : 0;
+		const marginBottom = Platform.OS === 'android' && ! isHtmlView ? headerToolbarStyles.container.height : 0;
 
 		const toolbarKeyboardAvoidingViewStyle = {
 			...styles.toolbarKeyboardAvoidingView,
@@ -114,16 +116,17 @@ class Layout extends Component {
 		return (
 			<SafeAreaView style={ useStyle( styles.container, styles.containerDark, this.props.theme ) } onLayout={ this.onRootViewLayout }>
 				<View style={ useStyle( styles.background, styles.backgroundDark, this.props.theme ) }>
-					{ mode === 'text' ? this.renderHTML() : this.renderVisual() }
+					{ isHtmlView ? this.renderHTML() : this.renderVisual() }
 				</View>
 				<View style={ { flex: 0, flexBasis: marginBottom, height: marginBottom } }>
 				</View>
-				<KeyboardAvoidingView
-					parentHeight={ this.state.rootViewHeight }
-					style={ toolbarKeyboardAvoidingViewStyle }
-				>
-					<Header />
-				</KeyboardAvoidingView>
+				{ ! isHtmlView && (
+					<KeyboardAvoidingView
+						parentHeight={ this.state.rootViewHeight }
+						style={ toolbarKeyboardAvoidingViewStyle }
+					>
+						<Header />
+					</KeyboardAvoidingView> ) }
 			</SafeAreaView>
 		);
 	}
