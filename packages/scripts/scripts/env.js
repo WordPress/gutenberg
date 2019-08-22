@@ -27,7 +27,8 @@ if ( ! env.WP_DEVELOP_DIR && command !== 'install' ) {
 		env.WP_DEVELOP_DIR = cwd() + '/wordpress';
 		env.MANAGED_WP = true;
 	} else {
-		stdout.write( 'Please ensure the WP_DEVELOP_DIR environment variable is set to your WordPress Development directory before running this script.\n' );
+		stdout.write( 'Please ensure the WP_DEVELOP_DIR environment variable is set to your WordPress Development directory before running this script.\n\n' );
+		stdout.write( "If you don't have a WordPress Development directory to use, run `npm run env install` to automatically configure one!\n" );
 		exit( 1 );
 	}
 }
