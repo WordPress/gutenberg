@@ -1,7 +1,7 @@
 <?php
 /**
  * Start: Include for phase 2
- * Block Areas REST API: WP_REST_Blocks_Controller class
+ * Block Directory REST API: WP_REST_Blocks_Controller class
  *
  * @package gutenberg
  * @since 5.7.0
