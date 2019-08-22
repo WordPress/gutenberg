@@ -231,7 +231,7 @@ export class InserterMenu extends Component {
 				filterValue,
 				itemsPerCategory,
 				filteredItems,
-				reusableItems,
+				reusableItems
 			),
 		} );
 
@@ -365,7 +365,6 @@ export class InserterMenu extends Component {
 							} }
 						>
 							{ ( fills ) => {
-								// __experimentalInserterMenuExtension should also handle when isMenuEmpty is true ( no installed block type results are found ).
 								if ( fills.length ) {
 									return fills;
 								}
