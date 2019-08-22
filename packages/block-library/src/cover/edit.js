@@ -33,10 +33,10 @@ import {
 	MediaUploadCheck,
 	PanelColorSettings,
 	withColors,
+	ColorPalette,
 } from '@wordpress/block-editor';
 import { Component, createRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -203,14 +203,14 @@ class CoverEdit extends Component {
 				<InspectorControls>
 					{ !! url && (
 						<PanelBody title={ __( 'Media Settings' ) }>
-							{ !! url && ( IMAGE_BACKGROUND_TYPE === backgroundType ) && (
+							{ IMAGE_BACKGROUND_TYPE === backgroundType && (
 								<ToggleControl
 									label={ __( 'Fixed Background' ) }
 									checked={ hasParallax }
 									onChange={ toggleParallax }
 								/>
 							) }
-							{ !! url && ( IMAGE_BACKGROUND_TYPE === backgroundType ) && ! hasParallax && (
+							{ IMAGE_BACKGROUND_TYPE === backgroundType && ! hasParallax && (
 								<FocalPointPicker
 									label={ __( 'Focal Point Picker' ) }
 									url={ url }
@@ -258,6 +258,26 @@ class CoverEdit extends Component {
 									</Button>
 								</PanelRow>
 							) }
+							<PanelRow>
+								{ VIDEO_BACKGROUND_TYPE === backgroundType && (
+									name
+								) }
+								<Button
+									isDefault
+									isSmall
+									className="block-library-cover__reset-button"
+									onClick={ () => setAttributes( {
+										url: undefined,
+										id: undefined,
+										backgroundType: undefined,
+										dimRatio: undefined,
+										focalPoint: undefined,
+										hasParallax: undefined,
+									} ) }
+								>
+									{ __( 'Clear Background' ) }
+								</Button>
+							</PanelRow>
 						</PanelBody>
 					) }
 					<PanelColorSettings
@@ -285,21 +305,6 @@ class CoverEdit extends Component {
 			</>
 		);
 
-		function StatefulColorPalette( props ) {
-			const settings = useSelect( ( select ) => {
-				return select( 'core/block-editor' ).getSettings();
-			} );
-			const colors = settings.colors;
-
-			return <ColorPalette
-				colors={ colors }
-				disableCustomColors={ true }
-				value={ overlayColor.color }
-				onChange={ setOverlayColor }
-				clearable={ false }
-				className="wp-block-cover__placeholder-color-palette"
-				{ ...props } />;
-		}
 		if ( ! ( url || overlayColor.color ) ) {
 			const placeholderIcon = <BlockIcon icon={ icon } />;
 			const label = __( 'Cover' );
@@ -319,7 +324,13 @@ class CoverEdit extends Component {
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
 						notices={ noticeUI }
 						onError={ this.onUploadError }
-						append={ <StatefulColorPalette /> }
+						append={ <ColorPalette
+							disableCustomColors={ true }
+							value={ overlayColor.color }
+							onChange={ setOverlayColor }
+							clearable={ false }
+							className="wp-block-cover__placeholder-color-palette"
+						/> }
 					/>
 				</>
 			);
