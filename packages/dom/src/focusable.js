@@ -100,7 +100,7 @@ export function find( context, options = {
 	// and may result in poor performance.
 	// see https://html.spec.whatwg.org/multipage/interaction.html#focusable-area.
 	if ( options.includeScrollable ) {
-		const allChildren = context.querySelectorAll( '*' );
+		const allChildren = context.getElementsByTagName( '*' );
 		const scrollableContainers = [ ...allChildren ].filter( ( el ) => {
 			const hasScroll = el.clientHeight <= el.scrollHeight;
 
