@@ -23,7 +23,7 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 	 */
 	public function __construct() {
 		$this->namespace = '__experimental';
-		$this->rest_base = 'blocks';
+		$this->rest_base = 'block-directory';
 	}
 
 	/**
@@ -34,7 +34,7 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 	public function register_routes() {
 		register_rest_route(
 			$this->namespace,
-			'/' . $this->rest_base,
+			'/' . $this->rest_base . '/search',
 			array(
 				array(
 					'methods'             => WP_REST_Server::READABLE,
@@ -217,7 +217,7 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 	 */
 	public function get_items( $request ) {
 
-		$search_string = $request->get_param( 'search' );
+		$search_string = $request->get_param( 'term' );
 
 		if ( empty( $search_string ) ) {
 			return rest_ensure_response( array() );

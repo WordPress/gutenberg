@@ -18,7 +18,7 @@ export default {
 		try {
 			yield fetchDownloadableBlocks( filterValue );
 			const results = yield apiFetch( {
-				path: `__experimental/blocks?search=${ filterValue }`,
+				path: `__experimental/block-directory/search?term=${ filterValue }`,
 			} );
 			const blocks = results.map( ( result ) => mapKeys( result, ( value, key ) => {
 				return camelCase( key );
@@ -34,7 +34,7 @@ export default {
 	* hasInstallBlocksPermission() {
 		try {
 			yield apiFetch( {
-				path: `__experimental/blocks?search=${ '' }`,
+				path: `__experimental/block-directory/search?term=${ '' }`,
 			} );
 			yield setInstallBlocksPermission( true );
 		} catch ( error ) {

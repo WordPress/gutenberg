@@ -76,7 +76,7 @@ export function* downloadBlock( item, onSuccess, onError ) {
 export function* installBlock( { id, name }, onSuccess, onError ) {
 	try {
 		const response = yield apiFetch( {
-			path: '__experimental/blocks/install',
+			path: '__experimental/block-directory/install',
 			data: {
 				slug: id,
 			},
@@ -103,7 +103,7 @@ export function* installBlock( { id, name }, onSuccess, onError ) {
 export function* uninstallBlock( { id, name }, onSuccess, onError ) {
 	try {
 		const response = yield apiFetch( {
-			path: '__experimental/blocks/uninstall',
+			path: '__experimental/block-directory/uninstall',
 			data: {
 				slug: id,
 			},
