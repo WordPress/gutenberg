@@ -280,8 +280,9 @@ function parse_block_metadata( $plugin ) {
 	$block->id = $plugin['slug'];
 
 	// AMBIGUOUS: There might be multiple blocks. Only the first element in blocks is mapped.
-	$block->name  = reset( $plugin['blocks'] )['name'];
-	$block->title = reset( $plugin['blocks'] )['title'];
+	$block_data   = reset( $plugin['blocks'] );
+	$block->name  = $block_data['name'];
+	$block->title = $block_data['title'];
 
 	// AMBIGUOUS: Plugin's description, not description in block.json.
 	$block->description = wp_trim_words( wp_strip_all_tags( $plugin['description'] ), 30, '...' );
@@ -296,19 +297,11 @@ function parse_block_metadata( $plugin ) {
 	// AMBIGUOUS: Plugin's icons or icon in block.json.
 	$block->icon = isset( $plugin['icons']['1x'] ) ? $plugin['icons']['1x'] : 'block-default';
 
-	/**
-	 * Get block asset url
-	 *
-	 * @since 5.7.0
-	 *
-	 * @param WP_Object $asset The plugin asset.
-	 * @return String The URL for the block asset.
-	 */
-	function get_block_asset_url( $asset ) {
-		return 'https://plugins.svn.wordpress.org/' . $plugin['slug'] . $asset;
-	}
+	$block->assets = array();
 
-	$block->assets = array_map( 'get_block_asset_url', $plugin['block_assets'] );
+	foreach ( $plugin['block_assets'] as $asset ) {
+		$block->assets[] = 'https://plugins.svn.wordpress.org/' . $plugin['slug'] . $asset;
+	}
 
 	$block->humanized_updated = human_time_diff( strtotime( $plugin['last_updated'] ), current_time( 'timestamp' ) ) . __( ' ago' );
 
