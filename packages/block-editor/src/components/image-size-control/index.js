@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEmpty } from 'lodash';
+import { isEmpty, noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -38,7 +38,7 @@ class ImageSizeControl extends Component {
 			width,
 			height,
 			onChange,
-			onChangeImage,
+			onChangeImage = noop,
 		} = this.props;
 
 		return (
@@ -97,7 +97,7 @@ class ImageSizeControl extends Component {
 							</ButtonGroup>
 							<Button
 								isSmall
-								onClick={ this.updateDimensions( imageWidth, imageHeight ) }
+								onClick={ this.updateDimensions() }
 							>
 								{ __( 'Reset' ) }
 							</Button>
