@@ -428,6 +428,22 @@ _Returns_
 
 -   `?Object`: The entity record's save error.
 
+<a name="getRawEntityRecord" href="#getRawEntityRecord">#</a> **getRawEntityRecord**
+
+Returns the entity's record object by key,
+with its attributes mapped to their raw values.
+
+_Parameters_
+
+-   _state_ `Object`: State tree.
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _key_ `number`: Record's key.
+
+_Returns_
+
+-   `?Object`: Object with the entity's raw attributes.
+
 <a name="getRedoEdit" href="#getRedoEdit">#</a> **getRedoEdit**
 
 Returns the next edit from the current undo offset
