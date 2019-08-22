@@ -237,6 +237,10 @@ export function* saveEntityRecord(
 		const path = `${ entity.baseURL }${ recordId ? '/' + recordId : '' }`;
 
 		if ( isAutosave ) {
+			// Most of this autosave logic is very specific to posts.
+			// This is fine for now as it is the only supported autosave,
+			// but ideally this should all be handled in the back end,
+			// so the client just sends and receives objects.
 			const persistedRecord = yield select(
 				'getRawEntityRecord',
 				kind,
@@ -275,13 +279,27 @@ export function* saveEntityRecord(
 			// when its update is requested by the author and the post had
 			// draft or auto-draft status.
 			if ( persistedRecord.id === updatedRecord.id ) {
-				yield receiveEntityRecords(
-					kind,
-					name,
-					{ ...persistedRecord, ...data, ...updatedRecord },
-					undefined,
-					true
-				);
+				let newRecord = { ...persistedRecord, ...data, ...updatedRecord };
+				newRecord = Object.keys( newRecord ).reduce( ( acc, key ) => {
+					// These properties are persisted in autosaves.
+					if ( [ 'title', 'excerpt', 'content' ].includes( key ) ) {
+						// Edits should be the "raw" attribute values.
+						acc[ key ] = get( newRecord[ key ], 'raw', newRecord[ key ] );
+					} else if ( key === 'status' ) {
+						// Status is only persisted in autosaves when going from
+						// "auto-draft" to "draft".
+						acc[ key ] =
+							persistedRecord.status === 'auto-draft' &&
+							newRecord.status === 'draft' ?
+								newRecord.status :
+								persistedRecord.status;
+					} else {
+						// These properties are not persisted in autosaves.
+						acc[ key ] = get( persistedRecord[ key ], 'raw', persistedRecord[ key ] );
+					}
+					return acc;
+				}, {} );
+				yield receiveEntityRecords( kind, name, newRecord, undefined, true );
 			} else {
 				yield receiveAutosaves( persistedRecord.id, updatedRecord );
 			}
