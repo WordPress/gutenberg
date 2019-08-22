@@ -85,27 +85,14 @@ function mergeConfigs( originalConfig, newConfig ) {
 			// If the newConfig element is an array, we need to try and merge them.
 			// This is intended to merge Docker volume configs, which exist in the form:
 			// /path/to/local/dir:/path/to/container/dir:config:stuff
-			newConfig[ key ].forEach( ( element ) => {
-				// First, check if it's actually a volume config.
-				// Ignore the first few characters, so that we skip over Windows drive letters.
-				const colonPos = element.indexOf( ':', 3 );
-				if ( colonPos > -1 && element.startsWith( pluginMountDir ) ) {
-					// Get the local directory that's being mounted. This can either be the plugin
-					// base directory, or a subdirectory of it.
-					const mountDir = element.substring( 0, colonPos );
-					// See if this mountDir exists in the originalConfig.
-					const index = originalConfig[ key ].findIndex( ( volume ) => {
-						return volume.startsWith( `${ mountDir }:` );
-					} );
-					if ( index > -1 ) {
-						// If mountDir exists in originalConfig, overwrite it with the new config.
-						originalConfig[ key ][ index ] = element;
-					} else {
-						// If mountDir doesn't exist, append the new config, instead.
-						originalConfig[ key ].push( element );
-					}
-				}
+
+			// Build an array from the original config, with items that belong to this plugin removed.
+			const cleanOriginal = originalConfig[ key ].filter( ( element ) => {
+				return ! element.startsWith( pluginMountDir );
 			} );
+
+			// Append the newConfig to the remaining config.
+			originalConfig[ key ] = [ ...cleanOriginal, ...newConfig[ key ] ];
 		} else if ( newConfig[ key ] instanceof Object ) {
 			// If the newConfig element is an object, we need to recursively merge it.
 			originalConfig[ key ] = mergeConfigs( originalConfig[ key ], newConfig[ key ] );
