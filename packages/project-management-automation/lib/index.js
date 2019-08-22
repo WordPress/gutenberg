@@ -11,38 +11,45 @@ const assignFixedIssues = require( './assign-fixed-issues' );
 const addFirstTimeContributorLabel = require( './add-first-time-contributor-label' );
 const addMilestone = require( './add-milestone' );
 
+const automations = [
+	{
+		event: 'pull_request',
+		action: 'opened',
+		task: assignFixedIssues,
+	},
+	{
+		event: 'pull_request',
+		action: 'opened',
+		task: addFirstTimeContributorLabel,
+	},
+	{
+		event: 'pull_request',
+		action: 'closed',
+		task: addMilestone,
+	},
+];
+
 ( async function main() {
-	if ( context.eventName !== 'pull_request' ) {
-		setFailed( 'main: Only `pull_request` events are supported' );
+	const token = getInput( 'github_token' );
+	if ( ! token ) {
+		setFailed( 'main: Input `github_token` is required' );
 		return;
 	}
 
-	const octokit = new GitHub( getInput( 'github_token' ) );
+	const octokit = new GitHub( token );
 
-	if ( context.action === 'opened' ) {
-		try {
-			debug( 'assign-fixed-issues' );
-			await assignFixedIssues( context, octokit );
-		} catch ( error ) {
-			setFailed( `assign-fixed-issues: ${ error }` );
-			return;
-		}
+	debug( `main: Received event = '${ context.eventName }', action = '${ context.action }'` );
 
-		try {
-			debug( 'add-first-time-contributor-label' );
-			await addFirstTimeContributorLabel( context, octokit );
-		} catch ( error ) {
-			setFailed( `add-first-time-contributor-label: ${ error }` );
-			return;
+	for ( const { event, action, task } of automations ) {
+		if ( event === context.eventName && action === context.action ) {
+			try {
+				debug( `main: Starting task ${ task.name }` );
+				await task( context, octokit );
+			} catch ( error ) {
+				debug( `main: Task ${ task.name } failed with error: ${ error }` );
+			}
 		}
 	}
 
-	if ( context.action === 'closed' ) {
-		try {
-			debug( 'add-milestone' );
-			await addMilestone( context, octokit );
-		} catch ( error ) {
-			setFailed( `add-milestone: ${ error }` );
-		}
-	}
+	debug( `main: All done!` );
 }() );
