@@ -4,8 +4,56 @@
 	margin-left: 8px;
 }
 
-.wp-block-social-links .editor-block-list__layout,
 .wp-block-social-links .editor-block-list__layout {
 	display: flex;
 	justify-content: flex-start;
+}
+
+// Reduce the paddings, margins, and UI of inner-blocks.
+// @todo: eventually we may add a feature that lets a parent container absorb the block UI of a child block.
+// When that happens, leverage that instead of the following overrides.
+.wp-block-social-links {
+	// 1. Reset margins on immediate innerblocks container.
+	> .block-editor-inner-blocks > .block-editor-block-list__layout {
+		margin-left: 0;
+		margin-right: 0;
+	}
+
+	// 2. Remove paddings on subsequent immediate children.
+	> .block-editor-inner-blocks > .block-editor-block-list__layout > .wp-block {
+		width: auto;
+		padding-left: 0;
+		padding-right: 0;
+	}
+
+	// 3. Remove margins on subsequent Edit container.
+	> .block-editor-inner-blocks > .block-editor-block-list__layout > .wp-block > .block-editor-block-list__block-edit {
+		margin-left: 0;
+		margin-right: 0;
+	}
+
+	// 4. Hide the block outlines.
+	> .block-editor-inner-blocks > .block-editor-block-list__layout > .wp-block > .block-editor-block-list__block-edit::before {
+		content: none;
+	}
+
+	// 5. Remove vertical margins on subsequent block container.
+	> .block-editor-inner-blocks > .block-editor-block-list__layout > .wp-block > .block-editor-block-list__block-edit > [data-block] {
+		margin-top: 0;
+		margin-bottom: 0;
+	}
+
+	// Hide the breadcrumb.
+	// Hide the mover.
+	.block-editor-block-list__breadcrumb,
+	.block-editor-block-mover.block-editor-block-mover { // Needs specificity.
+		display: none;
+	}
+}
+
+
+// Polish the Appender.
+// @todo: this should be the actual appender, and open the block library filtered to show only social icon child blocks.
+.wp-block-social-links .block-list-appender {
+	margin: 0;
 }
