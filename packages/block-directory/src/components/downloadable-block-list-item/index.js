@@ -39,11 +39,11 @@ function DownloadableBlockListItem( {
 						humanizedUpdated={ humanizedUpdated }
 					/>
 				</section>
-				<section className="block-directory-downloadable-block-list-item__footer">
+				<footer className="block-directory-downloadable-block-list-item__footer">
 					<DownloadableBlockAuthorInfo
 						author={ author }
 					/>
-				</section>
+				</footer>
 			</article>
 		</li>
 	);
