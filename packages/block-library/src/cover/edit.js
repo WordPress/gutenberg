@@ -16,6 +16,7 @@ import {
 	ToggleControl,
 	Toolbar,
 	withNotices,
+	ResizableBox,
 } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import {
@@ -39,6 +40,7 @@ import icon from './icon';
 import {
 	IMAGE_BACKGROUND_TYPE,
 	VIDEO_BACKGROUND_TYPE,
+	COVER_MIN_HEIGHT,
 	backgroundImageStyles,
 	dimRatioToClass,
 } from './shared';
@@ -92,6 +94,7 @@ class CoverEdit extends Component {
 		const {
 			attributes,
 			setAttributes,
+			isSelected,
 			className,
 			noticeUI,
 			overlayColor,
@@ -104,6 +107,7 @@ class CoverEdit extends Component {
 			hasParallax,
 			id,
 			url,
+			height = COVER_MIN_HEIGHT,
 		} = attributes;
 		const onSelectMedia = ( media ) => {
 			if ( ! media || ! media.url ) {
@@ -156,6 +160,7 @@ class CoverEdit extends Component {
 					{}
 			),
 			backgroundColor: overlayColor.color,
+			height,
 		};
 
 		if ( focalPoint ) {
@@ -268,39 +273,67 @@ class CoverEdit extends Component {
 		return (
 			<>
 				{ controls }
-				<div
-					data-url={ url }
-					style={ style }
-					className={ classes }
+				<ResizableBox
+					className={ classnames(
+						'block-library-cover__resize-container',
+						{ 'is-selected': isSelected },
+					) }
+					size={ {
+						height,
+					} }
+					minHeight={ COVER_MIN_HEIGHT }
+					enable={ {
+						top: false,
+						right: false,
+						bottom: true,
+						left: false,
+						topRight: false,
+						bottomRight: false,
+						bottomLeft: false,
+						topLeft: false,
+					} }
+					onResizeStop={ ( event, direction, elt, delta ) => {
+						const coverHeight = parseInt( height, 10 ) + parseInt( delta.height, 10 );
+						setAttributes( {
+							height: coverHeight,
+						} );
+					} }
 				>
-					{ IMAGE_BACKGROUND_TYPE === backgroundType && (
+
+					<div
+						data-url={ url }
+						style={ style }
+						className={ classes }
+					>
+						{ IMAGE_BACKGROUND_TYPE === backgroundType && (
 						// Used only to programmatically check if the image is dark or not
-						<img
-							ref={ this.imageRef }
-							aria-hidden
-							alt=""
-							style={ {
-								display: 'none',
-							} }
-							src={ url }
-						/>
-					) }
-					{ VIDEO_BACKGROUND_TYPE === backgroundType && (
-						<video
-							ref={ this.videoRef }
-							className="wp-block-cover__video-background"
-							autoPlay
-							muted
-							loop
-							src={ url }
-						/>
-					) }
-					<div className="wp-block-cover__inner-container">
-						<InnerBlocks
-							template={ INNER_BLOCKS_TEMPLATE }
-						/>
+							<img
+								ref={ this.imageRef }
+								aria-hidden
+								alt=""
+								style={ {
+									display: 'none',
+								} }
+								src={ url }
+							/>
+						) }
+						{ VIDEO_BACKGROUND_TYPE === backgroundType && (
+							<video
+								ref={ this.videoRef }
+								className="wp-block-cover__video-background"
+								autoPlay
+								muted
+								loop
+								src={ url }
+							/>
+						) }
+						<div className="wp-block-cover__inner-container">
+							<InnerBlocks
+								template={ INNER_BLOCKS_TEMPLATE }
+							/>
+						</div>
 					</div>
-				</div>
+				</ResizableBox>
 			</>
 		);
 	}

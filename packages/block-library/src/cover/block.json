@@ -28,6 +28,9 @@
 		},
 		"focalPoint": {
 			"type": "object"
+		},
+		"height": {
+			"type": "number"
 		}
 	}
 }
