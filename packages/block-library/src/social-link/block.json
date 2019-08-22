@@ -8,8 +8,7 @@
 			"type": "string"
 		},
 		"icon": {
-			"type": "string",
-			"default": "share"
+			"type": "string"
 		}
 	}
 }
