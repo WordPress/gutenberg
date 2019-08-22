@@ -37,7 +37,7 @@
 				"caption": {
 					"type": "string",
 					"source": "html",
-					"selector": "figcaption"
+					"selector": ".blocks-gallery-item__caption"
 				}
 			}
 		},
@@ -51,7 +51,7 @@
 		"caption": {
 			"type": "string",
 			"source": "html",
-			"selector": ".blocks-gallery-grid + figcaption"
+			"selector": ".blocks-gallery-caption"
 		},
 		"imageCrop": {
 			"type": "boolean",
