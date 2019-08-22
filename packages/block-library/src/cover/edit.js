@@ -115,6 +115,7 @@ class CoverEdit extends Component {
 			id,
 			url,
 			minHeight = COVER_DEFAULT_HEIGHT,
+			name,
 		} = attributes;
 		const onSelectMedia = ( media ) => {
 			if ( ! media || ! media.url ) {
@@ -144,6 +145,7 @@ class CoverEdit extends Component {
 			setAttributes( {
 				url: media.url,
 				id: media.id,
+				name: media.filename,
 				backgroundType: mediaType,
 				...( mediaType === VIDEO_BACKGROUND_TYPE ?
 					{ focalPoint: undefined, hasParallax: undefined } :
@@ -240,6 +242,9 @@ class CoverEdit extends Component {
 							</BaseControl>
 							{ !! ( url || id ) && (
 								<PanelRow>
+									{ VIDEO_BACKGROUND_TYPE === backgroundType && (
+										name
+									) }
 									<Button
 										isDefault
 										isSmall
@@ -255,29 +260,27 @@ class CoverEdit extends Component {
 							) }
 						</PanelBody>
 					) }
-					{ !! overlayColor.color && (
-						<PanelColorSettings
-							title={ __( 'Overlay' ) }
-							initialOpen={ true }
-							colorSettings={ [ {
-								value: overlayColor.color,
-								onChange: setOverlayColor,
-								label: __( 'Overlay Color' ),
-							} ] }
-						>
-							{ !! url && (
-								<RangeControl
-									label={ __( 'Background Opacity' ) }
-									value={ dimRatio }
-									onChange={ setDimRatio }
-									min={ 0 }
-									max={ 100 }
-									step={ 10 }
-									required
-								/>
-							) }
-						</PanelColorSettings>
-					) }
+					<PanelColorSettings
+						title={ __( 'Overlay' ) }
+						initialOpen={ true }
+						colorSettings={ [ {
+							value: overlayColor.color,
+							onChange: setOverlayColor,
+							label: __( 'Overlay Color' ),
+						} ] }
+					>
+						{ !! url && (
+							<RangeControl
+								label={ __( 'Background Opacity' ) }
+								value={ dimRatio }
+								onChange={ setDimRatio }
+								min={ 0 }
+								max={ 100 }
+								step={ 10 }
+								required
+							/>
+						) }
+					</PanelColorSettings>
 				</InspectorControls>
 			</>
 		);
