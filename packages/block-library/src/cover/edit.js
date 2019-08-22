@@ -17,8 +17,9 @@ import {
 	Toolbar,
 	withNotices,
 	ResizableBox,
+	BaseControl,
 } from '@wordpress/components';
-import { compose } from '@wordpress/compose';
+import { compose, withInstanceId } from '@wordpress/compose';
 import {
 	BlockControls,
 	BlockIcon,
@@ -92,6 +93,7 @@ class CoverEdit extends Component {
 
 	render() {
 		const {
+			instanceId,
 			attributes,
 			setAttributes,
 			isSelected,
@@ -166,7 +168,7 @@ class CoverEdit extends Component {
 		if ( focalPoint ) {
 			style.backgroundPosition = `${ focalPoint.x * 100 }% ${ focalPoint.y * 100 }%`;
 		}
-
+		const inputId = `block-cover-height-input-${ instanceId }`;
 		const controls = (
 			<>
 				<BlockControls>
@@ -210,6 +212,19 @@ class CoverEdit extends Component {
 									onChange={ ( value ) => setAttributes( { focalPoint: value } ) }
 								/>
 							) }
+							<BaseControl label={ __( 'Height in pixels' ) } id={ inputId }>
+								<input
+									type="number"
+									id={ inputId }
+									onChange={ ( event ) => {
+										const coverHeight = parseInt( event.target.value, 10 );
+										setAttributes( { height: coverHeight } );
+									} }
+									value={ height }
+									min={ COVER_MIN_HEIGHT }
+									step="10"
+								/>
+							</BaseControl>
 							<PanelColorSettings
 								title={ __( 'Overlay' ) }
 								initialOpen={ true }
@@ -405,4 +420,5 @@ class CoverEdit extends Component {
 export default compose( [
 	withColors( { overlayColor: 'background-color' } ),
 	withNotices,
+	withInstanceId,
 ] )( CoverEdit );
