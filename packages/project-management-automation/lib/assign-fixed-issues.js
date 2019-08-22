@@ -1,7 +1,7 @@
 /**
- * GitHub dependencies
+ * Internal dependencies
  */
-const { debug } = require( '@actions/core' );
+const debug = require( './debug' );
 
 async function assignFixedIssues( context, octokit ) {
 	const regex = /(?:close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved):? +(?:\#?|https?:\/\/github\.com\/WordPress\/gutenberg\/issues\/)(\d+)/gi;

@@ -1,7 +1,7 @@
 /**
  * GitHub dependencies
  */
-const { setFailed, getInput, debug } = require( '@actions/core' );
+const { setFailed, getInput } = require( '@actions/core' );
 const { context, GitHub } = require( '@actions/github' );
 
 /**
@@ -10,6 +10,7 @@ const { context, GitHub } = require( '@actions/github' );
 const assignFixedIssues = require( './assign-fixed-issues' );
 const addFirstTimeContributorLabel = require( './add-first-time-contributor-label' );
 const addMilestone = require( './add-milestone' );
+const debug = require( './debug' );
 
 const automations = [
 	{
@@ -51,5 +52,5 @@ const automations = [
 		}
 	}
 
-	debug( `main: All done!` );
+	debug( 'main: All done!' );
 }() );

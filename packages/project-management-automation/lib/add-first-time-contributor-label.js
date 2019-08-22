@@ -1,7 +1,7 @@
 /**
- * GitHub dependencies
+ * Internal dependencies
  */
-const { debug } = require( '@actions/core' );
+const debug = require( './debug' );
 
 async function addFirstTimeContributorLabel( context, octokit ) {
 	const owner = context.payload.repository.owner.login;

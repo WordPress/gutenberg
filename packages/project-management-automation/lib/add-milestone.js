@@ -1,7 +1,7 @@
 /**
- * GitHub dependencies
+ * Internal dependencies
  */
-const { debug } = require( '@actions/core' );
+const debug = require( './debug' );
 
 // Milestone due dates are calculated from a known due date:
 // 6.3, which was due on August 12 2019.
