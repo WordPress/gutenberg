@@ -4,20 +4,18 @@
 import addFirstTimeContributorLabel from '../add-first-time-contributor-label';
 
 describe( 'addFirstTimeContributorLabel', () => {
-	const context = {
-		payload: {
-			pull_request: {
-				user: {
-					login: 'matt',
-				},
-				number: 123,
+	const payload = {
+		pull_request: {
+			user: {
+				login: 'matt',
 			},
-			repository: {
-				owner: {
-					login: 'WordPress',
-				},
-				name: 'gutenberg',
+			number: 123,
+		},
+		repository: {
+			owner: {
+				login: 'WordPress',
 			},
+			name: 'gutenberg',
 		},
 	};
 
@@ -31,7 +29,7 @@ describe( 'addFirstTimeContributorLabel', () => {
 			},
 		};
 
-		await addFirstTimeContributorLabel( context, octokit );
+		await addFirstTimeContributorLabel( payload, octokit );
 
 		expect( octokit.search.commits ).toHaveBeenCalledWith( {
 			q: 'repo:WordPress/gutenberg+author:matt',
@@ -49,7 +47,7 @@ describe( 'addFirstTimeContributorLabel', () => {
 			},
 		};
 
-		await addFirstTimeContributorLabel( context, octokit );
+		await addFirstTimeContributorLabel( payload, octokit );
 
 		expect( octokit.search.commits ).toHaveBeenCalledWith( {
 			q: 'repo:WordPress/gutenberg+author:matt',

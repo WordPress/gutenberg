@@ -5,11 +5,9 @@ import addMilestone from '../add-milestone';
 
 describe( 'addFirstTimeContributorLabel', () => {
 	it( 'does nothing if PR is not merged', async () => {
-		const context = {
-			payload: {
-				pull_request: {
-					merged: false,
-				},
+		const payload = {
+			pull_request: {
+				merged: false,
 			},
 		};
 		const octokit = {
@@ -24,7 +22,7 @@ describe( 'addFirstTimeContributorLabel', () => {
 			},
 		};
 
-		await addMilestone( context, octokit );
+		await addMilestone( payload, octokit );
 
 		expect( octokit.issues.get ).not.toHaveBeenCalled();
 		expect( octokit.issues.createMilestone ).not.toHaveBeenCalled();
@@ -34,13 +32,11 @@ describe( 'addFirstTimeContributorLabel', () => {
 	} );
 
 	it( 'does nothing if base is not master', async () => {
-		const context = {
-			payload: {
-				pull_request: {
-					merged: true,
-					base: {
-						ref: 'release/5.0',
-					},
+		const payload = {
+			pull_request: {
+				merged: true,
+				base: {
+					ref: 'release/5.0',
 				},
 			},
 		};
@@ -56,7 +52,7 @@ describe( 'addFirstTimeContributorLabel', () => {
 			},
 		};
 
-		await addMilestone( context, octokit );
+		await addMilestone( payload, octokit );
 
 		expect( octokit.issues.get ).not.toHaveBeenCalled();
 		expect( octokit.issues.createMilestone ).not.toHaveBeenCalled();
@@ -66,21 +62,19 @@ describe( 'addFirstTimeContributorLabel', () => {
 	} );
 
 	it( 'does nothing if PR already has a milestone', async () => {
-		const context = {
-			payload: {
-				pull_request: {
-					merged: true,
-					base: {
-						ref: 'master',
-					},
-					number: 123,
+		const payload = {
+			pull_request: {
+				merged: true,
+				base: {
+					ref: 'master',
 				},
-				repository: {
-					owner: {
-						login: 'WordPress',
-					},
-					name: 'gutenberg',
+				number: 123,
+			},
+			repository: {
+				owner: {
+					login: 'WordPress',
 				},
+				name: 'gutenberg',
 			},
 		};
 		const octokit = {
@@ -97,7 +91,7 @@ describe( 'addFirstTimeContributorLabel', () => {
 			},
 		};
 
-		await addMilestone( context, octokit );
+		await addMilestone( payload, octokit );
 
 		expect( octokit.issues.get ).toHaveBeenCalledWith( {
 			owner: 'WordPress',
@@ -111,21 +105,19 @@ describe( 'addFirstTimeContributorLabel', () => {
 	} );
 
 	it( 'correctly milestones PRs when `package.json` has a `*.[1-8]` version', async () => {
-		const context = {
-			payload: {
-				pull_request: {
-					merged: true,
-					base: {
-						ref: 'master',
-					},
-					number: 123,
+		const payload = {
+			pull_request: {
+				merged: true,
+				base: {
+					ref: 'master',
 				},
-				repository: {
-					owner: {
-						login: 'WordPress',
-					},
-					name: 'gutenberg',
+				number: 123,
+			},
+			repository: {
+				owner: {
+					login: 'WordPress',
 				},
+				name: 'gutenberg',
 			},
 		};
 		const octokit = {
@@ -150,7 +142,7 @@ describe( 'addFirstTimeContributorLabel', () => {
 			},
 		};
 
-		await addMilestone( context, octokit );
+		await addMilestone( payload, octokit );
 
 		expect( octokit.issues.get ).toHaveBeenCalledWith( {
 			owner: 'WordPress',
@@ -181,21 +173,19 @@ describe( 'addFirstTimeContributorLabel', () => {
 	} );
 
 	it( 'correctly milestones PRs when `package.json` has a `*.9` version', async () => {
-		const context = {
-			payload: {
-				pull_request: {
-					merged: true,
-					base: {
-						ref: 'master',
-					},
-					number: 123,
+		const payload = {
+			pull_request: {
+				merged: true,
+				base: {
+					ref: 'master',
 				},
-				repository: {
-					owner: {
-						login: 'WordPress',
-					},
-					name: 'gutenberg',
+				number: 123,
+			},
+			repository: {
+				owner: {
+					login: 'WordPress',
 				},
+				name: 'gutenberg',
 			},
 		};
 		const octokit = {
@@ -220,7 +210,7 @@ describe( 'addFirstTimeContributorLabel', () => {
 			},
 		};
 
-		await addMilestone( context, octokit );
+		await addMilestone( payload, octokit );
 
 		expect( octokit.issues.get ).toHaveBeenCalledWith( {
 			owner: 'WordPress',

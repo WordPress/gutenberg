@@ -39,13 +39,13 @@ const automations = [
 
 	const octokit = new GitHub( token );
 
-	debug( `main: Received event = '${ context.eventName }', action = '${ context.action }'` );
+	debug( `main: Received event = '${ context.eventName }', action = '${ context.payload.action }'` );
 
 	for ( const { event, action, task } of automations ) {
-		if ( event === context.eventName && action === context.action ) {
+		if ( event === context.eventName && action === context.payload.action ) {
 			try {
 				debug( `main: Starting task ${ task.name }` );
-				await task( context, octokit );
+				await task( context.payload, octokit );
 			} catch ( error ) {
 				debug( `main: Task ${ task.name } failed with error: ${ error }` );
 			}

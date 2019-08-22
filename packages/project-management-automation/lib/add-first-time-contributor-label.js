@@ -3,10 +3,10 @@
  */
 const debug = require( './debug' );
 
-async function addFirstTimeContributorLabel( context, octokit ) {
-	const owner = context.payload.repository.owner.login;
-	const repo = context.payload.repository.name;
-	const author = context.payload.pull_request.user.login;
+async function addFirstTimeContributorLabel( payload, octokit ) {
+	const owner = payload.repository.owner.login;
+	const repo = payload.repository.name;
+	const author = payload.pull_request.user.login;
 
 	debug( `add-first-time-contributor-label: Searching for commits in ${ owner }/${ repo } by @${ author }` );
 
@@ -19,12 +19,12 @@ async function addFirstTimeContributorLabel( context, octokit ) {
 		return;
 	}
 
-	debug( `add-first-time-contributor-label: Adding 'First Time Contributor' label to issue #${ context.payload.pull_request.number }` );
+	debug( `add-first-time-contributor-label: Adding 'First Time Contributor' label to issue #${ payload.pull_request.number }` );
 
 	await octokit.issues.addLabels( {
 		owner,
 		repo,
-		issue_number: context.payload.pull_request.number,
+		issue_number: payload.pull_request.number,
 		labels: [ 'First-time Contributor' ],
 	} );
 }
