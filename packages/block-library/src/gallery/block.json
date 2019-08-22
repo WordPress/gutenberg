@@ -6,7 +6,7 @@
 			"type": "array",
 			"default": [ ],
 			"source": "query",
-			"selector": ".wp-block-gallery .blocks-gallery-item",
+			"selector": ".blocks-gallery-item",
 			"query": {
 				"url": {
 					"source": "attribute",
@@ -37,7 +37,7 @@
 				"caption": {
 					"type": "string",
 					"source": "html",
-					"selector": "figcaption"
+					"selector": ".blocks-gallery-item figcaption"
 				}
 			}
 		},
