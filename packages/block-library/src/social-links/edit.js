@@ -23,8 +23,9 @@ import { dispatch } from '@wordpress/data';
  *
  * @constant
  * @type {string[]}
-*/
+ */
 const ALLOWED_BLOCKS = [ 'core/social-link' ];
+const TEMPLATE = [ [ 'core/social-link' ] ];
 
 export const SocialLinksEdit = function( { className, clientId } ) {
 	return (
@@ -32,6 +33,7 @@ export const SocialLinksEdit = function( { className, clientId } ) {
 			<div className={ className }>
 				<InnerBlocks
 					allowedBlocks={ ALLOWED_BLOCKS }
+					template={ TEMPLATE }
 					renderAppender={ () => (
 						<IconButton
 							isLarge
@@ -41,7 +43,6 @@ export const SocialLinksEdit = function( { className, clientId } ) {
 								const newLink = createBlock( 'core/social-link' );
 								dispatch( 'core/block-editor' ).insertBlock( newLink, undefined, clientId );
 							} } >
-							{ __( 'Add link' ) }
 						</IconButton>
 					) }
 				/>
