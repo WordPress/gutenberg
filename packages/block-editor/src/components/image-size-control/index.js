@@ -32,7 +32,7 @@ class ImageSizeControl extends Component {
 		const {
 			imageWidth,
 			imageHeight,
-			imageSizeOptions,
+			imageSizeOptions = [],
 			isResizable = true,
 			slug,
 			width,
