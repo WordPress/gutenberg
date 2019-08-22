@@ -12,6 +12,12 @@ const REFERENCE_DATE = '2019-08-12';
 // Releases are every 14 days.
 const DAYS_PER_RELEASE = 14;
 
+/**
+ * Assigns the correct milestone to PRs once merged.
+ *
+ * @param {Object} payload Pull request event payload, see https://developer.github.com/v3/activity/events/types/#pullrequestevent.
+ * @param {Object} octokit Initialized Octokit REST client, see https://octokit.github.io/rest.js/.
+ */
 async function addMilestone( payload, octokit ) {
 	if ( ! payload.pull_request.merged ) {
 		debug( 'add-milestone: Pull request is not merged. Aborting' );

@@ -3,6 +3,13 @@
  */
 const debug = require( './debug' );
 
+/**
+ * Adds the 'First Time Contributor' label to PRs opened by contributors that
+ * have not yet made a commit.
+ *
+ * @param {Object} payload Pull request event payload, see https://developer.github.com/v3/activity/events/types/#pullrequestevent.
+ * @param {Object} octokit Initialized Octokit REST client, see https://octokit.github.io/rest.js/.
+ */
 async function addFirstTimeContributorLabel( payload, octokit ) {
 	const owner = payload.repository.owner.login;
 	const repo = payload.repository.name;
