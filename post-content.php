@@ -128,7 +128,7 @@
 <p><?php _e( 'Sure, the full-wide image can be pretty big. But sometimes the image is worth it.', 'gutenberg' ); ?></p>
 <!-- /wp:paragraph -->
 
-<!-- wp:gallery {"ids":[null,null],"align":"wide","images":[{"url":"https://cldup.com/_rSwtEeDGD.jpg","alt":""},{"url":"https://cldup.com/L-cC3qX2DN.jpg","alt":""}]} -->
+<!-- wp:gallery {"ids":[null,null],"align":"wide"} -->
 <figure class="wp-block-gallery alignwide columns-2 is-cropped">
 <ul class="blocks-gallery-grid">
 <li class="blocks-gallery-item"><figure><img src="https://cldup.com/_rSwtEeDGD.jpg" alt="" /></figure></li>
