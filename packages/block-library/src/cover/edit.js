@@ -198,9 +198,9 @@ class CoverEdit extends Component {
 						</>
 					) }
 				</BlockControls>
-				{ !! ( url || overlayColor.color ) && (
-					<InspectorControls>
-						<PanelBody title={ __( 'Cover Settings' ) }>
+				<InspectorControls>
+					{ !! url && (
+						<PanelBody title={ __( 'Media Settings' ) }>
 							{ !! ( url || id ) && (
 								<PanelRow>
 									<Button
@@ -253,30 +253,32 @@ class CoverEdit extends Component {
 									step="10"
 								/>
 							</BaseControl>
-							<PanelColorSettings
-								title={ __( 'Overlay' ) }
-								initialOpen={ true }
-								colorSettings={ [ {
-									value: overlayColor.color,
-									onChange: setOverlayColor,
-									label: __( 'Overlay Color' ),
-								} ] }
-							>
-								{ !! url && (
-									<RangeControl
-										label={ __( 'Background Opacity' ) }
-										value={ dimRatio }
-										onChange={ setDimRatio }
-										min={ 0 }
-										max={ 100 }
-										step={ 10 }
-										required
-									/>
-								) }
-							</PanelColorSettings>
 						</PanelBody>
-					</InspectorControls>
-				) }
+					) }
+					{ !! overlayColor.color && (
+						<PanelColorSettings
+							title={ __( 'Overlay' ) }
+							initialOpen={ true }
+							colorSettings={ [ {
+								value: overlayColor.color,
+								onChange: setOverlayColor,
+								label: __( 'Overlay Color' ),
+							} ] }
+						>
+							{ !! url && (
+								<RangeControl
+									label={ __( 'Background Opacity' ) }
+									value={ dimRatio }
+									onChange={ setDimRatio }
+									min={ 0 }
+									max={ 100 }
+									step={ 10 }
+									required
+								/>
+							) }
+						</PanelColorSettings>
+					) }
+				</InspectorControls>
 			</>
 		);
 
