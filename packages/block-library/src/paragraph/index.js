@@ -24,7 +24,6 @@ export const settings = {
 	keywords: [ __( 'text' ) ],
 	example: {
 		attributes: {
-			align: 'center',
 			content: __( 'Start writing, no matter what. The water does not flow until the faucet is turned on.' ),
 		},
 	},
