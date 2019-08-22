@@ -69,26 +69,39 @@ compose.version = coreCompose.version;
  * @return {Object} The merged config object.
  */
 function mergeConfigs( originalConfig, newConfig ) {
+	// Loop through each element of newConfig, and test what should be done with them.
 	Object.keys( newConfig ).forEach( ( key ) => {
 		if ( ! originalConfig[ key ] ) {
+			// If the originalConfig object doesn't have this element, we can just add it.
 			originalConfig[ key ] = newConfig[ key ];
 		} else if ( newConfig[ key ] instanceof Array ) {
+			// If the newConfig element is an array, we need to try and merge them.
+			// This is intended to merge Docker volume configs, which exist in the form:
+			// /path/to/local/dir:/path/to/container/dir:config:stuff
 			newConfig[ key ].forEach( ( element ) => {
+				// First, check if it's actually a volume config.
 				if ( element.startsWith( pluginMountDir ) && element.includes( ':' ) ) {
+					// Get the local directory that's being mounted. This can either be the plugin
+					// base directory, or a subdirectory of it.
 					const mountDir = element.split( ':' )[ 0 ];
+					// See if this mountDir exists in the originalConfig.
 					const index = originalConfig[ key ].findIndex( ( volume ) => {
 						return volume.startsWith( `${ mountDir }:` );
 					} );
 					if ( index > -1 ) {
+						// If mountDir exists in originalConfig, overwrite it with the new config.
 						originalConfig[ key ][ index ] = element;
 					} else {
+						// If mountDir doesn't exist, append the new config, instead.
 						originalConfig[ key ].push( element );
 					}
 				}
 			} );
 		} else if ( newConfig[ key ] instanceof Object ) {
+			// If the newConfig element is an object, we need to recursively merge it.
 			originalConfig[ key ] = mergeConfigs( originalConfig[ key ], newConfig[ key ] );
 		} else {
+			// Any other data types are overwritten by the newConfig.
 			originalConfig[ key ] = newConfig[ key ];
 		}
 	} );
