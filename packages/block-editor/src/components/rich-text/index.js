@@ -138,12 +138,11 @@ class RichTextWrapper extends Component {
 				mode: 'BLOCKS',
 				tagName,
 			} );
-			const shouldReplace = onReplace && isEmpty( value );
 
 			// Allows us to ask for this information when we get a report.
 			window.console.log( 'Received item:\n\n', file );
 
-			if ( shouldReplace ) {
+			if ( onReplace && isEmpty( value ) ) {
 				onReplace( content );
 			} else {
 				this.onSplit( value, content );
@@ -152,21 +151,10 @@ class RichTextWrapper extends Component {
 			return;
 		}
 
-		const canReplace = onReplace && isEmpty( value );
-		const canSplit = onReplace && onSplit;
-
-		let mode = 'INLINE';
-
-		if ( canReplace ) {
-			mode = 'BLOCKS';
-		} else if ( canSplit ) {
-			mode = 'AUTO';
-		}
-
 		const content = pasteHandler( {
 			HTML: html,
 			plainText,
-			mode,
+			mode: onReplace && onSplit ? 'AUTO' : 'INLINE',
 			tagName,
 			canUserUseUnfilteredHTML,
 		} );
@@ -182,7 +170,7 @@ class RichTextWrapper extends Component {
 
 			onChange( insert( value, valueToInsert ) );
 		} else if ( content.length > 0 ) {
-			if ( canReplace ) {
+			if ( onReplace && isEmpty( value ) ) {
 				onReplace( content );
 			} else {
 				this.onSplit( value, content );
