@@ -7,18 +7,33 @@ import { useSelect, useDispatch } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { defaultEntities } from './entities';
+import { defaultEntities, kinds } from './entities';
 
-const entities = defaultEntities.reduce(
-	( acc, entity ) => {
+const entities = {
+	...defaultEntities.reduce( ( acc, entity ) => {
 		if ( ! acc[ entity.kind ] ) {
 			acc[ entity.kind ] = {};
 		}
 		acc[ entity.kind ][ entity.name ] = { context: createContext() };
 		return acc;
-	},
-	{ postType: { post: { context: createContext() } } }
-);
+	}, {} ),
+	...kinds.reduce( ( acc, kind ) => {
+		acc[ kind.name ] = new Proxy(
+			{},
+			{
+				get( target, name ) {
+					if ( Reflect.has( target, name ) ) {
+						return Reflect.get( ...arguments );
+					}
+					const value = { context: createContext() };
+					Reflect.set( target, name, value );
+					return value;
+				},
+			}
+		);
+		return acc;
+	}, {} ),
+};
 
 /**
  * Context provider component for providing
