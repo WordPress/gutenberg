@@ -4,7 +4,6 @@
 import classnames from 'classnames';
 import {
 	get,
-	isEmpty,
 	filter,
 	map,
 	last,
@@ -17,12 +16,9 @@ import {
  */
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import {
-	Button,
-	ButtonGroup,
 	ExternalLink,
 	PanelBody,
 	ResizableBox,
-	SelectControl,
 	Spinner,
 	TextareaControl,
 	TextControl,
@@ -35,6 +31,7 @@ import {
 	BlockAlignmentToolbar,
 	BlockControls,
 	BlockIcon,
+	ImageSizeControl,
 	InspectorControls,
 	InspectorAdvancedControls,
 	MediaPlaceholder,
@@ -104,9 +101,6 @@ export class ImageEdit extends Component {
 		this.onSelectImage = this.onSelectImage.bind( this );
 		this.onSelectURL = this.onSelectURL.bind( this );
 		this.updateImage = this.updateImage.bind( this );
-		this.updateWidth = this.updateWidth.bind( this );
-		this.updateHeight = this.updateHeight.bind( this );
-		this.updateDimensions = this.updateDimensions.bind( this );
 		this.onSetHref = this.onSetHref.bind( this );
 		this.onSetTitle = this.onSetTitle.bind( this );
 		this.getFilename = this.getFilename.bind( this );
@@ -297,20 +291,6 @@ export class ImageEdit extends Component {
 		} );
 	}
 
-	updateWidth( width ) {
-		this.props.setAttributes( { width: parseInt( width, 10 ) } );
-	}
-
-	updateHeight( height ) {
-		this.props.setAttributes( { height: parseInt( height, 10 ) } );
-	}
-
-	updateDimensions( width = undefined, height = undefined ) {
-		return () => {
-			this.props.setAttributes( { width, height } );
-		};
-	}
-
 	getFilename( url ) {
 		const path = getPath( url );
 		if ( path ) {
@@ -451,67 +431,17 @@ export class ImageEdit extends Component {
 								</>
 							}
 						/>
-						{ ! isEmpty( imageSizeOptions ) && (
-							<SelectControl
-								label={ __( 'Image Size' ) }
-								value={ sizeSlug }
-								options={ imageSizeOptions }
-								onChange={ this.updateImage }
-							/>
-						) }
-						{ isResizable && (
-							<div className="block-library-image__dimensions">
-								<p className="block-library-image__dimensions__row">
-									{ __( 'Image Dimensions' ) }
-								</p>
-								<div className="block-library-image__dimensions__row">
-									<TextControl
-										type="number"
-										className="block-library-image__dimensions__width"
-										label={ __( 'Width' ) }
-										value={ width || imageWidth || '' }
-										min={ 1 }
-										onChange={ this.updateWidth }
-									/>
-									<TextControl
-										type="number"
-										className="block-library-image__dimensions__height"
-										label={ __( 'Height' ) }
-										value={ height || imageHeight || '' }
-										min={ 1 }
-										onChange={ this.updateHeight }
-									/>
-								</div>
-								<div className="block-library-image__dimensions__row">
-									<ButtonGroup aria-label={ __( 'Image Size' ) }>
-										{ [ 25, 50, 75, 100 ].map( ( scale ) => {
-											const scaledWidth = Math.round( imageWidth * ( scale / 100 ) );
-											const scaledHeight = Math.round( imageHeight * ( scale / 100 ) );
-
-											const isCurrent = width === scaledWidth && height === scaledHeight;
-
-											return (
-												<Button
-													key={ scale }
-													isSmall
-													isPrimary={ isCurrent }
-													isPressed={ isCurrent }
-													onClick={ this.updateDimensions( scaledWidth, scaledHeight ) }
-												>
-													{ scale }%
-												</Button>
-											);
-										} ) }
-									</ButtonGroup>
-									<Button
-										isSmall
-										onClick={ this.updateDimensions() }
-									>
-										{ __( 'Reset' ) }
-									</Button>
-								</div>
-							</div>
-						) }
+						<ImageSizeControl
+							onChangeImage={ this.updateImage }
+							onChange={ ( value ) => setAttributes( value ) }
+							slug={ sizeSlug }
+							width={ width }
+							height={ height }
+							imageSizeOptions={ imageSizeOptions }
+							isResizable={ isResizable }
+							imageWidth={ imageWidth }
+							imageHeight={ imageHeight }
+						/>
 					</PanelBody>
 				</InspectorControls>
 				<InspectorAdvancedControls>
