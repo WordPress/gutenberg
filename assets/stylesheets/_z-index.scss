@@ -115,7 +115,11 @@ $z-layers: (
 	".components-resizable-box__corner-handle": 2,
 
 	// Make sure block manager sticky category titles appear above the options
-	".edit-post-manage-blocks-modal__category-title": 1
+	".edit-post-manage-blocks-modal__category-title": 1,
+
+	".components-circular-option-picker__option.is-active": 1,
+	// Needs to be higher than .components-circular-option-picker__option.is-active.
+	".components-circular-option-picker__option.is-active + .dashicons-saved": 2
 );
 
 @function z-index( $key ) {
