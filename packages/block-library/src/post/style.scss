@@ -1,0 +1,11 @@
+.wp-block-post {
+	// Extra specificity to override default Placeholder styles.
+	&__placeholder-form.wp-block-post__placeholder-form {
+		align-items: center;
+		text-align: left;
+	}
+
+	&__placeholder-input {
+		width: 100px;
+	}
+}

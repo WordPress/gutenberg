@@ -62,6 +62,11 @@ import * as tagCloud from './tag-cloud';
 
 import * as classic from './classic';
 
+// Custom Entity Blocks
+import * as post from './post';
+import * as postTitle from './post-title';
+import * as postContent from './post-content';
+
 /**
  * Function to register an individual block.
  *
@@ -138,6 +143,11 @@ export const registerCoreBlocks = () => {
 		textColumns,
 		verse,
 		video,
+
+		// Register Custom Entity Blocks.
+		post,
+		postTitle,
+		postContent,
 	].forEach( registerBlock );
 
 	setDefaultBlockName( paragraph.name );
