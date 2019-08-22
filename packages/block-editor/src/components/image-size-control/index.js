@@ -19,22 +19,7 @@ class ImageSizeControl extends Component {
 	constructor( props ) {
 		super( props );
 
-		this.updateImage = this.updateImage.bind( this );
-		this.updateWidth = this.updateWidth.bind( this );
-		this.updateHeight = this.updateHeight.bind( this );
 		this.updateDimensions = this.updateDimensions.bind( this );
-	}
-
-	updateImage( slug ) {
-		this.props.onChangeImage( slug );
-	}
-
-	updateWidth( width ) {
-		this.props.onChange( { width: parseInt( width, 10 ) } );
-	}
-
-	updateHeight( height ) {
-		this.props.onChange( { height: parseInt( height, 10 ) } );
 	}
 
 	updateDimensions( width = undefined, height = undefined ) {
@@ -52,6 +37,8 @@ class ImageSizeControl extends Component {
 			slug,
 			width,
 			height,
+			onChange,
+			onChangeImage,
 		} = this.props;
 
 		return (
@@ -61,7 +48,7 @@ class ImageSizeControl extends Component {
 						label={ __( 'Image Size' ) }
 						value={ slug }
 						options={ imageSizeOptions }
-						onChange={ this.updateImage }
+						onChange={ onChangeImage }
 					/>
 				) }
 				{ isResizable && (
@@ -76,7 +63,7 @@ class ImageSizeControl extends Component {
 								label={ __( 'Width' ) }
 								value={ width || imageWidth || '' }
 								min={ 1 }
-								onChange={ this.updateWidth }
+								onChange={ ( value ) => onChange( { width: parseInt( value, 10 ) } ) }
 							/>
 							<TextControl
 								type="number"
@@ -84,7 +71,7 @@ class ImageSizeControl extends Component {
 								label={ __( 'Height' ) }
 								value={ height || imageHeight || '' }
 								min={ 1 }
-								onChange={ this.updateHeight }
+								onChange={ ( value ) => onChange( { height: parseInt( value, 10 ) } ) }
 							/>
 						</div>
 						<div className="block-editor-image-size-control__row">
