@@ -108,6 +108,34 @@ export function getEntityRecord( state, kind, name, key ) {
 }
 
 /**
+ * Returns the entity's record object by key,
+ * with its attributes mapped to their raw values.
+ *
+ * @param {Object} state  State tree.
+ * @param {string} kind   Entity kind.
+ * @param {string} name   Entity name.
+ * @param {number} key    Record's key.
+ *
+ * @return {Object?} Object with the entity's raw attributes.
+ */
+export const getRawEntityRecord = createSelector(
+	( state, kind, name, key ) => {
+		const record = getEntityRecord( state, kind, name, key );
+		return (
+			record &&
+							Object.keys( record ).reduce( ( acc, _key ) => {
+								// Because edits are the "raw" attribute values,
+								// we return those from record selectors to make rendering,
+								// comparisons, and joins with edits easier.
+								acc[ _key ] = get( record[ _key ], 'raw', record[ _key ] );
+								return acc;
+							}, {} )
+		);
+	},
+	( state ) => [ state.entities.data ]
+);
+
+/**
  * Returns the Entity's records.
  *
  * @param {Object}  state  State tree
@@ -156,8 +184,7 @@ export function getEntityRecordEdits( state, kind, name, recordId ) {
 export const getEntityRecordNonTransientEdits = createSelector(
 	( state, kind, name, recordId ) => {
 		const { transientEdits = {} } = getEntity( state, kind, name );
-		const edits =
-							getEntityRecordEdits( state, kind, name, recordId ) || [];
+		const edits = getEntityRecordEdits( state, kind, name, recordId ) || [];
 		return Object.keys( edits ).reduce( ( acc, key ) => {
 			if ( ! transientEdits[ key ] ) {
 				acc[ key ] = edits[ key ];
@@ -194,16 +221,10 @@ export function hasEditsForEntityRecord( state, kind, name, recordId ) {
  * @return {Object?} The entity record, merged with its edits.
  */
 export const getEditedEntityRecord = createSelector(
-	( state, kind, name, recordId ) => {
-		const record = getEntityRecord( state, kind, name, recordId );
-		return {
-			...Object.keys( record ).reduce( ( acc, key ) => {
-				acc[ key ] = get( record[ key ], 'raw', record[ key ] );
-				return acc;
-			}, {} ),
-			...getEntityRecordEdits( state, kind, name, recordId ),
-		};
-	},
+	( state, kind, name, recordId ) => ( {
+		...getRawEntityRecord( state, kind, name, recordId ),
+		...getEntityRecordEdits( state, kind, name, recordId ),
+	} ),
 	( state ) => [ state.entities.data ]
 );
 
@@ -237,12 +258,11 @@ export function isAutosavingEntityRecord( state, kind, name, recordId ) {
  * @return {boolean} Whether the entity record is saving or not.
  */
 export function isSavingEntityRecord( state, kind, name, recordId ) {
-	const { pending, isAutosave } = get(
+	return get(
 		state.entities.data,
-		[ kind, name, 'saving', recordId ],
-		{}
+		[ kind, name, 'saving', recordId, 'pending' ],
+		false
 	);
-	return Boolean( pending && ! isAutosave );
 }
 
 /**
