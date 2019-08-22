@@ -21,16 +21,16 @@ function render_block_navigation_menu( $attributes, $content, $block ) {
 /**
  * Adds parent and child relatin to innerBlocks
  *
- * @param array  $block The block.
- * @param string $block_tree the current tree.
+ * @param array $block The block.
  *
  * @return string Returns the block with ids and parents for innerBlocks.
  */
-function prepare_navigation( $block, $block_tree = '' ) {
+function prepare_navigation( $block ) {
+	$block_tree = '';
 	foreach ( (array) $block['innerBlocks'] as $key => $menu_item ) {
 		$block_tree .= '<li>' . $menu_item['innerContent'][0];
 		if ( count( (array) $menu_item['innerBlocks'] ) > 0 ) {
-			$block_tree .= prepare_navigation( $menu_item, '' );
+			$block_tree .= prepare_navigation( $menu_item );
 		}
 		$block_tree .= '</li>';
 	}
