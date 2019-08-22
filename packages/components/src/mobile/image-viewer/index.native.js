@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, PanResponder, Dimensions, ImageBackground } from 'react-native';
+import { View, PanResponder, Dimensions, ImageBackground, Image } from 'react-native';
 import Modal from 'react-native-modal';
 
 /**
@@ -13,6 +13,7 @@ import { Component } from '@wordpress/element';
  * Internal dependencies
  */
 import styles from './styles.scss';
+import { calculateFullscreenImageSize } from './utils';
 
 // Default Image ratio 4:3
 const IMAGE_ASPECT_RATIO = 4 / 3;
@@ -20,19 +21,54 @@ const IMAGE_ASPECT_RATIO = 4 / 3;
 class ImageViewer extends Component {
 	constructor() {
 		super( ...arguments );
+
+		this.state = {
+			width: undefined,
+			height: undefined,
+		};
+
+		this.onDimensionsChange = this.onDimensionsChange.bind( this );
+	}
+	
+	componentDidMount() {
+		Dimensions.addEventListener("change", this.onDimensionsChange);
+		this.fetchImageSize();
+	}
+
+	componentDidUpdate( prevProps ) {
+		if ( this.props.url !== prevProps.url ) {
+			this.fetchImageSize();
+		}
+	}
+
+    componentWillUnmount() {
+		Dimensions.removeEventListener("change", this.onDimensionsChange);
+	}
+
+	onDimensionsChange(dims) {
+		this.fetchImageSize();
+	}
+
+	fetchImageSize() {
+		this.container = Dimensions.get("window")
+		Image.getSize( this.props.url, ( width, height ) => {
+			this.image = { width, height };
+			this.calculateSize();
+		} );
+	}
+
+	calculateSize() {
+		const { width, height } = calculateFullscreenImageSize( this.image, this.container );
+		this.setState( { width, height } );
 	}
 
 	render() {
 		const {
 			title = '',
 			isVisible,
-      		style = {},
       		url = '',
-			contentStyle = {},
 		} = this.props;
     
-    	const self = this
-
 		const panResponder = PanResponder.create( {
 			onMoveShouldSetPanResponder: ( evt, gestureState ) => {
 				// Activates swipe down over child Touchables if the swipe is long enough.
@@ -44,12 +80,10 @@ class ImageViewer extends Component {
 			},
 		} );
 
-    const imageContainerHeight = getWidth() / IMAGE_ASPECT_RATIO;
-
 		return (
 			<Modal
 				isVisible={ isVisible }
-				style={ styles.bottomModal }
+				style={ styles.modal }
 				animationIn={ "fadeIn" }
 				animationInTiming={ 1000 }
 				animationOut={ "fadeOut" }
@@ -57,6 +91,7 @@ class ImageViewer extends Component {
 				backdropTransitionInTiming={ 50 }
 				backdropTransitionOutTiming={ 50 }
 				backdropOpacity={ 1 }
+				supportedOrientations={['portrait', 'landscape']}
 				onBackdropPress={ this.props.onClose }
 				onBackButtonPress={ this.props.onClose }
 				onSwipe={ this.props.onClose }
@@ -65,9 +100,9 @@ class ImageViewer extends Component {
 				onMoveShouldSetResponderCapture={ panResponder.panHandlers.onMoveShouldSetResponderCapture }
 				onAccessibilityEscape={ this.props.onClose }
 			>
-				<View style={ [ styles.content, contentStyle ] }>
+				<View style={ styles.content }>
           			<ImageBackground
-						style={ {width: getWidth(), height: imageContainerHeight} }
+						style={ {width: this.state.width, height: this.state.height} }
 						source={ { uri: url } }
 					/>
 				</View>
@@ -75,11 +110,5 @@ class ImageViewer extends Component {
 		);
 	}
 }
-
-function getWidth() {
-	return Math.min( Dimensions.get( 'window' ).width, styles.background.maxWidth );
-}
-
-ImageViewer.getWidth = getWidth;
 
 export default ImageViewer;
