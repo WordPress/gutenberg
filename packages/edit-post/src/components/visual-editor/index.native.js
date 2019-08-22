@@ -52,6 +52,7 @@ class VisualEditor extends Component {
 				header={ this.renderHeader() }
 				isFullyBordered={ isFullyBordered }
 				safeAreaBottomInset={ safeAreaBottomInset }
+				autoScroll={ true }
 			/>
 		);
 	}
