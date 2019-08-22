@@ -8,10 +8,14 @@
 
 .richTextDark {
 	color: $white;
-	text-decoration-color: $blue-500;
+	text-decoration-color: $blue-30;
 	background-color: $black;
 }
 
-.rich-text-placeholder {
+.richTextPlaceholder {
 	color: $gray;
+}
+
+.richTextPlaceholderDark {
+	color: $gray-50;
 }

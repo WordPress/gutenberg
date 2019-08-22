@@ -782,9 +782,11 @@ export class RichText extends Component {
 			minHeight = style.minHeight;
 		}
 
+		const placeholderStyle = useStyle( styles.richTextPlaceholder, styles.richTextPlaceholderDark, theme );
+
 		const {
 			color: defaultPlaceholderTextColor,
-		} = styles[ 'rich-text-placeholder' ];
+		} = placeholderStyle;
 
 		const {
 			color: defaultColor,
