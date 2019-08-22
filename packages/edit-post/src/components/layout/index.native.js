@@ -112,19 +112,21 @@ class Layout extends Component {
 		};
 
 		return (
-			<SafeAreaView style={ useStyle( styles.container, styles.containerDark, this.props.theme ) } onLayout={ this.onRootViewLayout }>
+			<View style={ useStyle( styles.container, styles.containerDark, this.props.theme ) } onLayout={ this.onRootViewLayout }>
 				<View style={ useStyle( styles.background, styles.backgroundDark, this.props.theme ) }>
 					{ mode === 'text' ? this.renderHTML() : this.renderVisual() }
 				</View>
 				<View style={ { flex: 0, flexBasis: marginBottom, height: marginBottom } }>
 				</View>
-				<KeyboardAvoidingView
-					parentHeight={ this.state.rootViewHeight }
-					style={ toolbarKeyboardAvoidingViewStyle }
-				>
-					<Header />
-				</KeyboardAvoidingView>
-			</SafeAreaView>
+				<SafeAreaView>
+					<KeyboardAvoidingView
+						parentHeight={ this.state.rootViewHeight }
+						style={ toolbarKeyboardAvoidingViewStyle }
+					>
+						<Header />
+					</KeyboardAvoidingView>
+				</SafeAreaView>
+			</View>
 		);
 	}
 }
