@@ -172,6 +172,18 @@ function register_block_core_latest_posts() {
 					'type'    => 'string',
 					'default' => false,
 				),
+				'imageSizeSlug'           => array(
+					'type'    => 'string',
+					'default' => 'thumbnail',
+				),
+				'imageSizeWidth'          => array(
+					'type'    => 'number',
+					'default' => null,
+				),
+				'imageSizeHeight'         => array(
+					'type'    => 'number',
+					'default' => null,
+				),
 			),
 			'render_callback' => 'render_block_core_latest_posts',
 		)

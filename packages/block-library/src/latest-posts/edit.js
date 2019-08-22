@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isUndefined, pickBy } from 'lodash';
+import { isUndefined, map, pickBy } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -27,6 +27,7 @@ import {
 	InspectorControls,
 	BlockAlignmentToolbar,
 	BlockControls,
+	__experimentalImageSizeControl as ImageSizeControl,
 } from '@wordpress/block-editor';
 import { withSelect } from '@wordpress/data';
 
@@ -37,6 +38,19 @@ const CATEGORIES_LIST_QUERY = {
 	per_page: -1,
 };
 const MAX_POSTS_COLUMNS = 6;
+
+// @todo This should be retrieved dynamically, or from site settings, since it can be changed by the site owner.
+function getImageDimensionsFromSlug( slug = 'thumbnail' ) {
+	switch ( slug ) {
+		case 'large':
+			return [ 1024, 1024 ];
+		case 'medium':
+			return [ 300, 300 ];
+		case 'thumbnail':
+		default:
+			return [ 150, 150 ];
+	}
+}
 
 class LatestPostsEdit extends Component {
 	constructor() {
@@ -72,6 +86,7 @@ class LatestPostsEdit extends Component {
 			attributes,
 			setAttributes,
 			getFeaturedMediaSourceUrl,
+			imageSizeOptions,
 			latestPosts,
 		} = this.props;
 		const { categoriesList } = this.state;
@@ -88,7 +103,14 @@ class LatestPostsEdit extends Component {
 			postsToShow,
 			excerptLength,
 			imageAlign,
+			imageSizeSlug,
+			imageSizeWidth,
+			imageSizeHeight,
 		} = attributes;
+
+		const [ imageWidth, imageHeight ] = getImageDimensionsFromSlug(
+			imageSizeSlug
+		);
 
 		const inspectorControls = (
 			<InspectorControls>
@@ -152,6 +174,31 @@ class LatestPostsEdit extends Component {
 					/>
 					{ displayFeaturedImage && (
 						<>
+							<ImageSizeControl
+								onChange={ ( value ) => {
+									const newAttrs = {};
+									if ( value.hasOwnProperty( 'width' ) ) {
+										newAttrs.imageSizeWidth = value.width;
+									}
+									if ( value.hasOwnProperty( 'height' ) ) {
+										newAttrs.imageSizeHeight = value.height;
+									}
+									setAttributes( newAttrs );
+								} }
+								slug={ imageSizeSlug }
+								width={ imageSizeWidth }
+								height={ imageSizeHeight }
+								imageWidth={ imageWidth }
+								imageHeight={ imageHeight }
+								imageSizeOptions={ imageSizeOptions }
+								onChangeImage={ ( value ) =>
+									setAttributes( {
+										imageSizeSlug: value,
+										imageSizeWidth: undefined,
+										imageSizeHeight: undefined,
+									} )
+								}
+							/>
 							<BaseControl>
 								<BaseControl.VisualLabel>
 									{ __( 'Image Alignment' ) }
@@ -297,6 +344,10 @@ class LatestPostsEdit extends Component {
 											<img
 												src={ imageSourceUrl }
 												alt=""
+												style={ {
+													maxWidth: imageSizeWidth,
+													maxHeight: imageSizeHeight,
+												} }
 											/>
 										) }
 									</div>
@@ -374,6 +425,8 @@ class LatestPostsEdit extends Component {
 
 export default withSelect( ( select, props ) => {
 	const { postsToShow, order, orderBy, categories } = props.attributes;
+	const { getSettings } = select( 'core/block-editor' );
+	const { imageSizes } = getSettings();
 	const { getEntityRecords, getMedia } = select( 'core' );
 	const latestPostsQuery = pickBy(
 		{
@@ -385,6 +438,10 @@ export default withSelect( ( select, props ) => {
 		( value ) => ! isUndefined( value )
 	);
 	return {
+		imageSizeOptions: map( imageSizes, ( { name, slug } ) => ( {
+			value: slug,
+			label: name,
+		} ) ),
 		// @todo get size dynamically based on size selected.
 		getFeaturedMediaSourceUrl( featuredImageId ) {
 			if ( featuredImageId ) {
