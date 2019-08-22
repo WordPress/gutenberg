@@ -1,4 +1,4 @@
-export default async function assignFixedIssues( context, octokit ) {
+async function assignFixedIssues( context, octokit ) {
 	const regex = /(?:close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved):? +(?:\#?|https?:\/\/github\.com\/WordPress\/gutenberg\/issues\/)(\d+)/gi;
 
 	let match;
@@ -20,3 +20,5 @@ export default async function assignFixedIssues( context, octokit ) {
 		} );
 	}
 }
+
+module.exports = assignFixedIssues;

@@ -6,10 +6,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - run: npm install
-        env:
-          PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: true
-      - run: npm run build:packages
+      - run: cd packages/pull-request-automation && npm install
       - uses: ./packages/pull-request-automation
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}

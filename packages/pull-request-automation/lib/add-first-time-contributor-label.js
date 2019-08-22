@@ -1,4 +1,4 @@
-export default async function addFirstTimeContributorLabel( context, octokit ) {
+async function addFirstTimeContributorLabel( context, octokit ) {
 	const owner = context.payload.repository.owner.login;
 	const repo = context.payload.repository.name;
 	const author = context.payload.pull_request.user.login;
@@ -18,3 +18,5 @@ export default async function addFirstTimeContributorLabel( context, octokit ) {
 		labels: [ 'First-time Contributor' ],
 	} );
 }
+
+module.exports = addFirstTimeContributorLabel;

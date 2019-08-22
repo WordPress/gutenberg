@@ -7,7 +7,7 @@ const REFERENCE_DATE = '2019-08-12';
 // Releases are every 14 days.
 const DAYS_PER_RELEASE = 14;
 
-export default async function addMilestone( context, octokit ) {
+async function addMilestone( context, octokit ) {
 	if ( ! context.payload.pull_request.merged ) {
 		return;
 	}
@@ -73,3 +73,5 @@ export default async function addMilestone( context, octokit ) {
 		milestone: number,
 	} );
 }
+
+module.exports = addMilestone;

@@ -8,4 +8,4 @@ inputs:
     required: true
 runs:
   using: node12
-  main: build/index.js
+  main: lib/index.js

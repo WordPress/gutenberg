@@ -1,15 +1,15 @@
 /**
- * External dependencies
+ * GitHub dependencies
  */
-import { setFailed, getInput, debug } from '@actions/core';
-import { context, GitHub } from '@actions/github';
+const { setFailed, getInput, debug } = require( '@actions/core' );
+const { context, GitHub } = require( '@actions/github' );
 
 /**
  * Internal dependencies
  */
-import assignFixedIssues from './assign-fixed-issues';
-import addFirstTimeContributorLabel from './add-first-time-contributor-label';
-import addMilestone from './add-milestone';
+const assignFixedIssues = require( './assign-fixed-issues' );
+const addFirstTimeContributorLabel = require( './add-first-time-contributor-label' );
+const addMilestone = require( './add-milestone' );
 
 ( async function main() {
 	if ( context.eventName !== 'pull_request' ) {
