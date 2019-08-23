@@ -141,7 +141,7 @@
     "node-sass": "^4.12.0",
     "react": "16.8.6",
 	"react-native": "jtreanor/react-native#v0.60.0-patched",
-	"react-native-dark-mode": "git+https://github.com/wordpress-mobile/react-native-dark-mode.git#b122e1ec5715c50f4d13835274d96876c743b609",
+	"react-native-dark-mode": "git+https://github.com/wordpress-mobile/react-native-dark-mode.git#fecbaffa81afdbb7ea6fa365b6a5aafab4554765",
     "react-native-hr": "git+https://github.com/Riglerr/react-native-hr.git#2d01a5cf77212d100e8b99e0310cce5234f977b3",
     "react-native-keyboard-aware-scroll-view": "git+https://github.com/wordpress-mobile/react-native-keyboard-aware-scroll-view.git#gb-v0.8.7",
     "react-native-modal": "^6.5.0",

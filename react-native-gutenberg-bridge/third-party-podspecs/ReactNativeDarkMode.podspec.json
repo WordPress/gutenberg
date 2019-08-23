@@ -13,7 +13,7 @@
     "git": "https://github.com/wordpress-mobile/react-native-dark-mode.git",
     "tag": "wp-0.0.10"
   },
-  "source_files": "library/ios/**/*.{h,m}",
+  "source_files": "ios/**/*.{h,m}",
   "dependencies": {
     "React": [
 
