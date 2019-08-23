@@ -1,8 +1,10 @@
-# WordPress Components Doc Site
+# WordPress Components: Doc Site
 
 > Documentation site with live examples, generated from README.md files
 
-## Note: This project is very experimental and is a work in progress!
+## 🚨 Note: This project is very experimental and is a work in progress! 🚨
+
+How this project is generated, and components like the custom Gutenberg blocks, are forks from a work-in-progress doc site generation project by [@itsjonq](https://github.com/ItsJonQ). The plan is to abstract the tooling and components and make those publicly available as easy to use npm packages.
 
 ## Getting Started
 
