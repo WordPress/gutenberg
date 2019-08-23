@@ -53,7 +53,12 @@
 
 
 // Polish the Appender.
-// @todo: this should be the actual appender, and open the block library filtered to show only social icon child blocks.
 .wp-block-social-links .block-list-appender {
 	margin: 0;
+
+	.block-editor-button-block-appender {
+		padding: $grid-size;
+		outline: none;
+		background: none;
+	}
 }
