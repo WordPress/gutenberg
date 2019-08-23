@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Toolbar } from '@wordpress/components';
+import { Toolbar, Icon, SVG, Path } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
@@ -10,6 +10,8 @@ import { compose } from '@wordpress/compose';
  * Internal dependencies
  */
 import { withBlockEditContext } from '../block-edit/context';
+
+const FullScreenIcon = <Icon icon={ () => <SVG width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><Path d="M17 7V3h-4v2h2v2h2zM3 3v4h2V5h2V3H3zM5 13H3v4h4v-2H5v-2zM15 13h2v4h-4v-2h2v-2z"></Path></SVG> } />;
 
 const BLOCK_ALIGNMENTS_CONTROLS = {
 	left: {
@@ -32,15 +34,15 @@ const BLOCK_ALIGNMENTS_CONTROLS = {
 		icon: 'align-full-width',
 		title: __( 'Full Width' ),
 	},
-	fullHeight: {
-		icon: 'image-flip-vertical',
-		title: __( 'Full height' ),
+	fullScreen: {
+		icon: FullScreenIcon,
+		title: __( 'Full Screen' ),
 	},
 };
 
-const DEFAULT_CONTROLS = [ [ 'left', 'center', 'right', 'wide', 'full' ], [ 'fullHeight' ] ];
+const DEFAULT_CONTROLS = [ [ 'left', 'center', 'right', 'wide', 'full' ], [ 'fullScreen' ] ];
 const DEFAULT_CONTROL = 'center';
-const WIDE_CONTROLS = [ 'wide', 'full', 'fullHeight' ];
+const WIDE_CONTROLS = [ 'wide', 'full', 'fullScreen' ];
 
 export function BlockAlignmentToolbar( {
 	value,
