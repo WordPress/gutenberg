@@ -101,7 +101,7 @@ export class PostPublishModal extends Component {
 				<div className="editor-post-publish-modal__content" { ...propsForModal }>
 					{ isPrePublish && (
 						isSaving ?
-							<div className="editor-post-publish-modal-pending">
+							<div className="editor-post-publish-modal__publishing-animation">
 								<Spinner />
 							</div> :
 							<>
@@ -113,16 +113,15 @@ export class PostPublishModal extends Component {
 									checked={ isPublishSidebarEnabled }
 									onChange={ onTogglePublishSidebar }
 								/>
-								<div className="editor-post-publish-modal__content-publish-controls">
+								<div className="editor-post-publish-modal__prepublish-controls">
 									<Button
 										isLink
-										className="editor-post-publish-modal__content-cancel-button"
+										className="editor-post-publish-modal__prepublish-cancel-button"
 										onClick={ onClose }
 									>
 										{ __( 'Cancel' ) }
 									</Button>
-									<PostPublishButton isLarge className="editor-post-publish-modal__content-cancel-button" focusOnMount={ true } onSubmit={ this.onSubmit } forceIsDirty={ forceIsDirty } forceIsSaving={ forceIsSaving } />
-									<span className="editor-post-publish-modal__spacer"></span>
+									<PostPublishButton isLarge className="editor-post-publish-modal__content-publish-button" focusOnMount={ true } onSubmit={ this.onSubmit } forceIsDirty={ forceIsDirty } forceIsSaving={ forceIsSaving } />
 								</div>
 							</>
 					) }

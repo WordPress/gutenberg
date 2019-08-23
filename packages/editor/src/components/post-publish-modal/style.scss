@@ -3,6 +3,7 @@
 	width: 35vw;
 }
 
+/* Override default modal styles */
 .editor-post-publish-modal .components-modal__header {
 	border-bottom: none;
 	margin-bottom: 12px;
@@ -44,30 +45,40 @@
 	clear: both;
 }
 
-.editor-post-publish-modal-pending {
-	display: flex;
-	justify-content: center;
-}
-
-.post-publish-modal__postpublish-post-address {
-	display: flex;
-	align-items: flex-end;
-	padding: 12px 0;
-}
-.post-publish-modal__postpublish-post-url {
-	flex: auto;
-	padding-right: 8px;
-}
-.post-publish-modal__postpublish-post-copy {
-	margin-bottom: 9px;
-}
-
-.editor-post-publish-modal__content-publish-controls {
+/* Pre-publish Modal Styles */
+.editor-post-publish-modal__prepublish-controls {
 	text-align: right;
 	padding: 24px 0 0;
 }
 
-.editor-post-publish-modal__content-publish-controls button.is-link,
-.editor-post-publish-modal__content-publish-controls button.is-large {
+.editor-post-publish-modal__prepublish-controls .editor-post-publish-modal__prepublish-cancel-button,
+.editor-post-publish-modal__prepublish-controls .editor-post-publish-modal__prepublish-publish-button {
 	padding: 0 24px 2px;
+}
+
+/* Publishing Modal Styles */
+.editor-post-publish-modal__publishing-animation {
+	display: flex;
+	justify-content: center;
+}
+
+/* Post Publish Modal Styles */
+.editor-post-publish-modal__postpublish-post-address {
+	display: flex;
+	align-items: flex-end;
+	padding: 12px 0;
+}
+
+.editor-post-publish-modal__postpublish-post-url {
+	flex: auto;
+	padding-right: 8px;
+}
+
+.editor-post-publish-modal__postpublish-post-copy {
+	margin-bottom: 9px;
+}
+
+.editor-post-publish-modal__postpublish-controls {
+	text-align: right;
+	padding: 24px 0 0;
 }

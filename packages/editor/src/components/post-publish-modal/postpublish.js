@@ -62,8 +62,8 @@ class PostPublishModalPostpublish extends Component {
 		const viewPostLabel = get( postType, [ 'labels', 'view_item' ] );
 
 		return (
-			<div className="post-publish-modal__postpublish">
-				<p className="post-publish-modal__postpublish-post-text">
+			<div className="editor-editor-post-publish-modal__prepublish">
+				<p className="editor-post-publish-modal__postpublish-post-text">
 					{
 						sprintf(
 							/* translators: %s: post type singular name */
@@ -71,10 +71,10 @@ class PostPublishModalPostpublish extends Component {
 						)
 					}
 				</p>
-				<div className="post-publish-modal__postpublish-post-address">
+				<div className="editor-post-publish-modal__postpublish-post-address">
 					<TextControl
 						disabled
-						className="post-publish-modal__postpublish-post-url"
+						className="editor-post-publish-modal__postpublish-post-url"
 						label={
 							sprintf(
 								/* translators: %s: post type singular name */
@@ -86,7 +86,7 @@ class PostPublishModalPostpublish extends Component {
 					<ClipboardButton
 						isDefault
 						isLarge
-						className="post-publish-modal__postpublish-post-copy"
+						className="editor-post-publish-modal__postpublish-post-copy"
 						text={ post.link }
 						onCopy={ this.onCopy }
 					>
@@ -94,7 +94,7 @@ class PostPublishModalPostpublish extends Component {
 					</ClipboardButton>
 				</div>
 				{ ! isScheduled && (
-					<div className="editor-post-publish-modal__content-publish-controls">
+					<div className="editor-post-publish-modal__postpublish-controls">
 						<Button
 							href={ post.link }
 							isPrimary
