@@ -94,7 +94,7 @@ export default compose( [
 		isTextModeEnabled: select( 'core/edit-post' ).getEditorMode() === 'text',
 	} ) ),
 	withDispatch( ( dispatch ) => {
-		const { clearSelectedBlock } = dispatch( 'core/block-editor' );
+		const { clearSelectedBlock } = dispatch( 'core/block-editor' );
 		const { togglePostTitleSelection } = dispatch( 'core/editor' );
 
 		return {
@@ -102,8 +102,9 @@ export default compose( [
 			undo: dispatch( 'core/editor' ).undo,
 			onHideKeyboard() {
 				clearSelectedBlock();
-				togglePostTitleSelection(false);
-			}
-	} } ),
+				togglePostTitleSelection( false );
+			},
+		};
+	}	),
 	withViewportMatch( { isLargeViewport: 'medium' } ),
 ] )( HeaderToolbar );
