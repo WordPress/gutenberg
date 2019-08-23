@@ -8,15 +8,7 @@ import { animated } from 'react-spring/web.cjs';
 /**
  * WordPress dependencies
  */
-import { useEntityProp } from '@wordpress/core-data';
-import {
-	useMemo,
-	useCallback,
-	useRef,
-	useEffect,
-	useLayoutEffect,
-	useState,
-} from '@wordpress/element';
+import { useRef, useEffect, useLayoutEffect, useState } from '@wordpress/element';
 import {
 	focus,
 	isTextField,
@@ -59,51 +51,6 @@ import InserterWithShortcuts from '../inserter-with-shortcuts';
 import Inserter from '../inserter';
 import { isInsideRootBlock } from '../../utils/dom';
 import useMovingAnimation from './moving-animation';
-
-const EMPTY_OBJECT = {};
-function useMetaAttributeSourceBackwardsCompatibility(
-	name,
-	_attributes,
-	_setAttributes
-) {
-	const { attributes: attributeTypes = EMPTY_OBJECT } =
-		getBlockType( name ) || EMPTY_OBJECT;
-	let [ attributes, setAttributes ] = [ _attributes, _setAttributes ];
-
-	if ( Object.values( attributeTypes ).some( ( type ) => type.source === 'meta' ) ) {
-		// eslint-disable-next-line react-hooks/rules-of-hooks
-		const [ meta, setMeta ] = useEntityProp( 'postType', 'post', 'meta' );
-
-		// eslint-disable-next-line react-hooks/rules-of-hooks
-		attributes = useMemo(
-			() => ( {
-				..._attributes,
-				...Object.keys( attributeTypes ).reduce( ( acc, key ) => {
-					if ( attributeTypes[ key ].source === 'meta' ) {
-						acc[ key ] = meta[ attributeTypes[ key ].meta ];
-					}
-					return acc;
-				}, {} ),
-			} ),
-			[ attributeTypes, meta, _attributes ]
-		);
-
-		// eslint-disable-next-line react-hooks/rules-of-hooks
-		setAttributes = useCallback(
-			( ...args ) => {
-				Object.keys( args[ 0 ] ).forEach( ( key ) => {
-					if ( attributeTypes[ key ].source === 'meta' ) {
-						setMeta( { [ attributeTypes[ key ].meta ]: args[ 0 ][ key ] } );
-					}
-				} );
-				return _setAttributes( ...args );
-			},
-			[ attributeTypes, setMeta, _setAttributes ]
-		);
-	}
-
-	return [ attributes, setAttributes ];
-}
 
 /**
  * Prevents default dragging behavior within a block to allow for multi-
@@ -155,12 +102,6 @@ function BlockListBlock( {
 	isNavigationMode,
 	enableNavigationMode,
 } ) {
-	[ attributes, setAttributes ] = useMetaAttributeSourceBackwardsCompatibility(
-		name,
-		attributes,
-		setAttributes
-	);
-
 	// Random state used to rerender the component if needed, ideally we don't need this
 	const [ , updateRerenderState ] = useState( {} );
 	const rerender = () => updateRerenderState( {} );
