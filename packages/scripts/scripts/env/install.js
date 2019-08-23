@@ -4,6 +4,8 @@
 const commandExistsSync = require( 'command-exists' ).sync;
 const request = require( 'request' );
 const DecompressZip = require( 'decompress-zip' );
+const chalk = require( 'chalk' );
+const { sprintf } = require( 'sprintf-js' );
 
 /**
  * Node dependencies.
@@ -65,4 +67,31 @@ function buildWordPress() {
 	// Mount the plugin into the WordPress install.
 	execSync( 'npm run env connect', { stdio: 'inherit' } );
 	execSync( `npm run env cli plugin activate ${ env.npm_package_wp_env_plugin_dir }`, { stdio: 'inherit' } );
+
+	const currentUrl = execSync( 'npm run --silent env cli option get siteurl' ).toString().trim();
+
+	stdout.write( chalk.white( '\nWelcome to...\n' ) );
+	for ( let ii = 0; env[ `npm_package_wp_env_welcome_logo_${ ii }` ]; ii++ ) {
+		stdout.write( chalk.green( env[ `npm_package_wp_env_welcome_logo_${ ii }` ] ) + '\n' );
+	}
+
+	if ( env.npm_package_wp_env_welcome_build_command ) {
+		const nextStep = sprintf(
+			'\nRun %s to build the latest version of %s, then open %s to get started!\n',
+			chalk.blue( env.npm_package_wp_env_welcome_build_command ),
+			chalk.green( env.npm_package_wp_env_plugin_name ),
+			chalk.blue( currentUrl )
+		);
+		stdout.write( chalk.white( nextStep ) );
+	}
+
+	stdout.write( chalk.white( '\nAccess the above install using the following credentials:\n' ) );
+
+	const access = sprintf(
+		'Default username: %s, password: %s\n',
+		chalk.blue( 'admin' ),
+		chalk.blue( 'password' )
+	);
+
+	stdout.write( chalk.white( access ) );
 }

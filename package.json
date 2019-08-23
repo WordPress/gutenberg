@@ -241,6 +241,15 @@
 	},
 	"wp-env": {
 		"plugin-dir": "gutenberg",
-		"docker-template": "./bin/docker-compose.override.yml.template"
+		"plugin-name": "Gutenberg",
+		"docker-template": "./bin/docker-compose.override.yml.template",
+		"welcome-logo": [
+			",⁻⁻⁻·       .                 |",
+			"|  ،⁓’.   . |---  ,---. ,---. |---. ,---. ,---. ,---.",
+			"|   | |   | |     |---' |   | |   | |---' |     |   |",
+			"`---' `---' `---’ `---’ '   ` `---' `---’ `     `---|",
+			"                                                `---'"
+		],
+		"welcome-build-command": "npm run dev"
 	}
 }
