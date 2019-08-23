@@ -2,11 +2,11 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { Children } from 'react';
 
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
 
 function Tiles( props ) {
 	const {
@@ -14,11 +14,12 @@ function Tiles( props ) {
 			align,
 			columns,
 			imageCrop,
-			images,
 		},
-		className,
 		children,
 	} = props;
+
+	// const className = 'wp-block-gallery';
+	const className = 'wp-tiles';
 
 	const newClassName = classnames(
 		className,
@@ -31,16 +32,13 @@ function Tiles( props ) {
 
 	return (
 		<ul className={ newClassName }>
-			{ images.map( ( img, index ) => {
-				/* translators: %1$d is the order number of the image, %2$d is the total number of images. */
-				const ariaLabel = sprintf( __( 'image %1$d of %2$d in gallery' ), ( index + 1 ), images.length );
-
+			{ Children.map( children, ( child ) => {
 				return (
-					<li className="blocks-gallery-item" key={ img.id || img.url }>
-						{ children( { img, index, ariaLabel } ) }
+					<li className="wp-tile">
+						{ child }
 					</li>
 				);
-			} ) }
+			}	) }
 		</ul>
 	);
 }

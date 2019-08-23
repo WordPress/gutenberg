@@ -11,7 +11,6 @@ import {
 	PanelBody,
 	RangeControl,
 	SelectControl,
-	Tiles,
 	ToggleControl,
 	withNotices,
 } from '@wordpress/components';
@@ -21,7 +20,7 @@ import {
 	InspectorControls,
 } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import { withSelect } from '@wordpress/data';
 
@@ -31,6 +30,7 @@ import { withSelect } from '@wordpress/data';
 import GalleryImage from './gallery-image';
 import icon from './icon';
 import { defaultColumnsNumber, pickRelevantMediaFiles } from './shared';
+import Tiles from './tiles';
 
 const MAX_COLUMNS = 8;
 const linkOptions = [
@@ -293,11 +293,14 @@ class GalleryEdit extends Component {
 				</InspectorControls>
 				{ noticeUI }
 				<Tiles
-					className={ className }
 					tilesProps={ tilesProps } >
-					{ ( { img, index, ariaLabel } ) => {
+					{ images.map( ( img, index ) => {
+						/* translators: %1$d is the order number of the image, %2$d is the total number of images. */
+						const ariaLabel = sprintf( __( 'image %1$d of %2$d in gallery' ), ( index + 1 ), images.length );
+
 						return (
 							<GalleryImage
+								key={ img.id || img.url }
 								url={ img.url }
 								alt={ img.alt }
 								id={ img.id }
@@ -313,7 +316,7 @@ class GalleryEdit extends Component {
 								aria-label={ ariaLabel }
 							/>
 						);
-					} }
+					} ) }
 				</Tiles>
 				{ mediaPlaceholder }
 			</>
