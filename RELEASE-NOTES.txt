@@ -1,6 +1,7 @@
 1.11.0
 ------
-* Toolbar scroll position now resets when its content changes
+* Toolbar scroll position now resets when its content changes.
+* Dark Mode for iOS.
 
 1.10.0
 ------
