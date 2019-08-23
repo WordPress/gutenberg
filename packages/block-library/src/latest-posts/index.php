@@ -50,6 +50,15 @@ function render_block_core_latest_posts( $attributes ) {
 			);
 		}
 
+		if ( isset( $attributes['displayPostAuthor'] ) && $attributes['displayPostAuthor'] ) {
+			$recent_author = get_user_by( 'ID', $post->post_author );
+			$author_display_name = 'by ' . $recent_author->display_name;
+			$list_items_markup .= sprintf(
+				'<span class="wp-block-latest-posts__post-author">%1$s</span>',
+				esc_html( $author_display_name )
+			);		
+		}
+
 		if ( isset( $attributes['displayPostContent'] ) && $attributes['displayPostContent']
 			&& isset( $attributes['displayPostContentRadio'] ) && 'excerpt' === $attributes['displayPostContentRadio'] ) {
 			$post_excerpt = $post->post_excerpt;
@@ -104,6 +113,10 @@ function render_block_core_latest_posts( $attributes ) {
 		$class .= ' has-dates';
 	}
 
+	if ( isset( $attributes['displayPostAuthor'] ) && $attributes['displayPostAuthor'] ) {
+		$class .= ' has-author';
+	}
+
 	if ( isset( $attributes['className'] ) ) {
 		$class .= ' ' . $attributes['className'];
 	}
@@ -152,6 +165,10 @@ function register_block_core_latest_posts() {
 					'default' => 55,
 				),
 				'displayPostDate'         => array(
+					'type'    => 'boolean',
+					'default' => false,
+				),
+				'displayPostAuthor'         => array(
 					'type'    => 'boolean',
 					'default' => false,
 				),

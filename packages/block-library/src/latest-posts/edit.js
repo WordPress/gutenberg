@@ -41,6 +41,7 @@ class LatestPostsEdit extends Component {
 		super( ...arguments );
 		this.state = {
 			categoriesList: [],
+			usersList: [],
 		};
 	}
 
@@ -61,6 +62,22 @@ class LatestPostsEdit extends Component {
 				}
 			}
 		);
+		//Users List
+		this.fetchRequest = apiFetch( {
+			path: addQueryArgs( `/wp/v2/users` ),
+		} ).then(
+			( usersList ) => {
+				if ( this.isStillMounted ) {
+					this.setState( { usersList } );
+				}
+			}
+		).catch(
+			() => {
+				if ( this.isStillMounted ) {
+					this.setState( { usersList: [] } );
+				}
+			}
+		);
 	}
 
 	componentWillUnmount() {
@@ -69,8 +86,8 @@ class LatestPostsEdit extends Component {
 
 	render() {
 		const { attributes, setAttributes, latestPosts } = this.props;
-		const { categoriesList } = this.state;
-		const { displayPostContentRadio, displayPostContent, displayPostDate, postLayout, columns, order, orderBy, categories, postsToShow, excerptLength } = attributes;
+		const { categoriesList, usersList } = this.state;
+		const { displayPostContentRadio, displayPostContent, displayPostDate, displayPostAuthor, postLayout, columns, order, orderBy, categories, postsToShow, excerptLength } = attributes;
 
 		const inspectorControls = (
 			<InspectorControls>
@@ -107,6 +124,11 @@ class LatestPostsEdit extends Component {
 						label={ __( 'Display post date' ) }
 						checked={ displayPostDate }
 						onChange={ ( value ) => setAttributes( { displayPostDate: value } ) }
+					/>
+					<ToggleControl
+						label={ __( 'Display post author' ) }
+						checked={ displayPostAuthor }
+						onChange={ ( value ) => setAttributes( { displayPostAuthor: value } ) }
 					/>
 				</PanelBody>
 
@@ -186,6 +208,7 @@ class LatestPostsEdit extends Component {
 						'wp-block-latest-posts__list': true,
 						'is-grid': postLayout === 'grid',
 						'has-dates': displayPostDate,
+						'has-author': displayPostAuthor,
 						[ `columns-${ columns }` ]: postLayout === 'grid',
 					} ) }
 				>
@@ -213,6 +236,11 @@ class LatestPostsEdit extends Component {
 									<time dateTime={ format( 'c', post.date_gmt ) } className="wp-block-latest-posts__post-date">
 										{ dateI18n( dateFormat, post.date_gmt ) }
 									</time>
+								}
+								{ displayPostAuthor && usersList[i].name &&
+									<span className="wp-block-latest-posts__post-author">
+								 		by { usersList[i].name }	
+									</span>
 								}
 								{ displayPostContent && displayPostContentRadio === 'excerpt' &&
 								<div className="wp-block-latest-posts__post-excerpt">
