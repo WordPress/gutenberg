@@ -14,6 +14,7 @@ import {
 	withFocusReturn,
 	withConstrainedTabbing,
 	Modal,
+	Button,
 } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
@@ -72,14 +73,14 @@ export class PostPublishModal extends Component {
 			modalTitle = isScheduled ? __( 'Scheduling' ) : __( 'Publishing' );
 		} else if ( isPrePublish ) {
 			if ( ! hasPublishAction ) {
-				modalTitle = __( 'Are you ready to submit for review?' );
+				modalTitle = __( 'Ready to submit for review?' );
 			} else if ( isBeingScheduled ) {
-				modalTitle = __( 'Are you ready to schedule?' );
+				modalTitle = __( 'Ready to schedule?' );
 			} else {
-				modalTitle = __( 'Are you ready to publish?' );
+				modalTitle = __( 'Ready to publish?' );
 			}
 		} else {
-			modalTitle = isScheduled ? __( 'Scheduled' ) : __( 'Published' );
+			modalTitle = isScheduled ? __( 'Post Scheduled' ) : __( 'Post Published!' ); //TODO: update Post with Post/Page/Custom type
 		}
 		return (
 			<Modal
@@ -111,8 +112,11 @@ export class PostPublishModal extends Component {
 					) }
 
 					{ ! isPostPublish && (
-						<div className="editor-post-publish-modal__header-publish-button">
-							<PostPublishButton focusOnMount={ true } onSubmit={ this.onSubmit } forceIsDirty={ forceIsDirty } forceIsSaving={ forceIsSaving } />
+						<div className="editor-post-publish-modal__content-publish-controls">
+							<Button isLink isLarge className="editor-post-publish-modal__content-cancel-button">
+								{ __( 'Cancel' ) }
+							</Button>
+							<PostPublishButton className="editor-post-publish-modal__content-cancel-button" focusOnMount={ true } onSubmit={ this.onSubmit } forceIsDirty={ forceIsDirty } forceIsSaving={ forceIsSaving } />
 							<span className="editor-post-publish-modal__spacer"></span>
 						</div>
 					) }

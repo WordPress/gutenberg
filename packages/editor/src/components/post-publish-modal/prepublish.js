@@ -35,7 +35,7 @@ function PostPublishModalPrepublish( {
 	if ( ! hasPublishAction ) {
 		prePublishBodyText = __( 'When you’re ready, submit your work for review, and an Editor will be able to approve it for you.' );
 	} else {
-		prePublishBodyText = __( 'Double-check your settings before publishing.' );
+		prePublishBodyText = __( 'Double-check your settings, then publish your post.' );
 	}
 
 	if ( isFloating ) {
@@ -55,17 +55,6 @@ function PostPublishModalPrepublish( {
 				<>
 					<div className="editor-post-publish-modal-panel">
 						<div className="editor-post-publish-modal-panel__heading">
-							{ __( 'Visibility:' ) }
-						</div>
-						<div className="editor-post-publish-modal-panel__value">
-							<PostVisibilityLabel />
-						</div>
-						<div className="editor-post-publish-modal__detail">
-							{ getVisibilityInfo( visibility ) }
-						</div>
-					</div>
-					<div className="editor-post-publish-modal-panel">
-						<div className="editor-post-publish-modal-panel__heading">
 							{ __( 'Publish:' ) }
 						</div>
 						<div className="editor-post-publish-modal-panel__value">
@@ -73,6 +62,17 @@ function PostPublishModalPrepublish( {
 						</div>
 						<div className="editor-post-publish-modal__detail">
 							{ prePublishDateText }
+						</div>
+					</div>
+					<div className="editor-post-publish-modal-panel">
+						<div className="editor-post-publish-modal-panel__heading">
+							{ __( 'Visibility:' ) }
+						</div>
+						<div className="editor-post-publish-modal-panel__value">
+							<PostVisibilityLabel />
+						</div>
+						<div className="editor-post-publish-modal__detail">
+							{ getVisibilityInfo( visibility ) }
 						</div>
 					</div>
 					<div className="editor-post-publish-modal-panel">

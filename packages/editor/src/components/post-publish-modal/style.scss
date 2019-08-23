@@ -1,9 +1,24 @@
 .editor-post-publish-modal {
 	min-width: 600px;
 }
+
+.editor-post-publish-modal .components-modal__header {
+	border-bottom: none;
+	margin-bottom: 12px;
+}
+
+.editor-post-publish-modal .components-modal__header .components-modal__header-heading {
+	font-weight: 400;
+	font-size: 23px;
+	line-height: 18px;
+	text-align: center;
+	letter-spacing: -0.5px;
+}
+
 .editor-post-publish-modal-panel {
 	padding: 16px 0;
 }
+
 .editor-post-publish-modal-panel__heading {
 	font-size: 13px;
 	line-height: 18px;
@@ -30,4 +45,14 @@
 
 .post-publish-modal__postpublish-post-address .components-text-control__input {
 	width: 80%;
+}
+
+.editor-post-publish-modal__content-publish-controls {
+	text-align: right;
+}
+.editor-post-publish-modal__content-cancel-button {
+	margin: 0 3px 0 12px;
+}
+.editor-post-publish-modal__content-publish-button {
+	margin: 0 3px 0 12px;
 }
