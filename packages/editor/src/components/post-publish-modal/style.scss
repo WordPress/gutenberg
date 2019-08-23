@@ -43,16 +43,25 @@
 	clear: both;
 }
 
-.post-publish-modal__postpublish-post-address .components-text-control__input {
-	width: 80%;
+.post-publish-modal__postpublish-post-address {
+	display: flex;
+	align-items: flex-end;
+	padding: 12px 0;
+}
+.post-publish-modal__postpublish-post-url {
+	flex: auto;
+	padding-right: 8px;
+}
+.post-publish-modal__postpublish-post-copy {
+	margin-bottom: 9px;
 }
 
 .editor-post-publish-modal__content-publish-controls {
 	text-align: right;
+	padding: 24px 0 0;
 }
-.editor-post-publish-modal__content-cancel-button {
-	margin: 0 3px 0 12px;
-}
-.editor-post-publish-modal__content-publish-button {
-	margin: 0 3px 0 12px;
+
+.editor-post-publish-modal__content-publish-controls button.is-link,
+.editor-post-publish-modal__content-publish-controls button.is-large {
+	padding: 0 24px 2px;
 }

@@ -6,7 +6,7 @@ import { get, find } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 // import { PanelBody } from '@wordpress/components';
 
 import { withSelect } from '@wordpress/data';
@@ -28,14 +28,19 @@ function PostPublishModalPrepublish( {
 	isFloating,
 	visibility,
 	children,
+	postType,
 } ) {
+	const postLabel = get( postType, [ 'labels', 'singular_name' ] );
 	let prePublishBodyText,
 		prePublishDateText;
 
 	if ( ! hasPublishAction ) {
 		prePublishBodyText = __( 'When you’re ready, submit your work for review, and an Editor will be able to approve it for you.' );
 	} else {
-		prePublishBodyText = __( 'Double-check your settings, then publish your post.' );
+		prePublishBodyText = sprintf(
+			/* translators: %s: post type singular name */
+			__( 'Double-check your settings, then publish your %s.' ), postLabel.toLowerCase()
+		);
 	}
 
 	if ( isFloating ) {
@@ -92,11 +97,13 @@ export default withSelect(
 			getEditedPostAttribute,
 			isEditedPostDateFloating,
 		} = select( 'core/editor' );
+		const { getPostType } = select( 'core' );
 		return {
 			hasPublishAction: get( getCurrentPost(), [ '_links', 'wp:action-publish' ], false ),
 			visibility: getEditedPostVisibility(),
 			publishDate: getEditedPostAttribute( 'date' ),
 			isFloating: isEditedPostDateFloating(),
+			postType: getPostType( getEditedPostAttribute( 'type' ) ),
 		};
 	}
 )( PostPublishModalPrepublish );

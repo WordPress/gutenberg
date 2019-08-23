@@ -6,7 +6,7 @@ import { get, omit } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import {
 	Spinner,
@@ -61,6 +61,7 @@ export class PostPublishModal extends Component {
 			PostPublishExtension,
 			PrePublishExtension,
 			hasPublishAction,
+			postLabel,
 			...additionalProps
 		} = this.props;
 		const propsForModal = omit( additionalProps, [ 'hasPublishAction', 'isDirty', 'isPostTypeViewable' ] );
@@ -79,8 +80,16 @@ export class PostPublishModal extends Component {
 			} else {
 				modalTitle = __( 'Ready to publish?' );
 			}
+		} else if ( isScheduled ) {
+			modalTitle = sprintf(
+				/* translators: %s: post type singular name */
+				__( '%s Scheduled!' ), postLabel
+			);
 		} else {
-			modalTitle = isScheduled ? __( 'Post Scheduled' ) : __( 'Post Published!' ); //TODO: update Post with Post/Page/Custom type
+			modalTitle = sprintf(
+				/* translators: %s: post type singular name */
+				__( '%s Published!' ), postLabel
+			);
 		}
 		return (
 			<Modal
@@ -102,6 +111,17 @@ export class PostPublishModal extends Component {
 									checked={ isPublishSidebarEnabled }
 									onChange={ onTogglePublishSidebar }
 								/>
+								<div className="editor-post-publish-modal__content-publish-controls">
+									<Button
+										isLink
+										className="editor-post-publish-modal__content-cancel-button"
+										onClick={ onClose }
+									>
+										{ __( 'Cancel' ) }
+									</Button>
+									<PostPublishButton isLarge className="editor-post-publish-modal__content-cancel-button" focusOnMount={ true } onSubmit={ this.onSubmit } forceIsDirty={ forceIsDirty } forceIsSaving={ forceIsSaving } />
+									<span className="editor-post-publish-modal__spacer"></span>
+								</div>
 							</>
 					) }
 
@@ -109,16 +129,6 @@ export class PostPublishModal extends Component {
 						<PostPublishModalPostpublish focusOnMount={ true } >
 							{ PostPublishExtension && <PostPublishExtension /> }
 						</PostPublishModalPostpublish>
-					) }
-
-					{ ! isPostPublish && (
-						<div className="editor-post-publish-modal__content-publish-controls">
-							<Button isLink isLarge className="editor-post-publish-modal__content-cancel-button">
-								{ __( 'Cancel' ) }
-							</Button>
-							<PostPublishButton className="editor-post-publish-modal__content-cancel-button" focusOnMount={ true } onSubmit={ this.onSubmit } forceIsDirty={ forceIsDirty } forceIsSaving={ forceIsSaving } />
-							<span className="editor-post-publish-modal__spacer"></span>
-						</div>
 					) }
 				</div>
 			</Modal>
@@ -150,6 +160,7 @@ export default compose( [
 			isPublishSidebarEnabled: isPublishSidebarEnabled(),
 			isSaving: isSavingPost(),
 			isScheduled: isCurrentPostScheduled(),
+			postLabel: get( postType, [ 'labels', 'singular_name' ] ),
 		};
 	} ),
 	withDispatch( ( dispatch, { isPublishSidebarEnabled } ) => {
