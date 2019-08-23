@@ -87,35 +87,6 @@ $color-palette-circle-spacing: 14px;
 	}
 }
 
-.components-color-palette__clear-color .components-color-palette__item {
-	color: $white;
-	background: $white;
-}
-
-.components-color-palette__clear-color-line {
-	display: block;
-	position: absolute;
-	border: 2px solid $alert-red;
-	border-radius: 50%;
-	top: 0;
-	left: 0;
-	bottom: 0;
-	right: 0;
-	&::before {
-		position: absolute;
-		top: 0;
-		left: 0;
-		content: "";
-		width: 100%;
-		height: 100%;
-		border-bottom: 2px solid $alert-red;
-		transform:
-			rotate(45deg)
-			translateY(- $color-palette-circle-size / 2 + 1px)
-			translateX(- 1px);
-	}
-}
-
 .components-color-palette__custom-color {
 	margin-right: $grid-size-large;
 
