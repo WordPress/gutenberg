@@ -86,12 +86,12 @@ function ScaledBlockPreview( { blocks, viewportWidth } ) {
 	return (
 		<div
 			ref={ previewRef }
-			className={ classnames( 'block-editor-block-preview__container', {
+			className={ classnames( 'block-editor-block-preview__container editor-styles-wrapper', {
 				'is-ready': isReady,
 			} ) }
 			aria-hidden
 		>
-			<Disabled style={ previewStyles } className="block-editor-block-preview__content editor-styles-wrapper">
+			<Disabled style={ previewStyles } className="block-editor-block-preview__content">
 				<BlockList />
 			</Disabled>
 		</div>
