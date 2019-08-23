@@ -1,18 +1,18 @@
 .wp-block-social-links {
 	display: flex;
 	justify-content: flex-start;
+}
 
-	.wp-social-icon {
-		display: block;
-		width: 36px;
-		height: 36px;
-		border-radius: 36px; // This makes it pill-shaped instead of oval, in cases where the image fed is not perfectly sized.
-		background-color: $light-gray-500;
-		background-size: 24px 24px;
-		background-position: center center;
-		background-repeat: no-repeat;
-		margin-right: $grid-size;
-	}
+.wp-social-icon {
+	display: block;
+	width: 36px;
+	height: 36px;
+	border-radius: 36px; // This makes it pill-shaped instead of oval, in cases where the image fed is not perfectly sized.
+	background-color: $light-gray-500;
+	background-size: 24px 24px;
+	background-position: center center;
+	background-repeat: no-repeat;
+	margin-right: $grid-size;
 }
 
 .wp-social-icon-share {

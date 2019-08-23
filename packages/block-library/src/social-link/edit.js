@@ -16,40 +16,32 @@ import {
 /**
  * Internal dependencies
  */
-import socialList from './social-list';
-import IconPicker from './icon-picker';
 
-const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
-	const { icon, url } = attributes;
+const SocialLinkEdit = ( { className, attributes, setAttributes, isSelected } ) => {
+	const { url } = attributes;
 	const [ showURLPopover, setPopover ] = useState( true );
 
+	// can we read the block settings somehow to get icon?
+	const icon = className.replace( 'wp-block-social-link-', '' );
 	const classes = classNames( 'wp-social-icon', `wp-social-icon-${ icon }` );
 	return (
 		<>
-			{ icon && (
-				<Button
-					className={ classes }
-					onClick={ () => setPopover( true ) }
-				>
-					{ isSelected && showURLPopover && (
-						<Popover
-							onFocusOutside={ () => setPopover( false ) }
-						>
-							<URLInput
-								value={ url }
-								onChange={ ( value ) => setAttributes( { url: value } ) }
-								disableSuggestions={ true }
-							/>
-						</Popover>
-					) }
-				</Button>
-			) }
-			{ ! icon &&
-				<IconPicker
-					icons={ Object.keys( socialList ) }
-					onClick={ ( value ) => setAttributes( { icon: value } ) }
-				/>
-			}
+			<Button
+				className={ classes }
+				onClick={ () => setPopover( true ) }
+			>
+				{ isSelected && showURLPopover && (
+					<Popover
+						onFocusOutside={ () => setPopover( false ) }
+					>
+						<URLInput
+							value={ url }
+							onChange={ ( value ) => setAttributes( { url: value } ) }
+							disableSuggestions={ true }
+						/>
+					</Popover>
+				) }
+			</Button>
 		</>
 	);
 };

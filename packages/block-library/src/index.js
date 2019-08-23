@@ -132,7 +132,7 @@ export const registerCoreBlocks = () => {
 		separator,
 		reusableBlock,
 		socialLinks,
-		socialLink,
+		...socialLink.sites,
 		spacer,
 		subhead,
 		table,

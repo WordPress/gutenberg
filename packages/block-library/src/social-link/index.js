@@ -7,22 +7,40 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import edit from './edit';
-import metadata from './block.json';
 import save from './save';
+import socialList from './social-list';
 
-const { name } = metadata;
-
-export { metadata, name };
-
-export const settings = {
-	title: __( 'Social link' ),
-	description: __( 'A social media or external link.' ),
+const commonAttribs = {
+	category: 'widgets',
+	parent: [ 'core/social-links' ],
 	supports: {
-		inserter: false,
 		reusable: false,
 		html: false,
+	},
+	attributes: {
+		url: {
+			type: 'string',
+		},
+		icon: {
+			type: 'string',
+		},
 	},
 	edit,
 	save,
 };
 
+// Create individual blocks out of each site in social-list.js
+// TODO: solve icon issue
+export const sites = Object.keys( socialList ).map(
+	( site ) => {
+		return {
+			name: 'core/social-link-' + site,
+			settings: {
+				title: socialList[ site ],
+				icon: 'share',
+				description: __( 'Link to ' + socialList[ site ] ),
+				...commonAttribs,
+			},
+		};
+	}
+);
