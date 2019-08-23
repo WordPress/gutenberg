@@ -22,7 +22,11 @@ describe( 'addFirstTimeContributorLabel', () => {
 	it( 'does nothing if the user has commits', async () => {
 		const octokit = {
 			search: {
-				commits: jest.fn( () => Promise.resolve( { total_count: 100 } ) ),
+				commits: jest.fn( () => Promise.resolve( {
+					data: {
+						total_count: 100,
+					},
+				} ) ),
 			},
 			issues: {
 				addLabels: jest.fn(),
@@ -40,7 +44,11 @@ describe( 'addFirstTimeContributorLabel', () => {
 	it( 'adds the label if the user does not have commits', async () => {
 		const octokit = {
 			search: {
-				commits: jest.fn( () => Promise.resolve( { total_count: 0 } ) ),
+				commits: jest.fn( () => Promise.resolve( {
+					data: {
+						total_count: 0,
+					},
+				} ) ),
 			},
 			issues: {
 				addLabels: jest.fn(),
