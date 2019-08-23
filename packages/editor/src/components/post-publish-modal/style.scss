@@ -44,6 +44,11 @@
 	clear: both;
 }
 
+.editor-post-publish-modal-pending {
+	display: flex;
+	justify-content: center;
+}
+
 .post-publish-modal__postpublish-post-address {
 	display: flex;
 	align-items: flex-end;

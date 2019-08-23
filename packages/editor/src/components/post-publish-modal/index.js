@@ -101,7 +101,9 @@ export class PostPublishModal extends Component {
 				<div className="editor-post-publish-modal__content" { ...propsForModal }>
 					{ isPrePublish && (
 						isSaving ?
-							<Spinner /> :
+							<div className="editor-post-publish-modal-pending">
+								<Spinner />
+							</div> :
 							<>
 								<PostPublishModalPrepublish>
 									{ PrePublishExtension && <PrePublishExtension /> }
