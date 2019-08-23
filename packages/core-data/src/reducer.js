@@ -167,6 +167,9 @@ function entity( entityConfig ) {
 								// If the edited value is still different to the persisted value,
 								// keep the edited value in edits.
 								if (
+									// Edits are the "raw" attribute values, but records may have
+									// objects with more properties, so we use `get` here for the
+									// comparison.
 									! isEqual( edits[ key ], get( record[ key ], 'raw', record[ key ] ) )
 								) {
 									acc[ key ] = edits[ key ];
@@ -330,18 +333,19 @@ export function undo( state = UNDO_INITIAL_STATE, action ) {
 						edits: { ...state.flattenedUndo, ...action.meta.undo.edits },
 					},
 				];
-			} else {
-				// Clear potential redos, because this only supports linear history.
-				nextState = state.slice( 0, state.offset || undefined );
-				nextState.flattenedUndo = state.flattenedUndo;
+				nextState.offset = 0;
+				return nextState;
 			}
+
+			// Clear potential redos, because this only supports linear history.
+			nextState = state.slice( 0, state.offset || undefined );
 			nextState.offset = 0;
 
 			nextState.push( {
 				kind: action.kind,
 				name: action.name,
 				recordId: action.recordId,
-				edits: { ...nextState.flattenedUndo, ...action.edits },
+				edits: { ...action.edits, ...state.flattenedUndo },
 			} );
 
 			return nextState;
