@@ -23,7 +23,7 @@ const SocialLinkEdit = ( { className, attributes, setAttributes, isSelected } ) 
 
 	// can we read the block settings somehow to get icon?
 	const icon = className.replace( 'wp-block-social-link-', '' );
-	const classes = classNames( 'wp-social-icon', `wp-social-icon-${ icon }` );
+	const classes = classNames( 'wp-social-icon', `wp-social-icon-${ icon }`, { 'wp-social-icon__is-incomplete': ( url ) ? false : true } );
 	return (
 		<>
 			<Button

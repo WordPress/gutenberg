@@ -9,8 +9,12 @@ import classNames from 'classnames';
 
 export default function save( { attributes, className } ) {
 	const { icon, url } = attributes;
-	const classes = classNames( 'wp-social-icon', `wp-social-icon-${ icon }` );
 
+	if ( ! url ) {
+		return null;
+	}
+
+	const classes = classNames( 'wp-social-icon', `wp-social-icon-${ icon }` );
 	return (
 		<span className={ className }>
 			<a href={ url }><span className={ classes }></span></a>
