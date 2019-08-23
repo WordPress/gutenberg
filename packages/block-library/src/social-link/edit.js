@@ -23,6 +23,8 @@ const SocialLinkEdit = ( { className, attributes, setAttributes, isSelected } ) 
 
 	// can we read the block settings somehow to get icon?
 	const icon = className.replace( 'wp-block-social-link-', '' );
+	setAttributes( { icon } );
+
 	const classes = classNames( 'wp-social-icon', `wp-social-icon-${ icon }`, { 'wp-social-icon__is-incomplete': ( url ) ? false : true } );
 	return (
 		<>
@@ -33,6 +35,7 @@ const SocialLinkEdit = ( { className, attributes, setAttributes, isSelected } ) 
 				{ isSelected && showURLPopover && (
 					<Popover
 						onFocusOutside={ () => setPopover( false ) }
+						position="bottom center"
 					>
 						<URLInput
 							value={ url }

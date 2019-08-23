@@ -17,9 +17,10 @@ const ALLOWED_BLOCKS = Object.keys( socialList ).map( ( site ) => {
 
 // Template contains the links that show when start
 const TEMPLATE = [
-	// [ 'core/social-link-mastodon' ],
+	[ 'core/social-link-facebook' ],
 	[ 'core/social-link-twitter' ],
-	// [ 'core/social-link-wordpress' ],
+	[ 'core/social-link-instagram' ],
+	[ 'core/social-link-wordpress' ],
 ];
 
 export const SocialLinksEdit = function( { className } ) {

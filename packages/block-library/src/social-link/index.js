@@ -23,6 +23,7 @@ const commonAttribs = {
 		},
 		icon: {
 			type: 'string',
+			default: 'share',
 		},
 	},
 	edit,
