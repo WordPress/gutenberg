@@ -40,7 +40,7 @@ const BLOCK_ALIGNMENTS_CONTROLS = {
 	},
 };
 
-const DEFAULT_CONTROLS = [ [ 'left', 'center', 'right', 'wide', 'full' ], [ 'fullScreen' ] ];
+const DEFAULT_CONTROLS = [ [ 'left', 'center', 'right' ], [ 'wide', 'full', 'fullScreen' ] ];
 const DEFAULT_CONTROL = 'center';
 const WIDE_CONTROLS = [ 'wide', 'full', 'fullScreen' ];
 
