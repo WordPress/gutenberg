@@ -21,10 +21,10 @@ import {
 	ToolbarButton,
 } from '@wordpress/components';
 import {
+	Caption,
 	MediaPlaceholder,
 	MediaUpload,
 	MEDIA_TYPE_IMAGE,
-	RichText,
 	BlockControls,
 	InspectorControls,
 } from '@wordpress/block-editor';
@@ -115,7 +115,6 @@ class ImageEdit extends React.Component {
 			requestImageFailedRetryDialog( attributes.id );
 		}
 
-		this._caption.blur();
 		this.setState( {
 			isCaptionSelected: false,
 		} );
@@ -201,8 +200,8 @@ class ImageEdit extends React.Component {
 	}
 
 	render() {
-		const { attributes, isSelected, setAttributes } = this.props;
-		const { url, caption, height, width, alt, href, id } = attributes;
+		const { attributes, isSelected } = this.props;
+		const { url, height, width, alt, href, id } = attributes;
 
 		const onImageSettingsButtonPressed = () => {
 			this.setState( { showSettings: true } );
@@ -338,40 +337,22 @@ class ImageEdit extends React.Component {
 							);
 						} }
 					/>
-					{ ( ! RichText.isEmpty( caption ) > 0 || isSelected ) && (
-						<View style={ { padding: 12, flex: 1 } }
-							accessible={ true }
-							accessibilityLabel={
-								isEmpty( caption ) ?
-									/* translators: accessibility text. Empty image caption. */
-									__( 'Image caption. Empty' ) :
-									sprintf(
-										/* translators: accessibility text. %s: image caption. */
-										__( 'Image caption. %s' ),
-										caption
-									)
-							}
-							accessibilityRole={ 'button' }
-						>
-							<RichText
-								setRef={ ( ref ) => {
-									this._caption = ref;
-								} }
-								rootTagsToEliminate={ [ 'p' ] }
-								placeholder={ __( 'Write caption…' ) }
-								value={ caption }
-								onChange={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
-								unstableOnFocus={ this.onFocusCaption }
-								onBlur={ this.props.onBlur } // always assign onBlur as props
-								isSelected={ this.state.isCaptionSelected }
-								__unstableMobileNoFocusOnMount
-								fontSize={ 14 }
-								underlineColorAndroid="transparent"
-								textAlign={ 'center' }
-								tagName={ '' }
-							/>
-						</View>
-					) }
+					<Caption
+						clientId={ this.props.clientId }
+						isSelected={ this.state.isCaptionSelected }
+						accessible={ true }
+						accessibilityLabelCreator={ ( caption ) =>
+							isEmpty( caption ) ?
+							/* translators: accessibility text. Empty image caption. */
+								( 'Image caption. Empty' ) :
+								sprintf(
+								/* translators: accessibility text. %s: image caption. */
+									__( 'Image caption. %s' ),
+									caption )
+						}
+						onFocus={ this.onFocusCaption }
+						onBlur={ this.props.onBlur } // always assign onBlur as props
+					/>
 				</View>
 			</TouchableWithoutFeedback>
 		);

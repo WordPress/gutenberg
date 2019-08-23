@@ -28,7 +28,9 @@ function MenuList( props ) {
 }
 
 function Navigation() {
-	const navItems = data.filter( ( item ) => item.url !== '/components/' );
+	const navItems = data.filter(
+		( item ) => item.url !== '/components/' && item.url !== '/components/contributing'
+	);
 
 	return (
 		<NavigationWrapper>

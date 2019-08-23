@@ -55,6 +55,11 @@
     "id": "components-index"
   },
   {
+    "title": "Contributing components",
+    "url": "/components/contributing",
+    "id": "components-contributing"
+  },
+  {
     "title": "Dashicon",
     "url": "/components/dashicon/",
     "id": "components-dashicon-index"

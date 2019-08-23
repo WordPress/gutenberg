@@ -712,3 +712,5 @@ describe( 'blocks', () => {
 		} );
 	} );
 } );
+
+/* eslint-enable react/forbid-elements */

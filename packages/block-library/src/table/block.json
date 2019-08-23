@@ -34,6 +34,11 @@
 							"type": "string",
 							"source": "attribute",
 							"attribute": "scope"
+						},
+						"align": {
+							"type": "string",
+							"source": "attribute",
+							"attribute": "data-align"
 						}
 					}
 				}
@@ -64,6 +69,11 @@
 							"type": "string",
 							"source": "attribute",
 							"attribute": "scope"
+						},
+						"align": {
+							"type": "string",
+							"source": "attribute",
+							"attribute": "data-align"
 						}
 					}
 				}
@@ -94,6 +104,11 @@
 							"type": "string",
 							"source": "attribute",
 							"attribute": "scope"
+						},
+						"align": {
+							"type": "string",
+							"source": "attribute",
+							"attribute": "data-align"
 						}
 					}
 				}

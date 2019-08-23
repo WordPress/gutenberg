@@ -1,6 +1,10 @@
 .block-editor-block-list__block[data-type="core/button"] {
 	&[data-align="center"] {
 		text-align: center;
+		div[data-block] {
+			margin-left: auto;
+			margin-right: auto;
+		}
 	}
 
 	&[data-align="right"] {
@@ -39,22 +43,6 @@
 	[data-rich-text-placeholder]::after {
 		opacity: 0.8;
 	}
-
-	// Don't let the placeholder text wrap in the variation preview.
-	.block-editor-block-preview__content & {
-		max-width: 100%;
-
-		.wp-block-button__link {
-			max-width: 100%;
-			overflow: hidden;
-			// Override is allowed here only because the rich text instance in
-			// a preview is not editable.
-			// To do: use the `save` function to preview a block transform, not
-			// the `edit` function.
-			white-space: nowrap !important;
-			text-overflow: ellipsis;
-		}
-	}
 }
 
 .wp-block-button__inline-link {
@@ -67,7 +55,7 @@
 		max-width: 290px;
 	}
 
-	@media (min-width: #{ ($break-medium) }) {
+	@include break-medium() {
 		max-width: 260px;
 
 		&-input__suggestions {
@@ -75,7 +63,7 @@
 		}
 
 	}
-	@media (min-width: #{ ($break-large) }) {
+	@include break-large() {
 		max-width: 290px;
 
 		&-input__suggestions {
@@ -90,4 +78,9 @@
 		overflow: visible;
 		margin-top: $grid-size-large;
 	}
+}
+
+// Display "table" is used because the button container should only wrap the content and not takes the full width.
+div[data-type="core/button"] div[data-block] {
+	display: table;
 }

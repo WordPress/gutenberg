@@ -2,26 +2,29 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { every, filter, forEach, map } from 'lodash';
+import {
+	every,
+	filter,
+	find,
+	forEach,
+	map,
+	some,
+} from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { compose } from '@wordpress/compose';
 import {
-	IconButton,
 	PanelBody,
 	RangeControl,
 	SelectControl,
 	ToggleControl,
-	Toolbar,
 	withNotices,
 } from '@wordpress/components';
 import {
-	BlockControls,
 	BlockIcon,
 	MediaPlaceholder,
-	MediaUpload,
 	InspectorControls,
 } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
@@ -63,6 +66,7 @@ class GalleryEdit extends Component {
 
 		this.state = {
 			selectedImage: null,
+			attachmentCaptions: null,
 		};
 	}
 
@@ -129,11 +133,46 @@ class GalleryEdit extends Component {
 		};
 	}
 
-	onSelectImages( images ) {
-		const { columns } = this.props.attributes;
+	selectCaption( newImage, images, attachmentCaptions ) {
+		const currentImage = find(
+			images, { id: newImage.id }
+		);
+
+		const currentImageCaption = currentImage ? currentImage.caption : newImage.caption;
+
+		if ( ! attachmentCaptions ) {
+			return currentImageCaption;
+		}
+
+		const attachment = find(
+			attachmentCaptions, { id: newImage.id }
+		);
+
+		// if the attachment caption is updated
+		if ( attachment && ( attachment.caption !== newImage.caption ) ) {
+			return newImage.caption;
+		}
+
+		return currentImageCaption;
+	}
+
+	onSelectImages( newImages ) {
+		const { columns, images } = this.props.attributes;
+		const { attachmentCaptions } = this.state;
+		this.setState(
+			{
+				attachmentCaptions: newImages.map( ( newImage ) => ( {
+					id: newImage.id,
+					caption: newImage.caption,
+				} ) ),
+			}
+		);
 		this.setAttributes( {
-			images: images.map( ( image ) => pickRelevantMediaFiles( image ) ),
-			columns: columns ? Math.min( images.length, columns ) : columns,
+			images: newImages.map( ( newImage ) => ( {
+				...pickRelevantMediaFiles( newImage ),
+				caption: this.selectCaption( newImage, images, attachmentCaptions ),
+			} ) ),
+			columns: columns ? Math.min( newImages.length, columns ) : columns,
 		} );
 	}
 
@@ -202,38 +241,26 @@ class GalleryEdit extends Component {
 	}
 
 	render() {
-		const { attributes, isSelected, className, noticeUI } = this.props;
-		const { images, columns = defaultColumnsNumber( attributes ), align, imageCrop, linkTo } = attributes;
+		const {
+			attributes,
+			className,
+			isSelected,
+			noticeUI,
+		} = this.props;
+		const {
+			align,
+			columns = defaultColumnsNumber( attributes ),
+			imageCrop,
+			images,
+			linkTo,
+		} = attributes;
 
 		const hasImages = !! images.length;
-
-		const controls = (
-			<BlockControls>
-				{ hasImages && (
-					<Toolbar>
-						<MediaUpload
-							onSelect={ this.onSelectImages }
-							allowedTypes={ ALLOWED_MEDIA_TYPES }
-							multiple
-							gallery
-							value={ images.map( ( img ) => img.id ) }
-							render={ ( { open } ) => (
-								<IconButton
-									className="components-toolbar__control"
-									label={ __( 'Edit gallery' ) }
-									icon="edit"
-									onClick={ open }
-								/>
-							) }
-						/>
-					</Toolbar>
-				) }
-			</BlockControls>
-		);
+		const hasImagesWithId = hasImages && some( images, ( { id } ) => id );
 
 		const mediaPlaceholder = (
 			<MediaPlaceholder
-				addToGallery={ hasImages }
+				addToGallery={ hasImagesWithId }
 				isAppender={ hasImages }
 				className={ className }
 				dropZoneUIOnly={ hasImages && ! isSelected }
@@ -246,24 +273,18 @@ class GalleryEdit extends Component {
 				accept="image/*"
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				multiple
-				value={ hasImages ? images : undefined }
+				value={ hasImagesWithId ? images : undefined }
 				onError={ this.onUploadError }
 				notices={ hasImages ? undefined : noticeUI }
 			/>
 		);
 
 		if ( ! hasImages ) {
-			return (
-				<>
-					{ controls }
-					{ mediaPlaceholder }
-				</>
-			);
+			return mediaPlaceholder;
 		}
 
 		return (
 			<>
-				{ controls }
 				<InspectorControls>
 					<PanelBody title={ __( 'Gallery Settings' ) }>
 						{ images.length > 1 && <RangeControl

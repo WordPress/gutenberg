@@ -20,9 +20,17 @@ module.exports = {
 	root: true,
 	extends: [
 		'plugin:@wordpress/eslint-plugin/recommended',
-		'plugin:jest/recommended',
+		'plugin:eslint-comments/recommended',
 	],
+	plugins: [
+		'import',
+	],
+	globals: {
+		wp: 'off',
+	},
 	rules: {
+		'@wordpress/dependency-group': 'error',
+		'@wordpress/gutenberg-phase': 'error',
 		'@wordpress/react-no-unsafe-timeout': 'error',
 		'no-restricted-syntax': [
 			'error',
@@ -107,15 +115,28 @@ module.exports = {
 	},
 	overrides: [
 		{
+			files: [ 'packages/**/*.js' ],
+			rules: {
+				'import/no-extraneous-dependencies': 'error',
+			},
+			excludedFiles: [
+				'**/*.@(android|ios|native).js',
+				'**/@(benchmark|test|__tests__)/**/*.js',
+			],
+		},
+		{
+			files: [
+				'packages/jest*/**/*.js',
+			],
+			extends: [
+				'plugin:@wordpress/eslint-plugin/test-unit',
+			],
+		},
+		{
 			files: [ 'packages/e2e-test*/**/*.js' ],
-			env: {
-				browser: true,
-			},
-			globals: {
-				browser: true,
-				page: true,
-				wp: true,
-			},
+			extends: [
+				'plugin:@wordpress/eslint-plugin/test-e2e',
+			],
 		},
 	],
 };

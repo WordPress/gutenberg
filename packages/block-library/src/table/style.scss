@@ -17,7 +17,7 @@
 
 		td,
 		th {
-			word-break: break-all;
+			word-break: break-word;
 		}
 	}
 
@@ -34,8 +34,7 @@
 
 		td,
 		th {
-			// Aligned tables shouldn't scroll horizontally so we need their contents to wrap.
-			word-break: break-all;
+			word-break: break-word;
 		}
 	}
 

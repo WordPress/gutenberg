@@ -22,6 +22,7 @@ import {
 import preventEventDiscovery from './prevent-event-discovery';
 import Layout from './components/layout';
 import EditorInitialization from './components/editor-initialization';
+import EditPostSettings from './components/edit-post-settings';
 
 class Editor extends Component {
 	constructor() {
@@ -35,6 +36,7 @@ class Editor extends Component {
 	getEditorSettings(
 		settings,
 		hasFixedToolbar,
+		showInserterHelpPanel,
 		focusMode,
 		hiddenBlockTypes,
 		blockTypes,
@@ -43,6 +45,7 @@ class Editor extends Component {
 			...settings,
 			hasFixedToolbar,
 			focusMode,
+			showInserterHelpPanel,
 		};
 
 		// Omit hidden block types if exists and non-empty.
@@ -76,6 +79,7 @@ class Editor extends Component {
 			onError,
 			hiddenBlockTypes,
 			blockTypes,
+			showInserterHelpPanel,
 			...props
 		} = this.props;
 
@@ -86,6 +90,7 @@ class Editor extends Component {
 		const editorSettings = this.getEditorSettings(
 			settings,
 			hasFixedToolbar,
+			showInserterHelpPanel,
 			focusMode,
 			hiddenBlockTypes,
 			blockTypes,
@@ -93,24 +98,26 @@ class Editor extends Component {
 
 		return (
 			<StrictMode>
-				<SlotFillProvider>
-					<DropZoneProvider>
-						<EditorProvider
-							settings={ editorSettings }
-							post={ post }
-							initialEdits={ initialEdits }
-							useSubRegistry={ false }
-							{ ...props }
-						>
-							<ErrorBoundary onError={ onError }>
-								<EditorInitialization postId={ postId } />
-								<Layout />
-								<KeyboardShortcuts shortcuts={ preventEventDiscovery } />
-							</ErrorBoundary>
-							<PostLockedModal />
-						</EditorProvider>
-					</DropZoneProvider>
-				</SlotFillProvider>
+				<EditPostSettings.Provider value={ settings }>
+					<SlotFillProvider>
+						<DropZoneProvider>
+							<EditorProvider
+								settings={ editorSettings }
+								post={ post }
+								initialEdits={ initialEdits }
+								useSubRegistry={ false }
+								{ ...props }
+							>
+								<ErrorBoundary onError={ onError }>
+									<EditorInitialization postId={ postId } />
+									<Layout />
+									<KeyboardShortcuts shortcuts={ preventEventDiscovery } />
+								</ErrorBoundary>
+								<PostLockedModal />
+							</EditorProvider>
+						</DropZoneProvider>
+					</SlotFillProvider>
+				</EditPostSettings.Provider>
 			</StrictMode>
 		);
 	}
@@ -122,6 +129,7 @@ export default withSelect( ( select, { postId, postType } ) => {
 	const { getBlockTypes } = select( 'core/blocks' );
 
 	return {
+		showInserterHelpPanel: isFeatureActive( 'showInserterHelpPanel' ),
 		hasFixedToolbar: isFeatureActive( 'fixedToolbar' ),
 		focusMode: isFeatureActive( 'focusMode' ),
 		post: getEntityRecord( 'postType', postType, postId ),

@@ -2,6 +2,12 @@
 
 ### Bug Fixes
 
+- Added missing `@wordpress/element` dependency which is used internally.
+
+## 4.4.0 (2019-08-05)
+
+### Bug Fixes
+
 - Configure Babel to target your current version of Node as described in [Jest docs](https://jestjs.io/docs/en/getting-started#using-babel).
 - Added missing [core-js](https://www.npmjs.com/package/core-js) dependency ([#16259](https://github.com/WordPress/gutenberg/pull/16259)).
 
