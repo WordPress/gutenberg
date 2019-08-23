@@ -17,12 +17,12 @@ async function addFirstTimeContributorLabel( payload, octokit ) {
 
 	debug( `add-first-time-contributor-label: Searching for commits in ${ owner }/${ repo } by @${ author }` );
 
-	const { total_count: totalCount } = await octokit.search.commits( {
+	const { data: { total_count: totalCount } } = await octokit.search.commits( {
 		q: `repo:${ owner }/${ repo }+author:${ author }`,
 	} );
 
 	if ( totalCount !== 0 ) {
-		debug( 'add-first-time-contributor-label: Commits found. Aborting' );
+		debug( `add-first-time-contributor-label: ${ totalCount } commits found. Aborting` );
 		return;
 	}
 
