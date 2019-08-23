@@ -27,25 +27,23 @@ const SocialLinkEdit = ( { className, attributes, setAttributes, isSelected } ) 
 
 	const classes = classNames( 'wp-social-icon', `wp-social-icon-${ icon }`, { 'wp-social-icon__is-incomplete': ( url ) ? false : true } );
 	return (
-		<>
-			<Button
-				className={ classes }
-				onClick={ () => setPopover( true ) }
-			>
-				{ isSelected && showURLPopover && (
-					<Popover
-						onFocusOutside={ () => setPopover( false ) }
-						position="bottom center"
-					>
-						<URLInput
-							value={ url }
-							onChange={ ( value ) => setAttributes( { url: value } ) }
-							disableSuggestions={ true }
-						/>
-					</Popover>
-				) }
-			</Button>
-		</>
+		<Button
+			className={ classes }
+			onClick={ () => setPopover( true ) }
+		>
+			{ isSelected && showURLPopover && (
+				<Popover
+					onFocusOutside={ () => setPopover( false ) }
+					position="bottom center"
+				>
+					<URLInput
+						value={ url }
+						onChange={ ( value ) => setAttributes( { url: value } ) }
+						disableSuggestions={ true }
+					/>
+				</Popover>
+			) }
+		</Button>
 	);
 };
 

@@ -34,12 +34,13 @@ const commonAttribs = {
 // TODO: solve icon issue
 export const sites = Object.keys( socialList ).map(
 	( site ) => {
+		const siteParams = socialList[ site ];
 		return {
 			name: 'core/social-link-' + site,
 			settings: {
-				title: socialList[ site ],
-				icon: 'share',
-				description: __( 'Link to ' + socialList[ site ] ),
+				title: siteParams.name,
+				icon: siteParams.icon,
+				description: __( 'Link to ' + siteParams.name ),
 				...commonAttribs,
 			},
 		};
