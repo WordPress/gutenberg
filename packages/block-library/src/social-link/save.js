@@ -6,18 +6,18 @@ import classNames from 'classnames';
 /**
  * WordPress dependencies
  */
-
-export default function save( { attributes, className } ) {
-	const { icon, url } = attributes;
+export default function save( { attributes } ) {
+	const { site, url } = attributes;
 
 	if ( ! url ) {
 		return null;
 	}
 
-	const classes = classNames( 'wp-social-icon', `wp-social-icon-${ icon }` );
+	// TODO: suggestions for fall back icon?
+	const classes = classNames( 'wp-social-icon' );
 	return (
-		<span className={ className }>
-			<a href={ url }><span className={ classes }></span></a>
-		</span>
+		<li className={ classes }>
+			<a href={ url }>{ site }</a>
+		</li>
 	);
 }

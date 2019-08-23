@@ -37,7 +37,7 @@ export const sites = Object.keys( socialList ).map(
 					url: {
 						type: 'string',
 					},
-					icon: {
+					site: {
 						type: 'string',
 						default: site,
 					},

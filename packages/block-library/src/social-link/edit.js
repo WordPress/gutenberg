@@ -16,16 +16,22 @@ import {
 /**
  * Internal dependencies
  */
+import { getIconBySite } from './social-list';
 
 const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
-	const { url, icon } = attributes;
+	const { url, site } = attributes;
 	const [ showURLPopover, setPopover ] = useState( true );
-	const classes = classNames( 'wp-social-link', `wp-social-link-${ icon }`, { 'wp-social-link__is-incomplete': ( url ) ? false : true } );
+	const classes = classNames( 'wp-social-link', { 'wp-social-link__is-incomplete': ( url ) ? false : true } );
+
+	// how to import icon here
+	const IconComponent = getIconBySite( site );
+
 	return (
 		<Button
 			className={ classes }
 			onClick={ () => setPopover( true ) }
 		>
+			<IconComponent />
 			{ isSelected && showURLPopover && (
 				<Popover
 					onFocusOutside={ () => setPopover( false ) }
