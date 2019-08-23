@@ -17,15 +17,10 @@ import {
  * Internal dependencies
  */
 
-const SocialLinkEdit = ( { className, attributes, setAttributes, isSelected } ) => {
-	const { url } = attributes;
+const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
+	const { url, icon } = attributes;
 	const [ showURLPopover, setPopover ] = useState( true );
-
-	// can we read the block settings somehow to get icon?
-	const icon = className.replace( 'wp-block-social-link-', '' );
-	setAttributes( { icon } );
-
-	const classes = classNames( 'wp-social-icon', `wp-social-icon-${ icon }`, { 'wp-social-icon__is-incomplete': ( url ) ? false : true } );
+	const classes = classNames( 'wp-social-link', `wp-social-link-${ icon }`, { 'wp-social-link__is-incomplete': ( url ) ? false : true } );
 	return (
 		<Button
 			className={ classes }

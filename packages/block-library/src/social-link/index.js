@@ -17,15 +17,6 @@ const commonAttribs = {
 		reusable: false,
 		html: false,
 	},
-	attributes: {
-		url: {
-			type: 'string',
-		},
-		icon: {
-			type: 'string',
-			default: 'share',
-		},
-	},
 	edit,
 	save,
 };
@@ -42,6 +33,15 @@ export const sites = Object.keys( socialList ).map(
 				icon: siteParams.icon,
 				description: __( 'Link to ' + siteParams.name ),
 				...commonAttribs,
+				attributes: {
+					url: {
+						type: 'string',
+					},
+					icon: {
+						type: 'string',
+						default: site,
+					},
+				},
 			},
 		};
 	}

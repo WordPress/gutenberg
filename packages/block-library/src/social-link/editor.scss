@@ -1,4 +1,4 @@
-.wp-social-icon__is-incomplete {
+.wp-social-link__is-incomplete {
 	opacity: 0.6;
 
 	[data-type*="core/social-link-"].is-selected &, // Matches the selected social logo block.
