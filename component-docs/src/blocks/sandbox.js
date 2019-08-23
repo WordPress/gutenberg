@@ -14,8 +14,21 @@ import React from 'react';
 import Card from '../components/card';
 import CodeExample from '../components/code-example';
 
-registerBlockType( 'docs/example', {
-	title: 'Example: Live',
+function transformCode( code ) {
+	if ( ! code ) {
+		return '';
+	}
+
+	const match = code.replace(
+		/import(?:["'\s]*([\w*{}\n, ]+)from\s*)?["'\s]*([@\w/_-]+)["'\s].*/gm,
+		''
+	);
+
+	return `() => {${ match }; return <Example />}`;
+}
+
+registerBlockType( 'docs/sandbox', {
+	title: 'Sandbox',
 	category: 'layout',
 	attributes: {
 		code: {
@@ -23,16 +36,23 @@ registerBlockType( 'docs/example', {
 			source: 'text',
 			selector: 'code',
 		},
+		name: {
+			type: 'string',
+		},
 	},
-	edit() {},
 	save( props ) {
 		const {
-			attributes: { code },
+			attributes: { code, name },
 		} = props;
 
 		return (
 			<Card>
-				<CodeExample code={ code } />
+				<CodeExample
+					name={ name }
+					code={ code }
+					enableCodeSandbox
+					transformCode={ transformCode }
+				/>
 			</Card>
 		);
 	},

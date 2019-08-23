@@ -10,7 +10,7 @@ const localDocs = path.join( localDocsDir, '/**/*.md' );
 const dataDestDir = path.resolve( __dirname, '../public/_data' );
 
 function getDataFileDir( filePath ) {
-	const rootDest = path.resolve( __dirname, '../public/_data/' );
+	const rootDest = path.resolve( __dirname, '../public/_data/components/' );
 	const fileDir = path.dirname( filePath ).replace( localDocsDir, '' );
 
 	return path.join( rootDest, fileDir );

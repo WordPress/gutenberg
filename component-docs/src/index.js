@@ -15,6 +15,8 @@ import '@wordpress/components/build-style/style.css';
  * Internal dependencies
  */
 import App from './app';
+import './styles/reset.css';
 import './styles/global.css';
+import './styles/variables.css';
 
 ReactDOM.render( <App />, document.getElementById( 'root' ) );

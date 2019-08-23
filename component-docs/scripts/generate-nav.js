@@ -2,7 +2,7 @@ const fs = require( 'fs' );
 const path = require( 'path' );
 const mkdirp = require( 'mkdirp' );
 const { getPostData } = require( './get-post-data' );
-const orderBy = require( 'lodash.orderby' );
+const { orderBy } = require( 'lodash' );
 
 const destDir = path.resolve( __dirname, '../src/data' );
 const fileDest = path.join( destDir, 'navigation.json' );

@@ -1,342 +1,342 @@
 [
   {
     "title": "Animate",
-    "url": "/animate/",
-    "id": "animate-index"
+    "url": "/components/animate/",
+    "id": "components-animate-index"
   },
   {
     "title": "Autocomplete",
-    "url": "/autocomplete/",
-    "id": "autocomplete-index"
+    "url": "/components/autocomplete/",
+    "id": "components-autocomplete-index"
   },
   {
     "title": "BaseControl",
-    "url": "/base-control/",
-    "id": "base-control-index"
+    "url": "/components/base-control/",
+    "id": "components-base-control-index"
   },
   {
     "title": "Button",
-    "url": "/button/",
-    "id": "button-index"
+    "url": "/components/button/",
+    "id": "components-button-index"
   },
   {
     "title": "ButtonGroup",
-    "url": "/button-group/",
-    "id": "button-group-index"
+    "url": "/components/button-group/",
+    "id": "components-button-group-index"
   },
   {
     "title": "CheckboxControl",
-    "url": "/checkbox-control/",
-    "id": "checkbox-control-index"
+    "url": "/components/checkbox-control/",
+    "id": "components-checkbox-control-index"
   },
   {
     "title": "ClipboardButton",
-    "url": "/clipboard-button/",
-    "id": "clipboard-button-index"
+    "url": "/components/clipboard-button/",
+    "id": "components-clipboard-button-index"
   },
   {
     "title": "ColorIndicator",
-    "url": "/color-indicator/",
-    "id": "color-indicator-index"
+    "url": "/components/color-indicator/",
+    "id": "components-color-indicator-index"
   },
   {
     "title": "ColorPalette",
-    "url": "/color-palette/",
-    "id": "color-palette-index"
+    "url": "/components/color-palette/",
+    "id": "components-color-palette-index"
   },
   {
     "title": "ColorPicker",
-    "url": "/color-picker/",
-    "id": "color-picker-index"
+    "url": "/components/color-picker/",
+    "id": "components-color-picker-index"
   },
   {
     "title": "Components",
-    "url": "/",
-    "id": "index"
+    "url": "/components/",
+    "id": "components-index"
   },
   {
     "title": "Dashicon",
-    "url": "/dashicon/",
-    "id": "dashicon-index"
+    "url": "/components/dashicon/",
+    "id": "components-dashicon-index"
   },
   {
     "title": "DateTimePicker",
-    "url": "/date-time/",
-    "id": "date-time-index"
+    "url": "/components/date-time/",
+    "id": "components-date-time-index"
   },
   {
     "title": "Disabled",
-    "url": "/disabled/",
-    "id": "disabled-index"
+    "url": "/components/disabled/",
+    "id": "components-disabled-index"
   },
   {
     "title": "Draggable",
-    "url": "/draggable/",
-    "id": "draggable-index"
+    "url": "/components/draggable/",
+    "id": "components-draggable-index"
   },
   {
     "title": "DropZone",
-    "url": "/drop-zone/",
-    "id": "drop-zone-index"
+    "url": "/components/drop-zone/",
+    "id": "components-drop-zone-index"
   },
   {
     "title": "Dropdown",
-    "url": "/dropdown/",
-    "id": "dropdown-index"
+    "url": "/components/dropdown/",
+    "id": "components-dropdown-index"
   },
   {
     "title": "DropdownMenu",
-    "url": "/dropdown-menu/",
-    "id": "dropdown-menu-index"
+    "url": "/components/dropdown-menu/",
+    "id": "components-dropdown-menu-index"
   },
   {
     "title": "ExternalLink",
-    "url": "/external-link/",
-    "id": "external-link-index"
+    "url": "/components/external-link/",
+    "id": "components-external-link-index"
   },
   {
     "title": "Focal Point Picker",
-    "url": "/focal-point-picker/",
-    "id": "focal-point-picker-index"
+    "url": "/components/focal-point-picker/",
+    "id": "components-focal-point-picker-index"
   },
   {
     "title": "Focusable Iframe",
-    "url": "/focusable-iframe/",
-    "id": "focusable-iframe-index"
+    "url": "/components/focusable-iframe/",
+    "id": "components-focusable-iframe-index"
   },
   {
     "title": "FontSizePicker",
-    "url": "/font-size-picker/",
-    "id": "font-size-picker-index"
+    "url": "/components/font-size-picker/",
+    "id": "components-font-size-picker-index"
   },
   {
     "title": "Form Token Field",
-    "url": "/form-token-field/",
-    "id": "form-token-field-index"
+    "url": "/components/form-token-field/",
+    "id": "components-form-token-field-index"
   },
   {
     "title": "FormFileUpload",
-    "url": "/form-file-upload/",
-    "id": "form-file-upload-index"
+    "url": "/components/form-file-upload/",
+    "id": "components-form-file-upload-index"
   },
   {
     "title": "FormToggle",
-    "url": "/form-toggle/",
-    "id": "form-toggle-index"
+    "url": "/components/form-toggle/",
+    "id": "components-form-toggle-index"
   },
   {
     "title": "Higher Order Components",
-    "url": "/higher-order/",
-    "id": "higher-order-index"
+    "url": "/components/higher-order/",
+    "id": "components-higher-order-index"
   },
   {
     "title": "HorizontalRule",
-    "url": "/primitives/block-quotation/",
-    "id": "primitives-block-quotation-index"
+    "url": "/components/primitives/block-quotation/",
+    "id": "components-primitives-block-quotation-index"
   },
   {
     "title": "HorizontalRule",
-    "url": "/primitives/horizontal-rule/",
-    "id": "primitives-horizontal-rule-index"
+    "url": "/components/primitives/horizontal-rule/",
+    "id": "components-primitives-horizontal-rule-index"
   },
   {
     "title": "Icon",
-    "url": "/icon/",
-    "id": "icon-index"
+    "url": "/components/icon/",
+    "id": "components-icon-index"
   },
   {
     "title": "Isolated Event Container",
-    "url": "/isolated-event-container/",
-    "id": "isolated-event-container-index"
+    "url": "/components/isolated-event-container/",
+    "id": "components-isolated-event-container-index"
   },
   {
     "title": "Keyboard Shortcuts",
-    "url": "/keyboard-shortcuts/",
-    "id": "keyboard-shortcuts-index"
+    "url": "/components/keyboard-shortcuts/",
+    "id": "components-keyboard-shortcuts-index"
   },
   {
     "title": "MenuGroup",
-    "url": "/menu-group/",
-    "id": "menu-group-index"
+    "url": "/components/menu-group/",
+    "id": "components-menu-group-index"
   },
   {
     "title": "MenuItem",
-    "url": "/menu-item/",
-    "id": "menu-item-index"
+    "url": "/components/menu-item/",
+    "id": "components-menu-item-index"
   },
   {
     "title": "MenuItemsChoice",
-    "url": "/menu-items-choice/",
-    "id": "menu-items-choice-index"
+    "url": "/components/menu-items-choice/",
+    "id": "components-menu-items-choice-index"
   },
   {
     "title": "Modal",
-    "url": "/modal/",
-    "id": "modal-index"
+    "url": "/components/modal/",
+    "id": "components-modal-index"
   },
   {
     "title": "NavigableContainers",
-    "url": "/navigable-container/",
-    "id": "navigable-container-index"
+    "url": "/components/navigable-container/",
+    "id": "components-navigable-container-index"
   },
   {
     "title": "Notice",
-    "url": "/notice/",
-    "id": "notice-index"
+    "url": "/components/notice/",
+    "id": "components-notice-index"
   },
   {
     "title": "Panel",
-    "url": "/panel/",
-    "id": "panel-index"
+    "url": "/components/panel/",
+    "id": "components-panel-index"
   },
   {
     "title": "Placeholder",
-    "url": "/placeholder/",
-    "id": "placeholder-index"
+    "url": "/components/placeholder/",
+    "id": "components-placeholder-index"
   },
   {
     "title": "Popover",
-    "url": "/popover/",
-    "id": "popover-index"
+    "url": "/components/popover/",
+    "id": "components-popover-index"
   },
   {
     "title": "QueryControls",
-    "url": "/query-controls/",
-    "id": "query-controls-index"
+    "url": "/components/query-controls/",
+    "id": "components-query-controls-index"
   },
   {
     "title": "RadioControl",
-    "url": "/radio-control/",
-    "id": "radio-control-index"
+    "url": "/components/radio-control/",
+    "id": "components-radio-control-index"
   },
   {
     "title": "RangeControl",
-    "url": "/range-control/",
-    "id": "range-control-index"
+    "url": "/components/range-control/",
+    "id": "components-range-control-index"
   },
   {
     "title": "Related components",
-    "url": "/icon-button/",
-    "id": "icon-button-index"
+    "url": "/components/icon-button/",
+    "id": "components-icon-button-index"
   },
   {
     "title": "ResizableBox",
-    "url": "/resizable-box/",
-    "id": "resizable-box-index"
+    "url": "/components/resizable-box/",
+    "id": "components-resizable-box-index"
   },
   {
     "title": "ResponsiveWrapper",
-    "url": "/responsive-wrapper/",
-    "id": "responsive-wrapper-index"
+    "url": "/components/responsive-wrapper/",
+    "id": "components-responsive-wrapper-index"
   },
   {
     "title": "SVG",
-    "url": "/primitives/svg/",
-    "id": "primitives-svg-index"
+    "url": "/components/primitives/svg/",
+    "id": "components-primitives-svg-index"
   },
   {
     "title": "Sandbox",
-    "url": "/sandbox/",
-    "id": "sandbox-index"
+    "url": "/components/sandbox/",
+    "id": "components-sandbox-index"
   },
   {
     "title": "ScrollLock",
-    "url": "/scroll-lock/",
-    "id": "scroll-lock-index"
+    "url": "/components/scroll-lock/",
+    "id": "components-scroll-lock-index"
   },
   {
     "title": "SelectControl",
-    "url": "/select-control/",
-    "id": "select-control-index"
+    "url": "/components/select-control/",
+    "id": "components-select-control-index"
   },
   {
     "title": "Slot Fill",
-    "url": "/slot-fill/",
-    "id": "slot-fill-index"
+    "url": "/components/slot-fill/",
+    "id": "components-slot-fill-index"
   },
   {
     "title": "Snackbar",
-    "url": "/snackbar/",
-    "id": "snackbar-index"
+    "url": "/components/snackbar/",
+    "id": "components-snackbar-index"
   },
   {
     "title": "Spinner",
-    "url": "/spinner/",
-    "id": "spinner-index"
+    "url": "/components/spinner/",
+    "id": "components-spinner-index"
   },
   {
     "title": "TabPanel",
-    "url": "/tab-panel/",
-    "id": "tab-panel-index"
+    "url": "/components/tab-panel/",
+    "id": "components-tab-panel-index"
   },
   {
     "title": "TextControl",
-    "url": "/text-control/",
-    "id": "text-control-index"
+    "url": "/components/text-control/",
+    "id": "components-text-control-index"
   },
   {
     "title": "TextareaControl",
-    "url": "/textarea-control/",
-    "id": "textarea-control-index"
+    "url": "/components/textarea-control/",
+    "id": "components-textarea-control-index"
   },
   {
     "title": "ToggleControl",
-    "url": "/toggle-control/",
-    "id": "toggle-control-index"
+    "url": "/components/toggle-control/",
+    "id": "components-toggle-control-index"
   },
   {
     "title": "Toolbar",
-    "url": "/toolbar/",
-    "id": "toolbar-index"
+    "url": "/components/toolbar/",
+    "id": "components-toolbar-index"
   },
   {
     "title": "Tooltip",
-    "url": "/tooltip/",
-    "id": "tooltip-index"
+    "url": "/components/tooltip/",
+    "id": "components-tooltip-index"
   },
   {
     "title": "TreeSelect",
-    "url": "/tree-select/",
-    "id": "tree-select-index"
+    "url": "/components/tree-select/",
+    "id": "components-tree-select-index"
   },
   {
     "title": "navigateRegions",
-    "url": "/higher-order/navigate-regions/",
-    "id": "higher-order-navigate-regions-index"
+    "url": "/components/higher-order/navigate-regions/",
+    "id": "components-higher-order-navigate-regions-index"
   },
   {
     "title": "withConstrainedTabbing",
-    "url": "/higher-order/with-constrained-tabbing/",
-    "id": "higher-order-with-constrained-tabbing-index"
+    "url": "/components/higher-order/with-constrained-tabbing/",
+    "id": "components-higher-order-with-constrained-tabbing-index"
   },
   {
     "title": "withFallbackStyles",
-    "url": "/higher-order/with-fallback-styles/",
-    "id": "higher-order-with-fallback-styles-index"
+    "url": "/components/higher-order/with-fallback-styles/",
+    "id": "components-higher-order-with-fallback-styles-index"
   },
   {
     "title": "withFilters",
-    "url": "/higher-order/with-filters/",
-    "id": "higher-order-with-filters-index"
+    "url": "/components/higher-order/with-filters/",
+    "id": "components-higher-order-with-filters-index"
   },
   {
     "title": "withFocusOutside",
-    "url": "/higher-order/with-focus-outside/",
-    "id": "higher-order-with-focus-outside-index"
+    "url": "/components/higher-order/with-focus-outside/",
+    "id": "components-higher-order-with-focus-outside-index"
   },
   {
     "title": "withFocusReturn",
-    "url": "/higher-order/with-focus-return/",
-    "id": "higher-order-with-focus-return-index"
+    "url": "/components/higher-order/with-focus-return/",
+    "id": "components-higher-order-with-focus-return-index"
   },
   {
     "title": "withNotices",
-    "url": "/higher-order/with-notices/",
-    "id": "higher-order-with-notices-index"
+    "url": "/components/higher-order/with-notices/",
+    "id": "components-higher-order-with-notices-index"
   },
   {
     "title": "withSpokenMessages",
-    "url": "/higher-order/with-spoken-messages/",
-    "id": "higher-order-with-spoken-messages-index"
+    "url": "/components/higher-order/with-spoken-messages/",
+    "id": "components-higher-order-with-spoken-messages-index"
   }
 ]

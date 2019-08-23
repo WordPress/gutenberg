@@ -1,9 +1,9 @@
 /**
  * External dependencies
  */
-import styled from '@emotion/styled';
+import styled from 'styled-components';
 
-const Card = styled( 'div' )`
+const Card = styled.div`
 	margin: 2em 0 3em;
 	border: 1px solid #ddd;
 	border-radius: 4px;
