@@ -9,13 +9,14 @@ import Hr from 'react-native-hr';
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
+import { withTheme, useStyle } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import styles from './editor.scss';
 
-export default class MoreEdit extends Component {
+export class MoreEdit extends Component {
 	constructor() {
 		super( ...arguments );
 
@@ -28,6 +29,8 @@ export default class MoreEdit extends Component {
 		const { customText } = this.props.attributes;
 		const { defaultText } = this.state;
 		const content = customText || defaultText;
+		const textStyle = useStyle( styles.moreText, styles.moreTextDark, this.props.theme );
+		const lineStyle = useStyle( styles.moreLine, styles.moreLineDark, this.props.theme );
 
 		return (
 			<View>
@@ -35,10 +38,12 @@ export default class MoreEdit extends Component {
 					text={ content }
 					marginLeft={ 0 }
 					marginRight={ 0 }
-					textStyle={ styles[ 'block-library-more__text' ] }
-					lineStyle={ styles[ 'block-library-more__line' ] }
+					textStyle={ textStyle }
+					lineStyle={ lineStyle }
 				/>
 			</View>
 		);
 	}
 }
+
+export default withTheme( MoreEdit );

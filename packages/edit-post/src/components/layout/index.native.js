@@ -11,7 +11,7 @@ import { sendNativeEditorDidLayout } from 'react-native-gutenberg-bridge';
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { HTMLTextInput, KeyboardAvoidingView, ReadableContentView } from '@wordpress/components';
+import { HTMLTextInput, KeyboardAvoidingView, ReadableContentView, useStyle, withTheme } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -112,8 +112,8 @@ class Layout extends Component {
 		};
 
 		return (
-			<SafeAreaView style={ styles.container } onLayout={ this.onRootViewLayout }>
-				<View style={ { flex: 1 } }>
+			<SafeAreaView style={ useStyle( styles.container, styles.containerDark, this.props.theme ) } onLayout={ this.onRootViewLayout }>
+				<View style={ useStyle( styles.background, styles.backgroundDark, this.props.theme ) }>
 					{ mode === 'text' ? this.renderHTML() : this.renderVisual() }
 				</View>
 				<View style={ { flex: 0, flexBasis: marginBottom, height: marginBottom } }>
@@ -143,4 +143,5 @@ export default compose( [
 			mode: getEditorMode(),
 		};
 	} ),
+	withTheme,
 ] )( Layout );
