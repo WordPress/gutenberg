@@ -1,12 +1,13 @@
 const fs = require( 'fs' );
 const path = require( 'path' );
-const glob = require( 'glob' );
+const glob = require( 'fast-glob' );
 const mkdirp = require( 'mkdirp' );
 const remark = require( 'remark' );
 const visit = require( 'unist-util-visit' );
 
 const localDocsDir = path.resolve( __dirname, '../../packages/components/src' );
-const localDocs = path.join( localDocsDir, '/**/*.md' );
+const localDocs = path.join( localDocsDir, '/*/*.md' );
+const localIndexDocs = path.join( localDocsDir, '/*.md' );
 const dataDestDir = path.resolve( __dirname, '../public/_data' );
 
 function getDataFileDir( filePath ) {
@@ -84,7 +85,7 @@ async function getDataFromFile( filePath ) {
 async function getPostData( singleFile ) {
 	mkdirp.sync( dataDestDir );
 
-	const files = singleFile ? [ singleFile ] : glob.sync( localDocs );
+	const files = singleFile ? [ singleFile ] : glob.sync( [ localDocs, localIndexDocs ] );
 
 	try {
 		const data = files.reduce( async ( asyncCollection, filePath ) => {

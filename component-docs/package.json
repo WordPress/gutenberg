@@ -9,10 +9,12 @@
 		"start:server": "node server.js",
 		"build": "npm run build:docs && npm run build:app",
 		"build:app": "react-scripts build",
-		"build:docs": "npm run clean:docs && npm run generate:docs && npm run generate:nav",
+		"build:docs": "npm run clean:docs && npm run generate:data",
 		"clean:docs": "rm -rf public/_data",
 		"generate:docs": "node ./scripts/generate-docs.js",
+		"generate:pkg": "node ./scripts/generate-pkg.js",
 		"generate:nav": "node ./scripts/generate-nav.js",
+		"generate:data": "npm run generate:docs && npm run generate:nav && npm run generate:pkg",
 		"watch:docs": "node ./scripts/watch-transform-data.js"
 	},
 	"dependencies": {
@@ -44,7 +46,7 @@
 		"chokidar": "3.0.2",
 		"concurrently": "4.1.1",
 		"express": "4.17.1",
-		"glob": "7.1.4",
+		"fast-glob": "3.0.4",
 		"mkdirp": "0.5.1",
 		"remark": "11.0.1",
 		"remark-parse": "7.0.1",

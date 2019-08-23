@@ -130,16 +130,6 @@
     "id": "components-higher-order-index"
   },
   {
-    "title": "HorizontalRule",
-    "url": "/components/primitives/block-quotation/",
-    "id": "components-primitives-block-quotation-index"
-  },
-  {
-    "title": "HorizontalRule",
-    "url": "/components/primitives/horizontal-rule/",
-    "id": "components-primitives-horizontal-rule-index"
-  },
-  {
     "title": "Icon",
     "url": "/components/icon/",
     "id": "components-icon-index"
@@ -230,11 +220,6 @@
     "id": "components-responsive-wrapper-index"
   },
   {
-    "title": "SVG",
-    "url": "/components/primitives/svg/",
-    "id": "components-primitives-svg-index"
-  },
-  {
     "title": "Sandbox",
     "url": "/components/sandbox/",
     "id": "components-sandbox-index"
@@ -298,45 +283,5 @@
     "title": "TreeSelect",
     "url": "/components/tree-select/",
     "id": "components-tree-select-index"
-  },
-  {
-    "title": "navigateRegions",
-    "url": "/components/higher-order/navigate-regions/",
-    "id": "components-higher-order-navigate-regions-index"
-  },
-  {
-    "title": "withConstrainedTabbing",
-    "url": "/components/higher-order/with-constrained-tabbing/",
-    "id": "components-higher-order-with-constrained-tabbing-index"
-  },
-  {
-    "title": "withFallbackStyles",
-    "url": "/components/higher-order/with-fallback-styles/",
-    "id": "components-higher-order-with-fallback-styles-index"
-  },
-  {
-    "title": "withFilters",
-    "url": "/components/higher-order/with-filters/",
-    "id": "components-higher-order-with-filters-index"
-  },
-  {
-    "title": "withFocusOutside",
-    "url": "/components/higher-order/with-focus-outside/",
-    "id": "components-higher-order-with-focus-outside-index"
-  },
-  {
-    "title": "withFocusReturn",
-    "url": "/components/higher-order/with-focus-return/",
-    "id": "components-higher-order-with-focus-return-index"
-  },
-  {
-    "title": "withNotices",
-    "url": "/components/higher-order/with-notices/",
-    "id": "components-higher-order-with-notices-index"
-  },
-  {
-    "title": "withSpokenMessages",
-    "url": "/components/higher-order/with-spoken-messages/",
-    "id": "components-higher-order-with-spoken-messages-index"
   }
 ]

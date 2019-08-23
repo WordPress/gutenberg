@@ -1,0 +1,16 @@
+{
+  "name": "@wordpress/components",
+  "version": "8.0.0",
+  "description": "UI components for WordPress.",
+  "homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/components/README.md",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/WordPress/gutenberg.git",
+    "directory": "packages/components"
+  },
+  "bugs": {
+    "url": "https://github.com/WordPress/gutenberg/issues"
+  },
+  "license": "GPL-2.0-or-later",
+  "author": "The WordPress Contributors"
+}

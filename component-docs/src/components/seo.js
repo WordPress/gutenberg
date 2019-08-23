@@ -9,10 +9,12 @@ import { Helmet } from 'react-helmet';
  */
 import { useRouter } from '../utils/hooks';
 
+const TITLE = 'WordPress Components';
+
 function getPageTitle( path, title ) {
-	let nextTitle = 'Muriel';
+	let nextTitle = TITLE;
 	if ( title && path !== '/' ) {
-		nextTitle = `${ title } | Muriel`;
+		nextTitle = `${ title } | ${ TITLE }`;
 	}
 
 	return nextTitle;

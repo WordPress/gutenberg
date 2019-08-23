@@ -8,6 +8,8 @@ import styled from 'styled-components';
 /**
  * Internal dependencies
  */
+import GithubLink from './github-link';
+import Version from './version';
 import { getColor } from '../../utils/color';
 
 export default function Menu() {
@@ -15,7 +17,15 @@ export default function Menu() {
 		<NavUI>
 			<NavListUI>
 				<li>
-					<NavLink to="/components/">Components</NavLink>
+					<NavLink to="/components/">Documentation</NavLink>
+				</li>
+			</NavListUI>
+			<NavListUI>
+				<li>
+					<Version />
+				</li>
+				<li>
+					<GithubLink />
 				</li>
 			</NavListUI>
 		</NavUI>
@@ -45,6 +55,7 @@ const NavUI = styled.nav`
 `;
 
 const NavListUI = styled.ul`
+	align-items: center;
 	display: flex;
 	list-style: none;
 	padding: 0;

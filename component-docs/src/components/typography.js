@@ -22,7 +22,7 @@ const Typography = styled.div`
 		h1 {
 			font-size: 3.5em;
 			font-weight: normal;
-			max-width: calc( 100% - 30px );
+			max-width: calc(100% - 30px);
 		}
 
 		h1 + p {
@@ -43,7 +43,7 @@ const Typography = styled.div`
 		h4,
 		h5,
 		h6 {
-			margin-top: 3em;
+			margin-top: 2em;
 		}
 
 		h1 + h2 {
