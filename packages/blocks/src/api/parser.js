@@ -457,6 +457,9 @@ export function createBlockWithFallback( blockNode ) {
 	// Coerce inner blocks from parsed form to canonical form.
 	innerBlocks = innerBlocks.map( createBlockWithFallback );
 
+	// Remove `undefined` innerBlocks.
+	innerBlocks = innerBlocks.filter( ( innerBlock ) => innerBlock );
+
 	const isFallbackBlock = (
 		name === freeformContentFallbackBlock ||
 		name === unregisteredFallbackBlock
