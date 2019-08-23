@@ -40,15 +40,7 @@ Live component examples can be rendered from the `README.md` files by wrapping e
 
 ```
 <!-- wp:docs/sandbox { "name": "button" } -->
-/`/`/`jsx
-import { Button } from "@wordpress/components";
-
-const Example = () => (
-	<Button isDefault>
-		Click me!
-	</Button>
-)
-/`/`/`
+...
 <!-- /wp:docs/sandbox -->
 ```
 
