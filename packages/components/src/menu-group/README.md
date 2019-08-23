@@ -16,7 +16,7 @@
 
 ### Usage
 
-A `MenuGroup` should be used to indicate that two or more individual MenuItems are related. When other menu items exist above or below a `MenuGroup`, the group should have a divider line between it and the adjacent item. A `MenuGroup` can optionally include a label to describe its contents. 
+A `MenuGroup` should be used to indicate that two or more individual MenuItems are related. When other menu items exist above or below a `MenuGroup`, the group should have a divider line between it and the adjacent item. A `MenuGroup` can optionally include a label to describe its contents.
 
 ![MenuGroup diagram with label and dividers](https://wordpress.org/gutenberg/files/2019/03/MenuGroup-Anatomy.png)
 
@@ -27,16 +27,19 @@ A `MenuGroup` should be used to indicate that two or more individual MenuItems a
 
 ### Usage
 
+<!-- wp:docs/sandbox { "name": "menu-grpoup" } -->
 ```jsx
 import { MenuGroup, MenuItem } from '@wordpress/components';
 
-const MyMenuGroup = () => (
+const Example = () => (
 	<MenuGroup label="Settings">
 		<MenuItem>Setting 1</MenuItem>
 		<MenuItem>Setting 2</MenuItem>
 	</MenuGroup>
 );
 ```
+<!-- /wp:docs/sandbox -->
+
 
 ## Related Components
 

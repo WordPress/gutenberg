@@ -2,10 +2,12 @@
 
 ## Usage
 
+<!-- wp:docs/sandbox { "name": "color-indicator" } -->
 ```jsx
 import { ColorIndicator } from '@wordpress/components';
 
-const MyColorIndicator = () => (
+const Example = () => (
 	<ColorIndicator colorValue="#f00" />
 );
 ```
+<!-- /wp:docs/sandbox -->

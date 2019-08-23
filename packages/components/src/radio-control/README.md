@@ -56,11 +56,12 @@ Designs with a radio button selected by default make a strong suggestion to the 
 
 Render a user interface to select the user type using radio inputs.
 
+<!-- wp:docs/sandbox { "name": "radio-control" } -->
 ```jsx
 import { RadioControl } from '@wordpress/components';
 import { withState } from '@wordpress/compose';
 
-const MyRadioControl = withState( {
+const Example = withState( {
 	option: 'a',
 } )( ( { option, setState } ) => (
 	<RadioControl
@@ -75,6 +76,8 @@ const MyRadioControl = withState( {
 	/>
 ) );
 ```
+<!-- /wp:docs/sandbox -->
+
 
 ### Props
 

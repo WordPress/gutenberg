@@ -2,13 +2,14 @@
 
 ## Usage
 
+<!-- wp:docs/sandbox { "name": "clipboard-button" } -->
 ```jsx
 import { ClipboardButton } from '@wordpress/components';
 import { withState } from '@wordpress/compose';
 
-const MyClipboardButton = withState( {
+const Example = withState( {
 	hasCopied: false,
-} )( ( { hasCopied, setState } ) => ( 
+} )( ( { hasCopied, setState } ) => (
 	<ClipboardButton
 		isPrimary
 		text="Text to be copied."
@@ -19,3 +20,4 @@ const MyClipboardButton = withState( {
 	</ClipboardButton>
 ) );
 ```
+<!-- /wp:docs/sandbox -->

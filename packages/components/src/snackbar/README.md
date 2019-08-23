@@ -19,7 +19,9 @@ A Snackbar displays a succinct message that is cleared out after a small delay. 
 To display a plain snackbar, pass the message as a `children` prop:
 
 ```jsx
-const MySnackbarNotice = () => (
+import { Snackbar } from '@wordpress/components';
+
+const Example = () => (
 	<Snackbar>
 		Post published successfully.
 	</Snackbar>
@@ -29,9 +31,11 @@ const MySnackbarNotice = () => (
 For more complex markup, you can pass any JSX element:
 
 ```jsx
-const MySnackbarNotice = () => (
+import { Snackbar } from '@wordpress/components';
+
+const Example = () => (
 	<Snackbar>
-		<p>An error occurred: <code>{ errorDetails }</code>.</p>
+		<p>An error occurred: <code>Error</code>.</p>
 	</Snackbar>
 );
 ```

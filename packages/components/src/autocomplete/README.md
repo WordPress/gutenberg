@@ -132,7 +132,7 @@ const MyAutocomplete = () => {
 			),
 		}
 	];
-		
+
 	return (
 		<div>
 			<Autocomplete completers={ autocompleters }>

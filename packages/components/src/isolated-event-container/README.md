@@ -14,10 +14,14 @@ The current isolated events are:
 
 Creates a custom component that won't propagate `mousedown` events outside of the component.
 
+<!-- wp:docs/sandbox { "name": "isolated-event-container" } -->
+
 ```jsx
 import { IsolatedEventContainer } from '@wordpress/components';
 
-const MyModal = () => {
+const Example = () => {
+	const clickHandler = (event) => console.log(event);
+
 	return (
 		<IsolatedEventContainer
 			className="component-some_component"
@@ -28,6 +32,8 @@ const MyModal = () => {
 	);
 };
 ```
+<!-- /wp:docs/sandbox -->
+
 
 ## Props
 

@@ -53,19 +53,21 @@ The `value` property is handled in a manner similar to controlled form component
 
 ## Usage
 
+<!-- wp:docs/sandbox { "name": "form-token-field" } -->
 ```jsx
 import { FormTokenField } from '@wordpress/components';
 import { withState } from '@wordpress/compose';
 
-const MyFormTokenField = withState( {
+const Example = withState( {
 	tokens: [],
 	suggestions: [ 'Africa', 'America', 'Antarctica', 'Asia', 'Europe', 'Oceania' ],
-} )( ( { tokens, suggestions, setState } ) => ( 
-	<FormTokenField 
-		value={ tokens } 
-		suggestions={ suggestions } 
+} )( ( { tokens, suggestions, setState } ) => (
+	<FormTokenField
+		value={ tokens }
+		suggestions={ suggestions }
 		onChange={ tokens => setState( { tokens } ) }
 		placeholder="Type a continent"
 	/>
 ) );
 ```
+<!-- /wp:docs/sandbox -->

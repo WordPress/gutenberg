@@ -54,11 +54,13 @@ If only a few child checkboxes are checked, the parent checkbox becomes a mixed 
 ### Usage
 
 Render an is author checkbox:
+
+<!-- wp:docs/sandbox { "name": "checkbox-control" } -->
 ```jsx
 import { CheckboxControl } from '@wordpress/components';
 import { withState } from '@wordpress/compose';
 
-const MyCheckboxControl = withState( {
+const Example = withState( {
 	isChecked: true,
 } )( ( { isChecked, setState } ) => (
 	<CheckboxControl
@@ -70,6 +72,7 @@ const MyCheckboxControl = withState( {
 	/>
 ) );
 ```
+<!-- /wp:docs/sandbox -->
 
 ### Props
 

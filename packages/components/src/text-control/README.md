@@ -35,19 +35,19 @@ TextControls should:
 3. Input text
 
 #### Label text
-Label text is used to inform users as to what information is requested for a text field. Every text field should have a label. Label text should be above the input field, and always visible. 
+Label text is used to inform users as to what information is requested for a text field. Every text field should have a label. Label text should be above the input field, and always visible.
 
 #### Containers
 Containers improve the discoverability of text fields by creating contrast between the text field and surrounding content.
 
 ![A TextControl with a stroke around the container to clearly indicate the input area](https://make.wordpress.org/design/files/2019/03/TextControl-Do.png)
 
-**Do** 
+**Do**
 A stroke around the container clearly indicates that users can input information.
 
 ![A TextControl without a clear visual marker to indicate the input area](https://make.wordpress.org/design/files/2019/03/TextControl-Dont.png)
 
-**Don’t** 
+**Don’t**
 Don’t use unclear visual markers to indicate a text field.
 
 ## Development guidelines
@@ -56,18 +56,22 @@ Don’t use unclear visual markers to indicate a text field.
 
 Render a user interface to input the name of an additional css class.
 
-    import { TextControl } from '@wordpress/components';
-    import { withState } from '@wordpress/compose';
-    
-    const MyTextControl = withState( {
-        className: '',
-    } )( ( { className, setState } ) => ( 
-        <TextControl
-            label="Additional CSS Class"
-            value={ className }
-            onChange={ ( className ) => setState( { className } ) }
-        />
-    ) );
+<!-- wp:docs/sandbox { "name": "text-control" } -->
+```jsx
+import { TextControl } from '@wordpress/components';
+import { withState } from '@wordpress/compose';
+
+const Example = withState( {
+	className: '',
+} )( ( { className, setState } ) => (
+	<TextControl
+		label="Additional CSS Class"
+		value={ className }
+		onChange={ ( className ) => setState( { className } ) }
+	/>
+) );
+```
+<!-- /wp:docs/sandbox -->
 
 ### Props
 

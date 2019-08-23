@@ -1,16 +1,18 @@
 # Placeholder
 
 ## Usage
+<!-- wp:docs/sandbox { "name": "placeholder" } -->
 ```jsx
 import { Placeholder } from '@wordpress/components';
 
-const MyPlaceholder = () => (
+const Example = () => (
 	<Placeholder
 		icon="wordpress-alt"
 		label="Placeholder"
 	/>
 );
 ```
+<!-- /wp:docs/sandbox -->
 
 ### Props
 

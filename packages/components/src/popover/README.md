@@ -7,11 +7,12 @@ Popover is a React component to render a floating content modal. It is similar i
 
 Render a Popover within the parent to which it should anchor:
 
+<!-- wp:docs/sandbox { "name": "popover" } -->
 ```jsx
 import { Button, Popover } from '@wordpress/components';
 import { withState } from '@wordpress/compose';
 
-const MyPopover = withState( {
+const Example = withState( {
 	isVisible: false,
 } )( ( { isVisible, setState } ) => {
 	const toggleVisible = () => {
@@ -29,6 +30,7 @@ const MyPopover = withState( {
 	);
 } );
 ```
+<!-- /wp:docs/sandbox -->
 
 If a Popover is returned by your component, it will be shown. To hide the popover, simply omit it from your component's render value.
 

@@ -1,13 +1,14 @@
 # Animate
 
-Simple interface to introduce animations to components. 
+Simple interface to introduce animations to components.
 
 ## Usage
 
+<!-- wp:docs/sandbox { "name": "animate" } -->
 ```jsx
-import { Animate } from '@wordpress/components';
+import { Animate, Notice } from '@wordpress/components';
 
-const MyAnimatedNotice = () => (
+const Example = () => (
 	<Animate todo="Add missing props">
 		{ ( { className } ) => (
 			<Notice className={ className } status="success">
@@ -17,6 +18,7 @@ const MyAnimatedNotice = () => (
 	</Animate>
 );
 ```
+<!-- /wp:docs/sandbox -->
 
 ## Props
 
@@ -30,7 +32,7 @@ Name | Type | Default | Description
 
 ### appear
 
-This animation is meant for popover/modal content, such as menus appearing. It shows the height and width of the animated element scaling from 0 to full size, from its point of origin. 
+This animation is meant for popover/modal content, such as menus appearing. It shows the height and width of the animated element scaling from 0 to full size, from its point of origin.
 
 #### Options
 

@@ -77,23 +77,31 @@ Don't apply any colors other than those for Warnings, Success, or Errors.
 
 To display a plain notice, pass `Notice` a string:
 
+<!-- wp:docs/sandbox { "name": "notice" } -->
 ```jsx
-const MyNotice = () => (
+import { Notice } from "@wordpress/components";
+
+const Example = () => (
 	<Notice status="error">
 		An unknown error occurred.
 	</Notice>
 );
 ```
+<!-- /wp:docs/sandbox -->
 
 For more complex markup, you can pass any JSX element:
 
+<!-- wp:docs/sandbox { "name": "notice-component" } -->
 ```jsx
-const MyNotice = () => (
+import { Notice } from "@wordpress/components";
+
+const Example = () => (
 	<Notice status="error">
-		<p>An error occurred: <code>{ errorDetails }</code>.</p>
+		<p>An error occurred: <code>Error</code>.</p>
 	</Notice>
 );
 ```
+<!-- /wp:docs/sandbox -->
 
 #### Props
 

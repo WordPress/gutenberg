@@ -2,10 +2,11 @@
 
 ## Usage
 
+<!-- wp:docs/sandbox { "name": "form-file-upload" } -->
 ```jsx
 import { FormFileUpload } from '@wordpress/components';
 
-const MyFormFileUpload = () => (
+const Example = () => (
 	<FormFileUpload
 		accept="image/*"
 		onChange={ () => console.log('new image') }
@@ -14,6 +15,7 @@ const MyFormFileUpload = () => (
 	</FormFileUpload>
 );
 ```
+<!-- /wp:docs/sandbox -->
 
 ## Props
 

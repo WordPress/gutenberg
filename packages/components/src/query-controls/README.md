@@ -2,15 +2,16 @@
 
 ## Usage
 
+<!-- wp:docs/sandbox { "name": "query-controls" } -->
 ```jsx
 import { QueryControls } from '@wordpress/components';
 import { withState } from '@wordpress/compose';
 
-const MyQueryControls = withState( {
+const Example = withState( {
 	orderBy: 'title',
 	order: 'asc',
 	category: 1,
-	categories: [ 
+	categories: [
 		{
 			id: 1,
 			name: 'Category 1',
@@ -40,3 +41,4 @@ const MyQueryControls = withState( {
 	/>
 ) );
 ```
+<!-- /wp:docs/sandbox -->

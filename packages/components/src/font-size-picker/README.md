@@ -5,14 +5,13 @@ The component renders a series of buttons that allow the user to select predefin
 
 ## Usage
 
-
+<!-- wp:docs/sandbox { "name": "font-size-picker" } -->
 ```jsx
 import { FontSizePicker } from '@wordpress/components';
 import { withState } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 
-...
-const MyFontSizePicker = withState( {
+const Example = withState( {
 	fontSize: 16,
 } )( ( { fontSize, setState } ) => {
 	const fontSizes = [
@@ -40,11 +39,8 @@ const MyFontSizePicker = withState( {
 		/>
 	);
 } );
-
-...
-
-<MyFontSizePicker />
 ```
+<!-- /wp:docs/sandbox -->
 
 ## Props
 

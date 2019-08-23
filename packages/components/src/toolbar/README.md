@@ -41,13 +41,14 @@ Toolbars that cannot be selected can either be given a disabled state, or be hid
 
 ### Usage
 
+<!-- wp:docs/sandbox { "name": "toolbar" } -->
 ```jsx
 import { Toolbar } from '@wordpress/components';
 import { withState } from '@wordpress/compose';
 
-const MyToolbar = withState( {
+const Example = withState( {
 	activeControl: 'up',
-} )( ( { activeControl, setState } ) => { 
+} )( ( { activeControl, setState } ) => {
 	function createThumbsControl( thumbs ) {
 		return {
 			icon: `thumbs-${ thumbs }`,
@@ -56,9 +57,10 @@ const MyToolbar = withState( {
 			onClick: () => setState( { activeControl: thumbs } ),
 		};
 	}
-	
+
 	return (
 		<Toolbar controls={ [ 'up', 'down' ].map( createThumbsControl ) } />
 	);
 } );
 ```
+<!-- /wp:docs/sandbox -->

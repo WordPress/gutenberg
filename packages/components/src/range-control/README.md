@@ -90,11 +90,12 @@ RangeControls should provide the full range of choices available for the user to
 
 Render a RangeControl to make a selection from a range of incremental values.
 
+<!-- wp:docs/sandbox { "name": "range-control" } -->
 ```jsx
 import { RangeControl } from '@wordpress/components';
 import { withState } from '@wordpress/compose';
 
-const MyRangeControl = withState( {
+const Example = withState( {
         columns: 2,
 } )( ( { columns, setState } ) => (
     <RangeControl
@@ -106,6 +107,7 @@ const MyRangeControl = withState( {
     />
 ) );
 ```
+<!-- /wp:docs/sandbox -->
 
 ### Props
 

@@ -118,11 +118,12 @@ The modal is used to create an accessible modal over an application.
 
 The following example shows you how to properly implement a modal. For the modal to properly work it's important you implement the close logic for the modal properly.
 
+<!-- wp:docs/sandbox { "name": "modal" } -->
 ```jsx
 import { Button, Modal } from '@wordpress/components';
 import { withState } from '@wordpress/compose';
 
-const MyModal = withState( {
+const Example = withState( {
 	isOpen: false,
 } )( ( { isOpen, setState } ) => (
 	<div>
@@ -139,6 +140,8 @@ const MyModal = withState( {
 	</div>
 ) );
 ```
+<!-- /wp:docs/sandbox -->
+
 
 ### Props
 

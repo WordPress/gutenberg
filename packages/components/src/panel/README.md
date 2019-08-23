@@ -57,10 +57,11 @@ The `Panel` creates a container with a header that can take collapsible `PanelBo
 
 ### Usage
 
+<!-- wp:docs/sandbox { "name": "panel" } -->
 ```jsx
 import { Panel, PanelBody, PanelRow } from '@wordpress/components';
- 
-const MyPanel = () => (
+
+const Example = () => (
 	<Panel header="My Panel">
 		<PanelBody
 			title="My Block Settings"
@@ -74,6 +75,7 @@ const MyPanel = () => (
 	</Panel>
 );
 ```
+<!-- /wp:docs/sandbox -->
 
 ### Sub-Components
 
@@ -98,7 +100,7 @@ Title of the `Panel`. Text will be rendered inside an `<h2>` tag.
 ---
 #### PanelBody
 
-The `PanelBody` creates a collapsible container that can be toggled open or closed. 
+The `PanelBody` creates a collapsible container that can be toggled open or closed.
 
 ##### Props
 

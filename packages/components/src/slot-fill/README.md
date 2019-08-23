@@ -14,10 +14,11 @@ Any Fill will automatically occupy this Slot space, even if rendered elsewhere i
 
 You can either use the Fill component directly, or a wrapper component type as in the below example to abstract the slot name from consumer awareness.
 
+<!-- wp:docs/sandbox { "name": "slot-fill" } -->
 ```jsx
 import { SlotFillProvider, Slot, Fill, Panel, PanelBody } from '@wordpress/components';
 
-const MySlotFillProvider = () => {
+const Example = () => {
 	const MyPanelSlot = () => (
 		<Panel header="Panel with slot">
 			<PanelBody>
@@ -25,7 +26,7 @@ const MySlotFillProvider = () => {
 			</PanelBody>
 		</Panel>
 	);
-	
+
 	MyPanelSlot.Content = () => (
 		<Fill name="MyPanelSlot">
 			Panel body
@@ -40,6 +41,7 @@ const MySlotFillProvider = () => {
 	);
 };
 ```
+<!-- /wp:docs/sandbox -->
 
 There is also `createSlotFill` helper method which was created to simplify the process of matching the corresponding `Slot` and `Fill` components:
 
@@ -56,7 +58,7 @@ const Toolbar = () => (
 	<div className="toolbar">
 		<Slot />
 	</div>
-); 
+);
 ```
 
 ## Props
@@ -83,7 +85,7 @@ const Toolbar = ( { isMobile } ) => (
 				return isMobile && fills.length > 3 ?
 					<div className="toolbar__mobile-long">{ fills }</div> :
 					fills;
-			} }	
+			} }
 		</Slot>
 	</div>
 );

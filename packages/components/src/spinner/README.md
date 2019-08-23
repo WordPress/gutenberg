@@ -2,10 +2,12 @@
 
 ## Usage
 
+<!-- wp:docs/sandbox { "name": "spinner" } -->
 ```jsx
 import { Spinner } from '@wordpress/components';
 
-const MySpinner = () => (
+const Example = () => (
 	<Spinner />
 );
 ```
+<!-- /wp:docs/sandbox -->

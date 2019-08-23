@@ -2,10 +2,11 @@
 
 ## Usage
 
+<!-- wp:docs/sandbox { "name": "dashicon" } -->
 ```jsx
 import { Dashicon } from '@wordpress/components';
 
-const MyDashicon = () => (
+const Example = () => (
 	<div>
 		<Dashicon icon="admin-home" />
 		<Dashicon icon="products" />
@@ -13,3 +14,4 @@ const MyDashicon = () => (
 	</div>
 );
 ```
+<!-- /wp:docs/sandbox -->

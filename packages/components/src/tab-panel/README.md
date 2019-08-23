@@ -1,8 +1,8 @@
 # TabPanel
 
-TabPanel is a React component to render an ARIA-compliant TabPanel. 
+TabPanel is a React component to render an ARIA-compliant TabPanel.
 
-TabPanels organize content across different screens, data sets, and interactions. It has two sections: a list of tabs, and the view to show when tabs are chosen. 
+TabPanels organize content across different screens, data sets, and interactions. It has two sections: a list of tabs, and the view to show when tabs are chosen.
 
 ![The “Document” tab selected in the sidebar TabPanel.](https://wordpress.org/gutenberg/files/2019/01/s_E36D9C9B8FFA15A1A8CE224E422535A12B016F88884089575F9998E52016A49F_1541785098230_TabPanel.png)
 
@@ -18,7 +18,7 @@ TabPanels organize content across different screens, data sets, and interactions
 TabPanels organize and allow navigation between groups of content that are related and at the same level of hierarchy.
 
 #### Tabs in a set
-As a set, all tabs are unified by a shared topic. For clarity, each tab should contain content that is distinct from all the other tabs in a set. 
+As a set, all tabs are unified by a shared topic. For clarity, each tab should contain content that is distinct from all the other tabs in a set.
 
 ### Anatomy
 
@@ -54,6 +54,7 @@ Place tabs above content. Tabs control the UI region displayed below them.
 
 ### Usage
 
+<!-- wp:docs/sandbox { "name": "tab-panel" } -->
 ```jsx
 import { TabPanel } from '@wordpress/components';
 
@@ -61,7 +62,7 @@ const onSelect = ( tabName ) => {
 	console.log( 'Selecting tab', tabName );
 };
 
-const MyTabPanel = () => (
+const Example = () => (
 	<TabPanel className="my-tab-panel"
 		activeClass="active-tab"
 		onSelect={ onSelect }
@@ -83,6 +84,7 @@ const MyTabPanel = () => (
 	</TabPanel>
 );
 ```
+<!-- /wp:docs/sandbox -->
 
 ### Props
 

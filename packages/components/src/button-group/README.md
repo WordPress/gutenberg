@@ -46,16 +46,18 @@ Button groups that cannot be selected can either be given a disabled state, or b
 
 ### Usage
 
+<!-- wp:docs/sandbox { "name": "button-group" } -->
 ```jsx
 import { Button, ButtonGroup } from '@wordpress/components';
 
-const MyButtonGroup = () => (
+const Example = () => (
 	<ButtonGroup>
 		<Button isPrimary>Button 1</Button>
 		<Button isPrimary>Button 2</Button>
 	</ButtonGroup>
 );
 ```
+<!-- /wp:docs/sandbox -->
 
 ## Related components
 

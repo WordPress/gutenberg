@@ -81,40 +81,56 @@ Use sentences in your menu.
 
 Render a user interface to select the size of an image.
 
-    import { SelectControl } from '@wordpress/components';
-    import { withState } from '@wordpress/compose';
+<!-- wp:docs/sandbox { "name": "select-control" } -->
+```jsx
+import { SelectControl } from '@wordpress/components';
+import { withState } from '@wordpress/compose';
 
-    const MySelectControl = withState( {
-        size: '50%',
-    } )( ( { size, setState } ) => (
-        <SelectControl
-            label="Size"
-            value={ size }
-            options={ [
-                { label: 'Big', value: '100%' },
-                { label: 'Medium', value: '50%' },
-                { label: 'Small', value: '25%' },
-            ] }
-            onChange={ ( size ) => { setState( { size } ) } }
-        />
-    ) );
+const Example = withState( {
+	size: '50%',
+} )( ( { size, setState } ) => (
+	<SelectControl
+		label="Size"
+		value={ size }
+		options={ [
+			{ label: 'Big', value: '100%' },
+			{ label: 'Medium', value: '50%' },
+			{ label: 'Small', value: '25%' },
+		] }
+		onChange={ ( size ) => { setState( { size } ) } }
+	/>
+) );
+```
+<!-- /wp:docs/sandbox -->
+
 
 Render a user interface to select multiple users from a list.
 
-        <SelectControl
-            multiple
-            label={ __( 'Select some users:' ) }
-            value={ this.state.users } // e.g: value = [ 'a', 'c' ]
-            onChange={ ( users ) => { this.setState( { users } ) } }
-            options={ [
-                { value: 'a', label: 'User A' },
-                { value: 'b', label: 'User B' },
-                { value: 'c', label: 'User c' },
-            ] }
-        />
+<!-- wp:docs/sandbox { "name": "select-control-multiple" } -->
+```jsx
+import { SelectControl } from '@wordpress/components';
+import { withState } from '@wordpress/compose';
+
+const Example = withState( {
+	users: [],
+} )( ( { users, setState } ) => (
+	<SelectControl
+		multiple
+		label="Select some users:"
+		value={ users } // e.g: value = [ 'a', 'c' ]
+		onChange={ ( users ) => { setState( { users } ) } }
+		options={ [
+			{ value: 'a', label: 'User A' },
+			{ value: 'b', label: 'User B' },
+			{ value: 'c', label: 'User c' },
+		] }
+	/>
+) );
+```
+<!-- /wp:docs/sandbox -->
+
 
 ### Props
-
 
 - The set of props accepted by the component will be specified below.
 - Props not included in this set will be applied to the select element.

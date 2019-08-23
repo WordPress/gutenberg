@@ -5,11 +5,13 @@ Accessible color picker.
 _Parts of the source code were derived and modified from [react-color](https://github.com/casesandberg/react-color/), released under the MIT license._
 
 ## Usage
+
+<!-- wp:docs/sandbox { "name": "color-picker" } -->
 ```jsx
 import { ColorPicker } from '@wordpress/components';
 import { withState } from '@wordpress/compose';
 
-const MyColorPicker = withState( {
+const Example = withState( {
 	color: '#f00',
 } )( ( { color, setState } ) => {
 	return (
@@ -21,3 +23,4 @@ const MyColorPicker = withState( {
 	);
 } );
 ```
+<!-- /wp:docs/sandbox -->

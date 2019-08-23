@@ -8,10 +8,11 @@ Accessibility note: the tooltip text is hidden from screen readers and assistive
 
 Render a Tooltip, passing as a child the element to which it should anchor:
 
+<!-- wp:docs/sandbox { "name": "tooltip" } -->
 ```jsx
 import { Tooltip, Button } from '@wordpress/components';
 
-const MyTooltip = () => (
+const Example = () => (
 	<Tooltip text="More information">
 		<Button isDefault>
 			Hover for more information
@@ -19,6 +20,7 @@ const MyTooltip = () => (
 	</Tooltip>
 );
 ```
+<!-- /wp:docs/sandbox -->
 
 ## Props
 

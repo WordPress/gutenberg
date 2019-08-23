@@ -7,7 +7,7 @@ Icon buttons tell users what actions they can take and give them a way to intera
 
 ![IconButton component](https://wordpress.org/gutenberg/files/2018/12/s_1D98B71431B26D39301DAD9ADD4189EA9DDF0B98AC93C77E7DE58172FFC06323_1541793686578_IconButton.png)
 
-![Toolbar component composed of attached IconButtons](https://wordpress.org/gutenberg/files/2018/12/s_1D98B71431B26D39301DAD9ADD4189EA9DDF0B98AC93C77E7DE58172FFC06323_1541793628237_Toolbar.png) 
+![Toolbar component composed of attached IconButtons](https://wordpress.org/gutenberg/files/2018/12/s_1D98B71431B26D39301DAD9ADD4189EA9DDF0B98AC93C77E7DE58172FFC06323_1541793628237_Toolbar.png)
 
 ## Table of contents
 
@@ -34,16 +34,18 @@ Icon buttons have low emphasis. They don’t stand out much on the page, so they
 
 ##  Usage
 
+<!-- wp:docs/sandbox { "name": "icon-button" } -->
 ```jsx
 import { IconButton } from '@wordpress/components';
 
-const MyIconButton = () => (
+const Example = () => (
 	<IconButton
 		icon="ellipsis"
 		label="More"
 	/>
 );
 ```
+<!-- /wp:docs/sandbox -->
 
 # Related components
 

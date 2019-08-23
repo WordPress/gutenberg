@@ -6,16 +6,19 @@
 
 Use as you would a standard `iframe`. You may pass `onFocus` directly as the callback to be invoked when the iframe receives focus, or on an ancestor component since the event will bubble.
 
+<!-- wp:docs/sandbox { "name": "focusable-frame" } -->
 ```jsx
 import { FocusableIframe } from '@wordpress/components';
 
-const MyFocusableIframe = () => (
+const Example = () => (
 	<FocusableIframe
-		src="/my-iframe-url"
+		src="/"
 		onFocus={ () => console.log( 'iframe is focused' ) }
 	/>
 );
 ```
+<!-- /wp:docs/sandbox -->
+
 
 ## Props
 

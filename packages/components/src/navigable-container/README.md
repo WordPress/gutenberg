@@ -45,6 +45,7 @@ A `TabbableContainer` will only be navigated using the `tab` key. Every intended
 
 ### Usage
 
+<!-- wp:docs/sandbox { "name": "navigable-container" } -->
 ```jsx
 import { NavigableMenu, TabbableContainer, Button } from '@wordpress/components';
 
@@ -52,7 +53,7 @@ function onNavigate( index, target ) {
 	console.log( `Navigates to ${ index }`, target );
 }
 
-const MyNavigableContainer = () => (
+const Example = () => (
 	<div>
 		<span>Navigable Menu:</span>
 		<NavigableMenu onNavigate={ onNavigate } orientation="horizontal">
@@ -60,7 +61,7 @@ const MyNavigableContainer = () => (
 			<Button isDefault>Item 2</Button>
 			<Button isDefault>Item 3</Button>
 		</NavigableMenu>
-		
+
 		<span>Tabbable Container:</span>
 		<TabbableContainer onNavigate={ onNavigate }>
 			<Button isDefault tabIndex="0">Section 1</Button>
@@ -71,3 +72,4 @@ const MyNavigableContainer = () => (
 	</div>
 );
 ```
+<!-- /wp:docs/sandbox -->

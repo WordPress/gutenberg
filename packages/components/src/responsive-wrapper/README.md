@@ -2,10 +2,11 @@
 
 ## Usage
 
+<!-- wp:docs/sandbox { "name": "responsive-wrapper" } -->
 ```jsx
 import { ResponsiveWrapper } from '@wordpress/components';
 
-const MyResponsiveWrapper = () => (
+const Example = () => (
 	<ResponsiveWrapper
 		naturalWidth={ 2000 }
 		naturalHeight={ 680 }
@@ -14,3 +15,4 @@ const MyResponsiveWrapper = () => (
 	</ResponsiveWrapper>
 );
 ```
+<!-- /wp:docs/sandbox -->

@@ -8,10 +8,11 @@ Most options are passed directly through to [re-resizable](https://github.com/bo
 
 The example below shows how you might use `ResizableBox` to set a width and height inside a block's `edit` component.
 
+<!-- wp:docs/sandbox { "name": "resizable-box" } -->
 ```jsx
 import { ResizableBox } from '@wordpress/components';
 
-const Edit = ( props ) => {
+const Example = ( props ) => {
 	const {
 		attributes: {
 			height,
@@ -52,4 +53,13 @@ const Edit = ( props ) => {
 		/>
 	);
 }
+
+Example.defaultProps = {
+	attributes: {
+		height: 200,
+		width: 200,
+	}
+}
 ```
+<!-- /wp:docs/sandbox -->
+

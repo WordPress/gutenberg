@@ -6,12 +6,13 @@ DateTimePicker is a React component to render a calendar and clock for selecting
 
 Render a DateTimePicker.
 
+<!-- wp:docs/sandbox { "name": "date-time-picker" } -->
 ```jsx
 import { DateTimePicker } from '@wordpress/components';
 import { __experimentalGetSettings } from '@wordpress/date';
 import { withState } from '@wordpress/compose';
 
-const MyDateTimePicker = withState( {
+const Example = withState( {
 	date: new Date(),
 } )( ( { date, setState } ) => {
 	const settings = __experimentalGetSettings();
@@ -34,6 +35,7 @@ const MyDateTimePicker = withState( {
 	);
 } );
 ```
+<!-- /wp:docs/sandbox -->
 
 ## Props
 

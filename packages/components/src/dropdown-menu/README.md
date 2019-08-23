@@ -1,6 +1,6 @@
 # DropdownMenu
 
-The DropdownMenu displays a list of actions (each contained in a MenuItem, MenuItemsChoice, or MenuGroup) in a compact way. It appears in a Popover after the user has interacted with an element (a button or icon) or when they perform a specific action. 
+The DropdownMenu displays a list of actions (each contained in a MenuItem, MenuItemsChoice, or MenuGroup) in a compact way. It appears in a Popover after the user has interacted with an element (a button or icon) or when they perform a specific action.
 
 ![An expanded DropdownMenu, containing a list of MenuItems.](https://wordpress.org/gutenberg/files/2019/01/DropdownMenuExample.png)
 
@@ -58,10 +58,11 @@ DropdownMenu is a React component to render an expandable menu of buttons. It is
 
 Render a Dropdown Menu with a set of controls:
 
+<!-- wp:docs/sandbox { "name": "dropdown-menu" } -->
 ```jsx
 import { DropdownMenu } from '@wordpress/components';
 
-const MyDropdownMenu = () => (
+const Example = () => (
 	<DropdownMenu
 		icon="move"
 		label="Select a direction"
@@ -90,6 +91,7 @@ const MyDropdownMenu = () => (
 	/>
 );
 ```
+<!-- /wp:docs/sandbox -->
 
 Alternatively, specify a `children` function which returns elements valid for use in a DropdownMenu: `MenuItem`, `MenuItemsChoice`, or `MenuGroup`.
 

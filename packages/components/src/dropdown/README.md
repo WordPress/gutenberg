@@ -6,11 +6,11 @@ and uses render props to render the button and the content.
 
 ## Usage
 
-
+<!-- wp:docs/sandbox { "name": "dropdown" } -->
 ```jsx
 import { Button, Dropdown } from '@wordpress/components';
 
-const MyDropdown = () => (
+const Example = () => (
 	<Dropdown
 		className="my-container-class-name"
 		contentClassName="my-popover-content-classname"
@@ -28,6 +28,7 @@ const MyDropdown = () => (
 	/>
 );
 ```
+<!-- /wp:docs/sandbox -->
 
 ## Props
 
@@ -90,21 +91,21 @@ Opt-in prop to show popovers fullscreen on mobile, pass `false` in this prop to 
 
  - Type: `String`
  - Required: No
- 
+
  ### focusOnMount
- 
+
  By default, the *first tabblable element* in the popover will receive focus when it mounts. This is the same as setting `focusOnMount` to `"firstElement"`. If you want to focus the container instead, you can set `focusOnMount` to `"container"`.
- 
+
  Set this prop to `false` to disable focus changing entirely. This should only be set when an appropriately accessible substitute behavior exists.
- 
+
  - Type: `String` or `Boolean`
  - Required: No
  - Default: `"firstElement"`
 
  ### popoverProps
- 
+
 Properties of popoverProps object will be passed as props to the `Popover` component.
-Use this o object to access properties/feature if the `Popover` component that are not already exposed in the `Dropdown`component, e.g.: the hability to have the popover without an arrow. 
- 
+Use this o object to access properties/feature if the `Popover` component that are not already exposed in the `Dropdown`component, e.g.: the hability to have the popover without an arrow.
+
  - Type: `Object`
  - Required: No

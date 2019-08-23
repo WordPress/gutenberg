@@ -4,11 +4,12 @@ MenuItem is a component which renders a button intended to be used in combinatio
 
 ## Usage
 
+<!-- wp:docs/sandbox { "name": "menu-item" } -->
 ```jsx
 import { MenuItem } from '@wordpress/components';
 import { withState } from '@wordpress/compose';
 
-const MyMenuItem = withState( {
+const Example = withState( {
 	isActive: true,
 } )( ( { isActive, setState } ) => (
 	<MenuItem
@@ -20,6 +21,7 @@ const MyMenuItem = withState( {
 	</MenuItem>
 ) );
 ```
+<!-- /wp:docs/sandbox -->
 
 ## Props
 

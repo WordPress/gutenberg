@@ -6,10 +6,12 @@ BaseControl component is used to generate labels and help text for components ha
 ## Usage
 
 Render a BaseControl for a textarea input:
+
+<!-- wp:docs/sandbox { "name": "base-control" } -->
 ```jsx
 import { BaseControl } from '@wordpress/components';
 
-const MyBaseControl = () => (
+const Example = () => (
 	<BaseControl
 		id="textarea-1"
 		label="Text"
@@ -21,6 +23,7 @@ const MyBaseControl = () => (
 	</BaseControl>
 );
 ```
+<!-- /wp:docs/sandbox -->
 
 ## Props
 
@@ -77,10 +80,12 @@ It should only be used in cases where the children being rendered inside BaseCon
 
 
 ## Usage
-```jsx
-import { BaseControl } from '@wordpress/components';
 
-const MyBaseControl = () => (
+<!-- wp:docs/sandbox { "name": "base-control" } -->
+```jsx
+import { BaseControl, Button } from '@wordpress/components';
+
+const Example = () => (
 	<BaseControl
 		help="Pressing the Select an author buttom will open a modal that allows an advanced mechanism for author selection"
 	>
@@ -93,6 +98,7 @@ const MyBaseControl = () => (
 	</BaseControl>
 );
 ```
+<!-- /wp:docs/sandbox -->
 
 ### Props
 

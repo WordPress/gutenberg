@@ -7,30 +7,34 @@ Corresponding CSS: `background-position: 50% 10%;`
 
 ## Usage
 
+<!-- wp:docs/sandbox { "name": "focal-point-picker" } -->
 ```jsx
 import { FocalPointPicker } from '@wordpress/components';
 
-const MyFocalPointPicker = withState( {
+const Example = withState( {
 	focalPoint: {
 		x: 0.5,
 		y: 0.5
 	},
-} )( ( { focalPoint, setState } ) => { 
-	const url = '/path/to/image';
+} )( ( { focalPoint, setState } ) => {
+	const url = 'https://s1.wp.com/wp-content/themes/h4/landing/marketing/pages/create/blog/media/v1-headline-image-1-2x.jpg';
 	const dimensions = {
 		width: 400,
 		height: 100
 	};
-	return ( 
-		<FocalPointPicker 
+	return (
+		<FocalPointPicker
 			url={ url }
 			dimensions={ dimensions }
 			value={ focalPoint }
-			onChange={ ( focalPoint ) => setState( { focalPoint } ) } 
+			onChange={ ( focalPoint ) => setState( { focalPoint } ) }
 		/>
-	) 
+	)
 } );
+```
+<!-- /wp:docs/sandbox -->
 
+```jsx
 /* Example function to render the CSS styles based on Focal Point Picker value */
 const renderImageContainerWithFocalPoint = ( url, focalPoint ) => {
 	const style = {
@@ -65,4 +69,4 @@ const renderImageContainerWithFocalPoint = ( url, focalPoint ) => {
 
 - Type: `Function`
 - Required: Yes
-- Description: Callback which is called when the focal point changes. 
+- Description: Callback which is called when the focal point changes.

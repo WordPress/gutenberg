@@ -76,19 +76,23 @@ When text input isn’t accepted, an error message can display instructions on h
 
 ### Usage
 
-    import { TextareaControl } from '@wordpress/components';
-    import { withState } from '@wordpress/compose';
+<!-- wp:docs/sandbox { "name": "textarea-control" } -->
+```jsx
+import { TextareaControl } from '@wordpress/components';
+import { withState } from '@wordpress/compose';
 
-    const MyTextareaControl = withState( {
-        text: '',
-    } )( ( { text, setState } ) => (
-        <TextareaControl
-            label="Text"
-            help="Enter some text"
-            value={ text }
-            onChange={ ( text ) => setState( { text } ) }
-        />
-    ) );
+const Example = withState( {
+	text: '',
+} )( ( { text, setState } ) => (
+	<TextareaControl
+		label="Text"
+		help="Enter some text"
+		value={ text }
+		onChange={ ( text ) => setState( { text } ) }
+	/>
+) );
+```
+<!-- /wp:docs/sandbox -->
 
 
 ### Props

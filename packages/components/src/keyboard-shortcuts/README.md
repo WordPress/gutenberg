@@ -10,17 +10,18 @@ It uses the [Mousetrap](https://craig.is/killing/mice) library to implement keyb
 
 Render `<KeyboardShortcuts />` with a `shortcuts` prop object:
 
+<!-- wp:docs/sandbox { "name": "keyboard-shortcuts" } -->
 ```jsx
 import { KeyboardShortcuts } from '@wordpress/components';
 import { withState } from '@wordpress/compose';
 
-const MyKeyboardShortcuts = withState( {
+const Example = withState( {
 	isAllSelected: false,
-} )( ( { isAllSelected, setState } ) => { 
+} )( ( { isAllSelected, setState } ) => {
 	const selectAll = () => {
 		setState( { isAllSelected: true } )
 	};
-	
+
 	return (
 		<div>
 			<KeyboardShortcuts shortcuts={ {
@@ -28,9 +29,10 @@ const MyKeyboardShortcuts = withState( {
 			} } />
 			[cmd/ctrl + A] Combination pressed? { isAllSelected ? 'Yes' : 'No' }
 		</div>
-	) 
+	)
 } )
 ```
+<!-- /wp:docs/sandbox -->
 
 ## Props
 
