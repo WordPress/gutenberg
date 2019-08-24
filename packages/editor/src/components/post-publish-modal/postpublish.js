@@ -51,7 +51,7 @@ class PostPublishModalPostpublish extends Component {
 					{
 						sprintf(
 							/* translators: %s: post type singular name */
-							__( 'Great Work! You\'ve just published your first %s. You can review it here to check for any mistakes, or start on a new %s.' ), postLabel.toLowerCase(), postLabel.toLowerCase()
+							__( 'Great Work! You\'ve just published your first %s. You can review it here to check for any mistakes, or start on a new %s.' ), postLabel, postLabel
 						)
 					}
 				</p>

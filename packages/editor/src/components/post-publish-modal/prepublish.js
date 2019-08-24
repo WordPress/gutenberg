@@ -33,7 +33,7 @@ function PostPublishModalPrepublish( {
 	} else {
 		prePublishBodyText = sprintf(
 			/* translators: %s: post type singular name */
-			__( 'Double-check your settings, then publish your %s.' ), postLabel.toLowerCase()
+			__( 'Double-check your settings, then publish your %s.' ), postLabel
 		);
 	}
 
