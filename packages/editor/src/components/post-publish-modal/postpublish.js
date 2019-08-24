@@ -13,11 +13,6 @@ import { Component, createRef } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 import { safeDecodeURIComponent } from '@wordpress/url';
 
-/**
- * Internal dependencies
- */
-// import PostScheduleLabel from '../post-schedule/label';
-
 class PostPublishModalPostpublish extends Component {
 	constructor() {
 		super( ...arguments );
@@ -25,15 +20,8 @@ class PostPublishModalPostpublish extends Component {
 			showCopyConfirmation: false,
 		};
 		this.onCopy = this.onCopy.bind( this );
-		this.onSelectInput = this.onSelectInput.bind( this );
 		this.postLink = createRef();
 	}
-
-	// componentDidMount() {
-	// 	if ( this.props.focusOnMount ) {
-	// 		this.postLink.current.focus();
-	// 	}
-	// }
 
 	componentWillUnmount() {
 		clearTimeout( this.dismissCopyConfirmation );
@@ -50,10 +38,6 @@ class PostPublishModalPostpublish extends Component {
 				showCopyConfirmation: false,
 			} );
 		}, 4000 );
-	}
-
-	onSelectInput( event ) {
-		event.target.select();
 	}
 
 	render() {

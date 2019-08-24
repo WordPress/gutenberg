@@ -32,14 +32,6 @@ export class PostPublishModal extends Component {
 		this.onSubmit = this.onSubmit.bind( this );
 	}
 
-	componentDidUpdate( prevProps ) {
-		// Automatically collapse the publish sidebar when a post
-		// is published and the user makes an edit.
-		if ( prevProps.isPublished && ! this.props.isSaving && this.props.isDirty ) {
-			this.props.onClose();
-		}
-	}
-
 	onSubmit() {
 		const { onClose, hasPublishAction, isPostTypeViewable } = this.props;
 		if ( ! hasPublishAction || ! isPostTypeViewable ) {

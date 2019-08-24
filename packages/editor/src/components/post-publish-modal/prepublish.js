@@ -7,8 +7,6 @@ import { get, find } from 'lodash';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-// import { PanelBody } from '@wordpress/components';
-
 import { withSelect } from '@wordpress/data';
 
 /**
@@ -17,10 +15,6 @@ import { withSelect } from '@wordpress/data';
 import PostVisibilityLabel from '../post-visibility/label';
 import PostScheduleLabel from '../post-schedule/label';
 import { visibilityOptions } from '../post-visibility/utils';
-// import PostVisibility from '../post-visibility';
-// import PostSchedule from '../post-schedule';
-// import MaybeTagsPanel from './maybe-tags-panel';
-// import MaybePostFormatPanel from './maybe-post-format-panel';
 
 function PostPublishModalPrepublish( {
 	hasPublishAction,
