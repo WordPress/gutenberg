@@ -22,10 +22,7 @@ import {
 	withFilters,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import {
-	Component,
-	Fragment,
-} from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 
@@ -229,7 +226,7 @@ export class MediaPlaceholder extends Component {
 		const { disableDropZone, onHTMLDrop = noop } = this.props;
 
 		if ( disableDropZone ) {
-			return <Fragment />;
+			return null;
 		}
 
 		return (

@@ -76,8 +76,7 @@ If true, the Drop Zone will not be rendered. Users won't be able to drag & drop 
 ### dropZoneUIOnly
 
 If true, only the Drop Zone will be rendered. No UI controls to upload the media will be shown.
-This prop will take precedence over `disableDropZone`.
-It means, if both the props are supplied with `true` value, the component will still render the Drop Zone.
+The `disableDropZone` prop still takes precedence over `dropZoneUIOnly` – specifying both as true will result in nothing to be rendered.
 
 - Type: `Boolean`
 - Required: No
