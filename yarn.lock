@@ -10112,9 +10112,9 @@ react-native-crypto@^2.0.1:
     pbkdf2 "3.0.8"
     public-encrypt "^4.0.0"
 
-"react-native-dark-mode@git+https://github.com/wordpress-mobile/react-native-dark-mode.git#fecbaffa81afdbb7ea6fa365b6a5aafab4554765":
+"react-native-dark-mode@git+https://github.com/wordpress-mobile/react-native-dark-mode.git#f09bf1480e7b34536413ab3300f29e4375edb2c6":
   version "0.0.10"
-  resolved "git+https://github.com/wordpress-mobile/react-native-dark-mode.git#fecbaffa81afdbb7ea6fa365b6a5aafab4554765"
+  resolved "git+https://github.com/wordpress-mobile/react-native-dark-mode.git#f09bf1480e7b34536413ab3300f29e4375edb2c6"
   dependencies:
     "@types/events" "^3.0.0"
     "@types/react" "^16.8.19"
