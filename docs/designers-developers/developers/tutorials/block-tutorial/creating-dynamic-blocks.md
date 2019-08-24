@@ -201,4 +201,4 @@ registerBlockType( 'gutenberg-examples/example-05-dynamic', {
 ```
 {% end %}
 
-Note that this code uses the `wp.components` utility but not `wp.data`. Make sure to update the `wp-data` dependency to `wp-compononents` in the PHP code.
+Note that this code uses the `wp.components` utility but not `wp.data`. Make sure to update the `wp-data` dependency to `wp-components` in the PHP code.
