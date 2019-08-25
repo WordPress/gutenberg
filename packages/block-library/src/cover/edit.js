@@ -109,7 +109,7 @@ class CoverEdit extends Component {
 			hasParallax,
 			id,
 			url,
-			height = COVER_MIN_HEIGHT,
+			minHeight = COVER_MIN_HEIGHT,
 		} = attributes;
 		const onSelectMedia = ( media ) => {
 			if ( ! media || ! media.url ) {
@@ -162,7 +162,7 @@ class CoverEdit extends Component {
 					{}
 			),
 			backgroundColor: overlayColor.color,
-			height,
+			minHeight,
 		};
 
 		if ( focalPoint ) {
@@ -218,17 +218,17 @@ class CoverEdit extends Component {
 									id={ inputId }
 									onChange={ ( event ) => {
 										let coverHeight = parseInt( event.target.value, 10 );
-										setAttributes( { height: coverHeight } );
+										setAttributes( { minHeight: coverHeight } );
 										if ( isNaN( coverHeight ) ) {
-											// Set cover height to default size and input box to empty string
-											setAttributes( { height: '' } );
+											// Set cover min height to default size and input box to empty string
+											setAttributes( { minHeight: '' } );
 											coverHeight = COVER_MIN_HEIGHT;
 										} else if ( coverHeight < COVER_MIN_HEIGHT ) {
-											// Set cover height to minimum size
+											// Set cover min height to minimum size
 											coverHeight = COVER_MIN_HEIGHT;
 										}
 									} }
-									value={ height }
+									value={ minHeight }
 									min={ COVER_MIN_HEIGHT }
 									step="10"
 								/>
@@ -302,7 +302,7 @@ class CoverEdit extends Component {
 						{ 'is-selected': isSelected },
 					) }
 					size={ {
-						height,
+						height: minHeight,
 					} }
 					minHeight={ COVER_MIN_HEIGHT }
 					enable={ {
@@ -316,9 +316,9 @@ class CoverEdit extends Component {
 						topLeft: false,
 					} }
 					onResizeStop={ ( event, direction, elt, delta ) => {
-						const coverHeight = parseInt( height, 10 ) + parseInt( delta.height, 10 );
+						const coverHeight = parseInt( minHeight, 10 ) + parseInt( delta.height, 10 );
 						setAttributes( {
-							height: coverHeight,
+							minHeight: coverHeight,
 						} );
 					} }
 				>

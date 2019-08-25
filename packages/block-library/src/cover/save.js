@@ -30,7 +30,7 @@ export default function save( { attributes } ) {
 		hasParallax,
 		overlayColor,
 		url,
-		height,
+		minHeight,
 	} = attributes;
 	const overlayColorClass = getColorClassName( 'background-color', overlayColor );
 	const style = backgroundType === IMAGE_BACKGROUND_TYPE ?
@@ -42,9 +42,8 @@ export default function save( { attributes } ) {
 	if ( focalPoint && ! hasParallax ) {
 		style.backgroundPosition = `${ focalPoint.x * 100 }% ${ focalPoint.y * 100 }%`;
 	}
-	if ( backgroundType === IMAGE_BACKGROUND_TYPE && height ) {
-		style.height = height;
-	}
+	style.minHeight = minHeight || undefined;
+
 	const classes = classnames(
 		dimRatioToClass( dimRatio ),
 		overlayColorClass,

@@ -29,7 +29,7 @@
 		"focalPoint": {
 			"type": "object"
 		},
-		"height": {
+		"minHeight": {
 			"type": "number"
 		}
 	}
