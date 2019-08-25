@@ -42,6 +42,7 @@ import {
 	IMAGE_BACKGROUND_TYPE,
 	VIDEO_BACKGROUND_TYPE,
 	COVER_MIN_HEIGHT,
+	COVER_DEFAULT_HEIGHT,
 	backgroundImageStyles,
 	dimRatioToClass,
 } from './shared';
@@ -109,7 +110,7 @@ class CoverEdit extends Component {
 			hasParallax,
 			id,
 			url,
-			minHeight = COVER_MIN_HEIGHT,
+			minHeight = COVER_DEFAULT_HEIGHT,
 		} = attributes;
 		const onSelectMedia = ( media ) => {
 			if ( ! media || ! media.url ) {
@@ -217,18 +218,19 @@ class CoverEdit extends Component {
 									type="number"
 									id={ inputId }
 									onChange={ ( event ) => {
-										let coverHeight = parseInt( event.target.value, 10 );
-										setAttributes( { minHeight: coverHeight } );
-										if ( isNaN( coverHeight ) ) {
+										let coverMinHeight = parseInt( event.target.value, 10 );
+										this.setState( { coverMinHeight } );
+										if ( isNaN( coverMinHeight ) ) {
 											// Set cover min height to default size and input box to empty string
-											setAttributes( { minHeight: '' } );
-											coverHeight = COVER_MIN_HEIGHT;
-										} else if ( coverHeight < COVER_MIN_HEIGHT ) {
+											this.setState( { coverMinHeight: COVER_DEFAULT_HEIGHT } );
+											coverMinHeight = COVER_DEFAULT_HEIGHT;
+										} else if ( coverMinHeight < COVER_MIN_HEIGHT ) {
 											// Set cover min height to minimum size
-											coverHeight = COVER_MIN_HEIGHT;
+											coverMinHeight = COVER_MIN_HEIGHT;
 										}
+										setAttributes( { minHeight: coverMinHeight } );
 									} }
-									value={ minHeight }
+									value={ this.state.coverMinHeight || minHeight }
 									min={ COVER_MIN_HEIGHT }
 									step="10"
 								/>
@@ -316,7 +318,8 @@ class CoverEdit extends Component {
 						topLeft: false,
 					} }
 					onResizeStop={ ( event, direction, elt, delta ) => {
-						const coverHeight = parseInt( minHeight, 10 ) + parseInt( delta.height, 10 );
+						const coverHeight = parseInt( minHeight + delta.height, 10 );
+						this.setState( { coverMinHeight: coverHeight } );
 						setAttributes( {
 							minHeight: coverHeight,
 						} );
