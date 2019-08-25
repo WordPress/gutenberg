@@ -8,7 +8,7 @@
 	white-space: nowrap;
 
 	&.is-saving {
-		animation: edit-post__loading-fade-animation 0.5s infinite;
+		animation: loading-fade-animation 0.5s infinite;
 	}
 
 	.dashicon {

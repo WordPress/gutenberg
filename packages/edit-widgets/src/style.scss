@@ -54,9 +54,9 @@ body.gutenberg_page_gutenberg-widgets {
  */
 
 // These keyframes should not be part of the _animations.scss mixins file.
-// Because keyframe animations can't be defined as mixins properly, they are duplicated.
-// Since hey are intended only for the editor, we add them here instead.
-@keyframes edit-post__loading-fade-animation {
+// That file is loaded in every stylesheet, which would create many duplicated declarations of these keyframes.
+// Instead, we're declaring them separately here.
+@keyframes loading-fade-animation {
 	0% {
 		opacity: 0.5;
 	}
@@ -68,7 +68,7 @@ body.gutenberg_page_gutenberg-widgets {
 	}
 }
 
-@keyframes edit-post__fade-in-animation {
+@keyframes fade-in-animation {
 	from {
 		opacity: 0;
 	}
