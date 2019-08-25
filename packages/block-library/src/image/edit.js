@@ -575,7 +575,6 @@ export class ImageEdit extends Component {
 			className,
 			maxWidth,
 			noticeUI,
-			toggleSelection,
 			isRTL,
 		} = this.props;
 		const {
@@ -892,15 +891,11 @@ export class ImageEdit extends Component {
 											bottom: true,
 											left: showLeftHandle,
 										} }
-										onResizeStart={ () => {
-											toggleSelection( false );
-										} }
 										onResizeStop={ ( event, direction, elt, delta ) => {
 											setAttributes( {
 												width: parseInt( currentWidth + delta.width, 10 ),
 												height: parseInt( currentHeight + delta.height, 10 ),
 											} );
-											toggleSelection( true );
 										} }
 									>
 										{ img }
