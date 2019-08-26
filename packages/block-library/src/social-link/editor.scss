@@ -1,4 +1,13 @@
+
+// default do not display incomplete
+// unless parent or child selected
 .wp-social-link__is-incomplete {
+	display: none;
+}
+
+.has-child-selected .wp-social-link__is-incomplete,
+.is-selected .wp-social-link__is-incomplete {
+	display: block;
 	opacity: 0.6;
 
 	[data-type*="core/social-link-"].is-selected &, // Matches the selected social logo block.
