@@ -4,7 +4,10 @@
 import { eventEmitter, initialMode } from 'react-native-dark-mode';
 import React from 'react';
 
-eventEmitter.setMaxListeners( 150 );
+// This was failing on CI
+if ( eventEmitter.setMaxListeners ) {
+	eventEmitter.setMaxListeners( 150 );
+}
 
 export function useStyle( light, dark, theme ) {
 	const finalDark = {
