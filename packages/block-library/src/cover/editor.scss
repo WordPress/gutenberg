@@ -1,5 +1,7 @@
 .wp-block-cover-image,
 .wp-block-cover {
+	min-height: auto;
+
 	&.components-placeholder h2 {
 		color: inherit;
 	}
