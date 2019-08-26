@@ -17,7 +17,7 @@ const {
 const {
 	buildWordPress,
 	downloadWordPressZip,
-	mergeYamlConfigs,
+	mergeYAMLConfigs,
 } = require( './env' );
 const {
 	fromConfigRoot,
@@ -45,6 +45,6 @@ module.exports = {
 	hasPackageProp,
 	hasProjectFile,
 	downloadWordPressZip,
-	mergeYamlConfigs,
+	mergeYAMLConfigs,
 	spawnScript,
 };

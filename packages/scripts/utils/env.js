@@ -28,7 +28,7 @@ const { tmpdir } = require( 'os' );
  * @param {string} baseDir        The base directory of the plugin, volumes in this directory belong to the plugin.
  * @return {Object} The merged config object.
  */
-function mergeYamlConfigs( originalConfig, newConfig, baseDir ) {
+function mergeYAMLConfigs( originalConfig, newConfig, baseDir ) {
 	// Loop through each element of newConfig, and test what should be done with them.
 	Object.keys( newConfig ).forEach( ( key ) => {
 		if ( ! originalConfig[ key ] ) {
@@ -48,7 +48,7 @@ function mergeYamlConfigs( originalConfig, newConfig, baseDir ) {
 			originalConfig[ key ] = [ ...cleanOriginal, ...newConfig[ key ] ];
 		} else if ( isPlainObject( newConfig[ key ] ) ) {
 			// If the newConfig element is an object, we need to recursively merge it.
-			originalConfig[ key ] = mergeYamlConfigs( originalConfig[ key ], newConfig[ key ], baseDir );
+			originalConfig[ key ] = mergeYAMLConfigs( originalConfig[ key ], newConfig[ key ], baseDir );
 		} else {
 			// Any other data types are overwritten by the newConfig.
 			originalConfig[ key ] = newConfig[ key ];
@@ -158,5 +158,5 @@ function buildWordPress( newInstall = true ) {
 module.exports = {
 	buildWordPress,
 	downloadWordPressZip,
-	mergeYamlConfigs,
+	mergeYAMLConfigs,
 };

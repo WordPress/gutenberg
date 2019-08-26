@@ -16,7 +16,7 @@ const { execSync } = require( 'child_process' );
  */
 const {
 	fromConfigRoot,
-	mergeYamlConfigs,
+	mergeYAMLConfigs,
 } = require( '../../utils' );
 
 const composeFile = normalize( `${ env.WP_DEVELOP_DIR }/docker-compose.override.yml` );
@@ -67,7 +67,7 @@ stdout.write( 'Updating docker-compose.override.yml...\n' );
 
 compose.version = coreCompose.version;
 
-const mergedCompose = mergeYamlConfigs( compose, pluginCompose, pluginMountDir );
+const mergedCompose = mergeYAMLConfigs( compose, pluginCompose, pluginMountDir );
 
 writeFileSync( composeFile, yaml.safeDump( mergedCompose, { lineWidth: -1 } ) );
 
