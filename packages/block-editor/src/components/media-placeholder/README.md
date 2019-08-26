@@ -22,7 +22,9 @@ const { MediaPlaceholder } = wp.editor;
 			allowedTypes = { [ 'image' ] }
 			multiple = { false }
 			labels = { { title: 'The Image' } }
-		/>;
+		>
+			"extra content"
+		</MediaPlaceholder>;
 		...
 	}
 ```
@@ -117,13 +119,6 @@ The call back receives an array with the new files. Each element of the collecti
 Media ID (or media IDs if multiple is true) to be selected by default when opening the media library.
 
 - Type: `Number|Array`
-- Required: No
-
-### append
-
-Components to render below the formfields, this property is passed to the placeholder component as `append`.
-
-- Type: `String|ReactElement`
 - Required: No
 
 

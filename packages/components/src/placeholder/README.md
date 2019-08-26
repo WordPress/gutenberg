@@ -20,4 +20,3 @@ Name | Type | Default | Description
 `label` | `string` | `undefined` | Renders a label for the placeholder.
 `instructions` | `string` | `undefined` | Renders instruction text below label.
 `isColumnLayout` | `bool` | `false` | Changes placeholder children layout from flex-row to flex-column.
-`append` | `string, ReactElement` | `undefined` | If provided, renders extra components after the placeholders.
