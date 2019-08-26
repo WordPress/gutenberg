@@ -40,10 +40,20 @@
 		}
 	}
 
+	.wp-block-cover__placeholder-color-palette {
+		// wraps about 6 color swatches
+		max-width: 290px;
+		margin-top: 1em;
+	}
+
 	// Apply max-width to floated items that have no intrinsic width
 	[data-align="left"] &,
 	[data-align="right"] & {
 		max-width: $content-width / 2;
 		width: 100%;
 	}
+}
+
+.block-library-cover__reset-button {
+	margin-left: auto;
 }
