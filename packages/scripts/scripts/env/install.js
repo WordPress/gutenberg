@@ -16,7 +16,7 @@ const { normalize } = require( 'path' );
 const { createWriteStream, existsSync } = require( 'fs' );
 const { tmpdir } = require( 'os' );
 
-env.WP_DEVELOP_DIR = cwd() + '/wordpress';
+env.WP_DEVELOP_DIR = normalize( cwd() + '/wordpress' );
 
 if ( existsSync( normalize( cwd() + '/wordpress/wp-config-sample.php' ) ) ) {
 	stdout.write( 'It looks like WordPress is already installed, please delete the `wordpress` directory for a fresh install, or run `npm run env start` to start the existing environment.\n' );
@@ -40,7 +40,7 @@ if ( commandExistsSync( 'git' ) ) {
 		stdout.write( 'Extracting...\n' );
 
 		unzipper.extract( {
-			path: normalize( env.WP_DEVELOP_DIR ),
+			path: env.WP_DEVELOP_DIR,
 			strip: 1,
 			filter: ( file ) => file.type !== 'Directory',
 		} );
@@ -55,14 +55,14 @@ if ( commandExistsSync( 'git' ) ) {
  * Runs the appropriate build/install commands in the WordPress directory.
  */
 function buildWordPress() {
-	execSync( 'npm install', { cwd: normalize( env.WP_DEVELOP_DIR ), stdio: 'inherit' } );
-	execSync( 'npm run env:start', { cwd: normalize( env.WP_DEVELOP_DIR ), stdio: 'inherit' } );
+	execSync( 'npm install', { cwd: env.WP_DEVELOP_DIR, stdio: 'inherit' } );
+	execSync( 'npm run env:start', { cwd: env.WP_DEVELOP_DIR, stdio: 'inherit' } );
 	if ( env.LOCAL_DIR === 'build' ) {
-		execSync( 'npm run build', { cwd: normalize( env.WP_DEVELOP_DIR ), stdio: 'inherit' } );
+		execSync( 'npm run build', { cwd: env.WP_DEVELOP_DIR, stdio: 'inherit' } );
 	} else {
-		execSync( 'npm run build:dev', { cwd: normalize( env.WP_DEVELOP_DIR ), stdio: 'inherit' } );
+		execSync( 'npm run build:dev', { cwd: env.WP_DEVELOP_DIR, stdio: 'inherit' } );
 	}
-	execSync( 'npm run env:install', { cwd: normalize( env.WP_DEVELOP_DIR ), stdio: 'inherit' } );
+	execSync( 'npm run env:install', { cwd: env.WP_DEVELOP_DIR, stdio: 'inherit' } );
 
 	// Mount the plugin into the WordPress install.
 	execSync( 'npm run env connect', { stdio: 'inherit' } );

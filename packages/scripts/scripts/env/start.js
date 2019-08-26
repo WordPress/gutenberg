@@ -27,4 +27,4 @@ if ( env.MANAGED_WP ) {
 }
 
 // Start the environment in the WordPress directory.
-execSync( 'npm run env:start', { cwd: normalize( env.WP_DEVELOP_DIR ), stdio: 'inherit' } );
+execSync( 'npm run env:start', { cwd: env.WP_DEVELOP_DIR, stdio: 'inherit' } );

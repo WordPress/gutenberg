@@ -14,10 +14,10 @@ const { normalize } = require( 'path' );
 const { createWriteStream } = require( 'fs' );
 const { tmpdir } = require( 'os' );
 
-env.WP_DEVELOP_DIR = cwd() + '/wordpress';
+env.WP_DEVELOP_DIR = normalize( cwd() + '/wordpress' );
 
 if ( commandExistsSync( 'git' ) ) {
-	execSync( 'git pull', { cwd: normalize( env.WP_DEVELOP_DIR ), stdio: 'inherit' } );
+	execSync( 'git pull', { cwd: env.WP_DEVELOP_DIR, stdio: 'inherit' } );
 	buildWordPress();
 } else {
 	stdout.write( "Git isn't available. Switching to downloading a zip version.\n" );
@@ -33,7 +33,7 @@ if ( commandExistsSync( 'git' ) ) {
 		stdout.write( 'Extracting...\n' );
 
 		unzipper.extract( {
-			path: normalize( env.WP_DEVELOP_DIR ),
+			path: env.WP_DEVELOP_DIR,
 			strip: 1,
 			filter: ( file ) => file.type !== 'Directory',
 		} );
@@ -48,12 +48,12 @@ if ( commandExistsSync( 'git' ) ) {
  * Runs the appropriate build/install commands in the WordPress directory.
  */
 function buildWordPress() {
-	execSync( 'npm install', { cwd: normalize( env.WP_DEVELOP_DIR ), stdio: 'inherit' } );
-	execSync( 'npm run env:start', { cwd: normalize( env.WP_DEVELOP_DIR ), stdio: 'inherit' } );
+	execSync( 'npm install', { cwd: env.WP_DEVELOP_DIR, stdio: 'inherit' } );
+	execSync( 'npm run env:start', { cwd: env.WP_DEVELOP_DIR, stdio: 'inherit' } );
 	if ( env.LOCAL_DIR === 'build' ) {
-		execSync( 'npm run build', { cwd: normalize( env.WP_DEVELOP_DIR ), stdio: 'inherit' } );
+		execSync( 'npm run build', { cwd: env.WP_DEVELOP_DIR, stdio: 'inherit' } );
 	} else {
-		execSync( 'npm run build:dev', { cwd: normalize( env.WP_DEVELOP_DIR ), stdio: 'inherit' } );
+		execSync( 'npm run build:dev', { cwd: env.WP_DEVELOP_DIR, stdio: 'inherit' } );
 	}
 
 	// Ensure the plugin is still mounted.

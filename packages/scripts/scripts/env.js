@@ -49,7 +49,7 @@ const command = args.shift();
 
 if ( ! env.WP_DEVELOP_DIR && command !== 'install' ) {
 	if ( existsSync( normalize( cwd() + '/wordpress/wp-config-sample.php' ) ) ) {
-		env.WP_DEVELOP_DIR = cwd() + '/wordpress';
+		env.WP_DEVELOP_DIR = normalize( cwd() + '/wordpress' );
 		env.MANAGED_WP = true;
 	} else {
 		stdout.write( chalk.white( 'Please ensure the WP_DEVELOP_DIR environment variable is set to your WordPress Development directory before running this script.\n\n' ) );

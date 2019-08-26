@@ -111,5 +111,5 @@ writeFileSync( composeFile, yaml.safeDump( mergedCompose, { lineWidth: -1 } ) );
 
 stdout.write( 'Restarting the WordPress environment...\n' );
 
-execSync( 'npm run env:stop', { cwd: normalize( env.WP_DEVELOP_DIR ), stdio: 'inherit' } );
-execSync( 'npm run env:start', { cwd: normalize( env.WP_DEVELOP_DIR ), stdio: 'inherit' } );
+execSync( 'npm run env:stop', { cwd: env.WP_DEVELOP_DIR, stdio: 'inherit' } );
+execSync( 'npm run env:start', { cwd: env.WP_DEVELOP_DIR, stdio: 'inherit' } );
