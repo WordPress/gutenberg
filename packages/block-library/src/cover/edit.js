@@ -12,12 +12,14 @@ import {
 	FocalPointPicker,
 	IconButton,
 	PanelBody,
+	PanelRow,
 	RangeControl,
 	ToggleControl,
 	Toolbar,
 	withNotices,
 	ResizableBox,
 	BaseControl,
+	Button,
 } from '@wordpress/components';
 import { compose, withInstanceId } from '@wordpress/compose';
 import {
@@ -30,6 +32,7 @@ import {
 	MediaUploadCheck,
 	PanelColorSettings,
 	withColors,
+	ColorPalette,
 } from '@wordpress/block-editor';
 import { Component, createRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -172,7 +175,7 @@ class CoverEdit extends Component {
 		const controls = (
 			<>
 				<BlockControls>
-					{ !! url && (
+					{ !! ( url || overlayColor.color ) && (
 						<>
 							<MediaUploadCheck>
 								<Toolbar>
@@ -194,9 +197,9 @@ class CoverEdit extends Component {
 						</>
 					) }
 				</BlockControls>
-				{ !! url && (
-					<InspectorControls>
-						<PanelBody title={ __( 'Cover Settings' ) }>
+				<InspectorControls>
+					{ !! url && (
+						<PanelBody title={ __( 'Media Settings' ) }>
 							{ IMAGE_BACKGROUND_TYPE === backgroundType && (
 								<ToggleControl
 									label={ __( 'Fixed Background' ) }
@@ -234,15 +237,36 @@ class CoverEdit extends Component {
 									step="10"
 								/>
 							</BaseControl>
-							<PanelColorSettings
-								title={ __( 'Overlay' ) }
-								initialOpen={ true }
-								colorSettings={ [ {
-									value: overlayColor.color,
-									onChange: setOverlayColor,
-									label: __( 'Overlay Color' ),
-								} ] }
-							>
+							<PanelRow>
+								<Button
+									isDefault
+									isSmall
+									className="block-library-cover__reset-button"
+									onClick={ () => setAttributes( {
+										url: undefined,
+										id: undefined,
+										backgroundType: undefined,
+										dimRatio: undefined,
+										focalPoint: undefined,
+										hasParallax: undefined,
+									} ) }
+								>
+									{ __( 'Clear Media' ) }
+								</Button>
+							</PanelRow>
+						</PanelBody>
+					) }
+					{ ( url || overlayColor.color ) && (
+						<PanelColorSettings
+							title={ __( 'Overlay' ) }
+							initialOpen={ true }
+							colorSettings={ [ {
+								value: overlayColor.color,
+								onChange: setOverlayColor,
+								label: __( 'Overlay Color' ),
+							} ] }
+						>
+							{ !! url && (
 								<RangeControl
 									label={ __( 'Background Opacity' ) }
 									value={ dimRatio }
@@ -252,14 +276,14 @@ class CoverEdit extends Component {
 									step={ 10 }
 									required
 								/>
-							</PanelColorSettings>
-						</PanelBody>
-					</InspectorControls>
-				) }
+							) }
+						</PanelColorSettings>
+					) }
+				</InspectorControls>
 			</>
 		);
 
-		if ( ! url ) {
+		if ( ! ( url || overlayColor.color ) ) {
 			const placeholderIcon = <BlockIcon icon={ icon } />;
 			const label = __( 'Cover' );
 
@@ -278,7 +302,15 @@ class CoverEdit extends Component {
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
 						notices={ noticeUI }
 						onError={ this.onUploadError }
-					/>
+					>
+						<ColorPalette
+							disableCustomColors={ true }
+							value={ overlayColor.color }
+							onChange={ setOverlayColor }
+							clearable={ false }
+							className="wp-block-cover__placeholder-color-palette"
+						/>
+					</MediaPlaceholder>
 				</>
 			);
 		}
