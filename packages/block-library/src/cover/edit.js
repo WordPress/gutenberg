@@ -114,7 +114,6 @@ class CoverEdit extends Component {
 			id,
 			url,
 			minHeight = COVER_DEFAULT_HEIGHT,
-			name,
 		} = attributes;
 		const onSelectMedia = ( media ) => {
 			if ( ! media || ! media.url ) {
@@ -144,7 +143,6 @@ class CoverEdit extends Component {
 			setAttributes( {
 				url: media.url,
 				id: media.id,
-				name: media.filename,
 				backgroundType: mediaType,
 				...( mediaType === VIDEO_BACKGROUND_TYPE ?
 					{ focalPoint: undefined, hasParallax: undefined } :
@@ -240,9 +238,6 @@ class CoverEdit extends Component {
 								/>
 							</BaseControl>
 							<PanelRow>
-								{ VIDEO_BACKGROUND_TYPE === backgroundType && (
-									name
-								) }
 								<Button
 									isDefault
 									isSmall

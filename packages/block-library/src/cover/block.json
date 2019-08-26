@@ -31,9 +31,6 @@
 		},
 		"minHeight": {
 			"type": "number"
-		},
-		"name": {
-			"type": "string"
 		}
 	}
 }
