@@ -2,7 +2,6 @@
  * External dependencies
  */
 const yaml = require( 'js-yaml' );
-const { isPlainObject } = require( 'lodash' );
 
 /**
  * Node dependencies.
@@ -15,7 +14,10 @@ const { execSync } = require( 'child_process' );
 /**
  * Internal dependencies
  */
-const { fromConfigRoot } = require( '../../utils' );
+const {
+	fromConfigRoot,
+	mergeYamlConfigs,
+} = require( '../../utils' );
 
 const composeFile = normalize( `${ env.WP_DEVELOP_DIR }/docker-compose.override.yml` );
 let compose = {};
@@ -65,48 +67,7 @@ stdout.write( 'Updating docker-compose.override.yml...\n' );
 
 compose.version = coreCompose.version;
 
-/**
- * Merges two YAML configs together.
- *
- * All new data from newConfig will be added to originalConfig. When arrays in newConfig look like lists of volume
- * mount instructions, it will attempt to replace items that mount from the same location. This allows the config
- * to be safely updated, and it'll be reflected in the updated config.
- *
- * @param {Object} originalConfig The original config object that we're overwriting.
- * @param {Object} newConfig      A new config object to merge into originalConfig.
- * @return {Object} The merged config object.
- */
-function mergeConfigs( originalConfig, newConfig ) {
-	// Loop through each element of newConfig, and test what should be done with them.
-	Object.keys( newConfig ).forEach( ( key ) => {
-		if ( ! originalConfig[ key ] ) {
-			// If the originalConfig object doesn't have this element, we can just add it.
-			originalConfig[ key ] = newConfig[ key ];
-		} else if ( Array.isArray( newConfig[ key ] ) ) {
-			// If the newConfig element is an array, we need to try and merge them.
-			// This is intended to merge Docker volume configs, which exist in the form:
-			// /path/to/local/dir:/path/to/container/dir:config:stuff
-
-			// Build an array from the original config, with items that belong to this plugin removed.
-			const cleanOriginal = originalConfig[ key ].filter( ( element ) => {
-				return ! element.startsWith( pluginMountDir );
-			} );
-
-			// Append the newConfig to the remaining config.
-			originalConfig[ key ] = [ ...cleanOriginal, ...newConfig[ key ] ];
-		} else if ( isPlainObject( newConfig[ key ] ) ) {
-			// If the newConfig element is an object, we need to recursively merge it.
-			originalConfig[ key ] = mergeConfigs( originalConfig[ key ], newConfig[ key ] );
-		} else {
-			// Any other data types are overwritten by the newConfig.
-			originalConfig[ key ] = newConfig[ key ];
-		}
-	} );
-
-	return originalConfig;
-}
-
-const mergedCompose = mergeConfigs( compose, pluginCompose );
+const mergedCompose = mergeYamlConfigs( compose, pluginCompose, pluginMountDir );
 
 writeFileSync( composeFile, yaml.safeDump( mergedCompose, { lineWidth: -1 } ) );
 
