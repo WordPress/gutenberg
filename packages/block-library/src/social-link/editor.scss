@@ -4,6 +4,13 @@
 	[data-type*="core/social-link-"].is-selected &, // Matches the selected social logo block.
 	&:focus {
 		opacity: 1;
-		@include block-style__focus();
 	}
+}
+
+[data-type*="core/social-link-"].is-selected .wp-social-link, // Matches the selected social logo block.
+.wp-social-link:focus {
+	box-shadow: 0 0 0 1px $white, 0 0 0 3px $blue-medium-500;
+
+	// Windows High Contrast mode will show this outline, but not the box-shadow.
+	outline: 2px solid transparent;
 }

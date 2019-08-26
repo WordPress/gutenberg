@@ -14,7 +14,9 @@ export default function save( { attributes } ) {
 	}
 
 	// TODO: suggestions for fall back icon?
+	// @todo: These classes don't appear to render in the final markup at all.
 	const classes = classNames( 'wp-social-icon' );
+
 	return (
 		<li className={ classes }>
 			<a href={ url }>{ site }</a>

@@ -21,9 +21,13 @@ import { getIconBySite } from './social-list';
 const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
 	const { url, site } = attributes;
 	const [ showURLPopover, setPopover ] = useState( true );
-	const classes = classNames( 'wp-social-link', { 'wp-social-link__is-incomplete': ( url ) ? false : true } );
+	const classes = classNames(
+		'wp-social-link',
+		'wp-social-link-' + site,
+		{ 'wp-social-link__is-incomplete': ( url ) ? false : true },
+	);
 
-	// how to import icon here
+	// Import icon.
 	const IconComponent = getIconBySite( site );
 
 	return (
