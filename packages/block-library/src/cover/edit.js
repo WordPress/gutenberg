@@ -19,7 +19,6 @@ import {
 	withNotices,
 	ResizableBox,
 	BaseControl,
-	ColorPalette,
 	Button,
 } from '@wordpress/components';
 import { compose, withInstanceId } from '@wordpress/compose';
@@ -240,24 +239,6 @@ class CoverEdit extends Component {
 									step="10"
 								/>
 							</BaseControl>
-							{ !! ( url || id ) && (
-								<PanelRow>
-									{ VIDEO_BACKGROUND_TYPE === backgroundType && (
-										name
-									) }
-									<Button
-										isDefault
-										isSmall
-										className="block-library-cover__reset-button"
-										onClick={ () => setAttributes( {
-											url: undefined,
-											id: undefined,
-										} ) }
-									>
-										{ __( 'Clear Background' ) }
-									</Button>
-								</PanelRow>
-							) }
 							<PanelRow>
 								{ VIDEO_BACKGROUND_TYPE === backgroundType && (
 									name
