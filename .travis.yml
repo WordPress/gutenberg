@@ -26,13 +26,13 @@ env:
     - PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: true
     - LOCAL_DIR: build
     - LOCAL_SCRIPT_DEBUG: false
-    - COMPOSER_INSTALL: false
-    - WORDPRESS: true
+    - INSTALL_COMPOSER: false
+    - INSTALL_WORDPRESS: true
 
 before_install:
   - nvm install
   - |
-    if [[ "$WORDPRESS" = "true" ]]; then
+    if [[ "$INSTALL_WORDPRESS" = "true" ]]; then
       # upgrade docker-compose
       sudo rm /usr/local/bin/docker-compose
       curl -L https://github.com/docker/compose/releases/download/1.24.0/docker-compose-`uname -s`-`uname -m` > docker-compose
@@ -44,7 +44,7 @@ install:
   - npm ci
   - npm run build
   - |
-    if [[ "$WORDPRESS" = "true" ]]; then
+    if [[ "$INSTALL_WORDPRESS" = "true" ]]; then
       # Install WordPress
       npm run env install
 
@@ -52,7 +52,7 @@ install:
       chmod 767 wordpress/build/wp-content/uploads
     fi
   - |
-    if [[ "$COMPOSER_INSTALL" = "true" ]]; then
+    if [[ "$INSTALL_COMPOSER" = "true" ]]; then
       npm run env docker-run -- php composer install
     fi
   - |
@@ -64,12 +64,12 @@ install:
 jobs:
   include:
     - name: Lint
-      env: COMPOSER_INSTALL=true
+      env: INSTALL_COMPOSER=true
       script:
         - npm run lint
 
     - name: Build artifacts
-      env: WORDPRESS=false
+      env: INSTALL_WORDPRESS=false
       install:
         # A "full" install is executed, since `npm ci` does not always exit
         # with an error status code if the lock file is inaccurate.
@@ -80,12 +80,12 @@ jobs:
         - npm run check-local-changes
 
     - name: License compatibility
-      env: WORDPRESS=false
+      env: INSTALL_WORDPRESS=false
       script:
         - npm run check-licenses
 
     - name: JavaScript unit tests
-      env: WORDPRESS=false
+      env: INSTALL_WORDPRESS=false
       script:
         # It's not necessary to run the full build, since Jest can interpret
         # source files with `babel-jest`. Some packages have their own custom
@@ -94,7 +94,7 @@ jobs:
         - npm run test-unit -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
 
     - name: JavaScript native mobile tests
-      env: WORDPRESS=false
+      env: INSTALL_WORDPRESS=false
       script:
         # It's not necessary to run the full build, since Jest can interpret
         # source files with `babel-jest`. Some packages have their own custom
@@ -103,12 +103,12 @@ jobs:
         - npm run test-unit:native -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
 
     - name: PHP unit tests
-      env: COMPOSER_INSTALL=true
+      env: INSTALL_COMPOSER=true
       script:
         - npm run test-php && npm run test-unit-php-multisite
 
     - name: PHP unit tests (PHP 5.6)
-      env: COMPOSER_INSTALL=true LOCAL_PHP=5.6-fpm
+      env: INSTALL_COMPOSER=true LOCAL_PHP=5.6-fpm
       script:
         - npm run test-php && npm run test-unit-php-multisite
 
