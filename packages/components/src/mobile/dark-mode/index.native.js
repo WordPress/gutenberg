@@ -24,6 +24,8 @@ export function withTheme( WrappedComponent ) {
 		constructor( props ) {
 			super( props );
 
+			this.onModeChanged = this.onModeChanged.bind( this );
+
 			this.state = {
 				mode: initialMode,
 			};
