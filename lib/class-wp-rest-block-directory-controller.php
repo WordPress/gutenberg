@@ -147,7 +147,7 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 			if ( $wp_filesystem instanceof WP_Filesystem_Base && is_wp_error( $wp_filesystem->errors ) && $wp_filesystem->errors->has_errors() ) {
 				return WP_Error( 'unable_to_connect_to_filesystem', esc_html( $wp_filesystem->errors->get_error_message() ) );
 			}
-			return WP_Error( 'unable_to_connect_to_filesystem', __( 'Unable to connect to the filesystem. Please confirm your credentials.' ) );
+			return WP_Error( 'unable_to_connect_to_filesystem', __( 'Unable to connect to the filesystem. Please confirm your credentials.', 'gutenberg' ) );
 		}
 
 		$install_status = install_plugin_install_status( $api );
@@ -303,7 +303,7 @@ function parse_block_metadata( $plugin ) {
 		$block->assets[] = 'https://plugins.svn.wordpress.org/' . $plugin['slug'] . $asset;
 	}
 
-	$block->humanized_updated = human_time_diff( strtotime( $plugin['last_updated'] ), current_time( 'timestamp' ) ) . __( ' ago' );
+	$block->humanized_updated = human_time_diff( strtotime( $plugin['last_updated'] ), current_time( 'timestamp' ) ) . __( ' ago', 'gutenberg' );
 
 	// TODO: calculate these values.
 	$block->author_average_rating = null;
