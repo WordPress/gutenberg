@@ -4,6 +4,8 @@
 import { eventEmitter, initialMode } from 'react-native-dark-mode';
 import React from 'react';
 
+eventEmitter.setMaxListeners( 150 );
+
 export function useStyle( light, dark, theme ) {
 	const finalDark = {
 		...light,
