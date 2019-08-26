@@ -40,7 +40,7 @@ const BLOCK_ALIGNMENTS_CONTROLS = {
 	},
 };
 
-const DEFAULT_CONTROLS = [ [ 'left', 'center', 'right' ], [ 'wide', 'full', 'fullScreen' ] ];
+const DEFAULT_CONTROLS = [ 'left', 'center', 'right', 'wide', 'full', 'fullScreen' ];
 const DEFAULT_CONTROL = 'center';
 const WIDE_CONTROLS = [ 'wide', 'full', 'fullScreen' ];
 
@@ -62,7 +62,7 @@ export function BlockAlignmentToolbar( {
 	}
 
 	/**
-	 * Given the control name returns a control object.
+	 * returns a control object according on the given control name .
 	 *
 	 * @param {string}  name Control name
 	 * @return {Object} Control object.
@@ -73,17 +73,13 @@ export function BlockAlignmentToolbar( {
 		onClick: applyOrUnset( name ),
 	} );
 
-	const enabledControls = wideControlsEnabled && false ?
+	const enabledControls = wideControlsEnabled ?
 		controls :
 		controls.filter( ( control ) => WIDE_CONTROLS.indexOf( control ) === -1 );
 
 	const activeAlignmentControl = wideControlsEnabled ? BLOCK_ALIGNMENTS_CONTROLS[ value ] : null;
 	const defaultAlignmentControl = BLOCK_ALIGNMENTS_CONTROLS[ DEFAULT_CONTROL ];
 
-	// Map buttons control.
-	// it can get the unidimensional shape: [ 'left', 'center', 'right' ]
-	// or 2-dimensional array if it desires the controls to be grouped:
-	// [ [ 'left', 'center', 'right' ], [ 'wide' ] ]
 	const toolbarControls = enabledControls.map( ( controlNames ) => (
 		Array.isArray( controlNames ) ? controlNames.map( mapButtonControl ) : mapButtonControl( controlNames )
 	) );
