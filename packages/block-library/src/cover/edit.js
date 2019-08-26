@@ -163,7 +163,6 @@ class CoverEdit extends Component {
 					{}
 			),
 			backgroundColor: overlayColor.color,
-			minHeight,
 		};
 
 		if ( focalPoint ) {
