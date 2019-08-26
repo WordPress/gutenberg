@@ -18,6 +18,10 @@ export const settings = {
 	title: __( 'Social links' ),
 	icon: 'share',
 	description: __( 'Create a block of links to your social media or external sites' ),
+	styles: [
+		{ name: 'default', label: __( 'Default' ), isDefault: true },
+		{ name: 'icon-only', label: __( 'Icon Only' ) },
+	],
 	edit,
 	save,
 };

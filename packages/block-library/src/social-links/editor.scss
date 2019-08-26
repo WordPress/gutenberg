@@ -62,3 +62,14 @@
 		background: none;
 	}
 }
+
+// Improve the preview.
+.block-editor-block-switcher__preview {
+	.wp-social-link:disabled {
+		opacity: 1;
+	}
+
+	.is-style-icon-only .wp-social-link:disabled {
+		color: $dark-gray-500;
+	}
+}
