@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-const commandExistsSync = require( 'command-exists' ).sync;
+const { sync: commandExistsSync } = require( 'command-exists' );
 
 /**
  * Node dependencies.
