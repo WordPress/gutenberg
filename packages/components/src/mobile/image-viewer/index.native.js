@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, PanResponder, Dimensions, ImageBackground, Image } from 'react-native';
+import { View, Dimensions, ImageBackground, Image } from 'react-native';
 import Modal from 'react-native-modal';
 
 /**
@@ -72,17 +72,6 @@ class ImageViewer extends Component {
 			url = '',
 		} = this.props;
 
-		const panResponder = PanResponder.create( {
-			onMoveShouldSetPanResponder: ( evt, gestureState ) => {
-				// Activates swipe down over child Touchables if the swipe is long enough.
-				// With this we can adjust sensibility on the swipe vs tap gestures.
-				if ( gestureState.dy > 3 ) {
-					gestureState.dy = 0;
-					return true;
-				}
-			},
-		} );
-
 		return (
 			<Modal
 				isVisible={ isVisible }
@@ -90,7 +79,7 @@ class ImageViewer extends Component {
 				animationIn={ 'fadeIn' }
 				animationInTiming={ 1000 }
 				animationOut={ 'fadeOut' }
-				animationOutTiming={ 1 }
+				animationOutTiming={ 250 }
 				backdropTransitionInTiming={ 50 }
 				backdropTransitionOutTiming={ 50 }
 				backdropOpacity={ 1 }
@@ -99,8 +88,6 @@ class ImageViewer extends Component {
 				onBackButtonPress={ this.props.onClose }
 				onSwipe={ this.props.onClose }
 				swipeDirection={ 'down' }
-				onMoveShouldSetResponder={ panResponder.panHandlers.onMoveShouldSetResponder }
-				onMoveShouldSetResponderCapture={ panResponder.panHandlers.onMoveShouldSetResponderCapture }
 				onAccessibilityEscape={ this.props.onClose }
 			>
 				<View style={ styles.content }>
