@@ -39,7 +39,7 @@ An array of control buttons to show in the toolbar.
 
 - Type: `array`
 - Required: No
-- Default: `[ [ 'left', 'center', 'right', 'wide', 'full' ], [ 'fullHeight' ] ]`
+- Default: `[ [ 'left', 'center', 'right', 'wide', 'full' ], [ 'fullScreen' ] ]`
 
 Basic buttons setup.
 ```es6
@@ -54,7 +54,7 @@ Grouped control buttons.
 <BlockAlignmentToolbar
     controls={ [
         [ 'left', 'center', 'right' ],
-        [ 'wide', 'full', 'fullHeight' ],
+        [ 'wide', 'full', 'fullScreen' ],
     ] }
 />
 ```
@@ -71,7 +71,7 @@ If `isCollapsed` is false, all buttons are shown in the main toolbar.
 
 #### wideControlsEnabled
 
-If it's true, the _wide_ controls are shown. These are `wide`, `full` and `fullHeight`
+If it's true, the _wide_ controls are shown. These are `wide`, `full` and `fullScreen`
 
 - Type: `boolean`
 - Required: No
@@ -100,7 +100,7 @@ import { BlockAlignmentToolbar } from '@wordpress/block-editor';
     onChange={ ( nextWidth ) => alert( { nextWidth } ) }
     controls={ [
         [ 'left', 'center', 'right' ],
-        [ 'wide', 'full', 'fullHeight' ],
+        [ 'wide', 'full', 'fullScreen' ],
     ] }
 />
 ```
