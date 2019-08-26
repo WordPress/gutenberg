@@ -284,7 +284,6 @@ export class ImageEdit extends Component {
 		this.onUploadError = this.onUploadError.bind( this );
 		this.onImageError = this.onImageError.bind( this );
 		this.getLinkDestinations = this.getLinkDestinations.bind( this );
-		this.updateExpansion = this.updateExpansion.bind( this );
 
 		this.state = {
 			captionFocused: false,
@@ -495,10 +494,6 @@ export class ImageEdit extends Component {
 		this.props.setAttributes( { ...extraUpdatedAttributes, align: nextAlign } );
 	}
 
-	updateExpansion( nextExpand ) {
-		this.props.setAttributes( { width: undefined, height: undefined, expand: nextExpand } );
-	}
-
 	updateImage( sizeSlug ) {
 		const { image } = this.props;
 
@@ -598,7 +593,6 @@ export class ImageEdit extends Component {
 			height,
 			linkTarget,
 			sizeSlug,
-			expand,
 		} = attributes;
 
 		const isExternal = isExternalImage( id, url );
@@ -700,7 +694,7 @@ export class ImageEdit extends Component {
 			[ `size-${ sizeSlug }` ]: sizeSlug,
 		} );
 
-		const isResizable = ( [ 'wide', 'full' ].indexOf( align ) === -1 && 'screen' !== expand ) && isLargeViewport;
+		const isResizable = ( [ 'wide', 'full' ].indexOf( align ) === -1 ) && isLargeViewport;
 
 		const imageSizeOptions = this.getImageSizeOptions();
 
@@ -904,14 +898,15 @@ export class ImageEdit extends Component {
 											left: showLeftHandle,
 										} }
 
-										onResizeStart={ onResizeStart }
+										onResizeStart={ () => {
+											toggleSelection( false );
+										} }
 
 										onResizeStop={ ( event, direction, elt, delta ) => {
 											onResizeStop();
 											setAttributes( {
 												width: parseInt( currentWidth + delta.width, 10 ),
 												height: parseInt( currentHeight + delta.height, 10 ),
-												// expand: false,
 											} );
 										} }
 									>

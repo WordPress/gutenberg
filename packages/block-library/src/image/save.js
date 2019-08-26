@@ -13,7 +13,7 @@ export default function save( { attributes } ) {
 		url,
 		alt,
 		caption,
-		align = 'none',
+		align,
 		href,
 		rel,
 		linkClass,
@@ -22,17 +22,15 @@ export default function save( { attributes } ) {
 		id,
 		linkTarget,
 		sizeSlug,
-		expand,
 	} = attributes;
 
 	const classes = classnames( {
 		[ `align${ align }` ]: align,
 		[ `size-${ sizeSlug }` ]: sizeSlug,
 		'is-resized': width || height,
-		[ `expand${ expand }` ]: expand ? expand : false,
 	} );
 
-	const Image = (
+	const image = (
 		<img
 			src={ url }
 			alt={ alt }
@@ -42,35 +40,35 @@ export default function save( { attributes } ) {
 		/>
 	);
 
-	const ImageElement = href ?
-		<a
-			className={ linkClass }
-			href={ href }
-			target={ linkTarget }
-			rel={ rel }
-		>
-			{ Image }
-		</a> :
-		Image;
-
-	const ImageWrapper = expand ?
-		<figure className={ classes }>
-			<div
-				className="wp-block-image__image-wrapper"
-				style={ { backgroundImage: `url(${ url })` } }
-			>
-				{ ImageElement }
-			</div>
+	const figure = (
+		<>
+			{ href ? (
+				<a
+					className={ linkClass }
+					href={ href }
+					target={ linkTarget }
+					rel={ rel }
+				>
+					{ image }
+				</a>
+			) : image }
 			{ ! RichText.isEmpty( caption ) && <RichText.Content tagName="figcaption" value={ caption } /> }
-		</figure> :
-		<figure className={ classes }>
-			{ ImageElement }
-			{ ! RichText.isEmpty( caption ) && <RichText.Content tagName="figcaption" value={ caption } /> }
-		</figure>;
+		</>
+	);
 
 	if ( 'left' === align || 'right' === align || 'center' === align ) {
-		return <div>{ ImageWrapper }</div>;
+		return (
+			<div>
+				<figure className={ classes }>
+					{ figure }
+				</figure>
+			</div>
+		);
 	}
 
-	return ImageWrapper;
+	return (
+		<figure className={ classes }>
+			{ figure }
+		</figure>
+	);
 }
