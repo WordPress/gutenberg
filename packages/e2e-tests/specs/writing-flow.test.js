@@ -10,7 +10,7 @@ import {
 	insertBlock,
 } from '@wordpress/e2e-test-utils';
 
-describe( 'adding blocks', () => {
+describe( 'Writing Flow', () => {
 	beforeEach( async () => {
 		await createNewPost();
 	} );
@@ -28,12 +28,13 @@ describe( 'adding blocks', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '/columns' );
 		await page.keyboard.press( 'Enter' );
+		await page.click( ':focus [aria-label="Two columns; equal split"]' );
 		await page.click( ':focus .block-editor-button-block-appender' );
 		await page.waitForSelector( ':focus.block-editor-inserter__search' );
 		await page.keyboard.type( 'Paragraph' );
 		await pressKeyTimes( 'Tab', 3 ); // Tab to paragraph result.
 		await page.keyboard.press( 'Enter' ); // Insert paragraph.
-		await page.keyboard.type( 'First col' );
+		await page.keyboard.type( '1st col' ); // If this text is too long, it may wrap to a new line and cause test failure. That's why we're using "1st" instead of "First" here.
 
 		// TODO: ArrowDown should traverse into the second column. In slower
 		// CPUs, it can sometimes remain in the first column paragraph. This
@@ -44,7 +45,7 @@ describe( 'adding blocks', () => {
 		await page.keyboard.type( 'Paragraph' );
 		await pressKeyTimes( 'Tab', 3 ); // Tab to paragraph result.
 		await page.keyboard.press( 'Enter' ); // Insert paragraph.
-		await page.keyboard.type( 'Second col' );
+		await page.keyboard.type( '2nd col' ); // If this text is too long, it may wrap to a new line and cause test failure. That's why we're using "2nd" instead of "Second" here.
 
 		// Arrow down from last of layouts exits nested context to default
 		// appender of root level.
@@ -54,14 +55,14 @@ describe( 'adding blocks', () => {
 		// Arrow up into nested context focuses last text input
 		await page.keyboard.press( 'ArrowUp' );
 		activeElementText = await page.evaluate( () => document.activeElement.textContent );
-		expect( activeElementText ).toBe( 'Second col' );
+		expect( activeElementText ).toBe( '2nd col' );
 
 		// Arrow up in inner blocks should navigate through (1) column wrapper,
 		// (2) text fields.
 		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'ArrowUp' );
 		activeElementText = await page.evaluate( () => document.activeElement.textContent );
-		expect( activeElementText ).toBe( 'First col' );
+		expect( activeElementText ).toBe( '1st col' );
 
 		// Arrow up from first text field in nested context focuses column and
 		// columns wrappers before escaping out.
@@ -315,7 +316,6 @@ describe( 'adding blocks', () => {
 	it( 'should navigate empty paragraph', async () => {
 		await clickBlockAppender();
 		await page.keyboard.press( 'Enter' );
-		await page.waitForFunction( () => document.activeElement.isContentEditable );
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'ArrowRight' );
@@ -391,6 +391,34 @@ describe( 'adding blocks', () => {
 		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.type( 'x' ); // Should be right after "1".
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should navigate contenteditable with side padding', async () => {
+		await clickBlockAppender();
+		await page.keyboard.press( 'Enter' );
+		await page.evaluate( () => {
+			document.activeElement.style.paddingLeft = '100px';
+		} );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.type( '1' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should navigate empty paragraphs', async () => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.type( '1' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.type( '3' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );

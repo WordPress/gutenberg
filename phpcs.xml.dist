@@ -25,20 +25,16 @@
 	<arg value="ps"/>
 	<arg name="extensions" value="php"/>
 
-	<file>.</file>
-
-	<!-- Exclude 3rd party libraries -->
-	<exclude-pattern>./node_modules</exclude-pattern>
-	<exclude-pattern>./vendor</exclude-pattern>
+	<file>./bin</file>
+	<file>./gutenberg.php</file>
+	<file>./lib</file>
+	<file>./packages</file>
+	<file>./phpunit</file>
+	<file>./post-content.php</file>
 
 	<!-- Exclude generated files -->
 	<exclude-pattern>./packages/block-serialization-spec-parser/parser.php</exclude-pattern>
-	<exclude-pattern>./build</exclude-pattern>
 
-	<rule ref="PHPCompatibility.PHP.NewKeywords.t_namespaceFound">
-		<exclude-pattern>lib/class-wp-rest-block-renderer-controller.php</exclude-pattern>
-		<exclude-pattern>lib/class-wp-rest-search-controller.php</exclude-pattern>
-	</rule>
 	<!-- These special comments are markers for the build process -->
 	<rule ref="Squiz.Commenting.InlineComment.WrongStyle">
 		<exclude-pattern>gutenberg.php</exclude-pattern>
@@ -71,13 +67,13 @@
 	</rule>
 
 	<!-- Ignore snake case error in parser -->
-	<rule ref="WordPress.NamingConventions.ValidVariableName.NotSnakeCase">
+	<rule ref="WordPress.NamingConventions.ValidVariableName.PropertyNotSnakeCase">
 		<exclude-pattern>./packages/block-serialization-default-parser/parser.php</exclude-pattern>
 	</rule>
-	<rule ref="WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar">
+	<rule ref="WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase">
 		<exclude-pattern>./packages/block-serialization-default-parser/parser.php</exclude-pattern>
 	</rule>
-	<rule ref="WordPress.NamingConventions.ValidVariableName.MemberNotSnakeCase">
+	<rule ref="WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase">
 		<exclude-pattern>./packages/block-serialization-default-parser/parser.php</exclude-pattern>
 	</rule>
 	<!-- Ignore filename error since it requires WP core build process change -->

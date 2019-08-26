@@ -11,6 +11,7 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { withInstanceId } from '@wordpress/compose';
 import { BACKSPACE, ENTER, UP, DOWN, LEFT, RIGHT, SPACE, DELETE, ESCAPE } from '@wordpress/keycodes';
+import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
  * Internal dependencies
@@ -48,12 +49,19 @@ class FormTokenField extends Component {
 		this.onInputChange = this.onInputChange.bind( this );
 		this.bindInput = this.bindInput.bind( this );
 		this.bindTokensAndInput = this.bindTokensAndInput.bind( this );
+		this.updateSuggestions = this.updateSuggestions.bind( this );
 	}
 
-	componentDidUpdate() {
+	componentDidUpdate( prevProps ) {
 		// Make sure to focus the input when the isActive state is true.
 		if ( this.state.isActive && ! this.input.hasFocus() ) {
 			this.input.focus();
+		}
+
+		const { suggestions, value } = this.props;
+		const suggestionsDidUpdate = ! isShallowEqual( suggestions, prevProps.suggestions );
+		if ( suggestionsDidUpdate || value !== prevProps.value ) {
+			this.updateSuggestions( suggestionsDidUpdate );
 		}
 	}
 
@@ -193,38 +201,14 @@ class FormTokenField extends Component {
 		const separator = this.props.tokenizeOnSpace ? /[ ,\t]+/ : /[,\t]+/;
 		const items = text.split( separator );
 		const tokenValue = last( items ) || '';
-		const inputHasMinimumChars = tokenValue.trim().length > 1;
-		const matchingSuggestions = this.getMatchingSuggestions( tokenValue );
-		const hasVisibleSuggestions = inputHasMinimumChars && !! matchingSuggestions.length;
 
 		if ( items.length > 1 ) {
 			this.addNewTokens( items.slice( 0, -1 ) );
 		}
 
-		this.setState( {
-			incompleteTokenValue: tokenValue,
-			selectedSuggestionIndex: -1,
-			selectedSuggestionScroll: false,
-			isExpanded: false,
-		} );
+		this.setState( { incompleteTokenValue: tokenValue }, this.updateSuggestions );
 
 		this.props.onInputChange( tokenValue );
-
-		if ( inputHasMinimumChars ) {
-			this.setState( {
-				isExpanded: hasVisibleSuggestions,
-			} );
-
-			if ( !! matchingSuggestions.length ) {
-				this.props.debouncedSpeak( sprintf( _n(
-					'%d result found, use up and down arrow keys to navigate.',
-					'%d results found, use up and down arrow keys to navigate.',
-					matchingSuggestions.length
-				), matchingSuggestions.length ), 'assertive' );
-			} else {
-				this.props.debouncedSpeak( __( 'No results.' ), 'assertive' );
-			}
-		}
 	}
 
 	handleDeleteKey( deleteToken ) {
@@ -465,6 +449,38 @@ class FormTokenField extends Component {
 
 	inputHasValidValue() {
 		return this.props.saveTransform( this.state.incompleteTokenValue ).length > 0;
+	}
+
+	updateSuggestions( resetSelectedSuggestion = true ) {
+		const { incompleteTokenValue } = this.state;
+
+		const inputHasMinimumChars = incompleteTokenValue.trim().length > 1;
+		const matchingSuggestions = this.getMatchingSuggestions( incompleteTokenValue );
+		const hasMatchingSuggestions = matchingSuggestions.length > 0;
+
+		const newState = {
+			isExpanded: inputHasMinimumChars && hasMatchingSuggestions,
+		};
+		if ( resetSelectedSuggestion ) {
+			newState.selectedSuggestionIndex = -1;
+			newState.selectedSuggestionScroll = false;
+		}
+
+		this.setState( newState );
+
+		if ( inputHasMinimumChars ) {
+			const { debouncedSpeak } = this.props;
+
+			const message = hasMatchingSuggestions ?
+				sprintf( _n(
+					'%d result found, use up and down arrow keys to navigate.',
+					'%d results found, use up and down arrow keys to navigate.',
+					matchingSuggestions.length
+				), matchingSuggestions.length ) :
+				__( 'No results.' );
+
+			debouncedSpeak( message, 'assertive' );
+		}
 	}
 
 	renderTokensAndInput() {

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/e2e-test-utils",
-	"version": "2.1.0",
+	"version": "2.2.0",
 	"description": "End-To-End (E2E) test utils for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -31,12 +31,12 @@
 		"@babel/runtime": "^7.4.4",
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/url": "file:../url",
-		"lodash": "^4.17.11",
+		"lodash": "^4.17.14",
 		"node-fetch": "^1.7.3"
 	},
 	"peerDependencies": {
 		"jest": ">=24",
-		"puppeteer": ">=1.6"
+		"puppeteer": ">=1.19.0"
 	},
 	"publishConfig": {
 		"access": "public"

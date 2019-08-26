@@ -22,12 +22,16 @@
 .components-editor-notices__dismissible,
 .components-editor-notices__pinned {
 	.components-notice {
+		box-sizing: border-box;
 		margin: 0 0 5px;
 		padding: 6px 12px;
-		min-height: $panel-header-height;
 
+		// Min-height matches the height of a single-line notice with an action button.
+		min-height: $header-height + $grid-size-small;
+
+		// Margins ensure that the dismiss button aligns to the center of the first line of text.
 		.components-notice__dismiss {
-			margin: 10px 5px;
+			margin: 6px -5px 6px 5px;
 		}
 	}
 }

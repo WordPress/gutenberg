@@ -76,7 +76,7 @@ export default class TokenList {
 	 *
 	 * @see https://dom.spec.whatwg.org/#domtokenlist
 	 *
-	 * @return {Generator} TokenList iterator.
+	 * @return {IterableIterator<string>} TokenList iterator.
 	 */
 	* [ Symbol.iterator ]() {
 		return yield* this._valueAsArray;

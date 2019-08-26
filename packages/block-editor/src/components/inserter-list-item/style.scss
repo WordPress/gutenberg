@@ -1,7 +1,7 @@
 .block-editor-block-types-list__list-item {
 	display: block;
 	width: 33.33%;
-	padding: 0 4px;
+	padding: 0;
 	margin: 0 0 12px;
 }
 
@@ -11,7 +11,7 @@
 	width: 100%;
 	font-size: $default-font-size;
 	color: $dark-gray-700;
-	padding: 0;
+	padding: 0 4px;
 	align-items: stretch;
 	justify-content: center;
 	cursor: pointer;
@@ -51,17 +51,21 @@
 		}
 
 		&:active,
-		&.is-active,
 		&:focus {
 			position: relative;
-
-			// Show the focus style in the icon inside instead.
-			outline: none;
-			@include block-style__focus-active();
+			@include block-style__focus();
 
 			.block-editor-block-types-list__item-icon,
 			.block-editor-block-types-list__item-title {
 				color: inherit;
+			}
+		}
+
+		&.is-active {
+			@include block-style__is-active();
+
+			&:focus {
+				@include block-style__is-active-focus();
 			}
 		}
 	}
@@ -87,31 +91,4 @@
 
 .block-editor-block-types-list__item-title {
 	padding: 4px 2px 8px;
-}
-
-.block-editor-block-types-list__item-has-children {
-	.block-editor-block-types-list__item-icon {
-		background: $white;
-		margin-right: 3px;
-		margin-bottom: 6px;
-		padding: 9px 20px 9px;
-		position: relative;
-		top: -2px;
-		left: -2px;
-		box-shadow: 0 0 0 1px $light-gray-500;
-	}
-
-	// Show a "stacked card" below an item that has children.
-	.block-editor-block-types-list__item-icon-stack {
-		display: block;
-		background: $white;
-		box-shadow: 0 0 0 1px $light-gray-500;
-		width: 100%;
-		height: 100%;
-		position: absolute;
-		z-index: -1; // Show below the card as a shadow
-		bottom: -6px;
-		right: -6px;
-		border-radius: 4px;
-	}
 }

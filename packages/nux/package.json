@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/nux",
-	"version": "3.4.0",
+	"version": "3.5.0",
 	"description": "NUX (New User eXperience) module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -27,7 +27,7 @@
 		"@wordpress/data": "file:../data",
 		"@wordpress/element": "file:../element",
 		"@wordpress/i18n": "file:../i18n",
-		"lodash": "^4.17.11",
+		"lodash": "^4.17.14",
 		"rememo": "^3.0.0"
 	},
 	"publishConfig": {

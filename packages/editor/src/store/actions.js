@@ -1,37 +1,144 @@
 /**
  * External dependencies
  */
-import { castArray, pick, mapValues, has } from 'lodash';
-import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
+import { has, castArray } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import deprecated from '@wordpress/deprecated';
 import { dispatch, select, apiFetch } from '@wordpress/data-controls';
-import {
-	parse,
-	synchronizeBlocksWithTemplate,
-} from '@wordpress/blocks';
+import { parse, synchronizeBlocksWithTemplate } from '@wordpress/blocks';
+import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
  * Internal dependencies
  */
 import {
-	getPostRawValue,
-} from './reducer';
-import {
 	STORE_KEY,
 	POST_UPDATE_TRANSACTION_ID,
-	SAVE_POST_NOTICE_ID,
 	TRASH_POST_NOTICE_ID,
-	AUTOSAVE_PROPERTIES,
 } from './constants';
 import {
 	getNotificationArgumentsForSaveSuccess,
 	getNotificationArgumentsForSaveFail,
 	getNotificationArgumentsForTrashFail,
 } from './utils/notice-builder';
+import serializeBlocks from './utils/serialize-blocks';
+import { awaitNextStateChange, getRegistry } from './controls';
+import * as sources from './block-sources';
+
+/**
+ * Map of Registry instance to WeakMap of dependencies by custom source.
+ *
+ * @type WeakMap<WPDataRegistry,WeakMap<WPBlockAttributeSource,Object>>
+ */
+const lastBlockSourceDependenciesByRegistry = new WeakMap;
+
+/**
+ * Given a blocks array, returns a blocks array with sourced attribute values
+ * applied. The reference will remain consistent with the original argument if
+ * no attribute values must be overridden. If sourced values are applied, the
+ * return value will be a modified copy of the original array.
+ *
+ * @param {WPBlock[]} blocks Original blocks array.
+ *
+ * @return {WPBlock[]} Blocks array with sourced values applied.
+ */
+function* getBlocksWithSourcedAttributes( blocks ) {
+	const registry = yield getRegistry();
+	if ( ! lastBlockSourceDependenciesByRegistry.has( registry ) ) {
+		return blocks;
+	}
+
+	const blockSourceDependencies = lastBlockSourceDependenciesByRegistry.get( registry );
+
+	let workingBlocks = blocks;
+	for ( let i = 0; i < blocks.length; i++ ) {
+		let block = blocks[ i ];
+		const blockType = yield select( 'core/blocks', 'getBlockType', block.name );
+
+		for ( const [ attributeName, schema ] of Object.entries( blockType.attributes ) ) {
+			if ( ! sources[ schema.source ] || ! sources[ schema.source ].apply ) {
+				continue;
+			}
+
+			if ( ! blockSourceDependencies.has( sources[ schema.source ] ) ) {
+				continue;
+			}
+
+			const dependencies = blockSourceDependencies.get( sources[ schema.source ] );
+			const sourcedAttributeValue = sources[ schema.source ].apply( schema, dependencies );
+
+			// It's only necessary to apply the value if it differs from the
+			// block's locally-assigned value, to avoid needlessly resetting
+			// the block editor.
+			if ( sourcedAttributeValue === block.attributes[ attributeName ] ) {
+				continue;
+			}
+
+			// Create a shallow clone to mutate, leaving the original intact.
+			if ( workingBlocks === blocks ) {
+				workingBlocks = [ ...workingBlocks ];
+			}
+
+			block = {
+				...block,
+				attributes: {
+					...block.attributes,
+					[ attributeName ]: sourcedAttributeValue,
+				},
+			};
+
+			workingBlocks.splice( i, 1, block );
+		}
+
+		// Recurse to apply source attributes to inner blocks.
+		if ( block.innerBlocks.length ) {
+			const appliedInnerBlocks = yield* getBlocksWithSourcedAttributes( block.innerBlocks );
+			if ( appliedInnerBlocks !== block.innerBlocks ) {
+				if ( workingBlocks === blocks ) {
+					workingBlocks = [ ...workingBlocks ];
+				}
+
+				block = {
+					...block,
+					innerBlocks: appliedInnerBlocks,
+				};
+
+				workingBlocks.splice( i, 1, block );
+			}
+		}
+	}
+
+	return workingBlocks;
+}
+
+/**
+ * Refreshes the last block source dependencies, optionally for a given subset
+ * of sources (defaults to the full set of sources).
+ *
+ * @param {?Array} sourcesToUpdate Optional subset of sources to reset.
+ *
+ * @yield {Object} Yielded actions or control descriptors.
+ */
+function* resetLastBlockSourceDependencies( sourcesToUpdate = Object.values( sources ) ) {
+	if ( ! sourcesToUpdate.length ) {
+		return;
+	}
+
+	const registry = yield getRegistry();
+	if ( ! lastBlockSourceDependenciesByRegistry.has( registry ) ) {
+		lastBlockSourceDependenciesByRegistry.set( registry, new WeakMap );
+	}
+
+	const lastBlockSourceDependencies = lastBlockSourceDependenciesByRegistry.get( registry );
+
+	for ( const source of sourcesToUpdate ) {
+		const dependencies = yield* source.getDependencies();
+		lastBlockSourceDependencies.set( source, dependencies );
+	}
+}
 
 /**
  * Returns an action generator used in signalling that editor has initialized with
@@ -42,13 +149,6 @@ import {
  * @param {Array?} template  Block Template.
  */
 export function* setupEditor( post, edits, template ) {
-	yield {
-		type: 'SETUP_EDITOR',
-		post,
-		edits,
-		template,
-	};
-
 	// In order to ensure maximum of a single parse during setup, edits are
 	// included as part of editor setup action. Assume edited content as
 	// canonical if provided, falling back to post.
@@ -67,8 +167,79 @@ export function* setupEditor( post, edits, template ) {
 		blocks = synchronizeBlocksWithTemplate( blocks, template );
 	}
 
-	yield resetEditorBlocks( blocks );
+	yield resetPost( post );
+	yield* resetLastBlockSourceDependencies();
+	yield {
+		type: 'SETUP_EDITOR',
+		post,
+		edits,
+		template,
+	};
+	yield resetEditorBlocks( blocks, { __unstableShouldCreateUndoLevel: false } );
 	yield setupEditorState( post );
+	if ( edits ) {
+		yield editPost( edits );
+	}
+	yield* __experimentalSubscribeSources();
+}
+
+/**
+ * Returns an action object signalling that the editor is being destroyed and
+ * that any necessary state or side-effect cleanup should occur.
+ *
+ * @return {Object} Action object.
+ */
+export function __experimentalTearDownEditor() {
+	return { type: 'TEAR_DOWN_EDITOR' };
+}
+
+/**
+ * Returns an action generator which loops to await the next state change,
+ * calling to reset blocks when a block source dependencies change.
+ *
+ * @yield {Object} Action object.
+ */
+export function* __experimentalSubscribeSources() {
+	while ( true ) {
+		yield awaitNextStateChange();
+
+		// The bailout case: If the editor becomes unmounted, it will flag
+		// itself as non-ready. Effectively unsubscribes from the registry.
+		const isStillReady = yield select( STORE_KEY, '__unstableIsEditorReady' );
+		if ( ! isStillReady ) {
+			break;
+		}
+
+		const registry = yield getRegistry();
+
+		let reset = false;
+		for ( const source of Object.values( sources ) ) {
+			if ( ! source.getDependencies ) {
+				continue;
+			}
+
+			const dependencies = yield* source.getDependencies();
+
+			if ( ! lastBlockSourceDependenciesByRegistry.has( registry ) ) {
+				lastBlockSourceDependenciesByRegistry.set( registry, new WeakMap );
+			}
+
+			const lastBlockSourceDependencies = lastBlockSourceDependenciesByRegistry.get( registry );
+			const lastDependencies = lastBlockSourceDependencies.get( source );
+
+			if ( ! isShallowEqual( dependencies, lastDependencies ) ) {
+				lastBlockSourceDependencies.set( source, dependencies );
+
+				// Allow the loop to continue in order to assign latest
+				// dependencies values, but mark for reset.
+				reset = true;
+			}
+		}
+
+		if ( reset ) {
+			yield resetEditorBlocks( yield select( STORE_KEY, 'getEditorBlocks' ), { __unstableShouldCreateUndoLevel: false } );
+		}
+	}
 }
 
 /**
@@ -110,7 +281,7 @@ export function* resetAutosave( newAutosave ) {
 }
 
 /**
- * Optimistic action for dispatching that a post update request has started.
+ * Action for dispatching that a post update request has started.
  *
  * @param {Object} options
  *
@@ -119,73 +290,20 @@ export function* resetAutosave( newAutosave ) {
 export function __experimentalRequestPostUpdateStart( options = {} ) {
 	return {
 		type: 'REQUEST_POST_UPDATE_START',
-		optimist: { type: BEGIN, id: POST_UPDATE_TRANSACTION_ID },
 		options,
 	};
 }
 
 /**
- * Optimistic action for indicating that the request post update has completed
- * successfully.
+ * Action for dispatching that a post update request has finished.
  *
- * @param {Object}  data                The data for the action.
- * @param {Object}  data.previousPost   The previous post prior to update.
- * @param {Object}  data.post           The new post after update
- * @param {boolean} data.isRevision     Whether the post is a revision or not.
- * @param {Object}  data.options        Options passed through from the original
- *                                      action dispatch.
- * @param {Object}  data.postType       The post type object.
+ * @param {Object} options
  *
- * @return {Object}	Action object.
- */
-export function __experimentalRequestPostUpdateSuccess( {
-	previousPost,
-	post,
-	isRevision,
-	options,
-	postType,
-} ) {
-	return {
-		type: 'REQUEST_POST_UPDATE_SUCCESS',
-		previousPost,
-		post,
-		optimist: {
-			// Note: REVERT is not a failure case here. Rather, it
-			// is simply reversing the assumption that the updates
-			// were applied to the post proper, such that the post
-			// treated as having unsaved changes.
-			type: isRevision ? REVERT : COMMIT,
-			id: POST_UPDATE_TRANSACTION_ID,
-		},
-		options,
-		postType,
-	};
-}
-
-/**
- * Optimistic action for indicating that the request post update has completed
- * with a failure.
- *
- * @param {Object}  data          The data for the action
- * @param {Object}  data.post     The post that failed updating.
- * @param {Object}  data.edits    The fields that were being updated.
- * @param {*}       data.error    The error from the failed call.
- * @param {Object}  data.options  Options passed through from the original
- *                                action dispatch.
  * @return {Object} An action object
  */
-export function __experimentalRequestPostUpdateFailure( {
-	post,
-	edits,
-	error,
-	options,
-} ) {
+export function __experimentalRequestPostUpdateFinish( options = {} ) {
 	return {
-		type: 'REQUEST_POST_UPDATE_FAILURE',
-		optimist: { type: REVERT, id: POST_UPDATE_TRANSACTION_ID },
-		post,
-		edits,
-		error,
+		type: 'REQUEST_POST_UPDATE_FINISH',
 		options,
 	};
 }
@@ -226,13 +344,11 @@ export function setupEditorState( post ) {
  *
  * @param {Object} edits Post attributes to edit.
  *
- * @return {Object} Action object.
+ * @yield {Object} Action object or control.
  */
-export function editPost( edits ) {
-	return {
-		type: 'EDIT_POST',
-		edits,
-	};
+export function* editPost( edits ) {
+	const { id, type } = yield select( STORE_KEY, 'getCurrentPost' );
+	yield dispatch( 'core', 'editEntityRecord', 'postType', type, id, edits );
 }
 
 /**
@@ -256,173 +372,61 @@ export function __experimentalOptimisticUpdatePost( edits ) {
  * @param {Object} options
  */
 export function* savePost( options = {} ) {
-	const isEditedPostSaveable = yield select(
-		STORE_KEY,
-		'isEditedPostSaveable'
-	);
-	if ( ! isEditedPostSaveable ) {
+	if ( ! ( yield select( STORE_KEY, 'isEditedPostSaveable' ) ) ) {
 		return;
 	}
-	let edits = yield select(
-		STORE_KEY,
-		'getPostEdits'
-	);
-	const isAutosave = !! options.isAutosave;
+	yield dispatch( STORE_KEY, 'editPost', {
+		content: yield select( STORE_KEY, 'getEditedPostContent' ),
+	} );
 
-	if ( isAutosave ) {
-		edits = pick( edits, AUTOSAVE_PROPERTIES );
-	}
-
-	const isEditedPostNew = yield select(
-		STORE_KEY,
-		'isEditedPostNew',
-	);
-
-	// New posts (with auto-draft status) must be explicitly assigned draft
-	// status if there is not already a status assigned in edits (publish).
-	// Otherwise, they are wrongly left as auto-draft. Status is not always
-	// respected for autosaves, so it cannot simply be included in the pick
-	// above. This behavior relies on an assumption that an auto-draft post
-	// would never be saved by anyone other than the owner of the post, per
-	// logic within autosaves REST controller to save status field only for
-	// draft/auto-draft by current user.
-	//
-	// See: https://core.trac.wordpress.org/ticket/43316#comment:88
-	// See: https://core.trac.wordpress.org/ticket/43316#comment:89
-	if ( isEditedPostNew ) {
-		edits = { status: 'draft', ...edits };
-	}
-
-	const post = yield select(
-		STORE_KEY,
-		'getCurrentPost'
-	);
-
-	const editedPostContent = yield select(
-		STORE_KEY,
-		'getEditedPostContent'
-	);
-
-	let toSend = {
-		...edits,
-		content: editedPostContent,
-		id: post.id,
+	yield __experimentalRequestPostUpdateStart( options );
+	const previousRecord = yield select( STORE_KEY, 'getCurrentPost' );
+	const edits = {
+		id: previousRecord.id,
+		...( yield select(
+			'core',
+			'getEntityRecordNonTransientEdits',
+			'postType',
+			previousRecord.type,
+			previousRecord.id
+		) ),
 	};
-
-	const currentPostType = yield select(
-		STORE_KEY,
-		'getCurrentPostType'
-	);
-
-	const postType = yield select(
+	yield dispatch(
 		'core',
-		'getPostType',
-		currentPostType
+		'saveEntityRecord',
+		'postType',
+		previousRecord.type,
+		edits,
+		options
 	);
+	yield __experimentalRequestPostUpdateFinish( options );
 
-	yield dispatch(
-		STORE_KEY,
-		'__experimentalRequestPostUpdateStart',
-		options,
+	const error = yield select(
+		'core',
+		'getLastEntitySaveError',
+		'postType',
+		previousRecord.type,
+		previousRecord.id
 	);
-
-	// Optimistically apply updates under the assumption that the post
-	// will be updated. See below logic in success resolution for revert
-	// if the autosave is applied as a revision.
-	yield dispatch(
-		STORE_KEY,
-		'__experimentalOptimisticUpdatePost',
-		toSend
-	);
-
-	let path = `/wp/v2/${ postType.rest_base }/${ post.id }`;
-	let method = 'PUT';
-	if ( isAutosave ) {
-		const currentUser = yield select( 'core', 'getCurrentUser' );
-		const currentUserId = currentUser ? currentUser.id : undefined;
-		const autosavePost = yield select( 'core', 'getAutosave', post.type, post.id, currentUserId );
-		const mappedAutosavePost = mapValues( pick( autosavePost, AUTOSAVE_PROPERTIES ), getPostRawValue );
-
-		// Ensure autosaves contain all expected fields, using autosave or
-		// post values as fallback if not otherwise included in edits.
-		toSend = {
-			...pick( post, AUTOSAVE_PROPERTIES ),
-			...mappedAutosavePost,
-			...toSend,
-		};
-		path += '/autosaves';
-		method = 'POST';
-	} else {
-		yield dispatch(
-			'core/notices',
-			'removeNotice',
-			SAVE_POST_NOTICE_ID
-		);
-		yield dispatch(
-			'core/notices',
-			'removeNotice',
-			'autosave-exists'
-		);
-	}
-
-	try {
-		const newPost = yield apiFetch( {
-			path,
-			method,
-			data: toSend,
-		} );
-
-		if ( isAutosave ) {
-			yield dispatch( 'core', 'receiveAutosaves', post.id, newPost );
-		} else {
-			yield dispatch( STORE_KEY, 'resetPost', newPost );
-		}
-
-		yield dispatch(
-			STORE_KEY,
-			'__experimentalRequestPostUpdateSuccess',
-			{
-				previousPost: post,
-				post: newPost,
-				options,
-				postType,
-				// An autosave may be processed by the server as a regular save
-				// when its update is requested by the author and the post was
-				// draft or auto-draft.
-				isRevision: newPost.id !== post.id,
-			}
-		);
-
-		const notifySuccessArgs = getNotificationArgumentsForSaveSuccess( {
-			previousPost: post,
-			post: newPost,
-			postType,
-			options,
-		} );
-		if ( notifySuccessArgs.length > 0 ) {
-			yield dispatch(
-				'core/notices',
-				'createSuccessNotice',
-				...notifySuccessArgs
-			);
-		}
-	} catch ( error ) {
-		yield dispatch(
-			STORE_KEY,
-			'__experimentalRequestPostUpdateFailure',
-			{ post, edits, error, options }
-		);
-		const notifyFailArgs = getNotificationArgumentsForSaveFail( {
-			post,
+	if ( error ) {
+		const args = getNotificationArgumentsForSaveFail( {
+			post: previousRecord,
 			edits,
 			error,
 		} );
-		if ( notifyFailArgs.length > 0 ) {
-			yield dispatch(
-				'core/notices',
-				'createErrorNotice',
-				...notifyFailArgs
-			);
+		if ( args.length ) {
+			yield dispatch( 'core/notices', 'createErrorNotice', ...args );
+		}
+	} else {
+		const updatedRecord = yield select( STORE_KEY, 'getCurrentPost' );
+		const args = getNotificationArgumentsForSaveSuccess( {
+			previousPost: previousRecord,
+			post: updatedRecord,
+			postType: yield select( 'core', 'getPostType', updatedRecord.type ),
+			options,
+		} );
+		if ( args.length ) {
+			yield dispatch( 'core/notices', 'createSuccessNotice', ...args );
 		}
 	}
 }
@@ -522,19 +526,19 @@ export function* autosave( options ) {
  * Returns an action object used in signalling that undo history should
  * restore last popped state.
  *
- * @return {Object} Action object.
+ * @yield {Object} Action object.
  */
-export function redo() {
-	return { type: 'REDO' };
+export function* redo() {
+	yield dispatch( 'core', 'redo' );
 }
 
 /**
  * Returns an action object used in signalling that undo history should pop.
  *
- * @return {Object} Action object.
+ * @yield {Object} Action object.
  */
-export function undo() {
-	return { type: 'UNDO' };
+export function* undo() {
+	yield dispatch( 'core', 'undo' );
 }
 
 /**
@@ -699,6 +703,42 @@ export function disablePublishSidebar() {
  *
  * @param  {string} lockName The lock name.
  *
+ * @example
+ * ```
+ * const { subscribe } = wp.data;
+ *
+ * const initialPostStatus = wp.data.select( 'core/editor' ).getEditedPostAttribute( 'status' );
+ *
+ * // Only allow publishing posts that are set to a future date.
+ * if ( 'publish' !== initialPostStatus ) {
+ *
+ * 	// Track locking.
+ * 	let locked = false;
+ *
+ * 	// Watch for the publish event.
+ * 	let unssubscribe = subscribe( () => {
+ * 		const currentPostStatus = wp.data.select( 'core/editor' ).getEditedPostAttribute( 'status' );
+ * 		if ( 'publish' !== currentPostStatus ) {
+ *
+ * 			// Compare the post date to the current date, lock the post if the date isn't in the future.
+ * 			const postDate = new Date( wp.data.select( 'core/editor' ).getEditedPostAttribute( 'date' ) );
+ * 			const currentDate = new Date();
+ * 			if ( postDate.getTime() <= currentDate.getTime() ) {
+ * 				if ( ! locked ) {
+ * 					locked = true;
+ * 					wp.data.dispatch( 'core/editor' ).lockPostSaving( 'futurelock' );
+ * 				}
+ * 			} else {
+ * 				if ( locked ) {
+ * 					locked = false;
+ * 					wp.data.dispatch( 'core/editor' ).unlockPostSaving( 'futurelock' );
+ * 				}
+ * 			}
+ * 		}
+ * 	} );
+ * }
+ * ```
+ *
  * @return {Object} Action object
  */
 export function lockPostSaving( lockName ) {
@@ -712,6 +752,12 @@ export function lockPostSaving( lockName ) {
  * Returns an action object used to signal that post saving is unlocked.
  *
  * @param  {string} lockName The lock name.
+ *
+ * @example
+ * ```
+ * // Unlock post saving with the lock key `mylock`:
+ * wp.data.dispatch( 'core/editor' ).unlockPostSaving( 'mylock' );
+ * ```
  *
  * @return {Object} Action object
  */
@@ -728,14 +774,56 @@ export function unlockPostSaving( lockName ) {
  * @param {Array}   blocks  Block Array.
  * @param {?Object} options Optional options.
  *
- * @return {Object} Action object
+ * @yield {Object} Action object
  */
-export function resetEditorBlocks( blocks, options = {} ) {
-	return {
-		type: 'RESET_EDITOR_BLOCKS',
-		blocks,
-		shouldCreateUndoLevel: options.__unstableShouldCreateUndoLevel !== false,
-	};
+export function* resetEditorBlocks( blocks, options = {} ) {
+	const lastBlockAttributesChange = yield select( 'core/block-editor', '__experimentalGetLastBlockAttributeChanges' );
+
+	// Sync to sources from block attributes updates.
+	if ( lastBlockAttributesChange ) {
+		const updatedSources = new Set;
+		const updatedBlockTypes = new Set;
+		for ( const [ clientId, attributes ] of Object.entries( lastBlockAttributesChange ) ) {
+			const blockName = yield select( 'core/block-editor', 'getBlockName', clientId );
+			if ( updatedBlockTypes.has( blockName ) ) {
+				continue;
+			}
+
+			updatedBlockTypes.add( blockName );
+			const blockType = yield select( 'core/blocks', 'getBlockType', blockName );
+
+			for ( const [ attributeName, newAttributeValue ] of Object.entries( attributes ) ) {
+				if ( ! blockType.attributes.hasOwnProperty( attributeName ) ) {
+					continue;
+				}
+
+				const schema = blockType.attributes[ attributeName ];
+				const source = sources[ schema.source ];
+
+				if ( source && source.update ) {
+					yield* source.update( schema, newAttributeValue );
+					updatedSources.add( source );
+				}
+			}
+		}
+
+		// Dependencies are reset so that source dependencies subscription
+		// skips a reset which would otherwise occur by dependencies change.
+		// This assures that at most one reset occurs per block change.
+		yield* resetLastBlockSourceDependencies( Array.from( updatedSources ) );
+	}
+
+	const edits = { blocks: yield* getBlocksWithSourcedAttributes( blocks ) };
+
+	if ( options.__unstableShouldCreateUndoLevel !== false ) {
+		// We create a new function here on every persistent edit
+		// to make sure the edit makes the post dirty and creates
+		// a new undo level.
+		edits.content = ( { blocks: blocksForSerialization = [] } ) =>
+			serializeBlocks( blocksForSerialization );
+	}
+
+	yield* editPost( edits );
 }
 
 /*

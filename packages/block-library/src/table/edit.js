@@ -14,6 +14,7 @@ import {
 	PanelColorSettings,
 	createCustomColorsHOC,
 	BlockIcon,
+	AlignmentToolbar,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import {
@@ -31,12 +32,15 @@ import {
  */
 import {
 	createTable,
-	updateCellContent,
+	updateSelectedCell,
+	getCellAttribute,
 	insertRow,
 	deleteRow,
 	insertColumn,
 	deleteColumn,
 	toggleSection,
+	isEmptyTableSection,
+	isCellSelected,
 } from './state';
 import icon from './icon';
 
@@ -63,6 +67,24 @@ const BACKGROUND_COLORS = [
 	},
 ];
 
+const ALIGNMENT_CONTROLS = [
+	{
+		icon: 'editor-alignleft',
+		title: __( 'Align Column Left' ),
+		align: 'left',
+	},
+	{
+		icon: 'editor-aligncenter',
+		title: __( 'Align Column Center' ),
+		align: 'center',
+	},
+	{
+		icon: 'editor-alignright',
+		title: __( 'Align Column Right' ),
+		align: 'right',
+	},
+];
+
 const withCustomBackgroundColors = createCustomColorsHOC( BACKGROUND_COLORS );
 
 export class TableEdit extends Component {
@@ -86,6 +108,8 @@ export class TableEdit extends Component {
 		this.onDeleteColumn = this.onDeleteColumn.bind( this );
 		this.onToggleHeaderSection = this.onToggleHeaderSection.bind( this );
 		this.onToggleFooterSection = this.onToggleFooterSection.bind( this );
+		this.onChangeColumnAlignment = this.onChangeColumnAlignment.bind( this );
+		this.getCellAlignment = this.getCellAlignment.bind( this );
 
 		this.state = {
 			initialRowCount: 2,
@@ -155,14 +179,73 @@ export class TableEdit extends Component {
 		}
 
 		const { attributes, setAttributes } = this.props;
-		const { section, rowIndex, columnIndex } = selectedCell;
 
-		setAttributes( updateCellContent( attributes, {
-			section,
-			rowIndex,
-			columnIndex,
-			content,
-		} ) );
+		setAttributes( updateSelectedCell(
+			attributes,
+			selectedCell,
+			( cellAttributes ) => ( { ...cellAttributes, content } ),
+		) );
+	}
+
+	/**
+	 * Align text within the a column.
+	 *
+	 * @param {string} align The new alignment to apply to the column.
+	 */
+	onChangeColumnAlignment( align ) {
+		const { selectedCell } = this.state;
+
+		if ( ! selectedCell ) {
+			return;
+		}
+
+		// Convert the cell selection to a column selection so that alignment
+		// is applied to the entire column.
+		const columnSelection = {
+			type: 'column',
+			columnIndex: selectedCell.columnIndex,
+		};
+
+		const { attributes, setAttributes } = this.props;
+		const newAttributes = updateSelectedCell(
+			attributes,
+			columnSelection,
+			( cellAttributes ) => ( { ...cellAttributes, align } ),
+		);
+		setAttributes( newAttributes );
+	}
+
+	/**
+	 * Get the alignment of the currently selected cell.
+	 *
+	 * @return {string} The new alignment to apply to the column.
+	 */
+	getCellAlignment() {
+		const { selectedCell } = this.state;
+
+		if ( ! selectedCell ) {
+			return;
+		}
+
+		const { attributes } = this.props;
+
+		return getCellAttribute( attributes, selectedCell, 'align' );
+	}
+
+	/**
+	 * Add or remove a `head` table section.
+	 */
+	onToggleHeaderSection() {
+		const { attributes, setAttributes } = this.props;
+		setAttributes( toggleSection( attributes, 'head' ) );
+	}
+
+	/**
+	 * Add or remove a `foot` table section.
+	 */
+	onToggleFooterSection() {
+		const { attributes, setAttributes } = this.props;
+		setAttributes( toggleSection( attributes, 'foot' ) );
 	}
 
 	/**
@@ -178,11 +261,11 @@ export class TableEdit extends Component {
 		}
 
 		const { attributes, setAttributes } = this.props;
-		const { section, rowIndex } = selectedCell;
+		const { sectionName, rowIndex } = selectedCell;
 
 		this.setState( { selectedCell: null } );
 		setAttributes( insertRow( attributes, {
-			section,
+			sectionName,
 			rowIndex: rowIndex + delta,
 		} ) );
 	}
@@ -201,16 +284,6 @@ export class TableEdit extends Component {
 		this.onInsertRow( 1 );
 	}
 
-	onToggleHeaderSection() {
-		const { attributes, setAttributes } = this.props;
-		setAttributes( toggleSection( attributes, 'head' ) );
-	}
-
-	onToggleFooterSection() {
-		const { attributes, setAttributes } = this.props;
-		setAttributes( toggleSection( attributes, 'foot' ) );
-	}
-
 	/**
 	 * Deletes the currently selected row.
 	 */
@@ -222,10 +295,10 @@ export class TableEdit extends Component {
 		}
 
 		const { attributes, setAttributes } = this.props;
-		const { section, rowIndex } = selectedCell;
+		const { sectionName, rowIndex } = selectedCell;
 
 		this.setState( { selectedCell: null } );
-		setAttributes( deleteRow( attributes, { section, rowIndex } ) );
+		setAttributes( deleteRow( attributes, { sectionName, rowIndex } ) );
 	}
 
 	/**
@@ -241,11 +314,10 @@ export class TableEdit extends Component {
 		}
 
 		const { attributes, setAttributes } = this.props;
-		const { section, columnIndex } = selectedCell;
+		const { columnIndex } = selectedCell;
 
 		this.setState( { selectedCell: null } );
 		setAttributes( insertColumn( attributes, {
-			section,
 			columnIndex: columnIndex + delta,
 		} ) );
 	}
@@ -275,23 +347,28 @@ export class TableEdit extends Component {
 		}
 
 		const { attributes, setAttributes } = this.props;
-		const { section, columnIndex } = selectedCell;
+		const { sectionName, columnIndex } = selectedCell;
 
 		this.setState( { selectedCell: null } );
-		setAttributes( deleteColumn( attributes, { section, columnIndex } ) );
+		setAttributes( deleteColumn( attributes, { sectionName, columnIndex } ) );
 	}
 
 	/**
 	 * Creates an onFocus handler for a specified cell.
 	 *
-	 * @param {Object} selectedCell Object with `section`, `rowIndex`, and
+	 * @param {Object} cellLocation Object with `section`, `rowIndex`, and
 	 *                              `columnIndex` properties.
 	 *
 	 * @return {Function} Function to call on focus.
 	 */
-	createOnFocus( selectedCell ) {
+	createOnFocus( cellLocation ) {
 		return () => {
-			this.setState( { selectedCell } );
+			this.setState( {
+				selectedCell: {
+					...cellLocation,
+					type: 'cell',
+				},
+			} );
 		};
 	}
 
@@ -346,48 +423,57 @@ export class TableEdit extends Component {
 	/**
 	 * Renders a table section.
 	 *
+	 * @param {Object} options
 	 * @param {string} options.type Section type: head, body, or foot.
 	 * @param {Array}  options.rows The rows to render.
 	 *
 	 * @return {Object} React element for the section.
 	 */
-	renderSection( { type, rows } ) {
-		if ( ! rows.length ) {
+	renderSection( { name, rows } ) {
+		if ( isEmptyTableSection( rows ) ) {
 			return null;
 		}
 
-		const Tag = `t${ type }`;
+		const Tag = `t${ name }`;
 		const { selectedCell } = this.state;
 
 		return (
 			<Tag>
 				{ rows.map( ( { cells }, rowIndex ) => (
 					<tr key={ rowIndex }>
-						{ cells.map( ( { content, tag: CellTag }, columnIndex ) => {
-							const isSelected = selectedCell && (
-								type === selectedCell.section &&
-								rowIndex === selectedCell.rowIndex &&
-								columnIndex === selectedCell.columnIndex
-							);
-
-							const cell = {
-								section: type,
+						{ cells.map( ( { content, tag: CellTag, scope, align }, columnIndex ) => {
+							const cellLocation = {
+								sectionName: name,
 								rowIndex,
 								columnIndex,
 							};
+							const isSelected = isCellSelected( cellLocation, selectedCell );
 
-							const cellClasses = classnames( { 'is-selected': isSelected } );
+							const cellClasses = classnames(	{
+								'is-selected': isSelected,
+								[ `has-text-align-${ align }` ]: align,
+							} );
+							const richTextClassName = 'wp-block-table__cell-content';
 
 							return (
 								<CellTag
 									key={ columnIndex }
 									className={ cellClasses }
+									scope={ CellTag === 'th' ? scope : undefined }
+									onClick={ ( event ) => {
+										// When a cell is selected, forward focus to the child RichText. This solves an issue where the
+										// user may click inside a cell, but outside of the RichText, resulting in nothing happening.
+										const richTextElement = event && event.target && event.target.querySelector( `.${ richTextClassName }` );
+										if ( richTextElement ) {
+											richTextElement.focus();
+										}
+									} }
 								>
 									<RichText
-										className="wp-block-table__cell-content"
+										className={ richTextClassName }
 										value={ content }
 										onChange={ this.onChange }
-										unstableOnFocus={ this.createOnFocus( cell ) }
+										unstableOnFocus={ this.createOnFocus( cellLocation ) }
 									/>
 								</CellTag>
 							);
@@ -416,7 +502,7 @@ export class TableEdit extends Component {
 		} = this.props;
 		const { initialRowCount, initialColumnCount } = this.state;
 		const { hasFixedLayout, head, body, foot } = attributes;
-		const isEmpty = ! head.length && ! body.length && ! foot.length;
+		const isEmpty = isEmptyTableSection( head ) && isEmptyTableSection( body ) && isEmptyTableSection( foot );
 		const Section = this.renderSection;
 
 		if ( isEmpty ) {
@@ -450,7 +536,7 @@ export class TableEdit extends Component {
 			);
 		}
 
-		const classes = classnames( className, backgroundColor.class, {
+		const tableClasses = classnames( backgroundColor.class, {
 			'has-fixed-layout': hasFixedLayout,
 			'has-background': !! backgroundColor.color,
 		} );
@@ -460,11 +546,19 @@ export class TableEdit extends Component {
 				<BlockControls>
 					<Toolbar>
 						<DropdownMenu
+							hasArrowIndicator
 							icon="editor-table"
 							label={ __( 'Edit table' ) }
 							controls={ this.getTableControls() }
 						/>
 					</Toolbar>
+					<AlignmentToolbar
+						label={ __( 'Change column alignment' ) }
+						alignmentControls={ ALIGNMENT_CONTROLS }
+						value={ this.getCellAlignment() }
+						onChange={ ( nextAlign ) => this.onChangeColumnAlignment( nextAlign ) }
+						onHover={ this.onHoverAlignment }
+					/>
 				</BlockControls>
 				<InspectorControls>
 					<PanelBody title={ __( 'Table Settings' ) } className="blocks-table-settings">
@@ -498,11 +592,13 @@ export class TableEdit extends Component {
 						] }
 					/>
 				</InspectorControls>
-				<table className={ classes }>
-					<Section type="head" rows={ head } />
-					<Section type="body" rows={ body } />
-					<Section type="foot" rows={ foot } />
-				</table>
+				<figure className={ className }>
+					<table className={ tableClasses }>
+						<Section name="head" rows={ head } />
+						<Section name="body" rows={ body } />
+						<Section name="foot" rows={ foot } />
+					</table>
+				</figure>
 			</>
 		);
 	}

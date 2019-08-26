@@ -110,7 +110,7 @@
 			border-left: none;
 			box-shadow: none;
 			pointer-events: none;
-			transition: border-color 0.1s linear, box-shadow 0.1s linear;
+			transition: border-color 0.1s linear, border-style 0.1s linear, box-shadow 0.1s linear;
 			@include reduce-motion("transition");
 
 			// Include a transparent outline for Windows High Contrast mode.
@@ -146,10 +146,19 @@
 				}
 			}
 		}
+
+		&.is-navigate-mode > .block-editor-block-list__block-edit::before {
+			border-color: $blue-medium-focus;
+			box-shadow: inset $block-left-border-width 0 0 0 $blue-medium-focus;
+
+			@include break-small() {
+				box-shadow: -$block-left-border-width 0 0 0 $blue-medium-focus;
+			}
+		}
 	}
 
 	// Hover style.
-	&.is-hovered > .block-editor-block-list__block-edit::before {
+	&.is-hovered:not(.is-navigate-mode) > .block-editor-block-list__block-edit::before {
 		box-shadow: -$block-left-border-width 0 0 0 $dark-opacity-light-500;
 
 		.is-dark-theme & {
@@ -168,8 +177,71 @@
 			opacity: 1;
 		}
 	}
-}
 
+	// Add extra border to parent blocks when their children are selected.
+	&.has-child-selected {
+
+		> .block-editor-block-list__block-edit::before {
+			border: $border-width dashed $dark-opacity-light-600;
+
+			.is-dark-theme & {
+				border-color: $light-opacity-light-500;
+			}
+		}
+
+		> .block-editor-block-list__block-edit > [data-block] > div > .block-editor-inner-blocks > .block-editor-block-list__layout > .block-editor-block-list__block:not(.is-selected) > .block-editor-block-list__block-edit::before,
+		> .block-editor-block-list__block-edit > [data-block] > div > .wp-block-cover__inner-container > .block-editor-inner-blocks > .block-editor-block-list__layout > .block-editor-block-list__block:not(.is-selected) > .block-editor-block-list__block-edit::before,
+		> .block-editor-block-list__block-edit > [data-block] > div > .wp-block-group__inner-container > .block-editor-inner-blocks > .block-editor-block-list__layout > .block-editor-block-list__block:not(.is-selected) > .block-editor-block-list__block-edit::before {
+			border: $border-width dashed $dark-opacity-light-600;
+
+			.is-dark-theme & {
+				border-color: $light-opacity-light-500;
+			}
+		}
+
+		&.is-hovered > .block-editor-block-list__block-edit::before,
+		> .block-editor-block-list__block-edit > [data-block] > div > .block-editor-inner-blocks > .block-editor-block-list__layout > .block-editor-block-list__block.is-hovered:not(.is-selected) > .block-editor-block-list__block-edit::before,
+		> .block-editor-block-list__block-edit > [data-block] > div > .wp-block-cover__inner-container > .block-editor-inner-blocks > .block-editor-block-list__layout > .block-editor-block-list__block.is-hovered:not(.is-selected) > .block-editor-block-list__block-edit::before,
+		> .block-editor-block-list__block-edit > [data-block] > div > .wp-block-group__inner-container > .block-editor-inner-blocks > .block-editor-block-list__layout > .block-editor-block-list__block.is-hovered:not(.is-selected) > .block-editor-block-list__block-edit::before {
+			border-style: solid;
+			border-color: $dark-opacity-light-500;
+			border-left-color: transparent;
+
+			.is-dark-theme & {
+				border-color: $light-opacity-light-400;
+				border-left-color: transparent;
+			}
+		}
+	}
+
+	// Add extra border to child blocks when they are selected.
+	&.is-selected {
+
+		> .block-editor-block-list__block-edit > [data-block] > div > .block-editor-inner-blocks > .block-editor-block-list__layout > .block-editor-block-list__block:not(.is-selected),
+		> .block-editor-block-list__block-edit > [data-block] > div > .wp-block-cover__inner-container > .block-editor-inner-blocks > .block-editor-block-list__layout > .block-editor-block-list__block:not(.is-selected),
+		> .block-editor-block-list__block-edit > [data-block] > div > .wp-block-group__inner-container > .block-editor-inner-blocks > .block-editor-block-list__layout > .block-editor-block-list__block:not(.is-selected) {
+
+			> .block-editor-block-list__block-edit::before {
+				border: $border-width dashed $dark-opacity-light-600;
+
+				.is-dark-theme & {
+					border-color: $light-opacity-light-500;
+				}
+			}
+
+			&.is-hovered > .block-editor-block-list__block-edit::before {
+				border-style: solid;
+				border-color: $dark-opacity-light-500;
+				border-left-color: transparent;
+
+				.is-dark-theme & {
+					border-color: $light-opacity-light-400;
+					border-left-color: transparent;
+				}
+			}
+		}
+	}
+}
 
 /**
  * Cross-block selection
@@ -439,19 +511,6 @@
 			float: left;
 		}
 
-		// Hide mover until wide breakpoints, or it might be covered by toolbar
-		&.is-multi-selected > .block-editor-block-mover,
-		> .block-editor-block-list__block-edit > .block-editor-block-mover {
-			display: none;
-		}
-
-		@include break-wide() {
-			&.is-multi-selected > .block-editor-block-mover,
-			> .block-editor-block-list__block-edit > .block-editor-block-mover {
-				display: block;
-			}
-		}
-
 		// Beyond the mobile breakpoint, wide images stretch outside of the column.
 		// To center the toolbar, we make it inline-flex so the toolbar is not full-wide.
 		@include break-small () {
@@ -463,6 +522,24 @@
 		// If the block movers are visible, push the breadcrumb down to make room for them.
 		.block-editor-block-mover.is-visible + .block-editor-block-list__breadcrumb {
 			top: (-$block-padding - $block-left-border-width - ($grid-size-small / 2));
+		}
+
+		// Align block toolbar to floated content.
+		// Extra specificity is needed to avoid applying this to innerblocks.
+		@include break-mobile() {
+			> .editor-block-list__block-edit > .block-editor-block-contextual-toolbar > .block-editor-block-toolbar {
+				/*!rtl:begin:ignore*/
+				left: $block-side-ui-width * 3 + ($grid-size-small * 1.5);
+				/*!rtl:end:ignore*/
+			}
+		}
+
+		@include break-xlarge() {
+			> .editor-block-list__block-edit > .block-editor-block-contextual-toolbar > .block-editor-block-toolbar {
+				/*!rtl:begin:ignore*/
+				left: $block-padding;
+				/*!rtl:end:ignore*/
+			}
 		}
 	}
 
@@ -530,8 +607,8 @@
 		margin: 0 $block-padding;
 	}
 
-	// Hide appender shortcuts in nested blocks
-	// This essentially duplicates the mobile styles for the appender component
+	// Hide appender shortcuts in nested blocks.
+	// This essentially duplicates the mobile styles for the appender component.
 	// It would be nice to be able to use element queries in that component instead https://github.com/tomhodgins/element-queries-spec
 	.block-editor-block-list__layout {
 		.block-editor-inserter-with-shortcuts {
@@ -544,6 +621,38 @@
 			right: $grid-size;
 		}
 	}
+}
+
+
+/**
+ * Styles that affect inner-block containers (nested blocks).
+ */
+
+// Hide trailing appender for non-empty blocks, until selected.
+.block-editor-inner-blocks {
+	.block-editor-block-list__block + .block-list-appender {
+		display: none;
+
+		// When a parent container is selected, show the appender.
+		.is-selected & {
+			display: block;
+		}
+	}
+
+	// When a child of a parent is selected, show the adjacent appender.
+	.block-editor-block-list__block.is-selected + .block-list-appender {
+		display: block;
+	}
+
+	/* @todo:
+	The two rules above can be simplified & combined when https://github.com/WordPress/gutenberg/pull/14961 is merged,
+	into the following:
+
+	.is-selected &,
+	.has-child-selected & {
+		display: block;
+	}
+	*/
 }
 
 
@@ -1006,22 +1115,19 @@
 		padding: 4px 4px;
 		background: $light-gray-500;
 		color: $dark-gray-900;
+		transition: box-shadow 0.1s linear;
+		@include reduce-motion("transition");
+
+		.components-button {
+			font-size: inherit;
+			line-height: inherit;
+			padding: 0;
+		}
 
 		.is-dark-theme & {
 			background: $dark-gray-600;
 			color: $white;
 		}
-
-		// Animate in
-		.block-editor-block-list__block:hover & {
-			opacity: 0;
-			@include edit-post__fade-in-animation(60ms, 0.5s);
-		}
-	}
-
-	// Position this above the toolbar of parent blocks.
-	.editor-inner-blocks & {
-		z-index: z-index(".editor-inner-blocks .block-editor-block-list__breadcrumb");
 	}
 
 	// Remove negative left breadcrumb position for left aligned blocks.
@@ -1033,6 +1139,38 @@
 	[data-align="right"] & {
 		left: auto;
 		right: 0;
+	}
+
+	// In navigation mode, this should appear similarly to the block toolbar.
+	.is-navigate-mode & {
+
+		// Position in the top left of the border.
+		left: -$block-padding;
+		top: -$block-toolbar-height - $block-padding;
+
+		.components-toolbar {
+			background: $white;
+			border: $border-width solid $blue-medium-focus;
+			border-left: none;
+			box-shadow: inset $block-left-border-width 0 0 0 $blue-medium-focus;
+			height: $block-toolbar-height + $border-width;
+			font-size: $default-font-size;
+			line-height: $block-toolbar-height - $grid-size;
+			padding-left: $grid-size;
+			padding-right: $grid-size;
+
+			.components-button {
+				box-shadow: none;
+			}
+
+			.is-dark-theme & {
+				border-color: $light-opacity-light-800;
+			}
+
+			@include break-small() {
+				box-shadow: -$block-left-border-width 0 0 0 $blue-medium-focus;
+			}
+		}
 	}
 }
 

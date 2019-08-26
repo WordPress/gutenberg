@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { useMemo, useState } from '@wordpress/element';
 import { compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 
@@ -10,8 +11,18 @@ import { withSelect } from '@wordpress/data';
 import WidgetArea from '../widget-area';
 
 function WidgetAreas( { areas, blockEditorSettings } ) {
+	const [ selectedArea, setSelectedArea ] = useState( 0 );
+	const onBlockSelectedInArea = useMemo(
+		() => areas.map( ( value, index ) => ( () => {
+			setSelectedArea( index );
+		} ) ),
+		[ areas, setSelectedArea ]
+	);
+
 	return areas.map( ( { id }, index ) => (
 		<WidgetArea
+			isSelectedArea={ index === selectedArea }
+			onBlockSelected={ onBlockSelectedInArea[ index ] }
 			blockEditorSettings={ blockEditorSettings }
 			key={ id }
 			id={ id }

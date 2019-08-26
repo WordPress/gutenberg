@@ -1,6 +1,6 @@
 .edit-post-visual-editor {
 	position: relative;
-	padding: 50px 0;
+	padding-top: 50px;
 
 	& .components-button {
 		font-family: $default-font;
@@ -8,11 +8,14 @@
 }
 
 .edit-post-visual-editor .block-editor-writing-flow__click-redirect {
-	// Collapse to minimum height of 50px, to fully occupy editor bottom pad.
-	height: 50px;
+	// Allow the page to be scrolled with the last block in the middle.
+	height: 50vh;
 	width: 100%;
-	// Offset for: Visual editor padding, block (default appender) margin.
-	margin: #{ -1 * $block-spacing } auto -50px;
+}
+
+// Hide the extra space when there are metaboxes.
+.has-metaboxes .edit-post-visual-editor .block-editor-writing-flow__click-redirect {
+	height: 0;
 }
 
 // The base width of blocks
@@ -89,25 +92,5 @@
 	.block-editor-block-list__layout > .block-editor-block-list__block[data-align="left"]:first-child,
 	.block-editor-block-list__layout > .block-editor-block-list__block[data-align="right"]:first-child {
 		margin-top: $block-padding + $block-spacing + $border-width + $border-width + $block-padding;
-	}
-
-	.block-editor-default-block-appender {
-		// Default to centered and content-width, like blocks
-		margin-left: auto;
-		margin-right: auto;
-		position: relative;
-
-		&[data-root-client-id=""] .block-editor-default-block-appender__content:hover {
-			// Outline on root-level default block appender is redundant with the
-			// WritingFlow click redirector.
-			outline: 1px solid transparent;
-		}
-	}
-
-	// Ensure that the height of the first appender, and the one between blocks, is the same as text.
-	.block-editor-block-list__block[data-type="core/paragraph"] p[data-is-placeholder-visible="true"] + p,
-	.block-editor-default-block-appender__content {
-		min-height: $empty-paragraph-height / 2;
-		line-height: $editor-line-height;
 	}
 }

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/media-utils",
-	"version": "0.2.0",
+	"version": "1.0.0",
 	"description": "WordPress Media Upload Utils.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -27,7 +27,7 @@
 		"@wordpress/blob": "file:../blob",
 		"@wordpress/element": "file:../element",
 		"@wordpress/i18n": "file:../i18n",
-		"lodash": "^4.17.11"
+		"lodash": "^4.17.14"
 	},
 	"publishConfig": {
 		"access": "public"

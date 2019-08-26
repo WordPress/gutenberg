@@ -36,7 +36,7 @@ describe( 'controls', () => {
 			} );
 
 			registry.dispatch( 'store2' ).action2();
-			expect( action1 ).toBeCalled();
+			expect( action1 ).toHaveBeenCalled();
 		} );
 	} );
 
@@ -107,8 +107,7 @@ describe( 'controls', () => {
 			expect( registry.select( 'store' ).getItems.hasResolver ).toBe( false );
 		} );
 	} );
-	describe( 'various action types have expected response and resolve as ' +
-		'expected with controls middleware', () => {
+	describe( 'various action types have expected response and resolve as expected with controls middleware', () => {
 		const actions = {
 			*withPromise() {
 				yield { type: 'SOME_ACTION' };
@@ -164,8 +163,7 @@ describe( 'controls', () => {
 				.toEqual( { type: 'NORMAL' } );
 		} );
 	} );
-	describe( 'action type resolves as expected with just promise ' +
-		'middleware', () => {
+	describe( 'action type resolves as expected with just promise middleware', () => {
 		const actions = {
 			normal: () => ( { type: 'NORMAL' } ),
 			withPromiseAndAction: () => new Promise(

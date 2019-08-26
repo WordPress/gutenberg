@@ -312,11 +312,11 @@ Mark a control as a registry control.
 
 _Parameters_
 
--   _registryControl_ `function`: Function receiving a registry object and returning a control.
+-   _registryControl_ `Function`: Function receiving a registry object and returning a control.
 
 _Returns_
 
--   `function`: marked registry control.
+-   `Function`: marked registry control.
 
 <a name="createRegistrySelector" href="#createRegistrySelector">#</a> **createRegistrySelector**
 
@@ -324,11 +324,11 @@ Mark a selector as a registry selector.
 
 _Parameters_
 
--   _registrySelector_ `function`: Function receiving a registry object and returning a state selector.
+-   _registrySelector_ `Function`: Function receiving a registry object and returning a state selector.
 
 _Returns_
 
--   `function`: marked registry selector.
+-   `Function`: marked registry selector.
 
 <a name="dispatch" href="#dispatch">#</a> **dispatch**
 
@@ -398,7 +398,7 @@ You can read more about the react context api here:
 
 _Usage_
 
-````js
+```js
 const {
   RegistryProvider,
   RegistryConsumer,
@@ -419,6 +419,7 @@ const App = ( { props } ) => {
     </RegistryConsumer>
   </RegistryProvider>
 }
+```
 
 <a name="RegistryProvider" href="#RegistryProvider">#</a> **RegistryProvider**
 
@@ -434,13 +435,13 @@ Given the name of a registered store, returns an object of the store's selectors
 The selector functions are been pre-bound to pass the current state automatically.
 As a consumer, you need only pass arguments of the selector, if applicable.
 
-*Usage*
+_Usage_
 
 ```js
 const { select } = wp.data;
 
 select( 'my-shop' ).getPrice( 'hammer' );
-````
+```
 
 _Parameters_
 

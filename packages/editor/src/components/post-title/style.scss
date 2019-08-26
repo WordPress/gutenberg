@@ -36,7 +36,7 @@
 		}
 
 		// Match h1 heading.
-		font-size: 2.441em;
+		font-size: 2.44em;
 		font-weight: 600;
 
 		// Large text needs a 3:1 contrast ratio.
@@ -106,11 +106,19 @@
 .editor-post-title .editor-post-permalink {
 	font-size: $default-font-size;
 	color: $dark-gray-900;
-	position: absolute;
-	top: -$block-toolbar-height + $border-width + $border-width + 1px; // Shift this element upward the same height as the block toolbar, minus the border size
-	left: 0;
-	right: 0;
+	height: auto;
+	position: relative;
+	left: $block-left-border-width;
+	top: -2px;
+	width: calc(100% - #{$block-left-border-width});
 
+	@include break-mobile() {
+		position: absolute;
+		top: -$block-toolbar-height + $border-width + $border-width + 1px; // Shift this element upward the same height as the block toolbar, minus the border size
+		right: 0;
+		flex-wrap: nowrap;
+		width: auto;
+	}
 	@include break-small() {
 		left: $block-side-ui-clearance;
 		right: $block-side-ui-clearance;

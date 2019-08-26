@@ -2,7 +2,11 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { navigateRegions, Popover, SlotFillProvider } from '@wordpress/components';
+import {
+	navigateRegions,
+	Popover,
+	SlotFillProvider,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies

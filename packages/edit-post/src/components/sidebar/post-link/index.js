@@ -30,6 +30,7 @@ function PostLink( {
 	postTitle,
 	postSlug,
 	postID,
+	postTypeLabel,
 } ) {
 	const { prefix, suffix } = permalinkParts;
 	let prefixElement, postNameElement, suffixElement;
@@ -95,7 +96,7 @@ function PostLink( {
 				</div>
 			) }
 			<p className="edit-post-post-link__preview-label">
-				{ __( 'Preview' ) }
+				{ postTypeLabel || __( 'View Post' ) }
 			</p>
 			<ExternalLink
 				className="edit-post-post-link__link"
@@ -148,6 +149,7 @@ export default compose( [
 			postTitle: getEditedPostAttribute( 'title' ),
 			postSlug: getEditedPostAttribute( 'slug' ),
 			postID: id,
+			postTypeLabel: get( postType, [ 'labels', 'view_item' ] ),
 		};
 	} ),
 	ifCondition( ( { isEnabled, isNew, postLink, isViewable, permalinkParts } ) => {

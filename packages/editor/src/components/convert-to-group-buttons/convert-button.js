@@ -55,33 +55,40 @@ export default compose( [
 			canInsertBlockType,
 		} = select( 'core/block-editor' );
 
-		const containerBlockAvailable = canInsertBlockType( 'core/group' );
+		const {
+			getGroupingBlockName,
+		} = select( 'core/blocks' );
+
+		const groupingBlockName = getGroupingBlockName();
+
+		const groupingBlockAvailable = canInsertBlockType( groupingBlockName );
 
 		const blocksSelection = getBlocksByClientId( clientIds );
 
-		const isSingleContainerBlock = blocksSelection.length === 1 && blocksSelection[ 0 ] && blocksSelection[ 0 ].name === 'core/group';
+		const isSingleGroupingBlock = blocksSelection.length === 1 && blocksSelection[ 0 ] && blocksSelection[ 0 ].name === groupingBlockName;
 
 		// Do we have
-		// 1. Container block available to be inserted?
+		// 1. Grouping block available to be inserted?
 		// 2. One or more blocks selected
 		// (we allow single Blocks to become groups unless
 		// they are a soltiary group block themselves)
 		const isGroupable = (
-			containerBlockAvailable &&
+			groupingBlockAvailable &&
 			blocksSelection.length &&
-			! isSingleContainerBlock
+			! isSingleGroupingBlock
 		);
 
-		// Do we have a single Group Block selected?
-		const isUngroupable = isSingleContainerBlock;
+		// Do we have a single Group Block selected and does that group have inner blocks?
+		const isUngroupable = isSingleGroupingBlock && !! blocksSelection[ 0 ].innerBlocks.length;
 
 		return {
 			isGroupable,
 			isUngroupable,
 			blocksSelection,
+			groupingBlockName,
 		};
 	} ),
-	withDispatch( ( dispatch, { clientIds, onToggle = noop, blocksSelection = [] } ) => {
+	withDispatch( ( dispatch, { clientIds, onToggle = noop, blocksSelection = [], groupingBlockName } ) => {
 		const {
 			replaceBlocks,
 		} = dispatch( 'core/block-editor' );
@@ -92,8 +99,8 @@ export default compose( [
 					return;
 				}
 
-				// Activate the `transform` on `core/group` which does the conversion
-				const newBlocks = switchToBlockType( blocksSelection, 'core/group' );
+				// Activate the `transform` on the Grouping Block which does the conversion
+				const newBlocks = switchToBlockType( blocksSelection, groupingBlockName );
 
 				if ( newBlocks ) {
 					replaceBlocks(

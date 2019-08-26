@@ -17,9 +17,7 @@ describe( 'Font Size Picker', () => {
 		// Create a paragraph block with some content.
 		await clickBlockAppender();
 		await page.keyboard.type( 'Paragraph to be made "large"' );
-		await page.click( '.components-font-size-picker__selector' );
-		const changeSizeButton = await page.waitForSelector( '.components-button.is-font-large' );
-		await changeSizeButton.click();
+		await page.select( '.components-font-size-picker__select .components-select-control__input', 'large' );
 
 		// Ensure content matches snapshot.
 		const content = await getEditedPostContent();
@@ -58,14 +56,9 @@ describe( 'Font Size Picker', () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'Paragraph with font size reset using button' );
 
-		await page.click( '.blocks-font-size .components-range-control__number' );
-		// This should be the default font-size of the current theme.
-		await page.keyboard.type( '22' );
+		await page.select( '.components-font-size-picker__select .components-select-control__input', 'normal' );
 
-		// Blur the range control
-		await page.click( '.components-base-control__label' );
-
-		const resetButton = ( await page.$x( '//*[contains(concat(" ", @class, " "), " components-font-size-picker__buttons ")]//*[text()=\'Reset\']' ) )[ 0 ];
+		const resetButton = ( await page.$x( '//*[contains(concat(" ", @class, " "), " components-font-size-picker__controls ")]//*[text()=\'Reset\']' ) )[ 0 ];
 		await resetButton.click();
 
 		// Ensure content matches snapshot.
@@ -78,9 +71,7 @@ describe( 'Font Size Picker', () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'Paragraph with font size reset using input field' );
 
-		await page.click( '.components-font-size-picker__selector' );
-		const changeSizeButton = await page.waitForSelector( '.components-button.is-font-large' );
-		await changeSizeButton.click();
+		await page.select( '.components-font-size-picker__select .components-select-control__input', 'large' );
 
 		// Clear the custom font size input.
 		await page.click( '.blocks-font-size .components-range-control__number' );
