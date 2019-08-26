@@ -43,7 +43,7 @@ try {
 	exit( 1 );
 }
 
-const pluginMountDir = normalize( cwd() );
+const pluginMountDir = cwd();
 
 const composeTemplateFile = env.npm_package_wp_env_docker_template ? normalize( cwd() + `/${ env.npm_package_wp_env_docker_template }` ) : fromConfigRoot( 'docker-compose.override.yml.template' );
 
