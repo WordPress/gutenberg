@@ -301,6 +301,13 @@ class GalleryEdit extends Component {
 			return mediaPlaceholder;
 		}
 
+		const captionClassNames = classnames(
+			'blocks-gallery-caption',
+			{
+				'screen-reader-text': ! isSelected && RichText.isEmpty( caption ),
+			}
+		);
+
 		return (
 			<>
 				<InspectorControls>
@@ -364,18 +371,16 @@ class GalleryEdit extends Component {
 						} ) }
 					</ul>
 					{ mediaPlaceholder }
-					{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
-						<RichText
-							tagName="figcaption"
-							className="blocks-gallery-caption"
-							placeholder={ __( 'Write gallery caption…' ) }
-							value={ caption }
-							unstableOnFocus={ this.onFocusGalleryCaption }
-							onChange={ ( value ) => setAttributes( { caption: value } ) }
-							isSelected={ this.state.galleryCaptionFocused }
-							inlineToolbar
-						/>
-					) }
+					<RichText
+						tagName="figcaption"
+						className={ captionClassNames }
+						placeholder={ __( 'Write gallery caption…' ) }
+						value={ caption }
+						unstableOnFocus={ this.onFocusGalleryCaption }
+						onChange={ ( value ) => setAttributes( { caption: value } ) }
+						isSelected={ this.state.galleryCaptionFocused }
+						inlineToolbar
+					/>
 				</figure>
 			</>
 		);
