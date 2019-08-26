@@ -458,6 +458,9 @@ export function createBlockWithFallback( blockNode ) {
 	innerBlocks = innerBlocks.map( createBlockWithFallback );
 
 	// Remove `undefined` innerBlocks.
+	//
+	// This is a temporary fix to prevent unrecoverable TypeErrors when handling unexpectedly
+	// empty freeform block nodes. See https://github.com/WordPress/gutenberg/pull/17164.
 	innerBlocks = innerBlocks.filter( ( innerBlock ) => innerBlock );
 
 	const isFallbackBlock = (
