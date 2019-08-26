@@ -81,7 +81,7 @@ function mergeConfigs( originalConfig, newConfig ) {
 		if ( ! originalConfig[ key ] ) {
 			// If the originalConfig object doesn't have this element, we can just add it.
 			originalConfig[ key ] = newConfig[ key ];
-		} else if ( newConfig[ key ] instanceof Array ) {
+		} else if ( Array.isArray( newConfig[ key ] ) ) {
 			// If the newConfig element is an array, we need to try and merge them.
 			// This is intended to merge Docker volume configs, which exist in the form:
 			// /path/to/local/dir:/path/to/container/dir:config:stuff
