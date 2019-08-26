@@ -151,6 +151,8 @@ class BottomSheetCell extends Component {
 				);
 		};
 
+		const iconStyle = getStyle( styles.icon, styles.iconDark, theme );
+
 		return (
 			<TouchableOpacity
 				accessible={ ! this.state.isEditingValue }
@@ -168,7 +170,7 @@ class BottomSheetCell extends Component {
 					<View style={ styles.cellRowContainer }>
 						{ icon && (
 							<View style={ styles.cellRowContainer }>
-								<Dashicon icon={ icon } size={ 24 } color={ theme === 'dark' && '#C3C4C7' } />
+								<Dashicon icon={ icon } size={ 24 } color={ iconStyle.color } />
 								<View style={ platformStyles.labelIconSeparator } />
 							</View>
 						) }
