@@ -1,3 +1,8 @@
+1.11.0
+------
+* Toolbar scroll position now resets when its content changes.
+* Dark Mode for iOS.
+
 1.10.0
 ------
 * Adding a block from the post title now shows the add block here indicator.

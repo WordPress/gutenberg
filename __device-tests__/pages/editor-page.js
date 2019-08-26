@@ -10,7 +10,7 @@ import wd from 'wd';
 /**
  * Internal dependencies
  */
-import { isAndroid, swipeUp, typeString, toggleHtmlMode } from '../helpers/utils';
+import { isAndroid, swipeUp, swipeDown, typeString, toggleHtmlMode } from '../helpers/utils';
 
 export default class EditorPage {
 	driver: wd.PromiseChainWebdriver;
@@ -46,9 +46,47 @@ export default class EditorPage {
 	// Finds the wd element for new block that was added and sets the element attribute
 	// and accessibilityId attributes on this object and selects the block
 	// position uses one based numbering
-	async getBlockAtPosition( position: number, blockName: string ) {
+	async getBlockAtPosition( position: number, blockName: string, options: { autoscroll: boolean } = { autoscroll: false } ) {
 		const blockLocator = `//*[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }.")]`;
 		const elements = await this.driver.elementsByXPath( blockLocator );
+		const lastElementFound = elements[ elements.length - 1 ];
+		if ( elements.length === 0 && options.autoscroll ) {
+			const firstBlockVisible = await this.getFirstBlockVisible();
+			const lastBlockVisible = await this.getLastBlockVisible();
+			// exit if no block is found
+			if ( ! firstBlockVisible || ! lastBlockVisible ) {
+				return lastElementFound;
+			}
+			const firstBlockAccessibilityId = await firstBlockVisible.getAttribute( this.accessibilityIdKey );
+			const firstBlockRowMatch = /Row (\d+)\./.exec( firstBlockAccessibilityId );
+			const firstBlockRow = firstBlockRowMatch && Number( firstBlockRowMatch[ 1 ] );
+			const lastBlockAccessibilityId = await lastBlockVisible.getAttribute( this.accessibilityIdKey );
+			const lastBlockRowMatch = /Row (\d+)\./.exec( lastBlockAccessibilityId );
+			const lastBlockRow = lastBlockRowMatch && Number( lastBlockRowMatch[ 1 ] );
+			if ( firstBlockRow && position < firstBlockRow ) {
+				if ( firstBlockRow === 1 ) { // we're at the top already stop recursing
+					return lastElementFound;
+				}
+				// scroll up
+				await swipeDown( this.driver );
+			} else if ( lastBlockRow && position > lastBlockRow ) {
+				// scroll down
+				await swipeUp( this.driver );
+			}
+			return this.getBlockAtPosition( position, blockName, options );
+		}
+		return lastElementFound;
+	}
+
+	async getFirstBlockVisible() {
+		const firstBlockLocator = `//*[contains(@${ this.accessibilityIdXPathAttrib }, " Block. Row ")]`;
+		const elements = await this.driver.elementsByXPath( firstBlockLocator );
+		return elements[ 0 ];
+	}
+
+	async getLastBlockVisible() {
+		const firstBlockLocator = `//*[contains(@${ this.accessibilityIdXPathAttrib }, " Block. Row ")]`;
+		const elements = await this.driver.elementsByXPath( firstBlockLocator );
 		return elements[ elements.length - 1 ];
 	}
 
@@ -56,9 +94,13 @@ export default class EditorPage {
 		return undefined !== await this.getBlockAtPosition( position, blockName );
 	}
 
-	async getTitleElement() {
+	async getTitleElement( options: { autoscroll: boolean } = { autoscroll: false } ) {
 		//TODO: Improve the identifier for this element
 		const elements = await this.driver.elementsByXPath( `//*[contains(@${ this.accessibilityIdXPathAttrib }, "Post title.")]` );
+		if ( elements.length === 0 && options.autoscroll ) {
+			await swipeDown( this.driver );
+			return this.getTitleElement( options );
+		}
 		return elements[ elements.length - 1 ];
 	}
 
@@ -198,8 +240,8 @@ export default class EditorPage {
 		await this.addNewBlock( this.paragraphBlockName );
 	}
 
-	async getParagraphBlockAtPosition( position: number ) {
-		return this.getBlockAtPosition( position, this.paragraphBlockName );
+	async getParagraphBlockAtPosition( position: number, options: { autoscroll: boolean } = { autoscroll: false } ) {
+		return this.getBlockAtPosition( position, this.paragraphBlockName, options );
 	}
 
 	async hasParagraphBlockAtPosition( position: number ) {
