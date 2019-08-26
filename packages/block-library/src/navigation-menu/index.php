@@ -19,11 +19,11 @@ function render_block_navigation_menu( $attributes, $content, $block ) {
 }
 
 /**
- * Adds parent and child relatin to innerBlocks
+ * Walks the inner block structure and retunrs an HTML list of it.
  *
  * @param array $block The block.
  *
- * @return string Returns the block with ids and parents for innerBlocks.
+ * @return string Returns  an HTML list from innerBlocks.
  */
 function prepare_navigation( $block ) {
 	$block_tree = '';
