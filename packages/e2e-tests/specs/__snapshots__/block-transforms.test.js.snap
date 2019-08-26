@@ -91,8 +91,8 @@ exports[`Block transforms correctly transform block Image in fixture core__image
 `;
 
 exports[`Block transforms correctly transform block Image in fixture core__image into the Gallery block 1`] = `
-"<!-- wp:gallery {\\"ids\\":[]} -->
-<ul class=\\"wp-block-gallery columns-0 is-cropped\\"></ul>
+"<!-- wp:gallery {\\"ids\\":[null]} -->
+<ul class=\\"wp-block-gallery columns-1 is-cropped\\"><li class=\\"blocks-gallery-item\\"><figure><img src=\\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\\" alt=\\"\\"/></figure></li></ul>
 <!-- /wp:gallery -->"
 `;
 
@@ -127,8 +127,8 @@ exports[`Block transforms correctly transform block Image in fixture core__image
 `;
 
 exports[`Block transforms correctly transform block Image in fixture core__image__attachment-link into the Gallery block 1`] = `
-"<!-- wp:gallery {\\"ids\\":[]} -->
-<ul class=\\"wp-block-gallery columns-0 is-cropped\\"></ul>
+"<!-- wp:gallery {\\"ids\\":[null]} -->
+<ul class=\\"wp-block-gallery columns-1 is-cropped\\"><li class=\\"blocks-gallery-item\\"><figure><img src=\\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\\" alt=\\"\\"/></figure></li></ul>
 <!-- /wp:gallery -->"
 `;
 
@@ -155,8 +155,8 @@ exports[`Block transforms correctly transform block Image in fixture core__image
 `;
 
 exports[`Block transforms correctly transform block Image in fixture core__image__center-caption into the Gallery block 1`] = `
-"<!-- wp:gallery {\\"ids\\":[],\\"align\\":\\"center\\"} -->
-<ul class=\\"wp-block-gallery aligncenter columns-0 is-cropped\\"></ul>
+"<!-- wp:gallery {\\"ids\\":[null],\\"align\\":\\"center\\"} -->
+<ul class=\\"wp-block-gallery aligncenter columns-1 is-cropped\\"><li class=\\"blocks-gallery-item\\"><figure><img src=\\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\\" alt=\\"\\"/><figcaption>Give it a try. Press the \\"really wide\\" button on the image toolbar.</figcaption></figure></li></ul>
 <!-- /wp:gallery -->"
 `;
 
@@ -183,8 +183,8 @@ exports[`Block transforms correctly transform block Image in fixture core__image
 `;
 
 exports[`Block transforms correctly transform block Image in fixture core__image__custom-link into the Gallery block 1`] = `
-"<!-- wp:gallery {\\"ids\\":[]} -->
-<ul class=\\"wp-block-gallery columns-0 is-cropped\\"></ul>
+"<!-- wp:gallery {\\"ids\\":[null]} -->
+<ul class=\\"wp-block-gallery columns-1 is-cropped\\"><li class=\\"blocks-gallery-item\\"><figure><img src=\\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\\" alt=\\"\\"/></figure></li></ul>
 <!-- /wp:gallery -->"
 `;
 
@@ -211,8 +211,8 @@ exports[`Block transforms correctly transform block Image in fixture core__image
 `;
 
 exports[`Block transforms correctly transform block Image in fixture core__image__custom-link-class into the Gallery block 1`] = `
-"<!-- wp:gallery {\\"ids\\":[]} -->
-<ul class=\\"wp-block-gallery columns-0 is-cropped\\"></ul>
+"<!-- wp:gallery {\\"ids\\":[null]} -->
+<ul class=\\"wp-block-gallery columns-1 is-cropped\\"><li class=\\"blocks-gallery-item\\"><figure><img src=\\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\\" alt=\\"\\"/></figure></li></ul>
 <!-- /wp:gallery -->"
 `;
 
@@ -239,8 +239,8 @@ exports[`Block transforms correctly transform block Image in fixture core__image
 `;
 
 exports[`Block transforms correctly transform block Image in fixture core__image__custom-link-rel into the Gallery block 1`] = `
-"<!-- wp:gallery {\\"ids\\":[]} -->
-<ul class=\\"wp-block-gallery columns-0 is-cropped\\"></ul>
+"<!-- wp:gallery {\\"ids\\":[null]} -->
+<ul class=\\"wp-block-gallery columns-1 is-cropped\\"><li class=\\"blocks-gallery-item\\"><figure><img src=\\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\\" alt=\\"\\"/></figure></li></ul>
 <!-- /wp:gallery -->"
 `;
 
@@ -267,8 +267,8 @@ exports[`Block transforms correctly transform block Image in fixture core__image
 `;
 
 exports[`Block transforms correctly transform block Image in fixture core__image__media-link into the Gallery block 1`] = `
-"<!-- wp:gallery {\\"ids\\":[]} -->
-<ul class=\\"wp-block-gallery columns-0 is-cropped\\"></ul>
+"<!-- wp:gallery {\\"ids\\":[null]} -->
+<ul class=\\"wp-block-gallery columns-1 is-cropped\\"><li class=\\"blocks-gallery-item\\"><figure><img src=\\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\\" alt=\\"\\"/></figure></li></ul>
 <!-- /wp:gallery -->"
 `;
 

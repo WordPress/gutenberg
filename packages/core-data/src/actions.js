@@ -132,7 +132,7 @@ export function* editEntityRecord( kind, name, recordId, edits ) {
 		kind,
 		name
 	);
-	const record = yield select( 'getEntityRecord', kind, name, recordId );
+	const record = yield select( 'getRawEntityRecord', kind, name, recordId );
 	const editedRecord = yield select(
 		'getEditedEntityRecord',
 		kind,
@@ -147,9 +147,9 @@ export function* editEntityRecord( kind, name, recordId, edits ) {
 		// Clear edits when they are equal to their persisted counterparts
 		// so that the property is not considered dirty.
 		edits: Object.keys( edits ).reduce( ( acc, key ) => {
-			const recordValue = get( record[ key ], 'raw', record[ key ] );
+			const recordValue = record[ key ];
 			const value = mergedEdits[ key ] ?
-				merge( recordValue, edits[ key ] ) :
+				merge( {}, recordValue, edits[ key ] ) :
 				edits[ key ];
 			acc[ key ] = isEqual( recordValue, value ) ? undefined : value;
 			return acc;
@@ -235,9 +235,14 @@ export function* saveEntityRecord(
 	let error;
 	try {
 		const path = `${ entity.baseURL }${ recordId ? '/' + recordId : '' }`;
+
 		if ( isAutosave ) {
+			// Most of this autosave logic is very specific to posts.
+			// This is fine for now as it is the only supported autosave,
+			// but ideally this should all be handled in the back end,
+			// so the client just sends and receives objects.
 			const persistedRecord = yield select(
-				'getEntityRecord',
+				'getRawEntityRecord',
 				kind,
 				name,
 				recordId
@@ -255,18 +260,49 @@ export function* saveEntityRecord(
 			// to the actual persisted entity if the edits don't
 			// have a value.
 			let data = { ...persistedRecord, ...autosavePost, ...record };
-			data = Object.keys( data ).reduce( ( acc, key ) => {
-				if ( key in [ 'title', 'excerpt', 'content' ] ) {
-					acc[ key ] = get( data[ key ], 'raw', data[ key ] );
-				}
-				return acc;
-			}, {} );
+			data = Object.keys( data ).reduce(
+				( acc, key ) => {
+					if ( [ 'title', 'excerpt', 'content' ].includes( key ) ) {
+						// Edits should be the "raw" attribute values.
+						acc[ key ] = get( data[ key ], 'raw', data[ key ] );
+					}
+					return acc;
+				},
+				{ status: data.status === 'auto-draft' ? 'draft' : data.status }
+			);
 			updatedRecord = yield apiFetch( {
 				path: `${ path }/autosaves`,
 				method: 'POST',
 				data,
 			} );
-			yield receiveAutosaves( persistedRecord.id, updatedRecord );
+			// An autosave may be processed by the server as a regular save
+			// when its update is requested by the author and the post had
+			// draft or auto-draft status.
+			if ( persistedRecord.id === updatedRecord.id ) {
+				let newRecord = { ...persistedRecord, ...data, ...updatedRecord };
+				newRecord = Object.keys( newRecord ).reduce( ( acc, key ) => {
+					// These properties are persisted in autosaves.
+					if ( [ 'title', 'excerpt', 'content' ].includes( key ) ) {
+						// Edits should be the "raw" attribute values.
+						acc[ key ] = get( newRecord[ key ], 'raw', newRecord[ key ] );
+					} else if ( key === 'status' ) {
+						// Status is only persisted in autosaves when going from
+						// "auto-draft" to "draft".
+						acc[ key ] =
+							persistedRecord.status === 'auto-draft' &&
+							newRecord.status === 'draft' ?
+								newRecord.status :
+								persistedRecord.status;
+					} else {
+						// These properties are not persisted in autosaves.
+						acc[ key ] = get( persistedRecord[ key ], 'raw', persistedRecord[ key ] );
+					}
+					return acc;
+				}, {} );
+				yield receiveEntityRecords( kind, name, newRecord, undefined, true );
+			} else {
+				yield receiveAutosaves( persistedRecord.id, updatedRecord );
+			}
 		} else {
 			updatedRecord = yield apiFetch( {
 				path,

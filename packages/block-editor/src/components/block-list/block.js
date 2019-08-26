@@ -691,6 +691,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 		replaceBlocks,
 		toggleSelection,
 		setNavigationMode,
+		__unstableMarkLastChangeAsPersistent,
 	} = dispatch( 'core/block-editor' );
 
 	return {
@@ -744,6 +745,12 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 			}
 		},
 		onReplace( blocks, indexToSelect ) {
+			if (
+				blocks.length &&
+				! isUnmodifiedDefaultBlock( blocks[ blocks.length - 1 ] )
+			) {
+				__unstableMarkLastChangeAsPersistent();
+			}
 			replaceBlocks( [ ownProps.clientId ], blocks, indexToSelect );
 		},
 		onShiftSelection() {
