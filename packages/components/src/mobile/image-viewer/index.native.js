@@ -13,7 +13,6 @@ import { Component } from '@wordpress/element';
  * Internal dependencies
  */
 import styles from './styles.scss';
-import { calculateFullscreenImageSize } from './utils';
 
 class ImageViewer extends Component {
 	constructor() {
@@ -47,16 +46,24 @@ class ImageViewer extends Component {
 	}
 
 	fetchImageSize( dimensions ) {
-		this.container = dimensions;
 		Image.getSize( this.props.url, ( width, height ) => {
-			this.image = { width, height };
-			this.calculateSize();
+			const { finalWidth, finalHeight } = this.calculateFullscreenImageSize( width, height, dimensions );
+			this.setState( { width: finalWidth, height: finalHeight } );
 		} );
 	}
 
-	calculateSize() {
-		const { width, height } = calculateFullscreenImageSize( this.image, this.container );
-		this.setState( { width, height } );
+	calculateFullscreenImageSize( imageWidth, imageHeight, container ) {
+		const imageRatio = imageWidth / imageHeight;
+		const screenRatio = container.width / container.height;
+		let finalWidth = container.width;
+		let finalHeight = container.height;
+		const shouldUseContainerHeightForImage = imageRatio < screenRatio;
+		if ( shouldUseContainerHeightForImage ) {
+			finalWidth = container.height * imageRatio;
+		} else {
+			finalHeight = container.width / imageRatio;
+		}
+		return { finalWidth, finalHeight };
 	}
 
 	render() {
