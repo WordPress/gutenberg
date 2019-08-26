@@ -4,6 +4,11 @@
 import { eventEmitter, initialMode } from 'react-native-dark-mode';
 import React from 'react';
 
+// This was failing on CI
+if ( eventEmitter.setMaxListeners ) {
+	eventEmitter.setMaxListeners( 150 );
+}
+
 export function useStyle( light, dark, theme ) {
 	const finalDark = {
 		...light,
@@ -19,15 +24,26 @@ export function withTheme( WrappedComponent ) {
 		constructor( props ) {
 			super( props );
 
+			this.onModeChanged = this.onModeChanged.bind( this );
+
 			this.state = {
 				mode: initialMode,
 			};
 		}
 
+		onModeChanged( newMode ) {
+			this.setState( { mode: newMode } );
+		}
+
 		componentDidMount() {
-			eventEmitter.on( 'currentModeChanged', ( newMode ) => {
-				this.setState( { mode: newMode } );
-			} );
+			this.subscription = eventEmitter.on( 'currentModeChanged', this.onModeChanged );
+		}
+
+		componentWillUnmount() {
+			// Conditional needed to pass UI Tests on CI
+			if ( eventEmitter.removeListener ) {
+				eventEmitter.removeListener( 'currentModeChanged', this.onModeChanged );
+			}
 		}
 
 		render() {
