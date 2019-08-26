@@ -280,27 +280,29 @@ class CoverEdit extends Component {
 							</PanelRow>
 						</PanelBody>
 					) }
-					<PanelColorSettings
-						title={ __( 'Overlay' ) }
-						initialOpen={ true }
-						colorSettings={ [ {
-							value: overlayColor.color,
-							onChange: setOverlayColor,
-							label: __( 'Overlay Color' ),
-						} ] }
-					>
-						{ !! url && (
-							<RangeControl
-								label={ __( 'Background Opacity' ) }
-								value={ dimRatio }
-								onChange={ setDimRatio }
-								min={ 0 }
-								max={ 100 }
-								step={ 10 }
-								required
-							/>
-						) }
-					</PanelColorSettings>
+					{ ( url || overlayColor.color ) && (
+						<PanelColorSettings
+							title={ __( 'Overlay' ) }
+							initialOpen={ true }
+							colorSettings={ [ {
+								value: overlayColor.color,
+								onChange: setOverlayColor,
+								label: __( 'Overlay Color' ),
+							} ] }
+						>
+							{ !! url && (
+								<RangeControl
+									label={ __( 'Background Opacity' ) }
+									value={ dimRatio }
+									onChange={ setDimRatio }
+									min={ 0 }
+									max={ 100 }
+									step={ 10 }
+									required
+								/>
+							) }
+						</PanelColorSettings>
+					) }
 				</InspectorControls>
 			</>
 		);
