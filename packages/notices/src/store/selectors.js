@@ -44,7 +44,7 @@ const DEFAULT_NOTICES = [];
  * @property {string}    label    Message to use as action label.
  * @property {?string}   url      Optional URL of resource if action incurs
  *                                browser navigation.
- * @property {?Function} callback Optional function to invoke when action is
+ * @property {?Function} onClick  Optional function to invoke when action is
  *                                triggered by user.
  *
  */
