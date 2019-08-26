@@ -2,6 +2,7 @@
  * External dependencies
  */
 const yaml = require( 'js-yaml' );
+const { isPlainObject } = require( 'lodash' );
 
 /**
  * Node dependencies.
@@ -93,7 +94,7 @@ function mergeConfigs( originalConfig, newConfig ) {
 
 			// Append the newConfig to the remaining config.
 			originalConfig[ key ] = [ ...cleanOriginal, ...newConfig[ key ] ];
-		} else if ( newConfig[ key ] instanceof Object ) {
+		} else if ( isPlainObject( newConfig[ key ] ) ) {
 			// If the newConfig element is an object, we need to recursively merge it.
 			originalConfig[ key ] = mergeConfigs( originalConfig[ key ], newConfig[ key ] );
 		} else {
