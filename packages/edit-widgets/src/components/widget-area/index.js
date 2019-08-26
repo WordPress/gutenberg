@@ -17,6 +17,8 @@ import {
 	Inserter as BlockInserter,
 	WritingFlow,
 	ObserveTyping,
+	BlockEditorKeyboardShortcuts,
+	ButtonBlockerAppender,
 } from '@wordpress/block-editor';
 import { withDispatch, withSelect } from '@wordpress/data';
 
@@ -71,9 +73,12 @@ function WidgetArea( {
 					settings={ settings }
 				>
 					{ isSelectedArea && (
-						<Inserter>
-							<BlockInserter />
-						</Inserter>
+						<>
+							<Inserter>
+								<BlockInserter />
+							</Inserter>
+							<BlockEditorKeyboardShortcuts />
+						</>
 					) }
 					<SelectionObserver
 						isSelectedArea={ isSelectedArea }
@@ -82,11 +87,16 @@ function WidgetArea( {
 					<Sidebar.Inspector>
 						<BlockInspector showNoBlockSelectedMessage={ false } />
 					</Sidebar.Inspector>
-					<WritingFlow>
-						<ObserveTyping>
-							<BlockList />
-						</ObserveTyping>
-					</WritingFlow>
+					<div className="editor-styles-wrapper">
+						<WritingFlow>
+							<ObserveTyping>
+								<BlockList
+									className="edit-widgets-main-block-list"
+									renderAppender={ ButtonBlockerAppender }
+								/>
+							</ObserveTyping>
+						</WritingFlow>
+					</div>
 				</BlockEditorProvider>
 			</PanelBody>
 		</Panel>

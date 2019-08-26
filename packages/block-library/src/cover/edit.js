@@ -16,8 +16,10 @@ import {
 	ToggleControl,
 	Toolbar,
 	withNotices,
+	ResizableBox,
+	BaseControl,
 } from '@wordpress/components';
-import { compose } from '@wordpress/compose';
+import { compose, withInstanceId } from '@wordpress/compose';
 import {
 	BlockControls,
 	BlockIcon,
@@ -39,6 +41,8 @@ import icon from './icon';
 import {
 	IMAGE_BACKGROUND_TYPE,
 	VIDEO_BACKGROUND_TYPE,
+	COVER_MIN_HEIGHT,
+	COVER_DEFAULT_HEIGHT,
 	backgroundImageStyles,
 	dimRatioToClass,
 } from './shared';
@@ -54,7 +58,6 @@ const INNER_BLOCKS_TEMPLATE = [
 		placeholder: __( 'Write title…' ),
 	} ],
 ];
-const INNER_BLOCKS_ALLOWED_BLOCKS = [ 'core/button', 'core/heading', 'core/paragraph' ];
 
 function retrieveFastAverageColor() {
 	if ( ! retrieveFastAverageColor.fastAverageColor ) {
@@ -91,8 +94,10 @@ class CoverEdit extends Component {
 
 	render() {
 		const {
+			instanceId,
 			attributes,
 			setAttributes,
+			isSelected,
 			className,
 			noticeUI,
 			overlayColor,
@@ -105,6 +110,7 @@ class CoverEdit extends Component {
 			hasParallax,
 			id,
 			url,
+			minHeight = COVER_DEFAULT_HEIGHT,
 		} = attributes;
 		const onSelectMedia = ( media ) => {
 			if ( ! media || ! media.url ) {
@@ -162,7 +168,7 @@ class CoverEdit extends Component {
 		if ( focalPoint ) {
 			style.backgroundPosition = `${ focalPoint.x * 100 }% ${ focalPoint.y * 100 }%`;
 		}
-
+		const inputId = `block-cover-height-input-${ instanceId }`;
 		const controls = (
 			<>
 				<BlockControls>
@@ -206,6 +212,28 @@ class CoverEdit extends Component {
 									onChange={ ( value ) => setAttributes( { focalPoint: value } ) }
 								/>
 							) }
+							<BaseControl label={ __( 'Height in pixels' ) } id={ inputId }>
+								<input
+									type="number"
+									id={ inputId }
+									onChange={ ( event ) => {
+										let coverMinHeight = parseInt( event.target.value, 10 );
+										this.setState( { coverMinHeight } );
+										if ( isNaN( coverMinHeight ) ) {
+											// Set cover min height to default size and input box to empty string
+											this.setState( { coverMinHeight: COVER_DEFAULT_HEIGHT } );
+											coverMinHeight = COVER_DEFAULT_HEIGHT;
+										} else if ( coverMinHeight < COVER_MIN_HEIGHT ) {
+											// Set cover min height to minimum size
+											coverMinHeight = COVER_MIN_HEIGHT;
+										}
+										setAttributes( { minHeight: coverMinHeight } );
+									} }
+									value={ this.state.coverMinHeight || minHeight }
+									min={ COVER_MIN_HEIGHT }
+									step="10"
+								/>
+							</BaseControl>
 							<PanelColorSettings
 								title={ __( 'Overlay' ) }
 								initialOpen={ true }
@@ -269,40 +297,68 @@ class CoverEdit extends Component {
 		return (
 			<>
 				{ controls }
-				<div
-					data-url={ url }
-					style={ style }
-					className={ classes }
+				<ResizableBox
+					className={ classnames(
+						'block-library-cover__resize-container',
+						{ 'is-selected': isSelected },
+					) }
+					size={ {
+						height: minHeight,
+					} }
+					minHeight={ COVER_MIN_HEIGHT }
+					enable={ {
+						top: false,
+						right: false,
+						bottom: true,
+						left: false,
+						topRight: false,
+						bottomRight: false,
+						bottomLeft: false,
+						topLeft: false,
+					} }
+					onResizeStop={ ( event, direction, elt, delta ) => {
+						const coverHeight = parseInt( minHeight + delta.height, 10 );
+						this.setState( { coverMinHeight: coverHeight } );
+						setAttributes( {
+							minHeight: coverHeight,
+						} );
+					} }
 				>
-					{ IMAGE_BACKGROUND_TYPE === backgroundType && (
+
+					<div
+						data-url={ url }
+						style={ style }
+						className={ classes }
+					>
+						{ IMAGE_BACKGROUND_TYPE === backgroundType && (
 						// Used only to programmatically check if the image is dark or not
-						<img
-							ref={ this.imageRef }
-							aria-hidden
-							alt=""
-							style={ {
-								display: 'none',
-							} }
-							src={ url }
-						/>
-					) }
-					{ VIDEO_BACKGROUND_TYPE === backgroundType && (
-						<video
-							ref={ this.videoRef }
-							className="wp-block-cover__video-background"
-							autoPlay
-							muted
-							loop
-							src={ url }
-						/>
-					) }
-					<div className="wp-block-cover__inner-container">
-						<InnerBlocks
-							template={ INNER_BLOCKS_TEMPLATE }
-							allowedBlocks={ INNER_BLOCKS_ALLOWED_BLOCKS }
-						/>
+							<img
+								ref={ this.imageRef }
+								aria-hidden
+								alt=""
+								style={ {
+									display: 'none',
+								} }
+								src={ url }
+							/>
+						) }
+						{ VIDEO_BACKGROUND_TYPE === backgroundType && (
+							<video
+								ref={ this.videoRef }
+								className="wp-block-cover__video-background"
+								autoPlay
+								muted
+								loop
+								src={ url }
+							/>
+						) }
+						<div className="wp-block-cover__inner-container">
+							<InnerBlocks
+								template={ INNER_BLOCKS_TEMPLATE }
+							/>
+						</div>
 					</div>
-				</div>
+				</ResizableBox>
 			</>
 		);
 	}
@@ -374,4 +430,5 @@ class CoverEdit extends Component {
 export default compose( [
 	withColors( { overlayColor: 'background-color' } ),
 	withNotices,
+	withInstanceId,
 ] )( CoverEdit );

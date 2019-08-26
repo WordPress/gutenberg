@@ -759,21 +759,29 @@ describe( 'state', () => {
 				blocks: [ wrapperBlock ],
 			} );
 
+			const originalWrapperBlockCacheKey = original.cache[ wrapperBlock.clientId ];
+
 			const state = blocks( original, {
 				type: 'REPLACE_BLOCKS',
 				clientIds: [ nestedBlock.clientId ],
 				blocks: [ replacementBlock ],
 			} );
 
+			const newWrapperBlockCacheKey = state.cache[ wrapperBlock.clientId ];
+
+			expect( newWrapperBlockCacheKey ).not.toBe( originalWrapperBlockCacheKey );
+
 			expect( state.order ).toEqual( {
 				'': [ wrapperBlock.clientId ],
 				[ wrapperBlock.clientId ]: [ replacementBlock.clientId ],
 				[ replacementBlock.clientId ]: [],
 			} );
+
 			expect( state.parents ).toEqual( {
 				[ wrapperBlock.clientId ]: '',
 				[ replacementBlock.clientId ]: wrapperBlock.clientId,
 			} );
+
 			expect( state.cache ).toEqual( {
 				[ wrapperBlock.clientId ]: {},
 				[ replacementBlock.clientId ]: {},

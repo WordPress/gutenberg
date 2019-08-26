@@ -6,8 +6,16 @@ import { useSpring, interpolate } from 'react-spring/web.cjs';
 /**
  * WordPress dependencies
  */
-import { useState, useLayoutEffect } from '@wordpress/element';
+import { useState, useLayoutEffect, useReducer } from '@wordpress/element';
 import { useReducedMotion } from '@wordpress/compose';
+
+/**
+ * Simple reducer used to increment a counter.
+ *
+ * @param {number} state  Previous counter value.
+ * @return {number} New state value.
+ */
+const counterReducer = ( state ) => state + 1;
 
 /**
  * Hook used to compute the styles required to move a div into a new position.
@@ -29,10 +37,17 @@ import { useReducedMotion } from '@wordpress/compose';
  */
 function useMovingAnimation( ref, isSelected, enableAnimation, triggerAnimationOnChange ) {
 	const prefersReducedMotion = useReducedMotion() || ! enableAnimation;
-	const [ resetAnimation, setResetAnimation ] = useState( false );
+	const [ triggeredAnimation, triggerAnimation ] = useReducer( counterReducer, 0 );
+	const [ finishedAnimation, endAnimation ] = useReducer( counterReducer, 0 );
 	const [ transform, setTransform ] = useState( { x: 0, y: 0 } );
 
 	const previous = ref.current ? ref.current.getBoundingClientRect() : null;
+
+	useLayoutEffect( () => {
+		if ( triggeredAnimation ) {
+			endAnimation();
+		}
+	}, [ triggeredAnimation ] );
 	useLayoutEffect( () => {
 		if ( prefersReducedMotion ) {
 			return;
@@ -46,42 +61,40 @@ function useMovingAnimation( ref, isSelected, enableAnimation, triggerAnimationO
 		ref.current.style.transform = newTransform.x === 0 && newTransform.y === 0 ?
 			undefined :
 			`translate3d(${ newTransform.x }px,${ newTransform.y }px,0)`;
-		setResetAnimation( true );
+		triggerAnimation();
 		setTransform( newTransform );
 	}, [ triggerAnimationOnChange ] );
-	useLayoutEffect( () => {
-		if ( resetAnimation ) {
-			setResetAnimation( false );
-		}
-	}, [ resetAnimation ] );
 	const animationProps = useSpring( {
 		from: transform,
 		to: {
 			x: 0,
 			y: 0,
 		},
-		reset: resetAnimation,
+		reset: triggeredAnimation !== finishedAnimation,
 		config: { mass: 5, tension: 2000, friction: 200 },
 		immediate: prefersReducedMotion,
 	} );
 
-	return {
-		transformOrigin: 'center',
-		transform: interpolate(
-			[
-				animationProps.x,
-				animationProps.y,
-			],
-			( x, y ) => x === 0 && y === 0 ? undefined : `translate3d(${ x }px,${ y }px,0)`
-		),
-		zIndex: interpolate(
-			[
-				animationProps.x,
-				animationProps.y,
-			],
-			( x, y ) => ! isSelected || ( x === 0 && y === 0 ) ? undefined : `1`
-		),
-	};
+	// Dismiss animations if disabled.
+	return prefersReducedMotion ?
+		{} :
+		{
+			transformOrigin: 'center',
+			transform: interpolate(
+				[
+					animationProps.x,
+					animationProps.y,
+				],
+				( x, y ) => x === 0 && y === 0 ? undefined : `translate3d(${ x }px,${ y }px,0)`
+			),
+			zIndex: interpolate(
+				[
+					animationProps.x,
+					animationProps.y,
+				],
+				( x, y ) => ! isSelected || ( x === 0 && y === 0 ) ? undefined : `1`
+			),
+		};
 }
 
 export default useMovingAnimation;

@@ -99,19 +99,16 @@
 		border-bottom: $border-width solid $light-gray-500;
 	}
 
-	.components-menu-item__button {
+	.components-menu-item__button,
+	.components-menu-item__button.components-icon-button {
 		padding-left: 2rem;
 
 		&.has-icon {
 			padding-left: 0.5rem;
 		}
-	}
 
-	.components-dropdown-menu__menu-item,
-	.components-menu-item__button {
-		&:disabled,
-		&[aria-disabled="true"] {
-			opacity: 0.3;
+		.dashicon {
+			margin-right: 4px;
 		}
 	}
 }

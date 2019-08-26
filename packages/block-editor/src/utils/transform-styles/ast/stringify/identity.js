@@ -286,3 +286,5 @@ Compiler.prototype.indent = function( level ) {
 
 	return Array( this.level ).join( this.indentation || '  ' );
 };
+
+/* eslint-enable @wordpress/no-unused-vars-before-return */

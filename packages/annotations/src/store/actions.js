@@ -13,16 +13,15 @@ import uuid from 'uuid/v4';
  *
  * The `range` property is only relevant if the selector is 'range'.
  *
- * @param {Object} annotation         The annotation to add.
- * @param {string} blockClientId      The blockClientId to add the annotation to.
- * @param {string} richTextIdentifier Identifier for the RichText instance the annotation applies to.
- * @param {Object} range              The range at which to apply this annotation.
- * @param {number} range.start        The offset where the annotation should start.
- * @param {number} range.end          The offset where the annotation should end.
- * @param {string} [selector="range"] The way to apply this annotation.
- * @param {string} [source="default"] The source that added the annotation.
- * @param {string} [id=uuid()]        The ID the annotation should have.
- *                                    Generates a UUID by default.
+ * @param {Object} annotation                    The annotation to add.
+ * @param {string} annotation.blockClientId      The blockClientId to add the annotation to.
+ * @param {string} annotation.richTextIdentifier Identifier for the RichText instance the annotation applies to.
+ * @param {Object} annotation.range              The range at which to apply this annotation.
+ * @param {number} annotation.range.start        The offset where the annotation should start.
+ * @param {number} annotation.range.end          The offset where the annotation should end.
+ * @param {string} annotation.[selector="range"] The way to apply this annotation.
+ * @param {string} annotation.[source="default"] The source that added the annotation.
+ * @param {string} annotation.[id]               The ID the annotation should have. Generates a UUID by default.
  *
  * @return {Object} Action object.
  */

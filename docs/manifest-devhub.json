@@ -102,6 +102,12 @@
 		"parent": "slotfills"
 	},
 	{
+		"title": "PluginDocumentSettingPanel",
+		"slug": "plugin-document-setting-panel",
+		"markdown_source": "../docs/designers-developers/developers/slotfills/plugin-document-setting-panel.md",
+		"parent": "slotfills"
+	},
+	{
 		"title": "PluginMoreMenuItem",
 		"slug": "plugin-more-menu-item",
 		"markdown_source": "../docs/designers-developers/developers/slotfills/plugin-more-menu-item.md",
@@ -1341,6 +1347,12 @@
 		"title": "@wordpress/priority-queue",
 		"slug": "packages-priority-queue",
 		"markdown_source": "../packages/priority-queue/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/project-management-automation",
+		"slug": "packages-project-management-automation",
+		"markdown_source": "../packages/project-management-automation/README.md",
 		"parent": "packages"
 	},
 	{

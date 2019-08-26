@@ -24,7 +24,6 @@ import {
 	getBlockType,
 	getBlockTypes,
 	hasBlockSupport,
-	hasChildBlocksWithInserterSupport,
 } from '@wordpress/blocks';
 
 // Module constants
@@ -169,7 +168,7 @@ export const __unstableGetBlockWithoutInnerBlocks = createSelector(
  * on each call
  *
  * @param {Object}  state        Editor state.
- * @param {?String} rootClientId Optional root client ID of block list.
+ * @param {?string} rootClientId Optional root client ID of block list.
  *
  * @return {Object[]} Post blocks.
  */
@@ -224,7 +223,7 @@ export const getClientIdsWithDescendants = createSelector(
  * The number returned includes nested blocks.
  *
  * @param {Object}  state     Global application state.
- * @param {?String} blockName Optional block name, if specified only blocks of that type will be counted.
+ * @param {?string} blockName Optional block name, if specified only blocks of that type will be counted.
  *
  * @return {number} Number of blocks in the post, or number of blocks with name equal to blockName.
  */
@@ -1241,7 +1240,6 @@ export const getInserterItems = createSelector(
 				isDisabled,
 				utility: calculateUtility( blockType.category, count, isContextual ),
 				frecency: calculateFrecency( time, count ),
-				hasChildBlocksWithInserterSupport: hasChildBlocksWithInserterSupport( blockType.name ),
 			};
 		};
 
@@ -1297,6 +1295,7 @@ export const getInserterItems = createSelector(
 
 /**
  * Determines whether there are items to show in the inserter.
+ *
  * @param {Object}  state        Editor state.
  * @param {?string} rootClientId Optional root client ID of block list.
  *
@@ -1404,4 +1403,26 @@ export function __experimentalGetLastBlockAttributeChanges( state ) {
  */
 function getReusableBlocks( state ) {
 	return get( state, [ 'settings', '__experimentalReusableBlocks' ], EMPTY_ARRAY );
+}
+
+/**
+ * Returns whether the navigation mode is enabled.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {boolean}     Is navigation mode enabled.
+ */
+export function isNavigationMode( state ) {
+	return state.isNavigationMode;
+}
+
+/**
+ * Returns true if the last change was an automatic change, false otherwise.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether the last change was automatic.
+ */
+export function didAutomaticChange( state ) {
+	return state.didAutomaticChange;
 }

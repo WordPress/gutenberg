@@ -17,8 +17,7 @@ import Identity from './identity';
  *
  * @param {Object} node
  * @param {Object} [options]
- * @return {String}
- * @api public
+ * @return {string}
  */
 
 export default function( node, options ) {

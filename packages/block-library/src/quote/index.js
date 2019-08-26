@@ -30,17 +30,23 @@ export const settings = {
 	edit,
 	save,
 	merge( attributes, { value, citation } ) {
+		// Quote citations cannot be merged. Pick the second one unless it's
+		// empty.
+		if ( ! citation ) {
+			citation = attributes.citation;
+		}
+
 		if ( ! value || value === '<p></p>' ) {
 			return {
 				...attributes,
-				citation: attributes.citation + citation,
+				citation,
 			};
 		}
 
 		return {
 			...attributes,
 			value: attributes.value + value,
-			citation: attributes.citation + citation,
+			citation,
 		};
 	},
 	deprecated,

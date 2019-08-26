@@ -11,6 +11,10 @@ import { orderBy } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { Toolbar, Slot, DropdownMenu } from '@wordpress/components';
 
+const POPOVER_PROPS = {
+	position: 'bottom left',
+};
+
 const FormatToolbar = () => {
 	return (
 		<div className="editor-format-toolbar block-editor-format-toolbar">
@@ -22,9 +26,9 @@ const FormatToolbar = () => {
 					{ ( fills ) => fills.length !== 0 &&
 						<DropdownMenu
 							icon={ false }
-							position="bottom left"
 							label={ __( 'More Rich Text Controls' ) }
 							controls={ orderBy( fills.map( ( [ { props } ] ) => props ), 'title' ) }
+							popoverProps={ POPOVER_PROPS }
 						/>
 					}
 				</Slot>
