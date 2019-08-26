@@ -40,7 +40,10 @@ export function withTheme( WrappedComponent ) {
 		}
 
 		componentWillUnmount() {
-			eventEmitter.removeListener( 'currentModeChanged', this.onModeChanged );
+			// Conditional needed to pass UI Tests on CI
+			if ( eventEmitter.removeListener ) {
+				eventEmitter.removeListener( 'currentModeChanged', this.onModeChanged );
+			}
 		}
 
 		render() {
