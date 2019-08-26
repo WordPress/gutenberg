@@ -75,6 +75,7 @@ _Parameters_
 -   _options.context_ `[string]`: Context under which to group notice.
 -   _options.id_ `[string]`: Identifier for notice. Automatically assigned if not specified.
 -   _options.isDismissible_ `[boolean]`: Whether the notice can be dismissed by user.
+-   _options.type_ `[string]`: Type of notice, one of `default`, or `snackbar`.
 -   _options.speak_ `[boolean]`: Whether the notice content should be announced to screen readers.
 -   _options.actions_ `[Array<WPNoticeAction>]`: User actions to be presented with notice.
 

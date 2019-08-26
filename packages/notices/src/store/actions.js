@@ -21,6 +21,8 @@ import { DEFAULT_CONTEXT, DEFAULT_STATUS } from './constants';
  *                                                             if not specified.
  * @param {boolean}               [options.isDismissible=true] Whether the notice can
  *                                                             be dismissed by user.
+ * @param {string}                [options.type='default']     Type of notice, one of
+ *                                                             `default`, or `snackbar`.
  * @param {boolean}               [options.speak=true]         Whether the notice
  *                                                             content should be
  *                                                             announced to screen

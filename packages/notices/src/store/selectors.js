@@ -29,6 +29,11 @@ const DEFAULT_NOTICES = [];
  *                                      removal without notice.
  * @property {boolean} isDismissible    Whether the notice can be dismissed by
  *                                      user. Defaults to `true`.
+ * @property {string}  type             Type of notice, one of `default`,
+ *                                      or `snackbar`. Defaults to `default`.
+ * @property {boolean} speak            Whether the notice content should be
+ *                                      announced to screen readers. Defaults to
+ *                                      `true`.
  * @property {WPNoticeAction[]} actions User actions to present with notice.
  *
  */
