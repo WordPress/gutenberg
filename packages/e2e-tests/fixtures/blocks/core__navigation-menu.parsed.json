@@ -10,9 +10,9 @@
                     "destination": "https://wordpress.org/"
                 },
                 "innerBlocks": [],
-                "innerHTML": "\n\t<a class=\"wp-block-navigation-menu-item\" href=\"https://wordpress.org/\">WordPress</a>\n\t",
+                "innerHTML": "\n\t<a href=\"https://wordpress.org/\">WordPress</a>\n\t",
                 "innerContent": [
-                    "\n\t<a class=\"wp-block-navigation-menu-item\" href=\"https://wordpress.org/\">WordPress</a>\n\t"
+                    "\n\t<a href=\"https://wordpress.org/\">WordPress</a>\n\t"
                 ]
             }
         ],
