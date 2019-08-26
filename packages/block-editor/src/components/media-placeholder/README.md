@@ -80,6 +80,15 @@ If false the default placeholder style is used.
 - Type: `Boolean`
 - Required: No
 - Default: `false`
+- Platform: Web | Mobile
+
+### isSelected
+
+Whether the block is selected or not.
+
+- Type: `Boolean`
+- Required: No
+- Platform: Mobile
 
 ### labels
 

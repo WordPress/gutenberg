@@ -8,6 +8,7 @@ import { View, Text, TouchableWithoutFeedback } from 'react-native';
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { MediaUpload, MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO } from '@wordpress/block-editor';
+import { Dashicon } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -15,7 +16,7 @@ import { MediaUpload, MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO } from '@wordpress/bloc
 import styles from './styles.scss';
 
 function MediaPlaceholder( props ) {
-	const { mediaType, labels = {}, icon, onSelectURL } = props;
+	const { mediaType, labels = {}, icon, onSelectURL, isAppender, isSelected } = props;
 
 	const isImage = MEDIA_TYPE_IMAGE === mediaType;
 	const isVideo = MEDIA_TYPE_VIDEO === mediaType;
@@ -46,41 +47,53 @@ function MediaPlaceholder( props ) {
 		accessibilityHint = __( 'Double tap to select a video' );
 	}
 
+	if ( isAppender !== undefined && ! isSelected ) {
+		return null;
+	}
+
 	return (
-		<MediaUpload
-			mediaType={ mediaType }
-			onSelectURL={ onSelectURL }
-			render={ ( { open, getMediaOptions } ) => {
-				return (
-					<TouchableWithoutFeedback
-						accessibilityLabel={ sprintf(
+		<View style={ { flex: 1 } }>
+			<MediaUpload
+				mediaType={ mediaType }
+				onSelectURL={ onSelectURL }
+				render={ ( { open, getMediaOptions } ) => {
+					return (
+						<TouchableWithoutFeedback
+							accessibilityLabel={ sprintf(
 							/* translators: accessibility text for the media block empty state. %s: media type */
-							__( '%s block. Empty' ),
-							placeholderTitle
-						) }
-						accessibilityRole={ 'button' }
-						accessibilityHint={ accessibilityHint }
-						onPress={ ( event ) => {
-							props.onFocus( event );
-							open();
-						} }
-					>
-						<View style={ styles.emptyStateContainer }>
-							{ getMediaOptions() }
-							<View style={ styles.modalIcon }>
-								{ icon }
+								__( '%s block. Empty' ),
+								placeholderTitle
+							) }
+							accessibilityRole={ 'button' }
+							accessibilityHint={ accessibilityHint }
+							onPress={ ( event ) => {
+								props.onFocus( event );
+								open();
+							} }
+						>
+							<View style={ [ styles.emptyStateContainer, isAppender && styles.isAppender ] }>
+								{ getMediaOptions() }
+								{	isAppender ?
+									<Dashicon icon="plus-alt" style={ styles.addBlockButton } color={ styles.addBlockButton.color } size={ styles.addBlockButton.size } /> :
+									<>
+										<View style={ styles.modalIcon }>
+											{ icon }
+										</View>
+										<Text style={ styles.emptyStateTitle }>
+											{ placeholderTitle }
+										</Text>
+										<Text style={ styles.emptyStateDescription }>
+											{ instructions }
+										</Text>
+									</> }
 							</View>
-							<Text style={ styles.emptyStateTitle }>
-								{ placeholderTitle }
-							</Text>
-							<Text style={ styles.emptyStateDescription }>
-								{ instructions }
-							</Text>
-						</View>
-					</TouchableWithoutFeedback>
-				);
-			} } />
+						</TouchableWithoutFeedback>
+					);
+				} } />
+		</View>
+
 	);
 }
 
 export default MediaPlaceholder;
+
