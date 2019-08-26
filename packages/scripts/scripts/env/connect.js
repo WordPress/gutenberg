@@ -21,9 +21,9 @@ let compose = {};
 if ( existsSync( composeFile ) ) {
 	try {
 		compose = yaml.safeLoad( readFileSync( composeFile, 'utf8' ) );
-	} catch ( e ) {
+	} catch ( error ) {
 		stdout.write( 'There was an error loading your docker-compose.override.yml file. Please fix or delete it, and try again.\n' );
-		stdout.write( e.toString() );
+		stdout.write( error.toString() );
 		exit( 1 );
 	}
 }
@@ -37,9 +37,9 @@ if ( ! existsSync( coreComposeFile ) ) {
 let coreCompose = {};
 try {
 	coreCompose = yaml.safeLoad( readFileSync( coreComposeFile, 'utf8' ) );
-} catch ( e ) {
+} catch ( error ) {
 	stdout.write( 'There was an error loading your docker-compose.yml in your WordPress directory. Please revert any changes to it, and try again.\n' );
-	stdout.write( e.toString() );
+	stdout.write( error.toString() );
 	exit( 1 );
 }
 
@@ -54,9 +54,9 @@ const composeTemplate = readFileSync( composeTemplateFile, 'utf8' )
 let pluginCompose = {};
 try {
 	pluginCompose = yaml.safeLoad( composeTemplate );
-} catch ( e ) {
+} catch ( error ) {
 	stdout.write( 'There was an error loading your docker-compose.override.yml.template file. Please revert any changes to it, and try again.\n' );
-	stdout.write( e.toString() );
+	stdout.write( error.toString() );
 	exit( 1 );
 }
 
