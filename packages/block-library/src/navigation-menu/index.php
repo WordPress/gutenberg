@@ -38,7 +38,7 @@ function prepare_navigation( $block ) {
 }
 
 /**
- * Register legacy widget block.
+ * Register the navigation menu block.
  */
 function register_block_core_navigation_menu() {
 	register_block_type(
