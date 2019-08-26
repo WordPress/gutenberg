@@ -15,9 +15,6 @@ import { Component } from '@wordpress/element';
 import styles from './styles.scss';
 import { calculateFullscreenImageSize } from './utils';
 
-// Default Image ratio 4:3
-const IMAGE_ASPECT_RATIO = 4 / 3;
-
 class ImageViewer extends Component {
 	constructor() {
 		super( ...arguments );
@@ -29,28 +26,28 @@ class ImageViewer extends Component {
 
 		this.onDimensionsChange = this.onDimensionsChange.bind( this );
 	}
-	
+
 	componentDidMount() {
-		Dimensions.addEventListener("change", this.onDimensionsChange);
-		this.fetchImageSize();
+		Dimensions.addEventListener( 'change', this.onDimensionsChange );
+		this.fetchImageSize( Dimensions.get( 'window' ) );
 	}
 
 	componentDidUpdate( prevProps ) {
 		if ( this.props.url !== prevProps.url ) {
-			this.fetchImageSize();
+			this.fetchImageSize( Dimensions.get( 'window' ) );
 		}
 	}
 
-    componentWillUnmount() {
-		Dimensions.removeEventListener("change", this.onDimensionsChange);
+	componentWillUnmount() {
+		Dimensions.removeEventListener( 'change', this.onDimensionsChange );
 	}
 
-	onDimensionsChange(dims) {
-		this.fetchImageSize();
+	onDimensionsChange( dimensions ) {
+		this.fetchImageSize( dimensions.window );
 	}
 
-	fetchImageSize() {
-		this.container = Dimensions.get("window")
+	fetchImageSize( dimensions ) {
+		this.container = dimensions;
 		Image.getSize( this.props.url, ( width, height ) => {
 			this.image = { width, height };
 			this.calculateSize();
@@ -64,11 +61,10 @@ class ImageViewer extends Component {
 
 	render() {
 		const {
-			title = '',
 			isVisible,
-      		url = '',
+			url = '',
 		} = this.props;
-    
+
 		const panResponder = PanResponder.create( {
 			onMoveShouldSetPanResponder: ( evt, gestureState ) => {
 				// Activates swipe down over child Touchables if the swipe is long enough.
@@ -84,25 +80,25 @@ class ImageViewer extends Component {
 			<Modal
 				isVisible={ isVisible }
 				style={ styles.modal }
-				animationIn={ "fadeIn" }
+				animationIn={ 'fadeIn' }
 				animationInTiming={ 1000 }
-				animationOut={ "fadeOut" }
-				animationOutTiming={ 250 }
+				animationOut={ 'fadeOut' }
+				animationOutTiming={ 1 }
 				backdropTransitionInTiming={ 50 }
 				backdropTransitionOutTiming={ 50 }
 				backdropOpacity={ 1 }
-				supportedOrientations={['portrait', 'landscape']}
+				supportedOrientations={ [ 'portrait', 'landscape' ] }
 				onBackdropPress={ this.props.onClose }
 				onBackButtonPress={ this.props.onClose }
 				onSwipe={ this.props.onClose }
-				swipeDirection="down"
+				swipeDirection={ 'down' }
 				onMoveShouldSetResponder={ panResponder.panHandlers.onMoveShouldSetResponder }
 				onMoveShouldSetResponderCapture={ panResponder.panHandlers.onMoveShouldSetResponderCapture }
 				onAccessibilityEscape={ this.props.onClose }
 			>
 				<View style={ styles.content }>
-          			<ImageBackground
-						style={ {width: this.state.width, height: this.state.height} }
+					<ImageBackground
+						style={ { width: this.state.width, height: this.state.height } }
 						source={ { uri: url } }
 					/>
 				</View>
