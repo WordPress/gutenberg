@@ -29,10 +29,16 @@ export function withTheme( WrappedComponent ) {
 			};
 		}
 
+		onModeChanged( newMode ) {
+			this.setState( { mode: newMode } );
+		}
+
 		componentDidMount() {
-			eventEmitter.on( 'currentModeChanged', ( newMode ) => {
-				this.setState( { mode: newMode } );
-			} );
+			this.subscription = eventEmitter.on( 'currentModeChanged', this.onModeChanged );
+		}
+
+		componentWillUnmount() {
+			eventEmitter.removeListener( 'currentModeChanged', this.onModeChanged );
 		}
 
 		render() {
