@@ -159,7 +159,7 @@ export class MediaPlaceholder extends Component {
 			notices,
 			onSelectURL,
 			mediaUpload,
-			append,
+			children,
 		} = this.props;
 
 		let instructions = labels.instructions;
@@ -217,9 +217,9 @@ export class MediaPlaceholder extends Component {
 				onClick={ onClick }
 				onDoubleClick={ onDoubleClick }
 				preview={ mediaPreview }
-				append={ append }
 			>
 				{ content }
+				{ children }
 			</Placeholder>
 		);
 	}

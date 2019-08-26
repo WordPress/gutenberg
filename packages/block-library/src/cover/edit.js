@@ -307,14 +307,15 @@ class CoverEdit extends Component {
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
 						notices={ noticeUI }
 						onError={ this.onUploadError }
-						append={ <ColorPalette
+					>
+						<ColorPalette
 							disableCustomColors={ true }
 							value={ overlayColor.color }
 							onChange={ setOverlayColor }
 							clearable={ false }
 							className="wp-block-cover__placeholder-color-palette"
-						/> }
-					/>
+						/>
+					</MediaPlaceholder>
 				</>
 			);
 		}
