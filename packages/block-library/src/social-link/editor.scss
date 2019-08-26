@@ -4,5 +4,6 @@
 	[data-type*="core/social-link-"].is-selected &, // Matches the selected social logo block.
 	&:focus {
 		opacity: 1;
+		@include block-style__focus();
 	}
 }

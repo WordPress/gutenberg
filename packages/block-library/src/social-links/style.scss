@@ -1,6 +1,8 @@
 .wp-block-social-links {
 	display: flex;
 	justify-content: flex-start;
+	padding-left: 0;
+	padding-right: 0;
 }
 
 .wp-social-link {
@@ -13,4 +15,10 @@
 	background-position: center center;
 	background-repeat: no-repeat;
 	margin-right: $grid-size;
+	padding: 6px;
+
+	a {
+		display: block;
+		line-height: 0;
+	}
 }
