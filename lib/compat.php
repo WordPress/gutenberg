@@ -65,7 +65,9 @@ add_filter( 'wp_insert_post_data', 'gutenberg_filter_wp_insert_post_data', 10, 2
  * with a function that passes `render_callback` the block object as the
  * argument.
  *
- * @param array $block A single parsed block object.
+ * @param string $pre_render The pre-rendered content. Default null.
+ * @param array  $block The block being rendered.
+ *
  * @return string String of rendered HTML.
  */
 function gutenberg_provide_render_callback_with_block_object( $pre_render, $block ) {
