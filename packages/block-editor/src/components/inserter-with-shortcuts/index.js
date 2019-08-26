@@ -2,13 +2,14 @@
  * External dependencies
  */
 import { filter, isEmpty } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { compose } from '@wordpress/compose';
-import { IconButton } from '@wordpress/components';
+import { Animate, IconButton } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { withDispatch, withSelect } from '@wordpress/data';
 
@@ -30,20 +31,24 @@ function InserterWithShortcuts( { items, isLocked, onInsert } ) {
 	} ).slice( 0, 3 );
 
 	return (
-		<div className="editor-inserter-with-shortcuts block-editor-inserter-with-shortcuts">
-			{ itemsWithoutDefaultBlock.map( ( item ) => (
-				<IconButton
-					key={ item.id }
-					className="editor-inserter-with-shortcuts__block block-editor-inserter-with-shortcuts__block"
-					onClick={ () => onInsert( item ) }
-					// translators: %s: block title/name to be added
-					label={ sprintf( __( 'Add %s' ), item.title ) }
-					icon={ (
-						<BlockIcon icon={ item.icon } />
-					) }
-				/>
-			) ) }
-		</div>
+		<Animate type="fade-in">
+			{ ( { className: animateClassName } ) => (
+				<div className={ classnames( 'editor-inserter-with-shortcuts block-editor-inserter-with-shortcuts', animateClassName ) }>
+					{ itemsWithoutDefaultBlock.map( ( item ) => (
+						<IconButton
+							key={ item.id }
+							className="editor-inserter-with-shortcuts__block block-editor-inserter-with-shortcuts__block"
+							onClick={ () => onInsert( item ) }
+							// translators: %s: block title/name to be added
+							label={ sprintf( __( 'Add %s' ), item.title ) }
+							icon={ (
+								<BlockIcon icon={ item.icon } />
+							) }
+						/>
+					) ) }
+				</div>
+			) }
+		</Animate>
 	);
 }
 

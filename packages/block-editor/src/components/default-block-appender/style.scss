@@ -40,12 +40,6 @@
 		}
 	}
 
-	&:hover {
-		.block-editor-inserter-with-shortcuts {
-			@include edit-post__fade-in-animation;
-		}
-	}
-
 	// Dropzone.
 	.components-drop-zone__content-icon {
 		display: none;
