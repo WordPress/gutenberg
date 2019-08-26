@@ -2,7 +2,14 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { filter, forEach, map, find, every } from 'lodash';
+import {
+	every,
+	filter,
+	find,
+	forEach,
+	map,
+	some,
+} from 'lodash';
 
 /**
  * WordPress dependencies
@@ -234,14 +241,26 @@ class GalleryEdit extends Component {
 	}
 
 	render() {
-		const { attributes, isSelected, className, noticeUI } = this.props;
-		const { images, columns = defaultColumnsNumber( attributes ), align, imageCrop, linkTo } = attributes;
+		const {
+			attributes,
+			className,
+			isSelected,
+			noticeUI,
+		} = this.props;
+		const {
+			align,
+			columns = defaultColumnsNumber( attributes ),
+			imageCrop,
+			images,
+			linkTo,
+		} = attributes;
 
 		const hasImages = !! images.length;
+		const hasImagesWithId = hasImages && some( images, ( { id } ) => id );
 
 		const mediaPlaceholder = (
 			<MediaPlaceholder
-				addToGallery={ hasImages }
+				addToGallery={ hasImagesWithId }
 				isAppender={ hasImages }
 				className={ className }
 				dropZoneUIOnly={ hasImages && ! isSelected }
@@ -254,7 +273,7 @@ class GalleryEdit extends Component {
 				accept="image/*"
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				multiple
-				value={ hasImages ? images : undefined }
+				value={ hasImagesWithId ? images : undefined }
 				onError={ this.onUploadError }
 				notices={ hasImages ? undefined : noticeUI }
 			/>

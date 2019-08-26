@@ -22,7 +22,9 @@ const { MediaPlaceholder } = wp.editor;
 			allowedTypes = { [ 'image' ] }
 			multiple = { false }
 			labels = { { title: 'The Image' } }
-		/>;
+		>
+			"extra content"
+		</MediaPlaceholder>;
 		...
 	}
 ```

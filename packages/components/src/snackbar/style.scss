@@ -8,6 +8,7 @@
 	padding: 16px 24px;
 	width: 100%;
 	max-width: 600px;
+	box-sizing: border-box;
 	cursor: pointer;
 
 	@include break-small() {
@@ -54,6 +55,7 @@
 	position: absolute;
 	z-index: z-index(".components-snackbar-list");
 	width: 100%;
+	box-sizing: border-box;
 }
 
 .components-snackbar-list__notice-container {

@@ -29,7 +29,7 @@ import {
 	withSelect,
 } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
-import { compose, pure } from '@wordpress/compose';
+import { compose, pure, ifCondition } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -691,6 +691,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 		replaceBlocks,
 		toggleSelection,
 		setNavigationMode,
+		__unstableMarkLastChangeAsPersistent,
 	} = dispatch( 'core/block-editor' );
 
 	return {
@@ -744,6 +745,12 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 			}
 		},
 		onReplace( blocks, indexToSelect ) {
+			if (
+				blocks.length &&
+				! isUnmodifiedDefaultBlock( blocks[ blocks.length - 1 ] )
+			) {
+				__unstableMarkLastChangeAsPersistent();
+			}
 			replaceBlocks( [ ownProps.clientId ], blocks, indexToSelect );
 		},
 		onShiftSelection() {
@@ -775,5 +782,8 @@ export default compose(
 	withViewportMatch( { isLargeViewport: 'medium' } ),
 	applyWithSelect,
 	applyWithDispatch,
+	// block is sometimes not mounted at the right time, causing it be undefined
+	// see issue for more info https://github.com/WordPress/gutenberg/issues/17013
+	ifCondition( ( { block } ) => !! block ),
 	withFilters( 'editor.BlockListBlock' )
 )( BlockListBlock );

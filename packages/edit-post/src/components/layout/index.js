@@ -62,6 +62,7 @@ function Layout( {
 	const className = classnames( 'edit-post-layout', {
 		'is-sidebar-opened': sidebarIsOpened,
 		'has-fixed-toolbar': hasFixedToolbar,
+		'has-metaboxes': hasActiveMetaboxes,
 	} );
 
 	const publishLandmarkProps = {

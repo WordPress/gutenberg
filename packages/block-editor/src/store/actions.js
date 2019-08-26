@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, first } from 'lodash';
+import { castArray, first, get, includes } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -218,6 +218,33 @@ export function toggleSelection( isSelectionEnabled = true ) {
 	};
 }
 
+function getBlocksWithDefaultStylesApplied( blocks, blockEditorSettings ) {
+	const preferredStyleVariations = get(
+		blockEditorSettings,
+		[ '__experimentalPreferredStyleVariations', 'value' ],
+		{}
+	);
+	return blocks.map( ( block ) => {
+		const blockName = block.name;
+		if ( ! preferredStyleVariations[ blockName ] ) {
+			return block;
+		}
+		const className = get( block, [ 'attributes', 'className' ] );
+		if ( includes( className, 'is-style-' ) ) {
+			return block;
+		}
+		const { attributes = {} } = block;
+		const blockStyle = preferredStyleVariations[ blockName ];
+		return {
+			...block,
+			attributes: {
+				...attributes,
+				className: `${ ( className || '' ) } is-style-${ blockStyle }`.trim(),
+			},
+		};
+	} );
+}
+
 /**
  * Returns an action object signalling that a blocks should be replaced with
  * one or more replacement blocks.
@@ -231,7 +258,13 @@ export function toggleSelection( isSelectionEnabled = true ) {
  */
 export function* replaceBlocks( clientIds, blocks, indexToSelect ) {
 	clientIds = castArray( clientIds );
-	blocks = castArray( blocks );
+	blocks = getBlocksWithDefaultStylesApplied(
+		castArray( blocks ),
+		yield select(
+			'core/block-editor',
+			'getSettings',
+		)
+	);
 	const rootClientId = yield select(
 		'core/block-editor',
 		'getBlockRootClientId',
@@ -398,7 +431,13 @@ export function* insertBlocks(
 	rootClientId,
 	updateSelection = true
 ) {
-	blocks = castArray( blocks );
+	blocks = getBlocksWithDefaultStylesApplied(
+		castArray( blocks ),
+		yield select(
+			'core/block-editor',
+			'getSettings',
+		)
+	);
 	const allowedBlocks = [];
 	for ( const block of blocks ) {
 		const isValid = yield select(
@@ -709,6 +748,20 @@ export function __unstableSaveReusableBlock( id, updatedId ) {
  */
 export function __unstableMarkLastChangeAsPersistent() {
 	return { type: 'MARK_LAST_CHANGE_AS_PERSISTENT' };
+}
+
+/**
+ * Returns an action object used in signalling that the last block change is
+ * an automatic change, meaning it was not performed by the user, and can be
+ * undone using the `Escape` and `Backspace` keys. This action must be called
+ * after the change was made, and any actions that are a consequence of it, so
+ * it is recommended to be called at the next idle period to ensure all
+ * selection changes have been recorded.
+ *
+ * @return {Object} Action object.
+ */
+export function __unstableMarkAutomaticChange() {
+	return { type: 'MARK_AUTOMATIC_CHANGE' };
 }
 
 /**
