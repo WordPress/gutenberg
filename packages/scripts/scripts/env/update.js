@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-const commandExistsSync = require( 'command-exists' ).sync;
+const { sync: commandExistsSync } = require( 'command-exists' );
 const request = require( 'request' );
 const DecompressZip = require( 'decompress-zip' );
 
