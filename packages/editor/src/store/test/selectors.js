@@ -1534,6 +1534,16 @@ describe( 'selectors', () => {
 				}
 			}
 		} );
+
+		it( 'should return false if autosaving is locked', () => {
+			const state = {
+				currentPost: {},
+				saving: {},
+				postAutosavingLock: { example: true },
+			};
+
+			expect( isEditedPostAutosaveable( state ) ).toBe( false );
+		} );
 	} );
 
 	describe( 'isEditedPostEmpty', () => {
