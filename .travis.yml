@@ -40,6 +40,7 @@ before_install:
     sudo mv docker-compose /usr/local/bin
 
 install:
+  - npm run env start
   - npm run env install -- --fast
 
 jobs:
@@ -51,7 +52,11 @@ jobs:
         - npm ci
         - npm run build
         # Install WordPress
-        - npm run env install
+        - git clone --depth=1 git://develop.git.wordpress.org/ wordpress
+        - cd wordpress
+        - npm install
+        - npm run build
+        - cd ..
         - mkdir -p wordpress/build/wp-content/uploads
         - chmod 767 wordpress/build/wp-content/uploads
         # Install Composer dependencies
@@ -98,7 +103,6 @@ jobs:
         - npm run test-php && npm run test-unit-php-multisite
 
     - name: PHP unit tests (PHP 5.6)
-      env: LOCAL_PHP=5.6-fpm
       script:
         - npm run test-php && npm run test-unit-php-multisite
 
