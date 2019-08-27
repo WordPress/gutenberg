@@ -14,6 +14,7 @@ export default function save( { attributes } ) {
 				rel={ nofollow && 'nofollow' }
 				title={ title }
 				target={ opensInNewTab && '_blank' }
+				className="wp-block-navigation-menu-item"
 			>
 				{ label }
 			</a>
