@@ -1431,6 +1431,7 @@ describe( 'selectors', () => {
 					return true;
 				},
 				getAutosave() {},
+				postAutosavingLock: {},
 			};
 
 			expect( isEditedPostAutosaveable( state ) ).toBe( true );
@@ -1463,6 +1464,7 @@ describe( 'selectors', () => {
 						excerpt: 'foo',
 					};
 				},
+				postAutosavingLock: {},
 			};
 
 			expect( isEditedPostAutosaveable( state ) ).toBe( false );
@@ -1494,6 +1496,7 @@ describe( 'selectors', () => {
 						excerpt: 'foo',
 					};
 				},
+				postAutosavingLock: {},
 			};
 
 			expect( isEditedPostAutosaveable( state ) ).toBe( true );
@@ -1528,6 +1531,7 @@ describe( 'selectors', () => {
 								[ variantField ]: 'bar',
 							};
 						},
+						postAutosavingLock: {},
 					};
 
 					expect( isEditedPostAutosaveable( state ) ).toBe( true );
