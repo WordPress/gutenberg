@@ -124,7 +124,7 @@ export class PostAuthor extends Component {
 	/**
 	 * Resolve the author objects into strings for display.
 	 *
-	 * @param {Array} results The array of suthors that matched the search.
+	 * @param {Array} results The array of authors that matched the search.
 	 *
 	 * @return {Array} an array of strings ready for displaying.
 	 */
@@ -218,7 +218,7 @@ export class PostAuthor extends Component {
 						sprintf( __( 'Type in %d or more characters for results' ), minQueryLength )
 					}
 					tStatusNoResults={ () => __( 'No search results' ) }
-					// translators: 1: the index of thre serlrcted result. 2: The total number of results.
+					// translators: 1: the index of thre selected result. 2: The total number of results.
 					tStatusSelectedOption={ ( selectedOption, length ) => sprintf( __( '%1$s (1 of %2$s) is selected' ), selectedOption, length ) }
 					tStatusResults={ ( length, contentSelectedOption ) => {
 						return (
