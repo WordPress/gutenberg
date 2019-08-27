@@ -31,6 +31,7 @@ import { Component } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import { withSelect } from '@wordpress/data';
+import { getFilename } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -321,10 +322,22 @@ class GalleryEdit extends Component {
 					) }
 				>
 					{ images.map( ( img, index ) => {
-						const imgAlt = ( img.alt && img.alt.length > 0 ) ? `${ img.alt }. ` : '';
+						let ariaLabel = '';
+						const imgOrderNumber = index + 1;
 
-						/* translators: %1$d is the order number of the image, %2$d is the total number of images. */
-						const ariaLabel = sprintf( __( '%1$simage %2$d of %3$d in gallery' ), imgAlt, ( index + 1 ), images.length );
+						if ( img.alt && img.alt.length > 0 ) {
+							/* translators: %1$d is the image alt, %2$d is order number of the image, %3$d is the total number of images. */
+							ariaLabel = sprintf( __( '%1$s %2$d of %3$d' ), img.alt, imgOrderNumber, images.length );
+						} else {
+							const filename = getFilename( img.url );
+							if ( filename ) {
+								/* translators: %1$d is the image file name, %2$d is order number of the image, %3$d is the total number of images. */
+								ariaLabel = sprintf( __( 'This image has an empty alt attribute; its file name is %1$s %2$d of %3$d' ), filename, imgOrderNumber, images.length );
+							} else {
+								/* translators: %1$d is order number of the image, %2$d is the total number of images. */
+								ariaLabel = sprintf( __( 'This image has an empty alt attribute %1$d of %2$d' ), imgOrderNumber, images.length );
+							}
+						}
 
 						return (
 							<li className="blocks-gallery-item" key={ img.id || img.url }>
