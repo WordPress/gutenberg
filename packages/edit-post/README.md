@@ -100,6 +100,61 @@ _Returns_
 
 -   `WPElement`: The WPElement to be rendered.
 
+<a name="PluginDocumentSettingPanel" href="#PluginDocumentSettingPanel">#</a> **PluginDocumentSettingPanel**
+
+Renders items below the Status & Availability panel in the Document Sidebar.
+
+_Usage_
+
+```js
+// Using ES5 syntax
+var el = wp.element.createElement;
+var __ = wp.i18n.__;
+var registerPlugin = wp.plugins.registerPlugin;
+var PluginDocumentSettingPanel = wp.editPost.PluginDocumentSettingPanel;
+
+function MyDocumentSettingPlugin() {
+	return el(
+		PluginDocumentSettingPanel,
+		{
+			className: 'my-document-setting-plugin',
+			title: 'My Panel',
+		},
+		__( 'My Document Setting Panel' )
+	);
+}
+
+registerPlugin( 'my-document-setting-plugin', {
+		render: MyDocumentSettingPlugin
+} );
+```
+
+```jsx
+// Using ESNext syntax
+const { registerPlugin } = wp.plugins;
+const { PluginDocumentSettingPanel } = wp.editPost;
+
+const MyDocumentSettingTest = () => (
+		<PluginDocumentSettingPanel className="my-document-setting-plugin" title="My Panel">
+		<p>My Document Setting Panel</p>
+	</PluginDocumentSettingPanel>
+);
+
+ registerPlugin( 'document-setting-test', { render: MyDocumentSettingTest } );
+```
+
+_Parameters_
+
+-   _props_ `Object`: Component properties.
+-   _props.name_ `[string]`: The machine-friendly name for the panel.
+-   _props.className_ `[string]`: An optional class name added to the row.
+-   _props.title_ `[string]`: The title of the panel
+-   _props.icon_ `[(string|Element)]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
+
+_Returns_
+
+-   `WPElement`: The WPElement to be rendered.
+
 <a name="PluginMoreMenuItem" href="#PluginMoreMenuItem">#</a> **PluginMoreMenuItem**
 
 Renders a menu item in `Plugins` group in `More Menu` drop down, and can be used to as a button or link depending on the props provided.

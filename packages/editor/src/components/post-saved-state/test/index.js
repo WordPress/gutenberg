@@ -66,7 +66,9 @@ describe( 'PostSavedState', () => {
 		);
 
 		expect( wrapper ).toMatchSnapshot();
-		wrapper.simulate( 'click' );
+		wrapper.simulate( 'click', {} );
 		expect( saveSpy ).toHaveBeenCalled();
+		// Regression: Verify the event object is not passed to prop callback.
+		expect( saveSpy.mock.calls[ 0 ] ).toEqual( [] );
 	} );
 } );

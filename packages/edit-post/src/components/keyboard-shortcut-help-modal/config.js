@@ -20,13 +20,19 @@ const {
 	ctrlShift,
 } = displayShortcutList;
 
-const globalShortcuts = {
-	title: __( 'Global shortcuts' ),
+const mainShortcut = {
+	className: 'edit-post-keyboard-shortcut-help__main-shortcuts',
 	shortcuts: [
 		{
 			keyCombination: access( 'h' ),
-			description: __( 'Display this help.' ),
+			description: __( 'Display these keyboard shortcuts.' ),
 		},
+	],
+};
+
+const globalShortcuts = {
+	title: __( 'Global shortcuts' ),
+	shortcuts: [
 		{
 			keyCombination: primary( 's' ),
 			description: __( 'Save your changes.' ),
@@ -148,6 +154,7 @@ const textFormattingShortcuts = {
 };
 
 export default [
+	mainShortcut,
 	globalShortcuts,
 	selectionShortcuts,
 	blockShortcuts,

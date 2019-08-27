@@ -416,6 +416,12 @@ export const EXPECTED_TRANSFORMS = {
 			'Group',
 		],
 	},
+	'core__table__scope-attribute': {
+		originalBlock: 'Table',
+		availableTransforms: [
+			'Group',
+		],
+	},
 	'core__tag-cloud': {
 		originalBlock: 'Tag Cloud',
 		availableTransforms: [

@@ -1,3 +1,8 @@
+/**
+ * Internal dependencies
+ */
+import { ZWNBSP } from '../../special-characters';
+
 export function getSparseArrayLength( array ) {
 	return array.reduce( ( i ) => i + 1, 0 );
 }
@@ -504,8 +509,8 @@ export const spec = [
 			endOffset: 0,
 			endContainer: element.firstChild.nextSibling,
 		} ),
-		startPath: [ 1, 2, 0 ],
-		endPath: [ 1, 2, 0 ],
+		startPath: [ 1, 1, 1 ],
+		endPath: [ 1, 1, 1 ],
 		record: {
 			start: 1,
 			end: 1,
@@ -568,7 +573,7 @@ export const spec = [
 	},
 	{
 		description: 'should remove padding',
-		html: '<br data-rich-text-padding="true">',
+		html: ZWNBSP,
 		createRange: ( element ) => ( {
 			startOffset: 0,
 			startContainer: element,

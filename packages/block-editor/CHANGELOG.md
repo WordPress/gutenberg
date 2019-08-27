@@ -1,4 +1,8 @@
-## Master
+## 3.0.0 (2019-08-05)
+
+### New Features
+
+- Added a new `allowedFormats` prop to `RichText` to fine tune allowed formats. Deprecated the `formattingControls` prop in favour of this. Also added a `withoutInteractiveFormatting` to specifically disable format types that would insert interactive elements, which can not be nested.
 
 ### Breaking Changes
 

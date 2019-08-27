@@ -35,7 +35,7 @@ const clickOnBlockSettingsMenuRemoveBlockButton = async () => {
 
 	let isRemoveButton = false;
 
-	let numButtons = await page.$$eval( '.block-editor-block-toolbar button', ( btns ) => btns.length );
+	let numButtons = await page.$$eval( '.block-editor-block-settings-menu__content button', ( btns ) => btns.length );
 
 	// Limit by the number of buttons available
 	while ( --numButtons ) {
@@ -64,8 +64,9 @@ describe( 'block deletion -', () => {
 			// The blocks can't be empty to trigger the toolbar
 			await page.keyboard.type( 'Paragraph to remove' );
 
-			// Press Escape to show the block toolbar
-			await page.keyboard.press( 'Escape' );
+			// Move the mouse to show the block toolbar
+			await page.mouse.move( 0, 0 );
+			await page.mouse.move( 10, 10 );
 
 			await clickOnBlockSettingsMenuRemoveBlockButton();
 
@@ -110,8 +111,8 @@ describe( 'block deletion -', () => {
 			// Click on something that's not a block.
 			await page.click( '.editor-post-title' );
 
-			// Click on the third (image) block so that its wrapper is selected and backspace to delete it.
-			await page.click( '.block-editor-block-list__block:nth-child(3) .components-placeholder__label' );
+			// Click on the image block so that its wrapper is selected and backspace to delete it.
+			await page.click( '.wp-block[data-type="core/image"] .components-placeholder__label' );
 			await page.keyboard.press( 'Backspace' );
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -143,12 +144,17 @@ describe( 'block deletion -', () => {
 } );
 
 describe( 'deleting all blocks', () => {
-	it( 'results in the default block getting selected', async () => {
+	beforeEach( async () => {
 		await createNewPost();
+	} );
+
+	it( 'results in the default block getting selected', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'Paragraph' );
 
-		await page.keyboard.press( 'Escape' );
+		// Move the mouse to show the block toolbar
+		await page.mouse.move( 0, 0 );
+		await page.mouse.move( 10, 10 );
 
 		await clickOnBlockSettingsMenuRemoveBlockButton();
 
@@ -168,7 +174,6 @@ describe( 'deleting all blocks', () => {
 		//
 		// See: https://github.com/WordPress/gutenberg/issues/15458
 		// See: https://github.com/WordPress/gutenberg/pull/15543
-		await createNewPost();
 
 		// Unregister default block type. This may happen if the editor is
 		// configured to not allow the default (paragraph) block type, either

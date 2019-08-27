@@ -28,10 +28,15 @@ The `recommended` preset will include rules governing an ES2015+ environment, an
 
 Alternatively, you can opt-in to only the more granular rulesets offered by the plugin. These include:
 
+- `custom`
 - `es5`
 - `esnext`
+- `jsdoc`
+- `jshint` (legacy)
 - `jsx-a11y`
 - `react`
+- `test-e2e`
+- `test-unit`
 
 For example, if your project does not use React, you could consider extending including only the ESNext rules in your project using the following `extends` definition:
 
@@ -55,6 +60,7 @@ Rule|Description|Recommended
 [react-no-unsafe-timeout](/packages/eslint-plugin/docs/rules/react-no-unsafe-timeout.md)|Disallow unsafe `setTimeout` in component|
 [valid-sprintf](/packages/eslint-plugin/docs/rules/valid-sprintf.md)|Enforce valid sprintf usage|✓
 [no-base-control-with-label-without-id](/packages/eslint-plugin/docs/rules/no-base-control-with-label-without-id.md)| Disallow the usage of BaseControl component with a label prop set but omitting the id property|✓
+[no-unguarded-get-range-at](/packages/eslint-plugin/docs/rules/no-unguarded-get-range-at.md)| Disallow the usage of unguarded `getRangeAt` calls|✓
 
 ### Legacy
 

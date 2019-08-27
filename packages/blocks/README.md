@@ -548,11 +548,11 @@ in the codebase.
 
 _Parameters_
 
--   _icon_ `(Object|string|WPElement)`: Slug of the Dashicon to be shown as the icon for the block in the inserter, or element or an object describing the icon.
+-   _icon_ `WPBlockTypeIconRender`: Render behavior of a block type icon; one of a Dashicon slug, an element, or a component.
 
 _Returns_
 
--   `Object`: Object describing the icon.
+-   `WPBlockTypeIconDescriptor`: Object describing the icon.
 
 <a name="parse" href="#parse">#</a> **parse**
 
@@ -586,6 +586,7 @@ Converts an HTML string to known blocks. Strips everything else.
 
 _Parameters_
 
+-   _options_ `Object`: 
 -   _options.HTML_ `[string]`: The HTML to convert.
 -   _options.plainText_ `[string]`: Plain text version.
 -   _options.mode_ `[string]`: Handle content as blocks or inline content. _ 'AUTO': Decide based on the content passed. _ 'INLINE': Always handle as inline content, and return string. \* 'BLOCKS': Always handle as blocks, and return array of blocks.
@@ -602,6 +603,7 @@ Converts an HTML string to known blocks.
 
 _Parameters_
 
+-   _$1_ `Object`: 
 -   _$1.HTML_ `string`: The HTML to convert.
 
 _Returns_
@@ -639,6 +641,7 @@ Takes a block or set of blocks and returns the serialized post content.
 _Parameters_
 
 -   _blocks_ `Array`: Block(s) to serialize.
+-   _options_ `WPBlockSerializationOptions`: Serialization options.
 
 _Returns_
 

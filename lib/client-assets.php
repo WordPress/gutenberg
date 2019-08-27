@@ -246,25 +246,11 @@ function gutenberg_register_scripts_and_styles() {
 	wp_add_inline_script(
 		'wp-api-fetch',
 		sprintf(
-			implode(
-				"\n",
-				array(
-					'( function() {',
-					'	var nonceMiddleware = wp.apiFetch.createNonceMiddleware( "%s" );',
-					'	wp.apiFetch.use( nonceMiddleware );',
-					'	wp.hooks.addAction(',
-					'		"heartbeat.tick",',
-					'		"core/api-fetch/create-nonce-middleware",',
-					'		function( response ) {',
-					'			if ( response[ "rest_nonce" ] ) {',
-					'				nonceMiddleware.nonce = response[ "rest_nonce" ];',
-					'			}',
-					'		}',
-					'	)',
-					'} )();',
-				)
-			),
-			( wp_installing() && ! is_multisite() ) ? '' : wp_create_nonce( 'wp_rest' )
+			'wp.apiFetch.nonceMiddleware = wp.apiFetch.createNonceMiddleware( "%s" );' .
+			'wp.apiFetch.use( wp.apiFetch.nonceMiddleware );' .
+			'wp.apiFetch.nonceEndpoint = "%s";',
+			( wp_installing() && ! is_multisite() ) ? '' : wp_create_nonce( 'wp_rest' ),
+			admin_url( 'admin-ajax.php?action=gutenberg_rest_nonce' )
 		),
 		'after'
 	);
@@ -284,21 +270,6 @@ function gutenberg_register_scripts_and_styles() {
 				'	wp.data',
 				'		.use( wp.data.plugins.persistence, { storageKey: storageKey } );',
 				'	wp.data.plugins.persistence.__unstableMigrate( { storageKey: storageKey } );',
-				'} )();',
-			)
-		)
-	);
-
-	// Add back compatibility for calls to wp.components.ServerSideRender.
-	wp_add_inline_script(
-		'wp-server-side-render',
-		implode(
-			"\n",
-			array(
-				'( function() {',
-				'	if ( wp && wp.components && wp.serverSideRender && ! wp.components.ServerSideRender ) {',
-				'		wp.components.ServerSideRender = wp.serverSideRender;',
-				'	};',
 				'} )();',
 			)
 		)
@@ -438,6 +409,13 @@ function gutenberg_register_vendor_scripts() {
 		'react-dom',
 		'https://unpkg.com/react-dom@16.8.4/umd/react-dom' . $react_suffix . '.js',
 		array( 'react' )
+	);
+
+	// TODO: This is necessarily only so long as core ships with v4.17.11, and
+	// can be removed at such time a newer version is available.
+	gutenberg_register_vendor_script(
+		'lodash',
+		'https://unpkg.com/lodash@4.17.14/lodash' . $suffix . '.js'
 	);
 }
 

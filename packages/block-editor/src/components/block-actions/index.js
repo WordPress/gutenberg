@@ -11,48 +11,62 @@ import { withSelect, withDispatch } from '@wordpress/data';
 import { cloneBlock, hasBlockSupport, switchToBlockType } from '@wordpress/blocks';
 
 function BlockActions( {
-	onDuplicate,
-	onRemove,
-	onInsertBefore,
-	onInsertAfter,
-	onGroup,
-	onUngroup,
-	isLocked,
 	canDuplicate,
+	canInsertDefaultBlock,
 	children,
+	isLocked,
+	onDuplicate,
+	onGroup,
+	onInsertAfter,
+	onInsertBefore,
+	onRemove,
+	onUngroup,
 } ) {
 	return children( {
+		canDuplicate,
+		canInsertDefaultBlock,
+		isLocked,
 		onDuplicate,
-		onRemove,
+		onGroup,
 		onInsertAfter,
 		onInsertBefore,
-		onGroup,
+		onRemove,
 		onUngroup,
-		isLocked,
-		canDuplicate,
 	} );
 }
 
 export default compose( [
 	withSelect( ( select, props ) => {
 		const {
+			canInsertBlockType,
+			getBlockRootClientId,
 			getBlocksByClientId,
 			getTemplateLock,
-			getBlockRootClientId,
 		} = select( 'core/block-editor' );
+		const { getDefaultBlockName } = select( 'core/blocks' );
 
 		const blocks = getBlocksByClientId( props.clientIds );
-		const canDuplicate = every( blocks, ( block ) => {
-			return !! block && hasBlockSupport( block.name, 'multiple', true );
-		} );
 		const rootClientId = getBlockRootClientId( props.clientIds[ 0 ] );
+		const canDuplicate = every( blocks, ( block ) => {
+			return (
+				!! block &&
+				hasBlockSupport( block.name, 'multiple', true ) &&
+				canInsertBlockType( block.name, rootClientId )
+			);
+		} );
+
+		const canInsertDefaultBlock = canInsertBlockType(
+			getDefaultBlockName(),
+			rootClientId
+		);
 
 		return {
-			isLocked: !! getTemplateLock( rootClientId ),
 			blocks,
 			canDuplicate,
-			rootClientId,
+			canInsertDefaultBlock,
 			extraProps: props,
+			isLocked: !! getTemplateLock( rootClientId ),
+			rootClientId,
 		};
 	} ),
 	withDispatch( ( dispatch, props, { select } ) => {
@@ -74,7 +88,7 @@ export default compose( [
 
 		return {
 			onDuplicate() {
-				if ( isLocked || ! canDuplicate ) {
+				if ( ! canDuplicate ) {
 					return;
 				}
 
@@ -117,8 +131,14 @@ export default compose( [
 					return;
 				}
 
+				const {
+					getGroupingBlockName,
+				} = select( 'core/blocks' );
+
+				const groupingBlockName = getGroupingBlockName();
+
 				// Activate the `transform` on `core/group` which does the conversion
-				const newBlocks = switchToBlockType( blocks, 'core/group' );
+				const newBlocks = switchToBlockType( blocks, groupingBlockName );
 
 				if ( ! newBlocks ) {
 					return;

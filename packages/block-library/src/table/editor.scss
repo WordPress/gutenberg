@@ -2,9 +2,17 @@
 	&[data-align="left"],
 	&[data-align="right"],
 	&[data-align="center"] {
+		// Stop table block from collapsing when tables are floated.
+		height: auto;
+
 		table {
 			// Ensure the table element is not full-width when aligned.
 			width: auto;
+		}
+
+		td,
+		th {
+			word-break: break-word;
 		}
 	}
 
@@ -19,9 +27,11 @@
 
 
 .wp-block-table {
+	// Remove default <figure> style.
+	margin: 0;
+
 	table {
 		border-collapse: collapse;
-		width: 100%;
 	}
 
 	td,

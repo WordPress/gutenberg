@@ -81,8 +81,6 @@ function applyInternetExplorerInputFix( editorNode ) {
 	};
 }
 
-const IS_PLACEHOLDER_VISIBLE_ATTR_NAME = 'data-is-placeholder-visible';
-
 /**
  * Whether or not the user agent is Internet Explorer.
  *
@@ -106,8 +104,6 @@ export default class Editable extends Component {
 	// update the attributes on the wrapper nodes here. `componentDidUpdate`
 	// will never be called.
 	shouldComponentUpdate( nextProps ) {
-		this.configureIsPlaceholderVisible( nextProps.isPlaceholderVisible );
-
 		if ( ! isEqual( this.props.style, nextProps.style ) ) {
 			this.editorNode.setAttribute( 'style', '' );
 			Object.assign( this.editorNode.style, {
@@ -120,6 +116,14 @@ export default class Editable extends Component {
 			this.editorNode.className = nextProps.className;
 		}
 
+		if ( this.props.start !== nextProps.start ) {
+			this.editorNode.setAttribute( 'start', nextProps.start );
+		}
+
+		if ( this.props.reversed !== nextProps.reversed ) {
+			this.editorNode.reversed = nextProps.reversed;
+		}
+
 		const { removedKeys, updatedKeys } = diffAriaProps( this.props, nextProps );
 		removedKeys.forEach( ( key ) =>
 			this.editorNode.removeAttribute( key ) );
@@ -127,13 +131,6 @@ export default class Editable extends Component {
 			this.editorNode.setAttribute( key, nextProps[ key ] ) );
 
 		return false;
-	}
-
-	configureIsPlaceholderVisible( isPlaceholderVisible ) {
-		const isPlaceholderVisibleString = String( !! isPlaceholderVisible );
-		if ( this.editorNode.getAttribute( IS_PLACEHOLDER_VISIBLE_ATTR_NAME ) !== isPlaceholderVisibleString ) {
-			this.editorNode.setAttribute( IS_PLACEHOLDER_VISIBLE_ATTR_NAME, isPlaceholderVisibleString );
-		}
 	}
 
 	bindEditorNode( editorNode ) {
@@ -158,7 +155,6 @@ export default class Editable extends Component {
 			record,
 			valueToEditableHTML,
 			className,
-			isPlaceholderVisible,
 			...remainingProps
 		} = this.props;
 
@@ -190,7 +186,6 @@ export default class Editable extends Component {
 			'aria-multiline': true,
 			className,
 			contentEditable: true,
-			[ IS_PLACEHOLDER_VISIBLE_ATTR_NAME ]: isPlaceholderVisible,
 			ref: this.bindEditorNode,
 			style: {
 				...style,

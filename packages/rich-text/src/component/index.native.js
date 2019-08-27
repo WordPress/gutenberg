@@ -47,7 +47,7 @@ const unescapeSpaces = ( text ) => {
  * Calls {@link pasteHandler} with a fallback to plain text when HTML processing
  * results in errors
  *
- * @param {function}  originalPasteHandler  The original handler function
+ * @param {Function}  originalPasteHandler  The original handler function
  * @param {Object}  [options]     The options to pass to {@link pasteHandler}
  *
  * @return {Array|string}         A list of blocks or a string, depending on
@@ -346,7 +346,6 @@ export class RichText extends Component {
 		this.lastAztecEventType = 'content size change';
 	}
 
-	// eslint-disable-next-line no-unused-vars
 	onEnter( event ) {
 		if ( this.props.onEnter ) {
 			this.props.onEnter();
@@ -385,7 +384,6 @@ export class RichText extends Component {
 		this.lastAztecEventType = 'input';
 	}
 
-	// eslint-disable-next-line no-unused-vars
 	onBackspace( event ) {
 		const {
 			__unstableOnMerge: onMerge,

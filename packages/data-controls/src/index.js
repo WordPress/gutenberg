@@ -95,10 +95,11 @@ export function dispatch( storeKey, actionName, ...args ) {
 /**
  * Utility for returning a promise that handles a selector with a resolver.
  *
- * @param {Object} registry     The data registry.
- * @param {string} storeKey     The store the selector belongs to
- * @param {string} selectorName The selector name
- * @param {Array}  args         The arguments fed to the selector
+ * @param {Object} registry             The data registry.
+ * @param {Object} options
+ * @param {string} options.storeKey     The store the selector belongs to
+ * @param {string} options.selectorName The selector name
+ * @param {Array}  options.args         The arguments fed to the selector
  *
  * @return {Promise}  A promise for resolving the given selector.
  */

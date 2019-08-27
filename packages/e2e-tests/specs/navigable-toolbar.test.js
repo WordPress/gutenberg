@@ -1,18 +1,11 @@
 /**
- * External dependencies
- */
-import { forEach } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { createNewPost, pressKeyWithModifier } from '@wordpress/e2e-test-utils';
 
-describe( 'block toolbar', () => {
-	forEach( {
-		unified: true,
-		contextual: false,
-	}, ( isUnifiedToolbar, label ) => {
+describe.each( [ [ 'unified', true ], [ 'contextual', false ] ] )(
+	'block toolbar (%s: %p)',
+	( label, isUnifiedToolbar ) => {
 		beforeEach( async () => {
 			await createNewPost();
 
@@ -25,32 +18,28 @@ describe( 'block toolbar', () => {
 			}, isUnifiedToolbar );
 		} );
 
-		const isInRichTextEditable = () => page.evaluate( () => (
-			document.activeElement.contentEditable === 'true'
-		) );
+		const isInBlockToolbar = () => page.evaluate( ( _isUnifiedToolbar ) => {
+			if ( _isUnifiedToolbar ) {
+				return !! document.activeElement
+					.closest( '.edit-post-header-toolbar' )
+					.querySelector( '.block-editor-block-toolbar' );
+			}
+			return !! document.activeElement.closest( '.block-editor-block-toolbar' );
+		}, isUnifiedToolbar );
 
-		const isInBlockToolbar = () => page.evaluate( () => (
-			!! document.activeElement.closest( '.block-editor-block-toolbar' )
-		) );
+		it( 'navigates in and out of toolbar by keyboard (Alt+F10, Escape)', async () => {
+			// Assumes new post focus starts in title. Create first new
+			// block by ArrowDown.
+			await page.keyboard.press( 'ArrowDown' );
 
-		describe( label, () => {
-			it( 'navigates in and out of toolbar by keyboard (Alt+F10, Escape)', async () => {
-				// Assumes new post focus starts in title. Create first new
-				// block by ArrowDown.
-				await page.keyboard.press( 'ArrowDown' );
+			// [TEMPORARY]: A new paragraph is not technically a block yet
+			// until starting to type within it.
+			await page.keyboard.type( 'Example' );
 
-				// [TEMPORARY]: A new paragraph is not technically a block yet
-				// until starting to type within it.
-				await page.keyboard.type( 'Example' );
-
-				// Upward
-				await pressKeyWithModifier( 'alt', 'F10' );
-				expect( await isInBlockToolbar() ).toBe( true );
-
-				// Downward
-				await page.keyboard.press( 'Escape' );
-				expect( await isInRichTextEditable() ).toBe( true );
-			} );
+			// Upward
+			await pressKeyWithModifier( 'alt', 'F10' );
+			expect( await isInBlockToolbar() ).toBe( true );
 		} );
-	} );
-} );
+	}
+);
+

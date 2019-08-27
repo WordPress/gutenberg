@@ -63,6 +63,10 @@
 		background-color: #0693e3;
 	}
 
+	.has-vivid-purple-background-color {
+		background-color: #9b51e0;
+	}
+
 	.has-very-light-gray-background-color {
 		background-color: #eee;
 	}
@@ -109,6 +113,10 @@
 		color: #0693e3;
 	}
 
+	.has-vivid-purple-color {
+		color: #9b51e0;
+	}
+
 	.has-very-light-gray-color {
 		color: #eee;
 	}
@@ -153,10 +161,12 @@
 }
 
 .has-text-align-left {
+	/*rtl:ignore*/
 	text-align: left;
 }
 
 .has-text-align-right {
+	/*rtl:ignore*/
 	text-align: right;
 }
 

@@ -11,6 +11,7 @@ import {
 	createNewPost,
 	saveDraft,
 	insertBlock,
+	disableNavigationMode,
 } from '@wordpress/e2e-test-utils';
 
 function readFile( filePath ) {
@@ -34,7 +35,7 @@ describe( 'Performance', () => {
 				}
 			} );
 
-			dispatch( 'core/editor' ).resetBlocks( blocks );
+			dispatch( 'core/block-editor' ).resetBlocks( blocks );
 		}, html );
 		await saveDraft();
 
@@ -53,6 +54,7 @@ describe( 'Performance', () => {
 		while ( i-- ) {
 			startTime = new Date();
 			await page.reload( { waitUntil: [ 'domcontentloaded', 'load' ] } );
+			await disableNavigationMode();
 		}
 
 		await insertBlock( 'Paragraph' );
