@@ -10,24 +10,34 @@ import { compose } from '@wordpress/compose';
 import { withPluginContext } from '@wordpress/plugins';
 import { withDispatch, withSelect } from '@wordpress/data';
 
+/**
+ * Internal dependencies
+ */
+import { EnablePluginDocumentSettingPanelOption } from '../../options-modal/options';
+
 export const { Fill, Slot } = createSlotFill( 'PluginDocumentSettingPanel' );
 
-const PluginDocumentSettingFill = ( { isEnabled, opened, onToggle, className, title, icon, children } ) => {
-	if ( ! isEnabled ) {
-		return null;
-	}
+const PluginDocumentSettingFill = ( { isEnabled, panelName, opened, onToggle, className, title, icon, children } ) => {
 	return (
-		<Fill>
-			<PanelBody
-				className={ className }
-				title={ title }
-				icon={ icon }
-				opened={ opened }
-				onToggle={ onToggle }
-			>
-				{ children }
-			</PanelBody>
-		</Fill>
+		<>
+			<EnablePluginDocumentSettingPanelOption
+				label={ title }
+				panelName={ panelName }
+			/>
+			<Fill>
+				{ isEnabled && (
+					<PanelBody
+						className={ className }
+						title={ title }
+						icon={ icon }
+						opened={ opened }
+						onToggle={ onToggle }
+					>
+						{ children }
+					</PanelBody>
+				) }
+			</Fill>
+		</>
 	);
 };
 
@@ -104,4 +114,5 @@ const PluginDocumentSettingPanel = compose(
 )( PluginDocumentSettingFill );
 
 PluginDocumentSettingPanel.Slot = Slot;
+
 export default PluginDocumentSettingPanel;

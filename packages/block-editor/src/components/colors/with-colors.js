@@ -23,7 +23,7 @@ const DEFAULT_COLORS = [];
  *
  * @param {Array} colorsArray An array of color objects.
  *
- * @return {function} The higher order component.
+ * @return {Function} The higher order component.
  */
 const withCustomColorPalette = ( colorsArray ) => createHigherOrderComponent( ( WrappedComponent ) => ( props ) => (
 	<WrappedComponent { ...props } colors={ colorsArray } />
@@ -33,7 +33,7 @@ const withCustomColorPalette = ( colorsArray ) => createHigherOrderComponent( ( 
  * Higher order component factory for injecting the editor colors as the
  * `colors` prop in the `withColors` HOC.
  *
- * @return {function} The higher order component.
+ * @return {Function} The higher order component.
  */
 const withEditorColorPalette = () => withSelect( ( select ) => {
 	const settings = select( 'core/block-editor' ).getSettings();
@@ -110,10 +110,10 @@ function createColorHOC( colorTypes, withColorPalette ) {
 						const previousColorObject = previousState[ colorAttributeName ];
 						const previousColor = get( previousColorObject, [ 'color' ] );
 						/**
-						* The "and previousColorObject" condition checks that a previous color object was already computed.
-						* At the start previousColorObject and colorValue are both equal to undefined
-						* bus as previousColorObject does not exist we should compute the object.
-						*/
+						 * The "and previousColorObject" condition checks that a previous color object was already computed.
+						 * At the start previousColorObject and colorValue are both equal to undefined
+						 * bus as previousColorObject does not exist we should compute the object.
+						 */
 						if ( previousColor === colorObject.color && previousColorObject ) {
 							newState[ colorAttributeName ] = previousColorObject;
 						} else {
@@ -187,7 +187,7 @@ export function createCustomColorsHOC( colorsArray ) {
  * );
  * ```
  *
- * @param {...(object|string)} colorTypes The arguments can be strings or objects. If the argument is an object,
+ * @param {...(Object|string)} colorTypes The arguments can be strings or objects. If the argument is an object,
  *                                        it should contain the color attribute name as key and the color context as value.
  *                                        If the argument is a string the value should be the color attribute name,
  *                                        the color context is computed by applying a kebab case transform to the value.

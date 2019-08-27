@@ -9,7 +9,7 @@ import { isEqual, reduce, some } from 'lodash';
  */
 import supportedMatchers from './supported-matchers';
 
-const createToBeCalledMatcher = ( matcherName, methodName ) =>
+const createToHaveBeenCalledMatcher = ( matcherName, methodName ) =>
 	( received ) => {
 		const spy = received[ methodName ];
 		const calls = spy.mock.calls;
@@ -33,7 +33,7 @@ const createToBeCalledMatcher = ( matcherName, methodName ) =>
 		};
 	};
 
-const createToBeCalledWithMatcher = ( matcherName, methodName ) =>
+const createToHaveBeenCalledWith = ( matcherName, methodName ) =>
 	( received, ...expected ) => {
 		const spy = received[ methodName ];
 		const calls = spy.mock.calls;
@@ -69,8 +69,8 @@ expect.extend(
 
 		return {
 			...result,
-			[ matcherName ]: createToBeCalledMatcher( `.${ matcherName }`, methodName ),
-			[ matcherNameWith ]: createToBeCalledWithMatcher( `.${ matcherNameWith }`, methodName ),
+			[ matcherName ]: createToHaveBeenCalledMatcher( `.${ matcherName }`, methodName ),
+			[ matcherNameWith ]: createToHaveBeenCalledWith( `.${ matcherNameWith }`, methodName ),
 		};
 	}, {} )
 );

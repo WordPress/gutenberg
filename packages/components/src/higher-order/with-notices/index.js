@@ -17,7 +17,7 @@ import NoticeList from '../../notice/list';
 /**
  * Override the default edit UI to include notices if supported.
  *
- * @param  {function|Component} OriginalComponent Original component.
+ * @param  {Function|Component} OriginalComponent Original component.
  * @return {Component}                            Wrapped component.
  */
 export default createHigherOrderComponent( ( OriginalComponent ) => {
@@ -43,10 +43,10 @@ export default createHigherOrderComponent( ( OriginalComponent ) => {
 		}
 
 		/**
-		* Function passed down as a prop that adds a new notice.
-		*
-		* @param {Object} notice  Notice to add.
-		*/
+		 * Function passed down as a prop that adds a new notice.
+		 *
+		 * @param {Object} notice  Notice to add.
+		 */
 		createNotice( notice ) {
 			const noticeToAdd = notice.id ? notice : { ...notice, id: uuid() };
 			this.setState( ( state ) => ( {
@@ -55,19 +55,19 @@ export default createHigherOrderComponent( ( OriginalComponent ) => {
 		}
 
 		/**
-		* Function passed as a prop that adds a new error notice.
-		*
-		* @param {string} msg  Error message of the notice.
-		*/
+		 * Function passed as a prop that adds a new error notice.
+		 *
+		 * @param {string} msg  Error message of the notice.
+		 */
 		createErrorNotice( msg ) {
 			this.createNotice( { status: 'error', content: msg } );
 		}
 
 		/**
-		* Removes a notice by id.
-		*
-		* @param {string} id  Id of the notice to remove.
-		*/
+		 * Removes a notice by id.
+		 *
+		 * @param {string} id  Id of the notice to remove.
+		 */
 		removeNotice( id ) {
 			this.setState( ( state ) => ( {
 				noticeList: state.noticeList.filter( ( notice ) => notice.id !== id ),
@@ -75,8 +75,8 @@ export default createHigherOrderComponent( ( OriginalComponent ) => {
 		}
 
 		/**
-		* Removes all notices
-		*/
+		 * Removes all notices
+		 */
 		removeAllNotices() {
 			this.setState( {
 				noticeList: [],

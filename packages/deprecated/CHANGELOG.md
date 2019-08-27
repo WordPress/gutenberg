@@ -1,3 +1,9 @@
+## Master
+
+### Bug Fix
+
+- When there is no `options.version` param provided `deprecated` method warns with more relaxed tone.
+
 ## 2.0.4 (2019-01-03)
 
 ## 2.0.0 (2018-09-05)

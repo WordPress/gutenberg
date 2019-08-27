@@ -46,6 +46,7 @@ class Inserter extends Component {
 	/**
 	 * Render callback to display Dropdown toggle element.
 	 *
+	 * @param {Object}   options
 	 * @param {Function} options.onToggle Callback to invoke when toggle is
 	 *                                    pressed.
 	 * @param {boolean}  options.isOpen   Whether dropdown is currently open.
@@ -64,6 +65,7 @@ class Inserter extends Component {
 	/**
 	 * Render callback to display Dropdown content element.
 	 *
+	 * @param {Object}   options
 	 * @param {Function} options.onClose Callback to invoke when dropdown is
 	 *                                   closed.
 	 *

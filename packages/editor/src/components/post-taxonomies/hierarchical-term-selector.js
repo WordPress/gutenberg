@@ -451,7 +451,6 @@ class HierarchicalTermSelector extends Component {
 				</form>
 			),
 		];
-		/* eslint-enable jsx-a11y/no-onchange */
 	}
 }
 

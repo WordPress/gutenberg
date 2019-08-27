@@ -15,7 +15,7 @@ jest.mock( '../components/layout', () => () => 'Layout' );
 /**
  * Internal dependencies
  */
-import '../store';
+import '..';
 import Editor from '../editor';
 
 const unsupportedBlock = `

@@ -24,8 +24,10 @@ describe( 'getEntityRecord', () => {
 				data: {
 					root: {
 						postType: {
-							items: {},
-							queries: {},
+							queriedData: {
+								items: {},
+								queries: {},
+							},
 						},
 					},
 				},
@@ -40,10 +42,12 @@ describe( 'getEntityRecord', () => {
 				data: {
 					root: {
 						postType: {
-							items: {
-								post: { slug: 'post' },
+							queriedData: {
+								items: {
+									post: { slug: 'post' },
+								},
+								queries: {},
 							},
-							queries: {},
 						},
 					},
 				},
@@ -60,8 +64,10 @@ describe( 'getEntityRecords', () => {
 				data: {
 					root: {
 						postType: {
-							items: {},
-							queries: {},
+							queriedData: {
+								items: {},
+								queries: {},
+							},
 						},
 					},
 				},
@@ -76,12 +82,14 @@ describe( 'getEntityRecords', () => {
 				data: {
 					root: {
 						postType: {
-							items: {
-								post: { slug: 'post' },
-								page: { slug: 'page' },
-							},
-							queries: {
-								'': [ 'post', 'page' ],
+							queriedData: {
+								items: {
+									post: { slug: 'post' },
+									page: { slug: 'page' },
+								},
+								queries: {
+									'': [ 'post', 'page' ],
+								},
 							},
 						},
 					},

@@ -27,7 +27,15 @@ const DEFAULT_ALIGNMENT_CONTROLS = [
 	},
 ];
 
-export function AlignmentToolbar( { value, onChange, alignmentControls = DEFAULT_ALIGNMENT_CONTROLS, isCollapsed = true } ) {
+export function AlignmentToolbar( props ) {
+	const {
+		value,
+		onChange,
+		alignmentControls = DEFAULT_ALIGNMENT_CONTROLS,
+		label = __( 'Change text alignment' ),
+		isCollapsed = true,
+	} = props;
+
 	function applyOrUnset( align ) {
 		return () => onChange( value === align ? undefined : align );
 	}
@@ -38,7 +46,7 @@ export function AlignmentToolbar( { value, onChange, alignmentControls = DEFAULT
 		<Toolbar
 			isCollapsed={ isCollapsed }
 			icon={ activeAlignment ? activeAlignment.icon : 'editor-alignleft' }
-			label={ __( 'Change text alignment' ) }
+			label={ label }
 			controls={ alignmentControls.map( ( control ) => {
 				const { align } = control;
 				const isActive = ( value === align );
