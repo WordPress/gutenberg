@@ -1,0 +1,13 @@
+[
+    {
+        "clientId": "_clientId_0",
+        "name": "core/social-link-medium",
+        "isValid": true,
+        "attributes": {
+            "url": "https://example.com/",
+            "site": "medium"
+        },
+        "innerBlocks": [],
+        "originalContent": "<li class=\"wp-block-social-link-medium wp-social-icon\"><a href=\"https://example.com/\">medium</a></li>"
+    }
+]

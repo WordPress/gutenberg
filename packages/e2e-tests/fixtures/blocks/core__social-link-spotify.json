@@ -1,0 +1,13 @@
+[
+    {
+        "clientId": "_clientId_0",
+        "name": "core/social-link-spotify",
+        "isValid": true,
+        "attributes": {
+            "url": "https://example.com/",
+            "site": "spotify"
+        },
+        "innerBlocks": [],
+        "originalContent": "<li class=\"wp-block-social-link-spotify wp-social-icon\"><a href=\"https://example.com/\">spotify</a></li>"
+    }
+]

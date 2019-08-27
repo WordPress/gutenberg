@@ -1,0 +1,22 @@
+[
+    {
+        "blockName": "core/social-link-etsy",
+        "attrs": {
+            "url": "https://example.com/"
+        },
+        "innerBlocks": [],
+        "innerHTML": "\n<li class=\"wp-block-social-link-etsy wp-social-icon\"><a href=\"https://example.com/\">etsy</a></li>\n",
+        "innerContent": [
+            "\n<li class=\"wp-block-social-link-etsy wp-social-icon\"><a href=\"https://example.com/\">etsy</a></li>\n"
+        ]
+    },
+    {
+        "blockName": null,
+        "attrs": {},
+        "innerBlocks": [],
+        "innerHTML": "\n",
+        "innerContent": [
+            "\n"
+        ]
+    }
+]

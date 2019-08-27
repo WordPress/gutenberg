@@ -1,0 +1,13 @@
+[
+    {
+        "clientId": "_clientId_0",
+        "name": "core/social-link-skype",
+        "isValid": true,
+        "attributes": {
+            "url": "https://example.com/",
+            "site": "skype"
+        },
+        "innerBlocks": [],
+        "originalContent": "<li class=\"wp-block-social-link-skype wp-social-icon\"><a href=\"https://example.com/\">skype</a></li>"
+    }
+]

@@ -1,0 +1,13 @@
+[
+    {
+        "clientId": "_clientId_0",
+        "name": "core/social-link-soundcloud",
+        "isValid": true,
+        "attributes": {
+            "url": "https://example.com/",
+            "site": "soundcloud"
+        },
+        "innerBlocks": [],
+        "originalContent": "<li class=\"wp-block-social-link-soundcloud wp-social-icon\"><a href=\"https://example.com/\">soundcloud</a></li>"
+    }
+]

@@ -1,0 +1,13 @@
+[
+    {
+        "clientId": "_clientId_0",
+        "name": "core/social-link-chain",
+        "isValid": true,
+        "attributes": {
+            "url": "https://example.com/",
+            "site": "chain"
+        },
+        "innerBlocks": [],
+        "originalContent": "<li class=\"wp-block-social-link-chain wp-social-icon\"><a href=\"https://example.com/\">chain</a></li>"
+    }
+]

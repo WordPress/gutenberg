@@ -4,23 +4,22 @@
         "attrs": {},
         "innerBlocks": [
             {
-                "blockName": "core/social-link",
+                "blockName": "core/social-link-mastodon",
                 "attrs": {
-                    "url": "https://mastodon.social/marcuskaz",
-                    "icon": "mastodon"
+                    "url": "https://mastodon.social/@marcuskaz"
                 },
                 "innerBlocks": [],
-                "innerHTML": "\n<span class=\"wp-block-social-link\"><a href=\"https://mastodon.social/marcuskaz\"><span class=\"wp-social-icon wp-social-icon-mastodon\"></span></a></span>\n",
+                "innerHTML": "\n<li class=\"wp-block-social-link-mastodon wp-social-icon\"><a href=\"https://mastodon.social/@marcuskaz\">mastodon</a></li>\n",
                 "innerContent": [
-                    "\n<span class=\"wp-block-social-link\"><a href=\"https://mastodon.social/marcuskaz\"><span class=\"wp-social-icon wp-social-icon-mastodon\"></span></a></span>\n"
+                    "\n<li class=\"wp-block-social-link-mastodon wp-social-icon\"><a href=\"https://mastodon.social/@marcuskaz\">mastodon</a></li>\n"
                 ]
             }
         ],
-        "innerHTML": "\n<div class=\"wp-block-social-links\"></div>\n",
+        "innerHTML": "\n<ul class=\"wp-block-social-links\"></ul>\n",
         "innerContent": [
-            "\n<div class=\"wp-block-social-links\">",
+            "\n<ul class=\"wp-block-social-links\">",
             null,
-            "</div>\n"
+            "</ul>\n"
         ]
     },
     {

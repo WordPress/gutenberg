@@ -1,0 +1,13 @@
+[
+    {
+        "clientId": "_clientId_0",
+        "name": "core/social-link-behance",
+        "isValid": true,
+        "attributes": {
+            "url": "https://example.com/",
+            "site": "behance"
+        },
+        "innerBlocks": [],
+        "originalContent": "<li class=\"wp-block-social-link-behance wp-social-icon\"><a href=\"https://example.com/\">behance</a></li>"
+    }
+]
