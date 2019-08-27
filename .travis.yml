@@ -15,7 +15,6 @@ cache:
     - $HOME/.jest-cache
     - $HOME/.npm
     - $HOME/.nvm/.cache
-    - $HOME/.phpbrew
     - wordpress
     - node_modules
     - vendor
@@ -71,7 +70,8 @@ jobs:
       env: INSTALL_AND_BUILD=true
       script: true
 
-    - name: Build artifacts
+    - stage: Tests
+      name: Build artifacts
       install:
         # A "full" install is executed, since `npm ci` does not always exit
         # with an error status code if the lock file is inaccurate.
@@ -81,8 +81,7 @@ jobs:
       script:
         - npm run check-local-changes
 
-    - stage: Tests
-      name: License compatibility
+    - name: License compatibility
       script:
         - npm run check-licenses
 
