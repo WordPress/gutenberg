@@ -149,8 +149,8 @@ describe( 'state', () => {
 			const value = getPostRawValue( { raw: '' } );
 
 			expect( value ).toBe( '' );
-			} );
-			} );
+		} );
+	} );
 
 	describe( 'preferences()', () => {
 		it( 'should apply all defaults', () => {
@@ -196,6 +196,12 @@ describe( 'state', () => {
 			const state = saving( null, {
 				type: 'REQUEST_POST_UPDATE_SUCCESS',
 			} );
+			expect( state ).toEqual( {
+				pending: false,
+				options: { isAutosave: true },
+			} );
+		} );
+	} );
 
 	describe( 'reusableBlocks()', () => {
 		it( 'should start out empty', () => {
@@ -537,9 +543,6 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toEqual( {} );
-		} );
-	} );
-
 		} );
 	} );
 } );
