@@ -1,14 +1,11 @@
 /**
  * Navigate through a block's toolbar using the keyboard. Asserts that each button receives focus.
+ * @return {Promise} A promise that resolves when it's finished tabbing through the buttons in a block's toolbar, asserting that each one received focus.
  */
 
 export async function tabThroughBlockToolbar() {
-	const blockToolbarButtons = await page.evaluate( () => {
-		// return an array with the classNames of the block toolbar's buttons
-		return [].slice.call(
-			document.querySelectorAll( '.block-editor-block-contextual-toolbar button:not([disabled])' )
-		).map( ( elem ) => elem.className );
-	} );
+	const blockToolbarButtons = await page.$$eval( '.block-editor-block-contextual-toolbar button:not([disabled])',
+		( elements ) => elements.map( ( elem ) => elem.className ) );
 
 	for ( const buttonClassName of blockToolbarButtons ) {
 		await page.keyboard.press( 'Tab' );

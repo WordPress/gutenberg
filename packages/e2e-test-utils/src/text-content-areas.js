@@ -1,9 +1,4 @@
 /**
- * Internal dependencies
- */
-import { getElementSelectorList } from './get-element-list';
-
-/**
  * Returns a list of a block's contenteditable elements.
  *
  * @param {boolean} empty When true, restricts the list to contenteditable elements with no value
@@ -17,5 +12,6 @@ export async function textContentAreas( { empty = false } ) {
 		return empty ? selector + '[data-is-placeholder-visible="true"]' : selector;
 	}, empty ).join( ',' );
 
-	return await getElementSelectorList( selectors );
+	return await page.$$eval( selectors,
+		( elements ) => elements.map( ( elem ) => elem.className ) );
 }

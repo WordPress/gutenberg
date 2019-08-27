@@ -22,7 +22,6 @@ export { getAllBlocks } from './get-all-blocks';
 export { getAvailableBlockTransforms } from './get-available-block-transforms';
 export { getBlockSetting } from './get-block-setting';
 export { getEditedPostContent } from './get-edited-post-content';
-export { getElementSelectorList } from './get-element-list';
 export { hasBlockSwitcher } from './has-block-switcher';
 export { insertAndPopulateBlock } from './insert-and-populate-block';
 export { insertBlock } from './insert-block';
