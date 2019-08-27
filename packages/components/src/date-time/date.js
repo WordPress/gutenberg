@@ -26,7 +26,7 @@ class DatePicker extends Component {
 
 	/*
 	* Todo: We should remove this function ASAP.
-	* It is kept because there is focus loose when we click the previous and next month buttons on react dates.
+	* It is kept because focus is lost when we click on the previous and next month buttons.
 	* This focus lose then makes the date picker popover close.
 	* Ideally we should add an upstream commit on react-dates to fix this issue.
 	*/
