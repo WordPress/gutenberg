@@ -16,6 +16,10 @@ cache:
     - $HOME/.npm
     - $HOME/.nvm/.cache
     - $HOME/.phpbrew
+    - wordpress
+    - node_modules
+    - vendor
+    - build
 
 branches:
   only:
@@ -26,34 +30,33 @@ env:
     - PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: true
     - LOCAL_DIR: build
     - LOCAL_SCRIPT_DEBUG: false
-    - INSTALL_COMPOSER: false
-    - INSTALL_WORDPRESS: true
+    - INSTALL_AND_BUILD: false
 
 before_install:
   - nvm install
   - |
-    if [[ "$INSTALL_WORDPRESS" = "true" ]]; then
-      # upgrade docker-compose
-      sudo rm /usr/local/bin/docker-compose
-      curl -L https://github.com/docker/compose/releases/download/1.24.0/docker-compose-`uname -s`-`uname -m` > docker-compose
-      chmod +x docker-compose
-      sudo mv docker-compose /usr/local/bin
-    fi
+    # upgrade docker-compose
+    sudo rm /usr/local/bin/docker-compose
+    curl -L https://github.com/docker/compose/releases/download/1.24.0/docker-compose-`uname -s`-`uname -m` > docker-compose
+    chmod +x docker-compose
+    sudo mv docker-compose /usr/local/bin
 
 install:
-  - npm ci
-  - npm run build
   - |
-    if [[ "$INSTALL_WORDPRESS" = "true" ]]; then
+    if [[ "$INSTALL_AND_BUILD" = "true" ]]; then
+      # Build Gutenberg
+      npm ci
+      npm run build
+
       # Install WordPress
       npm run env install
 
       mkdir -p wordpress/build/wp-content/uploads
       chmod 767 wordpress/build/wp-content/uploads
-    fi
-  - |
-    if [[ "$INSTALL_COMPOSER" = "true" ]]; then
+
       npm run env docker-run -- php composer install
+    else
+      npm run env reinstall
     fi
   - |
     if [[ "$E2E_ROLE" = "author" ]]; then
@@ -63,13 +66,12 @@ install:
 
 jobs:
   include:
-    - name: Lint
-      env: INSTALL_COMPOSER=true
-      script:
-        - npm run lint
+    - stage: Pre-tests
+      name: Warm up cache
+      env: INSTALL_AND_BUILD=true
+      script: true
 
     - name: Build artifacts
-      env: INSTALL_WORDPRESS=false
       install:
         # A "full" install is executed, since `npm ci` does not always exit
         # with an error status code if the lock file is inaccurate.
@@ -79,13 +81,12 @@ jobs:
       script:
         - npm run check-local-changes
 
-    - name: License compatibility
-      env: INSTALL_WORDPRESS=false
+    - stage: Tests
+      name: License compatibility
       script:
         - npm run check-licenses
 
     - name: JavaScript unit tests
-      env: INSTALL_WORDPRESS=false
       script:
         # It's not necessary to run the full build, since Jest can interpret
         # source files with `babel-jest`. Some packages have their own custom
@@ -94,7 +95,6 @@ jobs:
         - npm run test-unit -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
 
     - name: JavaScript native mobile tests
-      env: INSTALL_WORDPRESS=false
       script:
         # It's not necessary to run the full build, since Jest can interpret
         # source files with `babel-jest`. Some packages have their own custom
@@ -102,13 +102,16 @@ jobs:
         - npx lerna run build
         - npm run test-unit:native -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
 
+    - name: Lint
+      script:
+        - npm run lint
+
     - name: PHP unit tests
-      env: INSTALL_COMPOSER=true
       script:
         - npm run test-php && npm run test-unit-php-multisite
 
     - name: PHP unit tests (PHP 5.6)
-      env: INSTALL_COMPOSER=true LOCAL_PHP=5.6-fpm
+      env: LOCAL_PHP=5.6-fpm
       script:
         - npm run test-php && npm run test-unit-php-multisite
 
