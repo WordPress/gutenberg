@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { parse, stringify } from 'qs';
+import { last } from 'lodash';
 
 const URL_REGEXP = /^(?:https?:)?\/\/\S+$/i;
 const EMAIL_REGEXP = /^(mailto:)?[a-z0-9._%+-]+@[a-z0-9][a-z0-9.-]*\.[a-z]{2,63}$/i;
@@ -136,6 +137,20 @@ export function getPath( url ) {
 	const matches = /^[^\/\s:]+:(?:\/\/)?[^\/\s#?]+[\/]([^\s#?]+)[#?]{0,1}\S*$/.exec( url );
 	if ( matches ) {
 		return matches[ 1 ];
+	}
+}
+
+/**
+ * Returns the last part, presumably the file name, of URL.
+ *
+ * @param {string} url The full URL.
+ *
+ * @return {?string} The file name of the URL.
+ */
+export function getFilename( url ) {
+	const path = getPath( url );
+	if ( path ) {
+		return last( path.split( '/' ) );
 	}
 }
 
