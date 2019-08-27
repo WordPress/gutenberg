@@ -26,10 +26,9 @@ branches:
 
 env:
   global:
-    - PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: true
     - LOCAL_DIR: build
     - LOCAL_SCRIPT_DEBUG: false
-    - INSTALL_AND_BUILD: false
+    - FORCE_REDUCED_MOTION: true
 
 before_install:
   - nvm install
@@ -41,33 +40,22 @@ before_install:
     sudo mv docker-compose /usr/local/bin
 
 install:
-  - |
-    if [[ "$INSTALL_AND_BUILD" = "true" ]]; then
-      # Build Gutenberg
-      npm ci
-      npm run build
-
-      # Install WordPress
-      npm run env install
-
-      mkdir -p wordpress/build/wp-content/uploads
-      chmod 767 wordpress/build/wp-content/uploads
-
-      npm run env docker-run -- php composer install
-    else
-      npm run env reinstall
-    fi
-  - |
-    if [[ "$E2E_ROLE" = "author" ]]; then
-      npm run env cli -- user create author author@example.com --role=author --user_pass=authpass --path=build
-      npm run env cli -- post update 1 --post_author=2 --path=build
-    fi
+  - npm run env install -- --fast
 
 jobs:
   include:
     - stage: Pre-tests
       name: Warm up cache
-      env: INSTALL_AND_BUILD=true
+      install:
+        # Build Gutenberg
+        - npm ci
+        - npm run build
+        # Install WordPress
+        - npm run env install
+        - mkdir -p wordpress/build/wp-content/uploads
+        - chmod 767 wordpress/build/wp-content/uploads
+        # Install Composer dependencies
+        - npm run env docker-run -- php composer install
       script: true
 
     - stage: Tests
@@ -115,49 +103,53 @@ jobs:
         - npm run test-php && npm run test-unit-php-multisite
 
     - name: E2E tests (Admin) (1/4)
-      env: FORCE_REDUCED_MOTION=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
       script:
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 0' < ~/.jest-e2e-tests )
 
     - name: E2E tests (Admin) (2/4)
-      env: FORCE_REDUCED_MOTION=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
       script:
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 1' < ~/.jest-e2e-tests )
 
     - name: E2E tests (Admin) (3/4)
-      env: FORCE_REDUCED_MOTION=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
       script:
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 2' < ~/.jest-e2e-tests )
 
     - name: E2E tests (Admin) (4/4)
-      env: FORCE_REDUCED_MOTION=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
       script:
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 3' < ~/.jest-e2e-tests )
 
     - name: E2E tests (Author) (1/4)
-      env: E2E_ROLE=author FORCE_REDUCED_MOTION=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
+      before_script:
+        - npm run env cli -- user create author author@example.com --role=author --user_pass=authpass --path=build
+        - npm run env cli -- post update 1 --post_author=2 --path=build
       script:
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 0' < ~/.jest-e2e-tests )
 
     - name: E2E tests (Author) (2/4)
-      env: E2E_ROLE=author FORCE_REDUCED_MOTION=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
+      before_script:
+        - npm run env cli -- user create author author@example.com --role=author --user_pass=authpass --path=build
+        - npm run env cli -- post update 1 --post_author=2 --path=build
       script:
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 1' < ~/.jest-e2e-tests )
 
     - name: E2E tests (Author) (3/4)
-      env: E2E_ROLE=author FORCE_REDUCED_MOTION=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
+      before_script:
+        - npm run env cli -- user create author author@example.com --role=author --user_pass=authpass --path=build
+        - npm run env cli -- post update 1 --post_author=2 --path=build
       script:
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 2' < ~/.jest-e2e-tests )
 
     - name: E2E tests (Author) (4/4)
-      env: E2E_ROLE=author FORCE_REDUCED_MOTION=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
+      before_script:
+        - npm run env cli -- user create author author@example.com --role=author --user_pass=authpass --path=build
+        - npm run env cli -- post update 1 --post_author=2 --path=build
       script:
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 3' < ~/.jest-e2e-tests )
