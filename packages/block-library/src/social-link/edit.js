@@ -6,12 +6,13 @@ import classNames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { URLInput } from '@wordpress/block-editor';
+import { URLPopover } from '@wordpress/block-editor';
 import { useState } from '@wordpress/element';
 import {
 	Button,
-	Popover,
+	IconButton,
 } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -37,16 +38,18 @@ const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
 		>
 			<IconComponent />
 			{ isSelected && showURLPopover && (
-				<Popover
-					onFocusOutside={ () => setPopover( false ) }
-					position="bottom center"
+				<URLPopover
+					onClose={ () => setPopover( false ) }
 				>
-					<URLInput
-						value={ url }
-						onChange={ ( value ) => setAttributes( { url: value } ) }
-						disableSuggestions={ true }
-					/>
-				</Popover>
+					<form onSubmit={ () => setPopover( false ) }>
+						<input type="url"
+							value={ url }
+							onChange={ ( evt ) => setAttributes( { url: evt.target.value } ) }
+							placeholder={ __( 'Enter site URL' ) }
+						/>
+						<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
+					</form>
+				</URLPopover>
 			) }
 		</Button>
 	);
