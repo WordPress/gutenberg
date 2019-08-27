@@ -1,10 +1,8 @@
 /**
- * WordPress dependencies
+ * Internal dependencies
  */
-import {
-	insertBlock,
-	textContentAreas,
-} from '@wordpress/e2e-test-utils';
+import { insertBlock } from './insert-block';
+import { textContentAreas } from './text-content-areas';
 
 /**
  * Inserts a content block and then, if it has text content areas, fills them with text
@@ -19,9 +17,9 @@ export async function insertAndPopulateBlock( blockName, content ) {
 	await page.keyboard.type( content );
 
 	// if there are more contenteditable elements, select and populate them too:
-	const blocks = await textContentAreas( { empty: true } );
+	const blockContentAreas = await textContentAreas( { empty: true } );
 
-	for ( let i = 0; i < blocks.length; i++ ) {
+	for ( let i = 0; i < blockContentAreas.length; i++ ) {
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.type( content );
 	}
