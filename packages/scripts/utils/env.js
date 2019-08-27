@@ -105,15 +105,18 @@ function downloadWordPressZip() {
 /**
  * Runs the appropriate build/install commands in the WordPress directory.
  *
- * @param {boolean} newInstall Default true. Flag whether to treat this as a new WordPress install or not.
+ * @param {boolean} newInstall  Flag whether to treat this as a new WordPress install or not.
+ * @param {boolean} fastInstall When set, assumes NPM dependencies are already downloaded, and build commands have been run.
  */
-function buildWordPress( newInstall = true ) {
-	execSync( 'npm install', { cwd: env.WP_DEVELOP_DIR, stdio: 'inherit' } );
-	execSync( 'npm run env:start', { cwd: env.WP_DEVELOP_DIR, stdio: 'inherit' } );
-	if ( env.LOCAL_DIR === 'build' ) {
-		execSync( 'npm run build', { cwd: env.WP_DEVELOP_DIR, stdio: 'inherit' } );
-	} else {
-		execSync( 'npm run build:dev', { cwd: env.WP_DEVELOP_DIR, stdio: 'inherit' } );
+function buildWordPress( newInstall, fastInstall ) {
+	if ( ! fastInstall ) {
+		execSync( 'npm install', { cwd: env.WP_DEVELOP_DIR, stdio: 'inherit' } );
+		execSync( 'npm run env:start', { cwd: env.WP_DEVELOP_DIR, stdio: 'inherit' } );
+		if ( env.LOCAL_DIR === 'build' ) {
+			execSync( 'npm run build', { cwd: env.WP_DEVELOP_DIR, stdio: 'inherit' } );
+		} else {
+			execSync( 'npm run build:dev', { cwd: env.WP_DEVELOP_DIR, stdio: 'inherit' } );
+		}
 	}
 
 	if ( newInstall ) {

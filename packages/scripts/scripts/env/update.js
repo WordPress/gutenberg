@@ -22,11 +22,11 @@ env.WP_DEVELOP_DIR = normalize( cwd() + '/wordpress' );
 
 if ( commandExistsSync( 'git' ) ) {
 	execSync( 'git pull', { cwd: env.WP_DEVELOP_DIR, stdio: 'inherit' } );
-	buildWordPress();
+	buildWordPress( false, false );
 } else {
 	stdout.write( "Git isn't available. Switching to downloading a zip version.\n" );
 	downloadWordPressZip()
 		.then( () => {
-			buildWordPress( false );
+			buildWordPress( false, false );
 		} );
 }

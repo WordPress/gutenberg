@@ -27,6 +27,7 @@ if ( ! args.length ) {
 		start: "This will start a container that you've already installed and connected to.",
 		stop: "And this will stop it when you're done!",
 		update: 'If you used ' + chalk.blue( 'npm run env install' ) + ' to setup WordPress, run this command to update it.',
+		reinstall: 'Resets the database and re-configures WordPress again.',
 		cli: 'Run WP-CLI commands against the WordPress install.',
 		'lint-php': 'Run PHPCS linting on the plugin.',
 		'test-php': "Run the plugin's PHPUnit tests.",
