@@ -25,7 +25,7 @@ export function getWPAdminURL( page, query ) {
 /**
  * Performs some basic cleanup of a string for use as a post slug
  *
- * This replicates some of what santize_title() does in WordPress core, but
+ * This replicates some of what sanitize_title() does in WordPress core, but
  * is only designed to approximate what the slug will be.
  *
  * Converts whitespace, periods, forward slashes and underscores to hyphens.
@@ -39,5 +39,8 @@ export function getWPAdminURL( page, query ) {
  * @return {string} Processed string
  */
 export function cleanForSlug( string ) {
+	if ( ! string ) {
+		return '';
+	}
 	return toLower( deburr( trim( string.replace( /[\s\./_]+/g, '-' ), '-' ) ) );
 }

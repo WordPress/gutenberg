@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { noop } from 'lodash';
+import deepFreeze from 'deep-freeze';
 
 /**
  * WordPress dependencies
@@ -23,6 +24,7 @@ import actions, {
 	replaceBlocks,
 	resetBlocks,
 	selectBlock,
+	selectionChange,
 	setTemplateValidity,
 } from '../actions';
 import effects, { validateBlocksToTemplate } from '../effects';
@@ -32,7 +34,14 @@ import applyMiddlewares from '../middlewares';
 import '../../';
 
 describe( 'effects', () => {
-	const defaultBlockSettings = { save: () => 'Saved', category: 'common', title: 'block title' };
+	const defaultBlockSettings = {
+		attributes: {
+			content: {},
+		},
+		save: () => 'Saved',
+		category: 'common',
+		title: 'block title',
+	};
 
 	describe( '.MERGE_BLOCKS', () => {
 		const handler = effects.MERGE_BLOCKS;
@@ -47,14 +56,14 @@ describe( 'effects', () => {
 
 		it( 'should only focus the blockA if the blockA has no merge function', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
-			const blockA = {
+			const blockA = deepFreeze( {
 				clientId: 'chicken',
 				name: 'core/test-block',
-			};
-			const blockB = {
+			} );
+			const blockB = deepFreeze( {
 				clientId: 'ribs',
 				name: 'core/test-block',
-			};
+			} );
 			selectors.getBlock = ( state, clientId ) => {
 				return blockA.clientId === clientId ? blockA : blockB;
 			};
@@ -69,6 +78,9 @@ describe( 'effects', () => {
 
 		it( 'should merge the blocks if blocks of the same type', () => {
 			registerBlockType( 'core/test-block', {
+				attributes: {
+					content: {},
+				},
 				merge( attributes, attributesToMerge ) {
 					return {
 						content: attributes.content + ' ' + attributesToMerge.content,
@@ -78,25 +90,40 @@ describe( 'effects', () => {
 				category: 'common',
 				title: 'test block',
 			} );
-			const blockA = {
+			const blockA = deepFreeze( {
 				clientId: 'chicken',
 				name: 'core/test-block',
 				attributes: { content: 'chicken' },
-			};
-			const blockB = {
+				innerBlocks: [],
+			} );
+			const blockB = deepFreeze( {
 				clientId: 'ribs',
 				name: 'core/test-block',
 				attributes: { content: 'ribs' },
-			};
+				innerBlocks: [],
+			} );
 			selectors.getBlock = ( state, clientId ) => {
 				return blockA.clientId === clientId ? blockA : blockB;
 			};
 			const dispatch = jest.fn();
-			const getState = () => ( {} );
+			const getState = () => ( {
+				blockSelection: {
+					start: {
+						clientId: blockB.clientId,
+						attributeKey: 'content',
+						offset: 0,
+					},
+				},
+			} );
 			handler( mergeBlocks( blockA.clientId, blockB.clientId ), { dispatch, getState } );
 
 			expect( dispatch ).toHaveBeenCalledTimes( 2 );
-			expect( dispatch ).toHaveBeenCalledWith( selectBlock( 'chicken', -1 ) );
+			expect( dispatch ).toHaveBeenCalledWith( selectionChange(
+				blockA.clientId,
+				'content',
+				'chicken'.length + 1,
+				'chicken'.length + 1,
+			) );
 			const lastCall = dispatch.mock.calls[ 1 ];
 			expect( lastCall ).toHaveLength( 1 );
 			const [ lastCallArgument ] = lastCall;
@@ -114,6 +141,9 @@ describe( 'effects', () => {
 
 		it( 'should not merge the blocks have different types without transformation', () => {
 			registerBlockType( 'core/test-block', {
+				attributes: {
+					content: {},
+				},
 				merge( attributes, attributesToMerge ) {
 					return {
 						content: attributes.content + ' ' + attributesToMerge.content,
@@ -124,21 +154,31 @@ describe( 'effects', () => {
 				title: 'test block',
 			} );
 			registerBlockType( 'core/test-block-2', defaultBlockSettings );
-			const blockA = {
+			const blockA = deepFreeze( {
 				clientId: 'chicken',
 				name: 'core/test-block',
 				attributes: { content: 'chicken' },
-			};
-			const blockB = {
+				innerBlocks: [],
+			} );
+			const blockB = deepFreeze( {
 				clientId: 'ribs',
-				name: 'core/test-block2',
+				name: 'core/test-block-2',
 				attributes: { content: 'ribs' },
-			};
+				innerBlocks: [],
+			} );
 			selectors.getBlock = ( state, clientId ) => {
 				return blockA.clientId === clientId ? blockA : blockB;
 			};
 			const dispatch = jest.fn();
-			const getState = () => ( {} );
+			const getState = () => ( {
+				blockSelection: {
+					start: {
+						clientId: blockB.clientId,
+						attributeKey: 'content',
+						offset: 0,
+					},
+				},
+			} );
 			handler( mergeBlocks( blockA.clientId, blockB.clientId ), { dispatch, getState } );
 
 			expect( dispatch ).not.toHaveBeenCalled();
@@ -162,7 +202,7 @@ describe( 'effects', () => {
 			} );
 			registerBlockType( 'core/test-block-2', {
 				attributes: {
-					content: {
+					content2: {
 						type: 'string',
 					},
 				},
@@ -181,25 +221,40 @@ describe( 'effects', () => {
 				category: 'common',
 				title: 'test block 2',
 			} );
-			const blockA = {
+			const blockA = deepFreeze( {
 				clientId: 'chicken',
 				name: 'core/test-block',
 				attributes: { content: 'chicken' },
-			};
-			const blockB = {
+				innerBlocks: [],
+			} );
+			const blockB = deepFreeze( {
 				clientId: 'ribs',
 				name: 'core/test-block-2',
 				attributes: { content2: 'ribs' },
-			};
+				innerBlocks: [],
+			} );
 			selectors.getBlock = ( state, clientId ) => {
 				return blockA.clientId === clientId ? blockA : blockB;
 			};
 			const dispatch = jest.fn();
-			const getState = () => ( {} );
+			const getState = () => ( {
+				blockSelection: {
+					start: {
+						clientId: blockB.clientId,
+						attributeKey: 'content2',
+						offset: 0,
+					},
+				},
+			} );
 			handler( mergeBlocks( blockA.clientId, blockB.clientId ), { dispatch, getState } );
 
 			expect( dispatch ).toHaveBeenCalledTimes( 2 );
-			// expect( dispatch ).toHaveBeenCalledWith( focusBlock( 'chicken', { offset: -1 } ) );
+			expect( dispatch ).toHaveBeenCalledWith( selectionChange(
+				blockA.clientId,
+				'content',
+				'chicken'.length + 1,
+				'chicken'.length + 1,
+			) );
 			const expectedGenerator = replaceBlocks( [ 'chicken', 'ribs' ], [ {
 				clientId: 'chicken',
 				name: 'core/test-block',

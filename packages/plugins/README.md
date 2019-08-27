@@ -116,12 +116,11 @@ registerPlugin( 'plugin-name', {
 
 ```js
 // Using ESNext syntax
-const { Fragment } = wp.element;
 const { PluginSidebar, PluginSidebarMoreMenuItem } = wp.editPost;
 const { registerPlugin } = wp.plugins;
 
 const Component = () => (
-	<Fragment>
+	<>
 		<PluginSidebarMoreMenuItem
 			target="sidebar-name"
 		>
@@ -133,7 +132,7 @@ const Component = () => (
 		>
 			Content of the sidebar
 		</PluginSidebar>
-	</Fragment>
+	</>
 );
 
 registerPlugin( 'plugin-name', {

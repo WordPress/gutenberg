@@ -109,9 +109,11 @@ export const registerCoreBlocks = () => {
 		missing,
 		more,
 		image,
+		video,
 		nextpage,
 		separator,
 		list,
+		quote,
 	].forEach( ( { metadata, name, settings } ) => {
 		registerBlockType( name, {
 			...metadata,

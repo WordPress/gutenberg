@@ -7,16 +7,23 @@ import { size, map, without } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { withSelect } from '@wordpress/data';
+import { withSelect, withDispatch } from '@wordpress/data';
 import { EditorProvider, ErrorBoundary, PostLockedModal } from '@wordpress/editor';
 import { StrictMode, Component } from '@wordpress/element';
-import { KeyboardShortcuts } from '@wordpress/components';
+import {
+	KeyboardShortcuts,
+	SlotFillProvider,
+	DropZoneProvider,
+} from '@wordpress/components';
+import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import preventEventDiscovery from './prevent-event-discovery';
 import Layout from './components/layout';
+import EditorInitialization from './components/editor-initialization';
+import EditPostSettings from './components/edit-post-settings';
 
 class Editor extends Component {
 	constructor() {
@@ -30,14 +37,22 @@ class Editor extends Component {
 	getEditorSettings(
 		settings,
 		hasFixedToolbar,
+		showInserterHelpPanel,
 		focusMode,
 		hiddenBlockTypes,
 		blockTypes,
+		preferredStyleVariations,
+		updatePreferredStyleVariations,
 	) {
 		settings = {
 			...settings,
+			__experimentalPreferredStyleVariations: {
+				value: preferredStyleVariations,
+				onChange: updatePreferredStyleVariations,
+			},
 			hasFixedToolbar,
 			focusMode,
+			showInserterHelpPanel,
 		};
 
 		// Omit hidden block types if exists and non-empty.
@@ -62,14 +77,18 @@ class Editor extends Component {
 
 	render() {
 		const {
+			preferredStyleVariations,
 			settings,
 			hasFixedToolbar,
 			focusMode,
 			post,
+			postId,
 			initialEdits,
 			onError,
 			hiddenBlockTypes,
 			blockTypes,
+			showInserterHelpPanel,
+			updatePreferredStyleVariations,
 			...props
 		} = this.props;
 
@@ -80,40 +99,61 @@ class Editor extends Component {
 		const editorSettings = this.getEditorSettings(
 			settings,
 			hasFixedToolbar,
+			showInserterHelpPanel,
 			focusMode,
 			hiddenBlockTypes,
 			blockTypes,
+			preferredStyleVariations,
+			updatePreferredStyleVariations,
 		);
 
 		return (
 			<StrictMode>
-				<EditorProvider
-					settings={ editorSettings }
-					post={ post }
-					initialEdits={ initialEdits }
-					{ ...props }
-				>
-					<ErrorBoundary onError={ onError }>
-						<Layout />
-						<KeyboardShortcuts shortcuts={ preventEventDiscovery } />
-					</ErrorBoundary>
-					<PostLockedModal />
-				</EditorProvider>
+				<EditPostSettings.Provider value={ settings }>
+					<SlotFillProvider>
+						<DropZoneProvider>
+							<EditorProvider
+								settings={ editorSettings }
+								post={ post }
+								initialEdits={ initialEdits }
+								useSubRegistry={ false }
+								{ ...props }
+							>
+								<ErrorBoundary onError={ onError }>
+									<EditorInitialization postId={ postId } />
+									<Layout />
+									<KeyboardShortcuts shortcuts={ preventEventDiscovery } />
+								</ErrorBoundary>
+								<PostLockedModal />
+							</EditorProvider>
+						</DropZoneProvider>
+					</SlotFillProvider>
+				</EditPostSettings.Provider>
 			</StrictMode>
 		);
 	}
 }
 
-export default withSelect( ( select, { postId, postType } ) => {
-	const { isFeatureActive, getPreference } = select( 'core/edit-post' );
-	const { getEntityRecord } = select( 'core' );
-	const { getBlockTypes } = select( 'core/blocks' );
+export default compose( [
+	withSelect( ( select, { postId, postType } ) => {
+		const { isFeatureActive, getPreference } = select( 'core/edit-post' );
+		const { getEntityRecord } = select( 'core' );
+		const { getBlockTypes } = select( 'core/blocks' );
 
-	return {
-		hasFixedToolbar: isFeatureActive( 'fixedToolbar' ),
-		focusMode: isFeatureActive( 'focusMode' ),
-		post: getEntityRecord( 'postType', postType, postId ),
-		hiddenBlockTypes: getPreference( 'hiddenBlockTypes' ),
-		blockTypes: getBlockTypes(),
-	};
-} )( Editor );
+		return {
+			showInserterHelpPanel: isFeatureActive( 'showInserterHelpPanel' ),
+			hasFixedToolbar: isFeatureActive( 'fixedToolbar' ),
+			focusMode: isFeatureActive( 'focusMode' ),
+			post: getEntityRecord( 'postType', postType, postId ),
+			preferredStyleVariations: getPreference( 'preferredStyleVariations' ),
+			hiddenBlockTypes: getPreference( 'hiddenBlockTypes' ),
+			blockTypes: getBlockTypes(),
+		};
+	} ),
+	withDispatch( ( dispatch ) => {
+		const { updatePreferredStyleVariations } = dispatch( 'core/edit-post' );
+		return {
+			updatePreferredStyleVariations,
+		};
+	} ),
+] )( Editor );

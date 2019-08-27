@@ -22,7 +22,9 @@ export default function save( { attributes } ) {
 
 	return (
 		<div className={ className } style={ styles }>
-			<InnerBlocks.Content />
+			<div className="wp-block-group__inner-container">
+				<InnerBlocks.Content />
+			</div>
 		</div>
 	);
 }

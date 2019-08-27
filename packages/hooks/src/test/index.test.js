@@ -1,5 +1,3 @@
-/* eslint-disable no-console */
-
 /**
  * Internal dependencies
  */
@@ -77,6 +75,7 @@ beforeEach( () => {
 
 			delete hooks[ k ];
 		}
+		delete hooks.all;
 	} );
 } );
 
@@ -696,4 +695,83 @@ test( 'removing a filter triggers a hookRemoved action passing all callback deta
 		'testFilter',
 		'my_callback3'
 	);
+} );
+
+test( 'add an all filter and run it any hook to trigger it', () => {
+	addFilter( 'all', 'my_callback', filterA );
+	expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'testa' );
+	expect( applyFilters( 'test.filter-anything', 'test' ) ).toBe( 'testa' );
+} );
+
+test( 'add an all action and run it any hook to trigger it', () => {
+	addAction( 'all', 'my_callback', actionA );
+	addAction( 'test.action', 'my_callback', actionA );// Doesn't get triggered.
+	doAction( 'test.action-anything' );
+	expect( window.actionValue ).toBe( 'a' );
+} );
+
+test( 'add multiple all filters and run it any hook to trigger them', () => {
+	addFilter( 'all', 'my_callback', filterA );
+	addFilter( 'all', 'my_callback', filterB );
+	expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'testab' );
+	expect( applyFilters( 'test.filter-anything', 'test' ) ).toBe( 'testab' );
+} );
+
+test( 'add multiple all actions and run it any hook to trigger them', () => {
+	addAction( 'all', 'my_callback', actionA );
+	addAction( 'all', 'my_callback', actionB );
+	addAction( 'test.action', 'my_callback', actionA ); // Doesn't get triggered.
+	doAction( 'test.action-anything' );
+	expect( window.actionValue ).toBe( 'ab' );
+} );
+
+test( 'add multiple all filters and run it any hook to trigger them by priority', () => {
+	addFilter( 'all', 'my_callback', filterA, 11 );
+	addFilter( 'all', 'my_callback', filterB, 10 );
+	expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'testba' );
+	expect( applyFilters( 'test.filter-anything', 'test' ) ).toBe( 'testba' );
+} );
+
+test( 'add multiple all actions and run it any hook to trigger them by priority', () => {
+	addAction( 'all', 'my_callback', actionA, 11 );
+	addAction( 'all', 'my_callback', actionB, 10 );
+	addAction( 'test.action', 'my_callback', actionA ); // Doesn't get triggered.
+	doAction( 'test.action-anything' );
+	expect( window.actionValue ).toBe( 'ba' );
+} );
+
+test( 'checking hasAction with named callbacks and removing', () => {
+	addAction( 'test.action', 'my_callback', () => {} );
+	expect( hasAction( 'test.action', 'not_my_callback' ) ).toBe( false );
+	expect( hasAction( 'test.action', 'my_callback' ) ).toBe( true );
+	removeAction( 'test.action', 'my_callback' );
+	expect( hasAction( 'test.action', 'my_callback' ) ).toBe( false );
+} );
+
+test( 'checking hasAction with named callbacks and removeAllActions', () => {
+	addAction( 'test.action', 'my_callback', () => {} );
+	addAction( 'test.action', 'my_second_callback', () => {} );
+	expect( hasAction( 'test.action', 'my_callback' ) ).toBe( true );
+	expect( hasAction( 'test.action', 'my_callback' ) ).toBe( true );
+	removeAllActions( 'test.action' );
+	expect( hasAction( 'test.action', 'my_callback' ) ).toBe( false );
+	expect( hasAction( 'test.action', 'my_callback' ) ).toBe( false );
+} );
+
+test( 'checking hasFilter with named callbacks and removing', () => {
+	addFilter( 'test.filter', 'my_callback', () => {} );
+	expect( hasFilter( 'test.filter', 'not_my_callback' ) ).toBe( false );
+	expect( hasFilter( 'test.filter', 'my_callback' ) ).toBe( true );
+	removeFilter( 'test.filter', 'my_callback' );
+	expect( hasFilter( 'test.filter', 'my_callback' ) ).toBe( false );
+} );
+
+test( 'checking hasFilter with named callbacks and removeAllActions', () => {
+	addFilter( 'test.filter', 'my_callback', () => {} );
+	addFilter( 'test.filter', 'my_second_callback', () => {} );
+	expect( hasFilter( 'test.filter', 'my_callback' ) ).toBe( true );
+	expect( hasFilter( 'test.filter', 'my_second_callback' ) ).toBe( true );
+	removeAllFilters( 'test.filter' );
+	expect( hasFilter( 'test.filter', 'my_callback' ) ).toBe( false );
+	expect( hasFilter( 'test.filter', 'my_second_callback' ) ).toBe( false );
 } );

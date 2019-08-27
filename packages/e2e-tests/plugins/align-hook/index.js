@@ -1,7 +1,7 @@
 ( function() {
 	var registerBlockType = wp.blocks.registerBlockType;
 	var el = wp.element.createElement;
-	var InnerBlocks = wp.editor.InnerBlocks;
+	var InnerBlocks = wp.blockEditor.InnerBlocks;
 	var __ = wp.i18n.__;
 	var TEMPLATE = [
 		[ 'core/paragraph', { fontSize: 'large', content: __( 'Content…' ) } ],

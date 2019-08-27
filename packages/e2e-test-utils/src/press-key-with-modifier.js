@@ -16,8 +16,8 @@ import { modifiers, SHIFT, ALT, CTRL } from '@wordpress/keycodes';
  * that any `Event#preventDefault` which would have normally occurred in the
  * application as a result of Ctrl+A is respected.
  *
- * @link https://github.com/GoogleChrome/puppeteer/issues/1313
- * @link https://w3c.github.io/uievents/tools/key-event-viewer.html
+ * @see https://github.com/GoogleChrome/puppeteer/issues/1313
+ * @see https://w3c.github.io/uievents/tools/key-event-viewer.html
  *
  * @return {Promise} Promise resolving once the SelectAll emulation completes.
  */

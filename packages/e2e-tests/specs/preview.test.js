@@ -14,6 +14,7 @@ import {
 	saveDraft,
 	clickOnMoreMenuItem,
 	pressKeyWithModifier,
+	disableNavigationMode,
 } from '@wordpress/e2e-test-utils';
 
 async function openPreviewPage( editorPage ) {
@@ -44,9 +45,8 @@ async function openPreviewPage( editorPage ) {
  * @return {Promise} Promise resolving once navigation completes.
  */
 async function waitForPreviewNavigation( previewPage ) {
-	const navigationCompleted = previewPage.waitForNavigation();
 	await page.click( '.editor-post-preview' );
-	return navigationCompleted;
+	return previewPage.waitForNavigation();
 }
 
 /**
@@ -70,8 +70,10 @@ async function toggleCustomFieldsOption( shouldBeChecked ) {
 	);
 
 	if ( isChecked !== shouldBeChecked ) {
-		const navigationCompleted = page.waitForNavigation();
 		await checkboxHandle.click();
+		const [ saveButton ] = await page.$x( shouldBeChecked ? '//button[text()="Enable & Reload"]' : '//button[text()="Disable & Reload"]' );
+		const navigationCompleted = page.waitForNavigation();
+		saveButton.click();
 		await navigationCompleted;
 		return;
 	}
@@ -100,7 +102,7 @@ describe( 'Preview', () => {
 
 		// When autosave completes for a new post, the URL of the editor should
 		// update to include the ID. Use this to assert on preview URL.
-		const [ , postId ] = await( await editorPage.waitForFunction( () => {
+		const [ , postId ] = await ( await editorPage.waitForFunction( () => {
 			return window.location.search.match( /[\?&]post=(\d+)/ );
 		} ) ).jsonValue();
 
@@ -203,6 +205,7 @@ describe( 'Preview with Custom Fields enabled', () => {
 	beforeEach( async () => {
 		await createNewPost();
 		await toggleCustomFieldsOption( true );
+		await disableNavigationMode();
 	} );
 
 	afterEach( async () => {

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, first } from 'lodash';
+import { castArray, first, get, includes } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -131,7 +131,9 @@ export function* selectPreviousBlock( clientId ) {
 		clientId
 	);
 
-	yield selectBlock( previousBlockClientId, -1 );
+	if ( previousBlockClientId ) {
+		yield selectBlock( previousBlockClientId, -1 );
+	}
 }
 
 /**
@@ -147,7 +149,9 @@ export function* selectNextBlock( clientId ) {
 		clientId
 	);
 
-	yield selectBlock( nextBlockClientId );
+	if ( nextBlockClientId ) {
+		yield selectBlock( nextBlockClientId );
+	}
 }
 
 /**
@@ -204,7 +208,7 @@ export function clearSelectedBlock() {
  *
  * @param {boolean} [isSelectionEnabled=true] Whether block selection should
  *                                            be enabled.
-
+ *
  * @return {Object} Action object.
  */
 export function toggleSelection( isSelectionEnabled = true ) {
@@ -214,18 +218,53 @@ export function toggleSelection( isSelectionEnabled = true ) {
 	};
 }
 
+function getBlocksWithDefaultStylesApplied( blocks, blockEditorSettings ) {
+	const preferredStyleVariations = get(
+		blockEditorSettings,
+		[ '__experimentalPreferredStyleVariations', 'value' ],
+		{}
+	);
+	return blocks.map( ( block ) => {
+		const blockName = block.name;
+		if ( ! preferredStyleVariations[ blockName ] ) {
+			return block;
+		}
+		const className = get( block, [ 'attributes', 'className' ] );
+		if ( includes( className, 'is-style-' ) ) {
+			return block;
+		}
+		const { attributes = {} } = block;
+		const blockStyle = preferredStyleVariations[ blockName ];
+		return {
+			...block,
+			attributes: {
+				...attributes,
+				className: `${ ( className || '' ) } is-style-${ blockStyle }`.trim(),
+			},
+		};
+	} );
+}
+
 /**
  * Returns an action object signalling that a blocks should be replaced with
  * one or more replacement blocks.
  *
- * @param {(string|string[])} clientIds Block client ID(s) to replace.
- * @param {(Object|Object[])} blocks    Replacement block(s).
+ * @param {(string|string[])} clientIds     Block client ID(s) to replace.
+ * @param {(Object|Object[])} blocks        Replacement block(s).
+ * @param {number}            indexToSelect Index of replacement block to
+ *                                          select.
  *
- * @yields {Object} Action object.
+ * @yield {Object} Action object.
  */
-export function* replaceBlocks( clientIds, blocks ) {
+export function* replaceBlocks( clientIds, blocks, indexToSelect ) {
 	clientIds = castArray( clientIds );
-	blocks = castArray( blocks );
+	blocks = getBlocksWithDefaultStylesApplied(
+		castArray( blocks ),
+		yield select(
+			'core/block-editor',
+			'getSettings',
+		)
+	);
 	const rootClientId = yield select(
 		'core/block-editor',
 		'getBlockRootClientId',
@@ -249,6 +288,7 @@ export function* replaceBlocks( clientIds, blocks ) {
 		clientIds,
 		blocks,
 		time: Date.now(),
+		indexToSelect,
 	};
 	yield* ensureDefaultBlock();
 }
@@ -296,9 +336,9 @@ export const moveBlocksUp = createOnMove( 'MOVE_BLOCKS_UP' );
  * @param  {?string} toRootClientId   Root client ID destination.
  * @param  {number}  index            The index to move the block into.
  *
- * @yields {Object} Action object.
+ * @yield {Object} Action object.
  */
-export function* moveBlockToPosition( clientId, fromRootClientId, toRootClientId, index ) {
+export function* moveBlockToPosition( clientId, fromRootClientId = '', toRootClientId = '', index ) {
 	const templateLock = yield select(
 		'core/block-editor',
 		'getTemplateLock',
@@ -321,6 +361,12 @@ export function* moveBlockToPosition( clientId, fromRootClientId, toRootClientId
 	// If moving inside the same root block the move is always possible.
 	if ( fromRootClientId === toRootClientId ) {
 		yield action;
+		return;
+	}
+
+	// If templateLock is insert we can not remove the block from the parent.
+	// Given that here we know that we are moving the block to a different parent, the move should not be possible if the condition is true.
+	if ( templateLock === 'insert' ) {
 		return;
 	}
 
@@ -385,7 +431,13 @@ export function* insertBlocks(
 	rootClientId,
 	updateSelection = true
 ) {
-	blocks = castArray( blocks );
+	blocks = getBlocksWithDefaultStylesApplied(
+		castArray( blocks ),
+		yield select(
+			'core/block-editor',
+			'getSettings',
+		)
+	);
 	const allowedBlocks = [];
 	for ( const block of blocks ) {
 		const isValid = yield select(
@@ -598,6 +650,27 @@ export function exitFormattedText() {
 }
 
 /**
+ * Returns an action object used in signalling that the user caret has changed
+ * position.
+ *
+ * @param {string} clientId     The selected block client ID.
+ * @param {string} attributeKey The selected block attribute key.
+ * @param {number} startOffset  The start offset.
+ * @param {number} endOffset    The end offset.
+ *
+ * @return {Object} Action object.
+ */
+export function selectionChange( clientId, attributeKey, startOffset, endOffset ) {
+	return {
+		type: 'SELECTION_CHANGE',
+		clientId,
+		attributeKey,
+		startOffset,
+		endOffset,
+	};
+}
+
+/**
  * Returns an action object used in signalling that a new block of the default
  * type should be added to the block list.
  *
@@ -609,7 +682,13 @@ export function exitFormattedText() {
  * @return {Object} Action object
  */
 export function insertDefaultBlock( attributes, rootClientId, index ) {
-	const block = createBlock( getDefaultBlockName(), attributes );
+	// Abort if there is no default block type (if it has been unregistered).
+	const defaultBlockName = getDefaultBlockName();
+	if ( ! defaultBlockName ) {
+		return;
+	}
+
+	const block = createBlock( defaultBlockName, attributes );
 
 	return insertBlock( block, index, rootClientId );
 }
@@ -671,3 +750,30 @@ export function __unstableMarkLastChangeAsPersistent() {
 	return { type: 'MARK_LAST_CHANGE_AS_PERSISTENT' };
 }
 
+/**
+ * Returns an action object used in signalling that the last block change is
+ * an automatic change, meaning it was not performed by the user, and can be
+ * undone using the `Escape` and `Backspace` keys. This action must be called
+ * after the change was made, and any actions that are a consequence of it, so
+ * it is recommended to be called at the next idle period to ensure all
+ * selection changes have been recorded.
+ *
+ * @return {Object} Action object.
+ */
+export function __unstableMarkAutomaticChange() {
+	return { type: 'MARK_AUTOMATIC_CHANGE' };
+}
+
+/**
+ * Returns an action object used to enable or disable the navigation mode.
+ *
+ * @param {string} isNavigationMode Enable/Disable navigation mode.
+ *
+ * @return {Object} Action object
+ */
+export function setNavigationMode( isNavigationMode = true ) {
+	return {
+		type: 'SET_NAVIGATION_MODE',
+		isNavigationMode,
+	};
+}

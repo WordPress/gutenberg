@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { findKey } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { speak } from '@wordpress/a11y';
@@ -7,8 +12,10 @@ import {
 	doBlocksMatchTemplate,
 	switchToBlockType,
 	synchronizeBlocksWithTemplate,
+	cloneBlock,
 } from '@wordpress/blocks';
 import { _n, sprintf } from '@wordpress/i18n';
+import { create, toHTMLString, insert, remove } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -18,6 +25,7 @@ import {
 	selectBlock,
 	setTemplateValidity,
 	resetBlocks,
+	selectionChange,
 } from './actions';
 import {
 	getBlock,
@@ -26,6 +34,7 @@ import {
 	getTemplateLock,
 	getTemplate,
 	isValidTemplate,
+	getSelectionStart,
 } from './selectors';
 
 /**
@@ -62,22 +71,54 @@ export default {
 	MERGE_BLOCKS( action, store ) {
 		const { dispatch } = store;
 		const state = store.getState();
-		const [ firstBlockClientId, secondBlockClientId ] = action.blocks;
-		const blockA = getBlock( state, firstBlockClientId );
-		const blockType = getBlockType( blockA.name );
+		const [ clientIdA, clientIdB ] = action.blocks;
+		const blockA = getBlock( state, clientIdA );
+		const blockAType = getBlockType( blockA.name );
 
 		// Only focus the previous block if it's not mergeable
-		if ( ! blockType.merge ) {
+		if ( ! blockAType.merge ) {
 			dispatch( selectBlock( blockA.clientId ) );
 			return;
 		}
 
+		const blockB = getBlock( state, clientIdB );
+		const blockBType = getBlockType( blockB.name );
+		const { clientId, attributeKey, offset } = getSelectionStart( state );
+		const hasTextSelection = (
+			( clientId === clientIdA || clientId === clientIdB ) &&
+			attributeKey !== undefined &&
+			offset !== undefined
+		);
+
+		// A robust way to retain selection position through various transforms
+		// is to insert a special character at the position and then recover it.
+		const START_OF_SELECTED_AREA = '\u0086';
+
+		// Clone the blocks so we don't insert the character in a "live" block.
+		const cloneA = cloneBlock( blockA );
+		const cloneB = cloneBlock( blockB );
+
+		if ( hasTextSelection ) {
+			const selectedBlock = clientId === clientIdA ? cloneA : cloneB;
+			const html = selectedBlock.attributes[ attributeKey ];
+			const selectedBlockType = clientId === clientIdA ? blockAType : blockBType;
+			const multilineTag = selectedBlockType.attributes[ attributeKey ].multiline;
+			const value = insert( create( {
+				html,
+				multilineTag,
+			} ), START_OF_SELECTED_AREA, offset, offset );
+
+			selectedBlock.attributes[ attributeKey ] = toHTMLString( {
+				value,
+				multilineTag,
+			} );
+		}
+
 		// We can only merge blocks with similar types
 		// thus, we transform the block to merge first
-		const blockB = getBlock( state, secondBlockClientId );
 		const blocksWithTheSameType = blockA.name === blockB.name ?
-			[ blockB ] :
-			switchToBlockType( blockB, blockA.name );
+			[ cloneB ] :
+			switchToBlockType( cloneB, blockA.name );
 
 		// If the block types can not match, do nothing
 		if ( ! blocksWithTheSameType || ! blocksWithTheSameType.length ) {
@@ -85,12 +126,32 @@ export default {
 		}
 
 		// Calling the merge to update the attributes and remove the block to be merged
-		const updatedAttributes = blockType.merge(
-			blockA.attributes,
+		const updatedAttributes = blockAType.merge(
+			cloneA.attributes,
 			blocksWithTheSameType[ 0 ].attributes
 		);
 
-		dispatch( selectBlock( blockA.clientId, -1 ) );
+		if ( hasTextSelection ) {
+			const newAttributeKey = findKey( updatedAttributes, ( v ) =>
+				typeof v === 'string' && v.indexOf( START_OF_SELECTED_AREA ) !== -1
+			);
+			const convertedHtml = updatedAttributes[ newAttributeKey ];
+			const multilineTag = blockAType.attributes[ newAttributeKey ].multiline;
+			const convertedValue = create( { html: convertedHtml, multilineTag } );
+			const newOffset = convertedValue.text.indexOf( START_OF_SELECTED_AREA );
+			const newValue = remove( convertedValue, newOffset, newOffset + 1 );
+			const newHtml = toHTMLString( { value: newValue, multilineTag } );
+
+			updatedAttributes[ newAttributeKey ] = newHtml;
+
+			dispatch( selectionChange(
+				blockA.clientId,
+				newAttributeKey,
+				newOffset,
+				newOffset
+			) );
+		}
+
 		dispatch( replaceBlocks(
 			[ blockA.clientId, blockB.clientId ],
 			[

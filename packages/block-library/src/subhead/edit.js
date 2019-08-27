@@ -3,7 +3,6 @@
  */
 import deprecated from '@wordpress/deprecated';
 import { __ } from '@wordpress/i18n';
-import { Fragment } from '@wordpress/element';
 import {
 	RichText,
 	BlockControls,
@@ -19,7 +18,7 @@ export default function SubheadEdit( { attributes, setAttributes, className } ) 
 	} );
 
 	return (
-		<Fragment>
+		<>
 			<BlockControls>
 				<AlignmentToolbar
 					value={ align }
@@ -40,6 +39,6 @@ export default function SubheadEdit( { attributes, setAttributes, className } ) 
 				className={ className }
 				placeholder={ placeholder || __( 'Write subheading…' ) }
 			/>
-		</Fragment>
+		</>
 	);
 }

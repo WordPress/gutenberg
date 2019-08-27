@@ -23,7 +23,6 @@
 // When the block switcher does not have any transformations, we show it but as disabled.
 // The background and opacity change helps make the icon legible, despite being disabled.
 .components-button.block-editor-block-switcher__no-switcher-icon:disabled {
-	background: $light-gray-200;
 	border-radius: 0;
 	opacity: 0.84;
 
@@ -32,6 +31,7 @@
 	// and should be overridden when disabled.
 	.block-editor-block-icon.has-colors {
 		color: $dark-gray-500 !important;
+		background: $light-gray-200 !important;
 	}
 }
 
@@ -59,6 +59,7 @@
 		display: flex;
 		align-items: center;
 		transition: all 0.1s cubic-bezier(0.165, 0.84, 0.44, 1);
+		@include reduce-motion("transition");
 	}
 
 	// Add a dropdown arrow indicator.
@@ -87,26 +88,37 @@
 		@include formatting-button-style__focus();
 	}
 }
-
+// We double the max-width for it to fit both the preview & content but we keep the min width the same for the border to work.
 .components-popover:not(.is-mobile).block-editor-block-switcher__popover .components-popover__content {
 	min-width: 300px;
-	max-width: 340px;
+	max-width: calc(340px * 2);
+	display: flex;
+	background: $white;
+	box-shadow: $shadow-popover;
 }
 
 .block-editor-block-switcher__popover .components-popover__content {
+	.block-editor-block-switcher__container {
+		min-width: 300px;
+		max-width: 340px;
+		width: 50%;
+	}
+
 	@include break-medium {
 		position: relative;
 
-		.block-editor-block-preview {
-			border: $border-width solid $light-gray-500;
+		.block-editor-block-switcher__preview {
+			border-left: $border-width solid $light-gray-500;
 			box-shadow: $shadow-popover;
 			background: $white;
-			position: absolute;
-			left: 100%;
-			top: -1px;
-			bottom: -1px;
 			width: 300px;
 			height: auto;
+			// Sticky helps us keep the preview at the top when scrolling
+			position: sticky;
+			align-self: stretch;
+			// For sticky to work we need top
+			top: 0;
+			padding: 10px;
 		}
 	}
 
@@ -124,15 +136,15 @@
 	}
 }
 
-.block-editor-block-switcher__popover:not(.is-mobile) > .components-popover__content {
-	// Reset overflow to allow showing the preview on the left once an item is hovered.
-	overflow-y: visible;
-}
-
 .block-editor-block-switcher__popover .block-editor-block-styles {
 	margin: 0 -3px; // Remove the panel body padding while keeping it for the title.
 }
 
 .block-editor-block-switcher__popover .block-editor-block-types-list {
 	margin: 8px -8px -8px;
+}
+
+.block-editor-block-switcher__preview-title {
+	margin-bottom: 10px;
+	color: $dark-gray-300;
 }

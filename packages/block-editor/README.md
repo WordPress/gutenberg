@@ -16,7 +16,7 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 
 ```js
 import {
-	BlockEditorProvider
+	BlockEditorProvider,
 	BlockList
 } from '@wordpress/block-editor';
 import { useState } from '@wordpress/element';
@@ -56,7 +56,7 @@ In the example above, there's no registered block type, in order to use the bloc
 ```js
 import { registerCoreBlocks } from '@wordpress/block-library';
 
-registerCoreBlockTypes();
+registerCoreBlocks();
 
 // Make sure to load the block stylesheets too
 // import '@wordpress/block-library/build-style/style.css';
@@ -74,7 +74,9 @@ Undocumented declaration.
 
 <a name="Autocomplete" href="#Autocomplete">#</a> **Autocomplete**
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/autocomplete/README.md>
 
 <a name="BlockAlignmentToolbar" href="#BlockAlignmentToolbar">#</a> **BlockAlignmentToolbar**
 
@@ -120,6 +122,23 @@ Undocumented declaration.
 
 Undocumented declaration.
 
+<a name="BlockPreview" href="#BlockPreview">#</a> **BlockPreview**
+
+BlockPreview renders a preview of a block or array of blocks.
+
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/block-preview/README.md>
+
+_Parameters_
+
+-   _blocks_ `(Array|Object)`: A block instance (object) or an array of blocks to be previewed.
+-   _viewportWidth_ `number`: Width of the preview container in pixels. Controls at what size the blocks will be rendered inside the preview. Default: 700.
+
+_Returns_
+
+-   `WPElement`: Rendered element.
+
 <a name="BlockSelectionClearer" href="#BlockSelectionClearer">#</a> **BlockSelectionClearer**
 
 Undocumented declaration.
@@ -138,11 +157,15 @@ Undocumented declaration.
 
 <a name="BlockVerticalAlignmentToolbar" href="#BlockVerticalAlignmentToolbar">#</a> **BlockVerticalAlignmentToolbar**
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/block-vertical-alignment-toolbar/README.md>
 
 <a name="ButtonBlockerAppender" href="#ButtonBlockerAppender">#</a> **ButtonBlockerAppender**
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/button-block-appender/README.md>
 
 <a name="ColorPalette" href="#ColorPalette">#</a> **ColorPalette**
 
@@ -202,7 +225,7 @@ _Parameters_
 
 _Returns_
 
--   `string`: String with the class corresponding to the color in the provided context.
+-   `?string`: String with the class corresponding to the color in the provided context. Returns undefined if either colorContextName or colorSlug are not provided.
 
 <a name="getColorObjectByAttributeValues" href="#getColorObjectByAttributeValues">#</a> **getColorObjectByAttributeValues**
 
@@ -217,7 +240,7 @@ _Parameters_
 
 _Returns_
 
--   `?string`: If definedColor is passed and the name is found in colors, the color object exactly as set by the theme or editor defaults is returned. Otherwise, an object that just sets the color is defined.
+-   `?Object`: If definedColor is passed and the name is found in colors, the color object exactly as set by the theme or editor defaults is returned. Otherwise, an object that just sets the color is defined.
 
 <a name="getColorObjectByColorValue" href="#getColorObjectByColorValue">#</a> **getColorObjectByColorValue**
 
@@ -230,7 +253,7 @@ _Parameters_
 
 _Returns_
 
--   `?string`: Returns the color object included in the colors array whose color property equals colorValue. Returns undefined if no color object matches this requirement.
+-   `?Object`: Color object included in the colors array whose color property equals colorValue. Returns undefined if no color object matches this requirement.
 
 <a name="getFontSize" href="#getFontSize">#</a> **getFontSize**
 
@@ -261,7 +284,9 @@ _Returns_
 
 <a name="InnerBlocks" href="#InnerBlocks">#</a> **InnerBlocks**
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/inner-blocks/README.md>
 
 <a name="Inserter" href="#Inserter">#</a> **Inserter**
 
@@ -273,19 +298,27 @@ Undocumented declaration.
 
 <a name="InspectorControls" href="#InspectorControls">#</a> **InspectorControls**
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/inspector-controls/README.md>
 
 <a name="MediaPlaceholder" href="#MediaPlaceholder">#</a> **MediaPlaceholder**
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/media-placeholder/README.md>
 
 <a name="MediaUpload" href="#MediaUpload">#</a> **MediaUpload**
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/media-upload/README.md>
 
 <a name="MediaUploadCheck" href="#MediaUploadCheck">#</a> **MediaUploadCheck**
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/media-upload/README.md>
 
 <a name="MultiBlocksSwitcher" href="#MultiBlocksSwitcher">#</a> **MultiBlocksSwitcher**
 
@@ -301,7 +334,9 @@ Undocumented declaration.
 
 <a name="ObserveTyping" href="#ObserveTyping">#</a> **ObserveTyping**
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/observe-typing/README.md>
 
 <a name="PanelColorSettings" href="#PanelColorSettings">#</a> **PanelColorSettings**
 
@@ -309,7 +344,9 @@ Undocumented declaration.
 
 <a name="PlainText" href="#PlainText">#</a> **PlainText**
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/plain-text/README.md>
 
 <a name="PreserveScrollInReorder" href="#PreserveScrollInReorder">#</a> **PreserveScrollInReorder**
 
@@ -317,7 +354,9 @@ Undocumented declaration.
 
 <a name="RichText" href="#RichText">#</a> **RichText**
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/rich-text/README.md>
 
 <a name="RichTextShortcut" href="#RichTextShortcut">#</a> **RichTextShortcut**
 
@@ -331,38 +370,80 @@ Undocumented declaration.
 
 The default editor settings
 
- alignWide                     boolean       Enable/Disable Wide/Full Alignments
- availableLegacyWidgets        Array         Array of objects representing the legacy widgets available.
- colors                        Array         Palette colors
- disableCustomColors           boolean       Whether or not the custom colors are disabled
- fontSizes                     Array         Available font sizes
- disableCustomFontSizes        boolean       Whether or not the custom font sizes are disabled
- imageSizes                    Array         Available image sizes
- maxWidth                      number        Max width to constraint resizing
- allowedBlockTypes             boolean|Array Allowed block types
- hasFixedToolbar               boolean       Whether or not the editor toolbar is fixed
- hasPermissionsToManageWidgets boolean       Whether or not the user is able to manage widgets.
- focusMode                     boolean       Whether the focus mode is enabled or not
- styles                        Array         Editor Styles
- isRTL                         boolean       Whether the editor is in RTL mode
- bodyPlaceholder               string        Empty post placeholder
- titlePlaceholder              string        Empty title placeholder
+ alignWide                              boolean       Enable/Disable Wide/Full Alignments
+ availableLegacyWidgets                 Array         Array of objects representing the legacy widgets available.
+ colors                                 Array         Palette colors
+ disableCustomColors                    boolean       Whether or not the custom colors are disabled
+ fontSizes                              Array         Available font sizes
+ disableCustomFontSizes                 boolean       Whether or not the custom font sizes are disabled
+ imageSizes                             Array         Available image sizes
+ maxWidth                               number        Max width to constraint resizing
+ allowedBlockTypes                      boolean|Array Allowed block types
+ hasFixedToolbar                        boolean       Whether or not the editor toolbar is fixed
+ hasPermissionsToManageWidgets          boolean       Whether or not the user is able to manage widgets.
+ focusMode                              boolean       Whether the focus mode is enabled or not
+ styles                                 Array         Editor Styles
+ isRTL                                  boolean       Whether the editor is in RTL mode
+ bodyPlaceholder                        string        Empty post placeholder
+ titlePlaceholder                       string        Empty title placeholder
+ codeEditingEnabled                     string        Whether or not the user can switch to the code editor
+ showInserterHelpPanel                  boolean       Whether or not the inserter help panel is shown
+ **experimentalCanUserUseUnfilteredHTML string        Whether the user should be able to use unfiltered HTML or the HTML should be filtered e.g., to remove elements considered insecure like iframes.
+ **experimentalEnableLegacyWidgetBlock  boolean       Whether the user has enabled the Legacy Widget Block
+ \_\_experimentalEnableMenuBlock          boolean       Whether the user has enabled the Menu Block
 
 <a name="SkipToSelectedBlock" href="#SkipToSelectedBlock">#</a> **SkipToSelectedBlock**
 
 Undocumented declaration.
 
+<a name="storeConfig" href="#storeConfig">#</a> **storeConfig**
+
+Block editor data store configuration.
+
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#registerStore>
+
+_Type_
+
+-   `Object` 
+
+<a name="transformStyles" href="#transformStyles">#</a> **transformStyles**
+
+Applies a series of CSS rule transforms to wrap selectors inside a given class and/or rewrite URLs depending on the parameters passed.
+
+_Parameters_
+
+-   _styles_ `Array`: CSS rules.
+-   _wrapperClassName_ `string`: Wrapper Class Name.
+
+_Returns_
+
+-   `Array`: converted rules.
+
+<a name="Typewriter" href="#Typewriter">#</a> **Typewriter**
+
+Ensures that the text selection keeps the same vertical distance from the
+viewport during keyboard events within this component. The vertical distance
+can vary. It is the last clicked or scrolled to position.
+
 <a name="URLInput" href="#URLInput">#</a> **URLInput**
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/url-input/README.md>
 
 <a name="URLInputButton" href="#URLInputButton">#</a> **URLInputButton**
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/url-input/README.md>
 
 <a name="URLPopover" href="#URLPopover">#</a> **URLPopover**
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/url-popover/README.md>
 
 <a name="Warning" href="#Warning">#</a> **Warning**
 
@@ -389,7 +470,7 @@ export default compose(
 
 _Parameters_
 
--   _colorTypes_ `...(object|string)`: The arguments can be strings or objects. If the argument is an object, it should contain the color attribute name as key and the color context as value. If the argument is a string the value should be the color attribute name, the color context is computed by applying a kebab case transform to the value. Color context represents the context/place where the color is going to be used. The class name of the color is generated using 'has' followed by the color name and ending with the color context all in kebab case e.g: has-green-background-color.
+-   _colorTypes_ `...(Object|string)`: The arguments can be strings or objects. If the argument is an object, it should contain the color attribute name as key and the color context as value. If the argument is a string the value should be the color attribute name, the color context is computed by applying a kebab case transform to the value. Color context represents the context/place where the color is going to be used. The class name of the color is generated using 'has' followed by the color name and ending with the color context all in kebab case e.g: has-green-background-color.
 
 _Returns_
 
@@ -402,7 +483,7 @@ font size value retrieval, and font size change handling.
 
 _Parameters_
 
--   _args_ `...(object|string)`: The arguments should all be strings Each string contains the font size attribute name e.g: 'fontSize'.
+-   _fontSizeNames_ `...(Object|string)`: The arguments should all be strings. Each string contains the font size attribute name e.g: 'fontSize'.
 
 _Returns_
 

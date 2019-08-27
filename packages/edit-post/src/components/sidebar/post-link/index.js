@@ -6,7 +6,6 @@ import { get } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { PanelBody, TextControl, ExternalLink } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -31,6 +30,7 @@ function PostLink( {
 	postTitle,
 	postSlug,
 	postID,
+	postTypeLabel,
 } ) {
 	const { prefix, suffix } = permalinkParts;
 	let prefixElement, postNameElement, suffixElement;
@@ -89,14 +89,14 @@ function PostLink( {
 					/>
 					<p>
 						{ __( 'The last part of the URL. ' ) }
-						<ExternalLink href="https://codex.wordpress.org/Posts_Add_New_Screen">
+						<ExternalLink href="https://wordpress.org/support/article/writing-posts/#post-field-descriptions">
 							{ __( 'Read about permalinks' ) }
 						</ExternalLink>
 					</p>
 				</div>
 			) }
 			<p className="edit-post-post-link__preview-label">
-				{ __( 'Preview' ) }
+				{ postTypeLabel || __( 'View Post' ) }
 			</p>
 			<ExternalLink
 				className="edit-post-post-link__link"
@@ -104,9 +104,9 @@ function PostLink( {
 				target="_blank"
 			>
 				{ isEditable ?
-					( <Fragment>
+					( <>
 						{ prefixElement }{ postNameElement }{ suffixElement }
-					</Fragment> ) :
+					</> ) :
 					postLink
 				}
 			</ExternalLink>
@@ -149,6 +149,7 @@ export default compose( [
 			postTitle: getEditedPostAttribute( 'title' ),
 			postSlug: getEditedPostAttribute( 'slug' ),
 			postID: id,
+			postTypeLabel: get( postType, [ 'labels', 'view_item' ] ),
 		};
 	} ),
 	ifCondition( ( { isEnabled, isNew, postLink, isViewable, permalinkParts } ) => {

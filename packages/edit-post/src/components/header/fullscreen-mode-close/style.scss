@@ -4,11 +4,11 @@
 	display: none;
 
 	@include break-medium() {
-		display: block;
+		display: flex;
 		border-top: 0;
 		border-bottom: 0;
 		border-left: 0;
-		margin: -9px 10px -9px -10px;
+		margin: -9px 10px -8px -10px;
 		padding: 9px 10px;
 	}
 }

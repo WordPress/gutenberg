@@ -10,6 +10,9 @@ import { forwardRef } from '@wordpress/element';
 import TextareaAutosize from 'react-autosize-textarea';
 import classnames from 'classnames';
 
+/**
+ * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/plain-text/README.md
+ */
 const PlainText = forwardRef( ( { onChange, className, ...props }, ref ) => {
 	return (
 		<TextareaAutosize

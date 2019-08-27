@@ -6,7 +6,6 @@ import { noop, every } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Fragment } from '@wordpress/element';
 import { MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { hasBlockSupport, isReusableBlock } from '@wordpress/blocks';
@@ -24,7 +23,7 @@ export function ReusableBlockConvertButton( {
 	}
 
 	return (
-		<Fragment>
+		<>
 			{ ! isReusable && (
 				<MenuItem
 					className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
@@ -43,7 +42,7 @@ export function ReusableBlockConvertButton( {
 					{ __( 'Convert to Regular Block' ) }
 				</MenuItem>
 			) }
-		</Fragment>
+		</>
 	);
 }
 

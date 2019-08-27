@@ -1,14 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { Component, Fragment } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import {
 	Button,
 	Disabled,
 	PanelBody,
 	Placeholder,
 	RangeControl,
-	ServerSideRender,
 	TextControl,
 	ToggleControl,
 	Toolbar,
@@ -18,6 +17,7 @@ import {
 	BlockControls,
 	InspectorControls,
 } from '@wordpress/block-editor';
+import ServerSideRender from '@wordpress/server-side-render';
 
 const DEFAULT_MIN_ITEMS = 1;
 const DEFAULT_MAX_ITEMS = 10;
@@ -107,7 +107,7 @@ class RSSEdit extends Component {
 		];
 
 		return (
-			<Fragment>
+			<>
 				<BlockControls>
 					<Toolbar controls={ toolbarControls } />
 				</BlockControls>
@@ -164,7 +164,7 @@ class RSSEdit extends Component {
 						attributes={ this.props.attributes }
 					/>
 				</Disabled>
-			</Fragment>
+			</>
 		);
 	}
 }

@@ -8,10 +8,7 @@ import { includes } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	Component,
-	Fragment,
-} from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import {
 	RichText,
 	ContrastChecker,
@@ -76,7 +73,7 @@ class PullQuoteEdit extends Component {
 			[ textColor.class ]: textColor.class,
 		} ) : undefined;
 		return (
-			<Fragment>
+			<>
 				<figure style={ figureStyle } className={ classnames(
 					className, {
 						[ mainColor.class ]: isSolidColorStyle && mainColor.class,
@@ -140,7 +137,7 @@ class PullQuoteEdit extends Component {
 						) }
 					</PanelColorSettings>
 				</InspectorControls>
-			</Fragment>
+			</>
 		);
 	}
 }

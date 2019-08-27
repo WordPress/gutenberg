@@ -67,7 +67,7 @@ const config = {
 		// WP_LIVE_RELOAD_PORT global variable changes port on which live reload works
 		// when running watch mode.
 		! isProduction && new LiveReloadPlugin( { port: process.env.WP_LIVE_RELOAD_PORT || 35729 } ),
-		new DependencyExtractionWebpackPlugin(),
+		new DependencyExtractionWebpackPlugin( { injectPolyfill: true } ),
 	].filter( Boolean ),
 	stats: {
 		children: false,

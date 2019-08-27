@@ -1,8 +1,9 @@
-.components-font-size-picker__buttons {
+.components-font-size-picker__controls {
 	max-width: $sidebar-width - ( 2 * $panel-padding );
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
+	margin-bottom: $grid-size * 3;
 
 	// Apply the same height as the isSmall Reset button.
 	.components-range-control__number {
@@ -18,6 +19,12 @@
 	}
 }
 
+// needed to override CSS set in https://github.com/WordPress/gutenberg/blob/9c438f93a7215d50d1efc0492c308e4cbaa59c52/packages/edit-post/src/components/sidebar/settings-sidebar/style.scss#L6
+.components-font-size-picker__select.components-font-size-picker__select.components-font-size-picker__select.components-font-size-picker__select,
+.components-font-size-picker__select .components-base-control__field {
+	margin-bottom: 0;
+}
+
 .components-font-size-picker__custom-input {
 	.components-range-control__slider + .dashicon {
 		width: 30px;
@@ -25,44 +32,3 @@
 	}
 }
 
-.components-font-size-picker__dropdown-content .components-button {
-	display: block;
-	position: relative;
-	padding: 10px 20px 10px 40px;
-	width: 100%;
-	text-align: left;
-
-	.dashicon {
-		position: absolute;
-		top: calc(50% - 10px);
-		left: 10px;
-	}
-
-	&:hover {
-		@include menu-style__hover;
-	}
-
-	&:focus {
-		@include menu-style__focus;
-	}
-}
-
-.components-font-size-picker__buttons .components-font-size-picker__selector {
-	border: 1px solid;
-	background: none;
-	position: relative;
-	width: 110px;
-
-	@include input-style__neutral();
-
-	&:focus {
-		@include input-style__focus();
-	}
-
-	&::after {
-		@include dropdown-arrow();
-		right: 8px;
-		top: 12px;
-		position: absolute;
-	}
-}

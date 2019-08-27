@@ -6,17 +6,39 @@ To release Gutenberg, you need commit access to the [WordPress.org plugin reposi
 
 ## Plugin Releases
 
-### Versioning
+### Schedule
 
 We release a new major version approximately every two weeks. The current and next versions are [tracked in GitHub milestones](https://github.com/WordPress/gutenberg/milestones), along with each version's tagging date.
-
-### Release Candidates
 
 On the date of the current milestone, we publish a release candidate and make it available for plugin authors and users to test. If any regressions are found with a release candidate, a new release candidate can be published.
 
 The date in the milestone is the date of **tagging the release candidate**. On this date, all remaining PRs on the milestone are moved automatically to the next release.
 
 Release candidates should be versioned incrementally, starting with `-rc.1`, then `-rc.2`, and so on.
+
+Two days after the first release candidate, the stable version is created based on the last release candidate and any necessary regression fixes.
+
+Once the stable version is released, a post [like this](https://make.wordpress.org/core/2019/06/26/whats-new-in-gutenberg-26th-june/) describing the changes and performing a performance audit should be published.
+
+If critical bugs are discovered on stable versions of the plugin, patch versions can be released at any time.
+
+### Release Tool
+
+The plugin release process is entirely automated. To release the RC version of the plugin, run the following command and follow the instructions: (Note that at the time of writing, the tool doesn't support releasing multiple consecutive RC releases)
+
+```bash
+./bin/commander.js rc
+```
+
+To release a stable version, run:
+
+```bash
+./bin/commander.js stable
+```
+
+It is possible to run the "stable" release CLI in a consecutive way to release patch releases following the first stable release.
+
+### Manual Release Process
 
 #### Creating the first Release Candidate
 
@@ -70,10 +92,6 @@ git push origin release/x.x
 5. Publish the release.
 
 Here's an example [release candidate page](https://github.com/WordPress/gutenberg/releases/tag/v4.6.0-rc.1); yours should look like that when you're finished.
-
-##### Publishing the Call For Testing
-
-Ping @karmatosed in the `[#core-test](https://wordpress.slack.com/messages/C03B0H5J0)` team to publish a call for testing post. Here's an [example call for testing post.](https://make.wordpress.org/test/2019/01/04/call-for-testing-gutenberg-4-8/)
 
 #### Creating Release Candidate Patches (done via `git cherry-pick`)
 

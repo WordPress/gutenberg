@@ -1,0 +1,72 @@
+.wp-block-navigation-menu-item__edit-container {
+	display: grid;
+	grid-auto-columns: min-content;
+	grid-auto-flow: column;
+	align-items: center;
+	white-space: nowrap;
+}
+
+$menu-label-field-width: 140px;
+.wp-block-navigation-menu-item__edit-container {
+	border: 1px solid $light-gray-500;
+	// two pixes comes from two times one pixel border
+	width: $menu-label-field-width + $icon-button-size + 2px;
+	padding-left: 1px;
+}
+
+.wp-block-navigation-menu-item__edit-container .wp-block-navigation-menu-item__field {
+	border-right: 1px solid $light-gray-500 !important;
+	width: $menu-label-field-width;
+	border: none;
+	border-radius: 0;
+	padding-left: $grid-size-large;
+
+	min-height: $icon-button-size - 1px;
+	line-height: $icon-button-size - 1px;
+
+	&,
+	&:focus {
+		color: $dark-gray-500;
+	}
+}
+
+
+.wp-block-navigation-menu-item {
+	font-family: $editor-font;
+	color: #0073af;
+	font-weight: bold;
+	font-size: $text-editor-font-size;
+}
+
+.wp-block-navigation-menu-item__nofollow-external-link {
+	display: block;
+}
+
+// Separator
+.wp-block-navigation-menu-item__separator {
+	margin-top: $grid-size;
+	margin-bottom: $grid-size;
+	margin-left: 0;
+	margin-right: 0;
+	border-top: $border-width solid $light-gray-500;
+}
+
+// Popover styles
+.components-popover:not(.is-mobile).wp-block-navigation-menu-item__dropdown-content {
+	margin-top: -1px;
+	margin-left: -4px;
+}
+
+.wp-block-navigation-menu-item__dropdown-content .components-popover__content {
+	padding: $grid-size 0;
+}
+
+.wp-block-navigation-menu .block-editor-block-list__block[data-type="core/navigation-menu-item"] {
+	& > .block-editor-block-list__block-edit > div[role="toolbar"] {
+		display: none;
+	}
+
+	& > .block-editor-block-list__insertion-point {
+		display: none;
+	}
+}

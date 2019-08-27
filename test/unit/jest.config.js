@@ -14,17 +14,18 @@ module.exports = {
 	},
 	preset: '@wordpress/jest-preset-default',
 	setupFiles: [
-		'core-js/fn/symbol/async-iterator',
 		'<rootDir>/test/unit/config/gutenberg-phase.js',
 	],
 	testURL: 'http://localhost',
 	testPathIgnorePatterns: [
+		'/\.git/',
 		'/node_modules/',
 		'/packages/e2e-tests',
 		'<rootDir>/.*/build/',
 		'<rootDir>/.*/build-module/',
+		'<rootDir>/.+\.native\.js$',
 	],
-	transformIgnorePatterns: [
-		'node_modules/(?!(simple-html-tokenizer)/)',
-	],
+	transform: {
+		'^.+\\.[jt]sx?$': '<rootDir>/test/unit/scripts/babel-transformer.js',
+	},
 };

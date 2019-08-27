@@ -1,0 +1,13 @@
+
+.container {
+	flex: 1;
+	justify-content: flex-start;
+	background-color: #fff;
+}
+
+.toolbarKeyboardAvoidingView {
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	left: 0;
+}

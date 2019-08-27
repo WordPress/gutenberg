@@ -3,7 +3,7 @@
  * Plugin Name: Gutenberg
  * Plugin URI: https://github.com/WordPress/gutenberg
  * Description: Printing since 1440. This is the development plugin for the new block editor in core.
- * Version: 5.5.0
+ * Version: 6.4.0-rc.1
  * Author: Gutenberg Team
  * Text Domain: gutenberg
  *
@@ -11,7 +11,7 @@
  */
 
 ### BEGIN AUTO-GENERATED DEFINES
-define( 'GUTENBERG_DEVELOPMENT_MODE', true );
+defined( 'GUTENBERG_DEVELOPMENT_MODE' ) or define( 'GUTENBERG_DEVELOPMENT_MODE', true );
 ### END AUTO-GENERATED DEFINES
 
 gutenberg_pre_init();
@@ -43,14 +43,16 @@ function gutenberg_menu() {
 		'gutenberg'
 	);
 
-	add_submenu_page(
-		'gutenberg',
-		__( 'Widgets (beta)', 'gutenberg' ),
-		__( 'Widgets (beta)', 'gutenberg' ),
-		'edit_theme_options',
-		'gutenberg-widgets',
-		'the_gutenberg_widgets'
-	);
+	if ( get_option( 'gutenberg-experiments' ) && array_key_exists( 'gutenberg-widget-experiments', get_option( 'gutenberg-experiments' ) ) ) {
+		add_submenu_page(
+			'gutenberg',
+			__( 'Widgets (beta)', 'gutenberg' ),
+			__( 'Widgets (beta)', 'gutenberg' ),
+			'edit_theme_options',
+			'gutenberg-widgets',
+			'the_gutenberg_widgets'
+		);
+	}
 
 	if ( current_user_can( 'edit_posts' ) ) {
 		$submenu['gutenberg'][] = array(
@@ -62,9 +64,18 @@ function gutenberg_menu() {
 		$submenu['gutenberg'][] = array(
 			__( 'Documentation', 'gutenberg' ),
 			'edit_posts',
-			'https://wordpress.org/gutenberg/handbook/',
+			'https://developer.wordpress.org/block-editor/',
 		);
 	}
+
+	add_submenu_page(
+		'gutenberg',
+		__( 'Experiments Settings', 'gutenberg' ),
+		__( 'Experiments', 'gutenberg' ),
+		'edit_posts',
+		'gutenberg-experiments',
+		'the_gutenberg_experiments'
+	);
 }
 add_action( 'admin_menu', 'gutenberg_menu' );
 
@@ -89,7 +100,7 @@ function gutenberg_wordpress_version_notice() {
  */
 function gutenberg_build_files_notice() {
 	echo '<div class="error"><p>';
-	_e( 'Gutenberg development mode requires files to be built. Run <code>npm install</code> to install dependencies, <code>npm run build</code> to build the files or <code>npm run dev</code> to build the files and watch for changes. Read the <a href="https://github.com/WordPress/gutenberg/blob/master/CONTRIBUTING.md">contributing</a> file for more information.', 'gutenberg' );
+	_e( 'Gutenberg development mode requires files to be built. Run <code>npm install</code> to install dependencies, <code>npm run build</code> to build the files or <code>npm run dev</code> to build the files and watch for changes. Read the <a href="https://github.com/WordPress/gutenberg/blob/master/docs/contributors/getting-started.md">contributing</a> file for more information.', 'gutenberg' );
 	echo '</p></div>';
 }
 
@@ -117,3 +128,11 @@ function gutenberg_pre_init() {
 
 	require_once dirname( __FILE__ ) . '/lib/load.php';
 }
+
+/**
+ * Outputs a WP REST API nonce.
+ */
+function gutenberg_rest_nonce() {
+	exit( wp_create_nonce( 'wp_rest' ) );
+}
+add_action( 'wp_ajax_gutenberg_rest_nonce', 'gutenberg_rest_nonce' );

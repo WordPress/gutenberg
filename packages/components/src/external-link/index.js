@@ -24,7 +24,8 @@ export function ExternalLink( { href, children, className, rel = '', ...addition
 	] ) ).join( ' ' );
 	const classes = classnames( 'components-external-link', className );
 	return (
-		<a { ...additionalProps } className={ classes } href={ href } target="_blank" rel={ rel } ref={ ref }> { /* eslint-disable-line react/jsx-no-target-blank */ }
+		// eslint-disable-next-line react/jsx-no-target-blank
+		<a { ...additionalProps } className={ classes } href={ href } target="_blank" rel={ rel } ref={ ref }>
 			{ children }
 			<span className="screen-reader-text">
 				{

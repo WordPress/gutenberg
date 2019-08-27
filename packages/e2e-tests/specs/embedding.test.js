@@ -272,7 +272,7 @@ describe( 'Embedding content', () => {
 		await page.waitForSelector( '.wp-block-embed-wordpress' );
 	} );
 
-	it( 'should transform from video to embed block when YouTube URL is pasted', async () => {
+	it.skip( 'should transform from video to embed block when YouTube URL is pasted', async () => {
 		await clickBlockAppender();
 		await insertBlock( 'Video' );
 		await page.click( '.editor-media-placeholder__url-input-container button' );
@@ -281,7 +281,7 @@ describe( 'Embedding content', () => {
 		await page.waitForSelector( '.wp-block-embed-youtube' );
 	} );
 
-	it( 'should transform from image to embed block when Instagram URL is pasted', async () => {
+	it.skip( 'should transform from image to embed block when Instagram URL is pasted', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( '/image' );
 		await page.keyboard.press( 'Enter' );
@@ -291,7 +291,7 @@ describe( 'Embedding content', () => {
 		await page.waitForSelector( '.wp-block-embed-instagram' );
 	} );
 
-	it( 'should transform from audio to embed block when Soundcloud URL is pasted', async () => {
+	it.skip( 'should transform from audio to embed block when Soundcloud URL is pasted', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( '/audio' );
 		await page.keyboard.press( 'Enter' );

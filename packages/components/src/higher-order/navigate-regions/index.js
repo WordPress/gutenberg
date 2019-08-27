@@ -61,7 +61,7 @@ export default createHigherOrderComponent(
 				} );
 
 				// Disable reason: Clicking the editor should dismiss the regions focus style
-				/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
+				/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
 				return (
 					<div ref={ this.bindContainer } className={ className } onClick={ this.onClick }>
 						<KeyboardShortcuts
@@ -76,7 +76,7 @@ export default createHigherOrderComponent(
 						<WrappedComponent { ...this.props } />
 					</div>
 				);
-				/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
+				/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
 			}
 		};
 	}, 'navigateRegions'

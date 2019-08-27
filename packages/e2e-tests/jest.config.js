@@ -5,10 +5,11 @@ module.exports = {
 	],
 	setupFilesAfterEnv: [
 		'<rootDir>/config/setup-test-framework.js',
+		'@wordpress/jest-console',
+		'@wordpress/jest-puppeteer-axe',
 		'expect-puppeteer',
 	],
-	transformIgnorePatterns: [
-		'node_modules',
-		'scripts/config/puppeteer.config.js',
+	testPathIgnorePatterns: [
+		'e2e-tests/specs/performance.test.js',
 	],
 };

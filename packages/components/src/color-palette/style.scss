@@ -21,6 +21,7 @@ $color-palette-circle-spacing: 14px;
 	vertical-align: top;
 	transform: scale(1);
 	transition: 100ms transform ease;
+	@include reduce-motion("transition");
 	&:hover {
 		transform: scale(1.2);
 	}
@@ -42,6 +43,7 @@ $color-palette-circle-spacing: 14px;
 	background: transparent;
 	box-shadow: inset 0 0 0 ($color-palette-circle-size / 2);
 	transition: 100ms box-shadow ease;
+	@include reduce-motion("transition");
 	cursor: pointer;
 
 	&.is-active {
@@ -59,19 +61,20 @@ $color-palette-circle-spacing: 14px;
 	&::after {
 		content: "";
 		position: absolute;
-		top: 0;
-		left: 0;
-		bottom: 0;
-		right: 0;
+		top: -1px;
+		left: -1px;
+		bottom: -1px;
+		right: -1px;
 		border-radius: $radius-round;
 		box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
+		// Show a thin circular outline in Windows high contrast mode, otherwise the button is invisible.
+		border: 1px solid transparent;
 	}
 
 	&:focus {
 		outline: none;
 		&::after {
 			content: "";
-			position: absolute;
 			border: #{ $border-width * 2 } solid $dark-gray-400;
 			width: 32px;
 			height: 32px;
@@ -81,35 +84,6 @@ $color-palette-circle-spacing: 14px;
 			border-radius: $radius-round;
 			box-shadow: inset 0 0 0 2px $white;
 		}
-	}
-}
-
-.components-color-palette__clear-color .components-color-palette__item {
-	color: $white;
-	background: $white;
-}
-
-.components-color-palette__clear-color-line {
-	display: block;
-	position: absolute;
-	border: 2px solid $alert-red;
-	border-radius: 50%;
-	top: 0;
-	left: 0;
-	bottom: 0;
-	right: 0;
-	&::before {
-		position: absolute;
-		top: 0;
-		left: 0;
-		content: "";
-		width: 100%;
-		height: 100%;
-		border-bottom: 2px solid $alert-red;
-		transform:
-			rotate(45deg)
-			translateY(- $color-palette-circle-size / 2 + 1px)
-			translateX(- 1px);
 	}
 }
 

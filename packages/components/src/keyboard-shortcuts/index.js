@@ -10,6 +10,11 @@ import { forEach } from 'lodash';
  */
 import { Component, Children } from '@wordpress/element';
 
+/**
+ * Internal dependencies
+ */
+import { isAppleOS } from './platform';
+
 class KeyboardShortcuts extends Component {
 	constructor() {
 		super( ...arguments );
@@ -30,8 +35,10 @@ class KeyboardShortcuts extends Component {
 				const hasShift = modifiers.has( 'shift' );
 
 				if (
-					( modifiers.size === 1 && hasAlt ) ||
-					( modifiers.size === 2 && hasAlt && hasShift )
+					isAppleOS() && (
+						( modifiers.size === 1 && hasAlt ) ||
+						( modifiers.size === 2 && hasAlt && hasShift )
+					)
 				) {
 					throw new Error( `Cannot bind ${ key }. Alt and Shift+Alt modifiers are reserved for character input.` );
 				}

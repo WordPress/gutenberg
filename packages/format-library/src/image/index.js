@@ -1,22 +1,35 @@
 /**
  * WordPress dependencies
  */
-import { Path, SVG, TextControl, Popover, IconButton, __unstablePositionedAtSelection } from '@wordpress/components';
+import { Path, SVG, TextControl, Popover, IconButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
+import { Component, useMemo } from '@wordpress/element';
 import { insertObject } from '@wordpress/rich-text';
 import { MediaUpload, RichTextToolbarButton, MediaUploadCheck } from '@wordpress/block-editor';
 import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
+import { computeCaretRect } from '@wordpress/dom';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 const name = 'core/image';
+const title = __( 'Inline Image' );
 
 const stopKeyPropagation = ( event ) => event.stopPropagation();
 
+const PopoverAtImage = ( { dependencies, ...props } ) => {
+	return (
+		<Popover
+			position="bottom center"
+			focusOnMount={ false }
+			anchorRect={ useMemo( () => computeCaretRect(), dependencies ) }
+			{ ...props }
+		/>
+	);
+};
+
 export const image = {
 	name,
-	title: __( 'Image' ),
+	title,
 	keywords: [ __( 'photo' ), __( 'media' ) ],
 	object: true,
 	tagName: 'img',
@@ -81,15 +94,12 @@ export const image = {
 		render() {
 			const { value, onChange, isObjectActive, activeObjectAttributes } = this.props;
 			const { style } = activeObjectAttributes;
-			// Rerender PositionedAtSelection when the selection changes or when
-			// the width changes.
-			const key = value.start + style;
 
 			return (
 				<MediaUploadCheck>
 					<RichTextToolbarButton
 						icon={ <SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><Path d="M4 16h10c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v9c0 1.1.9 2 2 2zM4 5h10v9H4V5zm14 9v2h4v-2h-4zM2 20h20v-2H2v2zm6.4-8.8L7 9.4 5 12h8l-2.6-3.4-2 2.6z" /></SVG> }
-						title={ __( 'Inline Image' ) }
+						title={ title }
 						onClick={ this.openModal }
 						isActive={ isObjectActive }
 					/>
@@ -113,10 +123,11 @@ export const image = {
 							return null;
 						} }
 					/> }
-					{ isObjectActive && <__unstablePositionedAtSelection key={ key }>
-						<Popover
-							position="bottom center"
-							focusOnMount={ false }
+					{ isObjectActive &&
+						<PopoverAtImage
+							// Reposition Popover when the selection changes or
+							// when the width changes.
+							dependencies={ [ style, value.start ] }
 						>
 							{ // Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
 							/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */ }
@@ -154,8 +165,8 @@ export const image = {
 								<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
 							</form>
 							{ /* eslint-enable jsx-a11y/no-noninteractive-element-interactions */ }
-						</Popover>
-					</__unstablePositionedAtSelection> }
+						</PopoverAtImage>
+					}
 				</MediaUploadCheck>
 			);
 		}

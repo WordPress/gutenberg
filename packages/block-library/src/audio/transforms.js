@@ -40,7 +40,7 @@ const transforms = {
 					},
 				},
 				autoplay: {
-					type: 'srting',
+					type: 'string',
 					shortcode: ( { named: { autoplay } } ) => {
 						return autoplay;
 					},

@@ -1,16 +1,40 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
-import { RichText } from '@wordpress/block-editor';
+import {
+	getColorClassName,
+	RichText,
+} from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
-	const { align, level, content } = attributes;
+	const {
+		align,
+		content,
+		customTextColor,
+		level,
+		textColor,
+	} = attributes;
 	const tagName = 'h' + level;
+
+	const textClass = getColorClassName( 'color', textColor );
+
+	const className = classnames( {
+		[ textClass ]: textClass,
+		[ `has-text-align-${ align }` ]: align,
+	} );
 
 	return (
 		<RichText.Content
+			className={ className ? className : undefined }
 			tagName={ tagName }
-			style={ { textAlign: align } }
+			style={ {
+				color: textClass ? undefined : customTextColor,
+			} }
 			value={ content }
 		/>
 	);

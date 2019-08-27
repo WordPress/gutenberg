@@ -1,5 +1,19 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`cpt locking template_lock all should not error when deleting the cotents of a paragraph 1`] = `
+"<!-- wp:image -->
+<figure class=\\"wp-block-image\\"><img alt=\\"\\"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph {\\"placeholder\\":\\"Add a description\\"} -->
+<p></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:quote -->
+<blockquote class=\\"wp-block-quote\\"><p></p></blockquote>
+<!-- /wp:quote -->"
+`;
+
 exports[`cpt locking template_lock false should allow blocks to be inserted 1`] = `
 "<!-- wp:image -->
 <figure class=\\"wp-block-image\\"><img alt=\\"\\"/></figure>

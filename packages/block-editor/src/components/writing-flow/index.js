@@ -6,7 +6,7 @@ import { overEvery, find, findLast, reverse, first, last } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, createRef } from '@wordpress/element';
 import {
 	computeCaretRect,
 	focus,
@@ -17,7 +17,7 @@ import {
 	placeCaretAtVerticalEdge,
 	isEntirelySelected,
 } from '@wordpress/dom';
-import { UP, DOWN, LEFT, RIGHT, isKeyboardEvent } from '@wordpress/keycodes';
+import { UP, DOWN, LEFT, RIGHT, TAB, isKeyboardEvent } from '@wordpress/keycodes';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
@@ -34,7 +34,7 @@ import {
  * Browser constants
  */
 
-const { getSelection } = window;
+const { getSelection, getComputedStyle } = window;
 
 /**
  * Given an element, returns true if the element is a tabbable text field, or
@@ -78,7 +78,7 @@ class WritingFlow extends Component {
 
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.bindContainer = this.bindContainer.bind( this );
-		this.clearVerticalRect = this.clearVerticalRect.bind( this );
+		this.onMouseDown = this.onMouseDown.bind( this );
 		this.focusLastTextField = this.focusLastTextField.bind( this );
 
 		/**
@@ -89,14 +89,28 @@ class WritingFlow extends Component {
 		 * @type {?DOMRect}
 		 */
 		this.verticalRect = null;
+
+		/**
+		 * Reference of the writing flow appender element.
+		 * The reference is used to focus the first tabbable element after the block list
+		 * once we hit `tab` on the last block in navigation mode.
+		 */
+		this.appender = createRef();
 	}
 
 	bindContainer( ref ) {
 		this.container = ref;
 	}
 
-	clearVerticalRect() {
+	onMouseDown() {
 		this.verticalRect = null;
+		this.disableNavigationMode();
+	}
+
+	disableNavigationMode() {
+		if ( this.props.isNavigationMode ) {
+			this.props.disableNavigationMode();
+		}
 	}
 
 	/**
@@ -224,8 +238,10 @@ class WritingFlow extends Component {
 			hasMultiSelection,
 			onMultiSelect,
 			blocks,
+			selectedBlockClientId,
 			selectionBeforeEndClientId,
 			selectionAfterEndClientId,
+			isNavigationMode,
 		} = this.props;
 
 		const { keyCode, target } = event;
@@ -233,6 +249,7 @@ class WritingFlow extends Component {
 		const isDown = keyCode === DOWN;
 		const isLeft = keyCode === LEFT;
 		const isRight = keyCode === RIGHT;
+		const isTab = keyCode === TAB;
 		const isReverse = isUp || isLeft;
 		const isHorizontal = isLeft || isRight;
 		const isVertical = isUp || isDown;
@@ -240,6 +257,40 @@ class WritingFlow extends Component {
 		const isShift = event.shiftKey;
 		const hasModifier = isShift || event.ctrlKey || event.altKey || event.metaKey;
 		const isNavEdge = isVertical ? isVerticalEdge : isHorizontalEdge;
+
+		// In navigation mode, tab and arrows navigate from block to block.
+		if ( isNavigationMode ) {
+			const navigateUp = ( isTab && isShift ) || isUp;
+			const navigateDown = ( isTab && ! isShift ) || isDown;
+			const focusedBlockUid = navigateUp ? selectionBeforeEndClientId : selectionAfterEndClientId;
+
+			if (
+				( navigateDown || navigateUp ) &&
+				focusedBlockUid
+			) {
+				event.preventDefault();
+				this.props.onSelectBlock( focusedBlockUid );
+			}
+
+			// Special case when reaching the end of the blocks (navigate to the next tabbable outside of the writing flow)
+			if ( navigateDown && selectedBlockClientId && ! selectionAfterEndClientId && [ UP, DOWN ].indexOf( keyCode ) === -1 ) {
+				this.props.clearSelectedBlock();
+				this.appender.current.focus();
+			}
+			return;
+		}
+
+		// When presing any key other than up or down, the initial vertical
+		// position must ALWAYS be reset. The vertical position is saved so it
+		// can be restored as well as possible on sebsequent vertical arrow key
+		// presses. It may not always be possible to restore the exact same
+		// position (such as at an empty line), so it wouldn't be good to
+		// compute the position right before any vertical arrow key press.
+		if ( ! isVertical ) {
+			this.verticalRect = null;
+		} else if ( ! this.verticalRect ) {
+			this.verticalRect = computeCaretRect();
+		}
 
 		// This logic inside this condition needs to be checked before
 		// the check for event.nativeEvent.defaultPrevented.
@@ -281,11 +332,10 @@ class WritingFlow extends Component {
 			return;
 		}
 
-		if ( ! isVertical ) {
-			this.verticalRect = null;
-		} else if ( ! this.verticalRect ) {
-			this.verticalRect = computeCaretRect( target );
-		}
+		// In the case of RTL scripts, right means previous and left means next,
+		// which is the exact reverse of LTR.
+		const { direction } = getComputedStyle( target );
+		const isReverseDir = direction === 'rtl' ? ( ! isReverse ) : isReverse;
 
 		if ( isShift ) {
 			if (
@@ -316,9 +366,9 @@ class WritingFlow extends Component {
 				placeCaretAtVerticalEdge( closestTabbable, isReverse, this.verticalRect );
 				event.preventDefault();
 			}
-		} else if ( isHorizontal && getSelection().isCollapsed && isHorizontalEdge( target, isReverse ) ) {
-			const closestTabbable = this.getClosestTabbable( target, isReverse );
-			placeCaretAtHorizontalEdge( closestTabbable, isReverse );
+		} else if ( isHorizontal && getSelection().isCollapsed && isHorizontalEdge( target, isReverseDir ) ) {
+			const closestTabbable = this.getClosestTabbable( target, isReverseDir );
+			placeCaretAtHorizontalEdge( closestTabbable, isReverseDir );
 			event.preventDefault();
 		}
 	}
@@ -345,19 +395,20 @@ class WritingFlow extends Component {
 				<div
 					ref={ this.bindContainer }
 					onKeyDown={ this.onKeyDown }
-					onMouseDown={ this.clearVerticalRect }
+					onMouseDown={ this.onMouseDown }
 				>
 					{ children }
 				</div>
 				<div
+					ref={ this.appender }
 					aria-hidden
 					tabIndex={ -1 }
 					onClick={ this.focusLastTextField }
-					className="wp-block editor-writing-flow__click-redirect block-editor-writing-flow__click-redirect"
+					className="editor-writing-flow__click-redirect block-editor-writing-flow__click-redirect"
 				/>
 			</div>
 		);
-		/* eslint-disable jsx-a11y/no-static-element-interactions */
+		/* eslint-enable jsx-a11y/no-static-element-interactions */
 	}
 }
 
@@ -373,6 +424,7 @@ export default compose( [
 			getLastMultiSelectedBlockClientId,
 			hasMultiSelection,
 			getBlockOrder,
+			isNavigationMode,
 		} = select( 'core/block-editor' );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
@@ -388,13 +440,16 @@ export default compose( [
 			selectedLastClientId: getLastMultiSelectedBlockClientId(),
 			hasMultiSelection: hasMultiSelection(),
 			blocks: getBlockOrder(),
+			isNavigationMode: isNavigationMode(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { multiSelect, selectBlock } = dispatch( 'core/block-editor' );
+		const { multiSelect, selectBlock, setNavigationMode, clearSelectedBlock } = dispatch( 'core/block-editor' );
 		return {
 			onMultiSelect: multiSelect,
 			onSelectBlock: selectBlock,
+			disableNavigationMode: () => setNavigationMode( false ),
+			clearSelectedBlock,
 		};
 	} ),
 ] )( WritingFlow );

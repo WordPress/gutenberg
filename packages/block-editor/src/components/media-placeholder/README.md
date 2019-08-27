@@ -22,7 +22,9 @@ const { MediaPlaceholder } = wp.editor;
 			allowedTypes = { [ 'image' ] }
 			multiple = { false }
 			labels = { { title: 'The Image' } }
-		/>;
+		>
+			"extra content"
+		</MediaPlaceholder>;
 		...
 	}
 ```
@@ -63,6 +65,13 @@ This property is similar to the `accept` property. The difference is the format 
 Class name added to the placeholder.
 
 - Type: `String`
+- Required: No
+
+### icon
+
+Icon to display left of the title. When passed as a `String`, the icon will be resolved as a [Dashicon](https://developer.wordpress.org/resource/dashicons/). Alternatively, you can pass in a `WPComponent` such as `BlockIcon`to render instead.
+
+- Type: `String|WPComponent`
 - Required: No
 
 ### isAppender

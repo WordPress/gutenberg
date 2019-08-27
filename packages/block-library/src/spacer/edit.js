@@ -6,19 +6,19 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Fragment, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/block-editor';
 import { BaseControl, PanelBody, ResizableBox } from '@wordpress/components';
 import { withInstanceId } from '@wordpress/compose';
 
-const SpacerEdit = ( { attributes, isSelected, setAttributes, toggleSelection, instanceId } ) => {
+const SpacerEdit = ( { attributes, isSelected, setAttributes, instanceId } ) => {
 	const { height } = attributes;
 	const id = `block-spacer-height-input-${ instanceId }`;
 	const [ inputHeightValue, setInputHeightValue ] = useState( height );
 
 	return (
-		<Fragment>
+		<>
 			<ResizableBox
 				className={ classnames(
 					'block-library-spacer__resize-container',
@@ -44,10 +44,6 @@ const SpacerEdit = ( { attributes, isSelected, setAttributes, toggleSelection, i
 						height: spacerHeight,
 					} );
 					setInputHeightValue( spacerHeight );
-					toggleSelection( true );
-				} }
-				onResizeStart={ () => {
-					toggleSelection( false );
 				} }
 			/>
 			<InspectorControls>
@@ -78,7 +74,7 @@ const SpacerEdit = ( { attributes, isSelected, setAttributes, toggleSelection, i
 					</BaseControl>
 				</PanelBody>
 			</InspectorControls>
-		</Fragment>
+		</>
 	);
 };
 
