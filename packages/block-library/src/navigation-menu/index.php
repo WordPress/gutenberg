@@ -15,7 +15,7 @@
  * @return string Returns the post content with the legacy widget added.
  */
 function render_block_navigation_menu( $attributes, $content, $block ) {
-	return build_navigation_menu_html( $block );
+	return '<nav className="wp-block-navigation-menu">' . build_navigation_menu_html( $block ) . '</nav>';
 }
 
 /**
@@ -28,10 +28,24 @@ function render_block_navigation_menu( $attributes, $content, $block ) {
 function build_navigation_menu_html( $block ) {
 	$html = '';
 	foreach ( (array) $block['innerBlocks'] as $key => $menu_item ) {
-		$html .= '<li>' . $menu_item['innerContent'][0];
+
+		$html .= '<li class="wp-block-navigation-menu-item"><a class="wp-block-navigation-menu-item"';
+		if ( isset( $menu_item['attrs']['destination'] ) ) {
+			$html .= ' href="' . $menu_item['attrs']['destination'] . '"';
+		}
+		if ( isset( $menu_item['attrs']['title'] ) ) {
+			$html .= ' title="' . $menu_item['attrs']['title'] . '"';
+		}
+		$html .= ' >';
+		if ( isset( $menu_item['attrs']['label'] ) ) {
+			$html .= $menu_item['attrs']['label'];
+		}
+		$html .= '</a>';
+
 		if ( count( (array) $menu_item['innerBlocks'] ) > 0 ) {
 			$html .= build_navigation_menu_html( $menu_item );
 		}
+
 		$html .= '</li>';
 	}
 	return '<ul>' . $html . '</ul>';
