@@ -71,7 +71,7 @@ export default compose( [
 
 		return {
 			isDirty: isEditedPostDirty(),
-			isAutosaveable: isEditedPostAutosaveable() && ! isPostAutosavingLocked(),
+			isAutosaveable: isEditedPostAutosaveable(),
 			editsReference: getReferenceByDistinctEdits(),
 			isAutosaving: isAutosavingPost(),
 			autosaveInterval,
