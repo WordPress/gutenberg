@@ -14,10 +14,10 @@ const { statSync } = require( 'fs' );
 if ( env.MANAGED_WP ) {
 	// We're running in our managed WordPress environment, so check if we need to update.
 	let stat;
-	if ( commandExistsSync( 'git' ) ) {
+	if ( false && commandExistsSync( 'git' ) ) {
 		stat = statSync( normalize( env.WP_DEVELOP_DIR + '/.git' ) );
 	} else {
-		stat = statSync( normalize( env.WP_DEVELOP_DIR + '/.wp-config-sample.php' ) );
+		stat = statSync( normalize( env.WP_DEVELOP_DIR + '/wp-config-sample.php' ) );
 	}
 
 	const lastUpdated = new Date( stat.mtimeMs );

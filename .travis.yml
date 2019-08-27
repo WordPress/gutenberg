@@ -41,6 +41,7 @@ before_install:
 
 install:
   - npm run env start
+  - sleep 30
   - npm run env install -- --fast
 
 jobs:
