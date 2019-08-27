@@ -52,8 +52,9 @@ jobs:
         - npm ci
         - npm run build
         # Install WordPress
-        - git clone --depth=1 git://develop.git.wordpress.org/ wordpress
+        - [ ! -d "wordpress/.git" ] && git clone --depth=1 git://develop.git.wordpress.org/ wordpress
         - cd wordpress
+        - git pull
         - npm install
         - npm run build
         - cd ..
