@@ -64,7 +64,6 @@ export default compose( [
 			isEditedPostAutosaveable,
 			getReferenceByDistinctEdits,
 			isAutosavingPost,
-			isPostAutosavingLocked,
 		} = select( 'core/editor' );
 
 		const { autosaveInterval } = select( 'core/editor' ).getEditorSettings();
