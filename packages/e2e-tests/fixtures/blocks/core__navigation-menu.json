@@ -4,7 +4,7 @@
         "name": "core/navigation-menu",
         "isValid": true,
         "attributes": {
-            "automaticallyAdd": "false"
+            "automaticallyAdd": false
         },
         "innerBlocks": [
             {

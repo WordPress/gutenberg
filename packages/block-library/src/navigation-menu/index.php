@@ -48,7 +48,7 @@ function register_block_core_navigation_menu() {
 			'attributes'      => array(
 				'automaticallyAdd' => array(
 					'type'    => 'boolean',
-					'default' => 'false',
+					'default' => false,
 				),
 			),
 			'render_callback' => 'render_block_navigation_menu',
