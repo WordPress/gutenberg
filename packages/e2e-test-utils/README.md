@@ -563,6 +563,18 @@ _Returns_
 
 -   `Promise`: A promise that resolves when the browser has completed tabbing through the focusable elements of a common block, and through the contenteditbable areas unique to text blocks.
 
+<a name="tabThroughTextContentAreas" href="#tabThroughTextContentAreas">#</a> **tabThroughTextContentAreas**
+
+Tabs through the text content areas of a block and asserts the expected values
+
+_Parameters_
+
+-   _content_ `string`: The expected value of the block's contenteditable elements
+
+_Returns_
+
+-   `Promise`: A promise that's resolved when the browser has finished tabbing throught the contenteditable areas of a block, and asserting they have keyboard focus and the expected content.
+
 <a name="textContentAreas" href="#textContentAreas">#</a> **textContentAreas**
 
 Returns a list of a block's contenteditable elements.
@@ -574,18 +586,6 @@ _Parameters_
 _Returns_
 
 -   `Promise`: A promise that resolves when it's returned an array of classes representing the contenteditable areas of a block with keyboard focus.
-
-<a name="textContentAreasHaveFocus" href="#textContentAreasHaveFocus">#</a> **textContentAreasHaveFocus**
-
-Tabs through the text content areas of a block and asserts the expected values
-
-_Parameters_
-
--   _content_ `string`: The expected value of the block's contenteditable elements
-
-_Returns_
-
--   `Promise`: A promise that's resolved when the browser has finished tabbing throught the contenteditable areas of a block, and asserting they have keyboard focus and the expected content.
 
 <a name="toggleScreenOption" href="#toggleScreenOption">#</a> **toggleScreenOption**
 

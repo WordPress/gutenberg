@@ -10,7 +10,7 @@ import { textContentAreas } from './text-content-areas';
  * @return {Promise} A promise that's resolved when the browser has finished tabbing throught the contenteditable areas of a block, and asserting they have keyboard focus and the expected content.
  */
 
-export async function textContentAreasHaveFocus( content ) {
+export async function tabThroughTextContentAreas( content ) {
 	const blocks = await textContentAreas( { empty: false } );
 
 	for ( let i = 0; i < blocks.length; i++ ) {
