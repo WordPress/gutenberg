@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { tabThroughBlock } from './tab-through-block';
+import { tabThroughBlockControls } from './tab-through-block-controls';
 import { textContentAreasHaveFocus } from './text-content-areas-have-focus';
 
 /**
@@ -13,7 +13,7 @@ import { textContentAreasHaveFocus } from './text-content-areas-have-focus';
  */
 
 export async function tabThroughTextBlock( blockType, content ) {
-	await tabThroughBlock( blockType );
+	await tabThroughBlockControls( blockType );
 
 	// Tab causes the block text content to receive focus
 	await page.keyboard.press( 'Tab' );

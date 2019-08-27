@@ -290,10 +290,6 @@ _Parameters_
 -   _searchTerm_ `string`: The text to search the inserter for.
 -   _panelName_ `string`: The inserter panel to open (if it's closed by default).
 
-<a name="inserterToggleHasFocus" href="#inserterToggleHasFocus">#</a> **inserterToggleHasFocus**
-
-Asserts that a content block's inserter toggle has keyboard focus
-
 <a name="installPlugin" href="#installPlugin">#</a> **installPlugin**
 
 Installs a plugin from the WP.org repository.
@@ -506,7 +502,7 @@ running the test is not already the admin user).
 Switches the current user to whichever user we should be
 running the tests as (if we're not already that user).
 
-<a name="tabThroughBlock" href="#tabThroughBlock">#</a> **tabThroughBlock**
+<a name="tabThroughBlockControls" href="#tabThroughBlockControls">#</a> **tabThroughBlockControls**
 
 Tabs through a content block and asserts that the external wrapper, inserter toggle, mover controls, and toolbar buttons all receive keyboard focus.
 
@@ -514,7 +510,11 @@ _Parameters_
 
 -   _blockType_ `string`: The expected value of the data-type attribute of the block's external wrapper
 
-<a name="tabThroughBlockMoverControl" href="#tabThroughBlockMoverControl">#</a> **tabThroughBlockMoverControl**
+_Returns_
+
+-   `Promise`: A promise that's resolved when the browser has finished tabbing through the major components of a common block.
+
+<a name="tabThroughBlockMovers" href="#tabThroughBlockMovers">#</a> **tabThroughBlockMovers**
 
 Navigates through the block mover control using the keyboard. Asserts that the 'move up' and 'move down' controls receive focus.
 

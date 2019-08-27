@@ -3,7 +3,7 @@
  * Internal dependencies
  */
 
-import { tabThroughBlock } from './tab-through-block';
+import { tabThroughBlockControls } from './tab-through-block-controls';
 import { tabThroughPlaceholderButtons } from './tab-through-placeholder-buttons';
 
 /**
@@ -13,6 +13,6 @@ import { tabThroughPlaceholderButtons } from './tab-through-placeholder-buttons'
  * @return {Promise} A promise that resolves when the browser has completed tabbing through the common block components, and the placeholder buttons that are unique to blocks with file-upload features.
  */
 export async function tabThroughFileBlock( blockType ) {
-	await tabThroughBlock( blockType );
+	await tabThroughBlockControls( blockType );
 	await tabThroughPlaceholderButtons();
 }

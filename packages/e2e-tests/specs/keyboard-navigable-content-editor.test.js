@@ -12,7 +12,7 @@ import {
  * External dependencies
  */
 
-describe( 'Order of block keyboard navigation', () => {
+describe( 'Order of the block editor keyboard navigation', () => {
 	beforeEach( async () => {
 		await createNewPost();
 	} );
