@@ -11,6 +11,7 @@ import {
  *
  * @param {string} blockName The type of block to insert
  * @param {string} content  The text to enter into each contenteditable area
+ * @return {Promise} A promise that resolves when all the blocks are inserted and filled with content.
  */
 export async function insertAndPopulateBlock( blockName, content ) {
 	await insertBlock( blockName );

@@ -1,5 +1,6 @@
 /**
  * Navigates to the top of the content editor using the keyboard.
+ * @returns {Promise} A promise that's resolved when the browser has finished emulating the keyboard shortcut for focusing the top of the editor, and tabbed to the next focusable element.
  */
 
 /**
