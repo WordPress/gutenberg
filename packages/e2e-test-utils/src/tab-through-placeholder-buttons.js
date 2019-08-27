@@ -14,9 +14,9 @@ export const tabThroughPlaceholderButtons = async () => {
 
 	for ( const buttonClassName of placeholderButtons ) {
 		await page.keyboard.press( 'Tab' );
-		const focusePlaceholderButton = await page.evaluate( () =>
+		const focusedPlaceholderButton = await page.evaluate( () =>
 			document.activeElement.className
 		);
-		expect( focusePlaceholderButton ).toEqual( buttonClassName );
+		expect( focusedPlaceholderButton ).toEqual( buttonClassName );
 	}
 };
