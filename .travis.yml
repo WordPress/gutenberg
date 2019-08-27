@@ -16,7 +16,6 @@ cache:
     - $HOME/.npm
     - $HOME/.nvm/.cache
     - wordpress
-    - node_modules
     - vendor
     - build
 
@@ -42,7 +41,7 @@ before_install:
 install:
   - npm ci
   - npm run env start
-  - sleep 30
+  - sleep 10
   - npm run env install -- --fast
 
 jobs:
@@ -60,7 +59,7 @@ jobs:
           fi
         - cd wordpress
         - git pull
-        - npm install
+        - PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true npm ci
         - npm run build
         - cd ..
         - mkdir -p wordpress/build/wp-content/uploads
@@ -76,16 +75,17 @@ jobs:
         # with an error status code if the lock file is inaccurate.
         #
         # See: https://github.com/WordPress/gutenberg/issues/16157
-        - rm -rf node_modules
         - npm install
       script:
         - npm run check-local-changes
 
     - name: License compatibility
+      install: npm ci
       script:
         - npm run check-licenses
 
     - name: JavaScript unit tests
+      install: npm ci
       script:
         # It's not necessary to run the full build, since Jest can interpret
         # source files with `babel-jest`. Some packages have their own custom
@@ -94,6 +94,7 @@ jobs:
         - npm run test-unit -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
 
     - name: JavaScript native mobile tests
+      install: npm ci
       script:
         # It's not necessary to run the full build, since Jest can interpret
         # source files with `babel-jest`. Some packages have their own custom
@@ -102,18 +103,24 @@ jobs:
         - npm run test-unit:native -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
 
     - name: Lint
+      install: npm ci
       script:
         - npm run lint
 
     - name: PHP unit tests
+      install:
+        - npm ci
+        - npm run env start
+        - sleep 10
       script:
         - npm run test-php && npm run test-unit-php-multisite
 
     - name: PHP unit tests (PHP 5.6)
       install:
+        - npm ci
         - export LOCAL_PHP=5.6-fpm
         - npm run env start
-        - sleep 30
+        - sleep 10
       script:
         - npm run test-php && npm run test-unit-php-multisite
 
