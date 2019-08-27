@@ -169,6 +169,9 @@ jobs:
   allow_failures:
     - name: JavaScript native mobile tests
 
+before_cache:
+  - rm -rf wordpress/node_modules
+
 before_deploy:
   - npm install
   - npm run playground:build -- --public-url '/gutenberg'
