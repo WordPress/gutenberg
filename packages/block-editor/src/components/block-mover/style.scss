@@ -1,9 +1,25 @@
 .block-editor-block-mover {
 	min-height: $empty-paragraph-height;
 	opacity: 0;
+	background: $white;
+	border: 1px solid $dark-opacity-light-800;
+	border-radius: $icon-button-size-small * 3 + $grid-size-small; // Creates a pill shape
+	height: ($icon-button-size-small * 3) + ( $grid-size-small * 1.5);
+	padding-top: $grid-size-small / 2;
+	padding-bottom: $grid-size-small / 2;
+	transition: box-shadow 0.2s ease-out;
+	@include reduce-motion("transition");
+
+	.is-dark-theme & {
+		border-color: $light-opacity-light-800;
+	}
 
 	&.is-visible {
 		@include edit-post__fade-in-animation;
+	}
+
+	&:hover {
+		box-shadow: $shadow-toolbar;
 	}
 
 	// 24px is the smallest size of a good pressable button.
@@ -24,6 +40,8 @@
 	justify-content: center;
 	cursor: pointer;
 	padding: 0;
+	border: none;
+	box-shadow: none;
 
 	// Carefully adjust the size of the side UI to fit one paragraph of text (56px).
 	width: $block-side-ui-width;
@@ -46,6 +64,12 @@
 	.is-dark-theme .wp-block .wp-block &,
 	.wp-block .is-dark-theme .wp-block & {
 		color: $dark-opacity-300;
+	}
+
+	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover,
+	&:focus:not(:disabled) {
+		background-color: transparent;
+		box-shadow: none;
 	}
 
 	&[aria-disabled="true"] {
