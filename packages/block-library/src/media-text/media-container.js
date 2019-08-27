@@ -15,6 +15,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import icon from './media-container-icon';
+import editMediaIcon from './edit-media-icon';
 
 /**
  * Constants
@@ -55,7 +56,7 @@ class MediaContainer extends Component {
 							<IconButton
 								className="components-toolbar__control"
 								label={ __( 'Edit media' ) }
-								icon="edit"
+								icon={ editMediaIcon }
 								onClick={ open }
 							/>
 						) }

@@ -41,6 +41,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import icon from './icon';
+import editMediaIcon from './edit-media-icon';
 import {
 	IMAGE_BACKGROUND_TYPE,
 	VIDEO_BACKGROUND_TYPE,
@@ -187,7 +188,7 @@ class CoverEdit extends Component {
 											<IconButton
 												className="components-toolbar__control"
 												label={ __( 'Edit media' ) }
-												icon="edit"
+												icon={ editMediaIcon }
 												onClick={ open }
 											/>
 										) }

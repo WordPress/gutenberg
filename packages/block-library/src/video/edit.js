@@ -40,6 +40,7 @@ import {
  */
 import { createUpgradedEmbedBlock } from '../embed/util';
 import icon from './icon';
+import editMediaIcon from './edit-media-icon';
 
 const ALLOWED_MEDIA_TYPES = [ 'video' ];
 const VIDEO_POSTER_ALLOWED_MEDIA_TYPES = [ 'image' ];
@@ -206,7 +207,7 @@ class VideoEdit extends Component {
 							className="components-icon-button components-toolbar__control"
 							label={ __( 'Edit video' ) }
 							onClick={ switchToEditing }
-							icon="edit"
+							icon={ editMediaIcon }
 						/>
 					</Toolbar>
 				</BlockControls>
