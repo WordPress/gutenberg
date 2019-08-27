@@ -30,6 +30,9 @@
 
 		// Add a right border to show as separator in the block toolbar.
 		border-right: $border-width solid $light-gray-800;
+
+		// IE11 has thick paddings without this.
+		line-height: 0;
 	}
 
 	// Add a left border and adjust the color for Top Toolbar mode.
