@@ -19,7 +19,7 @@ import { decodeEntities } from '@wordpress/html-entities';
 /**
  * Internal dependencies
  */
-import logger from './logger';
+import { createLogger, createQueuedLogger } from './logger';
 import { getSaveContent } from '../serializer';
 import { normalizeBlockType } from '../utils';
 
@@ -299,10 +299,11 @@ export function getMeaningfulAttributePairs( token ) {
  *
  * @param {Object} actual   Actual token.
  * @param {Object} expected Expected token.
+ * @param {Object} logger   Validation logger object.
  *
  * @return {boolean} Whether two text tokens are equivalent.
  */
-export function isEquivalentTextTokens( actual, expected ) {
+export function isEquivalentTextTokens( actual, expected, logger = createLogger() ) {
 	// This function is intentionally written as syntactically "ugly" as a hot
 	// path optimization. Text is progressively normalized in order from least-
 	// to-most operationally expensive, until the earliest point at which text
@@ -393,10 +394,11 @@ export const isEqualAttributesOfName = {
  *
  * @param {Array[]} actual   Actual attributes tuples.
  * @param {Array[]} expected Expected attributes tuples.
+ * @param {Object}  logger   Validation logger object.
  *
  * @return {boolean} Whether attributes are equivalent.
  */
-export function isEqualTagAttributePairs( actual, expected ) {
+export function isEqualTagAttributePairs( actual, expected, logger = createLogger() ) {
 	// Attributes is tokenized as tuples. Their lengths should match. This also
 	// avoids us needing to check both attributes sets, since if A has any keys
 	// which do not exist in B, we know the sets to be different.
@@ -441,14 +443,15 @@ export function isEqualTagAttributePairs( actual, expected ) {
  * @type {Object}
  */
 export const isEqualTokensOfType = {
-	StartTag: ( actual, expected ) => {
+	StartTag: ( actual, expected, logger = createLogger() ) => {
 		if ( actual.tagName !== expected.tagName ) {
 			logger.warning( 'Expected tag name `%s`, instead saw `%s`.', expected.tagName, actual.tagName );
 			return false;
 		}
 
 		return isEqualTagAttributePairs(
-			...[ actual, expected ].map( getMeaningfulAttributePairs )
+			...[ actual, expected ].map( getMeaningfulAttributePairs ),
+			logger
 		);
 	},
 	Chars: isEquivalentTextTokens,
@@ -482,11 +485,12 @@ export function getNextNonWhitespaceToken( tokens ) {
  * Tokenize an HTML string, gracefully handling any errors thrown during
  * underlying tokenization.
  *
- * @param {string} html HTML string to tokenize.
+ * @param {string} html   HTML string to tokenize.
+ * @param {Object} logger Validation logger object.
  *
  * @return {Object[]|null} Array of valid tokenized HTML elements, or null on error
  */
-function getHTMLTokens( html ) {
+function getHTMLTokens( html, logger = createLogger() ) {
 	try {
 		return new Tokenizer( new DecodeEntityParser() ).tokenize( html );
 	} catch ( e ) {
@@ -523,14 +527,17 @@ export function isClosedByToken( currentToken, nextToken ) {
  * false otherwise. Invalid HTML is not considered equivalent, even if the
  * strings directly match.
  *
- * @param {string} actual Actual HTML string.
+ * @param {string} actual   Actual HTML string.
  * @param {string} expected Expected HTML string.
+ * @param {Object} logger   Validation logger object.
  *
  * @return {boolean} Whether HTML strings are equivalent.
  */
-export function isEquivalentHTML( actual, expected ) {
+export function isEquivalentHTML( actual, expected, logger = createLogger() ) {
 	// Tokenize input content and reserialized save content
-	const [ actualTokens, expectedTokens ] = [ actual, expected ].map( getHTMLTokens );
+	const [ actualTokens, expectedTokens ] = [ actual, expected ].map(
+		( html ) => getHTMLTokens( html, logger )
+	);
 
 	// If either is malformed then stop comparing - the strings are not equivalent
 	if ( ! actualTokens || ! expectedTokens ) {
@@ -556,7 +563,7 @@ export function isEquivalentHTML( actual, expected ) {
 		// Defer custom token type equality handling, otherwise continue and
 		// assume as equal
 		const isEqualTokens = isEqualTokensOfType[ actualToken.type ];
-		if ( isEqualTokens && ! isEqualTokens( actualToken, expectedToken ) ) {
+		if ( isEqualTokens && ! isEqualTokens( actualToken, expectedToken, logger ) ) {
 			return false;
 		}
 
@@ -584,6 +591,50 @@ export function isEquivalentHTML( actual, expected ) {
 }
 
 /**
+ * Returns an object with `isValid` property set to `true` if the parsed block
+ * is valid given the input content. A block is considered valid if, when serialized
+ * with assumed attributes, the content matches the original value. If block is
+ * invalid, this function returns all validations issues as well.
+ *
+ * @param {string|Object} blockTypeOrName      Block type.
+ * @param {Object}        attributes           Parsed block attributes.
+ * @param {string}        originalBlockContent Original block content.
+ * @param {Object}        logger           	   Validation logger object.
+ *
+ * @return {Object} Whether block is valid and contains validation messages.
+ */
+export function getBlockContentValidationResult( blockTypeOrName, attributes, originalBlockContent, logger = createQueuedLogger() ) {
+	const blockType = normalizeBlockType( blockTypeOrName );
+	let generatedBlockContent;
+	try {
+		generatedBlockContent = getSaveContent( blockType, attributes );
+	} catch ( error ) {
+		logger.error( 'Block validation failed because an error occurred while generating block content:\n\n%s', error.toString() );
+
+		return {
+			isValid: false,
+			validationIssues: logger.getItems(),
+		};
+	}
+
+	const isValid = isEquivalentHTML( originalBlockContent, generatedBlockContent, logger );
+	if ( ! isValid ) {
+		logger.error(
+			'Block validation failed for `%s` (%o).\n\nContent generated by `save` function:\n\n%s\n\nContent retrieved from post body:\n\n%s',
+			blockType.name,
+			blockType,
+			generatedBlockContent,
+			originalBlockContent
+		);
+	}
+
+	return {
+		isValid,
+		validationIssues: logger.getItems(),
+	};
+}
+
+/**
  * Returns true if the parsed block is valid given the input content. A block
  * is considered valid if, when serialized with assumed attributes, the content
  * matches the original value.
@@ -597,27 +648,7 @@ export function isEquivalentHTML( actual, expected ) {
  * @return {boolean} Whether block is valid.
  */
 export function isValidBlockContent( blockTypeOrName, attributes, originalBlockContent ) {
-	const blockType = normalizeBlockType( blockTypeOrName );
-	let generatedBlockContent;
-	try {
-		generatedBlockContent = getSaveContent( blockType, attributes );
-	} catch ( error ) {
-		logger.error( 'Block validation failed because an error occurred while generating block content:\n\n%s', error.toString() );
-		return false;
-	}
-
-	const isValid = isEquivalentHTML( originalBlockContent, generatedBlockContent );
-	if ( ! isValid ) {
-		logger.error(
-			'Block validation failed for `%s` (%o).\n\nContent generated by `save` function:\n\n%s\n\nContent retrieved from post body:\n\n%s',
-			blockType.name,
-			blockType,
-			generatedBlockContent,
-			originalBlockContent
-		);
-	}
+	const { isValid } = getBlockContentValidationResult( blockTypeOrName, attributes, originalBlockContent, createLogger() );
 
 	return isValid;
 }
-
-export { logger };

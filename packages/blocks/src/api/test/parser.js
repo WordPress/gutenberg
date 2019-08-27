@@ -484,9 +484,7 @@ describe( 'block parser', () => {
 
 			const migratedBlock = getMigratedBlock( block, parsedAttributes );
 
-			expect( migratedBlock ).toBe( block );
-			expect( console ).toHaveErrored();
-			expect( console ).toHaveWarned();
+			expect( migratedBlock ).toEqual( expect.objectContaining( block ) );
 		} );
 
 		it( 'should return with attributes parsed by the deprecated version', () => {
