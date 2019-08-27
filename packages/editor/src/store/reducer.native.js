@@ -12,15 +12,13 @@ import { combineReducers } from '@wordpress/data';
  * Internal dependencies
  */
 import {
-	editor,
-	initialEdits,
-	currentPost,
+	postId,
+	postType,
 	preferences,
 	saving,
 	postLock,
 	reusableBlocks,
 	template,
-	previewLink,
 	postSavingLock,
 	isReady,
 	editorSettings,
@@ -48,17 +46,14 @@ export const postTitle = combineReducers( {
 } );
 
 export default optimist( combineReducers( {
-	editor,
-	initialEdits,
-	currentPost,
+	postId,
+	postType,
 	preferences,
 	saving,
 	postLock,
 	reusableBlocks,
 	template,
-	previewLink,
 	postSavingLock,
 	isReady,
 	editorSettings,
-	postTitle,
 } ) );
