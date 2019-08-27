@@ -15,7 +15,7 @@
  * @return string Returns the post content with the legacy widget added.
  */
 function render_block_navigation_menu( $attributes, $content, $block ) {
-	return prepare_navigation( $block );
+	return build_navigation_menu_html( $block );
 }
 
 /**
@@ -25,16 +25,16 @@ function render_block_navigation_menu( $attributes, $content, $block ) {
  *
  * @return string Returns  an HTML list from innerBlocks.
  */
-function prepare_navigation( $block ) {
-	$block_tree = '';
+function build_navigation_menu_html( $block ) {
+	$html = '';
 	foreach ( (array) $block['innerBlocks'] as $key => $menu_item ) {
-		$block_tree .= '<li>' . $menu_item['innerContent'][0];
+		$html .= '<li>' . $menu_item['innerContent'][0];
 		if ( count( (array) $menu_item['innerBlocks'] ) > 0 ) {
-			$block_tree .= prepare_navigation( $menu_item );
+			$html .= build_navigation_menu_html( $menu_item );
 		}
-		$block_tree .= '</li>';
+		$html .= '</li>';
 	}
-	return '<ul>' . $block_tree . '</ul>';
+	return '<ul>' . $html . '</ul>';
 }
 
 /**
