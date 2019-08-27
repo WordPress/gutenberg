@@ -40,6 +40,7 @@ before_install:
     sudo mv docker-compose /usr/local/bin
 
 install:
+  - npm ci
   - npm run env start
   - sleep 30
   - npm run env install -- --fast
@@ -75,6 +76,7 @@ jobs:
         # with an error status code if the lock file is inaccurate.
         #
         # See: https://github.com/WordPress/gutenberg/issues/16157
+        - rm -rf node_modules
         - npm install
       script:
         - npm run check-local-changes
@@ -111,6 +113,7 @@ jobs:
       install:
         - export LOCAL_PHP=5.6-fpm
         - npm run env start
+        - sleep 30
       script:
         - npm run test-php && npm run test-unit-php-multisite
 
