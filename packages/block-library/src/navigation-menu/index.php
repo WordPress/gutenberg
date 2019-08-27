@@ -19,7 +19,7 @@ function render_block_navigation_menu( $attributes, $content, $block ) {
 }
 
 /**
- * Walks the inner block structure and retunrs an HTML list of it.
+ * Walks the inner block structure and returns an HTML list for it.
  *
  * @param array $block The block.
  *
