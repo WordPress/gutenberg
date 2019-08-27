@@ -387,6 +387,7 @@ The default editor settings
  bodyPlaceholder                        string        Empty post placeholder
  titlePlaceholder                       string        Empty title placeholder
  codeEditingEnabled                     string        Whether or not the user can switch to the code editor
+ showInserterHelpPanel                  boolean       Whether or not the inserter help panel is shown
  **experimentalCanUserUseUnfilteredHTML string        Whether the user should be able to use unfiltered HTML or the HTML should be filtered e.g., to remove elements considered insecure like iframes.
  **experimentalEnableLegacyWidgetBlock  boolean       Whether the user has enabled the Legacy Widget Block
  \_\_experimentalEnableMenuBlock          boolean       Whether the user has enabled the Menu Block
@@ -419,6 +420,12 @@ _Parameters_
 _Returns_
 
 -   `Array`: converted rules.
+
+<a name="Typewriter" href="#Typewriter">#</a> **Typewriter**
+
+Ensures that the text selection keeps the same vertical distance from the
+viewport during keyboard events within this component. The vertical distance
+can vary. It is the last clicked or scrolled to position.
 
 <a name="URLInput" href="#URLInput">#</a> **URLInput**
 

@@ -24,7 +24,6 @@ import {
 	getBlockType,
 	getBlockTypes,
 	hasBlockSupport,
-	hasChildBlocksWithInserterSupport,
 } from '@wordpress/blocks';
 
 // Module constants
@@ -1322,7 +1321,6 @@ export const getInserterItems = createSelector(
 				isDisabled,
 				utility: calculateUtility( blockType.category, count, isContextual ),
 				frecency: calculateFrecency( time, count ),
-				hasChildBlocksWithInserterSupport: hasChildBlocksWithInserterSupport( blockType.name ),
 			};
 		};
 
@@ -1497,4 +1495,15 @@ function getReusableBlocks( state ) {
  */
 export function isNavigationMode( state ) {
 	return state.isNavigationMode;
+}
+
+/**
+ * Returns true if the last change was an automatic change, false otherwise.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether the last change was automatic.
+ */
+export function didAutomaticChange( state ) {
+	return state.didAutomaticChange;
 }

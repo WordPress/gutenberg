@@ -20,6 +20,18 @@ _Returns_
 
 -   `boolean`: Whether the given block type is allowed to be inserted.
 
+<a name="didAutomaticChange" href="#didAutomaticChange">#</a> **didAutomaticChange**
+
+Returns true if the last change was an automatic change, false otherwise.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `boolean`: Whether the last change was automatic.
+
 <a name="getAdjacentBlockClientId" href="#getAdjacentBlockClientId">#</a> **getAdjacentBlockClientId**
 
 Returns the client ID of the block adjacent one at the given reference

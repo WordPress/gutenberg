@@ -1,3 +1,13 @@
+## Master
+
+### Breaking Changes
+
+- Files with `.spec.js` suffix are no longer matched as test files by default.
+
+### New Features
+
+- Align `testMatch` config option with Jest and allow test files with `.ts` suffix.
+
 ## 4.0.0 (2019-03-06)
 
 ### Breaking Changes

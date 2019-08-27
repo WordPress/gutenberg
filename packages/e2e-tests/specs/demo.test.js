@@ -28,12 +28,12 @@ describe( 'new editor state', () => {
 		await visitAdminPage( 'post-new.php', 'gutenberg-demo' );
 	} );
 
-	it( 'content should load without making the post dirty', async () => {
+	it( 'content should load, making the post dirty', async () => {
 		const isDirty = await page.evaluate( () => {
 			const { select } = window.wp.data;
 			return select( 'core/editor' ).isEditedPostDirty();
 		} );
-		expect( isDirty ).toBeFalsy();
+		expect( isDirty ).toBeTruthy();
 	} );
 
 	it( 'should be immediately saveable', async () => {

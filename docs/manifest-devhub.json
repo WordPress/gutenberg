@@ -1350,6 +1350,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/project-management-automation",
+		"slug": "packages-project-management-automation",
+		"markdown_source": "../packages/project-management-automation/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/redux-routine",
 		"slug": "packages-redux-routine",
 		"markdown_source": "../packages/redux-routine/README.md",

@@ -82,6 +82,7 @@ class EditorProvider extends Component {
 			...pick( settings, [
 				'alignWide',
 				'allowedBlockTypes',
+				'__experimentalPreferredStyleVariations',
 				'availableLegacyWidgets',
 				'bodyPlaceholder',
 				'codeEditingEnabled',
@@ -99,8 +100,10 @@ class EditorProvider extends Component {
 				'template',
 				'templateLock',
 				'titlePlaceholder',
+				'onUpdateDefaultBlockStyles',
 				'__experimentalEnableLegacyWidgetBlock',
 				'__experimentalEnableMenuBlock',
+				'showInserterHelpPanel',
 			] ),
 			__experimentalReusableBlocks: reusableBlocks,
 			__experimentalMediaUpload: hasUploadPermissions ? mediaUpload : undefined,

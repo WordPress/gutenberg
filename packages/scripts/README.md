@@ -252,6 +252,11 @@ This is how you execute those scripts using the presented setup:
 * `npm run test-e2e FILE_NAME -- --puppeteer-interactive ` - runs one test file interactively.
 * `npm run test-e2e:watch -- --puppeteer-interactive` - runs all tests interactively and watch for changes.
 
+Jest will look for test files with any of the following popular naming conventions:
+
+- Files with `.js` (or `.ts`) suffix at any level of depth in `spec` folders.
+- Files with `.spec.js` (or `.spec.ts`) suffix.
+
 This script automatically detects the best config to start Puppeteer but sometimes you may need to specify custom options:
  - You can add a `jest-puppeteer.config.js` at the root of the project or define a custom path using `JEST_PUPPETEER_CONFIG` environment variable. Check [jest-puppeteer](https://github.com/smooth-code/jest-puppeteer#jest-puppeteerconfigjs) for more details.
 
@@ -284,6 +289,12 @@ This is how you execute those scripts using the presented setup:
 * `npm run test:unit` - runs all unit tests.
 * `npm run test:unit:help` - prints all available options to configure unit tests runner.
 * `npm run test:unit:watch` - runs all unit tests in the watch mode.
+
+Jest will look for test files with any of the following popular naming conventions:
+
+- Files with `.js` (or `.ts`) suffix located at any level of depth in `__tests__` folders.
+- Files with `.js` (or `.ts`) suffix directly located in `test` folders.
+- Files with `.test.js` (or `.test.ts`) suffix.
 
 #### Advanced information
 

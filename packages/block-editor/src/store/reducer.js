@@ -1299,6 +1299,18 @@ export function lastBlockAttributesChange( state, action ) {
 	return null;
 }
 
+/**
+ * Reducer returning automatic change state.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {boolean} Updated state.
+ */
+export function didAutomaticChange( state, action ) {
+	return action.type === 'MARK_AUTOMATIC_CHANGE';
+}
+
 export default combineReducers( {
 	blocks,
 	isTyping,
@@ -1312,4 +1324,5 @@ export default combineReducers( {
 	preferences,
 	lastBlockAttributesChange,
 	isNavigationMode,
+	didAutomaticChange,
 } );

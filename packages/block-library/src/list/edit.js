@@ -7,13 +7,9 @@ import {
 	RichText,
 	BlockControls,
 	RichTextShortcut,
-	InspectorControls,
 } from '@wordpress/block-editor';
 import {
 	Toolbar,
-	TextControl,
-	PanelBody,
-	ToggleControl,
 } from '@wordpress/components';
 import {
 	__unstableIndentListItems as indentListItems,
@@ -27,6 +23,7 @@ import {
  * Internal dependencies
  */
 import { name } from './';
+import OrderedListSettings from './ordered-list-settings';
 
 export default function ListEdit( {
 	attributes,
@@ -141,36 +138,12 @@ export default function ListEdit( {
 		>
 			{ controls }
 		</RichText>
-		{ ordered &&
-			<InspectorControls>
-				<PanelBody title={ __( 'Ordered List Settings' ) }>
-					<TextControl
-						label={ __( 'Start Value' ) }
-						type="number"
-						onChange={ ( value ) => {
-							const int = parseInt( value, 10 );
-
-							setAttributes( {
-								// It should be possible to unset the value,
-								// e.g. with an empty string.
-								start: isNaN( int ) ? undefined : int,
-							} );
-						} }
-						value={ Number.isInteger( start ) ? start.toString( 10 ) : '' }
-						step="1"
-					/>
-					<ToggleControl
-						label={ __( 'Reverse List Numbering' ) }
-						checked={ reversed || false }
-						onChange={ ( value ) => {
-							setAttributes( {
-								// Unset the attribute if not reversed.
-								reversed: value || undefined,
-							} );
-						} }
-					/>
-				</PanelBody>
-			</InspectorControls>
-		}
+		{ ordered && (
+			<OrderedListSettings
+				setAttributes={ setAttributes }
+				ordered={ ordered }
+				reversed={ reversed }
+				start={ start }
+			/> ) }
 	</>;
 }

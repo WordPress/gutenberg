@@ -1,35 +1,3 @@
-// This is the preview that shows up to the right of the thumbnail when hovering.
-.block-editor-block-switcher__preview {
-	padding: $block-padding;
-	font-family: $editor-font;
-	overflow: hidden;
-	width: 100%;
-	pointer-events: none;
-	display: none;
-
-	@include break-medium {
-		display: block;
-	}
-
-	.block-editor-block-preview__content {
-		font-family: $editor-font;
-
-		> div {
-			font-family: $editor-font;
-		}
-
-		&:not(.is-tall-preview) {
-			// Vertical alignment.
-			margin-top: 50%;
-		}
-	}
-
-	.block-editor-block-preview__title {
-		margin-bottom: 10px;
-		color: $dark-gray-300;
-	}
-}
-
 // These rules ensure the preview scales smoothly regardless of the container size.
 .block-editor-block-preview__container {
 	// In the component, a top padding is provided as an inline style to provid an aspect-ratio.
@@ -39,6 +7,11 @@
 	// The preview component measures the pixel width of this item, so as to calculate the scale factor.
 	// But without this baseline width, it collapses to 0.
 	width: 100%;
+
+	overflow: hidden;
+	&.is-ready {
+		overflow: visible;
+	}
 }
 
 .block-editor-block-preview__content {
@@ -72,10 +45,6 @@
 
 	> div section {
 		height: auto;
-	}
-
-	&.is-tall-preview {
-		top: 4px;
 	}
 
 	.block-editor-block-list__insertion-point,

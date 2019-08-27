@@ -21,7 +21,6 @@ import { getBlockPreviewContainerDOMNode } from '../../utils/dom';
 function ScaledBlockPreview( { blocks, viewportWidth } ) {
 	const previewRef = useRef( null );
 
-	const [ isTallPreview, setIsTallPreview ] = useState( false );
 	const [ isReady, setIsReady ] = useState( false );
 	const [ previewScale, setPreviewScale ] = useState( 1 );
 	const [ { x, y }, setPosition ] = useState( { x: 0, y: 0 } );
@@ -51,7 +50,6 @@ function ScaledBlockPreview( { blocks, viewportWidth } ) {
 				const offsetY = ( containerElementRect.height > scaledElementRect.height * scale ) ?
 					( containerElementRect.height - ( scaledElementRect.height * scale ) ) / 2 : 0;
 
-				setIsTallPreview( scaledElementRect.height * scale > containerElementRect.height );
 				setPreviewScale( scale );
 				setPosition( { x: offsetX * scale, y: offsetY } );
 
@@ -60,7 +58,6 @@ function ScaledBlockPreview( { blocks, viewportWidth } ) {
 			} else {
 				const containerElementRect = containerElement.getBoundingClientRect();
 				setPreviewScale( containerElementRect.width / viewportWidth );
-				setIsTallPreview( true );
 			}
 
 			setIsReady( true );
@@ -86,14 +83,15 @@ function ScaledBlockPreview( { blocks, viewportWidth } ) {
 		width: viewportWidth,
 	};
 
-	const contentClassNames = classnames( 'block-editor-block-preview__content editor-styles-wrapper', {
-		'is-tall-preview': isTallPreview,
-		'is-ready': isReady,
-	} );
-
 	return (
-		<div ref={ previewRef } className="block-editor-block-preview__container" aria-hidden>
-			<Disabled style={ previewStyles } className={ contentClassNames }>
+		<div
+			ref={ previewRef }
+			className={ classnames( 'block-editor-block-preview__container editor-styles-wrapper', {
+				'is-ready': isReady,
+			} ) }
+			aria-hidden
+		>
+			<Disabled style={ previewStyles } className="block-editor-block-preview__content">
 				<BlockList />
 			</Disabled>
 		</div>

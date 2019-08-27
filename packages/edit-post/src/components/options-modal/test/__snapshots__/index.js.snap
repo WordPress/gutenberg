@@ -15,6 +15,10 @@ exports[`OptionsModal should match snapshot when the modal is active 1`] = `
     <WithSelect(WithDispatch(DeferredOption))
       label="Enable Tips"
     />
+    <WithSelect(WithDispatch(BaseOption))
+      feature="showInserterHelpPanel"
+      label="Enable Inserter Help Panel"
+    />
   </Section>
   <Section
     title="Document Panels"
