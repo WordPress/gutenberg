@@ -8,7 +8,7 @@ const EMAIL_REGEXP = /^(mailto:)?[a-z0-9._%+-]+@[a-z0-9][a-z0-9.-]*\.[a-z]{2,63}
 const USABLE_HREF_REGEXP = /^(?:[a-z]+:|#|\?|\.|\/)/i;
 
 /**
- * @typedef {{[k: string]: QueryArgParsed}} QueryArgObject
+ * @typedef {{[key: string]: QueryArgParsed}} QueryArgObject
  */
 
 /**
