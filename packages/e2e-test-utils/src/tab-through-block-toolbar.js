@@ -15,6 +15,6 @@ export async function tabThroughBlockToolbar() {
 		const focusedBlockToolBarButton = await page.evaluate( () =>
 			document.activeElement.className
 		);
-		await expect( focusedBlockToolBarButton ).toEqual( buttonClassName );
+		expect( focusedBlockToolBarButton ).toEqual( buttonClassName );
 	}
 }
