@@ -251,14 +251,6 @@ _Returns_
 
 -   `Promise`: Promise resolving with post content markup.
 
-<a name="getElementSelectorList" href="#getElementSelectorList">#</a> **getElementSelectorList**
-
-Returns an array of classnames that match a given selector on the current page
-
-_Parameters_
-
--   _selector_ `string`: The selector to query on the page
-
 <a name="hasBlockSwitcher" href="#hasBlockSwitcher">#</a> **hasBlockSwitcher**
 
 Returns a boolean indicating if the current selected block has a block switcher or not.
@@ -529,6 +521,10 @@ _Returns_
 <a name="tabThroughBlockToolbar" href="#tabThroughBlockToolbar">#</a> **tabThroughBlockToolbar**
 
 Navigate through a block's toolbar using the keyboard. Asserts that each button receives focus.
+
+_Returns_
+
+-   `Promise`: A promise that resolves when it's finished tabbing through the buttons in a block's toolbar, asserting that each one received focus.
 
 <a name="tabThroughFileBlock" href="#tabThroughFileBlock">#</a> **tabThroughFileBlock**
 
