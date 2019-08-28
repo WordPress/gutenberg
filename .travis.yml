@@ -61,7 +61,7 @@ install:
       # Grab the tools we need for WordPress' local-env.
       curl -sL https://github.com/WordPress/wordpress-develop/archive/master.zip -o /tmp/wordpress-develop.zip
       unzip -q /tmp/wordpress-develop.zip -d /tmp
-      mv
+      mv \
         /tmp/wordpress-develop-master/tools \
         /tmp/wordpress-develop-master/.env \
         /tmp/wordpress-develop-master/docker-compose.yml \
@@ -71,8 +71,6 @@ install:
 
       # Install WordPress.
       cd wordpress
-      pwd
-      ls -lah
       npm install dotenv wait-on
       npm run env:start
       sleep 10
