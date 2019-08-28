@@ -78,3 +78,32 @@
 		display: inline-block;
 	}
 }
+
+// Selected/unselected states.
+// Unselected block is preview, selected has additional options.
+// When no blocks are configured, the block shouldn't collapse but instead show some gray "skeleton indicators".
+[data-type="core/social-links"]:not(.is-selected):not(.has-child-selected) .wp-block-social-links {
+	min-height: 36px; // This height matches the height of the buttons and ensures an empty block doesn't collapse.
+}
+
+// Disappear but show on hover or nav mode focus.
+[data-type="core/social-links"] .wp-social-link__is-incomplete {
+	transition: transform 0.1s ease;
+	transform-origin: center center;
+}
+
+[data-type="core/social-links"]:not(.is-selected):not(.has-child-selected):not(.is-hovered) {
+	.wp-social-link__is-incomplete {
+		opacity: 0;
+		transform: scale(0);
+		width: 0;
+		padding: 0;
+		margin-right: 0;
+	}
+}
+
+[data-type="core/social-links"]:not(.is-selected):not(.has-child-selected) {
+	.wp-social-link__is-incomplete {
+		opacity: 0.6;
+	}
+}
