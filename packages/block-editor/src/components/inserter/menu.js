@@ -406,7 +406,7 @@ export class InserterMenu extends Component {
 									{ __(
 										'While writing, you can press'
 									) }
-									<kbd className="edit-post-keyboard-shortcut-help__shortcut-key">/</kbd>
+									<kbd>/</kbd>
 									{ __(
 										' to quickly insert new blocks.'
 									) }
