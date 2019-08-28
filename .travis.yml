@@ -48,7 +48,7 @@ install:
   - |
     if [[ "$INSTALL_WORDPRESS" = "true" ]]; then
       # Download and unpack WordPress.
-      curl s-L https://wordpress.org/nightly-builds/wordpress-latest.zip -o /tmp/wordpress-latest.zip
+      curl -sL https://wordpress.org/nightly-builds/wordpress-latest.zip -o /tmp/wordpress-latest.zip
       unzip /tmp/wordpress-latest.zip -d /tmp
       mkdir -p wordpress/src
       mkdir -p wordpress/build
@@ -83,7 +83,7 @@ install:
     fi
   - |
     if [[ "$INSTALL_COMPOSER" = "true" ]]; then
-      composer install
+      npm run env docker-run -- php composer install
     fi
   - |
     if [[ "$E2E_ROLE" = "author" ]]; then
@@ -94,7 +94,7 @@ install:
 jobs:
   include:
     - name: Lint
-      env: INSTALL_WORDPRESS=false INSTALL_COMPOSER=true
+      env: INSTALL_WORDPRESS=false
       script:
         - npm run lint
 
