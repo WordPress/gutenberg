@@ -68,6 +68,11 @@ export default function save( { attributes } ) {
 
 	return (
 		<figure>
+			{ /*
+			   * If the table has caption text, associate the figcaption element with the table
+			   * using aria-labelledby. This ensures screenreaders read the `figcaption` as they
+			   * would a table `caption` element.
+			   */ }
 			<table className={ classes } aria-labelledby={ hasCaption ? captionId : undefined }>
 				<Section type="head" rows={ head } />
 				<Section type="body" rows={ body } />
