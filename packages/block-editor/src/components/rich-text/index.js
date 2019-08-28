@@ -38,6 +38,11 @@ import FormatToolbar from './format-toolbar';
 import { withBlockEditContext } from '../block-edit/context';
 import { RemoveBrowserShortcuts } from './remove-browser-shortcuts';
 
+const requestIdleCallback = window.requestIdleCallback ||
+	function fallbackRequestIdleCallback( fn ) {
+		window.setTimeout( fn, 100 );
+	};
+
 const wrapperClasses = 'editor-rich-text block-editor-rich-text';
 const classes = 'editor-rich-text__editable block-editor-rich-text__editable';
 
@@ -301,7 +306,7 @@ class RichTextWrapper extends Component {
 	 * ensure all selection changes have been recorded.
 	 */
 	markAutomaticChange() {
-		window.requestIdleCallback( () => {
+		requestIdleCallback( () => {
 			this.props.markAutomaticChange();
 		} );
 	}
