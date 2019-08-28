@@ -146,14 +146,22 @@ const deprecated = [
 					<Tag>
 						{ rows.map( ( { cells }, rowIndex ) => (
 							<tr key={ rowIndex }>
-								{ cells.map( ( { content, tag, scope }, cellIndex ) =>
-									<RichText.Content
-										tagName={ tag }
-										value={ content }
-										key={ cellIndex }
-										scope={ tag === 'th' ? scope : undefined }
-									/>
-								) }
+								{ cells.map( ( { content, tag, scope, align }, cellIndex ) => {
+									const cellClasses = classnames( {
+										[ `has-text-align-${ align }` ]: align,
+									} );
+
+									return (
+										<RichText.Content
+											className={ cellClasses ? cellClasses : undefined }
+											data-align={ align }
+											tagName={ tag }
+											value={ content }
+											key={ cellIndex }
+											scope={ tag === 'th' ? scope : undefined }
+										/>
+									);
+								} ) }
 							</tr>
 						) ) }
 					</Tag>
