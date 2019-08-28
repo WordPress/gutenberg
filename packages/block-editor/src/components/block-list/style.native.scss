@@ -8,6 +8,10 @@
 	flex: 1;
 }
 
+.listDark {
+	background: #1c1c1e;
+}
+
 .switch {
 	flex-direction: row;
 	justify-content: flex-start;
@@ -26,6 +30,10 @@
 	height: 2px;
 }
 
+.lineStyleAddHereDark {
+	background-color: $gray-50;
+}
+
 .labelStyleAddHere {
 	flex: 1;
 	text-align: center;
@@ -34,10 +42,12 @@
 	font-weight: bold;
 }
 
+.labelStyleAddHereDark {
+	color: $gray-20;
+}
+
 .containerStyleAddHere {
-	flex: 1;
 	flex-direction: row;
-	background-color: $white;
 }
 
 .blockHolderSemiBordered {
@@ -55,7 +65,6 @@
 }
 
 .blockContainerFocused {
-	background-color: $white;
 	padding-left: 16;
 	padding-right: 16;
 	padding-top: 12;
@@ -64,6 +73,10 @@
 
 .blockHolderFocused {
 	border-color: $gray-lighten-30;
+}
+
+.blockHolderFocusedDark {
+	border-color: $gray-70;
 }
 
 .blockListFooter {

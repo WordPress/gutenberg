@@ -12,8 +12,7 @@ import {
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { isHorizontalEdge } from '@wordpress/dom';
-import { BACKSPACE, DELETE, ENTER, LEFT, RIGHT, SPACE } from '@wordpress/keycodes';
+import { BACKSPACE, DELETE, ENTER, LEFT, RIGHT, SPACE, ESCAPE } from '@wordpress/keycodes';
 import { withSelect } from '@wordpress/data';
 import { withSafeTimeout, compose } from '@wordpress/compose';
 import isShallowEqual from '@wordpress/is-shallow-equal';
@@ -24,7 +23,6 @@ import isShallowEqual from '@wordpress/is-shallow-equal';
 import FormatEdit from './format-edit';
 import Editable from './editable';
 import { pickAriaProps } from './aria';
-import { isEmpty } from '../is-empty';
 import { create } from '../create';
 import { apply, toDom } from '../to-dom';
 import { toHTMLString } from '../to-html-string';
@@ -85,42 +83,40 @@ function createPrepareEditableTree( props, prefix ) {
 class RichText extends Component {
 	constructor( {
 		value,
-		__unstableMultiline: multiline,
 		selectionStart,
 		selectionEnd,
 	} ) {
 		super( ...arguments );
 
-		if ( multiline === true || multiline === 'p' || multiline === 'li' ) {
-			this.multilineTag = multiline === true ? 'p' : multiline;
-		}
-
-		if ( this.multilineTag === 'li' ) {
-			this.multilineWrapperTags = [ 'ul', 'ol' ];
-		}
-
 		this.onFocus = this.onFocus.bind( this );
 		this.onBlur = this.onBlur.bind( this );
 		this.onChange = this.onChange.bind( this );
-		this.onDeleteKeyDown = this.onDeleteKeyDown.bind( this );
-		this.onKeyDown = this.onKeyDown.bind( this );
+		this.handleDelete = this.handleDelete.bind( this );
+		this.handleEnter = this.handleEnter.bind( this );
+		this.handleSpace = this.handleSpace.bind( this );
+		this.handleHorizontalNavigation = this.handleHorizontalNavigation.bind( this );
 		this.onPaste = this.onPaste.bind( this );
 		this.onCreateUndoLevel = this.onCreateUndoLevel.bind( this );
 		this.onInput = this.onInput.bind( this );
 		this.onCompositionEnd = this.onCompositionEnd.bind( this );
 		this.onSelectionChange = this.onSelectionChange.bind( this );
-		this.getRecord = this.getRecord.bind( this );
 		this.createRecord = this.createRecord.bind( this );
 		this.applyRecord = this.applyRecord.bind( this );
 		this.valueToFormat = this.valueToFormat.bind( this );
 		this.setRef = this.setRef.bind( this );
 		this.valueToEditableHTML = this.valueToEditableHTML.bind( this );
-		this.handleHorizontalNavigation = this.handleHorizontalNavigation.bind( this );
 		this.onPointerDown = this.onPointerDown.bind( this );
 		this.formatToValue = this.formatToValue.bind( this );
+		this.Editable = this.Editable.bind( this );
+
+		this.onKeyDown = ( event ) => {
+			this.handleDelete( event );
+			this.handleEnter( event );
+			this.handleSpace( event );
+			this.handleHorizontalNavigation( event );
+		};
 
 		this.state = {};
-
 		this.lastHistoryValue = value;
 
 		// Internal values are updated synchronously, unlike props and state.
@@ -152,34 +148,28 @@ class RichText extends Component {
 		}
 	}
 
-	/**
-	 * Get the current record (value and selection) from props and state.
-	 *
-	 * @return {Object} The current record (value and selection).
-	 */
-	getRecord() {
-		return this.record;
-	}
-
 	createRecord() {
+		const { __unstableMultilineTag: multilineTag } = this.props;
 		const selection = getSelection();
 		const range = selection.rangeCount > 0 ? selection.getRangeAt( 0 ) : null;
 
 		return create( {
 			element: this.editableRef,
 			range,
-			multilineTag: this.multilineTag,
-			multilineWrapperTags: this.multilineWrapperTags,
+			multilineTag,
+			multilineWrapperTags: multilineTag === 'li' ? [ 'ul', 'ol' ] : undefined,
 			__unstableIsEditableTree: true,
 		} );
 	}
 
 	applyRecord( record, { domOnly } = {} ) {
+		const { __unstableMultilineTag: multilineTag } = this.props;
+
 		apply( {
 			value: record,
 			current: this.editableRef,
-			multilineTag: this.multilineTag,
-			multilineWrapperTags: this.multilineWrapperTags,
+			multilineTag,
+			multilineWrapperTags: multilineTag === 'li' ? [ 'ul', 'ol' ] : undefined,
 			prepareEditableTree: createPrepareEditableTree( this.props, 'format_prepare_functions' ),
 			__unstableDomOnly: domOnly,
 			placeholder: this.props.placeholder,
@@ -229,7 +219,7 @@ class RichText extends Component {
 		window.console.log( 'Received HTML:\n\n', html );
 		window.console.log( 'Received plain text:\n\n', plainText );
 
-		const record = this.getRecord();
+		const record = this.record;
 		const transformed = formatTypes.reduce( ( accumlator, { __unstablePasteRule } ) => {
 			// Only allow one transform.
 			if ( __unstablePasteRule && accumlator === record ) {
@@ -330,19 +320,21 @@ class RichText extends Component {
 			return;
 		}
 
-		if ( event && event.nativeEvent.inputType ) {
-			const { inputType } = event.nativeEvent;
+		let inputType;
 
-			// The browser formatted something or tried to insert HTML.
-			// Overwrite it. It will be handled later by the format library if
-			// needed.
-			if (
-				inputType.indexOf( 'format' ) === 0 ||
-				INSERTION_INPUT_TYPES_TO_IGNORE.has( inputType )
-			) {
-				this.applyRecord( this.getRecord() );
-				return;
-			}
+		if ( event ) {
+			inputType = event.nativeEvent.inputType;
+		}
+
+		// The browser formatted something or tried to insert HTML.
+		// Overwrite it. It will be handled later by the format library if
+		// needed.
+		if ( inputType && (
+			inputType.indexOf( 'format' ) === 0 ||
+			INSERTION_INPUT_TYPES_TO_IGNORE.has( inputType )
+		) ) {
+			this.applyRecord( this.record );
+			return;
 		}
 
 		const value = this.createRecord();
@@ -358,7 +350,22 @@ class RichText extends Component {
 
 		this.onChange( change, { withoutHistory: true } );
 
-		const { __unstableInputRule: inputRule, formatTypes } = this.props;
+		const {
+			__unstableInputRule: inputRule,
+			__unstableMarkAutomaticChange: markAutomaticChange,
+			formatTypes,
+			setTimeout,
+			clearTimeout,
+		} = this.props;
+
+		// Create an undo level when input stops for over a second.
+		clearTimeout( this.onInput.timeout );
+		this.onInput.timeout = setTimeout( this.onCreateUndoLevel, 1000 );
+
+		// Only run input rules when inserting text.
+		if ( inputType !== 'insertText' ) {
+			return;
+		}
 
 		if ( inputRule ) {
 			inputRule( change, this.valueToFormat );
@@ -375,11 +382,8 @@ class RichText extends Component {
 		if ( transformed !== change ) {
 			this.onCreateUndoLevel();
 			this.onChange( { ...transformed, activeFormats } );
+			markAutomaticChange();
 		}
-
-		// Create an undo level when input stops for over a second.
-		this.props.clearTimeout( this.onInput.timeout );
-		this.onInput.timeout = this.props.setTimeout( this.onCreateUndoLevel, 1000 );
 	}
 
 	onCompositionEnd() {
@@ -391,9 +395,11 @@ class RichText extends Component {
 	}
 
 	/**
-	 * Handles the `selectionchange` event: sync the selection to local state.
+	 * Syncs the selection to local state. A callback for the `selectionchange`
+	 * native events, `keyup`, `mouseup` and `touchend` synthetic events, and
+	 * animation frames after the `focus` event.
 	 *
-	 * @param {Event} event `selectionchange` event.
+	 * @param {Event|SyntheticEvent|DOMHighResTimeStamp} event
 	 */
 	onSelectionChange( event ) {
 		if (
@@ -403,44 +409,55 @@ class RichText extends Component {
 			return;
 		}
 
+		// In case of a keyboard event, ignore selection changes during
+		// composition.
+		if (
+			event.nativeEvent &&
+			event.nativeEvent.isComposing
+		) {
+			return;
+		}
+
 		const { start, end } = this.createRecord();
-		const value = this.getRecord();
+		const value = this.record;
 
-		if ( start !== value.start || end !== value.end ) {
-			const {
-				__unstableIsCaretWithinFormattedText: isCaretWithinFormattedText,
-				__unstableOnEnterFormattedText: onEnterFormattedText,
-				__unstableOnExitFormattedText: onExitFormattedText,
-			} = this.props;
-			const newValue = {
-				...value,
-				start,
-				end,
-				// Allow `getActiveFormats` to get new `activeFormats`.
-				activeFormats: undefined,
-			};
+		if ( start === value.start && end === value.end ) {
+			return;
+		}
 
-			const activeFormats = getActiveFormats( newValue );
+		const {
+			__unstableIsCaretWithinFormattedText: isCaretWithinFormattedText,
+			__unstableOnEnterFormattedText: onEnterFormattedText,
+			__unstableOnExitFormattedText: onExitFormattedText,
+		} = this.props;
+		const newValue = {
+			...value,
+			start,
+			end,
+			// Allow `getActiveFormats` to get new `activeFormats`.
+			activeFormats: undefined,
+		};
 
-			// Update the value with the new active formats.
-			newValue.activeFormats = activeFormats;
+		const activeFormats = getActiveFormats( newValue );
 
-			if ( ! isCaretWithinFormattedText && activeFormats.length ) {
-				onEnterFormattedText();
-			} else if ( isCaretWithinFormattedText && ! activeFormats.length ) {
-				onExitFormattedText();
-			}
+		// Update the value with the new active formats.
+		newValue.activeFormats = activeFormats;
 
-			// It is important that the internal value is updated first,
-			// otherwise the value will be wrong on render!
-			this.record = newValue;
-			this.applyRecord( newValue, { domOnly: true } );
-			this.props.onSelectionChange( start, end );
-			this.setState( { activeFormats } );
+		if ( ! isCaretWithinFormattedText && activeFormats.length ) {
+			onEnterFormattedText();
+		} else if ( isCaretWithinFormattedText && ! activeFormats.length ) {
+			onExitFormattedText();
+		}
 
-			if ( activeFormats.length > 0 ) {
-				this.recalculateBoundaryStyle();
-			}
+		// It is important that the internal value is updated first,
+		// otherwise the value will be wrong on render!
+		this.record = newValue;
+		this.applyRecord( newValue, { domOnly: true } );
+		this.props.onSelectionChange( start, end );
+		this.setState( { activeFormats } );
+
+		if ( activeFormats.length > 0 ) {
+			this.recalculateBoundaryStyle();
 		}
 	}
 
@@ -505,112 +522,119 @@ class RichText extends Component {
 	}
 
 	/**
-	 * Handles a delete keyDown event to handle merge or removal for collapsed
-	 * selection where caret is at directional edge: forward for a delete key,
-	 * reverse for a backspace key.
+	 * Handles delete on keydown:
+	 * - outdent list items,
+	 * - delete content if everything is selected,
+	 * - trigger the onDelete prop when selection is uncollapsed and at an edge.
 	 *
-	 * @see https://en.wikipedia.org/wiki/Caret_navigation
-	 *
-	 * @param {KeyboardEvent} event Keydown event.
+	 * @param {SyntheticEvent} event A synthetic keyboard event.
 	 */
-	onDeleteKeyDown( event ) {
-		const { onDelete } = this.props;
-
-		if ( ! onDelete ) {
-			return;
-		}
-
+	handleDelete( event ) {
 		const { keyCode } = event;
-		const isReverse = keyCode === BACKSPACE;
-		const record = this.createRecord();
 
-		// Only process delete if the key press occurs at uncollapsed edge.
-		if ( ! isCollapsed( record ) ) {
+		if ( keyCode !== DELETE && keyCode !== BACKSPACE && keyCode !== ESCAPE ) {
 			return;
 		}
 
-		// It is important to consider emptiness because an empty container
-		// will include a padding BR node _after_ the caret, so in a forward
-		// deletion the isHorizontalEdge function will incorrectly interpret the
-		// presence of the BR node as not being at the edge.
-		const isEdge = ( isEmpty( record ) || isHorizontalEdge( this.editableRef, isReverse ) );
+		if ( this.props.__unstableDidAutomaticChange ) {
+			event.preventDefault();
+			this.props.__unstableUndo();
+			return;
+		}
 
-		if ( ! isEdge ) {
+		if ( keyCode === ESCAPE ) {
+			return;
+		}
+
+		const { onDelete, __unstableMultilineTag: multilineTag } = this.props;
+		const { activeFormats = [] } = this.state;
+		const value = this.createRecord();
+		const { start, end, text } = value;
+		const isReverse = keyCode === BACKSPACE;
+
+		if ( multilineTag ) {
+			const newValue = removeLineSeparator( value, isReverse );
+			if ( newValue ) {
+				this.onChange( newValue );
+				event.preventDefault();
+			}
+		}
+
+		// Always handle full content deletion ourselves.
+		if ( start === 0 && end !== 0 && end === text.length ) {
+			this.onChange( remove( value ) );
+			event.preventDefault();
+			return;
+		}
+
+		// Only process delete if the key press occurs at an uncollapsed edge.
+		if (
+			! onDelete ||
+			! isCollapsed( value ) ||
+			activeFormats.length ||
+			( isReverse && start !== 0 ) ||
+			( ! isReverse && end !== text.length )
+		) {
+			return;
+		}
+
+		onDelete( { isReverse, value } );
+		event.preventDefault();
+	}
+
+	/**
+	 * Triggers the `onEnter` prop on keydown.
+	 *
+	 * @param {SyntheticEvent} event A synthetic keyboard event.
+	 */
+	handleEnter( event ) {
+		if ( event.keyCode !== ENTER ) {
 			return;
 		}
 
 		event.preventDefault();
 
-		if ( onDelete ) {
-			onDelete( { isReverse, value: record } );
+		const { onEnter } = this.props;
+
+		if ( ! onEnter ) {
+			return;
 		}
+
+		onEnter( {
+			value: this.removeEditorOnlyFormats( this.createRecord() ),
+			onChange: this.onChange,
+			shiftKey: event.shiftKey,
+		} );
 	}
 
 	/**
-	 * Handles a keydown event.
+	 * Indents list items on space keydown.
 	 *
 	 * @param {SyntheticEvent} event A synthetic keyboard event.
 	 */
-	onKeyDown( event ) {
-		const { keyCode, shiftKey, altKey, metaKey, ctrlKey } = event;
-		const { onEnter } = this.props;
+	handleSpace( event ) {
+		const { tagName, __unstableMultilineTag: multilineTag } = this.props;
 
-		if (
-			// Only override left and right keys without modifiers pressed.
-			! shiftKey && ! altKey && ! metaKey && ! ctrlKey &&
-			( keyCode === LEFT || keyCode === RIGHT )
-		) {
-			this.handleHorizontalNavigation( event );
+		if ( event.keyCode !== SPACE || multilineTag !== 'li' ) {
+			return;
 		}
 
-		// Use the space key in list items (at the start of an item) to indent
-		// the list item.
-		if ( keyCode === SPACE && this.multilineTag === 'li' ) {
-			const value = this.createRecord();
+		const value = this.createRecord();
 
-			if ( isCollapsed( value ) ) {
-				const { text, start } = value;
-				const characterBefore = text[ start - 1 ];
-
-				// The caret must be at the start of a line.
-				if ( ! characterBefore || characterBefore === LINE_SEPARATOR ) {
-					this.onChange( indentListItems( value, { type: this.props.tagName } ) );
-					event.preventDefault();
-				}
-			}
+		if ( ! isCollapsed( value ) ) {
+			return;
 		}
 
-		if ( keyCode === DELETE || keyCode === BACKSPACE ) {
-			const value = this.createRecord();
-			const { start, end } = value;
+		const { text, start } = value;
+		const characterBefore = text[ start - 1 ];
 
-			// Always handle full content deletion ourselves.
-			if ( start === 0 && end !== 0 && end === value.text.length ) {
-				this.onChange( remove( value ) );
-				event.preventDefault();
-				return;
-			}
-
-			if ( this.multilineTag ) {
-				const newValue = removeLineSeparator( value, keyCode === BACKSPACE );
-				if ( newValue ) {
-					this.onChange( newValue );
-					event.preventDefault();
-				}
-			}
-
-			this.onDeleteKeyDown( event );
-		} else if ( keyCode === ENTER ) {
-			event.preventDefault();
-
-			if ( onEnter ) {
-				onEnter( {
-					value: this.removeEditorOnlyFormats( this.createRecord() ),
-					onChange: this.onChange,
-					shiftKey: event.shiftKey,
-				} );
-			}
+		// The caret must be at the start of a line.
+		if ( characterBefore && characterBefore !== LINE_SEPARATOR ) {
+			return;
 		}
+
+		this.onChange( indentListItems( value, { type: tagName } ) );
+		event.preventDefault();
 	}
 
 	/**
@@ -621,7 +645,17 @@ class RichText extends Component {
 	 * @param  {SyntheticEvent} event A synthetic keyboard event.
 	 */
 	handleHorizontalNavigation( event ) {
-		const value = this.getRecord();
+		const { keyCode, shiftKey, altKey, metaKey, ctrlKey } = event;
+
+		if (
+			// Only override left and right keys without modifiers pressed.
+			shiftKey || altKey || metaKey || ctrlKey ||
+			( keyCode !== LEFT && keyCode !== RIGHT )
+		) {
+			return;
+		}
+
+		const value = this.record;
 		const { text, formats, start, end, activeFormats = [] } = value;
 		const collapsed = isCollapsed( value );
 		// To do: ideally, we should look at visual position instead.
@@ -695,7 +729,7 @@ class RichText extends Component {
 			return;
 		}
 
-		const newPos = value.start + ( isReverse ? -1 : 1 );
+		const newPos = start + ( isReverse ? -1 : 1 );
 		const newActiveFormats = isReverse ? formatsBefore : formatsAfter;
 		const newValue = {
 			...value,
@@ -809,26 +843,30 @@ class RichText extends Component {
 	 * @return {Object} An internal rich-text value.
 	 */
 	formatToValue( value ) {
-		if ( this.props.format === 'string' ) {
-			const prepare = createPrepareEditableTree( this.props, 'format_value_functions' );
+		const { format, __unstableMultilineTag: multilineTag } = this.props;
 
-			value = create( {
-				html: value,
-				multilineTag: this.multilineTag,
-				multilineWrapperTags: this.multilineWrapperTags,
-			} );
-			value.formats = prepare( value );
-
+		if ( format !== 'string' ) {
 			return value;
 		}
+
+		const prepare = createPrepareEditableTree( this.props, 'format_value_functions' );
+
+		value = create( {
+			html: value,
+			multilineTag,
+			multilineWrapperTags: multilineTag === 'li' ? [ 'ul', 'ol' ] : undefined,
+		} );
+		value.formats = prepare( value );
 
 		return value;
 	}
 
 	valueToEditableHTML( value ) {
+		const { __unstableMultilineTag: multilineTag } = this.props;
+
 		return toDom( {
 			value,
-			multilineTag: this.multilineTag,
+			multilineTag,
 			prepareEditableTree: createPrepareEditableTree( this.props, 'format_prepare_functions' ),
 			placeholder: this.props.placeholder,
 		} ).body.innerHTML;
@@ -861,106 +899,84 @@ class RichText extends Component {
 	 * @return {*} The external data format, data type depends on props.
 	 */
 	valueToFormat( value ) {
+		const { format, __unstableMultilineTag: multilineTag } = this.props;
+
 		value = this.removeEditorOnlyFormats( value );
 
-		if ( this.props.format === 'string' ) {
-			return toHTMLString( {
-				value,
-				multilineTag: this.multilineTag,
-			} );
+		if ( format !== 'string' ) {
+			return;
 		}
 
-		return value;
+		return toHTMLString( { value, multilineTag } );
 	}
 
-	render() {
+	Editable( props ) {
 		const {
 			tagName: Tagname = 'div',
 			style,
-			wrapperClassName,
 			className,
 			placeholder,
-			__unstableIsSelected: isSelected,
-			children,
-			// To do: move autocompletion logic to rich-text.
-			__unstableAutocompleters: autocompleters,
-			__unstableAutocomplete: Autocomplete = ( { children: ch } ) => ch( {} ),
-			__unstableOnReplace: onReplace,
-			allowedFormats,
-			withoutInteractiveFormatting,
 		} = this.props;
-
 		// Generating a key that includes `tagName` ensures that if the tag
 		// changes, we replace the relevant element. This is needed because we
 		// prevent Editable component updates.
 		const key = Tagname;
-		const ariaProps = pickAriaProps( this.props );
-		const record = this.getRecord();
 
-		const autoCompleteContent = ( { listBoxId, activeId } ) => (
+		return (
+			<Editable
+				{ ...props }
+				tagName={ Tagname }
+				style={ style }
+				record={ this.record }
+				valueToEditableHTML={ this.valueToEditableHTML }
+				aria-label={ placeholder }
+				{ ...pickAriaProps( this.props ) }
+				className={ classnames( 'rich-text', className ) }
+				key={ key }
+				onPaste={ this.onPaste }
+				onInput={ this.onInput }
+				onCompositionEnd={ this.onCompositionEnd }
+				onKeyDown={ this.onKeyDown }
+				onFocus={ this.onFocus }
+				onBlur={ this.onBlur }
+				onMouseDown={ this.onPointerDown }
+				onTouchStart={ this.onPointerDown }
+				setRef={ this.setRef }
+				// Selection updates must be done at these events as they
+				// happen before the `selectionchange` event. In some cases,
+				// the `selectionchange` event may not even fire, for
+				// example when the window receives focus again on click.
+				onKeyUp={ this.onSelectionChange }
+				onMouseUp={ this.onSelectionChange }
+				onTouchEnd={ this.onSelectionChange }
+			/>
+		);
+	}
+
+	render() {
+		const {
+			__unstableIsSelected: isSelected,
+			children,
+			allowedFormats,
+			withoutInteractiveFormatting,
+		} = this.props;
+
+		return (
 			<>
-				<Editable
-					tagName={ Tagname }
-					style={ style }
-					record={ record }
-					valueToEditableHTML={ this.valueToEditableHTML }
-					aria-label={ placeholder }
-					aria-autocomplete={ listBoxId ? 'list' : undefined }
-					aria-owns={ listBoxId }
-					aria-activedescendant={ activeId }
-					{ ...ariaProps }
-					className={ classnames( 'rich-text', className ) }
-					key={ key }
-					onPaste={ this.onPaste }
-					onInput={ this.onInput }
-					onCompositionEnd={ this.onCompositionEnd }
-					onKeyDown={ this.onKeyDown }
-					onFocus={ this.onFocus }
-					onBlur={ this.onBlur }
-					onMouseDown={ this.onPointerDown }
-					onTouchStart={ this.onPointerDown }
-					setRef={ this.setRef }
-					// Selection updates must be done at these events as they
-					// happen before the `selectionchange` event. In some cases,
-					// the `selectionchange` event may not even fire, for
-					// example when the window receives focus again on click.
-					onKeyUp={ this.onSelectionChange }
-					onMouseUp={ this.onSelectionChange }
-					onTouchEnd={ this.onSelectionChange }
-				/>
 				{ isSelected && <FormatEdit
 					allowedFormats={ allowedFormats }
 					withoutInteractiveFormatting={ withoutInteractiveFormatting }
-					value={ record }
+					value={ this.record }
 					onChange={ this.onChange }
 				/> }
-			</>
-		);
-
-		const content = (
-			<Autocomplete
-				onReplace={ onReplace }
-				completers={ autocompleters }
-				record={ record }
-				onChange={ this.onChange }
-			>
-				{ autoCompleteContent }
-			</Autocomplete>
-		);
-
-		if ( ! children ) {
-			return content;
-		}
-
-		return (
-			<div className={ wrapperClassName }>
-				{ children( {
+				{ children && children( {
 					isSelected,
-					value: record,
+					value: this.record,
 					onChange: this.onChange,
+					Editable: this.Editable,
 				} ) }
-				{ content }
-			</div>
+				{ ! children && <this.Editable /> }
+			</>
 		);
 	}
 }

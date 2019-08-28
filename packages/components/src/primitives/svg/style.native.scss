@@ -15,12 +15,22 @@
 	fill: currentColor;
 }
 
-.unsupported-icon {
+.unsupported-icon-light {
 	color: $gray-dark;
 	fill: currentColor;
 }
 
-.warning-icon {
+.unsupported-icon-dark {
+	color: $white;
+	fill: currentColor;
+}
+
+.warning-icon-light {
 	color: $gray-dark;
+	fill: currentColor;
+}
+
+.warning-icon-dark {
+	color: $white;
 	fill: currentColor;
 }

@@ -1,5 +1,9 @@
 ## Master
 
+### Breaking Changes
+
+- Test files matching has changed to fix the overlap between two types of tests implemented with `test-e2e` and `test-unit`. Refer to the documentation of the corresponding scripts to learn about new file discovery rules.
+
 ### New Features
 
 - The bundled `puppeteer` dependency has been updated from requiring `1.6.1` to requiring `^1.19.0` ([#16875](https://github.com/WordPress/gutenberg/pull/16875)). It uses Chromium v77 instead of Chromium v69.

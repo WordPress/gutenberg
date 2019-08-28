@@ -2,7 +2,7 @@
  * External dependencies
  */
 import React from 'react';
-import { View, TextInput, TouchableWithoutFeedback, Text } from 'react-native';
+import { View, TouchableWithoutFeedback, Text } from 'react-native';
 /**
  * Internal dependencies
  */
@@ -20,12 +20,15 @@ import {
 	Icon,
 	Toolbar,
 	ToolbarButton,
+	withTheme,
+	useStyle,
 } from '@wordpress/components';
+
 import {
+	Caption,
 	MediaPlaceholder,
 	MediaUpload,
 	MEDIA_TYPE_VIDEO,
-	RichText,
 	BlockControls,
 	InspectorControls,
 } from '@wordpress/block-editor';
@@ -48,6 +51,7 @@ class VideoEdit extends React.Component {
 		super( props );
 
 		this.state = {
+			isCaptionSelected: false,
 			showSettings: false,
 			videoContainerHeight: 0,
 		};
@@ -59,6 +63,7 @@ class VideoEdit extends React.Component {
 		this.updateMediaProgress = this.updateMediaProgress.bind( this );
 		this.onVideoPressed = this.onVideoPressed.bind( this );
 		this.onVideoContanerLayout = this.onVideoContanerLayout.bind( this );
+		this.onFocusCaption = this.onFocusCaption.bind( this );
 	}
 
 	componentDidMount() {
@@ -75,6 +80,14 @@ class VideoEdit extends React.Component {
 		}
 	}
 
+	static getDerivedStateFromProps( props, state ) {
+		// Avoid a UI flicker in the toolbar by insuring that isCaptionSelected
+		// is updated immediately any time the isSelected prop becomes false
+		return {
+			isCaptionSelected: props.isSelected && state.isCaptionSelected,
+		};
+	}
+
 	onVideoPressed() {
 		const { attributes } = this.props;
 
@@ -82,6 +95,16 @@ class VideoEdit extends React.Component {
 			requestImageUploadCancelDialog( attributes.id );
 		} else if ( attributes.id && ! isURL( attributes.src ) ) {
 			requestImageFailedRetryDialog( attributes.id );
+		}
+
+		this.setState( {
+			isCaptionSelected: false,
+		} );
+	}
+
+	onFocusCaption() {
+		if ( ! this.state.isCaptionSelected ) {
+			this.setState( { isCaptionSelected: true } );
 		}
 	}
 
@@ -127,16 +150,18 @@ class VideoEdit extends React.Component {
 	}
 
 	getIcon( isRetryIcon, isMediaPlaceholder ) {
+		const iconStyle = useStyle( style.icon, style.iconDark, this.props.theme );
+
 		if ( isRetryIcon ) {
 			return <Icon icon={ SvgIconRetry } { ...style.icon } />;
 		}
 
-		return <Icon icon={ SvgIcon } { ...( ! isMediaPlaceholder ? style.iconUploading : style.icon ) } />;
+		return <Icon icon={ SvgIcon } { ...( ! isMediaPlaceholder ? style.iconUploading : iconStyle ) } />;
 	}
 
 	render() {
-		const { attributes, isSelected, setAttributes } = this.props;
-		const { caption, id, src } = attributes;
+		const { attributes, isSelected } = this.props;
+		const { id, src } = attributes;
 		const { videoContainerHeight } = this.state;
 
 		const toolbarEditButton = (
@@ -173,9 +198,10 @@ class VideoEdit extends React.Component {
 		return (
 			<TouchableWithoutFeedback onPress={ this.onVideoPressed } disabled={ ! isSelected }>
 				<View style={ { flex: 1 } }>
-					<BlockControls>
-						{ toolbarEditButton }
-					</BlockControls>
+					{ ! this.state.isCaptionSelected &&
+						<BlockControls>
+							{ toolbarEditButton }
+						</BlockControls> }
 					<InspectorControls>
 						{ false && <ToolbarButton //Not rendering settings button until it has an action
 							label={ __( 'Video Settings' ) }
@@ -212,7 +238,7 @@ class VideoEdit extends React.Component {
 									{ showVideo &&
 										<View style={ style.videoContainer }>
 											<Video
-												isSelected={ isSelected }
+												isSelected={ isSelected && ! this.state.isCaptionSelected }
 												style={ videoStyle }
 												source={ { uri: src } }
 												paused={ true }
@@ -229,24 +255,16 @@ class VideoEdit extends React.Component {
 							);
 						} }
 					/>
-					{ ( ! RichText.isEmpty( caption ) > 0 || isSelected ) && (
-						<View style={ { paddingTop: 8, paddingBottom: 0, flex: 1 } }>
-							<TextInput
-								style={ { textAlign: 'center' } }
-								fontFamily={ this.props.fontFamily || ( style[ 'caption-text' ].fontFamily ) }
-								underlineColorAndroid="transparent"
-								value={ caption }
-								placeholder={ __( 'Write caption…' ) }
-								placeholderTextColor={ style.captionPlaceholder.color }
-								onChangeText={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
-								onFocus={ this.props.onFocus }
-							/>
-						</View>
-					) }
+					<Caption
+						clientId={ this.props.clientId }
+						isSelected={ this.state.isCaptionSelected }
+						onFocus={ this.onFocusCaption }
+						onBlur={ this.props.onBlur } // always assign onBlur as props
+					/>
 				</View>
 			</TouchableWithoutFeedback>
 		);
 	}
 }
 
-export default VideoEdit;
+export default withTheme( VideoEdit );
