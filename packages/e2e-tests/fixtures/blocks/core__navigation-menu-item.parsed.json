@@ -6,9 +6,9 @@
             "destination": "https://wordpress.org/"
         },
         "innerBlocks": [],
-        "innerHTML": "\n<a class=\"wp-block-navigation-menu-item\" href=\"https://wordpress.org/\">WordPress</a>\n",
+        "innerHTML": "\n",
         "innerContent": [
-            "\n<a class=\"wp-block-navigation-menu-item\" href=\"https://wordpress.org/\">WordPress</a>\n"
+            "\n"
         ]
     },
     {
