@@ -15,17 +15,26 @@
 	background-position: center center;
 	background-repeat: no-repeat;
 	margin-right: $grid-size;
-	padding: 6px;
+	transition: transform 0.1s ease;
 
 	a {
+		padding: 6px;
 		display: block;
 		line-height: 0;
+		transition: transform 0.1s ease;
 	}
 
 	a,
+	a:hover,
+	a:active,
+	a:visited,
 	svg {
 		color: currentColor;
 		fill: currentColor;
+	}
+
+	&:hover {
+		transform: scale(1.1);
 	}
 }
 
@@ -406,6 +415,9 @@
 .wp-block-social-links.is-style-pill-shape {
 	.wp-social-link {
 		width: auto;
+	}
+
+	.wp-social-link a {
 		padding-left: 16px;
 		padding-right: 16px;
 	}
