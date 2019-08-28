@@ -8,9 +8,7 @@
 		word-break: normal;
 	}
 
-	caption {
-		caption-side: bottom;
-		margin-top: 0.5em;
+	figcaption {
 		@include caption-style-theme();
 	}
 }
