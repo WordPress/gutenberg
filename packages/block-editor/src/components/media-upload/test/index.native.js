@@ -67,9 +67,9 @@ describe( 'MediaUpload component', () => {
 	} );
 
 	const expectMediaPickerForOption = ( option, requestFunction ) => {
-		requestFunction.mockImplementation( ( mediaTypes, callback ) => {
+		requestFunction.mockImplementation( ( mediaTypes, multiple, callback ) => {
 			expect( mediaTypes[ 0 ] ).toEqual( MEDIA_TYPE_VIDEO );
-			callback( MEDIA_ID, MEDIA_URL );
+			callback( { id: MEDIA_ID, url: MEDIA_URL } );
 		} );
 
 		const onSelect = jest.fn();
@@ -106,4 +106,6 @@ describe( 'MediaUpload component', () => {
 	it( 'can select media by capturig', () => {
 		expectMediaPickerForOption( MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_TAKE_MEDIA, requestMediaPickFromDeviceCamera );
 	} );
+
+	//TODO add case with multiple = true
 } );
