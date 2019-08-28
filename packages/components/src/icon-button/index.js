@@ -56,7 +56,7 @@ function IconButton( props, ref ) {
 			className={ classes }
 			ref={ ref }
 		>
-			<Icon icon={ icon } ariaPressed={ ariaPressed } />
+			<Icon icon={ icon } ariaPressed={ ariaPressed } className={ classes } />
 			{ children }
 		</Button>
 	);

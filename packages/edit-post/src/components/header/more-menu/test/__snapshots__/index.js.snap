@@ -75,16 +75,18 @@ exports[`MoreMenu should match snapshot 1`] = `
                 type="button"
               >
                 <Icon
+                  className="components-icon-button components-dropdown-menu__toggle"
                   icon="ellipsis"
                   key="0,0"
                 >
                   <Dashicon
+                    className="components-icon-button components-dropdown-menu__toggle"
                     icon="ellipsis"
                     size={20}
                   >
                     <SVG
                       aria-hidden={true}
-                      className="dashicon dashicons-ellipsis"
+                      className="dashicon dashicons-ellipsis components-icon-button components-dropdown-menu__toggle"
                       focusable="false"
                       height={20}
                       role="img"
@@ -94,7 +96,7 @@ exports[`MoreMenu should match snapshot 1`] = `
                     >
                       <svg
                         aria-hidden="true"
-                        className="dashicon dashicons-ellipsis"
+                        className="dashicon dashicons-ellipsis components-icon-button components-dropdown-menu__toggle"
                         focusable="false"
                         height={20}
                         role="img"

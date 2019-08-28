@@ -23,7 +23,7 @@ exports[`PluginMoreMenuItem renders menu item as button properly 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="dashicon dashicons-smiley"
+        className="dashicon dashicons-smiley components-icon-button components-menu-item__button has-icon has-text"
         focusable="false"
         height={20}
         role="img"
