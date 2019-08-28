@@ -3,15 +3,13 @@
  */
 import {
 	AmazonIcon,
-	//AppleIcon,
 	BandcampIcon,
 	BehanceIcon,
 	ChainIcon,
 	CodepenIcon,
 	DeviantartIcon,
-	//DiggIcon,
 	DribbbleIcon,
-	//DropboxIcon,
+	DropboxIcon,
 	EtsyIcon,
 	FacebookIcon,
 	FeedIcon,
@@ -19,31 +17,29 @@ import {
 	FlickrIcon,
 	FoursquareIcon,
 	GoodreadsIcon,
-	//GoogleIcon,
+	GoogleIcon,
 	GithubIcon,
 	InstagramIcon,
 	LastfmIcon,
 	LinkedinIcon,
 	MailIcon,
 	MastodonIcon,
-	//MeetupIcon,
+	MeetupIcon,
 	MediumIcon,
 	PinterestIcon,
 	PocketIcon,
 	RedditIcon,
 	SkypeIcon,
-	//SlideshareIcon,
 	SnapchatIcon,
 	SoundcloudIcon,
 	SpotifyIcon,
-	//StumbleuponIcon,
 	TumblrIcon,
 	TwitchIcon,
 	TwitterIcon,
 	VimeoIcon,
 	VkIcon,
 	WordPressIcon,
-	//YelpIcon,
+	YelpIcon,
 	YoutubeIcon,
 } from './icons';
 
@@ -56,10 +52,6 @@ const socialList = {
 		name: 'Amazon',
 		icon: AmazonIcon,
 	},
-	/*apple: {
-		name: 'Apple',
-		icon: AppleIcon,
-	},*/
 	bandcamp: {
 		name: 'Bandcamp',
 		icon: BandcampIcon,
@@ -80,18 +72,14 @@ const socialList = {
 		name: 'DeviantArt',
 		icon: DeviantartIcon,
 	},
-	/*digg: {
-		name: 'Digg',
-		icon: DiggIcon,
-	},*/
 	dribbble: {
 		name: 'Dribbble',
 		icon: DribbbleIcon,
 	},
-	/*dropbox: {
+	dropbox: {
 		name: 'Dropbox',
 		icon: DropboxIcon,
-	},*/
+	},
 	etsy: {
 		name: 'Etsy',
 		icon: EtsyIcon,
@@ -116,10 +104,10 @@ const socialList = {
 		name: 'Goodreads',
 		icon: GoodreadsIcon,
 	},
-	/*google: {
+	google: {
 		name: 'Google',
 		icon: GoogleIcon,
-	},*/
+	},
 	github: {
 		name: 'Github',
 		icon: GithubIcon,
@@ -144,10 +132,10 @@ const socialList = {
 		name: 'Mastodon',
 		icon: MastodonIcon,
 	},
-	/*meetup: {
+	meetup: {
 		name: 'Meetup',
 		icon: MeetupIcon,
-	},*/
+	},
 	medium: {
 		name: 'Medium',
 		icon: MediumIcon,
@@ -168,10 +156,6 @@ const socialList = {
 		name: 'Skype',
 		icon: SkypeIcon,
 	},
-	/*slideshare: {
-		name: 'Slideshare',
-		icon: SlideshareIcon,
-	},*/
 	snapchat: {
 		name: 'Snapchat',
 		icon: SnapchatIcon,
@@ -184,10 +168,6 @@ const socialList = {
 		name: 'Spotify',
 		icon: SpotifyIcon,
 	},
-	/*stumbleupon: {
-		name: 'Stumbleupon',
-		icon: StumbleuponIcon,
-	},*/
 	tumblr: {
 		name: 'Tumblr',
 		icon: TumblrIcon,
@@ -212,10 +192,10 @@ const socialList = {
 		name: 'WordPress',
 		icon: WordPressIcon,
 	},
-	/*yelp: {
+	yelp: {
 		name: 'Yelp',
 		icon: YelpIcon,
-	},*/
+	},
 	youtube: {
 		name: 'YouTube',
 		icon: YoutubeIcon,
