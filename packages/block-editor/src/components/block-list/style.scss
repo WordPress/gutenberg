@@ -860,6 +860,7 @@
 
 	// Show a clickable plus.
 	.block-editor-inserter__toggle {
+		pointer-events: none;
 		margin-top: -8px;
 		border-radius: 50%;
 		color: $blue-medium-focus;
@@ -879,7 +880,17 @@
 
 	&:hover,
 	&.is-visible {
-		opacity: 1;
+		// Only show this inserter after a delay.
+		animation: block-editor-block-list__insertion-point-inserter-fade-in 0.2s ease-out 0.75s;
+		animation-fill-mode: forwards;
+		@include reduce-motion("animation");
+
+		// Do not enable pointer events on the button until after the parent animates.
+		.block-editor-inserter__toggle {
+			animation: block-editor-block-list__insertion-point-inserter-toggle-pointer-events 0.2s ease-out 0.75s;
+			animation-fill-mode: forwards;
+			@include reduce-motion("animation");
+		}
 	}
 }
 
@@ -893,9 +904,37 @@
 
 		&:hover,
 		&.is-visible {
-			opacity: 1;
+			// Only show this inserter after a delay.
+			animation: block-editor-block-list__insertion-point-inserter-fade-in 0.2s ease-out 0.5s;
+			animation-fill-mode: forwards;
+			@include reduce-motion("animation");
 			pointer-events: auto;
+
+			// Do not enable pointer events on the button until after the parent animates.
+			.block-editor-inserter__toggle {
+				animation: block-editor-block-list__insertion-point-inserter-toggle-pointer-events 0.2s ease-out 0.5s;
+				animation-fill-mode: forwards;
+				@include reduce-motion("animation");
+			}
 		}
+	}
+}
+
+@keyframes block-editor-block-list__insertion-point-inserter-fade-in {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+@keyframes block-editor-block-list__insertion-point-inserter-toggle-pointer-events {
+	from {
+		pointer-events: none;
+	}
+	to {
+		pointer-events: auto;
 	}
 }
 
