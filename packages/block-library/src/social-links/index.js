@@ -20,7 +20,8 @@ export const settings = {
 	description: __( 'Create a block of links to your social media or external sites' ),
 	styles: [
 		{ name: 'default', label: __( 'Default' ), isDefault: true },
-		{ name: 'icon-only', label: __( 'Icon Only' ) },
+		{ name: 'logos-only', label: __( 'Logos Only' ) },
+		{ name: 'pill-shape', label: __( 'Pill Shape' ) },
 	],
 	edit,
 	save,

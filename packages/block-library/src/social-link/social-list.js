@@ -173,7 +173,7 @@ const socialList = {
 		icon: SlideshareIcon,
 	},*/
 	snapchat: {
-		name: 'Snapshot',
+		name: 'Snapchat',
 		icon: SnapchatIcon,
 	},
 	soundcloud: {
