@@ -488,7 +488,14 @@ export class TableEdit extends Component {
 			clientId,
 		} = this.props;
 		const { initialRowCount, initialColumnCount } = this.state;
-		const { hasFixedLayout, caption, head, body, foot } = attributes;
+		const {
+			hasFixedLayout,
+			caption,
+			head,
+			body,
+			foot,
+			captionId = `wp-block-table-caption-${ clientId }`,
+		} = attributes;
 		const isEmpty = isEmptyTableSection( head ) && isEmptyTableSection( body ) && isEmptyTableSection( foot );
 		const Section = this.renderSection;
 
@@ -527,9 +534,6 @@ export class TableEdit extends Component {
 			'has-fixed-layout': hasFixedLayout,
 			'has-background': !! backgroundColor.color,
 		} );
-
-		// Append the client id to the caption id to ensure no two table block captions can have clashing ids.
-		const captionId = `wp-block-table-caption-${ clientId }`;
 
 		return (
 			<>
@@ -583,7 +587,7 @@ export class TableEdit extends Component {
 					/>
 				</InspectorControls>
 				<figure className={ className }>
-					<table className={ tableClasses }>
+					<table className={ tableClasses } aria-labelledby={ captionId }>
 						<Section name="head" rows={ head } />
 						<Section name="body" rows={ body } />
 						<Section name="foot" rows={ foot } />
