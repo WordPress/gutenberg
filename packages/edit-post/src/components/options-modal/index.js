@@ -23,9 +23,11 @@ import {
  */
 import Section from './section';
 import {
+	EnablePluginDocumentSettingPanelOption,
 	EnablePublishSidebarOption,
 	EnableTipsOption,
 	EnablePanelOption,
+	EnableFeature,
 } from './options';
 import MetaBoxesSection from './meta-boxes-section';
 
@@ -46,8 +48,10 @@ export function OptionsModal( { isModalActive, isViewable, closeModal } ) {
 			<Section title={ __( 'General' ) }>
 				<EnablePublishSidebarOption label={ __( 'Enable Pre-publish Checks' ) } />
 				<EnableTipsOption label={ __( 'Enable Tips' ) } />
+				<EnableFeature feature="showInserterHelpPanel" label={ __( 'Enable Inserter Help Panel' ) } />
 			</Section>
 			<Section title={ __( 'Document Panels' ) }>
+				<EnablePluginDocumentSettingPanelOption.Slot />
 				{ isViewable && (
 					<EnablePanelOption label={ __( 'Permalink' ) } panelName="post-link" />
 				) }

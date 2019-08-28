@@ -68,7 +68,7 @@ export default PluginPostStatusInfo;
 This new Slot is then exposed in the editor. The example below is from core and represents the Status & Visibility panel.
 
 As we can see, the `<PluginPostStatusInfo.Slot>` is wrapping all of the items that will appear in the panel.
-Any items that have been added via the SlotFill ( see the example above ), will be included in the `fills` parameter and be displayed betwee the `<PostAuthor/>` and `<PostTrash/>` components.
+Any items that have been added via the SlotFill ( see the example above ), will be included in the `fills` parameter and be displayed between the `<PostAuthor/>` and `<PostTrash/>` components.
 
 See [core code](https://github.com/WordPress/gutenberg/tree/master/packages/edit-post/src/components/sidebar/post-status/index.js#L26).
 
@@ -99,13 +99,14 @@ function PostStatus( { isOpened, onTogglePanel } ) {
 
 There are currently seven available SlotFills in the `edit-post` package. Please refer to the individual items below for usage and example details:
 
-* [PluginBlockSettingsMenuItem](./plugin-block-settings-menu-item.md)
-* [PluginMoreMenuItem](./plugin-more-menu-item.md)
-* [PluginPostPublishPanel](./plugin-post-publish-panel.md)
-* [PluginPostStatusInfo](./plugin-post-status-info.md)
-* [PluginPrePublishPanel](./plugin-pre-publish-panel.md)
-* [PluginSidebar](./plugin-sidebar.md)
-* [PluginSidebarMoreMenuItem](./plugin-sidebar-more-menu-item.md)
+* [PluginBlockSettingsMenuItem](/docs/designers-developers/developers/slotfills/plugin-block-settings-menu-item.md)
+* [PluginDocumentSettingPanel](/docs/designers-developers/developers/slotfills/plugin-document-setting-panel.md)
+* [PluginMoreMenuItem](/docs/designers-developers/developers/slotfills/plugin-more-menu-item.md)
+* [PluginPostPublishPanel](/docs/designers-developers/developers/slotfills/plugin-post-publish-panel.md)
+* [PluginPostStatusInfo](/docs/designers-developers/developers/slotfills/plugin-post-status-info.md)
+* [PluginPrePublishPanel](/docs/designers-developers/developers/slotfills/plugin-pre-publish-panel.md)
+* [PluginSidebar](/docs/designers-developers/developers/slotfills/plugin-sidebar.md)
+* [PluginSidebarMoreMenuItem](/docs/designers-developers/developers/slotfills/plugin-sidebar-more-menu-item.md)
 
 
 

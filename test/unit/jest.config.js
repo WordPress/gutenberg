@@ -23,5 +23,9 @@ module.exports = {
 		'/packages/e2e-tests',
 		'<rootDir>/.*/build/',
 		'<rootDir>/.*/build-module/',
+		'<rootDir>/.+\.native\.js$',
 	],
+	transform: {
+		'^.+\\.[jt]sx?$': '<rootDir>/test/unit/scripts/babel-transformer.js',
+	},
 };

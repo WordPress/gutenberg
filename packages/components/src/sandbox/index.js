@@ -48,7 +48,7 @@ class Sandbox extends Component {
 		if ( 'string' === typeof data ) {
 			try {
 				data = JSON.parse( data );
-			} catch ( e ) {} // eslint-disable-line no-empty
+			} catch ( e ) {}
 		}
 
 		// Verify that the mounted element is the source of the message

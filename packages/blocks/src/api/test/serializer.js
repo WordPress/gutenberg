@@ -243,6 +243,28 @@ describe( 'block serializer', () => {
 
 			expect( content ).toBe( 'Bananas' );
 		} );
+		it( 'serializes the freeform content fallback block with comment delimiters in nested context', () => {
+			registerBlockType( 'core/freeform-block', {
+				category: 'common',
+				title: 'freeform block',
+				attributes: {
+					fruit: {
+						type: 'string',
+					},
+				},
+				save: ( { attributes } ) => attributes.fruit,
+			} );
+			setFreeformContentHandlerName( 'core/freeform-block' );
+			const block = createBlock( 'core/freeform-block', { fruit: 'Bananas' } );
+
+			const content = serializeBlock( block, { isInnerBlocks: true } );
+
+			expect( content ).toBe(
+				'<!-- wp:freeform-block {\"fruit\":\"Bananas\"} -->\n' +
+				'Bananas\n' +
+				'<!-- /wp:freeform-block -->'
+			);
+		} );
 		it( 'serializes the unregistered fallback block without comment delimiters', () => {
 			registerBlockType( 'core/unregistered-block', {
 				category: 'common',

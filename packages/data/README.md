@@ -131,8 +131,6 @@ The `resolvers` option should be passed as an object where each key is the name 
 
 #### `controls`
 
-_**Note:** Controls are an opt-in feature, enabled via `use` (the [Plugins API](/packages/data/src/plugins/README.md))._
-
 A **control** defines the execution flow behavior associated with a specific action type. This can be particularly useful in implementing asynchronous data flows for your store. By defining your action creator or resolvers as a generator which yields specific controlled action types, the execution will proceed as defined by the control handler.
 
 The `controls` option should be passed as an object where each key is the name of the action type to act upon, the value a function which receives the original action object. It should returns either a promise which is to resolve when evaluation of the action should continue, or a value. The value or resolved promise value is assigned on the return value of the yield assignment. If the control handler returns undefined, the execution is not continued.
@@ -314,11 +312,11 @@ Mark a control as a registry control.
 
 _Parameters_
 
--   _registryControl_ `function`: Function receiving a registry object and returning a control.
+-   _registryControl_ `Function`: Function receiving a registry object and returning a control.
 
 _Returns_
 
--   `function`: marked registry control.
+-   `Function`: marked registry control.
 
 <a name="createRegistrySelector" href="#createRegistrySelector">#</a> **createRegistrySelector**
 
@@ -326,11 +324,11 @@ Mark a selector as a registry selector.
 
 _Parameters_
 
--   _registrySelector_ `function`: Function receiving a registry object and returning a state selector.
+-   _registrySelector_ `Function`: Function receiving a registry object and returning a state selector.
 
 _Returns_
 
--   `function`: marked registry selector.
+-   `Function`: marked registry selector.
 
 <a name="dispatch" href="#dispatch">#</a> **dispatch**
 
@@ -400,7 +398,7 @@ You can read more about the react context api here:
 
 _Usage_
 
-````js
+```js
 const {
   RegistryProvider,
   RegistryConsumer,
@@ -421,6 +419,7 @@ const App = ( { props } ) => {
     </RegistryConsumer>
   </RegistryProvider>
 }
+```
 
 <a name="RegistryProvider" href="#RegistryProvider">#</a> **RegistryProvider**
 
@@ -436,13 +435,13 @@ Given the name of a registered store, returns an object of the store's selectors
 The selector functions are been pre-bound to pass the current state automatically.
 As a consumer, you need only pass arguments of the selector, if applicable.
 
-*Usage*
+_Usage_
 
 ```js
 const { select } = wp.data;
 
 select( 'my-shop' ).getPrice( 'hammer' );
-````
+```
 
 _Parameters_
 
@@ -683,6 +682,10 @@ const SaleButton = withDispatch( ( dispatch, ownProps, { select } ) => {
 //
 //  <SaleButton>Start Sale!</SaleButton>
 ```
+
+_Note:_ It is important that the `mapDispatchToProps` function always
+returns an object with the same keys. For example, it should not contain
+conditions under which a different value would be returned.
 
 _Parameters_
 

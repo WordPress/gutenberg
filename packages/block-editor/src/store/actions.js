@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, first } from 'lodash';
+import { castArray, first, get, includes } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -208,7 +208,7 @@ export function clearSelectedBlock() {
  *
  * @param {boolean} [isSelectionEnabled=true] Whether block selection should
  *                                            be enabled.
-
+ *
  * @return {Object} Action object.
  */
 export function toggleSelection( isSelectionEnabled = true ) {
@@ -216,6 +216,33 @@ export function toggleSelection( isSelectionEnabled = true ) {
 		type: 'TOGGLE_SELECTION',
 		isSelectionEnabled,
 	};
+}
+
+function getBlocksWithDefaultStylesApplied( blocks, blockEditorSettings ) {
+	const preferredStyleVariations = get(
+		blockEditorSettings,
+		[ '__experimentalPreferredStyleVariations', 'value' ],
+		{}
+	);
+	return blocks.map( ( block ) => {
+		const blockName = block.name;
+		if ( ! preferredStyleVariations[ blockName ] ) {
+			return block;
+		}
+		const className = get( block, [ 'attributes', 'className' ] );
+		if ( includes( className, 'is-style-' ) ) {
+			return block;
+		}
+		const { attributes = {} } = block;
+		const blockStyle = preferredStyleVariations[ blockName ];
+		return {
+			...block,
+			attributes: {
+				...attributes,
+				className: `${ ( className || '' ) } is-style-${ blockStyle }`.trim(),
+			},
+		};
+	} );
 }
 
 /**
@@ -227,11 +254,17 @@ export function toggleSelection( isSelectionEnabled = true ) {
  * @param {number}            indexToSelect Index of replacement block to
  *                                          select.
  *
- * @yields {Object} Action object.
+ * @yield {Object} Action object.
  */
 export function* replaceBlocks( clientIds, blocks, indexToSelect ) {
 	clientIds = castArray( clientIds );
-	blocks = castArray( blocks );
+	blocks = getBlocksWithDefaultStylesApplied(
+		castArray( blocks ),
+		yield select(
+			'core/block-editor',
+			'getSettings',
+		)
+	);
 	const rootClientId = yield select(
 		'core/block-editor',
 		'getBlockRootClientId',
@@ -303,7 +336,7 @@ export const moveBlocksUp = createOnMove( 'MOVE_BLOCKS_UP' );
  * @param  {?string} toRootClientId   Root client ID destination.
  * @param  {number}  index            The index to move the block into.
  *
- * @yields {Object} Action object.
+ * @yield {Object} Action object.
  */
 export function* moveBlockToPosition( clientId, fromRootClientId = '', toRootClientId = '', index ) {
 	const templateLock = yield select(
@@ -328,6 +361,12 @@ export function* moveBlockToPosition( clientId, fromRootClientId = '', toRootCli
 	// If moving inside the same root block the move is always possible.
 	if ( fromRootClientId === toRootClientId ) {
 		yield action;
+		return;
+	}
+
+	// If templateLock is insert we can not remove the block from the parent.
+	// Given that here we know that we are moving the block to a different parent, the move should not be possible if the condition is true.
+	if ( templateLock === 'insert' ) {
 		return;
 	}
 
@@ -392,7 +431,13 @@ export function* insertBlocks(
 	rootClientId,
 	updateSelection = true
 ) {
-	blocks = castArray( blocks );
+	blocks = getBlocksWithDefaultStylesApplied(
+		castArray( blocks ),
+		yield select(
+			'core/block-editor',
+			'getSettings',
+		)
+	);
 	const allowedBlocks = [];
 	for ( const block of blocks ) {
 		const isValid = yield select(
@@ -705,3 +750,30 @@ export function __unstableMarkLastChangeAsPersistent() {
 	return { type: 'MARK_LAST_CHANGE_AS_PERSISTENT' };
 }
 
+/**
+ * Returns an action object used in signalling that the last block change is
+ * an automatic change, meaning it was not performed by the user, and can be
+ * undone using the `Escape` and `Backspace` keys. This action must be called
+ * after the change was made, and any actions that are a consequence of it, so
+ * it is recommended to be called at the next idle period to ensure all
+ * selection changes have been recorded.
+ *
+ * @return {Object} Action object.
+ */
+export function __unstableMarkAutomaticChange() {
+	return { type: 'MARK_AUTOMATIC_CHANGE' };
+}
+
+/**
+ * Returns an action object used to enable or disable the navigation mode.
+ *
+ * @param {string} isNavigationMode Enable/Disable navigation mode.
+ *
+ * @return {Object} Action object
+ */
+export function setNavigationMode( isNavigationMode = true ) {
+	return {
+		type: 'SET_NAVIGATION_MODE',
+		isNavigationMode,
+	};
+}

@@ -1,4 +1,4 @@
-## Master
+## 2.0.0 (2019-06-12)
 
 ### Braking Change
 

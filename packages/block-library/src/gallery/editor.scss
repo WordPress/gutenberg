@@ -19,11 +19,11 @@ ul.wp-block-gallery {
 		outline: none;
 	}
 
-	.is-selected {
+	figure.is-selected {
 		outline: 4px solid theme(primary);
 	}
 
-	.is-transient img {
+	figure.is-transient img {
 		opacity: 0.3;
 	}
 
@@ -33,11 +33,6 @@ ul.wp-block-gallery {
 		width: 100%;
 		max-height: 100%;
 		overflow-y: auto;
-	}
-
-	.block-editor-rich-text figcaption:not([data-is-placeholder-visible="true"]) {
-		position: relative;
-		overflow: hidden;
 	}
 
 	.is-selected .block-editor-rich-text {
@@ -65,15 +60,36 @@ ul.wp-block-gallery {
 
 		.components-button {
 			color: $white;
+			padding: 2px;
+			width: $icon-button-size-small;
+			height: $icon-button-size-small;
+
+			// Remove hover/focus box shadows, since they clash with the blue background.
+			&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover,
+			&:focus:not(:disabled) {
+				box-shadow: none;
+			}
+
+			@include break-small() {
+				// Use smaller buttons to fit when there are many columns.
+				.columns-7 &,
+				.columns-8 & {
+					padding: 0;
+					width: inherit;
+					height: inherit;
+				}
+			}
 		}
 
 		.components-button:focus {
 			color: inherit;
 		}
-
 	}
 
 	.block-editor-rich-text figcaption {
+		position: relative;
+		overflow: hidden;
+
 		a {
 			color: $white;
 		}
@@ -82,12 +98,20 @@ ul.wp-block-gallery {
 
 .block-library-gallery-item__move-menu,
 .block-library-gallery-item__inline-menu {
-	padding: 2px;
+	padding: $grid-size-small;
 	display: inline-flex;
 	z-index: z-index(".block-library-gallery-item__inline-menu");
 
 	.components-button {
 		color: transparent;
+	}
+
+	@include break-small() {
+		// Use smaller buttons to fit when there are many columns.
+		.columns-7 &,
+		.columns-8 & {
+			padding: $grid-size-small / 2;
+		}
 	}
 }
 

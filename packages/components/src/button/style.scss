@@ -60,6 +60,7 @@
 			box-shadow: none;
 			text-shadow: 0 1px 0 #fff;
 			transform: none;
+			opacity: 1;
 		}
 	}
 
@@ -90,7 +91,7 @@
 			box-shadow:
 				inset 0 -1px 0 color(theme(button) shade(50%)),
 				0 0 0 1px $white,
-				0 0 0 3px $blue-medium-focus;
+				0 0 0 3px color(theme(button) shade(5%));
 		}
 
 		&:active:enabled {
@@ -101,12 +102,31 @@
 		}
 
 		&:disabled,
-		&[aria-disabled="true"] {
-			color: color(theme(button) tint(30%));
-			background: color(theme(button) shade(30%));
-			border-color: color(theme(button) shade(20%));
+		&:disabled:active:enabled,
+		&[aria-disabled="true"],
+		&[aria-disabled="true"]:active:enabled {
+			color: color(theme(button) tint(40%));
+			background: color(theme(button));
+			border-color: color(theme(button) shade(7%));
 			box-shadow: none;
-			text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.1);
+			text-shadow: none;
+			opacity: 1;
+
+			// This specificity is needed to override alternate color schemes in WP-Admin.
+			&.is-button,
+			&.is-button:hover,
+			&:active:enabled {
+				box-shadow: none;
+				text-shadow: none;
+			}
+
+			&:focus:enabled {
+				color: color(theme(button) tint(40%));
+				border-color: color(theme(button) shade(7%));
+				box-shadow:
+					0 0 0 1px $white,
+					0 0 0 3px $blue-medium-focus;
+			}
 		}
 
 		&.is-busy,

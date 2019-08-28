@@ -14,7 +14,7 @@ import {
 	BlockControls,
 	InspectorControls,
 } from '@wordpress/block-editor';
-import { ServerSideRender } from '@wordpress/editor';
+import ServerSideRender from '@wordpress/server-side-render';
 
 /**
  * Internal dependencies

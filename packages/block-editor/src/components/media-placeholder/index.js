@@ -159,6 +159,7 @@ export class MediaPlaceholder extends Component {
 			notices,
 			onSelectURL,
 			mediaUpload,
+			children,
 		} = this.props;
 
 		let instructions = labels.instructions;
@@ -175,14 +176,14 @@ export class MediaPlaceholder extends Component {
 			const isVideo = isOneType && 'video' === allowedTypes[ 0 ];
 
 			if ( instructions === undefined && mediaUpload ) {
-				instructions = __( 'Drag a media file, upload a new one or select a file from your library.' );
+				instructions = __( 'Upload a media file or pick one from your media library.' );
 
 				if ( isAudio ) {
-					instructions = __( 'Drag an audio, upload a new one or select a file from your library.' );
+					instructions = __( 'Upload an audio file, pick one from your media library, or add one with a URL.' );
 				} else if ( isImage ) {
-					instructions = __( 'Drag an image, upload a new one or select a file from your library.' );
+					instructions = __( 'Upload an image file, pick one from your media library, or add one with a URL.' );
 				} else if ( isVideo ) {
-					instructions = __( 'Drag a video, upload a new one or select a file from your library.' );
+					instructions = __( 'Upload a video file, pick one from your media library, or add one with a URL.' );
 				}
 			}
 
@@ -218,6 +219,7 @@ export class MediaPlaceholder extends Component {
 				preview={ mediaPreview }
 			>
 				{ content }
+				{ children }
 			</Placeholder>
 		);
 	}

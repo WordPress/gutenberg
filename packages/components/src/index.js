@@ -1,6 +1,5 @@
 // Components
 export * from './primitives';
-// eslint-disable-next-line camelcase
 export { default as Animate } from './animate';
 export { default as Autocomplete } from './autocomplete';
 export { default as BaseControl } from './base-control';
@@ -53,10 +52,10 @@ export { default as SelectControl } from './select-control';
 export { default as Snackbar } from './snackbar';
 export { default as SnackbarList } from './snackbar/list';
 export { default as Spinner } from './spinner';
-export { default as ServerSideRender } from './server-side-render';
 export { default as TabPanel } from './tab-panel';
 export { default as TextControl } from './text-control';
 export { default as TextareaControl } from './textarea-control';
+export { default as Tip } from './tip';
 export { default as ToggleControl } from './toggle-control';
 export { default as Toolbar } from './toolbar';
 export { default as ToolbarButton } from './toolbar-button';

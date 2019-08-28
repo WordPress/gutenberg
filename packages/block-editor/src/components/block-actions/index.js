@@ -8,47 +8,65 @@ import { castArray, first, last, every } from 'lodash';
  */
 import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { cloneBlock, hasBlockSupport } from '@wordpress/blocks';
+import { cloneBlock, hasBlockSupport, switchToBlockType } from '@wordpress/blocks';
 
 function BlockActions( {
-	onDuplicate,
-	onRemove,
-	onInsertBefore,
-	onInsertAfter,
-	isLocked,
 	canDuplicate,
+	canInsertDefaultBlock,
 	children,
+	isLocked,
+	onDuplicate,
+	onGroup,
+	onInsertAfter,
+	onInsertBefore,
+	onRemove,
+	onUngroup,
 } ) {
 	return children( {
+		canDuplicate,
+		canInsertDefaultBlock,
+		isLocked,
 		onDuplicate,
-		onRemove,
+		onGroup,
 		onInsertAfter,
 		onInsertBefore,
-		isLocked,
-		canDuplicate,
+		onRemove,
+		onUngroup,
 	} );
 }
 
 export default compose( [
 	withSelect( ( select, props ) => {
 		const {
+			canInsertBlockType,
+			getBlockRootClientId,
 			getBlocksByClientId,
 			getTemplateLock,
-			getBlockRootClientId,
 		} = select( 'core/block-editor' );
+		const { getDefaultBlockName } = select( 'core/blocks' );
 
 		const blocks = getBlocksByClientId( props.clientIds );
-		const canDuplicate = every( blocks, ( block ) => {
-			return !! block && hasBlockSupport( block.name, 'multiple', true );
-		} );
 		const rootClientId = getBlockRootClientId( props.clientIds[ 0 ] );
+		const canDuplicate = every( blocks, ( block ) => {
+			return (
+				!! block &&
+				hasBlockSupport( block.name, 'multiple', true ) &&
+				canInsertBlockType( block.name, rootClientId )
+			);
+		} );
+
+		const canInsertDefaultBlock = canInsertBlockType(
+			getDefaultBlockName(),
+			rootClientId
+		);
 
 		return {
-			isLocked: !! getTemplateLock( rootClientId ),
 			blocks,
 			canDuplicate,
-			rootClientId,
+			canInsertDefaultBlock,
 			extraProps: props,
+			isLocked: !! getTemplateLock( rootClientId ),
+			rootClientId,
 		};
 	} ),
 	withDispatch( ( dispatch, props, { select } ) => {
@@ -65,11 +83,12 @@ export default compose( [
 			multiSelect,
 			removeBlocks,
 			insertDefaultBlock,
+			replaceBlocks,
 		} = dispatch( 'core/block-editor' );
 
 		return {
 			onDuplicate() {
-				if ( isLocked || ! canDuplicate ) {
+				if ( ! canDuplicate ) {
 					return;
 				}
 
@@ -106,6 +125,45 @@ export default compose( [
 					const lastSelectedIndex = getBlockIndex( last( castArray( clientIds ) ), rootClientId );
 					insertDefaultBlock( {}, rootClientId, lastSelectedIndex + 1 );
 				}
+			},
+			onGroup() {
+				if ( ! blocks.length ) {
+					return;
+				}
+
+				const {
+					getGroupingBlockName,
+				} = select( 'core/blocks' );
+
+				const groupingBlockName = getGroupingBlockName();
+
+				// Activate the `transform` on `core/group` which does the conversion
+				const newBlocks = switchToBlockType( blocks, groupingBlockName );
+
+				if ( ! newBlocks ) {
+					return;
+				}
+				replaceBlocks(
+					clientIds,
+					newBlocks
+				);
+			},
+
+			onUngroup() {
+				if ( ! blocks.length ) {
+					return;
+				}
+
+				const innerBlocks = blocks[ 0 ].innerBlocks;
+
+				if ( ! innerBlocks.length ) {
+					return;
+				}
+
+				replaceBlocks(
+					clientIds,
+					innerBlocks
+				);
 			},
 		};
 	} ),

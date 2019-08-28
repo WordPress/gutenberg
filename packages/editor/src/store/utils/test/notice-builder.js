@@ -93,7 +93,7 @@ describe( 'getNotificationArgumentsForSaveSuccess()', () => {
 	} );
 } );
 describe( 'getNotificationArgumentsForSaveFail()', () => {
-	const error = { code: '42' };
+	const error = { code: '42', message: 'Something went wrong.' };
 	const post = { status: 'publish' };
 	const edits = { status: 'publish' };
 	const defaultExpectedAction = { id: SAVE_POST_NOTICE_ID };
@@ -108,25 +108,25 @@ describe( 'getNotificationArgumentsForSaveFail()', () => {
 			'when post is not published and edits is published',
 			'',
 			[ 'draft', 'publish' ],
-			[ 'Publishing failed', defaultExpectedAction ],
+			[ 'Publishing failed. Error message: Something went wrong.', defaultExpectedAction ],
 		],
 		[
 			'when post is published and edits is privately published',
 			'',
 			[ 'draft', 'private' ],
-			[ 'Publishing failed', defaultExpectedAction ],
+			[ 'Publishing failed. Error message: Something went wrong.', defaultExpectedAction ],
 		],
 		[
 			'when post is published and edits is scheduled to be published',
 			'',
 			[ 'draft', 'future' ],
-			[ 'Scheduling failed', defaultExpectedAction ],
+			[ 'Scheduling failed. Error message: Something went wrong.', defaultExpectedAction ],
 		],
 		[
 			'when post is published and edits is published',
 			'',
 			[ 'publish', 'publish' ],
-			[ 'Updating failed', defaultExpectedAction ],
+			[ 'Updating failed. Error message: Something went wrong.', defaultExpectedAction ],
 		],
 	].forEach( ( [
 		description,

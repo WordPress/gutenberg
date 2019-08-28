@@ -38,3 +38,35 @@ describe( 'isInTheFuture', () => {
 		setSettings( settings );
 	} );
 } );
+
+describe( 'Moment.js Localization', () => {
+	it( 'should change the relative time strings', () => {
+		const settings = __experimentalGetSettings();
+
+		// Change the locale strings for tests.
+		setSettings( {
+			...settings,
+			l10n: {
+				...settings.l10n,
+				relative: {
+					...settings.l10n.relative,
+					mm: '%d localized minutes',
+					hh: '%d localized hours',
+				},
+			},
+		} );
+
+		// Get the freshly changed setings.
+		const newSettings = __experimentalGetSettings();
+
+		// Test the unchanged values.
+		expect( newSettings.l10n.locale ).toBe( settings.l10n.locale );
+
+		// Test the changed values.
+		expect( newSettings.l10n.relative.mm ).toBe( '%d localized minutes' );
+		expect( newSettings.l10n.relative.hh ).toBe( '%d localized hours' );
+
+		// Restore default settings
+		setSettings( settings );
+	} );
+} );

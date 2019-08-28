@@ -33,6 +33,20 @@ _Example_: Extract the `src` attribute from an image found in the block's markup
 // { "url": "https://lorempixel.com/1200/800/" }
 ```
 
+#### `attribute` Type Validation
+
+Accepted values in the `type` field of an `attribute` MUST be one of the following:
+
+* null
+* boolean
+* object
+* array
+* number
+* string
+* integer
+
+See [WordPress's REST API documentation](https://developer.wordpress.org/rest-api/extending-the-rest-api/schema/) for additional details.
+
 ### `text`
 
 Use `text` to extract the inner text from markup.
@@ -172,7 +186,7 @@ By default, a meta field will be excluded from a post object's meta. This can be
 
 ```php
 function gutenberg_my_block_init() {
-	register_meta( 'post', 'author', array(
+	register_post_meta( 'post', 'author', array(
 		'show_in_rest' => true,
 	) );
 }
@@ -184,11 +198,11 @@ Furthermore, be aware that WordPress defaults to:
 - not treating a meta datum as being unique, instead returning an array of values;
 - treating that datum as a string.
 
-If either behavior is not desired, the same `register_meta` call can be complemented with the `single` and/or `type` parameters as follows:
+If either behavior is not desired, the same `register_post_meta` call can be complemented with the `single` and/or `type` parameters as follows:
 
 ```php
 function gutenberg_my_block_init() {
-	register_meta( 'post', 'author_count', array(
+	register_post_meta( 'post', 'author_count', array(
 		'show_in_rest' => true,
 		'single' => true,
 		'type' => 'integer',

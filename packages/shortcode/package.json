@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/shortcode",
-	"version": "2.3.0",
+	"version": "2.4.0",
 	"description": "Shortcode module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -22,7 +22,7 @@
 	"react-native": "src/index",
 	"dependencies": {
 		"@babel/runtime": "^7.4.4",
-		"lodash": "^4.17.11",
+		"lodash": "^4.17.14",
 		"memize": "^1.0.5"
 	},
 	"publishConfig": {

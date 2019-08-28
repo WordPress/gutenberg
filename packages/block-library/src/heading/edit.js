@@ -69,6 +69,7 @@ function HeadingEdit( {
 					<HeadingToolbar minLevel={ 1 } maxLevel={ 7 } selectedLevel={ level } onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) } />
 					<p>{ __( 'Text Alignment' ) }</p>
 					<AlignmentToolbar
+						isCollapsed={ false }
 						value={ align }
 						onChange={ ( nextAlign ) => {
 							setAttributes( { align: nextAlign } );
@@ -100,13 +101,13 @@ function HeadingEdit( {
 				onReplace={ onReplace }
 				onRemove={ () => onReplace( [] ) }
 				className={ classnames( className, {
+					[ `has-text-align-${ align }` ]: align,
 					'has-text-color': textColor.color,
 					[ textColor.class ]: textColor.class,
 				} ) }
 				placeholder={ placeholder || __( 'Write heading…' ) }
 				style={ {
 					color: textColor.color,
-					textAlign: align,
 				} }
 			/>
 		</>

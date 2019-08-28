@@ -81,6 +81,10 @@ import { useDispatchWithMap } from '../use-dispatch';
  * //  <SaleButton>Start Sale!</SaleButton>
  * ```
  *
+ * _Note:_ It is important that the `mapDispatchToProps` function always
+ * returns an object with the same keys. For example, it should not contain
+ * conditions under which a different value would be returned.
+ *
  * @return {Component} Enhanced component with merged dispatcher props.
  */
 const withDispatch = ( mapDispatchToProps ) => createHigherOrderComponent(

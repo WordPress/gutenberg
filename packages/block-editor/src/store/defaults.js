@@ -10,23 +10,27 @@ export const PREFERENCES_DEFAULTS = {
 /**
  * The default editor settings
  *
- *  alignWide                     boolean       Enable/Disable Wide/Full Alignments
- *  availableLegacyWidgets        Array         Array of objects representing the legacy widgets available.
- *  colors                        Array         Palette colors
- *  disableCustomColors           boolean       Whether or not the custom colors are disabled
- *  fontSizes                     Array         Available font sizes
- *  disableCustomFontSizes        boolean       Whether or not the custom font sizes are disabled
- *  imageSizes                    Array         Available image sizes
- *  maxWidth                      number        Max width to constraint resizing
- *  allowedBlockTypes             boolean|Array Allowed block types
- *  hasFixedToolbar               boolean       Whether or not the editor toolbar is fixed
- *  hasPermissionsToManageWidgets boolean       Whether or not the user is able to manage widgets.
- *  focusMode                     boolean       Whether the focus mode is enabled or not
- *  styles                        Array         Editor Styles
- *  isRTL                         boolean       Whether the editor is in RTL mode
- *  bodyPlaceholder               string        Empty post placeholder
- *  titlePlaceholder              string        Empty title placeholder
- *  codeEditingEnabled            string        Whether or not the user can switch to the code editor
+ *  alignWide                              boolean       Enable/Disable Wide/Full Alignments
+ *  availableLegacyWidgets                 Array         Array of objects representing the legacy widgets available.
+ *  colors                                 Array         Palette colors
+ *  disableCustomColors                    boolean       Whether or not the custom colors are disabled
+ *  fontSizes                              Array         Available font sizes
+ *  disableCustomFontSizes                 boolean       Whether or not the custom font sizes are disabled
+ *  imageSizes                             Array         Available image sizes
+ *  maxWidth                               number        Max width to constraint resizing
+ *  allowedBlockTypes                      boolean|Array Allowed block types
+ *  hasFixedToolbar                        boolean       Whether or not the editor toolbar is fixed
+ *  hasPermissionsToManageWidgets          boolean       Whether or not the user is able to manage widgets.
+ *  focusMode                              boolean       Whether the focus mode is enabled or not
+ *  styles                                 Array         Editor Styles
+ *  isRTL                                  boolean       Whether the editor is in RTL mode
+ *  bodyPlaceholder                        string        Empty post placeholder
+ *  titlePlaceholder                       string        Empty title placeholder
+ *  codeEditingEnabled                     string        Whether or not the user can switch to the code editor
+ *  showInserterHelpPanel                  boolean       Whether or not the inserter help panel is shown
+ *  __experimentalCanUserUseUnfilteredHTML string        Whether the user should be able to use unfiltered HTML or the HTML should be filtered e.g., to remove elements considered insecure like iframes.
+ *  __experimentalEnableLegacyWidgetBlock  boolean       Whether the user has enabled the Legacy Widget Block
+ *  __experimentalEnableMenuBlock          boolean       Whether the user has enabled the Menu Block
  */
 export const SETTINGS_DEFAULTS = {
 	alignWide: false,
@@ -69,6 +73,11 @@ export const SETTINGS_DEFAULTS = {
 			name: __( 'Vivid cyan blue' ),
 			slug: 'vivid-cyan-blue',
 			color: '#0693e3',
+		},
+		{
+			name: __( 'Vivid purple' ),
+			slug: 'vivid-purple',
+			color: '#9b51e0',
 		},
 		{
 			name: __( 'Very light gray' ),
@@ -137,5 +146,9 @@ export const SETTINGS_DEFAULTS = {
 
 	availableLegacyWidgets: {},
 	hasPermissionsToManageWidgets: false,
+	showInserterHelpPanel: true,
+	__experimentalCanUserUseUnfilteredHTML: false,
+	__experimentalEnableLegacyWidgetBlock: false,
+	__experimentalEnableMenuBlock: false,
 };
 

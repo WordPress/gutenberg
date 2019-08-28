@@ -1,4 +1,10 @@
 /**
+ * External dependencies
+ */
+import { omit } from 'lodash';
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { createBlock } from '@wordpress/blocks';
@@ -82,7 +88,7 @@ export default [
 			) );
 
 			return [
-				attributes,
+				omit( attributes, [ 'columns' ] ),
 				migratedInnerBlocks,
 			];
 		},
@@ -91,6 +97,32 @@ export default [
 
 			return (
 				<div className={ `has-${ columns }-columns` }>
+					<InnerBlocks.Content />
+				</div>
+			);
+		},
+	},
+	{
+		attributes: {
+			columns: {
+				type: 'number',
+				default: 2,
+			},
+		},
+		migrate( attributes, innerBlocks ) {
+			attributes = omit( attributes, [ 'columns' ] );
+
+			return [ attributes, innerBlocks ];
+		},
+		save( { attributes } ) {
+			const { verticalAlignment, columns } = attributes;
+
+			const wrapperClasses = classnames( `has-${ columns }-columns`, {
+				[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
+			} );
+
+			return (
+				<div className={ wrapperClasses }>
 					<InnerBlocks.Content />
 				</div>
 			);
