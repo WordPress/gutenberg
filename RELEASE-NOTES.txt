@@ -6,14 +6,14 @@
 
 1.11.0
 ------
-* Toolbar scroll position now resets when its content changes
+* Toolbar scroll position now resets when its content changes.
+* Dark Mode for iOS.
 
 1.10.0
 ------
 * Adding a block from the post title now shows the add block here indicator.
 * Deselect post title any time a block is added
 * Fix loss of center alignment in image captions on Android
-* Fix merging of empty paragraph blocks when added from a post's title
 
 1.9.0
 ------
