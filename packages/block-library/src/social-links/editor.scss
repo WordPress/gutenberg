@@ -64,12 +64,17 @@
 }
 
 // Improve the preview.
-.block-editor-block-switcher__preview {
+// @todo: Look at improving the preview component to make this unnecessary.
+.block-editor-block-preview__content {
+
+	// This ensures buttons in preview are fully opaque despite being disabled.
 	.wp-social-link:disabled {
 		opacity: 1;
 	}
 
-	.is-style-icon-only .wp-social-link:disabled {
-		color: $dark-gray-500;
+	// This ensures the preview is of a good size.
+	[data-type="core/social-links"] {
+		width: auto !important;
+		display: inline-block;
 	}
 }
