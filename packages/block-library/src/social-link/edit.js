@@ -25,7 +25,7 @@ const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
 	const classes = classNames(
 		'wp-social-link',
 		'wp-social-link-' + site,
-		{ 'wp-social-link__is-incomplete': ( url ) ? false : true },
+		{ 'wp-social-link__is-incomplete': url },
 	);
 
 	// Import icon.
@@ -45,7 +45,7 @@ const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
 						<div className="editor-url-input block-editor-url-input">
 							<input type="text"
 								value={ url }
-								onChange={ ( evt ) => setAttributes( { url: evt.target.value } ) }
+								onChange={ ( event ) => setAttributes( { url: event.target.value } ) }
 								placeholder={ __( 'Enter site URL' ) }
 							/>
 						</div>

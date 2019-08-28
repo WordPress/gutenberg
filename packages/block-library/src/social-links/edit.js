@@ -15,7 +15,7 @@ const ALLOWED_BLOCKS = Object.keys( socialList ).map( ( site ) => {
 	return 'core/social-link-' + site;
 } );
 
-// Template contains the links that show when start
+// Template contains the links that show when start.
 const TEMPLATE = [
 	[ 'core/social-link-facebook' ],
 	[ 'core/social-link-twitter' ],
