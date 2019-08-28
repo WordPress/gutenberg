@@ -41,12 +41,14 @@ const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
 				<URLPopover
 					onClose={ () => setPopover( false ) }
 				>
-					<form onSubmit={ () => setPopover( false ) }>
-						<input type="url"
-							value={ url }
-							onChange={ ( evt ) => setAttributes( { url: evt.target.value } ) }
-							placeholder={ __( 'Enter site URL' ) }
-						/>
+					<form className="block-editor-url-popover__link-editor" onSubmit={ () => setPopover( false ) }>
+						<div className="editor-url-input block-editor-url-input">
+							<input type="text"
+								value={ url }
+								onChange={ ( evt ) => setAttributes( { url: evt.target.value } ) }
+								placeholder={ __( 'Enter site URL' ) }
+							/>
+						</div>
 						<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
 					</form>
 				</URLPopover>
