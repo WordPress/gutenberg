@@ -16,6 +16,7 @@ fi
 if [ "$CHECK_CORRECTNESS" = true ] ; then
   yarn flow || pFail
   yarn lint || pFail
+  yarn prettier:check || pFail
 fi
 
 if [ "$GUTENBERG_AS_PARENT" = true ] ; then

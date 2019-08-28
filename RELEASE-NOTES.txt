@@ -1,13 +1,19 @@
+1.12.0
+------
+* Add rich text styling to video captions
+* Prevent keyboard dismissal when switching between caption and text block on Android
+* Blocks that would be replaced are now hidden when add block bottom sheet displays
+
 1.11.0
 ------
-* Toolbar scroll position now resets when its content changes
+* Toolbar scroll position now resets when its content changes.
+* Dark Mode for iOS.
 
 1.10.0
 ------
 * Adding a block from the post title now shows the add block here indicator.
 * Deselect post title any time a block is added
 * Fix loss of center alignment in image captions on Android
-* Fix merging of empty paragraph blocks when added from a post's title
 
 1.9.0
 ------

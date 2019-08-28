@@ -2,18 +2,18 @@
  * @format */
 
 /**
-* This file is used in src/globals.js to patch jsdom-jscore.
-*
-* Node.prototype.contains is implemented as a simple recursive function.
-*
-* Node.prototype.insertBefore is re-implemented (code copied) with the
-* WrongDocumentError exception disabled.
-*
-* Element.prototype.matches is aliased to Element.prototype.matchesSelector.
-*
-* Getters are defined on the Node.prototype for the following properties:
-* parentElement, previousElementSibling, nextElementSibling.
-*/
+ * This file is used in src/globals.js to patch jsdom-jscore.
+ *
+ * Node.prototype.contains is implemented as a simple recursive function.
+ *
+ * Node.prototype.insertBefore is re-implemented (code copied) with the
+ * WrongDocumentError exception disabled.
+ *
+ * Element.prototype.matches is aliased to Element.prototype.matchesSelector.
+ *
+ * Getters are defined on the Node.prototype for the following properties:
+ * parentElement, previousElementSibling, nextElementSibling.
+ */
 
 /**
  * External dependencies
@@ -28,17 +28,10 @@ const { core } = jsdomLevel1Core.dom.level1;
 const { Node, Element, CharacterData } = core;
 
 // Exception codes
-const {
-	NO_MODIFICATION_ALLOWED_ERR,
-	HIERARCHY_REQUEST_ERR,
-	NOT_FOUND_ERR,
-} = core;
+const { NO_MODIFICATION_ALLOWED_ERR, HIERARCHY_REQUEST_ERR, NOT_FOUND_ERR } = core;
 
 // Node types
-const {
-	ATTRIBUTE_NODE,
-	DOCUMENT_FRAGMENT_NODE,
-} = Node;
+const { ATTRIBUTE_NODE, DOCUMENT_FRAGMENT_NODE } = Node;
 
 /**
  * Simple recursive implementation of Node.contains method
@@ -51,10 +44,12 @@ const {
  * expectation that this is implemented (as it is in the browser environment).
  */
 Node.prototype.contains = function( otherNode ) {
-	return this === otherNode ||
+	return (
+		this === otherNode ||
 		Array.prototype.some.call( this._childNodes, ( childNode ) => {
 			return childNode.contains( otherNode );
-		} );
+		} )
+	);
 };
 
 /**
@@ -71,7 +66,10 @@ Node.prototype.contains = function( otherNode ) {
  */
 Node.prototype.insertBefore = function( /* Node */ newChild, /* Node*/ refChild ) {
 	if ( this._readonly === true ) {
-		throw new core.DOMException( NO_MODIFICATION_ALLOWED_ERR, 'Attempting to modify a read-only node' );
+		throw new core.DOMException(
+			NO_MODIFICATION_ALLOWED_ERR,
+			'Attempting to modify a read-only node'
+		);
 	}
 
 	// Adopt unowned children, for weird nodes like DocumentType
