@@ -12,10 +12,10 @@ notifications:
 
 cache:
   directories:
+    - $HOME/.composer/cache
     - $HOME/.jest-cache
     - $HOME/.npm
     - $HOME/.nvm/.cache
-    - $HOME/.phpbrew
 
 branches:
   only:
