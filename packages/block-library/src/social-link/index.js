@@ -10,7 +10,7 @@ import edit from './edit';
 import save from './save';
 import socialList from './social-list';
 
-const commonAttribs = {
+const commonAttributes = {
 	category: 'widgets',
 	parent: [ 'core/social-links' ],
 	supports: {
@@ -32,7 +32,7 @@ export const sites = Object.keys( socialList ).map(
 				title: siteParams.name,
 				icon: siteParams.icon,
 				description: __( 'Link to ' + siteParams.name ),
-				...commonAttribs,
+				...commonAttributes,
 				attributes: {
 					url: {
 						type: 'string',
