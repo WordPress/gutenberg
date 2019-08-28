@@ -15,9 +15,7 @@ cache:
     - $HOME/.jest-cache
     - $HOME/.npm
     - $HOME/.nvm/.cache
-    - wordpress
-    - vendor
-    - build
+    - $HOME/.phpbrew
 
 branches:
   only:
@@ -25,51 +23,83 @@ branches:
 
 env:
   global:
+    - PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: true
+    - WP_DEVELOP_DIR: ./wordpress
     - LOCAL_DIR: build
     - LOCAL_SCRIPT_DEBUG: false
-    - FORCE_REDUCED_MOTION: true
+    - INSTALL_COMPOSER: false
+    - INSTALL_WORDPRESS: true
 
 before_install:
   - nvm install
   - |
-    # upgrade docker-compose
-    sudo rm /usr/local/bin/docker-compose
-    curl -L https://github.com/docker/compose/releases/download/1.24.0/docker-compose-`uname -s`-`uname -m` > docker-compose
-    chmod +x docker-compose
-    sudo mv docker-compose /usr/local/bin
+    if [[ "$INSTALL_WORDPRESS" = "true" ]]; then
+      # Upgrade docker-compose.
+      sudo rm /usr/local/bin/docker-compose
+      curl -sL https://github.com/docker/compose/releases/download/1.24.0/docker-compose-`uname -s`-`uname -m` > docker-compose
+      chmod +x docker-compose
+      sudo mv docker-compose /usr/local/bin
+    fi
 
 install:
+  # Build Gutenberg.
   - npm ci
-  - npm run env start
-  - sleep 10
-  - npm run env install -- --fast
+  - npm run build
+  - |
+    if [[ "$INSTALL_WORDPRESS" = "true" ]]; then
+      # Download and unpack WordPress.
+      curl s-L https://wordpress.org/nightly-builds/wordpress-latest.zip -o /tmp/wordpress-latest.zip
+      unzip /tmp/wordpress-latest.zip -d /tmp
+      mkdir -p wordpress/src
+      mkdir -p wordpress/build
+      mv /tmp/wordpress/* wordpress/build
+
+      # Create the upload directory with permissions that Travis can handle.
+      mkdir -p wordpress/build/wp-content/uploads
+      chmod 767 wordpress/build/wp-content/uploads
+
+      # Grab the tools we need for WordPress' local-env.
+      curl -sL https://github.com/WordPress/wordpress-develop/archive/master.zip -o /tmp/wordpress-develop.zip
+      unzip /tmp/wordpress-develop.zip -d /tmp
+      mv
+        /tmp/wordpress-develop-master/tools \
+        /tmp/wordpress-develop-master/.env \
+        /tmp/wordpress-develop-master/docker-compose.yml \
+        /tmp/wordpress-develop-master/wp-cli.yml \
+        /tmp/wordpress-develop-master/*config-sample.php \
+        /tmp/wordpress-develop-master/package.json wordpress
+
+      # Install WordPress.
+      cd wordpress
+      npm install dotenv wait-on
+      npm run env:start
+      sleep 10
+      npm run env:install
+      cd ..
+
+      # Connect Gutenberg to WordPress.
+      npm run env connect
+      npm run env cli plugin activate gutenberg
+    fi
+  - |
+    if [[ "$INSTALL_COMPOSER" = "true" ]]; then
+      composer install
+    fi
+  - |
+    if [[ "$E2E_ROLE" = "author" ]]; then
+      npm run env cli -- user create author author@example.com --role=author --user_pass=authpass --path=build
+      npm run env cli -- post update 1 --post_author=2 --path=build
+    fi
 
 jobs:
   include:
-    - stage: Pre-tests
-      name: Warm up cache
-      install:
-        # Build Gutenberg
-        - npm ci
-        - npm run build
-        # Install WordPress
-        - |
-          if [ ! -d "wordpress/.git" ]; then
-            git clone --depth=1 git://develop.git.wordpress.org/ wordpress
-          fi
-        - cd wordpress
-        - git pull
-        - PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true npm ci
-        - npm run build
-        - cd ..
-        - mkdir -p wordpress/build/wp-content/uploads
-        - chmod 767 wordpress/build/wp-content/uploads
-        # Install Composer dependencies
-        - npm run env docker-run -- php composer install
-      script: true
+    - name: Lint
+      env: INSTALL_WORDPRESS=false INSTALL_COMPOSER=true
+      script:
+        - npm run lint
 
-    - stage: Tests
-      name: Build artifacts
+    - name: Build artifacts
+      env: INSTALL_WORDPRESS=false
       install:
         # A "full" install is executed, since `npm ci` does not always exit
         # with an error status code if the lock file is inaccurate.
@@ -80,12 +110,12 @@ jobs:
         - npm run check-local-changes
 
     - name: License compatibility
-      install: npm ci
+      env: INSTALL_WORDPRESS=false
       script:
         - npm run check-licenses
 
     - name: JavaScript unit tests
-      install: npm ci
+      env: INSTALL_WORDPRESS=false
       script:
         # It's not necessary to run the full build, since Jest can interpret
         # source files with `babel-jest`. Some packages have their own custom
@@ -94,7 +124,7 @@ jobs:
         - npm run test-unit -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
 
     - name: JavaScript native mobile tests
-      install: npm ci
+      env: INSTALL_WORDPRESS=false
       script:
         # It's not necessary to run the full build, since Jest can interpret
         # source files with `babel-jest`. Some packages have their own custom
@@ -102,85 +132,66 @@ jobs:
         - npx lerna run build
         - npm run test-unit:native -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
 
-    - name: Lint
-      install: npm ci
-      script:
-        - npm run lint
-
     - name: PHP unit tests
-      install:
-        - npm ci
-        - npm run env start
-        - sleep 10
+      env: INSTALL_COMPOSER=true
       script:
         - npm run test-php && npm run test-unit-php-multisite
 
     - name: PHP unit tests (PHP 5.6)
-      install:
-        - npm ci
-        - export LOCAL_PHP=5.6-fpm
-        - npm run env start
-        - sleep 10
+      env: INSTALL_COMPOSER=true LOCAL_PHP=5.6-fpm
       script:
         - npm run test-php && npm run test-unit-php-multisite
 
     - name: E2E tests (Admin) (1/4)
+      env: FORCE_REDUCED_MOTION=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
       script:
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 0' < ~/.jest-e2e-tests )
 
     - name: E2E tests (Admin) (2/4)
+      env: FORCE_REDUCED_MOTION=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
       script:
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 1' < ~/.jest-e2e-tests )
 
     - name: E2E tests (Admin) (3/4)
+      env: FORCE_REDUCED_MOTION=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
       script:
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 2' < ~/.jest-e2e-tests )
 
     - name: E2E tests (Admin) (4/4)
+      env: FORCE_REDUCED_MOTION=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
       script:
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 3' < ~/.jest-e2e-tests )
 
     - name: E2E tests (Author) (1/4)
-      before_script:
-        - npm run env cli -- user create author author@example.com --role=author --user_pass=authpass --path=build
-        - npm run env cli -- post update 1 --post_author=2 --path=build
+      env: E2E_ROLE=author FORCE_REDUCED_MOTION=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
       script:
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 0' < ~/.jest-e2e-tests )
 
     - name: E2E tests (Author) (2/4)
-      before_script:
-        - npm run env cli -- user create author author@example.com --role=author --user_pass=authpass --path=build
-        - npm run env cli -- post update 1 --post_author=2 --path=build
+      env: E2E_ROLE=author FORCE_REDUCED_MOTION=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
       script:
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 1' < ~/.jest-e2e-tests )
 
     - name: E2E tests (Author) (3/4)
-      before_script:
-        - npm run env cli -- user create author author@example.com --role=author --user_pass=authpass --path=build
-        - npm run env cli -- post update 1 --post_author=2 --path=build
+      env: E2E_ROLE=author FORCE_REDUCED_MOTION=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
       script:
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 2' < ~/.jest-e2e-tests )
 
     - name: E2E tests (Author) (4/4)
-      before_script:
-        - npm run env cli -- user create author author@example.com --role=author --user_pass=authpass --path=build
-        - npm run env cli -- post update 1 --post_author=2 --path=build
+      env: E2E_ROLE=author FORCE_REDUCED_MOTION=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
       script:
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 3' < ~/.jest-e2e-tests )
 
   allow_failures:
     - name: JavaScript native mobile tests
-
-before_cache:
-  - rm -rf wordpress/node_modules
 
 before_deploy:
   - npm install
