@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isArray, isString } from 'lodash';
+import { isArray } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -15,7 +15,6 @@ import { forwardRef } from '@wordpress/element';
 import Tooltip from '../tooltip';
 import Button from '../button';
 import Icon from '../icon';
-import Dashicon from '../dashicon';
 
 function IconButton( props, ref ) {
 	const {
@@ -57,8 +56,7 @@ function IconButton( props, ref ) {
 			className={ classes }
 			ref={ ref }
 		>
-			{ isString( icon ) ? <Dashicon icon={ icon } ariaPressed={ ariaPressed } /> : <Icon icon={ icon } ariaPressed={ ariaPressed } className={ classes } /> }
-
+			<Icon icon={ icon } ariaPressed={ ariaPressed } />
 			{ children }
 		</Button>
 	);
