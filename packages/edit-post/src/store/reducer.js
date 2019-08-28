@@ -1,7 +1,14 @@
 /**
  * External dependencies
  */
-import { get, includes, flow, without, union } from 'lodash';
+import {
+	flow,
+	get,
+	includes,
+	omit,
+	union,
+	without,
+} from 'lodash';
 
 /**
  * WordPress dependencies
@@ -127,6 +134,23 @@ export const preferences = flow( [
 				return union( state, action.blockNames );
 		}
 
+		return state;
+	},
+	preferredStyleVariations( state, action ) {
+		switch ( action.type ) {
+			case 'UPDATE_PREFERRED_STYLE_VARIATIONS': {
+				if ( ! action.blockName ) {
+					return state;
+				}
+				if ( ! action.blockStyle ) {
+					return omit( state, [ action.blockName ] );
+				}
+				return {
+					...state,
+					[ action.blockName ]: action.blockStyle,
+				};
+			}
+		}
 		return state;
 	},
 } );
