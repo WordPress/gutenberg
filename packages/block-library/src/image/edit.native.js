@@ -24,10 +24,10 @@ import {
 } from '@wordpress/components';
 
 import {
+	Caption,
 	MediaPlaceholder,
 	MediaUpload,
 	MEDIA_TYPE_IMAGE,
-	RichText,
 	BlockControls,
 	InspectorControls,
 } from '@wordpress/block-editor';
@@ -118,7 +118,6 @@ class ImageEdit extends React.Component {
 			requestImageFailedRetryDialog( attributes.id );
 		}
 
-		this._caption.blur();
 		this.setState( {
 			isCaptionSelected: false,
 		} );
@@ -206,8 +205,8 @@ class ImageEdit extends React.Component {
 	}
 
 	render() {
-		const { attributes, isSelected, setAttributes } = this.props;
-		const { url, caption, height, width, alt, href, id } = attributes;
+		const { attributes, isSelected } = this.props;
+		const { url, height, width, alt, href, id } = attributes;
 
 		const onImageSettingsButtonPressed = () => {
 			this.setState( { showSettings: true } );
@@ -274,12 +273,6 @@ class ImageEdit extends React.Component {
 				</View>
 			);
 		}
-
-		// We still want to render the caption so that the soft keyboard is not forced to close on Android
-		const shouldCaptionDisplay = () => {
-			const isCaptionEmpty = RichText.isEmpty( caption ) > 0;
-			return ! isCaptionEmpty || isSelected;
-		};
 
 		const imageContainerHeight = Dimensions.get( 'window' ).width / IMAGE_ASPECT_RATIO;
 		const getImageComponent = ( openMediaOptions, getMediaOptions ) => (
@@ -349,38 +342,22 @@ class ImageEdit extends React.Component {
 							);
 						} }
 					/>
-					<View style={ { padding: 12, flex: 1, display: shouldCaptionDisplay() ? 'flex' : 'none' } }
+					<Caption
+						clientId={ this.props.clientId }
+						isSelected={ this.state.isCaptionSelected }
 						accessible={ true }
-						accessibilityLabel={
+						accessibilityLabelCreator={ ( caption ) =>
 							isEmpty( caption ) ?
 							/* translators: accessibility text. Empty image caption. */
-								__( 'Image caption. Empty' ) :
+								( 'Image caption. Empty' ) :
 								sprintf(
-									/* translators: accessibility text. %s: image caption. */
+								/* translators: accessibility text. %s: image caption. */
 									__( 'Image caption. %s' ),
-									caption
-								)
+									caption )
 						}
-						accessibilityRole={ 'button' }
-					>
-						<RichText
-							setRef={ ( ref ) => {
-								this._caption = ref;
-							} }
-							rootTagsToEliminate={ [ 'p' ] }
-							placeholder={ __( 'Write caption…' ) }
-							value={ caption }
-							onChange={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
-							unstableOnFocus={ this.onFocusCaption }
-							onBlur={ this.props.onBlur } // always assign onBlur as props
-							isSelected={ this.state.isCaptionSelected }
-							__unstableMobileNoFocusOnMount
-							fontSize={ 14 }
-							underlineColorAndroid="transparent"
-							textAlign={ 'center' }
-							tagName={ '' }
-						/>
-					</View>
+						onFocus={ this.onFocusCaption }
+						onBlur={ this.props.onBlur } // always assign onBlur as props
+					/>
 				</View>
 			</TouchableWithoutFeedback>
 		);
