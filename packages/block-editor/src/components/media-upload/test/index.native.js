@@ -87,7 +87,7 @@ describe( 'MediaUpload component', () => {
 				} } />
 		);
 		wrapper.find( 'Picker' ).simulate( 'change', option );
-		const media = { mediaId: MEDIA_ID, mediaUrl: MEDIA_URL };
+		const media = { id: MEDIA_ID, url: MEDIA_URL };
 
 		expect( requestFunction ).toHaveBeenCalledTimes( 1 );
 
