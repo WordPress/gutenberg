@@ -692,7 +692,7 @@
 		padding-right: $block-side-ui-clearance;
 
 		// Position for top level blocks.
-		left: -$block-side-ui-width - $block-side-ui-clearance - $block-padding - $border-width - $grid-size;
+		left: -$block-side-ui-width - $block-side-ui-clearance - $block-padding - $block-left-border-width;
 
 		// Hide on mobile, as mobile has a separate solution.
 		display: none;

@@ -2,33 +2,23 @@
 	min-height: $empty-paragraph-height;
 	opacity: 0;
 	background: $white;
-	border: 1px solid $dark-opacity-light-800;
-	border-radius: $icon-button-size-small * 3 + $grid-size-small; // Creates a pill shape
 	height: ($icon-button-size-small * 3) + ( $grid-size-small * 1.5);
 	padding-top: $grid-size-small / 2;
 	padding-bottom: $grid-size-small / 2;
-	transition: box-shadow 0.2s ease-out;
-	@include reduce-motion("transition");
-
-	.is-dark-theme & {
-		border-color: $light-opacity-light-800;
-	}
 
 	&.is-visible {
 		@include edit-post__fade-in-animation;
 	}
 
-	&:hover {
-		box-shadow: $shadow-toolbar;
-	}
-
-	// 24px is the smallest size of a good pressable button.
-	// With 3 pieces of side UI, that comes to a total of 72px.
-	// To vertically center against a 56px paragraph, move upwards 72px - 56px / 2.
-	// Don't do this for wide, fullwide, or mobile.
 	@include break-small() {
 		.block-editor-block-list__block:not([data-align="wide"]):not([data-align="full"]) & {
-			margin-top: -$grid-size;
+			border: 1px solid $dark-opacity-light-800;
+			border-right: none;
+			margin-top: $border-width;
+
+			.is-dark-theme & {
+				border-color: $light-opacity-light-800;
+			}
 		}
 	}
 }
