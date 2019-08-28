@@ -1,12 +1,10 @@
 
 export * from './amazon';
-export * from './apple';
 export * from './bandcamp';
 export * from './behance';
 export * from './chain';
 export * from './codepen';
 export * from './deviantart';
-export * from './digg';
 export * from './dribbble';
 export * from './dropbox';
 export * from './etsy';
@@ -29,11 +27,9 @@ export * from './pinterest';
 export * from './pocket';
 export * from './reddit';
 export * from './skype';
-export * from './slideshare';
 export * from './snapchat';
 export * from './soundcloud';
 export * from './spotify';
-export * from './stumbleupon';
 export * from './tumblr';
 export * from './twitch';
 export * from './twitter';

@@ -25,7 +25,7 @@ const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
 	const classes = classNames(
 		'wp-social-link',
 		'wp-social-link-' + site,
-		{ 'wp-social-link__is-incomplete': url },
+		{ 'wp-social-link__is-incomplete': ! url },
 	);
 
 	// Import icon.
@@ -41,7 +41,12 @@ const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
 				<URLPopover
 					onClose={ () => setPopover( false ) }
 				>
-					<form className="block-editor-url-popover__link-editor" onSubmit={ () => setPopover( false ) }>
+					<form
+						className="block-editor-url-popover__link-editor"
+						onSubmit={ ( event ) => {
+							event.preventDefault();
+							setPopover( false );
+						} } >
 						<div className="editor-url-input block-editor-url-input">
 							<input type="text"
 								value={ url }
