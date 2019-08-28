@@ -357,7 +357,7 @@ export class ImageEdit extends Component {
 			isEditing: false,
 		} );
 
-		const { id, url, alt, caption } = this.props.attributes;
+		const { id, url, alt, caption, linkDestination } = this.props.attributes;
 
 		let mediaAttributes = pickRelevantMediaFiles( media );
 
@@ -383,6 +383,12 @@ export class ImageEdit extends Component {
 		} else {
 			// Keep the same url when selecting the same file, so "Image Size" option is not changed.
 			additionalAttributes = { url };
+		}
+
+		// Check if the image is linked to it's media.
+		if ( linkDestination === LINK_DESTINATION_MEDIA ) {
+			// Update the media link.
+			mediaAttributes.href = media.url;
 		}
 
 		this.props.setAttributes( {
