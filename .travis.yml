@@ -25,7 +25,6 @@ env:
   global:
     - PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: true
     - WP_DEVELOP_DIR: ./wordpress
-    - LOCAL_DIR: build
     - LOCAL_SCRIPT_DEBUG: false
     - INSTALL_COMPOSER: false
     - INSTALL_WORDPRESS: true
@@ -51,12 +50,11 @@ install:
       curl -sL https://wordpress.org/nightly-builds/wordpress-latest.zip -o /tmp/wordpress-latest.zip
       unzip -q /tmp/wordpress-latest.zip -d /tmp
       mkdir -p wordpress/src
-      mkdir -p wordpress/build
-      mv /tmp/wordpress/* wordpress/build
+      mv /tmp/wordpress/* wordpress/src
 
       # Create the upload directory with permissions that Travis can handle.
-      mkdir -p wordpress/build/wp-content/uploads
-      chmod 767 wordpress/build/wp-content/uploads
+      mkdir -p wordpress/src/wp-content/uploads
+      chmod 767 wordpress/src/wp-content/uploads
 
       # Grab the tools we need for WordPress' local-env.
       curl -sL https://github.com/WordPress/wordpress-develop/archive/master.zip -o /tmp/wordpress-develop.zip
@@ -87,8 +85,8 @@ install:
     fi
   - |
     if [[ "$E2E_ROLE" = "author" ]]; then
-      npm run env cli -- user create author author@example.com --role=author --user_pass=authpass --path=build
-      npm run env cli -- post update 1 --post_author=2 --path=build
+      npm run env cli -- user create author author@example.com --role=author --user_pass=authpass
+      npm run env cli -- post update 1 --post_author=2
     fi
 
 jobs:
@@ -116,20 +114,24 @@ jobs:
 
     - name: JavaScript unit tests
       env: INSTALL_WORDPRESS=false
-      script:
+      install:
+        - npm ci
         # It's not necessary to run the full build, since Jest can interpret
         # source files with `babel-jest`. Some packages have their own custom
         # build tasks, however. These must be run.
         - npx lerna run build
+      script:
         - npm run test-unit -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
 
     - name: JavaScript native mobile tests
       env: INSTALL_WORDPRESS=false
-      script:
+      install:
+        - npm ci
         # It's not necessary to run the full build, since Jest can interpret
         # source files with `babel-jest`. Some packages have their own custom
         # build tasks, however. These must be run.
         - npx lerna run build
+      script:
         - npm run test-unit:native -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
 
     - name: PHP unit tests
