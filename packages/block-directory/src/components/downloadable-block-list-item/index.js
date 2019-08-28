@@ -18,6 +18,8 @@ function DownloadableBlockListItem( {
 		ratingCount,
 		author,
 		humanizedUpdated,
+		authorBlockCount,
+		authorBlockRating,
 	} = item;
 
 	return (
@@ -42,6 +44,8 @@ function DownloadableBlockListItem( {
 				<footer className="block-directory-downloadable-block-list-item__footer">
 					<DownloadableBlockAuthorInfo
 						author={ author }
+						authorBlockCount={ authorBlockCount }
+						authorBlockRating={ authorBlockRating }
 					/>
 				</footer>
 			</article>
