@@ -2,12 +2,12 @@
     {
         "clientId": "_clientId_0",
         "name": "core/social-link-google",
-        "isValid": false,
+        "isValid": true,
         "attributes": {
             "url": "https://example.com/",
             "site": "google"
         },
         "innerBlocks": [],
-        "originalContent": "<li class=\"wp-block-social-link-google wp-social-icon\"><a href=\"https://example.com/\">Google</a></li>"
+        "originalContent": "<li class=\"wp-block-social-link-google wp-social-icon\"><a href=\"https://example.com/\">google</a></li>"
     }
 ]

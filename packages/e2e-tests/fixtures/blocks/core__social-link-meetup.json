@@ -2,12 +2,12 @@
     {
         "clientId": "_clientId_0",
         "name": "core/social-link-meetup",
-        "isValid": false,
+        "isValid": true,
         "attributes": {
             "url": "https://example.com/",
             "site": "meetup"
         },
         "innerBlocks": [],
-        "originalContent": "<li class=\"wp-block-social-link-meetup wp-social-icon\"><a href=\"https://example.com/\">Meetup</a></li>"
+        "originalContent": "<li class=\"wp-block-social-link-meetup wp-social-icon\"><a href=\"https://example.com/\">meetup</a></li>"
     }
 ]

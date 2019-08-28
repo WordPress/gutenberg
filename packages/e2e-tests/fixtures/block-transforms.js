@@ -447,7 +447,9 @@ export const EXPECTED_TRANSFORMS = {
 		originalBlock: 'Dribbble',
 	},
 	'core__social-link-dropbox': {
-		availableTransforms: [],
+		availableTransforms: [
+			'Group',
+		],
 		originalBlock: 'Dropbox',
 	},
 	'core__social-link-etsy': {
@@ -499,7 +501,9 @@ export const EXPECTED_TRANSFORMS = {
 		originalBlock: 'Goodreads',
 	},
 	'core__social-link-google': {
-		availableTransforms: [],
+		availableTransforms: [
+			'Group',
+		],
 		originalBlock: 'Google',
 	},
 	'core__social-link-instagram': {
@@ -539,7 +543,9 @@ export const EXPECTED_TRANSFORMS = {
 		originalBlock: 'Medium',
 	},
 	'core__social-link-meetup': {
-		availableTransforms: [],
+		availableTransforms: [
+			'Group',
+		],
 		originalBlock: 'Meetup',
 	},
 	'core__social-link-pinterest': {
@@ -621,7 +627,9 @@ export const EXPECTED_TRANSFORMS = {
 		originalBlock: 'WordPress',
 	},
 	'core__social-link-yelp': {
-		availableTransforms: [],
+		availableTransforms: [
+			'Group',
+		],
 		originalBlock: 'Yelp',
 	},
 	'core__social-link-youtube': {

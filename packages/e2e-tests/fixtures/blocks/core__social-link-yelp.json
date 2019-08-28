@@ -2,12 +2,12 @@
     {
         "clientId": "_clientId_0",
         "name": "core/social-link-yelp",
-        "isValid": false,
+        "isValid": true,
         "attributes": {
             "url": "https://example.com/",
             "site": "yelp"
         },
         "innerBlocks": [],
-        "originalContent": "<li class=\"wp-block-social-link-yelp wp-social-icon\"><a href=\"https://example.com/\">Yelp</a></li>"
+        "originalContent": "<li class=\"wp-block-social-link-yelp wp-social-icon\"><a href=\"https://example.com/\">yelp</a></li>"
     }
 ]

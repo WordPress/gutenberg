@@ -2,12 +2,12 @@
     {
         "clientId": "_clientId_0",
         "name": "core/social-link-dropbox",
-        "isValid": false,
+        "isValid": true,
         "attributes": {
             "url": "https://example.com/",
             "site": "dropbox"
         },
         "innerBlocks": [],
-        "originalContent": "<li class=\"wp-block-social-link-dropbox wp-social-icon\"><a href=\"https://example.com/\">Dropbox</a></li>"
+        "originalContent": "<li class=\"wp-block-social-link-dropbox wp-social-icon\"><a href=\"https://example.com/\">dropbox</a></li>"
     }
 ]

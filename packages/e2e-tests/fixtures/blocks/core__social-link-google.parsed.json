@@ -5,9 +5,9 @@
             "url": "https://example.com/"
         },
         "innerBlocks": [],
-        "innerHTML": "\n<li class=\"wp-block-social-link-google wp-social-icon\"><a href=\"https://example.com/\">Google</a></li>\n",
+        "innerHTML": "\n<li class=\"wp-block-social-link-google wp-social-icon\"><a href=\"https://example.com/\">google</a></li>\n",
         "innerContent": [
-            "\n<li class=\"wp-block-social-link-google wp-social-icon\"><a href=\"https://example.com/\">Google</a></li>\n"
+            "\n<li class=\"wp-block-social-link-google wp-social-icon\"><a href=\"https://example.com/\">google</a></li>\n"
         ]
     },
     {
