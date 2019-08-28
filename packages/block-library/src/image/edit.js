@@ -62,7 +62,7 @@ import {
 	useRef,
 } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { getPath } from '@wordpress/url';
+import { getPath, prependHTTP } from '@wordpress/url';
 import { withViewportMatch } from '@wordpress/viewport';
 import { speak } from '@wordpress/a11y';
 
@@ -178,7 +178,14 @@ const ImageURLInputUI = ( {
 	const onSubmitLinkChange = useCallback( () => {
 		return ( event ) => {
 			if ( urlInput ) {
-				onChangeUrl( urlInput );
+				let imageUrl = urlInput;
+
+				// Append HTTP protocol to custom link.
+				if ( linkDestination === LINK_DESTINATION_CUSTOM ) {
+					imageUrl = prependHTTP( urlInput );
+				}
+
+				onChangeUrl( imageUrl );
 			}
 			stopEditLink();
 			setUrlInput( null );
