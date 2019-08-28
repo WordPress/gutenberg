@@ -93,12 +93,12 @@ install:
 jobs:
   include:
     - name: Lint
-      env: INSTALL_WORDPRESS=false
+      install:
+        - npm ci
       script:
         - npm run lint
 
     - name: Build artifacts
-      env: INSTALL_WORDPRESS=false
       install:
         # A "full" install is executed, since `npm ci` does not always exit
         # with an error status code if the lock file is inaccurate.
@@ -109,7 +109,8 @@ jobs:
         - npm run check-local-changes
 
     - name: License compatibility
-      env: INSTALL_WORDPRESS=false
+      install:
+        - npm ci
       script:
         - npm run check-licenses
 
@@ -125,7 +126,6 @@ jobs:
         - npm run test-unit -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
 
     - name: JavaScript native mobile tests
-      env: INSTALL_WORDPRESS=false
       install:
         - npm ci
         # It's not necessary to run the full build, since Jest can interpret
