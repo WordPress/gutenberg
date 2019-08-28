@@ -6,7 +6,8 @@ import { cloneElement, createElement, Component, isValidElement } from '@wordpre
 /**
  * Internal dependencies
  */
-import { Dashicon, SVG } from '../';
+import Dashicon from '../dashicon';
+import { SVG } from '../primitives';
 
 function Icon( { icon = null, size, ...additionalProps } ) {
 	let iconSize;
@@ -15,10 +16,6 @@ function Icon( { icon = null, size, ...additionalProps } ) {
 		// Dashicons should be 20x20 by default
 		iconSize = size || 20;
 		return <Dashicon icon={ icon } size={ iconSize } { ...additionalProps } />;
-	}
-
-	if ( Dashicon === icon.type ) {
-		return icon;
 	}
 
 	// Any other icons should be 24x24 by default
