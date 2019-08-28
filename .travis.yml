@@ -61,6 +61,7 @@ install:
       unzip -q /tmp/wordpress-develop.zip -d /tmp
       mv \
         /tmp/wordpress-develop-master/tools \
+        /tmp/wordpress-develop-master/tests \
         /tmp/wordpress-develop-master/.env \
         /tmp/wordpress-develop-master/docker-compose.yml \
         /tmp/wordpress-develop-master/wp-cli.yml \
