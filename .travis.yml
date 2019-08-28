@@ -49,7 +49,7 @@ install:
     if [[ "$INSTALL_WORDPRESS" = "true" ]]; then
       # Download and unpack WordPress.
       curl -sL https://wordpress.org/nightly-builds/wordpress-latest.zip -o /tmp/wordpress-latest.zip
-      unzip /tmp/wordpress-latest.zip -d /tmp
+      unzip -q /tmp/wordpress-latest.zip -d /tmp
       mkdir -p wordpress/src
       mkdir -p wordpress/build
       mv /tmp/wordpress/* wordpress/build
@@ -60,7 +60,7 @@ install:
 
       # Grab the tools we need for WordPress' local-env.
       curl -sL https://github.com/WordPress/wordpress-develop/archive/master.zip -o /tmp/wordpress-develop.zip
-      unzip /tmp/wordpress-develop.zip -d /tmp
+      unzip -q /tmp/wordpress-develop.zip -d /tmp
       mv
         /tmp/wordpress-develop-master/tools \
         /tmp/wordpress-develop-master/.env \
@@ -71,6 +71,8 @@ install:
 
       # Install WordPress.
       cd wordpress
+      pwd
+      ls -lah
       npm install dotenv wait-on
       npm run env:start
       sleep 10
