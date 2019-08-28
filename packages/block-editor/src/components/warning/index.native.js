@@ -6,7 +6,7 @@ import { View, Text } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { Icon } from '@wordpress/components';
+import { Icon, withTheme, useStyle } from '@wordpress/components';
 import { normalizeIconObject } from '@wordpress/blocks';
 
 /**
@@ -14,29 +14,33 @@ import { normalizeIconObject } from '@wordpress/blocks';
  */
 import styles from './style.scss';
 
-function Warning( { title, message, icon, iconClass, ...viewProps } ) {
+function Warning( { title, message, icon, iconClass, theme, ...viewProps } ) {
 	icon = icon && normalizeIconObject( icon );
+	const internalIconClass = 'warning-icon' + '-' + theme;
+	const titleStyle = useStyle( styles.title, styles.titleDark, theme );
+	const messageStyle = useStyle( styles.message, styles.messageDark, theme );
+
 	return (
 		<View
-			style={ styles.container }
+			style={ useStyle( styles.container, styles.containerDark, theme ) }
 			{ ...viewProps }
 		>
 			{ icon && (
 				<View style={ styles.icon }>
 					<Icon
-						className={ iconClass || 'warning-icon' }
+						className={ iconClass || internalIconClass }
 						icon={ icon && icon.src ? icon.src : icon }
 					/>
 				</View>
 			) }
 			{ title && (
-				<Text style={ styles.title }>{ title }</Text>
+				<Text style={ titleStyle }>{ title }</Text>
 			) }
 			{ message && (
-				<Text style={ styles.message }>{ message }</Text>
+				<Text style={ messageStyle }>{ message }</Text>
 			) }
 		</View>
 	);
 }
 
-export default Warning;
+export default withTheme( Warning );

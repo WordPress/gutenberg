@@ -12,7 +12,7 @@ import { __ } from '@wordpress/i18n';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { createBlock, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
-import { KeyboardAwareFlatList, ReadableContentView } from '@wordpress/components';
+import { KeyboardAwareFlatList, ReadableContentView, useStyle, withTheme } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -103,7 +103,7 @@ export class BlockList extends Component {
 					innerRef={ this.scrollViewInnerRef }
 					extraScrollHeight={ innerToolbarHeight + 10 }
 					keyboardShouldPersistTaps="always"
-					style={ styles.list }
+					style={ useStyle( styles.list, styles.listDark, this.context ) }
 					data={ this.props.blockClientIds }
 					extraData={ [ this.props.isFullyBordered ] }
 					keyExtractor={ identity }
@@ -126,6 +126,7 @@ export class BlockList extends Component {
 	}
 
 	renderItem( { item: clientId, index } ) {
+		const blockHolderFocusedStyle = useStyle( styles.blockHolderFocused, styles.blockHolderFocusedDark, this.props.theme );
 		const { shouldShowBlockAtIndex, shouldShowInsertionPoint } = this.props;
 		return (
 			<ReadableContentView>
@@ -138,18 +139,20 @@ export class BlockList extends Component {
 						rootClientId={ this.props.rootClientId }
 						onCaretVerticalPositionChange={ this.onCaretVerticalPositionChange }
 						borderStyle={ this.blockHolderBorderStyle() }
-						focusedBorderColor={ styles.blockHolderFocused.borderColor }
+						focusedBorderColor={ blockHolderFocusedStyle }
 					/> ) }
 			</ReadableContentView>
 		);
 	}
 
 	renderAddBlockSeparator() {
+		const lineStyle = useStyle( styles.lineStyleAddHere, styles.lineStyleAddHereDark, this.props.theme );
+		const labelStyle = useStyle( styles.labelStyleAddHere, styles.labelStyleAddHereDark, this.props.theme );
 		return (
 			<View style={ styles.containerStyleAddHere } >
-				<View style={ styles.lineStyleAddHere }></View>
-				<Text style={ styles.labelStyleAddHere } >{ __( 'ADD BLOCK HERE' ) }</Text>
-				<View style={ styles.lineStyleAddHere }></View>
+				<View style={ lineStyle }></View>
+				<Text style={ labelStyle } >{ __( 'ADD BLOCK HERE' ) }</Text>
+				<View style={ lineStyle }></View>
 			</View>
 		);
 	}
@@ -228,5 +231,6 @@ export default compose( [
 			replaceBlock,
 		};
 	} ),
+	withTheme,
 ] )( BlockList );
 
