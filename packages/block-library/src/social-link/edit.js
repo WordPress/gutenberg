@@ -21,7 +21,7 @@ import { getIconBySite } from './social-list';
 
 const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
 	const { url, site } = attributes;
-	const [ showURLPopover, setPopover ] = useState( true );
+	const [ showURLPopover, setPopover ] = useState( false );
 	const classes = classNames(
 		'wp-social-link',
 		'wp-social-link-' + site,
