@@ -103,6 +103,42 @@ describe( 'RichText', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
+	it( 'should undo backtick transform with backspace', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '`a`' );
+		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
+		await page.keyboard.press( 'Backspace' );
+
+		// Expect "`a`" to be restored.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should not undo backtick transform with backspace after typing', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '`a`' );
+		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
+		await page.keyboard.type( 'b' );
+		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.press( 'Backspace' );
+
+		// Expect "a" to be deleted.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should not undo backtick transform with backspace after selection change', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '`a`' );
+		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
+		// Move inside format boundary.
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'Backspace' );
+
+		// Expect "a" to be deleted.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
 	it( 'should not format text after code backtick', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'A `backtick` and more.' );

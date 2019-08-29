@@ -10,6 +10,10 @@
 	justify-content: center;
 }
 
+.containerDark {
+	background-color: $background-dark-secondary;
+}
+
 .icon {
 	width: 24px;
 	height: 24px;
@@ -24,8 +28,16 @@
 	color: $gray-dark;
 }
 
+.titleDark {
+	color: $white;
+}
+
 .message {
 	text-align: center;
 	color: $gray-text-min;
 	font-size: 12;
+}
+
+.messageDark {
+	color: $white;
 }

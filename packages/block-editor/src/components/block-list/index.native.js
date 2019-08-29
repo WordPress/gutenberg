@@ -12,7 +12,7 @@ import { __ } from '@wordpress/i18n';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { createBlock, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
-import { KeyboardAwareFlatList, ReadableContentView } from '@wordpress/components';
+import { KeyboardAwareFlatList, ReadableContentView, useStyle, withTheme } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -52,12 +52,12 @@ export class BlockList extends Component {
 		if ( this.props.isPostTitleSelected ) {
 			// if post title selected, insert at top of post
 			return 0;
-		} else if ( this.props.selectedBlockOrder === -1 ) {
+		} else if ( this.props.selectedBlockIndex === -1 ) {
 			// if no block selected, insert at end of post
 			return this.props.blockCount;
 		}
 		// insert after selected block
-		return this.props.selectedBlockOrder + 1;
+		return this.props.selectedBlockIndex + 1;
 	}
 
 	blockHolderBorderStyle() {
@@ -98,10 +98,11 @@ export class BlockList extends Component {
 				<KeyboardAwareFlatList
 					{ ...( Platform.OS === 'android' ? { removeClippedSubviews: false } : {} ) } // Disable clipping on Android to fix focus losing. See https://github.com/wordpress-mobile/gutenberg-mobile/pull/741#issuecomment-472746541
 					accessibilityLabel="block-list"
+					autoScroll={ this.props.autoScroll }
 					innerRef={ this.scrollViewInnerRef }
 					extraScrollHeight={ innerToolbarHeight + 10 }
 					keyboardShouldPersistTaps="always"
-					style={ styles.list }
+					style={ useStyle( styles.list, styles.listDark, this.context ) }
 					data={ blockClientIds }
 					extraData={ [ isFullyBordered ] }
 					keyExtractor={ identity }
@@ -130,29 +131,34 @@ export class BlockList extends Component {
 		return isUnmodifiedDefaultBlock( block );
 	}
 
-	renderItem( { item: clientId } ) {
+	renderItem( { item: clientId, index } ) {
+		const blockHolderFocusedStyle = useStyle( styles.blockHolderFocused, styles.blockHolderFocusedDark, this.props.theme );
+		const { shouldShowBlockAtIndex, shouldShowInsertionPoint } = this.props;
 		return (
 			<ReadableContentView>
-				{ this.props.shouldShowInsertionPoint( clientId ) && this.renderAddBlockSeparator() }
-				<BlockListBlock
-					key={ clientId }
-					showTitle={ false }
-					clientId={ clientId }
-					rootClientId={ this.props.rootClientId }
-					onCaretVerticalPositionChange={ this.onCaretVerticalPositionChange }
-					borderStyle={ this.blockHolderBorderStyle() }
-					focusedBorderColor={ styles.blockHolderFocused.borderColor }
-				/>
+				{ shouldShowInsertionPoint( clientId ) && this.renderAddBlockSeparator() }
+				{ shouldShowBlockAtIndex( index ) && (
+					<BlockListBlock
+						key={ clientId }
+						showTitle={ false }
+						clientId={ clientId }
+						rootClientId={ this.props.rootClientId }
+						onCaretVerticalPositionChange={ this.onCaretVerticalPositionChange }
+						borderStyle={ this.blockHolderBorderStyle() }
+						focusedBorderColor={ blockHolderFocusedStyle }
+					/> ) }
 			</ReadableContentView>
 		);
 	}
 
 	renderAddBlockSeparator() {
+		const lineStyle = useStyle( styles.lineStyleAddHere, styles.lineStyleAddHereDark, this.props.theme );
+		const labelStyle = useStyle( styles.labelStyleAddHere, styles.labelStyleAddHereDark, this.props.theme );
 		return (
 			<View style={ styles.containerStyleAddHere } >
-				<View style={ styles.lineStyleAddHere }></View>
-				<Text style={ styles.labelStyleAddHere } >{ __( 'ADD BLOCK HERE' ) }</Text>
-				<View style={ styles.lineStyleAddHere }></View>
+				<View style={ lineStyle }></View>
+				<Text style={ labelStyle } >{ __( 'ADD BLOCK HERE' ) }</Text>
+				<View style={ lineStyle }></View>
 			</View>
 		);
 	}
@@ -178,7 +184,6 @@ export default compose( [
 			getBlockOrder,
 			getSelectedBlock,
 			getSelectedBlockClientId,
-			isBlockSelected,
 			getBlockInsertionPoint,
 			isBlockInsertionPointVisible,
 		} = select( 'core/block-editor' );
@@ -186,24 +191,37 @@ export default compose( [
 		const selectedBlockClientId = getSelectedBlockClientId();
 		const blockClientIds = getBlockOrder( rootClientId );
 		const insertionPoint = getBlockInsertionPoint();
+		const blockInsertionPointIsVisible = isBlockInsertionPointVisible();
 		const shouldShowInsertionPoint = ( clientId ) => {
 			return (
-				isBlockInsertionPointVisible() &&
+				blockInsertionPointIsVisible &&
 				insertionPoint.rootClientId === rootClientId &&
 				blockClientIds[ insertionPoint.index ] === clientId
 			);
+		};
+
+		const selectedBlockIndex = getBlockIndex( selectedBlockClientId );
+		const shouldShowBlockAtIndex = ( index ) => {
+			const shouldHideBlockAtIndex = (
+				blockInsertionPointIsVisible &&
+				// if `index` === `insertionPoint.index`, then block is replaceable
+				index === insertionPoint.index &&
+				// only hide selected block
+				index === selectedBlockIndex
+			);
+			return ! shouldHideBlockAtIndex;
 		};
 
 		return {
 			blockClientIds,
 			blockCount: getBlockCount( rootClientId ),
 			getBlockName,
-			isBlockSelected,
 			isBlockInsertionPointVisible: isBlockInsertionPointVisible(),
+			shouldShowBlockAtIndex,
 			shouldShowInsertionPoint,
 			selectedBlock: getSelectedBlock(),
 			selectedBlockClientId,
-			selectedBlockOrder: getBlockIndex( selectedBlockClientId ),
+			selectedBlockIndex,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
@@ -219,5 +237,6 @@ export default compose( [
 			replaceBlock,
 		};
 	} ),
+	withTheme,
 ] )( BlockList );
 

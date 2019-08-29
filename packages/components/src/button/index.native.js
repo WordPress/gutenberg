@@ -19,7 +19,6 @@ const styles = StyleSheet.create( {
 		flexDirection: 'row',
 		justifyContent: 'center',
 		alignItems: 'center',
-		backgroundColor: 'white',
 	},
 	fixedRatio: {
 		aspectRatio: 1,
@@ -65,6 +64,7 @@ export default function Button( props ) {
 	} = props;
 
 	const isDisabled = ariaDisabled || disabled;
+
 	const buttonViewStyle = {
 		opacity: isDisabled ? 0.2 : 1,
 		...( fixedRatio && styles.fixedRatio ),

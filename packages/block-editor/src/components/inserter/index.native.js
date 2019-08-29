@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Dropdown, ToolbarButton, Dashicon } from '@wordpress/components';
+import { Dropdown, ToolbarButton, Dashicon, withTheme, useStyle } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
@@ -14,10 +14,10 @@ import { getUnregisteredTypeHandlerName } from '@wordpress/blocks';
 import styles from './style.scss';
 import InserterMenu from './menu';
 
-const defaultRenderToggle = ( { onToggle, disabled } ) => (
+const defaultRenderToggle = ( { onToggle, disabled, style } ) => (
 	<ToolbarButton
 		title={ __( 'Add block' ) }
-		icon={ ( <Dashicon icon="plus-alt" style={ styles.addBlockButton } color={ styles.addBlockButton.color } /> ) }
+		icon={ ( <Dashicon icon="plus-alt" style={ style } color={ style.color } /> ) }
 		onClick={ onToggle }
 		extraProps={ { hint: __( 'Double tap to add a block' ) } }
 		isDisabled={ disabled }
@@ -56,9 +56,10 @@ class Inserter extends Component {
 		const {
 			disabled,
 			renderToggle = defaultRenderToggle,
+			theme,
 		} = this.props;
-
-		return renderToggle( { onToggle, isOpen, disabled } );
+		const style = useStyle( styles.addBlockButton, styles.addBlockButtonDark, theme );
+		return renderToggle( { onToggle, isOpen, disabled, style } );
 	}
 
 	/**
@@ -118,4 +119,5 @@ export default compose( [
 			items: inserterItems.filter( ( { name } ) => name !== getUnregisteredTypeHandlerName() ),
 		};
 	} ),
+	withTheme,
 ] )( Inserter );

@@ -712,6 +712,20 @@ export function __unstableMarkLastChangeAsPersistent() {
 }
 
 /**
+ * Returns an action object used in signalling that the last block change is
+ * an automatic change, meaning it was not performed by the user, and can be
+ * undone using the `Escape` and `Backspace` keys. This action must be called
+ * after the change was made, and any actions that are a consequence of it, so
+ * it is recommended to be called at the next idle period to ensure all
+ * selection changes have been recorded.
+ *
+ * @return {Object} Action object.
+ */
+export function __unstableMarkAutomaticChange() {
+	return { type: 'MARK_AUTOMATIC_CHANGE' };
+}
+
+/**
  * Returns an action object used to enable or disable the navigation mode.
  *
  * @param {string} isNavigationMode Enable/Disable navigation mode.
