@@ -60,12 +60,6 @@
 		color: $light-opacity-300;
 	}
 
-	// Nested movers have a background, so don't invert the colors there.
-	.is-dark-theme .wp-block .wp-block &,
-	.wp-block .is-dark-theme .wp-block & {
-		color: $dark-opacity-300;
-	}
-
 	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover,
 	&:focus:not(:disabled) {
 		background-color: transparent;
@@ -117,28 +111,4 @@
 
 .block-editor-block-mover__description {
 	display: none;
-}
-
-// Apply a background in nested contexts, only on desktop.
-.block-editor-block-mover__control-drag-handle:not(:disabled):not([aria-disabled="true"]):not(.is-default),
-.block-editor-block-mover__control {
-	@include break-small() {
-		.block-editor-block-list__layout [data-align="right"] &,
-		.block-editor-block-list__layout [data-align="left"] &,
-		.block-editor-block-list__layout .block-editor-block-list__layout & {
-			background: $white;
-			box-shadow: inset 0 0 0 1px $light-gray-500;
-
-			&:nth-child(-n+2) {
-				margin-bottom: -1px;
-			}
-
-			&:hover,
-			&:active,
-			&:focus {
-				// Buttons are stacked with overlapping border to look like a unit, so elevate on interactions.
-				z-index: z-index(".block-editor-block-mover__control");
-			}
-		}
-	}
 }
