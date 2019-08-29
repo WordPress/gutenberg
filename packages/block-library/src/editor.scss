@@ -36,7 +36,6 @@
 @import "./text-columns/editor.scss";
 @import "./verse/editor.scss";
 @import "./video/editor.scss";
-@import "./site-title/editor.scss";
 
 /**
  * Import styles from internal editor components used by the blocks.
@@ -56,4 +55,11 @@
 .editor-styles-wrapper [data-block] {
 	margin-top: $default-block-margin;
 	margin-bottom: $default-block-margin;
+}
+
+.wp-block-custom-entity__save-button {
+	position: absolute;
+	right: 0;
+	top: 0;
+	z-index: z-index(".wp-block-custom-entity__save-button");
 }
