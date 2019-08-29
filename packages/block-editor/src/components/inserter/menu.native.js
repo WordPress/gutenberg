@@ -14,7 +14,7 @@ import {
 } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withInstanceId, compose } from '@wordpress/compose';
-import { BottomSheet, Icon } from '@wordpress/components';
+import { BottomSheet, Icon, withTheme, useStyle } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -63,6 +63,9 @@ export class InserterMenu extends Component {
 	render() {
 		const numberOfColumns = this.calculateNumberOfColumns();
 		const bottomPadding = styles.contentBottomPadding;
+		const modalIconWrapperStyle = useStyle( styles.modalIconWrapper, styles.modalIconWrapperDark, this.props.theme );
+		const modalIconStyle = useStyle( styles.modalIcon, styles.modalIconDark, this.props.theme );
+		const modalItemLabelStyle = useStyle( styles.modalItemLabel, styles.modalItemLabelDark, this.props.theme );
 
 		return (
 			<BottomSheet
@@ -89,12 +92,12 @@ export class InserterMenu extends Component {
 							accessibilityLabel={ item.title }
 							onPress={ () => this.props.onSelect( item ) }>
 							<View style={ styles.modalItem }>
-								<View style={ styles.modalIconWrapper }>
-									<View style={ styles.modalIcon }>
-										<Icon icon={ item.icon.src } fill={ styles.modalIcon.fill } size={ styles.modalIcon.width } />
+								<View style={ modalIconWrapperStyle }>
+									<View style={ modalIconStyle }>
+										<Icon icon={ item.icon.src } fill={ modalIconStyle.fill } size={ modalIconStyle.width } />
 									</View>
 								</View>
-								<Text style={ styles.modalItemLabel }>{ item.title }</Text>
+								<Text style={ modalItemLabelStyle }>{ item.title }</Text>
 							</View>
 						</TouchableHighlight>
 					}
@@ -213,4 +216,5 @@ export default compose(
 		};
 	} ),
 	withInstanceId,
+	withTheme,
 )( InserterMenu );

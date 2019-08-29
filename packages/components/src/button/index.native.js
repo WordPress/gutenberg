@@ -20,7 +20,6 @@ const styles = StyleSheet.create( {
 		justifyContent: 'center',
 		alignItems: 'center',
 		aspectRatio: 1,
-		backgroundColor: 'white',
 	},
 	buttonActive: {
 		flex: 1,
@@ -63,6 +62,7 @@ export default function Button( props ) {
 	} = props;
 
 	const isDisabled = ariaDisabled || disabled;
+
 	const buttonViewStyle = {
 		opacity: isDisabled ? 0.2 : 1,
 		...( ariaPressed ? styles.buttonActive : styles.buttonInactive ),

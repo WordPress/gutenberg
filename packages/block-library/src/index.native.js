@@ -101,6 +101,33 @@ export const coreBlocks = [
 	return memo;
 }, {} );
 
+/**
+ * Function to register an individual block.
+ *
+ * @param {Object} block The block to be registered.
+ *
+ */
+const registerBlock = ( block ) => {
+	if ( ! block ) {
+		return;
+	}
+	const { metadata, settings, name } = block;
+	registerBlockType( name, {
+		...metadata,
+		...settings,
+	} );
+};
+
+/**
+ * Function to register core blocks provided by the block editor.
+ *
+ * @example
+ * ```js
+ * import { registerCoreBlocks } from '@wordpress/block-library';
+ *
+ * registerCoreBlocks();
+ * ```
+ */
 export const registerCoreBlocks = () => {
 	[
 		paragraph,
@@ -114,13 +141,10 @@ export const registerCoreBlocks = () => {
 		separator,
 		list,
 		quote,
-	].forEach( ( { metadata, name, settings } ) => {
-		registerBlockType( name, {
-			...metadata,
-			...settings,
-		} );
-	} );
-};
+		// eslint-disable-next-line no-undef
+		typeof __DEV__ !== 'undefined' && __DEV__ ? mediaText : null,
+	].forEach( registerBlock );
 
-setDefaultBlockName( paragraph.name );
-setUnregisteredTypeHandlerName( missing.name );
+	setDefaultBlockName( paragraph.name );
+	setUnregisteredTypeHandlerName( missing.name );
+};
