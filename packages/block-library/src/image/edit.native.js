@@ -264,6 +264,7 @@ class ImageEdit extends React.Component {
 				<BottomSheet.Cell
 					icon={ 'empty' }
 					label={ __( 'Size' ) }
+					labelStyle={ styles.sizeInspectorControlsCell }
 					value={ getSizeSlugDisplay( sizeSlug ) }
 					editable={ false }
 					onChangeValue={ this.onSetLinkDestination }
@@ -286,7 +287,7 @@ class ImageEdit extends React.Component {
 			</BottomSheet>
 		);
 
-		//Used for display of Inspector Controls and sizeSlug Picker
+		//Used for display of Inspector Controls
 		const getSizeSlugDisplay = ( sizeSlugValue ) => {
 			if ( sizeSlugValue === undefined ) {
 				sizeSlugValue = DEFAULT_SIZE_SLUG;
