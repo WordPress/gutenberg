@@ -20,7 +20,6 @@ const commonAttributes = {
 };
 
 // Create individual blocks out of each site in social-list.js
-// TODO: solve icon issue
 export const sites = Object.keys( socialList ).map(
 	( site ) => {
 		const siteParams = socialList[ site ];
