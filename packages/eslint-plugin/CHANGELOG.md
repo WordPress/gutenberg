@@ -6,8 +6,6 @@
 - Stricter JSDoc linting using [`eslint-plugin-jsdoc`](https://github.com/gajus/eslint-plugin-jsdoc).
 - Stricter validation enabled for test files only using new `test-e2e` and `test-unit` rulesets.
 
-## 2.4.0 (2019-08-05)
-
 ### New Features
 
 - New Rule: [`@wordpress/no-unguarded-get-range-at`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/no-unguarded-get-range-at.md)
