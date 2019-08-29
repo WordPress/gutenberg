@@ -16,13 +16,10 @@ import {
 /**
  * Internal dependencies
  */
-import MenuItemInserter from './menu-item-inserter';
 import { __ } from '@wordpress/i18n';
 
 function NavigationMenu( {
 	attributes,
-	clientId,
-	isSelected,
 	setAttributes,
 } ) {
 	return (
@@ -44,12 +41,8 @@ function NavigationMenu( {
 			<div className="wp-block-navigation-menu">
 				<InnerBlocks
 					allowedBlocks={ [ 'core/navigation-menu-item' ] }
+					renderAppender={ InnerBlocks.ButtonBlockAppender }
 				/>
-				{ isSelected && (
-					<MenuItemInserter
-						rootClientId={ clientId }
-					/>
-				) }
 			</div>
 		</Fragment>
 	);
