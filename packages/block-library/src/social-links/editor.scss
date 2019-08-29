@@ -81,7 +81,6 @@
 
 // Selected/unselected states.
 // Unselected block is preview, selected has additional options.
-// When no blocks are configured, the block shouldn't collapse but instead show some gray "skeleton indicators".
 [data-type="core/social-links"]:not(.is-selected):not(.has-child-selected) .wp-block-social-links {
 	min-height: 36px; // This height matches the height of the buttons and ensures an empty block doesn't collapse.
 }

@@ -9,13 +9,14 @@
 	padding-right: 16px;
 }
 
-.has-child-selected .wp-social-link__is-incomplete,
-.is-selected .wp-social-link__is-incomplete {
+// The following two rules have their classes doubled to increase specificity.
+.has-child-selected .wp-social-link__is-incomplete.wp-social-link__is-incomplete,
+.is-selected .wp-social-link__is-incomplete.wp-social-link__is-incomplete {
 	background-color: $dark-gray-150;
 }
 
-.has-child-selected .is-style-logos-only .wp-social-link__is-incomplete,
-.is-selected .is-style-logos-only .wp-social-link__is-incomplete {
+.has-child-selected .is-style-logos-only .wp-social-link__is-incomplete.wp-social-link__is-incomplete,
+.is-selected .is-style-logos-only .wp-social-link__is-incomplete.wp-social-link__is-incomplete {
 	color: $dark-gray-150;
 	background-color: transparent;
 }
