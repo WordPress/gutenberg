@@ -20,7 +20,10 @@ import {
 	Toolbar,
 	ToolbarButton,
 	Picker,
+	withTheme,
+	useStyle,
 } from '@wordpress/components';
+
 import {
 	Caption,
 	MediaPlaceholder,
@@ -208,11 +211,13 @@ class ImageEdit extends React.Component {
 	}
 
 	getIcon( isRetryIcon ) {
+		const iconStyle = useStyle( styles.icon, styles.iconDark, this.props.theme );
+
 		if ( isRetryIcon ) {
 			return <Icon icon={ SvgIconRetry } { ...styles.iconRetry } />;
 		}
 
-		return <Icon icon={ SvgIcon } { ...styles.icon } />;
+		return <Icon icon={ SvgIcon } { ...iconStyle } />;
 	}
 
 	render() {
@@ -450,4 +455,4 @@ class ImageEdit extends React.Component {
 	}
 }
 
-export default ImageEdit;
+export default withTheme( ImageEdit );
