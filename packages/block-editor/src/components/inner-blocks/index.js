@@ -37,7 +37,7 @@ class InnerBlocks extends Component {
 	}
 
 	componentDidMount() {
-		const { templateLock, block } = this.props;
+		const { block, templateLock, value, replaceInnerBlocks } = this.props;
 		const { innerBlocks } = block;
 		// Only synchronize innerBlocks with template if innerBlocks are empty or a locking all exists directly on the block.
 		if ( innerBlocks.length === 0 || templateLock === 'all' ) {
@@ -49,10 +49,22 @@ class InnerBlocks extends Component {
 				templateInProcess: false,
 			} );
 		}
+
+		// Set controlled blocks value from parent, if any.
+		if ( value ) {
+			replaceInnerBlocks( value );
+		}
 	}
 
 	componentDidUpdate( prevProps ) {
-		const { template, block, templateLock } = this.props;
+		const {
+			block,
+			templateLock,
+			template,
+			isLastBlockChangePersistent,
+			onInput,
+			onChange,
+		} = this.props;
 		const { innerBlocks } = block;
 
 		this.updateNestedSettings();
@@ -61,6 +73,14 @@ class InnerBlocks extends Component {
 			const hasTemplateChanged = ! isEqual( template, prevProps.template );
 			if ( hasTemplateChanged ) {
 				this.synchronizeBlocksWithTemplate();
+			}
+		}
+
+		// Sync with controlled blocks value from parent, if possible.
+		if ( prevProps.block.innerBlocks !== innerBlocks ) {
+			const resetFunc = isLastBlockChangePersistent ? onInput : onChange;
+			if ( resetFunc ) {
+				resetFunc( innerBlocks );
 			}
 		}
 	}
@@ -149,6 +169,7 @@ InnerBlocks = compose( [
 			getBlockListSettings,
 			getBlockRootClientId,
 			getTemplateLock,
+			isLastBlockChangePersistent,
 		} = select( 'core/block-editor' );
 		const { clientId } = ownProps;
 		const block = getBlock( clientId );
@@ -159,6 +180,7 @@ InnerBlocks = compose( [
 			blockListSettings: getBlockListSettings( clientId ),
 			hasOverlay: block.name !== 'core/template' && ! isBlockSelected( clientId ) && ! hasSelectedInnerBlock( clientId, true ),
 			parentLock: getTemplateLock( rootClientId ),
+			isLastBlockChangePersistent: isLastBlockChangePersistent(),
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => {
