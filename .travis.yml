@@ -65,7 +65,7 @@ jobs:
       install:
         - npm ci
       script:
-        - npm run test-unit:native -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
+        - npm run test-unit:native -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache-native"
 
     - name: PHP unit tests (Docker)
       env: WP_VERSION=latest DOCKER=true
