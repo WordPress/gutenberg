@@ -1,6 +1,6 @@
-## Master
+## 8.2.0 (2019-08-29)
 
-## New Features
+### New Features
 
 - The bundled `re-resizable` dependency has been updated from requiring `5.0.1` to requiring `^6.0.0` ([#17011](https://github.com/WordPress/gutenberg/pull/17011)).
 
