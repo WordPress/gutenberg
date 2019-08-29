@@ -381,7 +381,9 @@ function withPersistentBlockChange( reducer ) {
 		// In comparing against the previous action, consider only those which
 		// would have qualified as one which would have been ignored or not
 		// have resulted in a changed state.
-		lastAction = action;
+		if ( ! isExplicitPersistentChange ) {
+			lastAction = action;
+		}
 
 		return nextState;
 	};
