@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { overEvery, find, findLast, reverse, first, last } from 'lodash';
+import { overEvery, find, findLast, reverse, first, last, castArray } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -86,9 +86,16 @@ function searchVerticallyForTabbableTextField( xPosition, yPosition, increment =
 		return;
 	}
 
-	const element = document.elementFromPoint( xPosition, yPosition );
-	if ( element && isTabbableTextField( element ) ) {
-		return element;
+	// Prefer elementsFromPoint where supported, but use a fallback otherwise.
+	const elementsFromPoint = document.elementsFromPoint || document.msElementsFromPoint || document.elementFromPoint;
+	if ( ! elementsFromPoint ) {
+		return;
+	}
+
+	const elements = castArray( elementsFromPoint( xPosition, yPosition ) );
+	const tabbable = find( elements, isTabbableTextField );
+	if ( tabbable ) {
+		return tabbable;
 	}
 
 	return searchVerticallyForTabbableTextField( xPosition, yPosition + increment, increment, searches - 1 );
