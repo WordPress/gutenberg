@@ -50,21 +50,17 @@ const IMAGE_SIZE_LARGE = 'large';
 const IMAGE_SIZE_FULL_SIZE = 'full';
 const DEFAULT_SIZE_SLUG = IMAGE_SIZE_LARGE;
 
-//If this value is below ~25, you start to see problems with ActionSheetIOS
-const BOTTOM_SHEET_TO_PICKER_ANIMATION_DELAY_MILLISECONDS = 50;
-
 // Default Image ratio 4:3
 const IMAGE_ASPECT_RATIO = 4 / 3;
 
 class ImageEdit extends React.Component {
-	menuTransitionTimeout = 0;
-
 	constructor( props ) {
 		super( props );
 
 		this.state = {
 			showSettings: false,
 			isCaptionSelected: false,
+			showImageOptions: false,
 		};
 
 		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind( this );
@@ -109,8 +105,6 @@ class ImageEdit extends React.Component {
 		if ( hasAction( 'blocks.onRemoveBlockCheckUpload' ) && this.state.isUploadInProgress ) {
 			doAction( 'blocks.onRemoveBlockCheckUpload', this.props.attributes.id );
 		}
-
-		clearTimeout( this.menuTransitionTimeout );
 	}
 
 	static getDerivedStateFromProps( props, state ) {
@@ -233,6 +227,13 @@ class ImageEdit extends React.Component {
 			this.setState( { showSettings: false } );
 		};
 
+		const onAfterImageSettingsDismissed = () => {
+			if ( this.state.showImageOptions ) {
+				picker.presentPicker();
+				this.setState( { showImageOptions: false } );
+			}
+		};
+
 		const getToolbarEditButton = ( open ) => (
 			<BlockControls>
 				<Toolbar>
@@ -249,6 +250,7 @@ class ImageEdit extends React.Component {
 			<BottomSheet
 				isVisible={ this.state.showSettings }
 				onClose={ onImageSettingsClose }
+				onDismiss={ onAfterImageSettingsDismissed }
 				hideHeader
 			>
 				<BottomSheet.Cell
@@ -329,13 +331,9 @@ class ImageEdit extends React.Component {
 		);
 
 		const onPickerPresent = () => {
-			const pickerInstance = picker;
 			this.setState( {
+				showImageOptions: true,
 				showSettings: false,
-			}, () => {
-				this.menuTransitionTimeout = setTimeout( function() {
-					pickerInstance.presentPicker();
-				}, BottomSheet.ANIMATION_OUT_DURATION_MILLISECONDS + BOTTOM_SHEET_TO_PICKER_ANIMATION_DELAY_MILLISECONDS );
 			} );
 		};
 
