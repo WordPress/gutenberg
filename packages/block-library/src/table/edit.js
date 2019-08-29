@@ -110,12 +110,97 @@ export class TableEdit extends Component {
 		this.onToggleFooterSection = this.onToggleFooterSection.bind( this );
 		this.onChangeColumnAlignment = this.onChangeColumnAlignment.bind( this );
 		this.getCellAlignment = this.getCellAlignment.bind( this );
+		this.rangeSelect = this.rangeSelect.bind( this );
+		this.onMouseDown = this.onMouseDown.bind( this );
+		this.onMouseUp = this.onMouseUp.bind( this );
+		this.onMouseOver = this.onMouseOver.bind( this );
+		this.onMerge = this.onMerge.bind( this );
 
 		this.state = {
 			initialRowCount: 2,
 			initialColumnCount: 2,
 			selectedCell: null,
+			selectedCells: [],
+			initialSelection: null,
+			isSelecting: false,
+			finalSelection: null,
+			mergedCells: false,
 		};
+	}
+
+	/**
+	 * Handle cell merging.
+	 */
+	onMerge() {
+		const { selectedCells } = this.state;
+		const { attributes, setAttributes } = this.props;
+		const { initialSelection, finalSelection } = this.state;
+		const largerColumn = initialSelection.columnIndex > finalSelection.columnIndex ? initialSelection.columnIndex : finalSelection.columnIndex;
+		const smallerColumn = initialSelection.columnIndex < finalSelection.columnIndex ? initialSelection.columnIndex : finalSelection.columnIndex;
+		const largerRow = initialSelection.rowIndex > finalSelection.rowIndex ? initialSelection.rowIndex : finalSelection.rowIndex;
+		const smallerRow = initialSelection.rowIndex < finalSelection.rowIndex ? initialSelection.rowIndex : finalSelection.rowIndex;
+		const colspan = largerColumn - smallerColumn + 1;
+		const rowspan = largerRow - smallerRow + 1;
+		attributes.body[ smallerRow ].cells[ smallerColumn ].colspan = colspan;
+		attributes.body[ smallerRow ].cells[ smallerColumn ].rowspan = rowspan;
+		for ( let x = smallerColumn; x <= largerColumn; x++ ) {
+			for ( let y = smallerRow; y <= largerRow; y++ ) {
+				if ( ! ( x === smallerColumn && y === smallerRow ) ) {
+					delete ( attributes.body[ y ].cells[ x ] );
+				}
+			}
+		}
+		setAttributes( attributes );
+		this.setState( {
+			selectedCells: [],
+			mergedCells: selectedCells,
+		} );
+	}
+
+	/**
+	 * Handle onMouseDown events.
+	 *
+	 * @param {Object} cellLocation Object with `section`, `rowIndex`, and `columnIndex` properties.
+	 */
+	onMouseDown( cellLocation ) {
+		const { isSelecting } = this.state;
+		if ( ! isSelecting ) {
+			this.setState( {
+				isSelecting: true,
+				initialSelection: cellLocation,
+				selectedCells: [],
+			} );
+		}
+	}
+
+	/**
+	 * Handle onMouseUp events.
+	 *
+	 * @param {Object} cellLocation Object with `section`, `rowIndex`, and `columnIndex` properties.
+	 */
+	onMouseUp( cellLocation ) {
+		const { isSelecting } = this.state;
+		if ( isSelecting ) {
+			this.setState( {
+				isSelecting: false,
+				finalSelection: cellLocation,
+			} );
+		}
+	}
+
+	/**
+	 * Handle onMouseOver events.
+	 *
+	 * @param {Object} cellLocation Object with `section`, `rowIndex`, and `columnIndex` properties.
+	 */
+	onMouseOver( cellLocation ) {
+		const {
+			isSelecting,
+		} = this.state;
+
+		if ( isSelecting ) {
+			this.rangeSelect( cellLocation );
+		}
 	}
 
 	/**
@@ -363,13 +448,38 @@ export class TableEdit extends Component {
 	 */
 	createOnFocus( cellLocation ) {
 		return () => {
+			const { selectedCells } = this.state;
+			selectedCells[ `${ cellLocation.columnIndex }::${ cellLocation.rowIndex }` ] = true;
 			this.setState( {
 				selectedCell: {
 					...cellLocation,
 					type: 'cell',
 				},
+				selectedCells,
 			} );
 		};
+	}
+
+	/**
+	 * Select a range.
+	 *
+	 * @param {Object} cellLocation Object with `section`, `rowIndex`, and `columnIndex` properties.
+	 */
+	rangeSelect( cellLocation ) {
+		const { initialSelection, selectedCell } = this.state;
+		const selectedCells = [];
+		const currentCell = cellLocation || selectedCell;
+		const largerColumn = initialSelection.columnIndex > currentCell.columnIndex ? initialSelection.columnIndex : currentCell.columnIndex;
+		const smallerColumn = initialSelection.columnIndex < currentCell.columnIndex ? initialSelection.columnIndex : currentCell.columnIndex;
+		const largerRow = initialSelection.rowIndex > currentCell.rowIndex ? initialSelection.rowIndex : currentCell.rowIndex;
+		const smallerRow = initialSelection.rowIndex < currentCell.rowIndex ? initialSelection.rowIndex : currentCell.rowIndex;
+
+		for ( let x = smallerColumn; x <= largerColumn; x++ ) {
+			for ( let y = smallerRow; y <= largerRow; y++ ) {
+				selectedCells[ `${ x }::${ y }` ] = true;
+			}
+		}
+		this.setState( { selectedCells } );
 	}
 
 	/**
@@ -378,8 +488,7 @@ export class TableEdit extends Component {
 	 * @return {Array} Table controls.
 	 */
 	getTableControls() {
-		const { selectedCell } = this.state;
-
+		const { selectedCell, selectedCells, mergedCells } = this.state;
 		return [
 			{
 				icon: 'table-row-before',
@@ -417,6 +526,12 @@ export class TableEdit extends Component {
 				isDisabled: ! selectedCell,
 				onClick: this.onDeleteColumn,
 			},
+			{
+				icon: 'table-cells-merge',
+				title: mergedCells ? __( 'Unmerge Cells' ) : __( 'Merge Cells' ),
+				isDisabled: 0 === Object.values( selectedCells ),
+				onClick: this.onMerge,
+			},
 		];
 	}
 
@@ -435,19 +550,19 @@ export class TableEdit extends Component {
 		}
 
 		const Tag = `t${ name }`;
-		const { selectedCell } = this.state;
+		const { selectedCell, selectedCells } = this.state;
 
 		return (
 			<Tag>
 				{ rows.map( ( { cells }, rowIndex ) => (
 					<tr key={ rowIndex }>
-						{ cells.map( ( { content, tag: CellTag, scope, align }, columnIndex ) => {
+						{ cells.map( ( { content, tag: CellTag, scope, align, colspan, rowspan }, columnIndex ) => {
 							const cellLocation = {
 								sectionName: name,
 								rowIndex,
 								columnIndex,
 							};
-							const isSelected = isCellSelected( cellLocation, selectedCell );
+							const isSelected = isCellSelected( cellLocation, selectedCell ) || selectedCells[ `${ cellLocation.columnIndex }::${ cellLocation.rowIndex }` ];
 
 							const cellClasses = classnames(	{
 								'is-selected': isSelected,
@@ -457,15 +572,38 @@ export class TableEdit extends Component {
 
 							return (
 								<CellTag
+									colSpan={ colspan }
+									rowSpan={ rowspan }
 									key={ columnIndex }
 									className={ cellClasses }
 									scope={ CellTag === 'th' ? scope : undefined }
+									onMouseDown={ () => {
+										this.onMouseDown( cellLocation );
+									} }
+									onMouseUp={ () => {
+										this.onMouseUp( cellLocation );
+									} }
+									onMouseOver={ () => {
+										this.onMouseOver( cellLocation );
+									} }
+									onFocus={ this.createOnFocus( cellLocation ) }
 									onClick={ ( event ) => {
-										// When a cell is selected, forward focus to the child RichText. This solves an issue where the
-										// user may click inside a cell, but outside of the RichText, resulting in nothing happening.
-										const richTextElement = event && event.target && event.target.querySelector( `.${ richTextClassName }` );
-										if ( richTextElement ) {
-											richTextElement.focus();
+										// If the shift key is depressed when clicking, and an existing cell is selected, do a multi-select
+										// betweeen them.
+										if ( event.shiftKey && isSelected ) {
+											// Select range.
+											this.rangeSelect();
+											event.preventDefault();
+										} else {
+											// Clear multi-selection and set initial selection.
+											this.setState( { selectedCells: [], initialSelection: cellLocation } );
+
+											// When a cell is selected, forward focus to the child RichText. This solves an issue where the
+											// user may click inside a cell, but outside of the RichText, resulting in nothing happening.
+											const richTextElement = event && event.target && event.target.querySelector( `.${ richTextClassName }` );
+											if ( richTextElement ) {
+												richTextElement.focus();
+											}
 										}
 									} }
 								>
@@ -484,12 +622,11 @@ export class TableEdit extends Component {
 		);
 	}
 
-	componentDidUpdate() {
+	componentDidUpdate( prevProps ) {
 		const { isSelected } = this.props;
-		const { selectedCell } = this.state;
-
-		if ( ! isSelected && selectedCell ) {
-			this.setState( { selectedCell: null } );
+		const { wasIsSelected } = prevProps;
+		if ( ! isSelected && wasIsSelected ) {
+			this.setState( { selectedCell: null, selectedCells: [] } );
 		}
 	}
 
