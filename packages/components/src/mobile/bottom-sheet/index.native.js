@@ -20,6 +20,8 @@ import PickerCell from './picker-cell';
 import SwitchCell from './switch-cell';
 import KeyboardAvoidingView from './keyboard-avoiding-view';
 
+const ANIMATION_OUT_DURATION_MILLISECONDS = 250;
+
 class BottomSheet extends Component {
 	constructor() {
 		super( ...arguments );
@@ -125,7 +127,7 @@ class BottomSheet extends Component {
 				animationIn={ animationIn }
 				animationInTiming={ 600 }
 				animationOut={ animationOut }
-				animationOutTiming={ 250 }
+				animationOutTiming={ ANIMATION_OUT_DURATION_MILLISECONDS }
 				backdropTransitionInTiming={ 50 }
 				backdropTransitionOutTiming={ 50 }
 				backdropOpacity={ 0.2 }
@@ -165,5 +167,6 @@ BottomSheet.Button = Button;
 BottomSheet.Cell = Cell;
 BottomSheet.PickerCell = PickerCell;
 BottomSheet.SwitchCell = SwitchCell;
+BottomSheet.ANIMATION_OUT_DURATION_MILLISECONDS = ANIMATION_OUT_DURATION_MILLISECONDS;
 
 export default BottomSheet;

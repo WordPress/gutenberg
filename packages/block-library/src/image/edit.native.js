@@ -19,6 +19,7 @@ import {
 	Icon,
 	Toolbar,
 	ToolbarButton,
+	Picker,
 } from '@wordpress/components';
 import {
 	Caption,
@@ -43,10 +44,21 @@ import SvgIconRetry from './icon-retry';
 const LINK_DESTINATION_CUSTOM = 'custom';
 const LINK_DESTINATION_NONE = 'none';
 
+const IMAGE_SIZE_THUMBNAIL = 'thumbnail';
+const IMAGE_SIZE_MEDIUM = 'medium';
+const IMAGE_SIZE_LARGE = 'large';
+const IMAGE_SIZE_FULL_SIZE = 'full';
+const DEFAULT_SIZE_SLUG = IMAGE_SIZE_LARGE;
+
+//If this value is below ~25, you start to see problems with ActionSheetIOS
+const BOTTOM_SHEET_TO_PICKER_ANIMATION_DELAY_MILLISECONDS = 50;
+
 // Default Image ratio 4:3
 const IMAGE_ASPECT_RATIO = 4 / 3;
 
 class ImageEdit extends React.Component {
+	menuTransitionTimeout = 0;
+
 	constructor( props ) {
 		super( props );
 
@@ -63,6 +75,7 @@ class ImageEdit extends React.Component {
 		this.updateAlt = this.updateAlt.bind( this );
 		this.updateImageURL = this.updateImageURL.bind( this );
 		this.onSetLinkDestination = this.onSetLinkDestination.bind( this );
+		this.onSetSizeSlug = this.onSetSizeSlug.bind( this );
 		this.onImagePressed = this.onImagePressed.bind( this );
 		this.onClearSettings = this.onClearSettings.bind( this );
 		this.onFocusCaption = this.onFocusCaption.bind( this );
@@ -96,6 +109,8 @@ class ImageEdit extends React.Component {
 		if ( hasAction( 'blocks.onRemoveBlockCheckUpload' ) && this.state.isUploadInProgress ) {
 			doAction( 'blocks.onRemoveBlockCheckUpload', this.props.attributes.id );
 		}
+
+		clearTimeout( this.menuTransitionTimeout );
 	}
 
 	static getDerivedStateFromProps( props, state ) {
@@ -167,11 +182,18 @@ class ImageEdit extends React.Component {
 		} );
 	}
 
+	onSetSizeSlug( sizeSlug ) {
+		this.props.setAttributes( {
+			sizeSlug,
+		} );
+	}
+
 	onClearSettings() {
 		this.props.setAttributes( {
 			alt: '',
 			linkDestination: LINK_DESTINATION_NONE,
 			href: undefined,
+			sizeSlug: DEFAULT_SIZE_SLUG,
 		} );
 	}
 
@@ -201,7 +223,7 @@ class ImageEdit extends React.Component {
 
 	render() {
 		const { attributes, isSelected } = this.props;
-		const { url, height, width, alt, href, id } = attributes;
+		const { url, height, width, alt, href, id, sizeSlug } = attributes;
 
 		const onImageSettingsButtonPressed = () => {
 			this.setState( { showSettings: true } );
@@ -240,6 +262,14 @@ class ImageEdit extends React.Component {
 					keyboardType="url"
 				/>
 				<BottomSheet.Cell
+					icon={ 'empty' }
+					label={ __( 'Size' ) }
+					value={ getSizeSlugDisplay( sizeSlug ) }
+					editable={ false }
+					onChangeValue={ this.onSetLinkDestination }
+					onPress={ onPickerPresent }
+				/>
+				<BottomSheet.Cell
 					icon={ 'editor-textcolor' }
 					label={ __( 'Alt Text' ) }
 					value={ alt || '' }
@@ -255,6 +285,58 @@ class ImageEdit extends React.Component {
 				/>
 			</BottomSheet>
 		);
+
+		//Used for display of Inspector Controls and sizeSlug Picker
+		const getSizeSlugDisplay = ( sizeSlugValue ) => {
+			if ( sizeSlugValue === undefined ) {
+				sizeSlugValue = DEFAULT_SIZE_SLUG;
+			}
+			const sizeDisplayItems = getSizeOptionsItems();
+			switch ( sizeSlugValue ) {
+				case IMAGE_SIZE_THUMBNAIL:
+					return sizeDisplayItems[ 0 ].label;
+				case IMAGE_SIZE_MEDIUM:
+					return sizeDisplayItems[ 1 ].label;
+				case IMAGE_SIZE_FULL_SIZE:
+					return sizeDisplayItems[ 3 ].label;
+				case IMAGE_SIZE_LARGE:
+				default:
+					return sizeDisplayItems[ 2 ].label;
+			}
+		};
+
+		const getSizeOptionsItems = () => {
+			return [
+				{ value: IMAGE_SIZE_THUMBNAIL, label: __( 'Thumbnail' ) },
+				{ value: IMAGE_SIZE_MEDIUM, label: __( 'Medium' ) },
+				{ value: IMAGE_SIZE_LARGE, label: __( 'Large' ) },
+				{ value: IMAGE_SIZE_FULL_SIZE, label: __( 'Full Size' ) },
+			];
+		};
+
+		let picker;
+
+		const getSizeOptions = () => (
+			<Picker
+				hideCancelButton={ true }
+				ref={ ( instance ) => picker = instance }
+				options={ getSizeOptionsItems() }
+				onChange={ ( value ) => {
+					this.onSetSizeSlug( value );
+				} }
+			/>
+		);
+
+		const onPickerPresent = () => {
+			const pickerInstance = picker;
+			this.setState( {
+				showSettings: false,
+			}, () => {
+				this.menuTransitionTimeout = setTimeout( function() {
+					pickerInstance.presentPicker();
+				}, BottomSheet.ANIMATION_OUT_DURATION_MILLISECONDS + BOTTOM_SHEET_TO_PICKER_ANIMATION_DELAY_MILLISECONDS );
+			} );
+		};
 
 		if ( ! url ) {
 			return (
@@ -279,6 +361,7 @@ class ImageEdit extends React.Component {
 			>
 				<View style={ { flex: 1 } }>
 					{ getInspectorControls() }
+					{ getSizeOptions() }
 					{ getMediaOptions() }
 					{ ( ! this.state.isCaptionSelected ) &&
 						getToolbarEditButton( openMediaOptions )
