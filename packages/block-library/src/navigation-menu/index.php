@@ -28,7 +28,6 @@ function render_block_navigation_menu( $attributes, $content, $block ) {
 function build_navigation_menu_html( $block ) {
 	$html = '';
 	foreach ( (array) $block['innerBlocks'] as $key => $menu_item ) {
-
 		$html .= '<li class="wp-block-navigation-menu-item"><a class="wp-block-navigation-menu-item"';
 		if ( isset( $menu_item['attrs']['destination'] ) ) {
 			$html .= ' href="' . $menu_item['attrs']['destination'] . '"';
