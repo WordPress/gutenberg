@@ -24,6 +24,12 @@ export const EXPECTED_TRANSFORMS = {
 			'Group',
 		],
 	},
+	core__button__squared: {
+		originalBlock: 'Button',
+		availableTransforms: [
+			'Group',
+		],
+	},
 	core__calendar: {
 		originalBlock: 'Calendar',
 		availableTransforms: [
