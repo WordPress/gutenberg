@@ -92,7 +92,7 @@ function searchVerticallyForTabbableTextField( xPosition, yPosition, increment =
 		return;
 	}
 
-	const elements = castArray( elementsFromPoint( xPosition, yPosition ) );
+	const elements = castArray( elementsFromPoint.call( document, xPosition, yPosition ) );
 	const tabbable = find( elements, isTabbableTextField );
 	if ( tabbable ) {
 		return tabbable;
