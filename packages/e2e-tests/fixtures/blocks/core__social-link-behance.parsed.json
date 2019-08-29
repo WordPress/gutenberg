@@ -5,10 +5,8 @@
             "url": "https://example.com/"
         },
         "innerBlocks": [],
-        "innerHTML": "\n<li class=\"wp-block-social-link-behance wp-social-icon\"><a href=\"https://example.com/\">behance</a></li>\n",
-        "innerContent": [
-            "\n<li class=\"wp-block-social-link-behance wp-social-icon\"><a href=\"https://example.com/\">behance</a></li>\n"
-        ]
+        "innerHTML": "",
+        "innerContent": []
     },
     {
         "blockName": null,

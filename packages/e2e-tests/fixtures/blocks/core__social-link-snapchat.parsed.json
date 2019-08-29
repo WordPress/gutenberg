@@ -5,10 +5,8 @@
             "url": "https://example.com/"
         },
         "innerBlocks": [],
-        "innerHTML": "\n<li class=\"wp-block-social-link-snapchat wp-social-icon\"><a href=\"https://example.com/\">snapchat</a></li>\n",
-        "innerContent": [
-            "\n<li class=\"wp-block-social-link-snapchat wp-social-icon\"><a href=\"https://example.com/\">snapchat</a></li>\n"
-        ]
+        "innerHTML": "",
+        "innerContent": []
     },
     {
         "blockName": null,
