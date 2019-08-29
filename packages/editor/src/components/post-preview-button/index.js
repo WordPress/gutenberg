@@ -208,13 +208,14 @@ export default compose( [
 			isEditedPostSaveable,
 			isEditedPostAutosaveable,
 			getEditedPostPreviewLink,
+			getEditorSettings,
 		} = select( 'core/editor' );
 		const {
 			getPostType,
 		} = select( 'core' );
-
-		const previewLink = getEditedPostPreviewLink();
-		const postType = getPostType( getEditedPostAttribute( 'type' ) );
+		const { postId, postType: _postType } = getEditorSettings();
+		const previewLink = getEditedPostPreviewLink( postId, _postType );
+		const postType = getPostType( _postType );
 
 		return {
 			postId: getCurrentPostId(),

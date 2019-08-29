@@ -56,6 +56,7 @@ function Layout( {
 	isSaving,
 	isMobileViewport,
 	isRichEditingEnabled,
+	isTemplate,
 } ) {
 	const sidebarIsOpened = editorSidebarOpened || pluginSidebarOpened || publishSidebarOpened;
 
@@ -92,7 +93,7 @@ function Layout( {
 				<ManageBlocksModal />
 				<OptionsModal />
 				{ ( mode === 'text' || ! isRichEditingEnabled ) && <TextEditor /> }
-				{ isRichEditingEnabled && mode === 'visual' && <VisualEditor /> }
+				{ isRichEditingEnabled && mode === 'visual' && <VisualEditor noTitle={ isTemplate } /> }
 				<div className="edit-post-layout__metaboxes">
 					<MetaBoxes location="normal" />
 				</div>
@@ -145,6 +146,7 @@ export default compose(
 		hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
 		isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
 		isRichEditingEnabled: select( 'core/editor' ).getEditorSettings().richEditingEnabled,
+		isTemplate: select( 'core/editor' ).getEditorSettings().templateId !== undefined,
 	} ) ),
 	withDispatch( ( dispatch ) => {
 		const { closePublishSidebar, togglePublishSidebar } = dispatch( 'core/edit-post' );

@@ -59,7 +59,11 @@ class EditorProvider extends Component {
 		}
 
 		props.updatePostLock( props.settings.postLock );
-		props.setupEditor( props.post, props.initialEdits, props.settings.template );
+		props.setupEditor(
+			props.template || props.post,
+			props.template ? undefined : props.initialEdits,
+			props.template ? undefined : props.settings.template
+		);
 
 		if ( props.settings.autosave ) {
 			props.createWarningNotice(

@@ -745,11 +745,16 @@ export function isPreviewingPost( state ) {
 /**
  * Returns the post preview link
  *
- * @param {Object} state Global application state.
+ * @param {Object} state    Global application state.
+ * @param {number} postId   Optional post ID override.
+ * @param {string} postType Optional post type override.
  *
  * @return {string?} Preview Link.
  */
-export function getEditedPostPreviewLink( state ) {
+export function getEditedPostPreviewLink( state, postId, postType ) {
+	if ( postId && postType ) {
+		state = { ...state, postId, postType };
+	}
 	if ( state.saving.pending || isSavingPost( state ) ) {
 		return;
 	}

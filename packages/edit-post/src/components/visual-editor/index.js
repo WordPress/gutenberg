@@ -23,7 +23,7 @@ import {
 import BlockInspectorButton from './block-inspector-button';
 import PluginBlockSettingsMenuGroup from '../block-settings-menu/plugin-block-settings-menu-group';
 
-function VisualEditor() {
+function VisualEditor( { noTitle } ) {
 	return (
 		<BlockSelectionClearer className="edit-post-visual-editor editor-styles-wrapper">
 			<VisualEditorGlobalKeyboardShortcuts />
@@ -32,7 +32,7 @@ function VisualEditor() {
 				<WritingFlow>
 					<ObserveTyping>
 						<CopyHandler>
-							<PostTitle />
+							{ ! noTitle && <PostTitle /> }
 							<BlockList />
 						</CopyHandler>
 					</ObserveTyping>
