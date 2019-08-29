@@ -19,8 +19,10 @@ const styles = StyleSheet.create( {
 		flexDirection: 'row',
 		justifyContent: 'center',
 		alignItems: 'center',
-		aspectRatio: 1,
 		backgroundColor: 'white',
+	},
+	fixedRatio: {
+		aspectRatio: 1,
 	},
 	buttonActive: {
 		flex: 1,
@@ -29,7 +31,6 @@ const styles = StyleSheet.create( {
 		alignItems: 'center',
 		borderRadius: 6,
 		borderColor: '#2e4453',
-		aspectRatio: 1,
 		backgroundColor: '#2e4453',
 	},
 	subscriptInactive: {
@@ -56,6 +57,7 @@ export default function Button( props ) {
 		onClick,
 		disabled,
 		hint,
+		fixedRatio = true,
 		'aria-disabled': ariaDisabled,
 		'aria-label': ariaLabel,
 		'aria-pressed': ariaPressed,
@@ -65,6 +67,7 @@ export default function Button( props ) {
 	const isDisabled = ariaDisabled || disabled;
 	const buttonViewStyle = {
 		opacity: isDisabled ? 0.2 : 1,
+		...( fixedRatio && styles.fixedRatio ),
 		...( ariaPressed ? styles.buttonActive : styles.buttonInactive ),
 	};
 
