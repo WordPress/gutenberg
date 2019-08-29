@@ -13,13 +13,13 @@ exports.ios12 = {
 exports.android8 = {
 	browserName: '',
 	platformName: 'Android',
-	platformVersion: '8.0',
-	deviceName: 'Android Emulator',
+	platformVersion: '9.0',
+	deviceName: 'Google Pixel 3 XL GoogleAPI Emulator',
 	automationName: 'UiAutomator2',
 	os: 'Android',
 	appPackage: 'com.gutenberg',
 	appActivity: 'com.gutenberg.MainActivity',
 	deviceOrientation: 'portrait',
-	appiumVersion: '1.12.1',
+	appiumVersion: '1.13.0',
 	app: undefined,
 };
