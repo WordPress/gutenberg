@@ -36,7 +36,7 @@ function build_navigation_menu_html( $block ) {
 		if ( isset( $menu_item['attrs']['title'] ) ) {
 			$html .= ' title="' . $menu_item['attrs']['title'] . '"';
 		}
-		$html .= ' >';
+		$html .= '>';
 		if ( isset( $menu_item['attrs']['label'] ) ) {
 			$html .= $menu_item['attrs']['label'];
 		}
