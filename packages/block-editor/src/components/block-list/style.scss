@@ -884,10 +884,8 @@
 
 	&:hover,
 	&.is-visible {
-		// Only show this inserter after a delay.
-		animation: block-editor-block-list__insertion-point-inserter-fade-in 0.2s ease-out 0.75s;
-		animation-fill-mode: forwards;
-		@include reduce-motion("animation");
+		opacity: 1;
+		transition-delay: 0.75s;
 
 		// Do not enable pointer events on the button until after the parent animates.
 		.block-editor-inserter__toggle {
@@ -908,28 +906,16 @@
 
 		&:hover,
 		&.is-visible {
-			// Only show this inserter after a delay.
-			animation: block-editor-block-list__insertion-point-inserter-fade-in 0.2s ease-out 0.5s;
-			animation-fill-mode: forwards;
-			@include reduce-motion("animation");
-			pointer-events: auto;
+			opacity: 1;
+			transition-delay: 0.75s;
 
 			// Do not enable pointer events on the button until after the parent animates.
 			.block-editor-inserter__toggle {
-				animation: block-editor-block-list__insertion-point-inserter-toggle-pointer-events 0.2s ease-out 0.5s;
+				animation: block-editor-block-list__insertion-point-inserter-toggle-pointer-events 0.2s ease-out 0.75s;
 				animation-fill-mode: forwards;
 				@include reduce-motion("animation");
 			}
 		}
-	}
-}
-
-@keyframes block-editor-block-list__insertion-point-inserter-fade-in {
-	from {
-		opacity: 0;
-	}
-	to {
-		opacity: 1;
 	}
 }
 
