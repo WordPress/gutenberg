@@ -246,6 +246,13 @@
 .wp-block-social-links.is-style-logos-only {
 	.wp-social-link {
 		background: none;
+
+		// Make these bigger.
+		padding: 4px;
+		svg {
+			width: 28px;
+			height: 28px;
+		}
 	}
 
 	.wp-social-link-amazon {
