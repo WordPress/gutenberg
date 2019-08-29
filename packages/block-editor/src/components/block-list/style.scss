@@ -861,7 +861,7 @@
 	// Show a clickable plus.
 	.block-editor-inserter__toggle {
 		pointer-events: none;
-		margin-top: -8px;
+		margin-top: $border-width * -3;
 		border-radius: 50%;
 		color: $blue-medium-focus;
 		background: $white;
