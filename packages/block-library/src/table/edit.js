@@ -129,32 +129,42 @@ export class TableEdit extends Component {
 	}
 
 	/**
-	 * Handle cell merging.
+	 * Handle cell merging and unmerging.
 	 */
 	onMerge() {
-		const { selectedCells } = this.state;
-		const { attributes, setAttributes } = this.props;
-		const { initialSelection, finalSelection } = this.state;
-		const largerColumn = initialSelection.columnIndex > finalSelection.columnIndex ? initialSelection.columnIndex : finalSelection.columnIndex;
-		const smallerColumn = initialSelection.columnIndex < finalSelection.columnIndex ? initialSelection.columnIndex : finalSelection.columnIndex;
-		const largerRow = initialSelection.rowIndex > finalSelection.rowIndex ? initialSelection.rowIndex : finalSelection.rowIndex;
-		const smallerRow = initialSelection.rowIndex < finalSelection.rowIndex ? initialSelection.rowIndex : finalSelection.rowIndex;
-		const colspan = largerColumn - smallerColumn + 1;
-		const rowspan = largerRow - smallerRow + 1;
-		attributes.body[ smallerRow ].cells[ smallerColumn ].colspan = colspan;
-		attributes.body[ smallerRow ].cells[ smallerColumn ].rowspan = rowspan;
-		for ( let x = smallerColumn; x <= largerColumn; x++ ) {
-			for ( let y = smallerRow; y <= largerRow; y++ ) {
-				if ( ! ( x === smallerColumn && y === smallerRow ) ) {
-					delete ( attributes.body[ y ].cells[ x ] );
+		const { selectedCells, mergedCells } = this.state;
+
+		// If we already have merged cells, unmerge them!
+		if ( mergedCells ) {
+
+		} else {
+			// Merge the cells.
+			const { attributes, setAttributes } = this.props;
+			const { initialSelection, finalSelection } = this.state;
+			const largerColumn = initialSelection.columnIndex > finalSelection.columnIndex ? initialSelection.columnIndex : finalSelection.columnIndex;
+			const smallerColumn = initialSelection.columnIndex < finalSelection.columnIndex ? initialSelection.columnIndex : finalSelection.columnIndex;
+			const largerRow = initialSelection.rowIndex > finalSelection.rowIndex ? initialSelection.rowIndex : finalSelection.rowIndex;
+			const smallerRow = initialSelection.rowIndex < finalSelection.rowIndex ? initialSelection.rowIndex : finalSelection.rowIndex;
+			const colspan = largerColumn - smallerColumn + 1;
+			const rowspan = largerRow - smallerRow + 1;
+			attributes.body[ smallerRow ].cells[ smallerColumn ].colspan = colspan;
+			attributes.body[ smallerRow ].cells[ smallerColumn ].rowspan = rowspan;
+			let mergedContent = attributes.body[ smallerRow ].cells[ smallerColumn ].content;
+			for ( let x = smallerColumn; x <= largerColumn; x++ ) {
+				for ( let y = smallerRow; y <= largerRow; y++ ) {
+					if ( ! ( x === smallerColumn && y === smallerRow ) ) {
+						mergedContent += '<br />' + attributes.body[ y ].cells[ x ].content;
+						delete ( attributes.body[ y ].cells[ x ] );
+					}
 				}
 			}
+			attributes.body[ smallerRow ].cells[ smallerColumn ].content = mergedContent;
+			setAttributes( attributes );
+			this.setState( {
+				selectedCells: [],
+				mergedCells: selectedCells,
+			} );
 		}
-		setAttributes( attributes );
-		this.setState( {
-			selectedCells: [],
-			mergedCells: selectedCells,
-		} );
 	}
 
 	/**
