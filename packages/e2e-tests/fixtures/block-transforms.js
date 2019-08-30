@@ -528,7 +528,7 @@ export const EXPECTED_TRANSFORMS = {
 		availableTransforms: [
 			'Group',
 		],
-		originalBlock: 'E-mail',
+		originalBlock: 'Mail',
 	},
 	'core__social-link-mastodon': {
 		availableTransforms: [

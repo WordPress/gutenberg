@@ -125,7 +125,7 @@ const socialList = {
 		icon: LinkedinIcon,
 	},
 	mail: {
-		name: 'E-mail',
+		name: 'Mail',
 		icon: MailIcon,
 	},
 	mastodon: {

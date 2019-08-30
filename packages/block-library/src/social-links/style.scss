@@ -10,9 +10,6 @@
 	width: 36px;
 	height: 36px;
 	border-radius: 36px; // This makes it pill-shaped instead of oval, in cases where the image fed is not perfectly sized.
-	background-size: 24px 24px;
-	background-position: center center;
-	background-repeat: no-repeat;
 	margin-right: $grid-size;
 	transition: transform 0.1s ease;
 
@@ -39,14 +36,15 @@
 
 // Provide colors for a range of icons.
 .wp-block-social-links:not(.is-style-logos-only) {
+	// Generic items such as mail, feed, etc.
+	.wp-social-link {
+		background-color: #f0f0f0;
+		color: #444;
+	}
+
 	.wp-social-link-amazon {
 		background-color: #f90;
 		color: #fff;
-	}
-
-	.wp-social-link-apple {
-		background-color: #f1f1f1;
-		color: #000;
 	}
 
 	.wp-social-link-bandcamp {
@@ -67,11 +65,6 @@
 	.wp-social-link-deviantart {
 		background-color: #02e49b;
 		color: #fff;
-	}
-
-	.wp-social-link-digg {
-		background-color: #f1f1f1;
-		color: #1b1a19;
 	}
 
 	.wp-social-link-dribbble {
@@ -174,11 +167,6 @@
 		color: #fff;
 	}
 
-	.wp-social-link-slideshare {
-		background-color: #0577b5;
-		color: #fff;
-	}
-
 	.wp-social-link-snapchat {
 		background-color: #fefc00;
 		color: #fff;
@@ -192,11 +180,6 @@
 
 	.wp-social-link-spotify {
 		background-color: #1bd760;
-		color: #fff;
-	}
-
-	.wp-social-link-stumbleupon {
-		background-color: #eb4923;
 		color: #fff;
 	}
 
@@ -258,10 +241,6 @@
 		color: #f90;
 	}
 
-	.wp-social-link-apple {
-		color: #000;
-	}
-
 	.wp-social-link-bandcamp {
 		color: #1ea0c3;
 	}
@@ -276,10 +255,6 @@
 
 	.wp-social-link-deviantart {
 		color: #02e49b;
-	}
-
-	.wp-social-link-digg {
-		color: #1b1a19;
 	}
 
 	.wp-social-link-dribbble {
@@ -362,10 +337,6 @@
 		color: #0478d7;
 	}
 
-	.wp-social-link-slideshare {
-		color: #0577b5;
-	}
-
 	.wp-social-link-snapchat {
 		color: #fff;
 		stroke: #000;
@@ -377,10 +348,6 @@
 
 	.wp-social-link-spotify {
 		color: #1bd760;
-	}
-
-	.wp-social-link-stumbleupon {
-		color: #eb4923;
 	}
 
 	.wp-social-link-tumblr {
