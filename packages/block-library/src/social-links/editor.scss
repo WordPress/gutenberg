@@ -63,6 +63,11 @@
 	}
 }
 
+// Center flex items. This has an equivalent in style.scss.
+[data-type="core/social-links"][data-align="center"] .wp-block-social-links {
+	justify-content: center;
+}
+
 // Improve the preview.
 // @todo: Look at improving the preview component to make this unnecessary.
 .block-editor-block-preview__content {

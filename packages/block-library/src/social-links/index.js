@@ -18,6 +18,9 @@ export const settings = {
 	title: __( 'Social links' ),
 	icon: 'share',
 	description: __( 'Create a block of links to your social media or external sites' ),
+	supports: {
+		align: [ 'left', 'center', 'right' ],
+	},
 	styles: [
 		{ name: 'default', label: __( 'Default' ), isDefault: true },
 		{ name: 'logos-only', label: __( 'Logos Only' ) },

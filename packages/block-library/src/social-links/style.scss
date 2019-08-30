@@ -34,6 +34,14 @@
 	}
 }
 
+// Center flex items. This has an equivalent in editor.scss.
+// It also needs to override some of the default classes usually applied to the centering class.
+.wp-block-social-links.aligncenter {
+	justify-content: center;
+	display: flex;
+}
+
+
 // Provide colors for a range of icons.
 .wp-block-social-links:not(.is-style-logos-only) {
 	// Generic items such as mail, feed, etc.
