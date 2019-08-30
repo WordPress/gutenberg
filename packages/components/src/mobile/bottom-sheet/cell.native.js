@@ -43,6 +43,7 @@ class BottomSheetCell extends Component {
 			value,
 			valuePlaceholder = '',
 			icon,
+			leftAlign,
 			labelStyle = {},
 			valueStyle = {},
 			onChangeValue,
@@ -58,7 +59,9 @@ class BottomSheetCell extends Component {
 		const isValueEditable = editable && onChangeValue !== undefined;
 		const cellLabelStyle = getStyle( styles.cellLabel, styles.cellTextDark, theme );
 		const cellLabelCenteredStyle = getStyle( styles.cellLabelCentered, styles.cellTextDark, theme );
-		const defaultLabelStyle = showValue || icon !== undefined ? cellLabelStyle : cellLabelCenteredStyle;
+		const cellLabelLeftAlignNoIconStyle = getStyle( styles.cellLabelLeftAlignNoIcon, styles.cellTextDark, theme );
+		const defaultMissingIconAndValue = leftAlign ? cellLabelLeftAlignNoIconStyle : cellLabelCenteredStyle;
+		const defaultLabelStyle = showValue || icon !== undefined ? cellLabelStyle : defaultMissingIconAndValue;
 		const drawSeparator = ( separatorType && separatorType !== 'none' ) || separatorStyle === undefined;
 
 		const onCellPress = () => {

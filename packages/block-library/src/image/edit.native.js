@@ -327,8 +327,10 @@ class ImageEdit extends React.Component {
 		const getSizeOptions = () => (
 			<Picker
 				hideCancelButton={ true }
+				title={ __( 'Image Size' ) }
 				ref={ ( instance ) => picker = instance }
 				options={ getSizeOptionsItems() }
+				leftAlign={ true }
 				onChange={ ( value ) => {
 					this.onSetSizeSlug( value );
 				} }
