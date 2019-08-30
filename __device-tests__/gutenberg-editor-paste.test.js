@@ -20,7 +20,7 @@ import testData from './helpers/test-data';
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 400000;
 
-xdescribe( 'Gutenberg Editor paste tests', () => {
+describe( 'Gutenberg Editor paste tests', () => {
 	// skip iOS for now
 	if ( ! isAndroid() ) {
 		it( 'skips the tests on any platform other than Android', async () => {
