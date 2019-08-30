@@ -1,0 +1,29 @@
+.wp-block-media-text {
+	display: flex;
+	align-items: flex-start;
+	flex-direction: row;
+}
+
+.has-media-on-the-right {
+	flex-direction: row-reverse;
+}
+
+.is-stacked-on-mobile {
+	flex-direction: column;
+
+	&.has-media-on-the-right {
+		flex-direction: column-reverse;
+	}
+}
+
+.is-vertically-aligned-top {
+	align-items: flex-start;
+}
+
+.is-vertically-aligned-center {
+	align-items: center;
+}
+
+.is-vertically-aligned-bottom {
+	align-items: flex-end;
+}
