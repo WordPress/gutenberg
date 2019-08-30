@@ -27,16 +27,16 @@ const AUTOSAVE_INTERVAL_SECONDS = 15;
 
 /**
  * Function which returns true if the current environment supports browser
- * localStorage, or false otherwise. The result of this function is cached and
+ * sessionStorage, or false otherwise. The result of this function is cached and
  * reused in subsequent invocations.
  */
-const hasLocalStorageSupport = once( () => {
+const hasSessionStorageSupport = once( () => {
 	try {
 		// Private Browsing in Safari 10 and earlier will throw an error when
-		// attempting to set into localStorage. The test here is intentional in
+		// attempting to set into sessionStorage. The test here is intentional in
 		// causing a thrown error as condition bailing from local autosave.
-		window.localStorage.setItem( '__wpEditorTestLocalStorage', '' );
-		window.localStorage.removeItem( '__wpEditorTestLocalStorage' );
+		window.sessionStorage.setItem( '__wpEditorTestSessionStorage', '' );
+		window.sessionStorage.removeItem( '__wpEditorTestSessionStorage' );
 		return true;
 	} catch ( error ) {
 		return false;
@@ -75,7 +75,7 @@ function useAutosaveCallback() {
 	} ) );
 
 	return useCallback( () => {
-		window.localStorage.setItem( 'post_' + postId, JSON.stringify( {
+		window.sessionStorage.setItem( postKey( postId ), JSON.stringify( {
 			post_title: getEditedPostAttribute( 'title' ),
 			content: getEditedPostAttribute( 'content' ),
 			excerpt: getEditedPostAttribute( 'excerpt' ),
@@ -100,7 +100,7 @@ function useAutosaveNotice() {
 	const { editPost, resetEditorBlocks } = useDispatch( 'core/editor' );
 
 	useEffect( () => {
-		let autosave = window.localStorage.getItem( 'post_' + postId );
+		let autosave = window.sessionStorage.getItem( postKey( postId ) );
 		if ( ! autosave ) {
 			return;
 		}
@@ -116,14 +116,14 @@ function useAutosaveNotice() {
 		const edits = { title, content, excerpt };
 
 		// Only display a notice if there is a difference between what has been
-		// saved and that which is stored in localStorage.
+		// saved and that which is stored in sessionStorage.
 		const hasDifference = Object.keys( edits ).some( ( key ) => {
 			return edits[ key ] !== getEditedPostAttribute( key );
 		} );
 
 		if ( ! hasDifference ) {
 			// If there is no difference, it can be safely ejected from storage.
-			window.localStorage.removeItem( 'post_' + postId );
+			window.sessionStorage.removeItem( postKey( postId ) );
 
 			return;
 		}
@@ -162,7 +162,7 @@ function useAutosavePurge() {
 
 	useEffect( () => {
 		if ( lastDidSave.current !== true && didSave ) {
-			window.localStorage.removeItem( 'post_' + postId );
+			window.sessionStorage.removeItem( postKey( postId ) );
 		}
 
 		lastDidSave.current = didSave;
@@ -182,4 +182,4 @@ function LocalAutosaveMonitor() {
 	);
 }
 
-export default ifCondition( hasLocalStorageSupport )( LocalAutosaveMonitor );
+export default ifCondition( hasSessionStorageSupport )( LocalAutosaveMonitor );
