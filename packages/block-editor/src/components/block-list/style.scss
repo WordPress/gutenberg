@@ -871,6 +871,7 @@
 		height: $block-padding * 2;
 		width: $block-padding * 2;
 		padding: $grid-size-small;
+		margin-top: $border-width;
 
 		&:not(:disabled):not([aria-disabled="true"]):hover {
 			box-shadow: none;
