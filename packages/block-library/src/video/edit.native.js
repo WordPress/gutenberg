@@ -136,9 +136,9 @@ class VideoEdit extends React.Component {
 		this.setState( { isUploadInProgress: false } );
 	}
 
-	onSelectMediaUploadOption( mediaId, mediaUrl ) {
+	onSelectMediaUploadOption( { id, url } ) {
 		const { setAttributes } = this.props;
-		setAttributes( { id: mediaId, src: mediaUrl } );
+		setAttributes( { id, src: url } );
 	}
 
 	onVideoContanerLayout( event ) {
@@ -165,8 +165,8 @@ class VideoEdit extends React.Component {
 		const { videoContainerHeight } = this.state;
 
 		const toolbarEditButton = (
-			<MediaUpload mediaType={ MEDIA_TYPE_VIDEO }
-				onSelectURL={ this.onSelectMediaUploadOption }
+			<MediaUpload allowedTypes={ [ MEDIA_TYPE_VIDEO ] }
+				onSelect={ this.onSelectMediaUploadOption }
 				render={ ( { open, getMediaOptions } ) => {
 					return (
 						<Toolbar>
@@ -186,8 +186,8 @@ class VideoEdit extends React.Component {
 			return (
 				<View style={ { flex: 1 } } >
 					<MediaPlaceholder
-						mediaType={ MEDIA_TYPE_VIDEO }
-						onSelectURL={ this.onSelectMediaUploadOption }
+						allowedTypes={ [ MEDIA_TYPE_VIDEO ] }
+						onSelect={ this.onSelectMediaUploadOption }
 						icon={ this.getIcon( false, true ) }
 						onFocus={ this.props.onFocus }
 					/>
