@@ -16,10 +16,11 @@ import { withTheme, useStyle } from '@wordpress/components';
 import styles from './styles.scss';
 
 function MediaPlaceholder( props ) {
-	const { mediaType, labels = {}, icon, onSelectURL, theme } = props;
+	const { allowedTypes = [], labels = {}, icon, onSelect, theme } = props;
 
-	const isImage = MEDIA_TYPE_IMAGE === mediaType;
-	const isVideo = MEDIA_TYPE_VIDEO === mediaType;
+	const isOneType = allowedTypes.length === 1;
+	const isImage = isOneType && allowedTypes.includes( MEDIA_TYPE_IMAGE );
+	const isVideo = isOneType && allowedTypes.includes( MEDIA_TYPE_VIDEO );
 
 	let placeholderTitle = labels.title;
 	if ( placeholderTitle === undefined ) {
@@ -52,8 +53,8 @@ function MediaPlaceholder( props ) {
 
 	return (
 		<MediaUpload
-			mediaType={ mediaType }
-			onSelectURL={ onSelectURL }
+			allowedTypes={ allowedTypes }
+			onSelect={ onSelect }
 			render={ ( { open, getMediaOptions } ) => {
 				return (
 					<TouchableWithoutFeedback
