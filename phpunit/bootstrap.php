@@ -5,6 +5,11 @@
  * @package Gutenberg
  */
 
+// If we're running in WP's build directory, ensure that WP knows that, too.
+if ( 'build' === getenv( 'LOCAL_DIR' ) ) {
+	define( 'WP_RUN_CORE_TESTS', true );
+}
+
 // Determine the tests directory (from a WP dev checkout).
 // Try the WP_TESTS_DIR environment variable first.
 $_tests_dir = getenv( 'WP_TESTS_DIR' );
