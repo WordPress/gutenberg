@@ -11,12 +11,20 @@
 	padding-bottom: 12;
 }
 
+.emptyStateContainerDark {
+	background-color: $background-dark-secondary;
+}
+
 .emptyStateTitle {
 	text-align: center;
 	margin-top: 8;
 	margin-bottom: 10;
 	font-size: 14;
 	color: #2e4453;
+}
+
+.emptyStateTitleDark {
+	color: $white;
 }
 
 .emptyStateDescription {

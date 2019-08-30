@@ -37,6 +37,7 @@ This property is similar to the `allowedTypes` property. The difference is the f
 
 - Type: `String`
 - Required: No
+- Platform: Web
 
 ### addToGallery
 
@@ -46,6 +47,7 @@ If false the gallery media modal opens in the edit mode where the user can edit 
 - Type: `Boolean`
 - Required: No
 - Default: `false`
+- Platform: Web
 
 ### allowedTypes
 
@@ -57,6 +59,7 @@ This property is similar to the `accept` property. The difference is the format 
 
 - Type: `Array`
 - Required: No
+- Platform: Web | Mobile
 
 ### className
 
@@ -64,6 +67,7 @@ Class name added to the placeholder.
 
 - Type: `String`
 - Required: No
+- Platform: Web
 
 ### icon
 
@@ -71,6 +75,7 @@ Icon to display left of the title. When passed as a `String`, the icon will be r
 
 - Type: `String|WPComponent`
 - Required: No
+- Platform: Web | Mobile
 
 ### isAppender
 
@@ -96,7 +101,7 @@ An object that can contain a `title` and `instructions` properties. These proper
 
 - Type: `Object`
 - Required: No
-
+- Platform: Web | Mobile
 
 ### multiple
 
@@ -105,6 +110,7 @@ Whether to allow multiple selection of files or not.
 - Type: `Boolean`
 - Required: No
 - Default: `false`
+- Platform: Web
 
 ### onError
 
@@ -112,6 +118,7 @@ Callback called when an upload error happens.
 
 - Type: `Function`
 - Required: No
+- Platform: Web
 
 ### onSelect
 
@@ -120,6 +127,11 @@ The call back receives an array with the new files. Each element of the collecti
 
 - Type: `Function`
 - Required: Yes
+- Platform: Web | Mobile
+
+The argument of the callback is an object containing the following properties:
+- Web: `{ url, alt, id, link, caption, sizes, media_details }`
+- Mobile: `{ id, url }`
 
 ### value
 
@@ -127,6 +139,7 @@ Media ID (or media IDs if multiple is true) to be selected by default when openi
 
 - Type: `Number|Array`
 - Required: No
+- Platform: Web
 
 
 ## Extend

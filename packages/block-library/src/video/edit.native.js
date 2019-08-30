@@ -20,7 +20,10 @@ import {
 	Icon,
 	Toolbar,
 	ToolbarButton,
+	withTheme,
+	useStyle,
 } from '@wordpress/components';
+
 import {
 	Caption,
 	MediaPlaceholder,
@@ -133,9 +136,9 @@ class VideoEdit extends React.Component {
 		this.setState( { isUploadInProgress: false } );
 	}
 
-	onSelectMediaUploadOption( mediaId, mediaUrl ) {
+	onSelectMediaUploadOption( { id, url } ) {
 		const { setAttributes } = this.props;
-		setAttributes( { id: mediaId, src: mediaUrl } );
+		setAttributes( { id, src: url } );
 	}
 
 	onVideoContanerLayout( event ) {
@@ -147,11 +150,13 @@ class VideoEdit extends React.Component {
 	}
 
 	getIcon( isRetryIcon, isMediaPlaceholder ) {
+		const iconStyle = useStyle( style.icon, style.iconDark, this.props.theme );
+
 		if ( isRetryIcon ) {
 			return <Icon icon={ SvgIconRetry } { ...style.icon } />;
 		}
 
-		return <Icon icon={ SvgIcon } { ...( ! isMediaPlaceholder ? style.iconUploading : style.icon ) } />;
+		return <Icon icon={ SvgIcon } { ...( ! isMediaPlaceholder ? style.iconUploading : iconStyle ) } />;
 	}
 
 	render() {
@@ -160,8 +165,8 @@ class VideoEdit extends React.Component {
 		const { videoContainerHeight } = this.state;
 
 		const toolbarEditButton = (
-			<MediaUpload mediaType={ MEDIA_TYPE_VIDEO }
-				onSelectURL={ this.onSelectMediaUploadOption }
+			<MediaUpload allowedTypes={ [ MEDIA_TYPE_VIDEO ] }
+				onSelect={ this.onSelectMediaUploadOption }
 				render={ ( { open, getMediaOptions } ) => {
 					return (
 						<Toolbar>
@@ -179,12 +184,14 @@ class VideoEdit extends React.Component {
 
 		if ( ! id ) {
 			return (
-				<MediaPlaceholder
-					mediaType={ MEDIA_TYPE_VIDEO }
-					onSelectURL={ this.onSelectMediaUploadOption }
-					icon={ this.getIcon( false, true ) }
-					onFocus={ this.props.onFocus }
-				/>
+				<View style={ { flex: 1 } } >
+					<MediaPlaceholder
+						allowedTypes={ [ MEDIA_TYPE_VIDEO ] }
+						onSelect={ this.onSelectMediaUploadOption }
+						icon={ this.getIcon( false, true ) }
+						onFocus={ this.props.onFocus }
+					/>
+				</View>
 			);
 		}
 
@@ -260,4 +267,4 @@ class VideoEdit extends React.Component {
 	}
 }
 
-export default VideoEdit;
+export default withTheme( VideoEdit );
