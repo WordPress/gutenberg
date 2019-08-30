@@ -49,7 +49,7 @@ const hasLocalStorageSupport = once( () => {
  *
  * @return {Function} Callback function.
  */
-function useAutosaveSaveCallback() {
+function useAutosaveCallback() {
 	const {
 		postId,
 		getEditedPostAttribute,
@@ -154,7 +154,7 @@ function useAutosavePurge() {
 }
 
 function LocalAutosaveMonitor() {
-	const autosave = useAutosaveSaveCallback();
+	const autosave = useAutosaveCallback();
 	useAutosaveNotice();
 	useAutosavePurge();
 
