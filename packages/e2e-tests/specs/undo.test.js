@@ -29,6 +29,10 @@ describe( 'undo', () => {
 		await pressKeyWithModifier( 'primary', 'z' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		await pressKeyWithModifier( 'primary', 'z' );
+
+		expect( await getEditedPostContent() ).toBe( '' );
 	} );
 
 	it( 'should undo typing after non input change', async () => {
@@ -43,6 +47,10 @@ describe( 'undo', () => {
 		await pressKeyWithModifier( 'primary', 'z' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		await pressKeyWithModifier( 'primary', 'z' );
+
+		expect( await getEditedPostContent() ).toBe( '' );
 	} );
 
 	it( 'Should undo to expected level intervals', async () => {
