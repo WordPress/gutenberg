@@ -269,7 +269,7 @@ class ImageEdit extends React.Component {
 					keyboardType="url"
 				/>
 				<BottomSheet.Cell
-					icon={ 'empty' }
+					icon={ 'editor-expand' }
 					label={ __( 'Size' ) }
 					labelStyle={ styles.sizeInspectorControlsCell }
 					value={ getSizeSlugDisplay( sizeSlug ) }
