@@ -865,12 +865,12 @@
 	// Show a clickable plus.
 	.block-editor-inserter__toggle {
 		pointer-events: none;
-		margin-top: $border-width * -3;
 		border-radius: 50%;
 		color: $blue-medium-focus;
 		background: $white;
-		height: $block-padding * 2 + 8px;
-		width: $block-padding * 2 + 8px;
+		height: $block-padding * 2;
+		width: $block-padding * 2;
+		padding: $grid-size-small;
 
 		&:not(:disabled):not([aria-disabled="true"]):hover {
 			box-shadow: none;
