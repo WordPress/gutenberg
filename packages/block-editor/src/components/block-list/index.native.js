@@ -140,7 +140,7 @@ export class BlockList extends Component {
 						rootClientId={ this.props.rootClientId }
 						onCaretVerticalPositionChange={ this.onCaretVerticalPositionChange }
 						borderStyle={ this.blockHolderBorderStyle() }
-						focusedBorderColor={ blockHolderFocusedStyle }
+						focusedBorderColor={ blockHolderFocusedStyle.borderColor }
 					/> ) }
 			</ReadableContentView>
 		);
