@@ -1,25 +1,18 @@
 .block-editor-block-mover {
 	min-height: $empty-paragraph-height;
 	opacity: 0;
-	background: $white;
-	border: 1px solid $dark-opacity-light-800;
-	border-radius: $icon-button-size-small * 3 + $grid-size-small; // Creates a pill shape
+	background: $dark-opacity-600;
+	border-radius: $radius-round-rectangle;
 	height: ($icon-button-size-small * 3) + ( $grid-size-small * 1.5);
 	padding-top: $grid-size-small / 2;
 	padding-bottom: $grid-size-small / 2;
-	transition: box-shadow 0.2s ease-out;
-	@include reduce-motion("transition");
 
 	.is-dark-theme & {
-		border-color: $light-opacity-light-800;
+		background: $light-opacity-600;
 	}
 
 	&.is-visible {
 		@include edit-post__fade-in-animation;
-	}
-
-	&:hover {
-		box-shadow: $shadow-toolbar;
 	}
 
 	// 24px is the smallest size of a good pressable button.
@@ -53,26 +46,30 @@
 		padding: #{ ($block-side-ui-width - $icon-button-size-small) / 2 } #{ ($block-side-ui-width - 18px) / 2 }; // This makes the SVG fill the whole available area, without scaling the artwork.
 	}
 
-	// Use opacity to work in various editor styles
-	color: $dark-opacity-300;
+	color: $light-gray-500;
 
 	.is-dark-theme & {
-		color: $light-opacity-300;
+		color: $dark-gray-500;
 	}
 
 	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover,
 	&:focus:not(:disabled) {
 		background-color: transparent;
 		box-shadow: none;
+		color: $white;
+
+		.is-dark-theme & {
+			color: $dark-gray-900;
+		}
 	}
 
 	&[aria-disabled="true"] {
 		cursor: default;
 		pointer-events: none;
-		color: $dark-opacity-light-300; // Use opacity to work in various editor styles.
+		color: $light-gray-800;
 
 		.is-dark-theme & {
-			color: $light-opacity-light-300;
+			color: $dark-gray-800;
 		}
 	}
 }
@@ -89,18 +86,10 @@
 	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):focus {
 		box-shadow: none;
 		background: none;
-
-		// Use opacity to work in various editor styles.
-		color: $dark-opacity-500;
+		color: $light-gray-500;
 
 		.is-dark-theme & {
-			color: $light-opacity-500;
-		}
-
-		// Nested movers have a background, so don't invert the colors there.
-		.is-dark-theme .wp-block .wp-block &,
-		.wp-block .is-dark-theme .wp-block & {
-			color: $dark-opacity-500;
+			color: $dark-gray-500;
 		}
 	}
 
