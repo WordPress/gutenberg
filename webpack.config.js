@@ -149,7 +149,7 @@ module.exports = {
 				},
 			},
 		] ),
-		new DependencyExtractionWebpackPlugin( { injectPolyfill: true } ),
+		new DependencyExtractionWebpackPlugin( { injectPolyfill: true, outputFormat: 'php' } ),
 	],
 	devtool,
 };
