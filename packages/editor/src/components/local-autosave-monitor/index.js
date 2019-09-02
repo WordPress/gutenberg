@@ -17,6 +17,8 @@ import { parse } from '@wordpress/blocks';
  */
 import AutosaveMonitor from '../autosave-monitor';
 
+const requestIdleCallback = window.requestIdleCallback ? window.requestIdleCallback : window.requestAnimationFrame;
+
 /**
  * Time interval at which local autosave should occur after a change, in
  * seconds.
@@ -75,11 +77,14 @@ function useAutosaveCallback() {
 	} ) );
 
 	return useCallback( () => {
-		window.sessionStorage.setItem( postKey( postId ), JSON.stringify( {
-			post_title: getEditedPostAttribute( 'title' ),
-			content: getEditedPostAttribute( 'content' ),
-			excerpt: getEditedPostAttribute( 'excerpt' ),
-		} ) );
+		const saveToSessionStorage = () => {
+			window.sessionStorage.setItem( postKey( postId ), JSON.stringify( {
+				post_title: getEditedPostAttribute( 'title' ),
+				content: getEditedPostAttribute( 'content' ),
+				excerpt: getEditedPostAttribute( 'excerpt' ),
+			} ) );
+		};
+		requestIdleCallback( saveToSessionStorage );
 	}, [ postId, getEditedPostAttribute ] );
 }
 
