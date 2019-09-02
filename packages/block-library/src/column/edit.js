@@ -23,6 +23,7 @@ function ColumnEdit( {
 	setAttributes,
 	updateAlignment,
 	hasChildBlocks,
+	parentLock,
 } ) {
 	const { verticalAlignment, width } = attributes;
 
@@ -60,7 +61,7 @@ function ColumnEdit( {
 				</PanelBody>
 			</InspectorControls>
 			<InnerBlocks
-				templateLock={ false }
+				templateLock={ parentLock }
 				renderAppender={
 					hasChildBlocks
 						? undefined
@@ -79,10 +80,18 @@ function ColumnEdit( {
 export default compose(
 	withSelect( ( select, ownProps ) => {
 		const { clientId } = ownProps;
-		const { getBlockOrder } = select( 'core/block-editor' );
+		const { getBlockOrder, getBlockRootClientId, getTemplateLock } = select(
+			'core/block-editor'
+		);
+
+		// Retrieve the parent of the Columns Block.
+		const rootParentClientId = getBlockRootClientId(
+			getBlockRootClientId( clientId )
+		);
 
 		return {
 			hasChildBlocks: getBlockOrder( clientId ).length > 0,
+			parentLock: getTemplateLock( rootParentClientId ),
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, registry ) => {
