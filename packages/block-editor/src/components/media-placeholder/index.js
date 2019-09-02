@@ -387,10 +387,10 @@ export class MediaPlaceholder extends Component {
 
 	render() {
 		const {
-			dropZoneUIOnly,
+			showMediaSelectionUI,
 		} = this.props;
 
-		if ( dropZoneUIOnly ) {
+		if ( showMediaSelectionUI ) {
 			return (
 				<MediaUploadCheck>
 					{ this.renderDropZone() }

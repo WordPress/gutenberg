@@ -87,13 +87,13 @@ If false the default placeholder style is used.
 - Default: `false`
 - Platform: Web | Mobile
 
-### isSelected
+### showMediaSelectionUI
 
-Whether the block is selected or not.
+Whether render a dropzone/placholder without any other additional UI.
 
 - Type: `Boolean`
 - Required: No
-- Platform: Mobile
+- Platform: Web | Mobile
 
 ### labels
 
