@@ -288,7 +288,11 @@ class RichText extends Component {
 			end: index,
 			activeFormats,
 		};
-		this.props.onSelectionChange( index, index );
+
+		if ( this.props.onSelectionChange ) {
+			this.props.onSelectionChange( index, index );
+		}
+
 		this.setState( { activeFormats } );
 
 		// Update selection as soon as possible, which is at the next animation
@@ -460,7 +464,11 @@ class RichText extends Component {
 		// otherwise the value will be wrong on render!
 		this.record = newValue;
 		this.applyRecord( newValue, { domOnly: true } );
-		this.props.onSelectionChange( start, end );
+
+		if ( this.props.onSelectionChange ) {
+			this.props.onSelectionChange( start, end );
+		}
+
 		this.setState( { activeFormats } );
 
 		if ( activeFormats.length > 0 ) {
@@ -510,7 +518,11 @@ class RichText extends Component {
 		this.value = this.valueToFormat( record );
 		this.record = record;
 		this.props.onChange( this.value );
-		this.props.onSelectionChange( start, end );
+
+		if ( this.props.onSelectionChange ) {
+			this.props.onSelectionChange( start, end );
+		}
+
 		this.setState( { activeFormats } );
 
 		if ( ! withoutHistory ) {
@@ -519,6 +531,10 @@ class RichText extends Component {
 	}
 
 	onCreateUndoLevel() {
+		if ( ! this.props.__unstableOnCreateUndoLevel ) {
+			return;
+		}
+
 		// If the content is the same, no level needs to be created.
 		if ( this.lastHistoryValue === this.value ) {
 			return;
@@ -747,7 +763,11 @@ class RichText extends Component {
 
 		this.record = newValue;
 		this.applyRecord( newValue );
-		this.props.onSelectionChange( newPos, newPos );
+
+		if ( this.props.onSelectionChange ) {
+			this.props.onSelectionChange( newPos, newPos );
+		}
+
 		this.setState( { activeFormats: newActiveFormats } );
 	}
 
@@ -785,6 +805,7 @@ class RichText extends Component {
 			selectionEnd,
 			placeholder,
 			__unstableIsSelected: isSelected,
+			onSelectionChange,
 		} = this.props;
 
 		// Check if the content changed.
@@ -795,12 +816,14 @@ class RichText extends Component {
 		);
 
 		// Check if the selection changed.
-		shouldReapply = shouldReapply || (
-			isSelected && ! prevProps.isSelected && (
-				this.record.start !== selectionStart ||
-				this.record.end !== selectionEnd
-			)
-		);
+		if ( onSelectionChange ) {
+			shouldReapply = shouldReapply || (
+				isSelected && ! prevProps.isSelected && (
+					this.record.start !== selectionStart ||
+					this.record.end !== selectionEnd
+				)
+			);
+		}
 
 		const prefix = 'format_prepare_props_';
 		const predicate = ( v, key ) => key.startsWith( prefix );
@@ -832,8 +855,10 @@ class RichText extends Component {
 
 			this.applyRecord( this.record );
 		} else if (
-			this.record.start !== selectionStart ||
-			this.record.end !== selectionEnd
+			onSelectionChange && (
+				this.record.start !== selectionStart ||
+				this.record.end !== selectionEnd
+			)
 		) {
 			this.record = {
 				...this.record,

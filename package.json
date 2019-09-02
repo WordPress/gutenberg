@@ -221,7 +221,8 @@
 		"playground:build": "npm run build:packages && parcel build playground/src/index.html -d playground/dist",
 		"playground:start": "concurrently \"npm run dev:packages\" \"parcel playground/src/index.html -d playground/dist\"",
 		"preenv": "npm run check-engines",
-		"env": "wp-scripts env"
+		"env": "wp-scripts env",
+		"test-package-e2e": "node ./bin/setup-packages-e2e-tests.js"
 	},
 	"lint-staged": {
 		"packages/*/package.json": [

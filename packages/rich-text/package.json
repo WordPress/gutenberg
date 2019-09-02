@@ -34,6 +34,9 @@
 		"memize": "^1.0.5",
 		"rememo": "^3.0.0"
 	},
+	"devDependencies": {
+		"@babel/core": "7.5.5"
+	},
 	"publishConfig": {
 		"access": "public"
 	}
