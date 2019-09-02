@@ -19,18 +19,20 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import BlockNavigator from './block-navigator';
+import useBlockNavigator from './use-block-navigator';
 
 function NavigationMenu( {
 	attributes,
 	setAttributes,
 	clientId,
 } ) {
+	const { NavigatorToolbarButton, NavigatorModal } = useBlockNavigator( clientId );
+
 	return (
 		<Fragment>
 			<BlockControls>
 				<Toolbar>
-					<BlockNavigator clientId={ clientId } />
+					<NavigatorToolbarButton />
 				</Toolbar>
 			</BlockControls>
 			<InspectorControls>
@@ -47,6 +49,7 @@ function NavigationMenu( {
 					/>
 				</PanelBody>
 			</InspectorControls>
+			<NavigatorModal />
 			<div className="wp-block-navigation-menu">
 				<InnerBlocks
 					allowedBlocks={ [ 'core/navigation-menu-item' ] }

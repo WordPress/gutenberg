@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import {
-	Fragment,
 	useState,
 } from '@wordpress/element';
 import {
@@ -26,7 +25,7 @@ const NavigatorIcon = (
 	</SVG>
 );
 
-export default function BlockNavigator( { clientId } ) {
+export default function useBlockNavigator( clientId ) {
 	const [ isNavigationListOpen, setIsNavigationListOpen ] = useState( false );
 
 	const {
@@ -48,28 +47,40 @@ export default function BlockNavigator( { clientId } ) {
 		selectBlock,
 	} = useDispatch( 'core/block-editor' );
 
-	return (
-		<Fragment>
-			{ isNavigationListOpen && (
-				<Modal
-					title={ __( 'Block Navigator' ) }
-					closeLabel={ __( 'Close' ) }
-					onRequestClose={ () => setIsNavigationListOpen( false ) }
-				>
-					<BlockNavigationList
-						blocks={ [ block ] }
-						selectedBlockClientId={ selectedBlockClientId }
-						selectBlock={ selectBlock }
-						showNestedBlocks
-					/>
-				</Modal>
-			) }
-			<IconButton
-				className="components-toolbar__control"
-				label={ __( 'Open block navigator' ) }
-				onClick={ () => setIsNavigationListOpen( true ) }
-				icon={ NavigatorIcon }
-			/>
-		</Fragment>
+	const NavigatorModal = () => {
+		if ( ! isNavigationListOpen ) {
+			return null;
+		}
+
+		return (
+			<Modal
+				title={ __( 'Block Navigator' ) }
+				closeLabel={ __( 'Close' ) }
+				onRequestClose={ () => {
+					setIsNavigationListOpen( false );
+				} }
+			>
+				<BlockNavigationList
+					blocks={ [ block ] }
+					selectedBlockClientId={ selectedBlockClientId }
+					selectBlock={ selectBlock }
+					showNestedBlocks
+				/>
+			</Modal>
+		);
+	};
+
+	const NavigatorToolbarButton = () => (
+		<IconButton
+			className="components-toolbar__control"
+			label={ __( 'Open block navigator' ) }
+			onClick={ () => setIsNavigationListOpen( true ) }
+			icon={ NavigatorIcon }
+		/>
 	);
+
+	return {
+		NavigatorModal,
+		NavigatorToolbarButton,
+	};
 }
