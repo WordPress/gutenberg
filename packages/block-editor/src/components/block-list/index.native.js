@@ -165,12 +165,15 @@ export default compose( [
 			getSelectedBlockClientId,
 			getBlockInsertionPoint,
 			isBlockInsertionPointVisible,
+			getSelectedBlock,
 		} = select( 'core/block-editor' );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 		const blockClientIds = getBlockOrder( rootClientId );
 		const insertionPoint = getBlockInsertionPoint();
 		const blockInsertionPointIsVisible = isBlockInsertionPointVisible();
+		const selectedBlock = getSelectedBlock();
+		const isSelectedGroup = selectedBlock && selectedBlock.name === 'core/group';
 		const shouldShowInsertionPoint = ( clientId ) => {
 			return (
 				blockInsertionPointIsVisible &&
@@ -182,7 +185,7 @@ export default compose( [
 		const selectedBlockIndex = getBlockIndex( selectedBlockClientId );
 		const shouldShowBlockAtIndex = ( index ) => {
 			const shouldHideBlockAtIndex = (
-				blockInsertionPointIsVisible &&
+				! isSelectedGroup && blockInsertionPointIsVisible &&
 				// if `index` === `insertionPoint.index`, then block is replaceable
 				index === insertionPoint.index &&
 				// only hide selected block
