@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { Component, createPortal } from '@wordpress/element';
-import { withInstanceId } from '@wordpress/compose';
+import { compose, withInstanceId } from '@wordpress/compose';
 import { ESCAPE } from '@wordpress/keycodes';
 
 /**
@@ -16,6 +16,8 @@ import { ESCAPE } from '@wordpress/keycodes';
 import ModalFrame from './frame';
 import ModalHeader from './header';
 import * as ariaHelper from './aria-helper';
+import withFocusReturn from '../higher-order/with-focus-return';
+import withFocusOutside from '../higher-order/with-focus-outside';
 import IsolatedEventContainer from '../isolated-event-container';
 
 // Used to count the number of open modals.
@@ -28,6 +30,7 @@ class Modal extends Component {
 
 		this.prepareDOM();
 		this.maybeClose = this.maybeClose.bind( this );
+		this.handleFocusOutside = this.handleFocusOutside.bind( this );
 	}
 
 	/**
@@ -101,6 +104,29 @@ class Modal extends Component {
 	closeLastModal() {
 		document.body.classList.remove( this.props.bodyOpenClassName );
 		ariaHelper.showApp();
+	}
+
+	/**
+	 * Callback function called when clicked outside the modal.
+	 *
+	 * @param {Object} event Mouse click event.
+	 */
+	handleFocusOutside( event ) {
+		if ( this.props.shouldCloseOnClickOutside ) {
+			this.onRequestClose( event );
+		}
+	}
+
+	/**
+	 * Calls the onRequestClose callback props when it is available.
+	 *
+	 * @param {Object} event Event object.
+	 */
+	onRequestClose( event ) {
+		const { onRequestClose } = this.props;
+		if ( onRequestClose ) {
+			onRequestClose( event );
+		}
 	}
 
 	/**
@@ -191,4 +217,8 @@ Modal.defaultProps = {
 	},
 };
 
-export default withInstanceId( Modal );
+export default compose( [
+	withFocusReturn,
+	withInstanceId,
+	withFocusOutside,
+] )( Modal );
