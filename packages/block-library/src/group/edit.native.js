@@ -22,15 +22,16 @@ function GroupEdit( {
 	hasInnerBlocks,
 	isSelected,
 } ) {
+	if ( ! isSelected && ! hasInnerBlocks ) {
+		return (
+			<View style={ styles.groupPlaceholder } />
+		);
+	}
+
 	return (
-		<>
-			{ ! isSelected && ! hasInnerBlocks ?
-				<View style={ styles.groupPlaceholder } /> :
-				<InnerBlocks
-					renderAppender={ isSelected && InnerBlocks.ButtonBlockAppender }
-				/>
-			}
-		</>
+		<InnerBlocks
+			renderAppender={ isSelected && InnerBlocks.ButtonBlockAppender }
+		/>
 	);
 }
 
