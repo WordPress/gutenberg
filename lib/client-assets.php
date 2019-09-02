@@ -240,7 +240,6 @@ function gutenberg_register_scripts_and_styles() {
 	//
 	// See: https://core.trac.wordpress.org/ticket/46107 .
 	// See: https://github.com/WordPress/gutenberg/pull/13451 .
-	global $wp_scripts;
 	if ( isset( $wp_scripts->registered['wp-api-fetch'] ) ) {
 		$wp_scripts->registered['wp-api-fetch']->deps[] = 'wp-hooks';
 	}
