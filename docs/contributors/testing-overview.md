@@ -368,7 +368,7 @@ If you're using a different setup, you can provide the base URL, username and pa
 WP_BASE_URL=http://localhost:8888 WP_USERNAME=admin WP_PASSWORD=password npm run test-e2e
 ```
 
-### New Core Blocks
+### Core Block Testing
 
 Every core block is required to have at least one set of fixture files to test the parsing and serialization of that block. See [the e2e tests fixtures readme](/packages/e2e-tests/fixtures/blocks/README.md) for more information and instructions.
 
