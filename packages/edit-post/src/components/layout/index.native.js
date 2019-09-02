@@ -118,8 +118,7 @@ class Layout extends Component {
 				<View style={ useStyle( styles.background, styles.backgroundDark, this.props.theme ) }>
 					{ isHtmlView ? this.renderHTML() : this.renderVisual() }
 				</View>
-				<View style={ { flex: 0, flexBasis: marginBottom, height: marginBottom } }>
-				</View>
+				<View style={ { flex: 0, flexBasis: marginBottom, height: marginBottom } } />
 				{ ! isHtmlView && (
 					<KeyboardAvoidingView
 						parentHeight={ this.state.rootViewHeight }

@@ -30,8 +30,8 @@ function HeaderToolbar( {
 	undo,
 	showInserter,
 	showKeyboardHideButton,
-	clearSelectedBlock,
 	theme,
+	onHideKeyboard,
 } ) {
 	const scrollViewRef = useRef( null );
 	const scrollToStart = () => {
@@ -76,7 +76,7 @@ function HeaderToolbar( {
 					<ToolbarButton
 						title={ __( 'Hide keyboard' ) }
 						icon="keyboard-hide"
-						onClick={ clearSelectedBlock }
+						onClick={ onHideKeyboard }
 						extraProps={ { hint: __( 'Tap to hide the keyboard' ) } }
 					/>
 				</Toolbar>
@@ -94,11 +94,19 @@ export default compose( [
 		showInserter: select( 'core/edit-post' ).getEditorMode() === 'visual' && select( 'core/editor' ).getEditorSettings().richEditingEnabled,
 		isTextModeEnabled: select( 'core/edit-post' ).getEditorMode() === 'text',
 	} ) ),
-	withDispatch( ( dispatch ) => ( {
-		redo: dispatch( 'core/editor' ).redo,
-		undo: dispatch( 'core/editor' ).undo,
-		clearSelectedBlock: dispatch( 'core/block-editor' ).clearSelectedBlock,
-	} ) ),
+	withDispatch( ( dispatch ) => {
+		const { clearSelectedBlock } = dispatch( 'core/block-editor' );
+		const { togglePostTitleSelection } = dispatch( 'core/editor' );
+
+		return {
+			redo: dispatch( 'core/editor' ).redo,
+			undo: dispatch( 'core/editor' ).undo,
+			onHideKeyboard() {
+				clearSelectedBlock();
+				togglePostTitleSelection( false );
+			},
+		};
+	} ),
 	withViewportMatch( { isLargeViewport: 'medium' } ),
 	withTheme,
 ] )( HeaderToolbar );
