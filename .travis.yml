@@ -58,11 +58,6 @@ jobs:
         - npm run build
         - npm run test-unit:native -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache-native"
 
-    - name: PHP unit tests (Docker)
-      env: WP_VERSION=latest DOCKER=true
-      script:
-        - ./bin/run-wp-unit-tests.sh
-
 before_deploy:
   - npm install
   - npm run playground:build -- --public-url '/gutenberg'

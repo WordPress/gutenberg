@@ -77,6 +77,9 @@ const mockNativeModules = {
 	UIManager: {
 		...NativeModules.UIManager,
 		getViewManagerConfig: jest.fn( () => ( { Commands: {} } ) ),
+		Platform: {
+			OS: 'android',
+		},
 	},
 };
 
