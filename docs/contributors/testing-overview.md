@@ -370,7 +370,7 @@ WP_BASE_URL=http://localhost:8888 WP_USERNAME=admin WP_PASSWORD=password npm run
 
 ### Core Block Testing
 
-Every core block is required to have at least one set of fixture files to test the parsing and serialization of that block. See [the e2e tests fixtures readme](/packages/e2e-tests/fixtures/blocks/README.md) for more information and instructions.
+Every core block is required to have at least one set of fixture files for its main save function and one for each deprecation. These fixtures test the parsing and serialization of the block. See [the e2e tests fixtures readme](/packages/e2e-tests/fixtures/blocks/README.md) for more information and instructions.
 
 ## PHP Testing
 
