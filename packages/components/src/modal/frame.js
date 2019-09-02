@@ -2,9 +2,8 @@
  * WordPress dependencies
  */
 import { Component, createRef } from '@wordpress/element';
-import { ESCAPE } from '@wordpress/keycodes';
 import { focus } from '@wordpress/dom';
-import { withGlobalEvents, compose } from '@wordpress/compose';
+import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -18,7 +17,6 @@ class ModalFrame extends Component {
 		super( ...arguments );
 
 		this.containerRef = createRef();
-		this.handleKeyDown = this.handleKeyDown.bind( this );
 		this.handleFocusOutside = this.handleFocusOutside.bind( this );
 		this.focusFirstTabbable = this.focusFirstTabbable.bind( this );
 	}
@@ -50,31 +48,6 @@ class ModalFrame extends Component {
 	 */
 	handleFocusOutside( event ) {
 		if ( this.props.shouldCloseOnClickOutside ) {
-			this.onRequestClose( event );
-		}
-	}
-
-	/**
-	 * Callback function called when a key is pressed.
-	 *
-	 * @param {KeyboardEvent} event Key down event.
-	 */
-	handleKeyDown( event ) {
-		if ( event.keyCode === ESCAPE ) {
-			this.handleEscapeKeyDown( event );
-		}
-	}
-
-	/**
-	 * Handles a escape key down event.
-	 *
-	 * Calls onRequestClose and prevents default key press behaviour.
-	 *
-	 * @param {Object} event Key down event.
-	 */
-	handleEscapeKeyDown( event ) {
-		if ( this.props.shouldCloseOnEsc ) {
-			event.preventDefault();
 			this.onRequestClose( event );
 		}
 	}
@@ -130,7 +103,4 @@ export default compose( [
 	withFocusReturn,
 	withConstrainedTabbing,
 	withFocusOutside,
-	withGlobalEvents( {
-		keydown: 'handleKeyDown',
-	} ),
 ] )( ModalFrame );

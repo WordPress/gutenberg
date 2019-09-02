@@ -8,6 +8,7 @@ import classnames from 'classnames';
  */
 import { Component, createPortal } from '@wordpress/element';
 import { withInstanceId } from '@wordpress/compose';
+import { ESCAPE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -26,6 +27,7 @@ class Modal extends Component {
 		super( props );
 
 		this.prepareDOM();
+		this.maybeClose = this.maybeClose.bind( this );
 	}
 
 	/**
@@ -102,6 +104,20 @@ class Modal extends Component {
 	}
 
 	/**
+	 * Stops proagation of the escape key outside the context of the modal.
+	 *
+	 * @param {Event} event The onKeyDown event.
+	 */
+	maybeClose( event ) {
+		const { onRequestClose, shouldCloseOnEsc } = this.props;
+
+		if ( event.keyCode === ESCAPE && shouldCloseOnEsc && onRequestClose ) {
+			event.stopPropagation();
+			onRequestClose( event );
+		}
+	}
+
+	/**
 	 * Renders the modal.
 	 *
 	 * @return {WPElement} The modal element.
@@ -128,6 +144,7 @@ class Modal extends Component {
 		return createPortal(
 			<IsolatedEventContainer
 				className={ classnames( 'components-modal__screen-overlay', overlayClassName ) }
+				onKeyDown={ this.maybeClose }
 			>
 				<ModalFrame
 					className={ classnames(
