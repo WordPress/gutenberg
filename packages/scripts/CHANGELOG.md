@@ -1,5 +1,7 @@
 ## Master
 
+## 4.1.0 (2019-09-03)
+
 ### New Features
 
 - Add the new `env` family of scripts [(#17004](https://github.com/WordPress/gutenberg/pull/17004/)).
