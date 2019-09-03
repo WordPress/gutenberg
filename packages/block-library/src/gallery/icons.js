@@ -12,7 +12,7 @@ export const icon = (
 
 export const leftArrow = (
 	<SVG width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
-		<Path d="M5.5 8.70002L11.1 14.4L12.5 12.9L8.3 8.70002L12.5 4.50002L11.1 3.00002L5.5 8.70002Z" />
+		<Path d="M5 8.70002L10.6 14.4L12 12.9L7.8 8.70002L12 4.50002L10.6 3.00002L5 8.70002Z" />
 	</SVG>
 );
 
