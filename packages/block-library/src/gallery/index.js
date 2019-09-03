@@ -8,7 +8,7 @@ import { __ } from '@wordpress/i18n';
  */
 import deprecated from './deprecated';
 import edit from './edit';
-import icon from './icon';
+import { icon } from './icons';
 import metadata from './block.json';
 import save from './save';
 import transforms from './transforms';
