@@ -16,7 +16,7 @@ class DependencyExtractionWebpackPlugin {
 		this.options = Object.assign(
 			{
 				injectPolyfill: false,
-				outputFormat: 'json',
+				outputFormat: 'php',
 				useDefaults: true,
 			},
 			options
