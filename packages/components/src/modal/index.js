@@ -1,14 +1,8 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { Component, createPortal } from '@wordpress/element';
-import { compose, withInstanceId } from '@wordpress/compose';
-import { ESCAPE } from '@wordpress/keycodes';
+import { withInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -16,9 +10,6 @@ import { ESCAPE } from '@wordpress/keycodes';
 import ModalFrame from './frame';
 import ModalHeader from './header';
 import * as ariaHelper from './aria-helper';
-import withFocusReturn from '../higher-order/with-focus-return';
-import withFocusOutside from '../higher-order/with-focus-outside';
-import IsolatedEventContainer from '../isolated-event-container';
 
 // Used to count the number of open modals.
 let parentElement,
@@ -27,10 +18,7 @@ let parentElement,
 class Modal extends Component {
 	constructor( props ) {
 		super( props );
-
 		this.prepareDOM();
-		this.maybeClose = this.maybeClose.bind( this );
-		this.handleFocusOutside = this.handleFocusOutside.bind( this );
 	}
 
 	/**
@@ -107,51 +95,12 @@ class Modal extends Component {
 	}
 
 	/**
-	 * Callback function called when clicked outside the modal.
-	 *
-	 * @param {Object} event Mouse click event.
-	 */
-	handleFocusOutside( event ) {
-		if ( this.props.shouldCloseOnClickOutside ) {
-			this.onRequestClose( event );
-		}
-	}
-
-	/**
-	 * Calls the onRequestClose callback props when it is available.
-	 *
-	 * @param {Object} event Event object.
-	 */
-	onRequestClose( event ) {
-		const { onRequestClose } = this.props;
-		if ( onRequestClose ) {
-			onRequestClose( event );
-		}
-	}
-
-	/**
-	 * Stops proagation of the escape key outside the context of the modal.
-	 *
-	 * @param {Event} event The onKeyDown event.
-	 */
-	maybeClose( event ) {
-		const { onRequestClose, shouldCloseOnEsc } = this.props;
-
-		if ( event.keyCode === ESCAPE && shouldCloseOnEsc && onRequestClose ) {
-			event.stopPropagation();
-			onRequestClose( event );
-		}
-	}
-
-	/**
 	 * Renders the modal.
 	 *
 	 * @return {WPElement} The modal element.
 	 */
 	render() {
 		const {
-			overlayClassName,
-			className,
 			onRequestClose,
 			title,
 			icon,
@@ -168,35 +117,26 @@ class Modal extends Component {
 		// Disable reason: this stops mouse events from triggering tooltips and
 		// other elements underneath the modal overlay.
 		return createPortal(
-			<IsolatedEventContainer
-				className={ classnames( 'components-modal__screen-overlay', overlayClassName ) }
-				onKeyDown={ this.maybeClose }
+			<ModalFrame
+				onRequestClose={ onRequestClose }
+				aria={ {
+					labelledby: title ? headingId : null,
+					describedby: aria.describedby,
+				} }
+				{ ...otherProps }
 			>
-				<ModalFrame
-					className={ classnames(
-						'components-modal__frame',
-						className
-					) }
-					onRequestClose={ onRequestClose }
-					aria={ {
-						labelledby: title ? headingId : null,
-						describedby: aria.describedby,
-					} }
-					{ ...otherProps }
-				>
-					<div className={ 'components-modal__content' } tabIndex="0">
-						<ModalHeader
-							closeLabel={ closeButtonLabel }
-							headingId={ headingId }
-							icon={ icon }
-							isDismissable={ isDismissable }
-							onClose={ onRequestClose }
-							title={ title }
-						/>
-						{ children }
-					</div>
-				</ModalFrame>
-			</IsolatedEventContainer>,
+				<div className={ 'components-modal__content' } tabIndex="0">
+					<ModalHeader
+						closeLabel={ closeButtonLabel }
+						headingId={ headingId }
+						icon={ icon }
+						isDismissable={ isDismissable }
+						onClose={ onRequestClose }
+						title={ title }
+					/>
+					{ children }
+				</div>
+			</ModalFrame>,
 			this.node
 		);
 	}
@@ -217,8 +157,4 @@ Modal.defaultProps = {
 	},
 };
 
-export default compose( [
-	withFocusReturn,
-	withInstanceId,
-	withFocusOutside,
-] )( Modal );
+export default withInstanceId( Modal );
