@@ -3,8 +3,8 @@
 This webpack plugin serves two purposes:
 
 - Externalize dependencies that are available as script dependencies on modern WordPress sites.
-- Add a JSON file for each entrypoint that declares the WordPress script dependencies for the
-  entrypoint.
+- Add an asset file for each entrypoint that declares an object with the list of WordPress script dependencies for the
+  entrypoint. The asset file also contains other useful metadata like the script handle or the current version.
 
 This allows JavaScript bundles produced by webpack to leverage WordPress style dependency sharing
 without an error-prone process of manually maintaining a dependency list.
@@ -59,7 +59,7 @@ const config = {
 };
 ```
 
-Each entrypoint in the webpack bundle will include JSON file that declares the WordPress script dependencies that should be enqueued.
+Each entrypoint in the webpack bundle will include an asset file that declares the WordPress script dependencies that should be enqueued. Such file also contains the unique version hash calculated based on the file content.
 
 For example:
 
@@ -70,8 +70,8 @@ import { Component } from '@wordpress/element';
 // Webpack will produce the output output/entrypoint.js
 /* bundled JavaScript output */
 
-// Webpack will also produce output/entrypoint.deps.json declaring script dependencies
-['wp-element']
+// Webpack will also produce output/entrypoint.asset.php declaring script dependencies
+<?php return array('dependencies' => array('wp-element'), 'version' => 'dd4c2dc50d046ed9d4c063a7ca95702f');
 ```
 
 By default, the following module requests are handled:
@@ -108,6 +108,13 @@ module.exports = {
   ]
 }
 ```
+
+##### `outputFormat`
+
+- Type: string
+- Default: `php`
+
+The output format for the generated asset file. There are two options available: 'php' or 'json'.
 
 ##### `useDefaults`
 
@@ -200,20 +207,20 @@ module.exports = {
 The functions `requestToExternal` and `requestToHandle` allow this module to handle arbitrary
 modules. `requestToExternal` is necessary to handle any module and maps a module request to a global
 name. `requestToHandle` maps the same module request to a script handle, the strings that will be
-included in the `entrypoint.deps.json` files.
+included in the `entrypoint.asset.php` files.
 
 ### WordPress
 
 Enqueue your script as usual and read the script dependencies dynamically:
 
 ```php
-$script_path         = 'path/to/script.js';
-$script_deps_path    = 'path/to/script.deps.json';
-$script_dependencies = file_exists( $script_deps_path )
-	? json_decode( file_get_contents( $script_deps_path ) )
-	: array();
+$script_path       = 'path/to/script.js';
+$script_asset_path = 'path/to/script.asset.php';
+$script_asset      = file_exists( $script_asset_path )
+	? include_once( $script_asset_path ) )
+	: array( 'dependencies' => array(), 'version' => filemtime( $script_path ) );
 $script_url = plugins_url( $script_path, __FILE__ );
-wp_enqueue_script( 'script', $script_url, $script_dependencies );
+wp_enqueue_script( 'script', $script_url, $script_asset['dependencies'], $script_asset['version'] );
 ```
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
