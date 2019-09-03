@@ -173,11 +173,6 @@
 			]
 		}
 	},
-	"husky": {
-		"hooks": {
-			"pre-commit": "lint-staged"
-		}
-	},
 	"scripts": {
 		"prebuild": "npm run check-engines",
 		"clean:packages": "rimraf ./packages/*/build ./packages/*/build-module ./packages/*/build-style ./packages/*/node_modules",
@@ -226,6 +221,11 @@
 		"playground:start": "concurrently \"npm run dev:packages\" \"parcel playground/src/index.html -d playground/dist\"",
 		"preenv": "npm run check-engines",
 		"env": "wp-scripts env"
+	},
+	"husky": {
+		"hooks": {
+			"pre-commit": "lint-staged"
+		}
 	},
 	"lint-staged": {
 		"packages/*/package.json": [
