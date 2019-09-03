@@ -2,7 +2,7 @@
  * External dependencies
  */
 const { createHash } = require( 'crypto' );
-const { serialize: phpSerialize } = require( 'php-serialize' );
+const json2php = require( 'json2php' );
 const { ExternalsPlugin } = require( 'webpack' );
 const { RawSource } = require( 'webpack-sources' );
 
@@ -78,7 +78,7 @@ class DependencyExtractionWebpackPlugin {
 
 	serialize( asset ) {
 		if ( this.options.outputFormat === 'php' ) {
-			return `<?php return unserialize('${ phpSerialize( asset ) }');`;
+			return `<?php return ${ json2php( JSON.parse( JSON.stringify( asset ) ) ) };`;
 		}
 
 		return JSON.stringify( asset );
