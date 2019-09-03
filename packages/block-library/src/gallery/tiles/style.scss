@@ -1,0 +1,87 @@
+.wp-tiles {
+	display: flex;
+	flex-wrap: wrap;
+	list-style-type: none;
+	padding: 0;
+
+	// .blocks-gallery-image,
+	.wp-tile {
+		// Add space between thumbnails, and unset right most thumbnails later.
+		margin: 0 $grid-size-large $grid-size-large 0;
+		display: flex;
+		flex-grow: 1;
+		flex-direction: column;
+		justify-content: center;
+		position: relative;
+	}
+
+	// On mobile and responsive viewports, we allow only 1 or 2 columns at the most.
+	// & .blocks-gallery-image,
+	& .wp-tile {
+		width: calc((100% - #{ $grid-size-large }) / 2);
+
+		&:nth-of-type(even) {
+			margin-right: 0;
+		}
+	}
+
+	// &.columns-1 .blocks-gallery-image,
+	&.columns-1 .wp-tile {
+		width: 100%;
+		margin-right: 0;
+	}
+
+	// Beyond mobile viewports, we allow up to 8 columns.
+	@include break-small {
+		@for $i from 3 through 8 {
+			// &.columns-#{ $i } .blocks-gallery-image,
+			&.columns-#{ $i } .wp-tile {
+				width: calc((100% - #{ $grid-size-large } * #{ $i - 1 }) / #{ $i });
+				margin-right: 16px;
+
+				// Rules inside this query are only run by Microsoft Edge.
+				// Edge miscalculates `calc`, so we have to add some buffer.
+				// See also https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/15637241/
+				@supports (-ms-ime-align:auto) {
+					width: calc((100% - #{ $grid-size-large } * #{ $i - 1 }) / #{ $i } - 1px);
+				}
+			}
+		}
+
+		// Unset the right margin on every rightmost gallery item to ensure center balance.
+		@for $column-count from 1 through 8 {
+			// &.columns-#{ $column-count } .blocks-gallery-image:nth-of-type(#{ $column-count }n),
+			&.columns-#{ $column-count } .wp-tile:nth-of-type(#{ $column-count }n) {
+				margin-right: 0;
+			}
+		}
+	}
+
+	// Last item always needs margins reset.
+	// .blocks-gallery-image:last-child,
+	.wp-tile:last-child {
+		margin-right: 0;
+	}
+
+	// Apply max-width to floated items that have no intrinsic width.
+	&.alignleft,
+	&.alignright {
+		max-width: $content-width / 2;
+		width: 100%;
+	}
+
+	// Keep the display property consistent when alignments are applied
+	// to preserve columns
+	&.alignleft,
+	&.aligncenter,
+	&.alignright {
+		display: flex;
+	}
+
+	// If the gallery is centered, center the content inside as well.
+	&.aligncenter {
+		.wp-tile > * {
+			justify-content: center;
+		}
+	}
+}
