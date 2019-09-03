@@ -59,6 +59,12 @@ ul.wp-block-gallery {
 		background: $white;
 		border: 1px solid $dark-opacity-light-800;
 		border-radius: $radius-round-rectangle;
+		transition: box-shadow 0.2s ease-out;
+		@include reduce-motion("transition");
+
+		&:hover {
+			box-shadow: $shadow-toolbar;
+		}
 
 		.components-button {
 			color: $dark-opacity-300;
