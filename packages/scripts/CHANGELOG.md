@@ -4,6 +4,10 @@
 
 - Add the new `env` family of scripts [(#17004](https://github.com/WordPress/gutenberg/pull/17004/)).
 
+### Bug Fixes
+
+- Add `wordpress` folder to the list of ignored paths in all applicable config files ([#17296](https://github.com/WordPress/gutenberg/pull/17296)).
+
 ## 4.0.0 (2019-08-29)
 
 ### Breaking Changes
