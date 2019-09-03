@@ -987,19 +987,21 @@ class RichText extends Component {
 
 	render() {
 		const {
-			__unstableIsSelected: isSelected,
+			__unstableIsSelected: isSelected = this.record.start !== undefined,
 			children,
 			allowedFormats,
 			withoutInteractiveFormatting,
+			formatTypes,
 		} = this.props;
 
 		return (
 			<>
-				{ isSelected && <FormatEdit
+				{ isSelected !== undefined && <FormatEdit
 					allowedFormats={ allowedFormats }
 					withoutInteractiveFormatting={ withoutInteractiveFormatting }
 					value={ this.record }
 					onChange={ this.onChange }
+					formatTypes={ formatTypes }
 				/> }
 				{ children && children( {
 					isSelected,
@@ -1023,8 +1025,8 @@ RichText.defaultProps = {
  * content.
  */
 export default compose( [
-	withSelect( ( select ) => ( {
-		formatTypes: select( 'core/rich-text' ).getFormatTypes(),
-	} ) ),
+	withSelect( ( select, {
+		formatTypes = select( 'core/rich-text' ).getFormatTypes(),
+	} ) => ( { formatTypes } ) ),
 	withSafeTimeout,
 ] )( RichText );

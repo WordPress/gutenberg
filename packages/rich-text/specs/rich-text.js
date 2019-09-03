@@ -1,10 +1,20 @@
 describe( 'RichText', () => {
 	const getValue = async () => {
-		return await page.evaluate( () => window._value );
+		return await page.evaluate( () => window.test.value );
 	};
 
 	beforeEach( async () => {
 		await page.goto( 'http://localhost:1234' );
+		await page.evaluate( async () => {
+			const { render, createElement, RichText } = window.test;
+			const onChange = ( newValue ) => window.test.value = newValue;
+			const element = createElement( RichText, { onChange } );
+			const container = document.querySelector( 'div' );
+
+			return new Promise( ( resolve ) => {
+				render( element, container, resolve );
+			} );
+		} );
 		await page.keyboard.press( 'Tab' );
 	} );
 
@@ -95,5 +105,19 @@ describe( 'RichText', () => {
 		await page.keyboard.type( '4' );
 
 		expect( await getValue() ).toBe( '1234' );
+	} );
+
+	it( 'should not format with native shortcut', async () => {
+		const key = process.platform === 'darwin' ? 'Meta' : 'Control';
+
+		await page.keyboard.type( '1' );
+		await page.keyboard.down( 'Shift' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.up( 'Shift' );
+		await page.keyboard.down( key );
+		await page.keyboard.press( 'b' );
+		await page.keyboard.up( key );
+
+		expect( await getValue() ).toBe( '1' );
 	} );
 } );

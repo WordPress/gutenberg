@@ -35,7 +35,8 @@
 		"rememo": "^3.0.0"
 	},
 	"devDependencies": {
-		"@babel/core": "7.5.5"
+		"@babel/core": "7.5.5",
+		"@wordpress/jest-console": "file:../jest-console"
 	},
 	"publishConfig": {
 		"access": "public"

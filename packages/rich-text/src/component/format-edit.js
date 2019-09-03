@@ -1,9 +1,4 @@
 /**
- * WordPress dependencies
- */
-import { withSelect } from '@wordpress/data';
-
-/**
  * Internal dependencies
  */
 import { getActiveFormat } from '../get-active-format';
@@ -77,6 +72,4 @@ const FormatEdit = ( {
 		);
 	} );
 
-export default withSelect( ( select ) => ( {
-	formatTypes: select( 'core/rich-text' ).getFormatTypes(),
-} ) )( FormatEdit );
+export default FormatEdit;

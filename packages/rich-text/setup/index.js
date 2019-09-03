@@ -1,14 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { render } from '@wordpress/element';
+import { render, createElement } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import { RichText } from '../src';
+import { RichText, toggleFormat } from '../src';
 
-render(
-	<RichText onChange={ ( newValue ) => window._value = newValue } />,
-	document.querySelector( 'div' )
-);
+// Expose component to be tested.
+window.test = { render, createElement, RichText, toggleFormat };
