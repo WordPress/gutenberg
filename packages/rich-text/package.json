@@ -36,7 +36,7 @@
 	},
 	"devDependencies": {
 		"@babel/core": "7.5.5",
-		"@wordpress/jest-console": "file:../jest-console"
+		"@wordpress/element": "file:../element"
 	},
 	"publishConfig": {
 		"access": "public"

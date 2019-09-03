@@ -14,7 +14,7 @@ process.on( 'unhandledRejection', ( err ) => {
  * External dependencies
  */
 const Bundler = require( 'parcel-bundler' );
-const { join } = require( 'path' );
+const { join, resolve } = require( 'path' );
 // eslint-disable-next-line jest/no-jest-import
 const jest = require( 'jest' );
 
@@ -30,7 +30,7 @@ bundler.on( 'buildEnd', () => {
 		'--config',
 		'bin/jest.config.js',
 		'--rootDir',
-		'packages/rich-text',
+		resolve( __dirname, '..' ),
 		'--runInBand',
 		...process.argv.slice( 2 ),
 	] ).then( () => {
