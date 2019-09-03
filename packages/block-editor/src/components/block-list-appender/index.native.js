@@ -20,9 +20,16 @@ function BlockListAppender( {
 	rootClientId,
 	canInsertDefaultBlock,
 	isLocked,
+	renderAppender: CustomAppender,
 } ) {
 	if ( isLocked ) {
 		return null;
+	}
+
+	if ( CustomAppender ) {
+		return (
+			<CustomAppender />
+		);
 	}
 
 	if ( canInsertDefaultBlock ) {

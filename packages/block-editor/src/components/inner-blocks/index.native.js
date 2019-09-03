@@ -121,6 +121,7 @@ class InnerBlocks extends Component {
 						<BlockList
 							rootClientId={ clientId }
 							renderAppender={ renderAppender }
+							withFooter={ false }
 						/>
 				) }
 			</>
