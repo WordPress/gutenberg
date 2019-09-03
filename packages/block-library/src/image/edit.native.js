@@ -19,7 +19,6 @@ import {
 	Icon,
 	Toolbar,
 	ToolbarButton,
-	Picker,
 	withTheme,
 	useStyle,
 } from '@wordpress/components';
@@ -43,15 +42,10 @@ import styles from './styles.scss';
 import MediaUploadProgress from './media-upload-progress';
 import SvgIcon from './icon';
 import SvgIconRetry from './icon-retry';
+import ImageSizePicker from './image-size-picker';
 
 const LINK_DESTINATION_CUSTOM = 'custom';
 const LINK_DESTINATION_NONE = 'none';
-
-const IMAGE_SIZE_THUMBNAIL = 'thumbnail';
-const IMAGE_SIZE_MEDIUM = 'medium';
-const IMAGE_SIZE_LARGE = 'large';
-const IMAGE_SIZE_FULL_SIZE = 'full';
-const DEFAULT_SIZE_SLUG = IMAGE_SIZE_LARGE;
 
 // Default Image ratio 4:3
 const IMAGE_ASPECT_RATIO = 4 / 3;
@@ -190,7 +184,7 @@ class ImageEdit extends React.Component {
 			alt: '',
 			linkDestination: LINK_DESTINATION_NONE,
 			href: undefined,
-			sizeSlug: DEFAULT_SIZE_SLUG,
+			sizeSlug: ImageSizePicker.DEFAULT_SIZE_SLUG,
 		} );
 	}
 
@@ -232,9 +226,12 @@ class ImageEdit extends React.Component {
 			this.setState( { showSettings: false } );
 		};
 
+		//set in ImageSizePicker using referenceOpenImageOptions prop
+		let openImageSizePicker = () => {};
+
 		const onAfterImageSettingsDismissed = () => {
 			if ( this.state.showImageOptions ) {
-				picker.presentPicker();
+				openImageSizePicker();
 				this.setState( { showImageOptions: false } );
 			}
 		};
@@ -271,7 +268,7 @@ class ImageEdit extends React.Component {
 				<BottomSheet.Cell
 					icon={ 'editor-expand' }
 					label={ __( 'Size' ) }
-					value={ getSizeSlugDisplay( sizeSlug ) }
+					value={ ImageSizePicker.sizeOptionLabels[ sizeSlug || ImageSizePicker.DEFAULT_SIZE_SLUG ] }
 					editable={ false }
 					onChangeValue={ this.onSetLinkDestination }
 					onPress={ onPickerPresent }
@@ -291,49 +288,6 @@ class ImageEdit extends React.Component {
 					onPress={ this.onClearSettings }
 				/>
 			</BottomSheet>
-		);
-
-		//Used for display of Inspector Controls
-		const getSizeSlugDisplay = ( sizeSlugValue ) => {
-			if ( sizeSlugValue === undefined ) {
-				sizeSlugValue = DEFAULT_SIZE_SLUG;
-			}
-			const sizeDisplayItems = getSizeOptionsItems();
-			switch ( sizeSlugValue ) {
-				case IMAGE_SIZE_THUMBNAIL:
-					return sizeDisplayItems[ 0 ].label;
-				case IMAGE_SIZE_MEDIUM:
-					return sizeDisplayItems[ 1 ].label;
-				case IMAGE_SIZE_FULL_SIZE:
-					return sizeDisplayItems[ 3 ].label;
-				case IMAGE_SIZE_LARGE:
-				default:
-					return sizeDisplayItems[ 2 ].label;
-			}
-		};
-
-		const getSizeOptionsItems = () => {
-			return [
-				{ value: IMAGE_SIZE_THUMBNAIL, label: __( 'Thumbnail' ) },
-				{ value: IMAGE_SIZE_MEDIUM, label: __( 'Medium' ) },
-				{ value: IMAGE_SIZE_LARGE, label: __( 'Large' ) },
-				{ value: IMAGE_SIZE_FULL_SIZE, label: __( 'Full Size' ) },
-			];
-		};
-
-		let picker;
-
-		const getSizeOptions = () => (
-			<Picker
-				hideCancelButton={ true }
-				title={ __( 'Image Size' ) }
-				ref={ ( instance ) => picker = instance }
-				options={ getSizeOptionsItems() }
-				leftAlign={ true }
-				onChange={ ( value ) => {
-					this.onSetSizeSlug( value );
-				} }
-			/>
 		);
 
 		const onPickerPresent = () => {
@@ -366,7 +320,14 @@ class ImageEdit extends React.Component {
 			>
 				<View style={ { flex: 1 } }>
 					{ getInspectorControls() }
-					{ getSizeOptions() }
+					<ImageSizePicker
+						onChange={ ( value ) => {
+							this.onSetSizeSlug( value );
+						} }
+						referenceOpenImageOptions={ ( { openImageOptions } ) => {
+							openImageSizePicker = openImageOptions;
+						} }
+					/>
 					{ getMediaOptions() }
 					{ ( ! this.state.isCaptionSelected ) &&
 						getToolbarEditButton( openMediaOptions )
