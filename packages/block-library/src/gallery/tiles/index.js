@@ -2,7 +2,11 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { Children } from 'react';
+
+/**
+ * WordPress dependencies
+ */
+import { Children } from '@wordpress/element';
 
 /**
  * WordPress dependencies
@@ -10,6 +14,7 @@ import { Children } from 'react';
 
 function Tiles( props ) {
 	const {
+		className,
 		tilesProps: {
 			align,
 			columns,
@@ -18,10 +23,8 @@ function Tiles( props ) {
 		children,
 	} = props;
 
-	// const className = 'wp-block-gallery';
-	const className = 'wp-tiles';
-
 	const newClassName = classnames(
+		'wp-tiles',
 		className,
 		{
 			[ `align${ align }` ]: align,

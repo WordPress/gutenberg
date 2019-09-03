@@ -293,6 +293,7 @@ class GalleryEdit extends Component {
 				</InspectorControls>
 				{ noticeUI }
 				<Tiles
+					className={ className }
 					tilesProps={ tilesProps } >
 					{ images.map( ( img, index ) => {
 						/* translators: %1$d is the order number of the image, %2$d is the total number of images. */

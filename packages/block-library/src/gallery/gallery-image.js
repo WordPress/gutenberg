@@ -120,10 +120,12 @@ class GalleryImage extends Component {
 			/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
 		);
 
-		const className = classnames( {
-			'is-selected': isSelected,
-			'is-transient': isBlobURL( url ),
-		} );
+		const className = classnames(
+			'blocks-gallery-image',
+			{
+				'is-selected': isSelected,
+				'is-transient': isBlobURL( url ),
+			} );
 
 		return (
 			<figure className={ className }>
