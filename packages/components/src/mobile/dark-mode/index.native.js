@@ -4,7 +4,7 @@
 import { eventEmitter, initialMode } from 'react-native-dark-mode';
 import React from 'react';
 
-// This was failing on CI
+// Conditional needed to pass UI Tests on CI
 if ( eventEmitter.setMaxListeners ) {
 	eventEmitter.setMaxListeners( 150 );
 }

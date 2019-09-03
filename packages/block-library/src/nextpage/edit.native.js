@@ -8,19 +8,19 @@ import Hr from 'react-native-hr';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { withTheme, useStyle } from '@wordpress/components';
+import { withTheme } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import styles from './editor.scss';
 
-export function NextPageEdit( { attributes, isSelected, onFocus, theme } ) {
+export function NextPageEdit( { attributes, isSelected, onFocus, useStyle } ) {
 	const { customText = __( 'Page break' ) } = attributes;
 	const accessibilityTitle = attributes.customText || '';
 	const accessibilityState = isSelected ? [ 'selected' ] : [];
-	const textStyle = useStyle( styles.nextpageText, styles.nextpageTextDark, theme );
-	const lineStyle = useStyle( styles.nextpageLine, styles.nextpageLineDark, theme );
+	const textStyle = useStyle( styles.nextpageText, styles.nextpageTextDark );
+	const lineStyle = useStyle( styles.nextpageLine, styles.nextpageLineDark );
 
 	return (
 		<View

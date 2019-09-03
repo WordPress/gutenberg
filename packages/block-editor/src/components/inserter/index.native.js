@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Dropdown, ToolbarButton, Dashicon, withTheme, useStyle } from '@wordpress/components';
+import { Dropdown, ToolbarButton, Dashicon, withTheme } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
@@ -56,9 +56,9 @@ class Inserter extends Component {
 		const {
 			disabled,
 			renderToggle = defaultRenderToggle,
-			theme,
+			useStyle,
 		} = this.props;
-		const style = useStyle( styles.addBlockButton, styles.addBlockButtonDark, theme );
+		const style = useStyle( styles.addBlockButton, styles.addBlockButtonDark );
 		return renderToggle( { onToggle, isOpen, disabled, style } );
 	}
 

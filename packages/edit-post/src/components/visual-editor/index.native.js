@@ -7,7 +7,7 @@ import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { BlockList } from '@wordpress/block-editor';
 import { PostTitle } from '@wordpress/editor';
-import { ReadableContentView, withTheme, useStyle } from '@wordpress/components';
+import { ReadableContentView, withTheme } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -20,9 +20,9 @@ class VisualEditor extends Component {
 			editTitle,
 			setTitleRef,
 			title,
-			theme,
+			useStyle,
 		} = this.props;
-		const blockHolderFocusedStyle = useStyle( styles.blockHolderFocused, styles.blockHolderFocusedDark, theme );
+		const blockHolderFocusedStyle = useStyle( styles.blockHolderFocused, styles.blockHolderFocusedDark );
 		return (
 			<ReadableContentView>
 				<PostTitle
