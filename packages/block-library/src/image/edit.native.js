@@ -271,7 +271,6 @@ class ImageEdit extends React.Component {
 				<BottomSheet.Cell
 					icon={ 'editor-expand' }
 					label={ __( 'Size' ) }
-					labelStyle={ styles.sizeInspectorControlsCell }
 					value={ getSizeSlugDisplay( sizeSlug ) }
 					editable={ false }
 					onChangeValue={ this.onSetLinkDestination }
