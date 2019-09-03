@@ -12,7 +12,7 @@ import { __ } from '@wordpress/i18n';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { createBlock, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
-import { KeyboardAwareFlatList, ReadableContentView, useStyle, withTheme } from '@wordpress/components';
+import { KeyboardAwareFlatList, ReadableContentView, withTheme } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -85,7 +85,7 @@ export class BlockList extends Component {
 					innerRef={ this.scrollViewInnerRef }
 					extraScrollHeight={ innerToolbarHeight + 10 }
 					keyboardShouldPersistTaps="always"
-					style={ useStyle( styles.list, styles.listDark, this.context ) }
+					style={ styles.list }
 					data={ this.props.blockClientIds }
 					extraData={ [ this.props.isFullyBordered ] }
 					keyExtractor={ identity }
@@ -108,7 +108,7 @@ export class BlockList extends Component {
 	}
 
 	renderItem( { item: clientId, index } ) {
-		const blockHolderFocusedStyle = useStyle( styles.blockHolderFocused, styles.blockHolderFocusedDark, this.props.theme );
+		const blockHolderFocusedStyle = this.props.useStyle( styles.blockHolderFocused, styles.blockHolderFocusedDark );
 		const { shouldShowBlockAtIndex, shouldShowInsertionPoint } = this.props;
 		return (
 			<ReadableContentView>
@@ -128,8 +128,8 @@ export class BlockList extends Component {
 	}
 
 	renderAddBlockSeparator() {
-		const lineStyle = useStyle( styles.lineStyleAddHere, styles.lineStyleAddHereDark, this.props.theme );
-		const labelStyle = useStyle( styles.labelStyleAddHere, styles.labelStyleAddHereDark, this.props.theme );
+		const lineStyle = this.props.useStyle( styles.lineStyleAddHere, styles.lineStyleAddHereDark );
+		const labelStyle = this.props.useStyle( styles.labelStyleAddHere, styles.labelStyleAddHereDark );
 		return (
 			<View style={ styles.containerStyleAddHere } >
 				<View style={ lineStyle }></View>

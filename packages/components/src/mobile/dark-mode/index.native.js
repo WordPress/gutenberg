@@ -47,7 +47,11 @@ export function withTheme( WrappedComponent ) {
 		}
 
 		render() {
-			return <WrappedComponent theme={ this.state.mode } { ...this.props } />;
+			return <WrappedComponent
+				theme={ this.state.mode }
+				useStyle={ ( light, dark ) => useStyle( light, dark, this.state.mode ) }
+				{ ...this.props }
+			/>;
 		}
 	};
 }
