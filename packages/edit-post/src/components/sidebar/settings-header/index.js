@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { withDispatch } from '@wordpress/data';
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -11,11 +12,12 @@ import SidebarHeader from '../sidebar-header';
 
 const SettingsHeader = ( { openDocumentSettings, openBlockSettings, sidebarName } ) => {
 	const blockLabel = __( 'Block' );
+	const documentLabel = applyFilters( 'editor.sidebar.settingsHeader.documentLabel', __( 'Document' ) );
 	const [ documentAriaLabel, documentActiveClass ] = sidebarName === 'edit-post/document' ?
 		// translators: ARIA label for the Document sidebar tab, selected.
-		[ __( 'Document (selected)' ), 'is-active' ] :
+		[ `${ documentLabel } ${ __( '(selected)' ) }`, 'is-active' ] :
 		// translators: ARIA label for the Document sidebar tab, not selected.
-		[ __( 'Document' ), '' ];
+		[ documentLabel, '' ];
 
 	const [ blockAriaLabel, blockActiveClass ] = sidebarName === 'edit-post/block' ?
 		// translators: ARIA label for the Settings Sidebar tab, selected.
@@ -35,9 +37,9 @@ const SettingsHeader = ( { openDocumentSettings, openBlockSettings, sidebarName 
 						onClick={ openDocumentSettings }
 						className={ `edit-post-sidebar__panel-tab ${ documentActiveClass }` }
 						aria-label={ documentAriaLabel }
-						data-label={ __( 'Document' ) }
+						data-label={ documentLabel }
 					>
-						{ __( 'Document' ) }
+						{ documentLabel }
 					</button>
 				</li>
 				<li>
