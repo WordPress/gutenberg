@@ -76,7 +76,7 @@ class DependencyExtractionWebpackPlugin {
 		return request;
 	}
 
-	serialize( asset ) {
+	stringify( asset ) {
 		if ( this.options.outputFormat === 'php' ) {
 			return `<?php return ${ json2php( JSON.parse( JSON.stringify( asset ) ) ) };`;
 		}
@@ -112,8 +112,8 @@ class DependencyExtractionWebpackPlugin {
 
 				const runtimeChunk = entrypoint.getRuntimeChunk();
 
-				// Build a stable JSON string that declares the WordPress script asset.
-				const assetString = this.serialize( {
+				// Get a stable, stringified representation of the WordPress script asset.
+				const assetString = this.stringify( {
 					dependencies: Array.from( entrypointExternalizedWpDeps ).sort(),
 					version: runtimeChunk.hash,
 				} );
