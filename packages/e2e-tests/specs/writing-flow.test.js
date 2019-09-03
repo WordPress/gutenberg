@@ -145,84 +145,6 @@ describe( 'Writing Flow', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	it( 'should navigate around nested inline boundaries', async () => {
-		await clickBlockAppender();
-		await pressKeyWithModifier( 'primary', 'b' );
-		await page.keyboard.type( '1 2' );
-		await page.keyboard.down( 'Shift' );
-		await page.keyboard.press( 'ArrowLeft' );
-		await page.keyboard.up( 'Shift' );
-		await pressKeyWithModifier( 'primary', 'i' );
-		await page.keyboard.press( 'ArrowLeft' );
-		await page.keyboard.press( 'ArrowLeft' );
-		await page.keyboard.down( 'Shift' );
-		await page.keyboard.press( 'ArrowLeft' );
-		await page.keyboard.up( 'Shift' );
-		await pressKeyWithModifier( 'primary', 'i' );
-		await page.keyboard.press( 'ArrowLeft' );
-
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-
-		await page.keyboard.type( 'a' );
-		await page.keyboard.press( 'ArrowRight' );
-		await page.keyboard.type( 'b' );
-		await page.keyboard.press( 'ArrowRight' );
-		await page.keyboard.type( 'c' );
-		await page.keyboard.press( 'ArrowRight' );
-		await page.keyboard.type( 'd' );
-		await page.keyboard.press( 'ArrowRight' );
-		await page.keyboard.type( 'e' );
-		await page.keyboard.press( 'ArrowRight' );
-		await page.keyboard.type( 'f' );
-		await page.keyboard.press( 'ArrowRight' );
-		await page.keyboard.type( 'g' );
-		await page.keyboard.press( 'ArrowRight' );
-		await page.keyboard.type( 'h' );
-		await page.keyboard.press( 'ArrowRight' );
-		await page.keyboard.type( 'i' );
-		await page.keyboard.press( 'ArrowRight' );
-		await page.keyboard.type( 'j' );
-
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-	} );
-
-	it( 'should insert line break at end', async () => {
-		await clickBlockAppender();
-		await page.keyboard.type( 'a' );
-		await pressKeyWithModifier( 'shift', 'Enter' );
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-	} );
-
-	it( 'should insert line break at end and continue writing', async () => {
-		await clickBlockAppender();
-		await page.keyboard.type( 'a' );
-		await pressKeyWithModifier( 'shift', 'Enter' );
-		await page.keyboard.type( 'b' );
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-	} );
-
-	it( 'should insert line break mid text', async () => {
-		await clickBlockAppender();
-		await page.keyboard.type( 'ab' );
-		await page.keyboard.press( 'ArrowLeft' );
-		await pressKeyWithModifier( 'shift', 'Enter' );
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-	} );
-
-	it( 'should insert line break at start', async () => {
-		await clickBlockAppender();
-		await page.keyboard.type( 'a' );
-		await page.keyboard.press( 'ArrowLeft' );
-		await pressKeyWithModifier( 'shift', 'Enter' );
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-	} );
-
-	it( 'should insert line break in empty container', async () => {
-		await clickBlockAppender();
-		await pressKeyWithModifier( 'shift', 'Enter' );
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-	} );
-
 	it( 'should not create extra line breaks in multiline value', async () => {
 		await insertBlock( 'Quote' );
 		await page.keyboard.type( 'a' );
@@ -256,53 +178,6 @@ describe( 'Writing Flow', () => {
 			!! document.activeElement.closest( '[data-type]' )
 		) );
 		expect( isInBlock ).toBe( true );
-	} );
-
-	it( 'should not delete surrounding space when deleting a word with Backspace', async () => {
-		await clickBlockAppender();
-		await page.keyboard.type( '1 2 3' );
-		await pressKeyTimes( 'ArrowLeft', ' 3'.length );
-		await page.keyboard.press( 'Backspace' );
-
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-
-		await page.keyboard.type( '2' );
-
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-	} );
-
-	it( 'should not delete surrounding space when deleting a word with Alt+Backspace', async () => {
-		await clickBlockAppender();
-		await page.keyboard.type( 'alpha beta gamma' );
-		await pressKeyTimes( 'ArrowLeft', ' gamma'.length );
-
-		if ( process.platform === 'darwin' ) {
-			await pressKeyWithModifier( 'alt', 'Backspace' );
-		} else {
-			await pressKeyWithModifier( 'primary', 'Backspace' );
-		}
-
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-
-		await page.keyboard.type( 'beta' );
-
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-	} );
-
-	it( 'should not delete surrounding space when deleting a selected word', async () => {
-		await clickBlockAppender();
-		await page.keyboard.type( 'alpha beta gamma' );
-		await pressKeyTimes( 'ArrowLeft', ' gamma'.length );
-		await page.keyboard.down( 'Shift' );
-		await pressKeyTimes( 'ArrowLeft', 'beta'.length );
-		await page.keyboard.up( 'Shift' );
-		await page.keyboard.press( 'Backspace' );
-
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-
-		await page.keyboard.type( 'beta' );
-
-		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
 	it( 'should create valid paragraph blocks when rapidly pressing Enter', async () => {

@@ -6,7 +6,7 @@ import { render, createElement } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { RichText, toggleFormat } from '../src';
+import { RichText, toggleFormat, insert } from '../src';
 
 // Expose component to be tested.
-window.test = { render, createElement, RichText, toggleFormat };
+window.test = { render, createElement, RichText, toggleFormat, insert };

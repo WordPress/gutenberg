@@ -441,6 +441,7 @@ class RichText extends Component {
 			__unstableOnEnterFormattedText: onEnterFormattedText,
 			__unstableOnExitFormattedText: onExitFormattedText,
 		} = this.props;
+
 		const newValue = {
 			...value,
 			start,
@@ -454,9 +455,9 @@ class RichText extends Component {
 		// Update the value with the new active formats.
 		newValue.activeFormats = activeFormats;
 
-		if ( ! isCaretWithinFormattedText && activeFormats.length ) {
+		if ( onEnterFormattedText && ! isCaretWithinFormattedText && activeFormats.length ) {
 			onEnterFormattedText();
-		} else if ( isCaretWithinFormattedText && ! activeFormats.length ) {
+		} else if ( onExitFormattedText && isCaretWithinFormattedText && ! activeFormats.length ) {
 			onExitFormattedText();
 		}
 

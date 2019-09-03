@@ -1,4 +1,5 @@
 describe( 'RichText', () => {
+	const isMac = process.platform === 'darwin';
 	const getValue = async () => {
 		return await page.evaluate( () => window.test.value );
 	};
@@ -108,16 +109,88 @@ describe( 'RichText', () => {
 	} );
 
 	it( 'should not format with native shortcut', async () => {
-		const key = process.platform === 'darwin' ? 'Meta' : 'Control';
-
 		await page.keyboard.type( '1' );
 		await page.keyboard.down( 'Shift' );
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.up( 'Shift' );
-		await page.keyboard.down( key );
+		await page.keyboard.down( isMac ? 'Meta' : 'Control' );
 		await page.keyboard.press( 'b' );
-		await page.keyboard.up( key );
+		await page.keyboard.up( isMac ? 'Meta' : 'Control' );
 
 		expect( await getValue() ).toBe( '1' );
+	} );
+
+	it( 'should not delete surrounding space when deleting a word with Backspace', async () => {
+		await page.keyboard.type( '1 2 3' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'Backspace' );
+
+		expect( await getValue() ).toBe( '1  3' );
+
+		await page.keyboard.type( '2' );
+
+		expect( await getValue() ).toBe( '1 2 3' );
+	} );
+
+	it( 'should not delete surrounding space when deleting a word with Alt+Backspace', async () => {
+		await page.keyboard.type( 'alpha beta gamma' );
+
+		for ( let index = 0; index < ' gamma'.length; index++ ) {
+			await page.keyboard.press( 'ArrowLeft' );
+		}
+
+		await page.keyboard.down( isMac ? 'Alt' : 'Control' );
+		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.up( isMac ? 'Alt' : 'Control' );
+
+		expect( await getValue() ).toBe( 'alpha  gamma' );
+
+		await page.keyboard.type( 'beta' );
+
+		expect( await getValue() ).toBe( 'alpha beta gamma' );
+	} );
+
+	it( 'should not delete surrounding space when deleting a selected word', async () => {
+		await page.keyboard.type( 'alpha beta gamma' );
+
+		for ( let index = 0; index < ' gamma'.length; index++ ) {
+			await page.keyboard.press( 'ArrowLeft' );
+		}
+
+		await page.keyboard.down( 'Shift' );
+
+		for ( let index = 0; index < 'beta'.length; index++ ) {
+			await page.keyboard.press( 'ArrowLeft' );
+		}
+
+		await page.keyboard.up( 'Shift' );
+		await page.keyboard.press( 'Backspace' );
+
+		expect( await getValue() ).toBe( 'alpha  gamma' );
+
+		await page.keyboard.type( 'beta' );
+
+		expect( await getValue() ).toBe( 'alpha beta gamma' );
+	} );
+
+	it( 'should arrow navigate (rtl)', async () => {
+		// Avoid using three, as it looks too much like two with some fonts.
+		const ARABIC_ZERO = '٠';
+		const ARABIC_ONE = '١';
+		const ARABIC_TWO = '٢';
+
+		await page.evaluate( () => document.dir = 'rtl' );
+		// We need at least three characters as arrow navigation *from* the
+		// edges might be handled differently.
+		await page.keyboard.type( ARABIC_ONE );
+		await page.keyboard.type( ARABIC_TWO );
+		await page.keyboard.press( 'ArrowRight' );
+		// This is the important key press: arrow nav *from* the middle.
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.type( ARABIC_ZERO );
+
+		// N.b.: HTML is LTR, so direction will be reversed!
+		expect( await getValue() ).toBe( ARABIC_ZERO + ARABIC_ONE + ARABIC_TWO );
 	} );
 } );

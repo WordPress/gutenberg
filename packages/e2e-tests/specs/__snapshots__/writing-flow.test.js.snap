@@ -70,36 +70,6 @@ exports[`Writing Flow should create valid paragraph blocks when rapidly pressing
 <!-- /wp:paragraph -->"
 `;
 
-exports[`Writing Flow should insert line break at end 1`] = `
-"<!-- wp:paragraph -->
-<p>a<br></p>
-<!-- /wp:paragraph -->"
-`;
-
-exports[`Writing Flow should insert line break at end and continue writing 1`] = `
-"<!-- wp:paragraph -->
-<p>a<br>b</p>
-<!-- /wp:paragraph -->"
-`;
-
-exports[`Writing Flow should insert line break at start 1`] = `
-"<!-- wp:paragraph -->
-<p><br>a</p>
-<!-- /wp:paragraph -->"
-`;
-
-exports[`Writing Flow should insert line break in empty container 1`] = `
-"<!-- wp:paragraph -->
-<p><br></p>
-<!-- /wp:paragraph -->"
-`;
-
-exports[`Writing Flow should insert line break mid text 1`] = `
-"<!-- wp:paragraph -->
-<p>a<br>b</p>
-<!-- /wp:paragraph -->"
-`;
-
 exports[`Writing Flow should merge forwards 1`] = `
 "<!-- wp:paragraph -->
 <p>123</p>
@@ -117,18 +87,6 @@ exports[`Writing Flow should navigate around inline boundaries 1`] = `
 
 <!-- wp:paragraph -->
 <p>BeforeThird</p>
-<!-- /wp:paragraph -->"
-`;
-
-exports[`Writing Flow should navigate around nested inline boundaries 1`] = `
-"<!-- wp:paragraph -->
-<p><strong><em>1</em> <em>2</em></strong></p>
-<!-- /wp:paragraph -->"
-`;
-
-exports[`Writing Flow should navigate around nested inline boundaries 2`] = `
-"<!-- wp:paragraph -->
-<p>a<strong>b<em>c1d</em>e f<em>g2h</em>i</strong>j</p>
 <!-- /wp:paragraph -->"
 `;
 
@@ -184,42 +142,6 @@ exports[`Writing Flow should not create extra line breaks in multiline value 1`]
 "<!-- wp:quote -->
 <blockquote class=\\"wp-block-quote\\"><p></p></blockquote>
 <!-- /wp:quote -->"
-`;
-
-exports[`Writing Flow should not delete surrounding space when deleting a selected word 1`] = `
-"<!-- wp:paragraph -->
-<p>alpha  gamma</p>
-<!-- /wp:paragraph -->"
-`;
-
-exports[`Writing Flow should not delete surrounding space when deleting a selected word 2`] = `
-"<!-- wp:paragraph -->
-<p>alpha beta gamma</p>
-<!-- /wp:paragraph -->"
-`;
-
-exports[`Writing Flow should not delete surrounding space when deleting a word with Alt+Backspace 1`] = `
-"<!-- wp:paragraph -->
-<p>alpha  gamma</p>
-<!-- /wp:paragraph -->"
-`;
-
-exports[`Writing Flow should not delete surrounding space when deleting a word with Alt+Backspace 2`] = `
-"<!-- wp:paragraph -->
-<p>alpha beta gamma</p>
-<!-- /wp:paragraph -->"
-`;
-
-exports[`Writing Flow should not delete surrounding space when deleting a word with Backspace 1`] = `
-"<!-- wp:paragraph -->
-<p>1  3</p>
-<!-- /wp:paragraph -->"
-`;
-
-exports[`Writing Flow should not delete surrounding space when deleting a word with Backspace 2`] = `
-"<!-- wp:paragraph -->
-<p>1 2 3</p>
-<!-- /wp:paragraph -->"
 `;
 
 exports[`Writing Flow should not prematurely multi-select 1`] = `
