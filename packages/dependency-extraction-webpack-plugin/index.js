@@ -118,7 +118,7 @@ class DependencyExtractionWebpackPlugin {
 					version: runtimeChunk.hash,
 				} );
 
-				// Determine a filename for the `[entrypoint].asset.[outputFormat]` file.
+				// Determine a filename for the asset file.
 				const [ filename, query ] = entrypointName.split( '?', 2 );
 				const assetFilename = compilation
 					.getPath( outputFilename, {
