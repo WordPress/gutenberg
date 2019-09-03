@@ -26,15 +26,16 @@ function NavigationMenu( {
 	setAttributes,
 	clientId,
 } ) {
-	const { NavigatorToolbarButton, NavigatorModal } = useBlockNavigator( clientId );
+	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator( clientId );
 
 	return (
 		<Fragment>
 			<BlockControls>
 				<Toolbar>
-					<NavigatorToolbarButton />
+					{ navigatorToolbarButton }
 				</Toolbar>
 			</BlockControls>
+			{ navigatorModal }
 			<InspectorControls>
 				<PanelBody
 					title={ __( 'Menu Settings' ) }
@@ -49,7 +50,6 @@ function NavigationMenu( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<NavigatorModal />
 			<div className="wp-block-navigation-menu">
 				<InnerBlocks
 					allowedBlocks={ [ 'core/navigation-menu-item' ] }

@@ -47,30 +47,7 @@ export default function useBlockNavigator( clientId ) {
 		selectBlock,
 	} = useDispatch( 'core/block-editor' );
 
-	const NavigatorModal = () => {
-		if ( ! isNavigationListOpen ) {
-			return null;
-		}
-
-		return (
-			<Modal
-				title={ __( 'Block Navigator' ) }
-				closeLabel={ __( 'Close' ) }
-				onRequestClose={ () => {
-					setIsNavigationListOpen( false );
-				} }
-			>
-				<BlockNavigationList
-					blocks={ [ block ] }
-					selectedBlockClientId={ selectedBlockClientId }
-					selectBlock={ selectBlock }
-					showNestedBlocks
-				/>
-			</Modal>
-		);
-	};
-
-	const NavigatorToolbarButton = () => (
+	const navigatorToolbarButton = (
 		<IconButton
 			className="components-toolbar__control"
 			label={ __( 'Open block navigator' ) }
@@ -79,8 +56,25 @@ export default function useBlockNavigator( clientId ) {
 		/>
 	);
 
+	const navigatorModal = isNavigationListOpen && (
+		<Modal
+			title={ __( 'Block Navigator' ) }
+			closeLabel={ __( 'Close' ) }
+			onRequestClose={ () => {
+				setIsNavigationListOpen( false );
+			} }
+		>
+			<BlockNavigationList
+				blocks={ [ block ] }
+				selectedBlockClientId={ selectedBlockClientId }
+				selectBlock={ selectBlock }
+				showNestedBlocks
+			/>
+		</Modal>
+	);
+
 	return {
-		NavigatorModal,
-		NavigatorToolbarButton,
+		navigatorToolbarButton,
+		navigatorModal,
 	};
 }
