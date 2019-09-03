@@ -7,28 +7,27 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 
-import { compose } from '@wordpress/compose';
 import { Component, createRef } from '@wordpress/element';
-import { focus } from '@wordpress/dom';
 import { ESCAPE } from '@wordpress/keycodes';
+import { focus } from '@wordpress/dom';
+import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
-
 import IsolatedEventContainer from '../isolated-event-container';
-import withConstrainedTabbing from '../higher-order/with-constrained-tabbing';
-import withFocusReturn from '../higher-order/with-focus-return';
 import withFocusOutside from '../higher-order/with-focus-outside';
+import withFocusReturn from '../higher-order/with-focus-return';
+import withConstrainedTabbing from '../higher-order/with-constrained-tabbing';
 
 class ModalFrame extends Component {
 	constructor() {
 		super( ...arguments );
 
 		this.containerRef = createRef();
-		this.focusFirstTabbable = this.focusFirstTabbable.bind( this );
-		this.maybeClose = this.maybeClose.bind( this );
+		this.handleKeyDown = this.handleKeyDown.bind( this );
 		this.handleFocusOutside = this.handleFocusOutside.bind( this );
+		this.focusFirstTabbable = this.focusFirstTabbable.bind( this );
 	}
 
 	/**
@@ -57,23 +56,44 @@ class ModalFrame extends Component {
 	 * @param {Object} event Mouse click event.
 	 */
 	handleFocusOutside( event ) {
-		const { onRequestClose, shouldCloseOnClickOutside } = this.props;
-
-		if ( shouldCloseOnClickOutside && onRequestClose ) {
-			onRequestClose( event );
+		if ( this.props.shouldCloseOnClickOutside ) {
+			this.onRequestClose( event );
 		}
 	}
 
 	/**
-	 * Stops proagation of the escape key outside the context of the modal.
+	 * Callback function called when a key is pressed.
 	 *
-	 * @param {Event} event The onKeyDown event.
+	 * @param {KeyboardEvent} event Key down event.
 	 */
-	maybeClose( event ) {
-		const { onRequestClose, shouldCloseOnEsc } = this.props;
+	handleKeyDown( event ) {
+		if ( event.keyCode === ESCAPE ) {
+			this.handleEscapeKeyDown( event );
+		}
+	}
 
-		if ( event.keyCode === ESCAPE && shouldCloseOnEsc && onRequestClose ) {
+	/**
+	 * Handles a escape key down event.
+	 *
+	 * Calls onRequestClose and prevents propagation of the event outside the modal.
+	 *
+	 * @param {Object} event Key down event.
+	 */
+	handleEscapeKeyDown( event ) {
+		if ( this.props.shouldCloseOnEsc ) {
 			event.stopPropagation();
+			this.onRequestClose( event );
+		}
+	}
+
+	/**
+	 * Calls the onRequestClose callback props when it is available.
+	 *
+	 * @param {Object} event Event object.
+	 */
+	onRequestClose( event ) {
+		const { onRequestClose } = this.props;
+		if ( onRequestClose ) {
 			onRequestClose( event );
 		}
 	}
@@ -100,7 +120,7 @@ class ModalFrame extends Component {
 		return (
 			<IsolatedEventContainer
 				className={ classnames( 'components-modal__screen-overlay', overlayClassName ) }
-				onKeyDown={ this.maybeClose }
+				onKeyDown={ this.handleKeyDown }
 			>
 				<div
 					className={ classnames(
