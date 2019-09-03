@@ -130,7 +130,7 @@ class DependencyExtractionWebpackPlugin {
 							.update( assetString )
 							.digest( 'hex' ),
 					} )
-					.replace( /\.js$/i, '.asset.' + outputFormat );
+					.replace( /\.js$/i, '.asset.' + ( outputFormat === 'php' ? 'php' : 'json' ) );
 
 				// Add source and file into compilation for webpack to output.
 				compilation.assets[ assetFilename ] = new RawSource( assetString );
