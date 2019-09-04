@@ -54,7 +54,7 @@ export default compose( [
 			isOpened: isEditorPanelOpened( PANEL_NAME ),
 		};
 	} ),
-	ifCondition( ( { isRemoved } ) => isRemoved ),
+	ifCondition( ( { isRemoved } ) => ! isRemoved ),
 	withDispatch( ( dispatch ) => ( {
 		onTogglePanel() {
 			return dispatch( 'core/edit-post' ).toggleEditorPanelOpened( PANEL_NAME );
