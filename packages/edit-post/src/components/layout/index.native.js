@@ -13,6 +13,8 @@ import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { HTMLTextInput, KeyboardAvoidingView, ReadableContentView, useStyle, withTheme } from '@wordpress/components';
 
+import { AutosaveMonitor } from '@wordpress/editor';
+
 /**
  * Internal dependencies
  */
@@ -115,6 +117,7 @@ class Layout extends Component {
 
 		return (
 			<SafeAreaView style={ useStyle( styles.container, styles.containerDark, this.props.theme ) } onLayout={ this.onRootViewLayout }>
+				<AutosaveMonitor />
 				<View style={ useStyle( styles.background, styles.backgroundDark, this.props.theme ) }>
 					{ isHtmlView ? this.renderHTML() : this.renderVisual() }
 				</View>
