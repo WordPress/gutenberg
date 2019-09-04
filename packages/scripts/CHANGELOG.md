@@ -1,5 +1,17 @@
 ## Master
 
+## 4.1.0 (2019-09-03)
+
+### New Features
+
+- Add the new `env` family of scripts [(#17004](https://github.com/WordPress/gutenberg/pull/17004/)).
+
+### Bug Fixes
+
+- Add `wordpress` folder to the list of ignored paths in all applicable config files ([#17296](https://github.com/WordPress/gutenberg/pull/17296)).
+
+## 4.0.0 (2019-08-29)
+
 ### Breaking Changes
 
 - Test files matching has changed to fix the overlap between two types of tests implemented with `test-e2e` and `test-unit`. Refer to the documentation of the corresponding scripts to learn about new file discovery rules.

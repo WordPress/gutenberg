@@ -24,6 +24,7 @@ function gutenberg_reregister_core_block_types() {
 		'latest-comments.php' => 'core/latest-comments',
 		'latest-posts.php'    => 'core/latest-posts',
 		'legacy-widget.php'   => 'core/legacy-widget',
+		'navigation-menu.php' => 'core/navigation-menu',
 		'rss.php'             => 'core/rss',
 		'shortcode.php'       => 'core/shortcode',
 		'search.php'          => 'core/search',
