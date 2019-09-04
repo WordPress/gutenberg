@@ -23,7 +23,7 @@ class HeadingToolbar extends Component {
 	}
 
 	render() {
-		const { isCollapsed, minLevel, maxLevel, selectedLevel, onChange } = this.props;
+		const { isCollapsed = true, minLevel, maxLevel, selectedLevel, onChange } = this.props;
 
 		return (
 			<Toolbar
