@@ -1,9 +1,11 @@
-.dashicon {
+.dashicon,
+.components-toolbar__control {
 	color: #7b9ab1;
 	fill: currentColor;
 }
 
-.dashicon-active {
+.dashicon-active,
+.is-active {
 	color: #fff;
 	fill: currentColor;
 }

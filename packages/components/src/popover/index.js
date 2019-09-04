@@ -324,7 +324,9 @@ const Popover = ( {
 			onFocusOutside( event );
 			return;
 		} else if ( ! onClickOutside ) {
-			onClose();
+			if ( onClose ) {
+				onClose();
+			}
 			return;
 		}
 

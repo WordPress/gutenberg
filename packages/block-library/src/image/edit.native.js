@@ -20,14 +20,13 @@ import {
 	Toolbar,
 	ToolbarButton,
 	withTheme,
-	useStyle,
 } from '@wordpress/components';
 
 import {
+	Caption,
 	MediaPlaceholder,
 	MediaUpload,
 	MEDIA_TYPE_IMAGE,
-	RichText,
 	BlockControls,
 	InspectorControls,
 } from '@wordpress/block-editor';
@@ -84,9 +83,9 @@ class ImageEdit extends React.Component {
 
 		if ( attributes.id && attributes.url && ! isURL( attributes.url ) ) {
 			if ( attributes.url.indexOf( 'file:' ) === 0 ) {
-				requestMediaImport( attributes.url, ( mediaId, mediaUri ) => {
-					if ( mediaUri ) {
-						setAttributes( { url: mediaUri, id: mediaId } );
+				requestMediaImport( attributes.url, ( id, url ) => {
+					if ( url ) {
+						setAttributes( { id, url } );
 					}
 				} );
 			}
@@ -118,7 +117,6 @@ class ImageEdit extends React.Component {
 			requestImageFailedRetryDialog( attributes.id );
 		}
 
-		this._caption.blur();
 		this.setState( {
 			isCaptionSelected: false,
 		} );
@@ -179,9 +177,9 @@ class ImageEdit extends React.Component {
 		} );
 	}
 
-	onSelectMediaUploadOption( mediaId, mediaUrl ) {
+	onSelectMediaUploadOption( { id, url } ) {
 		const { setAttributes } = this.props;
-		setAttributes( { url: mediaUrl, id: mediaId } );
+		setAttributes( { id, url } );
 	}
 
 	onFocusCaption() {
@@ -196,18 +194,17 @@ class ImageEdit extends React.Component {
 	}
 
 	getIcon( isRetryIcon ) {
-		const iconStyle = useStyle( styles.icon, styles.iconDark, this.props.theme );
-
 		if ( isRetryIcon ) {
 			return <Icon icon={ SvgIconRetry } { ...styles.iconRetry } />;
 		}
 
+		const iconStyle = this.props.useStyle( styles.icon, styles.iconDark );
 		return <Icon icon={ SvgIcon } { ...iconStyle } />;
 	}
 
 	render() {
-		const { attributes, isSelected, setAttributes } = this.props;
-		const { url, caption, height, width, alt, href, id } = attributes;
+		const { attributes, isSelected } = this.props;
+		const { url, height, width, alt, href, id } = attributes;
 
 		const onImageSettingsButtonPressed = () => {
 			this.setState( { showSettings: true } );
@@ -266,20 +263,14 @@ class ImageEdit extends React.Component {
 			return (
 				<View style={ { flex: 1 } } >
 					<MediaPlaceholder
-						mediaType={ MEDIA_TYPE_IMAGE }
-						onSelectURL={ this.onSelectMediaUploadOption }
+						allowedTypes={ [ MEDIA_TYPE_IMAGE ] }
+						onSelect={ this.onSelectMediaUploadOption }
 						icon={ this.getIcon( false ) }
 						onFocus={ this.props.onFocus }
 					/>
 				</View>
 			);
 		}
-
-		// We still want to render the caption so that the soft keyboard is not forced to close on Android
-		const shouldCaptionDisplay = () => {
-			const isCaptionEmpty = RichText.isEmpty( caption ) > 0;
-			return ! isCaptionEmpty || isSelected;
-		};
 
 		const imageContainerHeight = Dimensions.get( 'window' ).width / IMAGE_ASPECT_RATIO;
 		const getImageComponent = ( openMediaOptions, getMediaOptions ) => (
@@ -349,45 +340,29 @@ class ImageEdit extends React.Component {
 							);
 						} }
 					/>
-					<View style={ { padding: 12, flex: 1, display: shouldCaptionDisplay() ? 'flex' : 'none' } }
+					<Caption
+						clientId={ this.props.clientId }
+						isSelected={ this.state.isCaptionSelected }
 						accessible={ true }
-						accessibilityLabel={
+						accessibilityLabelCreator={ ( caption ) =>
 							isEmpty( caption ) ?
 							/* translators: accessibility text. Empty image caption. */
-								__( 'Image caption. Empty' ) :
+								( 'Image caption. Empty' ) :
 								sprintf(
-									/* translators: accessibility text. %s: image caption. */
+								/* translators: accessibility text. %s: image caption. */
 									__( 'Image caption. %s' ),
-									caption
-								)
+									caption )
 						}
-						accessibilityRole={ 'button' }
-					>
-						<RichText
-							setRef={ ( ref ) => {
-								this._caption = ref;
-							} }
-							rootTagsToEliminate={ [ 'p' ] }
-							placeholder={ __( 'Write caption…' ) }
-							value={ caption }
-							onChange={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
-							unstableOnFocus={ this.onFocusCaption }
-							onBlur={ this.props.onBlur } // always assign onBlur as props
-							isSelected={ this.state.isCaptionSelected }
-							__unstableMobileNoFocusOnMount
-							fontSize={ 14 }
-							underlineColorAndroid="transparent"
-							textAlign={ 'center' }
-							tagName={ '' }
-						/>
-					</View>
+						onFocus={ this.onFocusCaption }
+						onBlur={ this.props.onBlur } // always assign onBlur as props
+					/>
 				</View>
 			</TouchableWithoutFeedback>
 		);
 
 		return (
-			<MediaUpload mediaType={ MEDIA_TYPE_IMAGE }
-				onSelectURL={ this.onSelectMediaUploadOption }
+			<MediaUpload allowedTypes={ [ MEDIA_TYPE_IMAGE ] }
+				onSelect={ this.onSelectMediaUploadOption }
 				render={ ( { open, getMediaOptions } ) => {
 					return getImageComponent( open, getMediaOptions );
 				} }

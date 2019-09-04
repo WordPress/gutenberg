@@ -69,7 +69,7 @@ export function BlockSettingsMenu( { clientIds } ) {
 											clientId={ firstBlockClientId }
 										/>
 									) }
-									{ ! isLocked && canDuplicate && (
+									{ canDuplicate && (
 										<MenuItem
 											className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
 											onClick={ flow( onClose, onDuplicate ) }

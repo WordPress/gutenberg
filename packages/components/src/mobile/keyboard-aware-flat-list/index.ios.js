@@ -8,6 +8,7 @@ export const KeyboardAwareFlatList = ( {
 	extraScrollHeight,
 	shouldPreventAutomaticScroll,
 	innerRef,
+	autoScroll,
 	...listProps
 } ) => (
 	<KeyboardAwareScrollView
@@ -17,6 +18,7 @@ export const KeyboardAwareFlatList = ( {
 		keyboardShouldPersistTaps="handled"
 		extraScrollHeight={ extraScrollHeight }
 		extraHeight={ 0 }
+		enableAutomaticScroll={ autoScroll === undefined ? false : autoScroll }
 		innerRef={ ( ref ) => {
 			this.scrollViewRef = ref;
 			innerRef( ref );

@@ -231,6 +231,7 @@ export function* saveEntityRecord(
 	const recordId = record[ entityIdKey ];
 
 	yield { type: 'SAVE_ENTITY_RECORD_START', kind, name, recordId, isAutosave };
+	let updatedRecord;
 	let error;
 	try {
 		const path = `${ entity.baseURL }${ recordId ? '/' + recordId : '' }`;
@@ -260,14 +261,14 @@ export function* saveEntityRecord(
 				}
 				return acc;
 			}, {} );
-			const autosave = yield apiFetch( {
+			updatedRecord = yield apiFetch( {
 				path: `${ path }/autosaves`,
 				method: 'POST',
 				data,
 			} );
-			yield receiveAutosaves( persistedRecord.id, autosave );
+			yield receiveAutosaves( persistedRecord.id, updatedRecord );
 		} else {
-			const updatedRecord = yield apiFetch( {
+			updatedRecord = yield apiFetch( {
 				path,
 				method: recordId ? 'PUT' : 'POST',
 				data: record,
@@ -285,6 +286,8 @@ export function* saveEntityRecord(
 		error,
 		isAutosave,
 	};
+
+	return updatedRecord;
 }
 
 /**
