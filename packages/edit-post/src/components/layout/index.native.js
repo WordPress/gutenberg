@@ -11,7 +11,7 @@ import { sendNativeEditorDidLayout } from 'react-native-gutenberg-bridge';
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { HTMLTextInput, KeyboardAvoidingView, ReadableContentView, useStyle, withTheme } from '@wordpress/components';
+import { HTMLTextInput, KeyboardAvoidingView, ReadableContentView, withTheme } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -99,6 +99,7 @@ class Layout extends Component {
 	render() {
 		const {
 			mode,
+			useStyle,
 		} = this.props;
 
 		const isHtmlView = mode === 'text';
@@ -114,8 +115,8 @@ class Layout extends Component {
 		};
 
 		return (
-			<SafeAreaView style={ useStyle( styles.container, styles.containerDark, this.props.theme ) } onLayout={ this.onRootViewLayout }>
-				<View style={ useStyle( styles.background, styles.backgroundDark, this.props.theme ) }>
+			<SafeAreaView style={ useStyle( styles.container, styles.containerDark ) } onLayout={ this.onRootViewLayout }>
+				<View style={ useStyle( styles.background, styles.backgroundDark ) }>
 					{ isHtmlView ? this.renderHTML() : this.renderVisual() }
 				</View>
 				<View style={ { flex: 0, flexBasis: marginBottom, height: marginBottom } } />

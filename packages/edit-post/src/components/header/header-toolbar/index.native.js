@@ -15,7 +15,7 @@ import {
 	Inserter,
 	BlockToolbar,
 } from '@wordpress/block-editor';
-import { Toolbar, ToolbarButton, useStyle, withTheme } from '@wordpress/components';
+import { Toolbar, ToolbarButton, withTheme } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -30,7 +30,7 @@ function HeaderToolbar( {
 	undo,
 	showInserter,
 	showKeyboardHideButton,
-	theme,
+	useStyle,
 	onHideKeyboard,
 } ) {
 	const scrollViewRef = useRef( null );
@@ -39,7 +39,7 @@ function HeaderToolbar( {
 	};
 
 	return (
-		<View style={ useStyle( styles.container, styles.containerDark, theme ) }>
+		<View style={ useStyle( styles.container, styles.containerDark ) }>
 			<ScrollView
 				ref={ scrollViewRef }
 				onContentSizeChange={ scrollToStart }

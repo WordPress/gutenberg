@@ -16,8 +16,7 @@ import { __, _x, sprintf } from '@wordpress/i18n';
  */
 import styles from './styles.scss';
 import platformStyles from './cellStyles.scss';
-// `useStyle as getStyle`: Hack to avoid lint thinking this is a React Hook
-import { withTheme, useStyle as getStyle } from '../dark-mode';
+import { withTheme } from '../dark-mode';
 
 class BottomSheetCell extends Component {
 	constructor( props ) {
@@ -50,14 +49,14 @@ class BottomSheetCell extends Component {
 			editable = true,
 			separatorType,
 			style = {},
-			theme,
+			useStyle,
 			...valueProps
 		} = this.props;
 
 		const showValue = value !== undefined;
 		const isValueEditable = editable && onChangeValue !== undefined;
-		const cellLabelStyle = getStyle( styles.cellLabel, styles.cellTextDark, theme );
-		const cellLabelCenteredStyle = getStyle( styles.cellLabelCentered, styles.cellTextDark, theme );
+		const cellLabelStyle = useStyle( styles.cellLabel, styles.cellTextDark );
+		const cellLabelCenteredStyle = useStyle( styles.cellLabelCentered, styles.cellTextDark );
 		const defaultLabelStyle = showValue || icon !== undefined ? cellLabelStyle : cellLabelCenteredStyle;
 		const drawSeparator = ( separatorType && separatorType !== 'none' ) || separatorStyle === undefined;
 
@@ -81,8 +80,8 @@ class BottomSheetCell extends Component {
 
 		const separatorStyle = () => {
 			//eslint-disable-next-line @wordpress/no-unused-vars-before-return
-			const defaultSeparatorStyle = getStyle( styles.separator, styles.separatorDark, theme );
-			const cellSeparatorStyle = getStyle( styles.cellSeparator, styles.cellSeparatorDark, theme );
+			const defaultSeparatorStyle = this.props.useStyle( styles.separator, styles.separatorDark );
+			const cellSeparatorStyle = this.props.useStyle( styles.cellSeparator, styles.cellSeparatorDark );
 			const leftMarginStyle = { ...cellSeparatorStyle, ...platformStyles.separatorMarginLeft };
 			switch ( separatorType ) {
 				case 'leftMargin':
@@ -98,7 +97,7 @@ class BottomSheetCell extends Component {
 
 		const getValueComponent = () => {
 			const styleRTL = I18nManager.isRTL && styles.cellValueRTL;
-			const cellValueStyle = getStyle( styles.cellValue, styles.cellTextDark, theme );
+			const cellValueStyle = this.props.useStyle( styles.cellValue, styles.cellTextDark );
 			const finalStyle = { ...cellValueStyle, ...valueStyle, ...styleRTL };
 
 			// To be able to show the `middle` ellipsizeMode on editable cells
@@ -151,7 +150,7 @@ class BottomSheetCell extends Component {
 				);
 		};
 
-		const iconStyle = getStyle( styles.icon, styles.iconDark, theme );
+		const iconStyle = useStyle( styles.icon, styles.iconDark );
 
 		return (
 			<TouchableOpacity
