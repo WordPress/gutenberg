@@ -93,7 +93,7 @@ class DependencyExtractionWebpackPlugin {
 		compiler.hooks.emit.tap( this.constructor.name, ( compilation ) => {
 			const { injectPolyfill, outputFormat } = this.options;
 
-			// Process each entrypoint independently.
+			// Process each entry point independently.
 			for ( const [ entrypointName, entrypoint ] of compilation.entrypoints.entries() ) {
 				const entrypointExternalizedWpDeps = new Set();
 				if ( injectPolyfill ) {

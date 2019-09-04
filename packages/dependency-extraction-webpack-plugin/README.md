@@ -3,8 +3,8 @@
 This webpack plugin serves two purposes:
 
 - Externalize dependencies that are available as script dependencies on modern WordPress sites.
-- Add an asset file for each entrypoint that declares an object with the list of WordPress script dependencies for the
-  entrypoint. The asset file also contains other useful metadata like the script handle or the current version.
+- Add an asset file for each entry point that declares an object with the list of WordPress script dependencies for the
+  entry point. The asset file also contains the current version calculated for the current source code.
 
 This allows JavaScript bundles produced by webpack to leverage WordPress style dependency sharing
 without an error-prone process of manually maintaining a dependency list.
@@ -59,7 +59,7 @@ const config = {
 };
 ```
 
-Each entrypoint in the webpack bundle will include an asset file that declares the WordPress script dependencies that should be enqueued. Such file also contains the unique version hash calculated based on the file content.
+Each entry point in the webpack bundle will include an asset file that declares the WordPress script dependencies that should be enqueued. Such file also contains the unique version hash calculated based on the file content.
 
 For example:
 
@@ -128,8 +128,8 @@ Pass `useDefaults: false` to disable the default request handling.
 - Type: boolean
 - Default: `false`
 
-Force `wp-polyfill` to be included in each entrypoint's dependency list. This would be the same as
-adding `import '@wordpress/polyfill';` to each entrypoint.
+Force `wp-polyfill` to be included in each entry point's dependency list. This would be the same as
+adding `import '@wordpress/polyfill';` to each entry point.
 
 ##### `requestToExternal`
 
