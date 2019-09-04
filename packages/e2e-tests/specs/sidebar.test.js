@@ -124,6 +124,7 @@ describe( 'Sidebar', () => {
 			removeEditorPanel( 'featured-image' );
 			removeEditorPanel( 'post-excerpt' );
 			removeEditorPanel( 'discussion-panel' );
+			removeEditorPanel( 'post-status' );
 		} );
 
 		expect( await findSidebarPanelWithTitle( 'Categories' ) ).toBeUndefined();
@@ -131,5 +132,6 @@ describe( 'Sidebar', () => {
 		expect( await findSidebarPanelWithTitle( 'Featured Image' ) ).toBeUndefined();
 		expect( await findSidebarPanelWithTitle( 'Excerpt' ) ).toBeUndefined();
 		expect( await findSidebarPanelWithTitle( 'Discussion' ) ).toBeUndefined();
+		expect( await findSidebarPanelWithTitle( 'Status & Visibility' ) ).toBeUndefined();
 	} );
 } );
