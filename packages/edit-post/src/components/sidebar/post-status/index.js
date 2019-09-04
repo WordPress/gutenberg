@@ -46,13 +46,15 @@ function PostStatus( { isOpened, onTogglePanel } ) {
 
 export default compose( [
 	withSelect( ( select ) => {
-		const { isEditorPanelEnabled, isEditorPanelOpened } = select( 'core/edit-post' );
+		// We use isEditorPanelRemoved to hide the panel if it was programatically removed. We do
+		// not use isEditorPanelEnabled since this panel should not be disabled through the UI.
+		const { isEditorPanelRemoved, isEditorPanelOpened } = select( 'core/edit-post' );
 		return {
-			isEnabled: isEditorPanelEnabled( PANEL_NAME ),
+			isRemoved: isEditorPanelRemoved( PANEL_NAME ),
 			isOpened: isEditorPanelOpened( PANEL_NAME ),
 		};
 	} ),
-	ifCondition( ( { isEnabled } ) => isEnabled ),
+	ifCondition( ( { isRemoved } ) => isRemoved ),
 	withDispatch( ( dispatch ) => ( {
 		onTogglePanel() {
 			return dispatch( 'core/edit-post' ).toggleEditorPanelOpened( PANEL_NAME );
