@@ -109,6 +109,8 @@ class Modal extends Component {
 			aria,
 			instanceId,
 			isDismissable,
+			// Many of the documented props for Modal are passed straight through
+			// to the ModalFrame component and handled there.
 			...otherProps
 		} = this.props;
 
