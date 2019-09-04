@@ -9,22 +9,13 @@ if ( eventEmitter.setMaxListeners ) {
 	eventEmitter.setMaxListeners( 150 );
 }
 
-export function useStyle( light, dark, theme ) {
-	const finalDark = {
-		...light,
-		...dark,
-	};
-
-	return theme === 'dark' ? finalDark : light;
-}
-
-// This function takes a component...
 export function withTheme( WrappedComponent ) {
 	return class extends React.Component {
 		constructor( props ) {
 			super( props );
 
 			this.onModeChanged = this.onModeChanged.bind( this );
+			this.useStyle = this.useStyle.bind( this );
 
 			this.state = {
 				mode: initialMode,
@@ -46,10 +37,20 @@ export function withTheme( WrappedComponent ) {
 			}
 		}
 
+		useStyle( light, dark ) {
+			const isDarkMode = this.state.mode === 'dark';
+			const finalDark = {
+				...light,
+				...dark,
+			};
+
+			return isDarkMode ? finalDark : light;
+		}
+
 		render() {
 			return <WrappedComponent
 				theme={ this.state.mode }
-				useStyle={ ( light, dark ) => useStyle( light, dark, this.state.mode ) }
+				useStyle={ this.useStyle }
 				{ ...this.props }
 			/>;
 		}
