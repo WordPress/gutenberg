@@ -17,7 +17,7 @@ describe( 'Columns', () => {
 	it( 'restricts all blocks inside the columns block', async () => {
 		await insertBlock( 'Columns' );
 		await page.click( '[aria-label="Two columns; equal split"]' );
-		await page.click( '[aria-label="Block Navigation"]' );
+		await page.click( '[aria-label="Block navigation"]' );
 		const columnBlockMenuItem = ( await page.$x( '//button[contains(concat(" ", @class, " "), " block-editor-block-navigation__item-button ")][text()="Column"]' ) )[ 0 ];
 		await columnBlockMenuItem.click();
 		await openGlobalBlockInserter();
