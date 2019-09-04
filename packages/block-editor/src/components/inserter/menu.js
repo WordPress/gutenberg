@@ -7,6 +7,7 @@ import {
 	findIndex,
 	flow,
 	groupBy,
+	isArray,
 	isEmpty,
 	map,
 	some,
@@ -27,6 +28,7 @@ import {
 	PanelBody,
 	withSpokenMessages,
 	Tip,
+	Button,
 } from '@wordpress/components';
 import {
 	getCategories,
@@ -253,7 +255,7 @@ export class InserterMenu extends Component {
 	}
 
 	render() {
-		const { instanceId, onSelect, rootClientId, showInserterHelpPanel } = this.props;
+		const { instanceId, onSelect, rootClientId, showInserterHelpPanel, numberOfHiddenBlocks, openModal } = this.props;
 		const {
 			childItems,
 			hoveredItem,
@@ -356,7 +358,33 @@ export class InserterMenu extends Component {
 							</PanelBody>
 						) }
 						{ isEmpty( suggestedItems ) && isEmpty( reusableItems ) && isEmpty( itemsPerCategory ) && (
-							<p className="editor-inserter__no-results block-editor-inserter__no-results">{ __( 'No blocks found.' ) }</p>
+							<p className="editor-inserter__no-results block-editor-inserter__no-results">
+								{ numberOfHiddenBlocks ? __( 'No active blocks found.' ) : __( 'No blocks found.' ) }
+								{ !! numberOfHiddenBlocks && (
+									<>
+										<br />
+										{
+											sprintf(
+												_n(
+													'%1$d block is disabled.',
+													'%1$d blocks are disabled.',
+													numberOfHiddenBlocks
+												),
+												numberOfHiddenBlocks
+											)
+										}
+										<br />
+										<Button
+											isButton
+											isDefault
+											className="editor-inserter__block-manager-button block-editor-inserter__block-manager-button"
+											onClick={ () => openModal( 'edit-post/manage-blocks' ) }
+										>
+											{ __( 'Manage Blocks' ) }
+										</Button>
+									</>
+								) }
+							</p>
 						) }
 					</div>
 				</div>
@@ -429,6 +457,9 @@ export default compose(
 		const {
 			getChildBlockNames,
 		} = select( 'core/blocks' );
+		const {
+			getPreference,
+		} = select( 'core/edit-post' );
 
 		let destinationRootClientId = rootClientId;
 		if ( ! destinationRootClientId && ! clientId && ! isAppender ) {
@@ -438,12 +469,15 @@ export default compose(
 			}
 		}
 		const destinationRootBlockName = getBlockName( destinationRootClientId );
+		const hiddenBlockTypes = getPreference( 'hiddenBlockTypes' );
+		const numberOfHiddenBlocks = isArray( hiddenBlockTypes ) && hiddenBlockTypes.length;
 
 		return {
 			rootChildBlocks: getChildBlockNames( destinationRootBlockName ),
 			items: getInserterItems( destinationRootClientId ),
 			showInserterHelpPanel: getSettings().showInserterHelpPanel,
 			destinationRootClientId,
+			numberOfHiddenBlocks,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {
@@ -456,6 +490,10 @@ export default compose(
 		const {
 			__experimentalFetchReusableBlocks: fetchReusableBlocks,
 		} = dispatch( 'core/editor' );
+
+		const {
+			openModal,
+		} = dispatch( 'core/edit-post' );
 
 		// To avoid duplication, getInsertionIndex is extracted and used in two event handlers
 		// This breaks the withDispatch not containing any logic rule.
@@ -516,6 +554,7 @@ export default compose(
 
 				ownProps.onSelect();
 			},
+			openModal,
 		};
 	} ),
 	withSpokenMessages,
