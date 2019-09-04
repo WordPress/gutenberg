@@ -7,7 +7,7 @@ import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { BlockList } from '@wordpress/block-editor';
 import { PostTitle } from '@wordpress/editor';
-import { ReadableContentView } from '@wordpress/components';
+import { ReadableContentView, withTheme, useStyle } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -20,8 +20,9 @@ class VisualEditor extends Component {
 			editTitle,
 			setTitleRef,
 			title,
+			theme,
 		} = this.props;
-
+		const blockHolderFocusedStyle = useStyle( styles.blockHolderFocused, styles.blockHolderFocusedDark, theme );
 		return (
 			<ReadableContentView>
 				<PostTitle
@@ -34,7 +35,7 @@ class VisualEditor extends Component {
 							styles.blockHolderFullBordered :
 							styles.blockHolderSemiBordered
 					}
-					focusedBorderColor={ styles.blockHolderFocused.borderColor }
+					focusedBorderColor={ blockHolderFocusedStyle.borderColor }
 					accessibilityLabel="post-title"
 				/>
 			</ReadableContentView>
@@ -52,6 +53,7 @@ class VisualEditor extends Component {
 				header={ this.renderHeader() }
 				isFullyBordered={ isFullyBordered }
 				safeAreaBottomInset={ safeAreaBottomInset }
+				autoScroll={ true }
 			/>
 		);
 	}
@@ -81,4 +83,5 @@ export default compose( [
 			},
 		};
 	} ),
+	withTheme,
 ] )( VisualEditor );

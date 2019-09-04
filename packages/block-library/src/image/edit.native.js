@@ -20,7 +20,10 @@ import {
 	Icon,
 	Toolbar,
 	ToolbarButton,
+	withTheme,
+	useStyle,
 } from '@wordpress/components';
+
 import {
 	Caption,
 	MediaPlaceholder,
@@ -83,9 +86,9 @@ class ImageEdit extends React.Component {
 
 		if ( attributes.id && attributes.url && ! isURL( attributes.url ) ) {
 			if ( attributes.url.indexOf( 'file:' ) === 0 ) {
-				requestMediaImport( attributes.url, ( mediaId, mediaUri ) => {
-					if ( mediaUri ) {
-						setAttributes( { url: mediaUri, id: mediaId } );
+				requestMediaImport( attributes.url, ( id, url ) => {
+					if ( url ) {
+						setAttributes( { id, url } );
 					}
 				} );
 			}
@@ -178,9 +181,9 @@ class ImageEdit extends React.Component {
 		} );
 	}
 
-	onSelectMediaUploadOption( mediaId, mediaUrl ) {
+	onSelectMediaUploadOption( { id, url } ) {
 		const { setAttributes } = this.props;
-		setAttributes( { url: mediaUrl, id: mediaId } );
+		setAttributes( { id, url } );
 	}
 
 	onFocusCaption() {
@@ -195,11 +198,13 @@ class ImageEdit extends React.Component {
 	}
 
 	getIcon( isRetryIcon ) {
+		const iconStyle = useStyle( styles.icon, styles.iconDark, this.props.theme );
+
 		if ( isRetryIcon ) {
 			return <Icon icon={ SvgIconRetry } { ...styles.iconRetry } />;
 		}
 
-		return <Icon icon={ SvgIcon } { ...styles.icon } />;
+		return <Icon icon={ SvgIcon } { ...iconStyle } />;
 	}
 
 	render() {
@@ -275,8 +280,8 @@ class ImageEdit extends React.Component {
 			return (
 				<View style={ { flex: 1 } } >
 					<MediaPlaceholder
-						mediaType={ MEDIA_TYPE_IMAGE }
-						onSelectURL={ this.onSelectMediaUploadOption }
+						allowedTypes={ [ MEDIA_TYPE_IMAGE ] }
+						onSelect={ this.onSelectMediaUploadOption }
 						icon={ this.getIcon( false ) }
 						onFocus={ this.props.onFocus }
 					/>
@@ -376,8 +381,8 @@ class ImageEdit extends React.Component {
 		);
 
 		return (
-			<MediaUpload mediaType={ MEDIA_TYPE_IMAGE }
-				onSelectURL={ this.onSelectMediaUploadOption }
+			<MediaUpload allowedTypes={ [ MEDIA_TYPE_IMAGE ] }
+				onSelect={ this.onSelectMediaUploadOption }
 				render={ ( { open, getMediaOptions } ) => {
 					return getImageComponent( open, getMediaOptions );
 				} }
@@ -386,4 +391,4 @@ class ImageEdit extends React.Component {
 	}
 }
 
-export default ImageEdit;
+export default withTheme( ImageEdit );

@@ -10,6 +10,7 @@ export { default as Spinner } from './spinner';
 export { createSlotFill, Slot, Fill, Provider as SlotFillProvider } from './slot-fill';
 export { default as BaseControl } from './base-control';
 export { default as TextareaControl } from './textarea-control';
+export { default as Button } from './button';
 
 // Higher-Order Components
 export { default as withConstrainedTabbing } from './higher-order/with-constrained-tabbing';
@@ -28,3 +29,4 @@ export { default as KeyboardAvoidingView } from './mobile/keyboard-avoiding-view
 export { default as KeyboardAwareFlatList } from './mobile/keyboard-aware-flat-list';
 export { default as Picker } from './mobile/picker';
 export { default as ReadableContentView } from './mobile/readable-content-view';
+export * from './mobile/dark-mode';

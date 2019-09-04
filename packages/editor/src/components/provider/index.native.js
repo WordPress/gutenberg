@@ -5,7 +5,6 @@ import RNReactNativeGutenbergBridge, {
 	subscribeParentGetHtml,
 	subscribeParentToggleHTMLMode,
 	subscribeUpdateHtml,
-	subscribeSetFocusOnTitle,
 	subscribeSetTitle,
 } from 'react-native-gutenberg-bridge';
 
@@ -28,8 +27,6 @@ class NativeEditorProvider extends Component {
 
 		// Keep a local reference to `post` to detect changes
 		this.post = props.post;
-
-		this.setTitleRef = this.setTitleRef.bind( this );
 	}
 
 	componentDidMount() {
@@ -47,12 +44,6 @@ class NativeEditorProvider extends Component {
 
 		this.subscriptionParentUpdateHtml = subscribeUpdateHtml( ( payload ) => {
 			this.updateHtmlAction( payload.html );
-		} );
-
-		this.subscriptionParentSetFocusOnTitle = subscribeSetFocusOnTitle( () => {
-			if ( this.postTitleRef ) {
-				this.postTitleRef.focus();
-			}
 		} );
 	}
 
@@ -72,10 +63,6 @@ class NativeEditorProvider extends Component {
 		if ( this.subscriptionParentUpdateHtml ) {
 			this.subscriptionParentUpdateHtml.remove();
 		}
-
-		if ( this.subscriptionParentSetFocusOnTitle ) {
-			this.subscriptionParentSetFocusOnTitle.remove();
-		}
 	}
 
 	componentDidUpdate( prevProps ) {
@@ -85,10 +72,6 @@ class NativeEditorProvider extends Component {
 			const unsupportedBlockNames = blocks.filter( isUnsupportedBlock ).map( ( block ) => block.attributes.originalName );
 			RNReactNativeGutenbergBridge.editorDidMount( unsupportedBlockNames );
 		}
-	}
-
-	setTitleRef( titleRef ) {
-		this.postTitleRef = titleRef;
 	}
 
 	serializeToNativeAction() {
