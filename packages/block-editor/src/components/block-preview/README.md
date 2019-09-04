@@ -30,7 +30,7 @@ Width of the preview container in pixels. Controls at what size the blocks will 
 
 `viewportWidth` can be used to simulate how blocks look on different device sizes or to make sure make sure multiple previews will be rendered with the same scale, regardless of their content.
 
-### `onReady`
+### `__experimentalOnReady`
 * **Type** `Function`
 * **Default:** `noop`
 
@@ -39,7 +39,7 @@ Use this callback as an opportunity to know when the preview is ready. The callb
 ```es6
 
 <BlockPreview
-	onReady={ ( { scale } ) => console.log( `Current preview scale: ${ scale }` )
+	__experimentalOnReady={ ( { scale } ) => console.log( `Current preview scale: ${ scale }` )
 	blocks={ blocks }
 />
 ```
