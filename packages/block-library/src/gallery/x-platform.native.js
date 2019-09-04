@@ -1,7 +1,7 @@
 import { Text } from 'react-native';
 
 export { withNotices } from '@wordpress/components';
-export { blockicon } from '@wordpress/block-editor';
+export { BlockIcon } from '@wordpress/block-editor';
 
 const MediaPlaceholder = props => <Text>FakeMediaPlaceholder</Text>;
 const InspectorControls = props => <Text>FakeInspectorControls</Text>
