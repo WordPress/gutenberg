@@ -19,7 +19,7 @@ import Cell from './cell';
 import PickerCell from './picker-cell';
 import SwitchCell from './switch-cell';
 import KeyboardAvoidingView from './keyboard-avoiding-view';
-import { withTheme, useStyle } from '../dark-mode';
+import { withTheme } from '../dark-mode';
 
 class BottomSheet extends Component {
 	constructor() {
@@ -64,7 +64,7 @@ class BottomSheet extends Component {
 			hideHeader,
 			style = {},
 			contentStyle = {},
-			theme,
+			useStyle,
 		} = this.props;
 
 		const panResponder = PanResponder.create( {
@@ -120,7 +120,7 @@ class BottomSheet extends Component {
 			},
 		};
 
-		const backgroundStyle = useStyle( styles.background, styles.backgroundDark, theme );
+		const backgroundStyle = useStyle( styles.background, styles.backgroundDark );
 
 		return (
 			<Modal
