@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { withDispatch } from '@wordpress/data';
 import { applyFilters } from '@wordpress/hooks';
 
@@ -15,8 +15,8 @@ const SettingsHeader = ( { openDocumentSettings, openBlockSettings, sidebarName 
 	// translators: ARIA label for the Document sidebar tab, not selected.
 	const documentLabel = applyFilters( 'editor.sidebar.settingsHeader.documentLabel', __( 'Document' ) );
 	const [ documentAriaLabel, documentActiveClass ] = sidebarName === 'edit-post/document' ?
-		// translators: ARIA label for the Document sidebar tab, selected.
-		[ `${ documentLabel } ${ __( '(selected)' ) }`, 'is-active' ] :
+		// translators: 1: ARIA label for the Document sidebar tab, selected.
+		[ sprintf( __( '%1$s (selected)' ), documentLabel ), 'is-active' ] :
 		[ documentLabel, '' ];
 
 	const [ blockAriaLabel, blockActiveClass ] = sidebarName === 'edit-post/block' ?
