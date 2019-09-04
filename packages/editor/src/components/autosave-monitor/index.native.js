@@ -3,8 +3,11 @@
  */
 import { Component } from '@wordpress/element';
 import { compose } from '@wordpress/compose';
-import { withSelect, withDispatch } from '@wordpress/data';
+import { withSelect } from '@wordpress/data';
 
+/**
+ * External dependencies
+ */
 import RNReactNativeGutenbergBridge from 'react-native-gutenberg-bridge';
 
 export class AutosaveMonitor extends Component {
@@ -47,7 +50,9 @@ export class AutosaveMonitor extends Component {
 
 		if ( isPendingSave ) {
 			this.pendingSave = setTimeout(
-				() => { RNReactNativeGutenbergBridge.editorDidAutosave(); },
+				() => {
+					RNReactNativeGutenbergBridge.editorDidAutosave();
+				},
 				autosaveInterval * 1000
 			);
 		}
@@ -66,7 +71,7 @@ export default compose( [
 			isAutosavingPost,
 		} = select( 'core/editor' );
 
-		const  autosaveInterval = 2; // This value should be read from editor settings?
+		const autosaveInterval = 2; // This value should be read from editor settings
 
 		return {
 			isDirty: isEditedPostDirty(),
@@ -74,5 +79,5 @@ export default compose( [
 			isAutosaving: isAutosavingPost(),
 			autosaveInterval,
 		};
-	} )
+	} ),
 ] )( AutosaveMonitor );
