@@ -375,7 +375,7 @@ div[data-type="core/freeform"] {
 		}
 		.block-editor-block-contextual-toolbar {
 			float: right;
-			margin-right: $icon-button-size - $block-padding + ($border-width * 3);
+			margin-right: $icon-button-with-dropdown-size - $block-padding + ($border-width * 3);
 			transform: translateY(-#{ $block-padding - $border-width });
 			top: $block-padding;
 
@@ -409,7 +409,7 @@ div[data-type="core/freeform"] {
 		}
 
 		.mce-container.mce-toolbar.mce-stack-layout-item {
-			padding-right: $icon-button-size;
+			padding-right: $icon-button-with-dropdown-size;
 		}
 	}
 }
