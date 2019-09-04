@@ -265,14 +265,16 @@ class ImageEdit extends React.Component {
 					autoCorrect={ false }
 					keyboardType="url"
 				/>
-				<BottomSheet.Cell
-					icon={ 'editor-expand' }
-					label={ __( 'Size' ) }
-					value={ ImageSizePicker.sizeOptionLabels[ sizeSlug || ImageSizePicker.DEFAULT_SIZE_SLUG ] }
-					editable={ false }
-					onChangeValue={ this.onSetLinkDestination }
-					onPress={ onPickerPresent }
-				/>
+				{ // eslint-disable-next-line no-undef
+					__DEV__ &&
+					<BottomSheet.Cell
+						icon={ 'editor-expand' }
+						label={ __( 'Size' ) }
+						value={ ImageSizePicker.sizeOptionLabels[ sizeSlug || ImageSizePicker.DEFAULT_SIZE_SLUG ] }
+						editable={ false }
+						onChangeValue={ this.onSetLinkDestination }
+						onPress={ onPickerPresent }
+					/> }
 				<BottomSheet.Cell
 					icon={ 'editor-textcolor' }
 					label={ __( 'Alt Text' ) }
