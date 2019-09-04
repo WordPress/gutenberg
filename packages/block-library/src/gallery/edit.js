@@ -13,12 +13,12 @@ import {
 	SelectControl,
 	ToggleControl,
 	withNotices,
-} from '@wordpress/components';
+} from './x-platform';
 import {
 	BlockIcon,
 	MediaPlaceholder,
 	InspectorControls,
-} from '@wordpress/block-editor';
+} from './x-platform';
 import { Component } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
@@ -210,7 +210,8 @@ class GalleryEdit extends Component {
 	}
 
 	componentDidMount() {
-		const { attributes, mediaUpload } = this.props;
+		const { attributes } = this.props;
+		const mediaUpload = () => {};
 		const { images } = attributes;
 		if ( every( images, ( { url } ) => isBlobURL( url ) ) ) {
 			const filesList = map( images, ( { url } ) => getBlobByURL( url ) );
