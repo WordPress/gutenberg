@@ -131,7 +131,7 @@ class BlockListBlock extends Component {
 					>
 						{ isValid && this.getBlockForType() }
 						{ ! isValid &&
-						<BlockInvalidWarning blockTitle={ title } icon={ icon } />
+							<BlockInvalidWarning blockTitle={ title } icon={ icon } />
 						}
 					</View>
 					{ isSelected && <BlockMobileToolbar clientId={ clientId } /> }

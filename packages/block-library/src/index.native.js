@@ -49,6 +49,7 @@ import * as textColumns from './text-columns';
 import * as verse from './verse';
 import * as video from './video';
 import * as tagCloud from './tag-cloud';
+import * as group from './group';
 
 export const coreBlocks = [
 	// Common blocks are grouped at the top to prioritize their display
@@ -142,7 +143,9 @@ export const registerCoreBlocks = () => {
 		list,
 		quote,
 		// eslint-disable-next-line no-undef
-		typeof __DEV__ !== 'undefined' && __DEV__ ? mediaText : null,
+		!! __DEV__ ? mediaText : null,
+		// eslint-disable-next-line no-undef
+		!! __DEV__ ? group : null,
 	].forEach( registerBlock );
 
 	setDefaultBlockName( paragraph.name );

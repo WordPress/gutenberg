@@ -37,7 +37,7 @@ class MediaContainer extends Component {
 		this.onUploadError = this.onUploadError.bind( this );
 		this.calculateSize = this.calculateSize.bind( this );
 		this.onLayout = this.onLayout.bind( this );
-		this.onSelectURL = this.onSelectURL.bind( this );
+		this.onSelectMediaUploadOption = this.onSelectMediaUploadOption.bind( this );
 
 		this.state = {
 			width: 0,
@@ -55,13 +55,13 @@ class MediaContainer extends Component {
 		noticeOperations.createErrorNotice( message );
 	}
 
-	onSelectURL( mediaId, mediaUrl ) {
+	onSelectMediaUploadOption( { id, url } ) {
 		const { onSelectMedia } = this.props;
 
 		onSelectMedia( {
 			media_type: 'image',
-			id: mediaId,
-			src: mediaUrl,
+			id,
+			url,
 		} );
 	}
 
@@ -71,8 +71,8 @@ class MediaContainer extends Component {
 			<BlockControls>
 				<Toolbar>
 					<MediaUpload
-						onSelectURL={ this.onSelectURL }
-						mediaType={ MEDIA_TYPE_IMAGE }
+						onSelect={ this.onSelectMediaUploadOption }
+						allowedTypes={ [ MEDIA_TYPE_IMAGE ] }
 						value={ mediaId }
 						render={ ( { open } ) => (
 							<IconButton
@@ -163,8 +163,8 @@ class MediaContainer extends Component {
 				labels={ {
 					title: __( 'Media area' ),
 				} }
-				onSelectURL={ this.onSelectURL }
-				mediaType={ MEDIA_TYPE_IMAGE }
+				onSelect={ this.onSelectMediaUploadOption }
+				allowedTypes={ [ MEDIA_TYPE_IMAGE ] }
 				onFocus={ this.props.onFocus }
 			/>
 		);
