@@ -20,7 +20,7 @@ import { childrenBlock } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/html-entities';
 import { BACKSPACE } from '@wordpress/keycodes';
 import { isURL } from '@wordpress/url';
-import { useStyle, withTheme } from '@wordpress/components';
+import { withTheme } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -771,7 +771,7 @@ export class RichText extends Component {
 			style,
 			__unstableIsSelected: isSelected,
 			children,
-			theme,
+			useStyle,
 		} = this.props;
 
 		const record = this.getRecord();
@@ -782,7 +782,7 @@ export class RichText extends Component {
 			minHeight = style.minHeight;
 		}
 
-		const placeholderStyle = useStyle( styles.richTextPlaceholder, styles.richTextPlaceholderDark, theme );
+		const placeholderStyle = useStyle( styles.richTextPlaceholder, styles.richTextPlaceholderDark );
 
 		const {
 			color: defaultPlaceholderTextColor,
@@ -792,7 +792,7 @@ export class RichText extends Component {
 			color: defaultColor,
 			textDecorationColor: defaultTextDecorationColor,
 			fontFamily: defaultFontFamily,
-		} = useStyle( styles.richText, styles.richTextDark, theme );
+		} = useStyle( styles.richText, styles.richTextDark );
 
 		let selection = null;
 		if ( this.needsSelectionUpdate ) {
@@ -821,7 +821,7 @@ export class RichText extends Component {
 			this.firedAfterTextChanged = false;
 		}
 
-		const dynamicStyle = useStyle( style, styles.richTextDark, theme );
+		const dynamicStyle = useStyle( style, styles.richTextDark );
 
 		return (
 			<View>

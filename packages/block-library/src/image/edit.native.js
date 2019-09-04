@@ -21,7 +21,6 @@ import {
 	Toolbar,
 	ToolbarButton,
 	withTheme,
-	useStyle,
 } from '@wordpress/components';
 
 import {
@@ -199,12 +198,11 @@ class ImageEdit extends React.Component {
 	}
 
 	getIcon( isRetryIcon ) {
-		const iconStyle = useStyle( styles.icon, styles.iconDark, this.props.theme );
-
 		if ( isRetryIcon ) {
 			return <Icon icon={ SvgIconRetry } { ...styles.iconRetry } />;
 		}
 
+		const iconStyle = this.props.useStyle( styles.icon, styles.iconDark );
 		return <Icon icon={ SvgIcon } { ...iconStyle } />;
 	}
 
