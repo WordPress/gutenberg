@@ -12,11 +12,11 @@ import SidebarHeader from '../sidebar-header';
 
 const SettingsHeader = ( { openDocumentSettings, openBlockSettings, sidebarName } ) => {
 	const blockLabel = __( 'Block' );
+	// translators: ARIA label for the Document sidebar tab, not selected.
 	const documentLabel = applyFilters( 'editor.sidebar.settingsHeader.documentLabel', __( 'Document' ) );
 	const [ documentAriaLabel, documentActiveClass ] = sidebarName === 'edit-post/document' ?
 		// translators: ARIA label for the Document sidebar tab, selected.
 		[ `${ documentLabel } ${ __( '(selected)' ) }`, 'is-active' ] :
-		// translators: ARIA label for the Document sidebar tab, not selected.
 		[ documentLabel, '' ];
 
 	const [ blockAriaLabel, blockActiveClass ] = sidebarName === 'edit-post/block' ?
