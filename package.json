@@ -107,14 +107,14 @@
 		"fbjs": "0.8.17",
 		"fs-extra": "8.0.1",
 		"glob": "7.1.2",
-		"husky": "0.14.3",
+		"husky": "3.0.5",
 		"inquirer": "6.3.1",
 		"is-equal-shallow": "0.1.3",
 		"jest-junit": "6.4.0",
 		"jest-serializer-enzyme": "1.0.0",
 		"jsdom": "11.12.0",
 		"lerna": "3.16.4",
-		"lint-staged": "8.1.5",
+		"lint-staged": "9.2.5",
 		"lodash": "4.17.14",
 		"make-dir": "3.0.0",
 		"metro-react-native-babel-preset": "0.55.0",
@@ -201,7 +201,6 @@
 		"lint-types": "tsc",
 		"package-plugin": "./bin/build-plugin-zip.sh",
 		"pot-to-php": "./bin/pot-to-php.js",
-		"precommit": "lint-staged",
 		"publish:check": "npm run build:packages && lerna updated",
 		"publish:dev": "npm run build:packages && lerna publish --npm-tag next",
 		"publish:prod": "npm run build:packages && lerna publish",
@@ -222,6 +221,11 @@
 		"playground:start": "concurrently \"npm run dev:packages\" \"parcel playground/src/index.html -d playground/dist\"",
 		"preenv": "npm run check-engines",
 		"env": "wp-scripts env"
+	},
+	"husky": {
+		"hooks": {
+			"pre-commit": "lint-staged"
+		}
 	},
 	"lint-staged": {
 		"packages/*/package.json": [
