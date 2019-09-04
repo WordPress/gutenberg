@@ -3,7 +3,9 @@ const path = require( 'path' );
 const blacklist = require( 'metro-config/src/defaults/blacklist' );
 // Blacklist the nested GB filetree so modules are not resolved in duplicates,
 //  both in the nested directory and the parent directory.
-const blacklistElements = blacklist( [ new RegExp( path.basename( __dirname ) + '/gutenberg/.*' ) ] );
+const blacklistElements = blacklist( [
+	new RegExp( path.basename( __dirname ) + '/gutenberg/.*' ),
+] );
 
 const enm = require( './extra-node-modules.config.js' );
 
@@ -19,7 +21,9 @@ const mapper = function( accu, v ) {
 };
 
 const wppackages = wppackagenames.reduce( mapper, {} );
-const alternateRoots = [ path.resolve( __dirname, '../node_modules' ) ].concat( Object.values( wppackages ) );
+const alternateRoots = [ path.resolve( __dirname, '../node_modules' ) ].concat(
+	Object.values( wppackages )
+);
 
 module.exports = {
 	extraNodeModules: Object.assign( enm, wppackages ),
