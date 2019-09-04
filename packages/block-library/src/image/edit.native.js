@@ -119,10 +119,11 @@ class ImageEdit extends React.Component {
 		} else if ( attributes.id && ! isURL( attributes.url ) ) {
 			requestImageFailedRetryDialog( attributes.id );
 		}
-
+		// eslint-disable-next-line no-undef
+		const enableFullscreen = __DEV__;
 		this.setState( {
 			isCaptionSelected: false,
-			showImageViewer: true,
+			showImageViewer: enableFullscreen && true,
 		} );
 	}
 
@@ -272,7 +273,7 @@ class ImageEdit extends React.Component {
 			<ImageViewer
 				isVisible={ this.state.showImageViewer }
 				onClose={ onImageViewerClose }
-				url ={ url }
+				url={ url }
 			/>
 		);
 
