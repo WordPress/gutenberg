@@ -3,6 +3,7 @@
  */
 import {
 	activatePlugin,
+	clickOnMoreMenuItem,
 	createNewPost,
 	deactivatePlugin,
 	searchForBlock,
@@ -40,15 +41,9 @@ describe( 'Allowed Blocks Filter', () => {
 	} );
 
 	it( 'should remove not allowed blocks from the block manager', async () => {
-		const BLOCK_LABEL_SELECTOR = '.edit-post-manage-blocks-modal__checklist-item .components-checkbox-control__label';
-		await page.click(
-			'.edit-post-more-menu [aria-label="More tools & options"]'
-		);
-		const [ button ] = await page.$x(
-			`//button[contains(text(), 'Block Manager')]`
-		);
-		await button.click( 'button' );
+		await clickOnMoreMenuItem( 'Block Manager' );
 
+		const BLOCK_LABEL_SELECTOR = '.edit-post-manage-blocks-modal__checklist-item .components-checkbox-control__label';
 		await page.waitForSelector( BLOCK_LABEL_SELECTOR );
 		const blocks = await page.evaluate(
 			( selector ) => {
