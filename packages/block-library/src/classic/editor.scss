@@ -296,6 +296,8 @@ div[data-type="core/freeform"] {
 }
 
 .block-library-classic__toolbar {
+	// Only display the classic toolbar when the classic block is selected or when the
+	// block is empty or loading and the placeholder should be displayed.
 	display: none;
 	width: auto;
 	margin: 0 #{ -$block-padding };
@@ -309,6 +311,9 @@ div[data-type="core/freeform"] {
 	// On mobile, toolbars go edge to edge.
 	padding: 0 $block-padding;
 
+	// By using the `data-type` attribute in this selector it ensures these styles only appear
+	// when the block itself is selected, without it they would also show when a parent block
+	// is selected.
 	div[data-type="core/freeform"].is-selected & {
 		display: block;
 		border-color: $light-gray-800;
