@@ -309,7 +309,7 @@ div[data-type="core/freeform"] {
 	border-bottom: none;
 
 	// On mobile, toolbars go edge to edge.
-	padding: 0 $block-padding;
+	padding: 0;
 
 	// By using the `data-type` attribute in this selector it ensures these styles only appear
 	// when the block itself is selected, without it they would also show when a parent block
@@ -320,13 +320,17 @@ div[data-type="core/freeform"] {
 		border-color: $light-gray-800;
 	}
 
+	// Remove the box shadow to mimic other Gutenberg UI.
+	.mce-tinymce {
+		box-shadow: none;
+	}
+
 	@include break-small() {
 		padding: 0;
 	}
 
 	&:empty {
 		display: block;
-		height: $block-toolbar-height;
 		background: #f5f5f5;
 		border-bottom: $border-width solid #e2e4e7;
 
