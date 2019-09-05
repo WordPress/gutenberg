@@ -314,10 +314,10 @@ div[data-type="core/freeform"] {
 	// By using the `data-type` attribute in this selector it ensures these styles only appear
 	// when the block itself is selected, without it they would also show when a parent block
 	// is selected.
-	div[data-type="core/freeform"].is-selected & {
+	div[data-type="core/freeform"].is-selected &,
+	div[data-type="core/freeform"].is-typing & {
 		display: block;
 		border-color: $light-gray-800;
-		border-left-color: transparent;
 	}
 
 	@include break-small() {
