@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { compact, partial } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -9,6 +10,9 @@ import classnames from 'classnames';
 import { __ } from '@wordpress/i18n';
 import {
 	useCallback,
+	useContext,
+	useMemo,
+	useState,
 } from '@wordpress/element';
 import {
 	compose,
@@ -19,17 +23,26 @@ import {
 	RangeControl,
 	TextControl,
 	ToggleControl,
+	Toolbar,
 	withFallbackStyles,
 } from '@wordpress/components';
 import {
 	__experimentalUseGradient,
+	BlockControls,
 	ContrastChecker,
 	InspectorControls,
 	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
 	RichText,
 	URLInput,
+	URLPopover,
 	withColors,
 } from '@wordpress/block-editor';
+import { useSelect, useDispatch } from '@wordpress/data';
+
+/**
+ * Internal dependencies
+ */
+import { ButtonEditSettings } from './edit-settings';
 
 const { getComputedStyle } = window;
 
@@ -72,9 +85,134 @@ function BorderPanel( { borderRadius = '', setAttributes } ) {
 	);
 }
 
+function ToolbarMovers( { clientId } ) {
+	const {
+		parentID,
+		isFirst,
+		isLast,
+	} = useSelect(
+		( select ) => {
+			const {
+				getBlockIndex,
+				getBlockOrder,
+				getBlockRootClientId,
+			} = select( 'core/block-editor' );
+			const rootClientId = getBlockRootClientId( clientId );
+			const numberOfSiblings = getBlockOrder( rootClientId ).length;
+			const buttonIndex = getBlockIndex( clientId, rootClientId );
+			return {
+				parentID: rootClientId,
+				isFirst: buttonIndex === 0,
+				isLast: buttonIndex === ( numberOfSiblings - 1 ),
+			};
+		},
+		[ clientId ]
+	);
+	const { moveBlocksUp, moveBlocksDown } = useDispatch( 'core/block-editor' );
+	const moveUp = useCallback(
+		partial( moveBlocksUp, [ clientId ], parentID ),
+		[ moveBlocksUp, clientId, parentID ]
+	);
+	const moveDown = useCallback(
+		partial( moveBlocksDown, [ clientId ], parentID ),
+		[ moveBlocksDown, clientId, parentID ]
+	);
+	const toolbarControls = useMemo(
+		() => ( compact( [
+			isFirst ? null : {
+				icon: 'arrow-left-alt2',
+				title: __( 'Move left' ),
+				onClick: moveUp,
+			},
+			isLast ? null : {
+				icon: 'arrow-right-alt2',
+				title: __( 'Move right' ),
+				onClick: moveDown,
+			},
+		] ) ),
+		[ moveUp, moveDown, isFirst, isLast ]
+	);
+
+	return (
+		<BlockControls>
+			<Toolbar controls={ toolbarControls } />
+		</BlockControls>
+	);
+}
+
+const InlineURLPicker = withInstanceId(
+	function( { instanceId, isSelected, url, onChange } ) {
+		const linkId = `wp-block-button__inline-link-${ instanceId }`;
+		return (
+			<URLInput
+				className="wp-block-button__inline-link-input"
+				value={ url }
+				/* eslint-disable jsx-a11y/no-autofocus */
+				// Disable Reason: The rule is meant to prevent enabling auto-focus, not disabling it.
+				autoFocus={ false }
+				/* eslint-enable jsx-a11y/no-autofocus */
+				onChange={ onChange }
+				disableSuggestions={ ! isSelected }
+				id={ linkId }
+				isFullWidth
+				hasBorder
+			/>
+		);
+	}
+);
+
+function PopoverURLPicker( { url, onChange } ) {
+	const [ urlInput, setUrlInput ] = useState( url || '' );
+	const [ isPopoverEnable, setIsPopoverEnable ] = useState( true );
+	const onSubmit = useCallback(
+		() => {
+			onChange( urlInput );
+			setIsPopoverEnable( false );
+		},
+		[ urlInput, onChange ]
+	);
+	if ( ! isPopoverEnable ) {
+		return null;
+	}
+	return (
+		<URLPopover focusOnMount={ false }>
+			<URLPopover.LinkEditor
+				className="editor-format-toolbar__link-container-content block-editor-format-toolbar__link-container-content"
+				value={ urlInput }
+				onChangeInputValue={ setUrlInput }
+				onSubmit={ onSubmit }
+			/>
+		</URLPopover>
+	);
+}
+
+function URLPicker( { isSelected, url, setAttributes } ) {
+	const onChange = useCallback(
+		( value ) => setAttributes( { url: value } ),
+		[ setAttributes ]
+	);
+	const { urlInPopover } = useContext( ButtonEditSettings );
+	if ( urlInPopover ) {
+		return isSelected ? (
+			<PopoverURLPicker
+				url={ url }
+				onChange={ onChange }
+			/>
+		) : null;
+	}
+	return (
+		<InlineURLPicker
+			url={ url }
+			isSelected={ isSelected }
+			onChange={ onChange }
+		/>
+	);
+}
+
 function ButtonEdit( {
 	attributes,
 	backgroundColor,
+	clientId,
 	textColor,
 	setBackgroundColor,
 	setTextColor,
@@ -150,18 +288,10 @@ function ButtonEdit( {
 					borderRadius: borderRadius ? borderRadius + 'px' : undefined,
 				} }
 			/>
-			<URLInput
-				label={ __( 'Link' ) }
-				className="wp-block-button__inline-link"
-				value={ url }
-				/* eslint-disable jsx-a11y/no-autofocus */
-				// Disable Reason: The rule is meant to prevent enabling auto-focus, not disabling it.
-				autoFocus={ false }
-				/* eslint-enable jsx-a11y/no-autofocus */
-				onChange={ ( value ) => setAttributes( { url: value } ) }
-				disableSuggestions={ ! isSelected }
-				isFullWidth
-				hasBorder
+			<URLPicker
+				url={ url }
+				setAttributes={ setAttributes }
+				isSelected={ isSelected }
 			/>
 			<InspectorControls>
 				<PanelColorGradientSettings
@@ -210,12 +340,12 @@ function ButtonEdit( {
 					/>
 				</PanelBody>
 			</InspectorControls>
+			<ToolbarMovers clientId={ clientId } />
 		</div>
 	);
 }
 
 export default compose( [
-	withInstanceId,
 	withColors( 'backgroundColor', { textColor: 'color' } ),
 	applyFallbackStyles,
 ] )( ButtonEdit );

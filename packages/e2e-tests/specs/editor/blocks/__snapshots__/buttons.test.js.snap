@@ -1,0 +1,21 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Buttons can jump focus back & forth 1`] = `
+"<!-- wp:buttons -->
+<div class=\\"wp-block-buttons\\"><!-- wp:button -->
+<div class=\\"wp-block-button\\"><a class=\\"wp-block-button__link\\">WordPress</a></div>
+<!-- /wp:button -->
+
+<!-- wp:button -->
+<div class=\\"wp-block-button\\"><a class=\\"wp-block-button__link\\">Button!</a></div>
+<!-- /wp:button --></div>
+<!-- /wp:buttons -->"
+`;
+
+exports[`Buttons has focus on button content 1`] = `
+"<!-- wp:buttons -->
+<div class=\\"wp-block-buttons\\"><!-- wp:button -->
+<div class=\\"wp-block-button\\"><a class=\\"wp-block-button__link\\">Content</a></div>
+<!-- /wp:button --></div>
+<!-- /wp:buttons -->"
+`;

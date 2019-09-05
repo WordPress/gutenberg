@@ -7,23 +7,24 @@ import {
 	createNewPost,
 } from '@wordpress/e2e-test-utils';
 
-describe( 'Button', () => {
+describe( 'Buttons', () => {
 	beforeEach( async () => {
 		await createNewPost();
 	} );
 
 	it( 'has focus on button content', async () => {
-		await insertBlock( 'Button' );
+		await insertBlock( 'Buttons' );
 		await page.keyboard.type( 'Content' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
 	it( 'can jump focus back & forth', async () => {
-		await insertBlock( 'Button' );
+		await insertBlock( 'Buttons' );
 		await page.keyboard.type( 'WordPress' );
 		await page.keyboard.press( 'Tab' );
-		await page.keyboard.type( 'https://wordpress.org' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'Button!' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
