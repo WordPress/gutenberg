@@ -90,10 +90,14 @@ export default compose(
 
 		const parentColumnsId = getBlockRootClientId( clientId );
 		const parentOfColumnsId = getBlockRootClientId( parentColumnsId );
+		const columnsParentLock = parentOfColumnsId
+			? getTemplateLock( parentOfColumnsId )
+			: getTemplateLock();
 
 		return {
 			hasChildBlocks: getBlockOrder( clientId ).length > 0,
-			columnsParentLock: getTemplateLock( parentOfColumnsId ),
+			columnsParentLock:
+				columnsParentLock !== undefined ? columnsParentLock : false,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, registry ) => {
