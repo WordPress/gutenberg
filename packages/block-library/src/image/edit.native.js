@@ -9,7 +9,7 @@ import {
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
 } from 'react-native-gutenberg-bridge';
-import { isEmpty } from 'lodash';
+import { isEmpty, map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -41,10 +41,22 @@ import styles from './styles.scss';
 import MediaUploadProgress from './media-upload-progress';
 import SvgIcon from './icon';
 import SvgIconRetry from './icon-retry';
-import ImageSizePicker from './image-size-picker';
 
 const LINK_DESTINATION_CUSTOM = 'custom';
 const LINK_DESTINATION_NONE = 'none';
+
+const IMAGE_SIZE_THUMBNAIL = 'thumbnail';
+const IMAGE_SIZE_MEDIUM = 'medium';
+const IMAGE_SIZE_LARGE = 'large';
+const IMAGE_SIZE_FULL_SIZE = 'full';
+const DEFAULT_SIZE_SLUG = IMAGE_SIZE_LARGE;
+const sizeOptionLabels = {
+	[ IMAGE_SIZE_THUMBNAIL ]: __( 'Thumbnail' ),
+	[ IMAGE_SIZE_MEDIUM ]: __( 'Medium' ),
+	[ IMAGE_SIZE_LARGE ]: __( 'Large' ),
+	[ IMAGE_SIZE_FULL_SIZE ]: __( 'Full Size' ),
+};
+const sizeOptions = map( sizeOptionLabels, ( label, option ) => ( { value: option, label } ) );
 
 // Default Image ratio 4:3
 const IMAGE_ASPECT_RATIO = 4 / 3;
@@ -183,7 +195,7 @@ class ImageEdit extends React.Component {
 			alt: '',
 			linkDestination: LINK_DESTINATION_NONE,
 			href: undefined,
-			sizeSlug: ImageSizePicker.DEFAULT_SIZE_SLUG,
+			sizeSlug: DEFAULT_SIZE_SLUG,
 		} );
 	}
 
@@ -224,16 +236,6 @@ class ImageEdit extends React.Component {
 			this.setState( { showSettings: false } );
 		};
 
-		//set in ImageSizePicker using referenceOpenImageOptions prop
-		let openImageSizePicker = () => {};
-
-		const onAfterImageSettingsDismissed = () => {
-			if ( this.state.showImageOptions ) {
-				openImageSizePicker();
-				this.setState( { showImageOptions: false } );
-			}
-		};
-
 		const getToolbarEditButton = ( open ) => (
 			<BlockControls>
 				<Toolbar>
@@ -250,7 +252,6 @@ class ImageEdit extends React.Component {
 			<BottomSheet
 				isVisible={ this.state.showSettings }
 				onClose={ onImageSettingsClose }
-				onDismiss={ onAfterImageSettingsDismissed }
 				hideHeader
 			>
 				<BottomSheet.Cell
@@ -265,13 +266,13 @@ class ImageEdit extends React.Component {
 				/>
 				{ // eslint-disable-next-line no-undef
 					__DEV__ &&
-					<BottomSheet.Cell
+					<BottomSheet.PickerCell
+						hideCancelButton
 						icon={ 'editor-expand' }
 						label={ __( 'Size' ) }
-						value={ ImageSizePicker.sizeOptionLabels[ sizeSlug || ImageSizePicker.DEFAULT_SIZE_SLUG ] }
-						editable={ false }
-						onChangeValue={ this.onSetLinkDestination }
-						onPress={ onPickerPresent }
+						value={ sizeOptionLabels[ sizeSlug || DEFAULT_SIZE_SLUG ] }
+						onChangeValue={ ( newValue ) => this.onSetSizeSlug( newValue ) }
+						options={ sizeOptions }
 					/> }
 				<BottomSheet.Cell
 					icon={ 'editor-textcolor' }
@@ -289,13 +290,6 @@ class ImageEdit extends React.Component {
 				/>
 			</BottomSheet>
 		);
-
-		const onPickerPresent = () => {
-			this.setState( {
-				showImageOptions: true,
-				showSettings: false,
-			} );
-		};
 
 		if ( ! url ) {
 			return (
@@ -320,14 +314,6 @@ class ImageEdit extends React.Component {
 			>
 				<View style={ { flex: 1 } }>
 					{ getInspectorControls() }
-					<ImageSizePicker
-						onChange={ ( value ) => {
-							this.onSetSizeSlug( value );
-						} }
-						referenceOpenImageOptions={ ( { openImageOptions } ) => {
-							openImageSizePicker = openImageOptions;
-						} }
-					/>
 					{ getMediaOptions() }
 					{ ( ! this.state.isCaptionSelected ) &&
 						getToolbarEditButton( openMediaOptions )
