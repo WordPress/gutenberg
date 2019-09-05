@@ -116,7 +116,7 @@ Every pull request goes through a manual code review, in addition to automated t
 
 *As a contributor*, your responsibility is to learn from suggestions and iterate your pull request should it be needed based on feedback. Seek to collaborate and produce the best possible contribution to the greater whole.
 
-Code reviews are encouraged by everyone who is willing to attempt one. If you review a pull request and are confident in the changes, approve it. If you don't feel totally confident it is ready for merging, add your review with a comment that says it should have another set of eyes on it before final approval. This can help filter out obvious bugs and simplify reviews for core members. It also is a great learning experience as you can follow the later reviews to see how to improve your own future reviews.
+Code reviews are encouraged by everyone who is willing to attempt one. If you review a pull request and are confident in the changes, approve it. If you don't feel totally confident it is ready for merging, add your review with a comment that says it should have another set of eyes on it before final approval. This can help filter out obvious bugs and simplify reviews for core members. Following the later reviews will also help improve your reviewing confidence in the future.
 
 ### Design Review
 
