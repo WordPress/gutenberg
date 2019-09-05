@@ -309,7 +309,7 @@ div[data-type="core/freeform"] {
 	// On mobile, toolbars go edge to edge.
 	padding: 0 $block-padding;
 
-	.is-selected & {
+	div[data-type="core/freeform"].is-selected & {
 		display: block;
 		border-color: $light-gray-800;
 		border-left-color: transparent;
