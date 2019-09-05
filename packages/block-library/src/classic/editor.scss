@@ -296,6 +296,7 @@ div[data-type="core/freeform"] {
 }
 
 .block-library-classic__toolbar {
+	display: none;
 	width: auto;
 	margin: 0 #{ -$block-padding };
 	position: sticky;
@@ -309,6 +310,7 @@ div[data-type="core/freeform"] {
 	padding: 0 $block-padding;
 
 	.is-selected & {
+		display: block;
 		border-color: $light-gray-800;
 		border-left-color: transparent;
 	}
@@ -318,6 +320,7 @@ div[data-type="core/freeform"] {
 	}
 
 	&:empty {
+		display: block;
 		height: $block-toolbar-height;
 		background: #f5f5f5;
 		border-bottom: $border-width solid #e2e4e7;
