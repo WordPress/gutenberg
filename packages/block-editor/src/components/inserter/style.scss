@@ -89,9 +89,10 @@ $block-inserter-search-height: 38px;
 }
 
 .block-editor-inserter__results {
+	display: flex;
+	flex-wrap: wrap;
 	align-items: center;
 	justify-content: center;
-	display: flex;
 	flex-grow: 1;
 	overflow: auto;
 	position: relative;
@@ -109,6 +110,10 @@ $block-inserter-search-height: 38px;
 	// Don't show the top border on the first panel, let the Search border be the border.
 	[role="presentation"] + .components-panel__body {
 		border-top: none;
+	}
+
+	.components-panel__body {
+		width: 100%;
 	}
 }
 
