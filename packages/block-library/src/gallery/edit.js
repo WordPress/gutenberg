@@ -67,7 +67,6 @@ class GalleryEdit extends Component {
 		this.onFocusGalleryCaption = this.onFocusGalleryCaption.bind( this );
 
 		this.state = {
-			galleryCaptionFocused: false,
 			selectedImage: null,
 			attachmentCaptions: null,
 		};
@@ -202,11 +201,9 @@ class GalleryEdit extends Component {
 	}
 
 	onFocusGalleryCaption() {
-		if ( ! this.state.galleryCaptionFocused ) {
-			this.setState( {
-				selectedImage: null,
-			} );
-		}
+		this.setState( {
+			selectedImage: null,
+		} );
 	}
 
 	setImageAttributes( index, attributes ) {
@@ -247,11 +244,6 @@ class GalleryEdit extends Component {
 			this.setState( {
 				selectedImage: null,
 				captionSelected: false,
-			} );
-		}
-		if ( ! this.props.isSelected && prevProps.isSelected && this.state.galleryCaptionFocused ) {
-			this.setState( {
-				galleryCaptionFocused: false,
 			} );
 		}
 	}
@@ -307,7 +299,6 @@ class GalleryEdit extends Component {
 				'screen-reader-text': ! isSelected && RichText.isEmpty( caption ),
 			}
 		);
-
 		return (
 			<>
 				<InspectorControls>
@@ -378,7 +369,6 @@ class GalleryEdit extends Component {
 						value={ caption }
 						unstableOnFocus={ this.onFocusGalleryCaption }
 						onChange={ ( value ) => setAttributes( { caption: value } ) }
-						isSelected={ this.state.galleryCaptionFocused }
 						inlineToolbar
 					/>
 				</figure>
