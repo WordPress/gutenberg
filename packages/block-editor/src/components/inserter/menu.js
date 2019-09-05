@@ -375,9 +375,8 @@ export class InserterMenu extends Component {
 										}
 										<br />
 										<Button
-											isButton
 											isDefault
-											className="editor-inserter__block-manager-button block-editor-inserter__block-manager-button"
+											className="block-editor-inserter__block-manager-button"
 											onClick={ () => openModal( 'edit-post/manage-blocks' ) }
 										>
 											{ __( 'Manage Blocks' ) }
