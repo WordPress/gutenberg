@@ -1,4 +1,8 @@
 /**
+ * External dependencies
+ */
+import { map } from 'lodash';
+/**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
@@ -16,21 +20,11 @@ const sizeOptionLabels = {
 	[ IMAGE_SIZE_LARGE ]: __( 'Large' ),
 	[ IMAGE_SIZE_FULL_SIZE ]: __( 'Full Size' ),
 };
+const sizeOptions = map( sizeOptionLabels, ( label, option ) => ( { value: option, label } ) );
 
 class ImageSizePicker extends Component {
-	getSizeOptionsItems() {
-		return [
-			{ value: IMAGE_SIZE_THUMBNAIL, label: sizeOptionLabels[ IMAGE_SIZE_THUMBNAIL ] },
-			{ value: IMAGE_SIZE_MEDIUM, label: sizeOptionLabels[ IMAGE_SIZE_MEDIUM ] },
-			{ value: IMAGE_SIZE_LARGE, label: sizeOptionLabels[ IMAGE_SIZE_LARGE ] },
-			{ value: IMAGE_SIZE_FULL_SIZE, label: sizeOptionLabels[ IMAGE_SIZE_FULL_SIZE ] },
-		];
-	}
-
 	render() {
 		let picker;
-
-		const sizeOptions = this.getSizeOptionsItems();
 
 		const onPickerPresent = () => {
 			picker.presentPicker();
@@ -38,11 +32,11 @@ class ImageSizePicker extends Component {
 
 		const getImageSizeOptions = () => (
 			<Picker
-				hideCancelButton={ true }
+				hideCancelButton
 				title={ __( 'Image Size' ) }
 				ref={ ( instance ) => picker = instance }
 				options={ sizeOptions }
-				leftAlign={ true }
+				leftAlign
 				onChange={ this.props.onChange }
 			/>
 		);
