@@ -7,6 +7,7 @@ import { createRegistrySelector } from '@wordpress/data';
  * Internal dependencies
  */
 import {
+	isEditedPostDirty,
 	isEditedPostSaveable,
 	hasChangedContent,
 } from './selectors.js';
@@ -43,6 +44,10 @@ export const isEditedPostAutosaveable = createRegistrySelector( ( ) => function(
 	// This is not strictly accurate, and relies on a tolerance toward autosave
 	// request failures for unnecessary saves.
 	if ( hasChangedContent( state ) ) {
+		return true;
+	}
+
+	if ( isEditedPostDirty( state ) ) {
 		return true;
 	}
 
