@@ -24,6 +24,12 @@ export const EXPECTED_TRANSFORMS = {
 			'Group',
 		],
 	},
+	core__button__squared: {
+		originalBlock: 'Button',
+		availableTransforms: [
+			'Group',
+		],
+	},
 	core__calendar: {
 		originalBlock: 'Calendar',
 		availableTransforms: [
@@ -151,6 +157,13 @@ export const EXPECTED_TRANSFORMS = {
 		],
 	},
 	core__gallery: {
+		originalBlock: 'Gallery',
+		availableTransforms: [
+			'Group',
+			'Image',
+		],
+	},
+	'core__gallery-with-caption': {
 		originalBlock: 'Gallery',
 		availableTransforms: [
 			'Group',

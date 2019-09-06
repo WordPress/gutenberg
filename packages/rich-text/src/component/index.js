@@ -418,8 +418,15 @@ class RichText extends Component {
 			return;
 		}
 
-		const { start, end } = this.createRecord();
+		const { start, end, text } = this.createRecord();
 		const value = this.record;
+
+		// Fallback mechanism for IE11, which doesn't support the input event.
+		// Any input results in a selection change.
+		if ( text !== value.text ) {
+			this.onInput();
+			return;
+		}
 
 		if ( start === value.start && end === value.end ) {
 			return;

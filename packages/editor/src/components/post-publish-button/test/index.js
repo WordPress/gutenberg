@@ -4,6 +4,11 @@
 import { shallow } from 'enzyme';
 
 /**
+ * WordPress dependencies
+ */
+import { Button } from '@wordpress/components';
+
+/**
  * Internal dependencies
  */
 import { PostPublishButton } from '../';
@@ -19,7 +24,7 @@ describe( 'PostPublishButton', () => {
 				/>
 			);
 
-			expect( wrapper.prop( 'aria-disabled' ) ).toBe( true );
+			expect( wrapper.find( Button ).prop( 'aria-disabled' ) ).toBe( true );
 		} );
 
 		it( 'should be true if forceIsSaving is true', () => {
@@ -31,7 +36,7 @@ describe( 'PostPublishButton', () => {
 				/>
 			);
 
-			expect( wrapper.prop( 'aria-disabled' ) ).toBe( true );
+			expect( wrapper.find( Button ).prop( 'aria-disabled' ) ).toBe( true );
 		} );
 
 		it( 'should be true if post is not publishable and not forceIsDirty', () => {
@@ -43,7 +48,7 @@ describe( 'PostPublishButton', () => {
 				/>
 			);
 
-			expect( wrapper.prop( 'aria-disabled' ) ).toBe( true );
+			expect( wrapper.find( Button ).prop( 'aria-disabled' ) ).toBe( true );
 		} );
 
 		it( 'should be true if post is not saveable', () => {
@@ -54,7 +59,7 @@ describe( 'PostPublishButton', () => {
 				/>
 			);
 
-			expect( wrapper.prop( 'aria-disabled' ) ).toBe( true );
+			expect( wrapper.find( Button ).prop( 'aria-disabled' ) ).toBe( true );
 		} );
 
 		it( 'should be true if post saving is locked', () => {
@@ -66,7 +71,7 @@ describe( 'PostPublishButton', () => {
 				/>
 			);
 
-			expect( wrapper.prop( 'aria-disabled' ) ).toBe( true );
+			expect( wrapper.find( Button ).prop( 'aria-disabled' ) ).toBe( true );
 		} );
 
 		it( 'should be false if post is saveable but not publishable and forceIsDirty is true', () => {
@@ -78,7 +83,7 @@ describe( 'PostPublishButton', () => {
 				/>
 			);
 
-			expect( wrapper.prop( 'aria-disabled' ) ).toBe( false );
+			expect( wrapper.find( Button ).prop( 'aria-disabled' ) ).toBe( false );
 		} );
 
 		it( 'should be false if post is publishave and saveable', () => {
@@ -89,7 +94,7 @@ describe( 'PostPublishButton', () => {
 				/>
 			);
 
-			expect( wrapper.prop( 'aria-disabled' ) ).toBe( false );
+			expect( wrapper.find( Button ).prop( 'aria-disabled' ) ).toBe( false );
 		} );
 	} );
 
@@ -107,7 +112,7 @@ describe( 'PostPublishButton', () => {
 				/>
 			);
 
-			wrapper.simulate( 'click' );
+			wrapper.find( Button ).simulate( 'click' );
 
 			expect( onStatusChange ).toHaveBeenCalledWith( 'pending' );
 		} );
@@ -125,7 +130,7 @@ describe( 'PostPublishButton', () => {
 					isPublishable={ true } />
 			);
 
-			wrapper.simulate( 'click' );
+			wrapper.find( Button ).simulate( 'click' );
 
 			expect( onStatusChange ).toHaveBeenCalledWith( 'future' );
 		} );
@@ -143,7 +148,7 @@ describe( 'PostPublishButton', () => {
 					isPublishable={ true } />
 			);
 
-			wrapper.simulate( 'click' );
+			wrapper.find( Button ).simulate( 'click' );
 
 			expect( onStatusChange ).toHaveBeenCalledWith( 'private' );
 		} );
@@ -160,7 +165,7 @@ describe( 'PostPublishButton', () => {
 					isPublishable={ true } />
 			);
 
-			wrapper.simulate( 'click' );
+			wrapper.find( Button ).simulate( 'click' );
 
 			expect( onStatusChange ).toHaveBeenCalledWith( 'publish' );
 		} );
@@ -179,7 +184,7 @@ describe( 'PostPublishButton', () => {
 					isPublishable={ true } />
 			);
 
-			wrapper.simulate( 'click' );
+			wrapper.find( Button ).simulate( 'click' );
 
 			expect( onStatusChange ).toHaveBeenCalledWith( 'publish' );
 			expect( onSave ).toHaveBeenCalled();
@@ -194,6 +199,6 @@ describe( 'PostPublishButton', () => {
 			/>
 		);
 
-		expect( wrapper.find( 'ForwardRef(Button)' ).prop( 'isBusy' ) ).toBe( true );
+		expect( wrapper.find( Button ).prop( 'isBusy' ) ).toBe( true );
 	} );
 } );

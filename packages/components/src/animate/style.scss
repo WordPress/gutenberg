@@ -43,3 +43,19 @@
 		transform: translateX(0%);
 	}
 }
+
+.components-animate__loading {
+	animation: components-animate__loading 1.6s ease-in-out infinite;
+}
+
+@keyframes components-animate__loading {
+	0% {
+		opacity: 0.5;
+	}
+	50% {
+		opacity: 1;
+	}
+	100% {
+		opacity: 0.5;
+	}
+}

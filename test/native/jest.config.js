@@ -34,6 +34,7 @@ module.exports = {
 	],
 	testPathIgnorePatterns: [
 		'/node_modules/',
+		'/wordpress/',
 		'/__device-tests__/',
 	],
 	testURL: 'http://localhost/',

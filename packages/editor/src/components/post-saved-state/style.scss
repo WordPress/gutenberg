@@ -7,10 +7,6 @@
 	overflow: hidden;
 	white-space: nowrap;
 
-	&.is-saving {
-		animation: edit-post__loading-fade-animation 0.5s infinite;
-	}
-
 	.dashicon {
 		display: inline-block;
 		flex: 0 0 auto;

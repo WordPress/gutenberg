@@ -159,6 +159,7 @@ const {
 	getPermalink,
 	getPermalinkParts,
 	isPostSavingLocked,
+	isPostAutosavingLocked,
 	canUserUseUnfilteredHTML,
 } = selectors;
 
@@ -1157,6 +1158,28 @@ describe( 'selectors', () => {
 		} );
 	} );
 
+	describe( 'isPostAutosavingLocked', () => {
+		it( 'should return true if the post has postAutosavingLocks', () => {
+			const state = {
+				postAutosavingLock: { example: true },
+				currentPost: {},
+				saving: {},
+			};
+
+			expect( isPostAutosavingLocked( state ) ).toBe( true );
+		} );
+
+		it( 'should return false if the post has no postAutosavingLocks', () => {
+			const state = {
+				postAutosavingLock: {},
+				currentPost: {},
+				saving: {},
+			};
+
+			expect( isPostAutosavingLocked( state ) ).toBe( false );
+		} );
+	} );
+
 	describe( 'isEditedPostSaveable', () => {
 		it( 'should return false if the post has no title, excerpt, content', () => {
 			const state = {
@@ -1408,6 +1431,7 @@ describe( 'selectors', () => {
 					return true;
 				},
 				getAutosave() {},
+				postAutosavingLock: {},
 			};
 
 			expect( isEditedPostAutosaveable( state ) ).toBe( true );
@@ -1440,6 +1464,7 @@ describe( 'selectors', () => {
 						excerpt: 'foo',
 					};
 				},
+				postAutosavingLock: {},
 			};
 
 			expect( isEditedPostAutosaveable( state ) ).toBe( false );
@@ -1471,6 +1496,7 @@ describe( 'selectors', () => {
 						excerpt: 'foo',
 					};
 				},
+				postAutosavingLock: {},
 			};
 
 			expect( isEditedPostAutosaveable( state ) ).toBe( true );
@@ -1505,11 +1531,22 @@ describe( 'selectors', () => {
 								[ variantField ]: 'bar',
 							};
 						},
+						postAutosavingLock: {},
 					};
 
 					expect( isEditedPostAutosaveable( state ) ).toBe( true );
 				}
 			}
+		} );
+
+		it( 'should return false if autosaving is locked', () => {
+			const state = {
+				currentPost: {},
+				saving: {},
+				postAutosavingLock: { example: true },
+			};
+
+			expect( isEditedPostAutosaveable( state ) ).toBe( false );
 		} );
 	} );
 

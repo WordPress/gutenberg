@@ -535,6 +535,11 @@ export const isEditedPostAutosaveable = createRegistrySelector( ( select ) => fu
 		return false;
 	}
 
+	// A post is not autosavable when there is a post autosave lock.
+	if ( isPostAutosavingLocked( state ) ) {
+		return false;
+	}
+
 	const postType = getCurrentPostType( state );
 	const postId = getCurrentPostId( state );
 	const hasFetchedAutosave = select( 'core' ).hasFetchedAutosaves( postType, postId );
@@ -1098,6 +1103,17 @@ export function isPostLocked( state ) {
  */
 export function isPostSavingLocked( state ) {
 	return Object.keys( state.postSavingLock ).length > 0;
+}
+
+/**
+ * Returns whether post autosaving is locked.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Is locked.
+ */
+export function isPostAutosavingLocked( state ) {
+	return Object.keys( state.postAutosavingLock ).length > 0;
 }
 
 /**
