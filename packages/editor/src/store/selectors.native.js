@@ -46,5 +46,5 @@ export const isEditedPostAutosaveable = createRegistrySelector( ( ) => function(
 		return true;
 	}
 
-	return true;
+	return false;
 } );
