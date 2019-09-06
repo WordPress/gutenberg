@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { stubTrue, without, omit } from 'lodash';
+import { stubTrue, without } from 'lodash';
 
 /**
  * WordPress dependencies
