@@ -1,4 +1,4 @@
-ul.wp-block-gallery {
+.wp-block-gallery {
 	// Override the default list style type _only in the editor_
 	// to avoid :not() selector specificity issues.
 	// See https://github.com/WordPress/gutenberg/pull/10358
@@ -10,6 +10,11 @@ ul.wp-block-gallery {
 	.is-selected & {
 		margin-bottom: 0;
 	}
+}
+
+// need to override default editor ul styles
+.blocks-gallery-grid.blocks-gallery-grid {
+	margin-bottom: 0;
 }
 
 .blocks-gallery-item {

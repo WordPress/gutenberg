@@ -51,6 +51,7 @@ export function ConvertToGroupButton( {
 export default compose( [
 	withSelect( ( select, { clientIds } ) => {
 		const {
+			getBlockRootClientId,
 			getBlocksByClientId,
 			canInsertBlockType,
 		} = select( 'core/block-editor' );
@@ -61,7 +62,11 @@ export default compose( [
 
 		const groupingBlockName = getGroupingBlockName();
 
-		const groupingBlockAvailable = canInsertBlockType( groupingBlockName );
+		const rootClientId = clientIds && clientIds.length > 0 ?
+			getBlockRootClientId( clientIds[ 0 ] ) :
+			undefined;
+
+		const groupingBlockAvailable = canInsertBlockType( groupingBlockName, rootClientId );
 
 		const blocksSelection = getBlocksByClientId( clientIds );
 

@@ -1,8 +1,10 @@
-.wp-block-gallery {
+.wp-block-gallery,
+.blocks-gallery-grid {
 	display: flex;
 	flex-wrap: wrap;
 	list-style-type: none;
 	padding: 0;
+	margin-bottom: 0;
 
 	.blocks-gallery-image,
 	.blocks-gallery-item {
@@ -147,4 +149,9 @@
 			justify-content: center;
 		}
 	}
+}
+
+figure.wp-block-gallery {
+	display: block;
+	margin: 0;
 }

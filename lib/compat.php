@@ -94,8 +94,8 @@ function gutenberg_provide_render_callback_with_block_object( $pre_render, $bloc
 	if ( $is_dynamic ) {
 		$global_post = $post;
 
-		$block_type->prepare_attributes_for_render( $block['attrs'] );
-		$block_content = (string) call_user_func( $block_type->render_callback, $block['attrs'], $block_content, $block );
+		$prepared_attributes = $block_type->prepare_attributes_for_render( $block['attrs'] );
+		$block_content       = (string) call_user_func( $block_type->render_callback, $prepared_attributes, $block_content, $block );
 
 		$post = $global_post;
 	}

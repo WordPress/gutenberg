@@ -15,6 +15,7 @@ import {
 	saving,
 	reusableBlocks,
 	postSavingLock,
+	postAutosavingLock,
 } from '../reducer';
 
 describe( 'state', () => {
@@ -483,6 +484,51 @@ describe( 'state', () => {
 
 			state = postSavingLock( deepFreeze( state ), {
 				type: 'UNLOCK_POST_SAVING',
+				lockName: 'test-lock-2',
+			} );
+
+			expect( state ).toEqual( {} );
+		} );
+	} );
+
+	describe( 'postAutosavingLock', () => {
+		it( 'returns empty object by default', () => {
+			const state = postAutosavingLock( undefined, {} );
+
+			expect( state ).toEqual( {} );
+		} );
+
+		it( 'returns correct post locks when locks added and removed', () => {
+			let state = postAutosavingLock( undefined, {
+				type: 'LOCK_POST_AUTOSAVING',
+				lockName: 'test-lock',
+			} );
+
+			expect( state ).toEqual( {
+				'test-lock': true,
+			} );
+
+			state = postAutosavingLock( deepFreeze( state ), {
+				type: 'LOCK_POST_AUTOSAVING',
+				lockName: 'test-lock-2',
+			} );
+
+			expect( state ).toEqual( {
+				'test-lock': true,
+				'test-lock-2': true,
+			} );
+
+			state = postAutosavingLock( deepFreeze( state ), {
+				type: 'UNLOCK_POST_AUTOSAVING',
+				lockName: 'test-lock',
+			} );
+
+			expect( state ).toEqual( {
+				'test-lock-2': true,
+			} );
+
+			state = postAutosavingLock( deepFreeze( state ), {
+				type: 'UNLOCK_POST_AUTOSAVING',
 				lockName: 'test-lock-2',
 			} );
 
