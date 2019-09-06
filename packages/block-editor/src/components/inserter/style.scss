@@ -51,7 +51,7 @@ $block-inserter-search-height: 38px;
 }
 
 .block-editor-inserter__main-area {
-	width: auto;
+	width: 100%;
 	display: flex;
 	flex-direction: column;
 	height: 100%;
@@ -90,9 +90,7 @@ $block-inserter-search-height: 38px;
 
 .block-editor-inserter__results {
 	display: flex;
-	flex-wrap: wrap;
-	align-items: center;
-	justify-content: center;
+	flex-direction: column;
 	flex-grow: 1;
 	overflow: auto;
 	position: relative;
@@ -134,6 +132,7 @@ $block-inserter-search-height: 38px;
 	padding: 24px;
 	text-align: center;
 	color: $dark-gray-500;
+	margin: auto;
 
 	&::before {
 		content: "?";
