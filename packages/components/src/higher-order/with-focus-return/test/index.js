@@ -51,11 +51,18 @@ describe( 'withFocusReturn()', () => {
 			expect( wrappedElementShallow.children[ 0 ].type ).toBe( 'textarea' );
 		} );
 
-		it( 'should pass additional props through to the wrapped element', () => {
+		it( 'should pass own props through to the wrapped element', () => {
 			const renderedComposite = renderer.create( <Composite test="test" /> );
 			const wrappedElement = renderedComposite.root.findByType( Test );
 			// Ensure that the wrapped Test element has the appropriate props.
 			expect( wrappedElement.props.test ).toBe( 'test' );
+		} );
+
+		it( 'should not pass any withFocusReturn context props through to the wrapped element', () => {
+			const renderedComposite = renderer.create( <Composite test="test" /> );
+			const wrappedElement = renderedComposite.root.findByType( Test );
+			// Ensure that the wrapped Test element has the appropriate props.
+			expect( wrappedElement.props.focusHistory ).toBeUndefined();
 		} );
 
 		it( 'should not switch focus back to the bound focus element', () => {
