@@ -91,6 +91,7 @@ $block-inserter-search-height: 38px;
 .block-editor-inserter__results {
 	display: flex;
 	flex-direction: column;
+	align-items: center;
 	flex-grow: 1;
 	overflow: auto;
 	position: relative;
