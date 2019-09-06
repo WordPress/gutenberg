@@ -51,7 +51,7 @@ const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
 							<input type="text"
 								value={ url }
 								onChange={ ( event ) => setAttributes( { url: event.target.value } ) }
-								placeholder={ __( 'Enter Address or Profile' ) }
+								placeholder={ __( 'Enter Address' ) }
 							/>
 						</div>
 						<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
