@@ -233,10 +233,11 @@ class WritingFlow extends Component {
 		}
 
 		// Search around the caret, taking up to 10 steps in either direction horizontally before giving up.
+		const HORIZONTAL_SEARCH_COUNT = 30;
 		const width = targetRight - targetLeft;
-		const horizontalIncrement = width / 10;
+		const horizontalIncrement = width / HORIZONTAL_SEARCH_COUNT;
 
-		for ( let searches = 1; searches <= 10; searches++ ) {
+		for ( let searches = 1; searches <= HORIZONTAL_SEARCH_COUNT; searches++ ) {
 			const positionToRightOfCaret = xPosition + ( horizontalIncrement * searches );
 			if ( positionToRightOfCaret <= targetRight ) {
 				tabbable = searchVerticallyForTabbableTextField( positionToRightOfCaret, startYPosition, verticalIncrement );
