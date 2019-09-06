@@ -36,6 +36,7 @@ import {
 } from '@wordpress/block-editor';
 import { Component, createRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -105,6 +106,8 @@ class CoverEdit extends Component {
 			noticeUI,
 			overlayColor,
 			setOverlayColor,
+			onResizeStart,
+			onResizeStop,
 		} = this.props;
 		const {
 			backgroundType,
@@ -348,7 +351,9 @@ class CoverEdit extends Component {
 						bottomLeft: false,
 						topLeft: false,
 					} }
+					onResizeStart={ onResizeStart }
 					onResizeStop={ ( event, direction, elt, delta ) => {
+						onResizeStop();
 						const coverHeight = parseInt( minHeight + delta.height, 10 );
 						this.setState( { coverMinHeight: coverHeight } );
 						setAttributes( {
@@ -460,6 +465,14 @@ class CoverEdit extends Component {
 }
 
 export default compose( [
+	withDispatch( ( dispatch ) => {
+		const { toggleSelection } = dispatch( 'core/block-editor' );
+
+		return {
+			onResizeStart: () => toggleSelection( false ),
+			onResizeStop: () => toggleSelection( true ),
+		};
+	} ),
 	withColors( { overlayColor: 'background-color' } ),
 	withNotices,
 	withInstanceId,
