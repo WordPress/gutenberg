@@ -73,6 +73,49 @@ function retrieveFastAverageColor() {
 	return retrieveFastAverageColor.fastAverageColor;
 }
 
+const CoverHeightInput = withInstanceId(
+	function( { value = '', instanceId, onChange } ) {
+		const [ temporaryInput, setTemporaryInput ] = useState( null );
+		const onChangeEvent = useCallback(
+			( event ) => {
+				const unprocessedValue = event.target.value;
+				const inputValue = unprocessedValue !== '' ?
+					parseInt( event.target.value, 10 ) :
+					undefined;
+				if ( ( isNaN( inputValue ) || inputValue < COVER_MIN_HEIGHT ) && inputValue !== undefined ) {
+					setTemporaryInput( event.target.value );
+					return;
+				}
+				setTemporaryInput( null );
+				onChange( inputValue );
+			},
+			[ onChange, setTemporaryInput ]
+		);
+		const onBlurEvent = useCallback(
+			() => {
+				if ( temporaryInput !== null ) {
+					setTemporaryInput( null );
+				}
+			},
+			[ temporaryInput, setTemporaryInput ]
+		);
+		const inputId = `block-cover-height-input-${ instanceId }`;
+		return (
+			<BaseControl label={ __( 'Height in pixels' ) } id={ inputId }>
+				<input
+					type="number"
+					id={ inputId }
+					onChange={ onChangeEvent }
+					onBlur={ onBlurEvent }
+					value={ temporaryInput !== null ? temporaryInput : value }
+					min={ COVER_MIN_HEIGHT }
+					step="10"
+				/>
+			</BaseControl>
+		);
+	}
+);
+
 const RESIZABLE_BOX_ENABLE_OPTION = {
 	top: false,
 	right: false,
@@ -94,14 +137,17 @@ function ResizableCover( {
 	const onResizeEvent = useCallback(
 		( event, direction, elt ) => {
 			onResize( elt.clientHeight );
+			if ( ! isResizing ) {
+				setIsResizing( true );
+			}
 		},
-		[ onResize ],
+		[ onResize, setIsResizing ],
 	);
 	const onResizeStartEvent = useCallback(
-		() => {
-			setIsResizing( true );
+		( event, direction, elt ) => {
+			onResize( elt.clientHeight );
 		},
-		[ setIsResizing ]
+		[ onResize ]
 	);
 	const onResizeStopEvent = useCallback(
 		( event, direction, elt ) => {
@@ -159,7 +205,6 @@ class CoverEdit extends Component {
 
 	render() {
 		const {
-			instanceId,
 			attributes,
 			setAttributes,
 			isSelected,
@@ -230,13 +275,13 @@ class CoverEdit extends Component {
 					{}
 			),
 			backgroundColor: overlayColor.color,
-			minHeight: ( temporaryMinHeight || minHeight ) + 'px',
+			minHeight: ( temporaryMinHeight || minHeight ),
 		};
 
 		if ( focalPoint ) {
 			style.backgroundPosition = `${ focalPoint.x * 100 }% ${ focalPoint.y * 100 }%`;
 		}
-		const inputId = `block-cover-height-input-${ instanceId }`;
+
 		const controls = (
 			<>
 				<BlockControls>
@@ -280,27 +325,16 @@ class CoverEdit extends Component {
 									onChange={ ( value ) => setAttributes( { focalPoint: value } ) }
 								/>
 							) }
-							<BaseControl label={ __( 'Height in pixels' ) } id={ inputId }>
-								<input
-									type="number"
-									id={ inputId }
-									onChange={ ( event ) => {
-										const coverMinHeight = parseInt( event.target.value, 10 );
-										if ( isNaN( coverMinHeight ) ) {
-											setAttributes( { minHeight: undefined } );
-											return;
-										}
+							<CoverHeightInput
+								value={ temporaryMinHeight || minHeight }
+								onChange={
+									( value ) => {
 										setAttributes( {
-											minHeight: coverMinHeight > COVER_MIN_HEIGHT ?
-												coverMinHeight :
-												COVER_MIN_HEIGHT,
+											minHeight: value,
 										} );
-									} }
-									value={ temporaryMinHeight || minHeight }
-									min={ COVER_MIN_HEIGHT }
-									step="10"
-								/>
-							</BaseControl>
+									}
+								}
+							/>
 							<PanelRow>
 								<Button
 									isDefault
