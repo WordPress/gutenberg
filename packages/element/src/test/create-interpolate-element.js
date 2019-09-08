@@ -16,7 +16,7 @@ describe( 'createInterpolateElement', () => {
 		expect(
 			createInterpolateElement(
 				testString,
-				[ [ '%1$s', { value: 10 } ] ]
+				{ '%1$s': { value: 10 } }
 			)
 		).toEqual( <Fragment>{ testString }</Fragment> );
 	} );
@@ -25,7 +25,7 @@ describe( 'createInterpolateElement', () => {
 		expect(
 			createInterpolateElement(
 				testString,
-				[ '%1$s', { value: 10 } ],
+				{ '%1$s': { value: 10 } },
 			)
 		).toEqual( <Fragment>{ testString }</Fragment> );
 	} );
@@ -34,7 +34,7 @@ describe( 'createInterpolateElement', () => {
 		expect(
 			createInterpolateElement(
 				testString,
-				[ [ '%2$s', { value: 20 } ] ]
+				{ '%2$s': { value: 20 } }
 			)
 		).toEqual( <Fragment>{ testString }</Fragment> );
 	} );
@@ -55,16 +55,13 @@ describe( 'createInterpolateElement', () => {
 		);
 		expect( createInterpolateElement(
 			testString,
-			[
-				[
-					'a%1',
-					{
-						tag: 'a',
-						props: { href: 'https://github.com', className: 'some_class' },
-						hasChildren: true,
-					},
-				],
-			]
+			{
+				'a%1': {
+					tag: 'a',
+					props: { href: 'https://github.com', className: 'some_class' },
+					hasChildren: true,
+				},
+			}
 		) ).toEqual( expectedElement );
 	} );
 	it( 'returns expected react element for nested components', () => {
@@ -91,10 +88,10 @@ describe( 'createInterpolateElement', () => {
 		);
 		expect( createInterpolateElement(
 			testString,
-			[
-				[ 'a1', { tag: 'a', props: {}, hasChildren: true } ],
-				[ 'em1', { tag: 'em', props: {}, hasChildren: true } ],
-			]
+			{
+				a1: { tag: 'a', props: {}, hasChildren: true },
+				em1: { tag: 'em', props: {}, hasChildren: true },
+			}
 		) ).toEqual( expectedElement );
 	} );
 	it( 'returns a value for a prop value type token replacement', () => {
@@ -109,7 +106,7 @@ describe( 'createInterpolateElement', () => {
 		);
 		expect( createInterpolateElement(
 			testString,
-			[ [ '%1$s', { value: 10 } ] ],
+			{ '%1$s': { value: 10 } }
 		) ).toEqual( expectedElement );
 	} );
 	it( 'returns expected output for a custom component with children ' +
@@ -132,9 +129,9 @@ describe( 'createInterpolateElement', () => {
 		);
 		expect( createInterpolateElement(
 			testString,
-			[
-				[ 'span1', { tag: TestComponent, props: {}, hasChildren: true } ],
-			]
+			{
+				span1: { tag: TestComponent, props: {}, hasChildren: true },
+			}
 		) ).toEqual( expectedElement );
 	} );
 	it( 'returns expected output for self closing custom component', () => {
@@ -155,9 +152,9 @@ describe( 'createInterpolateElement', () => {
 		);
 		expect( createInterpolateElement(
 			testString,
-			[
-				[ 'span1', { tag: TestComponent, props: {}, hasChildren: false } ],
-			]
+			{
+				span1: { tag: TestComponent, props: {}, hasChildren: false },
+			}
 		) ).toEqual( expectedElement );
 	} );
 	it( 'returns expected output for complex replacement', () => {
@@ -196,13 +193,13 @@ describe( 'createInterpolateElement', () => {
 		);
 		expect( JSON.stringify( createInterpolateElement(
 			testString,
-			[
-				[ '%1$s', { value: 'concrete' } ],
-				[ 'a1', { tag: 'a', props: {}, hasChildren: true } ],
-				[ 'em1', { tag: 'em', props: {}, hasChildren: true } ],
-				[ '%2$s', { value: 'value' } ],
-				[ '%3$s', { value: <TestComponent /> } ],
-			]
+			{
+				'%1$s': { value: 'concrete' },
+				a1: { tag: 'a', props: {}, hasChildren: true },
+				em1: { tag: 'em', props: {}, hasChildren: true },
+				'%2$s': { value: 'value' },
+				'%3$s': { value: <TestComponent /> },
+			}
 		) ) ).toEqual( JSON.stringify( expectedElement ) );
 	} );
 	// test complex multi types replacements.

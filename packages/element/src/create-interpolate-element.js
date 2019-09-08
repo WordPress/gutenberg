@@ -193,16 +193,16 @@ const recursiveCreateElement = ( potentialElement, conversionMap ) => {
  * You would have something like this as the conversionMap value:
  *
  * ```js
- * [
- *     [ 'span%1', { tag: CustomComponent, props: {}, hasChildren: true } ],
- *     [ 'a%1', { tag: 'a', props: { href: 'https://github.com' }, hasChildren: true } ],
- *     [ '%1$s', { tag: CustomComponentB, props: {}, hasChildren: false } ],
- *     [ '%2$s', { value: 'custom value' } ]
- * ]
+ * {
+ *     'span%1': { tag: CustomComponent, props: {}, hasChildren: true },
+ *     'a%1': { tag: 'a', props: { href: 'https://github.com' }, hasChildren: true },
+ *     '%1$s': { tag: CustomComponentB, props: {}, hasChildren: false },
+ *     '%2$s': { value: 'custom value' },
+ * }
  * ```
  *
  * @param {string}  interpolatedString  The interpolation string to be parsed.
- * @param {Array[]} conversionMap       The map used to convert the string to
+ * @param {Object} conversionMap        The map used to convert the string to
  *                                      a react element.
  *
  * @return {Element}  A react element.
@@ -212,7 +212,10 @@ const createInterpolateElement = ( interpolatedString, conversionMap ) => {
 	return createElement(
 		Fragment,
 		{},
-		recursiveCreateElement( interpolatedString, conversionMap )
+		recursiveCreateElement(
+			interpolatedString,
+			Object.entries( conversionMap )
+		)
 	);
 };
 
