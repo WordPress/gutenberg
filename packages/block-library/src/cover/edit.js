@@ -360,7 +360,7 @@ class CoverEdit extends Component {
 					) }
 					{ ( url || overlayColor.color ) && (
 						<>
-							<PanelBody title={ __( 'Size' ) }>
+							<PanelBody title={ __( 'Dimensions' ) }>
 								<BaseControl label={ __( 'Height in pixels' ) } id={ inputId }>
 									<input
 										type="number"
