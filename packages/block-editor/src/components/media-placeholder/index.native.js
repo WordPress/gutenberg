@@ -26,7 +26,7 @@ function MediaPlaceholder( props ) {
 		icon,
 		onSelect,
 		isAppender,
-		showMediaSelectionUI,
+		disableMediaSelection,
 		theme,
 	} = props;
 
@@ -78,7 +78,7 @@ function MediaPlaceholder( props ) {
 					</Text>
 				</>
 			);
-		} else if ( isAppender && showMediaSelectionUI ) {
+		} else if ( isAppender && disableMediaSelection ) {
 			return (
 				<Dashicon
 					icon="plus-alt"
@@ -90,7 +90,7 @@ function MediaPlaceholder( props ) {
 		}
 	};
 
-	if ( isAppender && ! showMediaSelectionUI ) {
+	if ( isAppender && ! disableMediaSelection ) {
 		return null;
 	}
 

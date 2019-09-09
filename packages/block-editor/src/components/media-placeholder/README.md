@@ -87,7 +87,7 @@ If false the default placeholder style is used.
 - Default: `false`
 - Platform: Web | Mobile
 
-### showMediaSelectionUI
+### disableMediaSelection
 
 Whether render a dropzone/placholder without any other additional UI.
 
