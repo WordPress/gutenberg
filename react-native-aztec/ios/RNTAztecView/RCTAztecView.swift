@@ -245,14 +245,23 @@ class RCTAztecView: Aztec.TextView {
     }
     
     override func paste(_ sender: Any?) {
-        let start = selectedRange.location
-        let end = selectedRange.location + selectedRange.length
-        
         let pasteboard = UIPasteboard.general
         let text = readText(from: pasteboard) ?? ""
         let html = readHTML(from: pasteboard) ?? ""
         let imagesURLs = readImages(from: pasteboard)
+        sendPasteCallback(text: text, html: html, imagesURLs: imagesURLs);
+    }
 
+    override func pasteWithoutFormatting(_ sender: Any?) {
+        let pasteboard = UIPasteboard.general
+        let text = readText(from: pasteboard) ?? ""
+        let imagesURLs = readImages(from: pasteboard)
+        sendPasteCallback(text: text, html: "", imagesURLs: imagesURLs);
+    }
+
+    private func sendPasteCallback(text: String, html: String, imagesURLs: [String]) {
+        let start = selectedRange.location
+        let end = selectedRange.location + selectedRange.length
         onPaste?([
             "currentContent": cleanHTML(),
             "selectionStart": start,
