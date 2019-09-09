@@ -26,6 +26,7 @@ describe( 'new editor state', () => {
 			},
 		] );
 		await visitAdminPage( 'post-new.php', 'gutenberg-demo' );
+		expect( console ).toHaveWarned();
 	} );
 
 	it( 'content should load without making the post dirty', async () => {
@@ -33,6 +34,7 @@ describe( 'new editor state', () => {
 			const { select } = window.wp.data;
 			return select( 'core/editor' ).isEditedPostDirty();
 		} );
+
 		expect( isDirty ).toBeFalsy();
 	} );
 

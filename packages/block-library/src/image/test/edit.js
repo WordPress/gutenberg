@@ -27,6 +27,9 @@ describe( 'core/image/edit', () => {
 				url: 'http://www.example.com/myimage.jpeg',
 				alt: 'alt2',
 			} );
+
+			expect( console ).toHaveWarned();
+
 			expect( setAttributes ).toHaveBeenCalledWith( {
 				id: 1,
 				url: 'http://www.example.com/myimage.jpeg',

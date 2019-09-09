@@ -114,6 +114,7 @@ describe( 'Block transforms', () => {
 			await setPostContent( '' );
 			await page.click( '.editor-post-title .editor-post-title__block' );
 		}
+		expect( console ).toHaveWarned();
 	} );
 
 	it( 'should contain the expected transforms', async () => {
