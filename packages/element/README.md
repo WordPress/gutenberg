@@ -154,18 +154,18 @@ For example, for the given string:
 You would have something like this as the conversionMap value:
 
 ```js
-[
-    [ 'span%1', { tag: CustomComponent, props: {}, hasChildren: true } ],
-    [ 'a%1', { tag: 'a', props: { href: 'https://github.com' }, hasChildren: true } ],
-    [ '%1$s', { tag: CustomComponentB, props: {}, hasChildren: false } ],
-    [ '%2$s', { value: 'custom value' } ]
-]
+{
+    'span%1': { tag: CustomComponent, props: {}, hasChildren: true },
+    'a%1': { tag: 'a', props: { href: 'https://github.com' }, hasChildren: true },
+    '%1$s': { tag: CustomComponentB, props: {}, hasChildren: false },
+    '%2$s': { value: 'custom value' },
+}
 ```
 
 _Parameters_
 
 -   _interpolatedString_ `string`: The interpolation string to be parsed.
--   _conversionMap_ `Array<Array>`: The map used to convert the string to a react element.
+-   _conversionMap_ `Object`: The map used to convert the string to a react element.
 
 _Returns_
 

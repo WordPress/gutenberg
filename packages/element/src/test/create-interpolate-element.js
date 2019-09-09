@@ -25,7 +25,7 @@ describe( 'createInterpolateElement', () => {
 		expect(
 			createInterpolateElement(
 				testString,
-				{ '%1$s': { value: 10 } },
+				[ '%1$s', { value: 10 } ],
 			)
 		).toEqual( <Fragment>{ testString }</Fragment> );
 	} );
@@ -59,7 +59,6 @@ describe( 'createInterpolateElement', () => {
 				'a%1': {
 					tag: 'a',
 					props: { href: 'https://github.com', className: 'some_class' },
-					hasChildren: true,
 				},
 			}
 		) ).toEqual( expectedElement );
@@ -89,8 +88,8 @@ describe( 'createInterpolateElement', () => {
 		expect( createInterpolateElement(
 			testString,
 			{
-				a1: { tag: 'a', props: {}, hasChildren: true },
-				em1: { tag: 'em', props: {}, hasChildren: true },
+				a1: { tag: 'a', props: {} },
+				em1: { tag: 'em', props: {} },
 			}
 		) ).toEqual( expectedElement );
 	} );
@@ -130,7 +129,7 @@ describe( 'createInterpolateElement', () => {
 		expect( createInterpolateElement(
 			testString,
 			{
-				span1: { tag: TestComponent, props: {}, hasChildren: true },
+				span1: { tag: TestComponent, props: {} },
 			}
 		) ).toEqual( expectedElement );
 	} );
@@ -153,7 +152,7 @@ describe( 'createInterpolateElement', () => {
 		expect( createInterpolateElement(
 			testString,
 			{
-				span1: { tag: TestComponent, props: {}, hasChildren: false },
+				span1: { tag: TestComponent, props: {} },
 			}
 		) ).toEqual( expectedElement );
 	} );
@@ -195,8 +194,8 @@ describe( 'createInterpolateElement', () => {
 			testString,
 			{
 				'%1$s': { value: 'concrete' },
-				a1: { tag: 'a', props: {}, hasChildren: true },
-				em1: { tag: 'em', props: {}, hasChildren: true },
+				a1: { tag: 'a', props: {} },
+				em1: { tag: 'em', props: {} },
 				'%2$s': { value: 'value' },
 				'%3$s': { value: <TestComponent /> },
 			}

@@ -41,25 +41,27 @@ export const getTagsFromString = ( tagString ) => {
 };
 
 /**
- * Generates and returns the regular expression for the given arguments.
+ * Generates and returns the regular expression for the given type.
  *
+ * @param {Array}		tags          Array of tags to use for the reg ex
  * @param {string}  searchString  The search string serving as the base for the
  *                                expression.
- * @param {boolean} hasChildren   Whether the interpolation item has children.
- * @param {boolean} hasPropValue  Whether the interpolation item represents a
- *                                prop value.
+ * @param {string}	type					What type of regEx to return.
  *
  * @return {RegExp}  The generated regular expression.
  */
-const getRegEx = ( searchString, hasChildren, hasPropValue ) => {
+const getRegEx = ( tags, searchString, type ) => {
 	let pattern;
-	const [ openTag, closeTag, selfClosingTag ] = getTagsFromString( searchString );
-	if ( hasChildren ) {
-		pattern = escapeRegExp( openTag ) + '(.*)' + escapeRegExp( closeTag );
-	} else if ( hasPropValue ) {
-		pattern = escapeRegExp( searchString );
-	} else {
-		pattern = escapeRegExp( selfClosingTag );
+	const [ openTag, closeTag, selfClosingTag ] = tags;
+	switch ( type ) {
+		case 'children':
+			pattern = escapeRegExp( openTag ) + '(.*)' + escapeRegExp( closeTag );
+			break;
+		case 'propValue':
+			pattern = escapeRegExp( searchString );
+			break;
+		default:
+			pattern = escapeRegExp( selfClosingTag );
 	}
 	return new RegExp( pattern );
 };
@@ -90,11 +92,19 @@ const getMatchFromString = (
 	searchString,
 	conversionConfig
 ) => {
-	const regEx = getRegEx(
-		searchString,
-		getHasChildren( conversionConfig ),
-		getHasPropValue( conversionConfig )
+	const tags = getTagsFromString( searchString );
+	// first try children reg ex.  If there is a match, then return.
+	const match = interpolatedString.match(
+		getRegEx( tags, searchString, 'children' )
 	);
+	if ( match !== null ) {
+		conversionConfig.hasChildren = true;
+		return match;
+	}
+	// no children, try matching on another pattern and return.
+	const regEx = getHasPropValue( conversionConfig ) ?
+		getRegEx( tags, searchString, 'propValue' ) :
+		getRegEx( tags, searchString );
 	return interpolatedString.match( regEx );
 };
 
@@ -194,9 +204,9 @@ const recursiveCreateElement = ( potentialElement, conversionMap ) => {
  *
  * ```js
  * {
- *     'span%1': { tag: CustomComponent, props: {}, hasChildren: true },
- *     'a%1': { tag: 'a', props: { href: 'https://github.com' }, hasChildren: true },
- *     '%1$s': { tag: CustomComponentB, props: {}, hasChildren: false },
+ *     'span%1': { tag: CustomComponent, props: {} },
+ *     'a%1': { tag: 'a', props: { href: 'https://github.com' } },
+ *     '%1$s': { tag: CustomComponentB, props: {} },
  *     '%2$s': { value: 'custom value' },
  * }
  * ```
