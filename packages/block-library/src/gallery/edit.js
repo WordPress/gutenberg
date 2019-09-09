@@ -37,7 +37,7 @@ import { withSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import GalleryImage from './gallery-image';
-import icon from './icon';
+import { icon } from './icons';
 import { defaultColumnsNumber, pickRelevantMediaFiles } from './shared';
 
 const MAX_COLUMNS = 8;

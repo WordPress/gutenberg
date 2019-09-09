@@ -87,7 +87,7 @@ describe( 'New User Experience (NUX)', () => {
 		expect( nuxTipElements ).toHaveLength( 0 );
 	} );
 
-	it( 'should enable tips when the "Enable tips" option is toggled on', async () => {
+	it( 'should enable tips when the "Tips" option is toggled on', async () => {
 		// Start by disabling tips.
 		await page.click( '.nux-dot-tip__disable' );
 
@@ -99,8 +99,8 @@ describe( 'New User Experience (NUX)', () => {
 		let areTipsEnabled = await getTipsEnabled( page );
 		expect( areTipsEnabled ).toEqual( false );
 
-		// Toggle the 'Enable Tips' option to enable.
-		await toggleScreenOption( 'Enable Tips' );
+		// Toggle the 'Tips' option to enable.
+		await toggleScreenOption( 'Tips' );
 
 		// Tips should once again appear.
 		nuxTipElements = await page.$$( '.nux-dot-tip' );
