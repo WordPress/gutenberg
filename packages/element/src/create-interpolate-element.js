@@ -31,7 +31,7 @@ const getHasChildren = ( config ) => !! config.hasChildren;
  *
  * @return {string[]} The generated tags for the given string.
  */
-export const getTagsFromString = ( tagString ) => {
+const getTagsFromString = ( tagString ) => {
 	return [
 		`<${ tagString }>`,
 		`</${ tagString }>`,
