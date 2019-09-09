@@ -1,12 +1,14 @@
+// Editor specific styles for Social Links.
+.wp-block-social-links {
+	div.editor-url-input {
+		display: inline-block;
+		margin-left: $grid-size;
+	}
 
-.wp-block-social-links div.editor-url-input {
-	display: inline-block;
-	margin-left: $grid-size;
-}
-
-.wp-block-social-links .editor-block-list__layout {
-	display: flex;
-	justify-content: flex-start;
+	.editor-block-list__layout {
+		display: flex;
+		justify-content: flex-start;
+	}
 }
 
 // Reduce the paddings, margins, and UI of inner-blocks.
@@ -45,12 +47,13 @@
 
 	// Hide the breadcrumb.
 	// Hide the mover.
+	// Hide the sibling inserter.
+	.block-editor-block-list__insertion-point,
 	.block-editor-block-list__breadcrumb,
 	.block-editor-block-mover.block-editor-block-mover { // Needs specificity.
 		display: none;
 	}
 }
-
 
 // Polish the Appender.
 .wp-block-social-links .block-list-appender {
@@ -109,17 +112,20 @@
 // Unconfigured placeholder links are semitransparent.
 .wp-social-link.wp-social-link__is-incomplete {
 	opacity: 0.5;
-
-	&:hover,
-	&:focus {
-		opacity: 1;
-	}
 }
 
-[data-type="core/social-links"] .wp-block.is-selected .wp-social-link,
-.wp-social-link:focus {
+.wp-block-social-links .is-selected .wp-social-link__is-incomplete,
+.wp-social-link.wp-social-link__is-incomplete:hover,
+.wp-social-link.wp-social-link__is-incomplete:focus {
 	opacity: 1;
-	box-shadow: 0 0 0 1px $white, 0 0 0 3px $blue-medium-500;
+}
+
+
+// Focus styles for the button inside the child block.
+// The child block itself has a more generic focus style, see line 55.
+[data-type="core/social-links"] .wp-social-link:focus { // This needs specificity.
+	opacity: 1;
+	box-shadow: 0 0 0 2px $white, 0 0 0 4px $blue-medium-focus;
 
 	// Windows High Contrast mode will show this outline, but not the box-shadow.
 	outline: 2px solid transparent;
