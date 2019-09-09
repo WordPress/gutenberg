@@ -12,7 +12,7 @@ import {
 	MEDIA_TYPE_IMAGE,
 	MEDIA_TYPE_VIDEO,
 } from '@wordpress/block-editor';
-import { Dashicon, withTheme, useStyle } from '@wordpress/components';
+import { Dashicon, withTheme } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -27,7 +27,7 @@ function MediaPlaceholder( props ) {
 		onSelect,
 		isAppender,
 		disableMediaSelection,
-		theme,
+		useStyle,
 	} = props;
 
 	const isOneType = allowedTypes.length === 1;
@@ -60,8 +60,8 @@ function MediaPlaceholder( props ) {
 		accessibilityHint = __( 'Double tap to select a video' );
 	}
 
-	const emptyStateContainerStyle = useStyle( styles.emptyStateContainer, styles.emptyStateContainerDark, theme );
-	const emptyStateTitleStyle = useStyle( styles.emptyStateTitle, styles.emptyStateTitleDark, theme );
+	const emptyStateContainerStyle = useStyle( styles.emptyStateContainer, styles.emptyStateContainerDark );
+	const emptyStateTitleStyle = useStyle( styles.emptyStateTitle, styles.emptyStateTitleDark );
 
 	const renderContent = () => {
 		if ( isAppender === undefined || ! isAppender ) {

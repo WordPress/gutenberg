@@ -14,7 +14,7 @@ import {
 } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withInstanceId, compose } from '@wordpress/compose';
-import { BottomSheet, Icon, withTheme, useStyle } from '@wordpress/components';
+import { BottomSheet, Icon, withTheme } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -61,11 +61,12 @@ export class InserterMenu extends Component {
 	}
 
 	render() {
+		const { useStyle } = this.props;
 		const numberOfColumns = this.calculateNumberOfColumns();
 		const bottomPadding = styles.contentBottomPadding;
-		const modalIconWrapperStyle = useStyle( styles.modalIconWrapper, styles.modalIconWrapperDark, this.props.theme );
-		const modalIconStyle = useStyle( styles.modalIcon, styles.modalIconDark, this.props.theme );
-		const modalItemLabelStyle = useStyle( styles.modalItemLabel, styles.modalItemLabelDark, this.props.theme );
+		const modalIconWrapperStyle = useStyle( styles.modalIconWrapper, styles.modalIconWrapperDark );
+		const modalIconStyle = useStyle( styles.modalIcon, styles.modalIconDark );
+		const modalItemLabelStyle = useStyle( styles.modalItemLabel, styles.modalItemLabelDark );
 
 		return (
 			<BottomSheet

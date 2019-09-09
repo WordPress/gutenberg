@@ -15,7 +15,7 @@ import { withInstanceId, compose } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { withTheme, useStyle } from '../dark-mode';
+import { withTheme } from '../dark-mode';
 import HTMLInputContainer from './container';
 import styles from './style.scss';
 
@@ -61,8 +61,9 @@ export class HTMLTextInput extends Component {
 	}
 
 	render() {
-		const htmlStyle = useStyle( styles.htmlView, styles.htmlViewDark, this.props.theme );
-		const placeholderStyle = useStyle( styles.placeholder, styles.placeholderDark, this.props.theme );
+		const { useStyle } = this.props;
+		const htmlStyle = useStyle( styles.htmlView, styles.htmlViewDark );
+		const placeholderStyle = useStyle( styles.placeholder, styles.placeholderDark );
 		return (
 			<HTMLInputContainer parentHeight={ this.props.parentHeight }>
 				<TextInput
