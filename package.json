@@ -1,6 +1,6 @@
 {
   "name": "gutenberg-mobile",
-  "version": "1.11.0",
+  "version": "1.12.0",
   "private": true,
   "config": {
     "jsfiles": "./*.js src/*.js src/**/*.js src/**/**/*.js",
@@ -33,6 +33,7 @@
     "eslint-plugin-react-native": "^3.6.0",
     "eslint-plugin-wordpress": "git://github.com/WordPress-Coding-Standards/eslint-plugin-wordpress.git#552af1454d175e15f6d25aadc2ccde30a1922d4f",
     "flow-bin": "0.92.0",
+    "husky": "^3.0.2",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^24.1.0",
     "jest-junit": "^6.3.0",
@@ -49,6 +50,11 @@
     "rungen": "^0.3.2",
     "sprintf-js": "^1.1.1",
     "wd": "^1.11.1"
+  },
+  "husky": {
+      "hooks": {
+          "pre-commit": "yarn prettier:check"
+      }
   },
   "scripts": {
     "start": "react-native start",
@@ -101,6 +107,7 @@
     "test:e2e:install-app:ios": "yarn test:e2e:build-app:ios",
     "flow": "flow",
     "prettier": "prettier-eslint --write $npm_package_config_jsfiles $npm_package_config_scssfiles",
+    "prettier:check": "prettier-eslint --list-different $npm_package_config_jsfiles $npm_package_config_scssfiles || { echo '\nERROR: `yarn prettier:check` found a formatting problem.\nNo files have been changed. Try running `yarn prettier` to fix any formatting issues.\n'; exit 1; }",
     "clean": "yarn clean:aztec; yarn cache clean; yarn clean:haste; yarn clean:jest; yarn clean:metro; yarn clean:react; yarn clean:watchman; yarn clean:node;",
     "clean:runtime": "yarn clean:haste; yarn clean:react; yarn clean:metro; yarn clean:jest; yarn clean:watchman; yarn clean:babel-cache",
     "clean:aztec": "cd react-native-aztec && yarn clean && cd example && yarn clean",
