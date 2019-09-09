@@ -8,6 +8,7 @@ import { parse } from 'url';
  * WordPress dependencies
  */
 import {
+	clickOnCloseModalButton,
 	createNewPost,
 	createURL,
 	publishPost,
@@ -78,7 +79,7 @@ async function toggleCustomFieldsOption( shouldBeChecked ) {
 		return;
 	}
 
-	await page.click( '.edit-post-options-modal button[aria-label="Close dialog"]' );
+	await clickOnCloseModalButton( '.edit-post-options-modal' );
 }
 
 describe( 'Preview', () => {
