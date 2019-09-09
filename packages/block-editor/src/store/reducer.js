@@ -942,6 +942,10 @@ const BLOCK_SELECTION_INITIAL_STATE = {
 export function blockSelection( state = BLOCK_SELECTION_INITIAL_STATE, action ) {
 	switch ( action.type ) {
 		case 'CLEAR_SELECTED_BLOCK':
+			if ( ! state.start || ! state.start.clientId ) {
+				return state;
+			}
+
 			return {
 				...state,
 				start: BLOCK_SELECTION_EMPTY_OBJECT,
@@ -1027,7 +1031,13 @@ export function blockSelection( state = BLOCK_SELECTION_INITIAL_STATE, action ) 
 			const blockToSelect = action.blocks[ indexToSelect ];
 
 			if ( ! blockToSelect ) {
-				return state;
+				return {
+					...state,
+					start: BLOCK_SELECTION_EMPTY_OBJECT,
+					end: BLOCK_SELECTION_EMPTY_OBJECT,
+					isMultiSelecting: false,
+					initialPosition: null,
+				};
 			}
 
 			if (
