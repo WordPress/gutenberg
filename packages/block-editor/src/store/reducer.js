@@ -942,7 +942,13 @@ const BLOCK_SELECTION_INITIAL_STATE = {
 export function blockSelection( state = BLOCK_SELECTION_INITIAL_STATE, action ) {
 	switch ( action.type ) {
 		case 'CLEAR_SELECTED_BLOCK':
-			return BLOCK_SELECTION_INITIAL_STATE;
+			return {
+				...state,
+				start: BLOCK_SELECTION_EMPTY_OBJECT,
+				end: BLOCK_SELECTION_EMPTY_OBJECT,
+				isMultiSelecting: false,
+				initialPosition: null,
+			};
 		case 'START_MULTI_SELECT':
 			if ( state.isMultiSelecting ) {
 				return state;
@@ -965,7 +971,7 @@ export function blockSelection( state = BLOCK_SELECTION_INITIAL_STATE, action ) 
 			};
 		case 'MULTI_SELECT':
 			return {
-				...BLOCK_SELECTION_INITIAL_STATE,
+				...state,
 				isMultiSelecting: state.isMultiSelecting,
 				start: { clientId: action.start },
 				end: { clientId: action.end },
@@ -979,7 +985,7 @@ export function blockSelection( state = BLOCK_SELECTION_INITIAL_STATE, action ) 
 			}
 
 			return {
-				...BLOCK_SELECTION_INITIAL_STATE,
+				...state,
 				initialPosition: action.initialPosition,
 				start: { clientId: action.clientId },
 				end: { clientId: action.clientId },
@@ -988,7 +994,7 @@ export function blockSelection( state = BLOCK_SELECTION_INITIAL_STATE, action ) 
 		case 'INSERT_BLOCKS': {
 			if ( action.updateSelection ) {
 				return {
-					...BLOCK_SELECTION_INITIAL_STATE,
+					...state,
 					start: { clientId: action.blocks[ 0 ].clientId },
 					end: { clientId: action.blocks[ 0 ].clientId },
 				};
@@ -1005,7 +1011,13 @@ export function blockSelection( state = BLOCK_SELECTION_INITIAL_STATE, action ) 
 				return state;
 			}
 
-			return BLOCK_SELECTION_INITIAL_STATE;
+			return {
+				...state,
+				start: BLOCK_SELECTION_EMPTY_OBJECT,
+				end: BLOCK_SELECTION_EMPTY_OBJECT,
+				isMultiSelecting: false,
+				initialPosition: null,
+			};
 		case 'REPLACE_BLOCKS': {
 			if ( action.clientIds.indexOf( state.start.clientId ) === -1 ) {
 				return state;
@@ -1015,7 +1027,7 @@ export function blockSelection( state = BLOCK_SELECTION_INITIAL_STATE, action ) 
 			const blockToSelect = action.blocks[ indexToSelect ];
 
 			if ( ! blockToSelect ) {
-				return BLOCK_SELECTION_INITIAL_STATE;
+				return state;
 			}
 
 			if (
@@ -1026,19 +1038,19 @@ export function blockSelection( state = BLOCK_SELECTION_INITIAL_STATE, action ) 
 			}
 
 			return {
-				...BLOCK_SELECTION_INITIAL_STATE,
+				...state,
 				start: { clientId: blockToSelect.clientId },
 				end: { clientId: blockToSelect.clientId },
 			};
 		}
 		case 'TOGGLE_SELECTION':
 			return {
-				...BLOCK_SELECTION_INITIAL_STATE,
+				...state,
 				isEnabled: action.isSelectionEnabled,
 			};
 		case 'SELECTION_CHANGE':
 			return {
-				...BLOCK_SELECTION_INITIAL_STATE,
+				...state,
 				start: {
 					clientId: action.clientId,
 					attributeKey: action.attributeKey,
