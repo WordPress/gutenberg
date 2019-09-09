@@ -155,9 +155,9 @@ You would have something like this as the conversionMap value:
 
 ```js
 {
-    'span%1': { tag: CustomComponent, props: {}, hasChildren: true },
-    'a%1': { tag: 'a', props: { href: 'https://github.com' }, hasChildren: true },
-    '%1$s': { tag: CustomComponentB, props: {}, hasChildren: false },
+    'span%1': { tag: CustomComponent, props: {} },
+    'a%1': { tag: 'a', props: { href: 'https://github.com' } },
+    '%1$s': { tag: CustomComponentB, props: {} },
     '%2$s': { value: 'custom value' },
 }
 ```
