@@ -1,7 +1,7 @@
 
 .wp-block-social-links div.editor-url-input {
 	display: inline-block;
-	margin-left: 8px;
+	margin-left: $grid-size;
 }
 
 .wp-block-social-links .editor-block-list__layout {
@@ -96,7 +96,7 @@
 	transform-origin: center center;
 }
 
-[data-type="core/social-links"]:not(.is-selected):not(.has-child-selected):not(.is-hovered) {
+[data-type="core/social-links"]:not(.is-selected):not(.has-child-selected) {
 	.wp-social-link__is-incomplete {
 		opacity: 0;
 		transform: scale(0);
@@ -106,8 +106,21 @@
 	}
 }
 
-[data-type="core/social-links"]:not(.is-selected):not(.has-child-selected) {
-	.wp-social-link__is-incomplete {
-		opacity: 0.6;
+// Unconfigured placeholder links are semitransparent.
+.wp-social-link.wp-social-link__is-incomplete {
+	opacity: 0.5;
+
+	&:hover,
+	&:focus {
+		opacity: 1;
 	}
+}
+
+[data-type="core/social-links"] .wp-block.is-selected .wp-social-link,
+.wp-social-link:focus {
+	opacity: 1;
+	box-shadow: 0 0 0 1px $white, 0 0 0 3px $blue-medium-500;
+
+	// Windows High Contrast mode will show this outline, but not the box-shadow.
+	outline: 2px solid transparent;
 }
