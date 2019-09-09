@@ -115,6 +115,7 @@ describe( 'Sidebar', () => {
 		expect( await findSidebarPanelWithTitle( 'Featured Image' ) ).toBeDefined();
 		expect( await findSidebarPanelWithTitle( 'Excerpt' ) ).toBeDefined();
 		expect( await findSidebarPanelWithTitle( 'Discussion' ) ).toBeDefined();
+		expect( await findSidebarPanelWithTitle( 'Status & Visibility' ) ).toBeDefined();
 
 		await page.evaluate( () => {
 			const { removeEditorPanel } = wp.data.dispatch( 'core/edit-post' );
