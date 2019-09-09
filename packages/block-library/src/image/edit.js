@@ -45,7 +45,7 @@ import {
 	BACKSPACE,
 	ENTER,
 } from '@wordpress/keycodes';
-import { withSelect } from '@wordpress/data';
+import { withSelect, withDispatch } from '@wordpress/data';
 import {
 	BlockAlignmentToolbar,
 	BlockControls,
@@ -576,6 +576,8 @@ export class ImageEdit extends Component {
 			maxWidth,
 			noticeUI,
 			isRTL,
+			onResizeStart,
+			onResizeStop,
 		} = this.props;
 		const {
 			url,
@@ -891,7 +893,9 @@ export class ImageEdit extends Component {
 											bottom: true,
 											left: showLeftHandle,
 										} }
+										onResizeStart={ onResizeStart }
 										onResizeStop={ ( event, direction, elt, delta ) => {
+											onResizeStop();
 											setAttributes( {
 												width: parseInt( currentWidth + delta.width, 10 ),
 												height: parseInt( currentHeight + delta.height, 10 ),
@@ -924,6 +928,14 @@ export class ImageEdit extends Component {
 }
 
 export default compose( [
+	withDispatch( ( dispatch ) => {
+		const { toggleSelection } = dispatch( 'core/block-editor' );
+
+		return {
+			onResizeStart: () => toggleSelection( false ),
+			onResizeStop: () => toggleSelection( true ),
+		};
+	} ),
 	withSelect( ( select, props ) => {
 		const { getMedia } = select( 'core' );
 		const { getSettings } = select( 'core/block-editor' );
