@@ -14,7 +14,7 @@ import { default as VideoPlayer } from 'react-native-video';
 /**
  * Internal dependencies
  */
-import styles from './video-player.scss';
+import styles from './styles.scss';
 import PlayIcon from './gridicon-play';
 
 class Video extends Component {

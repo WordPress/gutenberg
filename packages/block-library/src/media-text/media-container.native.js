@@ -1,18 +1,26 @@
 /**
  * External dependencies
  */
-import { View, Image, ImageBackground } from 'react-native';
+import { Dimensions, View, ImageBackground } from 'react-native';
 
 /**
  * WordPress dependencies
  */
-import { IconButton, Toolbar, withNotices } from '@wordpress/components';
+import {
+	Icon,
+	IconButton,
+	Toolbar,
+	withNotices,
+} from '@wordpress/components';
 import {
 	BlockControls,
 	BlockIcon,
-	MediaPlaceholder,
 	MEDIA_TYPE_IMAGE,
+	MEDIA_TYPE_VIDEO,
+	MediaPlaceholder,
 	MediaUpload,
+	MediaUploadProgress,
+	VideoPlayer,
 } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -20,33 +28,30 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import styles from './style.scss';
 import icon from './media-container-icon';
 
-export function calculatePreferedImageSize( image, container ) {
-	const maxWidth = container.clientWidth;
-	const exceedMaxWidth = image.width > maxWidth;
-	const ratio = image.height / image.width;
-	const width = exceedMaxWidth ? maxWidth : image.width;
-	const height = exceedMaxWidth ? maxWidth * ratio : image.height;
-	return { width, height };
-}
+/**
+ * Constants
+ */
+const ALLOWED_MEDIA_TYPES = [ MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO ];
+// Default Video ratio 16:9
+const VIDEO_ASPECT_RATIO = 16 / 9;
+const VIDEO_EXTENSIONS = [ 'mp4', 'm4v', 'webm', 'ogv', 'flv' ];
 
 class MediaContainer extends Component {
 	constructor() {
 		super( ...arguments );
 		this.onUploadError = this.onUploadError.bind( this );
-		this.calculateSize = this.calculateSize.bind( this );
-		this.onLayout = this.onLayout.bind( this );
+		this.updateMediaProgress = this.updateMediaProgress.bind( this );
+		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind( this );
+		this.finishMediaUploadWithFailure = this.finishMediaUploadWithFailure.bind( this );
+		this.mediaUploadStateReset = this.mediaUploadStateReset.bind( this );
 		this.onSelectMediaUploadOption = this.onSelectMediaUploadOption.bind( this );
 
 		this.state = {
-			width: 0,
-			height: 0,
+			isUploadInProgress: false,
 		};
-
-		if ( this.props.mediaUrl ) {
-			this.onMediaChange();
-		}
 	}
 
 	onUploadError( message ) {
@@ -55,14 +60,25 @@ class MediaContainer extends Component {
 		noticeOperations.createErrorNotice( message );
 	}
 
-	onSelectMediaUploadOption( { id, url } ) {
+	onSelectMediaUploadOption( params ) {
+		const { id, url } = params;
 		const { onSelectMedia } = this.props;
 
+		console.log(params)
+
 		onSelectMedia( {
-			media_type: 'image',
 			id,
 			url,
 		} );
+	}
+
+
+	getIcon( isRetryIcon ) {
+		if ( isRetryIcon ) {
+			// return <Icon icon={ SvgIconRetry } { ...styles.iconRetry } />;
+		}
+
+		return <Icon icon={ icon } { ...styles.icon } />;
 	}
 
 	renderToolbarEditButton() {
@@ -72,88 +88,120 @@ class MediaContainer extends Component {
 				<Toolbar>
 					<MediaUpload
 						onSelect={ this.onSelectMediaUploadOption }
-						allowedTypes={ [ MEDIA_TYPE_IMAGE ] }
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
 						value={ mediaId }
-						render={ ( { open } ) => (
-							<IconButton
-								className="components-toolbar__control"
-								label={ __( 'Edit media' ) }
-								icon="edit"
-								onClick={ open }
-							/>
-						) }
+						render={ ( { open, getMediaOptions } ) => {
+							return <>
+								{ getMediaOptions() }
+								<IconButton
+									className="components-toolbar__control"
+									label={ __( 'Edit media' ) }
+									icon="edit"
+									onClick={ open }
+								/>
+							</>;
+						} }
 					/>
 				</Toolbar>
 			</BlockControls>
 		);
 	}
 
-	componentDidUpdate( prevProps ) {
-		if ( prevProps.mediaUrl !== this.props.mediaUrl ) {
-			this.onMediaChange();
+	updateMediaProgress( params ) {
+		console.log('Progress', params)
+		if ( ! this.state.isUploadInProgress ) {
+			this.setState( { isUploadInProgress: true } );
 		}
 	}
 
-	onMediaChange() {
-		const mediaType = this.props.mediaType;
-		if ( mediaType === 'video' ) {
+	finishMediaUploadWithSuccess( payload ) {
+		const { onMediaUpdate } = this.props;
 
-		} else if ( mediaType === 'image' ) {
-			Image.getSize( this.props.mediaUrl, ( width, height ) => {
-				this.media = { width, height };
-				this.calculateSize();
-			} );
-		}
+		console.log('Success', payload)
+
+		onMediaUpdate( {
+			id: payload.mediaServerId,
+			url: payload.mediaUrl,
+		} );
+		this.setState( { isUploadInProgress: false } );
 	}
 
-	calculateSize() {
-		if ( this.media === undefined || this.container === undefined ) {
-			return;
-		}
+	finishMediaUploadWithFailure( payload ) {
+		console.log('FAILURE')
+		// console.log(payload)
 
-		const { width, height } = calculatePreferedImageSize( this.media, this.container );
-		this.setState( { width, height } );
+		// const { onSelectMedia } = this.props;
+
+		// onSelectMedia( { mediaId: payload.mediaId } );
+		// this.setState( { isUploadInProgress: false } );
 	}
 
-	onLayout( event ) {
-		const { width, height } = event.nativeEvent.layout;
-		this.container = {
-			clientWidth: width,
-			clientHeight: height,
-		};
-		this.calculateSize();
+	mediaUploadStateReset() {
+		const { onSelectMedia } = this.props;
+		console.log('RESEt')
+
+		// onSelectMedia( { mediaId: null, mediaUrl: null } );
+		// this.setState( { isUploadInProgress: false } );
 	}
 
-	renderImage() {
+	renderImage( params ) {
+		const { isUploadInProgress } = this.state;
 		const { mediaAlt, mediaUrl } = this.props;
+		const { finalWidth, finalHeight, imageWidthWithinContainer } = params;
+		const opacity = isUploadInProgress ? 0.3 : 1;
 
 		return (
-			<View onLayout={ this.onLayout }>
+			<View style={ { flex: 1 } } >
+				{ ! imageWidthWithinContainer &&
+					<View style={ [ styles.imageContainer ] } >
+						{ this.getIcon( false ) }
+					</View> }
 				<ImageBackground
 					accessible={ true }
-					//disabled={ ! isSelected }
 					accessibilityLabel={ mediaAlt }
 					accessibilityHint={ __( 'Double tap and hold to edit' ) }
 					accessibilityRole={ 'imagebutton' }
-					style={ { width: this.state.width, height: this.state.height } }
+					style={ { width: finalWidth, height: finalHeight, opacity } }
 					resizeMethod="scale"
 					source={ { uri: mediaUrl } }
 					key={ mediaUrl }
-				>
-				</ImageBackground>
+				/>
 			</View>
 		);
 	}
 
-	renderVideo() {
-		const style = { videoContainer: {} };
+	renderVideo( params ) {
+		const { mediaUrl } = this.props;
+
+		const videoHeight = ( Dimensions.get( 'window' ).width / 2 ) / VIDEO_ASPECT_RATIO;
+
 		return (
-			<View onLayout={ this.onLayout }>
-				<View style={ style.videoContainer }>
-					{ /* TODO: show video preview */ }
-				</View>
+			<View style={ styles.videoContainer }>
+				<VideoPlayer
+					isSelected={ true }
+					style={ [ styles.video, { height: videoHeight } ] }
+					source={ { uri: mediaUrl } }
+					paused={ true }
+				/>
 			</View>
 		);
+	}
+
+	renderContent( params ) {
+		const { mediaType } = this.props;
+		let mediaElement = null;
+
+		console.log(this.props)
+
+		switch ( mediaType ) {
+			case 'image':
+				mediaElement = this.renderImage( params );
+				break;
+			case 'video':
+				mediaElement = this.renderVideo( params );
+				break;
+		}
+		return mediaElement;
 	}
 
 	renderPlaceholder() {
@@ -164,25 +212,35 @@ class MediaContainer extends Component {
 					title: __( 'Media area' ),
 				} }
 				onSelect={ this.onSelectMediaUploadOption }
-				allowedTypes={ [ MEDIA_TYPE_IMAGE ] }
+				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				onFocus={ this.props.onFocus }
 			/>
 		);
 	}
 
 	render() {
-		const { mediaUrl, mediaType } = this.props;
-		if ( mediaType && mediaUrl ) {
-			let mediaElement = null;
-			switch ( mediaType ) {
-				case 'image':
-					mediaElement = this.renderImage();
-					break;
-				case 'video':
-					mediaElement = this.renderVideo();
-					break;
-			}
-			return mediaElement;
+		const { mediaUrl, mediaType, mediaId } = this.props;
+
+		if ( mediaUrl ) {
+			return <>
+				{ this.renderToolbarEditButton() }
+
+				<MediaUploadProgress
+					coverUrl={ mediaUrl }
+					mediaId={ mediaId }
+					onUpdateMediaProgress={ this.updateMediaProgress }
+					onFinishMediaUploadWithSuccess={ this.finishMediaUploadWithSuccess }
+					onFinishMediaUploadWithFailure={ this.finishMediaUploadWithFailure }
+					onMediaUploadStateReset={ this.mediaUploadStateReset }
+					renderContent={ ( params ) => {
+						return (
+							<View style={ { flex: 1 } } >
+								{ this.renderContent( params ) }
+							</View>
+						);
+					} }
+				/>
+			</>;
 		}
 		return this.renderPlaceholder();
 	}

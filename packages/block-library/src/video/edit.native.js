@@ -6,7 +6,6 @@ import { View, TouchableWithoutFeedback, Text } from 'react-native';
 /**
  * Internal dependencies
  */
-import Video from './video-player';
 import {
 	mediaUploadSync,
 	requestImageFailedRetryDialog,
@@ -29,6 +28,8 @@ import {
 	MediaUploadProgress,
 	MEDIA_TYPE_VIDEO,
 	BlockControls,
+	InspectorControls,
+	VideoPlayer,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { isURL } from '@wordpress/url';
@@ -105,6 +106,7 @@ class VideoEdit extends React.Component {
 	}
 
 	updateMediaProgress( payload ) {
+		console.log(payload)
 		const { setAttributes } = this.props;
 		if ( payload.mediaUrl ) {
 			setAttributes( { url: payload.mediaUrl } );
@@ -116,6 +118,7 @@ class VideoEdit extends React.Component {
 
 	finishMediaUploadWithSuccess( payload ) {
 		const { setAttributes } = this.props;
+		console.log(payload)
 		setAttributes( { src: payload.mediaUrl, id: payload.mediaServerId } );
 		this.setState( { isUploadInProgress: false } );
 	}
@@ -134,6 +137,8 @@ class VideoEdit extends React.Component {
 
 	onSelectMediaUploadOption( { id, url } ) {
 		const { setAttributes } = this.props;
+
+		console.log( id, url)
 		setAttributes( { id, src: url } );
 	}
 
@@ -225,7 +230,7 @@ class VideoEdit extends React.Component {
 								<View onLayout={ this.onVideoContanerLayout } style={ containerStyle }>
 									{ showVideo &&
 										<View style={ style.videoContainer }>
-											<Video
+											<VideoPlayer
 												isSelected={ isSelected && ! this.state.isCaptionSelected }
 												style={ videoStyle }
 												source={ { uri: src } }

@@ -41,6 +41,7 @@ class MediaTextEdit extends Component {
 		super( ...arguments );
 
 		this.onSelectMedia = this.onSelectMedia.bind( this );
+		this.onMediaUpdate = this.onMediaUpdate.bind( this );
 		this.onWidthChange = this.onWidthChange.bind( this );
 		this.commitWidthChange = this.commitWidthChange.bind( this );
 		this.state = {
@@ -50,6 +51,9 @@ class MediaTextEdit extends Component {
 
 	onSelectMedia( media ) {
 		const { setAttributes } = this.props;
+
+		console.log('-----------media')
+		console.log(media)
 
 		let mediaType;
 		let src;
@@ -66,10 +70,19 @@ class MediaTextEdit extends Component {
 			mediaType = media.type;
 		}
 
-		if ( mediaType === 'image' ) {
+		if ( mediaType === 'image' && media.sizes ) {
 			// Try the "large" size URL, falling back to the "full" size URL below.
 			src = get( media, [ 'sizes', 'large', 'url' ] ) || get( media, [ 'media_details', 'sizes', 'large', 'source_url' ] );
 		}
+
+		console.log({
+			mediaAlt: media.alt,
+			mediaId: media.id,
+			mediaType,
+			mediaUrl: src || media.url,
+			imageFill: undefined,
+			focalPoint: undefined,
+		})
 
 		setAttributes( {
 			mediaAlt: media.alt,
@@ -78,6 +91,15 @@ class MediaTextEdit extends Component {
 			mediaUrl: src || media.url,
 			imageFill: undefined,
 			focalPoint: undefined,
+		} );
+	}
+
+	onMediaUpdate( media ) {
+		const { setAttributes } = this.props;
+
+		setAttributes( {
+			mediaId: media.id,
+			mediaUrl: media.url,
 		} );
 	}
 
@@ -105,6 +127,7 @@ class MediaTextEdit extends Component {
 		return (
 			<MediaContainer
 				onSelectMedia={ this.onSelectMedia }
+				onMediaUpdate={ this.onMediaUpdate }
 				onWidthChange={ this.onWidthChange }
 				commitWidthChange={ this.commitWidthChange }
 				onFocus={ this.props.onFocus }
