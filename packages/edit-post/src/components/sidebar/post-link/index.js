@@ -98,18 +98,20 @@ function PostLink( {
 			<p className="edit-post-post-link__preview-label">
 				{ postTypeLabel || __( 'View Post' ) }
 			</p>
-			<ExternalLink
-				className="edit-post-post-link__link"
-				href={ postLink }
-				target="_blank"
-			>
-				{ isEditable ?
-					( <>
-						{ prefixElement }{ postNameElement }{ suffixElement }
-					</> ) :
-					postLink
-				}
-			</ExternalLink>
+			<div className="edit-post-post-link__preview-link-container">
+				<ExternalLink
+					className="edit-post-post-link__link"
+					href={ postLink }
+					target="_blank"
+				>
+					{ isEditable ?
+						( <>
+							{ prefixElement }{ postNameElement }{ suffixElement }
+						</> ) :
+						postLink
+					}
+				</ExternalLink>
+			</div>
 		</PanelBody>
 	);
 }
