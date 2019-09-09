@@ -1,7 +1,6 @@
 /**
  * Internal dependencies
  */
-import { getTokenCount, resetTokenCount } from './token-count';
 import { createElement, Fragment, isValidElement } from './react';
 
 /**
@@ -108,14 +107,19 @@ const getMatchFromString = (
 	return interpolatedString.match( regEx );
 };
 
+// index for keys
+// This is external to `recursiveCreateElement` and reset in
+// `createInterpolateElement` because of the recursion.
+let keyIndex = -1;
+
 /**
  * Used to recursively create elements from the interpolation string using the
  * conversion map.
  *
- * @param {string} potentialElement  The interpolation string (or fragment)
- *                                   being processed.
- * @param {Array[]}conversionMap     The interpolation map used for converting
- *                                   the string to a react element.
+ * @param {string}  potentialElement  The interpolation string (or fragment)
+ *                                    being processed.
+ * @param {Array[]} conversionMap     The interpolation map used for converting
+ *                                    the string to a react element.
  *
  * @return {Element|string|Array}  A react element, string or array.
  */
@@ -129,7 +133,6 @@ const recursiveCreateElement = ( potentialElement, conversionMap ) => {
 	}
 	const [ mapItem ] = conversionMap.slice( 0, 1 );
 	const [ searchString, conversionConfig ] = mapItem;
-	let keyIndex;
 
 	/**
 	 * This short circuits the process if the conversion map has an invalid config.
@@ -161,12 +164,12 @@ const recursiveCreateElement = ( potentialElement, conversionMap ) => {
 			// if value is a react element, then need to wrap in Fragment with a key
 			// to prevent key warnings.
 			if ( isValidElement( conversionConfig.value ) ) {
-				keyIndex = getTokenCount( 'key' );
+				keyIndex++;
 				return <Fragment key={ keyIndex }>{ conversionConfig.value }</Fragment>;
 			}
 			return conversionConfig.value;
 		}
-		keyIndex = getTokenCount( 'key' );
+		keyIndex++;
 		return getHasChildren( conversionConfig ) ?
 			createElement(
 				conversionConfig.tag,
@@ -218,14 +221,14 @@ const recursiveCreateElement = ( potentialElement, conversionMap ) => {
  * @return {Element}  A react element.
  */
 const createInterpolateElement = ( interpolatedString, conversionMap ) => {
-	resetTokenCount();
+	keyIndex = -1;
 	return createElement(
 		Fragment,
 		{},
 		recursiveCreateElement(
 			interpolatedString,
 			Object.entries( conversionMap )
-		)
+		),
 	);
 };
 

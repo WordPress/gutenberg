@@ -47,7 +47,7 @@ describe( 'createInterpolateElement', () => {
 				'This is a string with ',
 				createElement(
 					'a',
-					{ href: 'https://github.com', className: 'some_class', key: 1 },
+					{ href: 'https://github.com', className: 'some_class', key: 0 },
 					'a link'
 				),
 				'.',
@@ -72,12 +72,12 @@ describe( 'createInterpolateElement', () => {
 				'This is a ',
 				createElement(
 					'a',
-					{ key: 1 },
+					{ key: 0 },
 					[
 						'string that is ',
 						createElement(
 							'em',
-							{ key: 2 },
+							{ key: 1 },
 							'linked'
 						),
 					]
@@ -121,7 +121,7 @@ describe( 'createInterpolateElement', () => {
 				'This is a string with a ',
 				createElement(
 					TestComponent,
-					{ key: 1 },
+					{ key: 0 },
 					'Custom Component'
 				),
 			]
@@ -145,7 +145,7 @@ describe( 'createInterpolateElement', () => {
 				'This is a string with a self closing custom component: ',
 				createElement(
 					TestComponent,
-					{ key: 1 }
+					{ key: 0 }
 				),
 			]
 		);
@@ -171,12 +171,12 @@ describe( 'createInterpolateElement', () => {
 				' value, with a ',
 				createElement(
 					'a',
-					{ key: 1 },
+					{ key: 0 },
 					[
 						'nested ',
 						createElement(
 							'em',
-							{ key: 2 },
+							{ key: 1 },
 							'value'
 						),
 						' link',
@@ -185,7 +185,7 @@ describe( 'createInterpolateElement', () => {
 				' and value: ',
 				createElement(
 					Fragment,
-					{ key: 3 },
+					{ key: 2 },
 					<TestComponent />,
 				),
 			]
