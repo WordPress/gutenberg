@@ -1,7 +1,7 @@
 # Resources
 
 ## Figma
-The [WordPress Design team](https://make.wordpress.org/design/) uses [Figma](https://www.figma.com/) to collaborate and share work. If you'd like to contribute, join the [#design channel](https://app.slack.com/client/T024MFP4J/C024MFP4Q) in [Slack](https://make.wordpress.org/chat/) and ask the team to set you up with a free Figma account. This will give you access to a helpful library of components used in WordPress. They are stable, fully supported, up to date, and ready for use in designs and prototypes. 
+The [WordPress Design team](https://make.wordpress.org/design/) uses [Figma](https://www.figma.com/) to collaborate and share work. If you'd like to contribute, join the [#design channel](https://app.slack.com/client/T024MFP4J/C02S78ZAL) in [Slack](https://make.wordpress.org/chat/) and ask the team to set you up with a free Figma account. This will give you access to a helpful library of components used in WordPress. They are stable, fully supported, up to date, and ready for use in designs and prototypes. 
 
 ### How to contribute
 
