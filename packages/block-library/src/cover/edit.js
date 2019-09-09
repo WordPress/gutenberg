@@ -131,6 +131,7 @@ const RESIZABLE_BOX_ENABLE_OPTION = {
 function ResizableCover( {
 	className,
 	children,
+	onResizeStart,
 	onResize,
 	onResizeStop,
 } ) {
@@ -146,9 +147,10 @@ function ResizableCover( {
 	);
 	const onResizeStartEvent = useCallback(
 		( event, direction, elt ) => {
+			onResizeStart( elt.clientHeight );
 			onResize( elt.clientHeight );
 		},
-		[ onResize ]
+		[ onResizeStart, onResize ]
 	);
 	const onResizeStopEvent = useCallback(
 		( event, direction, elt ) => {
@@ -213,8 +215,7 @@ class CoverEdit extends Component {
 			noticeUI,
 			overlayColor,
 			setOverlayColor,
-			onResizeStart,
-			onResizeStop,
+			toggleSelection,
 		} = this.props;
 		const {
 			backgroundType,
@@ -435,7 +436,7 @@ class CoverEdit extends Component {
 						'block-library-cover__resize-container',
 						{ 'is-selected': isSelected },
 					) }
-					onResizeStart={ onResizeStart }
+					onResizeStart={ () => toggleSelection( false ) }
 					onResize={ ( newMinHeight ) => {
 						this.setState( {
 							temporaryMinHeight: newMinHeight,
@@ -443,7 +444,7 @@ class CoverEdit extends Component {
 					} }
 					onResizeStop={
 						( newMinHeight ) => {
-							onResizeStop();
+							toggleSelection( true );
 							setAttributes( {
 								minHeight: newMinHeight,
 							} );
@@ -561,8 +562,7 @@ export default compose( [
 		const { toggleSelection } = dispatch( 'core/block-editor' );
 
 		return {
-			onResizeStart: () => toggleSelection( false ),
-			onResizeStop: () => toggleSelection( true ),
+			toggleSelection,
 		};
 	} ),
 	withColors( { overlayColor: 'background-color' } ),
