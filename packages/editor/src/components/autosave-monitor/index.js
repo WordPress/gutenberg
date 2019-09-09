@@ -60,9 +60,12 @@ export class AutosaveMonitor extends Component {
 export default compose( [
 	withSelect( ( select, ownProps ) => {
 		const {
+			getReferenceByDistinctEdits,
+		} = select( 'core' );
+
+		const {
 			isEditedPostDirty,
 			isEditedPostAutosaveable,
-			getReferenceByDistinctEdits,
 			isAutosavingPost,
 			getEditorSettings,
 		} = select( 'core/editor' );
