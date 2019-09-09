@@ -3,10 +3,7 @@
  */
 import optimist from 'redux-optimist';
 import {
-	flow,
-	reduce,
 	omit,
-	mapValues,
 	keys,
 	isEqual,
 	keyBy,
@@ -36,23 +33,6 @@ export function getPostRawValue( value ) {
 	}
 
 	return value;
-}
-
-/**
- * Returns an object against which it is safe to perform mutating operations,
- * given the original object and its current working copy.
- *
- * @param {Object} original Original object.
- * @param {Object} working  Working object.
- *
- * @return {Object} Mutation-safe object.
- */
-function getMutateSafeObject( original, working ) {
-	if ( original === working ) {
-		return { ...original };
-	}
-
-	return working;
 }
 
 /**
