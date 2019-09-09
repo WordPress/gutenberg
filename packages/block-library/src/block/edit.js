@@ -134,7 +134,7 @@ class ReusableBlockEdit extends Component {
 		}
 
 		return (
-			<div>
+			<div className="block-library-block__reusable-block-container">
 				{ ( isSelected || isEditing ) && (
 					<ReusableBlockEditPanel
 						isEditing={ isEditing }
