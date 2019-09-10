@@ -18,6 +18,7 @@
 
 	// Full Width Blocks
 	// specificity required to only target immediate child Blocks of a Group
+	> .editor-block-list__block-edit > div > .wp-block-group > .wp-block-group__inner-container > .editor-inner-blocks > .editor-block-list__layout > .wp-block[data-align="fullScreen"],
 	> .editor-block-list__block-edit > div > .wp-block-group > .wp-block-group__inner-container > .editor-inner-blocks > .editor-block-list__layout > .wp-block[data-align="full"] {
 		margin-left: auto;
 		margin-right: auto;
@@ -31,6 +32,7 @@
 	}
 
 	// Full Width Blocks with a background (ie: has padding)
+	> .editor-block-list__block-edit > div > .wp-block-group.has-background > .wp-block-group__inner-container > .editor-inner-blocks > .editor-block-list__layout > .wp-block[data-align="fullScreen"],
 	> .editor-block-list__block-edit > div > .wp-block-group.has-background > .wp-block-group__inner-container > .editor-inner-blocks > .editor-block-list__layout > .wp-block[data-align="full"] {
 		// note: using position `left` causes hoz scrollbars so
 		// we opt to use margin instead
@@ -48,6 +50,7 @@
 /**
  * Group: Full Width Alignment
  */
+.wp-block[data-type="core/group"][data-align="fullScreen"],
 .wp-block[data-type="core/group"][data-align="full"] {
 
 	// First tier of InnerBlocks must act like the container of the standard canvas
@@ -65,6 +68,7 @@
 
 	// Full Width Blocks
 	// specificity required to only target immediate child Blocks of Group
+	> .editor-block-list__block-edit > div > .wp-block-group > .wp-block-group__inner-container > .editor-inner-blocks > .editor-block-list__layout > .wp-block[data-align="fullScreen"],
 	> .editor-block-list__block-edit > div > .wp-block-group > .wp-block-group__inner-container > .editor-inner-blocks > .editor-block-list__layout > .wp-block[data-align="full"] {
 		padding-right: 0;
 		padding-left: 0;
@@ -81,6 +85,7 @@
 
 	// Full Width Blocks with a background (ie: has padding)
 	// note: also duplicated above for all Group widths
+	> .editor-block-list__block-edit > div > .wp-block-group.has-background > .wp-block-group__inner-container > .editor-inner-blocks > .editor-block-list__layout > .wp-block[data-align="fullScreen"],
 	> .editor-block-list__block-edit > div > .wp-block-group.has-background > .wp-block-group__inner-container > .editor-inner-blocks > .editor-block-list__layout > .wp-block[data-align="full"] {
 		width: calc(100% + 60px);
 	}

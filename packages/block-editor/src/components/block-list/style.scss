@@ -489,6 +489,7 @@
 
 	// Wide and full-wide
 	&[data-align="full"],
+	&[data-align="fullScreen"],
 	&[data-align="wide"] {
 		clear: both;
 
@@ -557,7 +558,8 @@
 	}
 
 	// Full-wide
-	&[data-align="full"] {
+	&[data-align="full"],
+	&[data-align="fullScreen"] {
 		// Position hover label on the left for the top level block.
 		> .block-editor-block-list__block-edit > .block-editor-block-list__breadcrumb {
 			left: 0;
@@ -810,6 +812,7 @@
 	}
 
 	// Reset negative margins on mobile for full-width.
+	&[data-align="fullScreen"] .block-editor-block-list__block-mobile-toolbar,
 	&[data-align="full"] .block-editor-block-list__block-mobile-toolbar {
 		margin-left: 0;
 		margin-right: 0;
@@ -920,6 +923,7 @@
 		}
 	}
 
+	&[data-align="fullScreen"] > .block-editor-block-list__insertion-point,
 	&[data-align="full"] > .block-editor-block-list__insertion-point {
 		left: 0;
 		right: 0;
@@ -1028,6 +1032,7 @@
 	}
 
 	// Full-aligned blocks have negative margins on the parent of the toolbar, so additional position adjustment is not required.
+	&[data-align="fullScreen"] .block-editor-block-contextual-toolbar,
 	&[data-align="full"] .block-editor-block-contextual-toolbar {
 		left: 0;
 		right: 0;
@@ -1219,6 +1224,7 @@
 		}
 
 		// Don't use this for full-wide blocks, as there's no clearance to accommodate extra area on the side.
+		&[data-align="fullScreen	"]::before,
 		&[data-align="full"]::before {
 			content: none;
 		}
