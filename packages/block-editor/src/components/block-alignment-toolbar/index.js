@@ -13,7 +13,7 @@ import { withBlockEditContext } from '../block-edit/context';
 
 const FullScreenIcon = <Icon icon={ () => <SVG width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><Path d="M17 7V3h-4v2h2v2h2zM3 3v4h2V5h2V3H3zM5 13H3v4h4v-2H5v-2zM15 13h2v4h-4v-2h2v-2z"></Path></SVG> } />;
 
-const BLOCK_ALIGNMENTS_CONTROLS = {
+export const BLOCK_ALIGNMENTS_CONTROLS = {
 	left: {
 		icon: 'align-left',
 		title: __( 'Align Left' ),
@@ -58,7 +58,10 @@ export function BlockAlignmentToolbar( {
 	 * @return {Function} Handler function.
 	 */
 	function applyOrUnset( align ) {
-		return () => onChange( value === align ? undefined : align );
+		return () => onChange(
+			value === align ? undefined : align,
+			Object.keys( BLOCK_ALIGNMENTS_CONTROLS )
+		);
 	}
 
 	/**
