@@ -487,8 +487,8 @@ export class ImageEdit extends Component {
 		this.props.setAttributes( { alt: newAlt } );
 	}
 
-	updateAlignment( nextAlign ) {
-		const extraUpdatedAttributes = [ 'wide', 'full' ].indexOf( nextAlign ) !== -1 ?
+	updateAlignment( nextAlign, types ) {
+		const extraUpdatedAttributes = [ 'wide', 'full', 'fullScreen' ].indexOf( nextAlign ) !== -1 ?
 			{ width: undefined, height: undefined } :
 			{};
 		this.props.setAttributes( { ...extraUpdatedAttributes, align: nextAlign } );
