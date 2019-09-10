@@ -24,6 +24,8 @@ export default function save( { attributes } ) {
 		sizeSlug,
 	} = attributes;
 
+	const newRel = RichText.isEmpty( rel ) ? undefined : rel;
+
 	const classes = classnames( {
 		[ `align${ align }` ]: align,
 		[ `size-${ sizeSlug }` ]: sizeSlug,
@@ -47,7 +49,7 @@ export default function save( { attributes } ) {
 					className={ linkClass }
 					href={ href }
 					target={ linkTarget }
-					rel={ rel }
+					rel={ newRel }
 				>
 					{ image }
 				</a>
