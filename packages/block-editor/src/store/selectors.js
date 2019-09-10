@@ -14,6 +14,7 @@ import {
 	orderBy,
 	reduce,
 	some,
+	find,
 } from 'lodash';
 import createSelector from 'rememo';
 
@@ -24,7 +25,9 @@ import {
 	getBlockType,
 	getBlockTypes,
 	hasBlockSupport,
+	parse,
 } from '@wordpress/blocks';
+import { SVG, Rect, G, Path } from '@wordpress/components';
 
 // Module constants
 
@@ -51,6 +54,7 @@ export const INSERTER_UTILITY_NONE = 0;
 const MILLISECONDS_PER_HOUR = 3600 * 1000;
 const MILLISECONDS_PER_DAY = 24 * 3600 * 1000;
 const MILLISECONDS_PER_WEEK = 7 * 24 * 3600 * 1000;
+const templateIcon = <SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><Rect x="0" fill="none" width="24" height="24" /><G><Path d="M19 3H5c-1.105 0-2 .895-2 2v14c0 1.105.895 2 2 2h14c1.105 0 2-.895 2-2V5c0-1.105-.895-2-2-2zM6 6h5v5H6V6zm4.5 13C9.12 19 8 17.88 8 16.5S9.12 14 10.5 14s2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5zm3-6l3-5 3 5h-6z" /></G></SVG>;
 
 /**
  * Shared reference to an empty array for cases where it is important to avoid
@@ -646,29 +650,6 @@ export function getLastMultiSelectedBlockClientId( state ) {
 }
 
 /**
- * Checks if possibleAncestorId is an ancestor of possibleDescendentId.
- *
- * @param {Object} state                Editor state.
- * @param {string} possibleAncestorId   Possible ancestor client ID.
- * @param {string} possibleDescendentId Possible descent client ID.
- *
- * @return {boolean} True if possibleAncestorId is an ancestor
- *                   of possibleDescendentId, and false otherwise.
- */
-const isAncestorOf = createSelector(
-	( state, possibleAncestorId, possibleDescendentId ) => {
-		let idToCheck = possibleDescendentId;
-		while ( possibleAncestorId !== idToCheck && idToCheck ) {
-			idToCheck = getBlockRootClientId( state, idToCheck );
-		}
-		return possibleAncestorId === idToCheck;
-	},
-	( state ) => [
-		state.blocks.order,
-	],
-);
-
-/**
  * Returns true if a multi-selection exists, and the block corresponding to the
  * specified client ID is the first block of the multi-selection set, or false
  * otherwise.
@@ -1112,41 +1093,6 @@ const canIncludeBlockTypeInInserter = ( state, blockType, rootClientId ) => {
 };
 
 /**
- * Returns whether we can show a reusable block in the inserter
- *
- * @param {Object} state Global State
- * @param {Object} reusableBlock Reusable block object
- * @param {?string} rootClientId Optional root client ID of block list.
- *
- * @return {boolean} Whether the given block type is allowed to be shown in the inserter.
- */
-const canIncludeReusableBlockInInserter = ( state, reusableBlock, rootClientId ) => {
-	if ( ! canInsertBlockTypeUnmemoized( state, 'core/block', rootClientId ) ) {
-		return false;
-	}
-
-	const referencedBlockName = getBlockName( state, reusableBlock.clientId );
-	if ( ! referencedBlockName ) {
-		return false;
-	}
-
-	const referencedBlockType = getBlockType( referencedBlockName );
-	if ( ! referencedBlockType ) {
-		return false;
-	}
-
-	if ( ! canInsertBlockTypeUnmemoized( state, referencedBlockName, rootClientId ) ) {
-		return false;
-	}
-
-	if ( isAncestorOf( state, reusableBlock.clientId, rootClientId ) ) {
-		return false;
-	}
-
-	return true;
-};
-
-/**
  * Determines the items that appear in the inserter. Includes both static
  * items (e.g. a regular block type) and dynamic items (e.g. a reusable block).
  *
@@ -1246,8 +1192,11 @@ export const getInserterItems = createSelector(
 		const buildReusableBlockInserterItem = ( reusableBlock ) => {
 			const id = `core/block/${ reusableBlock.id }`;
 
-			const referencedBlockName = getBlockName( state, reusableBlock.clientId );
-			const referencedBlockType = getBlockType( referencedBlockName );
+			const referencedBlocks = __experimentalGetParsedReusableBlock( state, reusableBlock.id );
+			let referencedBlockType;
+			if ( referencedBlocks.length === 1 ) {
+				referencedBlockType = getBlockType( referencedBlocks[ 0 ].name );
+			}
 
 			const { time, count = 0 } = getInsertUsage( state, id ) || {};
 			const utility = calculateUtility( 'reusable', count, false );
@@ -1258,7 +1207,7 @@ export const getInserterItems = createSelector(
 				name: 'core/block',
 				initialAttributes: { ref: reusableBlock.id },
 				title: reusableBlock.title,
-				icon: referencedBlockType.icon,
+				icon: referencedBlockType ? referencedBlockType.icon : templateIcon,
 				category: 'reusable',
 				keywords: [],
 				isDisabled: false,
@@ -1271,9 +1220,9 @@ export const getInserterItems = createSelector(
 			.filter( ( blockType ) => canIncludeBlockTypeInInserter( state, blockType, rootClientId ) )
 			.map( buildBlockTypeInserterItem );
 
-		const reusableBlockInserterItems = getReusableBlocks( state )
-			.filter( ( block ) => canIncludeReusableBlockInInserter( state, block, rootClientId ) )
-			.map( buildReusableBlockInserterItem );
+		const reusableBlockInserterItems = canInsertBlockTypeUnmemoized( state, 'core/block', rootClientId ) ?
+			getReusableBlocks( state ).map( buildReusableBlockInserterItem ) :
+			[];
 
 		return orderBy(
 			[ ...blockTypeInserterItems, ...reusableBlockInserterItems ],
@@ -1310,9 +1259,9 @@ export const hasInserterItems = createSelector(
 		if ( hasBlockType ) {
 			return true;
 		}
-		const hasReusableBlock = some(
-			getReusableBlocks( state ),
-			( block ) => canIncludeReusableBlockInInserter( state, block, rootClientId )
+		const hasReusableBlock = (
+			canInsertBlockTypeUnmemoized( state, 'core/block', rootClientId ) &&
+			getReusableBlocks( state ).length > 0
 		);
 
 		return hasReusableBlock;
@@ -1362,6 +1311,31 @@ export function getSettings( state ) {
 export function isLastBlockChangePersistent( state ) {
 	return state.blocks.isPersistentChange;
 }
+
+/**
+ * Returns the parsed block saved as shared block with the given ID.
+ *
+ * @param {Object}        state Global application state.
+ * @param {number|string} ref   The shared block's ID.
+ *
+ * @return {Object} The parsed block.
+ */
+export const __experimentalGetParsedReusableBlock = createSelector(
+	( state, ref ) => {
+		const reusableBlock = find(
+			getReusableBlocks( state ),
+			( block ) => block.id === ref
+		);
+		if ( ! reusableBlock ) {
+			return null;
+		}
+
+		return parse( reusableBlock.content );
+	},
+	( state ) => [
+		getReusableBlocks( state ),
+	],
+);
 
 /**
  * Returns true if the most recent block change is be considered ignored, or
