@@ -25,6 +25,10 @@ Callback when the alignment changes.
 - Type: `func`
 - Required: Yes
 
+The callback function provides two arguments:
+  * `next`: next alignment value.
+  * `alignTypes` the current alignments type currently supported.
+
 ```es6
 <BlockAlignmentToolbar
     onChange={ ( next ) => alert( next ? `Change to ${ next }` : 'Same one!' ) }
