@@ -114,9 +114,13 @@
 }
 
 [data-type="core/image"][data-align="fullScreen"] {
-	figure img {
-		width: 100%;
+	figure {
 		height: 100vh;
+		overflow: hidden;
+
+		img {
+			width: 100%;
+		}
 	}
 }
 
