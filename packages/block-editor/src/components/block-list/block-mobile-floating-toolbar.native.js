@@ -8,10 +8,10 @@ import { View } from 'react-native';
  */
 import styles from './block-mobile-floating-toolbar.scss';
 
-function FloatingToolbar( { offsetValue, children } ) {
+function FloatingToolbar( { children } ) {
 	return (
 		<View
-			style={ [ styles.floatingToolbarContainer, { top: offsetValue } ] }
+			style={ styles.floatingToolbarContainer }
 		>
 			<View
 				style={ styles.floatingToolbarFill }

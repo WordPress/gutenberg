@@ -9,10 +9,11 @@ export const KeyboardAwareFlatList = ( {
 	shouldPreventAutomaticScroll,
 	innerRef,
 	autoScroll,
+	style,
 	...listProps
 } ) => (
 	<KeyboardAwareScrollView
-		style={ { flex: 1 } }
+		style={ { flex: 1, overflow: 'visible' } }
 		keyboardDismissMode="none"
 		enableResetScrollToCoords={ false }
 		keyboardShouldPersistTaps="handled"
@@ -42,7 +43,7 @@ export const KeyboardAwareFlatList = ( {
 		onScroll={ ( event ) => {
 			this.latestContentOffsetY = event.nativeEvent.contentOffset.y;
 		} } >
-		<FlatList { ...listProps } />
+		<FlatList { ...listProps } style={ [ style, { overflow: 'visible' } ] } contentContainerStyle={ { overflow: 'visible' } } contentOffset={ { y: 44 } } />
 	</KeyboardAwareScrollView>
 );
 

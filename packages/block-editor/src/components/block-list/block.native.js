@@ -104,11 +104,6 @@ class BlockListBlock extends Component {
 		return blockName;
 	}
 
-	getOffsetValue() {
-		const { header, isFirstBlock } = this.props;
-		return ! isFirstBlock || header ? -toolbarHeight / 2 : toolbarHeight / 2;
-	}
-
 	render() {
 		const {
 			borderStyle,
@@ -128,7 +123,7 @@ class BlockListBlock extends Component {
 
 		return (
 			<>
-				{ displayToolbar && <FloatingToolbar offsetValue={ this.getOffsetValue() } /> }
+				{ displayToolbar && <FloatingToolbar /> }
 				<TouchableWithoutFeedback
 					onPress={ this.onFocus }
 					accessible={ ! isSelected }
