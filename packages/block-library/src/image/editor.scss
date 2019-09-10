@@ -1,24 +1,12 @@
 .wp-block-image {
 	position: relative;
 
-	&.is-transient .wp-block-image__image-wrapper {
+	&.is-transient img {
 		opacity: 0.3;
 	}
 
 	figcaption img {
 		display: inline;
-	}
-
-	.wp-block-image__image-wrapper {
-		-webkit-background-size: cover;
-		background-size: cover;
-		background-repeat: no-repeat;
-		background-position: 50% 50%;
-		img {
-			opacity: 0;
-			margin: 0;
-			padding: 0;
-		}
 	}
 
 	// Shown while image is being uploaded
@@ -125,17 +113,10 @@
 	}
 }
 
-
-
-// Joint behavior between align and expand.
-[data-type="core/image"][data-expand="screen"] {
-	.wp-block-image__image-wrapper,
-	.wp-block-image__image-wrapper img {
+[data-type="core/image"][data-align="fullScreen"] {
+	figure img {
+		width: 100%;
 		height: 100vh;
-	}
-
-	&:not([data-align="wide"]):not([data-align="full"]) .wp-block-image__image-wrapper {
-		display: inline-block;
 	}
 }
 

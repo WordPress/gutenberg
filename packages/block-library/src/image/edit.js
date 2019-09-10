@@ -125,12 +125,12 @@ const stopPropagationRelevantKeys = ( event ) => {
 };
 
 const ImageURLInputUI = ( {
-	advancedOptions,
-	linkDestination,
-	mediaLinks,
-	onChangeUrl,
-	url,
-} ) => {
+							  advancedOptions,
+							  linkDestination,
+							  mediaLinks,
+							  onChangeUrl,
+							  url,
+						  } ) => {
 	const [ isOpen, setIsOpen ] = useState( false );
 	const openLinkUI = useCallback( () => {
 		setIsOpen( true );
@@ -603,7 +603,6 @@ export class ImageEdit extends Component {
 					value={ align }
 					onChange={ this.updateAlignment }
 				/>
-
 				{ url && (
 					<>
 						<Toolbar>
@@ -694,7 +693,7 @@ export class ImageEdit extends Component {
 			[ `size-${ sizeSlug }` ]: sizeSlug,
 		} );
 
-		const isResizable = ( [ 'wide', 'full' ].indexOf( align ) === -1 ) && isLargeViewport;
+		const isResizable = ( [ 'wide', 'full', 'fullScreen' ].indexOf( align ) === -1 ) && isLargeViewport;
 
 		const imageSizeOptions = this.getImageSizeOptions();
 
@@ -804,14 +803,11 @@ export class ImageEdit extends Component {
 								defaultedAlt = __( 'This image has an empty alt attribute' );
 							}
 
-							const imgContainer = (
+							const img = (
 								// Disable reason: Image itself is not meant to be interactive, but
 								// should direct focus to block.
 								/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
-								<div
-									className="wp-block-image__image-wrapper"
-									style={ { backgroundImage: `url(${ url })` } }
-								>
+								<>
 									<img
 										src={ url }
 										alt={ defaultedAlt }
@@ -820,7 +816,7 @@ export class ImageEdit extends Component {
 										onError={ () => this.onImageError( url ) }
 									/>
 									{ isBlobURL( url ) && <Spinner /> }
-								</div>
+								</>
 								/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
 							);
 
@@ -829,7 +825,7 @@ export class ImageEdit extends Component {
 									<>
 										{ getInspectorControls( imageWidth, imageHeight ) }
 										<div style={ { width, height } }>
-											{ imgContainer }
+											{ img }
 										</div>
 									</>
 								);
@@ -897,11 +893,7 @@ export class ImageEdit extends Component {
 											bottom: true,
 											left: showLeftHandle,
 										} }
-
-										onResizeStart={ () => {
-											toggleSelection( false );
-										} }
-
+										onResizeStart={ onResizeStart }
 										onResizeStop={ ( event, direction, elt, delta ) => {
 											onResizeStop();
 											setAttributes( {
@@ -910,7 +902,7 @@ export class ImageEdit extends Component {
 											} );
 										} }
 									>
-										{ imgContainer }
+										{ img }
 									</ResizableBox>
 								</>
 							);

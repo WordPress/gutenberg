@@ -59,29 +59,11 @@
 	}
 }
 
-.wp-block-image .wp-block-image__image-wrapper {
-	-webkit-background-size: cover;
-	background-size: cover;
-	background-repeat: no-repeat;
-	background-position: 50% 50%;
-}
-
 .wp-block-image.expandscreen,
 .wp-block-image .expandscreen {
-	.wp-block-image__image-wrapper {
-		height: 100vh;
-	}
 
 	&.alignnone {
 		display: inline-block;
-	}
-
-	&.aligncenter .wp-block-image__image-wrapper {
-		display: inline-block;
-	}
-
-	&.alignfull .wp-block-image__image-wrapper {
-		width: 100vw;
 	}
 
 	img {
