@@ -171,13 +171,9 @@ export default compose( [
 
 		const rootBlockId = getBlockHierarchyRootClientId( clientId );
 		const rootBlock = getBlock( rootBlockId );
-		const parentBlockId = getBlock( clientId ).parent;
-		const parentBlock = getBlock( parentBlockId );
-		const isGroupRoot = rootBlock.name === 'core/group';
 		const hasRootInnerBlocks = rootBlock.innerBlocks.length !== 0;
-		const isMediaTextParent = parentBlock && parentBlock.name === 'core/media-text';
 
-		const displayToolbar = isSelected && isGroupRoot && hasRootInnerBlocks && ! isMediaTextParent;
+		const displayToolbar = isSelected && hasRootInnerBlocks;
 
 		return {
 			icon,
