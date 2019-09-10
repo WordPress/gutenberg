@@ -8,24 +8,3 @@
 	padding-left: 16px;
 	padding-right: 16px;
 }
-
-// The following two rules have their classes doubled to increase specificity.
-.has-child-selected .wp-social-link__is-incomplete.wp-social-link__is-incomplete,
-.is-selected .wp-social-link__is-incomplete.wp-social-link__is-incomplete {
-	background-color: $dark-gray-150;
-}
-
-.has-child-selected .is-style-logos-only .wp-social-link__is-incomplete.wp-social-link__is-incomplete,
-.is-selected .is-style-logos-only .wp-social-link__is-incomplete.wp-social-link__is-incomplete {
-	color: $dark-gray-150;
-	background-color: transparent;
-}
-
-
-[data-type*="core/social-link-"].is-selected .wp-social-link, // Matches the selected social logo block.
-.wp-social-link:focus {
-	box-shadow: 0 0 0 1px $white, 0 0 0 3px $blue-medium-500;
-
-	// Windows High Contrast mode will show this outline, but not the box-shadow.
-	outline: 2px solid transparent;
-}
