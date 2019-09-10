@@ -122,6 +122,8 @@ export function getBlockAttributes( state, clientId ) {
 export const getBlock = createSelector(
 	( state, clientId ) => {
 		const block = state.blocks.byClientId[ clientId ];
+		const parent = state.blocks.parents[ clientId ];
+
 		if ( ! block ) {
 			return null;
 		}
@@ -130,6 +132,7 @@ export const getBlock = createSelector(
 			...block,
 			attributes: getBlockAttributes( state, clientId ),
 			innerBlocks: getBlocks( state, clientId ),
+			parent,
 		};
 	},
 	( state, clientId ) => [

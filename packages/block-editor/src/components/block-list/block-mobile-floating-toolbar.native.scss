@@ -1,0 +1,19 @@
+.floatingToolbarContainer {
+	align-items: center;
+	justify-content: center;
+	z-index: 2;
+	left: 0;
+	right: 0;
+}
+
+.floatingToolbarFill {
+	background-color: $dark-gray-500;
+	margin: auto;
+	min-width: 100;
+	height: 44;
+	max-height: 44;
+	z-index: 2;
+	border-radius: 22px;
+	position: absolute;
+	flex-direction: row;
+}
