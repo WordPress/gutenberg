@@ -31,19 +31,11 @@ export const settings = {
 	],
 	transforms,
 	getEditWrapperProps( attributes ) {
-		const { align, width, expand } = attributes;
-		const editProps = {};
+		const { align, width } = attributes;
 
-		if ( 'left' === align || 'center' === align || 'right' === align || 'wide' === align || 'full' === align ) {
-			editProps[ 'data-align' ] = align;
-			editProps[ 'data-resized' ] = !! width;
+		if ( 'left' === align || 'center' === align || 'right' === align || 'wide' === align || 'full' === align || 'fullScreen' === align ) {
+			return { 'data-align': align, 'data-resized': !! width };
 		}
-
-		if ( 'screen' === expand ) {
-			editProps[ 'data-expand' ] = expand;
-		}
-
-		return editProps;
 	},
 	edit,
 	save,
