@@ -11,6 +11,30 @@ import { __ } from '@wordpress/i18n';
 
 const { wp } = window;
 
+const getFeaturedImageMediaFrame = () => {
+	return wp.media.view.MediaFrame.Select.extend( {
+
+		featuredImageToolbar: function( toolbar ) {
+			this.createSelectToolbar( toolbar, {
+				text:  wp.media.view.l10n.setFeaturedImage,
+				state: this.options.state
+			});
+		},
+
+		/**
+		 * Create the default states.
+		 *
+		 * @return {void}
+		 */
+		createStates: function createStates() {
+			this.states.add( [
+				this.on( 'toolbar:create:featured-image', this.featuredImageToolbar, this ),
+				new wp.media.controller.FeaturedImage(),
+			] );
+		},
+	} );
+};
+
 // Getter for the sake of unit tests.
 const getGalleryDetailsMediaFrame = () => {
 	/**
@@ -79,6 +103,7 @@ class MediaUpload extends Component {
 	constructor( {
 		allowedTypes,
 		gallery = false,
+		unstableFeaturedImageFlow = false,
 		modalClass,
 		multiple = false,
 		title = __( 'Select or Upload Media' ),
@@ -109,6 +134,22 @@ class MediaUpload extends Component {
 
 		if ( modalClass ) {
 			this.frame.$el.addClass( modalClass );
+		}
+
+		if ( unstableFeaturedImageFlow ) {
+			const featuredImageFrame = getFeaturedImageMediaFrame();
+			const attachments = getAttachmentsCollection( this.props.value );
+			const selection = new wp.media.model.Selection( attachments.models, {
+				props: attachments.props.toJSON(),
+			} );
+			this.frame = new featuredImageFrame( {
+				mimeType: allowedTypes,
+				state: 'featured-image',
+				multiple,
+				selection,
+				editing: ( this.props.value ) ? true : false,
+			} );
+			wp.media.frame = this.frame;
 		}
 
 		this.initializeListeners();
