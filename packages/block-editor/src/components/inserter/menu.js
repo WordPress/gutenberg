@@ -7,7 +7,7 @@ import {
 	findIndex,
 	flow,
 	groupBy,
-	isArray,
+	size,
 	isEmpty,
 	map,
 	some,
@@ -359,8 +359,8 @@ export class InserterMenu extends Component {
 						) }
 						{ isEmpty( suggestedItems ) && isEmpty( reusableItems ) && isEmpty( itemsPerCategory ) && (
 							<p className="editor-inserter__no-results block-editor-inserter__no-results">
-								{ numberOfHiddenBlocks ? __( 'No active blocks found.' ) : __( 'No blocks found.' ) }
-								{ !! numberOfHiddenBlocks && (
+								{ numberOfHiddenBlocks > 0 ? __( 'No active blocks found.' ) : __( 'No blocks found.' ) }
+								{ numberOfHiddenBlocks > 0 && (
 									<>
 										<br />
 										{
@@ -469,7 +469,7 @@ export default compose(
 		}
 		const destinationRootBlockName = getBlockName( destinationRootClientId );
 		const hiddenBlockTypes = getPreference( 'hiddenBlockTypes' );
-		const numberOfHiddenBlocks = isArray( hiddenBlockTypes ) && hiddenBlockTypes.length;
+		const numberOfHiddenBlocks = size( hiddenBlockTypes );
 
 		return {
 			rootChildBlocks: getChildBlockNames( destinationRootBlockName ),
