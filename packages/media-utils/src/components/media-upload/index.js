@@ -14,11 +14,17 @@ const { wp } = window;
 const getFeaturedImageMediaFrame = () => {
 	return wp.media.view.MediaFrame.Select.extend( {
 
-		featuredImageToolbar: function( toolbar ) {
+		/**
+		 * Enables the Set Featured Image Button.
+		 *
+		 * @param {Object} toolbar toolbar for featured image state
+		 * @return {void}
+		 */
+		featuredImageToolbar( toolbar ) {
 			this.createSelectToolbar( toolbar, {
-				text:  wp.media.view.l10n.setFeaturedImage,
-				state: this.options.state
-			});
+				text: wp.media.view.l10n.setFeaturedImage,
+				state: this.options.state,
+			} );
 		},
 
 		/**
