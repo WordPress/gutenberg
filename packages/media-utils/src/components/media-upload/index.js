@@ -13,7 +13,6 @@ const { wp } = window;
 
 const getFeaturedImageMediaFrame = () => {
 	return wp.media.view.MediaFrame.Select.extend( {
-
 		/**
 		 * Enables the Set Featured Image Button.
 		 *
@@ -33,8 +32,8 @@ const getFeaturedImageMediaFrame = () => {
 		 * @return {void}
 		 */
 		createStates: function createStates() {
+			this.on( 'toolbar:create:featured-image', this.featuredImageToolbar, this );
 			this.states.add( [
-				this.on( 'toolbar:create:featured-image', this.featuredImageToolbar, this ),
 				new wp.media.controller.FeaturedImage(),
 			] );
 		},
