@@ -783,9 +783,13 @@ export class ImageEdit extends Component {
 						value={ title || '' }
 						onChange={ this.onSetTitle }
 						help={
-							<ExternalLink href="https://www.w3.org/TR/html52/dom.html#the-title-attribute">
-								{ __( 'Provide an optional description for this image.' ) }
-							</ExternalLink>
+							<>
+								{ __( 'Describe the role of this image on the page.' ) }
+								<br />
+								<ExternalLink href="https://www.w3.org/TR/html52/dom.html#the-title-attribute">
+									{ __( '(Note: many devices and browsers do not display this text.)' ) }
+								</ExternalLink>
+							</>
 						}
 					/>
 				</InspectorAdvancedControls>
