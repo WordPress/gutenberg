@@ -136,6 +136,7 @@ export const EXPECTED_TRANSFORMS = {
 		originalBlock: 'Embed',
 		availableTransforms: [
 			'Group',
+			'Paragraph',
 		],
 	},
 	'core__file__new-window': {
