@@ -1804,7 +1804,7 @@ describe( 'state', () => {
 		} );
 
 		it( 'should set multi selection', () => {
-			const original = deepFreeze( { isMultiSelecting: false } );
+			const original = deepFreeze( { isMultiSelecting: false, initialPosition: null, isEnabled: true } );
 			const state = blockSelection( original, {
 				type: 'MULTI_SELECT',
 				start: 'ribs',
@@ -1821,7 +1821,7 @@ describe( 'state', () => {
 		} );
 
 		it( 'should set continuous multi selection', () => {
-			const original = deepFreeze( { isMultiSelecting: true } );
+			const original = deepFreeze( { isMultiSelecting: true, initialPosition: null, isEnabled: true } );
 			const state = blockSelection( original, {
 				type: 'MULTI_SELECT',
 				start: 'ribs',
@@ -1909,7 +1909,7 @@ describe( 'state', () => {
 		} );
 
 		it( 'should unset multi selection', () => {
-			const original = deepFreeze( { start: { clientId: 'ribs' }, end: { clientId: 'chicken' } } );
+			const original = deepFreeze( { start: { clientId: 'ribs' }, end: { clientId: 'chicken' }, isEnabled: true } );
 
 			const state1 = blockSelection( original, {
 				type: 'CLEAR_SELECTED_BLOCK',
@@ -1935,7 +1935,7 @@ describe( 'state', () => {
 		} );
 
 		it( 'should select inserted block', () => {
-			const original = deepFreeze( { start: 'ribs', end: 'chicken' } );
+			const original = deepFreeze( { start: 'ribs', end: 'chicken', initialPosition: null, isEnabled: true, isMultiSelecting: false } );
 
 			const state3 = blockSelection( original, {
 				type: 'INSERT_BLOCKS',
@@ -1984,7 +1984,7 @@ describe( 'state', () => {
 		} );
 
 		it( 'should replace the selected block', () => {
-			const original = deepFreeze( { start: { clientId: 'chicken' }, end: { clientId: 'chicken' } } );
+			const original = deepFreeze( { start: { clientId: 'chicken' }, end: { clientId: 'chicken' }, initialPosition: null, isEnabled: true, isMultiSelecting: false } );
 			const state = blockSelection( original, {
 				type: 'REPLACE_BLOCKS',
 				clientIds: [ 'chicken' ],
@@ -2023,7 +2023,7 @@ describe( 'state', () => {
 		} );
 
 		it( 'should replace the selected block if we keep it not at the end when replacing blocks', () => {
-			const original = deepFreeze( { start: { clientId: 'chicken' }, end: { clientId: 'chicken' } } );
+			const original = deepFreeze( { start: { clientId: 'chicken' }, end: { clientId: 'chicken' }, initialPosition: null, isEnabled: true, isMultiSelecting: false } );
 			const state = blockSelection( original, {
 				type: 'REPLACE_BLOCKS',
 				clientIds: [ 'chicken' ],
@@ -2048,7 +2048,7 @@ describe( 'state', () => {
 		} );
 
 		it( 'should reset if replacing with empty set', () => {
-			const original = deepFreeze( { start: { clientId: 'chicken' }, end: { clientId: 'chicken' } } );
+			const original = deepFreeze( { start: { clientId: 'chicken' }, end: { clientId: 'chicken' }, isEnabled: true } );
 			const state = blockSelection( original, {
 				type: 'REPLACE_BLOCKS',
 				clientIds: [ 'chicken' ],
@@ -2084,6 +2084,7 @@ describe( 'state', () => {
 				end: { clientId: 'chicken' },
 				initialPosition: null,
 				isMultiSelecting: false,
+				isEnabled: true,
 			} );
 			const state = blockSelection( original, {
 				type: 'REMOVE_BLOCKS',
@@ -2120,6 +2121,7 @@ describe( 'state', () => {
 				end: { clientId: 'chicken' },
 				initialPosition: null,
 				isMultiSelecting: false,
+				isEnabled: true,
 			} );
 			const newBlock = {
 				name: 'core/test-block',

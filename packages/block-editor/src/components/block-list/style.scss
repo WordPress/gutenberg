@@ -499,7 +499,7 @@
 		&.is-multi-selected > .block-editor-block-mover,
 		> .block-editor-block-list__block-edit > .block-editor-block-mover {
 			// This moves the menu up by the height of the button + border + padding.
-			top: -$block-side-ui-width - $block-padding - $block-side-ui-clearance;
+			top: -$block-side-ui-width - $block-padding - $block-side-ui-clearance - ( $border-width * 2 );
 			bottom: auto;
 			min-height: 0;
 			height: auto;
@@ -671,10 +671,6 @@
 	> .block-editor-block-list__block-edit > .block-editor-block-mover {
 		position: absolute;
 		width: $block-side-ui-width + $block-side-ui-clearance;
-
-		// Stretch to fill half of the available space to increase hoverable area.
-		height: 100%;
-		max-height: $block-side-ui-width * 4;
 	}
 
 	// Position depending on whether selected or not.
@@ -700,7 +696,7 @@
 		padding-right: $block-side-ui-clearance;
 
 		// Position for top level blocks.
-		left: -$block-side-ui-width - $block-side-ui-clearance - $block-padding - $border-width;
+		left: -$block-side-ui-width - $block-side-ui-clearance - $block-padding - $border-width - $grid-size;
 
 		// Hide on mobile, as mobile has a separate solution.
 		display: none;
@@ -864,12 +860,12 @@
 
 	// Show a clickable plus.
 	.block-editor-inserter__toggle {
-		margin-top: -8px;
 		border-radius: 50%;
 		color: $blue-medium-focus;
 		background: $white;
-		height: $block-padding * 2 + 8px;
-		width: $block-padding * 2 + 8px;
+		height: $block-padding * 2;
+		width: $block-padding * 2;
+		padding: $grid-size-small;
 
 		&:not(:disabled):not([aria-disabled="true"]):hover {
 			box-shadow: none;
