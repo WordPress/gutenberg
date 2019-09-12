@@ -71,9 +71,11 @@ export function addEntities( entities ) {
 export function receiveEntityRecords( kind, name, records, query, invalidateCache = false ) {
 	// Auto drafts should not have titles, but some plugins rely on them so we can't filter this
 	// on the server.
-	records = castArray( records ).map( ( record ) =>
-		record.status === 'auto-draft' ? { ...record, title: '' } : record
-	);
+	if ( kind === 'postType' ) {
+		records = castArray( records ).map( ( record ) =>
+			record.status === 'auto-draft' ? { ...record, title: '' } : record
+		);
+	}
 	let action;
 	if ( query ) {
 		action = receiveQueriedItems( records, query );
@@ -312,7 +314,11 @@ export function* saveEntityRecord(
 			// Auto drafts should be converted to drafts on explicit saves,
 			// but some plugins break with this behavior so we can't filter it on the server.
 			let data = record;
-			if ( persistedRecord.status === 'auto-draft' && ! data.status ) {
+			if (
+				kind === 'postType' &&
+				persistedRecord.status === 'auto-draft' &&
+				! data.status
+			) {
 				data = { ...data, status: 'draft' };
 			}
 			updatedRecord = yield apiFetch( {
