@@ -517,3 +517,9 @@ exports[`Block transforms correctly transform block Video in fixture core__video
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:media-text -->"
 `;
+
+exports[`Block transforms correctly transform block Embed in fixture core__embed into the Paragraph block 1`] = `
+<!-- wp:paragraph -->
+<p><a href=\\"https://example.com/\\">Embedded content from an example URL</a></p>
+<!-- /wp:paragraph -->
+`;
