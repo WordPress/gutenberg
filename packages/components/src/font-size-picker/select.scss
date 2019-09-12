@@ -1,0 +1,63 @@
+.components-font-size-picker__select {
+	// Need to override a generic rule
+	// that can apply to all controls in the sidebar
+	// Ideally that generic rule shouldn't target
+	// this select in the first place.
+	margin-bottom: 0 !important;
+
+	.components-base-control__field {
+		margin-bottom: 0;
+	}
+}
+
+.components-font-size-picker__select-dropdown {
+	display: inline-block;
+	width: 80px;
+}
+
+.components-font-size-picker__select-dropdown-content button {
+	display: block;
+	width: 100%;
+	text-align: left;
+	position: relative;
+	padding: 10px 5px;
+	line-height: 1;
+}
+
+.components-font-size-picker__select-dropdown-content button:hover {
+	background: #eee !important;
+}
+
+.components-font-size-picker__select-dropdown-content button.highlighted {
+	background: #eee !important;
+}
+
+.components-font-size-picker__select-dropdown-content button svg {
+	position: absolute;
+	left: 5px;
+	top: 50%;
+	transform: translateY(-50%);
+}
+
+.components-font-size-picker__select-dropdown-text-size {
+	margin-left: 30px;
+	display: block;
+}
+
+.components-font-size-picker__select-selector {
+	background: #fff !important;
+	padding: 0 !important;
+	padding: 0 10px !important;
+}
+
+.components-font-size-picker__select-selector::after {
+	content: "▼";
+	position: relative;
+	right: -10px;
+	padding: 0 8px;
+}
+
+.components-font-size-picker__select-selector:focus {
+	border: 1px solid $blue-medium-focus !important;
+	outline: none !important;
+}

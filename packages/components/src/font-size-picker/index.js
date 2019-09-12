@@ -10,7 +10,7 @@ import { __ } from '@wordpress/i18n';
  */
 import Button from '../button';
 import RangeControl from '../range-control';
-import SelectControl from '../select-control';
+import FontSizePickerSelect from './select';
 
 function getSelectValueFromFontSize( fontSizes, value ) {
 	if ( value ) {
@@ -22,7 +22,7 @@ function getSelectValueFromFontSize( fontSizes, value ) {
 
 function getSelectOptions( optionsArray ) {
 	return [
-		...optionsArray.map( ( option ) => ( { value: option.slug, label: option.name } ) ),
+		...optionsArray.map( ( option ) => ( { value: option.slug, label: option.name, size: option.size } ) ),
 		{ value: 'custom', label: __( 'Custom' ) },
 	];
 }
@@ -66,13 +66,10 @@ function FontSizePicker( {
 			</legend>
 			<div className="components-font-size-picker__controls">
 				{ ( fontSizes.length > 0 ) &&
-					<SelectControl
-						className={ 'components-font-size-picker__select' }
-						label={ 'Choose preset' }
-						hideLabelFromVision={ true }
+					<FontSizePickerSelect
 						value={ currentSelectValue }
 						onChange={ onSelectChangeValue }
-						options={ getSelectOptions( fontSizes ) }
+						fontSizes={ getSelectOptions( fontSizes ) }
 					/>
 				}
 				{ ( ! withSlider && ! disableCustomFontSizes ) &&

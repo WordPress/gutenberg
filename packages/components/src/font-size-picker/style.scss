@@ -1,3 +1,5 @@
+@import "./select.scss";
+
 .components-font-size-picker__controls {
 	max-width: $sidebar-width - ( 2 * $panel-padding );
 	display: flex;
