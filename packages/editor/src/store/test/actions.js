@@ -92,12 +92,14 @@ describe( 'Post generator actions', () => {
 				},
 			],
 			[
-				"yields an action for editing the post entity's content",
+				"yields an action for editing the post entity's content if not an autosave",
 				() => true,
 				() => {
-					const edits = { content: currentPost().content };
-					const { value } = fulfillment.next( edits.content );
-					expect( value ).toEqual( dispatch( STORE_KEY, 'editPost', edits ) );
+					if ( ! isAutosave ) {
+						const edits = { content: currentPost().content };
+						const { value } = fulfillment.next( edits.content );
+						expect( value ).toEqual( dispatch( STORE_KEY, 'editPost', edits ) );
+					}
 				},
 			],
 			[
@@ -148,7 +150,7 @@ describe( 'Post generator actions', () => {
 							'saveEntityRecord',
 							'postType',
 							post.type,
-							post,
+							isAutosave ? { ...post, content: undefined } : post,
 							{
 								isAutosave,
 							}

@@ -375,13 +375,16 @@ export function* savePost( options = {} ) {
 	if ( ! ( yield select( STORE_KEY, 'isEditedPostSaveable' ) ) ) {
 		return;
 	}
-	yield dispatch( STORE_KEY, 'editPost', {
+	let edits = {
 		content: yield select( STORE_KEY, 'getEditedPostContent' ),
-	} );
+	};
+	if ( ! options.isAutosave ) {
+		yield dispatch( STORE_KEY, 'editPost', edits );
+	}
 
 	yield __experimentalRequestPostUpdateStart( options );
 	const previousRecord = yield select( STORE_KEY, 'getCurrentPost' );
-	const edits = {
+	edits = {
 		id: previousRecord.id,
 		...( yield select(
 			'core',
@@ -390,6 +393,7 @@ export function* savePost( options = {} ) {
 			previousRecord.type,
 			previousRecord.id
 		) ),
+		...edits,
 	};
 	yield dispatch(
 		'core',
