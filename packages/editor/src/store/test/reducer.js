@@ -11,16 +11,12 @@ import {
 	isUpdatingSamePostProperty,
 	shouldOverwriteState,
 	getPostRawValue,
-	initialEdits,
-	editor,
-	currentPost,
 	preferences,
 	saving,
 	reusableBlocks,
 	postSavingLock,
-	previewLink,
+	postAutosavingLock,
 } from '../reducer';
-import { INITIAL_EDITS_DEFAULTS } from '../defaults';
 
 describe( 'state', () => {
 	describe( 'hasSameKeys()', () => {
@@ -156,326 +152,6 @@ describe( 'state', () => {
 		} );
 	} );
 
-	describe( 'editor()', () => {
-		describe( 'blocks()', () => {
-			it( 'should set its value by RESET_EDITOR_BLOCKS', () => {
-				const blocks = [ {
-					clientId: 'block3',
-					innerBlocks: [
-						{ clientId: 'block31', innerBlocks: [] },
-						{ clientId: 'block32', innerBlocks: [] },
-					],
-				} ];
-				const state = editor( undefined, {
-					type: 'RESET_EDITOR_BLOCKS',
-					blocks,
-				} );
-
-				expect( state.present.blocks.value ).toBe( blocks );
-			} );
-		} );
-
-		describe( 'edits()', () => {
-			it( 'should save newly edited properties', () => {
-				const original = editor( undefined, {
-					type: 'EDIT_POST',
-					edits: {
-						status: 'draft',
-						title: 'post title',
-					},
-				} );
-
-				const state = editor( original, {
-					type: 'EDIT_POST',
-					edits: {
-						tags: [ 1 ],
-					},
-				} );
-
-				expect( state.present.edits ).toEqual( {
-					status: 'draft',
-					title: 'post title',
-					tags: [ 1 ],
-				} );
-			} );
-
-			it( 'should return same reference if no changed properties', () => {
-				const original = editor( undefined, {
-					type: 'EDIT_POST',
-					edits: {
-						status: 'draft',
-						title: 'post title',
-					},
-				} );
-
-				const state = editor( original, {
-					type: 'EDIT_POST',
-					edits: {
-						status: 'draft',
-					},
-				} );
-
-				expect( state.present.edits ).toBe( original.present.edits );
-			} );
-
-			it( 'should save modified properties', () => {
-				const original = editor( undefined, {
-					type: 'EDIT_POST',
-					edits: {
-						status: 'draft',
-						title: 'post title',
-						tags: [ 1 ],
-					},
-				} );
-
-				const state = editor( original, {
-					type: 'EDIT_POST',
-					edits: {
-						title: 'modified title',
-						tags: [ 2 ],
-					},
-				} );
-
-				expect( state.present.edits ).toEqual( {
-					status: 'draft',
-					title: 'modified title',
-					tags: [ 2 ],
-				} );
-			} );
-
-			it( 'should merge object values', () => {
-				const original = editor( undefined, {
-					type: 'EDIT_POST',
-					edits: {
-						meta: {
-							a: 1,
-						},
-					},
-				} );
-
-				const state = editor( original, {
-					type: 'EDIT_POST',
-					edits: {
-						meta: {
-							b: 2,
-						},
-					},
-				} );
-
-				expect( state.present.edits ).toEqual( {
-					meta: {
-						a: 1,
-						b: 2,
-					},
-				} );
-			} );
-
-			it( 'return state by reference on unchanging update', () => {
-				const original = editor( undefined, {} );
-
-				const state = editor( original, {
-					type: 'UPDATE_POST',
-					edits: {},
-				} );
-
-				expect( state.present.edits ).toBe( original.present.edits );
-			} );
-
-			it( 'unset reset post values which match by canonical value', () => {
-				const original = editor( undefined, {
-					type: 'EDIT_POST',
-					edits: {
-						title: 'modified title',
-					},
-				} );
-
-				const state = editor( original, {
-					type: 'RESET_POST',
-					post: {
-						title: {
-							raw: 'modified title',
-						},
-					},
-				} );
-
-				expect( state.present.edits ).toEqual( {} );
-			} );
-
-			it( 'unset reset post values by deep match', () => {
-				const original = editor( undefined, {
-					type: 'EDIT_POST',
-					edits: {
-						title: 'modified title',
-						meta: {
-							a: 1,
-							b: 2,
-						},
-					},
-				} );
-
-				const state = editor( original, {
-					type: 'UPDATE_POST',
-					edits: {
-						title: 'modified title',
-						meta: {
-							a: 1,
-							b: 2,
-						},
-					},
-				} );
-
-				expect( state.present.edits ).toEqual( {} );
-			} );
-
-			it( 'should omit content when resetting', () => {
-				// Use case: When editing in Text mode, we defer to content on
-				// the property, but we reset blocks by parse when switching
-				// back to Visual mode.
-				const original = deepFreeze( editor( undefined, {} ) );
-				let state = editor( original, {
-					type: 'EDIT_POST',
-					edits: {
-						content: 'bananas',
-					},
-				} );
-
-				expect( state.present.edits ).toHaveProperty( 'content' );
-
-				state = editor( original, {
-					type: 'RESET_EDITOR_BLOCKS',
-					blocks: [ {
-						clientId: 'kumquat',
-						name: 'core/test-block',
-						attributes: {},
-						innerBlocks: [],
-					}, {
-						clientId: 'loquat',
-						name: 'core/test-block',
-						attributes: {},
-						innerBlocks: [],
-					} ],
-				} );
-
-				expect( state.present.edits ).not.toHaveProperty( 'content' );
-			} );
-		} );
-	} );
-
-	describe( 'initialEdits', () => {
-		it( 'should default to initial edits', () => {
-			const state = initialEdits( undefined, {} );
-
-			expect( state ).toBe( INITIAL_EDITS_DEFAULTS );
-		} );
-
-		it( 'should return initial edits on post reset', () => {
-			const state = initialEdits( undefined, {
-				type: 'RESET_POST',
-			} );
-
-			expect( state ).toBe( INITIAL_EDITS_DEFAULTS );
-		} );
-
-		it( 'should return referentially equal state if setup includes no edits', () => {
-			const original = initialEdits( undefined, {} );
-			const state = initialEdits( deepFreeze( original ), {
-				type: 'SETUP_EDITOR',
-			} );
-
-			expect( state ).toBe( original );
-		} );
-
-		it( 'should return referentially equal state if reset while having made no edits', () => {
-			const original = initialEdits( undefined, {} );
-			const state = initialEdits( deepFreeze( original ), {
-				type: 'RESET_POST',
-			} );
-
-			expect( state ).toBe( original );
-		} );
-
-		it( 'should return setup edits', () => {
-			const original = initialEdits( undefined, {} );
-			const state = initialEdits( deepFreeze( original ), {
-				type: 'SETUP_EDITOR',
-				edits: {
-					title: '',
-					content: '',
-				},
-			} );
-
-			expect( state ).toEqual( {
-				title: '',
-				content: '',
-			} );
-		} );
-
-		it( 'should unset content on editor setup', () => {
-			const original = initialEdits( undefined, {
-				type: 'SETUP_EDITOR',
-				edits: {
-					title: '',
-					content: '',
-				},
-			} );
-			const state = initialEdits( deepFreeze( original ), {
-				type: 'SETUP_EDITOR_STATE',
-			} );
-
-			expect( state ).toEqual( { title: '' } );
-		} );
-
-		it( 'should unset values on post update', () => {
-			const original = initialEdits( undefined, {
-				type: 'SETUP_EDITOR',
-				edits: {
-					title: '',
-				},
-			} );
-			const state = initialEdits( deepFreeze( original ), {
-				type: 'UPDATE_POST',
-				edits: {
-					title: '',
-				},
-			} );
-
-			expect( state ).toEqual( {} );
-		} );
-	} );
-
-	describe( 'currentPost()', () => {
-		it( 'should reset a post object', () => {
-			const original = deepFreeze( { title: 'unmodified' } );
-
-			const state = currentPost( original, {
-				type: 'RESET_POST',
-				post: {
-					title: 'new post',
-				},
-			} );
-
-			expect( state ).toEqual( {
-				title: 'new post',
-			} );
-		} );
-
-		it( 'should update the post object with UPDATE_POST', () => {
-			const original = deepFreeze( { title: 'unmodified', status: 'publish' } );
-
-			const state = currentPost( original, {
-				type: 'UPDATE_POST',
-				edits: {
-					title: 'updated post object from server',
-				},
-			} );
-
-			expect( state ).toEqual( {
-				title: 'updated post object from server',
-				status: 'publish',
-			} );
-		} );
-	} );
-
 	describe( 'preferences()', () => {
 		it( 'should apply all defaults', () => {
 			const state = preferences( undefined, {} );
@@ -508,43 +184,11 @@ describe( 'state', () => {
 		it( 'should update when a request is started', () => {
 			const state = saving( null, {
 				type: 'REQUEST_POST_UPDATE_START',
+				options: { isAutosave: true },
 			} );
 			expect( state ).toEqual( {
-				requesting: true,
-				successful: false,
-				error: null,
-				options: {},
-			} );
-		} );
-
-		it( 'should update when a request succeeds', () => {
-			const state = saving( null, {
-				type: 'REQUEST_POST_UPDATE_SUCCESS',
-			} );
-			expect( state ).toEqual( {
-				requesting: false,
-				successful: true,
-				error: null,
-				options: {},
-			} );
-		} );
-
-		it( 'should update when a request fails', () => {
-			const state = saving( null, {
-				type: 'REQUEST_POST_UPDATE_FAILURE',
-				error: {
-					code: 'pretend_error',
-					message: 'update failed',
-				},
-			} );
-			expect( state ).toEqual( {
-				requesting: false,
-				successful: false,
-				error: {
-					code: 'pretend_error',
-					message: 'update failed',
-				},
-				options: {},
+				pending: true,
+				options: { isAutosave: true },
 			} );
 		} );
 	} );
@@ -563,19 +207,14 @@ describe( 'state', () => {
 			const state = reusableBlocks( {}, {
 				type: 'RECEIVE_REUSABLE_BLOCKS',
 				results: [ {
-					reusableBlock: {
-						id: 123,
-						title: 'My cool block',
-					},
-					parsedBlock: {
-						clientId: 'foo',
-					},
+					id: 123,
+					title: 'My cool block',
 				} ],
 			} );
 
 			expect( state ).toEqual( {
 				data: {
-					123: { clientId: 'foo', title: 'My cool block' },
+					123: { id: 123, title: 'My cool block' },
 				},
 				isFetching: {},
 				isSaving: {},
@@ -592,9 +231,11 @@ describe( 'state', () => {
 			};
 
 			const state = reusableBlocks( initialState, {
-				type: 'UPDATE_REUSABLE_BLOCK_TITLE',
+				type: 'UPDATE_REUSABLE_BLOCK',
 				id: 123,
-				title: 'My block',
+				changes: {
+					title: 'My block',
+				},
 			} );
 
 			expect( state ).toEqual( {
@@ -609,7 +250,7 @@ describe( 'state', () => {
 		it( "should update the reusable block's id if it was temporary", () => {
 			const initialState = {
 				data: {
-					reusable1: { clientId: '', title: '' },
+					reusable1: { id: 'reusable1', title: '' },
 				},
 				isSaving: {},
 			};
@@ -622,7 +263,7 @@ describe( 'state', () => {
 
 			expect( state ).toEqual( {
 				data: {
-					123: { clientId: '', title: '' },
+					123: { id: 123, title: '' },
 				},
 				isFetching: {},
 				isSaving: {},
@@ -847,68 +488,48 @@ describe( 'state', () => {
 		} );
 	} );
 
-	describe( 'previewLink', () => {
-		it( 'returns null by default', () => {
-			const state = previewLink( undefined, {} );
+	describe( 'postAutosavingLock', () => {
+		it( 'returns empty object by default', () => {
+			const state = postAutosavingLock( undefined, {} );
 
-			expect( state ).toBe( null );
+			expect( state ).toEqual( {} );
 		} );
 
-		it( 'returns preview link from save success', () => {
-			const state = previewLink( null, {
-				type: 'REQUEST_POST_UPDATE_SUCCESS',
-				post: {
-					preview_link: 'https://example.com/?p=2611&preview=true',
-				},
+		it( 'returns correct post locks when locks added and removed', () => {
+			let state = postAutosavingLock( undefined, {
+				type: 'LOCK_POST_AUTOSAVING',
+				lockName: 'test-lock',
 			} );
 
-			expect( state ).toBe( 'https://example.com/?p=2611&preview=true' );
-		} );
-
-		it( 'returns post link with query arg from save success if no preview link', () => {
-			const state = previewLink( null, {
-				type: 'REQUEST_POST_UPDATE_SUCCESS',
-				post: {
-					link: 'https://example.com/sample-post/',
-				},
+			expect( state ).toEqual( {
+				'test-lock': true,
 			} );
 
-			expect( state ).toBe( 'https://example.com/sample-post/?preview=true' );
-		} );
-
-		it( 'returns same state if save success without preview link or post link', () => {
-			// Bug: This can occur for post types which are defined as
-			// `publicly_queryable => false` (non-viewable).
-			//
-			// See: https://github.com/WordPress/gutenberg/issues/12677
-			const state = previewLink( null, {
-				type: 'REQUEST_POST_UPDATE_SUCCESS',
-				post: {
-					preview_link: '',
-				},
+			state = postAutosavingLock( deepFreeze( state ), {
+				type: 'LOCK_POST_AUTOSAVING',
+				lockName: 'test-lock-2',
 			} );
 
-			expect( state ).toBe( null );
-		} );
-
-		it( 'returns resets on preview start', () => {
-			const state = previewLink( 'https://example.com/sample-post/', {
-				type: 'REQUEST_POST_UPDATE_START',
-				options: {
-					isPreview: true,
-				},
+			expect( state ).toEqual( {
+				'test-lock': true,
+				'test-lock-2': true,
 			} );
 
-			expect( state ).toBe( null );
-		} );
-
-		it( 'returns state on non-preview save start', () => {
-			const state = previewLink( 'https://example.com/sample-post/', {
-				type: 'REQUEST_POST_UPDATE_START',
-				options: {},
+			state = postAutosavingLock( deepFreeze( state ), {
+				type: 'UNLOCK_POST_AUTOSAVING',
+				lockName: 'test-lock',
 			} );
 
-			expect( state ).toBe( 'https://example.com/sample-post/' );
+			expect( state ).toEqual( {
+				'test-lock-2': true,
+			} );
+
+			state = postAutosavingLock( deepFreeze( state ), {
+				type: 'UNLOCK_POST_AUTOSAVING',
+				lockName: 'test-lock-2',
+			} );
+
+			expect( state ).toEqual( {} );
 		} );
 	} );
 } );

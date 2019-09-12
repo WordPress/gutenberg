@@ -10,7 +10,7 @@ import {
 	insertBlock,
 } from '@wordpress/e2e-test-utils';
 
-describe( 'adding blocks', () => {
+describe( 'Writing Flow', () => {
 	beforeEach( async () => {
 		await createNewPost();
 	} );
@@ -316,7 +316,6 @@ describe( 'adding blocks', () => {
 	it( 'should navigate empty paragraph', async () => {
 		await clickBlockAppender();
 		await page.keyboard.press( 'Enter' );
-		await page.waitForFunction( () => document.activeElement.isContentEditable );
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'ArrowRight' );
@@ -406,6 +405,20 @@ describe( 'adding blocks', () => {
 		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.type( '1' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should navigate empty paragraphs', async () => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.type( '1' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.type( '3' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );

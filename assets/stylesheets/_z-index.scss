@@ -32,9 +32,6 @@ $z-layers: (
 	".wp-block-cover.has-background-dim::before": 1, // Overlay area inside block cover need to be higher than the video background.
 	".wp-block-cover__video-background": 0, // Video background inside cover block.
 
-	// Side UI active buttons
-	".block-editor-block-mover__control": 1,
-
 	// Active pill button
 	".components-button.is-button {:focus or .is-primary}": 1,
 
@@ -46,24 +43,24 @@ $z-layers: (
 	".block-editor-block-list__block-edit .reusable-block-edit-panel *": 1,
 
 	// Show drop zone above most standard content, but below any overlays
-	".components-drop-zone": 100,
-	".components-drop-zone__content": 110,
+	".components-drop-zone": 40,
+	".components-drop-zone__content": 50,
 
 	// The block mover for floats should overlap the controls of adjacent blocks.
-	".block-editor-block-list__block {core/image aligned left or right}": 81,
+	".block-editor-block-list__block {core/image aligned left or right}": 21,
 
 	// Small screen inner blocks overlay must be displayed above drop zone,
 	// settings menu, and movers.
-	".block-editor-inner-blocks.has-overlay::after": 120,
+	".block-editor-inner-blocks.has-overlay::after": 60,
 
 	// The toolbar, when contextual, should be above any adjacent nested block click overlays.
-	".block-editor-block-list__layout .reusable-block-edit-panel": 121,
-	".block-editor-block-contextual-toolbar": 121,
-	".editor-inner-blocks .block-editor-block-list__breadcrumb": 122,
+	".block-editor-block-list__layout .reusable-block-edit-panel": 61,
+	".block-editor-block-contextual-toolbar": 61,
+	".editor-inner-blocks .block-editor-block-list__breadcrumb": 62,
 
 	// The block mover, particularly in nested contexts,
 	// should overlap most block content.
-	".block-editor-block-list__block.is-{selected,hovered} .block-editor-block-mover": 121,
+	".block-editor-block-list__block.is-{selected,hovered} .block-editor-block-mover": 61,
 
 	// Show sidebar above wp-admin navigation bar for mobile viewports:
 	// #wpadminbar { z-index: 99999 }
@@ -112,7 +109,10 @@ $z-layers: (
 
 	// Make sure corner handles are above side handles for ResizableBox component
 	".components-resizable-box__side-handle": 1,
-	".components-resizable-box__corner-handle": 2
+	".components-resizable-box__corner-handle": 2,
+
+	// Make sure block manager sticky category titles appear above the options
+	".edit-post-manage-blocks-modal__category-title": 1
 );
 
 @function z-index( $key ) {

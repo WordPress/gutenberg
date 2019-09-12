@@ -30,18 +30,6 @@
 // These keyframes should not be part of the _animations.scss mixins file.
 // Because keyframe animations can't be defined as mixins properly, they are duplicated.
 // Since hey are intended only for the editor, we add them here instead.
-@keyframes edit-post__loading-fade-animation {
-	0% {
-		opacity: 0.5;
-	}
-	50% {
-		opacity: 1;
-	}
-	100% {
-		opacity: 0.5;
-	}
-}
-
 @keyframes edit-post__fade-in-animation {
 	from {
 		opacity: 0;
@@ -61,8 +49,13 @@ body.block-editor-page {
 	@include wp-admin-reset( ".block-editor" );
 }
 
-.block-editor,
-// The modals are shown outside the .block-editor wrapper, they need these styles
+// Target the editor UI excluding the metaboxes and custom fields areas.
+.edit-post-header,
+.edit-post-visual-editor,
+.edit-post-text-editor,
+.edit-post-sidebar,
+.editor-post-publish-panel,
+.components-popover,
 .components-modal__frame {
 	@include reset;
 }

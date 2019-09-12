@@ -36,7 +36,7 @@ import { DEPRECATED_ENTRY_KEYS } from './constants';
 /**
  * An object describing a normalized block type icon.
  *
- * @typedef {WPBlockTypeIconDescriptor}
+ * @typedef {Object} WPBlockTypeIconDescriptor
  *
  * @property {WPBlockTypeIconRender} src         Render behavior of the icon,
  *                                               one of a Dashicon slug, an
@@ -60,23 +60,23 @@ import { DEPRECATED_ENTRY_KEYS } from './constants';
 /**
  * Defined behavior of a block type.
  *
- * @typedef {WPBlockType}
+ * @typedef {Object} WPBlockType
  *
- * @property {string}           name       Block type's namespaced name.
- * @property {string}           title      Human-readable block type label.
- * @property {string}           category   Block type category classification,
- *                                         used in search interfaces to arrange
- *                                         block types by category.
- * @property {?WPBlockTypeIcon} icon       Block type icon.
- * @property {?string[]}        keywords   Additional keywords to produce block
- *                                         type as result in search interfaces.
- * @property {?Object}          attributes Block type attributes.
- * @property {?WPComponent}     save       Optional component describing
- *                                         serialized markup structure of a
- *                                         block type.
- * @property {WPComponent}      edit       Component rendering an element to
- *                                         manipulate the attributes of a block
- *                                         in the context of an editor.
+ * @property {string}           name        Block type's namespaced name.
+ * @property {string}           title       Human-readable block type label.
+ * @property {string}           category    Block type category classification,
+ *                                          used in search interfaces to arrange
+ *                                          block types by category.
+ * @property {WPBlockTypeIcon} [icon]       Block type icon.
+ * @property {string[]}        [keywords]   Additional keywords to produce block
+ *                                          type as result in search interfaces.
+ * @property {Object}          [attributes] Block type attributes.
+ * @property {WPComponent}     [save]       Optional component describing
+ *                                          serialized markup structure of a
+ *                                          block type.
+ * @property {WPComponent}      edit        Component rendering an element to
+ *                                          manipulate the attributes of a block
+ *                                          in the context of an editor.
  */
 
 /**

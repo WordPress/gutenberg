@@ -179,7 +179,7 @@
 	box-shadow: 0 0 0 transparent;
 	transition: box-shadow 0.1s linear;
 	border-radius: $radius-round-rectangle;
-	border: $border-width solid $dark-gray-150;
+	border: $border-width solid $dark-gray-200;
 	@include reduce-motion("transition");
 }
 
@@ -394,11 +394,6 @@
 		box-sizing: inherit;
 	}
 
-	select {
-		font-size: $default-font-size;
-		color: $dark-gray-500;
-	}
-
 	.input-control, // Upstream name is `.regular-text`.
 	input[type="text"],
 	input[type="search"],
@@ -440,6 +435,8 @@
 
 	select {
 		padding: 2px;
+		font-size: $default-font-size;
+		color: $dark-gray-500;
 
 		&:focus {
 			border-color: $blue-medium-600;

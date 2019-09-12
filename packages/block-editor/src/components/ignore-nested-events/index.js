@@ -39,8 +39,6 @@ export class IgnoreNestedEvents extends Component {
 	 * it has not already been handled by a descendant IgnoreNestedEvents.
 	 *
 	 * @param {Event} event Event object.
-	 *
-	 * @return {void}
 	 */
 	proxyEvent( event ) {
 		const isHandled = !! event.nativeEvent._blockHandled;

@@ -13,15 +13,16 @@ import {
 
 export default function save( { attributes } ) {
 	const {
-		url,
-		text,
-		title,
 		backgroundColor,
-		textColor,
+		borderRadius,
 		customBackgroundColor,
 		customTextColor,
 		linkTarget,
 		rel,
+		text,
+		textColor,
+		title,
+		url,
 	} = attributes;
 
 	const textClass = getColorClassName( 'color', textColor );
@@ -32,11 +33,13 @@ export default function save( { attributes } ) {
 		[ textClass ]: textClass,
 		'has-background': backgroundColor || customBackgroundColor,
 		[ backgroundClass ]: backgroundClass,
+		'no-border-radius': borderRadius === 0,
 	} );
 
 	const buttonStyle = {
 		backgroundColor: backgroundClass ? undefined : customBackgroundColor,
 		color: textClass ? undefined : customTextColor,
+		borderRadius: borderRadius ? borderRadius + 'px' : undefined,
 	};
 
 	return (

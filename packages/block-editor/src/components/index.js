@@ -12,6 +12,7 @@ export { default as BlockEdit } from './block-edit';
 export { default as BlockFormatControls } from './block-format-controls';
 export { default as BlockIcon } from './block-icon';
 export { default as BlockNavigationDropdown } from './block-navigation/dropdown';
+export { default as BlockNavigationList } from './block-navigation/list';
 export { default as BlockVerticalAlignmentToolbar } from './block-vertical-alignment-toolbar';
 export { default as ButtonBlockerAppender } from './button-block-appender';
 export { default as ColorPalette } from './color-palette';
@@ -45,6 +46,7 @@ export { default as BlockEditorKeyboardShortcuts } from './block-editor-keyboard
 export { default as BlockInspector } from './block-inspector';
 export { default as BlockList } from './block-list';
 export { default as BlockMover } from './block-mover';
+export { default as BlockPreview } from './block-preview';
 export { default as BlockSelectionClearer } from './block-selection-clearer';
 export { default as BlockSettingsMenu } from './block-settings-menu';
 export { default as BlockTitle } from './block-title';
@@ -58,6 +60,7 @@ export { default as NavigableToolbar } from './navigable-toolbar';
 export { default as ObserveTyping } from './observe-typing';
 export { default as PreserveScrollInReorder } from './preserve-scroll-in-reorder';
 export { default as SkipToSelectedBlock } from './skip-to-selected-block';
+export { default as Typewriter } from './typewriter';
 export { default as Warning } from './warning';
 export { default as WritingFlow } from './writing-flow';
 

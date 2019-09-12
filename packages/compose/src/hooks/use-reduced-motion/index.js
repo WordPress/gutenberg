@@ -8,7 +8,9 @@ import useMediaQuery from '../use-media-query';
  *
  * @type {boolean}
  */
-const IS_IE = window.navigator.userAgent.indexOf( 'Trident' ) >= 0;
+const IS_IE =
+	typeof window !== 'undefined' &&
+	window.navigator.userAgent.indexOf( 'Trident' ) >= 0;
 
 /**
  * Hook returning whether the user has a preference for reduced motion.

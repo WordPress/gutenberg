@@ -30,6 +30,9 @@
 
 		// Add a right border to show as separator in the block toolbar.
 		border-right: $border-width solid $light-gray-800;
+
+		// IE11 has thick paddings without this.
+		line-height: 0;
 	}
 
 	// Add a left border and adjust the color for Top Toolbar mode.
@@ -44,5 +47,11 @@
 }
 
 .block-editor-block-toolbar__slot {
-	display: inline-flex;
+	// Required for IE11.
+	display: inline-block;
+
+	// IE11 doesn't read rules inside this query. They are applied only to modern browsers.
+	@supports (position: sticky) {
+		display: inline-flex;
+	}
 }
