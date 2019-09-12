@@ -69,6 +69,13 @@ export function addEntities( entities ) {
  * @return {Object} Action object.
  */
 export function receiveEntityRecords( kind, name, records, query, invalidateCache = false ) {
+	// Auto drafts should not have titles, but some plugins rely on them so we can't filter this
+	// on the server.
+	if ( kind === 'postType' ) {
+		records = castArray( records ).map( ( record ) =>
+			record.status === 'auto-draft' ? { ...record, title: '' } : record
+		);
+	}
 	let action;
 	if ( query ) {
 		action = receiveQueriedItems( records, query );
@@ -235,18 +242,18 @@ export function* saveEntityRecord(
 	let error;
 	try {
 		const path = `${ entity.baseURL }${ recordId ? '/' + recordId : '' }`;
+		const persistedRecord = yield select(
+			'getRawEntityRecord',
+			kind,
+			name,
+			recordId
+		);
 
 		if ( isAutosave ) {
 			// Most of this autosave logic is very specific to posts.
 			// This is fine for now as it is the only supported autosave,
 			// but ideally this should all be handled in the back end,
 			// so the client just sends and receives objects.
-			const persistedRecord = yield select(
-				'getRawEntityRecord',
-				kind,
-				name,
-				recordId
-			);
 			const currentUser = yield select( 'getCurrentUser' );
 			const currentUserId = currentUser ? currentUser.id : undefined;
 			const autosavePost = yield select(
@@ -304,10 +311,20 @@ export function* saveEntityRecord(
 				yield receiveAutosaves( persistedRecord.id, updatedRecord );
 			}
 		} else {
+			// Auto drafts should be converted to drafts on explicit saves,
+			// but some plugins break with this behavior so we can't filter it on the server.
+			let data = record;
+			if (
+				kind === 'postType' &&
+				persistedRecord.status === 'auto-draft' &&
+				! data.status
+			) {
+				data = { ...data, status: 'draft' };
+			}
 			updatedRecord = yield apiFetch( {
 				path,
 				method: recordId ? 'PUT' : 'POST',
-				data: record,
+				data,
 			} );
 			yield receiveEntityRecords( kind, name, updatedRecord, undefined, true );
 		}
