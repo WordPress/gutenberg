@@ -16,6 +16,7 @@ import { BACKSPACE, DELETE, ENTER, LEFT, RIGHT, SPACE, ESCAPE } from '@wordpress
 import { withSelect } from '@wordpress/data';
 import { withSafeTimeout, compose } from '@wordpress/compose';
 import isShallowEqual from '@wordpress/is-shallow-equal';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -298,6 +299,13 @@ class RichText extends Component {
 		this.rafId = window.requestAnimationFrame( this.onSelectionChange );
 
 		document.addEventListener( 'selectionchange', this.onSelectionChange );
+
+		if ( this.props.setFocusedElement ) {
+			deprecated( 'wp.blockEditor.RichText setFocusedElement prop', {
+				alternative: 'selection state from the block editor store.',
+			} );
+			this.props.setFocusedElement( this.props.instanceId );
+		}
 	}
 
 	onBlur() {
