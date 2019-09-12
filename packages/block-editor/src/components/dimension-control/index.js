@@ -69,7 +69,7 @@ export function DimensionControl( props ) {
 		} ) );
 
 		return [ {
-			label: __( 'Please select…' ),
+			label: __( 'Default' ),
 			value: '',
 		} ].concat( options );
 	};
