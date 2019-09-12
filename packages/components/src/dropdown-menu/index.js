@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { find, flatMap, isEmpty, isFunction } from 'lodash';
+import { flatMap, isEmpty, isFunction } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -75,13 +75,6 @@ function DropdownMenu( {
 		position,
 	}, popoverProps );
 
-	let activeControl = false;
-	flatMap( controlSets, ( controlSet ) => {
-		activeControl = find( controlSet, ( control ) => {
-			return control.isActive === true;
-		} );
-	} );
-
 	return (
 		<Dropdown
 			className={ classnames( 'components-dropdown-menu', className ) }
@@ -109,7 +102,6 @@ function DropdownMenu( {
 						onKeyDown={ openOnArrowDown }
 						aria-haspopup="true"
 						aria-expanded={ isOpen }
-						data-subscript={ activeControl ? activeControl.subscript : '' }
 						label={ label }
 					>
 						{ ( ! icon || hasArrowIndicator ) && <span className="components-dropdown-menu__indicator" /> }
@@ -151,7 +143,6 @@ function DropdownMenu( {
 										},
 									) }
 									icon={ control.icon }
-									data-subscript={ control.subscript }
 									role="menuitem"
 									disabled={ control.isDisabled }
 								>
