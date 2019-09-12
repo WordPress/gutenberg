@@ -6,7 +6,7 @@ import { map } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __, _x, sprintf } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { withInstanceId } from '@wordpress/compose';
 import { useState, useRef, useCallback, useEffect } from '@wordpress/element';
 
@@ -146,7 +146,7 @@ function FontSizePickerSelect( {
 						isLarge
 						onClick={ onToggle }
 						aria-expanded={ isOpen }
-						aria-label={ sprintf( __( 'Customize font size. %s' ), currentFontName ) }
+						aria-label={ __( 'Font Size' ) }
 						onKeyDown={ handleOnButtonKeyDown }
 						{ ...ariaProps }
 					>
