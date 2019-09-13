@@ -60,7 +60,7 @@ export default compose(
 			downloadAndInstallBlock: ( item ) => {
 				const onDownloadError = () => {
 					createErrorNotice(
-						__( 'Block previews can\'t load.' ),
+						__( 'Block previews can’t load.' ),
 						{
 							id: DOWNLOAD_ERROR_NOTICE_ID,
 							actions: [
