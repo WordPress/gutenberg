@@ -33,7 +33,7 @@ function BlockNavigation( { rootBlock, rootBlocks, selectedBlockClientId, select
 			role="presentation"
 			className="editor-block-navigation__container block-editor-block-navigation__container"
 		>
-			<p className="editor-block-navigation__label block-editor-block-navigation__label">{ __( 'Block Navigation' ) }</p>
+			<p className="editor-block-navigation__label block-editor-block-navigation__label">{ __( 'Block navigation' ) }</p>
 			{ hasHierarchy && (
 				<BlockNavigationList
 					blocks={ [ rootBlock ] }

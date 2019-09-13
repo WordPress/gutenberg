@@ -209,14 +209,14 @@ class ButtonEdit extends Component {
 						borderRadius={ borderRadius }
 						setAttributes={ setAttributes }
 					/>
-					<PanelBody title={ __( 'Link Settings' ) }>
+					<PanelBody title={ __( 'Link settings' ) }>
 						<ToggleControl
-							label={ __( 'Open in New Tab' ) }
+							label={ __( 'Open in new tab' ) }
 							onChange={ this.onToggleOpenInNewTab }
 							checked={ linkTarget === '_blank' }
 						/>
 						<TextControl
-							label={ __( 'Link Rel' ) }
+							label={ __( 'Link rel' ) }
 							value={ rel || '' }
 							onChange={ this.onSetLinkRel }
 						/>

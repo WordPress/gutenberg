@@ -37,7 +37,7 @@ class URLInputButton extends Component {
 	render() {
 		const { url, onChange } = this.props;
 		const { expanded } = this.state;
-		const buttonLabel = url ? __( 'Edit Link' ) : __( 'Insert Link' );
+		const buttonLabel = url ? __( 'Edit link' ) : __( 'Insert link' );
 
 		return (
 			<div className="editor-url-input__button block-editor-url-input__button">
