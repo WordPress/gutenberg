@@ -14,7 +14,7 @@ function DownloadableBlockHeader( { icon, title, rating, ratingCount, onClick } 
 	return (
 		<div className="block-directory-downloadable-block-header__row">
 			{
-				icon.match( /\.(jpeg|jpg|gif|png)/ ) !== null ?
+				icon.match( /\.(jpeg|jpg|gif|png)$/ ) !== null ?
 					<img src={ icon } alt="block icon" /> :
 					<span >
 						<BlockIcon icon={ icon } showColors />
