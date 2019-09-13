@@ -1,0 +1,133 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`CSS parse Should handle closing parenthesis within url 1`] = `
+Object {
+  "stylesheet": Object {
+    "parsingErrors": Array [],
+    "rules": Array [
+      Object {
+        "declarations": Array [
+          Object {
+            "position": Position {
+              "end": Object {
+                "column": 17,
+                "line": 1,
+              },
+              "source": undefined,
+              "start": Object {
+                "column": 6,
+                "line": 1,
+              },
+            },
+            "property": "b",
+            "type": "declaration",
+            "value": "url(\\")\\")",
+          },
+          Object {
+            "position": Position {
+              "end": Object {
+                "column": 31,
+                "line": 1,
+              },
+              "source": undefined,
+              "start": Object {
+                "column": 19,
+                "line": 1,
+              },
+            },
+            "property": "d",
+            "type": "declaration",
+            "value": "url(\\";a\\")",
+          },
+        ],
+        "position": Position {
+          "end": Object {
+            "column": 34,
+            "line": 1,
+          },
+          "source": undefined,
+          "start": Object {
+            "column": 1,
+            "line": 1,
+          },
+        },
+        "selectors": Array [
+          ".a",
+        ],
+        "type": "rule",
+      },
+    ],
+    "source": undefined,
+  },
+  "type": "stylesheet",
+}
+`;
+
+exports[`CSS parse Should handle urls without quotes 1`] = `
+Object {
+  "stylesheet": Object {
+    "parsingErrors": Array [],
+    "rules": Array [
+      Object {
+        "declarations": Array [
+          Object {
+            "position": Position {
+              "end": Object {
+                "column": 217,
+                "line": 2,
+              },
+              "source": undefined,
+              "start": Object {
+                "column": 4,
+                "line": 2,
+              },
+            },
+            "property": "background-image",
+            "type": "declaration",
+            "value": "url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAEBAMAAABb34NNAAAAFVBMVEXyrmHqcBDtdQ3pcRHcbRkAAAD/uSmYi/+cAAAABnRSTlORbFE2DwAwkbURAAAAEUlEQVQI12MIEmEwSwAiIAMAC/AB+fq6WIgAAAAASUVORK5CYII=)",
+          },
+          Object {
+            "position": Position {
+              "end": Object {
+                "column": 3,
+                "line": 4,
+              },
+              "source": undefined,
+              "start": Object {
+                "column": 4,
+                "line": 3,
+              },
+            },
+            "property": "background-repeat",
+            "type": "declaration",
+            "value": "no-repeat",
+          },
+        ],
+        "position": Position {
+          "end": Object {
+            "column": 4,
+            "line": 4,
+          },
+          "source": undefined,
+          "start": Object {
+            "column": 1,
+            "line": 1,
+          },
+        },
+        "selectors": Array [
+          ".a",
+        ],
+        "type": "rule",
+      },
+    ],
+    "source": undefined,
+  },
+  "type": "stylesheet",
+}
+`;
+
+exports[`CSS traverse Should traverse the CSS 1`] = `
+"namespace h1 {
+color: red;
+}"
+`;
