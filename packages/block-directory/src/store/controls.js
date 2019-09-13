@@ -14,9 +14,9 @@ import wpApiFetch from '@wordpress/api-fetch';
  *
  * @param {string} storeName    Store name.
  * @param {string} selectorName Selector name.
- * @param  {Array} args         Selector arguments.
+ * @param {Array}  args         Selector arguments.
  *
- * @return {Object} control descriptor.
+ * @return {Object} Control descriptor.
  */
 export function select( storeName, selectorName, ...args ) {
 	return {
@@ -32,9 +32,9 @@ export function select( storeName, selectorName, ...args ) {
  *
  * @param {string} storeName      Store name.
  * @param {string} dispatcherName Dispatcher name.
- * @param  {Array} args           Selector arguments.
+ * @param {Array}  args           Selector arguments.
  *
- * @return {Object} control descriptor.
+ * @return {Object} Control descriptor.
  */
 export function dispatch( storeName, dispatcherName, ...args ) {
 	return {
@@ -49,7 +49,8 @@ export function dispatch( storeName, dispatcherName, ...args ) {
  * Trigger an API Fetch request.
  *
  * @param {Object} request API Fetch Request Object.
- * @return {Object} control descriptor.
+ *
+ * @return {Object} Control descriptor.
  */
 export function apiFetch( request ) {
 	return {
@@ -60,9 +61,10 @@ export function apiFetch( request ) {
 
 /**
  * Loads JavaScript
- * @param {Array} asset the url for the JavaScript.
- * @param {Function} onLoad callback function on success.
- * @param {Function} onError callback funciton on failure.
+ *
+ * @param {Array}    asset   The url for the JavaScript.
+ * @param {Function} onLoad  Callback function on success.
+ * @param {Function} onError Callback funciton on failure.
  */
 const loadScript = ( asset, onLoad, onError ) => {
 	if ( ! asset ) {
@@ -81,6 +83,7 @@ const loadScript = ( asset, onLoad, onError ) => {
 
 /**
  * Loads CSS file.
+ *
  * @param {*} asset the url for the CSS file.
  */
 const loadStyle = ( asset ) => {
@@ -95,17 +98,15 @@ const loadStyle = ( asset ) => {
 
 /**
  * Load the asset files for a block
- * @param {Array} assets A collection of URL for the assets
- * @param {Function} onLoad callback function on success.
- * @param {Function} onError callback funciton on failure.
- * @return {Object} control descriptor.
+ *
+ * @param {Array} assets A collection of URL for the assets.
+ *
+ * @return {Object} Control descriptor.
  */
-export function* loadAssets( assets, onLoad, onError ) {
+export function* loadAssets( assets ) {
 	return {
 		type: 'LOAD_ASSETS',
 		assets,
-		onLoad,
-		onError,
 	};
 }
 
