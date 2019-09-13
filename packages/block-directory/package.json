@@ -19,6 +19,7 @@
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
+	"react-native": "src/index",
 	"dependencies": {
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/block-editor": "file:../block-editor",
