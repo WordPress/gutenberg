@@ -82,7 +82,7 @@ add_action( 'rest_api_init', 'gutenberg_register_rest_widget_areas' );
 /**
  * Registers the block directory.
  *
- * @since 5.7.0
+ * @since 6.5.0
  */
 function gutenberg_register_rest_block_directory() {
 	$block_directory_controller = new WP_REST_Block_Directory_Controller();
