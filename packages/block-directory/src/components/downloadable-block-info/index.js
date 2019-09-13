@@ -8,9 +8,9 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 function DownloadableBlockInfo( { description, activeInstalls, humanizedUpdated } ) {
 	return (
 		<Fragment>
-			<span className="block-directory-downloadable-block-info__content">
+			<p className="block-directory-downloadable-block-info__content">
 				{ description }
-			</span>
+			</p>
 			<div className="block-directory-downloadable-block-info__row">
 				<div className="block-directory-downloadable-block-info__column">
 					<Icon icon="chart-line"></Icon>{ sprintf( _n( '%d active installation', '%d active installations', activeInstalls ), activeInstalls ) }
