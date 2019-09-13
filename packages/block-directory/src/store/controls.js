@@ -122,8 +122,9 @@ const controls = {
 	},
 	LOAD_ASSETS( { assets } ) {
 		return new Promise( ( resolve, reject ) => {
-			if ( typeof assets === 'object' && assets.constructor === Array ) {
+			if ( Array.isArray( assets ) ) {
 				let scriptsCount = 0;
+
 				forEach( assets, ( asset ) => {
 					if ( asset.match( /\.js$/ ) !== null ) {
 						scriptsCount++;
