@@ -18,8 +18,6 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 
 	/**
 	 * Constructs the controller.
-	 *
-	 * @access public
 	 */
 	public function __construct() {
 		$this->namespace = '__experimental';
@@ -28,8 +26,6 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 
 	/**
 	 * Registers the necessary REST API routes.
-	 *
-	 * @access public
 	 */
 	public function register_routes() {
 		register_rest_route(
