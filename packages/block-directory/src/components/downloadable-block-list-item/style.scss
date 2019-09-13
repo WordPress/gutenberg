@@ -16,6 +16,7 @@
 	@include reduce-motion("transition");
 	position: relative;
 	text-align: left;
+	overflow: hidden;
 }
 
 .block-directory-downloadable-block-list-item__panel {
