@@ -49,7 +49,7 @@ function DownloadableBlocksPanel( { downloadableItems, onSelect, onHover, hasPer
 	return (
 		<Fragment>
 			<p className="block-directory-downloadable-blocks-panel__description">
-				{ __( 'No blocks found in your library. We did find these blocks available for download:' ) }
+				{ __( 'No blocks found in your library. These blocks can be downloaded and installed:' ) }
 			</p>
 			<DownloadableBlocksList items={ downloadableItems } onSelect={ onSelect } onHover={ onHover } />
 		</Fragment>
