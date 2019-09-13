@@ -282,10 +282,10 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 		$block->description = wp_trim_words( wp_strip_all_tags( $plugin['description'] ), 30, '...' );
 
 		$block->id                  = $plugin['slug'];
-		$block->rating              = $plugin['rating'];
+		$block->rating              = $plugin['rating'] / 20;
 		$block->rating_count        = $plugin['num_ratings'];
 		$block->active_installs     = $plugin['active_installs'];
-		$block->author_block_rating = $plugin['author_block_rating'];
+		$block->author_block_rating = $plugin['author_block_rating'] / 20;
 		$block->author_block_count  = $plugin['author_block_count'];
 
 		// Plugin's author, not author in block.json.
