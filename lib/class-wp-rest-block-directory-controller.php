@@ -4,13 +4,13 @@
  * Block Directory REST API: WP_REST_Blocks_Controller class
  *
  * @package gutenberg
- * @since 5.7.0
+ * @since 6.5.0
  */
 
 /**
  * Controller which provides REST endpoint for the blocks.
  *
- * @since 5.2.0
+ * @since 6.5.0
  *
  * @see WP_REST_Controller
  */
@@ -69,7 +69,7 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 	/**
 	 * Checks whether a given request has permission to install and activate plugins.
 	 *
-	 * @since 5.7.0
+	 * @since 6.5.0
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_Error|bool True if the request has permission, WP_Error object otherwise.
@@ -88,7 +88,7 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 	/**
 	 * Installs and activates a plugin
 	 *
-	 * @since 5.7.0
+	 * @since 6.5.0
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_Error|WP_REST_Response Response object on success, or WP_Error object on failure.
@@ -160,7 +160,7 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 	/**
 	 * Deactivates and deletes a plugin
 	 *
-	 * @since 5.7.0
+	 * @since 6.5.0
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_Error|WP_REST_Response Response object on success, or WP_Error object on failure.
@@ -206,7 +206,7 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 	/**
 	 * Search and retrieve blocks metadata
 	 *
-	 * @since 5.7.0
+	 * @since 6.5.0
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_Error|WP_REST_Response Response object on success, or WP_Error object on failure.
@@ -266,7 +266,7 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 	/**
 	 * Parse block metadata for a block
 	 *
-	 * @since 5.7.0
+	 * @since 6.5.0
 	 *
 	 * @param WP_Object $plugin The plugin metadata.
 	 * @return WP_Error|WP_REST_Response Response object on success, or WP_Error object on failure.
