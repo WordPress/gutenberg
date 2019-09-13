@@ -357,6 +357,7 @@ export class InserterMenu extends Component {
 								</a>
 							</PanelBody>
 						) }
+
 						<__experimentalInserterMenuExtension.Slot
 							fillProps={ {
 								onSelect,
