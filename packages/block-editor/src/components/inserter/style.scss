@@ -123,9 +123,13 @@ $block-inserter-search-height: 38px;
 }
 
 .block-editor-inserter__no-results {
-	font-style: italic;
 	padding: 24px;
 	text-align: center;
+	line-height: 1.75;
+}
+
+.block-editor-inserter__block-manager-button {
+	margin-top: 24px;
 }
 
 .block-editor-inserter__child-blocks {
