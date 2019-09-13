@@ -107,7 +107,6 @@ class EditorProvider extends Component {
 				'onUpdateDefaultBlockStyles',
 				'__experimentalEnableLegacyWidgetBlock',
 				'__experimentalEnableMenuBlock',
-				'__experimentalBlockDirectory',
 				'showInserterHelpPanel',
 			] ),
 			__experimentalReusableBlocks: reusableBlocks,
@@ -191,7 +190,7 @@ class EditorProvider extends Component {
 				{ children }
 				<ReusableBlocksButtons />
 				<ConvertToGroupButtons />
-				{ editorSettings.__experimentalBlockDirectory && <InserterMenuDownloadableBlocksPanel /> }
+				<InserterMenuDownloadableBlocksPanel />
 			</BlockEditorProvider>
 		);
 	}
