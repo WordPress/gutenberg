@@ -40,7 +40,6 @@ function DownloadableBlocksList( { items, onHover = noop, children, downloadAndI
 					onMouseEnter={ () => onHover( item ) }
 					onMouseLeave={ () => onHover( null ) }
 					onBlur={ () => onHover( null ) }
-					isDisabled={ item.isDisabled }
 					item={ item }
 				/>
 			) }
