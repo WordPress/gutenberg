@@ -290,7 +290,7 @@ function gutenberg_register_scripts_and_styles() {
 	gutenberg_override_style(
 		'wp-editor',
 		gutenberg_url( 'build/editor/style.css' ),
-		array( 'wp-components', 'wp-block-editor', 'wp-nux' ),
+		array( 'wp-components', 'wp-block-editor', 'wp-nux', 'wp-block-directory' ),
 		filemtime( gutenberg_dir_path() . 'build/editor/style.css' )
 	);
 	wp_style_add_data( 'wp-editor', 'rtl', 'replace' );
@@ -372,6 +372,14 @@ function gutenberg_register_scripts_and_styles() {
 		filemtime( gutenberg_dir_path() . 'build/edit-widgets/style.css' )
 	);
 	wp_style_add_data( 'wp-edit-widgets', 'rtl', 'replace' );
+
+	gutenberg_override_style(
+		'wp-block-directory',
+		gutenberg_url( 'build/block-directory/style.css' ),
+		array( 'wp-components' ),
+		filemtime( gutenberg_dir_path() . 'build/block-directory/style.css' )
+	);
+	wp_style_add_data( 'wp-block-directory', 'rtl', 'replace' );
 
 	if ( defined( 'GUTENBERG_LIVE_RELOAD' ) && GUTENBERG_LIVE_RELOAD ) {
 		$live_reload_url = ( GUTENBERG_LIVE_RELOAD === true ) ? 'http://localhost:35729/livereload.js' : GUTENBERG_LIVE_RELOAD;

@@ -1,0 +1,49 @@
+.block-directory-downloadable-block-list-item {
+	width: 100%;
+	padding: 0;
+	margin: 0 0 12px;
+	display: flex;
+	flex-direction: row;
+	font-size: $default-font-size;
+	color: $dark-gray-700;
+	align-items: flex-start;
+	justify-content: center;
+	background: transparent;
+	word-break: break-word;
+	border-radius: $radius-round-rectangle;
+	border: $border-width solid $light-gray-500;
+	transition: all 0.05s ease-in-out;
+	@include reduce-motion("transition");
+	position: relative;
+	text-align: left;
+	overflow: hidden;
+}
+
+.block-directory-downloadable-block-list-item__panel {
+	display: flex;
+	flex-grow: 1;
+	flex-direction: column;
+}
+
+.block-directory-downloadable-block-list-item__header {
+	display: flex;
+	flex-direction: column;
+	padding: 12px 12px 0;
+}
+
+.block-directory-downloadable-block-list-item__body {
+	display: flex;
+	flex-direction: column;
+	padding: 12px;
+}
+
+.block-directory-downloadable-block-list-item__footer {
+	display: flex;
+	flex-direction: column;
+	padding: 12px;
+	background-color: $light-gray-200;
+}
+
+.block-directory-downloadable-block-list-item__content {
+	color: $dark-gray-400;
+}

@@ -25,6 +25,11 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	/**
 	* End: Include for phase 2
 	*/
+
+	if ( ! class_exists( 'WP_REST_Block_Directory_Controller' ) ) {
+		require dirname( __FILE__ ) . '/class-wp-rest-block-directory-controller.php';
+	}
+
 	require dirname( __FILE__ ) . '/rest-api.php';
 }
 

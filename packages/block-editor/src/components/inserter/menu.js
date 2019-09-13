@@ -47,6 +47,7 @@ import BlockPreview from '../block-preview';
 import BlockTypesList from '../block-types-list';
 import BlockCard from '../block-card';
 import ChildBlocks from './child-blocks';
+import __experimentalInserterMenuExtension from '../inserter-menu-extension';
 
 const MAX_SUGGESTED_ITEMS = 9;
 
@@ -197,6 +198,7 @@ export class InserterMenu extends Component {
 
 	filter( filterValue = '' ) {
 		const { debouncedSpeak, items, rootChildBlocks } = this.props;
+
 		const filteredItems = searchItems( items, filterValue );
 
 		const childItems = filter( filteredItems, ( { name } ) => includes( rootChildBlocks, name ) );
@@ -241,7 +243,6 @@ export class InserterMenu extends Component {
 			_n( '%d result found.', '%d results found.', resultCount ),
 			resultCount
 		);
-
 		debouncedSpeak( resultsFoundMessage );
 	}
 
@@ -263,6 +264,7 @@ export class InserterMenu extends Component {
 			suggestedItems,
 		} = this.state;
 		const isPanelOpen = ( panel ) => openPanels.indexOf( panel ) !== -1;
+		const hasItems = isEmpty( suggestedItems ) && isEmpty( reusableItems ) && isEmpty( itemsPerCategory );
 		const hoveredItemBlockType = hoveredItem ? getBlockType( hoveredItem.name ) : null;
 
 		// Disable reason (no-autofocus): The inserter menu is a modal display, not one which
@@ -355,9 +357,27 @@ export class InserterMenu extends Component {
 								</a>
 							</PanelBody>
 						) }
-						{ isEmpty( suggestedItems ) && isEmpty( reusableItems ) && isEmpty( itemsPerCategory ) && (
-							<p className="editor-inserter__no-results block-editor-inserter__no-results">{ __( 'No blocks found.' ) }</p>
-						) }
+
+						<__experimentalInserterMenuExtension.Slot
+							fillProps={ {
+								onSelect,
+								onHover: this.onHover,
+								filterValue: this.state.filterValue,
+								hasItems,
+							} }
+						>
+							{ ( fills ) => {
+								if ( fills.length ) {
+									return fills;
+								}
+								if ( hasItems ) {
+									return (
+										<p className="editor-inserter__no-results block-editor-inserter__no-results">{ __( 'No blocks found.' ) }</p>
+									);
+								}
+								return null;
+							} }
+						</__experimentalInserterMenuExtension.Slot>
 					</div>
 				</div>
 
@@ -515,6 +535,7 @@ export default compose(
 				}
 
 				ownProps.onSelect();
+				return insertedBlock;
 			},
 		};
 	} ),

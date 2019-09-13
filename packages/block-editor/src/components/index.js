@@ -42,6 +42,7 @@ export { default as withColorContext } from './color-palette/with-color-context'
 
 export { default as __experimentalBlockSettingsMenuFirstItem } from './block-settings-menu/block-settings-menu-first-item';
 export { default as __experimentalBlockSettingsMenuPluginsExtension } from './block-settings-menu/block-settings-menu-plugins-extension';
+export { default as __experimentalInserterMenuExtension } from './inserter-menu-extension';
 export { default as BlockEditorKeyboardShortcuts } from './block-editor-keyboard-shortcuts';
 export { default as BlockInspector } from './block-inspector';
 export { default as BlockList } from './block-list';
