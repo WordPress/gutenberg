@@ -26,9 +26,6 @@ const gutenbergSetup = () => {
 	const apiFetch = require( '@wordpress/api-fetch' ).default;
 	const wpData = require( '@wordpress/data' );
 
-	// wp-api-fetch
-	apiFetch.use( apiFetch.createRootURLMiddleware( 'https://public-api.wordpress.com/' ) );
-
 	// wp-data
 	const userId = 1;
 	const storageKey = 'WP_DATA_USER_' + userId;
