@@ -35,7 +35,7 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 				array(
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => array( $this, 'get_items' ),
-					'permission_callback' => array( $this, 'get_items_permissions_check' ),
+					'permission_callback' => array( $this, 'permissions_check' ),
 				),
 				'schema' => array( $this, 'get_item_schema' ),
 			)
@@ -47,7 +47,7 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 				array(
 					'methods'             => WP_REST_Server::CREATABLE,
 					'callback'            => array( $this, 'install_block' ),
-					'permission_callback' => array( $this, 'get_items_permissions_check' ),
+					'permission_callback' => array( $this, 'permissions_check' ),
 				),
 				'schema' => array( $this, 'get_item_schema' ),
 			)
@@ -59,7 +59,7 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 				array(
 					'methods'             => WP_REST_Server::DELETABLE,
 					'callback'            => array( $this, 'uninstall_block' ),
-					'permission_callback' => array( $this, 'get_items_permissions_check' ),
+					'permission_callback' => array( $this, 'permissions_check' ),
 				),
 				'schema' => array( $this, 'get_item_schema' ),
 			)
@@ -74,7 +74,7 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_Error|bool True if the request has permission, WP_Error object otherwise.
 	 */
-	public function get_items_permissions_check( $request ) {
+	public function permissions_check( $request ) {
 		if ( ! current_user_can( 'install_plugins' ) || ! current_user_can( 'activate_plugins' ) ) {
 			return new WP_Error(
 				'rest_user_cannot_view',
