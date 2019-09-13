@@ -25,8 +25,8 @@
 		"@babel/runtime": "^7.4.4",
 		"@wordpress/escape-html": "file:../escape-html",
 		"lodash": "^4.17.14",
-		"react": "^16.8.4",
-		"react-dom": "^16.8.4"
+		"react": "^16.9.0",
+		"react-dom": "^16.9.0"
 	},
 	"publishConfig": {
 		"access": "public"
