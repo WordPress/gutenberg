@@ -388,7 +388,7 @@ export class InserterMenu extends Component {
 									<div className="block-editor-inserter__menu-help-panel-title">Content Blocks</div>
 									<p>
 										{ __(
-											'Welcome to the wonderful world of blocks! Blocks are the basis of all content within the editor. '
+											'Welcome to the wonderful world of blocks! Blocks are the basis of all content within the editor.'
 										) }
 									</p>
 									<p>
