@@ -138,6 +138,10 @@ class EditorProvider extends Component {
 		if ( this.props.settings !== prevProps.settings ) {
 			this.props.updateEditorSettings( this.props.settings );
 		}
+
+		// When a block is installed from the inserter and is unused,
+		// it is removed when saving the post.
+		// Todo: move this to the edit-post package into a separate component.
 		if ( ! isEqual( this.props.downloadableBlocksToUninstall, prevProps.downloadableBlocksToUninstall ) ) {
 			this.props.downloadableBlocksToUninstall.forEach( ( blockType ) => {
 				this.props.uninstallBlock( blockType, noop, () => {
