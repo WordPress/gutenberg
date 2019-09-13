@@ -493,12 +493,9 @@ export function* trashPost() {
 			}
 		);
 
-		// TODO: This should be an updatePost action (updating subsets of post
-		// properties), but right now editPost is tied with change detection.
 		yield dispatch(
 			STORE_KEY,
-			'resetPost',
-			{ ...post, status: 'trash' }
+			'savePost'
 		);
 	} catch ( error ) {
 		yield dispatch(
