@@ -64,7 +64,7 @@ export function apiFetch( request ) {
  *
  * @param {Array}    asset   The url for the JavaScript.
  * @param {Function} onLoad  Callback function on success.
- * @param {Function} onError Callback funciton on failure.
+ * @param {Function} onError Callback function on failure.
  */
 const loadScript = ( asset, onLoad, onError ) => {
 	if ( ! asset ) {
