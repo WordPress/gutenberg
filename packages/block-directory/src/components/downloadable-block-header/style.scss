@@ -3,21 +3,22 @@
 	flex-grow: 1;
 
 	.block-editor-block-icon {
-		width: 36px;
-		height: 36px;
-		font-size: 36px;
+		width: $icon-button-size;
+		height: $icon-button-size;
+		font-size: $icon-button-size;
 		background-color: $light-gray-300;
 	}
 
 	img {
-		width: 36px;
-		height: 36px;
+		width: $icon-button-size;
+		height: $icon-button-size;
 	}
 
 	.block-directory-downloadable-block-header__column {
 		display: flex;
 		flex-direction: column;
 		flex-grow: 1;
+
 		.block-directory-downloadable-block-header__title {
 			font-weight: 600;
 			margin-left: 12px;

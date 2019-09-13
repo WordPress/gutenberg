@@ -1,12 +1,12 @@
 .block-directory-downloadable-block-info__content {
-	font-size: 14px;
+	font-size: $default-font-size;
 }
 
 .block-directory-downloadable-block-info__row {
 	display: flex;
 	justify-content: space-between;
 	color: $dark-gray-400;
-	margin-top: 8px;
+	margin-top: $grid-size;
 
 	.block-directory-downloadable-block-info__column {
 		display: flex;
