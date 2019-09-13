@@ -347,12 +347,11 @@ describe( 'Post generator actions', () => {
 					}
 				) );
 			} );
-			it( 'yields expected dispatch action for resetting the post', () => {
+			it( 'yields expected dispatch action for saving the post', () => {
 				const { value } = fulfillment.next();
 				expect( value ).toEqual( dispatch(
 					STORE_KEY,
-					'resetPost',
-					{ ...currentPost, status: 'trash' }
+					'savePost',
 				) );
 			} );
 		} );
