@@ -32,8 +32,6 @@ export const storeConfig = {
 	resolvers,
 };
 
-const store = registerStore( MODULE_KEY, {
-	...storeConfig,
-} );
+const store = registerStore( MODULE_KEY, storeConfig );
 
 export default store;
