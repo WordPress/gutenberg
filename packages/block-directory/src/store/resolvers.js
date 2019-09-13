@@ -34,7 +34,7 @@ export default {
 	* hasInstallBlocksPermission() {
 		try {
 			yield apiFetch( {
-				path: `__experimental/block-directory/search?term=${ '' }`,
+				path: `__experimental/block-directory/search?term=`,
 			} );
 			yield setInstallBlocksPermission( true );
 		} catch ( error ) {
