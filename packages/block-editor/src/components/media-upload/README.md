@@ -79,9 +79,20 @@ Media ID (or media IDs if multiple is true) to be selected by default when openi
 - Type: `Number|Array`
 - Required: No
 
+### onClose
+
+Callback called when the media modal is closed.
+
+This is called both when media is selected and when the user closes the modal without making a selection.
+
+- Type: `Function`
+- Required: No
+
 ### onSelect
 
-Callback called when the media modal is closed, the selected media are passed as an argument.
+Callback called when the media modal is closed after media is selected. 
+
+This is called subsequent to `onClose` when media is selected. The selected media are passed as an argument.
 
 - Type: `Function`
 - Required: Yes
