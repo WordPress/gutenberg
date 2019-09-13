@@ -31,6 +31,7 @@ export const PREFERENCES_DEFAULTS = {
  *  __experimentalCanUserUseUnfilteredHTML string        Whether the user should be able to use unfiltered HTML or the HTML should be filtered e.g., to remove elements considered insecure like iframes.
  *  __experimentalEnableLegacyWidgetBlock  boolean       Whether the user has enabled the Legacy Widget Block
  *  __experimentalEnableMenuBlock          boolean       Whether the user has enabled the Menu Block
+ *  __experimentalBlockDirectory           boolean       Whether the user has enabled the Block Directory
  */
 export const SETTINGS_DEFAULTS = {
 	alignWide: false,
@@ -150,5 +151,6 @@ export const SETTINGS_DEFAULTS = {
 	__experimentalCanUserUseUnfilteredHTML: false,
 	__experimentalEnableLegacyWidgetBlock: false,
 	__experimentalEnableMenuBlock: false,
+	__experimentalBlockDirectory: false,
 };
 
