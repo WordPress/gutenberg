@@ -24,26 +24,21 @@ export const findSizeBySlug = ( sizes, slug ) => sizes.find( ( size ) => slug ==
 export default [
 	{
 		name: __( 'None' ),
-		size: 0,
 		slug: 'none',
 	},
 	{
 		name: __( 'Small' ),
-		size: 14,
 		slug: 'small',
 	},
 	{
 		name: __( 'Medium' ),
-		size: 24,
 		slug: 'medium',
 	},
 	{
 		name: __( 'Large' ),
-		size: 34,
 		slug: 'large',
 	}, {
 		name: __( 'Extra Large' ),
-		size: 60,
 		slug: 'xlarge',
 	},
 ];
