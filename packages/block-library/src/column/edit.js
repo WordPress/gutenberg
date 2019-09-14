@@ -31,15 +31,20 @@ import {
 
 function ColumnEdit( {
 	attributes,
+	className,
 	updateAlignment,
 	updateWidth,
 	hasChildBlocks,
 } ) {
 	const { verticalAlignment, width } = attributes;
 
-	const classes = classnames( 'block-core-columns', {
-		[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
-	} );
+	const classes = classnames(
+		className,
+		'block-core-columns',
+		{
+			[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
+		}
+	);
 
 	return (
 		<div className={ classes }>
