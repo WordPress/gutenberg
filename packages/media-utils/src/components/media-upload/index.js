@@ -142,19 +142,7 @@ class MediaUpload extends Component {
 		}
 
 		if ( unstableFeaturedImageFlow ) {
-			const featuredImageFrame = getFeaturedImageMediaFrame();
-			const attachments = getAttachmentsCollection( this.props.value );
-			const selection = new wp.media.model.Selection( attachments.models, {
-				props: attachments.props.toJSON(),
-			} );
-			this.frame = new featuredImageFrame( {
-				mimeType: allowedTypes,
-				state: 'featured-image',
-				multiple,
-				selection,
-				editing: ( this.props.value ) ? true : false,
-			} );
-			wp.media.frame = this.frame;
+			this.buildAndSetFeatureImageFrame();
 		}
 
 		this.initializeListeners();
@@ -211,6 +199,22 @@ class MediaUpload extends Component {
 		} );
 		wp.media.frame = this.frame;
 		this.initializeListeners();
+	}
+
+	buildAndSetFeatureImageFrame() {
+		const featuredImageFrame = getFeaturedImageMediaFrame();
+		const attachments = getAttachmentsCollection( this.props.value );
+		const selection = new wp.media.model.Selection( attachments.models, {
+			props: attachments.props.toJSON(),
+		} );
+		this.frame = new featuredImageFrame( {
+			mimeType: this.props.allowedTypes,
+			state: 'featured-image',
+			multiple: this.props.multiple,
+			selection,
+			editing: ( this.props.value ) ? true : false,
+		} );
+		wp.media.frame = this.frame;
 	}
 
 	componentWillUnmount() {
