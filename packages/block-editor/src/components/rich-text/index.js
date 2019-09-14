@@ -336,6 +336,7 @@ class RichTextWrapper extends Component {
 			didAutomaticChange,
 			undo,
 			placeholder,
+			keepPlaceholderOnFocus,
 			// eslint-disable-next-line no-unused-vars
 			allowedFormats,
 			withoutInteractiveFormatting,
@@ -383,7 +384,10 @@ class RichTextWrapper extends Component {
 				selectionEnd={ selectionEnd }
 				onSelectionChange={ onSelectionChange }
 				tagName={ tagName }
-				className={ classnames( classes, className, { 'is-selected': originalIsSelected } ) }
+				className={ classnames( classes, className, {
+					'is-selected': originalIsSelected,
+					'keep-placeholder-on-focus': keepPlaceholderOnFocus,
+				} ) }
 				placeholder={ placeholder }
 				allowedFormats={ adjustedAllowedFormats }
 				withoutInteractiveFormatting={ withoutInteractiveFormatting }
