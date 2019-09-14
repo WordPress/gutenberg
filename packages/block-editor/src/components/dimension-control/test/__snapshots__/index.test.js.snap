@@ -13,7 +13,7 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
   options={
     Array [
       Object {
-        "label": "Please select…",
+        "label": "Default",
         "value": "",
       },
       Object {
@@ -46,7 +46,7 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
   options={
     Array [
       Object {
-        "label": "Please select…",
+        "label": "Default",
         "value": "",
       },
       Object {
@@ -82,7 +82,6 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`] 
     <React.Fragment>
       <Icon
         icon="tablet"
-        label="Tablet Devices"
       />
       Margin
     </React.Fragment>
@@ -91,7 +90,7 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`] 
   options={
     Array [
       Object {
-        "label": "Please select…",
+        "label": "Default",
         "value": "",
       },
       Object {
@@ -127,7 +126,6 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
     <React.Fragment>
       <Icon
         icon="tablet"
-        label="all"
       />
       Margin
     </React.Fragment>
@@ -136,7 +134,7 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
   options={
     Array [
       Object {
-        "label": "Please select…",
+        "label": "Default",
         "value": "",
       },
       Object {
