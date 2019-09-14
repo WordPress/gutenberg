@@ -4,7 +4,7 @@
 import { get } from 'lodash';
 
 /**
- * Returns true if application is requesting for downloable blocks.
+ * Returns true if application is requesting for downloadable blocks.
  *
  * @param {Object} state       Global application state.
  *
