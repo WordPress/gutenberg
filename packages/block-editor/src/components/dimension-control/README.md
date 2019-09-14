@@ -48,7 +48,6 @@ registerBlockType( 'my-plugin/my-block', {
 			<DimensionControl
 				label={ __( 'Padding' ) }
 				icon={ 'desktop' }
-				iconLabel={ 'Desktop Devices' }
 				onReset={ partialRight( resetSpacingDimension, 'paddingSize' ) }
 				onSpacingChange={ partialRight( updateSpacing, 'paddingSize' ) }
 				currentSize={ paddingSize }
@@ -58,9 +57,9 @@ registerBlockType( 'my-plugin/my-block', {
 } );
 ```
 
-_Note:_ it is recommend to partially apply the value of the Block attribute to be updated (eg: `paddingSize`, `marginSize`...etc) to your callback functions. This avoids the need to unecessarily couple the component to the Block attribute schema.
+_Note:_ it is recommended to partially apply the value of the Block attribute to be updated (eg: `paddingSize`, `marginSize`...etc) to your callback functions. This avoids the need to unnecessarily couple the component to the Block attribute schema.
 
-_Note:_ by default if you do not provide an initial `currentSize` prop for the current dimension value, then no value will be selected (ie: there is no default dimension set). 
+_Note:_ by default, if you do not provide an initial `currentSize` prop for the current dimension value, then no value will be selected (ie: there is no default dimension set). 
 
 ## Props
 
@@ -89,12 +88,10 @@ An optional array of size objects in the following shape:
 [
 	{
 		name: __( 'Small' ),
-		size: 14,
 		slug: 'small',
 	},
 		{
 		name: __( 'Medium' ),
-		size: 14,
 		slug: 'small',
 	},
 	// ...etc
@@ -109,13 +106,6 @@ By default a set of relative sizes (`small`, `medium`...etc) are provided. See `
 * **Required:** No
 
 An optional dashicon to display before to the control label.
-
-### `iconLabel`
-* **Type:** `String`
-* **Default:** `''`
-* **Required:** No
-
-A label for the icon (see above).
 
 ### `onSpacingChange`
 * **Type:** `Function`
