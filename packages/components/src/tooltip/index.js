@@ -89,11 +89,11 @@ class Tooltip extends Component {
 			if ( event.currentTarget.disabled ) {
 				return;
 			}
-      
-      // If pressed key is escape, no further actions are needed.
-      if ( event.keyCode === ESCAPE ) {
-        return;
-      }
+
+			// If pressed key is escape, no further actions are needed.
+			if ( event.keyCode === ESCAPE ) {
+				return;
+			}
 
 			// A focus event will occur as a result of a mouse click, but it
 			// should be disambiguated between interacting with the button and
@@ -149,7 +149,6 @@ class Tooltip extends Component {
 
 	render() {
 		const { children, position, text, shortcut } = this.props;
-		const { isOver } = this.state;
 		if ( Children.count( children ) !== 1 ) {
 			if ( 'development' === process.env.NODE_ENV ) {
 				// eslint-disable-next-line no-console
@@ -160,15 +159,15 @@ class Tooltip extends Component {
 		}
 
 		const child = Children.only( children );
+		const { isOver } = this.state;
 		return cloneElement( child, {
 			onMouseEnter: this.createToggleIsOver( 'onMouseEnter', true ),
 			onMouseLeave: this.createToggleIsOver( 'onMouseLeave' ),
-			onMouseDown: this.createToggleIsOver( 'onMouseDown' ),
+			onMouseDown: this.createSetIsMouseDown( true ),
 			onClick: this.createToggleIsOver( 'onClick' ),
 			onKeyDown: this.createToggleIsOver( 'onKeyDown' ),
 			onFocus: this.createToggleIsOver( 'onFocus' ),
 			onBlur: this.createToggleIsOver( 'onBlur' ),
-			onMouseDown: this.createSetIsMouseDown( true ),
 			children: concatChildren(
 				child.props.children,
 				isOver && (
