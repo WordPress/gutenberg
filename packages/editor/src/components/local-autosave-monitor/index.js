@@ -157,21 +157,21 @@ function useAutosaveNotice() {
 function useAutosavePurge() {
 	const {
 		postId,
-		didSave,
+		isDirty,
 	} = useSelect( ( select ) => ( {
 		postId: select( 'core/editor' ).getCurrentPostId(),
-		didSave: select( 'core/editor' ).didPostSaveRequestSucceed(),
+		isDirty: select( 'core/editor' ).isEditedPostDirty(),
 	} ) );
 
-	const lastDidSave = useRef( didSave );
+	const lastIsDirty = useRef( isDirty );
 
 	useEffect( () => {
-		if ( lastDidSave.current !== true && didSave ) {
+		if ( lastIsDirty.current && ! isDirty ) {
 			window.sessionStorage.removeItem( postKey( postId ) );
 		}
 
-		lastDidSave.current = didSave;
-	}, [ didSave ] );
+		lastIsDirty.current = isDirty;
+	}, [ isDirty ] );
 }
 
 function LocalAutosaveMonitor() {
