@@ -23,7 +23,7 @@ import {
 import sizesTable, { findSizeBySlug } from './sizes';
 
 export function DimensionControl( props ) {
-	const { label, icon, iconLabel = 'all', sizes = sizesTable, currentSize, onSpacingChange, onReset, className = '' } = props;
+	const { label, icon, sizes = sizesTable, currentSize, onSpacingChange, onReset, className = '' } = props;
 
 	/**
 	 * Determines the size from the size slug (eg: `medium`)
@@ -77,7 +77,6 @@ export function DimensionControl( props ) {
 			{ icon && (
 				<Icon
 					icon={ icon }
-					label={ iconLabel || '' }
 				/>
 			) }
 			{ label }
