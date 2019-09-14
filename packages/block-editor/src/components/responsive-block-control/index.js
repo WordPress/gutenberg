@@ -8,13 +8,15 @@ import {
 } from '@wordpress/components';
 
 function ResponsiveBlockControl( props ) {
-	const { legend = '', property, toggleLabel, isOpen = false, onToggleResponsive, renderDefaultControl, renderResponsiveControl } = props;
+	const { legend = '', property, toggleLabel, isOpen = false, onToggleResponsive, renderDefaultControl, defaultLabel = __( 'All' ), devices = [ __( 'Desktop' ), __( 'Tablet' ), __( 'Mobile' ) ], renderResponsiveControls } = props;
 
-	if ( ! legend || ! property ) {
+	if ( ! legend || ! property || ! renderDefaultControl ) {
 		return null;
 	}
 
 	const toggleControlLabel = toggleLabel || sprintf( __( 'Manually adjust %s based on screensize.' ), property );
+
+	const responsiveControls = devices.map( ( deviceLabel ) => renderDefaultControl( deviceLabel ) );
 
 	return (
 
@@ -22,9 +24,9 @@ function ResponsiveBlockControl( props ) {
 			<legend className="block-editor-responsive-block-control__label">{ legend }</legend>
 
 			<div className="block-editor-responsive-block-control__inner">
-				{ ! isOpen && renderDefaultControl() }
+				{ ! isOpen && renderDefaultControl( defaultLabel ) }
 
-				{ isOpen && renderResponsiveControl() }
+				{ isOpen && ( renderResponsiveControls ? renderResponsiveControls() : responsiveControls ) }
 
 				<ToggleControl
 					label={ toggleControlLabel }
