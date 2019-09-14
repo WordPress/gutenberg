@@ -58,7 +58,7 @@ export function DimensionControl( props ) {
 	 * to a format suitable for use in the
 	 * <SelectControl /> options prop
 	 * @param  {Array} theSizes the array of sizes objects
-	 * @return {Array}       the array of options with default option prepended
+	 * @return {Array}          the array of options with default option prepended
 	 */
 	const formatSizesAsOptions = ( theSizes ) => {
 		const options = theSizes.map( ( { name, slug } ) => ( {
