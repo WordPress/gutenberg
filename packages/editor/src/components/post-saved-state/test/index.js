@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { mount, shallow } from 'enzyme';
 
 /**
  * Internal dependencies
@@ -10,7 +10,7 @@ import { PostSavedState } from '../';
 
 describe( 'PostSavedState', () => {
 	it( 'should display saving while save in progress, even if not saveable', () => {
-		const wrapper = shallow(
+		const wrapper = mount(
 			<PostSavedState
 				isNew
 				isDirty={ false }
@@ -66,7 +66,9 @@ describe( 'PostSavedState', () => {
 		);
 
 		expect( wrapper ).toMatchSnapshot();
-		wrapper.simulate( 'click' );
+		wrapper.simulate( 'click', {} );
 		expect( saveSpy ).toHaveBeenCalled();
+		// Regression: Verify the event object is not passed to prop callback.
+		expect( saveSpy.mock.calls[ 0 ] ).toEqual( [] );
 	} );
 } );

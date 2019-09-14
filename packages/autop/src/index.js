@@ -1,7 +1,7 @@
 /**
  * The regular expression for an HTML element.
  *
- * @type {String}
+ * @type {string}
  */
 const htmlSplitRegex = ( () => {
 	/* eslint-disable no-multi-spaces */

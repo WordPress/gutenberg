@@ -4,6 +4,7 @@
 import '@wordpress/core-data';
 import '@wordpress/block-editor';
 import '@wordpress/editor';
+import '@wordpress/viewport';
 import '@wordpress/notices';
 import { registerCoreBlocks } from '@wordpress/block-library';
 import { unregisterBlockType } from '@wordpress/blocks';

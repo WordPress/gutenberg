@@ -1,0 +1,10 @@
+{
+	"overrides": [
+		{
+			"files": [ "shared-tests.js" ],
+			"extends": [
+				"plugin:@wordpress/eslint-plugin/test-unit"
+			]
+		}
+	]
+}

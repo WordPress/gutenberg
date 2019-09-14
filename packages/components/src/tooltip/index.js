@@ -12,6 +12,7 @@ import {
 	cloneElement,
 	concatChildren,
 } from '@wordpress/element';
+import { ESCAPE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -22,7 +23,7 @@ import Shortcut from '../shortcut';
 /**
  * Time over children to wait before showing tooltip
  *
- * @type {Number}
+ * @type {number}
  */
 const TOOLTIP_DELAY = 700;
 
@@ -35,6 +36,22 @@ class Tooltip extends Component {
 			TOOLTIP_DELAY
 		);
 
+		/**
+		 * Prebound `isInMouseDown` handler, created as a constant reference to
+		 * assure ability to remove in component unmount.
+		 *
+		 * @type {Function}
+		 */
+		this.cancelIsMouseDown = this.createSetIsMouseDown( false );
+
+		/**
+		 * Whether a the mouse is currently pressed, used in determining whether
+		 * to handle a focus event as displaying the tooltip immediately.
+		 *
+		 * @type {boolean}
+		 */
+		this.isInMouseDown = false;
+
 		this.state = {
 			isOver: false,
 		};
@@ -42,6 +59,8 @@ class Tooltip extends Component {
 
 	componentWillUnmount() {
 		this.delayedSetIsOver.cancel();
+
+		document.removeEventListener( 'mouseup', this.cancelIsMouseDown );
 	}
 
 	emitToChild( eventName, event ) {
@@ -70,9 +89,16 @@ class Tooltip extends Component {
 			if ( event.currentTarget.disabled ) {
 				return;
 			}
+      
+      // If pressed key is escape, no further actions are needed.
+      if ( event.keyCode === ESCAPE ) {
+        return;
+      }
 
-			// If pressed key is escape, no further actions are needed.
-			if ( event.keyCode === 27 ) { // 27 is the keyCode for escape
+			// A focus event will occur as a result of a mouse click, but it
+			// should be disambiguated between interacting with the button and
+			// using an explicit focus shift as a cue to display the tooltip.
+			if ( 'focus' === event.type && this.isInMouseDown ) {
 				return;
 			}
 
@@ -90,6 +116,34 @@ class Tooltip extends Component {
 			} else {
 				this.setState( { isOver } );
 			}
+		};
+	}
+
+	/**
+	 * Creates an event callback to handle assignment of the `isInMouseDown`
+	 * instance property in response to a `mousedown` or `mouseup` event.
+	 *
+	 * @param {boolean} isMouseDown Whether handler is to be created for the
+	 *                              `mousedown` event, as opposed to `mouseup`.
+	 *
+	 * @return {Function} Event callback handler.
+	 */
+	createSetIsMouseDown( isMouseDown ) {
+		return ( event ) => {
+			// Preserve original child callback behavior
+			this.emitToChild( isMouseDown ? 'onMouseDown' : 'onMouseUp', event );
+
+			// On mouse down, the next `mouseup` should revert the value of the
+			// instance property and remove its own event handler. The bind is
+			// made on the document since the `mouseup` might not occur within
+			// the bounds of the element.
+			document[
+				isMouseDown ?
+					'addEventListener' :
+					'removeEventListener'
+			]( 'mouseup', this.cancelIsMouseDown );
+
+			this.isInMouseDown = isMouseDown;
 		};
 	}
 
@@ -114,6 +168,7 @@ class Tooltip extends Component {
 			onKeyDown: this.createToggleIsOver( 'onKeyDown' ),
 			onFocus: this.createToggleIsOver( 'onFocus' ),
 			onBlur: this.createToggleIsOver( 'onBlur' ),
+			onMouseDown: this.createSetIsMouseDown( true ),
 			children: concatChildren(
 				child.props.children,
 				isOver && (

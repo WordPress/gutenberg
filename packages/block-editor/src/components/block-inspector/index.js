@@ -15,11 +15,12 @@ import { withSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import SkipToSelectedBlock from '../skip-to-selected-block';
-import BlockIcon from '../block-icon';
+import BlockCard from '../block-card';
 import InspectorControls from '../inspector-controls';
 import InspectorAdvancedControls from '../inspector-advanced-controls';
 import BlockStyles from '../block-styles';
 import MultiSelectionInspector from '../multi-selection-inspector';
+import DefaultStylePicker from '../default-style-picker';
 const BlockInspector = ( {
 	blockType,
 	count,
@@ -51,13 +52,7 @@ const BlockInspector = ( {
 
 	return (
 		<>
-			<div className="editor-block-inspector__card block-editor-block-inspector__card">
-				<BlockIcon icon={ blockType.icon } showColors />
-				<div className="editor-block-inspector__card-content block-editor-block-inspector__card-content">
-					<div className="editor-block-inspector__card-title block-editor-block-inspector__card-title">{ blockType.title }</div>
-					<div className="editor-block-inspector__card-description block-editor-block-inspector__card-description">{ blockType.description }</div>
-				</div>
-			</div>
+			<BlockCard blockType={ blockType } />
 			{ hasBlockStyles && (
 				<div>
 					<PanelBody
@@ -67,6 +62,7 @@ const BlockInspector = ( {
 						<BlockStyles
 							clientId={ selectedBlockClientId }
 						/>
+						<DefaultStylePicker blockName={ blockType.name } />
 					</PanelBody>
 				</div>
 			) }

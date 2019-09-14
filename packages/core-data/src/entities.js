@@ -35,6 +35,8 @@ function* loadPostTypeEntities() {
 			kind: 'postType',
 			baseURL: '/wp/v2/' + postType.rest_base,
 			name,
+			transientEdits: { blocks: true },
+			mergedEdits: { meta: true },
 		};
 	} );
 }

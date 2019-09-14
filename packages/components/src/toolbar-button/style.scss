@@ -69,6 +69,18 @@
 	// Focus style
 	&:not(:disabled):focus > svg {
 		@include formatting-button-style__focus;
+		// Remove outline from SVG to apply on focused element - see below.
+		outline: 0;
+	}
+
+	// Microsoft Edge in high contrast mode only displays outlines on focused elements, not their children.
+	&:not(:disabled).is-active {
+		outline: 1px dotted transparent;
+		outline-offset: -2px;
+	}
+	// Microsoft Edge in high contrast mode only displays outlines on focused elements, not their children.
+	&:not(:disabled):focus {
+		outline: 2px solid transparent;
 	}
 }
 

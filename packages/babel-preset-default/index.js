@@ -18,8 +18,9 @@ module.exports = function( api ) {
 		const opts = {};
 
 		if ( isTestEnv ) {
-			opts.useBuiltIns = 'usage';
-			opts.corejs = 3;
+			opts.targets = {
+				node: 'current',
+			};
 		} else {
 			opts.modules = false;
 			opts.targets = {

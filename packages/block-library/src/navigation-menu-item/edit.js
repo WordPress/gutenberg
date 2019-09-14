@@ -17,6 +17,7 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
+	InnerBlocks,
 	InspectorControls,
 	PlainText,
 } from '@wordpress/block-editor';
@@ -137,6 +138,10 @@ function NavigationMenuItemEdit( {
 			</InspectorControls>
 			<div className="wp-block-navigation-menu-item">
 				{ content }
+				<InnerBlocks
+					allowedBlocks={ [ 'core/navigation-menu-item' ] }
+					renderAppender={ InnerBlocks.ButtonBlockAppender }
+				/>
 			</div>
 		</Fragment>
 	);

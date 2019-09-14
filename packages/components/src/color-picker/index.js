@@ -85,7 +85,7 @@ const isValidColor = ( colors ) => colors.hex ?
  * @param {Object} oldColors.draftHsl Same format as oldColors.hsl
  * @param {Object} data Data containing the new value to update.
  * @param {Object} data.source One of `hex`, `rgb`, `hsl`.
- * @param {string\number} data.value Value to update.
+ * @param {string|number} data.value Value to update.
  * @param {string} data.valueKey Depends on `data.source` values:
  *   - when source = `rgb`, valuKey can be `r`, `g`, `b`, or `a`.
  *   - when source = `hsl`, valuKey can be `h`, `s`, `l`, or `a`.

@@ -225,6 +225,17 @@ const withBlockCache = ( reducer ) => ( state = {}, action ) => {
 	}
 	newState.cache = state.cache ? state.cache : {};
 
+	/**
+	 * For each clientId provided, traverses up parents, adding the provided clientIds
+	 * and each parent's clientId to the returned array.
+	 *
+	 * When calling this function consider that it uses the old state, so any state
+	 * modifications made by the `reducer` will not be present.
+	 *
+	 * @param {Array} clientIds an Array of block clientIds.
+	 *
+	 * @return {Array} The provided clientIds and all of their parent clientIds.
+	 */
 	const getBlocksWithParentsClientIds = ( clientIds ) => {
 		return clientIds.reduce( ( result, clientId ) => {
 			let current = clientId;
@@ -264,11 +275,12 @@ const withBlockCache = ( reducer ) => ( state = {}, action ) => {
 			};
 			break;
 		case 'REPLACE_BLOCKS_AUGMENTED_WITH_CHILDREN':
+			const parentClientIds = fillKeysWithEmptyObject( getBlocksWithParentsClientIds( action.replacedClientIds ) );
+
 			newState.cache = {
 				...omit( newState.cache, action.replacedClientIds ),
-				...fillKeysWithEmptyObject(
-					getBlocksWithParentsClientIds( keys( flattenBlocks( action.blocks ) ) ),
-				),
+				...omit( parentClientIds, action.replacedClientIds ),
+				...fillKeysWithEmptyObject( keys( flattenBlocks( action.blocks ) ) ),
 			};
 			break;
 		case 'REMOVE_BLOCKS_AUGMENTED_WITH_CHILDREN':
@@ -569,7 +581,7 @@ const withSaveReusableBlock = ( reducer ) => ( state, action ) => {
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
  *
- * @returns {Object} Updated state.
+ * @return {Object} Updated state.
  */
 export const blocks = flow(
 	combineReducers,
@@ -930,7 +942,17 @@ const BLOCK_SELECTION_INITIAL_STATE = {
 export function blockSelection( state = BLOCK_SELECTION_INITIAL_STATE, action ) {
 	switch ( action.type ) {
 		case 'CLEAR_SELECTED_BLOCK':
-			return BLOCK_SELECTION_INITIAL_STATE;
+			if ( ! state.start || ! state.start.clientId ) {
+				return state;
+			}
+
+			return {
+				...state,
+				start: BLOCK_SELECTION_EMPTY_OBJECT,
+				end: BLOCK_SELECTION_EMPTY_OBJECT,
+				isMultiSelecting: false,
+				initialPosition: null,
+			};
 		case 'START_MULTI_SELECT':
 			if ( state.isMultiSelecting ) {
 				return state;
@@ -953,7 +975,7 @@ export function blockSelection( state = BLOCK_SELECTION_INITIAL_STATE, action ) 
 			};
 		case 'MULTI_SELECT':
 			return {
-				...BLOCK_SELECTION_INITIAL_STATE,
+				...state,
 				isMultiSelecting: state.isMultiSelecting,
 				start: { clientId: action.start },
 				end: { clientId: action.end },
@@ -967,7 +989,7 @@ export function blockSelection( state = BLOCK_SELECTION_INITIAL_STATE, action ) 
 			}
 
 			return {
-				...BLOCK_SELECTION_INITIAL_STATE,
+				...state,
 				initialPosition: action.initialPosition,
 				start: { clientId: action.clientId },
 				end: { clientId: action.clientId },
@@ -976,7 +998,7 @@ export function blockSelection( state = BLOCK_SELECTION_INITIAL_STATE, action ) 
 		case 'INSERT_BLOCKS': {
 			if ( action.updateSelection ) {
 				return {
-					...BLOCK_SELECTION_INITIAL_STATE,
+					...state,
 					start: { clientId: action.blocks[ 0 ].clientId },
 					end: { clientId: action.blocks[ 0 ].clientId },
 				};
@@ -993,7 +1015,13 @@ export function blockSelection( state = BLOCK_SELECTION_INITIAL_STATE, action ) 
 				return state;
 			}
 
-			return BLOCK_SELECTION_INITIAL_STATE;
+			return {
+				...state,
+				start: BLOCK_SELECTION_EMPTY_OBJECT,
+				end: BLOCK_SELECTION_EMPTY_OBJECT,
+				isMultiSelecting: false,
+				initialPosition: null,
+			};
 		case 'REPLACE_BLOCKS': {
 			if ( action.clientIds.indexOf( state.start.clientId ) === -1 ) {
 				return state;
@@ -1003,7 +1031,13 @@ export function blockSelection( state = BLOCK_SELECTION_INITIAL_STATE, action ) 
 			const blockToSelect = action.blocks[ indexToSelect ];
 
 			if ( ! blockToSelect ) {
-				return BLOCK_SELECTION_INITIAL_STATE;
+				return {
+					...state,
+					start: BLOCK_SELECTION_EMPTY_OBJECT,
+					end: BLOCK_SELECTION_EMPTY_OBJECT,
+					isMultiSelecting: false,
+					initialPosition: null,
+				};
 			}
 
 			if (
@@ -1014,19 +1048,19 @@ export function blockSelection( state = BLOCK_SELECTION_INITIAL_STATE, action ) 
 			}
 
 			return {
-				...BLOCK_SELECTION_INITIAL_STATE,
+				...state,
 				start: { clientId: blockToSelect.clientId },
 				end: { clientId: blockToSelect.clientId },
 			};
 		}
 		case 'TOGGLE_SELECTION':
 			return {
-				...BLOCK_SELECTION_INITIAL_STATE,
+				...state,
 				isEnabled: action.isSelectionEnabled,
 			};
 		case 'SELECTION_CHANGE':
 			return {
-				...BLOCK_SELECTION_INITIAL_STATE,
+				...state,
 				start: {
 					clientId: action.clientId,
 					attributeKey: action.attributeKey,
@@ -1196,6 +1230,22 @@ export const blockListSettings = ( state = {}, action ) => {
 };
 
 /**
+ * Reducer returning whether the navigation mode is enabled or not.
+ *
+ * @param {string} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {string} Updated state.
+ */
+export function isNavigationMode( state = true, action ) {
+	if ( action.type === 'SET_NAVIGATION_MODE' ) {
+		return action.isNavigationMode;
+	}
+
+	return state;
+}
+
+/**
  * Reducer return an updated state representing the most recent block attribute
  * update. The state is structured as an object where the keys represent the
  * client IDs of blocks, the values a subset of attributes from the most recent
@@ -1223,6 +1273,18 @@ export function lastBlockAttributesChange( state, action ) {
 	return null;
 }
 
+/**
+ * Reducer returning automatic change state.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {boolean} Updated state.
+ */
+export function didAutomaticChange( state, action ) {
+	return action.type === 'MARK_AUTOMATIC_CHANGE';
+}
+
 export default combineReducers( {
 	blocks,
 	isTyping,
@@ -1235,4 +1297,6 @@ export default combineReducers( {
 	settings,
 	preferences,
 	lastBlockAttributesChange,
+	isNavigationMode,
+	didAutomaticChange,
 } );

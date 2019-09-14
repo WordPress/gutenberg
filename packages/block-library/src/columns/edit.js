@@ -43,7 +43,7 @@ import {
  *
  * @constant
  * @type {string[]}
-*/
+ */
 const ALLOWED_BLOCKS = [ 'core/column' ];
 
 /**
@@ -101,7 +101,7 @@ const TEMPLATE_OPTIONS = [
  * Number of columns to assume for template in case the user opts to skip
  * template option selection.
  *
- * @type {Number}
+ * @type {number}
  */
 const DEFAULT_COLUMNS = 2;
 

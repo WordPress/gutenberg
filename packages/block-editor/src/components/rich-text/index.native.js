@@ -20,12 +20,12 @@ import Autocomplete from '../autocomplete';
 import BlockFormatControls from '../block-format-controls';
 import FormatToolbar from './format-toolbar';
 import { withBlockEditContext } from '../block-edit/context';
-import { ListEdit } from './list-edit';
 
 const wrapperClasses = 'editor-rich-text block-editor-rich-text';
 const classes = 'editor-rich-text__editable block-editor-rich-text__editable';
 
 function RichTextWraper( {
+	children,
 	tagName,
 	value: originalValue,
 	onChange: originalOnChange,
@@ -33,7 +33,6 @@ function RichTextWraper( {
 	selectionEnd,
 	onSelectionChange,
 	multiline,
-	onTagNameChange,
 	inlineToolbar,
 	wrapperClassName,
 	className,
@@ -49,7 +48,6 @@ function RichTextWraper( {
 	isSelected: originalIsSelected,
 	onCreateUndoLevel,
 	placeholder,
-	keepPlaceholderOnFocus,
 	// From experimental filter.
 	...experimentalProps
 } ) {
@@ -68,7 +66,6 @@ function RichTextWraper( {
 			wrapperClassName={ classnames( wrapperClasses, wrapperClassName ) }
 			className={ classnames( classes, className ) }
 			placeholder={ placeholder }
-			keepPlaceholderOnFocus={ keepPlaceholderOnFocus }
 			__unstableIsSelected={ originalIsSelected }
 			//__unstablePatterns={ getPatterns() }
 			//__unstableEnterPatterns={ getEnterPatterns() }
@@ -88,14 +85,7 @@ function RichTextWraper( {
 		>
 			{ ( { isSelected, value, onChange } ) =>
 				<View>
-					{ isSelected && multiline === 'li' && (
-						<ListEdit
-							onTagNameChange={ onTagNameChange }
-							tagName={ tagName }
-							value={ value }
-							onChange={ onChange }
-						/>
-					) }
+					{ children && children( { value, onChange } ) }
 					{ isSelected && ! inlineToolbar && (
 						<BlockFormatControls>
 							<FormatToolbar />

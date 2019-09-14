@@ -5,8 +5,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import { FlatList } from 'react-native';
 
 export const KeyboardAwareFlatList = ( {
-	blockToolbarHeight,
-	innerToolbarHeight,
+	extraScrollHeight,
 	shouldPreventAutomaticScroll,
 	innerRef,
 	...listProps
@@ -16,9 +15,7 @@ export const KeyboardAwareFlatList = ( {
 		keyboardDismissMode="none"
 		enableResetScrollToCoords={ false }
 		keyboardShouldPersistTaps="handled"
-		extraScrollHeight={ innerToolbarHeight }
-		extraBottomInset={ -listProps.safeAreaBottomInset }
-		inputAccessoryViewHeight={ blockToolbarHeight }
+		extraScrollHeight={ extraScrollHeight }
 		extraHeight={ 0 }
 		innerRef={ ( ref ) => {
 			this.scrollViewRef = ref;
