@@ -13,8 +13,6 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-import { withInstanceId } from '@wordpress/compose';
-
 import {
 	Fragment,
 } from '@wordpress/element';
@@ -98,4 +96,4 @@ export function DimensionControl( props ) {
 	);
 }
 
-export default withInstanceId( DimensionControl );
+export default DimensionControl;
