@@ -21,7 +21,7 @@ import {
 	create,
 	replace,
 	split,
-	LINE_SEPARATOR,
+	__UNSTABLE_LINE_SEPARATOR as LINE_SEPARATOR,
 	toHTMLString,
 	slice,
 } from '@wordpress/rich-text';
