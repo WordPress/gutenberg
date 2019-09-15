@@ -34,23 +34,21 @@
 		}
 	}
 
+	[data-rich-text-placeholder] {
+		pointer-events: none;
+		cursor: text;
+	}
+
 	[data-rich-text-placeholder]::after {
 		content: attr(data-rich-text-placeholder);
-		pointer-events: none;
 		// Use opacity to work in various editor styles.
 		// We don't specify the color here, because blocks or editor styles might provide their own.
 		opacity: 0.62;
 	}
 
 	// Could be unset for individual rich text instances.
-	&.is-selected {
-		&.keep-placeholder-on-focus [data-rich-text-placeholder] {
-			pointer-events: none;
-		}
-
-		&:not(.keep-placeholder-on-focus) [data-rich-text-placeholder]::after {
-			display: none;
-		}
+	&.is-selected:not(.keep-placeholder-on-focus) [data-rich-text-placeholder]::after {
+		display: none;
 	}
 }
 
