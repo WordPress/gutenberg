@@ -183,6 +183,7 @@ function LocalAutosaveMonitor() {
 		<AutosaveMonitor
 			interval={ AUTOSAVE_INTERVAL_SECONDS }
 			autosave={ autosave }
+			shouldThrottle
 		/>
 	);
 }

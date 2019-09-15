@@ -42,11 +42,24 @@ export class AutosaveMonitor extends Component {
 	}
 
 	toggleTimer( isPendingSave ) {
-		clearTimeout( this.pendingSave );
-		const { interval } = this.props;
-		if ( isPendingSave ) {
+		const { interval, shouldThrottle = false } = this.props;
+
+		// By default, AutosaveMonitor will wait for a pause in editing before
+		// autosaving. In other words, its action is "debounced".
+		//
+		// The `shouldThrottle` props allows overriding this behaviour, thus
+		// making the autosave action "throttled".
+		if ( ! shouldThrottle ) {
+			clearTimeout( this.pendingSave );
+			delete this.pendingSave;
+		}
+
+		if ( isPendingSave && ! ( shouldThrottle && this.pendingSave ) ) {
 			this.pendingSave = setTimeout(
-				() => this.props.autosave(),
+				() => {
+					this.props.autosave();
+					delete this.pendingSave;
+				},
 				interval * 1000
 			);
 		}
