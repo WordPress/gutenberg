@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { noop } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
@@ -8,7 +13,7 @@ import {
 } from '@wordpress/components';
 
 function ResponsiveBlockControl( props ) {
-	const { legend = '', property, toggleLabel, isOpen = false, onToggle, renderDefaultControl, defaultLabel = __( 'All' ), devices = [ __( 'Desktop' ), __( 'Tablet' ), __( 'Mobile' ) ], renderResponsiveControls } = props;
+	const { legend, property, toggleLabel, isOpen = false, onToggle = noop, renderDefaultControl, defaultLabel = __( 'All' ), devices = [ __( 'Desktop' ), __( 'Tablet' ), __( 'Mobile' ) ], renderResponsiveControls } = props;
 
 	if ( ! legend || ! property || ! renderDefaultControl ) {
 		return null;
