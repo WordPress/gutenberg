@@ -7,6 +7,7 @@ import { keyBy, map, groupBy, flowRight, isEqual, get } from 'lodash';
  * WordPress dependencies
  */
 import { combineReducers } from '@wordpress/data';
+import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
  * Internal dependencies
@@ -322,32 +323,26 @@ export function undo( state = UNDO_INITIAL_STATE, action ) {
 				return nextState;
 			}
 
-			let nextState;
-			if ( state.length === 0 ) {
-				// Create an initial entry so that we can undo to it.
-				nextState = [
-					{
-						kind: action.meta.undo.kind,
-						name: action.meta.undo.name,
-						recordId: action.meta.undo.recordId,
-						edits: { ...state.flattenedUndo, ...action.meta.undo.edits },
-					},
-				];
-				nextState.offset = 0;
-				return nextState;
-			}
-
 			// Clear potential redos, because this only supports linear history.
-			nextState = state.slice( 0, state.offset || undefined );
+			const nextState = state.slice( 0, state.offset || undefined );
 			nextState.offset = 0;
-
+			nextState.pop();
 			nextState.push( {
-				kind: action.kind,
-				name: action.name,
-				recordId: action.recordId,
-				edits: { ...action.edits, ...state.flattenedUndo },
+				kind: action.meta.undo.kind,
+				name: action.meta.undo.name,
+				recordId: action.meta.undo.recordId,
+				edits: { ...state.flattenedUndo, ...action.meta.undo.edits },
 			} );
-
+			const comparisonUndoEdits = Object.values( action.meta.undo.edits ).filter( ( edit ) => typeof edit !== 'function' );
+			const comparisonEdits = Object.values( action.edits ).filter( ( edit ) => typeof edit !== 'function' );
+			if ( ! isShallowEqual( comparisonUndoEdits, comparisonEdits ) ) {
+				nextState.push( {
+					kind: action.kind,
+					name: action.name,
+					recordId: action.recordId,
+					edits: action.edits,
+				} );
+			}
 			return nextState;
 	}
 
