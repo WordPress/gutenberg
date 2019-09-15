@@ -78,28 +78,12 @@ function GroupEdit( {
 								showResponsiveControls: isOpen,
 							} );
 						} }
-						renderDefaultControl={ () => (
+						renderDefaultControl={ ( label ) => (
 							<SelectControl
-								label={ 'All' }
+								label={ label }
 								hideLabelFromVision={ false }
 								options={ sizeOptions }
 							/>
-						) }
-						renderResponsiveControl={ () => (
-							<>
-								<SelectControl
-									label={ 'Desktop' }
-									hideLabelFromVision={ false }
-									options={ sizeOptions }
-								/>
-
-								<SelectControl
-									label={ 'Mobile' }
-									hideLabelFromVision={ false }
-									options={ sizeOptions }
-								/>
-
-							</>
 						) }
 					/>
 				</PanelBody>

@@ -16,7 +16,21 @@ function ResponsiveBlockControl( props ) {
 
 	const toggleControlLabel = toggleLabel || sprintf( __( 'Manually adjust %s based on screensize.' ), property );
 
-	const responsiveControls = devices.map( ( deviceLabel ) => renderDefaultControl( deviceLabel ) );
+	const defaultControl = (
+		<fieldset>
+			<legend>{ defaultLabel }</legend>
+			{ renderDefaultControl( defaultLabel ) }
+		</fieldset>
+	);
+
+	const responsiveControls = devices.map( ( deviceLabel ) => {
+		return (
+			<fieldset key={ deviceLabel }>
+				<legend>{ deviceLabel }</legend>
+				{ renderDefaultControl( deviceLabel ) }
+			</fieldset>
+		);
+	} );
 
 	return (
 
@@ -24,7 +38,7 @@ function ResponsiveBlockControl( props ) {
 			<legend className="block-editor-responsive-block-control__label">{ legend }</legend>
 
 			<div className="block-editor-responsive-block-control__inner">
-				{ ! isOpen && renderDefaultControl( defaultLabel ) }
+				{ ! isOpen && defaultControl }
 
 				{ isOpen && ( renderResponsiveControls ? renderResponsiveControls() : responsiveControls ) }
 
