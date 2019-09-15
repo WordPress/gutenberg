@@ -73,9 +73,9 @@ function GroupEdit( {
 						legend="Padding"
 						property="padding"
 						isOpen={ showResponsiveControls }
-						onToggleResponsive={ ( isOpen ) => {
+						onToggle={ ( isOn ) => {
 							setState( {
-								showResponsiveControls: isOpen,
+								showResponsiveControls: ! isOn,
 							} );
 						} }
 						renderDefaultControl={ ( label ) => (

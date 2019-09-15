@@ -8,13 +8,13 @@ import {
 } from '@wordpress/components';
 
 function ResponsiveBlockControl( props ) {
-	const { legend = '', property, toggleLabel, isOpen = false, onToggleResponsive, renderDefaultControl, defaultLabel = __( 'All' ), devices = [ __( 'Desktop' ), __( 'Tablet' ), __( 'Mobile' ) ], renderResponsiveControls } = props;
+	const { legend = '', property, toggleLabel, isOpen = false, onToggle, renderDefaultControl, defaultLabel = __( 'All' ), devices = [ __( 'Desktop' ), __( 'Tablet' ), __( 'Mobile' ) ], renderResponsiveControls } = props;
 
 	if ( ! legend || ! property || ! renderDefaultControl ) {
 		return null;
 	}
 
-	const toggleControlLabel = toggleLabel || sprintf( __( 'Manually adjust %s based on screensize.' ), property );
+	const toggleControlLabel = toggleLabel || sprintf( __( 'Use the same %s on all screensizes.' ), property );
 
 	const defaultControl = (
 		<fieldset>
@@ -23,7 +23,7 @@ function ResponsiveBlockControl( props ) {
 		</fieldset>
 	);
 
-	const responsiveControls = devices.map( ( deviceLabel ) => {
+	const defaultResponsiveControls = devices.map( ( deviceLabel ) => {
 		return (
 			<fieldset key={ deviceLabel }>
 				<legend>{ deviceLabel }</legend>
@@ -40,12 +40,12 @@ function ResponsiveBlockControl( props ) {
 			<div className="block-editor-responsive-block-control__inner">
 				{ ! isOpen && defaultControl }
 
-				{ isOpen && ( renderResponsiveControls ? renderResponsiveControls() : responsiveControls ) }
+				{ isOpen && ( renderResponsiveControls ? renderResponsiveControls() : defaultResponsiveControls ) }
 
 				<ToggleControl
 					label={ toggleControlLabel }
-					checked={ isOpen }
-					onChange={ onToggleResponsive }
+					checked={ ! isOpen }
+					onChange={ onToggle }
 				/>
 			</div>
 		</fieldset>
