@@ -16,7 +16,7 @@ import { __ } from '@wordpress/i18n';
  */
 import BlockIcon from '../block-icon';
 
-export default function BlockNavigationList( {
+export default function __experimentalBlockNavigationList( {
 	blocks,
 	selectedBlockClientId,
 	selectBlock,
@@ -48,7 +48,7 @@ export default function BlockNavigationList( {
 							</Button>
 						</div>
 						{ showNestedBlocks && !! block.innerBlocks && !! block.innerBlocks.length && (
-							<BlockNavigationList
+							<__experimentalBlockNavigationList
 								blocks={ block.innerBlocks }
 								selectedBlockClientId={ selectedBlockClientId }
 								selectBlock={ selectBlock }

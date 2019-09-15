@@ -122,10 +122,6 @@ Undocumented declaration.
 
 Undocumented declaration.
 
-<a name="BlockNavigationList" href="#BlockNavigationList">#</a> **BlockNavigationList**
-
-Undocumented declaration.
-
 <a name="BlockPreview" href="#BlockPreview">#</a> **BlockPreview**
 
 BlockPreview renders a preview of a block or array of blocks.
