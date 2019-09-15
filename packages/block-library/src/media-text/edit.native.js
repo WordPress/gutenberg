@@ -52,9 +52,6 @@ class MediaTextEdit extends Component {
 	onSelectMedia( media ) {
 		const { setAttributes } = this.props;
 
-		console.log('-----------media')
-		console.log(media)
-
 		let mediaType;
 		let src;
 		// for media selections originated from a file upload.
@@ -74,15 +71,6 @@ class MediaTextEdit extends Component {
 			// Try the "large" size URL, falling back to the "full" size URL below.
 			src = get( media, [ 'sizes', 'large', 'url' ] ) || get( media, [ 'media_details', 'sizes', 'large', 'source_url' ] );
 		}
-
-		console.log({
-			mediaAlt: media.alt,
-			mediaId: media.id,
-			mediaType,
-			mediaUrl: src || media.url,
-			imageFill: undefined,
-			focalPoint: undefined,
-		})
 
 		setAttributes( {
 			mediaAlt: media.alt,
@@ -121,7 +109,7 @@ class MediaTextEdit extends Component {
 	}
 
 	renderMediaArea() {
-		const { attributes } = this.props;
+		const { attributes, isSelected } = this.props;
 		const { mediaAlt, mediaId, mediaPosition, mediaType, mediaUrl, mediaWidth, imageFill, focalPoint } = attributes;
 
 		return (
@@ -131,7 +119,7 @@ class MediaTextEdit extends Component {
 				onWidthChange={ this.onWidthChange }
 				commitWidthChange={ this.commitWidthChange }
 				onFocus={ this.props.onFocus }
-				{ ...{ mediaAlt, mediaId, mediaType, mediaUrl, mediaPosition, mediaWidth, imageFill, focalPoint } }
+				{ ...{ mediaAlt, mediaId, mediaType, mediaUrl, mediaPosition, mediaWidth, imageFill, focalPoint, isSelected } }
 			/>
 		);
 	}
