@@ -39,7 +39,15 @@ describe( 'Basic rendering', () => {
 			);
 		} );
 
+		const activePropertyLabel = Array.from( container.querySelectorAll( 'legend' ) ).filter( ( legend ) => legend.innerHTML === 'Padding' );
+
+		const activeDeviceLabel = Array.from( container.querySelectorAll( 'legend' ) ).filter( ( legend ) => legend.innerHTML === 'All' );
+
+		const defaultControl = container.querySelector( 'input[value="All"]' );
 		expect( container.innerHTML ).not.toBe( '' );
+		expect( activeDeviceLabel ).toHaveLength( 1 );
+		expect( activePropertyLabel ).toHaveLength( 1 );
+		expect( defaultControl ).not.toBeNull();
 		expect( container.innerHTML ).toMatchSnapshot();
 	} );
 
@@ -90,3 +98,4 @@ describe( 'Basic rendering', () => {
 		expect( container.innerHTML ).toBe( '' );
 	} );
 } );
+

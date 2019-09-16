@@ -40,7 +40,7 @@ function ResponsiveBlockControl( props ) {
 	return (
 
 		<fieldset className="block-editor-responsive-block-control">
-			<legend className="block-editor-responsive-block-control__label">{ legend }</legend>
+			<legend className="block-editor-responsive-block-control__legend">{ legend }</legend>
 
 			<div className="block-editor-responsive-block-control__inner">
 				{ ! isOpen && defaultControl }
