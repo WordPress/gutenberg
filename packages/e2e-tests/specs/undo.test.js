@@ -108,4 +108,13 @@ describe( 'undo', () => {
 		const visibleContent = await page.evaluate( () => document.activeElement.textContent );
 		expect( visibleContent ).toBe( 'original' );
 	} );
+
+	it( 'should not create undo level when saving', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '1' );
+		await saveDraft();
+		await pressKeyWithModifier( 'primary', 'z' );
+
+		expect( await getEditedPostContent() ).toBe( '' );
+	} );
 } );
