@@ -16,7 +16,7 @@ function render_block_core_post_content() {
 		the_post();
 	}
 
-	return apply_filters( 'the_content', str_replace( ']]>', ']]&gt;', get_the_content() ) );
+	return '<div class="entry-content">' . apply_filters( 'the_content', str_replace( ']]>', ']]&gt;', get_the_content() ) ) . '</div>';
 }
 
 /**

@@ -39,15 +39,17 @@ export default function PostContentEdit() {
 			>
 				{ __( 'Update' ) }
 			</Button>
-			<InnerBlocks
-				value={ blocks }
-				onChange={ setBlocks }
-				onInput={ useCallback( () => {
-					setContent( ( { blocks: blocksForSerialization = [] } ) =>
-						serializeBlocks( blocksForSerialization )
-					);
-				}, [] ) }
-			/>
+			<div className="entry-content">
+				<InnerBlocks
+					value={ blocks }
+					onChange={ setBlocks }
+					onInput={ useCallback( () => {
+						setContent( ( { blocks: blocksForSerialization = [] } ) =>
+							serializeBlocks( blocksForSerialization )
+						);
+					}, [] ) }
+				/>
+			</div>
 		</>
 	);
 }
