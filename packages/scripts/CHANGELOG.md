@@ -1,5 +1,9 @@
 ## Master
 
+### Breaking Changes
+
+- The bundled `@wordpress/dependency-extraction-webpack-plugin` dependency has been updated to the next major version `^2.0.0`. `start` and `build` scripts save now the generated asset file for each entry point in the new PHP output format.
+
 ## 4.1.0 (2019-09-03)
 
 ### New Features
