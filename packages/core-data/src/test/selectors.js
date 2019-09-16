@@ -309,9 +309,9 @@ describe( 'getReferenceByDistinctEdits', () => {
 
 	describe( 'when using undo', () => {
 		it( 'should return referentially different values across changing states', () => {
-			const beforeState = { undo: [ {} ] };
+			const beforeState = { undo: [ {}, {} ] };
 			beforeState.undo.offset = 1;
-			const afterState = { undo: [ {} ] };
+			const afterState = { undo: [ {}, {} ] };
 			afterState.undo.offset = 0;
 			expect( getReferenceByDistinctEdits( beforeState ) ).not.toBe( getReferenceByDistinctEdits( afterState ) );
 		} );

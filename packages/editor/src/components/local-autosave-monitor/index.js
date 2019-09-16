@@ -85,7 +85,7 @@ function useAutosaveCallback() {
 			} ) );
 		};
 		requestIdleCallback( saveToSessionStorage );
-	}, [ postId, getEditedPostAttribute ] );
+	}, [ postId ] );
 }
 
 /**

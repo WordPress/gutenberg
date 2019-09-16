@@ -49,7 +49,7 @@ export class AutosaveMonitor extends Component {
 		//
 		// The `shouldThrottle` props allows overriding this behaviour, thus
 		// making the autosave action "throttled".
-		if ( ! shouldThrottle ) {
+		if ( ! shouldThrottle && this.pendingSave ) {
 			clearTimeout( this.pendingSave );
 			delete this.pendingSave;
 		}
