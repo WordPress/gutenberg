@@ -231,29 +231,6 @@ export const getPostEdits = createRegistrySelector( ( select ) => ( state ) => {
 } );
 
 /**
- * Returns a new reference when edited values have changed. This is useful in
- * inferring where an edit has been made between states by comparison of the
- * return values using strict equality.
- *
- * @example
- *
- * ```
- * const hasEditOccurred = (
- *    getReferenceByDistinctEdits( beforeState ) !==
- *    getReferenceByDistinctEdits( afterState )
- * );
- * ```
- *
- * @param {Object} state Editor state.
- *
- * @return {*} A value whose reference will change only when an edit occurs.
- */
-export const getReferenceByDistinctEdits = createSelector(
-	() => [],
-	( state ) => [ state.editor ],
-);
-
-/**
  * Returns an attribute value of the saved post.
  *
  * @param {Object} state         Global application state.
@@ -532,6 +509,11 @@ export function isEditedPostEmpty( state ) {
 export const isEditedPostAutosaveable = createRegistrySelector( ( select ) => function( state ) {
 	// A post must contain a title, an excerpt, or non-empty content to be valid for autosaving.
 	if ( ! isEditedPostSaveable( state ) ) {
+		return false;
+	}
+
+	// A post is not autosavable when there is a post autosave lock.
+	if ( isPostAutosavingLocked( state ) ) {
 		return false;
 	}
 
@@ -1098,6 +1080,17 @@ export function isPostLocked( state ) {
  */
 export function isPostSavingLocked( state ) {
 	return Object.keys( state.postSavingLock ).length > 0;
+}
+
+/**
+ * Returns whether post autosaving is locked.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Is locked.
+ */
+export function isPostAutosavingLocked( state ) {
+	return Object.keys( state.postAutosavingLock ).length > 0;
 }
 
 /**

@@ -177,7 +177,13 @@ export function* setupEditor( post, edits, template ) {
 	};
 	yield resetEditorBlocks( blocks, { __unstableShouldCreateUndoLevel: false } );
 	yield setupEditorState( post );
-	if ( edits ) {
+	if (
+		edits &&
+		Object.keys( edits ).some(
+			( key ) =>
+				edits[ key ] !== ( has( post, [ key, 'raw' ] ) ? post[ key ].raw : post[ key ] )
+		)
+	) {
 		yield editPost( edits );
 	}
 	yield* __experimentalSubscribeSources();
@@ -342,13 +348,22 @@ export function setupEditorState( post ) {
  * Returns an action object used in signalling that attributes of the post have
  * been edited.
  *
- * @param {Object} edits Post attributes to edit.
+ * @param {Object} edits   Post attributes to edit.
+ * @param {Object} options Options for the edit.
  *
  * @yield {Object} Action object or control.
  */
-export function* editPost( edits ) {
+export function* editPost( edits, options ) {
 	const { id, type } = yield select( STORE_KEY, 'getCurrentPost' );
-	yield dispatch( 'core', 'editEntityRecord', 'postType', type, id, edits );
+	yield dispatch(
+		'core',
+		'editEntityRecord',
+		'postType',
+		type,
+		id,
+		edits,
+		options
+	);
 }
 
 /**
@@ -375,13 +390,16 @@ export function* savePost( options = {} ) {
 	if ( ! ( yield select( STORE_KEY, 'isEditedPostSaveable' ) ) ) {
 		return;
 	}
-	yield dispatch( STORE_KEY, 'editPost', {
+	let edits = {
 		content: yield select( STORE_KEY, 'getEditedPostContent' ),
-	} );
+	};
+	if ( ! options.isAutosave ) {
+		yield dispatch( STORE_KEY, 'editPost', edits, { undoIgnore: true } );
+	}
 
 	yield __experimentalRequestPostUpdateStart( options );
 	const previousRecord = yield select( STORE_KEY, 'getCurrentPost' );
-	const edits = {
+	edits = {
 		id: previousRecord.id,
 		...( yield select(
 			'core',
@@ -390,6 +408,7 @@ export function* savePost( options = {} ) {
 			previousRecord.type,
 			previousRecord.id
 		) ),
+		...edits,
 	};
 	yield dispatch(
 		'core',
@@ -493,12 +512,9 @@ export function* trashPost() {
 			}
 		);
 
-		// TODO: This should be an updatePost action (updating subsets of post
-		// properties), but right now editPost is tied with change detection.
 		yield dispatch(
 			STORE_KEY,
-			'resetPost',
-			{ ...post, status: 'trash' }
+			'savePost'
 		);
 	} catch ( error ) {
 		yield dispatch(
@@ -628,19 +644,19 @@ export function __experimentalDeleteReusableBlock( id ) {
 }
 
 /**
- * Returns an action object used in signalling that a reusable block's title is
+ * Returns an action object used in signalling that a reusable block is
  * to be updated.
  *
- * @param {number} id    The ID of the reusable block to update.
- * @param {string} title The new title.
+ * @param {number} id      The ID of the reusable block to update.
+ * @param {Object} changes The changes to apply.
  *
  * @return {Object} Action object.
  */
-export function __experimentalUpdateReusableBlockTitle( id, title ) {
+export function __experimentalUpdateReusableBlock( id, changes ) {
 	return {
-		type: 'UPDATE_REUSABLE_BLOCK_TITLE',
+		type: 'UPDATE_REUSABLE_BLOCK',
 		id,
-		title,
+		changes,
 	};
 }
 

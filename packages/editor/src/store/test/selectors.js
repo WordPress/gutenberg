@@ -130,7 +130,6 @@ const {
 	getCurrentPostRevisionsCount,
 	getCurrentPostType,
 	getPostEdits,
-	getReferenceByDistinctEdits,
 	getEditedPostVisibility,
 	isCurrentPostPending,
 	isCurrentPostPublished,
@@ -159,6 +158,7 @@ const {
 	getPermalink,
 	getPermalinkParts,
 	isPostSavingLocked,
+	isPostAutosavingLocked,
 	canUserUseUnfilteredHTML,
 } = selectors;
 
@@ -778,21 +778,6 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'getReferenceByDistinctEdits', () => {
-		it( 'should return referentially equal values across unchanging state', () => {
-			const state = { editor: {} };
-
-			expect( getReferenceByDistinctEdits( state ) ).toBe( getReferenceByDistinctEdits( state ) );
-		} );
-
-		it( 'should return referentially unequal values across changing state', () => {
-			const beforeState = { editor: {} };
-			const afterState = { editor: {} };
-
-			expect( getReferenceByDistinctEdits( beforeState ) ).not.toBe( getReferenceByDistinctEdits( afterState ) );
-		} );
-	} );
-
 	describe( 'getEditedPostVisibility', () => {
 		it( 'should return public by default', () => {
 			const state = {
@@ -1157,6 +1142,28 @@ describe( 'selectors', () => {
 		} );
 	} );
 
+	describe( 'isPostAutosavingLocked', () => {
+		it( 'should return true if the post has postAutosavingLocks', () => {
+			const state = {
+				postAutosavingLock: { example: true },
+				currentPost: {},
+				saving: {},
+			};
+
+			expect( isPostAutosavingLocked( state ) ).toBe( true );
+		} );
+
+		it( 'should return false if the post has no postAutosavingLocks', () => {
+			const state = {
+				postAutosavingLock: {},
+				currentPost: {},
+				saving: {},
+			};
+
+			expect( isPostAutosavingLocked( state ) ).toBe( false );
+		} );
+	} );
+
 	describe( 'isEditedPostSaveable', () => {
 		it( 'should return false if the post has no title, excerpt, content', () => {
 			const state = {
@@ -1408,6 +1415,7 @@ describe( 'selectors', () => {
 					return true;
 				},
 				getAutosave() {},
+				postAutosavingLock: {},
 			};
 
 			expect( isEditedPostAutosaveable( state ) ).toBe( true );
@@ -1440,6 +1448,7 @@ describe( 'selectors', () => {
 						excerpt: 'foo',
 					};
 				},
+				postAutosavingLock: {},
 			};
 
 			expect( isEditedPostAutosaveable( state ) ).toBe( false );
@@ -1471,6 +1480,7 @@ describe( 'selectors', () => {
 						excerpt: 'foo',
 					};
 				},
+				postAutosavingLock: {},
 			};
 
 			expect( isEditedPostAutosaveable( state ) ).toBe( true );
@@ -1505,11 +1515,22 @@ describe( 'selectors', () => {
 								[ variantField ]: 'bar',
 							};
 						},
+						postAutosavingLock: {},
 					};
 
 					expect( isEditedPostAutosaveable( state ) ).toBe( true );
 				}
 			}
+		} );
+
+		it( 'should return false if autosaving is locked', () => {
+			const state = {
+				currentPost: {},
+				saving: {},
+				postAutosavingLock: { example: true },
+			};
+
+			expect( isEditedPostAutosaveable( state ) ).toBe( false );
 		} );
 	} );
 

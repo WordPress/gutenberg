@@ -69,6 +69,13 @@ export function addEntities( entities ) {
  * @return {Object} Action object.
  */
 export function receiveEntityRecords( kind, name, records, query, invalidateCache = false ) {
+	// Auto drafts should not have titles, but some plugins rely on them so we can't filter this
+	// on the server.
+	if ( kind === 'postType' ) {
+		records = castArray( records ).map( ( record ) =>
+			record.status === 'auto-draft' ? { ...record, title: '' } : record
+		);
+	}
 	let action;
 	if ( query ) {
 		action = receiveQueriedItems( records, query );
@@ -119,14 +126,16 @@ export function receiveEmbedPreview( url, preview ) {
  * Returns an action object that triggers an
  * edit to an entity record.
  *
- * @param {string} kind           Kind of the edited entity record.
- * @param {string} name           Name of the edited entity record.
- * @param {number} recordId       Record ID of the edited entity record.
- * @param {Object} edits          The edits.
+ * @param {string} kind     Kind of the edited entity record.
+ * @param {string} name     Name of the edited entity record.
+ * @param {number} recordId Record ID of the edited entity record.
+ * @param {Object} edits    The edits.
+ * @param {Object} options  Options for the edit.
+ * @param {boolean} options.undoIgnore Whether to ignore the edit in undo history or not.
  *
  * @return {Object} Action object.
  */
-export function* editEntityRecord( kind, name, recordId, edits ) {
+export function* editEntityRecord( kind, name, recordId, edits, options = {} ) {
 	const { transientEdits = {}, mergedEdits = {} } = yield select(
 		'getEntity',
 		kind,
@@ -148,8 +157,9 @@ export function* editEntityRecord( kind, name, recordId, edits ) {
 		// so that the property is not considered dirty.
 		edits: Object.keys( edits ).reduce( ( acc, key ) => {
 			const recordValue = record[ key ];
+			const editedRecordValue = editedRecord[ key ];
 			const value = mergedEdits[ key ] ?
-				merge( {}, recordValue, edits[ key ] ) :
+				merge( {}, editedRecordValue, edits[ key ] ) :
 				edits[ key ];
 			acc[ key ] = isEqual( recordValue, value ) ? undefined : value;
 			return acc;
@@ -160,7 +170,7 @@ export function* editEntityRecord( kind, name, recordId, edits ) {
 		type: 'EDIT_ENTITY_RECORD',
 		...edit,
 		meta: {
-			undo: {
+			undo: ! options.undoIgnore && {
 				...edit,
 				// Send the current values for things like the first undo stack entry.
 				edits: Object.keys( edits ).reduce( ( acc, key ) => {
@@ -235,18 +245,18 @@ export function* saveEntityRecord(
 	let error;
 	try {
 		const path = `${ entity.baseURL }${ recordId ? '/' + recordId : '' }`;
+		const persistedRecord = yield select(
+			'getRawEntityRecord',
+			kind,
+			name,
+			recordId
+		);
 
 		if ( isAutosave ) {
 			// Most of this autosave logic is very specific to posts.
 			// This is fine for now as it is the only supported autosave,
 			// but ideally this should all be handled in the back end,
 			// so the client just sends and receives objects.
-			const persistedRecord = yield select(
-				'getRawEntityRecord',
-				kind,
-				name,
-				recordId
-			);
 			const currentUser = yield select( 'getCurrentUser' );
 			const currentUserId = currentUser ? currentUser.id : undefined;
 			const autosavePost = yield select(
@@ -304,10 +314,20 @@ export function* saveEntityRecord(
 				yield receiveAutosaves( persistedRecord.id, updatedRecord );
 			}
 		} else {
+			// Auto drafts should be converted to drafts on explicit saves,
+			// but some plugins break with this behavior so we can't filter it on the server.
+			let data = record;
+			if (
+				kind === 'postType' &&
+				persistedRecord.status === 'auto-draft' &&
+				! data.status
+			) {
+				data = { ...data, status: 'draft' };
+			}
 			updatedRecord = yield apiFetch( {
 				path,
 				method: recordId ? 'PUT' : 'POST',
-				data: record,
+				data,
 			} );
 			yield receiveEntityRecords( kind, name, updatedRecord, undefined, true );
 		}

@@ -1,4 +1,4 @@
-ul.wp-block-gallery {
+.wp-block-gallery {
 	// Override the default list style type _only in the editor_
 	// to avoid :not() selector specificity issues.
 	// See https://github.com/WordPress/gutenberg/pull/10358
@@ -10,6 +10,11 @@ ul.wp-block-gallery {
 	.is-selected & {
 		margin-bottom: 0;
 	}
+}
+
+// need to override default editor ul styles
+.blocks-gallery-grid.blocks-gallery-grid {
+	margin-bottom: 0;
 }
 
 .blocks-gallery-item {
@@ -56,17 +61,23 @@ ul.wp-block-gallery {
 
 	.is-selected .block-library-gallery-item__move-menu,
 	.is-selected .block-library-gallery-item__inline-menu {
-		background-color: theme(primary);
+		background: $white;
+		border: 1px solid $dark-opacity-light-800;
+		border-radius: $radius-round-rectangle;
+		transition: box-shadow 0.2s ease-out;
+		@include reduce-motion("transition");
+
+		&:hover {
+			box-shadow: $shadow-toolbar;
+		}
 
 		.components-button {
-			color: $white;
+			color: $dark-opacity-300;
 			padding: 2px;
-			width: $icon-button-size-small;
 			height: $icon-button-size-small;
 
-			// Remove hover/focus box shadows, since they clash with the blue background.
-			&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover,
-			&:focus:not(:disabled) {
+			// Remove hover box shadows, since they clash with the container.
+			&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover {
 				box-shadow: none;
 			}
 
@@ -98,7 +109,7 @@ ul.wp-block-gallery {
 
 .block-library-gallery-item__move-menu,
 .block-library-gallery-item__inline-menu {
-	padding: $grid-size-small;
+	margin: $grid-size;
 	display: inline-flex;
 	z-index: z-index(".block-library-gallery-item__inline-menu");
 

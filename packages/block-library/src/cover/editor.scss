@@ -1,6 +1,5 @@
 .wp-block-cover-image,
 .wp-block-cover {
-	min-height: auto;
 
 	&.components-placeholder h2 {
 		color: inherit;
@@ -56,4 +55,9 @@
 
 .block-library-cover__reset-button {
 	margin-left: auto;
+}
+
+.block-library-cover__resize-container:not(.is-resizing) {
+	// Important is used to have higher specificity than the inline style set by re-resizable library.
+	height: auto !important;
 }

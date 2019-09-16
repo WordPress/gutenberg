@@ -17,6 +17,7 @@ import { __ } from '@wordpress/i18n';
 import { PreserveScrollInReorder } from '@wordpress/block-editor';
 import {
 	AutosaveMonitor,
+	LocalAutosaveMonitor,
 	UnsavedChangesWarning,
 	EditorNotices,
 	PostPublishPanel,
@@ -77,6 +78,7 @@ function Layout( {
 			<BrowserURL />
 			<UnsavedChangesWarning />
 			<AutosaveMonitor />
+			<LocalAutosaveMonitor />
 			<Header />
 			<div
 				className="edit-post-layout__content"

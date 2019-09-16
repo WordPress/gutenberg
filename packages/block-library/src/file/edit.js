@@ -12,6 +12,7 @@ import {
 	revokeBlobURL,
 } from '@wordpress/blob';
 import {
+	Animate,
 	ClipboardButton,
 	IconButton,
 	Toolbar,
@@ -205,43 +206,47 @@ class FileEdit extends Component {
 						</Toolbar>
 					</MediaUploadCheck>
 				</BlockControls>
-				<div className={ classes }>
-					<div className={ 'wp-block-file__content-wrapper' }>
-						<RichText
-							wrapperClassName={ 'wp-block-file__textlink' }
-							tagName="div" // must be block-level or else cursor disappears
-							value={ fileName }
-							placeholder={ __( 'Write file name…' ) }
-							withoutInteractiveFormatting
-							onChange={ ( text ) => setAttributes( { fileName: text } ) }
-						/>
-						{ showDownloadButton &&
-							<div className={ 'wp-block-file__button-richtext-wrapper' }>
-								{ /* Using RichText here instead of PlainText so that it can be styled like a button */ }
+				<Animate type={ isBlobURL( href ) ? 'loading' : null }>
+					{ ( { className: animateClassName } ) => (
+						<div className={ classnames( classes, animateClassName ) }>
+							<div className={ 'wp-block-file__content-wrapper' }>
 								<RichText
+									wrapperClassName={ 'wp-block-file__textlink' }
 									tagName="div" // must be block-level or else cursor disappears
-									className={ 'wp-block-file__button' }
-									value={ downloadButtonText }
+									value={ fileName }
+									placeholder={ __( 'Write file name…' ) }
 									withoutInteractiveFormatting
-									placeholder={ __( 'Add text…' ) }
-									onChange={ ( text ) => setAttributes( { downloadButtonText: text } ) }
+									onChange={ ( text ) => setAttributes( { fileName: text } ) }
 								/>
+								{ showDownloadButton &&
+									<div className={ 'wp-block-file__button-richtext-wrapper' }>
+										{ /* Using RichText here instead of PlainText so that it can be styled like a button */ }
+										<RichText
+											tagName="div" // must be block-level or else cursor disappears
+											className={ 'wp-block-file__button' }
+											value={ downloadButtonText }
+											withoutInteractiveFormatting
+											placeholder={ __( 'Add text…' ) }
+											onChange={ ( text ) => setAttributes( { downloadButtonText: text } ) }
+										/>
+									</div>
+								}
 							</div>
-						}
-					</div>
-					{ isSelected &&
-						<ClipboardButton
-							isDefault
-							text={ href }
-							className={ 'wp-block-file__copy-url-button' }
-							onCopy={ this.confirmCopyURL }
-							onFinishCopy={ this.resetCopyConfirmation }
-							disabled={ isBlobURL( href ) }
-						>
-							{ showCopyConfirmation ? __( 'Copied!' ) : __( 'Copy URL' ) }
-						</ClipboardButton>
-					}
-				</div>
+							{ isSelected &&
+								<ClipboardButton
+									isDefault
+									text={ href }
+									className={ 'wp-block-file__copy-url-button' }
+									onCopy={ this.confirmCopyURL }
+									onFinishCopy={ this.resetCopyConfirmation }
+									disabled={ isBlobURL( href ) }
+								>
+									{ showCopyConfirmation ? __( 'Copied!' ) : __( 'Copy URL' ) }
+								</ClipboardButton>
+							}
+						</div>
+					) }
+				</Animate>
 			</>
 		);
 	}

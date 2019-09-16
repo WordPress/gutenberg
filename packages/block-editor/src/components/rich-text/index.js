@@ -12,7 +12,7 @@ import { withDispatch, withSelect } from '@wordpress/data';
 import { pasteHandler, children as childrenSource, getBlockTransforms, findTransform } from '@wordpress/blocks';
 import { withInstanceId, compose } from '@wordpress/compose';
 import {
-	RichText,
+	__experimentalRichText as RichText,
 	__unstableCreateElement,
 	isEmpty,
 	__unstableIsEmptyLine as isEmptyLine,
@@ -21,13 +21,14 @@ import {
 	create,
 	replace,
 	split,
-	LINE_SEPARATOR,
+	__UNSTABLE_LINE_SEPARATOR as LINE_SEPARATOR,
 	toHTMLString,
 	slice,
 } from '@wordpress/rich-text';
 import { withFilters, IsolatedEventContainer } from '@wordpress/components';
 import { createBlobURL } from '@wordpress/blob';
 import deprecated from '@wordpress/deprecated';
+import { isURL } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -37,6 +38,11 @@ import BlockFormatControls from '../block-format-controls';
 import FormatToolbar from './format-toolbar';
 import { withBlockEditContext } from '../block-edit/context';
 import { RemoveBrowserShortcuts } from './remove-browser-shortcuts';
+
+const requestIdleCallback = window.requestIdleCallback ||
+	function fallbackRequestIdleCallback( fn ) {
+		window.setTimeout( fn, 100 );
+	};
 
 const wrapperClasses = 'editor-rich-text block-editor-rich-text';
 const classes = 'editor-rich-text__editable block-editor-rich-text__editable';
@@ -124,6 +130,7 @@ class RichTextWrapper extends Component {
 			tagName,
 			canUserUseUnfilteredHTML,
 			multiline,
+			__unstableEmbedURLOnPaste,
 		} = this.props;
 
 		if ( image && ! html ) {
@@ -133,12 +140,11 @@ class RichTextWrapper extends Component {
 				mode: 'BLOCKS',
 				tagName,
 			} );
-			const shouldReplace = onReplace && isEmpty( value );
 
 			// Allows us to ask for this information when we get a report.
 			window.console.log( 'Received item:\n\n', file );
 
-			if ( shouldReplace ) {
+			if ( onReplace && isEmpty( value ) ) {
 				onReplace( content );
 			} else {
 				this.onSplit( value, content );
@@ -147,15 +153,14 @@ class RichTextWrapper extends Component {
 			return;
 		}
 
-		const canReplace = onReplace && isEmpty( value );
-		const canSplit = onReplace && onSplit;
+		let mode = onReplace && onSplit ? 'AUTO' : 'INLINE';
 
-		let mode = 'INLINE';
-
-		if ( canReplace ) {
+		if (
+			__unstableEmbedURLOnPaste &&
+			isEmpty( value ) &&
+			isURL( plainText.trim() )
+		) {
 			mode = 'BLOCKS';
-		} else if ( canSplit ) {
-			mode = 'AUTO';
 		}
 
 		const content = pasteHandler( {
@@ -177,7 +182,7 @@ class RichTextWrapper extends Component {
 
 			onChange( insert( value, valueToInsert ) );
 		} else if ( content.length > 0 ) {
-			if ( canReplace ) {
+			if ( onReplace && isEmpty( value ) ) {
 				onReplace( content );
 			} else {
 				this.onSplit( value, content );
@@ -301,7 +306,7 @@ class RichTextWrapper extends Component {
 	 * ensure all selection changes have been recorded.
 	 */
 	markAutomaticChange() {
-		window.requestIdleCallback( () => {
+		requestIdleCallback( () => {
 			this.props.markAutomaticChange();
 		} );
 	}
@@ -331,6 +336,7 @@ class RichTextWrapper extends Component {
 			didAutomaticChange,
 			undo,
 			placeholder,
+			keepPlaceholderOnFocus,
 			// eslint-disable-next-line no-unused-vars
 			allowedFormats,
 			withoutInteractiveFormatting,
@@ -378,7 +384,10 @@ class RichTextWrapper extends Component {
 				selectionEnd={ selectionEnd }
 				onSelectionChange={ onSelectionChange }
 				tagName={ tagName }
-				className={ classnames( classes, className, { 'is-selected': originalIsSelected } ) }
+				className={ classnames( classes, className, {
+					'is-selected': originalIsSelected,
+					'keep-placeholder-on-focus': keepPlaceholderOnFocus,
+				} ) }
 				placeholder={ placeholder }
 				allowedFormats={ adjustedAllowedFormats }
 				withoutInteractiveFormatting={ withoutInteractiveFormatting }
@@ -466,6 +475,8 @@ const RichTextContainer = compose( [
 				selectionStart.clientId === clientId &&
 				selectionStart.attributeKey === identifier
 			);
+		} else if ( isSelected ) {
+			isSelected = selectionStart.clientId === clientId;
 		}
 
 		return {

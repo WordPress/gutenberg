@@ -139,12 +139,8 @@ export default compose( [
 		const { savePost, editPost } = dispatch( 'core/editor' );
 		return {
 			onSave: savePost,
-			onUpdateVisibility( status, password ) {
-				const edits = { status };
-				if ( password !== undefined ) {
-					edits.password = password;
-				}
-				editPost( edits );
+			onUpdateVisibility( status, password = '' ) {
+				editPost( { status, password } );
 			},
 		};
 	} ),
