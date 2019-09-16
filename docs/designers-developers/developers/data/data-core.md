@@ -450,6 +450,8 @@ _Parameters_
 -   _name_ `string`: Name of the edited entity record.
 -   _recordId_ `number`: Record ID of the edited entity record.
 -   _edits_ `Object`: The edits.
+-   _options_ `Object`: Options for the edit.
+-   _options.undoIgnore_ `boolean`: Whether to ignore the edit in undo history or not.
 
 _Returns_
 

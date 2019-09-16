@@ -313,6 +313,10 @@ export function undo( state = UNDO_INITIAL_STATE, action ) {
 				return nextState;
 			}
 
+			if ( ! action.meta.undo ) {
+				return state;
+			}
+
 			// Transient edits don't create an undo level, but are
 			// reachable in the next meaningful edit to which they
 			// are merged. They are defined in the entity's config.
@@ -333,6 +337,8 @@ export function undo( state = UNDO_INITIAL_STATE, action ) {
 				recordId: action.meta.undo.recordId,
 				edits: { ...state.flattenedUndo, ...action.meta.undo.edits },
 			} );
+			// When an edit is a function it's an optimization to avoid running some expensive operation.
+			// We can't rely on the function references being the same so we opt out of comparing them here.
 			const comparisonUndoEdits = Object.values( action.meta.undo.edits ).filter( ( edit ) => typeof edit !== 'function' );
 			const comparisonEdits = Object.values( action.edits ).filter( ( edit ) => typeof edit !== 'function' );
 			if ( ! isShallowEqual( comparisonUndoEdits, comparisonEdits ) ) {

@@ -98,7 +98,9 @@ describe( 'Post generator actions', () => {
 					if ( ! isAutosave ) {
 						const edits = { content: currentPost().content };
 						const { value } = fulfillment.next( edits.content );
-						expect( value ).toEqual( dispatch( STORE_KEY, 'editPost', edits ) );
+						expect( value ).toEqual(
+							dispatch( STORE_KEY, 'editPost', edits, { undoIgnore: true } )
+						);
 					}
 				},
 			],
@@ -495,7 +497,8 @@ describe( 'Editor actions', () => {
 					'postType',
 					post.type,
 					post.id,
-					edits
+					edits,
+					undefined
 				),
 			} );
 			expect( fulfillment.next() ).toEqual( {

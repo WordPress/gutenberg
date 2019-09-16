@@ -9,6 +9,7 @@ import {
 	selectBlockByClientId,
 	getAllBlocks,
 	saveDraft,
+	publishPost,
 	disableNavigationMode,
 } from '@wordpress/e2e-test-utils';
 
@@ -107,6 +108,24 @@ describe( 'undo', () => {
 		// the user since the blocks state failed to sync to block editor.
 		const visibleContent = await page.evaluate( () => document.activeElement.textContent );
 		expect( visibleContent ).toBe( 'original' );
+	} );
+
+	it( 'should not create undo levels when saving', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '1' );
+		await saveDraft();
+		await pressKeyWithModifier( 'primary', 'z' );
+
+		expect( await getEditedPostContent() ).toBe( '' );
+	} );
+
+	it( 'should not create undo levels when publishing', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '1' );
+		await publishPost();
+		await pressKeyWithModifier( 'primary', 'z' );
+
+		expect( await getEditedPostContent() ).toBe( '' );
 	} );
 
 	it( 'should immediately create an undo level on typing', async () => {
