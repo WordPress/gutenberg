@@ -117,4 +117,27 @@ describe( 'undo', () => {
 
 		expect( await getEditedPostContent() ).toBe( '' );
 	} );
+
+	it( 'should immediately create an undo level on typing', async () => {
+		await clickBlockAppender();
+
+		await page.keyboard.type( '1' );
+		await saveDraft();
+		await page.reload();
+
+		// Expect undo button to be disabled.
+		expect( await page.$( '.editor-history__undo[aria-disabled="true"]' ) ).not.toBeNull();
+
+		await page.click( '.wp-block-paragraph' );
+
+		await page.keyboard.type( '2' );
+
+		// Expect undo button to be enabled.
+		expect( await page.$( '.editor-history__undo[aria-disabled="true"]' ) ).toBeNull();
+
+		await pressKeyWithModifier( 'primary', 'z' );
+
+		// Expect "1".
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );
