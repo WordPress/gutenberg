@@ -12,7 +12,7 @@ import { withDispatch, withSelect } from '@wordpress/data';
 import { pasteHandler, children as childrenSource, getBlockTransforms, findTransform } from '@wordpress/blocks';
 import { withInstanceId, compose } from '@wordpress/compose';
 import {
-	RichText,
+	__experimentalRichText as RichText,
 	__unstableCreateElement,
 	isEmpty,
 	__unstableIsEmptyLine as isEmptyLine,
