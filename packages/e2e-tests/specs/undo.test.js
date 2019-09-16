@@ -9,6 +9,7 @@ import {
 	selectBlockByClientId,
 	getAllBlocks,
 	saveDraft,
+	publishPost,
 	disableNavigationMode,
 } from '@wordpress/e2e-test-utils';
 
@@ -113,6 +114,15 @@ describe( 'undo', () => {
 		await clickBlockAppender();
 		await page.keyboard.type( '1' );
 		await saveDraft();
+		await pressKeyWithModifier( 'primary', 'z' );
+
+		expect( await getEditedPostContent() ).toBe( '' );
+	} );
+
+	it( 'should not create undo levels when publishing', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '1' );
+		await publishPost();
 		await pressKeyWithModifier( 'primary', 'z' );
 
 		expect( await getEditedPostContent() ).toBe( '' );
