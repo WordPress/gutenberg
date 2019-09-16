@@ -153,6 +153,14 @@ export const preferences = flow( [
 		}
 		return state;
 	},
+	localAutosaveInterval( state, action ) {
+		switch ( action.type ) {
+			case 'UPDATE_LOCAL_AUTOSAVE_INTERVAL':
+				return action.interval;
+		}
+
+		return state;
+	},
 } );
 
 /**

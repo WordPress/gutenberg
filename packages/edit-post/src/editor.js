@@ -42,6 +42,7 @@ class Editor extends Component {
 		hiddenBlockTypes,
 		blockTypes,
 		preferredStyleVariations,
+		__experimentalLocalAutosaveInterval,
 		updatePreferredStyleVariations,
 	) {
 		settings = {
@@ -53,6 +54,7 @@ class Editor extends Component {
 			hasFixedToolbar,
 			focusMode,
 			showInserterHelpPanel,
+			__experimentalLocalAutosaveInterval,
 		};
 
 		// Omit hidden block types if exists and non-empty.
@@ -77,7 +79,6 @@ class Editor extends Component {
 
 	render() {
 		const {
-			preferredStyleVariations,
 			settings,
 			hasFixedToolbar,
 			focusMode,
@@ -87,6 +88,8 @@ class Editor extends Component {
 			onError,
 			hiddenBlockTypes,
 			blockTypes,
+			preferredStyleVariations,
+			__experimentalLocalAutosaveInterval,
 			showInserterHelpPanel,
 			updatePreferredStyleVariations,
 			...props
@@ -104,6 +107,7 @@ class Editor extends Component {
 			hiddenBlockTypes,
 			blockTypes,
 			preferredStyleVariations,
+			__experimentalLocalAutosaveInterval,
 			updatePreferredStyleVariations,
 		);
 
@@ -148,6 +152,7 @@ export default compose( [
 			preferredStyleVariations: getPreference( 'preferredStyleVariations' ),
 			hiddenBlockTypes: getPreference( 'hiddenBlockTypes' ),
 			blockTypes: getBlockTypes(),
+			__experimentalLocalAutosaveInterval: getPreference( 'localAutosaveInterval' ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

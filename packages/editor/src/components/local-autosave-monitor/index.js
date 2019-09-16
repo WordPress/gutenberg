@@ -20,14 +20,6 @@ import AutosaveMonitor from '../autosave-monitor';
 const requestIdleCallback = window.requestIdleCallback ? window.requestIdleCallback : window.requestAnimationFrame;
 
 /**
- * Time interval at which local autosave should occur after a change, in
- * seconds.
- *
- * @var {number}
- */
-const AUTOSAVE_INTERVAL_SECONDS = 15;
-
-/**
  * Function which returns true if the current environment supports browser
  * sessionStorage, or false otherwise. The result of this function is cached and
  * reused in subsequent invocations.
@@ -179,9 +171,14 @@ function LocalAutosaveMonitor() {
 	useAutosaveNotice();
 	useAutosavePurge();
 
+	const { localAutosaveInterval } = useSelect( ( select ) => ( {
+		localAutosaveInterval: select( 'core/editor' )
+			.getEditorSettings().__experimentalLocalAutosaveInterval,
+	} ) );
+
 	return (
 		<AutosaveMonitor
-			interval={ AUTOSAVE_INTERVAL_SECONDS }
+			interval={ localAutosaveInterval }
 			autosave={ autosave }
 			shouldThrottle
 		/>

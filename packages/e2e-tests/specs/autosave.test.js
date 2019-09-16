@@ -8,7 +8,8 @@ import {
 	pressKeyWithModifier,
 } from '@wordpress/e2e-test-utils';
 
-const AUTOSAVE_INTERVAL_SECONDS = 15;
+// Constant to override editor preference
+const AUTOSAVE_INTERVAL_SECONDS = 5;
 
 async function saveDraftWithKeyboard() {
 	return pressKeyWithModifier( 'primary', 's' );
@@ -36,6 +37,13 @@ async function getCurrentPostId() {
 	);
 }
 
+async function setLocalAutosaveInterval( value ) {
+	return page.evaluate( ( _value ) => {
+		window.wp.data.dispatch( 'core/edit-post' )
+			.__experimentalUpdateLocalAutosaveInterval( _value );
+	}, value );
+}
+
 function wrapParagraph( text ) {
 	return `<!-- wp:paragraph -->
 <p>${ text }</p>
@@ -46,6 +54,7 @@ describe( 'autosave', () => {
 	beforeEach( async () => {
 		await clearSessionStorage();
 		await createNewPost();
+		await setLocalAutosaveInterval( AUTOSAVE_INTERVAL_SECONDS );
 	} );
 
 	it( 'should save to sessionStorage', async () => {
