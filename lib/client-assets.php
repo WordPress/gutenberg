@@ -190,7 +190,7 @@ function gutenberg_register_packages_scripts() {
 		// Replace `.js` extension with `.asset.php` to find the generated dependencies file.
 		$asset_file   = substr( $path, 0, -3 ) . '.asset.php';
 		$asset        = file_exists( $asset_file )
-			? include_once( $asset_file )
+			? require_once( $asset_file )
 			: null;
 		$dependencies = isset( $asset['dependencies'] ) ? $asset['dependencies'] : array();
 		$version      = isset( $asset['version'] ) ? $asset['version'] : filemtime( $path );
