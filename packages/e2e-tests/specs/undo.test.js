@@ -109,15 +109,6 @@ describe( 'undo', () => {
 		expect( visibleContent ).toBe( 'original' );
 	} );
 
-	it( 'should not create undo level when saving', async () => {
-		await clickBlockAppender();
-		await page.keyboard.type( '1' );
-		await saveDraft();
-		await pressKeyWithModifier( 'primary', 'z' );
-
-		expect( await getEditedPostContent() ).toBe( '' );
-	} );
-
 	it( 'should immediately create an undo level on typing', async () => {
 		await clickBlockAppender();
 
