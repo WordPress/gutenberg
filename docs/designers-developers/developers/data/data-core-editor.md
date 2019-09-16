@@ -1054,7 +1054,7 @@ been edited.
 _Parameters_
 
 -   _edits_ `Object`: Post attributes to edit.
--   _undoIgnore_ `boolean`: Whether to ignore the edit in undo history or not.
+-   _options_ `Object`: Options for the edit.
 
 <a name="enablePublishSidebar" href="#enablePublishSidebar">#</a> **enablePublishSidebar**
 
