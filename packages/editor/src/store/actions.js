@@ -348,13 +348,22 @@ export function setupEditorState( post ) {
  * Returns an action object used in signalling that attributes of the post have
  * been edited.
  *
- * @param {Object} edits Post attributes to edit.
+ * @param {Object}  edits      Post attributes to edit.
+ * @param {boolean} undoIgnore Whether to ignore the edit in undo history or not.
  *
  * @yield {Object} Action object or control.
  */
-export function* editPost( edits ) {
+export function* editPost( edits, undoIgnore ) {
 	const { id, type } = yield select( STORE_KEY, 'getCurrentPost' );
-	yield dispatch( 'core', 'editEntityRecord', 'postType', type, id, edits );
+	yield dispatch(
+		'core',
+		'editEntityRecord',
+		'postType',
+		type,
+		id,
+		edits,
+		undoIgnore
+	);
 }
 
 /**
@@ -385,7 +394,7 @@ export function* savePost( options = {} ) {
 		content: yield select( STORE_KEY, 'getEditedPostContent' ),
 	};
 	if ( ! options.isAutosave ) {
-		yield dispatch( STORE_KEY, 'editPost', edits );
+		yield dispatch( STORE_KEY, 'editPost', edits, true );
 	}
 
 	yield __experimentalRequestPostUpdateStart( options );
