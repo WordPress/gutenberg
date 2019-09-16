@@ -126,14 +126,15 @@ export function receiveEmbedPreview( url, preview ) {
  * Returns an action object that triggers an
  * edit to an entity record.
  *
- * @param {string} kind           Kind of the edited entity record.
- * @param {string} name           Name of the edited entity record.
- * @param {number} recordId       Record ID of the edited entity record.
- * @param {Object} edits          The edits.
+ * @param {string}  kind       Kind of the edited entity record.
+ * @param {string}  name       Name of the edited entity record.
+ * @param {number}  recordId   Record ID of the edited entity record.
+ * @param {Object}  edits      The edits.
+ * @param {boolean} undoIgnore Whether to ignore the edit in undo history or not.
  *
  * @return {Object} Action object.
  */
-export function* editEntityRecord( kind, name, recordId, edits ) {
+export function* editEntityRecord( kind, name, recordId, edits, undoIgnore ) {
 	const { transientEdits = {}, mergedEdits = {} } = yield select(
 		'getEntity',
 		kind,
@@ -167,7 +168,7 @@ export function* editEntityRecord( kind, name, recordId, edits ) {
 		type: 'EDIT_ENTITY_RECORD',
 		...edit,
 		meta: {
-			undo: {
+			undo: ! undoIgnore && {
 				...edit,
 				// Send the current values for things like the first undo stack entry.
 				edits: Object.keys( edits ).reduce( ( acc, key ) => {
