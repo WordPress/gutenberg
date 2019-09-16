@@ -16,7 +16,7 @@ import { withTheme } from '@wordpress/components';
 import styles from './styles.scss';
 
 function MediaPlaceholder( props ) {
-	const { allowedTypes = [], labels = {}, icon, onSelect, useStyle } = props;
+	const { allowedTypes = [], labels = {}, icon, onSelect, useStyle, multiple } = props;
 
 	const isOneType = allowedTypes.length === 1;
 	const isImage = isOneType && allowedTypes.includes( MEDIA_TYPE_IMAGE );
@@ -55,6 +55,7 @@ function MediaPlaceholder( props ) {
 		<MediaUpload
 			allowedTypes={ allowedTypes }
 			onSelect={ onSelect }
+			multiple={ multiple }
 			render={ ( { open, getMediaOptions } ) => {
 				return (
 					<TouchableWithoutFeedback
