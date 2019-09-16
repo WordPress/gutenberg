@@ -43,15 +43,16 @@ function ResponsiveBlockControl( props ) {
 			<legend className="block-editor-responsive-block-control__legend">{ legend }</legend>
 
 			<div className="block-editor-responsive-block-control__inner">
-				{ ! isOpen && defaultControl }
-
-				{ isOpen && ( renderResponsiveControls ? renderResponsiveControls() : defaultResponsiveControls ) }
-
 				<ToggleControl
 					label={ toggleControlLabel }
 					checked={ ! isOpen }
 					onChange={ onToggle }
 				/>
+
+				{ ! isOpen && defaultControl }
+
+				{ isOpen && ( renderResponsiveControls ? renderResponsiveControls() : defaultResponsiveControls ) }
+
 			</div>
 		</fieldset>
 
