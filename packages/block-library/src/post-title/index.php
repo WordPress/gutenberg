@@ -11,8 +11,11 @@
  * @return string Returns the filtered post title for the current post wrapped inside "h1" tags.
  */
 function render_block_core_post_title() {
-	rewind_posts();
-	the_post();
+	if ( ! in_the_loop() ) {
+		rewind_posts();
+		the_post();
+	}
+
 	return the_title( '<h1>', '</h1>', false );
 }
 
