@@ -44,10 +44,18 @@ describe( 'Basic rendering', () => {
 		const activeDeviceLabel = Array.from( container.querySelectorAll( 'legend' ) ).filter( ( legend ) => legend.innerHTML === 'All' );
 
 		const defaultControl = container.querySelector( 'input[value="All"]' );
+
+		const toggleLabel = Array.from( container.querySelectorAll( 'label' ) ).filter( ( label ) => label.innerHTML.includes( 'Use the same padding on all screensizes' ) );
+
+		const toggleState = container.querySelector( 'input[type="checkbox"]' ).checked;
+
 		expect( container.innerHTML ).not.toBe( '' );
+
 		expect( activeDeviceLabel ).toHaveLength( 1 );
 		expect( activePropertyLabel ).toHaveLength( 1 );
 		expect( defaultControl ).not.toBeNull();
+		expect( toggleLabel ).not.toBeNull();
+		expect( toggleState ).toBe( true );
 		expect( container.innerHTML ).toMatchSnapshot();
 	} );
 
