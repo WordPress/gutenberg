@@ -157,8 +157,9 @@ export function* editEntityRecord( kind, name, recordId, edits, options = {} ) {
 		// so that the property is not considered dirty.
 		edits: Object.keys( edits ).reduce( ( acc, key ) => {
 			const recordValue = record[ key ];
+			const editedRecordValue = editedRecord[ key ];
 			const value = mergedEdits[ key ] ?
-				merge( {}, recordValue, edits[ key ] ) :
+				merge( {}, editedRecordValue, edits[ key ] ) :
 				edits[ key ];
 			acc[ key ] = isEqual( recordValue, value ) ? undefined : value;
 			return acc;
