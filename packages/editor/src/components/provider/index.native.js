@@ -1,21 +1,17 @@
 /**
- * External dependencies
- */
-import RNReactNativeGutenbergBridge, {
-	subscribeParentGetHtml,
-	subscribeParentToggleHTMLMode,
-	subscribeUpdateHtml,
-	subscribeSetFocusOnTitle,
-	subscribeSetTitle,
-} from 'react-native-gutenberg-bridge';
-
-/**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
 import { parse, serialize, getUnregisteredTypeHandlerName } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
+import RNReactNativeGutenbergBridge, {
+	subscribeParentGetHtml,
+	subscribeParentToggleHTMLMode,
+	subscribeUpdateHtml,
+	subscribeSetFocusOnTitle,
+	subscribeSetTitle,
+} from '@wordpress/react-native-gutenberg-bridge';
 
 /**
  * Internal dependencies

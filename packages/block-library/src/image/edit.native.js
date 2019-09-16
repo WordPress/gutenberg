@@ -3,12 +3,6 @@
  */
 import React from 'react';
 import { View, ImageBackground, Text, TouchableWithoutFeedback, Dimensions } from 'react-native';
-import {
-	requestMediaImport,
-	mediaUploadSync,
-	requestImageFailedRetryDialog,
-	requestImageUploadCancelDialog,
-} from 'react-native-gutenberg-bridge';
 import { isEmpty } from 'lodash';
 
 /**
@@ -31,6 +25,12 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { isURL } from '@wordpress/url';
 import { doAction, hasAction } from '@wordpress/hooks';
+import {
+	requestMediaImport,
+	mediaUploadSync,
+	requestImageFailedRetryDialog,
+	requestImageUploadCancelDialog,
+} from '@wordpress/react-native-gutenberg-bridge';
 
 /**
  * Internal dependencies

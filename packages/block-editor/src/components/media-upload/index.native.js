@@ -2,17 +2,17 @@
  * External dependencies
  */
 import React from 'react';
-import {
-	requestMediaPickFromMediaLibrary,
-	requestMediaPickFromDeviceLibrary,
-	requestMediaPickFromDeviceCamera,
-} from 'react-native-gutenberg-bridge';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { Picker } from '@wordpress/components';
+import {
+	requestMediaPickFromMediaLibrary,
+	requestMediaPickFromDeviceLibrary,
+	requestMediaPickFromDeviceCamera,
+} from '@wordpress/react-native-gutenberg-bridge';
 
 export const MEDIA_TYPE_IMAGE = 'image';
 export const MEDIA_TYPE_VIDEO = 'video';

@@ -35,7 +35,7 @@ module.exports = {
 	testPathIgnorePatterns: [
 		'/node_modules/',
 		'/wordpress/',
-		'/__device-tests__/',
+		'/react-native-e2e-tests/',
 	],
 	testURL: 'http://localhost/',
 	moduleDirectories: [ 'node_modules' ],

@@ -1,0 +1,11 @@
+--- DependencyGraph.js	2019-09-16 16:50:25.000000000 -0400
++++ DependencyGraph.js.patched	2019-09-15 09:17:47.000000000 -0400
+@@ -138,7 +138,7 @@
+       roots: config.watchFolders,
+       throwOnModuleCollision: true,
+       useWatchman: config.resolver.useWatchman,
+-      watch: true
++      watch: false
+     });
+   }
+ 

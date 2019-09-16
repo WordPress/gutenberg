@@ -3,7 +3,6 @@
  */
 import { Platform, SafeAreaView, View } from 'react-native';
 import SafeArea from 'react-native-safe-area';
-import { sendNativeEditorDidLayout } from 'react-native-gutenberg-bridge';
 
 /**
  * WordPress dependencies
@@ -12,6 +11,7 @@ import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { HTMLTextInput, KeyboardAvoidingView, ReadableContentView } from '@wordpress/components';
+import { sendNativeEditorDidLayout } from '@wordpress/react-native-gutenberg-bridge';
 
 /**
  * Internal dependencies

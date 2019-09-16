@@ -3,15 +3,11 @@
  */
 import React from 'react';
 import { View, TouchableWithoutFeedback, Text } from 'react-native';
+
 /**
  * Internal dependencies
  */
 import Video from './video-player';
-import {
-	mediaUploadSync,
-	requestImageFailedRetryDialog,
-	requestImageUploadCancelDialog,
-} from 'react-native-gutenberg-bridge';
 
 /**
  * WordPress dependencies
@@ -32,6 +28,11 @@ import {
 import { __ } from '@wordpress/i18n';
 import { isURL } from '@wordpress/url';
 import { doAction, hasAction } from '@wordpress/hooks';
+import {
+	mediaUploadSync,
+	requestImageFailedRetryDialog,
+	requestImageUploadCancelDialog,
+} from '@wordpress/react-native-gutenberg-bridge';
 
 /**
  * Internal dependencies

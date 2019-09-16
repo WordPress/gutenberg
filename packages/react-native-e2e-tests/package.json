@@ -1,0 +1,42 @@
+{
+	"name": "@wordpress/react-native-e2e-tests",
+	"version": "1.0.0",
+	"description": "End-To-End (E2E) tests for WordPress Native Mobile.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"e2e",
+		"native",
+		"tests",
+		"react-native"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/react-native-e2e-tests/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/react-native-e2e-tests"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=8"
+	},
+	"dependencies": {
+		"appium": "^1.13.0",
+		"wd": "^1.11.1"
+	},
+	"peerDependencies": {
+		"jest": ">=24",
+		"puppeteer": ">=1.19.0"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"scripts": {
+		"device-tests": "cross-env NODE_ENV=test jest --no-cache --maxWorkers=3 --reporters=default --reporters=jest-junit --verbose --config jest_ui.config.js",
+		"device-tests:local": "cross-env NODE_ENV=test jest --runInBand --reporters=default --reporters=jest-junit --detectOpenHandles --verbose --config jest_ui.config.js",
+		"device-tests:debug": "cross-env NODE_ENV=test node $NODE_DEBUG_OPTION --inspect-brk jest --runInBand --reporters=default --reporters=jest-junit --detectOpenHandles --verbose --config jest_ui.config.js"
+	}
+}

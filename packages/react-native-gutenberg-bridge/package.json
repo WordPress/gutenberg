@@ -1,0 +1,26 @@
+
+{
+	"name": "@wordpress/react-native-gutenberg-bridge",
+	"version": "1.0.0",
+	"description": "React Native bridge interface between react-native-gutenberg-editor and a native (iOS/Android) app.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"native",
+		"react-native"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/react-native-gutenberg-bridge/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/react-native-gutenberg-bridge"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"main": "index.js",
+	"publishConfig": {
+		"access": "public"
+	}
+}

@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { FlatList, View, Text, TouchableHighlight } from 'react-native';
-import { subscribeMediaAppend } from 'react-native-gutenberg-bridge';
 
 /**
  * WordPress dependencies
@@ -15,6 +14,7 @@ import {
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withInstanceId, compose } from '@wordpress/compose';
 import { BottomSheet, Icon } from '@wordpress/components';
+import { subscribeMediaAppend } from '@wordpress/react-native-gutenberg-bridge';
 
 /**
  * Internal dependencies
