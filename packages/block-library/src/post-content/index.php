@@ -11,6 +11,11 @@
  * @return string Returns the filtered post content of the current post.
  */
 function render_block_core_post_content() {
+	// TODO: Without this temporary fix, an infinite loop can occur.
+	if ( is_admin() || defined( 'REST_REQUEST' ) ) {
+		return '';
+	}
+
 	if ( ! in_the_loop() ) {
 		rewind_posts();
 		the_post();
