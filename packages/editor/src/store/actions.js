@@ -177,7 +177,13 @@ export function* setupEditor( post, edits, template ) {
 	};
 	yield resetEditorBlocks( blocks, { __unstableShouldCreateUndoLevel: false } );
 	yield setupEditorState( post );
-	if ( edits ) {
+	if (
+		edits &&
+		Object.keys( edits ).some(
+			( key ) =>
+				edits[ key ] !== ( has( post, [ key, 'raw' ] ) ? post[ key ].raw : post[ key ] )
+		)
+	) {
 		yield editPost( edits );
 	}
 	yield* __experimentalSubscribeSources();

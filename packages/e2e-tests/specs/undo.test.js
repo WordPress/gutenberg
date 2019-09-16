@@ -29,6 +29,10 @@ describe( 'undo', () => {
 		await pressKeyWithModifier( 'primary', 'z' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		await pressKeyWithModifier( 'primary', 'z' );
+
+		expect( await getEditedPostContent() ).toBe( '' );
 	} );
 
 	it( 'should undo typing after non input change', async () => {
@@ -43,6 +47,10 @@ describe( 'undo', () => {
 		await pressKeyWithModifier( 'primary', 'z' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		await pressKeyWithModifier( 'primary', 'z' );
+
+		expect( await getEditedPostContent() ).toBe( '' );
 	} );
 
 	it( 'Should undo to expected level intervals', async () => {
@@ -99,5 +107,28 @@ describe( 'undo', () => {
 		// the user since the blocks state failed to sync to block editor.
 		const visibleContent = await page.evaluate( () => document.activeElement.textContent );
 		expect( visibleContent ).toBe( 'original' );
+	} );
+
+	it( 'should immediately create an undo level on typing', async () => {
+		await clickBlockAppender();
+
+		await page.keyboard.type( '1' );
+		await saveDraft();
+		await page.reload();
+
+		// Expect undo button to be disabled.
+		expect( await page.$( '.editor-history__undo[aria-disabled="true"]' ) ).not.toBeNull();
+
+		await page.click( '.wp-block-paragraph' );
+
+		await page.keyboard.type( '2' );
+
+		// Expect undo button to be enabled.
+		expect( await page.$( '.editor-history__undo[aria-disabled="true"]' ) ).toBeNull();
+
+		await pressKeyWithModifier( 'primary', 'z' );
+
+		// Expect "1".
+		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );
