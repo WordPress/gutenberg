@@ -329,16 +329,6 @@ class CoverEdit extends Component {
 									onChange={ ( value ) => setAttributes( { focalPoint: value } ) }
 								/>
 							) }
-							<CoverHeightInput
-								value={ temporaryMinHeight || minHeight }
-								onChange={
-									( value ) => {
-										setAttributes( {
-											minHeight: value,
-										} );
-									}
-								}
-							/>
 							<PanelRow>
 								<Button
 									isDefault
@@ -361,28 +351,16 @@ class CoverEdit extends Component {
 					{ ( url || overlayColor.color ) && (
 						<>
 							<PanelBody title={ __( 'Dimensions' ) }>
-								<BaseControl label={ __( 'Height in pixels' ) } id={ inputId }>
-									<input
-										type="number"
-										id={ inputId }
-										onChange={ ( event ) => {
-											let coverMinHeight = parseInt( event.target.value, 10 );
-											this.setState( { coverMinHeight } );
-											if ( isNaN( coverMinHeight ) ) {
-											// Set cover min height to default size and input box to empty string
-												this.setState( { coverMinHeight: COVER_DEFAULT_HEIGHT } );
-												coverMinHeight = COVER_DEFAULT_HEIGHT;
-											} else if ( coverMinHeight < COVER_MIN_HEIGHT ) {
-											// Set cover min height to minimum size
-												coverMinHeight = COVER_MIN_HEIGHT;
-											}
-											setAttributes( { minHeight: coverMinHeight } );
-										} }
-										value={ this.state.coverMinHeight || minHeight }
-										min={ COVER_MIN_HEIGHT }
-										step="10"
-									/>
-								</BaseControl>
+								<CoverHeightInput
+									value={ temporaryMinHeight || minHeight }
+									onChange={
+										( value ) => {
+											setAttributes( {
+												minHeight: value,
+											} );
+										}
+									}
+								/>
 							</PanelBody>
 							<PanelColorSettings
 								title={ __( 'Overlay' ) }
