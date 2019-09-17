@@ -1,4 +1,4 @@
-## Master
+## 2.8.0 (2019-09-16)
 
 ### New Features
 
