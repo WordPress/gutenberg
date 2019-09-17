@@ -1,14 +1,15 @@
 /**
  * External dependencies
  */
-import RNReactNativeGutenbergBridge from 'react-native-gutenberg-bridge';
 import { mount } from 'enzyme';
+
 /**
  * WordPress dependencies
  */
 import { registerCoreBlocks } from '@wordpress/block-library';
 // Force register 'core/editor' store.
 import { store } from '@wordpress/editor'; // eslint-disable-line no-unused-vars
+import RNReactNativeGutenbergBridge from '@wordpress/react-native-gutenberg-bridge';
 
 jest.mock( '../components/layout', () => () => 'Layout' );
 

@@ -2,9 +2,13 @@
  * External dependencies
  */
 import { shallow } from 'enzyme';
+
+/**
+ * WordPress dependencies
+ */
 import {
 	sendMediaUpload,
-} from 'react-native-gutenberg-bridge';
+} from '@wordpress/react-native-gutenberg-bridge';
 
 /**
  * Internal dependencies
@@ -17,7 +21,7 @@ import {
 	MEDIA_UPLOAD_STATE_RESET,
 } from '../media-upload-progress';
 
-jest.mock( 'react-native-gutenberg-bridge', () => {
+jest.mock( '@wordpress/react-native-gutenberg-bridge', () => {
 	const callUploadCallback = ( payload ) => {
 		this.uploadCallBack( payload );
 	};

@@ -3,11 +3,15 @@
  */
 import { shallow } from 'enzyme';
 import { TouchableWithoutFeedback } from 'react-native';
+
+/**
+ * WordPress dependencies
+ */
 import {
 	requestMediaPickFromMediaLibrary,
 	requestMediaPickFromDeviceLibrary,
 	requestMediaPickFromDeviceCamera,
-} from 'react-native-gutenberg-bridge';
+} from '@wordpress/react-native-gutenberg-bridge';
 
 /**
  * Internal dependencies

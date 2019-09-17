@@ -36,6 +36,7 @@ module.exports = {
 		'/node_modules/',
 		'/wordpress/',
 		'/react-native-e2e-tests/',
+		'/react-native-gutenberg-editor/',
 	],
 	testURL: 'http://localhost/',
 	moduleDirectories: [ 'node_modules' ],
