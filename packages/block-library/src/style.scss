@@ -29,6 +29,7 @@
 // to assure colors take effect over another base class color, mainly to let
 // the colors override the added specificity by link states such as :hover.
 
+/* stylelint-disable scale-unlimited/declaration-strict-value */
 :root {
 	// Background colors.
 
@@ -131,6 +132,7 @@
 	}
 }
 
+/* stylelint-enable */
 
 // Font sizes.
 
