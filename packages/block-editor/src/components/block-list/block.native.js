@@ -5,6 +5,7 @@ import {
 	View,
 	Text,
 	TouchableWithoutFeedback,
+	Animated,
 } from 'react-native';
 
 /**
@@ -33,13 +34,53 @@ class BlockListBlock extends Component {
 
 		this.insertBlocksAfter = this.insertBlocksAfter.bind( this );
 		this.onFocus = this.onFocus.bind( this );
+		this.hideToolbar = this.hideToolbar.bind( this );
+		this.fadeOutToolbar = this.fadeOutToolbar.bind( this );
 
 		this.state = {
 			isFullyBordered: false,
+			showToolbar: true,
+			fadeAnim: new Animated.Value( 1 ),
 		};
 	}
 
+	componentDidUpdate() {
+		if ( this.props.displayToolbar ) {
+			this.hideToolbar();
+		}
+	}
+
+	fadeOutToolbar() {
+		this.setState( { fadeAnim: new Animated.Value( 1 ) },
+			() => {
+				Animated.timing(
+					this.state.fadeAnim,
+					{
+						toValue: 0,
+						duration: 200,
+						useNativeDriver: true,
+					}
+				).start( () => {
+					this.setState( { showToolbar: false } );
+				} );
+			} );
+	}
+
+	hideToolbar() {
+		if ( this.hideTimeout ) {
+			clearTimeout( this.hideTimeout );
+		}
+		this.hideTimeout = setTimeout( () => {
+			if ( this.state.showToolbar ) {
+				this.fadeOutToolbar();
+			}
+		}, 3000 );
+	}
+
 	onFocus() {
+		if ( ! this.state.showToolbar ) {
+			this.setState( { showToolbar: true } );
+		}
 		if ( ! this.props.isSelected ) {
 			this.props.onSelect();
 		}
@@ -121,9 +162,11 @@ class BlockListBlock extends Component {
 
 		const accessibilityLabel = this.getAccessibilityLabel();
 
+		const { fadeAnim } = this.state;
+
 		return (
 			<>
-				{ displayToolbar && <FloatingToolbar /> }
+				{ this.state.showToolbar && displayToolbar && <Animated.View style={ { opacity: fadeAnim } }><FloatingToolbar /></Animated.View> }
 				<TouchableWithoutFeedback
 					onPress={ this.onFocus }
 					accessible={ ! isSelected }
