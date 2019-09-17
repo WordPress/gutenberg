@@ -28,6 +28,8 @@ import FloatingToolbar from './block-mobile-floating-toolbar';
 
 const toolbarHeight = 44;
 
+const hideToolbarAfterMs = 3000;
+
 class BlockListBlock extends Component {
 	constructor() {
 		super( ...arguments );
@@ -57,11 +59,11 @@ class BlockListBlock extends Component {
 					this.state.fadeAnim,
 					{
 						toValue: 0,
-						duration: 200,
+						duration: 100,
 						useNativeDriver: true,
 					}
 				).start( () => {
-					this.setState( { showToolbar: false } );
+					this.setState( { showToolbar: false, fadeAnim: new Animated.Value( 1 ) } );
 				} );
 			} );
 	}
@@ -74,12 +76,12 @@ class BlockListBlock extends Component {
 			if ( this.state.showToolbar ) {
 				this.fadeOutToolbar();
 			}
-		}, 3000 );
+		}, hideToolbarAfterMs );
 	}
 
 	onFocus() {
 		if ( ! this.state.showToolbar ) {
-			this.setState( { showToolbar: true } );
+			this.setState( { showToolbar: true, fadeAnim: new Animated.Value( 1 ) } );
 		}
 		if ( ! this.props.isSelected ) {
 			this.props.onSelect();
