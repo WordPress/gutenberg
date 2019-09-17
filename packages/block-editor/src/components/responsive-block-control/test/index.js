@@ -3,6 +3,12 @@
  */
 import { render, unmountComponentAtNode } from 'react-dom';
 import { act } from 'react-dom/test-utils';
+import { uniqueId } from 'lodash';
+
+/**
+ * WordPress dependencies
+ */
+import { Fragment } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -23,6 +29,8 @@ afterEach( () => {
 	container = null;
 } );
 
+const inputId = uniqueId();
+
 describe( 'Basic rendering', () => {
 	it( 'should render with required props', () => {
 		act( () => {
@@ -31,9 +39,13 @@ describe( 'Basic rendering', () => {
 					legend="Padding"
 					property="padding"
 					renderDefaultControl={ ( label ) => (
-						<input
-							defaultValue={ label }
-						/>
+						<Fragment>
+							<label htmlFor={ inputId }>{ label }</label>
+							<input
+								id={ inputId }
+								defaultValue={ label }
+							/>
+						</Fragment>
 					) }
 				/>, container
 			);
@@ -41,7 +53,7 @@ describe( 'Basic rendering', () => {
 
 		const activePropertyLabel = Array.from( container.querySelectorAll( 'legend' ) ).filter( ( legend ) => legend.innerHTML === 'Padding' );
 
-		const activeDeviceLabel = Array.from( container.querySelectorAll( 'legend' ) ).filter( ( legend ) => legend.innerHTML === 'All' );
+		const activeDeviceLabel = Array.from( container.querySelectorAll( 'label' ) ).filter( ( label ) => label.innerText === 'Padding for desktop devices' );
 
 		const defaultControl = container.querySelector( 'input[value="All"]' );
 
@@ -65,9 +77,13 @@ describe( 'Basic rendering', () => {
 				<ResponsiveBlockControl
 					property="padding"
 					renderDefaultControl={ ( label ) => (
-						<input
-							defaultValue={ label }
-						/>
+						<Fragment>
+							<label htmlFor={ inputId }>{ label }</label>
+							<input
+								id={ inputId }
+								defaultValue={ label }
+							/>
+						</Fragment>
 					) }
 				/>, container
 			);
@@ -82,9 +98,14 @@ describe( 'Basic rendering', () => {
 				<ResponsiveBlockControl
 					legend="Padding"
 					renderDefaultControl={ ( label ) => (
-						<input
-							defaultValue={ label }
-						/>
+
+						<Fragment>
+							<label htmlFor={ inputId }>{ label }</label>
+							<input
+								id={ inputId }
+								defaultValue={ label }
+							/>
+						</Fragment>
 					) }
 				/>, container
 			);

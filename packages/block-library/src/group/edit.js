@@ -15,6 +15,7 @@ import {
 	PanelColorSettings,
 	withColors,
 	ResponsiveBlockControl,
+	ResponsiveBlockControlLabel,
 } from '@wordpress/block-editor';
 
 import {
@@ -80,7 +81,7 @@ function GroupEdit( {
 						} }
 						renderDefaultControl={ ( label ) => (
 							<SelectControl
-								label={ label }
+								label={ <ResponsiveBlockControlLabel property="Padding" device={ label } /> }
 								hideLabelFromVision={ false }
 								options={ sizeOptions }
 							/>

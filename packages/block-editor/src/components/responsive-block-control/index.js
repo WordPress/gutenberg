@@ -8,9 +8,25 @@ import { noop } from 'lodash';
  */
 import { __, sprintf } from '@wordpress/i18n';
 
+import { Fragment } from '@wordpress/element';
+
 import {
 	ToggleControl,
 } from '@wordpress/components';
+
+export function ResponsiveBlockControlLabel( { property, device } ) {
+	return (
+		<Fragment>
+			<span className="screen-reader-text">
+				{ property } for
+			</span>
+			{ device }
+			<span className="screen-reader-text">
+			devices
+			</span>
+		</Fragment>
+	);
+}
 
 function ResponsiveBlockControl( props ) {
 	const { legend, property, toggleLabel, isOpen = false, onToggle = noop, renderDefaultControl, defaultLabel = __( 'All' ), devices = [ __( 'Desktop' ), __( 'Tablet' ), __( 'Mobile' ) ], renderResponsiveControls } = props;
@@ -21,19 +37,13 @@ function ResponsiveBlockControl( props ) {
 
 	const toggleControlLabel = toggleLabel || sprintf( __( 'Use the same %s on all screensizes.' ), property );
 
-	const defaultControl = (
-		<fieldset>
-			<legend>{ defaultLabel }</legend>
-			{ renderDefaultControl( defaultLabel ) }
-		</fieldset>
-	);
+	const defaultControl = renderDefaultControl( defaultLabel );
 
-	const defaultResponsiveControls = devices.map( ( deviceLabel ) => {
+	const defaultResponsiveControls = devices.map( ( deviceLabel, index ) => {
 		return (
-			<fieldset key={ deviceLabel }>
-				<legend>{ deviceLabel }</legend>
+			<Fragment key={ index }>
 				{ renderDefaultControl( deviceLabel ) }
-			</fieldset>
+			</Fragment>
 		);
 	} );
 
@@ -55,7 +65,6 @@ function ResponsiveBlockControl( props ) {
 
 			</div>
 		</fieldset>
-
 	);
 }
 
