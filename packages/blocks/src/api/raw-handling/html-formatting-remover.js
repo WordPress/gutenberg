@@ -24,11 +24,7 @@ function getSibling( node, which ) {
 }
 
 function isFormattingSpace( character ) {
-	return (
-		character === ' ' ||
-		character === '\t' ||
-		character === '\n'
-	);
+	return character === ' ' || character === '\t' || character === '\n';
 }
 
 /**
@@ -42,49 +38,45 @@ export default function( node ) {
 		return;
 	}
 
-	if ( isFormattingSpace( node.data[ 0 ] ) ) {
+	// First, replace any sequence of HTML formatting space with a single space.
+	let newData = node.data.replace( /[ \n\t]+/g, ' ' );
+
+	// Remove the leading space if the text element is at the start of a block,
+	// is preceded by a line break element, or has a space in the previous
+	// element.
+	if ( newData[ 0 ] === ' ' ) {
 		const previousSibling = getSibling( node, 'previous' );
-		const hasPreviousSpace = (
+
+		if (
 			! previousSibling ||
 			previousSibling.nodeName === 'BR' ||
 			previousSibling.textContent.slice( -1 ) === ' '
-		);
-		node.data = node.data.replace( /^[ \n\t]+/, hasPreviousSpace ? '' : ' ' );
+		) {
+			newData = newData.slice( 1 );
+		}
 	}
 
-	if ( isFormattingSpace( node.data.slice( -1 ) ) ) {
+	// Remove the trailing space if the text element is at the end of a block,
+	// is succeded by a line break element, or has a space in the next element.
+	if ( newData[ newData.length - 1 ] === ' ' ) {
 		const nextSibling = getSibling( node, 'next' );
-		const hasNextSpace = (
+
+		if (
 			! nextSibling ||
 			nextSibling.nodeName === 'BR' ||
+			// Note that any next node data has not yet been replaced, so we
+			// have to check for any formatting space.
 			isFormattingSpace( nextSibling.textContent[ 0 ] )
-		);
-		node.data = node.data.replace( /[ \n\t]+$/, hasNextSpace ? '' : ' ' );
-	}
-
-	// Require at least two characters before attempting to replace formatting
-	// spaces in the middle.
-	if ( node.data.length > 2 ) {
-		const middle = node.data.slice( 1, -1 );
-
-		// Require at least two spaces in a row, a line break, or a tab
-		// character before trying to replace anything.
-		if (
-			middle.indexOf( '  ' ) !== -1 ||
-			middle.indexOf( '\n' ) !== -1 ||
-			middle.indexOf( '\t' ) !== -1
 		) {
-			node.data = (
-				node.data[ 0 ] +
-				middle.replace( /[ \n\t]+/g, ' ' ) +
-				node.data[ node.data.length - 1 ]
-			);
+			newData = newData.slice( 0, -1 );
 		}
 	}
 
 	// If there's no data left, remove the node, so `previousSibling` stays
-	// accurate.
-	if ( ! node.data ) {
+	// accurate. Otherwise, update the node data.
+	if ( ! newData ) {
 		node.parentNode.removeChild( node );
+	} else {
+		node.data = newData;
 	}
 }
