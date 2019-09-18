@@ -108,6 +108,7 @@ class MediaTextEdit extends Component {
 				onWidthChange={ this.onWidthChange }
 				commitWidthChange={ this.commitWidthChange }
 				onFocus={ this.props.onFocus }
+				isSelected={ this.props.isSelected }
 				{ ...{ mediaAlt, mediaId, mediaType, mediaUrl, mediaPosition, mediaWidth, imageFill, focalPoint } }
 			/>
 		);

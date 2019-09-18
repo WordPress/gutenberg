@@ -437,6 +437,68 @@ export function getBlockHierarchyRootClientId( state, clientId ) {
 }
 
 /**
+ * Given a block client ID, returns the hierarchy tree of client ID.
+ *
+ * @param {Object} state    Editor state.
+ * @param {string} clientId Block from which tree will be created.
+ *
+ * @return {Array} Hierarchy tree of client ID.
+ */
+export function getTree( state, clientId ) {
+	let current = clientId;
+	const tree = [ current ];
+	do {
+		current = state.blocks.parents[ current ];
+		if ( current ) {
+			tree.push( current );
+		}
+	} while ( current );
+	return tree;
+}
+
+/**
+ * Given a block client ID, returns the next element of the hierarchy from which the block is nested which should be selected onFocus, return the block itself for root level blocks.
+ *
+ * @param {Object} state    Editor state.
+ * @param {string} clientId Block from which to find first to select client ID.
+ *
+ * @return {string} First to select client ID
+ */
+export function getFirstToSelectBlock( state, clientId ) {
+	const selectedId = getSelectedBlockClientId( state );
+	const clientTree = getTree( state, clientId );
+	const rootParent = clientTree[ clientTree.length - 1 ];
+
+	let index = 0;
+	let commonParentFirstChild;
+	let hasCommonParent = false;
+
+	if ( ! selectedId ) {
+		return rootParent;
+	}
+
+	const selectedRoot = getBlockHierarchyRootClientId( state, selectedId );
+	const clientRoot = getBlockHierarchyRootClientId( state, clientId );
+
+	if ( selectedRoot !== clientRoot ) {
+		return rootParent;
+	}
+
+	const selectedTree = getTree( state, selectedId );
+
+	do {
+		const commonParentIndex = clientTree.indexOf( selectedTree[ index ] );
+		hasCommonParent = commonParentIndex >= 0;
+		if ( hasCommonParent ) {
+			commonParentFirstChild = clientTree[ commonParentIndex - 1 ];
+		}
+		index++;
+	} while ( index < selectedTree.length && ! hasCommonParent );
+
+	return commonParentFirstChild;
+}
+
+/**
  * Returns the client ID of the block adjacent one at the given reference
  * startClientId and modifier directionality. Defaults start startClientId to
  * the selected block, and direction as next block. Returns null if there is no

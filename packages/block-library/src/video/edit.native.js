@@ -185,6 +185,7 @@ class VideoEdit extends React.Component {
 						onSelect={ this.onSelectMediaUploadOption }
 						icon={ this.getIcon( false, true ) }
 						onFocus={ this.props.onFocus }
+						isBlockSelected={ this.props.isSelected }
 					/>
 				</View>
 			);

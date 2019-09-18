@@ -3,10 +3,62 @@
 }
 
 .blockContainer {
-	padding-left: 16px;
-	padding-right: 16px;
+	margin-left: 16px;
+	margin-right: 16px;
 	padding-top: 12px;
 	padding-bottom: 12px;
+}
+
+.blockContainerDimmed {
+	opacity: 0.2;
+}
+
+.blockHolderDashedBordered {
+	border-top-width: 1px;
+	border-bottom-width: 1px;
+	border-left-width: 1px;
+	border-right-width: 1px;
+	border-style: dashed;
+	border-color: $gray;
+	padding-left: 6px;
+	padding-right: 6px;
+	padding-top: 6px;
+	padding-bottom: 6px;
+	padding-bottom: 6px;
+	margin-right: 0px;
+	margin-left: 0px;
+	margin-bottom: 5px;
+	margin-top: 5px;
+	border-radius: 2px;
+}
+
+.selectedInnerGroup {
+	padding-top: 0px;
+	margin-left: 0px;
+	margin-right: 0px;
+}
+
+.margin {
+	margin-left: 9px;
+	margin-right: 9px;
+}
+
+.padding {
+	padding-left: 0px;
+	padding-right: 0px;
+	padding-top: 0px;
+}
+
+.dashedBorderStyle {
+	margin-left: 5px;
+	margin-right: 5px;
+}
+
+.innerBlockContainerFocused {
+	padding-left: 12px;
+	padding-right: 12px;
+	padding-top: 12px;
+	padding-bottom: 0; // will be flushed into inline toolbar height
 }
 
 .blockContainerFocused {

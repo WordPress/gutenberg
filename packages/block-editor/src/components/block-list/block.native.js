@@ -40,8 +40,9 @@ class BlockListBlock extends Component {
 	}
 
 	onFocus() {
-		if ( ! this.props.isSelected ) {
-			this.props.onSelect();
+		const { firstToSelect, isSelected, onSelect } = this.props;
+		if ( ! isSelected ) {
+			onSelect( firstToSelect );
 		}
 	}
 
@@ -117,6 +118,10 @@ class BlockListBlock extends Component {
 			showFloatingToolbar,
 			parentId,
 			isFirstBlock,
+			parentId,
+			isDashed,
+			isDimmed,
+			isGroup,
 		} = this.props;
 
 		const borderColor = isSelected ? focusedBorderColor : 'transparent';
@@ -147,7 +152,13 @@ class BlockListBlock extends Component {
 						{ showTitle && this.renderBlockTitle() }
 						<View
 							accessibilityLabel={ accessibilityLabel }
-							style={ [ ! isSelected && styles.blockContainer, isSelected && styles.blockContainerFocused ] }
+							style={ [ 
+								! isSelected && ( isDashed ? styles.blockHolderDashedBordered : styles.blockContainer ), 
+								! isSelected && isGroup &&  !parentId && styles.selectedInnerGroup,
+								isDimmed && styles.blockContainerDimmed, 
+								isSelected && ( parentId ? styles.innerBlockContainerFocused : styles.blockContainerFocused ),
+								isSelected && isGroup && !parentId && styles.padding
+							] }
 						>
 							{ isValid && this.getBlockForType() }
 							{ ! isValid &&
@@ -170,9 +181,12 @@ export default compose( [
 			isBlockSelected,
 			__unstableGetBlockWithoutInnerBlocks,
 			getBlockHierarchyRootClientId,
-			getBlock,
 			getBlockRootClientId,
+			getSelectedBlockClientId,
+			getBlock,
 			getSelectedBlock,
+			getBlockOrder,
+			getFirstToSelectBlock,
 		} = select( 'core/block-editor' );
 		const order = getBlockIndex( clientId, rootClientId );
 		const isSelected = isBlockSelected( clientId );
@@ -198,6 +212,17 @@ export default compose( [
 
 		const showFloatingToolbar = isSelected && hasRootInnerBlocks && ! isMediaText && ! isMediaTextParent;
 
+		const parentId = getBlockRootClientId( clientId );
+		const firstToSelect = getFirstToSelectBlock( clientId );
+
+		const selectedBlockClientId = getSelectedBlockClientId();
+		const isRootSiblingsSelected = getBlockRootClientId( selectedBlockClientId ) === '';
+
+		const isDashed = selectedBlockClientId === parentId;
+		const isDimmed = ! isSelected && ! isRootSiblingsSelected && !! selectedBlockClientId && firstToSelect === clientId && ! isDashed;
+
+		const parentId = getBlockRootClientId( clientId );
+
 		return {
 			icon,
 			name: name || 'core/missing',
@@ -211,6 +236,10 @@ export default compose( [
 			isValid,
 			getAccessibilityLabelExtra,
 			showFloatingToolbar,
+			parentId,
+			isDashed,
+			isDimmed,
+			firstToSelect,
 			parentId,
 		};
 	} ),

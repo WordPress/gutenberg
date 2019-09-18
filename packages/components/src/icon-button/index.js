@@ -25,12 +25,14 @@ function IconButton( props, ref ) {
 		tooltip,
 		shortcut,
 		labelPosition,
+		fill,
 		...additionalProps
 	} = props;
 	const classes = classnames( 'components-icon-button', className, {
 		'has-text': children,
 	} );
 	const tooltipText = tooltip || label;
+	const iconProps = fill ? { fill } : {};
 
 	// Should show the tooltip if...
 	const showTooltip = ! additionalProps.disabled && (

@@ -771,6 +771,8 @@ export class RichText extends Component {
 			__unstableIsSelected: isSelected,
 			children,
 			getStylesFromColorScheme,
+			blockIsSelected,
+			isParentSelected,
 		} = this.props;
 
 		const record = this.getRecord();
@@ -820,7 +822,8 @@ export class RichText extends Component {
 			this.firedAfterTextChanged = false;
 		}
 
-		const dynamicStyle = getStylesFromColorScheme( style, styles.richTextDark );
+		const dynamicStyle = useStyle( style, styles.richTextDark );
+		const lockOnFocus = blockIsSelected || isParentSelected ? {} : { pointerEvents: 'none' };
 
 		return (
 			<View>
@@ -866,6 +869,7 @@ export class RichText extends Component {
 					disableEditingMenu={ this.props.disableEditingMenu }
 					isMultiline={ this.isMultiline }
 					textAlign={ this.props.textAlign }
+					{ ...lockOnFocus }
 				/>
 				{ isSelected && <FormatEdit value={ record } onChange={ this.onFormatChange } /> }
 			</View>

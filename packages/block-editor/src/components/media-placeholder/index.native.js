@@ -115,7 +115,9 @@ function MediaPlaceholder( props ) {
 							accessibilityHint={ accessibilityHint }
 							onPress={ ( event ) => {
 								props.onFocus( event );
-								open();
+								if ( props.isBlockSelected ) {
+									open();
+								}
 							} }>
 							<View
 								style={ [

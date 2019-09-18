@@ -50,6 +50,7 @@ class PostTitle extends Component {
 			title,
 			focusedBorderColor,
 			borderStyle,
+			isDimmed,
 		} = this.props;
 
 		const decodedPlaceholder = decodeEntities( placeholder );
@@ -57,7 +58,7 @@ class PostTitle extends Component {
 
 		return (
 			<View
-				style={ [ styles.titleContainer, borderStyle, { borderColor } ] }
+				style={ [ styles.titleContainer, borderStyle, { borderColor }, isDimmed && styles.dimmed ] }
 				accessible={ ! this.props.isSelected }
 				accessibilityLabel={
 					isEmpty( title ) ?
@@ -104,11 +105,20 @@ export default compose(
 			isPostTitleSelected,
 		} = select( 'core/editor' );
 
-		const { getSelectedBlockClientId } = select( 'core/block-editor' );
+		const { getSelectedBlockClientId, getBlockHierarchyRootClientId, getBlock } = select( 'core/block-editor' );
+
+		const clientId = getSelectedBlockClientId();
+		const isAnyBlockSelected = !! clientId;
+		const rootBlockId = getBlockHierarchyRootClientId( clientId );
+		const rootBlock = getBlock( rootBlockId );
+		const hasRootInnerBlocks = rootBlock && rootBlock.innerBlocks.length !== 0;
+
+		const isDimmed = isAnyBlockSelected && hasRootInnerBlocks;
 
 		return {
-			isAnyBlockSelected: !! getSelectedBlockClientId(),
+			isAnyBlockSelected,
 			isSelected: isPostTitleSelected(),
+			isDimmed,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
