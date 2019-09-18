@@ -1,6 +1,6 @@
 ## Master
 
-- Added `createInterpolateElement` function (see [17376](https://github.com/WordPress/gutenberg/pull/17376))
+- Added `__experimentalCreateInterpolateElement` function (see [17376](https://github.com/WordPress/gutenberg/pull/17376))
 
 ## 2.8.0 (2019-09-16)
 
