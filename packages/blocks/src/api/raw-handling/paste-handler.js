@@ -24,6 +24,7 @@ import shortcodeConverter from './shortcode-converter';
 import markdownConverter from './markdown-converter';
 import iframeRemover from './iframe-remover';
 import googleDocsUIDRemover from './google-docs-uid-remover';
+import HTMLFormattingRemover from './html-formatting-remover';
 import { getPhrasingContentSchema } from './phrasing-content';
 import {
 	deepFilterHTML,
@@ -224,6 +225,7 @@ export function pasteHandler( { HTML = '', plainText = '', mode = 'AUTO', tagNam
 
 		piece = deepFilterHTML( piece, filters, blockContentSchema );
 		piece = removeInvalidHTML( piece, schema );
+		piece = deepFilterHTML( piece, [ HTMLFormattingRemover ], blockContentSchema );
 		piece = normaliseBlocks( piece );
 
 		// Allows us to ask for this information when we get a report.
