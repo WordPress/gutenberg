@@ -125,6 +125,12 @@ module.exports = {
 			],
 		},
 		{
+			files: [ 'packages/**/{storybook,stories}\/*\.js' ],
+			rules: {
+				'import/no-extraneous-dependencies': 'off',
+			},
+		},
+		{
 			files: [
 				'packages/jest*/**/*.js',
 			],
