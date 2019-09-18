@@ -11,6 +11,7 @@ import {
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
+import { ToolbarButton } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { getBlockType } from '@wordpress/blocks';
@@ -124,7 +125,15 @@ class BlockListBlock extends Component {
 		return (
 			<>
 				{ showFloatingToolbar && ( ! isFirstBlock || parentId === '' ) && <FloatingToolbar.Slot /> }
-				{ showFloatingToolbar && <FloatingToolbar /> }
+				{ showFloatingToolbar &&
+					( <FloatingToolbar>
+						<ToolbarButton
+							title={ __( 'Navigate Up' ) }
+							onClick={ () => this.props.onSelect( parentId ) }
+							icon="arrow-up-alt"
+						/>
+					</FloatingToolbar>
+				)}
 				<TouchableWithoutFeedback
 					onPress={ this.onFocus }
 					accessible={ ! isSelected }
@@ -157,6 +166,7 @@ export default compose( [
 			isBlockSelected,
 			__unstableGetBlockWithoutInnerBlocks,
 			getBlockHierarchyRootClientId,
+			getBlockRootClientId,
 			getBlock,
 			getBlockRootClientId,
 			getSelectedBlock,
@@ -184,6 +194,8 @@ export default compose( [
 		const hasRootInnerBlocks = rootBlock.innerBlocks.length !== 0;
 
 		const showFloatingToolbar = isSelected && hasRootInnerBlocks && ! isMediaText && ! isMediaTextParent;
+
+		const parentId = getBlockRootClientId( clientId );
 
 		return {
 			icon,
