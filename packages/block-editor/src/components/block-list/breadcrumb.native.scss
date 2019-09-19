@@ -2,16 +2,26 @@
 	flex-direction: row;
 	align-items: center;
 	justify-content: flex-start;
-	padding-left: 10;
-	padding-right: 10;
+	padding-left: 15;
+	padding-right: 15;
 }
 
 .breadcrumbTitle {
+	color: $light-gray-600;
+	margin-left: 4;
+}
+
+.icon {
 	color: $white;
-	margin-left: 5;
 }
 
 .button {
 	flex-direction: row;
 	align-items: center;
+}
+
+.arrow {
+	color: $light-gray-600;
+	margin-left: 4;
+	margin-right: 4;
 }
