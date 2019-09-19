@@ -91,4 +91,9 @@ describe( 'HTMLFormattingRemover', () => {
 		const output = '<div><strong>a</strong><strong> b</strong></div>';
 		expect( deepFilterHTML( input, [ filter ] ) ).toEqual( output );
 	} );
+
+	it( 'should ignore pre', () => {
+		const input = `<pre> a\n b\n</pre>`;
+		expect( deepFilterHTML( input, [ filter ] ) ).toEqual( input );
+	} );
 } );

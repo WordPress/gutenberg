@@ -28,13 +28,18 @@ function isFormattingSpace( character ) {
 }
 
 /**
- * Looks for comments, and removes them.
+ * Removes spacing that formats HTML.
  *
  * @param {Node} node The node to be processed.
  * @return {void}
  */
 export default function( node ) {
 	if ( node.nodeType !== node.TEXT_NODE ) {
+		return;
+	}
+
+	// Ignore pre content.
+	if ( node.parentElement.closest( 'pre' ) ) {
 		return;
 	}
 
