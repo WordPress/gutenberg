@@ -126,6 +126,7 @@ describe( 'RichText', () => {
 	it( 'should not undo backtick transform with backspace after selection change', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( '`a`' );
+		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
 		// Move inside format boundary.
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.press( 'ArrowLeft' );
