@@ -219,6 +219,15 @@ export function* redo() {
 }
 
 /**
+ * Forces the creation of a new undo level.
+ *
+ * @return {Object} Action object.
+ */
+export function __unstableCreateUndoLevel() {
+	return { type: 'CREATE_UNDO_LEVEL' };
+}
+
+/**
  * Action triggered to save an entity record.
  *
  * @param {string} kind    Kind of the received entity.
