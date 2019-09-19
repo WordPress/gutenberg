@@ -1398,5 +1398,5 @@ export function isNavigationMode( state ) {
  * @return {boolean} Whether the last change was automatic.
  */
 export function didAutomaticChange( state ) {
-	return state.didAutomaticChange;
+	return !! state.didAutomaticChange;
 }
