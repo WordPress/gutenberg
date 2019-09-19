@@ -8,7 +8,14 @@ import { has, get } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { applyFilters } from '@wordpress/hooks';
-import { Button, Spinner, ResponsiveWrapper, withFilters } from '@wordpress/components';
+import {
+	DropZone,
+	Button,
+	Spinner,
+	ResponsiveWrapper,
+	withNotices,
+	withFilters,
+} from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { MediaUpload, MediaUploadCheck } from '@wordpress/block-editor';
@@ -25,7 +32,15 @@ const DEFAULT_FEATURE_IMAGE_LABEL = __( 'Featured Image' );
 const DEFAULT_SET_FEATURE_IMAGE_LABEL = __( 'Set Featured Image' );
 const DEFAULT_REMOVE_FEATURE_IMAGE_LABEL = __( 'Remove Image' );
 
-function PostFeaturedImage( { currentPostId, featuredImageId, onUpdateImage, onRemoveImage, media, postType } ) {
+function PostFeaturedImage( {
+	currentPostId,
+	featuredImageId,
+	onUpdateImage,
+	onDropImage,
+	onRemoveImage,
+	media,
+	postType,
+} ) {
 	const postLabel = get( postType, [ 'labels' ], {} );
 	const instructions = <p>{ __( 'To edit the featured image, you need permission to upload media.' ) }</p>;
 
@@ -65,22 +80,25 @@ function PostFeaturedImage( { currentPostId, featuredImageId, onUpdateImage, onR
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
 						modalClass={ ! featuredImageId ? 'editor-post-featured-image__media-modal' : 'editor-post-featured-image__media-modal' }
 						render={ ( { open } ) => (
-							<Button
-								className={ ! featuredImageId ? 'editor-post-featured-image__toggle' : 'editor-post-featured-image__preview' }
-								onClick={ open }
-								aria-label={ ! featuredImageId ? null : __( 'Edit or update the image' ) }>
-								{ !! featuredImageId && media &&
-									<ResponsiveWrapper
-										naturalWidth={ mediaWidth }
-										naturalHeight={ mediaHeight }
-										isInline
-									>
-										<img src={ mediaSourceUrl } alt="" />
-									</ResponsiveWrapper>
-								}
-								{ !! featuredImageId && ! media && <Spinner /> }
-								{ ! featuredImageId && ( postLabel.set_featured_image || DEFAULT_SET_FEATURE_IMAGE_LABEL ) }
-							</Button>
+							<>
+								<DropZone onFilesDrop={ ! featuredImageId && onDropImage } />
+								<Button
+									className={ ! featuredImageId ? 'editor-post-featured-image__toggle' : 'editor-post-featured-image__preview' }
+									onClick={ open }
+									aria-label={ ! featuredImageId ? null : __( 'Edit or update the image' ) }>
+									{ !! featuredImageId && media &&
+										<ResponsiveWrapper
+											naturalWidth={ mediaWidth }
+											naturalHeight={ mediaHeight }
+											isInline
+										>
+											<img src={ mediaSourceUrl } alt="" />
+										</ResponsiveWrapper>
+									}
+									{ !! featuredImageId && ! media && <Spinner /> }
+									{ ! featuredImageId && ( postLabel.set_featured_image || DEFAULT_SET_FEATURE_IMAGE_LABEL ) }
+								</Button>
+							</>
 						) }
 						value={ featuredImageId }
 					/>
@@ -126,11 +144,26 @@ const applyWithSelect = withSelect( ( select ) => {
 	};
 } );
 
-const applyWithDispatch = withDispatch( ( dispatch ) => {
+const applyWithDispatch = withDispatch( ( dispatch, { noticeOperations }, { select } ) => {
 	const { editPost } = dispatch( 'core/editor' );
 	return {
 		onUpdateImage( image ) {
 			editPost( { featured_media: image.id } );
+		},
+		onDropImage( filesList ) {
+			select( 'core/block-editor' )
+				.getSettings()
+				.__experimentalMediaUpload( {
+					allowedTypes: [ 'image' ],
+					filesList,
+					onFileChange( [ image ] ) {
+						editPost( { featured_media: image.id } );
+					},
+					onError( message ) {
+						noticeOperations.removeAllNotices();
+						noticeOperations.createErrorNotice( message );
+					},
+				} );
 		},
 		onRemoveImage() {
 			editPost( { featured_media: 0 } );
@@ -139,6 +172,7 @@ const applyWithDispatch = withDispatch( ( dispatch ) => {
 } );
 
 export default compose(
+	withNotices,
 	applyWithSelect,
 	applyWithDispatch,
 	withFilters( 'editor.PostFeaturedImage' ),
