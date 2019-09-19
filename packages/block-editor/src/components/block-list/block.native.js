@@ -24,6 +24,7 @@ import BlockEdit from '../block-edit';
 import BlockInvalidWarning from './block-invalid-warning';
 import BlockMobileToolbar from './block-mobile-toolbar';
 import FloatingToolbar from './block-mobile-floating-toolbar';
+import Breadcrumbs from './breadcrumbs';
 
 const toolbarHeight = 44;
 
@@ -123,7 +124,7 @@ class BlockListBlock extends Component {
 
 		return (
 			<>
-				{ displayToolbar && <FloatingToolbar /> }
+				{ displayToolbar && <FloatingToolbar><Breadcrumbs clientId={ clientId } /></FloatingToolbar> }
 				<TouchableWithoutFeedback
 					onPress={ this.onFocus }
 					accessible={ ! isSelected }
