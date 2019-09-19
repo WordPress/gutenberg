@@ -24,7 +24,7 @@ import BlockEdit from '../block-edit';
 import BlockInvalidWarning from './block-invalid-warning';
 import BlockMobileToolbar from './block-mobile-toolbar';
 import FloatingToolbar from './block-mobile-floating-toolbar';
-import Breadcrumbs from './breadcrumbs';
+import Breadcrumbs from './breadcrumb';
 
 const toolbarHeight = 44;
 
