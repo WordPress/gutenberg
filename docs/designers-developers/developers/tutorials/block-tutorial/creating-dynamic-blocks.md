@@ -53,6 +53,9 @@ The following code example shows how to create a dynamic block that shows only t
 				post.title.rendered
 			);
 		} ),
+		save: function() {
+            		return null;
+        	}
 	} );
 }(
 	window.wp.blocks,
@@ -90,6 +93,9 @@ registerBlockType( 'gutenberg-examples/example-05-dynamic', {
 			{ post.title.rendered }
 		</a>;
 	} ),
+	save() {
+        	return null;
+    	}
 } );
 ```
 {% end %}
@@ -172,6 +178,9 @@ Gutenberg 2.8 added the [`<ServerSideRender>`](/packages/components/src/server-s
 				} )
 			);
 		},
+		save: function() {
+			return null;
+		}
 	} );
 }(
 	window.wp.blocks,
@@ -197,6 +206,9 @@ registerBlockType( 'gutenberg-examples/example-05-dynamic', {
 			/>
 		);
 	},
+	save: function() {
+        	return null;
+    	}
 } );
 ```
 {% end %}
