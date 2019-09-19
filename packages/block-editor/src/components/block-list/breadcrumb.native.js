@@ -1,19 +1,22 @@
 /**
  * WordPress dependencies
  */
-import { Toolbar, Button } from '@wordpress/components';
-import { withDispatch, withSelect } from '@wordpress/data';
+import { Icon } from '@wordpress/components';
+import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
+import { getBlockType } from '@wordpress/blocks';
 
 /**
  * External dependencies
  */
-import { View } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 
 /**
  * Internal dependencies
  */
 import BlockTitle from '../block-title';
+
+import styles from './breadcrumb.scss';
 
 /**
  * Block breadcrumb component, displaying the label of the block. If the block
@@ -23,37 +26,48 @@ import BlockTitle from '../block-title';
  * @param {string}   props.clientId        Client ID of block.
  * @return {WPElement} Block Breadcrumb.
  */
-const BlockBreadcrumb = ( { clientId, rootClientId, setNavigationMode } ) => {
+const BlockBreadcrumb = ( { clientId, blockIcon, rootClientId, rootBlockIcon } ) => {
 	return (
-		<View>
-			<Toolbar>
-				{ rootClientId && (
-					<BlockTitle clientId={ rootClientId } />
+		<View style={ styles.breadcrumbContainer }>
+			<TouchableOpacity style={ styles.button } onPress={ () => {/* Open BottomSheet with markup */} }>
+				{ rootClientId && rootBlockIcon && (
+					<Icon size={ 20 } icon={ rootBlockIcon.src } fill={ styles.breadcrumbTitle.color } />
 				) }
-				<Button onClick={ () => setNavigationMode( false ) }>
-					<BlockTitle clientId={ clientId } />
-				</Button>
-			</Toolbar>
+				<Icon size={ 24 } icon={ blockIcon.src } fill={ styles.breadcrumbTitle.color } />
+				<Text style={ styles.breadcrumbTitle }><BlockTitle clientId={ clientId } /></Text>
+			</TouchableOpacity>
 		</View>
 	);
 };
 
 export default compose( [
-	withSelect( ( select, { clientId, rootClientId } ) => {
-		return {
-			clientId,
-			rootClientId,
-		};
-	} ),
-	withDispatch( ( dispatch ) => {
+	withSelect( ( select, { clientId } ) => {
 		const {
-			setNavigationMode,
-		} = dispatch( 'core/block-editor' );
+			getBlockRootClientId,
+			getBlockName,
+		} = select( 'core/block-editor' );
+
+		const blockName = getBlockName( clientId );
+		const blockType = getBlockType( blockName );
+		const blockIcon = blockType.icon;
+
+		const rootClientId = getBlockRootClientId( clientId );
+
+		if ( ! rootClientId ) {
+			return {
+				clientId,
+				blockIcon,
+			};
+		}
+		const rootBlockName = getBlockName( rootClientId );
+		const rootBlockType = getBlockType( rootBlockName );
+		const rootBlockIcon = rootBlockType.icon;
 
 		return {
-			setNavigationMode( isNavigationMode ) {
-				setNavigationMode( isNavigationMode );
-			},
+			clientId,
+			blockIcon,
+			rootClientId,
+			rootBlockIcon,
 		};
 	} ),
 ] )( BlockBreadcrumb );

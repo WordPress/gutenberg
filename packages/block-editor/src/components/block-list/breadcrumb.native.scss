@@ -1,0 +1,17 @@
+.breadcrumbContainer {
+	flex-direction: row;
+	align-items: center;
+	justify-content: flex-start;
+	padding-left: 10;
+	padding-right: 10;
+}
+
+.breadcrumbTitle {
+	color: $white;
+	margin-left: 5;
+}
+
+.button {
+	flex-direction: row;
+	align-items: center;
+}
