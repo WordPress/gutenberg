@@ -26,6 +26,10 @@ import {
 	editorSettings,
 } from './reducer.js';
 
+import { EDITOR_SETTINGS_DEFAULTS } from './defaults.js';
+
+EDITOR_SETTINGS_DEFAULTS.autosaveInterval = 2; // This is a way to override default on mobile
+
 export * from './reducer.js';
 
 /**
