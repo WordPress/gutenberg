@@ -74,6 +74,10 @@ public class MainApplication extends Application implements ReactApplication {
             }
 
             @Override
+            public void editorDidAutosave() {
+            }
+
+            @Override
             public void editorDidEmitLog(String message, LogLevel logLevel) {
                 switch (logLevel) {
                     case TRACE:
