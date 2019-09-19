@@ -87,7 +87,7 @@ Also, if you look at package.json file it will include a new section:
 
 ```json
 "devDependencies": {
-  "@wordpress/scripts": "3.1.0"
+  "@wordpress/scripts": "5.0.0"
 }
 ```
 
@@ -154,13 +154,13 @@ Using wp-scripts ver 5.0.0+ build step will also produce a `index.asset.php` fil
 Here is how to use this asset file to automatically set the dependency list for enqueing the script. This prevents having to manually update the dependencies, it will be created based on the package imports used within your block.
 
 ```php
-$depver = include( plugin_dir_path( __FILE__ ) . 'build/index.asset.php');
+$asset_file = include( plugin_dir_path( __FILE__ ) . 'build/index.asset.php');
 
 wp_register_script(
 	'myguten-block',
 	plugins_url( 'build/index.js', __FILE__ ),
-	$depver['dependencies'],
-	$depver['version']
+	$asset_file['dependencies'],
+	$asset_file['version']
 );
 ```
 
