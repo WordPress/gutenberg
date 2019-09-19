@@ -148,20 +148,19 @@ Likewise, you do not need to include `node_modules` or any of the above configur
 
 ### Dependency Management
 
-The build step also produces a `index.deps.json` file that contains a JSON array of the wp packages required for your block. For our simple example above would be `["wp-blocks","wp-polyfill"]`
+Using wp-scripts ver 5.0.0+ build step will also produce a `index.asset.php` file that contains an array of dependencies and version number for your block. For our simple example above is something like:
+`array('dependencies' => array('wp-element', 'wp-polyfill'), 'version' => 'fc93c4a9675c108725227db345898bcc');`
 
-Here is how to use this JSON file to automatically set the dependency list for enqueing the script. This prevents having to manually update the dependencies, it will be created based on the package imports used within your block.
+Here is how to use this asset file to automatically set the dependency list for enqueing the script. This prevents having to manually update the dependencies, it will be created based on the package imports used within your block.
 
 ```php
-$dependencies_file_path = plugin_dir_path( __FILE__ ) . 'build/index.deps.json';
-$dependencies = file_exists( $dependencies_file_path )
-	? json_decode( file_get_contents( $dependencies_file_path ) )
-	: array();
+$depver = include( plugin_dir_path( __FILE__ ) . 'build/index.asset.php');
 
 wp_register_script(
 	'myguten-block',
 	plugins_url( 'build/index.js', __FILE__ ),
-	$dependencies
+	$depver['dependencies'],
+	$depver['version']
 );
 ```
 
