@@ -832,6 +832,20 @@ export function* resetEditorBlocks( blocks, options = {} ) {
 	const edits = { blocks: yield* getBlocksWithSourcedAttributes( blocks ) };
 
 	if ( options.__unstableShouldCreateUndoLevel !== false ) {
+		const { id, type } = yield select( STORE_KEY, 'getCurrentPost' );
+		const noChange =
+			( yield select( 'core', 'getEditedEntityRecord', 'postType', type, id ) )
+				.blocks === edits.blocks;
+		if ( noChange ) {
+			return yield dispatch(
+				'core',
+				'__unstableCreateUndoLevel',
+				'postType',
+				type,
+				id
+			);
+		}
+
 		// We create a new function here on every persistent edit
 		// to make sure the edit makes the post dirty and creates
 		// a new undo level.
