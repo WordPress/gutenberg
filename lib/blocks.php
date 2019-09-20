@@ -6,6 +6,28 @@
  */
 
 /**
+ * Retrieves registered social link blocks
+ *
+ * @return array Array of strings containing the registered social link block names.
+ */
+function gutenberg_get_registered_social_link_blocks() {
+	$social_link_prefix        = 'core/social-link';
+	$social_link_prefix_length = strlen( $social_link_prefix );
+
+	$registry    = WP_Block_Type_Registry::get_instance();
+	$block_types = $registry->get_all_registered();
+
+	$registered_social_link_blocks = array();
+	foreach ( $block_types as $block_type ) {
+		// Block type name starts with $social_link_prefix.
+		if ( strncmp( $block_type->name, $social_link_prefix, $social_link_prefix_length ) === 0 ) {
+			$registered_social_link_blocks[] = $block_type->name;
+		}
+	}
+	return $registered_social_link_blocks;
+}
+
+/**
  * Substitutes the implementation of a core-registered block type, if exists,
  * with the built result from the plugin.
  */
@@ -28,19 +50,27 @@ function gutenberg_reregister_core_block_types() {
 		'rss.php'             => 'core/rss',
 		'shortcode.php'       => 'core/shortcode',
 		'search.php'          => 'core/search',
-		'social-link.php'     => 'core/social-link',
+		'social-link.php'     => gutenberg_get_registered_social_link_blocks(),
 		'tag-cloud.php'       => 'core/tag-cloud',
 	);
 
 	$registry = WP_Block_Type_Registry::get_instance();
 
-	foreach ( $block_names as $file => $block_name ) {
+	foreach ( $block_names as $file => $block_names ) {
 		if ( ! file_exists( $blocks_dir . $file ) ) {
 			return;
 		}
 
-		if ( $registry->is_registered( $block_name ) ) {
-			$registry->unregister( $block_name );
+		if ( is_string( $block_names ) ) {
+			if ( $registry->is_registered( $block_names ) ) {
+				$registry->unregister( $block_names );
+			}
+		} elseif ( is_array( $block_names ) ) {
+			foreach ( $block_names as $block_name ) {
+				if ( $registry->is_registered( $block_name ) ) {
+					$registry->unregister( $block_name );
+				}
+			}
 		}
 
 		require $blocks_dir . $file;
