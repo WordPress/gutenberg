@@ -90,7 +90,7 @@ You can also customize the toolbar to include controls specific to your block ty
 ```
 {% ESNext %}
 ```js
-import { registerBlockType } from '@wordpress.blocks';
+import { registerBlockType } from '@wordpress/blocks';
 
 import {
 	RichText,
