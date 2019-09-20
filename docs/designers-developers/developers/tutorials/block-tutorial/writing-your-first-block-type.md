@@ -77,7 +77,7 @@ With the script enqueued, let's look at the implementation of the block itself:
 ```
 {% ESNext %}
 ```js
-const { registerBlockType } = wp.blocks;
+import { registerBlockType } from '@wordpress/blocks';
 
 const blockStyle = {
 	backgroundColor: '#900',
