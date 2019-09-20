@@ -155,6 +155,7 @@
 	overflow: auto;
 
 	@include break-medium() {
+		z-index: z-index(".edit-post-layout .edit-post-post-publish-panel-break-medium");
 		top: $admin-bar-height;
 		left: auto;
 		width: $sidebar-width;
