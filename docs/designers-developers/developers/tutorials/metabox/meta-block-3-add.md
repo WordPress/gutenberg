@@ -48,12 +48,6 @@ Add this code to your JavaScript file (this tutorial will call the file `myguten
 					onChange: updateBlockValue
 				} )
 			);
-		},
-
-		// No information saved to the block
-		// Data is saved to post meta via attributes
-		save: function() {
-			return null;
 		}
 	} );
 } )( window.wp );
@@ -91,12 +85,6 @@ registerBlockType( 'myguten/meta-block', {
 				/>
 			</div>
 		);
-	},
-
-	// No information saved to the block
-	// Data is saved to post meta via attributes
-	save() {
-		return null;
 	}
 } );
 ```
@@ -120,4 +108,3 @@ You can now edit a draft post and add a Meta Block to the post. You will see you
 ![Meta Block](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/metabox/meta-block.png)
 
 You can now use the post meta data in a template, or another block. See next section for [using post meta data](/docs/designers-developers/developers/tutorials/metabox/meta-block-4-use-data.md). You could also confirm the data is saved by checking the database table `wp_postmeta` and confirm the new post id contains the new field data.
-

@@ -7,7 +7,7 @@ There are two primary uses for dynamic blocks:
 1. Blocks where content should change even if a post has not been updated. One example from WordPress itself is the Latest Posts block. This block will update everywhere it is used when a new post is published.
 2. Blocks where updates to the code (HTML, CSS, JS) should be immediately shown on the front end of the website. For example, if you update the structure of a block by adding a new class, adding an HTML element, or changing the layout in any other way, using a dynamic block ensures those changes are applied immediately on all occurrences of that block across the site. (If a dynamic block is not used then when block code is updated Guterberg's [validation process](https://developer.wordpress.org/block-editor/developers/block-api/block-edit-save/#validation) generally applies, causing users to see the validation message, "This block appears to have been modified externally").
 
-For many dynamic blocks, the `save` callback function should be returned as `null`, which tells the editor to save only the [block attributes](https://developer.wordpress.org/block-editor/developers/block-api/block-attributes/) to the database.  These attributes are then passed into the server-side rendering callback, so you can decide how to display the block on the front end of your site. When you return `null`, the editor will skip the block markup validation process, avoiding issues with frequently-changing markup.
+For many dynamic blocks, there are no `save` callback function assigned, which tells the editor to save only the [block attributes](https://developer.wordpress.org/block-editor/developers/block-api/block-attributes/) to the database.  These attributes are then passed into the server-side rendering callback, so you can decide how to display the block on the front end of your site.
 
 If you are using [InnerBlocks](https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/inner-blocks/README.md) in a dynamic block you will need to save the `InnerBlocks` in the `save` callback function using `<InnerBlocks.Content/>`
 
@@ -30,7 +30,7 @@ The following code example shows how to create a dynamic block that shows only t
 		title: 'Example: last post',
 		icon: 'megaphone',
 		category: 'widgets',
-		
+
 		edit: withSelect( function( select ) {
 			return {
 				posts: select( 'core' ).getEntityRecords( 'postType', 'post' )
@@ -52,10 +52,7 @@ The following code example shows how to create a dynamic block that shows only t
 				{ className: className, href: post.link },
 				post.title.rendered
 			);
-		} ),
-		save: function() {
-            		return null;
-        	}
+		} )
 	} );
 }(
 	window.wp.blocks,
@@ -92,10 +89,7 @@ registerBlockType( 'gutenberg-examples/example-05-dynamic', {
 		return <a className={ className } href={ post.link }>
 			{ post.title.rendered }
 		</a>;
-	} ),
-	save() {
-        	return null;
-    	}
+	} )
 } );
 ```
 {% end %}
@@ -151,7 +145,7 @@ There are a few things to notice:
 
 ## Live rendering in the block editor
 
-Gutenberg 2.8 added the [`<ServerSideRender>`](/packages/components/src/server-side-render) block which enables rendering to take place on the server using PHP rather than in JavaScript. 
+Gutenberg 2.8 added the [`<ServerSideRender>`](/packages/components/src/server-side-render) block which enables rendering to take place on the server using PHP rather than in JavaScript.
 
 *Server-side render is meant as a fallback; client-side rendering in JavaScript is always preferred (client rendering is faster and allows better editor manipulation).*
 
@@ -177,9 +171,6 @@ Gutenberg 2.8 added the [`<ServerSideRender>`](/packages/components/src/server-s
 					attributes: props.attributes
 				} )
 			);
-		},
-		save: function() {
-			return null;
 		}
 	} );
 }(
@@ -198,17 +189,14 @@ registerBlockType( 'gutenberg-examples/example-05-dynamic', {
 	icon: 'megaphone',
 	category: 'widgets',
 
-	edit: function( props ) {
+	edit: ( props ) => {
 		return (
 			<ServerSideRender
 				block="gutenberg-examples/example-05-dynamic"
 				attributes={ props.attributes }
 			/>
 		);
-	},
-	save: function() {
-        	return null;
-    	}
+	}
 } );
 ```
 {% end %}
