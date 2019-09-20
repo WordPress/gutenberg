@@ -319,7 +319,7 @@ export function* saveEntityRecord(
 			let data = record;
 			if (
 				kind === 'postType' &&
-				persistedRecord.status === 'auto-draft' &&
+				persistedRecord && persistedRecord.status === 'auto-draft' &&
 				! data.status
 			) {
 				data = { ...data, status: 'draft' };
