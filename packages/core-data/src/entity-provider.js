@@ -9,7 +9,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
  */
 import { defaultEntities, kinds } from './entities';
 
-const entities = {
+const _entities = {
 	...defaultEntities.reduce( ( acc, entity ) => {
 		if ( ! acc[ entity.kind ] ) {
 			acc[ entity.kind ] = {};
@@ -18,21 +18,20 @@ const entities = {
 		return acc;
 	}, {} ),
 	...kinds.reduce( ( acc, kind ) => {
-		acc[ kind.name ] = new Proxy(
-			{},
-			{
-				get( target, name ) {
-					if ( Reflect.has( target, name ) ) {
-						return Reflect.get( ...arguments );
-					}
-					const value = { context: createContext() };
-					Reflect.set( target, name, value );
-					return value;
-				},
-			}
-		);
+		acc[ kind.name ] = {};
 		return acc;
 	}, {} ),
+};
+const getEntity = ( kind, type ) => {
+	if ( ! _entities[ kind ] ) {
+		throw new Error( `Missing entity config for kind: ${ kind }.` );
+	}
+
+	if ( ! _entities[ kind ][ type ] ) {
+		_entities[ kind ][ type ] = { context: createContext() };
+	}
+
+	return _entities[ kind ][ type ];
 };
 
 /**
@@ -49,7 +48,7 @@ const entities = {
  *                   the entity's context provider.
  */
 export default function EntityProvider( { kind, type, id, children } ) {
-	const Provider = entities[ kind ][ type ].context.Provider;
+	const Provider = getEntity( kind, type ).context.Provider;
 	return <Provider value={ id }>{ children }</Provider>;
 }
 
@@ -67,7 +66,7 @@ export default function EntityProvider( { kind, type, id, children } ) {
  *                          setter.
  */
 export function useEntityProp( kind, type, prop ) {
-	const id = useContext( entities[ kind ][ type ].context );
+	const id = useContext( getEntity( kind, type ).context );
 
 	const value = useSelect(
 		( select ) => {
