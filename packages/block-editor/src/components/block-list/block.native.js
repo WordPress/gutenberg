@@ -25,6 +25,7 @@ import BlockInvalidWarning from './block-invalid-warning';
 import BlockMobileToolbar from './block-mobile-toolbar';
 import FloatingToolbar from './block-mobile-floating-toolbar';
 import Breadcrumbs from './breadcrumb';
+import DocumentOutline from './document-outline';
 
 const toolbarHeight = 44;
 
@@ -34,9 +35,12 @@ class BlockListBlock extends Component {
 
 		this.insertBlocksAfter = this.insertBlocksAfter.bind( this );
 		this.onFocus = this.onFocus.bind( this );
+		this.showDocumentOutline = this.showDocumentOutline.bind( this );
+		this.hideDocumentOutline = this.hideDocumentOutline.bind( this );
 
 		this.state = {
 			isFullyBordered: false,
+			isOutlineVisible: false,
 		};
 	}
 
@@ -105,6 +109,13 @@ class BlockListBlock extends Component {
 		return blockName;
 	}
 
+	showDocumentOutline() {
+		this.setState( { isOutlineVisible: true } );
+	}
+	hideDocumentOutline() {
+		this.setState( { isOutlineVisible: false } );
+	}
+
 	render() {
 		const {
 			borderStyle,
@@ -116,6 +127,7 @@ class BlockListBlock extends Component {
 			showTitle,
 			title,
 			displayToolbar,
+			onSelect,
 		} = this.props;
 
 		const borderColor = isSelected ? focusedBorderColor : 'transparent';
@@ -124,7 +136,7 @@ class BlockListBlock extends Component {
 
 		return (
 			<>
-				{ displayToolbar && <FloatingToolbar><Breadcrumbs clientId={ clientId } /></FloatingToolbar> }
+				{ displayToolbar && <FloatingToolbar><Breadcrumbs clientId={ clientId } onPress={ this.showDocumentOutline } /></FloatingToolbar> }
 				<TouchableWithoutFeedback
 					onPress={ this.onFocus }
 					accessible={ ! isSelected }
@@ -144,6 +156,7 @@ class BlockListBlock extends Component {
 						{ isSelected && <BlockMobileToolbar clientId={ clientId } /> }
 					</View>
 				</TouchableWithoutFeedback>
+				{ this.state.isOutlineVisible && <DocumentOutline clientId={ clientId } isVisible={ this.state.isOutlineVisible } onClose={ this.hideDocumentOutline } onSelect={ onSelect } /> }
 			</>
 		);
 	}
