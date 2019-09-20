@@ -51,7 +51,7 @@
 		"jest": "^24.7.1",
 		"npm-package-json-lint": "^3.7.0",
 		"npm-run-all": "^4.1.5",
-		"npmpub": "^4.1.0",
+		"npmpub": "^5.0.0",
 		"remark-cli": "^7.0.0",
 		"remark-preset-lint-consistent": "^2.0.3",
 		"remark-preset-lint-recommended": "^3.0.3",
