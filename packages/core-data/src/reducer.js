@@ -304,9 +304,17 @@ export const entities = ( state = {}, action ) => {
  */
 const UNDO_INITIAL_STATE = [];
 UNDO_INITIAL_STATE.offset = 0;
+let lastEditAction;
 export function undo( state = UNDO_INITIAL_STATE, action ) {
 	switch ( action.type ) {
 		case 'EDIT_ENTITY_RECORD':
+		case 'CREATE_UNDO_LEVEL':
+			if ( action.type === 'CREATE_UNDO_LEVEL' ) {
+				action = lastEditAction;
+			} else {
+				lastEditAction = action;
+			}
+
 			if ( action.meta.isUndo || action.meta.isRedo ) {
 				const nextState = [ ...state ];
 				nextState.offset = state.offset + ( action.meta.isUndo ? -1 : 1 );
