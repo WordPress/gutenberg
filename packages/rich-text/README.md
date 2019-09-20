@@ -273,11 +273,6 @@ _Returns_
 
 -   `Object`: A new value with replacements applied.
 
-<a name="RichText" href="#RichText">#</a> **RichText**
-
-Renders a rich content input, providing users with the option to format the
-content.
-
 <a name="slice" href="#slice">#</a> **slice**
 
 Slice a Rich Text value from `startIndex` to `endIndex`. Indices are

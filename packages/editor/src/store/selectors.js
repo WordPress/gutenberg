@@ -235,6 +235,8 @@ export const getPostEdits = createRegistrySelector( ( select ) => ( state ) => {
  * inferring where an edit has been made between states by comparison of the
  * return values using strict equality.
  *
+ * @deprecated since Gutenberg 6.5.0.
+ *
  * @example
  *
  * ```
@@ -248,9 +250,14 @@ export const getPostEdits = createRegistrySelector( ( select ) => ( state ) => {
  *
  * @return {*} A value whose reference will change only when an edit occurs.
  */
-export const getReferenceByDistinctEdits = createSelector(
-	() => [],
-	( state ) => [ state.editor ],
+export const getReferenceByDistinctEdits = createRegistrySelector(
+	( select ) => ( /* state */ ) => {
+		deprecated( '`wp.data.select( \'core/editor\' ).getReferenceByDistinctEdits`', {
+			alternative: '`wp.data.select( \'core\' ).getReferenceByDistinctEdits`',
+		} );
+
+		return select( 'core' ).getReferenceByDistinctEdits();
+	}
 );
 
 /**

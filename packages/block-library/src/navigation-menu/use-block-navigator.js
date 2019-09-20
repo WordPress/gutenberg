@@ -9,7 +9,7 @@ import {
 	useDispatch,
 } from '@wordpress/data';
 import {
-	BlockNavigationList,
+	__experimentalBlockNavigationList,
 } from '@wordpress/block-editor';
 import {
 	IconButton,
@@ -64,7 +64,7 @@ export default function useBlockNavigator( clientId ) {
 				setIsNavigationListOpen( false );
 			} }
 		>
-			<BlockNavigationList
+			<__experimentalBlockNavigationList
 				blocks={ [ block ] }
 				selectedBlockClientId={ selectedBlockClientId }
 				selectBlock={ selectBlock }

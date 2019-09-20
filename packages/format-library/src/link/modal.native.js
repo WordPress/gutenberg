@@ -148,20 +148,20 @@ class ModalLinkUI extends Component {
 				/* eslint-enable jsx-a11y/no-autofocus */ }
 				<BottomSheet.Cell
 					icon={ 'editor-textcolor' }
-					label={ __( 'Link Text' ) }
+					label={ __( 'Link text' ) }
 					value={ text }
-					placeholder={ __( 'Add Link Text' ) }
+					placeholder={ __( 'Add link text' ) }
 					onChangeValue={ this.onChangeText }
 				/>
 				<BottomSheet.SwitchCell
 					icon={ 'external' }
-					label={ __( 'Open in New Tab' ) }
+					label={ __( 'Open in new tab' ) }
 					value={ this.state.opensInNewWindow }
 					onValueChange={ this.onChangeOpensInNewWindow }
 					separatorType={ 'fullWidth' }
 				/>
 				<BottomSheet.Cell
-					label={ __( 'Remove Link' ) }
+					label={ __( 'Remove link' ) }
 					labelStyle={ styles.clearLinkButton }
 					separatorType={ 'none' }
 					onPress={ this.removeLink }

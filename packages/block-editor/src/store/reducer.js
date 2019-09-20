@@ -1282,7 +1282,21 @@ export function lastBlockAttributesChange( state, action ) {
  * @return {boolean} Updated state.
  */
 export function didAutomaticChange( state, action ) {
-	return action.type === 'MARK_AUTOMATIC_CHANGE';
+	switch ( action.type ) {
+		case 'MARK_AUTOMATIC_CHANGE':
+			return 'pending';
+		case 'MARK_AUTOMATIC_CHANGE_FINAL':
+			if ( state === 'pending' ) {
+				return 'final';
+			}
+
+			return;
+		case 'SELECTION_CHANGE':
+			// As long as the state is not final, ignore any selection changes.
+			if ( state !== 'final' ) {
+				return state;
+			}
+	}
 }
 
 export default combineReducers( {

@@ -200,7 +200,7 @@ const ImageURLInputUI = ( {
 			<IconButton
 				icon="admin-links"
 				className="components-toolbar__control"
-				label={ url ? __( 'Edit Link' ) : __( 'Insert Link' ) }
+				label={ url ? __( 'Edit link' ) : __( 'Insert link' ) }
 				aria-expanded={ isOpen }
 				onClick={ openLinkUI }
 			/>
@@ -251,7 +251,7 @@ const ImageURLInputUI = ( {
 							/>
 							<IconButton
 								icon="no"
-								label={ __( 'Remove Link' ) }
+								label={ __( 'Remove link' ) }
 								onClick={ onLinkRemove }
 							/>
 						</>

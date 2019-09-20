@@ -22,7 +22,7 @@ function the_gutenberg_experiments( $page = 'gutenberg_page_gutenberg-experiment
 	<?php settings_errors(); ?>
 	<form method="post" action="options.php">
 		<?php settings_fields( 'gutenberg-experiments' ); ?>
-		<?php do_settings_sections( 'gutenberg-experiments' ); ?>           
+		<?php do_settings_sections( 'gutenberg-experiments' ); ?>
 		<?php submit_button(); ?>
 	</form>
 	</div>
@@ -62,6 +62,17 @@ function gutenberg_initialize_experiments_settings() {
 		array(
 			'label' => __( 'Enable Navigation Menu Block', 'gutenberg' ),
 			'id'    => 'gutenberg-menu-block',
+		)
+	);
+	add_settings_field(
+		'gutenberg-block-directory',
+		__( 'Block Directory', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Enable Block Directory search', 'gutenberg' ),
+			'id'    => 'gutenberg-block-directory',
 		)
 	);
 	register_setting(
@@ -114,6 +125,8 @@ function gutenberg_experiments_editor_settings( $settings ) {
 	$experiments_settings = array(
 		'__experimentalEnableLegacyWidgetBlock' => $experiments_exist ? array_key_exists( 'gutenberg-widget-experiments', get_option( 'gutenberg-experiments' ) ) : false,
 		'__experimentalEnableMenuBlock'         => $experiments_exist ? array_key_exists( 'gutenberg-menu-block', get_option( 'gutenberg-experiments' ) ) : false,
+		'__experimentalBlockDirectory'          => $experiments_exist ? array_key_exists( 'gutenberg-block-directory', get_option( 'gutenberg-experiments' ) ) : false,
+
 	);
 	return array_merge( $settings, $experiments_settings );
 }
