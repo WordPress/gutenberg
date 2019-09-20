@@ -22,6 +22,9 @@ describe( 'RootComponent', () => {
 
 	it( 'renders without crashing', () => {
 		const app = renderer.create( <RootComponent /> );
+		renderer.act( () => {
+			jest.runAllTicks();
+		} );
 		const rendered = app.toJSON();
 		expect( rendered ).toBeTruthy();
 		app.unmount();
@@ -29,10 +32,10 @@ describe( 'RootComponent', () => {
 
 	it( 'renders without crashing with a block focused', () => {
 		const app = renderer.create( <RootComponent /> );
-		const blocks = select( 'core/block-editor' ).getBlocks();
-
-		// Methods that modify state are required to be called inside `act`
 		renderer.act( () => {
+			jest.runAllTicks();
+			const blocks = select( 'core/block-editor' ).getBlocks();
+			// Methods that modify state are required to be called inside `act`
 			dispatch( 'core/block-editor' ).selectBlock( blocks[ 0 ].clientId );
 		} );
 
