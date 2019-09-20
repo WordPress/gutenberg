@@ -39,11 +39,6 @@ import FormatToolbar from './format-toolbar';
 import { withBlockEditContext } from '../block-edit/context';
 import { RemoveBrowserShortcuts } from './remove-browser-shortcuts';
 
-const requestIdleCallback = window.requestIdleCallback ||
-	function fallbackRequestIdleCallback( fn ) {
-		window.setTimeout( fn, 100 );
-	};
-
 const wrapperClasses = 'editor-rich-text block-editor-rich-text';
 const classes = 'editor-rich-text__editable block-editor-rich-text__editable';
 
@@ -70,11 +65,15 @@ class RichTextWrapper extends Component {
 		this.onPaste = this.onPaste.bind( this );
 		this.onDelete = this.onDelete.bind( this );
 		this.inputRule = this.inputRule.bind( this );
-		this.markAutomaticChange = this.markAutomaticChange.bind( this );
 	}
 
 	onEnter( { value, onChange, shiftKey } ) {
-		const { onReplace, onSplit, multiline } = this.props;
+		const {
+			onReplace,
+			onSplit,
+			multiline,
+			markAutomaticChange,
+		} = this.props;
 		const canSplit = onReplace && onSplit;
 
 		if ( onReplace ) {
@@ -88,7 +87,7 @@ class RichTextWrapper extends Component {
 				onReplace( [
 					transformation.transform( { content: value.text } ),
 				] );
-				this.markAutomaticChange();
+				markAutomaticChange();
 			}
 		}
 
@@ -252,7 +251,7 @@ class RichTextWrapper extends Component {
 	}
 
 	inputRule( value, valueToFormat ) {
-		const { onReplace } = this.props;
+		const { onReplace, markAutomaticChange } = this.props;
 
 		if ( ! onReplace ) {
 			return;
@@ -280,7 +279,7 @@ class RichTextWrapper extends Component {
 		const block = transformation.transform( content );
 
 		onReplace( [ block ] );
-		this.markAutomaticChange();
+		markAutomaticChange();
 	}
 
 	getAllowedFormats() {
@@ -299,16 +298,6 @@ class RichTextWrapper extends Component {
 		} );
 
 		return formattingControls.map( ( name ) => `core/${ name }` );
-	}
-
-	/**
-	 * Marks the last change as an automatic change at the next idle period to
-	 * ensure all selection changes have been recorded.
-	 */
-	markAutomaticChange() {
-		requestIdleCallback( () => {
-			this.props.markAutomaticChange();
-		} );
 	}
 
 	render() {
@@ -331,7 +320,6 @@ class RichTextWrapper extends Component {
 			onExitFormattedText,
 			isSelected: originalIsSelected,
 			onCreateUndoLevel,
-			// eslint-disable-next-line no-unused-vars
 			markAutomaticChange,
 			didAutomaticChange,
 			undo,
@@ -401,7 +389,7 @@ class RichTextWrapper extends Component {
 				__unstableOnEnterFormattedText={ onEnterFormattedText }
 				__unstableOnExitFormattedText={ onExitFormattedText }
 				__unstableOnCreateUndoLevel={ onCreateUndoLevel }
-				__unstableMarkAutomaticChange={ this.markAutomaticChange }
+				__unstableMarkAutomaticChange={ markAutomaticChange }
 				__unstableDidAutomaticChange={ didAutomaticChange }
 				__unstableUndo={ undo }
 			>
