@@ -23,7 +23,6 @@ import { getTranslation } from '../i18n-cache';
 import initialHtml from './initial-html';
 
 const gutenbergSetup = () => {
-	const apiFetch = require( '@wordpress/api-fetch' ).default;
 	const wpData = require( '@wordpress/data' );
 
 	// wp-data
