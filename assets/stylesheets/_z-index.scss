@@ -67,6 +67,9 @@ $z-layers: (
 	".edit-post-sidebar": 100000,
 	".edit-widgets-sidebar": 100000,
 	".edit-post-layout .edit-post-post-publish-panel": 100001,
+	// For larger views, the wp-admin navbar dropdown should be at top of
+	// the Publish Post sidebar.
+	".edit-post-layout .edit-post-post-publish-panel-break-medium": 99998,
 
 	// Show sidebar in greater than small viewports above editor related elements
 	// but bellow #adminmenuback { z-index: 100 }
