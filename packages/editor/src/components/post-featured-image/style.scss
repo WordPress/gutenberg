@@ -37,6 +37,7 @@
 .editor-post-featured-image__toggle {
 	border: $border-width dashed $light-gray-900;
 	background-color: $light-gray-300;
+	min-height: 90px;
 	line-height: 20px;
 	padding: $grid-size 0;
 	text-align: center;
