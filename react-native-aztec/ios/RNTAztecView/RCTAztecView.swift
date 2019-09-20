@@ -571,6 +571,9 @@ class RCTAztecView: Aztec.TextView {
 extension RCTAztecView: UITextViewDelegate {
 
     func textViewDidChangeSelection(_ textView: UITextView) {
+        guard isFirstResponder else {
+            return
+        }
         guard isInsertingDictationResult == false else {
             return
         }
