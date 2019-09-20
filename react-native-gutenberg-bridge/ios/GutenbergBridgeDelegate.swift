@@ -89,7 +89,6 @@ public protocol GutenbergBridgeDelegate: class {
     ///
     func gutenbergDidLoad()
 
-
     /// Tells the delegate every time the editor has finished layout.
     ///
     func gutenbergDidLayout()
@@ -103,6 +102,10 @@ public protocol GutenbergBridgeDelegate: class {
     /// Tells the delegate that logger method is called.
     ///
     func gutenbergDidEmitLog(message: String, logLevel: LogLevel)
+
+    /// Tells the delegate that the editor has sent an autosave event.
+    ///
+    func editorDidAutosave()
 }
 
 // MARK: - Optional GutenbergBridgeDelegate methods
