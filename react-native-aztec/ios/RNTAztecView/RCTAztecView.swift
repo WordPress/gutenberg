@@ -600,4 +600,8 @@ extension RCTAztecView: UITextViewDelegate {
     func textViewDidEndEditing(_ textView: UITextView) {
         onBlur?([:])
     }
+
+    func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
+        return false
+    }
 }
