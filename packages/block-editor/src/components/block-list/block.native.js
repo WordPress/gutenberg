@@ -131,6 +131,7 @@ class BlockListBlock extends Component {
 							title={ __( 'Navigate Up' ) }
 							onClick={ () => this.props.onSelect( parentId ) }
 							icon="arrow-up-alt"
+							extraProps={ { fill: 'white' } }
 						/>
 					</FloatingToolbar>
 				)}
