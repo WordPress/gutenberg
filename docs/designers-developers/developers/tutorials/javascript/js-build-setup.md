@@ -1,6 +1,6 @@
 # JavaScript Build Setup
 
-This page covers how to set up your development environment to use the ESNext and [JSX](https://reactjs.org/docs/introducing-jsx.html) syntaxes. ESNext is JavaScript code written using features that are only available in a specification greater than ECMAScript 5 (ES5 for short). JSX is a custom syntax extension to JavaScript that allows you write JavaScript in a more familiar tag syntax.
+This page covers how to set up your development environment to use the ESNext and [JSX](https://reactjs.org/docs/introducing-jsx.html) syntaxes. ESNext is JavaScript code written using features that are only available in a specification greater than ECMAScript 5 (ES5 for short). JSX is a custom syntax extension to JavaScript that allows you to write JavaScript in a more familiar tag syntax.
 
 This documentation covers development for your plugin to work with the Gutenberg project (ie: the block editor). If you want to develop Gutenberg itself, see the [Getting Started](/docs/contributors/getting-started.md) documentation.
 
@@ -8,7 +8,7 @@ Most browsers can not interpret or run ESNext and JSX syntaxes, so we use a tran
 
 There are a few reasons to use ESNext and the extra step. First, it makes for simpler code that is easier to read and write. Using a transformation step allows for tools to optimize the code to work on the widest variety of browsers. Also, by using a build step you can organize your code into smaller modules and files that can be bundled together into a single download.
 
-There are different tools that can perform this transformation or build step, WordPress uses webpack and Babel.
+There are different tools that can perform this transformation or build step; WordPress uses webpack and Babel.
 
 [webpack](https://webpack.js.org/) is a pluggable tool that processes JavaScript, creating a compiled bundle that runs in a browser. [Babel](https://babeljs.io/) transforms JavaScript from one format to another. You use Babel as a plugin to webpack to transform both ESNext and JSX to JavaScript.
 
@@ -22,7 +22,7 @@ For a quick start, you can use one of the examples from the [Gutenberg Examples 
 
 Both webpack and Babel are tools written in JavaScript and run using [Node.js](https://nodejs.org/) (node). Node.js is a runtime environment for JavaScript outside of a browser. Simply put, node allows you to run JavaScript code on the command-line.
 
-First, you need to set up node for your development environment. The steps required depend on your operating system, if you have a package manager installed, setup can be as straightforward as:
+First, you need to set up Node.js for your development environment. The steps required depend on your operating system, if you have a package manager installed, setup can be as straightforward as:
 
 - Ubuntu: `apt install node`
 - macOS: `brew install node`
@@ -119,7 +119,7 @@ To configure npm to run a script, you use the scripts section in `package.json` 
 
 You can then run the build using: `npm run build`.
 
-After the build finishes, you will see the built file created at `build/index.js`. Enqueue this file in the admin screen as shown in Step 2, and the block will load in the editor.
+After the build finishes, you will see the built file created at `build/index.js`. Enqueue this file in the admin screen as you would any JavaScript in WordPress, see [Step 2 in this tutorial](loading-javascript.md), and the block will load in the editor.
 
 ## Finishing Touches
 
@@ -151,7 +151,7 @@ Likewise, you do not need to include `node_modules` or any of the above configur
 Using wp-scripts ver 5.0.0+ build step will also produce a `index.asset.php` file that contains an array of dependencies and version number for your block. For our simple example above is something like:
 `array('dependencies' => array('wp-element', 'wp-polyfill'), 'version' => 'fc93c4a9675c108725227db345898bcc');`
 
-Here is how to use this asset file to automatically set the dependency list for enqueing the script. This prevents having to manually update the dependencies, it will be created based on the package imports used within your block.
+Here is how to use this asset file to automatically set the dependency list for enqueuing the script. This prevents having to manually update the dependencies, it will be created based on the package imports used within your block.
 
 ```php
 $asset_file = include( plugin_dir_path( __FILE__ ) . 'build/index.asset.php');
