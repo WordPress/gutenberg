@@ -26,6 +26,20 @@ export const settings = {
 		align: [ 'wide', 'full' ],
 		html: false,
 	},
+	example: {
+		attributes: {
+			align: 'wide',
+		},
+		innerBlocks: [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					fontSize: 'large',
+					content: __( 'The 4 Freedoms' ),
+				},
+			},
+		],
+	},
 	transforms,
 	edit,
 	save,

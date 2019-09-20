@@ -24,6 +24,45 @@ export const settings = {
 		align: [ 'wide', 'full' ],
 		html: false,
 	},
+	example: {
+		innerBlocks: [
+			{
+				name: 'core/column',
+				innerBlocks: [
+					{
+						name: 'core/image',
+						attributes: {
+							url: 'https://images.unsplash.com/photo-1549880339-d93e3072aef4',
+						},
+					},
+				],
+			},
+			{
+				name: 'core/column',
+				innerBlocks: [
+					{
+						name: 'core/paragraph',
+						attributes: {
+							content: __( 'WordPress is Open Source Software.' ),
+						},
+					},
+				],
+			},
+			{
+				name: 'core/column',
+				innerBlocks: [
+					{
+						name: 'core/paragraph',
+						attributes: {
+							content: __( 'Build' ) + '<br>' +
+							__( 'Change' ) + '<br>' +
+							__( 'Share' ),
+						},
+					},
+				],
+			},
+		],
+	},
 	deprecated,
 	edit,
 	save,

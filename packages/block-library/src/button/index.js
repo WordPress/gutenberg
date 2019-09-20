@@ -21,6 +21,13 @@ export const settings = {
 	description: __( 'Prompt visitors to take action with a button-style link.' ),
 	icon,
 	keywords: [ __( 'link' ) ],
+	example: {
+		attributes: {
+			className: 'is-style-fill',
+			url: 'https://wordpress.org/download',
+			text: 'Download WordPress',
+		},
+	},
 	supports: {
 		align: true,
 		alignWide: false,

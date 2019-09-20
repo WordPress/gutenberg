@@ -24,6 +24,22 @@ export const settings = {
 	supports: {
 		align: true,
 	},
+	example: {
+		attributes: {
+			customOverlayColor: '#065174',
+		},
+		innerBlocks: [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					customFontSize: 20,
+					content: __( 'The freedom to build.' ) + '<br>' +
+					__( 'The freedom to change.' ) + '<br>' +
+					__( 'The freedom to share.' ),
+				},
+			},
+		],
+	},
 	transforms,
 	save,
 	edit,

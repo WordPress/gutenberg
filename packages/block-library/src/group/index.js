@@ -22,12 +22,38 @@ export const settings = {
 	icon,
 	description: __( 'A block that groups other blocks.' ),
 	keywords: [ __( 'container' ), __( 'wrapper' ), __( 'row' ), __( 'section' ) ],
+	example: {
+		attributes: {
+			customBackgroundColor: '#065174',
+		},
+		innerBlocks: [
+			{
+				name: 'spacer',
+				attribiutes: {
+					height: 100,
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					customTextColor: '#ffffff',
+					fontSize: 'large',
+					content: __( 'The 4 Freedoms.' ),
+				},
+			},
+			{
+				name: 'spacer',
+				attribiutes: {
+					height: 100,
+				},
+			},
+		],
+	},
 	supports: {
 		align: [ 'wide', 'full' ],
 		anchor: true,
 		html: false,
 	},
-
 	transforms: {
 		from: [
 			{

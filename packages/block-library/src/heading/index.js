@@ -25,6 +25,11 @@ export const settings = {
 		className: false,
 		anchor: true,
 	},
+	example: {
+		attributes: {
+			content: __( 'Hello block editor!' ),
+		},
+	},
 	transforms,
 	deprecated,
 	merge( attributes, attributesToMerge ) {

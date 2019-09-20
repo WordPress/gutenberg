@@ -21,6 +21,13 @@ export const settings = {
 	title: __( 'Verse' ),
 	description: __( 'Insert poetry. Use special spacing formats. Or quote song lyrics.' ),
 	icon,
+	example: {
+		attributes: {
+			content: __( 'The freedom to build.' ) + '<br>' +
+			__( 'The freedom to change.' ) + '<br>' +
+			__( 'The freedom to share.' ),
+		},
+	},
 	keywords: [ __( 'poetry' ) ],
 	transforms,
 	deprecated,

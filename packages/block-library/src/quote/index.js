@@ -22,6 +22,12 @@ export const settings = {
 	description: __( 'Give quoted text visual emphasis. "In quoting others, we cite ourselves." — Julio Cortázar' ),
 	icon,
 	keywords: [ __( 'blockquote' ) ],
+	example: {
+		attributes: {
+			value: '<p>' + __( 'One of the hardest things to do in technology is disrupt yourself.' ) + '</p>',
+			citation: 'Matt Mullenweg',
+		},
+	},
 	styles: [
 		{ name: 'default', label: _x( 'Default', 'block style' ), isDefault: true },
 		{ name: 'large', label: _x( 'Large', 'block style' ) },

@@ -24,6 +24,11 @@ export const settings = {
 	supports: {
 		className: false,
 	},
+	example: {
+		attributes: {
+			values: '<li>5.2 – Jaco Pastorius</li><li>5.1 – Betty Carter</li><li>5.0 – Bebo Valdés</li>',
+		},
+	},
 	transforms,
 	merge( attributes, attributesToMerge ) {
 		const { values } = attributesToMerge;

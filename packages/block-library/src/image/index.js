@@ -25,6 +25,13 @@ export const settings = {
 		'img', // "img" is not translated as it is intended to reflect the HTML <img> tag.
 		__( 'photo' ),
 	],
+	example: {
+		attributes: {
+			sizeSlug: 'large',
+			url: 'https://images.unsplash.com/photo-1549880339-d93e3072aef4',
+			caption: __( 'Snow covered mountain' ),
+		},
+	},
 	styles: [
 		{ name: 'default', label: _x( 'Default', 'block style' ), isDefault: true },
 		{ name: 'circle-mask', label: _x( 'Circle Mask', 'block style' ) },

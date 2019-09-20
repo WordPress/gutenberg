@@ -21,6 +21,12 @@ export const settings = {
 	description: __( 'Embed a video from your media library or upload a new one.' ),
 	icon,
 	keywords: [ __( 'movie' ) ],
+	example: {
+		attributes: {
+			src: 'https://make.wordpress.org/design/files/2019/03/block-manager.mp4',
+			caption: __( 'Block Manager' ),
+		},
+	},
 	transforms,
 	supports: {
 		align: true,
