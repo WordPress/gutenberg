@@ -72,6 +72,7 @@ function BlockListBlock( {
 	rootClientId,
 	isSelected,
 	isPartOfMultiSelection,
+	isEditedPostEmpty,
 	isFirstMultiSelected,
 	isTypingWithinBlock,
 	isCaretWithinFormattedText,
@@ -420,7 +421,7 @@ function BlockListBlock( {
 	// the extent of a multi-selection, or not in a multi-selection.
 	const shouldShowInsertionPoint =
 		( isPartOfMultiSelection && isFirstMultiSelected ) ||
-		! isPartOfMultiSelection;
+		( ! isPartOfMultiSelection && ! isEditedPostEmpty );
 
 	// The wp-block className is important for editor styles.
 	// Generate the wrapper class names handling the different states of the block.
@@ -625,6 +626,9 @@ const applyWithSelect = withSelect(
 			__unstableGetBlockWithoutInnerBlocks,
 			isNavigationMode,
 		} = select( 'core/block-editor' );
+
+		const { isEditedPostEmpty } = select( 'core/editor' );
+
 		const block = __unstableGetBlockWithoutInnerBlocks( clientId );
 		const isSelected = isBlockSelected( clientId );
 		const { hasFixedToolbar, focusMode, isRTL } = getSettings();
@@ -641,6 +645,7 @@ const applyWithSelect = withSelect(
 		return {
 			isPartOfMultiSelection:
 				isBlockMultiSelected( clientId ) || isAncestorMultiSelected( clientId ),
+			isEditedPostEmpty: isEditedPostEmpty(),
 			isFirstMultiSelected: isFirstMultiSelectedBlock( clientId ),
 			// We only care about this prop when the block is selected
 			// Thus to avoid unnecessary rerenders we avoid updating the prop if the block is not selected.
