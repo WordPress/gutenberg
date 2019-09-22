@@ -109,6 +109,9 @@ function gutenberg_find_template( $template_file ) {
 		$_wp_current_template_post = $template_posts[0];
 	}
 
+	// Add extra hooks for template canvas.
+	add_action( 'wp_head', 'gutenberg_viewport_meta_tag', 0 );
+
 	// This file will be included instead of the theme's template file.
 	return gutenberg_dir_path() . 'lib/template-canvas.php';
 }
@@ -135,6 +138,15 @@ function gutenberg_render_the_template() {
 	echo '<div class="wp-site-blocks">';
 	echo $content; // phpcs:ignore WordPress.Security.EscapeOutput
 	echo '</div>';
+}
+
+/**
+ * Renders a 'viewport' meta tag.
+ *
+ * This is hooked into {@see 'wp_head'} to decouple its output from the default template canvas.
+ */
+function gutenberg_viewport_meta_tag() {
+	echo '<meta name="viewport" content="width=device-width, initial-scale=1" />' . "\n";
 }
 
 /**
