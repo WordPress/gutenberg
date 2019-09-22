@@ -86,3 +86,54 @@ function gutenberg_grant_template_caps( array $allcaps ) {
 	return $allcaps;
 }
 add_filter( 'user_has_cap', 'gutenberg_grant_template_caps' );
+
+/**
+ * Fixes the label of the 'wp_template' admin menu entry.
+ */
+function gutenberg_fix_template_admin_menu_entry() {
+	global $submenu;
+
+	if ( ! isset( $submenu['themes.php'] ) ) {
+		return;
+	}
+
+	$post_type = get_post_type_object( 'wp_template' );
+	foreach ( $submenu['themes.php'] as $key => $submenu_entry ) {
+		if ( $post_type->labels->all_items === $submenu['themes.php'][ $key ][0] ) {
+			$submenu['themes.php'][ $key ][0] = $post_type->labels->menu_name; // phpcs:ignore WordPress.WP.GlobalVariablesOverride
+			break;
+		}
+	}
+}
+add_action( 'admin_menu', 'gutenberg_fix_template_admin_menu_entry' );
+
+/**
+ * Filters the 'wp_template' post type columns in the admin list table.
+ *
+ * @param array $columns Columns to display.
+ * @return array Filtered $columns.
+ */
+function gutenberg_filter_template_list_table_columns( array $columns ) {
+	$columns['slug'] = __( 'Slug', 'gutenberg' );
+	if ( isset( $columns['date'] ) ) {
+		unset( $columns['date'] );
+	}
+	return $columns;
+}
+add_filter( 'manage_wp_template_posts_columns', 'gutenberg_filter_template_list_table_columns' );
+
+/**
+ * Renders column content for the 'wp_template' post type list table.
+ *
+ * @param string $column_name Column name to render.
+ * @param int    $post_id     Post ID.
+ */
+function gutenberg_render_template_list_table_column( $column_name, $post_id ) {
+	if ( 'slug' !== $column_name ) {
+		return;
+	}
+
+	$post = get_post( $post_id );
+	echo esc_html( $post->post_name );
+}
+add_action( 'manage_wp_template_posts_custom_column', 'gutenberg_render_template_list_table_column', 10, 2 );
