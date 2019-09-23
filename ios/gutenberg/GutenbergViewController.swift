@@ -45,6 +45,9 @@ class GutenbergViewController: UIViewController {
 }
 
 extension GutenbergViewController: GutenbergBridgeDelegate {
+    func editorDidAutosave() {
+        print("➡️ Editor Did Autosave")
+    }
 
     func gutenbergDidLoad() {
         gutenberg.setFocusOnTitle()
