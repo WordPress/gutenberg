@@ -100,7 +100,11 @@ describe( 'Block transforms', () => {
 
 	const transformStructure = {};
 	beforeAll( async () => {
-		await enableExperimentalFeatures( [ '#gutenberg-widget-experiments', '#gutenberg-menu-block' ] );
+		await enableExperimentalFeatures( [
+			'#gutenberg-widget-experiments',
+			'#gutenberg-menu-block',
+			'#gutenberg-full-site-editing',
+		] );
 		await createNewPost();
 
 		for ( const fileBase of fileBasenames ) {
