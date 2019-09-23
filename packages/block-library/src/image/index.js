@@ -29,7 +29,7 @@ export const settings = {
 		attributes: {
 			sizeSlug: 'large',
 			url: 'https://images.unsplash.com/photo-1549880339-d93e3072aef4',
-			caption: __( 'A snow covered mountain' ),
+			caption: __( 'Mont Blanc appears—still, snowy, and serene.' ),
 		},
 	},
 	styles: [
