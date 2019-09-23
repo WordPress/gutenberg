@@ -27,7 +27,8 @@ export const settings = {
 	},
 	example: {
 		attributes: {
-			content: __( 'Hello block editor!' ),
+			content: __( 'Code is Poetry' ),
+			level: 1,
 		},
 	},
 	transforms,

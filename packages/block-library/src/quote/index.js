@@ -26,8 +26,8 @@ export const settings = {
 		attributes: {
 			value: '<p>' + __( 'In quoting others, we cite ourselves.' ) + '</p>',
 			citation: 'Julio Cortázar',
+			className: 'is-style-large',
 		},
-		styles: 'large',
 	},
 	styles: [
 		{ name: 'default', label: _x( 'Default', 'block style' ), isDefault: true },

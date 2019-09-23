@@ -29,7 +29,7 @@ export const settings = {
 		attributes: {
 			sizeSlug: 'large',
 			url: 'https://images.unsplash.com/photo-1549880339-d93e3072aef4',
-			caption: __( 'Snow covered mountain' ),
+			caption: __( 'A snow covered mountain' ),
 		},
 	},
 	styles: [

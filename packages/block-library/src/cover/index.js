@@ -27,15 +27,16 @@ export const settings = {
 	example: {
 		attributes: {
 			customOverlayColor: '#065174',
+			dimRatio: 40,
+			url: 'https://images.unsplash.com/photo-1549880339-d93e3072aef4',
 		},
 		innerBlocks: [
 			{
 				name: 'core/paragraph',
 				attributes: {
-					customFontSize: 20,
-					content: __( 'The freedom to build.' ) + '<br>' +
-					__( 'The freedom to change.' ) + '<br>' +
-					__( 'The freedom to share.' ),
+					customFontSize: 40,
+					content: __( 'The freedom to build.' ),
+					align: 'center',
 				},
 			},
 		],
