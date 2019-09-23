@@ -130,8 +130,6 @@ export const registerCoreBlocks = () => {
 		search,
 		separator,
 		reusableBlock,
-		socialLinks,
-		...socialLink.sites,
 		spacer,
 		subhead,
 		table,
@@ -171,7 +169,7 @@ export const __experimentalRegisterExperimentalCoreBlocks = process.env.GUTENBER
 		__experimentalEnableLegacyWidgetBlock ? legacyWidget : null,
 		__experimentalEnableMenuBlock ? navigationMenu : null,
 		__experimentalEnableMenuBlock ? navigationMenuItem : null,
-		...socialLink.sites,
 		socialLinks,
+		...socialLink.sites,
 	].forEach( registerBlock );
 } : undefined;
