@@ -385,7 +385,9 @@ export class InserterMenu extends Component {
 					<div className="block-editor-inserter__menu-help-panel">
 						{ hoveredItem && (
 							<>
-								<BlockCard blockType={ hoveredItemBlockType } />
+								{ ! isReusableBlock( hoveredItem ) && (
+									<BlockCard blockType={ hoveredItemBlockType } />
+								) }
 								{ ( isReusableBlock( hoveredItem ) || hoveredItemBlockType.example ) && (
 									<div className="block-editor-inserter__preview">
 										<div className="block-editor-inserter__preview-content">
