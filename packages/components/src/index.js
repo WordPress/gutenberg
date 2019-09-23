@@ -3,6 +3,7 @@ export * from './primitives';
 export { default as Animate } from './animate';
 export { default as Autocomplete } from './autocomplete';
 export { default as BaseControl } from './base-control';
+export { default as Box } from './box';
 export { default as Button } from './button';
 export { default as ButtonGroup } from './button-group';
 export { default as CheckboxControl } from './checkbox-control';
