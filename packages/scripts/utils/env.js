@@ -14,7 +14,7 @@ const getAppDataPath = require( 'appdata-path' );
 const { execSync } = require( 'child_process' );
 const { env, exit, stdout } = require( 'process' );
 const { normalize } = require( 'path' );
-const { createWriteStream } = require( 'fs' );
+const { createWriteStream, mkdirSync } = require( 'fs' );
 const { tmpdir } = require( 'os' );
 
 /**
@@ -63,6 +63,7 @@ function mergeYAMLConfigs( originalConfig, newConfig, baseDir ) {
  * Installs the latest version of the WordPress nightly build in the managed WordPress directory.
  */
 async function installManagedWordPress() {
+	mkdirSync( getManagedWordPressPath(), { recursive: true } );
 	execSync( 'docker run -it --rm --volume "' + getManagedWordPressPath() + ':/var/www" wordpressdevelop/cli core download --path=/var/www/src --version=nightly --force', { stdio: 'inherit' } );
 
 	await new Promise( ( resolve ) => {
