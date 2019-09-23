@@ -262,9 +262,10 @@ export class InserterMenu extends Component {
 			openPanels,
 			reusableItems,
 			suggestedItems,
+			filterValue,
 		} = this.state;
 		const isPanelOpen = ( panel ) => openPanels.indexOf( panel ) !== -1;
-		const hasItems = isEmpty( suggestedItems ) && isEmpty( reusableItems ) && isEmpty( itemsPerCategory );
+		const hasItems = ! ( isEmpty( suggestedItems ) && isEmpty( reusableItems ) && isEmpty( itemsPerCategory ) );
 		const hoveredItemBlockType = hoveredItem ? getBlockType( hoveredItem.name ) : null;
 
 		// Disable reason (no-autofocus): The inserter menu is a modal display, not one which
@@ -362,7 +363,7 @@ export class InserterMenu extends Component {
 							fillProps={ {
 								onSelect,
 								onHover: this.onHover,
-								filterValue: this.state.filterValue,
+								filterValue,
 								hasItems,
 							} }
 						>
@@ -370,7 +371,7 @@ export class InserterMenu extends Component {
 								if ( fills.length ) {
 									return fills;
 								}
-								if ( hasItems ) {
+								if ( ! hasItems ) {
 									return (
 										<p className="editor-inserter__no-results block-editor-inserter__no-results">{ __( 'No blocks found.' ) }</p>
 									);
@@ -381,7 +382,7 @@ export class InserterMenu extends Component {
 					</div>
 				</div>
 
-				{ showInserterHelpPanel && (
+				{ hasItems && showInserterHelpPanel && (
 					<div className="block-editor-inserter__menu-help-panel">
 						{ hoveredItem && (
 							<>
