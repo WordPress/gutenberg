@@ -9,7 +9,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
  */
 import { defaultEntities, kinds } from './entities';
 
-const _entities = {
+const entities = {
 	...defaultEntities.reduce( ( acc, entity ) => {
 		if ( ! acc[ entity.kind ] ) {
 			acc[ entity.kind ] = {};
@@ -23,15 +23,15 @@ const _entities = {
 	}, {} ),
 };
 const getEntity = ( kind, type ) => {
-	if ( ! _entities[ kind ] ) {
+	if ( ! entities[ kind ] ) {
 		throw new Error( `Missing entity config for kind: ${ kind }.` );
 	}
 
-	if ( ! _entities[ kind ][ type ] ) {
-		_entities[ kind ][ type ] = { context: createContext() };
+	if ( ! entities[ kind ][ type ] ) {
+		entities[ kind ][ type ] = { context: createContext() };
 	}
 
-	return _entities[ kind ][ type ];
+	return entities[ kind ][ type ];
 };
 
 /**
