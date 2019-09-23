@@ -12,5 +12,6 @@ RCT_EXTERN_METHOD(requestMediaImport:(NSString *)sourceURL callback:(RCTResponse
 RCT_EXTERN_METHOD(editorDidLayout)
 RCT_EXTERN_METHOD(editorDidMount:(NSArray *)unsupportedBlockNames)
 RCT_EXTERN_METHOD(editorDidEmitLog:(NSString *)message logLevel:(int)logLevel)
+RCT_EXTERN_METHOD(editorDidAutosave)
 
 @end
