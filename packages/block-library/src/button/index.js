@@ -25,7 +25,7 @@ export const settings = {
 		attributes: {
 			className: 'is-style-fill',
 			url: 'https://wordpress.org/download',
-			text: 'Download WordPress',
+			text: __(  'Download WordPress' ),
 		},
 	},
 	supports: {
