@@ -28,14 +28,20 @@ export const settings = {
 	},
 	example: {
 		attributes: {
-			align: 'wide',
+			mediaType: 'image',
+			mediaUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Cistothorus_palustris_Iona.jpg/607px-Cistothorus_palustris_Iona.jpg',
 		},
 		innerBlocks: [
 			{
 				name: 'core/paragraph',
 				attributes: {
-					fontSize: 'large',
-					content: __( 'The 4 Freedoms' ),
+					content: __( 'The wren<br>Earns his living<br>Noiselessly.' ),
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: __( '— Kobayashi Issa (一茶)' ),
 				},
 			},
 		],
