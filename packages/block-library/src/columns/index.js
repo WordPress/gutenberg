@@ -30,20 +30,21 @@ export const settings = {
 				name: 'core/column',
 				innerBlocks: [
 					{
+						name: 'core/paragraph',
+						attributes: {
+							content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent et eros eu felis pellentesque efficitur. Nam dapibus felis malesuada tincidunt rhoncus. Integer non malesuada tortor.',
+						},
+					},
+					{
 						name: 'core/image',
 						attributes: {
 							url: 'https://images.unsplash.com/photo-1549880339-d93e3072aef4',
 						},
 					},
-				],
-			},
-			{
-				name: 'core/column',
-				innerBlocks: [
 					{
 						name: 'core/paragraph',
 						attributes: {
-							content: __( 'WordPress is Open Source Software.' ),
+							content: 'Suspendisse commodo neque lacus, a dictum orci interdum et. Ut vel mi ut leo fringilla rutrum.',
 						},
 					},
 				],
@@ -54,9 +55,13 @@ export const settings = {
 					{
 						name: 'core/paragraph',
 						attributes: {
-							content: __( 'Build' ) + '<br>' +
-							__( 'Change' ) + '<br>' +
-							__( 'Share' ),
+							content: __( 'Etiam et egestas lorem. Vivamus sagittis sit amet dolor quis lobortis. Integer sed fermentum arcu, id vulputate lacus. Etiam fermentum sem eu quam hendrerit, eget faucibus urna pulvinar.' ),
+						},
+					},
+					{
+						name: 'core/paragraph',
+						attributes: {
+							content: __( 'Nam risus massa, ullamcorper consectetur eros fermentum, porta aliquet ligula. Sed vel mauris nec enim ultricies commodo.' ),
 						},
 					},
 				],
@@ -67,4 +72,3 @@ export const settings = {
 	edit,
 	save,
 };
-
