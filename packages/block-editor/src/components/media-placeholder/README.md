@@ -87,12 +87,13 @@ If false the default placeholder style is used.
 - Default: `false`
 - Platform: Web | Mobile
 
-### disableMediaSelection
+### disableMediaButtons
 
-Whether render a dropzone/placholder without any other additional UI.
+If true, only the Drop Zone will be rendered. No UI controls to upload the media will be shown
 
 - Type: `Boolean`
 - Required: No
+- Default: false
 - Platform: Web | Mobile
 
 ### labels

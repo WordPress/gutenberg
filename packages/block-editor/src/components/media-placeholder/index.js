@@ -388,14 +388,16 @@ export class MediaPlaceholder extends Component {
 
 	render() {
 		const {
-			disableMediaSelection,
+			disableMediaButtons,
 			dropZoneUIOnly,
 		} = this.props;
 
-		if ( dropZoneUIOnly || disableMediaSelection ) {
-			deprecated( 'wp.blockEditor.MediaPlaceholder dropZoneUIOnly prop', {
-				alternative: 'disableMediaSelection',
-			} );
+		if ( dropZoneUIOnly || disableMediaButtons ) {
+			if ( dropZoneUIOnly ) {
+				deprecated( 'wp.blockEditor.MediaPlaceholder dropZoneUIOnly prop', {
+					alternative: 'disableMediaButtons',
+				} );
+			}
 
 			return (
 				<MediaUploadCheck>

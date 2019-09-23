@@ -26,7 +26,6 @@ describe( 'new editor state', () => {
 			},
 		] );
 		await visitAdminPage( 'post-new.php', 'gutenberg-demo' );
-		expect( console ).toHaveWarned();
 	} );
 
 	it( 'content should load without making the post dirty', async () => {
