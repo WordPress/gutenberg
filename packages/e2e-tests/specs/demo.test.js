@@ -33,7 +33,6 @@ describe( 'new editor state', () => {
 			const { select } = window.wp.data;
 			return select( 'core/editor' ).isEditedPostDirty();
 		} );
-
 		expect( isDirty ).toBeFalsy();
 	} );
 

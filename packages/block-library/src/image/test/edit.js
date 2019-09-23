@@ -27,7 +27,6 @@ describe( 'core/image/edit', () => {
 				url: 'http://www.example.com/myimage.jpeg',
 				alt: 'alt2',
 			} );
-
 			expect( setAttributes ).toHaveBeenCalledWith( {
 				id: 1,
 				url: 'http://www.example.com/myimage.jpeg',
@@ -38,7 +37,6 @@ describe( 'core/image/edit', () => {
 				url: 'http://www.example.com/myimage.jpeg',
 				alt: 'alt2',
 			} );
-
 			expect( setAttributes ).toHaveBeenCalledWith( {
 				id: 2,
 				url: 'http://www.example.com/myimage.jpeg',
