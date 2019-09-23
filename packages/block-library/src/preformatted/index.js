@@ -22,7 +22,9 @@ export const settings = {
 	icon,
 	example: {
 		attributes: {
-			content: __( 'Write preformatted text easily.' ),
+			content: __( 'EXT. XANADU - FAINT DAWN - 1940 (MINIATURE)' ) + '\n' +
+			__( 'Window, very small in the distance, illuminated.' ) + '\n' +
+			__( 'All around this is an almost totally black screen. Now, as the camera moves slowly towards the window which is almost a postage stamp in the frame, other forms appear;' ),
 		},
 	},
 	transforms,
