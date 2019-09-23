@@ -27,7 +27,7 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
                     callback(nil)
                     return
                 }
-                callback([mediaID, url])
+                callback([mediaID, url, mediaFilter])
             })
         }
     }
