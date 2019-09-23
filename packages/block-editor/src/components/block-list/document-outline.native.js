@@ -1,35 +1,58 @@
 /**
  * WordPress dependencies
  */
-import { BottomSheet } from '@wordpress/components';
+import { BottomSheet, Icon } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
+import { getBlockType } from '@wordpress/blocks';
+
 /**
  * External dependencies
  */
 import { flattenDeep } from 'lodash';
-import { FlatList } from 'react-native';
+import { FlatList, View, Text, TouchableOpacity } from 'react-native';
 
-const DocumentOutline = ( { isVisible, onClose, onSelect, clientId, blockList } ) => (
+/**
+ * Internal dependencies
+ */
+import styles from './document-outline.scss';
+
+const DocumentOutline = ( { isVisible, onClose, onSelect, clientId, blockList, selectedIndex } ) => (
 	<BottomSheet
 		isVisible={ isVisible }
 		onClose={ onClose }
 		title="Document Outline"
 	>
 		<FlatList
-			style={ { height: 300 } }
+			style={ styles.flatlist }
 			data={ blockList }
-			renderItem={ ( { item } ) => (
-				<BottomSheet.Cell
-					icon={ 'editor-textcolor' }
-					label={ item.name }
-					onPress={ () => {
-						onSelect( item.clientId );
-						onClose();
-					} }
-					separatorType={ 'none' }
-				/>
+			initialScrollIndex={ selectedIndex }
+			initialNumToRender={ 10 }
+			getItemLayout={ ( data, index ) => (
+				{ length: styles.rowContainer.height, offset: styles.rowContainer.height * index, index }
 			) }
+			renderItem={ ( { item } ) => {
+				const blockType = getBlockType( item.name );
+				return (
+					<TouchableOpacity
+						style={ { paddingLeft: Math.max( item.level - 1, 0 ) * styles.iconContainer.width } }
+						onPress={ () => {
+							onSelect( item.clientId );
+							onClose();
+						} }
+					>
+						<View style={ styles.rowContainer }>
+							<View style={ styles.itemContainer }>
+								{ ( item.level > 0 ) && <View style={ styles.iconContainer }><Icon size={ 18 } icon="subdirectory" /></View> }
+								<View style={ styles.iconContainer }><Icon size={ 18 } icon={ blockType.icon.src } /></View>
+								<Text>{ blockType.title }</Text>
+							</View>
+							{ item.clientId === clientId &&
+							( <Icon icon="saved" fill={ styles.selectedIcon.color } size={ 20 } /> ) }
+						</View>
+					</TouchableOpacity>
+				);
+			} }
 			keyExtractor={ ( item ) => item.clientId + clientId }
 		/>
 	</BottomSheet>
@@ -48,13 +71,15 @@ const flat = ( block, level ) => {
 };
 
 export default compose( [
-	withSelect( ( select ) => {
+	withSelect( ( select, { clientId } ) => {
 		const {
 			getBlocks,
 		} = select( 'core/block-editor' );
 		const blockList = flatBlocks( getBlocks() );
+		const selectedIndex = blockList.findIndex( ( block ) => block.clientId === clientId );
 		return {
 			blockList,
+			selectedIndex,
 		};
 	} ),
 ] )( DocumentOutline );

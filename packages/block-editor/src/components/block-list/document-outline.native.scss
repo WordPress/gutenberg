@@ -1,0 +1,23 @@
+.rowContainer {
+	align-items: center;
+	flex-direction: row;
+	justify-content: space-between;
+	height: 44;
+}
+
+.itemContainer {
+	align-items: center;
+	flex-direction: row;
+}
+
+.iconContainer {
+	width: 28;
+}
+
+.flatlist {
+	height: 300;
+}
+
+.selectedIcon {
+	color: $blue-wordpress;
+}
