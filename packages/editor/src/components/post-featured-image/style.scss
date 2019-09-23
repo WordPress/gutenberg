@@ -7,7 +7,11 @@
 	}
 
 	.components-spinner {
-		margin: 0;
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		margin-top: -9px;
+		margin-left: -9px;
 	}
 
 	// Stack consecutive buttons.
