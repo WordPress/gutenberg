@@ -24,27 +24,55 @@ export const settings = {
 	keywords: [ __( 'container' ), __( 'wrapper' ), __( 'row' ), __( 'section' ) ],
 	example: {
 		attributes: {
-			customBackgroundColor: '#065174',
+			customBackgroundColor: '#ffffff',
 		},
 		innerBlocks: [
 			{
-				name: 'core/spacer',
+				name: 'core/paragraph',
 				attributes: {
-					height: 100,
+					textColor: 'vivid-red',
+					fontSize: 'large',
+					content: __( 'One.' ),
 				},
 			},
 			{
 				name: 'core/paragraph',
 				attributes: {
-					customTextColor: '#ffffff',
+					textColor: 'luminous-vivid-orange',
 					fontSize: 'large',
-					content: __( 'The 4 Freedoms.' ),
+					content: __( 'Two.' ),
 				},
 			},
 			{
-				name: 'core/spacer',
+				name: 'core/paragraph',
 				attributes: {
-					height: 100,
+					textColor: 'luminous-vivid-amber',
+					fontSize: 'large',
+					content: __( 'Three.' ),
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					textColor: 'vivid-green-cyan',
+					fontSize: 'large',
+					content: __( 'Four.' ),
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					textColor: 'vivid-cyan-blue',
+					fontSize: 'large',
+					content: __( 'Five.' ),
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					textColor: 'vivid-purple',
+					fontSize: 'large',
+					content: __( 'Six.' ),
 				},
 			},
 		],
