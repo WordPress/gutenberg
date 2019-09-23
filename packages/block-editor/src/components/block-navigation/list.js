@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map } from 'lodash';
+import { map, findKey } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -15,6 +15,24 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import BlockIcon from '../block-icon';
+
+/**
+ * Get the block display name, if it has one, or the block title if it doesn't.
+ *
+ * @param {Object} blockType  The block type.
+ * @param {Object} attributes The values of the block's attributes
+ *
+ * @return {string} The display name value.
+ */
+function getBlockDisplayName( blockType, attributes ) {
+	const attributeName = findKey( blockType.attributes, { type: 'string', __experimentalIsDisplayName: true } );
+
+	if ( ! attributeName || ! attributes[ attributeName ] ) {
+		return blockType.title;
+	}
+
+	return attributes[ attributeName ];
+}
 
 export default function BlockNavigationList( {
 	blocks,
@@ -43,7 +61,7 @@ export default function BlockNavigationList( {
 								onClick={ () => selectBlock( block.clientId ) }
 							>
 								<BlockIcon icon={ blockType.icon } showColors />
-								{ blockType.title }
+								{ getBlockDisplayName( blockType, block.attributes ) }
 								{ isSelected && <span className="screen-reader-text">{ __( '(selected block)' ) }</span> }
 							</Button>
 						</div>
