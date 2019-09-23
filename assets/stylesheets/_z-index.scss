@@ -32,9 +32,6 @@ $z-layers: (
 	".wp-block-cover.has-background-dim::before": 1, // Overlay area inside block cover need to be higher than the video background.
 	".wp-block-cover__video-background": 0, // Video background inside cover block.
 
-	// Side UI active buttons
-	".block-editor-block-mover__control": 1,
-
 	// Active pill button
 	".components-button.is-button {:focus or .is-primary}": 1,
 
@@ -70,6 +67,9 @@ $z-layers: (
 	".edit-post-sidebar": 100000,
 	".edit-widgets-sidebar": 100000,
 	".edit-post-layout .edit-post-post-publish-panel": 100001,
+	// For larger views, the wp-admin navbar dropdown should be at top of
+	// the Publish Post sidebar.
+	".edit-post-layout .edit-post-post-publish-panel-break-medium": 99998,
 
 	// Show sidebar in greater than small viewports above editor related elements
 	// but bellow #adminmenuback { z-index: 100 }

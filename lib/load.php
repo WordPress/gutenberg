@@ -25,11 +25,20 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	/**
 	* End: Include for phase 2
 	*/
+
+	if ( ! class_exists( 'WP_REST_Block_Directory_Controller' ) ) {
+		require dirname( __FILE__ ) . '/class-wp-rest-block-directory-controller.php';
+	}
+
 	require dirname( __FILE__ ) . '/rest-api.php';
 }
 
+if ( ! class_exists( 'WP_Block_Styles_Registry' ) ) {
+	require dirname( __FILE__ ) . '/class-wp-block-styles-registry.php';
+}
+
 require dirname( __FILE__ ) . '/compat.php';
-require dirname( __FILE__ ) . '/class-wp-block-styles-registry.php';
+
 require dirname( __FILE__ ) . '/blocks.php';
 require dirname( __FILE__ ) . '/client-assets.php';
 require dirname( __FILE__ ) . '/demo.php';

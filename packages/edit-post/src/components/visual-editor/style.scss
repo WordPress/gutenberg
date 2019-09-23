@@ -35,7 +35,7 @@
 		&[data-align="wide"] > .block-editor-block-list__block-edit > .block-editor-block-contextual-toolbar,
 		&[data-align="full"] > .block-editor-block-list__block-edit > .block-editor-block-contextual-toolbar {
 			height: 0; // This collapses the container to an invisible element without margin.
-			width: calc(100% - 1px); // -1px to account for inner element left: 1px value causing overflow-x scrollbars
+			width: calc(100% - #{$block-side-ui-width * 3} - #{$grid-size-small * 1.5}); // -90px to account for inner element left position value causing overflow-x scrollbars
 			margin-left: 0;
 			margin-right: 0;
 			text-align: center;
@@ -43,6 +43,10 @@
 			// This is necessary because otherwise the mere presence of the toolbar can push down content.
 			// Pairs with relative rule on line 49.
 			float: left;
+
+			@include break-xlarge() {
+				width: calc(100% - #{$block-padding * 2} + #{$border-width * 2}); // On the largest screens, line the toolbar up with standard-aligned block controls.
+			}
 
 			.block-editor-block-toolbar {
 				max-width: $content-width;

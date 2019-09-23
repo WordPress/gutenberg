@@ -483,6 +483,8 @@ _Related_
 
 <a name="getReferenceByDistinctEdits" href="#getReferenceByDistinctEdits">#</a> **getReferenceByDistinctEdits**
 
+> **Deprecated** since Gutenberg 6.5.0.
+
 Returns a new reference when edited values have changed. This is useful in
 inferring where an edit has been made between states by comparison of the
 return values using strict equality.
@@ -892,6 +894,18 @@ _Returns_
 
 -   `boolean`: Whether or not the permalink is editable.
 
+<a name="isPostAutosavingLocked" href="#isPostAutosavingLocked">#</a> **isPostAutosavingLocked**
+
+Returns whether post autosaving is locked.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `boolean`: Is locked.
+
 <a name="isPostLocked" href="#isPostLocked">#</a> **isPostLocked**
 
 Returns whether the post is locked.
@@ -1042,6 +1056,7 @@ been edited.
 _Parameters_
 
 -   _edits_ `Object`: Post attributes to edit.
+-   _options_ `Object`: Options for the edit.
 
 <a name="enablePublishSidebar" href="#enablePublishSidebar">#</a> **enablePublishSidebar**
 

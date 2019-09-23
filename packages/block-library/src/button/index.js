@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -26,9 +26,8 @@ export const settings = {
 		alignWide: false,
 	},
 	styles: [
-		{ name: 'default', label: _x( 'Default', 'block style' ), isDefault: true },
+		{ name: 'fill', label: __( 'Fill' ), isDefault: true },
 		{ name: 'outline', label: __( 'Outline' ) },
-		{ name: 'squared', label: _x( 'Squared', 'block style' ) },
 	],
 	edit,
 	save,
