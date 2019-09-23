@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Dimensions, View, ImageBackground, Text, TouchableWithoutFeedback } from 'react-native';
+import { Dimensions, View, ImageBackground, Text, TouchableWithoutFeedback, Platform } from 'react-native';
 import {
 	requestMediaImport,
 	mediaUploadSync,
@@ -42,7 +42,8 @@ import SvgIconRetry from './icon-retry';
 /**
  * Constants
  */
-const ALLOWED_MEDIA_TYPES = [ MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO ];
+// For Android it will only work with the first element of the array (images)
+const ALLOWED_MEDIA_TYPES = [ MEDIA_TYPE_IMAGE, ...( Platform.OS === 'ios' ? [ MEDIA_TYPE_VIDEO ] : [] ) ];
 
 // Default Video ratio 16:9
 const VIDEO_ASPECT_RATIO = 16 / 9;
@@ -68,10 +69,10 @@ class MediaContainer extends Component {
 
 		if ( mediaId && mediaUrl && ! isURL( mediaUrl ) ) {
 			if ( mediaUrl.indexOf( 'file:' ) === 0 ) {
-				requestMediaImport( mediaUrl, ( id, url ) => {
+				requestMediaImport( mediaUrl, ( id, url, type ) => {
 					if ( url ) {
 						onSelectMedia( {
-							media_type: 'image', // video | image
+							media_type: type || 'image', // image fallback for android
 							id,
 							url,
 						} );
@@ -89,11 +90,11 @@ class MediaContainer extends Component {
 	}
 
 	onSelectMediaUploadOption( params ) {
-		const { id, url } = params;
+		const { id, url, type } = params;
 		const { onSelectMedia } = this.props;
 
 		onSelectMedia( {
-			media_type: 'image', // video | image
+			media_type: type || 'image', // image fallback for android
 			id,
 			url,
 		} );
@@ -244,10 +245,10 @@ class MediaContainer extends Component {
 		let mediaElement = null;
 
 		switch ( mediaType ) {
-			case 'image':
+			case MEDIA_TYPE_IMAGE:
 				mediaElement = this.renderImage( params, openMediaOptions );
 				break;
-			case 'video':
+			case MEDIA_TYPE_VIDEO:
 				mediaElement = this.renderVideo( params, openMediaOptions );
 				break;
 		}
@@ -270,7 +271,8 @@ class MediaContainer extends Component {
 	}
 
 	render() {
-		const { mediaUrl, mediaId } = this.props;
+		const { mediaUrl, mediaId, mediaType } = this.props;
+		const coverUrl = mediaType === MEDIA_TYPE_IMAGE ? mediaUrl : null;
 
 		if ( mediaUrl ) {
 			return (
@@ -284,7 +286,7 @@ class MediaContainer extends Component {
 							{ this.renderToolbarEditButton( open ) }
 
 							<MediaUploadProgress
-								coverUrl={ mediaUrl }
+								coverUrl={ coverUrl }
 								mediaId={ mediaId }
 								onUpdateMediaProgress={ this.updateMediaProgress }
 								onFinishMediaUploadWithSuccess={ this.finishMediaUploadWithSuccess }
