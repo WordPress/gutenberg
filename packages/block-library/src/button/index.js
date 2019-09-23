@@ -24,8 +24,8 @@ export const settings = {
 	example: {
 		attributes: {
 			className: 'is-style-fill',
-			url: 'https://wordpress.org/download',
-			text: __(  'Download WordPress' ),
+			backgroundColor: 'vivid-green-cyan',
+			text: __( 'Call to Action' ),
 		},
 	},
 	supports: {
