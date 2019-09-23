@@ -34,8 +34,8 @@ export const settings = {
 			{
 				name: 'core/paragraph',
 				attributes: {
-					customFontSize: 40,
-					content: __( 'The freedom to build.' ),
+					customFontSize: 48,
+					content: __( 'Snow Patrol' ),
 					align: 'center',
 				},
 			},
