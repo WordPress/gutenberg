@@ -10,6 +10,7 @@ import classnames from 'classnames';
 import { Button } from '@wordpress/components';
 import { getBlockType } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
+import { create, getTextContent } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -31,7 +32,11 @@ function getBlockDisplayName( blockType, attributes ) {
 		return blockType.title;
 	}
 
-	return attributes[ attributeName ];
+	// Strip any formatting.
+	const richTextValue = create( { html: attributes[ attributeName ] } );
+	const formatlessDisplayName = getTextContent( richTextValue );
+
+	return formatlessDisplayName;
 }
 
 export default function BlockNavigationList( {
