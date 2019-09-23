@@ -82,7 +82,7 @@ function PostFeaturedImage( {
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
 						modalClass={ ! featuredImageId ? 'editor-post-featured-image__media-modal' : 'editor-post-featured-image__media-modal' }
 						render={ ( { open } ) => (
-							<>
+							<div className="editor-post-featured-image__container">
 								<Button
 									className={ ! featuredImageId ? 'editor-post-featured-image__toggle' : 'editor-post-featured-image__preview' }
 									onClick={ open }
@@ -99,8 +99,8 @@ function PostFeaturedImage( {
 									{ !! featuredImageId && ! media && <Spinner /> }
 									{ ! featuredImageId && ( postLabel.set_featured_image || DEFAULT_SET_FEATURE_IMAGE_LABEL ) }
 								</Button>
-								<DropZone onFilesDrop={ ! featuredImageId && onDropImage } />
-							</>
+								<DropZone onFilesDrop={ onDropImage } />
+							</div>
 						) }
 						value={ featuredImageId }
 					/>

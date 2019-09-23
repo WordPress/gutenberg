@@ -1,6 +1,10 @@
 .editor-post-featured-image {
 	padding: 0;
-	position: relative;
+
+	&__container {
+		margin-bottom: 1em;
+		position: relative;
+	}
 
 	.components-spinner {
 		margin: 0;
