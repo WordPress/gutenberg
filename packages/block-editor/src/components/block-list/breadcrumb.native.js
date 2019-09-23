@@ -32,8 +32,7 @@ const BlockBreadcrumb = ( { clientId, blockIcon, rootClientId, rootBlockIcon } )
 			<TouchableOpacity style={ styles.button } onPress={ () => {/* Open BottomSheet with markup */} }>
 				{ rootClientId && rootBlockIcon && (
 					[ <Icon key="parent-icon" size={ 20 } icon={ rootBlockIcon.src } fill={ styles.icon.color } />,
-					// TODO set correct icon
-						<Icon key="arrow-icon" size={ 15 } icon="arrow-right-alt" style={ styles.arrow } fill={ styles.arrow.color } /> ]
+						<Icon key="subdirectory-icon" size={ 15 } icon="arrow-right-alt" style={ styles.arrow } fill={ styles.arrow.color } /> ]
 				) }
 				<Icon size={ 24 } icon={ blockIcon.src } fill={ styles.icon.color } />
 				<Text style={ styles.breadcrumbTitle }><BlockTitle clientId={ clientId } /></Text>
