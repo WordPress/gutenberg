@@ -26,10 +26,10 @@ import styles from './breadcrumb.scss';
  * @param {string}   props.clientId        Client ID of block.
  * @return {WPElement} Block Breadcrumb.
  */
-const BlockBreadcrumb = ( { clientId, blockIcon, rootClientId, rootBlockIcon } ) => {
+const BlockBreadcrumb = ( { clientId, blockIcon, rootClientId, rootBlockIcon, onPress } ) => {
 	return (
 		<View style={ styles.breadcrumbContainer }>
-			<TouchableOpacity style={ styles.button } onPress={ () => {/* Open BottomSheet with markup */} }>
+			<TouchableOpacity style={ styles.button } onPress={ onPress }>
 				{ rootClientId && rootBlockIcon && (
 					[ <Icon key="parent-icon" size={ 20 } icon={ rootBlockIcon.src } fill={ styles.icon.color } />,
 						<Icon key="subdirectory-icon" size={ 15 } icon="subdirectory" style={ styles.arrow } fill={ styles.arrow.color } /> ]
