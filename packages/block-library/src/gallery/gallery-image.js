@@ -6,8 +6,12 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+/**
+ * Internal dependencies
+ */
+import { GRID_SIZE_SMALL } from '../constants';
 import { Component } from '@wordpress/element';
-import { IconButton, Spinner } from '@wordpress/components';
+import { Box, IconButton, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { withSelect } from '@wordpress/data';
@@ -85,8 +89,23 @@ class GalleryImage extends Component {
 		}
 	}
 
+	calculatePadding() {
+		const { isCompact, isSelected } = this.props;
+
+		if ( isCompact ) {
+			if ( isSelected ) {
+				return 0;
+			}
+			return GRID_SIZE_SMALL / 2;
+		}
+
+		return GRID_SIZE_SMALL;
+	}
+
 	render() {
-		const { url, alt, id, linkTo, link, isFirstItem, isLastItem, isSelected, caption, onRemove, onMoveForward, onMoveBackward, setAttributes, 'aria-label': ariaLabel } = this.props;
+		const { url, alt, id, linkTo, link, isFirstItem, isLastItem, isSelected,
+			caption, onRemove, onMoveForward, onMoveBackward, setAttributes,
+			'aria-label': ariaLabel } = this.props;
 
 		let href;
 
@@ -128,7 +147,16 @@ class GalleryImage extends Component {
 		return (
 			<figure className={ className }>
 				{ href ? <a href={ href }>{ img }</a> : img }
-				<div className="block-library-gallery-item__move-menu">
+				{ /* <div className="block-library-gallery-item__move-menu"> */ }
+				<Box
+					display="inline-flex"
+					padding={ this.calculatePadding() + 'px' }
+					position="absolute"
+					top="-2px"
+					left="-2px"
+					bg={ isSelected ? '#0085ba' : 'inherit' }
+					zIndex={ 20 }
+				>
 					<IconButton
 						icon="arrow-left"
 						onClick={ isFirstItem ? undefined : onMoveBackward }
@@ -145,7 +173,8 @@ class GalleryImage extends Component {
 						aria-disabled={ isLastItem }
 						disabled={ ! isSelected }
 					/>
-				</div>
+				</Box>
+				{ /* </div> */ }
 				<div className="block-library-gallery-item__inline-menu">
 					<IconButton
 						icon="no-alt"
