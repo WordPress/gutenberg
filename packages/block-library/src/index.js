@@ -171,5 +171,7 @@ export const __experimentalRegisterExperimentalCoreBlocks = process.env.GUTENBER
 		__experimentalEnableLegacyWidgetBlock ? legacyWidget : null,
 		__experimentalEnableMenuBlock ? navigationMenu : null,
 		__experimentalEnableMenuBlock ? navigationMenuItem : null,
+		__experimentalEnableLegacyWidgetBlock ? socialLink : null,
+		__experimentalEnableLegacyWidgetBlock ? socialLinks : null,
 	].forEach( registerBlock );
 } : undefined;
