@@ -28,8 +28,8 @@ export const settings = {
 		},
 		innerBlocks: [
 			{
-				name: 'spacer',
-				attribiutes: {
+				name: 'core/spacer',
+				attributes: {
 					height: 100,
 				},
 			},
@@ -42,8 +42,8 @@ export const settings = {
 				},
 			},
 			{
-				name: 'spacer',
-				attribiutes: {
+				name: 'core/spacer',
+				attributes: {
 					height: 100,
 				},
 			},
