@@ -26,7 +26,7 @@ export const settings = {
 	},
 	example: {
 		attributes: {
-			values: '<li>5.2 – Jaco Pastorius</li><li>5.1 – Betty Carter</li><li>5.0 – Bebo Valdés</li>',
+			values: '<li>Alice.</li><li>The White Rabbit.</li><li>The Mouse.</li><li>The Dodo.</li><li>The Lory.</li><li>The Eaglet.</li><li>The Duck.</li><li>The Cheshire Cat.</li><li>The Mad Hatter.</li>',
 		},
 	},
 	transforms,
