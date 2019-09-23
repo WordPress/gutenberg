@@ -252,6 +252,7 @@ export function* saveEntityRecord(
 	yield { type: 'SAVE_ENTITY_RECORD_START', kind, name, recordId, isAutosave };
 	let updatedRecord;
 	let error;
+	let persistedEntity;
 	try {
 		const path = `${ entity.baseURL }${ recordId ? '/' + recordId : '' }`;
 		const persistedRecord = yield select(
@@ -333,6 +334,18 @@ export function* saveEntityRecord(
 			) {
 				data = { ...data, status: 'draft' };
 			}
+
+			// We perform an optimistic update here to clear all the edits that
+			// will be persisted so that if the server filters them, the new
+			// filtered values are always accepted.
+			persistedEntity = yield select(
+				'getEntityRecord',
+				kind,
+				name,
+				recordId
+			);
+			yield receiveEntityRecords( kind, name, { ...persistedEntity, ...data }, undefined, true );
+
 			updatedRecord = yield apiFetch( {
 				path,
 				method: recordId ? 'PUT' : 'POST',
@@ -342,6 +355,13 @@ export function* saveEntityRecord(
 		}
 	} catch ( _error ) {
 		error = _error;
+
+		// If we got to the point in the try block where we made an optimistic update,
+		// we need to roll it back here.
+		if ( persistedEntity ) {
+			yield receiveEntityRecords( kind, name, persistedEntity, undefined, true );
+			yield editEntityRecord( kind, name, recordId, record, { undoIgnore: true } );
+		}
 	}
 	yield {
 		type: 'SAVE_ENTITY_RECORD_FINISH',
