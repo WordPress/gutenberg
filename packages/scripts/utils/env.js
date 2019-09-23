@@ -140,13 +140,16 @@ async function installManagedWordPress() {
  * @param {boolean} newInstall  Flag whether to treat this as a new WordPress install or not.
  * @param {boolean} fastInstall When set, assumes NPM dependencies are already downloaded, and build commands have been run.
  */
-function buildWordPress( newInstall, fastInstall ) {
+async function buildWordPress( newInstall, fastInstall ) {
 	// Mount the plugin into the WordPress install.
 	execSync( 'npm run env connect -- --no-restart', { stdio: 'inherit' } );
 
 	if ( ! fastInstall ) {
 		execSync( 'npm install dotenv wait-on', { cwd: env.WP_DEVELOP_DIR, stdio: 'inherit' } );
 		execSync( 'npm run env:start', { cwd: env.WP_DEVELOP_DIR, stdio: 'inherit' } );
+		await new Promise( ( resolve ) => {
+			setTimeout( resolve, 10000 );
+		} );
 	}
 
 	if ( newInstall ) {
