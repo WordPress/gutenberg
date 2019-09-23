@@ -26,7 +26,6 @@ function TitleInput() {
 			</Button>
 			<RichText
 				tagName="h1"
-				formattingControls={ [] }
 				placeholder={ __( 'Site Title' ) }
 				value={ title }
 				onChange={ setTitle }
