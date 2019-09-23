@@ -28,7 +28,7 @@ export const settings = {
 	example: {
 		attributes: {
 			content: __( 'Code is Poetry' ),
-			level: 1,
+			level: 2,
 		},
 	},
 	transforms,
