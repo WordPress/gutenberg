@@ -22,7 +22,11 @@ export const settings = {
 	icon,
 	example: {
 		attributes: {
-			content: '<p>' + __( 'Welcome to the world of blocks.' ) + '</p>',
+			content: __( '// A "block" is the abstract term used' ) + '\n' +
+			__( '// to describe units of markup that,' ) + '\n' +
+			__( '// when composed together, form the' ) + '\n' +
+			__( '// content or layout of a page.' ) + '\n' +
+			__( 'registerBlockType( name, settings );' ),
 		},
 	},
 	supports: {
