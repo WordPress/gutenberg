@@ -1,13 +1,12 @@
 /**
  * External dependencies
  */
-const { sync: commandExistsSync } = require( 'command-exists' );
+const chalk = require( 'chalk' );
 
 /**
- * Node dependencies.
+ * Node dependencies
  */
-const { execSync } = require( 'child_process' );
-const { env, exit, cwd, stdout } = require( 'process' );
+const { env, exit, stdout } = require( 'process' );
 const { normalize } = require( 'path' );
 const { existsSync } = require( 'fs' );
 
@@ -16,29 +15,24 @@ const { existsSync } = require( 'fs' );
  */
 const {
 	buildWordPress,
-	downloadWordPressZip,
+	getManagedWordPressPath,
+	hasArgInCLI,
+	installManagedWordPress,
 } = require( '../../utils' );
-const { hasArgInCLI } = require( '../../utils' );
 
-env.WP_DEVELOP_DIR = normalize( cwd() + '/wordpress' );
+env.WP_DEVELOP_DIR = getManagedWordPressPath();
 
 if ( hasArgInCLI( '--fast' ) ) {
 	buildWordPress( true, true );
 	return;
 }
 
-if ( existsSync( normalize( cwd() + '/wordpress/wp-config-sample.php' ) ) ) {
-	stdout.write( 'It looks like WordPress is already installed, please delete the `wordpress` directory for a fresh install, or run `npm run env start` to start the existing environment.\n' );
+if ( existsSync( normalize( env.WP_DEVELOP_DIR + '/wp-config.php' ) ) ) {
+	stdout.write( chalk`{white It looks like WordPress is already installed, please run {blue npm run env clean} for a fresh install, or run {blue npm run env start} to start the existing environment.}\n` );
 	exit( 1 );
 }
 
-if ( commandExistsSync( 'git' ) ) {
-	execSync( 'git clone --depth=1 git://develop.git.wordpress.org/ wordpress', { stdio: 'inherit' } );
-	buildWordPress( true, false );
-} else {
-	stdout.write( "Git isn't available. Switching to downloading a zip version.\n" );
-	downloadWordPressZip()
-		.then( () => {
-			buildWordPress( true, false );
-		} );
-}
+installManagedWordPress()
+	.then( () => {
+		buildWordPress( true, false );
+	} );

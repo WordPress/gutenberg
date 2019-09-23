@@ -6,6 +6,7 @@ const request = require( 'request' );
 const DecompressZip = require( 'decompress-zip' );
 const chalk = require( 'chalk' );
 const { sprintf } = require( 'sprintf-js' );
+const getAppDataPath = require( 'appdata-path' );
 
 /**
  * Node dependencies.
@@ -59,12 +60,12 @@ function mergeYAMLConfigs( originalConfig, newConfig, baseDir ) {
 }
 
 /**
- * Downloads and extracts WordPress from the GitHub repo zip file.
- *
- * @return {Promise} A promise that resolves when WordPress has been downloaded and extracted.
+ * Installs the latest version of the WordPress nightly build in the managed WordPress directory.
  */
-function downloadWordPressZip() {
-	return new Promise( ( resolve ) => {
+async function installManagedWordPress() {
+	execSync( 'docker run -it --rm --volume "' + getManagedWordPressPath() + ':/var/www" wordpressdevelop/cli core download --path=/var/www/src --version=nightly --force', { stdio: 'inherit' } );
+
+	await new Promise( ( resolve ) => {
 		const tmpZip = normalize( tmpdir() + '/wordpress-develop.zip' );
 		const tmpZipWriter = createWriteStream( tmpZip );
 
@@ -83,9 +84,39 @@ function downloadWordPressZip() {
 			stdout.write( 'Extracting...\n' );
 
 			unzipper.extract( {
-				path: env.WP_DEVELOP_DIR,
+				path: getManagedWordPressPath(),
 				strip: 1,
-				filter: ( file ) => file.type !== 'Directory',
+				filter: ( file ) => {
+					if ( file.type === 'Directory' ) {
+						return false;
+					}
+
+					const allowedFolders = [
+						'tools',
+						'tests',
+					];
+					const allowedFiles = [
+						'.env',
+						'docker-compose.yml',
+						'package.json',
+						'wp-cli.yml',
+						'wp-tests-config-sample.php',
+					];
+
+					const path = file.path.replace( /[^\/]+\//, '' );
+
+					if ( allowedFiles.includes( path ) ) {
+						return true;
+					}
+
+					return allowedFolders.reduce( ( allowCopy, folder ) => {
+						if ( allowCopy ) {
+							return allowCopy;
+						}
+
+						return path.startsWith( folder + '/' );
+					}, false );
+				},
 			} );
 		} );
 
@@ -109,22 +140,17 @@ function downloadWordPressZip() {
  * @param {boolean} fastInstall When set, assumes NPM dependencies are already downloaded, and build commands have been run.
  */
 function buildWordPress( newInstall, fastInstall ) {
+	// Mount the plugin into the WordPress install.
+	execSync( 'npm run env connect -- --no-restart', { stdio: 'inherit' } );
+
 	if ( ! fastInstall ) {
-		execSync( 'npm install', { cwd: env.WP_DEVELOP_DIR, stdio: 'inherit' } );
+		execSync( 'npm install dotenv wait-on', { cwd: env.WP_DEVELOP_DIR, stdio: 'inherit' } );
 		execSync( 'npm run env:start', { cwd: env.WP_DEVELOP_DIR, stdio: 'inherit' } );
-		if ( env.LOCAL_DIR === 'build' ) {
-			execSync( 'npm run build', { cwd: env.WP_DEVELOP_DIR, stdio: 'inherit' } );
-		} else {
-			execSync( 'npm run build:dev', { cwd: env.WP_DEVELOP_DIR, stdio: 'inherit' } );
-		}
 	}
 
 	if ( newInstall ) {
 		execSync( 'npm run env:install', { cwd: env.WP_DEVELOP_DIR, stdio: 'inherit' } );
 	}
-
-	// Mount the plugin into the WordPress install.
-	execSync( 'npm run env connect', { stdio: 'inherit' } );
 
 	if ( newInstall ) {
 		execSync( `npm run env cli plugin activate ${ env.npm_package_wp_env_plugin_dir }`, { stdio: 'inherit' } );
@@ -158,8 +184,18 @@ function buildWordPress( newInstall, fastInstall ) {
 	}
 }
 
+/**
+ * Returns the path to the managed WordPress install.
+ *
+ * @return {string} The path to WordPress.
+ */
+function getManagedWordPressPath() {
+	return normalize( getAppDataPath() + '/wordpress-local-env' );
+}
+
 module.exports = {
 	buildWordPress,
-	downloadWordPressZip,
+	getManagedWordPressPath,
+	installManagedWordPress,
 	mergeYAMLConfigs,
 };

@@ -16,6 +16,7 @@ const { execSync } = require( 'child_process' );
  */
 const {
 	fromConfigRoot,
+	hasArgInCLI,
 	mergeYAMLConfigs,
 } = require( '../../utils' );
 
@@ -71,7 +72,9 @@ const mergedCompose = mergeYAMLConfigs( compose, pluginCompose, pluginMountDir )
 
 writeFileSync( composeFile, yaml.safeDump( mergedCompose, { lineWidth: -1 } ) );
 
-stdout.write( 'Restarting the WordPress environment...\n' );
+if ( ! hasArgInCLI( '--no-restart' ) ) {
+	stdout.write( 'Restarting the WordPress environment...\n' );
 
-execSync( 'npm run env:stop', { cwd: env.WP_DEVELOP_DIR, stdio: 'inherit' } );
-execSync( 'npm run env:start', { cwd: env.WP_DEVELOP_DIR, stdio: 'inherit' } );
+	execSync( 'npm run env:stop', { cwd: env.WP_DEVELOP_DIR, stdio: 'inherit' } );
+	execSync( 'npm run env:start', { cwd: env.WP_DEVELOP_DIR, stdio: 'inherit' } );
+}

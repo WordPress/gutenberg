@@ -17,6 +17,8 @@ const {
 const {
 	buildWordPress,
 	downloadWordPressZip,
+	getManagedWordPressPath,
+	installManagedWordPress,
 	mergeYAMLConfigs,
 } = require( './env' );
 const {
@@ -37,6 +39,7 @@ module.exports = {
 	getArgFromCLI,
 	getArgsFromCLI,
 	getFileArgsFromCLI,
+	getManagedWordPressPath,
 	getWebpackArgs,
 	hasBabelConfig,
 	hasArgInCLI,
@@ -44,6 +47,7 @@ module.exports = {
 	hasJestConfig,
 	hasPackageProp,
 	hasProjectFile,
+	installManagedWordPress,
 	downloadWordPressZip,
 	mergeYAMLConfigs,
 	spawnScript,
