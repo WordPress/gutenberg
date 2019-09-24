@@ -48,7 +48,10 @@ function ScaledBlockPreview( { blocks, viewportWidth, padding = 0, onReady } ) {
 				return;
 			}
 
-			let scale, position;
+			// Auxiliary vars used for onReady() callback.
+			let scale,
+				_x = 0,
+				_y = 0;
 
 			// If we're previewing a single block, scale the preview to fit it.
 			if ( blocks.length === 1 ) {
@@ -84,10 +87,11 @@ function ScaledBlockPreview( { blocks, viewportWidth, padding = 0, onReady } ) {
 						  padding
 						: 0;
 
-				position = { x: offsetX * scale, y: offsetY };
+				_x = offsetX * scale;
+				_y = offsetY;
 
 				setPreviewScale( scale );
-				setPosition( { x: offsetX, y: offsetY } );
+				setPosition( { x: _x, y: _y } );
 
 				// Hack: we need  to reset the scaled elements margins
 				previewElement.style.marginTop = '0';
@@ -100,15 +104,9 @@ function ScaledBlockPreview( { blocks, viewportWidth, padding = 0, onReady } ) {
 			setIsReady( true );
 			onReady( {
 				scale,
-				position,
+				position: { x: _x, y: _y },
 				previewContainerRef: previewRef,
-				styles: getOnlineStyles(
-					scale,
-					position.x,
-					position.y,
-					true,
-					viewportWidth
-				),
+				styles: getOnlineStyles( scale, _x, _y, true, viewportWidth ),
 			} );
 		}, 100 );
 
