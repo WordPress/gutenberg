@@ -39,7 +39,10 @@ Use this callback as an opportunity to know when the preview is ready. The callb
 ```es6
 
 <BlockPreview
-	__experimentalOnReady={ ( { scale } ) => console.log( `Current preview scale: ${ scale }` )
 	blocks={ blocks }
+	__experimentalOnReady={ ( { scale, previewContainerRef, position } ) => {
+		console.log( `scale ${ scale } applied to the <${ previewContainerRef.current.tagName }> element.` );
+		console.log( `at x: ${ position.x }, y: ${ position.y } position.` );
+	} }
 />
 ```
