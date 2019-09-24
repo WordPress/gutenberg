@@ -8,7 +8,9 @@ function isList( node ) {
 }
 
 function shallowTextContent( element ) {
-	return [ ...element.childNodes ]
+	// On mobile DOM implmentation NodeList is not spreadable so we need to convert it to an array.
+	const nodesArray = Array.prototype.slice.call( element.childNodes );
+	return nodesArray
 		.map( ( { nodeValue = '' } ) => nodeValue )
 		.join( '' );
 }
