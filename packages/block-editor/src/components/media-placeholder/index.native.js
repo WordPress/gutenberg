@@ -78,7 +78,7 @@ function MediaPlaceholder( props ) {
 					</Text>
 				</>
 			);
-		} else if ( isAppender && disableMediaButtons ) {
+		} else if ( isAppender && ! disableMediaButtons ) {
 			return (
 				<Dashicon
 					icon="plus-alt"
@@ -90,7 +90,7 @@ function MediaPlaceholder( props ) {
 		}
 	};
 
-	if ( isAppender && ! disableMediaButtons ) {
+	if ( isAppender && disableMediaButtons ) {
 		return null;
 	}
 

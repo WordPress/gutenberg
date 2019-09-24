@@ -93,7 +93,7 @@ If true, only the Drop Zone will be rendered. No UI controls to upload the media
 
 - Type: `Boolean`
 - Required: No
-- Default: false
+- Default: `false`
 - Platform: Web | Mobile
 
 ### labels
