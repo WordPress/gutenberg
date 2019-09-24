@@ -55,6 +55,7 @@ With the script enqueued, let's look at the implementation of the block itself:
 		title: 'Example: Basic',
 		icon: 'universal-access-alt',
 		category: 'layout',
+		example: {},
 		edit: function() {
 			return el(
 				'p',
@@ -89,6 +90,7 @@ registerBlockType( 'gutenberg-examples/example-01-basic-esnext', {
 	title: 'Example: Basic (esnext)',
 	icon: 'universal-access-alt',
 	category: 'layout',
+	example: {},
 	edit() {
 		return <div style={ blockStyle }>Hello World, step 1 (from the editor).</div>;
 	},

@@ -49,7 +49,6 @@ import BlockInsertionPoint from './insertion-point';
 import IgnoreNestedEvents from '../ignore-nested-events';
 import InserterWithShortcuts from '../inserter-with-shortcuts';
 import Inserter from '../inserter';
-import useHoveredArea from './hover-area';
 import { isInsideRootBlock } from '../../utils/dom';
 import useMovingAnimation from './moving-animation';
 
@@ -81,7 +80,6 @@ function BlockListBlock( {
 	isParentOfSelectedBlock,
 	isDraggable,
 	isSelectionEnabled,
-	isRTL,
 	className,
 	name,
 	isValid,
@@ -116,9 +114,6 @@ function BlockListBlock( {
 
 	// Reference to the block edit node
 	const blockNodeRef = useRef();
-
-	// Hovered area of the block
-	const hoverArea = useHoveredArea( wrapper );
 
 	const breadcrumb = useRef();
 
@@ -404,7 +399,7 @@ function BlockListBlock( {
 	// We render block movers and block settings to keep them tabbale even if hidden
 	const shouldRenderMovers =
 		! isNavigationMode &&
-		( isSelected || hoverArea === ( isRTL ? 'right' : 'left' ) ) &&
+		isSelected &&
 		! showEmptyBlockSideInserter &&
 		! isPartOfMultiSelection &&
 		! isTypingWithinBlock;
@@ -523,7 +518,7 @@ function BlockListBlock( {
 					<BlockMover
 						clientIds={ clientId }
 						blockElementId={ blockElementId }
-						isHidden={ ! ( isHovered || isSelected ) || hoverArea !== ( isRTL ? 'right' : 'left' ) }
+						isHidden={ ! isSelected }
 						isDraggable={
 							isDraggable !== false &&
 							( ! isPartOfMultiSelection && isMovable )

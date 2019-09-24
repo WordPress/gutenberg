@@ -14,6 +14,7 @@ The editor will automatically generate a class name for each block type to simpl
 		title: 'Example: Stylesheets',
 		icon: 'universal-access-alt',
 		category: 'layout',
+		example: {},
 		edit: function( props ) {
 			return el(
 				'p',
@@ -44,6 +45,8 @@ registerBlockType( 'gutenberg-examples/example-02-stylesheets', {
 	icon: 'universal-access-alt',
 
 	category: 'layout',
+
+	example: {},
 
 	edit( { className } ) {
 		return <p className={ className }>Hello World, step 2 (from the editor, in green).</p>;

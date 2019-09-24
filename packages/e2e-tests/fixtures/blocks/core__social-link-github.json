@@ -1,0 +1,13 @@
+[
+    {
+        "clientId": "_clientId_0",
+        "name": "core/social-link-github",
+        "isValid": true,
+        "attributes": {
+            "url": "https://example.com/",
+            "site": "github"
+        },
+        "innerBlocks": [],
+        "originalContent": ""
+    }
+]

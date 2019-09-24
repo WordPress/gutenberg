@@ -235,6 +235,8 @@ export const getPostEdits = createRegistrySelector( ( select ) => ( state ) => {
  * inferring where an edit has been made between states by comparison of the
  * return values using strict equality.
  *
+ * @deprecated since Gutenberg 6.5.0.
+ *
  * @example
  *
  * ```
@@ -248,9 +250,14 @@ export const getPostEdits = createRegistrySelector( ( select ) => ( state ) => {
  *
  * @return {*} A value whose reference will change only when an edit occurs.
  */
-export const getReferenceByDistinctEdits = createSelector(
-	() => [],
-	( state ) => [ state.editor ],
+export const getReferenceByDistinctEdits = createRegistrySelector(
+	( select ) => ( /* state */ ) => {
+		deprecated( '`wp.data.select( \'core/editor\' ).getReferenceByDistinctEdits`', {
+			alternative: '`wp.data.select( \'core\' ).getReferenceByDistinctEdits`',
+		} );
+
+		return select( 'core' ).getReferenceByDistinctEdits();
+	}
 );
 
 /**
@@ -532,6 +539,11 @@ export function isEditedPostEmpty( state ) {
 export const isEditedPostAutosaveable = createRegistrySelector( ( select ) => function( state ) {
 	// A post must contain a title, an excerpt, or non-empty content to be valid for autosaving.
 	if ( ! isEditedPostSaveable( state ) ) {
+		return false;
+	}
+
+	// A post is not autosavable when there is a post autosave lock.
+	if ( isPostAutosavingLocked( state ) ) {
 		return false;
 	}
 
@@ -1098,6 +1110,17 @@ export function isPostLocked( state ) {
  */
 export function isPostSavingLocked( state ) {
 	return Object.keys( state.postSavingLock ).length > 0;
+}
+
+/**
+ * Returns whether post autosaving is locked.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Is locked.
+ */
+export function isPostAutosavingLocked( state ) {
+	return Object.keys( state.postAutosavingLock ).length > 0;
 }
 
 /**

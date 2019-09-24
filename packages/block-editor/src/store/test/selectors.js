@@ -1934,19 +1934,21 @@ describe( 'selectors', () => {
 		it( 'should properly list block type and reusable block items', () => {
 			const state = {
 				blocks: {
-					byClientId: {
-						block1: { name: 'core/test-block-a' },
-					},
-					attributes: {
-						block1: {},
-					},
+					byClientId: {},
+					attributes: {},
 					order: {},
 					parents: {},
 					cache: {},
 				},
 				settings: {
 					__experimentalReusableBlocks: [
-						{ id: 1, isTemporary: false, clientId: 'block1', title: 'Reusable Block 1' },
+						{
+							id: 1,
+							isTemporary: false,
+							clientId: 'block1',
+							title: 'Reusable Block 1',
+							content: '<!-- /wp:test-block-a -->',
+						},
 					],
 				},
 				// Intentionally include a test case which considers
@@ -1989,155 +1991,31 @@ describe( 'selectors', () => {
 			} );
 		} );
 
-		it( 'should not list a reusable block item if it is being inserted inside it self', () => {
-			const state = {
-				blocks: {
-					byClientId: {
-						block1ref: {
-							name: 'core/block',
-							clientId: 'block1ref',
-						},
-						itselfBlock1: { name: 'core/test-block-a' },
-						itselfBlock2: { name: 'core/test-block-b' },
-					},
-					attributes: {
-						block1ref: {
-							attributes: {
-								ref: 1,
-							},
-						},
-						itselfBlock1: {},
-						itselfBlock2: {},
-					},
-					order: {
-						'': [ 'block1ref' ],
-					},
-					parents: {
-						block1ref: '',
-					},
-					cache: {
-						block1ref: {},
-					},
-				},
-				settings: {
-					__experimentalReusableBlocks: [
-						{ id: 1, isTemporary: false, clientId: 'itselfBlock1', title: 'Reusable Block 1' },
-						{ id: 2, isTemporary: false, clientId: 'itselfBlock2', title: 'Reusable Block 2' },
-					],
-				},
-				preferences: {
-					insertUsage: {},
-				},
-				blockListSettings: {},
-			};
-			const items = getInserterItems( state, 'itselfBlock1' );
-			const reusableBlockItems = filter( items, [ 'name', 'core/block' ] );
-			expect( reusableBlockItems ).toHaveLength( 1 );
-			expect( reusableBlockItems[ 0 ] ).toEqual( {
-				id: 'core/block/2',
-				name: 'core/block',
-				initialAttributes: { ref: 2 },
-				title: 'Reusable Block 2',
-				icon: {
-					src: 'test',
-				},
-				category: 'reusable',
-				keywords: [],
-				isDisabled: false,
-				utility: 0,
-				frecency: 0,
-			} );
-		} );
-
-		it( 'should not list a reusable block item if it is being inserted inside a descendent', () => {
-			const state = {
-				blocks: {
-					byClientId: {
-						block2ref: {
-							name: 'core/block',
-							clientId: 'block1ref',
-						},
-						referredBlock1: { name: 'core/test-block-a' },
-						referredBlock2: { name: 'core/test-block-b' },
-						childReferredBlock2: { name: 'core/test-block-a' },
-						grandchildReferredBlock2: { name: 'core/test-block-b' },
-					},
-					attributes: {
-						block2ref: {
-							attributes: {
-								ref: 2,
-							},
-						},
-						referredBlock1: {},
-						referredBlock2: {},
-						childReferredBlock2: {},
-						grandchildReferredBlock2: {},
-					},
-					order: {
-						'': [ 'block2ref' ],
-						referredBlock2: [ 'childReferredBlock2' ],
-						childReferredBlock2: [ 'grandchildReferredBlock2' ],
-					},
-					parents: {
-						block2ref: '',
-						childReferredBlock2: 'referredBlock2',
-						grandchildReferredBlock2: 'childReferredBlock2',
-					},
-					cache: {
-						block2ref: {},
-						childReferredBlock2: {},
-						grandchildReferredBlock2: {},
-					},
-				},
-
-				settings: {
-					__experimentalReusableBlocks: [
-						{ id: 1, isTemporary: false, clientId: 'referredBlock1', title: 'Reusable Block 1' },
-						{ id: 2, isTemporary: false, clientId: 'referredBlock2', title: 'Reusable Block 2' },
-					],
-				},
-				preferences: {
-					insertUsage: {},
-				},
-				blockListSettings: {},
-			};
-			const items = getInserterItems( state, 'grandchildReferredBlock2' );
-			const reusableBlockItems = filter( items, [ 'name', 'core/block' ] );
-			expect( reusableBlockItems ).toHaveLength( 1 );
-			expect( reusableBlockItems[ 0 ] ).toEqual( {
-				id: 'core/block/1',
-				name: 'core/block',
-				initialAttributes: { ref: 1 },
-				title: 'Reusable Block 1',
-				icon: {
-					src: 'test',
-				},
-				category: 'reusable',
-				keywords: [],
-				isDisabled: false,
-				utility: 0,
-				frecency: 0,
-			} );
-		} );
 		it( 'should order items by descending utility and frecency', () => {
 			const state = {
 				blocks: {
-					byClientId: {
-						block1: { name: 'core/test-block-a' },
-						block2: { name: 'core/test-block-a' },
-					},
-					attributes: {
-						block1: {},
-						block2: {},
-					},
+					byClientId: {},
+					attributes: {},
 					order: {},
 					parents: {},
 					cache: {},
 				},
 				settings: {
 					__experimentalReusableBlocks: [
-						{ id: 1, isTemporary: false, clientId: 'block1', title: 'Reusable Block 1' },
-						{ id: 2, isTemporary: false, clientId: 'block2', title: 'Reusable Block 2' },
+						{
+							id: 1,
+							isTemporary: false,
+							clientId: 'block1',
+							title: 'Reusable Block 1',
+							content: '<!-- /wp:test-block-a -->',
+						},
+						{
+							id: 2,
+							isTemporary: false,
+							clientId: 'block2',
+							title: 'Reusable Block 2',
+							content: '<!-- /wp:test-block-b -->',
+						},
 					],
 				},
 				preferences: {
@@ -2162,14 +2040,10 @@ describe( 'selectors', () => {
 			const state = {
 				blocks: {
 					byClientId: {
-						block1: { name: 'core/test-block-a' },
-						block2: { name: 'core/test-block-a' },
 						block3: { name: 'core/test-block-a' },
 						block4: { name: 'core/test-block-a' },
 					},
 					attributes: {
-						block1: {},
-						block2: {},
 						block3: {},
 						block4: {},
 					},
@@ -2181,16 +2055,26 @@ describe( 'selectors', () => {
 						block4: '',
 					},
 					cache: {
-						block1: {},
-						block2: {},
 						block3: {},
 						block4: {},
 					},
 				},
 				settings: {
 					__experimentalReusableBlocks: [
-						{ id: 1, isTemporary: false, clientId: 'block1', title: 'Reusable Block 1' },
-						{ id: 2, isTemporary: false, clientId: 'block2', title: 'Reusable Block 2' },
+						{
+							id: 1,
+							isTemporary: false,
+							clientId: 'block1',
+							title: 'Reusable Block 1',
+							content: '<!-- /wp:test-block-a -->',
+						},
+						{
+							id: 2,
+							isTemporary: false,
+							clientId: 'block2',
+							title: 'Reusable Block 2',
+							content: '<!-- /wp:test-block-b -->',
+						},
 					],
 				},
 				preferences: {

@@ -170,6 +170,21 @@ describe( 'Change detection', () => {
 		await assertIsDirty( false );
 	} );
 
+	it( 'Should not prompt if changes saved right after typing', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'Hello World' );
+
+		await Promise.all( [
+			// Wait for "Saved" to confirm save complete.
+			page.waitForSelector( '.editor-post-saved-state.is-saved' ),
+
+			// Keyboard shortcut Ctrl+S save.
+			pressKeyWithModifier( 'primary', 'S' ),
+		] );
+
+		await assertIsDirty( false );
+	} );
+
 	it( 'Should not save if all changes saved', async () => {
 		await page.type( '.editor-post-title__input', 'Hello World' );
 
