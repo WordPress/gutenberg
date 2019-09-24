@@ -15,7 +15,6 @@ module.exports = {
 	verbose: true,
 	// Automatically clear mock calls and instances between every test
 	clearMocks: true,
-	timers: 'fake',
 	preset: 'react-native',
 	setupFiles: [
 		'<rootDir>/gutenberg/test/native/setup.js',

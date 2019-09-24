@@ -21,6 +21,7 @@ describe( 'RootComponent', () => {
 	beforeAll( initializeEditor );
 
 	it( 'renders without crashing', () => {
+		jest.useFakeTimers();
 		const app = renderer.create( <RootComponent /> );
 		renderer.act( () => {
 			jest.runAllTicks();
