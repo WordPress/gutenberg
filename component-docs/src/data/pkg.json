@@ -1,6 +1,6 @@
 {
   "name": "@wordpress/components",
-  "version": "8.1.0",
+  "version": "8.3.0",
   "description": "UI components for WordPress.",
   "homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/components/README.md",
   "repository": {

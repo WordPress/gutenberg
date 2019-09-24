@@ -24,3 +24,4 @@ yarn-debug.log*
 yarn-error.log*
 
 package-lock.json
+component-docs/src/data/pkg.json
