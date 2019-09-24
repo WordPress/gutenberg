@@ -7,13 +7,14 @@ import {
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { Dropdown, IconButton } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, ifCondition } from '@wordpress/compose';
 import {
 	createBlock,
+	getBlockType,
 } from '@wordpress/blocks';
 
 /**
@@ -21,8 +22,8 @@ import {
  */
 import InserterMenu from './menu';
 
-const defaultRenderToggle = ( { onToggle, disabled, isOpen, blockName = 'block' } ) => {
-	const label = `${ __( 'Add' ) } ${ blockName }`;
+const defaultRenderToggle = ( { onToggle, disabled, isOpen, blockTitle } ) => {
+	const label = sprintf( _x( 'Add %s', 'directly add the allowed block' ), blockTitle );
 	return (
 		<IconButton
 			icon="insert"
@@ -69,7 +70,7 @@ class Inserter extends Component {
 		const {
 			disabled,
 			hasOneAllowedItem,
-			blockName,
+			blockTitle,
 			createIfOne,
 			renderToggle = defaultRenderToggle,
 		} = this.props;
@@ -78,7 +79,7 @@ class Inserter extends Component {
 			onToggle = createIfOne;
 		}
 
-		return renderToggle( { onToggle, isOpen, disabled, blockName } );
+		return renderToggle( { onToggle, isOpen, disabled, blockTitle } );
 	}
 
 	/**
@@ -125,12 +126,12 @@ class Inserter extends Component {
 
 export default compose( [
 	withSelect( ( select, { rootClientId } ) => {
-		const { hasInserterItems, hasOneAllowedItem, getOneAllowedItemName } = select( 'core/block-editor' );
-
+		const { hasInserterItems, hasOneAllowedItem, getOneAllowedItem } = select( 'core/block-editor' );
+		const allowedBlock = getBlockType( getOneAllowedItem( rootClientId ) );
 		return {
 			hasItems: hasInserterItems( rootClientId ),
 			hasOneAllowedItem: hasOneAllowedItem( rootClientId ),
-			blockName: getOneAllowedItemName( rootClientId ),
+			blockTitle: allowedBlock ? allowedBlock.title : '',
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {

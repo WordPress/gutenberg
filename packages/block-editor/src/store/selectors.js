@@ -1286,6 +1286,7 @@ export const hasInserterItems = createSelector(
 
 /**
  * Determines whether there is only one item that may be inserted.
+ *
  * @param {Object}  state        Editor state.
  * @param {?string} rootClientId Optional root client ID of block list.
  *
@@ -1302,29 +1303,29 @@ export const hasOneAllowedItem = ( state, rootClientId = null ) => {
 
 /**
  * Determines whether there is only one item that may be inserted.
+ *
  * @param {Object}  state        Editor state.
  * @param {?string} rootClientId Optional root client ID of block list.
  *
  * @return {string} The name of the allowed block.
  */
-export const getOneAllowedItemName = ( state, rootClientId = null ) => {
-	if ( rootClientId ) {
-		const parentBlockListSettings = getBlockListSettings( state, rootClientId );
-
-		if ( get( parentBlockListSettings, [ 'allowedBlocks', 'length' ], 0 ) === 1 ) {
-			let name = get( parentBlockListSettings, [ 'allowedBlocks' ] )[ 0 ];
-			name = name.split( '/' )[ 1 ].replace( '-', ' ' );
-			return name;
-		}
-
+export const getOneAllowedItem = ( state, rootClientId = null ) => {
+	if ( ! rootClientId ) {
+		return false;
+	}
+	if ( ! hasOneAllowedItem( state, rootClientId ) ) {
 		return false;
 	}
 
-	return false;
+	const parentBlockListSettings = getBlockListSettings( state, rootClientId );
+	const name = get( parentBlockListSettings, [ 'allowedBlocks', 0 ], 0 );
+
+	return name;
 };
 
 /**
  * Determines whether there is only one item that may be inserted.
+ *
  * @param {Object}  state           		Editor state.
  * @param {?string} clientId 				Block client ID.
  * @param {?string} destinationRootClientId Root client ID of block list.

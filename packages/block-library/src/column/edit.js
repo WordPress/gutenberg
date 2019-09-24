@@ -68,7 +68,6 @@ function ColumnEdit( {
 				</PanelBody>
 			</InspectorControls>
 			<InnerBlocks
-				allowedBlocks={ [ 'core/paragraph' ] }
 				templateLock={ false }
 				renderAppender={ (
 					hasChildBlocks ?
