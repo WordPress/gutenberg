@@ -253,6 +253,7 @@ export function* saveEntityRecord(
 	let updatedRecord;
 	let error;
 	let persistedEntity;
+	let currentEdits;
 	try {
 		const path = `${ entity.baseURL }${ recordId ? '/' + recordId : '' }`;
 		const persistedRecord = yield select(
@@ -344,6 +345,12 @@ export function* saveEntityRecord(
 				name,
 				recordId
 			);
+			currentEdits = yield select(
+				'getEntityRecordEdits',
+				kind,
+				name,
+				recordId
+			);
 			yield receiveEntityRecords( kind, name, { ...persistedEntity, ...data }, undefined, true );
 
 			updatedRecord = yield apiFetch( {
@@ -358,9 +365,9 @@ export function* saveEntityRecord(
 
 		// If we got to the point in the try block where we made an optimistic update,
 		// we need to roll it back here.
-		if ( persistedEntity ) {
+		if ( persistedEntity && currentEdits ) {
 			yield receiveEntityRecords( kind, name, persistedEntity, undefined, true );
-			yield editEntityRecord( kind, name, recordId, record, { undoIgnore: true } );
+			yield editEntityRecord( kind, name, recordId, currentEdits, { undoIgnore: true } );
 		}
 	}
 	yield {
