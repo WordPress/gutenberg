@@ -156,9 +156,9 @@ describe( 'autosave', () => {
 
 		await Promise.all( [
 			// Force remote autosave to occur immediately
-			await page.evaluate( () => window.wp.data.dispatch( 'core/editor' ).autosave() ),
+			page.evaluate( () => window.wp.data.dispatch( 'core/editor' ).autosave() ),
 			// Meanwhile, wait for local autosave
-			await sleep( AUTOSAVE_INTERVAL_SECONDS + 1 ),
+			sleep( AUTOSAVE_INTERVAL_SECONDS + 2 ),
 		] );
 
 		await page.reload();
