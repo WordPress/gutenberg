@@ -2,7 +2,7 @@
 	align-items: center;
 	flex-direction: row;
 	justify-content: space-between;
-	height: 44;
+	height: 50;
 }
 
 .itemContainer {
@@ -10,8 +10,23 @@
 	flex-direction: row;
 }
 
+.title {
+	flex: 1;
+	padding-right: 25;
+	color: $dark-gray-600;
+	font-size: 17px;
+}
+
 .iconContainer {
-	width: 28;
+	width: 32;
+}
+
+.blockIcon {
+	color: $dark-gray-600;
+}
+
+.subdirectoryIcon {
+	color: $light-gray-700;
 }
 
 .flatlist {
@@ -19,5 +34,7 @@
 }
 
 .selectedIcon {
+	position: absolute;
+	right: 0;
 	color: $blue-wordpress;
 }

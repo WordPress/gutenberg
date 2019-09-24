@@ -5,6 +5,7 @@ import { BottomSheet, Icon } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { getBlockType } from '@wordpress/blocks';
+import { create } from '@wordpress/rich-text';
 
 /**
  * External dependencies
@@ -33,6 +34,8 @@ const DocumentOutline = ( { isVisible, onClose, onSelect, clientId, blockList, s
 			) }
 			renderItem={ ( { item } ) => {
 				const blockType = getBlockType( item.name );
+				const title = getTitle( item, blockType.title );
+
 				return (
 					<TouchableOpacity
 						style={ { paddingLeft: Math.max( item.level - 1, 0 ) * styles.iconContainer.width } }
@@ -43,12 +46,12 @@ const DocumentOutline = ( { isVisible, onClose, onSelect, clientId, blockList, s
 					>
 						<View style={ styles.rowContainer }>
 							<View style={ styles.itemContainer }>
-								{ ( item.level > 0 ) && <View style={ styles.iconContainer }><Icon size={ 18 } icon="subdirectory" /></View> }
-								<View style={ styles.iconContainer }><Icon size={ 18 } icon={ blockType.icon.src } /></View>
-								<Text>{ blockType.title }</Text>
+								{ ( item.level > 0 ) && <View style={ styles.iconContainer }><Icon size={ 22 } icon="subdirectory" fill={ styles.subdirectoryIcon.color } /></View> }
+								<View style={ styles.iconContainer }><Icon size={ 24 } icon={ blockType.icon.src } fill={ styles.blockIcon.color } /></View>
+								<Text style={ styles.title } ellipsizeMode="tail" numberOfLines={ 1 }>{ title }</Text>
 							</View>
 							{ item.clientId === clientId &&
-							( <Icon icon="saved" fill={ styles.selectedIcon.color } size={ 20 } /> ) }
+							( <Icon style={ styles.selectedIcon } icon="saved" size={ 24 } fill={ styles.selectedIcon.color } /> ) }
 						</View>
 					</TouchableOpacity>
 				);
@@ -57,6 +60,24 @@ const DocumentOutline = ( { isVisible, onClose, onSelect, clientId, blockList, s
 		/>
 	</BottomSheet>
 );
+
+const isTextBlock = ( blockName ) => blockName === 'core/heading' || blockName === 'core/paragraph';
+const isQuote = ( blockName ) => blockName === 'core/quote';
+const getTitle = ( item, blockTitle ) => {
+	if ( isTextBlock( item.name ) ) {
+		const { text } = create( {
+			html: item.attributes.content,
+		} );
+		return text;
+	}
+	if ( isQuote( item.name ) ) {
+		const { text } = create( {
+			html: item.attributes.value,
+		} );
+		return text;
+	}
+	return blockTitle;
+};
 
 const flatBlocks = ( blocks = [] ) => flattenDeep( flat( blocks, 0 ) );
 
