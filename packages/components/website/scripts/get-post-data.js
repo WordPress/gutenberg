@@ -5,7 +5,7 @@ const mkdirp = require( 'mkdirp' );
 const remark = require( 'remark' );
 const visit = require( 'unist-util-visit' );
 
-const localDocsDir = path.resolve( __dirname, '../../packages/components/src' );
+const localDocsDir = path.resolve( __dirname, '../../src' );
 const localDocs = path.join( localDocsDir, '/*/*.md' );
 const localIndexDocs = path.join( localDocsDir, '/*.md' );
 const dataDestDir = path.resolve( __dirname, '../public/_data' );

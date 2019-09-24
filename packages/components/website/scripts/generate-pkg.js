@@ -2,7 +2,7 @@ const fs = require( 'fs' );
 const path = require( 'path' );
 const mkdirp = require( 'mkdirp' );
 
-const localDocsDir = path.resolve( __dirname, '../../packages/components/' );
+const localDocsDir = path.resolve( __dirname, '../../' );
 const localPkg = path.join( localDocsDir, '/package.json' );
 const destDir = path.resolve( __dirname, '../src/data' );
 const destFile = path.join( destDir, 'pkg.json' );

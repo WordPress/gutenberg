@@ -7,9 +7,8 @@ import ReactDOM from 'react-dom';
 /**
  * WordPress dependencies
  */
-/*eslint-disable */
+// eslint-disable-next-line no-restricted-syntax
 import '@wordpress/components/build-style/style.css';
-/*eslint-enable */
 
 /**
  * Internal dependencies

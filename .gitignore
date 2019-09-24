@@ -13,6 +13,7 @@ yarn.lock
 /wordpress
 
 playground/dist
+packages/components/website/build
 .cache
 
 # Report generated from jest-junit

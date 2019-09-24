@@ -1,4 +1,4 @@
-/*eslint-disable */
+/* eslint-disable no-bitwise */
 export function toHash( s ) {
 	let a = 1,
 		c = 0,
@@ -15,4 +15,4 @@ export function toHash( s ) {
 	}
 	return String( a );
 }
-/*eslint-enable */
+/* eslint-enable no-bitwise */
