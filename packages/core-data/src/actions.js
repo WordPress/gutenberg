@@ -367,7 +367,16 @@ export function* saveEntityRecord(
 		// we need to roll it back here.
 		if ( persistedEntity && currentEdits ) {
 			yield receiveEntityRecords( kind, name, persistedEntity, undefined, true );
-			yield editEntityRecord( kind, name, recordId, currentEdits, { undoIgnore: true } );
+			yield editEntityRecord(
+				kind,
+				name,
+				recordId,
+				{
+					...currentEdits,
+					...( yield select( 'getEntityRecordEdits', kind, name, recordId ) ),
+				},
+				{ undoIgnore: true }
+			);
 		}
 	}
 	yield {
