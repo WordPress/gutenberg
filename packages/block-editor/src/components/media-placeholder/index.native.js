@@ -8,7 +8,7 @@ import { View, Text, TouchableWithoutFeedback } from 'react-native';
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { MediaUpload, MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO } from '@wordpress/block-editor';
-import { withTheme } from '@wordpress/components';
+import { withPreferredColorScheme } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -16,7 +16,7 @@ import { withTheme } from '@wordpress/components';
 import styles from './styles.scss';
 
 function MediaPlaceholder( props ) {
-	const { allowedTypes = [], labels = {}, icon, onSelect, useStyle } = props;
+	const { allowedTypes = [], labels = {}, icon, onSelect, getStylesFromColorScheme } = props;
 
 	const isOneType = allowedTypes.length === 1;
 	const isImage = isOneType && allowedTypes.includes( MEDIA_TYPE_IMAGE );
@@ -48,8 +48,8 @@ function MediaPlaceholder( props ) {
 		accessibilityHint = __( 'Double tap to select a video' );
 	}
 
-	const emptyStateContainerStyle = useStyle( styles.emptyStateContainer, styles.emptyStateContainerDark );
-	const emptyStateTitleStyle = useStyle( styles.emptyStateTitle, styles.emptyStateTitleDark );
+	const emptyStateContainerStyle = getStylesFromColorScheme( styles.emptyStateContainer, styles.emptyStateContainerDark );
+	const emptyStateTitleStyle = getStylesFromColorScheme( styles.emptyStateTitle, styles.emptyStateTitleDark );
 
 	return (
 		<MediaUpload
@@ -88,4 +88,4 @@ function MediaPlaceholder( props ) {
 	);
 }
 
-export default withTheme( MediaPlaceholder );
+export default withPreferredColorScheme( MediaPlaceholder );

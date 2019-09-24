@@ -11,11 +11,11 @@ import { __ } from '@wordpress/i18n';
 import { parse } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withInstanceId, compose } from '@wordpress/compose';
+import { withPreferredColorScheme } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
-import { withTheme } from '../dark-mode';
 import HTMLInputContainer from './container';
 import styles from './style.scss';
 
@@ -61,9 +61,9 @@ export class HTMLTextInput extends Component {
 	}
 
 	render() {
-		const { useStyle } = this.props;
-		const htmlStyle = useStyle( styles.htmlView, styles.htmlViewDark );
-		const placeholderStyle = useStyle( styles.placeholder, styles.placeholderDark );
+		const { getStylesFromColorScheme } = this.props;
+		const htmlStyle = getStylesFromColorScheme( styles.htmlView, styles.htmlViewDark );
+		const placeholderStyle = getStylesFromColorScheme( styles.placeholder, styles.placeholderDark );
 		return (
 			<HTMLInputContainer parentHeight={ this.props.parentHeight }>
 				<TextInput
@@ -123,5 +123,5 @@ export default compose( [
 		};
 	} ),
 	withInstanceId,
-	withTheme,
+	withPreferredColorScheme,
 ] )( HTMLTextInput );

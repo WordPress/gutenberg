@@ -7,12 +7,12 @@ import { View } from 'react-native';
  * Internal dependencies
  */
 import styles from './style.scss';
-import { withTheme } from '../mobile/dark-mode';
+import { withPreferredColorScheme } from '@wordpress/compose';
 
-const ToolbarContainer = ( { useStyle, passedStyle, children } ) => (
-	<View style={ [ useStyle( styles.container, styles.containerDark ), passedStyle ] }>
+const ToolbarContainer = ( { getStylesFromColorScheme, passedStyle, children } ) => (
+	<View style={ [ getStylesFromColorScheme( styles.container, styles.containerDark ), passedStyle ] }>
 		{ children }
 	</View>
 );
 
-export default withTheme( ToolbarContainer );
+export default withPreferredColorScheme( ToolbarContainer );
