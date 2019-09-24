@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map, findKey } from 'lodash';
+import { map } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -26,14 +26,14 @@ import BlockIcon from '../block-icon';
  * @return {string} The display name value.
  */
 function getBlockDisplayName( blockType, attributes ) {
-	const attributeName = findKey( blockType.attributes, { type: 'string', __experimentalIsDisplayName: true } );
+	const displayNameAttribute = blockType.__experimentalDisplayNameAttribute;
 
-	if ( ! attributeName || ! attributes[ attributeName ] ) {
+	if ( ! displayNameAttribute || ! attributes[ displayNameAttribute ] ) {
 		return blockType.title;
 	}
 
 	// Strip any formatting.
-	const richTextValue = create( { html: attributes[ attributeName ] } );
+	const richTextValue = create( { html: attributes[ displayNameAttribute ] } );
 	const formatlessDisplayName = getTextContent( richTextValue );
 
 	return formatlessDisplayName;

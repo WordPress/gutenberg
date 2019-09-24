@@ -3,8 +3,7 @@
 	"category": "layout",
 	"attributes": {
 		"label": {
-			"type": "string",
-			"__experimentalIsDisplayName": true
+			"type": "string"
 		},
 		"destination": {
 			"type": "string"
