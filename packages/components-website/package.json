@@ -12,9 +12,6 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
-	"publishConfig": {
-		"access": "public"
-	},
 	"scripts": {
 		"prestart": "npm run build:docs",
 		"start": "concurrently 'npm run watch:docs' 'npm run start:server' 'npm run start:app'",
@@ -46,8 +43,8 @@
 		"prism-react-renderer": "0.1.7",
 		"remark": "11.0.1",
 		"remark-parse": "7.0.1",
-		"react": "^16.8.6",
-		"react-dom": "^16.8.6",
+		"react": "^16.9.0",
+		"react-dom": "^16.9.0",
 		"react-helmet": "5.2.1",
 		"react-live": "2.1.2",
 		"react-router": "5.0.1",
