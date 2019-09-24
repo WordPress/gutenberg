@@ -10,8 +10,7 @@ import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { parse } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
-import { withInstanceId, compose } from '@wordpress/compose';
-import { withPreferredColorScheme } from '@wordpress/compose';
+import { withInstanceId, compose, withPreferredColorScheme } from '@wordpress/compose';
 
 /**
  * Internal dependencies

@@ -14,13 +14,12 @@ import memize from 'memize';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { compose } from '@wordpress/compose';
+import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { childrenBlock } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/html-entities';
 import { BACKSPACE } from '@wordpress/keycodes';
 import { isURL } from '@wordpress/url';
-import { withPreferredColorScheme } from '@wordpress/compose';
 
 /**
  * Internal dependencies
