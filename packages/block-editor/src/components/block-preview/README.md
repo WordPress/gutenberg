@@ -34,10 +34,16 @@ Width of the preview container in pixels. Controls at what size the blocks will 
 * **Type** `Function`
 * **Default:** `noop`
 
-Use this callback as an opportunity to know when the preview is ready. The callback will pass the scale factor, offsets position (x, y) and the DOM element reference, if available. Eg:
+Use this callback as an opportunity to know when the preview is ready. The callback will pass, if available:
+
+* `scale`: the scale factor
+* `position`: offsets position (x, y)
+* `previewContainerRef`: DOM element reference
+* `styles`: Online styles applied to the preview container
+
+Eg:
 
 ```es6
-
 <BlockPreview
 	blocks={ blocks }
 	__experimentalOnReady={ ( { scale, previewContainerRef, position } ) => {
