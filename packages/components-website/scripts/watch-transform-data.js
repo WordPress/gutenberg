@@ -3,7 +3,7 @@ const chokidar = require( 'chokidar' );
 const { generateDocData } = require( './generate-doc-data' );
 const { getPostData } = require( './get-post-data' );
 
-const src = path.resolve( __dirname, '../../packages/components/src/**/*.md' );
+const src = path.resolve( __dirname, '../../components/src/**/*.md' );
 
 const watcher = chokidar.watch( src );
 let __state = { isReady: false };

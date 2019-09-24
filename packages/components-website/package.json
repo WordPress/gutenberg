@@ -1,7 +1,20 @@
 {
-	"name": "@wordpress/components-docsite",
+	"name": "@wordpress/components-website",
 	"version": "0.1.0",
-	"private": true,
+	"description": "Documentation website for @wordpress/components",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/components-website/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
 	"scripts": {
 		"prestart": "npm run build:docs",
 		"start": "concurrently 'npm run watch:docs' 'npm run start:server' 'npm run start:app'",
@@ -19,21 +32,20 @@
 	},
 	"dependencies": {
 		"@automattic/color-studio": "2.1.0",
-		"@wordpress/block-serialization-default-parser": "file:../../block-serialization-default-parser",
-		"@wordpress/blocks": "file:../../blocks",
-		"@wordpress/components": "file:../../components",
-		"@wordpress/compose": "file:../../compose",
-		"@wordpress/date": "file:../../date",
-		"@wordpress/element": "file:../../element",
-		"@wordpress/i18n": "file:../../i18n",
+		"@wordpress/block-serialization-default-parser": "file:../block-serialization-default-parser",
+		"@wordpress/blocks": "file:../blocks",
+		"@wordpress/components": "file:../components",
+		"@wordpress/compose": "file:../compose",
+		"@wordpress/date": "file:../date",
+		"@wordpress/element": "file:../element",
+		"@wordpress/i18n": "file:../i18n",
 		"axios": "0.19.0",
 		"classnames": "2.2.6",
-		"copy-to-clipboard": "3.2.0",
-		"fuse.js": "3.4.5",
 		"lodash": "4.17.11",
 		"marked": "0.7.0",
 		"prism-react-renderer": "0.1.7",
-		"query-string": "6.8.2",
+		"remark": "11.0.1",
+		"remark-parse": "7.0.1",
 		"react": "^16.8.6",
 		"react-dom": "^16.8.6",
 		"react-helmet": "5.2.1",
@@ -41,19 +53,8 @@
 		"react-router": "5.0.1",
 		"react-router-dom": "5.0.1",
 		"react-scripts": "3.0.1",
-		"reselect": "4.0.0",
 		"scroll-into-view-if-needed": "2.2.20",
 		"styled-components": "4.3.2",
-		"use-debounce": "3.0.0"
-	},
-	"devDependencies": {
-		"chokidar": "3.0.2",
-		"concurrently": "4.1.1",
-		"express": "4.17.1",
-		"fast-glob": "3.0.4",
-		"mkdirp": "0.5.1",
-		"remark": "11.0.1",
-		"remark-parse": "7.0.1",
 		"unified": "8.3.2",
 		"unist-util-visit": "2.0.0"
 	},

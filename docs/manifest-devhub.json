@@ -1128,6 +1128,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/components-website",
+		"slug": "packages-components-website",
+		"markdown_source": "../packages/components-website/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/components",
 		"slug": "packages-components",
 		"markdown_source": "../packages/components/README.md",
