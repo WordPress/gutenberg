@@ -79,6 +79,8 @@ function ScaledBlockPreview( {
 						  padding
 						: 0;
 
+				const position = { x: offsetX * scale, y: offsetY };
+
 				setPreviewScale( scale );
 				setPosition( { x: offsetX, y: offsetY } );
 
@@ -87,14 +89,17 @@ function ScaledBlockPreview( {
 
 				__experimentalOnReady( {
 					scale,
-					position: { x: offsetX * scale, y: offsetY },
+					position,
 					previewContainerRef: previewRef,
 				} );
 			} else {
 				const containerElementRect = containerElement.getBoundingClientRect();
 				const scale = containerElementRect.width / viewportWidth;
 				setPreviewScale( scale );
-				__experimentalOnReady( { scale, previewContainerRef: previewRef } );
+				__experimentalOnReady( {
+					scale,
+					previewContainerRef: previewRef,
+				} );
 			}
 
 			setIsReady( true );
