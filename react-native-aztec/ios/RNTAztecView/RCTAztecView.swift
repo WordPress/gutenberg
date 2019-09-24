@@ -602,6 +602,8 @@ extension RCTAztecView: UITextViewDelegate {
     }
 
     func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
+        let position = characterRange.location as NSNumber
+        setSelection(start: position, end: position)
         return false
     }
 }
