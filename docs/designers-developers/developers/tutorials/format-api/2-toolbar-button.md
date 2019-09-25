@@ -31,8 +31,8 @@ Paste this code in `my-custom-format.js`:
 ```
 {% ESNext %}
 ```js
-const { registerFormatType } = wp.richText;
-const { RichTextToolbarButton } = wp.blockEditor;
+import { registerFormatType } from '@wordpress/rich-text';
+import { RichTextToolbarButton } from '@wordpress/block-editor';
 
 const MyCustomButton = props => {
 	return <RichTextToolbarButton
@@ -113,10 +113,10 @@ The following sample code renders the previously shown button only on Paragraph 
 ```
 {% ESNext %}
 ```js
-const { compose, ifCondition } = wp.compose;
-const { registerFormatType } = wp.richText;
-const { RichTextToolbarButton } = wp.blockEditor;
-const { withSelect } = wp.data;
+import { compose, ifCondition } from '@wordpress/compose';
+import { registerFormatType } from '@wordpress/rich-text';
+import { RichTextToolbarButton } from '@wordpress/block-editor';
+import { withSelect } from '@wordpress/data';
 
 const MyCustomButton = props => {
 	return <RichTextToolbarButton
