@@ -662,7 +662,7 @@ reusable: false,
 
 Blocks can be added to collections, grouping together all blocks from the same origin
 
-`registerBlockCollection` takes three parameters `namespace`, `title` and `icon`.
+`registerBlockCollection` takes two parameters, `namespace` and an object of settings including `title` and `icon`.
 
 ### Namespace
 
