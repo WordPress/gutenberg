@@ -440,7 +440,7 @@ export class InserterMenu extends Component {
 }
 
 export default compose(
-	withSelect( ( select, { clientId, isAppender, rootClientId } ) => {
+	withSelect( ( select, { clientId, isAppender, rootClientId, showInserterHelpPanel } ) => {
 		const {
 			getInserterItems,
 			getBlockName,
@@ -464,7 +464,7 @@ export default compose(
 		return {
 			rootChildBlocks: getChildBlockNames( destinationRootBlockName ),
 			items: getInserterItems( destinationRootClientId ),
-			showInserterHelpPanel: getSettings().showInserterHelpPanel,
+			showInserterHelpPanel: showInserterHelpPanel && getSettings().showInserterHelpPanel,
 			destinationRootClientId,
 		};
 	} ),
