@@ -272,6 +272,8 @@ function gutenberg_register_scripts_and_styles() {
 		)
 	);
 
+	wp_enqueue_script( 'wp-block-directory' );
+
 	// Editor Styles.
 	// This empty stylesheet is defined to ensure backward compatibility.
 	gutenberg_override_style( 'wp-blocks', false );
