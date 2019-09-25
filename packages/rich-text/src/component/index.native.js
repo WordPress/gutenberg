@@ -70,6 +70,7 @@ const gutenbergFormatNamesToAztec = {
 	'core/bold': 'bold',
 	'core/italic': 'italic',
 	'core/strikethrough': 'strikethrough',
+	'core/underline': 'underline',
 };
 
 export class RichText extends Component {
