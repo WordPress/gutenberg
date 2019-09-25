@@ -15,9 +15,9 @@ import { normalizeIconObject } from '@wordpress/blocks';
  */
 import styles from './style.scss';
 
-function Warning( { title, message, icon, iconClass, theme, getStylesFromColorScheme, ...viewProps } ) {
+function Warning( { title, message, icon, iconClass, preferredColorScheme, getStylesFromColorScheme, ...viewProps } ) {
 	icon = icon && normalizeIconObject( icon );
-	const internalIconClass = 'warning-icon' + '-' + theme;
+	const internalIconClass = 'warning-icon' + '-' + preferredColorScheme;
 	const titleStyle = getStylesFromColorScheme( styles.title, styles.titleDark );
 	const messageStyle = getStylesFromColorScheme( styles.message, styles.messageDark );
 
