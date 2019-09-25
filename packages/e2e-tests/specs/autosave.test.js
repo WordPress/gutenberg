@@ -114,8 +114,15 @@ describe( 'autosave', () => {
 		), await getCurrentPostId() );
 		expect( await page.evaluate( () => window.sessionStorage.length ) ).toBe( 1 );
 
-		const logoutUrl = await page.$eval( '#wp-admin-bar-logout a', ( element ) => element.href );
-		await page.goto( logoutUrl );
+		await Promise.all( [
+			page.waitForSelector( '#wp-admin-bar-logout', { visible: true } ),
+			page.hover( '#wp-admin-bar-my-account' ),
+		] );
+		await Promise.all( [
+			page.waitForNavigation(),
+			page.click( '#wp-admin-bar-logout' ),
+		] );
+
 		expect( await page.evaluate( () => window.sessionStorage.length ) ).toBe( 0 );
 	} );
 
