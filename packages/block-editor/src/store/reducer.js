@@ -1092,6 +1092,8 @@ export function initialPosition( state, action ) {
 	} else if ( action.type === 'REMOVE_BLOCKS' ) {
 		return state;
 	}
+
+	// Reset the state by default (for any action not handled).
 }
 
 export function blocksMode( state = {}, action ) {
