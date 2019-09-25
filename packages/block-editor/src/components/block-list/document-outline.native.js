@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { __ } from '@wordpress/i18n';
 import { BottomSheet, Icon } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
@@ -22,7 +23,7 @@ const DocumentOutline = ( { isVisible, onClose, onSelect, clientId, blockList, s
 	<BottomSheet
 		isVisible={ isVisible }
 		onClose={ onClose }
-		title="Document Outline"
+		title={ __( 'Document Outline' ) }
 	>
 		<FlatList
 			style={ styles.flatlist }
