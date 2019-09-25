@@ -20,6 +20,7 @@ import { KeyboardAwareFlatList, ReadableContentView, withTheme } from '@wordpres
 import styles from './style.scss';
 import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
+import ScrollToContext from './ScrollToContext';
 
 const innerToolbarHeight = 44;
 
@@ -35,6 +36,14 @@ export class BlockList extends Component {
 		this.scrollViewInnerRef = this.scrollViewInnerRef.bind( this );
 		this.addBlockToEndOfPost = this.addBlockToEndOfPost.bind( this );
 		this.shouldFlatListPreventAutomaticScroll = this.shouldFlatListPreventAutomaticScroll.bind( this );
+		this.scrollTo = this.scrollTo.bind( this );
+	}
+
+	scrollTo( ) {
+		//TODO
+		if ( this.scrollViewRef ) {
+			this.scrollViewRef.scrollToEnd( { animated: true } );
+		}
 	}
 
 	addBlockToEndOfPost( newBlock ) {
@@ -116,19 +125,21 @@ export class BlockList extends Component {
 		const blockHolderFocusedStyle = this.props.useStyle( styles.blockHolderFocused, styles.blockHolderFocusedDark );
 		const { shouldShowBlockAtIndex, shouldShowInsertionPoint } = this.props;
 		return (
-			<ReadableContentView>
-				{ shouldShowInsertionPoint( clientId ) && this.renderAddBlockSeparator() }
-				{ shouldShowBlockAtIndex( index ) && (
-					<BlockListBlock
-						key={ clientId }
-						showTitle={ false }
-						clientId={ clientId }
-						rootClientId={ this.props.rootClientId }
-						onCaretVerticalPositionChange={ this.onCaretVerticalPositionChange }
-						borderStyle={ this.blockHolderBorderStyle() }
-						focusedBorderColor={ blockHolderFocusedStyle.borderColor }
-					/> ) }
-			</ReadableContentView>
+			<ScrollToContext.Provider value={ this.scrollTo }>
+				<ReadableContentView>
+					{ shouldShowInsertionPoint( clientId ) && this.renderAddBlockSeparator() }
+					{ shouldShowBlockAtIndex( index ) && (
+						<BlockListBlock
+							key={ clientId }
+							showTitle={ false }
+							clientId={ clientId }
+							rootClientId={ this.props.rootClientId }
+							onCaretVerticalPositionChange={ this.onCaretVerticalPositionChange }
+							borderStyle={ this.blockHolderBorderStyle() }
+							focusedBorderColor={ blockHolderFocusedStyle.borderColor }
+						/> ) }
+				</ReadableContentView>
+			</ScrollToContext.Provider>
 		);
 	}
 

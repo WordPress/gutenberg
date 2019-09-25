@@ -7,6 +7,7 @@ import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { getBlockType } from '@wordpress/blocks';
 import { create } from '@wordpress/rich-text';
+import { Component } from '@wordpress/element';
 
 /**
  * External dependencies
@@ -18,49 +19,73 @@ import { FlatList, View, Text, TouchableOpacity } from 'react-native';
  * Internal dependencies
  */
 import styles from './document-outline.scss';
+import ScrollToContext from './ScrollToContext';
 
-const DocumentOutline = ( { isVisible, onClose, onSelect, clientId, blockList, selectedIndex } ) => (
-	<BottomSheet
-		isVisible={ isVisible }
-		onClose={ onClose }
-		title={ __( 'Document Outline' ) }
-	>
-		<FlatList
-			style={ styles.flatlist }
-			data={ blockList }
-			initialScrollIndex={ selectedIndex }
-			initialNumToRender={ 10 }
-			getItemLayout={ ( data, index ) => (
-				{ length: styles.rowContainer.height, offset: styles.rowContainer.height * index, index }
-			) }
-			renderItem={ ( { item } ) => {
-				const blockType = getBlockType( item.name );
-				const title = getTitle( item, blockType.title );
+class DocumentOutline extends Component {
+	static contextType = ScrollToContext;
 
-				return (
-					<TouchableOpacity
-						style={ { paddingLeft: Math.max( item.level - 1, 0 ) * styles.iconContainer.width } }
-						onPress={ () => {
-							onSelect( item.clientId );
-							onClose();
-						} }
-					>
-						<View style={ styles.rowContainer }>
-							<View style={ styles.itemContainer }>
-								{ ( item.level > 0 ) && <View style={ styles.iconContainer }><Icon size={ 22 } icon="subdirectory" fill={ styles.subdirectoryIcon.color } /></View> }
-								<View style={ styles.iconContainer }><Icon size={ 24 } icon={ blockType.icon.src } fill={ styles.blockIcon.color } /></View>
-								<Text style={ styles.title } ellipsizeMode="tail" numberOfLines={ 1 }>{ title }</Text>
-							</View>
-							{ item.clientId === clientId &&
-							( <Icon style={ styles.selectedIcon } icon="saved" size={ 24 } fill={ styles.selectedIcon.color } /> ) }
-						</View>
-					</TouchableOpacity>
-				);
-			} }
-			keyExtractor={ ( item ) => item.clientId + clientId }
-		/>
-	</BottomSheet>
-);
+	constructor( props ) {
+		super( props );
+		this.renderItem = this.renderItem.bind( this );
+	}
+
+	onPressItem( clientId ) {
+		const { onClose, onSelect } = this.props;
+
+		onSelect( clientId );
+		// scroll to
+		this.context( clientId );
+		onClose();
+	}
+
+	renderItem( { item, index } ) {
+		const blockType = getBlockType( item.name );
+		const title = getTitle( item, blockType.title );
+		const { selectedIndex } = this.props;
+
+		return (
+			<TouchableOpacity
+				style={ { paddingLeft: Math.max( item.level - 1, 0 ) * styles.iconContainer.width } }
+				onPress={ () => {
+					this.onPressItem( item.clientId );
+				} }
+			>
+				<View style={ styles.rowContainer }>
+					<View style={ styles.itemContainer }>
+						{ ( item.level > 0 ) && <View style={ styles.iconContainer }><Icon size={ 20 } icon="subdirectory" fill={ styles.subdirectoryIcon.color } /></View> }
+						<View style={ styles.iconContainer }><Icon size={ 24 } icon={ blockType.icon.src } fill={ styles.blockIcon.color } /></View>
+						<Text style={ styles.title } ellipsizeMode="tail" numberOfLines={ 1 }>{ title }</Text>
+					</View>
+					{ selectedIndex === index &&
+					( <Icon style={ styles.selectedIcon } icon="saved" size={ 24 } fill={ styles.selectedIcon.color } /> ) }
+				</View>
+			</TouchableOpacity>
+		);
+	}
+
+	render() {
+		const { isVisible, onClose, blockList, selectedIndex } = this.props;
+		return (
+			<BottomSheet
+				isVisible={ isVisible }
+				onClose={ onClose }
+				title={ __( 'Document Outline' ) }
+			>
+				<FlatList
+					style={ styles.flatlist }
+					data={ blockList }
+					initialScrollIndex={ selectedIndex }
+					initialNumToRender={ 10 }
+					getItemLayout={ ( data, index ) => (
+						{ length: styles.rowContainer.height, offset: styles.rowContainer.height * index, index }
+					) }
+					renderItem={ this.renderItem }
+					keyExtractor={ ( item ) => item.clientId }
+				/>
+			</BottomSheet>
+		);
+	}
+}
 
 const isTextBlock = ( blockName ) => blockName === 'core/heading' || blockName === 'core/paragraph';
 const isQuote = ( blockName ) => blockName === 'core/quote';
