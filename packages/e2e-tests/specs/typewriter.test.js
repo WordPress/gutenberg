@@ -75,6 +75,13 @@ describe( 'TypeWriter', () => {
 		// Create first block.
 		await page.keyboard.press( 'Enter' );
 
+		// Create blocks until there is a scrollable container.
+		while ( await page.evaluate( () =>
+			! wp.dom.getScrollContainer( document.activeElement )
+		) ) {
+			await page.keyboard.press( 'Enter' );
+		}
+
 		await page.evaluate( () =>
 			wp.dom.getScrollContainer( document.activeElement ).scrollTop = 1
 		);
@@ -106,6 +113,13 @@ describe( 'TypeWriter', () => {
 	it( 'should scroll caret into view from the top', async () => {
 		// Create first block.
 		await page.keyboard.press( 'Enter' );
+
+		// Create blocks until there is a scrollable container.
+		while ( await page.evaluate( () =>
+			! wp.dom.getScrollContainer( document.activeElement )
+		) ) {
+			await page.keyboard.press( 'Enter' );
+		}
 
 		let count = 0;
 
