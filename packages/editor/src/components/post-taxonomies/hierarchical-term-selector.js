@@ -8,7 +8,7 @@ import { get, unescape as unescapeString, without, find, some, invoke } from 'lo
  */
 import { __, _x, _n, sprintf } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { Dashicon, TreeSelect, withSpokenMessages, withFilters, Button } from '@wordpress/components';
+import { CheckboxControl, TreeSelect, withSpokenMessages, withFilters, Button } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { withInstanceId, compose } from '@wordpress/compose';
 import apiFetch from '@wordpress/api-fetch';
@@ -55,9 +55,8 @@ class HierarchicalTermSelector extends Component {
 		};
 	}
 
-	onChange( event ) {
+	onChange( termId ) {
 		const { onUpdateTerms, terms = [], taxonomy } = this.props;
-		const termId = parseInt( event.target.value, 10 );
 		const hasTerm = terms.indexOf( termId ) !== -1;
 		const newTerms = hasTerm ?
 			without( terms, termId ) :
@@ -317,21 +316,18 @@ class HierarchicalTermSelector extends Component {
 		const { terms = [] } = this.props;
 		return renderedTerms.map( ( term ) => {
 			const id = `editor-post-taxonomies-hierarchical-term-${ term.id }`;
-			const checked = terms.indexOf( term.id ) !== -1;
 			return (
 				<div key={ term.id } className="editor-post-taxonomies__hierarchical-terms-choice">
-					<span className="components-checkbox-control__input-container">
-						<input
-							id={ id }
-							className="components-checkbox-control__input"
-							type="checkbox"
-							checked={ checked }
-							value={ term.id }
-							onChange={ this.onChange }
-						/>
-						{ checked ? <Dashicon icon="yes" className="components-checkbox-control__checked" role="presentation" /> : null }
-					</span>
-					<label className="components-checkbox-control__label" htmlFor={ id }>{ unescapeString( term.name ) }</label>
+					<CheckboxControl
+						id={ id }
+						checked={ terms.indexOf( term.id ) !== -1 }
+						value={ term.id }
+						onChange={ () => {
+							const termId = parseInt( term.id, 10 );
+							this.onChange( termId );
+						} }
+						label={ unescapeString( term.name ) }
+					/>
 					{ !! term.children.length && (
 						<div className="editor-post-taxonomies__hierarchical-terms-subchoices">
 							{ this.renderTerms( term.children ) }
