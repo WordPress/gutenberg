@@ -63,7 +63,7 @@ describe( 'TypeWriter', () => {
 
 		const positionAfterArrowUp = await getCaretPosition();
 
-		expect( positionAfterArrowUp ).toBeLessThan( newPosition );
+		expect( positionAfterArrowUp ).toBeLessThanOrEqual( newPosition );
 
 		// Should be scrolled to new position.
 		await page.keyboard.press( 'Enter' );
@@ -145,7 +145,7 @@ describe( 'TypeWriter', () => {
 
 		const newBottomPosition = await getCaretPosition();
 
-		expect( newBottomPosition ).toBeLessThan( bottomPostition );
+		expect( newBottomPosition ).toBeLessThanOrEqual( bottomPostition );
 
 		// Should maintain new caret position.
 		await page.keyboard.press( 'Enter' );
