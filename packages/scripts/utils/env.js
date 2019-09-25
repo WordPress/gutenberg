@@ -137,9 +137,7 @@ async function installManagedWordPress() {
 
 	const compose = readFileSync( normalize( getManagedWordPressPath() + '/docker-compose.yml' ), 'utf8' );
 
-	const newCompose = compose
-		.replace( /image: wordpressdevelop(.*)/g, 'image: docker.pkg.github.com/wordpress/wpdev-docker-images$1-16' )
-		.replace( /environment:/g, `environment:\n      PHP_FPM_UID: ${ uid }\n      PHP_FPM_GID: ${ gid }` );
+	const newCompose = compose.replace( /environment:/g, `environment:\n      PHP_FPM_UID: ${ uid }\n      PHP_FPM_GID: ${ gid }` );
 
 	writeFileSync( normalize( getManagedWordPressPath() + '/docker-compose.yml' ), newCompose );
 }
