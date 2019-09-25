@@ -1,3 +1,9 @@
+## Master
+
+### Deprecation
+
+- `dropZoneUIOnly` has been deprecated in favor of `disableMediaButtons`.
+
 ## 3.0.0 (2019-08-05)
 
 ### New Features
