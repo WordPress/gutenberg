@@ -154,12 +154,8 @@ describe( 'autosave', () => {
 
 		await page.type( '.wp-block-paragraph', ' after publish' );
 
-		await Promise.all( [
-			// Force remote autosave to occur immediately
-			page.evaluate( () => window.wp.data.dispatch( 'core/editor' ).autosave() ),
-			// Meanwhile, wait for local autosave
-			sleep( AUTOSAVE_INTERVAL_SECONDS + 2 ),
-		] );
+		await sleep( AUTOSAVE_INTERVAL_SECONDS + 2 );
+		await page.evaluate( () => window.wp.data.dispatch( 'core/editor' ).autosave() );
 
 		await page.reload();
 
