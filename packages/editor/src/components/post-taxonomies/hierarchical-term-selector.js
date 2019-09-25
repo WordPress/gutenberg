@@ -8,7 +8,7 @@ import { get, unescape as unescapeString, without, find, some, invoke } from 'lo
  */
 import { __, _x, _n, sprintf } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { TreeSelect, withSpokenMessages, withFilters, Button } from '@wordpress/components';
+import { Dashicon, TreeSelect, withSpokenMessages, withFilters, Button } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { withInstanceId, compose } from '@wordpress/compose';
 import apiFetch from '@wordpress/api-fetch';
@@ -317,17 +317,21 @@ class HierarchicalTermSelector extends Component {
 		const { terms = [] } = this.props;
 		return renderedTerms.map( ( term ) => {
 			const id = `editor-post-taxonomies-hierarchical-term-${ term.id }`;
+			const checked = terms.indexOf( term.id ) !== -1;
 			return (
 				<div key={ term.id } className="editor-post-taxonomies__hierarchical-terms-choice">
-					<input
-						id={ id }
-						className="editor-post-taxonomies__hierarchical-terms-input"
-						type="checkbox"
-						checked={ terms.indexOf( term.id ) !== -1 }
-						value={ term.id }
-						onChange={ this.onChange }
-					/>
-					<label htmlFor={ id }>{ unescapeString( term.name ) }</label>
+					<span className="components-checkbox-control__input-container">
+						<input
+							id={ id }
+							className="components-checkbox-control__input"
+							type="checkbox"
+							checked={ checked }
+							value={ term.id }
+							onChange={ this.onChange }
+						/>
+						{ checked ? <Dashicon icon="yes" className="components-checkbox-control__checked" role="presentation" /> : null }
+					</span>
+					<label className="components-checkbox-control__label" htmlFor={ id }>{ unescapeString( term.name ) }</label>
 					{ !! term.children.length && (
 						<div className="editor-post-taxonomies__hierarchical-terms-subchoices">
 							{ this.renderTerms( term.children ) }
