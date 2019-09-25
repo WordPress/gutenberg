@@ -22,7 +22,6 @@ import {
 	blocks,
 	isTyping,
 	isCaretWithinFormattedText,
-	selection,
 	selectionStart,
 	selectionEnd,
 	initialPosition,
@@ -1870,180 +1869,237 @@ describe( 'state', () => {
 				offset: 2,
 			} );
 		} );
-	} );
 
-	describe( 'selection()', () => {
 		it( 'should return with block clientId as selected', () => {
-			const state = selection( undefined, {
+			const action = {
 				type: 'SELECT_BLOCK',
 				clientId: 'kumquat',
-			} );
+			};
+			const state1 = selectionStart( undefined, action );
+			const state2 = selectionEnd( undefined, action );
+			const expected = { clientId: 'kumquat' };
 
-			expect( state ).toEqual( { clientId: 'kumquat' } );
+			expect( state1 ).toEqual( expected );
+			expect( state2 ).toEqual( expected );
 		} );
 
 		it( 'should not update the state if the block is already selected', () => {
 			const original = deepFreeze( { clientId: 'ribs' } );
-			const state = selection( original, {
+			const action = {
 				type: 'SELECT_BLOCK',
 				clientId: 'ribs',
-			} );
+			};
+			const state1 = selectionStart( original, action );
+			const state2 = selectionEnd( original, action );
 
-			expect( state ).toBe( original );
+			expect( state1 ).toBe( original );
+			expect( state2 ).toBe( original );
 		} );
 
 		it( 'should unset selection', () => {
 			const original = deepFreeze( { clientId: 'ribs' } );
-			const state = selection( original, {
+			const action = {
 				type: 'CLEAR_SELECTED_BLOCK',
-			} );
+			};
 
-			expect( state ).toEqual( {} );
+			const state1 = selectionStart( original, action );
+			const state2 = selectionEnd( original, action );
+
+			expect( state1 ).toEqual( {} );
+			expect( state2 ).toEqual( {} );
 		} );
 
 		it( 'should return same reference if clearing selection but no selection', () => {
-			const original = selection( undefined, {} );
-			const state = selection( original, {
+			const original = deepFreeze( {} );
+			const action = {
 				type: 'CLEAR_SELECTED_BLOCK',
-			} );
+			};
 
-			expect( state ).toBe( original );
+			const state1 = selectionStart( original, action );
+			const state2 = selectionEnd( original, action );
+
+			expect( state1 ).toBe( original );
+			expect( state2 ).toBe( original );
 		} );
 
 		it( 'should select inserted block', () => {
-			const state = selection( undefined, {
+			const action = {
 				type: 'INSERT_BLOCKS',
 				blocks: [ { clientId: 'ribs' } ],
 				updateSelection: true,
-			} );
+			};
+			const state1 = selectionStart( undefined, action );
+			const state2 = selectionEnd( undefined, action );
+			const expected = { clientId: 'ribs' };
 
-			expect( state ).toEqual( { clientId: 'ribs' } );
+			expect( state1 ).toEqual( expected );
+			expect( state2 ).toEqual( expected );
 		} );
 
 		it( 'should not select inserted block if updateSelection flag is false', () => {
 			const original = deepFreeze( { clientId: 'a' } );
-			const state = selection( original, {
+			const action = {
 				type: 'INSERT_BLOCKS',
 				blocks: [ { clientId: 'ribs' } ],
 				updateSelection: false,
-			} );
+			};
+			const state1 = selectionStart( original, action );
+			const state2 = selectionEnd( original, action );
 
-			expect( state ).toEqual( original );
+			expect( state1 ).toBe( original );
+			expect( state2 ).toBe( original );
 		} );
 
 		it( 'should not update the state if the block moved is already selected', () => {
 			const original = deepFreeze( { clientId: 'ribs' } );
-			const state = selection( original, {
+			const action = {
 				type: 'MOVE_BLOCKS_UP',
 				clientIds: [ 'ribs' ],
-			} );
+			};
 
-			expect( state ).toBe( original );
+			const state1 = selectionStart( original, action );
+			const state2 = selectionEnd( original, action );
+
+			expect( state1 ).toBe( original );
+			expect( state2 ).toBe( original );
 		} );
 
 		it( 'should replace the selected block', () => {
 			const original = deepFreeze( { clientId: 'chicken' } );
-			const state = selection( original, {
+			const action = {
 				type: 'REPLACE_BLOCKS',
 				clientIds: [ 'chicken' ],
 				blocks: [ { clientId: 'wings' } ],
-			} );
+			};
+			const state1 = selectionStart( original, action );
+			const state2 = selectionEnd( original, action );
+			const expected = { clientId: 'wings' };
 
-			expect( state ).toEqual( { clientId: 'wings' } );
+			expect( state1 ).toEqual( expected );
+			expect( state2 ).toEqual( expected );
 		} );
 
 		it( 'should not replace the selected block if we keep it at the end when replacing blocks', () => {
 			const original = deepFreeze( { clientId: 'wings' } );
-			const state = selection( original, {
+			const action = {
 				type: 'REPLACE_BLOCKS',
 				clientIds: [ 'wings' ],
 				blocks: [
 					{ clientId: 'chicken' },
 					{ clientId: 'wings' },
 				],
-			} );
+			};
+			const state1 = selectionStart( original, action );
+			const state2 = selectionEnd( original, action );
 
-			expect( state ).toBe( original );
+			expect( state1 ).toBe( original );
+			expect( state2 ).toBe( original );
 		} );
 
 		it( 'should replace the selected block if we keep it not at the end when replacing blocks', () => {
 			const original = deepFreeze( { clientId: 'chicken' } );
-			const state = selection( original, {
+			const action = {
 				type: 'REPLACE_BLOCKS',
 				clientIds: [ 'chicken' ],
 				blocks: [
 					{ clientId: 'chicken' },
 					{ clientId: 'wings' },
 				],
-			} );
+			};
+			const state1 = selectionStart( original, action );
+			const state2 = selectionEnd( original, action );
+			const expected = { clientId: 'wings' };
 
-			expect( state ).toEqual( { clientId: 'wings' } );
+			expect( state1 ).toEqual( expected );
+			expect( state2 ).toEqual( expected );
 		} );
 
 		it( 'should reset if replacing with empty set', () => {
 			const original = deepFreeze( { clientId: 'chicken' } );
-			const state = selection( original, {
+			const action = {
 				type: 'REPLACE_BLOCKS',
 				clientIds: [ 'chicken' ],
 				blocks: [],
-			} );
+			};
 
-			expect( state ).toEqual( {} );
+			const state1 = selectionStart( original, action );
+			const state2 = selectionEnd( original, action );
+
+			expect( state1 ).toEqual( {} );
+			expect( state2 ).toEqual( {} );
 		} );
 
 		it( 'should keep the selected block', () => {
 			const original = deepFreeze( { clientId: 'chicken' } );
-			const state = selection( original, {
+			const action = {
 				type: 'REPLACE_BLOCKS',
 				clientIds: [ 'ribs' ],
 				blocks: [ { clientId: 'wings' } ],
-			} );
+			};
+			const state1 = selectionStart( original, action );
+			const state2 = selectionEnd( original, action );
 
-			expect( state ).toBe( original );
+			expect( state1 ).toBe( original );
+			expect( state2 ).toBe( original );
 		} );
 
 		it( 'should remove the selection if we are removing the selected block', () => {
 			const original = deepFreeze( { clientId: 'chicken' } );
-			const state = selection( original, {
+			const action = {
 				type: 'REMOVE_BLOCKS',
 				clientIds: [ 'chicken' ],
-			} );
+			};
 
-			expect( state ).toEqual( {} );
+			const state1 = selectionStart( original, action );
+			const state2 = selectionEnd( original, action );
+
+			expect( state1 ).toEqual( {} );
+			expect( state2 ).toEqual( {} );
 		} );
 
 		it( 'should keep the selection if we are not removing the selected block', () => {
 			const original = deepFreeze( { clientId: 'chicken' } );
-			const state = selection( original, {
+			const action = {
 				type: 'REMOVE_BLOCKS',
 				clientIds: [ 'ribs' ],
-			} );
+			};
 
-			expect( state ).toBe( original );
+			const state1 = selectionStart( original, action );
+			const state2 = selectionEnd( original, action );
+
+			expect( state1 ).toEqual( original );
+			expect( state2 ).toEqual( original );
 		} );
 
 		it( 'should update the selection on inner blocks replace if updateSelection is true', () => {
 			const original = deepFreeze( { clientId: 'chicken' } );
-			const state = selection( original, {
+			const action = {
 				type: 'REPLACE_INNER_BLOCKS',
 				blocks: [ { clientId: 'another-block' } ],
 				rootClientId: 'parent',
 				updateSelection: true,
-			} );
+			};
+			const state1 = selectionStart( original, action );
+			const state2 = selectionEnd( original, action );
+			const expected = { clientId: 'another-block' };
 
-			expect( state ).toEqual( { clientId: 'another-block' } );
+			expect( state1 ).toEqual( expected );
+			expect( state2 ).toEqual( expected );
 		} );
 
 		it( 'should not update the selection on inner blocks replace if updateSelection is false', () => {
 			const original = deepFreeze( { clientId: 'chicken' } );
-			const state = selection( original, {
+			const action = {
 				type: 'REPLACE_INNER_BLOCKS',
 				blocks: [ { clientId: 'another-block' } ],
 				rootClientId: 'parent',
 				updateSelection: false,
-			} );
+			};
+			const state1 = selectionStart( original, action );
+			const state2 = selectionEnd( original, action );
 
-			expect( state ).toBe( original );
+			expect( state1 ).toEqual( original );
+			expect( state2 ).toEqual( original );
 		} );
 	} );
 

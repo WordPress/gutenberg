@@ -923,14 +923,15 @@ export function isCaretWithinFormattedText( state = false, action ) {
 }
 
 /**
- * General reducer returning the block selection's start and end.
+ * Internal helper reducer for selectionStart and selectionEnd. Can hold a block
+ * selection, represented by an object with property clientId.
  *
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
  *
  * @return {Object} Updated state.
  */
-export function selection( state = {}, action ) {
+function selection( state = {}, action ) {
 	switch ( action.type ) {
 		case 'CLEAR_SELECTED_BLOCK': {
 			if ( state.clientId ) {
