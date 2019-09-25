@@ -72,7 +72,7 @@ class Inserter extends Component {
 	 * @return {WPElement} Dropdown content element.
 	 */
 	renderContent( { onClose } ) {
-		const { rootClientId, clientId, isAppender } = this.props;
+		const { rootClientId, clientId, isAppender, showInserterHelpPanel } = this.props;
 
 		return (
 			<InserterMenu
@@ -80,6 +80,7 @@ class Inserter extends Component {
 				rootClientId={ rootClientId }
 				clientId={ clientId }
 				isAppender={ isAppender }
+				showInserterHelpPanel={ showInserterHelpPanel }
 			/>
 		);
 	}
