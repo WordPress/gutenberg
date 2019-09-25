@@ -17,7 +17,7 @@ export default function save( { attributes } ) {
 
 	let style;
 	if ( Number.isFinite( width ) ) {
-		style = { flexBasis: width + '%' };
+		style = { flexBasis: 'calc(' + width + '% - 16px)' };
 	}
 
 	return (

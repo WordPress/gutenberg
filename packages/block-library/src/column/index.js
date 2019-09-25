@@ -30,7 +30,7 @@ export const settings = {
 		if ( Number.isFinite( width ) ) {
 			return {
 				style: {
-					flexBasis: width + '%',
+					flexBasis: 'calc(' + width + '% - 16px)',
 				},
 			};
 		}
