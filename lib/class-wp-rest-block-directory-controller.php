@@ -276,7 +276,7 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 		// There might be multiple blocks in a plugin. Only the first block is mapped.
 		$block_data   = reset( $plugin['blocks'] );
 		$block->name  = $block_data['name'];
-		$block->title = $block_data['title'];
+		$block->title = $block_data['title'] ?: $plugin['name'];
 
 		// Plugin's description, not description in block.json.
 		$block->description = wp_trim_words( wp_strip_all_tags( $plugin['description'] ), 30, '...' );
