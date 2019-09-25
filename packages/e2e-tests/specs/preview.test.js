@@ -239,11 +239,11 @@ describe( 'Preview with Custom Fields enabled', () => {
 		// Return to editor and modify the title and content.
 		await editorPage.bringToFront();
 		await editorPage.click( '.editor-post-title__input' );
-		await pressKeyWithModifier( 'shift', 'Home' );
+		await pressKeyWithModifier( 'primary', 'a' );
 		await editorPage.keyboard.press( 'Delete' );
 		await editorPage.keyboard.type( 'title 2' );
 		await editorPage.keyboard.press( 'Tab' );
-		await pressKeyWithModifier( 'shift', 'Home' );
+		await pressKeyWithModifier( 'primary', 'a' );
 		await editorPage.keyboard.press( 'Delete' );
 		await editorPage.keyboard.type( 'content 2' );
 
