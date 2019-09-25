@@ -91,20 +91,19 @@ function useMovingAnimation( ref, isSelected, adjustScrolling, enableAnimation, 
 
 	const animationProps = useSpring( {
 		from: {
-			...transform,
-			scrollTop: adjustScrolling && scrollContainer ? scrollContainer.scrollTop : 0,
+			x: transform.x,
+			y: transform.y,
 		},
 		to: {
 			x: 0,
 			y: 0,
-			scrollTop: adjustScrolling ? transform.scrollTop : 0,
 		},
 		reset: triggeredAnimation !== finishedAnimation,
 		config: { mass: 5, tension: 2000, friction: 200 },
 		immediate: prefersReducedMotion,
 		onFrame: ( props ) => {
-			if ( adjustScrolling && scrollContainer && ! prefersReducedMotion ) {
-				scrollContainer.scrollTop = props.scrollTop;
+			if ( adjustScrolling && scrollContainer && ! prefersReducedMotion && props.y ) {
+				scrollContainer.scrollTop = transform.scrollTop + props.y;
 			}
 		},
 	} );
