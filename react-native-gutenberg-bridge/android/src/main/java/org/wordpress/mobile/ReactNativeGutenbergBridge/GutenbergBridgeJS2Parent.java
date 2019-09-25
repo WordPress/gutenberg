@@ -82,4 +82,6 @@ public interface GutenbergBridgeJS2Parent {
     void requestImageUploadCancel(int mediaId);
 
     void editorDidEmitLog(String message, LogLevel logLevel);
+
+    void editorDidAutosave();
 }

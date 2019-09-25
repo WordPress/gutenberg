@@ -118,6 +118,13 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
         hasObservers = false
     }
 
+    @objc
+    func editorDidAutosave() {
+        DispatchQueue.main.async {
+            self.delegate?.editorDidAutosave()
+        }
+    }
+
 
     /// Sends events to the JS side only if there is observers listening
     ///
