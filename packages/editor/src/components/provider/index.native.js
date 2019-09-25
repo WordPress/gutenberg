@@ -6,7 +6,7 @@ import RNReactNativeGutenbergBridge, {
 	subscribeParentToggleHTMLMode,
 	subscribeUpdateHtml,
 	subscribeSetTitle,
-	subscribeMediaAppend
+	subscribeMediaAppend,
 } from 'react-native-gutenberg-bridge';
 
 /**
@@ -48,11 +48,11 @@ class NativeEditorProvider extends Component {
 		} );
 
 		this.subscriptionParentMediaAppend = subscribeMediaAppend( ( payload ) => {
-			const blockName = 'core/' + payload.mediaType
+			const blockName = 'core/' + payload.mediaType;
 			const newBlock = createBlock( blockName, {
 				id: payload.mediaId,
 				[ payload.mediaType === 'image' ? 'url' : 'src' ]: payload.mediaUrl,
-			});
+			} );
 
 			this.props.insertBlock( newBlock, this.props.blockCount );
 		} );
@@ -168,7 +168,7 @@ export default compose( [
 		} = dispatch( 'core/editor' );
 		const {
 			clearSelectedBlock,
-			insertBlock
+			insertBlock,
 		} = dispatch( 'core/block-editor' );
 		const {
 			switchEditorMode,
