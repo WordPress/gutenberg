@@ -14,7 +14,7 @@ const getAppDataPath = require( 'appdata-path' );
 const { execSync } = require( 'child_process' );
 const { env, exit, stdout } = require( 'process' );
 const { normalize } = require( 'path' );
-const { createWriteStream, mkdirSync, readFileSync, writeFileSync } = require( 'fs' );
+const { createWriteStream, mkdirSync } = require( 'fs' );
 const { tmpdir } = require( 'os' );
 
 /**
@@ -134,12 +134,6 @@ async function installManagedWordPress() {
 			} )
 			.pipe( tmpZipWriter );
 	} );
-
-	const compose = readFileSync( normalize( getManagedWordPressPath() + '/docker-compose.yml' ), 'utf8' );
-
-	const newCompose = compose.replace( /environment:/g, `environment:\n      PHP_FPM_UID: ${ uid }\n      PHP_FPM_GID: ${ gid }` );
-
-	writeFileSync( normalize( getManagedWordPressPath() + '/docker-compose.yml' ), newCompose );
 }
 
 /**
