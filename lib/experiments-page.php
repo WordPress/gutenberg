@@ -9,10 +9,8 @@
  * The main entry point for the Gutenberg experiments page.
  *
  * @since 6.3.0
- *
- * @param string $page The page name the function is being called for, `'gutenberg_customizer'` for the Customizer.
  */
-function the_gutenberg_experiments( $page = 'gutenberg_page_gutenberg-experiments' ) {
+function the_gutenberg_experiments() {
 	?>
 	<div
 		id="experiments-editor"
