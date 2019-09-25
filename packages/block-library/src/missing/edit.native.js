@@ -21,7 +21,7 @@ import styles from './style.scss';
 export class UnsupportedBlockEdit extends Component {
 	render() {
 		const { originalName } = this.props.attributes;
-		const { getStylesFromColorScheme, theme } = this.props;
+		const { getStylesFromColorScheme, preferredColorScheme } = this.props;
 		const blockType = coreBlocks[ originalName ];
 
 		const title = blockType ? blockType.settings.title : __( 'Unsupported' );
@@ -29,7 +29,7 @@ export class UnsupportedBlockEdit extends Component {
 
 		const icon = blockType ? normalizeIconObject( blockType.settings.icon ) : 'admin-plugins';
 		const iconStyle = getStylesFromColorScheme( styles.unsupportedBlockIcon, styles.unsupportedBlockIconDark );
-		const iconClassName = 'unsupported-icon' + '-' + theme;
+		const iconClassName = 'unsupported-icon' + '-' + preferredColorScheme;
 		return (
 			<View style={ getStylesFromColorScheme( styles.unsupportedBlock, styles.unsupportedBlockDark ) }>
 				<Icon className={ iconClassName } icon={ icon && icon.src ? icon.src : icon } color={ iconStyle.color } />
