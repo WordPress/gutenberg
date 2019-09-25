@@ -147,6 +147,24 @@ describe( 'autosave', () => {
 		expect( await page.$( '.components-notice__content' ) ).toBe( null );
 	} );
 
+	it( 'should clear local autosave after successful remote autosave', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'before save' );
+		await saveDraft();
+
+		// Fake local autosave
+		await page.evaluate( ( postId ) => window.sessionStorage.setItem(
+			`wp-autosave-block-editor-post-${ postId }`,
+			JSON.stringify( { post_title: 'A', content: 'B', excerpt: 'C' } )
+		), await getCurrentPostId() );
+		expect( await page.evaluate( () => window.sessionStorage.length ) ).toBe( 1 );
+
+		// Trigger remote autosave
+		await page.evaluate( () => window.wp.data.dispatch( 'core/editor' ).autosave() );
+
+		expect( await page.evaluate( () => window.sessionStorage.length ) ).toBe( 0 );
+	} );
+
 	it( 'shouldn\'t conflict with server-side autosave', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'before publish' );
