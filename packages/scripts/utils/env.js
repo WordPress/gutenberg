@@ -64,7 +64,9 @@ function mergeYAMLConfigs( originalConfig, newConfig, baseDir ) {
  */
 async function installManagedWordPress() {
 	mkdirSync( getManagedWordPressPath(), { recursive: true } );
-	execSync( 'docker run -it --rm --volume "' + getManagedWordPressPath() + ':/var/www" wordpressdevelop/cli core download --path=/var/www/src --version=nightly --force', { stdio: 'inherit' } );
+	const uid = execSync( 'id -u' ).toString().trim();
+	const gid = execSync( 'id -g' ).toString().trim();
+	execSync( `docker run -it --rm --env PHP_FPM_UID=${ uid } --env PHP_FPM_GID=${ gid } --volume "` + getManagedWordPressPath() + ':/var/www" docker.pkg.github.com/wordpress/wpdev-docker-images/cli:latest-16 core download --path=/var/www/src --version=nightly --force', { stdio: 'inherit' } );
 
 	await new Promise( ( resolve ) => {
 		const tmpZip = normalize( tmpdir() + '/wordpress-develop.zip' );
@@ -135,7 +137,9 @@ async function installManagedWordPress() {
 
 	const compose = readFileSync( normalize( getManagedWordPressPath() + '/docker-compose.yml' ), 'utf8' );
 
-	const newCompose = compose.replace( /image: wordpressdevelop(.*)/, 'image: docker.pkg.github.com/wordpress/wpdev-docker-images$1-16' );
+	const newCompose = compose
+		.replace( /image: wordpressdevelop(.*)/, 'image: docker.pkg.github.com/wordpress/wpdev-docker-images$1-16' )
+		.replace( /environment:/, `environment:\n      PHP_FPM_UID: ${ uid }\n      PHP_FPM_GID: ${ gid }` );
 
 	writeFileSync( normalize( getManagedWordPressPath() + '/docker-compose.yml' ), newCompose );
 }
