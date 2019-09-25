@@ -24,7 +24,6 @@ branches:
 env:
   global:
     - PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: true
-    - WP_DEVELOP_DIR: ./wordpress
     - LOCAL_SCRIPT_DEBUG: false
     - INSTALL_COMPOSER: false
     - INSTALL_WORDPRESS: true
