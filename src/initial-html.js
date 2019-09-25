@@ -54,15 +54,15 @@ else:
 <!-- /wp:paragraph -->
 
 <!-- wp:image {"id":97629,"align":"full"} -->
-<figure class="wp-block-image alignfull"><img src="https://wordpress.org/gutenberg/files/2018/07/Screenshot-4-1.png" alt="" class="wp-image-97629"/></figure>
+<figure class="wp-block-image alignfull"><img src="https://wordpress.org/gutenberg/files/2018/07/Screenshot-4-1.png" alt="" class="wp-image-97629"/><figcaption><em>Gutenberg</em> on web</figcaption></figure>
 <!-- /wp:image -->
 
 <!-- wp:video {"id":683} -->
-<figure class="wp-block-video"><video controls src="https://i.cloudup.com/YtZFJbuQCE.mov"></video></figure>
+<figure class="wp-block-video"><video controls src="https://i.cloudup.com/YtZFJbuQCE.mov"></video><figcaption>Videos too!</figcaption></figure>
 <!-- /wp:video -->
 
 <!-- wp:paragraph {"align":"left"} -->
-<p style="text-align:left">We call the new editor Gutenberg. The entire editing experience has been rebuilt for media rich pages and posts. Experience the flexibility that blocks will bring, whether you are building your first site, or write code for a living.</p>
+<p class="has-text-align-left">We call the new editor Gutenberg. The entire editing experience has been rebuilt for media rich pages and posts. Experience the flexibility that blocks will bring, whether you are building your first site, or write code for a living.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:gallery {"ids":[null,null,null,null],"columns":4,"align":"wide","className":"alignwide gutenberg-landing\u002d\u002dfeatures-grid"} -->
@@ -78,7 +78,7 @@ else:
 <!-- /wp:wporg/download-button -->
 
 <!-- wp:paragraph {"align":"center","fontSize":"small","className":"gutenberg-landing\u002d\u002dbutton-disclaimer"} -->
-<p style="text-align:center" class="has-small-font-size gutenberg-landing--button-disclaimer"><em>Gutenberg is available as a plugin now, and soon by default in version 5.0 of WordPress. The <a href="https://wordpress.org/plugins/classic-editor/">classic editor</a> will be available as a plugin if needed.</em></p>
+<p class="has-text-align-center has-small-font-size gutenberg-landing--button-disclaimer"><em>Gutenberg is available as a plugin now, and soon by default in version 5.0 of WordPress. The <a href="https://wordpress.org/plugins/classic-editor/">classic editor</a> will be available as a plugin if needed.</em></p>
 <!-- /wp:paragraph -->
 
 <!-- wp:spacer -->
@@ -90,7 +90,7 @@ else:
 <!-- /wp:heading -->
 
 <!-- wp:paragraph {"align":"left"} -->
-<p style="text-align:left">Blocks are a great new tool for building engaging content. With blocks, you can insert, rearrange, and style multimedia content with very little technical knowledge. Instead of using custom code, you can add a block and focus on your content.</p>
+<p class="has-text-align-left">Blocks are a great new tool for building engaging content. With blocks, you can insert, rearrange, and style multimedia content with very little technical knowledge. Instead of using custom code, you can add a block and focus on your content.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:image {"id":358} -->
@@ -98,7 +98,7 @@ else:
 <!-- /wp:image -->
 
 <!-- wp:paragraph {"align":"left"} -->
-<p style="text-align:left">Without being an expert developer, you can build your own custom posts and pages. Here’s a selection of the default blocks included with Gutenberg:</p>
+<p class="has-text-align-left">Without being an expert developer, you can build your own custom posts and pages. Here’s a selection of the default blocks included with Gutenberg:</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:gallery {"ids":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],"columns":8,"align":"full","className":"alignfull"} -->
@@ -114,7 +114,7 @@ else:
 <!-- /wp:heading -->
 
 <!-- wp:paragraph {"align":"left"} -->
-<p style="text-align:left">A single block is nice—reliable, clear, distinct. Discover the flexibility to use media and content, side by side, driven by your vision.</p>
+<p class="has-text-align-left">A single block is nice—reliable, clear, distinct. Discover the flexibility to use media and content, side by side, driven by your vision.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:image {"id":98363} -->
@@ -132,29 +132,29 @@ else:
 <!-- wp:columns {"className":"gutenberg-landing\u002d\u002ddevelopers-columns"} -->
 <div class="wp-block-columns has-2-columns gutenberg-landing--developers-columns"><!-- wp:column -->
 <div class="wp-block-column"><!-- wp:paragraph {"align":"left"} -->
-<p style="text-align:left"><strong>Built with modern technology.</strong></p>
+<p class="has-text-align-left"><strong>Built with modern technology.</strong></p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph {"align":"left"} -->
-<p style="text-align:left">Gutenberg was developed on GitHub using the WordPress REST API, JavaScript, and React.</p>
+<p class="has-text-align-left">Gutenberg was developed on GitHub using the WordPress REST API, JavaScript, and React.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph {"align":"left","fontSize":"small"} -->
-<p style="text-align:left" class="has-small-font-size"><a href="https://wordpress.org/gutenberg/handbook/language/">Learn more</a></p>
+<p class="has-text-align-left has-small-font-size"><a href="https://wordpress.org/gutenberg/handbook/language/">Learn more</a></p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:column -->
 
 <!-- wp:column -->
 <div class="wp-block-column"><!-- wp:paragraph {"align":"left"} -->
-<p style="text-align:left"><strong>Designed for compatibility.</strong></p>
+<p class="has-text-align-left"><strong>Designed for compatibility.</strong></p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph {"align":"left"} -->
-<p style="text-align:left">We recommend migrating features to blocks, but support for existing WordPress functionality remains. There will be transition paths for shortcodes, meta-boxes, and Custom Post Types.</p>
+<p class="has-text-align-left">We recommend migrating features to blocks, but support for existing WordPress functionality remains. There will be transition paths for shortcodes, meta-boxes, and Custom Post Types.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph {"align":"left","fontSize":"small"} -->
-<p style="text-align:left" class="has-small-font-size"><a href="https://wordpress.org/gutenberg/handbook/reference/faq/">Learn more</a></p>
+<p class="has-text-align-left has-small-font-size"><a href="https://wordpress.org/gutenberg/handbook/reference/faq/">Learn more</a></p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:column --></div>
 <!-- /wp:columns -->
@@ -168,19 +168,19 @@ else:
 <!-- /wp:heading -->
 
 <!-- wp:paragraph {"align":"left"} -->
-<p style="text-align:left">Gutenberg is more than an editor. It’s also the foundation that’ll revolutionize customization and site building in WordPress.</p>
+<p class="has-text-align-left">Gutenberg is more than an editor. It’s also the foundation that’ll revolutionize customization and site building in WordPress.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:quote {"align":"left","className":"is-style-large"} -->
-<blockquote style="text-align:left" class="wp-block-quote is-style-large"><p>"This will make running your own blog a viable alternative again."</p><cite>— <a href="https://twitter.com/azumbrunnen_/status/1019347243084800005">Adrian Zumbrunnen</a></cite></blockquote>
+<blockquote class="has-text-align-left wp-block-quote is-style-large"><p>"This will make running your own blog a viable alternative again."</p><cite>— <a href="https://twitter.com/azumbrunnen_/status/1019347243084800005">Adrian Zumbrunnen</a></cite></blockquote>
 <!-- /wp:quote -->
 
 <!-- wp:quote {"align":"left","className":"is-style-large"} -->
-<blockquote style="text-align:left" class="wp-block-quote is-style-large"><p>"The web up until this point has been confined to some sort of rectangular screen. But that is not how it’s going to be. Gutenberg has the potential of moving us into the next time."</p><cite>— <a href="https://wordpress.tv/2017/12/10/morten-rand-hendriksen-gutenberg-and-the-wordpress-of-tomorrow/">Morten Rand-Hendriksen</a></cite></blockquote>
+<blockquote class="has-text-align-left wp-block-quote is-style-large"><p>"The web up until this point has been confined to some sort of rectangular screen. But that is not how it’s going to be. Gutenberg has the potential of moving us into the next time."</p><cite>— <a href="https://wordpress.tv/2017/12/10/morten-rand-hendriksen-gutenberg-and-the-wordpress-of-tomorrow/">Morten Rand-Hendriksen</a></cite></blockquote>
 <!-- /wp:quote -->
 
 <!-- wp:quote {"align":"left","className":"is-style-large"} -->
-<blockquote style="text-align:left" class="wp-block-quote is-style-large"><p>"The Gutenberg editor has some great assets that could genuinely help people to write better texts."</p><cite>— <a href="https://yoast.com/writing-with-gutenberg/">Marieke van de Rakt</a></cite></blockquote>
+<blockquote class="has-text-align-left wp-block-quote is-style-large"><p>"The Gutenberg editor has some great assets that could genuinely help people to write better texts."</p><cite>— <a href="https://yoast.com/writing-with-gutenberg/">Marieke van de Rakt</a></cite></blockquote>
 <!-- /wp:quote -->
 
 <!-- wp:spacer -->
@@ -192,7 +192,7 @@ else:
 <!-- /wp:wporg/download-button -->
 
 <!-- wp:paragraph {"align":"center","fontSize":"small","className":"gutenberg-landing\u002d\u002dbutton-disclaimer"} -->
-<p style="text-align:center" class="has-small-font-size gutenberg-landing--button-disclaimer"><em>Gutenberg is available as a plugin today, and will be included in version 5.0 of WordPress. The <a href="https://wordpress.org/plugins/classic-editor/">classic editor</a> will be available as a plugin if needed.</em></p>
+<p class="has-text-align-center has-small-font-size gutenberg-landing--button-disclaimer"><em>Gutenberg is available as a plugin today, and will be included in version 5.0 of WordPress. The <a href="https://wordpress.org/plugins/classic-editor/">classic editor</a> will be available as a plugin if needed.</em></p>
 <!-- /wp:paragraph -->
 
 <!-- wp:spacer -->

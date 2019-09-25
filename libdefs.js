@@ -8,5 +8,5 @@ declare module 'react-native' {
 }
 
 declare module 'react-native/lib/TextInputState' {
-    declare module.exports: any;
+	declare module.exports: any;
 }

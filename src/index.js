@@ -1,5 +1,11 @@
 /**
  * External dependencies
+ *
+ * @format
+ */
+
+/**
+ * External dependencies
  */
 import { AppRegistry, I18nManager, YellowBox } from 'react-native';
 import React from 'react';
