@@ -18,11 +18,6 @@ import {
 	EditorHistoryUndo,
 } from '@wordpress/editor';
 
-/**
- * Internal dependencies
- */
-import FullscreenModeClose from '../fullscreen-mode-close';
-
 function HeaderToolbar( { hasFixedToolbar, isLargeViewport, showInserter, isTextModeEnabled } ) {
 	const toolbarAriaLabel = hasFixedToolbar ?
 		/* translators: accessibility text for the editor toolbar when Top Toolbar is on */
@@ -35,9 +30,8 @@ function HeaderToolbar( { hasFixedToolbar, isLargeViewport, showInserter, isText
 			className="edit-post-header-toolbar"
 			aria-label={ toolbarAriaLabel }
 		>
-			<FullscreenModeClose />
 			<div>
-				<Inserter disabled={ ! showInserter } position="bottom right" />
+				<Inserter disabled={ ! showInserter } position="bottom right" showInserterHelpPanel />
 				<DotTip tipId="core/editor.inserter">
 					{ __( 'Welcome to the wonderful world of blocks! Click the “+” (“Add block”) button to add a new block. There are blocks available for all kinds of content: you can insert text, headings, images, lists, and lots more!' ) }
 				</DotTip>

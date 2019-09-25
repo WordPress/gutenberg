@@ -5,6 +5,9 @@
         "isValid": true,
         "attributes": {
             "postsToShow": 5,
+            "displayPostContent": false,
+            "displayPostContentRadio": "excerpt",
+            "excerptLength": 55,
             "displayPostDate": false,
             "postLayout": "list",
             "columns": 3,

@@ -3,9 +3,8 @@
  */
 import { __ } from '@wordpress/i18n';
 import { PanelBody } from '@wordpress/components';
-import { Fragment } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { compose, ifCondition } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -29,7 +28,7 @@ function PostStatus( { isOpened, onTogglePanel } ) {
 		<PanelBody className="edit-post-post-status" title={ __( 'Status & Visibility' ) } opened={ isOpened } onToggle={ onTogglePanel }>
 			<PluginPostStatusInfo.Slot>
 				{ ( fills ) => (
-					<Fragment>
+					<>
 						<PostVisibility />
 						<PostSchedule />
 						<PostFormat />
@@ -38,7 +37,7 @@ function PostStatus( { isOpened, onTogglePanel } ) {
 						<PostAuthor />
 						{ fills }
 						<PostTrash />
-					</Fragment>
+					</>
 				) }
 			</PluginPostStatusInfo.Slot>
 		</PanelBody>
@@ -46,9 +45,16 @@ function PostStatus( { isOpened, onTogglePanel } ) {
 }
 
 export default compose( [
-	withSelect( ( select ) => ( {
-		isOpened: select( 'core/edit-post' ).isEditorPanelOpened( PANEL_NAME ),
-	} ) ),
+	withSelect( ( select ) => {
+		// We use isEditorPanelRemoved to hide the panel if it was programatically removed. We do
+		// not use isEditorPanelEnabled since this panel should not be disabled through the UI.
+		const { isEditorPanelRemoved, isEditorPanelOpened } = select( 'core/edit-post' );
+		return {
+			isRemoved: isEditorPanelRemoved( PANEL_NAME ),
+			isOpened: isEditorPanelOpened( PANEL_NAME ),
+		};
+	} ),
+	ifCondition( ( { isRemoved } ) => ! isRemoved ),
 	withDispatch( ( dispatch ) => ( {
 		onTogglePanel() {
 			return dispatch( 'core/edit-post' ).toggleEditorPanelOpened( PANEL_NAME );

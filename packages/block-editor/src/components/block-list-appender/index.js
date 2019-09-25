@@ -21,19 +21,25 @@ function BlockListAppender( {
 	rootClientId,
 	canInsertDefaultBlock,
 	isLocked,
-	renderAppender,
+	renderAppender: CustomAppender,
 } ) {
 	if ( isLocked ) {
 		return null;
 	}
 
-	// A render prop has been provided, use it to render the appender.
-	if ( renderAppender ) {
+	// If a render prop has been provided
+	// use it to render the appender.
+	if ( CustomAppender ) {
 		return (
 			<div className="block-list-appender">
-				{ renderAppender() }
+				<CustomAppender />
 			</div>
 		);
+	}
+
+	// a false value means, don't render any appender.
+	if ( CustomAppender === false ) {
+		return null;
 	}
 
 	// Render the default block appender when renderAppender has not been

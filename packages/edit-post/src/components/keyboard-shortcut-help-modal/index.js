@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { castArray } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -40,30 +41,38 @@ const mapKeyCombination = ( keyCombination ) => keyCombination.map( ( character,
 } );
 
 const ShortcutList = ( { shortcuts } ) => (
-	<dl className="edit-post-keyboard-shortcut-help__shortcut-list">
+	/*
+	 * Disable reason: The `list` ARIA role is redundant but
+	 * Safari+VoiceOver won't announce the list otherwise.
+	 */
+	/* eslint-disable jsx-a11y/no-redundant-roles */
+	<ul className="edit-post-keyboard-shortcut-help__shortcut-list" role="list">
 		{ shortcuts.map( ( { keyCombination, description, ariaLabel }, index ) => (
-			<div
+			<li
 				className="edit-post-keyboard-shortcut-help__shortcut"
 				key={ index }
 			>
-				<dt className="edit-post-keyboard-shortcut-help__shortcut-term">
+				<div className="edit-post-keyboard-shortcut-help__shortcut-description">
+					{ description }
+				</div>
+				<div className="edit-post-keyboard-shortcut-help__shortcut-term">
 					<kbd className="edit-post-keyboard-shortcut-help__shortcut-key-combination" aria-label={ ariaLabel }>
 						{ mapKeyCombination( castArray( keyCombination ) ) }
 					</kbd>
-				</dt>
-				<dd className="edit-post-keyboard-shortcut-help__shortcut-description">
-					{ description }
-				</dd>
-			</div>
+				</div>
+			</li>
 		) ) }
-	</dl>
+	</ul>
+	/* eslint-enable jsx-a11y/no-redundant-roles */
 );
 
-const ShortcutSection = ( { title, shortcuts } ) => (
-	<section className="edit-post-keyboard-shortcut-help__section">
-		<h2 className="edit-post-keyboard-shortcut-help__section-title">
-			{ title }
-		</h2>
+const ShortcutSection = ( { title, shortcuts, className } ) => (
+	<section className={ classnames( 'edit-post-keyboard-shortcut-help__section', className ) }>
+		{ !! title && (
+			<h2 className="edit-post-keyboard-shortcut-help__section-title">
+				{ title }
+			</h2>
+		) }
 		<ShortcutList shortcuts={ shortcuts } />
 	</section>
 );

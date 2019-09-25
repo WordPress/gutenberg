@@ -102,7 +102,7 @@ export function blockStyles( state = {}, action ) {
  *
  * @param {string} setActionType  Action type.
  *
- * @return {function} Reducer.
+ * @return {Function} Reducer.
  */
 export function createBlockNameSetterReducer( setActionType ) {
 	return ( state = null, action ) => {
@@ -124,6 +124,7 @@ export function createBlockNameSetterReducer( setActionType ) {
 export const defaultBlockName = createBlockNameSetterReducer( 'SET_DEFAULT_BLOCK_NAME' );
 export const freeformFallbackBlockName = createBlockNameSetterReducer( 'SET_FREEFORM_FALLBACK_BLOCK_NAME' );
 export const unregisteredFallbackBlockName = createBlockNameSetterReducer( 'SET_UNREGISTERED_FALLBACK_BLOCK_NAME' );
+export const groupingBlockName = createBlockNameSetterReducer( 'SET_GROUPING_BLOCK_NAME' );
 
 /**
  * Reducer managing the categories
@@ -164,5 +165,6 @@ export default combineReducers( {
 	defaultBlockName,
 	freeformFallbackBlockName,
 	unregisteredFallbackBlockName,
+	groupingBlockName,
 	categories,
 } );

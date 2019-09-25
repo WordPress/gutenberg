@@ -12,6 +12,7 @@ process.on( 'unhandledRejection', ( err ) => {
 /**
  * External dependencies
  */
+/* eslint-disable-next-line jest/no-jest-import */
 const jest = require( 'jest' );
 
 /**
@@ -19,9 +20,9 @@ const jest = require( 'jest' );
  */
 const {
 	fromConfigRoot,
-	getCliArg,
-	getCliArgs,
-	hasCliArg,
+	getArgFromCLI,
+	getArgsFromCLI,
+	hasArgInCLI,
 	hasProjectFile,
 	hasJestConfig,
 } = require( '../utils' );
@@ -37,15 +38,15 @@ const config = ! hasJestConfig() ?
 	[ '--config', JSON.stringify( require( fromConfigRoot( 'jest-e2e.config.js' ) ) ) ] :
 	[];
 
-const hasRunInBand = hasCliArg( '--runInBand' ) ||
-	hasCliArg( '-i' );
+const hasRunInBand = hasArgInCLI( '--runInBand' ) ||
+	hasArgInCLI( '-i' );
 const runInBand = ! hasRunInBand ?
 	[ '--runInBand' ] :
 	[];
 
-if ( hasCliArg( '--puppeteer-interactive' ) ) {
+if ( hasArgInCLI( '--puppeteer-interactive' ) ) {
 	process.env.PUPPETEER_HEADLESS = 'false';
-	process.env.PUPPETEER_SLOWMO = getCliArg( '--puppeteer-slowmo' ) || 80;
+	process.env.PUPPETEER_SLOWMO = getArgFromCLI( '--puppeteer-slowmo' ) || 80;
 }
 
 const configsMapping = {
@@ -55,11 +56,11 @@ const configsMapping = {
 };
 
 Object.entries( configsMapping ).forEach( ( [ envKey, argName ] ) => {
-	if ( hasCliArg( argName ) ) {
-		process.env[ envKey ] = getCliArg( argName );
+	if ( hasArgInCLI( argName ) ) {
+		process.env[ envKey ] = getArgFromCLI( argName );
 	}
 } );
 
 const cleanUpPrefixes = [ '--puppeteer-', '--wordpress-' ];
 
-jest.run( [ ...config, ...runInBand, ...getCliArgs( cleanUpPrefixes ) ] );
+jest.run( [ ...config, ...runInBand, ...getArgsFromCLI( cleanUpPrefixes ) ] );

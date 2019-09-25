@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { Fragment } from '@wordpress/element';
 import { __experimentalBlockSettingsMenuPluginsExtension } from '@wordpress/block-editor';
 import { withSelect } from '@wordpress/data';
 
@@ -15,7 +14,7 @@ function ReusableBlocksButtons( { clientIds } ) {
 	return (
 		<__experimentalBlockSettingsMenuPluginsExtension>
 			{ ( { onClose } ) => (
-				<Fragment>
+				<>
 					<ReusableBlockConvertButton
 						clientIds={ clientIds }
 						onToggle={ onClose }
@@ -26,7 +25,7 @@ function ReusableBlocksButtons( { clientIds } ) {
 							onToggle={ onClose }
 						/>
 					) }
-				</Fragment>
+				</>
 			) }
 		</__experimentalBlockSettingsMenuPluginsExtension>
 	);

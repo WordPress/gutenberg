@@ -9,6 +9,7 @@ import {
 	setDefaultBlockName,
 	setFreeformContentHandlerName,
 	setUnregisteredTypeHandlerName,
+	setGroupingBlockName,
 	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
 } from '@wordpress/blocks';
 
@@ -33,6 +34,8 @@ import * as embed from './embed';
 import * as file from './file';
 import * as html from './html';
 import * as mediaText from './media-text';
+import * as navigationMenu from './navigation-menu';
+import * as navigationMenuItem from './navigation-menu-item';
 import * as latestComments from './latest-comments';
 import * as latestPosts from './latest-posts';
 import * as legacyWidget from './legacy-widget';
@@ -51,13 +54,30 @@ import * as shortcode from './shortcode';
 import * as spacer from './spacer';
 import * as subhead from './subhead';
 import * as table from './table';
-import * as template from './template';
 import * as textColumns from './text-columns';
 import * as verse from './verse';
 import * as video from './video';
 import * as tagCloud from './tag-cloud';
-
 import * as classic from './classic';
+import * as socialLinks from './social-links';
+import * as socialLink from './social-link';
+
+/**
+ * Function to register an individual block.
+ *
+ * @param {Object} block The block to be registered.
+ *
+ */
+const registerBlock = ( block ) => {
+	if ( ! block ) {
+		return;
+	}
+	const { metadata, settings, name } = block;
+	if ( metadata ) {
+		unstable__bootstrapServerSideBlockDefinitions( { [ name ]: metadata } );
+	}
+	registerBlockType( name, settings );
+};
 
 /**
  * Function to register core blocks provided by the block editor.
@@ -101,7 +121,6 @@ export const registerCoreBlocks = () => {
 		mediaText,
 		latestComments,
 		latestPosts,
-		process.env.GUTENBERG_PHASE === 2 ? legacyWidget : null,
 		missing,
 		more,
 		nextpage,
@@ -115,24 +134,42 @@ export const registerCoreBlocks = () => {
 		subhead,
 		table,
 		tagCloud,
-		template,
 		textColumns,
 		verse,
 		video,
-	].forEach( ( block ) => {
-		if ( ! block ) {
-			return;
-		}
-		const { metadata, settings, name } = block;
-		if ( metadata ) {
-			unstable__bootstrapServerSideBlockDefinitions( { [ name ]: metadata } ); // eslint-disable-line camelcase
-		}
-		registerBlockType( name, settings );
-	} );
+	].forEach( registerBlock );
 
 	setDefaultBlockName( paragraph.name );
 	if ( window.wp && window.wp.oldEditor ) {
 		setFreeformContentHandlerName( classic.name );
 	}
 	setUnregisteredTypeHandlerName( missing.name );
+
+	if ( group ) {
+		setGroupingBlockName( group.name );
+	}
 };
+
+/**
+ * Function to register experimental core blocks depending on editor settings.
+ *
+ * @param {Object} settings Editor settings.
+ *
+ * @example
+ * ```js
+ * import { __experimentalRegisterExperimentalCoreBlocks } from '@wordpress/block-library';
+ *
+ * __experimentalRegisterExperimentalCoreBlocks( settings );
+ * ```
+ */
+export const __experimentalRegisterExperimentalCoreBlocks = process.env.GUTENBERG_PHASE === 2 ? ( settings ) => {
+	const { __experimentalEnableLegacyWidgetBlock, __experimentalEnableMenuBlock } = settings;
+
+	[
+		__experimentalEnableLegacyWidgetBlock ? legacyWidget : null,
+		__experimentalEnableMenuBlock ? navigationMenu : null,
+		__experimentalEnableMenuBlock ? navigationMenuItem : null,
+		socialLinks,
+		...socialLink.sites,
+	].forEach( registerBlock );
+} : undefined;

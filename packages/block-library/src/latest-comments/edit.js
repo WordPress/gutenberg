@@ -8,8 +8,8 @@ import {
 	RangeControl,
 	ToggleControl,
 } from '@wordpress/components';
-import { ServerSideRender } from '@wordpress/editor';
-import { Component, Fragment } from '@wordpress/element';
+import ServerSideRender from '@wordpress/server-side-render';
+import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -61,7 +61,7 @@ class LatestComments extends Component {
 		} = this.props.attributes;
 
 		return (
-			<Fragment>
+			<>
 				<InspectorControls>
 					<PanelBody title={ __( 'Latest Comments Settings' ) }>
 						<ToggleControl
@@ -95,7 +95,7 @@ class LatestComments extends Component {
 						attributes={ this.props.attributes }
 					/>
 				</Disabled>
-			</Fragment>
+			</>
 		);
 	}
 }

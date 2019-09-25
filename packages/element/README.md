@@ -219,6 +219,12 @@ _Related_
 
 -   <https://reactjs.org/docs/react-api.html#reactlazy>
 
+<a name="memo" href="#memo">#</a> **memo**
+
+_Related_
+
+-   <https://reactjs.org/docs/react-api.html#reactmemo>
+
 <a name="RawHTML" href="#RawHTML">#</a> **RawHTML**
 
 Component used as equivalent of Fragment with unescaped HTML, in cases where
@@ -228,7 +234,9 @@ aside from `children` are passed.
 
 _Parameters_
 
+-   _props_ `Object`: 
 -   _props.children_ `string`: HTML to render.
+-   _props.props_ `Object`: Any additonal props to be set on the containing div.
 
 _Returns_
 

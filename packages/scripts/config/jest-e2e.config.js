@@ -11,9 +11,12 @@ const { hasBabelConfig } = require( '../utils' );
 const jestE2EConfig = {
 	preset: 'jest-puppeteer',
 	testMatch: [
-		'**/__tests__/**/*.js',
-		'**/?(*.)(spec|test).js',
-		'**/test/*.js',
+		'**/specs/**/*.[jt]s',
+		'**/?(*.)spec.[jt]s',
+	],
+	testPathIgnorePatterns: [
+		'/node_modules/',
+		'/wordpress/',
 	],
 };
 

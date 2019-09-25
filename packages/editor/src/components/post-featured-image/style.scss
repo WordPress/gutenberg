@@ -5,10 +5,10 @@
 		margin: 0;
 	}
 
-	// Space consecutive buttons evenly.
+	// Stack consecutive buttons.
 	.components-button + .components-button {
+		display: block;
 		margin-top: 1em;
-		margin-right: 8px;
 	}
 
 	// This keeps images at their intrinsic size (eg. a 50px
@@ -25,6 +25,7 @@
 	width: 100%;
 	padding: 0;
 	transition: all 0.1s ease-out;
+	@include reduce-motion("transition");
 	box-shadow: 0 0 0 0 $blue-medium-500;
 }
 

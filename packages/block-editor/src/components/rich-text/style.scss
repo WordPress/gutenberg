@@ -1,22 +1,9 @@
-
 .block-editor-rich-text {
 	// This is needed to position the formatting toolbar.
 	position: relative;
 }
 
 .block-editor-rich-text__editable {
-	position: relative;
-	// In HTML, leading and trailing spaces are not visible, and multiple spaces
-	// elsewhere are visually reduced to one space. This rule prevents spaces
-	// from collapsing so all space is visible in the editor and can be removed.
-	// It also prevents some browsers from inserting non-breaking spaces at the
-	// end of a line to prevent the space from visually disappearing. Sometimes
-	// these non breaking spaces can linger in the editor causing unwanted non
-	// breaking spaces in between words. If also prevent Firefox from inserting
-	// a trailing `br` node to visualise any trailing space, causing the element
-	// to be saved.
-	white-space: pre-wrap !important;
-
 	> p:first-child {
 		margin-top: 0;
 	}
@@ -47,37 +34,27 @@
 		}
 	}
 
-	&[data-is-placeholder-visible="true"] {
-		position: absolute;
-		top: 0;
-		width: 100%;
-		margin-top: 0;
-
-		& > p {
-			margin-top: 0;
-		}
-
-		// Ensure that if placeholder wraps (mobile/nested contexts) the clickable area is full-height.
-		height: 100%;
+	[data-rich-text-placeholder] {
+		pointer-events: none;
 	}
 
-	// Placeholder text.
-	& + .block-editor-rich-text__editable {
-		pointer-events: none;
-
+	[data-rich-text-placeholder]::after {
+		content: attr(data-rich-text-placeholder);
 		// Use opacity to work in various editor styles.
 		// We don't specify the color here, because blocks or editor styles might provide their own.
-		&,
-		p {
-			opacity: 0.62;
-		}
+		opacity: 0.62;
 	}
 
-	// Captions may have lighter (gray) text, or be shown on a range of different background luminosites.
-	// To ensure legibility, we increase the default placeholder opacity to ensure contrast.
-	&[data-is-placeholder-visible="true"] + figcaption.block-editor-rich-text__editable {
-		opacity: 0.8;
+	// Could be unset for individual rich text instances.
+	&.is-selected:not(.keep-placeholder-on-focus) [data-rich-text-placeholder]::after {
+		display: none;
 	}
+}
+
+// Captions may have lighter (gray) text, or be shown on a range of different background luminosites.
+// To ensure legibility, we increase the default placeholder opacity to ensure contrast.
+figcaption.block-editor-rich-text__editable [data-rich-text-placeholder]::before {
+	opacity: 0.8;
 }
 
 .block-editor-rich-text__inline-toolbar {

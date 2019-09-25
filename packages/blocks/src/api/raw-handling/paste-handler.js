@@ -11,6 +11,7 @@ import { getBlockContent } from '../serializer';
 import { getBlockAttributes, parseWithGrammar } from '../parser';
 import normaliseBlocks from './normalise-blocks';
 import specialCommentConverter from './special-comment-converter';
+import commentRemover from './comment-remover';
 import isInlineContent from './is-inline-content';
 import phrasingContentReducer from './phrasing-content-reducer';
 import headRemover from './head-remover';
@@ -44,7 +45,7 @@ const { console } = window;
  * @return {string} HTML only containing phrasing content.
  */
 function filterInlineHTML( HTML ) {
-	HTML = deepFilterHTML( HTML, [ googleDocsUIDRemover, phrasingContentReducer ] );
+	HTML = deepFilterHTML( HTML, [ googleDocsUIDRemover, phrasingContentReducer, commentRemover ] );
 	HTML = removeInvalidHTML( HTML, getPhrasingContentSchema(), { inline: true } );
 
 	// Allows us to ask for this information when we get a report.
@@ -112,6 +113,7 @@ function htmlToBlocks( { html, rawTransforms } ) {
 /**
  * Converts an HTML string to known blocks. Strips everything else.
  *
+ * @param {Object}  options
  * @param {string}  [options.HTML]                     The HTML to convert.
  * @param {string}  [options.plainText]                Plain text version.
  * @param {string}  [options.mode]                     Handle content as blocks or inline content.
@@ -204,6 +206,7 @@ export function pasteHandler( { HTML = '', plainText = '', mode = 'AUTO', tagNam
 			imageCorrector,
 			phrasingContentReducer,
 			specialCommentConverter,
+			commentRemover,
 			figureContentReducer,
 			blockquoteNormaliser,
 		];

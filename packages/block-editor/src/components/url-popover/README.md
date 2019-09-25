@@ -8,7 +8,6 @@ URLPopover is a presentational React component used to render a popover used for
 The component will be rendered adjacent to its parent.
 
 ```jsx
-import { Fragment } from '@wordpress/elements';
 import { ToggleControl, IconButton, Button } from '@wordpress/components';
 import { URLPopover } from '@wordpress/block-editor';
 
@@ -58,7 +57,7 @@ class MyURLPopover extends Component {
 		const { url, isVisible, isEditing } = this.state;
 
 		return (
-			<Fragment>
+			<>
 				<Button onClick={ this.openURLPopover }>Edit URL</Button>
 				{ isVisible && (
 					<URLPopover
@@ -77,7 +76,7 @@ class MyURLPopover extends Component {
 						</form>
 					</URLPopover>
 				) }
-			</Fragment>
+			</>
 		);
 	}
 }
@@ -112,3 +111,80 @@ drawer.
 
 - Type: `Function`
 - Required: No
+
+
+## Useful UI pieces
+
+The URLPopover exposes two components that may be used as child components to make the UI creation process easier.
+Although in the editor these components are used inside URLPopover and they were built with URLPopover use cases in mind, it maybe is possible and perfectly fine to use them standalone if they fit a use-case.
+
+### LinkViewer
+
+LinkViewer provides a simple UI that allows users to see a link and may also offer a button to switch to a mode that will enable editing that link.
+The component accepts the following props. Any other props are passed through to the underlying `div` container.
+
+### className
+
+A class that together with "block-editor-url-popover__link-viewer" is used as a class of the wrapper div.
+If no className is passed only "block-editor-url-popover__link-viewer" is used.
+
+- Type: `String`
+- Required: No
+
+### linkClassName
+
+A class that will be used in the component that renders the link. 
+
+- Type: `String`
+- Required: No
+
+### url
+
+The current URL to view.
+
+- Type: `String`
+- Required: Yes
+
+### urlLabel
+
+The URL label, if not passed a label is automatically generated from the `url`.
+
+- Type: `String`
+- Required: No
+
+### onEditLinkClick
+
+A function called when the user presses the button that allows editing a link. If not passed the link-edit button is not rendered.
+
+- Type: `function`
+- Required: No
+
+
+### LinkEditor
+
+LinkEditor provides a simple UI that allows users to edit link.
+The component accepts the following props. Any other props are passed through to the underlying `form` container.
+
+### value
+
+This property should be set to the attribute (or component state) property used to store the URL.
+This property is directly passed to  `URLInput` component ([refer to its documentation](/packages/components/src/url-input/README.md)) to read additional details.
+
+- Type: `String`
+- Required: Yes
+
+### onChange
+
+Called when the value changes. The second parameter is `null` unless the user selects a post from the suggestions dropdown.
+More
+This property is directly passed to component `URLInput` ([refer to its documentation](/packages/components/src/url-input/README.md)) to read additional details.
+
+- Type: `function`
+- Required: Yes
+
+### autocompleteRef
+
+Reference passed to the auto complete element of the ([URLInput component](/packages/components/src/url-input/README.md)).
+
+- Type: `Object`
+- Required: no

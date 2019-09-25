@@ -17,6 +17,13 @@ import controls from './controls';
  */
 const MODULE_KEY = 'core/block-editor';
 
+/**
+ * Block editor data store configuration.
+ *
+ * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#registerStore
+ *
+ * @type {Object}
+ */
 export const storeConfig = {
 	reducer,
 	selectors,

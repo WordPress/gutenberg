@@ -69,9 +69,7 @@ class DropZoneProvider extends Component {
 		this.state = {
 			hoveredDropZone: -1,
 			isDraggingOverDocument: false,
-			isDraggingOverElement: false,
 			position: null,
-			type: null,
 		};
 	}
 
@@ -105,9 +103,7 @@ class DropZoneProvider extends Component {
 		this.setState( {
 			hoveredDropZone: -1,
 			isDraggingOverDocument: false,
-			isDraggingOverElement: false,
 			position: null,
-			type: null,
 		} );
 
 		this.dropZones.forEach( ( dropZone ) => dropZone.setState( {

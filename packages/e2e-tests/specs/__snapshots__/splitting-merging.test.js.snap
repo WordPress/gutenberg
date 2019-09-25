@@ -83,3 +83,9 @@ exports[`splitting and merging blocks should split and merge paragraph blocks us
 <p>BeforeSecond:Second</p>
 <!-- /wp:paragraph -->"
 `;
+
+exports[`splitting and merging blocks should undo split in one go 1`] = `
+"<!-- wp:paragraph -->
+<p>12</p>
+<!-- /wp:paragraph -->"
+`;

@@ -17,12 +17,12 @@ import { __ } from '@wordpress/i18n';
 import { PreserveScrollInReorder } from '@wordpress/block-editor';
 import {
 	AutosaveMonitor,
+	LocalAutosaveMonitor,
 	UnsavedChangesWarning,
 	EditorNotices,
 	PostPublishPanel,
 } from '@wordpress/editor';
 import { withDispatch, withSelect } from '@wordpress/data';
-import { Fragment } from '@wordpress/element';
 import { PluginArea } from '@wordpress/plugins';
 import { withViewportMatch } from '@wordpress/viewport';
 import { compose } from '@wordpress/compose';
@@ -63,6 +63,7 @@ function Layout( {
 	const className = classnames( 'edit-post-layout', {
 		'is-sidebar-opened': sidebarIsOpened,
 		'has-fixed-toolbar': hasFixedToolbar,
+		'has-metaboxes': hasActiveMetaboxes,
 	} );
 
 	const publishLandmarkProps = {
@@ -77,6 +78,7 @@ function Layout( {
 			<BrowserURL />
 			<UnsavedChangesWarning />
 			<AutosaveMonitor />
+			<LocalAutosaveMonitor />
 			<Header />
 			<div
 				className="edit-post-layout__content"
@@ -85,8 +87,7 @@ function Layout( {
 				aria-label={ __( 'Editor content' ) }
 				tabIndex="-1"
 			>
-				<EditorNotices dismissible={ false } className="is-pinned" />
-				<EditorNotices dismissible={ true } />
+				<EditorNotices />
 				<PreserveScrollInReorder />
 				<EditorModeKeyboardShortcuts />
 				<KeyboardShortcutHelpModal />
@@ -111,7 +112,7 @@ function Layout( {
 					PostPublishExtension={ PluginPostPublishPanel.Slot }
 				/>
 			) : (
-				<Fragment>
+				<>
 					<div className="edit-post-toggle-publish-panel" { ...publishLandmarkProps }>
 						<Button
 							isDefault
@@ -128,7 +129,7 @@ function Layout( {
 					{
 						isMobileViewport && sidebarIsOpened && <ScrollLock />
 					}
-				</Fragment>
+				</>
 			) }
 			<Popover.Slot />
 			<PluginArea />

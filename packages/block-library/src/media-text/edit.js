@@ -16,7 +16,7 @@ import {
 	PanelColorSettings,
 	withColors,
 } from '@wordpress/block-editor';
-import { Component, Fragment } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import {
 	PanelBody,
 	TextareaControl,
@@ -33,10 +33,12 @@ import MediaContainer from './media-container';
 /**
  * Constants
  */
-const ALLOWED_BLOCKS = [ 'core/button', 'core/paragraph', 'core/heading', 'core/list' ];
 const TEMPLATE = [
 	[ 'core/paragraph', { fontSize: 'large', placeholder: _x( 'Content…', 'content placeholder' ) } ],
 ];
+// this limits the resize to a safe zone to avoid making broken layouts
+const WIDTH_CONSTRAINT_PERCENTAGE = 15;
+const applyWidthConstraints = ( width ) => Math.max( WIDTH_CONSTRAINT_PERCENTAGE, Math.min( width, 100 - WIDTH_CONSTRAINT_PERCENTAGE ) );
 
 class MediaTextEdit extends Component {
 	constructor() {
@@ -85,7 +87,7 @@ class MediaTextEdit extends Component {
 
 	onWidthChange( width ) {
 		this.setState( {
-			mediaWidth: width,
+			mediaWidth: applyWidthConstraints( width ),
 		} );
 	}
 
@@ -93,7 +95,7 @@ class MediaTextEdit extends Component {
 		const { setAttributes } = this.props;
 
 		setAttributes( {
-			mediaWidth: width,
+			mediaWidth: applyWidthConstraints( width ),
 		} );
 		this.setState( {
 			mediaWidth: null,
@@ -198,18 +200,18 @@ class MediaTextEdit extends Component {
 					value={ mediaAlt }
 					onChange={ onMediaAltChange }
 					help={
-						<Fragment>
+						<>
 							<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
 								{ __( 'Describe the purpose of the image' ) }
 							</ExternalLink>
 							{ __( 'Leave empty if the image is purely decorative.' ) }
-						</Fragment>
+						</>
 					}
 				/> ) }
 			</PanelBody>
 		);
 		return (
-			<Fragment>
+			<>
 				<InspectorControls>
 					{ mediaTextGeneralSettings }
 					<PanelColorSettings
@@ -230,12 +232,11 @@ class MediaTextEdit extends Component {
 				<div className={ classNames } style={ style } >
 					{ this.renderMediaArea() }
 					<InnerBlocks
-						allowedBlocks={ ALLOWED_BLOCKS }
 						template={ TEMPLATE }
 						templateInsertUpdatesSelection={ false }
 					/>
 				</div>
-			</Fragment>
+			</>
 		);
 	}
 }

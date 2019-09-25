@@ -21,6 +21,7 @@ describe( 'removeFormat', () => {
 		};
 		const expected = {
 			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
+			activeFormats: [],
 			text: 'one two three',
 		};
 		const result = removeFormat( deepFreeze( record ), 'strong', 3, 6 );
@@ -37,6 +38,7 @@ describe( 'removeFormat', () => {
 		};
 		const expected = {
 			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
+			activeFormats: [],
 			text: 'one two three',
 		};
 		const result = removeFormat( deepFreeze( record ), 'strong', 4, 4 );

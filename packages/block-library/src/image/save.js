@@ -7,7 +7,6 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { RichText } from '@wordpress/block-editor';
-import { Fragment } from '@wordpress/element';
 
 export default function save( { attributes } ) {
 	const {
@@ -22,10 +21,12 @@ export default function save( { attributes } ) {
 		height,
 		id,
 		linkTarget,
+		sizeSlug,
 	} = attributes;
 
 	const classes = classnames( {
 		[ `align${ align }` ]: align,
+		[ `size-${ sizeSlug }` ]: sizeSlug,
 		'is-resized': width || height,
 	} );
 
@@ -40,7 +41,7 @@ export default function save( { attributes } ) {
 	);
 
 	const figure = (
-		<Fragment>
+		<>
 			{ href ? (
 				<a
 					className={ linkClass }
@@ -52,7 +53,7 @@ export default function save( { attributes } ) {
 				</a>
 			) : image }
 			{ ! RichText.isEmpty( caption ) && <RichText.Content tagName="figcaption" value={ caption } /> }
-		</Fragment>
+		</>
 	);
 
 	if ( 'left' === align || 'right' === align || 'center' === align ) {

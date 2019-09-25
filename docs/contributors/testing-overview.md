@@ -21,7 +21,7 @@ When writing tests consider the following:
 
 Tests for JavaScript use [Jest](https://jestjs.io/) as the test runner and its API for [globals](https://jestjs.io/docs/en/api.html) (`describe`, `test`, `beforeEach` and so on) [assertions](https://jestjs.io/docs/en/expect.html), [mocks](https://jestjs.io/docs/en/mock-functions.html), [spies](https://jestjs.io/docs/en/jest-object.html#jestspyonobject-methodname) and [mock functions](https://jestjs.io/docs/en/mock-function-api.html). If needed, you can also use [Enzyme](https://github.com/airbnb/enzyme) for React component testing.
 
-Assuming you've followed the [instructions](https://github.com/WordPress/gutenberg/blob/master/CONTRIBUTING.md) to install Node and project dependencies, tests can be run from the command-line with NPM:
+Assuming you've followed the [instructions](/docs/contributors/getting-started.md) to install Node and project dependencies, tests can be run from the command-line with NPM:
 
 ```
 npm test
@@ -344,7 +344,7 @@ It's tempting to snapshot deep renders, but that makes for huge snapshots. Addit
 
 ## End to end Testing
 
-If you're using the built-in [local environment](https://github.com/WordPress/gutenberg/blob/master/CONTRIBUTING.md#local-environment), you can run the e2e tests locally using this command:
+If you're using the built-in [local environment](/docs/contributors/getting-started.md#local-environment), you can run the e2e tests locally using this command:
 
 ```bash
 npm run test-e2e
@@ -368,9 +368,13 @@ If you're using a different setup, you can provide the base URL, username and pa
 WP_BASE_URL=http://localhost:8888 WP_USERNAME=admin WP_PASSWORD=password npm run test-e2e
 ```
 
+### Core Block Testing
+
+Every core block is required to have at least one set of fixture files for its main save function and one for each deprecation. These fixtures test the parsing and serialization of the block. See [the e2e tests fixtures readme](/packages/e2e-tests/fixtures/blocks/README.md) for more information and instructions.
+
 ## PHP Testing
 
-Tests for PHP use [PHPUnit](https://phpunit.de/) as the testing framework. If you're using the built-in [local environment](https://github.com/WordPress/gutenberg/blob/master/CONTRIBUTING.md#local-environment), you can run the PHP tests locally using this command:
+Tests for PHP use [PHPUnit](https://phpunit.de/) as the testing framework. If you're using the built-in [local environment](/docs/contributors/getting-started.md#local-environment), you can run the PHP tests locally using this command:
 
 ```bash
 npm run test-php

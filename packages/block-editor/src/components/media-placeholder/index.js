@@ -22,7 +22,7 @@ import {
 	withFilters,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { Component, Fragment } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 
@@ -159,6 +159,7 @@ export class MediaPlaceholder extends Component {
 			notices,
 			onSelectURL,
 			mediaUpload,
+			children,
 		} = this.props;
 
 		let instructions = labels.instructions;
@@ -175,14 +176,14 @@ export class MediaPlaceholder extends Component {
 			const isVideo = isOneType && 'video' === allowedTypes[ 0 ];
 
 			if ( instructions === undefined && mediaUpload ) {
-				instructions = __( 'Drag a media file, upload a new one or select a file from your library.' );
+				instructions = __( 'Upload a media file or pick one from your media library.' );
 
 				if ( isAudio ) {
-					instructions = __( 'Drag an audio, upload a new one or select a file from your library.' );
+					instructions = __( 'Upload an audio file, pick one from your media library, or add one with a URL.' );
 				} else if ( isImage ) {
-					instructions = __( 'Drag an image, upload a new one or select a file from your library.' );
+					instructions = __( 'Upload an image file, pick one from your media library, or add one with a URL.' );
 				} else if ( isVideo ) {
-					instructions = __( 'Drag a video, upload a new one or select a file from your library.' );
+					instructions = __( 'Upload a video file, pick one from your media library, or add one with a URL.' );
 				}
 			}
 
@@ -218,12 +219,18 @@ export class MediaPlaceholder extends Component {
 				preview={ mediaPreview }
 			>
 				{ content }
+				{ children }
 			</Placeholder>
 		);
 	}
 
 	renderDropZone() {
-		const { onHTMLDrop = noop } = this.props;
+		const { disableDropZone, onHTMLDrop = noop } = this.props;
+
+		if ( disableDropZone ) {
+			return null;
+		}
+
 		return (
 			<DropZone
 				onFilesDrop={ this.onFilesUpload }
@@ -327,7 +334,7 @@ export class MediaPlaceholder extends Component {
 
 		if ( mediaUpload && isAppender ) {
 			return (
-				<Fragment>
+				<>
 					{ this.renderDropZone() }
 					<FormFileUpload
 						onChange={ this.onUpload }
@@ -335,7 +342,7 @@ export class MediaPlaceholder extends Component {
 						multiple={ multiple }
 						render={ ( { openFileDialog } ) => {
 							const content = (
-								<Fragment>
+								<>
 									<IconButton
 										isLarge
 										className={ classnames(
@@ -350,17 +357,18 @@ export class MediaPlaceholder extends Component {
 									{ mediaLibraryButton }
 									{ this.renderUrlSelectionUI() }
 									{ this.renderCancelLink() }
-								</Fragment>
+								</>
 							);
 							return this.renderPlaceholder( content, openFileDialog );
 						} }
 					/>
-				</Fragment>
+				</>
 			);
 		}
+
 		if ( mediaUpload ) {
 			const content = (
-				<Fragment>
+				<>
 					{ this.renderDropZone() }
 					<FormFileUpload
 						isLarge
@@ -378,10 +386,11 @@ export class MediaPlaceholder extends Component {
 					{ mediaLibraryButton }
 					{ this.renderUrlSelectionUI() }
 					{ this.renderCancelLink() }
-				</Fragment>
+				</>
 			);
 			return this.renderPlaceholder( content );
 		}
+
 		return this.renderPlaceholder( mediaLibraryButton );
 	}
 

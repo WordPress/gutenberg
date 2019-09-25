@@ -59,7 +59,7 @@ For features included in the Gutenberg plugin, the deprecation policy is intende
 - The PHP function `gutenberg_get_block_categories` has been removed. Use [`get_block_categories`](https://developer.wordpress.org/reference/functions/get_block_categories/) instead.
 - The PHP function `register_tinymce_scripts` has been removed. Use [`wp_register_tinymce_scripts`](https://developer.wordpress.org/reference/functions/wp_register_tinymce_scripts/) instead.
 - The PHP function `gutenberg_register_post_types` has been removed.
-- The `gutenberg` theme support option has been removed. Use [`align-wide`](https://wordpress.org/gutenberg/handbook/designers-developers/developers/themes/theme-support/#wide-alignment) instead.
+- The `gutenberg` theme support option has been removed. Use [`align-wide`](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#wide-alignment) instead.
 - The PHP function `gutenberg_prepare_blocks_for_js` has been removed. Use [`get_block_editor_server_block_settings`](https://developer.wordpress.org/reference/functions/get_block_editor_server_block_settings/) instead.
 - The PHP function `gutenberg_load_list_reusable_blocks` has been removed.
 - The PHP function `_gutenberg_utf8_split` has been removed. Use `_mb_substr` instead.

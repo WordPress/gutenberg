@@ -77,6 +77,44 @@ describe( 'Tooltip', () => {
 			expect( popover ).toHaveLength( 1 );
 		} );
 
+		it( 'should show not popover on focus as result of mousedown', () => {
+			const originalOnMouseDown = jest.fn();
+			const originalOnMouseUp = jest.fn();
+			const wrapper = mount(
+				<Tooltip text="Help text">
+					<button
+						onMouseDown={ originalOnMouseDown }
+						onMouseUp={ originalOnMouseUp }
+					>
+						Hover Me!
+					</button>
+				</Tooltip>
+			);
+
+			const button = wrapper.find( 'button' );
+
+			let event;
+
+			event = { type: 'mousedown' };
+			button.simulate( event.type, event );
+			expect( originalOnMouseDown ).toHaveBeenCalledWith( expect.objectContaining( {
+				type: event.type,
+			} ) );
+
+			event = { type: 'focus', currentTarget: {} };
+			button.simulate( event.type, event );
+
+			const popover = wrapper.find( 'Popover' );
+			expect( wrapper.state( 'isOver' ) ).toBe( false );
+			expect( popover ).toHaveLength( 0 );
+
+			event = new window.MouseEvent( 'mouseup' );
+			document.dispatchEvent( event );
+			expect( originalOnMouseUp ).toHaveBeenCalledWith( expect.objectContaining( {
+				type: event.type,
+			} ) );
+		} );
+
 		it( 'should show popover on delayed mouseenter', () => {
 			const originalMouseEnter = jest.fn();
 			const wrapper = TestUtils.renderIntoDocument(
@@ -90,10 +128,9 @@ describe( 'Tooltip', () => {
 				</Tooltip>
 			);
 
-			/* eslint-disable react/no-find-dom-node */
 			const button = TestUtils.findRenderedDOMComponentWithTag( wrapper, 'button' );
+			// eslint-disable-next-line react/no-find-dom-node
 			TestUtils.Simulate.mouseEnter( ReactDOM.findDOMNode( button ) );
-			/* eslint-enable react/no-find-dom-node */
 
 			expect( originalMouseEnter ).toHaveBeenCalledTimes( 1 );
 			expect( wrapper.state.isOver ).toBe( false );

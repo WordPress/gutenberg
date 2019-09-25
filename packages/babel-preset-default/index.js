@@ -18,7 +18,9 @@ module.exports = function( api ) {
 		const opts = {};
 
 		if ( isTestEnv ) {
-			opts.useBuiltIns = 'usage';
+			opts.targets = {
+				node: 'current',
+			};
 		} else {
 			opts.modules = false;
 			opts.targets = {
@@ -58,12 +60,14 @@ module.exports = function( api ) {
 				require.resolve( '@wordpress/babel-plugin-import-jsx-pragma' ),
 				{
 					scopeVariable: 'createElement',
+					scopeVariableFrag: 'Fragment',
 					source: '@wordpress/element',
 					isDefault: false,
 				},
 			],
 			[ require.resolve( '@babel/plugin-transform-react-jsx' ), {
 				pragma: 'createElement',
+				pragmaFrag: 'Fragment',
 			} ],
 			require.resolve( '@babel/plugin-proposal-async-generator-functions' ),
 			maybeGetPluginTransformRuntime(),

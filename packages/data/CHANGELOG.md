@@ -1,9 +1,25 @@
-## Master
+## 4.6.0 (2019-06-12)
+
+### New Feature
+
+- Expose `useSelect` hook for usage in functional components. ([#15737](https://github.com/WordPress/gutenberg/pull/15737))
+- Expose `useDispatch` hook for usage in functional components. ([#15896](https://github.com/WordPress/gutenberg/pull/15896))
+
+### Enhancements
+
+- `withSelect` internally uses the new `useSelect` hook. ([#15737](https://github.com/WordPress/gutenberg/pull/15737).  **Note:** This _could_ impact performance of code using `withSelect` in edge-cases. To avoid impact, memoize passed in `mapSelectToProps` callbacks or implement `useSelect` directly with dependencies.
+- `withDispatch` internally uses a new `useDispatchWithMap` hook (an internal only api) ([#15896](https://github.com/WordPress/gutenberg/pull/15896))
+
+## 4.5.0 (2019-05-21)
 
 ### Bug Fix
 
 - Restore functionality of action-generators returning a Promise.  Clarify intent and behaviour for `wp.data.dispatch` behaviour. Dispatch actions now always
  return a promise ([#14830](https://github.com/WordPress/gutenberg/pull/14830)
+ 
+### Enhancements
+
+- Expose `hasResolver` property on returned selectors indicating whether the selector has a corresponding resolver.
 
 ## 4.3.0 (2019-03-06)
 

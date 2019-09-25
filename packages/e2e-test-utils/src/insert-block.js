@@ -18,5 +18,8 @@ export async function insertBlock( searchTerm, panelName = null ) {
 		) )[ 0 ];
 		await panelButton.click();
 	}
-	await page.click( `button[aria-label="${ searchTerm }"]` );
+	const insertButton = ( await page.$x(
+		`//button//span[contains(text(), '${ searchTerm }')]`
+	) )[ 0 ];
+	await insertButton.click();
 }

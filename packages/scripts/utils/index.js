@@ -2,17 +2,23 @@
  * Internal dependencies
  */
 const {
-	getCliArg,
-	getCliArgs,
-	hasCliArg,
+	getArgFromCLI,
+	getArgsFromCLI,
+	getFileArgsFromCLI,
+	hasArgInCLI,
+	hasFileArgInCLI,
 	spawnScript,
-	cleanUpArgs,
 } = require( './cli' );
 const {
 	getWebpackArgs,
 	hasBabelConfig,
 	hasJestConfig,
 } = require( './config' );
+const {
+	buildWordPress,
+	downloadWordPressZip,
+	mergeYAMLConfigs,
+} = require( './env' );
 const {
 	fromConfigRoot,
 	hasProjectFile,
@@ -25,16 +31,20 @@ const {
 } = require( './string' );
 
 module.exports = {
+	buildWordPress,
 	camelCaseDash,
 	fromConfigRoot,
-	getCliArg,
-	getCliArgs,
+	getArgFromCLI,
+	getArgsFromCLI,
+	getFileArgsFromCLI,
 	getWebpackArgs,
 	hasBabelConfig,
-	hasCliArg,
+	hasArgInCLI,
+	hasFileArgInCLI,
 	hasJestConfig,
 	hasPackageProp,
 	hasProjectFile,
+	downloadWordPressZip,
+	mergeYAMLConfigs,
 	spawnScript,
-	cleanUpArgs,
 };
