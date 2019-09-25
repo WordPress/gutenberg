@@ -45,6 +45,17 @@ const middlewares = [
 	fetchAllMiddleware,
 ];
 
+let fetchReference = typeof window !== 'undefined' && 'fetch' in window && typeof window.fetch === 'function' && window.fetch.bind( window );
+
+/**
+ * Defines a custom fetch reference to support fetch on Node
+ *
+ * @param {Function} newFetchReference The new fetch reference
+ */
+function setFetchReference( newFetchReference ) {
+	fetchReference = newFetchReference;
+}
+
 function registerMiddleware( middleware ) {
 	middlewares.unshift( middleware );
 }
@@ -70,7 +81,7 @@ const defaultFetchHandler = ( nextOptions ) => {
 		headers[ 'Content-Type' ] = 'application/json';
 	}
 
-	const responsePromise = window.fetch(
+	const responsePromise = fetchReference(
 		url || path,
 		{
 			...DEFAULT_OPTIONS,
@@ -128,7 +139,7 @@ let fetchHandler = defaultFetchHandler;
 
 /**
  * Defines a custom fetch handler for making the requests that will override
- * the default one using window.fetch
+ * the default one using fetch
  *
  * @param {Function} newFetchHandler The new fetch handler
  */
@@ -158,7 +169,7 @@ function apiFetch( options ) {
 				}
 
 				// If the nonce is invalid, refresh it and try again.
-				window.fetch( apiFetch.nonceEndpoint )
+				fetchReference( apiFetch.nonceEndpoint )
 					.then( checkStatus )
 					.then( ( data ) => data.text() )
 					.then( ( text ) => {
@@ -174,6 +185,7 @@ function apiFetch( options ) {
 
 apiFetch.use = registerMiddleware;
 apiFetch.setFetchHandler = setFetchHandler;
+apiFetch.setFetchReference = setFetchReference;
 
 apiFetch.createNonceMiddleware = createNonceMiddleware;
 apiFetch.createPreloadingMiddleware = createPreloadingMiddleware;

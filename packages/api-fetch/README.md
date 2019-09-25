@@ -1,6 +1,6 @@
 # API Fetch
 
-Utility to make WordPress REST API requests. It's a wrapper around `window.fetch`.
+Utility to make WordPress REST API requests. It's a wrapper around `fetch`.
 
 ## Installation
 
@@ -89,7 +89,7 @@ apiFetch.use( apiFetch.createRootURLMiddleware( rootURL ) );
 
 ### Custom fetch handler
 
-The `api-fetch` package uses `window.fetch` for making the requests but you can use a custom fetch handler by using the `setFetchHandler` method. The custom fetch handler will receive the `options` passed to the `apiFetch` calls.
+The `api-fetch` package uses `fetch` for making the requests but you can use a custom fetch handler by using the `setFetchHandler` method. The custom fetch handler will receive the `options` passed to the `apiFetch` calls.
 
 **Example**
 
@@ -111,3 +111,15 @@ apiFetch.setFetchHandler( ( options ) => {
 ```
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
+
+### Custom fetch reference
+For polyfilling fetch on Node environment.
+
+**Example**
+
+```js
+import apiFetch from '@wordpress/api-fetch';
+import fetch from 'isomorphic-fetch';
+
+apiFetch.setFetchReference( fetch );
+```
