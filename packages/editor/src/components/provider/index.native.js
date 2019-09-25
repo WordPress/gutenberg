@@ -6,13 +6,14 @@ import RNReactNativeGutenbergBridge, {
 	subscribeParentToggleHTMLMode,
 	subscribeUpdateHtml,
 	subscribeSetTitle,
+	subscribeMediaAppend
 } from 'react-native-gutenberg-bridge';
 
 /**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { parse, serialize, getUnregisteredTypeHandlerName } from '@wordpress/blocks';
+import { parse, serialize, getUnregisteredTypeHandlerName, createBlock } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
@@ -45,6 +46,16 @@ class NativeEditorProvider extends Component {
 		this.subscriptionParentUpdateHtml = subscribeUpdateHtml( ( payload ) => {
 			this.updateHtmlAction( payload.html );
 		} );
+
+		this.subscriptionParentMediaAppend = subscribeMediaAppend( ( payload ) => {
+			const blockName = 'core/' + payload.mediaType
+			const newBlock = createBlock( blockName, {
+				id: payload.mediaId,
+				[ payload.mediaType === 'image' ? 'url' : 'src' ]: payload.mediaUrl,
+			});
+
+			this.props.insertBlock( newBlock, this.props.blockCount );
+		} );
 	}
 
 	componentWillUnmount() {
@@ -62,6 +73,10 @@ class NativeEditorProvider extends Component {
 
 		if ( this.subscriptionParentUpdateHtml ) {
 			this.subscriptionParentUpdateHtml.remove();
+		}
+
+		if ( this.subscriptionParentMediaAppend ) {
+			this.subscriptionParentMediaAppend.remove();
 		}
 	}
 
@@ -122,7 +137,7 @@ class NativeEditorProvider extends Component {
 }
 
 export default compose( [
-	withSelect( ( select ) => {
+	withSelect( ( select, { rootClientId } ) => {
 		const {
 			__unstableIsEditorReady: isEditorReady,
 			getEditorBlocks,
@@ -133,12 +148,17 @@ export default compose( [
 			getEditorMode,
 		} = select( 'core/edit-post' );
 
+		const {
+			getBlockCount,
+		} = select( 'core/block-editor' );
+
 		return {
 			mode: getEditorMode(),
 			isReady: isEditorReady(),
 			blocks: getEditorBlocks(),
 			title: getEditedPostAttribute( 'title' ),
 			getEditedPostContent,
+			blockCount: getBlockCount( rootClientId ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
@@ -148,6 +168,7 @@ export default compose( [
 		} = dispatch( 'core/editor' );
 		const {
 			clearSelectedBlock,
+			insertBlock
 		} = dispatch( 'core/block-editor' );
 		const {
 			switchEditorMode,
@@ -155,6 +176,7 @@ export default compose( [
 
 		return {
 			clearSelectedBlock,
+			insertBlock,
 			editTitle( title ) {
 				editPost( { title } );
 			},
