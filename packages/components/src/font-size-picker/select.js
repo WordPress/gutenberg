@@ -6,7 +6,7 @@ import { map } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { withInstanceId } from '@wordpress/compose';
 import { useState, useRef, useCallback, useEffect } from '@wordpress/element';
 
@@ -27,11 +27,7 @@ function FontSizePickerSelect( {
 	value,
 } ) {
 	const currentFont = fontSizes.find( ( font ) => font.value === value );
-	const currentFontName =
-    ( currentFont && currentFont.name ) ||
-    ( ! value && _x( 'Normal', 'font size name' ) ) ||
-    _x( 'Custom', 'font size name' );
-	const currentFontSlug = currentFont ? currentFont.slug : '';
+	const currentFontLabel = currentFont ? currentFont.label : '';
 
 	const onChangeValue = ( event ) => {
 		const newValue = event.target.value;
@@ -115,11 +111,9 @@ function FontSizePickerSelect( {
 	};
 
 	// Improve voiceover consistency compared to native select
-	const buttonRole = 'combobox';
-	const ariaActiveDescendant = `item-${ currentFontSlug }`;
+	const ariaActiveDescendant = `item-${ value }`;
 	const ariaHasPopup = 'listbox';
 	const ariaProps = {
-		role: buttonRole,
 		'aria-haspopup': ariaHasPopup,
 		'aria-activedescendant': ariaActiveDescendant,
 	};
@@ -145,12 +139,11 @@ function FontSizePickerSelect( {
 						className="components-font-size-picker__select-selector"
 						isLarge
 						onClick={ onToggle }
-						aria-expanded={ isOpen }
-						aria-label={ __( 'Font Size' ) }
+						aria-label={ __( 'Choose Preset' ) }
 						onKeyDown={ handleOnButtonKeyDown }
 						{ ...ariaProps }
 					>
-						{ currentFontName }
+						{ currentFontLabel }
 					</Button>
 				) }
 				renderContent={ () => {

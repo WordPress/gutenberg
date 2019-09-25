@@ -17,7 +17,8 @@ function getSelectValueFromFontSize( fontSizes, value ) {
 		const fontSizeValue = fontSizes.find( ( font ) => font.size === value );
 		return fontSizeValue ? fontSizeValue.slug : 'custom';
 	}
-	return 'normal';
+	// We can't be sure what the theme font settings are so let's assume the "normal" size will be second if there are more than 2 sizes, and first if there are 2 or less.
+	return fontSizes.length > 2 ? fontSizes[ 1 ].slug : fontSizes[ 0 ].slug;
 }
 
 function getSelectOptions( optionsArray ) {
