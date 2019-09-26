@@ -1234,10 +1234,5 @@
 	// Pull the warning upwards to the edge, and add a negative bottom margin to compensate.
 	margin-bottom: -$block-padding;
 	transform: translateY(-$block-padding);
-
-	// Bigger padding on mobile where blocks are edge to edge.
-	padding: 10px $block-padding;
-	@include break-small() {
-		padding: 10px $block-padding;
-	}
+	padding: 10px $block-padding $block-padding;
 }
