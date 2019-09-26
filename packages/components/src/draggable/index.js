@@ -116,7 +116,7 @@ class Draggable extends Component {
 		}
 
 		// Hack: Remove iFrames as it's causing the embeds drag clone to freeze
-		[ ...clone.querySelectorAll( 'iframe' ) ].forEach( ( child ) => child.parentNode.removeChild( child ) );
+		Array.from( clone.querySelectorAll( 'iframe' ) ).forEach( ( child ) => child.parentNode.removeChild( child ) );
 
 		this.cloneWrapper.appendChild( clone );
 		elementWrapper.appendChild( this.cloneWrapper );
