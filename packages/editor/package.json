@@ -53,7 +53,8 @@
 		"react-autosize-textarea": "^3.0.2",
 		"redux-optimist": "^1.0.0",
 		"refx": "^3.0.0",
-		"rememo": "^3.0.0"
+		"rememo": "^3.0.0",
+		"styled-components": "^4.4.0"
 	},
 	"publishConfig": {
 		"access": "public"

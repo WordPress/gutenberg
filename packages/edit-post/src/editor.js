@@ -8,7 +8,7 @@ import { size, map, without } from 'lodash';
  * WordPress dependencies
  */
 import { withSelect } from '@wordpress/data';
-import { EditorProvider, ErrorBoundary, PostLockedModal } from '@wordpress/editor';
+import { ThemeProvider, EditorProvider, ErrorBoundary, PostLockedModal } from '@wordpress/editor';
 import { StrictMode, Component } from '@wordpress/element';
 import {
 	KeyboardShortcuts,
@@ -110,7 +110,9 @@ class Editor extends Component {
 							>
 								<ErrorBoundary onError={ onError }>
 									<EditorInitialization postId={ postId } />
-									<Layout />
+									<ThemeProvider>
+										<Layout />
+									</ThemeProvider>
 									<KeyboardShortcuts shortcuts={ preventEventDiscovery } />
 								</ErrorBoundary>
 								<PostLockedModal />

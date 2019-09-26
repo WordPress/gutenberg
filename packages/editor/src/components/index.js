@@ -61,4 +61,10 @@ export { default as WordCount } from './word-count';
 // State Related Components
 export { default as EditorProvider } from './provider';
 
+/*
+* Theme Provider
+*/
+
+export { default as ThemeProvider } from './theme-provider';
+
 export * from './deprecated';

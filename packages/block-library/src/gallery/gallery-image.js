@@ -90,15 +90,10 @@ class GalleryImage extends Component {
 	}
 
 	calculatePadding() {
-		const { isCompact, isSelected } = this.props;
-
+		const { isCompact } = this.props;
 		if ( isCompact ) {
-			if ( isSelected ) {
-				return 0;
-			}
-			return GRID_SIZE_SMALL / 2;
+			return 0;
 		}
-
 		return GRID_SIZE_SMALL;
 	}
 
@@ -108,7 +103,6 @@ class GalleryImage extends Component {
 			'aria-label': ariaLabel } = this.props;
 
 		let href;
-
 		switch ( linkTo ) {
 			case 'media':
 				href = url;
@@ -147,15 +141,14 @@ class GalleryImage extends Component {
 		return (
 			<figure className={ className }>
 				{ href ? <a href={ href }>{ img }</a> : img }
-				{ /* <div className="block-library-gallery-item__move-menu"> */ }
 				<Box
-					display="inline-flex"
+					display={ 'inline-flex' }
 					padding={ this.calculatePadding() + 'px' }
 					position="absolute"
 					top="-2px"
 					left="-2px"
-					bg={ isSelected ? '#0085ba' : 'inherit' }
 					zIndex={ 20 }
+					bg={ isSelected ? '#0085ba' : 'inherit' }
 				>
 					<IconButton
 						icon="arrow-left"
@@ -174,8 +167,16 @@ class GalleryImage extends Component {
 						disabled={ ! isSelected }
 					/>
 				</Box>
-				{ /* </div> */ }
-				<div className="block-library-gallery-item__inline-menu">
+
+				<Box
+					display={ 'inline-flex' }
+					padding={ this.calculatePadding() + 'px' }
+					position="absolute"
+					top="-2px"
+					right="-2px"
+					bg={ isSelected ? '#0085ba' : 'inherit' }
+					zIndex={ 20 }
+				>
 					<IconButton
 						icon="no-alt"
 						onClick={ onRemove }
@@ -183,7 +184,7 @@ class GalleryImage extends Component {
 						label={ __( 'Remove Image' ) }
 						disabled={ ! isSelected }
 					/>
-				</div>
+				</Box>
 				<RichText
 					tagName="figcaption"
 					placeholder={ isSelected ? __( 'Write caption…' ) : null }
