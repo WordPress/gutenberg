@@ -19,7 +19,6 @@ describe( 'Multi-block selection', () => {
 		const firstBlockSelector = '[data-type="core/paragraph"]';
 		const secondBlockSelector = '[data-type="core/image"]';
 		const thirdBlockSelector = '[data-type="core/quote"]';
-		const multiSelectedCssClass = 'is-multi-selected';
 
 		// Creating test blocks
 		await clickBlockAppender();
@@ -29,21 +28,11 @@ describe( 'Multi-block selection', () => {
 		await page.keyboard.type( 'Quote Block' );
 
 		const blocks = [ firstBlockSelector, secondBlockSelector, thirdBlockSelector ];
-		const expectMultiSelected = async ( selectors, areMultiSelected ) => {
-			for ( const selector of selectors ) {
-				const className = await page.$eval( selector, ( element ) => element.className );
-				if ( areMultiSelected ) {
-					expect( className ).toEqual( expect.stringContaining( multiSelectedCssClass ) );
-				} else {
-					expect( className ).not.toEqual( expect.stringContaining( multiSelectedCssClass ) );
-				}
-			}
-		};
 
 		// Default: No selection
-		await expectMultiSelected( blocks, false );
+		await expect( blocks ).not.toBeMultiSelected();
 
-		// Multiselect via Shift + click
+		// Multi-select via Shift + click
 		await page.mouse.move( 200, 300 );
 		await page.click( firstBlockSelector );
 		await page.keyboard.down( 'Shift' );
@@ -51,39 +40,38 @@ describe( 'Multi-block selection', () => {
 		await page.keyboard.up( 'Shift' );
 
 		// Verify selection
-		await expectMultiSelected( blocks, true );
+		await expect( blocks ).toBeMultiSelected();
 
 		// Unselect
 		await page.click( secondBlockSelector );
 
 		// No selection
-		await expectMultiSelected( blocks, false );
+		await expect( blocks ).not.toBeMultiSelected();
 
-		// Multiselect via keyboard
+		// Multi-select via keyboard
 		await page.click( 'body' );
 		await pressKeyWithModifier( 'primary', 'a' );
 
 		// Verify selection
-		await expectMultiSelected( blocks, true );
+		await expect( blocks ).toBeMultiSelected();
 
 		// Unselect
 		await page.keyboard.press( 'Escape' );
 
 		// No selection
-		await expectMultiSelected( blocks, false );
+		await expect( blocks ).not.toBeMultiSelected();
 
 		// Select all via double shortcut.
 		await page.click( firstBlockSelector );
 		await pressKeyWithModifier( 'primary', 'a' );
 		await pressKeyWithModifier( 'primary', 'a' );
-		await expectMultiSelected( blocks, true );
+		await expect( blocks ).toBeMultiSelected();
 	} );
 
 	it( 'Should select/unselect multiple blocks using Shift + Arrows', async () => {
 		const firstBlockSelector = '[data-type="core/paragraph"]';
 		const secondBlockSelector = '[data-type="core/image"]';
 		const thirdBlockSelector = '[data-type="core/quote"]';
-		const multiSelectedCssClass = 'is-multi-selected';
 
 		// Creating test blocks
 		await clickBlockAppender();
@@ -93,21 +81,11 @@ describe( 'Multi-block selection', () => {
 		await page.keyboard.type( 'Quote Block' );
 
 		const blocks = [ firstBlockSelector, secondBlockSelector, thirdBlockSelector ];
-		const expectMultiSelected = async ( selectors, areMultiSelected ) => {
-			for ( const selector of selectors ) {
-				const className = await page.$eval( selector, ( element ) => element.className );
-				if ( areMultiSelected ) {
-					expect( className ).toEqual( expect.stringContaining( multiSelectedCssClass ) );
-				} else {
-					expect( className ).not.toEqual( expect.stringContaining( multiSelectedCssClass ) );
-				}
-			}
-		};
 
 		// Default: No selection
-		await expectMultiSelected( blocks, false );
+		await expect( blocks ).not.toBeMultiSelected();
 
-		// Multiselect via Shift + click
+		// Multi-select via Shift + click
 		await page.mouse.move( 200, 300 );
 		await page.click( firstBlockSelector );
 		await page.keyboard.down( 'Shift' );
@@ -116,7 +94,7 @@ describe( 'Multi-block selection', () => {
 		await page.keyboard.up( 'Shift' );
 
 		// Verify selection
-		await expectMultiSelected( blocks, true );
+		await expect( blocks ).toBeMultiSelected();
 	} );
 
 	it( 'should speak() number of blocks selected with multi-block selection', async () => {
@@ -127,7 +105,7 @@ describe( 'Multi-block selection', () => {
 		await insertBlock( 'Paragraph' );
 		await page.keyboard.type( 'Third Paragraph' );
 
-		// Multiselect via keyboard.
+		// Multi-select via keyboard.
 		await pressKeyWithModifier( 'primary', 'a' );
 		await pressKeyWithModifier( 'primary', 'a' );
 
@@ -208,7 +186,6 @@ describe( 'Multi-block selection', () => {
 		const firstBlockSelector = '[data-type="core/paragraph"]';
 		const secondBlockSelector = '[data-type="core/image"]';
 		const thirdBlockSelector = '[data-type="core/quote"]';
-		const multiSelectedCssClass = 'is-multi-selected';
 
 		// Creating test blocks
 		await clickBlockAppender();
@@ -218,19 +195,9 @@ describe( 'Multi-block selection', () => {
 		await page.keyboard.type( 'Quote Block' );
 
 		const blocks = [ firstBlockSelector, secondBlockSelector, thirdBlockSelector ];
-		const expectMultiSelected = async ( selectors, areMultiSelected ) => {
-			for ( const selector of selectors ) {
-				const className = await page.$eval( selector, ( element ) => element.className );
-				if ( areMultiSelected ) {
-					expect( className ).toEqual( expect.stringContaining( multiSelectedCssClass ) );
-				} else {
-					expect( className ).not.toEqual( expect.stringContaining( multiSelectedCssClass ) );
-				}
-			}
-		};
 
 		// Default: No selection
-		await expectMultiSelected( blocks, false );
+		await expect( blocks ).not.toBeMultiSelected();
 
 		// Multi-select via CMD + click.
 		await page.mouse.move( 200, 300 );
@@ -240,7 +207,7 @@ describe( 'Multi-block selection', () => {
 		await page.keyboard.up( 'Meta' );
 
 		// Verify selection of blocks 1 and 3.
-		await expectMultiSelected( [ firstBlockSelector, thirdBlockSelector ], true );
+		await expect( [ firstBlockSelector, thirdBlockSelector ] ).toBeMultiSelected();
 
 		// Multi-select second block.
 		await page.keyboard.down( 'Meta' );
@@ -248,7 +215,7 @@ describe( 'Multi-block selection', () => {
 		await page.keyboard.up( 'Meta' );
 
 		// Verify selection of all blocks.
-		await expectMultiSelected( blocks, true );
+		await expect( blocks ).toBeMultiSelected();
 
 		// Unselect
 		await page.keyboard.down( 'Meta' );
@@ -256,13 +223,13 @@ describe( 'Multi-block selection', () => {
 		await page.keyboard.up( 'Meta' );
 
 		// Verify selection of blocks 2 and 3.
-		await expectMultiSelected( [ secondBlockSelector, thirdBlockSelector ], true );
+		await expect( [ secondBlockSelector, thirdBlockSelector ] ).toBeMultiSelected();
 
 		await page.keyboard.down( 'Meta' );
 		await page.click( secondBlockSelector );
 		await page.keyboard.up( 'Meta' );
 
 		// No selection
-		await expectMultiSelected( blocks, false );
+		await expect( blocks ).not.toBeMultiSelected();
 	} );
 } );

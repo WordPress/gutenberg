@@ -17,6 +17,11 @@ import {
 } from '@wordpress/e2e-test-utils';
 
 /**
+ * Internal dependencies
+ */
+import { toBeMultiSelected } from '../matchers';
+
+/**
  * Environment variables
  */
 const { PUPPETEER_TIMEOUT } = process.env;
@@ -40,6 +45,11 @@ const OBSERVED_CONSOLE_MESSAGE_TYPES = {
  * @type {Array}
  */
 const pageEvents = [];
+
+// Add custom matchers specific to Gutenberg.
+expect.extend( {
+	toBeMultiSelected,
+} );
 
 // The Jest timeout is increased because these tests are a bit slow
 jest.setTimeout( PUPPETEER_TIMEOUT || 100000 );
