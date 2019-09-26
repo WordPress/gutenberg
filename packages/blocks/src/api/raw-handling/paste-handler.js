@@ -16,6 +16,8 @@ import isInlineContent from './is-inline-content';
 import phrasingContentReducer from './phrasing-content-reducer';
 import headRemover from './head-remover';
 import msListConverter from './ms-list-converter';
+import msStripComments from './ms-strip-comments';
+import msStripFootnotes from './ms-strip-footnotes';
 import listReducer from './list-reducer';
 import imageCorrector from './image-corrector';
 import blockquoteNormaliser from './blockquote-normaliser';
@@ -201,6 +203,8 @@ export function pasteHandler( { HTML = '', plainText = '', mode = 'AUTO', tagNam
 		const filters = [
 			googleDocsUIDRemover,
 			msListConverter,
+			msStripComments,
+			msStripFootnotes,
 			headRemover,
 			listReducer,
 			imageCorrector,
