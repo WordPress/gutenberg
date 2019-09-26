@@ -23,6 +23,9 @@ describe( 'RootComponent', () => {
 	it( 'renders without crashing', () => {
 		jest.useFakeTimers();
 		const app = renderer.create( <RootComponent /> );
+		// Gutenberg store currently has some asynchronous parts in the store setup
+		// Need to run all ticks so `isReady` is true in the editor store
+		// See: https://github.com/wordpress-mobile/gutenberg-mobile/pull/1366#discussion_r326813061
 		renderer.act( () => {
 			jest.runAllTicks();
 		} );
