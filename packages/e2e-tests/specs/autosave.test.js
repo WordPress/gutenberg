@@ -91,8 +91,9 @@ describe( 'autosave', () => {
 		await saveDraftWithKeyboard();
 		await page.keyboard.type( ' after save' );
 
+		// Trigger local autosave
+		await page.evaluate( () => window.wp.data.dispatch( 'core/editor' ).localAutosave() );
 		// Reload without saving on the server
-		await sleep( AUTOSAVE_INTERVAL_SECONDS + 1 );
 		await page.reload();
 
 		const notice = await page.$eval( '.components-notice__content', ( element ) => element.innerText );
@@ -152,11 +153,10 @@ describe( 'autosave', () => {
 		await page.keyboard.type( 'before save' );
 		await saveDraft();
 
-		// Fake local autosave
-		await page.evaluate( ( postId ) => window.sessionStorage.setItem(
-			`wp-autosave-block-editor-post-${ postId }`,
-			JSON.stringify( { post_title: 'A', content: 'B', excerpt: 'C' } )
-		), await getCurrentPostId() );
+		await page.keyboard.type( 'after save' );
+
+		// Trigger local autosave
+		await page.evaluate( () => window.wp.data.dispatch( 'core/editor' ).localAutosave() );
 		expect( await page.evaluate( () => window.sessionStorage.length ) ).toBe( 1 );
 
 		// Trigger remote autosave

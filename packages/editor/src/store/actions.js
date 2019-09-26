@@ -372,6 +372,20 @@ export function* autosave( options ) {
 	);
 }
 
+export function* localAutosave() {
+	const post = yield select( STORE_KEY, 'getCurrentPost' );
+	const title = yield select( STORE_KEY, 'getEditedPostAttribute', 'title' );
+	const content = yield select( STORE_KEY, 'getEditedPostAttribute', 'content' );
+	const excerpt = yield select( STORE_KEY, 'getEditedPostAttribute', 'excerpt' );
+	yield {
+		type: 'LOCAL_AUTOSAVE_SET',
+		postId: post.id,
+		title,
+		content,
+		excerpt,
+	};
+}
+
 /**
  * Returns an action object used in signalling that undo history should
  * restore last popped state.
