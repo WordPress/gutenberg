@@ -1298,9 +1298,9 @@ export function lastBlockAttributesChange( state, action ) {
  * @param {boolean} state  Current state.
  * @param {Object}  action Dispatched action.
  *
- * @return {boolean} Updated state.
+ * @return {string} Updated state.
  */
-export function didAutomaticChange( state, action ) {
+export function automaticChangeStatus( state, action ) {
 	switch ( action.type ) {
 		case 'MARK_AUTOMATIC_CHANGE':
 			return 'pending';
@@ -1316,6 +1316,8 @@ export function didAutomaticChange( state, action ) {
 				return state;
 			}
 	}
+
+	// Reset the state by default (for any action not handled).
 }
 
 export default combineReducers( {
@@ -1335,5 +1337,5 @@ export default combineReducers( {
 	preferences,
 	lastBlockAttributesChange,
 	isNavigationMode,
-	didAutomaticChange,
+	automaticChangeStatus,
 } );
