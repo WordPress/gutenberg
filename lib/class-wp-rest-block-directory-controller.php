@@ -212,7 +212,7 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 	 */
 	public function get_items( $request ) {
 
-		$search_string = $request->get_param( 'term' );
+		$search_string = trim( $request->get_param( 'term' ) );
 
 		if ( empty( $search_string ) ) {
 			return rest_ensure_response( array() );
@@ -274,6 +274,7 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 
 		$block->assets = array();
 		foreach ( $plugin['block_assets'] as $asset ) {
+			// TODO: Return from API, not client-set
 			$block->assets[] = 'https://plugins.svn.wordpress.org/' . $plugin['slug'] . $asset;
 		}
 
