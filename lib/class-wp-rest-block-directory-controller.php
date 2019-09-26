@@ -110,7 +110,7 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 		);
 
 		if ( is_wp_error( $api ) ) {
-			return new WP_Error( $api->get_error_code(), $api->get_error_message() );
+			return $api;
 		}
 
 		$skin     = new WP_Ajax_Upgrader_Skin();
@@ -125,15 +125,16 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 		$result = $upgrader->install( $api->download_link );
 
 		if ( is_wp_error( $result ) ) {
-			return WP_Error( $result->get_error_code(), $result->get_error_message() );
+			return $result;
 		}
 
+		// This should be the same as $result above.
 		if ( is_wp_error( $skin->result ) ) {
-			return WP_Error( $skin->$result->get_error_code(), $skin->$result->get_error_message() );
+			return $skin->result;
 		}
 
 		if ( $skin->get_errors()->has_errors() ) {
-			return WP_Error( $skin->$result->get_error_code(), $skin->$result->get_error_messages() );
+			return $skin->get_errors();
 		}
 
 		if ( is_null( $result ) ) {
@@ -196,7 +197,7 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 		$delete_result = delete_plugins( array( $install_status['file'] ) );
 
 		if ( is_wp_error( $delete_result ) ) {
-			return WP_Error( $delete_result->get_error_code(), $delete_result->get_error_message() );
+			return $delete_result;
 		}
 
 		return rest_ensure_response( true );
