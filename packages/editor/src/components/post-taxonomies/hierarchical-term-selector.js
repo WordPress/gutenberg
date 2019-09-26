@@ -315,13 +315,10 @@ class HierarchicalTermSelector extends Component {
 	renderTerms( renderedTerms ) {
 		const { terms = [] } = this.props;
 		return renderedTerms.map( ( term ) => {
-			const id = `editor-post-taxonomies-hierarchical-term-${ term.id }`;
 			return (
 				<div key={ term.id } className="editor-post-taxonomies__hierarchical-terms-choice">
 					<CheckboxControl
-						id={ id }
 						checked={ terms.indexOf( term.id ) !== -1 }
-						value={ term.id }
 						onChange={ () => {
 							const termId = parseInt( term.id, 10 );
 							this.onChange( termId );
