@@ -295,12 +295,15 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 		$block->icon = isset( $plugin['icons']['1x'] ) ? $plugin['icons']['1x'] : 'block-default';
 
 		$block->assets = array();
-
 		foreach ( $plugin['block_assets'] as $asset ) {
 			$block->assets[] = 'https://plugins.svn.wordpress.org/' . $plugin['slug'] . $asset;
 		}
 
-		$block->humanized_updated = human_time_diff( strtotime( $plugin['last_updated'] ), current_time( 'timestamp' ) ) . __( ' ago', 'gutenberg' );
+		$block->humanized_updated = sprintf(
+			/* translators: %s: Human-readable time difference. */
+			__( '%s ago', 'gutenberg' ),
+			human_time_diff( strtotime( $plugin['last_updated'] ), current_time( 'timestamp' ) )
+		);
 
 		return $block;
 	}
