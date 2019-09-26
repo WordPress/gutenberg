@@ -93,6 +93,7 @@ function MediaPlaceholder( props ) {
 	if ( isAppender && disableMediaButtons ) {
 		return null;
 	}
+
 	const emptyStateContainerStyle = getStylesFromColorScheme( styles.emptyStateContainer, styles.emptyStateContainerDark );
 
 	return (
