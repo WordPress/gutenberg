@@ -74,3 +74,4 @@ export { default as withFocusOutside } from './higher-order/with-focus-outside';
 export { default as withFocusReturn, Provider as FocusReturnProvider } from './higher-order/with-focus-return';
 export { default as withNotices } from './higher-order/with-notices';
 export { default as withSpokenMessages } from './higher-order/with-spoken-messages';
+export { withTheme, default as ThemeProvider } from './theme-provider';

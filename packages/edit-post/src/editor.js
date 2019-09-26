@@ -8,12 +8,13 @@ import { size, map, without } from 'lodash';
  * WordPress dependencies
  */
 import { withSelect } from '@wordpress/data';
-import { ThemeProvider, EditorProvider, ErrorBoundary, PostLockedModal } from '@wordpress/editor';
+import { EditorProvider, ErrorBoundary, PostLockedModal } from '@wordpress/editor';
 import { StrictMode, Component } from '@wordpress/element';
 import {
 	KeyboardShortcuts,
 	SlotFillProvider,
 	DropZoneProvider,
+	ThemeProvider,
 } from '@wordpress/components';
 
 /**

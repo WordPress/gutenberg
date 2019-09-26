@@ -3,6 +3,8 @@
  */
 import { ThemeProvider } from 'styled-components';
 
+export { withTheme as withTheme } from 'styled-components';
+
 const getTheme = ( theme ) => ( {
 	fontSizes: {
 		small: 12,

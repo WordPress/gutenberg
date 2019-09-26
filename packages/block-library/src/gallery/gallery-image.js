@@ -9,14 +9,14 @@ import classnames from 'classnames';
 /**
  * Internal dependencies
  */
-import { GRID_SIZE_SMALL } from '../constants';
 import { Component } from '@wordpress/element';
-import { Box, IconButton, Spinner } from '@wordpress/components';
+import { Box, IconButton, Spinner, withTheme } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { withSelect } from '@wordpress/data';
 import { RichText } from '@wordpress/block-editor';
 import { isBlobURL } from '@wordpress/blob';
+import { compose } from '@wordpress/compose';
 
 class GalleryImage extends Component {
 	constructor() {
@@ -90,11 +90,11 @@ class GalleryImage extends Component {
 	}
 
 	calculatePadding() {
-		const { isCompact } = this.props;
+		const { isCompact, theme } = this.props;
 		if ( isCompact ) {
 			return 0;
 		}
-		return GRID_SIZE_SMALL;
+		return theme.space.small;
 	}
 
 	render() {
@@ -148,7 +148,7 @@ class GalleryImage extends Component {
 					top="-2px"
 					left="-2px"
 					zIndex={ 20 }
-					bg={ isSelected ? '#0085ba' : 'inherit' }
+					bg={ isSelected ? 'primary' : 'inherit' }
 				>
 					<IconButton
 						icon="arrow-left"
@@ -174,7 +174,7 @@ class GalleryImage extends Component {
 					position="absolute"
 					top="-2px"
 					right="-2px"
-					bg={ isSelected ? '#0085ba' : 'inherit' }
+					bg={ isSelected ? 'primary' : 'inherit' }
 					zIndex={ 20 }
 				>
 					<IconButton
@@ -199,11 +199,13 @@ class GalleryImage extends Component {
 	}
 }
 
-export default withSelect( ( select, ownProps ) => {
-	const { getMedia } = select( 'core' );
-	const { id } = ownProps;
+export default compose(
+	withTheme,
+	withSelect( ( select, ownProps ) => {
+		const { getMedia } = select( 'core' );
+		const { id } = ownProps;
 
-	return {
-		image: id ? getMedia( id ) : null,
-	};
-} )( GalleryImage );
+		return {
+			image: id ? getMedia( id ) : null,
+		};
+	} ) )( GalleryImage );
