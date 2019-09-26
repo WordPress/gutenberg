@@ -2146,7 +2146,7 @@ describe( 'state', () => {
 				clientId: 'bar',
 			} );
 
-			expect( state ).toBe( [ 'bar' ] );
+			expect( state ).toStrictEqual( [ 'bar' ] );
 		} );
 
 		it( 'should replace selection when there is no item', () => {
@@ -2155,7 +2155,7 @@ describe( 'state', () => {
 				clientId: 'bar',
 			} );
 
-			expect( state ).toBe( [ 'bar' ] );
+			expect( state ).toStrictEqual( [ 'bar' ] );
 		} );
 
 		it( 'should clear the selection when there is more than one item', () => {
@@ -2164,7 +2164,7 @@ describe( 'state', () => {
 				clientId: 'bar',
 			} );
 
-			expect( state ).toBe( [] );
+			expect( state ).toStrictEqual( [] );
 		} );
 	} );
 
