@@ -9,6 +9,12 @@
 	}
 }
 
+.block-editor-responsive-block-control__legend {
+	margin: 0;
+	margin-bottom: 0.6em;
+	margin-left: -3px;
+}
+
 .block-editor-responsive-block-control__label {
 	font-weight: 600;
 	margin-bottom: 0.6em;
@@ -18,3 +24,8 @@
 .block-editor-responsive-block-control__inner {
 	margin-left: -1px; // visual compensation
 }
+
+.block-editor-responsive-block-control__toggle {
+	margin-left: 1px;
+}
+
