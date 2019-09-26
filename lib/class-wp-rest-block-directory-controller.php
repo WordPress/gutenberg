@@ -32,14 +32,12 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 			$this->namespace,
 			'/' . $this->rest_base . '/search',
 			array(
-				array(
-					'methods'             => WP_REST_Server::READABLE,
-					'callback'            => array( $this, 'get_items' ),
-					'permission_callback' => array( $this, 'get_items_permissions_check' ),
-					'args' => array(
-						'term' => array(
-							'required' => true,
-						),
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => array( $this, 'get_items' ),
+				'permission_callback' => array( $this, 'get_items_permissions_check' ),
+				'args' => array(
+					'term' => array(
+						'required' => true,
 					),
 				),
 				'schema' => array( $this, 'get_item_schema' ),
@@ -50,14 +48,12 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 			$this->namespace,
 			'/' . $this->rest_base . '/install',
 			array(
-				array(
-					'methods'             => WP_REST_Server::CREATABLE,
-					'callback'            => array( $this, 'install_block' ),
-					'permission_callback' => array( $this, 'install_items_permissions_check' ),
-					'args' => array(
-						'slug' => array(
-							'required' => true,
-						),
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => array( $this, 'install_block' ),
+				'permission_callback' => array( $this, 'install_items_permissions_check' ),
+				'args' => array(
+					'slug' => array(
+						'required' => true,
 					),
 				),
 				'schema' => array( $this, 'get_item_schema' ),
@@ -68,14 +64,12 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 			$this->namespace,
 			'/' . $this->rest_base . '/uninstall',
 			array(
-				array(
-					'methods'             => WP_REST_Server::DELETABLE,
-					'callback'            => array( $this, 'uninstall_block' ),
-					'permission_callback' => array( $this, 'delete_items_permissions_check' ),
-					'args' => array(
-						'slug' => array(
-							'required' => true,
-						),
+				'methods'             => WP_REST_Server::DELETABLE,
+				'callback'            => array( $this, 'uninstall_block' ),
+				'permission_callback' => array( $this, 'delete_items_permissions_check' ),
+				'args' => array(
+					'slug' => array(
+						'required' => true,
 					),
 				),
 				'schema' => array( $this, 'get_item_schema' ),
