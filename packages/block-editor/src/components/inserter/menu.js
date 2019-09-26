@@ -266,7 +266,7 @@ export class InserterMenu extends Component {
 		} = this.state;
 
 		const isPanelOpen = ( panel ) => openPanels.indexOf( panel ) !== -1;
-		const hasItems = ! ( isEmpty( suggestedItems ) && isEmpty( reusableItems ) && isEmpty( itemsPerCategory ) );
+		const hasItems = ! isEmpty( suggestedItems ) || ! isEmpty( reusableItems ) || ! isEmpty( itemsPerCategory );
 		const hoveredItemBlockType = hoveredItem ? getBlockType( hoveredItem.name ) : null;
 		const hasHelpPanel = hasItems && showInserterHelpPanel;
 
