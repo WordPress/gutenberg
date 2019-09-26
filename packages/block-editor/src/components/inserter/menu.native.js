@@ -13,8 +13,8 @@ import {
 	isUnmodifiedDefaultBlock,
 } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
-import { withInstanceId, compose } from '@wordpress/compose';
-import { BottomSheet, Icon, withTheme } from '@wordpress/components';
+import { withInstanceId, compose, withPreferredColorScheme } from '@wordpress/compose';
+import { BottomSheet, Icon } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -61,12 +61,12 @@ export class InserterMenu extends Component {
 	}
 
 	render() {
-		const { useStyle } = this.props;
+		const { getStylesFromColorScheme } = this.props;
 		const numberOfColumns = this.calculateNumberOfColumns();
 		const bottomPadding = styles.contentBottomPadding;
-		const modalIconWrapperStyle = useStyle( styles.modalIconWrapper, styles.modalIconWrapperDark );
-		const modalIconStyle = useStyle( styles.modalIcon, styles.modalIconDark );
-		const modalItemLabelStyle = useStyle( styles.modalItemLabel, styles.modalItemLabelDark );
+		const modalIconWrapperStyle = getStylesFromColorScheme( styles.modalIconWrapper, styles.modalIconWrapperDark );
+		const modalIconStyle = getStylesFromColorScheme( styles.modalIcon, styles.modalIconDark );
+		const modalItemLabelStyle = getStylesFromColorScheme( styles.modalItemLabel, styles.modalItemLabelDark );
 
 		return (
 			<BottomSheet
@@ -217,5 +217,5 @@ export default compose(
 		};
 	} ),
 	withInstanceId,
-	withTheme,
+	withPreferredColorScheme,
 )( InserterMenu );

@@ -4,10 +4,10 @@
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { withDispatch, withSelect } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { BlockList } from '@wordpress/block-editor';
 import { PostTitle } from '@wordpress/editor';
-import { ReadableContentView, withTheme } from '@wordpress/components';
+import { ReadableContentView } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -20,9 +20,9 @@ class VisualEditor extends Component {
 			editTitle,
 			setTitleRef,
 			title,
-			useStyle,
+			getStylesFromColorScheme,
 		} = this.props;
-		const blockHolderFocusedStyle = useStyle( styles.blockHolderFocused, styles.blockHolderFocusedDark );
+		const blockHolderFocusedStyle = getStylesFromColorScheme( styles.blockHolderFocused, styles.blockHolderFocusedDark );
 		return (
 			<ReadableContentView>
 				<PostTitle
@@ -83,5 +83,5 @@ export default compose( [
 			},
 		};
 	} ),
-	withTheme,
+	withPreferredColorScheme,
 ] )( VisualEditor );
