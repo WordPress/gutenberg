@@ -860,7 +860,7 @@ class RichText extends Component {
 				formats: activeFormats,
 			} );
 
-			this.applyRecord( this.record );
+			this.applyRecord( this.record, { domOnly: true } );
 		} else if (
 			this.record.start !== selectionStart ||
 			this.record.end !== selectionEnd
