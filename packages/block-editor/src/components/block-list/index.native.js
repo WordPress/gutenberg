@@ -168,7 +168,6 @@ export default compose( [
 			getBlockInsertionPoint,
 			isBlockInsertionPointVisible,
 			getSelectedBlock,
-			isBlockSelected,
 			getBlockRootClientId,
 		} = select( 'core/block-editor' );
 
@@ -210,9 +209,6 @@ export default compose( [
 			shouldShowBlockAtIndex,
 			shouldShowInsertionPoint,
 			selectedBlockClientId,
-			rootClientId,
-			getBlockIndex,
-			isBlockSelected,
 			isFirstBlock,
 			selectedBlockParentId,
 		};

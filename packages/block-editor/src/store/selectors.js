@@ -122,7 +122,6 @@ export function getBlockAttributes( state, clientId ) {
 export const getBlock = createSelector(
 	( state, clientId ) => {
 		const block = state.blocks.byClientId[ clientId ];
-
 		if ( ! block ) {
 			return null;
 		}
