@@ -6,8 +6,9 @@ import {
 	createNewPost,
 	getEditedPostContent,
 	pressKeyWithModifier,
-	saveDraft,
 	publishPost,
+	saveDraft,
+	toggleOfflineMode,
 } from '@wordpress/e2e-test-utils';
 
 // Constant to override editor preference
@@ -161,8 +162,25 @@ describe( 'autosave', () => {
 
 		// Trigger remote autosave
 		await page.evaluate( () => window.wp.data.dispatch( 'core/editor' ).autosave() );
-
 		expect( await page.evaluate( () => window.sessionStorage.length ) ).toBe( 0 );
+	} );
+
+	it( 'shouldn\'t clear local autosave if remote autosave fails', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'before save' );
+		await saveDraft();
+
+		await page.keyboard.type( 'after save' );
+		await page.evaluate( () => window.wp.data.dispatch( 'core/editor' ).localAutosave() );
+		expect( await page.evaluate( () => window.sessionStorage.length ) ).toBe( 1 );
+
+		toggleOfflineMode( true );
+
+		// Trigger remote autosave
+		await page.evaluate( () => window.wp.data.dispatch( 'core/editor' ).autosave() );
+		expect( await page.evaluate( () => window.sessionStorage.length ) ).toBe( 1 );
+
+		toggleOfflineMode( false );
 	} );
 
 	it( 'shouldn\'t conflict with server-side autosave', async () => {

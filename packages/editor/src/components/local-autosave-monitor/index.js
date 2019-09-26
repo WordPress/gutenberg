@@ -16,6 +16,10 @@ import { parse } from '@wordpress/blocks';
  * Internal dependencies
  */
 import AutosaveMonitor from '../autosave-monitor';
+import {
+	localAutosaveGet,
+	localAutosaveClear,
+} from '../../store/controls';
 
 const requestIdleCallback = window.requestIdleCallback ? window.requestIdleCallback : window.requestAnimationFrame;
 
@@ -38,46 +42,16 @@ const hasSessionStorageSupport = once( () => {
 } );
 
 /**
- * Function returning a sessionStorage key to set or retrieve a given post's
- * automatic session backup.
- *
- * Keys are crucially prefixed with 'wp-autosave-' so that wp-login.php's
- * `loggedout` handler can clear sessionStorage of any user-private content.
- *
- * @see https://github.com/WordPress/wordpress-develop/blob/6dad32d2aed47e6c0cf2aee8410645f6d7aba6bd/src/wp-login.php#L103
- *
- * @param {string} postId  Post ID.
- * @return {string}        sessionStorage key
- */
-function postKey( postId ) {
-	return `wp-autosave-block-editor-post-${ postId }`;
-}
-
-/**
  * Custom hook which returns a callback function to be invoked when a local
  * autosave should occur.
  *
  * @return {Function} Callback function.
  */
 function useAutosaveCallback() {
-	const {
-		postId,
-		getEditedPostAttribute,
-	} = useSelect( ( select ) => ( {
-		postId: select( 'core/editor' ).getCurrentPostId(),
-		getEditedPostAttribute: select( 'core/editor' ).getEditedPostAttribute,
-	} ) );
-
+	const { localAutosave } = useDispatch( 'core/editor' );
 	return useCallback( () => {
-		const saveToSessionStorage = () => {
-			window.sessionStorage.setItem( postKey( postId ), JSON.stringify( {
-				post_title: getEditedPostAttribute( 'title' ),
-				content: getEditedPostAttribute( 'content' ),
-				excerpt: getEditedPostAttribute( 'excerpt' ),
-			} ) );
-		};
-		requestIdleCallback( saveToSessionStorage );
-	}, [ postId ] );
+		requestIdleCallback( localAutosave );
+	}, [] );
 }
 
 /**
@@ -97,7 +71,7 @@ function useAutosaveNotice() {
 	const { editPost, resetEditorBlocks } = useDispatch( 'core/editor' );
 
 	useEffect( () => {
-		let autosave = window.sessionStorage.getItem( postKey( postId ) );
+		let autosave = localAutosaveGet( postId );
 		if ( ! autosave ) {
 			return;
 		}
@@ -120,7 +94,7 @@ function useAutosaveNotice() {
 
 		if ( ! hasDifference ) {
 			// If there is no difference, it can be safely ejected from storage.
-			window.sessionStorage.removeItem( postKey( postId ) );
+			localAutosaveClear( postId );
 
 			return;
 		}
@@ -150,20 +124,30 @@ function useAutosavePurge() {
 	const {
 		postId,
 		isDirty,
+		isAutosaving,
+		didError,
 	} = useSelect( ( select ) => ( {
 		postId: select( 'core/editor' ).getCurrentPostId(),
+		postType: select( 'core/editor' ).getCurrentPostType(),
 		isDirty: select( 'core/editor' ).isEditedPostDirty(),
+		isAutosaving: select( 'core/editor' ).isAutosavingPost(),
+		didError: select( 'core/editor' ).didPostSaveRequestFail(),
 	} ) );
 
 	const lastIsDirty = useRef( isDirty );
+	const lastIsAutosaving = useRef( isAutosaving );
 
 	useEffect( () => {
-		if ( lastIsDirty.current && ! isDirty ) {
-			window.sessionStorage.removeItem( postKey( postId ) );
+		if (
+			( lastIsDirty.current && ! isDirty ) ||
+			( lastIsAutosaving.current && ! isAutosaving && ! didError )
+		) {
+			localAutosaveClear( postId );
 		}
 
 		lastIsDirty.current = isDirty;
-	}, [ isDirty ] );
+		lastIsAutosaving.current = isAutosaving;
+	}, [ isDirty, isAutosaving, didError ] );
 }
 
 function LocalAutosaveMonitor() {
