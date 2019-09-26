@@ -36,10 +36,16 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => array( $this, 'get_items' ),
 					'permission_callback' => array( $this, 'permissions_check' ),
+					'args' => array(
+						'term' => array(
+							'required' => true,
+						),
+					),
 				),
 				'schema' => array( $this, 'get_item_schema' ),
 			)
 		);
+
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/install',
@@ -48,10 +54,16 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 					'methods'             => WP_REST_Server::CREATABLE,
 					'callback'            => array( $this, 'install_block' ),
 					'permission_callback' => array( $this, 'permissions_check' ),
+					'args' => array(
+						'slug' => array(
+							'required' => true,
+						),
+					),
 				),
 				'schema' => array( $this, 'get_item_schema' ),
 			)
 		);
+
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/uninstall',
@@ -60,6 +72,11 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 					'methods'             => WP_REST_Server::DELETABLE,
 					'callback'            => array( $this, 'uninstall_block' ),
 					'permission_callback' => array( $this, 'permissions_check' ),
+					'args' => array(
+						'slug' => array(
+							'required' => true,
+						),
+					),
 				),
 				'schema' => array( $this, 'get_item_schema' ),
 			)
