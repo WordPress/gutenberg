@@ -329,16 +329,6 @@ class CoverEdit extends Component {
 									onChange={ ( value ) => setAttributes( { focalPoint: value } ) }
 								/>
 							) }
-							<CoverHeightInput
-								value={ temporaryMinHeight || minHeight }
-								onChange={
-									( value ) => {
-										setAttributes( {
-											minHeight: value,
-										} );
-									}
-								}
-							/>
 							<PanelRow>
 								<Button
 									isDefault
@@ -359,27 +349,41 @@ class CoverEdit extends Component {
 						</PanelBody>
 					) }
 					{ ( url || overlayColor.color ) && (
-						<PanelColorSettings
-							title={ __( 'Overlay' ) }
-							initialOpen={ true }
-							colorSettings={ [ {
-								value: overlayColor.color,
-								onChange: setOverlayColor,
-								label: __( 'Overlay Color' ),
-							} ] }
-						>
-							{ !! url && (
-								<RangeControl
-									label={ __( 'Background Opacity' ) }
-									value={ dimRatio }
-									onChange={ setDimRatio }
-									min={ 0 }
-									max={ 100 }
-									step={ 10 }
-									required
+						<>
+							<PanelBody title={ __( 'Dimensions' ) }>
+								<CoverHeightInput
+									value={ temporaryMinHeight || minHeight }
+									onChange={
+										( value ) => {
+											setAttributes( {
+												minHeight: value,
+											} );
+										}
+									}
 								/>
-							) }
-						</PanelColorSettings>
+							</PanelBody>
+							<PanelColorSettings
+								title={ __( 'Overlay' ) }
+								initialOpen={ true }
+								colorSettings={ [ {
+									value: overlayColor.color,
+									onChange: setOverlayColor,
+									label: __( 'Overlay Color' ),
+								} ] }
+							>
+								{ !! url && (
+									<RangeControl
+										label={ __( 'Background Opacity' ) }
+										value={ dimRatio }
+										onChange={ setDimRatio }
+										min={ 0 }
+										max={ 100 }
+										step={ 10 }
+										required
+									/>
+								) }
+							</PanelColorSettings>
+						</>
 					) }
 				</InspectorControls>
 			</>
