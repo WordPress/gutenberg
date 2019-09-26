@@ -902,6 +902,12 @@ describe( 'selectors', () => {
 
 		it( 'should return selected block clientIds if there is non-consecutive selection', () => {
 			const state = {
+				blocks: {
+					order: {},
+					parents: {},
+				},
+				selectionStart: {},
+				selectionEnd: {},
 				nonConsecutiveSelection: [ 1, 2, 3, 4 ],
 			};
 
