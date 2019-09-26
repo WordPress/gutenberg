@@ -194,6 +194,12 @@ exports[`List should insert a line break on shift+enter in a non trailing list i
 <!-- /wp:list -->"
 `;
 
+exports[`List should not indent list on space with modifier 1`] = `
+"<!-- wp:list -->
+<ul><li>1</li><li> </li></ul>
+<!-- /wp:list -->"
+`;
+
 exports[`List should not transform lines in block when transforming multiple blocks 1`] = `
 "<!-- wp:list -->
 <ul><li>one<br>...</li><li>two</li></ul>

@@ -427,4 +427,14 @@ describe( 'List', () => {
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	it( 'should not indent list on space with modifier', async () => {
+		await clickBlockAppender();
+
+		await page.keyboard.type( '* 1' );
+		await page.keyboard.press( 'Enter' );
+		await pressKeyWithModifier( 'shift', 'Space' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );
