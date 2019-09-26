@@ -245,7 +245,7 @@ class WP_REST_Widget_Areas_Controller extends WP_REST_Controller {
 	 *
 	 * @since 5.7.0
 	 *
-	 * @param string $sidebar_id Indentifier of the sidebar.
+	 * @param string $sidebar_id Identifier of the sidebar.
 	 * @return object Sidebar data with a content array.
 	 */
 	protected function get_sidebar_data( $sidebar_id ) {
