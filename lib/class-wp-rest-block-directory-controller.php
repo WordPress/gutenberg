@@ -218,39 +218,17 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 			return rest_ensure_response( array() );
 		}
 
-		include( ABSPATH . WPINC . '/version.php' );
+		require_once ABSPATH . 'wp-admin/includes/plugin-install.php';
+		require_once ABSPATH . 'wp-admin/includes/plugin.php';
 
-		$url = 'http://api.wordpress.org/plugins/info/1.2/';
-		$url = add_query_arg(
-			array(
-				'action'              => 'query_plugins',
-				'request[block]'      => $search_string,
-				'request[wp_version]' => '5.3',
-				'request[per_page]'   => '3',
-			),
-			$url
-		);
-		$ssl = wp_http_supports( array( 'ssl' ) );
-		if ( $ssl ) {
-			$url = set_url_scheme( $url, 'https' );
-		}
-
-		global $wp_version;
-		$http_args = array(
-			'timeout'    => 15,
-			'user-agent' => 'WordPress/' . $wp_version . '; ' . home_url( '/' ),
-		);
-
-		$request  = wp_remote_get( $url, $http_args );
-		$response = json_decode( wp_remote_retrieve_body( $request ), true );
-
-		if ( ! function_exists( 'get_plugins' ) ) {
-			require_once ABSPATH . 'wp-admin/includes/plugin.php';
-		}
+		$response = plugins_api( 'query_plugins', array(
+			'block' => $search_string,
+			'per_page' => 3
+		) );
 
 		$result = array();
 
-		foreach ( $response['plugins'] as $plugin ) {
+		foreach ( $response->plugins as $plugin ) {
 			$installed_plugins = get_plugins( '/' . $plugin['slug'] );
 
 			// Only show uninstalled blocks.
