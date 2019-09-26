@@ -922,98 +922,50 @@ export function isCaretWithinFormattedText( state = false, action ) {
 	return state;
 }
 
-const BLOCK_SELECTION_EMPTY_ARRAY = [];
-const BLOCK_SELECTION_INITIAL_STATE = {
-	selections: BLOCK_SELECTION_EMPTY_ARRAY,
-	isMultiSelecting: false,
-	isEnabled: true,
-};
-
 /**
- * Reducer returning the block selection's state.
+ * Internal helper reducer for selectionStart and selectionEnd. Can hold a block
+ * selection, represented by an object with property clientId.
  *
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
  *
  * @return {Object} Updated state.
  */
-export function blockSelection( state = BLOCK_SELECTION_INITIAL_STATE, action ) {
+function selection( state = {}, action ) {
 	switch ( action.type ) {
-		case 'CLEAR_SELECTED_BLOCK':
-			return BLOCK_SELECTION_INITIAL_STATE;
-		case 'START_MULTI_SELECT':
-			if ( state.isMultiSelecting ) {
-				return state;
-			}
-
-			return {
-				...state,
-				isMultiSelecting: true,
-			};
-		case 'STOP_MULTI_SELECT':
-			if ( ! state.isMultiSelecting ) {
-				return state;
-			}
-
-			return {
-				...state,
-				isMultiSelecting: false,
-			};
-		case 'MULTI_SELECT':
-			return {
-				...BLOCK_SELECTION_INITIAL_STATE,
-				isMultiSelecting: state.isMultiSelecting,
-				selections: [
-					{
-						start: { clientId: action.start },
-						end: { clientId: action.end },
-					},
-				],
-			};
-		case 'SELECT_BLOCK':
-			if ( state.selections.find( ( { start, end } ) => start.clientId === action.clientId || end.clientId === action.clientId ) ) {
-				return state;
-			}
-
-			return {
-				...BLOCK_SELECTION_INITIAL_STATE,
-				selections: [
-					{
-						start: { clientId: action.clientId },
-						end: { clientId: action.clientId },
-						initialPosition: action.initialPosition,
-					},
-				],
-			};
-
-		case 'REPLACE_INNER_BLOCKS': // REPLACE_INNER_BLOCKS and INSERT_BLOCKS should follow the same logic.
-		case 'INSERT_BLOCKS': {
-			if ( action.updateSelection ) {
-				return {
-					...BLOCK_SELECTION_INITIAL_STATE,
-					selections: [
-						{
-							start: { clientId: action.blocks[ 0 ].clientId },
-							end: { clientId: action.blocks[ 0 ].clientId },
-						},
-					],
-				};
+		case 'CLEAR_SELECTED_BLOCK': {
+			if ( state.clientId ) {
+				return {};
 			}
 
 			return state;
+		}
+		case 'SELECT_BLOCK':
+			if ( action.clientId === state.clientId ) {
+				return state;
+			}
+
+			return { clientId: action.clientId };
+		case 'REPLACE_INNER_BLOCKS': // REPLACE_INNER_BLOCKS and INSERT_BLOCKS should follow the same logic.
+		case 'INSERT_BLOCKS': {
+			if ( ! action.updateSelection ) {
+				return state;
+			}
+
+			return { clientId: action.blocks[ 0 ].clientId };
 		}
 		case 'REMOVE_BLOCKS':
 			if (
 				! action.clientIds ||
 				! action.clientIds.length ||
-				! action.clientIds.every( ( clientIdToRemove ) => state.selections.find( ( { start, end } ) => start.clientId === clientIdToRemove || end.clientId === clientIdToRemove ) )
+				action.clientIds.indexOf( state.clientId ) === -1
 			) {
 				return state;
 			}
 
-			return BLOCK_SELECTION_INITIAL_STATE;
+			return {};
 		case 'REPLACE_BLOCKS': {
-			if ( ! action.clientIds.every( ( clientIdToReplace ) => state.selections.find( ( { start, end } ) => start.clientId === clientIdToReplace || end.clientId === clientIdToReplace ) ) ) {
+			if ( action.clientIds.indexOf( state.clientId ) === -1 ) {
 				return state;
 			}
 
@@ -1021,86 +973,127 @@ export function blockSelection( state = BLOCK_SELECTION_INITIAL_STATE, action ) 
 			const blockToSelect = action.blocks[ indexToSelect ];
 
 			if ( ! blockToSelect ) {
-				return BLOCK_SELECTION_INITIAL_STATE;
+				return {};
 			}
 
-			if ( state.selections.find( ( { start, end } ) => start.clientId === blockToSelect.clientId || end.clientId === blockToSelect.clientId ) ) {
+			if ( blockToSelect.clientId === state.clientId ) {
 				return state;
 			}
 
-			return {
-				...BLOCK_SELECTION_INITIAL_STATE,
-				selections: [
-					{
-						start: { clientId: blockToSelect.clientId },
-						end: { clientId: blockToSelect.clientId },
-					},
-				],
-			};
+			return { clientId: blockToSelect.clientId };
 		}
-		case 'TOGGLE_SELECTION':
-			return {
-				...BLOCK_SELECTION_INITIAL_STATE,
-				isEnabled: action.isSelectionEnabled,
-			};
-		case 'SELECTION_CHANGE':
-			return {
-				...BLOCK_SELECTION_INITIAL_STATE,
-				selections: [
-					{
-						start: {
-							clientId: action.clientId,
-							attributeKey: action.attributeKey,
-							offset: action.startOffset,
-						},
-						end: {
-							clientId: action.clientId,
-							attributeKey: action.attributeKey,
-							offset: action.endOffset,
-						},
-					},
-				],
-			};
-		case 'ADD_SELECTION':
-			return {
-				...BLOCK_SELECTION_INITIAL_STATE,
-				selections: [
-					...state.selections,
-					{
-						start: {
-							clientId: action.clientId,
-							attributeKey: action.attributeKey,
-							offset: action.startOffset,
-						},
-						end: {
-							clientId: action.clientId,
-							attributeKey: action.attributeKey,
-							offset: action.endOffset,
-						},
-					},
-				],
-			};
-		case 'REMOVE_SELECTION':
-			return {
-				...BLOCK_SELECTION_INITIAL_STATE,
-				selections: state.selections.filter( ( { start, end } ) => {
-					if (
-						start.clientId === action.clientId &&
-						end.clientId === action.clientId &&
-						start.attributeKey === action.attributeKey &&
-						end.attributeKey === action.attributeKey &&
-						start.offset === action.startOffset &&
-						end.offset === action.endOffset
-					) {
-						return false;
-					}
-
-					return true;
-				} ),
-			};
 	}
 
 	return state;
+}
+
+/**
+ * Reducer returning the block selection's start.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function selectionStart( state = {}, action ) {
+	switch ( action.type ) {
+		case 'SELECTION_CHANGE':
+			return {
+				clientId: action.clientId,
+				attributeKey: action.attributeKey,
+				offset: action.startOffset,
+			};
+		case 'RESET_SELECTION':
+			return action.selectionStart;
+		case 'MULTI_SELECT':
+			return { clientId: action.start };
+	}
+
+	return selection( state, action );
+}
+
+/**
+ * Reducer returning the block selection's end.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function selectionEnd( state = {}, action ) {
+	switch ( action.type ) {
+		case 'SELECTION_CHANGE':
+			return {
+				clientId: action.clientId,
+				attributeKey: action.attributeKey,
+				offset: action.endOffset,
+			};
+		case 'RESET_SELECTION':
+			return action.selectionEnd;
+		case 'MULTI_SELECT':
+			return { clientId: action.end };
+	}
+
+	return selection( state, action );
+}
+
+/**
+ * Reducer returning whether the user is multi-selecting.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {boolean} Updated state.
+ */
+export function isMultiSelecting( state = false, action ) {
+	switch ( action.type ) {
+		case 'START_MULTI_SELECT':
+			return true;
+
+		case 'STOP_MULTI_SELECT':
+			return false;
+	}
+
+	return state;
+}
+
+/**
+ * Reducer returning whether selection is enabled.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {boolean} Updated state.
+ */
+export function isSelectionEnabled( state = true, action ) {
+	switch ( action.type ) {
+		case 'TOGGLE_SELECTION':
+			return action.isSelectionEnabled;
+	}
+
+	return state;
+}
+
+/**
+ * Reducer returning the intial block selection.
+ *
+ * Currently this in only used to restore the selection after block deletion.
+ * This reducer should eventually be removed in favour of setting selection
+ * directly.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {?number} Initial position: -1 or undefined.
+ */
+export function initialPosition( state, action ) {
+	if ( action.type === 'SELECT_BLOCK' ) {
+		return action.initialPosition;
+	} else if ( action.type === 'REMOVE_BLOCKS' ) {
+		return state;
+	}
+
+	// Reset the state by default (for any action not handled).
 }
 
 export function blocksMode( state = {}, action ) {
@@ -1305,17 +1298,37 @@ export function lastBlockAttributesChange( state, action ) {
  * @param {boolean} state  Current state.
  * @param {Object}  action Dispatched action.
  *
- * @return {boolean} Updated state.
+ * @return {string} Updated state.
  */
-export function didAutomaticChange( state, action ) {
-	return action.type === 'MARK_AUTOMATIC_CHANGE';
+export function automaticChangeStatus( state, action ) {
+	switch ( action.type ) {
+		case 'MARK_AUTOMATIC_CHANGE':
+			return 'pending';
+		case 'MARK_AUTOMATIC_CHANGE_FINAL':
+			if ( state === 'pending' ) {
+				return 'final';
+			}
+
+			return;
+		case 'SELECTION_CHANGE':
+			// As long as the state is not final, ignore any selection changes.
+			if ( state !== 'final' ) {
+				return state;
+			}
+	}
+
+	// Reset the state by default (for any action not handled).
 }
 
 export default combineReducers( {
 	blocks,
 	isTyping,
 	isCaretWithinFormattedText,
-	blockSelection,
+	selectionStart,
+	selectionEnd,
+	isMultiSelecting,
+	isSelectionEnabled,
+	initialPosition,
 	blocksMode,
 	blockListSettings,
 	insertionPoint,
@@ -1324,5 +1337,5 @@ export default combineReducers( {
 	preferences,
 	lastBlockAttributesChange,
 	isNavigationMode,
-	didAutomaticChange,
+	automaticChangeStatus,
 } );

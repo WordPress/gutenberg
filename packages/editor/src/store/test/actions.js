@@ -14,7 +14,6 @@ import {
 } from '../constants';
 
 jest.mock( '@wordpress/data-controls' );
-jest.mock( '../block-sources' );
 
 select.mockImplementation( ( ...args ) => {
 	const { select: actualSelect } = jest
@@ -92,12 +91,16 @@ describe( 'Post generator actions', () => {
 				},
 			],
 			[
-				"yields an action for editing the post entity's content",
+				"yields an action for editing the post entity's content if not an autosave",
 				() => true,
 				() => {
-					const edits = { content: currentPost().content };
-					const { value } = fulfillment.next( edits.content );
-					expect( value ).toEqual( dispatch( STORE_KEY, 'editPost', edits ) );
+					if ( ! isAutosave ) {
+						const edits = { content: currentPost().content };
+						const { value } = fulfillment.next( edits.content );
+						expect( value ).toEqual(
+							dispatch( STORE_KEY, 'editPost', edits, { undoIgnore: true } )
+						);
+					}
 				},
 			],
 			[
@@ -148,7 +151,7 @@ describe( 'Post generator actions', () => {
 							'saveEntityRecord',
 							'postType',
 							post.type,
-							post,
+							isAutosave ? { ...post, content: undefined } : post,
 							{
 								isAutosave,
 							}
@@ -347,12 +350,11 @@ describe( 'Post generator actions', () => {
 					}
 				) );
 			} );
-			it( 'yields expected dispatch action for resetting the post', () => {
+			it( 'yields expected dispatch action for saving the post', () => {
 				const { value } = fulfillment.next();
 				expect( value ).toEqual( dispatch(
 					STORE_KEY,
-					'resetPost',
-					{ ...currentPost, status: 'trash' }
+					'savePost',
 				) );
 			} );
 		} );
@@ -494,7 +496,8 @@ describe( 'Editor actions', () => {
 					'postType',
 					post.type,
 					post.id,
-					edits
+					edits,
+					undefined
 				),
 			} );
 			expect( fulfillment.next() ).toEqual( {

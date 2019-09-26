@@ -50,6 +50,7 @@ function PostFeaturedImage( { currentPostId, featuredImageId, onUpdateImage, onR
 					<MediaUpload
 						title={ postLabel.featured_image || DEFAULT_FEATURE_IMAGE_LABEL }
 						onSelect={ onUpdateImage }
+						unstableFeaturedImageFlow
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
 						modalClass={ ! featuredImageId ? 'editor-post-featured-image__media-modal' : 'editor-post-featured-image__media-modal' }
 						render={ ( { open } ) => (
@@ -77,6 +78,7 @@ function PostFeaturedImage( { currentPostId, featuredImageId, onUpdateImage, onR
 						<MediaUpload
 							title={ postLabel.featured_image || DEFAULT_FEATURE_IMAGE_LABEL }
 							onSelect={ onUpdateImage }
+							unstableFeaturedImageFlow
 							allowedTypes={ ALLOWED_MEDIA_TYPES }
 							modalClass="editor-post-featured-image__media-modal"
 							render={ ( { open } ) => (

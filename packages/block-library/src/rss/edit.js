@@ -94,13 +94,13 @@ class RSSEdit extends Component {
 			},
 			{
 				icon: 'list-view',
-				title: __( 'List View' ),
+				title: __( 'List view' ),
 				onClick: () => setAttributes( { blockLayout: 'list' } ),
 				isActive: blockLayout === 'list',
 			},
 			{
 				icon: 'grid-view',
-				title: __( 'Grid View' ),
+				title: __( 'Grid view' ),
 				onClick: () => setAttributes( { blockLayout: 'grid' } ),
 				isActive: blockLayout === 'grid',
 			},

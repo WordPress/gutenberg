@@ -9,17 +9,19 @@ import classnames from 'classnames';
 import { __ } from '@wordpress/i18n';
 import {
 	Component,
+	useCallback,
 } from '@wordpress/element';
 import {
 	compose,
 	withInstanceId,
 } from '@wordpress/compose';
 import {
-	withFallbackStyles,
+	BaseControl,
 	PanelBody,
+	RangeControl,
 	TextControl,
 	ToggleControl,
-	BaseControl,
+	withFallbackStyles,
 } from '@wordpress/components';
 import {
 	URLInput,
@@ -45,6 +47,31 @@ const applyFallbackStyles = withFallbackStyles( ( node, ownProps ) => {
 } );
 
 const NEW_TAB_REL = 'noreferrer noopener';
+const MIN_BORDER_RADIUS_VALUE = 0;
+const MAX_BORDER_RADIUS_VALUE = 50;
+const INITIAL_BORDER_RADIUS_POSITION = 5;
+
+function BorderPanel( { borderRadius = '', setAttributes } ) {
+	const setBorderRadius = useCallback(
+		( newBorderRadius ) => {
+			setAttributes( { borderRadius: newBorderRadius } );
+		},
+		[ setAttributes ]
+	);
+	return (
+		<PanelBody title={ __( 'Border Settings' ) }>
+			<RangeControl
+				value={ borderRadius }
+				label={ __( 'Border Radius' ) }
+				min={ MIN_BORDER_RADIUS_VALUE }
+				max={ MAX_BORDER_RADIUS_VALUE }
+				initialPosition={ INITIAL_BORDER_RADIUS_POSITION }
+				allowReset
+				onChange={ setBorderRadius }
+			/>
+		</PanelBody>
+	);
+}
 
 class ButtonEdit extends Component {
 	constructor() {
@@ -99,12 +126,13 @@ class ButtonEdit extends Component {
 		} = this.props;
 
 		const {
-			text,
-			url,
-			title,
+			borderRadius,
 			linkTarget,
-			rel,
 			placeholder,
+			rel,
+			text,
+			title,
+			url,
 		} = attributes;
 
 		const linkId = `wp-block-button__inline-link-${ instanceId }`;
@@ -122,11 +150,13 @@ class ButtonEdit extends Component {
 							[ backgroundColor.class ]: backgroundColor.class,
 							'has-text-color': textColor.color,
 							[ textColor.class ]: textColor.class,
+							'no-border-radius': borderRadius === 0,
 						}
 					) }
 					style={ {
 						backgroundColor: backgroundColor.color,
 						color: textColor.color,
+						borderRadius: borderRadius ? borderRadius + 'px' : undefined,
 					} }
 				/>
 				<BaseControl
@@ -175,14 +205,18 @@ class ButtonEdit extends Component {
 							} }
 						/>
 					</PanelColorSettings>
-					<PanelBody title={ __( 'Link Settings' ) }>
+					<BorderPanel
+						borderRadius={ borderRadius }
+						setAttributes={ setAttributes }
+					/>
+					<PanelBody title={ __( 'Link settings' ) }>
 						<ToggleControl
-							label={ __( 'Open in New Tab' ) }
+							label={ __( 'Open in new tab' ) }
 							onChange={ this.onToggleOpenInNewTab }
 							checked={ linkTarget === '_blank' }
 						/>
 						<TextControl
-							label={ __( 'Link Rel' ) }
+							label={ __( 'Link rel' ) }
 							value={ rel || '' }
 							onChange={ this.onSetLinkRel }
 						/>

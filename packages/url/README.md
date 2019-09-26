@@ -30,7 +30,7 @@ const newURL = addQueryArgs( 'https://google.com', { q: 'test' } ); // https://g
 
 _Parameters_
 
--   _url_ `?string`: URL to which arguments should be appended. If omitted, only the resulting querystring is returned.
+-   _url_ `[string]`: URL to which arguments should be appended. If omitted, only the resulting querystring is returned.
 -   _args_ `Object`: Query arguments to apply to URL.
 
 _Returns_
@@ -72,7 +72,7 @@ _Parameters_
 
 _Returns_
 
--   `?string`: The authority part of the URL.
+-   `(string|void)`: The authority part of the URL.
 
 <a name="getFragment" href="#getFragment">#</a> **getFragment**
 
@@ -91,7 +91,7 @@ _Parameters_
 
 _Returns_
 
--   `?string`: The fragment part of the URL.
+-   `(string|void)`: The fragment part of the URL.
 
 <a name="getPath" href="#getPath">#</a> **getPath**
 
@@ -110,7 +110,7 @@ _Parameters_
 
 _Returns_
 
--   `?string`: The path part of the URL.
+-   `(string|void)`: The path part of the URL.
 
 <a name="getProtocol" href="#getProtocol">#</a> **getProtocol**
 
@@ -129,7 +129,7 @@ _Parameters_
 
 _Returns_
 
--   `?string`: The protocol part of the URL.
+-   `(string|void)`: The protocol part of the URL.
 
 <a name="getQueryArg" href="#getQueryArg">#</a> **getQueryArg**
 
@@ -143,12 +143,12 @@ const foo = getQueryArg( 'https://wordpress.org?foo=bar&bar=baz', 'foo' ); // ba
 
 _Parameters_
 
--   _url_ `string`: URL
--   _arg_ `string`: Query arg name
+-   _url_ `string`: URL.
+-   _arg_ `string`: Query arg name.
 
 _Returns_
 
--   `(Array|string)`: Query arg value.
+-   `(QueryArgParsed|undefined)`: Query arg value.
 
 <a name="getQueryString" href="#getQueryString">#</a> **getQueryString**
 
@@ -167,7 +167,7 @@ _Parameters_
 
 _Returns_
 
--   `?string`: The query string part of the URL.
+-   `(string|void)`: The query string part of the URL.
 
 <a name="hasQueryArg" href="#hasQueryArg">#</a> **hasQueryArg**
 
@@ -181,8 +181,8 @@ const hasBar = hasQueryArg( 'https://wordpress.org?foo=bar&bar=baz', 'bar' ); //
 
 _Parameters_
 
--   _url_ `string`: URL
--   _arg_ `string`: Query arg name
+-   _url_ `string`: URL.
+-   _arg_ `string`: Query arg name.
 
 _Returns_
 
@@ -331,11 +331,11 @@ const actualURL = prependHTTP( 'wordpress.org' ); // http://wordpress.org
 
 _Parameters_
 
--   _url_ `string`: The URL to test
+-   _url_ `string`: The URL to test.
 
 _Returns_
 
--   `string`: The updated URL
+-   `string`: The updated URL.
 
 <a name="removeQueryArgs" href="#removeQueryArgs">#</a> **removeQueryArgs**
 
@@ -349,12 +349,12 @@ const newUrl = removeQueryArgs( 'https://wordpress.org?foo=bar&bar=baz&baz=fooba
 
 _Parameters_
 
--   _url_ `string`: URL
--   _args_ `...string`: Query Args
+-   _url_ `string`: URL.
+-   _args_ `...string`: Query Args.
 
 _Returns_
 
--   `string`: Updated URL
+-   `string`: Updated URL.
 
 <a name="safeDecodeURI" href="#safeDecodeURI">#</a> **safeDecodeURI**
 

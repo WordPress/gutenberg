@@ -16,6 +16,7 @@ import { BACKSPACE, DELETE, ENTER, LEFT, RIGHT, SPACE, ESCAPE } from '@wordpress
 import { withSelect } from '@wordpress/data';
 import { withSafeTimeout, compose } from '@wordpress/compose';
 import isShallowEqual from '@wordpress/is-shallow-equal';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -110,6 +111,10 @@ class RichText extends Component {
 		this.Editable = this.Editable.bind( this );
 
 		this.onKeyDown = ( event ) => {
+			if ( event.defaultPrevented ) {
+				return;
+			}
+
 			this.handleDelete( event );
 			this.handleEnter( event );
 			this.handleSpace( event );
@@ -298,6 +303,13 @@ class RichText extends Component {
 		this.rafId = window.requestAnimationFrame( this.onSelectionChange );
 
 		document.addEventListener( 'selectionchange', this.onSelectionChange );
+
+		if ( this.props.setFocusedElement ) {
+			deprecated( 'wp.blockEditor.RichText setFocusedElement prop', {
+				alternative: 'selection state from the block editor store.',
+			} );
+			this.props.setFocusedElement( this.props.instanceId );
+		}
 	}
 
 	onBlur() {
@@ -418,10 +430,27 @@ class RichText extends Component {
 			return;
 		}
 
-		const { start, end } = this.createRecord();
+		const { start, end, text } = this.createRecord();
 		const value = this.record;
 
+		// Fallback mechanism for IE11, which doesn't support the input event.
+		// Any input results in a selection change.
+		if ( text !== value.text ) {
+			this.onInput();
+			return;
+		}
+
 		if ( start === value.start && end === value.end ) {
+			// If a placeholder is set, some browsers seems to place the
+			// selection after the placeholder instead of the text node that is
+			// padding the empty container element. The internal selection is
+			// set correctly to zero, but the caret is not visible. By
+			// reapplying the value to the DOM we reset the selection to the
+			// right node, making the caret visible again.
+			if ( value.text.length === 0 && start === 0 ) {
+				this.applyRecord( value );
+			}
+
 			return;
 		}
 
@@ -936,7 +965,10 @@ class RichText extends Component {
 				onPaste={ this.onPaste }
 				onInput={ this.onInput }
 				onCompositionEnd={ this.onCompositionEnd }
-				onKeyDown={ this.onKeyDown }
+				onKeyDown={ props.onKeyDown ? ( event ) => {
+					props.onKeyDown( event );
+					this.onKeyDown( event );
+				} : this.onKeyDown }
 				onFocus={ this.onFocus }
 				onBlur={ this.onBlur }
 				onMouseDown={ this.onPointerDown }

@@ -481,7 +481,7 @@ _Returns_
 
 <a name="getSelectedBlockClientIds" href="#getSelectedBlockClientIds">#</a> **getSelectedBlockClientIds**
 
-Returns the current selection set of block client IDs (multi-selection or single selection).
+Returns the current selection set of block client IDs (multiselection or single selection).
 
 _Parameters_
 
@@ -703,7 +703,7 @@ _Returns_
 Returns true if the block corresponding to the specified client ID is
 currently selected but isn't the last of the selected blocks. Here "last"
 refers to the block sequence in the document, _not_ the sequence of
-multi-selection, which is why `state.blockSelection.end` isn't used.
+multi-selection, which is why `state.selectionEnd` isn't used.
 
 _Parameters_
 
@@ -754,21 +754,6 @@ _Parameters_
 _Returns_
 
 -   `boolean`: Whether the most recent block change was persistent.
-
-<a name="isLastMultiSelectedBlock" href="#isLastMultiSelectedBlock">#</a> **isLastMultiSelectedBlock**
-
-Returns true if a multi-selection exists, and the block corresponding to the
-specified client ID is the last block of the multi-selection set, or false
-otherwise.
-
-_Parameters_
-
--   _state_ `Object`: Editor state.
--   _clientId_ `string`: Block client ID.
-
-_Returns_
-
--   `boolean`: Whether block is last in multi-selection.
 
 <a name="isMultiSelecting" href="#isMultiSelecting">#</a> **isMultiSelecting**
 

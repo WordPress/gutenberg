@@ -11,6 +11,35 @@ import { __ } from '@wordpress/i18n';
 
 const { wp } = window;
 
+const getFeaturedImageMediaFrame = () => {
+	return wp.media.view.MediaFrame.Select.extend( {
+		/**
+		 * Enables the Set Featured Image Button.
+		 *
+		 * @param {Object} toolbar toolbar for featured image state
+		 * @return {void}
+		 */
+		featuredImageToolbar( toolbar ) {
+			this.createSelectToolbar( toolbar, {
+				text: wp.media.view.l10n.setFeaturedImage,
+				state: this.options.state,
+			} );
+		},
+
+		/**
+		 * Create the default states.
+		 *
+		 * @return {void}
+		 */
+		createStates: function createStates() {
+			this.on( 'toolbar:create:featured-image', this.featuredImageToolbar, this );
+			this.states.add( [
+				new wp.media.controller.FeaturedImage(),
+			] );
+		},
+	} );
+};
+
 // Getter for the sake of unit tests.
 const getGalleryDetailsMediaFrame = () => {
 	/**
@@ -79,6 +108,7 @@ class MediaUpload extends Component {
 	constructor( {
 		allowedTypes,
 		gallery = false,
+		unstableFeaturedImageFlow = false,
 		modalClass,
 		multiple = false,
 		title = __( 'Select or Upload Media' ),
@@ -109,6 +139,10 @@ class MediaUpload extends Component {
 
 		if ( modalClass ) {
 			this.frame.$el.addClass( modalClass );
+		}
+
+		if ( unstableFeaturedImageFlow ) {
+			this.buildAndSetFeatureImageFrame();
 		}
 
 		this.initializeListeners();
@@ -165,6 +199,22 @@ class MediaUpload extends Component {
 		} );
 		wp.media.frame = this.frame;
 		this.initializeListeners();
+	}
+
+	buildAndSetFeatureImageFrame() {
+		const featuredImageFrame = getFeaturedImageMediaFrame();
+		const attachments = getAttachmentsCollection( this.props.value );
+		const selection = new wp.media.model.Selection( attachments.models, {
+			props: attachments.props.toJSON(),
+		} );
+		this.frame = new featuredImageFrame( {
+			mimeType: this.props.allowedTypes,
+			state: 'featured-image',
+			multiple: this.props.multiple,
+			selection,
+			editing: ( this.props.value ) ? true : false,
+		} );
+		wp.media.frame = this.frame;
 	}
 
 	componentWillUnmount() {
