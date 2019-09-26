@@ -191,6 +191,7 @@ describe( 'List', () => {
 		await page.keyboard.type( 'one' );
 		await page.keyboard.press( 'Enter' );
 		await clickBlockToolbarButton( 'Indent list item' );
+		await pressKeyTimes( 'Tab', 6 );
 		await page.keyboard.type( 'two' );
 		await transformBlockTo( 'Paragraph' );
 
@@ -273,6 +274,7 @@ describe( 'List', () => {
 		await page.keyboard.type( 'one' );
 		await page.keyboard.press( 'Enter' );
 		await clickBlockToolbarButton( 'Indent list item' );
+		await pressKeyTimes( 'Tab', 6 );
 		await page.keyboard.type( 'two' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'three' );
