@@ -181,7 +181,7 @@ function BlockListBlock( {
 
 	// Handling the error state
 	const [ hasError, setErrorState ] = useState( false );
-	const onBlockError = () => setErrorState( false );
+	const onBlockError = () => setErrorState( true );
 
 	// Handling of forceContextualToolbarFocus
 	const isForcingContextualToolbar = useRef( false );
