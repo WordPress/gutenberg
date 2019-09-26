@@ -1090,6 +1090,20 @@ export function nonConsecutiveSelection( state = [], action ) {
 			}
 
 			return [ action.clientId ];
+
+		case 'REPLACE_INNER_BLOCKS': // REPLACE_INNER_BLOCKS and INSERT_BLOCKS should follow the same logic.
+		case 'INSERT_BLOCKS':
+			if ( ! action.updateSelection ) {
+				return state;
+			}
+
+			return [];
+
+		case 'REMOVE_BLOCKS':
+			return without( state, action.clientIds );
+
+		case 'REPLACE_BLOCKS':
+			return [];
 	}
 
 	return state;
