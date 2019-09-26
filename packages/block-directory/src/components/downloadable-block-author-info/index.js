@@ -11,7 +11,15 @@ function DownloadableBlockAuthorInfo( { author, authorBlockCount, authorBlockRat
 				{ sprintf( __( 'Authored by %s' ), author ) }
 			</span>
 			<span className="block-directory-downloadable-block-author-info__content">
-				{ sprintf( _n( 'This author has %d block, with an average rating of %d.', 'This author has %d blocks, with an average rating of %d.', authorBlockCount, authorBlockRating ), authorBlockCount, authorBlockRating ) }
+				{ sprintf(
+					_n(
+						'This author has %d block, with an average rating of %d.',
+						'This author has %d blocks, with an average rating of %d.',
+						authorBlockCount
+					),
+					authorBlockCount,
+					authorBlockRating
+				) }
 			</span>
 		</Fragment>
 	);
