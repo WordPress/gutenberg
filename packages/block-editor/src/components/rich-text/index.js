@@ -260,7 +260,7 @@ class RichTextWrapper extends Component {
 		const { start, text } = value;
 		const characterBefore = text.slice( start - 1, start );
 
-		if ( ! /\s/.test( characterBefore ) ) {
+		if ( characterBefore !== ' ' ) {
 			return;
 		}
 
