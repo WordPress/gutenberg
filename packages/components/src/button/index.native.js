@@ -94,7 +94,7 @@ export function Button( props ) {
 	const subscriptInactive = getStylesFromColorScheme( styles.subscriptInactive, styles.subscriptInactiveDark );
 
 	const newChildren = Children.map( compact( children ), ( child ) => {
-		return cloneElement( child, { theme: props.theme, active: ariaPressed } );
+		return cloneElement( child, { colorScheme: props.preferredColorScheme, active: ariaPressed } );
 	} );
 
 	return (
