@@ -403,7 +403,8 @@ function BlockListBlock( {
 		isSelected &&
 		! showEmptyBlockSideInserter &&
 		! isPartOfMultiSelection &&
-		! isTypingWithinBlock;
+		! isTypingWithinBlock &&
+		! horizontalMover;
 	const shouldShowBreadcrumb =
 		( isSelected && isNavigationMode ) ||
 		( ! isNavigationMode && ! isFocusMode && isHovered && ! isEmptyDefaultBlock );
@@ -451,6 +452,20 @@ function BlockListBlock( {
 		};
 	}
 	const blockElementId = `block-${ clientId }`;
+	const blockMover = (
+		<BlockMover
+			clientIds={ clientId }
+			blockElementId={ blockElementId }
+			isHidden={ ! isSelected }
+			isDraggable={
+				isDraggable !== false &&
+				( ! isPartOfMultiSelection && isMovable )
+			}
+			onDragStart={ onDragStart }
+			onDragEnd={ onDragEnd }
+			horizontalMover={ horizontalMover }
+		/>
+	);
 
 	// We wrap the BlockEdit component in a div that hides it when editing in
 	// HTML mode. This allows us to render all of the ancillary pieces
@@ -468,6 +483,7 @@ function BlockListBlock( {
 			clientId={ clientId }
 			isSelectionEnabled={ isSelectionEnabled }
 			toggleSelection={ toggleSelection }
+			blockMover={ horizontalMover ? blockMover : null }
 		/>
 	);
 	if ( mode !== 'visual' ) {
@@ -518,20 +534,7 @@ function BlockListBlock( {
 				/>
 			) }
 			<div className="editor-block-list__block-edit block-editor-block-list__block-edit">
-				{ shouldRenderMovers && (
-					<BlockMover
-						clientIds={ clientId }
-						blockElementId={ blockElementId }
-						isHidden={ ! isSelected }
-						isDraggable={
-							isDraggable !== false &&
-							( ! isPartOfMultiSelection && isMovable )
-						}
-						onDragStart={ onDragStart }
-						onDragEnd={ onDragEnd }
-						horizontalMover={ horizontalMover }
-					/>
-				) }
+				{ shouldRenderMovers && blockMover }
 				{ shouldShowBreadcrumb && (
 					<BlockBreadcrumb
 						clientId={ clientId }

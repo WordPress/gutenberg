@@ -1,5 +1,17 @@
 .block-editor-block-mover {
 
+	&.is-horizontal {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		width: auto;
+		min-height: auto;
+
+		.block-editor-block-mover__control-drag-handle {
+			display: none;
+		}
+
+	}
+
 	@include break-small() {
 		min-height: $empty-paragraph-height;
 		opacity: 0;
