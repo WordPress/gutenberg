@@ -315,7 +315,7 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 	/**
 	 * Determine if the endpoints are available.
 	 *
-	 * Only the 'Direct' filesystem transport is supported at present.
+	 * Only the 'Direct' filesystem transport, and SSH/FTP when credentials are stored are supported at present.
 	 *
 	 * @since 6.5.0
 	 *
@@ -323,11 +323,16 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 	 */
 	private static function is_filesystem_available() {
 		$filesystem_method = get_filesystem_method();
-		if ( 'direct' !== $filesystem_method ) {
-			return new WP_Error( 'fs_unavailable', 'The filesystem is currently unavailable for installing blocks.' );
+
+		ob_start();
+		$filesystem_credentials_are_stored = request_filesystem_credentials( self_admin_url() );
+		ob_end_clean();
+
+		if ( 'direct' === $filesystem_method || $filesystem_credentials_are_stored ) {
+			return true;
 		}
 
-		return true;
+		return new WP_Error( 'fs_unavailable', __( 'The filesystem is currently unavailable for installing blocks.', 'gutenberg' ) );
 	}
 
 	/**
