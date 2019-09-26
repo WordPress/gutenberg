@@ -208,4 +208,5 @@ export default compose(
 		return {
 			image: id ? getMedia( id ) : null,
 		};
-	} ) )( GalleryImage );
+	} )
+)( GalleryImage );
