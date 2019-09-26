@@ -2114,6 +2114,15 @@ describe( 'state', () => {
 			expect( state ).toBe( [ 'foo' ] );
 		} );
 
+		it( 'should not add block to selection twice', () => {
+			const state = nonConsecutiveSelection( [ 'foo', 'bar' ], {
+				type: 'ADD_SELECTION',
+				clientId: 'foo',
+			} );
+
+			expect( state ).toBe( [ 'foo', 'bar' ] );
+		} );
+
 		it( 'should remove block from selection', () => {
 			const state = nonConsecutiveSelection( [ 'foo', 'bar' ], {
 				type: 'REMOVE_SELECTION',

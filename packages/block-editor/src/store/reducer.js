@@ -1072,6 +1072,10 @@ export function isMultiSelecting( state = false, action ) {
 export function nonConsecutiveSelection( state = [], action ) {
 	switch ( action.type ) {
 		case 'ADD_SELECTION':
+			if ( state.indexOf( action.clientId ) !== -1 ) {
+				return state;
+			}
+
 			return [ ...state, action.clientId ];
 
 		case 'REMOVE_SELECTION':
