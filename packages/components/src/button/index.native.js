@@ -8,11 +8,7 @@ import { compact } from 'lodash';
  * WordPress dependencies
  */
 import { Children, cloneElement } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import { withTheme } from '../mobile/dark-mode';
+import { withPreferredColorScheme } from '@wordpress/compose';
 
 const isAndroid = Platform.OS === 'android';
 const marginBottom = isAndroid ? -0.5 : 0;
@@ -71,7 +67,7 @@ export function Button( props ) {
 		disabled,
 		hint,
 		fixedRatio = true,
-		useStyle,
+		getStylesFromColorScheme,
 		'aria-disabled': ariaDisabled,
 		'aria-label': ariaLabel,
 		'aria-pressed': ariaPressed,
@@ -95,7 +91,7 @@ export function Button( props ) {
 		states.push( 'disabled' );
 	}
 
-	const subscriptInactive = useStyle( styles.subscriptInactive, styles.subscriptInactiveDark );
+	const subscriptInactive = getStylesFromColorScheme( styles.subscriptInactive, styles.subscriptInactiveDark );
 
 	const newChildren = Children.map( compact( children ), ( child ) => {
 		return cloneElement( child, { theme: props.theme, active: ariaPressed } );
@@ -123,4 +119,4 @@ export function Button( props ) {
 	);
 }
 
-export default withTheme( Button );
+export default withPreferredColorScheme( Button );
