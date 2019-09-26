@@ -347,12 +347,10 @@ function BlockListBlock( {
 			return;
 		}
 
-		if ( event.shiftKey ) {
-			if ( ! isSelected ) {
-				onShiftSelection();
-				event.preventDefault();
-			}
-		} else if ( event.ctrlKey || event.metaKey ) {
+		if ( event.shiftKey && ! isSelected ) {
+			onShiftSelection();
+			event.preventDefault();
+		} else if ( ( event.ctrlKey || event.metaKey ) && ! isSelected ) {
 			onNonConsecutiveSelect();
 			event.preventDefault();
 
