@@ -7,6 +7,7 @@ import {
 	insertBlock,
 	clickBlockAppender,
 	pressKeyWithModifier,
+	pressKeyTimes,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'RichText', () => {
@@ -83,10 +84,12 @@ describe( 'RichText', () => {
 		await page.mouse.move( 0, 0 );
 		await page.mouse.move( 10, 10 );
 		await page.click( '[aria-label="Bold"]' );
+		await pressKeyTimes( 'Tab', 5 );
 		await page.keyboard.type( 'bold' );
 		await page.mouse.move( 0, 0 );
 		await page.mouse.move( 10, 10 );
 		await page.click( '[aria-label="Bold"]' );
+		await pressKeyTimes( 'Tab', 5 );
 		await page.keyboard.type( '.' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -238,6 +241,7 @@ describe( 'RichText', () => {
 
 	it( 'should handle Home and End keys', async () => {
 		await page.keyboard.press( 'Enter' );
+		await page.evaluate( () => new Promise( window.requestAnimationFrame ) );
 
 		await pressKeyWithModifier( 'primary', 'b' );
 		await page.keyboard.type( '12' );

@@ -282,20 +282,6 @@ class RichText extends Component {
 
 		this.recalculateBoundaryStyle();
 
-		// We know for certain that on focus, the old selection is invalid. It
-		// will be recalculated on the next mouseup, keyup, or touchend event.
-		const index = undefined;
-		const activeFormats = undefined;
-
-		this.record = {
-			...this.record,
-			start: index,
-			end: index,
-			activeFormats,
-		};
-		this.props.onSelectionChange( index, index );
-		this.setState( { activeFormats } );
-
 		// Update selection as soon as possible, which is at the next animation
 		// frame. The event listener for selection changes may be added too late
 		// at this point, but this focus event is still too early to calculate
