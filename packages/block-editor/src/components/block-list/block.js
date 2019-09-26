@@ -633,7 +633,7 @@ const applyWithSelect = withSelect(
 			isNavigationMode,
 		} = select( 'core/block-editor' );
 		const block = __unstableGetBlockWithoutInnerBlocks( clientId );
-		const isSelected = isBlockSelected( clientId );
+		const isSelected = isBlockSelected( clientId ) && ! isPartOfNonConsecutiveSelection( clientId );
 		const { hasFixedToolbar, focusMode, isRTL } = getSettings();
 		const templateLock = getTemplateLock( rootClientId );
 		const isParentOfSelectedBlock = hasSelectedInnerBlock( clientId, true );
