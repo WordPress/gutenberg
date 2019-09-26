@@ -902,7 +902,7 @@ export function nonConsecutiveSelection( state ) {
  * @return {boolean} Whether there is a non-consecutive selection or not.
  */
 export function hasNonConsecutiveSelection( state ) {
-	return state.nonConsecutiveSelection.length > 1;
+	return state.nonConsecutiveSelection && state.nonConsecutiveSelection.length > 1;
 }
 
 /**
