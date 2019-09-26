@@ -27,6 +27,7 @@
 		line-height: $default-line-height;
 		font-family: $default-font;
 		font-size: $default-font-size;
+		margin: 1em 0;
 	}
 
 	.block-editor-warning__contents {
@@ -44,11 +45,16 @@
 
 	.block-editor-warning__action {
 		margin: 0 6px 0 0;
+
+		.components-button {
+			vertical-align: top;
+		}
 	}
 }
 
 .block-editor-warning__secondary {
 	margin: 3px 0 0 -4px;
+	height: $block-controls-height;
 
 	// the padding and margin of the more menu is intentionally non-standard
 	.components-icon-button {

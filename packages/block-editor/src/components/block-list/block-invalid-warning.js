@@ -44,46 +44,45 @@ export class BlockInvalidWarning extends Component {
 			{ title: __( 'Attempt Block Recovery' ), onClick: attemptBlockRecovery },
 		];
 
-		if ( compare ) {
-			return (
-				<Modal
-					title={
-						// translators: Dialog title to fix block content
-						__( 'Resolve Block' )
-					}
-					onRequestClose={ this.onCompareClose }
-					className="editor-block-compare block-editor-block-compare"
-				>
-					<BlockCompare
-						block={ block }
-						onKeep={ convertToHTML }
-						onConvert={ convertToBlocks }
-						convertor={ blockToBlocks }
-						convertButtonText={ __( 'Convert to Blocks' ) }
-					/>
-				</Modal>
-			);
-		}
-
 		return (
-			<Warning
-				actions={ [
-					<Button key="convert" onClick={ this.onCompare } isLarge isPrimary={ ! hasHTMLBlock }>
-						{
-							// translators: Button to fix block content
-							_x( 'Resolve', 'imperative verb' )
+			<>
+				<Warning
+					actions={ [
+						<Button key="convert" onClick={ this.onCompare } isLarge isPrimary={ ! hasHTMLBlock }>
+							{
+								// translators: Button to fix block content
+								_x( 'Resolve', 'imperative verb' )
+							}
+						</Button>,
+						hasHTMLBlock && (
+							<Button key="edit" onClick={ convertToHTML } isLarge isPrimary>
+								{ __( 'Convert to HTML' ) }
+							</Button>
+						),
+					] }
+					secondaryActions={ hiddenActions }
+				>
+					{ __( 'This block contains unexpected or invalid content.' ) }
+				</Warning>
+				{ compare && (
+					<Modal
+						title={
+							// translators: Dialog title to fix block content
+							__( 'Resolve Block' )
 						}
-					</Button>,
-					hasHTMLBlock && (
-						<Button key="edit" onClick={ convertToHTML } isLarge isPrimary>
-							{ __( 'Convert to HTML' ) }
-						</Button>
-					),
-				] }
-				secondaryActions={ hiddenActions }
-			>
-				{ __( 'This block contains unexpected or invalid content.' ) }
-			</Warning>
+						onRequestClose={ this.onCompareClose }
+						className="editor-block-compare block-editor-block-compare"
+					>
+						<BlockCompare
+							block={ block }
+							onKeep={ convertToHTML }
+							onConvert={ convertToBlocks }
+							convertor={ blockToBlocks }
+							convertButtonText={ __( 'Convert to Blocks' ) }
+						/>
+					</Modal>
+				) }
+			</>
 		);
 	}
 }
