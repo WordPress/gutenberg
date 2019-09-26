@@ -31,7 +31,7 @@ describe( 'Taxonomies', () => {
 		return page.evaluate(
 			() => {
 				return Array.from( document.querySelectorAll(
-					'.editor-post-taxonomies__hierarchical-terms-choice > .components-checkbox-control__input:checked'
+					'.editor-post-taxonomies__hierarchical-terms-choice .components-checkbox-control__input:checked'
 				) ).map( ( node ) => {
 					return node.parentElement.querySelector(
 						'label'
@@ -83,7 +83,7 @@ describe( 'Taxonomies', () => {
 		await page.click( '.editor-post-taxonomies__hierarchical-terms-submit' );
 
 		// Wait for the categories to load.
-		await page.waitForSelector( '.editor-post-taxonomies__hierarchical-terms-choice > .components-checkbox-control__input:checked' );
+		await page.waitForSelector( '.editor-post-taxonomies__hierarchical-terms-choice .components-checkbox-control__input:checked' );
 
 		let selectedCategories = await getSelectCategories();
 
