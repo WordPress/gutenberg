@@ -691,7 +691,7 @@ export function addSelection( clientId, attributeKey, startOffset, endOffset ) {
 }
 
 /**
- * Returns an action object used in signalling that a selection has been undone.
+ * Returns an action object used in signalling that a selection has been removed.
  *
  * @param {string} clientId     The selected block client ID.
  * @param {string} attributeKey The selected block attribute key.

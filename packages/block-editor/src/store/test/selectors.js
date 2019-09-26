@@ -36,6 +36,9 @@ const {
 	getMultiSelectedBlocks,
 	getMultiSelectedBlocksStartClientId,
 	getMultiSelectedBlocksEndClientId,
+	nonConsecutiveSelection,
+	hasNonConsecutiveSelection,
+	isPartOfNonConsecutiveSelection,
 	getBlockOrder,
 	getBlockIndex,
 	getPreviousBlockClientId,
@@ -1021,6 +1024,60 @@ describe( 'selectors', () => {
 			};
 
 			expect( getMultiSelectedBlocksEndClientId( state ) ).toBe( 4 );
+		} );
+	} );
+
+	describe( 'nonConsecutiveSelection', () => {
+		it( 'returns an empty array if there is no selection', () => {
+			const state = { nonConsecutiveSelection: [] };
+
+			expect( nonConsecutiveSelection( state ) ).toBe( [] );
+		} );
+
+		it( 'returns list of non-consecutively selected blocks', () => {
+			const state = { nonConsecutiveSelection: [ 'a', 'b', 'c' ] };
+
+			expect( nonConsecutiveSelection( state ) ).toBe( [ 'a', 'b', 'c' ] );
+		} );
+	} );
+
+	describe( 'hasNonConsecutiveSelection', () => {
+		it( 'returns false if there are no items', () => {
+			const state = { nonConsecutiveSelection: [] };
+
+			expect( hasNonConsecutiveSelection( state ) ).toStrictEqual( false );
+		} );
+
+		it( 'returns false if there are less than 2 items', () => {
+			const state = { nonConsecutiveSelection: [ 'a' ] };
+
+			expect( hasNonConsecutiveSelection( state ) ).toStrictEqual( false );
+		} );
+
+		it( 'returns true if there is more than 1 item', () => {
+			const state = { nonConsecutiveSelection: [ 'a', 'b' ] };
+
+			expect( hasNonConsecutiveSelection( state ) ).toStrictEqual( true );
+		} );
+	} );
+
+	describe( 'isPartOfNonConsecutiveSelection', () => {
+		it( 'returns false if there are no items', () => {
+			const state = { nonConsecutiveSelection: [] };
+
+			expect( isPartOfNonConsecutiveSelection( state, 'a' ) ).toStrictEqual( false );
+		} );
+
+		it( 'returns false if item is not in the list', () => {
+			const state = { nonConsecutiveSelection: [ 'a', 'b' ] };
+
+			expect( isPartOfNonConsecutiveSelection( state, 'c' ) ).toStrictEqual( false );
+		} );
+
+		it( 'returns if item is in the list', () => {
+			const state = { nonConsecutiveSelection: [ 'a', 'b' ] };
+
+			expect( isPartOfNonConsecutiveSelection( state, 'b' ) ).toStrictEqual( true );
 		} );
 	} );
 

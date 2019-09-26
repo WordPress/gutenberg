@@ -877,6 +877,41 @@ export function isSelectionEnabled( state ) {
 }
 
 /**
+ * Selector that returns the current non-consecutive block selection.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Array} Current non-consecutive selection.
+ */
+export function nonConsecutiveSelection( state ) {
+	return state.nonConsecutiveSelection;
+}
+
+/**
+ * Selector that returns whether there is a non-consecutive block selection or not.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether there is a non-consecutive selection or not.
+ */
+export function hasNonConsecutiveSelection( state ) {
+	return state.nonConsecutiveSelection.length > 1;
+}
+
+/**
+ * Returns true if the client ID occurs within the non-consecutive selection, or
+ * false otherwise.
+ *
+ * @param {Object} state    Editor state.
+ * @param {string} clientId Block client ID.
+ *
+ * @return {boolean} Whether block is in non-consecutive selection.
+ */
+export function isPartOfNonConsecutiveSelection( state, clientId ) {
+	return hasNonConsecutiveSelection( state ) && state.nonConsecutiveSelection.indexOf( clientId ) !== -1;
+}
+
+/**
  * Returns the block's editing mode, defaulting to "visual" if not explicitly
  * assigned.
  *

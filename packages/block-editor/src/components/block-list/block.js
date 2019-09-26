@@ -73,6 +73,7 @@ function BlockListBlock( {
 	isSelected,
 	isPartOfMultiSelection,
 	isFirstMultiSelected,
+	isPartOfNonConsecutiveSelection,
 	isTypingWithinBlock,
 	isCaretWithinFormattedText,
 	isEmptyDefaultBlock,
@@ -92,7 +93,7 @@ function BlockListBlock( {
 	onInsertBlocksAfter,
 	onMerge,
 	onSelect,
-	onMultiSelect,
+	onNonConsecutiveSelect,
 	onRemove,
 	onInsertDefaultBlockAfter,
 	toggleSelection,
@@ -156,6 +157,7 @@ function BlockListBlock( {
 		if (
 			isBlockHovered ||
 			isPartOfMultiSelection ||
+			isPartOfNonConsecutiveSelection ||
 			isSelected ||
 			hadTouchStart.current
 		) {
@@ -257,7 +259,7 @@ function BlockListBlock( {
 	}, [ isFirstMultiSelected ] );
 
 	// Block Reordering animation
-	const animationStyle = useMovingAnimation( wrapper, isSelected || isPartOfMultiSelection, isSelected || isFirstMultiSelected, enableAnimation, animateOnChange );
+	const animationStyle = useMovingAnimation( wrapper, isSelected || isPartOfMultiSelection || isPartOfNonConsecutiveSelection, isSelected || isFirstMultiSelected, enableAnimation, animateOnChange );
 
 	// Focus the breadcrumb if the wrapper is focused on navigation mode.
 	// Focus the first editable or the wrapper if edit mode.
@@ -279,7 +281,7 @@ function BlockListBlock( {
 	 * (via `setFocus`), typically if there is no focusable input in the block.
 	 */
 	const onFocus = () => {
-		if ( ! isSelected && ! isPartOfMultiSelection ) {
+		if ( ! isSelected && ! isPartOfMultiSelection && ! isPartOfNonConsecutiveSelection ) {
 			onSelect();
 		}
 	};
@@ -351,7 +353,7 @@ function BlockListBlock( {
 				event.preventDefault();
 			}
 		} else if ( event.ctrlKey || event.metaKey ) {
-			onMultiSelect();
+			onNonConsecutiveSelect();
 			event.preventDefault();
 
 		// Avoid triggering multi-selection if we click toolbars/inspectors
@@ -364,7 +366,7 @@ function BlockListBlock( {
 			// onFocus excludes blocks involved in a multi-selection, as
 			// focus can be incurred by starting a multi-selection (focus
 			// moved to first block's multi-controls).
-			if ( isPartOfMultiSelection ) {
+			if ( isPartOfMultiSelection || isPartOfNonConsecutiveSelection ) {
 				onSelect();
 			}
 		}
@@ -377,7 +379,7 @@ function BlockListBlock( {
 	};
 
 	// Rendering the output
-	const isHovered = isBlockHovered && ! isPartOfMultiSelection;
+	const isHovered = isBlockHovered && ! isPartOfMultiSelection && ! isPartOfNonConsecutiveSelection;
 	const blockType = getBlockType( name );
 	// translators: %s: Type of block (i.e. Text, Image etc)
 	const blockLabel = sprintf( __( 'Block: %s' ), blockType.title );
@@ -434,7 +436,7 @@ function BlockListBlock( {
 			'has-warning': ! isValid || !! hasError || isUnregisteredBlock,
 			'is-selected': shouldAppearSelected,
 			'is-navigate-mode': isNavigationMode,
-			'is-multi-selected': isPartOfMultiSelection,
+			'is-multi-selected': isPartOfMultiSelection || isPartOfNonConsecutiveSelection,
 			'is-hovered': shouldAppearHovered,
 			'is-reusable': isReusableBlock( blockType ),
 			'is-dragging': isDragging,
@@ -616,6 +618,7 @@ const applyWithSelect = withSelect(
 			isAncestorMultiSelected,
 			isBlockMultiSelected,
 			isFirstMultiSelectedBlock,
+			isPartOfNonConsecutiveSelection,
 			isTyping,
 			isCaretWithinFormattedText,
 			getBlockMode,
@@ -645,6 +648,7 @@ const applyWithSelect = withSelect(
 		return {
 			isPartOfMultiSelection:
 				isBlockMultiSelected( clientId ) || isAncestorMultiSelected( clientId ),
+			isPartOfNonConsecutiveSelection: isPartOfNonConsecutiveSelection( clientId ),
 			isFirstMultiSelected: isFirstMultiSelectedBlock( clientId ),
 			// We only care about this prop when the block is selected
 			// Thus to avoid unnecessary rerenders we avoid updating the prop if the block is not selected.
@@ -703,8 +707,8 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 		onSelect( clientId = ownProps.clientId, initialPosition ) {
 			selectBlock( clientId, initialPosition );
 		},
-		onMultiSelect( clientId = ownProps.clientId ) {
-			if ( ownProps.isPartOfMultiSelection ) {
+		onNonConsecutiveSelect( clientId = ownProps.clientId ) {
+			if ( ownProps.isPartOfNonConsecutiveSelection ) {
 				removeSelection( clientId );
 			} else {
 				addSelection( clientId );

@@ -26,6 +26,7 @@ import {
 	selectionEnd,
 	initialPosition,
 	isMultiSelecting,
+	nonConsecutiveSelection,
 	preferences,
 	blocksMode,
 	insertionPoint,
@@ -2100,6 +2101,61 @@ describe( 'state', () => {
 
 			expect( state1 ).toEqual( original );
 			expect( state2 ).toEqual( original );
+		} );
+	} );
+
+	describe( 'nonConsecutiveSelection', () => {
+		it( 'should add block to selection', () => {
+			const state = nonConsecutiveSelection( [], {
+				type: 'ADD_SELECTION',
+				clientId: 'foo',
+			} );
+
+			expect( state ).toBe( [ 'foo' ] );
+		} );
+
+		it( 'should remove block from selection', () => {
+			const state = nonConsecutiveSelection( [ 'foo', 'bar' ], {
+				type: 'REMOVE_SELECTION',
+				clientId: 'foo',
+			} );
+
+			expect( state ).toBe( [ 'bar' ] );
+		} );
+
+		it( 'should clear the selection', () => {
+			const state = nonConsecutiveSelection( [ 'foo', 'bar' ], {
+				type: 'CLEAR_SELECTION',
+			} );
+
+			expect( state ).toBe( [] );
+		} );
+
+		it( 'should replace selection when there is only one item', () => {
+			const state = nonConsecutiveSelection( [ 'foo' ], {
+				type: 'SELECT_BLOCK',
+				clientId: 'bar',
+			} );
+
+			expect( state ).toBe( [ 'bar' ] );
+		} );
+
+		it( 'should replace selection when there is no item', () => {
+			const state = nonConsecutiveSelection( [], {
+				type: 'SELECT_BLOCK',
+				clientId: 'bar',
+			} );
+
+			expect( state ).toBe( [ 'bar' ] );
+		} );
+
+		it( 'should clear the selection when there is more than one item', () => {
+			const state = nonConsecutiveSelection( [ 'foo', 'bar' ], {
+				type: 'SELECT_BLOCK',
+				clientId: 'bar',
+			} );
+
+			expect( state ).toBe( [] );
 		} );
 	} );
 

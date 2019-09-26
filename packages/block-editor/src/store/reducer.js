@@ -982,6 +982,10 @@ function selection( state = {}, action ) {
 
 			return { clientId: blockToSelect.clientId };
 		}
+
+		case 'ADD_SELECTION':
+		case 'REMOVE_SELECTION':
+			return {};
 	}
 
 	return state;
@@ -1052,6 +1056,36 @@ export function isMultiSelecting( state = false, action ) {
 
 		case 'STOP_MULTI_SELECT':
 			return false;
+	}
+
+	return state;
+}
+
+/**
+ * Reducer returning whether the user is doing a non-consecutive block selection.
+ *
+ * @param {Array} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {Array} Updated state.
+ */
+export function nonConsecutiveSelection( state = [], action ) {
+	switch ( action.type ) {
+		case 'ADD_SELECTION':
+			return [ ...state, action.clientId ];
+
+		case 'REMOVE_SELECTION':
+			return without( state, action.clientId );
+
+		case 'CLEAR_SELECTED_BLOCK':
+			return [];
+
+		case 'SELECT_BLOCK':
+			if ( state.length > 1 ) {
+				return [];
+			}
+
+			return [ action.clientId ];
 	}
 
 	return state;
@@ -1329,6 +1363,7 @@ export default combineReducers( {
 	isMultiSelecting,
 	isSelectionEnabled,
 	initialPosition,
+	nonConsecutiveSelection,
 	blocksMode,
 	blockListSettings,
 	insertionPoint,
