@@ -64,18 +64,19 @@
 
 .video {
 	width: 100%;
-	height: 144;
+	height: 100%;
 }
 
 .videoContainer {
-	height: 144;
+	flex: 1;
 	background-color: #000;
 }
 
 .videoPlaceholder {
+	width: 100%;
+	height: 100%;
 	align-items: center;
 	background-color: $gray-lighten-30;
-	height: 144;
 	justify-content: center;
 }
 

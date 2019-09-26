@@ -29,6 +29,7 @@ import {
 	MEDIA_TYPE_VIDEO,
 	BlockControls,
 	InspectorControls,
+	VIDEO_ASPECT_RATIO,
 	VideoPlayer,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
@@ -41,8 +42,6 @@ import { doAction, hasAction } from '@wordpress/hooks';
 import style from './style.scss';
 import SvgIcon from './icon';
 import SvgIconRetry from './icon-retry';
-
-const VIDEO_ASPECT_RATIO = 1.7;
 
 class VideoEdit extends React.Component {
 	constructor( props ) {

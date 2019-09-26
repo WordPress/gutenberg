@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Dimensions, View, ImageBackground, Text, TouchableWithoutFeedback, Platform } from 'react-native';
+import { View, ImageBackground, Text, TouchableWithoutFeedback, Platform } from 'react-native';
 import {
 	requestMediaImport,
 	mediaUploadSync,
@@ -26,6 +26,7 @@ import {
 	MediaPlaceholder,
 	MediaUpload,
 	MediaUploadProgress,
+	VIDEO_ASPECT_RATIO,
 	VideoPlayer,
 } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
@@ -43,10 +44,10 @@ import SvgIconRetry from './icon-retry';
  * Constants
  */
 // For Android it will only work with the first element of the array (images)
-const ALLOWED_MEDIA_TYPES = [ MEDIA_TYPE_IMAGE, ...( Platform.OS === 'ios' ? [ MEDIA_TYPE_VIDEO ] : [] ) ];
-
-// Default Video ratio 16:9
-const VIDEO_ASPECT_RATIO = 16 / 9;
+const ALLOWED_MEDIA_TYPES = Platform.select( {
+	android: [ MEDIA_TYPE_IMAGE ],
+	ios: [ MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO ],
+} );
 
 class MediaContainer extends Component {
 	constructor() {
@@ -72,7 +73,7 @@ class MediaContainer extends Component {
 				requestMediaImport( mediaUrl, ( id, url, type ) => {
 					if ( url ) {
 						onSelectMedia( {
-							media_type: type || 'image', // image fallback for android
+							media_type: type || MEDIA_TYPE_IMAGE, // image fallback for android
 							id,
 							url,
 						} );
@@ -94,7 +95,7 @@ class MediaContainer extends Component {
 		const { onSelectMedia } = this.props;
 
 		onSelectMedia( {
-			media_type: type || 'image', // image fallback for android
+			media_type: type || MEDIA_TYPE_IMAGE, // image fallback for android
 			id,
 			url,
 		} );
@@ -206,7 +207,6 @@ class MediaContainer extends Component {
 		const { mediaUrl, isSelected } = this.props;
 		const { isUploadInProgress } = this.state;
 		const { isUploadFailed, retryMessage } = params;
-		const videoHeight = ( Dimensions.get( 'window' ).width / 2 ) / VIDEO_ASPECT_RATIO;
 		const showVideo = isURL( mediaUrl ) && ! isUploadInProgress && ! isUploadFailed;
 
 		return (
@@ -216,12 +216,12 @@ class MediaContainer extends Component {
 				onLongPress={ openMediaOptions }
 				disabled={ ! isSelected }
 			>
-				<View style={ styles.content } >
+				<View aspectRatio={ VIDEO_ASPECT_RATIO }>
 					{ showVideo &&
-						<View style={ [ styles.videoContainer, { height: videoHeight } ] }>
+						<View style={ styles.videoContainer }>
 							<VideoPlayer
 								isSelected={ isSelected }
-								style={ [ styles.video, { height: videoHeight } ] }
+								style={ styles.video }
 								source={ { uri: mediaUrl } }
 								paused={ true }
 							/>
