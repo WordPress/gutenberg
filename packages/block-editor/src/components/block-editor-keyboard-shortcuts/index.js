@@ -57,8 +57,14 @@ class BlockEditorKeyboardShortcuts extends Component {
 	}
 
 	deleteSelectedBlocks( event ) {
-		const { selectedBlockClientIds, hasMultiSelection, onRemove, isLocked } = this.props;
-		if ( hasMultiSelection ) {
+		const {
+			selectedBlockClientIds,
+			hasMultiSelection,
+			hasNonConsecutiveSelection,
+			onRemove,
+			isLocked,
+		} = this.props;
+		if ( hasMultiSelection || hasNonConsecutiveSelection ) {
 			event.preventDefault();
 			if ( ! isLocked ) {
 				onRemove( selectedBlockClientIds );
@@ -67,11 +73,11 @@ class BlockEditorKeyboardShortcuts extends Component {
 	}
 
 	/**
-	 * Clears current multi-selection, if one exists.
+	 * Clears current multi-selection or non-consecutive selection, if one exists.
 	 */
 	clearMultiSelection() {
-		const { hasMultiSelection, clearSelectedBlock } = this.props;
-		if ( hasMultiSelection ) {
+		const { hasMultiSelection, hasNonConsecutiveSelection, clearSelectedBlock } = this.props;
+		if ( hasMultiSelection || hasNonConsecutiveSelection ) {
 			clearSelectedBlock();
 			window.getSelection().removeAllRanges();
 		}
@@ -125,6 +131,7 @@ export default compose( [
 			getBlockOrder,
 			getSelectedBlockClientIds,
 			hasMultiSelection,
+			hasNonConsecutiveSelection,
 			getBlockRootClientId,
 			getTemplateLock,
 		} = select( 'core/block-editor' );
@@ -133,6 +140,7 @@ export default compose( [
 		return {
 			rootBlocksClientIds: getBlockOrder(),
 			hasMultiSelection: hasMultiSelection(),
+			hasNonConsecutiveSelection: hasNonConsecutiveSelection(),
 			isLocked: some(
 				selectedBlockClientIds,
 				( clientId ) => !! getTemplateLock( getBlockRootClientId( clientId ) )
