@@ -172,35 +172,30 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 		include_once( ABSPATH . 'wp-admin/includes/class-wp-upgrader.php' );
 		include_once( ABSPATH . 'wp-admin/includes/plugin-install.php' );
 
+		$slug = trim( $request->get_param( 'slug' ) );
+
+		if ( ! $slug ) {
+			return new WP_Error( 'slug_not_provided', 'Valid slug not provided.' );
+		}
+
 		// Verify filesystem is accessible first.
 		$filesystem_available = self::is_filesystem_available();
 		if ( is_wp_error( $filesystem_available ) ) {
 			return $filesystem_available;
 		}
 
-		$api = plugins_api(
-			'plugin_information',
-			array(
-				'slug'   => $request->get_param( 'slug' ),
-				'fields' => array(
-					'sections' => false,
-				),
-			)
-		);
+		$plugin_files = get_plugins( '/' . $slug );
 
-		if ( is_wp_error( $api ) ) {
-			return WP_Error( $api->get_error_code(), $api->get_error_message() );
+		if ( ! $plugin_files ) {
+			return new WP_Error( 'block_not_found', 'Valid slug not provided.' );
 		}
 
-		$install_status = install_plugin_install_status( $api );
+		$plugin_files = array_keys( $plugin_files );
+		$plugin_file = $slug . '/' . reset( $plugin_files );
 
-		$deactivate_result = deactivate_plugins( $install_status['file'] );
+		deactivate_plugins( $plugin_file );
 
-		if ( is_wp_error( $deactivate_result ) ) {
-			return WP_Error( $deactivate_result->get_error_code(), $deactivate_result->get_error_message() );
-		}
-
-		$delete_result = delete_plugins( array( $install_status['file'] ) );
+		$delete_result = delete_plugins( array( $plugin_file ) );
 
 		if ( is_wp_error( $delete_result ) ) {
 			return $delete_result;
