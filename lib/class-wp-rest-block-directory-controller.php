@@ -99,6 +99,8 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 		include_once( ABSPATH . 'wp-admin/includes/class-wp-upgrader.php' );
 		include_once( ABSPATH . 'wp-admin/includes/plugin-install.php' );
 
+		$slug = $request->get_param( 'slug' );
+
 		// Verify filesystem is accessible first.
 		$filesystem_available = self::is_filesystem_available();
 		if ( is_wp_error( $filesystem_available ) ) {
@@ -108,7 +110,7 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 		$api = plugins_api(
 			'plugin_information',
 			array(
-				'slug'   => $request->get_param( 'slug' ),
+				'slug'   => $slug,
 				'fields' => array(
 					'sections' => false,
 				),
@@ -146,13 +148,13 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 			return WP_Error( 'unable_to_connect_to_filesystem', __( 'Unable to connect to the filesystem. Please confirm your credentials.', 'gutenberg' ) );
 		}
 
-		$install_status = install_plugin_install_status( $api );
+		// Find the plugin to activate it.
+		$plugin_files = get_plugins( '/' . $slug );
+		$plugin_files = array_keys( $plugin_files );
 
-		$activate_result = activate_plugin( $install_status['file'] );
+		$plugin_file = $slug . '/' . reset( $plugin_files );
 
-		if ( is_wp_error( $activate_result ) ) {
-			return WP_Error( $activate_result->get_error_code(), $activate_result->get_error_message() );
-		}
+		activate_plugin( $plugin_file );
 
 		return rest_ensure_response( true );
 	}
