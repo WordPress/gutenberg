@@ -437,4 +437,13 @@ describe( 'List', () => {
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	it( 'should only convert to list when shortcut ends with space', async () => {
+		await clickBlockAppender();
+
+		// Tests the shortcut with a non breaking space.
+		await page.keyboard.type( '* ' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );

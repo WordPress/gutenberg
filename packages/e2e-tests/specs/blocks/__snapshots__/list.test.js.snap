@@ -210,6 +210,12 @@ exports[`List should not undo asterisk transform with backspace after selection 
 
 exports[`List should not undo asterisk transform with backspace after typing 1`] = `""`;
 
+exports[`List should only convert to list when shortcut ends with space 1`] = `
+"<!-- wp:paragraph -->
+<p>* </p>
+<!-- /wp:paragraph -->"
+`;
+
 exports[`List should outdent with children 1`] = `
 "<!-- wp:list -->
 <ul><li>a<ul><li>b<ul><li>c</li></ul></li></ul></li></ul>
