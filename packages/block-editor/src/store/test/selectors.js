@@ -195,7 +195,7 @@ describe( 'selectors', () => {
 						123: [],
 					},
 					parents: {
-						123: '23',
+						123: '',
 					},
 					cache: {
 						123: {},
@@ -208,7 +208,6 @@ describe( 'selectors', () => {
 				name: 'core/paragraph',
 				attributes: {},
 				innerBlocks: [],
-				parent: '23',
 			} );
 		} );
 
@@ -262,9 +261,7 @@ describe( 'selectors', () => {
 					name: 'core/paragraph',
 					attributes: {},
 					innerBlocks: [],
-					parent: 123,
 				} ],
-				parent: '',
 			} );
 		} );
 	} );
@@ -296,8 +293,8 @@ describe( 'selectors', () => {
 			};
 
 			expect( getBlocks( state ) ).toEqual( [
-				{ clientId: 123, name: 'core/paragraph', attributes: {}, innerBlocks: [], parent: '' },
-				{ clientId: 23, name: 'core/heading', attributes: {}, innerBlocks: [], parent: '' },
+				{ clientId: 123, name: 'core/paragraph', attributes: {}, innerBlocks: [] },
+				{ clientId: 23, name: 'core/heading', attributes: {}, innerBlocks: [] },
 			] );
 		} );
 	} );
@@ -710,7 +707,7 @@ describe( 'selectors', () => {
 					},
 					parents: {
 						123: '',
-						23: '123',
+						23: '',
 					},
 					cache: {
 						23: {},
@@ -724,7 +721,6 @@ describe( 'selectors', () => {
 				name: 'core/heading',
 				attributes: {},
 				innerBlocks: [],
-				parent: '123',
 			} );
 		} );
 	} );
@@ -2251,9 +2247,6 @@ describe( 'selectors', () => {
 					},
 					cache: {
 						block1: {},
-					},
-					parents: {
-						123: '',
 					},
 				},
 				preferences: {

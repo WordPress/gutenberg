@@ -115,6 +115,8 @@ class BlockListBlock extends Component {
 			showTitle,
 			title,
 			displayToolbar,
+			parentId,
+			isFirstBlock,
 		} = this.props;
 
 		const borderColor = isSelected ? focusedBorderColor : 'transparent';
@@ -123,7 +125,8 @@ class BlockListBlock extends Component {
 
 		return (
 			<>
-				{ displayToolbar && <FloatingToolbar /> }
+				{ displayToolbar && ( ! isFirstBlock || parentId === '' ) && <FloatingToolbar.Slot /> }
+				<FloatingToolbar />
 				<TouchableWithoutFeedback
 					onPress={ this.onFocus }
 					accessible={ ! isSelected }
@@ -157,6 +160,7 @@ export default compose( [
 			__unstableGetBlockWithoutInnerBlocks,
 			getBlockHierarchyRootClientId,
 			getBlock,
+			getBlockRootClientId,
 		} = select( 'core/block-editor' );
 		const order = getBlockIndex( clientId, rootClientId );
 		const isSelected = isBlockSelected( clientId );
@@ -174,6 +178,7 @@ export default compose( [
 		const hasRootInnerBlocks = rootBlock.innerBlocks.length !== 0;
 
 		const displayToolbar = isSelected && hasRootInnerBlocks;
+		const parentId = getBlockRootClientId( clientId );
 
 		return {
 			icon,
@@ -188,6 +193,7 @@ export default compose( [
 			isValid,
 			getAccessibilityLabelExtra,
 			displayToolbar,
+			parentId,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {
