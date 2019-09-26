@@ -61,7 +61,6 @@ function MediaPlaceholder( props ) {
 		accessibilityHint = __( 'Double tap to select a video' );
 	}
 
-	const emptyStateContainerStyle = getStylesFromColorScheme( styles.emptyStateContainer, styles.emptyStateContainerDark );
 	const emptyStateTitleStyle = getStylesFromColorScheme( styles.emptyStateTitle, styles.emptyStateTitleDark );
 
 	const renderContent = () => {
@@ -94,6 +93,8 @@ function MediaPlaceholder( props ) {
 	if ( isAppender && disableMediaButtons ) {
 		return null;
 	}
+
+	const emptyStateContainerStyle = getStylesFromColorScheme( styles.emptyStateContainer, styles.emptyStateContainerDark );
 
 	return (
 		<View style={ { flex: 1 } }>
