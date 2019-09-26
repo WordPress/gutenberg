@@ -99,6 +99,12 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 		include_once( ABSPATH . 'wp-admin/includes/class-wp-upgrader.php' );
 		include_once( ABSPATH . 'wp-admin/includes/plugin-install.php' );
 
+		// Verify filesystem is accessible first.
+		$filesystem_available = self::is_filesystem_available();
+		if ( is_wp_error( $filesystem_available ) ) {
+			return $filesystem_available;
+		}
+
 		$api = plugins_api(
 			'plugin_information',
 			array(
@@ -115,12 +121,6 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 
 		$skin     = new WP_Ajax_Upgrader_Skin();
 		$upgrader = new Plugin_Upgrader( $skin );
-
-		$filesystem_method = get_filesystem_method();
-
-		if ( 'direct' !== $filesystem_method ) {
-			return WP_Error( null, 'Only direct FS_METHOD is supported.' );
-		}
 
 		$result = $upgrader->install( $api->download_link );
 
@@ -171,6 +171,12 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 		include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 		include_once( ABSPATH . 'wp-admin/includes/class-wp-upgrader.php' );
 		include_once( ABSPATH . 'wp-admin/includes/plugin-install.php' );
+
+		// Verify filesystem is accessible first.
+		$filesystem_available = self::is_filesystem_available();
+		if ( is_wp_error( $filesystem_available ) ) {
+			return $filesystem_available;
+		}
 
 		$api = plugins_api(
 			'plugin_information',
@@ -239,6 +245,24 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 		}
 
 		return rest_ensure_response( $result );
+	}
+
+	/**
+	 * Determine if the endpoints are available.
+	 *
+	 * Only the 'Direct' filesystem transport is supported at present.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @return bool|WP_Error True if filesystem is available, WP_Error otherwise.
+	 */
+	private static function is_filesystem_available() {
+		$filesystem_method = get_filesystem_method();
+		if ( 'direct' !== $filesystem_method ) {
+			return new WP_Error( 'fs_unavailable', 'The filesystem is currently unavailable for installing blocks.' );
+		}
+
+		return true;
 	}
 
 	/**
