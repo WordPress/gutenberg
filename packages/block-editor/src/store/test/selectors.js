@@ -899,6 +899,14 @@ describe( 'selectors', () => {
 
 			expect( getSelectedBlockClientIds( state ) ).toEqual( [ 9, 8, 7 ] );
 		} );
+
+		it( 'should return selected block clientIds if there is non-consecutive selection', () => {
+			const state = {
+				nonConsecutiveSelection: [ 1, 2, 3, 4 ],
+			};
+
+			expect( getSelectedBlockClientIds( state ) ).toEqual( [ 1, 2, 3, 4 ] );
+		} );
 	} );
 
 	describe( 'getMultiSelectedBlockClientIds', () => {

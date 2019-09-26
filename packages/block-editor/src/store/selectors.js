@@ -539,7 +539,9 @@ export function getSelectedBlocksInitialCaretPosition( state ) {
 }
 
 /**
- * Returns the current selection set of block client IDs (multiselection or single selection).
+ * Returns the current selection set of block client IDs.
+ *
+ * Handles multi-selection, single selection, and non-consecutive block selection.
  *
  * @param {Object} state Editor state.
  *
@@ -548,6 +550,10 @@ export function getSelectedBlocksInitialCaretPosition( state ) {
 export const getSelectedBlockClientIds = createSelector(
 	( state ) => {
 		const { selectionStart, selectionEnd } = state;
+
+		if ( hasNonConsecutiveSelection( state ) ) {
+			return nonConsecutiveSelection( state );
+		}
 
 		if (
 			selectionStart.clientId === undefined ||
@@ -582,6 +588,7 @@ export const getSelectedBlockClientIds = createSelector(
 		state.blocks.order,
 		state.selectionStart.clientId,
 		state.selectionEnd.clientId,
+		state.nonConsecutiveSelection,
 	],
 );
 
