@@ -1031,13 +1031,13 @@ describe( 'selectors', () => {
 		it( 'returns an empty array if there is no selection', () => {
 			const state = { nonConsecutiveSelection: [] };
 
-			expect( nonConsecutiveSelection( state ) ).toBe( [] );
+			expect( nonConsecutiveSelection( state ) ).toStrictEqual( [] );
 		} );
 
 		it( 'returns list of non-consecutively selected blocks', () => {
 			const state = { nonConsecutiveSelection: [ 'a', 'b', 'c' ] };
 
-			expect( nonConsecutiveSelection( state ) ).toBe( [ 'a', 'b', 'c' ] );
+			expect( nonConsecutiveSelection( state ) ).toStrictEqual( [ 'a', 'b', 'c' ] );
 		} );
 	} );
 

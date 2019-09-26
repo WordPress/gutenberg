@@ -2111,7 +2111,7 @@ describe( 'state', () => {
 				clientId: 'foo',
 			} );
 
-			expect( state ).toBe( [ 'foo' ] );
+			expect( state ).toStrictEqual( [ 'foo' ] );
 		} );
 
 		it( 'should not add block to selection twice', () => {
@@ -2120,7 +2120,7 @@ describe( 'state', () => {
 				clientId: 'foo',
 			} );
 
-			expect( state ).toBe( [ 'foo', 'bar' ] );
+			expect( state ).toStrictEqual( [ 'foo', 'bar' ] );
 		} );
 
 		it( 'should remove block from selection', () => {
@@ -2129,15 +2129,15 @@ describe( 'state', () => {
 				clientId: 'foo',
 			} );
 
-			expect( state ).toBe( [ 'bar' ] );
+			expect( state ).toStrictEqual( [ 'bar' ] );
 		} );
 
 		it( 'should clear the selection', () => {
 			const state = nonConsecutiveSelection( [ 'foo', 'bar' ], {
-				type: 'CLEAR_SELECTION',
+				type: 'CLEAR_SELECTED_BLOCK',
 			} );
 
-			expect( state ).toBe( [] );
+			expect( state ).toStrictEqual( [] );
 		} );
 
 		it( 'should replace selection when there is only one item', () => {
