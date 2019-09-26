@@ -64,9 +64,14 @@ function mergeYAMLConfigs( originalConfig, newConfig, baseDir ) {
  */
 async function installManagedWordPress() {
 	mkdirSync( getManagedWordPressPath(), { recursive: true } );
-	const uid = execSync( 'id -u' ).toString().trim();
-	const gid = execSync( 'id -g' ).toString().trim();
-	execSync( `docker run -it --rm --env PHP_FPM_UID=${ uid } --env PHP_FPM_GID=${ gid } --volume "` + getManagedWordPressPath() + ':/var/www" docker.pkg.github.com/wordpress/wpdev-docker-images/cli:latest-16 core download --path=/var/www/src --version=nightly --force', { stdio: 'inherit' } );
+	let envVars = '';
+	if ( env.PHP_FPM_UID ) {
+		envVars += `--env PHP_FPM_UID=${ env.PHP_FPM_UID }`;
+	}
+	if ( env.PHP_FPM_GID ) {
+		envVars += `--env PHP_FPM_GID=${ env.PHP_FPM_GID }`;
+	}
+	execSync( `docker run -it --rm ${ envVars } --volume "` + getManagedWordPressPath() + ':/var/www" docker.pkg.github.com/wordpress/wpdev-docker-images/cli:latest-16 core download --path=/var/www/src --version=nightly --force', { stdio: 'inherit' } );
 
 	await new Promise( ( resolve ) => {
 		const tmpZip = normalize( tmpdir() + '/wordpress-develop.zip' );

@@ -5,25 +5,13 @@ services:
       - %PLUGIN_MOUNT_DIR%/packages/e2e-tests/plugins:/var/www/${LOCAL_DIR-src}/wp-content/plugins/gutenberg-test-plugins
       - %PLUGIN_MOUNT_DIR%/packages/e2e-tests/mu-plugins:/var/www/${LOCAL_DIR-src}/wp-content/mu-plugins
   php:
-    image: docker.pkg.github.com/wordpress/wpdev-docker-images/php:${LOCAL_PHP-latest}-16
-    environment:
-      PHP_FPM_UID: 2000
-      PHP_FPM_GID: 2000
     volumes:
       - %PLUGIN_MOUNT_DIR%:/var/www/${LOCAL_DIR-src}/wp-content/plugins/%PLUGIN_INSTALL_DIR%
       - %PLUGIN_MOUNT_DIR%/packages/e2e-tests/plugins:/var/www/${LOCAL_DIR-src}/wp-content/plugins/gutenberg-test-plugins
       - %PLUGIN_MOUNT_DIR%/packages/e2e-tests/mu-plugins:/var/www/${LOCAL_DIR-src}/wp-content/mu-plugins
   cli:
-    image: docker.pkg.github.com/wordpress/wpdev-docker-images/cli:${LOCAL_PHP-latest}-16
-    environment:
-      PHP_FPM_UID: 2000
-      PHP_FPM_GID: 2000
     volumes:
       - %PLUGIN_MOUNT_DIR%:/var/www/${LOCAL_DIR-src}/wp-content/plugins/%PLUGIN_INSTALL_DIR%
   phpunit:
-    image: docker.pkg.github.com/wordpress/wpdev-docker-images/phpunit:${LOCAL_PHP-latest}-16
-    environment:
-      PHP_FPM_UID: 2000
-      PHP_FPM_GID: 2000
     volumes:
       - %PLUGIN_MOUNT_DIR%:/var/www/${LOCAL_DIR-src}/wp-content/plugins/%PLUGIN_INSTALL_DIR%

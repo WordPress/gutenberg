@@ -9,6 +9,7 @@ const chalk = require( 'chalk' );
 const { env, exit, stdout } = require( 'process' );
 const { normalize } = require( 'path' );
 const { existsSync } = require( 'fs' );
+const { userInfo } = require( 'os' );
 
 /**
  * Internal dependencies
@@ -41,6 +42,16 @@ if ( ! args.length ) {
 		stdout.write( chalk.green( script ) + '\n    ' + chalk.white( scripts[ script ] ) + '\n\n' );
 	} );
 	exit( 0 );
+}
+
+const user = userInfo();
+
+if ( ! env.PHP_FPM_UID && user.uid > 0 ) {
+	env.PHP_FPM_UID = user.uid;
+}
+
+if ( ! env.PHP_FPM_GID && user.gid > 0 ) {
+	env.PHP_FPM_GID = user.gid;
 }
 
 const command = args.shift();
