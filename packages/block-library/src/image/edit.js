@@ -917,6 +917,7 @@ export class ImageEdit extends Component {
 							onChange={ ( value ) => setAttributes( { caption: value } ) }
 							isSelected={ this.state.captionFocused }
 							inlineToolbar
+							withoutWrapper
 						/>
 					) }
 				</figure>

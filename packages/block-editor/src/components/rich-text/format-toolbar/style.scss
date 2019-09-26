@@ -3,6 +3,16 @@
 	flex-shrink: 0;
 }
 
+.without-wrapper .block-editor-format-toolbar {
+	justify-content: center;
+	position: absolute;
+	top: -$block-controls-height - 4px;
+	line-height: 0;
+	left: 0;
+	right: 0;
+	z-index: 1;
+}
+
 .block-editor-format-toolbar__selection-position {
 	position: absolute;
 	transform: translateX(-50%);
