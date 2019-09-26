@@ -295,7 +295,6 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 		$block->icon = isset( $plugin['icons']['1x'] ) ? $plugin['icons']['1x'] : 'block-default';
 
 		$block->assets = array();
-
 		foreach ( $plugin['block_assets'] as $asset ) {
 			$block->assets[] = 'https://plugins.svn.wordpress.org/' . $plugin['slug'] . $asset;
 		}
