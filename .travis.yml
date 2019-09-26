@@ -28,6 +28,8 @@ env:
     - LOCAL_SCRIPT_DEBUG: false
     - INSTALL_COMPOSER: false
     - INSTALL_WORDPRESS: true
+    - PHP_FPM_UID: "`id -u`"
+    - PHP_FPM_GID: "`id -g`"
 
 before_install:
   - nvm install --latest-npm
