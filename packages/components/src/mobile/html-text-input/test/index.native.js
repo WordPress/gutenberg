@@ -33,10 +33,14 @@ const findTitleTextInput = ( wrapper ) => {
 	return findTextInputInWrapper( wrapper, { placeholder } );
 };
 
+const getStylesFromColorScheme = () => {
+	return { color: 'white' };
+};
+
 describe( 'HTMLTextInput', () => {
 	it( 'HTMLTextInput renders', () => {
 		const wrapper = shallow(
-			<HTMLTextInput />
+			<HTMLTextInput getStylesFromColorScheme={ getStylesFromColorScheme } />
 		);
 		expect( wrapper ).toBeTruthy();
 	} );
@@ -47,6 +51,7 @@ describe( 'HTMLTextInput', () => {
 		const wrapper = shallow(
 			<HTMLTextInput
 				onChange={ onChange }
+				getStylesFromColorScheme={ getStylesFromColorScheme }
 			/>
 		);
 
@@ -71,6 +76,7 @@ describe( 'HTMLTextInput', () => {
 			<HTMLTextInput
 				onPersist={ onPersist }
 				onChange={ jest.fn() }
+				getStylesFromColorScheme={ getStylesFromColorScheme }
 			/>
 		);
 
@@ -101,6 +107,7 @@ describe( 'HTMLTextInput', () => {
 		const wrapper = shallow(
 			<HTMLTextInput
 				editTitle={ editTitle }
+				getStylesFromColorScheme={ getStylesFromColorScheme }
 			/>
 		);
 

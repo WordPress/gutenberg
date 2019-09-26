@@ -674,7 +674,7 @@ export class ImageEdit extends Component {
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				value={ { id, src } }
 				mediaPreview={ mediaPreview }
-				dropZoneUIOnly={ ! isEditing && url }
+				disableMediaButtons={ ! isEditing && url }
 			/>
 		);
 		if ( isEditing || ! url ) {

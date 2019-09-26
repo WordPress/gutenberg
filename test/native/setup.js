@@ -14,10 +14,17 @@ jest.mock( 'react-native-gutenberg-bridge', () => {
 		subscribeUpdateHtml: jest.fn(),
 		subscribeMediaAppend: jest.fn(),
 		editorDidMount: jest.fn(),
+		editorDidAutosave: jest.fn(),
 		subscribeMediaUpload: jest.fn(),
 		requestMediaPickFromMediaLibrary: jest.fn(),
 		requestMediaPickFromDeviceLibrary: jest.fn(),
 		requestMediaPickFromDeviceCamera: jest.fn(),
+	};
+} );
+
+jest.mock( 'react-native-dark-mode', () => {
+	return {
+		useDarkModeContext: () => 'light',
 	};
 } );
 
