@@ -111,6 +111,10 @@ class RichText extends Component {
 		this.Editable = this.Editable.bind( this );
 
 		this.onKeyDown = ( event ) => {
+			if ( event.defaultPrevented ) {
+				return;
+			}
+
 			this.handleDelete( event );
 			this.handleEnter( event );
 			this.handleSpace( event );
@@ -961,7 +965,10 @@ class RichText extends Component {
 				onPaste={ this.onPaste }
 				onInput={ this.onInput }
 				onCompositionEnd={ this.onCompositionEnd }
-				onKeyDown={ this.onKeyDown }
+				onKeyDown={ props.onKeyDown ? ( event ) => {
+					props.onKeyDown( event );
+					this.onKeyDown( event );
+				} : this.onKeyDown }
 				onFocus={ this.onFocus }
 				onBlur={ this.onBlur }
 				onMouseDown={ this.onPointerDown }
