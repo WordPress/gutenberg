@@ -326,7 +326,11 @@ class RichText extends Component {
 		// (CJK), do not trigger a change if characters are being composed.
 		// Browsers setting `isComposing` to `true` will usually emit a final
 		// `input` event when the characters are composed.
-		if ( event && event.nativeEvent.isComposing ) {
+		if (
+			event &&
+			event.nativeEvent &&
+			event.nativeEvent.isComposing
+		) {
 			// Also don't update any selection.
 			document.removeEventListener( 'selectionchange', this.onSelectionChange );
 			return;
@@ -335,6 +339,10 @@ class RichText extends Component {
 		let inputType;
 
 		if ( event ) {
+			inputType = event.inputType;
+		}
+
+		if ( ! inputType ) {
 			inputType = event.nativeEvent.inputType;
 		}
 
@@ -401,7 +409,7 @@ class RichText extends Component {
 	onCompositionEnd() {
 		// Ensure the value is up-to-date for browsers that don't emit a final
 		// input event after composition.
-		this.onInput();
+		this.onInput( { inputType: 'insertText' } );
 		// Tracking selection changes can be resumed.
 		document.addEventListener( 'selectionchange', this.onSelectionChange );
 	}
