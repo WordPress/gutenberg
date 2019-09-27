@@ -17,6 +17,9 @@ const getTheme = ( theme ) => ( {
 		large: 16,
 		xlarge: 24,
 	},
+	zIndices: {
+		'block-library-gallery-item__inline-menu': 20,
+	},
 	colors: themes[ theme || '' ] || themes.default,
 } );
 

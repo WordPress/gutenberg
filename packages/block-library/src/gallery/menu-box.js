@@ -10,7 +10,7 @@ const MenuBox = ( { right, isSelected, isCompact, children } ) => {
 			display={ 'inline-flex' }
 			padding={ isCompact ? 0 : 'small' }
 			position="absolute"
-			zIndex={ 20 }
+			zIndex={ 'block-library-gallery-item__inline-menu' }
 			bg={ isSelected ? 'primary' : 'inherit' }
 			top="-2px"
 			{ ...side }
