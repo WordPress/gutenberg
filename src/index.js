@@ -7,7 +7,7 @@
 /**
  * External dependencies
  */
-import { AppRegistry, I18nManager, YellowBox } from 'react-native';
+import { AppRegistry, I18nManager } from 'react-native';
 import React from 'react';
 
 /**
@@ -79,6 +79,7 @@ export class RootComponent extends React.Component {
 
 export function registerApp() {
 	// Disable warnings as they disrupt the user experience in dev mode
+	// eslint-disable-next-line no-console
 	console.disableYellowBox = true;
 
 	gutenbergSetup();
