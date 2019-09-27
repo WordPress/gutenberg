@@ -9,6 +9,7 @@ import SafeArea from 'react-native-safe-area';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
+import { withPreferredColorScheme } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -63,6 +64,7 @@ class BottomSheet extends Component {
 			hideHeader,
 			style = {},
 			contentStyle = {},
+			getStylesFromColorScheme,
 		} = this.props;
 
 		const panResponder = PanResponder.create( {
@@ -118,6 +120,8 @@ class BottomSheet extends Component {
 			},
 		};
 
+		const backgroundStyle = getStylesFromColorScheme( styles.background, styles.backgroundDark );
+
 		return (
 			<Modal
 				isVisible={ isVisible }
@@ -139,7 +143,7 @@ class BottomSheet extends Component {
 			>
 				<KeyboardAvoidingView
 					behavior={ Platform.OS === 'ios' && 'padding' }
-					style={ { ...styles.background, borderColor: 'rgba(0, 0, 0, 0.1)', ...style } }
+					style={ { ...backgroundStyle, borderColor: 'rgba(0, 0, 0, 0.1)', ...style } }
 					keyboardVerticalOffset={ -this.state.safeAreaBottomInset }
 				>
 					<View style={ styles.dragIndicator } />
@@ -160,10 +164,12 @@ function getWidth() {
 	return Math.min( Dimensions.get( 'window' ).width, styles.background.maxWidth );
 }
 
-BottomSheet.getWidth = getWidth;
-BottomSheet.Button = Button;
-BottomSheet.Cell = Cell;
-BottomSheet.PickerCell = PickerCell;
-BottomSheet.SwitchCell = SwitchCell;
+const ThemedBottomSheet = withPreferredColorScheme( BottomSheet );
 
-export default BottomSheet;
+ThemedBottomSheet.getWidth = getWidth;
+ThemedBottomSheet.Button = Button;
+ThemedBottomSheet.Cell = Cell;
+ThemedBottomSheet.PickerCell = PickerCell;
+ThemedBottomSheet.SwitchCell = SwitchCell;
+
+export default ThemedBottomSheet;
