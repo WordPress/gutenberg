@@ -95,14 +95,11 @@ ul.wp-block-gallery {
 	}
 }
 
-.components-button {
-	color: transparent;
-}
-
 .blocks-gallery-item__move-backward,
 .blocks-gallery-item__move-forward,
 .blocks-gallery-item__remove {
 	padding: 0;
+	color: transparent;
 }
 
 .blocks-gallery-item .components-spinner {
