@@ -36,9 +36,7 @@
 
 	// 4. Minimize the block outlines.
 	.wp-block-social-links > .block-editor-inner-blocks > .block-editor-block-list__layout > .wp-block > .block-editor-block-list__block-edit::before {
-		border-right: none;
-		border-top: none;
-		border-bottom: none;
+		border: none;
 	}
 
 	.wp-block-social-links > .block-editor-inner-blocks > .block-editor-block-list__layout > .wp-block.is-hovered:not(.is-navigate-mode) > .block-editor-block-list__block-edit::before {
@@ -59,12 +57,84 @@
 	}
 
 	// Hide the breadcrumb.
-	// Hide the mover.
 	// Hide the sibling inserter.
+	// Hide the block type indicator.
 	.wp-block-social-links .block-editor-block-list__insertion-point,
 	.wp-block-social-links .block-editor-block-list__breadcrumb,
-	.wp-block-social-links .block-editor-block-mover.block-editor-block-mover { // Needs specificity.
+	.wp-block-social-links .block-editor-block-toolbar > .components-toolbar:first-child {
 		display: none;
+	}
+
+	// Change the style of selected child block to be more like gallery.
+	// @todo, if we like this it should not be CSS overrides like this, it should probably be a prop or something.
+	// Hide the drag handle.
+	// Hide the block type indicator.
+	.wp-block-social-links .block-editor-block-mover__control-drag-handle,
+	.wp-block-social-links .block-editor-block-toolbar > .components-toolbar:first-child {
+		display: none;
+	}
+
+	// Make block movers horizontal.
+	.wp-block-social-links .wp-block.is-selected .block-editor-block-mover {
+		margin-top: 0;
+		padding-right: 0;
+		width: 48px + 2px;
+		left: -70px; // @todo: replace these two with variables.
+		display: flex;
+
+		.block-editor-block-mover__control {
+			width: 24px;
+			height: 24px;
+
+			svg {
+				width: 24px;
+				transform: rotate(-90deg);
+				padding: 3px;
+			}
+		}
+	}
+
+	// Move ellipsis to the right.
+	.wp-block-social-links .wp-block.is-selected .block-editor-block-contextual-toolbar {
+		position: absolute;
+		right: 8px;
+		transform: none;
+
+		.block-editor-block-toolbar {
+			box-shadow: none;
+			top: 0;
+			left: 0;
+
+			.components-toolbar {
+				background: $white;
+				border: 1px solid $dark-opacity-light-800;
+				border-radius: $radius-round-rectangle;
+			}
+
+			.block-editor-block-settings-menu {
+				padding: 0;
+			}
+
+			.block-editor-block-settings-menu .components-dropdown-menu__toggle {
+				border: none;
+				padding: 2px;
+				border-radius: $radius-round-rectangle;
+
+				&:hover {
+					box-shadow: none;
+				}
+			}
+		}
+	}
+
+	// Position mover and ellipsis the same, vertically.
+	.wp-block-social-links .wp-block.is-selected .block-editor-block-mover,
+	.wp-block-social-links .wp-block.is-selected .block-editor-block-contextual-toolbar {
+		top: 50%;
+	}
+	.wp-block-social-links .wp-block.is-selected .block-editor-block-contextual-toolbar .block-editor-block-toolbar,
+	.wp-block-social-links .wp-block.is-selected .block-editor-block-mover {
+		transform: translateY(-50%);
 	}
 }
 
