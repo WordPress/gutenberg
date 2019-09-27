@@ -99,7 +99,7 @@ describe( 'Taxonomies', () => {
 		await page.reload();
 
 		// Wait for the categories to load.
-		await page.waitForSelector( '.editor-post-taxonomies__hierarchical-terms-input:checked' );
+		await page.waitForSelector( '.editor-post-taxonomies__hierarchical-terms-choice .components-checkbox-control__input:checked' );
 
 		selectedCategories = await getSelectCategories();
 
