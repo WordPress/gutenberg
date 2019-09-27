@@ -69,13 +69,8 @@ function withFocusReturn( options ) {
 			componentWillUnmount() {
 				const {
 					activeElementOnMount,
-					isFocused,
 					ownFocusedElements,
 				} = this;
-
-				if ( ! isFocused ) {
-					return;
-				}
 
 				// Defer to the component's own explicit focus return behavior,
 				// if specified. The function should return `false` to prevent
