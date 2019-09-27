@@ -3,7 +3,7 @@
 .components-font-size-picker__controls {
 	max-width: $sidebar-width - ( 2 * $panel-padding );
 	display: flex;
-	align-items: center;
+	align-items: flex-end;
 	margin-bottom: $grid-size * 3;
 
 	// Apply the same height as the isSmall Reset button.

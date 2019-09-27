@@ -46,14 +46,18 @@
 
 .components-font-size-picker__select-selector.components-font-size-picker__select-selector {
 	background: #fff;
+	border: 1px solid $dark-gray-200;
+	border-radius: 4px;
+	box-shadow: none;
 	margin-top: $grid-size;
+	padding-left: $grid-size-small;
+	position: relative;
 }
 
 .components-font-size-picker__select-selector::after {
 	content: "▼";
-	position: relative;
-	right: -10px;
-	padding: 0 8px;
+	position: absolute;
+	right: $grid-size-small;
 }
 
 .components-font-size-picker__select-selector:focus {

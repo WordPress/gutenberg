@@ -93,7 +93,7 @@ function FontSizePicker( {
 						onChange( undefined );
 						setCurrentSelectValue( getSelectValueFromFontSize( fontSizes, undefined ) );
 					} }
-					isSmall
+					isLarge
 					isDefault
 				>
 					{ __( 'Reset' ) }
