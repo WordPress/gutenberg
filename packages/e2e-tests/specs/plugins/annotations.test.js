@@ -49,6 +49,7 @@ describe( 'Using Plugins API', () => {
 		// Click add annotation button.
 		const addAnnotationButton = ( await page.$x( "//button[contains(text(), 'Add annotation')]" ) )[ 0 ];
 		await addAnnotationButton.click();
+		await page.evaluate( () => document.querySelector( '[contenteditable]' ).focus() );
 	}
 
 	/**
@@ -60,6 +61,7 @@ describe( 'Using Plugins API', () => {
 		// Click remove annotations button.
 		const addAnnotationButton = ( await page.$x( "//button[contains(text(), 'Remove annotations')]" ) )[ 0 ];
 		await addAnnotationButton.click();
+		await page.evaluate( () => document.querySelector( '[contenteditable]' ).focus() );
 	}
 
 	/**
