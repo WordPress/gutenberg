@@ -228,7 +228,7 @@ _Related_
 <a name="Platform" href="#Platform">#</a> **Platform**
 
 Component used to detect the current Platform being used. Use Platform.OS === 'web' to detect if running on web enviroment.
-This is the same concept as the React-Native implementation found here: https://facebook.github.io/react-native/docs/platform-specific-code#platform-module .
+This is the same concept as the React-Native implementation found here: <https://facebook.github.io/react-native/docs/platform-specific-code#platform-module>
 
 <a name="RawHTML" href="#RawHTML">#</a> **RawHTML**
 
