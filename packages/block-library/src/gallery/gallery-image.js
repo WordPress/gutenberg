@@ -13,7 +13,6 @@ import { BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { withSelect } from '@wordpress/data';
 import { RichText } from '@wordpress/block-editor';
 import { isBlobURL } from '@wordpress/blob';
-import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -184,13 +183,11 @@ class GalleryImage extends Component {
 	}
 }
 
-export default compose(
-	withSelect( ( select, ownProps ) => {
-		const { getMedia } = select( 'core' );
-		const { id } = ownProps;
+export default withSelect( ( select, ownProps ) => {
+	const { getMedia } = select( 'core' );
+	const { id } = ownProps;
 
-		return {
-			image: id ? getMedia( id ) : null,
-		};
-	} )
-)( GalleryImage );
+	return {
+		image: id ? getMedia( id ) : null,
+	};
+} )( GalleryImage );
