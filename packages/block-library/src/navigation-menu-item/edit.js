@@ -138,9 +138,17 @@ function NavigationMenuItemEdit( {
 			</InspectorControls>
 			<div className="wp-block-navigation-menu-item">
 				{ content }
-				<InnerBlocks
-					allowedBlocks={ [ 'core/navigation-menu-item' ] }
-				/>
+				{ ! isSelected &&
+					<InnerBlocks
+						allowedBlocks={ [ 'core/navigation-menu-item' ] }
+						renderAppender={ false }
+					/>
+				}
+				{ isSelected &&
+					<InnerBlocks
+						allowedBlocks={ [ 'core/navigation-menu-item' ] }
+					/>
+				}
 			</div>
 		</Fragment>
 	);
