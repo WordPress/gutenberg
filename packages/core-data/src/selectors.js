@@ -207,7 +207,11 @@ export const getEntityRecordNonTransientEdits = createSelector(
  * @return {boolean} Whether the entity record has edits or not.
  */
 export function hasEditsForEntityRecord( state, kind, name, recordId ) {
-	return Object.keys( getEntityRecordNonTransientEdits( state, kind, name, recordId ) ).length > 0;
+	return (
+		isSavingEntityRecord( state, kind, name, recordId ) ||
+		Object.keys( getEntityRecordNonTransientEdits( state, kind, name, recordId ) )
+			.length > 0
+	);
 }
 
 /**

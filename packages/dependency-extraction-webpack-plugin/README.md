@@ -217,7 +217,7 @@ Enqueue your script as usual and read the script dependencies dynamically:
 $script_path       = 'path/to/script.js';
 $script_asset_path = 'path/to/script.asset.php';
 $script_asset      = file_exists( $script_asset_path )
-	? require( $script_asset_path ) )
+	? require( $script_asset_path ) 
 	: array( 'dependencies' => array(), 'version' => filemtime( $script_path ) );
 $script_url = plugins_url( $script_path, __FILE__ );
 wp_enqueue_script( 'script', $script_url, $script_asset['dependencies'], $script_asset['version'] );

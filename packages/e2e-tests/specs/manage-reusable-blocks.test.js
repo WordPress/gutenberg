@@ -16,7 +16,7 @@ describe( 'Managing reusable blocks', () => {
 	 * @return {Promise} Promise resolving to number of post list entries.
 	 */
 	async function getNumberOfEntries() {
-		return page.evaluate( () => document.querySelectorAll( '.entry' ).length );
+		return page.evaluate( () => document.querySelectorAll( '.hentry' ).length );
 	}
 
 	beforeAll( async () => {

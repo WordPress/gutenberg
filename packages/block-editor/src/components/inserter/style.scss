@@ -217,4 +217,9 @@ $block-inserter-search-height: 38px;
 	padding: 10px;
 	display: grid;
 	flex-grow: 2;
+
+	.block-editor-block-preview__container {
+		margin-right: 0;
+		margin-left: 0;
+	}
 }

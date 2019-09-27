@@ -31,7 +31,7 @@
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/rich-text": "file:../rich-text",
 		"@wordpress/url": "file:../url",
-		"lodash": "^4.17.14"
+		"lodash": "^4.17.15"
 	},
 	"publishConfig": {
 		"access": "public"

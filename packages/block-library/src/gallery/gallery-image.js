@@ -160,15 +160,17 @@ class GalleryImage extends Component {
 						disabled={ ! isSelected }
 					/>
 				</div>
-				<RichText
-					tagName="figcaption"
-					placeholder={ isSelected ? __( 'Write caption…' ) : null }
-					value={ caption }
-					isSelected={ this.state.captionSelected }
-					onChange={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
-					unstableOnFocus={ this.onSelectCaption }
-					inlineToolbar
-				/>
+				{ ( isSelected || caption ) && (
+					<RichText
+						tagName="figcaption"
+						placeholder={ isSelected ? __( 'Write caption…' ) : null }
+						value={ caption }
+						isSelected={ this.state.captionSelected }
+						onChange={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
+						unstableOnFocus={ this.onSelectCaption }
+						inlineToolbar
+					/>
+				) }
 			</figure>
 		);
 	}

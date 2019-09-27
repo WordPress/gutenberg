@@ -6,6 +6,7 @@ import {
 	createNewPost,
 	getEditedPostContent,
 	pressKeyWithModifier,
+	saveDraft,
 } from '@wordpress/e2e-test-utils';
 
 // Constant to override editor preference
@@ -99,6 +100,50 @@ describe( 'autosave', () => {
 		expect( await getEditedPostContent() ).toEqual( wrapParagraph( 'before save' ) );
 		await page.click( '.components-notice__action' );
 		expect( await getEditedPostContent() ).toEqual( wrapParagraph( 'before save after save' ) );
+	} );
+
+	it( 'should clear sessionStorage upon user logout', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'before save' );
+		await saveDraft();
+
+		// Fake local autosave
+		await page.evaluate( ( postId ) => window.sessionStorage.setItem(
+			`wp-autosave-block-editor-post-${ postId }`,
+			JSON.stringify( { post_title: 'A', content: 'B', excerpt: 'C' } )
+		), await getCurrentPostId() );
+		expect( await page.evaluate( () => window.sessionStorage.length ) ).toBe( 1 );
+
+		await Promise.all( [
+			page.waitForSelector( '#wp-admin-bar-logout', { visible: true } ),
+			page.hover( '#wp-admin-bar-my-account' ),
+		] );
+		await Promise.all( [
+			page.waitForNavigation(),
+			page.click( '#wp-admin-bar-logout' ),
+		] );
+
+		expect( await page.evaluate( () => window.sessionStorage.length ) ).toBe( 0 );
+	} );
+
+	it( 'shouldn\'t contaminate other posts', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'before save' );
+		await saveDraft();
+
+		// Fake local autosave
+		await page.evaluate( ( postId ) => window.sessionStorage.setItem(
+			`wp-autosave-block-editor-post-${ postId }`,
+			JSON.stringify( { post_title: 'A', content: 'B', excerpt: 'C' } )
+		), await getCurrentPostId() );
+		expect( await page.evaluate( () => window.sessionStorage.length ) ).toBe( 1 );
+
+		await page.reload();
+		const notice = await page.$eval( '.components-notice__content', ( element ) => element.innerText );
+		expect( notice ).toContain( 'The backup of this post in your browser is different from the version below.' );
+
+		await createNewPost();
+		expect( await page.$( '.components-notice__content' ) ).toBe( null );
 	} );
 
 	afterAll( async () => {

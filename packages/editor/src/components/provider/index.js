@@ -11,6 +11,7 @@ import { compose } from '@wordpress/compose';
 import { Component } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
+import { EntityProvider } from '@wordpress/core-data';
 import { BlockEditorProvider, transformStyles } from '@wordpress/block-editor';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
@@ -164,6 +165,7 @@ class EditorProvider extends Component {
 		const {
 			canUserUseUnfilteredHTML,
 			children,
+			post,
 			blocks,
 			resetEditorBlocks,
 			isReady,
@@ -185,18 +187,20 @@ class EditorProvider extends Component {
 		);
 
 		return (
-			<BlockEditorProvider
-				value={ blocks }
-				onInput={ resetEditorBlocksWithoutUndoLevel }
-				onChange={ resetEditorBlocks }
-				settings={ editorSettings }
-				useSubRegistry={ false }
-			>
-				{ children }
-				<ReusableBlocksButtons />
-				<ConvertToGroupButtons />
-				{ editorSettings.__experimentalBlockDirectory && <InserterMenuDownloadableBlocksPanel /> }
-			</BlockEditorProvider>
+			<EntityProvider kind="postType" type={ post.type } id={ post.id }>
+				<BlockEditorProvider
+					value={ blocks }
+					onInput={ resetEditorBlocksWithoutUndoLevel }
+					onChange={ resetEditorBlocks }
+					settings={ editorSettings }
+					useSubRegistry={ false }
+				>
+					{ children }
+					<ReusableBlocksButtons />
+					<ConvertToGroupButtons />
+					{ editorSettings.__experimentalBlockDirectory && <InserterMenuDownloadableBlocksPanel /> }
+				</BlockEditorProvider>
+			</EntityProvider>
 		);
 	}
 }
