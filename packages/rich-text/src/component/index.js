@@ -358,19 +358,29 @@ class RichText extends Component {
 			unstableOnFocus();
 		}
 
-		// We know for certain that on focus, the old selection is invalid. It
-		// will be recalculated on the next mouseup, keyup, or touchend event.
-		const index = undefined;
-		const activeFormats = EMPTY_ACTIVE_FORMATS;
+		if ( ! this.props.__unstableIsSelected ) {
+			// We know for certain that on focus, the old selection is invalid. It
+			// will be recalculated on the next mouseup, keyup, or touchend event.
+			const index = undefined;
+			const activeFormats = EMPTY_ACTIVE_FORMATS;
 
-		this.record = {
-			...this.record,
-			start: index,
-			end: index,
-			activeFormats,
-		};
-		this.props.onSelectionChange( index, index );
-		this.setState( { activeFormats } );
+			this.record = {
+				...this.record,
+				start: index,
+				end: index,
+				activeFormats,
+			};
+			this.props.onSelectionChange( index, index );
+			this.setState( { activeFormats } );
+		} else {
+			this.props.onSelectionChange( this.record.start, this.record.end );
+			this.setState( {
+				activeFormats: getActiveFormats( {
+					...this.record,
+					activeFormats: undefined,
+				}, EMPTY_ACTIVE_FORMATS ),
+			} );
+		}
 
 		// Update selection as soon as possible, which is at the next animation
 		// frame. The event listener for selection changes may be added too late
