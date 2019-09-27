@@ -1,15 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { Box, withTheme } from '@wordpress/components';
+import { Box } from '@wordpress/components';
 
-const MenuBox = ( { right, isSelected, isCompact, theme, children } ) => {
-	const padding = isCompact ? 0 : theme.space.small;
+const MenuBox = ( { right, isSelected, isCompact, children } ) => {
 	const side = right ? { right: '-2px' } : { left: '-2px' };
 	return (
 		<Box
 			display={ 'inline-flex' }
-			padding={ padding }
+			padding={ isCompact ? 0 : 'small' }
 			position="absolute"
 			zIndex={ 20 }
 			bg={ isSelected ? 'primary' : 'inherit' }
@@ -21,4 +20,4 @@ const MenuBox = ( { right, isSelected, isCompact, theme, children } ) => {
 	);
 };
 
-export default withTheme( MenuBox );
+export default MenuBox;
