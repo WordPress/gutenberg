@@ -78,8 +78,8 @@ export class RootComponent extends React.Component {
 }
 
 export function registerApp() {
-	// Disable require circle warnings showing up in the app (they will still be visible in the console)
-	YellowBox.ignoreWarnings( [ 'Require cycle:' ] );
+	// Disable warnings as they disrupt the user experience in dev mode
+	console.disableYellowBox = true;
 
 	gutenbergSetup();
 
