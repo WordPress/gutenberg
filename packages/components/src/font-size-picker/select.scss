@@ -44,10 +44,9 @@
 	display: block;
 }
 
-.components-font-size-picker__select-selector {
-	background: #fff !important;
-	padding: 0 !important;
-	padding: 0 10px !important;
+.components-font-size-picker__select-selector.components-font-size-picker__select-selector {
+	background: #fff;
+	margin-top: $grid-size;
 }
 
 .components-font-size-picker__select-selector::after {

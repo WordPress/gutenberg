@@ -57,7 +57,6 @@ function FontSizePickerSelect( {
 	}, [ focusActiveItem, value ] );
 
 	// Work around to manage + force open state outside of Dropdown
-
 	const handleOnToggle = ( nextOpen ) => {
 		if ( nextOpen ) {
 			focusActiveItem();
@@ -102,11 +101,9 @@ function FontSizePickerSelect( {
 	};
 
 	// Improve voiceover consistency compared to native select
-	const ariaActiveDescendant = `item-${ value }`;
 	const ariaHasPopup = 'listbox';
 	const ariaProps = {
 		'aria-haspopup': ariaHasPopup,
-		'aria-activedescendant': ariaActiveDescendant,
 	};
 
 	/**
@@ -122,16 +119,19 @@ function FontSizePickerSelect( {
 				focusOnMount="container"
 				onToggle={ handleOnToggle }
 				renderToggle={ ( { onToggle } ) => (
-					<Button
-						className="components-font-size-picker__select-selector"
-						isLarge
-						onClick={ onToggle }
-						aria-label={ __( 'Choose Preset' ) }
-						onKeyDown={ handleOnButtonKeyDown }
-						{ ...ariaProps }
-					>
-						{ currentFontLabel }
-					</Button>
+					// eslint-disable-next-line jsx-a11y/label-has-for
+					<label className="components-font-size-picker__select-label">
+						{ __( 'Preset Size' ) }
+						<Button
+							className="components-font-size-picker__select-selector"
+							isLarge
+							onClick={ onToggle }
+							onKeyDown={ handleOnButtonKeyDown }
+							{ ...ariaProps }
+						>
+							{ currentFontLabel }
+						</Button>
+					</label>
 				) }
 				renderContent={ () => {
 					return (

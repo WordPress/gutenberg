@@ -62,7 +62,7 @@ function FontSizePicker( {
 
 	return (
 		<fieldset>
-			<legend>
+			<legend className="screen-reader-text">
 				{ __( 'Font Size' ) }
 			</legend>
 			<div className="components-font-size-picker__controls">
@@ -74,13 +74,16 @@ function FontSizePicker( {
 					/>
 				}
 				{ ( ! withSlider && ! disableCustomFontSizes ) &&
+				// eslint-disable-next-line jsx-a11y/label-has-for
+				<label className="components-range-control__label">
+					{ __( 'Custom' ) }
 					<input
 						className="components-range-control__number"
 						type="number"
 						onChange={ onChangeValue }
-						aria-label={ __( 'Custom' ) }
 						value={ value || '' }
 					/>
+				</label>
 				}
 				<Button
 					className="components-color-palette__clear"

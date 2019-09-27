@@ -11,6 +11,7 @@
 		height: 30px;
 		margin-left: 0;
 		margin-right: $grid-size;
+		margin-top: $grid-size;
 
 		// Show the reset button as disabled until a value is entered.
 		&[value=""] + .components-button {
@@ -31,6 +32,12 @@
 .components-font-size-picker__select.components-font-size-picker__select.components-font-size-picker__select.components-font-size-picker__select,
 .components-font-size-picker__select .components-base-control__field {
 	margin-bottom: 0;
+}
+
+.components-range-control__label,
+.components-font-size-picker__select-label {
+	display: flex;
+	flex-direction: column;
 }
 
 .components-font-size-picker__custom-input {
