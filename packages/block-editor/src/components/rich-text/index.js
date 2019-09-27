@@ -260,6 +260,7 @@ class RichTextWrapper extends Component {
 		const { start, text } = value;
 		const characterBefore = text.slice( start - 1, start );
 
+		// The character right before the caret must be a plain space.
 		if ( characterBefore !== ' ' ) {
 			return;
 		}
