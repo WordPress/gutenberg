@@ -170,6 +170,8 @@ class RichText extends Component {
 	applyRecord( record, { domOnly } = {} ) {
 		const { __unstableMultilineTag: multilineTag } = this.props;
 
+		this.ignoreFocus = true;
+
 		apply( {
 			value: record,
 			current: this.editableRef,
@@ -179,6 +181,8 @@ class RichText extends Component {
 			__unstableDomOnly: domOnly,
 			placeholder: this.props.placeholder,
 		} );
+
+		this.ignoreFocus = false;
 	}
 
 	/**
@@ -275,6 +279,10 @@ class RichText extends Component {
 	 */
 	onFocus() {
 		const { unstableOnFocus } = this.props;
+
+		if ( this.ignoreFocus ) {
+			return;
+		}
 
 		if ( unstableOnFocus ) {
 			unstableOnFocus();
