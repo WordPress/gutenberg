@@ -3,8 +3,11 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { BlockControls, PlainText } from '@wordpress/block-editor';
-import { transformStyles } from '@wordpress/editor';
+import {
+	BlockControls,
+	PlainText,
+	transformStyles,
+} from '@wordpress/block-editor';
 import { Disabled, SandBox } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 

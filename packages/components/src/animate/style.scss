@@ -1,7 +1,7 @@
 .components-animate__appear {
 	animation: components-animate__appear-animation 0.1s cubic-bezier(0, 0, 0.2, 1) 0s;
 	animation-fill-mode: forwards;
-	@include reduce-motion;
+	@include reduce-motion("animation");
 
 	&.is-from-top,
 	&.is-from-top.is-from-left {
@@ -31,7 +31,7 @@
 .components-animate__slide-in {
 	animation: components-animate__slide-in-animation 0.1s cubic-bezier(0, 0, 0.2, 1);
 	animation-fill-mode: forwards;
-	@include reduce-motion;
+	@include reduce-motion("animation");
 
 	&.is-from-left {
 		transform: translateX(+100%);
@@ -41,5 +41,21 @@
 @keyframes components-animate__slide-in-animation {
 	100% {
 		transform: translateX(0%);
+	}
+}
+
+.components-animate__loading {
+	animation: components-animate__loading 1.6s ease-in-out infinite;
+}
+
+@keyframes components-animate__loading {
+	0% {
+		opacity: 0.5;
+	}
+	50% {
+		opacity: 1;
+	}
+	100% {
+		opacity: 0.5;
 	}
 }

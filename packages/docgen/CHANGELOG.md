@@ -1,6 +1,12 @@
-## Master
+## 1.3.0 (2019-08-05)
 
-### Enhancements
+### Bug Fixes
+
+- Docblocks with CRLF endings are now parsed correctly.
+
+## 1.2.0 (2019-05-21)
+
+### Enhancement
 
 - Docblocks including a `@private` tag will be omitted from the generated result.
 

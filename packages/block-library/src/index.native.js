@@ -44,7 +44,6 @@ import * as shortcode from './shortcode';
 import * as spacer from './spacer';
 import * as subhead from './subhead';
 import * as table from './table';
-import * as template from './template';
 import * as textColumns from './text-columns';
 import * as verse from './verse';
 import * as video from './video';
@@ -92,7 +91,6 @@ export const coreBlocks = [
 	subhead,
 	table,
 	tagCloud,
-	template,
 	textColumns,
 	verse,
 	video,
@@ -109,9 +107,11 @@ export const registerCoreBlocks = () => {
 		missing,
 		more,
 		image,
+		video,
 		nextpage,
 		separator,
 		list,
+		quote,
 	].forEach( ( { metadata, name, settings } ) => {
 		registerBlockType( name, {
 			...metadata,

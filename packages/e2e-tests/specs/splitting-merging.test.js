@@ -202,4 +202,14 @@ describe( 'splitting and merging blocks', () => {
 		// And focus is retained:
 		expect( await isInDefaultBlock() ).toBe( true );
 	} );
+
+	it( 'should undo split in one go', async () => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '12' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'Enter' );
+		await pressKeyWithModifier( 'primary', 'z' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );

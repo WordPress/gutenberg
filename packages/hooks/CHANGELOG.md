@@ -1,3 +1,15 @@
+## 2.6.0 (2019-08-29)
+
+### New Feature
+
+ - Enable an optional namespace parameter for `hasAction` & `hasFilter`. When checking if an action or filter exists, `hasAction` and `hasFilter` now accept an optional paramter to limit matches by namespace.
+
+## 2.4.0 (2019-06-12)
+
+### New Feature
+
+- Enable support for the 'all' hook in non production environments.
+
 ## 2.0.4 (2019-01-03)
 
 ## 2.0.0 (2018-09-05)

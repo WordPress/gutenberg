@@ -139,7 +139,7 @@ export default compose( [
 		const { savePost, editPost } = dispatch( 'core/editor' );
 		return {
 			onSave: savePost,
-			onUpdateVisibility( status, password = null ) {
+			onUpdateVisibility( status, password = '' ) {
 				editPost( { status, password } );
 			},
 		};

@@ -6,7 +6,6 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Fragment } from '@wordpress/element';
 import { compose } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { IconButton } from '@wordpress/components';
@@ -19,7 +18,7 @@ import shortcuts from '../../../keyboard-shortcuts';
 
 const SidebarHeader = ( { children, className, closeLabel, closeSidebar, title } ) => {
 	return (
-		<Fragment>
+		<>
 			<div className="components-panel__header edit-post-sidebar-header__small">
 				<span className="edit-post-sidebar-header__title">
 					{ title || __( '(no title)' ) }
@@ -39,7 +38,7 @@ const SidebarHeader = ( { children, className, closeLabel, closeSidebar, title }
 					shortcut={ shortcuts.toggleSidebar }
 				/>
 			</div>
-		</Fragment>
+		</>
 	);
 };
 

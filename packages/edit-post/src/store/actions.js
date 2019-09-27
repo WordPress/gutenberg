@@ -4,13 +4,6 @@
 import { castArray } from 'lodash';
 
 /**
- * Internal dependencies
- */
-import { __unstableSubscribe } from './controls';
-import { onChangeListener } from './utils';
-import { STORE_KEY, VIEW_AS_LINK_SELECTOR } from './constants';
-
-/**
  * Returns an action object used in signalling that the user opened an editor sidebar.
  *
  * @param {string} name Sidebar name to be opened.
@@ -115,7 +108,7 @@ export function toggleEditorPanelEnabled( panelName ) {
  * @param {string} panelName A string that identifies the panel to open or close.
  *
  * @return {Object} Action object.
-*/
+ */
 export function toggleEditorPanelOpened( panelName ) {
 	return {
 		type: 'TOGGLE_PANEL_OPENED',
@@ -188,6 +181,29 @@ export function hideBlockTypes( blockNames ) {
 }
 
 /**
+ * Returns an action object used in signaling that a style should be auto-applied when a block is created.
+ *
+ * @param {string}  blockName  Name of the block.
+ * @param {?string} blockStyle Name of the style that should be auto applied. If undefined, the "auto apply" setting of the block is removed.
+ *
+ * @return {Object} Action object.
+ */
+export function updatePreferredStyleVariations( blockName, blockStyle ) {
+	return {
+		type: 'UPDATE_PREFERRED_STYLE_VARIATIONS',
+		blockName,
+		blockStyle,
+	};
+}
+
+export function __experimentalUpdateLocalAutosaveInterval( interval ) {
+	return {
+		type: 'UPDATE_LOCAL_AUTOSAVE_INTERVAL',
+		interval,
+	};
+}
+
+/**
  * Returns an action object used in signalling that block types by the given
  * name(s) should be shown.
  *
@@ -238,75 +254,3 @@ export function metaBoxUpdatesSuccess() {
 		type: 'META_BOX_UPDATES_SUCCESS',
 	};
 }
-
-/**
- * Returns an action generator used to initialize some subscriptions for the
- * post editor:
- *
- * - subscription for toggling the `edit-post/block` general sidebar when a
- *   block is selected.
- * - subscription for hiding/showing the sidebar depending on size of viewport.
- * - subscription for updating the "View Post" link in the admin bar when
- *   permalink is updated.
- */
-export function* __unstableInitialize() {
-	// Select the block settings tab when the selected block changes
-	yield __unstableSubscribe( ( registry ) => onChangeListener(
-		() => !! registry.select( 'core/block-editor' )
-			.getBlockSelectionStart(),
-		( hasBlockSelection ) => {
-			if ( ! registry.select( 'core/edit-post' ).isEditorSidebarOpened() ) {
-				return;
-			}
-			if ( hasBlockSelection ) {
-				registry.dispatch( STORE_KEY )
-					.openGeneralSidebar( 'edit-post/block' );
-			} else {
-				registry.dispatch( STORE_KEY )
-					.openGeneralSidebar( 'edit-post/document' );
-			}
-		}
-	) );
-	// hide/show the sidebar depending on size of viewport.
-	yield __unstableSubscribe( ( registry ) => onChangeListener(
-		() => registry.select( 'core/viewport' )
-			.isViewportMatch( '< medium' ),
-		( () => {
-			let sidebarToReOpenOnExpand = null;
-			return ( isSmall ) => {
-				const { getActiveGeneralSidebarName } = registry.select( STORE_KEY );
-				const {
-					closeGeneralSidebar: closeSidebar,
-					openGeneralSidebar: openSidebar,
-				} = registry.dispatch( STORE_KEY );
-				if ( isSmall ) {
-					sidebarToReOpenOnExpand = getActiveGeneralSidebarName();
-					if ( sidebarToReOpenOnExpand ) {
-						closeSidebar();
-					}
-				} else if (
-					sidebarToReOpenOnExpand &&
-					! getActiveGeneralSidebarName()
-				) {
-					openSidebar( sidebarToReOpenOnExpand );
-				}
-			};
-		} )(),
-		true
-	) );
-	// Update View Post link in the admin bar when permalink is updated.
-	yield __unstableSubscribe( ( registry ) => onChangeListener(
-		() => registry.select( 'core/editor' ).getCurrentPost().link,
-		( newPermalink ) => {
-			if ( ! newPermalink ) {
-				return;
-			}
-			const nodeToUpdate = document.querySelector( VIEW_AS_LINK_SELECTOR );
-			if ( ! nodeToUpdate ) {
-				return;
-			}
-			nodeToUpdate.setAttribute( 'href', newPermalink );
-		}
-	) );
-}
-

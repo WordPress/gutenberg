@@ -14,7 +14,7 @@
  */
 function render_block_core_latest_posts( $attributes ) {
 	$args = array(
-		'posts_per_page'   => $attributes['postCount'],
+		'posts_per_page'   => $attributes['postsToShow'],
 		'post_status'      => 'publish',
 		'order'            => $attributes['order'],
 		'orderby'          => $attributes['orderBy'],
@@ -34,7 +34,7 @@ function render_block_core_latest_posts( $attributes ) {
 	foreach ( $recent_posts as $post ) {
 		$title = get_the_title( $post );
 		if ( ! $title ) {
-			$title = __( '(Untitled)' );
+			$title = __( '(no title)' );
 		}
 		$list_items_markup .= sprintf(
 			'<li><a href="%1$s">%2$s</a>',
@@ -51,7 +51,7 @@ function render_block_core_latest_posts( $attributes ) {
 		}
 
 		if ( isset( $attributes['displayPostContent'] ) && $attributes['displayPostContent']
-			&& isset( $attributes['displayPostContentRadio'] ) && 'excerpt' == $attributes['displayPostContentRadio'] ) {
+			&& isset( $attributes['displayPostContentRadio'] ) && 'excerpt' === $attributes['displayPostContentRadio'] ) {
 			$post_excerpt = $post->post_excerpt;
 			if ( ! ( $post_excerpt ) ) {
 				$post_excerpt = $post->post_content;
@@ -59,7 +59,7 @@ function render_block_core_latest_posts( $attributes ) {
 			$trimmed_excerpt = esc_html( wp_trim_words( $post_excerpt, $excerpt_length, ' &hellip; ' ) );
 
 			$list_items_markup .= sprintf(
-				'<div class="wp-block-latest-posts____post-excerpt">%1$s',
+				'<div class="wp-block-latest-posts__post-excerpt">%1$s',
 				$trimmed_excerpt
 			);
 
@@ -67,7 +67,7 @@ function render_block_core_latest_posts( $attributes ) {
 				$list_items_markup .= sprintf(
 					'<a href="%1$s">%2$s</a></div>',
 					esc_url( get_permalink( $post ) ),
-					__( 'Read More' )
+					__( 'Read more' )
 				);
 			} else {
 				$list_items_markup .= sprintf(
@@ -77,7 +77,7 @@ function render_block_core_latest_posts( $attributes ) {
 		}
 
 		if ( isset( $attributes['displayPostContent'] ) && $attributes['displayPostContent']
-			&& isset( $attributes['displayPostContentRadio'] ) && 'full_post' == $attributes['displayPostContentRadio'] ) {
+			&& isset( $attributes['displayPostContentRadio'] ) && 'full_post' === $attributes['displayPostContentRadio'] ) {
 			$list_items_markup .= sprintf(
 				'<div class="wp-block-latest-posts__post-full-content">%1$s</div>',
 				wp_kses_post( html_entity_decode( $post->post_content, ENT_QUOTES, get_option( 'blog_charset' ) ) )
@@ -108,13 +108,11 @@ function render_block_core_latest_posts( $attributes ) {
 		$class .= ' ' . $attributes['className'];
 	}
 
-	$block_content = sprintf(
+	return sprintf(
 		'<ul class="%1$s">%2$s</ul>',
 		esc_attr( $class ),
 		$list_items_markup
 	);
-
-	return $block_content;
 }
 
 /**
@@ -135,7 +133,7 @@ function register_block_core_latest_posts() {
 				'categories'              => array(
 					'type' => 'string',
 				),
-				'postCount'               => array(
+				'postsToShow'             => array(
 					'type'    => 'number',
 					'default' => 5,
 				),

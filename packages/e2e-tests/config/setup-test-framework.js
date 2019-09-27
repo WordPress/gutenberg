@@ -122,6 +122,19 @@ function observeConsoleLogging() {
 			return;
 		}
 
+		// A bug present in WordPress 5.2 will produce console warnings when
+		// loading the Dashicons font. These can be safely ignored, as they do
+		// not otherwise regress on application behavior. This logic should be
+		// removed once the associated ticket has been closed.
+		//
+		// See: https://core.trac.wordpress.org/ticket/47183
+		if (
+			text.startsWith( 'Failed to decode downloaded font:' ) ||
+			text.startsWith( 'OTS parsing error:' )
+		) {
+			return;
+		}
+
 		const logFunction = OBSERVED_CONSOLE_MESSAGE_TYPES[ type ];
 
 		// As of Puppeteer 1.6.1, `message.text()` wrongly returns an object of

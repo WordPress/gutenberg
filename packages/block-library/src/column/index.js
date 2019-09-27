@@ -25,6 +25,16 @@ export const settings = {
 		reusable: false,
 		html: false,
 	},
+	getEditWrapperProps( attributes ) {
+		const { width } = attributes;
+		if ( Number.isFinite( width ) ) {
+			return {
+				style: {
+					flexBasis: width + '%',
+				},
+			};
+		}
+	},
 	edit,
 	save,
 };

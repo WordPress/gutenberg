@@ -35,3 +35,8 @@
 	color: $dark-gray-300;
 	font-size: $default-font-size;
 }
+
+.wp-block-latest-posts__post-excerpt {
+	margin-top: $grid-size;
+	margin-bottom: $grid-size-large;
+}

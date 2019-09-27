@@ -36,7 +36,7 @@ describe( 'controls', () => {
 			} );
 
 			registry.dispatch( 'store2' ).action2();
-			expect( action1 ).toBeCalled();
+			expect( action1 ).toHaveBeenCalled();
 		} );
 	} );
 
@@ -80,8 +80,34 @@ describe( 'controls', () => {
 
 		registry.select( 'store' ).getItems();
 	} );
-	describe( 'various action types have expected response and resolve as ' +
-		'expected with controls middleware', () => {
+	describe( 'selectors have expected value for the `hasResolver` property', () => {
+		it( 'when custom store has resolvers defined', () => {
+			registry.registerStore( 'store', {
+				reducer: jest.fn(),
+				selectors: {
+					getItems: ( state ) => state,
+					getItem: ( state ) => state,
+				},
+				resolvers: {
+					* getItems() {
+						yield 'foo';
+					},
+				},
+			} );
+			expect( registry.select( 'store' ).getItems.hasResolver ).toBe( true );
+			expect( registry.select( 'store' ).getItem.hasResolver ).toBe( false );
+		} );
+		it( 'when custom store does not have resolvers defined', () => {
+			registry.registerStore( 'store', {
+				reducer: jest.fn(),
+				selectors: {
+					getItems: ( state ) => state,
+				},
+			} );
+			expect( registry.select( 'store' ).getItems.hasResolver ).toBe( false );
+		} );
+	} );
+	describe( 'various action types have expected response and resolve as expected with controls middleware', () => {
 		const actions = {
 			*withPromise() {
 				yield { type: 'SOME_ACTION' };
@@ -137,8 +163,7 @@ describe( 'controls', () => {
 				.toEqual( { type: 'NORMAL' } );
 		} );
 	} );
-	describe( 'action type resolves as expected with just promise ' +
-		'middleware', () => {
+	describe( 'action type resolves as expected with just promise middleware', () => {
 		const actions = {
 			normal: () => ( { type: 'NORMAL' } ),
 			withPromiseAndAction: () => new Promise(

@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { withViewportMatch } from '@wordpress/viewport';
+import { withViewportMatch } from '@wordpress/viewport'; // Temporary click-through disable on desktop.
 import { Component } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { synchronizeBlocksWithTemplate, withBlockContentContext } from '@wordpress/blocks';
@@ -25,6 +25,7 @@ import DefaultBlockAppender from './default-block-appender';
  */
 import BlockList from '../block-list';
 import { withBlockEditContext } from '../block-edit/context';
+import TemplatePicker from './template-picker';
 
 class InnerBlocks extends Component {
 	constructor() {
@@ -35,20 +36,14 @@ class InnerBlocks extends Component {
 		this.updateNestedSettings();
 	}
 
-	getTemplateLock() {
-		const {
-			templateLock,
-			parentLock,
-		} = this.props;
-		return templateLock === undefined ? parentLock : templateLock;
-	}
-
 	componentDidMount() {
-		const { innerBlocks } = this.props.block;
-		// only synchronize innerBlocks with template if innerBlocks are empty or a locking all exists
-		if ( innerBlocks.length === 0 || this.getTemplateLock() === 'all' ) {
+		const { templateLock, block } = this.props;
+		const { innerBlocks } = block;
+		// Only synchronize innerBlocks with template if innerBlocks are empty or a locking all exists directly on the block.
+		if ( innerBlocks.length === 0 || templateLock === 'all' ) {
 			this.synchronizeBlocksWithTemplate();
 		}
+
 		if ( this.state.templateInProcess ) {
 			this.setState( {
 				templateInProcess: false,
@@ -57,12 +52,12 @@ class InnerBlocks extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
-		const { template, block } = this.props;
+		const { template, block, templateLock } = this.props;
 		const { innerBlocks } = block;
 
 		this.updateNestedSettings();
-		// only synchronize innerBlocks with template if innerBlocks are empty or a locking all exists
-		if ( innerBlocks.length === 0 || this.getTemplateLock() === 'all' ) {
+		// Only synchronize innerBlocks with template if innerBlocks are empty or a locking all exists directly on the block.
+		if ( innerBlocks.length === 0 || templateLock === 'all' ) {
 			const hasTemplateChanged = ! isEqual( template, prevProps.template );
 			if ( hasTemplateChanged ) {
 				this.synchronizeBlocksWithTemplate();
@@ -91,11 +86,13 @@ class InnerBlocks extends Component {
 			blockListSettings,
 			allowedBlocks,
 			updateNestedSettings,
+			templateLock,
+			parentLock,
 		} = this.props;
 
 		const newSettings = {
 			allowedBlocks,
-			templateLock: this.getTemplateLock(),
+			templateLock: templateLock === undefined ? parentLock : templateLock,
 		};
 
 		if ( ! isShallowEqual( blockListSettings, newSettings ) ) {
@@ -105,24 +102,36 @@ class InnerBlocks extends Component {
 
 	render() {
 		const {
+			isSmallScreen, // Temporary click-through disable on desktop.
 			clientId,
-			isSmallScreen,
-			isSelectedBlockInRoot,
+			hasOverlay,
 			renderAppender,
+			template,
+			__experimentalTemplateOptions: templateOptions,
+			__experimentalOnSelectTemplateOption: onSelectTemplateOption,
+			__experimentalAllowTemplateOptionSkip: allowTemplateOptionSkip,
 		} = this.props;
 		const { templateInProcess } = this.state;
 
+		const isPlaceholder = template === null && !! templateOptions;
+
 		const classes = classnames( 'editor-inner-blocks block-editor-inner-blocks', {
-			'has-overlay': isSmallScreen && ! isSelectedBlockInRoot,
+			'has-overlay': isSmallScreen && ( hasOverlay && ! isPlaceholder ), // Temporary click-through disable on desktop.
 		} );
 
 		return (
 			<div className={ classes }>
 				{ ! templateInProcess && (
-					<BlockList
-						rootClientId={ clientId }
-						renderAppender={ renderAppender }
-					/>
+					isPlaceholder ?
+						<TemplatePicker
+							options={ templateOptions }
+							onSelect={ onSelectTemplateOption }
+							allowSkip={ allowTemplateOptionSkip }
+						/> :
+						<BlockList
+							rootClientId={ clientId }
+							renderAppender={ renderAppender }
+						/>
 				) }
 			</div>
 		);
@@ -130,8 +139,8 @@ class InnerBlocks extends Component {
 }
 
 InnerBlocks = compose( [
+	withViewportMatch( { isSmallScreen: '< medium' } ), // Temporary click-through disable on desktop.
 	withBlockEditContext( ( context ) => pick( context, [ 'clientId' ] ) ),
-	withViewportMatch( { isSmallScreen: '< medium' } ),
 	withSelect( ( select, ownProps ) => {
 		const {
 			isBlockSelected,
@@ -142,12 +151,13 @@ InnerBlocks = compose( [
 			getTemplateLock,
 		} = select( 'core/block-editor' );
 		const { clientId } = ownProps;
+		const block = getBlock( clientId );
 		const rootClientId = getBlockRootClientId( clientId );
 
 		return {
-			isSelectedBlockInRoot: isBlockSelected( clientId ) || hasSelectedInnerBlock( clientId ),
-			block: getBlock( clientId ),
+			block,
 			blockListSettings: getBlockListSettings( clientId ),
+			hasOverlay: block.name !== 'core/template' && ! isBlockSelected( clientId ) && ! hasSelectedInnerBlock( clientId, true ),
 			parentLock: getTemplateLock( rootClientId ),
 		};
 	} ),

@@ -23,6 +23,7 @@ describe( 'applyFormat', () => {
 		};
 		const expected = {
 			...record,
+			activeFormats: [ em ],
 			formats: [ [ em ], [ em ], [ em ], [ em ] ],
 		};
 		const result = applyFormat( deepFreeze( record ), em, 0, 4 );
@@ -39,6 +40,7 @@ describe( 'applyFormat', () => {
 		};
 		const expected = {
 			...record,
+			activeFormats: [ em ],
 			formats: [ [ strong, em ], [ strong, em ], [ strong, em ], [ strong, em ] ],
 		};
 		const result = applyFormat( deepFreeze( record ), em, 0, 4 );
@@ -55,6 +57,7 @@ describe( 'applyFormat', () => {
 		};
 		const expected = {
 			...record,
+			activeFormats: [ em ],
 			formats: [ [ strong, em ], [ strong, em ], [ strong, em ], [ strong, em ] ],
 		};
 		const result = applyFormat( deepFreeze( record ), em, 0, 4 );
@@ -71,6 +74,7 @@ describe( 'applyFormat', () => {
 		};
 		const expected = {
 			...record,
+			activeFormats: [ strong ],
 			formats: [ [ strong ], [ strong, em ], [ strong, em ], [ strong ] ],
 		};
 		const result = applyFormat( deepFreeze( record ), strong, 0, 4 );
@@ -87,6 +91,7 @@ describe( 'applyFormat', () => {
 		};
 		const expected = {
 			...record,
+			activeFormats: [ strong ],
 			formats: [ [ strong ], [ strong, em ], [ strong, em ], , ],
 		};
 		const result = applyFormat( deepFreeze( record ), strong, 0, 3 );
@@ -103,6 +108,7 @@ describe( 'applyFormat', () => {
 		};
 		const expected = {
 			...record,
+			activeFormats: [ strong ],
 			formats: [ , [ strong, em ], [ strong, em ], [ strong ] ],
 		};
 		const result = applyFormat( deepFreeze( record ), strong, 1, 4 );
@@ -119,6 +125,7 @@ describe( 'applyFormat', () => {
 		};
 		const expected = {
 			...record,
+			activeFormats: [ strong ],
 			formats: [ , [ strong, em ], [ strong ], [ strong, em ] ],
 		};
 		const result = applyFormat( deepFreeze( record ), strong, 1, 4 );
@@ -134,6 +141,7 @@ describe( 'applyFormat', () => {
 			text: 'one two three',
 		};
 		const expected = {
+			activeFormats: [ strong ],
 			formats: [ , , , [ strong ], [ strong, em ], [ strong, em ], [ em ], , , , , , , ],
 			text: 'one two three',
 		};
@@ -152,6 +160,7 @@ describe( 'applyFormat', () => {
 			end: 6,
 		};
 		const expected = {
+			activeFormats: [ strong ],
 			formats: [ , , , [ strong ], [ strong, em ], [ strong, em ], [ em ], , , , , , , ],
 			text: 'one two three',
 			start: 3,
@@ -184,12 +193,14 @@ describe( 'applyFormat', () => {
 
 	it( 'should apply format on existing format if selection is collapsed', () => {
 		const record = {
+			activeFormats: [ a ],
 			formats: [ , , , , [ a ], [ a ], [ a ], , , , , , , ],
 			text: 'one two three',
 			start: 4,
 			end: 4,
 		};
 		const expected = {
+			activeFormats: [ a2 ],
 			formats: [ , , , , [ a2 ], [ a2 ], [ a2 ], , , , , , , ],
 			text: 'one two three',
 			start: 4,

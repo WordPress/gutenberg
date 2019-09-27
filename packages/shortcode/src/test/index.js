@@ -90,6 +90,13 @@ describe( 'shortcode', () => {
 			expect( result2 ).toBe( 'this has the bar shortcode' );
 		} );
 
+		it( 'should replace the shortcode with data from an attribute', () => {
+			const result1 = replace( 'foo', 'this [foo param="replacement text"] came from a shortcode attribute', ( match ) => {
+				return match.attrs.named.param || '';
+			} );
+			expect( result1 ).toBe( 'this replacement text came from a shortcode attribute' );
+		} );
+
 		it( 'should not replace the shortcode when it does not match', () => {
 			const result1 = replace( 'bar', 'this has the [foo] shortcode', () => 'bar' );
 			expect( result1 ).toBe( 'this has the [foo] shortcode' );

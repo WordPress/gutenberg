@@ -22,7 +22,9 @@ const { MediaPlaceholder } = wp.editor;
 			allowedTypes = { [ 'image' ] }
 			multiple = { false }
 			labels = { { title: 'The Image' } }
-		/>;
+		>
+			"extra content"
+		</MediaPlaceholder>;
 		...
 	}
 ```
@@ -63,6 +65,30 @@ This property is similar to the `accept` property. The difference is the format 
 Class name added to the placeholder.
 
 - Type: `String`
+- Required: No
+
+### disableDropZone
+
+If true, the Drop Zone will not be rendered. Users won't be able to drag & drop any media into the component or the block. The UI controls to upload the media via file, url or the media library would be intact.
+
+- Type: `Boolean`
+- Required: No
+- Default: `false`
+
+### dropZoneUIOnly
+
+If true, only the Drop Zone will be rendered. No UI controls to upload the media will be shown.
+The `disableDropZone` prop still takes precedence over `dropZoneUIOnly` – specifying both as true will result in nothing to be rendered.
+
+- Type: `Boolean`
+- Required: No
+- Default: `false`
+
+### icon
+
+Icon to display left of the title. When passed as a `String`, the icon will be resolved as a [Dashicon](https://developer.wordpress.org/resource/dashicons/). Alternatively, you can pass in a `WPComponent` such as `BlockIcon`to render instead.
+
+- Type: `String|WPComponent`
 - Required: No
 
 ### isAppender

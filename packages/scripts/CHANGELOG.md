@@ -1,6 +1,58 @@
-## Unreleased
+## 5.0.0 (2019-09-16)
 
-### New Feature
+### Breaking Changes
+
+- The bundled `@wordpress/dependency-extraction-webpack-plugin` dependency has been updated to the next major version `^2.0.0`. `start` and `build` scripts save now the generated asset file for each entry point in the new PHP output format.
+
+## 4.1.0 (2019-09-03)
+
+### New Features
+
+- Add the new `env` family of scripts [(#17004](https://github.com/WordPress/gutenberg/pull/17004/)).
+
+### Bug Fixes
+
+- Add `wordpress` folder to the list of ignored paths in all applicable config files ([#17296](https://github.com/WordPress/gutenberg/pull/17296)).
+
+## 4.0.0 (2019-08-29)
+
+### Breaking Changes
+
+- Test files matching has changed to fix the overlap between two types of tests implemented with `test-e2e` and `test-unit`. Refer to the documentation of the corresponding scripts to learn about new file discovery rules.
+
+### New Features
+
+- The bundled `puppeteer` dependency has been updated from requiring `1.6.1` to requiring `^1.19.0` ([#16875](https://github.com/WordPress/gutenberg/pull/16875)). It uses Chromium v77 instead of Chromium v69.
+- The bundled `jest-puppeteer` dependency has been updated from requiring `^4.0.0` to requiring `^4.3.0` ([#16875](https://github.com/WordPress/gutenberg/pull/16875)).
+- The bundled `eslint` dependency has been updated from requiring `^5.16.0` to requiring `^6.1.0`.
+- The bundled `@wordpress/eslint-plugin` dependency has been updated to the next major version `^3.0.0` due to new ESLint rules enabled for all test files.
+
+### Bug Fix
+
+- Use the SCSS shared `stylelint-config-wordpress` config so that both CSS and SCSS rules are used ([#17060](https://github.com/WordPress/gutenberg/pull/17060))
+
+## 3.4.0 (2019-08-05)
+
+### New Features
+
+- The `build` and `start` commands supports simplified syntax for multiple entry points: `wp-scripts build entry-one.js entry-two.js` ([15982](https://github.com/WordPress/gutenberg/pull/15982)).
+
+### Bug Fix
+
+- Added missing [babel-jest](https://www.npmjs.com/package/babel-jest) dependency ([#16259](https://github.com/WordPress/gutenberg/pull/16259)).
+
+## 3.3.0 (2019-06-12)
+
+### New Features
+
+- The `lint-js` command lints now JS files in the entire project's directories by default ([15890](https://github.com/WordPress/gutenberg/pull/15890)).
+- The `lint-pkg-json` command lints now `package.json` files in the entire project's directories by default ([15890](https://github.com/WordPress/gutenberg/pull/15890)).
+- The `lint-style` command lints now CSS and SCSS files in the entire project's directories by default ([15890](https://github.com/WordPress/gutenberg/pull/15890)).
+- The `lint-js`, `lint-pkg-json` and `lint-style` commands ignore now files located in `build` and `node_modules` folders by default ([15977](https://github.com/WordPress/gutenberg/pull/15977)).
+
+## 3.2.0 (2019-05-21)
+
+### New Features
 
 - Leverage `@wordpress/dependency-extraction-webpack-plugin` plugin to extract WordPress
   dependencies.

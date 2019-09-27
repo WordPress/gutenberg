@@ -6,19 +6,20 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Fragment, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/block-editor';
 import { BaseControl, PanelBody, ResizableBox } from '@wordpress/components';
-import { withInstanceId } from '@wordpress/compose';
+import { compose, withInstanceId } from '@wordpress/compose';
+import { withDispatch } from '@wordpress/data';
 
-const SpacerEdit = ( { attributes, isSelected, setAttributes, toggleSelection, instanceId } ) => {
+const SpacerEdit = ( { attributes, isSelected, setAttributes, instanceId, onResizeStart, onResizeStop } ) => {
 	const { height } = attributes;
 	const id = `block-spacer-height-input-${ instanceId }`;
 	const [ inputHeightValue, setInputHeightValue ] = useState( height );
 
 	return (
-		<Fragment>
+		<>
 			<ResizableBox
 				className={ classnames(
 					'block-library-spacer__resize-container',
@@ -38,16 +39,14 @@ const SpacerEdit = ( { attributes, isSelected, setAttributes, toggleSelection, i
 					bottomLeft: false,
 					topLeft: false,
 				} }
+				onResizeStart={ onResizeStart }
 				onResizeStop={ ( event, direction, elt, delta ) => {
+					onResizeStop();
 					const spacerHeight = parseInt( height + delta.height, 10 );
 					setAttributes( {
 						height: spacerHeight,
 					} );
 					setInputHeightValue( spacerHeight );
-					toggleSelection( true );
-				} }
-				onResizeStart={ () => {
-					toggleSelection( false );
 				} }
 			/>
 			<InspectorControls>
@@ -78,8 +77,18 @@ const SpacerEdit = ( { attributes, isSelected, setAttributes, toggleSelection, i
 					</BaseControl>
 				</PanelBody>
 			</InspectorControls>
-		</Fragment>
+		</>
 	);
 };
 
-export default withInstanceId( SpacerEdit );
+export default compose( [
+	withDispatch( ( dispatch ) => {
+		const { toggleSelection } = dispatch( 'core/block-editor' );
+
+		return {
+			onResizeStart: () => toggleSelection( false ),
+			onResizeStop: () => toggleSelection( true ),
+		};
+	} ),
+	withInstanceId,
+] )( SpacerEdit );

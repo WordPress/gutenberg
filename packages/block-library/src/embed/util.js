@@ -7,14 +7,15 @@ import { DEFAULT_EMBED_BLOCK, WORDPRESS_EMBED_BLOCK, ASPECT_RATIOS } from './con
 /**
  * External dependencies
  */
-import { includes } from 'lodash';
+import { includes, kebabCase, toLower } from 'lodash';
 import classnames from 'classnames/dedupe';
+import memoize from 'memize';
 
 /**
  * WordPress dependencies
  */
 import { renderToString } from '@wordpress/element';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, getBlockType } from '@wordpress/blocks';
 
 /**
  * Returns true if any of the regular expressions match the URL.
@@ -57,7 +58,7 @@ export const getPhotoHtml = ( photo ) => {
 	return renderToString( photoPreview );
 };
 
-/***
+/**
  * Creates a more suitable embed block based on the passed in props
  * and attributes generated from an embed block's preview.
  *
@@ -67,8 +68,8 @@ export const getPhotoHtml = ( photo ) => {
  * versions, so we require that these are generated separately.
  * See `getAttributesFromPreview` in the generated embed edit component.
  *
- * @param {Object}            props                 The block's props.
- * @param {Object}            attributesFromPreview Attributes generated from the block's most up to date preview.
+ * @param {Object} props                  The block's props.
+ * @param {Object} attributesFromPreview  Attributes generated from the block's most up to date preview.
  * @return {Object|undefined} A more suitable embed block if one exists.
  */
 export const createUpgradedEmbedBlock = ( props, attributesFromPreview ) => {
@@ -80,6 +81,10 @@ export const createUpgradedEmbedBlock = ( props, attributesFromPreview ) => {
 	}
 
 	const matchingBlock = findBlock( url );
+
+	if ( ! getBlockType( matchingBlock ) ) {
+		return;
+	}
 
 	// WordPress blocks can work on multiple sites, and so don't have patterns,
 	// so if we're in a WordPress block, assume the user has chosen it for a WordPress URL.
@@ -170,7 +175,7 @@ export function getClassNames( html, existingClassNames = '', allowResponsive = 
  * Creates a paragraph block containing a link to the URL, and calls `onReplace`.
  *
  * @param {string}   url       The URL that could not be embedded.
- * @param {function} onReplace Function to call with the created fallback block.
+ * @param {Function} onReplace Function to call with the created fallback block.
  */
 export function fallback( url, onReplace ) {
 	const link = <a href={ url }>{ url }</a>;
@@ -178,3 +183,40 @@ export function fallback( url, onReplace ) {
 		createBlock( 'core/paragraph', { content: renderToString( link ) } )
 	);
 }
+
+/***
+ * Gets block attributes based on the preview and responsive state.
+ *
+ * @param {Object} preview The preview data.
+ * @param {string} title The block's title, e.g. Twitter.
+ * @param {Object} currentClassNames The block's current class names.
+ * @param {boolean} isResponsive Boolean indicating if the block supports responsive content.
+ * @param {boolean} allowResponsive Apply responsive classes to fixed size content.
+ * @return {Object} Attributes and values.
+ */
+export const getAttributesFromPreview = memoize( ( preview, title, currentClassNames, isResponsive, allowResponsive = true ) => {
+	if ( ! preview ) {
+		return {};
+	}
+
+	const attributes = {};
+	// Some plugins only return HTML with no type info, so default this to 'rich'.
+	let { type = 'rich' } = preview;
+	// If we got a provider name from the API, use it for the slug, otherwise we use the title,
+	// because not all embed code gives us a provider name.
+	const { html, provider_name: providerName } = preview;
+	const providerNameSlug = kebabCase( toLower( '' !== providerName ? providerName : title ) );
+
+	if ( isFromWordPress( html ) ) {
+		type = 'wp-embed';
+	}
+
+	if ( html || 'photo' === type ) {
+		attributes.type = type;
+		attributes.providerNameSlug = providerNameSlug;
+	}
+
+	attributes.className = getClassNames( html, currentClassNames, isResponsive && allowResponsive );
+
+	return attributes;
+} );

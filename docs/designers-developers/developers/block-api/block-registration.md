@@ -42,7 +42,7 @@ title: __( 'Book' )
 
 * **Type:** `String`
 
-This is a short description for your block, which can be translated with our translation functions. This will be shown in the block inspector.
+This is a short description for your block, which can be translated with our translation functions. This will be shown in the Block Tab in the Settings Sidebar.
 
 ```js
 description: __( 'Block showing a Book card.' )
@@ -55,6 +55,7 @@ description: __( 'Block showing a Book card.' )
 Blocks are grouped into categories to help users browse and discover them.
 
 The core provided categories are:
+
 * common
 * formatting
 * layout
@@ -85,11 +86,10 @@ icon: <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="no
 **Note:** Custom SVG icons are automatically wrapped in the [`wp.components.SVG` component](/packages/components/src/primitives/svg/) to add accessibility attributes (`aria-hidden`, `role`, and `focusable`).
 
 An object can also be passed as icon, in this case, icon, as specified above, should be included in the src property.
-Besides src the object can contain background and foreground colors, this colors will appear with the icon
-when they are applicable e.g.: in the inserter.
+
+Besides src the object can contain background and foreground colors, this colors will appear with the icon when they are applicable e.g.: in the inserter.
 
 ```js
-
 icon: {
 	// Specifying a background color to appear with the icon e.g.: in the inserter.
 	background: '#7e70af',
@@ -168,13 +168,33 @@ attributes: {
 
 * **See: [Attributes](/docs/designers-developers/developers/block-api/block-attributes.md).**
 
+#### Example (optional)
+
+* **Type:** `Object`
+
+Example provides structured example data for the block. This data is used to construct a preview for the block to be shown in the Inspector Help Panel when the user mouses over the block.
+
+The data provided in the example object should match the attributes defined. For example:
+
+```js
+example: {
+    attributes: {
+        cover: 'https://example.com/image.jpg',
+        author: 'William Shakespeare',
+        pages: 500
+    },
+},
+```
+
+If `example` is not defined, the preview will not be shown. So even if no-attributes are defined, setting a empty example object `example: {}` will trigger the preview to show.
+
 #### Transforms (optional)
 
 * **Type:** `Array`
 
 Transforms provide rules for what a block can be transformed from and what it can be transformed to. A block can be transformed from another block, a shortcode, a regular expression, a file or a raw DOM node.
 
-For example, a paragraph block can be transformed into a heading block. This uses the `createBlock` function from the [`wp-blocks` package](/packages/blocks/README.md#createBlock)
+For example, a Paragraph block can be transformed into a Heading block. This uses the `createBlock` function from the [`wp-blocks` package](/packages/blocks/README.md#createBlock).
 
 {% codetabs %}
 {% ES5 %}
@@ -274,7 +294,7 @@ transforms: {
 ```
 {% end %}
 
-A block can also be transformed into another block type. For example, a heading block can be transformed into a paragraph block.
+A block can also be transformed into another block type. For example, a Heading block can be transformed into a Paragraph block.
 
 {% codetabs %}
 {% ES5 %}
@@ -311,7 +331,41 @@ transforms: {
 ```
 {% end %}
 
-A block with innerBlocks can also be transformed from and to another block with innerBlocks.
+In addition to accepting an array of known block types, the `blocks` option also accepts a "wildcard" (`"*"`). This allows for transformations which apply to _all_ block types (eg: all blocks can transform into `core/group`):
+
+{% codetabs %}
+{% ES5 %}
+```js
+transforms: {
+    from: [
+        {
+            type: 'block',
+            blocks: [ '*' ], // wildcard - match any block
+            transform: function( attributes, innerBlocks ) {
+                // transform logic here
+            },
+        },
+    ],
+},
+```
+{% ESNext %}
+```js
+transforms: {
+    from: [
+        {
+            type: 'block',
+            blocks: [ '*' ], // wildcard - match any block
+            transform: ( attributes, innerBlocks ) => {
+                // transform logic here
+            },
+        },
+    ],
+},
+```
+{% end %}
+
+
+A block with InnerBlocks can also be transformed from and to another block with InnerBlocks.
 
 {% codetabs %}
 {% ES5 %}
@@ -444,7 +498,7 @@ transforms: {
 ```
 {% end %}
 
-A prefix transform is a transform that will be applied if the user prefixes some text in e.g. the paragraph block with a given pattern and a trailing space.
+A prefix transform is a transform that will be applied if the user prefixes some text in e.g. the Paragraph block with a given pattern and a trailing space.
 
 {% codetabs %}
 {% ES5 %}
@@ -486,7 +540,7 @@ transforms: {
 
 * **Type:** `Array`
 
-Blocks are able to be inserted into blocks that use [`InnerBlocks`](/packages/block-editor/src/components/inner-blocks/README.md) as nested content. Sometimes it is useful to restrict a block so that it is only available as a nested block. For example, you might want to allow an 'Add to Cart' block to only be available within a 'Product' block.
+Blocks are able to be inserted into blocks that use [`InnerBlocks`](https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/inner-blocks/README.md) as nested content. Sometimes it is useful to restrict a block so that it is only available as a nested block. For example, you might want to allow an 'Add to Cart' block to only be available within a 'Product' block.
 
 Setting `parent` lets a block require that it is only available when nested within the specified blocks.
 

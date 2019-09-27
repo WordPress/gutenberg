@@ -19,8 +19,9 @@ import { getFontSize, getFontSizeClass } from './utils';
  * Higher-order component, which handles font size logic for class generation,
  * font size value retrieval, and font size change handling.
  *
- * @param {...(object|string)} args The arguments should all be strings
- *                                  Each string contains the font size attribute name e.g: 'fontSize'.
+ * @param {...(Object|string)} fontSizeNames The arguments should all be strings.
+ *                                           Each string contains the font size
+ *                                           attribute name e.g: 'fontSize'.
  *
  * @return {Function} Higher-order component.
  */
@@ -64,7 +65,7 @@ export default ( ...fontSizeNames ) => {
 
 					createSetFontSize( fontSizeAttributeName, customFontSizeAttributeName ) {
 						return ( fontSizeValue ) => {
-							const fontSizeObject = find( this.props.fontSizes, { size: fontSizeValue } );
+							const fontSizeObject = find( this.props.fontSizes, { size: Number( fontSizeValue ) } );
 							this.props.setAttributes( {
 								[ fontSizeAttributeName ]: fontSizeObject && fontSizeObject.slug ? fontSizeObject.slug : undefined,
 								[ customFontSizeAttributeName ]: fontSizeObject && fontSizeObject.slug ? undefined : fontSizeValue,

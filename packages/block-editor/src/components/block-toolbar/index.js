@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { withSelect } from '@wordpress/data';
-import { Fragment } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -30,11 +29,11 @@ function BlockToolbar( { blockClientIds, isValid, mode } ) {
 	return (
 		<div className="editor-block-toolbar block-editor-block-toolbar">
 			{ mode === 'visual' && isValid && (
-				<Fragment>
+				<>
 					<BlockSwitcher clientIds={ blockClientIds } />
-					<BlockControls.Slot />
-					<BlockFormatControls.Slot />
-				</Fragment>
+					<BlockControls.Slot bubblesVirtually className="block-editor-block-toolbar__slot" />
+					<BlockFormatControls.Slot bubblesVirtually className="block-editor-block-toolbar__slot" />
+				</>
 			) }
 			<BlockSettingsMenu clientIds={ blockClientIds } />
 		</div>

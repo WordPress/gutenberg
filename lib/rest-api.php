@@ -67,6 +67,25 @@ function gutenberg_register_rest_widget_updater_routes() {
 	$widgets_controller->register_routes();
 }
 add_action( 'rest_api_init', 'gutenberg_register_rest_widget_updater_routes' );
+
 /**
- * End: Include for phase 2
+ * Registers the widget area REST API routes.
+ *
+ * @since 5.7.0
  */
+function gutenberg_register_rest_widget_areas() {
+	$widget_areas_controller = new WP_REST_Widget_Areas_Controller();
+	$widget_areas_controller->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_rest_widget_areas' );
+
+/**
+ * Registers the block directory.
+ *
+ * @since 6.5.0
+ */
+function gutenberg_register_rest_block_directory() {
+	$block_directory_controller = new WP_REST_Block_Directory_Controller();
+	$block_directory_controller->register_routes();
+}
+add_filter( 'rest_api_init', 'gutenberg_register_rest_block_directory' );

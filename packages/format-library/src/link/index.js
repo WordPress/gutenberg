@@ -2,16 +2,18 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component, Fragment } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { withSpokenMessages } from '@wordpress/components';
 import {
 	getTextContent,
 	applyFormat,
 	removeFormat,
 	slice,
+	isCollapsed,
 } from '@wordpress/rich-text';
 import { isURL, isEmail } from '@wordpress/url';
 import { RichTextToolbarButton, RichTextShortcut } from '@wordpress/block-editor';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -29,6 +31,28 @@ export const link = {
 	attributes: {
 		url: 'href',
 		target: 'target',
+	},
+	__unstablePasteRule( value, { html, plainText } ) {
+		if ( isCollapsed( value ) ) {
+			return value;
+		}
+
+		const pastedText = ( html || plainText ).replace( /<[^>]+>/g, '' ).trim();
+
+		// A URL was pasted, turn the selection into a link
+		if ( ! isURL( pastedText ) ) {
+			return value;
+		}
+
+		// Allows us to ask for this information when we get a report.
+		window.console.log( 'Created link:\n\n', pastedText );
+
+		return applyFormat( value, {
+			type: name,
+			attributes: {
+				url: decodeEntities( pastedText ),
+			},
+		} );
 	},
 	edit: withSpokenMessages( class LinkEdit extends Component {
 		constructor() {
@@ -70,17 +94,7 @@ export const link = {
 			const { isActive, activeAttributes, value, onChange } = this.props;
 
 			return (
-				<Fragment>
-					<RichTextShortcut
-						type="access"
-						character="a"
-						onUse={ this.addLink }
-					/>
-					<RichTextShortcut
-						type="access"
-						character="s"
-						onUse={ this.onRemoveFormat }
-					/>
+				<>
 					<RichTextShortcut
 						type="primary"
 						character="k"
@@ -117,7 +131,7 @@ export const link = {
 						value={ value }
 						onChange={ onChange }
 					/>
-				</Fragment>
+				</>
 			);
 		}
 	} ),

@@ -1,18 +1,18 @@
 # JavaScript Build Setup
 
-This page covers how to set up your development environment to use the ESNext and [JSX](https://reactjs.org/docs/introducing-jsx.html) syntaxes. ESNext is JavaScript code written using features that are only available in a specification greater than ECMAScript 5 (ES5 for short). JSX is a custom syntax extension to JavaScript which helps you to describe what the UI should look like.
+This page covers how to set up your development environment to use the ESNext and [JSX](https://reactjs.org/docs/introducing-jsx.html) syntaxes. ESNext is JavaScript code written using features that are only available in a specification greater than ECMAScript 5 (ES5 for short). JSX is a custom syntax extension to JavaScript that allows you to write JavaScript in a more familiar tag syntax.
 
-This documentation covers development for your plugin to work with the new setup provided by the Gutenberg project (ie: the block editor). If you want to develop Gutenberg itself, see the [Getting Started](/docs/contributors/getting-started.md) documentation.
+This documentation covers development for your plugin to work with the Gutenberg project (ie: the block editor). If you want to develop Gutenberg itself, see the [Getting Started](/docs/contributors/getting-started.md) documentation.
 
 Most browsers can not interpret or run ESNext and JSX syntaxes, so we use a transformation step to convert these syntaxes to code that browsers can understand.
 
 There are a few reasons to use ESNext and the extra step. First, it makes for simpler code that is easier to read and write. Using a transformation step allows for tools to optimize the code to work on the widest variety of browsers. Also, by using a build step you can organize your code into smaller modules and files that can be bundled together into a single download.
 
-There are different tools that can perform this transformation or build step, but WordPress uses webpack and Babel.
+There are different tools that can perform this transformation or build step; WordPress uses webpack and Babel.
 
 [webpack](https://webpack.js.org/) is a pluggable tool that processes JavaScript, creating a compiled bundle that runs in a browser. [Babel](https://babeljs.io/) transforms JavaScript from one format to another. You use Babel as a plugin to webpack to transform both ESNext and JSX to JavaScript.
 
-The [@wordpress/scripts](https://www.npmjs.com/package/@wordpress/scripts) package abstracts these libraries away to standardize and simplify development, so you won't need to handle the details for configuring those libraries.
+The [@wordpress/scripts](https://www.npmjs.com/package/@wordpress/scripts) package abstracts these libraries away to standardize and simplify development, so you won't need to handle the details for configuring those libraries. See the package documentation for configuration details.
 
 ## Quick Start
 
@@ -22,15 +22,15 @@ For a quick start, you can use one of the examples from the [Gutenberg Examples 
 
 Both webpack and Babel are tools written in JavaScript and run using [Node.js](https://nodejs.org/) (node). Node.js is a runtime environment for JavaScript outside of a browser. Simply put, node allows you to run JavaScript code on the command-line.
 
-First, you need to set up node for your development environment. The steps required change depending on your operating system, but if you have a package manager installed, setup can be as straightforward as:
+First, you need to set up Node.js for your development environment. The steps required depend on your operating system, if you have a package manager installed, setup can be as straightforward as:
 
 - Ubuntu: `apt install node`
 - macOS: `brew install node`
 - Windows: `choco install node`
 
-Additionally, the [Node.js download page](https://nodejs.org/en/download/) includes installers and binaries.
+If you are not using a package manager, see the [Node.js download page](https://nodejs.org/en/download/) for installers and binaries.
 
-**Note:** The build tools and process occur on the command-line, so some basic familiarity using a terminal application is required. Some text editors have a terminal built-in which is fine to use; Visual Studio Code and PhpStorm are two popular options.
+**Note:** The build tools and process occur on the command-line, so basic familiarity using a terminal application is required. Some text editors have a terminal built-in that is fine to use; Visual Studio Code and PhpStorm are two popular options.
 
 ### Node Package Manager (npm)
 
@@ -65,7 +65,7 @@ About to write to /home/mkaz/src/wp/scratch/package.json:
   "description": "Test block",
   "main": "block.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+	"test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "mkaz",
   "license": "GPL-2.0-only"
@@ -87,7 +87,7 @@ Also, if you look at package.json file it will include a new section:
 
 ```json
 "devDependencies": {
-	"@wordpress/scripts": "3.1.0"
+  "@wordpress/scripts": "5.0.0"
 }
 ```
 
@@ -98,7 +98,7 @@ The `@wordpress/scripts` package handles the dependencies and default configurat
 With that in mind, let's set up a basic block. Create a file at `src/index.js` with the following content:
 
 ```js
-const { registerBlockType } = wp.blocks;
+import { registerBlockType } from '@wordpress/blocks';
 
 registerBlockType( 'myguten/test-block', {
 	title: 'Basic Example',
@@ -119,7 +119,7 @@ To configure npm to run a script, you use the scripts section in `package.json` 
 
 You can then run the build using: `npm run build`.
 
-After the build finishes, you will see the built file created at `build/index.js`.
+After the build finishes, you will see the built file created at `build/index.js`. Enqueue this file in the admin screen as you would any JavaScript in WordPress, see [Step 2 in this tutorial](loading-javascript.md), and the block will load in the editor.
 
 ## Finishing Touches
 
@@ -140,12 +140,31 @@ Now, when you run `npm start` a watcher will run in the terminal. You can then e
 
 **Note:** keep an eye on your terminal for any errors. If you make a typo or syntax error, the build will fail and the error will be in the terminal.
 
-
 ### Source Control
 
 Because a typical `node_modules` folder will contain thousands of files that change with every software update, you should exclude `node_modules/` from your source control. If you ever start from a fresh clone, simply run `npm install` in the same folder your `package.json` is located to pull your required packages.
 
-Likewise, you do not need to include `node_modules` or any of the above configuration files in your plugin because they will be bundled inside the file that webpack builds. **Be sure to enqueue the `build/index.js` file** in your plugin PHP. This is the only JavaScript file needed for your block to run.
+Likewise, you do not need to include `node_modules` or any of the above configuration files in your plugin because they will be bundled inside the file that webpack builds. **Be sure to enqueue the `build/index.js` file** in your plugin PHP. This is the main JavaScript file needed for your block to run.
+
+### Dependency Management
+
+Using wp-scripts ver 5.0.0+ build step will also produce a `index.asset.php` file that contains an array of dependencies and version number for your block. For our simple example above is something like:
+`array('dependencies' => array('wp-element', 'wp-polyfill'), 'version' => 'fc93c4a9675c108725227db345898bcc');`
+
+Here is how to use this asset file to automatically set the dependency list for enqueuing the script. This prevents having to manually update the dependencies, it will be created based on the package imports used within your block.
+
+```php
+$asset_file = include( plugin_dir_path( __FILE__ ) . 'build/index.asset.php');
+
+wp_register_script(
+	'myguten-block',
+	plugins_url( 'build/index.js', __FILE__ ),
+	$asset_file['dependencies'],
+	$asset_file['version']
+);
+```
+
+See [ESNext blocks in gutenberg-examples repo](https://github.com/WordPress/gutenberg-examples) for full examples.
 
 ## Summary
 

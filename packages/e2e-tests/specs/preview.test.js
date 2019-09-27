@@ -8,12 +8,14 @@ import { parse } from 'url';
  * WordPress dependencies
  */
 import {
+	clickOnCloseModalButton,
 	createNewPost,
 	createURL,
 	publishPost,
 	saveDraft,
 	clickOnMoreMenuItem,
 	pressKeyWithModifier,
+	disableNavigationMode,
 } from '@wordpress/e2e-test-utils';
 
 async function openPreviewPage( editorPage ) {
@@ -44,9 +46,8 @@ async function openPreviewPage( editorPage ) {
  * @return {Promise} Promise resolving once navigation completes.
  */
 async function waitForPreviewNavigation( previewPage ) {
-	const navigationCompleted = previewPage.waitForNavigation();
 	await page.click( '.editor-post-preview' );
-	return navigationCompleted;
+	return previewPage.waitForNavigation();
 }
 
 /**
@@ -70,13 +71,15 @@ async function toggleCustomFieldsOption( shouldBeChecked ) {
 	);
 
 	if ( isChecked !== shouldBeChecked ) {
-		const navigationCompleted = page.waitForNavigation();
 		await checkboxHandle.click();
+		const [ saveButton ] = await page.$x( shouldBeChecked ? '//button[text()="Enable & Reload"]' : '//button[text()="Disable & Reload"]' );
+		const navigationCompleted = page.waitForNavigation();
+		saveButton.click();
 		await navigationCompleted;
 		return;
 	}
 
-	await page.click( '.edit-post-options-modal button[aria-label="Close dialog"]' );
+	await clickOnCloseModalButton( '.edit-post-options-modal' );
 }
 
 describe( 'Preview', () => {
@@ -203,6 +206,7 @@ describe( 'Preview with Custom Fields enabled', () => {
 	beforeEach( async () => {
 		await createNewPost();
 		await toggleCustomFieldsOption( true );
+		await disableNavigationMode();
 	} );
 
 	afterEach( async () => {
@@ -235,11 +239,11 @@ describe( 'Preview with Custom Fields enabled', () => {
 		// Return to editor and modify the title and content.
 		await editorPage.bringToFront();
 		await editorPage.click( '.editor-post-title__input' );
-		await pressKeyWithModifier( 'shift', 'Home' );
+		await pressKeyWithModifier( 'primary', 'a' );
 		await editorPage.keyboard.press( 'Delete' );
 		await editorPage.keyboard.type( 'title 2' );
 		await editorPage.keyboard.press( 'Tab' );
-		await pressKeyWithModifier( 'shift', 'Home' );
+		await pressKeyWithModifier( 'primary', 'a' );
 		await editorPage.keyboard.press( 'Delete' );
 		await editorPage.keyboard.type( 'content 2' );
 
