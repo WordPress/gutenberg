@@ -119,7 +119,7 @@ class Editor extends Component {
 				raw: serialize( parse( props.initialHtml || '' ) ),
 			},
 			type: 'post',
-			status: 'auto-draft',
+			status: 'draft',
 			meta: [],
 		};
 
