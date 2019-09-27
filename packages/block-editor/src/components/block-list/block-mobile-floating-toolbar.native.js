@@ -17,14 +17,12 @@ const { Fill, Slot } = createSlotFill( 'FloatingToolbar' );
 function FloatingToolbar( { children } ) {
 	return (
 		<Fill>
-			<TouchableWithoutFeedback>
+			<TouchableWithoutFeedback onPress={ () => {
+				console.warn( 'WORK' ); //eslint-disable-line no-console
+			} }>
 				<View
-					style={ styles.floatingToolbarContainer }
-				>
-					<View
-						style={ styles.floatingToolbarFill }
-					>{ children }
-					</View>
+					style={ styles.floatingToolbarFill }
+				>{ children }
 				</View>
 			</TouchableWithoutFeedback>
 		</Fill>
