@@ -6,17 +6,19 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-/**
- * Internal dependencies
- */
 import { Component } from '@wordpress/element';
-import { Box, IconButton, Spinner, withTheme } from '@wordpress/components';
+import { IconButton, Spinner, withTheme } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { withSelect } from '@wordpress/data';
 import { RichText } from '@wordpress/block-editor';
 import { isBlobURL } from '@wordpress/blob';
 import { compose } from '@wordpress/compose';
+
+/**
+ * Internal dependencies
+ */
+import MenuBox from './menu-box';
 
 class GalleryImage extends Component {
 	constructor() {
@@ -99,7 +101,7 @@ class GalleryImage extends Component {
 
 	render() {
 		const { url, alt, id, linkTo, link, isFirstItem, isLastItem, isSelected,
-			caption, onRemove, onMoveForward, onMoveBackward, setAttributes,
+			caption, onRemove, onMoveForward, onMoveBackward, setAttributes, isCompact,
 			'aria-label': ariaLabel } = this.props;
 
 		let href;
@@ -141,14 +143,9 @@ class GalleryImage extends Component {
 		return (
 			<figure className={ className }>
 				{ href ? <a href={ href }>{ img }</a> : img }
-				<Box
-					display={ 'inline-flex' }
-					padding={ this.calculatePadding() + 'px' }
-					position="absolute"
-					top="-2px"
-					left="-2px"
-					zIndex={ 20 }
-					bg={ isSelected ? 'primary' : 'inherit' }
+				<MenuBox
+					isSelected={ isSelected }
+					isCompact={ isCompact }
 				>
 					<IconButton
 						icon="arrow-left"
@@ -166,16 +163,12 @@ class GalleryImage extends Component {
 						aria-disabled={ isLastItem }
 						disabled={ ! isSelected }
 					/>
-				</Box>
+				</MenuBox>
 
-				<Box
-					display={ 'inline-flex' }
-					padding={ this.calculatePadding() + 'px' }
-					position="absolute"
-					top="-2px"
-					right="-2px"
-					bg={ isSelected ? 'primary' : 'inherit' }
-					zIndex={ 20 }
+				<MenuBox
+					isSelected={ isSelected }
+					isCompact={ isCompact }
+					right
 				>
 					<IconButton
 						icon="no-alt"
@@ -184,7 +177,7 @@ class GalleryImage extends Component {
 						label={ __( 'Remove Image' ) }
 						disabled={ ! isSelected }
 					/>
-				</Box>
+				</MenuBox>
 				<RichText
 					tagName="figcaption"
 					placeholder={ isSelected ? __( 'Write caption…' ) : null }
