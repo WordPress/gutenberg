@@ -53,7 +53,6 @@ function NavigationMenu( {
 			<div className="wp-block-navigation-menu">
 				<InnerBlocks
 					allowedBlocks={ [ 'core/navigation-menu-item' ] }
-					renderAppender={ InnerBlocks.ButtonBlockAppender }
 				/>
 			</div>
 		</Fragment>

@@ -140,7 +140,6 @@ function NavigationMenuItemEdit( {
 				{ content }
 				<InnerBlocks
 					allowedBlocks={ [ 'core/navigation-menu-item' ] }
-					renderAppender={ InnerBlocks.ButtonBlockAppender }
 				/>
 			</div>
 		</Fragment>
