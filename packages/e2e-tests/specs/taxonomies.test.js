@@ -33,9 +33,7 @@ describe( 'Taxonomies', () => {
 				return Array.from( document.querySelectorAll(
 					'.editor-post-taxonomies__hierarchical-terms-choice .components-checkbox-control__input:checked'
 				) ).map( ( node ) => {
-					return node.parentElement.nextSibling.querySelector(
-						'label'
-					).innerText;
+					return node.parentElement.nextSibling.innerText;
 				} );
 			}
 		);
