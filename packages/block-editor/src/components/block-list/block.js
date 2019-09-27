@@ -576,10 +576,10 @@ function BlockListBlock( {
 							</div>,
 						] }
 					</BlockCrashBoundary>
+					{ !! hasError && <BlockCrashWarning /> }
 					{ shouldShowMobileToolbar && (
 						<BlockMobileToolbar clientId={ clientId } />
 					) }
-					{ !! hasError && <BlockCrashWarning /> }
 				</IgnoreNestedEvents>
 			</div>
 			{ showInserterShortcuts && (
