@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { IconButton, Spinner, withTheme } from '@wordpress/components';
+import { IconButton, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { withSelect } from '@wordpress/data';
@@ -89,14 +89,6 @@ class GalleryImage extends Component {
 				captionSelected: false,
 			} );
 		}
-	}
-
-	calculatePadding() {
-		const { isCompact, theme } = this.props;
-		if ( isCompact ) {
-			return 0;
-		}
-		return theme.space.small;
 	}
 
 	render() {
@@ -193,7 +185,6 @@ class GalleryImage extends Component {
 }
 
 export default compose(
-	withTheme,
 	withSelect( ( select, ownProps ) => {
 		const { getMedia } = select( 'core' );
 		const { id } = ownProps;
