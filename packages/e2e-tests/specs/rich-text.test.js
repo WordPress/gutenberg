@@ -84,11 +84,33 @@ describe( 'RichText', () => {
 		await page.mouse.move( 0, 0 );
 		await page.mouse.move( 10, 10 );
 		await page.click( '[aria-label="Bold"]' );
-		await pressKeyTimes( 'Tab', 5 );
 		await page.keyboard.type( 'bold' );
 		await page.mouse.move( 0, 0 );
 		await page.mouse.move( 10, 10 );
 		await page.click( '[aria-label="Bold"]' );
+		await page.keyboard.type( '.' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should not return focus when tabbing to formatting button', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'Some ' );
+		await pressKeyWithModifier( 'alt', 'F10' );
+		// Wait for button to receive focus.
+		await page.waitForFunction( () =>
+			document.activeElement.nodeName === 'BUTTON'
+		);
+		await pressKeyTimes( 'Tab', 2 );
+		await page.keyboard.press( 'Space' );
+		await pressKeyTimes( 'Tab', 5 );
+		await page.keyboard.type( 'bold' );
+		await pressKeyWithModifier( 'alt', 'F10' );
+		await page.waitForFunction( () =>
+			document.activeElement.nodeName === 'BUTTON'
+		);
+		await pressKeyTimes( 'Tab', 2 );
+		await page.keyboard.press( 'Space' );
 		await pressKeyTimes( 'Tab', 5 );
 		await page.keyboard.type( '.' );
 

@@ -48,6 +48,12 @@ exports[`RichText should not lose selection direction 1`] = `
 <!-- /wp:paragraph -->"
 `;
 
+exports[`RichText should not return focus when tabbing to formatting button 1`] = `
+"<!-- wp:paragraph -->
+<p>Some <strong>bold</strong>.</p>
+<!-- /wp:paragraph -->"
+`;
+
 exports[`RichText should not undo backtick transform with backspace after selection change 1`] = `""`;
 
 exports[`RichText should not undo backtick transform with backspace after typing 1`] = `""`;
@@ -76,14 +82,14 @@ exports[`RichText should transform backtick to code 2`] = `
 <!-- /wp:paragraph -->"
 `;
 
-exports[`RichText should update internal selection after fresh focus 1`] = `
-"<!-- wp:paragraph -->
-<p>1<strong>2</strong></p>
-<!-- /wp:paragraph -->"
-`;
-
 exports[`RichText should undo backtick transform with backspace 1`] = `
 "<!-- wp:paragraph -->
 <p>\`a\`</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`RichText should update internal selection after fresh focus 1`] = `
+"<!-- wp:paragraph -->
+<p>1<strong>2</strong></p>
 <!-- /wp:paragraph -->"
 `;

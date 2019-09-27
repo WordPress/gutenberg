@@ -3,8 +3,17 @@
  */
 import { Fill, ToolbarButton } from '@wordpress/components';
 import { displayShortcut } from '@wordpress/keycodes';
+import { useRef } from '@wordpress/element';
 
-export function RichTextToolbarButton( { name, shortcutType, shortcutCharacter, ...props } ) {
+export function RichTextToolbarButton( {
+	name,
+	shortcutType,
+	shortcutCharacter,
+	onClick,
+	...props
+} ) {
+	const activeElement = useRef( null );
+
 	let shortcut;
 	let fillName = 'RichText.ToolbarControls';
 
@@ -21,6 +30,19 @@ export function RichTextToolbarButton( { name, shortcutType, shortcutCharacter, 
 			<ToolbarButton
 				{ ...props }
 				shortcut={ shortcut }
+				extraProps={ {
+					onMouseDown: () => {
+						activeElement.current = document.activeElement;
+					},
+				} }
+				onClick={ () => {
+					onClick( ...arguments );
+
+					if ( activeElement.current ) {
+						activeElement.current.focus();
+						activeElement.current = null;
+					}
+				} }
 			/>
 		</Fill>
 	);

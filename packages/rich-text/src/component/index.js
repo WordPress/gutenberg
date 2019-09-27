@@ -526,6 +526,8 @@ class RichText extends Component {
 	 * @param {Object}  $2                Named options.
 	 * @param {boolean} $2.withoutHistory If true, no undo level will be
 	 *                                    created.
+	 * @param {boolean} $2.focus          If true, the rich text element will
+	 *                                    receive focus.
 	 */
 	onChange( record, { withoutHistory, focus } = {} ) {
 		if ( focus ) {
