@@ -241,6 +241,7 @@ describe( 'Blocks raw handling', () => {
 			'ms-word',
 			'ms-word-styled',
 			'ms-word-online',
+			'ms-word-with-comment',
 			'evernote',
 			'iframe-embed',
 			'one-image',

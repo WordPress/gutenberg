@@ -1,0 +1,3 @@
+Hello, this is a test. This paragraph can be copied and pasted just fine.
+
+However, this paragraph includes a comment, which breaks copy/paste in WordPress’s Gutenberg editor.
