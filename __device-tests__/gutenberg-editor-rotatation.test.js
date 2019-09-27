@@ -17,7 +17,7 @@ import testData from './helpers/test-data';
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 300000;
 
-xdescribe( 'Gutenberg Editor tests', () => {
+describe( 'Gutenberg Editor tests', () => {
 	let driver;
 	let editorPage;
 	let allPassed = true;
