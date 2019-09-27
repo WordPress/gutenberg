@@ -132,7 +132,6 @@
 		"react-test-renderer": "16.8.4",
 		"rimraf": "2.6.2",
 		"rtlcss": "2.4.0",
-		"sass": "1.22.12",
 		"sass-loader": "6.0.7",
 		"semver": "6.0.0",
 		"shallow-equal": "1.0.0",
