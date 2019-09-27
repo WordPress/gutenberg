@@ -102,7 +102,7 @@ const CoverHeightInput = withInstanceId(
 		);
 		const inputId = `block-cover-height-input-${ instanceId }`;
 		return (
-			<BaseControl label={ __( 'Height in pixels' ) } id={ inputId }>
+			<BaseControl label={ __( 'Minimum height in pixels' ) } id={ inputId }>
 				<input
 					type="number"
 					id={ inputId }
