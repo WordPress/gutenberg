@@ -325,15 +325,16 @@ export function* saveEntityRecord(
 				yield receiveAutosaves( persistedRecord.id, updatedRecord );
 			}
 		} else {
-			// Auto drafts should be converted to drafts on explicit saves,
+			// Auto drafts should be converted to drafts on explicit saves and we should not respect their default title,
 			// but some plugins break with this behavior so we can't filter it on the server.
 			let data = record;
-			if (
-				kind === 'postType' &&
-				persistedRecord && persistedRecord.status === 'auto-draft' &&
-				! data.status
-			) {
-				data = { ...data, status: 'draft' };
+			if ( kind === 'postType' && persistedRecord && persistedRecord.status === 'auto-draft' ) {
+				if ( ! data.status ) {
+					data = { ...data, status: 'draft' };
+				}
+				if ( ! data.title || data.title === 'Auto Draft' ) {
+					data = { ...data, title: '' };
+				}
 			}
 
 			// We perform an optimistic update here to clear all the edits that
