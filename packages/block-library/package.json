@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-library",
-	"version": "2.7.0",
+	"version": "2.9.0",
 	"description": "Block library for the WordPress editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -45,7 +45,7 @@
 		"@wordpress/viewport": "file:../viewport",
 		"classnames": "^2.2.5",
 		"fast-average-color": "4.3.0",
-		"lodash": "^4.17.14",
+		"lodash": "^4.17.15",
 		"memize": "^1.0.5",
 		"moment": "^2.22.1",
 		"tinycolor2": "^1.4.1",

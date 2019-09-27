@@ -1,7 +1,9 @@
 /**
  * Internal dependencies
  */
+import { clickOnCloseModalButton } from './click-on-close-modal-button';
 import { clickOnMoreMenuItem } from './click-on-more-menu-item';
+import { toggleMoreMenu } from './toggle-more-menu';
 
 /**
  * Toggles the screen option with the given label.
@@ -22,5 +24,6 @@ export async function toggleScreenOption( label, shouldBeChecked = undefined ) {
 		await handle.click();
 	}
 
-	await page.click( 'button[aria-label="Close dialog"]' );
+	await clickOnCloseModalButton();
+	await toggleMoreMenu();
 }

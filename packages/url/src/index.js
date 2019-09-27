@@ -8,6 +8,14 @@ const EMAIL_REGEXP = /^(mailto:)?[a-z0-9._%+-]+@[a-z0-9][a-z0-9.-]*\.[a-z]{2,63}
 const USABLE_HREF_REGEXP = /^(?:[a-z]+:|#|\?|\.|\/)/i;
 
 /**
+ * @typedef {{[key: string]: QueryArgParsed}} QueryArgObject
+ */
+
+/**
+ * @typedef {string|string[]|QueryArgObject} QueryArgParsed
+ */
+
+/**
  * Determines whether the given string looks like a URL.
  *
  * @param {string} url The string to scrutinise.
@@ -50,7 +58,7 @@ export function isEmail( email ) {
  * const protocol2 = getProtocol( 'https://wordpress.org' ); // 'https:'
  * ```
  *
- * @return {?string} The protocol part of the URL.
+ * @return {string|void} The protocol part of the URL.
  */
 export function getProtocol( url ) {
 	const matches = /^([^\s:]+:)/.exec( url );
@@ -90,7 +98,7 @@ export function isValidProtocol( protocol ) {
  * const authority2 = getAuthority( 'https://localhost:8080/test/' ); // 'localhost:8080'
  * ```
  *
- * @return {?string} The authority part of the URL.
+ * @return {string|void} The authority part of the URL.
  */
 export function getAuthority( url ) {
 	const matches = /^[^\/\s:]+:(?:\/\/)?\/?([^\/\s#?]+)[\/#?]{0,1}\S*$/.exec( url );
@@ -130,7 +138,7 @@ export function isValidAuthority( authority ) {
  * const path2 = getPath( 'https://wordpress.org/help/faq/' ); // 'help/faq'
  * ```
  *
- * @return {?string} The path part of the URL.
+ * @return {string|void} The path part of the URL.
  */
 export function getPath( url ) {
 	const matches = /^[^\/\s:]+:(?:\/\/)?[^\/\s#?]+[\/]([^\s#?]+)[#?]{0,1}\S*$/.exec( url );
@@ -170,7 +178,7 @@ export function isValidPath( path ) {
  * const queryString2 = getQueryString( 'https://wordpress.org#fragment?query=false&search=hello' ); // 'query=false&search=hello'
  * ```
  *
- * @return {?string} The query string part of the URL.
+ * @return {string|void} The query string part of the URL.
  */
 export function getQueryString( url ) {
 	const matches = /^\S+?\?([^\s#]+)/.exec( url );
@@ -210,7 +218,7 @@ export function isValidQueryString( queryString ) {
  * const fragment2 = getFragment( 'https://wordpress.org#another-fragment?query=true' ); // '#another-fragment'
  * ```
  *
- * @return {?string} The fragment part of the URL.
+ * @return {string|void} The fragment part of the URL.
  */
 export function getFragment( url ) {
 	const matches = /^\S+?(#[^\s\?]*)/.exec( url );
@@ -244,9 +252,9 @@ export function isValidFragment( fragment ) {
  * includes query arguments, the arguments are merged with (and take precedent
  * over) the existing set.
  *
- * @param {?string} url  URL to which arguments should be appended. If omitted,
- *                       only the resulting querystring is returned.
- * @param {Object}  args Query arguments to apply to URL.
+ * @param {string} [url='']  URL to which arguments should be appended. If omitted,
+ *                           only the resulting querystring is returned.
+ * @param {Object} args      Query arguments to apply to URL.
  *
  * @example
  * ```js
@@ -282,15 +290,15 @@ export function addQueryArgs( url = '', args ) {
 /**
  * Returns a single query argument of the url
  *
- * @param {string} url URL
- * @param {string} arg Query arg name
+ * @param {string} url URL.
+ * @param {string} arg Query arg name.
  *
  * @example
  * ```js
  * const foo = getQueryArg( 'https://wordpress.org?foo=bar&bar=baz', 'foo' ); // bar
  * ```
  *
- * @return {Array|string} Query arg value.
+ * @return {QueryArgParsed|undefined} Query arg value.
  */
 export function getQueryArg( url, arg ) {
 	const queryStringIndex = url.indexOf( '?' );
@@ -302,8 +310,8 @@ export function getQueryArg( url, arg ) {
 /**
  * Determines whether the URL contains a given query arg.
  *
- * @param {string} url URL
- * @param {string} arg Query arg name
+ * @param {string} url URL.
+ * @param {string} arg Query arg name.
  *
  * @example
  * ```js
@@ -319,15 +327,15 @@ export function hasQueryArg( url, arg ) {
 /**
  * Removes arguments from the query string of the url
  *
- * @param {string} url  URL
- * @param {...string} args Query Args
+ * @param {string}    url  URL.
+ * @param {...string} args Query Args.
  *
  * @example
  * ```js
  * const newUrl = removeQueryArgs( 'https://wordpress.org?foo=bar&bar=baz&baz=foobar', 'foo', 'bar' ); // https://wordpress.org?baz=foobar
  * ```
  *
- * @return {string} Updated URL
+ * @return {string} Updated URL.
  */
 export function removeQueryArgs( url, ...args ) {
 	const queryStringIndex = url.indexOf( '?' );
@@ -342,16 +350,17 @@ export function removeQueryArgs( url, ...args ) {
 /**
  * Prepends "http://" to a url, if it looks like something that is meant to be a TLD.
  *
- * @param  {string} url The URL to test
+ * @param {string} url The URL to test.
  *
  * @example
  * ```js
  * const actualURL = prependHTTP( 'wordpress.org' ); // http://wordpress.org
  * ```
  *
- * @return {string}     The updated URL
+ * @return {string} The updated URL.
  */
 export function prependHTTP( url ) {
+	url = url.trim();
 	if ( ! USABLE_HREF_REGEXP.test( url ) && ! EMAIL_REGEXP.test( url ) ) {
 		return 'http://' + url;
 	}

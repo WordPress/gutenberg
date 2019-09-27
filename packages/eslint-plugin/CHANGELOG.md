@@ -1,14 +1,21 @@
-## Master
+## 3.0.0 (2019-08-29)
 
 ### Breaking Changes
 
 - The [`@wordpress/no-unused-vars-before-return` rule](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/no-unused-vars-before-return.md) has been improved to exempt object destructuring only if destructuring to more than one property.
 - Stricter JSDoc linting using [`eslint-plugin-jsdoc`](https://github.com/gajus/eslint-plugin-jsdoc).
+- Stricter validation enabled for test files only using new `test-e2e` and `test-unit` rulesets.
 
 ### New Features
 
 - New Rule: [`@wordpress/no-unguarded-get-range-at`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/no-unguarded-get-range-at.md)
 - Enable `wp` global by default in the `recommended` config.
+- New ruleset `test-e2e` added for end-to-end tests validation.
+- New ruleset `test-unit` added for unit tests validation.
+
+### Enhancements
+
+- Remove `@wordpress/dependency-group` and `@wordpress/gutenberg-phase` rules from the `custom` and `recommended` configs and leave them as opt-in features.
 
 ## 2.4.0 (2019-08-05)
 

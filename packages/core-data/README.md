@@ -65,6 +65,8 @@ _Parameters_
 -   _name_ `string`: Name of the edited entity record.
 -   _recordId_ `number`: Record ID of the edited entity record.
 -   _edits_ `Object`: The edits.
+-   _options_ `Object`: Options for the edit.
+-   _options.undoIgnore_ `boolean`: Whether to ignore the edit in undo history or not.
 
 _Returns_
 
@@ -428,6 +430,22 @@ _Returns_
 
 -   `?Object`: The entity record's save error.
 
+<a name="getRawEntityRecord" href="#getRawEntityRecord">#</a> **getRawEntityRecord**
+
+Returns the entity's record object by key,
+with its attributes mapped to their raw values.
+
+_Parameters_
+
+-   _state_ `Object`: State tree.
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _key_ `number`: Record's key.
+
+_Returns_
+
+-   `?Object`: Object with the entity's raw attributes.
+
 <a name="getRedoEdit" href="#getRedoEdit">#</a> **getRedoEdit**
 
 Returns the next edit from the current undo offset
@@ -440,6 +458,27 @@ _Parameters_
 _Returns_
 
 -   `?Object`: The edit.
+
+<a name="getReferenceByDistinctEdits" href="#getReferenceByDistinctEdits">#</a> **getReferenceByDistinctEdits**
+
+Returns a new reference when edited values have changed. This is useful in
+inferring where an edit has been made between states by comparison of the
+return values using strict equality.
+
+_Usage_
+
+    const hasEditOccurred = (
+       getReferenceByDistinctEdits( beforeState ) !==
+       getReferenceByDistinctEdits( afterState )
+    );
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+
+_Returns_
+
+-   `*`: A value whose reference will change only when an edit occurs.
 
 <a name="getThemeSupports" href="#getThemeSupports">#</a> **getThemeSupports**
 

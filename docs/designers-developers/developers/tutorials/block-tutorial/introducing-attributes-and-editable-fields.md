@@ -72,7 +72,11 @@ Here is the complete block definition for Example 03.
 				selector: 'p',
 			},
 		},
-
+		example: {
+			attributes: {
+				content: 'Hello World',
+			},
+		},
 		edit: function( props ) {
 			var content = props.attributes.content;
 			function onChangeContent( newContent ) {
@@ -104,8 +108,8 @@ Here is the complete block definition for Example 03.
 ```
 {% ESNext %}
 ```js
-const { registerBlockType } = wp.blocks;
-const { RichText } = wp.editor;
+import { registerBlockType } from '@wordpress/blocks';
+import { RichText } from '@wordpress/block-editor';
 
 registerBlockType( 'gutenberg-examples/example-03-editable-esnext', {
 	title: 'Example: Editable (esnext)',
@@ -116,6 +120,11 @@ registerBlockType( 'gutenberg-examples/example-03-editable-esnext', {
 			type: 'array',
 			source: 'children',
 			selector: 'p',
+		},
+	},
+	example: {
+		attributes: {
+			content: 'Hello World',
 		},
 	},
 	edit: ( props ) => {

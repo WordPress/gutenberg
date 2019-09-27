@@ -2,74 +2,53 @@
 
 Gutenberg is a Node.js-based project, built primarily in JavaScript.
 
-The easiest way to get started (on MacOS, Linux, or Windows 10 with the Linux Subsystem) is by running the Local Environment setup script, `./bin/setup-local-env.sh`. This will check if you have everything installed and updated, and help you download any extra tools you need.
+The first step is to install a recent version of Node. The easiest way (on MacOS, Linux, or Windows 10 with the Linux Subsystem) is by installing and running [nvm]. Once `nvm` is installed, you can install the correct version of Node by running `nvm install` in the Gutenberg directory.
 
-For another version of Windows, or if you prefer to set things up manually, be sure to have <a href="https://nodejs.org/en/">Node.js installed first</a>. You should be running a Node version matching the [current active LTS release](https://github.com/nodejs/Release#release-schedule) or newer for this plugin to work correctly. You can check your Node.js version by typing `node -v` in the Terminal prompt.
-
-If you have an incompatible version of Node in your development environment, you can use [nvm] to change node versions on the command line:
+Once you have Node installed, run these scripts:
 
 ```
-nvm install
-nvm use
+npm install
+npm run build
 ```
 
-You also should have the latest release of [npm installed][npm]. npm is a separate project from Node.js and is updated frequently. If you've just installed Node.js which includes a version of npm within the installation you most likely will need also to update your npm installation. To update npm, type this into your terminal: `npm install npm@latest -g`
+This will build Gutenberg, ready to be used as a WordPress plugin!
 
-To test the plugin, or to contribute to it, you can clone this repository and build the plugin files using Node. How you do that depends on whether you're developing locally or uploading the plugin to a remote host.
+If you don't have a local WordPress environment to load Gutenberg in, we can help get that up and running, too.
 
 ## Local Environment
 
-First, you need a WordPress Environment to run the plugin on. The quickest way to get up and running is to use the provided docker setup. Install [docker](https://www.docker.com/) and [docker-compose](https://docs.docker.com/compose/) by following the most recent instructions on the docker site.
+The quickest way to get up and running is to use the provided Docker setup. If you don't already have it, you'll need to install Docker by following their instructions for [Windows 10 Pro](https://docs.docker.com/docker-for-windows/install/), [all other version of Windows](https://docs.docker.com/toolbox/toolbox_install_windows/), [macOS](https://docs.docker.com/docker-for-mac/install/), or [Linux](https://docs.docker.com/v17.12/install/linux/docker-ce/ubuntu/#install-using-the-convenience-script).
 
-In the folder of your preference, clone this project and enter the working directory:
-```bash
-git clone git@github.com:WordPress/gutenberg.git
-cd gutenberg
+Once Docker is installed and running, run this script to install WordPress, and build your local environment:
+
+```
+npm run env install
 ```
 
-Then, run a setup script to check if docker and node are configured properly and starts the local WordPress instance. You may need to run this script multiple times if prompted.
+WordPress will be installed in the `wordpress` directory, if you need to access WordPress core files directly, you can find them there.
+
+If you already have WordPress checked out in a different directory, you can use that installation, instead, by running these commands:
+
 ```
-./bin/setup-local-env.sh
-```
-
-**If you're developing themes, or core WordPress functionality alongside Gutenberg**, you can make the WordPress files accessible in `wordpress/` by following these instructions instead:
-
-1. If this is your first time setting up the environment, run `DOCKER_ENV=localwpdev ./bin/setup-local-env.sh` instead of `./bin/setup-local-env.sh`
-2. If you've already had the previous environment set up, you need to start fresh, and you can do that by first running `docker-compose down --rmi all`. After that, you can repeat step 1.
-3. If you turn off your computer or restart Docker, you can get your local WordPress dev environment back by typing `docker-compose -f docker-compose.yml -f docker-compose-localdev.yml up`. If you just run `docker-compose up`, you will get the vanilla install that doesn't expose the WordPress folder.
-
-**If everything was successful**, you'll see the following ASCII art:
-```
-Welcome to...
-
-,⁻⁻⁻·       .                 |
-|  ،⁓’.   . |---  ,---. ,---. |---. ,---. ,---. ,---.
-|   | |   | |     |---' |   | |   | |---' |     |   |
-`---' `---' `---’ `---’ '   ` `---' `---’ `     `---|
-                                                `---'
+export WP_DEVELOP_DIR=/path/to/wordpress-develop
+npm run env connect
 ```
 
-The WordPress installation should be available at `http://localhost:8888` (**Username**: `admin`, **Password**: `password`).
-Inside the "docker" directory, you can use any docker command to interact with your containers. If this port is in use, you can override it in your `docker-compose.override.yml` file. If you're running [e2e tests](/docs/contributors/testing-overview.md#end-to-end-testing), this change will be used correctly.
+This will use WordPress' own local environment, and mount your Gutenberg directory as a volume there.
 
-To bring down this local WordPress instance later run:
-```
-docker-compose down
-```
+In Windows, you can set the `WP_DEVELOP_DIR` environment variable using the appropriate method for your shell:
 
-If you'd like to see your changes reflected in this local WordPress instance, run:
-```
-npm install
-npm run dev
-```
+    CMD: set WP_DEVELOP_DIR=/path/to/wordpress-develop
+    PowerShell: $env:WP_DEVELOP_DIR = "/path/to/wordpress-develop"
 
-Alternatively, you can use your own local WordPress environment and clone this repository right into your `wp-content/plugins` directory.
+The WordPress installation should be available at `http://localhost:8889` (**Username**: `admin`, **Password**: `password`).
+If this port is in use, you can override it using the `LOCAL_PORT` environment variable. For example, `export LOCAL_PORT=7777` will change the URL to `http://localhost:7777` . If you're running [e2e tests](/docs/contributors/testing-overview.md#end-to-end-testing), this change will be used correctly.
 
-Next, open a terminal (or if on Windows, a command prompt) and navigate to the repository you cloned. Now type `npm install` to get the dependencies all set up. Then you can type `npm run dev` in your terminal or command prompt to keep the plugin building in the background as you work on it.
+To bring down this local WordPress instance later run `npm run env stop`. To bring it back up again, run `npm run env start`.
 
-WordPress comes with specific [debug systems](https://wordpress.org/support/article/debugging-in-wordpress/) designed to simplify the process as well as standardize code across core, plugins and themes. It is possible to use environment variables (`WP_DEBUG` and `SCRIPT_DEBUG`) to update a site's configuration constants located in `wp-config.php` file. Both flags can be disabled at any time by running the following command:
+WordPress comes with specific [debug systems](https://wordpress.org/support/article/debugging-in-wordpress/) designed to simplify the process as well as standardize code across core, plugins and themes. It is possible to use environment variables (`LOCAL_WP_DEBUG` and `LOCAL_SCRIPT_DEBUG`) to update a site's configuration constants located in `wp-config.php` file. Both flags can be disabled at any time by running the following command:
 ```
-SCRIPT_DEBUG=false WP_DEBUG=false ./bin/setup-local-env.sh
+LOCAL_SCRIPT_DEBUG=false LOCAL_WP_DEBUG=false npm run env install
 ```
 By default, both flags will be set to `true`.
 

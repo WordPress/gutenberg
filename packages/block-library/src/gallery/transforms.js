@@ -36,7 +36,7 @@ const transforms = {
 				// Loop through all the images and check if they have the same align.
 				align = every( attributes, [ 'align', align ] ) ? align : undefined;
 
-				const validImages = filter( attributes, ( { id, url } ) => id && url );
+				const validImages = filter( attributes, ( { url } ) => url );
 
 				return createBlock( 'core/gallery', {
 					images: validImages.map( ( { id, url, alt, caption } ) => ( {

@@ -42,12 +42,25 @@ export class AutosaveMonitor extends Component {
 	}
 
 	toggleTimer( isPendingSave ) {
-		clearTimeout( this.pendingSave );
-		const { autosaveInterval } = this.props;
-		if ( isPendingSave ) {
+		const { interval, shouldThrottle = false } = this.props;
+
+		// By default, AutosaveMonitor will wait for a pause in editing before
+		// autosaving. In other words, its action is "debounced".
+		//
+		// The `shouldThrottle` props allows overriding this behaviour, thus
+		// making the autosave action "throttled".
+		if ( ! shouldThrottle && this.pendingSave ) {
+			clearTimeout( this.pendingSave );
+			delete this.pendingSave;
+		}
+
+		if ( isPendingSave && ! ( shouldThrottle && this.pendingSave ) ) {
 			this.pendingSave = setTimeout(
-				() => this.props.autosave(),
-				autosaveInterval * 1000
+				() => {
+					this.props.autosave();
+					delete this.pendingSave;
+				},
+				interval * 1000
 			);
 		}
 	}
@@ -58,25 +71,32 @@ export class AutosaveMonitor extends Component {
 }
 
 export default compose( [
-	withSelect( ( select ) => {
+	withSelect( ( select, ownProps ) => {
+		const {
+			getReferenceByDistinctEdits,
+		} = select( 'core' );
+
 		const {
 			isEditedPostDirty,
 			isEditedPostAutosaveable,
-			getReferenceByDistinctEdits,
 			isAutosavingPost,
+			getEditorSettings,
 		} = select( 'core/editor' );
 
-		const { autosaveInterval } = select( 'core/editor' ).getEditorSettings();
+		const { interval = getEditorSettings().autosaveInterval } = ownProps;
 
 		return {
 			isDirty: isEditedPostDirty(),
 			isAutosaveable: isEditedPostAutosaveable(),
 			editsReference: getReferenceByDistinctEdits(),
 			isAutosaving: isAutosavingPost(),
-			autosaveInterval,
+			interval,
 		};
 	} ),
-	withDispatch( ( dispatch ) => ( {
-		autosave: dispatch( 'core/editor' ).autosave,
+	withDispatch( ( dispatch, ownProps ) => ( {
+		autosave() {
+			const { autosave = dispatch( 'core/editor' ).autosave } = ownProps;
+			autosave();
+		},
 	} ) ),
 ] )( AutosaveMonitor );

@@ -17,17 +17,35 @@ import { parse, serialize, getUnregisteredTypeHandlerName, createBlock } from '@
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
+const postTypeEntities = [
+	{ name: 'post', baseURL: '/wp/v2/posts' },
+	{ name: 'page', baseURL: '/wp/v2/pages' },
+	{ name: 'attachment', baseURL: '/wp/v2/media' },
+	{ name: 'wp_block', baseURL: '/wp/v2/blocks' },
+].map( ( postTypeEntity ) => ( {
+	kind: 'postType',
+	...postTypeEntity,
+	transientEdits: {
+		blocks: true,
+	},
+	mergedEdits: {
+		meta: true,
+	},
+} ) );
+
 /**
  * Internal dependencies
  */
 import EditorProvider from './index.js';
 
 class NativeEditorProvider extends Component {
-	constructor( props ) {
+	constructor() {
 		super( ...arguments );
 
 		// Keep a local reference to `post` to detect changes
-		this.post = props.post;
+		this.post = this.props.post;
+		this.props.addEntities( postTypeEntities );
+		this.props.receiveEntityRecords( 'postType', this.post.type, this.post );
 	}
 
 	componentDidMount() {
@@ -173,13 +191,19 @@ export default compose( [
 		const {
 			switchEditorMode,
 		} = dispatch( 'core/edit-post' );
+		const {
+			addEntities,
+			receiveEntityRecords,
+		} = dispatch( 'core' );
 
 		return {
+			addEntities,
 			clearSelectedBlock,
 			insertBlock,
 			editTitle( title ) {
 				editPost( { title } );
 			},
+			receiveEntityRecords,
 			resetEditorBlocksWithoutUndoLevel( blocks ) {
 				resetEditorBlocks( blocks, {
 					__unstableShouldCreateUndoLevel: false,
