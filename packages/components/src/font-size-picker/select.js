@@ -8,7 +8,7 @@ import { map } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { withInstanceId } from '@wordpress/compose';
-import { useState, useRef, useCallback, useEffect } from '@wordpress/element';
+import { useRef, useCallback, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -28,15 +28,6 @@ function FontSizePickerSelect( {
 } ) {
 	const currentFont = fontSizes.find( ( font ) => font.value === value );
 	const currentFontLabel = currentFont ? currentFont.label : '';
-
-	const onChangeValue = ( event ) => {
-		const newValue = event.target.value;
-		if ( newValue === '' ) {
-			onChange( undefined );
-			return;
-		}
-		onChange( Number( newValue ) );
-	};
 
 	/**
   * CHANGES
@@ -66,13 +57,8 @@ function FontSizePickerSelect( {
 	}, [ focusActiveItem, value ] );
 
 	// Work around to manage + force open state outside of Dropdown
-	const [ isOpen, setOpen ] = useState( false );
-	const openDropdown = () => {
-		setOpen( true );
-	};
-	const closeDropdown = () => setOpen( false );
+
 	const handleOnToggle = ( nextOpen ) => {
-		setOpen( nextOpen );
 		if ( nextOpen ) {
 			focusActiveItem();
 		}
@@ -81,12 +67,17 @@ function FontSizePickerSelect( {
 	// Work around to force dropdown to open via Button
 	const handleOnButtonKeyDown = ( event ) => {
 		const { key } = event;
+		const currentIndex = fontSizes.indexOf( currentFont );
+		const highestIndex = fontSizes.length - 1;
+		let newIndex;
 		switch ( key ) {
 			case 'ArrowUp':
-				openDropdown();
+				newIndex = currentIndex > 0 ? currentIndex - 1 : highestIndex;
+				onChange( fontSizes[ newIndex ].value );
 				break;
 			case 'ArrowDown':
-				openDropdown();
+				newIndex = currentIndex < highestIndex ? currentIndex + 1 : 0;
+				onChange( fontSizes[ newIndex ].value );
 				break;
 			default:
 		}
@@ -129,11 +120,7 @@ function FontSizePickerSelect( {
 				contentClassName="components-font-size-picker__select-dropdown-content"
 				position="bottom"
 				focusOnMount="container"
-				onChange={ onChangeValue }
-				onOpen={ openDropdown }
-				onClose={ closeDropdown }
 				onToggle={ handleOnToggle }
-				isOpen={ isOpen }
 				renderToggle={ ( { onToggle } ) => (
 					<Button
 						className="components-font-size-picker__select-selector"
@@ -166,7 +153,6 @@ function FontSizePickerSelect( {
 											key={ option.value }
 											onClick={ () => {
 												onChange( option.value );
-												closeDropdown();
 											} }
 											className={ `is-font-${ option.value }` }
 											role={ itemRole }
