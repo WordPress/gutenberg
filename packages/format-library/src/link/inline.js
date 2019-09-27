@@ -149,9 +149,9 @@ class InlineLinkUI extends Component {
 
 		if ( isCollapsed( value ) && ! isActive ) {
 			const toInsert = applyFormat( create( { text: url } ), format, 0, url.length );
-			onChange( insert( value, toInsert ) );
+			onChange( insert( value, toInsert ), { focus: true } );
 		} else {
-			onChange( applyFormat( value, format ) );
+			onChange( applyFormat( value, format ), { focus: true } );
 		}
 
 		this.resetState();

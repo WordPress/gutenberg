@@ -527,7 +527,11 @@ class RichText extends Component {
 	 * @param {boolean} $2.withoutHistory If true, no undo level will be
 	 *                                    created.
 	 */
-	onChange( record, { withoutHistory } = {} ) {
+	onChange( record, { withoutHistory, focus } = {} ) {
+		if ( focus ) {
+			this.editableRef.focus();
+		}
+
 		this.applyRecord( record );
 
 		const { start, end, activeFormats = [] } = record;
