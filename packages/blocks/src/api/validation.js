@@ -50,7 +50,7 @@ const REGEXP_STYLE_URL_TYPE = /^url\s*\(['"\s]*(.*?)['"\s]*\)$/;
  * See: https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#boolean-attributes
  * Extracted from: https://html.spec.whatwg.org/multipage/indices.html#attributes-3
  *
- * Object.keys( [ ...document.querySelectorAll( '#attributes-1 > tbody > tr' ) ]
+ * Object.keys( Array.from( document.querySelectorAll( '#attributes-1 > tbody > tr' ) )
  *     .filter( ( tr ) => tr.lastChild.textContent.indexOf( 'Boolean attribute' ) !== -1 )
  *     .reduce( ( result, tr ) => Object.assign( result, {
  *         [ tr.firstChild.textContent.trim() ]: true
@@ -97,7 +97,7 @@ const BOOLEAN_ATTRIBUTES = [
  * See: https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#enumerated-attribute
  * Extracted from: https://html.spec.whatwg.org/multipage/indices.html#attributes-3
  *
- * Object.keys( [ ...document.querySelectorAll( '#attributes-1 > tbody > tr' ) ]
+ * Object.keys( Array.from( document.querySelectorAll( '#attributes-1 > tbody > tr' ) )
  *     .filter( ( tr ) => /^("(.+?)";?\s*)+/.test( tr.lastChild.textContent.trim() ) )
  *     .reduce( ( result, tr ) => Object.assign( result, {
  *         [ tr.firstChild.textContent.trim() ]: true
@@ -164,9 +164,9 @@ const TEXT_NORMALIZATIONS = [
  * Tested aginst "12.5 Named character references":
  *
  * ```
- * const references = [ ...document.querySelectorAll(
+ * const references = Array.from( document.querySelectorAll(
  *     '#named-character-references-table tr[id^=entity-] td:first-child'
- * ) ].map( ( code ) => code.textContent )
+ * ) ).map( ( code ) => code.textContent )
  * references.every( ( reference ) => /^[\da-z]+$/i.test( reference ) )
  * ```
  *
