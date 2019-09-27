@@ -4,6 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { toggleFormat } from '@wordpress/rich-text';
 import { RichTextToolbarButton, RichTextShortcut, __unstableRichTextInputEvent } from '@wordpress/block-editor';
+import { Platform } from '@wordpress/element';
 
 const name = 'core/underline';
 const title = __( 'Underline' );
@@ -26,7 +27,17 @@ export const underline = {
 					},
 				} ) );
 		};
-
+		const button = (
+			<RichTextToolbarButton
+				name="underline"
+				icon="editor-underline"
+				title={ title }
+				onClick={ onToggle }
+				isActive={ isActive }
+				shortcutType="primary"
+				shortcutCharacter="u"
+			/>
+		);
 		return (
 			<>
 				<RichTextShortcut
@@ -34,15 +45,7 @@ export const underline = {
 					character="u"
 					onUse={ onToggle }
 				/>
-				<RichTextToolbarButton
-					name="underline"
-					icon="editor-underline"
-					title={ title }
-					onClick={ onToggle }
-					isActive={ isActive }
-					shortcutType="primary"
-					shortcutCharacter="u"
-				/>
+				{ Platform.OS === 'web' ? null : button }
 				<__unstableRichTextInputEvent
 					inputType="formatUnderline"
 					onInput={ onToggle }
