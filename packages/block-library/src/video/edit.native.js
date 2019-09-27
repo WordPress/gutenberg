@@ -26,6 +26,7 @@ import {
 	Caption,
 	MediaPlaceholder,
 	MediaUpload,
+	MediaUploadProgress,
 	MEDIA_TYPE_VIDEO,
 	BlockControls,
 	InspectorControls,
@@ -37,7 +38,6 @@ import { doAction, hasAction } from '@wordpress/hooks';
 /**
  * Internal dependencies
  */
-import MediaUploadProgress from '../image/media-upload-progress';
 import style from './style.scss';
 import SvgIcon from './icon';
 import SvgIconRetry from './icon-retry';
