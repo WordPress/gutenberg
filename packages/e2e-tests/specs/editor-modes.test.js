@@ -78,7 +78,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 		expect( htmlBlockContent ).toEqual( '<p>Hello world!</p>' );
 
 		// Change the font size using the sidebar.
-		await page.select( '.components-font-size-picker__select .components-select-control__input', 'large' );
+		await page.select( '.components-font-size-picker__select-selector', 'large' );
 
 		// Make sure the HTML content updated.
 		htmlBlockContent = await page.$eval( '.block-editor-block-list__layout .block-editor-block-list__block .block-editor-block-list__block-html-textarea', ( node ) => node.textContent );
