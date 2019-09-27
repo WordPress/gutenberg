@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/block-editor';
-import { BaseControl, Box, PanelBody, ResizableBox } from '@wordpress/components';
+import { BaseControl, PanelBody, ResizableBox } from '@wordpress/components';
 import { withInstanceId } from '@wordpress/compose';
 
 const SpacerEdit = ( { attributes, isSelected, setAttributes, instanceId } ) => {
@@ -19,22 +19,6 @@ const SpacerEdit = ( { attributes, isSelected, setAttributes, instanceId } ) => 
 
 	return (
 		<>
-			<Box
-				width={ 1 / 2 }
-				justifyContent="flex-start"
-				alignContent="center"
-				color="#fff"
-				bg="tomato">
-				Tomato
-				<Box
-					bg="blue">
-					Blue
-				</Box>
-				<Box
-					bg="green">
-					Green
-				</Box>
-			</Box>
 			<ResizableBox
 				className={ classnames(
 					'block-library-spacer__resize-container',
