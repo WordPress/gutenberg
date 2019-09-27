@@ -13,3 +13,4 @@ The following resources offer additional information for developers who wish to 
 * [Managing Packages](/docs/contributors/managing-packages.md).
 * [Gutenberg Release Process](/docs/contributors/release.md) - a checklist for the different type of releases for Gutenberg project.
 * [Localizing Gutenberg Plugin](/docs/contributors/localizing.md) - a guide on how to translate Gutenberg in your locale or language.
+* [React Native mobile Gutenberg](/docs/contributors/native-mobile.md) - a guide on the React Native based mobile Gutenberg editor.
