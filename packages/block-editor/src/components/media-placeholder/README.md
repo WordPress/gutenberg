@@ -70,8 +70,6 @@ Class name added to the placeholder.
 - Type: `String`
 - Required: No
 - Platform: Web
-<<<<<<< HEAD
-=======
 
 ### disableDropZone
 
@@ -89,7 +87,6 @@ The `disableDropZone` prop still takes precedence over `dropZoneUIOnly` – spec
 - Type: `Boolean`
 - Required: No
 - Default: `false`
->>>>>>> master
 
 ### icon
 
