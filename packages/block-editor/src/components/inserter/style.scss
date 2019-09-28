@@ -134,12 +134,11 @@ $block-inserter-search-height: 38px;
 	color: $dark-gray-500;
 	margin: auto;
 
-	&::before {
-		content: "?";
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		padding: $grid-size-xlarge $grid-size-large;
+	& > svg {
+		display: block;
+		width: 24px;
+		height: 24px;
+		padding: $grid-size-xlarge $grid-size-xlarge + $grid-size-large;
 		margin-left: auto;
 		margin-right: auto;
 		font-style: normal;
@@ -148,6 +147,7 @@ $block-inserter-search-height: 38px;
 		border-radius: $radius-round-rectangle;
 		border: $border-width dashed $dark-gray-150;
 		margin-bottom: $grid-size-large;
+		box-sizing: content-box;
 	}
 }
 

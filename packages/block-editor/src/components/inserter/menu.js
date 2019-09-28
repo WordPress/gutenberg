@@ -27,6 +27,8 @@ import {
 	PanelBody,
 	withSpokenMessages,
 	Tip,
+	Path,
+	SVG,
 } from '@wordpress/components';
 import {
 	getCategories,
@@ -356,7 +358,12 @@ export class InserterMenu extends Component {
 							</PanelBody>
 						) }
 						{ isEmpty( suggestedItems ) && isEmpty( reusableItems ) && isEmpty( itemsPerCategory ) && (
-							<p className="editor-inserter__no-results block-editor-inserter__no-results">{ __( 'No blocks found.' ) }</p>
+							<p className="editor-inserter__no-results block-editor-inserter__no-results">
+								<SVG width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+									<Path d="M8 10c0-2.21 1.79-4 4-4s4 1.79 4 4c0 1.283-.79 1.973-1.56 2.646C13.712 13.283 13 13.905 13 15h-2c0-1.821.942-2.543 1.77-3.178.65-.498 1.23-.943 1.23-1.822 0-1.1-.9-2-2-2s-2 .9-2 2H8zM13 16v2h-2v-2h2z" fill="#6c7781" />
+								</SVG>
+								{ __( 'No blocks found.' ) }
+							</p>
 						) }
 					</div>
 				</div>
