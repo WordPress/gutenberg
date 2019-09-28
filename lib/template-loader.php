@@ -106,7 +106,7 @@ function gutenberg_find_template( $template_file ) {
 
 	if ( $template_query->have_posts() ) {
 		$template_posts            = $template_query->get_posts();
-		$_wp_current_template_post = $template_posts[0];
+		$_wp_current_template_post = array_shift( $template_posts );
 	}
 
 	// Add extra hooks for template canvas.
