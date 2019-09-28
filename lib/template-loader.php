@@ -111,9 +111,20 @@ function gutenberg_find_template( $template_file ) {
 
 	// Add extra hooks for template canvas.
 	add_action( 'wp_head', 'gutenberg_viewport_meta_tag', 0 );
+	remove_action( 'wp_head', '_wp_render_title_tag', 1 );
+	add_action( 'wp_head', 'gutenberg_render_title_tag', 1 );
 
 	// This file will be included instead of the theme's template file.
 	return gutenberg_dir_path() . 'lib/template-canvas.php';
+}
+
+/**
+ * Displays title tag with content, regardless of whether theme has title-tag support.
+ *
+ * @see _wp_render_title_tag()
+ */
+function gutenberg_render_title_tag() {
+	echo '<title>' . wp_get_document_title() . '</title>' . "\n";
 }
 
 /**
