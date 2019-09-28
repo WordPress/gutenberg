@@ -74,6 +74,8 @@ export default withSelect( ( select ) => {
 	const { getEntityRecords } = select( 'core' );
 	const filterDefaultPages = {
 		parent: 0,
+		order: 'asc',
+		orderby: 'id',
 	};
 	return {
 		pages: getEntityRecords( 'postType', 'page', filterDefaultPages ),
