@@ -189,6 +189,10 @@ _Parameters_
 
 -   _blockType_ `string`: The expected value of the data-type attribute of the block's external wrapper
 
+_Returns_
+
+-   `Promise`: A promise that's resolved when the active element is evaluated and asserted against the expected result.
+
 <a name="findSidebarPanelToggleButtonWithTitle" href="#findSidebarPanelToggleButtonWithTitle">#</a> **findSidebarPanelToggleButtonWithTitle**
 
 Finds a sidebar panel with the provided title.
@@ -586,6 +590,10 @@ _Parameters_
 _Returns_
 
 -   `Promise`: A promise that resolves when it's returned an array of classes representing the contenteditable areas of a block with keyboard focus.
+
+<a name="toggleMoreMenu" href="#toggleMoreMenu">#</a> **toggleMoreMenu**
+
+Toggles the More Menu.
 
 <a name="toggleScreenOption" href="#toggleScreenOption">#</a> **toggleScreenOption**
 
