@@ -19,7 +19,7 @@ function InserterMenuDownloadableBlocksPanel() {
 		<__experimentalInserterMenuExtension>
 			{
 				( { onSelect, onHover, filterValue, hasItems } ) => {
-					if ( ! hasItems ) {
+					if ( hasItems || ! filterValue ) {
 						return null;
 					}
 

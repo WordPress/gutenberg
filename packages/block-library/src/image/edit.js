@@ -674,7 +674,7 @@ export class ImageEdit extends Component {
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				value={ { id, src } }
 				mediaPreview={ mediaPreview }
-				dropZoneUIOnly={ ! isEditing && url }
+				disableMediaButtons={ ! isEditing && url }
 			/>
 		);
 		if ( isEditing || ! url ) {
@@ -939,7 +939,7 @@ export default compose( [
 	withSelect( ( select, props ) => {
 		const { getMedia } = select( 'core' );
 		const { getSettings } = select( 'core/block-editor' );
-		const { id } = props.attributes;
+		const { attributes: { id }, isSelected } = props;
 		const {
 			__experimentalMediaUpload,
 			imageSizes,
@@ -948,7 +948,7 @@ export default compose( [
 		} = getSettings();
 
 		return {
-			image: id ? getMedia( id ) : null,
+			image: id && isSelected ? getMedia( id ) : null,
 			maxWidth,
 			isRTL,
 			imageSizes,

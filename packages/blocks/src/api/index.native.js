@@ -35,5 +35,9 @@ export {
 	isUnmodifiedDefaultBlock,
 	normalizeIconObject,
 } from './utils';
+export {
+	doBlocksMatchTemplate,
+	synchronizeBlocksWithTemplate,
+} from './templates';
 export { pasteHandler, getPhrasingContentSchema } from './raw-handling';
 export { default as children } from './children';

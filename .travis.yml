@@ -20,6 +20,7 @@ cache:
 branches:
   only:
     - master
+    - rnmobile/master
 
 env:
   global:

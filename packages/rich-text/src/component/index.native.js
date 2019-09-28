@@ -14,7 +14,7 @@ import memize from 'memize';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { compose } from '@wordpress/compose';
+import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { childrenBlock } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -770,25 +770,28 @@ export class RichText extends Component {
 			style,
 			__unstableIsSelected: isSelected,
 			children,
+			getStylesFromColorScheme,
 		} = this.props;
 
 		const record = this.getRecord();
 		const html = this.getHtmlToRender( record, tagName );
 
-		let minHeight = styles[ 'rich-text' ].minHeight;
+		let minHeight = styles.richText.minHeight;
 		if ( style && style.minHeight ) {
 			minHeight = style.minHeight;
 		}
 
+		const placeholderStyle = getStylesFromColorScheme( styles.richTextPlaceholder, styles.richTextPlaceholderDark );
+
 		const {
 			color: defaultPlaceholderTextColor,
-		} = styles[ 'rich-text-placeholder' ];
+		} = placeholderStyle;
 
 		const {
 			color: defaultColor,
 			textDecorationColor: defaultTextDecorationColor,
 			fontFamily: defaultFontFamily,
-		} = styles[ 'rich-text' ];
+		} = getStylesFromColorScheme( styles.richText, styles.richTextDark );
 
 		let selection = null;
 		if ( this.needsSelectionUpdate ) {
@@ -817,6 +820,8 @@ export class RichText extends Component {
 			this.firedAfterTextChanged = false;
 		}
 
+		const dynamicStyle = getStylesFromColorScheme( style, styles.richTextDark );
+
 		return (
 			<View>
 				{ children && children( {
@@ -833,7 +838,7 @@ export class RichText extends Component {
 						}
 					} }
 					style={ {
-						...style,
+						...dynamicStyle,
 						minHeight: Math.max( minHeight, this.state.height ),
 					} }
 					text={ { text: html, eventCount: this.lastEventCount, selection } }
@@ -878,4 +883,5 @@ export default compose( [
 	withSelect( ( select ) => ( {
 		formatTypes: select( 'core/rich-text' ).getFormatTypes(),
 	} ) ),
+	withPreferredColorScheme,
 ] )( RichText );

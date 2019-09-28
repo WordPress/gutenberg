@@ -414,14 +414,16 @@ class RichTextWrapper extends Component {
 							completers={ autocompleters }
 							record={ value }
 							onChange={ onChange }
+							isSelected={ isSelected }
 						>
-							{ ( { listBoxId, activeId } ) =>
+							{ ( { listBoxId, activeId, onKeyDown } ) =>
 								<Editable
 									aria-autocomplete={ listBoxId ? 'list' : undefined }
 									aria-owns={ listBoxId }
 									aria-activedescendant={ activeId }
 									start={ start }
 									reversed={ reversed }
+									onKeyDown={ onKeyDown }
 								/>
 							}
 						</Autocomplete>

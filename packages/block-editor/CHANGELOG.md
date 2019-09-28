@@ -1,3 +1,9 @@
+## Master
+
+### Deprecation
+
+- `dropZoneUIOnly` prop in `MediaPlaceholder` component has been deprecated in favor of `disableMediaButtons` prop.
+
 ## 3.0.0 (2019-08-05)
 
 ### New Features
