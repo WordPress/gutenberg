@@ -9,6 +9,7 @@ import {
 	InspectorControls,
 	BlockControls,
 } from '@wordpress/block-editor';
+import { withSelect } from '@wordpress/data';
 import {
 	CheckboxControl,
 	PanelBody,
@@ -25,8 +26,17 @@ function NavigationMenu( {
 	attributes,
 	setAttributes,
 	clientId,
+	pages,
 } ) {
 	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator( clientId );
+	let defaultMenuItems = false;
+	if ( pages ) {
+		defaultMenuItems = pages.map( ( page ) => {
+			return [ 'core/navigation-menu-item',
+				{ label: page.title.rendered, destination: page.permalink_template },
+			];
+		} );
+	}
 
 	return (
 		<Fragment>
@@ -52,6 +62,7 @@ function NavigationMenu( {
 			</InspectorControls>
 			<div className="wp-block-navigation-menu">
 				<InnerBlocks
+					template={ defaultMenuItems ? defaultMenuItems : null }
 					allowedBlocks={ [ 'core/navigation-menu-item' ] }
 				/>
 			</div>
@@ -59,4 +70,13 @@ function NavigationMenu( {
 	);
 }
 
-export default NavigationMenu;
+export default withSelect( ( select ) => {
+	const { getEntityRecords } = select( 'core' );
+	const filterDefaultPages = {
+		parent: 0,
+	};
+	return {
+		pages: getEntityRecords( 'postType', 'page', filterDefaultPages ),
+	};
+} )( NavigationMenu );
+
