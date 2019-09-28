@@ -1,5 +1,6 @@
 /**
  * Tabs through the file upload buttons that appear in a file content block's placeholder area
+ *
  * @return {Promise} A promise that resolves when the browser has completed tabbing through the placeholder buttons that are unique to blocks with file-upload features.
  */
 export const tabThroughPlaceholderButtons = async () => {

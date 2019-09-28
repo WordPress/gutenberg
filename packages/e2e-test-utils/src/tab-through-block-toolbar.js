@@ -1,5 +1,6 @@
 /**
  * Navigate through a block's toolbar using the keyboard. Asserts that each button receives focus.
+ *
  * @return {Promise} A promise that resolves when it's finished tabbing through the buttons in a block's toolbar, asserting that each one received focus.
  */
 
