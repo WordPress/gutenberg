@@ -116,7 +116,11 @@ class ModalLinkUI extends Component {
 	}
 
 	onDismiss() {
-		this.submitLink();
+		if ( this.state.inputValue === '' ) {
+			this.removeLink();
+		} else {
+			this.submitLink();
+		}
 	}
 
 	render() {

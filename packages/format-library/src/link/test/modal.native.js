@@ -15,26 +15,26 @@ describe( 'LinksUI', () => {
 		expect( wrapper ).toBeTruthy();
 	} );
 
-	// it( 'Links are removed when no text is in the URL field', () => {
-	// 	// Given
-	// 	const onRemove = jest.fn();
-	// 	const wrapper = shallow(
-	// 		<ModalLinkUI
-	// 			onRemove={ onRemove }
-	// 			onClose={ jest.fn() }
-	// 		/>
-	// 	).dive().dive(); // -> dive() removes the HOC layer that was blocking access to ModalLinkUI
+	it( 'Links are removed when no text is in the URL field', () => {
+		// Given
+		const onRemove = jest.fn();
+		const wrapper = shallow(
+			<ModalLinkUI
+				onRemove={ onRemove }
+				onClose={ jest.fn() }
+			/>
+		).dive().dive(); // -> dive() removes the HOC layer that was blocking access to ModalLinkUI
 
-	// 	// When
+		// When
 
-	// 	// Close the BottomSheet
-	// 	const bottomSheet = wrapper.find( 'BottomSheet' ).first();
-	// 	bottomSheet.simulate( 'close' );
+		// Close the BottomSheet
+		const bottomSheet = wrapper.find( 'BottomSheet' ).first();
+		bottomSheet.simulate( 'close' );
 
-	// 	// Then
+		// Then
 
-	// 	expect( onRemove ).toHaveBeenCalledTimes( 1 );
-	// } );
+		expect( onRemove ).toHaveBeenCalledTimes( 1 );
+	} );
 
 	it( 'Links are saved when URL field has content', () => {
 		// Given
