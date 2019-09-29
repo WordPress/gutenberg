@@ -26,6 +26,11 @@ const getFeaturedImageMediaFrame = () => {
 			} );
 		},
 
+		/**
+		 * Handle the edit state requirements of selected media item.
+		 *
+		 * @return {void}
+		 */
 		editState( ) {
 			const selection = this.state( 'featured-image' ).get( 'selection' ),
 				view = new wp.media.view.EditImage( { model: selection.single(), controller: this } ).render();
@@ -61,7 +66,51 @@ const getGalleryDetailsMediaFrame = () => {
 	 * @class GalleryDetailsMediaFrame
 	 * @class
 	 */
-	return wp.media.view.MediaFrame.Post.extend( {
+	return wp.media.view.MediaFrame.Select.extend( {
+
+		galleryToolbar( ) {
+			const editing = this.state().get( 'editing' );
+			this.toolbar.set( new wp.media.view.Toolbar( {
+				controller: this,
+				items: {
+					insert: {
+						style: 'primary',
+						text: editing ? wp.media.view.l10n.updateGallery : wp.media.view.l10n.insertGallery,
+						priority: 80,
+						requires: { library: true },
+
+						/**
+						 * @fires wp.media.controller.State#update
+						 */
+						click() {
+							const controller = this.controller,
+								state = controller.state();
+
+							controller.close();
+							state.trigger( 'update', state.get( 'library' ) );
+
+							// Restore and reset the default state.
+							controller.setState( controller.options.state );
+							controller.reset();
+						},
+					},
+				},
+			} ) );
+		},
+
+		/**
+		 * Handle the edit state requirements of selected media item.
+		 *
+		 * @return {void}
+		 */
+		editState( ) {
+			const selection = this.state( 'gallery-library' ).get( 'selection' ),
+				view = new wp.media.view.EditImage( { model: selection.single(), controller: this } ).render();
+			this.content.set( view );
+
+			// after bringing in the frame, load the actual editor via an ajax call
+			view.loadEditor();
+		},
 
 		/**
 		 * Create the default states.
@@ -69,6 +118,9 @@ const getGalleryDetailsMediaFrame = () => {
 		 * @return {void}
 		 */
 		createStates: function createStates() {
+			this.on( 'toolbar:create:main-gallery', this.galleryToolbar, this );
+			this.on( 'content:render:edit-image', this.editState, this );
+
 			this.states.add( [
 				new wp.media.controller.Library( {
 					id: 'gallery',
@@ -83,6 +135,7 @@ const getGalleryDetailsMediaFrame = () => {
 						type: 'image',
 					}, this.options.library ) ),
 				} ),
+				new wp.media.controller.EditImage( { model: this.options.editImage } ),
 
 				new wp.media.controller.GalleryEdit( {
 					library: this.options.selection,
@@ -166,6 +219,7 @@ class MediaUpload extends Component {
 		if ( gallery ) {
 			this.buildAndSetGalleryFrame();
 		} else {
+			this.buildAndSetEditFrame();
 			const frameConfig = {
 				title,
 				button: {
@@ -187,7 +241,6 @@ class MediaUpload extends Component {
 		if ( unstableFeaturedImageFlow ) {
 			this.buildAndSetFeatureImageFrame();
 		}
-		this.buildAndSetEditFrame();
 		this.initializeListeners();
 	}
 
