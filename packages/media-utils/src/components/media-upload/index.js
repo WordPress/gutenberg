@@ -26,6 +26,15 @@ const getFeaturedImageMediaFrame = () => {
 			} );
 		},
 
+		editState( ) {
+			const selection = this.state( 'featured-image' ).get( 'selection' ),
+				view = new wp.media.view.EditImage( { model: selection.single(), controller: this } ).render();
+			this.content.set( view );
+
+			// after bringing in the frame, load the actual editor via an ajax call
+			view.loadEditor();
+		},
+
 		/**
 		 * Create the default states.
 		 *
@@ -33,8 +42,11 @@ const getFeaturedImageMediaFrame = () => {
 		 */
 		createStates: function createStates() {
 			this.on( 'toolbar:create:featured-image', this.featuredImageToolbar, this );
+			this.on( 'content:render:edit-image', this.editState, this );
+
 			this.states.add( [
 				new wp.media.controller.FeaturedImage(),
+				new wp.media.controller.EditImage( { model: this.options.editImage } ),
 			] );
 		},
 	} );
@@ -81,6 +93,37 @@ const getGalleryDetailsMediaFrame = () => {
 				} ),
 
 				new wp.media.controller.GalleryAdd(),
+			] );
+		},
+	} );
+};
+
+const addEditState = ( types ) => {
+	return wp.media.view.MediaFrame.Select.extend( {
+
+		editState( ) {
+			const selection = this.state( 'library' ).get( 'selection' ),
+				view = new wp.media.view.EditImage( { model: selection.single(), controller: this } ).render();
+
+			this.content.set( view );
+
+			// after bringing in the frame, load the actual editor via an ajax call
+			view.loadEditor();
+		},
+		/**
+		 * Create the default states.
+		 *
+		 * @return {void}
+		 */
+		createStates: function createStates() {
+			this.on( 'content:render:edit-image', this.editState, this );
+			this.states.add( [
+				new wp.media.controller.Library( {
+					library: wp.media.query( defaults( {
+						type: types,
+					}, this.options.library ) ),
+				} ),
+				new wp.media.controller.EditImage( { model: this.options.editImage } ),
 			] );
 		},
 	} );
@@ -144,7 +187,7 @@ class MediaUpload extends Component {
 		if ( unstableFeaturedImageFlow ) {
 			this.buildAndSetFeatureImageFrame();
 		}
-
+		this.buildAndSetEditFrame();
 		this.initializeListeners();
 	}
 
@@ -184,7 +227,6 @@ class MediaUpload extends Component {
 		if ( ! this.GalleryDetailsMediaFrame ) {
 			this.GalleryDetailsMediaFrame = getGalleryDetailsMediaFrame();
 		}
-
 		const attachments = getAttachmentsCollection( value );
 		const selection = new wp.media.model.Selection( attachments.models, {
 			props: attachments.props.toJSON(),
@@ -210,6 +252,22 @@ class MediaUpload extends Component {
 		this.frame = new featuredImageFrame( {
 			mimeType: this.props.allowedTypes,
 			state: 'featured-image',
+			multiple: this.props.multiple,
+			selection,
+			editing: ( this.props.value ) ? true : false,
+		} );
+		wp.media.frame = this.frame;
+	}
+
+	buildAndSetEditFrame() {
+		const editFrame = addEditState( this.props.allowedTypes );
+		const attachments = getAttachmentsCollection( this.props.value );
+		const selection = new wp.media.model.Selection( attachments.models, {
+			props: attachments.props.toJSON(),
+		} );
+		this.frame = new editFrame( {
+			mimeType: this.props.allowedTypes,
+			state: 'library',
 			multiple: this.props.multiple,
 			selection,
 			editing: ( this.props.value ) ? true : false,
@@ -250,7 +308,6 @@ class MediaUpload extends Component {
 
 	onOpen() {
 		this.updateCollection();
-
 		if ( ! this.props.value ) {
 			return;
 		}
