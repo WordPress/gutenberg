@@ -25,7 +25,7 @@ import {
 	toHTMLString,
 	slice,
 } from '@wordpress/rich-text';
-import { withFilters, IsolatedEventContainer } from '@wordpress/components';
+import { withFilters } from '@wordpress/components';
 import { createBlobURL } from '@wordpress/blob';
 import deprecated from '@wordpress/deprecated';
 import { isURL } from '@wordpress/url';
@@ -36,6 +36,7 @@ import { isURL } from '@wordpress/url';
 import Autocomplete from '../autocomplete';
 import BlockFormatControls from '../block-format-controls';
 import FormatToolbar from './format-toolbar';
+import InlineFormatToolbar from './inline-format-toolbar';
 import { withBlockEditContext } from '../block-edit/context';
 import { RemoveBrowserShortcuts } from './remove-browser-shortcuts';
 
@@ -326,7 +327,6 @@ class RichTextWrapper extends Component {
 			undo,
 			placeholder,
 			keepPlaceholderOnFocus,
-			withoutWrapper,
 			// eslint-disable-next-line no-unused-vars
 			allowedFormats,
 			withoutInteractiveFormatting,
@@ -404,13 +404,7 @@ class RichTextWrapper extends Component {
 							</BlockFormatControls>
 						) }
 						{ isSelected && inlineToolbar && hasFormats && (
-							<IsolatedEventContainer className={ classnames(
-								'editor-rich-text__inline-toolbar',
-								'block-editor-rich-text__inline-toolbar',
-								{ 'without-wrapper': withoutWrapper }
-							) }>
-								<FormatToolbar />
-							</IsolatedEventContainer>
+							<InlineFormatToolbar />
 						) }
 						{ isSelected && <RemoveBrowserShortcuts /> }
 						<Autocomplete
@@ -436,7 +430,7 @@ class RichTextWrapper extends Component {
 			</RichText>
 		);
 
-		if ( withoutWrapper ) {
+		if ( ! wrapperClassName ) {
 			return content;
 		}
 

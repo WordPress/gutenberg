@@ -59,17 +59,13 @@ figcaption.block-editor-rich-text__editable [data-rich-text-placeholder]::before
 
 .block-editor-rich-text__inline-toolbar {
 	position: relative;
-
-	&:not(.without-wrapper) {
-		display: flex;
-		justify-content: center;
-		position: absolute;
-		top: -$block-controls-height - 4px;
-		line-height: 0;
-		left: 0;
-		right: 0;
-		z-index: 1;
-	}
+	display: flex;
+	justify-content: center;
+	top: -$block-controls-height - 4px;
+	line-height: 0;
+	left: 0;
+	right: 0;
+	z-index: 1;
 
 	ul.components-toolbar {
 		box-shadow: $shadow-toolbar;
