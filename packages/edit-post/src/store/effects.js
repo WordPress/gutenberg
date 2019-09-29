@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { reduce, isFunction } from 'lodash';
+import { reduce } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -44,7 +44,7 @@ const effects = {
 		const hasActiveMetaBoxes = select( 'core/edit-post' ).hasMetaBoxes();
 
 		// First remove any existing subscription in order to prevent multiple saves
-		if ( isFunction( saveMetaboxUnsubscribe ) ) {
+		if ( !! saveMetaboxUnsubscribe ) {
 			saveMetaboxUnsubscribe();
 		}
 
