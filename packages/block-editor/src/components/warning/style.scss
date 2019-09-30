@@ -16,7 +16,10 @@
 	.is-selected & {
 		// Use opacity to work in various editor styles.
 		border-color: $dark-opacity-light-800;
-		border-left-color: transparent;
+
+		@include break-small {
+			border-left-color: transparent;
+		}
 
 		.is-dark-theme & {
 			border-color: $light-opacity-light-800;
