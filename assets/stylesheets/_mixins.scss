@@ -511,10 +511,14 @@
 		}
 	}
 
+	// We provide explicit pixel dimensions to ensure a crisp appearance.
+	// This radio button style should be ported upstream.
 	input[type="radio"] {
 		border-radius: $radius-round;
 
 		&:checked::before {
+			width: 6px;
+			height: 6px;
 			margin: 6px 0 0 6px;
 			background-color: $white;
 
