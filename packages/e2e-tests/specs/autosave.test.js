@@ -96,7 +96,7 @@ describe( 'autosave', () => {
 		await page.keyboard.type( ' after save' );
 
 		// Trigger local autosave
-		await page.evaluate( () => window.wp.data.dispatch( 'core/editor' ).localAutosave() );
+		await page.evaluate( () => window.wp.data.dispatch( 'core/editor' ).__experimentalLocalAutosave() );
 		// Reload without saving on the server
 		await page.reload();
 
@@ -160,7 +160,7 @@ describe( 'autosave', () => {
 		await page.keyboard.type( 'after save' );
 
 		// Trigger local autosave
-		await page.evaluate( () => window.wp.data.dispatch( 'core/editor' ).localAutosave() );
+		await page.evaluate( () => window.wp.data.dispatch( 'core/editor' ).__experimentalLocalAutosave() );
 		expect( await page.evaluate( () => window.sessionStorage.length ) ).toBe( 1 );
 
 		// Trigger remote autosave
@@ -174,7 +174,7 @@ describe( 'autosave', () => {
 		await saveDraft();
 
 		await page.keyboard.type( 'after save' );
-		await page.evaluate( () => window.wp.data.dispatch( 'core/editor' ).localAutosave() );
+		await page.evaluate( () => window.wp.data.dispatch( 'core/editor' ).__experimentalLocalAutosave() );
 		expect( await page.evaluate( () => window.sessionStorage.length ) ).toBe( 1 );
 
 		toggleOfflineMode( true );
@@ -197,7 +197,7 @@ describe( 'autosave', () => {
 		// Trigger remote autosave
 		await page.evaluate( () => window.wp.data.dispatch( 'core/editor' ).autosave() );
 		// Force conflicting local autosave
-		await page.evaluate( () => window.wp.data.dispatch( 'core/editor' ).localAutosave() );
+		await page.evaluate( () => window.wp.data.dispatch( 'core/editor' ).__experimentalLocalAutosave() );
 		expect( await page.evaluate( () => window.sessionStorage.length ) ).toBe( 1 );
 
 		await page.reload();

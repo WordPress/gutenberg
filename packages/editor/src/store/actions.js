@@ -372,7 +372,7 @@ export function* autosave( options ) {
 	);
 }
 
-export function* localAutosave() {
+export function* __experimentalLocalAutosave() {
 	const post = yield select( STORE_KEY, 'getCurrentPost' );
 	const title = yield select( STORE_KEY, 'getEditedPostAttribute', 'title' );
 	const content = yield select( STORE_KEY, 'getEditedPostAttribute', 'content' );
