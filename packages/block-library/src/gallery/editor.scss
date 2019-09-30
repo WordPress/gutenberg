@@ -54,7 +54,8 @@ ul.wp-block-gallery {
 		}
 	}
 
-	.is-selected {
+	.is-selected .block-library-gallery-item__move-menu,
+	.is-selected .block-library-gallery-item__inline-menu {
 		background-color: theme(primary);
 
 		.components-button {

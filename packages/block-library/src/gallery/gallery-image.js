@@ -137,6 +137,7 @@ class GalleryImage extends Component {
 				<MenuBox
 					isSelected={ isSelected }
 					isCompact={ isCompact }
+					className="block-library-gallery-item__move-menu"
 				>
 					<IconButton
 						icon="arrow-left"
@@ -160,6 +161,7 @@ class GalleryImage extends Component {
 					isSelected={ isSelected }
 					isCompact={ isCompact }
 					right
+					className="block-library-gallery-item__inline-menu"
 				>
 					<IconButton
 						icon="no-alt"
