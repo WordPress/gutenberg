@@ -28,7 +28,7 @@ export const settings = {
 		attributes: {
 			customOverlayColor: '#065174',
 			dimRatio: 40,
-			url: 'https://images.unsplash.com/photo-1549880339-d93e3072aef4',
+			url: 'https://upload.wikimedia.org/wikipedia/commons/9/95/Windbuchencom.jpg',
 		},
 		innerBlocks: [
 			{

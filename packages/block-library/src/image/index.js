@@ -28,7 +28,7 @@ export const settings = {
 	example: {
 		attributes: {
 			sizeSlug: 'large',
-			url: 'https://images.unsplash.com/photo-1549880339-d93e3072aef4',
+			url: 'https://upload.wikimedia.org/wikipedia/commons/1/15/MtBlanc1.JPG',
 			caption: __( 'Mont Blanc appears—still, snowy, and serene.' ),
 		},
 	},

@@ -29,7 +29,7 @@ export const settings = {
 	example: {
 		attributes: {
 			mediaType: 'image',
-			mediaUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Cistothorus_palustris_Iona.jpg/607px-Cistothorus_palustris_Iona.jpg',
+			mediaUrl: 'https://upload.wikimedia.org/wikipedia/commons/d/d4/Biologia_Centrali-Americana_-_Cantorchilus_semibadius_1902.jpg',
 		},
 		innerBlocks: [
 			{

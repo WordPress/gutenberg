@@ -26,8 +26,8 @@ export const settings = {
 		attributes: {
 			columns: 2,
 			images: [
-				{ url: 'https://images.unsplash.com/photo-1506653291967-767803668ace' },
-				{ url: 'https://images.unsplash.com/photo-1505764761634-1d77b57e1966' },
+				{ url: 'https://upload.wikimedia.org/wikipedia/commons/c/c3/Glacial_lakes%2C_Bhutan.jpg' },
+				{ url: 'https://upload.wikimedia.org/wikipedia/commons/0/01/Sediment_off_the_Yucatan_Peninsula.jpg' },
 			],
 		},
 	},

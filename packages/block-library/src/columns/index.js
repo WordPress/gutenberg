@@ -38,7 +38,7 @@ export const settings = {
 					{
 						name: 'core/image',
 						attributes: {
-							url: 'https://images.unsplash.com/photo-1549880339-d93e3072aef4',
+							url: 'https://upload.wikimedia.org/wikipedia/commons/9/95/Windbuchencom.jpg',
 						},
 					},
 					{
