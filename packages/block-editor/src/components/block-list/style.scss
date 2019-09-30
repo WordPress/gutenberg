@@ -1236,9 +1236,11 @@
 	transform: translateY(-$block-padding);
 
 	&.block-editor-block-list__block-crash-warning {
-		// Reset margin-bottom. Without this, the block has negative margin.
-		// Because of the crash the block also has no content, so this avoids
-		// overlapping of the next block.
+		// The block crash warning has no block preview underneath it.
+		// The lack of a preview combined with the negative margin that
+		// the warning normally has results in crashed blocks overlapping
+		// any blocks that come after them. Resetting the margin to `auto`
+		// solves this.
 		margin-bottom: auto;
 	}
 }
