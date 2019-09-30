@@ -412,4 +412,23 @@ describe( 'List', () => {
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	it( 'should not indent list on space with modifier', async () => {
+		await clickBlockAppender();
+
+		await page.keyboard.type( '* 1' );
+		await page.keyboard.press( 'Enter' );
+		await pressKeyWithModifier( 'shift', 'Space' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should only convert to list when shortcut ends with space', async () => {
+		await clickBlockAppender();
+
+		// Tests the shortcut with a non breaking space.
+		await page.keyboard.type( '* ' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );

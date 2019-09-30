@@ -650,9 +650,14 @@ class RichText extends Component {
 	 * @param {SyntheticEvent} event A synthetic keyboard event.
 	 */
 	handleSpace( event ) {
+		const { keyCode, shiftKey, altKey, metaKey, ctrlKey } = event;
 		const { tagName, __unstableMultilineTag: multilineTag } = this.props;
 
-		if ( event.keyCode !== SPACE || multilineTag !== 'li' ) {
+		if (
+			// Only override when no modifiers are pressed.
+			shiftKey || altKey || metaKey || ctrlKey ||
+			keyCode !== SPACE || multilineTag !== 'li'
+		) {
 			return;
 		}
 
