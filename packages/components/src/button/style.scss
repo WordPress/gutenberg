@@ -87,6 +87,8 @@
 
 		// [aria-disabled="true"] is not specific enough to override default styling,
 		// so double-up selector to increase specificity.
+		// This is primarily an issue on Button components that are aria-disabled,
+		// but not disabled.
 		&:disabled,
 		&:disabled:active:enabled,
 		&[aria-disabled="true"][aria-disabled="true"],
@@ -97,6 +99,7 @@
 			opacity: 1;
 
 			// This specificity is needed to override alternate color schemes in WP-Admin.
+			// This can presumably be removed when https://core.trac.wordpress.org/ticket/34904 lands.
 			&.is-button,
 			&.is-button:hover,
 			&:active:enabled {
