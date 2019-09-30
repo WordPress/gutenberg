@@ -20,8 +20,8 @@
 
 	// Default button style
 	&.is-default {
-		color: color(theme(button) shade(5%));
-		border-color: color(theme(button) shade(5%));
+		color: color(theme(button) shade(6%));
+		border-color: color(theme(button) shade(6%));
 		background: #f3f5f6;
 
 		&:hover {
@@ -41,7 +41,6 @@
 		}
 
 		&:active:enabled {
-			transform: translateY(1px);
 			background: #f3f5f6;
 			color: color(theme(button) shade(5%));
 			border-color: #7e8993;
@@ -80,7 +79,6 @@
 		}
 
 		&:active:enabled {
-			transform: translateY(1px);
 			background: color(theme(button) shade(20%));
 			border-color: color(theme(button) shade(20%));
 			color: $white;
