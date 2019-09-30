@@ -20,6 +20,13 @@ export const settings = {
 	supports: {
 		align: [ 'left', 'center', 'right' ],
 	},
+	example: {
+		innerBlocks: [
+			{ name: 'core/social-link-wordpress', attributes: { url: 'https://wordpress.org' } },
+			{ name: 'core/social-link-facebook', attributes: { url: 'https://www.facebook.com/WordPress/' } },
+			{ name: 'core/social-link-twitter', attributes: { url: 'https://twitter.com/WordPress' } },
+		],
+	},
 	styles: [
 		{ name: 'default', label: __( 'Default' ), isDefault: true },
 		{ name: 'logos-only', label: __( 'Logos Only' ) },
