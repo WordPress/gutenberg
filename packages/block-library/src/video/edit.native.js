@@ -2,7 +2,7 @@
  * External dependencies
  */
 import React from 'react';
-import { View, TouchableWithoutFeedback, Text } from 'react-native';
+import { TouchableWithoutFeedback, Text } from 'react-native';
 /**
  * Internal dependencies
  */
@@ -21,6 +21,7 @@ import {
 	Toolbar,
 	ToolbarButton,
 	withTheme,
+	Box,
 } from '@wordpress/components';
 
 import {
@@ -61,7 +62,7 @@ class VideoEdit extends React.Component {
 		this.finishMediaUploadWithFailure = this.finishMediaUploadWithFailure.bind( this );
 		this.updateMediaProgress = this.updateMediaProgress.bind( this );
 		this.onVideoPressed = this.onVideoPressed.bind( this );
-		this.onVideoContanerLayout = this.onVideoContanerLayout.bind( this );
+		this.onVideoContainerLayout = this.onVideoContainerLayout.bind( this );
 		this.onFocusCaption = this.onFocusCaption.bind( this );
 	}
 
@@ -140,7 +141,7 @@ class VideoEdit extends React.Component {
 		setAttributes( { id, src: url } );
 	}
 
-	onVideoContanerLayout( event ) {
+	onVideoContainerLayout( event ) {
 		const { width } = event.nativeEvent.layout;
 		const height = width / VIDEO_ASPECT_RATIO;
 		if ( height !== this.state.videoContainerHeight ) {
@@ -182,20 +183,20 @@ class VideoEdit extends React.Component {
 
 		if ( ! id ) {
 			return (
-				<View style={ { flex: 1 } } >
+				<Box flex={ 1 }>
 					<MediaPlaceholder
 						allowedTypes={ [ MEDIA_TYPE_VIDEO ] }
 						onSelect={ this.onSelectMediaUploadOption }
 						icon={ this.getIcon( false, true ) }
 						onFocus={ this.props.onFocus }
 					/>
-				</View>
+				</Box>
 			);
 		}
 
 		return (
 			<TouchableWithoutFeedback onPress={ this.onVideoPressed } disabled={ ! isSelected }>
-				<View style={ { flex: 1 } }>
+				<Box flex={ 1 }>
 					{ ! this.state.isCaptionSelected &&
 						<BlockControls>
 							{ toolbarEditButton }
@@ -216,12 +217,17 @@ class VideoEdit extends React.Component {
 						renderContent={ ( { isUploadInProgress, isUploadFailed, retryMessage } ) => {
 							const showVideo = isURL( src ) && ! isUploadInProgress && ! isUploadFailed;
 							const icon = this.getIcon( isUploadFailed, false );
-							const styleIconContainer = isUploadFailed ? style.modalIconRetry : style.modalIcon;
+							const iconContainerSize = isUploadFailed ? 80 : 40;
 
 							const iconContainer = (
-								<View style={ styleIconContainer }>
+								<Box
+									width={ iconContainerSize }
+									height={ iconContainerSize }
+									alignItems="center"
+									justifyContent="center"
+								>
 									{ icon }
-								</View>
+								</Box>
 							);
 
 							const videoStyle = {
@@ -232,24 +238,22 @@ class VideoEdit extends React.Component {
 							const containerStyle = showVideo && isSelected ? style.containerFocused : style.container;
 
 							return (
-								<View onLayout={ this.onVideoContanerLayout } style={ containerStyle }>
-									{ showVideo &&
-										<View style={ style.videoContainer }>
+								<Box onLayout={ this.onVideoContainerLayout } { ...containerStyle }>
+									{ showVideo ?
+										( <Box { ...style.videoContainer }>
 											<Video
 												isSelected={ isSelected && ! this.state.isCaptionSelected }
 												style={ videoStyle }
 												source={ { uri: src } }
 												paused={ true }
 											/>
-										</View>
-									}
-									{ ! showVideo &&
-										<View style={ { height: videoContainerHeight, width: '100%', ...style.placeholder } }>
+										</Box> )									:
+										( <Box { ...{ height: videoContainerHeight, width: '100%', ...style.placeholder } } >
 											{ videoContainerHeight > 0 && iconContainer }
 											{ isUploadFailed && <Text style={ style.uploadFailedText }>{ retryMessage }</Text> }
-										</View>
+										</Box> )
 									}
-								</View>
+								</Box>
 							);
 						} }
 					/>
@@ -259,7 +263,7 @@ class VideoEdit extends React.Component {
 						onFocus={ this.onFocusCaption }
 						onBlur={ this.props.onBlur } // always assign onBlur as props
 					/>
-				</View>
+				</Box>
 			</TouchableWithoutFeedback>
 		);
 	}
