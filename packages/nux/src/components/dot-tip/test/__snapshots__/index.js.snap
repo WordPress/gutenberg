@@ -8,6 +8,7 @@ exports[`DotTip should render correctly 1`] = `
   getAnchorRect={[Function]}
   noArrow={true}
   onClick={[Function]}
+  onFocusOutside={[Function]}
   position="middle right"
   role="dialog"
 >
