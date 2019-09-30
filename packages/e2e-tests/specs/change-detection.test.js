@@ -323,4 +323,29 @@ describe( 'Change detection', () => {
 
 		await assertIsDirty( false );
 	} );
+
+	it( 'should save posts without titles and persist and overwrite the auto draft title', async () => {
+		// Enter content.
+		await clickBlockAppender();
+		await page.keyboard.type( 'Paragraph' );
+
+		// Save
+		await Promise.all( [
+			// Wait for "Saved" to confirm save complete.
+			page.waitForSelector( '.editor-post-saved-state.is-saved' ),
+
+			// Keyboard shortcut Ctrl+S save.
+			pressKeyWithModifier( 'primary', 'S' ),
+		] );
+
+		// Verify that the title is empty.
+		const title = await page.$eval(
+			'.editor-post-title__input',
+			( element ) => element.innerHTML
+		);
+		expect( title ).toBe( '' );
+
+		// Verify that the post is not dirty.
+		await assertIsDirty( false );
+	} );
 } );
