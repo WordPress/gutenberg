@@ -14,6 +14,9 @@ import {
 // Constant to override editor preference
 const AUTOSAVE_INTERVAL_SECONDS = 5;
 
+const AUTOSAVE_NOTICE_REMOTE = 'There is an autosave of this post that is more recent than the version below.';
+const AUTOSAVE_NOTICE_LOCAL = 'The backup of this post in your browser is different from the version below.';
+
 async function saveDraftWithKeyboard() {
 	return pressKeyWithModifier( 'primary', 's' );
 }
@@ -98,7 +101,7 @@ describe( 'autosave', () => {
 		await page.reload();
 
 		const notice = await page.$eval( '.components-notice__content', ( element ) => element.innerText );
-		expect( notice ).toContain( 'The backup of this post in your browser is different from the version below.' );
+		expect( notice ).toContain( AUTOSAVE_NOTICE_LOCAL );
 
 		expect( await getEditedPostContent() ).toEqual( wrapParagraph( 'before save' ) );
 		await page.click( '.components-notice__action' );
@@ -188,16 +191,23 @@ describe( 'autosave', () => {
 		await page.keyboard.type( 'before publish' );
 		await publishPost();
 
-		await page.type( '.wp-block-paragraph', ' after publish' );
+		await page.click( '.wp-block-paragraph' );
+		await page.keyboard.type( ' after publish' );
 
-		await sleep( AUTOSAVE_INTERVAL_SECONDS + 2 );
-		await page.evaluate( () => window.wp.data.dispatch( 'core/editor' ).autosave() );
+		// Trigger remote autosave
+		// await page.evaluate( () => window.wp.data.dispatch( 'core/editor' ).autosave() );
+		// Force conflicting local autosave
+		await page.evaluate( () => window.wp.data.dispatch( 'core/editor' ).localAutosave() );
+		expect( await page.evaluate( () => window.sessionStorage.length ) ).toBe( 1 );
 
 		await page.reload();
 
 		// Only one autosave notice should be displayed.
+		await sleep( 2 );
 		const notices = await page.$$( '.components-notice' );
 		expect( notices.length ).toBe( 1 );
+		const notice = await page.$eval( '.components-notice__content', ( element ) => element.innerText );
+		expect( notice ).toContain( AUTOSAVE_NOTICE_REMOTE );
 	} );
 
 	afterAll( async () => {

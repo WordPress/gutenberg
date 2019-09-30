@@ -62,45 +62,74 @@ function useAutosaveNotice() {
 	const {
 		postId,
 		getEditedPostAttribute,
-	} = useSelect( ( select ) => ( {
-		postId: select( 'core/editor' ).getCurrentPostId(),
-		getEditedPostAttribute: select( 'core/editor' ).getEditedPostAttribute,
-	} ) );
+		remoteAutosave,
+		hasFetchedAutosave,
+	} = useSelect( ( select ) => {
+		const _postId = select( 'core/editor' ).getCurrentPostId();
+		const postType = select( 'core/editor' ).getCurrentPostType();
+		const user = select( 'core' ).getCurrentUser();
+		return {
+			postId: _postId,
+			getEditedPostAttribute: select( 'core/editor' ).getEditedPostAttribute,
+			remoteAutosave: select( 'core' ).getAutosave( postType, _postId, user.id ),
+			hasFetchedAutosave: select( 'core' ).hasFetchedAutosaves( postType, _postId ),
+		};
+	} );
 
 	const { createWarningNotice, removeNotice } = useDispatch( 'core/notices' );
 	const { editPost, resetEditorBlocks } = useDispatch( 'core/editor' );
 
 	useEffect( () => {
-		let autosave = localAutosaveGet( postId );
-		if ( ! autosave ) {
+		if ( ! hasFetchedAutosave ) {
+			return;
+		}
+
+		let localAutosave = localAutosaveGet( postId );
+		if ( ! localAutosave ) {
 			return;
 		}
 
 		try {
-			autosave = JSON.parse( autosave );
+			localAutosave = JSON.parse( localAutosave );
 		} catch ( error ) {
 			// Not usable if it can't be parsed.
 			return;
 		}
 
-		const { post_title: title, content, excerpt } = autosave;
+		const { post_title: title, content, excerpt } = localAutosave;
 		const edits = { title, content, excerpt };
 
-		// Only display a notice if there is a difference between what has been
-		// saved and that which is stored in sessionStorage.
-		const hasDifference = Object.keys( edits ).some( ( key ) => {
-			return edits[ key ] !== getEditedPostAttribute( key );
-		} );
+		{
+			// Only display a notice if there is a difference between what has been
+			// saved and that which is stored in sessionStorage.
+			const hasDifference = Object.keys( edits ).some( ( key ) => {
+				return edits[ key ] !== getEditedPostAttribute( key );
+			} );
 
-		if ( ! hasDifference ) {
-			// If there is no difference, it can be safely ejected from storage.
-			localAutosaveClear( postId );
+			if ( ! hasDifference ) {
+				// If there is no difference, it can be safely ejected from storage.
+				localAutosaveClear( postId );
+				return;
+			}
+		}
 
-			return;
+		if ( remoteAutosave ) { // FIXME
+			const hasDifference = Object.keys( edits ).some( ( key ) => {
+				return edits[ key ] !== remoteAutosave[ key ].raw;
+			} );
+			if ( ! hasDifference ) {
+				localAutosaveClear( postId );
+				return;
+			}
+
+			const remo = Object.keys( edits ).reduce( ( acc, k ) => ( {
+				...acc,
+				[ k ]: remoteAutosave[ k ].raw,
+			} ), {} );
+			throw new Error( JSON.stringify( [ edits, remo ] ) );
 		}
 
 		const noticeId = uniqueId( 'wpEditorAutosaveRestore' );
-
 		createWarningNotice( __( 'The backup of this post in your browser is different from the version below.' ), {
 			id: noticeId,
 			actions: [
@@ -114,7 +143,7 @@ function useAutosaveNotice() {
 				},
 			],
 		} );
-	}, [ postId ] );
+	}, [ postId, remoteAutosave ] );
 }
 
 /**
