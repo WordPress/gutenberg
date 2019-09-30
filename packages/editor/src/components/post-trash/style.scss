@@ -1,10 +1,12 @@
 .editor-post-trash.components-button {
 	width: 100%;
-	color: darken($alert-red, 10%);
+	color: darken($alert-red, 15%);
+	border-color: darken($alert-red, 15%);
 	justify-content: center;
 
 	&:hover,
 	&:focus {
-		color: darken($alert-red, 15%);
+		color: darken($alert-red, 20%);
+		border-color: darken($alert-red, 20%);
 	}
 }
