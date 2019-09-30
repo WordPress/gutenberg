@@ -1,4 +1,4 @@
-public typealias MediaPickerDidPickMediaCallback = (_ id: Int32?, _ url: String?) -> Void
+public typealias MediaPickerDidPickMediaCallback = (_ id: Int32?, _ url: String?, _ mediaType: String?) -> Void
 
 public enum MediaPickerSource: String {
     case mediaLibrary = "SITE_MEDIA_LIBRARY"

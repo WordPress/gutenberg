@@ -22,12 +22,12 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
             return MediaFilter.other
         })
         DispatchQueue.main.async {
-            self.delegate?.gutenbergDidRequestMedia(from: mediaSource, filter: mediaFilter, with: { (mediaID, url) in
+            self.delegate?.gutenbergDidRequestMedia(from: mediaSource, filter: mediaFilter, with: { (mediaID, url, mediaType) in
                 guard let mediaID = mediaID else {
                     callback(nil)
                     return
                 }
-                callback([mediaID, url, mediaFilter])
+                callback([mediaID, url, mediaType])
             })
         }
     }
@@ -39,12 +39,12 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
             return
         }
         DispatchQueue.main.async {
-            self.delegate?.gutenbergDidRequestImport(from: url, with: { (mediaID, url) in
+            self.delegate?.gutenbergDidRequestImport(from: url, with: { (mediaID, url, mediaType) in
                 guard let url = url, let mediaID = mediaID else {
                     callback(nil)
                     return
                 }
-                callback([mediaID, url])
+                callback([mediaID, url, mediaType])
             })
         }
     }
