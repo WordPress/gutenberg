@@ -21,6 +21,11 @@ export const settings = {
 	description: __( 'Add custom HTML code and preview it as you edit.' ),
 	icon,
 	keywords: [ __( 'embed' ) ],
+	example: {
+		attributes: {
+			content: '<marquee>' + __( 'Welcome to the wonderful world of blocks…' ) + '</marquee>',
+		},
+	},
 	supports: {
 		customClassName: false,
 		className: false,
