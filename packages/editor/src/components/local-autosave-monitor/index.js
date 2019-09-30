@@ -42,19 +42,6 @@ const hasSessionStorageSupport = once( () => {
 } );
 
 /**
- * Custom hook which returns a callback function to be invoked when a local
- * autosave should occur.
- *
- * @return {Function} Callback function.
- */
-function useAutosaveCallback() {
-	const { localAutosave } = useDispatch( 'core/editor' );
-	return useCallback( () => {
-		requestIdleCallback( localAutosave );
-	}, [] );
-}
-
-/**
  * Custom hook which manages the creation of a notice prompting the user to
  * restore a local autosave, if one exists.
  */
@@ -72,7 +59,7 @@ function useAutosaveNotice() {
 			postId: _postId,
 			getEditedPostAttribute: select( 'core/editor' ).getEditedPostAttribute,
 			remoteAutosave: select( 'core' ).getAutosave( postType, _postId, user.id ),
-			hasFetchedAutosave: select( 'core' ).hasFetchedAutosaves( postType, _postId ),
+			hasFetchedAutosave: select( 'core' ).hasFetchedAutosaves( postType, _postId ) && user.id,
 		};
 	} );
 
@@ -113,20 +100,8 @@ function useAutosaveNotice() {
 			}
 		}
 
-		if ( remoteAutosave ) { // FIXME
-			const hasDifference = Object.keys( edits ).some( ( key ) => {
-				return edits[ key ] !== remoteAutosave[ key ].raw;
-			} );
-			if ( ! hasDifference ) {
-				localAutosaveClear( postId );
-				return;
-			}
-
-			const remo = Object.keys( edits ).reduce( ( acc, k ) => ( {
-				...acc,
-				[ k ]: remoteAutosave[ k ].raw,
-			} ), {} );
-			throw new Error( JSON.stringify( [ edits, remo ] ) );
+		if ( remoteAutosave ) {
+			return;
 		}
 
 		const noticeId = uniqueId( 'wpEditorAutosaveRestore' );
@@ -143,7 +118,7 @@ function useAutosaveNotice() {
 				},
 			],
 		} );
-	}, [ postId, remoteAutosave ] );
+	}, [ postId, hasFetchedAutosave ] );
 }
 
 /**
@@ -167,10 +142,7 @@ function useAutosavePurge() {
 	const lastIsAutosaving = useRef( isAutosaving );
 
 	useEffect( () => {
-		if (
-			( lastIsDirty.current && ! isDirty ) ||
-			( lastIsAutosaving.current && ! isAutosaving && ! didError )
-		) {
+		if ( lastIsAutosaving.current && ! isAutosaving && ! didError ) {
 			localAutosaveClear( postId );
 		}
 
@@ -180,7 +152,10 @@ function useAutosavePurge() {
 }
 
 function LocalAutosaveMonitor() {
-	const autosave = useAutosaveCallback();
+	const { localAutosave } = useDispatch( 'core/editor' );
+	const autosave = useCallback( () => {
+		requestIdleCallback( localAutosave );
+	}, [] );
 	useAutosaveNotice();
 	useAutosavePurge();
 

@@ -195,7 +195,7 @@ describe( 'autosave', () => {
 		await page.keyboard.type( ' after publish' );
 
 		// Trigger remote autosave
-		// await page.evaluate( () => window.wp.data.dispatch( 'core/editor' ).autosave() );
+		await page.evaluate( () => window.wp.data.dispatch( 'core/editor' ).autosave() );
 		// Force conflicting local autosave
 		await page.evaluate( () => window.wp.data.dispatch( 'core/editor' ).localAutosave() );
 		expect( await page.evaluate( () => window.sessionStorage.length ) ).toBe( 1 );
