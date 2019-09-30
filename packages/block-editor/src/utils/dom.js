@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { isString, includes } from 'lodash';
+
+/**
  * Given a block client ID, returns the corresponding DOM node for the block,
  * if exists. As much as possible, this helper should be avoided, and used only
  * in cases where isolated behaviors need remote access to a block node.
@@ -85,4 +90,15 @@ export function isInsideRootBlock( blockElement, element ) {
  */
 export function hasInnerBlocksContext( element ) {
 	return !! element.querySelector( '.block-editor-block-list__layout' );
+}
+
+/**
+ * Determines whether the parameter is a custom element tag name.
+ *
+ * @param {*} tagName Parameter to be checked.
+ *
+ * @return {boolean} True if the parameter is a custom element, or false otherwise.
+ */
+export function isCustomElement( tagName ) {
+	return isString( tagName ) && includes( tagName, '-' );
 }
