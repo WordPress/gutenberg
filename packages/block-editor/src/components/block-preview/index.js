@@ -32,7 +32,13 @@ const getOnlineStyles = ( scale, x, y, isReady, width ) => ( {
 	width,
 } );
 
-function ScaledBlockPreview( { blocks, viewportWidth, padding = 0, onReady } ) {
+function ScaledBlockPreview( {
+	blocks,
+	viewportWidth,
+	padding = 0,
+	onReady,
+	delay,
+} ) {
 	const previewRef = useRef( null );
 
 	const [ isReady, setIsReady ] = useState( false );
@@ -108,7 +114,7 @@ function ScaledBlockPreview( { blocks, viewportWidth, padding = 0, onReady } ) {
 				previewContainerRef: previewRef,
 				styles: getOnlineStyles( scale, _x, _y, true, viewportWidth ),
 			} );
-		}, 0 );
+		}, delay );
 
 		// Cleanup
 		return () => {
@@ -157,6 +163,7 @@ export function BlockPreview( {
 	padding,
 	settings,
 	__experimentalOnReady = noop,
+	__experimentalDelay = 100,
 } ) {
 	const renderedBlocks = useMemo( () => castArray( blocks ), [ blocks ] );
 	const [ recompute, triggerRecompute ] = useReducer(
@@ -177,6 +184,7 @@ export function BlockPreview( {
 				viewportWidth={ viewportWidth }
 				padding={ padding }
 				onReady={ __experimentalOnReady }
+				delay={ __experimentalDelay }
 			/>
 		</BlockEditorProvider>
 	);
