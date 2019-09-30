@@ -21,7 +21,7 @@ import { select, dispatch } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { isValidIcon, normalizeIconObject } from './utils';
+import { isValidIcon, normalizeIconObject, isCustomElement } from './utils';
 import { DEPRECATED_ENTRY_KEYS } from './constants';
 
 /**
@@ -180,9 +180,9 @@ export function registerBlockType( name, settings ) {
 		);
 		return;
 	}
-	if ( 'edit' in settings && ! isFunction( settings.edit ) ) {
+	if ( 'edit' in settings && ! isFunction( settings.edit ) && ! isCustomElement( settings.edit ) ) {
 		console.error(
-			'The "edit" property must be a valid function.'
+			'The "edit" property must be a valid component or custom element tag name.'
 		);
 		return;
 	}

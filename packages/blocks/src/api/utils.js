@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { every, has, isFunction, isString } from 'lodash';
+import { every, has, isFunction, isString, includes } from 'lodash';
 import { default as tinycolor, mostReadable } from 'tinycolor2';
 
 /**
@@ -120,4 +120,15 @@ export function normalizeBlockType( blockTypeOrName ) {
 	}
 
 	return blockTypeOrName;
+}
+
+/**
+ * Determines whether the parameter is a custom element tag name.
+ *
+ * @param {*} tagName Parameter to be checked.
+ *
+ * @return {boolean} True if the parameter is a custom element, or false otherwise.
+ */
+export function isCustomElement( tagName ) {
+	return isString( tagName ) && includes( tagName, '-' );
 }
