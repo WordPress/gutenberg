@@ -30,7 +30,7 @@ export const settings = {
 			{
 				name: 'core/paragraph',
 				attributes: {
-					textColor: 'vivid-red',
+					customTextColor: '#cf2e2e',
 					fontSize: 'large',
 					content: __( 'One.' ),
 				},
@@ -38,7 +38,7 @@ export const settings = {
 			{
 				name: 'core/paragraph',
 				attributes: {
-					textColor: 'luminous-vivid-orange',
+					customTextColor: '#ff6900',
 					fontSize: 'large',
 					content: __( 'Two.' ),
 				},
@@ -46,7 +46,7 @@ export const settings = {
 			{
 				name: 'core/paragraph',
 				attributes: {
-					textColor: 'luminous-vivid-amber',
+					customTextColor: '#fcb900',
 					fontSize: 'large',
 					content: __( 'Three.' ),
 				},
@@ -54,7 +54,7 @@ export const settings = {
 			{
 				name: 'core/paragraph',
 				attributes: {
-					textColor: 'vivid-green-cyan',
+					customTextColor: '#00d084',
 					fontSize: 'large',
 					content: __( 'Four.' ),
 				},
@@ -62,7 +62,7 @@ export const settings = {
 			{
 				name: 'core/paragraph',
 				attributes: {
-					textColor: 'vivid-cyan-blue',
+					customTextColor: '#0693e3',
 					fontSize: 'large',
 					content: __( 'Five.' ),
 				},
@@ -70,7 +70,7 @@ export const settings = {
 			{
 				name: 'core/paragraph',
 				attributes: {
-					textColor: 'vivid-purple',
+					customTextColor: '#9b51e0',
 					fontSize: 'large',
 					content: __( 'Six.' ),
 				},
