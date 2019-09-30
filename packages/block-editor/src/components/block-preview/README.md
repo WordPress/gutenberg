@@ -30,6 +30,12 @@ Width of the preview container in pixels. Controls at what size the blocks will 
 
 `viewportWidth` can be used to simulate how blocks look on different device sizes or to make sure make sure multiple previews will be rendered with the same scale, regardless of their content.
 
+### __experimentalScalingDelay
+* **Type** `Int`
+* **Default** `100ms`
+
+It defines the delay before to start to calc the scale factor and position of the preview block.
+
 ### `__experimentalOnReady`
 * **Type** `Function`
 * **Default:** `noop`
@@ -39,7 +45,7 @@ Use this callback as an opportunity to know when the preview is ready. The callb
 * `scale`: the scale factor
 * `position`: offsets position (x, y)
 * `previewContainerRef`: DOM element reference
-* `styles`: Online styles applied to the preview container
+* `inlineStyles`: Inline styles applied to the preview container
 
 Eg:
 

@@ -24,7 +24,7 @@ import BlockEditorProvider from '../provider';
 import BlockList from '../block-list';
 import { getBlockPreviewContainerDOMNode } from '../../utils/dom';
 
-const getOnlineStyles = ( scale, x, y, isReady, width ) => ( {
+const getInlineStyles = ( scale, x, y, isReady, width ) => ( {
 	transform: `scale(${ scale })`,
 	visibility: isReady ? 'visible' : 'hidden',
 	left: -x,
@@ -37,7 +37,7 @@ function ScaledBlockPreview( {
 	viewportWidth,
 	padding = 0,
 	onReady,
-	delay,
+	scalingDelay,
 } ) {
 	const previewRef = useRef( null );
 
@@ -112,9 +112,15 @@ function ScaledBlockPreview( {
 				scale,
 				position: { x: _x, y: _y },
 				previewContainerRef: previewRef,
-				styles: getOnlineStyles( scale, _x, _y, true, viewportWidth ),
+				inlineStyles: getInlineStyles(
+					scale,
+					_x,
+					_y,
+					true,
+					viewportWidth
+				),
 			} );
-		}, delay );
+		}, scalingDelay );
 
 		// Cleanup
 		return () => {
@@ -128,7 +134,7 @@ function ScaledBlockPreview( {
 		return null;
 	}
 
-	const previewStyles = getOnlineStyles(
+	const previewStyles = getInlineStyles(
 		previewScale,
 		x,
 		y,
@@ -163,7 +169,7 @@ export function BlockPreview( {
 	padding,
 	settings,
 	__experimentalOnReady = noop,
-	__experimentalDelay = 100,
+	__experimentalScalingDelay = 100,
 } ) {
 	const renderedBlocks = useMemo( () => castArray( blocks ), [ blocks ] );
 	const [ recompute, triggerRecompute ] = useReducer(
@@ -184,7 +190,7 @@ export function BlockPreview( {
 				viewportWidth={ viewportWidth }
 				padding={ padding }
 				onReady={ __experimentalOnReady }
-				delay={ __experimentalDelay }
+				scalingDelay={ __experimentalScalingDelay }
 			/>
 		</BlockEditorProvider>
 	);
