@@ -219,6 +219,7 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 		}
 
 		include( ABSPATH . WPINC . '/version.php' );
+		global $wp_version;
 
 		$url = 'http://api.wordpress.org/plugins/info/1.2/';
 		$url = add_query_arg(
@@ -236,7 +237,6 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 			$url = set_url_scheme( $url, 'https' );
 		}
 
-		global $wp_version;
 		$http_args = array(
 			'timeout'    => 15,
 			'user-agent' => 'WordPress/' . $wp_version . '; ' . home_url( '/' ),
