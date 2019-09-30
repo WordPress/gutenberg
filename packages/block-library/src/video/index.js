@@ -23,7 +23,7 @@ export const settings = {
 	keywords: [ __( 'movie' ) ],
 	example: {
 		attributes: {
-			src: 'https://make.wordpress.org/design/files/2019/03/block-manager.mp4',
+			src: 'https://make.wordpress.org/design/files/2019/09/wordpress.mp4',
 			caption: __( 'Block Manager' ),
 		},
 	},
