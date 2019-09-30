@@ -104,7 +104,7 @@ const getGalleryDetailsMediaFrame = () => {
 		 * @return {void}
 		 */
 		editState( ) {
-			const selection = this.state( 'gallery-library' ).get( 'selection' ),
+			const selection = this.state( 'gallery' ).get( 'selection' ),
 				view = new wp.media.view.EditImage( { model: selection.single(), controller: this } ).render();
 			this.content.set( view );
 
