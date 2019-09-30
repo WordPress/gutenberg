@@ -11,6 +11,11 @@ import { __ } from '@wordpress/i18n';
 
 const { wp } = window;
 
+/**
+ * Prepares the Featured Image toolbars and frames.
+ *
+ * @return {wp.media.view.MediaFrame.Select} The default media workflow.
+ */
 const getFeaturedImageMediaFrame = () => {
 	return wp.media.view.MediaFrame.Select.extend( {
 		/**
@@ -57,7 +62,11 @@ const getFeaturedImageMediaFrame = () => {
 	} );
 };
 
-// Getter for the sake of unit tests.
+/**
+ * Prepares the Gallery toolbars and frames.
+ *
+ * @return {wp.media.view.MediaFrame.Select} The default media workflow.
+ */
 const getGalleryDetailsMediaFrame = () => {
 	/**
 	 * Custom gallery details frame.
@@ -68,6 +77,11 @@ const getGalleryDetailsMediaFrame = () => {
 	 */
 	return wp.media.view.MediaFrame.Select.extend( {
 
+		/**
+		 * Set up gallery toolbar.
+		 *
+		 * @return {void}
+		 */
 		galleryToolbar( ) {
 			const editing = this.state().get( 'editing' );
 			this.toolbar.set( new wp.media.view.Toolbar( {
@@ -151,6 +165,12 @@ const getGalleryDetailsMediaFrame = () => {
 	} );
 };
 
+/**
+ * Prepares the edit state and sets the listener for "Edit Image" button click.
+ *
+ * @param {Object} types passes the allowedTypes object to the media library.
+ * @return {wp.media.view.MediaFrame.Select} The default media workflow.
+ */
 const addEditState = ( types ) => {
 	return wp.media.view.MediaFrame.Select.extend( {
 
@@ -252,6 +272,11 @@ class MediaUpload extends Component {
 		this.frame.on( 'close', this.onClose );
 	}
 
+	/**
+	 * Sets the Gallery frame and initializes listeners.
+	 *
+	 * @return {void}
+	 */
 	buildAndSetGalleryFrame() {
 		const {
 			addToGallery = false,
@@ -296,6 +321,11 @@ class MediaUpload extends Component {
 		this.initializeListeners();
 	}
 
+	/**
+	 * Initializes the Media Library requirements for the featured image flow.
+	 *
+	 * @return {void}
+	 */
 	buildAndSetFeatureImageFrame() {
 		const featuredImageFrame = getFeaturedImageMediaFrame();
 		const attachments = getAttachmentsCollection( this.props.value );
@@ -312,6 +342,11 @@ class MediaUpload extends Component {
 		wp.media.frame = this.frame;
 	}
 
+	/**
+	 * Initializes the Media Library requirements for "Edit Image" buton inside the Attachment Details frame.
+	 *
+	 * @return {void}
+	 */
 	buildAndSetEditFrame() {
 		const editFrame = addEditState( this.props.allowedTypes );
 		const attachments = getAttachmentsCollection( this.props.value );
