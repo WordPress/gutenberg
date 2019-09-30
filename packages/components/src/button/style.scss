@@ -20,35 +20,32 @@
 
 	// Default button style
 	&.is-default {
-		color: #555;
-		border-color: #ccc;
-		background: #f7f7f7;
-		box-shadow: inset 0 -1px 0 #ccc;
+		color: color(theme(button) shade(5%));
+		border-color: color(theme(button) shade(5%));
+		background: #f3f5f6;
 
 		&:hover {
-			background: #fafafa;
-			border-color: #999;
-			box-shadow: inset 0 -1px 0 #999;
-			color: #23282d;
+			background: #f1f1f1;
+			border-color: color(theme(button) shade(25%));
+			color: color(theme(button) shade(25%));
 			text-decoration: none;
 		}
 
 		&:focus:enabled {
-			background: #fafafa;
-			color: #23282d;
-			border-color: #999;
-			box-shadow:
-				inset 0 -1px 0 #999,
-				0 0 0 1px $white,
-				0 0 0 3px $blue-medium-focus;
+			background: #f3f5f6;
+			color: color(theme(button) shade(25%));
+			border-color: color(theme(button) shade(5%));
+			box-shadow: 0 0 0 1px color(theme(button) shade(5%));
 			text-decoration: none;
 
 		}
 
 		&:active:enabled {
-			background: #eee;
-			border-color: #999;
-			box-shadow: inset 0 1px 0 #999,;
+			transform: translateY(1px);
+			background: #f3f5f6;
+			color: color(theme(button) shade(5%));
+			border-color: #7e8993;
+			box-shadow: none;
 		}
 
 		&:disabled,
@@ -56,7 +53,6 @@
 			color: #a0a5aa;
 			border-color: #ddd;
 			background: #f7f7f7;
-			box-shadow: none;
 			text-shadow: 0 1px 0 #fff;
 			transform: none;
 			opacity: 1;
