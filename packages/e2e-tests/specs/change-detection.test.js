@@ -330,7 +330,13 @@ describe( 'Change detection', () => {
 		await page.keyboard.type( 'Paragraph' );
 
 		// Save
-		await pressKeyWithModifier( 'primary', 'S' );
+		await Promise.all( [
+			// Wait for "Saved" to confirm save complete.
+			page.waitForSelector( '.editor-post-saved-state.is-saved' ),
+
+			// Keyboard shortcut Ctrl+S save.
+			pressKeyWithModifier( 'primary', 'S' ),
+		] );
 
 		// Verify that the title is empty.
 		const title = await page.$eval(
