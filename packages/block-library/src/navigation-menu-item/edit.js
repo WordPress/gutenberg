@@ -6,6 +6,7 @@ import { invoke } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { withSelect } from '@wordpress/data';
 import {
 	Dropdown,
 	ExternalLink,
@@ -149,4 +150,11 @@ function NavigationMenuItemEdit( {
 	);
 }
 
-export default NavigationMenuItemEdit;
+export default withSelect( ( select, ownProps ) => {
+	const { hasSelectedInnerBlock } = select( 'core/block-editor' );
+	const { clientId } = ownProps;
+
+	return {
+		isParentOfSelectedBlock: hasSelectedInnerBlock( clientId, true ),
+	};
+} )( NavigationMenuItemEdit );

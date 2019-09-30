@@ -459,7 +459,6 @@ function BlockListBlock( {
 		<BlockEdit
 			name={ name }
 			isSelected={ isSelected }
-			isParentOfSelectedBlock={ isParentOfSelectedBlock }
 			attributes={ attributes }
 			setAttributes={ setAttributes }
 			insertBlocksAfter={ isLocked ? undefined : onInsertBlocksAfter }
