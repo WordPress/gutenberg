@@ -1234,4 +1234,13 @@
 	// Pull the warning upwards to the edge, and add a negative bottom margin to compensate.
 	margin-bottom: -$block-padding;
 	transform: translateY(-$block-padding);
+
+	&.block-editor-block-list__block-crash-warning {
+		// The block crash warning has no block preview underneath it.
+		// The lack of a preview combined with the negative margin that
+		// the warning normally has results in crashed blocks overlapping
+		// any blocks that come after them. Resetting the margin to `auto`
+		// solves this.
+		margin-bottom: auto;
+	}
 }
