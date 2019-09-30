@@ -181,7 +181,7 @@ function BlockListBlock( {
 
 	// Handling the error state
 	const [ hasError, setErrorState ] = useState( false );
-	const onBlockError = () => setErrorState( false );
+	const onBlockError = () => setErrorState( true );
 
 	// Handling of forceContextualToolbarFocus
 	const isForcingContextualToolbar = useRef( false );
@@ -576,10 +576,10 @@ function BlockListBlock( {
 							</div>,
 						] }
 					</BlockCrashBoundary>
+					{ !! hasError && <BlockCrashWarning /> }
 					{ shouldShowMobileToolbar && (
 						<BlockMobileToolbar clientId={ clientId } />
 					) }
-					{ !! hasError && <BlockCrashWarning /> }
 				</IgnoreNestedEvents>
 			</div>
 			{ showInserterShortcuts && (
