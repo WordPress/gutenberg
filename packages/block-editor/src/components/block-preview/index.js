@@ -61,7 +61,7 @@ function ScaledBlockPreview( { blocks, viewportWidth } ) {
 			}
 
 			setIsReady( true );
-		}, 100 );
+		}, 0 );
 
 		// Cleanup
 		return () => {
