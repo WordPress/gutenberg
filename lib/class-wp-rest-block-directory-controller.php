@@ -225,8 +225,9 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 			array(
 				'action'              => 'query_plugins',
 				'request[block]'      => $search_string,
-				'request[wp_version]' => '5.3',
+				'request[locale]'     => get_user_locale(),
 				'request[per_page]'   => '3',
+				'request[wp_version]' => '5.3',
 			),
 			$url
 		);
