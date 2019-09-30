@@ -2,12 +2,12 @@
 	background-color: $dark-gray-500;
 	margin: auto;
 	min-width: 100;
-	max-height: 44;
+	max-height: $floating-toolbar-height;
 	border-radius: 22px;
 	flex-direction: row;
 	z-index: 100;
-	top: -44;
-	height: 44;
+	top: -$floating-toolbar-height;
+	height: $floating-toolbar-height;
 	position: absolute;
 	align-items: center;
 	justify-content: center;

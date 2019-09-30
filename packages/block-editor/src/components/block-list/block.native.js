@@ -25,8 +25,6 @@ import BlockInvalidWarning from './block-invalid-warning';
 import BlockMobileToolbar from './block-mobile-toolbar';
 import FloatingToolbar from './block-mobile-floating-toolbar';
 
-const toolbarHeight = 44;
-
 class BlockListBlock extends Component {
 	constructor() {
 		super( ...arguments );
@@ -114,7 +112,7 @@ class BlockListBlock extends Component {
 			isValid,
 			showTitle,
 			title,
-			displayToolbar,
+			showFloatingToolbar,
 			parentId,
 			isFirstBlock,
 		} = this.props;
@@ -125,14 +123,14 @@ class BlockListBlock extends Component {
 
 		return (
 			<>
-				{ displayToolbar && ( ! isFirstBlock || parentId === '' ) && <FloatingToolbar.Slot /> }
+				{ showFloatingToolbar && ( ! isFirstBlock || parentId === '' ) && <FloatingToolbar.Slot /> }
 				<FloatingToolbar />
 				<TouchableWithoutFeedback
 					onPress={ this.onFocus }
 					accessible={ ! isSelected }
 					accessibilityRole={ 'button' }
 				>
-					<View style={ [ styles.blockHolder, borderStyle, { borderColor, minHeight: toolbarHeight } ] }>
+					<View style={ [ styles.blockHolder, borderStyle, { borderColor } ] }>
 						{ showTitle && this.renderBlockTitle() }
 						<View
 							accessibilityLabel={ accessibilityLabel }
@@ -177,7 +175,7 @@ export default compose( [
 		const rootBlock = getBlock( rootBlockId );
 		const hasRootInnerBlocks = rootBlock.innerBlocks.length !== 0;
 
-		const displayToolbar = isSelected && hasRootInnerBlocks;
+		const showFloatingToolbar = isSelected && hasRootInnerBlocks;
 		const parentId = getBlockRootClientId( clientId );
 
 		return {
@@ -192,7 +190,7 @@ export default compose( [
 			isSelected,
 			isValid,
 			getAccessibilityLabelExtra,
-			displayToolbar,
+			showFloatingToolbar,
 			parentId,
 		};
 	} ),
