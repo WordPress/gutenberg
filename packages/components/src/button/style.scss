@@ -85,13 +85,10 @@
 			color: $white;
 		}
 
-		// [aria-disabled="true"] is not specific enough to override default styling,
-		// so double-up selector to increase specificity.
-		// This is primarily an issue on Button components that are aria-disabled,
-		// but not disabled.
 		&:disabled,
 		&:disabled:active:enabled,
-		&[aria-disabled="true"][aria-disabled="true"],
+		&[aria-disabled="true"],
+		&[aria-disabled="true"]:enabled, // This catches a situation where a Button is aria-disabled, but not disabled.
 		&[aria-disabled="true"]:active:enabled {
 			color: color(theme(button) tint(40%));
 			background: color(theme(button) tint(10%));
