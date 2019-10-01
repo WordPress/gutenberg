@@ -23,7 +23,10 @@ import {
 import InserterMenu from './menu';
 
 const defaultRenderToggle = ( { onToggle, disabled, isOpen, blockTitle } ) => {
-	const label = sprintf( _x( 'Add %s', 'directly add the allowed block' ), blockTitle );
+	let label = sprintf( _x( 'Add %s', 'directly add the allowed block' ), blockTitle );
+	if ( blockTitle === '' ) {
+		label = 'Add block';
+	}
 	return (
 		<IconButton
 			icon="insert"
