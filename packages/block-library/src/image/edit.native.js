@@ -45,12 +45,12 @@ import SvgIconRetry from './icon-retry';
 
 const LINK_DESTINATION_CUSTOM = 'custom';
 const LINK_DESTINATION_NONE = 'none';
-const NEW_TAB_REL = 'noreferrer noopener';
+export const NEW_TAB_REL = 'noreferrer noopener';
 
 // Default Image ratio 4:3
 const IMAGE_ASPECT_RATIO = 4 / 3;
 
-class ImageEdit extends React.Component {
+export class ImageEdit extends React.Component {
 	constructor( props ) {
 		super( props );
 
