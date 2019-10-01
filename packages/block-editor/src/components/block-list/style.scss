@@ -101,6 +101,9 @@
 
 	.block-editor-block-list__block-edit {
 		position: relative;
+		& > div {
+			display: flex;
+		}
 
 		&::before {
 			z-index: z-index(".block-editor-block-list__block-edit::before");

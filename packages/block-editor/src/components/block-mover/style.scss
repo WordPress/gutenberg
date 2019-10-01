@@ -5,6 +5,10 @@
 		grid-template-columns: 1fr 1fr;
 		width: auto;
 		min-height: auto;
+		height: $icon-button-size-small;
+		position: relative;
+		top: $block-padding;
+		margin-left: $block-padding;
 
 		.block-editor-block-mover__control-drag-handle {
 			display: none;

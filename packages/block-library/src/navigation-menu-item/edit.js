@@ -42,7 +42,6 @@ function NavigationMenuItemEdit( {
 	isSelected,
 	isParentOfSelectedBlock,
 	setAttributes,
-	blockMover,
 } ) {
 	const plainTextRef = useRef( null );
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
