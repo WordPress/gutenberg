@@ -62,6 +62,7 @@ describe( 'Allowed Blocks Setting on InnerBlocks ', () => {
 		const parentBlockSelector = '[data-type="test/allowed-blocks-dynamic"]';
 		const blockAppender = '.block-list-appender button';
 		const appenderSelector = `${ parentBlockSelector } ${ blockAppender }`;
+		const listSelector = `${ parentBlockSelector } ${ '.block-editor-rich-text__editable' }`;
 		await page.waitForSelector( appenderSelector );
 		await page.click( appenderSelector );
 		await openAllBlockInserterCategories();
@@ -76,6 +77,7 @@ describe( 'Allowed Blocks Setting on InnerBlocks ', () => {
 		) )[ 0 ];
 		await insertButton.click();
 		await insertBlock( 'Image' );
+		await page.click( listSelector );
 		await page.click( appenderSelector );
 		await openAllBlockInserterCategories();
 		expect(
