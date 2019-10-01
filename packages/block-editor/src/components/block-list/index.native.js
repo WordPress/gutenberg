@@ -10,9 +10,9 @@ import { Text, View, Platform, TouchableWithoutFeedback } from 'react-native';
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { withDispatch, withSelect } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { createBlock, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
-import { KeyboardAwareFlatList, ReadableContentView, withTheme } from '@wordpress/components';
+import { KeyboardAwareFlatList, ReadableContentView } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -113,7 +113,7 @@ export class BlockList extends Component {
 	}
 
 	renderItem( { item: clientId, index } ) {
-		const blockHolderFocusedStyle = this.props.useStyle( styles.blockHolderFocused, styles.blockHolderFocusedDark );
+		const blockHolderFocusedStyle = this.props.getStylesFromColorScheme( styles.blockHolderFocused, styles.blockHolderFocusedDark );
 		const { shouldShowBlockAtIndex, shouldShowInsertionPoint } = this.props;
 		return (
 			<ReadableContentView>
@@ -133,8 +133,8 @@ export class BlockList extends Component {
 	}
 
 	renderAddBlockSeparator() {
-		const lineStyle = this.props.useStyle( styles.lineStyleAddHere, styles.lineStyleAddHereDark );
-		const labelStyle = this.props.useStyle( styles.labelStyleAddHere, styles.labelStyleAddHereDark );
+		const lineStyle = this.props.getStylesFromColorScheme( styles.lineStyleAddHere, styles.lineStyleAddHereDark );
+		const labelStyle = this.props.getStylesFromColorScheme( styles.labelStyleAddHere, styles.labelStyleAddHereDark );
 		return (
 			<View style={ styles.containerStyleAddHere } >
 				<View style={ lineStyle }></View>
@@ -220,6 +220,6 @@ export default compose( [
 			replaceBlock,
 		};
 	} ),
-	withTheme,
+	withPreferredColorScheme,
 ] )( BlockList );
 

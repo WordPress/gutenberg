@@ -9,7 +9,7 @@ import Hr from 'react-native-hr';
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { withTheme } from '@wordpress/components';
+import { withPreferredColorScheme } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -26,13 +26,13 @@ export class MoreEdit extends Component {
 	}
 
 	render() {
-		const { attributes, useStyle } = this.props;
+		const { attributes, getStylesFromColorScheme } = this.props;
 		const { customText } = attributes;
 		const { defaultText } = this.state;
 
 		const content = customText || defaultText;
-		const textStyle = useStyle( styles.moreText, styles.moreTextDark );
-		const lineStyle = useStyle( styles.moreLine, styles.moreLineDark );
+		const textStyle = getStylesFromColorScheme( styles.moreText, styles.moreTextDark );
+		const lineStyle = getStylesFromColorScheme( styles.moreLine, styles.moreLineDark );
 
 		return (
 			<View>
@@ -48,4 +48,4 @@ export class MoreEdit extends Component {
 	}
 }
 
-export default withTheme( MoreEdit );
+export default withPreferredColorScheme( MoreEdit );

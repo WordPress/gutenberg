@@ -15,7 +15,7 @@ import {
 	MEDIA_UPLOAD_STATE_SUCCEEDED,
 	MEDIA_UPLOAD_STATE_FAILED,
 	MEDIA_UPLOAD_STATE_RESET,
-} from '../media-upload-progress';
+} from '../';
 
 jest.mock( 'react-native-gutenberg-bridge', () => {
 	const callUploadCallback = ( payload ) => {
