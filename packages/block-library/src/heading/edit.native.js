@@ -31,6 +31,7 @@ const HeadingEdit = ( {
 				maxLevel={ 7 }
 				selectedLevel={ attributes.level }
 				onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) }
+				isCollapsed={ false }
 			/>
 		</BlockControls>
 		<RichText

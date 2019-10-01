@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/redux-routine",
-	"version": "3.5.0",
+	"version": "3.6.0",
 	"description": "Redux middleware for generator coroutines.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -25,7 +25,7 @@
 	"dependencies": {
 		"@babel/runtime": "^7.4.4",
 		"is-promise": "^2.1.0",
-		"lodash": "^4.17.14",
+		"lodash": "^4.17.15",
 		"rungen": "^0.3.2"
 	},
 	"publishConfig": {

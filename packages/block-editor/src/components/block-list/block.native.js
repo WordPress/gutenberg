@@ -26,8 +26,6 @@ import BlockMobileToolbar from './block-mobile-toolbar';
 import FloatingToolbar from './block-mobile-floating-toolbar';
 import Breadcrumbs from './breadcrumb';
 
-const toolbarHeight = 44;
-
 class BlockListBlock extends Component {
 	constructor() {
 		super( ...arguments );
@@ -115,7 +113,9 @@ class BlockListBlock extends Component {
 			isValid,
 			showTitle,
 			title,
-			displayToolbar,
+			showFloatingToolbar,
+			parentId,
+			isFirstBlock,
 		} = this.props;
 
 		const borderColor = isSelected ? focusedBorderColor : 'transparent';
@@ -124,13 +124,14 @@ class BlockListBlock extends Component {
 
 		return (
 			<>
-				{ displayToolbar && <FloatingToolbar><Breadcrumbs clientId={ clientId } /></FloatingToolbar> }
+				{ showFloatingToolbar && ( ! isFirstBlock || parentId === '' ) && <FloatingToolbar.Slot /> }
+				{ showFloatingToolbar && <FloatingToolbar><Breadcrumbs clientId={ clientId } /></FloatingToolbar> }
 				<TouchableWithoutFeedback
 					onPress={ this.onFocus }
 					accessible={ ! isSelected }
 					accessibilityRole={ 'button' }
 				>
-					<View style={ [ styles.blockHolder, borderStyle, { borderColor, minHeight: toolbarHeight } ] }>
+					<View style={ [ styles.blockHolder, borderStyle, { borderColor } ] }>
 						{ showTitle && this.renderBlockTitle() }
 						<View
 							accessibilityLabel={ accessibilityLabel }
@@ -158,6 +159,8 @@ export default compose( [
 			__unstableGetBlockWithoutInnerBlocks,
 			getBlockHierarchyRootClientId,
 			getBlock,
+			getBlockRootClientId,
+			getSelectedBlock,
 		} = select( 'core/block-editor' );
 		const order = getBlockIndex( clientId, rootClientId );
 		const isSelected = isBlockSelected( clientId );
@@ -170,11 +173,18 @@ export default compose( [
 		const icon = blockType.icon;
 		const getAccessibilityLabelExtra = blockType.__experimentalGetAccessibilityLabel;
 
+		const selectedBlock = getSelectedBlock();
+		const parentId = getBlockRootClientId( clientId );
+		const parentBlock = getBlock( parentId );
+
+		const isMediaText = selectedBlock && selectedBlock.name === 'core/media-text';
+		const isMediaTextParent = parentBlock && parentBlock.name === 'core/media-text';
+
 		const rootBlockId = getBlockHierarchyRootClientId( clientId );
 		const rootBlock = getBlock( rootBlockId );
 		const hasRootInnerBlocks = rootBlock.innerBlocks.length !== 0;
 
-		const displayToolbar = isSelected && hasRootInnerBlocks;
+		const showFloatingToolbar = isSelected && hasRootInnerBlocks && ! isMediaText && ! isMediaTextParent;
 
 		return {
 			icon,
@@ -188,7 +198,8 @@ export default compose( [
 			isSelected,
 			isValid,
 			getAccessibilityLabelExtra,
-			displayToolbar,
+			showFloatingToolbar,
+			parentId,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {

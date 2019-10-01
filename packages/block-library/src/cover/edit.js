@@ -9,15 +9,25 @@ import tinycolor from 'tinycolor2';
  * WordPress dependencies
  */
 import {
+	Component,
+	createRef,
+	useCallback,
+	useState,
+} from '@wordpress/element';
+import {
 	FocalPointPicker,
 	IconButton,
 	PanelBody,
+	PanelRow,
 	RangeControl,
 	ToggleControl,
 	Toolbar,
 	withNotices,
+	ResizableBox,
+	BaseControl,
+	Button,
 } from '@wordpress/components';
-import { compose } from '@wordpress/compose';
+import { compose, withInstanceId } from '@wordpress/compose';
 import {
 	BlockControls,
 	BlockIcon,
@@ -28,9 +38,10 @@ import {
 	MediaUploadCheck,
 	PanelColorSettings,
 	withColors,
+	ColorPalette,
 } from '@wordpress/block-editor';
-import { Component, createRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -39,6 +50,7 @@ import icon from './icon';
 import {
 	IMAGE_BACKGROUND_TYPE,
 	VIDEO_BACKGROUND_TYPE,
+	COVER_MIN_HEIGHT,
 	backgroundImageStyles,
 	dimRatioToClass,
 } from './shared';
@@ -62,11 +74,117 @@ function retrieveFastAverageColor() {
 	return retrieveFastAverageColor.fastAverageColor;
 }
 
+const CoverHeightInput = withInstanceId(
+	function( { value = '', instanceId, onChange } ) {
+		const [ temporaryInput, setTemporaryInput ] = useState( null );
+		const onChangeEvent = useCallback(
+			( event ) => {
+				const unprocessedValue = event.target.value;
+				const inputValue = unprocessedValue !== '' ?
+					parseInt( event.target.value, 10 ) :
+					undefined;
+				if ( ( isNaN( inputValue ) || inputValue < COVER_MIN_HEIGHT ) && inputValue !== undefined ) {
+					setTemporaryInput( event.target.value );
+					return;
+				}
+				setTemporaryInput( null );
+				onChange( inputValue );
+			},
+			[ onChange, setTemporaryInput ]
+		);
+		const onBlurEvent = useCallback(
+			() => {
+				if ( temporaryInput !== null ) {
+					setTemporaryInput( null );
+				}
+			},
+			[ temporaryInput, setTemporaryInput ]
+		);
+		const inputId = `block-cover-height-input-${ instanceId }`;
+		return (
+			<BaseControl label={ __( 'Minimum height in pixels' ) } id={ inputId }>
+				<input
+					type="number"
+					id={ inputId }
+					onChange={ onChangeEvent }
+					onBlur={ onBlurEvent }
+					value={ temporaryInput !== null ? temporaryInput : value }
+					min={ COVER_MIN_HEIGHT }
+					step="10"
+				/>
+			</BaseControl>
+		);
+	}
+);
+
+const RESIZABLE_BOX_ENABLE_OPTION = {
+	top: false,
+	right: false,
+	bottom: true,
+	left: false,
+	topRight: false,
+	bottomRight: false,
+	bottomLeft: false,
+	topLeft: false,
+};
+
+function ResizableCover( {
+	className,
+	children,
+	onResizeStart,
+	onResize,
+	onResizeStop,
+} ) {
+	const [ isResizing, setIsResizing ] = useState( false );
+	const onResizeEvent = useCallback(
+		( event, direction, elt ) => {
+			onResize( elt.clientHeight );
+			if ( ! isResizing ) {
+				setIsResizing( true );
+			}
+		},
+		[ onResize, setIsResizing ],
+	);
+	const onResizeStartEvent = useCallback(
+		( event, direction, elt ) => {
+			onResizeStart( elt.clientHeight );
+			onResize( elt.clientHeight );
+		},
+		[ onResizeStart, onResize ]
+	);
+	const onResizeStopEvent = useCallback(
+		( event, direction, elt ) => {
+			onResizeStop( elt.clientHeight );
+			setIsResizing( false );
+		},
+		[ onResizeStop, setIsResizing ]
+	);
+
+	return (
+		<ResizableBox
+			className={ classnames(
+				className,
+				{
+					'is-resizing': isResizing,
+				}
+			) }
+			enable={ RESIZABLE_BOX_ENABLE_OPTION }
+			onResizeStart={ onResizeStartEvent }
+			onResize={ onResizeEvent }
+			onResizeStop={ onResizeStopEvent }
+			minHeight={ COVER_MIN_HEIGHT }
+		>
+			{ children }
+		</ResizableBox>
+	);
+}
+
 class CoverEdit extends Component {
 	constructor() {
 		super( ...arguments );
 		this.state = {
 			isDark: false,
+			temporaryMinHeight: null,
 		};
 		this.imageRef = createRef();
 		this.videoRef = createRef();
@@ -92,10 +210,12 @@ class CoverEdit extends Component {
 		const {
 			attributes,
 			setAttributes,
+			isSelected,
 			className,
 			noticeUI,
 			overlayColor,
 			setOverlayColor,
+			toggleSelection,
 		} = this.props;
 		const {
 			backgroundType,
@@ -104,6 +224,7 @@ class CoverEdit extends Component {
 			hasParallax,
 			id,
 			url,
+			minHeight,
 		} = attributes;
 		const onSelectMedia = ( media ) => {
 			if ( ! media || ! media.url ) {
@@ -149,6 +270,8 @@ class CoverEdit extends Component {
 		};
 		const setDimRatio = ( ratio ) => setAttributes( { dimRatio: ratio } );
 
+		const { temporaryMinHeight } = this.state;
+
 		const style = {
 			...(
 				backgroundType === IMAGE_BACKGROUND_TYPE ?
@@ -156,6 +279,7 @@ class CoverEdit extends Component {
 					{}
 			),
 			backgroundColor: overlayColor.color,
+			minHeight: ( temporaryMinHeight || minHeight ),
 		};
 
 		if ( focalPoint ) {
@@ -165,7 +289,7 @@ class CoverEdit extends Component {
 		const controls = (
 			<>
 				<BlockControls>
-					{ !! url && (
+					{ !! ( url || overlayColor.color ) && (
 						<>
 							<MediaUploadCheck>
 								<Toolbar>
@@ -187,9 +311,9 @@ class CoverEdit extends Component {
 						</>
 					) }
 				</BlockControls>
-				{ !! url && (
-					<InspectorControls>
-						<PanelBody title={ __( 'Cover Settings' ) }>
+				<InspectorControls>
+					{ !! url && (
+						<PanelBody title={ __( 'Media Settings' ) }>
 							{ IMAGE_BACKGROUND_TYPE === backgroundType && (
 								<ToggleControl
 									label={ __( 'Fixed Background' ) }
@@ -205,6 +329,39 @@ class CoverEdit extends Component {
 									onChange={ ( value ) => setAttributes( { focalPoint: value } ) }
 								/>
 							) }
+							<PanelRow>
+								<Button
+									isDefault
+									isSmall
+									className="block-library-cover__reset-button"
+									onClick={ () => setAttributes( {
+										url: undefined,
+										id: undefined,
+										backgroundType: undefined,
+										dimRatio: undefined,
+										focalPoint: undefined,
+										hasParallax: undefined,
+									} ) }
+								>
+									{ __( 'Clear Media' ) }
+								</Button>
+							</PanelRow>
+						</PanelBody>
+					) }
+					{ ( url || overlayColor.color ) && (
+						<>
+							<PanelBody title={ __( 'Dimensions' ) }>
+								<CoverHeightInput
+									value={ temporaryMinHeight || minHeight }
+									onChange={
+										( value ) => {
+											setAttributes( {
+												minHeight: value,
+											} );
+										}
+									}
+								/>
+							</PanelBody>
 							<PanelColorSettings
 								title={ __( 'Overlay' ) }
 								initialOpen={ true }
@@ -214,23 +371,25 @@ class CoverEdit extends Component {
 									label: __( 'Overlay Color' ),
 								} ] }
 							>
-								<RangeControl
-									label={ __( 'Background Opacity' ) }
-									value={ dimRatio }
-									onChange={ setDimRatio }
-									min={ 0 }
-									max={ 100 }
-									step={ 10 }
-									required
-								/>
+								{ !! url && (
+									<RangeControl
+										label={ __( 'Background Opacity' ) }
+										value={ dimRatio }
+										onChange={ setDimRatio }
+										min={ 0 }
+										max={ 100 }
+										step={ 10 }
+										required
+									/>
+								) }
 							</PanelColorSettings>
-						</PanelBody>
-					</InspectorControls>
-				) }
+						</>
+					) }
+				</InspectorControls>
 			</>
 		);
 
-		if ( ! url ) {
+		if ( ! ( url || overlayColor.color ) ) {
 			const placeholderIcon = <BlockIcon icon={ icon } />;
 			const label = __( 'Cover' );
 
@@ -249,7 +408,15 @@ class CoverEdit extends Component {
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
 						notices={ noticeUI }
 						onError={ this.onUploadError }
-					/>
+					>
+						<ColorPalette
+							disableCustomColors={ true }
+							value={ overlayColor.color }
+							onChange={ setOverlayColor }
+							clearable={ false }
+							className="wp-block-cover__placeholder-color-palette"
+						/>
+					</MediaPlaceholder>
 				</>
 			);
 		}
@@ -268,39 +435,64 @@ class CoverEdit extends Component {
 		return (
 			<>
 				{ controls }
-				<div
-					data-url={ url }
-					style={ style }
-					className={ classes }
+				<ResizableCover
+					className={ classnames(
+						'block-library-cover__resize-container',
+						{ 'is-selected': isSelected },
+					) }
+					onResizeStart={ () => toggleSelection( false ) }
+					onResize={ ( newMinHeight ) => {
+						this.setState( {
+							temporaryMinHeight: newMinHeight,
+						} );
+					} }
+					onResizeStop={
+						( newMinHeight ) => {
+							toggleSelection( true );
+							setAttributes( {
+								minHeight: newMinHeight,
+							} );
+							this.setState( {
+								temporaryMinHeight: null,
+							} );
+						}
+					}
 				>
-					{ IMAGE_BACKGROUND_TYPE === backgroundType && (
+
+					<div
+						data-url={ url }
+						style={ style }
+						className={ classes }
+					>
+						{ IMAGE_BACKGROUND_TYPE === backgroundType && (
 						// Used only to programmatically check if the image is dark or not
-						<img
-							ref={ this.imageRef }
-							aria-hidden
-							alt=""
-							style={ {
-								display: 'none',
-							} }
-							src={ url }
-						/>
-					) }
-					{ VIDEO_BACKGROUND_TYPE === backgroundType && (
-						<video
-							ref={ this.videoRef }
-							className="wp-block-cover__video-background"
-							autoPlay
-							muted
-							loop
-							src={ url }
-						/>
-					) }
-					<div className="wp-block-cover__inner-container">
-						<InnerBlocks
-							template={ INNER_BLOCKS_TEMPLATE }
-						/>
+							<img
+								ref={ this.imageRef }
+								aria-hidden
+								alt=""
+								style={ {
+									display: 'none',
+								} }
+								src={ url }
+							/>
+						) }
+						{ VIDEO_BACKGROUND_TYPE === backgroundType && (
+							<video
+								ref={ this.videoRef }
+								className="wp-block-cover__video-background"
+								autoPlay
+								muted
+								loop
+								src={ url }
+							/>
+						) }
+						<div className="wp-block-cover__inner-container">
+							<InnerBlocks
+								template={ INNER_BLOCKS_TEMPLATE }
+							/>
+						</div>
 					</div>
-				</div>
+				</ResizableCover>
 			</>
 		);
 	}
@@ -370,6 +562,14 @@ class CoverEdit extends Component {
 }
 
 export default compose( [
+	withDispatch( ( dispatch ) => {
+		const { toggleSelection } = dispatch( 'core/block-editor' );
+
+		return {
+			toggleSelection,
+		};
+	} ),
 	withColors( { overlayColor: 'background-color' } ),
 	withNotices,
+	withInstanceId,
 ] )( CoverEdit );

@@ -299,6 +299,10 @@ _Returns_
 
 -   `Promise`: Promise resolving with a boolean indicating if the focused block is the default block.
 
+<a name="isOfflineMode" href="#isOfflineMode">#</a> **isOfflineMode**
+
+Undocumented declaration.
+
 <a name="loginUser" href="#loginUser">#</a> **loginUser**
 
 Performs log in with specified username and password.
@@ -472,6 +476,14 @@ running the test is not already the admin user).
 
 Switches the current user to whichever user we should be
 running the tests as (if we're not already that user).
+
+<a name="toggleMoreMenu" href="#toggleMoreMenu">#</a> **toggleMoreMenu**
+
+Toggles the More Menu.
+
+<a name="toggleOfflineMode" href="#toggleOfflineMode">#</a> **toggleOfflineMode**
+
+Undocumented declaration.
 
 <a name="toggleScreenOption" href="#toggleScreenOption">#</a> **toggleScreenOption**
 

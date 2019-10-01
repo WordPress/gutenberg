@@ -10,7 +10,6 @@ gutenberg.zip
 *.log
 phpcs.xml
 yarn.lock
-docker-compose.override.yml
 /wordpress
 
 playground/dist

@@ -133,14 +133,14 @@ describe( 'Change detection', () => {
 		await assertIsDirty( false );
 	} );
 
-	it( 'Should not prompt to confirm unsaved changes for new post with initial edits', async () => {
+	it( 'Should prompt to confirm unsaved changes for new post with initial edits', async () => {
 		await createNewPost( {
 			title: 'My New Post',
 			content: 'My content',
 			excerpt: 'My excerpt',
 		} );
 
-		await assertIsDirty( false );
+		await assertIsDirty( true );
 	} );
 
 	it( 'Should prompt if property changed without save', async () => {
@@ -151,12 +151,28 @@ describe( 'Change detection', () => {
 
 	it( 'Should prompt if content added without save', async () => {
 		await clickBlockAppender();
+		await page.keyboard.type( 'Paragraph' );
 
 		await assertIsDirty( true );
 	} );
 
 	it( 'Should not prompt if changes saved', async () => {
 		await page.type( '.editor-post-title__input', 'Hello World' );
+
+		await Promise.all( [
+			// Wait for "Saved" to confirm save complete.
+			page.waitForSelector( '.editor-post-saved-state.is-saved' ),
+
+			// Keyboard shortcut Ctrl+S save.
+			pressKeyWithModifier( 'primary', 'S' ),
+		] );
+
+		await assertIsDirty( false );
+	} );
+
+	it( 'Should not prompt if changes saved right after typing', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'Hello World' );
 
 		await Promise.all( [
 			// Wait for "Saved" to confirm save complete.
@@ -223,9 +239,9 @@ describe( 'Change detection', () => {
 		// Keyboard shortcut Ctrl+S save.
 		await pressKeyWithModifier( 'primary', 'S' );
 
-		await releaseSaveIntercept();
-
 		await assertIsDirty( true );
+
+		await releaseSaveIntercept();
 	} );
 
 	it( 'Should prompt if changes made while save is in-flight', async () => {
@@ -240,6 +256,7 @@ describe( 'Change detection', () => {
 		await pressKeyWithModifier( 'primary', 'S' );
 
 		await page.type( '.editor-post-title__input', '!' );
+		await page.waitForSelector( '.editor-post-save-draft' );
 
 		await releaseSaveIntercept();
 
@@ -279,6 +296,7 @@ describe( 'Change detection', () => {
 		await pressKeyWithModifier( 'primary', 'S' );
 
 		await clickBlockAppender();
+		await page.keyboard.type( 'Paragraph' );
 
 		// Allow save to complete. Disabling interception flushes pending.
 		await Promise.all( [
@@ -303,6 +321,31 @@ describe( 'Change detection', () => {
 		// See: https://github.com/WordPress/gutenberg/issues/14766
 		await page.evaluate( () => window.wp.data.dispatch( 'core/editor' ).__experimentalReceiveReusableBlocks( [] ) );
 
+		await assertIsDirty( false );
+	} );
+
+	it( 'should save posts without titles and persist and overwrite the auto draft title', async () => {
+		// Enter content.
+		await clickBlockAppender();
+		await page.keyboard.type( 'Paragraph' );
+
+		// Save
+		await Promise.all( [
+			// Wait for "Saved" to confirm save complete.
+			page.waitForSelector( '.editor-post-saved-state.is-saved' ),
+
+			// Keyboard shortcut Ctrl+S save.
+			pressKeyWithModifier( 'primary', 'S' ),
+		] );
+
+		// Verify that the title is empty.
+		const title = await page.$eval(
+			'.editor-post-title__input',
+			( element ) => element.innerHTML
+		);
+		expect( title ).toBe( '' );
+
+		// Verify that the post is not dirty.
 		await assertIsDirty( false );
 	} );
 } );

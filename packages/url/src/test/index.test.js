@@ -496,6 +496,18 @@ describe( 'prependHTTP', () => {
 
 		expect( prependHTTP( url ) ).toBe( url );
 	} );
+
+	it( 'should remove leading whitespace before prepending HTTP', () => {
+		const url = ' wordpress.org';
+
+		expect( prependHTTP( url ) ).toBe( 'http://wordpress.org' );
+	} );
+
+	it( 'should not have trailing whitespaces', () => {
+		const url = 'wordpress.org ';
+
+		expect( prependHTTP( url ) ).toBe( 'http://wordpress.org' );
+	} );
 } );
 
 describe( 'safeDecodeURI', () => {

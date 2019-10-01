@@ -8,7 +8,7 @@ import { get, unescape as unescapeString, without, find, some, invoke } from 'lo
  */
 import { __, _x, _n, sprintf } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { TreeSelect, withSpokenMessages, withFilters, Button } from '@wordpress/components';
+import { CheckboxControl, TreeSelect, withSpokenMessages, withFilters, Button } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { withInstanceId, compose } from '@wordpress/compose';
 import apiFetch from '@wordpress/api-fetch';
@@ -55,9 +55,8 @@ class HierarchicalTermSelector extends Component {
 		};
 	}
 
-	onChange( event ) {
+	onChange( termId ) {
 		const { onUpdateTerms, terms = [], taxonomy } = this.props;
-		const termId = parseInt( event.target.value, 10 );
 		const hasTerm = terms.indexOf( termId ) !== -1;
 		const newTerms = hasTerm ?
 			without( terms, termId ) :
@@ -316,18 +315,16 @@ class HierarchicalTermSelector extends Component {
 	renderTerms( renderedTerms ) {
 		const { terms = [] } = this.props;
 		return renderedTerms.map( ( term ) => {
-			const id = `editor-post-taxonomies-hierarchical-term-${ term.id }`;
 			return (
 				<div key={ term.id } className="editor-post-taxonomies__hierarchical-terms-choice">
-					<input
-						id={ id }
-						className="editor-post-taxonomies__hierarchical-terms-input"
-						type="checkbox"
+					<CheckboxControl
 						checked={ terms.indexOf( term.id ) !== -1 }
-						value={ term.id }
-						onChange={ this.onChange }
+						onChange={ () => {
+							const termId = parseInt( term.id, 10 );
+							this.onChange( termId );
+						} }
+						label={ unescapeString( term.name ) }
 					/>
-					<label htmlFor={ id }>{ unescapeString( term.name ) }</label>
 					{ !! term.children.length && (
 						<div className="editor-post-taxonomies__hierarchical-terms-subchoices">
 							{ this.renderTerms( term.children ) }

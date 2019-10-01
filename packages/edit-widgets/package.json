@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/edit-widgets",
-	"version": "0.5.0",
+	"version": "0.7.0",
 	"private": true,
 	"description": "Widgets Page module for WordPress..",
 	"author": "The WordPress Contributors",
@@ -34,7 +34,7 @@
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/media-utils": "file:../media-utils",
 		"@wordpress/notices": "file:../notices",
-		"lodash": "^4.17.14",
+		"lodash": "^4.17.15",
 		"rememo": "^3.0.0"
 	},
 	"publishConfig": {

@@ -1,5 +1,6 @@
 .wp-block-cover-image,
 .wp-block-cover {
+
 	&.components-placeholder h2 {
 		color: inherit;
 	}
@@ -38,10 +39,25 @@
 		}
 	}
 
+	.wp-block-cover__placeholder-color-palette {
+		// wraps about 6 color swatches
+		max-width: 290px;
+		margin-top: 1em;
+	}
+
 	// Apply max-width to floated items that have no intrinsic width
 	[data-align="left"] &,
 	[data-align="right"] & {
 		max-width: $content-width / 2;
 		width: 100%;
 	}
+}
+
+.block-library-cover__reset-button {
+	margin-left: auto;
+}
+
+.block-library-cover__resize-container:not(.is-resizing) {
+	// Important is used to have higher specificity than the inline style set by re-resizable library.
+	height: auto !important;
 }

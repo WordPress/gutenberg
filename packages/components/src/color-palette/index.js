@@ -18,7 +18,7 @@ import Tooltip from '../tooltip';
 import ColorPicker from '../color-picker';
 import Dashicon from '../dashicon';
 
-export default function ColorPalette( { colors, disableCustomColors = false, value, onChange, className } ) {
+export default function ColorPalette( { colors, disableCustomColors = false, value, onChange, className, clearable = true } ) {
 	function applyOrUnset( color ) {
 		return () => onChange( value === color ? undefined : color );
 	}
@@ -79,16 +79,17 @@ export default function ColorPalette( { colors, disableCustomColors = false, val
 						) }
 					/>
 				}
-
-				<Button
-					className="components-color-palette__clear"
-					type="button"
-					onClick={ () => onChange( undefined ) }
-					isSmall
-					isDefault
-				>
-					{ __( 'Clear' ) }
-				</Button>
+				{ !! clearable && (
+					<Button
+						className="components-color-palette__clear"
+						type="button"
+						onClick={ () => onChange( undefined ) }
+						isSmall
+						isDefault
+					>
+						{ __( 'Clear' ) }
+					</Button>
+				) }
 			</div>
 		</div>
 	);

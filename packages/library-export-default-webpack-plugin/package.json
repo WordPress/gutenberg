@@ -26,7 +26,7 @@
 	],
 	"main": "index.js",
 	"dependencies": {
-		"lodash": "^4.17.14",
+		"lodash": "^4.17.15",
 		"webpack-sources": "^1.1.0"
 	},
 	"peerDependencies": {

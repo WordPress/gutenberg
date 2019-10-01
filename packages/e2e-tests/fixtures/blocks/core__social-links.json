@@ -1,0 +1,22 @@
+[
+    {
+        "clientId": "_clientId_0",
+        "name": "core/social-links",
+        "isValid": true,
+        "attributes": {},
+        "innerBlocks": [
+            {
+                "clientId": "_clientId_0",
+                "name": "core/social-link-mastodon",
+                "isValid": true,
+                "attributes": {
+                    "url": "https://mastodon.social/@marcuskaz",
+                    "site": "mastodon"
+                },
+                "innerBlocks": [],
+                "originalContent": ""
+            }
+        ],
+        "originalContent": "<ul class=\"wp-block-social-links\"></ul>"
+    }
+]

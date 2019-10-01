@@ -7,10 +7,12 @@
 	cursor: pointer;
 	-webkit-appearance: none;
 	background: none;
+	transition: box-shadow 0.1s linear;
+	@include reduce-motion("transition");
 
 	&.is-button {
-		padding: 0 10px 1px;
-		line-height: 26px;
+		padding: 0 10px;
+		line-height: 2;
 		height: 28px;
 		border-radius: 3px;
 		white-space: nowrap;
@@ -20,36 +22,31 @@
 
 	// Default button style
 	&.is-default {
-		color: #555;
-		border-color: #ccc;
-		background: #f7f7f7;
-		box-shadow: inset 0 -1px 0 #ccc;
-		vertical-align: top;
+		color: color(theme(button) shade(6%));
+		border-color: color(theme(button) shade(6%));
+		background: #f3f5f6;
 
 		&:hover {
-			background: #fafafa;
-			border-color: #999;
-			box-shadow: inset 0 -1px 0 #999;
-			color: #23282d;
+			background: #f1f1f1;
+			border-color: color(theme(button) shade(25%));
+			color: color(theme(button) shade(25%));
 			text-decoration: none;
 		}
 
 		&:focus:enabled {
-			background: #fafafa;
-			color: #23282d;
-			border-color: #999;
-			box-shadow:
-				inset 0 -1px 0 #999,
-				0 0 0 1px $white,
-				0 0 0 3px $blue-medium-focus;
+			background: #f3f5f6;
+			color: color(theme(button) shade(25%));
+			border-color: color(theme(button) shade(5%));
+			box-shadow: 0 0 0 1px color(theme(button) shade(5%));
 			text-decoration: none;
 
 		}
 
 		&:active:enabled {
-			background: #eee;
-			border-color: #999;
-			box-shadow: inset 0 1px 0 #999,;
+			background: #f3f5f6;
+			color: color(theme(button) shade(5%));
+			border-color: #7e8993;
+			box-shadow: none;
 		}
 
 		&:disabled,
@@ -57,7 +54,6 @@
 			color: #a0a5aa;
 			border-color: #ddd;
 			background: #f7f7f7;
-			box-shadow: none;
 			text-shadow: 0 1px 0 #fff;
 			transform: none;
 			opacity: 1;
@@ -66,53 +62,42 @@
 
 	&.is-primary {
 		background: color(theme(button));
-		border-color: color(theme(button) shade(20%)) color(theme(button) shade(25%)) color(theme(button) shade(25%));
-		box-shadow: inset 0 -1px 0 color(theme(button) shade(25%));
+		border-color: color(theme(button));
 		color: $white;
 		text-decoration: none;
-		text-shadow:
-			0 -1px 1px color(theme(button) shade(30%)),
-			1px 0 1px color(theme(button) shade(30%)),
-			0 1px 1px color(theme(button) shade(30%)),
-			-1px 0 1px color(theme(button) shade(30%));
+		text-shadow: none;
 
 		&:hover,
 		&:focus:enabled {
-			background: color(theme(button) shade(5%));
-			border-color: color(theme(button) shade(50%));
+			background: color(theme(button) shade(10%));
+			border-color: color(theme(button) shade(10%));
 			color: $white;
-		}
-
-		&:hover {
-			box-shadow: inset 0 -1px 0 color(theme(button) shade(50%));
 		}
 
 		&:focus:enabled {
 			box-shadow:
-				inset 0 -1px 0 color(theme(button) shade(50%)),
 				0 0 0 1px $white,
-				0 0 0 3px color(theme(button) shade(5%));
+				0 0 0 3px color(theme(button));
 		}
 
 		&:active:enabled {
 			background: color(theme(button) shade(20%));
-			border-color: color(theme(button) shade(50%));
-			box-shadow: inset 0 1px 0 color(theme(button) shade(50%));
-			vertical-align: top;
+			border-color: color(theme(button) shade(20%));
+			color: $white;
 		}
 
 		&:disabled,
 		&:disabled:active:enabled,
 		&[aria-disabled="true"],
+		&[aria-disabled="true"]:enabled, // This catches a situation where a Button is aria-disabled, but not disabled.
 		&[aria-disabled="true"]:active:enabled {
 			color: color(theme(button) tint(40%));
-			background: color(theme(button));
-			border-color: color(theme(button) shade(7%));
-			box-shadow: none;
-			text-shadow: none;
+			background: color(theme(button) tint(10%));
+			border-color: color(theme(button) tint(10%));
 			opacity: 1;
 
 			// This specificity is needed to override alternate color schemes in WP-Admin.
+			// This can presumably be removed when https://core.trac.wordpress.org/ticket/34904 lands.
 			&.is-button,
 			&.is-button:hover,
 			&:active:enabled {
@@ -121,11 +106,9 @@
 			}
 
 			&:focus:enabled {
-				color: color(theme(button) tint(40%));
-				border-color: color(theme(button) shade(7%));
 				box-shadow:
 					0 0 0 1px $white,
-					0 0 0 3px $blue-medium-focus;
+					0 0 0 3px color(theme(button));
 			}
 		}
 
@@ -138,13 +121,13 @@
 			/* stylelint-disable */
 			background-image: linear-gradient(
 				-45deg,
-				theme(primary) 28%,
-				color(theme(primary) shade(30%)) 28%,
-				color(theme(primary) shade(30%)) 72%,
-				theme(primary) 72%
+				theme(button) 28%,
+				color(theme(button) shade(20%)) 28%,
+				color(theme(button) shade(20%)) 72%,
+				theme(button) 72%
 			);
 			/* stylelint-enable */
-			border-color: color(theme(primary) shade(50%));
+			border-color: color(theme(button));
 		}
 	}
 

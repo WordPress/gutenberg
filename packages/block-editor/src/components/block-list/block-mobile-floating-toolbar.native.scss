@@ -1,17 +1,15 @@
-.floatingToolbarContainer {
-	align-items: center;
-	justify-content: center;
-	z-index: 2;
-	left: 0;
-	right: 0;
-	top: -44;
-	position: absolute;
-}
-
 .floatingToolbarFill {
 	background-color: rgba(29, 35, 39, 0.85);
-	height: 44;
+	margin: auto;
+	min-width: 100;
+	max-height: $floating-toolbar-height;
 	border-radius: 22px;
 	flex-direction: row;
-	justify-content: flex-start;
+	z-index: 100;
+	top: -$floating-toolbar-height;
+	height: $floating-toolbar-height;
+	position: absolute;
+	align-items: center;
+	justify-content: center;
+	align-self: center;
 }

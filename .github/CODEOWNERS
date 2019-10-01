@@ -11,6 +11,8 @@
 
 # Blocks
 /packages/block-library                         @Soean @ajitbohra @jorgefilipecosta @talldan
+/packages/block-library/src/social-links        @mkaz
+/packages/block-library/src/social-link         @mkaz
 
 # Editor
 /packages/annotations                           @atimmer @ellatrix
