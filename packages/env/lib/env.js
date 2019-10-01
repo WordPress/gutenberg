@@ -31,7 +31,7 @@ const wpCliRun = ( command, isTests = false ) =>
 const setupSite = ( isTests = false ) =>
 	wpCliRun(
 		`wp core install --url=localhost:888${
-			isTests ? '8' : '9'
+			isTests ? '9' : '8'
 		} --title=Gutenberg --admin_user=admin --admin_password=password --admin_email=admin@wordpress.org`,
 		isTests
 	);
