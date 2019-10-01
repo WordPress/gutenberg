@@ -73,7 +73,7 @@ class MediaContainer extends Component {
 				requestMediaImport( mediaUrl, ( id, url, type ) => {
 					if ( url ) {
 						onSelectMedia( {
-							media_type: type || MEDIA_TYPE_IMAGE, // image fallback for android
+							media_type: type,
 							id,
 							url,
 						} );
@@ -95,7 +95,7 @@ class MediaContainer extends Component {
 		const { onSelectMedia } = this.props;
 
 		onSelectMedia( {
-			media_type: type || MEDIA_TYPE_IMAGE, // image fallback for android
+			media_type: type,
 			id,
 			url,
 		} );
