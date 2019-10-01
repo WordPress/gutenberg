@@ -42,17 +42,6 @@
 	align-items: center;
 }
 
-.container {
-	flex: 1;
-}
-
-.containerFocused {
-	flex: 1;
-	border-color: toggle;
-	border-width: 2px;
-	border-style: solid;
-}
-
 .icon {
 	fill: $gray-dark;
 	width: 100%;

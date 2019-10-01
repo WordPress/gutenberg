@@ -41,6 +41,7 @@ import { doAction, hasAction } from '@wordpress/hooks';
  */
 import MediaUploadProgress from '../image/media-upload-progress';
 import style from './style.scss';
+import styles from './styles';
 import SvgIcon from './icon';
 import SvgIconRetry from './icon-retry';
 
@@ -230,7 +231,7 @@ class VideoEdit extends React.Component {
 								...style.video,
 							};
 
-							const containerStyle = showVideo && isSelected ? style.containerFocused : style.container;
+							const containerStyle = showVideo && isSelected ? styles.containerFocused : styles.container;
 
 							return (
 								<Box onLayout={ this.onVideoContainerLayout } { ...containerStyle }>
