@@ -108,7 +108,7 @@ class Modal extends Component {
 			children,
 			aria,
 			instanceId,
-			isDismissable,
+			isDismissible,
 			// Many of the documented props for Modal are passed straight through
 			// to the ModalFrame component and handled there.
 			...otherProps
@@ -132,7 +132,7 @@ class Modal extends Component {
 						closeLabel={ closeButtonLabel }
 						headingId={ headingId }
 						icon={ icon }
-						isDismissable={ isDismissable }
+						isDismissible={ isDismissible }
 						onClose={ onRequestClose }
 						title={ title }
 					/>
@@ -151,7 +151,7 @@ Modal.defaultProps = {
 	focusOnMount: true,
 	shouldCloseOnEsc: true,
 	shouldCloseOnClickOutside: true,
-	isDismissable: true,
+	isDismissible: true,
 	/* accessibility */
 	aria: {
 		labelledby: null,
