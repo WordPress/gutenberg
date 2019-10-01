@@ -27,10 +27,8 @@ env:
     - LOCAL_SCRIPT_DEBUG: false
     - INSTALL_COMPOSER: false
     - INSTALL_WORDPRESS: true
-    - secure: "OWec7xWzVqI/Q0WAfWruUxSgNt9CWRG2IX6BtAl1MbjZbq5rMYZVWdw/Q0arYErVWmTATdTfrXB/GDYqdrn8Xnq0MnroPZxoI1elWXUvhv76BT1/MLj/8KNqsHDSuHLsNtFeO/ewmUMs/z2WbmBinvcsV4IuDlEksZIsQ/yOvldZ9NWLZ5LH2OCW6WBEvyXjM2dMjgPJv8NOqtKxqQPXg80jyR2J+eF6TpL+kQ9ZV0OFKMBXFq+jiWRVQYuxSTh+Pk6gWAF/nrNbXQU2CfEtuldM3daQUGgou8spIRv0+bRziDVgZdrDxGRQOxAb2p0KP+g6WTGQs5tK7fXzB4sDOTcdU4jY5hhICwGUt9igQYvyXVmh749hEs+RIkNuPqqsuNhFvKrMYFQChSWTyfRMC0OO5UIiCpJh55NSa8BZjNAEzXBv3un++EDoS787nABZskJJ39FUvB3tdGSqGJXJV60ENYshB8ltA+jYhX0bFepMsPXsXqgjcFm625Fv9G7BJXCoMkjAp5vWPyb4gKUkcqJP+vjk+zKqnzO4DVJCbPelC2xqwmVNdJnBKJoLfQYGdsSshdBLNHzGfaqgOVP5JSKK44jI38hPGeKBQ0+EmyPCsgg1f+VUXXQkb2aNB0MDEyuVfytkSRG65S3WBIMMb6u7qjEXjXz7oSHsRrI6hKo="
 
 before_install:
-  - echo "$GITHUB_TOKEN" | docker login docker.pkg.github.com -u pento --password-stdin
   - nvm install --latest-npm
   - |
     if [[ "$INSTALL_WORDPRESS" = "true" ]]; then
