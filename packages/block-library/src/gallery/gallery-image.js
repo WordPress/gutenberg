@@ -14,11 +14,6 @@ import { withSelect } from '@wordpress/data';
 import { RichText } from '@wordpress/block-editor';
 import { isBlobURL } from '@wordpress/blob';
 
-/**
- * Internal dependencies
- */
-import MenuBox from './menu-box';
-
 class GalleryImage extends Component {
 	constructor() {
 		super( ...arguments );
@@ -91,11 +86,10 @@ class GalleryImage extends Component {
 	}
 
 	render() {
-		const { url, alt, id, linkTo, link, isFirstItem, isLastItem, isSelected,
-			caption, onRemove, onMoveForward, onMoveBackward, setAttributes, isCompact,
-			'aria-label': ariaLabel } = this.props;
+		const { url, alt, id, linkTo, link, isFirstItem, isLastItem, isSelected, caption, onRemove, onMoveForward, onMoveBackward, setAttributes, 'aria-label': ariaLabel } = this.props;
 
 		let href;
+
 		switch ( linkTo ) {
 			case 'media':
 				href = url;
@@ -134,10 +128,7 @@ class GalleryImage extends Component {
 		return (
 			<figure className={ className }>
 				{ href ? <a href={ href }>{ img }</a> : img }
-				<MenuBox
-					isSelected={ isSelected }
-					isCompact={ isCompact }
-				>
+				<div className="block-library-gallery-item__move-menu">
 					<IconButton
 						icon="arrow-left"
 						onClick={ isFirstItem ? undefined : onMoveBackward }
@@ -154,13 +145,8 @@ class GalleryImage extends Component {
 						aria-disabled={ isLastItem }
 						disabled={ ! isSelected }
 					/>
-				</MenuBox>
-
-				<MenuBox
-					isSelected={ isSelected }
-					isCompact={ isCompact }
-					right
-				>
+				</div>
+				<div className="block-library-gallery-item__inline-menu">
 					<IconButton
 						icon="no-alt"
 						onClick={ onRemove }
@@ -168,7 +154,7 @@ class GalleryImage extends Component {
 						label={ __( 'Remove Image' ) }
 						disabled={ ! isSelected }
 					/>
-				</MenuBox>
+				</div>
 				<RichText
 					tagName="figcaption"
 					placeholder={ isSelected ? __( 'Write caption…' ) : null }

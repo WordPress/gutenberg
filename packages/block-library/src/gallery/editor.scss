@@ -54,7 +54,8 @@ ul.wp-block-gallery {
 		}
 	}
 
-	.is-selected {
+	.is-selected .block-library-gallery-item__move-menu,
+	.is-selected .block-library-gallery-item__inline-menu {
 		background-color: theme(primary);
 
 		.components-button {
@@ -95,11 +96,41 @@ ul.wp-block-gallery {
 	}
 }
 
+.block-library-gallery-item__move-menu,
+.block-library-gallery-item__inline-menu {
+	padding: $grid-size-small;
+	display: inline-flex;
+	z-index: z-index(".block-library-gallery-item__inline-menu");
+
+	.components-button {
+		color: transparent;
+	}
+
+	@include break-small() {
+		// Use smaller buttons to fit when there are many columns.
+		.columns-7 &,
+		.columns-8 & {
+			padding: $grid-size-small / 2;
+		}
+	}
+}
+
+.block-library-gallery-item__inline-menu {
+	position: absolute;
+	top: -2px;
+	right: -2px;
+}
+
+.block-library-gallery-item__move-menu {
+	position: absolute;
+	top: -2px;
+	left: -2px;
+}
+
 .blocks-gallery-item__move-backward,
 .blocks-gallery-item__move-forward,
 .blocks-gallery-item__remove {
 	padding: 0;
-	color: transparent;
 }
 
 .blocks-gallery-item .components-spinner {

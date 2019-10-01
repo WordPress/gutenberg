@@ -311,7 +311,6 @@ class GalleryEdit extends Component {
 									url={ img.url }
 									alt={ img.alt }
 									id={ img.id }
-									isCompact={ columns >= 7 }
 									isFirstItem={ index === 0 }
 									isLastItem={ ( index + 1 ) === images.length }
 									isSelected={ isSelected && this.state.selectedImage === index }
