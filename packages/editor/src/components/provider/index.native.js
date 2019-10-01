@@ -72,7 +72,7 @@ class NativeEditorProvider extends Component {
 				[ payload.mediaType === 'image' ? 'url' : 'src' ]: payload.mediaUrl,
 			} );
 
-			this.props.insertBlock( newBlock, this.props.blockCount );
+			this.props.insertBlock( newBlock, this.props.selectedBlockIndex );
 		} );
 	}
 
@@ -155,7 +155,7 @@ class NativeEditorProvider extends Component {
 }
 
 export default compose( [
-	withSelect( ( select, { rootClientId } ) => {
+	withSelect( ( select ) => {
 		const {
 			__unstableIsEditorReady: isEditorReady,
 			getEditorBlocks,
@@ -167,8 +167,12 @@ export default compose( [
 		} = select( 'core/edit-post' );
 
 		const {
-			getBlockCount,
+			getBlockIndex,
+			getSelectedBlockClientId,
 		} = select( 'core/block-editor' );
+
+		const selectedBlockClientId = getSelectedBlockClientId();
+		const selectedBlockIndex = getBlockIndex( selectedBlockClientId );
 
 		return {
 			mode: getEditorMode(),
@@ -176,7 +180,7 @@ export default compose( [
 			blocks: getEditorBlocks(),
 			title: getEditedPostAttribute( 'title' ),
 			getEditedPostContent,
-			blockCount: getBlockCount( rootClientId ),
+			selectedBlockIndex: selectedBlockIndex,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
