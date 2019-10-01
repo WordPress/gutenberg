@@ -6,7 +6,8 @@ import renderer from 'react-test-renderer';
 /**
  * Internal dependencies
  */
-import { ImageEdit, NEW_TAB_REL } from '../edit';
+import { ImageEdit } from '../edit';
+import { NEW_TAB_REL } from '../constants';
 
 const getStylesFromColorScheme = () => {
 	return { color: 'white' };

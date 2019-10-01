@@ -42,10 +42,12 @@ import { withPreferredColorScheme } from '@wordpress/compose';
 import styles from './styles.scss';
 import SvgIcon from './icon';
 import SvgIconRetry from './icon-retry';
+import { getUpdatedLinkTargetSettings } from './utils';
 
-const LINK_DESTINATION_CUSTOM = 'custom';
-const LINK_DESTINATION_NONE = 'none';
-export const NEW_TAB_REL = 'noreferrer noopener';
+import {
+	LINK_DESTINATION_CUSTOM,
+	LINK_DESTINATION_NONE,
+} from './constants';
 
 // Default Image ratio 4:3
 const IMAGE_ASPECT_RATIO = 4 / 3;
@@ -172,20 +174,8 @@ export class ImageEdit extends React.Component {
 	}
 
 	onSetNewTab( value ) {
-		const { rel } = this.props.attributes;
-		const linkTarget = value ? '_blank' : undefined;
-
-		let updatedRel = rel;
-		if ( linkTarget && ! rel ) {
-			updatedRel = NEW_TAB_REL;
-		} else if ( ! linkTarget && rel === NEW_TAB_REL ) {
-			updatedRel = undefined;
-		}
-
-		this.props.setAttributes( {
-			linkTarget,
-			rel: updatedRel,
-		} );
+		const updatedLinkTarget = getUpdatedLinkTargetSettings( value, this.props.attributes );
+		this.props.setAttributes( updatedLinkTarget );
 	}
 
 	onClearSettings() {
