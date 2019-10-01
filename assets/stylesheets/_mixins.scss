@@ -179,7 +179,7 @@
 	box-shadow: 0 0 0 transparent;
 	transition: box-shadow 0.1s linear;
 	border-radius: $radius-round-rectangle;
-	border: $border-width solid $dark-gray-150;
+	border: $border-width solid $dark-gray-200;
 	@include reduce-motion("transition");
 }
 
@@ -419,8 +419,12 @@
 
 		/* Fonts smaller than 16px causes mobile safari to zoom. */
 		font-size: $mobile-text-min-font-size;
+		/* Override core line-height. To be reviewed. */
+		line-height: normal;
 		@include break-small {
 			font-size: $default-font-size;
+			/* Override core line-height. To be reviewed. */
+			line-height: normal;
 		}
 
 		&:focus {
@@ -511,10 +515,14 @@
 		}
 	}
 
+	// We provide explicit pixel dimensions to ensure a crisp appearance.
+	// This radio button style should be ported upstream.
 	input[type="radio"] {
 		border-radius: $radius-round;
 
 		&:checked::before {
+			width: 6px;
+			height: 6px;
 			margin: 6px 0 0 6px;
 			background-color: $white;
 

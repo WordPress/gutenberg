@@ -106,7 +106,6 @@ describe( 'RichText', () => {
 	it( 'should undo backtick transform with backspace', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( '`a`' );
-		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
 		await page.keyboard.press( 'Backspace' );
 
 		// Expect "`a`" to be restored.
@@ -116,7 +115,6 @@ describe( 'RichText', () => {
 	it( 'should not undo backtick transform with backspace after typing', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( '`a`' );
-		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
 		await page.keyboard.type( 'b' );
 		await page.keyboard.press( 'Backspace' );
 		await page.keyboard.press( 'Backspace' );

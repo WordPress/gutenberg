@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/format-library",
-	"version": "1.7.0",
+	"version": "1.9.0",
 	"description": "Format library for the WordPress editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -31,7 +31,7 @@
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/rich-text": "file:../rich-text",
 		"@wordpress/url": "file:../url",
-		"lodash": "^4.17.14"
+		"lodash": "^4.17.15"
 	},
 	"publishConfig": {
 		"access": "public"

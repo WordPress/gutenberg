@@ -58,7 +58,25 @@ describe( 'List', () => {
 	it( 'should undo asterisk transform with backspace', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( '* ' );
+		await page.keyboard.press( 'Backspace' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should undo asterisk transform with backspace after selection changes', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '* ' );
 		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
+		await page.keyboard.press( 'Backspace' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should undo asterisk transform with backspace after selection changes without requestIdleCallback', async () => {
+		await clickBlockAppender();
+		await page.evaluate( () => delete window.requestIdleCallback );
+		await page.keyboard.type( '* ' );
+		await new Promise( ( resolve ) => setTimeout( resolve, 100 ) );
 		await page.keyboard.press( 'Backspace' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -67,7 +85,6 @@ describe( 'List', () => {
 	it( 'should undo asterisk transform with escape', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( '* ' );
-		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
 		await page.keyboard.press( 'Escape' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -76,7 +93,6 @@ describe( 'List', () => {
 	it( 'should not undo asterisk transform with backspace after typing', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( '* a' );
-		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
 		await page.keyboard.press( 'Backspace' );
 		await page.keyboard.press( 'Backspace' );
 
@@ -87,7 +103,6 @@ describe( 'List', () => {
 		await clickBlockAppender();
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '* ' );
-		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
 		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'ArrowDown' );
 		await page.keyboard.press( 'Backspace' );
@@ -409,6 +424,25 @@ describe( 'List', () => {
 		await page.keyboard.press( 'Enter' );
 		// The caret should land in the second item.
 		await page.keyboard.type( '2' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should not indent list on space with modifier', async () => {
+		await clickBlockAppender();
+
+		await page.keyboard.type( '* 1' );
+		await page.keyboard.press( 'Enter' );
+		await pressKeyWithModifier( 'shift', 'Space' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should only convert to list when shortcut ends with space', async () => {
+		await clickBlockAppender();
+
+		// Tests the shortcut with a non breaking space.
+		await page.keyboard.type( '* ' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );

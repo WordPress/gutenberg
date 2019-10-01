@@ -118,7 +118,9 @@ class Editor extends Component {
 				// For now, let's assume: serialize( parse( html ) ) !== html
 				raw: serialize( parse( props.initialHtml || '' ) ),
 			},
-			type: 'draft',
+			type: 'post',
+			status: 'draft',
+			meta: [],
 		};
 
 		return (

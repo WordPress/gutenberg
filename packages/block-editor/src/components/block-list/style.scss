@@ -419,6 +419,10 @@
 			width: auto;
 			border-bottom: $border-width solid $light-gray-800;
 			bottom: auto;
+
+			@include break-small() {
+				border-bottom: none;
+			}
 		}
 	}
 
@@ -495,7 +499,7 @@
 		&.is-multi-selected > .block-editor-block-mover,
 		> .block-editor-block-list__block-edit > .block-editor-block-mover {
 			// This moves the menu up by the height of the button + border + padding.
-			top: -$block-side-ui-width - $block-padding - $block-side-ui-clearance;
+			top: -$block-side-ui-width - $block-padding - $block-side-ui-clearance - ( $border-width * 2 );
 			bottom: auto;
 			min-height: 0;
 			height: auto;
@@ -526,7 +530,7 @@
 
 		// Align block toolbar to floated content.
 		// Extra specificity is needed to avoid applying this to innerblocks.
-		@include break-mobile() {
+		@include break-small() {
 			> .editor-block-list__block-edit > .block-editor-block-contextual-toolbar > .block-editor-block-toolbar {
 				/*!rtl:begin:ignore*/
 				left: $block-side-ui-width * 3 + ($grid-size-small * 1.5);
@@ -667,10 +671,6 @@
 	> .block-editor-block-list__block-edit > .block-editor-block-mover {
 		position: absolute;
 		width: $block-side-ui-width + $block-side-ui-clearance;
-
-		// Stretch to fill half of the available space to increase hoverable area.
-		height: 100%;
-		max-height: $block-side-ui-width * 4;
 	}
 
 	// Position depending on whether selected or not.
@@ -696,7 +696,7 @@
 		padding-right: $block-side-ui-clearance;
 
 		// Position for top level blocks.
-		left: -$block-side-ui-width - $block-side-ui-clearance - $block-padding - $border-width;
+		left: -$block-side-ui-width - $block-side-ui-clearance - $block-padding - $border-width - $grid-size;
 
 		// Hide on mobile, as mobile has a separate solution.
 		display: none;
@@ -860,12 +860,12 @@
 
 	// Show a clickable plus.
 	.block-editor-inserter__toggle {
-		margin-top: -8px;
 		border-radius: 50%;
 		color: $blue-medium-focus;
 		background: $white;
-		height: $block-padding * 2 + 8px;
-		width: $block-padding * 2 + 8px;
+		height: $block-padding * 2;
+		width: $block-padding * 2;
+		padding: $grid-size-small;
 
 		&:not(:disabled):not([aria-disabled="true"]):hover {
 			box-shadow: none;
@@ -1067,6 +1067,15 @@
 		// RTL note: this rule should not be auto-flipped based on direction.
 		/*rtl:ignore*/
 		float: right;
+
+		// IE11 moves the toolbar to the right because the parent container doesn't expand.
+		// A min-width mitigates this.
+		min-width: 200px;
+
+		// IE11 does not support `position: sticky`.
+		@supports (position: sticky) {
+			min-width: 0;
+		}
 	}
 
 	.block-editor-block-list__block[data-align="left"] &,
@@ -1226,9 +1235,12 @@
 	margin-bottom: -$block-padding;
 	transform: translateY(-$block-padding);
 
-	// Bigger padding on mobile where blocks are edge to edge.
-	padding: 10px $block-padding;
-	@include break-small() {
-		padding: 10px $block-padding;
+	&.block-editor-block-list__block-crash-warning {
+		// The block crash warning has no block preview underneath it.
+		// The lack of a preview combined with the negative margin that
+		// the warning normally has results in crashed blocks overlapping
+		// any blocks that come after them. Resetting the margin to `auto`
+		// solves this.
+		margin-bottom: auto;
 	}
 }

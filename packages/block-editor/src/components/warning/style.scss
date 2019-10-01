@@ -6,7 +6,7 @@
 	background-color: $white;
 	border: $border-width solid $light-gray-500;
 	text-align: left;
-	padding: 20px;
+	padding: 10px $block-padding $block-padding;
 
 	// Avoid conflict with the multi-selection highlight color.
 	.has-warning.is-multi-selected & {
@@ -16,7 +16,10 @@
 	.is-selected & {
 		// Use opacity to work in various editor styles.
 		border-color: $dark-opacity-light-800;
-		border-left-color: transparent;
+
+		@include break-small {
+			border-left-color: transparent;
+		}
 
 		.is-dark-theme & {
 			border-color: $light-opacity-light-800;
@@ -27,6 +30,12 @@
 		line-height: $default-line-height;
 		font-family: $default-font;
 		font-size: $default-font-size;
+		margin: 1em 0;
+
+	}
+	// Required extra-specifity to override paragraph block styles.
+	p.block-editor-warning__message.block-editor-warning__message {
+		min-height: auto;
 	}
 
 	.block-editor-warning__contents {
@@ -34,7 +43,7 @@
 		flex-direction: row;
 		justify-content: space-between;
 		flex-wrap: wrap;
-		align-items: center;
+		align-items: baseline;
 		width: 100%;
 	}
 
@@ -48,7 +57,8 @@
 }
 
 .block-editor-warning__secondary {
-	margin: 3px 0 0 -4px;
+	margin: 5px 0 0 -4px;
+	height: $block-controls-height;
 
 	// the padding and margin of the more menu is intentionally non-standard
 	.components-icon-button {

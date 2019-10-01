@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "6.3.0",
+	"version": "6.6.0-rc.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -23,6 +23,7 @@
 		"@wordpress/api-fetch": "file:packages/api-fetch",
 		"@wordpress/autop": "file:packages/autop",
 		"@wordpress/blob": "file:packages/blob",
+		"@wordpress/block-directory": "file:packages/block-directory",
 		"@wordpress/block-editor": "file:packages/block-editor",
 		"@wordpress/block-library": "file:packages/block-library",
 		"@wordpress/block-serialization-default-parser": "file:packages/block-serialization-default-parser",
@@ -92,7 +93,7 @@
 		"babel-plugin-react-native-classname-to-style": "1.2.2",
 		"babel-plugin-react-native-platform-specific-extensions": "1.1.1",
 		"benchmark": "2.1.4",
-		"browserslist": "4.6.2",
+		"browserslist": "4.7.0",
 		"chalk": "2.4.1",
 		"commander": "2.20.0",
 		"concurrently": "3.5.0",
@@ -103,20 +104,19 @@
 		"enzyme": "3.9.0",
 		"eslint-plugin-eslint-comments": "3.1.2",
 		"eslint-plugin-import": "2.18.2",
-		"eslint-plugin-jest": "22.14.1",
 		"fast-glob": "2.2.7",
 		"fbjs": "0.8.17",
 		"fs-extra": "8.0.1",
 		"glob": "7.1.2",
-		"husky": "0.14.3",
+		"husky": "3.0.5",
 		"inquirer": "6.3.1",
 		"is-equal-shallow": "0.1.3",
 		"jest-junit": "6.4.0",
 		"jest-serializer-enzyme": "1.0.0",
 		"jsdom": "11.12.0",
 		"lerna": "3.16.4",
-		"lint-staged": "8.1.5",
-		"lodash": "4.17.14",
+		"lint-staged": "9.2.5",
+		"lodash": "4.17.15",
 		"make-dir": "3.0.0",
 		"metro-react-native-babel-preset": "0.55.0",
 		"metro-react-native-babel-transformer": "0.55.0",
@@ -126,10 +126,10 @@
 		"parcel-bundler": "1.12.3",
 		"postcss": "7.0.13",
 		"progress": "2.0.3",
-		"react": "16.8.4",
-		"react-dom": "16.8.4",
+		"react": "16.9.0",
+		"react-dom": "16.9.0",
 		"react-native": "0.60.0",
-		"react-test-renderer": "16.8.4",
+		"react-test-renderer": "16.9.0",
 		"rimraf": "2.6.2",
 		"rtlcss": "2.4.0",
 		"sass-loader": "6.0.7",
@@ -141,6 +141,7 @@
 		"source-map-loader": "0.2.4",
 		"sprintf-js": "1.1.1",
 		"stylelint-config-wordpress": "13.1.0",
+		"typescript": "3.5.3",
 		"uuid": "3.3.2",
 		"webpack": "4.8.3",
 		"worker-farm": "1.7.0"
@@ -188,24 +189,24 @@
 		"dev:packages": "node ./bin/packages/watch.js",
 		"docs:build": "node ./docs/tool/index.js && node ./bin/update-readmes.js",
 		"fixtures:clean": "rimraf \"packages/e2e-tests/fixtures/blocks/*.+(json|serialized.html)\"",
-		"fixtures:server-registered": "docker-compose run -w /var/www/html/wp-content/plugins/gutenberg --rm wordpress ./bin/get-server-blocks.php > test/integration/full-content/server-registered.json",
+		"fixtures:server-registered": "wp-scripts env docker-run php ./bin/get-server-blocks.php > test/integration/full-content/server-registered.json",
 		"fixtures:generate": "npm run fixtures:server-registered && cross-env GENERATE_MISSING_FIXTURES=y npm run test-unit",
 		"fixtures:regenerate": "npm run fixtures:clean && npm run fixtures:generate",
-		"lint": "concurrently \"npm run lint-js\" \"npm run lint-pkg-json\" \"npm run lint-css\"",
+		"lint": "concurrently \"npm run lint-js\" \"npm run lint-pkg-json\" \"npm run lint-css\" \"npm run lint-types\"",
 		"lint-js": "wp-scripts lint-js",
 		"lint-js:fix": "npm run lint-js -- --fix",
-		"lint-php": "docker-compose run --rm composer run-script lint",
+		"lint-php": "wp-scripts env lint-php",
 		"lint-pkg-json": "wp-scripts lint-pkg-json ./packages",
 		"lint-css": "wp-scripts lint-style '**/*.scss'",
 		"lint-css:fix": "npm run lint-css -- --fix",
+		"lint-types": "tsc",
 		"package-plugin": "./bin/build-plugin-zip.sh",
 		"pot-to-php": "./bin/pot-to-php.js",
-		"precommit": "lint-staged",
 		"publish:check": "npm run build:packages && lerna updated",
 		"publish:dev": "npm run build:packages && lerna publish --npm-tag next",
 		"publish:prod": "npm run build:packages && lerna publish",
 		"test": "npm run lint && npm run test-unit",
-		"pretest-e2e": "cross-env SCRIPT_DEBUG=false ./bin/reset-local-e2e-tests.sh",
+		"pretest-e2e": "npm run env reinstall",
 		"test-e2e": "wp-scripts test-e2e --config packages/e2e-tests/jest.config.js",
 		"test-e2e:watch": "npm run test-e2e -- --watch",
 		"test-performance": "wp-scripts test-e2e --config packages/e2e-tests/jest.performance.config.js",
@@ -213,12 +214,19 @@
 		"test-unit": "wp-scripts test-unit-js --config test/unit/jest.config.js",
 		"test-unit:update": "npm run test-unit -- --updateSnapshot",
 		"test-unit:watch": "npm run test-unit -- --watch",
-		"test-unit-php": "docker-compose run --rm wordpress_phpunit phpunit",
-		"test-unit-php-multisite": "docker-compose run -e WP_MULTISITE=1 --rm wordpress_phpunit phpunit",
+		"test-unit-php": "wp-scripts env test-php",
+		"test-unit-php-multisite": "cross-env WP_MULTISITE=1 wp-scripts env test-php",
 		"test-unit:native": "cd test/native/ && cross-env NODE_ENV=test jest --config ./jest.config.js",
 		"test-unit:native:debug": "cd test/native/ && node --inspect ../../node_modules/.bin/jest --runInBand --config ./jest.config.js",
 		"playground:build": "npm run build:packages && parcel build playground/src/index.html -d playground/dist",
-		"playground:start": "concurrently \"npm run dev:packages\" \"parcel playground/src/index.html -d playground/dist\""
+		"playground:start": "concurrently \"npm run dev:packages\" \"parcel playground/src/index.html -d playground/dist\"",
+		"preenv": "npm run check-engines",
+		"env": "wp-scripts env"
+	},
+	"husky": {
+		"hooks": {
+			"pre-commit": "lint-staged"
+		}
 	},
 	"lint-staged": {
 		"packages/*/package.json": [
@@ -236,5 +244,18 @@
 		"packages/**/*.js": [
 			"node ./bin/update-readmes.js"
 		]
+	},
+	"wp-env": {
+		"plugin-dir": "gutenberg",
+		"plugin-name": "Gutenberg",
+		"docker-template": "./bin/docker-compose.override.yml.template",
+		"welcome-logo": [
+			",⁻⁻⁻·       .                 |",
+			"|  ،⁓’.   . |---  ,---. ,---. |---. ,---. ,---. ,---.",
+			"|   | |   | |     |---' |   | |   | |---' |     |   |",
+			"`---' `---' `---’ `---’ '   ` `---' `---’ `     `---|",
+			"                                                `---'"
+		],
+		"welcome-build-command": "npm run dev"
 	}
 }

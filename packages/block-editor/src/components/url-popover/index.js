@@ -61,7 +61,7 @@ class URLPopover extends Component {
 							<IconButton
 								className="editor-url-popover__settings-toggle block-editor-url-popover__settings-toggle"
 								icon="arrow-down-alt2"
-								label={ __( 'Link Settings' ) }
+								label={ __( 'Link settings' ) }
 								onClick={ this.toggleSettingsVisibility }
 								aria-expanded={ isSettingsExpanded }
 							/>

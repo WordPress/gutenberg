@@ -20,7 +20,10 @@ import { KeyboardAwareFlatList, ReadableContentView } from '@wordpress/component
 import styles from './style.scss';
 import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
+<<<<<<< HEAD
 import FloatingToolbar from './block-mobile-floating-toolbar';
+=======
+>>>>>>> master
 
 const innerToolbarHeight = 44;
 
@@ -96,9 +99,12 @@ export class BlockList extends Component {
 					ListHeaderComponent={ header }
 					ListEmptyComponent={ this.renderDefaultBlockAppender }
 					ListFooterComponent={ withFooter && this.renderBlockListFooter }
+<<<<<<< HEAD
 					getItemLayout={ ( data, index ) => {
 						return { length: 0, offset: 0, index };
 					} }
+=======
+>>>>>>> master
 				/>
 
 				{ renderAppender && blockClientIds.length > 0 &&
@@ -172,7 +178,10 @@ export default compose( [
 			getBlockInsertionPoint,
 			isBlockInsertionPointVisible,
 			getSelectedBlock,
+<<<<<<< HEAD
 			getBlockRootClientId,
+=======
+>>>>>>> master
 		} = select( 'core/block-editor' );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
@@ -213,8 +222,11 @@ export default compose( [
 			shouldShowBlockAtIndex,
 			shouldShowInsertionPoint,
 			selectedBlockClientId,
+<<<<<<< HEAD
 			isFirstBlock,
 			selectedBlockParentId,
+=======
+>>>>>>> master
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

@@ -63,7 +63,7 @@ describe( 'TypeWriter', () => {
 
 		const positionAfterArrowUp = await getCaretPosition();
 
-		expect( positionAfterArrowUp ).toBeLessThan( newPosition );
+		expect( positionAfterArrowUp ).toBeLessThanOrEqual( newPosition );
 
 		// Should be scrolled to new position.
 		await page.keyboard.press( 'Enter' );
@@ -74,6 +74,13 @@ describe( 'TypeWriter', () => {
 	it( 'should maintain caret position after scroll', async () => {
 		// Create first block.
 		await page.keyboard.press( 'Enter' );
+
+		// Create blocks until there is a scrollable container.
+		while ( await page.evaluate( () =>
+			! wp.dom.getScrollContainer( document.activeElement )
+		) ) {
+			await page.keyboard.press( 'Enter' );
+		}
 
 		await page.evaluate( () =>
 			wp.dom.getScrollContainer( document.activeElement ).scrollTop = 1
@@ -107,6 +114,13 @@ describe( 'TypeWriter', () => {
 		// Create first block.
 		await page.keyboard.press( 'Enter' );
 
+		// Create blocks until there is a scrollable container.
+		while ( await page.evaluate( () =>
+			! wp.dom.getScrollContainer( document.activeElement )
+		) ) {
+			await page.keyboard.press( 'Enter' );
+		}
+
 		let count = 0;
 
 		// Create blocks until the the typewriter effect kicks in.
@@ -131,7 +145,7 @@ describe( 'TypeWriter', () => {
 
 		const newBottomPosition = await getCaretPosition();
 
-		expect( newBottomPosition ).toBeLessThan( bottomPostition );
+		expect( newBottomPosition ).toBeLessThanOrEqual( bottomPostition );
 
 		// Should maintain new caret position.
 		await page.keyboard.press( 'Enter' );

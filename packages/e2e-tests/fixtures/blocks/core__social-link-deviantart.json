@@ -1,0 +1,13 @@
+[
+    {
+        "clientId": "_clientId_0",
+        "name": "core/social-link-deviantart",
+        "isValid": true,
+        "attributes": {
+            "url": "https://example.com/",
+            "site": "deviantart"
+        },
+        "innerBlocks": [],
+        "originalContent": ""
+    }
+]

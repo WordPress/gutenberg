@@ -161,13 +161,13 @@ class LatestPostsEdit extends Component {
 		const layoutControls = [
 			{
 				icon: 'list-view',
-				title: __( 'List View' ),
+				title: __( 'List view' ),
 				onClick: () => setAttributes( { postLayout: 'list' } ),
 				isActive: postLayout === 'list',
 			},
 			{
 				icon: 'grid-view',
-				title: __( 'Grid View' ),
+				title: __( 'Grid view' ),
 				onClick: () => setAttributes( { postLayout: 'grid' } ),
 				isActive: postLayout === 'grid',
 			},

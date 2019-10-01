@@ -7,26 +7,35 @@ import {
 import {
 	InnerBlocks,
 	InspectorControls,
+	BlockControls,
 } from '@wordpress/block-editor';
 import {
 	CheckboxControl,
 	PanelBody,
+	Toolbar,
 } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import MenuItemInserter from './menu-item-inserter';
-import { __ } from '@wordpress/i18n';
+import useBlockNavigator from './use-block-navigator';
 
 function NavigationMenu( {
 	attributes,
-	clientId,
-	isSelected,
 	setAttributes,
+	clientId,
 } ) {
+	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator( clientId );
+
 	return (
 		<Fragment>
+			<BlockControls>
+				<Toolbar>
+					{ navigatorToolbarButton }
+				</Toolbar>
+			</BlockControls>
+			{ navigatorModal }
 			<InspectorControls>
 				<PanelBody
 					title={ __( 'Menu Settings' ) }
@@ -45,11 +54,6 @@ function NavigationMenu( {
 				<InnerBlocks
 					allowedBlocks={ [ 'core/navigation-menu-item' ] }
 				/>
-				{ isSelected && (
-					<MenuItemInserter
-						rootClientId={ clientId }
-					/>
-				) }
 			</div>
 		</Fragment>
 	);
