@@ -45,6 +45,7 @@ import SvgIconRetry from './icon-retry';
 
 const LINK_DESTINATION_CUSTOM = 'custom';
 const LINK_DESTINATION_NONE = 'none';
+const NEW_TAB_REL = 'noreferrer noopener';
 
 // Default Image ratio 4:3
 const IMAGE_ASPECT_RATIO = 4 / 3;
@@ -65,6 +66,7 @@ class ImageEdit extends React.Component {
 		this.updateAlt = this.updateAlt.bind( this );
 		this.updateImageURL = this.updateImageURL.bind( this );
 		this.onSetLinkDestination = this.onSetLinkDestination.bind( this );
+		this.onSetNewTab = this.onSetNewTab.bind( this );
 		this.onImagePressed = this.onImagePressed.bind( this );
 		this.onClearSettings = this.onClearSettings.bind( this );
 		this.onFocusCaption = this.onFocusCaption.bind( this );
@@ -169,6 +171,23 @@ class ImageEdit extends React.Component {
 		} );
 	}
 
+	onSetNewTab( value ) {
+		const { rel } = this.props.attributes;
+		const linkTarget = value ? '_blank' : undefined;
+
+		let updatedRel = rel;
+		if ( linkTarget && ! rel ) {
+			updatedRel = NEW_TAB_REL;
+		} else if ( ! linkTarget && rel === NEW_TAB_REL ) {
+			updatedRel = undefined;
+		}
+
+		this.props.setAttributes( {
+			linkTarget,
+			rel: updatedRel,
+		} );
+	}
+
 	onClearSettings() {
 		this.props.setAttributes( {
 			alt: '',
@@ -204,7 +223,7 @@ class ImageEdit extends React.Component {
 
 	render() {
 		const { attributes, isSelected } = this.props;
-		const { url, height, width, alt, href, id } = attributes;
+		const { url, height, width, alt, href, id, linkTarget } = attributes;
 
 		const getToolbarEditButton = ( open ) => (
 			<BlockControls>
@@ -230,6 +249,12 @@ class ImageEdit extends React.Component {
 						autoCapitalize="none"
 						autoCorrect={ false }
 						keyboardType="url"
+					/>
+					<BottomSheet.SwitchCell
+						icon={ 'external' }
+						label={ __( 'Open in new tab' ) }
+						value={ linkTarget === '_blank' }
+						onValueChange={ this.onSetNewTab }
 					/>
 					<BottomSheet.Cell
 						icon={ 'editor-textcolor' }
