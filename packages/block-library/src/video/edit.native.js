@@ -196,7 +196,7 @@ class VideoEdit extends React.Component {
 
 		return (
 			<TouchableWithoutFeedback onPress={ this.onVideoPressed } disabled={ ! isSelected }>
-				<Box flex={ 1 }>
+				<Box>
 					{ ! this.state.isCaptionSelected &&
 						<BlockControls>
 							{ toolbarEditButton }
@@ -217,15 +217,10 @@ class VideoEdit extends React.Component {
 						renderContent={ ( { isUploadInProgress, isUploadFailed, retryMessage } ) => {
 							const showVideo = isURL( src ) && ! isUploadInProgress && ! isUploadFailed;
 							const icon = this.getIcon( isUploadFailed, false );
-							const iconContainerSize = isUploadFailed ? 80 : 40;
+							const styleIconContainer = isUploadFailed ? style.modalIconRetry : style.modalIcon;
 
 							const iconContainer = (
-								<Box
-									width={ iconContainerSize }
-									height={ iconContainerSize }
-									alignItems="center"
-									justifyContent="center"
-								>
+								<Box { ...styleIconContainer } >
 									{ icon }
 								</Box>
 							);
@@ -247,7 +242,7 @@ class VideoEdit extends React.Component {
 												source={ { uri: src } }
 												paused={ true }
 											/>
-										</Box> )									:
+										</Box> ) :
 										( <Box { ...{ height: videoContainerHeight, width: '100%', ...style.placeholder } } >
 											{ videoContainerHeight > 0 && iconContainer }
 											{ isUploadFailed && <Text style={ style.uploadFailedText }>{ retryMessage }</Text> }
