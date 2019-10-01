@@ -1,9 +1,4 @@
 /**
- * WordPress dependencies
- */
-// import { withInstanceId } from '@wordpress/compose';
-
-/**
  * Internal dependencies
  */
 import Cell from '../mobile/bottom-sheet/cell';
