@@ -510,10 +510,15 @@ public class WPAndroidGlueCode {
         return "";
     }
 
+    private String getMediaType(final boolean isVideo) {
+        return isVideo ? "video" : "image";
+    }
+
     public void appendMediaFile(int mediaId, final String mediaUrl, final boolean isVideo) {
         if (mPendingMediaSelectedCallback != null && mMediaPickedByUserOnBlock) {
+            String mediaType = getMediaType(isVideo);
             mMediaPickedByUserOnBlock = false;
-            mPendingMediaSelectedCallback.onMediaSelected(mediaId, mediaUrl);
+            mPendingMediaSelectedCallback.onMediaSelected(mediaId, mediaUrl, mediaType);
             mPendingMediaSelectedCallback = null;
         } else {
             // we can assume we're being passed a new image from share intent as there was no selectMedia callback
@@ -527,8 +532,9 @@ public class WPAndroidGlueCode {
 
     public void appendUploadMediaFile(final int mediaId, final String mediaUri, final boolean isVideo) {
        if (isMediaUploadCallbackRegistered() && mMediaPickedByUserOnBlock) {
+           String mediaType = getMediaType(isVideo);
            mMediaPickedByUserOnBlock = false;
-           mPendingMediaUploadCallback.onUploadMediaFileSelected(mediaId, mediaUri);
+           mPendingMediaUploadCallback.onUploadMediaFileSelected(mediaId, mediaUri, mediaType);
        } else {
            // we can assume we're being passed a new image from share intent as there was no selectMedia callback
            sendOrDeferAppendMediaSignal(mediaId, mediaUri, isVideo);
@@ -537,7 +543,7 @@ public class WPAndroidGlueCode {
 
     private void sendOrDeferAppendMediaSignal(final int mediaId, final String mediaUri, final boolean isVideo) {
         // if editor is mounted, let's append the media file
-        String mediaType = isVideo ? "video" : "image";
+        String mediaType = getMediaType(isVideo);
         if (mIsEditorMounted) {
             if (!TextUtils.isEmpty(mediaUri) && mediaId > 0) {
                 // send signal to JS

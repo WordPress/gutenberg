@@ -8,11 +8,11 @@ public interface GutenbergBridgeJS2Parent {
     void editorDidMount(ReadableArray unsupportedBlockNames);
 
     interface MediaSelectedCallback {
-        void onMediaSelected(int mediaId, String mediaUrl);
+        void onMediaSelected(int mediaId, String mediaUrl, String mediaType);
     }
 
     interface MediaUploadCallback {
-        void onUploadMediaFileSelected(int mediaId, String mediaUri);
+        void onUploadMediaFileSelected(int mediaId, String mediaUri, String mediaType);
         void onUploadMediaFileClear(int mediaId);
         void onMediaFileUploadProgress(int mediaId, float progress);
         void onMediaFileUploadSucceeded(int mediaId, String mediaUrl, int serverId);
