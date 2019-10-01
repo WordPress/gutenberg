@@ -180,7 +180,7 @@ export default compose( [
 			blocks: getEditorBlocks(),
 			title: getEditedPostAttribute( 'title' ),
 			getEditedPostContent,
-			selectedBlockIndex: selectedBlockIndex,
+			selectedBlockIndex,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
