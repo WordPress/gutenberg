@@ -193,6 +193,8 @@ export class ImageEdit extends React.Component {
 			alt: '',
 			linkDestination: LINK_DESTINATION_NONE,
 			href: undefined,
+			linkTarget: undefined,
+			rel: undefined,
 		} );
 	}
 
