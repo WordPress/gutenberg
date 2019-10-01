@@ -129,10 +129,7 @@ class Layout extends Component {
 						style={ toolbarKeyboardAvoidingViewStyle }
 					>
 						<Header />
-<<<<<<< HEAD
-=======
 						<BottomSheetSettings />
->>>>>>> master
 					</KeyboardAvoidingView> ) }
 			</SafeAreaView>
 		);

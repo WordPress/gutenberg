@@ -94,15 +94,7 @@ export const link = {
 		}
 
 		onRemoveFormat() {
-			const { onChange, speak, value } = this.props;
-			const startFormat = getActiveFormat( value, 'core/link' );
-
-			// If the previous position from start doesn't have the link is because we are at the start
-			const linkStart = ! find( value.formats[ value.start - 1 ], startFormat );
-			if ( linkStart && isCollapsed( value ) ) {
-				return;
-			}
-
+			const { onChange, speak } = this.props;
 			const linkSelection = this.getLinkSelection();
 
 			onChange( removeFormat( linkSelection, name ) );
