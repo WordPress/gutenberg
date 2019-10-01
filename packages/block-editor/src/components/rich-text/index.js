@@ -25,7 +25,7 @@ import {
 	toHTMLString,
 	slice,
 } from '@wordpress/rich-text';
-import { withFilters } from '@wordpress/components';
+import { withFilters, Popover } from '@wordpress/components';
 import { createBlobURL } from '@wordpress/blob';
 import deprecated from '@wordpress/deprecated';
 import { isURL } from '@wordpress/url';
@@ -36,7 +36,6 @@ import { isURL } from '@wordpress/url';
 import Autocomplete from '../autocomplete';
 import BlockFormatControls from '../block-format-controls';
 import FormatToolbar from './format-toolbar';
-import InlineFormatToolbar from './inline-format-toolbar';
 import { withBlockEditContext } from '../block-edit/context';
 import { RemoveBrowserShortcuts } from './remove-browser-shortcuts';
 
@@ -406,7 +405,17 @@ class RichTextWrapper extends Component {
 							</BlockFormatControls>
 						) }
 						{ isSelected && inlineToolbar && hasFormats && (
-							<InlineFormatToolbar editableRef={ this.ref } />
+							<Popover
+								noArrow
+								position="top center"
+								focusOnMount={ false }
+								getAnchorRect={ () =>
+									this.ref.current.getBoundingClientRect()
+								}
+								className="block-editor-rich-text__inline-format-toolbar"
+							>
+								<FormatToolbar />
+							</Popover>
 						) }
 						{ isSelected && <RemoveBrowserShortcuts /> }
 						<Autocomplete
