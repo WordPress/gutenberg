@@ -52,17 +52,6 @@ figcaption.block-editor-rich-text__editable [data-rich-text-placeholder]::before
 	opacity: 0.8;
 }
 
-.block-editor-rich-text__inline-toolbar {
-	position: relative;
-	display: flex;
-	justify-content: center;
-	top: -$block-controls-height - 4px;
-	line-height: 0;
-	left: 0;
-	right: 0;
-	z-index: 1;
-
-	ul.components-toolbar {
-		box-shadow: $shadow-toolbar;
-	}
+.components-popover.block-editor-rich-text__inline-format-toolbar .components-popover__content {
+	min-width: auto;
 }
