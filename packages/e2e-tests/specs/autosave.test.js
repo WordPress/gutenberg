@@ -98,7 +98,7 @@ describe( 'autosave', () => {
 		// Trigger local autosave
 		await page.evaluate( () => window.wp.data.dispatch( 'core/editor' ).__experimentalLocalAutosave() );
 		// Reload without saving on the server
-		await page.reload();
+		await page.reload( { waitUntil: [ 'domcontentloaded', 'networkidle2' ] } );
 
 		const notice = await page.$eval( '.components-notice__content', ( element ) => element.innerText );
 		expect( notice ).toContain( AUTOSAVE_NOTICE_LOCAL );
@@ -144,7 +144,7 @@ describe( 'autosave', () => {
 		), await getCurrentPostId() );
 		expect( await page.evaluate( () => window.sessionStorage.length ) ).toBe( 1 );
 
-		await page.reload();
+		await page.reload( { waitUntil: [ 'domcontentloaded', 'networkidle2' ] } );
 		const notice = await page.$eval( '.components-notice__content', ( element ) => element.innerText );
 		expect( notice ).toContain( 'The backup of this post in your browser is different from the version below.' );
 
@@ -200,10 +200,10 @@ describe( 'autosave', () => {
 		await page.evaluate( () => window.wp.data.dispatch( 'core/editor' ).__experimentalLocalAutosave() );
 		expect( await page.evaluate( () => window.sessionStorage.length ) ).toBe( 1 );
 
-		await page.reload();
+		await page.reload( { waitUntil: [ 'domcontentloaded', 'networkidle2' ] } );
+		await sleep( 2 );
 
 		// Only one autosave notice should be displayed.
-		await sleep( 2 );
 		const notices = await page.$$( '.components-notice' );
 		expect( notices.length ).toBe( 1 );
 		const notice = await page.$eval( '.components-notice__content', ( element ) => element.innerText );
