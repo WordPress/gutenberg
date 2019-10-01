@@ -1,9 +1,4 @@
 /**
- * WordPress dependencies
- */
-// import { withInstanceId } from '@wordpress/compose';
-
-/**
  * Internal dependencies
  */
 import PickerCell from '../mobile/bottom-sheet/picker-cell';
