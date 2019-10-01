@@ -97,9 +97,8 @@ export const link = {
 			const { onChange, speak, value } = this.props;
 			const startFormat = getActiveFormat( value, 'core/link' );
 
-			// If the previous position from start doesn't have the link is because we are at the start
-			const linkStart = ! find( value.formats[ value.start - 1 ], startFormat );
-			if ( linkStart && isCollapsed( value ) ) {
+			// Before we try to remove anything we check if there is something at the caret position to remove.
+			if ( isCollapsed( value ) && startFormat === undefined ) {
 				return;
 			}
 
