@@ -11,7 +11,7 @@ import {
 /**
  * WordPress dependencies
  */
-import { Component, createRef } from '@wordpress/element';
+import { Component, forwardRef } from '@wordpress/element';
 import { BACKSPACE, DELETE, ENTER, LEFT, RIGHT, SPACE, ESCAPE } from '@wordpress/keycodes';
 import { withSelect } from '@wordpress/data';
 import { withSafeTimeout, compose } from '@wordpress/compose';
@@ -128,8 +128,6 @@ class RichText extends Component {
 		this.record = this.formatToValue( value );
 		this.record.start = selectionStart;
 		this.record.end = selectionEnd;
-
-		this.ref = createRef();
 	}
 
 	componentWillUnmount() {
@@ -139,7 +137,7 @@ class RichText extends Component {
 
 	componentDidMount() {
 		if ( process.env.NODE_ENV === 'development' ) {
-			const computedStyle = getComputedStyle( this.ref.current );
+			const computedStyle = getComputedStyle( this.props.forwardedRef.current );
 
 			if ( computedStyle.display === 'inline' ) {
 				// eslint-disable-next-line no-console
@@ -149,12 +147,12 @@ class RichText extends Component {
 	}
 
 	createRecord() {
-		const { __unstableMultilineTag: multilineTag } = this.props;
+		const { __unstableMultilineTag: multilineTag, forwardedRef } = this.props;
 		const selection = getSelection();
 		const range = selection.rangeCount > 0 ? selection.getRangeAt( 0 ) : null;
 
 		return create( {
-			element: this.ref.current,
+			element: forwardedRef.current,
 			range,
 			multilineTag,
 			multilineWrapperTags: multilineTag === 'li' ? [ 'ul', 'ol' ] : undefined,
@@ -163,11 +161,11 @@ class RichText extends Component {
 	}
 
 	applyRecord( record, { domOnly } = {} ) {
-		const { __unstableMultilineTag: multilineTag } = this.props;
+		const { __unstableMultilineTag: multilineTag, forwardedRef } = this.props;
 
 		apply( {
 			value: record,
-			current: this.ref.current,
+			current: forwardedRef.current,
 			multilineTag,
 			multilineWrapperTags: multilineTag === 'li' ? [ 'ul', 'ol' ] : undefined,
 			prepareEditableTree: createPrepareEditableTree( this.props, 'format_prepare_functions' ),
@@ -495,7 +493,7 @@ class RichText extends Component {
 
 	recalculateBoundaryStyle() {
 		const boundarySelector = '*[data-rich-text-format-boundary]';
-		const element = this.ref.current.querySelector( boundarySelector );
+		const element = this.props.forwardedRef.current.querySelector( boundarySelector );
 
 		if ( ! element ) {
 			return;
@@ -696,7 +694,7 @@ class RichText extends Component {
 		const { text, formats, start, end, activeFormats = [] } = value;
 		const collapsed = isCollapsed( value );
 		// To do: ideally, we should look at visual position instead.
-		const { direction } = getComputedStyle( this.ref.current );
+		const { direction } = getComputedStyle( this.props.forwardedRef.current );
 		const reverseKey = direction === 'rtl' ? RIGHT : LEFT;
 		const isReverse = event.keyCode === reverseKey;
 
@@ -791,7 +789,7 @@ class RichText extends Component {
 		const { target } = event;
 
 		// If the child element has no text content, it must be an object.
-		if ( target === this.ref.current || target.textContent ) {
+		if ( target === this.props.forwardedRef.current || target.textContent ) {
 			return;
 		}
 
@@ -953,6 +951,7 @@ class RichText extends Component {
 			style,
 			className,
 			placeholder,
+			forwardedRef,
 		} = this.props;
 		// Generating a key that includes `tagName` ensures that if the tag
 		// changes, we replace the relevant element. This is needed because we
@@ -962,6 +961,7 @@ class RichText extends Component {
 		return (
 			<Editable
 				{ ...props }
+				ref={ forwardedRef }
 				tagName={ Tagname }
 				style={ style }
 				record={ this.record }
@@ -988,7 +988,6 @@ class RichText extends Component {
 				onKeyUp={ this.onSelectionChange }
 				onMouseUp={ this.onSelectionChange }
 				onTouchEnd={ this.onSelectionChange }
-				ref={ this.ref }
 			/>
 		);
 	}
@@ -1026,13 +1025,17 @@ RichText.defaultProps = {
 	value: '',
 };
 
-/**
- * Renders a rich content input, providing users with the option to format the
- * content.
- */
-export default compose( [
+const RichTextWrapper = compose( [
 	withSelect( ( select ) => ( {
 		formatTypes: select( 'core/rich-text' ).getFormatTypes(),
 	} ) ),
 	withSafeTimeout,
 ] )( RichText );
+
+/**
+ * Renders a rich content input, providing users with the option to format the
+ * content.
+ */
+export default forwardRef( ( props, ref ) => {
+	return <RichTextWrapper { ...props } forwardedRef={ ref } />;
+} );

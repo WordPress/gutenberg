@@ -7,7 +7,7 @@ import { omit } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { RawHTML, Component } from '@wordpress/element';
+import { RawHTML, Component, createRef } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { pasteHandler, children as childrenSource, getBlockTransforms, findTransform } from '@wordpress/blocks';
 import { withInstanceId, compose } from '@wordpress/compose';
@@ -61,6 +61,7 @@ function getMultilineTag( multiline ) {
 class RichTextWrapper extends Component {
 	constructor() {
 		super( ...arguments );
+		this.ref = createRef();
 		this.onEnter = this.onEnter.bind( this );
 		this.onSplit = this.onSplit.bind( this );
 		this.onPaste = this.onPaste.bind( this );
@@ -368,6 +369,7 @@ class RichTextWrapper extends Component {
 		const content = (
 			<RichText
 				{ ...experimentalProps }
+				ref={ this.ref }
 				value={ adjustedValue }
 				onChange={ adjustedOnChange }
 				selectionStart={ selectionStart }
@@ -404,7 +406,7 @@ class RichTextWrapper extends Component {
 							</BlockFormatControls>
 						) }
 						{ isSelected && inlineToolbar && hasFormats && (
-							<InlineFormatToolbar />
+							<InlineFormatToolbar editableRef={ this.ref } />
 						) }
 						{ isSelected && <RemoveBrowserShortcuts /> }
 						<Autocomplete
