@@ -403,8 +403,7 @@ function BlockListBlock( {
 		isSelected &&
 		! showEmptyBlockSideInserter &&
 		! isPartOfMultiSelection &&
-		! isTypingWithinBlock &&
-		! horizontalMover;
+		! isTypingWithinBlock;
 	const shouldShowBreadcrumb =
 		( isSelected && isNavigationMode ) ||
 		( ! isNavigationMode && ! isFocusMode && isHovered && ! isEmptyDefaultBlock );
@@ -483,7 +482,6 @@ function BlockListBlock( {
 			clientId={ clientId }
 			isSelectionEnabled={ isSelectionEnabled }
 			toggleSelection={ toggleSelection }
-			blockMover={ horizontalMover ? blockMover : null }
 		/>
 	);
 	if ( mode !== 'visual' ) {
@@ -534,7 +532,7 @@ function BlockListBlock( {
 				/>
 			) }
 			<div className="editor-block-list__block-edit block-editor-block-list__block-edit">
-				{ shouldRenderMovers && blockMover }
+				{ shouldRenderMovers && ! horizontalMover && blockMover }
 				{ shouldShowBreadcrumb && (
 					<BlockBreadcrumb
 						clientId={ clientId }
@@ -574,6 +572,7 @@ function BlockListBlock( {
 						{ isValid && mode === 'html' && (
 							<BlockHtml clientId={ clientId } />
 						) }
+						{ shouldRenderMovers && horizontalMover && blockMover }
 						{ ! isValid && [
 							<BlockInvalidWarning
 								key="invalid-warning"
