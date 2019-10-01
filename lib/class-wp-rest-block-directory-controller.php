@@ -35,12 +35,12 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => array( $this, 'get_items' ),
 				'permission_callback' => array( $this, 'get_items_permissions_check' ),
-				'args' => array(
+				'args'                => array(
 					'term' => array(
 						'required' => true,
 					),
 				),
-				'schema' => array( $this, 'get_item_schema' ),
+				'schema'              => array( $this, 'get_item_schema' ),
 			)
 		);
 
@@ -51,12 +51,12 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 				'methods'             => WP_REST_Server::CREATABLE,
 				'callback'            => array( $this, 'install_block' ),
 				'permission_callback' => array( $this, 'install_items_permissions_check' ),
-				'args' => array(
+				'args'                => array(
 					'slug' => array(
 						'required' => true,
 					),
 				),
-				'schema' => array( $this, 'get_item_schema' ),
+				'schema'              => array( $this, 'get_item_schema' ),
 			)
 		);
 
@@ -67,12 +67,12 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 				'methods'             => WP_REST_Server::DELETABLE,
 				'callback'            => array( $this, 'uninstall_block' ),
 				'permission_callback' => array( $this, 'delete_items_permissions_check' ),
-				'args' => array(
+				'args'                => array(
 					'slug' => array(
 						'required' => true,
 					),
 				),
-				'schema' => array( $this, 'get_item_schema' ),
+				'schema'              => array( $this, 'get_item_schema' ),
 			)
 		);
 	}
@@ -82,10 +82,9 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 	 *
 	 * @since 6.5.0
 	 *
-	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_Error|bool True if the request has permission, WP_Error object otherwise.
 	 */
-	public function get_items_permissions_check( $request ) {
+	public function get_items_permissions_check() {
 		if ( ! current_user_can( 'install_plugins' ) || ! current_user_can( 'activate_plugins' ) ) {
 			return new WP_Error(
 				'rest_user_cannot_view',
@@ -255,7 +254,7 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 		}
 
 		$plugin_files = array_keys( $plugin_files );
-		$plugin_file = $slug . '/' . reset( $plugin_files );
+		$plugin_file  = $slug . '/' . reset( $plugin_files );
 
 		deactivate_plugins( $plugin_file );
 
@@ -287,10 +286,13 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 		require_once ABSPATH . 'wp-admin/includes/plugin-install.php';
 		require_once ABSPATH . 'wp-admin/includes/plugin.php';
 
-		$response = plugins_api( 'query_plugins', array(
-			'block' => $search_string,
-			'per_page' => 3
-		) );
+		$response = plugins_api(
+			'query_plugins',
+			array(
+				'block'    => $search_string,
+				'per_page' => 3,
+			)
+		);
 
 		$result = array();
 
@@ -343,7 +345,10 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 		// There might be multiple blocks in a plugin. Only the first block is mapped.
 		$block_data   = reset( $plugin['blocks'] );
 		$block->name  = $block_data['name'];
-		$block->title = $block_data['title'] ?: $plugin['name'];
+		$block->title = $block_data['title'];
+		if ( ! $block->title ) {
+			$block->title = $plugin['name'];
+		}
 
 		// Plugin's description, not description in block.json.
 		$block->description = wp_trim_words( wp_strip_all_tags( $plugin['description'] ), 30, '...' );
@@ -363,7 +368,7 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 
 		$block->assets = array();
 		foreach ( $plugin['block_assets'] as $asset ) {
-			// TODO: Return from API, not client-set
+			// TODO: Return from API, not client-set.
 			$block->assets[] = 'https://plugins.svn.wordpress.org/' . $plugin['slug'] . $asset;
 		}
 
