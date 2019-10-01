@@ -196,11 +196,39 @@ describe( 'autosave', () => {
 
 		// Trigger remote autosave
 		await page.evaluate( () => window.wp.data.dispatch( 'core/editor' ).autosave() );
+
+		// EXPERIMENTAL NONSENSE
+		let attemptsLeft = 3;
+		while ( attemptsLeft-- ) {
+			if ( ! attemptsLeft ) {
+				throw new Error( 'Autosave unsuccessful' );
+			}
+
+			const { id: authorId } = await page.evaluate( () => window.wp.data.select( 'core' ).getCurrentUser() );
+			const { id: postId } = await page.evaluate( () => window.wp.data.select( 'core/editor' ).getCurrentPost() );
+			const autosave = await page.evaluate(
+				( _postId, _authorId ) => window.wp.data.select( 'core' ).getAutosave( 'post', _postId, _authorId ),
+				postId,
+				authorId,
+			);
+
+			if ( autosave ) {
+				break;
+			}
+
+			await page.evaluate( () => window.wp.data.dispatch( 'core/editor' ).autosave() );
+			await sleep( 1 );
+		}
 		// Force conflicting local autosave
 		await page.evaluate( () => window.wp.data.dispatch( 'core/editor' ).__experimentalLocalAutosave() );
 		expect( await page.evaluate( () => window.sessionStorage.length ) ).toBe( 1 );
 
 		await page.reload( { waitUntil: [ 'domcontentloaded' ] } );
+
+		// Unrelated to local autosave. If this assertion fails, it means the
+		// autosave prior to reloading has failed.
+		expect( await page.evaluate( () => window.wp.data.select( 'core/editor' ).getEditorSettings().autosave ) )
+			.toHaveProperty( 'editLink' );
 
 		// Only one autosave notice should be displayed.
 		const notices = await page.$$( '.components-notice' );
