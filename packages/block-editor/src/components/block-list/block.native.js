@@ -124,7 +124,7 @@ class BlockListBlock extends Component {
 		return (
 			<>
 				{ showFloatingToolbar && ( ! isFirstBlock || parentId === '' ) && <FloatingToolbar.Slot /> }
-				<FloatingToolbar />
+				{ showFloatingToolbar && <FloatingToolbar /> }
 				<TouchableWithoutFeedback
 					onPress={ this.onFocus }
 					accessible={ ! isSelected }
