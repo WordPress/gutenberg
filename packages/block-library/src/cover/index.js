@@ -24,6 +24,23 @@ export const settings = {
 	supports: {
 		align: true,
 	},
+	example: {
+		attributes: {
+			customOverlayColor: '#065174',
+			dimRatio: 40,
+			url: 'https://upload.wikimedia.org/wikipedia/commons/9/95/Windbuchencom.jpg',
+		},
+		innerBlocks: [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					customFontSize: 48,
+					content: __( '<strong>Snow Patrol</strong>' ),
+					align: 'center',
+				},
+			},
+		],
+	},
 	transforms,
 	save,
 	edit,

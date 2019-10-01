@@ -21,5 +21,11 @@ describe( 'Babel preset default', () => {
 		} );
 
 		expect( output.code ).toMatchSnapshot();
+
+		// See https://github.com/WordPress/gutenberg/pull/17643.
+		// Workaround for a problem with browserslist which was warning about outdated
+		// dependencies (even though the dependencies were up-to-date.)
+		/* eslint-disable-next-line no-console */
+		console.warn.mockReset();
 	} );
 } );

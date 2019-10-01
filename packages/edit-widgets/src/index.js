@@ -9,7 +9,6 @@ import { registerCoreBlocks, __experimentalRegisterExperimentalCoreBlocks } from
  * Internal dependencies
  */
 import './hooks';
-import './store';
 import EditWidgetsInitializer from './components/edit-widgets-initializer';
 import CustomizerEditWidgetsInitializer from './components/customizer-edit-widgets-initializer';
 
