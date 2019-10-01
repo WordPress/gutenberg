@@ -6,6 +6,7 @@ import {
 	insertBlock,
 	getEditedPostContent,
 	pressKeyTimes,
+	switchEditorModeTo,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'adding blocks', () => {
@@ -96,10 +97,7 @@ describe( 'adding blocks', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Second paragraph' );
 
-		// Switch to Text Mode to check HTML Output
-		await page.click( '.edit-post-more-menu [aria-label="More tools & options"]' );
-		const codeEditorButton = ( await page.$x( "//button[contains(text(), 'Code Editor')]" ) )[ 0 ];
-		await codeEditorButton.click( 'button' );
+		await switchEditorModeTo( 'Code' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );

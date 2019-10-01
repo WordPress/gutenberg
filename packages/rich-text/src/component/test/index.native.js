@@ -8,6 +8,10 @@ import { shallow } from 'enzyme';
  */
 import { RichText } from '../index';
 
+const getStylesFromColorScheme = () => {
+	return { color: 'white' };
+};
+
 describe( 'RichText Native', () => {
 	let richText;
 
@@ -40,6 +44,7 @@ describe( 'RichText Native', () => {
 			} }
 			formatTypes={ [] }
 			onSelectionChange={ jest.fn() }
+			getStylesFromColorScheme={ getStylesFromColorScheme }
 		/> );
 
 		const event = {

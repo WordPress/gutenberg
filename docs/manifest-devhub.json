@@ -1086,6 +1086,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/block-directory",
+		"slug": "packages-block-directory",
+		"markdown_source": "../packages/block-directory/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/block-editor",
 		"slug": "packages-block-editor",
 		"markdown_source": "../packages/block-editor/README.md",
@@ -1347,6 +1353,12 @@
 		"title": "@wordpress/priority-queue",
 		"slug": "packages-priority-queue",
 		"markdown_source": "../packages/priority-queue/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/project-management-automation",
+		"slug": "packages-project-management-automation",
+		"markdown_source": "../packages/project-management-automation/README.md",
 		"parent": "packages"
 	},
 	{

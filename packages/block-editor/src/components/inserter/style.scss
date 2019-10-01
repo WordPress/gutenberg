@@ -154,19 +154,21 @@ $block-inserter-search-height: 38px;
 	overflow-y: auto;
 
 	@include break-medium {
-		display: block;
+		display: flex;
+		flex-direction: column;
 	}
 
 	.block-editor-block-card {
 		padding-bottom: 20px;
-		margin-bottom: 10px;
+		margin-bottom: 20px;
 		border-bottom: $border-width solid $light-gray-500;
 		@include edit-post__fade-in-animation();
 	}
-}
 
-.block-editor-inserter__preview-title {
-	margin-bottom: 10px;
+	.block-editor-inserter__preview {
+		display: flex;
+		flex-grow: 2;
+	}
 }
 
 .block-editor-inserter__menu-help-panel-no-block {
@@ -206,4 +208,18 @@ $block-inserter-search-height: 38px;
 	font-size: $big-font-size;
 	font-weight: 600;
 	margin-bottom: 20px;
+}
+
+.block-editor-inserter__preview-content {
+	border: $border-width solid $light-gray-500;
+	border-radius: $radius-round-rectangle;
+	min-height: 150px;
+	padding: 10px;
+	display: grid;
+	flex-grow: 2;
+
+	.block-editor-block-preview__container {
+		margin-right: 0;
+		margin-left: 0;
+	}
 }

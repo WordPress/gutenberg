@@ -5,7 +5,6 @@ import RNReactNativeGutenbergBridge, {
 	subscribeParentGetHtml,
 	subscribeParentToggleHTMLMode,
 	subscribeUpdateHtml,
-	subscribeSetFocusOnTitle,
 	subscribeSetTitle,
 } from 'react-native-gutenberg-bridge';
 
@@ -17,19 +16,35 @@ import { parse, serialize, getUnregisteredTypeHandlerName } from '@wordpress/blo
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
+const postTypeEntities = [
+	{ name: 'post', baseURL: '/wp/v2/posts' },
+	{ name: 'page', baseURL: '/wp/v2/pages' },
+	{ name: 'attachment', baseURL: '/wp/v2/media' },
+	{ name: 'wp_block', baseURL: '/wp/v2/blocks' },
+].map( ( postTypeEntity ) => ( {
+	kind: 'postType',
+	...postTypeEntity,
+	transientEdits: {
+		blocks: true,
+	},
+	mergedEdits: {
+		meta: true,
+	},
+} ) );
+
 /**
  * Internal dependencies
  */
 import EditorProvider from './index.js';
 
 class NativeEditorProvider extends Component {
-	constructor( props ) {
+	constructor() {
 		super( ...arguments );
 
 		// Keep a local reference to `post` to detect changes
-		this.post = props.post;
-
-		this.setTitleRef = this.setTitleRef.bind( this );
+		this.post = this.props.post;
+		this.props.addEntities( postTypeEntities );
+		this.props.receiveEntityRecords( 'postType', this.post.type, this.post );
 	}
 
 	componentDidMount() {
@@ -47,12 +62,6 @@ class NativeEditorProvider extends Component {
 
 		this.subscriptionParentUpdateHtml = subscribeUpdateHtml( ( payload ) => {
 			this.updateHtmlAction( payload.html );
-		} );
-
-		this.subscriptionParentSetFocusOnTitle = subscribeSetFocusOnTitle( () => {
-			if ( this.postTitleRef ) {
-				this.postTitleRef.focus();
-			}
 		} );
 	}
 
@@ -72,10 +81,6 @@ class NativeEditorProvider extends Component {
 		if ( this.subscriptionParentUpdateHtml ) {
 			this.subscriptionParentUpdateHtml.remove();
 		}
-
-		if ( this.subscriptionParentSetFocusOnTitle ) {
-			this.subscriptionParentSetFocusOnTitle.remove();
-		}
 	}
 
 	componentDidUpdate( prevProps ) {
@@ -85,10 +90,6 @@ class NativeEditorProvider extends Component {
 			const unsupportedBlockNames = blocks.filter( isUnsupportedBlock ).map( ( block ) => block.attributes.originalName );
 			RNReactNativeGutenbergBridge.editorDidMount( unsupportedBlockNames );
 		}
-	}
-
-	setTitleRef( titleRef ) {
-		this.postTitleRef = titleRef;
 	}
 
 	serializeToNativeAction() {
@@ -169,12 +170,18 @@ export default compose( [
 		const {
 			switchEditorMode,
 		} = dispatch( 'core/edit-post' );
+		const {
+			addEntities,
+			receiveEntityRecords,
+		} = dispatch( 'core' );
 
 		return {
+			addEntities,
 			clearSelectedBlock,
 			editTitle( title ) {
 				editPost( { title } );
 			},
+			receiveEntityRecords,
 			resetEditorBlocksWithoutUndoLevel( blocks ) {
 				resetEditorBlocks( blocks, {
 					__unstableShouldCreateUndoLevel: false,

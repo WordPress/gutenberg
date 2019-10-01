@@ -44,11 +44,11 @@ import * as shortcode from './shortcode';
 import * as spacer from './spacer';
 import * as subhead from './subhead';
 import * as table from './table';
-import * as template from './template';
 import * as textColumns from './text-columns';
 import * as verse from './verse';
 import * as video from './video';
 import * as tagCloud from './tag-cloud';
+import * as group from './group';
 
 export const coreBlocks = [
 	// Common blocks are grouped at the top to prioritize their display
@@ -92,7 +92,6 @@ export const coreBlocks = [
 	subhead,
 	table,
 	tagCloud,
-	template,
 	textColumns,
 	verse,
 	video,
@@ -101,6 +100,33 @@ export const coreBlocks = [
 	return memo;
 }, {} );
 
+/**
+ * Function to register an individual block.
+ *
+ * @param {Object} block The block to be registered.
+ *
+ */
+const registerBlock = ( block ) => {
+	if ( ! block ) {
+		return;
+	}
+	const { metadata, settings, name } = block;
+	registerBlockType( name, {
+		...metadata,
+		...settings,
+	} );
+};
+
+/**
+ * Function to register core blocks provided by the block editor.
+ *
+ * @example
+ * ```js
+ * import { registerCoreBlocks } from '@wordpress/block-library';
+ *
+ * registerCoreBlocks();
+ * ```
+ */
 export const registerCoreBlocks = () => {
 	[
 		paragraph,
@@ -114,13 +140,12 @@ export const registerCoreBlocks = () => {
 		separator,
 		list,
 		quote,
-	].forEach( ( { metadata, name, settings } ) => {
-		registerBlockType( name, {
-			...metadata,
-			...settings,
-		} );
-	} );
-};
+		// eslint-disable-next-line no-undef
+		!! __DEV__ ? mediaText : null,
+		// eslint-disable-next-line no-undef
+		!! __DEV__ ? group : null,
+	].forEach( registerBlock );
 
-setDefaultBlockName( paragraph.name );
-setUnregisteredTypeHandlerName( missing.name );
+	setDefaultBlockName( paragraph.name );
+	setUnregisteredTypeHandlerName( missing.name );
+};

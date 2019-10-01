@@ -46,19 +46,19 @@ describe.each( configFixtures )( 'Webpack `%s`', ( configCase ) => {
 			webpack( options, ( err, stats ) => {
 				expect( err ).toBeNull();
 
-				const depsFiles = glob( `${ outputDirectory }/*.deps.json` );
+				const assetFiles = glob( `${ outputDirectory }/*.asset.@(json|php)` );
 				const expectedLength =
 					typeof options.entry === 'object' ? Object.keys( options.entry ).length : 1;
-				expect( depsFiles ).toHaveLength( expectedLength );
+				expect( assetFiles ).toHaveLength( expectedLength );
 
-				// Deps files should match
-				depsFiles.forEach( ( depsFile ) => {
-					expect( require( depsFile ) ).toMatchSnapshot(
-						'Dependencies JSON should match snapshot'
+				// Asset files should match.
+				assetFiles.forEach( ( assetFile ) => {
+					expect( fs.readFileSync( assetFile, 'utf-8' ) ).toMatchSnapshot(
+						'Asset file should match snapshot'
 					);
 				} );
 
-				// Webpack stats external modules should match
+				// Webpack stats external modules should match.
 				const externalModules = stats.compilation.modules
 					.filter( ( { external } ) => external )
 					.sort()

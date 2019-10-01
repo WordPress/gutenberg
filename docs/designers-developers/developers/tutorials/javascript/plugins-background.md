@@ -1,6 +1,6 @@
 # Plugins Background
 
-The primary means of extending WordPress is the plugin. The WordPress [Plugin Basics](https://developer.wordpress.org/plugins/the-basics/) documentation provides details on building a plugin. 
+The primary means of extending WordPress is the plugin. The WordPress [Plugin Basics](https://developer.wordpress.org/plugins/plugin-basics/) documentation provides details on building a plugin. 
 
 The quickest way to start is to create a new directory in `wp-content/plugins/` to contain your plugin code. For this example, call it `myguten-plugin`.
 

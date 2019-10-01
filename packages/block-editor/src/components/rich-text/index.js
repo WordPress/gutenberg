@@ -12,7 +12,7 @@ import { withDispatch, withSelect } from '@wordpress/data';
 import { pasteHandler, children as childrenSource, getBlockTransforms, findTransform } from '@wordpress/blocks';
 import { withInstanceId, compose } from '@wordpress/compose';
 import {
-	RichText,
+	__experimentalRichText as RichText,
 	__unstableCreateElement,
 	isEmpty,
 	__unstableIsEmptyLine as isEmptyLine,
@@ -21,13 +21,14 @@ import {
 	create,
 	replace,
 	split,
-	LINE_SEPARATOR,
+	__UNSTABLE_LINE_SEPARATOR as LINE_SEPARATOR,
 	toHTMLString,
 	slice,
 } from '@wordpress/rich-text';
 import { withFilters, IsolatedEventContainer } from '@wordpress/components';
 import { createBlobURL } from '@wordpress/blob';
 import deprecated from '@wordpress/deprecated';
+import { isURL } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -67,7 +68,12 @@ class RichTextWrapper extends Component {
 	}
 
 	onEnter( { value, onChange, shiftKey } ) {
-		const { onReplace, onSplit, multiline } = this.props;
+		const {
+			onReplace,
+			onSplit,
+			multiline,
+			markAutomaticChange,
+		} = this.props;
 		const canSplit = onReplace && onSplit;
 
 		if ( onReplace ) {
@@ -81,6 +87,7 @@ class RichTextWrapper extends Component {
 				onReplace( [
 					transformation.transform( { content: value.text } ),
 				] );
+				markAutomaticChange();
 			}
 		}
 
@@ -122,6 +129,7 @@ class RichTextWrapper extends Component {
 			tagName,
 			canUserUseUnfilteredHTML,
 			multiline,
+			__unstableEmbedURLOnPaste,
 		} = this.props;
 
 		if ( image && ! html ) {
@@ -131,12 +139,11 @@ class RichTextWrapper extends Component {
 				mode: 'BLOCKS',
 				tagName,
 			} );
-			const shouldReplace = onReplace && isEmpty( value );
 
 			// Allows us to ask for this information when we get a report.
 			window.console.log( 'Received item:\n\n', file );
 
-			if ( shouldReplace ) {
+			if ( onReplace && isEmpty( value ) ) {
 				onReplace( content );
 			} else {
 				this.onSplit( value, content );
@@ -145,15 +152,14 @@ class RichTextWrapper extends Component {
 			return;
 		}
 
-		const canReplace = onReplace && isEmpty( value );
-		const canSplit = onReplace && onSplit;
+		let mode = onReplace && onSplit ? 'AUTO' : 'INLINE';
 
-		let mode = 'INLINE';
-
-		if ( canReplace ) {
+		if (
+			__unstableEmbedURLOnPaste &&
+			isEmpty( value ) &&
+			isURL( plainText.trim() )
+		) {
 			mode = 'BLOCKS';
-		} else if ( canSplit ) {
-			mode = 'AUTO';
 		}
 
 		const content = pasteHandler( {
@@ -175,7 +181,7 @@ class RichTextWrapper extends Component {
 
 			onChange( insert( value, valueToInsert ) );
 		} else if ( content.length > 0 ) {
-			if ( canReplace ) {
+			if ( onReplace && isEmpty( value ) ) {
 				onReplace( content );
 			} else {
 				this.onSplit( value, content );
@@ -245,7 +251,7 @@ class RichTextWrapper extends Component {
 	}
 
 	inputRule( value, valueToFormat ) {
-		const { onReplace } = this.props;
+		const { onReplace, markAutomaticChange } = this.props;
 
 		if ( ! onReplace ) {
 			return;
@@ -254,7 +260,8 @@ class RichTextWrapper extends Component {
 		const { start, text } = value;
 		const characterBefore = text.slice( start - 1, start );
 
-		if ( ! /\s/.test( characterBefore ) ) {
+		// The character right before the caret must be a plain space.
+		if ( characterBefore !== ' ' ) {
 			return;
 		}
 
@@ -273,6 +280,7 @@ class RichTextWrapper extends Component {
 		const block = transformation.transform( content );
 
 		onReplace( [ block ] );
+		markAutomaticChange();
 	}
 
 	getAllowedFormats() {
@@ -313,7 +321,11 @@ class RichTextWrapper extends Component {
 			onExitFormattedText,
 			isSelected: originalIsSelected,
 			onCreateUndoLevel,
+			markAutomaticChange,
+			didAutomaticChange,
+			undo,
 			placeholder,
+			keepPlaceholderOnFocus,
 			// eslint-disable-next-line no-unused-vars
 			allowedFormats,
 			withoutInteractiveFormatting,
@@ -361,7 +373,10 @@ class RichTextWrapper extends Component {
 				selectionEnd={ selectionEnd }
 				onSelectionChange={ onSelectionChange }
 				tagName={ tagName }
-				className={ classnames( classes, className, { 'is-selected': originalIsSelected } ) }
+				className={ classnames( classes, className, {
+					'is-selected': originalIsSelected,
+					'keep-placeholder-on-focus': keepPlaceholderOnFocus,
+				} ) }
 				placeholder={ placeholder }
 				allowedFormats={ adjustedAllowedFormats }
 				withoutInteractiveFormatting={ withoutInteractiveFormatting }
@@ -375,6 +390,9 @@ class RichTextWrapper extends Component {
 				__unstableOnEnterFormattedText={ onEnterFormattedText }
 				__unstableOnExitFormattedText={ onExitFormattedText }
 				__unstableOnCreateUndoLevel={ onCreateUndoLevel }
+				__unstableMarkAutomaticChange={ markAutomaticChange }
+				__unstableDidAutomaticChange={ didAutomaticChange }
+				__unstableUndo={ undo }
 			>
 				{ ( { isSelected, value, onChange, Editable } ) =>
 					<>
@@ -397,14 +415,16 @@ class RichTextWrapper extends Component {
 							completers={ autocompleters }
 							record={ value }
 							onChange={ onChange }
+							isSelected={ isSelected }
 						>
-							{ ( { listBoxId, activeId } ) =>
+							{ ( { listBoxId, activeId, onKeyDown } ) =>
 								<Editable
 									aria-autocomplete={ listBoxId ? 'list' : undefined }
 									aria-owns={ listBoxId }
 									aria-activedescendant={ activeId }
 									start={ start }
 									reversed={ reversed }
+									onKeyDown={ onKeyDown }
 								/>
 							}
 						</Autocomplete>
@@ -435,6 +455,7 @@ const RichTextContainer = compose( [
 			getSelectionStart,
 			getSelectionEnd,
 			getSettings,
+			didAutomaticChange,
 		} = select( 'core/block-editor' );
 
 		const selectionStart = getSelectionStart();
@@ -445,6 +466,8 @@ const RichTextContainer = compose( [
 				selectionStart.clientId === clientId &&
 				selectionStart.attributeKey === identifier
 			);
+		} else if ( isSelected ) {
+			isSelected = selectionStart.clientId === clientId;
 		}
 
 		return {
@@ -453,6 +476,7 @@ const RichTextContainer = compose( [
 			selectionStart: isSelected ? selectionStart.offset : undefined,
 			selectionEnd: isSelected ? selectionEnd.offset : undefined,
 			isSelected,
+			didAutomaticChange: didAutomaticChange(),
 		};
 	} ),
 	withDispatch( ( dispatch, {
@@ -465,7 +489,9 @@ const RichTextContainer = compose( [
 			enterFormattedText,
 			exitFormattedText,
 			selectionChange,
+			__unstableMarkAutomaticChange,
 		} = dispatch( 'core/block-editor' );
+		const { undo } = dispatch( 'core/editor' );
 
 		return {
 			onCreateUndoLevel: __unstableMarkLastChangeAsPersistent,
@@ -474,6 +500,8 @@ const RichTextContainer = compose( [
 			onSelectionChange( start, end ) {
 				selectionChange( clientId, identifier, start, end );
 			},
+			markAutomaticChange: __unstableMarkAutomaticChange,
+			undo,
 		};
 	} ),
 	withFilters( 'experimentalRichText' ),

@@ -19,6 +19,10 @@
 		"**/test/*.[jt]s",
 		"**/?(*.)test.[jt]s"
 	],
+	"testPathIgnorePatterns": [
+		"/node_modules/",
+		"/wordpress/"
+	],
 	"timers": "fake",
 	"transform": {
 		"^.+\\.[jt]sx?$": "<rootDir>/node_modules/babel-jest"
