@@ -159,6 +159,7 @@ export default compose( [
 			getBlockHierarchyRootClientId,
 			getBlock,
 			getBlockRootClientId,
+			getSelectedBlock,
 		} = select( 'core/block-editor' );
 		const order = getBlockIndex( clientId, rootClientId );
 		const isSelected = isBlockSelected( clientId );
@@ -171,12 +172,18 @@ export default compose( [
 		const icon = blockType.icon;
 		const getAccessibilityLabelExtra = blockType.__experimentalGetAccessibilityLabel;
 
+		const selectedBlock = getSelectedBlock();
+		const parentId = getBlockRootClientId( clientId );
+		const parentBlock = getBlock( parentId );
+
+		const isMediaText = selectedBlock && selectedBlock.name === 'core/media-text';
+		const isMediaTextParent = parentBlock && parentBlock.name === 'core/media-text';
+
 		const rootBlockId = getBlockHierarchyRootClientId( clientId );
 		const rootBlock = getBlock( rootBlockId );
 		const hasRootInnerBlocks = rootBlock.innerBlocks.length !== 0;
 
-		const showFloatingToolbar = isSelected && hasRootInnerBlocks;
-		const parentId = getBlockRootClientId( clientId );
+		const showFloatingToolbar = isSelected && hasRootInnerBlocks && ! isMediaText && ! isMediaTextParent;
 
 		return {
 			icon,
