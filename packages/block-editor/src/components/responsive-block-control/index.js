@@ -59,9 +59,13 @@ function ResponsiveBlockControl( props ) {
 					onChange={ onToggle }
 				/>
 
-				{ ! isOpen && defaultControl }
+				<div hidden={ isOpen }>
+					{ defaultControl }
+				</div>
 
-				{ isOpen && ( renderResponsiveControls ? renderResponsiveControls() : defaultResponsiveControls ) }
+				<div hidden={ ! isOpen }>
+					{ ( renderResponsiveControls ? renderResponsiveControls() : defaultResponsiveControls ) }
+				</div>
 
 			</div>
 		</fieldset>
