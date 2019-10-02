@@ -753,13 +753,15 @@ export class RichText extends Component {
 
 	getHtmlToRender( record, tagName ) {
 		// Save back to HTML from React tree
-		const value = this.valueToFormat( record );
+		let value = this.valueToFormat( record );
 
-		if ( value === undefined || value === '' ) {
+		if ( value === undefined ) {
 			this.lastEventCount = undefined; // force a refresh on the native side
-			return '';
-		} else if ( tagName ) {
-			return `<${ tagName }>${ value }</${ tagName }>`;
+			value = '';
+		} 
+		
+		if ( tagName ) {
+			value = `<${ tagName }>${ value }</${ tagName }>`;
 		}
 		return value;
 	}
