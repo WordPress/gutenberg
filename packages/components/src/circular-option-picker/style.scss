@@ -1,0 +1,106 @@
+$color-palette-circle-size: 28px;
+$color-palette-circle-spacing: 14px;
+
+.components-circular-option-picker {
+	margin-right: -14px;
+	width: calc(100% + 14px);
+
+	.components-circular-option-picker__custom-clear-wrapper {
+		width: calc(100% - 14px);
+		display: flex;
+		justify-content: flex-end;
+	}
+}
+
+.components-circular-option-picker__option-wrapper {
+	display: inline-block;
+	height: $color-palette-circle-size;
+	width: $color-palette-circle-size;
+	margin-right: $color-palette-circle-spacing;
+	margin-bottom: $color-palette-circle-spacing;
+	vertical-align: top;
+	transform: scale(1);
+	transition: 100ms transform ease;
+	@include reduce-motion("transition");
+	&:hover {
+		transform: scale(1.2);
+	}
+
+	// Ensure that the <div> that <Dropdown> wraps our toggle button with is full height
+	& > div {
+		height: 100%;
+		width: 100%;
+	}
+}
+
+.components-circular-option-picker__option {
+	display: inline-block;
+	vertical-align: top;
+	height: 100%;
+	width: 100%;
+	border: none;
+	border-radius: 50%;
+	background: transparent;
+	box-shadow: inset 0 0 0 ($color-palette-circle-size / 2);
+	transition: 100ms box-shadow ease;
+	@include reduce-motion("transition");
+	cursor: pointer;
+
+	&.is-active {
+		box-shadow: inset 0 0 0 4px;
+		position: relative;
+		z-index: z-index(".components-circular-option-picker__option.is-active");
+
+		& + .dashicons-saved {
+			position: absolute;
+			left: 4px;
+			top: 4px;
+			border-radius: 50%;
+			z-index: z-index(".components-circular-option-picker__option.is-active + .dashicons-saved");
+			background: $white;
+			pointer-events: none;
+		}
+	}
+
+	&::after {
+		content: "";
+		position: absolute;
+		top: -1px;
+		left: -1px;
+		bottom: -1px;
+		right: -1px;
+		border-radius: $radius-round;
+		box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
+		// Show a thin circular outline in Windows high contrast mode, otherwise the button is invisible.
+		border: 1px solid transparent;
+	}
+
+	&:focus {
+		outline: none;
+		&::after {
+			content: "";
+			border: #{ $border-width * 2 } solid $dark-gray-400;
+			width: 32px;
+			height: 32px;
+			position: absolute;
+			top: -2px;
+			left: -2px;
+			border-radius: $radius-round;
+			box-shadow: inset 0 0 0 2px $white;
+		}
+	}
+}
+
+.components-circular-option-picker__button-action .components-circular-option-picker__option {
+	color: $white;
+	background: $white;
+}
+
+
+.components-circular-option-picker__dropdown-link-action {
+	margin-right: $grid-size-large;
+
+	.components-button {
+		line-height: 22px;
+	}
+}
