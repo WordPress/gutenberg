@@ -28,7 +28,6 @@ import {
 	MediaUploadProgress,
 	MEDIA_TYPE_VIDEO,
 	BlockControls,
-	InspectorControls,
 	VIDEO_ASPECT_RATIO,
 	VideoPlayer,
 } from '@wordpress/block-editor';
