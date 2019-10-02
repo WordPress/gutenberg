@@ -9,6 +9,12 @@ import classnames from 'classnames';
 import { withFilters } from '@wordpress/components';
 import { getBlockDefaultClassName, hasBlockSupport, getBlockType } from '@wordpress/blocks';
 
+/**
+ * Internal dependencies
+ */
+import CustomElement from '../custom-element';
+import { isCustomElement } from '../../utils/dom';
+
 export const Edit = ( props ) => {
 	const { attributes = {}, name } = props;
 	const blockType = getBlockType( name );
@@ -27,6 +33,10 @@ export const Edit = ( props ) => {
 	// with which a block is displayed. If `blockType` is valid, assign
 	// them preferentially as the render value for the block.
 	const Component = blockType.edit || blockType.save;
+
+	if ( isCustomElement( Component ) ) {
+		return <CustomElement { ...props } tagName={ Component } className={ className } />;
+	}
 
 	return <Component { ...props } className={ className } />;
 };
