@@ -15,7 +15,7 @@ import { isEmpty } from 'lodash';
  * WordPress dependencies
  */
 import {
-	BottomSheet,
+	TextControl,
 	Icon,
 	Toolbar,
 	ToolbarButton,
@@ -221,25 +221,25 @@ class ImageEdit extends React.Component {
 		const getInspectorControls = () => (
 			<InspectorControls>
 				<PanelBody title={ __( 'Image Settings' ) } >
-					<BottomSheet.Cell
+					<TextControl
 						icon={ 'admin-links' }
 						label={ __( 'Link To' ) }
 						value={ href || '' }
 						valuePlaceholder={ __( 'Add URL' ) }
-						onChangeValue={ this.onSetLinkDestination }
+						onChange={ this.onSetLinkDestination }
 						autoCapitalize="none"
 						autoCorrect={ false }
 						keyboardType="url"
 					/>
-					<BottomSheet.Cell
+					<TextControl
 						icon={ 'editor-textcolor' }
 						label={ __( 'Alt Text' ) }
 						value={ alt || '' }
 						valuePlaceholder={ __( 'None' ) }
 						separatorType={ 'fullWidth' }
-						onChangeValue={ this.updateAlt }
+						onChange={ this.updateAlt }
 					/>
-					<BottomSheet.Cell
+					<TextControl
 						label={ __( 'Clear All Settings' ) }
 						labelStyle={ styles.clearSettingsButton }
 						separatorType={ 'none' }
