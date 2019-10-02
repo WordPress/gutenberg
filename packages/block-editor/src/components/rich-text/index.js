@@ -66,6 +66,7 @@ class RichTextWrapper extends Component {
 		this.onPaste = this.onPaste.bind( this );
 		this.onDelete = this.onDelete.bind( this );
 		this.inputRule = this.inputRule.bind( this );
+		this.getAnchorRect = this.getAnchorRect.bind( this );
 	}
 
 	onEnter( { value, onChange, shiftKey } ) {
@@ -302,6 +303,30 @@ class RichTextWrapper extends Component {
 		return formattingControls.map( ( name ) => `core/${ name }` );
 	}
 
+	getAnchorRect() {
+		const { current } = this.ref;
+		const rect = current.getBoundingClientRect();
+
+		// Add some space.
+		const buffer = 4;
+
+		// Subtract padding if any.
+		let { paddingTop } = window.getComputedStyle( current );
+
+		paddingTop = parseInt( paddingTop, 10 );
+
+		return {
+			x: rect.left,
+			y: rect.top + paddingTop - buffer,
+			width: rect.width,
+			height: rect.height - paddingTop + buffer,
+			left: rect.left,
+			right: rect.right,
+			top: rect.top + paddingTop - buffer,
+			bottom: rect.bottom,
+		};
+	}
+
 	render() {
 		const {
 			children,
@@ -409,29 +434,7 @@ class RichTextWrapper extends Component {
 								noArrow
 								position="top center"
 								focusOnMount={ false }
-								getAnchorRect={ () => {
-									const { current } = this.ref;
-									const rect = current.getBoundingClientRect();
-
-									// Add some space.
-									const buffer = 4;
-
-									// Subtract padding if any.
-									let { paddingTop } = window.getComputedStyle( current );
-
-									paddingTop = parseInt( paddingTop, 10 );
-
-									return {
-										x: rect.left,
-										y: rect.top + paddingTop - buffer,
-										width: rect.width,
-										height: rect.height - paddingTop + buffer,
-										left: rect.left,
-										right: rect.right,
-										top: rect.top + paddingTop - buffer,
-										bottom: rect.bottom,
-									};
-								} }
+								getAnchorRect={ this.getAnchorRect }
 								className="block-editor-rich-text__inline-format-toolbar"
 							>
 								<FormatToolbar />
