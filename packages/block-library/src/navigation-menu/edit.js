@@ -105,6 +105,10 @@ function NavigationMenu( {
 		textColorCSSClass: textColor.class ? textColor.class : null,
 	} );
 
+	const moverOptions = {
+		position: 'inside',
+		orientation: 'horizontal',
+	};
 	return (
 		<Fragment>
 			<BlockControls>
@@ -140,7 +144,7 @@ function NavigationMenu( {
 						template={ defaultMenuItems ? defaultMenuItems : null }
 						allowedBlocks={ [ 'core/navigation-menu-item' ] }
 						templateInsertUpdatesSelection={ false }
-						moverOptions
+						moverOptions={ moverOptions }
 					/>
 				}
 			</div>
