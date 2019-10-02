@@ -409,9 +409,29 @@ class RichTextWrapper extends Component {
 								noArrow
 								position="top center"
 								focusOnMount={ false }
-								getAnchorRect={ () =>
-									this.ref.current.getBoundingClientRect()
-								}
+								getAnchorRect={ () => {
+									const { current } = this.ref;
+									const rect = current.getBoundingClientRect();
+
+									// Add some space.
+									const buffer = 4;
+
+									// Subtract padding if any.
+									let { paddingTop } = window.getComputedStyle( current );
+
+									paddingTop = parseInt( paddingTop, 10 );
+
+									return {
+										x: rect.left,
+										y: rect.top + paddingTop - buffer,
+										width: rect.width,
+										height: rect.height - paddingTop + buffer,
+										left: rect.left,
+										right: rect.right,
+										top: rect.top + paddingTop - buffer,
+										bottom: rect.bottom,
+									};
+								} }
 								className="block-editor-rich-text__inline-format-toolbar"
 							>
 								<FormatToolbar />
