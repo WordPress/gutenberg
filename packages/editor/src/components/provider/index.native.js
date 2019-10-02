@@ -176,7 +176,6 @@ export default compose( [
 		} = select( 'core/block-editor' );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
-	
 		return {
 			mode: getEditorMode(),
 			isReady: isEditorReady(),
@@ -184,7 +183,7 @@ export default compose( [
 			title: getEditedPostAttribute( 'title' ),
 			getEditedPostContent,
 			selectedBlockIndex: getBlockIndex( selectedBlockClientId ),
-			blockCount: getBlockCount( rootClientId )
+			blockCount: getBlockCount( rootClientId ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
