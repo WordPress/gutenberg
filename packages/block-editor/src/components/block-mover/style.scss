@@ -9,11 +9,6 @@
 		position: relative;
 		top: $block-padding;
 		margin-left: $block-padding;
-
-		.block-editor-block-mover__control-drag-handle {
-			display: none;
-		}
-
 	}
 
 	@include break-small() {
