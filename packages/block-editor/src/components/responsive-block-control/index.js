@@ -36,6 +36,8 @@ function ResponsiveBlockControl( props ) {
 
 	const toggleControlLabel = toggleLabel || sprintf( __( 'Use the same %s on all screensizes.' ), property );
 
+	const toggleHelpText = __( 'Toggle between using the same value for all screen sizes or using a unique value per screen size.' );
+
 	const defaultControl = renderDefaultControl( defaultLabel );
 
 	const defaultResponsiveControls = devices.map( ( deviceLabel, index ) => {
@@ -57,6 +59,7 @@ function ResponsiveBlockControl( props ) {
 					label={ toggleControlLabel }
 					checked={ ! isOpen }
 					onChange={ onToggle }
+					help={ toggleHelpText }
 				/>
 
 				<div hidden={ isOpen }>
