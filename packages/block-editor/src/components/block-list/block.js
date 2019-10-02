@@ -67,7 +67,7 @@ function BlockListBlock( {
 	mode,
 	isFocusMode,
 	hasFixedToolbar,
-	horizontalMover,
+	moverOptions,
 	isLocked,
 	clientId,
 	rootClientId,
@@ -462,7 +462,7 @@ function BlockListBlock( {
 			}
 			onDragStart={ onDragStart }
 			onDragEnd={ onDragEnd }
-			horizontalMover={ horizontalMover }
+			moverOptions={ moverOptions }
 		/>
 	);
 
@@ -528,11 +528,11 @@ function BlockListBlock( {
 			{ isFirstMultiSelected && (
 				<BlockMultiControls
 					rootClientId={ rootClientId }
-					horizontalMover={ horizontalMover }
+					moverOptions={ moverOptions }
 				/>
 			) }
 			<div className="editor-block-list__block-edit block-editor-block-list__block-edit">
-				{ shouldRenderMovers && ! horizontalMover && blockMover }
+				{ shouldRenderMovers && ! moverOptions && blockMover }
 				{ shouldShowBreadcrumb && (
 					<BlockBreadcrumb
 						clientId={ clientId }
@@ -572,7 +572,7 @@ function BlockListBlock( {
 						{ isValid && mode === 'html' && (
 							<BlockHtml clientId={ clientId } />
 						) }
-						{ shouldRenderMovers && horizontalMover && blockMover }
+						{ shouldRenderMovers && moverOptions && blockMover }
 						{ ! isValid && [
 							<BlockInvalidWarning
 								key="invalid-warning"
@@ -585,7 +585,7 @@ function BlockListBlock( {
 					</BlockCrashBoundary>
 					{ !! hasError && <BlockCrashWarning /> }
 					{ shouldShowMobileToolbar && (
-						<BlockMobileToolbar clientId={ clientId } horizontalMover={ horizontalMover } />
+						<BlockMobileToolbar clientId={ clientId } moverOptions={ moverOptions } />
 					) }
 				</IgnoreNestedEvents>
 			</div>

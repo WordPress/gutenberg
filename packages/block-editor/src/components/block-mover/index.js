@@ -44,7 +44,7 @@ export class BlockMover extends Component {
 	}
 
 	render() {
-		const { onMoveUp, onMoveDown, horizontalMover, isFirst, isLast, isDraggable, onDragStart, onDragEnd, clientIds, blockElementId, blockType, firstIndex, isLocked, instanceId, isHidden, rootClientId } = this.props;
+		const { onMoveUp, onMoveDown, moverOptions, isFirst, isLast, isDraggable, onDragStart, onDragEnd, clientIds, blockElementId, blockType, firstIndex, isLocked, instanceId, isHidden, rootClientId } = this.props;
 		const { isFocused } = this.state;
 		const blocksCount = castArray( clientIds ).length;
 		if ( isLocked || ( isFirst && isLast && ! rootClientId ) ) {
@@ -56,12 +56,12 @@ export class BlockMover extends Component {
 		// to an unfocused state (body as active element) without firing blur on,
 		// the rendering parent, leaving it unable to react to focus out.
 		return (
-			<div className={ classnames( 'editor-block-mover block-editor-block-mover', { 'is-visible': isFocused || ! isHidden, 'is-horizontal': horizontalMover } ) }>
+			<div className={ classnames( 'editor-block-mover block-editor-block-mover', { 'is-visible': isFocused || ! isHidden, 'is-horizontal': moverOptions } ) }>
 				<IconButton
 					className="editor-block-mover__control block-editor-block-mover__control"
 					onClick={ isFirst ? null : onMoveUp }
-					icon={ horizontalMover ? leftArrow : upArrow }
-					label={ horizontalMover ? __( 'Move left' ) : __( 'Move up' ) }
+					icon={ moverOptions ? leftArrow : upArrow }
+					label={ moverOptions ? __( 'Move left' ) : __( 'Move up' ) }
 					aria-describedby={ `block-editor-block-mover__up-description-${ instanceId }` }
 					aria-disabled={ isFirst }
 					onFocus={ this.onFocus }
@@ -79,8 +79,8 @@ export class BlockMover extends Component {
 				<IconButton
 					className="editor-block-mover__control block-editor-block-mover__control"
 					onClick={ isLast ? null : onMoveDown }
-					icon={ horizontalMover ? rightArrow : downArrow }
-					label={ horizontalMover ? __( 'Move right' ) : __( 'Move down' ) }
+					icon={ moverOptions ? rightArrow : downArrow }
+					label={ moverOptions ? __( 'Move right' ) : __( 'Move down' ) }
 					aria-describedby={ `block-editor-block-mover__down-description-${ instanceId }` }
 					aria-disabled={ isLast }
 					onFocus={ this.onFocus }
