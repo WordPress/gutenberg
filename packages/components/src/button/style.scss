@@ -8,6 +8,7 @@
 	-webkit-appearance: none;
 	background: none;
 	transition: box-shadow 0.1s linear;
+	@include reduce-motion("transition");
 
 	&.is-button {
 		padding: 0 10px;

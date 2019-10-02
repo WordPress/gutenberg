@@ -6,6 +6,7 @@ import { invoke } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { withSelect } from '@wordpress/data';
 import {
 	Dropdown,
 	ExternalLink,
@@ -37,6 +38,7 @@ function NavigationMenuItemEdit( {
 	attributes,
 	clientId,
 	isSelected,
+	isParentOfSelectedBlock,
 	setAttributes,
 } ) {
 	const plainTextRef = useRef( null );
@@ -138,13 +140,21 @@ function NavigationMenuItemEdit( {
 			</InspectorControls>
 			<div className="wp-block-navigation-menu-item">
 				{ content }
-				<InnerBlocks
-					allowedBlocks={ [ 'core/navigation-menu-item' ] }
-					renderAppender={ InnerBlocks.ButtonBlockAppender }
-				/>
+				{ ( isSelected || isParentOfSelectedBlock ) &&
+					<InnerBlocks
+						allowedBlocks={ [ 'core/navigation-menu-item' ] }
+					/>
+				}
 			</div>
 		</Fragment>
 	);
 }
 
-export default NavigationMenuItemEdit;
+export default withSelect( ( select, ownProps ) => {
+	const { hasSelectedInnerBlock } = select( 'core/block-editor' );
+	const { clientId } = ownProps;
+
+	return {
+		isParentOfSelectedBlock: hasSelectedInnerBlock( clientId, true ),
+	};
+} )( NavigationMenuItemEdit );

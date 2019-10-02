@@ -29,6 +29,7 @@ function MediaPlaceholder( props ) {
 		isAppender,
 		disableMediaButtons,
 		getStylesFromColorScheme,
+		multiple,
 	} = props;
 
 	const isOneType = allowedTypes.length === 1;
@@ -101,6 +102,7 @@ function MediaPlaceholder( props ) {
 			<MediaUpload
 				allowedTypes={ allowedTypes }
 				onSelect={ onSelect }
+				multiple={ multiple }
 				render={ ( { open, getMediaOptions } ) => {
 					return (
 						<TouchableWithoutFeedback
