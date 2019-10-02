@@ -14,7 +14,11 @@ describe( 'saveEntityRecord', () => {
 		expect( fulfillment.next( entities ).value.type ).toBe(
 			'SAVE_ENTITY_RECORD_START'
 		);
-		const { value: apiFetchAction } = fulfillment.next();
+		expect( fulfillment.next().value.type ).toBe( 'SELECT' );
+		expect( fulfillment.next().value.type ).toBe( 'SELECT' );
+		expect( fulfillment.next().value.type ).toBe( 'SELECT' );
+		expect( fulfillment.next().value.type ).toBe( 'RECEIVE_ITEMS' );
+		const { value: apiFetchAction } = fulfillment.next( {} );
 		expect( apiFetchAction.request ).toEqual( {
 			path: '/wp/v2/posts',
 			method: 'POST',
@@ -46,7 +50,11 @@ describe( 'saveEntityRecord', () => {
 		expect( fulfillment.next( entities ).value.type ).toBe(
 			'SAVE_ENTITY_RECORD_START'
 		);
-		const { value: apiFetchAction } = fulfillment.next();
+		expect( fulfillment.next().value.type ).toBe( 'SELECT' );
+		expect( fulfillment.next().value.type ).toBe( 'SELECT' );
+		expect( fulfillment.next().value.type ).toBe( 'SELECT' );
+		expect( fulfillment.next().value.type ).toBe( 'RECEIVE_ITEMS' );
+		const { value: apiFetchAction } = fulfillment.next( {} );
 		expect( apiFetchAction.request ).toEqual( {
 			path: '/wp/v2/posts/10',
 			method: 'PUT',
@@ -68,7 +76,11 @@ describe( 'saveEntityRecord', () => {
 		expect( fulfillment.next( entities ).value.type ).toBe(
 			'SAVE_ENTITY_RECORD_START'
 		);
-		const { value: apiFetchAction } = fulfillment.next();
+		expect( fulfillment.next().value.type ).toBe( 'SELECT' );
+		expect( fulfillment.next().value.type ).toBe( 'SELECT' );
+		expect( fulfillment.next().value.type ).toBe( 'SELECT' );
+		expect( fulfillment.next().value.type ).toBe( 'RECEIVE_ITEMS' );
+		const { value: apiFetchAction } = fulfillment.next( {} );
 		expect( apiFetchAction.request ).toEqual( {
 			path: '/wp/v2/types/page',
 			method: 'PUT',

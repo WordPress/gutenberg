@@ -1,5 +1,13 @@
 ## Master
 
+## 5.1.0 (2019-09-03)
+
+### Bug Fixes
+
+- Add `wordpress` folder to the list of ignored paths ([#17296](https://github.com/WordPress/gutenberg/pull/17296)).
+
+## 5.0.0 (2019-08-29)
+
 ### Breaking Changes
 
 - Files with `.spec.js` suffix are no longer matched as test files by default.

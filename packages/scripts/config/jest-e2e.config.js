@@ -14,6 +14,10 @@ const jestE2EConfig = {
 		'**/specs/**/*.[jt]s',
 		'**/?(*.)spec.[jt]s',
 	],
+	testPathIgnorePatterns: [
+		'/node_modules/',
+		'/wordpress/',
+	],
 };
 
 if ( ! hasBabelConfig() ) {

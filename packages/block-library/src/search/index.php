@@ -15,8 +15,9 @@
 function render_block_core_search( $attributes ) {
 	static $instance_id = 0;
 
-	$input_id     = 'wp-block-search__input-' . ++$instance_id;
-	$label_markup = '';
+	$input_id      = 'wp-block-search__input-' . ++$instance_id;
+	$label_markup  = '';
+	$button_markup = '';
 
 	if ( ! empty( $attributes['label'] ) ) {
 		$label_markup = sprintf(

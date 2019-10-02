@@ -11,7 +11,7 @@ import { RawHTML } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { pasteHandler, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { withInstanceId, compose } from '@wordpress/compose';
-import { RichText } from '@wordpress/rich-text';
+import { __experimentalRichText as RichText } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies

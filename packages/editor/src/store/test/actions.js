@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
-
-/**
  * WordPress dependencies
  */
 import { select, dispatch, apiFetch } from '@wordpress/data-controls';
@@ -14,13 +9,11 @@ import { select, dispatch, apiFetch } from '@wordpress/data-controls';
 import * as actions from '../actions';
 import {
 	STORE_KEY,
-	SAVE_POST_NOTICE_ID,
 	TRASH_POST_NOTICE_ID,
 	POST_UPDATE_TRANSACTION_ID,
 } from '../constants';
 
 jest.mock( '@wordpress/data-controls' );
-jest.mock( '../block-sources' );
 
 select.mockImplementation( ( ...args ) => {
 	const { select: actualSelect } = jest
@@ -59,36 +52,14 @@ const postType = {
 };
 const postId = 44;
 const postTypeSlug = 'post';
-const userId = 1;
 
 describe( 'Post generator actions', () => {
 	describe( 'savePost()', () => {
 		let fulfillment,
-			edits,
 			currentPost,
 			currentPostStatus,
-			currentUser,
-			editPostToSendOptimistic,
-			autoSavePost,
-			autoSavePostToSend,
-			savedPost,
-			savedPostStatus,
-			isAutosave,
-			isEditedPostNew,
-			savedPostMessage;
+			isAutosave;
 		beforeEach( () => {
-			edits = ( defaultStatus = null ) => {
-				const postObject = {
-					title: 'foo',
-					content: 'bar',
-					excerpt: 'cheese',
-					foo: 'bar',
-				};
-				if ( defaultStatus !== null ) {
-					postObject.status = defaultStatus;
-				}
-				return postObject;
-			};
 			currentPost = () => ( {
 				id: postId,
 				type: postTypeSlug,
@@ -97,323 +68,171 @@ describe( 'Post generator actions', () => {
 				excerpt: 'crackers',
 				status: currentPostStatus,
 			} );
-			currentUser = { id: userId };
-			editPostToSendOptimistic = () => {
-				const postObject = {
-					...edits(),
-					content: editedPostContent,
-					id: currentPost().id,
-				};
-				if ( ! postObject.status && isEditedPostNew ) {
-					postObject.status = 'draft';
-				}
-				if ( isAutosave ) {
-					delete postObject.foo;
-				}
-				return postObject;
-			};
-			autoSavePost = { status: 'autosave', bar: 'foo' };
-			autoSavePostToSend = () => editPostToSendOptimistic();
-			savedPost = () => (
-				{
-					...currentPost(),
-					...editPostToSendOptimistic(),
-					content: editedPostContent,
-					status: savedPostStatus,
-				}
-			);
 		} );
-		const editedPostContent = 'to infinity and beyond';
 		const reset = ( isAutosaving ) => fulfillment = actions.savePost(
 			{ isAutosave: isAutosaving }
 		);
-		const rewind = ( isAutosaving, isNewPost ) => {
-			reset( isAutosaving );
-			fulfillment.next();
-			fulfillment.next( true );
-			fulfillment.next( edits() );
-			fulfillment.next( isNewPost );
-			fulfillment.next( currentPost() );
-			fulfillment.next( editedPostContent );
-			fulfillment.next( postTypeSlug );
-			fulfillment.next( postType );
-			fulfillment.next();
-			if ( isAutosaving ) {
-				fulfillment.next( currentUser );
-				fulfillment.next();
-			} else {
-				fulfillment.next();
-				fulfillment.next();
-			}
-		};
-		const initialTestConditions = [
+		const testConditions = [
 			[
-				'yields action for selecting if edited post is saveable',
+				'yields an action for checking if the post is saveable',
 				() => true,
 				() => {
 					reset( isAutosave );
 					const { value } = fulfillment.next();
-					expect( value ).toEqual(
-						select( STORE_KEY, 'isEditedPostSaveable' )
-					);
+					expect( value ).toEqual( select( STORE_KEY, 'isEditedPostSaveable' ) );
 				},
 			],
 			[
-				'yields action for selecting the post edits done',
+				'yields an action for selecting the current edited post content',
 				() => true,
 				() => {
 					const { value } = fulfillment.next( true );
-					expect( value ).toEqual(
-						select( STORE_KEY, 'getPostEdits' )
-					);
+					expect( value ).toEqual( select( STORE_KEY, 'getEditedPostContent' ) );
 				},
 			],
 			[
-				'yields action for selecting whether the edited post is new',
+				"yields an action for editing the post entity's content if not an autosave",
 				() => true,
 				() => {
-					const { value } = fulfillment.next( edits() );
-					expect( value ).toEqual(
-						select( STORE_KEY, 'isEditedPostNew' )
-					);
+					if ( ! isAutosave ) {
+						const edits = { content: currentPost().content };
+						const { value } = fulfillment.next( edits.content );
+						expect( value ).toEqual(
+							dispatch( STORE_KEY, 'editPost', edits, { undoIgnore: true } )
+						);
+					}
 				},
 			],
 			[
-				'yields action for selecting the current post',
-				() => true,
-				() => {
-					const { value } = fulfillment.next( isEditedPostNew );
-					expect( value ).toEqual(
-						select( STORE_KEY, 'getCurrentPost' )
-					);
-				},
-			],
-			[
-				'yields action for selecting the edited post content',
-				() => true,
-				() => {
-					const { value } = fulfillment.next( currentPost() );
-					expect( value ).toEqual(
-						select( STORE_KEY, 'getEditedPostContent' )
-					);
-				},
-			],
-			[
-				'yields action for selecting current post type slug',
-				() => true,
-				() => {
-					const { value } = fulfillment.next( editedPostContent );
-					expect( value ).toEqual(
-						select( STORE_KEY, 'getCurrentPostType' )
-					);
-				},
-			],
-			[
-				'yields action for selecting the post type object',
-				() => true,
-				() => {
-					const { value } = fulfillment.next( postTypeSlug );
-					expect( value ).toEqual(
-						select( 'core', 'getPostType', postTypeSlug )
-					);
-				},
-			],
-			[
-				'yields action for dispatching request post update start',
-				() => true,
-				() => {
-					const { value } = fulfillment.next( postType );
-					expect( value ).toEqual(
-						dispatch(
-							STORE_KEY,
-							'__experimentalRequestPostUpdateStart',
-							{ isAutosave }
-						)
-					);
-				},
-			],
-			[
-				'yields action for dispatching optimistic update of post',
+				'yields an action for signalling that an update to the post started',
 				() => true,
 				() => {
 					const { value } = fulfillment.next();
-					expect( value ).toEqual(
-						dispatch(
-							STORE_KEY,
-							'__experimentalOptimisticUpdatePost',
-							editPostToSendOptimistic()
-						)
-					);
+					expect( value ).toEqual( {
+						type: 'REQUEST_POST_UPDATE_START',
+						options: { isAutosave },
+					} );
 				},
 			],
 			[
-				'yields action for dispatching the removal of save post notice',
-				( isAutosaving ) => ! isAutosaving,
+				'yields an action for selecting the current post',
+				() => true,
 				() => {
 					const { value } = fulfillment.next();
-					expect( value ).toEqual(
-						dispatch(
-							'core/notices',
-							'removeNotice',
-							SAVE_POST_NOTICE_ID,
-						)
-					);
+					expect( value ).toEqual( select( STORE_KEY, 'getCurrentPost' ) );
 				},
 			],
 			[
-				'yields action for dispatching the removal of autosave notice',
-				( isAutosaving ) => ! isAutosaving,
+				"yields an action for selecting the post entity's non transient edits",
+				() => true,
 				() => {
-					const { value } = fulfillment.next();
-					expect( value ).toEqual(
-						dispatch(
-							'core/notices',
-							'removeNotice',
-							'autosave-exists'
-						)
-					);
-				},
-			],
-			[
-				'yields action for selecting the currentUser',
-				( isAutosaving ) => isAutosaving,
-				() => {
-					const { value } = fulfillment.next();
-					expect( value ).toEqual(
-						select( 'core', 'getCurrentUser' )
-					);
-				},
-			],
-			[
-				'yields action for selecting the autosavePost',
-				( isAutosaving ) => isAutosaving,
-				() => {
-					const { value } = fulfillment.next( currentUser );
+					const post = currentPost();
+					const { value } = fulfillment.next( post );
 					expect( value ).toEqual(
 						select(
 							'core',
-							'getAutosave',
-							postTypeSlug,
-							postId,
-							userId
+							'getEntityRecordNonTransientEdits',
+							'postType',
+							post.type,
+							post.id
 						)
 					);
 				},
 			],
-		];
-		const fetchErrorConditions = [
 			[
-				'yields action for dispatching post update failure',
+				'yields an action for dispatching an update to the post entity',
+				() => true,
 				() => {
-					const error = { foo: 'bar', code: 'fail' };
-					apiFetchThrowError( error );
-					const editsObject = edits();
-					const { value } = isAutosave ?
-						fulfillment.next( autoSavePost ) :
-						fulfillment.next();
-					if ( isAutosave ) {
-						delete editsObject.foo;
-					}
+					const post = currentPost();
+					const { value } = fulfillment.next( post );
 					expect( value ).toEqual(
 						dispatch(
-							STORE_KEY,
-							'__experimentalRequestPostUpdateFailure',
+							'core',
+							'saveEntityRecord',
+							'postType',
+							post.type,
+							isAutosave ? { ...post, content: undefined } : post,
 							{
-								post: currentPost(),
-								edits: isEditedPostNew ?
-									{ ...editsObject, status: 'draft' } :
-									editsObject,
-								error,
-								options: { isAutosave },
+								isAutosave,
 							}
 						)
 					);
 				},
 			],
 			[
-				'yields action for dispatching an appropriate error notice',
-				() => {
-					const { value } = fulfillment.next( [ 'foo', 'bar' ] );
-					expect( value ).toEqual(
-						dispatch(
-							'core/notices',
-							'createErrorNotice',
-							...[ 'Updating failed.', { id: 'SAVE_POST_NOTICE_ID' } ]
-						)
-					);
-				},
-			],
-		];
-		const fetchSuccessConditions = [
-			[
-				'yields action for updating the post via the api',
-				() => {
-					apiFetchDoActual();
-					rewind( isAutosave, isEditedPostNew );
-					const { value } = isAutosave ?
-						fulfillment.next( autoSavePost ) :
-						fulfillment.next();
-					const data = isAutosave ?
-						autoSavePostToSend() :
-						editPostToSendOptimistic();
-					const path = isAutosave ? '/autosaves' : '';
-					expect( value ).toEqual(
-						apiFetch(
-							{
-								path: `/wp/v2/${ postType.rest_base }/${ editPostToSendOptimistic().id }${ path }`,
-								method: isAutosave ? 'POST' : 'PUT',
-								data,
-							}
-						)
-					);
-				},
-			],
-			[
-				'yields action for dispatch the appropriate reset action',
-				() => {
-					const { value } = fulfillment.next( savedPost() );
-
-					if ( isAutosave ) {
-						expect( value ).toEqual( dispatch( 'core', 'receiveAutosaves', postId, savedPost() ) );
-					} else {
-						expect( value ).toEqual( dispatch( STORE_KEY, 'resetPost', savedPost() ) );
-					}
-				},
-			],
-			[
-				'yields action for dispatching the post update success',
+				'yields an action for signalling that an update to the post finished',
+				() => true,
 				() => {
 					const { value } = fulfillment.next();
+					expect( value ).toEqual( {
+						type: 'REQUEST_POST_UPDATE_FINISH',
+						options: { isAutosave },
+					} );
+				},
+			],
+			[
+				"yields an action for selecting the entity's save error",
+				() => true,
+				() => {
+					const post = currentPost();
+					const { value } = fulfillment.next();
 					expect( value ).toEqual(
-						dispatch(
-							STORE_KEY,
-							'__experimentalRequestPostUpdateSuccess',
-							{
-								previousPost: currentPost(),
-								post: savedPost(),
-								options: { isAutosave },
-								postType,
-								isRevision: false,
-							}
+						select(
+							'core',
+							'getLastEntitySaveError',
+							'postType',
+							post.type,
+							post.id
 						)
 					);
 				},
 			],
 			[
-				'yields dispatch action for success notification',
+				'yields an action for selecting the current post',
+				() => true,
 				() => {
-					const { value } = fulfillment.next( [ 'foo', 'bar' ] );
-					const expected = isAutosave ?
-						undefined :
-						dispatch(
-							'core/notices',
-							'createSuccessNotice',
-							...[
-								savedPostMessage,
-								{ actions: [], id: 'SAVE_POST_NOTICE_ID', type: 'snackbar' },
-							]
+					const { value } = fulfillment.next();
+					expect( value ).toEqual( select( STORE_KEY, 'getCurrentPost' ) );
+				},
+			],
+			[
+				'yields an action for selecting the current post type config',
+				() => true,
+				() => {
+					const post = currentPost();
+					const { value } = fulfillment.next( post );
+					expect( value ).toEqual( select( 'core', 'getPostType', post.type ) );
+				},
+			],
+			[
+				'yields an action for dispatching a success notice',
+				() => true,
+				() => {
+					if ( ! isAutosave && currentPostStatus === 'publish' ) {
+						const { value } = fulfillment.next( postType );
+						expect( value ).toEqual(
+							dispatch(
+								'core/notices',
+								'createSuccessNotice',
+								'Updated Post',
+								{
+									actions: [],
+									id: 'SAVE_POST_NOTICE_ID',
+									type: 'snackbar',
+								}
+							)
 						);
-					expect( value ).toEqual( expected );
+					}
+				},
+			],
+			[
+				'implicitly returns undefined',
+				() => true,
+				() => {
+					expect( fulfillment.next() ).toEqual( {
+						done: true,
+						value: undefined,
+					} );
 				},
 			],
 		];
@@ -430,74 +249,27 @@ describe( 'Post generator actions', () => {
 			}
 		};
 
-		const testRunRoutine = ( [ testDescription, testRoutine ] ) => {
-			it( testDescription, () => {
-				testRoutine();
-			} );
-		};
-
-		describe( 'yields with expected responses when edited post is not saveable', () => {
-			it( 'yields action for selecting if edited post is saveable', () => {
-				reset( false );
-				const { value } = fulfillment.next();
-				expect( value ).toEqual(
-					select( STORE_KEY, 'isEditedPostSaveable' )
-				);
-			} );
-			it( 'if edited post is not saveable then bails', () => {
-				const { value, done } = fulfillment.next( false );
-				expect( done ).toBe( true );
-				expect( value ).toBeUndefined();
-			} );
-		} );
 		describe( 'yields with expected responses for when not autosaving and edited post is new', () => {
 			beforeEach( () => {
 				isAutosave = false;
-				isEditedPostNew = true;
-				savedPostStatus = 'publish';
 				currentPostStatus = 'draft';
-				savedPostMessage = 'Post published';
 			} );
-			initialTestConditions.forEach( conditionalRunTestRoutine( false ) );
-			describe( 'fetch action throwing an error', () => {
-				fetchErrorConditions.forEach( testRunRoutine );
-			} );
-			describe( 'fetch action not throwing an error', () => {
-				fetchSuccessConditions.forEach( testRunRoutine );
-			} );
+			testConditions.forEach( conditionalRunTestRoutine( false ) );
 		} );
 
 		describe( 'yields with expected responses for when not autosaving and edited post is not new', () => {
 			beforeEach( () => {
 				isAutosave = false;
-				isEditedPostNew = false;
 				currentPostStatus = 'publish';
-				savedPostStatus = 'publish';
-				savedPostMessage = 'Updated Post';
 			} );
-			initialTestConditions.forEach( conditionalRunTestRoutine( false ) );
-			describe( 'fetch action throwing error', () => {
-				fetchErrorConditions.forEach( testRunRoutine );
-			} );
-			describe( 'fetch action not throwing error', () => {
-				fetchSuccessConditions.forEach( testRunRoutine );
-			} );
+			testConditions.forEach( conditionalRunTestRoutine( false ) );
 		} );
 		describe( 'yields with expected responses for when autosaving is true and edited post is not new', () => {
 			beforeEach( () => {
 				isAutosave = true;
-				isEditedPostNew = false;
 				currentPostStatus = 'autosave';
-				savedPostStatus = 'publish';
-				savedPostMessage = 'Post published';
 			} );
-			initialTestConditions.forEach( conditionalRunTestRoutine( true ) );
-			describe( 'fetch action throwing error', () => {
-				fetchErrorConditions.forEach( testRunRoutine );
-			} );
-			describe( 'fetch action not throwing error', () => {
-				fetchSuccessConditions.forEach( testRunRoutine );
-			} );
+			testConditions.forEach( conditionalRunTestRoutine( true ) );
 		} );
 	} );
 	describe( 'autosave()', () => {
@@ -578,12 +350,11 @@ describe( 'Post generator actions', () => {
 					}
 				) );
 			} );
-			it( 'yields expected dispatch action for resetting the post', () => {
+			it( 'yields expected dispatch action for saving the post', () => {
 				const { value } = fulfillment.next();
 				expect( value ).toEqual( dispatch(
 					STORE_KEY,
-					'resetPost',
-					{ ...currentPost, status: 'trash' }
+					'savePost',
 				) );
 			} );
 		} );
@@ -663,14 +434,15 @@ describe( 'Editor actions', () => {
 		} );
 		it( 'should yield action object for resetEditorBlocks', () => {
 			const { value } = fulfillment.next();
-			expect( value ).toEqual( actions.resetEditorBlocks( [] ) );
+			expect( Object.keys( value ) ).toEqual( [] );
 		} );
 		it( 'should yield action object for setupEditorState', () => {
 			const { value } = fulfillment.next();
 			expect( value ).toEqual(
-				actions.setupEditorState(
-					{ content: { raw: '' }, status: 'publish' }
-				)
+				actions.setupEditorState( {
+					content: { raw: '' },
+					status: 'publish',
+				} )
 			);
 		} );
 	} );
@@ -691,47 +463,7 @@ describe( 'Editor actions', () => {
 			const result = actions.__experimentalRequestPostUpdateStart();
 			expect( result ).toEqual( {
 				type: 'REQUEST_POST_UPDATE_START',
-				optimist: { type: BEGIN, id: POST_UPDATE_TRANSACTION_ID },
 				options: {},
-			} );
-		} );
-	} );
-
-	describe( 'requestPostUpdateSuccess', () => {
-		it( 'should return the REQUEST_POST_UPDATE_SUCCESS action', () => {
-			const testActionData = {
-				previousPost: {},
-				post: {},
-				options: {},
-				postType: 'post',
-			};
-			const result = actions.__experimentalRequestPostUpdateSuccess( {
-				...testActionData,
-				isRevision: false,
-			} );
-			expect( result ).toEqual( {
-				...testActionData,
-				type: 'REQUEST_POST_UPDATE_SUCCESS',
-				optimist: { type: COMMIT, id: POST_UPDATE_TRANSACTION_ID },
-			} );
-		} );
-	} );
-
-	describe( 'requestPostUpdateFailure', () => {
-		it( 'should return the REQUEST_POST_UPDATE_FAILURE action', () => {
-			const testActionData = {
-				post: {},
-				options: {},
-				edits: {},
-				error: {},
-			};
-			const result = actions.__experimentalRequestPostUpdateFailure(
-				testActionData
-			);
-			expect( result ).toEqual( {
-				...testActionData,
-				type: 'REQUEST_POST_UPDATE_FAILURE',
-				optimist: { type: REVERT, id: POST_UPDATE_TRANSACTION_ID },
 			} );
 		} );
 	} );
@@ -748,11 +480,29 @@ describe( 'Editor actions', () => {
 	} );
 
 	describe( 'editPost', () => {
-		it( 'should return EDIT_POST action', () => {
+		it( 'should edit the relevant entity record', () => {
 			const edits = { format: 'sample' };
-			expect( actions.editPost( edits ) ).toEqual( {
-				type: 'EDIT_POST',
-				edits,
+			const fulfillment = actions.editPost( edits );
+			expect( fulfillment.next() ).toEqual( {
+				done: false,
+				value: select( STORE_KEY, 'getCurrentPost' ),
+			} );
+			const post = { id: 1, type: 'post' };
+			expect( fulfillment.next( post ) ).toEqual( {
+				done: false,
+				value: dispatch(
+					'core',
+					'editEntityRecord',
+					'postType',
+					post.type,
+					post.id,
+					edits,
+					undefined
+				),
+			} );
+			expect( fulfillment.next() ).toEqual( {
+				done: true,
+				value: undefined,
 			} );
 		} );
 	} );
@@ -770,17 +520,29 @@ describe( 'Editor actions', () => {
 	} );
 
 	describe( 'redo', () => {
-		it( 'should return REDO action', () => {
-			expect( actions.redo() ).toEqual( {
-				type: 'REDO',
+		it( 'should yield the REDO action', () => {
+			const fulfillment = actions.redo();
+			expect( fulfillment.next() ).toEqual( {
+				done: false,
+				value: dispatch( 'core', 'redo' ),
+			} );
+			expect( fulfillment.next() ).toEqual( {
+				done: true,
+				value: undefined,
 			} );
 		} );
 	} );
 
 	describe( 'undo', () => {
-		it( 'should return UNDO action', () => {
-			expect( actions.undo() ).toEqual( {
-				type: 'UNDO',
+		it( 'should yield the UNDO action', () => {
+			const fulfillment = actions.undo();
+			expect( fulfillment.next() ).toEqual( {
+				done: false,
+				value: dispatch( 'core', 'undo' ),
+			} );
+			expect( fulfillment.next() ).toEqual( {
+				done: true,
+				value: undefined,
 			} );
 		} );
 	} );

@@ -49,7 +49,6 @@ import BlockInsertionPoint from './insertion-point';
 import IgnoreNestedEvents from '../ignore-nested-events';
 import InserterWithShortcuts from '../inserter-with-shortcuts';
 import Inserter from '../inserter';
-import useHoveredArea from './hover-area';
 import { isInsideRootBlock } from '../../utils/dom';
 import useMovingAnimation from './moving-animation';
 
@@ -81,7 +80,6 @@ function BlockListBlock( {
 	isParentOfSelectedBlock,
 	isDraggable,
 	isSelectionEnabled,
-	isRTL,
 	className,
 	name,
 	isValid,
@@ -116,9 +114,6 @@ function BlockListBlock( {
 
 	// Reference to the block edit node
 	const blockNodeRef = useRef();
-
-	// Hovered area of the block
-	const hoverArea = useHoveredArea( wrapper );
 
 	const breadcrumb = useRef();
 
@@ -186,7 +181,7 @@ function BlockListBlock( {
 
 	// Handling the error state
 	const [ hasError, setErrorState ] = useState( false );
-	const onBlockError = () => setErrorState( false );
+	const onBlockError = () => setErrorState( true );
 
 	// Handling of forceContextualToolbarFocus
 	const isForcingContextualToolbar = useRef( false );
@@ -261,7 +256,7 @@ function BlockListBlock( {
 	}, [ isFirstMultiSelected ] );
 
 	// Block Reordering animation
-	const animationStyle = useMovingAnimation( wrapper, isSelected || isPartOfMultiSelection, enableAnimation, animateOnChange );
+	const animationStyle = useMovingAnimation( wrapper, isSelected || isPartOfMultiSelection, isSelected || isFirstMultiSelected, enableAnimation, animateOnChange );
 
 	// Focus the breadcrumb if the wrapper is focused on navigation mode.
 	// Focus the first editable or the wrapper if edit mode.
@@ -404,7 +399,7 @@ function BlockListBlock( {
 	// We render block movers and block settings to keep them tabbale even if hidden
 	const shouldRenderMovers =
 		! isNavigationMode &&
-		( isSelected || hoverArea === ( isRTL ? 'right' : 'left' ) ) &&
+		isSelected &&
 		! showEmptyBlockSideInserter &&
 		! isPartOfMultiSelection &&
 		! isTypingWithinBlock;
@@ -523,7 +518,7 @@ function BlockListBlock( {
 					<BlockMover
 						clientIds={ clientId }
 						blockElementId={ blockElementId }
-						isHidden={ ! ( isHovered || isSelected ) || hoverArea !== ( isRTL ? 'right' : 'left' ) }
+						isHidden={ ! isSelected }
 						isDraggable={
 							isDraggable !== false &&
 							( ! isPartOfMultiSelection && isMovable )
@@ -581,10 +576,10 @@ function BlockListBlock( {
 							</div>,
 						] }
 					</BlockCrashBoundary>
+					{ !! hasError && <BlockCrashWarning /> }
 					{ shouldShowMobileToolbar && (
 						<BlockMobileToolbar clientId={ clientId } />
 					) }
-					{ !! hasError && <BlockCrashWarning /> }
 				</IgnoreNestedEvents>
 			</div>
 			{ showInserterShortcuts && (
@@ -691,6 +686,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 		replaceBlocks,
 		toggleSelection,
 		setNavigationMode,
+		__unstableMarkLastChangeAsPersistent,
 	} = dispatch( 'core/block-editor' );
 
 	return {
@@ -744,6 +740,12 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 			}
 		},
 		onReplace( blocks, indexToSelect ) {
+			if (
+				blocks.length &&
+				! isUnmodifiedDefaultBlock( blocks[ blocks.length - 1 ] )
+			) {
+				__unstableMarkLastChangeAsPersistent();
+			}
 			replaceBlocks( [ ownProps.clientId ], blocks, indexToSelect );
 		},
 		onShiftSelection() {

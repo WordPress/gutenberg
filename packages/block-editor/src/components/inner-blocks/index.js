@@ -7,6 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { withViewportMatch } from '@wordpress/viewport'; // Temporary click-through disable on desktop.
 import { Component } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { synchronizeBlocksWithTemplate, withBlockContentContext } from '@wordpress/blocks';
@@ -101,6 +102,7 @@ class InnerBlocks extends Component {
 
 	render() {
 		const {
+			isSmallScreen, // Temporary click-through disable on desktop.
 			clientId,
 			hasOverlay,
 			renderAppender,
@@ -114,7 +116,7 @@ class InnerBlocks extends Component {
 		const isPlaceholder = template === null && !! templateOptions;
 
 		const classes = classnames( 'editor-inner-blocks block-editor-inner-blocks', {
-			'has-overlay': hasOverlay && ! isPlaceholder,
+			'has-overlay': isSmallScreen && ( hasOverlay && ! isPlaceholder ), // Temporary click-through disable on desktop.
 		} );
 
 		return (
@@ -137,6 +139,7 @@ class InnerBlocks extends Component {
 }
 
 InnerBlocks = compose( [
+	withViewportMatch( { isSmallScreen: '< medium' } ), // Temporary click-through disable on desktop.
 	withBlockEditContext( ( context ) => pick( context, [ 'clientId' ] ) ),
 	withSelect( ( select, ownProps ) => {
 		const {

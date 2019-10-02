@@ -31,7 +31,7 @@ describe( 'Font Size Picker', () => {
 
 		await page.click( '.blocks-font-size .components-range-control__number' );
 		// This should be the "small" font-size of the current theme.
-		await page.keyboard.type( '19.5' );
+		await page.keyboard.type( '16' );
 
 		// Ensure content matches snapshot.
 		const content = await getEditedPostContent();

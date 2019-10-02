@@ -12,7 +12,7 @@ import { computeCaretRect } from '@wordpress/dom';
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 const name = 'core/image';
-const title = __( 'Inline Image' );
+const title = __( 'Inline image' );
 
 const stopKeyPropagation = ( event ) => event.stopPropagation();
 

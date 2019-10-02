@@ -24,6 +24,10 @@ jest.mock( 'react-native-gutenberg-bridge', () => {
 
 jest.mock( 'react-native-dark-mode', () => {
 	return {
+		initialMode: 'light',
+		eventEmitter: {
+			on: jest.fn(),
+		},
 		useDarkModeContext: () => 'light',
 	};
 } );

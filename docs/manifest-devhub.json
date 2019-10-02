@@ -1086,6 +1086,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/block-directory",
+		"slug": "packages-block-directory",
+		"markdown_source": "../packages/block-directory/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/block-editor",
 		"slug": "packages-block-editor",
 		"markdown_source": "../packages/block-editor/README.md",
@@ -1227,6 +1233,12 @@
 		"title": "@wordpress/element",
 		"slug": "packages-element",
 		"markdown_source": "../packages/element/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/env",
+		"slug": "packages-env",
+		"markdown_source": "../packages/env/README.md",
 		"parent": "packages"
 	},
 	{

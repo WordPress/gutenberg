@@ -35,7 +35,12 @@ You can also customize the toolbar to include controls specific to your block ty
 				default: 'none',
 			},
 		},
-
+		example: {
+			attributes: {
+				content: 'Hello World',
+				alignment: 'right',
+			},
+		},
 		edit: function( props ) {
 			var content = props.attributes.content;
 			var alignment = props.attributes.alignment;
@@ -90,13 +95,13 @@ You can also customize the toolbar to include controls specific to your block ty
 ```
 {% ESNext %}
 ```js
-const { registerBlockType } = wp.blocks;
+import { registerBlockType } from '@wordpress/blocks';
 
-const {
+import {
 	RichText,
 	AlignmentToolbar,
 	BlockControls,
-} = wp.editor;
+} from '@wordpress/block-editor';
 
 registerBlockType( 'gutenberg-examples/example-04-controls-esnext', {
 	title: 'Example: Controls (esnext)',
@@ -111,6 +116,12 @@ registerBlockType( 'gutenberg-examples/example-04-controls-esnext', {
 		alignment: {
 			type: 'string',
 			default: 'none',
+		},
+	},
+	example: {
+		attributes: {
+			content: 'Hello World',
+			alignment: 'right',
 		},
 	},
 	edit: ( props ) => {

@@ -194,6 +194,12 @@ exports[`List should insert a line break on shift+enter in a non trailing list i
 <!-- /wp:list -->"
 `;
 
+exports[`List should not indent list on space with modifier 1`] = `
+"<!-- wp:list -->
+<ul><li>1</li><li> </li></ul>
+<!-- /wp:list -->"
+`;
+
 exports[`List should not transform lines in block when transforming multiple blocks 1`] = `
 "<!-- wp:list -->
 <ul><li>one<br>...</li><li>two</li></ul>
@@ -203,6 +209,12 @@ exports[`List should not transform lines in block when transforming multiple blo
 exports[`List should not undo asterisk transform with backspace after selection change 1`] = `""`;
 
 exports[`List should not undo asterisk transform with backspace after typing 1`] = `""`;
+
+exports[`List should only convert to list when shortcut ends with space 1`] = `
+"<!-- wp:paragraph -->
+<p>* </p>
+<!-- /wp:paragraph -->"
+`;
 
 exports[`List should outdent with children 1`] = `
 "<!-- wp:list -->
@@ -273,6 +285,18 @@ exports[`List should split into two with paragraph and merge lists 3`] = `
 `;
 
 exports[`List should undo asterisk transform with backspace 1`] = `
+"<!-- wp:paragraph -->
+<p>* </p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`List should undo asterisk transform with backspace after selection changes 1`] = `
+"<!-- wp:paragraph -->
+<p>* </p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`List should undo asterisk transform with backspace after selection changes without requestIdleCallback 1`] = `
 "<!-- wp:paragraph -->
 <p>* </p>
 <!-- /wp:paragraph -->"

@@ -44,39 +44,39 @@ const el = wp.element.createElement;
 const { registerBlockType } = wp.blocks;
 
 registerBlockType( 'myguten/simple', {
-	title: __('Simple Block', 'myguten'),
+	title: __( 'Simple Block', 'myguten' ),
 	category: 'widgets',
 
 	edit: () => {
 		return el(
 			'p',
-			{ style: { color:'red'}, },
-			__('Hello World', 'myguten')
+			{ style: { color: 'red' } },
+			__( 'Hello World', 'myguten' )
 		);
 	},
 
 	save: () => {
 		return el(
 			'p',
-			{ style: { color:'red'}, },
-			__('Hello World', 'myguten')
+			{ style: { color: 'red' } },
+			__( 'Hello World', 'myguten' )
 		);
-	}
-});
+	},
+} );
 ```
 {% ESNext %}
 ```js
-const { __ } = wp.i18n;
-const { registerBlockType } = wp.blocks;
+import { __ } from '@wordpress/i18n';
+import { registerBlockType } from '@wordpress/blocks';
 
 registerBlockType( 'myguten/simple', {
-	title: __('Simple Block', 'myguten'),
+	title: __( 'Simple Block', 'myguten' ),
 	category: 'widgets',
 
 	edit: () => {
 		return (
 			<p style="color:red">
-				{ __('Hello World', 'myguten') }
+				{ __( 'Hello World', 'myguten' ) }
 			</p>
 		);
 	},
@@ -84,11 +84,11 @@ registerBlockType( 'myguten/simple', {
 	save: () => {
 		return (
 			<p style="color:red">
-				{ __('Hello World', 'myguten') }
+				{ __( 'Hello World', 'myguten' ) }
 			</p>
 		);
-	}
-});
+	},
+} );
 ```
 {% end %}
 
@@ -259,4 +259,3 @@ Using `make-json` automatically names the file with the md5 hash, so it is ready
 You will need to set your WordPress installation to Esperanto language. Go to Settings > General and change your site language to Esperanto.
 
 With the language set, create a new post, add the block, and you will see the translations used.
-
