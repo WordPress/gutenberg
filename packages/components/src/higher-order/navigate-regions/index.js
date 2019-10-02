@@ -34,7 +34,7 @@ export default createHigherOrderComponent(
 			}
 
 			focusRegion( offset ) {
-				const regions = [ ...this.container.querySelectorAll( '[role="region"]' ) ];
+				const regions = Array.from( this.container.querySelectorAll( '[role="region"]' ) );
 				if ( ! regions.length ) {
 					return;
 				}

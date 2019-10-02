@@ -19,13 +19,13 @@ import {
 	Icon,
 	Toolbar,
 	ToolbarButton,
-	withTheme,
 } from '@wordpress/components';
 
 import {
 	Caption,
 	MediaPlaceholder,
 	MediaUpload,
+	MediaUploadProgress,
 	MEDIA_TYPE_IMAGE,
 	BlockControls,
 	InspectorControls,
@@ -33,12 +33,12 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { isURL } from '@wordpress/url';
 import { doAction, hasAction } from '@wordpress/hooks';
+import { withPreferredColorScheme } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import styles from './styles.scss';
-import MediaUploadProgress from './media-upload-progress';
 import SvgIcon from './icon';
 import SvgIconRetry from './icon-retry';
 
@@ -198,7 +198,7 @@ class ImageEdit extends React.Component {
 			return <Icon icon={ SvgIconRetry } { ...styles.iconRetry } />;
 		}
 
-		const iconStyle = this.props.useStyle( styles.icon, styles.iconDark );
+		const iconStyle = this.props.getStylesFromColorScheme( styles.icon, styles.iconDark );
 		return <Icon icon={ SvgIcon } { ...iconStyle } />;
 	}
 
@@ -371,4 +371,4 @@ class ImageEdit extends React.Component {
 	}
 }
 
-export default withTheme( ImageEdit );
+export default withPreferredColorScheme( ImageEdit );
