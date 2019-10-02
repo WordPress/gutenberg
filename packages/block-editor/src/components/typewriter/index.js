@@ -129,7 +129,7 @@ class Typewriter extends Component {
 			return;
 		}
 
-		const diff = currentCaretRect.y - this.caretRect.y;
+		const diff = currentCaretRect.top - this.caretRect.top;
 
 		if ( diff === 0 ) {
 			return;
@@ -148,10 +148,10 @@ class Typewriter extends Component {
 			scrollContainer.scrollTop;
 		const scrollContainerY = windowScroll ?
 			0 :
-			scrollContainer.getBoundingClientRect().y;
+			scrollContainer.getBoundingClientRect().top;
 		const relativeScrollPosition = windowScroll ?
-			this.caretRect.y / window.innerHeight :
-			( this.caretRect.y - scrollContainerY ) /
+			this.caretRect.top / window.innerHeight :
+			( this.caretRect.top - scrollContainerY ) /
 			( window.innerHeight - scrollContainerY );
 
 		// If the scroll position is at the start, the active editable element
@@ -178,10 +178,10 @@ class Typewriter extends Component {
 		// view.
 		if (
 			// The caret is under the lower fold.
-			this.caretRect.y + this.caretRect.height >
+			this.caretRect.top + this.caretRect.height >
 				scrollContainerY + scrollContainerHeight ||
 			// The caret is above the upper fold.
-			this.caretRect.y < scrollContainerY
+			this.caretRect.top < scrollContainerY
 		) {
 			// Reset the caret position to maintain.
 			this.caretRect = currentCaretRect;
