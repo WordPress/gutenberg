@@ -440,7 +440,7 @@ export class RichText extends Component {
 	/**
 	 * Handles a paste event from the native Aztec Wrapper.
 	 *
-	 * @param {PasteEvent} event The paste event which wraps `nativeEvent`.
+	 * @param {Object} event The paste event which wraps `nativeEvent`.
 	 */
 	onPaste( event ) {
 		const {
@@ -759,8 +759,8 @@ export class RichText extends Component {
 			this.lastEventCount = undefined; // force a refresh on the native side
 			value = '';
 		}
-		// On android if content is empty we need to send no content or else the placeholder with not show 
-		if ( ! this.iOS  && value === '') {
+		// On android if content is empty we need to send no content or else the placeholder with not show.
+		if ( ! this.iOS && value === '' ) {
 			return value;
 		}
 
