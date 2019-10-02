@@ -101,7 +101,7 @@
 
 	.block-editor-block-list__block-edit {
 		position: relative;
-		& > div {
+		&.has-mover-inside > div {
 			display: flex;
 		}
 

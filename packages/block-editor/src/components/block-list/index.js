@@ -195,7 +195,10 @@ class BlockList extends Component {
 			className,
 			blockClientIds,
 			rootClientId,
-			moverOptions,
+			moverOptions = {
+				position: 'outside',
+				orientation: 'vertical',
+			},
 			isDraggable,
 			selectedBlockClientId,
 			multiSelectedBlockClientIds,

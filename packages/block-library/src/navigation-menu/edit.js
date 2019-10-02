@@ -46,6 +46,10 @@ function NavigationMenu( {
 		[ pages ]
 	);
 
+	const moverOptions = {
+		position: 'inside',
+		orientation: 'horizontal',
+	};
 	return (
 		<Fragment>
 			<BlockControls>
@@ -76,7 +80,7 @@ function NavigationMenu( {
 					<InnerBlocks
 						template={ defaultMenuItems ? defaultMenuItems : null }
 						allowedBlocks={ [ 'core/navigation-menu-item' ] }
-						moverOptions
+						moverOptions={ moverOptions }
 					/>
 				}
 			</div>
