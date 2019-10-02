@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
+import { noop, uniqueId } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -15,15 +15,14 @@ import {
 } from '@wordpress/components';
 
 export function ResponsiveBlockControlLabel( { property, device } ) {
+	const accessibleLabel = sprintf( __( 'Controls the %s property for %s devices.' ), property, device );
+	const descId = uniqueId();
 	return (
 		<Fragment>
-			<span className="screen-reader-text">
-				{ property } for
+			<span aria-describedby={ `rbc-desc-${ descId }` }>
+				{ device }
 			</span>
-			{ device }
-			<span className="screen-reader-text">
-			devices
-			</span>
+			<span className="screen-reader-text" id={ `rbc-desc-${ descId }` }>{ accessibleLabel }</span>
 		</Fragment>
 	);
 }
