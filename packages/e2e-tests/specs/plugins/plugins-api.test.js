@@ -9,7 +9,8 @@ import {
 	deactivatePlugin,
 	openDocumentSettingsSidebar,
 	openPublishPanel,
-	publishPost, setBrowserViewport,
+	publishPost,
+	setBrowserViewport,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Using Plugins API', () => {
