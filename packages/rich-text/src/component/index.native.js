@@ -758,8 +758,12 @@ export class RichText extends Component {
 		if ( value === undefined ) {
 			this.lastEventCount = undefined; // force a refresh on the native side
 			value = '';
-		} 
-		
+		}
+		// On android if content is empty we need to send no content or else the placeholder with not show 
+		if ( ! this.iOS  && value === '') {
+			return value;
+		}
+
 		if ( tagName ) {
 			value = `<${ tagName }>${ value }</${ tagName }>`;
 		}
