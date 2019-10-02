@@ -48,11 +48,6 @@
 			margin-top: -4px;
 		}
 
-		// Override negative margins so this toolbar isn't hidden by overflow. Overflow is needed for long captions.
-		.block-editor-rich-text__inline-toolbar {
-			top: 0;
-		}
-
 		// Make extra space for the inline toolbar.
 		figcaption {
 			padding-top: 48px;
