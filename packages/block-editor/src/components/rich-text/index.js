@@ -308,7 +308,7 @@ class RichTextWrapper extends Component {
 		const rect = current.getBoundingClientRect();
 
 		// Add some space.
-		const buffer = 4;
+		const buffer = 6;
 
 		// Subtract padding if any.
 		let { paddingTop } = window.getComputedStyle( current );
