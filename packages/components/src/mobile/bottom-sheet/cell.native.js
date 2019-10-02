@@ -59,6 +59,7 @@ class BottomSheetCell extends Component {
 		const cellLabelCenteredStyle = getStylesFromColorScheme( styles.cellLabelCentered, styles.cellTextDark );
 		const defaultLabelStyle = showValue || icon !== undefined ? cellLabelStyle : cellLabelCenteredStyle;
 		const drawSeparator = ( separatorType && separatorType !== 'none' ) || separatorStyle === undefined;
+		const drawDoubleSeparator = drawSeparator && separatorType === 'doubleFullWidth';
 
 		const onCellPress = () => {
 			if ( isValueEditable ) {
@@ -87,6 +88,7 @@ class BottomSheetCell extends Component {
 				case 'leftMargin':
 					return leftMarginStyle;
 				case 'fullWidth':
+				case 'doubleFullWidth':
 					return defaultSeparatorStyle;
 				case 'none':
 					return undefined;
@@ -165,6 +167,9 @@ class BottomSheetCell extends Component {
 				onPress={ onCellPress }
 				style={ { ...styles.clipToBounds, ...style } }
 			>
+				{ drawDoubleSeparator && (
+					<View style={ separatorStyle() } />
+				) }
 				<View style={ styles.cellContainer }>
 					<View style={ styles.cellRowContainer }>
 						{ icon && (
