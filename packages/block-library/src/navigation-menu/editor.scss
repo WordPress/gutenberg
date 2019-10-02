@@ -96,3 +96,11 @@ $color-control-label-height: 20px;
 		margin-top: 2px;
 	}
 }
+
+.block-editor-block-mover {
+	&.is-horizontal {
+		.block-editor-block-mover__control-drag-handle {
+			display: none;
+		}
+	}
+}
