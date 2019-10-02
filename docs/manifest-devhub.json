@@ -1236,6 +1236,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/env",
+		"slug": "packages-env",
+		"markdown_source": "../packages/env/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/escape-html",
 		"slug": "packages-escape-html",
 		"markdown_source": "../packages/escape-html/README.md",
