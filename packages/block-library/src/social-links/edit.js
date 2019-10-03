@@ -26,12 +26,17 @@ const TEMPLATE = [
 ];
 
 export const SocialLinksEdit = function( { className } ) {
+	const moverOptions = {
+		position: 'inside',
+		orientation: 'horizontal',
+	};
 	return (
 		<div className={ className }>
 			<InnerBlocks
 				allowedBlocks={ ALLOWED_BLOCKS }
 				templateLock={ false }
 				template={ TEMPLATE }
+				moverOptions={ moverOptions }
 			/>
 		</div>
 	);
