@@ -73,7 +73,7 @@ Using the `ALLOWED_BLOCKS` property, you can define the set of blocks allowed in
 const ALLOWED_BLOCKS = [ 'core/image', 'core/paragraph' ];
 //...
 <InnerBlocks
-    allowedBlocks={ ALLOWED_BLOCKS }
+	allowedBlocks={ ALLOWED_BLOCKS }
 />
 ```
 
@@ -137,11 +137,11 @@ The `InnerBlocks` template is for the component in the single block that you cre
 
 ```php
 add_action( 'init', function() {
-    $post_type_object = get_post_type_object( 'post' );
-    $post_type_object->template = array(
+	$post_type_object = get_post_type_object( 'post' );
+	$post_type_object->template = array(
 		array( 'core/image' ),
 		array( 'core/heading' )
-    );
+	);
 } );
 ```
 
