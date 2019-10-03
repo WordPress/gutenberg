@@ -3,6 +3,7 @@
  */
 import {
 	Fragment,
+	useMemo,
 } from '@wordpress/element';
 import {
 	InnerBlocks,
@@ -31,14 +32,19 @@ function NavigationMenu( {
 	isRequesting,
 } ) {
 	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator( clientId );
-	let defaultMenuItems = false;
-	if ( pages ) {
-		defaultMenuItems = pages.map( ( page ) => {
-			return [ 'core/navigation-menu-item',
-				{ label: page.title.rendered, destination: page.permalink_template },
-			];
-		} );
-	}
+	const defaultMenuItems = useMemo(
+		() => {
+			if ( ! pages ) {
+				return null;
+			}
+			return pages.map( ( page ) => {
+				return [ 'core/navigation-menu-item',
+					{ label: page.title.rendered, destination: page.permalink_template },
+				];
+			} );
+		},
+		[ pages ]
+	);
 
 	return (
 		<Fragment>
