@@ -4,13 +4,14 @@
  */
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { withInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
+import ButtonGroup from '../button-group';
 import Button from '../button';
 import RangeControl from '../range-control';
-import SelectControl from '../select-control';
 
 function getSelectValueFromFontSize( fontSizes, value ) {
 	if ( value ) {
@@ -20,13 +21,6 @@ function getSelectValueFromFontSize( fontSizes, value ) {
 	return 'normal';
 }
 
-function getSelectOptions( optionsArray ) {
-	return [
-		...optionsArray.map( ( option ) => ( { value: option.slug, label: option.name } ) ),
-		{ value: 'custom', label: __( 'Custom' ) },
-	];
-}
-
 function FontSizePicker( {
 	fallbackFontSize,
 	fontSizes = [],
@@ -34,6 +28,7 @@ function FontSizePicker( {
 	onChange,
 	value,
 	withSlider = false,
+	instanceId,
 } ) {
 	const [ currentSelectValue, setCurrentSelectValue ] = useState( getSelectValueFromFontSize( fontSizes, value ) );
 
@@ -51,7 +46,7 @@ function FontSizePicker( {
 		onChange( Number( newValue ) );
 	};
 
-	const onSelectChangeValue = ( eventValue ) => {
+	const onSelectChangeValue = ( { currentTarget: { id: eventValue } } ) => {
 		setCurrentSelectValue( eventValue );
 		const selectedFont = fontSizes.find( ( font ) => font.slug === eventValue );
 		if ( selectedFont ) {
@@ -66,23 +61,43 @@ function FontSizePicker( {
 			</legend>
 			<div className="components-font-size-picker__controls">
 				{ ( fontSizes.length > 0 ) &&
-					<SelectControl
-						className={ 'components-font-size-picker__select' }
-						label={ 'Choose preset' }
-						hideLabelFromVision={ true }
-						value={ currentSelectValue }
-						onChange={ onSelectChangeValue }
-						options={ getSelectOptions( fontSizes ) }
-					/>
+					<ButtonGroup
+						className="components-font-size-picker__button-group"
+						aria-label={ __( 'Font Size Preset' ) }
+					>
+						{ fontSizes.map( ( fontSize ) => {
+							const selected = fontSize.slug === currentSelectValue;
+							return (
+								<Button
+									key={ fontSize.slug }
+									id={ fontSize.slug }
+									className="components-font-size-picker__button-group-button"
+									onClick={ onSelectChangeValue }
+									aria-pressed={ selected }
+									isPrimary={ selected }
+									style={ { fontSize: fontSize.size } }
+									isDefault
+								>
+									{ fontSize.name }
+								</Button>
+							);
+						} ) }
+					</ButtonGroup>
 				}
 				{ ( ! withSlider && ! disableCustomFontSizes ) &&
-					<input
-						className="components-range-control__number"
-						type="number"
-						onChange={ onChangeValue }
-						aria-label={ __( 'Custom' ) }
-						value={ value || '' }
-					/>
+					<>
+						<label htmlFor={ `components-range-control__number-${ instanceId }` }>
+							{ __( 'Custom' ) }
+						</label>
+						<input
+							id={ `components-range-control__number-${ instanceId }` }
+							className="components-range-control__number"
+							type="number"
+							onChange={ onChangeValue }
+							aria-label={ __( 'Custom' ) }
+							value={ value || '' }
+						/>
+					</>
 				}
 				<Button
 					className="components-color-palette__clear"
@@ -115,4 +130,4 @@ function FontSizePicker( {
 	);
 }
 
-export default FontSizePicker;
+export default withInstanceId( FontSizePicker );
