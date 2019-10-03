@@ -196,6 +196,7 @@ describe( 'autosave', () => {
 
 		// Trigger remote autosave
 		await page.evaluate( () => window.wp.data.dispatch( 'core/editor' ).autosave() );
+		await page.waitForFunction( () => ! window.wp.data.select( 'core/editor' ).isAutosavingPost() );
 
 		// Force conflicting local autosave
 		await page.evaluate( () => window.wp.data.dispatch( 'core/editor' ).__experimentalLocalAutosave() );
@@ -210,9 +211,7 @@ describe( 'autosave', () => {
 		// drop this test's expectations if we don't have an autosave object
 		// available.
 		const stillHasRemoteAutosave = await page.evaluate( () => window.wp.data.select( 'core/editor' ).getEditorSettings().autosave );
-		if ( ! stillHasRemoteAutosave ) {
-			return;
-		}
+		expect( stillHasRemoteAutosave ).toBe( true );
 
 		// Only one autosave notice should be displayed.
 		const notices = await page.$$( '.components-notice' );
