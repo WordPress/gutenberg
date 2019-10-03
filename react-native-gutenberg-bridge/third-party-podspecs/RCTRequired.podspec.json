@@ -1,5 +1,5 @@
 {
-  "name": "React-jsinspector",
+  "name": "RCTRequired",
   "version": "0.61.2",
   "summary": "-",
   "homepage": "http://facebook.github.io/react-native/",
@@ -13,7 +13,7 @@
     "git": "https://github.com/facebook/react-native.git",
     "tag": "v0.61.2"
   },
-  "source_files": "*.{cpp,h}",
-  "header_dir": "jsinspector",
-  "prepare_command": "TMP_DIR=$(mktemp -d); mv * $TMP_DIR; cp -R \"$TMP_DIR/ReactCommon/jsinspector\"/* . && true"
+  "source_files": "**/*.{c,h,m,mm,cpp}",
+  "header_dir": "RCTRequired",
+  "prepare_command": "TMP_DIR=$(mktemp -d); mv * $TMP_DIR; cp -R \"$TMP_DIR/Libraries/RCTRequired\"/* . && true"
 }
