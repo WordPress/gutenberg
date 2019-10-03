@@ -19,7 +19,7 @@ class HeadingToolbar extends Component {
 	createLevelControl( targetLevel, selectedLevel, onChange ) {
 		const isActive = targetLevel === selectedLevel;
 		return {
-			icon: <HeadingLevelIcon level={ targetLevel } __unstableActive={ isActive } />,
+			icon: <HeadingLevelIcon level={ targetLevel } isToggled={ isActive } />,
 			// translators: %s: heading level e.g: "1", "2", "3"
 			title: sprintf( __( 'Heading %d' ), targetLevel ),
 			isActive,

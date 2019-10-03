@@ -321,7 +321,6 @@ exports[`TimePicker matches the snapshot when the is12hour prop is specified 1`]
         className="components-datetime__time-field components-datetime__time-field-am-pm"
       >
         <ForwardRef(Button)
-          aria-pressed={false}
           className="components-datetime__time-am-button"
           isDefault={true}
           isToggled={false}
@@ -330,7 +329,6 @@ exports[`TimePicker matches the snapshot when the is12hour prop is specified 1`]
           AM
         </ForwardRef(Button)>
         <ForwardRef(Button)
-          aria-pressed={true}
           className="components-datetime__time-pm-button"
           isDefault={true}
           isToggled={true}
@@ -504,7 +502,6 @@ exports[`TimePicker matches the snapshot when the is12hour prop is true 1`] = `
         className="components-datetime__time-field components-datetime__time-field-am-pm"
       >
         <ForwardRef(Button)
-          aria-pressed={false}
           className="components-datetime__time-am-button"
           isDefault={true}
           isToggled={false}
@@ -513,7 +510,6 @@ exports[`TimePicker matches the snapshot when the is12hour prop is true 1`] = `
           AM
         </ForwardRef(Button)>
         <ForwardRef(Button)
-          aria-pressed={true}
           className="components-datetime__time-pm-button"
           isDefault={true}
           isToggled={true}

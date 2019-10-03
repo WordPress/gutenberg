@@ -301,7 +301,6 @@ class TimePicker extends Component {
 						{ is12Hour && (
 							<div className="components-datetime__time-field components-datetime__time-field-am-pm">
 								<Button
-									aria-pressed={ am === 'AM' }
 									isDefault
 									className="components-datetime__time-am-button"
 									isToggled={ am === 'AM' }
@@ -310,7 +309,6 @@ class TimePicker extends Component {
 									{ __( 'AM' ) }
 								</Button>
 								<Button
-									aria-pressed={ am === 'PM' }
 									isDefault
 									className="components-datetime__time-pm-button"
 									isToggled={ am === 'PM' }

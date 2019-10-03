@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { omit } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -14,9 +14,10 @@ export const Path = ( props ) => createElement( 'path', props );
 export const Polygon = ( props ) => createElement( 'polygon', props );
 export const Rect = ( props ) => createElement( 'rect', props );
 
-export const SVG = ( props ) => {
+export const SVG = ( { className, isToggled, ...props } ) => {
 	const appliedProps = {
 		...props,
+		className: classnames( className, { 'is-toggled': isToggled } ) || undefined,
 		role: 'img',
 		'aria-hidden': 'true',
 		focusable: 'false',
@@ -24,5 +25,5 @@ export const SVG = ( props ) => {
 
 	// Disable reason: We need to have a way to render HTML tag for web.
 	// eslint-disable-next-line react/forbid-elements
-	return <svg { ...omit( appliedProps, '__unstableActive' ) } />;
+	return <svg { ...appliedProps } />;
 };

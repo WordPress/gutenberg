@@ -40,7 +40,9 @@ export function Button( props, ref ) {
 	} );
 
 	const tag = href !== undefined && ! disabled ? 'a' : 'button';
-	const tagProps = tag === 'a' ? { href, target } : { type: 'button', disabled };
+	const tagProps = tag === 'a' ?
+		{ href, target } :
+		{ type: 'button', disabled, 'aria-pressed': isToggled };
 
 	return createElement( tag, {
 		...tagProps,

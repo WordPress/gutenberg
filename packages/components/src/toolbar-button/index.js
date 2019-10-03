@@ -50,7 +50,7 @@ function ToolbarButton( {
 				className,
 				{ 'is-active': isActive }
 			) }
-			aria-pressed={ isActive }
+			isToggled={ isActive }
 			disabled={ isDisabled }
 			{ ...extraProps }
 		/>

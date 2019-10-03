@@ -16,21 +16,21 @@ export {
 	Rect,
 } from 'react-native-svg';
 
-export const SVG = ( props ) => {
+export const SVG = ( { className = '', isToggled, ...props } ) => {
 	const colorScheme = props.colorScheme || 'light';
-	const stylesFromClasses = ( props.className || '' ).split( ' ' ).map( ( element ) => styles[ element ] ).filter( Boolean );
-	const defaultStyle = props.__unstableActive ? styles[ 'is-active' ] : styles[ 'components-toolbar__control-' + colorScheme ];
+	const stylesFromClasses = className.split( ' ' ).map( ( element ) => styles[ element ] ).filter( Boolean );
+	const defaultStyle = isToggled ? styles[ 'is-active' ] : styles[ 'components-toolbar__control-' + colorScheme ];
 	const styleValues = Object.assign( {}, props.style, defaultStyle, ...stylesFromClasses );
 
-	const safeProps = { ...props, style: styleValues };
+	const appliedProps = { ...props, style: styleValues };
 
 	return (
 		<Svg
 			//We want to re-render when style color is changed
-			key={ safeProps.style.color }
+			key={ appliedProps.style.color }
 			height="100%"
 			width="100%"
-			{ ...safeProps }
+			{ ...appliedProps }
 		/>
 	);
 };

@@ -596,6 +596,7 @@ export class ImageEdit extends Component {
 					onError={ this.onUploadError }
 				/> }
 				{ url && (
+<<<<<<< HEAD
 					<ToolbarGroup>
 						<ImageURLInputUI
 							url={ href || '' }
@@ -626,6 +627,49 @@ export class ImageEdit extends Component {
 							}
 						/>
 					</ToolbarGroup>
+=======
+					<>
+						<ToolbarGroup>
+							<IconButton
+								className={ classnames( 'components-icon-button components-toolbar__control', { 'is-active': this.state.isEditing } ) }
+								label={ __( 'Edit image' ) }
+								isToggled={ this.state.isEditing }
+								onClick={ this.toggleIsEditing }
+								icon={ editImageIcon }
+							/>
+						</ToolbarGroup>
+						<ToolbarGroup>
+							<ImageURLInputUI
+								url={ href || '' }
+								onChangeUrl={ this.onSetHref }
+								mediaLinks={ this.getLinkDestinations() }
+								linkDestination={ linkDestination }
+								advancedOptions={
+									<>
+										<ToggleControl
+											label={ __( 'Open in New Tab' ) }
+											onChange={ this.onSetNewTab }
+											checked={ linkTarget === '_blank' } />
+										<TextControl
+											label={ __( 'Link Rel' ) }
+											value={ cleanRel || '' }
+											onChange={ this.onSetLinkRel }
+											onKeyPress={ stopPropagation }
+											onKeyDown={ stopPropagationRelevantKeys }
+										/>
+										<TextControl
+											label={ __( 'Link CSS Class' ) }
+											value={ linkClass || '' }
+											onKeyPress={ stopPropagation }
+											onKeyDown={ stopPropagationRelevantKeys }
+											onChange={ this.onSetLinkClass }
+										/>
+									</>
+								}
+							/>
+						</ToolbarGroup>
+					</>
+>>>>>>> Components: Try fixing the active state of toolbar SVG icons on native mobile
 				) }
 			</BlockControls>
 		);
@@ -737,7 +781,7 @@ export class ImageEdit extends Component {
 													key={ scale }
 													isSmall
 													isPrimary={ isCurrent }
-													aria-pressed={ isCurrent }
+													isToggled={ isCurrent }
 													onClick={ this.updateDimensions( scaledWidth, scaledHeight ) }
 												>
 													{ scale }%
