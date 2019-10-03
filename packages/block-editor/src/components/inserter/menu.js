@@ -270,6 +270,7 @@ export class InserterMenu extends Component {
 		const hasItems = ! isEmpty( suggestedItems ) || ! isEmpty( reusableItems ) || ! isEmpty( itemsPerCategory );
 		const hoveredItemBlockType = hoveredItem ? getBlockType( hoveredItem.name ) : null;
 		const hasHelpPanel = hasItems && showInserterHelpPanel;
+		const shouldShowBlockHelpPanel = hasHelpPanel && hoveredItem && ( isReusableBlock( hoveredItem ) || hoveredItemBlockType.example );
 
 		// Disable reason (no-autofocus): The inserter menu is a modal display, not one which
 		// is always visible, and one which already incurs this behavior of autoFocus via
@@ -387,28 +388,26 @@ export class InserterMenu extends Component {
 
 				{ hasHelpPanel && (
 					<div className="block-editor-inserter__menu-help-panel">
-						{ hoveredItem && (
+						{ shouldShowBlockHelpPanel && (
 							<>
 								{ ! isReusableBlock( hoveredItem ) && (
 									<BlockCard blockType={ hoveredItemBlockType } />
 								) }
-								{ ( isReusableBlock( hoveredItem ) || hoveredItemBlockType.example ) && (
-									<div className="block-editor-inserter__preview">
-										<div className="block-editor-inserter__preview-content">
-											<BlockPreview
-												viewportWidth={ 500 }
-												blocks={
-													hoveredItemBlockType.example ?
-														getBlockFromExample( hoveredItem.name, hoveredItemBlockType.example ) :
-														createBlock( hoveredItem.name, hoveredItem.initialAttributes )
-												}
-											/>
-										</div>
+								<div className="block-editor-inserter__preview">
+									<div className="block-editor-inserter__preview-content">
+										<BlockPreview
+											viewportWidth={ 500 }
+											blocks={
+												hoveredItemBlockType.example ?
+													getBlockFromExample( hoveredItem.name, hoveredItemBlockType.example ) :
+													createBlock( hoveredItem.name, hoveredItem.initialAttributes )
+											}
+										/>
 									</div>
-								) }
+								</div>
 							</>
 						) }
-						{ ! hoveredItem && (
+						{ ! shouldShowBlockHelpPanel && (
 							<div className="block-editor-inserter__menu-help-panel-no-block">
 								<div className="block-editor-inserter__menu-help-panel-no-block-text">
 									<div className="block-editor-inserter__menu-help-panel-title">{ __( 'Content Blocks' ) }</div>
