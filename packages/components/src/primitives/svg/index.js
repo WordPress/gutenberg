@@ -19,5 +19,5 @@ export const SVG = ( props ) => {
 
 	// Disable reason: We need to have a way to render HTML tag for web.
 	// eslint-disable-next-line react/forbid-elements
-	return <svg { ...omit( appliedProps, 'active' ) } />;
+	return <svg { ...omit( appliedProps, '__unstableActive' ) } />;
 };
