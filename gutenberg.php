@@ -58,7 +58,7 @@ function gutenberg_menu() {
 		$submenu['gutenberg'][] = array(
 			__( 'Support', 'gutenberg' ),
 			'edit_posts',
-			__( 'https://wordpress.org/support/plugin/gutenberg', 'gutenberg' ),
+			'https://wordpress.org/support/plugin/gutenberg',
 		);
 
 		$submenu['gutenberg'][] = array(
