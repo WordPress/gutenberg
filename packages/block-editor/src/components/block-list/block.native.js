@@ -25,6 +25,7 @@ import BlockEdit from '../block-edit';
 import BlockInvalidWarning from './block-invalid-warning';
 import BlockMobileToolbar from './block-mobile-toolbar';
 import FloatingToolbar from './block-mobile-floating-toolbar';
+import { NavigateUpSVG } from './nav-up-icon'
 
 class BlockListBlock extends Component {
 	constructor() {
@@ -130,7 +131,7 @@ class BlockListBlock extends Component {
 						<ToolbarButton
 							title={ __( 'Navigate Up' ) }
 							onClick={ () => this.props.onSelect( parentId ) }
-							icon="arrow-up-alt"
+							icon={ NavigateUpSVG } //"arrow-up-alt"
 							extraProps={ { fill: 'white' } }
 						/>
 					</FloatingToolbar>
