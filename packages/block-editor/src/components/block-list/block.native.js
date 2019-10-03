@@ -11,7 +11,7 @@ import {
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { ToolbarButton } from '@wordpress/components';
+import { ToolbarButton, Toolbar } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { getBlockType } from '@wordpress/blocks';
@@ -128,14 +128,16 @@ class BlockListBlock extends Component {
 				{ showFloatingToolbar && ( ! isFirstBlock || parentId === '' ) && <FloatingToolbar.Slot /> }
 				{ showFloatingToolbar &&
 					( <FloatingToolbar>
-						<ToolbarButton
-							title={ __( 'Navigate Up' ) }
-							onClick={ () => this.props.onSelect( parentId ) }
-							icon={ NavigateUpSVG } //"arrow-up-alt"
-							extraProps={ { fill: 'white' } }
-						/>
-					</FloatingToolbar>
-				)}
+							<Toolbar rtl passedStyle={styles.floating}>
+								<ToolbarButton
+									title={ __( 'Navigate Up' ) }
+									onClick={ () => this.props.onSelect( parentId ) }
+									icon={ NavigateUpSVG }
+									extraProps={ { fill: 'white' } }
+								/>
+							</Toolbar>
+						</FloatingToolbar>
+					)}
 				<TouchableWithoutFeedback
 					onPress={ this.onFocus }
 					accessible={ ! isSelected }
