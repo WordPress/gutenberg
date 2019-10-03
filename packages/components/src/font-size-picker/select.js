@@ -23,15 +23,13 @@ import {
 
 function FontSizePickerSelect( {
 	fontSizes = [],
+	instanceId,
 	onChange,
 	value,
 } ) {
 	const currentFont = fontSizes.find( ( font ) => font.value === value );
 	const currentFontLabel = currentFont ? currentFont.label : '';
 
-	/**
-  * CHANGES
-  */
 	// Work-around to focus active item
 	const popoverRef = useRef( null );
 	const focusActiveItem = useCallback( () => {
@@ -106,9 +104,7 @@ function FontSizePickerSelect( {
 		'aria-haspopup': ariaHasPopup,
 	};
 
-	/**
-  * / CHANGES
-  */
+	const id = `font-size-picker__select-${ instanceId }`;
 
 	return (
 		<BaseControl className="components-font-size-picker__select">
@@ -119,11 +115,12 @@ function FontSizePickerSelect( {
 				focusOnMount="container"
 				onToggle={ handleOnToggle }
 				renderToggle={ ( { onToggle } ) => (
-					// eslint-disable-next-line jsx-a11y/label-has-for
-					<label className="components-font-size-picker__select-label">
+					<label htmlFor={ id } className="components-font-size-picker__select-label">
 						{ __( 'Preset Size' ) }
 						<Button
+							aria-label={ __( 'Preset Size' ) }
 							className="components-font-size-picker__select-selector"
+							id={ id }
 							isLarge
 							onClick={ onToggle }
 							onKeyDown={ handleOnButtonKeyDown }
