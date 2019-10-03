@@ -61,25 +61,6 @@ function FontSizePickerSelect( {
 		}
 	};
 
-	// Work around to force dropdown to open via Button
-	const handleOnButtonKeyDown = ( event ) => {
-		const { key } = event;
-		const currentIndex = fontSizes.indexOf( currentFont );
-		const highestIndex = fontSizes.length - 1;
-		let newIndex;
-		switch ( key ) {
-			case 'ArrowUp':
-				newIndex = currentIndex > 0 ? currentIndex - 1 : highestIndex;
-				onChange( fontSizes[ newIndex ].value );
-				break;
-			case 'ArrowDown':
-				newIndex = currentIndex < highestIndex ? currentIndex + 1 : 0;
-				onChange( fontSizes[ newIndex ].value );
-				break;
-			default:
-		}
-	};
-
 	// Work around to prevent scrolling.
 	// Need to adjust navigable-content/container
 	// https://github.com/WordPress/gutenberg/blob/master/packages/components/src/navigable-container/container.js#L89
@@ -123,7 +104,6 @@ function FontSizePickerSelect( {
 							id={ id }
 							isLarge
 							onClick={ onToggle }
-							onKeyDown={ handleOnButtonKeyDown }
 							{ ...ariaProps }
 						>
 							{ currentFontLabel }
