@@ -18,8 +18,8 @@ export {
 
 export const SVG = ( props ) => {
 	const stylesFromClasses = ( props.className || '' ).split( ' ' ).map( ( element ) => styles[ element ] ).filter( Boolean );
-	const stylesFromAriaPressed = props.ariaPressed ? styles[ 'is-active' ] : styles[ 'components-toolbar__control' ];
-	const styleValues = Object.assign( {}, props.style, stylesFromAriaPressed, ...stylesFromClasses );
+	const defaultStyle = props.__unstableActive ? styles[ 'is-active' ] : styles[ 'components-toolbar__control' ];
+	const styleValues = Object.assign( {}, props.style, defaultStyle, ...stylesFromClasses );
 
 	const safeProps = { ...props, style: styleValues };
 
