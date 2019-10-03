@@ -1,3 +1,9 @@
+## Master
+
+### Bug Fixes
+
+- Added a temporary workaround for the default config used with `lint-js` command. It uses linting rules for both e2e and unit tests with all files until override files globbing logic is fixed when using `eslint` with `--config` (related [issue](https://github.com/eslint/eslint/issues/11558)).
+
 ## 5.0.0 (2019-09-16)
 
 ### Breaking Changes
