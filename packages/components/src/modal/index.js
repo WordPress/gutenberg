@@ -119,8 +119,8 @@ class Modal extends Component {
 		const headingId = aria.labelledby || `components-modal-header-${ instanceId }`;
 
 		if ( isDismissable ) {
-			deprecated( 'isDismissable property', {
-				alternative: 'isDismissible',
+			deprecated( 'isDismissable prop of the Modal component', {
+				alternative: 'isDismissible prop (renamed) of the Modal component',
 			} );
 		}
 		// Disable reason: this stops mouse events from triggering tooltips and
