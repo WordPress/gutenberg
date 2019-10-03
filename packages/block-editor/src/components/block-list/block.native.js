@@ -172,7 +172,6 @@ export default compose( [
 			getBlockHierarchyRootClientId,
 			getBlockRootClientId,
 			getBlock,
-			getBlockRootClientId,
 			getSelectedBlock,
 		} = select( 'core/block-editor' );
 		const order = getBlockIndex( clientId, rootClientId );
@@ -198,8 +197,6 @@ export default compose( [
 		const hasRootInnerBlocks = rootBlock.innerBlocks.length !== 0;
 
 		const showFloatingToolbar = isSelected && hasRootInnerBlocks && ! isMediaText && ! isMediaTextParent;
-
-		const parentId = getBlockRootClientId( clientId );
 
 		return {
 			icon,
