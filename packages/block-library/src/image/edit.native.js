@@ -240,7 +240,7 @@ class ImageEdit extends React.Component {
 						onChangeValue={ this.updateAlt }
 					/>
 				</PanelBody>
-				<PanelBody>
+				<PanelBody padded={ false }>
 					<TextControl
 						label={ __( 'Clear All Settings' ) }
 						labelStyle={ styles.clearSettingsButton }

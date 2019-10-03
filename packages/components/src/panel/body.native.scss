@@ -1,8 +1,15 @@
-.sectionHeader {
-	color: $dark-gray-500;
-	padding-bottom: 8px;
+.paddedPanelContainer {
+	padding: 0 16px;
 }
 
-.section {
-	padding: 8px 0;
+.panelContainer {
+	padding: 0 0;
+}
+
+.sectionHeaderText {
+	color: #87a6bc;
+	padding-top: 24;
+	padding-bottom: 8;
+	font-size: 14;
+	font-weight: 500;
 }

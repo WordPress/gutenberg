@@ -19,10 +19,12 @@ export class PanelBody extends Component {
 	}
 
 	render() {
-		const { children, title } = this.props;
+		const { children, title, padded = true } = this.props;
+		const containerStyle = padded ? styles.paddedPanelContainer : styles.panelContainer;
+
 		return (
-			<View style={ styles.section }>
-				{ title && <Text style={ styles.sectionHeader }>{ title.toUpperCase() }</Text> }
+			<View style={ containerStyle }>
+				{ title && <Text style={ styles.sectionHeaderText }>{ title }</Text> }
 				{ children }
 			</View>
 		);
