@@ -30,7 +30,7 @@ import {
 	InspectorControls,
 	withColors,
 	PanelColorSettings,
-	GradientPickerControl,
+	__experimentalGradientPickerControl,
 } from '@wordpress/block-editor';
 
 const { getComputedStyle } = window;
@@ -212,7 +212,7 @@ class ButtonEdit extends Component {
 						/>
 					</PanelColorSettings>
 					<PanelBody title={ __( 'Gradient' ) }>
-						<GradientPickerControl
+						<__experimentalGradientPickerControl
 							onChange={
 								( newGradient ) => {
 									setAttributes( {

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { GradientPicker } from '@wordpress/components';
+import { __experimentalGradientPicker } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 
 function GradientPickerWithGradients( props ) {
@@ -9,7 +9,7 @@ function GradientPickerWithGradients( props ) {
 		select( 'core/block-editor' ).getSettings().gradients
 	) );
 	return (
-		<GradientPicker
+		<__experimentalGradientPicker
 			{ ...props }
 			gradients={ gradients }
 		/>
@@ -18,7 +18,7 @@ function GradientPickerWithGradients( props ) {
 
 export default function( props ) {
 	const ComponentToUse = props.gradients ?
-		GradientPicker :
+		__experimentalGradientPicker :
 		GradientPickerWithGradients;
 	return ( <ComponentToUse { ...props } /> );
 }
