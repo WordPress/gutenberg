@@ -18,10 +18,9 @@ module.exports = async function detectContext() {
 
 	// Race multiple file read streams against each other until
 	// a plugin or theme header is found.
-	const files = ( await readDir( './' ) ).filter( ( file ) => {
-		const extension = path.extname( file );
-		return extension === '.php' || extension === '.css';
-	} );
+	const files = ( await readDir( './' ) ).filter(
+		( file ) => path.extname( file ) === '.php' || path.basename( file ) === 'style.css'
+	);
 	const streams = [];
 	for ( const file of files ) {
 		const fileStream = fs.createReadStream( file, 'utf8' );
