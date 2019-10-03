@@ -6,11 +6,44 @@ Note: A single block can only contain one `InnerBlock` component.
 
 Here is the basic InnerBlocks usage.
 
+{% codetabs %}
+{% ES5 %}
+```js
+( function( blocks, element, blockEditor ) {
+	var el = element.createElement;
+	var InnerBlocks = blockEditor.InnerBlocks;
+
+	blocks.registerBlockType( 'a8c/workshop-ex7', {
+		// ...
+
+		edit: function( props ) {
+			return el(
+				'div',
+				{ className: props.className },
+				InnerBlocks
+			);
+		},
+
+		save: function( props ) {
+			return el(
+				'div'
+				{ className: props.className },
+				InnerBlocks.Content
+			);
+		},
+	}
+} (
+	window.wp.blocks,
+	window.wp.element,
+	window.wp.blockEditor,
+) );
+```
+{% ESNext %}
 ```js
 import { registerBlockType } from '@wordpress/blocks';
 import { InnerBlocks } from '@wordpress/block-editor';
 
-registerBlockType( 'a8c/workshop-ex4', {
+registerBlockType( 'a8c/workshop-ex7', {
 	// ...
 
 	edit: ( { className } ) => {
@@ -21,15 +54,16 @@ registerBlockType( 'a8c/workshop-ex4', {
 		);
 	},
 
-	save: () => {
+	save: ( { className } ) => {
 		return (
-			<div>
+			<div className={ className }>
 				<InnerBlocks.Content />
 			</div>
 		);
 	},
 } );
 ```
+{% end %}
 
 ## Allowed Blocks
 
@@ -48,6 +82,29 @@ const ALLOWED_BLOCKS = [ 'core/image', 'core/paragraph' ];
 
 Use the template property to define a set of blocks that prefill the InnerBlocks component when inserted. You can set attributes on the blocks to define their use. The example below shows a book review template using InnerBlocks component and setting placeholders values to show the block usage.
 
+{% codetabs %}
+{% ES5 %}
+```js
+const MY_TEMPLATE = [
+	[ 'core/image', {} ],
+	[ 'core/heading', { placeholder: 'Book Title' } ],
+	[ 'core/paragraph', { placeholder: 'Summary' } ],
+];
+
+//...
+
+	edit: function( props ) {
+
+		return el(
+			InnerBlocks,
+			{
+				template: MY_TEMPLATE,
+				templateLock: "all",
+			}
+		);
+	},
+```
+{% ESNext %}
 ```js
 const MY_TEMPLATE = [
 	[ 'core/image', {} ],
@@ -67,7 +124,7 @@ const MY_TEMPLATE = [
 		);
 	},
 ```
-
+{% end %}
 
 Use the `templateLock` property to lock down the template. Using `all` locks the template complete, no changes can be made. Using `insert` prevents additional blocks to be inserted, but existing blocks can be reorderd. See [templateLock documentation](/packages/block-editor/src/components/inner-blocks#templatelock) for additional information.
 
