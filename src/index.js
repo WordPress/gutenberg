@@ -7,7 +7,7 @@
 /**
  * External dependencies
  */
-import { AppRegistry, I18nManager, YellowBox } from 'react-native';
+import { AppRegistry, I18nManager } from 'react-native';
 import React from 'react';
 
 /**
@@ -23,11 +23,7 @@ import { getTranslation } from '../i18n-cache';
 import initialHtml from './initial-html';
 
 const gutenbergSetup = () => {
-	const apiFetch = require( '@wordpress/api-fetch' ).default;
 	const wpData = require( '@wordpress/data' );
-
-	// wp-api-fetch
-	apiFetch.use( apiFetch.createRootURLMiddleware( 'https://public-api.wordpress.com/' ) );
 
 	// wp-data
 	const userId = 1;
@@ -82,8 +78,9 @@ export class RootComponent extends React.Component {
 }
 
 export function registerApp() {
-	// Disable require circle warnings showing up in the app (they will still be visible in the console)
-	YellowBox.ignoreWarnings( [ 'Require cycle:' ] );
+	// Disable warnings as they disrupt the user experience in dev mode
+	// eslint-disable-next-line no-console
+	console.disableYellowBox = true;
 
 	gutenbergSetup();
 
