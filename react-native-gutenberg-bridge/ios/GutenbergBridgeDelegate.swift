@@ -1,4 +1,4 @@
-public typealias MediaPickerDidPickMediaCallback = (_ id: Int32?, _ url: String?) -> Void
+public typealias MediaPickerDidPickMediaCallback = (_ media: [(Int32?,String?)]?) -> Void
 
 public enum MediaPickerSource: String {
     case mediaLibrary = "SITE_MEDIA_LIBRARY"
@@ -61,15 +61,15 @@ public protocol GutenbergBridgeDelegate: class {
     ///
     /// - Parameters:
     ///     - source: the source from where the picker will get the media
-    ///     - callback: A callback block to be called with an upload mediaIdentifier and a placeholder image file url, use nil on both parameters to signal that the action was canceled.
+    ///     - callback: A callback block to be called with an array of upload mediaIdentifiers and a placeholder images file url, use nil on both parameters to signal that the action was canceled.
     ///
-    func gutenbergDidRequestMedia(from source: MediaPickerSource, filter: [MediaFilter]?, with callback: @escaping MediaPickerDidPickMediaCallback)
+    func gutenbergDidRequestMedia(from source: MediaPickerSource, filter: [MediaFilter]?, allowMultipleSelection: Bool, with callback: @escaping MediaPickerDidPickMediaCallback)
 
     /// Tells the delegate that gutenberg JS requested the import of media item based on the provided URL
     ///
     /// - Parameters:
     ///   - url: the url to import
-    ///   - callback: A callback block to be called with an upload mediaIdentifier and a placeholder image file url, use nil on both parameters to signal that the action has failed.
+    ///   - callback: A callback block to be called with an array of upload mediaIdentifiers and a placeholder images file url, use nil on both parameters to signal that the action has failed.
     //
     func gutenbergDidRequestImport(from url: URL, with callback: @escaping MediaPickerDidPickMediaCallback)
 
@@ -89,7 +89,6 @@ public protocol GutenbergBridgeDelegate: class {
     ///
     func gutenbergDidLoad()
 
-
     /// Tells the delegate every time the editor has finished layout.
     ///
     func gutenbergDidLayout()
@@ -103,6 +102,10 @@ public protocol GutenbergBridgeDelegate: class {
     /// Tells the delegate that logger method is called.
     ///
     func gutenbergDidEmitLog(message: String, logLevel: LogLevel)
+
+    /// Tells the delegate that the editor has sent an autosave event.
+    ///
+    func editorDidAutosave()
 }
 
 // MARK: - Optional GutenbergBridgeDelegate methods

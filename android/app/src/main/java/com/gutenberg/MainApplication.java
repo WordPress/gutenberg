@@ -45,11 +45,11 @@ public class MainApplication extends Application implements ReactApplication {
             }
 
             @Override
-            public void requestMediaPickFromDeviceLibrary(MediaUploadCallback mediaUploadCallback, MediaType mediaType) {
+            public void requestMediaPickFromDeviceLibrary(MediaUploadCallback mediaUploadCallback, Boolean allowMultipleSelection, MediaType mediaType) {
             }
 
             @Override
-            public void requestMediaPickFromMediaLibrary(MediaSelectedCallback mediaSelectedCallback, MediaType mediaType) {
+            public void requestMediaPickFromMediaLibrary(MediaSelectedCallback mediaSelectedCallback, Boolean allowMultipleSelection, MediaType mediaType) {
             }
 
 
@@ -71,6 +71,10 @@ public class MainApplication extends Application implements ReactApplication {
 
             @Override
             public void editorDidMount(ReadableArray unsupportedBlockNames) {
+            }
+
+            @Override
+            public void editorDidAutosave() {
             }
 
             @Override

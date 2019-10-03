@@ -1,18 +1,27 @@
 package org.wordpress.mobile.ReactNativeGutenbergBridge;
 
 import com.facebook.react.bridge.ReadableArray;
+import com.facebook.react.bridge.WritableMap;
+
+import java.util.List;
 
 public interface GutenbergBridgeJS2Parent {
+    interface RNMedia {
+        String getUrl();
+        int getId();
+        WritableMap toMap();
+    }
+
     void responseHtml(String title, String html, boolean changed);
 
     void editorDidMount(ReadableArray unsupportedBlockNames);
 
     interface MediaSelectedCallback {
-        void onMediaSelected(int mediaId, String mediaUrl);
+        void onMediaSelected(List<RNMedia> mediaList);
     }
 
     interface MediaUploadCallback {
-        void onUploadMediaFileSelected(int mediaId, String mediaUri);
+        void onUploadMediaFileSelected(List<RNMedia> mediaList);
         void onUploadMediaFileClear(int mediaId);
         void onMediaFileUploadProgress(int mediaId, float progress);
         void onMediaFileUploadSucceeded(int mediaId, String mediaUrl, int serverId);
@@ -65,9 +74,9 @@ public interface GutenbergBridgeJS2Parent {
         }
     }
 
-    void requestMediaPickFromMediaLibrary(MediaSelectedCallback mediaSelectedCallback, MediaType mediaType);
+    void requestMediaPickFromMediaLibrary(MediaSelectedCallback mediaSelectedCallback, Boolean allowMultipleSelection, MediaType mediaType);
 
-    void requestMediaPickFromDeviceLibrary(MediaUploadCallback mediaUploadCallback, MediaType mediaType);
+    void requestMediaPickFromDeviceLibrary(MediaUploadCallback mediaUploadCallback, Boolean allowMultipleSelection, MediaType mediaType);
 
     void requestMediaPickerFromDeviceCamera(MediaUploadCallback mediaUploadCallback, MediaType mediaType);
 
@@ -82,4 +91,6 @@ public interface GutenbergBridgeJS2Parent {
     void requestImageUploadCancel(int mediaId);
 
     void editorDidEmitLog(String message, LogLevel logLevel);
+
+    void editorDidAutosave();
 }

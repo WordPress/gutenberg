@@ -45,6 +45,9 @@ class GutenbergViewController: UIViewController {
 }
 
 extension GutenbergViewController: GutenbergBridgeDelegate {
+    func editorDidAutosave() {
+        print("➡️ Editor Did Autosave")
+    }
 
     func gutenbergDidLoad() {
         gutenberg.setFocusOnTitle()
@@ -61,7 +64,7 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
         print("↳ HTML: \(html)")
     }
 
-    func gutenbergDidRequestMedia(from source: MediaPickerSource, filter: [MediaFilter]?, with callback: @escaping MediaPickerDidPickMediaCallback) {
+    func gutenbergDidRequestMedia(from source: MediaPickerSource, filter: [MediaFilter]?, allowMultipleSelection: Bool, with callback: @escaping MediaPickerDidPickMediaCallback) {
         guard let currentFilter = filter?.first else {
             return
         }
@@ -70,9 +73,17 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
             print("Gutenberg did request media picker, passing a sample url in callback")
             switch currentFilter {
             case .image:
-                callback(1, "https://cldup.com/cXyG__fTLN.jpg")
+                if(allowMultipleSelection) {
+                    callback([(1, "https://cldup.com/cXyG__fTLN.jpg"), (3, "https://cldup.com/cXyG__fTLN.jpg")])
+                } else {
+                    callback([(1, "https://cldup.com/cXyG__fTLN.jpg")])
+                }
             case .video:
-                callback(2, "https://i.cloudup.com/YtZFJbuQCE.mov")
+                if(allowMultipleSelection) {
+                    callback([(2, "https://i.cloudup.com/YtZFJbuQCE.mov"), (4, "https://i.cloudup.com/YtZFJbuQCE.mov")])
+                } else {
+                    callback([(2, "https://i.cloudup.com/YtZFJbuQCE.mov")])
+                }
             default:
                 break
             }
@@ -87,16 +98,16 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
 
     func gutenbergDidRequestImport(from url: URL, with callback: @escaping MediaPickerDidPickMediaCallback) {
         let id = mediaUploadCoordinator.upload(url: url)
-        callback(id, url.absoluteString)
+        callback([(id, url.absoluteString)])
     }
 
     func pickAndUpload(from source: UIImagePickerController.SourceType, filter: MediaFilter, callback: @escaping MediaPickerDidPickMediaCallback) {
         mediaPickCoordinator = MediaPickCoordinator(presenter: self, filter: filter, callback: { (url) in
             guard let url = url, let mediaID = self.mediaUploadCoordinator.upload(url: url) else {
-                callback(nil, nil)
+                callback([(nil, nil)])
                 return
             }
-            callback(mediaID, url.absoluteString)
+            callback([(mediaID, url.absoluteString)])
             self.mediaPickCoordinator = nil
         } )
         mediaPickCoordinator?.pick(from: source)
