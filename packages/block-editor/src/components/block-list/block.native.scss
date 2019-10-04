@@ -36,16 +36,15 @@
 }
 
 .toolbar {
-  border-left-width: 0px;
-}
- 
-.pipe {
-  margin-top: auto;
-  margin-bottom: auto;
-  margin-left: 2px;
-  height: 28px;
-  width: 1px;
-  background-color: #e9eff3;
-  opacity: 0.4;
+	border-left-width: 0;
 }
 
+.pipe {
+	margin-top: auto;
+	margin-bottom: auto;
+	margin-left: 2px;
+	height: 28px;
+	width: 1px;
+	background-color: #e9eff3;
+	opacity: 0.4;
+}
