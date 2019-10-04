@@ -25,7 +25,7 @@ import BlockEdit from '../block-edit';
 import BlockInvalidWarning from './block-invalid-warning';
 import BlockMobileToolbar from './block-mobile-toolbar';
 import FloatingToolbar from './block-mobile-floating-toolbar';
-import { NavigateUpSVG } from './nav-up-icon'
+import { NavigateUpSVG } from './nav-up-icon';
 
 class BlockListBlock extends Component {
 	constructor() {
@@ -128,17 +128,17 @@ class BlockListBlock extends Component {
 				{ showFloatingToolbar && ( ! isFirstBlock || parentId === '' ) && <FloatingToolbar.Slot /> }
 				{ showFloatingToolbar &&
 					( <FloatingToolbar>
-							<Toolbar passedStyle={ styles.toolbar }>
-								<ToolbarButton
-									title={ __( 'Navigate Up' ) }
-									onClick={ () => this.props.onSelect( parentId ) }
-									icon={ NavigateUpSVG }
-									extraProps={ { fill: 'white' } }
-								/>
-								<View style={styles.pipe}/>
-							</Toolbar>
-						</FloatingToolbar>
-					)}
+						<Toolbar passedStyle={ styles.toolbar }>
+							<ToolbarButton
+								title={ __( 'Navigate Up' ) }
+								onClick={ () => this.props.onSelect( parentId ) }
+								icon={ NavigateUpSVG }
+								extraProps={ { fill: 'white' } }
+							/>
+							<View style={ styles.pipe } />
+						</Toolbar>
+					</FloatingToolbar>
+					) }
 				<TouchableWithoutFeedback
 					onPress={ this.onFocus }
 					accessible={ ! isSelected }
@@ -171,8 +171,8 @@ export default compose( [
 			isBlockSelected,
 			__unstableGetBlockWithoutInnerBlocks,
 			getBlockHierarchyRootClientId,
-			getBlockRootClientId,
 			getBlock,
+			getBlockRootClientId,
 			getSelectedBlock,
 		} = select( 'core/block-editor' );
 		const order = getBlockIndex( clientId, rootClientId );
