@@ -76,7 +76,7 @@ export function select( storeKey, selectorName, ...args ) {
  *
  * // Action generator using dispatch
  * export function* myAction {
- *   yield dispatch( 'core/edit-post' ).togglePublishSidebar();
+ *   yield dispatch( 'core/edit-post', 'togglePublishSidebar' );
  *   // do some other things.
  * }
  * ```
