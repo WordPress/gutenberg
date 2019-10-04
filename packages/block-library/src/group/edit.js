@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { withSelect } from '@wordpress/data';
-import { compose, withState } from '@wordpress/compose';
+import { compose } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import {
 	InspectorControls,
@@ -28,8 +28,6 @@ function GroupEdit( {
 	setBackgroundColor,
 	backgroundColor,
 	hasInnerBlocks,
-	showResponsiveControls,
-	setState,
 } ) {
 	const styles = {
 		backgroundColor: backgroundColor.color,
@@ -73,12 +71,7 @@ function GroupEdit( {
 					<ResponsiveBlockControl
 						legend="Padding"
 						property="padding"
-						isOpen={ showResponsiveControls }
-						onToggle={ ( isOn ) => {
-							setState( {
-								showResponsiveControls: ! isOn,
-							} );
-						} }
+						responsiveControlsActive={ true }
 						renderDefaultControl={ ( label ) => (
 							<SelectControl
 								label={ <ResponsiveBlockControlLabel property="Padding" device={ label } /> }
@@ -112,8 +105,5 @@ export default compose( [
 		return {
 			hasInnerBlocks: !! ( block && block.innerBlocks.length ),
 		};
-	} ),
-	withState( {
-		showResponsiveControls: false,
 	} ),
 ] )( GroupEdit );

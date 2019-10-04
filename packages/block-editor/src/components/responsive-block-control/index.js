@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-import { noop, uniqueId } from 'lodash';
+import { uniqueId } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
 
-import { Fragment } from '@wordpress/element';
+import { Fragment, useState } from '@wordpress/element';
 
 import {
 	ToggleControl,
@@ -28,7 +28,9 @@ export function ResponsiveBlockControlLabel( { property, device } ) {
 }
 
 function ResponsiveBlockControl( props ) {
-	const { legend, property, toggleLabel, isOpen = false, onToggle = noop, renderDefaultControl, defaultLabel = __( 'All' ), devices = [ __( 'Desktop' ), __( 'Tablet' ), __( 'Mobile' ) ], renderResponsiveControls } = props;
+	const { legend, property, toggleLabel, responsiveControlsActive = false, renderDefaultControl, defaultLabel = __( 'All' ), devices = [ __( 'Desktop' ), __( 'Tablet' ), __( 'Mobile' ) ], renderResponsiveControls } = props;
+
+	const [ isResponsiveMode, setIsResponsiveMode ] = useState( responsiveControlsActive );
 
 	if ( ! legend || ! property || ! renderDefaultControl ) {
 		return null;
@@ -48,6 +50,10 @@ function ResponsiveBlockControl( props ) {
 		);
 	} );
 
+	const handleToggle = ( isChecked ) => {
+		setIsResponsiveMode( ! isChecked );
+	};
+
 	return (
 
 		<fieldset className="block-editor-responsive-block-control">
@@ -57,16 +63,16 @@ function ResponsiveBlockControl( props ) {
 				<ToggleControl
 					className="block-editor-responsive-block-control__toggle"
 					label={ toggleControlLabel }
-					checked={ ! isOpen }
-					onChange={ onToggle }
+					checked={ ! isResponsiveMode }
+					onChange={ handleToggle }
 					help={ toggleHelpText }
 				/>
 
-				<div className="block-editor-responsive-block-control__group block-editor-responsive-block-control__group--default" hidden={ isOpen }>
+				<div className="block-editor-responsive-block-control__group block-editor-responsive-block-control__group--default" hidden={ isResponsiveMode }>
 					{ defaultControl }
 				</div>
 
-				<div className="block-editor-responsive-block-control__group block-editor-responsive-block-control__group--responsive" hidden={ ! isOpen }>
+				<div className="block-editor-responsive-block-control__group block-editor-responsive-block-control__group--responsive" hidden={ ! isResponsiveMode }>
 					{ ( renderResponsiveControls ? renderResponsiveControls() : defaultResponsiveControls ) }
 				</div>
 
