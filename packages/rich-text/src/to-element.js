@@ -9,14 +9,12 @@ import { createElement, Fragment } from '@wordpress/element';
 import { toObjectTree } from './to-object-tree';
 
 /**
- * Create an HTML string from a Rich Text value. If a `multilineTag` is
+ * Create an element tree from a Rich Text value. If a `multilineTag` is
  * provided, text separated by a line separator will be wrapped in it.
  *
- * @param {Object} $1                      Named argements.
- * @param {Object} $1.value                Rich text value.
- * @param {string} $1.multilineTag         Multiline tag.
- * @param {Array}  $1.multilineWrapperTags Tags where lines can be found if
- *                                         nesting is possible.
+ * @param {Object} $1                        Named argements.
+ * @param {Object} $1.value                  Rich text value.
+ * @param {string} [$1.multilineTag]         Multiline tag.
  *
  * @return {string} HTML string.
  */
