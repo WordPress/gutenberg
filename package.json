@@ -143,7 +143,7 @@
 		"stylelint-config-wordpress": "13.1.0",
 		"typescript": "3.5.3",
 		"uuid": "3.3.2",
-		"webpack": "4.8.3",
+		"webpack": "4.41.0",
 		"worker-farm": "1.7.0"
 	},
 	"npmPackageJsonLintConfig": {
