@@ -256,5 +256,46 @@ describe( 'Default and Responsive modes', () => {
 		expect( defaultControlGroup.hidden ).toBe( false );
 		expect( responsiveControlGroup.hidden ).toBe( true );
 	} );
+
+	it( 'should render custom responsive controls when renderResponsiveControls is provided ', () => {
+		const spyRenderDefaultControl = jest.fn();
+
+		const mockRenderResponsiveControls = jest.fn( ( devices ) => {
+			return devices.map( ( deviceLabel ) => {
+				const deviceLower = deviceLabel.toLowerCase();
+				return (
+					<Fragment key={ `${ inputId }-${ deviceLower }` }>
+						<label htmlFor={ `${ inputId }-${ deviceLower }` }>Custom Device { deviceLabel }</label>
+						<input
+							id={ `${ inputId }-${ deviceLower }` }
+							defaultValue={ deviceLabel }
+							type="range"
+						/>
+					</Fragment>
+				);
+			} );
+		} );
+
+		act( () => {
+			render(
+				<ResponsiveBlockControl
+					legend="Padding"
+					property="padding"
+					renderDefaultControl={ spyRenderDefaultControl }
+					renderResponsiveControls={ mockRenderResponsiveControls }
+				/>, container
+			);
+		} );
+
+		// The user should see "range" controls so we can legitimately query for them here
+		const customControls = Array.from( container.querySelectorAll( 'input[type="range"]' ) );
+
+		// Should be called for default control only and not for the responsive controls
+		expect( spyRenderDefaultControl ).toHaveBeenCalledTimes( 1 );
+
+		expect( mockRenderResponsiveControls ).toHaveBeenCalledTimes( 1 );
+
+		expect( customControls ).toHaveLength( 3 );
+	} );
 } );
 
