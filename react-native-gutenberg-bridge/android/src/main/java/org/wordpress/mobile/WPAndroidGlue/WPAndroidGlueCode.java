@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.MutableContextWrapper;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -521,7 +522,17 @@ public class WPAndroidGlueCode {
         }
     }
 
-    public void toggleEditorMode() {
+    public void toggleEditorMode(boolean htmlModeEnabled) {
+        // Turn off hardware acceleration for Oreo
+        // see https://github.com/wordpress-mobile/gutenberg-mobile/issues/1268#issuecomment-535887390
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
+            && Build.VERSION.SDK_INT <= Build.VERSION_CODES.O_MR1) {
+            if (htmlModeEnabled) {
+                mReactRootView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+            } else {
+                mReactRootView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+            }
+        }
         mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().toggleEditorMode();
     }
 

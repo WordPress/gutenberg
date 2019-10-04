@@ -1,3 +1,9 @@
+1.14.0
+------
+* Fix a bug on iOS 13.0 were tapping on a link opens Safari
+* Fix a link editing issue, where trying to add a empty link at the start of another link would remove the existing link.
+* Fix missing content on long posts in html mode on Android
+
 1.12.0
 ------
 * Add rich text styling to video captions
