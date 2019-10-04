@@ -42,13 +42,14 @@ function ResponsiveBlockControl( props ) {
 
 	const defaultControl = renderDefaultControl( defaultLabel );
 
-	const defaultResponsiveControls = devices.map( ( deviceLabel, index ) => {
-		return (
+	const defaultResponsiveControls = () => {
+		return devices.map( ( deviceLabel, index ) => (
 			<Fragment key={ index }>
 				{ renderDefaultControl( deviceLabel ) }
 			</Fragment>
+		)
 		);
-	} );
+	};
 
 	const handleToggle = ( isChecked ) => {
 		setIsResponsiveMode( ! isChecked );
@@ -73,7 +74,7 @@ function ResponsiveBlockControl( props ) {
 				</div>
 
 				<div className="block-editor-responsive-block-control__group block-editor-responsive-block-control__group--responsive" hidden={ ! isResponsiveMode }>
-					{ ( renderResponsiveControls ? renderResponsiveControls() : defaultResponsiveControls ) }
+					{ ( renderResponsiveControls ? renderResponsiveControls( devices ) : defaultResponsiveControls() ) }
 				</div>
 
 			</div>
