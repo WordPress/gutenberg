@@ -127,7 +127,7 @@ The **`selectors`** object includes a set of functions for accessing and derivin
 
 A **resolver** is a side-effect for a selector. If your selector result may need to be fulfilled from an external source, you can define a resolver such that the first time the selector is called, the fulfillment behavior is effected.
 
-The `resolvers` option should be passed as an object where each key is the name of the selector to act upon, the value a function which receives the same arguments passed to the selector, excluding the state argument. It can then dispatch as necessary to fulfill the requirements of the selector, taking advantage of the fact that most data consumers will subscribe to subsequent state changes (by `subscribe` or `withSelect`).
+The `resolvers` option should be passed as an object where each key is the name of the selector to act upon, the value a function or generator which receives the same arguments passed to the selector, excluding the state argument. It can then return or yield actions to fulfill the requirements of the selector, taking advantage of the fact that most data consumers will subscribe to subsequent state changes (by `subscribe` or `withSelect`).
 
 #### `controls`
 
