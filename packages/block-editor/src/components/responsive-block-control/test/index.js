@@ -53,7 +53,7 @@ describe( 'Basic rendering', () => {
 
 		const activePropertyLabel = Array.from( container.querySelectorAll( 'legend' ) ).filter( ( legend ) => legend.innerHTML === 'Padding' );
 
-		const activeDeviceLabel = Array.from( container.querySelectorAll( 'label' ) ).filter( ( label ) => label.innerText === 'Padding for desktop devices' );
+		const activeDeviceLabel = Array.from( container.querySelectorAll( 'label' ) ).filter( ( label ) => label.innerHTML.includes( 'All' ) );
 
 		const defaultControl = container.querySelector( 'input[value="All"]' );
 
@@ -61,7 +61,14 @@ describe( 'Basic rendering', () => {
 
 		const toggleState = container.querySelector( 'input[type="checkbox"]' ).checked;
 
+		const defaultControlGroupHidden = container.querySelector( '.block-editor-responsive-block-control__group--default' ).hidden;
+
+		const responsiveControlGroupHidden = container.querySelector( '.block-editor-responsive-block-control__group--responsive' ).hidden;
+
 		expect( container.innerHTML ).not.toBe( '' );
+
+		expect( defaultControlGroupHidden ).toBe( false );
+		expect( responsiveControlGroupHidden ).toBe( true );
 
 		expect( activeDeviceLabel ).toHaveLength( 1 );
 		expect( activePropertyLabel ).toHaveLength( 1 );
@@ -127,4 +134,3 @@ describe( 'Basic rendering', () => {
 		expect( container.innerHTML ).toBe( '' );
 	} );
 } );
-

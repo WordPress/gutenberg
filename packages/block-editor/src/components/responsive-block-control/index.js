@@ -62,11 +62,11 @@ function ResponsiveBlockControl( props ) {
 					help={ toggleHelpText }
 				/>
 
-				<div hidden={ isOpen }>
+				<div className="block-editor-responsive-block-control__group block-editor-responsive-block-control__group--default" hidden={ isOpen }>
 					{ defaultControl }
 				</div>
 
-				<div hidden={ ! isOpen }>
+				<div className="block-editor-responsive-block-control__group block-editor-responsive-block-control__group--responsive" hidden={ ! isOpen }>
 					{ ( renderResponsiveControls ? renderResponsiveControls() : defaultResponsiveControls ) }
 				</div>
 
