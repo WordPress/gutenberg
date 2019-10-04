@@ -2,7 +2,7 @@
 
 ### Documentation
 
-- Resolve inaccurate usage examples associated with `dispatch` function.
+- Resolved syntax errors and inaccurate usage examples associated with `dispatch` function.
 
 ## 1.0.0 (2019-06-12)
 
