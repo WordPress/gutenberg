@@ -1,13 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { createElement } from '@wordpress/element';
+import { createElement, Fragment } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-
-import { toTree } from './to-tree';
+import { toObjectTree } from './to-object-tree';
 
 /**
  * Create an HTML string from a Rich Text value. If a `multilineTag` is
@@ -24,7 +23,6 @@ import { toTree } from './to-tree';
 export function toElement( {
 	value,
 	multilineTag,
-	multilineWrapperTags,
 	prepareEditableTree,
 	placeholder,
 } ) {
@@ -35,86 +33,31 @@ export function toElement( {
 		};
 	}
 
-	const tree = toTree( {
+	const tree = toObjectTree( {
 		value,
 		multilineTag,
-		multilineWrapperTags,
-		createEmpty,
-		append,
-		getLastChild,
-		getParent,
-		isText,
-		getText,
-		remove,
-		appendText,
 		isEditableTree: true,
 		placeholder,
 	} );
+	const elementTree = createElementTree( tree.children );
 
-	return <>{ createChildrenHTML( tree.children ) }</>;
+	return createElement( Fragment, null, ...elementTree );
 }
 
-function createEmpty() {
-	return {};
-}
+function createElementTree( objects = [] ) {
+	return objects.map( ( { type, attributes, object, children, text } ) => {
+		if ( text !== undefined ) {
+			return text;
+		}
 
-function getLastChild( { children } ) {
-	return children && children[ children.length - 1 ];
-}
+		if ( attributes && 'contentEditable' in attributes ) {
+			attributes.suppressContentEditableWarning = true;
+		}
 
-function append( parent, object ) {
-	if ( typeof object === 'string' ) {
-		object = { text: object };
-	}
+		if ( object ) {
+			return createElement( type, attributes );
+		}
 
-	object.parent = parent;
-	parent.children = parent.children || [];
-	parent.children.push( object );
-	return object;
-}
-
-function appendText( object, text ) {
-	object.text += text;
-}
-
-function getParent( { parent } ) {
-	return parent;
-}
-
-function isText( { text } ) {
-	return typeof text === 'string';
-}
-
-function getText( { text } ) {
-	return text;
-}
-
-function remove( object ) {
-	const index = object.parent.children.indexOf( object );
-
-	if ( index !== -1 ) {
-		object.parent.children.splice( index, 1 );
-	}
-
-	return object;
-}
-
-function createElementHTML( { type, attributes, object, children }, index ) {
-	attributes = { ...attributes, key: index };
-
-	if ( 'contentEditable' in attributes ) {
-		attributes.suppressContentEditableWarning = true;
-	}
-
-	if ( object ) {
-		return createElement( type, attributes );
-	}
-
-	return createElement( type, attributes, createChildrenHTML( children ) );
-}
-
-function createChildrenHTML( children = [] ) {
-	return children.map( ( child, index ) => {
-		return child.text === undefined ? createElementHTML( child, index ) : child.text;
+		return createElement( type, attributes, ...createElementTree( children ) );
 	} );
 }

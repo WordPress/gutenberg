@@ -1010,7 +1010,6 @@ class RichText extends Component {
 				onMouseUp={ this.onSelectionChange }
 				onTouchEnd={ this.onSelectionChange }
 				multilineTag={ multilineTag }
-				multilineWrapperTags={ multilineTag === 'li' ? [ 'ul', 'ol' ] : undefined }
 				prepareEditableTree={ createPrepareEditableTree( this.props, 'format_prepare_functions' ) }
 			/>
 		);
