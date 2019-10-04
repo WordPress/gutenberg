@@ -131,7 +131,26 @@ describe( 'Basic rendering', () => {
 	} );
 } );
 
-describe( 'Interactions', () => {
+describe( 'Default and Responsive modes', () => {
+	it( 'should render in responsive mode when responsiveControlsActive prop is set to true', () => {
+		act( () => {
+			render(
+				<ResponsiveBlockControl
+					legend="Padding"
+					property="padding"
+					responsiveControlsActive={ true }
+					renderDefaultControl={ renderTestDefaultControlComponent }
+				/>, container
+			);
+		} );
+
+		const defaultControlGroup = container.querySelector( '.block-editor-responsive-block-control__group--default' );
+		const responsiveControlGroup = container.querySelector( '.block-editor-responsive-block-control__group--responsive' );
+
+		expect( defaultControlGroup.hidden ).toBe( true );
+		expect( responsiveControlGroup.hidden ).toBe( false );
+	} );
+
 	it( 'should switch between default and responsive modes when interacting with toggle control', () => {
 		act( () => {
 			render(
@@ -143,11 +162,14 @@ describe( 'Interactions', () => {
 			);
 		} );
 
-		const toggleLabel = Array.from( container.querySelectorAll( 'label' ) ).find( ( label ) => label.innerHTML.includes( 'Use the same padding on all screensizes' ) );
 		const defaultControlGroup = container.querySelector( '.block-editor-responsive-block-control__group--default' );
 		const responsiveControlGroup = container.querySelector( '.block-editor-responsive-block-control__group--responsive' );
+
+		// Select elements based on what the user can see
+		const toggleLabel = Array.from( container.querySelectorAll( 'label' ) ).find( ( label ) => label.innerHTML.includes( 'Use the same padding on all screensizes' ) );
 		const toggleInput = container.querySelector( `#${ toggleLabel.getAttribute( 'for' ) }` );
 
+		// Initial mode (default)
 		expect( defaultControlGroup.hidden ).toBe( false );
 		expect( responsiveControlGroup.hidden ).toBe( true );
 
