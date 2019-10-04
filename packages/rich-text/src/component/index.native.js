@@ -760,7 +760,7 @@ export class RichText extends Component {
 			value = '';
 		}
 		// On android if content is empty we need to send no content or else the placeholder with not show.
-		if ( ! this.iOS && value === '' ) {
+		if ( ! this.isIOS && value === '' ) {
 			return value;
 		}
 
