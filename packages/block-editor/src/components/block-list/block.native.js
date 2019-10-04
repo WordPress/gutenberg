@@ -128,13 +128,14 @@ class BlockListBlock extends Component {
 				{ showFloatingToolbar && ( ! isFirstBlock || parentId === '' ) && <FloatingToolbar.Slot /> }
 				{ showFloatingToolbar &&
 					( <FloatingToolbar>
-							<Toolbar rtl passedStyle={styles.floating}>
+							<Toolbar passedStyle={ styles.toolbar }>
 								<ToolbarButton
 									title={ __( 'Navigate Up' ) }
 									onClick={ () => this.props.onSelect( parentId ) }
 									icon={ NavigateUpSVG }
 									extraProps={ { fill: 'white' } }
 								/>
+								<View style={styles.pipe}/>
 							</Toolbar>
 						</FloatingToolbar>
 					)}

@@ -13,8 +13,8 @@ import { withPreferredColorScheme } from '@wordpress/compose';
  */
 import styles from './style.scss';
 
-const ToolbarContainer = ( { getStylesFromColorScheme, passedStyle, children, rtl = false } ) => (
-	<View style={ [ getStylesFromColorScheme( styles.container, styles.containerDark ), passedStyle, rtl ? styles.rightBorder : styles.leftBorder ] }>
+const ToolbarContainer = ( { getStylesFromColorScheme, passedStyle, children } ) => (
+	<View style={ [ getStylesFromColorScheme( styles.container, styles.containerDark ), passedStyle ] }>
 		{ children }
 	</View>
 );
