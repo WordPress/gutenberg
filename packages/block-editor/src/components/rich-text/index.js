@@ -7,7 +7,7 @@ import { omit } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { RawHTML, Component } from '@wordpress/element';
+import { RawHTML, Component, createRef } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { pasteHandler, children as childrenSource, getBlockTransforms, findTransform } from '@wordpress/blocks';
 import { withInstanceId, compose } from '@wordpress/compose';
@@ -25,7 +25,7 @@ import {
 	toHTMLString,
 	slice,
 } from '@wordpress/rich-text';
-import { withFilters, IsolatedEventContainer } from '@wordpress/components';
+import { withFilters, Popover } from '@wordpress/components';
 import { createBlobURL } from '@wordpress/blob';
 import deprecated from '@wordpress/deprecated';
 import { isURL } from '@wordpress/url';
@@ -60,11 +60,13 @@ function getMultilineTag( multiline ) {
 class RichTextWrapper extends Component {
 	constructor() {
 		super( ...arguments );
+		this.ref = createRef();
 		this.onEnter = this.onEnter.bind( this );
 		this.onSplit = this.onSplit.bind( this );
 		this.onPaste = this.onPaste.bind( this );
 		this.onDelete = this.onDelete.bind( this );
 		this.inputRule = this.inputRule.bind( this );
+		this.getAnchorRect = this.getAnchorRect.bind( this );
 	}
 
 	onEnter( { value, onChange, shiftKey } ) {
@@ -260,7 +262,8 @@ class RichTextWrapper extends Component {
 		const { start, text } = value;
 		const characterBefore = text.slice( start - 1, start );
 
-		if ( ! /\s/.test( characterBefore ) ) {
+		// The character right before the caret must be a plain space.
+		if ( characterBefore !== ' ' ) {
 			return;
 		}
 
@@ -298,6 +301,30 @@ class RichTextWrapper extends Component {
 		} );
 
 		return formattingControls.map( ( name ) => `core/${ name }` );
+	}
+
+	getAnchorRect() {
+		const { current } = this.ref;
+		const rect = current.getBoundingClientRect();
+
+		// Add some space.
+		const buffer = 6;
+
+		// Subtract padding if any.
+		let { paddingTop } = window.getComputedStyle( current );
+
+		paddingTop = parseInt( paddingTop, 10 );
+
+		return {
+			x: rect.left,
+			y: rect.top + paddingTop - buffer,
+			width: rect.width,
+			height: rect.height - paddingTop + buffer,
+			left: rect.left,
+			right: rect.right,
+			top: rect.top + paddingTop - buffer,
+			bottom: rect.bottom,
+		};
 	}
 
 	render() {
@@ -366,6 +393,7 @@ class RichTextWrapper extends Component {
 		const content = (
 			<RichText
 				{ ...experimentalProps }
+				ref={ this.ref }
 				value={ adjustedValue }
 				onChange={ adjustedOnChange }
 				selectionStart={ selectionStart }
@@ -402,11 +430,15 @@ class RichTextWrapper extends Component {
 							</BlockFormatControls>
 						) }
 						{ isSelected && inlineToolbar && hasFormats && (
-							<IsolatedEventContainer
-								className="editor-rich-text__inline-toolbar block-editor-rich-text__inline-toolbar"
+							<Popover
+								noArrow
+								position="top center"
+								focusOnMount={ false }
+								getAnchorRect={ this.getAnchorRect }
+								className="block-editor-rich-text__inline-format-toolbar"
 							>
 								<FormatToolbar />
-							</IsolatedEventContainer>
+							</Popover>
 						) }
 						{ isSelected && <RemoveBrowserShortcuts /> }
 						<Autocomplete
@@ -431,6 +463,10 @@ class RichTextWrapper extends Component {
 				}
 			</RichText>
 		);
+
+		if ( ! wrapperClassName ) {
+			return content;
+		}
 
 		return (
 			<div className={ classnames( wrapperClasses, wrapperClassName ) }>

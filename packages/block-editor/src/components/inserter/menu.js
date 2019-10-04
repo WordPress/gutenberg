@@ -34,6 +34,7 @@ import {
 	createBlock,
 	isUnmodifiedDefaultBlock,
 	getBlockType,
+	getBlockFromExample,
 } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withInstanceId, compose, withSafeTimeout } from '@wordpress/compose';
@@ -396,11 +397,11 @@ export class InserterMenu extends Component {
 										<div className="block-editor-inserter__preview-content">
 											<BlockPreview
 												viewportWidth={ 500 }
-												blocks={ createBlock(
-													hoveredItem.name,
-													hoveredItemBlockType.example ? hoveredItemBlockType.example.attributes : hoveredItem.initialAttributes,
-													hoveredItemBlockType.example ? hoveredItemBlockType.example.innerBlocks : undefined
-												) }
+												blocks={
+													hoveredItemBlockType.example ?
+														getBlockFromExample( hoveredItem.name, hoveredItemBlockType.example ) :
+														createBlock( hoveredItem.name, hoveredItem.initialAttributes )
+												}
 											/>
 										</div>
 									</div>

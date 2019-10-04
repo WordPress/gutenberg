@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { mount, shallow } from 'enzyme';
 
 /**
  * Internal dependencies
@@ -13,8 +13,8 @@ describe( 'ColorPalette', () => {
 	const currentColor = '#f00';
 	const onChange = jest.fn();
 
-	const wrapper = shallow( <ColorPalette colors={ colors } value={ currentColor } onChange={ onChange } /> );
-	const buttons = wrapper.find( '.components-color-palette__item-wrapper button' );
+	const wrapper = mount( <ColorPalette colors={ colors } value={ currentColor } onChange={ onChange } /> );
+	const buttons = wrapper.find( 'Option button' );
 
 	beforeEach( () => {
 		onChange.mockClear();
@@ -44,7 +44,7 @@ describe( 'ColorPalette', () => {
 	} );
 
 	test( 'should call onClick with undefined, when the clearButton onClick is triggered', () => {
-		const clearButton = wrapper.find( '.components-color-palette__clear' );
+		const clearButton = wrapper.find( 'ButtonAction button' );
 
 		expect( clearButton ).toHaveLength( 1 );
 

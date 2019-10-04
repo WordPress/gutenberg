@@ -24,7 +24,9 @@ export const settings = {
 	keywords: [ __( 'text' ) ],
 	example: {
 		attributes: {
-			content: __( 'Start writing, no matter what. The water does not flow until the faucet is turned on.' ),
+			content: __( 'In a village of La Mancha, the name of which I have no desire to call to mind, there lived not long since one of those gentlemen that keep a lance in the lance-rack, an old buckler, a lean hack, and a greyhound for coursing.' ),
+			customFontSize: 28,
+			dropCap: true,
 		},
 	},
 	supports: {

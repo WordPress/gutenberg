@@ -6,19 +6,14 @@ import { isEqual } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, createElement } from '@wordpress/element';
+import { Component, createElement, forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { diffAriaProps } from './aria';
 
-export default class Editable extends Component {
-	constructor() {
-		super();
-		this.bindEditorNode = this.bindEditorNode.bind( this );
-	}
-
+class Editable extends Component {
 	// We must prevent rerenders because the browser will modify the DOM. React
 	// will rerender the DOM fine, but we're losing selection and it would be
 	// more expensive to do so as it would just set the inner HTML through
@@ -29,38 +24,35 @@ export default class Editable extends Component {
 	// update the attributes on the wrapper nodes here. `componentDidUpdate`
 	// will never be called.
 	shouldComponentUpdate( nextProps ) {
+		const element = this.props.forwardedRef.current;
+
 		if ( ! isEqual( this.props.style, nextProps.style ) ) {
-			this.editorNode.setAttribute( 'style', '' );
-			Object.assign( this.editorNode.style, {
+			element.setAttribute( 'style', '' );
+			Object.assign( element.style, {
 				...( nextProps.style || {} ),
 				whiteSpace: 'pre-wrap',
 			} );
 		}
 
 		if ( ! isEqual( this.props.className, nextProps.className ) ) {
-			this.editorNode.className = nextProps.className;
+			element.className = nextProps.className;
 		}
 
 		if ( this.props.start !== nextProps.start ) {
-			this.editorNode.setAttribute( 'start', nextProps.start );
+			element.setAttribute( 'start', nextProps.start );
 		}
 
 		if ( this.props.reversed !== nextProps.reversed ) {
-			this.editorNode.reversed = nextProps.reversed;
+			element.reversed = nextProps.reversed;
 		}
 
 		const { removedKeys, updatedKeys } = diffAriaProps( this.props, nextProps );
 		removedKeys.forEach( ( key ) =>
-			this.editorNode.removeAttribute( key ) );
+			element.removeAttribute( key ) );
 		updatedKeys.forEach( ( key ) =>
-			this.editorNode.setAttribute( key, nextProps[ key ] ) );
+			element.setAttribute( key, nextProps[ key ] ) );
 
 		return false;
-	}
-
-	bindEditorNode( editorNode ) {
-		this.editorNode = editorNode;
-		this.props.setRef( editorNode );
 	}
 
 	render() {
@@ -70,10 +62,9 @@ export default class Editable extends Component {
 			record,
 			valueToEditableHTML,
 			className,
+			forwardedRef,
 			...remainingProps
 		} = this.props;
-
-		delete remainingProps.setRef;
 
 		// In HTML, leading and trailing spaces are not visible, and multiple
 		// spaces elsewhere are visually reduced to one space. This rule
@@ -101,7 +92,7 @@ export default class Editable extends Component {
 			'aria-multiline': true,
 			className,
 			contentEditable: true,
-			ref: this.bindEditorNode,
+			ref: forwardedRef,
 			style: {
 				...style,
 				whiteSpace,
@@ -112,3 +103,7 @@ export default class Editable extends Component {
 		} );
 	}
 }
+
+export default forwardRef( ( props, ref ) => {
+	return <Editable { ...props } forwardedRef={ ref } />;
+} );
