@@ -1,3 +1,6 @@
+$floating-toolbar-height: 44;
+$floating-toolbar-first-child-top: 32; // $floating-toolbar-height - padding
+
 .floatingToolbarFill {
 	background-color: $dark-gray-500;
 	margin: auto;
@@ -15,5 +18,5 @@
 }
 
 .withTop {
-	top: $floating-toolbar-first-child-top;
+	top: -$floating-toolbar-first-child-top;
 }
