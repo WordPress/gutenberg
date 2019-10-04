@@ -113,7 +113,7 @@ class BlockListBlock extends Component {
 			showTitle,
 			title,
 			showFloatingToolbar,
-			parentId,
+			showFloatingToolbarForChild,
 			isFirstBlock,
 		} = this.props;
 
@@ -121,10 +121,11 @@ class BlockListBlock extends Component {
 
 		const accessibilityLabel = this.getAccessibilityLabel();
 
+		const showToolbar = ( ( showFloatingToolbarForChild ) || ( showFloatingToolbar && ! isFirstBlock ) ) || false;
+
 		return (
 			<>
-				{ showFloatingToolbar && ( ! isFirstBlock || parentId === '' ) && <FloatingToolbar.Slot /> }
-				{ showFloatingToolbar && <FloatingToolbar /> }
+				{ showToolbar && <FloatingToolbar forChild={ showFloatingToolbarForChild } /> }
 				<TouchableWithoutFeedback
 					onPress={ this.onFocus }
 					accessible={ ! isSelected }
@@ -160,6 +161,8 @@ export default compose( [
 			getBlock,
 			getBlockRootClientId,
 			getSelectedBlock,
+			getBlockOrder,
+			getSelectedBlockClientId,
 		} = select( 'core/block-editor' );
 		const order = getBlockIndex( clientId, rootClientId );
 		const isSelected = isBlockSelected( clientId );
@@ -175,6 +178,11 @@ export default compose( [
 		const selectedBlock = getSelectedBlock();
 		const parentId = getBlockRootClientId( clientId );
 		const parentBlock = getBlock( parentId );
+
+		// Fix for androidd toolbar add margin when first of inner block is selected
+		const blockClientIds = getBlockOrder( clientId );
+		const selectedID = getSelectedBlockClientId();
+		const showFloatingToolbarForChild = blockClientIds && blockClientIds.length && selectedID === blockClientIds[ 0 ];
 
 		const isMediaText = selectedBlock && selectedBlock.name === 'core/media-text';
 		const isMediaTextParent = parentBlock && parentBlock.name === 'core/media-text';
@@ -198,7 +206,7 @@ export default compose( [
 			isValid,
 			getAccessibilityLabelExtra,
 			showFloatingToolbar,
-			parentId,
+			showFloatingToolbarForChild,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {
