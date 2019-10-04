@@ -204,7 +204,7 @@ describe( 'createRegistry', () => {
 			expect( registry.select( 'demo' ).getValue() ).toBe( 'OK' );
 		} );
 
-		it( 'should behave as a side effect for the given selector, with arguments', () => {
+		it( 'should support resolvers as a side effect for the given selector, with arguments', () => {
 			const resolver = jest.fn();
 			registry.registerStore( 'demo', {
 				reducer: ( state = 'OK' ) => state,
@@ -223,6 +223,32 @@ describe( 'createRegistry', () => {
 			expect( resolver ).toHaveBeenCalledTimes( 1 );
 			registry.select( 'demo' ).getValue( 'arg3', 'arg4' );
 			expect( resolver ).toHaveBeenCalledTimes( 2 );
+		} );
+
+		it( 'should support generator resolvers', () => {
+			registry.registerStore( 'demo', {
+				reducer: ( state = 'NOTOK', action ) => {
+					return action.type === 'SET_OK' ? 'OK' : state;
+				},
+				selectors: {
+					getValue: ( state ) => state,
+				},
+				resolvers: {
+					* getValue() {
+						yield { type: '__INERT__' };
+						yield { type: 'SET_OK' };
+					},
+				},
+			} );
+
+			const promise = subscribeUntil( [
+				() => registry.select( 'demo' ).getValue() === 'OK',
+				() => registry.select( 'core/data' ).hasFinishedResolution( 'demo', 'getValue' ),
+			] );
+
+			registry.select( 'demo' ).getValue();
+
+			return promise;
 		} );
 
 		it( 'should support the object resolver definition', () => {

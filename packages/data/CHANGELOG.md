@@ -1,3 +1,9 @@
+## Master
+
+### Bug Fixes
+
+- Support generator resolvers for stores without controls defined.
+
 ## 4.6.0 (2019-06-12)
 
 ### New Feature

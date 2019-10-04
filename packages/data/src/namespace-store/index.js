@@ -118,7 +118,7 @@ function createReduxStore( key, options, registry ) {
 		promise,
 	];
 
-	if ( options.controls ) {
+	if ( options.controls || options.resolvers ) {
 		const normalizedControls = mapValues( options.controls, ( control ) => {
 			return control.isRegistryControl ? control( registry ) : control;
 		} );
