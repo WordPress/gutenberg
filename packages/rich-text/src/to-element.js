@@ -102,6 +102,10 @@ function remove( object ) {
 function createElementHTML( { type, attributes, object, children }, index ) {
 	attributes = { ...attributes, key: index };
 
+	if ( 'contentEditable' in attributes ) {
+		attributes.suppressContentEditableWarning = true;
+	}
+
 	if ( object ) {
 		return createElement( type, attributes );
 	}
