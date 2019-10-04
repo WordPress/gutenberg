@@ -6,6 +6,7 @@ import {
 	find,
 	isNil,
 	pickBy,
+	startsWith,
 } from 'lodash';
 
 /**
@@ -23,9 +24,8 @@ import deprecated from '@wordpress/deprecated';
  */
 import FormatEdit from './format-edit';
 import Editable from './editable';
-import { pickAriaProps } from './aria';
 import { create } from '../create';
-import { apply, toDom } from '../to-dom';
+import { apply } from '../to-dom';
 import { toHTMLString } from '../to-html-string';
 import { remove } from '../remove';
 import { removeFormat } from '../remove-format';
@@ -79,6 +79,10 @@ function createPrepareEditableTree( props, prefix ) {
 	}, value.formats );
 }
 
+export const pickAriaProps = ( props ) =>
+	pickBy( props, ( value, key ) =>
+		startsWith( key, 'aria-' ) && ! isNil( value ) );
+
 /**
  * If the selection is set on the placeholder element, collapse the selection to
  * the start (before the placeholder).
@@ -130,7 +134,6 @@ class RichText extends Component {
 		this.createRecord = this.createRecord.bind( this );
 		this.applyRecord = this.applyRecord.bind( this );
 		this.valueToFormat = this.valueToFormat.bind( this );
-		this.valueToEditableHTML = this.valueToEditableHTML.bind( this );
 		this.onPointerDown = this.onPointerDown.bind( this );
 		this.formatToValue = this.formatToValue.bind( this );
 		this.Editable = this.Editable.bind( this );
@@ -932,17 +935,6 @@ class RichText extends Component {
 		return value;
 	}
 
-	valueToEditableHTML( value ) {
-		const { __unstableMultilineTag: multilineTag } = this.props;
-
-		return toDom( {
-			value,
-			multilineTag,
-			prepareEditableTree: createPrepareEditableTree( this.props, 'format_prepare_functions' ),
-			placeholder: this.props.placeholder,
-		} ).body.innerHTML;
-	}
-
 	/**
 	 * Removes editor only formats from the value.
 	 *
@@ -983,29 +975,24 @@ class RichText extends Component {
 
 	Editable( props ) {
 		const {
-			tagName: Tagname = 'div',
+			tagName,
 			style,
 			className,
 			placeholder,
 			forwardedRef,
+			multilineTag,
 		} = this.props;
-		// Generating a key that includes `tagName` ensures that if the tag
-		// changes, we replace the relevant element. This is needed because we
-		// prevent Editable component updates.
-		const key = Tagname;
 
 		return (
 			<Editable
 				{ ...props }
 				ref={ forwardedRef }
-				tagName={ Tagname }
+				tagName={ tagName }
 				style={ style }
-				record={ this.record }
-				valueToEditableHTML={ this.valueToEditableHTML }
-				aria-label={ placeholder }
+				value={ this.record }
+				placeholder={ placeholder }
 				{ ...pickAriaProps( this.props ) }
 				className={ classnames( 'rich-text', className ) }
-				key={ key }
 				onPaste={ this.onPaste }
 				onInput={ this.onInput }
 				onCompositionEnd={ this.onCompositionEnd }
@@ -1024,6 +1011,9 @@ class RichText extends Component {
 				onKeyUp={ this.onSelectionChange }
 				onMouseUp={ this.onSelectionChange }
 				onTouchEnd={ this.onSelectionChange }
+				multilineTag={ multilineTag }
+				multilineWrapperTags={ multilineTag === 'li' ? [ 'ul', 'ol' ] : undefined }
+				prepareEditableTree={ createPrepareEditableTree( this.props, 'format_prepare_functions' ) }
 			/>
 		);
 	}
