@@ -125,6 +125,8 @@ class BlockListBlock extends Component {
 
 		return (
 			<>
+				{ /* Keep in mind that the FloatingToolbar for the first child is rendered in its parent -
+				that means we should use selectedBlockId rather clientID since clientID will be a parent id */ }
 				{ showToolbar && <FloatingToolbar forChild={ showFloatingToolbarForChild } /> }
 				<TouchableWithoutFeedback
 					onPress={ this.onFocus }
@@ -179,7 +181,7 @@ export default compose( [
 		const parentId = getBlockRootClientId( clientId );
 		const parentBlock = getBlock( parentId );
 
-		// Fix for androidd toolbar add margin when first of inner block is selected
+		// Fix for android floating toolbar - show toolbar in parent for the first of inner block if is selected
 		const blockClientIds = getBlockOrder( clientId );
 		const selectedID = getSelectedBlockClientId();
 		const showFloatingToolbarForChild = blockClientIds && blockClientIds.length && selectedID === blockClientIds[ 0 ];
