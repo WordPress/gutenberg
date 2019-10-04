@@ -129,6 +129,43 @@ describe( 'Basic rendering', () => {
 
 		expect( container.innerHTML ).toBe( '' );
 	} );
+
+	it( 'should render with custom label for toggle control when provided', () => {
+		const customToggleLabel = 'Utilise a matching padding value on all viewports';
+		act( () => {
+			render(
+				<ResponsiveBlockControl
+					legend="Padding"
+					property="padding"
+					renderDefaultControl={ renderTestDefaultControlComponent }
+					toggleLabel={ customToggleLabel }
+				/>, container
+			);
+		} );
+
+		const actualToggleLabel = container.querySelector( 'label.components-toggle-control__label' ).innerHTML;
+
+		expect( actualToggleLabel ).toEqual( customToggleLabel );
+	} );
+
+	it( 'should pass custom label for default control group to the renderDefaultControl function when provided', () => {
+		const customDefaultControlGroupLabel = 'Everything';
+
+		const spyRenderDefaultControl = jest.fn();
+
+		act( () => {
+			render(
+				<ResponsiveBlockControl
+					legend="Padding"
+					property="padding"
+					renderDefaultControl={ spyRenderDefaultControl }
+					defaultLabel={ customDefaultControlGroupLabel }
+				/>, container
+			);
+		} );
+
+		expect( spyRenderDefaultControl ).toHaveBeenCalledWith( customDefaultControlGroupLabel );
+	} );
 } );
 
 describe( 'Default and Responsive modes', () => {
@@ -149,6 +186,36 @@ describe( 'Default and Responsive modes', () => {
 
 		expect( defaultControlGroup.hidden ).toBe( true );
 		expect( responsiveControlGroup.hidden ).toBe( false );
+	} );
+
+	it( 'should render a set of custom devices in responsive mode when provided', () => {
+		const customDeviceSet = [ 'Tiny', 'Small', 'Medium', 'Huge' ];
+
+		const mockRenderDefaultControl = jest.fn( renderTestDefaultControlComponent );
+
+		act( () => {
+			render(
+				<ResponsiveBlockControl
+					legend="Padding"
+					property="padding"
+					responsiveControlsActive={ true }
+					renderDefaultControl={ mockRenderDefaultControl }
+					devices={ customDeviceSet }
+				/>, container
+			);
+		} );
+
+		const defaultRenderControlCall = 1;
+
+		// Get array of labels which match those in the custom devices provided
+		const responsiveDevicesLabels = Array.from( container.querySelectorAll( 'label' ) ).filter( ( label ) => {
+			const labelText = label.innerHTML;
+			// Is the label one of those in the custom device set?
+			return customDeviceSet.includes( labelText );
+		} );
+
+		expect( responsiveDevicesLabels ).toHaveLength( customDeviceSet.length );
+		expect( mockRenderDefaultControl ).toHaveBeenCalledTimes( customDeviceSet.length + defaultRenderControlCall );
 	} );
 
 	it( 'should switch between default and responsive modes when interacting with toggle control', () => {
