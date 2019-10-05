@@ -59,7 +59,7 @@
 		"stylelint-find-rules": "^2.1.0"
 	},
 	"peerDependencies": {
-		"stylelint": "^9.5.0 || ^10.1.0"
+		"stylelint": "^10.1.0 || ^11.0.0"
 	},
 	"scripts": {
 		"dry-release": "npmpub --dry --verbose",
