@@ -1,9 +1,11 @@
 # 15.0.0
 
+-   Added: NodeJS 12.x.x support.
 -   Updated: `stylelint` to `11.0.0`.
 -   Removed: `stylelint < 10.1.0` compatibility.
 -   Updated: `stylelint-config-recommended` to `3.0.0`.
 -   Updated: `stylelint-config-recommended-scss` to `4.0.0`.
+-   Updated: Bump minimum Node.js required version to `10.0.0`.
 
 # 14.0.0
 
