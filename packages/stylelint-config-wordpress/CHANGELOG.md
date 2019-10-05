@@ -1,7 +1,7 @@
 # 15.0.0
 
 -   Updated: `stylelint` to `11.0.0`.
--   Removed: `stylelint < 9.1.3` compatibility.
+-   Removed: `stylelint < 10.1.0` compatibility.
 
 # 14.0.0
 
