@@ -11,59 +11,14 @@ import { escapeRegExp, flatMap } from 'lodash';
 const getHasPropValue = ( config ) => !! config.value;
 const getHasChildren = ( config ) => !! config.hasChildren;
 
-/**
- * Transforms a given string value into a collection of html like tags.
- *
- * @example
- *
- * If you provide `something` as the tagString, this will return:
- *
- * ```js
- * const tags = getTagsFromString( 'something' );
- * const tagsAre = tags === [
- *     '<something>',
- *     '</something>',
- *     '<something/>',
- * ];
- * ```
- *
- * @param {string} tagString  Something like `a%1`.
- *
- * @return {string[]} The generated tags for the given string.
- */
-const getTagsFromString = ( tagString ) => {
-	return [
-		`<${ tagString }>`,
-		`</${ tagString }>`,
-		`<${ tagString }/>`,
-	];
-};
+const getBalancedTagsExpression = ( searchString ) => new RegExp(
+	escapeRegExp( `<${ searchString }>` ) +
+		'(.*)' + escapeRegExp( `</${ searchString }>` )
+);
 
-/**
- * Generates and returns the regular expression for the given type.
- *
- * @param {Array}		tags          Array of tags to use for the reg ex
- * @param {string}  searchString  The search string serving as the base for the
- *                                expression.
- * @param {string}	type					What type of regEx to return.
- *
- * @return {RegExp}  The generated regular expression.
- */
-const getRegEx = ( tags, searchString, type ) => {
-	let pattern;
-	const [ openTag, closeTag, selfClosingTag ] = tags;
-	switch ( type ) {
-		case 'children':
-			pattern = escapeRegExp( openTag ) + '(.*)' + escapeRegExp( closeTag );
-			break;
-		case 'propValue':
-			pattern = escapeRegExp( searchString );
-			break;
-		default:
-			pattern = escapeRegExp( selfClosingTag );
-	}
-	return new RegExp( pattern );
-};
+const getSelfClosingTagExpression = ( searchString ) => new RegExp(
+	escapeRegExp( `<${ searchString }/>` )
+);
 
 /**
  * Generates and returns the regular expression used for splitting a string
@@ -91,20 +46,22 @@ const getMatchFromString = (
 	searchString,
 	conversionConfig
 ) => {
-	const tags = getTagsFromString( searchString );
-	// first try children reg ex.  If there is a match, then return.
+	// first try children reg ex. If there is a match, then return.
 	const match = interpolatedString.match(
-		getRegEx( tags, searchString, 'children' )
+		getBalancedTagsExpression( searchString )
 	);
+
 	if ( match !== null ) {
 		conversionConfig.hasChildren = true;
 		return match;
 	}
-	// no children, try matching on another pattern and return.
-	const regEx = getHasPropValue( conversionConfig ) ?
-		getRegEx( tags, searchString, 'propValue' ) :
-		getRegEx( tags, searchString );
-	return interpolatedString.match( regEx );
+
+	// If config has property "value", then just return on search string
+	// since it is not a component.
+	const expression = getHasPropValue( conversionConfig ) ?
+		new RegExp( escapeRegExp( searchString ) ) :
+		getSelfClosingTagExpression( searchString );
+	return interpolatedString.match( expression );
 };
 
 // index for keys
