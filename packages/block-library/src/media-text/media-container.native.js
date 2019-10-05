@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, ImageBackground, Text, TouchableWithoutFeedback, Platform } from 'react-native';
+import { View, ImageBackground, Text, TouchableWithoutFeedback } from 'react-native';
 import {
 	requestMediaImport,
 	mediaUploadSync,
@@ -43,11 +43,7 @@ import SvgIconRetry from './icon-retry';
 /**
  * Constants
  */
-// For Android it will only work with the first element of the array (images)
-const ALLOWED_MEDIA_TYPES = Platform.select( {
-	android: [ MEDIA_TYPE_IMAGE ],
-	ios: [ MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO ],
-} );
+const ALLOWED_MEDIA_TYPES = [ MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO ];
 
 class MediaContainer extends Component {
 	constructor() {
@@ -174,9 +170,9 @@ class MediaContainer extends Component {
 				onLongPress={ openMediaOptions }
 				disabled={ ! isSelected }
 			>
-				<View style={ styles.content } >
+				<View style={ styles.content }>
 					{ ! imageWidthWithinContainer &&
-						<View style={ styles.imageContainer } >
+						<View style={ styles.imageContainer }>
 							{ this.getIcon( false ) }
 						</View> }
 					<ImageBackground
@@ -190,7 +186,7 @@ class MediaContainer extends Component {
 						key={ mediaUrl }
 					>
 						{ isUploadFailed &&
-							<View style={ [ styles.imageContainer, styles.uploadFailed ] } >
+							<View style={ [ styles.imageContainer, styles.uploadFailed ] }>
 								<View style={ styles.modalIcon }>
 									{ this.getIcon( isUploadFailed ) }
 								</View>
@@ -276,34 +272,35 @@ class MediaContainer extends Component {
 
 		if ( mediaUrl ) {
 			return (
-				<MediaUpload
-					onSelect={ this.onSelectMediaUploadOption }
-					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					value={ mediaId }
-					render={ ( { open, getMediaOptions } ) => {
-						return <>
-							{ getMediaOptions() }
-							{ this.renderToolbarEditButton( open ) }
+				<View style={ { flex: 1 } }>
+					<MediaUpload
+						onSelect={ this.onSelectMediaUploadOption }
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
+						value={ mediaId }
+						render={ ( { open, getMediaOptions } ) => {
+							return <>
+								{ getMediaOptions() }
+								{ this.renderToolbarEditButton( open ) }
 
-							<MediaUploadProgress
-								coverUrl={ coverUrl }
-								mediaId={ mediaId }
-								onUpdateMediaProgress={ this.updateMediaProgress }
-								onFinishMediaUploadWithSuccess={ this.finishMediaUploadWithSuccess }
-								onFinishMediaUploadWithFailure={ this.finishMediaUploadWithFailure }
-								onMediaUploadStateReset={ this.mediaUploadStateReset }
-								renderContent={ ( params ) => {
-									return (
-										<View style={ styles.content } >
-											{ this.renderContent( params, open ) }
-										</View>
-									);
-								} }
-							/>
-						</>;
-					} }
-				/>
-
+								<MediaUploadProgress
+									coverUrl={ coverUrl }
+									mediaId={ mediaId }
+									onUpdateMediaProgress={ this.updateMediaProgress }
+									onFinishMediaUploadWithSuccess={ this.finishMediaUploadWithSuccess }
+									onFinishMediaUploadWithFailure={ this.finishMediaUploadWithFailure }
+									onMediaUploadStateReset={ this.mediaUploadStateReset }
+									renderContent={ ( params ) => {
+										return (
+											<View style={ styles.content }>
+												{ this.renderContent( params, open ) }
+											</View>
+										);
+									} }
+								/>
+							</>;
+						} }
+					/>
+				</View>
 			);
 		}
 		return this.renderPlaceholder();
