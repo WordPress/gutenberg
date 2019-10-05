@@ -38,17 +38,17 @@
 	"dependencies": {
 		"stylelint-config-recommended": "^3.0.0",
 		"stylelint-config-recommended-scss": "^4.0.0",
-		"stylelint-scss": "^3.9.3"
+		"stylelint-scss": "^3.11.1"
 	},
 	"devDependencies": {
-		"@commitlint/cli": "^8.1.0",
-		"@commitlint/config-conventional": "^8.1.0",
+		"@commitlint/cli": "^8.2.0",
+		"@commitlint/config-conventional": "^8.2.0",
 		"@wordpress/npm-package-json-lint-config": "^2.1.0",
-		"eslint": "^6.3.0",
-		"eslint-plugin-jest": "^22.4.1",
+		"eslint": "^6.5.1",
+		"eslint-plugin-jest": "^22.17.0",
 		"eslint-plugin-wordpress": "git://github.com/WordPress-Coding-Standards/eslint-plugin-wordpress.git#b65ae0cea1199c9714641ed3be7ea98fcb27dd6c",
-		"husky": "^3.0.3",
-		"jest": "^24.7.1",
+		"husky": "^3.0.8",
+		"jest": "^24.9.0",
 		"npm-package-json-lint": "^3.7.0",
 		"npm-run-all": "^4.1.5",
 		"npmpub": "^5.0.0",
