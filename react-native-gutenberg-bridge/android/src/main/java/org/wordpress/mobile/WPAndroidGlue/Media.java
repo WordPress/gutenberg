@@ -49,6 +49,7 @@ public class Media implements RNMedia {
         WritableMap map = new WritableNativeMap();
         map.putInt("id", mId);
         map.putString("url", mUrl);
+        map.putString("type", mType);
         return map;
     }
 }
