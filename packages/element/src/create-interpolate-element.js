@@ -131,7 +131,7 @@ const recursiveCreateElement = ( potentialElement, conversionMap ) => {
 	if ( ! Array.isArray( conversionMap ) || ! conversionMap.length ) {
 		return potentialElement;
 	}
-	const [ mapItem ] = conversionMap.slice( 0, 1 );
+	const [ mapItem ] = conversionMap;
 	const [ searchString, conversionConfig ] = mapItem;
 
 	/**
