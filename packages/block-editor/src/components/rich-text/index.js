@@ -11,6 +11,7 @@ import { RawHTML, Component, createRef } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { pasteHandler, children as childrenSource, getBlockTransforms, findTransform } from '@wordpress/blocks';
 import { withInstanceId, compose } from '@wordpress/compose';
+import { escapeHTML, unescapeHTML } from '@wordpress/escape-html';
 import {
 	__experimentalRichText as RichText,
 	__unstableCreateElement,
@@ -379,8 +380,8 @@ class RichTextWrapper extends Component {
 
 		const adjustedAllowedFormats = this.getAllowedFormats();
 		const hasFormats = ! adjustedAllowedFormats || adjustedAllowedFormats.length > 0;
-		let adjustedValue = originalValue;
-		let adjustedOnChange = originalOnChange;
+		let adjustedValue = unescapeHTML( originalValue );
+		let adjustedOnChange = ( newValue ) => originalOnChange( escapeHTML( newValue ) );
 
 		// Handle deprecated format.
 		if ( Array.isArray( originalValue ) ) {

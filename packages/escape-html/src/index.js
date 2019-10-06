@@ -2,6 +2,12 @@
  * Internal dependencies
  */
 import __unstableEscapeGreaterThan from './escape-greater';
+import {
+	entityToNameMap,
+	entityToNamePattern,
+	nameToEntityMap,
+	nameToEntityPattern,
+} from './named-character-entities';
 
 /**
  * Regular expression matching invalid attribute names.
@@ -77,7 +83,9 @@ export function escapeLessThan( value ) {
  * @return {string} Escaped attribute value.
  */
 export function escapeAttribute( value ) {
-	return __unstableEscapeGreaterThan( escapeQuotationMark( escapeAmpersand( value ) ) );
+	return __unstableEscapeGreaterThan(
+		escapeQuotationMark( escapeAmpersand( value ) )
+	);
 }
 
 /**
@@ -93,7 +101,15 @@ export function escapeAttribute( value ) {
  * @return {string} Escaped HTML element value.
  */
 export function escapeHTML( value ) {
-	return escapeLessThan( escapeAmpersand( value ) );
+	return value.replace( entityToNamePattern, ( match ) =>
+		entityToNameMap.hasOwnProperty( match ) ? entityToNameMap[ match ] : match
+	);
+}
+
+export function unescapeHTML( value ) {
+	return value.replace( nameToEntityPattern, ( match ) =>
+		nameToEntityMap.hasOwnProperty( match ) ? nameToEntityMap[ match ] : match
+	);
 }
 
 /**
