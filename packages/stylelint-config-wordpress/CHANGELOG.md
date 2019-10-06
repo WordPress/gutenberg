@@ -1,3 +1,7 @@
+# HEAD
+
+-   Updated: `stylelint-find-rules` to `2.2.0`.
+
 # 15.0.0
 
 -   Added: NodeJS 12.x.x support.
