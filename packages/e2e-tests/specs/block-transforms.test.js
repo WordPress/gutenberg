@@ -65,10 +65,31 @@ const isAnExpectedUnhandledBlock = ( fileBase ) => {
 
 const setPostContentAndSelectBlock = async ( content ) => {
 	await setPostContent( content );
-	const blocks = await getAllBlocks();
-	const clientId = blocks[ 0 ].clientId;
-	await page.click( '.editor-post-title .editor-post-title__block' );
-	await selectBlockByClientId( clientId );
+	// A block may have complex logic, e.g., adds InnerBlocks that get selected.
+	// Our selection may be ignored if another block gets selected, we can not know if the a
+	// a block adds inner blocks or not or when that adds is going to happen,
+	// so we try to select the block three times.
+	for ( let i = 0; ; ) {
+		try {
+			const blocks = await getAllBlocks();
+			const clientId = blocks[ 0 ].clientId;
+			await page.waitForSelector( `#block-${ clientId }`, {
+				timeout: 1000,
+			} );
+			await page.click( '.editor-post-title .editor-post-title__block' );
+			await selectBlockByClientId( clientId );
+
+			await page.waitForSelector( `#block-${ clientId }.is-selected`, {
+				timeout: 1000,
+			} );
+			return;
+		} catch ( err ) {
+			++i;
+			if ( i === 3 ) {
+				throw err;
+			}
+		}
+	}
 };
 
 const getTransformStructureFromFile = async ( fileBase ) => {
@@ -92,7 +113,8 @@ const getTransformResult = async ( blockContent, transformName ) => {
 	await setPostContentAndSelectBlock( blockContent );
 	expect( await hasBlockSwitcher() ).toBe( true );
 	await transformBlockTo( transformName );
-	return getEditedPostContent();
+	const content = await getEditedPostContent();
+	return content;
 };
 
 describe( 'Block transforms', () => {
@@ -132,11 +154,7 @@ describe( 'Block transforms', () => {
 	} );
 
 	describe( 'correctly transform', () => {
-		beforeAll( async () => {
-			await createNewPost();
-		} );
-
-		beforeEach( async () => {
+		afterEach( async () => {
 			await setPostContent( '' );
 			await page.click( '.editor-post-title .editor-post-title__block' );
 		} );
