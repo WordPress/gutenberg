@@ -122,6 +122,7 @@ module.exports = {
 			excludedFiles: [
 				'**/*.@(android|ios|native).js',
 				'**/@(benchmark|test|__tests__)/**/*.js',
+				'**/{storybook,stories}\/*\.js',
 			],
 		},
 		{

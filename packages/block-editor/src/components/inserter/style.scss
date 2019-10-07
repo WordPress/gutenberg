@@ -69,6 +69,10 @@ $block-inserter-search-height: 38px;
 	border-bottom-color: $white;
 }
 
+.components-popover.block-editor-inserter__popover {
+	z-index: z-index(".components-popover.block-editor-inserter__popover");
+}
+
 .components-popover input[type="search"].block-editor-inserter__search {
 	display: block;
 	margin: $grid-size-large;

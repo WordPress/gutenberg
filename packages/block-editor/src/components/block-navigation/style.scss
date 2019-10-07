@@ -85,3 +85,7 @@ $tree-item-height: 36px;
 		background: $light-gray-300;
 	}
 }
+
+.components-popover.block-editor-block-navigation__popover {
+	z-index: z-index(".components-popover.block-editor-block-navigation__popover");
+}

@@ -48,6 +48,9 @@
 		},
 		"borderRadius": {
 			"type": "number"
+		},
+		"customGradient": {
+			"type": "string"
 		}
 	}
 }

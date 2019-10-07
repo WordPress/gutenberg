@@ -15,7 +15,7 @@ function PostExcerpt( { excerpt, onUpdateExcerpt } ) {
 				onChange={ ( value ) => onUpdateExcerpt( value ) }
 				value={ excerpt }
 			/>
-			<ExternalLink href={ __( 'https://codex.wordpress.org/Excerpt' ) }>
+			<ExternalLink href={ __( 'https://wordpress.org/support/article/excerpt/' ) }>
 				{ __( 'Learn more about manual excerpts' ) }
 			</ExternalLink>
 		</div>

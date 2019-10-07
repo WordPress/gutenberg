@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { FlatList, View, Text, TouchableHighlight } from 'react-native';
-import { subscribeMediaAppend } from 'react-native-gutenberg-bridge';
 
 /**
  * WordPress dependencies
@@ -23,22 +22,10 @@ import styles from './style.scss';
 
 export class InserterMenu extends Component {
 	componentDidMount() {
-		this.subscriptionParentMediaAppend = subscribeMediaAppend( ( payload ) => {
-			this.props.onSelect( {
-				name: 'core/' + payload.mediaType,
-				initialAttributes: {
-					id: payload.mediaId,
-					[ payload.mediaType === 'image' ? 'url' : 'src' ]: payload.mediaUrl,
-				},
-			} );
-		} );
 		this.onOpen();
 	}
 
 	componentWillUnmount() {
-		if ( this.subscriptionParentMediaAppend ) {
-			this.subscriptionParentMediaAppend.remove();
-		}
 		this.onClose();
 	}
 

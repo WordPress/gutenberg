@@ -23,6 +23,7 @@ import styles from './block.scss';
 import BlockEdit from '../block-edit';
 import BlockInvalidWarning from './block-invalid-warning';
 import BlockMobileToolbar from './block-mobile-toolbar';
+import FloatingToolbar from './block-mobile-floating-toolbar';
 
 class BlockListBlock extends Component {
 	constructor() {
@@ -111,6 +112,9 @@ class BlockListBlock extends Component {
 			isValid,
 			showTitle,
 			title,
+			showFloatingToolbar,
+			parentId,
+			isFirstBlock,
 		} = this.props;
 
 		const borderColor = isSelected ? focusedBorderColor : 'transparent';
@@ -118,25 +122,29 @@ class BlockListBlock extends Component {
 		const accessibilityLabel = this.getAccessibilityLabel();
 
 		return (
-			<TouchableWithoutFeedback
-				onPress={ this.onFocus }
-				accessible={ ! isSelected }
-				accessibilityRole={ 'button' }
-			>
-				<View style={ [ styles.blockHolder, borderStyle, { borderColor } ] }>
-					{ showTitle && this.renderBlockTitle() }
-					<View
-						accessibilityLabel={ accessibilityLabel }
-						style={ [ ! isSelected && styles.blockContainer, isSelected && styles.blockContainerFocused ] }
-					>
-						{ isValid && this.getBlockForType() }
-						{ ! isValid &&
+			<>
+				{ showFloatingToolbar && ( ! isFirstBlock || parentId === '' ) && <FloatingToolbar.Slot /> }
+				{ showFloatingToolbar && <FloatingToolbar /> }
+				<TouchableWithoutFeedback
+					onPress={ this.onFocus }
+					accessible={ ! isSelected }
+					accessibilityRole={ 'button' }
+				>
+					<View style={ [ styles.blockHolder, borderStyle, { borderColor } ] }>
+						{ showTitle && this.renderBlockTitle() }
+						<View
+							accessibilityLabel={ accessibilityLabel }
+							style={ [ ! isSelected && styles.blockContainer, isSelected && styles.blockContainerFocused ] }
+						>
+							{ isValid && this.getBlockForType() }
+							{ ! isValid &&
 							<BlockInvalidWarning blockTitle={ title } icon={ icon } />
-						}
+							}
+						</View>
+						{ isSelected && <BlockMobileToolbar clientId={ clientId } /> }
 					</View>
-					{ isSelected && <BlockMobileToolbar clientId={ clientId } /> }
-				</View>
-			</TouchableWithoutFeedback>
+				</TouchableWithoutFeedback>
+			</>
 		);
 	}
 }
@@ -148,6 +156,10 @@ export default compose( [
 			getBlocks,
 			isBlockSelected,
 			__unstableGetBlockWithoutInnerBlocks,
+			getBlockHierarchyRootClientId,
+			getBlock,
+			getBlockRootClientId,
+			getSelectedBlock,
 		} = select( 'core/block-editor' );
 		const order = getBlockIndex( clientId, rootClientId );
 		const isSelected = isBlockSelected( clientId );
@@ -159,6 +171,19 @@ export default compose( [
 		const title = blockType.title;
 		const icon = blockType.icon;
 		const getAccessibilityLabelExtra = blockType.__experimentalGetAccessibilityLabel;
+
+		const selectedBlock = getSelectedBlock();
+		const parentId = getBlockRootClientId( clientId );
+		const parentBlock = getBlock( parentId );
+
+		const isMediaText = selectedBlock && selectedBlock.name === 'core/media-text';
+		const isMediaTextParent = parentBlock && parentBlock.name === 'core/media-text';
+
+		const rootBlockId = getBlockHierarchyRootClientId( clientId );
+		const rootBlock = getBlock( rootBlockId );
+		const hasRootInnerBlocks = rootBlock.innerBlocks.length !== 0;
+
+		const showFloatingToolbar = isSelected && hasRootInnerBlocks && ! isMediaText && ! isMediaTextParent;
 
 		return {
 			icon,
@@ -172,6 +197,8 @@ export default compose( [
 			isSelected,
 			isValid,
 			getAccessibilityLabelExtra,
+			showFloatingToolbar,
+			parentId,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {

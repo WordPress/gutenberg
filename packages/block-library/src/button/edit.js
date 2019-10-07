@@ -30,6 +30,7 @@ import {
 	InspectorControls,
 	withColors,
 	PanelColorSettings,
+	__experimentalGradientPickerControl,
 } from '@wordpress/block-editor';
 
 const { getComputedStyle } = window;
@@ -133,6 +134,7 @@ class ButtonEdit extends Component {
 			text,
 			title,
 			url,
+			customGradient,
 		} = attributes;
 
 		const linkId = `wp-block-button__inline-link-${ instanceId }`;
@@ -146,15 +148,16 @@ class ButtonEdit extends Component {
 					withoutInteractiveFormatting
 					className={ classnames(
 						'wp-block-button__link', {
-							'has-background': backgroundColor.color,
-							[ backgroundColor.class ]: backgroundColor.class,
+							'has-background': backgroundColor.color || customGradient,
+							[ backgroundColor.class ]: ! customGradient && backgroundColor.class,
 							'has-text-color': textColor.color,
 							[ textColor.class ]: textColor.class,
 							'no-border-radius': borderRadius === 0,
 						}
 					) }
 					style={ {
-						backgroundColor: backgroundColor.color,
+						backgroundColor: ! customGradient && backgroundColor.color,
+						background: customGradient,
 						color: textColor.color,
 						borderRadius: borderRadius ? borderRadius + 'px' : undefined,
 					} }
@@ -183,7 +186,10 @@ class ButtonEdit extends Component {
 						colorSettings={ [
 							{
 								value: backgroundColor.color,
-								onChange: setBackgroundColor,
+								onChange: ( newColor ) => {
+									setAttributes( { customGradient: undefined } );
+									setBackgroundColor( newColor );
+								},
 								label: __( 'Background Color' ),
 							},
 							{
@@ -205,6 +211,20 @@ class ButtonEdit extends Component {
 							} }
 						/>
 					</PanelColorSettings>
+					<PanelBody title={ __( 'Gradient' ) }>
+						<__experimentalGradientPickerControl
+							onChange={
+								( newGradient ) => {
+									setAttributes( {
+										customGradient: newGradient,
+										backgroundColor: undefined,
+										customBackgroundColor: undefined,
+									} );
+								}
+							}
+							value={ customGradient }
+						/>
+					</PanelBody>
 					<BorderPanel
 						borderRadius={ borderRadius }
 						setAttributes={ setAttributes }

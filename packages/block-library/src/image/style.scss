@@ -18,10 +18,6 @@
 		width: 100%;
 	}
 
-	// This resets the intrinsic margin on the figure in non-floated, wide, and full-wide alignments.
-	margin-left: 0;
-	margin-right: 0;
-
 	// Floats get an extra wrapping <div> element, so the <figure> becomes a child.
 	.alignleft,
 	.alignright,

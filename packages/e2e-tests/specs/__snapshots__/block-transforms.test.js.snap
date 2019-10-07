@@ -74,6 +74,18 @@ exports[`Block transforms correctly transform block Heading in fixture core__hea
 <!-- /wp:quote -->"
 `;
 
+exports[`Block transforms correctly transform block Heading in fixture core__heading__h2-color into the Paragraph block 1`] = `
+"<!-- wp:paragraph -->
+<p>Text</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`Block transforms correctly transform block Heading in fixture core__heading__h2-color into the Quote block 1`] = `
+"<!-- wp:quote -->
+<blockquote class=\\"wp-block-quote\\"><p>Text</p></blockquote>
+<!-- /wp:quote -->"
+`;
+
 exports[`Block transforms correctly transform block Heading in fixture core__heading__h4-em into the Paragraph block 1`] = `
 "<!-- wp:paragraph -->
 <p>The <em>Inserter</em> Tool</p>
