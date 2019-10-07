@@ -44,10 +44,16 @@ export default compose( [
 			getBlock,
 		} = select( 'core/block-editor' );
 
+		const {
+			getGroupingBlockName,
+		} = select( 'core/blocks' );
+
 		const selectedId = getSelectedBlockClientId();
 		const selectedBlock = getBlock( selectedId );
 
-		const isUngroupable = selectedBlock && selectedBlock.innerBlocks && !! selectedBlock.innerBlocks.length;
+		const groupingBlockName = getGroupingBlockName();
+
+		const isUngroupable = selectedBlock && selectedBlock.innerBlocks && !! selectedBlock.innerBlocks.length && selectedBlock.name === groupingBlockName;
 		const innerBlocks = isUngroupable ? selectedBlock.innerBlocks : [];
 
 		return {
