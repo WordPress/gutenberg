@@ -17,6 +17,20 @@ defined( 'GUTENBERG_DEVELOPMENT_MODE' ) or define( 'GUTENBERG_DEVELOPMENT_MODE',
 gutenberg_pre_init();
 
 /**
+ * Checks whether the Gutenberg experiment is enabled.
+ *
+ * @since 6.7.0
+ *
+ * @param string $name The name of the experiment.
+ *
+ * @return bool True when the experiment is enabled.
+ */
+function gutenberg_is_experiment_enabled( $name ) {
+	$experiments = get_option( 'gutenberg-experiments' );
+	return ! empty( $experiments[ $name ] );
+}
+
+/**
  * Gutenberg's Menu.
  *
  * Adds a new wp-admin menu page for the Gutenberg editor.

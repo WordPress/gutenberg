@@ -22,13 +22,12 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 		require dirname( __FILE__ ) . '/class-experimental-wp-widget-blocks-manager.php';
 		require dirname( __FILE__ ) . '/class-wp-rest-widget-areas-controller.php';
 	}
-	/**
-	* End: Include for phase 2
-	*/
-
 	if ( ! class_exists( 'WP_REST_Block_Directory_Controller' ) ) {
 		require dirname( __FILE__ ) . '/class-wp-rest-block-directory-controller.php';
 	}
+	/**
+	* End: Include for phase 2
+	*/
 
 	require dirname( __FILE__ ) . '/rest-api.php';
 }
@@ -43,6 +42,7 @@ require dirname( __FILE__ ) . '/blocks.php';
 require dirname( __FILE__ ) . '/templates.php';
 require dirname( __FILE__ ) . '/template-loader.php';
 require dirname( __FILE__ ) . '/client-assets.php';
+require dirname( __FILE__ ) . '/block-directory.php';
 require dirname( __FILE__ ) . '/demo.php';
 require dirname( __FILE__ ) . '/widgets.php';
 require dirname( __FILE__ ) . '/widgets-page.php';

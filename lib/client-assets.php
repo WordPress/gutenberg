@@ -272,8 +272,6 @@ function gutenberg_register_scripts_and_styles() {
 		)
 	);
 
-	wp_enqueue_script( 'wp-block-directory' );
-
 	// Editor Styles.
 	// This empty stylesheet is defined to ensure backward compatibility.
 	gutenberg_override_style( 'wp-blocks', false );
@@ -289,7 +287,7 @@ function gutenberg_register_scripts_and_styles() {
 	gutenberg_override_style(
 		'wp-editor',
 		gutenberg_url( 'build/editor/style.css' ),
-		array( 'wp-components', 'wp-block-editor', 'wp-nux', 'wp-block-directory' ),
+		array( 'wp-components', 'wp-block-editor', 'wp-nux' ),
 		filemtime( gutenberg_dir_path() . 'build/editor/style.css' )
 	);
 	wp_style_add_data( 'wp-editor', 'rtl', 'replace' );
