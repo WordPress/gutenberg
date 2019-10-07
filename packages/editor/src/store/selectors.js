@@ -1192,6 +1192,14 @@ export function getEditorBlocks( state ) {
 	return getEditedPostAttribute( state, 'blocks' ) || EMPTY_ARRAY;
 }
 
+export function getEditorSelectionStart( state ) {
+	return getEditedPostAttribute( state, 'selectionStart' );
+}
+
+export function getEditorSelectionEnd( state ) {
+	return getEditedPostAttribute( state, 'selectionEnd' );
+}
+
 /**
  * Is the editor ready
  *
