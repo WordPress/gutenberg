@@ -7,10 +7,13 @@ import { isFunction } from 'lodash';
 /**
  * WordPress dependencies
  */
+/**
+ * Internal dependencies
+ */
 import {
 	Icon,
 	SelectControl,
-} from '@wordpress/components';
+} from '../';
 import { __ } from '@wordpress/i18n';
 
 import {
