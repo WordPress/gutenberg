@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { omit } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { createElement } from '@wordpress/element';
