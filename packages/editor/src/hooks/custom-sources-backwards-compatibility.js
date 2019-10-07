@@ -16,7 +16,7 @@ function useMetaAttributeSource( name, _attributes, _setAttributes ) {
 
 	if ( Object.values( attributeTypes ).some( ( type ) => type.source === 'meta' ) ) {
 		// eslint-disable-next-line react-hooks/rules-of-hooks
-		const { type } = useSelect( ( select ) => select( 'core/editor' ).getCurrentPost(), [] );
+		const type = useSelect( ( select ) => select( 'core/editor' ).getCurrentPostType(), [] );
 		// eslint-disable-next-line react-hooks/rules-of-hooks
 		const [ meta, setMeta ] = useEntityProp( 'postType', type, 'meta' );
 
