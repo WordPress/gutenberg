@@ -8,6 +8,7 @@ import { dropRight, times } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { compose } from '@wordpress/compose';
 import {
 	PanelBody,
 	RangeControl,
@@ -19,6 +20,8 @@ import {
 	InnerBlocks,
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
+	PanelColorSettings,
+	withColors,
 } from '@wordpress/block-editor';
 import { withDispatch, useSelect } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
@@ -110,6 +113,8 @@ export function ColumnsEdit( {
 	className,
 	updateAlignment,
 	updateColumns,
+	setBackgroundColor,
+	backgroundColor,
 	clientId,
 } ) {
 	const { verticalAlignment } = attributes;
@@ -131,9 +136,14 @@ export function ColumnsEdit( {
 		}
 	}, [ forceUseTemplate ] );
 
-	const classes = classnames( className, {
+	const classes = classnames( className, backgroundColor.class, {
+		'has-background': !! backgroundColor.color,
 		[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 	} );
+
+	const styles = {
+		backgroundColor: backgroundColor.color,
+	};
 
 	// The template selector is shown when we first insert the columns block (count === 0).
 	// or if there's no template available.
@@ -154,6 +164,17 @@ export function ColumnsEdit( {
 								max={ 6 }
 							/>
 						</PanelBody>
+						<PanelColorSettings
+							title={ __( 'Color Settings' ) }
+							initialOpen={ false }
+							colorSettings={ [
+								{
+									value: backgroundColor.color,
+									onChange: setBackgroundColor,
+									label: __( 'Background Color' ),
+								},
+							] }
+						/>
 					</InspectorControls>
 					<BlockControls>
 						<BlockVerticalAlignmentToolbar
@@ -163,7 +184,7 @@ export function ColumnsEdit( {
 					</BlockControls>
 				</>
 			) }
-			<div className={ classes }>
+			<div className={ classes } style={ styles }>
 				<InnerBlocks
 					__experimentalTemplateOptions={ TEMPLATE_OPTIONS }
 					__experimentalOnSelectTemplateOption={ ( nextTemplate ) => {
@@ -183,85 +204,88 @@ export function ColumnsEdit( {
 	);
 }
 
-export default withDispatch( ( dispatch, ownProps, registry ) => ( {
-	/**
-	 * Update all child Column blocks with a new vertical alignment setting
-	 * based on whatever alignment is passed in. This allows change to parent
-	 * to overide anything set on a individual column basis.
-	 *
-	 * @param {string} verticalAlignment the vertical alignment setting
-	 */
-	updateAlignment( verticalAlignment ) {
-		const { clientId, setAttributes } = ownProps;
-		const { updateBlockAttributes } = dispatch( 'core/block-editor' );
-		const { getBlockOrder } = registry.select( 'core/block-editor' );
+export default compose( [
+	withColors( 'backgroundColor' ),
+	withDispatch( ( dispatch, ownProps, registry ) => ( {
+		/**
+		 * Update all child Column blocks with a new vertical alignment setting
+		 * based on whatever alignment is passed in. This allows change to parent
+		 * to overide anything set on a individual column basis.
+		 *
+		 * @param {string} verticalAlignment the vertical alignment setting
+		 */
+		updateAlignment( verticalAlignment ) {
+			const { clientId, setAttributes } = ownProps;
+			const { updateBlockAttributes } = dispatch( 'core/block-editor' );
+			const { getBlockOrder } = registry.select( 'core/block-editor' );
 
-		// Update own alignment.
-		setAttributes( { verticalAlignment } );
+			// Update own alignment.
+			setAttributes( { verticalAlignment } );
 
-		// Update all child Column Blocks to match
-		const innerBlockClientIds = getBlockOrder( clientId );
-		innerBlockClientIds.forEach( ( innerBlockClientId ) => {
-			updateBlockAttributes( innerBlockClientId, {
-				verticalAlignment,
+			// Update all child Column Blocks to match
+			const innerBlockClientIds = getBlockOrder( clientId );
+			innerBlockClientIds.forEach( ( innerBlockClientId ) => {
+				updateBlockAttributes( innerBlockClientId, {
+					verticalAlignment,
+				} );
 			} );
-		} );
-	},
+		},
 
-	/**
-	 * Updates the column count, including necessary revisions to child Column
-	 * blocks to grant required or redistribute available space.
-	 *
-	 * @param {number} previousColumns Previous column count.
-	 * @param {number} newColumns      New column count.
-	 */
-	updateColumns( previousColumns, newColumns ) {
-		const { clientId } = ownProps;
-		const { replaceInnerBlocks } = dispatch( 'core/block-editor' );
-		const { getBlocks } = registry.select( 'core/block-editor' );
+		/**
+		 * Updates the column count, including necessary revisions to child Column
+		 * blocks to grant required or redistribute available space.
+		 *
+		 * @param {number} previousColumns Previous column count.
+		 * @param {number} newColumns      New column count.
+		 */
+		updateColumns( previousColumns, newColumns ) {
+			const { clientId } = ownProps;
+			const { replaceInnerBlocks } = dispatch( 'core/block-editor' );
+			const { getBlocks } = registry.select( 'core/block-editor' );
 
-		let innerBlocks = getBlocks( clientId );
-		const hasExplicitWidths = hasExplicitColumnWidths( innerBlocks );
+			let innerBlocks = getBlocks( clientId );
+			const hasExplicitWidths = hasExplicitColumnWidths( innerBlocks );
 
-		// Redistribute available width for existing inner blocks.
-		const isAddingColumn = newColumns > previousColumns;
+			// Redistribute available width for existing inner blocks.
+			const isAddingColumn = newColumns > previousColumns;
 
-		if ( isAddingColumn && hasExplicitWidths ) {
-			// If adding a new column, assign width to the new column equal to
-			// as if it were `1 / columns` of the total available space.
-			const newColumnWidth = toWidthPrecision( 100 / newColumns );
+			if ( isAddingColumn && hasExplicitWidths ) {
+				// If adding a new column, assign width to the new column equal to
+				// as if it were `1 / columns` of the total available space.
+				const newColumnWidth = toWidthPrecision( 100 / newColumns );
 
-			// Redistribute in consideration of pending block insertion as
-			// constraining the available working width.
-			const widths = getRedistributedColumnWidths( innerBlocks, 100 - newColumnWidth );
+				// Redistribute in consideration of pending block insertion as
+				// constraining the available working width.
+				const widths = getRedistributedColumnWidths( innerBlocks, 100 - newColumnWidth );
 
-			innerBlocks = [
-				...getMappedColumnWidths( innerBlocks, widths ),
-				...times( newColumns - previousColumns, () => {
-					return createBlock( 'core/column', {
-						width: newColumnWidth,
-					} );
-				} ),
-			];
-		} else if ( isAddingColumn ) {
-			innerBlocks = [
-				...innerBlocks,
-				...times( newColumns - previousColumns, () => {
-					return createBlock( 'core/column' );
-				} ),
-			];
-		} else {
-			// The removed column will be the last of the inner blocks.
-			innerBlocks = dropRight( innerBlocks, previousColumns - newColumns );
+				innerBlocks = [
+					...getMappedColumnWidths( innerBlocks, widths ),
+					...times( newColumns - previousColumns, () => {
+						return createBlock( 'core/column', {
+							width: newColumnWidth,
+						} );
+					} ),
+				];
+			} else if ( isAddingColumn ) {
+				innerBlocks = [
+					...innerBlocks,
+					...times( newColumns - previousColumns, () => {
+						return createBlock( 'core/column' );
+					} ),
+				];
+			} else {
+				// The removed column will be the last of the inner blocks.
+				innerBlocks = dropRight( innerBlocks, previousColumns - newColumns );
 
-			if ( hasExplicitWidths ) {
-				// Redistribute as if block is already removed.
-				const widths = getRedistributedColumnWidths( innerBlocks, 100 );
+				if ( hasExplicitWidths ) {
+					// Redistribute as if block is already removed.
+					const widths = getRedistributedColumnWidths( innerBlocks, 100 );
 
-				innerBlocks = getMappedColumnWidths( innerBlocks, widths );
+					innerBlocks = getMappedColumnWidths( innerBlocks, widths );
+				}
 			}
-		}
 
-		replaceInnerBlocks( clientId, innerBlocks, false );
-	},
-} ) )( ColumnsEdit );
+			replaceInnerBlocks( clientId, innerBlocks, false );
+		},
+	} ) ),
+] )( ColumnsEdit );
