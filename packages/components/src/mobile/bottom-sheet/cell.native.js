@@ -60,6 +60,7 @@ class BottomSheetCell extends Component {
 		const defaultLabelStyle = showValue || icon !== undefined ? cellLabelStyle : cellLabelCenteredStyle;
 		const drawSeparator = ( separatorType && separatorType !== 'none' ) || separatorStyle === undefined;
 		const drawDoubleSeparator = drawSeparator && separatorType === 'doubleFullWidth';
+		const drawTopSeparator = drawSeparator && separatorType === 'topFullWidth';
 
 		const onCellPress = () => {
 			if ( isValueEditable ) {
@@ -89,6 +90,7 @@ class BottomSheetCell extends Component {
 					return leftMarginStyle;
 				case 'fullWidth':
 				case 'doubleFullWidth':
+				case 'topFullWidth':
 					return defaultSeparatorStyle;
 				case 'none':
 					return undefined;
@@ -167,7 +169,7 @@ class BottomSheetCell extends Component {
 				onPress={ onCellPress }
 				style={ { ...styles.clipToBounds, ...style } }
 			>
-				{ drawDoubleSeparator && (
+				{ ( drawDoubleSeparator || drawTopSeparator ) && (
 					<View style={ separatorStyle() } />
 				) }
 				<View style={ styles.cellContainer }>
@@ -185,7 +187,7 @@ class BottomSheetCell extends Component {
 					{ showValue && getValueComponent() }
 					{ children }
 				</View>
-				{ drawSeparator && (
+				{ ! drawTopSeparator && (
 					<View style={ separatorStyle() } />
 				) }
 			</TouchableOpacity>

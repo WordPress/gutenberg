@@ -244,7 +244,7 @@ class ImageEdit extends React.Component {
 					<TextControl
 						label={ __( 'Clear All Settings' ) }
 						labelStyle={ styles.clearSettingsButton }
-						separatorType={ 'doubleFullWidth' }
+						separatorType={ 'topFullWidth' }
 						onPress={ this.onClearSettings }
 					/>
 				</PanelBody>
