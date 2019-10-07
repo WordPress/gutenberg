@@ -61,4 +61,25 @@ describe( 'Block with a meta attribute', () => {
 			expect( await inputValue.jsonValue() ).toBe( 'Meta Value' );
 		} ) );
 	} );
+
+	it( 'Should persist the meta attribute properly in a different post type', async () => {
+		await createNewPost( { postType: 'page' } );
+		await insertBlock( 'Test Meta Attribute Block' );
+		await page.keyboard.type( 'Value' );
+
+		// Regression Test: Previously the caret would wrongly reset to the end
+		// of any input for meta-sourced attributes, due to syncing behavior of
+		// meta attribute updates.
+		//
+		// See: https://github.com/WordPress/gutenberg/issues/15739
+		await pressKeyTimes( 'ArrowLeft', 5 );
+		await page.keyboard.type( 'Meta ' );
+
+		await saveDraft();
+		await page.reload();
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+		const persistedValue = await page.evaluate( () => document.querySelector( '.my-meta-input' ).value );
+		expect( persistedValue ).toBe( 'Meta Value' );
+	} );
 } );
