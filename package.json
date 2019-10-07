@@ -76,6 +76,8 @@
 		"@storybook/addon-docs": "5.3.0-alpha.2",
 		"@storybook/addon-viewport": "5.2.1",
 		"@storybook/react": "5.2.1",
+		"@storybook/react-native": "5.2.3",
+		"@storybook/react-native-server": "5.2.3",
 		"@wordpress/babel-plugin-import-jsx-pragma": "file:packages/babel-plugin-import-jsx-pragma",
 		"@wordpress/babel-plugin-makepot": "file:packages/babel-plugin-makepot",
 		"@wordpress/babel-preset-default": "file:packages/babel-preset-default",
@@ -85,8 +87,8 @@
 		"@wordpress/docgen": "file:packages/docgen",
 		"@wordpress/e2e-test-utils": "file:packages/e2e-test-utils",
 		"@wordpress/e2e-tests": "file:packages/e2e-tests",
-		"@wordpress/eslint-plugin": "file:packages/eslint-plugin",
 		"@wordpress/env": "file:packages/env",
+		"@wordpress/eslint-plugin": "file:packages/eslint-plugin",
 		"@wordpress/jest-console": "file:packages/jest-console",
 		"@wordpress/jest-preset-default": "file:packages/jest-preset-default",
 		"@wordpress/jest-puppeteer-axe": "file:packages/jest-puppeteer-axe",
@@ -229,7 +231,8 @@
 		"playground:dev": "concurrently \"npm run dev:packages\" \"parcel playground/src/index.html -d playground/dist\"",
 		"preenv": "npm run check-engines",
 		"env": "wp-scripts env",
-		"design-system:dev": "concurrently \"npm run dev:packages\" \"start-storybook -c ./packages/components/storybook\"",
+		"design-system:dev": "concurrently \"npm run dev:packages\" \"./node_modules/@storybook/react/bin/index.js -c ./packages/components/storybook\"",
+		"design-system:dev:native": "concurrently \"npm run dev:packages\" \"(adb reverse tcp:7007 tcp:7007 || true) && ./node_modules/@storybook/react-native-server/bin/index.js -c ./packages/components/storybook\"",
 		"design-system:build": "build-storybook -c ./packages/components/storybook -o ./playground/dist/design-system/components"
 	},
 	"husky": {
