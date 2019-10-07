@@ -126,8 +126,8 @@ class BlockListBlock extends Component {
 		return (
 			<>
 				{ /* Keep in mind that the FloatingToolbar for the first child is rendered in its parent -
-				that means we should use selectedBlockId rather clientID since clientID will be a parent id */ }
-				{ showToolbar && <FloatingToolbar forChild={ showFloatingToolbarForChild } /> }
+				that means we should use selectedBlockId rather clientID since clientID will be a parent's id */ }
+				{ showToolbar && <FloatingToolbar adjustVerticalPosition={ showFloatingToolbarForChild ? styles.blockContainerFocused.paddingTop : 0 } /> }
 				<TouchableWithoutFeedback
 					onPress={ this.onFocus }
 					accessible={ ! isSelected }
@@ -180,11 +180,10 @@ export default compose( [
 		const selectedBlock = getSelectedBlock();
 		const parentId = getBlockRootClientId( clientId );
 		const parentBlock = getBlock( parentId );
-
 		// Fix for android floating toolbar - show toolbar in parent for the first of inner block if is selected
 		const blockClientIds = getBlockOrder( clientId );
 		const selectedID = getSelectedBlockClientId();
-		const showFloatingToolbarForChild = blockClientIds && blockClientIds.length && selectedID === blockClientIds[ 0 ];
+		const showFloatingToolbarForChild = name !== 'core/media-text' && blockClientIds && blockClientIds.length && selectedID === blockClientIds[ 0 ];
 
 		const isMediaText = selectedBlock && selectedBlock.name === 'core/media-text';
 		const isMediaTextParent = parentBlock && parentBlock.name === 'core/media-text';

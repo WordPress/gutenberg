@@ -5,14 +5,14 @@
 .blockContainer {
 	padding-left: 16px;
 	padding-right: 16px;
-	padding-top: 12px;
+	padding-top: $block-padding-top;
 	padding-bottom: 12px;
 }
 
 .blockContainerFocused {
 	padding-left: 16px;
 	padding-right: 16px;
-	padding-top: 12px;
+	padding-top: $block-padding-top;
 	padding-bottom: 0; // will be flushed into inline toolbar height
 }
 
