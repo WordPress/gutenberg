@@ -23,7 +23,6 @@ import deprecated from '@wordpress/deprecated';
  * Internal dependencies
  */
 import FormatEdit from './format-edit';
-import Editable from './editable';
 import { create } from '../create';
 import { apply } from '../to-dom';
 import { toHTMLString } from '../to-html-string';
@@ -57,6 +56,24 @@ const INSERTION_INPUT_TYPES_TO_IGNORE = new Set( [
 	'insertHorizontalRule',
 	'insertLink',
 ] );
+
+// In HTML, leading and trailing spaces are not visible, and multiple spaces
+// elsewhere are visually reduced to one space. This rule prevents spaces from
+// collapsing so all space is visible in the editor and can be removed. It also
+// prevents some browsers from inserting non-breaking spaces at the end of a
+// line to prevent the space from visually disappearing. Sometimes these non
+// breaking spaces can linger in the editor causing unwanted non breaking spaces
+// in between words. If also prevent Firefox from inserting a trailing `br` node
+// to visualise any trailing space, causing the element to be saved.
+//
+// > Authors are encouraged to set the 'white-space' property on editing hosts
+// > and on markup that was originally created through these editing mechanisms
+// > to the value 'pre-wrap'. Default HTML whitespace handling is not well
+// > suited to WYSIWYG editing, and line wrapping will not work correctly in
+// > some corner cases if 'white-space' is left at its default value.
+// >
+// > https://html.spec.whatwg.org/multipage/interaction.html#best-practices-for-in-page-editors
+const whiteSpace = 'pre-wrap';
 
 /**
  * Global stylesheet.
@@ -169,6 +186,8 @@ class RichText extends Component {
 				console.warn( 'RichText cannot be used with an inline container. Please use a different tagName.' );
 			}
 		}
+
+		this.applyRecord( this.record, { domOnly: true } );
 	}
 
 	createRecord() {
@@ -860,9 +879,11 @@ class RichText extends Component {
 			__unstableIsSelected: isSelected,
 		} = this.props;
 
+		// Check if tag name changed.
+		let shouldReapply = tagName !== prevProps.tagName;
+
 		// Check if the content changed.
-		let shouldReapply = (
-			tagName === prevProps.tagName &&
+		shouldReapply = shouldReapply || (
 			value !== prevProps.value &&
 			value !== this.value
 		);
@@ -971,25 +992,21 @@ class RichText extends Component {
 
 	Editable( props ) {
 		const {
-			tagName,
-			style,
+			tagName: TagName = 'div',
+			style = {},
 			className,
 			placeholder,
 			forwardedRef,
-			__unstableMultilineTag: multilineTag,
 		} = this.props;
 		const ariaProps = pickBy( this.props, ( value, key ) =>
 			startsWith( key, 'aria-' ) );
 
 		return (
-			<Editable
+			<TagName
 				{ ...props }
 				{ ...ariaProps }
 				ref={ forwardedRef }
-				tagName={ tagName }
-				style={ style }
-				value={ this.record }
-				placeholder={ placeholder }
+				style={ { ...style, whiteSpace } }
 				className={ classnames( 'rich-text', className ) }
 				onPaste={ this.onPaste }
 				onInput={ this.onInput }
@@ -1009,8 +1026,11 @@ class RichText extends Component {
 				onKeyUp={ this.onSelectionChange }
 				onMouseUp={ this.onSelectionChange }
 				onTouchEnd={ this.onSelectionChange }
-				multilineTag={ multilineTag }
-				prepareEditableTree={ createPrepareEditableTree( this.props, 'format_prepare_functions' ) }
+				role="textbox"
+				aria-multiline
+				aria-label={ placeholder }
+				contentEditable
+				suppressContentEditableWarning
 			/>
 		);
 	}

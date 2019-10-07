@@ -258,7 +258,7 @@ export function toTree( {
 						// Necessary to prevent the placeholder from catching
 						// selection. The placeholder is also not editable after
 						// all.
-						contentEditable: 'false',
+						contenteditable: 'false',
 					},
 				} );
 			}

@@ -12,7 +12,7 @@ import {
  * Internal dependencies
  */
 
-import { toObjectTree } from './to-object-tree';
+import { toTree } from './to-tree';
 
 /**
  * Create an HTML string from a Rich Text value. If a `multilineTag` is
@@ -25,8 +25,65 @@ import { toObjectTree } from './to-object-tree';
  * @return {string} HTML string.
  */
 export function toHTMLString( { value, multilineTag } ) {
-	const tree = toObjectTree( { value, multilineTag } );
+	const tree = toTree( {
+		value,
+		multilineTag,
+		createEmpty,
+		append,
+		getLastChild,
+		getParent,
+		isText,
+		getText,
+		remove,
+		appendText,
+	} );
+
 	return createChildrenHTML( tree.children );
+}
+
+function createEmpty() {
+	return {};
+}
+
+function getLastChild( { children } ) {
+	return children && children[ children.length - 1 ];
+}
+
+function append( parent, object ) {
+	if ( typeof object === 'string' ) {
+		object = { text: object };
+	}
+
+	object.parent = parent;
+	parent.children = parent.children || [];
+	parent.children.push( object );
+	return object;
+}
+
+function appendText( object, text ) {
+	object.text += text;
+}
+
+function getParent( { parent } ) {
+	return parent;
+}
+
+function isText( { text } ) {
+	return typeof text === 'string';
+}
+
+function getText( { text } ) {
+	return text;
+}
+
+function remove( object ) {
+	const index = object.parent.children.indexOf( object );
+
+	if ( index !== -1 ) {
+		object.parent.children.splice( index, 1 );
+	}
+
+	return object;
 }
 
 function createElementHTML( { type, attributes, object, children } ) {
