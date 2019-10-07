@@ -55,6 +55,7 @@ public interface GutenbergBridgeJS2Parent {
     enum MediaType {
         IMAGE("image"),
         VIDEO("video"),
+        MEDIA("media"),
         AUDIO("audio"),
         OTHER("other");
 
