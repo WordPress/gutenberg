@@ -8,6 +8,12 @@
 	@include break-medium() {
 		flex-wrap: nowrap;
 	}
+
+	&.has-background {
+		// Matches paragraph Block padding
+		// Todo: normalise with variables
+		padding: 20px 30px;
+	}
 }
 
 .wp-block-column {
