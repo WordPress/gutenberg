@@ -23,12 +23,13 @@ import {
 import sizesTable, { findSizeBySlug } from './sizes';
 
 export function DimensionControl( props ) {
-	const { label, icon, sizes = sizesTable, currentSize, onSpacingChange, onReset, className = '' } = props;
+	const { label, icon, sizes = sizesTable, currentSize, onChange, onReset, className = '' } = props;
 
 	/**
 	 * Determines the size from the size slug (eg: `medium`)
 	 * and decides whether to call the change or reset callback
 	 * handlers
+  *
 	 * @param  {string} val the DOMEvent event.target
 	 * @return {void}
 	 */
@@ -37,14 +38,15 @@ export function DimensionControl( props ) {
 
 		if ( ! theSize || currentSize === theSize.slug ) {
 			resetSpacing();
-		} else if ( isFunction( onSpacingChange ) ) {
-			onSpacingChange( theSize.slug );
+		} else if ( isFunction( onChange ) ) {
+			onChange( theSize.slug );
 		}
 	};
 
 	/**
 	 * Applies the callback to handle resetting
 	 * a dimension spacing values
+  *
 	 * @return {void}
 	 */
 	const resetSpacing = () => {
@@ -57,6 +59,7 @@ export function DimensionControl( props ) {
 	 * Converts the sizes lookup tablet
 	 * to a format suitable for use in the
 	 * <SelectControl /> options prop
+  *
 	 * @param  {Array} theSizes the array of sizes objects
 	 * @return {Array}          the array of options with default option prepended
 	 */
