@@ -113,8 +113,6 @@ class BlockListBlock extends Component {
 			showTitle,
 			title,
 			showFloatingToolbar,
-			parentId,
-			isFirstBlock,
 		} = this.props;
 
 		const borderColor = isSelected ? focusedBorderColor : 'transparent';
@@ -123,7 +121,6 @@ class BlockListBlock extends Component {
 
 		return (
 			<>
-				{ showFloatingToolbar && ( ! isFirstBlock || parentId === '' ) && <FloatingToolbar.Slot /> }
 				{ showFloatingToolbar && <FloatingToolbar /> }
 				<TouchableWithoutFeedback
 					onPress={ this.onFocus }
@@ -153,18 +150,13 @@ export default compose( [
 	withSelect( ( select, { clientId, rootClientId } ) => {
 		const {
 			getBlockIndex,
-			getBlocks,
 			isBlockSelected,
 			__unstableGetBlockWithoutInnerBlocks,
 			getBlockHierarchyRootClientId,
 			getBlock,
-			getBlockRootClientId,
-			getSelectedBlock,
 		} = select( 'core/block-editor' );
 		const order = getBlockIndex( clientId, rootClientId );
 		const isSelected = isBlockSelected( clientId );
-		const isFirstBlock = order === 0;
-		const isLastBlock = order === getBlocks().length - 1;
 		const block = __unstableGetBlockWithoutInnerBlocks( clientId );
 		const { name, attributes, isValid } = block || {};
 		const blockType = getBlockType( name || 'core/missing' );
@@ -172,18 +164,11 @@ export default compose( [
 		const icon = blockType.icon;
 		const getAccessibilityLabelExtra = blockType.__experimentalGetAccessibilityLabel;
 
-		const selectedBlock = getSelectedBlock();
-		const parentId = getBlockRootClientId( clientId );
-		const parentBlock = getBlock( parentId );
-
-		const isMediaText = selectedBlock && selectedBlock.name === 'core/media-text';
-		const isMediaTextParent = parentBlock && parentBlock.name === 'core/media-text';
-
 		const rootBlockId = getBlockHierarchyRootClientId( clientId );
 		const rootBlock = getBlock( rootBlockId );
 		const hasRootInnerBlocks = rootBlock.innerBlocks.length !== 0;
 
-		const showFloatingToolbar = isSelected && hasRootInnerBlocks && ! isMediaText && ! isMediaTextParent;
+		const showFloatingToolbar = isSelected && hasRootInnerBlocks;
 
 		return {
 			icon,
@@ -192,13 +177,10 @@ export default compose( [
 			title,
 			attributes,
 			blockType,
-			isFirstBlock,
-			isLastBlock,
 			isSelected,
 			isValid,
 			getAccessibilityLabelExtra,
 			showFloatingToolbar,
-			parentId,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {
