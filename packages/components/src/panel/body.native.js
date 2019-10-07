@@ -18,7 +18,7 @@ export class PanelBody extends Component {
 		this.state = {};
 	}
 
-	getContainerStyle = () => {
+	getContainerStyle() {
 		const { title, padded = true } = this.props;
 
 		if ( padded && title ) {
