@@ -11,11 +11,9 @@ import { DimensionControl } from '../';
 
 describe( 'DimensionControl', () => {
 	const onChangeHandler = jest.fn();
-	const onResetHandler = jest.fn();
 
 	afterEach( () => {
 		onChangeHandler.mockClear();
-		onResetHandler.mockClear();
 	} );
 
 	describe( 'rendering', () => {
@@ -109,12 +107,12 @@ describe( 'DimensionControl', () => {
 			expect( onChangeHandler.mock.calls[ 1 ][ 0 ] ).toEqual( 'medium' );
 		} );
 
-		it( 'should call onReset handler with when no size is provided on change', () => {
+		it( 'should call onChange handler with undefined value when no size is provided on change', () => {
 			const wrapper = mount(
 				<DimensionControl
 					instanceId={ uniqueId() }
 					label={ 'Padding' }
-					onReset={ onResetHandler }
+					onChange={ onChangeHandler }
 				/>
 			);
 
@@ -124,7 +122,7 @@ describe( 'DimensionControl', () => {
 				},
 			} );
 
-			expect( onResetHandler ).toHaveBeenCalledTimes( 1 );
+			expect( onChangeHandler ).toHaveBeenNthCalledWith( 1, undefined );
 		} );
 	} );
 } );

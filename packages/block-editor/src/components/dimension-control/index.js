@@ -23,46 +23,34 @@ import {
 import sizesTable, { findSizeBySlug } from './sizes';
 
 export function DimensionControl( props ) {
-	const { label, icon, sizes = sizesTable, value, onChange, onReset, className = '' } = props;
+	const { label, icon, sizes = sizesTable, value, onChange, className = '' } = props;
 
 	/**
-	 * Determines the size from the size slug (eg: `medium`)
-	 * and decides whether to call the change or reset callback
-	 * handlers
+  * Determines the size from the size slug (eg: `medium`)
+  * and decides whether to call the change or reset callback
+  * handlers
   *
-	 * @param  {string} val the DOMEvent event.target
-	 * @return {void}
-	 */
+  * @param  {string} val the DOMEvent event.target
+  * @return {void}
+  */
 	const onChangeSpacingSize = ( val ) => {
 		const theSize = findSizeBySlug( sizes, val );
 
 		if ( ! theSize || value === theSize.slug ) {
-			resetSpacing();
+			onChange( undefined );
 		} else if ( isFunction( onChange ) ) {
 			onChange( theSize.slug );
 		}
 	};
 
 	/**
-	 * Applies the callback to handle resetting
-	 * a dimension spacing values
+  * Converts the sizes lookup tablet
+  * to a format suitable for use in the
+  * <SelectControl /> options prop
   *
-	 * @return {void}
-	 */
-	const resetSpacing = () => {
-		if ( isFunction( onReset ) ) {
-			onReset();
-		}
-	};
-
-	/**
-	 * Converts the sizes lookup tablet
-	 * to a format suitable for use in the
-	 * <SelectControl /> options prop
-  *
-	 * @param  {Array} theSizes the array of sizes objects
-	 * @return {Array}          the array of options with default option prepended
-	 */
+  * @param  {Array} theSizes the array of sizes objects
+  * @return {Array}          the array of options with default option prepended
+  */
 	const formatSizesAsOptions = ( theSizes ) => {
 		const options = theSizes.map( ( { name, slug } ) => ( {
 			label: name,
