@@ -83,12 +83,12 @@ describe( 'DimensionControl', () => {
 	} );
 
 	describe( 'callbacks', () => {
-		it( 'should call onSpacingChange handler with correct args on size change', () => {
+		it( 'should call onChange handler with correct args on size change', () => {
 			const wrapper = mount(
 				<DimensionControl
 					instanceId={ uniqueId() }
 					label={ 'Padding' }
-					onSpacingChange={ onChangeHandler }
+					onChange={ onChangeHandler }
 				/>
 			);
 
