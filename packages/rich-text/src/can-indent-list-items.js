@@ -4,11 +4,11 @@
 import { getLineIndex } from './get-line-index';
 
 /**
- * Indents any selected list items if possible.
+ * Checks if the selected list item can be indented.
  *
  * @param {Object} value Value to check.
  *
- * @return {boolean} Whether or not the
+ * @return {boolean} Whether or not the selected list item can be indented.
  */
 export function canIndentListItems( value ) {
 	const lineIndex = getLineIndex( value );

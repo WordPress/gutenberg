@@ -5,11 +5,11 @@
 import { getLineIndex } from './get-line-index';
 
 /**
- * Outdents any selected list items if possible.
+ * Checks if the selected list item can be outdented.
  *
- * @param {Object} value Value to change.
+ * @param {Object} value Value to check.
  *
- * @return {Object} The changed value.
+ * @return {boolean} Whether or not the selected list item can be outdented.
  */
 export function canOutdentListItems( value ) {
 	const { replacements, start } = value;
