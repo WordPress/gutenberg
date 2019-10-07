@@ -109,6 +109,7 @@ public class WPAndroidGlueCode {
         void onUploadPhotoButtonClicked(boolean allowMultipleSelection);
         void onCapturePhotoButtonClicked();
         void onUploadVideoButtonClicked(boolean allowMultipleSelection);
+        void onUploadMediaButtonClicked(boolean allowMultipleSelection);
         void onCaptureVideoButtonClicked();
         void onRetryUploadForMediaClicked(int mediaId);
         void onCancelUploadForMediaClicked(int mediaId);
