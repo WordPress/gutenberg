@@ -32,7 +32,7 @@ export class PanelBody extends Component {
 	}
 
 	render() {
-		const { children, title, padded = true } = this.props;
+		const { children, title } = this.props;
 
 		return (
 			<View style={ this.getContainerStyle() }>
