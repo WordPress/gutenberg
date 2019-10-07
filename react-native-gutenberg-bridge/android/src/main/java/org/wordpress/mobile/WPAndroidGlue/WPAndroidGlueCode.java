@@ -169,8 +169,10 @@ public class WPAndroidGlueCode {
                     mOnMediaLibraryButtonListener.onUploadPhotoButtonClicked(allowMultipleSelection);
                 } else if (mediaType == MediaType.VIDEO) {
                     mOnMediaLibraryButtonListener.onUploadVideoButtonClicked(allowMultipleSelection);
-                }
+                } else if (mediaType == MediaType.MEDIA) {
+                mOnMediaLibraryButtonListener.onUploadMediaButtonClicked(allowMultipleSelection);
             }
+        }
 
             @Override
             public void requestMediaPickerFromDeviceCamera(MediaUploadCallback mediaUploadCallback, MediaType mediaType) {
