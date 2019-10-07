@@ -377,6 +377,7 @@ class WritingFlow extends Component {
 	 * Sets focus to the end of the last tabbable text field, if one exists.
 	 */
 	focusLastTextField() {
+		this.disableNavigationMode();
 		const focusableNodes = focus.focusable.find( this.container );
 		const target = findLast( focusableNodes, isTabbableTextField );
 		if ( target ) {
