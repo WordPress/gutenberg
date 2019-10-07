@@ -14,7 +14,7 @@ import BlockFormatControls from '../block-format-controls';
  */
 import UngroupButton from '../ungroup-button';
 
-export const BlockToolbar = ( { blockClientIds, isValid, mode } ) => {
+export const BlockToolbar = ( { blockClientIds, isValid, mode, isSelectedGroup } ) => {
 	if ( blockClientIds.length === 0 ) {
 		return null;
 	}
@@ -23,7 +23,7 @@ export const BlockToolbar = ( { blockClientIds, isValid, mode } ) => {
 		<>
 			{ mode === 'visual' && isValid && (
 				<>
-					<UngroupButton />
+					{ isSelectedGroup && <UngroupButton /> }
 					<BlockControls.Slot />
 					<BlockFormatControls.Slot />
 				</>
@@ -37,12 +37,16 @@ export default withSelect( ( select ) => {
 		getBlockMode,
 		getSelectedBlockClientIds,
 		isBlockValid,
+		getSelectedBlock,
 	} = select( 'core/block-editor' );
 	const blockClientIds = getSelectedBlockClientIds();
+	const selectedBlock = getSelectedBlock();
+	const isSelectedGroup = selectedBlock && selectedBlock.name === 'core/group';
 
 	return {
 		blockClientIds,
 		isValid: blockClientIds.length === 1 ? isBlockValid( blockClientIds[ 0 ] ) : null,
 		mode: blockClientIds.length === 1 ? getBlockMode( blockClientIds[ 0 ] ) : null,
+		isSelectedGroup,
 	};
 } )( BlockToolbar );
