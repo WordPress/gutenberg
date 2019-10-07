@@ -23,7 +23,7 @@ import {
 import sizesTable, { findSizeBySlug } from './sizes';
 
 export function DimensionControl( props ) {
-	const { label, icon, sizes = sizesTable, currentSize, onChange, onReset, className = '' } = props;
+	const { label, icon, sizes = sizesTable, value, onChange, onReset, className = '' } = props;
 
 	/**
 	 * Determines the size from the size slug (eg: `medium`)
@@ -36,7 +36,7 @@ export function DimensionControl( props ) {
 	const onChangeSpacingSize = ( val ) => {
 		const theSize = findSizeBySlug( sizes, val );
 
-		if ( ! theSize || currentSize === theSize.slug ) {
+		if ( ! theSize || value === theSize.slug ) {
 			resetSpacing();
 		} else if ( isFunction( onChange ) ) {
 			onChange( theSize.slug );
@@ -91,7 +91,7 @@ export function DimensionControl( props ) {
 			className={ classnames( className, 'block-editor-dimension-control' ) }
 			label={ selectLabel }
 			hideLabelFromVision={ false }
-			value={ currentSize }
+			value={ value }
 			onChange={ onChangeSpacingSize }
 			options={ formatSizesAsOptions( sizes ) }
 		/>
