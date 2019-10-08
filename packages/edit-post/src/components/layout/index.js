@@ -21,6 +21,7 @@ import {
 	EditorNotices,
 	PostPublishPanel,
 } from '@wordpress/editor';
+import { BlockBreadcrumb } from '@wordpress/block-editor';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { PluginArea } from '@wordpress/plugins';
 import { withViewportMatch } from '@wordpress/viewport';
@@ -56,6 +57,7 @@ function Layout( {
 	isSaving,
 	isMobileViewport,
 	isRichEditingEnabled,
+	showFooter,
 } ) {
 	const sidebarIsOpened = editorSidebarOpened || pluginSidebarOpened || publishSidebarOpened;
 
@@ -92,7 +94,16 @@ function Layout( {
 				<ManageBlocksModal />
 				<OptionsModal />
 				{ ( mode === 'text' || ! isRichEditingEnabled ) && <TextEditor /> }
-				{ isRichEditingEnabled && mode === 'visual' && <VisualEditor /> }
+				{ isRichEditingEnabled && mode === 'visual' && (
+					<>
+						<VisualEditor />
+						{ showFooter && (
+							<div className="edit-post-layout__footer">
+								<BlockBreadcrumb />
+							</div>
+						) }
+					</>
+				) }
 				<div className="edit-post-layout__metaboxes">
 					<MetaBoxes location="normal" />
 				</div>
@@ -145,6 +156,7 @@ export default compose(
 		hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
 		isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
 		isRichEditingEnabled: select( 'core/editor' ).getEditorSettings().richEditingEnabled,
+		showFooter: !! select( 'core/block-editor' ).getSelectedBlockClientId(),
 	} ) ),
 	withDispatch( ( dispatch ) => {
 		const { closePublishSidebar, togglePublishSidebar } = dispatch( 'core/edit-post' );

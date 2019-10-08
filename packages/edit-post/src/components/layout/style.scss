@@ -234,3 +234,28 @@
 		}
 	}
 }
+
+.edit-post-layout__footer {
+	display: none;
+	z-index: z-index(".edit-post-layout__footer");
+
+	// Stretch to mimic outline padding on desktop.
+	@include break-medium() {
+		display: inline-flex;
+		position: fixed;
+		bottom: 0;
+		right: 0;
+		background: $white;
+		height: 30px;
+		padding: 0 10px;
+		align-items: center;
+		border-top: $border-width solid $light-gray-500;
+		font-size: 12px;
+
+		.edit-post-layout.is-sidebar-opened & {
+			right: $sidebar-width;
+		}
+	}
+}
+@include editor-left(".edit-post-layout__footer");
+
