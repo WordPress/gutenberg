@@ -1,0 +1,24 @@
+.block-editor-block-breadcrumb {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+
+	li {
+		display: inline-block;
+		margin: 0;
+
+		&:not(.block-editor-block-breadcrumb__current)::after {
+			content: "▸";
+		}
+	}
+}
+
+.block-editor-block-breadcrumb__button.components-button {
+	color: inherit;
+	font-size: inherit;
+}
+
+.block-editor-block-breadcrumb__current {
+	padding: 0 10px;
+	font-size: inherit;
+}

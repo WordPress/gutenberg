@@ -82,6 +82,20 @@ _Related_
 
 Undocumented declaration.
 
+<a name="BlockBreadcrumb" href="#BlockBreadcrumb">#</a> **BlockBreadcrumb**
+
+Block breadcrumb component, displaying the label of the block. If the block
+descends from a root block, a button is displayed enabling the user to select
+the root block.
+
+_Parameters_
+
+-   _props.clientId_ `string`: Client ID of block.
+
+_Returns_
+
+-   `WPElement`: Block Breadcrumb.
+
 <a name="BlockControls" href="#BlockControls">#</a> **BlockControls**
 
 Undocumented declaration.
