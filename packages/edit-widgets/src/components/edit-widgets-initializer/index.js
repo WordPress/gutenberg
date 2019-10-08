@@ -1,19 +1,9 @@
 /**
- * WordPress dependencies
- */
-import { compose } from '@wordpress/compose';
-import { useEffect } from '@wordpress/element';
-import { withDispatch } from '@wordpress/data';
-
-/**
  * Internal dependencies
  */
 import Layout from '../layout';
 
-function EditWidgetsInitializer( { setupWidgetAreas, settings } ) {
-	useEffect( () => {
-		setupWidgetAreas();
-	}, [] );
+function EditWidgetsInitializer( { settings } ) {
 	return (
 		<Layout
 			blockEditorSettings={ settings }
@@ -21,11 +11,4 @@ function EditWidgetsInitializer( { setupWidgetAreas, settings } ) {
 	);
 }
 
-export default compose( [
-	withDispatch( ( dispatch ) => {
-		const { setupWidgetAreas } = dispatch( 'core/edit-widgets' );
-		return {
-			setupWidgetAreas,
-		};
-	} ),
-] )( EditWidgetsInitializer );
+export default EditWidgetsInitializer;

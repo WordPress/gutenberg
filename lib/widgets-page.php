@@ -97,7 +97,7 @@ function gutenberg_widgets_init( $hook ) {
 				wp.editWidgets.%s( "widgets-editor", %s );
 			} );',
 			$initializer_name,
-			wp_json_encode( $settings )
+			wp_json_encode( gutenberg_experiments_editor_settings( $settings ) )
 		)
 	);
 

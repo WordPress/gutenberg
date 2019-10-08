@@ -17,7 +17,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 
 	it( 'should switch between visual and HTML modes', async () => {
 		// This block should be in "visual" mode by default.
-		let visualBlock = await page.$$( '.block-editor-block-list__layout .block-editor-block-list__block .block-editor-rich-text' );
+		let visualBlock = await page.$$( '.block-editor-block-list__layout .block-editor-block-list__block .rich-text' );
 		expect( visualBlock ).toHaveLength( 1 );
 
 		// Move the mouse to show the block toolbar
@@ -43,7 +43,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 		await changeModeButton.click();
 
 		// This block should be in "visual" mode by default.
-		visualBlock = await page.$$( '.block-editor-block-list__layout .block-editor-block-list__block .block-editor-rich-text' );
+		visualBlock = await page.$$( '.block-editor-block-list__layout .block-editor-block-list__block .rich-text' );
 		expect( visualBlock ).toHaveLength( 1 );
 	} );
 
@@ -97,11 +97,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 		let blockInspectorTab = await page.$( '.edit-post-sidebar__panel-tab.is-active[data-label="Block"]' );
 		expect( blockInspectorTab ).not.toBeNull();
 
-		// Switch to Code Editor and hide More Menu
 		await switchEditorModeTo( 'Code' );
-		await page.click(
-			'.edit-post-more-menu [aria-label="More tools & options"]'
-		);
 
 		// The Block inspector should not be active anymore
 		blockInspectorTab = await page.$( '.edit-post-sidebar__panel-tab.is-active[data-label="Block"]' );

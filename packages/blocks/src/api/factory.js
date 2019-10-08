@@ -15,6 +15,7 @@ import {
 	uniq,
 	isFunction,
 	isEmpty,
+	map,
 } from 'lodash';
 
 /**
@@ -461,3 +462,17 @@ export function switchToBlockType( blocks, name ) {
 		return applyFilters( 'blocks.switchToBlockType.transformedBlock', transformedBlock, blocks );
 	} );
 }
+
+/**
+ * Create a block object from the example API.
+ *
+ * @param {string} name
+ * @param {Object} example
+ *
+ * @return {Object} block.
+ */
+export const getBlockFromExample = ( name, example ) => {
+	return createBlock( name, example.attributes, map(
+		example.innerBlocks, ( innerBlock ) => getBlockFromExample( innerBlock.name, innerBlock )
+	) );
+};

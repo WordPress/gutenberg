@@ -14,7 +14,7 @@ describe( 'default-autocompleters', () => {
 	const defaultAutocompleters = [ userAutocompleter ];
 
 	it( 'provides default completers if none are provided', () => {
-		const result = applyFilters( 'editor.Autocomplete.completers', null, BLOCK_NAME );
+		const result = applyFilters( 'editor.Autocomplete.completers', undefined, BLOCK_NAME );
 		/*
 		 * Assert structural equality because defaults are provided as a
 		 * list of cloned completers (and not referentially equal).
@@ -37,7 +37,7 @@ describe( 'default-autocompleters', () => {
 	} );
 
 	it( 'provides copies of defaults so they may be directly modified', () => {
-		const result = applyFilters( 'editor.Autocomplete.completers', null, BLOCK_NAME );
+		const result = applyFilters( 'editor.Autocomplete.completers', undefined, BLOCK_NAME );
 		result.forEach( ( completer, i ) => {
 			const defaultCompleter = defaultAutocompleters[ i ];
 			expect( completer ).not.toBe( defaultCompleter );

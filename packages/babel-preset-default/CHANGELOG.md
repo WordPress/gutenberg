@@ -1,3 +1,9 @@
+## 4.5.0 (2019-08-29)
+
+### Bug Fixes
+
+- Added missing `@wordpress/element` dependency which is used internally.
+
 ## 4.4.0 (2019-08-05)
 
 ### Bug Fixes

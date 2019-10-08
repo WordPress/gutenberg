@@ -12,10 +12,13 @@ export { default as BlockEdit } from './block-edit';
 export { default as BlockFormatControls } from './block-format-controls';
 export { default as BlockIcon } from './block-icon';
 export { default as BlockNavigationDropdown } from './block-navigation/dropdown';
+export { default as __experimentalBlockNavigationList } from './block-navigation/list';
 export { default as BlockVerticalAlignmentToolbar } from './block-vertical-alignment-toolbar';
 export { default as ButtonBlockerAppender } from './button-block-appender';
 export { default as ColorPalette } from './color-palette';
 export { default as ContrastChecker } from './contrast-checker';
+export { default as __experimentalGradientPicker } from './gradient-picker';
+export { default as __experimentalGradientPickerControl } from './gradient-picker/control';
 export { default as InnerBlocks } from './inner-blocks';
 export { default as InspectorAdvancedControls } from './inspector-advanced-controls';
 export { default as InspectorControls } from './inspector-controls';
@@ -41,6 +44,7 @@ export { default as withColorContext } from './color-palette/with-color-context'
 
 export { default as __experimentalBlockSettingsMenuFirstItem } from './block-settings-menu/block-settings-menu-first-item';
 export { default as __experimentalBlockSettingsMenuPluginsExtension } from './block-settings-menu/block-settings-menu-plugins-extension';
+export { default as __experimentalInserterMenuExtension } from './inserter-menu-extension';
 export { default as BlockEditorKeyboardShortcuts } from './block-editor-keyboard-shortcuts';
 export { default as BlockInspector } from './block-inspector';
 export { default as BlockList } from './block-list';

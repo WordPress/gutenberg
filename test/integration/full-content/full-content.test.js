@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { startsWith, get } from 'lodash';
+import { omit, startsWith, get } from 'lodash';
 import { format } from 'util';
 
 /**
@@ -32,8 +32,9 @@ const blockBasenames = getAvailableBlockFixturesBasenames();
 function normalizeParsedBlocks( blocks ) {
 	return blocks.map( ( block, index ) => {
 		// Clone and remove React-instance-specific stuff; also, attribute
-		// values that equal `undefined` will be removed
-		block = JSON.parse( JSON.stringify( block ) );
+		// values that equal `undefined` will be removed. Validation issues
+		// add too much noise so they get removed as well.
+		block = JSON.parse( JSON.stringify( omit( block, 'validationIssues' ) ) );
 
 		// Change client IDs to a predictable value
 		block.clientId = '_clientId_' + index;
@@ -113,6 +114,7 @@ describe( 'full post content fixture', () => {
 				/* eslint-disable no-console */
 				console.warn.mockReset();
 				console.error.mockReset();
+				console.info.mockReset();
 				/* eslint-enable no-console */
 			}
 

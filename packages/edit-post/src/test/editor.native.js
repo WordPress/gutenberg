@@ -3,6 +3,8 @@
  */
 import RNReactNativeGutenbergBridge from 'react-native-gutenberg-bridge';
 import { mount } from 'enzyme';
+import { act } from 'react-dom/test-utils';
+
 /**
  * WordPress dependencies
  */
@@ -28,9 +30,14 @@ describe( 'Editor', () => {
 	beforeAll( registerCoreBlocks );
 
 	it( 'detects unsupported block and sends hasUnsupportedBlocks true to native', () => {
+		jest.useFakeTimers();
 		RNReactNativeGutenbergBridge.editorDidMount = jest.fn();
 
 		const appContainer = renderEditorWith( unsupportedBlock );
+		// for some reason resetEditorBlocks() is asynchronous when dispatching editEntityRecord
+		act( () => {
+			jest.runAllTicks();
+		} );
 		appContainer.unmount();
 
 		expect( RNReactNativeGutenbergBridge.editorDidMount ).toHaveBeenCalledTimes( 1 );

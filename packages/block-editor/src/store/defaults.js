@@ -31,6 +31,7 @@ export const PREFERENCES_DEFAULTS = {
  *  __experimentalCanUserUseUnfilteredHTML string        Whether the user should be able to use unfiltered HTML or the HTML should be filtered e.g., to remove elements considered insecure like iframes.
  *  __experimentalEnableLegacyWidgetBlock  boolean       Whether the user has enabled the Legacy Widget Block
  *  __experimentalEnableMenuBlock          boolean       Whether the user has enabled the Menu Block
+ *  __experimentalBlockDirectory           boolean       Whether the user has enabled the Block Directory
  */
 export const SETTINGS_DEFAULTS = {
 	alignWide: false,
@@ -150,5 +151,81 @@ export const SETTINGS_DEFAULTS = {
 	__experimentalCanUserUseUnfilteredHTML: false,
 	__experimentalEnableLegacyWidgetBlock: false,
 	__experimentalEnableMenuBlock: false,
+	__experimentalBlockDirectory: false,
+	gradients: [
+		{
+			name: __( 'Vivid cyan blue to vivid purple' ),
+			gradient: 'linear-gradient(135deg, rgba(6, 147, 227, 1) 0%, rgb(155, 81, 224) 100%)',
+		},
+		{
+			name: __( 'Vivid green cyan to vivid cyan blue' ),
+			gradient: 'linear-gradient(135deg, rgba(0, 208, 132, 1) 0%, rgba(6, 147, 227, 1) 100%)',
+		},
+		{
+			name: __( 'Light green cyan to vivid green cyan' ),
+			gradient: 'linear-gradient(135deg, rgb(122, 220, 180) 0%, rgb(0, 208, 130) 100%)',
+		},
+		{
+			name: __( 'Luminous vivid amber to luminous vivid orange' ),
+			gradient: 'linear-gradient(135deg, rgba(252, 185, 0, 1) 0%, rgba(255, 105, 0, 1) 100%)',
+		},
+		{
+			name: __( 'Luminous vivid orange to vivid red' ),
+			gradient: 'linear-gradient(135deg, rgba(255, 105, 0, 1) 0%, rgb(207, 46, 46) 100%)',
+		},
+		{
+			name: __( 'Very light gray to cyan bluish gray' ),
+			gradient: 'linear-gradient(135deg, rgb(238, 238, 238) 0%, rgb(169, 184, 195)',
+		},
+		// The following use new, customized colors.
+		{
+			name: __( 'Cool to warm spectrum' ),
+			gradient: 'linear-gradient(135deg, rgb(74, 234, 220), rgb(151, 120, 209), rgb(207, 42, 186), rgb(238, 44, 130), rgb(251, 105, 98),rgb(254, 248, 76)',
+		},
+		{
+			name: __( 'Blush light purple' ),
+			gradient: 'linear-gradient(135deg, rgb(255, 206, 236), rgb(152, 150, 240)',
+		},
+		{
+			name: __( 'Blush bordeaux' ),
+			gradient: 'linear-gradient(135deg, rgb(254, 205, 165), rgb(254, 45, 45), rgb(107, 0, 62)',
+		},
+		{
+			name: __( 'Purple crush' ),
+			gradient: 'linear-gradient(135deg, rgb(52, 226, 228), rgb(71, 33, 251), rgb(171, 29, 254)',
+		},
+		{
+			name: __( 'Luminous dusk' ),
+			gradient: 'linear-gradient(135deg, rgb(255, 203, 112), rgb(199, 81, 192), rgb(65, 88, 208)',
+		},
+		{
+			name: __( 'Hazy dawn' ),
+			gradient: 'linear-gradient(135deg, rgb(250, 172, 168), rgb(218, 208, 236)',
+		},
+		{
+			name: __( 'Pale ocean' ),
+			gradient: 'linear-gradient(135deg, rgb(255, 245, 203), rgb(182, 227, 212), rgb(51, 167, 181)',
+		},
+		{
+			name: __( 'Electric grass' ),
+			gradient: 'linear-gradient(135deg, rgb(202, 248, 128), rgb(113, 206, 126)',
+		},
+		{
+			name: __( 'Subdued olive' ),
+			gradient: 'linear-gradient(135deg, rgb(250, 250, 225), rgb(103, 166, 113)',
+		},
+		{
+			name: __( 'Atomic cream' ),
+			gradient: 'linear-gradient(135deg, rgb(253, 215, 154), rgb(0, 74, 89)',
+		},
+		{
+			name: __( 'Nightshade' ),
+			gradient: 'linear-gradient(135deg, rgb(51, 9, 104), rgb(49, 205, 207)',
+		},
+		{
+			name: __( 'Midnight' ),
+			gradient: 'linear-gradient(135deg, rgb(2, 3, 129), rgb(40, 116, 252)',
+		},
+	],
 };
 
