@@ -136,34 +136,34 @@ The class name is built appending 'has-', followed by the class name _using_ keb
 
 ### Block Gradient Presents
 
-Different blocks have the possibility of customizing gradients. The block editor provides a default gradients, but a theme can overwrite it and provide its own:
+Different blocks have the possibility of selecting from a list of predined of gradients. The block editor provides a default gradient presets, but a theme can overwrite them and provide its own:
 
 ```php
 add_theme_support( 'editor-gradient-presets', array(
 	array(
-		'name' => __( 'strong magenta', 'themeLangDomain' ),
-		'slug' => 'strong-magenta',
-		'color' => '#a156b4',
+		'name' => __( 'Vivid cyan blue to vivid purple', 'themeLangDomain' ),
+		'gradient' => 'linear-gradient(135deg, rgba(6, 147, 227, 1) 0%, rgb(155, 81, 224) 100%)',
 	),
 	array(
-		'name' => __( 'light grayish magenta', 'themeLangDomain' ),
-		'slug' => 'light-grayish-magenta',
-		'color' => '#d0a5db',
+		'name' => __( 'Vivid green cyan to vivid cyan blue', 'themeLangDomain' ),
+		'gradient' => 'linear-gradient(135deg, rgba(0, 208, 132, 1) 0%, rgba(6, 147, 227, 1) 100%)',
 	),
 	array(
-		'name' => __( 'very light gray', 'themeLangDomain' ),
-		'slug' => 'very-light-gray',
-		'color' => '#eee',
+		'name' => __( 'Light green cyan to vivid green cyan', 'themeLangDomain' ),
+		'gradient' => 'linear-gradient(135deg, rgb(122, 220, 180) 0%, rgb(0, 208, 130) 100%)',
 	),
 	array(
-		'name' => __( 'very dark gray', 'themeLangDomain' ),
-		'slug' => 'very-dark-gray',
-		'color' => '#444',
+		'name' => __( 'Luminous vivid amber to luminous vivid orange', 'themeLangDomain' ),
+		'gradient' => 'linear-gradient(135deg, rgba(252, 185, 0, 1) 0%, rgba(255, 105, 0, 1) 100%)',
+	),
+	array(
+		'name' => __( 'Luminous vivid orange to vivid red', 'themeLangDomain' ),
+		'gradient' => 'linear-gradient(135deg, rgba(255, 105, 0, 1) 0%, rgb(207, 46, 46) 100%)',
 	),
 ) );
 ```
 
-`name` is a human-readable label (demonstrated above) that appears in the tooltip and provides a meaningful description of the color to users. It is especially important for those who rely on screen readers or would otherwise have difficulty perceiving the color. `slug` is a unique identifier for the color and is used to generate the CSS classes used by the block editor color palette. `color` is the hexadecimal code to specify the color.
+`name` is a human-readable label (demonstrated above) that appears in the tooltip and provides a meaningful description of the gradient to users. It is especially important for those who rely on screen readers or would otherwise have difficulty perceiving the color. `gradient` is a CSS value of a gradient applied to a background-image of the block. Details of valid gradient types can be found in the [mozilla documentation](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Images/Using_CSS_gradients).
 
 
 ### Block Font Sizes:
