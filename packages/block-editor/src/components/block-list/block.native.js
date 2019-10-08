@@ -115,6 +115,7 @@ class BlockListBlock extends Component {
 			showTitle,
 			title,
 			showFloatingToolbar,
+			parentId,
 		} = this.props;
 
 		const borderColor = isSelected ? focusedBorderColor : 'transparent';
@@ -163,13 +164,17 @@ export default compose( [
 	withSelect( ( select, { clientId, rootClientId } ) => {
 		const {
 			getBlockIndex,
+			getBlocks,
 			isBlockSelected,
 			__unstableGetBlockWithoutInnerBlocks,
 			getBlockHierarchyRootClientId,
 			getBlock,
+			getBlockRootClientId,
+			getSelectedBlock,
 		} = select( 'core/block-editor' );
 		const order = getBlockIndex( clientId, rootClientId );
 		const isSelected = isBlockSelected( clientId );
+		const isLastBlock = order === getBlocks().length - 1;
 		const block = __unstableGetBlockWithoutInnerBlocks( clientId );
 		const { name, attributes, isValid } = block || {};
 		const blockType = getBlockType( name || 'core/missing' );
@@ -177,11 +182,18 @@ export default compose( [
 		const icon = blockType.icon;
 		const getAccessibilityLabelExtra = blockType.__experimentalGetAccessibilityLabel;
 
+		const selectedBlock = getSelectedBlock();
+		const parentId = getBlockRootClientId( clientId );
+		const parentBlock = getBlock( parentId );
+
+		const isMediaText = selectedBlock && selectedBlock.name === 'core/media-text';
+		const isMediaTextParent = parentBlock && parentBlock.name === 'core/media-text';
+
 		const rootBlockId = getBlockHierarchyRootClientId( clientId );
 		const rootBlock = getBlock( rootBlockId );
 		const hasRootInnerBlocks = rootBlock.innerBlocks.length !== 0;
 
-		const showFloatingToolbar = isSelected && hasRootInnerBlocks;
+		const showFloatingToolbar = isSelected && hasRootInnerBlocks && ! isMediaText && ! isMediaTextParent;
 
 		return {
 			icon,
@@ -190,10 +202,12 @@ export default compose( [
 			title,
 			attributes,
 			blockType,
+			isLastBlock,
 			isSelected,
 			isValid,
 			getAccessibilityLabelExtra,
 			showFloatingToolbar,
+			parentId,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {
