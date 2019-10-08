@@ -134,6 +134,38 @@ Themes are responsible for creating the classes that apply the colors in differe
 
 The class name is built appending 'has-', followed by the class name _using_ kebab case and ending with the context name.
 
+### Block Gradient Presents
+
+Different blocks have the possibility of customizing gradients. The block editor provides a default gradients, but a theme can overwrite it and provide its own:
+
+```php
+add_theme_support( 'editor-gradient-presets', array(
+	array(
+		'name' => __( 'strong magenta', 'themeLangDomain' ),
+		'slug' => 'strong-magenta',
+		'color' => '#a156b4',
+	),
+	array(
+		'name' => __( 'light grayish magenta', 'themeLangDomain' ),
+		'slug' => 'light-grayish-magenta',
+		'color' => '#d0a5db',
+	),
+	array(
+		'name' => __( 'very light gray', 'themeLangDomain' ),
+		'slug' => 'very-light-gray',
+		'color' => '#eee',
+	),
+	array(
+		'name' => __( 'very dark gray', 'themeLangDomain' ),
+		'slug' => 'very-dark-gray',
+		'color' => '#444',
+	),
+) );
+```
+
+`name` is a human-readable label (demonstrated above) that appears in the tooltip and provides a meaningful description of the color to users. It is especially important for those who rely on screen readers or would otherwise have difficulty perceiving the color. `slug` is a unique identifier for the color and is used to generate the CSS classes used by the block editor color palette. `color` is the hexadecimal code to specify the color.
+
+
 ### Block Font Sizes:
 
 Blocks may allow the user to configure the font sizes they use, e.g., the paragraph block. The block  provides a default set of font sizes, but a theme can overwrite it and provide its own:
