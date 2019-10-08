@@ -447,7 +447,7 @@ describe( 'List', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	it( 'should preserve indentation after merge', async () => {
+	it( 'should preserve indentation after merging backward and forward', async () => {
 		await clickBlockAppender();
 
 		// Tests the shortcut with a non breaking space.
@@ -462,8 +462,19 @@ describe( 'List', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'Enter' );
 
-		// Merge the pragraph back.
+		// Merge the pragraph back. No list items should be joined.
 		await page.keyboard.press( 'Backspace' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		// Again create a new paragraph.
+		await page.keyboard.press( 'Enter' );
+
+		// Move to the end of the list.
+		await page.keyboard.press( 'ArrowLeft' );
+
+		// Merge forward. No list items should be joined.
+		await page.keyboard.press( 'Delete' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );

@@ -102,10 +102,14 @@ export default {
 			const selectedBlock = clientId === clientIdA ? cloneA : cloneB;
 			const html = selectedBlock.attributes[ attributeKey ];
 			const selectedBlockType = clientId === clientIdA ? blockAType : blockBType;
-			const multilineTag = selectedBlockType.attributes[ attributeKey ].multiline;
+			const {
+				multiline: multilineTag,
+				__unstableMultilineWrapperTags: multilineWrapperTags,
+			} = selectedBlockType.attributes[ attributeKey ];
 			const value = insert( create( {
 				html,
 				multilineTag,
+				multilineWrapperTags,
 			} ), START_OF_SELECTED_AREA, offset, offset );
 
 			selectedBlock.attributes[ attributeKey ] = toHTMLString( {
