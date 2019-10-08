@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-import { Image as RNImage } from 'react-native';
+import { Image as RNImage, View } from 'react-native';
 
 /**
  * WordPress dependencies
  */
-import { forwardRef } from '@wordpress/element';
+import { forwardRef, useEffect } from '@wordpress/element';
 
-export function Image( { src, alt, ...additionalProps }, ref ) {
+export function Image( { src, alt, style, ...additionalProps }, ref ) {
 	if ( ! src ) {
 		return null;
 	}
@@ -17,13 +17,28 @@ export function Image( { src, alt, ...additionalProps }, ref ) {
 		uri: src,
 	};
 
+	const [ aspectRatio, setAspectRatio ] = useState(1);
+    useEffect( () => {
+        RNImage.getSize( src, ( width, height ) => {
+            setAspectRatio( width / height );
+        } );
+	}, [ src, setAspectRatio ] );
+
+	const containerStyle = {
+		flex: 1,
+		aspectRatio,
+	};
+
 	return (
-		<RNImage
-			ref={ ref }
-			accessibilityLabel={ alt }
-			source={ source }
-			{ ...additionalProps }
-		/>
+		<View style={ [ containerStyle, style] }>
+			<RNImage
+				ref={ ref }
+				accessibilityLabel={ alt }
+				source={ source }
+				style={ { flex: 1 } }
+				{ ...additionalProps }
+			/>
+		</View>
 	);
 }
 
