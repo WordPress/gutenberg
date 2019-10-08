@@ -136,8 +136,15 @@ export default {
 				typeof v === 'string' && v.indexOf( START_OF_SELECTED_AREA ) !== -1
 			);
 			const convertedHtml = updatedAttributes[ newAttributeKey ];
-			const multilineTag = blockAType.attributes[ newAttributeKey ].multiline;
-			const convertedValue = create( { html: convertedHtml, multilineTag } );
+			const {
+				multiline: multilineTag,
+				__unstableMultilineWrapperTags: multilineWrapperTags,
+			} = blockAType.attributes[ newAttributeKey ];
+			const convertedValue = create( {
+				html: convertedHtml,
+				multilineTag,
+				multilineWrapperTags,
+			} );
 			const newOffset = convertedValue.text.indexOf( START_OF_SELECTED_AREA );
 			const newValue = remove( convertedValue, newOffset, newOffset + 1 );
 			const newHtml = toHTMLString( { value: newValue, multilineTag } );
