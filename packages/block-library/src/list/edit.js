@@ -125,7 +125,6 @@ export default function ListEdit( {
 			tagName={ tagName }
 			onChange={ ( nextValues ) => setAttributes( { values: nextValues } ) }
 			value={ values }
-			wrapperClassName="block-library-list"
 			className={ className }
 			placeholder={ __( 'Write list…' ) }
 			onMerge={ mergeBlocks }

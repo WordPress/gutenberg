@@ -468,6 +468,10 @@ class RichTextWrapper extends Component {
 			return content;
 		}
 
+		deprecated( 'wp.blockEditor.RichText wrapperClassName prop', {
+			alternative: 'className prop or create your own wrapper div',
+		} );
+
 		return (
 			<div className={ classnames( wrapperClasses, wrapperClassName ) }>
 				{ content }
