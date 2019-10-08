@@ -17,7 +17,7 @@ export function Image( { src, alt, style, ...additionalProps }, ref ) {
 		uri: src,
 	};
 
-	const [ aspectRatio, setAspectRatio ] = useState(undefined);
+	const [ aspectRatio, setAspectRatio ] = useState();
     useEffect( () => {
         RNImage.getSize( src, ( width, height ) => {
             setAspectRatio( width / height );
