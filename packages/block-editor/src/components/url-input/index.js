@@ -230,7 +230,7 @@ class URLInput extends Component {
 	}
 
 	render() {
-		const { value = '', autoFocus = true, instanceId, className, id, isFullWidth, hasBorder } = this.props;
+		const { value = '', autoFocus = true, instanceId, className, id, isFullWidth, hasBorder, placeholder = __( 'Paste URL or type to search' ) } = this.props;
 		const { showSuggestions, suggestions, selectedSuggestion, loading } = this.state;
 
 		const suggestionsListboxId = `block-editor-url-input-suggestions-${ instanceId }`;
@@ -251,7 +251,7 @@ class URLInput extends Component {
 					value={ value }
 					onChange={ this.onChange }
 					onInput={ stopEventPropagation }
-					placeholder={ __( 'Paste URL or type to search' ) }
+					placeholder={ placeholder }
 					onKeyDown={ this.onKeyDown }
 					role="combobox"
 					aria-expanded={ showSuggestions }
