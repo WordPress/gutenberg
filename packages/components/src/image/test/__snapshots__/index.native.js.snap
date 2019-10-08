@@ -1,0 +1,58 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Image renders an img tag passing any additional props 1`] = `
+<View
+  style={
+    Array [
+      Object {
+        "aspectRatio": 1,
+        "flex": 1,
+      },
+      undefined,
+    ]
+  }
+>
+  <Image
+    accessibilityLabel="WordPress logo"
+    data-id="123"
+    source={
+      Object {
+        "uri": "https://s.w.org/style/images/about/WordPress-logotype-wmark.png",
+      }
+    }
+    style={
+      Object {
+        "flex": 1,
+      }
+    }
+  />
+</View>
+`;
+
+exports[`Image renders an img tag with src and alt 1`] = `
+<View
+  style={
+    Array [
+      Object {
+        "aspectRatio": 1,
+        "flex": 1,
+      },
+      undefined,
+    ]
+  }
+>
+  <Image
+    accessibilityLabel="WordPress logo"
+    source={
+      Object {
+        "uri": "https://s.w.org/style/images/about/WordPress-logotype-wmark.png",
+      }
+    }
+    style={
+      Object {
+        "flex": 1,
+      }
+    }
+  />
+</View>
+`;
