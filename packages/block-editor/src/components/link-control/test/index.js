@@ -51,10 +51,10 @@ describe( 'Basic rendering', () => {
 		} );
 
 		// Search Input UI
-		const searchInputLabel = Array.from( container.querySelectorAll( 'label' ) ).find( ( label ) => label.innerText === 'Search or input url' );
-		const searchInput = container.querySelector( 'input[type="url"]' );
+		// const searchInputLabel = Array.from( container.querySelectorAll( 'label' ) ).find( ( label ) => label.innerText === 'Search or input url' );
+		const searchInput = container.querySelector( 'input[aria-label="URL"]' );
 
-		expect( searchInputLabel ).not.toBeNull();
+		// expect( searchInputLabel ).not.toBeNull();
 		expect( searchInput ).not.toBeNull();
 	} );
 
@@ -71,6 +71,6 @@ describe( 'Basic rendering', () => {
 			Simulate.click( openIconButton );
 		} );
 
-		expect( openIconButton.nextSibling.innerHTML ).toEqual( expect.stringMatching( 'Search or input url' ) );
+		expect( openIconButton.nextSibling.innerHTML ).toEqual( expect.stringMatching( 'Paste URL or type to search' ) );
 	} );
 } );

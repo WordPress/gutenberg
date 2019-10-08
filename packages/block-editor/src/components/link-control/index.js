@@ -10,8 +10,18 @@ import { __ } from '@wordpress/i18n';
 import {
 	useCallback,
 	useState,
+	useRef,
 	Fragment,
 } from '@wordpress/element';
+
+import {
+	LEFT,
+	RIGHT,
+	UP,
+	DOWN,
+	BACKSPACE,
+	ENTER,
+} from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -20,12 +30,13 @@ import {
 	URLPopover,
 } from '../';
 
-import { withInstanceId } from '@wordpress/compose';
-
-function LinkControl( { instanceId, defaultOpen = false } ) {
+function LinkControl( { defaultOpen = false } ) {
 	// State
 	const [ isOpen, setIsOpen ] = useState( defaultOpen );
 	const [ inputValue, setInputValue ] = useState( '' );
+
+	// Refs
+	const autocompleteRef = useRef( null );
 
 	// Effects
 	const openLinkUI = useCallback( () => {
@@ -33,11 +44,24 @@ function LinkControl( { instanceId, defaultOpen = false } ) {
 	} );
 
 	// Handlers
-	const onInputChange = ( event ) => {
-		setInputValue( event.target.value );
+	const onInputChange = ( value = '' ) => {
+		setInputValue( value );
 	};
 
-	const inputId = `link-control-search-input-${ instanceId }`;
+	const onSubmitLinkChange = ( value ) => {
+		setInputValue( value );
+	};
+
+	const stopPropagation = ( event ) => {
+		event.stopPropagation();
+	};
+
+	const stopPropagationRelevantKeys = ( event ) => {
+		if ( [ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ].indexOf( event.keyCode ) > -1 ) {
+			// Stop the key event from propagating up to ObserveTyping.startTypingInTextField.
+			event.stopPropagation();
+		}
+	};
 
 	return (
 		<Fragment>
@@ -51,10 +75,25 @@ function LinkControl( { instanceId, defaultOpen = false } ) {
 			{ isOpen && (
 
 				<URLPopover>
-					<form onSubmit={ onInputChange }>
-						<label htmlFor={ inputId }>{ __( 'Search or input url' ) }</label>
-						<input id={ inputId } className="link-control__search-input" type="url" value={ inputValue } onChange={ onInputChange } />
-					</form>
+					<div className="link-control__popover-inner">
+						<div className="link-control__search">
+							<URLPopover.LinkEditor
+								className="link-control__search-input"
+								value={ inputValue }
+								onChangeInputValue={ onInputChange }
+								onKeyDown={ stopPropagationRelevantKeys }
+								onKeyPress={ stopPropagation }
+								onSubmit={ onSubmitLinkChange }
+								autocompleteRef={ autocompleteRef }
+							/>
+							<IconButton
+								icon="no-alt"
+								className="link-control__search-reset"
+								label={ __( 'Reset url input' ) }
+								onClick={ () => onInputChange() }
+							/>
+						</div>
+					</div>
 				</URLPopover>
 
 			) }
@@ -62,4 +101,4 @@ function LinkControl( { instanceId, defaultOpen = false } ) {
 	);
 }
 
-export default withInstanceId( LinkControl );
+export default LinkControl;

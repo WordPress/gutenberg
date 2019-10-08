@@ -1,0 +1,22 @@
+.link-control__popover-inner {
+	padding: 20px;
+}
+
+.link-control__search {
+	position: relative;
+}
+
+.link-control__search-input {
+	border: 1px solid #000;
+	padding-right: 36px; // width of reset button
+
+	.components-button {
+		display: none;
+	}
+}
+
+.link-control__search-reset {
+	position: absolute;
+	top: 0;
+	right: 0;
+}
