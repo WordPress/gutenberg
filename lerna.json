@@ -7,7 +7,7 @@
 	"ignoreChanges": [
 		"**/benchmark/*.js",
 		"**/CHANGELOG.md",
-		"**/test/**",
+		"**/{__mocks__,__tests__,test}/**",
 		"**/{storybook,stories}/**"
 	],
 	"packages": [
