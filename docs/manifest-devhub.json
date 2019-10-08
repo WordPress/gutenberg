@@ -444,12 +444,6 @@
 		"parent": "block-tutorial"
 	},
 	{
-		"title": "Nested Blocks: Using InnerBlock",
-		"slug": "nested-blocks-inner-blocks",
-		"markdown_source": "../docs/designers-developers/developers/tutorials/block-tutorial/nested-blocks-inner-blocks.md",
-		"parent": "block-tutorial"
-	},
-	{
 		"title": "Creating dynamic blocks",
 		"slug": "creating-dynamic-blocks",
 		"markdown_source": "../docs/designers-developers/developers/tutorials/block-tutorial/creating-dynamic-blocks.md",
@@ -459,6 +453,12 @@
 		"title": "Generate Blocks with WP-CLI",
 		"slug": "generate-blocks-with-wp-cli",
 		"markdown_source": "../docs/designers-developers/developers/tutorials/block-tutorial/generate-blocks-with-wp-cli.md",
+		"parent": "block-tutorial"
+	},
+	{
+		"title": "Nested Blocks: Using InnerBlocks",
+		"slug": "nested-blocks-inner-blocks",
+		"markdown_source": "../docs/designers-developers/developers/tutorials/block-tutorial/nested-blocks-inner-blocks.md",
 		"parent": "block-tutorial"
 	},
 	{
