@@ -9,6 +9,13 @@
 	padding-bottom: 12px;
 }
 
+.blockContainerInner {
+	margin-left: 0;
+	margin-right: 0;
+	padding-left: 0;
+	padding-right: 0;
+}
+
 .blockContainerDimmed {
 	opacity: 0.2;
 }
@@ -24,18 +31,17 @@
 	padding-right: 6px;
 	padding-top: 6px;
 	padding-bottom: 6px;
-	padding-bottom: 6px;
-	margin-right: 0px;
-	margin-left: 0px;
+	margin-right: 0;
+	margin-left: 0;
 	margin-bottom: 5px;
 	margin-top: 5px;
 	border-radius: 2px;
 }
 
 .selectedInnerGroup {
-	padding-top: 0px;
-	margin-left: 0px;
-	margin-right: 0px;
+	padding-top: 0;
+	margin-left: 0;
+	margin-right: 0;
 }
 
 .margin {
@@ -43,10 +49,17 @@
 	margin-right: 9px;
 }
 
+.marginInnerGroup {
+	margin-left: 0;
+	margin-right: 0;
+	padding-left: 0;
+	padding-right: 0;
+}
+
 .padding {
-	padding-left: 0px;
-	padding-right: 0px;
-	padding-top: 0px;
+	padding-left: 0;
+	padding-right: 0;
+	padding-top: 0;
 }
 
 .dashedBorderStyle {

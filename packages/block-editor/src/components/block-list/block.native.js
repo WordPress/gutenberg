@@ -122,6 +122,10 @@ class BlockListBlock extends Component {
 			isDashed,
 			isDimmed,
 			isGroup,
+			isInnerBlock,
+			isChildOfSameRootBlook,
+			isNestedInnerBlock,
+			isGroupType,
 		} = this.props;
 
 		const borderColor = isSelected ? focusedBorderColor : 'transparent';
@@ -153,11 +157,18 @@ class BlockListBlock extends Component {
 						<View
 							accessibilityLabel={ accessibilityLabel }
 							style={ [ 
-								! isSelected && ( isDashed ? styles.blockHolderDashedBordered : styles.blockContainer ), 
-								! isSelected && isGroup &&  !parentId && styles.selectedInnerGroup,
+								! isSelected && ( isDashed ? styles.blockHolderDashedBordered : isNestedInnerBlock && !isDimmed ? styles.blockContainerInner : styles.blockContainer), 
+								! isSelected &&  isDashed  && isNestedInnerBlock && styles.blockContainerInner,
+								! isSelected && isGroup && !parentId && styles.selectedInnerGroup,
+								! isSelected && isInnerBlock && !isChildOfSameRootBlook && !isDashed && styles.marginInnerGroup , 
+								! isSelected && isNestedInnerBlock && !isDimmed && styles.blockContainerInner,
+								! isSelected && isNestedInnerBlock && {paddingLeft: 0},
 								isDimmed && styles.blockContainerDimmed, 
 								isSelected && ( parentId ? styles.innerBlockContainerFocused : styles.blockContainerFocused ),
-								isSelected && isGroup && !parentId && styles.padding
+								isSelected && isGroup && !parentId && styles.padding,
+								isSelected && isNestedInnerBlock && styles.marginInnerGroup,
+								isSelected && isGroupType && styles.marginInnerGroup,
+
 							] }
 						>
 							{ isValid && this.getBlockForType() }
@@ -221,7 +232,11 @@ export default compose( [
 		const isDashed = selectedBlockClientId === parentId;
 		const isDimmed = ! isSelected && ! isRootSiblingsSelected && !! selectedBlockClientId && firstToSelect === clientId && ! isDashed;
 
-		const parentId = getBlockRootClientId( clientId );
+		const isInnerBlock = parentId && firstToSelect !== parentId
+		const isChildOfSameRootBlook = rootBlockId === getBlockHierarchyRootClientId( selectedBlockClientId )
+		const isNestedInnerBlock = !isDashed && rootBlockId === getBlockRootClientId( firstToSelect )
+		const isGroup = hasRootInnerBlocks; //blockType ==='core/group'; 
+		const isGroupType = blockType.name === 'core/group'
 
 		return {
 			icon,
@@ -240,7 +255,11 @@ export default compose( [
 			isDashed,
 			isDimmed,
 			firstToSelect,
-			parentId,
+			isGroup,
+			isInnerBlock,
+			isChildOfSameRootBlook,
+			isNestedInnerBlock,
+			isGroupType,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {
