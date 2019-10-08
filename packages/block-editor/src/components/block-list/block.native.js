@@ -151,20 +151,30 @@ class BlockListBlock extends Component {
 					accessible={ ! isSelected }
 					accessibilityRole={ 'button' }
 				>
-					<View style={ [
-						styles.blockHolder,
-						borderStyle,
+					<View style={ [ 
+						styles.blockHolder, 
+						borderStyle, 
 						isGroupType && isSelected && styles.margin,
-						isDashed && styles.dashedBorderStyle,
-						{ borderColor },
-					]
-					}>
+						isDashed && styles.dashedBorderStyle, 
+						{ borderColor } 
+						] 
+						}>
 						{ showTitle && this.renderBlockTitle() }
 						<View
 							accessibilityLabel={ accessibilityLabel }
-							style={ [ ! isSelected && ( isDashed ? styles.blockHolderDashedBordered : styles.blockContainer ),
-								isDimmed && styles.blockContainerDimmed,
-								isSelected && styles.blockContainerFocused,
+							style={ [ 
+								! isSelected && ( isDashed ? styles.blockHolderDashedBordered : isNestedInnerBlock && !isDimmed ? styles.blockContainerInner : styles.blockContainer), 
+								! isSelected &&  isDashed  && isNestedInnerBlock && styles.blockContainerInner,
+								! isSelected && isGroup && !parentId && styles.selectedInnerGroup,
+								! isSelected && isInnerBlock && !isChildOfSameRootBlook && !isDashed && styles.marginInnerGroup , 
+								! isSelected && isNestedInnerBlock && !isDimmed && styles.blockContainerInner,
+								! isSelected && isNestedInnerBlock && {paddingLeft: 0},
+								isDimmed && styles.blockContainerDimmed, 
+								isSelected && ( parentId ? styles.innerBlockContainerFocused : styles.blockContainerFocused ),
+								isSelected && isGroup && !parentId && styles.padding,
+								isSelected && isNestedInnerBlock && styles.marginInnerGroup,
+								isSelected && isGroupType && styles.marginInnerGroup,
+
 							] }
 						>
 							{ isValid && this.getBlockForType() }
