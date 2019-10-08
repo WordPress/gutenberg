@@ -3,6 +3,7 @@
  */
 import memize from 'memize';
 import { size, map, without } from 'lodash';
+import { subscribeSetFocusOnTitle } from 'react-native-gutenberg-bridge';
 
 /**
  * WordPress dependencies
@@ -31,6 +32,8 @@ class Editor extends Component {
 		this.getEditorSettings = memize( this.getEditorSettings, {
 			maxSize: 1,
 		} );
+
+		this.setTitleRef = this.setTitleRef.bind( this );
 	}
 
 	getEditorSettings(
@@ -66,6 +69,24 @@ class Editor extends Component {
 		return settings;
 	}
 
+	componentDidMount() {
+		this.subscriptionParentSetFocusOnTitle = subscribeSetFocusOnTitle( () => {
+			if ( this.postTitleRef ) {
+				this.postTitleRef.focus();
+			}
+		} );
+	}
+
+	componentWillUnmount() {
+		if ( this.subscriptionParentSetFocusOnTitle ) {
+			this.subscriptionParentSetFocusOnTitle.remove();
+		}
+	}
+
+	setTitleRef( titleRef ) {
+		this.postTitleRef = titleRef;
+	}
+
 	render() {
 		const {
 			settings,
@@ -97,7 +118,9 @@ class Editor extends Component {
 				// For now, let's assume: serialize( parse( html ) ) !== html
 				raw: serialize( parse( props.initialHtml || '' ) ),
 			},
-			type: 'draft',
+			type: 'post',
+			status: 'draft',
+			meta: [],
 		};
 
 		return (

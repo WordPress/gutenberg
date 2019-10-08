@@ -181,6 +181,14 @@ export const EXPECTED_TRANSFORMS = {
 		originalBlock: 'Group',
 		availableTransforms: [],
 	},
+	'core__heading__h2-color': {
+		originalBlock: 'Heading',
+		availableTransforms: [
+			'Quote',
+			'Group',
+			'Paragraph',
+		],
+	},
 	'core__heading__h4-em': {
 		originalBlock: 'Heading',
 		availableTransforms: [

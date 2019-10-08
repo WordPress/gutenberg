@@ -20,5 +20,6 @@ export const settings = {
 	supports: {
 		align: true,
 	},
+	example: {},
 	edit,
 };

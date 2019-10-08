@@ -183,4 +183,14 @@ export default {
 
 		return resetBlocks( updatedBlockList );
 	},
+	MARK_AUTOMATIC_CHANGE( action, store ) {
+		const {
+			setTimeout,
+			requestIdleCallback = ( callback ) => setTimeout( callback, 100 ),
+		} = window;
+
+		requestIdleCallback( () => {
+			store.dispatch( { type: 'MARK_AUTOMATIC_CHANGE_FINAL' } );
+		} );
+	},
 };

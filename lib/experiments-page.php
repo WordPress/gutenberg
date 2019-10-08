@@ -9,10 +9,8 @@
  * The main entry point for the Gutenberg experiments page.
  *
  * @since 6.3.0
- *
- * @param string $page The page name the function is being called for, `'gutenberg_customizer'` for the Customizer.
  */
-function the_gutenberg_experiments( $page = 'gutenberg_page_gutenberg-experiments' ) {
+function the_gutenberg_experiments() {
 	?>
 	<div
 		id="experiments-editor"
@@ -75,6 +73,17 @@ function gutenberg_initialize_experiments_settings() {
 			'id'    => 'gutenberg-block-directory',
 		)
 	);
+	add_settings_field(
+		'gutenberg-full-site-editing',
+		__( 'Full Site Editing', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Enable Full Site Editing', 'gutenberg' ),
+			'id'    => 'gutenberg-full-site-editing',
+		)
+	);
 	register_setting(
 		'gutenberg-experiments',
 		'gutenberg-experiments'
@@ -126,6 +135,7 @@ function gutenberg_experiments_editor_settings( $settings ) {
 		'__experimentalEnableLegacyWidgetBlock' => $experiments_exist ? array_key_exists( 'gutenberg-widget-experiments', get_option( 'gutenberg-experiments' ) ) : false,
 		'__experimentalEnableMenuBlock'         => $experiments_exist ? array_key_exists( 'gutenberg-menu-block', get_option( 'gutenberg-experiments' ) ) : false,
 		'__experimentalBlockDirectory'          => $experiments_exist ? array_key_exists( 'gutenberg-block-directory', get_option( 'gutenberg-experiments' ) ) : false,
+		'__experimentalEnableFullSiteEditing'   => $experiments_exist ? array_key_exists( 'gutenberg-full-site-editing', get_option( 'gutenberg-experiments' ) ) : false,
 
 	);
 	return array_merge( $settings, $experiments_settings );

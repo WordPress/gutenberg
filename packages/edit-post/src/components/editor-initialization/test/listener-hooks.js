@@ -137,10 +137,11 @@ describe( 'listener hook tests', () => {
 				getSpyedFunction( STORE_KEY, 'closeGeneralSidebar' )
 			).not.toHaveBeenCalled();
 		} );
-		it( 'closes sidebar if viewport is small and there is an active ' +
-			'sidebar name available', () => {
+		it( 'does not close sidebar if viewport is small and there is an active ' +
+			'sidebar name available on initial render', () => {
 			setMockReturnValue( 'core/viewport', 'isViewportMatch', true );
 			setMockReturnValue( STORE_KEY, 'getActiveGeneralSidebarName', 'foo' );
+			// initial render does nothing (and sidebar will be closed already)
 			act( () => {
 				renderComponent( useAdjustSidebarListener, 10 );
 			} );
@@ -149,22 +150,53 @@ describe( 'listener hook tests', () => {
 			).not.toHaveBeenCalled();
 			expect(
 				getSpyedFunction( STORE_KEY, 'closeGeneralSidebar' )
-			).toHaveBeenCalledTimes( 1 );
+			).not.toHaveBeenCalled();
 		} );
-		it( 'opens sidebar if viewport is not small, and there is a cached sidebar to ' +
-			'reopen on expand', () => {
-			setMockReturnValue( 'core/viewport', 'isViewportMatch', true );
+		it( 'closes sidebar if viewport is small and there is an active ' +
+			'sidebar name available when viewport size changes', () => {
+			setMockReturnValue( 'core/viewport', 'isViewportMatch', false );
 			setMockReturnValue( STORE_KEY, 'getActiveGeneralSidebarName', 'foo' );
+			// initial render does nothing and sidebar will be open already.
 			act( () => {
 				renderComponent( useAdjustSidebarListener, 10 );
 			} );
-			setMockReturnValue( 'core/viewport', 'isViewportMatch', false );
+			setMockReturnValue( 'core/viewport', 'isViewportMatch', true );
+			// This render should result in the sidebar closing because viewport is
+			// now small triggering a change.
 			act( () => {
 				subscribeTrigger();
 			} );
 			expect(
 				getSpyedFunction( STORE_KEY, 'openGeneralSidebar' )
-			).toHaveBeenCalledWith( 'foo' );
+			).not.toHaveBeenCalled();
+			expect(
+				getSpyedFunction( STORE_KEY, 'closeGeneralSidebar' )
+			).toHaveBeenCalledTimes( 1 );
+		} );
+		it( 'opens sidebar if viewport is not small, and there is a cached sidebar ' +
+      'to reopen on expand', () => {
+			setMockReturnValue( 'core/viewport', 'isViewportMatch', false );
+			setMockReturnValue( STORE_KEY, 'getActiveGeneralSidebarName', 'foo' );
+			// initial render does nothing and sidebar should be open.
+			act( () => {
+				renderComponent( useAdjustSidebarListener, 10 );
+			} );
+			setMockReturnValue( 'core/viewport', 'isViewportMatch', true );
+			setMockReturnValue( STORE_KEY, 'getActiveGeneralSidebarName', 'bar' );
+			// next render should close the sidebar and active sidebar at time of
+			// closing is cached.
+			act( () => {
+				subscribeTrigger();
+			} );
+			setMockReturnValue( 'core/viewport', 'isViewportMatch', false );
+			setMockReturnValue( STORE_KEY, 'getActiveGeneralSidebarName', '' );
+			// next render should open the sidebar to the cached general sidebar name.
+			act( () => {
+				subscribeTrigger();
+			} );
+			expect(
+				getSpyedFunction( STORE_KEY, 'openGeneralSidebar' )
+			).toHaveBeenCalledWith( 'bar' );
 			expect(
 				getSpyedFunction( STORE_KEY, 'openGeneralSidebar' )
 			).toHaveBeenCalledTimes( 1 );

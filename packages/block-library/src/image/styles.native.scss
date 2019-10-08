@@ -22,11 +22,6 @@
 	color: $alert-red;
 }
 
-.mediaUploadProgress {
-	flex: 1;
-	background-color: $gray-lighten-30;
-}
-
 .modalIcon {
 	width: 80px;
 	height: 80px;
@@ -44,4 +39,8 @@
 	fill: $gray-dark;
 	width: 100%;
 	height: 100%;
+}
+
+.iconDark {
+	fill: $white;
 }

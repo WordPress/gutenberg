@@ -7,6 +7,7 @@ import { keyBy, map, groupBy, flowRight, isEqual, get } from 'lodash';
  * WordPress dependencies
  */
 import { combineReducers } from '@wordpress/data';
+import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
  * Internal dependencies
@@ -303,51 +304,62 @@ export const entities = ( state = {}, action ) => {
  */
 const UNDO_INITIAL_STATE = [];
 UNDO_INITIAL_STATE.offset = 0;
+let lastEditAction;
 export function undo( state = UNDO_INITIAL_STATE, action ) {
 	switch ( action.type ) {
 		case 'EDIT_ENTITY_RECORD':
+		case 'CREATE_UNDO_LEVEL':
+			const isCreateUndoLevel = action.type === 'CREATE_UNDO_LEVEL';
+			if ( isCreateUndoLevel ) {
+				action = lastEditAction;
+			} else {
+				lastEditAction = action;
+			}
+
 			if ( action.meta.isUndo || action.meta.isRedo ) {
 				const nextState = [ ...state ];
 				nextState.offset = state.offset + ( action.meta.isUndo ? -1 : 1 );
 				return nextState;
 			}
 
+			if ( ! action.meta.undo ) {
+				return state;
+			}
+
 			// Transient edits don't create an undo level, but are
 			// reachable in the next meaningful edit to which they
 			// are merged. They are defined in the entity's config.
-			if ( ! Object.keys( action.edits ).some( ( key ) => ! action.transientEdits[ key ] ) ) {
+			if ( ! isCreateUndoLevel && ! Object.keys( action.edits ).some( ( key ) => ! action.transientEdits[ key ] ) ) {
 				const nextState = [ ...state ];
 				nextState.flattenedUndo = { ...state.flattenedUndo, ...action.edits };
 				nextState.offset = state.offset;
 				return nextState;
 			}
 
-			let nextState;
-			if ( state.length === 0 ) {
-				// Create an initial entry so that we can undo to it.
-				nextState = [
-					{
-						kind: action.meta.undo.kind,
-						name: action.meta.undo.name,
-						recordId: action.meta.undo.recordId,
-						edits: { ...state.flattenedUndo, ...action.meta.undo.edits },
-					},
-				];
-				nextState.offset = 0;
-				return nextState;
-			}
-
 			// Clear potential redos, because this only supports linear history.
-			nextState = state.slice( 0, state.offset || undefined );
+			const nextState = state.slice( 0, state.offset || undefined );
 			nextState.offset = 0;
-
-			nextState.push( {
-				kind: action.kind,
-				name: action.name,
-				recordId: action.recordId,
-				edits: { ...action.edits, ...state.flattenedUndo },
-			} );
-
+			nextState.pop();
+			if ( ! isCreateUndoLevel ) {
+				nextState.push( {
+					kind: action.meta.undo.kind,
+					name: action.meta.undo.name,
+					recordId: action.meta.undo.recordId,
+					edits: { ...state.flattenedUndo, ...action.meta.undo.edits },
+				} );
+			}
+			// When an edit is a function it's an optimization to avoid running some expensive operation.
+			// We can't rely on the function references being the same so we opt out of comparing them here.
+			const comparisonUndoEdits = Object.values( action.meta.undo.edits ).filter( ( edit ) => typeof edit !== 'function' );
+			const comparisonEdits = Object.values( action.edits ).filter( ( edit ) => typeof edit !== 'function' );
+			if ( ! isShallowEqual( comparisonUndoEdits, comparisonEdits ) ) {
+				nextState.push( {
+					kind: action.kind,
+					name: action.name,
+					recordId: action.recordId,
+					edits: action.edits,
+				} );
+			}
 			return nextState;
 	}
 

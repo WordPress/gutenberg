@@ -18,6 +18,8 @@ import { metaBoxUpdatesSuccess, requestMetaBoxUpdates } from './actions';
 import { getActiveMetaBoxLocations } from './selectors';
 import { getMetaBoxContainer } from '../utils/meta-boxes';
 
+let saveMetaboxUnsubscribe;
+
 const effects = {
 	SET_META_BOXES_PER_LOCATIONS( action, store ) {
 		// Allow toggling metaboxes panels
@@ -40,8 +42,14 @@ const effects = {
 		//
 		// See: https://github.com/WordPress/WordPress/blob/5.1.1/wp-admin/includes/post.php#L2307-L2309
 		const hasActiveMetaBoxes = select( 'core/edit-post' ).hasMetaBoxes();
+
+		// First remove any existing subscription in order to prevent multiple saves
+		if ( !! saveMetaboxUnsubscribe ) {
+			saveMetaboxUnsubscribe();
+		}
+
 		// Save metaboxes when performing a full save on the post.
-		subscribe( () => {
+		saveMetaboxUnsubscribe = subscribe( () => {
 			const isSavingPost = select( 'core/editor' ).isSavingPost();
 			const isAutosavingPost = select( 'core/editor' ).isAutosavingPost();
 

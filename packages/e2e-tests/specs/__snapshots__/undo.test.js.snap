@@ -1,16 +1,8 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`undo Should undo to expected level intervals 1`] = `
+exports[`undo should immediately create an undo level on typing 1`] = `
 "<!-- wp:paragraph -->
-<p>This</p>
-<!-- /wp:paragraph -->
-
-<!-- wp:paragraph -->
-<p>is</p>
-<!-- /wp:paragraph -->
-
-<!-- wp:paragraph -->
-<p>test</p>
+<p>1</p>
 <!-- /wp:paragraph -->"
 `;
 

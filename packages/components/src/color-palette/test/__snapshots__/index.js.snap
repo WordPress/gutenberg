@@ -100,187 +100,384 @@ exports[`ColorPalette Dropdown .renderToggle should render dropdown content 1`] 
 
 exports[`ColorPalette Dropdown should render it correctly 1`] = `
 <Dropdown
-  className="components-color-palette__custom-color"
+  className="components-circular-option-picker__dropdown-link-action"
   contentClassName="components-color-palette__picker"
   renderContent={[Function]}
   renderToggle={[Function]}
-/>
+>
+  <div
+    className="components-circular-option-picker__dropdown-link-action"
+  >
+    <ForwardRef(Button)
+      aria-expanded={false}
+      aria-label="Custom color picker"
+      isLink={true}
+      onClick={[Function]}
+    >
+      <button
+        aria-expanded={false}
+        aria-label="Custom color picker"
+        className="components-button is-link"
+        onClick={[Function]}
+        type="button"
+      >
+        Custom Color
+      </button>
+    </ForwardRef(Button)>
+  </div>
+</Dropdown>
 `;
 
 exports[`ColorPalette should allow disabling custom color picker 1`] = `
-<div
-  className="components-color-palette"
->
-  <div
-    className="components-color-palette__item-wrapper"
-    key="#f00"
-  >
-    <Tooltip
-      text="red"
-    >
-      <button
+<CircularOptionPicker
+  actions={
+    <React.Fragment>
+      <ButtonAction
+        onClick={[Function]}
+      >
+        Clear
+      </ButtonAction>
+    </React.Fragment>
+  }
+  options={
+    Array [
+      <Option
         aria-label="Color: red"
-        aria-pressed={true}
-        className="components-color-palette__item is-active"
+        isSelected={true}
         onClick={[Function]}
         style={
           Object {
             "color": "#f00",
           }
         }
-        type="button"
-      />
-    </Tooltip>
-    <Dashicon
-      icon="saved"
-    />
-  </div>
-  <div
-    className="components-color-palette__item-wrapper"
-    key="#fff"
-  >
-    <Tooltip
-      text="white"
-    >
-      <button
+        tooltipText="red"
+      />,
+      <Option
         aria-label="Color: white"
-        aria-pressed={false}
-        className="components-color-palette__item"
+        isSelected={false}
         onClick={[Function]}
         style={
           Object {
             "color": "#fff",
           }
         }
-        type="button"
-      />
-    </Tooltip>
-  </div>
-  <div
-    className="components-color-palette__item-wrapper"
-    key="#00f"
-  >
-    <Tooltip
-      text="blue"
-    >
-      <button
+        tooltipText="white"
+      />,
+      <Option
         aria-label="Color: blue"
-        aria-pressed={false}
-        className="components-color-palette__item"
+        isSelected={false}
         onClick={[Function]}
         style={
           Object {
             "color": "#00f",
           }
         }
-        type="button"
-      />
-    </Tooltip>
-  </div>
-  <div
-    className="components-color-palette__custom-clear-wrapper"
-  >
-    <ForwardRef(Button)
-      className="components-color-palette__clear"
-      isDefault={true}
-      isSmall={true}
-      onClick={[Function]}
-      type="button"
-    >
-      Clear
-    </ForwardRef(Button)>
-  </div>
-</div>
+        tooltipText="blue"
+      />,
+    ]
+  }
+/>
 `;
 
 exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
-<div
-  className="components-color-palette"
+<ColorPalette
+  colors={
+    Array [
+      Object {
+        "color": "#f00",
+        "name": "red",
+      },
+      Object {
+        "color": "#fff",
+        "name": "white",
+      },
+      Object {
+        "color": "#00f",
+        "name": "blue",
+      },
+    ]
+  }
+  onChange={[MockFunction]}
+  value="#f00"
 >
-  <div
-    className="components-color-palette__item-wrapper"
-    key="#f00"
+  <CircularOptionPicker
+    actions={
+      <React.Fragment>
+        <DropdownLinkAction
+          buttonProps={
+            Object {
+              "aria-label": "Custom color picker",
+            }
+          }
+          dropdownProps={
+            Object {
+              "contentClassName": "components-color-palette__picker",
+              "renderContent": [Function],
+            }
+          }
+          linkText="Custom Color"
+        />
+        <ButtonAction
+          onClick={[Function]}
+        >
+          Clear
+        </ButtonAction>
+      </React.Fragment>
+    }
+    options={
+      Array [
+        <Option
+          aria-label="Color: red"
+          isSelected={true}
+          onClick={[Function]}
+          style={
+            Object {
+              "color": "#f00",
+            }
+          }
+          tooltipText="red"
+        />,
+        <Option
+          aria-label="Color: white"
+          isSelected={false}
+          onClick={[Function]}
+          style={
+            Object {
+              "color": "#fff",
+            }
+          }
+          tooltipText="white"
+        />,
+        <Option
+          aria-label="Color: blue"
+          isSelected={false}
+          onClick={[Function]}
+          style={
+            Object {
+              "color": "#00f",
+            }
+          }
+          tooltipText="blue"
+        />,
+      ]
+    }
   >
-    <Tooltip
-      text="red"
+    <div
+      className="components-circular-option-picker"
     >
-      <button
+      <Option
         aria-label="Color: red"
-        aria-pressed={true}
-        className="components-color-palette__item is-active"
+        isSelected={true}
+        key="#f00"
         onClick={[Function]}
         style={
           Object {
             "color": "#f00",
           }
         }
-        type="button"
-      />
-    </Tooltip>
-    <Dashicon
-      icon="saved"
-    />
-  </div>
-  <div
-    className="components-color-palette__item-wrapper"
-    key="#fff"
-  >
-    <Tooltip
-      text="white"
-    >
-      <button
+        tooltipText="red"
+      >
+        <div
+          className="components-circular-option-picker__option-wrapper"
+        >
+          <Tooltip
+            text="red"
+          >
+            <button
+              aria-label="Color: red"
+              aria-pressed={true}
+              className="components-circular-option-picker__option is-active"
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onMouseDown={[Function]}
+              onMouseEnter={[Function]}
+              onMouseLeave={[Function]}
+              style={
+                Object {
+                  "color": "#f00",
+                }
+              }
+              type="button"
+            />
+          </Tooltip>
+          <Dashicon
+            icon="saved"
+          >
+            <SVG
+              aria-hidden={true}
+              className="dashicon dashicons-saved"
+              focusable="false"
+              height={20}
+              role="img"
+              viewBox="0 0 20 20"
+              width={20}
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <svg
+                aria-hidden="true"
+                className="dashicon dashicons-saved"
+                focusable="false"
+                height={20}
+                role="img"
+                viewBox="0 0 20 20"
+                width={20}
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <Path
+                  d="M15.3 5.3l-6.8 6.8-2.8-2.8-1.4 1.4 4.2 4.2 8.2-8.2"
+                >
+                  <path
+                    d="M15.3 5.3l-6.8 6.8-2.8-2.8-1.4 1.4 4.2 4.2 8.2-8.2"
+                  />
+                </Path>
+              </svg>
+            </SVG>
+          </Dashicon>
+        </div>
+      </Option>
+      <Option
         aria-label="Color: white"
-        aria-pressed={false}
-        className="components-color-palette__item"
+        isSelected={false}
+        key="#fff"
         onClick={[Function]}
         style={
           Object {
             "color": "#fff",
           }
         }
-        type="button"
-      />
-    </Tooltip>
-  </div>
-  <div
-    className="components-color-palette__item-wrapper"
-    key="#00f"
-  >
-    <Tooltip
-      text="blue"
-    >
-      <button
+        tooltipText="white"
+      >
+        <div
+          className="components-circular-option-picker__option-wrapper"
+        >
+          <Tooltip
+            text="white"
+          >
+            <button
+              aria-label="Color: white"
+              aria-pressed={false}
+              className="components-circular-option-picker__option"
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onMouseDown={[Function]}
+              onMouseEnter={[Function]}
+              onMouseLeave={[Function]}
+              style={
+                Object {
+                  "color": "#fff",
+                }
+              }
+              type="button"
+            />
+          </Tooltip>
+        </div>
+      </Option>
+      <Option
         aria-label="Color: blue"
-        aria-pressed={false}
-        className="components-color-palette__item"
+        isSelected={false}
+        key="#00f"
         onClick={[Function]}
         style={
           Object {
             "color": "#00f",
           }
         }
-        type="button"
-      />
-    </Tooltip>
-  </div>
-  <div
-    className="components-color-palette__custom-clear-wrapper"
-  >
-    <Dropdown
-      className="components-color-palette__custom-color"
-      contentClassName="components-color-palette__picker"
-      renderContent={[Function]}
-      renderToggle={[Function]}
-    />
-    <ForwardRef(Button)
-      className="components-color-palette__clear"
-      isDefault={true}
-      isSmall={true}
-      onClick={[Function]}
-      type="button"
-    >
-      Clear
-    </ForwardRef(Button)>
-  </div>
-</div>
+        tooltipText="blue"
+      >
+        <div
+          className="components-circular-option-picker__option-wrapper"
+        >
+          <Tooltip
+            text="blue"
+          >
+            <button
+              aria-label="Color: blue"
+              aria-pressed={false}
+              className="components-circular-option-picker__option"
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onMouseDown={[Function]}
+              onMouseEnter={[Function]}
+              onMouseLeave={[Function]}
+              style={
+                Object {
+                  "color": "#00f",
+                }
+              }
+              type="button"
+            />
+          </Tooltip>
+        </div>
+      </Option>
+      <div
+        className="components-circular-option-picker__custom-clear-wrapper"
+      >
+        <DropdownLinkAction
+          buttonProps={
+            Object {
+              "aria-label": "Custom color picker",
+            }
+          }
+          dropdownProps={
+            Object {
+              "contentClassName": "components-color-palette__picker",
+              "renderContent": [Function],
+            }
+          }
+          linkText="Custom Color"
+        >
+          <Dropdown
+            className="components-circular-option-picker__dropdown-link-action"
+            contentClassName="components-color-palette__picker"
+            renderContent={[Function]}
+            renderToggle={[Function]}
+          >
+            <div
+              className="components-circular-option-picker__dropdown-link-action"
+            >
+              <ForwardRef(Button)
+                aria-expanded={false}
+                aria-label="Custom color picker"
+                isLink={true}
+                onClick={[Function]}
+              >
+                <button
+                  aria-expanded={false}
+                  aria-label="Custom color picker"
+                  className="components-button is-link"
+                  onClick={[Function]}
+                  type="button"
+                >
+                  Custom Color
+                </button>
+              </ForwardRef(Button)>
+            </div>
+          </Dropdown>
+        </DropdownLinkAction>
+        <ButtonAction
+          onClick={[Function]}
+        >
+          <ForwardRef(Button)
+            className="components-circular-option-picker__clear"
+            isDefault={true}
+            isSmall={true}
+            onClick={[Function]}
+            type="button"
+          >
+            <button
+              className="components-button components-circular-option-picker__clear is-button is-default is-small"
+              onClick={[Function]}
+              type="button"
+            >
+              Clear
+            </button>
+          </ForwardRef(Button)>
+        </ButtonAction>
+      </div>
+    </div>
+  </CircularOptionPicker>
+</ColorPalette>
 `;

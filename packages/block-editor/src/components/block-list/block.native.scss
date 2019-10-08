@@ -3,7 +3,6 @@
 }
 
 .blockContainer {
-	background-color: $white;
 	padding-left: 16px;
 	padding-right: 16px;
 	padding-top: 12px;
@@ -11,7 +10,6 @@
 }
 
 .blockContainerFocused {
-	background-color: $white;
 	padding-left: 16px;
 	padding-right: 16px;
 	padding-top: 12px;
@@ -35,4 +33,21 @@
 
 .blockText {
 	min-height: 50px;
+}
+
+.toolbar {
+	border-left-width: 0;
+	margin-right: auto;
+	padding-left: 2px;
+	height: 44px;
+}
+
+.pipe {
+	margin-top: auto;
+	margin-bottom: auto;
+	margin-left: 2px;
+	height: 28px;
+	width: 1px;
+	background-color: #e9eff3;
+	opacity: 0.4;
 }

@@ -1,5 +1,19 @@
 ## Master
 
+### New Features
+
+- The bundled `webpack` dependency has been updated from requiring `4.8.3` to requiring `^4.41.0` ([#17746](https://github.com/WordPress/gutenberg/pull/17746)).
+
+### Bug Fixes
+
+- Added a temporary workaround for the default config used with `lint-js` command. It uses linting rules for both e2e and unit tests with all files until override files globbing logic is fixed when using `eslint` with `--config` (related [issue](https://github.com/eslint/eslint/issues/11558)).
+
+## 5.0.0 (2019-09-16)
+
+### Breaking Changes
+
+- The bundled `@wordpress/dependency-extraction-webpack-plugin` dependency has been updated to the next major version `^2.0.0`. `start` and `build` scripts save now the generated asset file for each entry point in the new PHP output format.
+
 ## 4.1.0 (2019-09-03)
 
 ### New Features
