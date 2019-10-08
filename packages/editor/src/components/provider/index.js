@@ -108,6 +108,7 @@ class EditorProvider extends Component {
 				'__experimentalBlockDirectory',
 				'__experimentalEnableFullSiteEditing',
 				'showInserterHelpPanel',
+				'gradients',
 			] ),
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalReusableBlocks: reusableBlocks,

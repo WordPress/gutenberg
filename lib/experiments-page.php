@@ -137,6 +137,12 @@ function gutenberg_experiments_editor_settings( $settings ) {
 		'__experimentalEnableFullSiteEditing'   => gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing' ),
 
 	);
+
+	$gradient_presets = current( (array) get_theme_support( 'editor-gradient-presets' ) );
+	if ( false !== $gradient_presets ) {
+		$experiments_settings['gradients'] = $gradient_presets;
+	}
+
 	return array_merge( $settings, $experiments_settings );
 }
 add_filter( 'block_editor_settings', 'gutenberg_experiments_editor_settings' );
