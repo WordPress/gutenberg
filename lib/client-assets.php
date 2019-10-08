@@ -67,6 +67,19 @@ function gutenberg_override_script( &$scripts, $handle, $src, $deps = array(), $
 		$script->deps = $deps;
 		$script->ver  = $ver;
 		$script->args = $in_footer;
+
+		/*
+		 * The script's `group` designation is an indication of whether it is
+		 * to be printed in the header or footer. The behavior here defers to
+		 * the arguments as passed. Specifically, group data is not assigned
+		 * for a script unless it is designated to be printed in the footer.
+		 */
+
+		// See: `wp_register_script` .
+		unset( $script->extra['group'] );
+		if ( $in_footer ) {
+			$script->add_data( 'group', 1 );
+		}
 	} else {
 		$scripts->add( $handle, $src, $deps, $ver, $in_footer );
 	}
@@ -185,18 +198,25 @@ function gutenberg_register_vendor_scripts( &$scripts ) {
 		$scripts,
 		'react',
 		'https://unpkg.com/react@16.9.0/umd/react' . $react_suffix . '.js',
-		array( 'wp-polyfill' )
+		array( 'wp-polyfill' ),
+		'16.9.0',
+		true
 	);
 	gutenberg_register_vendor_script(
 		$scripts,
 		'react-dom',
 		'https://unpkg.com/react-dom@16.9.0/umd/react-dom' . $react_suffix . '.js',
-		array( 'react' )
+		array( 'react' ),
+		'16.9.0',
+		true
 	);
 	gutenberg_register_vendor_script(
 		$scripts,
 		'lodash',
-		'https://unpkg.com/lodash@4.17.15/lodash' . $suffix . '.js'
+		'https://unpkg.com/lodash@4.17.15/lodash' . $suffix . '.js',
+		array(),
+		'4.17.15',
+		true
 	);
 }
 add_action( 'wp_default_scripts', 'gutenberg_register_vendor_scripts' );
@@ -426,7 +446,7 @@ function gutenberg_enqueue_block_editor_assets() {
 		);
 	}
 }
-add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_block_editor_assets', 5 );
+add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_block_editor_assets' );
 
 /**
  * Retrieves a unique and reasonably short and human-friendly filename for a
@@ -464,15 +484,21 @@ function gutenberg_vendor_script_filename( $handle, $src ) {
  * possible, or downloading it if the cached version is unavailable or
  * outdated.
  *
- * @param WP_Scripts $scripts WP_Scripts instance (passed by reference).
- * @param string     $handle  Name of the script.
- * @param string     $src     Full URL of the external script.
- * @param array      $deps    Optional. An array of registered script handles this
- *                            script depends on.
+ * @param WP_Scripts       $scripts   WP_Scripts instance (passed by reference).
+ * @param string           $handle    Name of the script.
+ * @param string           $src       Full URL of the external script.
+ * @param array            $deps      Optional. An array of registered script handles this
+ *                                    script depends on.
+ * @param string|bool|null $ver       Optional. String specifying script version number, if it has one, which is added to the URL
+ *                                    as a query string for cache busting purposes. If version is set to false, a version
+ *                                    number is automatically added equal to current installed WordPress version.
+ *                                    If set to null, no version is added.
+ * @param bool             $in_footer Optional. Whether to enqueue the script before </body> instead of in the <head>.
+ *                                    Default 'false'.
  *
  * @since 0.1.0
  */
-function gutenberg_register_vendor_script( &$scripts, $handle, $src, $deps = array() ) {
+function gutenberg_register_vendor_script( &$scripts, $handle, $src, $deps = array(), $ver = null, $in_footer = false ) {
 	if ( defined( 'GUTENBERG_LOAD_VENDOR_SCRIPTS' ) && ! GUTENBERG_LOAD_VENDOR_SCRIPTS ) {
 		return;
 	}
@@ -502,7 +528,7 @@ function gutenberg_register_vendor_script( &$scripts, $handle, $src, $deps = arr
 		if ( ! $f ) {
 			// Failed to open the file for writing, probably due to server
 			// permissions.  Enqueue the script directly from the URL instead.
-			gutenberg_override_script( $scripts, $handle, $src, $deps, null );
+			gutenberg_override_script( $scripts, $handle, $src, $deps, $ver, $in_footer );
 			return;
 		}
 		fclose( $f );
@@ -515,7 +541,7 @@ function gutenberg_register_vendor_script( &$scripts, $handle, $src, $deps = arr
 			// The request failed. If the file is already cached, continue to
 			// use this file. If not, then unlink the 0 byte file, and enqueue
 			// the script directly from the URL.
-			gutenberg_override_script( $scripts, $handle, $src, $deps, null );
+			gutenberg_override_script( $scripts, $handle, $src, $deps, $ver, $in_footer );
 			unlink( $full_path );
 			return;
 		}
@@ -525,7 +551,8 @@ function gutenberg_register_vendor_script( &$scripts, $handle, $src, $deps = arr
 		$handle,
 		gutenberg_url( 'vendor/' . $filename ),
 		$deps,
-		null
+		$ver,
+		$in_footer
 	);
 }
 
