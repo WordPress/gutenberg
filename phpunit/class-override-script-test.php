@@ -62,7 +62,7 @@ class Override_Script_Test extends WP_UnitTestCase {
 		$this->assertEquals( 'https://example.com/updated', $script->src );
 		$this->assertEquals( array( 'updated-dependency', 'wp-i18n' ), $script->deps );
 		$this->assertEquals( 'updated-version', $script->ver );
-		$this->assertEquals( 1, $script->extra['group'] );
+		$this->assertTrue( $script->args );
 	}
 
 	/**
@@ -84,6 +84,6 @@ class Override_Script_Test extends WP_UnitTestCase {
 		$this->assertEquals( 'https://example.com/', $script->src );
 		$this->assertEquals( array( 'dependency', 'wp-i18n' ), $script->deps );
 		$this->assertEquals( 'version', $script->ver );
-		$this->assertEquals( 1, $script->extra['group'] );
+		$this->assertTrue( $script->args );
 	}
 }

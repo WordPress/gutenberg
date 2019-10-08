@@ -66,19 +66,7 @@ function gutenberg_override_script( &$scripts, $handle, $src, $deps = array(), $
 		$script->src  = $src;
 		$script->deps = $deps;
 		$script->ver  = $ver;
-
-		/*
-		 * The script's `group` designation is an indication of whether it is
-		 * to be printed in the header or footer. The behavior here defers to
-		 * the arguments as passed. Specifically, group data is not assigned
-		 * for a script unless it is designated to be printed in the footer.
-		 */
-
-		// See: `wp_register_script` .
-		unset( $script->extra['group'] );
-		if ( $in_footer ) {
-			$script->add_data( 'group', 1 );
-		}
+		$script->args = $in_footer;
 	} else {
 		$scripts->add( $handle, $src, $deps, $ver, $in_footer );
 	}
