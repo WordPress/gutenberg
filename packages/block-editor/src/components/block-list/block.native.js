@@ -151,7 +151,14 @@ class BlockListBlock extends Component {
 					accessible={ ! isSelected }
 					accessibilityRole={ 'button' }
 				>
-					<View style={ [ styles.blockHolder, borderStyle, { borderColor } ] }>
+					<View style={ [
+						styles.blockHolder,
+						borderStyle,
+						isGroupType && isSelected && styles.margin,
+						isDashed && styles.dashedBorderStyle,
+						{ borderColor },
+					]
+					}>
 						{ showTitle && this.renderBlockTitle() }
 						<View
 							accessibilityLabel={ accessibilityLabel }
