@@ -227,3 +227,11 @@ $block-inserter-search-height: 38px;
 		padding: 10px;
 	}
 }
+
+.block-editor-inserter__preview-content-missing {
+	flex: 1;
+	display: flex;
+	justify-content: center;
+	padding-top: 90px;
+	color: $dark-gray-400;
+}
