@@ -6,7 +6,7 @@ import { Image as RNImage, View } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { forwardRef, useEffect } from '@wordpress/element';
+import { forwardRef, useEffect, useState } from '@wordpress/element';
 
 export function Image( { src, alt, style, ...additionalProps }, ref ) {
 	if ( ! src ) {
