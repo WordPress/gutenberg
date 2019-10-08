@@ -9,6 +9,9 @@ import { uniqueId } from 'lodash';
  * WordPress dependencies
  */
 import { Fragment } from '@wordpress/element';
+import {
+	SelectControl,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -31,13 +34,31 @@ afterEach( () => {
 
 const inputId = uniqueId();
 
-const renderTestDefaultControlComponent = ( label ) => {
+const sizeOptions = [
+	{
+		label: 'Please select',
+		value: '',
+	},
+	{
+		label: 'Small',
+		value: 'small',
+	},
+	{
+		label: 'Medium',
+		value: 'medium',
+	},
+	{
+		label: 'Large',
+		value: 'large',
+	},
+];
+
+const renderTestDefaultControlComponent = ( labelComponent ) => {
 	return (
 		<Fragment>
-			<label htmlFor={ inputId }>{ label }</label>
-			<input
-				id={ inputId }
-				defaultValue={ label }
+			<SelectControl
+				label={ labelComponent }
+				options={ sizeOptions }
 			/>
 		</Fragment>
 	);
@@ -55,11 +76,11 @@ describe( 'Basic rendering', () => {
 			);
 		} );
 
-		const activePropertyLabel = Array.from( container.querySelectorAll( 'legend' ) ).filter( ( legend ) => legend.innerHTML === 'Padding' );
+		const activePropertyLabel = Array.from( container.querySelectorAll( 'legend' ) ).find( ( legend ) => legend.innerHTML === 'Padding' );
 
-		const activeDeviceLabel = Array.from( container.querySelectorAll( 'label' ) ).filter( ( label ) => label.innerHTML.includes( 'All' ) );
+		const activeDeviceLabel = Array.from( container.querySelectorAll( 'label' ) ).find( ( label ) => label.innerHTML.includes( 'All' ) );
 
-		const defaultControl = container.querySelector( 'input[value="All"]' );
+		const defaultControl = container.querySelector( `#${ activeDeviceLabel.getAttribute( 'for' ) }` );
 
 		const toggleLabel = Array.from( container.querySelectorAll( 'label' ) ).filter( ( label ) => label.innerHTML.includes( 'Use the same padding on all screensizes' ) );
 
@@ -74,8 +95,8 @@ describe( 'Basic rendering', () => {
 		expect( defaultControlGroupHidden ).toBe( false );
 		expect( responsiveControlGroupHidden ).toBe( true );
 
-		expect( activeDeviceLabel ).toHaveLength( 1 );
-		expect( activePropertyLabel ).toHaveLength( 1 );
+		expect( activeDeviceLabel ).not.toBeNull();
+		expect( activePropertyLabel ).not.toBeNull();
 		expect( defaultControl ).not.toBeNull();
 		expect( toggleLabel ).not.toBeNull();
 		expect( toggleState ).toBe( true );
@@ -100,16 +121,7 @@ describe( 'Basic rendering', () => {
 			render(
 				<ResponsiveBlockControl
 					legend="Padding"
-					renderDefaultControl={ ( label ) => (
-
-						<Fragment>
-							<label htmlFor={ inputId }>{ label }</label>
-							<input
-								id={ inputId }
-								defaultValue={ label }
-							/>
-						</Fragment>
-					) }
+					renderDefaultControl={ renderTestDefaultControlComponent }
 				/>, container
 			);
 		} );
@@ -151,20 +163,20 @@ describe( 'Basic rendering', () => {
 	it( 'should pass custom label for default control group to the renderDefaultControl function when provided', () => {
 		const customDefaultControlGroupLabel = 'Everything';
 
-		const spyRenderDefaultControl = jest.fn();
-
 		act( () => {
 			render(
 				<ResponsiveBlockControl
 					legend="Padding"
 					property="padding"
-					renderDefaultControl={ spyRenderDefaultControl }
+					renderDefaultControl={ renderTestDefaultControlComponent }
 					defaultLabel={ customDefaultControlGroupLabel }
 				/>, container
 			);
 		} );
 
-		expect( spyRenderDefaultControl ).toHaveBeenCalledWith( customDefaultControlGroupLabel );
+		const defaultControlLabel = Array.from( container.querySelectorAll( 'label' ) ).find( ( label ) => label.innerHTML.includes( 'Everything' ) );
+
+		expect( defaultControlLabel ).not.toBeNull();
 	} );
 } );
 
@@ -211,7 +223,7 @@ describe( 'Default and Responsive modes', () => {
 		const responsiveDevicesLabels = Array.from( container.querySelectorAll( 'label' ) ).filter( ( label ) => {
 			const labelText = label.innerHTML;
 			// Is the label one of those in the custom device set?
-			return customDeviceSet.includes( labelText );
+			return !! customDeviceSet.find( ( deviceName ) => labelText.includes( deviceName ) );
 		} );
 
 		expect( responsiveDevicesLabels ).toHaveLength( customDeviceSet.length );
