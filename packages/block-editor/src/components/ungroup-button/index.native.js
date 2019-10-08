@@ -17,7 +17,7 @@ import { compose } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { UngroupIcon } from './icon';
+import UngroupIcon from './icon';
 
 export function UngroupButton( {
 	onConvertFromGroup,
