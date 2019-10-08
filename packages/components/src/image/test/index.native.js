@@ -6,7 +6,7 @@ import { shallow } from 'enzyme';
 /**
  * Internal dependencies
  */
-import Image from '../';
+import { Image } from '../';
 
 describe( 'Image', () => {
 	it( 'renders nothing when src omitted', () => {
