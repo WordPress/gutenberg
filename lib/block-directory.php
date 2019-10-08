@@ -1,4 +1,9 @@
 <?php
+/**
+ * Block directory functions.
+ *
+ * @package gutenberg
+ */
 
 if ( ! has_action( 'admin_enqueue_scripts', 'gutenberg_aenqueue_block_editor_assets_block_directory' ) ) {
 	/**

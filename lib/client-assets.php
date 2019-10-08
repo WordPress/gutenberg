@@ -154,6 +154,7 @@ add_filter( 'load_script_translation_file', 'gutenberg_override_translation_file
  *
  * @since 4.1.0
  *
+ * @param WP_Styles        $styles WP_Styles instance (passed by reference).
  * @param string           $handle Name of the stylesheet. Should be unique.
  * @param string           $src    Full URL of the stylesheet, or path of the stylesheet relative to the WordPress root directory.
  * @param array            $deps   Optional. An array of registered stylesheet handles this stylesheet depends on. Default empty array.
@@ -392,22 +393,9 @@ add_action( 'wp_default_styles', 'gutenberg_register_packages_styles' );
  *
  * @since 0.1.0
  */
-function gutenberg_register_scripts_and_styles() {
+function gutenberg_enqueue_block_editor_assets() {
 	global $wp_scripts;
-	global $wp_styles;
 
-	// Add nonce middleware which accounts for the absence of the heartbeat
-	// listener. This relies on API Fetch implementation running middlewares in
-	// order of last added, and that the original nonce middleware would defer
-	// to an X-WP-Nonce header already being present. This inline script should
-	// be removed once the following Core ticket is resolved in assigning the
-	// nonce received from heartbeat to the created middleware.
-	//
-	// See: https://core.trac.wordpress.org/ticket/46107 .
-	// See: https://github.com/WordPress/gutenberg/pull/13451 .
-	if ( isset( $wp_scripts->registered['wp-api-fetch'] ) ) {
-		$wp_scripts->registered['wp-api-fetch']->deps[] = 'wp-hooks';
-	}
 	wp_add_inline_script(
 		'wp-api-fetch',
 		sprintf(
@@ -441,9 +429,6 @@ function gutenberg_register_scripts_and_styles() {
 		)
 	);
 
-	// This empty stylesheet is defined to ensure backward compatibility.
-	// gutenberg_override_style( $wp_styles, 'wp-blocks', false );
-
 	if ( defined( 'GUTENBERG_LIVE_RELOAD' ) && GUTENBERG_LIVE_RELOAD ) {
 		$live_reload_url = ( GUTENBERG_LIVE_RELOAD === true ) ? 'http://localhost:35729/livereload.js' : GUTENBERG_LIVE_RELOAD;
 
@@ -453,8 +438,7 @@ function gutenberg_register_scripts_and_styles() {
 		);
 	}
 }
-add_action( 'wp_enqueue_scripts', 'gutenberg_register_scripts_and_styles', 5 );
-add_action( 'admin_enqueue_scripts', 'gutenberg_register_scripts_and_styles', 5 );
+add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_block_editor_assets', 5 );
 
 /**
  * Retrieves a unique and reasonably short and human-friendly filename for a
