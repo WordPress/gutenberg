@@ -309,7 +309,8 @@ export function undo( state = UNDO_INITIAL_STATE, action ) {
 	switch ( action.type ) {
 		case 'EDIT_ENTITY_RECORD':
 		case 'CREATE_UNDO_LEVEL':
-			if ( action.type === 'CREATE_UNDO_LEVEL' ) {
+			const isCreateUndoLevel = action.type === 'CREATE_UNDO_LEVEL';
+			if ( isCreateUndoLevel ) {
 				action = lastEditAction;
 			} else {
 				lastEditAction = action;
@@ -328,7 +329,7 @@ export function undo( state = UNDO_INITIAL_STATE, action ) {
 			// Transient edits don't create an undo level, but are
 			// reachable in the next meaningful edit to which they
 			// are merged. They are defined in the entity's config.
-			if ( ! Object.keys( action.edits ).some( ( key ) => ! action.transientEdits[ key ] ) ) {
+			if ( ! isCreateUndoLevel && ! Object.keys( action.edits ).some( ( key ) => ! action.transientEdits[ key ] ) ) {
 				const nextState = [ ...state ];
 				nextState.flattenedUndo = { ...state.flattenedUndo, ...action.edits };
 				nextState.offset = state.offset;
@@ -339,12 +340,14 @@ export function undo( state = UNDO_INITIAL_STATE, action ) {
 			const nextState = state.slice( 0, state.offset || undefined );
 			nextState.offset = 0;
 			nextState.pop();
-			nextState.push( {
-				kind: action.meta.undo.kind,
-				name: action.meta.undo.name,
-				recordId: action.meta.undo.recordId,
-				edits: { ...state.flattenedUndo, ...action.meta.undo.edits },
-			} );
+			if ( ! isCreateUndoLevel ) {
+				nextState.push( {
+					kind: action.meta.undo.kind,
+					name: action.meta.undo.name,
+					recordId: action.meta.undo.recordId,
+					edits: { ...state.flattenedUndo, ...action.meta.undo.edits },
+				} );
+			}
 			// When an edit is a function it's an optimization to avoid running some expensive operation.
 			// We can't rely on the function references being the same so we opt out of comparing them here.
 			const comparisonUndoEdits = Object.values( action.meta.undo.edits ).filter( ( edit ) => typeof edit !== 'function' );

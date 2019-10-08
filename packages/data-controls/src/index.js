@@ -14,10 +14,10 @@ import { createRegistryControl } from '@wordpress/data';
  * import { apiFetch } from '@wordpress/data-controls';
  *
  * // Action generator using apiFetch
- * export function* myAction {
- *		const path = '/v2/my-api/items';
- *		const items = yield apiFetch( { path } );
- *		// do something with the items.
+ * export function* myAction() {
+ * 	const path = '/v2/my-api/items';
+ * 	const items = yield apiFetch( { path } );
+ * 	// do something with the items.
  * }
  * ```
  *
@@ -46,9 +46,9 @@ export const apiFetch = ( request ) => {
  * import { select } from '@wordpress/data-controls';
  *
  * // Action generator using select
- * export function* myAction {
- *		const isSidebarOpened = yield select( 'core/edit-post', 'isEditorSideBarOpened' );
- *		// do stuff with the result from the select.
+ * export function* myAction() {
+ * 	const isSidebarOpened = yield select( 'core/edit-post', 'isEditorSideBarOpened' );
+ * 	// do stuff with the result from the select.
  * }
  * ```
  *
@@ -75,9 +75,9 @@ export function select( storeKey, selectorName, ...args ) {
  * import { dispatch } from '@wordpress/data-controls';
  *
  * // Action generator using dispatch
- * export function* myAction {
- *   yield dispatch( 'core/edit-post' ).togglePublishSidebar();
- *   // do some other things.
+ * export function* myAction() {
+ * 	yield dispatch( 'core/edit-post', 'togglePublishSidebar' );
+ * 	// do some other things.
  * }
  * ```
  *
@@ -141,7 +141,7 @@ const resolveSelect = ( registry, { storeKey, selectorName, args } ) => {
  * import * as actions from './actions';
  * import * as resolvers from './resolvers';
  *
- * registerStore ( 'my-custom-store', {
+ * registerStore( 'my-custom-store', {
  * 	reducer,
  * 	controls,
  * 	actions,

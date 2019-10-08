@@ -97,7 +97,6 @@ class PullQuoteEdit extends Component {
 								// translators: placeholder text used for the quote
 								__( 'Write quote…' )
 							}
-							wrapperClassName="block-library-pullquote__content"
 						/>
 						{ ( ! RichText.isEmpty( citation ) || isSelected ) && (
 							<RichText
