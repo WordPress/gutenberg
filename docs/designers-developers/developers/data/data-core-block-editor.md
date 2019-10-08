@@ -303,6 +303,19 @@ _Returns_
 
 -   `?string`: First block client ID in the multi-selection set.
 
+<a name="getFirstToSelectBlock" href="#getFirstToSelectBlock">#</a> **getFirstToSelectBlock**
+
+Given a block client ID, returns the next element of the hierarchy from which the block is nested which should be selected onFocus, return the block itself for root level blocks.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+-   _clientId_ `string`: Block from which to find first to select client ID.
+
+_Returns_
+
+-   `string`: First to select client ID
+
 <a name="getGlobalBlockCount" href="#getGlobalBlockCount">#</a> **getGlobalBlockCount**
 
 Returns the total number of blocks, or the total number of blocks with a specific name in a post.
@@ -579,6 +592,19 @@ _Parameters_
 _Returns_
 
 -   `?string`: Block Template Lock
+
+<a name="getTree" href="#getTree">#</a> **getTree**
+
+Given a block client ID, returns the hierarchy tree of client ID.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+-   _clientId_ `string`: Block from which tree will be created.
+
+_Returns_
+
+-   `Array`: Hierarchy tree of client ID.
 
 <a name="hasInserterItems" href="#hasInserterItems">#</a> **hasInserterItems**
 

@@ -822,7 +822,7 @@ export class RichText extends Component {
 			this.firedAfterTextChanged = false;
 		}
 
-		const dynamicStyle = useStyle( style, styles.richTextDark );
+		const dynamicStyle = getStylesFromColorScheme( style, styles.richTextDark );
 		const lockOnFocus = blockIsSelected || isParentSelected ? {} : { pointerEvents: 'none' };
 
 		return (

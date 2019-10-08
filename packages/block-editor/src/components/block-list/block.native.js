@@ -118,7 +118,6 @@ class BlockListBlock extends Component {
 			showFloatingToolbar,
 			parentId,
 			isFirstBlock,
-			parentId,
 			isDashed,
 			isDimmed,
 			isGroup,
@@ -156,16 +155,16 @@ class BlockListBlock extends Component {
 						{ showTitle && this.renderBlockTitle() }
 						<View
 							accessibilityLabel={ accessibilityLabel }
-							style={ [ 
-								! isSelected && ( isDashed ? styles.blockHolderDashedBordered : isNestedInnerBlock && !isDimmed ? styles.blockContainerInner : styles.blockContainer), 
-								! isSelected &&  isDashed  && isNestedInnerBlock && styles.blockContainerInner,
-								! isSelected && isGroup && !parentId && styles.selectedInnerGroup,
-								! isSelected && isInnerBlock && !isChildOfSameRootBlook && !isDashed && styles.marginInnerGroup , 
-								! isSelected && isNestedInnerBlock && !isDimmed && styles.blockContainerInner,
-								! isSelected && isNestedInnerBlock && {paddingLeft: 0},
-								isDimmed && styles.blockContainerDimmed, 
+							style={ [
+								! isSelected && ( isDashed ? styles.blockHolderDashedBordered : isNestedInnerBlock && ! isDimmed ? styles.blockContainerInner : styles.blockContainer ),
+								! isSelected && isDashed && isNestedInnerBlock && styles.blockContainerInner,
+								! isSelected && isGroup && ! parentId && styles.selectedInnerGroup,
+								! isSelected && isInnerBlock && ! isChildOfSameRootBlook && ! isDashed && styles.marginInnerGroup,
+								! isSelected && isNestedInnerBlock && ! isDimmed && styles.blockContainerInner,
+								! isSelected && isNestedInnerBlock && { paddingLeft: 0 },
+								isDimmed && styles.blockContainerDimmed,
 								isSelected && ( parentId ? styles.innerBlockContainerFocused : styles.blockContainerFocused ),
-								isSelected && isGroup && !parentId && styles.padding,
+								isSelected && isGroup && ! parentId && styles.padding,
 								isSelected && isNestedInnerBlock && styles.marginInnerGroup,
 								isSelected && isGroupType && styles.marginInnerGroup,
 
@@ -198,6 +197,7 @@ export default compose( [
 			getSelectedBlock,
 			getBlockOrder,
 			getFirstToSelectBlock,
+			getSelectedBlock,
 		} = select( 'core/block-editor' );
 		const order = getBlockIndex( clientId, rootClientId );
 		const isSelected = isBlockSelected( clientId );
@@ -232,11 +232,17 @@ export default compose( [
 		const isDashed = selectedBlockClientId === parentId;
 		const isDimmed = ! isSelected && ! isRootSiblingsSelected && !! selectedBlockClientId && firstToSelect === clientId && ! isDashed;
 
-		const isInnerBlock = parentId && firstToSelect !== parentId
-		const isChildOfSameRootBlook = rootBlockId === getBlockHierarchyRootClientId( selectedBlockClientId )
-		const isNestedInnerBlock = !isDashed && rootBlockId === getBlockRootClientId( firstToSelect )
-		const isGroup = hasRootInnerBlocks; //blockType ==='core/group'; 
-		const isGroupType = blockType.name === 'core/group'
+		const isInnerBlock = parentId && firstToSelect !== parentId;
+		const isChildOfSameRootBlook = rootBlockId === getBlockHierarchyRootClientId( selectedBlockClientId );
+		const isNestedInnerBlock = ! isDashed && rootBlockId === getBlockRootClientId( firstToSelect );
+		const isGroup = hasRootInnerBlocks;//blockType ==='core/group';
+		const isGroupType = blockType.name === 'core/group';
+
+		const selectedBlock = getSelectedBlock();
+		const parentBlock = getBlock( parentId );
+
+		const isMediaText = selectedBlock && selectedBlock.name === 'core/media-text';
+		const isMediaTextParent = parentBlock && parentBlock.name === 'core/media-text';
 
 		return {
 			icon,
