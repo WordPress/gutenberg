@@ -71,6 +71,6 @@ describe( 'Basic rendering', () => {
 			Simulate.click( openIconButton );
 		} );
 
-		expect( openIconButton.nextSibling.innerHTML ).toEqual( expect.stringMatching( 'Paste URL or type to search' ) );
+		expect( openIconButton.nextSibling.innerHTML ).toEqual( expect.stringMatching( 'Search or type url' ) );
 	} );
 } );

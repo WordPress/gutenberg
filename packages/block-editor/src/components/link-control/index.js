@@ -28,6 +28,7 @@ import {
  */
 import {
 	URLPopover,
+	URLInput,
 } from '../';
 
 function LinkControl( { defaultOpen = false } ) {
@@ -77,21 +78,33 @@ function LinkControl( { defaultOpen = false } ) {
 				<URLPopover>
 					<div className="link-control__popover-inner">
 						<div className="link-control__search">
-							<URLPopover.LinkEditor
-								className="link-control__search-input"
-								value={ inputValue }
-								onChangeInputValue={ onInputChange }
-								onKeyDown={ stopPropagationRelevantKeys }
-								onKeyPress={ stopPropagation }
+
+							<form
 								onSubmit={ onSubmitLinkChange }
-								autocompleteRef={ autocompleteRef }
-							/>
-							<IconButton
-								icon="no-alt"
-								className="link-control__search-reset"
-								label={ __( 'Reset url input' ) }
-								onClick={ () => onInputChange() }
-							/>
+							>
+
+								<URLInput
+									value={ inputValue }
+									onChange={ onInputChange }
+									autocompleteRef={ autocompleteRef }
+									onKeyDown={ stopPropagationRelevantKeys }
+									onKeyPress={ stopPropagation }
+									placeholder={ __( 'Search or type url' ) }
+								/>
+								<IconButton
+									className="screen-reader-text"
+									icon="editor-break"
+									label={ __( 'Apply' ) }
+									type="submit"
+								/>
+								<IconButton
+									type="reset"
+									label={ __( 'Reset' ) }
+									icon="no-alt"
+									className="link-control__search-reset"
+									onClick={ () => onInputChange() }
+								/>
+							</form>
 						</div>
 					</div>
 				</URLPopover>
