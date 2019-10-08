@@ -54,6 +54,20 @@ describe( 'undo', () => {
 		expect( await getEditedPostContent() ).toBe( '' );
 	} );
 
+	it( 'should undo bold', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'test' );
+		await saveDraft();
+		await page.reload();
+		await page.click( '.wp-block-paragraph' );
+		await pressKeyWithModifier( 'primary', 'a' );
+		await pressKeyWithModifier( 'primary', 'b' );
+		await pressKeyWithModifier( 'primary', 'z' );
+
+		const visibleResult = await page.evaluate( () => document.activeElement.innerHTML );
+		expect( visibleResult ).toBe( 'test' );
+	} );
+
 	it( 'Should undo/redo to expected level intervals', async () => {
 		await clickBlockAppender();
 
