@@ -41,6 +41,23 @@ describe( 'Basic rendering', () => {
 		expect( container.innerHTML ).toMatchSnapshot();
 	} );
 
+	it( 'should render core link ui interface when open', () => {
+		act( () => {
+			render(
+				<LinkControl
+					defaultOpen={ true }
+				/>, container
+			);
+		} );
+
+		// Search Input UI
+		const searchInputLabel = Array.from( container.querySelectorAll( 'label' ) ).find( ( label ) => label.innerText === 'Search or input url' );
+		const searchInput = container.querySelector( 'input[type="url"]' );
+
+		expect( searchInputLabel ).not.toBeNull();
+		expect( searchInput ).not.toBeNull();
+	} );
+
 	it( 'should toggle link ui open on icon ui click', () => {
 		act( () => {
 			render(
@@ -54,6 +71,6 @@ describe( 'Basic rendering', () => {
 			Simulate.click( openIconButton );
 		} );
 
-		expect( openIconButton.nextSibling.innerHTML ).toEqual( expect.stringMatching( 'Link UI is open' ) );
+		expect( openIconButton.nextSibling.innerHTML ).toEqual( expect.stringMatching( 'Search or input url' ) );
 	} );
 } );

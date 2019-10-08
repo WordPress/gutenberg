@@ -13,14 +13,31 @@ import {
 	Fragment,
 } from '@wordpress/element';
 
-function LinkControl() {
+/**
+ * Internal dependencies
+ */
+import {
+	URLPopover,
+} from '../';
+
+import { withInstanceId } from '@wordpress/compose';
+
+function LinkControl( { instanceId, defaultOpen = false } ) {
 	// State
-	const [ isOpen, setIsOpen ] = useState( false );
+	const [ isOpen, setIsOpen ] = useState( defaultOpen );
+	const [ inputValue, setInputValue ] = useState( '' );
 
 	// Effects
 	const openLinkUI = useCallback( () => {
 		setIsOpen( true );
 	} );
+
+	// Handlers
+	const onInputChange = ( event ) => {
+		setInputValue( event.target.value );
+	};
+
+	const inputId = `link-control-search-input-${ instanceId }`;
 
 	return (
 		<Fragment>
@@ -33,11 +50,16 @@ function LinkControl() {
 
 			{ isOpen && (
 
-				<div>Link UI is open</div>
+				<URLPopover>
+					<form onSubmit={ onInputChange }>
+						<label htmlFor={ inputId }>{ __( 'Search or input url' ) }</label>
+						<input id={ inputId } className="link-control__search-input" type="url" value={ inputValue } onChange={ onInputChange } />
+					</form>
+				</URLPopover>
 
 			) }
 		</Fragment>
 	);
 }
 
-export default LinkControl;
+export default withInstanceId( LinkControl );
