@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-import { uniqueId } from 'lodash';
+import { uniqueId, isFunction } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
 
-import { Fragment, useState } from '@wordpress/element';
+import { Fragment, useState, useEffect } from '@wordpress/element';
 
 import {
 	ToggleControl,
@@ -28,9 +28,15 @@ export function ResponsiveBlockControlLabel( { property, device } ) {
 }
 
 function ResponsiveBlockControl( props ) {
-	const { legend, property, toggleLabel, responsiveControlsActive = false, renderDefaultControl, defaultLabel = __( 'All' ), devices = [ __( 'Desktop' ), __( 'Tablet' ), __( 'Mobile' ) ], renderResponsiveControls } = props;
+	const { legend, property, toggleLabel, responsiveControlsActive = false, onIsResponsiveModeChange, renderDefaultControl, defaultLabel = __( 'All' ), devices = [ __( 'Desktop' ), __( 'Tablet' ), __( 'Mobile' ) ], renderResponsiveControls } = props;
 
 	const [ isResponsiveMode, setIsResponsiveMode ] = useState( responsiveControlsActive );
+
+	useEffect( () => {
+		if ( isFunction( onIsResponsiveModeChange ) ) {
+			onIsResponsiveModeChange( isResponsiveMode );
+		}
+	}, [ isResponsiveMode ] );
 
 	if ( ! legend || ! property || ! renderDefaultControl ) {
 		return null;

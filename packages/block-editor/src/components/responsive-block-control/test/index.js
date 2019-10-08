@@ -309,5 +309,39 @@ describe( 'Default and Responsive modes', () => {
 
 		expect( customControls ).toHaveLength( 3 );
 	} );
+
+	it( 'should call onIsResponsiveModeChange callback when responsive mode is toggled on/off ', () => {
+		const onIsResponsiveModeChangeSpy = jest.fn();
+
+		act( () => {
+			render(
+				<ResponsiveBlockControl
+					legend="Padding"
+					property="padding"
+					renderDefaultControl={ renderTestDefaultControlComponent }
+					onIsResponsiveModeChange={ onIsResponsiveModeChangeSpy }
+				/>, container
+			);
+		} );
+
+		const toggleInput = container.querySelector( '.block-editor-responsive-block-control__toggle input' );
+
+		// Initial render
+		expect( onIsResponsiveModeChangeSpy ).toHaveBeenCalledWith( false );
+
+		// Toggle to "responsive" mode
+		act( () => {
+			Simulate.change( toggleInput, { target: { checked: false } } );
+		} );
+
+		expect( onIsResponsiveModeChangeSpy ).toHaveBeenCalledWith( true );
+
+		// Revert to "default" mode
+		act( () => {
+			Simulate.change( toggleInput, { target: { checked: true } } );
+		} );
+
+		expect( onIsResponsiveModeChangeSpy ).toHaveBeenCalledWith( false );
+	} );
 } );
 
