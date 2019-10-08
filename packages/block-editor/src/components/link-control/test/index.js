@@ -74,3 +74,45 @@ describe( 'Basic rendering', () => {
 		expect( openIconButton.nextSibling.innerHTML ).toEqual( expect.stringMatching( 'Search or type url' ) );
 	} );
 } );
+
+describe( 'Searching', () => {
+	it( 'should render search results for current search term', () => {
+		act( () => {
+			render(
+				<LinkControl
+					defaultOpen={ true }
+				/>, container
+			);
+		} );
+
+		let searchResultElements;
+
+		// Search Input UI
+		const searchInput = container.querySelector( 'input[aria-label="URL"]' );
+
+		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
+		searchResultElements = container.querySelectorAll( '[role="menu"] button[role="menuitem"]' );
+
+		expect( searchResultElements ).toHaveLength( 0 );
+
+		// Simulate searching for a term
+		act( () => {
+			Simulate.change( searchInput, { target: { value: 'WordPress' } } );
+		} );
+
+		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
+		searchResultElements = container.querySelectorAll( '[role="menu"] button[role="menuitem"]' );
+
+		expect( searchResultElements ).toHaveLength( 2 );
+
+		// Reset the search term
+		act( () => {
+			Simulate.change( searchInput, { target: { value: '' } } );
+		} );
+
+		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
+		searchResultElements = container.querySelectorAll( '[role="menu"] button[role="menuitem"]' );
+
+		expect( searchResultElements ).toHaveLength( 0 );
+	} );
+} );

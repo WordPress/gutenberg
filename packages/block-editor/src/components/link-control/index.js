@@ -3,6 +3,8 @@
  */
 import {
 	IconButton,
+	MenuItem,
+	NavigableMenu,
 } from '@wordpress/components';
 
 import { __ } from '@wordpress/i18n';
@@ -64,6 +66,42 @@ function LinkControl( { defaultOpen = false } ) {
 		}
 	};
 
+	// Render Components
+	const renderSearchResults = () => (
+		<div className="link-control__search-results">
+			<NavigableMenu>
+
+				<MenuItem
+					className="link-control__search-item"
+					key="some-key-here"
+					icon={ 'wordpress' }
+					info="make.wordpress.com"
+					onClick={ () => {
+						// do things
+					} }
+				>
+					<span>WordPress!</span>
+					<span className="link-control__search-item-type">URL</span>
+				</MenuItem>
+				<MenuItem
+					className="link-control__search-item"
+					key="some-other-key-here"
+					icon={ 'admin-page' }
+					info="2 days ago"
+					onClick={ () => {
+						// do things
+					} }
+				>
+					<span>Hello World</span>
+					<span className="link-control__search-item-type">Page</span>
+				</MenuItem>
+
+			</NavigableMenu>
+		</div>
+	);
+
+	const shouldRenderSearchResults = !! inputValue;
+
 	return (
 		<Fragment>
 			<IconButton
@@ -75,7 +113,9 @@ function LinkControl( { defaultOpen = false } ) {
 
 			{ isOpen && (
 
-				<URLPopover>
+				<URLPopover
+					additionalControls={ shouldRenderSearchResults && renderSearchResults() }
+				>
 					<div className="link-control__popover-inner">
 						<div className="link-control__search">
 
@@ -84,6 +124,7 @@ function LinkControl( { defaultOpen = false } ) {
 							>
 
 								<URLInput
+									className="link-control__search-input"
 									value={ inputValue }
 									onChange={ onInputChange }
 									autocompleteRef={ autocompleteRef }

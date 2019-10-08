@@ -20,3 +20,33 @@
 	top: 0;
 	right: 0;
 }
+
+.link-control__search-results {
+	padding: 20px;
+}
+
+
+.link-control__search-item {
+	position: relative;
+
+	.link-control__search-item-type {
+		position: absolute;
+		top: 50%;
+		transform: translateY(-50%);
+		right: 10px;
+		display: block;
+		padding: 3px 8px;
+		font-size: 0.9em;
+		background-color: #f3f4f5;
+		border-radius: 2px;
+	}
+
+	.components-menu-item__info-wrapper {
+		flex: 1;
+	}
+}
+
+// Specificity overide
+.link-control__search-results div[role="menu"] > .link-control__search-item.link-control__search-item {
+	padding: 10px;
+}
