@@ -187,7 +187,6 @@ export default compose( [
 			getSelectedBlock,
 			getBlockOrder,
 			getFirstToSelectBlock,
-			getSelectedBlock,
 		} = select( 'core/block-editor' );
 		const order = getBlockIndex( clientId, rootClientId );
 		const isSelected = isBlockSelected( clientId );
@@ -213,7 +212,6 @@ export default compose( [
 
 		const showFloatingToolbar = isSelected && hasRootInnerBlocks && ! isMediaText && ! isMediaTextParent;
 
-		const parentId = getBlockRootClientId( clientId );
 		const firstToSelect = getFirstToSelectBlock( clientId );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
@@ -227,12 +225,6 @@ export default compose( [
 		const isNestedInnerBlock = ! isDashed && rootBlockId === getBlockRootClientId( firstToSelect );
 		const isGroup = hasRootInnerBlocks;//blockType ==='core/group';
 		const isGroupType = blockType.name === 'core/group';
-
-		const selectedBlock = getSelectedBlock();
-		const parentBlock = getBlock( parentId );
-
-		const isMediaText = selectedBlock && selectedBlock.name === 'core/media-text';
-		const isMediaTextParent = parentBlock && parentBlock.name === 'core/media-text';
 
 		return {
 			icon,
