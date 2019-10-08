@@ -396,6 +396,7 @@ export class InserterMenu extends Component {
 									<div className="block-editor-inserter__preview">
 										<div className="block-editor-inserter__preview-content">
 											<BlockPreview
+												padding={ 10 }
 												viewportWidth={ 500 }
 												blocks={
 													hoveredItemBlockType.example ?
