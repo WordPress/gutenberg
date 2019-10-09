@@ -11,6 +11,7 @@ import {
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
+import { ToolbarButton, Toolbar } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { getBlockType } from '@wordpress/blocks';
@@ -24,6 +25,7 @@ import BlockEdit from '../block-edit';
 import BlockInvalidWarning from './block-invalid-warning';
 import BlockMobileToolbar from './block-mobile-toolbar';
 import FloatingToolbar from './block-mobile-floating-toolbar';
+import NavigateUpSVG from './nav-up-icon';
 
 class BlockListBlock extends Component {
 	constructor() {
@@ -115,6 +117,7 @@ class BlockListBlock extends Component {
 			showFloatingToolbar,
 			showFloatingToolbarForChild,
 			isFirstBlock,
+			parentId,
 		} = this.props;
 
 		const borderColor = isSelected ? focusedBorderColor : 'transparent';
@@ -127,7 +130,18 @@ class BlockListBlock extends Component {
 			<>
 				{ /* Keep in mind that the FloatingToolbar for the first child is rendered in its parent -
 				that means we should use selectedBlockId rather clientID since clientID will be a parent's id */ }
-				{ showToolbar && <FloatingToolbar adjustVerticalPosition={ showFloatingToolbarForChild ? styles.blockContainerFocused.paddingTop : 0 } /> }
+				{ showToolbar &&
+					( <FloatingToolbar adjustVerticalPosition={ showFloatingToolbarForChild ? styles.blockContainerFocused.paddingTop : 0 } >
+						<Toolbar passedStyle={ styles.toolbar }>
+							<ToolbarButton
+								title={ __( 'Navigate Up' ) }
+								onClick={ () => this.props.onSelect( parentId ) }
+								icon={ NavigateUpSVG }
+							/>
+							<View style={ styles.pipe } />
+						</Toolbar>
+					</FloatingToolbar>
+					) }
 				<TouchableWithoutFeedback
 					onPress={ this.onFocus }
 					accessible={ ! isSelected }
@@ -208,6 +222,7 @@ export default compose( [
 			getAccessibilityLabelExtra,
 			showFloatingToolbar,
 			showFloatingToolbarForChild,
+			parentId,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {

@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { getBlockType } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
 import { useEntityProp } from '@wordpress/core-data';
 import { useMemo, useCallback } from '@wordpress/element';
 import { createHigherOrderComponent } from '@wordpress/compose';
@@ -15,7 +16,9 @@ function useMetaAttributeSource( name, _attributes, _setAttributes ) {
 
 	if ( Object.values( attributeTypes ).some( ( type ) => type.source === 'meta' ) ) {
 		// eslint-disable-next-line react-hooks/rules-of-hooks
-		const [ meta, setMeta ] = useEntityProp( 'postType', 'post', 'meta' );
+		const type = useSelect( ( select ) => select( 'core/editor' ).getCurrentPostType(), [] );
+		// eslint-disable-next-line react-hooks/rules-of-hooks
+		const [ meta, setMeta ] = useEntityProp( 'postType', type, 'meta' );
 
 		// eslint-disable-next-line react-hooks/rules-of-hooks
 		attributes = useMemo(

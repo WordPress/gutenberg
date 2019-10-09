@@ -54,27 +54,84 @@ describe( 'undo', () => {
 		expect( await getEditedPostContent() ).toBe( '' );
 	} );
 
-	it( 'Should undo to expected level intervals', async () => {
+	it( 'Should undo/redo to expected level intervals', async () => {
 		await clickBlockAppender();
 
+		const firstBlock = await getEditedPostContent();
+
 		await page.keyboard.type( 'This' );
+
+		const firstText = await getEditedPostContent();
+
 		await page.keyboard.press( 'Enter' );
+
+		const secondBlock = await getEditedPostContent();
+
 		await page.keyboard.type( 'is' );
+
+		const secondText = await getEditedPostContent();
+
 		await page.keyboard.press( 'Enter' );
+
+		const thirdBlock = await getEditedPostContent();
+
 		await page.keyboard.type( 'test' );
 
-		expect( await getEditedPostContent() ).toMatchSnapshot();
+		const thirdText = await getEditedPostContent();
+
+		await new Promise( ( resolve ) => setTimeout( resolve, 1000 ) );
 
 		await pressKeyWithModifier( 'primary', 'z' ); // Undo 3rd paragraph text.
+
+		expect( await getEditedPostContent() ).toBe( thirdBlock );
+
 		await pressKeyWithModifier( 'primary', 'z' ); // Undo 3rd block.
+
+		expect( await getEditedPostContent() ).toBe( secondText );
+
 		await pressKeyWithModifier( 'primary', 'z' ); // Undo 2nd paragraph text.
+
+		expect( await getEditedPostContent() ).toBe( secondBlock );
+
 		await pressKeyWithModifier( 'primary', 'z' ); // Undo 2nd block.
+
+		expect( await getEditedPostContent() ).toBe( firstText );
+
 		await pressKeyWithModifier( 'primary', 'z' ); // Undo 1st paragraph text.
+
+		expect( await getEditedPostContent() ).toBe( firstBlock );
+
 		await pressKeyWithModifier( 'primary', 'z' ); // Undo 1st block.
 
 		expect( await getEditedPostContent() ).toBe( '' );
 		// After undoing every action, there should be no more undo history.
 		expect( await page.$( '.editor-history__undo[aria-disabled="true"]' ) ).not.toBeNull();
+
+		await pressKeyWithModifier( 'primaryShift', 'z' ); // Redo 1st block.
+
+		expect( await getEditedPostContent() ).toBe( firstBlock );
+		// After redoing one change, the undo button should be enabled again.
+		expect( await page.$( '.editor-history__undo[aria-disabled="true"]' ) ).toBeNull();
+
+		await pressKeyWithModifier( 'primaryShift', 'z' ); // Redo 1st paragraph text.
+
+		expect( await getEditedPostContent() ).toBe( firstText );
+
+		await pressKeyWithModifier( 'primaryShift', 'z' ); // Redo 2nd block.
+
+		expect( await getEditedPostContent() ).toBe( secondBlock );
+
+		await pressKeyWithModifier( 'primaryShift', 'z' ); // Redo 2nd paragraph text.
+
+		expect( await getEditedPostContent() ).toBe( secondText );
+
+		await pressKeyWithModifier( 'primaryShift', 'z' ); // Redo 3rd block.
+
+		expect( await getEditedPostContent() ).toBe( thirdBlock );
+
+		await pressKeyWithModifier( 'primaryShift', 'z' ); // Redo 3rd paragraph text.
+
+		expect( await getEditedPostContent() ).toBe( thirdText );
 	} );
 
 	it( 'should undo for explicit persistence editing post', async () => {
