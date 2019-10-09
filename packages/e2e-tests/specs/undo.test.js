@@ -25,15 +25,27 @@ describe( 'undo', () => {
 		await new Promise( ( resolve ) => setTimeout( resolve, 1000 ) );
 		await page.keyboard.type( ' after pause' );
 
-		expect( await getEditedPostContent() ).toMatchSnapshot();
+		const after = await getEditedPostContent();
+
+		expect( after ).toMatchSnapshot();
 
 		await pressKeyWithModifier( 'primary', 'z' );
 
-		expect( await getEditedPostContent() ).toMatchSnapshot();
+		const before = await getEditedPostContent();
+
+		expect( before ).toMatchSnapshot();
 
 		await pressKeyWithModifier( 'primary', 'z' );
 
 		expect( await getEditedPostContent() ).toBe( '' );
+
+		await pressKeyWithModifier( 'primaryShift', 'z' );
+
+		expect( await getEditedPostContent() ).toBe( before );
+
+		await pressKeyWithModifier( 'primaryShift', 'z' );
+
+		expect( await getEditedPostContent() ).toBe( after );
 	} );
 
 	it( 'should undo typing after non input change', async () => {
@@ -43,15 +55,27 @@ describe( 'undo', () => {
 		await pressKeyWithModifier( 'primary', 'b' );
 		await page.keyboard.type( 'after keyboard' );
 
-		expect( await getEditedPostContent() ).toMatchSnapshot();
+		const after = await getEditedPostContent();
+
+		expect( after ).toMatchSnapshot();
 
 		await pressKeyWithModifier( 'primary', 'z' );
 
-		expect( await getEditedPostContent() ).toMatchSnapshot();
+		const before = await getEditedPostContent();
+
+		expect( before ).toMatchSnapshot();
 
 		await pressKeyWithModifier( 'primary', 'z' );
 
 		expect( await getEditedPostContent() ).toBe( '' );
+
+		await pressKeyWithModifier( 'primaryShift', 'z' );
+
+		expect( await getEditedPostContent() ).toBe( before );
+
+		await pressKeyWithModifier( 'primaryShift', 'z' );
+
+		expect( await getEditedPostContent() ).toBe( after );
 	} );
 
 	it( 'Should undo/redo to expected level intervals', async () => {
@@ -78,8 +102,6 @@ describe( 'undo', () => {
 		await page.keyboard.type( 'test' );
 
 		const thirdText = await getEditedPostContent();
-
-		await new Promise( ( resolve ) => setTimeout( resolve, 1000 ) );
 
 		await pressKeyWithModifier( 'primary', 'z' ); // Undo 3rd paragraph text.
 
