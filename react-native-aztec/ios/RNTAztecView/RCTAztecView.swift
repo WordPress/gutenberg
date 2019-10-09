@@ -407,18 +407,36 @@ class RCTAztecView: Aztec.TextView {
         }
     }
 
+    override var textColor: UIColor? {
+        didSet {
+            typingAttributes[NSAttributedString.Key.foregroundColor] = self.textColor
+        }
+    }
+
+    override var typingAttributes: [NSAttributedString.Key : Any] {
+        didSet {
+            // Keep placeholder attributes in sync with typing attributes.
+            placeholderLabel.attributedText = NSAttributedString(string: placeholderLabel.text ?? "", attributes: placeholderAttributes)
+        }
+    }
+
     // MARK: - Placeholder
 
     @objc var placeholder: String {
         set {
-            var placeholderAttributes = typingAttributes
-            placeholderAttributes[.foregroundColor] = placeholderTextColor
             placeholderLabel.attributedText = NSAttributedString(string: newValue, attributes: placeholderAttributes)
         }
 
         get {
             return placeholderLabel.text ?? ""
         }
+    }
+
+    /// Attributes to use on the placeholder.
+    var placeholderAttributes: [NSAttributedString.Key: Any] {
+        var placeholderAttributes = typingAttributes
+        placeholderAttributes[.foregroundColor] = placeholderTextColor
+        return placeholderAttributes
     }
 
     @objc var placeholderTextColor: UIColor {
