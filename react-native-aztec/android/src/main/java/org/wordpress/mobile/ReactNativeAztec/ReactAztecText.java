@@ -79,6 +79,7 @@ public class ReactAztecText extends AztecText {
             put(AztecTextFormat.FORMAT_ITALIC, "italic");
             put(AztecTextFormat.FORMAT_CITE, "italic");
             put(AztecTextFormat.FORMAT_STRIKETHROUGH, "strikethrough");
+            put(AztecTextFormat.FORMAT_UNDERLINE, "underline");
         }
     };
 
@@ -480,6 +481,9 @@ public class ReactAztecText extends AztecText {
                     break;
                 case "strikethrough":
                     newFormatsSet.add(AztecTextFormat.FORMAT_STRIKETHROUGH);
+                    break;
+                case "underline":
+                    newFormatsSet.add(AztecTextFormat.FORMAT_UNDERLINE);
                     break;
             }
         }
