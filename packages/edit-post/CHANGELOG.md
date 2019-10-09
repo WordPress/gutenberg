@@ -1,3 +1,9 @@
+## Master
+
+### Bug Fixes
+
+- Fix regression introduced by EditorInitializer component which auto-closed sidebar plugins when opened on small screens. ([#17712](https://github.com/WordPress/gutenberg/pull/17712))
+
 ## 3.6.0 (2019-08-05)
 
 ### Refactor
