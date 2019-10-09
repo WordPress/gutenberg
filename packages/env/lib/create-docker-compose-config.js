@@ -1,7 +1,8 @@
 module.exports = function createDockerComposeConfig(
 	pluginPath,
 	pluginName,
-	pluginTestsPath
+	pluginTestsPath,
+	scriptsPath
 ) {
 	const commonVolumes = `
       - ${ pluginPath }/:/var/www/html/wp-content/plugins/${ pluginName }/
@@ -14,6 +15,7 @@ module.exports = function createDockerComposeConfig(
 	return `version: '2'
 volumes:
   tests-wordpress:
+  tests-wordpress-phpunit:
 services:
   mysql:
     environment:
@@ -51,5 +53,19 @@ services:
       - tests-wordpress
     image: wordpress:cli
     volumes:${ testsVolumes }
+  tests-wordpress-phpunit:
+    depends_on:
+      - mysql
+    environment:
+      PHPUNIT_DB_HOST: mysql
+    image: chriszarate/wordpress-phpunit
+    volumes:
+      - ${ pluginPath }/:/app/
+      - ${ scriptsPath }/:/scripts/
+      - tests-wordpress-phpunit/:/tmp/
+  composer:
+    image: composer
+    volumes:
+      - ${ pluginPath }/:/app/
   `;
 };

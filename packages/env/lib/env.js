@@ -17,6 +17,7 @@ const createDockerComposeConfig = require( './create-docker-compose-config' );
 const pluginPath = process.cwd();
 const pluginName = path.basename( pluginPath );
 const pluginTestsPath = fs.existsSync( './packages' ) ? '/packages' : '';
+const scriptsPath = path.join( __dirname, './scripts' );
 const dockerComposeOptions = {
 	config: path.join( __dirname, 'docker-compose.yml' ),
 };
@@ -95,7 +96,12 @@ module.exports = {
 		spinner.text = `Installing WordPress@${ ref }.`;
 		fs.writeFileSync(
 			dockerComposeOptions.config,
-			createDockerComposeConfig( pluginPath, pluginName, pluginTestsPath )
+			createDockerComposeConfig(
+				pluginPath,
+				pluginName,
+				pluginTestsPath,
+				scriptsPath
+			)
 		);
 
 		// These will bring up the database container,
@@ -161,5 +167,39 @@ module.exports = {
 		// Remove dangling containers and finish.
 		await dockerCompose.rm( dockerComposeOptions );
 		spinner.text = `Cleaned ${ description }.`;
+	},
+
+	async run( { container, command, spinner } ) {
+		command = command.join( ' ' );
+		spinner.text = `Running \`${ command }\` in "${ container }".`;
+
+		if ( container === 'tests-wordpress-phpunit' ) {
+			// Run this "on-demand" to avoid making `start` slower.
+			await dockerCompose
+				.run(
+					'tests-wordpress-phpunit',
+					'/scripts/install-tests-wordpress-phpunit.sh tests-wordpress-phpunit root password mysql',
+					dockerComposeOptions
+				)
+				.catch( () => {} );
+		}
+
+		const result = await dockerCompose.run(
+			container,
+			command,
+			dockerComposeOptions
+		);
+		if ( result.out ) {
+			// eslint-disable-next-line no-console
+			console.log( `\n\n${ result.out }\n\n` );
+		} else if ( result.err ) {
+			// eslint-disable-next-line no-console
+			console.error( `\n\n${ result.err }\n\n` );
+			throw result.err;
+		}
+
+		// Remove dangling containers and finish.
+		await dockerCompose.rm( dockerComposeOptions );
+		spinner.text = `Ran \`${ command }\` in "${ container }".`;
 	},
 };
