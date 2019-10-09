@@ -39,9 +39,19 @@
 }
 
 .selectedInnerGroup {
-	padding-top: 0;
+	margin-left: 16px;
+	margin-right: 16px;
+}
+
+.noMargin {
+	// padding-top: 0;
 	margin-left: 0;
 	margin-right: 0;
+}
+
+.noGroupPadding {
+	padding-top: 0;
+	padding-bottom: 0;
 }
 
 .margin {
@@ -59,7 +69,7 @@
 .padding {
 	padding-left: 0;
 	padding-right: 0;
-	padding-top: 0;
+	// padding-top: 0;
 }
 
 .dashedBorderStyle {
