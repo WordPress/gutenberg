@@ -16,6 +16,7 @@ import { isEmpty } from 'lodash';
  */
 import {
 	TextControl,
+	ToggleControl,
 	Icon,
 	Toolbar,
 	ToolbarButton,
@@ -42,14 +43,17 @@ import { withPreferredColorScheme } from '@wordpress/compose';
 import styles from './styles.scss';
 import SvgIcon from './icon';
 import SvgIconRetry from './icon-retry';
+import { getUpdatedLinkTargetSettings } from './utils';
 
-const LINK_DESTINATION_CUSTOM = 'custom';
-const LINK_DESTINATION_NONE = 'none';
+import {
+	LINK_DESTINATION_CUSTOM,
+	LINK_DESTINATION_NONE,
+} from './constants';
 
 // Default Image ratio 4:3
 const IMAGE_ASPECT_RATIO = 4 / 3;
 
-class ImageEdit extends React.Component {
+export class ImageEdit extends React.Component {
 	constructor( props ) {
 		super( props );
 
@@ -65,6 +69,7 @@ class ImageEdit extends React.Component {
 		this.updateAlt = this.updateAlt.bind( this );
 		this.updateImageURL = this.updateImageURL.bind( this );
 		this.onSetLinkDestination = this.onSetLinkDestination.bind( this );
+		this.onSetNewTab = this.onSetNewTab.bind( this );
 		this.onImagePressed = this.onImagePressed.bind( this );
 		this.onClearSettings = this.onClearSettings.bind( this );
 		this.onFocusCaption = this.onFocusCaption.bind( this );
@@ -169,11 +174,18 @@ class ImageEdit extends React.Component {
 		} );
 	}
 
+	onSetNewTab( value ) {
+		const updatedLinkTarget = getUpdatedLinkTargetSettings( value, this.props.attributes );
+		this.props.setAttributes( updatedLinkTarget );
+	}
+
 	onClearSettings() {
 		this.props.setAttributes( {
 			alt: '',
 			linkDestination: LINK_DESTINATION_NONE,
 			href: undefined,
+			linkTarget: undefined,
+			rel: undefined,
 		} );
 	}
 
@@ -204,7 +216,7 @@ class ImageEdit extends React.Component {
 
 	render() {
 		const { attributes, isSelected } = this.props;
-		const { url, height, width, alt, href, id } = attributes;
+		const { url, height, width, alt, href, id, linkTarget } = attributes;
 
 		const getToolbarEditButton = ( open ) => (
 			<BlockControls>
@@ -230,6 +242,12 @@ class ImageEdit extends React.Component {
 						autoCapitalize="none"
 						autoCorrect={ false }
 						keyboardType="url"
+					/>
+					<ToggleControl
+						icon={ 'external' }
+						label={ __( 'Open in new tab' ) }
+						checked={ linkTarget === '_blank' }
+						onChange={ this.onSetNewTab }
 					/>
 					<TextControl
 						icon={ 'editor-textcolor' }
