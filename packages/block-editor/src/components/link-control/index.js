@@ -68,11 +68,11 @@ function LinkControl( { defaultOpen = false } ) {
 
 	// Render Components
 	const renderSearchResults = () => (
-		<div className="link-control__search-results">
+		<div className="block-editor-link-control__search-results">
 			<NavigableMenu>
 
 				<MenuItem
-					className="link-control__search-item"
+					className="block-editor-link-control__search-item"
 					key="some-key-here"
 					icon={ 'wordpress' }
 					info="make.wordpress.com"
@@ -81,10 +81,10 @@ function LinkControl( { defaultOpen = false } ) {
 					} }
 				>
 					<span>WordPress!</span>
-					<span className="link-control__search-item-type">URL</span>
+					<span className="block-editor-link-control__search-item-type">URL</span>
 				</MenuItem>
 				<MenuItem
-					className="link-control__search-item"
+					className="block-editor-link-control__search-item"
 					key="some-other-key-here"
 					icon={ 'admin-page' }
 					info="2 days ago"
@@ -93,7 +93,7 @@ function LinkControl( { defaultOpen = false } ) {
 					} }
 				>
 					<span>Hello World</span>
-					<span className="link-control__search-item-type">Page</span>
+					<span className="block-editor-link-control__search-item-type">Page</span>
 				</MenuItem>
 
 			</NavigableMenu>
@@ -116,15 +116,15 @@ function LinkControl( { defaultOpen = false } ) {
 				<URLPopover
 					additionalControls={ shouldRenderSearchResults && renderSearchResults() }
 				>
-					<div className="link-control__popover-inner">
-						<div className="link-control__search">
+					<div className="block-editor-link-control__popover-inner">
+						<div className="block-editor-link-control__search">
 
 							<form
 								onSubmit={ onSubmitLinkChange }
 							>
 
 								<URLInput
-									className="link-control__search-input"
+									className="block-editor-link-control__search-input"
 									value={ inputValue }
 									onChange={ onInputChange }
 									autocompleteRef={ autocompleteRef }
@@ -142,7 +142,7 @@ function LinkControl( { defaultOpen = false } ) {
 									type="reset"
 									label={ __( 'Reset' ) }
 									icon="no-alt"
-									className="link-control__search-reset"
+									className="block-editor-link-control__search-reset"
 									onClick={ () => onInputChange() }
 								/>
 							</form>

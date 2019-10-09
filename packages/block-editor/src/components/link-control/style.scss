@@ -1,12 +1,12 @@
-.link-control__popover-inner {
+.block-editor-link-control__popover-inner {
 	padding: 20px;
 }
 
-.link-control__search {
+.block-editor-link-control__search {
 	position: relative;
 }
 
-.link-control__search-input {
+.block-editor-link-control__search-input {
 	border: 1px solid #000;
 	padding-right: 36px; // width of reset button
 
@@ -15,21 +15,21 @@
 	}
 }
 
-.link-control__search-reset {
+.block-editor-link-control__search-reset {
 	position: absolute;
 	top: 0;
 	right: 0;
 }
 
-.link-control__search-results {
+.block-editor-link-control__search-results {
 	padding: 20px;
 }
 
 
-.link-control__search-item {
+.block-editor-link-control__search-item {
 	position: relative;
 
-	.link-control__search-item-type {
+	.block-editor-link-control__search-item-type {
 		position: absolute;
 		top: 50%;
 		transform: translateY(-50%);
@@ -47,6 +47,6 @@
 }
 
 // Specificity overide
-.link-control__search-results div[role="menu"] > .link-control__search-item.link-control__search-item {
+.block-editor-link-control__search-results div[role="menu"] > .block-editor-link-control__search-item.block-editor-link-control__search-item {
 	padding: 10px;
 }
