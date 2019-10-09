@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { throttle } from 'lodash';
+import { throttle, isFunction } from 'lodash';
 import classnames from 'classnames';
 import scrollIntoView from 'dom-scroll-into-view';
 
@@ -21,12 +21,15 @@ import { withSelect } from '@wordpress/data';
 const stopEventPropagation = ( event ) => event.stopPropagation();
 
 class URLInput extends Component {
-	constructor( { autocompleteRef } ) {
-		super( ...arguments );
+	constructor( props ) {
+		super( props );
 
 		this.onChange = this.onChange.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
-		this.autocompleteRef = autocompleteRef || createRef();
+		this.selectLink = this.selectLink.bind( this );
+		this.handleOnClick = this.handleOnClick.bind( this );
+		this.bindSuggestionNode = this.bindSuggestionNode.bind( this );
+		this.autocompleteRef = props.autocompleteRef || createRef();
 		this.inputRef = createRef();
 		this.updateSuggestions = throttle( this.updateSuggestions.bind( this ), 200 );
 
@@ -45,6 +48,7 @@ class URLInput extends Component {
 		// when already expanded
 		if ( showSuggestions && selectedSuggestion !== null && ! this.scrollingIntoView ) {
 			this.scrollingIntoView = true;
+
 			scrollIntoView( this.suggestionNodes[ selectedSuggestion ], this.autocompleteRef.current, {
 				onlyScrollIfNeeded: true,
 			} );
@@ -230,7 +234,7 @@ class URLInput extends Component {
 	}
 
 	render() {
-		const { value = '', autoFocus = true, instanceId, className, id, isFullWidth, hasBorder, placeholder = __( 'Paste URL or type to search' ) } = this.props;
+		const { value = '', autoFocus = true, instanceId, className, id, isFullWidth, hasBorder, placeholder = __( 'Paste URL or type to search' ), renderSuggestions } = this.props;
 		const { showSuggestions, suggestions, selectedSuggestion, loading } = this.state;
 
 		const suggestionsListboxId = `block-editor-url-input-suggestions-${ instanceId }`;
@@ -263,7 +267,17 @@ class URLInput extends Component {
 
 				{ ( loading ) && <Spinner /> }
 
-				{ showSuggestions && !! suggestions.length &&
+				{ isFunction( renderSuggestions ) && showSuggestions && !! suggestions.length && renderSuggestions( {
+					suggestions,
+					suggestionsListboxId,
+					suggestionOptionIdPrefix,
+					selectedSuggestion,
+					bindSuggestionNode: this.bindSuggestionNode,
+					handleSuggestionClick: this.handleOnClick,
+					autocompleteRef: this.autocompleteRef,
+				} ) }
+
+				{ ! isFunction( renderSuggestions ) && showSuggestions && !! suggestions.length &&
 					<Popover
 						position="bottom"
 						noArrow
@@ -311,7 +325,12 @@ export default compose(
 	withSafeTimeout,
 	withSpokenMessages,
 	withInstanceId,
-	withSelect( ( select ) => {
+	withSelect( ( select, props ) => {
+		// If a link suggestions handler is already provided then
+		// bail
+		if ( isFunction( props.fetchLinkSuggestions ) ) {
+			return;
+		}
 		const { getSettings } = select( 'core/block-editor' );
 		return {
 			fetchLinkSuggestions: getSettings().__experimentalFetchLinkSuggestions,
