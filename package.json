@@ -15,7 +15,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"config": {
-		"GUTENBERG_PHASE": 2
+		"GUTENBERG_PHASE": 1
 	},
 	"dependencies": {
 		"@wordpress/a11y": "file:packages/a11y",

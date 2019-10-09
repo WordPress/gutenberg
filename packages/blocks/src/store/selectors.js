@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import createSelector from 'rememo';
+import { createSelector } from '@wordpress/data';
 import { filter, get, includes, map, some, flow, deburr } from 'lodash';
 
 /**

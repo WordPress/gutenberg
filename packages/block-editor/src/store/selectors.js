@@ -16,7 +16,7 @@ import {
 	some,
 	find,
 } from 'lodash';
-import createSelector from 'rememo';
+import { createSelector } from '@wordpress/data';
 
 /**
  * WordPress dependencies

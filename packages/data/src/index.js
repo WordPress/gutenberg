@@ -2,6 +2,7 @@
  * External dependencies
  */
 import combineReducers from 'turbo-combine-reducers';
+import { createSelector } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -72,6 +73,8 @@ export { plugins };
  *                          object, and constructs a state object with the same shape.
  */
 export { combineReducers };
+
+export { createSelector };
 
 /**
  * Given the name of a registered store, returns an object of the store's selectors.

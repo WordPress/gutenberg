@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import createSelector from 'rememo';
+import { createSelector } from '@wordpress/data';
 import { includes, difference, keys, has } from 'lodash';
 
 /**

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import createSelector from 'rememo';
+import { createSelector } from '@wordpress/data';
 import { map, find, get, filter, compact, defaultTo } from 'lodash';
 
 /**

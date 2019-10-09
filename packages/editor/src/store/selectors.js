@@ -10,7 +10,7 @@ import {
 	mapValues,
 	includes,
 } from 'lodash';
-import createSelector from 'rememo';
+import { createSelector } from '@wordpress/data';
 
 /**
  * WordPress dependencies
