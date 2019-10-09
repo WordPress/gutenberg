@@ -448,12 +448,20 @@ class RichText extends Component {
 			// set correctly to zero, but the caret is not visible. By
 			// reapplying the value to the DOM we reset the selection to the
 			// right node, making the caret visible again.
-			if ( value.text.length === 0 && start === 0 ) {
+			if (
+				value.text.length === 0 &&
+				start === 0 &&
+				// Only do this once.
+				! this.onSelectionChange.isCaretVisible
+			) {
 				this.applyRecord( value );
+				this.onSelectionChange.isCaretVisible = true;
 			}
 
 			return;
 		}
+
+		this.onSelectionChange.isCaretVisible = false;
 
 		const {
 			__unstableIsCaretWithinFormattedText: isCaretWithinFormattedText,
