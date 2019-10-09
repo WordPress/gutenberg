@@ -5,7 +5,7 @@ exports[`Image renders an img tag passing any additional props 1`] = `
   style={
     Array [
       Object {
-        "aspectRatio": 1,
+        "aspectRatio": undefined,
         "flex": 1,
       },
       undefined,
@@ -34,7 +34,7 @@ exports[`Image renders an img tag with src and alt 1`] = `
   style={
     Array [
       Object {
-        "aspectRatio": 1,
+        "aspectRatio": undefined,
         "flex": 1,
       },
       undefined,
