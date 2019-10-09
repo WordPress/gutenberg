@@ -19,14 +19,6 @@ import SubdirectorSVG from './subdirectory-icon';
 
 import styles from './breadcrumb.scss';
 
-/**
- * Block breadcrumb component, displaying the label of the block. If the block
- * descends from a root block, a button is displayed enabling the user to select
- * the root block.
- *
- * @param {string}   props.clientId        Client ID of block.
- * @return {WPElement} Block Breadcrumb.
- */
 const BlockBreadcrumb = ( { clientId, blockIcon, rootClientId, rootBlockIcon } ) => {
 	return (
 		<View style={ styles.breadcrumbContainer }>
