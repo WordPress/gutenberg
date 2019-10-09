@@ -44,6 +44,7 @@ const resetDatabase = ( isTests = false ) =>
 module.exports = {
 	async start( { ref, spinner = {} } ) {
 		spinner.text = `Downloading WordPress@${ ref } 0/100%.`;
+		let percent = 0;
 		const gitFetchOptions = {
 			fetchOpts: {
 				callbacks: {
@@ -51,10 +52,11 @@ module.exports = {
 						// Fetches are finished when all objects are received and indexed,
 						// so received objects plus indexed objects should equal twice
 						// the total number of objects when done.
-						const percent = (
+						percent = Math.max(
+							percent,
 							( ( progress.receivedObjects() + progress.indexedObjects() ) /
 								( progress.totalObjects() * 2 ) ) *
-							100
+								100
 						).toFixed( 0 );
 						spinner.text = `Downloading WordPress@${ ref } ${ percent }/100%.`;
 					},
@@ -63,34 +65,39 @@ module.exports = {
 		};
 
 		// Clone or get the repo.
-		const repoPath = `../${ pluginName }-wordpress/`;
-		const repo = await NodeGit.Clone(
-			'https://github.com/WordPress/WordPress.git',
-			repoPath,
-			gitFetchOptions
-		)
-			// Repo already exists, get it.
-			.catch( () => NodeGit.Repository.open( repoPath ) );
+		const cloneOrGetRepo = async ( repoPath ) => {
+			const repo = await NodeGit.Clone(
+				'https://github.com/WordPress/WordPress.git',
+				repoPath,
+				gitFetchOptions
+			)
+				// Repo already exists, get it.
+				.catch( () => NodeGit.Repository.open( repoPath ) );
 
-		// Checkout the specified ref.
-		const remote = await repo.getRemote( 'origin' );
-		await remote.fetch( ref, gitFetchOptions.fetchOpts );
-		await remote.disconnect();
-		try {
-			await repo.checkoutRef(
-				await repo
-					.getReference( 'FETCH_HEAD' )
-					// Sometimes git doesn't update FETCH_HEAD for things
-					// like tags so we try another method here.
-					.catch( repo.getReference.bind( repo, ref ) ),
-				{
-					checkoutStrategy: NodeGit.Checkout.STRATEGY.FORCE,
-				}
-			);
-		} catch ( err ) {
-			// Some commit refs need to be set as detached.
-			await repo.setHeadDetached( ref );
-		}
+			// Checkout the specified ref.
+			const remote = await repo.getRemote( 'origin' );
+			await remote.fetch( ref, gitFetchOptions.fetchOpts );
+			await remote.disconnect();
+			try {
+				await repo.checkoutRef(
+					await repo
+						.getReference( 'FETCH_HEAD' )
+						// Sometimes git doesn't update FETCH_HEAD for things
+						// like tags so we try another method here.
+						.catch( repo.getReference.bind( repo, ref ) ),
+					{
+						checkoutStrategy: NodeGit.Checkout.STRATEGY.FORCE,
+					}
+				);
+			} catch ( err ) {
+				// Some commit refs need to be set as detached.
+				await repo.setHeadDetached( ref );
+			}
+		};
+		await Promise.all( [
+			cloneOrGetRepo( `../${ pluginName }-wordpress/` ),
+			cloneOrGetRepo( `../${ pluginName }-tests-wordpress/` ),
+		] );
 		spinner.text = `Downloading WordPress@${ ref } 100/100%.`;
 
 		spinner.text = `Installing WordPress@${ ref }.`;

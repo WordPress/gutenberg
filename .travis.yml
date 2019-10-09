@@ -14,6 +14,8 @@ cache:
     - $HOME/.jest-cache
     - $HOME/.npm
     - $HOME/.nvm/.cache
+    - ../gutenberg-wordpress
+    - ../gutenberg-tests-wordpress
 
 branches:
   only:
@@ -111,12 +113,12 @@ jobs:
         - npm run test-unit:native -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
 
     - name: PHP unit tests
-      env: INSTALL_COMPOSER=true INSTALL_WORDPRESS=false
+      env: INSTALL_COMPOSER=true
       script:
         - npm run test-php && npm run test-unit-php-multisite
 
     - name: PHP unit tests (PHP 5.6)
-      env: INSTALL_COMPOSER=true INSTALL_WORDPRESS=false LOCAL_PHP=5.6-fpm
+      env: INSTALL_COMPOSER=true LOCAL_PHP=5.6-fpm
       script:
         - npm run test-php && npm run test-unit-php-multisite
 

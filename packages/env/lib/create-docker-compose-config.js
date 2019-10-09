@@ -11,10 +11,9 @@ module.exports = function createDockerComposeConfig(
 	const volumes = `
       - ${ pluginPath }/../${ pluginName }-wordpress/:/var/www/html/${ commonVolumes }`;
 	const testsVolumes = `
-      - tests-wordpress:/var/www/html/${ commonVolumes }`;
+      - ${ pluginPath }/../${ pluginName }-tests-wordpress/:/var/www/html/${ commonVolumes }`;
 	return `version: '2'
 volumes:
-  tests-wordpress:
   tests-wordpress-phpunit:
 services:
   mysql:
