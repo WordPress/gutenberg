@@ -11,7 +11,7 @@
 	&.block-editor-link-control__search-input > input[type="text"] {
 		display: block;
 		padding: 11px $grid-size-large;
-		padding-right: 36px; // width of reset button
+		padding-right: 38px; // width of reset button
 		position: relative;
 		z-index: 1;
 		border: 1px solid #e1e1e1;
@@ -32,8 +32,9 @@
 
 .block-editor-link-control__search-reset {
 	position: absolute;
-	top: 0;
-	right: 0;
+	top: 4px; // has to be hard coded as form expands with search suggestions
+	right: 2px; // push away to avoid focus style obscuring input border
+	z-index: 10;
 }
 
 .block-editor-link-control__search-results {

@@ -4,12 +4,14 @@
 import {
 	IconButton,
 	Icon,
+	ToggleControl,
 } from '@wordpress/components';
 /**
  * External dependencies
  */
 import classnames from 'classnames';
 import { __ } from '@wordpress/i18n';
+import { isFunction } from 'lodash';
 
 import {
 	useCallback,
@@ -35,7 +37,7 @@ import {
 	URLInput,
 } from '../';
 
-function LinkControl( { defaultOpen = false, fetchSearchSuggestions } ) {
+function LinkControl( { defaultOpen = false, fetchSearchSuggestions, renderAdditionalSettings } ) {
 	// State
 	const [ isOpen, setIsOpen ] = useState( defaultOpen );
 	const [ inputValue, setInputValue ] = useState( '' );
@@ -95,6 +97,15 @@ function LinkControl( { defaultOpen = false, fetchSearchSuggestions } ) {
 		/* eslint-enable react/jsx-key */
 	};
 
+	const renderSettings = () => (
+		<Fragment>
+			<ToggleControl
+				label={ __( 'Open in New Tab' ) }
+				checked={ false } />
+			{ isFunction( renderAdditionalSettings ) && renderAdditionalSettings() }
+		</Fragment>
+	);
+
 	return (
 		<Fragment>
 			<IconButton
@@ -106,14 +117,15 @@ function LinkControl( { defaultOpen = false, fetchSearchSuggestions } ) {
 
 			{ isOpen && (
 
-				<URLPopover>
+				<URLPopover
+					renderSettings={ renderSettings }
+				>
 					<div className="block-editor-link-control__popover-inner">
 						<div className="block-editor-link-control__search">
 
 							<form
 								onSubmit={ onSubmitLinkChange }
 							>
-
 								<URLInput
 									className="block-editor-link-control__search-input"
 									value={ inputValue }
@@ -125,19 +137,16 @@ function LinkControl( { defaultOpen = false, fetchSearchSuggestions } ) {
 									renderSuggestions={ renderSearchResults }
 									fetchLinkSuggestions={ fetchSearchSuggestions }
 								/>
-								<IconButton
-									className="screen-reader-text"
-									icon="editor-break"
-									label={ __( 'Apply' ) }
-									type="submit"
-								/>
-								<IconButton
-									type="reset"
-									label={ __( 'Reset' ) }
-									icon="no-alt"
-									className="block-editor-link-control__search-reset"
-									onClick={ () => onInputChange() }
-								/>
+
+								{ inputValue && (
+									<IconButton
+										type="reset"
+										label={ __( 'Reset' ) }
+										icon="no-alt"
+										className="block-editor-link-control__search-reset"
+										onClick={ () => onInputChange( '' ) }
+									/>
+								) }
 							</form>
 						</div>
 					</div>
