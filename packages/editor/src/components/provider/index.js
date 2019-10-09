@@ -40,6 +40,7 @@ const fetchLinkSuggestions = async ( search ) => {
 		id: post.id,
 		url: post.url,
 		title: decodeEntities( post.title ) || __( '(no title)' ),
+		type: post.subtype || post.type,
 	} ) );
 };
 
