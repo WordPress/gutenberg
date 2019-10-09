@@ -12,7 +12,7 @@ export const KeyboardAwareFlatList = ( {
 	...listProps
 } ) => (
 	<KeyboardAwareScrollView
-		style={ { flex: 1, overflow: 'visible' } }
+		style={ { flex: 1 } }
 		keyboardDismissMode="none"
 		enableResetScrollToCoords={ false }
 		keyboardShouldPersistTaps="handled"
