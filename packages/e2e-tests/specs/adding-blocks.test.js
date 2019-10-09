@@ -29,6 +29,9 @@ describe( 'adding blocks', () => {
 	}
 
 	it( 'Should insert content using the placeholder and the regular inserter', async () => {
+		// This ensures the editor is loaded in navigation mode.
+		await page.reload();
+
 		// Click below editor to focus last field (block appender)
 		await clickBelow( await page.$( '.block-editor-default-block-appender' ) );
 		expect( await page.$( '[data-type="core/paragraph"]' ) ).not.toBeNull();
