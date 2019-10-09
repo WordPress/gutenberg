@@ -234,6 +234,18 @@ exports[`List should place the caret in the right place with nested list 1`] = `
 <!-- /wp:list -->"
 `;
 
+exports[`List should preserve indentation after merging backward and forward 1`] = `
+"<!-- wp:list -->
+<ul><li>1<ul><li>2</li><li>3</li></ul></li><li></li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List should preserve indentation after merging backward and forward 2`] = `
+"<!-- wp:list -->
+<ul><li>1<ul><li>2</li><li>3</li></ul></li></ul>
+<!-- /wp:list -->"
+`;
+
 exports[`List should split indented list item 1`] = `
 "<!-- wp:list -->
 <ul><li>one<ul><li>two</li><li>three</li></ul></li></ul>
