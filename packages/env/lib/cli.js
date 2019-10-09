@@ -33,7 +33,12 @@ const withSpinner = ( command ) => ( ...args ) => {
 				) }ms)`
 			);
 		},
-		( err ) => spinner.fail( err.message || err.err )
+		( err ) => {
+			spinner.fail( err.message );
+			// eslint-disable-next-line no-console
+			console.error( `\n\n${ err.out || err.err }\n\n` );
+			process.exit( err.exitCode || 1 );
+		}
 	);
 };
 
