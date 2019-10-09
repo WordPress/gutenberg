@@ -3,11 +3,15 @@
  */
 import {
 	IconButton,
-	MenuItem,
-	NavigableMenu,
+	Icon,
 } from '@wordpress/components';
-
+/**
+ * External dependencies
+ */
+import classnames from 'classnames';
 import { __ } from '@wordpress/i18n';
+
+import { uniqueId } from 'lodash';
 
 import {
 	useCallback,
@@ -66,41 +70,50 @@ function LinkControl( { defaultOpen = false } ) {
 		}
 	};
 
+	const fetchFauxSuggestions = async () => ( [
+		{
+			id: uniqueId(),
+			title: 'WordPress',
+			type: 'URL',
+			url: 'make.wordpress.com',
+		},
+		{
+			id: uniqueId(),
+			title: 'Hello World',
+			type: 'Page',
+			info: '2 days ago',
+			url: '?p=1234',
+		},
+	] );
+
 	// Render Components
-	const renderSearchResults = () => (
-		<div className="block-editor-link-control__search-results">
-			<NavigableMenu>
-
-				<MenuItem
-					className="block-editor-link-control__search-item"
-					key="some-key-here"
-					icon={ 'wordpress' }
-					info="make.wordpress.com"
-					onClick={ () => {
-						// do things
-					} }
-				>
-					<span>WordPress!</span>
-					<span className="block-editor-link-control__search-item-type">URL</span>
-				</MenuItem>
-				<MenuItem
-					className="block-editor-link-control__search-item"
-					key="some-other-key-here"
-					icon={ 'admin-page' }
-					info="2 days ago"
-					onClick={ () => {
-						// do things
-					} }
-				>
-					<span>Hello World</span>
-					<span className="block-editor-link-control__search-item-type">Page</span>
-				</MenuItem>
-
-			</NavigableMenu>
-		</div>
-	);
-
-	const shouldRenderSearchResults = !! inputValue;
+	const renderSearchResults = function renderSearchResults( { suggestions, suggestionsListboxId, suggestionOptionIdPrefix, selectedSuggestion, bindSuggestionNode, handleSuggestionClick } ) {
+		return (
+			<div id={ suggestionsListboxId } role="listbox" ref={ autocompleteRef } className="block-editor-link-control__search-results">
+				{ suggestions.map( ( suggestion, index ) => (
+					<button
+						key={ suggestion.id }
+						role="option"
+						tabIndex="-1"
+						id={ `${ suggestionOptionIdPrefix }-${ index }` }
+						ref={ bindSuggestionNode( index ) }
+						className={ classnames( 'block-editor-link-control__search-item', {
+							'is-selected': index === selectedSuggestion,
+						} ) }
+						onClick={ () => handleSuggestionClick( suggestion ) }
+						aria-selected={ index === selectedSuggestion }
+					>
+						<Icon icon="wordpress" />
+						<span className="block-editor-link-control__search-item-header">
+							<span className="block-editor-link-control__search-item-title">{ suggestion.title }</span>
+							<span className="block-editor-link-control__search-item-info">{ suggestion.info || suggestion.url || '' }</span>
+						</span>
+						<span className="block-editor-link-control__search-item-type">{ suggestion.type || '' }</span>
+					</button>
+				) ) }
+			</div>
+		);
+	};
 
 	return (
 		<Fragment>
@@ -113,9 +126,7 @@ function LinkControl( { defaultOpen = false } ) {
 
 			{ isOpen && (
 
-				<URLPopover
-					additionalControls={ shouldRenderSearchResults && renderSearchResults() }
-				>
+				<URLPopover>
 					<div className="block-editor-link-control__popover-inner">
 						<div className="block-editor-link-control__search">
 
@@ -131,6 +142,8 @@ function LinkControl( { defaultOpen = false } ) {
 									onKeyDown={ stopPropagationRelevantKeys }
 									onKeyPress={ stopPropagation }
 									placeholder={ __( 'Search or type url' ) }
+									renderSuggestions={ renderSearchResults }
+									fetchLinkSuggestions={ fetchFauxSuggestions }
 								/>
 								<IconButton
 									className="screen-reader-text"

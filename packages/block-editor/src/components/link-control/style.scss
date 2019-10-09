@@ -6,12 +6,10 @@
 	position: relative;
 }
 
-.block-editor-link-control__search-input {
-	border: 1px solid #000;
-	padding-right: 36px; // width of reset button
-
-	.components-button {
-		display: none;
+.block-editor-link-control__search .block-editor-link-control__search-input {
+	&.block-editor-link-control__search-input > input[type="text"] { // specificity overide
+		border: 1px solid #666;
+		padding-right: 36px; // width of reset button
 	}
 }
 
@@ -22,12 +20,34 @@
 }
 
 .block-editor-link-control__search-results {
-	padding: 20px;
+	// padding: 20px;
 }
 
 
 .block-editor-link-control__search-item {
 	position: relative;
+	display: flex;
+	align-items: center;
+	font-size: $default-font-size;
+	cursor: pointer;
+	background: $white;
+	width: 100%;
+	border: none;
+	text-align: left;
+	padding: 10px;
+
+	span {
+		display: block;
+	}
+
+	.dashicon {
+		margin-right: 1em;
+	}
+
+	.block-editor-link-control__search-item-info {
+		color: #999;
+		font-size: 0.9em;
+	}
 
 	.block-editor-link-control__search-item-type {
 		position: absolute;
