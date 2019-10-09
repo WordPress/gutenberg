@@ -15,6 +15,7 @@ import { View, Text, TouchableOpacity } from 'react-native';
  * Internal dependencies
  */
 import BlockTitle from '../block-title';
+import SubdirectorSVG from './subdirectory-icon';
 
 import styles from './breadcrumb.scss';
 
@@ -32,7 +33,8 @@ const BlockBreadcrumb = ( { clientId, blockIcon, rootClientId, rootBlockIcon } )
 			<TouchableOpacity style={ styles.button } onPress={ () => {/* Open BottomSheet with markup */} }>
 				{ rootClientId && rootBlockIcon && (
 					[ <Icon key="parent-icon" size={ 20 } icon={ rootBlockIcon.src } fill={ styles.icon.color } />,
-						<Icon key="subdirectory-icon" size={ 14 } icon="subdirectory" style={ styles.arrow } fill={ styles.arrow.color } /> ]
+						<SubdirectorSVG key="subdirectory-icon" />,
+					]
 				) }
 				<Icon size={ 24 } icon={ blockIcon.src } fill={ styles.icon.color } />
 				<Text style={ styles.breadcrumbTitle }><BlockTitle clientId={ clientId } /></Text>
