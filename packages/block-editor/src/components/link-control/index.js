@@ -11,8 +11,6 @@ import {
 import classnames from 'classnames';
 import { __ } from '@wordpress/i18n';
 
-import { uniqueId } from 'lodash';
-
 import {
 	useCallback,
 	useState,
@@ -37,7 +35,7 @@ import {
 	URLInput,
 } from '../';
 
-function LinkControl( { defaultOpen = false } ) {
+function LinkControl( { defaultOpen = false, fetchSearchSuggestions } ) {
 	// State
 	const [ isOpen, setIsOpen ] = useState( defaultOpen );
 	const [ inputValue, setInputValue ] = useState( '' );
@@ -70,40 +68,21 @@ function LinkControl( { defaultOpen = false } ) {
 		}
 	};
 
-	const fetchFauxSuggestions = async () => ( [
-		{
-			id: uniqueId(),
-			title: 'WordPress',
-			type: 'URL',
-			url: 'make.wordpress.com',
-		},
-		{
-			id: uniqueId(),
-			title: 'Hello World',
-			type: 'Page',
-			info: '2 days ago',
-			url: '?p=1234',
-		},
-	] );
-
 	// Render Components
-	const renderSearchResults = function renderSearchResults( { suggestions, suggestionsListboxId, suggestionOptionIdPrefix, selectedSuggestion, bindSuggestionNode, handleSuggestionClick } ) {
+	const renderSearchResults = function renderSearchResults( { suggestionsListProps, buildSuggestionItemProps, suggestions, selectedSuggestion, handleSuggestionClick } ) {
+		/* eslint-disable react/jsx-key */
 		return (
-			<div id={ suggestionsListboxId } role="listbox" ref={ autocompleteRef } className="block-editor-link-control__search-results">
+			<div { ...suggestionsListProps } className="block-editor-link-control__search-results">
 				{ suggestions.map( ( suggestion, index ) => (
 					<button
-						key={ suggestion.id }
-						role="option"
-						tabIndex="-1"
-						id={ `${ suggestionOptionIdPrefix }-${ index }` }
-						ref={ bindSuggestionNode( index ) }
+						{ ...buildSuggestionItemProps( suggestion, index ) }
 						className={ classnames( 'block-editor-link-control__search-item', {
 							'is-selected': index === selectedSuggestion,
 						} ) }
 						onClick={ () => handleSuggestionClick( suggestion ) }
-						aria-selected={ index === selectedSuggestion }
+
 					>
-						<Icon icon="wordpress" />
+						<Icon className="block-editor-link-control__search-item-icon" icon="wordpress" />
 						<span className="block-editor-link-control__search-item-header">
 							<span className="block-editor-link-control__search-item-title">{ suggestion.title }</span>
 							<span className="block-editor-link-control__search-item-info">{ suggestion.info || suggestion.url || '' }</span>
@@ -113,6 +92,7 @@ function LinkControl( { defaultOpen = false } ) {
 				) ) }
 			</div>
 		);
+		/* eslint-enable react/jsx-key */
 	};
 
 	return (
@@ -143,7 +123,7 @@ function LinkControl( { defaultOpen = false } ) {
 									onKeyPress={ stopPropagation }
 									placeholder={ __( 'Search or type url' ) }
 									renderSuggestions={ renderSearchResults }
-									fetchLinkSuggestions={ fetchFauxSuggestions }
+									fetchLinkSuggestions={ fetchSearchSuggestions }
 								/>
 								<IconButton
 									className="screen-reader-text"
