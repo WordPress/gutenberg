@@ -69,17 +69,16 @@ function LinkControl( { defaultOpen = false, fetchSearchSuggestions } ) {
 	};
 
 	// Render Components
-	const renderSearchResults = function renderSearchResults( { suggestionsListProps, buildSuggestionItemProps, suggestions, selectedSuggestion, handleSuggestionClick } ) {
+	const renderSearchResults = ( { suggestionsListProps, buildSuggestionItemProps, suggestions, selectedSuggestion, handleSuggestionClick } ) => {
 		/* eslint-disable react/jsx-key */
 		return (
-			<div { ...suggestionsListProps } className="block-editor-link-control__search-results">
+			<ul { ...suggestionsListProps } className="block-editor-link-control__search-results">
 				{ suggestions.map( ( suggestion, index ) => (
-					<button
+					<li
 						{ ...buildSuggestionItemProps( suggestion, index ) }
 						className={ classnames( 'block-editor-link-control__search-item', {
 							'is-selected': index === selectedSuggestion,
 						} ) }
-						onClick={ () => handleSuggestionClick( suggestion ) }
 
 					>
 						<Icon className="block-editor-link-control__search-item-icon" icon="wordpress" />
@@ -87,10 +86,11 @@ function LinkControl( { defaultOpen = false, fetchSearchSuggestions } ) {
 							<span className="block-editor-link-control__search-item-title">{ suggestion.title }</span>
 							<span className="block-editor-link-control__search-item-info">{ suggestion.info || suggestion.url || '' }</span>
 						</span>
-						<span className="block-editor-link-control__search-item-type">{ suggestion.type || '' }</span>
-					</button>
+						<span className="block-editor-link-control__search-item-type">{ suggestion.type.toLowerCase() || '' }</span>
+						<button type="button" onClick={ () => handleSuggestionClick( suggestion ) }>Insert Link</button>
+					</li>
 				) ) }
-			</div>
+			</ul>
 		);
 		/* eslint-enable react/jsx-key */
 	};
