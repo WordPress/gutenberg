@@ -105,6 +105,61 @@ class BlockListBlock extends Component {
 		return blockName;
 	}
 
+	applySelectedStyle() {
+		const {
+			isInnerBlock,
+			isNestedInnerBlock,
+			isGroupType,
+		} = this.props;
+
+		if ( isNestedInnerBlock || isGroupType ) {
+			return styles.nestedFocusedBlock;
+		}
+
+		if ( isInnerBlock ) {
+			return styles.innerBlockContainerFocused;
+		}
+		return styles.blockContainerFocused;
+	}
+
+	applyUnSelectedStyle() {
+		const {
+			isDashed,
+			isDimmed,
+			isNestedInnerBlock,
+			isInnerBlock,
+			isChildOfSameRootBlook,
+			isGroupType,
+			parentId,
+		} = this.props;
+
+		if ( ! isDashed && isInnerBlock && ! isChildOfSameRootBlook ) {
+			return styles.blockContainerInner;
+		}
+
+		const dashedStyle = [ styles.blockHolderDashedBordered ];
+		let defaultStyle = [ styles.blockContainer ];
+
+		if ( isDashed ) {
+			defaultStyle = dashedStyle;
+		}
+
+		if ( isNestedInnerBlock ) {
+			if ( ! isDimmed || isDashed ) {
+				return [ ...defaultStyle, styles.blockContainerInner ];
+			}
+			return [ ...defaultStyle, styles.nestedBlockContainerInner ];
+		}
+
+		if ( isGroupType ) {
+			if ( ! parentId || isChildOfSameRootBlook ) {
+				return [ ...defaultStyle, styles.horizontalMarginNone ];
+			}
+		}
+
+		return defaultStyle;
+	}
+
 	render() {
 		const {
 			borderStyle,
@@ -162,8 +217,8 @@ class BlockListBlock extends Component {
 						<View
 							accessibilityLabel={ accessibilityLabel }
 							style={ [
-								! isSelected && applyUnSelectedStyle( this.props ),
-								isSelected && applySelectedStyle( this.props ),
+								! isSelected && this.applyUnSelectedStyle(),
+								isSelected && this.applySelectedStyle(),
 								isDimmed && styles.blockContainerDimmed,
 								isGroupType && styles.verticalPaddingNone,
 							] }
@@ -181,44 +236,6 @@ class BlockListBlock extends Component {
 	}
 }
 
-function applySelectedStyle( { isInnerBlock, isNestedInnerBlock, isGroupType } ) {
-	let selectedStyle = [ isInnerBlock ? styles.innerBlockContainerFocused : styles.blockContainerFocused ];
-
-	if ( isNestedInnerBlock || isGroupType ) {
-		selectedStyle = [ ...selectedStyle, styles.blockContainerInner ];
-	}
-
-	return selectedStyle;
-}
-
-function applyUnSelectedStyle( { isDashed, isDimmed, isNestedInnerBlock, isInnerBlock, isChildOfSameRootBlook, isGroupType, parentId } ) {
-	let unSelectedStyle = [ styles.blockContainer ];
-
-	if ( isNestedInnerBlock ) {
-		if ( ! isDimmed ) {
-			unSelectedStyle = [ ...unSelectedStyle, styles.blockContainerInner ];
-		}
-		unSelectedStyle = [ ...unSelectedStyle, styles.horizontalMarginNone ];
-	}
-
-	if ( isDashed ) {
-		unSelectedStyle = [ ...unSelectedStyle, styles.blockHolderDashedBordered ];
-		if ( isNestedInnerBlock ) {
-			unSelectedStyle = [ ...unSelectedStyle, styles.blockContainerInner ];
-		}
-	} else if ( isInnerBlock && ! isChildOfSameRootBlook ) {
-		unSelectedStyle = [ ...unSelectedStyle, styles.blockContainerInner ];
-	}
-
-	if ( isGroupType ) {
-		if ( ! parentId || isChildOfSameRootBlook ) {
-			unSelectedStyle = [ ...unSelectedStyle, styles.horizontalMarginNone ];
-		}
-	}
-
-	return unSelectedStyle;
-}
-
 export default compose( [
 	withSelect( ( select, { clientId, rootClientId } ) => {
 		const {
@@ -227,9 +244,9 @@ export default compose( [
 			isBlockSelected,
 			__unstableGetBlockWithoutInnerBlocks,
 			getBlockHierarchyRootClientId,
-			getBlockRootClientId,
 			getSelectedBlockClientId,
 			getBlock,
+			getBlockRootClientId,
 			getSelectedBlock,
 			getFirstToSelectBlock,
 		} = select( 'core/block-editor' );

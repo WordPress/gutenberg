@@ -14,6 +14,15 @@
 	margin-right: 0;
 	padding-left: 0;
 	padding-right: 0;
+	padding-top: 12px;
+	padding-bottom: 12px;
+}
+
+.nestedBlockContainerInner {
+	margin-left: 0;
+	margin-right: 0;
+	padding-top: 9px;
+	padding-bottom: 9px;
 }
 
 .blockContainerDimmed {
@@ -25,11 +34,11 @@
 	border-radius: 2px;
 	border-style: dashed;
 	border-color: $gray;
-	padding: 6px;
+	padding: 5px;
 	margin-right: 0;
 	margin-left: 0;
-	margin-bottom: 5px;
-	margin-top: 5px;
+	margin-bottom: 6px;
+	margin-top: 6px;
 }
 
 .horizontalMarginNone {
@@ -55,6 +64,15 @@
 .dashedBorderMargin {
 	margin-left: 5px;
 	margin-right: 5px;
+}
+
+.nestedFocusedBlock {
+	margin-left: 0;
+	margin-right: 0;
+	padding-left: 0;
+	padding-right: 0;
+	padding-top: 12px;
+	padding-bottom: 0; // will be flushed into inline toolbar height
 }
 
 .innerBlockContainerFocused {
