@@ -43,7 +43,7 @@
 		content: "";
 		position: absolute;
 		left: -1px;
-		right: -2px;
+		right: $grid-size-large; // avoid overlaying scrollbars
 		display: block;
 		pointer-events: none;
 		z-index: 100;
