@@ -25,6 +25,12 @@ export const settings = {
 		className: false,
 		anchor: true,
 	},
+	example: {
+		attributes: {
+			content: __( 'Code is Poetry' ),
+			level: 2,
+		},
+	},
 	transforms,
 	deprecated,
 	merge( attributes, attributesToMerge ) {

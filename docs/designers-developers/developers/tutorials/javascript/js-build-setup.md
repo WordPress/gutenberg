@@ -98,7 +98,7 @@ The `@wordpress/scripts` package handles the dependencies and default configurat
 With that in mind, let's set up a basic block. Create a file at `src/index.js` with the following content:
 
 ```js
-const { registerBlockType } = wp.blocks;
+import { registerBlockType } from '@wordpress/blocks';
 
 registerBlockType( 'myguten/test-block', {
 	title: 'Basic Example',

@@ -181,7 +181,7 @@ function BlockListBlock( {
 
 	// Handling the error state
 	const [ hasError, setErrorState ] = useState( false );
-	const onBlockError = () => setErrorState( false );
+	const onBlockError = () => setErrorState( true );
 
 	// Handling of forceContextualToolbarFocus
 	const isForcingContextualToolbar = useRef( false );
@@ -256,7 +256,7 @@ function BlockListBlock( {
 	}, [ isFirstMultiSelected ] );
 
 	// Block Reordering animation
-	const animationStyle = useMovingAnimation( wrapper, isSelected || isPartOfMultiSelection, enableAnimation, animateOnChange );
+	const animationStyle = useMovingAnimation( wrapper, isSelected || isPartOfMultiSelection, isSelected || isFirstMultiSelected, enableAnimation, animateOnChange );
 
 	// Focus the breadcrumb if the wrapper is focused on navigation mode.
 	// Focus the first editable or the wrapper if edit mode.
@@ -576,10 +576,10 @@ function BlockListBlock( {
 							</div>,
 						] }
 					</BlockCrashBoundary>
+					{ !! hasError && <BlockCrashWarning /> }
 					{ shouldShowMobileToolbar && (
 						<BlockMobileToolbar clientId={ clientId } />
 					) }
-					{ !! hasError && <BlockCrashWarning /> }
 				</IgnoreNestedEvents>
 			</div>
 			{ showInserterShortcuts && (

@@ -34,6 +34,11 @@ $checkbox-input-size-sm: 25px; // width + height for small viewports
 	&:checked {
 		background: #11a0d2;
 		border-color: #11a0d2;
+
+		// Hide default checkbox styles in IE.
+		&::-ms-check {
+			opacity: 0;
+		}
 	}
 
 	&:focus:checked {

@@ -2,9 +2,12 @@
 export { default as BlockControls } from './block-controls';
 export { default as BlockEdit } from './block-edit';
 export { default as BlockFormatControls } from './block-format-controls';
+export { default as BlockIcon } from './block-icon';
+export { default as BlockVerticalAlignmentToolbar } from './block-vertical-alignment-toolbar';
 export * from './colors';
 export * from './font-sizes';
 export { default as AlignmentToolbar } from './alignment-toolbar';
+export { default as InnerBlocks } from './inner-blocks';
 export { default as InspectorControls } from './inspector-controls';
 export { default as PlainText } from './plain-text';
 export {
@@ -15,9 +18,11 @@ export {
 } from './rich-text';
 export { default as MediaPlaceholder } from './media-placeholder';
 export { default as MediaUpload, MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO } from './media-upload';
+export { default as MediaUploadProgress } from './media-upload-progress';
 export { default as URLInput } from './url-input';
 export { default as BlockInvalidWarning } from './block-list/block-invalid-warning';
 export { default as Caption } from './caption';
+export { BottomSheetSettings, BlockSettingsButton } from './block-settings';
 
 // Content Related Components
 export { default as BlockList } from './block-list';

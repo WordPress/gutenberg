@@ -10,8 +10,10 @@ import { sendNativeEditorDidLayout } from 'react-native-gutenberg-bridge';
  */
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { BottomSheetSettings } from '@wordpress/block-editor';
+import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { HTMLTextInput, KeyboardAvoidingView, ReadableContentView } from '@wordpress/components';
+import { AutosaveMonitor } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -75,7 +77,7 @@ class Layout extends Component {
 
 	renderHTML() {
 		return (
-			<HTMLTextInput />
+			<HTMLTextInput parentHeight={ this.state.rootViewHeight } />
 		);
 	}
 
@@ -99,10 +101,13 @@ class Layout extends Component {
 	render() {
 		const {
 			mode,
+			getStylesFromColorScheme,
 		} = this.props;
 
+		const isHtmlView = mode === 'text';
+
 		// add a margin view at the bottom for the header
-		const marginBottom = Platform.OS === 'android' ? headerToolbarStyles.container.height : 0;
+		const marginBottom = Platform.OS === 'android' && ! isHtmlView ? headerToolbarStyles.container.height : 0;
 
 		const toolbarKeyboardAvoidingViewStyle = {
 			...styles.toolbarKeyboardAvoidingView,
@@ -112,18 +117,20 @@ class Layout extends Component {
 		};
 
 		return (
-			<SafeAreaView style={ styles.container } onLayout={ this.onRootViewLayout }>
-				<View style={ { flex: 1 } }>
-					{ mode === 'text' ? this.renderHTML() : this.renderVisual() }
+			<SafeAreaView style={ getStylesFromColorScheme( styles.container, styles.containerDark ) } onLayout={ this.onRootViewLayout }>
+				<AutosaveMonitor />
+				<View style={ getStylesFromColorScheme( styles.background, styles.backgroundDark ) }>
+					{ isHtmlView ? this.renderHTML() : this.renderVisual() }
 				</View>
-				<View style={ { flex: 0, flexBasis: marginBottom, height: marginBottom } }>
-				</View>
-				<KeyboardAvoidingView
-					parentHeight={ this.state.rootViewHeight }
-					style={ toolbarKeyboardAvoidingViewStyle }
-				>
-					<Header />
-				</KeyboardAvoidingView>
+				<View style={ { flex: 0, flexBasis: marginBottom, height: marginBottom } } />
+				{ ! isHtmlView && (
+					<KeyboardAvoidingView
+						parentHeight={ this.state.rootViewHeight }
+						style={ toolbarKeyboardAvoidingViewStyle }
+					>
+						<Header />
+						<BottomSheetSettings />
+					</KeyboardAvoidingView> ) }
 			</SafeAreaView>
 		);
 	}
@@ -143,4 +150,5 @@ export default compose( [
 			mode: getEditorMode(),
 		};
 	} ),
+	withPreferredColorScheme,
 ] )( Layout );

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, get, merge, isEqual, find } from 'lodash';
+import { castArray, get, isEqual, find } from 'lodash';
 
 /**
  * Internal dependencies
@@ -159,7 +159,7 @@ export function* editEntityRecord( kind, name, recordId, edits, options = {} ) {
 			const recordValue = record[ key ];
 			const editedRecordValue = editedRecord[ key ];
 			const value = mergedEdits[ key ] ?
-				merge( {}, editedRecordValue, edits[ key ] ) :
+				{ ...editedRecordValue, ...edits[ key ] } :
 				edits[ key ];
 			acc[ key ] = isEqual( recordValue, value ) ? undefined : value;
 			return acc;
@@ -252,6 +252,8 @@ export function* saveEntityRecord(
 	yield { type: 'SAVE_ENTITY_RECORD_START', kind, name, recordId, isAutosave };
 	let updatedRecord;
 	let error;
+	let persistedEntity;
+	let currentEdits;
 	try {
 		const path = `${ entity.baseURL }${ recordId ? '/' + recordId : '' }`;
 		const persistedRecord = yield select(
@@ -323,16 +325,35 @@ export function* saveEntityRecord(
 				yield receiveAutosaves( persistedRecord.id, updatedRecord );
 			}
 		} else {
-			// Auto drafts should be converted to drafts on explicit saves,
+			// Auto drafts should be converted to drafts on explicit saves and we should not respect their default title,
 			// but some plugins break with this behavior so we can't filter it on the server.
 			let data = record;
-			if (
-				kind === 'postType' &&
-				persistedRecord && persistedRecord.status === 'auto-draft' &&
-				! data.status
-			) {
-				data = { ...data, status: 'draft' };
+			if ( kind === 'postType' && persistedRecord && persistedRecord.status === 'auto-draft' ) {
+				if ( ! data.status ) {
+					data = { ...data, status: 'draft' };
+				}
+				if ( ! data.title || data.title === 'Auto Draft' ) {
+					data = { ...data, title: '' };
+				}
 			}
+
+			// We perform an optimistic update here to clear all the edits that
+			// will be persisted so that if the server filters them, the new
+			// filtered values are always accepted.
+			persistedEntity = yield select(
+				'getEntityRecord',
+				kind,
+				name,
+				recordId
+			);
+			currentEdits = yield select(
+				'getEntityRecordEdits',
+				kind,
+				name,
+				recordId
+			);
+			yield receiveEntityRecords( kind, name, { ...persistedEntity, ...data }, undefined, true );
+
 			updatedRecord = yield apiFetch( {
 				path,
 				method: recordId ? 'PUT' : 'POST',
@@ -342,6 +363,22 @@ export function* saveEntityRecord(
 		}
 	} catch ( _error ) {
 		error = _error;
+
+		// If we got to the point in the try block where we made an optimistic update,
+		// we need to roll it back here.
+		if ( persistedEntity && currentEdits ) {
+			yield receiveEntityRecords( kind, name, persistedEntity, undefined, true );
+			yield editEntityRecord(
+				kind,
+				name,
+				recordId,
+				{
+					...currentEdits,
+					...( yield select( 'getEntityRecordEdits', kind, name, recordId ) ),
+				},
+				{ undoIgnore: true }
+			);
+		}
 	}
 	yield {
 		type: 'SAVE_ENTITY_RECORD_FINISH',

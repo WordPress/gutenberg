@@ -12,7 +12,7 @@ import { withSelect, withDispatch } from '@wordpress/data';
 import TokenList from '@wordpress/token-list';
 import { ENTER, SPACE } from '@wordpress/keycodes';
 import { _x } from '@wordpress/i18n';
-import { getBlockType, cloneBlock, createBlock } from '@wordpress/blocks';
+import { getBlockType, cloneBlock, getBlockFromExample } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -124,9 +124,13 @@ function BlockStyles( {
 						<div className="editor-block-styles__item-preview block-editor-block-styles__item-preview">
 							<BlockPreview
 								viewportWidth={ 500 }
-								blocks={ type.example ?
-									createBlock( block.name, { ...type.example.attributes, className: styleClassName }, type.example.innerBlocks ) :
-									cloneBlock( block, { className: styleClassName } )
+								blocks={
+									type.example ?
+										getBlockFromExample( block.name, {
+											attributes: { ...type.example.attributes, className: styleClassName },
+											innerBlocks: type.example.innerBlocks,
+										} ) :
+										cloneBlock( block, { className: styleClassName } )
 								}
 							/>
 						</div>

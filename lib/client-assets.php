@@ -240,7 +240,6 @@ function gutenberg_register_scripts_and_styles() {
 	//
 	// See: https://core.trac.wordpress.org/ticket/46107 .
 	// See: https://github.com/WordPress/gutenberg/pull/13451 .
-	global $wp_scripts;
 	if ( isset( $wp_scripts->registered['wp-api-fetch'] ) ) {
 		$wp_scripts->registered['wp-api-fetch']->deps[] = 'wp-hooks';
 	}
@@ -409,6 +408,8 @@ function gutenberg_register_vendor_scripts() {
 	// Vendor Scripts.
 	$react_suffix = ( SCRIPT_DEBUG ? '.development' : '.production' ) . $suffix;
 
+	// TODO: Overrides for react, react-dom and lodash are necessary
+	// until WordPress 5.3 is released.
 	gutenberg_register_vendor_script(
 		'react',
 		'https://unpkg.com/react@16.9.0/umd/react' . $react_suffix . '.js',
@@ -419,12 +420,9 @@ function gutenberg_register_vendor_scripts() {
 		'https://unpkg.com/react-dom@16.9.0/umd/react-dom' . $react_suffix . '.js',
 		array( 'react' )
 	);
-
-	// TODO: This is necessarily only so long as core ships with v4.17.11, and
-	// can be removed at such time a newer version is available.
 	gutenberg_register_vendor_script(
 		'lodash',
-		'https://unpkg.com/lodash@4.17.14/lodash' . $suffix . '.js'
+		'https://unpkg.com/lodash@4.17.15/lodash' . $suffix . '.js'
 	);
 }
 

@@ -14,7 +14,7 @@ import { forwardRef } from '@wordpress/element';
  */
 import Tooltip from '../tooltip';
 import Button from '../button';
-import Dashicon from '../dashicon';
+import Icon from '../icon';
 
 function IconButton( props, ref ) {
 	const {
@@ -27,7 +27,6 @@ function IconButton( props, ref ) {
 		labelPosition,
 		...additionalProps
 	} = props;
-	const { 'aria-pressed': ariaPressed } = additionalProps;
 	const classes = classnames( 'components-icon-button', className, {
 		'has-text': children,
 	} );
@@ -56,7 +55,7 @@ function IconButton( props, ref ) {
 			className={ classes }
 			ref={ ref }
 		>
-			{ isString( icon ) ? <Dashicon icon={ icon } ariaPressed={ ariaPressed } /> : icon }
+			{ isString( icon ) ? <Icon icon={ icon } /> : icon }
 			{ children }
 		</Button>
 	);
