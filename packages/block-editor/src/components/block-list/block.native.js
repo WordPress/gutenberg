@@ -120,7 +120,6 @@ class BlockListBlock extends Component {
 			isFirstBlock,
 			isDashed,
 			isDimmed,
-			isGroup,
 			isInnerBlock,
 			isChildOfSameRootBlook,
 			isNestedInnerBlock,
@@ -165,19 +164,13 @@ class BlockListBlock extends Component {
 							accessibilityLabel={ accessibilityLabel }
 							style={ [
 								! isSelected && ( isDashed ? styles.blockHolderDashedBordered : styles.blockContainer ),
-								! isSelected && isDashed && isNestedInnerBlock && styles.blockContainerInner,
-								! isSelected && ! isDashed && isNestedInnerBlock && styles.horizontalMarginNone,
-								! isSelected && isInnerBlock && ! isChildOfSameRootBlook && ! isDashed && styles.blockContainerInner,
-								! isSelected && isNestedInnerBlock && ! isDimmed && styles.blockContainerInner,
-								! isSelected && isGroup && ! parentId && styles.horizontalMarginNone,
-								! isSelected && isGroupType && isChildOfSameRootBlook && styles.horizontalMarginNone,
+								! isSelected && ( ( isDashed || ! isDimmed ) && isNestedInnerBlock ) || ( isInnerBlock && ! isChildOfSameRootBlook && ! isDashed ) && styles.blockContainerInner,
+								! isSelected && ( isGroupType && ( ! parentId || isChildOfSameRootBlook ) || isNestedInnerBlock ) && styles.horizontalMarginNone,
 								isDimmed && isInnerBlock && styles.marginSelectedInnerBlock,
 								isDimmed && styles.blockContainerDimmed,
-								isSelected && ( parentId ? styles.innerBlockContainerFocused : styles.blockContainerFocused ),
-								isSelected && isGroup && ! parentId && styles.horizontalPaddingNone,
+								isSelected && ( isInnerBlock ? styles.innerBlockContainerFocused : styles.blockContainerFocused ),
 								isSelected && ( isNestedInnerBlock || isGroupType ) && styles.blockContainerInner,
 								( isGroupType || ( isGroupType && isDashed ) ) && styles.verticalPaddingNone,
-								isGroupType && isNestedInnerBlock && styles.horizontalMarginNone,
 							] }
 						>
 							{ isValid && this.getBlockForType() }
@@ -242,7 +235,6 @@ export default compose( [
 		const isInnerBlock = parentId && firstToSelect !== parentId;
 		const isChildOfSameRootBlook = rootBlockId === getBlockHierarchyRootClientId( selectedBlockClientId );
 		const isNestedInnerBlock = ! isDashed && selectedBlockClientId === getBlockRootClientId( firstToSelect );
-		const isGroup = hasRootInnerBlocks;
 		const isGroupType = blockType.name === 'core/group';
 
 		return {
@@ -262,7 +254,6 @@ export default compose( [
 			isDashed,
 			isDimmed,
 			firstToSelect,
-			isGroup,
 			isInnerBlock,
 			isChildOfSameRootBlook,
 			isNestedInnerBlock,
