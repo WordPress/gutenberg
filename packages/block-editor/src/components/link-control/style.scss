@@ -50,7 +50,7 @@
 	}
 
 	&::before {
-		height: $grid-size-large;
+		height: $grid-size-large/2;
 		top: -1px;
 		bottom: auto;
 		background: linear-gradient(to bottom, #fff 0%, transparent 100%);
@@ -128,4 +128,14 @@
 // Specificity overide
 .block-editor-link-control__search-results div[role="menu"] > .block-editor-link-control__search-item.block-editor-link-control__search-item {
 	padding: 10px;
+}
+
+.block-editor-link-control__settings {
+	border-top: 1px solid #e1e1e1;
+	margin: 0 $grid-size-large;
+	padding: $grid-size-large $grid-size-large;
+
+	:last-child {
+		margin-bottom: 0;
+	}
 }

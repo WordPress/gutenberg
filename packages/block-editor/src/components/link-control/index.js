@@ -99,13 +99,13 @@ function LinkControl( { defaultOpen = false, fetchSearchSuggestions, renderAddit
 		/* eslint-enable react/jsx-key */
 	};
 
-	const renderSettings = () => (
-		<Fragment>
+	const LinkControlAdditionalSettings = () => (
+		<div className="block-editor-link-control__settings">
 			<ToggleControl
 				label={ __( 'Open in New Tab' ) }
 				checked={ false } />
 			{ isFunction( renderAdditionalSettings ) && renderAdditionalSettings() }
-		</Fragment>
+		</div>
 	);
 
 	return (
@@ -119,9 +119,7 @@ function LinkControl( { defaultOpen = false, fetchSearchSuggestions, renderAddit
 
 			{ isOpen && (
 
-				<URLPopover
-					renderSettings={ renderSettings }
-				>
+				<URLPopover>
 					<div className="block-editor-link-control__popover-inner">
 						<div className="block-editor-link-control__search">
 
@@ -149,6 +147,7 @@ function LinkControl( { defaultOpen = false, fetchSearchSuggestions, renderAddit
 										onClick={ () => onInputChange( '' ) }
 									/>
 								) }
+								{ inputValue && <LinkControlAdditionalSettings /> }
 							</form>
 						</div>
 					</div>
