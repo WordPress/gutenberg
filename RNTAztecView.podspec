@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   s.platforms        = { :ios => "11.0" }
   s.swift_version    = '4.2'
   s.xcconfig         = {'OTHER_LDFLAGS' => '-lxml2',
-						'HEADER_SEARCH_PATHS' => '/usr/include/libxml2'}
+						'HEADER_SEARCH_PATHS' => '$(SDKROOT)/usr/include/libxml2'}
   s.dependency         'React-Core'
   s.dependency         'WordPress-Aztec-iOS'
 
