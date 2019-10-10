@@ -151,6 +151,8 @@ export const registerCoreBlocks = () => {
 		// eslint-disable-next-line no-undef
 		!! __DEV__ ? group : null,
 		spacer,
+		// eslint-disable-next-line no-undef
+		!! __DEV__ ? gallery : null,
 	].forEach( registerBlock );
 
 	setDefaultBlockName( paragraph.name );
