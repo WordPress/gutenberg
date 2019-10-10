@@ -25,10 +25,7 @@
 	border-radius: 2px;
 	border-style: dashed;
 	border-color: $gray;
-	padding-left: 6px;
-	padding-right: 6px;
-	padding-top: 6px;
-	padding-bottom: 6px;
+	padding: 6px;
 	margin-right: 0;
 	margin-left: 0;
 	margin-bottom: 5px;
@@ -50,17 +47,17 @@
 	padding-bottom: 0;
 }
 
-.outlineBorderMargin {
-	margin-left: 9px;
-	margin-right: 9px;
-}
-
 .horizontalPaddingNone {
 	padding-left: 0;
 	padding-right: 0;
 }
 
-.dashedBorderStyle {
+.outlineBorderMargin {
+	margin-left: 9px;
+	margin-right: 9px;
+}
+
+.dashedBorderMargin {
 	margin-left: 5px;
 	margin-right: 5px;
 }

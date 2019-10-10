@@ -154,7 +154,7 @@ class BlockListBlock extends Component {
 						styles.blockHolder,
 						borderStyle,
 						isSelected && ( isGroupType || isInnerBlock || isNestedInnerBlock ) && styles.outlineBorderMargin,
-						isDashed && styles.dashedBorderStyle,
+						isDashed && styles.dashedBorderMargin,
 						isGroupType && styles.verticalPaddingNone,
 						{ borderColor },
 					]
@@ -170,7 +170,7 @@ class BlockListBlock extends Component {
 								isDimmed && styles.blockContainerDimmed,
 								isSelected && ( isInnerBlock ? styles.innerBlockContainerFocused : styles.blockContainerFocused ),
 								isSelected && ( isNestedInnerBlock || isGroupType ) && styles.blockContainerInner,
-								( isGroupType || ( isGroupType && isDashed ) ) && styles.verticalPaddingNone,
+								isGroupType && styles.verticalPaddingNone,
 							] }
 						>
 							{ isValid && this.getBlockForType() }
