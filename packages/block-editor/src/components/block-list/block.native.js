@@ -121,7 +121,6 @@ class BlockListBlock extends Component {
 			isDashed,
 			isDimmed,
 			isInnerBlock,
-			isChildOfSameRootBlook,
 			isNestedInnerBlock,
 			isGroupType,
 		} = this.props;
@@ -163,12 +162,9 @@ class BlockListBlock extends Component {
 						<View
 							accessibilityLabel={ accessibilityLabel }
 							style={ [
-								! isSelected && ( isDashed ? styles.blockHolderDashedBordered : styles.blockContainer ),
-								! isSelected && ( ( isDashed || ! isDimmed ) && isNestedInnerBlock ) || ( isInnerBlock && ! isChildOfSameRootBlook && ! isDashed ) && styles.blockContainerInner,
-								! isSelected && ( isGroupType && ( ! parentId || isChildOfSameRootBlook ) || isNestedInnerBlock ) && styles.horizontalMarginNone,
+								! isSelected && applyUnSelectedStyle( this.props ),
+								isSelected && applySelectedStyle( this.props ),
 								isDimmed && styles.blockContainerDimmed,
-								isSelected && ( isInnerBlock ? styles.innerBlockContainerFocused : styles.blockContainerFocused ),
-								isSelected && ( isNestedInnerBlock || isGroupType ) && styles.blockContainerInner,
 								isGroupType && styles.verticalPaddingNone,
 							] }
 						>
@@ -183,6 +179,44 @@ class BlockListBlock extends Component {
 			</>
 		);
 	}
+}
+
+function applySelectedStyle( { isInnerBlock, isNestedInnerBlock, isGroupType } ) {
+	let selectedStyle = [ isInnerBlock ? styles.innerBlockContainerFocused : styles.blockContainerFocused ];
+
+	if ( isNestedInnerBlock || isGroupType ) {
+		selectedStyle = [ ...selectedStyle, styles.blockContainerInner ];
+	}
+
+	return selectedStyle;
+}
+
+function applyUnSelectedStyle( { isDashed, isDimmed, isNestedInnerBlock, isInnerBlock, isChildOfSameRootBlook, isGroupType, parentId } ) {
+	let unSelectedStyle = [ styles.blockContainer ];
+
+	if ( isNestedInnerBlock ) {
+		if ( ! isDimmed ) {
+			unSelectedStyle = [ ...unSelectedStyle, styles.blockContainerInner ];
+		}
+		unSelectedStyle = [ ...unSelectedStyle, styles.horizontalMarginNone ];
+	}
+
+	if ( isDashed ) {
+		unSelectedStyle = [ ...unSelectedStyle, styles.blockHolderDashedBordered ];
+		if ( isNestedInnerBlock ) {
+			unSelectedStyle = [ ...unSelectedStyle, styles.blockContainerInner ];
+		}
+	} else if ( isInnerBlock && ! isChildOfSameRootBlook ) {
+		unSelectedStyle = [ ...unSelectedStyle, styles.blockContainerInner ];
+	}
+
+	if ( isGroupType ) {
+		if ( ! parentId || isChildOfSameRootBlook ) {
+			unSelectedStyle = [ ...unSelectedStyle, styles.horizontalMarginNone ];
+		}
+	}
+
+	return unSelectedStyle;
 }
 
 export default compose( [
