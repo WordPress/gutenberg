@@ -21,10 +21,8 @@
 }
 
 .blockHolderDashedBordered {
-	border-top-width: 1px;
-	border-bottom-width: 1px;
-	border-left-width: 1px;
-	border-right-width: 1px;
+	border-width: 1px;
+	border-radius: 2px;
 	border-style: dashed;
 	border-color: $gray;
 	padding-left: 6px;
@@ -35,7 +33,6 @@
 	margin-left: 0;
 	margin-bottom: 5px;
 	margin-top: 5px;
-	border-radius: 2px;
 }
 
 .marginSelectedInnerBlock {
