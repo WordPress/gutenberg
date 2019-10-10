@@ -100,7 +100,7 @@ function fixPlaceholderSelection() {
 		return;
 	}
 
-	window.getSelection().collapseToStart();
+	selection.collapseToStart();
 }
 
 /**
