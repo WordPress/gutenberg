@@ -107,6 +107,7 @@ public class WPAndroidGlueCode {
     public interface OnMediaLibraryButtonListener {
         void onMediaLibraryImageButtonClicked(boolean allowMultipleSelection);
         void onMediaLibraryVideoButtonClicked(boolean allowMultipleSelection);
+        void onMediaLibraryMediaButtonClicked(boolean allowMultipleSelection);
         void onUploadPhotoButtonClicked(boolean allowMultipleSelection);
         void onCapturePhotoButtonClicked();
         void onUploadVideoButtonClicked(boolean allowMultipleSelection);
@@ -159,6 +160,8 @@ public class WPAndroidGlueCode {
                     mOnMediaLibraryButtonListener.onMediaLibraryImageButtonClicked(allowMultipleSelection);
                 } else if (mediaType == MediaType.VIDEO) {
                     mOnMediaLibraryButtonListener.onMediaLibraryVideoButtonClicked(allowMultipleSelection);
+                } else if (mediaType == MediaType.MEDIA) {
+                    mOnMediaLibraryButtonListener.onMediaLibraryMediaButtonClicked(allowMultipleSelection);
                 }
             }
 
