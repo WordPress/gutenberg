@@ -38,38 +38,29 @@
 	border-radius: 2px;
 }
 
-.selectedInnerGroup {
+.marginSelectedInnerBlock {
 	margin-left: 16px;
 	margin-right: 16px;
 }
 
-.noMargin {
-	// padding-top: 0;
+.horizontalMarginNone {
 	margin-left: 0;
 	margin-right: 0;
 }
 
-.noGroupPadding {
+.verticalPaddingNone {
 	padding-top: 0;
 	padding-bottom: 0;
 }
 
-.margin {
+.outlineBorderMargin {
 	margin-left: 9px;
 	margin-right: 9px;
 }
 
-.marginInnerGroup {
-	margin-left: 0;
-	margin-right: 0;
+.horizontalPaddingNone {
 	padding-left: 0;
 	padding-right: 0;
-}
-
-.padding {
-	padding-left: 0;
-	padding-right: 0;
-	// padding-top: 0;
 }
 
 .dashedBorderStyle {

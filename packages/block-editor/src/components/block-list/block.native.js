@@ -154,9 +154,9 @@ class BlockListBlock extends Component {
 					<View style={ [
 						styles.blockHolder,
 						borderStyle,
-						isSelected && ( isGroupType || isInnerBlock || isNestedInnerBlock ) && styles.margin,
+						isSelected && ( isGroupType || isInnerBlock || isNestedInnerBlock ) && styles.outlineBorderMargin,
 						isDashed && styles.dashedBorderStyle,
-						isGroupType && styles.noGroupPadding,
+						isGroupType && styles.verticalPaddingNone,
 						{ borderColor },
 					]
 					}>
@@ -166,22 +166,18 @@ class BlockListBlock extends Component {
 							style={ [
 								! isSelected && ( isDashed ? styles.blockHolderDashedBordered : styles.blockContainer ),
 								! isSelected && isDashed && isNestedInnerBlock && styles.blockContainerInner,
-								! isSelected && ! isDashed && isNestedInnerBlock && styles.noMargin,
-								! isSelected && isGroup && ! parentId && styles.selectedInnerGroup,
-								! isSelected && isInnerBlock && ! isChildOfSameRootBlook && ! isDashed && styles.marginInnerGroup,
+								! isSelected && ! isDashed && isNestedInnerBlock && styles.horizontalMarginNone,
+								! isSelected && isInnerBlock && ! isChildOfSameRootBlook && ! isDashed && styles.blockContainerInner,
 								! isSelected && isNestedInnerBlock && ! isDimmed && styles.blockContainerInner,
-								! isSelected && isNestedInnerBlock && { paddingLeft: 0 },
-								! isSelected && isGroup && ! parentId && styles.noMargin,
-								! isSelected && isGroupType && isChildOfSameRootBlook && styles.noMargin,
-								isDimmed && isInnerBlock && styles.selectedInnerGroup,
+								! isSelected && isGroup && ! parentId && styles.horizontalMarginNone,
+								! isSelected && isGroupType && isChildOfSameRootBlook && styles.horizontalMarginNone,
+								isDimmed && isInnerBlock && styles.marginSelectedInnerBlock,
 								isDimmed && styles.blockContainerDimmed,
 								isSelected && ( parentId ? styles.innerBlockContainerFocused : styles.blockContainerFocused ),
-								isSelected && isGroup && ! parentId && styles.padding,
-								isSelected && isNestedInnerBlock && styles.marginInnerGroup,
-								isSelected && isGroupType && styles.marginInnerGroup,
-								isGroupType && styles.noGroupPadding,
-								isGroupType && isDashed && { paddingTop: 0, paddingBottom: 0 },
-								isGroupType && isNestedInnerBlock && styles.noMargin,
+								isSelected && isGroup && ! parentId && styles.horizontalPaddingNone,
+								isSelected && ( isNestedInnerBlock || isGroupType ) && styles.blockContainerInner,
+								( isGroupType || ( isGroupType && isDashed ) ) && styles.verticalPaddingNone,
+								isGroupType && isNestedInnerBlock && styles.horizontalMarginNone,
 							] }
 						>
 							{ isValid && this.getBlockForType() }
