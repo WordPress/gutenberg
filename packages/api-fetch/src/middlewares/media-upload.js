@@ -11,7 +11,7 @@ import parseResponseAndNormalizeError from '../utils/response';
  *
  * @return {*} The evaluated result of the remaining middleware chain.
  */
-function imageUploadMiddleware( options, next ) {
+function mediaUploadMiddleware( options, next ) {
 	const isMediaUploadRequest =
 		( options.path && options.path.indexOf( '/wp/v2/media' ) !== -1 ) ||
 		( options.url && options.url.indexOf( '/wp/v2/media' ) !== -1 );
@@ -27,6 +27,12 @@ function imageUploadMiddleware( options, next ) {
 		const shouldRetry = !! attachmentId && retries < maxRetries;
 
 		if ( ! shouldRetry ) {
+			if ( attachmentId ) {
+				next( {
+					path: `/wp/v2/media/${ attachmentId }`,
+					method: 'DELETE',
+				} );
+			}
 			return Promise.reject( response );
 		}
 
@@ -46,4 +52,4 @@ function imageUploadMiddleware( options, next ) {
 		.catch( retry );
 }
 
-export default imageUploadMiddleware;
+export default mediaUploadMiddleware;

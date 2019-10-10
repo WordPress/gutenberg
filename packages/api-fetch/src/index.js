@@ -8,7 +8,7 @@ import fetchAllMiddleware from './middlewares/fetch-all-middleware';
 import namespaceEndpointMiddleware from './middlewares/namespace-endpoint';
 import httpV1Middleware from './middlewares/http-v1';
 import userLocaleMiddleware from './middlewares/user-locale';
-import imageUploadMiddleware from './middlewares/image-upload';
+import mediaUploadMiddleware from './middlewares/media-upload';
 import parseResponseAndNormalizeError from './utils/response';
 
 /**
@@ -137,6 +137,6 @@ apiFetch.createNonceMiddleware = createNonceMiddleware;
 apiFetch.createPreloadingMiddleware = createPreloadingMiddleware;
 apiFetch.createRootURLMiddleware = createRootURLMiddleware;
 apiFetch.fetchAllMiddleware = fetchAllMiddleware;
-apiFetch.imageUploadMiddleware = imageUploadMiddleware;
+apiFetch.mediaUploadMiddleware = mediaUploadMiddleware;
 
 export default apiFetch;
