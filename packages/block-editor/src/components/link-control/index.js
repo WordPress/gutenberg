@@ -50,9 +50,26 @@ function LinkControl( { defaultOpen = false, fetchSearchSuggestions, renderAddit
 		setIsOpen( true );
 	} );
 
+	const getSearchFetcher = useCallback( ( value ) => {
+		return ( /^https?:/.test( value ) ) ? handleURLSearch : handleEntitySearch;
+	} );
+
 	// Handlers
 	const onInputChange = ( value = '' ) => {
 		setInputValue( value );
+	};
+
+	const handleURLSearch = async ( value ) => {
+		return [ {
+			id: 1,
+			title: value,
+			type: 'URL',
+			url: value,
+		} ];
+	};
+
+	const handleEntitySearch = ( value ) => {
+		return fetchSearchSuggestions( value );
 	};
 
 	const onSubmitLinkChange = ( value ) => {
@@ -85,7 +102,9 @@ function LinkControl( { defaultOpen = false, fetchSearchSuggestions, renderAddit
 							} ) }
 
 						>
-							<Icon className="block-editor-link-control__search-item-icon" icon="wordpress" />
+							{ suggestion.type.toLowerCase() === 'url' && (
+								<Icon className="block-editor-link-control__search-item-icon" icon="admin-site-alt3" />
+							) }
 							<span className="block-editor-link-control__search-item-header">
 								<span className="block-editor-link-control__search-item-title">{ suggestion.title }</span>
 								<span className="block-editor-link-control__search-item-info">{ suggestion.info || suggestion.url || '' }</span>
@@ -135,7 +154,8 @@ function LinkControl( { defaultOpen = false, fetchSearchSuggestions, renderAddit
 									onKeyPress={ stopPropagation }
 									placeholder={ __( 'Search or type url' ) }
 									renderSuggestions={ renderSearchResults }
-									fetchLinkSuggestions={ fetchSearchSuggestions }
+									fetchLinkSuggestions={ getSearchFetcher( inputValue ) }
+									handleURLSuggestions={ true }
 								/>
 
 								{ inputValue && (
@@ -144,7 +164,7 @@ function LinkControl( { defaultOpen = false, fetchSearchSuggestions, renderAddit
 										label={ __( 'Reset' ) }
 										icon="no-alt"
 										className="block-editor-link-control__search-reset"
-										onClick={ () => onInputChange( '' ) }
+										onClick={ () => onInputChange( undefined ) }
 									/>
 								) }
 								{ inputValue && <LinkControlAdditionalSettings /> }
