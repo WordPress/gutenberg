@@ -13,7 +13,7 @@ Pod::Spec.new do |s|
   s.source_files     = 'react-native-aztec/ios/RNTAztecView/*.{h,m,swift}'
   s.public_header_files = 'react-native-aztec/ios/RNTAztecView/*.h'
   s.requires_arc     = true
-  s.platforms        = { :ios => "10.0" }
+  s.platforms        = { :ios => "11.0" }
   s.swift_version    = '4.2'
   s.xcconfig         = {'OTHER_LDFLAGS' => '-lxml2',
 						'HEADER_SEARCH_PATHS' => '/usr/include/libxml2'}
