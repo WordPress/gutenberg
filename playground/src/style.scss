@@ -1,9 +1,9 @@
-@import "../../assets/stylesheets/colors";
-@import "../../assets/stylesheets/variables";
-@import "../../assets/stylesheets/mixins";
-@import "../../assets/stylesheets/breakpoints";
-@import "../../assets/stylesheets/animations";
-@import "../../assets/stylesheets/z-index";
+@import "../../packages/base-styles/colors";
+@import "../../packages/base-styles/variables";
+@import "../../packages/base-styles/mixins";
+@import "../../packages/base-styles/breakpoints";
+@import "../../packages/base-styles/animations";
+@import "../../packages/base-styles/z-index";
 
 @import "./reset";
 @import "./editor-styles";
