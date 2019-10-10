@@ -22,6 +22,7 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
+	"sideEffects": false,
 	"dependencies": {
 		"@babel/runtime": "^7.4.4",
 		"is-promise": "^2.1.0",
