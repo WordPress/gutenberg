@@ -11,12 +11,12 @@ Pod::Spec.new do |s|
   s.homepage     = 'https://github.com/wordpress-mobile/gutenberg-mobile'
   s.license      = package['license']
   s.authors          = 'Automattic'
-  s.platform     = :ios, '10.0'
+  s.platform     = :ios, '11.0'
   s.source       = { :git => 'https://github.com/wordpress-mobile/gutenberg-mobile.git' }
   s.source_files = 'react-native-gutenberg-bridge/ios/*.{h,m,swift}'
   s.requires_arc = true
   s.preserve_paths = 'bundle/ios/*'
-  s.swift_version = '4.2'
+  s.swift_version = '5.0'
 
   s.dependency 'React', react_native_version
   s.dependency 'React-RCTImage', react_native_version
