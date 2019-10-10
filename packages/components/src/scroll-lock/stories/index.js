@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { withState } from '@wordpress/compose';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -11,12 +11,10 @@ import ScrollLock from '../';
 
 export default { title: 'ScrollLock', component: ScrollLock };
 
-const Example = withState( {
-	isScrollLocked: false,
-} )( ( { isScrollLocked, setState } ) => {
-	const toggleLock = () => {
-		setState( ( state ) => ( { isScrollLocked: ! state.isScrollLocked } ) );
-	};
+const Example = () => {
+	const [ isScrollLocked, setScrollLocked ] = useState( false );
+	const toggleLock = () => setScrollLocked( ! isScrollLocked );
+
 	return (
 		<StripedBackground>
 			<div>Start scrolling down...</div>
@@ -31,14 +29,15 @@ const Example = withState( {
 			</ToggleContainer>
 		</StripedBackground>
 	);
-} );
+};
 
 function StripedBackground( props ) {
 	return (
 		<div
 			style={ {
 				backgroundColor: '#fff',
-				backgroundImage: 'linear-gradient(transparent 50%, rgba(0, 0, 0, 0.05) 50%)',
+				backgroundImage:
+					'linear-gradient(transparent 50%, rgba(0, 0, 0, 0.05) 50%)',
 				backgroundSize: '50px 50px',
 				height: 3000,
 				position: 'relative',
