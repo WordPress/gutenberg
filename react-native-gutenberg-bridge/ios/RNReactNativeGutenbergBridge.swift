@@ -28,16 +28,16 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
                     return
                 }
                 if (allowMultipleSelection) {
-                    let formattedMedia = media.map { (id, url) in
-                        return [mediaDictKeys.IDKey: id, mediaDictKeys.URLKey: url]
+                    let formattedMedia = media.map { (id, url, type) in
+                        return [mediaDictKeys.IDKey: id, mediaDictKeys.URLKey: url, mediaDictKeys.TypeKey: type]
                     }
                     callback([formattedMedia])
                 } else {
-                    guard let (mediaID, mediaURL) = media.first else {
+                    guard let (mediaID, mediaURL, mediaType) = media.first else {
                         callback(nil)
                         return
                     }
-                    callback([[mediaDictKeys.IDKey: mediaID, mediaDictKeys.URLKey: mediaURL]])
+                    callback([[mediaDictKeys.IDKey: mediaID, mediaDictKeys.URLKey: mediaURL, mediaDictKeys.TypeKey: mediaType]])
                 }
             })
         }
@@ -194,5 +194,6 @@ extension RNReactNativeGutenbergBridge {
     enum mediaDictKeys {
         static let IDKey = "id"
         static let URLKey = "url"
+        static let TypeKey = "type"
     }
 }
