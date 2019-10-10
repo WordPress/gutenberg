@@ -72,10 +72,10 @@
 		"@babel/runtime-corejs3": "7.4.5",
 		"@babel/traverse": "7.4.5",
 		"@octokit/rest": "16.26.0",
-		"@storybook/addon-a11y": "5.2.1",
-		"@storybook/addon-docs": "5.3.0-alpha.2",
-		"@storybook/addon-viewport": "5.2.1",
-		"@storybook/react": "5.2.1",
+		"@storybook/addon-a11y": "5.2.3",
+		"@storybook/addon-docs": "5.2.3",
+		"@storybook/addon-viewport": "5.2.3",
+		"@storybook/react": "5.2.3",
 		"@wordpress/babel-plugin-import-jsx-pragma": "file:packages/babel-plugin-import-jsx-pragma",
 		"@wordpress/babel-plugin-makepot": "file:packages/babel-plugin-makepot",
 		"@wordpress/babel-preset-default": "file:packages/babel-preset-default",
@@ -225,12 +225,12 @@
 		"test-unit-php-multisite": "cross-env WP_MULTISITE=1 wp-scripts env test-php",
 		"test-unit:native": "cd test/native/ && cross-env NODE_ENV=test jest --config ./jest.config.js",
 		"test-unit:native:debug": "cd test/native/ && node --inspect ../../node_modules/.bin/jest --runInBand --config ./jest.config.js",
-		"playground:build": "npm run build:packages && parcel build playground/src/index.html -d playground/dist && npm run design-system:build",
+		"design-system:build": "npm run build:packages && build-storybook -c ./packages/components/storybook -o ./playground/dist/design-system/components",
+		"design-system:dev": "concurrently \"npm run dev:packages\" \"start-storybook -c ./packages/components/storybook\"",
+		"playground:build": "npm run build:packages && parcel build playground/src/index.html -d playground/dist",
 		"playground:dev": "concurrently \"npm run dev:packages\" \"parcel playground/src/index.html -d playground/dist\"",
 		"preenv": "npm run check-engines",
-		"env": "wp-scripts env",
-		"design-system:dev": "concurrently \"npm run dev:packages\" \"start-storybook -c ./packages/components/storybook\"",
-		"design-system:build": "build-storybook -c ./packages/components/storybook -o ./playground/dist/design-system/components"
+		"env": "wp-scripts env"
 	},
 	"husky": {
 		"hooks": {

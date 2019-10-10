@@ -18,6 +18,8 @@ import { Component } from '@wordpress/element';
 import {
 	Toolbar,
 } from '@wordpress/components';
+import { compose } from '@wordpress/compose';
+import { withViewportMatch } from '@wordpress/viewport';
 
 /**
  * Internal dependencies
@@ -119,6 +121,7 @@ class MediaTextEdit extends Component {
 			attributes,
 			backgroundColor,
 			setAttributes,
+			isMobile,
 		} = this.props;
 		const {
 			isStackedOnMobile,
@@ -126,17 +129,18 @@ class MediaTextEdit extends Component {
 			mediaWidth,
 			verticalAlignment,
 		} = attributes;
-		const temporaryMediaWidth = this.state.mediaWidth || mediaWidth;
+		const shouldStack = isStackedOnMobile && isMobile;
+		const temporaryMediaWidth = shouldStack ? 100 : ( this.state.mediaWidth || mediaWidth );
 		const widthString = `${ temporaryMediaWidth }%`;
 		const containerStyles = {
 			...styles[ 'wp-block-media-text' ],
 			...styles[ `is-vertically-aligned-${ verticalAlignment }` ],
 			...( mediaPosition === 'right' ? styles[ 'has-media-on-the-right' ] : {} ),
-			...( isStackedOnMobile ? styles[ 'is-stacked-on-mobile' ] : {} ),
-			...( isStackedOnMobile && mediaPosition === 'right' ? styles[ 'is-stacked-on-mobile.has-media-on-the-right' ] : {} ),
+			...( shouldStack ? styles[ 'is-stacked-on-mobile' ] : {} ),
+			...( shouldStack && mediaPosition === 'right' ? styles[ 'is-stacked-on-mobile.has-media-on-the-right' ] : {} ),
 			backgroundColor: backgroundColor.color,
 		};
-		const innerBlockWidth = 100 - temporaryMediaWidth;
+		const innerBlockWidth = shouldStack ? 100 : ( 100 - temporaryMediaWidth );
 		const innerBlockWidthString = `${ innerBlockWidth }%`;
 
 		const toolbarControls = [ {
@@ -184,4 +188,7 @@ class MediaTextEdit extends Component {
 	}
 }
 
-export default withColors( 'backgroundColor' )( MediaTextEdit );
+export default compose(
+	withColors( 'backgroundColor' ),
+	withViewportMatch( { isMobile: '< small' } )
+)( MediaTextEdit );
