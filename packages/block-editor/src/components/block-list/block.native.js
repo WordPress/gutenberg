@@ -166,7 +166,6 @@ class BlockListBlock extends Component {
 								! isSelected && ( isDashed ? styles.blockHolderDashedBordered : styles.blockContainer ),
 								! isSelected && ( ( isDashed || ! isDimmed ) && isNestedInnerBlock ) || ( isInnerBlock && ! isChildOfSameRootBlook && ! isDashed ) && styles.blockContainerInner,
 								! isSelected && ( isGroupType && ( ! parentId || isChildOfSameRootBlook ) || isNestedInnerBlock ) && styles.horizontalMarginNone,
-								isDimmed && isInnerBlock && styles.marginSelectedInnerBlock,
 								isDimmed && styles.blockContainerDimmed,
 								isSelected && ( isInnerBlock ? styles.innerBlockContainerFocused : styles.blockContainerFocused ),
 								isSelected && ( isNestedInnerBlock || isGroupType ) && styles.blockContainerInner,
