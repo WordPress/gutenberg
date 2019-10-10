@@ -1,16 +1,12 @@
 /**
  * WordPress dependencies
  */
-import {
-	useEntityProp,
-	useEntitySaving,
-	EntityProvider,
-} from '@wordpress/core-data';
+import { useEntityProp, useEntitySaving } from '@wordpress/core-data';
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { RichText } from '@wordpress/block-editor';
 
-function TitleInput() {
+export default function SiteTitleEdit() {
 	const [ title, setTitle ] = useEntityProp( 'root', 'site', 'title' );
 	const [ isDirty, isSaving, save ] = useEntitySaving( 'root', 'site', 'title' );
 	return (
@@ -31,13 +27,5 @@ function TitleInput() {
 				onChange={ setTitle }
 			/>
 		</>
-	);
-}
-
-export default function SiteTitleEdit() {
-	return (
-		<EntityProvider kind="root" type="site">
-			<TitleInput />
-		</EntityProvider>
 	);
 }

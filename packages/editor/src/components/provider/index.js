@@ -188,19 +188,23 @@ class EditorProvider extends Component {
 		);
 
 		return (
-			<EntityProvider kind="postType" type={ post.type } id={ post.id }>
-				<BlockEditorProvider
-					value={ blocks }
-					onInput={ resetEditorBlocksWithoutUndoLevel }
-					onChange={ resetEditorBlocks }
-					settings={ editorSettings }
-					useSubRegistry={ false }
-				>
-					{ children }
-					<ReusableBlocksButtons />
-					<ConvertToGroupButtons />
-					{ editorSettings.__experimentalBlockDirectory && <InserterMenuDownloadableBlocksPanel /> }
-				</BlockEditorProvider>
+			<EntityProvider kind="root" type="site">
+				<EntityProvider kind="postType" type={ post.type } id={ post.id }>
+					<BlockEditorProvider
+						value={ blocks }
+						onInput={ resetEditorBlocksWithoutUndoLevel }
+						onChange={ resetEditorBlocks }
+						settings={ editorSettings }
+						useSubRegistry={ false }
+					>
+						{ children }
+						<ReusableBlocksButtons />
+						<ConvertToGroupButtons />
+						{ editorSettings.__experimentalBlockDirectory && (
+							<InserterMenuDownloadableBlocksPanel />
+						) }
+					</BlockEditorProvider>
+				</EntityProvider>
 			</EntityProvider>
 		);
 	}
