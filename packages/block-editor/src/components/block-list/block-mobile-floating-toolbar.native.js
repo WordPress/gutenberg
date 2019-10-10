@@ -12,7 +12,7 @@ function FloatingToolbar( { children } ) {
 	return (
 		<TouchableWithoutFeedback>
 			<View
-				style={ styles.floatingToolbarFill }
+				style={ styles.floatingToolbar }
 			>{ children }
 			</View>
 		</TouchableWithoutFeedback>
