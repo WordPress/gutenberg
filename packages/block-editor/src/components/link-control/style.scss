@@ -1,7 +1,3 @@
-.block-editor-link-control__popover-inner {
-	padding: 20px;
-}
-
 .block-editor-link-control__search {
 	position: relative;
 }
@@ -11,6 +7,7 @@
 	&.block-editor-link-control__search-input > input[type="text"] {
 		display: block;
 		padding: 11px $grid-size-large;
+		margin: $grid-size-large;
 		padding-right: 38px; // width of reset button
 		position: relative;
 		z-index: 1;
@@ -32,17 +29,47 @@
 
 .block-editor-link-control__search-reset {
 	position: absolute;
-	top: 4px; // has to be hard coded as form expands with search suggestions
-	right: 2px; // push away to avoid focus style obscuring input border
+	top: 19px; // has to be hard coded as form expands with search suggestions
+	right: 19px; // push away to avoid focus style obscuring input border
 	z-index: 10;
+}
+
+.block-editor-link-control__search-results-wrapper {
+	position: relative;
+	margin-top: -$grid-size-large + 1px;
+
+	&::before,
+	&::after {
+		content: "";
+		position: absolute;
+		left: -1px;
+		right: -2px;
+		display: block;
+		pointer-events: none;
+		z-index: 100;
+	}
+
+	&::before {
+		height: $grid-size-large;
+		top: -1px;
+		bottom: auto;
+		background: linear-gradient(to bottom, #fff 0%, transparent 100%);
+	}
+
+	&::after {
+		height: 20px;
+		bottom: -1px;
+		top: auto;
+		background: linear-gradient(to bottom, transparent 0%, #fff 100%);
+	}
 }
 
 .block-editor-link-control__search-results {
 	margin: 0;
-	padding: $grid-size-large 0;
-	list-style: none;
+	padding: $grid-size-large/2 $grid-size-large;
+	max-height: 200px;
+	overflow-y: scroll; // allow results list to scroll
 }
-
 
 .block-editor-link-control__search-item {
 	position: relative;
