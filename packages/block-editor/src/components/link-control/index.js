@@ -74,10 +74,11 @@ function LinkControl( { defaultOpen = false, fetchSearchSuggestions, renderAddit
 	const renderSearchResults = ( { suggestionsListProps, buildSuggestionItemProps, suggestions, selectedSuggestion, handleSuggestionClick } ) => {
 		/* eslint-disable react/jsx-key */
 		return (
-			<ul { ...suggestionsListProps } className="block-editor-link-control__search-results">
+			<div { ...suggestionsListProps } className="block-editor-link-control__search-results">
 				{ suggestions.map( ( suggestion, index ) => (
-					<li
+					<button
 						{ ...buildSuggestionItemProps( suggestion, index ) }
+						onClick={ () => handleSuggestionClick( suggestion ) }
 						className={ classnames( 'block-editor-link-control__search-item', {
 							'is-selected': index === selectedSuggestion,
 						} ) }
@@ -89,10 +90,9 @@ function LinkControl( { defaultOpen = false, fetchSearchSuggestions, renderAddit
 							<span className="block-editor-link-control__search-item-info">{ suggestion.info || suggestion.url || '' }</span>
 						</span>
 						<span className="block-editor-link-control__search-item-type">{ suggestion.type.toLowerCase() || '' }</span>
-						<button type="button" onClick={ () => handleSuggestionClick( suggestion ) }>Insert Link</button>
-					</li>
+					</button>
 				) ) }
-			</ul>
+			</div>
 		);
 		/* eslint-enable react/jsx-key */
 	};
