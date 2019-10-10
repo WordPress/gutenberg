@@ -34,7 +34,7 @@
 	flex-shrink: 0;
 	line-height: $default-line-height;
 
-	&:not(:disabled):not([aria-disabled="true"]):not(.is-default) {
+	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):not(:focus) {
 		text-decoration: underline;
 
 		&:hover {
