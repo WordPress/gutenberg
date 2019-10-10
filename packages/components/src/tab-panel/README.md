@@ -119,6 +119,7 @@ An array of objects containing the following properties:
 - `name`: `(string)` Defines the key for the tab.
 - `title`:`(string)` Defines the translated text for the tab.
 - `className`:`(string)` Optional. Defines the class to put on the tab.
+- `onSelect`:`(function)` Optional. The function called when the tab is selected
 
 >> **Note:** Other fields may be added to the object and accessed from the child function if desired.
 
@@ -133,9 +134,9 @@ The class to add to the active tab
 - Required: No
 - Default: `is-active`
 
-#### initialTabName
+#### controlledTabName
 
-Optionally provide a tab name for a tab to be selected upon mounting of component. If this prop is not set, the first tab will be selected by default.
+Provide a tab name for a tab to be selected upon mounting and controlled throughout the component's lifecycle. If this prop is not set, the first tab will be selected by default.
 
 - Type: `String`
 - Required: No
@@ -147,4 +148,4 @@ A function which renders the tabviews given the selected tab. The function is pa
 The element to which the tooltip should anchor.
 
 - Type: (`Object`) => `Element`
-- Required: Yes
+- Required: No

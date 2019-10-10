@@ -96,8 +96,7 @@ describe( 'Sidebar', () => {
 		expect( isActiveDocumentTab ).toBe( true );
 
 		// Tab into and activate "Block".
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Space' );
+		await page.keyboard.press( 'ArrowRight' );
 		const isActiveBlockTab = await page.evaluate( () => (
 			document.activeElement.textContent === 'Block' &&
 			document.activeElement.classList.contains( 'is-active' )
