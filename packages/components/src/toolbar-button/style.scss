@@ -29,6 +29,7 @@
 		border-radius: $radius-round-rectangle;
 		height: 30px;
 		width: 30px;
+		box-sizing: border-box;
 	}
 
 	// Subscript for numbered icon buttons, like headings
