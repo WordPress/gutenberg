@@ -70,14 +70,14 @@ class URLInput extends Component {
 	}
 
 	updateSuggestions( value ) {
-		const { fetchLinkSuggestions } = this.props;
+		const { fetchLinkSuggestions, handleURLSuggestions } = this.props;
 		if ( ! fetchLinkSuggestions ) {
 			return;
 		}
 
 		// Show the suggestions after typing at least 2 characters
 		// and also for URLs
-		if ( value.length < 2 || /^https?:/.test( value ) ) {
+		if ( value.length < 2 || ( ! handleURLSuggestions && /^https?:/.test( value ) ) ) {
 			this.setState( {
 				showSuggestions: false,
 				selectedSuggestion: null,
