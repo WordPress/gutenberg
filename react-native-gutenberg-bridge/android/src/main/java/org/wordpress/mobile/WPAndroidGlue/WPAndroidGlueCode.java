@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.MutableContextWrapper;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -529,6 +530,20 @@ public class WPAndroidGlueCode {
         } else {
             // we can assume we're being passed a new image from share intent as there was no selectMedia callback
             sendOrDeferAppendMediaSignal(mediaId, mediaUrl, isVideo);
+        }
+    }
+
+
+    public void toggleEditorMode(boolean htmlModeEnabled) {
+        // Turn off hardware acceleration for Oreo
+        // see https://github.com/wordpress-mobile/gutenberg-mobile/issues/1268#issuecomment-535887390
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
+                && Build.VERSION.SDK_INT <= Build.VERSION_CODES.O_MR1) {
+            if (htmlModeEnabled) {
+                mReactRootView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+            } else {
+                mReactRootView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+            }
         }
     }
 
