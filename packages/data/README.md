@@ -330,10 +330,6 @@ _Returns_
 
 -   `Function`: marked registry selector.
 
-<a name="createSelector" href="#createSelector">#</a> **createSelector**
-
-Undocumented declaration.
-
 <a name="dispatch" href="#dispatch">#</a> **dispatch**
 
 Given the name of a registered store, returns an object of the store's action creators.
