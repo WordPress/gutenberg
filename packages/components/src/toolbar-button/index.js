@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * Internal dependencies
  */
 import IconButton from '../icon-button';
-import ToolbarButtonContainer from './toolbar-button-container';
+import AccessibleToolbarButton from './accessible-toolbar-button';
 
 function ToolbarButton( {
 	containerClassName,
@@ -23,7 +23,7 @@ function ToolbarButton( {
 	children,
 } ) {
 	return (
-		<ToolbarButtonContainer className={ containerClassName }>
+		<AccessibleToolbarButton className={ containerClassName }>
 			<IconButton
 				icon={ icon }
 				label={ title }
@@ -43,7 +43,7 @@ function ToolbarButton( {
 				{ ...extraProps }
 			/>
 			{ children }
-		</ToolbarButtonContainer>
+		</AccessibleToolbarButton>
 	);
 }
 

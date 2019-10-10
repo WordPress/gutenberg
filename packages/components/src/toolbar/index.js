@@ -10,6 +10,7 @@ import { flatMap } from 'lodash';
 import ToolbarButton from '../toolbar-button';
 import DropdownMenu from '../dropdown-menu';
 import ToolbarContainer from './toolbar-container';
+import AccessibleToolbar from './accessible-toolbar';
 
 /**
  * Renders a toolbar with controls.
@@ -50,6 +51,12 @@ function Toolbar( { controls = [], children, className, isCollapsed, icon, label
 		return null;
 	}
 
+	const cx = classnames( 'components-toolbar', className );
+
+	if ( ! controls || ! controls.length ) {
+		return <AccessibleToolbar className={ cx } { ...otherProps }>{ children }</AccessibleToolbar>;
+	}
+
 	// Normalize controls to nested array of objects (sets of controls)
 	let controlSets = controls;
 	if ( ! Array.isArray( controlSets[ 0 ] ) ) {
@@ -63,13 +70,13 @@ function Toolbar( { controls = [], children, className, isCollapsed, icon, label
 				icon={ icon }
 				label={ label }
 				controls={ controlSets }
-				className={ classnames( 'components-toolbar', className ) }
+				className={ cx }
 			/>
 		);
 	}
 
 	return (
-		<ToolbarContainer className={ classnames( 'components-toolbar', className ) } { ...otherProps }>
+		<ToolbarContainer className={ cx } { ...otherProps }>
 			{ flatMap( controlSets, ( controlSet, indexOfSet ) => (
 				controlSet.map( ( control, indexOfControl ) => (
 					<ToolbarButton
