@@ -140,6 +140,7 @@ export const registerCoreBlocks = () => {
 		separator,
 		list,
 		quote,
+		preformatted,
 		// eslint-disable-next-line no-undef
 		!! __DEV__ ? mediaText : null,
 		// eslint-disable-next-line no-undef
