@@ -8,6 +8,11 @@ import { act, Simulate } from 'react-dom/test-utils';
  * Internal dependencies
  */
 import LinkControl from '../index';
+import { fauxEntitySuggestions, fetchFauxEntitySuggestions } from './fixtures';
+
+function currentEventLoopEnd() {
+	return new Promise( ( resolve ) => setImmediate( resolve ) );
+}
 
 let container = null;
 beforeEach( () => {
@@ -24,28 +29,10 @@ afterEach( () => {
 } );
 
 describe( 'Basic rendering', () => {
-	it( 'should render icon button and in closed state by default', () => {
+	it( 'should render with required props', () => {
 		act( () => {
 			render(
 				<LinkControl
-				/>, container
-			);
-		} );
-		const openIconButton = container.querySelector( '[aria-label="Insert link"]' );
-		const openIcon = openIconButton.querySelector( 'svg' );
-		const expectedIconClassName = expect.stringContaining( 'dashicons-insert' );
-
-		expect( openIconButton ).not.toBeNull();
-		expect( openIcon.getAttribute( 'class' ) ).toEqual( expectedIconClassName );
-
-		expect( container.innerHTML ).toMatchSnapshot();
-	} );
-
-	it( 'should render core link ui interface when open', () => {
-		act( () => {
-			render(
-				<LinkControl
-					defaultOpen={ true }
 				/>, container
 			);
 		} );
@@ -56,31 +43,19 @@ describe( 'Basic rendering', () => {
 
 		// expect( searchInputLabel ).not.toBeNull();
 		expect( searchInput ).not.toBeNull();
-	} );
 
-	it( 'should toggle link ui open on icon ui click', () => {
-		act( () => {
-			render(
-				<LinkControl
-				/>, container
-			);
-		} );
-		const openIconButton = container.querySelector( '[aria-label="Insert link"]' );
-
-		act( () => {
-			Simulate.click( openIconButton );
-		} );
-
-		expect( openIconButton.nextSibling.innerHTML ).toEqual( expect.stringMatching( 'Search or type url' ) );
+		expect( container.innerHTML ).toMatchSnapshot();
 	} );
 } );
 
 describe( 'Searching', () => {
-	it( 'should render search results for current search term', () => {
+	it( 'should render search results for current search term', async ( ) => {
+		const searchTerm = 'Hello';
+
 		act( () => {
 			render(
 				<LinkControl
-					defaultOpen={ true }
+					fetchSearchSuggestions={ fetchFauxEntitySuggestions }
 				/>, container
 			);
 		} );
@@ -97,21 +72,27 @@ describe( 'Searching', () => {
 
 		// Simulate searching for a term
 		act( () => {
-			Simulate.change( searchInput, { target: { value: 'WordPress' } } );
+			Simulate.change( searchInput, { target: { value: searchTerm } } );
 		} );
 
-		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
-		searchResultElements = container.querySelectorAll( '[role="menu"] button[role="menuitem"]' );
+		// fetchFauxEntitySuggestions resolves on next "tick" of event loop
+		await currentEventLoopEnd();
 
-		expect( searchResultElements ).toHaveLength( 2 );
+		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
+		searchResultElements = container.querySelectorAll( '[role="listbox"] button[role="option"]' );
+
+		expect( searchResultElements ).toHaveLength( fauxEntitySuggestions.length );
 
 		// Reset the search term
 		act( () => {
 			Simulate.change( searchInput, { target: { value: '' } } );
 		} );
 
+		// fetchFauxEntitySuggestions resolves on next "tick" of event loop
+		await currentEventLoopEnd();
+
 		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
-		searchResultElements = container.querySelectorAll( '[role="menu"] button[role="menuitem"]' );
+		searchResultElements = container.querySelectorAll( '[role="listbox"] button[role="option"]' );
 
 		expect( searchResultElements ).toHaveLength( 0 );
 	} );
