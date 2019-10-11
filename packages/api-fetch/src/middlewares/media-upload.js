@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+
+/**
  * Internal dependencies
  */
 import parseResponseAndNormalizeError from '../utils/response';
@@ -22,20 +27,7 @@ function mediaUploadMiddleware( options, next ) {
 	let retries = 0;
 	const maxRetries = 5;
 
-	const retry = ( response ) => {
-		const attachmentId = response.headers.get( 'x-wp-upload-attachment-id' );
-		const shouldRetry = !! attachmentId && retries < maxRetries;
-
-		if ( ! shouldRetry ) {
-			if ( attachmentId ) {
-				next( {
-					path: `/wp/v2/media/${ attachmentId }`,
-					method: 'DELETE',
-				} );
-			}
-			return Promise.reject( response );
-		}
-
+	const postProcess = ( attachmentId ) => {
 		retries++;
 		return next( {
 			path: `/wp/v2/media/${ attachmentId }/post-process`,
@@ -44,12 +36,31 @@ function mediaUploadMiddleware( options, next ) {
 			parse: false,
 		} )
 			.then( ( res ) => parseResponseAndNormalizeError( res, options.parse ) )
-			.catch( retry );
+			.catch( () => {
+				if ( retries < maxRetries ) {
+					return postProcess( attachmentId );
+				}
+				next( {
+					path: `/wp/v2/media/${ attachmentId }?force=true`,
+					method: 'DELETE',
+				} );
+				const error = {
+					code: 'post_process',
+					message: __( 'Media upload failed. If this is a photo or a large image, please scale it down and try again.' ),
+				};
+				return Promise.reject( error );
+			} );
 	};
 
 	return next( { ...options, parse: false } )
 		.then( ( response ) => parseResponseAndNormalizeError( response, options.parse ) )
-		.catch( retry );
+		.catch( ( response ) => {
+			const attachmentId = response.headers.get( 'x-wp-upload-attachment-id' );
+			if ( attachmentId ) {
+				return postProcess( attachmentId );
+			}
+			return Promise.reject( response );
+		} );
 }
 
 export default mediaUploadMiddleware;
