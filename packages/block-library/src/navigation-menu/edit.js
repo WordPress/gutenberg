@@ -76,6 +76,7 @@ function NavigationMenu( {
 					<InnerBlocks
 						template={ defaultMenuItems ? defaultMenuItems : null }
 						allowedBlocks={ [ 'core/navigation-menu-item' ] }
+						templateInsertUpdatesSelection={ false }
 					/>
 				}
 			</div>

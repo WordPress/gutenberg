@@ -218,12 +218,22 @@ $block-inserter-search-height: 38px;
 	border: $border-width solid $light-gray-500;
 	border-radius: $radius-round-rectangle;
 	min-height: 150px;
-	padding: 10px;
 	display: grid;
 	flex-grow: 2;
 
 	.block-editor-block-preview__container {
 		margin-right: 0;
 		margin-left: 0;
+		padding: 10px;
 	}
+}
+
+.block-editor-inserter__preview-content-missing {
+	flex: 1;
+	display: flex;
+	justify-content: center;
+	color: $dark-gray-400;
+	border: $border-width solid $light-gray-500;
+	border-radius: $radius-round-rectangle;
+	align-items: center;
 }

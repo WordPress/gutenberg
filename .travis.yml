@@ -199,8 +199,9 @@ jobs:
       if: branch = master
       name: Deploy Playground
       env: INSTALL_WORDPRESS=false
+      install:
+        - npm ci
       before_deploy:
-        - npm install
         - npm run playground:build -- --public-url '/gutenberg'
         - npm run design-system:build
       deploy:

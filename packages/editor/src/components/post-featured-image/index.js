@@ -62,6 +62,7 @@ function PostFeaturedImage( { currentPostId, featuredImageId, onUpdateImage, onR
 									<ResponsiveWrapper
 										naturalWidth={ mediaWidth }
 										naturalHeight={ mediaHeight }
+										isInline
 									>
 										<img src={ mediaSourceUrl } alt="" />
 									</ResponsiveWrapper>
