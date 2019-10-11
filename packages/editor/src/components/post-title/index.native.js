@@ -105,15 +105,15 @@ export default compose(
 			isPostTitleSelected,
 		} = select( 'core/editor' );
 
-		const { getSelectedBlockClientId, getBlockHierarchyRootClientId, getBlock } = select( 'core/block-editor' );
+		const { getSelectedBlockClientId, getBlockRootClientId, getFirstToSelectBlock } = select( 'core/block-editor' );
 
 		const clientId = getSelectedBlockClientId();
 		const isAnyBlockSelected = !! clientId;
-		const rootBlockId = getBlockHierarchyRootClientId( clientId );
-		const rootBlock = getBlock( rootBlockId );
-		const hasRootInnerBlocks = rootBlock && rootBlock.innerBlocks.length !== 0;
+		const parentId = getBlockRootClientId( clientId );
+		const firstToSelect = getFirstToSelectBlock( clientId );
+		const isInnerBlock = parentId && firstToSelect !== parentId;
 
-		const isDimmed = isAnyBlockSelected && hasRootInnerBlocks;
+		const isDimmed = isAnyBlockSelected && isInnerBlock;
 
 		return {
 			isAnyBlockSelected,
