@@ -16,7 +16,7 @@ export const defaultProps = {
 
 export function Footer( props ) {
 	const { className, isShady, ...additionalProps } = props;
-	const mergedProps = { ...useCardContext(), ...props };
+	const mergedProps = { ...defaultProps, ...useCardContext(), ...props };
 	const { size, variant } = mergedProps;
 
 	const classes = classnames(
@@ -29,7 +29,5 @@ export function Footer( props ) {
 
 	return <FooterUI { ...additionalProps } className={ classes } />;
 }
-
-Footer.defaultProps = defaultProps;
 
 export default Footer;

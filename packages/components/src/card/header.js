@@ -16,7 +16,7 @@ export const defaultProps = {
 
 export function Header( props ) {
 	const { className, isShady, ...additionalProps } = props;
-	const mergedProps = { ...useCardContext(), ...props };
+	const mergedProps = { ...defaultProps, ...useCardContext(), ...props };
 	const { size, variant } = mergedProps;
 
 	const classes = classnames(
@@ -29,7 +29,5 @@ export function Header( props ) {
 
 	return <HeaderUI { ...additionalProps } className={ classes } />;
 }
-
-Header.defaultProps = defaultProps;
 
 export default Header;

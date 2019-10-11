@@ -16,7 +16,7 @@ export const defaultProps = {
 
 export function Body( props ) {
 	const { className, isShady, ...additionalProps } = props;
-	const mergedProps = { ...useCardContext(), ...props };
+	const mergedProps = { ...defaultProps, ...useCardContext(), ...props };
 	const { size } = mergedProps;
 
 	const classes = classnames(
@@ -28,7 +28,5 @@ export function Body( props ) {
 
 	return <BodyUI { ...additionalProps } className={ classes } />;
 }
-
-Body.defaultProps = defaultProps;
 
 export default Body;
