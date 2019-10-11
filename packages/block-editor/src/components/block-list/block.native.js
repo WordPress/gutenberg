@@ -279,7 +279,7 @@ export default compose( [
 		const selectedBlockClientId = getSelectedBlockClientId();
 		const isRootSiblingsSelected = getBlockRootClientId( selectedBlockClientId ) === '';
 
-		const isDashed = selectedBlockClientId === parentId;
+		const isDashed = selectedBlockClientId === parentId && ! isMediaTextParent;
 		const isDimmed = ! isSelected && ! isRootSiblingsSelected && !! selectedBlockClientId && firstToSelect === clientId && ! isDashed;
 
 		const isInnerBlock = parentId && firstToSelect !== parentId;
