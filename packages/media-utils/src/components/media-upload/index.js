@@ -165,44 +165,6 @@ const getGalleryDetailsMediaFrame = () => {
 	} );
 };
 
-/**
- * Prepares the edit state and sets the listener for "Edit Image" button click.
- *
- * @param {Object} types passes the allowedTypes object to the media library.
- * @return {wp.media.view.MediaFrame.Select} The default media workflow.
- */
-const addEditState = ( types ) => {
-	return wp.media.view.MediaFrame.Select.extend( {
-
-		editState( ) {
-			const selection = this.state( 'library' ).get( 'selection' ),
-				view = new wp.media.view.EditImage( { model: selection.single(), controller: this } ).render();
-
-			this.content.set( view );
-
-			// after bringing in the frame, load the actual editor via an ajax call
-			view.loadEditor();
-		},
-
-		/**
-		 * Create the default states.
-		 *
-		 * @return {void}
-		 */
-		createStates: function createStates() {
-			this.on( 'content:render:edit-image', this.editState, this );
-			this.states.add( [
-				new wp.media.controller.Library( {
-					library: wp.media.query( defaults( {
-						type: types,
-					}, this.options.library ) ),
-				} ),
-				new wp.media.controller.EditImage( { model: this.options.editImage } ),
-			] );
-		},
-	} );
-};
-
 // the media library image object contains numerous attributes
 // we only need this set to display the image in the library
 const slimImageObject = ( img ) => {
