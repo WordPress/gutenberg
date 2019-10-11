@@ -29,8 +29,14 @@ class Slider extends Component {
 		}
 	}
 
-	handleToggleFocus() {
-		this.setState( { hasFocus: ! this.state.hasFocus } );
+	handleToggleFocus( validateInput = false ) {
+		const newState = { hasFocus: ! this.state.hasFocus };
+
+		if ( validateInput ) {
+			newState.sliderValue = this.validateInput( this.state.sliderValue );
+		}
+
+		this.setState( newState );
 	}
 
 	validateInput( text ) {
@@ -46,9 +52,8 @@ class Slider extends Component {
 
 	handleChange( text ) {
 		if ( ! isNaN( Number( text ) ) ) {
-			const newValue = this.validateInput( text );
-			this.props.onChangeValue( newValue );
-			this.setState( { sliderValue: newValue } );
+			this.props.onChangeValue( text );
+			this.setState( { sliderValue: text } );
 		}
 	}
 
@@ -84,7 +89,7 @@ class Slider extends Component {
 					style={ [ styles.sliderTextInput, hasFocus ? styles.isSelected : {} ] }
 					onChangeText={ this.handleChange }
 					onFocus={ this.handleToggleFocus }
-					onBlur={ this.handleToggleFocus }
+					onBlur={ () => this.handleToggleFocus( true ) }
 					keyboardType="numeric"
 					value={ `${ sliderValue }` }
 				/>
