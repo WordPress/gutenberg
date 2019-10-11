@@ -78,6 +78,7 @@ class ParagraphEdit extends Component {
 					onReplace={ onReplace }
 					onRemove={ onReplace ? () => onReplace( [] ) : undefined }
 					placeholder={ placeholder || __( 'Start writing…' ) }
+					isParentSelected={ this.props.isParentSelected }
 				/>
 			</View>
 		);

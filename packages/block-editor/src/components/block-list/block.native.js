@@ -62,6 +62,7 @@ class BlockListBlock extends Component {
 			<BlockEdit
 				name={ this.props.name }
 				isSelected={ this.props.isSelected }
+				isParentSelected={ this.props.isParentSelected }
 				attributes={ this.props.attributes }
 				setAttributes={ this.props.onChange }
 				onFocus={ this.onFocus }
