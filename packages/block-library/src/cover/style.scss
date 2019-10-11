@@ -12,52 +12,6 @@
 	align-items: center;
 	overflow: hidden;
 
-	&.has-left-content {
-		justify-content: flex-start;
-
-		h2,
-		.wp-block-cover-image-text,
-		.wp-block-cover-text {
-			margin-left: 0;
-			text-align: left;
-		}
-	}
-
-	&.has-right-content {
-		justify-content: flex-end;
-
-		h2,
-		.wp-block-cover-image-text,
-		.wp-block-cover-text {
-			margin-right: 0;
-			text-align: right;
-		}
-	}
-
-	h2,
-	.wp-block-cover-image-text,
-	.wp-block-cover-text {
-		font-size: 2em;
-		line-height: 1.25;
-		z-index: 1;
-		margin-bottom: 0;
-		max-width: $content-width;
-		padding: $block-padding;
-		text-align: center;
-	}
-
-	h2:not(.has-text-color),
-	.wp-block-cover-image-text,
-	.wp-block-cover-text {
-		color: $white;
-		a,
-		a:hover,
-		a:focus,
-		a:active {
-			color: $white;
-		}
-	}
-
 	&.has-parallax {
 		background-attachment: fixed;
 
@@ -149,4 +103,57 @@
 	height: 100%;
 	z-index: z-index(".wp-block-cover__video-background");
 	object-fit: cover;
+}
+
+// Styles bellow only exist to support older versions of the block.
+// Versions that not had inner blocks and used an h2 heading had a section (and not a div) with a class wp-block-cover-image (and not a wp-block-cover).
+// We are using the previous referred differences to target old versions.
+
+section.wp-block-cover-image h2,
+.wp-block-cover-image-text,
+.wp-block-cover-text {
+	color: $white;
+	a,
+	a:hover,
+	a:focus,
+	a:active {
+		color: $white;
+	}
+}
+
+.wp-block-cover-image
+.wp-block-cover {
+	&.has-left-content {
+		justify-content: flex-start;
+	}
+
+	&.has-right-content {
+		justify-content: flex-end;
+	}
+}
+
+section.wp-block-cover-image.has-left-content > h2,
+.wp-block-cover-image.has-left-content .wp-block-cover-image-text,
+.wp-block-cover.has-left-content .wp-block-cover-text {
+	margin-left: 0;
+	text-align: left;
+}
+
+section.wp-block-cover-image.has-right-content > h2,
+.wp-block-cover-image.has-right-content .wp-block-cover-image-text,
+.wp-block-cover.has-right-content .wp-block-cover-text {
+	margin-right: 0;
+	text-align: right;
+}
+
+section.wp-block-cover-image > h2,
+.wp-block-cover-image .wp-block-cover-image-text,
+.wp-block-cover .wp-block-cover-text {
+	font-size: 2em;
+	line-height: 1.25;
+	z-index: 1;
+	margin-bottom: 0;
+	max-width: $content-width;
+	padding: $block-padding;
+	text-align: center;
 }
