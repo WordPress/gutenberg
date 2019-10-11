@@ -30,10 +30,10 @@ const Appear = ( { origin } ) => (
 	</Animate>
 );
 
-export const appearTopLeft = () => <Appear origin="top left" />
-export const appearTopLeft = () => <Appear origin="top left" />
-export const appearTopLeft = () => <Appear origin="top left" />
-export const appearTopLeft = () => <Appear origin="top left" />
+export const appearTopLeft = () => <Appear origin="top left" />;
+export const appearTopRight = () => <Appear origin="top right" />;
+export const appearBottomLeft = () => <Appear origin="bottom left" />;
+export const appearBottomRight = () => <Appear origin="bottom right" />;
 
 export const loading = () => (
 	<Animate type="loading">
