@@ -16,7 +16,7 @@ export const _default = () => (
 	</Animate>
 );
 
-// unexported helper for various origins
+// Unexported helper for different origins.
 const Appear = ( { origin } ) => (
 	<Animate
 		type="appear"
