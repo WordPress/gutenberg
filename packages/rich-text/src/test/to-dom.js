@@ -103,8 +103,8 @@ describe( 'applyValue', () => {
 			const futureBody = createElement( document, future ).cloneNode( true );
 			const childNodes = Array.from( futureBody.childNodes );
 			applyValue( futureBody, body );
-			const count = childNodes.reduce( ( acc, { parentNode } ) => {
-				return parentNode === body ? acc + 1 : acc;
+			const count = childNodes.reduce( ( accumulator, { parentNode } ) => {
+				return parentNode === body ? accumulator + 1 : accumulator;
 			}, 0 );
 			expect( body.innerHTML ).toEqual( future );
 			expect( count ).toEqual( movedCount );

@@ -97,6 +97,7 @@ export const settings = {
 					const alignments = [ 'wide', 'full' ];
 
 					// Determine the widest setting of all the blocks to be grouped
+
 					const widestAlignment = blocks.reduce( ( accumulator, block ) => {
 						const { align } = block.attributes;
 						return alignments.indexOf( align ) > alignments.indexOf( accumulator ) ? align : accumulator;

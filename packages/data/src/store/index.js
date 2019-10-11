@@ -16,8 +16,8 @@ function createCoreDataStore( registry ) {
 				'hasFinishedResolution',
 				'isResolving',
 				'getCachedResolvers',
-			].reduce( ( memo, selectorName ) => ( {
-				...memo,
+			].reduce( ( memoAccumulator, selectorName ) => ( {
+				...memoAccumulator,
 				[ selectorName ]: getCoreDataSelector( selectorName ),
 			} ), {} );
 		},
@@ -29,8 +29,8 @@ function createCoreDataStore( registry ) {
 				'invalidateResolution',
 				'invalidateResolutionForStore',
 				'invalidateResolutionForStoreSelector',
-			].reduce( ( memo, actionName ) => ( {
-				...memo,
+			].reduce( ( memoAccumulator, actionName ) => ( {
+				...memoAccumulator,
 				[ actionName ]: getCoreDataAction( actionName ),
 			} ), {} );
 		},

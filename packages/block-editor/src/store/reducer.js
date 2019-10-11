@@ -67,8 +67,8 @@ function mapBlockOrder( blocks, rootClientId = '' ) {
  * @return {Object} Block order map object.
  */
 function mapBlockParents( blocks, rootClientId = '' ) {
-	return blocks.reduce( ( result, block ) => Object.assign(
-		result,
+	return blocks.reduce( ( resultAccumulator, block ) => Object.assign(
+		resultAccumulator,
 		{ [ block.clientId ]: rootClientId },
 		mapBlockParents( block.innerBlocks, block.clientId )
 	), {} );
@@ -202,9 +202,9 @@ export function isUpdatingSameBlockAttribute( action, lastAction ) {
  * @return {Object} Object filled with empty object as values for each clientId.
  */
 const fillKeysWithEmptyObject = ( objectKeys ) => {
-	return objectKeys.reduce( ( result, key ) => {
-		result[ key ] = {};
-		return result;
+	return objectKeys.reduce( ( resultAccumulator, key ) => {
+		resultAccumulator[ key ] = {};
+		return resultAccumulator;
 	}, {} );
 };
 
@@ -237,13 +237,13 @@ const withBlockCache = ( reducer ) => ( state = {}, action ) => {
 	 * @return {Array} The provided clientIds and all of their parent clientIds.
 	 */
 	const getBlocksWithParentsClientIds = ( clientIds ) => {
-		return clientIds.reduce( ( result, clientId ) => {
+		return clientIds.reduce( ( resultAccumulator, clientId ) => {
 			let current = clientId;
 			do {
-				result.push( current );
+				resultAccumulator.push( current );
 				current = state.parents[ current ];
 			} while ( current );
-			return result;
+			return resultAccumulator;
 		}, [] );
 	};
 

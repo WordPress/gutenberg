@@ -164,7 +164,7 @@ function entity( entityConfig ) {
 								continue;
 							}
 
-							const nextEdits = Object.keys( edits ).reduce( ( acc, key ) => {
+							const nextEdits = Object.keys( edits ).reduce( ( accumulator, key ) => {
 								// If the edited value is still different to the persisted value,
 								// keep the edited value in edits.
 								if (
@@ -173,9 +173,9 @@ function entity( entityConfig ) {
 									// comparison.
 									! isEqual( edits[ key ], get( record[ key ], 'raw', record[ key ] ) )
 								) {
-									acc[ key ] = edits[ key ];
+									accumulator[ key ] = edits[ key ];
 								}
-								return acc;
+								return accumulator;
 							}, {} );
 
 							if ( Object.keys( nextEdits ).length ) {

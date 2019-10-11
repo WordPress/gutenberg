@@ -19,26 +19,26 @@ import { REDUCER_KEY } from './name';
 // Instead of getEntityRecord, the consumer could use more user-frieldly named selector: getPostType, getTaxonomy...
 // The "kind" and the "name" of the entity are combined to generate these shortcuts.
 
-const entitySelectors = defaultEntities.reduce( ( result, entity ) => {
+const entitySelectors = defaultEntities.reduce( ( resultAccumulator, entity ) => {
 	const { kind, name } = entity;
-	result[ getMethodName( kind, name ) ] = ( state, key ) => selectors.getEntityRecord( state, kind, name, key );
-	result[ getMethodName( kind, name, 'get', true ) ] = ( state, ...args ) => selectors.getEntityRecords( state, kind, name, ...args );
-	return result;
+	resultAccumulator[ getMethodName( kind, name ) ] = ( state, key ) => selectors.getEntityRecord( state, kind, name, key );
+	resultAccumulator[ getMethodName( kind, name, 'get', true ) ] = ( state, ...args ) => selectors.getEntityRecords( state, kind, name, ...args );
+	return resultAccumulator;
 }, {} );
 
-const entityResolvers = defaultEntities.reduce( ( result, entity ) => {
+const entityResolvers = defaultEntities.reduce( ( resultAccumulator, entity ) => {
 	const { kind, name } = entity;
-	result[ getMethodName( kind, name ) ] = ( key ) => resolvers.getEntityRecord( kind, name, key );
+	resultAccumulator[ getMethodName( kind, name ) ] = ( key ) => resolvers.getEntityRecord( kind, name, key );
 	const pluralMethodName = getMethodName( kind, name, 'get', true );
-	result[ pluralMethodName ] = ( ...args ) => resolvers.getEntityRecords( kind, name, ...args );
-	result[ pluralMethodName ].shouldInvalidate = ( action, ...args ) => resolvers.getEntityRecords.shouldInvalidate( action, kind, name, ...args );
-	return result;
+	resultAccumulator[ pluralMethodName ] = ( ...args ) => resolvers.getEntityRecords( kind, name, ...args );
+	resultAccumulator[ pluralMethodName ].shouldInvalidate = ( action, ...args ) => resolvers.getEntityRecords.shouldInvalidate( action, kind, name, ...args );
+	return resultAccumulator;
 }, {} );
 
-const entityActions = defaultEntities.reduce( ( result, entity ) => {
+const entityActions = defaultEntities.reduce( ( resultAccumulator, entity ) => {
 	const { kind, name } = entity;
-	result[ getMethodName( kind, name, 'save' ) ] = ( key ) => actions.saveEntityRecord( kind, name, key );
-	return result;
+	resultAccumulator[ getMethodName( kind, name, 'save' ) ] = ( key ) => actions.saveEntityRecord( kind, name, key );
+	return resultAccumulator;
 }, {} );
 
 registerStore( REDUCER_KEY, {

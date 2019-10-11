@@ -10,16 +10,16 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { defaultEntities, kinds } from './entities';
 
 const entities = {
-	...defaultEntities.reduce( ( acc, entity ) => {
-		if ( ! acc[ entity.kind ] ) {
-			acc[ entity.kind ] = {};
+	...defaultEntities.reduce( ( accumulator, entity ) => {
+		if ( ! accumulator[ entity.kind ] ) {
+			accumulator[ entity.kind ] = {};
 		}
-		acc[ entity.kind ][ entity.name ] = { context: createContext() };
-		return acc;
+		accumulator[ entity.kind ][ entity.name ] = { context: createContext() };
+		return accumulator;
 	}, {} ),
-	...kinds.reduce( ( acc, kind ) => {
-		acc[ kind.name ] = {};
-		return acc;
+	...kinds.reduce( ( accumulator, kind ) => {
+		accumulator[ kind.name ] = {};
+		return accumulator;
 	}, {} ),
 };
 const getEntity = ( kind, type ) => {
