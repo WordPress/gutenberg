@@ -56,18 +56,25 @@ function build_navigation_menu_html( $block ) {
  * @uses render_block_navigation_menu()
  */
 function register_block_core_navigation_menu() {
+	$block_content = file_get_contents ( dirname( __FILE__ ) . '/../../../packages/block-library/src/navigation-menu/block.json' );
+	if ( ! $block_content ) {
+		throw new Error(
+			'There is not a block.json file defined for the block!'
+		);
+	}
+	$block_definition = json_decode( $block_content, true );
+	if( is_null( $block_definition ) ) {
+		throw new Error(
+			'There is not possible to parse the block.json file!'
+		);
+	}
+
+	$block_name = $block_definition['name'];
+	unset( $block_definition['name'] );
+
 	register_block_type(
-		'core/navigation-menu',
-		array(
-			'category'        => 'layout',
-			'attributes'      => array(
-				'automaticallyAdd' => array(
-					'type'    => 'boolean',
-					'default' => false,
-				),
-			),
-			'render_callback' => 'render_block_navigation_menu',
-		)
+		$block_name,
+		$block_definition
 	);
 }
 

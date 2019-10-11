@@ -1,0 +1,14 @@
+{
+	"name": "core/navigation-menu",
+	"category": "layout",
+	"attributes": {
+		"className": {
+			"type": "string"
+		},
+
+		"automaticallyAdd": {
+			"type": "boolean",
+			"default": false
+		}
+	}
+}
