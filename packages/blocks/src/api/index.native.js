@@ -2,6 +2,8 @@ export {
 	cloneBlock,
 	createBlock,
 	switchToBlockType,
+	getBlockTransforms,
+	findTransform,
 } from './factory';
 export {
 	default as parse,
