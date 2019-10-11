@@ -51,7 +51,7 @@ function LinkControl( { defaultOpen = false, fetchSearchSuggestions, renderAddit
 	} );
 
 	const getSearchFetcher = useCallback( ( value ) => {
-		return ( /^https?:/.test( value ) ) ? handleURLSearch : handleEntitySearch;
+		return ( /^https?:/.test( value ) ) ? handleURLSearch : fetchSearchSuggestions;
 	} );
 
 	// Handlers
@@ -66,10 +66,6 @@ function LinkControl( { defaultOpen = false, fetchSearchSuggestions, renderAddit
 			type: 'URL',
 			url: value,
 		} ];
-	};
-
-	const handleEntitySearch = ( value ) => {
-		return fetchSearchSuggestions( value );
 	};
 
 	const onSubmitLinkChange = ( value ) => {
