@@ -12,7 +12,9 @@ npm install @wordpress/base-styles --save-dev
 
 ## Use
 
-In your application's scss files, include available styles like so:
+### Scss utilities and variables
+
+In your application's scss file, include styles like so:
 
 ```scss
 @import "~@wordpress/base-styles/colors";
@@ -21,6 +23,15 @@ In your application's scss files, include available styles like so:
 @import "~@wordpress/base-styles/breakpoints";
 @import "~@wordpress/base-styles/animations";
 @import "~@wordpress/base-styles/z-index";
+```
+
+### Post-CSS themes
+
+To use themes with `@wordpress/postcss-themes`, import them like so:
+
+```js
+const themes = require( '@wordpress/base-styles/themes' );
+const wpPostcss = require( '@wordpress/postcss-themes' )( themes )
 ```
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
