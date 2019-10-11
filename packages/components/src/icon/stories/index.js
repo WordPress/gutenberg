@@ -15,12 +15,12 @@ export const _default = () => (
 	</div>
 );
 
-export const Sizes = () => {
-	const sizes = [ 14, 16, 20, 24, 28, 32, 40, 48, 56 ];
+export const sizes = () => {
+	const iconSizes = [ 14, 16, 20, 24, 28, 32, 40, 48, 56 ];
 
 	return (
 		<>
-			{ sizes.map( ( size ) => (
+			{ iconSizes.map( ( size ) => (
 				<div key={ size } style={ { padding: 20, display: 'inline-block' } }>
 					<Icon icon="screenoptions" size={ size } />
 					<IconSizeLabel size={ size } />
@@ -30,8 +30,8 @@ export const Sizes = () => {
 	);
 };
 
-export const Colors = () => {
-	const colors = [ 'blue', 'purple', 'green' ];
+export const colors = () => {
+	const iconColors = [ 'blue', 'purple', 'green' ];
 
 	/**
 	 * The SVG icon inherits the color from a parent selector.
@@ -39,7 +39,7 @@ export const Colors = () => {
 
 	return (
 		<>
-			{ colors.map( ( color ) => (
+			{ iconColors.map( ( color ) => (
 				<div
 					key={ color }
 					style={ { padding: 20, display: 'inline-block', color } }
@@ -52,7 +52,7 @@ export const Colors = () => {
 	);
 };
 
-export const WithAFunction = () => (
+export const withAFunction = () => (
 	<Icon
 		icon={ () => (
 			<SVG>
@@ -62,7 +62,7 @@ export const WithAFunction = () => (
 	/>
 );
 
-export const WithAComponent = () => {
+export const withAComponent = () => {
 	const MyIconComponent = () => (
 		<SVG>
 			<Path d="M5 4v3h5.5v12h3V7H19V4z" />
@@ -72,7 +72,7 @@ export const WithAComponent = () => {
 	return <Icon icon={ MyIconComponent } />;
 };
 
-export const WithAnSVG = () => {
+export const withAnSVG = () => {
 	return (
 		<Icon
 			icon={

@@ -7,9 +7,9 @@ export default { title: 'IconButton', component: IconButton };
 
 export const _default = () => <IconButton icon="ellipsis" label="More" />;
 
-export const Grouped = () => {
-	const GroupContainer = ( props ) => (
-		<div style={ { display: 'inline-flex' } } { ...props } />
+export const grouped = () => {
+	const GroupContainer = ( { children } ) => (
+		<div style={ { display: 'inline-flex' } }>{ children }</div>
 	);
 
 	return (
