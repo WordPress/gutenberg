@@ -1,16 +1,7 @@
 /**
- * External dependencies
- */
-import { shallow } from 'enzyme';
-
-/**
  * Internal dependencies
  */
 import { RichText } from '../index';
-
-const getStylesFromColorScheme = () => {
-	return { color: 'white' };
-};
 
 describe( 'RichText Native', () => {
 	let richText;
