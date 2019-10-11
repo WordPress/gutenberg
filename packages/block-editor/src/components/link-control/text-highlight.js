@@ -12,7 +12,7 @@ import {
 
 const TextHighlight = ( { text = '', highlight = '' } ) => {
 	if ( ! highlight.trim() ) {
-		return { text };
+		return text;
 	}
 
 	const regex = new RegExp( `(${ escapeRegExp( highlight ) })`, 'gi' );
