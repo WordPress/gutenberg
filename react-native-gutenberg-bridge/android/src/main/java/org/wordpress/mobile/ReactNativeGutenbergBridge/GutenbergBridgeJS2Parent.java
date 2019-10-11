@@ -9,6 +9,7 @@ public interface GutenbergBridgeJS2Parent {
     interface RNMedia {
         String getUrl();
         int getId();
+        String getType();
         WritableMap toMap();
     }
 

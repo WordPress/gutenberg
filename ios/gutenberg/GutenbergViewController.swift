@@ -74,15 +74,15 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
             switch currentFilter {
             case .image:
                 if(allowMultipleSelection) {
-                    callback([(1, "https://cldup.com/cXyG__fTLN.jpg"), (3, "https://cldup.com/cXyG__fTLN.jpg")])
+                    callback([(1, "https://cldup.com/cXyG__fTLN.jpg", "image"), (3, "https://cldup.com/cXyG__fTLN.jpg", "image")])
                 } else {
-                    callback([(1, "https://cldup.com/cXyG__fTLN.jpg")])
+                    callback([(1, "https://cldup.com/cXyG__fTLN.jpg", "image")])
                 }
             case .video:
                 if(allowMultipleSelection) {
-                    callback([(2, "https://i.cloudup.com/YtZFJbuQCE.mov"), (4, "https://i.cloudup.com/YtZFJbuQCE.mov")])
+                    callback([(2, "https://i.cloudup.com/YtZFJbuQCE.mov", "video"), (4, "https://i.cloudup.com/YtZFJbuQCE.mov", "video")])
                 } else {
-                    callback([(2, "https://i.cloudup.com/YtZFJbuQCE.mov")])
+                    callback([(2, "https://i.cloudup.com/YtZFJbuQCE.mov", "video")])
                 }
             default:
                 break
@@ -98,16 +98,16 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
 
     func gutenbergDidRequestImport(from url: URL, with callback: @escaping MediaPickerDidPickMediaCallback) {
         let id = mediaUploadCoordinator.upload(url: url)
-        callback([(id, url.absoluteString)])
+        callback([(id, url.absoluteString, "image")])
     }
 
     func pickAndUpload(from source: UIImagePickerController.SourceType, filter: MediaFilter, callback: @escaping MediaPickerDidPickMediaCallback) {
         mediaPickCoordinator = MediaPickCoordinator(presenter: self, filter: filter, callback: { (url) in
             guard let url = url, let mediaID = self.mediaUploadCoordinator.upload(url: url) else {
-                callback([(nil, nil)])
+                callback([(nil, nil, nil)])
                 return
             }
-            callback([(mediaID, url.absoluteString)])
+            callback([(mediaID, url.absoluteString, "image")])
             self.mediaPickCoordinator = nil
         } )
         mediaPickCoordinator?.pick(from: source)
