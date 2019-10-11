@@ -11,12 +11,13 @@ import {
  */
 import classnames from 'classnames';
 import { __ } from '@wordpress/i18n';
-import { isFunction } from 'lodash';
+import { isFunction, escapeRegExp } from 'lodash';
 
 import {
 	useCallback,
 	useState,
 	useRef,
+	Fragment,
 } from '@wordpress/element';
 
 import {
@@ -35,6 +36,22 @@ import {
 	URLPopover,
 	URLInput,
 } from '../';
+
+const TextHighlight = ( { text = '', highlight = '' } ) => {
+	if ( ! highlight.trim() ) {
+		return { text };
+	}
+
+	const regex = new RegExp( `(${ escapeRegExp( highlight ) })`, 'gi' );
+	const parts = text.split( regex );
+	return (
+		<Fragment>
+			{ parts.filter( ( part ) => part ).map( ( part, i ) => (
+				regex.test( part ) ? <mark key={ i }>{ part }</mark> : <span key={ i }>{ part }</span>
+			) ) }
+		</Fragment>
+	);
+};
 
 function LinkControl( { defaultOpen = false, fetchSearchSuggestions, renderAdditionalSettings } ) {
 	// State
@@ -102,7 +119,9 @@ function LinkControl( { defaultOpen = false, fetchSearchSuggestions, renderAddit
 								<Icon className="block-editor-link-control__search-item-icon" icon="admin-site-alt3" />
 							) }
 							<span className="block-editor-link-control__search-item-header">
-								<span className="block-editor-link-control__search-item-title">{ suggestion.title }</span>
+								<span className="block-editor-link-control__search-item-title">
+									<TextHighlight text={ suggestion.title } highlight={ inputValue } />
+								</span>
 								<span className="block-editor-link-control__search-item-info">{ suggestion.info || suggestion.url || '' }</span>
 							</span>
 							<span className="block-editor-link-control__search-item-type">{ suggestion.type.toLowerCase() || '' }</span>

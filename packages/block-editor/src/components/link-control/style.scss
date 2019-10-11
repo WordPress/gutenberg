@@ -92,12 +92,8 @@
 		background: #e1e1e1;
 	}
 
-	span {
-		display: block;
-	}
-
-
 	.block-editor-link-control__search-item-header {
+		display: block;
 		margin-right: 1em;
 	}
 
@@ -107,16 +103,29 @@
 	}
 
 	.block-editor-link-control__search-item-title {
-		font-weight: 500;
+		display: block;
 		margin-bottom: 0.2em;
+		font-weight: 500;
+
+		mark {
+			font-weight: 700;
+			color: #000;
+			background-color: transparent;
+		}
+
+		span {
+			font-weight: normal;
+		}
 	}
 
 	.block-editor-link-control__search-item-info {
+		display: block;
 		color: #999;
 		font-size: 0.9em;
 	}
 
 	.block-editor-link-control__search-item-type {
+		display: block;
 		padding: 3px 8px;
 		margin-left: auto;
 		font-size: 0.9em;
