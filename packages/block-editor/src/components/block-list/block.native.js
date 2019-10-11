@@ -121,6 +121,7 @@ class BlockListBlock extends Component {
 		if ( isInnerBlock ) {
 			return styles.innerBlockContainerFocused;
 		}
+
 		return styles.blockContainerFocused;
 	}
 
@@ -139,12 +140,7 @@ class BlockListBlock extends Component {
 			return styles.blockContainerInner;
 		}
 
-		const dashedStyle = [ styles.blockHolderDashedBordered ];
-		let defaultStyle = [ styles.blockContainer ];
-
-		if ( isDashed ) {
-			defaultStyle = dashedStyle;
-		}
+		const defaultStyle = [ isDashed ? styles.blockHolderDashedBordered : styles.blockContainer ];
 
 		if ( isNestedInnerBlock ) {
 			if ( ! isDimmed || isDashed ) {
@@ -153,10 +149,8 @@ class BlockListBlock extends Component {
 			return [ ...defaultStyle, styles.nestedBlockContainerInner ];
 		}
 
-		if ( isGroupType ) {
-			if ( ! parentId || isChildOfSameRootBlook ) {
-				return [ ...defaultStyle, styles.horizontalMarginNone ];
-			}
+		if ( isGroupType && ( ! parentId || isChildOfSameRootBlook ) ) {
+			return [ ...defaultStyle, styles.horizontalMarginNone ];
 		}
 
 		return defaultStyle;
