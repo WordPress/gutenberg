@@ -40,9 +40,11 @@ class BlockListBlock extends Component {
 	}
 
 	onFocus() {
-		const { firstToSelect, isSelected, onSelect } = this.props;
+		const { firstToSelect, isSelected, onSelect, isParentSelected, isMediaText } = this.props;
 		if ( ! isSelected ) {
-			onSelect( firstToSelect );
+			if ( ! isMediaText || ! isParentSelected ) {
+				onSelect( firstToSelect );
+			}
 		}
 	}
 
@@ -286,6 +288,7 @@ export default compose( [
 		const isChildOfSameRootBlook = rootBlockId === getBlockHierarchyRootClientId( selectedBlockClientId );
 		const isNestedInnerBlock = ! isDashed && selectedBlockClientId === getBlockRootClientId( firstToSelect );
 		const isGroupType = blockType.name === 'core/group';
+		const isParentSelected = parentId === selectedBlockClientId;
 
 		return {
 			icon,
@@ -308,6 +311,8 @@ export default compose( [
 			isChildOfSameRootBlook,
 			isNestedInnerBlock,
 			isGroupType,
+			isParentSelected,
+			isMediaText,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {
