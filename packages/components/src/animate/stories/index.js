@@ -24,7 +24,7 @@ const Appear = ( { origin } ) => (
 	>
 		{ ( { className } ) => (
 			<Notice className={ className } status="success">
-				<p>Appear animation. Origin: { origin }</p>
+				<p>Appear animation. Origin: { origin }.</p>
 			</Notice>
 		) }
 	</Animate>
