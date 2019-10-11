@@ -140,8 +140,7 @@ export const registerCoreBlocks = () => {
 		separator,
 		list,
 		quote,
-		// eslint-disable-next-line no-undef
-		!! __DEV__ ? mediaText : null,
+		mediaText,
 		// eslint-disable-next-line no-undef
 		!! __DEV__ ? group : null,
 	].forEach( registerBlock );
