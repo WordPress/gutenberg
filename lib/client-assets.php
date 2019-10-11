@@ -145,10 +145,6 @@ function gutenberg_override_translation_file( $file, $handle ) {
 		$path_parts['basename']
 	);
 
-	if ( ! is_readable( $plugin_translation_file ) ) {
-		return $file;
-	}
-
 	return $plugin_translation_file;
 }
 add_filter( 'load_script_translation_file', 'gutenberg_override_translation_file', 10, 2 );
