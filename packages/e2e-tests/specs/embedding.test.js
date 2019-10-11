@@ -3,15 +3,15 @@
  */
 import {
 	clickBlockAppender,
-	createNewPost,
-	createEmbeddingMatcher,
-	createURLMatcher,
-	setUpResponseMocking,
-	createJSONResponse,
-	getEditedPostContent,
 	clickButton,
+	createEmbeddingMatcher,
+	createJSONResponse,
+	createNewPost,
+	createURLMatcher,
+	getEditedPostContent,
 	insertBlock,
 	publishPost,
+	setUpResponseMocking,
 } from '@wordpress/e2e-test-utils';
 
 const MOCK_EMBED_WORDPRESS_SUCCESS_RESPONSE = {

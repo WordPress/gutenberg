@@ -448,7 +448,7 @@
 	// Left
 	&[data-align="left"] {
 		// This is in the editor only; the image should be floated on the frontend.
-		.block-editor-block-list__block-edit {
+		> .block-editor-block-list__block-edit {
 			/*!rtl:begin:ignore*/
 			float: left;
 			margin-right: 2em;

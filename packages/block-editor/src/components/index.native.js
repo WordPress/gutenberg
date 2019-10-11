@@ -23,6 +23,7 @@ export { default as URLInput } from './url-input';
 export { default as BlockInvalidWarning } from './block-list/block-invalid-warning';
 export { default as Caption } from './caption';
 export { BottomSheetSettings, BlockSettingsButton } from './block-settings';
+export { default as VideoPlayer, VIDEO_ASPECT_RATIO } from './video-player';
 
 // Content Related Components
 export { default as BlockList } from './block-list';

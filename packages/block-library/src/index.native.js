@@ -5,6 +5,7 @@ import {
 	registerBlockType,
 	setDefaultBlockName,
 	setUnregisteredTypeHandlerName,
+	setGroupingBlockName,
 } from '@wordpress/blocks';
 
 /**
@@ -149,4 +150,7 @@ export const registerCoreBlocks = () => {
 
 	setDefaultBlockName( paragraph.name );
 	setUnregisteredTypeHandlerName( missing.name );
+	if ( group ) {
+		setGroupingBlockName( group.name );
+	}
 };
