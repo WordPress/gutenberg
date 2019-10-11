@@ -38,9 +38,8 @@ import {
 
 import TextHighlight from './text-highlight';
 
-function LinkControl( { defaultOpen = false, fetchSearchSuggestions, renderAdditionalSettings } ) {
+function LinkControl( { fetchSearchSuggestions, renderAdditionalSettings } ) {
 	// State
-	const [ isOpen, setIsOpen ] = useState( defaultOpen );
 	const [ inputValue, setInputValue ] = useState( '' );
 
 	// Refs
@@ -58,7 +57,6 @@ function LinkControl( { defaultOpen = false, fetchSearchSuggestions, renderAddit
 
 	const closeLinkUI = () => {
 		setInputValue( '' );
-		setIsOpen( false );
 	};
 
 	const handleURLSearch = async ( value ) => {
@@ -126,10 +124,6 @@ function LinkControl( { defaultOpen = false, fetchSearchSuggestions, renderAddit
 			{ isFunction( renderAdditionalSettings ) && renderAdditionalSettings() }
 		</div>
 	);
-
-	if ( ! isOpen ) {
-		return null;
-	}
 
 	return (
 		<URLPopover
