@@ -17,7 +17,7 @@ export const _default = () => (
 );
 
 // unexported helper for various origins
-const Appear = ( origin ) => (
+const Appear = ( { origin } ) => (
 	<Animate
 		type="appear"
 		options={ { origin } }
@@ -30,10 +30,10 @@ const Appear = ( origin ) => (
 	</Animate>
 );
 
-export const appearTopLeft = () => Appear( 'top left' );
-export const appearTopRight = () => Appear( 'top right' );
-export const appearBottomLeft = () => Appear( 'bottom left' );
-export const appearBottomRight = () => Appear( 'bottom right' );
+export const appearTopLeft = () => <Appear origin="top left" />
+export const appearTopLeft = () => <Appear origin="top left" />
+export const appearTopLeft = () => <Appear origin="top left" />
+export const appearTopLeft = () => <Appear origin="top left" />
 
 export const loading = () => (
 	<Animate type="loading">
