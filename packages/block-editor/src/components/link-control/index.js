@@ -17,7 +17,6 @@ import {
 	useCallback,
 	useState,
 	useRef,
-	Fragment,
 } from '@wordpress/element';
 
 import {
@@ -46,10 +45,6 @@ function LinkControl( { defaultOpen = false, fetchSearchSuggestions, renderAddit
 	const autocompleteRef = useRef( null );
 
 	// Effects
-	const openLinkUI = useCallback( () => {
-		setIsOpen( true );
-	} );
-
 	const getSearchFetcher = useCallback( ( value ) => {
 		return ( /^https?:/.test( value ) ) ? handleURLSearch : fetchSearchSuggestions;
 	} );
@@ -57,6 +52,11 @@ function LinkControl( { defaultOpen = false, fetchSearchSuggestions, renderAddit
 	// Handlers
 	const onInputChange = ( value = '' ) => {
 		setInputValue( value );
+	};
+
+	const closeLinkUI = () => {
+		setInputValue( '' );
+		setIsOpen( false );
 	};
 
 	const handleURLSearch = async ( value ) => {
@@ -123,54 +123,47 @@ function LinkControl( { defaultOpen = false, fetchSearchSuggestions, renderAddit
 		</div>
 	);
 
+	if ( ! isOpen ) {
+		return null;
+	}
+
 	return (
-		<Fragment>
-			<IconButton
-				icon="insert"
-				className="components-toolbar__control"
-				label={ __( 'Insert link' ) }
-				onClick={ openLinkUI }
-			/>
+		<URLPopover
+			onClose={ closeLinkUI }
+		>
+			<div className="block-editor-link-control__popover-inner">
+				<div className="block-editor-link-control__search">
 
-			{ isOpen && (
+					<form
+						onSubmit={ onSubmitLinkChange }
+					>
+						<URLInput
+							className="block-editor-link-control__search-input"
+							value={ inputValue }
+							onChange={ onInputChange }
+							autocompleteRef={ autocompleteRef }
+							onKeyDown={ stopPropagationRelevantKeys }
+							onKeyPress={ stopPropagation }
+							placeholder={ __( 'Search or type url' ) }
+							renderSuggestions={ renderSearchResults }
+							fetchLinkSuggestions={ getSearchFetcher( inputValue ) }
+							handleURLSuggestions={ true }
+						/>
 
-				<URLPopover>
-					<div className="block-editor-link-control__popover-inner">
-						<div className="block-editor-link-control__search">
-
-							<form
-								onSubmit={ onSubmitLinkChange }
-							>
-								<URLInput
-									className="block-editor-link-control__search-input"
-									value={ inputValue }
-									onChange={ onInputChange }
-									autocompleteRef={ autocompleteRef }
-									onKeyDown={ stopPropagationRelevantKeys }
-									onKeyPress={ stopPropagation }
-									placeholder={ __( 'Search or type url' ) }
-									renderSuggestions={ renderSearchResults }
-									fetchLinkSuggestions={ getSearchFetcher( inputValue ) }
-									handleURLSuggestions={ true }
-								/>
-
-								{ inputValue && (
-									<IconButton
-										type="reset"
-										label={ __( 'Reset' ) }
-										icon="no-alt"
-										className="block-editor-link-control__search-reset"
-										onClick={ () => onInputChange( undefined ) }
-									/>
-								) }
-								{ inputValue && <LinkControlAdditionalSettings /> }
-							</form>
-						</div>
-					</div>
-				</URLPopover>
-
-			) }
-		</Fragment>
+						{ inputValue && (
+							<IconButton
+								type="reset"
+								label={ __( 'Reset' ) }
+								icon="no-alt"
+								className="block-editor-link-control__search-reset"
+								onClick={ () => onInputChange( undefined ) }
+							/>
+						) }
+						{ inputValue && <LinkControlAdditionalSettings /> }
+					</form>
+				</div>
+			</div>
+		</URLPopover>
 	);
 }
 
