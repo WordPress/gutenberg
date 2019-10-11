@@ -13,8 +13,9 @@ Here is the basic InnerBlocks usage.
 	var el = element.createElement;
 	var InnerBlocks = blockEditor.InnerBlocks;
 
-	blocks.registerBlockType( 'a8c/workshop-ex7', {
-		// ...
+	blocks.registerBlockType( 'gutenberg-examples/example-06', {
+		title: 'Example: Inner Blocks',
+		category: 'layout',
 
 		edit: function( props ) {
 			return el(
@@ -26,12 +27,12 @@ Here is the basic InnerBlocks usage.
 
 		save: function( props ) {
 			return el(
-				'div'
+				'div',
 				{ className: props.className },
 				InnerBlocks.Content
 			);
 		},
-	}
+	} );
 } (
 	window.wp.blocks,
 	window.wp.element,
