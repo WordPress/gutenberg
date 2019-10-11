@@ -121,10 +121,12 @@ describe( 'Searching', () => {
 
 		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
 		const searchResultElements = container.querySelectorAll( '[role="listbox"] button[role="option"]' );
-		const searchResultHTML = searchResultElements[ 0 ].innerHTML;
+		const firstSearchResultItemHTML = searchResultElements[ 0 ].innerHTML;
+		const expectedResultsLength = 1;
 
-		expect( searchResultElements ).toHaveLength( 1 );
-		expect( searchResultHTML ).toEqual( expect.stringContaining( searchTerm ) );
+		expect( searchResultElements ).toHaveLength( expectedResultsLength );
+		expect( firstSearchResultItemHTML ).toEqual( expect.stringContaining( searchTerm ) );
+		expect( firstSearchResultItemHTML ).toEqual( expect.stringContaining( 'url' ) );
 	} );
 
 	it( 'should reset input and search results when search term is cleared or reset', async ( ) => {
