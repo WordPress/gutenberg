@@ -183,6 +183,7 @@ const addEditState = ( types ) => {
 			// after bringing in the frame, load the actual editor via an ajax call
 			view.loadEditor();
 		},
+
 		/**
 		 * Create the default states.
 		 *
@@ -239,12 +240,8 @@ class MediaUpload extends Component {
 		if ( gallery ) {
 			this.buildAndSetGalleryFrame();
 		} else {
-			this.buildAndSetEditFrame();
 			const frameConfig = {
 				title,
-				button: {
-					text: __( 'Select' ),
-				},
 				multiple,
 			};
 			if ( !! allowedTypes ) {
@@ -335,27 +332,6 @@ class MediaUpload extends Component {
 		this.frame = new featuredImageFrame( {
 			mimeType: this.props.allowedTypes,
 			state: 'featured-image',
-			multiple: this.props.multiple,
-			selection,
-			editing: ( this.props.value ) ? true : false,
-		} );
-		wp.media.frame = this.frame;
-	}
-
-	/**
-	 * Initializes the Media Library requirements for "Edit Image" buton inside the Attachment Details frame.
-	 *
-	 * @return {void}
-	 */
-	buildAndSetEditFrame() {
-		const editFrame = addEditState( this.props.allowedTypes );
-		const attachments = getAttachmentsCollection( this.props.value );
-		const selection = new wp.media.model.Selection( attachments.models, {
-			props: attachments.props.toJSON(),
-		} );
-		this.frame = new editFrame( {
-			mimeType: this.props.allowedTypes,
-			state: 'library',
 			multiple: this.props.multiple,
 			selection,
 			editing: ( this.props.value ) ? true : false,
