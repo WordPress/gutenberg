@@ -10,6 +10,7 @@ export default function PreformattedEdit( { attributes, mergeBlocks, setAttribut
 	return (
 		<RichText
 			tagName="pre"
+			identifier="content"
 			// Ensure line breaks are normalised to HTML.
 			value={ content.replace( /\n/g, '<br>' ) }
 			onChange={ ( nextContent ) => {
