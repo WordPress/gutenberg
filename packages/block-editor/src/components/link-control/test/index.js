@@ -10,7 +10,7 @@ import { act, Simulate } from 'react-dom/test-utils';
 import LinkControl from '../index';
 import { fauxEntitySuggestions, fetchFauxEntitySuggestions } from './fixtures';
 
-function currentEventLoopEnd() {
+function eventLoopTick() {
 	return new Promise( ( resolve ) => setImmediate( resolve ) );
 }
 
@@ -76,7 +76,7 @@ describe( 'Searching', () => {
 		} );
 
 		// fetchFauxEntitySuggestions resolves on next "tick" of event loop
-		await currentEventLoopEnd();
+		await eventLoopTick();
 
 		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
 		searchResultElements = container.querySelectorAll( '[role="listbox"] button[role="option"]' );
@@ -89,11 +89,59 @@ describe( 'Searching', () => {
 		} );
 
 		// fetchFauxEntitySuggestions resolves on next "tick" of event loop
-		await currentEventLoopEnd();
+		await eventLoopTick();
 
 		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
 		searchResultElements = container.querySelectorAll( '[role="listbox"] button[role="option"]' );
 
+		expect( searchResultElements ).toHaveLength( 0 );
+	} );
+
+	it( 'should reset input and search results when search term is cleared or reset', async ( ) => {
+		const searchTerm = 'Hello';
+
+		act( () => {
+			render(
+				<LinkControl
+					fetchSearchSuggestions={ fetchFauxEntitySuggestions }
+				/>, container
+			);
+		} );
+
+		let searchResultElements;
+		let searchInput;
+
+		// Search Input UI
+		searchInput = container.querySelector( 'input[aria-label="URL"]' );
+
+		// Simulate searching for a term
+		act( () => {
+			Simulate.change( searchInput, { target: { value: searchTerm } } );
+		} );
+
+		// fetchFauxEntitySuggestions resolves on next "tick" of event loop
+		await eventLoopTick();
+
+		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
+		searchResultElements = container.querySelectorAll( '[role="listbox"] button[role="option"]' );
+
+		// Check we have definitely rendered some suggestions
+		expect( searchResultElements ).toHaveLength( fauxEntitySuggestions.length );
+
+		// Grab the reset button now it's available
+		const resetUI = container.querySelector( '[aria-label="Reset"]' );
+
+		act( () => {
+			Simulate.click( resetUI );
+		} );
+
+		await eventLoopTick();
+
+		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
+		searchResultElements = container.querySelectorAll( '[role="listbox"] button[role="option"]' );
+		searchInput = container.querySelector( 'input[aria-label="URL"]' );
+
+		expect( searchInput.value ).toBe( '' );
 		expect( searchResultElements ).toHaveLength( 0 );
 	} );
 } );

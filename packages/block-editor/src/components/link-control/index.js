@@ -148,15 +148,15 @@ function LinkControl( { fetchSearchSuggestions, renderAdditionalSettings } ) {
 							handleURLSuggestions={ true }
 						/>
 
-						{ inputValue && (
-							<IconButton
-								type="reset"
-								label={ __( 'Reset' ) }
-								icon="no-alt"
-								className="block-editor-link-control__search-reset"
-								onClick={ () => onInputChange( undefined ) }
-							/>
-						) }
+						<IconButton
+							disabled={ ! inputValue.length }
+							type="reset"
+							label={ __( 'Reset' ) }
+							icon="no-alt"
+							className="block-editor-link-control__search-reset"
+							onClick={ () => onInputChange( undefined ) }
+						/>
+
 						{ inputValue && <LinkControlAdditionalSettings /> }
 					</form>
 				</div>
