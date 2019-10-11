@@ -11,13 +11,12 @@ import {
  */
 import classnames from 'classnames';
 import { __ } from '@wordpress/i18n';
-import { isFunction, escapeRegExp } from 'lodash';
+import { isFunction } from 'lodash';
 
 import {
 	useCallback,
 	useState,
 	useRef,
-	Fragment,
 } from '@wordpress/element';
 
 import {
@@ -37,21 +36,7 @@ import {
 	URLInput,
 } from '../';
 
-const TextHighlight = ( { text = '', highlight = '' } ) => {
-	if ( ! highlight.trim() ) {
-		return { text };
-	}
-
-	const regex = new RegExp( `(${ escapeRegExp( highlight ) })`, 'gi' );
-	const parts = text.split( regex );
-	return (
-		<Fragment>
-			{ parts.filter( ( part ) => part ).map( ( part, i ) => (
-				regex.test( part ) ? <mark key={ i }>{ part }</mark> : <span key={ i }>{ part }</span>
-			) ) }
-		</Fragment>
-	);
-};
+import TextHighlight from './text-highlight';
 
 function LinkControl( { defaultOpen = false, fetchSearchSuggestions, renderAdditionalSettings } ) {
 	// State
