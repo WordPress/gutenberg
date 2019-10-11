@@ -44,7 +44,8 @@ export function createBlock( name, attributes = {}, innerBlocks = [] ) {
 
 	// Ensure attributes contains only values defined by block type, and merge
 	// default values for missing attributes.
-	const sanitizedAttributes = reduce( blockType.attributes, ( result, schema, key ) => {
+	const accumulator=blockType.attributes
+	const sanitizedAttributes = reduce(accumulator , ( result, schema, key ) => {
 		const value = attributes[ key ];
 
 		if ( undefined !== value ) {

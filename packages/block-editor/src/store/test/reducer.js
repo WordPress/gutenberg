@@ -1425,7 +1425,7 @@ describe( 'state', () => {
 						],
 					},
 				];
-				const original = deepFreeze( actions.reduce( blocks, undefined ) );
+				const original = deepFreeze( actions.reduce( blocksAccumulator, undefined ) );
 
 				const state = blocks( original, {
 					type: 'RESET_BLOCKS',

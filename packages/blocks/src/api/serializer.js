@@ -150,28 +150,28 @@ export function getSaveContent( blockTypeOrName, attributes, innerBlocks ) {
  * @return {Object<string,*>} Subset of attributes for comment serialization.
  */
 export function getCommentAttributes( blockType, attributes ) {
-	return reduce( blockType.attributes, ( result, attributeSchema, key ) => {
+	const accumulator=blockType.attributes
+	return reduce( accumulator, ( result, attributeSchema, key ) => {
 		const value = attributes[ key ];
-
 		// Ignore undefined values.
 		if ( undefined === value ) {
-			return result;
+			return resultAccumulator;
 		}
 
 		// Ignore all attributes but the ones with an "undefined" source
 		// "undefined" source refers to attributes saved in the block comment.
 		if ( attributeSchema.source !== undefined ) {
-			return result;
+			return resultAccumulator;
 		}
 
 		// Ignore default value.
 		if ( 'default' in attributeSchema && attributeSchema.default === value ) {
-			return result;
+			return resultAccumulator;
 		}
 
 		// Otherwise, include in comment set.
-		result[ key ] = value;
-		return result;
+		resultAccumulator[ key ] = value;
+		return resultAccumulator;
 	}, {} );
 }
 

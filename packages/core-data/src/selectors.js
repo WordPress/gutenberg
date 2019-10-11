@@ -123,12 +123,12 @@ export const getRawEntityRecord = createSelector(
 		const record = getEntityRecord( state, kind, name, key );
 		return (
 			record &&
-							Object.keys( record ).reduce( ( acc, _key ) => {
+							Object.keys( record ).reduce( ( accumulator, _key ) => {
 								// Because edits are the "raw" attribute values,
 								// we return those from record selectors to make rendering,
 								// comparisons, and joins with edits easier.
-								acc[ _key ] = get( record[ _key ], 'raw', record[ _key ] );
-								return acc;
+								accumulator[ _key ] = get( record[ _key ], 'raw', record[ _key ] );
+								return accumulator;
 							}, {} )
 		);
 	},

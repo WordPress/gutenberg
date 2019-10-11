@@ -66,7 +66,7 @@ export default [
 			) );
 		},
 		migrate( attributes, innerBlocks ) {
-			const columns = innerBlocks.reduce( ( result, innerBlock ) => {
+			const columns = innerBlocks.reduce( ( resultAccumulator, innerBlock ) => {
 				const { originalContent } = innerBlock;
 
 				let columnIndex = getDeprecatedLayoutColumn( originalContent );
@@ -74,13 +74,13 @@ export default [
 					columnIndex = 0;
 				}
 
-				if ( ! result[ columnIndex ] ) {
-					result[ columnIndex ] = [];
+				if ( ! resultAccumulator[ columnIndex ] ) {
+					resultAccumulator[ columnIndex ] = [];
 				}
 
-				result[ columnIndex ].push( innerBlock );
+				resultAccumulator[ columnIndex ].push( innerBlock );
 
-				return result;
+				return resultAccumulator;
 			}, [] );
 
 			const migratedInnerBlocks = columns.map( ( columnBlocks ) => (
