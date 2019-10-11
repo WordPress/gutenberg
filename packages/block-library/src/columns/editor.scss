@@ -41,12 +41,9 @@
 		> [data-type="core/column"] > .editor-block-list__block-edit,
 		> [data-type="core/column"] > .editor-block-list__block-edit > div[data-block],
 		> [data-type="core/column"] > .editor-block-list__block-edit .block-core-columns {
-			// IE11 doesn't read rules inside this query. They are applied only to modern browsers.
-			@supports (position: sticky) {
-				display: flex;
-				flex-direction: column;
-				flex: 1;
-			}
+			display: flex;
+			flex-direction: column;
+			flex: 1 0 auto;
 		}
 
 		// Adjust the individual column block.
