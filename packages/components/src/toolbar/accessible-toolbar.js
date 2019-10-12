@@ -8,11 +8,11 @@ import { useToolbarState, Toolbar } from 'reakit/Toolbar';
  */
 import ToolbarContext from '../toolbar-context';
 
-function AccessibleToolbar( props ) {
+function AccessibleToolbar( { label, ...props } ) {
 	const toolbar = useToolbarState( { loop: true } );
 	return (
 		<ToolbarContext.Provider value={ toolbar }>
-			<Toolbar { ...toolbar } { ...props } />
+			<Toolbar { ...toolbar } aria-label={ label } { ...props } />
 		</ToolbarContext.Provider>
 	);
 }

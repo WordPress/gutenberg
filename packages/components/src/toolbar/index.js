@@ -51,10 +51,15 @@ function Toolbar( { controls = [], children, className, isCollapsed, icon, label
 		return null;
 	}
 
-	const cx = classnames( 'components-toolbar', className );
+	const cls = classnames( 'components-toolbar', className );
+	const isLegacy = Boolean( controls.length ) || typeof isCollapsed !== 'undefined' || icon;
 
-	if ( ! controls || ! controls.length ) {
-		return <AccessibleToolbar className={ cx } { ...otherProps }>{ children }</AccessibleToolbar>;
+	if ( ! isLegacy ) {
+		return (
+			<AccessibleToolbar className={ cls } label={ label } { ...otherProps }>
+				{ children }
+			</AccessibleToolbar>
+		);
 	}
 
 	// Normalize controls to nested array of objects (sets of controls)
@@ -70,13 +75,13 @@ function Toolbar( { controls = [], children, className, isCollapsed, icon, label
 				icon={ icon }
 				label={ label }
 				controls={ controlSets }
-				className={ cx }
+				className={ cls }
 			/>
 		);
 	}
 
 	return (
-		<ToolbarContainer className={ cx } { ...otherProps }>
+		<ToolbarContainer className={ cls } { ...otherProps }>
 			{ flatMap( controlSets, ( controlSet, indexOfSet ) => (
 				controlSet.map( ( control, indexOfControl ) => (
 					<ToolbarButton
