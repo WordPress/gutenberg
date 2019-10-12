@@ -137,11 +137,10 @@ describe( 'listener hook tests', () => {
 				getSpyedFunction( STORE_KEY, 'closeGeneralSidebar' )
 			).not.toHaveBeenCalled();
 		} );
-		it( 'does not close sidebar if viewport is small and there is an active ' +
+		it( 'closes sidebar if viewport is small and there is an active ' +
 			'sidebar name available on initial render', () => {
 			setMockReturnValue( 'core/viewport', 'isViewportMatch', true );
 			setMockReturnValue( STORE_KEY, 'getActiveGeneralSidebarName', 'foo' );
-			// initial render does nothing (and sidebar will be closed already)
 			act( () => {
 				renderComponent( useAdjustSidebarListener, 10 );
 			} );
@@ -150,7 +149,7 @@ describe( 'listener hook tests', () => {
 			).not.toHaveBeenCalled();
 			expect(
 				getSpyedFunction( STORE_KEY, 'closeGeneralSidebar' )
-			).not.toHaveBeenCalled();
+			).toHaveBeenCalled();
 		} );
 		it( 'closes sidebar if viewport is small and there is an active ' +
 			'sidebar name available when viewport size changes', () => {

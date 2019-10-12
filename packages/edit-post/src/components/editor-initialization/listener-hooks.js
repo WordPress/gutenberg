@@ -64,7 +64,7 @@ export const useAdjustSidebarListener = ( postId ) => {
 
 	const { openGeneralSidebar, closeGeneralSidebar } = useDispatch( STORE_KEY );
 
-	const previousIsSmall = useRef( isSmall );
+	const previousIsSmall = useRef( null );
 	const sidebarToReOpenOnExpand = useRef( null );
 
 	useEffect( () => {
