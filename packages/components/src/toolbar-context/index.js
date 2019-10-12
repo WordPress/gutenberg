@@ -3,6 +3,6 @@
  */
 import { createContext } from '@wordpress/element';
 
-const ToolbarContext = createContext( {} );
+const ToolbarContext = createContext();
 
 export default ToolbarContext;
