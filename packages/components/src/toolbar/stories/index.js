@@ -26,7 +26,7 @@ export function _default() {
 		);
 
 		return (
-			<Toolbar label="Card options">
+			<Toolbar accessibilityLabel="Card options">
 				{ [ 'up', 'down' ].map( createToolbarButton ) }
 			</Toolbar>
 		);

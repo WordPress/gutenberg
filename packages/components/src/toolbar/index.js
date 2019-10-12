@@ -43,7 +43,7 @@ import AccessibleToolbar from './accessible-toolbar';
  *
  * @return {ReactElement} The rendered toolbar.
  */
-function Toolbar( { controls = [], children, className, isCollapsed, icon, label, ...otherProps } ) {
+function Toolbar( { controls = [], children, className, isCollapsed, icon, accessibilityLabel, label, ...otherProps } ) {
 	if (
 		( ! controls || ! controls.length ) &&
 		! children
@@ -52,11 +52,10 @@ function Toolbar( { controls = [], children, className, isCollapsed, icon, label
 	}
 
 	const cls = classnames( 'components-toolbar', className );
-	const isLegacy = Boolean( controls.length ) || typeof isCollapsed !== 'undefined' || icon;
 
-	if ( ! isLegacy ) {
+	if ( accessibilityLabel ) {
 		return (
-			<AccessibleToolbar className={ cls } label={ label } { ...otherProps }>
+			<AccessibleToolbar className={ cls } accessibilityLabel={ accessibilityLabel } { ...otherProps }>
 				{ children }
 			</AccessibleToolbar>
 		);
