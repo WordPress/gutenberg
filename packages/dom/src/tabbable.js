@@ -126,11 +126,10 @@ function compareObjectTabbables( a, b ) {
 }
 
 export function find( context ) {
-	const accumulator=createStatefulCollapseRadioGroup()
 	return findFocusable( context )
 		.filter( isTabbableIndex )
 		.map( mapElementToObjectTabbable )
 		.sort( compareObjectTabbables )
 		.map( mapObjectTabbableToElement )
-		.reduce( accumulator, [] );
+		.reduce( createStatefulCollapseRadioGroup(), [] );
 }

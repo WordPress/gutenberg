@@ -233,13 +233,13 @@ export const getClientIdsWithDescendants = createSelector(
  */
 export const getGlobalBlockCount = createSelector(
 	( state, blockName ) => {
-		const clientIdsAccumulator = getClientIdsWithDescendants( state );
+		const clientIds = getClientIdsWithDescendants( state );
 		if ( ! blockName ) {
-			return clientIdsAccumulator.length;
+			return clientIds.length;
 		}
-		return reduce( clientIdsAccumulator, ( count, clientId ) => {
+		return reduce( clientIds, ( accumulator, clientId ) => {
 			const block = state.blocks.byClientId[ clientId ];
-			return block.name === blockName ? count + 1 : count;
+			return block.name === blockName ? accumulator + 1 : accumulator;
 		}, 0 );
 	},
 	( state ) => [

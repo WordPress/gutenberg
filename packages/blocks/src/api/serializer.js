@@ -150,8 +150,7 @@ export function getSaveContent( blockTypeOrName, attributes, innerBlocks ) {
  * @return {Object<string,*>} Subset of attributes for comment serialization.
  */
 export function getCommentAttributes( blockType, attributes ) {
-	const accumulator=blockType.attributes
-	return reduce( accumulator, ( result, attributeSchema, key ) => {
+	return reduce( blockType.attributes, ( resultAccumulator, attributeSchema, key ) => {
 		const value = attributes[ key ];
 		// Ignore undefined values.
 		if ( undefined === value ) {
