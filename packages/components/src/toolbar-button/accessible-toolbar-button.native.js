@@ -1,10 +1,6 @@
 /**
- * External dependencies
+ * Internal dependencies
  */
-import { View } from 'react-native';
+import ToolbarButtonContainer from './toolbar-button-container';
 
-export default ( props ) => (
-	<View>
-		{ props.children }
-	</View>
-);
+export default ToolbarButtonContainer;
