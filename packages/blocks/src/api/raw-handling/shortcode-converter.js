@@ -29,7 +29,13 @@ function segmentHTMLToShortcodeBlock( HTML, lastIndex = 0 ) {
 	}
 
 	const transformTags = castArray( transformation.tag );
-	const transformTag = first( transformTags );
+
+	let transformTag = first( transformTags );
+	for ( let i = 0; i < transformTags.length; i++ ) {
+		if ( regexp( transformTags[ i ] ).test( HTML ) ) {
+			transformTag = transformTags[ i ];
+		}
+	}
 
 	let match;
 
