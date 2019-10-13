@@ -73,7 +73,7 @@
 		"@babel/traverse": "7.4.5",
 		"@octokit/rest": "16.26.0",
 		"@storybook/addon-a11y": "5.2.3",
-		"@storybook/addon-docs": "5.2.3",
+		"@storybook/addon-info": "5.2.3",
 		"@storybook/addon-viewport": "5.2.3",
 		"@storybook/react": "5.2.3",
 		"@wordpress/babel-plugin-import-jsx-pragma": "file:packages/babel-plugin-import-jsx-pragma",
