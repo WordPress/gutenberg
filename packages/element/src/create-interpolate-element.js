@@ -56,12 +56,8 @@ const getMatchFromString = (
 		return match;
 	}
 
-	// If config has property "value", then just return on search string
-	// since it is not a component.
-	const expression = getHasPropValue( conversionConfig ) ?
-		new RegExp( escapeRegExp( searchString ) ) :
-		getSelfClosingTagExpression( searchString );
-	return interpolatedString.match( expression );
+	// no children, so just return selfClosingTag match
+	return interpolatedString.match( getSelfClosingTagExpression( searchString ) );
 };
 
 // index for keys
@@ -150,6 +146,32 @@ const recursiveCreateElement = ( potentialElement, conversionMap ) => {
 };
 
 /**
+ * This reorders the conversionMap so that it's entries match the order of
+ * elements in the string.
+ *
+ * This is necessary because the parser is order sensitive due to the potential
+ * for nested elements (eg. <a>Some linked <em>and emphasized</em></a> string).
+ * This ensures that the parsing will be done correctly yet still allow for the
+ * consumer not to worry about order in the map.
+ *
+ * @param interpolatedString {string}  The string being parsed.
+ * @param conversionMap      {Array}   The map being reordered
+ *
+ * @return {Array}  The new map in the correct order for the tags in the string.
+ */
+const reorderMapByElementOrder = ( interpolatedString, conversionMap ) => {
+	// if length of map is only one then we can just return as is.
+	if ( conversionMap.length === 1 ) {
+		return conversionMap;
+	}
+	return conversionMap.sort( ( [ tagA ], [ tagB ] ) => {
+		tagA = `<${ tagA }`;
+		tagB = `<${ tagB }`;
+		return interpolatedString.indexOf( tagA ) > interpolatedString.indexOf( tagB );
+	} );
+};
+
+/**
  * This function creates an interpolated element from a passed in string with
  * specific tags matching how the string should be converted to an element via
  * the conversion map value.
@@ -157,36 +179,61 @@ const recursiveCreateElement = ( potentialElement, conversionMap ) => {
  * @example
  * For example, for the given string:
  *
- * "This is a <span%1>string</span%1> with <a%1>a link</a%1>, a self-closing
- * %1$s tag and a plain value %2$s"
+ * "This is a <span>string</span> with <a>a link</a>, a self-closing
+ * <CustomComponentB/> tag and a plain value <custom value/>"
  *
  * You would have something like this as the conversionMap value:
  *
  * ```js
  * {
- *     'span%1': { tag: CustomComponent, props: {} },
- *     'a%1': { tag: 'a', props: { href: 'https://github.com' } },
- *     '%1$s': { tag: CustomComponentB, props: {} },
- *     '%2$s': { value: 'custom value' },
+ *     span: { tag: CustomComponent, props: {} },
+ *     a: { tag: 'a', props: { href: 'https://github.com' } },
+ *     CustomComponentB: { tag: CustomComponentB, props: {} },
+ *     'custom value': { value: 'custom value' },
  * }
  * ```
  *
  * @param {string}  interpolatedString  The interpolation string to be parsed.
- * @param {Object} conversionMap        The map used to convert the string to
+ * @param {Object}  conversionMap       The map used to convert the string to
  *                                      a react element.
  *
  * @return {Element}  A react element.
  */
 const createInterpolateElement = ( interpolatedString, conversionMap ) => {
 	keyIndex = -1;
+
+	if ( ! isValidConversionMap( conversionMap ) ) {
+		return interpolatedString;
+	}
+
+	// verify that the object isn't empty.
+	conversionMap = Object.entries( conversionMap );
+	if ( conversionMap.length === 0 ) {
+		return interpolatedString;
+	}
+
 	return createElement(
 		Fragment,
 		{},
 		recursiveCreateElement(
 			interpolatedString,
-			Object.entries( conversionMap )
+			reorderMapByElementOrder( interpolatedString, conversionMap )
 		),
 	);
+};
+
+/**
+ * Validate conversion map.
+ *
+ * A map is considered valid if it's an object and does not have length.
+ *
+ * @param conversionMap {Object}  The map being validated.
+ *
+ * @return boolean  True means the map is valid.
+ */
+const isValidConversionMap = ( conversionMap ) => {
+	return typeof conversionMap === 'object' &&
+		typeof conversionMap.length === 'undefined';
 };
 
 export default createInterpolateElement;
