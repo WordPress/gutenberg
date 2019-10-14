@@ -30,8 +30,8 @@ In your application's scss file, include styles like so:
 To use themes with `@wordpress/postcss-themes`, import them like so:
 
 ```js
-const themes = require( '@wordpress/base-styles/themes' );
-const wpPostcss = require( '@wordpress/postcss-themes' )( themes )
+const { adminColorSchemes } = require( '@wordpress/base-styles' );
+const wpPostcss = require( '@wordpress/postcss-themes' )( adminColorSchemes )
 ```
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

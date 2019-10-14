@@ -1,4 +1,4 @@
-module.exports = {
+exports.adminColorSchemes = {
 	defaults: {
 		primary: '#0085ba',
 		secondary: '#11a0d2',
