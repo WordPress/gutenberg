@@ -29,7 +29,7 @@ class Slider extends Component {
 		}
 	}
 
-	handleToggleFocus( validateInput = false ) {
+	handleToggleFocus( validateInput = true ) {
 		const newState = { hasFocus: ! this.state.hasFocus };
 
 		if ( validateInput ) {
@@ -74,7 +74,7 @@ class Slider extends Component {
 		return (
 			<View style={ styles.sliderContainer }>
 				<RNSlider
-					value={ value }
+					value={ this.validateInput( value ) }
 					disabled={ disabled }
 					style={ styles.slider }
 					step={ step }
@@ -89,7 +89,7 @@ class Slider extends Component {
 					style={ [ styles.sliderTextInput, hasFocus ? styles.isSelected : {} ] }
 					onChangeText={ this.handleChange }
 					onFocus={ this.handleToggleFocus }
-					onBlur={ () => this.handleToggleFocus( true ) }
+					onBlur={ this.handleToggleFocus }
 					keyboardType="numeric"
 					value={ `${ sliderValue }` }
 				/>
