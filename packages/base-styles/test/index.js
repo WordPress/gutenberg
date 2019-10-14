@@ -12,37 +12,37 @@ const run = ( filename ) => {
 };
 
 describe( 'base-styles', () => {
-	it( 'can use animations', ( ) => {
+	it( 'can use animations', () => {
 		return run( 'animations.scss' ).then( ( result ) => {
 			expect( result.css.toString() ).toMatchSnapshot();
 		} );
 	} );
 
-	it( 'can use breakpoints', ( ) => {
+	it( 'can use breakpoints', () => {
 		return run( 'breakpoints.scss' ).then( ( result ) => {
 			expect( result.css.toString() ).toMatchSnapshot();
 		} );
 	} );
 
-	it( 'can use colors', ( ) => {
+	it( 'can use colors', () => {
 		return run( 'colors.scss' ).then( ( result ) => {
 			expect( result.css.toString() ).toMatchSnapshot();
 		} );
 	} );
 
-	it( 'can use mixins', ( ) => {
+	it( 'can use mixins', () => {
 		return run( 'mixins.scss' ).then( ( result ) => {
 			expect( result.css.toString() ).toMatchSnapshot();
 		} );
 	} );
 
-	it( 'can use variables', ( ) => {
+	it( 'can use variables', () => {
 		return run( 'variables.scss' ).then( ( result ) => {
 			expect( result.css.toString() ).toMatchSnapshot();
 		} );
 	} );
 
-	it( 'can use z-indexes', ( ) => {
+	it( 'can use z-indexes', () => {
 		return run( 'z-index.scss' ).then( ( result ) => {
 			expect( result.css.toString() ).toMatchSnapshot();
 		} );
