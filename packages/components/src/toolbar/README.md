@@ -42,23 +42,24 @@ Toolbars that cannot be selected can either be given a disabled state, or be hid
 ### Usage
 
 ```jsx
-import { Toolbar } from '@wordpress/components';
-import { withState } from '@wordpress/compose';
+import { Toolbar, ToolbarButton } from '@wordpress/components';
+import { useState } from '@wordpress/element';
 
-const MyToolbar = withState( {
-	activeControl: 'up',
-} )( ( { activeControl, setState } ) => { 
-	function createThumbsControl( thumbs ) {
-		return {
-			icon: `thumbs-${ thumbs }`,
-			title: `Thumbs ${ thumbs }`,
-			isActive: activeControl === thumbs,
-			onClick: () => setState( { activeControl: thumbs } ),
-		};
-	}
-	
+function MyToolbar() {
+	const [ thumb, setThumb ] = useState();
+
+	const getThumbProps = ( icon ) => ( {
+		icon: `thumbs-${ icon }`,
+		title: `Thumbs ${ icon }`,
+		isActive: thumb === icon,
+		onClick: () => setThumb( thumb === icon ? null : icon ),
+	} );
+
 	return (
-		<Toolbar controls={ [ 'up', 'down' ].map( createThumbsControl ) } />
+		<Toolbar accessibilityLabel="Options">
+			<ToolbarButton { ...getThumbProps( 'up' ) } />
+			<ToolbarButton { ...getThumbProps( 'down' ) } />
+		</Toolbar>
 	);
-} );
+}
 ```
