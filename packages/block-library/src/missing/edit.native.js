@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import { Platform, View, Text } from 'react-native';
+import { Platform, View, Text, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
 
 /**
  * WordPress dependencies
  */
-import { BottomSheet, Button, Icon, IconButton } from '@wordpress/components';
+import { BottomSheet, Icon } from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import { coreBlocks } from '@wordpress/block-library';
 import { normalizeIconObject } from '@wordpress/blocks';
@@ -34,36 +34,35 @@ export class UnsupportedBlockEdit extends Component {
 
 	renderHelpIcon() {
 		return <View style={ styles.helpIconContainer } >
-			<IconButton
+			<Icon
 				className="unsupported-icon-help"
 				label={ __( 'Help icon' ) }
-				onClick={ this.toggleSheet.bind( this ) }
 				icon="editor-help"
 			/>
 		</View>;
 	}
 
 	renderSheet() {
+		const marginBottom = isAndroid ? 16 : 0;
 		return <BottomSheet
 			isVisible={ this.state.showHelp }
-			hideHeader={ true }
+			hideHeader
 			onClose={ this.toggleSheet.bind( this ) }
-			contentStyle={ styles.content }
 		>
-			<Icon icon="info-outline" style={ styles.infoIcon } size={ styles.infoIcon.size } />
-			<Text style={ styles.infoTitle }>
-				{ __( 'This block isn\'t yet supported on WordPress for ' + platformText ) }
-			</Text>
-			<Button
-				onClick={ this.toggleSheet.bind( this ) }
-				fixedRatio={ false }
-			>
-				<View style={ styles.infoCloseButton } >
+			<View style={ styles.infoContainer } >
+				<Icon icon="info-outline" style={ styles.infoIcon } size={ styles.infoIcon.size } />
+				<Text style={ styles.infoTitle }>
+					{ __( 'This block isn\'t yet supported on WordPress for ' + platformText ) }
+				</Text>
+				<TouchableOpacity
+					onPress={ this.toggleSheet.bind( this ) }
+					style={ [ styles.infoCloseButton, { marginBottom } ] }
+				>
 					<Text style={ styles.infoCloseButtonText } >
 						{ __( 'Close' ) }
 					</Text>
-				</View>
-			</Button>
+				</TouchableOpacity>
+			</View>
 		</BottomSheet>;
 	}
 
@@ -79,12 +78,19 @@ export class UnsupportedBlockEdit extends Component {
 		const iconStyle = getStylesFromColorScheme( styles.unsupportedBlockIcon, styles.unsupportedBlockIconDark );
 		const iconClassName = 'unsupported-icon' + '-' + preferredColorScheme;
 		return (
-			<View style={ getStylesFromColorScheme( styles.unsupportedBlock, styles.unsupportedBlockDark ) }>
-				{ this.renderHelpIcon() }
-				<Icon className={ iconClassName } icon={ icon && icon.src ? icon.src : icon } color={ iconStyle.color } />
-				<Text style={ titleStyle }>{ title }</Text>
-				{ this.renderSheet() }
-			</View>
+			<TouchableWithoutFeedback
+				accessibilityLabel={ __( originalName + ' block' ) }
+				accessibilityRole={ 'button' }
+				accessibilityHint={ __( 'Double click to show help' ) }
+				onPress={ this.toggleSheet.bind( this ) }
+			>
+				<View style={ getStylesFromColorScheme( styles.unsupportedBlock, styles.unsupportedBlockDark ) }>
+					{ this.renderHelpIcon() }
+					<Icon className={ iconClassName } icon={ icon && icon.src ? icon.src : icon } color={ iconStyle.color } />
+					<Text style={ titleStyle }>{ title }</Text>
+					{ this.renderSheet() }
+				</View>
+			</TouchableWithoutFeedback>
 		);
 	}
 }

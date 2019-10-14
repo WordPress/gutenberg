@@ -9,21 +9,28 @@
 }
 
 .helpIconContainer {
-	padding-top: 16;
-	padding-right: 8;
+	padding-top: 8;
+	padding-right: 0;
 	height: 24;
 	width: 100%;
 	align-items: flex-end;
 }
 
+.infoContainer {
+	flex-direction: column;
+	align-items: center;
+	justify-content: flex-end;
+}
+
 .infoIcon {
 	size: 32;
+	height: 32;
 	color: $gray-darken-30;
 }
 
 .infoTitle {
 	padding-top: 16;
-	padding-bottom: 24;
+	padding-bottom: 8;
 	padding-left: 16;
 	padding-right: 16;
 	text-align: center;
@@ -32,8 +39,9 @@
 }
 
 .infoCloseButton {
-	height: 24;
-	flex: 1;
+	height: 48;
+	width: 100%;
+	justify-content: center;
 }
 
 .infoCloseButtonText {

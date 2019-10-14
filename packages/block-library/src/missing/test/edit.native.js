@@ -54,7 +54,7 @@ describe( 'Missing block', () => {
 			const component = getTestComponentWithContent();
 			const testInstance = component.root;
 			const bottomSheet = testInstance.findByType( BottomSheet );
-			const children = bottomSheet.props.children;
+			const children = bottomSheet.props.children.props.children;
 			expect( children.length ).toBe( 3 );
 			expect( children[ 0 ].props.icon ).toBe( 'info-outline' );
 		} );
@@ -63,7 +63,7 @@ describe( 'Missing block', () => {
 			const component = getTestComponentWithContent();
 			const testInstance = component.root;
 			const bottomSheet = testInstance.findByType( BottomSheet );
-			const children = bottomSheet.props.children;
+			const children = bottomSheet.props.children.props.children;
 			expect( children[ 1 ].props.children ).toBe( 'This block isn\'t yet supported on WordPress for iOS' );
 		} );
 
@@ -71,8 +71,8 @@ describe( 'Missing block', () => {
 			const component = getTestComponentWithContent();
 			const testInstance = component.root;
 			const bottomSheet = testInstance.findByType( BottomSheet );
-			const children = bottomSheet.props.children;
-			expect( children[ 2 ].props.children.props.children.props.children ).toBe( 'Close' );
+			const children = bottomSheet.props.children.props.children;
+			expect( children[ 2 ].props.children.props.children ).toBe( 'Close' );
 		} );
 	} );
 
