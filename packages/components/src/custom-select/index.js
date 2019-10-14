@@ -84,6 +84,7 @@ export default function CustomSelect( { label, items } ) {
 			</span>
 			<Button
 				{ ...getToggleButtonProps( {
+					'aria-label': label,
 					className: 'components-custom-select__button',
 				} ) }
 			>
