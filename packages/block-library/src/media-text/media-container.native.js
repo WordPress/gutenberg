@@ -32,6 +32,7 @@ import {
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { isURL } from '@wordpress/url';
+import { compose, withPreferredColorScheme } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -112,7 +113,8 @@ class MediaContainer extends Component {
 			return <Icon icon={ SvgIconRetry } { ...( styles.iconRetry, isVideo ? styles.iconRetryVideo : {} ) } />;
 		}
 
-		return <Icon icon={ icon } { ...styles.icon } />;
+		const iconStyle = this.props.getStylesFromColorScheme( styles.icon, styles.iconDark );
+		return <Icon icon={ icon } { ...iconStyle } />;
 	}
 
 	renderToolbarEditButton( open ) {
@@ -254,7 +256,7 @@ class MediaContainer extends Component {
 	renderPlaceholder() {
 		return (
 			<MediaPlaceholder
-				icon={ <BlockIcon icon={ icon } /> }
+				icon={ this.getIcon( false ) }
 				labels={ {
 					title: __( 'Media area' ),
 				} }
@@ -307,4 +309,7 @@ class MediaContainer extends Component {
 	}
 }
 
-export default withNotices( MediaContainer );
+export default compose(
+	withNotices,
+	withPreferredColorScheme,
+)( MediaContainer );
