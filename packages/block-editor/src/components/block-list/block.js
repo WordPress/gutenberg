@@ -451,7 +451,7 @@ function BlockListBlock( {
 		};
 	}
 	const blockElementId = `block-${ clientId }`;
-	const { position, orientation } = moverOptions;
+	const { position: moverPosition, orientation: moverOrientation } = moverOptions;
 	const blockMover = (
 		<BlockMover
 			clientIds={ clientId }
@@ -463,7 +463,7 @@ function BlockListBlock( {
 			}
 			onDragStart={ onDragStart }
 			onDragEnd={ onDragEnd }
-			orientation={ orientation }
+			orientation={ moverOrientation }
 		/>
 	);
 
@@ -535,10 +535,10 @@ function BlockListBlock( {
 			<div
 				className={ classnames(
 					'editor-block-list__block-edit block-editor-block-list__block-edit',
-					{ 'has-mover-inside': position === 'inside' },
+					{ 'has-mover-inside': moverPosition === 'inside' },
 				) }
 			>
-				{ shouldRenderMovers && ( position === 'outside' ) && blockMover }
+				{ shouldRenderMovers && ( moverPosition === 'outside' ) && blockMover }
 				{ shouldShowBreadcrumb && (
 					<BlockBreadcrumb
 						clientId={ clientId }
@@ -578,7 +578,7 @@ function BlockListBlock( {
 						{ isValid && mode === 'html' && (
 							<BlockHtml clientId={ clientId } />
 						) }
-						{ shouldRenderMovers && ( position === 'inside' ) && blockMover }
+						{ shouldRenderMovers && ( moverPosition === 'inside' ) && blockMover }
 						{ ! isValid && [
 							<BlockInvalidWarning
 								key="invalid-warning"
