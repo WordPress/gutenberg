@@ -69,8 +69,12 @@ function register_block_core_navigation_menu() {
 		);
 	}
 
+	// Pick up block name and remove it from the block-definition object.
 	$block_name = $block_definition['name'];
 	unset( $block_definition['name'] );
+
+	// Add render callback into block-definition object.
+	$block_definition['render_callback'] = 'render_block_navigation_menu';
 
 	register_block_type(
 		$block_name,
