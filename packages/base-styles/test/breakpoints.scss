@@ -1,0 +1,11 @@
+@import "../breakpoints";
+@import "../colors";
+@import "../mixins";
+@import "../variables";
+
+.test {
+	max-width: 100px;
+	@include break-huge() {
+		max-width: 200px;
+	}
+}

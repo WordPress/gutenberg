@@ -1,0 +1,5 @@
+@import "../z-index";
+
+.test {
+	z-index: z-index(".edit-post-header");
+}

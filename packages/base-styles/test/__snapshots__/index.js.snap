@@ -1,0 +1,350 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`base-styles can use animations 1`] = `
+"/**
+ * Breakpoint mixins
+ */
+/**
+ * Long content fade mixin
+ *
+ * Creates a fading overlay to signify that the content is longer
+ * than the space allows.
+ */
+/**
+ * Button states and focus styles
+ */
+/**
+ * Applies editor left position to the selector passed as argument
+ */
+/**
+ * Applies editor right position to the selector passed as argument
+ */
+/**
+ * Styles that are reused verbatim in a few places
+ */
+/**
+ * Allows users to opt-out of animations via OS-level preferences.
+ */
+/**
+ * Reset default styles for JavaScript UI based pages.
+ * This is a WP-admin agnostic reset
+ */
+/**
+ * Reset the WP Admin page styles for Gutenberg-like pages.
+ */
+.test {
+  animation: edit-post__fade-in-animation 0.2s ease-out 0s;
+  animation-fill-mode: forwards; }
+  @media (prefers-reduced-motion: reduce) {
+    .test {
+      animation-duration: 1ms; } }
+"
+`;
+
+exports[`base-styles can use breakpoints 1`] = `
+"/**
+ * Breakpoints & Media Queries
+ */
+/**
+ * Colors
+ */
+/**
+ * Breakpoint mixins
+ */
+/**
+ * Long content fade mixin
+ *
+ * Creates a fading overlay to signify that the content is longer
+ * than the space allows.
+ */
+/**
+ * Button states and focus styles
+ */
+/**
+ * Applies editor left position to the selector passed as argument
+ */
+/**
+ * Applies editor right position to the selector passed as argument
+ */
+/**
+ * Styles that are reused verbatim in a few places
+ */
+/**
+ * Allows users to opt-out of animations via OS-level preferences.
+ */
+/**
+ * Reset default styles for JavaScript UI based pages.
+ * This is a WP-admin agnostic reset
+ */
+/**
+ * Reset the WP Admin page styles for Gutenberg-like pages.
+ */
+/**
+ * Often re-used variables
+ */
+.test {
+  max-width: 100px; }
+  @media (min-width: 1440px) {
+    .test {
+      max-width: 200px; } }
+"
+`;
+
+exports[`base-styles can use colors 1`] = `
+"/**
+ * Colors
+ */
+body {
+  color: #000; }
+"
+`;
+
+exports[`base-styles can use mixins 1`] = `
+"/**
+ * Breakpoints & Media Queries
+ */
+/**
+ * Colors
+ */
+/**
+ * Breakpoint mixins
+ */
+/**
+ * Long content fade mixin
+ *
+ * Creates a fading overlay to signify that the content is longer
+ * than the space allows.
+ */
+/**
+ * Button states and focus styles
+ */
+/**
+ * Applies editor left position to the selector passed as argument
+ */
+/**
+ * Applies editor right position to the selector passed as argument
+ */
+/**
+ * Styles that are reused verbatim in a few places
+ */
+/**
+ * Allows users to opt-out of animations via OS-level preferences.
+ */
+/**
+ * Reset default styles for JavaScript UI based pages.
+ * This is a WP-admin agnostic reset
+ */
+/**
+ * Reset the WP Admin page styles for Gutenberg-like pages.
+ */
+/**
+ * Often re-used variables
+ */
+:root {
+  box-sizing: border-box; }
+  :root *,
+  :root *::before,
+  :root *::after {
+    box-sizing: inherit; }
+  :root .input-control,
+  :root input[type=\\"text\\"],
+  :root input[type=\\"search\\"],
+  :root input[type=\\"radio\\"],
+  :root input[type=\\"tel\\"],
+  :root input[type=\\"time\\"],
+  :root input[type=\\"url\\"],
+  :root input[type=\\"week\\"],
+  :root input[type=\\"password\\"],
+  :root input[type=\\"checkbox\\"],
+  :root input[type=\\"color\\"],
+  :root input[type=\\"date\\"],
+  :root input[type=\\"datetime\\"],
+  :root input[type=\\"datetime-local\\"],
+  :root input[type=\\"email\\"],
+  :root input[type=\\"month\\"],
+  :root input[type=\\"number\\"],
+  :root select,
+  :root textarea {
+    font-family: -apple-system, BlinkMacSystemFont, \\"Segoe UI\\", Roboto, Oxygen-Sans, Ubuntu, Cantarell, \\"Helvetica Neue\\", sans-serif;
+    padding: 6px 8px;
+    box-shadow: 0 0 0 transparent;
+    transition: box-shadow 0.1s linear;
+    border-radius: 4px;
+    border: 1px solid #7e8993;
+    /* Fonts smaller than 16px causes mobile safari to zoom. */
+    font-size: 16px;
+    /* Override core line-height. To be reviewed. */
+    line-height: normal; }
+    @media (prefers-reduced-motion: reduce) {
+      :root .input-control,
+      :root input[type=\\"text\\"],
+      :root input[type=\\"search\\"],
+      :root input[type=\\"radio\\"],
+      :root input[type=\\"tel\\"],
+      :root input[type=\\"time\\"],
+      :root input[type=\\"url\\"],
+      :root input[type=\\"week\\"],
+      :root input[type=\\"password\\"],
+      :root input[type=\\"checkbox\\"],
+      :root input[type=\\"color\\"],
+      :root input[type=\\"date\\"],
+      :root input[type=\\"datetime\\"],
+      :root input[type=\\"datetime-local\\"],
+      :root input[type=\\"email\\"],
+      :root input[type=\\"month\\"],
+      :root input[type=\\"number\\"],
+      :root select,
+      :root textarea {
+        transition-duration: 0s; } }
+    @media (min-width: 600px) {
+      :root .input-control,
+      :root input[type=\\"text\\"],
+      :root input[type=\\"search\\"],
+      :root input[type=\\"radio\\"],
+      :root input[type=\\"tel\\"],
+      :root input[type=\\"time\\"],
+      :root input[type=\\"url\\"],
+      :root input[type=\\"week\\"],
+      :root input[type=\\"password\\"],
+      :root input[type=\\"checkbox\\"],
+      :root input[type=\\"color\\"],
+      :root input[type=\\"date\\"],
+      :root input[type=\\"datetime\\"],
+      :root input[type=\\"datetime-local\\"],
+      :root input[type=\\"email\\"],
+      :root input[type=\\"month\\"],
+      :root input[type=\\"number\\"],
+      :root select,
+      :root textarea {
+        font-size: 13px;
+        /* Override core line-height. To be reviewed. */
+        line-height: normal; } }
+    :root .input-control:focus,
+    :root input[type=\\"text\\"]:focus,
+    :root input[type=\\"search\\"]:focus,
+    :root input[type=\\"radio\\"]:focus,
+    :root input[type=\\"tel\\"]:focus,
+    :root input[type=\\"time\\"]:focus,
+    :root input[type=\\"url\\"]:focus,
+    :root input[type=\\"week\\"]:focus,
+    :root input[type=\\"password\\"]:focus,
+    :root input[type=\\"checkbox\\"]:focus,
+    :root input[type=\\"color\\"]:focus,
+    :root input[type=\\"date\\"]:focus,
+    :root input[type=\\"datetime\\"]:focus,
+    :root input[type=\\"datetime-local\\"]:focus,
+    :root input[type=\\"email\\"]:focus,
+    :root input[type=\\"month\\"]:focus,
+    :root input[type=\\"number\\"]:focus,
+    :root select:focus,
+    :root textarea:focus {
+      color: #191e23;
+      border-color: #007cba;
+      box-shadow: 0 0 0 1px #007cba;
+      outline: 2px solid transparent; }
+  :root input[type=\\"number\\"] {
+    padding-left: 4px;
+    padding-right: 4px; }
+  :root select {
+    padding: 2px;
+    font-size: 13px;
+    color: #555d66; }
+    :root select:focus {
+      border-color: #008dbe;
+      outline: 2px solid transparent;
+      outline-offset: 0; }
+  :root input[type=\\"checkbox\\"],
+  :root input[type=\\"radio\\"] {
+    border: 2px solid #6c7781;
+    margin-right: 12px;
+    transition: none; }
+    :root input[type=\\"checkbox\\"]:focus,
+    :root input[type=\\"radio\\"]:focus {
+      border-color: #6c7781;
+      box-shadow: 0 0 0 1px #6c7781; }
+    :root input[type=\\"checkbox\\"]:checked,
+    :root input[type=\\"radio\\"]:checked {
+      background: theme(toggle);
+      border-color: theme(toggle); }
+    :root input[type=\\"checkbox\\"]:checked:focus,
+    :root input[type=\\"radio\\"]:checked:focus {
+      box-shadow: 0 0 0 2px #555d66; }
+  :root input[type=\\"checkbox\\"] {
+    border-radius: 2px; }
+    :root input[type=\\"checkbox\\"]:checked::before, :root input[type=\\"checkbox\\"][aria-checked=\\"mixed\\"]::before {
+      margin: -3px -5px;
+      color: #fff; }
+      @media (min-width: 782px) {
+        :root input[type=\\"checkbox\\"]:checked::before, :root input[type=\\"checkbox\\"][aria-checked=\\"mixed\\"]::before {
+          margin: -4px 0 0 -5px; } }
+    :root input[type=\\"checkbox\\"][aria-checked=\\"mixed\\"] {
+      background: theme(toggle);
+      border-color: theme(toggle); }
+      :root input[type=\\"checkbox\\"][aria-checked=\\"mixed\\"]::before {
+        content: \\"\\\\f460\\";
+        float: left;
+        display: inline-block;
+        vertical-align: middle;
+        width: 16px;
+        /* stylelint-disable */
+        font: normal 30px/1 dashicons;
+        /* stylelint-enable */
+        speak: none;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale; }
+        @media (min-width: 782px) {
+          :root input[type=\\"checkbox\\"][aria-checked=\\"mixed\\"]::before {
+            float: none;
+            font-size: 21px; } }
+      :root input[type=\\"checkbox\\"][aria-checked=\\"mixed\\"]:focus {
+        box-shadow: 0 0 0 2px #555d66; }
+  :root input[type=\\"radio\\"] {
+    border-radius: 50%; }
+    :root input[type=\\"radio\\"]:checked::before {
+      width: 6px;
+      height: 6px;
+      margin: 6px 0 0 6px;
+      background-color: #fff; }
+      @media (min-width: 782px) {
+        :root input[type=\\"radio\\"]:checked::before {
+          margin: 3px 0 0 3px; } }
+  :root input::-webkit-input-placeholder,
+  :root textarea::-webkit-input-placeholder {
+    color: rgba(14, 28, 46, 0.62); }
+  :root input::-moz-placeholder,
+  :root textarea::-moz-placeholder {
+    opacity: 1;
+    color: rgba(14, 28, 46, 0.62); }
+  :root input:-ms-input-placeholder,
+  :root textarea:-ms-input-placeholder {
+    color: rgba(14, 28, 46, 0.62); }
+  .is-dark-theme :root input::-webkit-input-placeholder, .is-dark-theme
+  :root textarea::-webkit-input-placeholder {
+    color: rgba(255, 255, 255, 0.65); }
+  .is-dark-theme :root input::-moz-placeholder, .is-dark-theme
+  :root textarea::-moz-placeholder {
+    opacity: 1;
+    color: rgba(255, 255, 255, 0.65); }
+  .is-dark-theme :root input:-ms-input-placeholder, .is-dark-theme
+  :root textarea:-ms-input-placeholder {
+    color: rgba(255, 255, 255, 0.65); }
+"
+`;
+
+exports[`base-styles can use variables 1`] = `
+"/**
+ * Colors
+ */
+/**
+ * Often re-used variables
+ */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, \\"Segoe UI\\", Roboto, Oxygen-Sans, Ubuntu, Cantarell, \\"Helvetica Neue\\", sans-serif; }
+"
+`;
+
+exports[`base-styles can use z-indexes 1`] = `
+".test {
+  z-index: 30; }
+"
+`;
