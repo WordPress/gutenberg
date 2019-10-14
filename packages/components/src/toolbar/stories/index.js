@@ -8,26 +8,29 @@ import { useState } from '@wordpress/element';
  */
 import Toolbar from '../';
 import ToolbarButton from '../../toolbar-button';
+import ToolbarGroup from '../../toolbar-group';
 
 export default { title: 'Toolbar', component: Toolbar };
 
 export function _default() {
 	const MyToolbar = () => {
-		const [ active, setActive ] = useState();
+		const [ thumb, setThumb ] = useState();
 
-		const createToolbarButton = ( thumbs ) => (
-			<ToolbarButton
-				key={ thumbs }
-				icon={ `thumbs-${ thumbs }` }
-				title={ `Thumbs ${ thumbs }` }
-				isActive={ active === thumbs }
-				onClick={ () => setActive( thumbs ) }
-			/>
-		);
+		const getThumbProps = ( icon ) => ( {
+			icon: `thumbs-${ icon }`,
+			title: `Thumbs ${ icon }`,
+			isActive: thumb === icon,
+			onClick: () => setThumb( thumb === icon ? null : icon ),
+		} );
 
 		return (
-			<Toolbar accessibilityLabel="Card options">
-				{ [ 'up', 'down' ].map( createToolbarButton ) }
+			<Toolbar accessibilityLabel="Options">
+				<ToolbarButton { ...getThumbProps( 'up' ) } />
+				<ToolbarButton { ...getThumbProps( 'down' ) } />
+				<ToolbarGroup
+					isCollapsed
+					controls={ [ getThumbProps( 'up' ), getThumbProps( 'down' ) ] }
+				/>
 			</Toolbar>
 		);
 	};
