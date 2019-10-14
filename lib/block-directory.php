@@ -5,7 +5,7 @@
  * @package gutenberg
  */
 
-if ( ! has_action( 'admin_enqueue_scripts', 'gutenberg_aenqueue_block_editor_assets_block_directory' ) ) {
+if ( ! has_action( 'admin_enqueue_scripts', 'enqueue_block_editor_assets_block_directory' ) ) {
 	/**
 	 * Function responsible for enqueuing the assets required
 	 * for the block directory functionality in the editor.
