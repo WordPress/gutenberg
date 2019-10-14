@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -24,7 +25,7 @@ export default function save( { attributes } ) {
 		sizeSlug,
 	} = attributes;
 
-	const newRel = RichText.isEmpty( rel ) ? undefined : rel;
+	const newRel = isEmpty( rel ) ? undefined : rel;
 
 	const classes = classnames( {
 		[ `align${ align }` ]: align,
