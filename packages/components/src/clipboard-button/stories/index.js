@@ -11,16 +11,15 @@ import ClipboardButton from '../';
 export default { title: 'Clipboard Button', component: ClipboardButton };
 
 export const _default = () => {
-	const [ hasCopied, setState ] = useState( false );
-
+	const [ copied, setCopied ] = useState( false );
 	return (
 		<ClipboardButton
 			isPrimary
-			text="Text to be copied."
-			onCopy={ () => setState( true ) }
-			onFinishCopy={ () => setState( false ) }
+			text="Text"
+			onCopy={ () => setCopied( true ) }
+			onFinishCopy={ () => setCopied( false ) }
 		>
-			{ hasCopied ? 'Copied!' : 'Copy Text' }
+			{ copied ? 'Copied!' : 'Copy "Text"' }
 		</ClipboardButton>
 	);
 };
