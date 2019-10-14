@@ -1,4 +1,4 @@
-module.exports = function( { config } ) {
+module.exports = ( { config } ) => {
 	config.module.rules.push( {
 		test: /\/stories\/.+\.js$/,
 		loaders: [ require.resolve( '@storybook/source-loader' ) ],

@@ -6,6 +6,6 @@
 import { ColorIndicator } from '@wordpress/components';
 
 const MyColorIndicator = () => (
-	<ColorIndicator colorValue="#0073AA" />
+	<ColorIndicator colorValue="#0073aa" />
 );
 ```

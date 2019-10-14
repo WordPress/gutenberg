@@ -9,5 +9,5 @@ export default {
 };
 
 export const _default = () => (
-	<ColorIndicator colorValue="#0073AA" />
+	<ColorIndicator colorValue="#0073aa" />
 );
