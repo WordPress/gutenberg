@@ -244,7 +244,8 @@ function gutenberg_register_scripts_and_styles() {
 		sprintf(
 			'wp.apiFetch.nonceMiddleware = wp.apiFetch.createNonceMiddleware( "%s" );' .
 			'wp.apiFetch.use( wp.apiFetch.nonceMiddleware );' .
-			'wp.apiFetch.nonceEndpoint = "%s";',
+			'wp.apiFetch.nonceEndpoint = "%s";' .
+			'wp.apiFetch.use( wp.apiFetch.mediaUploadMiddleware );',
 			( wp_installing() && ! is_multisite() ) ? '' : wp_create_nonce( 'wp_rest' ),
 			admin_url( 'admin-ajax.php?action=gutenberg_rest_nonce' )
 		),
