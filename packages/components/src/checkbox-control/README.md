@@ -59,13 +59,13 @@ import { CheckboxControl } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 
 const MyCheckboxControl = () => (
-	const [ isChecked, setState ] = useState( true );
+	const [ checked, setChecked ] = useState( true );
 	<CheckboxControl
 		heading="User"
 		label="Is author"
 		help="Is the user a author or not?"
 		checked={ isChecked }
-		onChange={ ( val ) => setState( val ) }
+		onChange={ setChecked }
 	/>
 ) );
 ```
