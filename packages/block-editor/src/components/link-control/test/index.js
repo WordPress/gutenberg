@@ -29,7 +29,7 @@ afterEach( () => {
 } );
 
 describe( 'Basic rendering', () => {
-	it( 'should render with required props', () => {
+	it( 'should display with required props', () => {
 		act( () => {
 			render(
 				<LinkControl
@@ -49,7 +49,55 @@ describe( 'Basic rendering', () => {
 } );
 
 describe( 'Searching', () => {
-	it( 'should render search suggestions when current input value is not URL-like', async ( ) => {
+	it( 'should display loading UI when input is valid but search results have yet to be returned', async () => {
+		const searchTerm = 'Hello';
+
+		let resolver;
+
+		const fauxRequest = () => new Promise( ( resolve ) => {
+			resolver = resolve;
+		} );
+
+		act( () => {
+			render(
+				<LinkControl
+					fetchSearchSuggestions={ fauxRequest }
+				/>, container
+			);
+		} );
+
+		// Search Input UI
+		const searchInput = container.querySelector( 'input[aria-label="URL"]' );
+
+		// Simulate searching for a term
+		act( () => {
+			Simulate.change( searchInput, { target: { value: searchTerm } } );
+		} );
+
+		// fetchFauxEntitySuggestions resolves on next "tick" of event loop
+		await eventLoopTick();
+
+		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
+		const searchResultElements = container.querySelectorAll( '[role="menu"] button[role="menuitem"]' );
+
+		let loadingUI = container.querySelector( '.components-spinner' );
+
+		expect( searchResultElements ).toHaveLength( 0 );
+
+		expect( loadingUI ).not.toBeNull();
+
+		act( () => {
+			resolver( fauxEntitySuggestions );
+		} );
+
+		await eventLoopTick();
+
+		loadingUI = container.querySelector( '.components-spinner' );
+
+		expect( loadingUI ).toBeNull();
+	} );
+
+	it( 'should display search suggestions when current input value is not URL-like', async ( ) => {
 		const searchTerm = 'Hello';
 
 		act( () => {
@@ -97,7 +145,7 @@ describe( 'Searching', () => {
 		expect( searchResultElements ).toHaveLength( 0 );
 	} );
 
-	it( 'should render a single suggestion result when the current input value is URL-like', async ( ) => {
+	it( 'should display a single suggestion result when the current input value is URL-like', async ( ) => {
 		const searchTerm = 'http://make.wordpress.com';
 
 		act( () => {

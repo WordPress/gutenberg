@@ -127,6 +127,7 @@ function LinkControl( { fetchSearchSuggestions, renderAdditionalSettings } ) {
 
 	return (
 		<URLPopover
+			className="block-editor-link-control"
 			onClose={ closeLinkUI }
 		>
 			<div className="block-editor-link-control__popover-inner">

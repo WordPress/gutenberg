@@ -148,3 +148,18 @@
 		margin-bottom: 0;
 	}
 }
+
+.block-editor-link-control .block-editor-link-control__search-input .components-spinner {
+	display: block;
+	z-index: 100;
+	float: none;
+
+	&.components-spinner { // Specificity overide
+		position: relative;
+		top: auto;
+		left: auto;
+		right: auto;
+		bottom: auto;
+		margin: 0 auto $grid-size-large auto;
+	}
+}
