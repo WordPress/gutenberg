@@ -9,7 +9,7 @@ import namespaceEndpointMiddleware from './middlewares/namespace-endpoint';
 import httpV1Middleware from './middlewares/http-v1';
 import userLocaleMiddleware from './middlewares/user-locale';
 import mediaUploadMiddleware from './middlewares/media-upload';
-import parseResponseAndNormalizeError from './utils/response';
+import { parseResponseAndNormalizeError, parseAndThrowError } from './utils/response';
 
 /**
  * Default set of header values which should be sent with every request unless
@@ -79,6 +79,7 @@ const defaultFetchHandler = ( nextOptions ) => {
 
 	return responsePromise
 		.then( checkStatus )
+		.catch( ( response ) => parseAndThrowError( response, parse ) )
 		.then( ( response ) => parseResponseAndNormalizeError( response, parse ) );
 };
 

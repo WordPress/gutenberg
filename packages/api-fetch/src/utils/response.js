@@ -23,6 +23,22 @@ const parseResponse = ( response, shouldParseResponse = true ) => {
 	return response;
 };
 
+const parseJsonAndNormalizeError = ( response ) => {
+	const invalidJsonError = {
+		code: 'invalid_json',
+		message: __( 'The response is not a valid JSON response.' ),
+	};
+
+	if ( ! response || ! response.json ) {
+		throw invalidJsonError;
+	}
+
+	return response.json()
+		.catch( () => {
+			throw invalidJsonError;
+		} );
+};
+
 /**
  * Parses the apiFetch response properly and normalize response errors.
  *
@@ -31,35 +47,24 @@ const parseResponse = ( response, shouldParseResponse = true ) => {
  *
  * @return {Promise} Parsed response.
  */
-const parseResponseAndNormalizeError = ( response, shouldParseResponse = true ) => {
+export const parseResponseAndNormalizeError = ( response, shouldParseResponse = true ) => {
 	return Promise.resolve( parseResponse( response, shouldParseResponse ) )
-		.catch( ( res ) => {
-			if ( ! shouldParseResponse ) {
-				throw res;
-			}
-
-			const invalidJsonError = {
-				code: 'invalid_json',
-				message: __( 'The response is not a valid JSON response.' ),
-			};
-
-			if ( ! res || ! res.json ) {
-				throw invalidJsonError;
-			}
-
-			return res.json()
-				.catch( () => {
-					throw invalidJsonError;
-				} )
-				.then( ( error ) => {
-					const unknownError = {
-						code: 'unknown_error',
-						message: __( 'An unknown error occurred.' ),
-					};
-
-					throw error || unknownError;
-				} );
-		} );
+		.catch( ( res ) => parseAndThrowError( res, shouldParseResponse ) );
 };
 
-export default parseResponseAndNormalizeError;
+export function parseAndThrowError( response, shouldParseResponse = true ) {
+	if ( ! shouldParseResponse ) {
+		throw response;
+	}
+
+	return parseJsonAndNormalizeError( response )
+		.then( ( error ) => {
+			const unknownError = {
+				code: 'unknown_error',
+				message: __( 'An unknown error occurred.' ),
+			};
+
+			throw error || unknownError;
+		} );
+}
+
