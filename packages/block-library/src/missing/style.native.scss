@@ -1,8 +1,50 @@
 /** @format */
+.content {
+	padding-top: 8;
+	padding-bottom: 16;
+	padding-left: 16;
+	padding-right: 16;
+	align-items: center;
+	justify-content: space-evenly;
+}
+
+.helpIconContainer {
+	padding-top: 16;
+	padding-right: 8;
+	height: 24;
+	width: 100%;
+	align-items: flex-end;
+}
+
+.infoIcon {
+	size: 32;
+	color: $gray-darken-30;
+}
+
+.infoTitle {
+	padding-top: 16;
+	padding-bottom: 24;
+	padding-left: 16;
+	padding-right: 16;
+	text-align: center;
+	font-size: 18;
+	font-weight: bold;
+}
+
+.infoCloseButton {
+	height: 24;
+	flex: 1;
+}
+
+.infoCloseButtonText {
+	font-size: 16;
+	text-align: center;
+	color: $gray-darken-30;
+}
 
 .unsupportedBlock {
 	background-color: #e9eff3; // grey lighten 30
-	padding-top: 24;
+	padding-top: 0;
 	padding-bottom: 24;
 	padding-left: 8;
 	padding-right: 8;
