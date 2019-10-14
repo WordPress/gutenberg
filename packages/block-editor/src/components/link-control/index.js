@@ -45,11 +45,6 @@ function LinkControl( { fetchSearchSuggestions, renderAdditionalSettings } ) {
 	// Refs
 	const autocompleteRef = useRef( null );
 
-	// Effects
-	const getSearchFetcher = useCallback( ( value ) => {
-		return ( /^https?:/.test( value ) ) ? handleURLSearch : fetchSearchSuggestions;
-	} );
-
 	// Handlers
 	const onInputChange = ( value = '' ) => {
 		setInputValue( value );
@@ -57,6 +52,10 @@ function LinkControl( { fetchSearchSuggestions, renderAdditionalSettings } ) {
 
 	const closeLinkUI = () => {
 		setInputValue( '' );
+	};
+
+	const onSubmitLinkChange = ( value ) => {
+		setInputValue( value );
 	};
 
 	const handleURLSearch = async ( value ) => {
@@ -68,10 +67,6 @@ function LinkControl( { fetchSearchSuggestions, renderAdditionalSettings } ) {
 		} ];
 	};
 
-	const onSubmitLinkChange = ( value ) => {
-		setInputValue( value );
-	};
-
 	const stopPropagation = ( event ) => {
 		event.stopPropagation();
 	};
@@ -79,9 +74,14 @@ function LinkControl( { fetchSearchSuggestions, renderAdditionalSettings } ) {
 	const stopPropagationRelevantKeys = ( event ) => {
 		if ( [ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ].indexOf( event.keyCode ) > -1 ) {
 			// Stop the key event from propagating up to ObserveTyping.startTypingInTextField.
-			event.stopPropagation();
+			stopPropagation( event );
 		}
 	};
+
+	// Effects
+	const getSearchHandler = useCallback( ( value ) => {
+		return ( /^https?:/.test( value ) ) ? handleURLSearch( value ) : fetchSearchSuggestions( value );
+	}, [ handleURLSearch, fetchSearchSuggestions ] );
 
 	// Render Components
 	const renderSearchResults = ( { suggestionsListProps, buildSuggestionItemProps, suggestions, selectedSuggestion, handleSuggestionClick } ) => {
@@ -144,7 +144,7 @@ function LinkControl( { fetchSearchSuggestions, renderAdditionalSettings } ) {
 							onKeyPress={ stopPropagation }
 							placeholder={ __( 'Search or type url' ) }
 							renderSuggestions={ renderSearchResults }
-							fetchLinkSuggestions={ getSearchFetcher( inputValue ) }
+							fetchLinkSuggestions={ getSearchHandler }
 							handleURLSuggestions={ true }
 						/>
 

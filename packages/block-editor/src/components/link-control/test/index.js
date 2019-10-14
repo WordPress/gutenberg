@@ -79,7 +79,7 @@ describe( 'Searching', () => {
 		await eventLoopTick();
 
 		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
-		searchResultElements = container.querySelectorAll( '[role="listbox"] button[role="option"]' );
+		searchResultElements = container.querySelectorAll( '[role="listbox"] [role="option"]' );
 
 		expect( searchResultElements ).toHaveLength( fauxEntitySuggestions.length );
 
@@ -92,7 +92,7 @@ describe( 'Searching', () => {
 		await eventLoopTick();
 
 		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
-		searchResultElements = container.querySelectorAll( '[role="listbox"] button[role="option"]' );
+		searchResultElements = container.querySelectorAll( '[role="listbox"] [role="option"]' );
 
 		expect( searchResultElements ).toHaveLength( 0 );
 	} );
@@ -120,7 +120,7 @@ describe( 'Searching', () => {
 		await eventLoopTick();
 
 		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
-		const searchResultElements = container.querySelectorAll( '[role="listbox"] button[role="option"]' );
+		const searchResultElements = container.querySelectorAll( '[role="listbox"] [role="option"]' );
 		const firstSearchResultItemHTML = searchResultElements[ 0 ].innerHTML;
 		const expectedResultsLength = 1;
 
@@ -155,7 +155,7 @@ describe( 'Searching', () => {
 		await eventLoopTick();
 
 		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
-		searchResultElements = container.querySelectorAll( '[role="listbox"] button[role="option"]' );
+		searchResultElements = container.querySelectorAll( '[role="listbox"] [role="option"]' );
 
 		// Check we have definitely rendered some suggestions
 		expect( searchResultElements ).toHaveLength( fauxEntitySuggestions.length );
@@ -170,7 +170,7 @@ describe( 'Searching', () => {
 		await eventLoopTick();
 
 		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
-		searchResultElements = container.querySelectorAll( '[role="listbox"] button[role="option"]' );
+		searchResultElements = container.querySelectorAll( '[role="listbox"] [role="option"]' );
 		searchInput = container.querySelector( 'input[aria-label="URL"]' );
 
 		expect( searchInput.value ).toBe( '' );
