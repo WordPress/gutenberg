@@ -20,7 +20,6 @@ import {
 } from '@wordpress/components';
 import {
 	BlockControls,
-	BlockIcon,
 	MEDIA_TYPE_IMAGE,
 	MEDIA_TYPE_VIDEO,
 	MediaPlaceholder,
