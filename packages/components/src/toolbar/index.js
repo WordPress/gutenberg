@@ -2,15 +2,12 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { flatMap } from 'lodash';
 
 /**
  * Internal dependencies
  */
-import ToolbarButton from '../toolbar-button';
-import DropdownMenu from '../dropdown-menu';
 import ToolbarContainer from './toolbar-container';
-import AccessibleToolbar from './accessible-toolbar';
+import ToolbarGroup from '../toolbar-group';
 
 /**
  * Renders a toolbar with controls.
@@ -43,56 +40,20 @@ import AccessibleToolbar from './accessible-toolbar';
  *
  * @return {ReactElement} The rendered toolbar.
  */
-function Toolbar( { controls = [], children, className, isCollapsed, icon, accessibilityLabel, label, ...otherProps } ) {
-	if (
-		( ! controls || ! controls.length ) &&
-		! children
-	) {
-		return null;
-	}
-
+function Toolbar( { className, accessibilityLabel, ...otherProps } ) {
 	const cls = classnames( 'components-toolbar', className );
 
 	if ( accessibilityLabel ) {
 		return (
-			<AccessibleToolbar className={ cls } accessibilityLabel={ accessibilityLabel } { ...otherProps }>
-				{ children }
-			</AccessibleToolbar>
-		);
-	}
-
-	// Normalize controls to nested array of objects (sets of controls)
-	let controlSets = controls;
-	if ( ! Array.isArray( controlSets[ 0 ] ) ) {
-		controlSets = [ controlSets ];
-	}
-
-	if ( isCollapsed ) {
-		return (
-			<DropdownMenu
-				hasArrowIndicator
-				icon={ icon }
-				label={ label }
-				controls={ controlSets }
+			<ToolbarContainer
 				className={ cls }
+				accessibilityLabel={ accessibilityLabel }
+				{ ...otherProps }
 			/>
 		);
 	}
 
-	return (
-		<ToolbarContainer className={ cls } { ...otherProps }>
-			{ flatMap( controlSets, ( controlSet, indexOfSet ) => (
-				controlSet.map( ( control, indexOfControl ) => (
-					<ToolbarButton
-						key={ [ indexOfSet, indexOfControl ].join() }
-						containerClassName={ indexOfSet > 0 && indexOfControl === 0 ? 'has-left-divider' : null }
-						{ ...control }
-					/>
-				) )
-			) ) }
-			{ children }
-		</ToolbarContainer>
-	);
+	return <ToolbarGroup className={ cls } { ...otherProps } />;
 }
 
 export default Toolbar;
