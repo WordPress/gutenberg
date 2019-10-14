@@ -865,21 +865,11 @@ class RichText extends Component {
 		shouldReapply = shouldReapply ||
 			placeholder !== prevProps.placeholder;
 
-		const { activeFormats = [] } = this.record;
-
 		if ( shouldReapply ) {
 			this.value = value;
 			this.record = this.formatToValue( value );
 			this.record.start = selectionStart;
 			this.record.end = selectionEnd;
-
-			updateFormats( {
-				value: this.record,
-				start: this.record.start,
-				end: this.record.end,
-				formats: activeFormats,
-			} );
-
 			this.applyRecord( this.record );
 		} else if (
 			this.record.start !== selectionStart ||
