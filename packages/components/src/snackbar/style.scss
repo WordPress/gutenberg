@@ -39,14 +39,15 @@
 		text-decoration: underline;
 		background-color: transparent;
 
-		&:hover {
-			color: $blue-medium-400;
-		}
-
 		&:focus {
 			color: $white;
 			box-shadow: none;
 			outline: 1px dotted $white;
+		}
+		
+		&:hover,
+		&:focus:hover {
+			color: $blue-medium-400;
 		}
 	}
 }
