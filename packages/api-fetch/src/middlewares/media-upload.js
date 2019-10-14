@@ -7,6 +7,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import {
+	parseAndThrowError,
 	parseResponseAndNormalizeError,
 } from '../utils/response';
 
@@ -53,7 +54,7 @@ function mediaUploadMiddleware( options, next ) {
 	return next( { ...options, parse: false } )
 		.catch( ( response ) => {
 			const attachmentId = response.headers.get( 'x-wp-upload-attachment-id' );
-			if ( response.status === 500 && attachmentId ) {
+			if ( ( response.status === 500 || response.status === 502 ) && attachmentId ) {
 				return postProcess( attachmentId ).catch( () => {
 					if ( options.parse !== false ) {
 						return Promise.reject( {
@@ -65,7 +66,7 @@ function mediaUploadMiddleware( options, next ) {
 					return Promise.reject( response );
 				} );
 			}
-			return Promise.reject( response );
+			return parseAndThrowError( response, options.parse );
 		} )
 		.then( ( response ) => parseResponseAndNormalizeError( response, options.parse ) );
 }
