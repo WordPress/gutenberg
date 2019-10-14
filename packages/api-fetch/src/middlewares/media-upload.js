@@ -56,7 +56,7 @@ function mediaUploadMiddleware( options, next ) {
 		.then( ( response ) => parseResponseAndNormalizeError( response, options.parse ) )
 		.catch( ( response ) => {
 			const attachmentId = response.headers.get( 'x-wp-upload-attachment-id' );
-			if ( attachmentId ) {
+			if ( response.status === 500 && attachmentId ) {
 				return postProcess( attachmentId );
 			}
 			return Promise.reject( response );
