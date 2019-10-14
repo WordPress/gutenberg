@@ -14,6 +14,7 @@ import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaSelectedCallback;
+import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaType;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.RNMedia;
 
 import java.util.List;
@@ -107,7 +108,7 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
 
     @ReactMethod
     public void requestMediaPickFrom(String mediaSource, ReadableArray filter, Boolean allowMultipleSelection, final Callback onUploadMediaSelected) {
-        GutenbergBridgeJS2Parent.MediaType mediaType = getMediaTypeFromFilter(filter);
+        MediaType mediaType = getMediaTypeFromFilter(filter);
         if (mediaSource.equals(MEDIA_SOURCE_MEDIA_LIBRARY)) {
             mGutenbergBridgeJS2Parent.requestMediaPickFromMediaLibrary(getNewMediaSelectedCallback(allowMultipleSelection, onUploadMediaSelected), allowMultipleSelection, mediaType);
         } else if (mediaSource.equals(MEDIA_SOURCE_DEVICE_LIBRARY)) {
@@ -117,13 +118,21 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
         }
     }
 
-    private GutenbergBridgeJS2Parent.MediaType getMediaTypeFromFilter(ReadableArray filter) {
-        for (Object object : filter.toArrayList()) {
-            String filterValue = (String) object;
-            return GutenbergBridgeJS2Parent.MediaType.getEnum(filterValue);
-        }
+    private MediaType getMediaTypeFromFilter(ReadableArray filter) {
+        switch (filter.size()) {
+            case 1:
+                return MediaType.getEnum(filter.getString(0));
+            case 2:
+                MediaType filter0 = MediaType.getEnum(filter.getString(0));
+                MediaType filter1 = MediaType.getEnum(filter.getString(1));
 
-        return GutenbergBridgeJS2Parent.MediaType.OTHER;
+                if ((filter0.equals(MediaType.VIDEO) && filter1.equals(MediaType.IMAGE))
+                    || (filter0.equals(MediaType.IMAGE) && filter1.equals(MediaType.VIDEO))) {
+                    return MediaType.MEDIA;
+                }
+            default:
+                return MediaType.OTHER;
+        }
     }
 
     @ReactMethod
