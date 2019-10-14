@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { Platform } from 'react-native';
+
+/**
  * Internal dependencies
  */
 import Cell from './cell';
@@ -12,9 +17,9 @@ export default function BottomSheetRangeCell( props ) {
 		maximumValue = 10,
 		disabled,
 		step = 1,
-		minimumTrackTintColor = '#909090',
-		maximumTrackTintColor = '#909090',
-		thumbTintColor = '#000',
+		minimumTrackTintColor = '#00669b',
+		maximumTrackTintColor = Platform.OS === 'ios' ? '#e9eff3' : '#909090',
+		thumbTintColor = Platform.OS === 'ios' ? '#fff' : '#00669b',
 		...cellProps
 	} = props;
 
