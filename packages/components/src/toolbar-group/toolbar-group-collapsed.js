@@ -24,7 +24,7 @@ function ToolbarGroupCollapsed( { controls = [], className, icon, label, toggleP
 			label={ label }
 			controls={ controls }
 			className={ className }
-			toggleProps={ itemProps }
+			toggleProps={ context ? itemProps : toggleProps }
 		/>
 	);
 }
