@@ -8,6 +8,12 @@ export default `
 <figure class="wp-block-image"><img alt=""/></figure>
 <!-- /wp:image -->
 
+<!-- wp:media-text -->
+<div class="wp-block-media-text is-stacked-on-mobile"><figure class="wp-block-media-text__media"></figure><div class="wp-block-media-text__content"><!-- wp:paragraph {"placeholder":"Content…","fontSize":"large"} -->
+<p class="has-large-font-size"></p>
+<!-- /wp:paragraph --></div></div>
+<!-- /wp:media-text -->
+
 <!-- wp:image -->
 <figure class="wp-block-image"><img src="https://cldup.com/cXyG__fTLN.jpg" alt=""/></figure>
 <!-- /wp:image -->
