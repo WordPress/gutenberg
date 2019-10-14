@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import Downshift, { useSelect } from 'downshift';
+import { useSelect } from 'downshift';
 import classnames from 'classnames';
 
 /**
@@ -19,7 +19,7 @@ const stateReducer = (
 	{ type, changes, props: { items } }
 ) => {
 	switch ( type ) {
-		case Downshift.stateChangeTypes.ToggleButtonKeyDownArrowDown:
+		case useSelect.stateChangeTypes.ToggleButtonKeyDownArrowDown:
 			// If we already have a selected item, try to select the next one,
 			// without circular navigation. Otherwise, select the first item.
 			return {
@@ -31,7 +31,7 @@ const stateReducer = (
 							0
 					],
 			};
-		case Downshift.stateChangeTypes.ToggleButtonKeyDownArrowUp:
+		case useSelect.stateChangeTypes.ToggleButtonKeyDownArrowUp:
 			// If we already have a selected item, try to select the previous one,
 			// without circular navigation. Otherwise, select the last item.
 			return {
