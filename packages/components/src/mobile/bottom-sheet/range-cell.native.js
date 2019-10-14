@@ -12,6 +12,7 @@ import Slider from '../slider';
 export default function BottomSheetRangeCell( props ) {
 	const {
 		value,
+		defaultValue,
 		onChangeValue,
 		minimumValue = 0,
 		maximumValue = 10,
@@ -30,6 +31,7 @@ export default function BottomSheetRangeCell( props ) {
 		>
 			<Slider
 				value={ value }
+				defaultValue={ defaultValue }
 				disabled={ disabled }
 				step={ step }
 				minimumValue={ minimumValue }

@@ -18,14 +18,17 @@ class Slider extends Component {
 		super( props );
 		this.handleToggleFocus = this.handleToggleFocus.bind( this );
 		this.handleChange = this.handleChange.bind( this );
+		this.handleReset = this.handleReset.bind( this );
 
-		this.state = { hasFocus: false, sliderValue: props.value || props.minimumValue };
+		const initialValue = this.validateInput( props.value || props.defaultValue || props.minimumValue );
+
+		this.state = { hasFocus: false, initialValue, sliderValue: initialValue };
 	}
 
 	componentDidUpdate( ) {
 		const reset = this.props.value === null;
 		if ( reset ) {
-			this.handleChange( this.props.minimumValue );
+			this.handleReset();
 		}
 	}
 
@@ -52,14 +55,19 @@ class Slider extends Component {
 
 	handleChange( text ) {
 		if ( ! isNaN( Number( text ) ) ) {
-			this.props.onChangeValue( text );
+			if ( this.props.onChangeValue ) {
+				this.props.onChangeValue( text );
+			}
 			this.setState( { sliderValue: text } );
 		}
 	}
 
+	handleReset() {
+		this.handleChange( this.props.defaultValue || this.state.initialValue );
+	}
+
 	render() {
 		const {
-			value,
 			minimumValue,
 			maximumValue,
 			disabled,
@@ -74,7 +82,7 @@ class Slider extends Component {
 		return (
 			<View style={ styles.sliderContainer }>
 				<RNSlider
-					value={ this.validateInput( value ) }
+					value={ this.validateInput( sliderValue ) }
 					disabled={ disabled }
 					style={ styles.slider }
 					step={ step }
