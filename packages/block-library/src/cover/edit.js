@@ -110,7 +110,7 @@ const CoverHeightInput = withInstanceId(
 					onBlur={ onBlurEvent }
 					value={ temporaryInput !== null ? temporaryInput : value }
 					min={ COVER_MIN_HEIGHT }
-					step="10"
+					step="1"
 				/>
 			</BaseControl>
 		);
