@@ -6,7 +6,8 @@ import { cloneElement, createElement, Component, isValidElement } from '@wordpre
 /**
  * Internal dependencies
  */
-import { Dashicon, SVG } from '../';
+import Dashicon from '../dashicon';
+import { SVG } from '../primitives';
 
 function Icon( { icon = null, size, ...additionalProps } ) {
 	let iconSize;

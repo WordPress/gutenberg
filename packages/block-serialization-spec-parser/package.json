@@ -20,6 +20,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"main": "parser.js",
+	"sideEffects": false,
 	"dependencies": {
 		"pegjs": "^0.10.0",
 		"phpegjs": "^1.0.0-beta7"
