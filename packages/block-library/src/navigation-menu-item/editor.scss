@@ -1,13 +1,11 @@
+$menu-label-field-width: 140px;
+
 .wp-block-navigation-menu-item__edit-container {
 	display: grid;
 	grid-auto-columns: min-content;
 	grid-auto-flow: column;
 	align-items: center;
 	white-space: nowrap;
-}
-
-$menu-label-field-width: 140px;
-.wp-block-navigation-menu-item__edit-container {
 	border: 1px solid $light-gray-500;
 	// two pixes comes from two times one pixel border
 	width: $menu-label-field-width + $icon-button-size + 2px;

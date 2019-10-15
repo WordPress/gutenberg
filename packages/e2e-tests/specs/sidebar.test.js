@@ -2,8 +2,9 @@
  * WordPress dependencies
  */
 import {
-	findSidebarPanelWithTitle,
+	clearLocalStorage,
 	createNewPost,
+	findSidebarPanelWithTitle,
 	observeFocusLoss,
 	openDocumentSettingsSidebar,
 	pressKeyWithModifier,
@@ -21,6 +22,7 @@ describe( 'Sidebar', () => {
 
 	it( 'should have sidebar visible at the start with document sidebar active on desktop', async () => {
 		await setBrowserViewport( 'large' );
+		await clearLocalStorage();
 		await createNewPost();
 		const { nodesCount, content, height, width } = await page.$$eval( ACTIVE_SIDEBAR_TAB_SELECTOR, ( nodes ) => {
 			const firstNode = nodes[ 0 ];
@@ -45,6 +47,7 @@ describe( 'Sidebar', () => {
 
 	it( 'should have the sidebar closed by default on mobile', async () => {
 		await setBrowserViewport( 'small' );
+		await clearLocalStorage();
 		await createNewPost();
 		const sidebar = await page.$( SIDEBAR_SELECTOR );
 		expect( sidebar ).toBeNull();
@@ -52,6 +55,7 @@ describe( 'Sidebar', () => {
 
 	it( 'should close the sidebar when resizing from desktop to mobile', async () => {
 		await setBrowserViewport( 'large' );
+		await clearLocalStorage();
 		await createNewPost();
 
 		const sidebars = await page.$$( SIDEBAR_SELECTOR );
@@ -66,6 +70,7 @@ describe( 'Sidebar', () => {
 
 	it( 'should reopen sidebar the sidebar when resizing from mobile to desktop if the sidebar was closed automatically', async () => {
 		await setBrowserViewport( 'large' );
+		await clearLocalStorage();
 		await createNewPost();
 		await setBrowserViewport( 'small' );
 
@@ -115,6 +120,7 @@ describe( 'Sidebar', () => {
 		expect( await findSidebarPanelWithTitle( 'Featured Image' ) ).toBeDefined();
 		expect( await findSidebarPanelWithTitle( 'Excerpt' ) ).toBeDefined();
 		expect( await findSidebarPanelWithTitle( 'Discussion' ) ).toBeDefined();
+		expect( await findSidebarPanelWithTitle( 'Status & Visibility' ) ).toBeDefined();
 
 		await page.evaluate( () => {
 			const { removeEditorPanel } = wp.data.dispatch( 'core/edit-post' );
@@ -124,6 +130,7 @@ describe( 'Sidebar', () => {
 			removeEditorPanel( 'featured-image' );
 			removeEditorPanel( 'post-excerpt' );
 			removeEditorPanel( 'discussion-panel' );
+			removeEditorPanel( 'post-status' );
 		} );
 
 		expect( await findSidebarPanelWithTitle( 'Categories' ) ).toBeUndefined();
@@ -131,5 +138,6 @@ describe( 'Sidebar', () => {
 		expect( await findSidebarPanelWithTitle( 'Featured Image' ) ).toBeUndefined();
 		expect( await findSidebarPanelWithTitle( 'Excerpt' ) ).toBeUndefined();
 		expect( await findSidebarPanelWithTitle( 'Discussion' ) ).toBeUndefined();
+		expect( await findSidebarPanelWithTitle( 'Status & Visibility' ) ).toBeUndefined();
 	} );
 } );

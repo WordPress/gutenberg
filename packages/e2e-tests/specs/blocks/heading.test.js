@@ -66,7 +66,7 @@ describe( 'Heading', () => {
 		await page.click( COLOR_INPUT_FIELD_SELECTOR );
 		await pressKeyWithModifier( 'primary', 'A' );
 		await page.keyboard.type( '#181717' );
-		await page.click( '.wp-block-heading' );
+		await page.click( '[data-type="core/heading"] h3' );
 		await page.waitForSelector( '.component-color-indicator[aria-label="(text color: #181717)"]' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
@@ -77,11 +77,11 @@ describe( 'Heading', () => {
 		const [ colorPanelToggle ] = await page.$x( COLOR_PANEL_TOGGLE_X_SELECTOR );
 		await colorPanelToggle.click();
 
-		const whiteColorButtonSelector = `${ TEXT_COLOR_UI_X_SELECTOR }//button[@aria-label='Color: White']`;
-		const [ whiteColorButton ] = await page.$x( whiteColorButtonSelector );
-		await whiteColorButton.click();
-		await page.click( '.wp-block-heading' );
-		await page.waitForXPath( `${ whiteColorButtonSelector }[@aria-pressed='true']` );
+		const accentColorButtonSelector = `${ TEXT_COLOR_UI_X_SELECTOR }//button[@aria-label='Color: Accent Color']`;
+		const [ accentColorButton ] = await page.$x( accentColorButtonSelector );
+		await accentColorButton.click();
+		await page.click( '[data-type="core/heading"] h2' );
+		await page.waitForXPath( `${ accentColorButtonSelector }[@aria-pressed='true']` );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );

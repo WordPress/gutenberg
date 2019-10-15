@@ -79,6 +79,11 @@
 			@include menu-style__focus();
 		}
 
+		&:hover,
+		&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover {
+			@include menu-style__hover();
+		}
+
 		// Formatting buttons
 		> svg {
 			border-radius: $radius-round-rectangle;

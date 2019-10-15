@@ -45,7 +45,7 @@ import {
 	BACKSPACE,
 	ENTER,
 } from '@wordpress/keycodes';
-import { withSelect } from '@wordpress/data';
+import { withSelect, withDispatch } from '@wordpress/data';
 import {
 	BlockAlignmentToolbar,
 	BlockControls,
@@ -72,18 +72,20 @@ import { speak } from '@wordpress/a11y';
 import { createUpgradedEmbedBlock } from '../embed/util';
 import icon from './icon';
 import ImageSize from './image-size';
+import { getUpdatedLinkTargetSettings } from './utils';
 
 /**
  * Module constants
  */
-const MIN_SIZE = 20;
-const LINK_DESTINATION_NONE = 'none';
-const LINK_DESTINATION_MEDIA = 'media';
-const LINK_DESTINATION_ATTACHMENT = 'attachment';
-const LINK_DESTINATION_CUSTOM = 'custom';
-const NEW_TAB_REL = 'noreferrer noopener';
-const ALLOWED_MEDIA_TYPES = [ 'image' ];
-const DEFAULT_SIZE_SLUG = 'large';
+import {
+	MIN_SIZE,
+	LINK_DESTINATION_NONE,
+	LINK_DESTINATION_MEDIA,
+	LINK_DESTINATION_ATTACHMENT,
+	LINK_DESTINATION_CUSTOM,
+	ALLOWED_MEDIA_TYPES,
+	DEFAULT_SIZE_SLUG,
+} from './constants';
 
 export const pickRelevantMediaFiles = ( image ) => {
 	const imageProps = pick( image, [ 'alt', 'id', 'link', 'caption' ] );
@@ -200,7 +202,7 @@ const ImageURLInputUI = ( {
 			<IconButton
 				icon="admin-links"
 				className="components-toolbar__control"
-				label={ url ? __( 'Edit Link' ) : __( 'Insert Link' ) }
+				label={ url ? __( 'Edit link' ) : __( 'Insert link' ) }
 				aria-expanded={ isOpen }
 				onClick={ openLinkUI }
 			/>
@@ -251,7 +253,7 @@ const ImageURLInputUI = ( {
 							/>
 							<IconButton
 								icon="no"
-								label={ __( 'Remove Link' ) }
+								label={ __( 'Remove link' ) }
 								onClick={ onLinkRemove }
 							/>
 						</>
@@ -451,20 +453,8 @@ export class ImageEdit extends Component {
 	}
 
 	onSetNewTab( value ) {
-		const { rel } = this.props.attributes;
-		const linkTarget = value ? '_blank' : undefined;
-
-		let updatedRel = rel;
-		if ( linkTarget && ! rel ) {
-			updatedRel = NEW_TAB_REL;
-		} else if ( ! linkTarget && rel === NEW_TAB_REL ) {
-			updatedRel = undefined;
-		}
-
-		this.props.setAttributes( {
-			linkTarget,
-			rel: updatedRel,
-		} );
+		const updatedLinkTarget = getUpdatedLinkTargetSettings( value, this.props.attributes );
+		this.props.setAttributes( updatedLinkTarget );
 	}
 
 	onFocusCaption() {
@@ -575,8 +565,9 @@ export class ImageEdit extends Component {
 			className,
 			maxWidth,
 			noticeUI,
-			toggleSelection,
 			isRTL,
+			onResizeStart,
+			onResizeStop,
 		} = this.props;
 		const {
 			url,
@@ -892,15 +883,13 @@ export class ImageEdit extends Component {
 											bottom: true,
 											left: showLeftHandle,
 										} }
-										onResizeStart={ () => {
-											toggleSelection( false );
-										} }
+										onResizeStart={ onResizeStart }
 										onResizeStop={ ( event, direction, elt, delta ) => {
+											onResizeStop();
 											setAttributes( {
 												width: parseInt( currentWidth + delta.width, 10 ),
 												height: parseInt( currentHeight + delta.height, 10 ),
 											} );
-											toggleSelection( true );
 										} }
 									>
 										{ img }
@@ -929,10 +918,18 @@ export class ImageEdit extends Component {
 }
 
 export default compose( [
+	withDispatch( ( dispatch ) => {
+		const { toggleSelection } = dispatch( 'core/block-editor' );
+
+		return {
+			onResizeStart: () => toggleSelection( false ),
+			onResizeStop: () => toggleSelection( true ),
+		};
+	} ),
 	withSelect( ( select, props ) => {
 		const { getMedia } = select( 'core' );
 		const { getSettings } = select( 'core/block-editor' );
-		const { id } = props.attributes;
+		const { attributes: { id }, isSelected } = props;
 		const {
 			__experimentalMediaUpload,
 			imageSizes,
@@ -941,7 +938,7 @@ export default compose( [
 		} = getSettings();
 
 		return {
-			image: id ? getMedia( id ) : null,
+			image: id && isSelected ? getMedia( id ) : null,
 			maxWidth,
 			isRTL,
 			imageSizes,

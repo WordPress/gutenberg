@@ -66,10 +66,14 @@ describe( 'MediaUpload component', () => {
 		expectOptionForMediaType( MEDIA_TYPE_VIDEO, OPTION_TAKE_VIDEO );
 	} );
 
-	const expectMediaPickerForOption = ( option, requestFunction ) => {
-		requestFunction.mockImplementation( ( mediaTypes, callback ) => {
+	const expectMediaPickerForOption = ( option, allowMultiple, requestFunction ) => {
+		requestFunction.mockImplementation( ( mediaTypes, multiple, callback ) => {
 			expect( mediaTypes[ 0 ] ).toEqual( MEDIA_TYPE_VIDEO );
-			callback( MEDIA_ID, MEDIA_URL );
+			if ( multiple ) {
+				callback( [ { id: MEDIA_ID, url: MEDIA_URL } ] );
+			} else {
+				callback( { id: MEDIA_ID, url: MEDIA_URL } );
+			}
 		} );
 
 		const onSelect = jest.fn();
@@ -78,6 +82,7 @@ describe( 'MediaUpload component', () => {
 			<MediaUpload
 				allowedTypes={ [ MEDIA_TYPE_VIDEO ] }
 				onSelect={ onSelect }
+				multiple={ allowMultiple }
 				render={ ( { open, getMediaOptions } ) => {
 					return (
 						<TouchableWithoutFeedback onPress={ open }>
@@ -92,18 +97,26 @@ describe( 'MediaUpload component', () => {
 		expect( requestFunction ).toHaveBeenCalledTimes( 1 );
 
 		expect( onSelect ).toHaveBeenCalledTimes( 1 );
-		expect( onSelect ).toHaveBeenCalledWith( media );
+		expect( onSelect ).toHaveBeenCalledWith( allowMultiple ? [ media ] : media );
 	};
 
 	it( 'can select media from device library', () => {
-		expectMediaPickerForOption( MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_CHOOSE_FROM_DEVICE, requestMediaPickFromDeviceLibrary );
+		expectMediaPickerForOption( MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_CHOOSE_FROM_DEVICE, false, requestMediaPickFromDeviceLibrary );
 	} );
 
 	it( 'can select media from WP media library', () => {
-		expectMediaPickerForOption( MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY, requestMediaPickFromMediaLibrary );
+		expectMediaPickerForOption( MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY, false, requestMediaPickFromMediaLibrary );
 	} );
 
 	it( 'can select media by capturig', () => {
-		expectMediaPickerForOption( MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_TAKE_MEDIA, requestMediaPickFromDeviceCamera );
+		expectMediaPickerForOption( MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_TAKE_MEDIA, false, requestMediaPickFromDeviceCamera );
+	} );
+
+	it( 'can select multiple media from device library', () => {
+		expectMediaPickerForOption( MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_CHOOSE_FROM_DEVICE, true, requestMediaPickFromDeviceLibrary );
+	} );
+
+	it( 'can select multiple media from WP media library', () => {
+		expectMediaPickerForOption( MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY, true, requestMediaPickFromMediaLibrary );
 	} );
 } );

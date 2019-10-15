@@ -32,19 +32,19 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.keyboard.type( 'First column' );
 
 		// Navigate to the columns blocks.
-		await page.click( '[aria-label="Block Navigation"]' );
+		await page.click( '[aria-label="Block navigation"]' );
 		const columnsBlockMenuItem = ( await page.$x( "//button[contains(@class,'block-editor-block-navigation__item') and contains(text(), 'Columns')]" ) )[ 0 ];
 		await columnsBlockMenuItem.click();
 
 		// Tweak the columns count.
-		await page.focus( '.edit-post-settings-sidebar__panel-block .components-range-control__number[aria-label="Columns"]' );
+		await page.focus( '.block-editor-block-inspector .components-range-control__number[aria-label="Columns"]' );
 		await page.keyboard.down( 'Shift' );
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.up( 'Shift' );
 		await page.keyboard.type( '3' );
 
 		// Navigate to the last column block.
-		await page.click( '[aria-label="Block Navigation"]' );
+		await page.click( '[aria-label="Block navigation"]' );
 		const lastColumnsBlockMenuItem = ( await page.$x(
 			"//button[contains(@class,'block-editor-block-navigation__item') and contains(text(), 'Column')]"
 		) )[ 3 ];

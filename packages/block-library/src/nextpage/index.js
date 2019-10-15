@@ -26,6 +26,7 @@ export const settings = {
 		className: false,
 		html: false,
 	},
+	example: {},
 	transforms,
 	edit,
 	save,

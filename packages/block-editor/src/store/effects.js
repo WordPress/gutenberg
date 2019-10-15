@@ -102,10 +102,14 @@ export default {
 			const selectedBlock = clientId === clientIdA ? cloneA : cloneB;
 			const html = selectedBlock.attributes[ attributeKey ];
 			const selectedBlockType = clientId === clientIdA ? blockAType : blockBType;
-			const multilineTag = selectedBlockType.attributes[ attributeKey ].multiline;
+			const {
+				multiline: multilineTag,
+				__unstableMultilineWrapperTags: multilineWrapperTags,
+			} = selectedBlockType.attributes[ attributeKey ];
 			const value = insert( create( {
 				html,
 				multilineTag,
+				multilineWrapperTags,
 			} ), START_OF_SELECTED_AREA, offset, offset );
 
 			selectedBlock.attributes[ attributeKey ] = toHTMLString( {
@@ -136,8 +140,15 @@ export default {
 				typeof v === 'string' && v.indexOf( START_OF_SELECTED_AREA ) !== -1
 			);
 			const convertedHtml = updatedAttributes[ newAttributeKey ];
-			const multilineTag = blockAType.attributes[ newAttributeKey ].multiline;
-			const convertedValue = create( { html: convertedHtml, multilineTag } );
+			const {
+				multiline: multilineTag,
+				__unstableMultilineWrapperTags: multilineWrapperTags,
+			} = blockAType.attributes[ newAttributeKey ];
+			const convertedValue = create( {
+				html: convertedHtml,
+				multilineTag,
+				multilineWrapperTags,
+			} );
 			const newOffset = convertedValue.text.indexOf( START_OF_SELECTED_AREA );
 			const newValue = remove( convertedValue, newOffset, newOffset + 1 );
 			const newHtml = toHTMLString( { value: newValue, multilineTag } );
@@ -182,5 +193,15 @@ export default {
 		const updatedBlockList = synchronizeBlocksWithTemplate( blocks, template );
 
 		return resetBlocks( updatedBlockList );
+	},
+	MARK_AUTOMATIC_CHANGE( action, store ) {
+		const {
+			setTimeout,
+			requestIdleCallback = ( callback ) => setTimeout( callback, 100 ),
+		} = window;
+
+		requestIdleCallback( () => {
+			store.dispatch( { type: 'MARK_AUTOMATIC_CHANGE_FINAL' } );
+		} );
 	},
 };

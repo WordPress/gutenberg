@@ -1,3 +1,10 @@
+## 2.8.0 (2019-09-16)
+
+### New Features
+
+- The bundled `react` dependency has been updated from requiring `^16.8.4` to requiring `^16.9.0` ([#16982](https://github.com/WordPress/gutenberg/pull/16982)). It contains [new deprecations](https://reactjs.org/blog/2019/08/08/react-v16.9.0.html#new-deprecations) as well.
+- The bundled `react-dom` dependency has been updated from requiring `^16.8.4` to requiring `^16.9.0` ([#16982](https://github.com/WordPress/gutenberg/pull/16982)).
+
 ## 2.4.0 (2019-05-21)
 
 ### New Features

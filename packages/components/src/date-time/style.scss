@@ -146,7 +146,6 @@
 			}
 
 			select {
-				padding: 2px;
 				margin-right: 4px;
 
 				&:focus {
@@ -158,7 +157,6 @@
 			input[type="number"] {
 				padding: 2px;
 				margin-right: 4px;
-				width: 40px;
 				text-align: center;
 				-moz-appearance: textfield;
 
@@ -210,7 +208,7 @@
 }
 
 .components-datetime__time-field-month-select {
-	width: 90px;
+	max-width: 145px;
 }
 
 // Hack to center the datepicker component within the popover.

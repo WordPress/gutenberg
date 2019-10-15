@@ -160,6 +160,7 @@ export class MediaPlaceholder extends Component {
 			notices,
 			onSelectURL,
 			mediaUpload,
+			children,
 		} = this.props;
 
 		let instructions = labels.instructions;
@@ -219,12 +220,18 @@ export class MediaPlaceholder extends Component {
 				preview={ mediaPreview }
 			>
 				{ content }
+				{ children }
 			</Placeholder>
 		);
 	}
 
 	renderDropZone() {
-		const { onHTMLDrop = noop } = this.props;
+		const { disableDropZone, onHTMLDrop = noop } = this.props;
+
+		if ( disableDropZone ) {
+			return null;
+		}
+
 		return (
 			<DropZone
 				onFilesDrop={ this.onFilesUpload }
@@ -359,6 +366,7 @@ export class MediaPlaceholder extends Component {
 				</>
 			);
 		}
+
 		if ( mediaUpload ) {
 			const content = (
 				<>
@@ -383,6 +391,7 @@ export class MediaPlaceholder extends Component {
 			);
 			return this.renderPlaceholder( content );
 		}
+
 		return this.renderPlaceholder( mediaLibraryButton );
 	}
 

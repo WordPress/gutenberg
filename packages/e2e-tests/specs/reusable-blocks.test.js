@@ -118,6 +118,7 @@ describe( 'Reusable Blocks', () => {
 		// Tab three times to navigate to the block's content
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Enter' ); // Enter edit mode
 
 		// Change the block's content
 		await page.keyboard.type( 'Oh! ' );
@@ -142,7 +143,7 @@ describe( 'Reusable Blocks', () => {
 
 		// Check that its content is up to date
 		const text = await page.$eval(
-			'.block-editor-block-list__block[data-type="core/block"] .block-editor-rich-text',
+			'.block-editor-block-list__block[data-type="core/block"] p',
 			( element ) => element.innerText
 		);
 		expect( text ).toMatch( 'Oh! Hello there!' );
@@ -165,7 +166,7 @@ describe( 'Reusable Blocks', () => {
 
 		// Check that its content is up to date
 		const text = await page.$eval(
-			'.block-editor-block-list__block[data-type="core/paragraph"] .block-editor-rich-text',
+			'.block-editor-block-list__block[data-type="core/paragraph"] p',
 			( element ) => element.innerText
 		);
 		expect( text ).toMatch( 'Oh! Hello there!' );

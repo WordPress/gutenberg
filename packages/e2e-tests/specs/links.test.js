@@ -453,7 +453,7 @@ describe( 'Links', () => {
 		}
 
 		// Focus on first paragraph, so the link popover will appear over the subsequent ones
-		await page.click( '[aria-label="Block Navigation"]' );
+		await page.click( '[aria-label="Block navigation"]' );
 		await page.click( '.block-editor-block-navigation__item button' );
 
 		// Select some text
@@ -465,7 +465,7 @@ describe( 'Links', () => {
 		await waitForAutoFocus();
 
 		// Click on the Link Settings button
-		await page.click( 'button[aria-label="Link Settings"]' );
+		await page.click( 'button[aria-label="Link settings"]' );
 
 		// Move mouse over the 'open in new tab' section, then click and drag
 		const settings = await page.$( '.block-editor-url-popover__settings' );

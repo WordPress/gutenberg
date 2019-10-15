@@ -7,12 +7,12 @@ import { omit } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { RawHTML, Component } from '@wordpress/element';
+import { RawHTML, Component, createRef } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { pasteHandler, children as childrenSource, getBlockTransforms, findTransform } from '@wordpress/blocks';
 import { withInstanceId, compose } from '@wordpress/compose';
 import {
-	RichText,
+	__experimentalRichText as RichText,
 	__unstableCreateElement,
 	isEmpty,
 	__unstableIsEmptyLine as isEmptyLine,
@@ -21,13 +21,14 @@ import {
 	create,
 	replace,
 	split,
-	LINE_SEPARATOR,
+	__UNSTABLE_LINE_SEPARATOR as LINE_SEPARATOR,
 	toHTMLString,
 	slice,
 } from '@wordpress/rich-text';
-import { withFilters, IsolatedEventContainer } from '@wordpress/components';
+import { withFilters, Popover } from '@wordpress/components';
 import { createBlobURL } from '@wordpress/blob';
 import deprecated from '@wordpress/deprecated';
+import { isURL } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -59,16 +60,22 @@ function getMultilineTag( multiline ) {
 class RichTextWrapper extends Component {
 	constructor() {
 		super( ...arguments );
+		this.ref = createRef();
 		this.onEnter = this.onEnter.bind( this );
 		this.onSplit = this.onSplit.bind( this );
 		this.onPaste = this.onPaste.bind( this );
 		this.onDelete = this.onDelete.bind( this );
 		this.inputRule = this.inputRule.bind( this );
-		this.markAutomaticChange = this.markAutomaticChange.bind( this );
+		this.getAnchorRect = this.getAnchorRect.bind( this );
 	}
 
 	onEnter( { value, onChange, shiftKey } ) {
-		const { onReplace, onSplit, multiline } = this.props;
+		const {
+			onReplace,
+			onSplit,
+			multiline,
+			markAutomaticChange,
+		} = this.props;
 		const canSplit = onReplace && onSplit;
 
 		if ( onReplace ) {
@@ -82,7 +89,7 @@ class RichTextWrapper extends Component {
 				onReplace( [
 					transformation.transform( { content: value.text } ),
 				] );
-				this.markAutomaticChange();
+				markAutomaticChange();
 			}
 		}
 
@@ -124,6 +131,7 @@ class RichTextWrapper extends Component {
 			tagName,
 			canUserUseUnfilteredHTML,
 			multiline,
+			__unstableEmbedURLOnPaste,
 		} = this.props;
 
 		if ( image && ! html ) {
@@ -133,12 +141,11 @@ class RichTextWrapper extends Component {
 				mode: 'BLOCKS',
 				tagName,
 			} );
-			const shouldReplace = onReplace && isEmpty( value );
 
 			// Allows us to ask for this information when we get a report.
 			window.console.log( 'Received item:\n\n', file );
 
-			if ( shouldReplace ) {
+			if ( onReplace && isEmpty( value ) ) {
 				onReplace( content );
 			} else {
 				this.onSplit( value, content );
@@ -147,15 +154,14 @@ class RichTextWrapper extends Component {
 			return;
 		}
 
-		const canReplace = onReplace && isEmpty( value );
-		const canSplit = onReplace && onSplit;
+		let mode = onReplace && onSplit ? 'AUTO' : 'INLINE';
 
-		let mode = 'INLINE';
-
-		if ( canReplace ) {
+		if (
+			__unstableEmbedURLOnPaste &&
+			isEmpty( value ) &&
+			isURL( plainText.trim() )
+		) {
 			mode = 'BLOCKS';
-		} else if ( canSplit ) {
-			mode = 'AUTO';
 		}
 
 		const content = pasteHandler( {
@@ -177,7 +183,7 @@ class RichTextWrapper extends Component {
 
 			onChange( insert( value, valueToInsert ) );
 		} else if ( content.length > 0 ) {
-			if ( canReplace ) {
+			if ( onReplace && isEmpty( value ) ) {
 				onReplace( content );
 			} else {
 				this.onSplit( value, content );
@@ -247,7 +253,7 @@ class RichTextWrapper extends Component {
 	}
 
 	inputRule( value, valueToFormat ) {
-		const { onReplace } = this.props;
+		const { onReplace, markAutomaticChange } = this.props;
 
 		if ( ! onReplace ) {
 			return;
@@ -256,7 +262,8 @@ class RichTextWrapper extends Component {
 		const { start, text } = value;
 		const characterBefore = text.slice( start - 1, start );
 
-		if ( ! /\s/.test( characterBefore ) ) {
+		// The character right before the caret must be a plain space.
+		if ( characterBefore !== ' ' ) {
 			return;
 		}
 
@@ -275,7 +282,7 @@ class RichTextWrapper extends Component {
 		const block = transformation.transform( content );
 
 		onReplace( [ block ] );
-		this.markAutomaticChange();
+		markAutomaticChange();
 	}
 
 	getAllowedFormats() {
@@ -296,14 +303,28 @@ class RichTextWrapper extends Component {
 		return formattingControls.map( ( name ) => `core/${ name }` );
 	}
 
-	/**
-	 * Marks the last change as an automatic change at the next idle period to
-	 * ensure all selection changes have been recorded.
-	 */
-	markAutomaticChange() {
-		window.requestIdleCallback( () => {
-			this.props.markAutomaticChange();
-		} );
+	getAnchorRect() {
+		const { current } = this.ref;
+		const rect = current.getBoundingClientRect();
+
+		// Add some space.
+		const buffer = 6;
+
+		// Subtract padding if any.
+		let { paddingTop } = window.getComputedStyle( current );
+
+		paddingTop = parseInt( paddingTop, 10 );
+
+		return {
+			x: rect.left,
+			y: rect.top + paddingTop - buffer,
+			width: rect.width,
+			height: rect.height - paddingTop + buffer,
+			left: rect.left,
+			right: rect.right,
+			top: rect.top + paddingTop - buffer,
+			bottom: rect.bottom,
+		};
 	}
 
 	render() {
@@ -326,11 +347,11 @@ class RichTextWrapper extends Component {
 			onExitFormattedText,
 			isSelected: originalIsSelected,
 			onCreateUndoLevel,
-			// eslint-disable-next-line no-unused-vars
 			markAutomaticChange,
 			didAutomaticChange,
 			undo,
 			placeholder,
+			keepPlaceholderOnFocus,
 			// eslint-disable-next-line no-unused-vars
 			allowedFormats,
 			withoutInteractiveFormatting,
@@ -372,13 +393,17 @@ class RichTextWrapper extends Component {
 		const content = (
 			<RichText
 				{ ...experimentalProps }
+				ref={ this.ref }
 				value={ adjustedValue }
 				onChange={ adjustedOnChange }
 				selectionStart={ selectionStart }
 				selectionEnd={ selectionEnd }
 				onSelectionChange={ onSelectionChange }
 				tagName={ tagName }
-				className={ classnames( classes, className, { 'is-selected': originalIsSelected } ) }
+				className={ classnames( classes, className, {
+					'is-selected': originalIsSelected,
+					'keep-placeholder-on-focus': keepPlaceholderOnFocus,
+				} ) }
 				placeholder={ placeholder }
 				allowedFormats={ adjustedAllowedFormats }
 				withoutInteractiveFormatting={ withoutInteractiveFormatting }
@@ -392,7 +417,7 @@ class RichTextWrapper extends Component {
 				__unstableOnEnterFormattedText={ onEnterFormattedText }
 				__unstableOnExitFormattedText={ onExitFormattedText }
 				__unstableOnCreateUndoLevel={ onCreateUndoLevel }
-				__unstableMarkAutomaticChange={ this.markAutomaticChange }
+				__unstableMarkAutomaticChange={ markAutomaticChange }
 				__unstableDidAutomaticChange={ didAutomaticChange }
 				__unstableUndo={ undo }
 			>
@@ -405,11 +430,15 @@ class RichTextWrapper extends Component {
 							</BlockFormatControls>
 						) }
 						{ isSelected && inlineToolbar && hasFormats && (
-							<IsolatedEventContainer
-								className="editor-rich-text__inline-toolbar block-editor-rich-text__inline-toolbar"
+							<Popover
+								noArrow
+								position="top center"
+								focusOnMount={ false }
+								getAnchorRect={ this.getAnchorRect }
+								className="block-editor-rich-text__inline-format-toolbar"
 							>
 								<FormatToolbar />
-							</IsolatedEventContainer>
+							</Popover>
 						) }
 						{ isSelected && <RemoveBrowserShortcuts /> }
 						<Autocomplete
@@ -417,14 +446,16 @@ class RichTextWrapper extends Component {
 							completers={ autocompleters }
 							record={ value }
 							onChange={ onChange }
+							isSelected={ isSelected }
 						>
-							{ ( { listBoxId, activeId } ) =>
+							{ ( { listBoxId, activeId, onKeyDown } ) =>
 								<Editable
 									aria-autocomplete={ listBoxId ? 'list' : undefined }
 									aria-owns={ listBoxId }
 									aria-activedescendant={ activeId }
 									start={ start }
 									reversed={ reversed }
+									onKeyDown={ onKeyDown }
 								/>
 							}
 						</Autocomplete>
@@ -432,6 +463,14 @@ class RichTextWrapper extends Component {
 				}
 			</RichText>
 		);
+
+		if ( ! wrapperClassName ) {
+			return content;
+		}
+
+		deprecated( 'wp.blockEditor.RichText wrapperClassName prop', {
+			alternative: 'className prop or create your own wrapper div',
+		} );
 
 		return (
 			<div className={ classnames( wrapperClasses, wrapperClassName ) }>
@@ -466,6 +505,8 @@ const RichTextContainer = compose( [
 				selectionStart.clientId === clientId &&
 				selectionStart.attributeKey === identifier
 			);
+		} else if ( isSelected ) {
+			isSelected = selectionStart.clientId === clientId;
 		}
 
 		return {
