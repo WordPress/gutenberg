@@ -1,10 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { Panel } from '@wordpress/components';
+import { Panel, ToggleControl, RangeControl } from '@wordpress/components';
 import { compose, ifCondition } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
-import { BlockInspector } from '@wordpress/block-editor';
+import { BlockInspector, __experimentalSimulateMediaQuery } from '@wordpress/block-editor';
+import { __ } from '@wordpress/i18n';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -21,6 +23,45 @@ import DiscussionPanel from '../discussion-panel';
 import PageAttributes from '../page-attributes';
 import MetaBoxes from '../../meta-boxes';
 import PluginDocumentSettingPanel from '../plugin-document-setting-panel';
+
+const PARTIAL_PATHS = [
+	//'block-editor/style.css',
+	'block-library/style.css',
+	'block-library/theme.css',
+	'block-library/editor.css',
+	//'format-library/style.css',
+];
+function TestSimulateMediaQuery() {
+	const [ simulateValue, setSimulateValue ] = useState( 400 );
+	const [ isSimulationEnable, setIsSimulationEnabled ] = useState( true );
+	const toggleUI = (
+		<ToggleControl
+			label={ __( 'Enabled width simulation' ) }
+			checked={ isSimulationEnable }
+			onChange={ ( newValue ) => setIsSimulationEnabled( newValue ) }
+		/>
+	);
+	if ( ! isSimulationEnable ) {
+		return toggleUI;
+	}
+	return (
+		<>
+			{ toggleUI }
+			<RangeControl
+				value={ simulateValue }
+				label={ __( 'Simulated width value' ) }
+				min={ 0 }
+				max={ 2000 }
+				allowReset
+				onChange={ ( newValue ) => ( setSimulateValue( newValue ) ) }
+			/>
+			<__experimentalSimulateMediaQuery
+				value={ simulateValue }
+				partialPaths={ PARTIAL_PATHS }
+			/>
+		</>
+	);
+}
 
 const SettingsSidebar = ( { sidebarName } ) => (
 	<Sidebar name={ sidebarName }>
@@ -43,6 +84,7 @@ const SettingsSidebar = ( { sidebarName } ) => (
 			{ sidebarName === 'edit-post/block' && (
 				<BlockInspector />
 			) }
+			<TestSimulateMediaQuery />
 		</Panel>
 	</Sidebar>
 );
