@@ -191,8 +191,11 @@ function LinkControl( { currentLink, fetchSearchSuggestions, renderAdditionalSet
 								onClick={ resetInput }
 							/>
 
-							{ inputValue && <LinkControlAdditionalSettings /> }
 						</form>
+					) }
+
+					{ ! isEditingLink && (
+						<LinkControlAdditionalSettings />
 					) }
 				</div>
 			</div>
