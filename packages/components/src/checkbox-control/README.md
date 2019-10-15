@@ -59,7 +59,7 @@ import { CheckboxControl } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 
 const MyCheckboxControl = () => (
-	const [ checked, setChecked ] = useState( true );
+	const [ isChecked, setChecked ] = useState( true );
 	<CheckboxControl
 		heading="User"
 		label="Is author"
