@@ -26,6 +26,10 @@ import {
 	editorSettings,
 } from './reducer.js';
 
+import { EDITOR_SETTINGS_DEFAULTS } from './defaults.js';
+
+EDITOR_SETTINGS_DEFAULTS.autosaveInterval = 0; // This is a way to override default behavior on mobile, and make it ping the native save at each keystroke
+
 export * from './reducer.js';
 
 /**

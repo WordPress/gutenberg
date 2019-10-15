@@ -10,8 +10,9 @@ import { sendNativeEditorDidLayout } from 'react-native-gutenberg-bridge';
  */
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
-import { HTMLTextInput, KeyboardAvoidingView, ReadableContentView, withTheme } from '@wordpress/components';
+import { compose, withPreferredColorScheme } from '@wordpress/compose';
+import { HTMLTextInput, KeyboardAvoidingView, ReadableContentView } from '@wordpress/components';
+import { AutosaveMonitor } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -99,7 +100,7 @@ class Layout extends Component {
 	render() {
 		const {
 			mode,
-			useStyle,
+			getStylesFromColorScheme,
 		} = this.props;
 
 		const isHtmlView = mode === 'text';
@@ -115,8 +116,9 @@ class Layout extends Component {
 		};
 
 		return (
-			<SafeAreaView style={ useStyle( styles.container, styles.containerDark ) } onLayout={ this.onRootViewLayout }>
-				<View style={ useStyle( styles.background, styles.backgroundDark ) }>
+			<SafeAreaView style={ getStylesFromColorScheme( styles.container, styles.containerDark ) } onLayout={ this.onRootViewLayout }>
+				<AutosaveMonitor />
+				<View style={ getStylesFromColorScheme( styles.background, styles.backgroundDark ) }>
 					{ isHtmlView ? this.renderHTML() : this.renderVisual() }
 				</View>
 				<View style={ { flex: 0, flexBasis: marginBottom, height: marginBottom } } />
@@ -146,5 +148,5 @@ export default compose( [
 			mode: getEditorMode(),
 		};
 	} ),
-	withTheme,
+	withPreferredColorScheme,
 ] )( Layout );

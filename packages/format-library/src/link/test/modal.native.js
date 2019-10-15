@@ -53,8 +53,7 @@ describe( 'LinksUI', () => {
 
 		// Simulate user typing on the URL Cell.
 		const bottomSheet = wrapper.dive().find( 'BottomSheet' ).first();
-		// withTheme is type "_class", we search for it and dive into BottomSheetCell
-		const cell = bottomSheet.dive().find( '_class' ).first().dive();
+		const cell = bottomSheet.dive().find( 'WithPreferredColorScheme(BottomSheetCell)' ).first().dive();
 
 		cell.simulate( 'changeValue', 'wordpress.com' );
 
