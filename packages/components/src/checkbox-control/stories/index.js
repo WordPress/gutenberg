@@ -26,11 +26,11 @@ export const _default = () => {
 	);
 };
 
-export const Controls = () => {
+export const withKnobs = () => {
 	const [ isChecked, setChecked ] = useState( true );
 	const heading = text( 'Heading', 'User' );
 	const label = text( 'Label', 'Is author' );
-	const help = text( 'Help', 'Is the user a author or not?' );
+	const help = text( 'Help', 'Is the user an author or not?' );
 	return (
 		<CheckboxControl
 			heading={ heading }
