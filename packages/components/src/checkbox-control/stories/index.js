@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { text } from '@storybook/addon-knobs';
+import { withKnobs, text } from '@storybook/addon-knobs';
 
 /**
  * WordPress dependencies
@@ -26,7 +26,7 @@ export const _default = () => {
 	);
 };
 
-export const withKnobs = () => {
+export const Knobs = () => {
 	const [ isChecked, setChecked ] = useState( true );
 	const heading = text( 'Heading', 'User' );
 	const label = text( 'Label', 'Is author' );
@@ -40,4 +40,8 @@ export const withKnobs = () => {
 			onChange={ setChecked }
 		/>
 	);
+};
+
+Knobs.story = {
+	decorators: [ withKnobs ],
 };
