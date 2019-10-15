@@ -24,7 +24,7 @@ function PanelActions( { actions } ) {
 						label={ label }
 						separatorType="topFullWidth"
 						onPress={ onPress }
-						labelStyle={ [ styles.defaultLabelStyle, labelStyle ] }
+						labelStyle={ { ...styles.defaultLabelStyle, ...labelStyle } }
 						key={ label }
 					/>
 				);
