@@ -565,12 +565,12 @@ export function serializeBlockNode( blockNode, options = {} ) {
  * @return {Function} An implementation which parses the post content.
  */
 const createParse = ( parseImplementation ) =>
-	( content ) => parseImplementation( content ).reduce( ( memoAccumulator, blockNode ) => {
+	( content ) => parseImplementation( content ).reduce( ( accumulator, blockNode ) => {
 		const block = createBlockWithFallback( blockNode );
 		if ( block ) {
-			memoAccumulator.push( block );
+			accumulator.push( block );
 		}
-		return memoAccumulator;
+		return accumulator;
 	}, [] );
 
 /**
