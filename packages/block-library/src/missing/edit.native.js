@@ -43,6 +43,8 @@ export class UnsupportedBlockEdit extends Component {
 	}
 
 	renderSheet() {
+		// This margin is necessary for Android because of the way the modals on each platform are
+		// being rendered. This extra margin makes the modals look the same on each platform.
 		const marginBottom = isAndroid ? 16 : 0;
 		return <BottomSheet
 			isVisible={ this.state.showHelp }
@@ -81,7 +83,7 @@ export class UnsupportedBlockEdit extends Component {
 			<TouchableWithoutFeedback
 				accessibilityLabel={ __( originalName + ' block' ) }
 				accessibilityRole={ 'button' }
-				accessibilityHint={ __( 'Double click to show help' ) }
+				accessibilityHint={ __( 'Tap the top right corner to show help' ) }
 				onPress={ this.toggleSheet.bind( this ) }
 			>
 				<View style={ getStylesFromColorScheme( styles.unsupportedBlock, styles.unsupportedBlockDark ) }>
