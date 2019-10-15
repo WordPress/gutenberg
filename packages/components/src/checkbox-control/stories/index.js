@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { text } from '@storybook/addon-knobs';
+
+/**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
@@ -14,27 +19,6 @@ export const _default = () => {
 	const [ isChecked, setChecked ] = useState( true );
 	return (
 		<CheckboxControl
-			checked={ isChecked }
-			onChange={ setChecked }
-		/>
-	);
-};
-
-export const Heading = () => {
-	const [ isChecked, setChecked ] = useState( true );
-	return (
-		<CheckboxControl
-			heading="User"
-			checked={ isChecked }
-			onChange={ setChecked }
-		/>
-	);
-};
-
-export const Label = () => {
-	const [ isChecked, setChecked ] = useState( true );
-	return (
-		<CheckboxControl
 			label="Is author"
 			checked={ isChecked }
 			onChange={ setChecked }
@@ -42,24 +26,16 @@ export const Label = () => {
 	);
 };
 
-export const Help = () => {
+export const Controls = () => {
 	const [ isChecked, setChecked ] = useState( true );
+	const heading = text( 'Heading', 'User' );
+	const label = text( 'Label', 'Is author' );
+	const help = text( 'Help', 'Is the user a author or not?' );
 	return (
 		<CheckboxControl
-			help="Is the user a author or not?"
-			checked={ isChecked }
-			onChange={ setChecked }
-		/>
-	);
-};
-
-export const All = () => {
-	const [ isChecked, setChecked ] = useState( true );
-	return (
-		<CheckboxControl
-			heading="User"
-			label="Is author"
-			help="Is the user a author or not?"
+			heading={ heading }
+			label={ label }
+			help={ help }
 			checked={ isChecked }
 			onChange={ setChecked }
 		/>
