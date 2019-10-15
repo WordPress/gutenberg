@@ -3,11 +3,9 @@
  */
 import { InnerBlocks } from '@wordpress/block-editor';
 
-const allowedBlocks = [ 'core/list-item' ];
+const allowedBlocks = [ 'core/checklist-item' ];
 const template = [
-	[ 'core/list-item', {}, [
-		[ 'core/paragraph' ],
-	] ],
+	[ 'core/checklist-item' ],
 ];
 
 export default function Edit() {

@@ -15,9 +15,13 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'List (new)' ),
-	description: __( 'You can hide anything here!' ),
-	icon: 'arrow-down',
+	title: __( 'Checklist Item' ),
+	description: __( 'Check!' ),
+	icon: 'yes-alt',
+	parent: [ 'core/checklist' ],
 	save,
 	edit,
+	merge( { value: a = '' }, { value: b = '' } ) {
+		return { value: a + b };
+	},
 };

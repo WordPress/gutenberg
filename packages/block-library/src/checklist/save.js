@@ -4,5 +4,5 @@
 import { InnerBlocks } from '@wordpress/block-editor';
 
 export default function Save() {
-	return <li><InnerBlocks.Content /></li>;
+	return <ul><InnerBlocks.Content /></ul>;
 }

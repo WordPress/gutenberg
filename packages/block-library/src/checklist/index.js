@@ -15,10 +15,9 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'List Item' ),
-	description: __( 'You can hide anything here!' ),
-	icon: 'arrow-down',
-	parent: [ 'core/list-2' ],
+	title: __( 'Checklist' ),
+	description: __( 'Check!' ),
+	icon: 'yes-alt',
 	save,
 	edit,
 };
