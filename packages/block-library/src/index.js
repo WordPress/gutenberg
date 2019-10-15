@@ -40,6 +40,8 @@ import * as latestComments from './latest-comments';
 import * as latestPosts from './latest-posts';
 import * as legacyWidget from './legacy-widget';
 import * as list from './list';
+import * as list2 from './list-2';
+import * as listItem from './list-item';
 import * as missing from './missing';
 import * as more from './more';
 import * as nextpage from './nextpage';
@@ -98,6 +100,8 @@ export const registerCoreBlocks = () => {
 		heading,
 		gallery,
 		list,
+		list2,
+		listItem,
 		quote,
 
 		// Register all remaining core blocks.
