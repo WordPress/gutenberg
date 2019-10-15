@@ -14,8 +14,11 @@ import { default as VideoPlayer } from 'react-native-video';
 /**
  * Internal dependencies
  */
-import styles from './video-player.scss';
+import styles from './styles.scss';
 import PlayIcon from './gridicon-play';
+
+// Default Video ratio 16:9
+export const VIDEO_ASPECT_RATIO = 16 / 9;
 
 class Video extends Component {
 	constructor() {

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, get, merge, isEqual, find } from 'lodash';
+import { castArray, get, isEqual, find } from 'lodash';
 
 /**
  * Internal dependencies
@@ -159,7 +159,7 @@ export function* editEntityRecord( kind, name, recordId, edits, options = {} ) {
 			const recordValue = record[ key ];
 			const editedRecordValue = editedRecord[ key ];
 			const value = mergedEdits[ key ] ?
-				merge( {}, editedRecordValue, edits[ key ] ) :
+				{ ...editedRecordValue, ...edits[ key ] } :
 				edits[ key ];
 			acc[ key ] = isEqual( recordValue, value ) ? undefined : value;
 			return acc;

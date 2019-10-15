@@ -37,7 +37,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await columnsBlockMenuItem.click();
 
 		// Tweak the columns count.
-		await page.focus( '.edit-post-settings-sidebar__panel-block .components-range-control__number[aria-label="Columns"]' );
+		await page.focus( '.block-editor-block-inspector .components-range-control__number[aria-label="Columns"]' );
 		await page.keyboard.down( 'Shift' );
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.up( 'Shift' );

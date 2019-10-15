@@ -17,7 +17,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 
 	it( 'should switch between visual and HTML modes', async () => {
 		// This block should be in "visual" mode by default.
-		let visualBlock = await page.$$( '.block-editor-block-list__layout .block-editor-block-list__block .block-editor-rich-text' );
+		let visualBlock = await page.$$( '.block-editor-block-list__layout .block-editor-block-list__block .rich-text' );
 		expect( visualBlock ).toHaveLength( 1 );
 
 		// Move the mouse to show the block toolbar
@@ -43,7 +43,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 		await changeModeButton.click();
 
 		// This block should be in "visual" mode by default.
-		visualBlock = await page.$$( '.block-editor-block-list__layout .block-editor-block-list__block .block-editor-rich-text' );
+		visualBlock = await page.$$( '.block-editor-block-list__layout .block-editor-block-list__block .rich-text' );
 		expect( visualBlock ).toHaveLength( 1 );
 	} );
 

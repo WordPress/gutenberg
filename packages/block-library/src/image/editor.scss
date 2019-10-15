@@ -1,6 +1,10 @@
 .wp-block-image {
 	position: relative;
 
+	// This resets the intrinsic margin on the figure in non-floated, wide, and full-wide alignments.
+	margin-left: 0;
+	margin-right: 0;
+
 	&.is-transient img {
 		opacity: 0.3;
 	}
@@ -95,13 +99,6 @@
 	.block-editor-block-list__block-edit {
 		figure {
 			margin: 0;
-			display: table;
-		}
-
-		// This maps to the figcaption on the frontend.
-		.block-editor-rich-text {
-			display: table-caption;
-			caption-side: bottom;
 		}
 	}
 }
@@ -116,11 +113,4 @@
 // This is similar to above but for resized unfloated images only, where the markup is different.
 [data-type="core/image"] .block-editor-block-list__block-edit figure.is-resized {
 	margin: 0;
-	display: table;
-
-	// This maps to the figcaption on the frontend.
-	.block-editor-rich-text {
-		display: table-caption;
-		caption-side: bottom;
-	}
 }

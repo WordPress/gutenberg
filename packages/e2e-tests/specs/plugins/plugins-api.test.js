@@ -10,6 +10,7 @@ import {
 	openDocumentSettingsSidebar,
 	openPublishPanel,
 	publishPost,
+	setBrowserViewport,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Using Plugins API', () => {
@@ -74,6 +75,23 @@ describe( 'Using Plugins API', () => {
 
 			const pluginSidebarClosed = await page.$( '.edit-post-sidebar' );
 			expect( pluginSidebarClosed ).toBeNull();
+		} );
+
+		describe( 'Medium screen', () => {
+			beforeAll( async () => {
+				await setBrowserViewport( 'medium' );
+			} );
+
+			afterAll( async () => {
+				await setBrowserViewport( 'large' );
+			} );
+
+			it( 'Should open plugins sidebar using More Menu item and render content', async () => {
+				await clickOnMoreMenuItem( 'Sidebar title plugin' );
+
+				const pluginSidebarContent = await page.$eval( '.edit-post-sidebar', ( el ) => el.innerHTML );
+				expect( pluginSidebarContent ).toMatchSnapshot();
+			} );
 		} );
 	} );
 
