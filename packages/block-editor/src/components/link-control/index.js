@@ -5,7 +5,9 @@ import {
 	IconButton,
 	Icon,
 	ToggleControl,
+	ExternalLink,
 } from '@wordpress/components';
+
 /**
  * External dependencies
  */
@@ -152,13 +154,23 @@ function LinkControl( { currentLink, fetchSearchSuggestions, renderAdditionalSet
 				<div className="block-editor-link-control__search">
 
 					{ ! isEditingLink && (
-						<div>
-							<URLPopover.LinkViewer
-								onKeyPress={ stopPropagation }
-								url={ currentLink.url }
-								onEditLinkClick={ onStartEditing }
-								urlLabel={ currentLink.title }
-							/>
+						<div
+							className={ classnames( 'block-editor-link-control__search-item', {
+								'is-current': true,
+							} ) }
+						>
+							<span className="block-editor-link-control__search-item-header">
+
+								<ExternalLink
+									className="block-editor-link-control__search-item-title"
+									href={ currentLink.url }
+								>
+									{ currentLink.title }
+								</ExternalLink>
+								<span className="block-editor-link-control__search-item-info">{ currentLink.info || filterURLForDisplay( safeDecodeURI( currentLink.url ) ) || '' }</span>
+							</span>
+							<span className="block-editor-link-control__search-item-type">{ currentLink.type.toLowerCase() || '' }</span>
+							<IconButton className="block-editor-link-control__search-item-action block-editor-link-control__search-item-action--edit" icon="edit" label={ __( 'Edit' ) } onClick={ onStartEditing } />
 						</div>
 					) }
 

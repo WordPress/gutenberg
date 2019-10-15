@@ -1,5 +1,6 @@
 .block-editor-link-control__search {
 	position: relative;
+	min-width: 340px;
 }
 
 .block-editor-link-control__search .block-editor-link-control__search-input {
@@ -30,7 +31,7 @@
 .block-editor-link-control__search-reset {
 	position: absolute;
 	top: 19px; // has to be hard coded as form expands with search suggestions
-	right: 19px; // push away to avoid focus style obscuring input border
+	right: 25px; // push away to avoid focus style obscuring input border
 	z-index: 10;
 }
 
@@ -81,15 +82,21 @@
 	width: 100%;
 	border: none;
 	text-align: left;
-	padding: 10px;
+	padding: 10px 15px;
+	border-radius: 5px;
 
 	&:hover,
 	&:focus {
 		background-color: #e9e9e9;
 	}
 
-	&.is-selected {
-		background: #e1e1e1;
+	&.is-current {
+		background: transparent;
+		border: 2px solid #ccc;
+		margin: $grid-size-large;
+		width: calc(100% - #{$grid-size-large*2});
+		cursor: default;
+		padding-right: 10px; // visually compensate for edit icon padding
 	}
 
 	.block-editor-link-control__search-item-header {
@@ -162,4 +169,9 @@
 		bottom: auto;
 		margin: 0 auto $grid-size-large auto;
 	}
+}
+
+.block-editor-link-control__search-item-action {
+	margin-left: 0.5em;
+	flex-shrink: 0;
 }
