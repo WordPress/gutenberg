@@ -219,7 +219,7 @@ export class ImageEdit extends React.Component {
 		const { attributes, isSelected } = this.props;
 		const { url, height, width, alt, href, id, linkTarget } = attributes;
 
-		const actions = [ { label: 'Clear All Settings', onPress: this.onClearSettings, labelStyle: styles.clearSettingsButton } ];
+		const actions = [ { label: __( 'Clear All Settings' ), onPress: this.onClearSettings } ];
 
 		const getToolbarEditButton = ( open ) => (
 			<BlockControls>

@@ -6,7 +6,6 @@ import { View } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
 import {
 	TextControl,
 } from '@wordpress/components';
@@ -22,10 +21,10 @@ function PanelActions( { actions } ) {
 			{ actions.map( ( { label, onPress, labelStyle } ) => {
 				return (
 					<TextControl
-						label={ sprintf( __( '%s' ), label ) }
+						label={ label }
 						separatorType="topFullWidth"
 						onPress={ onPress }
-						labelStyle={ labelStyle }
+						labelStyle={ [ styles.defaultLabelStyle, labelStyle ] }
 						key={ label }
 					/>
 				);
