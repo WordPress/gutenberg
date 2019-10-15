@@ -61,7 +61,7 @@ class BottomSheetCell extends Component {
 		const cellLabelLeftAlignNoIconStyle = getStylesFromColorScheme( styles.cellLabelLeftAlignNoIcon, styles.cellTextDark );
 		const defaultMissingIconAndValue = leftAlign ? cellLabelLeftAlignNoIconStyle : cellLabelCenteredStyle;
 		const defaultLabelStyle = showValue || icon !== undefined ? cellLabelStyle : defaultMissingIconAndValue;
-		
+
 		const drawSeparator = ( separatorType && separatorType !== 'none' ) || separatorStyle === undefined;
 
 		const onCellPress = () => {
