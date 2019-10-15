@@ -46,6 +46,35 @@ body.gutenberg_page_gutenberg-widgets {
 	&.is-in-customizer {
 		min-height: initial;
 		position: initial;
+
+		.block-editor-inserter__main-area input {
+			width: auto;
+		}
+
+		@include break-medium {
+			.block-editor-inserter {
+				position: relative;
+			}
+
+			.block-editor-inserter__popover:not(.is-mobile) > .components-popover__content {
+				overflow-y: visible;
+				height: 432px;
+			}
+
+			.block-editor-inserter__menu,
+			.block-editor-inserter__main-area {
+				width: 400px;
+				position: relative;
+			}
+
+			.components-popover input[type="search"].block-editor-inserter__search {
+				font-size: $default-font-size;
+			}
+
+			.block-editor-inserter__results {
+				height: 394px;
+			}
+		}
 	}
 }
 
