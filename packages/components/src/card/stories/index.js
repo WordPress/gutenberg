@@ -9,13 +9,18 @@ import { text, boolean, select } from '@storybook/addon-knobs';
 /**
  * Internal dependencies
  */
-import Card from '../';
+import Card from '../index';
+import CardBody from '../body';
+import CardDivider from '../divider';
+import CardFooter from '../footer';
+import CardHeader from '../header';
+import CardMedia from '../media';
 
 export default { title: 'Card', component: Card };
 
 export const _default = () => (
 	<Card>
-		<Card.Body>Code is Poetry</Card.Body>
+		<CardBody>Code is Poetry</CardBody>
 	</Card>
 );
 
@@ -23,53 +28,53 @@ export const media = () => {
 	return (
 		<div>
 			<Card style={ { width: 360 } } size="sm">
-				<Card.Media>
+				<CardMedia>
 					<img
 						src="https://images.unsplash.com/photo-1570776765652-4ce2a88cc1f9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1350&q=80"
 						alt="SMELLING MARSHMELLOW ICECREAM CONE"
 					/>
-				</Card.Media>
-				<Card.Body>
+				</CardMedia>
+				<CardBody>
 					<div>Content</div>
-				</Card.Body>
+				</CardBody>
 			</Card>
 			<br />
 
 			<Card style={ { width: 360 } } size="sm">
-				<Card.Header>
+				<CardHeader>
 					<div>Content</div>
-				</Card.Header>
-				<Card.Media>
+				</CardHeader>
+				<CardMedia>
 					<img
 						src="https://images.unsplash.com/photo-1570776765652-4ce2a88cc1f9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1350&q=80"
 						alt="SMELLING MARSHMELLOW ICECREAM CONE"
 					/>
-				</Card.Media>
+				</CardMedia>
 			</Card>
 			<br />
 
 			<Card style={ { width: 360 } } size="sm">
-				<Card.Header>
+				<CardHeader>
 					<div>Content</div>
-				</Card.Header>
-				<Card.Media>
+				</CardHeader>
+				<CardMedia>
 					<img
 						src="https://images.unsplash.com/photo-1570776765652-4ce2a88cc1f9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1350&q=80"
 						alt="SMELLING MARSHMELLOW ICECREAM CONE"
 					/>
-				</Card.Media>
-				<Card.Footer>
+				</CardMedia>
+				<CardFooter>
 					<div>Content</div>
-				</Card.Footer>
+				</CardFooter>
 			</Card>
 			<br />
 			<Card style={ { width: 360 } } size="sm">
-				<Card.Media>
+				<CardMedia>
 					<img
 						src="https://images.unsplash.com/photo-1570776765652-4ce2a88cc1f9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1350&q=80"
 						alt="SMELLING MARSHMELLOW ICECREAM CONE"
 					/>
-				</Card.Media>
+				</CardMedia>
 			</Card>
 
 			<br />
@@ -77,7 +82,7 @@ export const media = () => {
 			<br />
 			<br />
 			<Card style={ { width: 360 } }>
-				<Card.Media>
+				<CardMedia>
 					<iframe
 						width="560"
 						height="315"
@@ -87,7 +92,7 @@ export const media = () => {
 						allowFullScreen
 						title="CORGI!!!!!!!"
 					></iframe>
-				</Card.Media>
+				</CardMedia>
 			</Card>
 		</div>
 	);
@@ -111,13 +116,13 @@ export const divider = () => {
 	return (
 		<div>
 			<Card style={ { width: 360 } } { ...props }>
-				<Card.Body>
+				<CardBody>
 					<div>Content</div>
-				</Card.Body>
-				<Card.Divider />
-				<Card.Body>
+				</CardBody>
+				<CardDivider />
+				<CardBody>
 					<div>Content</div>
-				</Card.Body>
+				</CardBody>
 			</Card>
 		</div>
 	);
@@ -148,9 +153,13 @@ export const playground = () => {
 	return (
 		<>
 			<Card { ...props }>
-				{ header && <Card.Header isShady={ isHeaderShady }>{ header }</Card.Header> }
-				{ body && <Card.Body>{ body }</Card.Body> }
-				{ footer && <Card.Footer isShady={ isFooterShady }>{ footer }</Card.Footer> }
+				{ header && (
+					<CardHeader isShady={ isHeaderShady }>{ header }</CardHeader>
+				) }
+				{ body && <CardBody>{ body }</CardBody> }
+				{ footer && (
+					<CardFooter isShady={ isFooterShady }>{ footer }</CardFooter>
+				) }
 			</Card>
 		</>
 	);
@@ -158,10 +167,10 @@ export const playground = () => {
 
 export const blockDirectoryCard = () => {
 	return (
-		<Card size="sm">
-			<Card.Body>Stuff</Card.Body>
-			<Card.Divider />
-			<Card.Body isShady>Stuff</Card.Body>
+		<Card>
+			<CardBody size="sm">Stuff</CardBody>
+			<CardDivider />
+			<CardBody isShady>Stuff</CardBody>
 		</Card>
 	);
 };

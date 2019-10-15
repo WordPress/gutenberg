@@ -6,6 +6,10 @@ export { default as BaseControl } from './base-control';
 export { default as Button } from './button';
 export { default as ButtonGroup } from './button-group';
 export { default as Card } from './card';
+export { default as CardBody } from './card/body';
+export { default as CardDivider } from './card/divider';
+export { default as CardFooter } from './card/footer';
+export { default as CardMedia } from './card/media';
 export { default as CheckboxControl } from './checkbox-control';
 export { default as ClipboardButton } from './clipboard-button';
 export { default as ColorIndicator } from './color-indicator';
@@ -64,14 +68,28 @@ export { default as ToolbarButton } from './toolbar-button';
 export { default as Tooltip } from './tooltip';
 export { default as TreeSelect } from './tree-select';
 export { default as IsolatedEventContainer } from './isolated-event-container';
-export { createSlotFill, Slot, Fill, Provider as SlotFillProvider } from './slot-fill';
+export {
+	createSlotFill,
+	Slot,
+	Fill,
+	Provider as SlotFillProvider,
+} from './slot-fill';
 
 // Higher-Order Components
 export { default as navigateRegions } from './higher-order/navigate-regions';
-export { default as withConstrainedTabbing } from './higher-order/with-constrained-tabbing';
-export { default as withFallbackStyles } from './higher-order/with-fallback-styles';
+export {
+	default as withConstrainedTabbing,
+} from './higher-order/with-constrained-tabbing';
+export {
+	default as withFallbackStyles,
+} from './higher-order/with-fallback-styles';
 export { default as withFilters } from './higher-order/with-filters';
 export { default as withFocusOutside } from './higher-order/with-focus-outside';
-export { default as withFocusReturn, Provider as FocusReturnProvider } from './higher-order/with-focus-return';
+export {
+	default as withFocusReturn,
+	Provider as FocusReturnProvider,
+} from './higher-order/with-focus-return';
 export { default as withNotices } from './higher-order/with-notices';
-export { default as withSpokenMessages } from './higher-order/with-spoken-messages';
+export {
+	default as withSpokenMessages,
+} from './higher-order/with-spoken-messages';

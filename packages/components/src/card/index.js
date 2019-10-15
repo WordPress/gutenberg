@@ -7,12 +7,7 @@ import classnames from 'classnames';
  * Internal dependencies
  */
 import { CardProvider } from './context';
-import Body from './body';
-import Divider from './divider';
-import Footer from './footer';
-import Header from './header';
-import Media from './media';
-import { CardUI } from './styles/card.styles';
+import { CardUI } from './styles/card-styles';
 
 export const defaultProps = {
 	size: 'md',
@@ -40,12 +35,6 @@ export function Card( props ) {
 		</CardProvider>
 	);
 }
-
-Card.Body = Body;
-Card.Divider = Divider;
-Card.Footer = Footer;
-Card.Header = Header;
-Card.Media = Media;
 
 Card.defaultProps = defaultProps;
 

@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * Internal dependencies
  */
-import { FooterUI } from './styles/card.styles';
+import { FooterUI } from './styles/card-styles';
 import { useCardContext } from './context';
 
 export const defaultProps = {
@@ -14,7 +14,7 @@ export const defaultProps = {
 	size: 'md',
 };
 
-export function Footer( props ) {
+export function CardFooter( props ) {
 	const { className, isShady, ...additionalProps } = props;
 	const mergedProps = { ...defaultProps, ...useCardContext(), ...props };
 	const { size, variant } = mergedProps;
@@ -30,4 +30,4 @@ export function Footer( props ) {
 	return <FooterUI { ...additionalProps } className={ classes } />;
 }
 
-export default Footer;
+export default CardFooter;

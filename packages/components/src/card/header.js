@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * Internal dependencies
  */
-import { HeaderUI } from './styles/card.styles';
+import { HeaderUI } from './styles/card-styles';
 import { useCardContext } from './context';
 
 export const defaultProps = {
@@ -14,7 +14,7 @@ export const defaultProps = {
 	size: 'md',
 };
 
-export function Header( props ) {
+export function CardHeader( props ) {
 	const { className, isShady, ...additionalProps } = props;
 	const mergedProps = { ...defaultProps, ...useCardContext(), ...props };
 	const { size, variant } = mergedProps;
@@ -30,4 +30,4 @@ export function Header( props ) {
 	return <HeaderUI { ...additionalProps } className={ classes } />;
 }
 
-export default Header;
+export default CardHeader;

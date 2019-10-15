@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * Internal dependencies
  */
-import { BodyUI } from './styles/card.styles';
+import { BodyUI } from './styles/card-styles';
 import { useCardContext } from './context';
 
 export const defaultProps = {
@@ -14,7 +14,7 @@ export const defaultProps = {
 	size: 'md',
 };
 
-export function Body( props ) {
+export function CardBody( props ) {
 	const { className, isShady, ...additionalProps } = props;
 	const mergedProps = { ...defaultProps, ...useCardContext(), ...props };
 	const { size } = mergedProps;
@@ -29,4 +29,4 @@ export function Body( props ) {
 	return <BodyUI { ...additionalProps } className={ classes } />;
 }
 
-export default Body;
+export default CardBody;

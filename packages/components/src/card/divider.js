@@ -6,14 +6,21 @@ import classnames from 'classnames';
 /**
  * Internal dependencies
  */
-import { DividerUI } from './styles/card.styles';
+import { DividerUI } from './styles/card-styles';
 
-export function Divider( props ) {
+export function CardDivider( props ) {
 	const { className, ...additionalProps } = props;
 
 	const classes = classnames( 'components-card-divider', className );
 
-	return <DividerUI { ...additionalProps } className={ classes } role="separator" />;
+	return (
+		<DividerUI
+			{ ...additionalProps }
+			children={ null }
+			className={ classes }
+			role="separator"
+		/>
+	);
 }
 
-export default Divider;
+export default CardDivider;

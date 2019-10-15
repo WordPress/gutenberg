@@ -6,9 +6,9 @@ import classnames from 'classnames';
 /**
  * Internal dependencies
  */
-import { MediaUI } from './styles/card.styles';
+import { MediaUI } from './styles/card-styles';
 
-export function Media( props ) {
+export function CardMedia( props ) {
 	const { className, ...additionalProps } = props;
 
 	const classes = classnames( 'components-card-media', className );
@@ -16,4 +16,4 @@ export function Media( props ) {
 	return <MediaUI { ...additionalProps } className={ classes } />;
 }
 
-export default Media;
+export default CardMedia;
