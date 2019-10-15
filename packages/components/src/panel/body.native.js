@@ -18,24 +18,11 @@ export class PanelBody extends Component {
 		this.state = {};
 	}
 
-	getContainerStyle() {
-		const { title, padded = true } = this.props;
-
-		if ( padded && title ) {
-			return styles.paddedPanelContainer;
-		} else if ( padded && ! title ) {
-			return [ styles.paddedPanelContainer, styles.noTitleContainer ];
-		} else if ( ! padded && title ) {
-			return [ styles.panelContainer ];
-		}
-		return [ styles.panelContainer, styles.noTitleContainer ];
-	}
-
 	render() {
 		const { children, title } = this.props;
 
 		return (
-			<View style={ this.getContainerStyle() }>
+			<View style={ styles.panelContainer }>
 				{ title && <Text style={ styles.sectionHeaderText }>{ title }</Text> }
 				{ children }
 			</View>

@@ -20,6 +20,7 @@ import {
 	Toolbar,
 	ToolbarButton,
 	PanelBody,
+	PanelActions,
 } from '@wordpress/components';
 
 import {
@@ -206,6 +207,8 @@ class ImageEdit extends React.Component {
 		const { attributes, isSelected } = this.props;
 		const { url, height, width, alt, href, id } = attributes;
 
+		const actions = [ { label: 'Clear All Settings', onPress: this.onClearSettings, labelStyle: styles.clearSettingsButton } ];
+
 		const getToolbarEditButton = ( open ) => (
 			<BlockControls>
 				<Toolbar>
@@ -240,14 +243,7 @@ class ImageEdit extends React.Component {
 						onChangeValue={ this.updateAlt }
 					/>
 				</PanelBody>
-				<PanelBody padded={ false }>
-					<TextControl
-						label={ __( 'Clear All Settings' ) }
-						labelStyle={ styles.clearSettingsButton }
-						separatorType={ 'topFullWidth' }
-						onPress={ this.onClearSettings }
-					/>
-				</PanelBody>
+				<PanelActions actions={ actions } />
 			</InspectorControls>
 		);
 
