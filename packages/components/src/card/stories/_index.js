@@ -30,16 +30,14 @@ export const _default = () => {
 	const isFooterShady = boolean( 'Footer/Shady', false );
 
 	return (
-		<>
-			<Card { ...props }>
-				{ header && (
-					<CardHeader isShady={ isHeaderShady }>{ header }</CardHeader>
-				) }
-				{ body && <CardBody isShady={ isBodyShady }>{ body }</CardBody> }
-				{ footer && (
-					<CardFooter isShady={ isFooterShady }>{ footer }</CardFooter>
-				) }
-			</Card>
-		</>
+		<Card { ...props }>
+			{ header && (
+				<CardHeader isShady={ isHeaderShady }>{ header }</CardHeader>
+			) }
+			{ body && <CardBody isShady={ isBodyShady }>{ body }</CardBody> }
+			{ footer && (
+				<CardFooter isShady={ isFooterShady }>{ footer }</CardFooter>
+			) }
+		</Card>
 	);
 };
