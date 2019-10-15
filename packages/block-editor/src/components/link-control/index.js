@@ -28,6 +28,8 @@ import {
 	ENTER,
 } from '@wordpress/keycodes';
 
+import { safeDecodeURI, filterURLForDisplay } from '@wordpress/url';
+
 /**
  * Internal dependencies
  */
@@ -121,7 +123,7 @@ function LinkControl( { currentLink, fetchSearchSuggestions, renderAdditionalSet
 								<span className="block-editor-link-control__search-item-title">
 									<TextHighlight text={ suggestion.title } highlight={ inputValue } />
 								</span>
-								<span className="block-editor-link-control__search-item-info">{ suggestion.info || suggestion.url || '' }</span>
+								<span className="block-editor-link-control__search-item-info">{ suggestion.info || filterURLForDisplay( safeDecodeURI( suggestion.url ) ) || '' }</span>
 							</span>
 							<span className="block-editor-link-control__search-item-type">{ suggestion.type.toLowerCase() || '' }</span>
 						</button>
@@ -151,8 +153,12 @@ function LinkControl( { currentLink, fetchSearchSuggestions, renderAdditionalSet
 
 					{ ! isEditingLink && (
 						<div>
-							<p>The link is { currentLink.title } { currentLink.url }</p>
-							<button type="button" onClick={ onStartEditing }>Edit Link</button>
+							<URLPopover.LinkViewer
+								onKeyPress={ stopPropagation }
+								url={ currentLink.url }
+								onEditLinkClick={ onStartEditing }
+								urlLabel={ currentLink.title }
+							/>
 						</div>
 					) }
 
