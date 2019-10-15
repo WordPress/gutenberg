@@ -52,8 +52,8 @@ export const HeaderUI = styled.div`
 export const MediaUI = styled.div`
 	box-sizing: border-box;
 
-	img,
-	iframe {
+	& > img,
+	& > iframe {
 		display: block;
 		height: auto;
 		max-width: 100%;
