@@ -26,6 +26,7 @@ export const CardUI = styled.div`
 
 	&.is-variant {
 		&-raised {
+			border: none;
 			box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.2),
 				0px 1px 1px 0px rgba(0, 0, 0, 0.14),
 				0px 2px 1px -1px rgba(0, 0, 0, 0.12);
@@ -39,6 +40,10 @@ export const HeaderUI = styled.div`
 	border-top-right-radius: ${ borderRadius };
 	box-sizing: border-box;
 
+	&:last-child {
+		border-bottom: none;
+	}
+
 	${ headerFooterSizes };
 	${ handleBorderless };
 	${ handleShady };
@@ -50,8 +55,9 @@ export const MediaUI = styled.div`
 	img,
 	iframe {
 		display: block;
-		max-width: 100%;
 		height: auto;
+		max-width: 100%;
+		width: 100%;
 	}
 
 	&:first-child {
@@ -83,6 +89,10 @@ export const FooterUI = styled.div`
 	border-bottom-left-radius: ${ borderRadius };
 	border-bottom-right-radius: ${ borderRadius };
 	box-sizing: border-box;
+
+	&:first-child {
+		border-top: none;
+	}
 
 	${ headerFooterSizes };
 	${ handleBorderless };
@@ -137,10 +147,6 @@ export function handleBorderless() {
 	return `
 		&.is-variant {
 			&-borderless {
-				border: none;
-			}
-
-			&-raised {
 				border: none;
 			}
 		}
