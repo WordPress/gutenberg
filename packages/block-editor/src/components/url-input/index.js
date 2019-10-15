@@ -211,6 +211,10 @@ class URLInput extends Component {
 				break;
 			}
 		}
+
+		if ( isFunction( this.props.onKeyDown ) ) {
+			this.props.onKeyDown( event, suggestion );
+		}
 	}
 
 	selectLink( suggestion ) {
