@@ -32,6 +32,7 @@ import {
 	MEDIA_TYPE_IMAGE,
 	BlockControls,
 	InspectorControls,
+	BlockAlignmentToolbar,
 } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { isURL } from '@wordpress/url';
@@ -42,7 +43,7 @@ import { withPreferredColorScheme } from '@wordpress/compose';
  * Internal dependencies
  */
 import styles from './styles.scss';
-import SvgIcon from './icon';
+import SvgIcon, { editImageIcon } from './icon';
 import SvgIconRetry from './icon-retry';
 import { getUpdatedLinkTargetSettings } from './utils';
 
@@ -88,6 +89,7 @@ export class ImageEdit extends React.Component {
 		this.onImagePressed = this.onImagePressed.bind( this );
 		this.onClearSettings = this.onClearSettings.bind( this );
 		this.onFocusCaption = this.onFocusCaption.bind( this );
+		this.updateAlignment = this.updateAlignment.bind(this)
 	}
 
 	componentDidMount() {
@@ -182,6 +184,10 @@ export class ImageEdit extends React.Component {
 		this.props.setAttributes( { url, width: undefined, height: undefined } );
 	}
 
+	updateAlignment( nextAlign ) {
+		this.props.setAttributes( { align: nextAlign } )
+	}
+
 	onSetLinkDestination( href ) {
 		this.props.setAttributes( {
 			linkDestination: LINK_DESTINATION_CUSTOM,
@@ -238,17 +244,22 @@ export class ImageEdit extends React.Component {
 
 	render() {
 		const { attributes, isSelected } = this.props;
-		const { url, height, width, alt, href, id, linkTarget, sizeSlug } = attributes;
+		const { align, url, height, width, alt, href, id, linkTarget, sizeSlug } = attributes;
 
 		const getToolbarEditButton = ( open ) => (
 			<BlockControls>
 				<Toolbar>
 					<ToolbarButton
 						title={ __( 'Edit image' ) }
-						icon="edit"
+						icon={ editImageIcon }
 						onClick={ open }
 					/>
 				</Toolbar>
+				<BlockAlignmentToolbar
+					value={ align }
+					onChange={ this.updateAlignment }
+					isCollapsed={ false }
+				/>
 			</BlockControls>
 		);
 
@@ -312,6 +323,14 @@ export class ImageEdit extends React.Component {
 			);
 		}
 
+		const alignToFlex = {
+			left: 'flex-start',
+			center: 'center',
+			right: 'flex-end',
+			full: 'center',
+			wide: 'center',
+		};
+
 		const imageContainerHeight = Dimensions.get( 'window' ).width / IMAGE_ASPECT_RATIO;
 		const getImageComponent = ( openMediaOptions, getMediaOptions ) => (
 			<TouchableWithoutFeedback
@@ -346,7 +365,7 @@ export class ImageEdit extends React.Component {
 							);
 
 							return (
-								<View style={ { flex: 1 } } >
+								<View style={ { flex: 1, alignSelf: alignToFlex[align] } } >
 									{ ! imageWidthWithinContainer &&
 										<View style={ [ styles.imageContainer, { height: imageContainerHeight } ] } >
 											{ this.getIcon( false ) }
