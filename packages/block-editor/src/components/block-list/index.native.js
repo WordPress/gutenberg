@@ -20,7 +20,6 @@ import { KeyboardAwareFlatList, ReadableContentView } from '@wordpress/component
 import styles from './style.scss';
 import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
-import FloatingToolbar from './block-mobile-floating-toolbar';
 
 const innerToolbarHeight = 44;
 
@@ -43,7 +42,7 @@ export class BlockList extends Component {
 	}
 
 	blockHolderBorderStyle() {
-		return this.props.isFullyBordered || this.props.hasFullBorder ? styles.blockHolderFullBordered : styles.blockHolderSemiBordered;
+		return this.props.isFullyBordered ? styles.blockHolderFullBordered : styles.blockHolderSemiBordered;
 	}
 
 	onCaretVerticalPositionChange( targetId, caretY, previousCaretY ) {
@@ -70,15 +69,13 @@ export class BlockList extends Component {
 	}
 
 	render() {
-		const { clearSelectedBlock, blockClientIds, isFullyBordered, title, header, withFooter = true, renderAppender, isFirstBlock, selectedBlockParentId } = this.props;
+		const { clearSelectedBlock, blockClientIds, isFullyBordered, title, header, withFooter = true, renderAppender } = this.props;
 
-		const showFloatingToolbar = isFirstBlock && selectedBlockParentId !== '';
 		return (
 			<View
 				style={ { flex: 1 } }
 				onAccessibilityEscape={ clearSelectedBlock }
 			>
-				{ showFloatingToolbar && <FloatingToolbar.Slot fillProps={ { innerFloatingToolbar: showFloatingToolbar } } /> }
 				<KeyboardAwareFlatList
 					{ ...( Platform.OS === 'android' ? { removeClippedSubviews: false } : {} ) } // Disable clipping on Android to fix focus losing. See https://github.com/wordpress-mobile/gutenberg-mobile/pull/741#issuecomment-472746541
 					accessibilityLabel="block-list"
@@ -172,7 +169,6 @@ export default compose( [
 			getBlockInsertionPoint,
 			isBlockInsertionPointVisible,
 			getSelectedBlock,
-			getBlockRootClientId,
 		} = select( 'core/block-editor' );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
@@ -191,10 +187,6 @@ export default compose( [
 
 		const selectedBlockIndex = getBlockIndex( selectedBlockClientId, rootClientId );
 
-		const isFirstBlock = selectedBlockIndex === 0;
-
-		const selectedBlockParentId = getBlockRootClientId( selectedBlockClientId );
-
 		const shouldShowBlockAtIndex = ( index ) => {
 			const shouldHideBlockAtIndex = (
 				! isSelectedGroup && blockInsertionPointIsVisible &&
@@ -206,8 +198,6 @@ export default compose( [
 			return ! shouldHideBlockAtIndex;
 		};
 
-		const hasFullBorder = !! getBlockRootClientId( selectedBlockClientId ) || isSelectedGroup;
-
 		return {
 			blockClientIds,
 			blockCount: getBlockCount( rootClientId ),
@@ -215,10 +205,6 @@ export default compose( [
 			shouldShowBlockAtIndex,
 			shouldShowInsertionPoint,
 			selectedBlockClientId,
-			isFirstBlock,
-			rootClientId,
-			selectedBlockParentId,
-			hasFullBorder,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

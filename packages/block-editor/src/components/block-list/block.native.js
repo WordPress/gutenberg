@@ -169,7 +169,6 @@ class BlockListBlock extends Component {
 			title,
 			showFloatingToolbar,
 			parentId,
-			isFirstBlock,
 			isDashed,
 			isDimmed,
 			isInnerBlock,
@@ -183,7 +182,6 @@ class BlockListBlock extends Component {
 
 		return (
 			<>
-				{ showFloatingToolbar && ( ! isFirstBlock || parentId === '' ) && <FloatingToolbar.Slot /> }
 				{ showFloatingToolbar &&
 					( <FloatingToolbar>
 						<Toolbar passedStyle={ styles.toolbar }>
@@ -249,7 +247,6 @@ export default compose( [
 		} = select( 'core/block-editor' );
 		const order = getBlockIndex( clientId, rootClientId );
 		const isSelected = isBlockSelected( clientId );
-		const isFirstBlock = order === 0;
 		const isLastBlock = order === getBlocks().length - 1;
 		const block = __unstableGetBlockWithoutInnerBlocks( clientId );
 		const { name, attributes, isValid } = block || {};
@@ -292,7 +289,6 @@ export default compose( [
 			title,
 			attributes,
 			blockType,
-			isFirstBlock,
 			isLastBlock,
 			isSelected,
 			isValid,
