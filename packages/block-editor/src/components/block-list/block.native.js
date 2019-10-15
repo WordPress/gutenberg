@@ -40,11 +40,9 @@ class BlockListBlock extends Component {
 	}
 
 	onFocus() {
-		const { firstToSelect, isSelected, onSelect, isParentSelected, isMediaText } = this.props;
+		const { firstToSelectId, isSelected, onSelect } = this.props;
 		if ( ! isSelected ) {
-			if ( ! isMediaText || ! isParentSelected ) {
-				onSelect( firstToSelect );
-			}
+			onSelect( firstToSelectId );
 		}
 	}
 
@@ -71,6 +69,7 @@ class BlockListBlock extends Component {
 				mergeBlocks={ this.props.mergeBlocks }
 				onCaretVerticalPositionChange={ this.props.onCaretVerticalPositionChange }
 				clientId={ this.props.clientId }
+				isInnerBlock={ this.props.isInnerBlock }
 			/>
 		);
 	}
@@ -135,6 +134,7 @@ class BlockListBlock extends Component {
 			isChildOfSameRootBlook,
 			isGroupType,
 			parentId,
+			isMediaTextParent,
 		} = this.props;
 
 		if ( ! isDashed && isInnerBlock && ! isChildOfSameRootBlook ) {
@@ -142,6 +142,10 @@ class BlockListBlock extends Component {
 		}
 
 		const defaultStyle = [ isDashed ? styles.blockHolderDashedBordered : styles.blockContainer ];
+
+		if ( isMediaTextParent ) {
+			return [ ...defaultStyle, styles.blockContainerMediaTextInner ];
+		}
 
 		if ( isNestedInnerBlock ) {
 			if ( ! isDimmed || isDashed ) {
@@ -174,6 +178,7 @@ class BlockListBlock extends Component {
 			isInnerBlock,
 			isNestedInnerBlock,
 			isGroupType,
+			isMediaTextParent,
 		} = this.props;
 
 		const borderColor = isSelected ? focusedBorderColor : 'transparent';
@@ -202,8 +207,8 @@ class BlockListBlock extends Component {
 					<View style={ [
 						styles.blockHolder,
 						borderStyle,
-						isSelected && ( isGroupType || isInnerBlock || isNestedInnerBlock ) && styles.outlineBorderMargin,
-						isDashed && styles.dashedBorderMargin,
+						isSelected && ! isMediaTextParent && ( isGroupType || isInnerBlock || isNestedInnerBlock ) && styles.outlineBorderMargin,
+						isDashed && ! isMediaTextParent && styles.dashedBorderMargin,
 						isGroupType && styles.verticalPaddingNone,
 						{ borderColor },
 					]
@@ -268,18 +273,18 @@ export default compose( [
 
 		const showFloatingToolbar = isSelected && hasRootInnerBlocks && ! isMediaText && ! isMediaTextParent;
 
-		const firstToSelect = getFirstToSelectBlock( clientId );
+		const firstToSelectId = getFirstToSelectBlock( clientId );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 		const isRootSiblingsSelected = getBlockRootClientId( selectedBlockClientId ) === '';
 
-		const isDashed = selectedBlockClientId === parentId && ! isMediaTextParent;
-		const isDimmed = ! isSelected && ! isRootSiblingsSelected && !! selectedBlockClientId && firstToSelect === clientId && ! isDashed;
+		const isDashed = selectedBlockClientId === parentId;
+		const isDimmed = ! isSelected && ! isRootSiblingsSelected && !! selectedBlockClientId && firstToSelectId === clientId && ! isDashed;
 
-		const isInnerBlock = parentId && firstToSelect !== parentId;
+		const isInnerBlock = parentId && firstToSelectId !== parentId;
 		const isChildOfSameRootBlook = rootBlockId === getBlockHierarchyRootClientId( selectedBlockClientId );
-		const isNestedInnerBlock = ! isDashed && selectedBlockClientId === getBlockRootClientId( firstToSelect );
-		const isGroupType = blockType.name === 'core/group';
+		const isNestedInnerBlock = ! isDashed && selectedBlockClientId === getBlockRootClientId( firstToSelectId );
+		const isGroupType = blockType.name === 'core/group' || blockType.name === 'core/media-text';
 		const isParentSelected = parentId === selectedBlockClientId;
 
 		return {
@@ -297,12 +302,13 @@ export default compose( [
 			parentId,
 			isDashed,
 			isDimmed,
-			firstToSelect,
+			firstToSelectId,
 			isInnerBlock,
 			isChildOfSameRootBlook,
 			isNestedInnerBlock,
 			isGroupType,
 			isParentSelected,
+			isMediaTextParent,
 			isMediaText,
 		};
 	} ),

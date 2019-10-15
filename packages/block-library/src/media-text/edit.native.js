@@ -133,6 +133,7 @@ class MediaTextEdit extends Component {
 			backgroundColor,
 			setAttributes,
 			isMobile,
+			isSelected,
 		} = this.props;
 		const {
 			isStackedOnMobile,
@@ -150,6 +151,7 @@ class MediaTextEdit extends Component {
 			...( shouldStack ? styles[ 'is-stacked-on-mobile' ] : {} ),
 			...( shouldStack && mediaPosition === 'right' ? styles[ 'is-stacked-on-mobile.has-media-on-the-right' ] : {} ),
 			backgroundColor: backgroundColor.color,
+			...{ padding: isSelected ? 8 : 16 },
 		};
 		const innerBlockWidth = shouldStack ? 100 : ( 100 - temporaryMediaWidth );
 		const innerBlockWidthString = `${ innerBlockWidth }%`;
@@ -187,11 +189,19 @@ class MediaTextEdit extends Component {
 						{ this.renderMediaArea() }
 					</View>
 					<View style={ { width: innerBlockWidthString } }>
-						<InnerBlocks
-							allowedBlocks={ ALLOWED_BLOCKS }
-							template={ TEMPLATE }
-							templateInsertUpdatesSelection={ false }
-						/>
+						<View
+							style={ [
+								shouldStack && { marginTop: 12 },
+								! shouldStack && mediaPosition === 'right' && { marginRight: 12 },
+								! shouldStack && mediaPosition === 'left' && { marginLeft: 12 },
+							] }
+						>
+							<InnerBlocks
+								allowedBlocks={ ALLOWED_BLOCKS }
+								template={ TEMPLATE }
+								templateInsertUpdatesSelection={ false }
+							/>
+						</View>
 					</View>
 				</View>
 			</>

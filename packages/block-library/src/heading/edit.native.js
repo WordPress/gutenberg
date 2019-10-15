@@ -23,6 +23,7 @@ const HeadingEdit = ( {
 	onReplace,
 	setAttributes,
 	style,
+	isInnerBlock,
 } ) => (
 	<View onAccessibilityTap={ onFocus }>
 		<BlockControls>
@@ -57,6 +58,7 @@ const HeadingEdit = ( {
 			onReplace={ onReplace }
 			onRemove={ () => onReplace( [] ) }
 			placeholder={ attributes.placeholder || __( 'Write heading…' ) }
+			isInnerBlock={ isInnerBlock }
 		/>
 	</View>
 );

@@ -177,7 +177,7 @@ export default compose( [
 		const insertionPoint = getBlockInsertionPoint();
 		const blockInsertionPointIsVisible = isBlockInsertionPointVisible();
 		const selectedBlock = getSelectedBlock();
-		const isSelectedGroup = selectedBlock && selectedBlock.name === 'core/group';
+		const isSelectedGroup = selectedBlock && ( selectedBlock.name === 'core/group' || selectedBlock.name === 'core/media-text' );
 		const shouldShowInsertionPoint = ( clientId ) => {
 			return (
 				blockInsertionPointIsVisible &&

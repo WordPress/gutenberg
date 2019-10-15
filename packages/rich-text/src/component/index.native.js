@@ -111,6 +111,7 @@ export class RichText extends Component {
 			activeFormats: [],
 			selectedFormat: null,
 			height: 0,
+			isActive: ! this.props.isInnerBlock,
 		};
 		this.needsSelectionUpdate = false;
 		this.savedContent = '';
@@ -706,6 +707,7 @@ export class RichText extends Component {
 		//  to determine if we should focus the RichText.
 		if ( this.props.blockIsSelected && ! this.props.__unstableMobileNoFocusOnMount ) {
 			this._editor.focus();
+			this.setState( { isActive: true } );
 			this.onSelectionChange( this.props.selectionStart || 0, this.props.selectionEnd || 0 );
 		}
 	}
@@ -713,6 +715,7 @@ export class RichText extends Component {
 	componentWillUnmount() {
 		if ( this._editor.isFocused() && this.props.shouldBlurOnUnmount ) {
 			this._editor.blur();
+			this.setState( { isActive: false } );
 		}
 	}
 
@@ -731,11 +734,15 @@ export class RichText extends Component {
 
 		if ( isSelected && ! prevIsSelected ) {
 			this._editor.focus();
+			this.setState( { isActive: true } );
 			// Update selection props explicitly when component is selected as Aztec won't call onSelectionChange
 			// if its internal value hasn't change. When created, default value is 0, 0
 			this.onSelectionChange( this.props.selectionStart || 0, this.props.selectionEnd || 0 );
 		} else if ( ! isSelected && prevIsSelected ) {
 			this._editor.blur();
+			if ( this.props.isInnerBlock ) {
+				this.setState( { isActive: false } );
+			}
 		}
 	}
 
@@ -778,7 +785,6 @@ export class RichText extends Component {
 			children,
 			getStylesFromColorScheme,
 			blockIsSelected,
-			isParentSelected,
 		} = this.props;
 
 		const record = this.getRecord();
@@ -828,7 +834,7 @@ export class RichText extends Component {
 			this.firedAfterTextChanged = false;
 		}
 
-		const lockOnFocus = blockIsSelected || isParentSelected ? {} : { pointerEvents: 'none' };
+		const lockOnFocus = blockIsSelected || this.state.isActive ? {} : { pointerEvents: 'none' };
 
 		return (
 			<View>

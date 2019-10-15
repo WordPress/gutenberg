@@ -93,7 +93,7 @@ class MediaContainer extends Component {
 	}
 
 	renderPlaceholder() {
-		const { onSelectMedia, className, noticeUI } = this.props;
+		const { onSelectMedia, className, noticeUI, style } = this.props;
 		return (
 			<MediaPlaceholder
 				icon={ <BlockIcon icon={ icon } /> }
@@ -106,6 +106,7 @@ class MediaContainer extends Component {
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				notices={ noticeUI }
 				onError={ this.onUploadError }
+				style={ style }
 			/>
 		);
 	}
