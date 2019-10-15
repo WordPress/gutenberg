@@ -4,6 +4,11 @@
 import { castArray, get, isEqual, find } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import { dispatch } from '@wordpress/data';
+
+/**
  * Internal dependencies
  */
 import {
@@ -12,6 +17,7 @@ import {
 } from './queried-data';
 import { getKindEntities, DEFAULT_ENTITY_KEY } from './entities';
 import { select, apiFetch } from './controls';
+import gun from './gun';
 
 /**
  * Returns an action object used in signalling that authors have been received.
@@ -68,7 +74,7 @@ export function addEntities( entities ) {
  *
  * @return {Object} Action object.
  */
-export function receiveEntityRecords( kind, name, records, query, invalidateCache = false ) {
+export function* receiveEntityRecords( kind, name, records, query, invalidateCache = false ) {
 	// Auto drafts should not have titles, but some plugins rely on them so we can't filter this
 	// on the server.
 	if ( kind === 'postType' ) {
@@ -81,6 +87,34 @@ export function receiveEntityRecords( kind, name, records, query, invalidateCach
 		action = receiveQueriedItems( records, query );
 	} else {
 		action = receiveItems( records );
+	}
+
+	// Set up synced edits listeners the first time we receive a record.
+	const { key = DEFAULT_ENTITY_KEY, syncedEdits = {} } = yield select(
+		'getEntity',
+		kind,
+		name
+	);
+	for ( const record of castArray( records ) ) {
+		if ( ! ( yield select( 'getEntityRecord', kind, name, record[ key ] ) ) ) {
+			const gunRecord = gun
+				.get( kind )
+				.get( name )
+				.get( record[ key ] );
+			for ( const syncedEditsKey of Object.keys( syncedEdits ) ) {
+				gunRecord
+					.get( syncedEditsKey )
+					.openWithArrays( ( edit ) =>
+						dispatch( 'core' ).editEntityRecord(
+							kind,
+							name,
+							record[ key ],
+							{ [ syncedEditsKey ]: edit },
+							{ undoIgnore: true, syncIgnore: true }
+						)
+					);
+			}
+		}
 	}
 
 	return {
@@ -136,11 +170,11 @@ export function receiveEmbedPreview( url, preview ) {
  * @return {Object} Action object.
  */
 export function* editEntityRecord( kind, name, recordId, edits, options = {} ) {
-	const { transientEdits = {}, mergedEdits = {} } = yield select(
-		'getEntity',
-		kind,
-		name
-	);
+	const {
+		transientEdits = {},
+		mergedEdits = {},
+		syncedEdits = {},
+	} = yield select( 'getEntity', kind, name );
 	const record = yield select( 'getRawEntityRecord', kind, name, recordId );
 	const editedRecord = yield select(
 		'getEditedEntityRecord',
@@ -148,6 +182,20 @@ export function* editEntityRecord( kind, name, recordId, edits, options = {} ) {
 		name,
 		recordId
 	);
+
+	if ( ! options.syncIgnore ) {
+		// Broadcast any synced edits.
+		for ( const syncedEditsKey of Object.keys( syncedEdits ).filter( ( key ) =>
+			edits.hasOwnProperty( key )
+		) ) {
+			gun
+				.get( kind )
+				.get( name )
+				.get( recordId )
+				.get( syncedEditsKey )
+				.putWithArrays( edits[ syncedEditsKey ] );
+		}
+	}
 
 	const edit = {
 		kind,

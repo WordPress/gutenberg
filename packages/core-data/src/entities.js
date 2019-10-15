@@ -37,6 +37,7 @@ function* loadPostTypeEntities() {
 			name,
 			transientEdits: { blocks: true },
 			mergedEdits: { meta: true },
+			syncedEdits: { blocks: true },
 		};
 	} );
 }
