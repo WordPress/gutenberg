@@ -73,7 +73,6 @@ export class ImageEdit extends React.Component {
 
 		this.state = {
 			isCaptionSelected: false,
-			showImageOptions: false,
 		};
 
 		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind( this );
@@ -189,7 +188,7 @@ export class ImageEdit extends React.Component {
 			href,
 		} );
 	}
-	
+
 	onSetNewTab( value ) {
 		const updatedLinkTarget = getUpdatedLinkTargetSettings( value, this.props.attributes );
 		this.props.setAttributes( updatedLinkTarget );

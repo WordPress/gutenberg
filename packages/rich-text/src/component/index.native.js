@@ -826,8 +826,6 @@ export class RichText extends Component {
 			this.firedAfterTextChanged = false;
 		}
 
-		const dynamicStyle = getStylesFromColorScheme( style, styles.richTextDark );
-
 		return (
 			<View>
 				{ children && children( {
@@ -844,7 +842,7 @@ export class RichText extends Component {
 						}
 					} }
 					style={ {
-						...dynamicStyle,
+						...style,
 						minHeight: Math.max( minHeight, this.state.height ),
 					} }
 					text={ { text: html, eventCount: this.lastEventCount, selection } }
