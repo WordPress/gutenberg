@@ -80,6 +80,9 @@
 	.block-editor-url-input .components-base-control__field {
 		margin-bottom: 0;
 	}
+	.block-editor-url-input .components-spinner {
+		bottom: $input-padding + 1;
+	}
 }
 
 .block-editor-url-popover__link-viewer-url {

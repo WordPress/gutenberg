@@ -273,7 +273,7 @@ class URLInput extends Component {
 			selectedSuggestion,
 			loading,
 		} = this.state;
-		const baseControlId = `url-input-control-${ instanceId }`;
+		const id = `url-input-control-${ instanceId }`;
 
 		const suggestionsListboxId = `block-editor-url-input-suggestions-${ instanceId }`;
 		const suggestionOptionIdPrefix = `block-editor-url-input-suggestion-${ instanceId }`;
@@ -298,7 +298,7 @@ class URLInput extends Component {
 		return (
 			<BaseControl
 				label={ label }
-				id={ baseControlId }
+				id={ id }
 				className={ classnames( 'editor-url-input block-editor-url-input', className, {
 					'is-full-width': isFullWidth,
 					'has-border': hasBorder,
