@@ -13,7 +13,7 @@ import {
  */
 import classnames from 'classnames';
 import { __ } from '@wordpress/i18n';
-import { isFunction, partialRight } from 'lodash';
+import { isFunction, partial, partialRight, noop } from 'lodash';
 
 import {
 	useCallback,
@@ -42,7 +42,7 @@ import {
 
 import TextHighlight from './text-highlight';
 
-function LinkControl( { currentLink, fetchSearchSuggestions, renderAdditionalSettings, onLinkChange } ) {
+function LinkControl( { currentLink, fetchSearchSuggestions, renderAdditionalSettings, onLinkChange, onSettingChange = { noop }, linkSettings } ) {
 	// State
 	const [ inputValue, setInputValue ] = useState( '' );
 	const [ isEditingLink, setIsEditingLink ] = useState( true );
@@ -140,7 +140,8 @@ function LinkControl( { currentLink, fetchSearchSuggestions, renderAdditionalSet
 		<div className="block-editor-link-control__settings">
 			<ToggleControl
 				label={ __( 'Open in New Tab' ) }
-				checked={ false } />
+				onChange={ partial( onSettingChange, 'new-tab' ) }
+				checked={ linkSettings[ 'new-tab' ] } />
 			{ isFunction( renderAdditionalSettings ) && renderAdditionalSettings() }
 		</div>
 	);
