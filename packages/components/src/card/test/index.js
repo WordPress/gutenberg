@@ -64,7 +64,7 @@ describe( 'Card', () => {
 			expect( cardBody.text() ).toBe( 'Hello' );
 		} );
 
-		test( 'should receive modifer props from context', () => {
+		test( 'should receive modifier props from context', () => {
 			const card = mount(
 				<Card size="xs">
 					<CardBody>Hello</CardBody>
@@ -100,7 +100,7 @@ describe( 'Card', () => {
 			expect( cardHeader.text() ).toBe( 'Hello' );
 		} );
 
-		test( 'should receive modifer props from context', () => {
+		test( 'should receive modifier props from context', () => {
 			const card = mount(
 				<Card size="xs" variant="borderless">
 					<CardHeader>Hello</CardHeader>
@@ -140,7 +140,7 @@ describe( 'Card', () => {
 			expect( cardFooter.text() ).toBe( 'Hello' );
 		} );
 
-		test( 'should receive modifer props from context', () => {
+		test( 'should receive modifier props from context', () => {
 			const card = mount(
 				<Card size="xs" variant="borderless">
 					<CardFooter>Hello</CardFooter>
