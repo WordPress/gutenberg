@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+
+/**
  * Internal dependencies
  */
 import createNonceMiddleware from './middlewares/nonce';
@@ -78,9 +83,22 @@ const defaultFetchHandler = ( nextOptions ) => {
 	);
 
 	return responsePromise
-		.then( checkStatus )
-		.catch( ( response ) => parseAndThrowError( response, parse ) )
-		.then( ( response ) => parseResponseAndNormalizeError( response, parse ) );
+		// Return early if fetch errors. If fetch error, there is most likely no
+		// network connection. Unfortunately fetch just throws a TypeError and
+		// the message might depend on the browser.
+		.then(
+			( response ) =>
+				Promise.resolve( response )
+					.then( checkStatus )
+					.catch( ( response ) => parseAndThrowError( response, parse ) )
+					.then( ( response ) => parseResponseAndNormalizeError( response, parse ) ),
+			() => {
+				throw {
+					code: 'fetch_error',
+					message: __( 'You are probably offline.' ),
+				};
+			}
+		);
 };
 
 let fetchHandler = defaultFetchHandler;

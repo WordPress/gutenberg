@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -108,10 +108,11 @@ export function getNotificationArgumentsForSaveFail( data ) {
 	// Check if message string contains HTML. Notice text is currently only
 	// supported as plaintext, and stripping the tags may muddle the meaning.
 	if ( error.message && ! ( /<\/?[^>]*>/.test( error.message ) ) ) {
-		noticeMessage = sprintf( __( '%1$s Error message: %2$s' ), noticeMessage, error.message );
+		noticeMessage = [ noticeMessage, error.message ].join( ' ' );
 	}
 	return [ noticeMessage, {
 		id: SAVE_POST_NOTICE_ID,
+		type: 'snackbar',
 	} ];
 }
 
