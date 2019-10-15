@@ -273,6 +273,19 @@ _Returns_
 
 -   `string`: The block's default class.
 
+<a name="getBlockFromExample" href="#getBlockFromExample">#</a> **getBlockFromExample**
+
+Create a block object from the example API.
+
+_Parameters_
+
+-   _name_ `string`: 
+-   _example_ `Object`: 
+
+_Returns_
+
+-   `Object`: block.
+
 <a name="getBlockMenuDefaultClassName" href="#getBlockMenuDefaultClassName">#</a> **getBlockMenuDefaultClassName**
 
 Returns the block's default menu item classname from its name.

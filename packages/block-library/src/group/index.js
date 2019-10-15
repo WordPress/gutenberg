@@ -22,12 +22,66 @@ export const settings = {
 	icon,
 	description: __( 'A block that groups other blocks.' ),
 	keywords: [ __( 'container' ), __( 'wrapper' ), __( 'row' ), __( 'section' ) ],
+	example: {
+		attributes: {
+			customBackgroundColor: '#ffffff',
+		},
+		innerBlocks: [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					customTextColor: '#cf2e2e',
+					fontSize: 'large',
+					content: __( 'One.' ),
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					customTextColor: '#ff6900',
+					fontSize: 'large',
+					content: __( 'Two.' ),
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					customTextColor: '#fcb900',
+					fontSize: 'large',
+					content: __( 'Three.' ),
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					customTextColor: '#00d084',
+					fontSize: 'large',
+					content: __( 'Four.' ),
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					customTextColor: '#0693e3',
+					fontSize: 'large',
+					content: __( 'Five.' ),
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					customTextColor: '#9b51e0',
+					fontSize: 'large',
+					content: __( 'Six.' ),
+				},
+			},
+		],
+	},
 	supports: {
 		align: [ 'wide', 'full' ],
 		anchor: true,
 		html: false,
 	},
-
 	transforms: {
 		from: [
 			{
@@ -43,9 +97,9 @@ export const settings = {
 					const alignments = [ 'wide', 'full' ];
 
 					// Determine the widest setting of all the blocks to be grouped
-					const widestAlignment = blocks.reduce( ( result, block ) => {
+					const widestAlignment = blocks.reduce( ( accumulator, block ) => {
 						const { align } = block.attributes;
-						return alignments.indexOf( align ) > alignments.indexOf( result ) ? align : result;
+						return alignments.indexOf( align ) > alignments.indexOf( accumulator ) ? align : accumulator;
 					}, undefined );
 
 					// Clone the Blocks to be Grouped

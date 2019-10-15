@@ -34,6 +34,7 @@ import {
 	createBlock,
 	isUnmodifiedDefaultBlock,
 	getBlockType,
+	getBlockFromExample,
 } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withInstanceId, compose, withSafeTimeout } from '@wordpress/compose';
@@ -262,10 +263,13 @@ export class InserterMenu extends Component {
 			openPanels,
 			reusableItems,
 			suggestedItems,
+			filterValue,
 		} = this.state;
+
 		const isPanelOpen = ( panel ) => openPanels.indexOf( panel ) !== -1;
-		const hasItems = isEmpty( suggestedItems ) && isEmpty( reusableItems ) && isEmpty( itemsPerCategory );
+		const hasItems = ! isEmpty( suggestedItems ) || ! isEmpty( reusableItems ) || ! isEmpty( itemsPerCategory );
 		const hoveredItemBlockType = hoveredItem ? getBlockType( hoveredItem.name ) : null;
+		const hasHelpPanel = hasItems && showInserterHelpPanel;
 
 		// Disable reason (no-autofocus): The inserter menu is a modal display, not one which
 		// is always visible, and one which already incurs this behavior of autoFocus via
@@ -276,7 +280,7 @@ export class InserterMenu extends Component {
 		return (
 			<div
 				className={ classnames( 'editor-inserter__menu block-editor-inserter__menu', {
-					'has-help-panel': showInserterHelpPanel,
+					'has-help-panel': hasHelpPanel,
 				} ) }
 				onKeyPress={ stopKeyPropagation }
 				onKeyDown={ this.onKeyDown }
@@ -362,7 +366,7 @@ export class InserterMenu extends Component {
 							fillProps={ {
 								onSelect,
 								onHover: this.onHover,
-								filterValue: this.state.filterValue,
+								filterValue,
 								hasItems,
 							} }
 						>
@@ -370,7 +374,7 @@ export class InserterMenu extends Component {
 								if ( fills.length ) {
 									return fills;
 								}
-								if ( hasItems ) {
+								if ( ! hasItems ) {
 									return (
 										<p className="editor-inserter__no-results block-editor-inserter__no-results">{ __( 'No blocks found.' ) }</p>
 									);
@@ -381,27 +385,32 @@ export class InserterMenu extends Component {
 					</div>
 				</div>
 
-				{ showInserterHelpPanel && (
+				{ hasHelpPanel && (
 					<div className="block-editor-inserter__menu-help-panel">
 						{ hoveredItem && (
 							<>
 								{ ! isReusableBlock( hoveredItem ) && (
 									<BlockCard blockType={ hoveredItemBlockType } />
 								) }
-								{ ( isReusableBlock( hoveredItem ) || hoveredItemBlockType.example ) && (
-									<div className="block-editor-inserter__preview">
+								<div className="block-editor-inserter__preview">
+									{ ( isReusableBlock( hoveredItem ) || hoveredItemBlockType.example ) ? (
 										<div className="block-editor-inserter__preview-content">
 											<BlockPreview
+												padding={ 10 }
 												viewportWidth={ 500 }
-												blocks={ createBlock(
-													hoveredItem.name,
-													hoveredItemBlockType.example ? hoveredItemBlockType.example.attributes : hoveredItem.initialAttributes,
-													hoveredItemBlockType.example ? hoveredItemBlockType.example.innerBlocks : undefined
-												) }
+												blocks={
+													hoveredItemBlockType.example ?
+														getBlockFromExample( hoveredItem.name, hoveredItemBlockType.example ) :
+														createBlock( hoveredItem.name, hoveredItem.initialAttributes )
+												}
 											/>
 										</div>
-									</div>
-								) }
+									) : (
+										<div className="block-editor-inserter__preview-content-missing">
+											{ __( 'No Preview Available.' ) }
+										</div>
+									) }
+								</div>
 							</>
 						) }
 						{ ! hoveredItem && (

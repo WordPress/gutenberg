@@ -24,6 +24,11 @@ export const settings = {
 	supports: {
 		className: false,
 	},
+	example: {
+		attributes: {
+			values: '<li>Alice.</li><li>The White Rabbit.</li><li>The Cheshire Cat.</li><li>The Mad Hatter.</li><li>The Queen of Hearts.</li>',
+		},
+	},
 	transforms,
 	merge( attributes, attributesToMerge ) {
 		const { values } = attributesToMerge;

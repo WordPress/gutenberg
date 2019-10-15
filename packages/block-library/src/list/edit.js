@@ -35,12 +35,8 @@ export default function ListEdit( {
 	const { ordered, values, reversed, start } = attributes;
 	const tagName = ordered ? 'ol' : 'ul';
 
-	const controls = ( { value, onChange } ) => {
-		if ( value.start === undefined ) {
-			return;
-		}
-
-		return <>
+	const controls = ( { value, onChange } ) => (
+		<>
 			<RichTextShortcut
 				type="primary"
 				character="["
@@ -115,8 +111,8 @@ export default function ListEdit( {
 					] }
 				/>
 			</BlockControls>
-		</>;
-	};
+		</>
+	);
 
 	return <>
 		<RichText
@@ -125,7 +121,6 @@ export default function ListEdit( {
 			tagName={ tagName }
 			onChange={ ( nextValues ) => setAttributes( { values: nextValues } ) }
 			value={ values }
-			wrapperClassName="block-library-list"
 			className={ className }
 			placeholder={ __( 'Write list…' ) }
 			onMerge={ mergeBlocks }

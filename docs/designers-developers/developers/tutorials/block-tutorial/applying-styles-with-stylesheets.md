@@ -37,7 +37,7 @@ The editor will automatically generate a class name for each block type to simpl
 ```
 {% ESNext %}
 ```js
-const { registerBlockType } = wp.blocks;
+import { registerBlockType } from '@wordpress/blocks';
 
 registerBlockType( 'gutenberg-examples/example-02-stylesheets', {
 	title: 'Example: Stylesheets',

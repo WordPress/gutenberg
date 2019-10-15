@@ -11,6 +11,7 @@ import { waitForWindowDimensions } from './wait-for-window-dimensions';
 export async function setBrowserViewport( type ) {
 	const allowedDimensions = {
 		large: { width: 960, height: 700 },
+		medium: { width: 768, height: 700 },
 		small: { width: 600, height: 700 },
 	};
 	const currentDimension = allowedDimensions[ type ];

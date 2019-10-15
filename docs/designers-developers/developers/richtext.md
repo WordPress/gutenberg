@@ -61,8 +61,8 @@ wp.blocks.registerBlockType( /* ... */, {
 ```
 {% ESNext %}
 ```js
-const { registerBlockType } = wp.blocks;
-const { RichText } = wp.editor;
+import { registerBlockType } from '@wordpress/blocks';
+import { RichText } from '@wordpress/block-editor';
 
 registerBlockType( /* ... */, {
 	// ...

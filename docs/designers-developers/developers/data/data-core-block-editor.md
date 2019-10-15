@@ -703,7 +703,7 @@ _Returns_
 Returns true if the block corresponding to the specified client ID is
 currently selected but isn't the last of the selected blocks. Here "last"
 refers to the block sequence in the document, _not_ the sequence of
-multi-selection, which is why `state.blockSelection.end` isn't used.
+multi-selection, which is why `state.selectionEnd` isn't used.
 
 _Parameters_
 

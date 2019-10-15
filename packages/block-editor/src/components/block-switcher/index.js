@@ -8,7 +8,7 @@ import { castArray, filter, first, mapKeys, orderBy, uniq, map } from 'lodash';
  */
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { Dropdown, IconButton, Toolbar, PanelBody, Path, SVG } from '@wordpress/components';
-import { getBlockType, getPossibleBlockTransformations, switchToBlockType, cloneBlock, createBlock } from '@wordpress/blocks';
+import { getBlockType, getPossibleBlockTransformations, switchToBlockType, cloneBlock, getBlockFromExample } from '@wordpress/blocks';
 import { Component } from '@wordpress/element';
 import { DOWN } from '@wordpress/keycodes';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -171,7 +171,10 @@ export class BlockSwitcher extends Component {
 									viewportWidth={ 500 }
 									blocks={
 										hoveredBlockType.example ?
-											createBlock( hoveredBlock.name, { ...hoveredBlockType.example.attributes, className: hoveredClassName }, hoveredBlockType.example.innerBlocks ) :
+											getBlockFromExample( hoveredBlock.name, {
+												attributes: { ...hoveredBlockType.example.attributes, className: hoveredClassName },
+												innerBlocks: hoveredBlockType.example.innerBlocks,
+											} ) :
 											cloneBlock( hoveredBlock, { className: hoveredClassName } )
 									}
 								/>

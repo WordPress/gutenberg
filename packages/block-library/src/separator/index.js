@@ -21,6 +21,13 @@ export const settings = {
 	description: __( 'Create a break between ideas or sections with a horizontal separator.' ),
 	icon,
 	keywords: [ __( 'horizontal-line' ), 'hr', __( 'divider' ) ],
+	example: {
+		attributes: {
+			customColor: '#065174',
+			className: 'is-style-wide',
+
+		},
+	},
 	styles: [
 		{ name: 'default', label: __( 'Default' ), isDefault: true },
 		{ name: 'wide', label: __( 'Wide Line' ) },

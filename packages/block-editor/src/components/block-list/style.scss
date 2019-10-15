@@ -448,7 +448,7 @@
 	// Left
 	&[data-align="left"] {
 		// This is in the editor only; the image should be floated on the frontend.
-		.block-editor-block-list__block-edit {
+		> .block-editor-block-list__block-edit {
 			/*!rtl:begin:ignore*/
 			float: left;
 			margin-right: 2em;
@@ -1235,9 +1235,12 @@
 	margin-bottom: -$block-padding;
 	transform: translateY(-$block-padding);
 
-	// Bigger padding on mobile where blocks are edge to edge.
-	padding: 10px $block-padding;
-	@include break-small() {
-		padding: 10px $block-padding;
+	&.block-editor-block-list__block-crash-warning {
+		// The block crash warning has no block preview underneath it.
+		// The lack of a preview combined with the negative margin that
+		// the warning normally has results in crashed blocks overlapping
+		// any blocks that come after them. Resetting the margin to `auto`
+		// solves this.
+		margin-bottom: auto;
 	}
 }

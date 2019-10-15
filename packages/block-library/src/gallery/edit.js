@@ -273,7 +273,7 @@ class GalleryEdit extends Component {
 				addToGallery={ hasImagesWithId }
 				isAppender={ hasImages }
 				className={ className }
-				dropZoneUIOnly={ hasImages && ! isSelected }
+				disableMediaButtons={ hasImages && ! isSelected }
 				icon={ ! hasImages && <BlockIcon icon={ icon } /> }
 				labels={ {
 					title: ! hasImages && __( 'Gallery' ),

@@ -14,7 +14,6 @@ import {
 	navigateRegions,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { PreserveScrollInReorder } from '@wordpress/block-editor';
 import {
 	AutosaveMonitor,
 	LocalAutosaveMonitor,
@@ -88,7 +87,6 @@ function Layout( {
 				tabIndex="-1"
 			>
 				<EditorNotices />
-				<PreserveScrollInReorder />
 				<EditorModeKeyboardShortcuts />
 				<KeyboardShortcutHelpModal />
 				<ManageBlocksModal />

@@ -107,12 +107,10 @@ describe( 'effects', () => {
 			};
 			const dispatch = jest.fn();
 			const getState = () => ( {
-				blockSelection: {
-					start: {
-						clientId: blockB.clientId,
-						attributeKey: 'content',
-						offset: 0,
-					},
+				selectionStart: {
+					clientId: blockB.clientId,
+					attributeKey: 'content',
+					offset: 0,
 				},
 			} );
 			handler( mergeBlocks( blockA.clientId, blockB.clientId ), { dispatch, getState } );
@@ -171,12 +169,10 @@ describe( 'effects', () => {
 			};
 			const dispatch = jest.fn();
 			const getState = () => ( {
-				blockSelection: {
-					start: {
-						clientId: blockB.clientId,
-						attributeKey: 'content',
-						offset: 0,
-					},
+				selectionStart: {
+					clientId: blockB.clientId,
+					attributeKey: 'content',
+					offset: 0,
 				},
 			} );
 			handler( mergeBlocks( blockA.clientId, blockB.clientId ), { dispatch, getState } );
@@ -238,12 +234,10 @@ describe( 'effects', () => {
 			};
 			const dispatch = jest.fn();
 			const getState = () => ( {
-				blockSelection: {
-					start: {
-						clientId: blockB.clientId,
-						attributeKey: 'content2',
-						offset: 0,
-					},
+				selectionStart: {
+					clientId: blockB.clientId,
+					attributeKey: 'content2',
+					offset: 0,
 				},
 			} );
 			handler( mergeBlocks( blockA.clientId, blockB.clientId ), { dispatch, getState } );
