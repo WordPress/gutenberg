@@ -14,7 +14,7 @@ import {
 /**
  * Internal dependencies
  */
-import styles from './action.scss';
+import styles from './actions.scss';
 
 function PanelActions( { actions } ) {
 	return (
