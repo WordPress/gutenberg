@@ -11,7 +11,7 @@ import {
  */
 import classnames from 'classnames';
 import { __ } from '@wordpress/i18n';
-import { isFunction } from 'lodash';
+import { isFunction, partialRight } from 'lodash';
 
 import {
 	useCallback,
@@ -38,9 +38,10 @@ import {
 
 import TextHighlight from './text-highlight';
 
-function LinkControl( { fetchSearchSuggestions, renderAdditionalSettings } ) {
+function LinkControl( { currentLink, fetchSearchSuggestions, renderAdditionalSettings, onLinkChange } ) {
 	// State
 	const [ inputValue, setInputValue ] = useState( '' );
+	const [ isEditingLink, setIsEditingLink ] = useState( true );
 
 	// Refs
 	const autocompleteRef = useRef( null );
@@ -51,11 +52,26 @@ function LinkControl( { fetchSearchSuggestions, renderAdditionalSettings } ) {
 	};
 
 	const closeLinkUI = () => {
-		setInputValue( '' );
+		resetInput();
 	};
 
-	const onSubmitLinkChange = ( value ) => {
-		setInputValue( value );
+	const resetInput = useCallback( () => {
+		setInputValue( '' );
+	} );
+
+	const onLinkSelect = ( event, suggestion ) => {
+		event.preventDefault();
+		event.stopPropagation();
+
+		setIsEditingLink( false );
+
+		if ( isFunction( onLinkChange ) ) {
+			onLinkChange( suggestion );
+		}
+	};
+
+	const onStartEditing = () => {
+		setIsEditingLink( true );
 	};
 
 	const handleURLSearch = async ( value ) => {
@@ -84,7 +100,7 @@ function LinkControl( { fetchSearchSuggestions, renderAdditionalSettings } ) {
 	}, [ handleURLSearch, fetchSearchSuggestions ] );
 
 	// Render Components
-	const renderSearchResults = ( { suggestionsListProps, buildSuggestionItemProps, suggestions, selectedSuggestion, handleSuggestionClick } ) => {
+	const renderSearchResults = ( { suggestionsListProps, buildSuggestionItemProps, suggestions, selectedSuggestion } ) => {
 		/* eslint-disable react/jsx-key */
 		return (
 			<div className="block-editor-link-control__search-results-wrapper">
@@ -92,7 +108,7 @@ function LinkControl( { fetchSearchSuggestions, renderAdditionalSettings } ) {
 					{ suggestions.map( ( suggestion, index ) => (
 						<button
 							{ ...buildSuggestionItemProps( suggestion, index ) }
-							onClick={ () => handleSuggestionClick( suggestion ) }
+							onClick={ partialRight( onLinkSelect, suggestion ) }
 							className={ classnames( 'block-editor-link-control__search-item', {
 								'is-selected': index === selectedSuggestion,
 							} ) }
@@ -133,33 +149,40 @@ function LinkControl( { fetchSearchSuggestions, renderAdditionalSettings } ) {
 			<div className="block-editor-link-control__popover-inner">
 				<div className="block-editor-link-control__search">
 
-					<form
-						onSubmit={ onSubmitLinkChange }
-					>
-						<URLInput
-							className="block-editor-link-control__search-input"
-							value={ inputValue }
-							onChange={ onInputChange }
-							autocompleteRef={ autocompleteRef }
-							onKeyDown={ stopPropagationRelevantKeys }
-							onKeyPress={ stopPropagation }
-							placeholder={ __( 'Search or type url' ) }
-							renderSuggestions={ renderSearchResults }
-							fetchLinkSuggestions={ getSearchHandler }
-							handleURLSuggestions={ true }
-						/>
+					{ ! isEditingLink && (
+						<div>
+							<p>The link is { currentLink.title } { currentLink.url }</p>
+							<button type="button" onClick={ onStartEditing }>Edit Link</button>
+						</div>
+					) }
 
-						<IconButton
-							disabled={ ! inputValue.length }
-							type="reset"
-							label={ __( 'Reset' ) }
-							icon="no-alt"
-							className="block-editor-link-control__search-reset"
-							onClick={ () => onInputChange( undefined ) }
-						/>
+					{ isEditingLink && (
+						<form>
+							<URLInput
+								className="block-editor-link-control__search-input"
+								value={ inputValue }
+								onChange={ onInputChange }
+								autocompleteRef={ autocompleteRef }
+								onKeyDown={ stopPropagationRelevantKeys }
+								onKeyPress={ stopPropagation }
+								placeholder={ __( 'Search or type url' ) }
+								renderSuggestions={ renderSearchResults }
+								fetchLinkSuggestions={ getSearchHandler }
+								handleURLSuggestions={ true }
+							/>
 
-						{ inputValue && <LinkControlAdditionalSettings /> }
-					</form>
+							<IconButton
+								disabled={ ! inputValue.length }
+								type="reset"
+								label={ __( 'Reset' ) }
+								icon="no-alt"
+								className="block-editor-link-control__search-reset"
+								onClick={ resetInput }
+							/>
+
+							{ inputValue && <LinkControlAdditionalSettings /> }
+						</form>
+					) }
 				</div>
 			</div>
 		</URLPopover>
