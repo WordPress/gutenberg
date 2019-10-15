@@ -163,7 +163,12 @@ function LinkControl( { currentLink, fetchSearchSuggestions, renderAdditionalSet
 								value={ inputValue }
 								onChange={ onInputChange }
 								autocompleteRef={ autocompleteRef }
-								onKeyDown={ stopPropagationRelevantKeys }
+								onKeyDown={ ( event, suggestion ) => {
+									stopPropagationRelevantKeys( event );
+									if ( event.keyCode === ENTER ) {
+										onLinkSelect( event, suggestion );
+									}
+								} }
 								onKeyPress={ stopPropagation }
 								placeholder={ __( 'Search or type url' ) }
 								renderSuggestions={ renderSearchResults }
