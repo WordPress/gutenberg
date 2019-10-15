@@ -237,9 +237,9 @@ export const getGlobalBlockCount = createSelector(
 		if ( ! blockName ) {
 			return clientIds.length;
 		}
-		return reduce( clientIds, ( count, clientId ) => {
+		return reduce( clientIds, ( accumulator, clientId ) => {
 			const block = state.blocks.byClientId[ clientId ];
-			return block.name === blockName ? count + 1 : count;
+			return block.name === blockName ? accumulator + 1 : accumulator;
 		}, 0 );
 	},
 	( state ) => [
