@@ -22,7 +22,6 @@
 	"react-native": "src/index",
 	"dependencies": {
 		"@babel/runtime": "^7.4.4",
-		"@storybook/addon-knobs": "5.2.4",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/deprecated": "file:../deprecated",
@@ -46,6 +45,9 @@
 		"rememo": "^3.0.0",
 		"tinycolor2": "^1.4.1",
 		"uuid": "^3.3.2"
+	},
+	"devDependencies": {
+		"@storybook/addon-knobs": "5.2.4"
 	},
 	"publishConfig": {
 		"access": "public"
