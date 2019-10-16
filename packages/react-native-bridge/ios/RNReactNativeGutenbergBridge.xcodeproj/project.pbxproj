@@ -31,8 +31,6 @@
 		7EA30CED21AC8C240092F894 /* RNReactNativeGutenbergBridge-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RNReactNativeGutenbergBridge-Bridging-Header.h"; sourceTree = "<group>"; };
 		7EA30CEE21AC8C250092F894 /* Gutenberg.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Gutenberg.swift; sourceTree = "<group>"; };
 		7EA30CF221AC91E20092F894 /* RNReactNativeGutenbergBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNReactNativeGutenbergBridge.swift; sourceTree = "<group>"; };
-		7EA30D8821AD60CA0092F894 /* libRNTAztecView.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libRNTAztecView.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		7EA30D9721AD69370092F894 /* libRNTAztecView.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libRNTAztecView.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		7EA30DA621AD7A100092F894 /* GutenbergBridgeDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GutenbergBridgeDelegate.swift; sourceTree = "<group>"; };
 		7EA30DA821AD7A2F0092F894 /* GutenbergBridgeDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GutenbergBridgeDataSource.swift; sourceTree = "<group>"; };
 		B3E7B5891CC2AC0600A0062D /* RNReactNativeGutenbergBridge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNReactNativeGutenbergBridge.m; sourceTree = "<group>"; };
@@ -67,17 +65,7 @@
 				7EA30CEE21AC8C250092F894 /* Gutenberg.swift */,
 				7EA30CED21AC8C240092F894 /* RNReactNativeGutenbergBridge-Bridging-Header.h */,
 				134814211AA4EA7D00B7C361 /* Products */,
-				7EA30D8721AD60CA0092F894 /* Frameworks */,
 			);
-			sourceTree = "<group>";
-		};
-		7EA30D8721AD60CA0092F894 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				7EA30D9721AD69370092F894 /* libRNTAztecView.a */,
-				7EA30D8821AD60CA0092F894 /* libRNTAztecView.a */,
-			);
-			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

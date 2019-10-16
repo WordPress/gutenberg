@@ -32,7 +32,7 @@ module.exports = function( api ) {
 				// Auto-add `import { createElement } from '@wordpress/element';` when JSX is found
 				plugins: [
 					[
-						'./gutenberg/packages/babel-plugin-import-jsx-pragma',
+						'@wordpress/babel-plugin-import-jsx-pragma',
 						{
 							scopeVariable: 'createElement',
 							scopeVariableFrag: 'Fragment',

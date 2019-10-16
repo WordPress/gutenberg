@@ -101,7 +101,7 @@ repositories {
 
     if (rootProject.ext.buildGutenbergFromSource) {
         // If building from source, use the local sources from node_modules
-        def nodeModulesPath = "${project.buildDir}/../../../node_modules/"
+        def nodeModulesPath = "${project.projectDir}/../../../node_modules/"
         maven { url "${nodeModulesPath}/react-native/android" }
         maven { url "${nodeModulesPath}/jsc-android/dist" }
     } else {
@@ -125,9 +125,9 @@ dependencies {
 
         implementation 'com.facebook.react:react-native:+'
     } else {
-        implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-svg', readHashedVersion('../../package.json', 'react-native-svg', 'dependencies')))
+        implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-svg', readHashedVersion('../../react-native-editor/package.json', 'react-native-svg', 'dependencies')))
         implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-recyclerview-list', 'f845b3c2c4411b8e97db23724bf1a535530c5435'))
-        implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-video', readHashedVersion('../../package.json', 'react-native-video', 'dependencies')))
+        implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-video', readHashedVersion('../../react-native-editor/package.json', 'react-native-video', 'dependencies')))
 
         def rnVersion = readReactNativeVersion('../package.json', 'peerDependencies')
         implementation "com.facebook.react:react-native:${rnVersion}"
@@ -157,7 +157,7 @@ if (isJitPack) {
     }
 
     task cleanupNodeModulesFolder(type: Delete) {
-        delete '../../node_modules'
+        delete '../../../node_modules'
     }
 
     if (isJitPack) {

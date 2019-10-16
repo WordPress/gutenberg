@@ -56,7 +56,6 @@
 		7ECFA93B21C39B5000FC131B /* HeadingBlockFormatHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeadingBlockFormatHandler.swift; sourceTree = "<group>"; };
 		7ECFA93F21C39BA000FC131B /* BlockFormatHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockFormatHandler.swift; sourceTree = "<group>"; };
 		7ECFA94121C39BBB00FC131B /* BlockModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockModel.swift; sourceTree = "<group>"; };
-		F1017BCE20ED1B1A002B1024 /* libReact.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libReact.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		F121467C20ED2F81003DD17B /* RCTAztecViewManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RCTAztecViewManager.m; sourceTree = "<group>"; };
 		F13BF49E20ECF5440047D3F9 /* RCTAztecView-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RCTAztecView-Bridging-Header.h"; sourceTree = "<group>"; };
 		F13BF49F20ECF5450047D3F9 /* RCTAztecViewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RCTAztecViewManager.swift; sourceTree = "<group>"; };
@@ -82,7 +81,6 @@
 			children = (
 				F145CFC82087D16A006C159A /* RNTAztecView */,
 				F166A37320EE6DC7008E7C9F /* Dependencies */,
-				F145CFF92087D497006C159A /* Frameworks */,
 				F145CFC72087D16A006C159A /* Products */,
 			);
 			sourceTree = "<group>";
@@ -107,14 +105,6 @@
 				7ECFA93F21C39BA000FC131B /* BlockFormatHandler.swift */,
 			);
 			path = RNTAztecView;
-			sourceTree = "<group>";
-		};
-		F145CFF92087D497006C159A /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				F1017BCE20ED1B1A002B1024 /* libReact.a */,
-			);
-			path = Frameworks;
 			sourceTree = "<group>";
 		};
 		F166A37320EE6DC7008E7C9F /* Dependencies */ = {

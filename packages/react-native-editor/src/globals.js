@@ -6,12 +6,12 @@
  */
 import jsdom from 'jsdom-jscore-rn';
 import jsdomLevel1Core from 'jsdom-jscore-rn/lib/jsdom/level1/core';
-import { nativeLoggingHook } from 'react-native-gutenberg-bridge';
 
 /**
  * WordPress dependencies
  */
 import { createElement } from '@wordpress/element';
+import { nativeLoggingHook } from '@wordpress/react-native-bridge';
 
 /**
  * Internal dependencies
