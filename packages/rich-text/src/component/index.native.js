@@ -3,7 +3,6 @@
 /**
  * External dependencies
  */
-import RCTAztecView from 'react-native-aztec';
 import { View, Platform } from 'react-native';
 import {
 	pickBy,
@@ -13,6 +12,7 @@ import memize from 'memize';
 /**
  * WordPress dependencies
  */
+import RCTAztecView from '@wordpress/react-native-aztec';
 import { Component } from '@wordpress/element';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
