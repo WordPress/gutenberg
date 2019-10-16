@@ -9,7 +9,6 @@ import { withKnobs } from '@storybook/addon-knobs';
  */
 import '../build-style/style.css';
 
-addDecorator( withKnobs );
 addDecorator( withA11y );
 addDecorator( withKnobs );
 configure(
