@@ -31,11 +31,12 @@ module.exports = {
 	testEnvironment: 'jsdom',
 	testMatch: [
 		'**/test/*.native.[jt]s?(x)',
+		'<rootDir>/packages/react-native-editor/src/**/__tests__/**/*.[jt]s?(x)',
+		'<rootDir>/packages/react-native-editor/src/**/?(*.)+(spec|test).[jt]s?(x)',
 	],
 	testPathIgnorePatterns: [
 		'/node_modules/',
 		'/wordpress/',
-		'/__device-tests__/',
 	],
 	testURL: 'http://localhost/',
 	moduleDirectories: [ 'node_modules' ],
