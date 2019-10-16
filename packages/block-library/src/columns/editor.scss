@@ -43,7 +43,14 @@
 		> [data-type="core/column"] > .editor-block-list__block-edit .block-core-columns {
 			display: flex;
 			flex-direction: column;
-			flex: 1 0 auto;
+
+			// This flex rule fixes an issue in IE11.
+			flex: 1 1 auto;
+
+			// IE11 does not support `position: sticky`, so we use it here to serve correct Flex rules to modern browsers.
+			@supports (position: sticky) {
+				flex: 1;
+			}
 		}
 
 		// Adjust the individual column block.
