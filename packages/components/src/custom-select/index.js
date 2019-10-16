@@ -18,6 +18,18 @@ const stateReducer = (
 	{ selectedItem },
 	{ type, changes, props: { items } }
 ) => {
+	// TODO: Remove this.
+	// eslint-disable-next-line no-console
+	console.debug(
+		'Selected Item: ',
+		selectedItem,
+		'Type: ',
+		type,
+		'Changes: ',
+		changes,
+		'Items: ',
+		items
+	);
 	switch ( type ) {
 		case useSelect.stateChangeTypes.ToggleButtonKeyDownArrowDown:
 			// If we already have a selected item, try to select the next one,
@@ -84,6 +96,7 @@ export default function CustomSelect( { label, items } ) {
 			</span>
 			<Button
 				{ ...getToggleButtonProps( {
+					// This is needed because some speech recognition software don't support `aria-labelledby`.
 					'aria-label': label,
 					className: 'components-custom-select__button',
 				} ) }
