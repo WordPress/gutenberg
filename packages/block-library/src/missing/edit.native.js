@@ -42,28 +42,34 @@ export class UnsupportedBlockEdit extends Component {
 		</View>;
 	}
 
-	renderSheet() {
+	renderSheetButton( text, action ) {
 		// This margin is necessary for Android because of the way the modals on each platform are
 		// being rendered. This extra margin makes the modals look the same on each platform.
 		const marginBottom = isAndroid ? 16 : 0;
+		return <TouchableOpacity
+			onPress={ action() }
+			style={ [ styles.infoButton, { marginBottom } ] }
+		>
+			<Text style={ styles.infoButtonText } >{ text }</Text>
+		</TouchableOpacity>;
+	}
+
+	renderSheet() {
 		return <BottomSheet
 			isVisible={ this.state.showHelp }
 			hideHeader
 			onClose={ this.toggleSheet.bind( this ) }
 		>
 			<View style={ styles.infoContainer } >
-				<Icon icon="info-outline" style={ styles.infoIcon } size={ styles.infoIcon.size } />
-				<Text style={ styles.infoTitle }>
+				<Icon icon="editor-help" style={ styles.infoIcon } size={ styles.infoIcon.size } />
+				<Text style={ [ styles.infoText, styles.infoTitle ] }>
 					{ __( 'This block isn\'t yet supported on WordPress for ' + platformText ) }
 				</Text>
-				<TouchableOpacity
-					onPress={ this.toggleSheet.bind( this ) }
-					style={ [ styles.infoCloseButton, { marginBottom } ] }
-				>
-					<Text style={ styles.infoCloseButtonText } >
-						{ __( 'Close' ) }
-					</Text>
-				</TouchableOpacity>
+				<Text style={ [ styles.infoText, styles.infoDescription ] }>
+					{ __( 'We are working hard to add more blocks with each release. In the meantime, you can also edit this post on the web.' ) }
+				</Text>
+				{ this.renderSheetButton( __( 'Edit in Safari' ), () => this.toggleSheet.bind( this ) ) }
+				{ this.renderSheetButton( __( 'Close' ), () => this.toggleSheet.bind( this ) ) }
 			</View>
 		</BottomSheet>;
 	}
