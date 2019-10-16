@@ -10,11 +10,9 @@ import { Children } from '@wordpress/element';
 
 function Tiles( props ) {
 	const {
-		tilesProps: {
 		//	align,
-			columns,
+		columns,
 		//	imageCrop,
-		},
 		children,
 	} = props;
 
