@@ -45,7 +45,7 @@
 			flex-direction: column;
 
 			// This flex rule fixes an issue in IE11.
-			flex: 1 0 auto;
+			flex: 1 1 auto;
 
 			// IE11 does not support `position: sticky`, so we use it here to serve correct Flex rules to modern browsers.
 			@supports (position: sticky) {
