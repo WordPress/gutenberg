@@ -23,4 +23,4 @@ Name | Type | Default | Description
 `size` | `string` | `medium` | Determines the amount of padding within the card.
 `variant` | `string` | `default` | Determines the style of the card.a
 
-Note: This component is connected to [`<Card />`'s Context](../README.md#context). Passing props directly to this component will override the props derived from contet.
+Note: This component is connected to [`<Card />`'s Context](../README.md#context). Passing props directly to this component will override the props derived from context.
