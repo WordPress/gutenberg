@@ -9,6 +9,17 @@ import { Image as RNImage, View } from 'react-native';
 import { forwardRef, useEffect, useState } from '@wordpress/element';
 
 export function Image( { src, alt, style, ...additionalProps }, ref ) {
+	const [ aspectRatio, setAspectRatio ] = useState();
+	useEffect( () => {
+		if ( src ) {
+			RNImage.getSize( src, ( width, height ) => {
+				setAspectRatio( width / height );
+			} );
+		} else {
+			setAspectRatio( undefined );
+		}
+	}, [ src, setAspectRatio ] );
+
 	if ( ! src ) {
 		return null;
 	}
@@ -17,20 +28,13 @@ export function Image( { src, alt, style, ...additionalProps }, ref ) {
 		uri: src,
 	};
 
-	const [ aspectRatio, setAspectRatio ] = useState();
-    useEffect( () => {
-        RNImage.getSize( src, ( width, height ) => {
-            setAspectRatio( width / height );
-        } );
-	}, [ src, setAspectRatio ] );
-
 	const containerStyle = {
 		flex: 1,
 		aspectRatio,
 	};
 
 	return (
-		<View style={ [ containerStyle, style] }>
+		<View style={ [ containerStyle, style ] }>
 			<RNImage
 				ref={ ref }
 				accessibilityLabel={ alt }
