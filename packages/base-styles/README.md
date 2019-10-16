@@ -25,7 +25,7 @@ In your application's scss file, include styles like so:
 @import "~@wordpress/base-styles/z-index";
 ```
 
-### Post-CSS themes
+### PostCSS themes
 
 To use themes with `@wordpress/postcss-themes`, import them like so:
 
