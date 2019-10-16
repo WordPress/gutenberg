@@ -1,11 +1,12 @@
 .block-editor-link-control__search {
 	position: relative;
-	min-width: 340px;
+	min-width: $modal-min-width;
 }
 
 .block-editor-link-control__search .block-editor-link-control__search-input {
 	// Specificity overide
 	&.block-editor-link-control__search-input > input[type="text"] {
+		width: calc(100% - #{$grid-size-large*2});
 		display: block;
 		padding: 11px $grid-size-large;
 		margin: $grid-size-large;
@@ -31,7 +32,7 @@
 .block-editor-link-control__search-reset {
 	position: absolute;
 	top: 19px; // has to be hard coded as form expands with search suggestions
-	right: 25px; // push away to avoid focus style obscuring input border
+	right: 19px; // push away to avoid focus style obscuring input border
 	z-index: 10;
 }
 
