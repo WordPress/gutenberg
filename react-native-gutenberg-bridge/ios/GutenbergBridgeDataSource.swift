@@ -30,4 +30,18 @@ public protocol GutenbergBridgeDataSource: class {
     ///
     /// - Returns: Gutenberg related localization key value pairs for the current locale.
     func gutenbergTranslations() -> [String : [String]]?
+
+    var siteSlug: String? { get }
+
+    var extraHTTPHeaders: [String: Any]? { get }
+}
+
+extension GutenbergBridgeDataSource {
+    var siteSlug: String? {
+        return nil
+    }
+
+    var extraHTTPHeaders: [String: Any]? {
+        return nil
+    }
 }
