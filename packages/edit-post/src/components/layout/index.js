@@ -57,7 +57,6 @@ function Layout( {
 	isSaving,
 	isMobileViewport,
 	isRichEditingEnabled,
-	showFooter,
 } ) {
 	const sidebarIsOpened = editorSidebarOpened || pluginSidebarOpened || publishSidebarOpened;
 
@@ -97,11 +96,9 @@ function Layout( {
 				{ isRichEditingEnabled && mode === 'visual' && (
 					<>
 						<VisualEditor />
-						{ showFooter && (
-							<div className="edit-post-layout__footer">
-								<BlockBreadcrumb />
-							</div>
-						) }
+						<div className="edit-post-layout__footer">
+							<BlockBreadcrumb />
+						</div>
 					</>
 				) }
 				<div className="edit-post-layout__metaboxes">
@@ -156,7 +153,6 @@ export default compose(
 		hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
 		isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
 		isRichEditingEnabled: select( 'core/editor' ).getEditorSettings().richEditingEnabled,
-		showFooter: !! select( 'core/block-editor' ).getSelectedBlockClientId(),
 	} ) ),
 	withDispatch( ( dispatch ) => {
 		const { closePublishSidebar, togglePublishSidebar } = dispatch( 'core/edit-post' );
