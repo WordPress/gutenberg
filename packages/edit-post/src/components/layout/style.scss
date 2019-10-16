@@ -182,8 +182,10 @@
 }
 
 .edit-post-layout .editor-post-publish-panel__header-publish-button {
+	justify-content: center;
+
 	// Match the size of the Publish... button.
-	.components-button.is-large {
+	.components-button {
 		height: 33px;
 		line-height: 32px;
 	}
