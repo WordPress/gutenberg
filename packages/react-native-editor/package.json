@@ -105,8 +105,6 @@
     "install:wpcli": "(test -x bin/wp-cli.phar || curl -Ls https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar -o bin/wp-cli.phar && chmod +x bin/wp-cli.phar) && bin/wp-cli.phar --info",
     "prewp": "npm run install:wpcli",
     "wp": "php -d memory_limit=512M bin/wp-cli.phar",
-    "premakepot": "( command -v xgettext >/dev/null 2>&1 || { echo \"ERROR: xgettext is required to parse our Flow code.\" >&2; exit 1; } ) && npm run makepot:gutenberg",
-    "makepot": "bash -c \"xgettext -f <( find . -path './src/*.js' ! -path 'node_modules' -print ) --from-code=UTF-8 -k__ -k_n -k_x -k_nx -x ./gutenberg.pot -o ./gutenberg-mobile.pot\"",
     "android": "react-native run-android",
     "prewpandroid": "rm -Rf $TMPDIR/gbmobile-wpandroidfakernroot && mkdir $TMPDIR/gbmobile-wpandroidfakernroot && ln -s $(cd \"$(dirname \"../../../\")\"; pwd) $TMPDIR/gbmobile-wpandroidfakernroot/android",
     "wpandroid": "npm run android --root $TMPDIR/gbmobile-wpandroidfakernroot --variant wasabiDebug --appIdSuffix beta --appFolder WordPress --main-activity=ui.WPLaunchActivity",
