@@ -11,11 +11,8 @@ import { __ } from '@wordpress/i18n';
 import BlockTitle from '../block-title';
 
 /**
- * Block breadcrumb component, displaying the label of the block. If the block
- * descends from a root block, a button is displayed enabling the user to select
- * the root block.
+ * Block breadcrumb component, displaying the hierarchy of the current block selection as a breadcrumb.
  *
- * @param {string}   props.clientId        Client ID of block.
  * @return {WPElement} Block Breadcrumb.
  */
 const BlockBreadcrumb = function() {
