@@ -189,6 +189,10 @@ _Returns_
 
 -   `Array`: Ordered client IDs of editor blocks.
 
+<a name="getBlockParents" href="#getBlockParents">#</a> **getBlockParents**
+
+Undocumented declaration.
+
 <a name="getBlockRootClientId" href="#getBlockRootClientId">#</a> **getBlockRootClientId**
 
 Given a block client ID, returns the root block from which the block is
