@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * Internal dependencies
  */
-import { CardProvider } from './context';
+import { CardContext } from './context';
 import { CardUI } from './styles/card-styles';
 
 export const defaultProps = {
@@ -16,6 +16,12 @@ export const defaultProps = {
 
 export function Card( props ) {
 	const { className, size, variant, ...additionalProps } = props;
+	const { Provider } = CardContext;
+
+	const contextProps = {
+		size,
+		variant,
+	};
 
 	const classes = classnames(
 		'components-card',
@@ -24,15 +30,10 @@ export function Card( props ) {
 		className
 	);
 
-	const contextProps = {
-		size,
-		variant,
-	};
-
 	return (
-		<CardProvider { ...contextProps }>
+		<Provider value={ contextProps }>
 			<CardUI { ...additionalProps } className={ classes } />
-		</CardProvider>
+		</Provider>
 	);
 }
 
