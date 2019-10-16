@@ -3,11 +3,11 @@
  */
 import { Platform, SafeAreaView, View } from 'react-native';
 import SafeArea from 'react-native-safe-area';
-import { sendNativeEditorDidLayout } from 'react-native-gutenberg-bridge';
 
 /**
  * WordPress dependencies
  */
+import { sendNativeEditorDidLayout } from '@wordpress/react-native-bridge';
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 import { BottomSheetSettings } from '@wordpress/block-editor';

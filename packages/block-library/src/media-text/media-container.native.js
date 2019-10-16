@@ -2,12 +2,6 @@
  * External dependencies
  */
 import { View, ImageBackground, Text, TouchableWithoutFeedback } from 'react-native';
-import {
-	requestMediaImport,
-	mediaUploadSync,
-	requestImageFailedRetryDialog,
-	requestImageUploadCancelDialog,
-} from 'react-native-gutenberg-bridge';
 
 /**
  * WordPress dependencies
@@ -18,6 +12,14 @@ import {
 	Toolbar,
 	withNotices,
 } from '@wordpress/components';
+
+import {
+	requestMediaImport,
+	mediaUploadSync,
+	requestImageFailedRetryDialog,
+	requestImageUploadCancelDialog,
+} from '@wordpress/react-native-bridge';
+
 import {
 	BlockControls,
 	MEDIA_TYPE_IMAGE,

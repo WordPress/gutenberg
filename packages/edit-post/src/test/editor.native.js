@@ -1,13 +1,13 @@
 /**
  * External dependencies
  */
-import RNReactNativeGutenbergBridge from 'react-native-gutenberg-bridge';
 import { mount } from 'enzyme';
 import { act } from 'react-dom/test-utils';
 
 /**
  * WordPress dependencies
  */
+import RNReactNativeGutenbergBridge from '@wordpress/react-native-bridge';
 import { registerCoreBlocks } from '@wordpress/block-library';
 // Force register 'core/editor' store.
 import { store } from '@wordpress/editor'; // eslint-disable-line no-unused-vars

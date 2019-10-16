@@ -2,15 +2,15 @@
  * External dependencies
  */
 import React from 'react';
-import {
-	requestMediaPickFromMediaLibrary,
-	requestMediaPickFromDeviceLibrary,
-	requestMediaPickFromDeviceCamera,
-} from 'react-native-gutenberg-bridge';
 
 /**
  * WordPress dependencies
  */
+import {
+	requestMediaPickFromMediaLibrary,
+	requestMediaPickFromDeviceLibrary,
+	requestMediaPickFromDeviceCamera,
+} from '@wordpress/react-native-bridge';
 import { __ } from '@wordpress/i18n';
 import { Picker } from '@wordpress/components';
 

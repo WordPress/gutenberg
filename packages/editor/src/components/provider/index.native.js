@@ -1,5 +1,5 @@
 /**
- * External dependencies
+ * WordPress dependencies
  */
 import RNReactNativeGutenbergBridge, {
 	subscribeParentGetHtml,
@@ -7,11 +7,7 @@ import RNReactNativeGutenbergBridge, {
 	subscribeUpdateHtml,
 	subscribeSetTitle,
 	subscribeMediaAppend,
-} from 'react-native-gutenberg-bridge';
-
-/**
- * WordPress dependencies
- */
+} from '@wordpress/react-native-bridge';
 import { Component } from '@wordpress/element';
 import { parse, serialize, getUnregisteredTypeHandlerName, createBlock } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';

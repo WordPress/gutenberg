@@ -3,12 +3,6 @@
  */
 import React from 'react';
 import { View, ImageBackground, Text, TouchableWithoutFeedback, Dimensions } from 'react-native';
-import {
-	requestMediaImport,
-	mediaUploadSync,
-	requestImageFailedRetryDialog,
-	requestImageUploadCancelDialog,
-} from 'react-native-gutenberg-bridge';
 import { isEmpty } from 'lodash';
 
 /**
@@ -22,6 +16,13 @@ import {
 	ToolbarButton,
 	PanelBody,
 } from '@wordpress/components';
+
+import {
+	requestMediaImport,
+	mediaUploadSync,
+	requestImageFailedRetryDialog,
+	requestImageUploadCancelDialog,
+} from '@wordpress/react-native-bridge';
 
 import {
 	Caption,
