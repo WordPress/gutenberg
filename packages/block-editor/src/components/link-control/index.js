@@ -7,6 +7,7 @@ import {
 	Icon,
 	ToggleControl,
 	ExternalLink,
+	Popover,
 } from '@wordpress/components';
 
 /**
@@ -37,7 +38,6 @@ import { safeDecodeURI, filterURLForDisplay, isURL } from '@wordpress/url';
  * Internal dependencies
  */
 import {
-	URLPopover,
 	URLInput,
 } from '../';
 
@@ -148,9 +148,11 @@ function LinkControl( { currentLink, fetchSearchSuggestions, renderAdditionalSet
 	);
 
 	return (
-		<URLPopover
+		<Popover
 			className="block-editor-link-control"
 			onClose={ closeLinkUI }
+			position="bottom center"
+			focusOnMount="firstElement"
 		>
 			<div className="block-editor-link-control__popover-inner">
 				<div className="block-editor-link-control__search">
@@ -215,7 +217,7 @@ function LinkControl( { currentLink, fetchSearchSuggestions, renderAdditionalSet
 					) }
 				</div>
 			</div>
-		</URLPopover>
+		</Popover>
 	);
 }
 
