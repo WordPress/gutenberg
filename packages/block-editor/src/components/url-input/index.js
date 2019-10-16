@@ -265,7 +265,7 @@ class URLInput extends Component {
 
 				{ showSuggestions && !! suggestions.length &&
 					<Popover
-						position="bottom"
+						position="bottom left"
 						noArrow
 						focusOnMount={ false }
 					>
