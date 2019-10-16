@@ -5,7 +5,6 @@ import {
 	Button,
 	IconButton,
 	Icon,
-	ToggleControl,
 	ExternalLink,
 	Popover,
 } from '@wordpress/components';
@@ -15,7 +14,7 @@ import {
  */
 import classnames from 'classnames';
 import { __ } from '@wordpress/i18n';
-import { isFunction, partial, partialRight, noop } from 'lodash';
+import { isFunction, partialRight, noop } from 'lodash';
 
 import {
 	useCallback,
@@ -41,9 +40,10 @@ import {
 	URLInput,
 } from '../';
 
+import LinkControlSettingsDrawer from './settings-drawer';
 import TextHighlight from './text-highlight';
 
-function LinkControl( { currentLink, fetchSearchSuggestions, renderAdditionalSettings, onLinkChange, onSettingChange = { noop }, linkSettings } ) {
+function LinkControl( { currentLink, fetchSearchSuggestions, onLinkChange, onSettingChange = { noop }, linkSettings } ) {
 	// State
 	const [ inputValue, setInputValue ] = useState( '' );
 	const [ isEditingLink, setIsEditingLink ] = useState( true );
@@ -137,16 +137,6 @@ function LinkControl( { currentLink, fetchSearchSuggestions, renderAdditionalSet
 		/* eslint-enable react/jsx-key */
 	};
 
-	const LinkControlAdditionalSettings = () => (
-		<div className="block-editor-link-control__settings">
-			<ToggleControl
-				label={ __( 'Open in New Tab' ) }
-				onChange={ partial( onSettingChange, 'new-tab' ) }
-				checked={ linkSettings[ 'new-tab' ] } />
-			{ isFunction( renderAdditionalSettings ) && renderAdditionalSettings() }
-		</div>
-	);
-
 	return (
 		<Popover
 			className="block-editor-link-control"
@@ -213,7 +203,7 @@ function LinkControl( { currentLink, fetchSearchSuggestions, renderAdditionalSet
 					) }
 
 					{ ! isEditingLink && (
-						<LinkControlAdditionalSettings />
+						<LinkControlSettingsDrawer settings={ linkSettings } onSettingChange={ onSettingChange } />
 					) }
 				</div>
 			</div>
