@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { uniqueId, random } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import '@wordpress/editor'; // This shouldn't be necessary
@@ -10,6 +15,7 @@ import {
 	BlockList,
 	WritingFlow,
 	ObserveTyping,
+	LinkControl,
 } from '@wordpress/block-editor';
 import {
 	Popover,
@@ -35,6 +41,48 @@ import '@wordpress/format-library/build-style/style.css';
 
 function App() {
 	const [ blocks, updateBlocks ] = useState( [] );
+	const [ link, setLink ] = useState( null );
+	const [ linkSettings, setLinkSettings ] = useState( {
+		'new-tab': false,
+	} );
+
+	/* eslint-disable @wordpress/react-no-unsafe-timeout */
+	const timeout = ( ms ) => {
+		return new Promise( ( resolve ) => setTimeout( resolve, ms ) );
+	};
+	/* eslint-enable @wordpress/react-no-unsafe-timeout */
+
+	const fetchFauxEntitySuggestions = async () => {
+		// Simulate network
+		await timeout( random( 200, 1000 ) );
+
+		return ( [
+			{
+				id: uniqueId(),
+				title: 'Hello Page',
+				type: 'Page',
+				url: '/hello-page/',
+			},
+			{
+				id: uniqueId(),
+				title: 'Hello Post',
+				type: 'Post',
+				url: '/hello-post/',
+			},
+			{
+				id: uniqueId(),
+				title: 'Hello Another One',
+				type: 'Page',
+				url: '/hello-another-one/',
+			},
+			{
+				id: uniqueId(),
+				title: 'This is another Post with a much longer title just to be really annoying and to try and break the UI',
+				type: 'Post',
+				url: '/this-is-another-post-with-a-much-longer-title-just-to-be-really-annoying-and-to-try-and-break-the-ui/',
+			},
+		] );
+	};
 
 	return (
 		<Fragment>
@@ -53,9 +101,25 @@ function App() {
 								<BlockEditorKeyboardShortcuts />
 								<WritingFlow>
 									<ObserveTyping>
+										<LinkControl
+											defaultOpen={ true }
+											fetchSearchSuggestions={ fetchFauxEntitySuggestions }
+											onLinkChange={ ( theLink ) => {
+												setLink( theLink );
+											} }
+											currentLink={ link }
+											linkSettings={ linkSettings }
+											onSettingChange={ ( setting, value ) => {
+												setLinkSettings( {
+													...linkSettings,
+													[ setting ]: value,
+												} );
+											} }
+										/>
 										<BlockList />
 									</ObserveTyping>
 								</WritingFlow>
+
 							</div>
 							<Popover.Slot />
 						</BlockEditorProvider>
