@@ -14,6 +14,7 @@ import { UP, DOWN, ENTER, TAB } from '@wordpress/keycodes';
 import { Spinner, withSpokenMessages, Popover } from '@wordpress/components';
 import { withInstanceId, withSafeTimeout, compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
+import { isURL } from '@wordpress/url';
 
 // Since URLInput is rendered in the context of other inputs, but should be
 // considered a separate modal node, prevent keyboard events from propagating
@@ -77,7 +78,7 @@ class URLInput extends Component {
 
 		// Show the suggestions after typing at least 2 characters
 		// and also for URLs
-		if ( value.length < 2 || ( ! handleURLSuggestions && /^https?:/.test( value ) ) ) {
+		if ( value.length < 2 || ( ! handleURLSuggestions && isURL( value ) ) ) {
 			this.setState( {
 				showSuggestions: false,
 				selectedSuggestion: null,
