@@ -87,8 +87,8 @@ const defaultFetchHandler = ( nextOptions ) => {
 		// network connection. Unfortunately fetch just throws a TypeError and
 		// the message might depend on the browser.
 		.then(
-			( response ) =>
-				Promise.resolve( response )
+			( value ) =>
+				Promise.resolve( value )
 					.then( checkStatus )
 					.catch( ( response ) => parseAndThrowError( response, parse ) )
 					.then( ( response ) => parseResponseAndNormalizeError( response, parse ) ),
