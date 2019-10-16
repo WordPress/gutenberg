@@ -92,16 +92,16 @@
 
 	&.is-current {
 		background: transparent;
-		border: 2px solid #ccc;
-		margin: $grid-size-large;
-		width: calc(100% - #{$grid-size-large*2});
+		border: 0;
+		width: 100%;
 		cursor: default;
-		padding-right: 10px; // visually compensate for edit icon padding
+		padding: $grid-size-large;
+		padding-left: $grid-size-xlarge;
 	}
 
 	.block-editor-link-control__search-item-header {
 		display: block;
-		margin-right: 1em;
+		margin-right: $grid-size-xlarge;
 	}
 
 	.block-editor-link-control__search-item-icon {
@@ -148,8 +148,8 @@
 
 .block-editor-link-control__settings {
 	border-top: 1px solid #e1e1e1;
-	margin: 0 $grid-size-large;
-	padding: $grid-size-large $grid-size-large;
+	margin: 0;
+	padding: $grid-size-large $grid-size-xlarge;
 
 	:last-child {
 		margin-bottom: 0;
@@ -172,6 +172,6 @@
 }
 
 .block-editor-link-control__search-item-action {
-	margin-left: 0.5em;
+	margin-left: auto; // push to far right hand side
 	flex-shrink: 0;
 }

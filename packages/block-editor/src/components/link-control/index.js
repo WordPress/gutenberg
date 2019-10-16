@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import {
+	Button,
 	IconButton,
 	Icon,
 	ToggleControl,
@@ -170,8 +171,10 @@ function LinkControl( { currentLink, fetchSearchSuggestions, renderAdditionalSet
 								</ExternalLink>
 								<span className="block-editor-link-control__search-item-info">{ currentLink.info || filterURLForDisplay( safeDecodeURI( currentLink.url ) ) || '' }</span>
 							</span>
-							<span className="block-editor-link-control__search-item-type">{ currentLink.type.toLowerCase() || '' }</span>
-							<IconButton className="block-editor-link-control__search-item-action block-editor-link-control__search-item-action--edit" icon="edit" label={ __( 'Edit' ) } onClick={ onStartEditing } />
+
+							<Button isDefault onClick={ onStartEditing } className="block-editor-link-control__search-item-action block-editor-link-control__search-item-action--edit">
+								Change
+							</Button>
 						</div>
 					) }
 
