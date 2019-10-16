@@ -31,7 +31,7 @@ import {
 	ENTER,
 } from '@wordpress/keycodes';
 
-import { safeDecodeURI, filterURLForDisplay } from '@wordpress/url';
+import { safeDecodeURI, filterURLForDisplay, isURL } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -101,7 +101,7 @@ function LinkControl( { currentLink, fetchSearchSuggestions, renderAdditionalSet
 
 	// Effects
 	const getSearchHandler = useCallback( ( value ) => {
-		return ( /^https?:/.test( value ) ) ? handleURLSearch( value ) : fetchSearchSuggestions( value );
+		return ( isURL( value ) ) ? handleURLSearch( value ) : fetchSearchSuggestions( value );
 	}, [ handleURLSearch, fetchSearchSuggestions ] );
 
 	// Render Components
