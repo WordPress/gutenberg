@@ -12,12 +12,12 @@ export const getCardProps = ( props = {} ) => {
 		size: select(
 			'size',
 			{
-				lg: 'lg',
-				md: 'md',
-				sm: 'sm',
-				xs: 'xs',
+				large: 'large',
+				medium: 'medium',
+				small: 'small',
+				extraSmall: 'extraSmall',
 			},
-			size || 'md'
+			size || 'medium'
 		),
 		variant: select(
 			'variant',
