@@ -18,6 +18,7 @@ class Slider extends Component {
 		super( props );
 		this.handleToggleFocus = this.handleToggleFocus.bind( this );
 		this.handleChange = this.handleChange.bind( this );
+		this.handleValueSave = this.handleValueSave.bind( this );
 		this.handleReset = this.handleReset.bind( this );
 
 		const initialValue = this.validateInput( props.value || props.defaultValue || props.minimumValue );
@@ -36,7 +37,8 @@ class Slider extends Component {
 		const newState = { hasFocus: ! this.state.hasFocus };
 
 		if ( validateInput ) {
-			newState.sliderValue = this.validateInput( this.state.sliderValue );
+			const sliderValue = this.validateInput( this.state.sliderValue );
+			this.handleValueSave( sliderValue );
 		}
 
 		this.setState( newState );
@@ -48,12 +50,18 @@ class Slider extends Component {
 			return minimumValue;
 		}
 		if ( typeof text === 'number' ) {
-			return text;
+			return Math.min( Math.max( text, minimumValue ), maximumValue );
 		}
 		return Math.min( Math.max( text.replace( /[^0-9]/g, '' ).replace( /^0+(?=\d)/, '' ), minimumValue ), maximumValue );
 	}
 
 	handleChange( text ) {
+		if ( ! isNaN( Number( text ) ) ) {
+			this.setState( { sliderValue: text } );
+		}
+	}
+
+	handleValueSave( text ) {
 		if ( ! isNaN( Number( text ) ) ) {
 			if ( this.props.onChangeValue ) {
 				this.props.onChangeValue( text );
@@ -63,7 +71,7 @@ class Slider extends Component {
 	}
 
 	handleReset() {
-		this.handleChange( this.props.defaultValue || this.state.initialValue );
+		this.handleValueSave( this.props.defaultValue || this.state.initialValue );
 	}
 
 	render() {
@@ -92,6 +100,7 @@ class Slider extends Component {
 					maximumTrackTintColor={ maximumTrackTintColor }
 					thumbTintColor={ thumbTintColor }
 					onValueChange={ this.handleChange }
+					onSlidingComplete={ this.handleValueSave }
 				/>
 				<TextInput
 					style={ [ styles.sliderTextInput, hasFocus ? styles.isSelected : {} ] }
