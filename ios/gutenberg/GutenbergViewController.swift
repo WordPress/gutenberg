@@ -45,6 +45,7 @@ class GutenbergViewController: UIViewController {
 }
 
 extension GutenbergViewController: GutenbergBridgeDelegate {
+
     func editorDidAutosave() {
         print("➡️ Editor Did Autosave")
     }
@@ -179,6 +180,14 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
 }
 
 extension GutenbergViewController: GutenbergBridgeDataSource {
+    var siteSlug: String? {
+        return nil
+    }
+
+    var extraHTTPHeaders: [String : Any]? {
+        return nil
+    }
+
     
     func gutenbergLocale() -> String? {
         return Locale.preferredLanguages.first ?? "en"

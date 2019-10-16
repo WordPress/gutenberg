@@ -35,13 +35,3 @@ public protocol GutenbergBridgeDataSource: class {
 
     var extraHTTPHeaders: [String: Any]? { get }
 }
-
-extension GutenbergBridgeDataSource {
-    var siteSlug: String? {
-        return nil
-    }
-
-    var extraHTTPHeaders: [String: Any]? {
-        return nil
-    }
-}
