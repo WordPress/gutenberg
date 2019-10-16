@@ -1,0 +1,54 @@
+1.15.0
+------
+* Fix issue when multiple media selection adds only one image or video block on Android
+* Fix issue when force Touch app shortcut doesn't work properly selecting "New Photo Post" on iOS
+* Add Link Target (Open in new tab) to Image Block.
+* [iOS] DarkMode improvements.
+* New block: Media & Text
+
+1.14.0
+------
+* Fix a bug on iOS 13.0 were tapping on a link opens Safari
+* Fix a link editing issue, where trying to add a empty link at the start of another link would remove the existing link.
+* Fix missing content on long posts in html mode on Android
+
+1.12.0
+------
+* Add rich text styling to video captions
+* Prevent keyboard dismissal when switching between caption and text block on Android
+* Blocks that would be replaced are now hidden when add block bottom sheet displays
+* Tapping on empty editor area now always inserts new block at end of post
+
+1.11.0
+------
+* Toolbar scroll position now resets when its content changes.
+* Dark Mode for iOS.
+
+1.10.0
+------
+* Adding a block from the post title now shows the add block here indicator.
+* Deselect post title any time a block is added
+* Fix loss of center alignment in image captions on Android
+
+1.9.0
+------
+* Enable video block on Android platform
+* Tapping on an empty editor area will create a new paragraph block
+* Fix content loss issue when loading unsupported blocks containing inner blocks.
+* Adding a block from the Post Title now inserts the block at the top of the Post.
+
+1.8.0
+------
+* Fix pasting simple text on Post Title
+* Remove editable empty line after list on the List block
+* Performance improvements on rich text editing
+
+1.7.0
+------
+* Fixed keyboard flickering issue after pressing Enter repeatedly on the Post Title.
+* New blocks are available: video/quote/more
+
+1.6.0
+------
+* Fixed issue with link settings where “Open in New Tab” was always OFF on open.
+* Added UI to display a warning when a block has invalid content.
