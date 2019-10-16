@@ -17,7 +17,6 @@ import { __, sprintf } from '@wordpress/i18n';
 
 export const Gallery = ( props ) => {
 	const {
-		galleryProps,
 		selectedImage,
 		mediaPlaceholder,
 		onMoveBackward,
@@ -26,13 +25,10 @@ export const Gallery = ( props ) => {
 		onSelectImage,
 		onSetImageAttributes,
 	//	onFocusGalleryCaption,
-	} = props;
-
-	const {
 		attributes,
 		isSelected,
 	//	setAttributes,
-	} = galleryProps;
+	} = props;
 
 	const {
 		align,
@@ -46,7 +42,7 @@ export const Gallery = ( props ) => {
 
 	return (
 		<View>
-			<Tiles tilesProps={ tilesProps }>
+			<Tiles { ...tilesProps }>
 				{ images.map( ( img, index ) => {
 					/* translators: %1$d is the order number of the image, %2$d is the total number of images. */
 					const ariaLabel = sprintf( __( 'image %1$d of %2$d in gallery' ), ( index + 1 ), images.length );
