@@ -22,6 +22,8 @@ export const settings = {
 
 	description: __( 'Add a page, link, or other item to your Navigation Menu.' ),
 
+	__experimentalDisplayName: 'label',
+
 	edit,
 	save,
 };
