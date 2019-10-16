@@ -42,6 +42,7 @@ class BottomSheetCell extends Component {
 			value,
 			valuePlaceholder = '',
 			icon,
+			leftAlign,
 			labelStyle = {},
 			valueStyle = {},
 			onChangeValue,
@@ -57,7 +58,10 @@ class BottomSheetCell extends Component {
 		const isValueEditable = editable && onChangeValue !== undefined;
 		const cellLabelStyle = getStylesFromColorScheme( styles.cellLabel, styles.cellTextDark );
 		const cellLabelCenteredStyle = getStylesFromColorScheme( styles.cellLabelCentered, styles.cellTextDark );
-		const defaultLabelStyle = showValue || icon !== undefined ? cellLabelStyle : cellLabelCenteredStyle;
+		const cellLabelLeftAlignNoIconStyle = getStylesFromColorScheme( styles.cellLabelLeftAlignNoIcon, styles.cellTextDark );
+		const defaultMissingIconAndValue = leftAlign ? cellLabelLeftAlignNoIconStyle : cellLabelCenteredStyle;
+		const defaultLabelStyle = showValue || icon !== undefined ? cellLabelStyle : defaultMissingIconAndValue;
+
 		const drawSeparator = ( separatorType && separatorType !== 'none' ) || separatorStyle === undefined;
 
 		const onCellPress = () => {
