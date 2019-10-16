@@ -21,6 +21,7 @@ import { setLocaleData } from '@wordpress/i18n';
 import './globals';
 import { getTranslation } from '../i18n-cache';
 import initialHtml from './initial-html';
+import setupApiFetch from './api-fetch-setup';
 
 const gutenbergSetup = () => {
 	const wpData = require( '@wordpress/data' );
@@ -53,6 +54,7 @@ export class RootComponent extends React.Component {
 	constructor( props ) {
 		super( props );
 		setupLocale( props.locale, props.translations );
+		setupApiFetch( props.siteSlug, props.extraHTTPHeaders );
 		require( '@wordpress/edit-post' ).initializeEditor();
 	}
 
