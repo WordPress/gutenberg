@@ -42,7 +42,7 @@ export class BlockList extends Component {
 	}
 
 	blockHolderBorderStyle() {
-		return this.props.isFullyBordered ? styles.blockHolderFullBordered : styles.blockHolderSemiBordered;
+		return this.props.isFullyBordered || this.props.hasFullBorder ? styles.blockHolderFullBordered : styles.blockHolderSemiBordered;
 	}
 
 	onCaretVerticalPositionChange( targetId, caretY, previousCaretY ) {
@@ -169,6 +169,7 @@ export default compose( [
 			getBlockInsertionPoint,
 			isBlockInsertionPointVisible,
 			getSelectedBlock,
+			getBlockRootClientId,
 		} = select( 'core/block-editor' );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
@@ -198,6 +199,8 @@ export default compose( [
 			return ! shouldHideBlockAtIndex;
 		};
 
+		const hasFullBorder = !! getBlockRootClientId( selectedBlockClientId ) || isSelectedGroup;
+
 		return {
 			blockClientIds,
 			blockCount: getBlockCount( rootClientId ),
@@ -205,6 +208,7 @@ export default compose( [
 			shouldShowBlockAtIndex,
 			shouldShowInsertionPoint,
 			selectedBlockClientId,
+			hasFullBorder,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
