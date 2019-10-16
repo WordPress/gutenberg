@@ -7,7 +7,7 @@
 		display: inline-block;
 		margin: 0;
 
-		&:not(.block-editor-block-breadcrumb__current)::after {
+		&:not(:last-child)::after {
 			content: "▸";
 		}
 	}
