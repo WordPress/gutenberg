@@ -26,7 +26,7 @@ export const _default = () => {
 	);
 };
 
-export const _withKnobs = () => {
+export const all = () => {
 	const [ isChecked, setChecked ] = useState( true );
 	const heading = text( 'Heading', 'User' );
 	const label = text( 'Label', 'Is author' );
