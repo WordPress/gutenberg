@@ -10,7 +10,7 @@ import { CardProvider } from './context';
 import { CardUI } from './styles/card-styles';
 
 export const defaultProps = {
-	size: 'md',
+	size: 'medium',
 	variant: 'default',
 };
 

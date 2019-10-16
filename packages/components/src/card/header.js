@@ -11,7 +11,7 @@ import { useCardContext } from './context';
 
 export const defaultProps = {
 	isShady: false,
-	size: 'md',
+	size: 'medium',
 };
 
 export function CardHeader( props ) {

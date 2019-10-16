@@ -108,16 +108,16 @@ export const DividerUI = styled.div`
 export function bodySize() {
 	return `
 		&.is-size {
-			&-lg {
+			&-large {
 				padding: 28px;
 			}
-			&-md {
+			&-medium {
 				padding: 20px;
 			}
-			&-sm {
+			&-small {
 				padding: 12px;
 			}
-			&-xs {
+			&-extraSmall {
 				padding: 8px;
 			}
 		}
@@ -127,16 +127,16 @@ export function bodySize() {
 export function headerFooterSizes() {
 	return `
 		&.is-size {
-			&-lg {
+			&-large {
 				padding: 20px 28px;
 			}
-			&-md {
+			&-medium {
 				padding: 12px 20px;
 			}
-			&-sm {
+			&-small {
 				padding: 8px 12px;
 			}
-			&-xs {
+			&-extraSmall {
 				padding: 4px 8px;
 			}
 		}

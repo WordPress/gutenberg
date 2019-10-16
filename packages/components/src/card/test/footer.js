@@ -32,10 +32,10 @@ describe( 'CardFooter', () => {
 
 	describe( 'modifiers', () => {
 		test( 'should be able to render size modifier', () => {
-			const wrapper = shallow( <CardFooter size="lg" /> );
+			const wrapper = shallow( <CardFooter size="large" /> );
 			const cardFooter = wrapper.find( '.components-card-footer' );
 
-			expect( cardFooter.hasClass( 'is-size-lg' ) ).toBe( true );
+			expect( cardFooter.hasClass( 'is-size-large' ) ).toBe( true );
 		} );
 
 		test( 'should be able to render shady modifier', () => {

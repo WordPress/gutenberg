@@ -19,7 +19,7 @@ const Example = () => (
 <!-- prettier-ignore -->
 Name | Type | Default | Description
 --- | --- | --- | ---
-`size` | `string` | `md` | Determines the amount of padding within the card.
+`size` | `string` | `medium` | Determines the amount of padding within the card.
 `variant` | `string` | `default` | Determines the style of the card.
 
 ## Sub-Components

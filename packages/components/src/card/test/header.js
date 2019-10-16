@@ -32,10 +32,10 @@ describe( 'CardHeader', () => {
 
 	describe( 'modifiers', () => {
 		test( 'should be able to render size modifier', () => {
-			const wrapper = shallow( <CardHeader size="lg" /> );
+			const wrapper = shallow( <CardHeader size="large" /> );
 			const cardHeader = wrapper.find( '.components-card-header' );
 
-			expect( cardHeader.hasClass( 'is-size-lg' ) ).toBe( true );
+			expect( cardHeader.hasClass( 'is-size-large' ) ).toBe( true );
 		} );
 
 		test( 'should be able to render shady modifier', () => {

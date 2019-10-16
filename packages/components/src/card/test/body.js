@@ -32,10 +32,10 @@ describe( 'CardBody', () => {
 
 	describe( 'modifiers', () => {
 		test( 'should be able to render size modifier', () => {
-			const wrapper = shallow( <CardBody size="lg" /> );
+			const wrapper = shallow( <CardBody size="large" /> );
 			const cardBody = wrapper.find( '.components-card-body' );
 
-			expect( cardBody.hasClass( 'is-size-lg' ) ).toBe( true );
+			expect( cardBody.hasClass( 'is-size-large' ) ).toBe( true );
 		} );
 
 		test( 'should be able to render shady modifier', () => {
