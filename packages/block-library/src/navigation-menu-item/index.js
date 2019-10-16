@@ -22,7 +22,7 @@ export const settings = {
 
 	description: __( 'Add a page, link, or other item to your Navigation Menu.' ),
 
-	__experimentalDisplayNameAttribute: 'label',
+	__experimentalDisplayName: 'label',
 
 	edit,
 	save,

@@ -26,7 +26,7 @@ import BlockIcon from '../block-icon';
  * @return {string} The display name value.
  */
 function getBlockDisplayName( blockType, attributes ) {
-	const displayNameAttribute = blockType.__experimentalDisplayNameAttribute;
+	const displayNameAttribute = blockType.__experimentalDisplayName;
 
 	if ( ! displayNameAttribute || ! attributes[ displayNameAttribute ] ) {
 		return blockType.title;
