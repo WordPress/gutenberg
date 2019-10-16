@@ -316,7 +316,7 @@ class GalleryEdit extends Component {
 				</InspectorControls>
 				{ noticeUI }
 				<Gallery
-					galleryProps={ this.props }
+					{ ...this.props }
 					selectedImage={ this.state.selectedImage }
 					mediaPlaceholder={ mediaPlaceholder }
 					onMoveBackward={ this.onMoveBackward }
