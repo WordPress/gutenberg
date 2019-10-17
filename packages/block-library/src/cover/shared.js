@@ -8,7 +8,7 @@ export function backgroundImageStyles( url ) {
 }
 
 export function dimRatioToClass( ratio ) {
-	return ( ratio === 0 || ratio === 50 ) ?
+	return ( ratio === 0 || ratio === 50 || ! ratio ) ?
 		null :
 		'has-background-dim-' + ( 10 * Math.round( ratio / 10 ) );
 }
