@@ -13,11 +13,15 @@ import { useContext, Children, cloneElement } from '@wordpress/element';
  */
 import ToolbarContext from '../toolbar-context';
 
-function AccessibleToolbarButton( props ) {
+function AccessibleToolbarButtonContainer( props ) {
 	const toolbar = useContext( ToolbarContext );
-	const children = Children.only( props.children );
-	const itemProps = useToolbarItem( toolbar, children.props );
-	return cloneElement( children, itemProps );
+	const button = Children.only( props.children );
+	const itemHTMLProps = useToolbarItem( toolbar, button.props );
+	return (
+		<div { ...props }>
+			{ cloneElement( button, itemHTMLProps ) }
+		</div>
+	);
 }
 
-export default AccessibleToolbarButton;
+export default AccessibleToolbarButtonContainer;

@@ -13,7 +13,7 @@ import { useContext } from '@wordpress/element';
  */
 import IconButton from '../icon-button';
 import ToolbarContext from '../toolbar-context';
-import AccessibleToolbarButton from './accessible-toolbar-button';
+import AccessibleToolbarButtonContainer from './accessible-toolbar-button-container';
 import ToolbarButtonContainer from './toolbar-button-container';
 
 function ToolbarButton( {
@@ -53,9 +53,9 @@ function ToolbarButton( {
 
 	if ( context ) {
 		return (
-			<AccessibleToolbarButton className={ containerClassName }>
+			<AccessibleToolbarButtonContainer className={ containerClassName }>
 				{ button }
-			</AccessibleToolbarButton>
+			</AccessibleToolbarButtonContainer>
 		);
 	}
 
