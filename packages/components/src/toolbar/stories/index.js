@@ -28,6 +28,7 @@ export function _default() {
 				<ToolbarButton { ...getThumbProps( 'up' ) } />
 				<ToolbarButton { ...getThumbProps( 'down' ) } />
 				<ToolbarGroup
+					label="Option group"
 					isCollapsed
 					controls={ [ getThumbProps( 'up' ), getThumbProps( 'down' ) ] }
 				/>
