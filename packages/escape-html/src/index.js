@@ -26,12 +26,14 @@ const REGEXP_INVALID_ATTRIBUTE_NAME = /[\u007F-\u009F "'>/="\uFDD0-\uFDEF]/;
  * @see https://w3c.github.io/html/syntax.html#ambiguous-ampersand
  * @see https://w3c.github.io/html/syntax.html#named-character-references
  *
- * @param {string} value Original string.
+ * @param {string}  value Original string.
+ * @param {boolean} all   Set to true to escape all ampersands.
  *
  * @return {string} Escaped string.
  */
-export function escapeAmpersand( value ) {
-	return value.replace( /&(?!([a-z0-9]+|#[0-9]+|#x[a-f0-9]+);)/gi, '&amp;' );
+export function escapeAmpersand( value, all ) {
+	const regExp = all ? /&/gi : /&(?!([a-z0-9]+|#[0-9]+|#x[a-f0-9]+);)/gi;
+	return value.replace( regExp, '&amp;' );
 }
 
 /**
@@ -94,6 +96,32 @@ export function escapeAttribute( value ) {
  */
 export function escapeHTML( value ) {
 	return escapeLessThan( escapeAmpersand( value ) );
+}
+
+/**
+ * Returns an escaped Editable HTML element value. This is different from
+ * `escapeHTML`, because for editable HTML, all ampersands must be escaped in
+ * order to render the content correctly on the page.
+ *
+ * @param {string} value Element value.
+ *
+ * @return {string} Escaped HTML element value.
+ */
+export function escapeEditableHTML( value ) {
+	return escapeLessThan( escapeAmpersand( value, true ) );
+}
+
+/**
+ * Returns an unescaped Editable HTML element value.
+ *
+ * @param {string} value Element value.
+ *
+ * @return {string} Escaped HTML element value.
+ */
+export function unescapeEditableHTML( value ) {
+	return value
+		.replace( /(?<!&amp;)&lt;/gi, '<' )
+		.replace( /&amp;/gi, '&' );
 }
 
 /**
