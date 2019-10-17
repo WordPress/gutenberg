@@ -112,19 +112,6 @@ export function escapeEditableHTML( value ) {
 }
 
 /**
- * Returns an unescaped Editable HTML element value.
- *
- * @param {string} value Element value.
- *
- * @return {string} Escaped HTML element value.
- */
-export function unescapeEditableHTML( value ) {
-	return value
-		.replace( /(?<!&amp;)&lt;/gi, '<' )
-		.replace( /&amp;/gi, '&' );
-}
-
-/**
  * Returns true if the given attribute name is valid, or false otherwise.
  *
  * @param {string} name Attribute name to test.

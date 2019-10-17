@@ -32,6 +32,7 @@ _Related_
 _Parameters_
 
 -   _value_ `string`: Original string.
+-   _all_ `boolean`: Set to true to escape all ampersands.
 
 _Returns_
 
@@ -63,6 +64,20 @@ _Parameters_
 _Returns_
 
 -   `string`: Escaped attribute value.
+
+<a name="escapeEditableHTML" href="#escapeEditableHTML">#</a> **escapeEditableHTML**
+
+Returns an escaped Editable HTML element value. This is different from
+`escapeHTML`, because for editable HTML, all ampersands must be escaped in
+order to render the content correctly on the page.
+
+_Parameters_
+
+-   _value_ `string`: Element value.
+
+_Returns_
+
+-   `string`: Escaped HTML element value.
 
 <a name="escapeHTML" href="#escapeHTML">#</a> **escapeHTML**
 

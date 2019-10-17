@@ -4,7 +4,7 @@
 	"attributes": {
 		"content": {
 			"type": "string",
-			"source": "html",
+			"source": "text",
 			"selector": "code"
 		}
 	}
