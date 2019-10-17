@@ -10,7 +10,7 @@ import { boolean, text } from '@storybook/addon-knobs';
  */
 import Card from '../index';
 import CardFooter from '../footer';
-import { getCardStoryProps } from './__utils';
+import { getCardStoryProps } from './_utils';
 
 export default { title: 'Card/Footer', component: CardFooter };
 

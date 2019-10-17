@@ -10,7 +10,7 @@ import { boolean, text } from '@storybook/addon-knobs';
  */
 import Card from '../index';
 import CardHeader from '../header';
-import { getCardStoryProps } from './__utils';
+import { getCardStoryProps } from './_utils';
 
 export default { title: 'Card/Header', component: CardHeader };
 

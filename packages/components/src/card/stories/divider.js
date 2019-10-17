@@ -4,7 +4,7 @@
 import Card from '../index';
 import CardBody from '../body';
 import CardDivider from '../divider';
-import { getCardStoryProps } from './__utils';
+import { getCardStoryProps } from './_utils';
 
 export default { title: 'Card/Divider', component: CardDivider };
 
