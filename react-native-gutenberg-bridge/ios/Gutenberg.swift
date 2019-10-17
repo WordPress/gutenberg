@@ -64,14 +64,6 @@ public class Gutenberg: NSObject {
             initialProps["translations"] = translations
         }
 
-        if let slug = dataSource.siteSlug {
-            initialProps["siteSlug"] = slug
-        }
-
-        if let extraHeaders = dataSource.extraHTTPHeaders {
-            initialProps["extraHTTPHeaders"] = extraHeaders
-        }
-        
         return initialProps
     }
 

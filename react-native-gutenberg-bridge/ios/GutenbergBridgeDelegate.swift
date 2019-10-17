@@ -120,6 +120,8 @@ public protocol GutenbergBridgeDelegate: class {
     /// Tells the delegate that the editor has sent an autosave event.
     ///
     func editorDidAutosave()
+
+    func gutenbergDidRequestFetch(path: String, response: @escaping (Swift.Result<Any, NSError>) -> Void) 
 }
 
 // MARK: - Optional GutenbergBridgeDelegate methods
