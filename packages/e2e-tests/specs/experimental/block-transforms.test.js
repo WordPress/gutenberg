@@ -32,8 +32,8 @@ import {
 	getAvailableBlockFixturesBasenames,
 	getBlockFixtureHTML,
 	getBlockFixtureParsedJSON,
-} from '../fixtures/';
-import { EXPECTED_TRANSFORMS } from '../fixtures/block-transforms.js';
+} from '../../fixtures/';
+import { EXPECTED_TRANSFORMS } from '../../fixtures/block-transforms.js';
 
 /*
 * Returns true if the fileBase refers to a fixture of a block
