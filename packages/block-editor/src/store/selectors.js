@@ -1292,7 +1292,7 @@ export const hasInserterItems = createSelector(
  *
  * @return {boolean} True if there is one item available, false if zero or more than one.
  */
-export const hasOneAllowedItem = ( state, rootClientId = null ) => {
+export const hasOnlyOneAllowedInserterItem = ( state, rootClientId = null ) => {
 	if ( rootClientId ) {
 		const parentBlockListSettings = getBlockListSettings( state, rootClientId );
 		return get( parentBlockListSettings, [ 'allowedBlocks', 'length' ], 0 ) === 1;
@@ -1309,11 +1309,11 @@ export const hasOneAllowedItem = ( state, rootClientId = null ) => {
  *
  * @return {string} The name of the allowed block.
  */
-export const getOneAllowedItem = ( state, rootClientId = null ) => {
+export const getTheOnlyAllowedItem = ( state, rootClientId = null ) => {
 	if ( ! rootClientId ) {
 		return false;
 	}
-	if ( ! hasOneAllowedItem( state, rootClientId ) ) {
+	if ( ! hasOnlyOneAllowedInserterItem( state, rootClientId ) ) {
 		return false;
 	}
 

@@ -72,14 +72,14 @@ class Inserter extends Component {
 	renderToggle( { onToggle, isOpen } ) {
 		const {
 			disabled,
-			hasOneAllowedItem,
+			hasOnlyOneAllowedInserterItem,
 			blockTitle,
-			createIfOne,
+			insertTheOnlyAllowedItem,
 			renderToggle = defaultRenderToggle,
 		} = this.props;
 
-		if ( hasOneAllowedItem ) {
-			onToggle = createIfOne;
+		if ( hasOnlyOneAllowedInserterItem ) {
+			onToggle = insertTheOnlyAllowedItem;
 		}
 
 		return renderToggle( { onToggle, isOpen, disabled, blockTitle } );
@@ -129,47 +129,44 @@ class Inserter extends Component {
 
 export default compose( [
 	withSelect( ( select, { rootClientId } ) => {
-		const { hasInserterItems, hasOneAllowedItem, getOneAllowedItem } = select( 'core/block-editor' );
-		const allowedBlock = getBlockType( getOneAllowedItem( rootClientId ) );
+		const { hasInserterItems, hasOnlyOneAllowedInserterItem, getTheOnlyAllowedItem } = select( 'core/block-editor' );
+		const allowedBlock = getBlockType( getTheOnlyAllowedItem( rootClientId ) );
 		return {
 			hasItems: hasInserterItems( rootClientId ),
-			hasOneAllowedItem: hasOneAllowedItem( rootClientId ),
+			hasOnlyOneAllowedInserterItem: hasOnlyOneAllowedInserterItem( rootClientId ),
 			blockTitle: allowedBlock ? allowedBlock.title : '',
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {
-		// eslint-disable-next-line no-restricted-syntax
-		function createIfOne() {
-			const { rootClientId, clientId, destinationRootClientId, isAppender } = ownProps;
-			const {
-				getBlockListSettings,
-			} = select( 'core/block-editor' );
-			const parentBlockListSettings = getBlockListSettings( rootClientId );
-			const isOnlyOneAllowedBlock = get( parentBlockListSettings, [ 'allowedBlocks', 'length' ], 0 ) === 1;
-
-			if ( ! isOnlyOneAllowedBlock ) {
-				return false;
-			}
-
-			const parentAllowedBlocks = get( parentBlockListSettings, [ 'allowedBlocks' ] );
-
-			const {
-				getInsertionIndex,
-			} = select( 'core/block-editor' );
-
-			const {
-				insertBlock,
-			} = dispatch( 'core/block-editor' );
-			const insertedBlock = createBlock( parentAllowedBlocks[ 0 ] );
-			insertBlock(
-				insertedBlock,
-				getInsertionIndex( clientId, destinationRootClientId, isAppender ),
-				rootClientId
-			);
-		}
-
 		return {
-			createIfOne,
+			insertTheOnlyAllowedItem: () => {
+				const { rootClientId, clientId, destinationRootClientId, isAppender } = ownProps;
+				const {
+					getBlockListSettings,
+				} = select( 'core/block-editor' );
+				const parentBlockListSettings = getBlockListSettings( rootClientId );
+				const isOnlyOneAllowedBlock = get( parentBlockListSettings, [ 'allowedBlocks', 'length' ], 0 ) === 1;
+
+				if ( ! isOnlyOneAllowedBlock ) {
+					return false;
+				}
+
+				const parentAllowedBlocks = get( parentBlockListSettings, [ 'allowedBlocks' ] );
+
+				const {
+					getInsertionIndex,
+				} = select( 'core/block-editor' );
+
+				const {
+					insertBlock,
+				} = dispatch( 'core/block-editor' );
+				const insertedBlock = createBlock( parentAllowedBlocks[ 0 ] );
+				insertBlock(
+					insertedBlock,
+					getInsertionIndex( clientId, destinationRootClientId, isAppender ),
+					rootClientId
+				);
+			},
 		};
 	} ),
 	ifCondition( ( { hasItems } ) => hasItems ),
