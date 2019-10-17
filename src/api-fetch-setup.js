@@ -26,6 +26,6 @@ const fetchHandler = ( options ) => {
 	} );
 };
 
-export default ( setupApiFetch = () => {
+export default () => {
 	apiFetch.setFetchHandler( ( options ) => fetchHandler( options ) );
-} );
+};
