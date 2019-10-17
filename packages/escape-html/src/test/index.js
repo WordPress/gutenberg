@@ -22,7 +22,7 @@ function testEscapeAmpersand( implementation ) {
 	it( 'should escape ampersand', () => {
 		const result = implementation( 'foo & bar &amp; &AMP; baz &#931; &#bad; &#x3A3; &#X3a3; &#xevil;' );
 
-		expect( result ).toBe( 'foo &amp; bar &amp; &AMP; baz &#931; &amp;#bad; &#x3A3; &#X3a3; &amp;#xevil;' );
+		expect( result ).toBe( 'foo &amp; bar &amp;amp; &amp;AMP; baz &amp;#931; &amp;#bad; &amp;#x3A3; &amp;#X3a3; &amp;#xevil;' );
 	} );
 }
 
