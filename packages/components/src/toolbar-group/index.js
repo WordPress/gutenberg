@@ -55,7 +55,7 @@ function ToolbarGroup( {
 		return null;
 	}
 
-	const cls = classnames( 'components-toolbar', className );
+	const finalClassName = classnames( 'components-toolbar', className );
 
 	// Normalize controls to nested array of objects (sets of controls)
 	let controlSets = controls;
@@ -69,13 +69,13 @@ function ToolbarGroup( {
 				icon={ icon }
 				label={ label }
 				controls={ controlSets }
-				className={ cls }
+				className={ finalClassName }
 			/>
 		);
 	}
 
 	return (
-		<ToolbarGroupContainer className={ cls } { ...otherProps }>
+		<ToolbarGroupContainer className={ finalClassName } { ...otherProps }>
 			{ flatMap( controlSets, ( controlSet, indexOfSet ) =>
 				controlSet.map( ( control, indexOfControl ) => (
 					<ToolbarButton
