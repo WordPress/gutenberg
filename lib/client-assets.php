@@ -145,10 +145,6 @@ function gutenberg_override_translation_file( $file, $handle ) {
 		$path_parts['basename']
 	);
 
-	if ( ! is_readable( $plugin_translation_file ) ) {
-		return $file;
-	}
-
 	return $plugin_translation_file;
 }
 add_filter( 'load_script_translation_file', 'gutenberg_override_translation_file', 10, 2 );
@@ -248,7 +244,8 @@ function gutenberg_register_scripts_and_styles() {
 		sprintf(
 			'wp.apiFetch.nonceMiddleware = wp.apiFetch.createNonceMiddleware( "%s" );' .
 			'wp.apiFetch.use( wp.apiFetch.nonceMiddleware );' .
-			'wp.apiFetch.nonceEndpoint = "%s";',
+			'wp.apiFetch.nonceEndpoint = "%s";' .
+			'wp.apiFetch.use( wp.apiFetch.mediaUploadMiddleware );',
 			( wp_installing() && ! is_multisite() ) ? '' : wp_create_nonce( 'wp_rest' ),
 			admin_url( 'admin-ajax.php?action=gutenberg_rest_nonce' )
 		),
