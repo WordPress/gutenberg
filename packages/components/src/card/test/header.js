@@ -12,7 +12,7 @@ describe( 'CardHeader', () => {
 	describe( 'basic rendering', () => {
 		test( 'should have components-card className', () => {
 			const wrapper = shallow( <CardHeader /> );
-			const cardHeader = wrapper.find( '.components-card-header' );
+			const cardHeader = wrapper.find( '.components-card__header' );
 
 			expect( cardHeader.length ).toBe( 1 );
 		} );
@@ -33,21 +33,21 @@ describe( 'CardHeader', () => {
 	describe( 'modifiers', () => {
 		test( 'should be able to render size modifier', () => {
 			const wrapper = shallow( <CardHeader size="large" /> );
-			const cardHeader = wrapper.find( '.components-card-header' );
+			const cardHeader = wrapper.find( '.components-card__header' );
 
 			expect( cardHeader.hasClass( 'is-size-large' ) ).toBe( true );
 		} );
 
 		test( 'should be able to render shady modifier', () => {
 			const wrapper = shallow( <CardHeader isShady /> );
-			const cardHeader = wrapper.find( '.components-card-header' );
+			const cardHeader = wrapper.find( '.components-card__header' );
 
 			expect( cardHeader.hasClass( 'is-shady' ) ).toBe( true );
 		} );
 
 		test( 'should be able to render variant modifier', () => {
 			const wrapper = shallow( <CardHeader variant="borderless" /> );
-			const cardHeader = wrapper.find( '.components-card-header' );
+			const cardHeader = wrapper.find( '.components-card__header' );
 
 			expect( cardHeader.hasClass( 'is-variant-borderless' ) ).toBe( true );
 		} );

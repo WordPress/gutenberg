@@ -20,7 +20,7 @@ export function CardFooter( props ) {
 	const { size, variant } = mergedProps;
 
 	const classes = classnames(
-		'components-card-footer',
+		'components-card__footer',
 		isShady && 'is-shady',
 		size && `is-size-${ size }`,
 		variant && `is-variant-${ variant }`,

@@ -11,7 +11,7 @@ import { MediaUI } from './styles/card-styles';
 export function CardMedia( props ) {
 	const { className, ...additionalProps } = props;
 
-	const classes = classnames( 'components-card-media', className );
+	const classes = classnames( 'components-card__media', className );
 
 	return <MediaUI { ...additionalProps } className={ classes } />;
 }

@@ -12,7 +12,7 @@ describe( 'CardDivider', () => {
 	describe( 'basic rendering', () => {
 		test( 'should have components-card className', () => {
 			const wrapper = shallow( <CardDivider /> );
-			const cardDivider = wrapper.find( '.components-card-divider' );
+			const cardDivider = wrapper.find( '.components-card__divider' );
 
 			expect( cardDivider.length ).toBe( 1 );
 		} );
@@ -30,7 +30,7 @@ describe( 'CardDivider', () => {
 
 		test( 'should have role of separator', () => {
 			const wrapper = shallow( <CardDivider /> );
-			const cardDivider = wrapper.find( '.components-card-divider' );
+			const cardDivider = wrapper.find( '.components-card__divider' );
 
 			expect( cardDivider.prop( 'role' ) ).toBe( 'separator' );
 		} );

@@ -12,7 +12,7 @@ describe( 'CardFooter', () => {
 	describe( 'basic rendering', () => {
 		test( 'should have components-card className', () => {
 			const wrapper = shallow( <CardFooter /> );
-			const cardFooter = wrapper.find( '.components-card-footer' );
+			const cardFooter = wrapper.find( '.components-card__footer' );
 
 			expect( cardFooter.length ).toBe( 1 );
 		} );
@@ -33,21 +33,21 @@ describe( 'CardFooter', () => {
 	describe( 'modifiers', () => {
 		test( 'should be able to render size modifier', () => {
 			const wrapper = shallow( <CardFooter size="large" /> );
-			const cardFooter = wrapper.find( '.components-card-footer' );
+			const cardFooter = wrapper.find( '.components-card__footer' );
 
 			expect( cardFooter.hasClass( 'is-size-large' ) ).toBe( true );
 		} );
 
 		test( 'should be able to render shady modifier', () => {
 			const wrapper = shallow( <CardFooter isShady /> );
-			const cardFooter = wrapper.find( '.components-card-footer' );
+			const cardFooter = wrapper.find( '.components-card__footer' );
 
 			expect( cardFooter.hasClass( 'is-shady' ) ).toBe( true );
 		} );
 
 		test( 'should be able to render variant modifier', () => {
 			const wrapper = shallow( <CardFooter variant="borderless" /> );
-			const cardFooter = wrapper.find( '.components-card-footer' );
+			const cardFooter = wrapper.find( '.components-card__footer' );
 
 			expect( cardFooter.hasClass( 'is-variant-borderless' ) ).toBe( true );
 		} );

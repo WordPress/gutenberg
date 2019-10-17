@@ -11,7 +11,7 @@ import { DividerUI } from './styles/card-styles';
 export function CardDivider( props ) {
 	const { className, ...additionalProps } = props;
 
-	const classes = classnames( 'components-card-divider', className );
+	const classes = classnames( 'components-card__divider', className );
 
 	return (
 		<DividerUI

@@ -12,7 +12,7 @@ describe( 'CardMedia', () => {
 	describe( 'basic rendering', () => {
 		test( 'should have components-card className', () => {
 			const wrapper = shallow( <CardMedia /> );
-			const cardMedia = wrapper.find( '.components-card-media' );
+			const cardMedia = wrapper.find( '.components-card__media' );
 
 			expect( cardMedia.length ).toBe( 1 );
 		} );

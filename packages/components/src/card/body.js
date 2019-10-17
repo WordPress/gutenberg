@@ -20,7 +20,7 @@ export function CardBody( props ) {
 	const { size } = mergedProps;
 
 	const classes = classnames(
-		'components-card-body',
+		'components-card__body',
 		isShady && 'is-shady',
 		size && `is-size-${ size }`,
 		className

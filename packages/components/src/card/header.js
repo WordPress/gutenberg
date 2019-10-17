@@ -20,7 +20,7 @@ export function CardHeader( props ) {
 	const { size, variant } = mergedProps;
 
 	const classes = classnames(
-		'components-card-header',
+		'components-card__header',
 		isShady && 'is-shady',
 		size && `is-size-${ size }`,
 		variant && `is-variant-${ variant }`,

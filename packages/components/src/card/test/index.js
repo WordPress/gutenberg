@@ -70,7 +70,7 @@ describe( 'Card', () => {
 					<CardBody>Hello</CardBody>
 				</Card>
 			);
-			const cardBody = card.find( '.components-card-body' ).first();
+			const cardBody = card.find( '.components-card__body' ).first();
 
 			expect( cardBody.hasClass( 'is-size-extraSmall' ) ).toBe( true );
 		} );
@@ -81,7 +81,7 @@ describe( 'Card', () => {
 					<CardBody size="large">Hello</CardBody>
 				</Card>
 			);
-			const cardBody = card.find( '.components-card-body' ).first();
+			const cardBody = card.find( '.components-card__body' ).first();
 
 			expect( cardBody.hasClass( 'is-size-large' ) ).toBe( true );
 		} );
@@ -106,7 +106,7 @@ describe( 'Card', () => {
 					<CardHeader>Hello</CardHeader>
 				</Card>
 			);
-			const cardHeader = card.find( '.components-card-header' ).first();
+			const cardHeader = card.find( '.components-card__header' ).first();
 
 			expect( cardHeader.hasClass( 'is-size-extraSmall' ) ).toBe( true );
 			expect( cardHeader.hasClass( 'is-variant-borderless' ) ).toBe( true );
@@ -120,7 +120,7 @@ describe( 'Card', () => {
 					</CardHeader>
 				</Card>
 			);
-			const cardHeader = card.find( '.components-card-header' ).first();
+			const cardHeader = card.find( '.components-card__header' ).first();
 
 			expect( cardHeader.hasClass( 'is-size-large' ) ).toBe( true );
 			expect( cardHeader.hasClass( 'is-variant-raised' ) ).toBe( true );
@@ -146,7 +146,7 @@ describe( 'Card', () => {
 					<CardFooter>Hello</CardFooter>
 				</Card>
 			);
-			const cardFooter = card.find( '.components-card-footer' ).first();
+			const cardFooter = card.find( '.components-card__footer' ).first();
 
 			expect( cardFooter.hasClass( 'is-size-extraSmall' ) ).toBe( true );
 			expect( cardFooter.hasClass( 'is-variant-borderless' ) ).toBe( true );
@@ -160,7 +160,7 @@ describe( 'Card', () => {
 					</CardFooter>
 				</Card>
 			);
-			const cardFooter = card.find( '.components-card-footer' ).first();
+			const cardFooter = card.find( '.components-card__footer' ).first();
 
 			expect( cardFooter.hasClass( 'is-size-large' ) ).toBe( true );
 			expect( cardFooter.hasClass( 'is-variant-raised' ) ).toBe( true );
