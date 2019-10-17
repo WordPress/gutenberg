@@ -107,7 +107,7 @@ class InnerBlocks extends Component {
 			hasOverlay,
 			renderAppender,
 			template,
-			moverOptions,
+			__experimentalMoverOptions: moverOptions,
 			__experimentalTemplateOptions: templateOptions,
 			__experimentalOnSelectTemplateOption: onSelectTemplateOption,
 			__experimentalAllowTemplateOptionSkip: allowTemplateOptionSkip,
