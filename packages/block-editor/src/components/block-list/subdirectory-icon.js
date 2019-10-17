@@ -5,9 +5,6 @@ import { SVG, Path } from '@wordpress/components';
 
 const Subdirectory = ( { ...extraProps } ) => (
 	<SVG
-		aria-hidden
-		role="img"
-		focusable="false"
 		xmlns="http://www.w3.org/2000/svg"
 		width={ 14 }
 		height={ 14 }
