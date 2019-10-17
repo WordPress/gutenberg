@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { overEvery, find, findLast, reverse, first, last, castArray } from 'lodash';
+import { overEvery, find, findLast, reverse, first, last, filter } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -70,35 +70,6 @@ export function isNavigationCandidate( element, keyCode, hasModifier ) {
 	// Native inputs should not navigate horizontally.
 	const { tagName } = element;
 	return tagName !== 'INPUT' && tagName !== 'TEXTAREA';
-}
-
-/**
- * From the point determined by the x and y position, search using the increment until finding
- * a tabbable text field or until the number of searches expires.
- *
- * @param {number} xPosition The horizontal starting position.
- * @param {number} yPosition The vertical starting position.
- * @param {number} increment The size of the increment from the starting position.
- * @param {number} searches  The number of searches to perform.
- */
-function searchVerticallyForTabbableTextField( xPosition, yPosition, increment = 5, searches = 10 ) {
-	if ( searches === 0 ) {
-		return;
-	}
-
-	// Prefer elementsFromPoint where supported, but use a fallback otherwise.
-	const elementsFromPoint = document.elementsFromPoint || document.msElementsFromPoint || document.elementFromPoint;
-	if ( ! elementsFromPoint ) {
-		return;
-	}
-
-	const elements = castArray( elementsFromPoint.call( document, xPosition, yPosition ) );
-	const tabbable = find( elements, isTabbableTextField );
-	if ( tabbable ) {
-		return tabbable;
-	}
-
-	return searchVerticallyForTabbableTextField( xPosition, yPosition + increment, increment, searches - 1 );
 }
 
 class WritingFlow extends Component {
@@ -217,43 +188,81 @@ class WritingFlow extends Component {
 	}
 
 	getClosestVerticalTabbable( target, isReverse ) {
-		// Start searching from the caret position.
+		const focusableNodes = focus.focusable.find( this.container );
+
+		if ( ! focusableNodes[ 0 ] ) {
+			return;
+		}
+
+		const targetRect = target.getBoundingClientRect();
+
+		if ( ! targetRect ) {
+			return;
+		}
+
+		const targetVerticalCenter = targetRect.top + ( targetRect.bottom - targetRect.top );
+
+		const filteredNodes = filter( focusableNodes, ( node ) => {
+			if ( node === target ) {
+				return false;
+			}
+
+			if ( ! focus.tabbable.isTabbableIndex( node ) ) {
+				return false;
+			}
+
+			if ( ! isTextField( node ) ) {
+				return false;
+			}
+
+			const nodeRect = node.getBoundingClientRect();
+			const nodeVerticalCenter = nodeRect.top + ( ( nodeRect.bottom - nodeRect.top ) / 2 );
+			const isNodeInCorrectDirection = (
+				( ! isReverse && nodeVerticalCenter > targetVerticalCenter ) ||
+				( isReverse && nodeVerticalCenter < targetVerticalCenter )
+			);
+
+			// User is navigating up, but focusable is below, or vice versa.
+			if ( ! isNodeInCorrectDirection ) {
+				return false;
+			}
+
+			// Focusable is not directly above or below the target, ignore this focusable.
+			if ( nodeRect.left > targetRect.right || nodeRect.right < targetRect.left ) {
+				return false;
+			}
+
+			return true;
+		} );
+
 		const caretRect = computeCaretRect();
-		const { left: xPosition } = caretRect || {};
-		const { top: targetTop, bottom: targetBottom, left: targetLeft, right: targetRight } = target.getBoundingClientRect();
+		const caretCentroid = {
+			x: caretRect.left,
+			y: caretRect.top + ( ( caretRect.bottom - caretRect.top ) / 2 ),
+		};
 
-		// Search vertically in a 10px increment as most text fields should be taller than 10px.
-		const verticalIncrement = isReverse ? -10 : 10;
-		const startYPosition = ( isReverse ? targetTop : targetBottom ) + verticalIncrement;
+		const sortedNodes = filteredNodes.sort( ( leftNode, rightNode ) => {
+			const leftNodeRect = leftNode.getBoundingClientRect();
+			const rightNodeRect = rightNode.getBoundingClientRect();
 
-		// Make an initial vertical search from the caret's position.
-		let tabbable = searchVerticallyForTabbableTextField( xPosition, startYPosition, verticalIncrement );
-		if ( tabbable ) {
-			return tabbable;
-		}
+			const leftNodeCentroid = {
+				x: leftNodeRect.left,
+				y: leftNodeRect.top + ( ( leftNodeRect.bottom - leftNodeRect.top ) / 2 ),
+			};
+			const rightNodeCentroid = {
+				x: rightNodeRect.left,
+				y: rightNodeRect.top + ( ( rightNodeRect.bottom - rightNodeRect.top ) / 2 ),
+			};
 
-		// Search around the caret, taking up to 10 steps in either direction horizontally before giving up.
-		const HORIZONTAL_SEARCH_COUNT = 30;
-		const width = targetRight - targetLeft;
-		const horizontalIncrement = width / HORIZONTAL_SEARCH_COUNT;
+			// Use pythagorean theorum to calculate the distance between the caret and the node.
+			const leftNodeDistance = Math.sqrt( Math.pow( leftNodeCentroid.x - caretCentroid.x, 2 ) + Math.pow( leftNodeCentroid.y - caretCentroid.y, 2 ) );
+			const rightNodeDistance = Math.sqrt( Math.pow( rightNodeCentroid.x - caretCentroid.x, 2 ) + Math.pow( rightNodeCentroid.y - caretCentroid.y, 2 ) );
 
-		for ( let searches = 1; searches <= HORIZONTAL_SEARCH_COUNT; searches++ ) {
-			const positionToRightOfCaret = xPosition + ( horizontalIncrement * searches );
-			if ( positionToRightOfCaret <= targetRight ) {
-				tabbable = searchVerticallyForTabbableTextField( positionToRightOfCaret, startYPosition, verticalIncrement );
-				if ( tabbable ) {
-					return tabbable;
-				}
-			}
+			// Sort by shortest distance first.
+			return leftNodeDistance - rightNodeDistance;
+		} );
 
-			const positionToLeftOfCaret = xPosition - ( horizontalIncrement * searches );
-			if ( positionToLeftOfCaret >= targetLeft ) {
-				tabbable = searchVerticallyForTabbableTextField( positionToLeftOfCaret, startYPosition, verticalIncrement );
-				if ( tabbable ) {
-					return tabbable;
-				}
-			}
-		}
+		return sortedNodes[ 0 ];
 	}
 
 	expandSelection( isReverse ) {
