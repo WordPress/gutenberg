@@ -31,7 +31,7 @@ const REGEXP_INVALID_ATTRIBUTE_NAME = /[\u007F-\u009F "'>/="\uFDD0-\uFDEF]/;
  * @return {string} Escaped string.
  */
 export function escapeAmpersand( value ) {
-	return value.replace( /&/gi, '&amp;' );
+	return value.replace( /&(?!([a-z0-9]+|#[0-9]+|#x[a-f0-9]+);)/gi, '&amp;' );
 }
 
 /**

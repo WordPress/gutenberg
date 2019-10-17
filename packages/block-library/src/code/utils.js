@@ -11,6 +11,7 @@ import { flow } from 'lodash';
  */
 export function escape( content ) {
 	return flow(
+		escapeAmpersands,
 		escapeOpeningSquareBrackets,
 		escapeProtocolInIsolatedUrls
 	)( content || '' );
@@ -26,7 +27,31 @@ export function unescape( content ) {
 	return flow(
 		unescapeProtocolInIsolatedUrls,
 		unescapeOpeningSquareBrackets,
+		unescapeAmpersands
 	)( content || '' );
+}
+
+/**
+ * Returns the given content with all its ampersand characters converted
+ * into their HTML entity counterpart (i.e. & => &amp;)
+ *
+ * @param {string}  content The content of a code block.
+ * @return {string} The given content with its ampersands converted into
+ *                  their HTML entity counterpart (i.e. & => &amp;)
+ */
+function escapeAmpersands( content ) {
+	return content.replace( /&/g, '&amp;' );
+}
+
+/**
+ * Returns the given content with all &amp; HTML entities converted into &.
+ *
+ * @param {string}  content The content of a code block.
+ * @return {string} The given content with all &amp; HTML entities
+ *                  converted into &.
+ */
+function unescapeAmpersands( content ) {
+	return content.replace( /&amp;/g, '&' );
 }
 
 /**

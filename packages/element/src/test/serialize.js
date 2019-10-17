@@ -188,7 +188,7 @@ describe( 'renderElement()', () => {
 	it( 'renders escaped string element', () => {
 		const result = renderElement( 'hello & world &amp; friends <img/>' );
 
-		expect( result ).toBe( 'hello &amp; world &amp;amp; friends &lt;img/>' );
+		expect( result ).toBe( 'hello &amp; world &amp; friends &lt;img/>' );
 	} );
 
 	it( 'renders numeric element as string', () => {
