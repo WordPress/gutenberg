@@ -32,7 +32,7 @@ describe( 'Managing reusable blocks', () => {
 		await importButton.click();
 
 		// Select the file to upload
-		const testReusableBlockFile = path.join( __dirname, '..', 'assets', 'greeting-reusable-block.json' );
+		const testReusableBlockFile = path.join( __dirname, '..', '..', '..', 'assets', 'greeting-reusable-block.json' );
 		const input = await page.$( '.list-reusable-blocks-import-form input' );
 		await input.uploadFile( testReusableBlockFile );
 
