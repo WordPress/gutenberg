@@ -4,7 +4,6 @@
 import {
 	Button,
 	IconButton,
-	Icon,
 	ExternalLink,
 	Popover,
 } from '@wordpress/components';
@@ -41,7 +40,7 @@ import {
 } from '../';
 
 import LinkControlSettingsDrawer from './settings-drawer';
-import TextHighlight from './text-highlight';
+import LinkControlSearchItem from './search-item';
 
 function LinkControl( { currentLink, fetchSearchSuggestions, onLinkChange, onSettingChange = { noop }, linkSettings } ) {
 	// State
@@ -111,25 +110,15 @@ function LinkControl( { currentLink, fetchSearchSuggestions, onLinkChange, onSet
 			<div className="block-editor-link-control__search-results-wrapper">
 				<div { ...suggestionsListProps } className="block-editor-link-control__search-results">
 					{ suggestions.map( ( suggestion, index ) => (
-						<button
-							{ ...buildSuggestionItemProps( suggestion, index ) }
+						<LinkControlSearchItem
+							key={ `${ suggestion.id }-${ index }` }
+							itemProps={ buildSuggestionItemProps( suggestion, index ) }
+							suggestion={ suggestion }
 							onClick={ partialRight( onLinkSelect, suggestion ) }
-							className={ classnames( 'block-editor-link-control__search-item', {
-								'is-selected': index === selectedSuggestion,
-							} ) }
-
-						>
-							{ suggestion.type.toLowerCase() === 'url' && (
-								<Icon className="block-editor-link-control__search-item-icon" icon="admin-site-alt3" />
-							) }
-							<span className="block-editor-link-control__search-item-header">
-								<span className="block-editor-link-control__search-item-title">
-									<TextHighlight text={ suggestion.title } highlight={ inputValue } />
-								</span>
-								<span className="block-editor-link-control__search-item-info">{ suggestion.info || filterURLForDisplay( safeDecodeURI( suggestion.url ) ) || '' }</span>
-							</span>
-							<span className="block-editor-link-control__search-item-type">{ suggestion.type.toLowerCase() || '' }</span>
-						</button>
+							isSelected={ index === selectedSuggestion }
+							isUrl={ suggestion.type.toLowerCase() === 'url' }
+							searchTerm={ inputValue }
+						/>
 					) ) }
 				</div>
 			</div>

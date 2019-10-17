@@ -264,7 +264,6 @@ class URLInput extends Component {
 
 		const buildSuggestionItemProps = ( suggestion, index ) => {
 			return {
-				key: suggestion.id,
 				role: 'option',
 				tabIndex: '-1',
 				id: `${ suggestionOptionIdPrefix }-${ index }`,
