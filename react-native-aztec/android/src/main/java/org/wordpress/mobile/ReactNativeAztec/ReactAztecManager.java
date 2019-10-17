@@ -103,6 +103,7 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
                 new LinkFormatter.LinkStyle(
                         Color.parseColor("#016087"), true)
         ));
+        aztecText.addPlugin(new CssUnderlinePlugin());
         return aztecText;
     }
 
@@ -413,7 +414,6 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
             view.addPlugin(new VideoShortcodePlugin());
             view.addPlugin(new AudioShortcodePlugin());
             view.addPlugin(new HiddenGutenbergPlugin(view));
-            view.addPlugin(new CssUnderlinePlugin());
             view.setImageGetter(new GlideImageLoader(view.getContext()));
             view.setVideoThumbnailGetter(new GlideVideoThumbnailLoader(view.getContext()));
             // we need to restart the editor now
