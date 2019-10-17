@@ -129,7 +129,7 @@
     "test:e2e:build-app:android": "npm run test:e2e:bundle:android && cd android && ./gradlew clean && ./gradlew assembleDebug",
     "test:e2e:install-app:android": "cd android && ./gradlew installDebug",
     "test:e2e:bundle:ios": "react-native bundle --reset-cache --platform=ios --dev=false --minify false --entry-file=index.js --bundle-output=./ios/build/gutenberg/Build/Products/Release-iphonesimulator/gutenberg.app/main.jsbundle --assets-dest=./ios/build/gutenberg/Build/Products/Release-iphonesimulator/gutenberg.app",
-    "test:e2e:build-app:ios": "react-native run-ios --configuration Release --no-packager && npm run test:e2e:bundle:ios && WORK_DIR=$(pwd) && cd ./ios/build/gutenberg/Build/Products/Release-iphonesimulator && zip -r $WORK_DIR/ios/Gutenberg.app.zip gutenberg.app",
+    "test:e2e:build-app:ios": "react-native run-ios --configuration Release --no-packager && WORK_DIR=$(pwd) && cd ./ios/build/gutenberg/Build/Products/Release-iphonesimulator && zip -r $WORK_DIR/ios/Gutenberg.app.zip gutenberg.app",
     "test:e2e:install-app:ios": "npm run test:e2e:build-app:ios",
     "clean": "npm run clean:aztec; npm run cache clean; npm run clean:haste; npm run clean:jest; npm run clean:metro; npm run clean:react; npm run clean:watchman;",
     "clean:runtime": "npm run clean:haste; npm run clean:react; npm run clean:metro; npm run clean:jest; npm run clean:watchman; npm run clean:babel-cache",
@@ -142,8 +142,6 @@
     "clean:watchman": "command -v watchman >/dev/null 2>&1 && watchman watch-del-all; true",
     "clean:babel-cache": "rm -rf ../../node_modules/.cache/babel-loader/*",
     "clean:i18n-cache": "rm -rf ./i18n-cache/data/*.json && rm -f ./i18n-cache/index.native.js",
-    "lint": "eslint . --ext .js",
-    "lint:fix": "npm run lint --fix",
     "version": "npm run bundle && git add -A bundle"
   }
 }
