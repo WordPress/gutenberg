@@ -33,7 +33,7 @@ describe( 'adding inline tokens', () => {
 		// Wait for media modal to appear and upload image.
 		await page.waitForSelector( '.media-modal input[type=file]' );
 		const inputElement = await page.$( '.media-modal input[type=file]' );
-		const testImagePath = path.join( __dirname, '..', 'assets', '10x10_e2e_test_image_z9T8jK.png' );
+		const testImagePath = path.join( __dirname, '..', '..', '..', 'assets', '10x10_e2e_test_image_z9T8jK.png' );
 		const filename = uuid();
 		const tmpFileName = path.join( os.tmpdir(), filename + '.png' );
 		fs.copyFileSync( testImagePath, tmpFileName );
