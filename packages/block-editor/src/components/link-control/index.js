@@ -3,7 +3,6 @@
  */
 import {
 	Button,
-	IconButton,
 	ExternalLink,
 	Popover,
 } from '@wordpress/components';
@@ -12,43 +11,26 @@ import {
  * External dependencies
  */
 import classnames from 'classnames';
-import { __ } from '@wordpress/i18n';
 import { isFunction, partialRight, noop } from 'lodash';
 
 import {
 	useCallback,
 	useState,
-	useRef,
 } from '@wordpress/element';
-
-import {
-	LEFT,
-	RIGHT,
-	UP,
-	DOWN,
-	BACKSPACE,
-	ENTER,
-} from '@wordpress/keycodes';
 
 import { safeDecodeURI, filterURLForDisplay, isURL } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
-import {
-	URLInput,
-} from '../';
-
 import LinkControlSettingsDrawer from './settings-drawer';
 import LinkControlSearchItem from './search-item';
+import LinkControlInputSearch from './input-search';
 
 function LinkControl( { currentLink, fetchSearchSuggestions, onLinkChange, onSettingChange = { noop }, linkSettings } ) {
 	// State
 	const [ inputValue, setInputValue ] = useState( '' );
 	const [ isEditingLink, setIsEditingLink ] = useState( true );
-
-	// Refs
-	const autocompleteRef = useRef( null );
 
 	// Handlers
 	const onInputChange = ( value = '' ) => {
@@ -85,17 +67,6 @@ function LinkControl( { currentLink, fetchSearchSuggestions, onLinkChange, onSet
 			type: 'URL',
 			url: value,
 		} ];
-	};
-
-	const stopPropagation = ( event ) => {
-		event.stopPropagation();
-	};
-
-	const stopPropagationRelevantKeys = ( event ) => {
-		if ( [ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ].indexOf( event.keyCode ) > -1 ) {
-			// Stop the key event from propagating up to ObserveTyping.startTypingInTextField.
-			stopPropagation( event );
-		}
 	};
 
 	// Effects
@@ -160,35 +131,14 @@ function LinkControl( { currentLink, fetchSearchSuggestions, onLinkChange, onSet
 					) }
 
 					{ isEditingLink && (
-						<form>
-							<URLInput
-								className="block-editor-link-control__search-input"
-								value={ inputValue }
-								onChange={ onInputChange }
-								autocompleteRef={ autocompleteRef }
-								onKeyDown={ ( event, suggestion ) => {
-									stopPropagationRelevantKeys( event );
-									if ( event.keyCode === ENTER ) {
-										onLinkSelect( event, suggestion );
-									}
-								} }
-								onKeyPress={ stopPropagation }
-								placeholder={ __( 'Search or type url' ) }
-								renderSuggestions={ renderSearchResults }
-								fetchLinkSuggestions={ getSearchHandler }
-								handleURLSuggestions={ true }
-							/>
-
-							<IconButton
-								disabled={ ! inputValue.length }
-								type="reset"
-								label={ __( 'Reset' ) }
-								icon="no-alt"
-								className="block-editor-link-control__search-reset"
-								onClick={ resetInput }
-							/>
-
-						</form>
+						<LinkControlInputSearch
+							value={ inputValue }
+							onChange={ onInputChange }
+							onSelect={ onLinkSelect }
+							renderSuggestions={ renderSearchResults }
+							fetchSuggestions={ getSearchHandler }
+							onReset={ resetInput }
+						/>
 					) }
 
 					{ ! isEditingLink && (
