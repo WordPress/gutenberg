@@ -1302,19 +1302,19 @@ export const hasOnlyOneAllowedInserterItem = ( state, rootClientId = null ) => {
 };
 
 /**
- * Determines whether there is only one item that may be inserted.
+ * Gets the name of the only item that may be inserted.
  *
  * @param {Object}  state        Editor state.
  * @param {?string} rootClientId Optional root client ID of block list.
  *
- * @return {string} The name of the allowed block.
+ * @return {string?} The name of the allowed block or null.
  */
 export const getTheOnlyAllowedItem = ( state, rootClientId = null ) => {
 	if ( ! rootClientId ) {
-		return false;
+		return null;
 	}
 	if ( ! hasOnlyOneAllowedInserterItem( state, rootClientId ) ) {
-		return false;
+		return null;
 	}
 
 	const parentBlockListSettings = getBlockListSettings( state, rootClientId );
@@ -1324,7 +1324,7 @@ export const getTheOnlyAllowedItem = ( state, rootClientId = null ) => {
 };
 
 /**
- * Determines whether there is only one item that may be inserted.
+ * Get the current insertion index.
  *
  * @param {Object}  state           		Editor state.
  * @param {?string} clientId 				Block client ID.
