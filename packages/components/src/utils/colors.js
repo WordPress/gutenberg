@@ -6,7 +6,7 @@ import hexRgb from 'hex-rgb';
 /**
  * Internal dependencies
  */
-import { COLORS } from './colors.values';
+import { COLORS } from './colors-values';
 
 /**
  * Generating a CSS complient rgba() color value.
