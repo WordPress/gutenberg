@@ -33,6 +33,10 @@ exports[`adding blocks Should insert content using the placeholder and the regul
 <p>Paragraph block</p>
 <!-- /wp:paragraph -->
 
+<!-- wp:paragraph -->
+<p>Second paragraph</p>
+<!-- /wp:paragraph -->
+
 <!-- wp:quote -->
 <blockquote class=\\"wp-block-quote\\"><p>Quote block</p></blockquote>
 <!-- /wp:quote -->
@@ -46,9 +50,5 @@ Foo</pre>
 <!-- wp:shortcode -->
 [myshortcode]With multiple
 lines preserved[/myshortcode]
-<!-- /wp:shortcode -->
-
-<!-- wp:paragraph -->
-<p>Second paragraph</p>
-<!-- /wp:paragraph -->"
+<!-- /wp:shortcode -->"
 `;
