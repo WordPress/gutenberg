@@ -12,6 +12,7 @@ import {
 	ObserveTyping,
 } from '@wordpress/block-editor';
 import {
+	Button,
 	Popover,
 	SlotFillProvider,
 	DropZoneProvider,
@@ -40,6 +41,9 @@ function App() {
 		<Fragment>
 			<div className="playground__header">
 				<h1 className="playground__logo">Gutenberg Playground</h1>
+				<Button isLarge href="design-system/components" target="_blank">
+					Design System Components
+				</Button>
 			</div>
 			<div className="playground__body">
 				<SlotFillProvider>
@@ -67,7 +71,4 @@ function App() {
 }
 
 registerCoreBlocks();
-render(
-	<App />,
-	document.querySelector( '#app' )
-);
+render( <App />, document.querySelector( '#app' ) );
