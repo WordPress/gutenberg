@@ -23,10 +23,8 @@ import {
 import InserterMenu from './menu';
 
 const defaultRenderToggle = ( { onToggle, disabled, isOpen, blockTitle } ) => {
-	let label = sprintf( _x( 'Add %s', 'directly add the allowed block' ), blockTitle );
-	if ( blockTitle === '' ) {
-		label = 'Add block';
-	}
+	const label = blockTitle === '' ? _x( 'Add block', 'Generic label for block inseter button' ) : sprintf( _x( 'Add %s', 'directly add the only allowed block' ), blockTitle );
+
 	return (
 		<IconButton
 			icon="insert"
@@ -110,8 +108,6 @@ class Inserter extends Component {
 
 	render() {
 		const { position } = this.props;
-		const toggle = this.renderToggle;
-
 		return (
 			<Dropdown
 				className="editor-inserter block-editor-inserter"
@@ -120,7 +116,7 @@ class Inserter extends Component {
 				onToggle={ this.onToggle }
 				expandOnMobile
 				headerTitle={ __( 'Add a block' ) }
-				renderToggle={ toggle }
+				renderToggle={ this.renderToggle }
 				renderContent={ this.renderContent }
 			/>
 		);
