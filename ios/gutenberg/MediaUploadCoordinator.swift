@@ -1,7 +1,7 @@
 
 import Foundation
 import UIKit
-import RNReactNativeGutenbergBridge
+import Gutenberg
 
 class MediaUploadCoordinator: NSObject {
   

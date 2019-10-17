@@ -1,6 +1,6 @@
 
 import UIKit
-import RNReactNativeGutenbergBridge
+import Gutenberg
 import Aztec
 
 class GutenbergViewController: UIViewController {
