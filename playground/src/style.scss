@@ -10,8 +10,11 @@
 
 
 .playground__header {
-	padding: 20px;
+	align-items: center;
 	border-bottom: 1px solid #ddd;
+	display: flex;
+	justify-content: space-between;
+	padding: 20px;
 }
 
 .playground__logo {
