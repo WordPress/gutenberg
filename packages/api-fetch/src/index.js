@@ -140,6 +140,4 @@ apiFetch.createRootURLMiddleware = createRootURLMiddleware;
 apiFetch.fetchAllMiddleware = fetchAllMiddleware;
 apiFetch.mediaUploadMiddleware = mediaUploadMiddleware;
 
-apiFetch.DEFAULT_HEADERS = DEFAULT_HEADERS;
-
 export default apiFetch;
