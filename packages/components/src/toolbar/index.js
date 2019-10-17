@@ -4,10 +4,18 @@
 import classnames from 'classnames';
 
 /**
+ * WordPress dependencies
+ */
+import deprecated from '@wordpress/deprecated';
+
+/**
  * Internal dependencies
  */
-import ToolbarContainer from './toolbar-container';
 import ToolbarGroup from '../toolbar-group';
+import ToolbarContainer from './toolbar-container';
+import ToolbarContext from './toolbar-context';
+
+export const __unstableToolbarContext = ToolbarContext;
 
 /**
  * Renders a toolbar with controls.
@@ -52,6 +60,10 @@ function Toolbar( { className, accessibilityLabel, ...otherProps } ) {
 			/>
 		);
 	}
+
+	deprecated( 'Using `Toolbar` as a collapsible group of controls', {
+		alternative: '`ToolbarGroup`',
+	} );
 
 	return <ToolbarGroup className={ cls } { ...otherProps } />;
 }

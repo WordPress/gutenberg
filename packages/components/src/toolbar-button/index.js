@@ -12,7 +12,7 @@ import { useContext } from '@wordpress/element';
  * Internal dependencies
  */
 import IconButton from '../icon-button';
-import ToolbarContext from '../toolbar-context';
+import { __unstableToolbarContext } from '../toolbar';
 import AccessibleToolbarButtonContainer from './accessible-toolbar-button-container';
 import ToolbarButtonContainer from './toolbar-button-container';
 
@@ -29,7 +29,8 @@ function ToolbarButton( {
 	extraProps,
 	children,
 } ) {
-	const context = useContext( ToolbarContext );
+	const accessibleToolbarState = useContext( __unstableToolbarContext );
+
 	const button = (
 		<IconButton
 			icon={ icon }
@@ -51,7 +52,7 @@ function ToolbarButton( {
 		/>
 	);
 
-	if ( context ) {
+	if ( accessibleToolbarState ) {
 		return (
 			<AccessibleToolbarButtonContainer className={ containerClassName }>
 				{ button }

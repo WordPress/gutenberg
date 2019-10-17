@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { useToolbarItem } from 'reakit/Toolbar';
+import { ToolbarItem } from 'reakit/Toolbar';
 
 /**
  * WordPress dependencies
@@ -12,21 +12,31 @@ import { useContext } from '@wordpress/element';
  * Internal dependencies
  */
 import DropdownMenu from '../dropdown-menu';
-import ToolbarContext from '../toolbar-context';
+import { __unstableToolbarContext } from '../toolbar';
 
-function ToolbarGroupCollapsed( { controls = [], className, icon, label, toggleProps } ) {
-	const context = useContext( ToolbarContext );
-	const itemProps = useToolbarItem( context, toggleProps );
-	return (
+function ToolbarGroupCollapsed( { controls = [], className, icon, label } ) {
+	const accessibleToolbarState = useContext( __unstableToolbarContext );
+
+	const renderDropdownMenu = ( toggleProps ) => (
 		<DropdownMenu
 			hasArrowIndicator
 			icon={ icon }
 			label={ label }
 			controls={ controls }
 			className={ className }
-			toggleProps={ context ? itemProps : toggleProps }
+			toggleProps={ toggleProps }
 		/>
 	);
+
+	if ( accessibleToolbarState ) {
+		return (
+			<ToolbarItem { ...accessibleToolbarState }>
+				{ ( toolbarItemHTMLProps ) => renderDropdownMenu( toolbarItemHTMLProps ) }
+			</ToolbarItem>
+		);
+	}
+
+	return renderDropdownMenu();
 }
 
 export default ToolbarGroupCollapsed;

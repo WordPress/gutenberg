@@ -6,7 +6,7 @@ import { useToolbarState, Toolbar } from 'reakit/Toolbar';
 /**
  * Internal dependencies
  */
-import ToolbarContext from '../toolbar-context';
+import ToolbarContext from './toolbar-context';
 
 function ToolbarContainer( { accessibilityLabel, ...props } ) {
 	const toolbar = useToolbarState( { loop: true } );

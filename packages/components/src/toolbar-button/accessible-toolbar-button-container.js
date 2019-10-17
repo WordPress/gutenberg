@@ -6,20 +6,20 @@ import { useToolbarItem } from 'reakit/Toolbar';
 /**
  * WordPress dependencies
  */
-import { useContext, Children, cloneElement } from '@wordpress/element';
+import { Children, cloneElement, useContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import ToolbarContext from '../toolbar-context';
+import { __unstableToolbarContext } from '../toolbar';
 
 function AccessibleToolbarButtonContainer( props ) {
-	const toolbar = useContext( ToolbarContext );
-	const button = Children.only( props.children );
-	const itemHTMLProps = useToolbarItem( toolbar, button.props );
+	const accessibleToolbarState = useContext( __unstableToolbarContext );
+	const childButton = Children.only( props.children );
+	const itemHTMLProps = useToolbarItem( accessibleToolbarState, childButton.props );
 	return (
 		<div { ...props }>
-			{ cloneElement( button, itemHTMLProps ) }
+			{ cloneElement( childButton, itemHTMLProps ) }
 		</div>
 	);
 }
