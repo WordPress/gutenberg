@@ -16,7 +16,6 @@ const Example = () => (
 
 ## Props
 
-<!-- prettier-ignore -->
 Name | Type | Default | Description
 --- | --- | --- | ---
 `size` | `string` | `medium` | Determines the amount of padding within the card.
@@ -70,13 +69,13 @@ const Example = () => (
 
 `<Card />`'s sub-components are connected to `<Card />` using [Context](https://reactjs.org/docs/context.html). Certain props like `size` and `variant` are passed through to the sub-components.
 
-In the following example, the `<CardBody />` will render with a size of `sm`:
+In the following example, the `<CardBody />` will render with a size of `small`:
 
 ```jsx
 import { Card, CardBody } from '@wordpress/components';
 
 const Example = () => (
-	<Card size="xs">
+	<Card size="small">
 		<CardBody>...</CardBody>
 	</Card>
 );
@@ -88,10 +87,10 @@ These sub-components are designed to be flexible. The Context props can be overr
 import { Card, CardBody } from '@wordpress/components';
 
 const Example = () => (
-	<Card size="xs">
+	<Card size="small">
 		<CardBody>...</CardBody>
 		<CardBody>...</CardBody>
-		<CardBody size="lg">...</CardBody>
+		<CardBody size="large">...</CardBody>
 	</Card>
 );
 ```

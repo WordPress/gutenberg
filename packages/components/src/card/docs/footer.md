@@ -16,7 +16,6 @@ const Example = () => (
 
 ## Props
 
-<!-- prettier-ignore -->
 Name | Type | Default | Description
 --- | --- | --- | ---
 `isShady` | `boolean` | `false` | Renders with a light gray background color.
