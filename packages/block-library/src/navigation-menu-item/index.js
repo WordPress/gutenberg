@@ -18,7 +18,7 @@ export const settings = {
 
 	parent: [ 'core/navigation-menu' ],
 
-	icon: 'admin-links',
+	icon: 'carrot', // Placeholder; needs definitive icon.
 
 	description: __( 'Add a page, link, or other item to your Navigation Menu.' ),
 

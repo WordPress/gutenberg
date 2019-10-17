@@ -1,55 +1,50 @@
 /**
  * External dependencies
  */
-import { invoke } from 'lodash';
+/**
+ * External dependencies
+ */
 import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
+/**
+ * WordPress dependencies
+ */
 import { withSelect } from '@wordpress/data';
 import {
-	Dropdown,
 	ExternalLink,
-	IconButton,
 	PanelBody,
 	TextareaControl,
 	TextControl,
+	Toolbar,
 	ToggleControl,
+	ToolbarButton,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
+	BlockControls,
 	InnerBlocks,
 	InspectorControls,
 	PlainText,
+	URLPopover,
 } from '@wordpress/block-editor';
 import {
 	Fragment,
-	useCallback,
 	useRef,
+	useState,
 } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import MenuItemActions from './menu-item-actions';
-const POPOVER_PROPS = { noArrow: true };
 
 function NavigationMenuItemEdit( {
 	attributes,
-	clientId,
 	isSelected,
 	isParentOfSelectedBlock,
 	setAttributes,
 } ) {
 	const plainTextRef = useRef( null );
-	const onEditLableClicked = useCallback(
-		( onClose ) => () => {
-			onClose();
-			invoke( plainTextRef, [ 'current', 'textarea', 'focus' ] );
-		},
-		[ plainTextRef ]
-	);
+	const [ isLinkOpen, setLinkOpen ] = useState( false );
+	const { label, url } = attributes;
 	let content;
 	if ( isSelected ) {
 		content = (
@@ -57,41 +52,43 @@ function NavigationMenuItemEdit( {
 				<PlainText
 					ref={ plainTextRef }
 					className="wp-block-navigation-menu-item__field"
-					value={ attributes.label }
-					onChange={ ( label ) => setAttributes( { label } ) }
+					value={ label }
+					onChange={ ( labelValue ) => setAttributes( { label: labelValue } ) }
 					aria-label={ __( 'Navigation Label' ) }
 					maxRows={ 1 }
-				/>
-				<Dropdown
-					contentClassName="wp-block-navigation-menu-item__dropdown-content"
-					position="bottom left"
-					popoverProps={ POPOVER_PROPS }
-					renderToggle={ ( { isOpen, onToggle } ) => (
-						<IconButton
-							icon={ isOpen ? 'arrow-up-alt2' : 'arrow-down-alt2' }
-							label={ __( 'More options' ) }
-							onClick={ onToggle }
-							aria-expanded={ isOpen }
-						/>
-					) }
-					renderContent={ ( { onClose } ) => (
-						<MenuItemActions
-							clientId={ clientId }
-							destination={ attributes.destination }
-							onEditLableClicked={ onEditLableClicked( onClose ) }
-						/>
-					) }
 				/>
 			</div>
 		);
 	} else {
 		content = <div className="wp-block-navigation-menu-item__container">
-			{ attributes.label }
+			{ label }
 		</div>;
 	}
 
 	return (
 		<Fragment>
+			<BlockControls>
+				<Toolbar>
+					<ToolbarButton
+						name="link"
+						icon="admin-links"
+						title={ __( 'Link' ) }
+						onClick={ () => setLinkOpen( ! isLinkOpen ) }
+					/>
+					{ isLinkOpen &&
+					<>
+						<URLPopover
+							className="wp-block-navigation-menu-item__inline-link-input"
+						>
+							<URLPopover.LinkEditor
+								value={ url }
+								onChangeInputValue={ ( value ) => setAttributes( { url: value } ) }
+							/>
+						</URLPopover>
+					</>
+					}
+				</Toolbar>
+			</BlockControls>
 			<InspectorControls>
 				<PanelBody
 					title={ __( 'Menu Settings' ) }
