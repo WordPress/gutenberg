@@ -54,7 +54,7 @@ export class RootComponent extends React.Component {
 	constructor( props ) {
 		super( props );
 		setupLocale( props.locale, props.translations );
-		setupApiFetch( props.siteSlug, props.extraHTTPHeaders );
+		setupApiFetch();
 		require( '@wordpress/edit-post' ).initializeEditor();
 	}
 

@@ -97,4 +97,8 @@ export function requestOtherMediaPickFrom( mediaSource, multiple, callback ) {
 	return RNReactNativeGutenbergBridge.requestOtherMediaPickFrom( mediaSource, multiple, callback );
 }
 
+export function fetchRequest( path ) {
+	return RNReactNativeGutenbergBridge.fetchRequest( path );
+}
+
 export default RNReactNativeGutenbergBridge;
