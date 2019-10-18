@@ -1,4 +1,4 @@
-# Base styles
+# Base Styles
 
 Base scss utilities and variables for WordPress.
 
