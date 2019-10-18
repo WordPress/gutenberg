@@ -35,7 +35,6 @@ const stateReducer = (
 			// If we already have a selected item, try to select the next one,
 			// without circular navigation. Otherwise, select the first item.
 			return {
-				...changes,
 				selectedItem:
 					items[
 						selectedItem ?
@@ -47,7 +46,6 @@ const stateReducer = (
 			// If we already have a selected item, try to select the previous one,
 			// without circular navigation. Otherwise, select the last item.
 			return {
-				...changes,
 				selectedItem:
 					items[
 						selectedItem ?
