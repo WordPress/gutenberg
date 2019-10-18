@@ -19,6 +19,7 @@ import Button from './button';
 import Cell from './cell';
 import PickerCell from './picker-cell';
 import SwitchCell from './switch-cell';
+import RangeCell from './range-cell';
 import KeyboardAvoidingView from './keyboard-avoiding-view';
 
 class BottomSheet extends Component {
@@ -136,6 +137,8 @@ class BottomSheet extends Component {
 				onBackdropPress={ this.props.onClose }
 				onBackButtonPress={ this.props.onClose }
 				onSwipe={ this.props.onClose }
+				onDismiss={ Platform.OS === 'ios' ? this.props.onDismiss : undefined }
+				onModalHide={ Platform.OS === 'android' ? this.props.onDismiss : undefined }
 				swipeDirection="down"
 				onMoveShouldSetResponder={ panResponder.panHandlers.onMoveShouldSetResponder }
 				onMoveShouldSetResponderCapture={ panResponder.panHandlers.onMoveShouldSetResponderCapture }
@@ -171,5 +174,6 @@ ThemedBottomSheet.Button = Button;
 ThemedBottomSheet.Cell = Cell;
 ThemedBottomSheet.PickerCell = PickerCell;
 ThemedBottomSheet.SwitchCell = SwitchCell;
+ThemedBottomSheet.RangeCell = RangeCell;
 
 export default ThemedBottomSheet;

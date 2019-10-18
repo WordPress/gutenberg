@@ -75,8 +75,8 @@ describe( 'Font Size Picker', () => {
 
 		// Clear the custom font size input.
 		await page.click( '.blocks-font-size .components-range-control__number' );
-		await pressKeyTimes( 'ArrowRight', 4 );
-		await pressKeyTimes( 'Backspace', 4 );
+		await pressKeyTimes( 'ArrowRight', 5 );
+		await pressKeyTimes( 'Backspace', 5 );
 
 		// Ensure content matches snapshot.
 		const content = await getEditedPostContent();

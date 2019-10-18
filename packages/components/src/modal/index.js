@@ -3,7 +3,7 @@
  */
 import { Component, createPortal } from '@wordpress/element';
 import { withInstanceId } from '@wordpress/compose';
-import { deprecated } from '@wordpress/deprecated';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
