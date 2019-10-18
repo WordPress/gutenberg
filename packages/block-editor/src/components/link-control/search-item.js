@@ -11,7 +11,7 @@ import TextHighlight from './text-highlight';
 /**
  * WordPress dependencies
  */
-import { safeDecodeURI, filterURLForDisplay } from '@wordpress/url';
+import { safeDecodeURI } from '@wordpress/url';
 
 import {
 	Icon,
@@ -33,7 +33,7 @@ export const LinkControlSearchItem = ( { itemProps, suggestion, isSelected = fal
 				<span className="block-editor-link-control__search-item-title">
 					<TextHighlight text={ suggestion.title } highlight={ searchTerm } />
 				</span>
-				<span className="block-editor-link-control__search-item-info">{ suggestion.info || filterURLForDisplay( safeDecodeURI( suggestion.url ) ) || '' }</span>
+				<span className="block-editor-link-control__search-item-info">{ safeDecodeURI( suggestion.url ) || '' }</span>
 			</span>
 			<span className="block-editor-link-control__search-item-type">{ suggestion.type.toLowerCase() || '' }</span>
 		</button>

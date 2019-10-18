@@ -18,7 +18,7 @@ import {
 	useState,
 } from '@wordpress/element';
 
-import { safeDecodeURI, filterURLForDisplay, isURL } from '@wordpress/url';
+import { safeDecodeURI, filterURLForDisplay, isURL, prependHTTP } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -65,13 +65,13 @@ function LinkControl( { currentLink, fetchSearchSuggestions, onLinkChange, onSet
 			id: 1,
 			title: value,
 			type: 'URL',
-			url: value,
+			url: prependHTTP( value ),
 		} ];
 	};
 
 	// Effects
 	const getSearchHandler = useCallback( ( value ) => {
-		return ( isURL( value ) ) ? handleURLSearch( value ) : fetchSearchSuggestions( value );
+		return ( isURL( value ) || value.includes( 'www.' ) ) ? handleURLSearch( value ) : fetchSearchSuggestions( value );
 	}, [ handleURLSearch, fetchSearchSuggestions ] );
 
 	// Render Components
