@@ -157,3 +157,121 @@ if ( ! has_action( 'enqueue_block_editor_assets', 'enqueue_editor_block_styles_a
 	}
 	add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_editor_block_styles_assets' );
 }
+
+/**
+ * Function that returns the automatically generated style for a single color.
+ *
+ * @param array $color Color whose style should be generated.
+ * @return string The automatically generated color style
+ */
+function gutenberg_generate_color_style( $color ) {
+	$slug  = $color['slug'];
+	$value = $color['color'];
+
+	$contexts = array( 'color', 'background-color' );
+
+	$color_style = '';
+	foreach ( $contexts as $context ) {
+		$color_style .= implode(
+			"\n",
+			array(
+				".has-$slug-$context {",
+				"\t$context: $value;",
+				"}\n",
+			)
+		);
+	}
+	return $color_style;
+}
+
+/**
+ * Function that returns the automatically generated styles for the editor color palette.
+ *
+ * @return string The automatically generated styles string for the editor color palette.
+ */
+function gutenberg_generate_editor_color_palette_styles() {
+	$color_palette = current( (array) get_theme_support( 'editor-color-palette' ) );
+	if ( false === $color_palette ) {
+		return '';
+	}
+	return implode(
+		'',
+		array_map( 'gutenberg_generate_color_style', $color_palette )
+	);
+}
+
+/**
+ * Function that returns the automatically generated style for a single editor font size.
+ *
+ * @param array $font_size Font size whose style should be generated.
+ * @return string The automatically generated font size style
+ */
+function gutenberg_generate_font_size_style( $font_size ) {
+	$slug  = $font_size['slug'];
+	$value = $font_size['size'];
+
+	return implode(
+		"\n",
+		array(
+			".has-$slug-font-size {",
+			"\tfont-size: " . $value . 'pt;',
+			"}\n",
+		)
+	);
+}
+
+/**
+ * Function that returns the automatically generated styles for editor font sizes.
+ *
+ * @return string The automatically generated styles string for the editor font sizes.
+ */
+function gutenberg_generate_editor_font_sizes_styles() {
+	$font_sizes = current( (array) get_theme_support( 'editor-font-sizes' ) );
+	if ( false === $font_sizes ) {
+		return '';
+	}
+	return implode(
+		'',
+		array_map( 'gutenberg_generate_font_size_style', $font_sizes )
+	);
+}
+/**
+ * Function responsible for enqueuing automatically generated editor styles e.g: colors and font-sizes.
+ */
+function gutenberg_enqueue_automatic_editor_styles() {
+	$style_generators = array(
+		'editor-color-palette' => 'gutenberg_generate_editor_color_palette_styles',
+		'editor-font-sizes'    => 'gutenberg_generate_editor_font_sizes_styles',
+	);
+
+	$theme_automatic_styles_support = get_theme_support( '__experimental-editor-automatic-styles' );
+	if ( false === $theme_automatic_styles_support ) {
+		return;
+	}
+
+	$automatic_styles_supported = array();
+	if ( true === $theme_automatic_styles_support ) {
+		$automatic_styles_supported = array_keys( $style_generators );
+	} elseif ( is_array( $theme_automatic_styles_support ) && count( $theme_automatic_styles_support ) === 1 ) {
+		$automatic_styles_supported = current( (array) $theme_automatic_styles_support );
+	} else {
+		// Invalid theme support value passed.
+		return;
+	}
+
+	$styles = '';
+	foreach ( $automatic_styles_supported as $style_support ) {
+		if ( ! $style_generators[ $style_support ] ) {
+			continue;
+		}
+		$styles .= call_user_func( $style_generators[ $style_support ] );
+	}
+	if ( '' === $styles ) {
+		return;
+	}
+	wp_register_style( 'wp-editor-automatic-styles', false, array( 'wp-blocks' ), true );
+	wp_add_inline_style( 'wp-editor-automatic-styles', $styles );
+	wp_enqueue_style( 'wp-editor-automatic-styles' );
+}
+add_action( 'enqueue_block_assets', 'gutenberg_enqueue_automatic_editor_styles' );
+
