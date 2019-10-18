@@ -149,9 +149,27 @@ export default compose( [
 
 				const parentAllowedBlocks = get( parentBlockListSettings, [ 'allowedBlocks' ] );
 
-				const {
-					getInsertionIndex,
-				} = select( 'core/block-editor' );
+				const getInsertionIndex = () => {
+					const {
+						getBlockIndex,
+						getBlockSelectionEnd,
+						getBlockOrder,
+					} = select( 'core/block-editor' );
+
+					// If the clientId is defined, we insert at the position of the block.
+					if ( clientId ) {
+						return getBlockIndex( clientId, destinationRootClientId );
+					}
+
+					// If there a selected block, we insert after the selected block.
+					const end = getBlockSelectionEnd();
+					if ( ! isAppender && end ) {
+						return getBlockIndex( end, destinationRootClientId ) + 1;
+					}
+
+					// Otherwise, we insert at the end of the current rootClientId
+					return getBlockOrder( destinationRootClientId ).length;
+				};
 
 				const {
 					insertBlock,

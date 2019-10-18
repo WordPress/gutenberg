@@ -1324,32 +1324,6 @@ export const getTheOnlyAllowedItem = ( state, rootClientId = null ) => {
 };
 
 /**
- * Get the current insertion index.
- *
- * @param {Object}  state           		Editor state.
- * @param {?string} clientId 				Block client ID.
- * @param {?string} destinationRootClientId Root client ID of block list.
- * @param {boolean} isAppender 	    		Determines if the block is added to a set of existing
- * 											blocks in a list.
- * @return {number} The insertion index.
- */
-export function getInsertionIndex( state, clientId, destinationRootClientId, isAppender ) {
-	// If the clientId is defined, we insert at the position of the block.
-	if ( clientId ) {
-		return getBlockIndex( state, clientId, destinationRootClientId );
-	}
-
-	// If there a selected block, we insert after the selected block.
-	const end = getBlockSelectionEnd( state );
-	if ( ! isAppender && end ) {
-		return getBlockIndex( state, end, destinationRootClientId ) + 1;
-	}
-
-	// Otherwise, we insert at the end of the current rootClientId
-	return getBlockOrder( state, destinationRootClientId ).length;
-}
-
-/**
  * Returns the Block List settings of a block, if any exist.
  *
  * @param {Object}  state    Editor state.
