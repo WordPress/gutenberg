@@ -420,6 +420,14 @@ export function getBlockRootClientId( state, clientId ) {
 		null;
 }
 
+/**
+ * Given a block client ID, returns the list of all its parents.
+ *
+ * @param {Object} state    Editor state.
+ * @param {string} clientId Block from which to find root client ID.
+ *
+ * @return {Array} ClientIDs of the parent blocks.
+ */
 export const getBlockParents = createSelector(
 	( state, clientId ) => {
 		const parents = [];
