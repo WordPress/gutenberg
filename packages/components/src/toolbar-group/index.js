@@ -55,7 +55,7 @@ function ToolbarGroup( {
 		return null;
 	}
 
-	const finalClassName = classnames( 'components-toolbar', className );
+	const finalClassName = classnames( 'components-toolbar-group', className );
 
 	// Normalize controls to nested array of objects (sets of controls)
 	let controlSets = controls;
