@@ -60,7 +60,7 @@ function Layout( {
 } ) {
 	const sidebarIsOpened = editorSidebarOpened || pluginSidebarOpened || publishSidebarOpened;
 
-	const className = classnames( 'edit-post-layout', {
+	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
 		'is-sidebar-opened': sidebarIsOpened,
 		'has-fixed-toolbar': hasFixedToolbar,
 		'has-metaboxes': hasActiveMetaboxes,
@@ -81,7 +81,7 @@ function Layout( {
 			<LocalAutosaveMonitor />
 			<Header />
 			<div
-				className="edit-post-layout__content"
+				className="edit-post-layout__content edit-post-layout__scrollable-container"
 				role="region"
 				/* translators: accessibility text for the content landmark region. */
 				aria-label={ __( 'Editor content' ) }
@@ -92,23 +92,21 @@ function Layout( {
 				<KeyboardShortcutHelpModal />
 				<ManageBlocksModal />
 				<OptionsModal />
-				<div className="edit-post-layout__scrollable-container">
-					{ ( mode === 'text' || ! isRichEditingEnabled ) && <TextEditor /> }
-					{ isRichEditingEnabled && mode === 'visual' && <VisualEditor /> }
-					<div className="edit-post-layout__metaboxes">
-						<MetaBoxes location="normal" />
-					</div>
-					<div className="edit-post-layout__metaboxes">
-						<MetaBoxes location="advanced" />
-					</div>
-					{ isMobileViewport && sidebarIsOpened && <ScrollLock /> }
+				{ ( mode === 'text' || ! isRichEditingEnabled ) && <TextEditor /> }
+				{ isRichEditingEnabled && mode === 'visual' && <VisualEditor /> }
+				<div className="edit-post-layout__metaboxes">
+					<MetaBoxes location="normal" />
 				</div>
-				{ isRichEditingEnabled && mode === 'visual' && (
-					<div className="edit-post-layout__footer">
-						<BlockBreadcrumb />
-					</div>
-				) }
+				<div className="edit-post-layout__metaboxes">
+					<MetaBoxes location="advanced" />
+				</div>
+				{ isMobileViewport && sidebarIsOpened && <ScrollLock /> }
 			</div>
+			{ isRichEditingEnabled && mode === 'visual' && (
+				<div className="edit-post-layout__footer">
+					<BlockBreadcrumb />
+				</div>
+			) }
 			{ publishSidebarOpened ? (
 				<PostPublishPanel
 					{ ...publishLandmarkProps }
