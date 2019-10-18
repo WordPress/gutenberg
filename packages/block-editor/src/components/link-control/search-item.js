@@ -17,16 +17,18 @@ import {
 	Icon,
 } from '@wordpress/components';
 
-export const LinkControlSearchItem = ( { itemProps, suggestion, isSelected = false, onClick, isUrl = false, searchTerm = '' } ) => {
+export const LinkControlSearchItem = ( { itemProps, suggestion, isSelected = false, onClick, isURL = false, searchTerm = '' } ) => {
 	return (
 		<button
 			{ ...itemProps }
 			onClick={ onClick }
 			className={ classnames( 'block-editor-link-control__search-item', {
 				'is-selected': isSelected,
+				'is-url': isURL,
+				'is-entity': ! isURL,
 			} ) }
 		>
-			{ isUrl && (
+			{ isURL && (
 				<Icon className="block-editor-link-control__search-item-icon" icon="admin-site-alt3" />
 			) }
 			<span className="block-editor-link-control__search-item-header">

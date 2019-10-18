@@ -118,6 +118,14 @@
 		min-width: 24px;
 	}
 
+	.block-editor-link-control__search-item-info,
+	.block-editor-link-control__search-item-title {
+		text-overflow: ellipsis;
+		max-width: 230px;
+		overflow: hidden;
+		white-space: nowrap;
+	}
+
 	.block-editor-link-control__search-item-title {
 		display: block;
 		margin-bottom: 0.2em;

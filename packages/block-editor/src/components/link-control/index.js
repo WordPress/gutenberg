@@ -87,7 +87,7 @@ function LinkControl( { currentLink, fetchSearchSuggestions, onLinkChange, onSet
 							suggestion={ suggestion }
 							onClick={ partialRight( onLinkSelect, suggestion ) }
 							isSelected={ index === selectedSuggestion }
-							isUrl={ suggestion.type.toLowerCase() === 'url' }
+							isURL={ suggestion.type.toLowerCase() === 'url' }
 							searchTerm={ inputValue }
 						/>
 					) ) }
