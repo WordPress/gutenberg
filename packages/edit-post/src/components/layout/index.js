@@ -92,21 +92,22 @@ function Layout( {
 				<KeyboardShortcutHelpModal />
 				<ManageBlocksModal />
 				<OptionsModal />
-				{ ( mode === 'text' || ! isRichEditingEnabled ) && <TextEditor /> }
+				<div className="edit-post-layout__scrollable-container">
+					{ ( mode === 'text' || ! isRichEditingEnabled ) && <TextEditor /> }
+					{ isRichEditingEnabled && mode === 'visual' && <VisualEditor /> }
+					<div className="edit-post-layout__metaboxes">
+						<MetaBoxes location="normal" />
+					</div>
+					<div className="edit-post-layout__metaboxes">
+						<MetaBoxes location="advanced" />
+					</div>
+					{ isMobileViewport && sidebarIsOpened && <ScrollLock /> }
+				</div>
 				{ isRichEditingEnabled && mode === 'visual' && (
-					<>
-						<VisualEditor />
-						<div className="edit-post-layout__footer">
-							<BlockBreadcrumb />
-						</div>
-					</>
+					<div className="edit-post-layout__footer">
+						<BlockBreadcrumb />
+					</div>
 				) }
-				<div className="edit-post-layout__metaboxes">
-					<MetaBoxes location="normal" />
-				</div>
-				<div className="edit-post-layout__metaboxes">
-					<MetaBoxes location="advanced" />
-				</div>
 			</div>
 			{ publishSidebarOpened ? (
 				<PostPublishPanel
@@ -132,9 +133,6 @@ function Layout( {
 					</div>
 					<SettingsSidebar />
 					<Sidebar.Slot />
-					{
-						isMobileViewport && sidebarIsOpened && <ScrollLock />
-					}
 				</>
 			) }
 			<Popover.Slot />
