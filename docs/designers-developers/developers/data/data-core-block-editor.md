@@ -580,19 +580,6 @@ _Returns_
 
 -   `?string`: Block Template Lock
 
-<a name="getTheOnlyAllowedItem" href="#getTheOnlyAllowedItem">#</a> **getTheOnlyAllowedItem**
-
-Gets the name of the only item that may be inserted.
-
-_Parameters_
-
--   _state_ `Object`: Editor state.
--   _rootClientId_ `?string`: Optional root client ID of block list.
-
-_Returns_
-
--   `?string`: The name of the allowed block or null.
-
 <a name="hasInserterItems" href="#hasInserterItems">#</a> **hasInserterItems**
 
 Determines whether there are items to show in the inserter.
@@ -617,19 +604,6 @@ _Parameters_
 _Returns_
 
 -   `boolean`: Whether multi-selection has been made.
-
-<a name="hasOnlyOneAllowedInserterItem" href="#hasOnlyOneAllowedInserterItem">#</a> **hasOnlyOneAllowedInserterItem**
-
-Determines whether there is only one item that may be inserted.
-
-_Parameters_
-
--   _state_ `Object`: Editor state.
--   _rootClientId_ `?string`: Optional root client ID of block list.
-
-_Returns_
-
--   `boolean`: True if there is one item available, false if zero or more than one.
 
 <a name="hasSelectedBlock" href="#hasSelectedBlock">#</a> **hasSelectedBlock**
 
