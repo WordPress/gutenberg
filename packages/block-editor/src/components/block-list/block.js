@@ -67,7 +67,7 @@ function BlockListBlock( {
 	mode,
 	isFocusMode,
 	hasFixedToolbar,
-	moverOptions,
+	moverDirection,
 	isLocked,
 	clientId,
 	rootClientId,
@@ -451,7 +451,6 @@ function BlockListBlock( {
 		};
 	}
 	const blockElementId = `block-${ clientId }`;
-	const { position: moverPosition, orientation: moverOrientation } = moverOptions;
 	const blockMover = (
 		<BlockMover
 			clientIds={ clientId }
@@ -463,7 +462,7 @@ function BlockListBlock( {
 			}
 			onDragStart={ onDragStart }
 			onDragEnd={ onDragEnd }
-			orientation={ moverOrientation }
+			orientation={ moverDirection }
 		/>
 	);
 
@@ -529,16 +528,16 @@ function BlockListBlock( {
 			{ isFirstMultiSelected && (
 				<BlockMultiControls
 					rootClientId={ rootClientId }
-					moverOptions={ moverOptions }
+					moverDirection={ moverDirection }
 				/>
 			) }
 			<div
 				className={ classnames(
 					'editor-block-list__block-edit block-editor-block-list__block-edit',
-					{ 'has-mover-inside': moverPosition === 'inside' },
+					{ 'has-mover-inside': moverDirection === 'horizontal' },
 				) }
 			>
-				{ shouldRenderMovers && ( moverPosition === 'outside' ) && blockMover }
+				{ shouldRenderMovers && ( moverDirection === 'vertical' ) && blockMover }
 				{ shouldShowBreadcrumb && (
 					<BlockBreadcrumb
 						clientId={ clientId }
@@ -578,7 +577,7 @@ function BlockListBlock( {
 						{ isValid && mode === 'html' && (
 							<BlockHtml clientId={ clientId } />
 						) }
-						{ shouldRenderMovers && ( moverPosition === 'inside' ) && blockMover }
+						{ shouldRenderMovers && ( moverDirection === 'horizontal' ) && blockMover }
 						{ ! isValid && [
 							<BlockInvalidWarning
 								key="invalid-warning"
@@ -591,7 +590,7 @@ function BlockListBlock( {
 					</BlockCrashBoundary>
 					{ !! hasError && <BlockCrashWarning /> }
 					{ shouldShowMobileToolbar && (
-						<BlockMobileToolbar clientId={ clientId } moverOptions={ moverOptions } />
+						<BlockMobileToolbar clientId={ clientId } moverDirection={ moverDirection } />
 					) }
 				</IgnoreNestedEvents>
 			</div>

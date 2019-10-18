@@ -11,7 +11,7 @@ import BlockMover from '../block-mover';
 function BlockListMultiControls( {
 	multiSelectedBlockClientIds,
 	isSelecting,
-	moverOptions,
+	moverDirection,
 } ) {
 	if ( isSelecting ) {
 		return null;
@@ -20,7 +20,7 @@ function BlockListMultiControls( {
 	return (
 		<BlockMover
 			clientIds={ multiSelectedBlockClientIds }
-			moverOptions={ moverOptions }
+			orientation={ moverDirection }
 		/>
 	);
 }

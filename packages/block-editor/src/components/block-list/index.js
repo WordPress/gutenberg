@@ -195,10 +195,7 @@ class BlockList extends Component {
 			className,
 			blockClientIds,
 			rootClientId,
-			moverOptions = {
-				position: 'outside',
-				orientation: 'vertical',
-			},
+			moverDirection = 'vertical',
 			isDraggable,
 			selectedBlockClientId,
 			multiSelectedBlockClientIds,
@@ -231,7 +228,7 @@ class BlockList extends Component {
 								blockRef={ this.setBlockRef }
 								onSelectionStart={ this.onSelectionStart }
 								isDraggable={ isDraggable }
-								moverOptions={ moverOptions }
+								moverDirection={ moverDirection }
 
 								// This prop is explicitely computed and passed down
 								// to avoid being impacted by the async mode

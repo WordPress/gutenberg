@@ -107,7 +107,7 @@ class InnerBlocks extends Component {
 			hasOverlay,
 			renderAppender,
 			template,
-			__experimentalMoverOptions: moverOptions,
+			__experimentalMoverDirection: moverDirection,
 			__experimentalTemplateOptions: templateOptions,
 			__experimentalOnSelectTemplateOption: onSelectTemplateOption,
 			__experimentalAllowTemplateOptionSkip: allowTemplateOptionSkip,
@@ -132,7 +132,7 @@ class InnerBlocks extends Component {
 						<BlockList
 							rootClientId={ clientId }
 							renderAppender={ renderAppender }
-							moverOptions={ moverOptions }
+							moverDirection={ moverDirection }
 						/>
 				) }
 			</div>
