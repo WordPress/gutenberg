@@ -83,6 +83,7 @@ function NavigationMenuItemEdit( {
 							<URLPopover.LinkEditor
 								value={ url }
 								onChangeInputValue={ ( value ) => setAttributes( { url: value } ) }
+								onKeyPress={ ( event ) => event.stopPropagation() }
 							/>
 						</URLPopover>
 					</>

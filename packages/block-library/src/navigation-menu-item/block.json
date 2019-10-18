@@ -5,9 +5,6 @@
 		"label": {
 			"type": "string"
 		},
-		"destination": {
-			"type": "string"
-		},
 		"nofollow": {
 			"type": "boolean",
 			"default": false

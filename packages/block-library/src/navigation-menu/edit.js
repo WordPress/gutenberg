@@ -51,7 +51,9 @@ function NavigationMenu( {
 				return null;
 			}
 			return pages.map( ( page ) => {
-				return [ 'core/navigation-menu-item', { label: page.title.rendered, destination: page.permalink_template } ];
+				return [ 'core/navigation-menu-item',
+					{ label: page.title.rendered, url: page.permalink_template },
+				];
 			} );
 		},
 		[ pages ]
