@@ -484,8 +484,6 @@ export class TableEdit extends Component {
 			backgroundColor,
 			setBackgroundColor,
 			setAttributes,
-			isSelected,
-			clientId,
 		} = this.props;
 		const { initialRowCount, initialColumnCount } = this.state;
 		const {
@@ -494,7 +492,6 @@ export class TableEdit extends Component {
 			head,
 			body,
 			foot,
-			captionId = `wp-block-table-caption-${ clientId }`,
 		} = attributes;
 		const isEmpty = isEmptyTableSection( head ) && isEmptyTableSection( body ) && isEmptyTableSection( foot );
 		const Section = this.renderSection;
@@ -587,26 +584,16 @@ export class TableEdit extends Component {
 					/>
 				</InspectorControls>
 				<figure className={ className }>
-					<table className={ tableClasses } aria-labelledby={ captionId }>
+					<table className={ tableClasses }>
 						<Section name="head" rows={ head } />
 						<Section name="body" rows={ body } />
 						<Section name="foot" rows={ foot } />
 					</table>
-					{ /*
-					   * Use a figcaption, which is visibly hidden and a separate RichText for updating
-					   * the caption. Screenreaders seem to have issues announcing the figure when figcaption
-					   * is rendered using a RichText. The cause is the extra wrapping divs added by the RichText.
-					   * Using two elements is a workaround for the problem.
-					   */ }
-					<figcaption id={ captionId } className="screen-reader-text">{ caption }</figcaption>
 					<RichText
-						className={ classnames( 'wp-block-table__caption-content', {
-							'is-visible': isSelected || caption,
-						} ) }
-						tagName="div"
+						tagName="figcaption"
 						placeholder={ __( 'Write caption…' ) }
 						value={ caption }
-						onChange={ ( value ) => setAttributes( { caption: value, captionId } ) }
+						onChange={ ( value ) => setAttributes( { caption: value } ) }
 						// Deselect the selected table cell when the caption is focused.
 						unstableOnFocus={ () => this.setState( { selectedCell: null } ) }
 					/>

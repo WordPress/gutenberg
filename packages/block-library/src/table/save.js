@@ -16,7 +16,6 @@ export default function save( { attributes } ) {
 		foot,
 		backgroundColor,
 		caption,
-		captionId,
 	} = attributes;
 	const isEmpty = ! head.length && ! body.length && ! foot.length;
 
@@ -68,19 +67,13 @@ export default function save( { attributes } ) {
 
 	return (
 		<figure>
-			{ /*
-			   * If the table has caption text, associate the figcaption element with the table
-			   * using aria-labelledby. This ensures screenreaders read the `figcaption` as they
-			   * would a table `caption` element.
-			   */ }
-			<table className={ classes } aria-labelledby={ hasCaption ? captionId : undefined }>
+			<table className={ classes }>
 				<Section type="head" rows={ head } />
 				<Section type="body" rows={ body } />
 				<Section type="foot" rows={ foot } />
 			</table>
 			{ hasCaption && (
 				<RichText.Content
-					id={ captionId }
 					tagName="figcaption"
 					value={ caption }
 				/>
