@@ -366,6 +366,19 @@ _Returns_
 
 -   `?Object`: Record.
 
+<a name="getEntityRecordChangesByRecord" href="#getEntityRecordChangesByRecord">#</a> **getEntityRecordChangesByRecord**
+
+Returns a list of objects with each edited entity
+record and its corresponding edits.
+
+_Parameters_
+
+-   _state_ `Object`: State tree.
+
+_Returns_
+
+-   `Array`: The list of edited records with their edits.
+
 <a name="getEntityRecordEdits" href="#getEntityRecordEdits">#</a> **getEntityRecordEdits**
 
 Returns the specified entity record's edits.
