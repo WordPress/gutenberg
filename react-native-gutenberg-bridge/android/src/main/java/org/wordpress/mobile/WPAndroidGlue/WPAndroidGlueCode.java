@@ -548,6 +548,7 @@ public class WPAndroidGlueCode {
                 mReactRootView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
             }
         }
+        mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().toggleEditorMode();
     }
 
     public void appendMediaFiles(ArrayList<Media> mediaList) {
