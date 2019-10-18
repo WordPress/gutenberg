@@ -39,7 +39,7 @@ function ToolbarButton( {
 			data-subscript={ subscript }
 			onClick={ ( event ) => {
 				event.stopPropagation();
-				onClick();
+				onClick( event );
 			} }
 			className={ classnames(
 				'components-toolbar__control',

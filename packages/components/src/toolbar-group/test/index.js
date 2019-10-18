@@ -1,26 +1,26 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { mount } from 'enzyme';
 
 /**
  * Internal dependencies
  */
-import Toolbar from '../';
+import ToolbarGroup from '../';
 
-describe( 'Toolbar', () => {
+describe( 'ToolbarGroup', () => {
 	describe( 'basic rendering', () => {
 		it( 'should render an empty node, when controls are not passed', () => {
-			const toolbar = shallow( <Toolbar /> );
-			expect( toolbar.type() ).toBeNull();
+			const wrapper = mount( <ToolbarGroup /> );
+			expect( wrapper.html() ).toBeNull();
 		} );
 
 		it( 'should render an empty node, when controls are empty', () => {
-			const toolbar = shallow( <Toolbar controls={ [] } /> );
-			expect( toolbar.type() ).toBeNull();
+			const wrapper = mount( <ToolbarGroup controls={ [] } /> );
+			expect( wrapper.html() ).toBeNull();
 		} );
 
-		it( 'should render a list of controls with ToolbarButtons', () => {
+		it( 'should render a list of controls with buttons', () => {
 			const clickHandler = ( event ) => event;
 			const controls = [
 				{
@@ -31,19 +31,17 @@ describe( 'Toolbar', () => {
 					isActive: false,
 				},
 			];
-			const toolbar = shallow( <Toolbar controls={ controls } /> );
-			const listItem = toolbar.find( 'ToolbarButton' );
-			expect( listItem.props() ).toMatchObject( {
-				containerClassName: null,
-				icon: 'wordpress',
-				title: 'WordPress',
-				subscript: 'wp',
-				onClick: clickHandler,
-				isActive: false,
+			const wrapper = mount( <ToolbarGroup controls={ controls } /> );
+			const button = wrapper.find( '[aria-label="WordPress"]' ).hostNodes();
+			expect( button.props() ).toMatchObject( {
+				'aria-label': 'WordPress',
+				'aria-pressed': false,
+				'data-subscript': 'wp',
+				type: 'button',
 			} );
 		} );
 
-		it( 'should render a list of controls with ToolbarButtons and active control', () => {
+		it( 'should render a list of controls with buttons and active control', () => {
 			const clickHandler = ( event ) => event;
 			const controls = [
 				{
@@ -54,15 +52,13 @@ describe( 'Toolbar', () => {
 					isActive: true,
 				},
 			];
-			const toolbar = shallow( <Toolbar controls={ controls } /> );
-			const listItem = toolbar.find( 'ToolbarButton' );
-			expect( listItem.props() ).toMatchObject( {
-				containerClassName: null,
-				icon: 'wordpress',
-				title: 'WordPress',
-				subscript: 'wp',
-				onClick: clickHandler,
-				isActive: true,
+			const wrapper = mount( <ToolbarGroup controls={ controls } /> );
+			const button = wrapper.find( '[aria-label="WordPress"]' ).hostNodes();
+			expect( button.props() ).toMatchObject( {
+				'aria-label': 'WordPress',
+				'aria-pressed': true,
+				'data-subscript': 'wp',
+				type: 'button',
 			} );
 		} );
 
@@ -82,15 +78,16 @@ describe( 'Toolbar', () => {
 				],
 			];
 
-			const toolbar = shallow( <Toolbar controls={ controls } /> );
-			expect( toolbar.children() ).toHaveLength( 2 );
-			expect( toolbar.childAt( 0 ).prop( 'containerClassName' ) ).toBeNull();
-			expect( toolbar.childAt( 1 ).prop( 'containerClassName' ) ).toBe( 'has-left-divider' );
+			const wrapper = mount( <ToolbarGroup controls={ controls } /> );
+			const buttons = wrapper.find( 'button' ).hostNodes();
+			const hasLeftDivider = wrapper.find( '.has-left-divider' ).hostNodes();
+			expect( buttons ).toHaveLength( 2 );
+			expect( hasLeftDivider ).toHaveLength( 1 );
+			expect( hasLeftDivider.html() ).toContain( buttons.at( 1 ).html() );
 		} );
 
 		it( 'should call the clickHandler on click.', () => {
 			const clickHandler = jest.fn();
-			const event = { stopPropagation: () => undefined };
 			const controls = [
 				{
 					icon: 'wordpress',
@@ -100,11 +97,10 @@ describe( 'Toolbar', () => {
 					isActive: true,
 				},
 			];
-			const toolbar = shallow( <Toolbar controls={ controls } /> );
-			const listItem = toolbar.find( 'ToolbarButton' );
-			listItem.simulate( 'click', event );
+			const wrapper = mount( <ToolbarGroup controls={ controls } /> );
+			const button = wrapper.find( '[aria-label="WordPress"]' ).hostNodes();
+			button.simulate( 'click' );
 			expect( clickHandler ).toHaveBeenCalledTimes( 1 );
-			expect( clickHandler ).toHaveBeenCalledWith( event );
 		} );
 	} );
 } );
