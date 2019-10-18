@@ -480,7 +480,12 @@ export default compose(
 	withDispatch( ( dispatch, ownProps, { select } ) => {
 		const { clientId, destinationRootClientId, isAppender } = ownProps;
 
-		const getInsertionIndex = () => {
+		// To avoid duplication, getInsertionIndex is extracted and used in two event handlers
+		// This breaks the withDispatch not containing any logic rule.
+		// Since it's a function only called when the event handlers are called,
+		// it's fine to extract it.
+		// eslint-disable-next-line no-restricted-syntax
+		function getInsertionIndex() {
 			const {
 				getBlockIndex,
 				getBlockSelectionEnd,
@@ -500,7 +505,7 @@ export default compose(
 
 			// Otherwise, we insert at the end of the current rootClientId
 			return getBlockOrder( destinationRootClientId ).length;
-		};
+		}
 
 		const {
 			showInsertionPoint,

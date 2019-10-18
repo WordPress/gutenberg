@@ -125,11 +125,11 @@ class Inserter extends Component {
 
 export default compose( [
 	withSelect( ( select, { rootClientId } ) => {
-		const { hasInserterItems, hasOnlyOneAllowedInserterItem, getTheOnlyAllowedItem } = select( 'core/block-editor' );
-		const allowedBlock = getBlockType( getTheOnlyAllowedItem( rootClientId ) );
+		const { hasInserterItems, __experimentalHasOnlyOneAllowedInserterItem, __experimentalGetTheOnlyAllowedItem } = select( 'core/block-editor' );
+		const allowedBlock = getBlockType( __experimentalGetTheOnlyAllowedItem( rootClientId ) );
 		return {
 			hasItems: hasInserterItems( rootClientId ),
-			hasOnlyOneAllowedInserterItem: hasOnlyOneAllowedInserterItem( rootClientId ),
+			hasOnlyOneAllowedInserterItem: __experimentalHasOnlyOneAllowedInserterItem( rootClientId ),
 			blockTitle: allowedBlock ? allowedBlock.title : '',
 		};
 	} ),
@@ -149,7 +149,7 @@ export default compose( [
 
 				const parentAllowedBlocks = get( parentBlockListSettings, [ 'allowedBlocks' ] );
 
-				const getInsertionIndex = () => {
+				function getInsertionIndex() {
 					const {
 						getBlockIndex,
 						getBlockSelectionEnd,
@@ -169,7 +169,7 @@ export default compose( [
 
 					// Otherwise, we insert at the end of the current rootClientId
 					return getBlockOrder( destinationRootClientId ).length;
-				};
+				}
 
 				const {
 					insertBlock,
