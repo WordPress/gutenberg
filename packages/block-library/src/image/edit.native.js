@@ -9,7 +9,7 @@ import {
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
 } from 'react-native-gutenberg-bridge';
-import { isEmpty } from 'lodash';
+import { isEmpty, map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -17,6 +17,7 @@ import { isEmpty } from 'lodash';
 import {
 	TextControl,
 	ToggleControl,
+	SelectControl,
 	Icon,
 	Image,
 	Toolbar,
@@ -51,6 +52,19 @@ import {
 	LINK_DESTINATION_NONE,
 } from './constants';
 
+const IMAGE_SIZE_THUMBNAIL = 'thumbnail';
+const IMAGE_SIZE_MEDIUM = 'medium';
+const IMAGE_SIZE_LARGE = 'large';
+const IMAGE_SIZE_FULL_SIZE = 'full';
+const DEFAULT_SIZE_SLUG = IMAGE_SIZE_LARGE;
+const sizeOptionLabels = {
+	[ IMAGE_SIZE_THUMBNAIL ]: __( 'Thumbnail' ),
+	[ IMAGE_SIZE_MEDIUM ]: __( 'Medium' ),
+	[ IMAGE_SIZE_LARGE ]: __( 'Large' ),
+	[ IMAGE_SIZE_FULL_SIZE ]: __( 'Full Size' ),
+};
+const sizeOptions = map( sizeOptionLabels, ( label, option ) => ( { value: option, label } ) );
+
 // Default Image ratio 4:3
 const IMAGE_ASPECT_RATIO = 4 / 3;
 
@@ -71,6 +85,7 @@ export class ImageEdit extends React.Component {
 		this.updateImageURL = this.updateImageURL.bind( this );
 		this.onSetLinkDestination = this.onSetLinkDestination.bind( this );
 		this.onSetNewTab = this.onSetNewTab.bind( this );
+		this.onSetSizeSlug = this.onSetSizeSlug.bind( this );
 		this.onImagePressed = this.onImagePressed.bind( this );
 		this.onClearSettings = this.onClearSettings.bind( this );
 		this.onFocusCaption = this.onFocusCaption.bind( this );
@@ -180,12 +195,19 @@ export class ImageEdit extends React.Component {
 		this.props.setAttributes( updatedLinkTarget );
 	}
 
+	onSetSizeSlug( sizeSlug ) {
+		this.props.setAttributes( {
+			sizeSlug,
+		} );
+	}
+
 	onClearSettings() {
 		this.props.setAttributes( {
 			alt: '',
 			linkDestination: LINK_DESTINATION_NONE,
 			href: undefined,
 			linkTarget: undefined,
+			sizeSlug: DEFAULT_SIZE_SLUG,
 			rel: undefined,
 		} );
 	}
@@ -217,7 +239,7 @@ export class ImageEdit extends React.Component {
 
 	render() {
 		const { attributes, isSelected } = this.props;
-		const { url, height, width, alt, href, id, linkTarget } = attributes;
+		const { url, height, width, alt, href, id, linkTarget, sizeSlug } = attributes;
 
 		const getToolbarEditButton = ( open ) => (
 			<BlockControls>
@@ -250,6 +272,16 @@ export class ImageEdit extends React.Component {
 						checked={ linkTarget === '_blank' }
 						onChange={ this.onSetNewTab }
 					/>
+					{ // eslint-disable-next-line no-undef
+						__DEV__ &&
+						<SelectControl
+							hideCancelButton
+							icon={ 'editor-expand' }
+							label={ __( 'Size' ) }
+							value={ sizeOptionLabels[ sizeSlug || DEFAULT_SIZE_SLUG ] }
+							onChangeValue={ ( newValue ) => this.onSetSizeSlug( newValue ) }
+							options={ sizeOptions }
+						/> }
 					<TextControl
 						icon={ 'editor-textcolor' }
 						label={ __( 'Alt Text' ) }

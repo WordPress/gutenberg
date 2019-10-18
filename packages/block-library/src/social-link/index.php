@@ -22,7 +22,7 @@ function render_core_social_link( $attributes ) {
 	}
 
 	$icon = core_social_link_get_icon( $site );
-	return '<li class="wp-social-link wp-social-link-' . $site . '"><a href="' . esc_attr( $url ) . '"> ' . $icon . '</a></li>';
+	return '<li class="wp-social-link wp-social-link-' . $site . '"><a href="' . esc_url( $url ) . '"> ' . $icon . '</a></li>';
 }
 
 /**
