@@ -60,6 +60,7 @@ function ToolbarButton( {
 		);
 	}
 
+	// ToolbarButton is being used outside of the accessible Toolbar
 	return (
 		<ToolbarButtonContainer className={ containerClassName }>
 			{ button }

@@ -30,6 +30,7 @@ function ToolbarGroupCollapsed( { controls = [], className, icon, label } ) {
 
 	if ( accessibleToolbarState ) {
 		return (
+			// https://reakit.io/docs/composition/#render-props
 			<ToolbarItem { ...accessibleToolbarState }>
 				{ ( toolbarItemHTMLProps ) => renderDropdownMenu( toolbarItemHTMLProps ) }
 			</ToolbarItem>

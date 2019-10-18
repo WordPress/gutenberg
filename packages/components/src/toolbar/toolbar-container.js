@@ -9,10 +9,12 @@ import { useToolbarState, Toolbar } from 'reakit/Toolbar';
 import ToolbarContext from './toolbar-context';
 
 function ToolbarContainer( { accessibilityLabel, ...props } ) {
-	const toolbar = useToolbarState( { loop: true } );
+	// https://reakit.io/docs/basic-concepts/#state-hooks
+	const toolbarState = useToolbarState( { loop: true } );
+
 	return (
-		<ToolbarContext.Provider value={ toolbar }>
-			<Toolbar { ...toolbar } aria-label={ accessibilityLabel } { ...props } />
+		<ToolbarContext.Provider value={ toolbarState }>
+			<Toolbar { ...toolbarState } aria-label={ accessibilityLabel } { ...props } />
 		</ToolbarContext.Provider>
 	);
 }

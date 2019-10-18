@@ -12,7 +12,7 @@ import ToolbarGroupContainer from './toolbar-group-container';
 import ToolbarGroupCollapsed from './toolbar-group-collapsed';
 
 /**
- * Renders a toolbar with controls.
+ * Renders a collapsible group of controls
  *
  * The `controls` prop accepts an array of sets. A set is an array of controls.
  * Controls have the following shape:
@@ -33,14 +33,6 @@ import ToolbarGroupCollapsed from './toolbar-group-collapsed';
  *
  * Either `controls` or `children` is required, otherwise this components
  * renders nothing.
- *
- * @param {Object}        props
- * @param {Array}        [props.controls]  The controls to render in this toolbar.
- * @param {ReactElement} [props.children]  Any other things to render inside the
- *                                         toolbar besides the controls.
- * @param {string}       [props.className] Class to set on the container div.
- *
- * @return {ReactElement} The rendered toolbar.
  */
 function ToolbarGroup( {
 	controls = [],
