@@ -11,9 +11,11 @@
 	border: 1px solid $dark-gray-200;
 	border-radius: 4px;
 	color: $dark-gray-500;
+	display: initial;
 	min-height: 28px;
 	min-width: 130px;
 	position: relative;
+	text-align: left;
 
 	&:focus {
 		border-color: $blue-medium-500;
