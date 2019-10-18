@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { text } from '@storybook/addon-knobs';
+
 /**
  * Internal dependencies
  */
