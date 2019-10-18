@@ -2,7 +2,6 @@
  * Internal dependencies
  */
 import ScreenReaderText from '../';
-import '../style.scss';
 
 export default { title: 'ScreenReaderText', component: ScreenReaderText };
 
