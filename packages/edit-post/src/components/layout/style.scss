@@ -54,7 +54,7 @@
 		// Because the body element scrolls the navigation sidebar, we have to use position fixed here.
 		// Otherwise you would scroll the editing canvas out of view when you scroll the sidebar.
 		position: fixed;
-		bottom: 0;
+		bottom: $footer-height;
 		left: 0;
 		right: 0;
 
@@ -69,6 +69,12 @@
 		// This is similar to the code in the @editor-left mixin, but uses margins instead.
 		// Because we are beyond the medium breakpoint, we only have to worry about folded, auto-folded, and default.
 		margin-left: $admin-sidebar-width;
+
+		// Make room for the footer
+		.edit-post-layout.is-mode-visual & {
+			bottom: $footer-height;
+			min-height: calc(100% - #{ $header-height + $admin-bar-height + $footer-height });
+		}
 
 		// Auto fold is when on smaller breakpoints, nav menu auto colllapses.
 		body.auto-fold & {
@@ -217,18 +223,19 @@
 	// Stretch to mimic outline padding on desktop.
 	@include break-medium() {
 		display: flex;
+		position: fixed;
+		bottom: 0;
+		right: 0;
 		background: $white;
-		height: $icon-button-size-small;
+		height: $footer-height;
 		padding: 0 $grid-size;
 		align-items: center;
 		border-top: $border-width solid $light-gray-500;
 		font-size: $default-font-size;
-
-		.edit-post-layout.is-sidebar-opened & {
-			right: $sidebar-width;
-		}
+		box-sizing: border-box;
 	}
 }
+@include editor-left(".edit-post-layout__footer");
 
 .edit-post-layout__scrollable-container {
 	// On mobile the main content (html or body) area has to scroll.
