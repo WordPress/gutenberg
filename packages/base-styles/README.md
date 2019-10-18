@@ -1,6 +1,6 @@
 # Base Styles
 
-Base scss utilities and variables for WordPress.
+Base SCSS utilities and variables for WordPress.
 
 ## Installation
 
@@ -12,9 +12,9 @@ npm install @wordpress/base-styles --save-dev
 
 ## Use
 
-### Scss utilities and variables
+### SCSS utilities and variables
 
-In your application's scss file, include styles like so:
+In your application's SCSS file, include styles like so:
 
 ```scss
 @import "~@wordpress/base-styles/colors";

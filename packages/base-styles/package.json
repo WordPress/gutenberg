@@ -1,7 +1,7 @@
 {
 	"name": "@wordpress/base-styles",
 	"version": "1.0.0-alpha.1",
-	"description": "Base scss utilities and variables for WordPress.",
+	"description": "Base SCSS utilities and variables for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
