@@ -2,7 +2,6 @@
 /**
  * External dependencies
  */
-import React from 'react';
 import { View } from 'react-native';
 /**
  * WordPress dependencies
@@ -25,36 +24,40 @@ import styles from './editor.scss';
 const minSpacerHeight = 20;
 const maxSpacerHeight = 500;
 
-const SpacerEdit = ( { isSelected } ) => {
-	const [ spacerHeight, setSpacerHeight ] = useState( 20 );
+const SpacerEdit = ( { isSelected, attributes, setAttributes } ) => {
+	const { height } = attributes;
+	const [ sliderSpacerHeight, setSpacerHeight ] = useState( height );
 
 	const changeSpacerHeight = ( value ) => {
-		if ( value < minSpacerHeight ) {
-			return setSpacerHeight( minSpacerHeight );
-		} else if ( value > maxSpacerHeight ) {
-			return setSpacerHeight( maxSpacerHeight );
-		} return setSpacerHeight( value );
+		let spacerHeight = value;
+		setSpacerHeight( spacerHeight );
+		if ( spacerHeight < minSpacerHeight ) {
+			spacerHeight = minSpacerHeight;
+		} else if ( spacerHeight > maxSpacerHeight ) {
+			spacerHeight = maxSpacerHeight;
+		}
+		setAttributes( {
+			height: spacerHeight,
+		} );
 	};
 
-	const getInspectorControls = () => (
-		<InspectorControls>
-			<PanelBody title={ __( 'SpacerSettings' ) } >
-				<BottomSheet.RangeCell
-					icon={ 'admin-settings' }
-					label={ __( 'Slider' ) }
-					value={ spacerHeight }
-					minimumValue={ minSpacerHeight }
-					maximumValue={ maxSpacerHeight }
-					separatorType={ 'fullWidth' }
-					onChangeValue={ ( value ) => changeSpacerHeight( value ) }
-				/>
-			</PanelBody>
-		</InspectorControls>
-	);
+	const maximumValue = height > maxSpacerHeight ? height * 2 : maxSpacerHeight;
 
 	return (
-		<View style={ [ styles.staticSpacer, isSelected && styles.selectedSpacer, { height: spacerHeight } ] }>
-			{ getInspectorControls() }
+		<View style={ [ styles.staticSpacer, isSelected && styles.selectedSpacer, { height } ] }>
+			<InspectorControls>
+				<PanelBody title={ __( 'SpacerSettings' ) } >
+					<BottomSheet.RangeCell
+						icon={ 'admin-settings' }
+						label={ __( 'Slider' ) }
+						value={ sliderSpacerHeight }
+						minimumValue={ minSpacerHeight }
+						maximumValue={ maximumValue }
+						separatorType={ 'fullWidth' }
+						onChangeValue={ ( value ) => changeSpacerHeight( value ) }
+					/>
+				</PanelBody>
+			</InspectorControls>
 		</View>
 	);
 };
