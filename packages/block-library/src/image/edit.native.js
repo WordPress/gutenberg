@@ -313,8 +313,10 @@ export class ImageEdit extends React.Component {
 								</View>
 							);
 
+							const containerStyle = ! imageWidthWithinContainer ? { flex: 1 } : { flex: 1, justifyContent: 'center', alignItems: 'center' };
+
 							return (
-								<View style={ { flex: 1 } } >
+								<View style={ containerStyle } >
 									{ ! imageWidthWithinContainer &&
 										<View style={ [ styles.imageContainer, { height: imageContainerHeight } ] } >
 											{ this.getIcon( false ) }
