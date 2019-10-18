@@ -191,7 +191,16 @@ _Returns_
 
 <a name="getBlockParents" href="#getBlockParents">#</a> **getBlockParents**
 
-Undocumented declaration.
+Given a block client ID, returns the list of all its parents.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+-   _clientId_ `string`: Block from which to find root client ID.
+
+_Returns_
+
+-   `Array`: ClientIDs of the parent blocks.
 
 <a name="getBlockRootClientId" href="#getBlockRootClientId">#</a> **getBlockRootClientId**
 
