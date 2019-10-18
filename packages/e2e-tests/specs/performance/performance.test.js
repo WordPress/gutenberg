@@ -20,7 +20,7 @@ function readFile( filePath ) {
 
 describe( 'Performance', () => {
 	it( '1000 paragraphs', async () => {
-		const html = readFile( join( __dirname, '../assets/large-post.html' ) );
+		const html = readFile( join( __dirname, '../../assets/large-post.html' ) );
 
 		await createNewPost();
 		await page.evaluate( ( _html ) => {
