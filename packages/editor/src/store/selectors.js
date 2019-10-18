@@ -827,7 +827,7 @@ export function getSuggestedPostFormat( state ) {
  *
  * @param {Object} state Editor state.
  *
- * @return {WPBlock[]} Filtered set of blocks for save.
+ * @return {import('@wordpress/blocks').WPBlockType[]} Filtered set of blocks for save.
  */
 export function getBlocksForSerialization( state ) {
 	deprecated( '`core/editor` getBlocksForSerialization selector', {

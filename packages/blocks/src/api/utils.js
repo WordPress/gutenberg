@@ -28,7 +28,7 @@ const ICON_COLORS = [ '#191e23', '#f8f9f9' ];
  * and its attributes are equal to the default attributes
  * which means the block is unmodified.
  *
- * @param  {WPBlock} block Block Object
+ * @param  {import('./registration').WPBlockType} block Block Object
  *
  * @return {boolean}       Whether the block is an unmodified default block
  */
@@ -77,11 +77,11 @@ export function isValidIcon( icon ) {
  * and returns a new icon object that is normalized so we can rely on just on possible icon structure
  * in the codebase.
  *
- * @param {WPBlockTypeIconRender} icon Render behavior of a block type icon;
- *                                     one of a Dashicon slug, an element, or a
- *                                     component.
+ * @param {import('./registration').WPBlockTypeIconRender} icon Render behavior of a block type icon;
+ *                                                              one of a Dashicon slug, an element, or a
+ *                                                              component.
  *
- * @return {WPBlockTypeIconDescriptor} Object describing the icon.
+ * @return {import('./registration').WPBlockTypeIconDescriptor} Object describing the icon.
  */
 export function normalizeIconObject( icon ) {
 	if ( isValidIcon( icon ) ) {

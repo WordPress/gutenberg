@@ -28,7 +28,7 @@ import { DEPRECATED_ENTRY_KEYS } from './constants';
  * Render behavior of a block type icon; one of a Dashicon slug, an element,
  * or a component.
  *
- * @typedef {(string|WPElement|WPComponent)} WPBlockTypeIconRender
+ * @typedef {(string|import('@wordpress/element').WPElement|import('@wordpress/element').WPComponent)} WPBlockTypeIconRender
  *
  * @see https://developer.wordpress.org/resource/dashicons/
  */
@@ -62,21 +62,21 @@ import { DEPRECATED_ENTRY_KEYS } from './constants';
  *
  * @typedef {Object} WPBlockType
  *
- * @property {string}           name        Block type's namespaced name.
- * @property {string}           title       Human-readable block type label.
- * @property {string}           category    Block type category classification,
- *                                          used in search interfaces to arrange
- *                                          block types by category.
- * @property {WPBlockTypeIcon} [icon]       Block type icon.
- * @property {string[]}        [keywords]   Additional keywords to produce block
- *                                          type as result in search interfaces.
- * @property {Object}          [attributes] Block type attributes.
- * @property {WPComponent}     [save]       Optional component describing
- *                                          serialized markup structure of a
- *                                          block type.
- * @property {WPComponent}      edit        Component rendering an element to
- *                                          manipulate the attributes of a block
- *                                          in the context of an editor.
+ * @property {string}                                   name         Block type's namespaced name.
+ * @property {string}                                   title        Human-readable block type label.
+ * @property {string}                                   category     Block type category classification,
+ *                                                                   used in search interfaces to arrange
+ *                                                                   block types by category.
+ * @property {WPBlockTypeIcon}                          [icon]       Block type icon.
+ * @property {string[]}                                 [keywords]   Additional keywords to produce block
+ *                                                                   type as result in search interfaces.
+ * @property {Object}                                   [attributes] Block type attributes.
+ * @property {import('@wordpress/element').WPComponent} [save]       Optional component describing
+ *                                                                   serialized markup structure of a
+ *                                                                   block type.
+ * @property {import('@wordpress/element').WPComponent} edit         Component rendering an element to
+ *                                                                   manipulate the attributes of a block
+ *                                                                   in the context of an editor.
  */
 
 /**
@@ -113,7 +113,7 @@ export function unstable__bootstrapServerSideBlockDefinitions( definitions ) { /
  * @param {string} name     Block name.
  * @param {Object} settings Block settings.
  *
- * @return {?WPBlock} The block, if it has been successfully registered;
+ * @return {?WPBlockType} The block, if it has been successfully registered;
  *                     otherwise `undefined`.
  */
 export function registerBlockType( name, settings ) {
@@ -233,7 +233,7 @@ export function registerBlockType( name, settings ) {
  *
  * @param {string} name Block name.
  *
- * @return {?WPBlock} The previous block value, if it has been successfully
+ * @return {?WPBlockType} The previous block value, if it has been successfully
  *                     unregistered; otherwise `undefined`.
  */
 export function unregisterBlockType( name ) {

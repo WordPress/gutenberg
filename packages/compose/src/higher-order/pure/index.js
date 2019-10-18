@@ -18,7 +18,7 @@ import createHigherOrderComponent from '../../utils/create-higher-order-componen
  * @param {string}   modifierName                    Seed name from which to
  *                                                   generated display name.
  *
- * @return {WPComponent} Component class with generated display name assigned.
+ * @return {import('@wordpress/element').WPComponent} Component class with generated display name assigned.
  */
 const pure = createHigherOrderComponent( ( Wrapped ) => {
 	if ( Wrapped.prototype instanceof Component ) {

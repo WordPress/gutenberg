@@ -203,7 +203,7 @@ _Parameters_
 
 _Returns_
 
--   `Array<WPBlock>`: Filtered set of blocks for save.
+-   `null`: Filtered set of blocks for save.
 
 <a name="getClientIdsOfDescendants" href="#getClientIdsOfDescendants">#</a> **getClientIdsOfDescendants**
 

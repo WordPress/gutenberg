@@ -38,10 +38,10 @@ export const toWidthPrecision = ( value ) =>
  * when the given block is the last block in the set. For the last block, the
  * behavior is reversed.
  *
- * @param {WPBlock[]} blocks   Block objects.
- * @param {string}    clientId Client ID to consider for adjacent blocks.
+ * @param {import('@wordpress/blocks').WPBlockType[]} blocks   Block objects.
+ * @param {string}                                    clientId Client ID to consider for adjacent blocks.
  *
- * @return {WPBlock[]} Adjacent block objects.
+ * @return {import('@wordpress/blocks').WPBlockType[]} Adjacent block objects.
  */
 export function getAdjacentBlocks( blocks, clientId ) {
 	const index = findIndex( blocks, { clientId } );
@@ -54,8 +54,8 @@ export function getAdjacentBlocks( blocks, clientId ) {
  * Returns an effective width for a given block. An effective width is equal to
  * its attribute value if set, or a computed value assuming equal distribution.
  *
- * @param {WPBlock} block           Block object.
- * @param {number}  totalBlockCount Total number of blocks in Columns.
+ * @param {import('@wordpress/blocks').WPBlockType} block           Block object.
+ * @param {number}                                  totalBlockCount Total number of blocks in Columns.
  *
  * @return {number} Effective column width.
  */
@@ -67,9 +67,9 @@ export function getEffectiveColumnWidth( block, totalBlockCount ) {
 /**
  * Returns the total width occupied by the given set of column blocks.
  *
- * @param {WPBlock[]} blocks          Block objects.
- * @param {?number}   totalBlockCount Total number of blocks in Columns.
- *                                    Defaults to number of blocks passed.
+ * @param {import('@wordpress/blocks').WPBlockType[]} blocks          Block objects.
+ * @param {?number}                                   totalBlockCount Total number of blocks in Columns.
+ *                                                                    Defaults to number of blocks passed.
  *
  * @return {number} Total width occupied by blocks.
  */
@@ -80,9 +80,9 @@ export function getTotalColumnsWidth( blocks, totalBlockCount = blocks.length ) 
 /**
  * Returns an object of `clientId` → `width` of effective column widths.
  *
- * @param {WPBlock[]} blocks          Block objects.
- * @param {?number}   totalBlockCount Total number of blocks in Columns.
- *                                    Defaults to number of blocks passed.
+ * @param {import('@wordpress/blocks').WPBlockType[]} blocks          Block objects.
+ * @param {?number}                                   totalBlockCount Total number of blocks in Columns.
+ *                                                                    Defaults to number of blocks passed.
  *
  * @return {Object<string,number>} Column widths.
  */
@@ -98,10 +98,10 @@ export function getColumnWidths( blocks, totalBlockCount = blocks.length ) {
  * proportional to their current widths, constrained or expanded to fit within
  * the given available width.
  *
- * @param {WPBlock[]} blocks          Block objects.
- * @param {number}    availableWidth  Maximum width to fit within.
- * @param {?number}   totalBlockCount Total number of blocks in Columns.
- *                                    Defaults to number of blocks passed.
+ * @param {import('@wordpress/blocks').WPBlockType[]} blocks          Block objects.
+ * @param {number}                                    availableWidth  Maximum width to fit within.
+ * @param {?number}                                   totalBlockCount Total number of blocks in Columns.
+ *                                                    Defaults to number of blocks passed.
  *
  * @return {Object<string,number>} Redistributed column widths.
  */
@@ -120,7 +120,7 @@ export function getRedistributedColumnWidths( blocks, availableWidth, totalBlock
  * Returns true if column blocks within the provided set are assigned with
  * explicit widths, or false otherwise.
  *
- * @param {WPBlock[]} blocks Block objects.
+ * @param {import('@wordpress/blocks').WPBlockType[]} blocks Block objects.
  *
  * @return {boolean} Whether columns have explicit widths.
  */
@@ -132,10 +132,10 @@ export function hasExplicitColumnWidths( blocks ) {
  * Returns a copy of the given set of blocks with new widths assigned from the
  * provided object of redistributed column widths.
  *
- * @param {WPBlock[]}             blocks Block objects.
- * @param {Object<string,number>} widths Redistributed column widths.
+ * @param {import('@wordpress/blocks').WPBlockType[]} blocks Block objects.
+ * @param {Object<string,number>}                     widths Redistributed column widths.
  *
- * @return {WPBlock[]} blocks Mapped block objects.
+ * @return {import('@wordpress/blocks').WPBlockType[]} blocks Mapped block objects.
  */
 export function getMappedColumnWidths( blocks, widths ) {
 	return blocks.map( ( block ) => merge( {}, block, {

@@ -98,7 +98,7 @@ class Modal extends Component {
 	/**
 	 * Renders the modal.
 	 *
-	 * @return {WPElement} The modal element.
+	 * @return {import('@wordpress/element').WPElement} The modal element.
 	 */
 	render() {
 		const {

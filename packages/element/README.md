@@ -148,7 +148,7 @@ _Related_
 
 _Parameters_
 
--   _component_ `Component`: Component
+-   _component_ `null`: Component
 -   _target_ `Element`: DOM node into which element should be rendered
 
 <a name="createRef" href="#createRef">#</a> **createRef**
@@ -167,7 +167,7 @@ Finds the dom node of a React component
 
 _Parameters_
 
--   _component_ `Component`: component's instance
+-   _component_ `null`: component's instance
 -   _target_ `Element`: DOM node into which element should be rendered
 
 <a name="forwardRef" href="#forwardRef">#</a> **forwardRef**
@@ -183,7 +183,7 @@ _Parameters_
 
 _Returns_
 
--   `WPComponent`: Enhanced component.
+-   `Component`: Enhanced component.
 
 <a name="Fragment" href="#Fragment">#</a> **Fragment**
 
@@ -203,7 +203,7 @@ _Returns_
 
 <a name="isValidElement" href="#isValidElement">#</a> **isValidElement**
 
-Checks if an object is a valid WPElement
+Checks if an object is a valid WPElement.
 
 _Parameters_
 
@@ -240,7 +240,7 @@ _Parameters_
 
 _Returns_
 
--   `WPElement`: Dangerously-rendering element.
+-   `null`: Dangerously-rendering component.
 
 <a name="render" href="#render">#</a> **render**
 
@@ -248,8 +248,8 @@ Renders a given element into the target DOM node.
 
 _Parameters_
 
--   _element_ `WPElement`: Element to render
--   _target_ `Element`: DOM node into which element should be rendered
+-   _element_ `null`: Element to render.
+-   _target_ `Element`: DOM node into which element should be rendered.
 
 <a name="renderToString" href="#renderToString">#</a> **renderToString**
 
@@ -257,7 +257,7 @@ Serializes a React element to string.
 
 _Parameters_
 
--   _element_ `WPElement`: Element to serialize.
+-   _element_ `null`: Element to serialize.
 -   _context_ `?Object`: Context object.
 -   _legacyContext_ `?Object`: Legacy context object.
 

@@ -25,7 +25,7 @@ const HANDLED_SHORTCUTS = [
  * shortcuts. Since shortcuts never change, the element can be considered
  * static, and can be skipped in reconciliation.
  *
- * @type {WPElement}
+ * @type {import('@wordpress/element').WPElement}
  */
 const SHORTCUTS_ELEMENT = (
 	<KeyboardShortcuts
@@ -40,6 +40,6 @@ const SHORTCUTS_ELEMENT = (
  * Component which registered keyboard event handlers to prevent default
  * behaviors for key combinations otherwise handled internally by RichText.
  *
- * @return {WPElement} WordPress element.
+ * @return {import('@wordpress/element').WPComponent} The component to be rendered.
  */
 export const RemoveBrowserShortcuts = () => SHORTCUTS_ELEMENT;

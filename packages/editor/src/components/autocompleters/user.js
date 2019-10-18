@@ -6,7 +6,7 @@ import apiFetch from '@wordpress/api-fetch';
 /**
  * A user mentions completer.
  *
- * @type {Completer}
+ * @type {import('@wordpress/components').Completer}
  */
 export default {
 	name: 'users',

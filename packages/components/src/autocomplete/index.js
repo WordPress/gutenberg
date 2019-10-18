@@ -77,7 +77,7 @@ import withSpokenMessages from '../higher-order/with-spoken-messages';
 /**
  * A completion value.
  *
- * @typedef {(string|WPElement|Object)} OptionCompletionValue
+ * @typedef {(string|import('@wordpress/element').WPElement|Object)} OptionCompletionValue
  */
 
 /**

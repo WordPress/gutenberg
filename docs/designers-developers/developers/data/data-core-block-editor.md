@@ -233,7 +233,7 @@ _Parameters_
 
 _Returns_
 
--   `Array<WPBlock>`: Block objects.
+-   `null`: Block objects.
 
 <a name="getBlockSelectionEnd" href="#getBlockSelectionEnd">#</a> **getBlockSelectionEnd**
 
@@ -345,7 +345,7 @@ _Parameters_
 
 _Returns_
 
--   `Array<Editor.InserterItem>`: Items that appear in inserter.
+-   `Array<EditorInserterItem>`: Items that appear in inserter.
 
 <a name="getLastMultiSelectedBlockClientId" href="#getLastMultiSelectedBlockClientId">#</a> **getLastMultiSelectedBlockClientId**
 

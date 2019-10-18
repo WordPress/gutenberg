@@ -34,18 +34,7 @@ const DEFAULT_NOTICES = [];
  * @property {boolean} speak            Whether the notice content should be
  *                                      announced to screen readers. Defaults to
  *                                      `true`.
- * @property {WPNoticeAction[]} actions User actions to present with notice.
- *
- */
-
-/**
- * @typedef {Object} WPNoticeAction Object describing a user action option associated with a notice.
- *
- * @property {string}    label    Message to use as action label.
- * @property {?string}   url      Optional URL of resource if action incurs
- *                                browser navigation.
- * @property {?Function} onClick  Optional function to invoke when action is
- *                                triggered by user.
+ * @property {import('./actions').WPNoticeAction[]} actions User actions to present with notice.
  *
  */
 

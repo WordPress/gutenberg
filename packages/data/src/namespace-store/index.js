@@ -30,11 +30,11 @@ import * as metadataActions from './metadata/actions';
 /**
  * Creates a namespace object with a store derived from the reducer given.
  *
- * @param {string}         key      Unique namespace identifier.
- * @param {Object}         options  Registered store options, with properties
- *                                  describing reducer, actions, selectors, and
- *                                  resolvers.
- * @param {WPDataRegistry} registry Registry reference.
+ * @param {string}                               key      Unique namespace identifier.
+ * @param {Object}                               options  Registered store options, with properties
+ *                                                        describing reducer, actions, selectors, and
+ *                                                        resolvers.
+ * @param {import('../registry').WPDataRegistry} registry Registry reference.
  *
  * @return {Object} Store Object.
  */
@@ -104,11 +104,11 @@ export default function createNamespace( key, options, registry ) {
 /**
  * Creates a redux store for a namespace.
  *
- * @param {string}         key      Unique namespace identifier.
- * @param {Object}         options  Registered store options, with properties
- *                                  describing reducer, actions, selectors, and
- *                                  resolvers.
- * @param {WPDataRegistry} registry Registry reference.
+ * @param {string}                               key      Unique namespace identifier.
+ * @param {Object}                               options  Registered store options, with properties
+ *                                                        describing reducer, actions, selectors, and
+ *                                                        resolvers.
+ * @param {import('../registry').WPDataRegistry} registry Registry reference.
  *
  * @return {Object} Newly created redux store.
  */

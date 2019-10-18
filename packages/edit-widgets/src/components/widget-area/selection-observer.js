@@ -10,7 +10,7 @@ import { withSelect, withDispatch } from '@wordpress/data';
  * can be used to ensuring that only one block appears as selected
  * when multiple editors exist in a page.
  *
- * @type {WPComponent}
+ * @type {import('@wordpress/element').WPComponent}
  */
 
 class SelectionObserver extends Component {

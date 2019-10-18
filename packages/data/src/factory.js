@@ -29,7 +29,7 @@ export function createRegistrySelector( registrySelector ) {
 	 * Registry on which to call `select`, stubbed for non-standard usage to
 	 * use the default registry.
 	 *
-	 * @type {WPDataRegistry}
+	 * @type {import('./registry').WPDataRegistry}
 	 */
 	selector.registry = defaultRegistry;
 

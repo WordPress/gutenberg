@@ -36,11 +36,11 @@ import ToolbarContainer from './toolbar-container';
  *
  * @param {Object}        props
  * @param {Array}        [props.controls]  The controls to render in this toolbar.
- * @param {ReactElement} [props.children]  Any other things to render inside the
+ * @param {import('@wordpress/element').WPElement} [props.children]  Any other things to render inside the
  *                                         toolbar besides the controls.
  * @param {string}       [props.className] Class to set on the container div.
  *
- * @return {ReactElement} The rendered toolbar.
+ * @return {import('@wordpress/element').WPComponent} The rendered component.
  */
 function Toolbar( { controls = [], children, className, isCollapsed, icon, label, ...otherProps } ) {
 	if (

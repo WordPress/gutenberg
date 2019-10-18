@@ -348,9 +348,9 @@ function getNormalStylePropertyValue( property, value ) {
 /**
  * Serializes a React element to string.
  *
- * @param {WPElement} element       Element to serialize.
- * @param {?Object}   context       Context object.
- * @param {?Object}   legacyContext Legacy context object.
+ * @param {import('@wordpress/element').WPElement} element       Element to serialize.
+ * @param {?Object}                                context       Context object.
+ * @param {?Object}                                legacyContext Legacy context object.
  *
  * @return {string} Serialized element.
  */
