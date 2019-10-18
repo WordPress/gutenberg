@@ -246,16 +246,16 @@
 		bottom: 0;
 		right: 0;
 		background: $white;
-		height: 30px;
-		padding: 0 10px;
+		height: $icon-button-size-small;
+		padding: 0 $grid-size;
 		align-items: center;
 		border-top: $border-width solid $light-gray-500;
-		font-size: 12px;
+		font-size: $default-font-size;
 
 		.edit-post-layout.is-sidebar-opened & {
 			right: $sidebar-width;
 		}
 	}
 }
-@include editor-left(".edit-post-layout__footer");
 
+@include editor-left(".edit-post-layout__footer");

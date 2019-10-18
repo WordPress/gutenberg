@@ -8,17 +8,31 @@
 		margin: 0;
 
 		&:not(:last-child)::after {
-			content: "▸";
+			content: "\2192"; // This becomes →.
 		}
 	}
 }
 
 .block-editor-block-breadcrumb__button.components-button {
-	color: inherit;
+	color: $dark-gray-500;
 	font-size: inherit;
+	height: $icon-button-size-small;
+	line-height: 100%;
+
+	&:hover {
+		text-decoration: underline;
+	}
+
+	&:focus {
+		@include square-style__focus();
+		outline-offset: -2px;
+		box-shadow: none;
+	}
 }
 
 .block-editor-block-breadcrumb__current {
-	padding: 0 10px;
+	color: $dark-gray-500;
+	padding: 0 $grid-size;
 	font-size: inherit;
+	cursor: default;
 }
