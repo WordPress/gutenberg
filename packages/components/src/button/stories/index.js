@@ -1,11 +1,22 @@
 /**
+ * External dependencies
+ */
+import { text } from '@storybook/addon-knobs';
+
+/**
  * Internal dependencies
  */
 import Button from '../';
 
 export default { title: 'Button', component: Button };
 
-export const _default = () => <Button>Hello Button</Button>;
+export const _default = () => {
+	const label = text( 'Label', 'Hello Button' );
+
+	return (
+		<Button>{ label }</Button>
+	);
+};
 
 export const primary = () => <Button isPrimary>Hello Button</Button>;
 
