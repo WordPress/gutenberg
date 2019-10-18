@@ -347,21 +347,6 @@ _Returns_
 
 -   `Array<Editor.InserterItem>`: Items that appear in inserter.
 
-<a name="getInsertionIndex" href="#getInsertionIndex">#</a> **getInsertionIndex**
-
-Determines whether there is only one item that may be inserted.
-
-_Parameters_
-
--   _state_ `Object`: Editor state.
--   _clientId_ `?string`: Block client ID.
--   _destinationRootClientId_ `?string`: Root client ID of block list.
--   _isAppender_ `boolean`: Determines if the block is added to a set of existing blocks in a list.
-
-_Returns_
-
--   `number`: The insertion index.
-
 <a name="getLastMultiSelectedBlockClientId" href="#getLastMultiSelectedBlockClientId">#</a> **getLastMultiSelectedBlockClientId**
 
 Returns the client ID of the last block in the multi-selection set, or null
@@ -453,19 +438,6 @@ _Parameters_
 _Returns_
 
 -   `?string`: Adjacent block's client ID, or null if none exists.
-
-<a name="getOneAllowedItem" href="#getOneAllowedItem">#</a> **getOneAllowedItem**
-
-Determines whether there is only one item that may be inserted.
-
-_Parameters_
-
--   _state_ `Object`: Editor state.
--   _rootClientId_ `?string`: Optional root client ID of block list.
-
-_Returns_
-
--   `string`: The name of the allowed block.
 
 <a name="getPreviousBlockClientId" href="#getPreviousBlockClientId">#</a> **getPreviousBlockClientId**
 
@@ -608,6 +580,19 @@ _Returns_
 
 -   `?string`: Block Template Lock
 
+<a name="getTheOnlyAllowedItem" href="#getTheOnlyAllowedItem">#</a> **getTheOnlyAllowedItem**
+
+Gets the name of the only item that may be inserted.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+-   _rootClientId_ `?string`: Optional root client ID of block list.
+
+_Returns_
+
+-   `?string`: The name of the allowed block or null.
+
 <a name="hasInserterItems" href="#hasInserterItems">#</a> **hasInserterItems**
 
 Determines whether there are items to show in the inserter.
@@ -633,7 +618,7 @@ _Returns_
 
 -   `boolean`: Whether multi-selection has been made.
 
-<a name="hasOneAllowedItem" href="#hasOneAllowedItem">#</a> **hasOneAllowedItem**
+<a name="hasOnlyOneAllowedInserterItem" href="#hasOnlyOneAllowedInserterItem">#</a> **hasOnlyOneAllowedInserterItem**
 
 Determines whether there is only one item that may be inserted.
 
