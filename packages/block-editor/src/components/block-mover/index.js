@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { IconButton } from '@wordpress/components';
 import { getBlockType } from '@wordpress/blocks';
 import { Component } from '@wordpress/element';
@@ -44,12 +44,47 @@ export class BlockMover extends Component {
 	}
 
 	render() {
-		const { onMoveUp, onMoveDown, orientation, isFirst, isLast, isDraggable, onDragStart, onDragEnd, clientIds, blockElementId, blockType, firstIndex, isLocked, instanceId, isHidden, rootClientId } = this.props;
+		const { onMoveUp, onMoveDown, orientation, isRTL, isFirst, isLast, isDraggable, onDragStart, onDragEnd, clientIds, blockElementId, blockType, firstIndex, isLocked, instanceId, isHidden, rootClientId } = this.props;
 		const { isFocused } = this.state;
 		const blocksCount = castArray( clientIds ).length;
 		if ( isLocked || ( isFirst && isLast && ! rootClientId ) ) {
 			return null;
 		}
+
+		const getArrowIcon = ( hdir ) => {
+			let arrow;
+			switch ( hdir ) {
+				case 'left':
+					arrow = isRTL ? rightArrow : leftArrow;
+					arrow = orientation === 'horizontal' ? arrow : upArrow;
+					break;
+
+				case 'right':
+					arrow = isRTL ? leftArrow : rightArrow;
+					arrow = orientation === 'horizontal' ? arrow : downArrow;
+					break;
+
+				default:
+					break;
+			}
+			return arrow;
+		};
+
+		const getMovementDirection = ( mdir ) => {
+			switch ( mdir ) {
+				case 'left':
+					mdir = isRTL ? 'right' : mdir;
+					break;
+
+				case 'right':
+					mdir = isRTL ? 'left' : mdir;
+					break;
+
+				default:
+					break;
+			}
+			return mdir;
+		};
 
 		// We emulate a disabled state because forcefully applying the `disabled`
 		// attribute on the button while it has focus causes the screen to change
@@ -60,8 +95,9 @@ export class BlockMover extends Component {
 				<IconButton
 					className="editor-block-mover__control block-editor-block-mover__control"
 					onClick={ isFirst ? null : onMoveUp }
-					icon={ orientation === 'horizontal' ? leftArrow : upArrow }
-					label={ orientation === 'horizontal' ? __( 'Move left' ) : __( 'Move up' ) }
+					icon={ getArrowIcon( 'left' ) }
+					// translators: %s: Horizontal direction of block movement ( left, right )
+					label={ orientation === 'horizontal' ? sprintf( __( 'Move %s' ), getMovementDirection( 'left' ) ) : __( 'Move up' ) }
 					aria-describedby={ `block-editor-block-mover__up-description-${ instanceId }` }
 					aria-disabled={ isFirst }
 					onFocus={ this.onFocus }
@@ -79,8 +115,9 @@ export class BlockMover extends Component {
 				<IconButton
 					className="editor-block-mover__control block-editor-block-mover__control"
 					onClick={ isLast ? null : onMoveDown }
-					icon={ orientation === 'horizontal' ? rightArrow : downArrow }
-					label={ orientation === 'horizontal' ? __( 'Move right' ) : __( 'Move down' ) }
+					icon={ getArrowIcon( 'right' ) }
+					// translators: %s: Horizontal direction of block movement ( left, right )
+					label={ orientation === 'horizontal' ? sprintf( __( 'Move %s' ), getMovementDirection( 'right' ) ) : __( 'Move down' ) }
 					aria-describedby={ `block-editor-block-mover__down-description-${ instanceId }` }
 					aria-disabled={ isLast }
 					onFocus={ this.onFocus }
@@ -95,6 +132,8 @@ export class BlockMover extends Component {
 							isFirst,
 							isLast,
 							-1,
+							orientation,
+							isRTL,
 						)
 					}
 				</span>
@@ -107,6 +146,8 @@ export class BlockMover extends Component {
 							isFirst,
 							isLast,
 							1,
+							orientation,
+							isRTL,
 						)
 					}
 				</span>
@@ -125,12 +166,17 @@ export default compose(
 		const blockOrder = getBlockOrder( rootClientId );
 		const firstIndex = getBlockIndex( firstClientId, rootClientId );
 		const lastIndex = getBlockIndex( last( normalizedClientIds ), rootClientId );
+		const { getSettings } = select( 'core/block-editor' );
+		const {
+			isRTL,
+		} = getSettings();
 
 		return {
 			blockType: block ? getBlockType( block.name ) : null,
 			isLocked: getTemplateLock( rootClientId ) === 'all',
 			rootClientId,
 			firstIndex,
+			isRTL,
 			isFirst: firstIndex === 0,
 			isLast: lastIndex === blockOrder.length - 1,
 		};
