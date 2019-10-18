@@ -1,0 +1,2554 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`@wordpress/components Components|Animate Appear Bottom Left 1`] = `
+<div
+  className="components-animate__appear is-from-left is-from-bottom components-notice is-success is-dismissible"
+>
+  <div
+    className="components-notice__content"
+  >
+    <p>
+      Appear animation. Origin: 
+      bottom left
+      .
+    </p>
+  </div>
+  <button
+    aria-label="Dismiss this notice"
+    className="components-button components-icon-button components-notice__dismiss"
+    onClick={[Function]}
+    type="button"
+  >
+    <svg
+      aria-hidden="true"
+      className="dashicon dashicons-no-alt"
+      focusable="false"
+      height={20}
+      role="img"
+      viewBox="0 0 20 20"
+      width={20}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M14.95 6.46L11.41 10l3.54 3.54-1.41 1.41L10 11.42l-3.53 3.53-1.42-1.42L8.58 10 5.05 6.47l1.42-1.42L10 8.58l3.54-3.53z"
+      />
+    </svg>
+  </button>
+</div>
+`;
+
+exports[`@wordpress/components Components|Animate Appear Bottom Right 1`] = `
+<div
+  className="components-animate__appear is-from-right is-from-bottom components-notice is-success is-dismissible"
+>
+  <div
+    className="components-notice__content"
+  >
+    <p>
+      Appear animation. Origin: 
+      bottom right
+      .
+    </p>
+  </div>
+  <button
+    aria-label="Dismiss this notice"
+    className="components-button components-icon-button components-notice__dismiss"
+    onClick={[Function]}
+    type="button"
+  >
+    <svg
+      aria-hidden="true"
+      className="dashicon dashicons-no-alt"
+      focusable="false"
+      height={20}
+      role="img"
+      viewBox="0 0 20 20"
+      width={20}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M14.95 6.46L11.41 10l3.54 3.54-1.41 1.41L10 11.42l-3.53 3.53-1.42-1.42L8.58 10 5.05 6.47l1.42-1.42L10 8.58l3.54-3.53z"
+      />
+    </svg>
+  </button>
+</div>
+`;
+
+exports[`@wordpress/components Components|Animate Appear Top Left 1`] = `
+<div
+  className="components-animate__appear is-from-left is-from-top components-notice is-success is-dismissible"
+>
+  <div
+    className="components-notice__content"
+  >
+    <p>
+      Appear animation. Origin: 
+      top left
+      .
+    </p>
+  </div>
+  <button
+    aria-label="Dismiss this notice"
+    className="components-button components-icon-button components-notice__dismiss"
+    onClick={[Function]}
+    type="button"
+  >
+    <svg
+      aria-hidden="true"
+      className="dashicon dashicons-no-alt"
+      focusable="false"
+      height={20}
+      role="img"
+      viewBox="0 0 20 20"
+      width={20}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M14.95 6.46L11.41 10l3.54 3.54-1.41 1.41L10 11.42l-3.53 3.53-1.42-1.42L8.58 10 5.05 6.47l1.42-1.42L10 8.58l3.54-3.53z"
+      />
+    </svg>
+  </button>
+</div>
+`;
+
+exports[`@wordpress/components Components|Animate Appear Top Right 1`] = `
+<div
+  className="components-animate__appear is-from-right is-from-top components-notice is-success is-dismissible"
+>
+  <div
+    className="components-notice__content"
+  >
+    <p>
+      Appear animation. Origin: 
+      top right
+      .
+    </p>
+  </div>
+  <button
+    aria-label="Dismiss this notice"
+    className="components-button components-icon-button components-notice__dismiss"
+    onClick={[Function]}
+    type="button"
+  >
+    <svg
+      aria-hidden="true"
+      className="dashicon dashicons-no-alt"
+      focusable="false"
+      height={20}
+      role="img"
+      viewBox="0 0 20 20"
+      width={20}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M14.95 6.46L11.41 10l3.54 3.54-1.41 1.41L10 11.42l-3.53 3.53-1.42-1.42L8.58 10 5.05 6.47l1.42-1.42L10 8.58l3.54-3.53z"
+      />
+    </svg>
+  </button>
+</div>
+`;
+
+exports[`@wordpress/components Components|Animate Default 1`] = `
+<div
+  className="components-notice is-success is-dismissible"
+>
+  <div
+    className="components-notice__content"
+  >
+    <p>
+      No default animation. Use one of type = "appear", "slide-in", or "loading".
+    </p>
+  </div>
+  <button
+    aria-label="Dismiss this notice"
+    className="components-button components-icon-button components-notice__dismiss"
+    onClick={[Function]}
+    type="button"
+  >
+    <svg
+      aria-hidden="true"
+      className="dashicon dashicons-no-alt"
+      focusable="false"
+      height={20}
+      role="img"
+      viewBox="0 0 20 20"
+      width={20}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M14.95 6.46L11.41 10l3.54 3.54-1.41 1.41L10 11.42l-3.53 3.53-1.42-1.42L8.58 10 5.05 6.47l1.42-1.42L10 8.58l3.54-3.53z"
+      />
+    </svg>
+  </button>
+</div>
+`;
+
+exports[`@wordpress/components Components|Animate Loading 1`] = `
+<div
+  className="components-animate__loading components-notice is-success is-dismissible"
+>
+  <div
+    className="components-notice__content"
+  >
+    <p>
+      Loading animation.
+    </p>
+  </div>
+  <button
+    aria-label="Dismiss this notice"
+    className="components-button components-icon-button components-notice__dismiss"
+    onClick={[Function]}
+    type="button"
+  >
+    <svg
+      aria-hidden="true"
+      className="dashicon dashicons-no-alt"
+      focusable="false"
+      height={20}
+      role="img"
+      viewBox="0 0 20 20"
+      width={20}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M14.95 6.46L11.41 10l3.54 3.54-1.41 1.41L10 11.42l-3.53 3.53-1.42-1.42L8.58 10 5.05 6.47l1.42-1.42L10 8.58l3.54-3.53z"
+      />
+    </svg>
+  </button>
+</div>
+`;
+
+exports[`@wordpress/components Components|Animate Slide In 1`] = `
+<div
+  className="components-animate__slide-in is-from-left components-notice is-success is-dismissible"
+>
+  <div
+    className="components-notice__content"
+  >
+    <p>
+      Slide-in animation.
+    </p>
+  </div>
+  <button
+    aria-label="Dismiss this notice"
+    className="components-button components-icon-button components-notice__dismiss"
+    onClick={[Function]}
+    type="button"
+  >
+    <svg
+      aria-hidden="true"
+      className="dashicon dashicons-no-alt"
+      focusable="false"
+      height={20}
+      role="img"
+      viewBox="0 0 20 20"
+      width={20}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M14.95 6.46L11.41 10l3.54 3.54-1.41 1.41L10 11.42l-3.53 3.53-1.42-1.42L8.58 10 5.05 6.47l1.42-1.42L10 8.58l3.54-3.53z"
+      />
+    </svg>
+  </button>
+</div>
+`;
+
+exports[`@wordpress/components Components|Button Default 1`] = `
+<button
+  className="components-button"
+  type="button"
+>
+  Default Button
+</button>
+`;
+
+exports[`@wordpress/components Components|Button Disabled 1`] = `
+<button
+  className="components-button"
+  disabled={true}
+  type="button"
+>
+  Disabled Button
+</button>
+`;
+
+exports[`@wordpress/components Components|Button Disabled Link 1`] = `
+<button
+  className="components-button"
+  disabled={true}
+  type="button"
+>
+  Disabled Link Button
+</button>
+`;
+
+exports[`@wordpress/components Components|Button Large 1`] = `
+<button
+  className="components-button is-button is-default is-large"
+  type="button"
+>
+  Large Button
+</button>
+`;
+
+exports[`@wordpress/components Components|Button Large Primary 1`] = `
+<button
+  className="components-button is-button is-primary is-large"
+  type="button"
+>
+  Large Primary Button
+</button>
+`;
+
+exports[`@wordpress/components Components|Button Link 1`] = `
+<a
+  className="components-button"
+  href="https://wordpress.org/"
+  target="_blank"
+>
+  Link Button
+</a>
+`;
+
+exports[`@wordpress/components Components|Button Primary 1`] = `
+<button
+  className="components-button is-button is-primary"
+  type="button"
+>
+  Primary Button
+</button>
+`;
+
+exports[`@wordpress/components Components|Button Small 1`] = `
+<button
+  className="components-button is-button is-default is-small"
+  type="button"
+>
+  Small Button
+</button>
+`;
+
+exports[`@wordpress/components Components|Button Toggled 1`] = `
+<button
+  className="components-button is-toggled"
+  type="button"
+>
+  Toggled Button
+</button>
+`;
+
+exports[`@wordpress/components Components|ButtonGroup Default 1`] = `
+<div
+  className="components-button-group"
+  role="group"
+>
+  <button
+    className="components-button is-button is-primary"
+    style={
+      Object {
+        "margin": "0 4px",
+      }
+    }
+    type="button"
+  >
+    Button 1
+  </button>
+  <button
+    className="components-button is-button is-primary"
+    style={
+      Object {
+        "margin": "0 4px",
+      }
+    }
+    type="button"
+  >
+    Button 2
+  </button>
+</div>
+`;
+
+exports[`@wordpress/components Components|CheckboxControl All 1`] = `
+<div
+  className="components-base-control"
+>
+  <div
+    className="components-base-control__field"
+  >
+    <label
+      className="components-base-control__label"
+      htmlFor="inspector-checkbox-control-1"
+    >
+      User
+    </label>
+    <span
+      className="components-checkbox-control__input-container"
+    >
+      <input
+        aria-describedby="inspector-checkbox-control-1__help"
+        checked={true}
+        className="components-checkbox-control__input"
+        id="inspector-checkbox-control-1"
+        onChange={[Function]}
+        type="checkbox"
+        value="1"
+      />
+      <svg
+        aria-hidden="true"
+        className="dashicon dashicons-yes components-checkbox-control__checked"
+        focusable="false"
+        height={20}
+        role="img"
+        viewBox="0 0 20 20"
+        width={20}
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M14.83 4.89l1.34.94-5.81 8.38H9.02L5.78 9.67l1.34-1.25 2.57 2.4z"
+        />
+      </svg>
+    </span>
+    <label
+      className="components-checkbox-control__label"
+      htmlFor="inspector-checkbox-control-1"
+    >
+      Is author
+    </label>
+  </div>
+  <p
+    className="components-base-control__help"
+    id="inspector-checkbox-control-1__help"
+  >
+    Is the user an author or not?
+  </p>
+</div>
+`;
+
+exports[`@wordpress/components Components|CheckboxControl Default 1`] = `
+<div
+  className="components-base-control"
+>
+  <div
+    className="components-base-control__field"
+  >
+    <span
+      className="components-checkbox-control__input-container"
+    >
+      <input
+        checked={true}
+        className="components-checkbox-control__input"
+        id="inspector-checkbox-control-0"
+        onChange={[Function]}
+        type="checkbox"
+        value="1"
+      />
+      <svg
+        aria-hidden="true"
+        className="dashicon dashicons-yes components-checkbox-control__checked"
+        focusable="false"
+        height={20}
+        role="img"
+        viewBox="0 0 20 20"
+        width={20}
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M14.83 4.89l1.34.94-5.81 8.38H9.02L5.78 9.67l1.34-1.25 2.57 2.4z"
+        />
+      </svg>
+    </span>
+    <label
+      className="components-checkbox-control__label"
+      htmlFor="inspector-checkbox-control-0"
+    >
+      Is author
+    </label>
+  </div>
+</div>
+`;
+
+exports[`@wordpress/components Components|ColorPalette Default 1`] = `
+<div
+  className="components-circular-option-picker"
+>
+  <div
+    className="components-circular-option-picker__option-wrapper"
+  >
+    <button
+      aria-label="Color: red"
+      aria-pressed={false}
+      className="components-circular-option-picker__option"
+      onBlur={[Function]}
+      onClick={[Function]}
+      onFocus={[Function]}
+      onMouseDown={[Function]}
+      onMouseEnter={[Function]}
+      onMouseLeave={[Function]}
+      style={
+        Object {
+          "color": "#f00",
+        }
+      }
+      type="button"
+    />
+  </div>
+  <div
+    className="components-circular-option-picker__option-wrapper"
+  >
+    <button
+      aria-label="Color: white"
+      aria-pressed={false}
+      className="components-circular-option-picker__option"
+      onBlur={[Function]}
+      onClick={[Function]}
+      onFocus={[Function]}
+      onMouseDown={[Function]}
+      onMouseEnter={[Function]}
+      onMouseLeave={[Function]}
+      style={
+        Object {
+          "color": "#fff",
+        }
+      }
+      type="button"
+    />
+  </div>
+  <div
+    className="components-circular-option-picker__option-wrapper"
+  >
+    <button
+      aria-label="Color: blue"
+      aria-pressed={false}
+      className="components-circular-option-picker__option"
+      onBlur={[Function]}
+      onClick={[Function]}
+      onFocus={[Function]}
+      onMouseDown={[Function]}
+      onMouseEnter={[Function]}
+      onMouseLeave={[Function]}
+      style={
+        Object {
+          "color": "#00f",
+        }
+      }
+      type="button"
+    />
+  </div>
+  <div
+    className="components-circular-option-picker__custom-clear-wrapper"
+  >
+    <div
+      className="components-circular-option-picker__dropdown-link-action"
+    >
+      <button
+        aria-expanded={false}
+        aria-label="Custom color picker"
+        className="components-button is-link"
+        onClick={[Function]}
+        type="button"
+      >
+        Custom Color
+      </button>
+    </div>
+    <button
+      className="components-button components-circular-option-picker__clear is-button is-default is-small"
+      onClick={[Function]}
+      type="button"
+    >
+      Clear
+    </button>
+  </div>
+</div>
+`;
+
+exports[`@wordpress/components Components|ColorPalette With Knobs 1`] = `
+<div
+  className="components-circular-option-picker"
+>
+  <div
+    className="components-circular-option-picker__option-wrapper"
+  >
+    <button
+      aria-label="Color: red"
+      aria-pressed={false}
+      className="components-circular-option-picker__option"
+      onBlur={[Function]}
+      onClick={[Function]}
+      onFocus={[Function]}
+      onMouseDown={[Function]}
+      onMouseEnter={[Function]}
+      onMouseLeave={[Function]}
+      style={
+        Object {
+          "color": "#f00",
+        }
+      }
+      type="button"
+    />
+  </div>
+  <div
+    className="components-circular-option-picker__option-wrapper"
+  >
+    <button
+      aria-label="Color: white"
+      aria-pressed={false}
+      className="components-circular-option-picker__option"
+      onBlur={[Function]}
+      onClick={[Function]}
+      onFocus={[Function]}
+      onMouseDown={[Function]}
+      onMouseEnter={[Function]}
+      onMouseLeave={[Function]}
+      style={
+        Object {
+          "color": "#fff",
+        }
+      }
+      type="button"
+    />
+  </div>
+  <div
+    className="components-circular-option-picker__option-wrapper"
+  >
+    <button
+      aria-label="Color: blue"
+      aria-pressed={false}
+      className="components-circular-option-picker__option"
+      onBlur={[Function]}
+      onClick={[Function]}
+      onFocus={[Function]}
+      onMouseDown={[Function]}
+      onMouseEnter={[Function]}
+      onMouseLeave={[Function]}
+      style={
+        Object {
+          "color": "#00f",
+        }
+      }
+      type="button"
+    />
+  </div>
+  <div
+    className="components-circular-option-picker__custom-clear-wrapper"
+  >
+    <div
+      className="components-circular-option-picker__dropdown-link-action"
+    >
+      <button
+        aria-expanded={false}
+        aria-label="Custom color picker"
+        className="components-button is-link"
+        onClick={[Function]}
+        type="button"
+      >
+        Custom Color
+      </button>
+    </div>
+    <button
+      className="components-button components-circular-option-picker__clear is-button is-default is-small"
+      onClick={[Function]}
+      type="button"
+    >
+      Clear
+    </button>
+  </div>
+</div>
+`;
+
+exports[`@wordpress/components Components|ColorPicker Alpha Enabled 1`] = `
+<div
+  className="components-color-picker is-alpha-enabled"
+>
+  <div
+    className="components-color-picker__saturation"
+  >
+    <div>
+      <div
+        className="components-color-picker__saturation-color"
+        onMouseDown={[Function]}
+        onTouchMove={[Function]}
+        onTouchStart={[Function]}
+        role="application"
+        style={
+          Object {
+            "background": "hsl(0,100%, 50%)",
+          }
+        }
+      >
+        <div
+          className="components-color-picker__saturation-white"
+        />
+        <div
+          className="components-color-picker__saturation-black"
+        />
+        <button
+          aria-describedby="color-picker-saturation-1"
+          aria-label="Choose a shade"
+          className="components-color-picker__saturation-pointer"
+          onKeyDown={[Function]}
+          style={
+            Object {
+              "left": "100%",
+              "top": "0%",
+            }
+          }
+        />
+        <div
+          className="components-visually-hidden"
+          id="color-picker-saturation-1"
+        >
+          Use your arrow keys to change the base color. Move up to lighten the color, down to darken, left to decrease saturation, and right to increase saturation.
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    className="components-color-picker__body"
+  >
+    <div
+      className="components-color-picker__controls"
+    >
+      <div
+        className="components-color-picker__swatch"
+      >
+        <div
+          className="components-color-picker__active"
+          style={
+            Object {
+              "backgroundColor": "rgb(255, 0, 0)",
+            }
+          }
+        />
+      </div>
+      <div
+        className="components-color-picker__toggles"
+      >
+        <div>
+          <div
+            className="components-color-picker__hue"
+          >
+            <div
+              className="components-color-picker__hue-gradient"
+            />
+            <div
+              className="components-color-picker__hue-bar"
+              onMouseDown={[Function]}
+              onTouchMove={[Function]}
+              onTouchStart={[Function]}
+            >
+              <div
+                aria-describedby="components-color-picker__hue-description-1"
+                aria-label="Hue value in degrees, from 0 to 359."
+                aria-orientation="horizontal"
+                aria-valuemax="1"
+                aria-valuemin="359"
+                aria-valuenow={0}
+                className="components-color-picker__hue-pointer"
+                onKeyDown={[Function]}
+                role="slider"
+                style={
+                  Object {
+                    "left": "0%",
+                  }
+                }
+                tabIndex="0"
+              />
+              <p
+                className="components-visually-hidden"
+                id="components-color-picker__hue-description-1"
+              >
+                Move the arrow left or right to change hue.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div
+            className="components-color-picker__alpha"
+          >
+            <div
+              className="components-color-picker__alpha-gradient"
+              style={
+                Object {
+                  "background": "linear-gradient(to right, rgba(255,0,0, 0) 0%, rgba(255,0,0, 1) 100%)",
+                }
+              }
+            />
+            <div
+              className="components-color-picker__alpha-bar"
+              onMouseDown={[Function]}
+              onTouchMove={[Function]}
+              onTouchStart={[Function]}
+            >
+              <div
+                aria-label="Alpha value, from 0 (transparent) to 1 (fully opaque)."
+                aria-orientation="horizontal"
+                aria-valuemax="1"
+                aria-valuemin="0"
+                aria-valuenow={1}
+                className="components-color-picker__alpha-pointer"
+                onKeyDown={[Function]}
+                role="slider"
+                style={
+                  Object {
+                    "left": "100%",
+                  }
+                }
+                tabIndex="0"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      className="components-color-picker__inputs-wrapper"
+    >
+      <div
+        className="components-color-picker__inputs-fields"
+      >
+        <div
+          className="components-base-control components-color-picker__inputs-field"
+        >
+          <div
+            className="components-base-control__field"
+          >
+            <label
+              className="components-base-control__label"
+              htmlFor="inspector-text-control-1"
+            >
+              Color value in hexadecimal
+            </label>
+            <input
+              className="components-text-control__input"
+              id="inspector-text-control-1"
+              onBlur={[Function]}
+              onChange={[Function]}
+              onKeyDown={[Function]}
+              type="text"
+              value="#ff0000"
+            />
+          </div>
+        </div>
+      </div>
+      <div
+        className="components-color-picker__inputs-toggle"
+      >
+        <button
+          aria-label="Change color format"
+          className="components-button components-icon-button"
+          onBlur={[Function]}
+          onClick={[Function]}
+          onFocus={[Function]}
+          onMouseDown={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            className="dashicon dashicons-arrow-down-alt2"
+            focusable="false"
+            height={20}
+            role="img"
+            viewBox="0 0 20 20"
+            width={20}
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M5 6l5 5 5-5 2 1-7 7-7-7z"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`@wordpress/components Components|ColorPicker Default 1`] = `
+<div
+  className="components-color-picker is-alpha-disabled"
+>
+  <div
+    className="components-color-picker__saturation"
+  >
+    <div>
+      <div
+        className="components-color-picker__saturation-color"
+        onMouseDown={[Function]}
+        onTouchMove={[Function]}
+        onTouchStart={[Function]}
+        role="application"
+        style={
+          Object {
+            "background": "hsl(0,100%, 50%)",
+          }
+        }
+      >
+        <div
+          className="components-color-picker__saturation-white"
+        />
+        <div
+          className="components-color-picker__saturation-black"
+        />
+        <button
+          aria-describedby="color-picker-saturation-0"
+          aria-label="Choose a shade"
+          className="components-color-picker__saturation-pointer"
+          onKeyDown={[Function]}
+          style={
+            Object {
+              "left": "100%",
+              "top": "0%",
+            }
+          }
+        />
+        <div
+          className="components-visually-hidden"
+          id="color-picker-saturation-0"
+        >
+          Use your arrow keys to change the base color. Move up to lighten the color, down to darken, left to decrease saturation, and right to increase saturation.
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    className="components-color-picker__body"
+  >
+    <div
+      className="components-color-picker__controls"
+    >
+      <div
+        className="components-color-picker__swatch"
+      >
+        <div
+          className="components-color-picker__active"
+          style={
+            Object {
+              "backgroundColor": "rgb(255, 0, 0)",
+            }
+          }
+        />
+      </div>
+      <div
+        className="components-color-picker__toggles"
+      >
+        <div>
+          <div
+            className="components-color-picker__hue"
+          >
+            <div
+              className="components-color-picker__hue-gradient"
+            />
+            <div
+              className="components-color-picker__hue-bar"
+              onMouseDown={[Function]}
+              onTouchMove={[Function]}
+              onTouchStart={[Function]}
+            >
+              <div
+                aria-describedby="components-color-picker__hue-description-0"
+                aria-label="Hue value in degrees, from 0 to 359."
+                aria-orientation="horizontal"
+                aria-valuemax="1"
+                aria-valuemin="359"
+                aria-valuenow={0}
+                className="components-color-picker__hue-pointer"
+                onKeyDown={[Function]}
+                role="slider"
+                style={
+                  Object {
+                    "left": "0%",
+                  }
+                }
+                tabIndex="0"
+              />
+              <p
+                className="components-visually-hidden"
+                id="components-color-picker__hue-description-0"
+              >
+                Move the arrow left or right to change hue.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      className="components-color-picker__inputs-wrapper"
+    >
+      <div
+        className="components-color-picker__inputs-fields"
+      >
+        <div
+          className="components-base-control components-color-picker__inputs-field"
+        >
+          <div
+            className="components-base-control__field"
+          >
+            <label
+              className="components-base-control__label"
+              htmlFor="inspector-text-control-0"
+            >
+              Color value in hexadecimal
+            </label>
+            <input
+              className="components-text-control__input"
+              id="inspector-text-control-0"
+              onBlur={[Function]}
+              onChange={[Function]}
+              onKeyDown={[Function]}
+              type="text"
+              value="#ff0000"
+            />
+          </div>
+        </div>
+      </div>
+      <div
+        className="components-color-picker__inputs-toggle"
+      >
+        <button
+          aria-label="Change color format"
+          className="components-button components-icon-button"
+          onBlur={[Function]}
+          onClick={[Function]}
+          onFocus={[Function]}
+          onMouseDown={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            className="dashicon dashicons-arrow-down-alt2"
+            focusable="false"
+            height={20}
+            role="img"
+            viewBox="0 0 20 20"
+            width={20}
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M5 6l5 5 5-5 2 1-7 7-7-7z"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`@wordpress/components Components|Dashicon Default 1`] = `
+<svg
+  aria-hidden="true"
+  className="dashicon dashicons-wordpress"
+  color="#0079AA"
+  focusable="false"
+  height={20}
+  role="img"
+  viewBox="0 0 20 20"
+  width={20}
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <path
+    d="M20 10c0-5.52-4.48-10-10-10S0 4.48 0 10s4.48 10 10 10 10-4.48 10-10zM10 1.01c4.97 0 8.99 4.02 8.99 8.99s-4.02 8.99-8.99 8.99S1.01 14.97 1.01 10 5.03 1.01 10 1.01zM8.01 14.82L4.96 6.61c.49-.03 1.05-.08 1.05-.08.43-.05.38-1.01-.06-.99 0 0-1.29.1-2.13.1-.15 0-.33 0-.52-.01 1.44-2.17 3.9-3.6 6.7-3.6 2.09 0 3.99.79 5.41 2.09-.6-.08-1.45.35-1.45 1.42 0 .66.38 1.22.79 1.88.31.54.5 1.22.5 2.21 0 1.34-1.27 4.48-1.27 4.48l-2.71-7.5c.48-.03.75-.16.75-.16.43-.05.38-1.1-.05-1.08 0 0-1.3.11-2.14.11-.78 0-2.11-.11-2.11-.11-.43-.02-.48 1.06-.05 1.08l.84.08 1.12 3.04zm6.02 2.15L16.64 10s.67-1.69.39-3.81c.63 1.14.94 2.42.94 3.81 0 2.96-1.56 5.58-3.94 6.97zM2.68 6.77L6.5 17.25c-2.67-1.3-4.47-4.08-4.47-7.25 0-1.16.2-2.23.65-3.23zm7.45 4.53l2.29 6.25c-.75.27-1.57.42-2.42.42-.72 0-1.41-.11-2.06-.3z"
+  />
+</svg>
+`;
+
+exports[`@wordpress/components Components|Draggable Default 1`] = `
+<div>
+  <p>
+    Is Dragging? 
+    No
+  </p>
+  <div
+    id="draggable-example-box"
+    style={
+      Object {
+        "display": "inline-flex",
+      }
+    }
+  >
+    <div
+      draggable={true}
+      onDragEnd={[Function]}
+      onDragStart={[Function]}
+      style={
+        Object {
+          "alignItems": "center",
+          "background": "#ddd",
+          "display": "flex",
+          "height": 100,
+          "justifyContent": "center",
+          "width": 100,
+        }
+      }
+    >
+      <svg
+        aria-hidden="true"
+        className="dashicon dashicons-move"
+        focusable="false"
+        height={20}
+        role="img"
+        viewBox="0 0 20 20"
+        width={20}
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M19 10l-4 4v-3h-4v4h3l-4 4-4-4h3v-4H5v3l-4-4 4-4v3h4V5H6l4-4 4 4h-3v4h4V6z"
+        />
+      </svg>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`@wordpress/components Components|ExternalLink Default 1`] = `
+<a
+  className="components-external-link"
+  href="https://wordpress.org"
+  rel="external noreferrer noopener"
+  target="_blank"
+>
+  WordPress
+  <span
+    className="components-visually-hidden"
+  >
+    (opens in a new tab)
+  </span>
+  <svg
+    aria-hidden="true"
+    className="dashicon dashicons-external components-external-link__icon"
+    focusable="false"
+    height={20}
+    role="img"
+    viewBox="0 0 20 20"
+    width={20}
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M9 3h8v8l-2-1V6.92l-5.6 5.59-1.41-1.41L14.08 5H10zm3 12v-3l2-2v7H3V6h8L9 8H5v7h7z"
+    />
+  </svg>
+</a>
+`;
+
+exports[`@wordpress/components Components|FontSizePicker Default 1`] = `
+<fieldset
+  className="components-font-size-picker"
+>
+  <legend>
+    Font Size
+  </legend>
+  <div
+    className="components-font-size-picker__controls"
+  >
+    <div
+      className="components-base-control components-font-size-picker__select"
+    >
+      <div
+        className="components-base-control__field"
+      >
+        <label
+          className="components-visually-hidden"
+          htmlFor="inspector-select-control-0"
+        >
+          Choose preset
+        </label>
+        <select
+          className="components-select-control__input"
+          id="inspector-select-control-0"
+          multiple={false}
+          onChange={[Function]}
+          value="normal"
+        >
+          <option
+            value="small"
+          >
+            Small
+          </option>
+          <option
+            value="normal"
+          >
+            Normal
+          </option>
+          <option
+            value="big"
+          >
+            Big
+          </option>
+          <option
+            value="custom"
+          >
+            Custom
+          </option>
+        </select>
+      </div>
+    </div>
+    <input
+      aria-label="Custom"
+      className="components-range-control__number"
+      onChange={[Function]}
+      type="number"
+      value={16}
+    />
+    <button
+      className="components-button components-color-palette__clear is-button is-default is-small"
+      disabled={false}
+      onClick={[Function]}
+      type="button"
+    >
+      Reset
+    </button>
+  </div>
+</fieldset>
+`;
+
+exports[`@wordpress/components Components|FontSizePicker With Slider 1`] = `
+<fieldset
+  className="components-font-size-picker"
+>
+  <legend>
+    Font Size
+  </legend>
+  <div
+    className="components-font-size-picker__controls"
+  >
+    <div
+      className="components-base-control components-font-size-picker__select"
+    >
+      <div
+        className="components-base-control__field"
+      >
+        <label
+          className="components-visually-hidden"
+          htmlFor="inspector-select-control-1"
+        >
+          Choose preset
+        </label>
+        <select
+          className="components-select-control__input"
+          id="inspector-select-control-1"
+          multiple={false}
+          onChange={[Function]}
+          value="normal"
+        >
+          <option
+            value="small"
+          >
+            Small
+          </option>
+          <option
+            value="normal"
+          >
+            Normal
+          </option>
+          <option
+            value="big"
+          >
+            Big
+          </option>
+          <option
+            value="custom"
+          >
+            Custom
+          </option>
+        </select>
+      </div>
+    </div>
+    <button
+      className="components-button components-color-palette__clear is-button is-default is-small"
+      disabled={false}
+      onClick={[Function]}
+      type="button"
+    >
+      Reset
+    </button>
+  </div>
+  <div
+    className="components-base-control components-range-control components-font-size-picker__custom-input"
+  >
+    <div
+      className="components-base-control__field"
+    >
+      <label
+        className="components-base-control__label"
+        htmlFor="inspector-range-control-0"
+      >
+        Custom Size
+      </label>
+      <svg
+        aria-hidden="true"
+        className="dashicon dashicons-editor-textcolor"
+        focusable="false"
+        height={20}
+        role="img"
+        viewBox="0 0 20 20"
+        width={20}
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M13.23 15h1.9L11 4H9L5 15h1.88l1.07-3h4.18zm-1.53-4.54H8.51L10 5.6z"
+        />
+      </svg>
+      <input
+        className="components-range-control__slider"
+        id="inspector-range-control-0"
+        max={100}
+        min={12}
+        onChange={[Function]}
+        type="range"
+        value={16}
+      />
+      <svg
+        aria-hidden="true"
+        className="dashicon dashicons-editor-textcolor"
+        focusable="false"
+        height={20}
+        role="img"
+        viewBox="0 0 20 20"
+        width={20}
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M13.23 15h1.9L11 4H9L5 15h1.88l1.07-3h4.18zm-1.53-4.54H8.51L10 5.6z"
+        />
+      </svg>
+      <input
+        aria-label="Custom Size"
+        className="components-range-control__number"
+        max={100}
+        min={12}
+        onBlur={[Function]}
+        onChange={[Function]}
+        type="number"
+        value={16}
+      />
+    </div>
+  </div>
+</fieldset>
+`;
+
+exports[`@wordpress/components Components|FontSizePicker Without Custom Sizes 1`] = `
+<fieldset
+  className="components-font-size-picker"
+>
+  <legend>
+    Font Size
+  </legend>
+  <div
+    className="components-font-size-picker__controls"
+  >
+    <div
+      className="components-base-control components-font-size-picker__select"
+    >
+      <div
+        className="components-base-control__field"
+      >
+        <label
+          className="components-visually-hidden"
+          htmlFor="inspector-select-control-2"
+        >
+          Choose preset
+        </label>
+        <select
+          className="components-select-control__input"
+          id="inspector-select-control-2"
+          multiple={false}
+          onChange={[Function]}
+          value="normal"
+        >
+          <option
+            value="small"
+          >
+            Small
+          </option>
+          <option
+            value="normal"
+          >
+            Normal
+          </option>
+          <option
+            value="big"
+          >
+            Big
+          </option>
+          <option
+            value="custom"
+          >
+            Custom
+          </option>
+        </select>
+      </div>
+    </div>
+    <button
+      className="components-button components-color-palette__clear is-button is-default is-small"
+      disabled={false}
+      onClick={[Function]}
+      type="button"
+    >
+      Reset
+    </button>
+  </div>
+</fieldset>
+`;
+
+exports[`@wordpress/components Components|Icon Colors 1`] = `
+Array [
+  <div
+    style={
+      Object {
+        "color": "blue",
+        "display": "inline-block",
+        "padding": 20,
+      }
+    }
+  >
+    <svg
+      aria-hidden="true"
+      className="dashicon dashicons-screenoptions"
+      focusable="false"
+      height={20}
+      role="img"
+      viewBox="0 0 20 20"
+      width={20}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M9 9V3H3v6h6zm8 0V3h-6v6h6zm-8 8v-6H3v6h6zm8 0v-6h-6v6h6z"
+      />
+    </svg>
+    <div
+      style={
+        Object {
+          "fontSize": 12,
+        }
+      }
+    >
+      24
+      px
+    </div>
+  </div>,
+  <div
+    style={
+      Object {
+        "color": "purple",
+        "display": "inline-block",
+        "padding": 20,
+      }
+    }
+  >
+    <svg
+      aria-hidden="true"
+      className="dashicon dashicons-screenoptions"
+      focusable="false"
+      height={20}
+      role="img"
+      viewBox="0 0 20 20"
+      width={20}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M9 9V3H3v6h6zm8 0V3h-6v6h6zm-8 8v-6H3v6h6zm8 0v-6h-6v6h6z"
+      />
+    </svg>
+    <div
+      style={
+        Object {
+          "fontSize": 12,
+        }
+      }
+    >
+      24
+      px
+    </div>
+  </div>,
+  <div
+    style={
+      Object {
+        "color": "green",
+        "display": "inline-block",
+        "padding": 20,
+      }
+    }
+  >
+    <svg
+      aria-hidden="true"
+      className="dashicon dashicons-screenoptions"
+      focusable="false"
+      height={20}
+      role="img"
+      viewBox="0 0 20 20"
+      width={20}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M9 9V3H3v6h6zm8 0V3h-6v6h6zm-8 8v-6H3v6h6zm8 0v-6h-6v6h6z"
+      />
+    </svg>
+    <div
+      style={
+        Object {
+          "fontSize": 12,
+        }
+      }
+    >
+      24
+      px
+    </div>
+  </div>,
+]
+`;
+
+exports[`@wordpress/components Components|Icon Default 1`] = `
+<div>
+  <svg
+    aria-hidden="true"
+    className="dashicon dashicons-screenoptions"
+    focusable="false"
+    height="24"
+    role="img"
+    viewBox="0 0 20 20"
+    width="24"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M9 9V3H3v6h6zm8 0V3h-6v6h6zm-8 8v-6H3v6h6zm8 0v-6h-6v6h6z"
+    />
+  </svg>
+  <div
+    style={
+      Object {
+        "fontSize": 12,
+      }
+    }
+  >
+    24
+    px
+  </div>
+</div>
+`;
+
+exports[`@wordpress/components Components|Icon Sizes 1`] = `
+Array [
+  <div
+    style={
+      Object {
+        "display": "inline-block",
+        "padding": 20,
+      }
+    }
+  >
+    <svg
+      aria-hidden="true"
+      className="dashicon dashicons-screenoptions"
+      focusable="false"
+      height={14}
+      role="img"
+      viewBox="0 0 20 20"
+      width={14}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M9 9V3H3v6h6zm8 0V3h-6v6h6zm-8 8v-6H3v6h6zm8 0v-6h-6v6h6z"
+      />
+    </svg>
+    <div
+      style={
+        Object {
+          "fontSize": 12,
+        }
+      }
+    >
+      14
+      px
+    </div>
+  </div>,
+  <div
+    style={
+      Object {
+        "display": "inline-block",
+        "padding": 20,
+      }
+    }
+  >
+    <svg
+      aria-hidden="true"
+      className="dashicon dashicons-screenoptions"
+      focusable="false"
+      height={16}
+      role="img"
+      viewBox="0 0 20 20"
+      width={16}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M9 9V3H3v6h6zm8 0V3h-6v6h6zm-8 8v-6H3v6h6zm8 0v-6h-6v6h6z"
+      />
+    </svg>
+    <div
+      style={
+        Object {
+          "fontSize": 12,
+        }
+      }
+    >
+      16
+      px
+    </div>
+  </div>,
+  <div
+    style={
+      Object {
+        "display": "inline-block",
+        "padding": 20,
+      }
+    }
+  >
+    <svg
+      aria-hidden="true"
+      className="dashicon dashicons-screenoptions"
+      focusable="false"
+      height={20}
+      role="img"
+      viewBox="0 0 20 20"
+      width={20}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M9 9V3H3v6h6zm8 0V3h-6v6h6zm-8 8v-6H3v6h6zm8 0v-6h-6v6h6z"
+      />
+    </svg>
+    <div
+      style={
+        Object {
+          "fontSize": 12,
+        }
+      }
+    >
+      20
+      px
+    </div>
+  </div>,
+  <div
+    style={
+      Object {
+        "display": "inline-block",
+        "padding": 20,
+      }
+    }
+  >
+    <svg
+      aria-hidden="true"
+      className="dashicon dashicons-screenoptions"
+      focusable="false"
+      height={24}
+      role="img"
+      viewBox="0 0 20 20"
+      width={24}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M9 9V3H3v6h6zm8 0V3h-6v6h6zm-8 8v-6H3v6h6zm8 0v-6h-6v6h6z"
+      />
+    </svg>
+    <div
+      style={
+        Object {
+          "fontSize": 12,
+        }
+      }
+    >
+      24
+      px
+    </div>
+  </div>,
+  <div
+    style={
+      Object {
+        "display": "inline-block",
+        "padding": 20,
+      }
+    }
+  >
+    <svg
+      aria-hidden="true"
+      className="dashicon dashicons-screenoptions"
+      focusable="false"
+      height={28}
+      role="img"
+      viewBox="0 0 20 20"
+      width={28}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M9 9V3H3v6h6zm8 0V3h-6v6h6zm-8 8v-6H3v6h6zm8 0v-6h-6v6h6z"
+      />
+    </svg>
+    <div
+      style={
+        Object {
+          "fontSize": 12,
+        }
+      }
+    >
+      28
+      px
+    </div>
+  </div>,
+  <div
+    style={
+      Object {
+        "display": "inline-block",
+        "padding": 20,
+      }
+    }
+  >
+    <svg
+      aria-hidden="true"
+      className="dashicon dashicons-screenoptions"
+      focusable="false"
+      height={32}
+      role="img"
+      viewBox="0 0 20 20"
+      width={32}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M9 9V3H3v6h6zm8 0V3h-6v6h6zm-8 8v-6H3v6h6zm8 0v-6h-6v6h6z"
+      />
+    </svg>
+    <div
+      style={
+        Object {
+          "fontSize": 12,
+        }
+      }
+    >
+      32
+      px
+    </div>
+  </div>,
+  <div
+    style={
+      Object {
+        "display": "inline-block",
+        "padding": 20,
+      }
+    }
+  >
+    <svg
+      aria-hidden="true"
+      className="dashicon dashicons-screenoptions"
+      focusable="false"
+      height={40}
+      role="img"
+      viewBox="0 0 20 20"
+      width={40}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M9 9V3H3v6h6zm8 0V3h-6v6h6zm-8 8v-6H3v6h6zm8 0v-6h-6v6h6z"
+      />
+    </svg>
+    <div
+      style={
+        Object {
+          "fontSize": 12,
+        }
+      }
+    >
+      40
+      px
+    </div>
+  </div>,
+  <div
+    style={
+      Object {
+        "display": "inline-block",
+        "padding": 20,
+      }
+    }
+  >
+    <svg
+      aria-hidden="true"
+      className="dashicon dashicons-screenoptions"
+      focusable="false"
+      height={48}
+      role="img"
+      viewBox="0 0 20 20"
+      width={48}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M9 9V3H3v6h6zm8 0V3h-6v6h6zm-8 8v-6H3v6h6zm8 0v-6h-6v6h6z"
+      />
+    </svg>
+    <div
+      style={
+        Object {
+          "fontSize": 12,
+        }
+      }
+    >
+      48
+      px
+    </div>
+  </div>,
+  <div
+    style={
+      Object {
+        "display": "inline-block",
+        "padding": 20,
+      }
+    }
+  >
+    <svg
+      aria-hidden="true"
+      className="dashicon dashicons-screenoptions"
+      focusable="false"
+      height={56}
+      role="img"
+      viewBox="0 0 20 20"
+      width={56}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M9 9V3H3v6h6zm8 0V3h-6v6h6zm-8 8v-6H3v6h6zm8 0v-6h-6v6h6z"
+      />
+    </svg>
+    <div
+      style={
+        Object {
+          "fontSize": 12,
+        }
+      }
+    >
+      56
+      px
+    </div>
+  </div>,
+]
+`;
+
+exports[`@wordpress/components Components|Icon With A Component 1`] = `
+<svg
+  aria-hidden="true"
+  focusable="false"
+  role="img"
+>
+  <path
+    d="M5 4v3h5.5v12h3V7H19V4z"
+  />
+</svg>
+`;
+
+exports[`@wordpress/components Components|Icon With A Function 1`] = `
+<svg
+  aria-hidden="true"
+  focusable="false"
+  role="img"
+>
+  <path
+    d="M5 4v3h5.5v12h3V7H19V4z"
+  />
+</svg>
+`;
+
+exports[`@wordpress/components Components|Icon With An SVG 1`] = `
+<svg
+  aria-hidden="true"
+  focusable="false"
+  height={24}
+  role="img"
+  width={24}
+>
+  <path
+    d="M5 4v3h5.5v12h3V7H19V4z"
+  />
+</svg>
+`;
+
+exports[`@wordpress/components Components|IconButton Default 1`] = `
+<button
+  aria-label="More"
+  className="components-button components-icon-button"
+  onBlur={[Function]}
+  onClick={[Function]}
+  onFocus={[Function]}
+  onMouseDown={[Function]}
+  onMouseEnter={[Function]}
+  onMouseLeave={[Function]}
+  type="button"
+>
+  <svg
+    aria-hidden="true"
+    className="dashicon dashicons-ellipsis"
+    focusable="false"
+    height={20}
+    role="img"
+    viewBox="0 0 20 20"
+    width={20}
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M5 10c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12-2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-7 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+    />
+  </svg>
+</button>
+`;
+
+exports[`@wordpress/components Components|IconButton Grouped 1`] = `
+<div
+  style={
+    Object {
+      "display": "inline-flex",
+    }
+  }
+>
+  <button
+    aria-label="Bold"
+    className="components-button components-icon-button"
+    onBlur={[Function]}
+    onClick={[Function]}
+    onFocus={[Function]}
+    onMouseDown={[Function]}
+    onMouseEnter={[Function]}
+    onMouseLeave={[Function]}
+    type="button"
+  >
+    <svg
+      aria-hidden="true"
+      className="dashicon dashicons-editor-bold"
+      focusable="false"
+      height={20}
+      role="img"
+      viewBox="0 0 20 20"
+      width={20}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M6 4v13h4.54c1.37 0 2.46-.33 3.26-1 .8-.66 1.2-1.58 1.2-2.77 0-.84-.17-1.51-.51-2.01s-.9-.85-1.67-1.03v-.09c.57-.1 1.02-.4 1.36-.9s.51-1.13.51-1.91c0-1.14-.39-1.98-1.17-2.5C12.75 4.26 11.5 4 9.78 4H6zm2.57 5.15V6.26h1.36c.73 0 1.27.11 1.61.32.34.22.51.58.51 1.07 0 .54-.16.92-.47 1.15s-.82.35-1.51.35h-1.5zm0 2.19h1.6c1.44 0 2.16.53 2.16 1.61 0 .6-.17 1.05-.51 1.34s-.86.43-1.57.43H8.57v-3.38z"
+      />
+    </svg>
+  </button>
+  <button
+    aria-label="Italic"
+    className="components-button components-icon-button"
+    onBlur={[Function]}
+    onClick={[Function]}
+    onFocus={[Function]}
+    onMouseDown={[Function]}
+    onMouseEnter={[Function]}
+    onMouseLeave={[Function]}
+    type="button"
+  >
+    <svg
+      aria-hidden="true"
+      className="dashicon dashicons-editor-italic"
+      focusable="false"
+      height={20}
+      role="img"
+      viewBox="0 0 20 20"
+      width={20}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M14.78 6h-2.13l-2.8 9h2.12l-.62 2H4.6l.62-2h2.14l2.8-9H8.03l.62-2h6.75z"
+      />
+    </svg>
+  </button>
+  <button
+    aria-label="Underline"
+    className="components-button components-icon-button"
+    onBlur={[Function]}
+    onClick={[Function]}
+    onFocus={[Function]}
+    onMouseDown={[Function]}
+    onMouseEnter={[Function]}
+    onMouseLeave={[Function]}
+    type="button"
+  >
+    <svg
+      aria-hidden="true"
+      className="dashicon dashicons-editor-underline"
+      focusable="false"
+      height={20}
+      role="img"
+      viewBox="0 0 20 20"
+      width={20}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M14 5h-2v5.71c0 1.99-1.12 2.98-2.45 2.98-1.32 0-2.55-1-2.55-2.96V5H5v5.87c0 1.91 1 4.54 4.48 4.54 3.49 0 4.52-2.58 4.52-4.5V5zm0 13v-2H5v2h9z"
+      />
+    </svg>
+  </button>
+</div>
+`;
+
+exports[`@wordpress/components Components|Modal Default 1`] = `
+<button
+  className="components-button is-button is-default"
+  onClick={[Function]}
+  type="button"
+>
+  Open Modal
+</button>
+`;
+
+exports[`@wordpress/components Components|RangeControl Default 1`] = `
+<div
+  className="components-base-control components-range-control"
+>
+  <div
+    className="components-base-control__field"
+  >
+    <label
+      className="components-base-control__label"
+      htmlFor="inspector-range-control-1"
+    >
+      How many columns should this use?
+    </label>
+    <input
+      className="components-range-control__slider"
+      id="inspector-range-control-1"
+      onChange={[Function]}
+      type="range"
+      value={5}
+    />
+    <input
+      aria-label="How many columns should this use?"
+      className="components-range-control__number"
+      onBlur={[Function]}
+      onChange={[Function]}
+      type="number"
+      value={5}
+    />
+  </div>
+</div>
+`;
+
+exports[`@wordpress/components Components|RangeControl With Help 1`] = `
+<div
+  className="components-base-control components-range-control"
+>
+  <div
+    className="components-base-control__field"
+  >
+    <label
+      className="components-base-control__label"
+      htmlFor="inspector-range-control-2"
+    >
+      How many columns should this use?
+    </label>
+    <input
+      aria-describedby="inspector-range-control-2__help"
+      className="components-range-control__slider"
+      id="inspector-range-control-2"
+      onChange={[Function]}
+      type="range"
+      value={5}
+    />
+    <input
+      aria-label="How many columns should this use?"
+      className="components-range-control__number"
+      onBlur={[Function]}
+      onChange={[Function]}
+      type="number"
+      value={5}
+    />
+  </div>
+  <p
+    className="components-base-control__help"
+    id="inspector-range-control-2__help"
+  >
+    Please select the number of columns you would like this to contain.
+  </p>
+</div>
+`;
+
+exports[`@wordpress/components Components|RangeControl With Icon After 1`] = `
+<div
+  className="components-base-control components-range-control"
+>
+  <div
+    className="components-base-control__field"
+  >
+    <label
+      className="components-base-control__label"
+      htmlFor="inspector-range-control-5"
+    >
+      How many columns should this use?
+    </label>
+    <input
+      className="components-range-control__slider"
+      id="inspector-range-control-5"
+      onChange={[Function]}
+      type="range"
+      value={5}
+    />
+    <svg
+      aria-hidden="true"
+      className="dashicon dashicons-wordpress"
+      focusable="false"
+      height={20}
+      role="img"
+      viewBox="0 0 20 20"
+      width={20}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M20 10c0-5.52-4.48-10-10-10S0 4.48 0 10s4.48 10 10 10 10-4.48 10-10zM10 1.01c4.97 0 8.99 4.02 8.99 8.99s-4.02 8.99-8.99 8.99S1.01 14.97 1.01 10 5.03 1.01 10 1.01zM8.01 14.82L4.96 6.61c.49-.03 1.05-.08 1.05-.08.43-.05.38-1.01-.06-.99 0 0-1.29.1-2.13.1-.15 0-.33 0-.52-.01 1.44-2.17 3.9-3.6 6.7-3.6 2.09 0 3.99.79 5.41 2.09-.6-.08-1.45.35-1.45 1.42 0 .66.38 1.22.79 1.88.31.54.5 1.22.5 2.21 0 1.34-1.27 4.48-1.27 4.48l-2.71-7.5c.48-.03.75-.16.75-.16.43-.05.38-1.1-.05-1.08 0 0-1.3.11-2.14.11-.78 0-2.11-.11-2.11-.11-.43-.02-.48 1.06-.05 1.08l.84.08 1.12 3.04zm6.02 2.15L16.64 10s.67-1.69.39-3.81c.63 1.14.94 2.42.94 3.81 0 2.96-1.56 5.58-3.94 6.97zM2.68 6.77L6.5 17.25c-2.67-1.3-4.47-4.08-4.47-7.25 0-1.16.2-2.23.65-3.23zm7.45 4.53l2.29 6.25c-.75.27-1.57.42-2.42.42-.72 0-1.41-.11-2.06-.3z"
+      />
+    </svg>
+    <input
+      aria-label="How many columns should this use?"
+      className="components-range-control__number"
+      onBlur={[Function]}
+      onChange={[Function]}
+      type="number"
+      value={5}
+    />
+  </div>
+</div>
+`;
+
+exports[`@wordpress/components Components|RangeControl With Icon Before 1`] = `
+<div
+  className="components-base-control components-range-control"
+>
+  <div
+    className="components-base-control__field"
+  >
+    <label
+      className="components-base-control__label"
+      htmlFor="inspector-range-control-4"
+    >
+      How many columns should this use?
+    </label>
+    <svg
+      aria-hidden="true"
+      className="dashicon dashicons-wordpress"
+      focusable="false"
+      height={20}
+      role="img"
+      viewBox="0 0 20 20"
+      width={20}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M20 10c0-5.52-4.48-10-10-10S0 4.48 0 10s4.48 10 10 10 10-4.48 10-10zM10 1.01c4.97 0 8.99 4.02 8.99 8.99s-4.02 8.99-8.99 8.99S1.01 14.97 1.01 10 5.03 1.01 10 1.01zM8.01 14.82L4.96 6.61c.49-.03 1.05-.08 1.05-.08.43-.05.38-1.01-.06-.99 0 0-1.29.1-2.13.1-.15 0-.33 0-.52-.01 1.44-2.17 3.9-3.6 6.7-3.6 2.09 0 3.99.79 5.41 2.09-.6-.08-1.45.35-1.45 1.42 0 .66.38 1.22.79 1.88.31.54.5 1.22.5 2.21 0 1.34-1.27 4.48-1.27 4.48l-2.71-7.5c.48-.03.75-.16.75-.16.43-.05.38-1.1-.05-1.08 0 0-1.3.11-2.14.11-.78 0-2.11-.11-2.11-.11-.43-.02-.48 1.06-.05 1.08l.84.08 1.12 3.04zm6.02 2.15L16.64 10s.67-1.69.39-3.81c.63 1.14.94 2.42.94 3.81 0 2.96-1.56 5.58-3.94 6.97zM2.68 6.77L6.5 17.25c-2.67-1.3-4.47-4.08-4.47-7.25 0-1.16.2-2.23.65-3.23zm7.45 4.53l2.29 6.25c-.75.27-1.57.42-2.42.42-.72 0-1.41-.11-2.06-.3z"
+      />
+    </svg>
+    <input
+      className="components-range-control__slider"
+      id="inspector-range-control-4"
+      onChange={[Function]}
+      type="range"
+      value={5}
+    />
+    <input
+      aria-label="How many columns should this use?"
+      className="components-range-control__number"
+      onBlur={[Function]}
+      onChange={[Function]}
+      type="number"
+      value={5}
+    />
+  </div>
+</div>
+`;
+
+exports[`@wordpress/components Components|RangeControl With Minimum And Maximum Limits 1`] = `
+<div
+  className="components-base-control components-range-control"
+>
+  <div
+    className="components-base-control__field"
+  >
+    <label
+      className="components-base-control__label"
+      htmlFor="inspector-range-control-3"
+    >
+      How many columns should this use?
+    </label>
+    <input
+      className="components-range-control__slider"
+      id="inspector-range-control-3"
+      max={10}
+      min={2}
+      onChange={[Function]}
+      type="range"
+      value={5}
+    />
+    <input
+      aria-label="How many columns should this use?"
+      className="components-range-control__number"
+      max={10}
+      min={2}
+      onBlur={[Function]}
+      onChange={[Function]}
+      type="number"
+      value={5}
+    />
+  </div>
+</div>
+`;
+
+exports[`@wordpress/components Components|RangeControl With Reset 1`] = `
+<div
+  className="components-base-control components-range-control"
+>
+  <div
+    className="components-base-control__field"
+  >
+    <label
+      className="components-base-control__label"
+      htmlFor="inspector-range-control-6"
+    >
+      How many columns should this use?
+    </label>
+    <input
+      className="components-range-control__slider"
+      id="inspector-range-control-6"
+      onChange={[Function]}
+      type="range"
+      value={5}
+    />
+    <input
+      aria-label="How many columns should this use?"
+      className="components-range-control__number"
+      onBlur={[Function]}
+      onChange={[Function]}
+      type="number"
+      value={5}
+    />
+    <button
+      className="components-button components-range-control__reset is-button is-default is-small"
+      disabled={false}
+      onClick={[Function]}
+      type="button"
+    >
+      Reset
+    </button>
+  </div>
+</div>
+`;
+
+exports[`@wordpress/components Components|ResizableBox Default 1`] = `
+<div
+  style={
+    Object {
+      "margin": 30,
+    }
+  }
+>
+  <div
+    className="components-resizable-box__container has-show-handle"
+    style={
+      Object {
+        "boxSizing": "border-box",
+        "height": "200px",
+        "maxHeight": undefined,
+        "maxWidth": undefined,
+        "minHeight": 50,
+        "minWidth": 50,
+        "position": "relative",
+        "userSelect": "auto",
+        "width": "400px",
+      }
+    }
+  >
+    <div
+      style={
+        Object {
+          "alignItems": "center",
+          "background": "#eee",
+          "display": "flex",
+          "height": "100%",
+          "justifyContent": "center",
+          "width": "100%",
+        }
+      }
+    >
+      <span>
+        Resize
+      </span>
+    </div>
+    <span>
+      <div
+        className="components-resizable-box__handle components-resizable-box__side-handle components-resizable-box__handle-right"
+        onMouseDown={[Function]}
+        onTouchStart={[Function]}
+        style={
+          Object {
+            "bottom": null,
+            "cursor": "col-resize",
+            "height": null,
+            "left": null,
+            "position": "absolute",
+            "right": null,
+            "top": null,
+            "userSelect": "none",
+            "width": null,
+          }
+        }
+      />
+      <div
+        className="components-resizable-box__handle components-resizable-box__side-handle components-resizable-box__handle-bottom"
+        onMouseDown={[Function]}
+        onTouchStart={[Function]}
+        style={
+          Object {
+            "bottom": null,
+            "cursor": "row-resize",
+            "height": null,
+            "left": null,
+            "position": "absolute",
+            "right": null,
+            "top": null,
+            "userSelect": "none",
+            "width": null,
+          }
+        }
+      />
+      <div
+        className="components-resizable-box__handle components-resizable-box__corner-handle components-resizable-box__handle-bottom components-resizable-box__handle-right"
+        onMouseDown={[Function]}
+        onTouchStart={[Function]}
+        style={
+          Object {
+            "bottom": null,
+            "cursor": "se-resize",
+            "height": null,
+            "left": null,
+            "position": "absolute",
+            "right": null,
+            "top": null,
+            "userSelect": "none",
+            "width": null,
+          }
+        }
+      />
+    </span>
+  </div>
+</div>
+`;
+
+exports[`@wordpress/components Components|ScrollLock Default 1`] = `
+<div
+  style={
+    Object {
+      "backgroundColor": "#fff",
+      "backgroundImage": "linear-gradient(transparent 50%, rgba(0, 0, 0, 0.05) 50%)",
+      "backgroundSize": "50px 50px",
+      "height": 3000,
+      "position": "relative",
+    }
+  }
+>
+  <div>
+    Start scrolling down...
+  </div>
+  <div
+    style={
+      Object {
+        "display": "flex",
+        "justifyContent": "center",
+        "padding": 40,
+        "position": "sticky",
+        "textAlign": "center",
+        "top": 0,
+      }
+    }
+  >
+    <div>
+      <button
+        className="components-button is-button is-default"
+        onClick={[Function]}
+        type="button"
+      >
+        Toggle Scroll Lock
+      </button>
+      <p>
+        Scroll locked: 
+        <strong>
+          No
+        </strong>
+      </p>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`@wordpress/components Components|Snackbar Default 1`] = `
+<div
+  className="components-snackbar"
+  label="Dismiss this notice"
+  onClick={[Function]}
+  onKeyPress={[Function]}
+  role="button"
+  tabIndex="0"
+>
+  <div
+    className="components-snackbar__content"
+  >
+    Use Snackbars to communicate low priority, non-interruptive messages to the user.
+  </div>
+</div>
+`;
+
+exports[`@wordpress/components Components|Snackbar With Actions 1`] = `
+<div
+  className="components-snackbar"
+  label="Dismiss this notice"
+  onClick={[Function]}
+  onKeyPress={[Function]}
+  role="button"
+  tabIndex="0"
+>
+  <div
+    className="components-snackbar__content"
+  >
+    Use Snackbars with an action link to an external page.
+    <a
+      className="components-button components-snackbar__action is-tertiary"
+      href="https://wordpress.org"
+      onClick={[Function]}
+    >
+      Open WP.org
+    </a>
+  </div>
+</div>
+`;
+
+exports[`@wordpress/components Components|Spinner Default 1`] = `
+<span
+  className="components-spinner"
+/>
+`;
+
+exports[`@wordpress/components Components|ToggleControl Default 1`] = `
+<div
+  className="components-base-control components-toggle-control"
+>
+  <div
+    className="components-base-control__field"
+  >
+    <span
+      className="components-form-toggle is-checked"
+    >
+      <input
+        checked={true}
+        className="components-form-toggle__input"
+        id="inspector-toggle-control-0"
+        onChange={[Function]}
+        type="checkbox"
+      />
+      <span
+        className="components-form-toggle__track"
+      />
+      <span
+        className="components-form-toggle__thumb"
+      />
+      <svg
+        aria-hidden="true"
+        className="components-form-toggle__on"
+        focusable="false"
+        height="6"
+        role="img"
+        viewBox="0 0 2 6"
+        width="2"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M0 0h2v6H0z"
+        />
+      </svg>
+    </span>
+    <label
+      className="components-toggle-control__label"
+      htmlFor="inspector-toggle-control-0"
+    >
+      Does this have a fixed background?
+    </label>
+  </div>
+</div>
+`;
+
+exports[`@wordpress/components Components|ToggleControl With Help Text 1`] = `
+<div
+  className="components-base-control components-toggle-control"
+>
+  <div
+    className="components-base-control__field"
+  >
+    <span
+      className="components-form-toggle is-checked"
+    >
+      <input
+        aria-describedby="inspector-toggle-control-1__help"
+        checked={true}
+        className="components-form-toggle__input"
+        id="inspector-toggle-control-1"
+        onChange={[Function]}
+        type="checkbox"
+      />
+      <span
+        className="components-form-toggle__track"
+      />
+      <span
+        className="components-form-toggle__thumb"
+      />
+      <svg
+        aria-hidden="true"
+        className="components-form-toggle__on"
+        focusable="false"
+        height="6"
+        role="img"
+        viewBox="0 0 2 6"
+        width="2"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M0 0h2v6H0z"
+        />
+      </svg>
+    </span>
+    <label
+      className="components-toggle-control__label"
+      htmlFor="inspector-toggle-control-1"
+    >
+      Does this have a fixed background?
+    </label>
+  </div>
+  <p
+    className="components-base-control__help"
+    id="inspector-toggle-control-1__help"
+  >
+    Has fixed background.
+  </p>
+</div>
+`;
+
+exports[`@wordpress/components Components|VisuallyHidden Default 1`] = `
+Array [
+  <div
+    className="components-visually-hidden"
+  >
+    This should not show.
+  </div>,
+  <div>
+    This text will 
+    <span
+      className="components-visually-hidden"
+    >
+      but not inline 
+    </span>
+     always show.
+  </div>,
+]
+`;
