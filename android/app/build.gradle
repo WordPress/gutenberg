@@ -148,7 +148,6 @@ dependencies {
     implementation project(':react-native-video')
     implementation project(':react-native-svg')
     implementation project(':react-native-aztec')
-    implementation project(':react-native-recyclerview-list')
     implementation project(':react-native-gutenberg-bridge')
     implementation "org.wordpress:utils:$wordpressUtilsVersion"
     implementation 'androidx.appcompat:appcompat:1.0.0'

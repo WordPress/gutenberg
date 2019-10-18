@@ -29,7 +29,6 @@ import com.facebook.react.modules.core.DefaultHardwareBackBtnHandler;
 import com.facebook.react.shell.MainPackageConfig;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
-import com.github.godness84.RNRecyclerViewList.RNRecyclerviewListPackage;
 import com.horcrux.svg.SvgPackage;
 
 import org.wordpress.android.util.AppLog;
@@ -252,7 +251,6 @@ public class WPAndroidGlueCode {
                 new MainReactPackage(getMainPackageConfig(getImagePipelineConfig(sOkHttpClient))),
                 new SvgPackage(),
                 new ReactAztecPackage(),
-                new RNRecyclerviewListPackage(),
                 new ReactVideoPackage(),
                 mRnReactNativeGutenbergBridgePackage);
     }

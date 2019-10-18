@@ -10034,7 +10034,7 @@ prop-types-exact@^1.2.0:
     object.assign "^4.1.0"
     reflect.ownkeys "^0.2.0"
 
-prop-types@^15.5.10, prop-types@^15.6.0, prop-types@^15.6.1, prop-types@^15.6.2, prop-types@^15.7.2:
+prop-types@^15.5.10, prop-types@^15.6.1, prop-types@^15.6.2, prop-types@^15.7.2:
   version "15.7.2"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.7.2.tgz#52c41e75b8c87e72b9d9360e0206b99dcbffa6c5"
   integrity sha512-8QQikdH7//R2vurIJSutZ1smHYTcLpRWEOlHnzcWHmBYrOGUysKwSsrC89BCiFj3CbrfJ/nXFdJepOVrY1GCHQ==
@@ -10297,12 +10297,6 @@ react-native-randombytes@^3.5.1:
   dependencies:
     buffer "^4.9.1"
     sjcl "^1.0.3"
-
-"react-native-recyclerview-list@git+https://github.com/wordpress-mobile/react-native-recyclerview-list.git#eadaa2f62d2f488d4dc80f9148e52b62047297ab":
-  version "1.0.0"
-  resolved "git+https://github.com/wordpress-mobile/react-native-recyclerview-list.git#eadaa2f62d2f488d4dc80f9148e52b62047297ab"
-  dependencies:
-    prop-types "^15.6.0"
 
 react-native-safe-area@^0.5.0:
   version "0.5.1"
