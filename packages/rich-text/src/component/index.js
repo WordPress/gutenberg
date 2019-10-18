@@ -606,6 +606,15 @@ class RichText extends Component {
 
 		if ( multilineTag ) {
 			const newValue = removeLineSeparator( value, isReverse );
+
+			//check to see if we should remove the first item of a list
+			if ( isReverse && ! newValue && value.start === 0 && value.end === 0 && value.text.length > 0 ) {
+				const simulateDelete = removeLineSeparator( value, ! isReverse );
+				this.onChange( simulateDelete );
+				event.preventDefault();
+				return;
+			}
+
 			if ( newValue ) {
 				this.onChange( newValue );
 				event.preventDefault();
