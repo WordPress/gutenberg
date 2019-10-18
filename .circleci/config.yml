@@ -112,20 +112,23 @@ jobs:
     - restore_cache:
         name: Restore Dependencies Cache
         keys:
-        - dependencies-v2-{{ checksum "react-native-aztec/ios/Cartfile.resolved" }}-{{
+        - dependencies-v3-{{ checksum "ios/Gemfile.lock" }}-{{ checksum "ios/Podfile.lock" }}-{{
           checksum "yarn.lock" }}
-        - dependencies-v2-{{ checksum "react-native-aztec/ios/Cartfile.resolved" }}
-        - dependencies-v2-
+        - dependencies-v3-{{ checksum "ios/Gemfile.lock" }}-{{ checksum "ios/Podfile.lock" }}
+        - dependencies-v3-{{ checksum "ios/Gemfile.lock" }}
+        - dependencies-v3-
     - run:
         name: Yarn preios (if needed)
         command: test -e ios/build/gutenberg/Build/Products/Release-iphonesimulator/gutenberg.app || yarn preios
     - save_cache:
         name: Save Dependencies Cache
-        key: dependencies-v2-{{ checksum "react-native-aztec/ios/Cartfile.resolved" }}-{{
+        key: dependencies-v3-{{ checksum "ios/Gemfile.lock" }}-{{ checksum "ios/Podfile.lock" }}-{{
           checksum "yarn.lock" }}
         paths:
-        - react-native-aztec/ios/Carthage
-        - ~/.rncache
+        - ios/Pods
+        - ~/Library/Caches/CocoaPods
+        - ~/.cocoapods/repos/trunk
+        - ios/vendor
     - run:
         name: Build (if needed)
         command: test -e ios/build/gutenberg/Build/Products/Release-iphonesimulator/gutenberg.app || yarn react-native run-ios --configuration Release --no-packager
