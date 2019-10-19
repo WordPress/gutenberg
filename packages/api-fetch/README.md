@@ -19,7 +19,7 @@ import apiFetch from '@wordpress/api-fetch';
 
 apiFetch( { path: '/wp-json/wp/v2/posts' } ).then( posts => {
 	console.log( posts );
-} ).catch(error => {
+} ).catch( error => {
 	console.log( error );
 } );
 ```
