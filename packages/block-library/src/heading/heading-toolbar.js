@@ -17,11 +17,12 @@ import HeadingLevelIcon from './heading-level-icon';
 
 class HeadingToolbar extends Component {
 	createLevelControl( targetLevel, selectedLevel, onChange ) {
+		const isActive = targetLevel === selectedLevel;
 		return {
-			icon: <HeadingLevelIcon level={ targetLevel } />,
+			icon: <HeadingLevelIcon level={ targetLevel } __unstableActive={ isActive } />,
 			// translators: %s: heading level e.g: "1", "2", "3"
 			title: sprintf( __( 'Heading %d' ), targetLevel ),
-			isActive: targetLevel === selectedLevel,
+			isActive,
 			onClick: () => onChange( targetLevel ),
 		};
 	}

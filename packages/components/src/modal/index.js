@@ -3,6 +3,7 @@
  */
 import { Component, createPortal } from '@wordpress/element';
 import { withInstanceId } from '@wordpress/compose';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -108,7 +109,8 @@ class Modal extends Component {
 			children,
 			aria,
 			instanceId,
-			isDismissable,
+			isDismissible,
+			isDismissable, //Deprecated
 			// Many of the documented props for Modal are passed straight through
 			// to the ModalFrame component and handled there.
 			...otherProps
@@ -116,6 +118,11 @@ class Modal extends Component {
 
 		const headingId = aria.labelledby || `components-modal-header-${ instanceId }`;
 
+		if ( isDismissable ) {
+			deprecated( 'isDismissable prop of the Modal component', {
+				alternative: 'isDismissible prop (renamed) of the Modal component',
+			} );
+		}
 		// Disable reason: this stops mouse events from triggering tooltips and
 		// other elements underneath the modal overlay.
 		return createPortal(
@@ -132,7 +139,7 @@ class Modal extends Component {
 						closeLabel={ closeButtonLabel }
 						headingId={ headingId }
 						icon={ icon }
-						isDismissable={ isDismissable }
+						isDismissible={ isDismissible || isDismissable }
 						onClose={ onRequestClose }
 						title={ title }
 					/>
@@ -151,7 +158,7 @@ Modal.defaultProps = {
 	focusOnMount: true,
 	shouldCloseOnEsc: true,
 	shouldCloseOnClickOutside: true,
-	isDismissable: true,
+	isDismissible: true,
 	/* accessibility */
 	aria: {
 		labelledby: null,

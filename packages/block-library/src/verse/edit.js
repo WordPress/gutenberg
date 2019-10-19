@@ -35,8 +35,7 @@ export default function VerseEdit( { attributes, setAttributes, className, merge
 					} );
 				} }
 				placeholder={ __( 'Write…' ) }
-				wrapperClassName={ className }
-				className={ classnames( {
+				className={ classnames( className, {
 					[ `has-text-align-${ textAlign }` ]: textAlign,
 				} ) }
 				onMerge={ mergeBlocks }

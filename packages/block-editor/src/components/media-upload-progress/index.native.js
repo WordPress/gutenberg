@@ -123,7 +123,11 @@ export class MediaUploadProgress extends React.Component {
 
 		return (
 			<View style={ styles.mediaUploadProgress }>
-				{ showSpinner && <Spinner progress={ progress } /> }
+				{ showSpinner &&
+					<View style={ styles.progressBar }>
+						<Spinner progress={ progress } />
+					</View>
+				}
 				{ coverUrl &&
 					<ImageSize src={ coverUrl } >
 						{ ( sizes ) => {

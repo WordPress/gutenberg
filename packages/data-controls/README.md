@@ -30,7 +30,7 @@ _Usage_
 import { apiFetch } from '@wordpress/data-controls';
 
 // Action generator using apiFetch
-export function* myAction {
+export function* myAction() {
 	const path = '/v2/my-api/items';
 	const items = yield apiFetch( { path } );
 	// do something with the items.
@@ -63,7 +63,7 @@ import * as selectors from './selectors';
 import * as actions from './actions';
 import * as resolvers from './resolvers';
 
-registerStore ( 'my-custom-store', {
+registerStore( 'my-custom-store', {
 	reducer,
 	controls,
 	actions,
@@ -86,9 +86,9 @@ _Usage_
 import { dispatch } from '@wordpress/data-controls';
 
 // Action generator using dispatch
-export function* myAction {
-  yield dispatch( 'core/edit-post' ).togglePublishSidebar();
-  // do some other things.
+export function* myAction() {
+	yield dispatch( 'core/edit-post', 'togglePublishSidebar' );
+	// do some other things.
 }
 ```
 
@@ -116,7 +116,7 @@ _Usage_
 import { select } from '@wordpress/data-controls';
 
 // Action generator using select
-export function* myAction {
+export function* myAction() {
 	const isSidebarOpened = yield select( 'core/edit-post', 'isEditorSideBarOpened' );
 	// do stuff with the result from the select.
 }

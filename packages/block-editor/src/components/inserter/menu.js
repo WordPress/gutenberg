@@ -34,6 +34,7 @@ import {
 	createBlock,
 	isUnmodifiedDefaultBlock,
 	getBlockType,
+	getBlockFromExample,
 } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withInstanceId, compose, withSafeTimeout } from '@wordpress/compose';
@@ -391,20 +392,25 @@ export class InserterMenu extends Component {
 								{ ! isReusableBlock( hoveredItem ) && (
 									<BlockCard blockType={ hoveredItemBlockType } />
 								) }
-								{ ( isReusableBlock( hoveredItem ) || hoveredItemBlockType.example ) && (
-									<div className="block-editor-inserter__preview">
+								<div className="block-editor-inserter__preview">
+									{ ( isReusableBlock( hoveredItem ) || hoveredItemBlockType.example ) ? (
 										<div className="block-editor-inserter__preview-content">
 											<BlockPreview
+												padding={ 10 }
 												viewportWidth={ 500 }
-												blocks={ createBlock(
-													hoveredItem.name,
-													hoveredItemBlockType.example ? hoveredItemBlockType.example.attributes : hoveredItem.initialAttributes,
-													hoveredItemBlockType.example ? hoveredItemBlockType.example.innerBlocks : undefined
-												) }
+												blocks={
+													hoveredItemBlockType.example ?
+														getBlockFromExample( hoveredItem.name, hoveredItemBlockType.example ) :
+														createBlock( hoveredItem.name, hoveredItem.initialAttributes )
+												}
 											/>
 										</div>
-									</div>
-								) }
+									) : (
+										<div className="block-editor-inserter__preview-content-missing">
+											{ __( 'No Preview Available.' ) }
+										</div>
+									) }
+								</div>
 							</>
 						) }
 						{ ! hoveredItem && (

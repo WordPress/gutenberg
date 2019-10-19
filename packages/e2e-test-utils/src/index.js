@@ -68,6 +68,7 @@ export { tabThroughTextBlock } from './tab-through-text-block';
 export { tabThroughTextContentAreas } from './tab-through-text-content-areas';
 export { textContentAreas } from './text-content-areas';
 export { toggleMoreMenu } from './toggle-more-menu';
+export { toggleOfflineMode, isOfflineMode } from './offline-mode';
 export { toggleScreenOption } from './toggle-screen-option';
 export { transformBlockTo } from './transform-block-to';
 export { uninstallPlugin } from './uninstall-plugin';

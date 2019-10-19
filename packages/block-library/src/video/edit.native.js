@@ -6,7 +6,6 @@ import { View, TouchableWithoutFeedback, Text } from 'react-native';
 /**
  * Internal dependencies
  */
-import Video from './video-player';
 import {
 	mediaUploadSync,
 	requestImageFailedRetryDialog,
@@ -29,7 +28,8 @@ import {
 	MediaUploadProgress,
 	MEDIA_TYPE_VIDEO,
 	BlockControls,
-	InspectorControls,
+	VIDEO_ASPECT_RATIO,
+	VideoPlayer,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { isURL } from '@wordpress/url';
@@ -42,15 +42,12 @@ import style from './style.scss';
 import SvgIcon from './icon';
 import SvgIconRetry from './icon-retry';
 
-const VIDEO_ASPECT_RATIO = 1.7;
-
 class VideoEdit extends React.Component {
 	constructor( props ) {
 		super( props );
 
 		this.state = {
 			isCaptionSelected: false,
-			showSettings: false,
 			videoContainerHeight: 0,
 		};
 
@@ -199,13 +196,6 @@ class VideoEdit extends React.Component {
 						<BlockControls>
 							{ toolbarEditButton }
 						</BlockControls> }
-					<InspectorControls>
-						{ false && <ToolbarButton //Not rendering settings button until it has an action
-							label={ __( 'Video Settings' ) }
-							icon="admin-generic"
-							onClick={ () => ( null ) }
-						/> }
-					</InspectorControls>
 					<MediaUploadProgress
 						mediaId={ id }
 						onFinishMediaUploadWithSuccess={ this.finishMediaUploadWithSuccess }
@@ -234,7 +224,7 @@ class VideoEdit extends React.Component {
 								<View onLayout={ this.onVideoContanerLayout } style={ containerStyle }>
 									{ showVideo &&
 										<View style={ style.videoContainer }>
-											<Video
+											<VideoPlayer
 												isSelected={ isSelected && ! this.state.isCaptionSelected }
 												style={ videoStyle }
 												source={ { uri: src } }

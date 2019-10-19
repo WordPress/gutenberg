@@ -32,6 +32,16 @@ const success = chalk.bold.green;
 // Utils
 
 /**
+ * Small utility used to read an uncached version of a JSON file
+ *
+ * @param {string} fileName
+ */
+function readJSONFile( fileName ) {
+	const data = fs.readFileSync( fileName, 'utf8' );
+	return JSON.parse( data );
+}
+
+/**
  * Asks the user for a confirmation to continue or abort otherwise
  *
  * @param {string} message      Confirmation message.
@@ -250,7 +260,7 @@ async function runReleaseBranchCreationStep( abortMessage ) {
 	await runStep( 'Creating the release branch', abortMessage, async () => {
 		const simpleGit = SimpleGit( gitWorkingDirectoryPath );
 		const packageJsonPath = gitWorkingDirectoryPath + '/package.json';
-		const packageJson = require( packageJsonPath );
+		const packageJson = readJSONFile( packageJsonPath );
 		const parsedVersion = semver.parse( packageJson.version );
 
 		// Follow the WordPress version guidelines to compute the version to be used
@@ -294,7 +304,7 @@ async function runReleaseBranchCheckoutStep( abortMessage ) {
 	await runStep( 'Getting into the release branch', abortMessage, async () => {
 		const simpleGit = SimpleGit( gitWorkingDirectoryPath );
 		const packageJsonPath = gitWorkingDirectoryPath + '/package.json';
-		const masterPackageJson = require( packageJsonPath );
+		const masterPackageJson = readJSONFile( packageJsonPath );
 		const masterParsedVersion = semver.parse( masterPackageJson.version );
 		releaseBranch = 'release/' + masterParsedVersion.major + '.' + masterParsedVersion.minor;
 
@@ -302,7 +312,7 @@ async function runReleaseBranchCheckoutStep( abortMessage ) {
 		await simpleGit.checkout( releaseBranch );
 		console.log( '>> The local release branch ' + success( releaseBranch ) + ' has been successfully checked out.' );
 
-		const releaseBranchPackageJson = require( packageJsonPath );
+		const releaseBranchPackageJson = readJSONFile( packageJsonPath );
 		const releaseBranchParsedVersion = semver.parse( releaseBranchPackageJson.version );
 
 		if ( releaseBranchParsedVersion.prerelease && releaseBranchParsedVersion.prerelease.length ) {
@@ -341,8 +351,8 @@ async function runBumpPluginVersionAndCommitStep( version, abortMessage ) {
 		const packageJsonPath = gitWorkingDirectoryPath + '/package.json';
 		const packageLockPath = gitWorkingDirectoryPath + '/package-lock.json';
 		const pluginFilePath = gitWorkingDirectoryPath + '/gutenberg.php';
-		const packageJson = require( packageJsonPath );
-		const packageLock = require( packageLockPath );
+		const packageJson = readJSONFile( packageJsonPath );
+		const packageLock = readJSONFile( packageLockPath );
 		const newPackageJson = {
 			...packageJson,
 			version,
