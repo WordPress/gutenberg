@@ -10,7 +10,7 @@ import {
 	PanelBody,
 	BottomSheet,
 } from '@wordpress/components';
-import { useState } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import {
 	InspectorControls,
 } from '@wordpress/block-editor';
@@ -27,21 +27,27 @@ const maxSpacerHeight = 500;
 const SpacerEdit = ( { isSelected, attributes, setAttributes } ) => {
 	const { height } = attributes;
 	const [ sliderSpacerHeight, setSpacerHeight ] = useState( height );
+	const [ sliderSpacerMaxHeight, setSpacerMaxHeight ] = useState( height );
+
+	// Height defined on the web can be higher than
+	// `maxSpacerHeight`, so there is a need to `setSpacerMaxHeight`
+	// after the initial render.
+	useEffect( () => {
+		setSpacerMaxHeight( height > maxSpacerHeight ? height * 2 : maxSpacerHeight );
+	}, [] );
 
 	const changeSpacerHeight = ( value ) => {
 		let spacerHeight = value;
 		setSpacerHeight( spacerHeight );
 		if ( spacerHeight < minSpacerHeight ) {
 			spacerHeight = minSpacerHeight;
-		} else if ( spacerHeight > maxSpacerHeight ) {
-			spacerHeight = maxSpacerHeight;
+		} else if ( spacerHeight > sliderSpacerMaxHeight ) {
+			spacerHeight = sliderSpacerMaxHeight;
 		}
 		setAttributes( {
 			height: spacerHeight,
 		} );
 	};
-
-	const maximumValue = height > maxSpacerHeight ? height * 2 : maxSpacerHeight;
 
 	return (
 		<View style={ [ styles.staticSpacer, isSelected && styles.selectedSpacer, { height } ] }>
@@ -49,10 +55,10 @@ const SpacerEdit = ( { isSelected, attributes, setAttributes } ) => {
 				<PanelBody title={ __( 'SpacerSettings' ) } >
 					<BottomSheet.RangeCell
 						icon={ 'admin-settings' }
-						label={ __( 'Slider' ) }
+						label={ __( 'Height in pixels' ) }
 						value={ sliderSpacerHeight }
 						minimumValue={ minSpacerHeight }
-						maximumValue={ maximumValue }
+						maximumValue={ sliderSpacerMaxHeight }
 						separatorType={ 'fullWidth' }
 						onChangeValue={ ( value ) => changeSpacerHeight( value ) }
 					/>

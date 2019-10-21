@@ -20,7 +20,7 @@ export default function BottomSheetRangeCell( props ) {
 		step = 1,
 		minimumTrackTintColor = '#00669b',
 		maximumTrackTintColor = Platform.OS === 'ios' ? '#e9eff3' : '#909090',
-		thumbTintColor = Platform.OS === 'ios' ? '#fff' : '#00669b',
+		thumbTintColor = Platform.OS === 'android' && '#00669b',
 		...cellProps
 	} = props;
 
