@@ -35,7 +35,7 @@ export const LinkControlSearchItem = ( { itemProps, suggestion, isSelected = fal
 				<span className="block-editor-link-control__search-item-title">
 					<TextHighlight text={ suggestion.title } highlight={ searchTerm } />
 				</span>
-				<span className="block-editor-link-control__search-item-info">{ safeDecodeURI( suggestion.url ) || '' }</span>
+				<span aria-hidden={ ! isURL } className="block-editor-link-control__search-item-info">{ safeDecodeURI( suggestion.url ) || '' }</span>
 			</span>
 			{ suggestion.type && (
 				<span className="block-editor-link-control__search-item-type">{ suggestion.type }</span>
