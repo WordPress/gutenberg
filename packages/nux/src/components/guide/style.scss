@@ -1,0 +1,93 @@
+.nux-guide {
+	@media (max-width: $break-small) {
+		bottom: 15%;
+		left: $grid-size-xlarge;
+		right: $grid-size-xlarge;
+		top: 15%;
+	}
+
+	.components-modal__header {
+		background: none;
+		border-bottom: none;
+	}
+
+	&__container {
+		align-items: center;
+		display: flex;
+		flex-direction: column;
+		margin-top: -$header-height;
+		min-height: 100%;
+	}
+
+	&__footer {
+		align-content: center;
+		display: flex;
+		height: 30px;
+		justify-content: center;
+		margin: auto 0 $grid-size-xlarge 0;
+		position: relative;
+		width: 100%;
+
+		@include break-small() {
+			margin: $grid-size-xlarge 0 0;
+		}
+	}
+
+	&__page-control {
+		display: flex;
+
+		.components-button {
+			margin: 0 2px;
+		}
+	}
+
+	&__back-button,
+	&__forward-button,
+	&__finish-button {
+		height: 30px;
+		position: absolute;
+	}
+
+	&__back-button,
+	&__forward-button {
+		font-size: 0;
+		padding: 4px 2px;
+
+		&.has-text svg {
+			margin: 0;
+		}
+
+		@include break-small() {
+			font-size: $default-font-size;
+		}
+	}
+
+	&__back-button {
+		left: 0;
+
+		@include break-small() {
+			padding: 4px 8px 4px 2px;
+
+			&.has-text svg {
+				margin-right: 4px;
+			}
+		}
+	}
+
+	&__forward-button {
+		right: 0;
+
+		@include break-small() {
+			padding: 4px 2px 4px 8px;
+
+			&.has-text svg {
+				margin-left: 4px;
+				order: 1;
+			}
+		}
+	}
+
+	&__finish-button {
+		right: 0;
+	}
+}
