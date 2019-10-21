@@ -1,4 +1,4 @@
-package = JSON.parse(File.read(File.join(__dir__, 'package.json')))
+package = JSON.parse(File.read(File.join(__dir__, 'packages', 'react-native-bridge', 'package.json')))
 # Use the same RN version that the JS tools use
 react_native_version = package['dependencies']['react-native']
 # Extract the tagged version if package.json points to a tag
