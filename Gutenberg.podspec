@@ -13,9 +13,9 @@ Pod::Spec.new do |s|
   s.authors          = 'Automattic'
   s.platform     = :ios, '11.0'
   s.source       = { :git => 'https://github.com/WordPress/gutenberg.git' }
-  s.source_files = 'ios/*.{h,m,swift}'
+  s.source_files = 'packages/react-native-bridge/ios/*.{h,m,swift}'
   s.requires_arc = true
-  s.preserve_paths = 'bundle/ios/*'
+  s.preserve_paths = 'packages/react-native-editor/bundle/ios/*'
   s.swift_version = '5.0'
 
   s.dependency 'React', react_native_version
