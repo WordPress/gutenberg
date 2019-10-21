@@ -63,16 +63,30 @@ function LinkControl( { currentLink, fetchSearchSuggestions, onLinkChange, onSet
 
 	const handleURLSearch = async ( value ) => {
 		return [ {
-			id: 1,
+			id: '1',
 			title: value,
 			type: 'URL',
 			url: prependHTTP( value ),
 		} ];
 	};
 
+	const handleEntitySearch = async ( value ) => {
+		const results = await Promise.all( [
+			fetchSearchSuggestions( value ),
+			handleURLSearch( value ),
+		] );
+
+		const couldBeURL = ! value.includes( ' ' );
+
+		// If it's potentially a URL search then concat on a URL search suggestion
+		// just for good measure. That way once the actual results run out we always
+		// have a URL option to fallback on.
+		return couldBeURL ? results[ 0 ].concat( results[ 1 ] ) : results[ 0 ];
+	};
+
 	// Effects
 	const getSearchHandler = useCallback( ( value ) => {
-		return ( isURL( value ) || value.includes( 'www.' ) ) ? handleURLSearch( value ) : fetchSearchSuggestions( value );
+		return ( isURL( value ) || value.includes( 'www.' ) ) ? handleURLSearch( value ) : handleEntitySearch( value );
 	}, [ handleURLSearch, fetchSearchSuggestions ] );
 
 	// Render Components
