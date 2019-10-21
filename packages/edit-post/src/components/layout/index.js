@@ -6,6 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { __experimentalPageTemplatePicker } from '@wordpress/block-editor';
 import {
 	Button,
 	Popover,
@@ -56,6 +57,7 @@ function Layout( {
 	isSaving,
 	isMobileViewport,
 	isRichEditingEnabled,
+	showPageTemplatePicker,
 } ) {
 	const sidebarIsOpened = editorSidebarOpened || pluginSidebarOpened || publishSidebarOpened;
 
@@ -71,6 +73,12 @@ function Layout( {
 		'aria-label': __( 'Editor publish' ),
 		tabIndex: -1,
 	};
+
+	const templates = [
+		{ name: 'About', content: '<!-- wp:paragraph {"align":"left"} --><p class="has-text-align-left">Visitors will want to know who is on the other side of the page. Use this space to write about yourself, your site, your business, or anything you want. Use the testimonials below to quote others, talking about the same thing – in their own words.</p><!-- /wp:paragraph -->' },
+		{ name: 'Contact', content: '<!-- wp:paragraph {"align":"left"} --><p class="has-text-align-left">Let\'s talk 👋 Don\'t hesitate to reach out with the contact information below, or send a message using the form.</p><!-- /wp:paragraph -->' },
+	];
+
 	return (
 		<FocusReturnProvider className={ className }>
 			<FullscreenMode />
@@ -131,21 +139,49 @@ function Layout( {
 			) }
 			<Popover.Slot />
 			<PluginArea />
+			{ showPageTemplatePicker && <__experimentalPageTemplatePicker templates={ templates } /> }
 		</FocusReturnProvider>
 	);
 }
 
 export default compose(
-	withSelect( ( select ) => ( {
-		mode: select( 'core/edit-post' ).getEditorMode(),
-		editorSidebarOpened: select( 'core/edit-post' ).isEditorSidebarOpened(),
-		pluginSidebarOpened: select( 'core/edit-post' ).isPluginSidebarOpened(),
-		publishSidebarOpened: select( 'core/edit-post' ).isPublishSidebarOpened(),
-		hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' ),
-		hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
-		isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
-		isRichEditingEnabled: select( 'core/editor' ).getEditorSettings().richEditingEnabled,
-	} ) ),
+	withSelect( ( select ) => {
+		const {
+			getEditorMode,
+			isEditorSidebarOpened,
+			isPluginSidebarOpened,
+			isPublishSidebarOpened,
+			isFeatureActive,
+			hasMetaBoxes,
+			isSavingMetaBoxes,
+		} = select( 'core/edit-post' );
+
+		const {
+			getCurrentPostType,
+			getEditorSettings,
+		} = select( 'core/editor' );
+
+		const {
+			getBlockCount,
+			getSettings,
+		} = select( 'core/block-editor' );
+
+		const isPageTemplatesEnabled = getSettings().__experimentalEnablePageTemplates;
+		const isEmpty = getBlockCount() === 0;
+		const isPage = getCurrentPostType() === 'page';
+
+		return {
+			mode: getEditorMode(),
+			editorSidebarOpened: isEditorSidebarOpened(),
+			pluginSidebarOpened: isPluginSidebarOpened(),
+			publishSidebarOpened: isPublishSidebarOpened(),
+			hasFixedToolbar: isFeatureActive( 'fixedToolbar' ),
+			hasActiveMetaboxes: hasMetaBoxes(),
+			isSaving: isSavingMetaBoxes,
+			isRichEditingEnabled: getEditorSettings().richEditingEnabled,
+			showPageTemplatePicker: isPageTemplatesEnabled && isEmpty && isPage,
+		};
+	} ),
 	withDispatch( ( dispatch ) => {
 		const { closePublishSidebar, togglePublishSidebar } = dispatch( 'core/edit-post' );
 		return {
