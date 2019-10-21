@@ -37,7 +37,9 @@ export const LinkControlSearchItem = ( { itemProps, suggestion, isSelected = fal
 				</span>
 				<span className="block-editor-link-control__search-item-info">{ safeDecodeURI( suggestion.url ) || '' }</span>
 			</span>
-			<span className="block-editor-link-control__search-item-type">{ suggestion.type.toLowerCase() || '' }</span>
+			{ suggestion.type && (
+				<span className="block-editor-link-control__search-item-type">{ suggestion.type }</span>
+			) }
 		</button>
 	);
 };
