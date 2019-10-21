@@ -20,7 +20,12 @@ function getSelectValueFromFontSize( fontSizes, value ) {
 	return 'normal';
 }
 
-function getSelectOptions( optionsArray ) {
+function getSelectOptions( optionsArray, disableCustomFontSizes ) {
+	if(disableCustomFontSizes){
+		return [
+			...optionsArray.map( ( option ) => ( { value: option.slug, label: option.name } ) )
+		];
+	}
 	return [
 		...optionsArray.map( ( option ) => ( { value: option.slug, label: option.name } ) ),
 		{ value: 'custom', label: __( 'Custom' ) },
@@ -72,7 +77,7 @@ function FontSizePicker( {
 						hideLabelFromVision={ true }
 						value={ currentSelectValue }
 						onChange={ onSelectChangeValue }
-						options={ getSelectOptions( fontSizes ) }
+						options={ getSelectOptions( fontSizes, disableCustomFontSizes ) }
 					/>
 				}
 				{ ( ! withSlider && ! disableCustomFontSizes ) &&
