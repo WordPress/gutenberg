@@ -11,14 +11,22 @@ import { forwardRef, useEffect, useState } from '@wordpress/element';
 export function Image( { src, alt, style, ...additionalProps }, ref ) {
 	const [ aspectRatio, setAspectRatio ] = useState();
 	useEffect( () => {
+		let isMounted = true;
+
 		if ( src ) {
 			RNImage.getSize( src, ( width, height ) => {
-				setAspectRatio( width / height );
+				if ( isMounted ) {
+					setAspectRatio(width / height);
+				}
 			} );
 		} else {
 			setAspectRatio( undefined );
 		}
-	}, [ src, setAspectRatio ] );
+
+		return () => {
+			isMounted = false;
+		}
+	}, [ src ] );
 
 	if ( ! src ) {
 		return null;
