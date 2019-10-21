@@ -2,10 +2,7 @@
  * WordPress dependencies
  */
 import {
-	clickBlockAppender,
-	clickOnMoreMenuItem,
 	createNewPost,
-	saveDraft,
 	toggleScreenOption,
 } from '@wordpress/e2e-test-utils';
 
@@ -109,72 +106,5 @@ describe( 'New User Experience (NUX)', () => {
 		// Tips should be enabled in localStorage as well.
 		areTipsEnabled = await getTipsEnabled( page );
 		expect( areTipsEnabled ).toEqual( true );
-	} );
-
-	// TODO: This test should be enabled once
-	// https://github.com/WordPress/gutenberg/issues/7458 is fixed.
-	it.skip( 'should show tips as disabled if all tips have been shown', async () => {
-		await clickAllTips( page );
-
-		// Open the "More" menu to check the "Show Tips" element.
-		await page.click( '.edit-post-more-menu [aria-label="More tools & options"]' );
-		const showTipsButton = await page.$x( '//button[contains(text(), "Show Tips")][@aria-pressed="false"]' );
-
-		expect( showTipsButton ).toHaveLength( 1 );
-	} );
-
-	// TODO: This test should be enabled once
-	// https://github.com/WordPress/gutenberg/issues/7458 is fixed.
-	it.skip( 'should reset tips if all tips have been shown and show tips was unchecked', async () => {
-		const { numberOfTips } = await clickAllTips( page );
-
-		// Click again to re-enable tips; they should appear.
-		await clickOnMoreMenuItem( 'Show Tips' );
-
-		// Open the "More" menu to check the "Show Tips" element.
-		await page.click( '.edit-post-more-menu [aria-label="More tools & options"]' );
-		const showTipsButton = await page.$x( '//button[contains(text(), "Show Tips")][@aria-pressed="true"]' );
-
-		expect( showTipsButton ).toHaveLength( 1 );
-
-		// Tips should re-appear on the page.
-		const nuxTipElements = await page.$$( '.nux-dot-tip' );
-		expect( nuxTipElements ).toHaveLength( 1 );
-
-		// Tips should be enabled again.
-		const areTipsEnabled = await getTipsEnabled( page );
-		expect( areTipsEnabled ).toEqual( true );
-
-		// Dismissed tips should be reset and ready to be shown again.
-		const resetTips = await getTips( page );
-		const newNumberOfTips = resetTips.tipIds.length;
-		expect( newNumberOfTips ).toHaveLength( numberOfTips );
-	} );
-
-	// TODO: This test should be enabled once
-	// https://github.com/WordPress/gutenberg/issues/7753 is fixed.
-	// See: https://github.com/WordPress/gutenberg/issues/7753#issuecomment-403952816
-	it.skip( 'should show tips if "Show tips" was disabled on a draft and then enabled', async () => {
-		// Click the "Show tips" button (enabled by default) to disable tips.
-		await clickOnMoreMenuItem( 'Show Tips' );
-
-		// Let's type something so there's content in this post.
-		await page.click( '.editor-post-title__input' );
-		await page.keyboard.type( 'Post title' );
-		await clickBlockAppender();
-		await page.keyboard.type( 'Post content goes here.' );
-		await saveDraft();
-
-		// Refresh the page; tips should be disabled.
-		await page.reload();
-		let nuxTipElements = await page.$$( '.nux-dot-tip' );
-		expect( nuxTipElements ).toHaveLength( 0 );
-
-		// Clicking should re-enable tips.
-		await clickOnMoreMenuItem( 'Show Tips' );
-
-		// Tips should re-appear on the page.
-		nuxTipElements = await page.$$( '.nux-dot-tip' );
-		expect( nuxTipElements ).toHaveLength( 1 );
 	} );
 } );

@@ -37,7 +37,7 @@
 			background: #f3f5f6;
 			color: color(theme(button) shade(25%));
 			border-color: color(theme(button) shade(5%));
-			box-shadow: 0 0 0 1px color(theme(button) shade(5%));
+			box-shadow: 0 0 0 $border-width color(theme(button) shade(5%));
 			text-decoration: none;
 
 		}
@@ -54,7 +54,7 @@
 			color: #a0a5aa;
 			border-color: #ddd;
 			background: #f7f7f7;
-			text-shadow: 0 1px 0 #fff;
+			text-shadow: 0 $border-width 0 #fff;
 			transform: none;
 			opacity: 1;
 		}
@@ -76,7 +76,7 @@
 
 		&:focus:enabled {
 			box-shadow:
-				0 0 0 1px $white,
+				0 0 0 $border-width $white,
 				0 0 0 3px color(theme(button));
 		}
 
@@ -107,7 +107,7 @@
 
 			&:focus:enabled {
 				box-shadow:
-					0 0 0 1px $white,
+					0 0 0 $border-width $white,
 					0 0 0 3px color(theme(button));
 			}
 		}
@@ -157,8 +157,8 @@
 		&:focus {
 			color: #124964;
 			box-shadow:
-				0 0 0 1px #5b9dd9,
-				0 0 2px 1px rgba(30, 140, 190, 0.8);
+				0 0 0 $border-width #5b9dd9,
+				0 0 2px $border-width rgba(30, 140, 190, 0.8);
 		}
 	}
 
