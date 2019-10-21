@@ -11,11 +11,11 @@ import { forwardRef, useEffect, useState } from '@wordpress/element';
 export function Image( { src, alt, style, ...additionalProps }, ref ) {
 	const [ aspectRatio, setAspectRatio ] = useState();
 	useEffect( () => {
-		let isMounted = true;
+		let didCancel = false;
 
 		if ( src ) {
 			RNImage.getSize( src, ( width, height ) => {
-				if ( isMounted ) {
+				if ( ! didCancel ) {
 					setAspectRatio(width / height);
 				}
 			} );
@@ -24,7 +24,7 @@ export function Image( { src, alt, style, ...additionalProps }, ref ) {
 		}
 
 		return () => {
-			isMounted = false;
+			didCancel = true;
 		}
 	}, [ src ] );
 
