@@ -148,7 +148,7 @@
     "react-native-dark-mode": "git+https://github.com/wordpress-mobile/react-native-dark-mode.git#f09bf1480e7b34536413ab3300f29e4375edb2c6",
     "react-native-hr": "git+https://github.com/Riglerr/react-native-hr.git#2d01a5cf77212d100e8b99e0310cce5234f977b3",
     "react-native-keyboard-aware-scroll-view": "git+https://github.com/wordpress-mobile/react-native-keyboard-aware-scroll-view.git#gb-v0.8.7",
-    "react-native-modal": "^6.5.0",
+    "react-native-modal": "^11.4.0",
     "react-native-safe-area": "^0.5.0",
     "react-native-svg": "git+https://github.com/wordpress-mobile/react-native-svg.git#55244dc79ab876550599c82dca763c3eba0153c5",
     "react-native-video": "git+https://github.com/wordpress-mobile/react-native-video.git#3a0e2fa6fc6bf1fe1a54adb2dbf94545b28c2bc4",
