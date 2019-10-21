@@ -84,6 +84,17 @@ function gutenberg_initialize_experiments_settings() {
 			'id'    => 'gutenberg-full-site-editing',
 		)
 	);
+	add_settings_field(
+		'gutenberg-page-templates',
+		__( 'Page Templates', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Enable Page Templates', 'gutenberg' ),
+			'id'    => 'gutenberg-page-templates',
+		)
+	);
 	register_setting(
 		'gutenberg-experiments',
 		'gutenberg-experiments'
@@ -136,6 +147,7 @@ function gutenberg_experiments_editor_settings( $settings ) {
 		'__experimentalEnableMenuBlock'         => $experiments_exist ? array_key_exists( 'gutenberg-menu-block', get_option( 'gutenberg-experiments' ) ) : false,
 		'__experimentalBlockDirectory'          => $experiments_exist ? array_key_exists( 'gutenberg-block-directory', get_option( 'gutenberg-experiments' ) ) : false,
 		'__experimentalEnableFullSiteEditing'   => $experiments_exist ? array_key_exists( 'gutenberg-full-site-editing', get_option( 'gutenberg-experiments' ) ) : false,
+		'__experimentalEnablePageTemplates'     => $experiments_exist ? array_key_exists( 'gutenberg-page-templates', get_option( 'gutenberg-experiments' ) ) : false,
 
 	);
 	return array_merge( $settings, $experiments_settings );

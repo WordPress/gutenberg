@@ -109,6 +109,7 @@ class EditorProvider extends Component {
 				'__experimentalEnableLegacyWidgetBlock',
 				'__experimentalEnableMenuBlock',
 				'__experimentalBlockDirectory',
+				'__experimentalEnablePageTemplates',
 				'showInserterHelpPanel',
 			] ),
 			__experimentalReusableBlocks: reusableBlocks,
