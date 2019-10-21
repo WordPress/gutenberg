@@ -1,0 +1,97 @@
+.edit-post-editor-regions {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	max-height: 100%;
+	position: relative;
+
+	// On Mobile keep a margin for the header and admin header
+	// as both of these are fixed
+	top: 0;
+	@include break-small() {
+		margin-top: 0;
+
+		// On Desktop position the container as fixed to avoid scroll bleed.
+		position: fixed;
+		top: $admin-bar-height-big;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		height: auto;
+	}
+
+	@include break-medium() {
+		top: $admin-bar-height;
+	}
+}
+@include editor-left(".edit-post-editor-regions");
+
+.edit-post-editor-regions__body {
+	flex-grow: 1;
+	display: flex;
+
+	// On Mobile the header is fixed to keep HTML as scrollable.
+	@include break-small() {
+		overflow: auto;
+	}
+}
+
+.edit-post-editor-regions__content {
+	flex-grow: 1;
+
+	// On Mobile the header is fixed to keep HTML as scrollable.
+	@include break-small() {
+		overflow: auto;
+	}
+}
+
+.edit-post-editor-regions__sidebar {
+	width: auto; // Keep the sidebar width flexible.
+	flex-shrink: 0;
+
+	// On Mobile the header is fixed to keep HTML as scrollable.
+	@include break-small() {
+		overflow: auto;
+	}
+}
+
+.edit-post-editor-regions__header {
+	flex-shrink: 0;
+	height: auto;  // Keep the height flexible.
+
+	// On Mobile the header is sticky.
+	position: sticky;
+	top: 0;
+	@include break-small() {
+		// Cancel the fixed positionning used in mobile.
+		position: initial;
+		overflow: auto;
+	}
+}
+
+.edit-post-editor-regions__footer {
+	height: auto;  // Keep the height flexible.
+	flex-shrink: 0;
+	overflow: auto;
+
+	// On Mobile the footer is hidden
+	display: none;
+	@include break-small() {
+		display: block;
+	}
+}
+
+.edit-post-editor-regions__publish {
+	z-index: z-index(".edit-post-editor-regions__publish");
+	position: fixed !important; // Need to override the default relative positionning
+	top: -9999em;
+	bottom: auto;
+	left: auto;
+	right: 0;
+	width: $sidebar-width;
+
+	&:focus {
+		top: auto;
+		bottom: 0;
+	}
+}

@@ -5,6 +5,15 @@
 	& .components-button {
 		font-family: $default-font;
 	}
+
+	flex: 1 1 auto;
+
+	// In IE11 flex-basis: 100% cause a bug where the metaboxes area overlap with the content area.
+	// But it works as expected without it.
+	// The flex-basis is needed for the other browsers to make sure the content area is full-height.
+	@supports (position: sticky) {
+		flex-basis: 100%;
+	}
 }
 
 .edit-post-visual-editor .block-editor-writing-flow__click-redirect {
