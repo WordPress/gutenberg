@@ -38,11 +38,56 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 				array(
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => array( $this, 'get_title' ),
-					// 'permission_callback' => array( $this, 'get_remote_url_permissions_check' ),
+					'args' => array(
+						'url' => array(
+							'validate_callback' => function( $param ) {
+								return $this->validate_url( $param );
+							},
+							'sanitize_callback' => function( $param ) {
+								return $this->sanitize_url( $param );
+							},
+						),
+					),
+					'permission_callback' => array( $this, 'get_remote_url_permissions_check' ),
 				),
 			)
 		);
+	}
 
+
+
+
+
+	public function get_title( $request ) {
+
+		// TODO: Sanitize and validate
+		$url = $request->get_param( 'url' );
+
+		$html_response = $this->get_remote_url_html( $url );
+
+		if ( is_wp_error( $html_response ) ) {
+			return new WP_Error( 'no_title', 'Unable to retrieve title tag. ' . $html_response->get_error_message(), array( 'status' => 404 ) );
+		}
+
+		$title_list = $html_response->getElementsByTagName( 'title' );
+
+		$title = $title_list->item( 0 );
+
+		if ( empty( $title ) ) {
+			return new WP_Error( 'no_title', 'No title tag at remote url.', array( 'status' => 404 ) );
+		}
+
+		$title_text = $title->nodeValue;
+
+		return rest_ensure_response( $title_text );
+	}
+
+	public function validate_url( $url ) {
+		return wp_http_validate_url( $url );
+	}
+
+	public function sanitize_url( $url ) {
+		return esc_url_raw( $url );
 	}
 
 	/**
@@ -51,13 +96,16 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	 * @since 5.7.0
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
-	 * @return WP_Error|bool True if the request has read access, WP_Error object otherwise.
+	 * @return WP_Error|bool True if the request has access, WP_Error object otherwise.
 	 *
 	 * This function is overloading a function defined in WP_REST_Controller so it should have the same parameters.
 	 * phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 	 */
 	public function get_remote_url_permissions_check( $request ) {
-		if ( ! current_user_can( 'edit_theme_options' ) ) {
+
+		$required_cap = 'edit_posts';
+
+		if ( ! current_user_can( $required_cap ) ) {
 			return new WP_Error(
 				'rest_user_cannot_view',
 				__( 'Sorry, you are not allowed to access remote urls.', 'gutenberg' )
@@ -67,30 +115,6 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 		return true;
 	}
 	/* phpcs:enable */
-
-	public function get_title( $request ) {
-
-		// TODO: Sanitize and validate
-		$url = $request->get_param( 'url' );
-
-		$html = $this->get_remote_url_html( $url );
-
-		if ( is_wp_error( $html ) ) {
-			return new WP_Error( 'no_title', 'Unable to retrieve title tag . ' . $html->get_error_message(), array( 'status' => 404 ) );
-		}
-
-		$title_list = $html->getElementsByTagName( 'title' );
-
-		$title = $title_list->item( 0 );
-
-		if ( empty( $title ) ) {
-			return new WP_Error( 'no_title', 'No title tag at remote url', array( 'status' => 404 ) );
-		}
-
-		$title_text = $title->nodeValue;
-
-		return rest_ensure_response( $title_text );
-	}
 
 
 	private function get_remote_url_html( $url ) {
