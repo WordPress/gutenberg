@@ -3,7 +3,7 @@
         "blockName": "core/navigation-menu-item",
         "attrs": {
             "label": "WordPress",
-            "destination": "https://wordpress.org/"
+            "url": "https://wordpress.org/"
         },
         "innerBlocks": [],
         "innerHTML": "\n",
