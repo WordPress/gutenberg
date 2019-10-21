@@ -9,32 +9,6 @@ import TextInputState from 'react-native/lib/TextInputState';
 const AztecManager = UIManager.getViewManagerConfig( 'RCTAztecView' );
 
 class AztecView extends React.Component {
-	static propTypes = {
-		activeFormats: PropTypes.array,
-		isSelected: PropTypes.bool,
-		disableGutenbergMode: PropTypes.bool,
-		deleteEnter: PropTypes.bool,
-		text: PropTypes.object,
-		placeholder: PropTypes.string,
-		placeholderTextColor: ColorPropType,
-		color: ColorPropType,
-		linkTextColor: ColorPropType,
-		maxImagesWidth: PropTypes.number,
-		minImagesWidth: PropTypes.number,
-		onChange: PropTypes.func,
-		onFocus: PropTypes.func,
-		onBlur: PropTypes.func,
-		onContentSizeChange: PropTypes.func,
-		onEnter: PropTypes.func,
-		onBackspace: PropTypes.func,
-		onScroll: PropTypes.func,
-		onSelectionChange: PropTypes.func,
-		onHTMLContentWithCursor: PropTypes.func,
-		onCaretVerticalPositionChange: PropTypes.func,
-		blockType: PropTypes.object,
-		...TextViewPropTypes, // include the default view properties
-	}
-
 	dispatch( command, params ) {
 		params = params || [];
 		UIManager.dispatchViewManagerCommand(
@@ -130,55 +104,81 @@ class AztecView extends React.Component {
 		TextInputState.blurTextInput( ReactNative.findNodeHandle( this ) );
 	}
 
-focus = () => {
-	TextInputState.focusTextInput( ReactNative.findNodeHandle( this ) );
-}
+	focus = () => {
+		TextInputState.focusTextInput( ReactNative.findNodeHandle( this ) );
+	}
 
-isFocused = () => {
-	const focusedField = TextInputState.currentlyFocusedField();
-	return focusedField && ( focusedField === ReactNative.findNodeHandle( this ) );
-}
+	isFocused = () => {
+		const focusedField = TextInputState.currentlyFocusedField();
+		return focusedField && ( focusedField === ReactNative.findNodeHandle( this ) );
+	}
 
-_onPress = ( event ) => {
-	if ( ! this.isFocused() ) {
-		this.focus( event ); // Call to move the focus in RN way (TextInputState)
-		this._onFocus( event ); // Check if there are listeners set on the focus event
+	_onPress = ( event ) => {
+		if ( ! this.isFocused() ) {
+			this.focus( event ); // Call to move the focus in RN way (TextInputState)
+			this._onFocus( event ); // Check if there are listeners set on the focus event
+		}
+	}
+
+	_onAztecFocus = ( event ) => {
+	// IMPORTANT: the onFocus events from Aztec are thrown away on Android as these are handled by onPress() in the upper level.
+	// It's necessary to do this otherwise onFocus may be set by `{...otherProps}` and thus the onPress + onFocus
+	// combination generate an infinite loop as described in https://github.com/wordpress-mobile/gutenberg-mobile/issues/302
+	// For iOS, this is necessary to let the system know when Aztec was focused programatically.
+		if ( Platform.OS === 'ios' ) {
+			this._onPress( event );
+		}
+	}
+
+	render() {
+		// eslint-disable-next-line no-unused-vars
+		const { onActiveFormatsChange, onFocus, ...otherProps } = this.props;
+		return (
+			<TouchableWithoutFeedback onPress={ this._onPress }>
+				<RCTAztecView
+					{ ...otherProps }
+					onContentSizeChange={ this._onContentSizeChange }
+					onHTMLContentWithCursor={ this._onHTMLContentWithCursor }
+					onSelectionChange={ this._onSelectionChange }
+					onEnter={ this.props.onEnter && this._onEnter }
+					deleteEnter={ this.props.deleteEnter }
+					// IMPORTANT: the onFocus events are thrown away as these are handled by onPress() in the upper level.
+					// It's necessary to do this otherwise onFocus may be set by `{...otherProps}` and thus the onPress + onFocus
+					// combination generate an infinite loop as described in https://github.com/wordpress-mobile/gutenberg-mobile/issues/302
+					onFocus={ this._onAztecFocus }
+					onBlur={ this._onBlur }
+					onBackspace={ this._onBackspace }
+				/>
+			</TouchableWithoutFeedback>
+		);
 	}
 }
 
-_onAztecFocus = ( event ) => {
-// IMPORTANT: the onFocus events from Aztec are thrown away on Android as these are handled by onPress() in the upper level.
-// It's necessary to do this otherwise onFocus may be set by `{...otherProps}` and thus the onPress + onFocus
-// combination generate an infinite loop as described in https://github.com/wordpress-mobile/gutenberg-mobile/issues/302
-// For iOS, this is necessary to let the system know when Aztec was focused programatically.
-	if ( Platform.OS === 'ios' ) {
-		this._onPress( event );
-	}
-}
-
-render() {
-	// eslint-disable-next-line no-unused-vars
-	const { onActiveFormatsChange, onFocus, ...otherProps } = this.props;
-	return (
-		<TouchableWithoutFeedback onPress={ this._onPress }>
-			<RCTAztecView
-				{ ...otherProps }
-				onContentSizeChange={ this._onContentSizeChange }
-				onHTMLContentWithCursor={ this._onHTMLContentWithCursor }
-				onSelectionChange={ this._onSelectionChange }
-				onEnter={ this.props.onEnter && this._onEnter }
-				deleteEnter={ this.props.deleteEnter }
-				// IMPORTANT: the onFocus events are thrown away as these are handled by onPress() in the upper level.
-				// It's necessary to do this otherwise onFocus may be set by `{...otherProps}` and thus the onPress + onFocus
-				// combination generate an infinite loop as described in https://github.com/wordpress-mobile/gutenberg-mobile/issues/302
-				onFocus={ this._onAztecFocus }
-				onBlur={ this._onBlur }
-				onBackspace={ this._onBackspace }
-			/>
-		</TouchableWithoutFeedback>
-	);
-}
-}
+AztecView.propTypes = {
+	activeFormats: PropTypes.array,
+	isSelected: PropTypes.bool,
+	disableGutenbergMode: PropTypes.bool,
+	deleteEnter: PropTypes.bool,
+	text: PropTypes.object,
+	placeholder: PropTypes.string,
+	placeholderTextColor: ColorPropType,
+	color: ColorPropType,
+	linkTextColor: ColorPropType,
+	maxImagesWidth: PropTypes.number,
+	minImagesWidth: PropTypes.number,
+	onChange: PropTypes.func,
+	onFocus: PropTypes.func,
+	onBlur: PropTypes.func,
+	onContentSizeChange: PropTypes.func,
+	onEnter: PropTypes.func,
+	onBackspace: PropTypes.func,
+	onScroll: PropTypes.func,
+	onSelectionChange: PropTypes.func,
+	onHTMLContentWithCursor: PropTypes.func,
+	onCaretVerticalPositionChange: PropTypes.func,
+	blockType: PropTypes.object,
+	...TextViewPropTypes, // include the default view properties
+};
 
 const RCTAztecView = requireNativeComponent( 'RCTAztecView', AztecView );
 
