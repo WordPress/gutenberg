@@ -8,9 +8,7 @@ import {
 	publishPost,
 } from '@wordpress/e2e-test-utils';
 
-// This test isn't reliable on Travis and fails from time to time.
-// See: https://github.com/WordPress/gutenberg/pull/15211.
-describe.skip( 'WP Editor Meta Boxes', () => {
+describe( 'WP Editor Meta Boxes', () => {
 	beforeAll( async () => {
 		await activatePlugin( 'gutenberg-test-plugin-wp-editor-meta-box' );
 		await createNewPost();
@@ -25,7 +23,7 @@ describe.skip( 'WP Editor Meta Boxes', () => {
 		await page.type( '.editor-post-title__input', 'Hello Meta' );
 
 		// Type something
-		await page.click( '#test_tinymce_id-html' );
+		await expect( page ).toClick( '#test_tinymce_id-html' );
 		await page.type( '#test_tinymce_id', 'Typing in a metabox' );
 		await page.click( '#test_tinymce_id-tmce' );
 
@@ -33,7 +31,8 @@ describe.skip( 'WP Editor Meta Boxes', () => {
 
 		await page.reload();
 
-		await page.click( '#test_tinymce_id-html' );
+		await expect( page ).toClick( '#test_tinymce_id-html' );
+		await page.waitForSelector( '#test_tinymce_id' );
 		const content = await page.$eval(
 			'#test_tinymce_id',
 			( textarea ) => textarea.value
