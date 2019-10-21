@@ -186,6 +186,49 @@ describe( 'autosave', () => {
 		toggleOfflineMode( false );
 	} );
 
+	it( 'should clear local autosave after successful save', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'before save' );
+		await saveDraft();
+
+		await page.keyboard.type( 'after save' );
+
+		// Trigger local autosave
+		expect( await page.evaluate( () => window.sessionStorage.length ) ).toBe( 0 );
+		await page.evaluate( () => window.wp.data.dispatch( 'core/editor' ).__experimentalLocalAutosave() );
+		expect( await page.evaluate( () => window.sessionStorage.length ) ).toBe( 1 );
+
+		// Save and wait for "Saved" to confirm save complete.
+		await Promise.all( [
+			page.waitForSelector( '.editor-post-saved-state.is-saved' ),
+			pressKeyWithModifier( 'primary', 'S' ),
+		] );
+
+		expect( await page.evaluate( () => window.sessionStorage.length ) ).toBe( 1 );
+	} );
+
+	it( 'shouldn\'t clear local autosave if save fails', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'before save' );
+		await saveDraft();
+
+		await page.keyboard.type( 'after save' );
+		await page.evaluate( () => window.wp.data.dispatch( 'core/editor' ).__experimentalLocalAutosave() );
+		expect( await page.evaluate( () => window.sessionStorage.length ) ).toBe( 1 );
+
+		toggleOfflineMode( true );
+
+		// Save and wait for "Saved" to confirm save complete.
+		await Promise.all( [
+			page.waitForSelector( '.editor-post-saved-state.is-saved' ),
+			pressKeyWithModifier( 'primary', 'S' ),
+		] );
+
+		expect( await page.evaluate( () => window.sessionStorage.length ) ).toBe( 1 );
+
+		toggleOfflineMode( false );
+	} );
+
 	it( 'shouldn\'t conflict with server-side autosave', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'before publish' );
