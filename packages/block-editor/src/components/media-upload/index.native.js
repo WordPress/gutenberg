@@ -42,7 +42,15 @@ export class MediaUpload extends React.Component {
 	componentDidMount() {
 		const { allowedTypes = [] } = this.props;
 		getOtherMediaOptions( allowedTypes, ( otherMediaOptions ) => {
-			this.setState( { otherMediaOptions } );
+			const otherMediaOptionsWithIcons = otherMediaOptions.map( ( option ) => {
+				return {
+					icon: this.getChooseFromDeviceIcon(),
+					value: option.value,
+					label: option.label,
+				};
+			} );
+
+			this.setState( { otherMediaOptions: otherMediaOptionsWithIcons } );
 		} );
 	}
 
