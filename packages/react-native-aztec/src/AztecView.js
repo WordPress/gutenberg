@@ -9,6 +9,21 @@ import TextInputState from 'react-native/lib/TextInputState';
 const AztecManager = UIManager.getViewManagerConfig( 'RCTAztecView' );
 
 class AztecView extends React.Component {
+	constructor( props ) {
+		super( props );
+		this._onContentSizeChange = this._onContentSizeChange.bind( this );
+		this._onEnter = this._onEnter.bind( this );
+		this._onBackspace = this._onBackspace.bind( this );
+		this._onHTMLContentWithCursor = this._onHTMLContentWithCursor.bind( this );
+		this._onFocus = this._onFocus.bind( this );
+		this._onBlur = this._onBlur.bind( this );
+		this._onSelectionChange = this._onSelectionChange.bind( this );
+		this.blur = this.blur.bind( this );
+		this.focus = this.focus.bind( this );
+		this._onPress = this._onPress.bind( this );
+		this.isFocused = this.isFocused.bind( this );
+		this._onAztecFocus = this._onAztecFocus.bind( this );
+	}
 	dispatch( command, params ) {
 		params = params || [];
 		UIManager.dispatchViewManagerCommand(
@@ -22,7 +37,7 @@ class AztecView extends React.Component {
 		this.dispatch( AztecManager.Commands.returnHTMLWithCursor );
 	}
 
-	_onContentSizeChange = ( event ) => {
+	_onContentSizeChange( event ) {
 		if ( ! this.props.onContentSizeChange ) {
 			return;
 		}
@@ -31,7 +46,7 @@ class AztecView extends React.Component {
 		onContentSizeChange( size );
 	}
 
-	_onEnter = ( event ) => {
+	_onEnter( event ) {
 		if ( ! this.isFocused() ) {
 			return;
 		}
@@ -44,7 +59,7 @@ class AztecView extends React.Component {
 		onEnter( event );
 	}
 
-	_onBackspace = ( event ) => {
+	_onBackspace( event ) {
 		if ( ! this.props.onBackspace ) {
 			return;
 		}
@@ -53,7 +68,7 @@ class AztecView extends React.Component {
 		onBackspace( event );
 	}
 
-	_onHTMLContentWithCursor = ( event ) => {
+	_onHTMLContentWithCursor( event ) {
 		if ( ! this.props.onHTMLContentWithCursor ) {
 			return;
 		}
@@ -65,7 +80,7 @@ class AztecView extends React.Component {
 		onHTMLContentWithCursor( text, selectionStart, selectionEnd );
 	}
 
-	_onFocus = ( event ) => {
+	_onFocus( event ) {
 		if ( ! this.props.onFocus ) {
 			return;
 		}
@@ -74,7 +89,7 @@ class AztecView extends React.Component {
 		onFocus( event );
 	}
 
-	_onBlur = ( event ) => {
+	_onBlur( event ) {
 		this.selectionEndCaretY = null;
 		TextInputState.blurTextInput( ReactNative.findNodeHandle( this ) );
 		if ( ! this.props.onBlur ) {
@@ -85,7 +100,7 @@ class AztecView extends React.Component {
 		onBlur( event );
 	}
 
-	_onSelectionChange = ( event ) => {
+	_onSelectionChange( event ) {
 		if ( this.props.onSelectionChange ) {
 			const { selectionStart, selectionEnd, text } = event.nativeEvent;
 			const { onSelectionChange } = this.props;
@@ -100,27 +115,27 @@ class AztecView extends React.Component {
 		}
 	}
 
-	blur = () => {
+	blur() {
 		TextInputState.blurTextInput( ReactNative.findNodeHandle( this ) );
 	}
 
-	focus = () => {
+	focus() {
 		TextInputState.focusTextInput( ReactNative.findNodeHandle( this ) );
 	}
 
-	isFocused = () => {
+	isFocused() {
 		const focusedField = TextInputState.currentlyFocusedField();
 		return focusedField && ( focusedField === ReactNative.findNodeHandle( this ) );
 	}
 
-	_onPress = ( event ) => {
+	_onPress( event ) {
 		if ( ! this.isFocused() ) {
 			this.focus( event ); // Call to move the focus in RN way (TextInputState)
 			this._onFocus( event ); // Check if there are listeners set on the focus event
 		}
 	}
 
-	_onAztecFocus = ( event ) => {
+	_onAztecFocus( event ) {
 	// IMPORTANT: the onFocus events from Aztec are thrown away on Android as these are handled by onPress() in the upper level.
 	// It's necessary to do this otherwise onFocus may be set by `{...otherProps}` and thus the onPress + onFocus
 	// combination generate an infinite loop as described in https://github.com/wordpress-mobile/gutenberg-mobile/issues/302
