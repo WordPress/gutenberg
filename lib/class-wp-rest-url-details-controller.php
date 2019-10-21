@@ -33,74 +33,20 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	public function register_routes() {
 		register_rest_route(
 			$this->namespace,
-			'/' . $this->rest_base,
+			'/' . $this->rest_base . '/title',
 			array(
 				array(
 					'methods'             => WP_REST_Server::READABLE,
-					'callback'            => array( $this, 'get_remote_url' ),
+					'callback'            => array( $this, 'get_title' ),
 					// 'permission_callback' => array( $this, 'get_remote_url_permissions_check' ),
 				),
-				// 'schema' => array( $this, 'get_public_item_schema' ),
 			)
 		);
 
 	}
 
 	/**
-	 * Retrieves the comment's schema, conforming to JSON Schema.
-	 *
-	 * @since 6.1.0
-	 *
-	 * @return array
-	 */
-	public function get_item_schema() {
-		$schema = array(
-			'$schema'    => 'http://json-schema.org/draft-04/schema#',
-			'title'      => 'widget-area',
-			'type'       => 'object',
-			'properties' => array(
-				'id'      => array(
-					'description' => __( 'Unique identifier for the object.', 'gutenberg' ),
-					'type'        => 'string',
-					'context'     => array( 'view', 'edit', 'embed' ),
-					'readonly'    => true,
-				),
-				'content' => array(
-					'description' => __( 'The content for the object.', 'gutenberg' ),
-					'type'        => 'object',
-					'context'     => array( 'view', 'edit', 'embed' ),
-					'arg_options' => array(
-						'sanitize_callback' => null,
-						'validate_callback' => null,
-					),
-					'properties'  => array(
-						'raw'           => array(
-							'description' => __( 'Content for the object, as it exists in the database.', 'gutenberg' ),
-							'type'        => 'string',
-							'context'     => array( 'view', 'edit', 'embed' ),
-						),
-						'rendered'      => array(
-							'description' => __( 'HTML content for the object, transformed for display.', 'gutenberg' ),
-							'type'        => 'string',
-							'context'     => array( 'view', 'edit', 'embed' ),
-							'readonly'    => true,
-						),
-						'block_version' => array(
-							'description' => __( 'Version of the content block format used by the object.', 'gutenberg' ),
-							'type'        => 'integer',
-							'context'     => array( 'view', 'edit', 'embed' ),
-							'readonly'    => true,
-						),
-					),
-				),
-			),
-		);
-
-		return $schema;
-	}
-
-	/**
-	 * Checks whether a given request has permission to read widget areas.
+	 * Checks whether a given request has permission to read remote urls.
 	 *
 	 * @since 5.7.0
 	 *
@@ -110,11 +56,11 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	 * This function is overloading a function defined in WP_REST_Controller so it should have the same parameters.
 	 * phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 	 */
-	public function get_items_permissions_check( $request ) {
+	public function get_remote_url_permissions_check( $request ) {
 		if ( ! current_user_can( 'edit_theme_options' ) ) {
 			return new WP_Error(
 				'rest_user_cannot_view',
-				__( 'Sorry, you are not allowed to read sidebars.', 'gutenberg' )
+				__( 'Sorry, you are not allowed to access remote urls.', 'gutenberg' )
 			);
 		}
 
@@ -122,18 +68,52 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	}
 	/* phpcs:enable */
 
-	/**
-	 * Retrieves all widget areas.
-	 *
-	 * @since 5.7.0
-	 *
-	 * @param WP_REST_Request $request Full details about the request.
-	 * @return WP_Error|WP_REST_Response Response object on success, or WP_Error object on failure.
-	 */
-	public function get_remote_url( $request ) {
+	public function get_title( $request ) {
 
-		$data = [ 'hello-world' ];
+		// TODO: Sanitize and validate
+		$url = $request->get_param( 'url' );
 
-		return rest_ensure_response( $data );
+		$html = $this->get_remote_url_html( $url );
+
+		if ( is_wp_error( $html ) ) {
+			return new WP_Error( 'no_title', 'Unable to retrieve title tag . ' . $html->get_error_message(), array( 'status' => 404 ) );
+		}
+
+		$title_list = $html->getElementsByTagName( 'title' );
+
+		$title = $title_list->item( 0 );
+
+		if ( empty( $title ) ) {
+			return new WP_Error( 'no_title', 'No title tag at remote url', array( 'status' => 404 ) );
+		}
+
+		$title_text = $title->nodeValue;
+
+		return rest_ensure_response( $title_text );
+	}
+
+
+	private function get_remote_url_html( $url ) {
+
+		$response = wp_remote_get( $url );
+
+		if ( is_wp_error( $response ) || ! is_array( $response ) ) {
+			return new WP_Error( 'no_response', 'Unable to contact remote url . ' . $response->get_error_message(), array( 'status' => 404 ) );
+		}
+
+		$body = wp_remote_retrieve_body( $response );
+
+		$dom = new DOMDocument( '1.0', 'UTF - 8' );
+
+		// set error level
+		$internalErrors = libxml_use_internal_errors( true );
+
+		// load HTML
+		$dom->loadHTML( $body );
+
+		// Restore error level
+		libxml_use_internal_errors( $internalErrors );
+
+		return $dom;
 	}
 }
