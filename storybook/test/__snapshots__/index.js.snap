@@ -466,6 +466,17 @@ exports[`@wordpress/components Components|CheckboxControl Default 1`] = `
 </div>
 `;
 
+exports[`@wordpress/components Components|ColorIndicator Default 1`] = `
+<span
+  className="component-color-indicator"
+  style={
+    Object {
+      "background": "#0073aa",
+    }
+  }
+/>
+`;
+
 exports[`@wordpress/components Components|ColorPalette Default 1`] = `
 <div
   className="components-circular-option-picker"
