@@ -304,6 +304,7 @@ class URLInput extends Component {
 					selectedSuggestion,
 					suggestionsListProps,
 					buildSuggestionItemProps,
+					isLoading: loading,
 					handleSuggestionClick: this.handleOnClick,
 				} ) }
 

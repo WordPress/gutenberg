@@ -90,11 +90,14 @@ function LinkControl( { currentLink, fetchSearchSuggestions, onLinkChange, onSet
 	}, [ handleURLSearch, fetchSearchSuggestions ] );
 
 	// Render Components
-	const renderSearchResults = ( { suggestionsListProps, buildSuggestionItemProps, suggestions, selectedSuggestion } ) => {
+	const renderSearchResults = ( { suggestionsListProps, buildSuggestionItemProps, suggestions, selectedSuggestion, isLoading } ) => {
+		const resultsListClasses = classnames( 'block-editor-link-control__search-results', {
+			'is-loading': isLoading,
+		} );
 		/* eslint-disable react/jsx-key */
 		return (
 			<div className="block-editor-link-control__search-results-wrapper">
-				<div { ...suggestionsListProps } className="block-editor-link-control__search-results">
+				<div { ...suggestionsListProps } className={ resultsListClasses }>
 					{ suggestions.map( ( suggestion, index ) => (
 						<LinkControlSearchItem
 							key={ `${ suggestion.id }-${ index }` }

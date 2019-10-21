@@ -71,6 +71,10 @@
 	padding: $grid-size-large/2 $grid-size-large;
 	max-height: 200px;
 	overflow-y: scroll; // allow results list to scroll
+
+	&.is-loading {
+		opacity: 0.2;
+	}
 }
 
 .block-editor-link-control__search-item {
@@ -180,13 +184,16 @@
 	float: none;
 
 	&.components-spinner { // Specificity overide
-		position: relative;
-		top: auto;
-		left: auto;
+		position: absolute;
+		top: 70px;
+		left: 50%;
 		right: auto;
 		bottom: auto;
-		margin: 0 auto $grid-size-large auto;
+		margin: 0 auto 16px auto;
+		transform: translateX(-50%);
 	}
+
+
 }
 
 .block-editor-link-control__search-item-action {
