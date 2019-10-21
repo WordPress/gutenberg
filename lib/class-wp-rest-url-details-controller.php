@@ -143,10 +143,25 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	 */
 	private function get_remote_url_html( $url ) {
 
-		$response = wp_remote_get( $url );
+		$response = null;
 
-		if ( is_wp_error( $response ) || ! is_array( $response ) ) {
-			return new WP_Error( 'no_response', __( 'Unable to contact remote url.', 'gutenberg' ) . $response->get_error_message(), array( 'status' => 404 ) );
+		// Transient per URL
+		$cache_key = 'g_url_details_response_' . md5( $url );
+
+		// Attempt to retrieve cached response
+		$cached_response = get_transient( $cache_key );
+
+		if ( ! empty( $cached_response ) ) {
+			$response = $cached_response;
+		} else {
+			$response = wp_remote_get( $url );
+
+			if ( is_wp_error( $response ) || ! is_array( $response ) ) {
+				return new WP_Error( 'no_response', __( 'Unable to contact remote url.', 'gutenberg' ) . $response->get_error_message(), array( 'status' => 404 ) );
+			}
+
+			// Only cache valid responses.
+			set_transient( $cache_key, $response, HOUR_IN_SECONDS );
 		}
 
 		$body = wp_remote_retrieve_body( $response );
