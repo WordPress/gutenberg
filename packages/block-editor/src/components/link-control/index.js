@@ -1,4 +1,10 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+import { isFunction, partialRight, noop } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -6,12 +12,7 @@ import {
 	ExternalLink,
 	Popover,
 } from '@wordpress/components';
-
-/**
- * External dependencies
- */
-import classnames from 'classnames';
-import { isFunction, partialRight, noop } from 'lodash';
+import { __ } from '@wordpress/i18n';
 
 import {
 	useCallback,
@@ -125,7 +126,7 @@ function LinkControl( { currentLink, fetchSearchSuggestions, onLinkChange, onSet
 							</span>
 
 							<Button isDefault onClick={ onStartEditing } className="block-editor-link-control__search-item-action block-editor-link-control__search-item-action--edit">
-								Change
+								{ __( 'Change' ) }
 							</Button>
 						</div>
 					) }
