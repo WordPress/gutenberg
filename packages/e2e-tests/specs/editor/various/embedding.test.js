@@ -271,33 +271,4 @@ describe( 'Embedding content', () => {
 		// Check the block has become a WordPress block.
 		await page.waitForSelector( '.wp-block-embed-wordpress' );
 	} );
-
-	it.skip( 'should transform from video to embed block when YouTube URL is pasted', async () => {
-		await clickBlockAppender();
-		await insertBlock( 'Video' );
-		await page.click( '.editor-media-placeholder__url-input-container button' );
-		await page.keyboard.type( 'https://www.youtube.com/watch?v=lXMskKTw3Bc' );
-		await page.keyboard.press( 'Enter' );
-		await page.waitForSelector( '.wp-block-embed-youtube' );
-	} );
-
-	it.skip( 'should transform from image to embed block when Instagram URL is pasted', async () => {
-		await clickBlockAppender();
-		await page.keyboard.type( '/image' );
-		await page.keyboard.press( 'Enter' );
-		await page.click( '.editor-media-placeholder__url-input-container button' );
-		await page.keyboard.type( 'https://www.instagram.com/p/Bvl97o2AK6x/' );
-		await page.keyboard.press( 'Enter' );
-		await page.waitForSelector( '.wp-block-embed-instagram' );
-	} );
-
-	it.skip( 'should transform from audio to embed block when Soundcloud URL is pasted', async () => {
-		await clickBlockAppender();
-		await page.keyboard.type( '/audio' );
-		await page.keyboard.press( 'Enter' );
-		await page.click( '.editor-media-placeholder__url-input-container button' );
-		await page.keyboard.type( 'https://soundcloud.com/a-boogie-wit-da-hoodie/swervin' );
-		await page.keyboard.press( 'Enter' );
-		await page.waitForSelector( '.wp-block-embed-soundcloud' );
-	} );
 } );
