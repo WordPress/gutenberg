@@ -14,7 +14,7 @@ module.exports = {
 	extraNodeModules: enm,
 	resolver: {
 		blacklistRE: blacklistElements,
-		sourceExts: [ 'js', 'json', 'scss', 'sass' ],
+		sourceExts: [ 'js', 'json', 'scss', 'sass', 'ts', 'tsx' ],
 	},
 	transformer: {
 		babelTransformerPath: require.resolve( './sass-transformer.js' ),
