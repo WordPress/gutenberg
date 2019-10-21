@@ -38,7 +38,7 @@ function MyMediaUploader() {
 			<MediaUpload
 				onSelect={ ( media ) => console.log( 'selected ' + media.length ) }
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
-				value={ media }
+				value={ mediaId }
 				render={ ( { open } ) => (
 					<Button onClick={ open }>
 						Open Media Library
@@ -76,9 +76,9 @@ Whether to allow multiple selections or not.
 
 ### value
 
-An object or an array of objects that contain media ID (`id` property) to be selected by default when opening the media library.
+Media ID (or media IDs if multiple is true) to be selected by default when opening the media library.
 
-- Type: `Object|Array`
+- Type: `Number|Array`
 - Required: No
 - Platform: Web
 
