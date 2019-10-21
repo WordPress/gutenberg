@@ -27,13 +27,13 @@ class BlockEdit extends Component {
 		);
 	}
 
-	propsToContext( name, isSelected, clientId, onFocus, onCaretVerticalPositionChange, attributes, setAttributes ) {
-		return { name, isSelected, clientId, onFocus, onCaretVerticalPositionChange, attributes, setAttributes };
+	propsToContext( name, isSelected, clientId, onFocus, onCaretVerticalPositionChange ) {
+		return { name, isSelected, clientId, onFocus, onCaretVerticalPositionChange };
 	}
 
 	render() {
-		const { name, isSelected, clientId, onFocus, onCaretVerticalPositionChange, attributes, setAttributes } = this.props;
-		const value = this.propsToContext( name, isSelected, clientId, onFocus, onCaretVerticalPositionChange, attributes, setAttributes );
+		const { name, isSelected, clientId, onFocus, onCaretVerticalPositionChange } = this.props;
+		const value = this.propsToContext( name, isSelected, clientId, onFocus, onCaretVerticalPositionChange );
 
 		return (
 			<BlockEditContextProvider value={ value }>

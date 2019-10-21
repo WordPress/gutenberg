@@ -8,7 +8,13 @@ import { kebabCase, startCase } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useMemo, Children, cloneElement } from '@wordpress/element';
+import { useSelect, useDispatch } from '@wordpress/data';
+import {
+	useCallback,
+	useMemo,
+	Children,
+	cloneElement,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -63,7 +69,16 @@ export default function __experimentalUseColors(
 	},
 	deps = []
 ) {
-	const { attributes, setAttributes } = useBlockEditContext();
+	const { clientId } = useBlockEditContext();
+	const attributes = useSelect(
+		( select ) => select( 'core/block-editor' ).getBlockAttributes( clientId ),
+		[ clientId ]
+	);
+	const { updateBlockAttributes } = useDispatch( 'core/block-editor' );
+	const setAttributes = useCallback(
+		( newAttributes ) => updateBlockAttributes( clientId, newAttributes ),
+		[ updateBlockAttributes, clientId ]
+	);
 
 	const createComponent = useMemo(
 		() =>
