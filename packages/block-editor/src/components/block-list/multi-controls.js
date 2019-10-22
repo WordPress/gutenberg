@@ -20,7 +20,7 @@ function BlockListMultiControls( {
 	return (
 		<BlockMover
 			clientIds={ multiSelectedBlockClientIds }
-			orientation={ moverDirection }
+			__experimentalOrientation={ moverDirection }
 		/>
 	);
 }

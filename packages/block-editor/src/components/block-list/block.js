@@ -462,7 +462,7 @@ function BlockListBlock( {
 			}
 			onDragStart={ onDragStart }
 			onDragEnd={ onDragEnd }
-			orientation={ moverDirection }
+			__experimentalOrientation={ moverDirection }
 		/>
 	);
 

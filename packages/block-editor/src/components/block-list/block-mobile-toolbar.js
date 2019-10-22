@@ -13,7 +13,7 @@ function BlockMobileToolbar( { clientId, moverDirection } ) {
 	return (
 		<div className="editor-block-list__block-mobile-toolbar block-editor-block-list__block-mobile-toolbar">
 			<VisualEditorInserter />
-			<BlockMover clientIds={ [ clientId ] } orientation={ moverDirection } />
+			<BlockMover clientIds={ [ clientId ] } __experimentalOrientation={ moverDirection } />
 		</div>
 	);
 }

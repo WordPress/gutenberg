@@ -132,7 +132,7 @@ class InnerBlocks extends Component {
 						<BlockList
 							rootClientId={ clientId }
 							renderAppender={ renderAppender }
-							moverDirection={ moverDirection }
+							__experimentalMoverDirection={ moverDirection }
 						/>
 				) }
 			</div>
