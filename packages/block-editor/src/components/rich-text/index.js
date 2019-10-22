@@ -7,7 +7,7 @@ import { omit } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { RawHTML, Component, createRef } from '@wordpress/element';
+import { RawHTML, Component, createRef, Platform } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { pasteHandler, children as childrenSource, getBlockTransforms, findTransform } from '@wordpress/blocks';
 import { withInstanceId, compose } from '@wordpress/compose';
@@ -429,7 +429,7 @@ class RichTextWrapper extends Component {
 								<FormatToolbar />
 							</BlockFormatControls>
 						) }
-						{ isSelected && inlineToolbar && hasFormats && (
+						{ Platform.OS === 'web' && isSelected && inlineToolbar && hasFormats && (
 							<Popover
 								noArrow
 								position="top center"
@@ -440,25 +440,27 @@ class RichTextWrapper extends Component {
 								<FormatToolbar />
 							</Popover>
 						) }
-						{ isSelected && <RemoveBrowserShortcuts /> }
-						<Autocomplete
-							onReplace={ onReplace }
-							completers={ autocompleters }
-							record={ value }
-							onChange={ onChange }
-							isSelected={ isSelected }
-						>
-							{ ( { listBoxId, activeId, onKeyDown } ) =>
-								<Editable
-									aria-autocomplete={ listBoxId ? 'list' : undefined }
-									aria-owns={ listBoxId }
-									aria-activedescendant={ activeId }
-									start={ start }
-									reversed={ reversed }
-									onKeyDown={ onKeyDown }
-								/>
-							}
-						</Autocomplete>
+						{ Platform.OS === 'web' && isSelected && <RemoveBrowserShortcuts /> }
+						{ Platform.OS === 'web' && (
+							<Autocomplete
+								onReplace={onReplace}
+								completers={autocompleters}
+								record={value}
+								onChange={onChange}
+								isSelected={isSelected}
+							>
+								{({ listBoxId, activeId, onKeyDown }) =>
+									<Editable
+										aria-autocomplete={listBoxId ? 'list' : undefined}
+										aria-owns={listBoxId}
+										aria-activedescendant={activeId}
+										start={start}
+										reversed={reversed}
+										onKeyDown={onKeyDown}
+									/>
+								}
+							</Autocomplete>
+						) }
 					</>
 				}
 			</RichText>
