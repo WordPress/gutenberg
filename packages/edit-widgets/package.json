@@ -46,6 +46,7 @@
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/media-utils": "file:../media-utils",
 		"@wordpress/notices": "file:../notices",
+		"@wordpress/plugins": "file:../plugins",
 		"classnames": "^2.2.5",
 		"lodash": "^4.17.19",
 		"rememo": "^3.0.0"
