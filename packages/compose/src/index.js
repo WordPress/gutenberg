@@ -1,20 +1,8 @@
-/**
- * External dependencies
- */
-import { flowRight } from 'lodash';
-
 // Utils
 export { default as createHigherOrderComponent } from './utils/create-higher-order-component';
 
-/**
- * Composes multiple higher-order components into a single higher-order component. Performs right-to-left function
- * composition, where each successive invocation is supplied the return value of the previous.
- *
- * @param {...Function} hocs The HOC functions to invoke.
- *
- * @return {Function} Returns the new composite function.
- */
-export { flowRight as compose };
+// Compose helper (aliased flowRight from Lodash)
+export { default as compose } from './higher-order/compose';
 
 // Higher-order components
 export { default as ifCondition } from './higher-order/if-condition';
