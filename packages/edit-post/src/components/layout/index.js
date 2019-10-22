@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __experimentalPageTemplatePicker } from '@wordpress/block-editor';
+import { __experimentalPageTemplatePicker, __experimentalWithPageTemplatePickerVisible } from '@wordpress/block-editor';
 import {
 	Button,
 	Popover,
@@ -145,43 +145,16 @@ function Layout( {
 }
 
 export default compose(
-	withSelect( ( select ) => {
-		const {
-			getEditorMode,
-			isEditorSidebarOpened,
-			isPluginSidebarOpened,
-			isPublishSidebarOpened,
-			isFeatureActive,
-			hasMetaBoxes,
-			isSavingMetaBoxes,
-		} = select( 'core/edit-post' );
-
-		const {
-			getCurrentPostType,
-			getEditorSettings,
-		} = select( 'core/editor' );
-
-		const {
-			getBlockCount,
-			getSettings,
-		} = select( 'core/block-editor' );
-
-		const isPageTemplatesEnabled = getSettings().__experimentalEnablePageTemplates;
-		const isEmpty = getBlockCount() === 0;
-		const isPage = getCurrentPostType() === 'page';
-
-		return {
-			mode: getEditorMode(),
-			editorSidebarOpened: isEditorSidebarOpened(),
-			pluginSidebarOpened: isPluginSidebarOpened(),
-			publishSidebarOpened: isPublishSidebarOpened(),
-			hasFixedToolbar: isFeatureActive( 'fixedToolbar' ),
-			hasActiveMetaboxes: hasMetaBoxes(),
-			isSaving: isSavingMetaBoxes,
-			isRichEditingEnabled: getEditorSettings().richEditingEnabled,
-			showPageTemplatePicker: isPageTemplatesEnabled && isEmpty && isPage,
-		};
-	} ),
+	withSelect( ( select ) => ( {
+		mode: select( 'core/edit-post' ).getEditorMode(),
+		editorSidebarOpened: select( 'core/edit-post' ).isEditorSidebarOpened(),
+		pluginSidebarOpened: select( 'core/edit-post' ).isPluginSidebarOpened(),
+		publishSidebarOpened: select( 'core/edit-post' ).isPublishSidebarOpened(),
+		hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' ),
+		hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
+		isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
+		isRichEditingEnabled: select( 'core/editor' ).getEditorSettings().richEditingEnabled,
+	} ) ),
 	withDispatch( ( dispatch ) => {
 		const { closePublishSidebar, togglePublishSidebar } = dispatch( 'core/edit-post' );
 		return {
@@ -191,4 +164,5 @@ export default compose(
 	} ),
 	navigateRegions,
 	withViewportMatch( { isMobileViewport: '< small' } ),
+	__experimentalWithPageTemplatePickerVisible,
 )( Layout );
