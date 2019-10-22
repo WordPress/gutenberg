@@ -1,6 +1,0 @@
-@import "../animations";
-@import "../mixins";
-
-.test {
-	@include edit-post__fade-in-animation();
-}
