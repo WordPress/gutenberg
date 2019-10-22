@@ -44,6 +44,7 @@ import Sidebar from '../sidebar';
 import PluginPostPublishPanel from '../sidebar/plugin-post-publish-panel';
 import PluginPrePublishPanel from '../sidebar/plugin-pre-publish-panel';
 import FullscreenMode from '../fullscreen-mode';
+import defaultTemplates from '../default-templates';
 
 function Layout( {
 	mode,
@@ -73,11 +74,6 @@ function Layout( {
 		'aria-label': __( 'Editor publish' ),
 		tabIndex: -1,
 	};
-
-	const templates = [
-		{ name: 'About', content: '<!-- wp:paragraph {"align":"left"} --><p class="has-text-align-left">Visitors will want to know who is on the other side of the page. Use this space to write about yourself, your site, your business, or anything you want. Use the testimonials below to quote others, talking about the same thing – in their own words.</p><!-- /wp:paragraph -->' },
-		{ name: 'Contact', content: '<!-- wp:paragraph {"align":"left"} --><p class="has-text-align-left">Let\'s talk 👋 Don\'t hesitate to reach out with the contact information below, or send a message using the form.</p><!-- /wp:paragraph -->' },
-	];
 
 	return (
 		<FocusReturnProvider className={ className }>
@@ -139,7 +135,7 @@ function Layout( {
 			) }
 			<Popover.Slot />
 			<PluginArea />
-			{ showPageTemplatePicker && <__experimentalPageTemplatePicker templates={ templates } /> }
+			{ showPageTemplatePicker && <__experimentalPageTemplatePicker templates={ defaultTemplates } /> }
 		</FocusReturnProvider>
 	);
 }
