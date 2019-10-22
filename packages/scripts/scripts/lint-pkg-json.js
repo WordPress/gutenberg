@@ -25,7 +25,7 @@ const hasLintConfig = hasArgInCLI( '-c' ) ||
 	hasArgInCLI( '--configFile' ) ||
 	hasProjectFile( '.npmpackagejsonlintrc.json' ) ||
 	hasProjectFile( 'npmpackagejsonlint.config.js' ) ||
-	hasPackageProp( 'npmPackageJsonLintConfig' );
+	hasPackageProp( 'npmpackagejsonlint' );
 
 const defaultConfigArgs = ! hasLintConfig ?
 	[ '--configFile', fromConfigRoot( 'npmpackagejsonlint.json' ) ] :
