@@ -9,7 +9,7 @@ import { omit } from 'lodash';
  */
 import { RawHTML, Component, createRef, Platform } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
-import { pasteHandler, children as childrenSource, getBlockTransforms, findTransform } from '@wordpress/blocks';
+import { pasteHandler, children as childrenSource, getBlockTransforms, findTransform, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { withInstanceId, compose } from '@wordpress/compose';
 import {
 	__experimentalRichText as RichText,
@@ -481,12 +481,23 @@ class RichTextWrapper extends Component {
 
 const RichTextContainer = compose( [
 	withInstanceId,
-	withBlockEditContext( ( { clientId } ) => ( { clientId } ) ),
+	withBlockEditContext(({ clientId, onCaretVerticalPositionChange, isSelected }, ownProps) => {
+		if ( Platform.OS === 'web' ) {
+			return { clientId }
+		} else {
+			return {
+				clientId,
+				blockIsSelected: ownProps.isSelected !== undefined ? ownProps.isSelected : isSelected,
+				onCaretVerticalPositionChange,
+			};
+		}
+	} ),
 	withSelect( ( select, {
 		clientId,
 		instanceId,
 		identifier = instanceId,
 		isSelected,
+		blockIsSelected,
 	} ) => {
 		const {
 			isCaretWithinFormattedText,
@@ -494,6 +505,7 @@ const RichTextContainer = compose( [
 			getSelectionEnd,
 			getSettings,
 			didAutomaticChange,
+			__unstableGetBlockWithoutInnerBlocks,
 		} = select( 'core/block-editor' );
 
 		const selectionStart = getSelectionStart();
@@ -508,6 +520,19 @@ const RichTextContainer = compose( [
 			isSelected = selectionStart.clientId === clientId;
 		}
 
+		let extraProps = {}
+		if ( Platform.OS !== 'web' ) {
+			// If the block of this RichText is unmodified then it's a candidate for replacing when adding a new block.
+			// In order to fix https://github.com/wordpress-mobile/gutenberg-mobile/issues/1126, let's blur on unmount in that case.
+			// This apparently assumes functionality the BlockHlder actually
+			const block = clientId && __unstableGetBlockWithoutInnerBlocks(clientId);
+			const shouldBlurOnUnmount = block && isSelected && isUnmodifiedDefaultBlock(block);
+			extraProps = {
+				blockIsSelected,
+				shouldBlurOnUnmount,
+			}
+		}
+
 		return {
 			canUserUseUnfilteredHTML: __experimentalCanUserUseUnfilteredHTML,
 			isCaretWithinFormattedText: isCaretWithinFormattedText(),
@@ -515,6 +540,7 @@ const RichTextContainer = compose( [
 			selectionEnd: isSelected ? selectionEnd.offset : undefined,
 			isSelected,
 			didAutomaticChange: didAutomaticChange(),
+			...extraProps,
 		};
 	} ),
 	withDispatch( ( dispatch, {
