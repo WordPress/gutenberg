@@ -6,6 +6,7 @@ import styled from 'styled-components';
 /**
  * Internal dependencies
  */
+import { HorizontalRule } from '../../primitives';
 import { color } from '../../utils/colors';
 
 export const styleProps = {
@@ -94,10 +95,13 @@ export const FooterUI = styled.div`
 	${ handleShady };
 `;
 
-export const DividerUI = styled.div`
-	background-color: ${ borderColor };
+export const DividerUI = styled( HorizontalRule )`
+	all: unset;
+	border-top: 1px solid ${ borderColor };
 	box-sizing: border-box;
-	height: 1px;
+	display: block;
+	height: 0;
+	width: 100%;
 `;
 
 export function bodySize() {
