@@ -900,12 +900,6 @@
 		"parent": "components"
 	},
 	{
-		"title": "ScreenReaderText",
-		"slug": "screen-reader-text",
-		"markdown_source": "../packages/components/src/screen-reader-text/README.md",
-		"parent": "components"
-	},
-	{
 		"title": "ScrollLock",
 		"slug": "scroll-lock",
 		"markdown_source": "../packages/components/src/scroll-lock/README.md",
@@ -975,6 +969,12 @@
 		"title": "TreeSelect",
 		"slug": "tree-select",
 		"markdown_source": "../packages/components/src/tree-select/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "VisuallyHidden",
+		"slug": "visually-hidden",
+		"markdown_source": "../packages/components/src/visually-hidden/README.md",
 		"parent": "components"
 	},
 	{
