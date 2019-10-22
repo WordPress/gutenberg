@@ -34,7 +34,7 @@ import LinkControlSettingsDrawer from './settings-drawer';
 import LinkControlSearchItem from './search-item';
 import LinkControlInputSearch from './input-search';
 
-function LinkControl( { currentLink, fetchSearchSuggestions, onLinkChange, onSettingsChange = { noop }, currentSettings } ) {
+function LinkControl( { currentLink, className, fetchSearchSuggestions, onLinkChange, onSettingsChange = { noop }, currentSettings } ) {
 	// State
 	const [ inputValue, setInputValue ] = useState( '' );
 	const [ isEditingLink, setIsEditingLink ] = useState( true );
@@ -145,7 +145,7 @@ function LinkControl( { currentLink, fetchSearchSuggestions, onLinkChange, onSet
 
 	return (
 		<Popover
-			className="block-editor-link-control"
+			className={ classnames( 'block-editor-link-control', className ) }
 			onClose={ closeLinkUI }
 			position="bottom center"
 			focusOnMount="firstElement"
