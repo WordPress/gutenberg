@@ -3,7 +3,6 @@
  */
 import classnames from 'classnames';
 import { omit } from 'lodash';
-import { View } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -383,14 +382,14 @@ class RichTextWrapper extends Component {
 				__unstableUndo={ undo }
 			>
 				{ ( { isSelected, value, onChange } ) =>
-					<View>
+					<>
 						{ children && children( { value, onChange } ) }
 						{ isSelected && ! inlineToolbar && (
 							<BlockFormatControls>
 								<FormatToolbar />
 							</BlockFormatControls>
 						) }
-					</View>
+					</>
 				}
 			</RichText>
 		);

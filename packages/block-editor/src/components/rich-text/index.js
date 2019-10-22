@@ -26,7 +26,6 @@ import {
 	slice,
 } from '@wordpress/rich-text';
 import { withFilters, Popover } from '@wordpress/components';
-import { createBlobURL } from '@wordpress/blob';
 import deprecated from '@wordpress/deprecated';
 import { isURL } from '@wordpress/url';
 
@@ -38,6 +37,7 @@ import BlockFormatControls from '../block-format-controls';
 import FormatToolbar from './format-toolbar';
 import { withBlockEditContext } from '../block-edit/context';
 import { RemoveBrowserShortcuts } from './remove-browser-shortcuts';
+import { filePasteHandler } from './file-paste-handler';
 
 const wrapperClasses = 'editor-rich-text block-editor-rich-text';
 const classes = 'editor-rich-text__editable block-editor-rich-text__editable';
@@ -124,7 +124,7 @@ class RichTextWrapper extends Component {
 		}
 	}
 
-	onPaste( { value, onChange, html, plainText, image } ) {
+	onPaste( { value, onChange, html, plainText, images } ) {
 		const {
 			onReplace,
 			onSplit,
@@ -134,16 +134,13 @@ class RichTextWrapper extends Component {
 			__unstableEmbedURLOnPaste,
 		} = this.props;
 
-		if ( image && ! html ) {
-			const file = image.getAsFile ? image.getAsFile() : image;
+		let imagesHTML = filePasteHandler(images, html)
+		if ( imagesHTML ) {			
 			const content = pasteHandler( {
-				HTML: `<img src="${ createBlobURL( file ) }">`,
+				HTML: imagesHTML,
 				mode: 'BLOCKS',
 				tagName,
-			} );
-
-			// Allows us to ask for this information when we get a report.
-			window.console.log( 'Received item:\n\n', file );
+			} );			
 
 			if ( onReplace && isEmpty( value ) ) {
 				onReplace( content );
