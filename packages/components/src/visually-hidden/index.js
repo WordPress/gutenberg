@@ -1,14 +1,24 @@
-
+/**
+ * VisuallyHidden component to render text out non-visually
+ * for use in devices such as a screen reader.
+ */
 function VisuallyHidden( {
-	children,
-	isInline = false,
+	as = 'div',
+	...props
 } ) {
-	const TagName = isInline ? 'span' : 'div';
-	return (
-		<TagName className="components-visually-hidden">
-			{ children }
-		</TagName>
-	);
+	return renderAsRenderProps( {
+		as,
+		className: 'components-visually-hidden',
+		...props,
+	} );
+}
+
+// render "as" to be either string (tag name) or component (fn)
+function renderAsRenderProps( { as: T = 'div', ...props } ) {
+	if ( typeof props.children === 'function' ) {
+		return props.children( props );
+	}
+	return <T { ...props } />;
 }
 
 export default VisuallyHidden;

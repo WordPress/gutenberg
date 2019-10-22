@@ -11,7 +11,7 @@ export const _default = () => (
 			This should not show.
 		</VisuallyHidden>
 		<div>
-			This text will <VisuallyHidden isInline>but not inline </VisuallyHidden> always show.
+			This text will <VisuallyHidden as="span">but not inline </VisuallyHidden> always show.
 		</div>
 	</>
 );
