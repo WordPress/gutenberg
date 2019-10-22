@@ -14,28 +14,28 @@ import { __, _n, sprintf } from '@wordpress/i18n';
  * @param {boolean} isLast        This is the last block.
  * @param {number}  dir           Direction of movement (> 0 is considered to be going
  *                                 down, < 0 is up).
- * @param {string} orientation    The orientation of the block movers, vertical or horizontal.
- * @param {boolean}   isRTL   	  True if current writing system is right to left.
+ * @param {string}  orientation   The orientation of the block movers, vertical or
+ * 								   horizontal.
+ * @param {boolean} isRTL   	  True if current writing system is right to left.
  *
  * @return {string} Label for the block movement controls.
  */
 export function getBlockMoverDescription( selectedCount, type, firstIndex, isFirst, isLast, dir, orientation, isRTL ) {
 	const position = ( firstIndex + 1 );
 
-	const getMovementDirection = ( mdir ) => {
-		switch ( mdir ) {
-			case 'left':
-				mdir = isRTL ? 'right' : mdir;
-				break;
-
-			case 'right':
-				mdir = isRTL ? 'left' : mdir;
-				break;
-
-			default:
-				break;
+	const getMovementDirection = ( moveDirection ) => {
+		if ( moveDirection === 'up' ) {
+			if ( orientation === 'horizontal' ) {
+				return isRTL ? 'right' : 'left';
+			}
+			return 'up';
+		} else if ( moveDirection === 'down' ) {
+			if ( orientation === 'horizontal' ) {
+				return isRTL ? 'left' : 'right';
+			}
+			return 'down';
 		}
-		return mdir;
+		return null;
 	};
 
 	if ( selectedCount > 1 ) {
@@ -54,7 +54,7 @@ export function getBlockMoverDescription( selectedCount, type, firstIndex, isFir
 			__( 'Move %1$s block from position %2$d %3$s to position %4$d' ),
 			type,
 			position,
-			orientation === 'horizontal' ? getMovementDirection( 'right' ) : 'down',
+			getMovementDirection( 'down' ),
 			( position + 1 ),
 		);
 	}
@@ -65,7 +65,7 @@ export function getBlockMoverDescription( selectedCount, type, firstIndex, isFir
 		return sprintf(
 			__( 'Block %1$s is at the end of the content and can’t be moved %2$s' ),
 			type,
-			orientation === 'horizontal' ? getMovementDirection( 'right' ) : 'down',
+			getMovementDirection( 'down' ),
 
 		);
 	}
@@ -77,7 +77,7 @@ export function getBlockMoverDescription( selectedCount, type, firstIndex, isFir
 			__( 'Move %1$s block from position %2$d %3$s to position %4$d' ),
 			type,
 			position,
-			orientation === 'horizontal' ? getMovementDirection( 'left' ) : 'up',
+			getMovementDirection( 'up' ),
 			( position - 1 ),
 		);
 	}
@@ -88,7 +88,7 @@ export function getBlockMoverDescription( selectedCount, type, firstIndex, isFir
 		return sprintf(
 			__( 'Block %1$s is at the beginning of the content and can’t be moved %2$s' ),
 			type,
-			orientation === 'horizontal' ? getMovementDirection( 'left' ) : 'up',
+			getMovementDirection( 'up' ),
 		);
 	}
 }

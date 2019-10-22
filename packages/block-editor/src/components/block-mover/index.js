@@ -51,39 +51,34 @@ export class BlockMover extends Component {
 			return null;
 		}
 
-		const getArrowIcon = ( hdir ) => {
-			let arrow;
-			switch ( hdir ) {
-				case 'left':
-					arrow = isRTL ? rightArrow : leftArrow;
-					arrow = orientation === 'horizontal' ? arrow : upArrow;
-					break;
-
-				case 'right':
-					arrow = isRTL ? leftArrow : rightArrow;
-					arrow = orientation === 'horizontal' ? arrow : downArrow;
-					break;
-
-				default:
-					break;
+		const getArrowIcon = ( moveDirection ) => {
+			if ( moveDirection === 'up' ) {
+				if ( orientation === 'horizontal' ) {
+					return isRTL ? rightArrow : leftArrow;
+				}
+				return upArrow;
+			} else if ( moveDirection === 'down' ) {
+				if ( orientation === 'horizontal' ) {
+					return isRTL ? leftArrow : rightArrow;
+				}
+				return downArrow;
 			}
-			return arrow;
+			return null;
 		};
 
-		const getMovementDirection = ( mdir ) => {
-			switch ( mdir ) {
-				case 'left':
-					mdir = isRTL ? 'right' : mdir;
-					break;
-
-				case 'right':
-					mdir = isRTL ? 'left' : mdir;
-					break;
-
-				default:
-					break;
+		const getMovementDirection = ( moveDirection ) => {
+			if ( moveDirection === 'up' ) {
+				if ( orientation === 'horizontal' ) {
+					return isRTL ? 'right' : 'left';
+				}
+				return 'up';
+			} else if ( moveDirection === 'down' ) {
+				if ( orientation === 'horizontal' ) {
+					return isRTL ? 'left' : 'right';
+				}
+				return 'down';
 			}
-			return mdir;
+			return null;
 		};
 
 		// We emulate a disabled state because forcefully applying the `disabled`
@@ -95,9 +90,9 @@ export class BlockMover extends Component {
 				<IconButton
 					className="editor-block-mover__control block-editor-block-mover__control"
 					onClick={ isFirst ? null : onMoveUp }
-					icon={ getArrowIcon( 'left' ) }
+					icon={ getArrowIcon( 'up' ) }
 					// translators: %s: Horizontal direction of block movement ( left, right )
-					label={ orientation === 'horizontal' ? sprintf( __( 'Move %s' ), getMovementDirection( 'left' ) ) : __( 'Move up' ) }
+					label={ sprintf( __( 'Move %s' ), getMovementDirection( 'up' ) ) }
 					aria-describedby={ `block-editor-block-mover__up-description-${ instanceId }` }
 					aria-disabled={ isFirst }
 					onFocus={ this.onFocus }
@@ -115,9 +110,9 @@ export class BlockMover extends Component {
 				<IconButton
 					className="editor-block-mover__control block-editor-block-mover__control"
 					onClick={ isLast ? null : onMoveDown }
-					icon={ getArrowIcon( 'right' ) }
+					icon={ getArrowIcon( 'down' ) }
 					// translators: %s: Horizontal direction of block movement ( left, right )
-					label={ orientation === 'horizontal' ? sprintf( __( 'Move %s' ), getMovementDirection( 'right' ) ) : __( 'Move down' ) }
+					label={ sprintf( __( 'Move %s' ), getMovementDirection( 'down' ) ) }
 					aria-describedby={ `block-editor-block-mover__down-description-${ instanceId }` }
 					aria-disabled={ isLast }
 					onFocus={ this.onFocus }
