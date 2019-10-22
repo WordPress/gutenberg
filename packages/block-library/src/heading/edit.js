@@ -76,7 +76,6 @@ function HeadingEdit( {
 					onRemove={ () => onReplace( [] ) }
 					className={ classnames( className, {
 						[ `has-text-align-${ align }` ]: align,
-						'has-text-color': TextColor.color,
 					} ) }
 					placeholder={ placeholder || __( 'Write heading…' ) }
 				/>

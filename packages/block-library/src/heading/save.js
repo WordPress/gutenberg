@@ -34,7 +34,7 @@ export default function save( { attributes } ) {
 			className={ className ? className : undefined }
 			tagName={ tagName }
 			style={ {
-				color: textClass ? undefined : customTextColor,
+				color: textColor,
 			} }
 			value={ content }
 		/>
