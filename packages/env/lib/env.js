@@ -30,9 +30,11 @@ const wpCliRun = ( command, isTests = false ) =>
 	);
 const setupSite = ( isTests = false ) =>
 	wpCliRun(
-		`wp core install --url=localhost:888${
-			isTests ? '9' : '8'
-		} --title=Gutenberg --admin_user=admin --admin_password=password --admin_email=admin@wordpress.org`,
+		`wp core install --url=localhost:${
+			isTests ?
+				process.env.WP_ENV_TESTS_PORT || 8889 :
+				process.env.WP_ENV_PORT || 8888
+		} --title=${ pluginName } --admin_user=admin --admin_password=password --admin_email=admin@wordpress.org`,
 		isTests
 	);
 const activatePlugin = ( isTests = false ) =>
