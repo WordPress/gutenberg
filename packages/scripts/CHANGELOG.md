@@ -1,3 +1,13 @@
+## Master
+
+### Breaking Changes
+
+- The bundled `npm-package-json-lint` dependency has been updated from requiring `^3.6.0` to requiring `^4.0.2` ([#18054](https://github.com/WordPress/gutenberg/pull/18054)). Please see the [migration guide](https://npmpackagejsonlint.org/docs/en/v3-to-v4). Note: `npmPackageJsonLintConfig` prop in the `package.json` file needs to be renamed to `npmpackagejsonlint`.
+
+### New Features
+
+- The bundled `puppeteer` dependency has been updated from requiring `^1.19.0` to requiring `^1.20.0` ([#18054](https://github.com/WordPress/gutenberg/pull/18054)). It uses Chromium v78 instead of Chromium v77.
+
 ## 5.1.0
 
 ### New Features
