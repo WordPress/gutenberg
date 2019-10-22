@@ -156,35 +156,6 @@
 		"webpack": "4.41.0",
 		"worker-farm": "1.7.0"
 	},
-	"npmpackagejsonlint": {
-		"extends": "@wordpress/npm-package-json-lint-config",
-		"rules": {
-			"description-format": [
-				"error",
-				{
-					"requireCapitalFirstLetter": true,
-					"requireEndingPeriod": true
-				}
-			],
-			"prefer-no-devDependencies": "error",
-			"require-publishConfig": "error",
-			"require-repository-directory": "error",
-			"valid-values-author": [
-				"error",
-				[
-					"The WordPress Contributors"
-				]
-			],
-			"valid-values-publishConfig": [
-				"error",
-				[
-					{
-						"access": "public"
-					}
-				]
-			]
-		}
-	},
 	"scripts": {
 		"prebuild": "npm run check-engines",
 		"clean:packages": "rimraf ./packages/*/build ./packages/*/build-module ./packages/*/build-style ./packages/*/node_modules",
@@ -207,7 +178,7 @@
 		"lint-js": "wp-scripts lint-js",
 		"lint-js:fix": "npm run lint-js -- --fix",
 		"lint-php": "wp-scripts env lint-php",
-		"lint-pkg-json": "wp-scripts lint-pkg-json 'packages/*/package.json'",
+		"lint-pkg-json": "wp-scripts lint-pkg-json . 'packages/*/package.json'",
 		"lint-css": "wp-scripts lint-style '**/*.scss'",
 		"lint-css:fix": "npm run lint-css -- --fix",
 		"lint-types": "tsc",
