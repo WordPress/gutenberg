@@ -171,6 +171,10 @@ _Related_
 
 Undocumented declaration.
 
+<a name="ColorPaletteControl" href="#ColorPaletteControl">#</a> **ColorPaletteControl**
+
+Undocumented declaration.
+
 <a name="ContrastChecker" href="#ContrastChecker">#</a> **ContrastChecker**
 
 Undocumented declaration.
