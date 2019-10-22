@@ -5,7 +5,7 @@ function VisuallyHidden( {
 } ) {
 	const TagName = isInline ? 'span' : 'div';
 	return (
-		<TagName className="screen-reader-text">
+		<TagName className="components-visually-hidden">
 			{ children }
 		</TagName>
 	);
