@@ -51,6 +51,7 @@ export const HeaderUI = styled.div`
 
 export const MediaUI = styled.div`
 	box-sizing: border-box;
+	overflow: hidden;
 
 	& > img,
 	& > iframe {
@@ -61,19 +62,13 @@ export const MediaUI = styled.div`
 	}
 
 	&:first-child {
-		img,
-		iframe {
-			border-top-left-radius: ${ borderRadius };
-			border-top-right-radius: ${ borderRadius };
-		}
+		border-top-left-radius: ${ borderRadius };
+		border-top-right-radius: ${ borderRadius };
 	}
 
 	&:last-child {
-		img,
-		iframe {
-			border-bottom-left-radius: ${ borderRadius };
-			border-bottom-right-radius: ${ borderRadius };
-		}
+		border-bottom-left-radius: ${ borderRadius };
+		border-bottom-right-radius: ${ borderRadius };
 	}
 `;
 

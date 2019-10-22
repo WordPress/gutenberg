@@ -2,8 +2,9 @@
  * External dependencies
  */
 /* eslint-disable import/no-extraneous-dependencies */
-import { boolean, text } from '@storybook/addon-knobs';
+import { boolean, number, select, text } from '@storybook/addon-knobs';
 /* eslint-enable import/no-extraneous-dependencies */
+import styled from 'styled-components';
 
 /**
  * Internal dependencies
@@ -103,5 +104,63 @@ export const iframeEmbed = () => {
 				></iframe>
 			</CardMedia>
 		</Card>
+	);
+};
+
+/**
+ * Referring to other styled components:
+ * https://www.styled-components.com/docs/advanced#referring-to-other-components
+ * https://www.styled-components.com/docs/advanced#caveat
+ */
+const StyledCardMedia = styled( CardMedia )( '' );
+const StyledCardBody = styled( CardBody )( '' );
+
+const HorizontallyAlignedCard = styled( Card )`
+	display: flex;
+
+	&.is-right {
+		flex-direction: row-reverse;
+	}
+
+	${ StyledCardBody } {
+		flex: 1;
+	}
+
+	${ StyledCardMedia } {
+		&.is-left {
+			border-radius: 3px 0 0 3px;
+		}
+		&.is-right {
+			border-radius: 0 3px 3px 0;
+		}
+	}
+`;
+
+export const horizontallyAligned = () => {
+	const align = select(
+		'Align',
+		{
+			left: 'left',
+			right: 'right',
+		},
+		'left'
+	);
+	const content = text( 'Content', 'Content' );
+	const maxWidth = number( 'Media Width', 200 );
+	const classes = `is-${ align }`;
+
+	return (
+		<>
+			<p>
+				Note: This story demonstrates how this UI may be created. It
+				requires extra styling.
+			</p>
+			<HorizontallyAlignedCard className={ classes }>
+				<StyledCardMedia className={ classes } style={ { maxWidth } }>
+					<DummyImage />
+				</StyledCardMedia>
+				<StyledCardBody>{ content }</StyledCardBody>
+			</HorizontallyAlignedCard>
+		</>
 	);
 };
