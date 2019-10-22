@@ -7,6 +7,7 @@ import {
 	Popover,
 	SlotFillProvider,
 } from '@wordpress/components';
+import { PluginArea } from '@wordpress/plugins';
 
 /**
  * Internal dependencies
@@ -33,6 +34,7 @@ function Layout( { blockEditorSettings } ) {
 				/>
 			</div>
 			<Popover.Slot />
+			<PluginArea />
 		</SlotFillProvider>
 	);
 }
