@@ -92,10 +92,11 @@ function retrieveAnnotationPositions( formats ) {
 /**
  * Updates annotations in the state based on positions retrieved from RichText.
  *
- * @param {Array}    annotations           The annotations that are currently applied.
- * @param {Array}    positions             The current positions of the given annotations.
- * @param {Function} removeAnnotation      Function to remove an annotation from the state.
- * @param {Function} updateAnnotationRange Function to update an annotation range in the state.
+ * @param {Array}    annotations                   The annotations that are currently applied.
+ * @param {Array}    positions                     The current positions of the given annotations.
+ * @param {Object}   actions
+ * @param {Function} actions.removeAnnotation      Function to remove an annotation from the state.
+ * @param {Function} actions.updateAnnotationRange Function to update an annotation range in the state.
  */
 function updateAnnotationsWithPositions( annotations, positions, { removeAnnotation, updateAnnotationRange } ) {
 	annotations.forEach( ( currentAnnotation ) => {

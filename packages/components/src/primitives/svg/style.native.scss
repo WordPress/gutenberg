@@ -1,9 +1,17 @@
-.dashicon {
+.dashicon-light,
+.components-toolbar__control-light {
 	color: #7b9ab1;
 	fill: currentColor;
 }
 
-.dashicon-active {
+.dashicon-dark,
+.components-toolbar__control-dark {
+	color: $gray_20;
+	fill: currentColor;
+}
+
+.dashicon-active,
+.is-active {
 	color: #fff;
 	fill: currentColor;
 }
@@ -13,12 +21,22 @@
 	fill: currentColor;
 }
 
-.unsupported-icon {
+.unsupported-icon-light {
 	color: $gray-dark;
 	fill: currentColor;
 }
 
-.warning-icon {
+.unsupported-icon-dark {
+	color: $white;
+	fill: currentColor;
+}
+
+.warning-icon-light {
 	color: $gray-dark;
+	fill: currentColor;
+}
+
+.warning-icon-dark {
+	color: $white;
 	fill: currentColor;
 }

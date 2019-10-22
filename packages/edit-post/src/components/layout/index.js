@@ -14,9 +14,9 @@ import {
 	navigateRegions,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { PreserveScrollInReorder } from '@wordpress/block-editor';
 import {
 	AutosaveMonitor,
+	LocalAutosaveMonitor,
 	UnsavedChangesWarning,
 	EditorNotices,
 	PostPublishPanel,
@@ -62,6 +62,7 @@ function Layout( {
 	const className = classnames( 'edit-post-layout', {
 		'is-sidebar-opened': sidebarIsOpened,
 		'has-fixed-toolbar': hasFixedToolbar,
+		'has-metaboxes': hasActiveMetaboxes,
 	} );
 
 	const publishLandmarkProps = {
@@ -76,6 +77,7 @@ function Layout( {
 			<BrowserURL />
 			<UnsavedChangesWarning />
 			<AutosaveMonitor />
+			<LocalAutosaveMonitor />
 			<Header />
 			<div
 				className="edit-post-layout__content"
@@ -85,7 +87,6 @@ function Layout( {
 				tabIndex="-1"
 			>
 				<EditorNotices />
-				<PreserveScrollInReorder />
 				<EditorModeKeyboardShortcuts />
 				<KeyboardShortcutHelpModal />
 				<ManageBlocksModal />

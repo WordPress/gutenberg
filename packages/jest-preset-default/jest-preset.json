@@ -15,9 +15,13 @@
 		"<rootDir>/node_modules/enzyme-to-json/serializer.js"
 	],
 	"testMatch": [
-		"**/__tests__/**/*.js",
-		"**/?(*.)(spec|test).js",
-		"**/test/*.js"
+		"**/__tests__/**/*.[jt]s",
+		"**/test/*.[jt]s",
+		"**/?(*.)test.[jt]s"
+	],
+	"testPathIgnorePatterns": [
+		"/node_modules/",
+		"/wordpress/"
 	],
 	"timers": "fake",
 	"transform": {

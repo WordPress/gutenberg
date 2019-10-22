@@ -126,7 +126,7 @@
 @mixin button-style__hover {
 	background-color: $white;
 	color: $dark-gray-900;
-	box-shadow: inset 0 0 0 1px $light-gray-500, inset 0 0 0 2px $white, 0 1px 1px rgba($dark-gray-900, 0.2);
+	box-shadow: inset 0 0 0 1px $dark-gray-500, inset 0 0 0 2px $white;
 }
 
 @mixin button-style__active() {
@@ -143,7 +143,6 @@
 
 	// Windows High Contrast mode will show this outline, but not the box-shadow.
 	outline: 2px solid transparent;
-	outline-offset: -2px;
 }
 
 // Switch.
@@ -173,7 +172,6 @@
 
 	// Windows High Contrast mode will show this outline, but not the box-shadow.
 	outline: 2px solid transparent;
-	outline-offset: -2px;
 }
 
 // Tabs, Inputs, Square buttons.
@@ -181,7 +179,7 @@
 	box-shadow: 0 0 0 transparent;
 	transition: box-shadow 0.1s linear;
 	border-radius: $radius-round-rectangle;
-	border: $border-width solid $dark-gray-150;
+	border: $border-width solid $dark-gray-200;
 	@include reduce-motion("transition");
 }
 
@@ -192,7 +190,6 @@
 
 	// Windows High Contrast mode will show this outline, but not the box-shadow.
 	outline: 2px solid transparent;
-	outline-offset: -2px;
 }
 
 // Square buttons.
@@ -244,7 +241,6 @@
 
 	// Windows High Contrast mode will show this outline, but not the box-shadow.
 	outline: 2px solid transparent;
-	outline-offset: -2px;
 }
 
 @mixin block-style__is-active() {
@@ -398,11 +394,6 @@
 		box-sizing: inherit;
 	}
 
-	select {
-		font-size: $default-font-size;
-		color: $dark-gray-500;
-	}
-
 	.input-control, // Upstream name is `.regular-text`.
 	input[type="text"],
 	input[type="search"],
@@ -428,8 +419,12 @@
 
 		/* Fonts smaller than 16px causes mobile safari to zoom. */
 		font-size: $mobile-text-min-font-size;
+		/* Override core line-height. To be reviewed. */
+		line-height: normal;
 		@include break-small {
 			font-size: $default-font-size;
+			/* Override core line-height. To be reviewed. */
+			line-height: normal;
 		}
 
 		&:focus {
@@ -444,6 +439,8 @@
 
 	select {
 		padding: 2px;
+		font-size: $default-font-size;
+		color: $dark-gray-500;
 
 		&:focus {
 			border-color: $blue-medium-600;
@@ -518,10 +515,14 @@
 		}
 	}
 
+	// We provide explicit pixel dimensions to ensure a crisp appearance.
+	// This radio button style should be ported upstream.
 	input[type="radio"] {
 		border-radius: $radius-round;
 
 		&:checked::before {
+			width: 6px;
+			height: 6px;
 			margin: 6px 0 0 6px;
 			background-color: $white;
 

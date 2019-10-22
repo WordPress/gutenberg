@@ -1,8 +1,4 @@
-/** @flow
- * @format */
-
 module.exports = {
-
 	//Mock block paragraph style with minimum height
 	blockText: {
 		minHeight: 50,
@@ -19,7 +15,7 @@ module.exports = {
 	blockCode: {
 		fontFamily: 'serif',
 	},
-	'rich-text': {
+	richText: {
 		fontFamily: 'serif',
 		minHeight: 30,
 	},
@@ -69,5 +65,14 @@ module.exports = {
 	},
 	iconUploading: {
 		fill: 'gray',
+	},
+	placeholder: {
+		color: 'gray',
+	},
+	richTextPlaceholder: {
+		color: 'gray',
+	},
+	unsupportedBlockIcon: {
+		color: 'white',
 	},
 };

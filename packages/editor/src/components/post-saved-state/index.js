@@ -8,7 +8,7 @@ import { get } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Dashicon, Button, IconButton } from '@wordpress/components';
+import { Animate, Dashicon, Button, IconButton } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { displayShortcut } from '@wordpress/keycodes';
@@ -66,10 +66,14 @@ export class PostSavedState extends Component {
 			} );
 
 			return (
-				<span className={ classes }>
-					<Dashicon icon="cloud" />
-					{ isAutosaving ? __( 'Autosaving' ) : __( 'Saving' ) }
-				</span>
+				<Animate type="loading">
+					{ ( { className: animateClassName } ) => (
+						<span className={ classnames( classes, animateClassName ) }>
+							<Dashicon icon="cloud" />
+							{ isAutosaving ? __( 'Autosaving' ) : __( 'Saving' ) }
+						</span>
+					) }
+				</Animate>
 			);
 		}
 
@@ -103,7 +107,7 @@ export class PostSavedState extends Component {
 				<IconButton
 					className="editor-post-save-draft"
 					label={ label }
-					onClick={ onSave }
+					onClick={ () => onSave() }
 					shortcut={ displayShortcut.primary( 's' ) }
 					icon="cloud-upload"
 				/>
@@ -113,7 +117,7 @@ export class PostSavedState extends Component {
 		return (
 			<Button
 				className="editor-post-save-draft"
-				onClick={ onSave }
+				onClick={ () => onSave() }
 				shortcut={ displayShortcut.primary( 's' ) }
 				isTertiary
 			>
@@ -152,5 +156,5 @@ export default compose( [
 		onSave: dispatch( 'core/editor' ).savePost,
 	} ) ),
 	withSafeTimeout,
-	withViewportMatch( { isLargeViewport: 'medium' } ),
+	withViewportMatch( { isLargeViewport: 'small' } ),
 ] )( PostSavedState );

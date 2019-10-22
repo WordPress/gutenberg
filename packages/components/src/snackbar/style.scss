@@ -8,6 +8,7 @@
 	padding: 16px 24px;
 	width: 100%;
 	max-width: 600px;
+	box-sizing: border-box;
 	cursor: pointer;
 
 	@include break-small() {
@@ -27,18 +28,25 @@
 }
 
 .components-snackbar__action.components-button {
-	margin-left: 32px;
+	margin-left: $grid-size * 4;
 	color: $white;
 	height: auto;
 	flex-shrink: 0;
 	line-height: $default-line-height;
+	padding: 0;
 
 	&:not(:disabled):not([aria-disabled="true"]):not(.is-default) {
 		text-decoration: underline;
+		background-color: transparent;
+
+		&:focus {
+			color: $white;
+			box-shadow: none;
+			outline: 1px dotted $white;
+		}
 
 		&:hover {
-			color: $white;
-			text-decoration: none;
+			color: $blue-medium-400;
 		}
 	}
 }
@@ -54,6 +62,7 @@
 	position: absolute;
 	z-index: z-index(".components-snackbar-list");
 	width: 100%;
+	box-sizing: border-box;
 }
 
 .components-snackbar-list__notice-container {

@@ -33,7 +33,7 @@ The plugin release process is entirely automated. To release the RC version of t
 To release a stable version, run:
 
 ```bash
-./bin.commander.js stable
+./bin/commander.js stable
 ```
 
 It is possible to run the "stable" release CLI in a consecutive way to release patch releases following the first stable release.

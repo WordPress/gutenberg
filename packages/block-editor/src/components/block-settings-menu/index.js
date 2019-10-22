@@ -6,7 +6,7 @@ import { castArray, flow } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _n } from '@wordpress/i18n';
 import {
 	Toolbar,
 	DropdownMenu,
@@ -25,6 +25,11 @@ import BlockUnknownConvertButton from './block-unknown-convert-button';
 import __experimentalBlockSettingsMenuFirstItem from './block-settings-menu-first-item';
 import __experimentalBlockSettingsMenuPluginsExtension from './block-settings-menu-plugins-extension';
 
+const POPOVER_PROPS = {
+	className: 'block-editor-block-settings-menu__popover editor-block-settings-menu__popover',
+	position: 'bottom right',
+};
+
 export function BlockSettingsMenu( { clientIds } ) {
 	const blockClientIds = castArray( clientIds );
 	const count = blockClientIds.length;
@@ -32,16 +37,21 @@ export function BlockSettingsMenu( { clientIds } ) {
 
 	return (
 		<BlockActions clientIds={ clientIds }>
-			{ ( { onDuplicate, onRemove, onInsertAfter, onInsertBefore, canDuplicate, isLocked } ) => (
+			{ ( {
+				canDuplicate,
+				canInsertDefaultBlock,
+				isLocked,
+				onDuplicate,
+				onInsertAfter,
+				onInsertBefore,
+				onRemove,
+			} ) => (
 				<Toolbar>
 					<DropdownMenu
 						icon="ellipsis"
 						label={ __( 'More options' ) }
-						position="bottom right"
 						className="block-editor-block-settings-menu"
-						__unstableToggleClassName="block-editor-block-settings-menu__toggle editor-block-settings-menu__toggle"
-						__unstableMenuClassName="block-editor-block-settings-menu__content editor-block-settings-menu__content"
-						__unstablePopoverClassName="block-editor-block-settings-menu__popover editor-block-settings-menu__popover"
+						popoverProps={ POPOVER_PROPS }
 					>
 						{ ( { onClose } ) => (
 							<>
@@ -59,7 +69,7 @@ export function BlockSettingsMenu( { clientIds } ) {
 											clientId={ firstBlockClientId }
 										/>
 									) }
-									{ ! isLocked && canDuplicate && (
+									{ canDuplicate && (
 										<MenuItem
 											className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
 											onClick={ flow( onClose, onDuplicate ) }
@@ -69,7 +79,7 @@ export function BlockSettingsMenu( { clientIds } ) {
 											{ __( 'Duplicate' ) }
 										</MenuItem>
 									) }
-									{ ! isLocked && (
+									{ canInsertDefaultBlock && (
 										<>
 											<MenuItem
 												className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
@@ -107,7 +117,7 @@ export function BlockSettingsMenu( { clientIds } ) {
 											icon="trash"
 											shortcut={ shortcuts.removeBlock.display }
 										>
-											{ __( 'Remove Block' ) }
+											{ _n( 'Remove Block', 'Remove Blocks', count ) }
 										</MenuItem>
 									) }
 								</MenuGroup>

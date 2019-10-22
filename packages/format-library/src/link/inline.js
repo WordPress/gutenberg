@@ -74,7 +74,7 @@ class InlineLinkUI extends Component {
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.onChangeInputValue = this.onChangeInputValue.bind( this );
 		this.setLinkTarget = this.setLinkTarget.bind( this );
-		this.onClickOutside = this.onClickOutside.bind( this );
+		this.onFocusOutside = this.onFocusOutside.bind( this );
 		this.resetState = this.resetState.bind( this );
 		this.autocompleteRef = createRef();
 
@@ -89,13 +89,15 @@ class InlineLinkUI extends Component {
 		const opensInNewWindow = target === '_blank';
 
 		if ( ! isShowingInput( props, state ) ) {
+			const update = {};
 			if ( url !== state.inputValue ) {
-				return { inputValue: url };
+				update.inputValue = url;
 			}
 
 			if ( opensInNewWindow !== state.opensInNewWindow ) {
-				return { opensInNewWindow };
+				update.opensInNewWindow = opensInNewWindow;
 			}
+			return Object.keys( update ).length ? update : null;
 		}
 
 		return null;
@@ -165,13 +167,13 @@ class InlineLinkUI extends Component {
 		}
 	}
 
-	onClickOutside( event ) {
+	onFocusOutside() {
 		// The autocomplete suggestions list renders in a separate popover (in a portal),
-		// so onClickOutside fails to detect that a click on a suggestion occurred in the
+		// so onFocusOutside fails to detect that a click on a suggestion occurred in the
 		// LinkContainer. Detect clicks on autocomplete suggestions using a ref here, and
 		// return to avoid the popover being closed.
 		const autocompleteElement = this.autocompleteRef.current;
-		if ( autocompleteElement && autocompleteElement.contains( event.target ) ) {
+		if ( autocompleteElement && autocompleteElement.contains( document.activeElement ) ) {
 			return;
 		}
 
@@ -198,7 +200,7 @@ class InlineLinkUI extends Component {
 				value={ value }
 				isActive={ isActive }
 				addingLink={ addingLink }
-				onClickOutside={ this.onClickOutside }
+				onFocusOutside={ this.onFocusOutside }
 				onClose={ this.resetState }
 				focusOnMount={ showInput ? 'firstElement' : false }
 				renderSettings={ () => (
@@ -210,7 +212,7 @@ class InlineLinkUI extends Component {
 				) }
 			>
 				{ showInput ? (
-					<URLPopover.__experimentalLinkEditor
+					<URLPopover.LinkEditor
 						className="editor-format-toolbar__link-container-content block-editor-format-toolbar__link-container-content"
 						value={ inputValue }
 						onChangeInputValue={ this.onChangeInputValue }
@@ -220,11 +222,11 @@ class InlineLinkUI extends Component {
 						autocompleteRef={ this.autocompleteRef }
 					/>
 				) : (
-					<URLPopover.__experimentalLinkViewer
+					<URLPopover.LinkViewer
 						className="editor-format-toolbar__link-container-content block-editor-format-toolbar__link-container-content"
 						onKeyPress={ stopKeyPropagation }
 						url={ url }
-						editLink={ this.editLink }
+						onEditLinkClick={ this.editLink }
 						linkClassName={ isValidHref( prependHTTP( url ) ) ? undefined : 'has-invalid-link' }
 					/>
 				) }

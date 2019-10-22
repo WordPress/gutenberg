@@ -2,11 +2,10 @@
  * External dependencies
  */
 import React from 'react';
-import { View, TextInput, TouchableWithoutFeedback, Text } from 'react-native';
+import { View, TouchableWithoutFeedback, Text } from 'react-native';
 /**
  * Internal dependencies
  */
-import Video from './video-player';
 import {
 	mediaUploadSync,
 	requestImageFailedRetryDialog,
@@ -21,13 +20,16 @@ import {
 	Toolbar,
 	ToolbarButton,
 } from '@wordpress/components';
+import { withPreferredColorScheme } from '@wordpress/compose';
 import {
+	Caption,
 	MediaPlaceholder,
 	MediaUpload,
+	MediaUploadProgress,
 	MEDIA_TYPE_VIDEO,
-	RichText,
 	BlockControls,
-	InspectorControls,
+	VIDEO_ASPECT_RATIO,
+	VideoPlayer,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { isURL } from '@wordpress/url';
@@ -36,19 +38,16 @@ import { doAction, hasAction } from '@wordpress/hooks';
 /**
  * Internal dependencies
  */
-import MediaUploadProgress from '../image/media-upload-progress';
 import style from './style.scss';
 import SvgIcon from './icon';
 import SvgIconRetry from './icon-retry';
-
-const VIDEO_ASPECT_RATIO = 1.7;
 
 class VideoEdit extends React.Component {
 	constructor( props ) {
 		super( props );
 
 		this.state = {
-			showSettings: false,
+			isCaptionSelected: false,
 			videoContainerHeight: 0,
 		};
 
@@ -59,6 +58,7 @@ class VideoEdit extends React.Component {
 		this.updateMediaProgress = this.updateMediaProgress.bind( this );
 		this.onVideoPressed = this.onVideoPressed.bind( this );
 		this.onVideoContanerLayout = this.onVideoContanerLayout.bind( this );
+		this.onFocusCaption = this.onFocusCaption.bind( this );
 	}
 
 	componentDidMount() {
@@ -75,6 +75,14 @@ class VideoEdit extends React.Component {
 		}
 	}
 
+	static getDerivedStateFromProps( props, state ) {
+		// Avoid a UI flicker in the toolbar by insuring that isCaptionSelected
+		// is updated immediately any time the isSelected prop becomes false
+		return {
+			isCaptionSelected: props.isSelected && state.isCaptionSelected,
+		};
+	}
+
 	onVideoPressed() {
 		const { attributes } = this.props;
 
@@ -82,6 +90,16 @@ class VideoEdit extends React.Component {
 			requestImageUploadCancelDialog( attributes.id );
 		} else if ( attributes.id && ! isURL( attributes.src ) ) {
 			requestImageFailedRetryDialog( attributes.id );
+		}
+
+		this.setState( {
+			isCaptionSelected: false,
+		} );
+	}
+
+	onFocusCaption() {
+		if ( ! this.state.isCaptionSelected ) {
+			this.setState( { isCaptionSelected: true } );
 		}
 	}
 
@@ -113,9 +131,9 @@ class VideoEdit extends React.Component {
 		this.setState( { isUploadInProgress: false } );
 	}
 
-	onSelectMediaUploadOption( mediaId, mediaUrl ) {
+	onSelectMediaUploadOption( { id, url } ) {
 		const { setAttributes } = this.props;
-		setAttributes( { id: mediaId, src: mediaUrl } );
+		setAttributes( { id, src: url } );
 	}
 
 	onVideoContanerLayout( event ) {
@@ -131,17 +149,18 @@ class VideoEdit extends React.Component {
 			return <Icon icon={ SvgIconRetry } { ...style.icon } />;
 		}
 
-		return <Icon icon={ SvgIcon } { ...( ! isMediaPlaceholder ? style.iconUploading : style.icon ) } />;
+		const iconStyle = this.props.getStylesFromColorScheme( style.icon, style.iconDark );
+		return <Icon icon={ SvgIcon } { ...( ! isMediaPlaceholder ? style.iconUploading : iconStyle ) } />;
 	}
 
 	render() {
-		const { attributes, isSelected, setAttributes } = this.props;
-		const { caption, id, src } = attributes;
+		const { attributes, isSelected } = this.props;
+		const { id, src } = attributes;
 		const { videoContainerHeight } = this.state;
 
 		const toolbarEditButton = (
-			<MediaUpload mediaType={ MEDIA_TYPE_VIDEO }
-				onSelectURL={ this.onSelectMediaUploadOption }
+			<MediaUpload allowedTypes={ [ MEDIA_TYPE_VIDEO ] }
+				onSelect={ this.onSelectMediaUploadOption }
 				render={ ( { open, getMediaOptions } ) => {
 					return (
 						<Toolbar>
@@ -161,8 +180,8 @@ class VideoEdit extends React.Component {
 			return (
 				<View style={ { flex: 1 } } >
 					<MediaPlaceholder
-						mediaType={ MEDIA_TYPE_VIDEO }
-						onSelectURL={ this.onSelectMediaUploadOption }
+						allowedTypes={ [ MEDIA_TYPE_VIDEO ] }
+						onSelect={ this.onSelectMediaUploadOption }
 						icon={ this.getIcon( false, true ) }
 						onFocus={ this.props.onFocus }
 					/>
@@ -173,16 +192,10 @@ class VideoEdit extends React.Component {
 		return (
 			<TouchableWithoutFeedback onPress={ this.onVideoPressed } disabled={ ! isSelected }>
 				<View style={ { flex: 1 } }>
-					<BlockControls>
-						{ toolbarEditButton }
-					</BlockControls>
-					<InspectorControls>
-						{ false && <ToolbarButton //Not rendering settings button until it has an action
-							label={ __( 'Video Settings' ) }
-							icon="admin-generic"
-							onClick={ () => ( null ) }
-						/> }
-					</InspectorControls>
+					{ ! this.state.isCaptionSelected &&
+						<BlockControls>
+							{ toolbarEditButton }
+						</BlockControls> }
 					<MediaUploadProgress
 						mediaId={ id }
 						onFinishMediaUploadWithSuccess={ this.finishMediaUploadWithSuccess }
@@ -211,8 +224,8 @@ class VideoEdit extends React.Component {
 								<View onLayout={ this.onVideoContanerLayout } style={ containerStyle }>
 									{ showVideo &&
 										<View style={ style.videoContainer }>
-											<Video
-												isSelected={ isSelected }
+											<VideoPlayer
+												isSelected={ isSelected && ! this.state.isCaptionSelected }
 												style={ videoStyle }
 												source={ { uri: src } }
 												paused={ true }
@@ -229,23 +242,16 @@ class VideoEdit extends React.Component {
 							);
 						} }
 					/>
-					{ ( ! RichText.isEmpty( caption ) > 0 || isSelected ) && (
-						<View style={ { paddingTop: 8, paddingBottom: 0, flex: 1 } }>
-							<TextInput
-								style={ { textAlign: 'center' } }
-								fontFamily={ this.props.fontFamily || ( style[ 'caption-text' ].fontFamily ) }
-								underlineColorAndroid="transparent"
-								value={ caption }
-								placeholder={ __( 'Write caption…' ) }
-								onChangeText={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
-								onFocus={ this.props.onFocus }
-							/>
-						</View>
-					) }
+					<Caption
+						clientId={ this.props.clientId }
+						isSelected={ this.state.isCaptionSelected }
+						onFocus={ this.onFocusCaption }
+						onBlur={ this.props.onBlur } // always assign onBlur as props
+					/>
 				</View>
 			</TouchableWithoutFeedback>
 		);
 	}
 }
 
-export default VideoEdit;
+export default withPreferredColorScheme( VideoEdit );

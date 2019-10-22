@@ -14,7 +14,7 @@ import memize from 'memize';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { compose } from '@wordpress/compose';
+import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { childrenBlock } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -47,7 +47,7 @@ const unescapeSpaces = ( text ) => {
  * Calls {@link pasteHandler} with a fallback to plain text when HTML processing
  * results in errors
  *
- * @param {function}  originalPasteHandler  The original handler function
+ * @param {Function}  originalPasteHandler  The original handler function
  * @param {Object}  [options]     The options to pass to {@link pasteHandler}
  *
  * @return {Array|string}         A list of blocks or a string, depending on
@@ -346,7 +346,6 @@ export class RichText extends Component {
 		this.lastAztecEventType = 'content size change';
 	}
 
-	// eslint-disable-next-line no-unused-vars
 	onEnter( event ) {
 		if ( this.props.onEnter ) {
 			this.props.onEnter();
@@ -385,7 +384,6 @@ export class RichText extends Component {
 		this.lastAztecEventType = 'input';
 	}
 
-	// eslint-disable-next-line no-unused-vars
 	onBackspace( event ) {
 		const {
 			__unstableOnMerge: onMerge,
@@ -442,7 +440,7 @@ export class RichText extends Component {
 	/**
 	 * Handles a paste event from the native Aztec Wrapper.
 	 *
-	 * @param {PasteEvent} event The paste event which wraps `nativeEvent`.
+	 * @param {Object} event The paste event which wraps `nativeEvent`.
 	 */
 	onPaste( event ) {
 		const {
@@ -755,13 +753,19 @@ export class RichText extends Component {
 
 	getHtmlToRender( record, tagName ) {
 		// Save back to HTML from React tree
-		const value = this.valueToFormat( record );
+		let value = this.valueToFormat( record );
 
-		if ( value === undefined || value === '' ) {
+		if ( value === undefined ) {
 			this.lastEventCount = undefined; // force a refresh on the native side
-			return '';
-		} else if ( tagName ) {
-			return `<${ tagName }>${ value }</${ tagName }>`;
+			value = '';
+		}
+		// On android if content is empty we need to send no content or else the placeholder with not show.
+		if ( ! this.isIOS && value === '' ) {
+			return value;
+		}
+
+		if ( tagName ) {
+			value = `<${ tagName }>${ value }</${ tagName }>`;
 		}
 		return value;
 	}
@@ -772,25 +776,28 @@ export class RichText extends Component {
 			style,
 			__unstableIsSelected: isSelected,
 			children,
+			getStylesFromColorScheme,
 		} = this.props;
 
 		const record = this.getRecord();
 		const html = this.getHtmlToRender( record, tagName );
 
-		let minHeight = styles[ 'rich-text' ].minHeight;
+		let minHeight = styles.richText.minHeight;
 		if ( style && style.minHeight ) {
 			minHeight = style.minHeight;
 		}
 
+		const placeholderStyle = getStylesFromColorScheme( styles.richTextPlaceholder, styles.richTextPlaceholderDark );
+
 		const {
 			color: defaultPlaceholderTextColor,
-		} = styles[ 'rich-text-placeholder' ];
+		} = placeholderStyle;
 
 		const {
 			color: defaultColor,
 			textDecorationColor: defaultTextDecorationColor,
 			fontFamily: defaultFontFamily,
-		} = styles[ 'rich-text' ];
+		} = getStylesFromColorScheme( styles.richText, styles.richTextDark );
 
 		let selection = null;
 		if ( this.needsSelectionUpdate ) {
@@ -880,4 +887,5 @@ export default compose( [
 	withSelect( ( select ) => ( {
 		formatTypes: select( 'core/rich-text' ).getFormatTypes(),
 	} ) ),
+	withPreferredColorScheme,
 ] )( RichText );

@@ -122,6 +122,23 @@ Undocumented declaration.
 
 Undocumented declaration.
 
+<a name="BlockPreview" href="#BlockPreview">#</a> **BlockPreview**
+
+BlockPreview renders a preview of a block or array of blocks.
+
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/block-preview/README.md>
+
+_Parameters_
+
+-   _blocks_ `(Array|Object)`: A block instance (object) or an array of blocks to be previewed.
+-   _viewportWidth_ `number`: Width of the preview container in pixels. Controls at what size the blocks will be rendered inside the preview. Default: 700.
+
+_Returns_
+
+-   `WPElement`: Rendered element.
+
 <a name="BlockSelectionClearer" href="#BlockSelectionClearer">#</a> **BlockSelectionClearer**
 
 Undocumented declaration.
@@ -370,7 +387,11 @@ The default editor settings
  bodyPlaceholder                        string        Empty post placeholder
  titlePlaceholder                       string        Empty title placeholder
  codeEditingEnabled                     string        Whether or not the user can switch to the code editor
- \_\_experimentalCanUserUseUnfilteredHTML string        Whether the user should be able to use unfiltered HTML or the HTML should be filtered e.g., to remove elements considered insecure like iframes.
+ showInserterHelpPanel                  boolean       Whether or not the inserter help panel is shown
+ **experimentalCanUserUseUnfilteredHTML string        Whether the user should be able to use unfiltered HTML or the HTML should be filtered e.g., to remove elements considered insecure like iframes.
+ **experimentalEnableLegacyWidgetBlock  boolean       Whether the user has enabled the Legacy Widget Block
+ **experimentalEnableMenuBlock          boolean       Whether the user has enabled the Menu Block
+ **experimentalBlockDirectory           boolean       Whether the user has enabled the Block Directory
 
 <a name="SkipToSelectedBlock" href="#SkipToSelectedBlock">#</a> **SkipToSelectedBlock**
 
@@ -400,6 +421,12 @@ _Parameters_
 _Returns_
 
 -   `Array`: converted rules.
+
+<a name="Typewriter" href="#Typewriter">#</a> **Typewriter**
+
+Ensures that the text selection keeps the same vertical distance from the
+viewport during keyboard events within this component. The vertical distance
+can vary. It is the last clicked or scrolled to position.
 
 <a name="URLInput" href="#URLInput">#</a> **URLInput**
 
@@ -444,7 +471,7 @@ export default compose(
 
 _Parameters_
 
--   _colorTypes_ `...(object|string)`: The arguments can be strings or objects. If the argument is an object, it should contain the color attribute name as key and the color context as value. If the argument is a string the value should be the color attribute name, the color context is computed by applying a kebab case transform to the value. Color context represents the context/place where the color is going to be used. The class name of the color is generated using 'has' followed by the color name and ending with the color context all in kebab case e.g: has-green-background-color.
+-   _colorTypes_ `...(Object|string)`: The arguments can be strings or objects. If the argument is an object, it should contain the color attribute name as key and the color context as value. If the argument is a string the value should be the color attribute name, the color context is computed by applying a kebab case transform to the value. Color context represents the context/place where the color is going to be used. The class name of the color is generated using 'has' followed by the color name and ending with the color context all in kebab case e.g: has-green-background-color.
 
 _Returns_
 
@@ -457,7 +484,7 @@ font size value retrieval, and font size change handling.
 
 _Parameters_
 
--   _args_ `...(object|string)`: The arguments should all be strings Each string contains the font size attribute name e.g: 'fontSize'.
+-   _fontSizeNames_ `...(Object|string)`: The arguments should all be strings. Each string contains the font size attribute name e.g: 'fontSize'.
 
 _Returns_
 

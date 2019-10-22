@@ -32,7 +32,7 @@ export function PostPublishButtonOrToggle( {
 	 * Conditions to show a BUTTON (publish directly) or a TOGGLE (open publish sidebar):
 	 *
 	 * 1) We want to show a BUTTON when the post status is at the _final stage_
-	 * for a particular role (see https://codex.wordpress.org/Post_Status):
+	 * for a particular role (see https://wordpress.org/support/article/post-status/):
 	 *
 	 * - is published
 	 * - is scheduled to be published

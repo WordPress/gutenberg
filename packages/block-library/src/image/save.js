@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -23,6 +24,8 @@ export default function save( { attributes } ) {
 		linkTarget,
 		sizeSlug,
 	} = attributes;
+
+	const newRel = isEmpty( rel ) ? undefined : rel;
 
 	const classes = classnames( {
 		[ `align${ align }` ]: align,
@@ -47,7 +50,7 @@ export default function save( { attributes } ) {
 					className={ linkClass }
 					href={ href }
 					target={ linkTarget }
-					rel={ rel }
+					rel={ newRel }
 				>
 					{ image }
 				</a>

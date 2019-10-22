@@ -21,8 +21,8 @@ import {
  * @return {null} This is a data component so does not render any ui.
  */
 export default function( { postId } ) {
-	useAdjustSidebarListener( postId );
 	useBlockSelectionListener( postId );
+	useAdjustSidebarListener( postId );
 	useUpdatePostLinkListener( postId );
 	const { triggerGuide } = useDispatch( 'core/nux' );
 	useEffect( () => {

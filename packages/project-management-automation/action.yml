@@ -1,0 +1,10 @@
+name: Gutenberg project management automation
+description: >
+  Various automation to assist with managing the Gutenberg GitHub repository.
+inputs:
+  github_token:
+    description: Secret GitHub API token to use for making API requests.
+    required: true
+runs:
+  using: node12
+  main: lib/index.js

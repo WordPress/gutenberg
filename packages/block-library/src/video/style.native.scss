@@ -53,14 +53,14 @@
 	border-style: solid;
 }
 
-.caption-text {
-	font-family: $default-regular-font;
-}
-
 .icon {
 	fill: $gray-dark;
 	width: 100%;
 	height: 100%;
+}
+
+.iconDark {
+	fill: $white;
 }
 
 .iconUploading {

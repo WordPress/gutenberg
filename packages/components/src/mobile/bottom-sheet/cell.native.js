@@ -10,6 +10,7 @@ import { isEmpty } from 'lodash';
 import { Dashicon } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { __, _x, sprintf } from '@wordpress/i18n';
+import { withPreferredColorScheme } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -17,7 +18,7 @@ import { __, _x, sprintf } from '@wordpress/i18n';
 import styles from './styles.scss';
 import platformStyles from './cellStyles.scss';
 
-export default class BottomSheetCell extends Component {
+class BottomSheetCell extends Component {
 	constructor( props ) {
 		super( ...arguments );
 		this.state = {
@@ -41,6 +42,7 @@ export default class BottomSheetCell extends Component {
 			value,
 			valuePlaceholder = '',
 			icon,
+			leftAlign,
 			labelStyle = {},
 			valueStyle = {},
 			onChangeValue,
@@ -48,13 +50,20 @@ export default class BottomSheetCell extends Component {
 			editable = true,
 			separatorType,
 			style = {},
+			getStylesFromColorScheme,
 			...valueProps
 		} = this.props;
 
 		const showValue = value !== undefined;
 		const isValueEditable = editable && onChangeValue !== undefined;
-		const defaultLabelStyle = showValue || icon !== undefined ? styles.cellLabel : styles.cellLabelCentered;
+		const cellLabelStyle = getStylesFromColorScheme( styles.cellLabel, styles.cellTextDark );
+		const cellLabelCenteredStyle = getStylesFromColorScheme( styles.cellLabelCentered, styles.cellTextDark );
+		const cellLabelLeftAlignNoIconStyle = getStylesFromColorScheme( styles.cellLabelLeftAlignNoIcon, styles.cellTextDark );
+		const defaultMissingIconAndValue = leftAlign ? cellLabelLeftAlignNoIconStyle : cellLabelCenteredStyle;
+		const defaultLabelStyle = showValue || icon !== undefined ? cellLabelStyle : defaultMissingIconAndValue;
+
 		const drawSeparator = ( separatorType && separatorType !== 'none' ) || separatorStyle === undefined;
+		const drawTopSeparator = drawSeparator && separatorType === 'topFullWidth';
 
 		const onCellPress = () => {
 			if ( isValueEditable ) {
@@ -75,22 +84,27 @@ export default class BottomSheetCell extends Component {
 		};
 
 		const separatorStyle = () => {
-			const leftMarginStyle = { ...styles.cellSeparator, ...platformStyles.separatorMarginLeft };
+			//eslint-disable-next-line @wordpress/no-unused-vars-before-return
+			const defaultSeparatorStyle = this.props.getStylesFromColorScheme( styles.separator, styles.separatorDark );
+			const cellSeparatorStyle = this.props.getStylesFromColorScheme( styles.cellSeparator, styles.cellSeparatorDark );
+			const leftMarginStyle = { ...cellSeparatorStyle, ...platformStyles.separatorMarginLeft };
 			switch ( separatorType ) {
 				case 'leftMargin':
 					return leftMarginStyle;
 				case 'fullWidth':
-					return styles.separator;
+				case 'topFullWidth':
+					return defaultSeparatorStyle;
 				case 'none':
 					return undefined;
 				case undefined:
-					return showValue ? leftMarginStyle : styles.separator;
+					return showValue ? leftMarginStyle : defaultSeparatorStyle;
 			}
 		};
 
 		const getValueComponent = () => {
 			const styleRTL = I18nManager.isRTL && styles.cellValueRTL;
-			const finalStyle = { ...styles.cellValue, ...valueStyle, ...styleRTL };
+			const cellValueStyle = this.props.getStylesFromColorScheme( styles.cellValue, styles.cellTextDark );
+			const finalStyle = { ...cellValueStyle, ...valueStyle, ...styleRTL };
 
 			// To be able to show the `middle` ellipsizeMode on editable cells
 			// we show the TextInput just when the user wants to edit the value,
@@ -114,7 +128,7 @@ export default class BottomSheetCell extends Component {
 				/>
 			) : (
 				<Text
-					style={ { ...styles.cellValue, ...valueStyle } }
+					style={ { ...cellValueStyle, ...valueStyle } }
 					numberOfLines={ 1 }
 					ellipsizeMode={ 'middle' }
 				>
@@ -142,6 +156,8 @@ export default class BottomSheetCell extends Component {
 				);
 		};
 
+		const iconStyle = getStylesFromColorScheme( styles.icon, styles.iconDark );
+
 		return (
 			<TouchableOpacity
 				accessible={ ! this.state.isEditingValue }
@@ -155,25 +171,30 @@ export default class BottomSheetCell extends Component {
 				onPress={ onCellPress }
 				style={ { ...styles.clipToBounds, ...style } }
 			>
+				{ drawTopSeparator && (
+					<View style={ separatorStyle() } />
+				) }
 				<View style={ styles.cellContainer }>
 					<View style={ styles.cellRowContainer }>
 						{ icon && (
 							<View style={ styles.cellRowContainer }>
-								<Dashicon icon={ icon } size={ 24 } />
+								<Dashicon icon={ icon } size={ 24 } color={ iconStyle.color } />
 								<View style={ platformStyles.labelIconSeparator } />
 							</View>
 						) }
-						<Text numberOfLines={ 1 } style={ { ...defaultLabelStyle, ...labelStyle } }>
+						<Text numberOfLines={ 1 } style={ [ defaultLabelStyle, labelStyle ] }>
 							{ label }
 						</Text>
 					</View>
 					{ showValue && getValueComponent() }
 					{ children }
 				</View>
-				{ drawSeparator && (
+				{ ! drawTopSeparator && (
 					<View style={ separatorStyle() } />
 				) }
 			</TouchableOpacity>
 		);
 	}
 }
+
+export default withPreferredColorScheme( BottomSheetCell );

@@ -273,6 +273,19 @@ _Returns_
 
 -   `string`: The block's default class.
 
+<a name="getBlockFromExample" href="#getBlockFromExample">#</a> **getBlockFromExample**
+
+Create a block object from the example API.
+
+_Parameters_
+
+-   _name_ `string`: 
+-   _example_ `Object`: 
+
+_Returns_
+
+-   `Object`: block.
+
 <a name="getBlockMenuDefaultClassName" href="#getBlockMenuDefaultClassName">#</a> **getBlockMenuDefaultClassName**
 
 Returns the block's default menu item classname from its name.
@@ -586,6 +599,7 @@ Converts an HTML string to known blocks. Strips everything else.
 
 _Parameters_
 
+-   _options_ `Object`: 
 -   _options.HTML_ `[string]`: The HTML to convert.
 -   _options.plainText_ `[string]`: Plain text version.
 -   _options.mode_ `[string]`: Handle content as blocks or inline content. _ 'AUTO': Decide based on the content passed. _ 'INLINE': Always handle as inline content, and return string. \* 'BLOCKS': Always handle as blocks, and return array of blocks.
@@ -602,6 +616,7 @@ Converts an HTML string to known blocks.
 
 _Parameters_
 
+-   _$1_ `Object`: 
 -   _$1.HTML_ `string`: The HTML to convert.
 
 _Returns_

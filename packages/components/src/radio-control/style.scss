@@ -1,6 +1,10 @@
 .components-radio-control {
 	display: flex;
 	flex-direction: column;
+
+	.components-base-control__help {
+		margin-top: 0;
+	}
 }
 
 .components-radio-control__option:not(:last-child) {

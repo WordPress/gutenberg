@@ -2,6 +2,7 @@
  * External dependencies
  */
 const { createHash } = require( 'crypto' );
+const json2php = require( 'json2php' );
 const { ExternalsPlugin } = require( 'webpack' );
 const { RawSource } = require( 'webpack-sources' );
 
@@ -15,6 +16,7 @@ class DependencyExtractionWebpackPlugin {
 		this.options = Object.assign(
 			{
 				injectPolyfill: false,
+				outputFormat: 'php',
 				useDefaults: true,
 			},
 			options
@@ -74,6 +76,14 @@ class DependencyExtractionWebpackPlugin {
 		return request;
 	}
 
+	stringify( asset ) {
+		if ( this.options.outputFormat === 'php' ) {
+			return `<?php return ${ json2php( JSON.parse( JSON.stringify( asset ) ) ) };`;
+		}
+
+		return JSON.stringify( asset );
+	}
+
 	apply( compiler ) {
 		this.externalsPlugin.apply( compiler );
 
@@ -81,10 +91,12 @@ class DependencyExtractionWebpackPlugin {
 		const { filename: outputFilename } = output;
 
 		compiler.hooks.emit.tap( this.constructor.name, ( compilation ) => {
-			// Process each entrypoint independently.
+			const { injectPolyfill, outputFormat } = this.options;
+
+			// Process each entry point independently.
 			for ( const [ entrypointName, entrypoint ] of compilation.entrypoints.entries() ) {
 				const entrypointExternalizedWpDeps = new Set();
-				if ( this.options.injectPolyfill ) {
+				if ( injectPolyfill ) {
 					entrypointExternalizedWpDeps.add( 'wp-polyfill' );
 				}
 
@@ -98,27 +110,31 @@ class DependencyExtractionWebpackPlugin {
 					}
 				}
 
-				// Build a stable JSON string that declares the WordPress script dependencies.
-				const sortedDepsArray = Array.from( entrypointExternalizedWpDeps ).sort();
-				const depsString = JSON.stringify( sortedDepsArray );
+				const runtimeChunk = entrypoint.getRuntimeChunk();
 
-				// Determine a filename for the `[entrypoint].deps.json` file.
+				// Get a stable, stringified representation of the WordPress script asset.
+				const assetString = this.stringify( {
+					dependencies: Array.from( entrypointExternalizedWpDeps ).sort(),
+					version: runtimeChunk.hash,
+				} );
+
+				// Determine a filename for the asset file.
 				const [ filename, query ] = entrypointName.split( '?', 2 );
-				const depsFilename = compilation
+				const assetFilename = compilation
 					.getPath( outputFilename, {
-						chunk: entrypoint.getRuntimeChunk(),
+						chunk: runtimeChunk,
 						filename,
 						query,
 						basename: basename( filename ),
 						contentHash: createHash( 'md4' )
-							.update( depsString )
+							.update( assetString )
 							.digest( 'hex' ),
 					} )
-					.replace( /\.js$/i, '.deps.json' );
+					.replace( /\.js$/i, '.asset.' + ( outputFormat === 'php' ? 'php' : 'json' ) );
 
 				// Add source and file into compilation for webpack to output.
-				compilation.assets[ depsFilename ] = new RawSource( depsString );
-				entrypoint.getRuntimeChunk().files.push( depsFilename );
+				compilation.assets[ assetFilename ] = new RawSource( assetString );
+				runtimeChunk.files.push( assetFilename );
 			}
 		} );
 	}

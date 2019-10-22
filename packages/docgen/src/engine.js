@@ -1,12 +1,12 @@
 /**
-* External dependencies.
-*/
+ * External dependencies.
+ */
 const espree = require( 'espree' );
 const { flatten } = require( 'lodash' );
 
 /**
-* Internal dependencies.
-*/
+ * Internal dependencies.
+ */
 const getIntermediateRepresentation = require( './get-intermediate-representation' );
 
 const getAST = ( source ) => espree.parse( source, {

@@ -11,6 +11,11 @@
 		&.is-toggled {
 			margin-left: 5px;
 		}
+
+		svg {
+			max-width: 24px;
+			max-height: 24px;
+		}
 	}
 
 	// Colorize plugin icons to ensure contrast and cohesion, but allow plugin developers to override.

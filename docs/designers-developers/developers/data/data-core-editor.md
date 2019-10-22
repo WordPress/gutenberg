@@ -118,12 +118,6 @@ _Related_
 
 -   getBlockCount in core/block-editor store.
 
-<a name="getBlockDependantsCacheBust" href="#getBlockDependantsCacheBust">#</a> **getBlockDependantsCacheBust**
-
-_Related_
-
--   getBlockDependantsCacheBust in core/block-editor store.
-
 <a name="getBlockHierarchyRootClientId" href="#getBlockHierarchyRootClientId">#</a> **getBlockHierarchyRootClientId**
 
 _Related_
@@ -197,6 +191,8 @@ _Related_
 -   getBlockSelectionStart in core/block-editor store.
 
 <a name="getBlocksForSerialization" href="#getBlocksForSerialization">#</a> **getBlocksForSerialization**
+
+> **Deprecated** since Gutenberg 6.2.0.
 
 Returns a set of blocks which are to be used in consideration of the post's
 generated save content.
@@ -315,8 +311,7 @@ _Returns_
 
 <a name="getEditedPostContent" href="#getEditedPostContent">#</a> **getEditedPostContent**
 
-Returns the content of the post being edited, preferring raw string edit
-before falling back to serialization of block state.
+Returns the content of the post being edited.
 
 _Parameters_
 
@@ -487,6 +482,8 @@ _Related_
 -   getPreviousBlockClientId in core/block-editor store.
 
 <a name="getReferenceByDistinctEdits" href="#getReferenceByDistinctEdits">#</a> **getReferenceByDistinctEdits**
+
+> **Deprecated** since Gutenberg 6.5.0.
 
 Returns a new reference when edited values have changed. This is useful in
 inferring where an edit has been made between states by comparison of the
@@ -746,6 +743,7 @@ Return true if the current post has already been published.
 _Parameters_
 
 -   _state_ `Object`: Global application state.
+-   _currentPost_ `?Object`: Explicit current post for bypassing registry selector.
 
 _Returns_
 
@@ -895,6 +893,18 @@ _Parameters_
 _Returns_
 
 -   `boolean`: Whether or not the permalink is editable.
+
+<a name="isPostAutosavingLocked" href="#isPostAutosavingLocked">#</a> **isPostAutosavingLocked**
+
+Returns whether post autosaving is locked.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `boolean`: Is locked.
 
 <a name="isPostLocked" href="#isPostLocked">#</a> **isPostLocked**
 
@@ -1046,10 +1056,7 @@ been edited.
 _Parameters_
 
 -   _edits_ `Object`: Post attributes to edit.
-
-_Returns_
-
--   `Object`: Action object.
+-   _options_ `Object`: Options for the edit.
 
 <a name="enablePublishSidebar" href="#enablePublishSidebar">#</a> **enablePublishSidebar**
 
@@ -1100,6 +1107,41 @@ _Related_
 
 Returns an action object used to signal that post saving is locked.
 
+_Usage_
+
+    const { subscribe } = wp.data;
+
+    const initialPostStatus = wp.data.select( 'core/editor' ).getEditedPostAttribute( 'status' );
+
+    // Only allow publishing posts that are set to a future date.
+    if ( 'publish' !== initialPostStatus ) {
+
+    	// Track locking.
+    	let locked = false;
+
+    	// Watch for the publish event.
+    	let unssubscribe = subscribe( () => {
+    		const currentPostStatus = wp.data.select( 'core/editor' ).getEditedPostAttribute( 'status' );
+    		if ( 'publish' !== currentPostStatus ) {
+
+    			// Compare the post date to the current date, lock the post if the date isn't in the future.
+    			const postDate = new Date( wp.data.select( 'core/editor' ).getEditedPostAttribute( 'date' ) );
+    			const currentDate = new Date();
+    			if ( postDate.getTime() <= currentDate.getTime() ) {
+    				if ( ! locked ) {
+    					locked = true;
+    					wp.data.dispatch( 'core/editor' ).lockPostSaving( 'futurelock' );
+    				}
+    			} else {
+    				if ( locked ) {
+    					locked = false;
+    					wp.data.dispatch( 'core/editor' ).unlockPostSaving( 'futurelock' );
+    				}
+    			}
+    		}
+    	} );
+    }
+
 _Parameters_
 
 -   _lockName_ `string`: The lock name.
@@ -1148,10 +1190,6 @@ _Related_
 
 Returns an action object used in signalling that undo history should
 restore last popped state.
-
-_Returns_
-
--   `Object`: Action object.
 
 <a name="refreshPost" href="#refreshPost">#</a> **refreshPost**
 
@@ -1210,10 +1248,6 @@ _Parameters_
 
 -   _blocks_ `Array`: Block Array.
 -   _options_ `?Object`: Optional options.
-
-_Returns_
-
--   `Object`: Action object
 
 <a name="resetPost" href="#resetPost">#</a> **resetPost**
 
@@ -1328,13 +1362,14 @@ Action generator for trashing the current post in the editor.
 
 Returns an action object used in signalling that undo history should pop.
 
-_Returns_
-
--   `Object`: Action object.
-
 <a name="unlockPostSaving" href="#unlockPostSaving">#</a> **unlockPostSaving**
 
 Returns an action object used to signal that post saving is unlocked.
+
+_Usage_
+
+    // Unlock post saving with the lock key `mylock`:
+    wp.data.dispatch( 'core/editor' ).unlockPostSaving( 'mylock' );
 
 _Parameters_
 

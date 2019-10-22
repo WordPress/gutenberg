@@ -20,9 +20,17 @@ module.exports = {
 	root: true,
 	extends: [
 		'plugin:@wordpress/eslint-plugin/recommended',
-		'plugin:jest/recommended',
+		'plugin:eslint-comments/recommended',
 	],
+	plugins: [
+		'import',
+	],
+	globals: {
+		wp: 'off',
+	},
 	rules: {
+		'@wordpress/dependency-group': 'error',
+		'@wordpress/gutenberg-phase': 'error',
 		'@wordpress/react-no-unsafe-timeout': 'error',
 		'no-restricted-syntax': [
 			'error',
@@ -56,6 +64,10 @@ module.exports = {
 			{
 				selector: 'CallExpression[callee.name=/^(__|_x|_n|_nx)$/] Literal[value=/\\.{3}/]',
 				message: 'Use ellipsis character (…) in place of three dots',
+			},
+			{
+				selector: 'ImportDeclaration[source.value="redux"] Identifier.imported[name="combineReducers"]',
+				message: 'Use `combineReducers` from `@wordpress/data`',
 			},
 			{
 				selector: 'ImportDeclaration[source.value="lodash"] Identifier.imported[name="memoize"]',
@@ -103,15 +115,30 @@ module.exports = {
 	},
 	overrides: [
 		{
+			files: [ 'packages/**/*.js' ],
+			rules: {
+				'import/no-extraneous-dependencies': 'error',
+			},
+			excludedFiles: [
+				'**/*.@(android|ios|native).js',
+				'**/benchmark/**/*.js',
+				'**/@(__mocks__|__tests__|test)/**/*.js',
+				'**/@(storybook|stories)/**/*.js',
+			],
+		},
+		{
+			files: [
+				'packages/jest*/**/*.js',
+			],
+			extends: [
+				'plugin:@wordpress/eslint-plugin/test-unit',
+			],
+		},
+		{
 			files: [ 'packages/e2e-test*/**/*.js' ],
-			env: {
-				browser: true,
-			},
-			globals: {
-				browser: true,
-				page: true,
-				wp: true,
-			},
+			extends: [
+				'plugin:@wordpress/eslint-plugin/test-e2e',
+			],
 		},
 	],
 };
