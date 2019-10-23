@@ -72,6 +72,7 @@
 		"@actions/github": "1.0.0",
 		"@babel/core": "7.4.5",
 		"@babel/plugin-syntax-jsx": "7.2.0",
+		"@babel/plugin-transform-flow-strip-types": "7.6.3",
 		"@babel/runtime-corejs3": "7.4.5",
 		"@babel/traverse": "7.4.5",
 		"@octokit/rest": "16.26.0",
@@ -178,8 +179,8 @@
 		"stylelint-config-wordpress": "13.1.0",
 		"typescript": "3.5.3",
 		"uuid": "3.3.2",
-		"webpack": "4.41.0",
 		"wd": "^1.11.1",
+		"webpack": "4.41.0",
 		"worker-farm": "1.7.0"
 	},
 	"npmPackageJsonLintConfig": {
