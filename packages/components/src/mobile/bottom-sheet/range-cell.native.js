@@ -40,8 +40,8 @@ export default function BottomSheetRangeCell( props ) {
 
 	const accessibilityLabel =
 	sprintf(
-		/* translators: accessibility text. Inform about current spacer height value. %2$s: Spacer height current value. */
-		_x( '%1$s. Current value is %2$s px', 'range cell' ),
+		/* translators: accessibility text. Inform about current value. %2$s: Current value. */
+		_x( '%1$s. Current value is %2$s', 'Slider for picking a number inside a range' ),
 		cellProps.label, value
 	);
 
