@@ -33,6 +33,10 @@ class Slider extends Component {
 		}
 	}
 
+	componentWillUnmount() {
+		this.handleToggleFocus();
+	}
+
 	handleToggleFocus( validateInput = true ) {
 		const newState = { hasFocus: ! this.state.hasFocus };
 

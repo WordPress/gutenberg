@@ -52,7 +52,7 @@ const SpacerEdit = ( { isSelected, attributes, setAttributes } ) => {
 	return (
 		<View style={ [ styles.staticSpacer, isSelected && styles.selectedSpacer, { height } ] }>
 			<InspectorControls>
-				<PanelBody title={ __( 'SpacerSettings' ) } >
+				<PanelBody title={ __( 'Spacer Settings' ) } >
 					<BottomSheet.RangeCell
 						icon={ 'admin-settings' }
 						label={ __( 'Height in pixels' ) }
