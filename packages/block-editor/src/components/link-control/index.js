@@ -139,7 +139,7 @@ function LinkControl( { currentLink, fetchSearchSuggestions, onLinkChange, onSet
 								>
 									{ currentLink.title }
 								</ExternalLink>
-								<span className="block-editor-link-control__search-item-info">{ currentLink.info || filterURLForDisplay( safeDecodeURI( currentLink.url ) ) || '' }</span>
+								<span className="block-editor-link-control__search-item-info">{ filterURLForDisplay( safeDecodeURI( currentLink.url ) ) || '' }</span>
 							</span>
 
 							<Button isDefault onClick={ onStartEditing } className="block-editor-link-control__search-item-action block-editor-link-control__search-item-action--edit">

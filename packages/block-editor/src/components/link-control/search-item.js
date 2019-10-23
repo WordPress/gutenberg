@@ -12,6 +12,7 @@ import TextHighlight from './text-highlight';
  * WordPress dependencies
  */
 import { safeDecodeURI } from '@wordpress/url';
+import { __ } from '@wordpress/i18n';
 
 import {
 	Icon,
@@ -35,7 +36,12 @@ export const LinkControlSearchItem = ( { itemProps, suggestion, isSelected = fal
 				<span className="block-editor-link-control__search-item-title">
 					<TextHighlight text={ suggestion.title } highlight={ searchTerm } />
 				</span>
-				<span aria-hidden={ ! isURL } className="block-editor-link-control__search-item-info">{ safeDecodeURI( suggestion.url ) || '' }</span>
+				<span aria-hidden={ ! isURL } className="block-editor-link-control__search-item-info">
+					{ ! isURL && ( safeDecodeURI( suggestion.url ) || '' ) }
+					{ isURL && (
+						__( 'Press ENTER to add this link' )
+					) }
+				</span>
 			</span>
 			{ suggestion.type && (
 				<span className="block-editor-link-control__search-item-type">{ suggestion.type }</span>
