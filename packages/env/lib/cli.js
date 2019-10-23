@@ -46,10 +46,10 @@ module.exports = function cli() {
 			chalk`Starts WordPress for development on port {bold.underline ${ terminalLink(
 				'8888',
 				'http://localhost:8888'
-			) }} and tests on port {bold.underline ${ terminalLink(
+			) }} (override with WP_ENV_PORT) and tests on port {bold.underline ${ terminalLink(
 				'8889',
 				'http://localhost:8889'
-			) }}. If the current working directory is a plugin and/or has e2e-tests with plugins and/or mu-plugins, they will be mounted appropiately.`
+			) }} (override with WP_ENV_TESTS_PORT). If the current working directory is a plugin and/or has e2e-tests with plugins and/or mu-plugins, they will be mounted appropiately.`
 		),
 		( args ) => {
 			args.positional( 'ref', {
