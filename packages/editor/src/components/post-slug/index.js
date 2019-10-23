@@ -41,7 +41,7 @@ export class PostSlug extends Component {
 		const { instanceId } = this.props;
 		const { editedSlug } = this.state;
 
-		const inputId = 'edit-post-post-slug-' + instanceId;
+		const inputId = 'editor-post-slug-' + instanceId;
 
 		return (
 			<PostSlugCheck>
@@ -52,7 +52,7 @@ export class PostSlug extends Component {
 					value={ editedSlug }
 					onChange={ ( event ) => this.setState( { editedSlug: event.target.value } ) }
 					onBlur={ this.setSlug }
-					className="edit-post-post-slug__input"
+					className="editor-post-slug__input"
 				/>
 			</PostSlugCheck>
 		);
