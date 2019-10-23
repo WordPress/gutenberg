@@ -12,7 +12,7 @@ import { camelCase, upperFirst } from 'lodash';
  * @param {string}   modifierName                    Seed name from which to
  *                                                   generated display name.
  *
- * @return {import('@wordpress/element').WPComponent} Component class with generated display name assigned.
+ * @return {WPComponent} Component class with generated display name assigned.
  */
 function createHigherOrderComponent( mapComponentToEnhancedComponent, modifierName ) {
 	return ( OriginalComponent ) => {

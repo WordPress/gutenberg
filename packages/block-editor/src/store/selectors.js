@@ -265,7 +265,7 @@ export const getGlobalBlockCount = createSelector(
  * @param {Object}   state     Editor state.
  * @param {string[]} clientIds Client IDs for which blocks are to be returned.
  *
- * @return {import('@wordpress/blocks').WPBlockType[]} Block objects.
+ * @return {WPBlock[]} Block objects.
  */
 export const getBlocksByClientId = createSelector(
 	( state, clientIds ) => map(
@@ -1125,9 +1125,9 @@ const canIncludeBlockTypeInInserter = ( state, blockType, rootClientId ) => {
  * @param {Object}  state        Editor state.
  * @param {?string} rootClientId Optional root client ID of block list.
  *
- * @return {EditorInserterItem[]} Items that appear in inserter.
+ * @return {WPEditorInserterItem[]} Items that appear in inserter.
  *
- * @typedef {Object} EditorInserterItem
+ * @typedef {Object} WPEditorInserterItem
  * @property {string}   id                Unique identifier for the item.
  * @property {string}   name              The type of block to create.
  * @property {Object}   initialAttributes Attributes to pass to the newly created block.

@@ -41,7 +41,7 @@ async function openPreviewPage( editorPage ) {
  * Given a Puppeteer Page instance for a preview window, clicks Preview, and
  * awaits the window navigation.
  *
- * @param {import('puppeteer').Page} previewPage Page on which to await navigation.
+ * @param {puppeteer.Page} previewPage Page on which to await navigation.
  *
  * @return {Promise} Promise resolving once navigation completes.
  */

@@ -10,9 +10,9 @@ import { createHigherOrderComponent, compose } from '@wordpress/compose';
  * Higher-order component which renders the original component with the current
  * registry context passed as its `registry` prop.
  *
- * @param {import('@wordpress/element').WPComponent} OriginalComponent Original component.
+ * @param {WPComponent} OriginalComponent Original component.
  *
- * @return {import('@wordpress/element').WPComponent} Enhanced component.
+ * @return {WPComponent} Enhanced component.
  */
 const withRegistry = createHigherOrderComponent(
 	( OriginalComponent ) => ( props ) => (
@@ -75,8 +75,8 @@ class BlockEditorProvider extends Component {
 	 * This needs to be done synchronously after state changes (instead of using
 	 * `componentDidUpdate`) in order to avoid batching these changes.
 	 *
-	 * @param {import('@wordpress/data').WPDataRegistry} registry Registry from which block editor
-	 *                                                            dispatch is to be overridden.
+	 * @param {WPDataRegistry} registry Registry from which block editor
+	 *                                  dispatch is to be overridden.
 	 */
 	attachChangeObserver( registry ) {
 		if ( this.unsubscribe ) {

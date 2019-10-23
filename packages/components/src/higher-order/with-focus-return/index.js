@@ -35,12 +35,12 @@ function isComponentLike( object ) {
  * reference to the current active element so we know where to restore focus
  * when the component is unmounted.
  *
- * @param {(import('@wordpress/element').WPComponent|Object)} options The component to be enhanced with
- *                                                                    focus return behavior, or an object
- *                                                                    describing the component and the
- *                                                                    focus return characteristics.
+ * @param {(WPComponent|Object)} options The component to be enhanced with
+ *                                      focus return behavior, or an object
+ *                                      describing the component and the
+ *                                      focus return characteristics.
  *
- * @return {import('@wordpress/element').WPComponent} Component with the focus restauration behaviour.
+ * @return {WPComponent} Component with the focus restauration behaviour.
  */
 function withFocusReturn( options ) {
 	// Normalize as overloaded form `withFocusReturn( options )( Component )`

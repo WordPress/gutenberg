@@ -137,7 +137,7 @@ _Parameters_
 
 _Returns_
 
--   `null`: The component to be rendered.
+-   `WPComponent`: The component to be rendered.
 
 <a name="BlockSelectionClearer" href="#BlockSelectionClearer">#</a> **BlockSelectionClearer**
 

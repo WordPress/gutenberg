@@ -6,10 +6,10 @@ import { get } from 'lodash';
 /**
  * Creates a middleware handling resolvers cache invalidation.
  *
- * @param {import('./registry').WPDataRegistry} registry   The registry reference for which to create
- *                                                         the middleware.
- * @param {string}                              reducerKey The namespace for which to create the
- *                                                         middleware.
+ * @param {WPDataRegistry} registry   The registry reference for which to create
+ *                                    the middleware.
+ * @param {string}         reducerKey The namespace for which to create the
+ *                                    middleware.
  *
  * @return {Function} Middleware function.
  */

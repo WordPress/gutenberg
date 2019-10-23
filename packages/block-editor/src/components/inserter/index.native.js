@@ -50,7 +50,7 @@ class Inserter extends Component {
 	 *                                    pressed.
 	 * @param {boolean}  options.isOpen   Whether dropdown is currently open.
 	 *
-	 * @return {import('@wordpress/element').WPElement} Dropdown toggle element.
+	 * @return {WPElement} Dropdown toggle element.
 	 */
 	renderToggle( { onToggle, isOpen } ) {
 		const {
@@ -69,7 +69,7 @@ class Inserter extends Component {
 	 * @param {Function} options.onClose Callback to invoke when dropdown is
 	 *                                   closed.
 	 *
-	 * @return {import('@wordpress/element').WPElement} Dropdown content element.
+	 * @return {WPElement} Dropdown content element.
 	 */
 	renderContent( { onClose, isOpen } ) {
 		const { rootClientId, clientId, isAppender } = this.props;

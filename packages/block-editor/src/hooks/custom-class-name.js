@@ -47,9 +47,9 @@ export function addAttribute( settings ) {
  * Override the default edit UI to include a new block inspector control for
  * assigning the custom class name, if block supports custom class name.
  *
- * @param {import('@wordpress/element').WPComponent} BlockEdit Original component.
+ * @param {WPComponent} BlockEdit Original component.
  *
- * @return {import('@wordpress/element').WPComponent} Wrapped component.
+ * @return {WPComponent} Wrapped component.
  */
 export const withInspectorControl = createHigherOrderComponent( ( BlockEdit ) => {
 	return ( props ) => {

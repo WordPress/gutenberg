@@ -4,10 +4,6 @@
 import defaultRegistry from './default-registry';
 
 /**
- * @typedef {import('./registry').WPDataRegistry} WPDataRegistry
- */
-
-/**
  * Mark a selector as a registry selector.
  *
  * @param {Function} registrySelector Function receiving a registry object and returning a state selector.
@@ -29,7 +25,7 @@ export function createRegistrySelector( registrySelector ) {
 	 * Registry on which to call `select`, stubbed for non-standard usage to
 	 * use the default registry.
 	 *
-	 * @type {import('./registry').WPDataRegistry}
+	 * @type {WPDataRegistry}
 	 */
 	selector.registry = defaultRegistry;
 

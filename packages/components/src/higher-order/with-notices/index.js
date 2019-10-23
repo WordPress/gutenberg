@@ -17,9 +17,9 @@ import NoticeList from '../../notice/list';
 /**
  * Override the default edit UI to include notices if supported.
  *
- * @param  {import('@wordpress/element').WPComponent} OriginalComponent Original component.
+ * @param  {WPComponent} OriginalComponent Original component.
  *
- * @return {import('@wordpress/element').WPComponent} Wrapped component.
+ * @return {WPComponent} Wrapped component.
  */
 export default createHigherOrderComponent( ( OriginalComponent ) => {
 	return class WrappedBlockEdit extends Component {

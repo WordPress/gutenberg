@@ -45,7 +45,7 @@ import useSelect from '../use-select';
  * component and update automatically if the price of a hammer ever changes in
  * the store.
  *
- * @return {import('@wordpress/element').WPComponent} Enhanced component with merged state data props.
+ * @return {WPComponent} Enhanced component with merged state data props.
  */
 const withSelect = ( mapSelectToProps ) => createHigherOrderComponent(
 	( WrappedComponent ) => pure(

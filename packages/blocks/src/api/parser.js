@@ -296,11 +296,11 @@ export function getBlockAttributes( blockTypeOrName, innerHTML, attributes = {} 
  * deprecated migrations applied, or the original block if it was both valid
  * and no eligible migrations exist.
  *
- * @param {import('./registration').WPBlockType} block            Original block object.
- * @param {Object}                               parsedAttributes Attributes as parsed from the initial
- *                                                                block markup.
+ * @param {WPBlock} block            Original block object.
+ * @param {Object}  parsedAttributes Attributes as parsed from the initial
+ *                                   block markup.
  *
- * @return {import('./registration').WPBlockType} Migrated block object.
+ * @return {WPBlock} Migrated block object.
  */
 export function getMigratedBlock( block, parsedAttributes ) {
 	const blockType = getBlockType( block.name );

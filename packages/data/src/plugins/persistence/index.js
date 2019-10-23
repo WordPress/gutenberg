@@ -112,10 +112,10 @@ export function createPersistenceInterface( options ) {
 /**
  * Data plugin to persist store state into a single storage key.
  *
- * @param {import('../../registry').WPDataRegistry} registry      Data registry.
- * @param {?WPDataPersistencePluginOptions}         pluginOptions Plugin options.
+ * @param {WPDataRegistry}                  registry      Data registry.
+ * @param {?WPDataPersistencePluginOptions} pluginOptions Plugin options.
  *
- * @return {import('../../registry').WPDataPlugin} Data plugin.
+ * @return {WPDataPlugin} Data plugin.
  */
 const persistencePlugin = function( registry, pluginOptions ) {
 	const persistence = createPersistenceInterface( pluginOptions );

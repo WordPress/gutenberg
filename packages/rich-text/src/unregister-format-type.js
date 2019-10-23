@@ -9,8 +9,8 @@ import { removeFilter } from '@wordpress/hooks';
  *
  * @param {string} name Format name.
  *
- * @return {import('./register-format-type').WPFormat|undefined} The previous format value,
- *         if it has been successfully unregistered; otherwise `undefined`.
+ * @return {WPFormat|undefined} The previous format value, if it has been successfully
+ *                              unregistered; otherwise `undefined`.
  */
 export function unregisterFormatType( name ) {
 	const oldFormat = select( 'core/rich-text' ).getFormatType( name );

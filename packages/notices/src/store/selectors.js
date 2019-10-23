@@ -34,7 +34,7 @@ const DEFAULT_NOTICES = [];
  * @property {boolean} speak            Whether the notice content should be
  *                                      announced to screen readers. Defaults to
  *                                      `true`.
- * @property {import('./actions').WPNoticeAction[]} actions User actions to present with notice.
+ * @property {WPNoticeAction[]} actions User actions to present with notice.
  *
  */
 

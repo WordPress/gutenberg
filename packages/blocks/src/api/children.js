@@ -16,7 +16,7 @@ import * as node from './node';
 /**
  * A representation of a block's rich text value.
  *
- * @typedef {import('./node').WPBlockNode[]} WPBlockChildren
+ * @typedef {WPBlockNode[]} WPBlockChildren
  */
 
 /**
@@ -24,7 +24,7 @@ import * as node from './node';
  *
  * @param {WPBlockChildren} children Block children object to convert.
  *
- * @return {import('@wordpress/element').WPElement} A serialize-capable element.
+ * @return {WPElement} A serialize-capable element.
  */
 export function getSerializeCapableElement( children ) {
 	// The fact that block children are compatible with the element serializer is
@@ -41,7 +41,7 @@ export function getSerializeCapableElement( children ) {
  *
  * @param {WPBlockChildren} children Block children object to convert.
  *
- * @return {Array<import('./node').WPBlockNode>} An array of individual block nodes.
+ * @return {Array<WPBlockNode>} An array of individual block nodes.
  */
 function getChildrenArray( children ) {
 	// The fact that block children are compatible with the element serializer

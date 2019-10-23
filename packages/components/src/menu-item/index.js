@@ -18,7 +18,7 @@ import IconButton from '../icon-button';
 /**
  * Renders a generic menu item for use inside the more menu.
  *
- * @return {import('@wordpress/element').WPComponent} The component to be rendered.
+ * @return {WPComponent} The component to be rendered.
  */
 export function MenuItem( {
 	children,

@@ -31,19 +31,19 @@ import { isString } from 'lodash';
 /**
  * Object containing a React element.
  *
- * @typedef {import('react').ReactElement} WPElement
+ * @typedef {react.ReactElement} WPElement
  */
 
 /**
  * Object containing a React component.
  *
- * @typedef {import('react').Component} WPComponent
+ * @typedef {react.Component} WPComponent
  */
 
 /**
  * Object containing a React synthetic event.
  *
- * @typedef {import('react').SyntheticEvent} WPSyntheticEvent
+ * @typedef {react.SyntheticEvent} WPSyntheticEvent
  */
 
 /**
@@ -107,7 +107,7 @@ export { createRef };
  * @param {Function} forwarder Function passed `props` and `ref`, expected to
  *                             return an element.
  *
- * @return {Component} Enhanced component.
+ * @return {WPComponent} Enhanced component.
  */
 export { forwardRef };
 

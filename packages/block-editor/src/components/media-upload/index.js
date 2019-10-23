@@ -8,7 +8,7 @@ import { withFilters } from '@wordpress/components';
  * an integration with the core blocks that handle media files. By default it renders nothing but
  * it provides a way to have it overridden with the `editor.MediaUpload` filter.
  *
- * @return {import('@wordpress/element').WPComponent} The component to be rendered.
+ * @return {WPComponent} The component to be rendered.
  */
 const MediaUpload = () => null;
 

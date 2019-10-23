@@ -101,7 +101,7 @@ class ModalFrame extends Component {
 	/**
 	 * Renders the modal frame element.
 	 *
-	 * @return {import('@wordpress/element').WPElement} The modal frame element.
+	 * @return {WPElement} The modal frame element.
 	 */
 	render() {
 		const {
