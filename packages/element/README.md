@@ -225,6 +225,11 @@ _Related_
 
 -   <https://reactjs.org/docs/react-api.html#reactmemo>
 
+<a name="Platform" href="#Platform">#</a> **Platform**
+
+Component used to detect the current Platform being used. Use Platform.OS === 'web' to detect if running on web enviroment.
+This is the same concept as the React-Native implementation found here: <https://facebook.github.io/react-native/docs/platform-specific-code#platform-module>
+
 <a name="RawHTML" href="#RawHTML">#</a> **RawHTML**
 
 Component used as equivalent of Fragment with unescaped HTML, in cases where
