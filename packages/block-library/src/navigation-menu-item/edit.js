@@ -35,7 +35,6 @@ import {
 	BlockControls,
 	InnerBlocks,
 	InspectorControls,
-	PlainText,
 	URLPopover,
 } from '@wordpress/block-editor';
 import {
@@ -84,16 +83,14 @@ function NavigationMenuItemEdit( {
 	let content;
 	if ( isSelected ) {
 		content = (
-			<div className="wp-block-navigation-menu-item__edit-container">
-				<PlainText
-					ref={ plainTextRef }
-					className="wp-block-navigation-menu-item__field"
-					value={ label }
-					onChange={ ( labelValue ) => setAttributes( { label: labelValue } ) }
-					aria-label={ __( 'Navigation Label' ) }
-					maxRows={ 1 }
-				/>
-			</div>
+			<TextControl
+				ref={ plainTextRef }
+				className="wp-block-navigation-menu-item__field"
+				value={ label }
+				onChange={ ( labelValue ) => setAttributes( { label: labelValue } ) }
+				label={ __( 'Navigation Label' ) }
+				hideLabelFromVision={ true }
+			/>
 		);
 	} else {
 		content = <div className="wp-block-navigation-menu-item__container">
