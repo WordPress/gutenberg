@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { some, castArray, first, mapValues, pickBy, includes } from 'lodash';
+import { some, castArray, find, mapValues, pickBy, includes } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -29,7 +29,7 @@ function segmentHTMLToShortcodeBlock( HTML, lastIndex = 0 ) {
 	}
 
 	const transformTags = castArray( transformation.tag );
-	const transformTag = first( transformTags );
+	const transformTag = find( transformTags, ( tag ) => regexp( tag ).test( HTML ) );
 
 	let match;
 
