@@ -126,6 +126,9 @@ function gutenberg_fix_template_admin_menu_entry() {
 		return;
 	}
 	$post_type = get_post_type_object( 'wp_template' );
+	if ( ! $post_type ) {
+		return;
+	}
 	foreach ( $submenu['themes.php'] as $key => $submenu_entry ) {
 		if ( $post_type->labels->all_items === $submenu['themes.php'][ $key ][0] ) {
 			$submenu['themes.php'][ $key ][0] = $post_type->labels->menu_name; // phpcs:ignore WordPress.WP.GlobalVariablesOverride
