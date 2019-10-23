@@ -31,8 +31,13 @@ const BlockBreadcrumb = function() {
 		};
 	}, [] );
 
+	/*
+	 * Disable reason: The `list` ARIA role is redundant but
+	 * Safari+VoiceOver won't announce the list otherwise.
+	 */
+	/* eslint-disable jsx-a11y/no-redundant-roles */
 	return (
-		<ul className="block-editor-block-breadcrumb">
+		<ul className="block-editor-block-breadcrumb" role="list">
 			<li>
 				<Button
 					className="block-editor-block-breadcrumb__button"
@@ -59,6 +64,7 @@ const BlockBreadcrumb = function() {
 				</li>
 			) }
 		</ul>
+		/* eslint-enable jsx-a11y/no-redundant-roles */
 	);
 };
 

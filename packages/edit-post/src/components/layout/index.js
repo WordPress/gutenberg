@@ -103,7 +103,13 @@ function Layout( {
 				{ isMobileViewport && sidebarIsOpened && <ScrollLock /> }
 			</div>
 			{ isRichEditingEnabled && mode === 'visual' && (
-				<div className="edit-post-layout__footer">
+				<div
+					className="edit-post-layout__footer"
+					role="region"
+					/* translators: accessibility text for the content landmark region. */
+					aria-label={ __( 'Editor footer' ) }
+					tabIndex="-1"
+				>
 					<BlockBreadcrumb />
 				</div>
 			) }
