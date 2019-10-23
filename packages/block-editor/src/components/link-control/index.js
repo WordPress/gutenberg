@@ -94,13 +94,13 @@ function LinkControl( { currentLink, fetchSearchSuggestions, onLinkChange, onSet
 		const resultsListClasses = classnames( 'block-editor-link-control__search-results', {
 			'is-loading': isLoading,
 		} );
-		/* eslint-disable react/jsx-key */
+
 		return (
 			<div className="block-editor-link-control__search-results-wrapper">
 				<div { ...suggestionsListProps } className={ resultsListClasses }>
 					{ suggestions.map( ( suggestion, index ) => (
 						<LinkControlSearchItem
-							key={ `${ suggestion.id }-${ index }` }
+							key={ `${ suggestion.id }-${ suggestion.type }` }
 							itemProps={ buildSuggestionItemProps( suggestion, index ) }
 							suggestion={ suggestion }
 							onClick={ onLinkSelect( suggestion ) }
@@ -112,7 +112,6 @@ function LinkControl( { currentLink, fetchSearchSuggestions, onLinkChange, onSet
 				</div>
 			</div>
 		);
-		/* eslint-enable react/jsx-key */
 	};
 
 	return (
