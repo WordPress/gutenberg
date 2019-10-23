@@ -7,7 +7,7 @@ import moment from 'moment';
 /**
  * Internal dependencies
  */
-import DatePicker from '../date';
+import DatePicker from '..';
 
 const TIMEZONELESS_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
 

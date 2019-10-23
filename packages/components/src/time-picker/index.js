@@ -198,10 +198,10 @@ class TimePicker extends Component {
 
 	renderMonth( month ) {
 		return (
-			<div key="render-month" className="components-datetime__time-field components-datetime__time-field-month">
+			<div key="render-month" className="components-time-picker-field components-time-picker-field-month">
 				<select
 					aria-label={ __( 'Month' ) }
-					className="components-datetime__time-field-month-select"
+					className="components-time-picker-field-month-select"
 					value={ month }
 					onChange={ this.onChangeMonth }
 					onBlur={ this.updateMonth }
@@ -225,10 +225,10 @@ class TimePicker extends Component {
 
 	renderDay( day ) {
 		return (
-			<div key="render-day" className="components-datetime__time-field components-datetime__time-field-day">
+			<div key="render-day" className="components-time-picker-field components-time-picker-field-day">
 				<input
 					aria-label={ __( 'Day' ) }
-					className="components-datetime__time-field-day-input"
+					className="components-time-picker-field-day-input"
 					type="number"
 					value={ day }
 					step={ 1 }
@@ -250,15 +250,15 @@ class TimePicker extends Component {
 		const { is12Hour } = this.props;
 		const { year, minutes, hours, am } = this.state;
 		return (
-			<div className={ classnames( 'components-datetime__time' ) }>
+			<div className={ classnames( 'components-time-picker' ) }>
 				<fieldset>
-					<legend className="components-datetime__time-legend invisible">{ __( 'Date' ) }</legend>
-					<div className="components-datetime__time-wrapper">
+					<legend className="components-time-picker-legend invisible">{ __( 'Date' ) }</legend>
+					<div className="components-time-picker-wrapper">
 						{ this.renderDayMonthFormat( is12Hour ) }
-						<div className="components-datetime__time-field components-datetime__time-field-year">
+						<div className="components-time-picker-field components-time-picker-field-year">
 							<input
 								aria-label={ __( 'Year' ) }
-								className="components-datetime__time-field-year-input"
+								className="components-time-picker-field-year-input"
 								type="number"
 								step={ 1 }
 								value={ year }
@@ -270,12 +270,12 @@ class TimePicker extends Component {
 				</fieldset>
 
 				<fieldset>
-					<legend className="components-datetime__time-legend invisible">{ __( 'Time' ) }</legend>
-					<div className="components-datetime__time-wrapper">
-						<div className="components-datetime__time-field components-datetime__time-field-time">
+					<legend className="components-time-picker-legend invisible">{ __( 'Time' ) }</legend>
+					<div className="components-time-picker-wrapper">
+						<div className="components-time-picker-field components-time-picker-field-time">
 							<input
 								aria-label={ __( 'Hours' ) }
-								className="components-datetime__time-field-hours-input"
+								className="components-time-picker-field-hours-input"
 								type="number"
 								step={ 1 }
 								min={ this.getMinHours() }
@@ -285,11 +285,11 @@ class TimePicker extends Component {
 								onBlur={ this.updateHours }
 							/>
 							<span
-								className="components-datetime__time-separator"
+								className="components-time-picker-separator"
 								aria-hidden="true">:</span>
 							<input
 								aria-label={ __( 'Minutes' ) }
-								className="components-datetime__time-field-minutes-input"
+								className="components-time-picker-field-minutes-input"
 								type="number"
 								min={ 0 }
 								max={ 59 }
@@ -299,11 +299,11 @@ class TimePicker extends Component {
 							/>
 						</div>
 						{ is12Hour && (
-							<div className="components-datetime__time-field components-datetime__time-field-am-pm">
+							<div className="components-time-picker-field components-time-picker-field-am-pm">
 								<Button
 									aria-pressed={ am === 'AM' }
 									isDefault
-									className="components-datetime__time-am-button"
+									className="components-time-picker-am-button"
 									isToggled={ am === 'AM' }
 									onClick={ this.updateAmPm( 'AM' ) }
 								>
@@ -312,7 +312,7 @@ class TimePicker extends Component {
 								<Button
 									aria-pressed={ am === 'PM' }
 									isDefault
-									className="components-datetime__time-pm-button"
+									className="components-time-picker-pm-button"
 									isToggled={ am === 'PM' }
 									onClick={ this.updateAmPm( 'PM' ) }
 								>

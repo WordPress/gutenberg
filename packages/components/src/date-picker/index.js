@@ -81,7 +81,7 @@ class DatePicker extends Component {
 
 		return (
 			<div
-				className="components-datetime__date"
+				className="components-date-picker"
 				ref={ this.nodeRef }
 			>
 				<DayPickerSingleDateController
