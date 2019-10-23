@@ -2,7 +2,7 @@
  * External dependencies
  */
 import memoize from 'memize';
-import { kebabCase, startCase } from 'lodash';
+import { kebabCase, camelCase, startCase } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -70,8 +70,14 @@ export default function __experimentalUseColors(
 	deps = []
 ) {
 	const { clientId } = useBlockEditContext();
-	const attributes = useSelect(
-		( select ) => select( 'core/block-editor' ).getBlockAttributes( clientId ),
+	const { attributes, settingsColors } = useSelect(
+		( select ) => {
+			const { getBlockAttributes, getSettings } = select( 'core/block-editor' );
+			return {
+				attributes: getBlockAttributes( clientId ),
+				settingsColors: getSettings().colors,
+			};
+		},
 		[ clientId ]
 	);
 	const { updateBlockAttributes } = useDispatch( 'core/block-editor' );
@@ -83,26 +89,48 @@ export default function __experimentalUseColors(
 	const createComponent = useMemo(
 		() =>
 			memoize(
-				( attribute, color ) => ( { children } ) =>
+				( attribute, color, colorValue, customColor ) => ( { children } ) =>
 					// Clone children, setting the style attribute from the color configuration,
 					// if not already set explicitly through props.
-					Children.map( children, ( child ) =>
-						cloneElement( child, {
-							className: color ?
-								`${ child.props.className } has-${ kebabCase( attribute ) }` :
-								child.props.className,
-							style: { [ attribute ]: color, ...child.props.style },
-						} )
-					),
+					Children.map( children, ( child ) => {
+						let className = child.props.className;
+						let style = child.props.style;
+						if ( color ) {
+							className = `${ child.props.className } has-${ kebabCase(
+								color
+							) }-${ kebabCase( attribute ) }`;
+							style = { [ attribute ]: colorValue, ...child.props.style };
+						} else if ( customColor ) {
+							className = `${ child.props.className } has-${ kebabCase( attribute ) }`;
+							style = { [ attribute ]: customColor, ...child.props.style };
+						}
+						return cloneElement( child, {
+							className,
+							style,
+						} );
+					} ),
 				{ maxSize: colorConfigs.length }
 			),
 		[ colorConfigs.length ]
 	);
 	const createSetColor = useMemo(
 		() =>
-			memoize( ( name ) => ( newColor ) => setAttributes( { [ name ]: newColor } ), {
-				maxSize: colorConfigs.length,
-			} ),
+			memoize(
+				( name, colors ) => ( newColor ) => {
+					const color = colors.find( ( _color ) => _color.color === newColor );
+					setAttributes( {
+						[ color ? camelCase( `custom ${ name }` ) : name ]: undefined,
+					} );
+					setAttributes( {
+						[ color ? name : camelCase( `custom ${ name }` ) ]: color ?
+							color.slug :
+							newColor,
+					} );
+				},
+				{
+					maxSize: colorConfigs.length,
+				}
+			),
 		[ setAttributes, colorConfigs.length ]
 	);
 
@@ -121,7 +149,7 @@ export default function __experimentalUseColors(
 				componentName = panelLabel.replace( /\s/g, '' ), // E.g. 'BackgroundColor'.
 
 				color = colorConfig.color,
-				colors,
+				colors = settingsColors,
 			} = {
 				...colorConfig,
 				color: attributes[ colorConfig.name ],
@@ -129,10 +157,16 @@ export default function __experimentalUseColors(
 
 			// We memoize the non-primitives to avoid unnecessary updates
 			// when they are used as props for other components.
-			acc[ componentName ] = createComponent( attribute, color );
+			const _color = colors.find( ( __color ) => __color.slug === color );
+			acc[ componentName ] = createComponent(
+				attribute,
+				color,
+				_color && _color.color,
+				attributes[ camelCase( `custom ${ name }` ) ]
+			);
 			acc[ componentName ].displayName = componentName;
 			acc[ componentName ].color = color;
-			acc[ componentName ].setColor = createSetColor( name );
+			acc[ componentName ].setColor = createSetColor( name, colors );
 
 			const newSettingIndex =
 				colorSettings.push( {
