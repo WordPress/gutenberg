@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isFunction, partialRight, noop } from 'lodash';
+import { isFunction, noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -46,7 +46,7 @@ function LinkControl( { currentLink, fetchSearchSuggestions, onLinkChange, onSet
 		setInputValue( '' );
 	} );
 
-	const onLinkSelect = ( event, suggestion ) => {
+	const onLinkSelect = ( suggestion ) => ( event ) => {
 		event.preventDefault();
 		event.stopPropagation();
 
@@ -103,7 +103,7 @@ function LinkControl( { currentLink, fetchSearchSuggestions, onLinkChange, onSet
 							key={ `${ suggestion.id }-${ index }` }
 							itemProps={ buildSuggestionItemProps( suggestion, index ) }
 							suggestion={ suggestion }
-							onClick={ partialRight( onLinkSelect, suggestion ) }
+							onClick={ onLinkSelect( suggestion ) }
 							isSelected={ index === selectedSuggestion }
 							isURL={ suggestion.type.toLowerCase() === 'url' }
 							searchTerm={ inputValue }

@@ -43,7 +43,7 @@ const LinkControlInputSearch = ( { value, onChange, onSelect, renderSuggestions,
 				onKeyDown={ ( event, suggestion ) => {
 					stopPropagationRelevantKeys( event );
 					if ( event.keyCode === ENTER ) {
-						onSelect( event, suggestion );
+						onSelect( suggestion )( event );
 					}
 				} }
 				onKeyPress={ stopPropagation }
