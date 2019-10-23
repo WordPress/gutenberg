@@ -6,7 +6,7 @@ import { shallow } from 'enzyme';
 /**
  * Internal dependencies
  */
-import TimePicker from '../time';
+import TimePicker from '..';
 
 describe( 'TimePicker', () => {
 	it( 'matches the snapshot when the is12hour prop is true', () => {
