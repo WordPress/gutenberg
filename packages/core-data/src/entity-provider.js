@@ -119,7 +119,7 @@ export function useEntityProp( kind, type, prop ) {
  * @param {string}          type    The entity type.
  * @param {string|[string]} [props] The property name or list of property names.
  */
-export function useEntitySaving( kind, type, props ) {
+export function __experimentalUseEntitySaving( kind, type, props ) {
 	const id = useEntityId( kind, type );
 
 	const [ isDirty, isSaving, edits ] = useSelect(

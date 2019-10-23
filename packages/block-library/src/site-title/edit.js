@@ -1,14 +1,21 @@
 /**
  * WordPress dependencies
  */
-import { useEntityProp, useEntitySaving } from '@wordpress/core-data';
+import {
+	useEntityProp,
+	__experimentalUseEntitySaving,
+} from '@wordpress/core-data';
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { RichText } from '@wordpress/block-editor';
 
 export default function SiteTitleEdit() {
 	const [ title, setTitle ] = useEntityProp( 'root', 'site', 'title' );
-	const [ isDirty, isSaving, save ] = useEntitySaving( 'root', 'site', 'title' );
+	const [ isDirty, isSaving, save ] = __experimentalUseEntitySaving(
+		'root',
+		'site',
+		'title'
+	);
 	return (
 		<>
 			<Button

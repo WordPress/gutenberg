@@ -53,5 +53,5 @@ export {
 	default as EntityProvider,
 	useEntityId,
 	useEntityProp,
-	useEntitySaving,
+	__experimentalUseEntitySaving,
 } from './entity-provider';
