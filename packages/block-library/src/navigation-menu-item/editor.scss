@@ -1,15 +1,16 @@
-// Specificity override for .edit-post-visual-editor input[type="text"]
-.wp-block-navigation-menu-item__field .components-text-control__input.components-text-control__input {
-	border-radius: 0;
-	background-color: transparent;
-	padding: $block-padding;
-}
-
 .wp-block-navigation-menu-item__field .components-text-control__input.components-text-control__input,
-.wp-block-navigation-menu-item {
+.wp-block-navigation-menu-item__container {
+	border-radius: 0;
+	padding: $block-padding;
 	font-family: $editor-font;
 	font-weight: bold;
 	font-size: $text-editor-font-size;
+	background-color: var(--background-color-menu-link);
+	color: var(--color-menu-link);
+
+	&:focus {
+		color: var(--color-menu-link);
+	}
 }
 
 .wp-block-navigation-menu-item__nofollow-external-link {
