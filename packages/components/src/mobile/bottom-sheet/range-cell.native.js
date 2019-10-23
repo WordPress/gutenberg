@@ -5,7 +5,7 @@ import { Platform, AccessibilityInfo, findNodeHandle } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { sprintf } from '@wordpress/i18n';
+import { _x, __, sprintf } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 
 /**
@@ -38,6 +38,13 @@ export default function BottomSheetRangeCell( props ) {
 		}
 	};
 
+	const accessibilityLabel =
+	sprintf(
+		/* translators: accessibility text. Inform about current spacer height value. %2$s: Spacer height current value. */
+		_x( '%1$s. Current value is %2$s px', 'range cell' ),
+		cellProps.label, value
+	);
+
 	return (
 		<Cell
 			{ ...cellProps }
@@ -45,7 +52,11 @@ export default function BottomSheetRangeCell( props ) {
 			editable={ true }
 			accessible={ accessible }
 			onPress={ onCellPress }
-			accessibilityHint={ sprintf( 'Current value is %s pixels. Double tap to edit this value.', value ) }
+			accessibilityLabel={ accessibilityLabel }
+			accessibilityHint={
+				/* translators: accessibility text (hint for focusing a slider) */
+				__( 'Double tap to change the value using slider' )
+			}
 		>
 			<Slider
 				value={ value }
@@ -62,6 +73,7 @@ export default function BottomSheetRangeCell( props ) {
 					this.sliderRef = slider;
 				} }
 				accessibilityRole={ 'adjustable' }
+				accessible={ true }
 			/>
 		</Cell>
 	);

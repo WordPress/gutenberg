@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Slider as RNSlider, TextInput, View } from 'react-native';
+import { Slider as RNSlider, TextInput, View, Platform } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -93,7 +93,7 @@ class Slider extends Component {
 		const { hasFocus, sliderValue } = this.state;
 
 		return (
-			<View style={ styles.sliderContainer }>
+			<View style={ styles.sliderContainer } accessible={ Platform.OS === 'android' }>
 				<RNSlider
 					value={ this.validateInput( sliderValue ) }
 					disabled={ disabled }
