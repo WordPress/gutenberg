@@ -31,7 +31,7 @@ async function addMilestone( payload, octokit ) {
 
 	debug( 'add-milestone: Fetching current milestone' );
 
-	const { milestone } = await octokit.issues.get( {
+	const { data: { milestone } } = await octokit.issues.get( {
 		owner: payload.repository.owner.login,
 		repo: payload.repository.name,
 		issue_number: payload.pull_request.number,
@@ -44,13 +44,13 @@ async function addMilestone( payload, octokit ) {
 
 	debug( 'add-milestone: Fetching `package.json` contents' );
 
-	const { content } = await octokit.repos.getContents( {
+	const { data: { content, encoding } } = await octokit.repos.getContents( {
 		owner: payload.repository.owner.login,
 		repo: payload.repository.name,
 		path: 'package.json',
 	} );
 
-	const { version } = JSON.parse( content );
+	const { version } = JSON.parse( Buffer.from( content, encoding ).toString() );
 
 	let [ major, minor ] = version.split( '.' ).map( Number );
 
@@ -81,7 +81,7 @@ async function addMilestone( payload, octokit ) {
 
 	debug( 'add-milestone: Fetching all milestones' );
 
-	const milestones = await octokit.issues.listMilestonesForRepo( {
+	const { data: milestones } = await octokit.issues.listMilestonesForRepo( {
 		owner: payload.repository.owner.login,
 		repo: payload.repository.name,
 	} );

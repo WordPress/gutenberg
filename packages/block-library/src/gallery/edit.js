@@ -2,7 +2,14 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { filter, forEach, map, find, every } from 'lodash';
+import {
+	every,
+	filter,
+	find,
+	forEach,
+	map,
+	some,
+} from 'lodash';
 
 /**
  * WordPress dependencies
@@ -19,6 +26,7 @@ import {
 	BlockIcon,
 	MediaPlaceholder,
 	InspectorControls,
+	RichText,
 } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
@@ -29,7 +37,7 @@ import { withSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import GalleryImage from './gallery-image';
-import icon from './icon';
+import { icon } from './icons';
 import { defaultColumnsNumber, pickRelevantMediaFiles } from './shared';
 
 const MAX_COLUMNS = 8;
@@ -56,6 +64,7 @@ class GalleryEdit extends Component {
 		this.onUploadError = this.onUploadError.bind( this );
 		this.setImageAttributes = this.setImageAttributes.bind( this );
 		this.setAttributes = this.setAttributes.bind( this );
+		this.onFocusGalleryCaption = this.onFocusGalleryCaption.bind( this );
 
 		this.state = {
 			selectedImage: null,
@@ -191,6 +200,12 @@ class GalleryEdit extends Component {
 		return checked ? __( 'Thumbnails are cropped to align.' ) : __( 'Thumbnails are not cropped.' );
 	}
 
+	onFocusGalleryCaption() {
+		this.setState( {
+			selectedImage: null,
+		} );
+	}
+
 	setImageAttributes( index, attributes ) {
 		const { attributes: { images } } = this.props;
 		const { setAttributes } = this;
@@ -234,14 +249,28 @@ class GalleryEdit extends Component {
 	}
 
 	render() {
-		const { attributes, isSelected, className, noticeUI } = this.props;
-		const { images, columns = defaultColumnsNumber( attributes ), align, imageCrop, linkTo } = attributes;
+		const {
+			attributes,
+			className,
+			isSelected,
+			noticeUI,
+			setAttributes,
+		} = this.props;
+		const {
+			align,
+			columns = defaultColumnsNumber( attributes ),
+			caption,
+			imageCrop,
+			images,
+			linkTo,
+		} = attributes;
 
 		const hasImages = !! images.length;
+		const hasImagesWithId = hasImages && some( images, ( { id } ) => id );
 
 		const mediaPlaceholder = (
 			<MediaPlaceholder
-				addToGallery={ hasImages }
+				addToGallery={ hasImagesWithId }
 				isAppender={ hasImages }
 				className={ className }
 				disableMediaButtons={ hasImages && ! isSelected }
@@ -254,7 +283,7 @@ class GalleryEdit extends Component {
 				accept="image/*"
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				multiple
-				value={ hasImages ? images : undefined }
+				value={ hasImagesWithId ? images : undefined }
 				onError={ this.onUploadError }
 				notices={ hasImages ? undefined : noticeUI }
 			/>
@@ -264,6 +293,12 @@ class GalleryEdit extends Component {
 			return mediaPlaceholder;
 		}
 
+		const captionClassNames = classnames(
+			'blocks-gallery-caption',
+			{
+				'screen-reader-text': ! isSelected && RichText.isEmpty( caption ),
+			}
+		);
 		return (
 			<>
 				<InspectorControls>
@@ -291,42 +326,52 @@ class GalleryEdit extends Component {
 					</PanelBody>
 				</InspectorControls>
 				{ noticeUI }
-				<ul
-					className={ classnames(
-						className,
-						{
-							[ `align${ align }` ]: align,
-							[ `columns-${ columns }` ]: columns,
-							'is-cropped': imageCrop,
-						}
-					) }
+				<figure className={ classnames(
+					className,
+					{
+						[ `align${ align }` ]: align,
+						[ `columns-${ columns }` ]: columns,
+						'is-cropped': imageCrop,
+					}
+				) }
 				>
-					{ images.map( ( img, index ) => {
+					<ul className="blocks-gallery-grid">
+						{ images.map( ( img, index ) => {
 						/* translators: %1$d is the order number of the image, %2$d is the total number of images. */
-						const ariaLabel = sprintf( __( 'image %1$d of %2$d in gallery' ), ( index + 1 ), images.length );
+							const ariaLabel = sprintf( __( 'image %1$d of %2$d in gallery' ), ( index + 1 ), images.length );
 
-						return (
-							<li className="blocks-gallery-item" key={ img.id || img.url }>
-								<GalleryImage
-									url={ img.url }
-									alt={ img.alt }
-									id={ img.id }
-									isFirstItem={ index === 0 }
-									isLastItem={ ( index + 1 ) === images.length }
-									isSelected={ isSelected && this.state.selectedImage === index }
-									onMoveBackward={ this.onMoveBackward( index ) }
-									onMoveForward={ this.onMoveForward( index ) }
-									onRemove={ this.onRemoveImage( index ) }
-									onSelect={ this.onSelectImage( index ) }
-									setAttributes={ ( attrs ) => this.setImageAttributes( index, attrs ) }
-									caption={ img.caption }
-									aria-label={ ariaLabel }
-								/>
-							</li>
-						);
-					} ) }
-				</ul>
-				{ mediaPlaceholder }
+							return (
+								<li className="blocks-gallery-item" key={ img.id || img.url }>
+									<GalleryImage
+										url={ img.url }
+										alt={ img.alt }
+										id={ img.id }
+										isFirstItem={ index === 0 }
+										isLastItem={ ( index + 1 ) === images.length }
+										isSelected={ isSelected && this.state.selectedImage === index }
+										onMoveBackward={ this.onMoveBackward( index ) }
+										onMoveForward={ this.onMoveForward( index ) }
+										onRemove={ this.onRemoveImage( index ) }
+										onSelect={ this.onSelectImage( index ) }
+										setAttributes={ ( attrs ) => this.setImageAttributes( index, attrs ) }
+										caption={ img.caption }
+										aria-label={ ariaLabel }
+									/>
+								</li>
+							);
+						} ) }
+					</ul>
+					{ mediaPlaceholder }
+					<RichText
+						tagName="figcaption"
+						className={ captionClassNames }
+						placeholder={ __( 'Write gallery caption…' ) }
+						value={ caption }
+						unstableOnFocus={ this.onFocusGalleryCaption }
+						onChange={ ( value ) => setAttributes( { caption: value } ) }
+						inlineToolbar
+					/>
+				</figure>
 			</>
 		);
 	}

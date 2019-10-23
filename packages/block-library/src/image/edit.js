@@ -45,7 +45,7 @@ import {
 	BACKSPACE,
 	ENTER,
 } from '@wordpress/keycodes';
-import { withSelect } from '@wordpress/data';
+import { withSelect, withDispatch } from '@wordpress/data';
 import {
 	BlockAlignmentToolbar,
 	BlockControls,
@@ -72,18 +72,20 @@ import { speak } from '@wordpress/a11y';
 import { createUpgradedEmbedBlock } from '../embed/util';
 import icon from './icon';
 import ImageSize from './image-size';
+import { getUpdatedLinkTargetSettings, removeNewTabRel } from './utils';
 
 /**
  * Module constants
  */
-const MIN_SIZE = 20;
-const LINK_DESTINATION_NONE = 'none';
-const LINK_DESTINATION_MEDIA = 'media';
-const LINK_DESTINATION_ATTACHMENT = 'attachment';
-const LINK_DESTINATION_CUSTOM = 'custom';
-const NEW_TAB_REL = 'noreferrer noopener';
-const ALLOWED_MEDIA_TYPES = [ 'image' ];
-const DEFAULT_SIZE_SLUG = 'large';
+import {
+	MIN_SIZE,
+	LINK_DESTINATION_NONE,
+	LINK_DESTINATION_MEDIA,
+	LINK_DESTINATION_ATTACHMENT,
+	LINK_DESTINATION_CUSTOM,
+	ALLOWED_MEDIA_TYPES,
+	DEFAULT_SIZE_SLUG,
+} from './constants';
 
 export const pickRelevantMediaFiles = ( image ) => {
 	const imageProps = pick( image, [ 'alt', 'id', 'link', 'caption' ] );
@@ -200,7 +202,7 @@ const ImageURLInputUI = ( {
 			<IconButton
 				icon="admin-links"
 				className="components-toolbar__control"
-				label={ url ? __( 'Edit Link' ) : __( 'Insert Link' ) }
+				label={ url ? __( 'Edit link' ) : __( 'Insert link' ) }
 				aria-expanded={ isOpen }
 				onClick={ openLinkUI }
 			/>
@@ -251,7 +253,7 @@ const ImageURLInputUI = ( {
 							/>
 							<IconButton
 								icon="no"
-								label={ __( 'Remove Link' ) }
+								label={ __( 'Remove link' ) }
 								onClick={ onLinkRemove }
 							/>
 						</>
@@ -451,20 +453,8 @@ export class ImageEdit extends Component {
 	}
 
 	onSetNewTab( value ) {
-		const { rel } = this.props.attributes;
-		const linkTarget = value ? '_blank' : undefined;
-
-		let updatedRel = rel;
-		if ( linkTarget && ! rel ) {
-			updatedRel = NEW_TAB_REL;
-		} else if ( ! linkTarget && rel === NEW_TAB_REL ) {
-			updatedRel = undefined;
-		}
-
-		this.props.setAttributes( {
-			linkTarget,
-			rel: updatedRel,
-		} );
+		const updatedLinkTarget = getUpdatedLinkTargetSettings( value, this.props.attributes );
+		this.props.setAttributes( updatedLinkTarget );
 	}
 
 	onFocusCaption() {
@@ -575,8 +565,9 @@ export class ImageEdit extends Component {
 			className,
 			maxWidth,
 			noticeUI,
-			toggleSelection,
 			isRTL,
+			onResizeStart,
+			onResizeStop,
 		} = this.props;
 		const {
 			url,
@@ -594,6 +585,7 @@ export class ImageEdit extends Component {
 			sizeSlug,
 		} = attributes;
 
+		const cleanRel = removeNewTabRel( rel );
 		const isExternal = isExternalImage( id, url );
 		const editImageIcon = ( <SVG width={ 20 } height={ 20 } viewBox="0 0 20 20"><Rect x={ 11 } y={ 3 } width={ 7 } height={ 5 } rx={ 1 } /><Rect x={ 2 } y={ 12 } width={ 7 } height={ 5 } rx={ 1 } /><Path d="M13,12h1a3,3,0,0,1-3,3v2a5,5,0,0,0,5-5h1L15,9Z" /><Path d="M4,8H3l2,3L7,8H6A3,3,0,0,1,9,5V3A5,5,0,0,0,4,8Z" /></SVG> );
 		const controls = (
@@ -626,18 +618,18 @@ export class ImageEdit extends Component {
 											onChange={ this.onSetNewTab }
 											checked={ linkTarget === '_blank' } />
 										<TextControl
+											label={ __( 'Link Rel' ) }
+											value={ cleanRel || '' }
+											onChange={ this.onSetLinkRel }
+											onKeyPress={ stopPropagation }
+											onKeyDown={ stopPropagationRelevantKeys }
+										/>
+										<TextControl
 											label={ __( 'Link CSS Class' ) }
 											value={ linkClass || '' }
 											onKeyPress={ stopPropagation }
 											onKeyDown={ stopPropagationRelevantKeys }
 											onChange={ this.onSetLinkClass }
-										/>
-										<TextControl
-											label={ __( 'Link Rel' ) }
-											value={ rel || '' }
-											onChange={ this.onSetLinkRel }
-											onKeyPress={ stopPropagation }
-											onKeyDown={ stopPropagationRelevantKeys }
 										/>
 									</>
 								}
@@ -892,15 +884,13 @@ export class ImageEdit extends Component {
 											bottom: true,
 											left: showLeftHandle,
 										} }
-										onResizeStart={ () => {
-											toggleSelection( false );
-										} }
+										onResizeStart={ onResizeStart }
 										onResizeStop={ ( event, direction, elt, delta ) => {
+											onResizeStop();
 											setAttributes( {
 												width: parseInt( currentWidth + delta.width, 10 ),
 												height: parseInt( currentHeight + delta.height, 10 ),
 											} );
-											toggleSelection( true );
 										} }
 									>
 										{ img }
@@ -929,10 +919,18 @@ export class ImageEdit extends Component {
 }
 
 export default compose( [
+	withDispatch( ( dispatch ) => {
+		const { toggleSelection } = dispatch( 'core/block-editor' );
+
+		return {
+			onResizeStart: () => toggleSelection( false ),
+			onResizeStop: () => toggleSelection( true ),
+		};
+	} ),
 	withSelect( ( select, props ) => {
 		const { getMedia } = select( 'core' );
 		const { getSettings } = select( 'core/block-editor' );
-		const { id } = props.attributes;
+		const { attributes: { id }, isSelected } = props;
 		const {
 			__experimentalMediaUpload,
 			imageSizes,
@@ -941,7 +939,7 @@ export default compose( [
 		} = getSettings();
 
 		return {
-			image: id ? getMedia( id ) : null,
+			image: id && isSelected ? getMedia( id ) : null,
 			maxWidth,
 			isRTL,
 			imageSizes,

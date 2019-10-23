@@ -2,10 +2,12 @@
  * External dependencies
  */
 import { invoke } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
+import { withSelect } from '@wordpress/data';
 import {
 	Dropdown,
 	ExternalLink,
@@ -17,6 +19,7 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
+	InnerBlocks,
 	InspectorControls,
 	PlainText,
 } from '@wordpress/block-editor';
@@ -36,6 +39,7 @@ function NavigationMenuItemEdit( {
 	attributes,
 	clientId,
 	isSelected,
+	isParentOfSelectedBlock,
 	setAttributes,
 } ) {
 	const plainTextRef = useRef( null );
@@ -81,8 +85,11 @@ function NavigationMenuItemEdit( {
 			</div>
 		);
 	} else {
-		content = attributes.label;
+		content = <div className="wp-block-navigation-menu-item__container">
+			{ attributes.label }
+		</div>;
 	}
+
 	return (
 		<Fragment>
 			<InspectorControls>
@@ -135,11 +142,28 @@ function NavigationMenuItemEdit( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<div className="wp-block-navigation-menu-item">
+			<div className={ classnames(
+				'wp-block-navigation-menu-item', {
+					'is-editing': isSelected || isParentOfSelectedBlock,
+					'is-selected': isSelected,
+				} ) }
+			>
 				{ content }
+				{ ( isSelected || isParentOfSelectedBlock ) &&
+					<InnerBlocks
+						allowedBlocks={ [ 'core/navigation-menu-item' ] }
+					/>
+				}
 			</div>
 		</Fragment>
 	);
 }
 
-export default NavigationMenuItemEdit;
+export default withSelect( ( select, ownProps ) => {
+	const { hasSelectedInnerBlock } = select( 'core/block-editor' );
+	const { clientId } = ownProps;
+
+	return {
+		isParentOfSelectedBlock: hasSelectedInnerBlock( clientId, true ),
+	};
+} )( NavigationMenuItemEdit );

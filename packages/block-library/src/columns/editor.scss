@@ -1,10 +1,3 @@
-@mixin flex-full-height() {
-	display: flex;
-	flex-direction: column;
-	flex: 1;
-}
-
-
 // These margins make sure that nested blocks stack/overlay with the parent block chrome
 // This is sort of an experiment at making sure the editor looks as much like the end result as possible
 // Potentially the rules here can apply to all nested blocks and enable stacking, in which case it should be moved elsewhere
@@ -48,8 +41,18 @@
 		> [data-type="core/column"] > .editor-block-list__block-edit,
 		> [data-type="core/column"] > .editor-block-list__block-edit > div[data-block],
 		> [data-type="core/column"] > .editor-block-list__block-edit .block-core-columns {
-			@include flex-full-height();
+			display: flex;
+			flex-direction: column;
+
+			// This flex rule fixes an issue in IE11.
+			flex: 1 1 auto;
+
+			// IE11 does not support `position: sticky`, so we use it here to serve correct Flex rules to modern browsers.
+			@supports (position: sticky) {
+				flex: 1;
+			}
 		}
+
 		// Adjust the individual column block.
 		> [data-type="core/column"] {
 

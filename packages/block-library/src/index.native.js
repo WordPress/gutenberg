@@ -5,6 +5,7 @@ import {
 	registerBlockType,
 	setDefaultBlockName,
 	setUnregisteredTypeHandlerName,
+	setGroupingBlockName,
 } from '@wordpress/blocks';
 
 /**
@@ -44,7 +45,6 @@ import * as shortcode from './shortcode';
 import * as spacer from './spacer';
 import * as subhead from './subhead';
 import * as table from './table';
-import * as template from './template';
 import * as textColumns from './text-columns';
 import * as verse from './verse';
 import * as video from './video';
@@ -93,13 +93,12 @@ export const coreBlocks = [
 	subhead,
 	table,
 	tagCloud,
-	template,
 	textColumns,
 	verse,
 	video,
-].reduce( ( memo, block ) => {
-	memo[ block.name ] = block;
-	return memo;
+].reduce( ( accumulator, block ) => {
+	accumulator[ block.name ] = block;
+	return accumulator;
 }, {} );
 
 /**
@@ -142,12 +141,14 @@ export const registerCoreBlocks = () => {
 		separator,
 		list,
 		quote,
-		// eslint-disable-next-line no-undef
-		!! __DEV__ ? mediaText : null,
+		mediaText,
 		// eslint-disable-next-line no-undef
 		!! __DEV__ ? group : null,
 	].forEach( registerBlock );
 
 	setDefaultBlockName( paragraph.name );
 	setUnregisteredTypeHandlerName( missing.name );
+	if ( group ) {
+		setGroupingBlockName( group.name );
+	}
 };

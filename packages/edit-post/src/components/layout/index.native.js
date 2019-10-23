@@ -10,6 +10,7 @@ import { sendNativeEditorDidLayout } from 'react-native-gutenberg-bridge';
  */
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
+import { BottomSheetSettings } from '@wordpress/block-editor';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { HTMLTextInput, KeyboardAvoidingView, ReadableContentView } from '@wordpress/components';
 import { AutosaveMonitor } from '@wordpress/editor';
@@ -128,6 +129,7 @@ class Layout extends Component {
 						style={ toolbarKeyboardAvoidingViewStyle }
 					>
 						<Header />
+						<BottomSheetSettings />
 					</KeyboardAvoidingView> ) }
 			</SafeAreaView>
 		);

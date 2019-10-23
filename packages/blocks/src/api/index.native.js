@@ -30,6 +30,7 @@ export {
 	hasChildBlocksWithInserterSupport,
 	setDefaultBlockName,
 	getDefaultBlockName,
+	setGroupingBlockName,
 } from './registration';
 export {
 	isUnmodifiedDefaultBlock,

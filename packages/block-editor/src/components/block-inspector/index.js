@@ -20,6 +20,7 @@ import InspectorControls from '../inspector-controls';
 import InspectorAdvancedControls from '../inspector-advanced-controls';
 import BlockStyles from '../block-styles';
 import MultiSelectionInspector from '../multi-selection-inspector';
+import DefaultStylePicker from '../default-style-picker';
 const BlockInspector = ( {
 	blockType,
 	count,
@@ -50,7 +51,7 @@ const BlockInspector = ( {
 	}
 
 	return (
-		<>
+		<div className="block-editor-block-inspector">
 			<BlockCard blockType={ blockType } />
 			{ hasBlockStyles && (
 				<div>
@@ -61,6 +62,7 @@ const BlockInspector = ( {
 						<BlockStyles
 							clientId={ selectedBlockClientId }
 						/>
+						<DefaultStylePicker blockName={ blockType.name } />
 					</PanelBody>
 				</div>
 			) }
@@ -79,7 +81,7 @@ const BlockInspector = ( {
 				</InspectorAdvancedControls.Slot>
 			</div>
 			<SkipToSelectedBlock key="back" />
-		</>
+		</div>
 	);
 };
 

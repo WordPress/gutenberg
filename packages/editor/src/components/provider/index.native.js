@@ -6,15 +6,32 @@ import RNReactNativeGutenbergBridge, {
 	subscribeParentToggleHTMLMode,
 	subscribeUpdateHtml,
 	subscribeSetTitle,
+	subscribeMediaAppend,
 } from 'react-native-gutenberg-bridge';
 
 /**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { parse, serialize, getUnregisteredTypeHandlerName } from '@wordpress/blocks';
+import { parse, serialize, getUnregisteredTypeHandlerName, createBlock } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
+
+const postTypeEntities = [
+	{ name: 'post', baseURL: '/wp/v2/posts' },
+	{ name: 'page', baseURL: '/wp/v2/pages' },
+	{ name: 'attachment', baseURL: '/wp/v2/media' },
+	{ name: 'wp_block', baseURL: '/wp/v2/blocks' },
+].map( ( postTypeEntity ) => ( {
+	kind: 'postType',
+	...postTypeEntity,
+	transientEdits: {
+		blocks: true,
+	},
+	mergedEdits: {
+		meta: true,
+	},
+} ) );
 
 /**
  * Internal dependencies
@@ -22,11 +39,13 @@ import { compose } from '@wordpress/compose';
 import EditorProvider from './index.js';
 
 class NativeEditorProvider extends Component {
-	constructor( props ) {
+	constructor() {
 		super( ...arguments );
 
 		// Keep a local reference to `post` to detect changes
-		this.post = props.post;
+		this.post = this.props.post;
+		this.props.addEntities( postTypeEntities );
+		this.props.receiveEntityRecords( 'postType', this.post.type, this.post );
 	}
 
 	componentDidMount() {
@@ -45,6 +64,19 @@ class NativeEditorProvider extends Component {
 		this.subscriptionParentUpdateHtml = subscribeUpdateHtml( ( payload ) => {
 			this.updateHtmlAction( payload.html );
 		} );
+
+		this.subscriptionParentMediaAppend = subscribeMediaAppend( ( payload ) => {
+			const blockName = 'core/' + payload.mediaType;
+			const newBlock = createBlock( blockName, {
+				id: payload.mediaId,
+				[ payload.mediaType === 'image' ? 'url' : 'src' ]: payload.mediaUrl,
+			} );
+
+			const indexAfterSelected = this.props.selectedBlockIndex + 1;
+			const insertionIndex = indexAfterSelected || this.props.blockCount;
+
+			this.props.insertBlock( newBlock, insertionIndex );
+		} );
 	}
 
 	componentWillUnmount() {
@@ -62,6 +94,10 @@ class NativeEditorProvider extends Component {
 
 		if ( this.subscriptionParentUpdateHtml ) {
 			this.subscriptionParentUpdateHtml.remove();
+		}
+
+		if ( this.subscriptionParentMediaAppend ) {
+			this.subscriptionParentMediaAppend.remove();
 		}
 	}
 
@@ -122,7 +158,7 @@ class NativeEditorProvider extends Component {
 }
 
 export default compose( [
-	withSelect( ( select ) => {
+	withSelect( ( select, { rootClientId } ) => {
 		const {
 			__unstableIsEditorReady: isEditorReady,
 			getEditorBlocks,
@@ -133,12 +169,21 @@ export default compose( [
 			getEditorMode,
 		} = select( 'core/edit-post' );
 
+		const {
+			getBlockCount,
+			getBlockIndex,
+			getSelectedBlockClientId,
+		} = select( 'core/block-editor' );
+
+		const selectedBlockClientId = getSelectedBlockClientId();
 		return {
 			mode: getEditorMode(),
 			isReady: isEditorReady(),
 			blocks: getEditorBlocks(),
 			title: getEditedPostAttribute( 'title' ),
 			getEditedPostContent,
+			selectedBlockIndex: getBlockIndex( selectedBlockClientId ),
+			blockCount: getBlockCount( rootClientId ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
@@ -148,16 +193,24 @@ export default compose( [
 		} = dispatch( 'core/editor' );
 		const {
 			clearSelectedBlock,
+			insertBlock,
 		} = dispatch( 'core/block-editor' );
 		const {
 			switchEditorMode,
 		} = dispatch( 'core/edit-post' );
+		const {
+			addEntities,
+			receiveEntityRecords,
+		} = dispatch( 'core' );
 
 		return {
+			addEntities,
 			clearSelectedBlock,
+			insertBlock,
 			editTitle( title ) {
 				editPost( { title } );
 			},
+			receiveEntityRecords,
 			resetEditorBlocksWithoutUndoLevel( blocks ) {
 				resetEditorBlocks( blocks, {
 					__unstableShouldCreateUndoLevel: false,

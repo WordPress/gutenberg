@@ -45,6 +45,12 @@
 		},
 		"placeholder": {
 			"type": "string"
+		},
+		"borderRadius": {
+			"type": "number"
+		},
+		"customGradient": {
+			"type": "string"
 		}
 	}
 }

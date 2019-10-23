@@ -14,4 +14,26 @@ module.exports = {
 		document: true,
 		wp: 'readonly',
 	},
+	overrides: [
+		{
+			// Unit test files and their helpers only.
+			files: [
+				'**/@(test|__tests__)/**/*.js',
+				'**/?(*.)test.js',
+			],
+			extends: [
+				require.resolve( './test-unit.js' ),
+			],
+		},
+		{
+			// End-to-end test files and their helpers only.
+			files: [
+				'**/specs/**/*.js',
+				'**/?(*.)spec.js',
+			],
+			extends: [
+				require.resolve( './test-e2e.js' ),
+			],
+		},
+	],
 };

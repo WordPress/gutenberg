@@ -46,6 +46,8 @@ export { switchEditorModeTo } from './switch-editor-mode-to';
 export { disableNavigationMode } from './keyboard-mode';
 export { switchUserToAdmin } from './switch-user-to-admin';
 export { switchUserToTest } from './switch-user-to-test';
+export { toggleMoreMenu } from './toggle-more-menu';
+export { toggleOfflineMode, isOfflineMode } from './offline-mode';
 export { toggleScreenOption } from './toggle-screen-option';
 export { transformBlockTo } from './transform-block-to';
 export { uninstallPlugin } from './uninstall-plugin';

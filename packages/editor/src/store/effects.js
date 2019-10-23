@@ -7,7 +7,6 @@ import {
 	deleteReusableBlocks,
 	convertBlockToReusable,
 	convertBlockToStatic,
-	receiveReusableBlocks,
 } from './effects/reusable-blocks';
 
 export default {
@@ -20,7 +19,6 @@ export default {
 	DELETE_REUSABLE_BLOCK: ( action, store ) => {
 		deleteReusableBlocks( action, store );
 	},
-	RECEIVE_REUSABLE_BLOCKS: receiveReusableBlocks,
 	CONVERT_BLOCK_TO_STATIC: convertBlockToStatic,
 	CONVERT_BLOCK_TO_REUSABLE: convertBlockToReusable,
 };

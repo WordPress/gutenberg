@@ -21,6 +21,7 @@ module.exports = {
 		'/\.git/',
 		'/node_modules/',
 		'/packages/e2e-tests',
+		'/wordpress/',
 		'<rootDir>/.*/build/',
 		'<rootDir>/.*/build-module/',
 		'<rootDir>/.+\.native\.js$',

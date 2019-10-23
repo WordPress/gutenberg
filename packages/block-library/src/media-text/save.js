@@ -41,6 +41,7 @@ export default function save( { attributes } ) {
 	const backgroundClass = getColorClassName( 'background-color', backgroundColor );
 	const className = classnames( {
 		'has-media-on-the-right': 'right' === mediaPosition,
+		'has-background': ( backgroundClass || customBackgroundColor ),
 		[ backgroundClass ]: backgroundClass,
 		'is-stacked-on-mobile': isStackedOnMobile,
 		[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,

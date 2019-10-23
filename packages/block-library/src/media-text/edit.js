@@ -141,14 +141,17 @@ class MediaTextEdit extends Component {
 		const classNames = classnames( className, {
 			'has-media-on-the-right': 'right' === mediaPosition,
 			'is-selected': isSelected,
+			'has-background': ( backgroundColor.class || backgroundColor.color ),
 			[ backgroundColor.class ]: backgroundColor.class,
 			'is-stacked-on-mobile': isStackedOnMobile,
 			[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 			'is-image-fill': imageFill,
 		} );
 		const widthString = `${ temporaryMediaWidth || mediaWidth }%`;
+		const gridTemplateColumns = 'right' === mediaPosition ? `1fr ${ widthString }` : `${ widthString } 1fr`;
 		const style = {
-			gridTemplateColumns: 'right' === mediaPosition ? `auto ${ widthString }` : `${ widthString } auto`,
+			gridTemplateColumns,
+			msGridColumns: gridTemplateColumns,
 			backgroundColor: backgroundColor.color,
 		};
 		const colorSettings = [ {

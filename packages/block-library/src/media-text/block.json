@@ -41,7 +41,7 @@
 		},
 		"isStackedOnMobile": {
 			"type": "boolean",
-			"default": false
+			"default": true
 		},
 		"verticalAlignment": {
 			"type": "string"

@@ -60,6 +60,99 @@ const deprecated = [
 			customTextColor: {
 				type: 'string',
 			},
+			linkTarget: {
+				type: 'string',
+				source: 'attribute',
+				selector: 'a',
+				attribute: 'target',
+			},
+			rel: {
+				type: 'string',
+				source: 'attribute',
+				selector: 'a',
+				attribute: 'rel',
+			},
+			placeholder: {
+				type: 'string',
+			},
+		},
+		isEligible( attribute ) {
+			return attribute.className && attribute.className.includes( 'is-style-squared' );
+		},
+		migrate( attributes ) {
+			let newClassName = attributes.className;
+			if ( newClassName ) {
+				newClassName = newClassName.replace( /is-style-squared[\s]?/, '' ).trim();
+			}
+			return {
+				...attributes,
+				className: newClassName ? newClassName : undefined,
+				borderRadius: 0,
+			};
+		},
+		save( { attributes } ) {
+			const {
+				backgroundColor,
+				customBackgroundColor,
+				customTextColor,
+				linkTarget,
+				rel,
+				text,
+				textColor,
+				title,
+				url,
+			} = attributes;
+
+			const textClass = getColorClassName( 'color', textColor );
+			const backgroundClass = getColorClassName( 'background-color', backgroundColor );
+
+			const buttonClasses = classnames( 'wp-block-button__link', {
+				'has-text-color': textColor || customTextColor,
+				[ textClass ]: textClass,
+				'has-background': backgroundColor || customBackgroundColor,
+				[ backgroundClass ]: backgroundClass,
+			} );
+
+			const buttonStyle = {
+				backgroundColor: backgroundClass ? undefined : customBackgroundColor,
+				color: textClass ? undefined : customTextColor,
+			};
+
+			return (
+				<div>
+					<RichText.Content
+						tagName="a"
+						className={ buttonClasses }
+						href={ url }
+						title={ title }
+						style={ buttonStyle }
+						value={ text }
+						target={ linkTarget }
+						rel={ rel }
+					/>
+				</div>
+			);
+		},
+	},
+	{
+		attributes: {
+			...blockAttributes,
+			align: {
+				type: 'string',
+				default: 'none',
+			},
+			backgroundColor: {
+				type: 'string',
+			},
+			textColor: {
+				type: 'string',
+			},
+			customBackgroundColor: {
+				type: 'string',
+			},
+			customTextColor: {
+				type: 'string',
+			},
 		},
 		save( { attributes } ) {
 			const {

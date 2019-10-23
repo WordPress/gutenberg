@@ -1,7 +1,6 @@
 .components-font-size-picker__controls {
 	max-width: $sidebar-width - ( 2 * $panel-padding );
 	display: flex;
-	justify-content: space-between;
 	align-items: center;
 	margin-bottom: $grid-size * 3;
 
@@ -9,6 +8,7 @@
 	.components-range-control__number {
 		height: 30px;
 		margin-left: 0;
+		margin-right: $grid-size;
 
 		// Show the reset button as disabled until a value is entered.
 		&[value=""] + .components-button {
@@ -17,9 +17,15 @@
 			pointer-events: none;
 		}
 	}
+
+	// Allow the font-size picker dropdown to grow in width.
+	.components-font-size-picker__select {
+		margin-right: $grid-size;
+		flex-grow: 1;
+	}
 }
 
-// needed to override CSS set in https://github.com/WordPress/gutenberg/blob/9c438f93a7215d50d1efc0492c308e4cbaa59c52/packages/edit-post/src/components/sidebar/settings-sidebar/style.scss#L6
+// Needed to override CSS set in https://github.com/WordPress/gutenberg/blob/9c438f93a7215d50d1efc0492c308e4cbaa59c52/packages/edit-post/src/components/sidebar/settings-sidebar/style.scss#L6.
 .components-font-size-picker__select.components-font-size-picker__select.components-font-size-picker__select.components-font-size-picker__select,
 .components-font-size-picker__select .components-base-control__field {
 	margin-bottom: 0;
