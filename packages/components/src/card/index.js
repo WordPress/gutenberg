@@ -10,23 +10,32 @@ import { CardContext } from './context';
 import { CardUI } from './styles/card-styles';
 
 export const defaultProps = {
+	isBorderless: false,
+	isElevated: false,
 	size: 'medium',
-	variant: 'default',
 };
 
 export function Card( props ) {
-	const { className, size, variant, ...additionalProps } = props;
+	const {
+		className,
+		isBorderless,
+		isElevated,
+		size,
+		...additionalProps
+	} = props;
 	const { Provider } = CardContext;
 
 	const contextProps = {
+		isBorderless,
+		isElevated,
 		size,
-		variant,
 	};
 
 	const classes = classnames(
 		'components-card',
+		isBorderless && 'is-borderless',
+		isElevated && 'is-elevated',
 		size && `is-size-${ size }`,
-		variant && `is-variant-${ variant }`,
 		className
 	);
 

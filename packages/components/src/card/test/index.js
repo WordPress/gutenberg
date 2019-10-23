@@ -35,19 +35,19 @@ describe( 'Card', () => {
 		} );
 	} );
 
-	describe( 'variants', () => {
-		test( 'should render borderless variant', () => {
-			const wrapper = shallow( <Card variant="borderless" /> );
+	describe( 'styles', () => {
+		test( 'should render borderless', () => {
+			const wrapper = shallow( <Card isBorderless /> );
 			const card = wrapper.find( '.components-card' );
 
-			expect( card.hasClass( 'is-variant-borderless' ) ).toBe( true );
+			expect( card.hasClass( 'is-borderless' ) ).toBe( true );
 		} );
 
-		test( 'should render raised variant', () => {
-			const wrapper = shallow( <Card variant="raised" /> );
+		test( 'should render elevated styles', () => {
+			const wrapper = shallow( <Card isElevated /> );
 			const card = wrapper.find( '.components-card' );
 
-			expect( card.hasClass( 'is-variant-raised' ) ).toBe( true );
+			expect( card.hasClass( 'is-elevated' ) ).toBe( true );
 		} );
 	} );
 
@@ -102,20 +102,20 @@ describe( 'Card', () => {
 
 		test( 'should receive modifier props from context', () => {
 			const card = mount(
-				<Card size="extraSmall" variant="borderless">
+				<Card size="extraSmall" isBorderless={ true }>
 					<CardHeader>Hello</CardHeader>
 				</Card>
 			);
 			const cardHeader = card.find( '.components-card__header' ).first();
 
 			expect( cardHeader.hasClass( 'is-size-extraSmall' ) ).toBe( true );
-			expect( cardHeader.hasClass( 'is-variant-borderless' ) ).toBe( true );
+			expect( cardHeader.hasClass( 'is-borderless' ) ).toBe( true );
 		} );
 
 		test( 'should be able to override props from context', () => {
 			const card = mount(
-				<Card size="extraSmall" variant="borderless">
-					<CardHeader size="large" variant="raised">
+				<Card size="extraSmall" isBorderless={ true }>
+					<CardHeader size="large" isBorderless={ false }>
 						Hello
 					</CardHeader>
 				</Card>
@@ -123,7 +123,7 @@ describe( 'Card', () => {
 			const cardHeader = card.find( '.components-card__header' ).first();
 
 			expect( cardHeader.hasClass( 'is-size-large' ) ).toBe( true );
-			expect( cardHeader.hasClass( 'is-variant-raised' ) ).toBe( true );
+			expect( cardHeader.hasClass( 'is-borderless' ) ).toBe( false );
 		} );
 	} );
 
@@ -142,20 +142,20 @@ describe( 'Card', () => {
 
 		test( 'should receive modifier props from context', () => {
 			const card = mount(
-				<Card size="extraSmall" variant="borderless">
+				<Card size="extraSmall" isBorderless={ true }>
 					<CardFooter>Hello</CardFooter>
 				</Card>
 			);
 			const cardFooter = card.find( '.components-card__footer' ).first();
 
 			expect( cardFooter.hasClass( 'is-size-extraSmall' ) ).toBe( true );
-			expect( cardFooter.hasClass( 'is-variant-borderless' ) ).toBe( true );
+			expect( cardFooter.hasClass( 'is-borderless' ) ).toBe( true );
 		} );
 
 		test( 'should be able to override props from context', () => {
 			const card = mount(
-				<Card size="extraSmall" variant="borderless">
-					<CardFooter size="large" variant="raised">
+				<Card size="extraSmall" isBorderless={ true }>
+					<CardFooter size="large" isBorderless={ false }>
 						Hello
 					</CardFooter>
 				</Card>
@@ -163,7 +163,7 @@ describe( 'Card', () => {
 			const cardFooter = card.find( '.components-card__footer' ).first();
 
 			expect( cardFooter.hasClass( 'is-size-large' ) ).toBe( true );
-			expect( cardFooter.hasClass( 'is-variant-raised' ) ).toBe( true );
+			expect( cardFooter.hasClass( 'is-borderless' ) ).toBe( false );
 		} );
 	} );
 

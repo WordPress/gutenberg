@@ -20,14 +20,14 @@ export default { title: 'Card', component: Card };
 export const _default = () => {
 	const props = getCardStoryProps();
 
-	const body = text( 'Body/Content', 'Code is Poetry' );
-	const isBodyShady = boolean( 'Body/Shady', false );
+	const body = text( 'Body: children', 'Code is Poetry' );
+	const isBodyShady = boolean( 'Body: isShady', false );
 
-	const header = text( 'Header/Content', 'Header' );
-	const isHeaderShady = boolean( 'Header/Shady', false );
+	const header = text( 'Header: children', 'Header' );
+	const isHeaderShady = boolean( 'Header: isShady', false );
 
-	const footer = text( 'Footer/Content', 'Footer' );
-	const isFooterShady = boolean( 'Footer/Shady', false );
+	const footer = text( 'Footer: children', 'Footer' );
+	const isFooterShady = boolean( 'Footer: isShady', false );
 
 	return (
 		<Card { ...props }>

@@ -16,8 +16,8 @@ export default { title: 'Card/Footer', component: CardFooter };
 
 export const _default = () => {
 	const props = getCardStoryProps();
-	const content = text( 'Content', 'Content' );
-	const isShady = boolean( 'isShady', false );
+	const content = text( 'Footer: children', 'Content' );
+	const isShady = boolean( 'Footer: isShady', false );
 
 	return (
 		<Card { ...props }>

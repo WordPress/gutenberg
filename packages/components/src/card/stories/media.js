@@ -26,12 +26,12 @@ const DummyImage = () => (
 );
 
 export const _default = () => {
+	const mediaOnTop = boolean( 'Example: On Top', true );
 	const props = getCardStoryProps();
 
-	const mediaOnTop = boolean( 'On Top', true );
 	const showTopContent = ! mediaOnTop;
 	const showBottomContent = ! showTopContent;
-	const content = text( 'Content', 'Content' );
+	const content = text( 'Body: children', 'Content' );
 
 	return (
 		<Card { ...props }>
@@ -138,15 +138,15 @@ const HorizontallyAlignedCard = styled( Card )`
 
 export const horizontallyAligned = () => {
 	const align = select(
-		'Align',
+		'Example: Align',
 		{
 			left: 'left',
 			right: 'right',
 		},
 		'left'
 	);
-	const content = text( 'Content', 'Content' );
-	const maxWidth = number( 'Media Width', 200 );
+	const maxWidth = number( 'Example: Media Width', 200 );
+	const content = text( 'Body: children', 'Content' );
 	const classes = `is-${ align }`;
 
 	return (

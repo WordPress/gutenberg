@@ -18,8 +18,9 @@ const Example = () => (
 
 Name | Type | Default | Description
 --- | --- | --- | ---
+`isBorderless` | `boolean` | `false` | Determines the border style of the card.
+`isElevated` | `boolean` | `false` | Determines the elevation style of the card.
 `size` | `string` | `medium` | Determines the amount of padding within the card.
-`variant` | `string` | `default` | Determines the style of the card.
 
 ## Sub-Components
 

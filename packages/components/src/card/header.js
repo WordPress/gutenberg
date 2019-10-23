@@ -10,6 +10,7 @@ import { HeaderUI } from './styles/card-styles';
 import { useCardContext } from './context';
 
 export const defaultProps = {
+	isBorderless: false,
 	isShady: false,
 	size: 'medium',
 };
@@ -17,13 +18,13 @@ export const defaultProps = {
 export function CardHeader( props ) {
 	const { className, isShady, ...additionalProps } = props;
 	const mergedProps = { ...defaultProps, ...useCardContext(), ...props };
-	const { size, variant } = mergedProps;
+	const { isBorderless, size } = mergedProps;
 
 	const classes = classnames(
 		'components-card__header',
+		isBorderless && 'is-borderless',
 		isShady && 'is-shady',
 		size && `is-size-${ size }`,
-		variant && `is-variant-${ variant }`,
 		className
 	);
 

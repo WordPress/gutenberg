@@ -45,11 +45,11 @@ describe( 'CardHeader', () => {
 			expect( cardHeader.hasClass( 'is-shady' ) ).toBe( true );
 		} );
 
-		test( 'should be able to render variant modifier', () => {
-			const wrapper = shallow( <CardHeader variant="borderless" /> );
+		test( 'should be able to render borderless modifier', () => {
+			const wrapper = shallow( <CardHeader isBorderless /> );
 			const cardHeader = wrapper.find( '.components-card__header' );
 
-			expect( cardHeader.hasClass( 'is-variant-borderless' ) ).toBe( true );
+			expect( cardHeader.hasClass( 'is-borderless' ) ).toBe( true );
 		} );
 	} );
 } );

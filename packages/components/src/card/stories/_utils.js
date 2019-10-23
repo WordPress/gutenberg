@@ -2,15 +2,17 @@
  * External dependencies
  */
 /* eslint-disable import/no-extraneous-dependencies */
-import { select } from '@storybook/addon-knobs';
+import { boolean, select } from '@storybook/addon-knobs';
 /* eslint-enable import/no-extraneous-dependencies */
 
 export const getCardProps = ( props = {} ) => {
-	const { size, variant } = props;
+	const { size } = props;
 
 	return {
+		isBorderless: boolean( 'Card: isBorderless', false ),
+		isElevated: boolean( 'Card: isElevated', false ),
 		size: select(
-			'size',
+			'Card: size',
 			{
 				large: 'large',
 				medium: 'medium',
@@ -19,21 +21,12 @@ export const getCardProps = ( props = {} ) => {
 			},
 			size || 'medium'
 		),
-		variant: select(
-			'variant',
-			{
-				default: 'default',
-				borderless: 'borderless',
-				raised: 'raised',
-			},
-			variant || 'default'
-		),
 	};
 };
 
 export const getCardStyleProps = ( props = {} ) => {
 	const width = select(
-		'Card Width',
+		'Example: Width',
 		{
 			'640px': 640,
 			'360px': 360,
