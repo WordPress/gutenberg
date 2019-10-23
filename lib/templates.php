@@ -10,7 +10,7 @@
  */
 function gutenberg_register_template_post_type() {
 	if (
-		get_option( 'gutenberg-experiments' ) &&
+		! get_option( 'gutenberg-experiments' ) ||
 		! array_key_exists( 'gutenberg-full-site-editing', get_option( 'gutenberg-experiments' ) )
 	) {
 		return;
