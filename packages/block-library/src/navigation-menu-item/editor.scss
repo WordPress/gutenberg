@@ -28,12 +28,16 @@ $menu-label-field-width: 140px;
 	}
 }
 
-
 .wp-block-navigation-menu-item {
 	font-family: $editor-font;
-	color: #0073af;
 	font-weight: bold;
 	font-size: $text-editor-font-size;
+
+	.wp-block-navigation-menu-item__container,
+	&.is-editing .editor-plain-text {
+		background-color: var(--background-color-menu-link);
+		color: var(--color-menu-link);
+	}
 }
 
 .wp-block-navigation-menu-item__nofollow-external-link {
@@ -42,10 +46,7 @@ $menu-label-field-width: 140px;
 
 // Separator
 .wp-block-navigation-menu-item__separator {
-	margin-top: $grid-size;
-	margin-bottom: $grid-size;
-	margin-left: 0;
-	margin-right: 0;
+	margin: $grid-size 0 $grid-size;
 	border-top: $border-width solid $light-gray-500;
 }
 
