@@ -137,6 +137,12 @@ class URLInput extends Component {
 
 	onKeyDown( event ) {
 		const { showSuggestions, selectedSuggestion, suggestions, loading } = this.state;
+
+		// Trigger `onKeyDown` event, passing the selected suggestion besides the event class.
+		if ( this.props.onKeyDown ) {
+			this.props.onKeyDown( event, selectedSuggestion );
+		}
+
 		// If the suggestions are not shown or loading, we shouldn't handle the arrow keys
 		// We shouldn't preventDefault to allow block arrow keys navigation
 		if ( ! showSuggestions || ! suggestions.length || loading ) {
@@ -209,10 +215,6 @@ class URLInput extends Component {
 				}
 				break;
 			}
-		}
-
-		if ( this.props.onKeyDown ) {
-			this.props.onKeyDown( event, selectedSuggestion );
 		}
 	}
 
