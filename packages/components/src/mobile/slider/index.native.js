@@ -87,6 +87,7 @@ class Slider extends Component {
 			minimumTrackTintColor,
 			maximumTrackTintColor,
 			thumbTintColor,
+			...sliderProps
 		} = this.props;
 
 		const { hasFocus, sliderValue } = this.state;
@@ -105,6 +106,7 @@ class Slider extends Component {
 					thumbTintColor={ thumbTintColor }
 					onValueChange={ this.handleChange }
 					onSlidingComplete={ this.handleValueSave }
+					{ ...sliderProps }
 				/>
 				<TextInput
 					style={ [ styles.sliderTextInput, hasFocus ? styles.isSelected : {} ] }

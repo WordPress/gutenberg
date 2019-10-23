@@ -34,6 +34,7 @@ class BottomSheetCell extends Component {
 
 	render() {
 		const {
+			accessible,
 			accessibilityLabel,
 			accessibilityHint,
 			accessibilityRole,
@@ -160,7 +161,7 @@ class BottomSheetCell extends Component {
 
 		return (
 			<TouchableOpacity
-				accessible={ ! this.state.isEditingValue }
+				accessible={ accessible !== undefined ? accessible : ! this.state.isEditingValue }
 				accessibilityLabel={ getAccessibilityLabel() }
 				accessibilityRole={ accessibilityRole || 'button' }
 				accessibilityHint={ isValueEditable ?

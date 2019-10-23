@@ -1,7 +1,12 @@
 /**
  * External dependencies
  */
-import { Platform } from 'react-native';
+import { Platform, AccessibilityInfo, findNodeHandle } from 'react-native';
+/**
+ * WordPress dependencies
+ */
+import { sprintf } from '@wordpress/i18n';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -23,11 +28,24 @@ export default function BottomSheetRangeCell( props ) {
 		thumbTintColor = Platform.OS === 'android' && '#00669b',
 		...cellProps
 	} = props;
+	const [ accessible, onChangeAccessible ] = useState( true );
+
+	const onCellPress = () => {
+		onChangeAccessible( false );
+		if ( this.sliderRef ) {
+			const reactTag = findNodeHandle( this.sliderRef );
+			AccessibilityInfo.setAccessibilityFocus( reactTag );
+		}
+	};
 
 	return (
 		<Cell
-			editable={ false }
 			{ ...cellProps }
+			accessibilityRole={ 'none' }
+			editable={ true }
+			accessible={ accessible }
+			onPress={ onCellPress }
+			accessibilityHint={ sprintf( 'Current value is %s pixels. Double tap to edit this value.', value ) }
 		>
 			<Slider
 				value={ value }
@@ -40,6 +58,10 @@ export default function BottomSheetRangeCell( props ) {
 				maximumTrackTintColor={ maximumTrackTintColor }
 				thumbTintColor={ thumbTintColor }
 				onChangeValue={ onChangeValue }
+				ref={ ( slider ) => {
+					this.sliderRef = slider;
+				} }
+				accessibilityRole={ 'adjustable' }
 			/>
 		</Cell>
 	);
