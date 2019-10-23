@@ -175,8 +175,6 @@ class URLInput extends Component {
 			return;
 		}
 
-		const suggestion = this.state.suggestions[ this.state.selectedSuggestion ];
-
 		switch ( event.keyCode ) {
 			case UP: {
 				event.stopPropagation();
@@ -198,7 +196,7 @@ class URLInput extends Component {
 			}
 			case TAB: {
 				if ( this.state.selectedSuggestion !== null ) {
-					this.selectLink( suggestion );
+					this.selectLink( selectedSuggestion );
 					// Announce a link has been selected when tabbing away from the input field.
 					this.props.speak( __( 'Link selected.' ) );
 				}
@@ -207,14 +205,14 @@ class URLInput extends Component {
 			case ENTER: {
 				if ( this.state.selectedSuggestion !== null ) {
 					event.stopPropagation();
-					this.selectLink( suggestion );
+					this.selectLink( selectedSuggestion );
 				}
 				break;
 			}
 		}
 
 		if ( this.props.onKeyDown ) {
-			this.props.onKeyDown( event, suggestion );
+			this.props.onKeyDown( event, selectedSuggestion );
 		}
 	}
 
