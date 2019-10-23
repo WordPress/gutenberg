@@ -250,8 +250,24 @@ class URLInput extends Component {
 	}
 
 	render() {
-		const { value = '', autoFocus = true, instanceId, className, id, isFullWidth, hasBorder, placeholder = __( 'Paste URL or type to search' ), renderSuggestions } = this.props;
-		const { showSuggestions, suggestions, selectedSuggestion, loading } = this.state;
+		const {
+			instanceId,
+			className,
+			id,
+			isFullWidth,
+			hasBorder,
+			renderSuggestions,
+			placeholder = __( 'Paste URL or type to search' ),
+			value = '',
+			autoFocus = true,
+		} = this.props;
+
+		const {
+			showSuggestions,
+			suggestions,
+			selectedSuggestion,
+			loading,
+		} = this.state;
 
 		const suggestionsListboxId = `block-editor-url-input-suggestions-${ instanceId }`;
 		const suggestionOptionIdPrefix = `block-editor-url-input-suggestion-${ instanceId }`;
