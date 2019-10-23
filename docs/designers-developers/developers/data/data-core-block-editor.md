@@ -191,7 +191,7 @@ _Returns_
 
 <a name="getBlockParents" href="#getBlockParents">#</a> **getBlockParents**
 
-Given a block client ID, returns the list of all its parents.
+Given a block client ID, returns the list of all its parents from top to bottom.
 
 _Parameters_
 

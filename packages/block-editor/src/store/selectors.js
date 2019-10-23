@@ -421,7 +421,7 @@ export function getBlockRootClientId( state, clientId ) {
 }
 
 /**
- * Given a block client ID, returns the list of all its parents.
+ * Given a block client ID, returns the list of all its parents from top to bottom.
  *
  * @param {Object} state    Editor state.
  * @param {string} clientId Block from which to find root client ID.

@@ -47,14 +47,14 @@ const BlockBreadcrumb = function() {
 					{ __( 'Document' ) }
 				</Button>
 			</li>
-			{ parents.map( ( parent ) => (
-				<li key={ parent }>
+			{ parents.map( ( parentClientId ) => (
+				<li key={ parentClientId }>
 					<Button
 						className="block-editor-block-breadcrumb__button"
 						isTertiary
-						onClick={ () => selectBlock( parent ) }
+						onClick={ () => selectBlock( parentClientId ) }
 					>
-						<BlockTitle clientId={ parent } />
+						<BlockTitle clientId={ parentClientId } />
 					</Button>
 				</li>
 			) ) }
