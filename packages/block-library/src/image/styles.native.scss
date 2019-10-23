@@ -40,3 +40,13 @@
 .iconDark {
 	fill: $white;
 }
+
+.content {
+	flex: 1;
+}
+
+.contentCentered {
+	flex: 1;
+	justify-content: center;
+	align-items: center;
+}
