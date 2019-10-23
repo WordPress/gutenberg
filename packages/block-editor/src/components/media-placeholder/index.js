@@ -25,6 +25,7 @@ import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -387,10 +388,17 @@ export class MediaPlaceholder extends Component {
 
 	render() {
 		const {
+			disableMediaButtons,
 			dropZoneUIOnly,
 		} = this.props;
 
-		if ( dropZoneUIOnly ) {
+		if ( dropZoneUIOnly || disableMediaButtons ) {
+			if ( dropZoneUIOnly ) {
+				deprecated( 'wp.blockEditor.MediaPlaceholder dropZoneUIOnly prop', {
+					alternative: 'disableMediaButtons',
+				} );
+			}
+
 			return (
 				<MediaUploadCheck>
 					{ this.renderDropZone() }

@@ -28,7 +28,7 @@ const HeadingEdit = ( {
 		<BlockControls>
 			<HeadingToolbar
 				minLevel={ 2 }
-				maxLevel={ 5 }
+				maxLevel={ 7 }
 				selectedLevel={ attributes.level }
 				onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) }
 			/>

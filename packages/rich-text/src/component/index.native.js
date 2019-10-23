@@ -14,13 +14,12 @@ import memize from 'memize';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { compose } from '@wordpress/compose';
+import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { childrenBlock } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/html-entities';
 import { BACKSPACE } from '@wordpress/keycodes';
 import { isURL } from '@wordpress/url';
-import { withTheme } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -771,7 +770,7 @@ export class RichText extends Component {
 			style,
 			__unstableIsSelected: isSelected,
 			children,
-			useStyle,
+			getStylesFromColorScheme,
 		} = this.props;
 
 		const record = this.getRecord();
@@ -782,7 +781,7 @@ export class RichText extends Component {
 			minHeight = style.minHeight;
 		}
 
-		const placeholderStyle = useStyle( styles.richTextPlaceholder, styles.richTextPlaceholderDark );
+		const placeholderStyle = getStylesFromColorScheme( styles.richTextPlaceholder, styles.richTextPlaceholderDark );
 
 		const {
 			color: defaultPlaceholderTextColor,
@@ -792,7 +791,7 @@ export class RichText extends Component {
 			color: defaultColor,
 			textDecorationColor: defaultTextDecorationColor,
 			fontFamily: defaultFontFamily,
-		} = useStyle( styles.richText, styles.richTextDark );
+		} = getStylesFromColorScheme( styles.richText, styles.richTextDark );
 
 		let selection = null;
 		if ( this.needsSelectionUpdate ) {
@@ -821,7 +820,7 @@ export class RichText extends Component {
 			this.firedAfterTextChanged = false;
 		}
 
-		const dynamicStyle = useStyle( style, styles.richTextDark );
+		const dynamicStyle = getStylesFromColorScheme( style, styles.richTextDark );
 
 		return (
 			<View>
@@ -884,5 +883,5 @@ export default compose( [
 	withSelect( ( select ) => ( {
 		formatTypes: select( 'core/rich-text' ).getFormatTypes(),
 	} ) ),
-	withTheme,
+	withPreferredColorScheme,
 ] )( RichText );

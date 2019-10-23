@@ -41,3 +41,18 @@
 	align-items: center;
 	fill: $gray-dark;
 }
+
+.isAppender {
+	height: auto;
+	background-color: $white;
+	border: $border-width solid $light-gray-500;
+	border-radius: 4px;
+}
+
+.addBlockButton {
+	color: $white;
+	background-color: $dark-gray-500;
+	border-radius: $icon-button-size-small / 2;
+	overflow: hidden;
+	size: $icon-button-size-small;
+}

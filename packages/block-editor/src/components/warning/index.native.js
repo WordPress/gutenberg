@@ -6,7 +6,8 @@ import { View, Text } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { Icon, withTheme } from '@wordpress/components';
+import { Icon } from '@wordpress/components';
+import { withPreferredColorScheme } from '@wordpress/compose';
 import { normalizeIconObject } from '@wordpress/blocks';
 
 /**
@@ -14,15 +15,15 @@ import { normalizeIconObject } from '@wordpress/blocks';
  */
 import styles from './style.scss';
 
-function Warning( { title, message, icon, iconClass, theme, useStyle, ...viewProps } ) {
+function Warning( { title, message, icon, iconClass, preferredColorScheme, getStylesFromColorScheme, ...viewProps } ) {
 	icon = icon && normalizeIconObject( icon );
-	const internalIconClass = 'warning-icon' + '-' + theme;
-	const titleStyle = useStyle( styles.title, styles.titleDark );
-	const messageStyle = useStyle( styles.message, styles.messageDark );
+	const internalIconClass = 'warning-icon' + '-' + preferredColorScheme;
+	const titleStyle = getStylesFromColorScheme( styles.title, styles.titleDark );
+	const messageStyle = getStylesFromColorScheme( styles.message, styles.messageDark );
 
 	return (
 		<View
-			style={ useStyle( styles.container, styles.containerDark ) }
+			style={ getStylesFromColorScheme( styles.container, styles.containerDark ) }
 			{ ...viewProps }
 		>
 			{ icon && (
@@ -43,4 +44,4 @@ function Warning( { title, message, icon, iconClass, theme, useStyle, ...viewPro
 	);
 }
 
-export default withTheme( Warning );
+export default withPreferredColorScheme( Warning );
