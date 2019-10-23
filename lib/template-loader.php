@@ -132,6 +132,7 @@ function gutenberg_render_title_tag() {
  */
 function gutenberg_render_the_template() {
 	global $_wp_current_template_post;
+	global $wp_embed;
 
 	if ( ! $_wp_current_template_post || 'wp_template' !== $_wp_current_template_post->post_type ) {
 		echo '<h1>' . esc_html__( 'No matching template found', 'gutenberg' ) . '</h1>';
@@ -140,8 +141,11 @@ function gutenberg_render_the_template() {
 
 	$content = $_wp_current_template_post->post_content;
 
+	$content = $wp_embed->run_shortcode( $content );
+	$content = $wp_embed->autoembed( $content );
 	$content = do_blocks( $content );
 	$content = wptexturize( $content );
+	$content = wp_make_content_images_responsive( $content );
 	$content = str_replace( ']]>', ']]&gt;', $content );
 
 	// Wrap block template in .wp-site-blocks to allow for specific descendant styles
