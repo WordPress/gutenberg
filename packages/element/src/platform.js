@@ -1,3 +1,14 @@
+/**
+ * Parts of this source were derived and modified from react-native-web,
+ * released under the MIT license.
+ *
+ * Copyright (c) 2016-present, Nicolas Gallagher.
+ * Copyright (c) 2015-present, Facebook, Inc.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ */
 const Platform = {
 	OS: 'web',
 	select: ( spec ) => ( 'web' in spec ? spec.web : spec.default ),
