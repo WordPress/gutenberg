@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isFunction, noop } from 'lodash';
+import { isFunction, noop, startsWith } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -19,7 +19,13 @@ import {
 	useState,
 } from '@wordpress/element';
 
-import { safeDecodeURI, filterURLForDisplay, isURL, prependHTTP } from '@wordpress/url';
+import {
+	safeDecodeURI,
+	filterURLForDisplay,
+	isURL,
+	prependHTTP,
+	getProtocol,
+} from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -61,19 +67,35 @@ function LinkControl( { currentLink, fetchSearchSuggestions, onLinkChange, onSet
 		setIsEditingLink( true );
 	};
 
-	const handleURLSearch = async ( value ) => {
+	const handleDirectEntry = async ( value ) => {
+		let type = 'URL';
+
+		const protocol = getProtocol( value ) || '';
+
+		if ( protocol.includes( 'mailto' ) ) {
+			type = 'mailto';
+		}
+
+		if ( protocol.includes( 'tel' ) ) {
+			type = 'tel';
+		}
+
+		if ( startsWith( value, '#' ) ) {
+			type = 'internal';
+		}
+
 		return [ {
 			id: '1',
 			title: value,
-			type: 'URL',
-			url: prependHTTP( value ),
+			url: type === 'URL' ? prependHTTP( value ) : value,
+			type,
 		} ];
 	};
 
 	const handleEntitySearch = async ( value ) => {
 		const results = await Promise.all( [
 			fetchSearchSuggestions( value ),
-			handleURLSearch( value ),
+			handleDirectEntry( value ),
 		] );
 
 		const couldBeURL = ! value.includes( ' ' );
@@ -86,8 +108,15 @@ function LinkControl( { currentLink, fetchSearchSuggestions, onLinkChange, onSet
 
 	// Effects
 	const getSearchHandler = useCallback( ( value ) => {
-		return ( isURL( value ) || value.includes( 'www.' ) ) ? handleURLSearch( value ) : handleEntitySearch( value );
-	}, [ handleURLSearch, fetchSearchSuggestions ] );
+		const protocol = getProtocol( value ) || '';
+		const isMailto = protocol.includes( 'mailto' );
+		const isInternal = startsWith( value, '#' );
+		const isTel = protocol.includes( 'tel' );
+
+		const handleManualEntry = isInternal || isMailto || isTel || isURL( value ) || value.includes( 'www.' );
+
+		return ( handleManualEntry ) ? handleDirectEntry( value ) : handleEntitySearch( value );
+	}, [ handleDirectEntry, fetchSearchSuggestions ] );
 
 	// Render Components
 	const renderSearchResults = ( { suggestionsListProps, buildSuggestionItemProps, suggestions, selectedSuggestion, isLoading } ) => {
