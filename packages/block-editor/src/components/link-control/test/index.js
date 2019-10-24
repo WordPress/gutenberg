@@ -144,9 +144,11 @@ describe( 'Searching', () => {
 		expect( searchResultElements ).toHaveLength( 0 );
 	} );
 
-	it( 'should display a single suggestion result when the current input value is URL-like', async ( ) => {
-		const searchTerm = 'https://make.wordpress.com';
-
+	it.each( [
+		[ 'https://make.wordpress.org' ], // explicit https
+		[ 'http://make.wordpress.org' ], // explicit http
+		[ 'www.wordpress.org' ], // usage of "www"
+	] )( 'should display a single suggestion result when the current input value is URL-like (eg: %s)', async ( searchTerm ) => {
 		act( () => {
 			render(
 				<LinkControl

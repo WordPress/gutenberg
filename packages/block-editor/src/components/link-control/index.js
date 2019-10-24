@@ -113,7 +113,7 @@ function LinkControl( { currentLink, className, fetchSearchSuggestions, onLinkCh
 		const isInternal = startsWith( value, '#' );
 		const isTel = protocol.includes( 'tel' );
 
-		const handleManualEntry = isInternal || isMailto || isTel || isURL( value ) || value.includes( 'www.' );
+		const handleManualEntry = isInternal || isMailto || isTel || isURL( value ) || ( value && value.includes( 'www.' ) );
 
 		return ( handleManualEntry ) ? handleDirectEntry( value ) : handleEntitySearch( value );
 	}, [ handleDirectEntry, fetchSearchSuggestions ] );
