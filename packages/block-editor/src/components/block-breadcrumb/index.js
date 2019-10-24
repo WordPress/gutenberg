@@ -27,7 +27,7 @@ const BlockBreadcrumb = function() {
 		return {
 			parents: getBlockParents( selectedBlockClientId ),
 			clientId: selectedBlockClientId,
-			hasSelection: getSelectionStart().clientId,
+			hasSelection: !! getSelectionStart().clientId,
 		};
 	}, [] );
 
