@@ -11,25 +11,29 @@ import ColorPicker from '../';
 
 export default { title: 'ColorPicker', component: ColorPicker };
 
-export const _default = () => {
+const ColorPickerWithState = ( { ...props } ) => {
 	const [ color, setColor ] = useState( '#f00' );
 	return (
 		<ColorPicker
+			{ ...props }
 			color={ color }
 			onChangeComplete={ ( value ) => setColor( value.hex ) }
+		/>
+	);
+};
+
+export const _default = () => {
+	return (
+		<ColorPickerWithState
 			disableAlpha
 		/>
 	);
 };
 
 export const AlphaEnabled = () => {
-	const [ color, setColor ] = useState( '#f0f' );
 	return (
-		<ColorPicker
-			color={ color }
-			onChangeComplete={ ( value ) => setColor( value.hex ) }
+		<ColorPickerWithState
 			disableAlpha={ false }
 		/>
 	);
 };
-
