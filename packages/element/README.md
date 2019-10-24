@@ -227,13 +227,25 @@ _Related_
 
 <a name="Platform" href="#Platform">#</a> **Platform**
 
-Component used to detect the current Platform being used. Use Platform.OS === 'web' to detect if running on web enviroment.
-This is the same concept as the React-Native implementation found here: <https://facebook.github.io/react-native/docs/platform-specific-code#platform-module>
-Here is an example of how to use the select method
+Component used to detect the current Platform being used.
+Use Platform.OS === 'web' to detect if running on web enviroment.
+
+This is the same concept as the React Native implementation.
+
+_Related_
+
+-   <https://facebook.github.io/react-native/docs/platform-specific-code#platform-module>
+
+Here is an example of how to use the select method:
+
+_Usage_
+
+```js
 const placeholderLabel = Platform.select( {
-  native: **( 'Add media' ),
-  web: **( 'Drag images, upload new ones or select files from your library.' ),
+  native: __( 'Add media' ),
+  web: __( 'Drag images, upload new ones or select files from your library.' ),
 } );
+```
 
 <a name="RawHTML" href="#RawHTML">#</a> **RawHTML**
 
