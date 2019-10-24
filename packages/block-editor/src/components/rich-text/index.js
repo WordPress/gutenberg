@@ -134,13 +134,13 @@ class RichTextWrapper extends Component {
 			__unstableEmbedURLOnPaste,
 		} = this.props;
 
-		let imagesHTML = filePasteHandler(images, html)
-		if ( imagesHTML ) {			
+		const imagesHTML = filePasteHandler( images, html );
+		if ( imagesHTML ) {
 			const content = pasteHandler( {
 				HTML: imagesHTML,
 				mode: 'BLOCKS',
 				tagName,
-			} );			
+			} );
 
 			if ( onReplace && isEmpty( value ) ) {
 				onReplace( content );
@@ -440,20 +440,20 @@ class RichTextWrapper extends Component {
 						{ Platform.OS === 'web' && isSelected && <RemoveBrowserShortcuts /> }
 						{ Platform.OS === 'web' && (
 							<Autocomplete
-								onReplace={onReplace}
-								completers={autocompleters}
-								record={value}
-								onChange={onChange}
-								isSelected={isSelected}
+								onReplace={ onReplace }
+								completers={ autocompleters }
+								record={ value }
+								onChange={ onChange }
+								isSelected={ isSelected }
 							>
-								{({ listBoxId, activeId, onKeyDown }) =>
+								{ ( { listBoxId, activeId, onKeyDown } ) =>
 									<Editable
-										aria-autocomplete={listBoxId ? 'list' : undefined}
-										aria-owns={listBoxId}
-										aria-activedescendant={activeId}
-										start={start}
-										reversed={reversed}
-										onKeyDown={onKeyDown}
+										aria-autocomplete={ listBoxId ? 'list' : undefined }
+										aria-owns={ listBoxId }
+										aria-activedescendant={ activeId }
+										start={ start }
+										reversed={ reversed }
+										onKeyDown={ onKeyDown }
 									/>
 								}
 							</Autocomplete>
@@ -481,16 +481,15 @@ class RichTextWrapper extends Component {
 
 const RichTextContainer = compose( [
 	withInstanceId,
-	withBlockEditContext(({ clientId, onCaretVerticalPositionChange, isSelected }, ownProps) => {
+	withBlockEditContext( ( { clientId, onCaretVerticalPositionChange, isSelected }, ownProps ) => {
 		if ( Platform.OS === 'web' ) {
-			return { clientId }
-		} else {
-			return {
-				clientId,
-				blockIsSelected: ownProps.isSelected !== undefined ? ownProps.isSelected : isSelected,
-				onCaretVerticalPositionChange,
-			};
+			return { clientId };
 		}
+		return {
+			clientId,
+			blockIsSelected: ownProps.isSelected !== undefined ? ownProps.isSelected : isSelected,
+			onCaretVerticalPositionChange,
+		};
 	} ),
 	withSelect( ( select, {
 		clientId,
@@ -520,17 +519,17 @@ const RichTextContainer = compose( [
 			isSelected = selectionStart.clientId === clientId;
 		}
 
-		let extraProps = {}
+		let extraProps = {};
 		if ( Platform.OS !== 'web' ) {
 			// If the block of this RichText is unmodified then it's a candidate for replacing when adding a new block.
 			// In order to fix https://github.com/wordpress-mobile/gutenberg-mobile/issues/1126, let's blur on unmount in that case.
 			// This apparently assumes functionality the BlockHlder actually
-			const block = clientId && __unstableGetBlockWithoutInnerBlocks(clientId);
-			const shouldBlurOnUnmount = block && isSelected && isUnmodifiedDefaultBlock(block);
+			const block = clientId && __unstableGetBlockWithoutInnerBlocks( clientId );
+			const shouldBlurOnUnmount = block && isSelected && isUnmodifiedDefaultBlock( block );
 			extraProps = {
 				blockIsSelected,
 				shouldBlurOnUnmount,
-			}
+			};
 		}
 
 		return {
