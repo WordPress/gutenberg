@@ -615,7 +615,7 @@ class RichText extends Component {
 		if ( multilineTag ) {
 			let newValue;
 
-			// Check to see if we should remove the first item of a list
+			// Check to see if we should remove the first item if empty.
 			if ( isReverse && value.start === 0 && value.end === 0 && isEmptyLine( value ) ) {
 				newValue = removeLineSeparator( value, ! isReverse );
 			} else {
