@@ -499,7 +499,6 @@ export default compose(
 				getBlockSelectionEnd,
 				getBlockOrder,
 			} = select( 'core/block-editor' );
-
 			const { clientId, destinationRootClientId, isAppender } = ownProps;
 
 			// If the clientId is defined, we insert at the position of the block.
