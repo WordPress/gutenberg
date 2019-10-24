@@ -605,14 +605,14 @@ class RichText extends Component {
 		const { start, end, text } = value;
 		const isReverse = keyCode === BACKSPACE;
 
-		if ( multilineTag ) {
-			// Always handle full content deletion ourselves.
-			if ( start === 0 && end !== 0 && end === text.length ) {
-				this.onChange( remove( value ) );
-				event.preventDefault();
-				return;
-			}
+		// Always handle full content deletion ourselves.
+		if ( start === 0 && end !== 0 && end === text.length ) {
+			this.onChange( remove( value ) );
+			event.preventDefault();
+			return;
+		}
 
+		if ( multilineTag ) {
 			let newValue;
 
 			// Check to see if we should remove the first item of a list
