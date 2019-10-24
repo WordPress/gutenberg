@@ -7,7 +7,7 @@ import {
 	requestMediaPickFromDeviceLibrary,
 	requestMediaPickFromDeviceCamera,
 	getOtherMediaOptions,
-	requesOtherMediaPickFrom,
+	requestOtherMediaPickFrom,
 } from 'react-native-gutenberg-bridge';
 
 /**
@@ -122,7 +122,7 @@ export class MediaUpload extends React.Component {
 			this.onPickerSelect( requestMediaPickFromMediaLibrary );
 		} else {
 			const { onSelect, multiple = false } = this.props;
-			requesOtherMediaPickFrom( value, multiple, ( media ) => {
+			requestOtherMediaPickFrom( value, multiple, ( media ) => {
 				if ( ( multiple && media ) || ( media && media.id ) ) {
 					onSelect( media );
 				}
