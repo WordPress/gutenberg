@@ -10,6 +10,7 @@ import {
 	PanelBody,
 	BottomSheet,
 } from '@wordpress/components';
+import { withPreferredColorScheme } from '@wordpress/compose';
 import { useState, useEffect } from '@wordpress/element';
 import {
 	InspectorControls,
@@ -24,7 +25,7 @@ import styles from './editor.scss';
 const minSpacerHeight = 20;
 const maxSpacerHeight = 500;
 
-const SpacerEdit = ( { isSelected, attributes, setAttributes } ) => {
+const SpacerEdit = ( { isSelected, attributes, setAttributes, getStylesFromColorScheme } ) => {
 	const { height } = attributes;
 	const [ sliderSpacerHeight, setSpacerHeight ] = useState( height );
 	const [ sliderSpacerMaxHeight, setSpacerMaxHeight ] = useState( height );
@@ -49,8 +50,10 @@ const SpacerEdit = ( { isSelected, attributes, setAttributes } ) => {
 		} );
 	};
 
+	const defaultStyle = getStylesFromColorScheme( styles.staticSpacer, styles.staticDarkSpacer );
+
 	return (
-		<View style={ [ styles.staticSpacer, isSelected && styles.selectedSpacer, { height } ] }>
+		<View style={ [ defaultStyle, isSelected && styles.selectedSpacer, { height } ] }>
 			<InspectorControls>
 				<PanelBody title={ __( 'Spacer Settings' ) } >
 					<BottomSheet.RangeCell
@@ -61,6 +64,7 @@ const SpacerEdit = ( { isSelected, attributes, setAttributes } ) => {
 						maximumValue={ sliderSpacerMaxHeight }
 						separatorType={ 'fullWidth' }
 						onChangeValue={ ( value ) => changeSpacerHeight( value ) }
+						style={ styles.rangeCellContainer }
 					/>
 				</PanelBody>
 			</InspectorControls>
@@ -68,4 +72,4 @@ const SpacerEdit = ( { isSelected, attributes, setAttributes } ) => {
 	);
 };
 
-export default SpacerEdit;
+export default withPreferredColorScheme( SpacerEdit );

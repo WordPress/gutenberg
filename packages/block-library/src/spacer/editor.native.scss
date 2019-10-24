@@ -5,6 +5,14 @@
 	border-radius: 1px;
 }
 
+.staticDarkSpacer {
+	border: $border-width dashed rgba($color: $light-gray-500, $alpha: 0.3);
+}
+
 .selectedSpacer {
-	border: $border-width solid $blue-wordpress;
+	border: $border-width * 2 solid $blue-30;
+}
+
+.rangeCellContainer {
+	padding-bottom: 16px;
 }

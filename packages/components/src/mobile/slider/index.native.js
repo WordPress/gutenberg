@@ -113,7 +113,8 @@ class Slider extends Component {
 					onChangeText={ this.handleChange }
 					onFocus={ this.handleToggleFocus }
 					onBlur={ this.handleToggleFocus }
-					keyboardType="numeric"
+					keyboardType="number-pad"
+					returnKeyType="done"
 					value={ `${ sliderValue }` }
 				/>
 			</View>
