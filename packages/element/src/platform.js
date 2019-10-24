@@ -21,7 +21,7 @@ const Platform = {
  * Here is an example of how to use the select method:
  * @example
  * ```js
- * import { Platform } from '@wordpress/element'; 
+ * import { Platform } from '@wordpress/element';
  *
  * const placeholderLabel = Platform.select( {
  *   native: __( 'Add media' ),
