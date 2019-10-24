@@ -4,6 +4,8 @@
 * Fix issue when force Touch app shortcut doesn't work properly selecting "New Photo Post" on iOS
 * Add Link Target (Open in new tab) to Image Block.
 * [iOS] DarkMode improvements.
+* [iOS] Update to iOS 11 and Swift 5
+* New block: Media & Text
 
 1.14.0
 ------
