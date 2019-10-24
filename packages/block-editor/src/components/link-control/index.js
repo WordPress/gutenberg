@@ -17,6 +17,8 @@ import { __ } from '@wordpress/i18n';
 import {
 	useCallback,
 	useState,
+	useEffect,
+	Fragment,
 } from '@wordpress/element';
 
 import {
@@ -27,6 +29,8 @@ import {
 	getProtocol,
 } from '@wordpress/url';
 
+import { withInstanceId } from '@wordpress/compose';
+
 /**
  * Internal dependencies
  */
@@ -35,23 +39,49 @@ import LinkControlSearchItem from './search-item';
 import LinkControlInputSearch from './input-search';
 
 function LinkControl( {
+	instanceId,
 	currentLink,
 	className,
 	fetchSearchSuggestions,
 	onLinkChange,
-	onSettingsChange = { noop },
 	currentSettings,
+	onSettingsChange = { noop },
 	onKeyDown = noop,
 	onKeyPress = noop,
 	onClose = noop,
 } ) {
 	// State
 	const [ inputValue, setInputValue ] = useState( '' );
-	const [ isEditingLink, setIsEditingLink ] = useState( true );
+	const [ isEditingLink, setIsEditingLink ] = useState( false );
+
+	// Effects
+	useEffect( () => {
+		// If we have a link then stop editing mode
+		if ( currentLink ) {
+			setIsEditingLink( false );
+		} else {
+			setIsEditingLink( true );
+		}
+	}, [ currentLink ] );
 
 	// Handlers
 	const onInputChange = ( value = '' ) => {
 		setInputValue( value );
+	};
+
+	const onLinkSelect = ( suggestion ) => ( event ) => {
+		event.preventDefault();
+		event.stopPropagation();
+
+		if ( isFunction( onLinkChange ) ) {
+			onLinkChange( suggestion );
+		}
+	};
+
+	// Utils
+
+	const startEditMode = () => {
+		setIsEditingLink( true );
 	};
 
 	const closeLinkUI = () => {
@@ -61,21 +91,6 @@ function LinkControl( {
 
 	const resetInput = () => {
 		setInputValue( '' );
-	};
-
-	const onLinkSelect = ( suggestion ) => ( event ) => {
-		event.preventDefault();
-		event.stopPropagation();
-
-		setIsEditingLink( false );
-
-		if ( isFunction( onLinkChange ) ) {
-			onLinkChange( suggestion );
-		}
-	};
-
-	const onStartEditing = () => {
-		setIsEditingLink( true );
 	};
 
 	const handleDirectEntry = async ( value ) => {
@@ -166,27 +181,34 @@ function LinkControl( {
 			<div className="block-editor-link-control__popover-inner">
 				<div className="block-editor-link-control__search">
 
-					{ ! isEditingLink && (
-						<div
-							className={ classnames( 'block-editor-link-control__search-item', {
-								'is-current': true,
-							} ) }
-						>
-							<span className="block-editor-link-control__search-item-header">
+					{ ( ! isEditingLink && currentLink ) && (
+						<Fragment>
+							<p className="screen-reader-text" id={ `current-link-label-${ instanceId }` }>
+								{ __( 'Currently selected' ) }:
+							</p>
+							<div
+								aria-labelledby={ `current-link-label-${ instanceId }` }
+								aria-selected="true"
+								className={ classnames( 'block-editor-link-control__search-item', {
+									'is-current': true,
+								} ) }
+							>
+								<span className="block-editor-link-control__search-item-header">
 
-								<ExternalLink
-									className="block-editor-link-control__search-item-title"
-									href={ currentLink.url }
-								>
-									{ currentLink.title }
-								</ExternalLink>
-								<span className="block-editor-link-control__search-item-info">{ filterURLForDisplay( safeDecodeURI( currentLink.url ) ) || '' }</span>
-							</span>
+									<ExternalLink
+										className="block-editor-link-control__search-item-title"
+										href={ currentLink.url }
+									>
+										{ currentLink.title }
+									</ExternalLink>
+									<span className="block-editor-link-control__search-item-info">{ filterURLForDisplay( safeDecodeURI( currentLink.url ) ) || '' }</span>
+								</span>
 
-							<Button isDefault onClick={ onStartEditing } className="block-editor-link-control__search-item-action block-editor-link-control__search-item-action--edit">
-								{ __( 'Change' ) }
-							</Button>
-						</div>
+								<Button isDefault onClick={ startEditMode } className="block-editor-link-control__search-item-action block-editor-link-control__search-item-action--edit">
+									{ __( 'Change' ) }
+								</Button>
+							</div>
+						</Fragment>
 					) }
 
 					{ isEditingLink && (
@@ -211,4 +233,4 @@ function LinkControl( {
 	);
 }
 
-export default LinkControl;
+export default withInstanceId( LinkControl );
