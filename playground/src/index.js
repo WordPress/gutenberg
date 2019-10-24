@@ -84,6 +84,19 @@ function App() {
 		] );
 	};
 
+	const handleOnKeyDownEvent = ( { keyCode }, suggestion ) => {
+		console.log( `onKeyDown - Key code: ${ keyCode }` );
+		if ( null !== suggestion ) {
+			console.log( `suggestion: ${ suggestion }` );
+		}
+		event.stopPropagation();
+	};
+
+	const handleOnKeyPressEvent = ( { keyCode } ) => {
+		console.log( `onKeyPress - Key code: ${ keyCode }` );
+		event.stopPropagation();
+	};
+
 	return (
 		<Fragment>
 			<div className="playground__header">
@@ -114,6 +127,8 @@ function App() {
 												} );
 											} }
 											fetchSearchSuggestions={ fetchFauxEntitySuggestions }
+											onKeyDown={ handleOnKeyDownEvent }
+											onKeyPress={ handleOnKeyPressEvent }
 										/>
 										<BlockList />
 									</ObserveTyping>
