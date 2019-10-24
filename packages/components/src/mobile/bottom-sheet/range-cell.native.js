@@ -22,6 +22,8 @@ class BottomSheetRangeCell extends Component {
 		this.handleChange = this.handleChange.bind( this );
 		this.handleValueSave = this.handleValueSave.bind( this );
 		this.handleReset = this.handleReset.bind( this );
+		this.onChangeValue = this.onChangeValue.bind( this );
+		this.onCellPress = this.onCellPress.bind( this );
 
 		const initialValue = this.validateInput( props.value || props.defaultValue || props.minimumValue );
 
@@ -78,7 +80,7 @@ class BottomSheetRangeCell extends Component {
 		}
 	}
 
-	onChangeValue = ( initialValue ) => {
+	onChangeValue( initialValue ) {
 		const { minimumValue, maximumValue, setAttributes, attribute } = this.props;
 
 		let sliderValue = initialValue;
@@ -90,15 +92,15 @@ class BottomSheetRangeCell extends Component {
 		setAttributes( {
 			[ attribute ]: sliderValue,
 		} );
-	};
+	}
 
-	onCellPress = () => {
+	onCellPress() {
 		this.setState( { accessible: false } );
 		if ( this.sliderRef ) {
 			const reactTag = findNodeHandle( this.sliderRef );
 			AccessibilityInfo.setAccessibilityFocus( reactTag );
 		}
-	};
+	}
 
 	render() {
 		const {
