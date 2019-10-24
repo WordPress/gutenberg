@@ -142,7 +142,7 @@ function ButtonEdit( {
 				style={ {
 					...( customGradient ?
 						{ background: customGradient } :
-						( { backgroundColor: backgroundColor.color } )
+						{ backgroundColor: backgroundColor.color }
 					),
 					color: textColor.color,
 					borderRadius: borderRadius ? borderRadius + 'px' : undefined,
