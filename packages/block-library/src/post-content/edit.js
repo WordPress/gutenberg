@@ -1,7 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { useEntityProp, useEntitySaving } from '@wordpress/core-data';
+import {
+	useEntityProp,
+	__experimentalUseEntitySaving,
+} from '@wordpress/core-data';
 import { useMemo, useCallback } from '@wordpress/element';
 import { parse } from '@wordpress/blocks';
 import { Button } from '@wordpress/components';
@@ -20,7 +23,7 @@ export default function PostContentEdit() {
 		'post',
 		'blocks'
 	);
-	const [ isDirty, isSaving, save ] = useEntitySaving(
+	const [ isDirty, isSaving, save ] = __experimentalUseEntitySaving(
 		'postType',
 		'post',
 		'content'

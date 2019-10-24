@@ -1,7 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { useEntityProp, useEntitySaving } from '@wordpress/core-data';
+import {
+	useEntityProp,
+	__experimentalUseEntitySaving,
+} from '@wordpress/core-data';
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { RichText } from '@wordpress/block-editor';
@@ -11,7 +14,7 @@ const saveProps = [ 'title', 'slug' ];
 export default function PostTitleEdit() {
 	const [ title, setTitle ] = useEntityProp( 'postType', 'post', 'title' );
 	const [ , setSlug ] = useEntityProp( 'postType', 'post', 'slug' );
-	const [ isDirty, isSaving, save ] = useEntitySaving(
+	const [ isDirty, isSaving, save ] = __experimentalUseEntitySaving(
 		'postType',
 		'post',
 		saveProps
@@ -29,13 +32,13 @@ export default function PostTitleEdit() {
 			</Button>
 			<RichText
 				tagName="h1"
-				formattingControls={ [] }
 				placeholder={ __( 'Title' ) }
 				value={ title }
 				onChange={ ( value ) => {
 					setTitle( value );
 					setSlug( cleanForSlug( value ) );
 				} }
+				allowedFormats={ [] }
 			/>
 		</>
 	);
