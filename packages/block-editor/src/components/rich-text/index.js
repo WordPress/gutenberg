@@ -324,6 +324,29 @@ class RichTextWrapper extends Component {
 		};
 	}
 
+	renderFormatToolbar( inline ) {
+		if ( inline && Platform.OS === 'web ' ) {
+			// Render in popover
+			return (
+				<Popover
+					noArrow
+					position="top center"
+					focusOnMount={ false }
+					getAnchorRect={ this.getAnchorRect }
+					className="block-editor-rich-text__inline-format-toolbar"
+				>
+					<FormatToolbar />
+				</Popover>
+			);
+		}
+		// Render regular toolbar
+		return (
+			<BlockFormatControls>
+				<FormatToolbar />
+			</BlockFormatControls>
+		);
+	}
+
 	render() {
 		const {
 			children,
@@ -421,22 +444,7 @@ class RichTextWrapper extends Component {
 				{ ( { isSelected, value, onChange, Editable } ) =>
 					<>
 						{ children && children( { value, onChange } ) }
-						{ isSelected && ! inlineToolbar && hasFormats && (
-							<BlockFormatControls>
-								<FormatToolbar />
-							</BlockFormatControls>
-						) }
-						{ Platform.OS === 'web' && isSelected && inlineToolbar && hasFormats && (
-							<Popover
-								noArrow
-								position="top center"
-								focusOnMount={ false }
-								getAnchorRect={ this.getAnchorRect }
-								className="block-editor-rich-text__inline-format-toolbar"
-							>
-								<FormatToolbar />
-							</Popover>
-						) }
+						{ isSelected && hasFormats && this.renderFormatToolbar( inlineToolbar ) }
 						{ isSelected && <RemoveBrowserShortcuts /> }
 						<Autocomplete
 							onReplace={ onReplace }
