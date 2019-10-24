@@ -38,7 +38,6 @@ describe( 'Basic rendering', () => {
 		} );
 
 		// Search Input UI
-		// const searchInputLabel = Array.from( container.querySelectorAll( 'label' ) ).find( ( label ) => label.innerText === 'Search or input url' );
 		const searchInput = container.querySelector( 'input[aria-label="URL"]' );
 
 		// expect( searchInputLabel ).not.toBeNull();
@@ -98,7 +97,7 @@ describe( 'Searching', () => {
 	} );
 
 	it( 'should display search suggestions when current input value is not URL-like', async ( ) => {
-		const searchTerm = 'Hello';
+		const searchTerm = 'Hello world';
 
 		act( () => {
 			render(
@@ -146,7 +145,7 @@ describe( 'Searching', () => {
 	} );
 
 	it( 'should display a single suggestion result when the current input value is URL-like', async ( ) => {
-		const searchTerm = 'http://make.wordpress.com';
+		const searchTerm = 'https://make.wordpress.com';
 
 		act( () => {
 			render(
@@ -174,11 +173,11 @@ describe( 'Searching', () => {
 
 		expect( searchResultElements ).toHaveLength( expectedResultsLength );
 		expect( firstSearchResultItemHTML ).toEqual( expect.stringContaining( searchTerm ) );
-		expect( firstSearchResultItemHTML ).toEqual( expect.stringContaining( 'url' ) );
+		expect( firstSearchResultItemHTML ).toEqual( expect.stringContaining( 'Press ENTER to add this link' ) );
 	} );
 
 	it( 'should reset input and search results when search term is cleared or reset', async ( ) => {
-		const searchTerm = 'Hello';
+		const searchTerm = 'Hello world';
 
 		act( () => {
 			render(
