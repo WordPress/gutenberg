@@ -30,7 +30,7 @@ describe( 'Toolbar', () => {
 			const wrapper = mount( <Toolbar /> );
 			expect( wrapper.html() ).toBeNull();
 			expect( console ).toHaveWarnedWith(
-				'Using `Toolbar` as a collapsible group of controls is deprecated. Please use `ToolbarGroup` instead.'
+				'Using `Toolbar` as a collapsible group of controls is deprecated. Please use `ToolbarGroup` instead. Note: If you want to render an accessible toolbar, pass in an `accessibilityLabel` prop.'
 			);
 		} );
 

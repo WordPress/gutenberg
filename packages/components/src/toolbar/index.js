@@ -32,6 +32,7 @@ function Toolbar( { className, accessibilityLabel, ...otherProps } ) {
 
 	deprecated( 'Using `Toolbar` as a collapsible group of controls', {
 		alternative: '`ToolbarGroup`',
+		hint: 'If you want to render an accessible toolbar, pass in an `accessibilityLabel` prop.',
 	} );
 
 	return <ToolbarGroup className={ finalClassName } { ...otherProps } />;
