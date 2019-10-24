@@ -9,10 +9,10 @@
  *
  * See VisuallyHidden hidden for example.
  *
- * @param {string|Component} as what tag/component to render
- * @return {Component} rendered component
+ * @param {string|Component} as A tag or component to render.
+ * @return {Component} The rendered component.
  */
-function renderAsRenderProps( { as: T = 'div', ...props } ) {
+function renderAsRenderProps( { as: Component = 'div', ...props } ) {
 	if ( typeof props.children === 'function' ) {
 		return props.children( props );
 	}
