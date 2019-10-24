@@ -17,6 +17,18 @@ import ToolbarContext from './toolbar-context';
 
 export const __unstableToolbarContext = ToolbarContext;
 
+/**
+ * Renders an accessible toolbar that follows the
+ * [WAI-ARIA Toolbar Pattern](https://www.w3.org/TR/wai-aria-practices/#toolbar).
+ *
+ * The `accessibilityLabel` is required. Otherwise it will produce a warning.
+ *
+ * To add controls, simply pass `ToolbarButton` components as children.
+ *
+ * @param {Object} props
+ * @param {string} props.accessibilityLabel Required label for assistive technology users
+ * @param {string} [props.className]
+ */
 function Toolbar( { className, accessibilityLabel, ...otherProps } ) {
 	const finalClassName = classnames( 'components-toolbar', className );
 
