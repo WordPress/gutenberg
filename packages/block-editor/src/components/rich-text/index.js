@@ -437,7 +437,7 @@ class RichTextWrapper extends Component {
 								<FormatToolbar />
 							</Popover>
 						) }
-						{ Platform.OS === 'web' && isSelected && <RemoveBrowserShortcuts /> }
+						{ isSelected && <RemoveBrowserShortcuts /> }
 						{ Platform.OS === 'web' && (
 							<Autocomplete
 								onReplace={ onReplace }
