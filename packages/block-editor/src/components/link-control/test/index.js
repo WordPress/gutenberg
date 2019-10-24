@@ -3,7 +3,7 @@
  */
 import { render, unmountComponentAtNode } from 'react-dom';
 import { act, Simulate } from 'react-dom/test-utils';
-import { last } from 'lodash';
+import { first, last } from 'lodash';
 
 /**
  * Internal dependencies
@@ -97,8 +97,9 @@ describe( 'Searching for a link', () => {
 		expect( loadingUI ).toBeNull();
 	} );
 
-	it( 'should display search suggestions when current input value is not URL-like', async ( ) => {
+	it( 'should display only search suggestions when current input value is not URL-like', async ( ) => {
 		const searchTerm = 'Hello world';
+		const firstFauxSuggestion = first( fauxEntitySuggestions );
 
 		act( () => {
 			render(
@@ -108,15 +109,8 @@ describe( 'Searching for a link', () => {
 			);
 		} );
 
-		let searchResultElements;
-
 		// Search Input UI
 		const searchInput = container.querySelector( 'input[aria-label="URL"]' );
-
-		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
-		searchResultElements = container.querySelectorAll( '[role="menu"] button[role="menuitem"]' );
-
-		expect( searchResultElements ).toHaveLength( 0 );
 
 		// Simulate searching for a term
 		act( () => {
@@ -127,25 +121,39 @@ describe( 'Searching for a link', () => {
 		await eventLoopTick();
 
 		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
-		searchResultElements = container.querySelectorAll( '[role="listbox"] [role="option"]' );
+		const searchResultElements = container.querySelectorAll( '[role="listbox"] [role="option"]' );
+		const firstSearchResultItemHTML = first( searchResultElements ).innerHTML;
+		const lastSearchResultItemHTML = last( searchResultElements ).innerHTML;
 
 		expect( searchResultElements ).toHaveLength( fauxEntitySuggestions.length );
 
-		// Reset the search term
-		act( () => {
-			Simulate.change( searchInput, { target: { value: '' } } );
-		} );
+		// Sanity check that a search suggestion shows up corresponding to the data
+		expect( firstSearchResultItemHTML ).toEqual( expect.stringContaining( firstFauxSuggestion.title ) );
+		expect( firstSearchResultItemHTML ).toEqual( expect.stringContaining( firstFauxSuggestion.type ) );
 
-		// fetchFauxEntitySuggestions resolves on next "tick" of event loop
-		await eventLoopTick();
-
-		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
-		searchResultElements = container.querySelectorAll( '[role="listbox"] [role="option"]' );
-
-		expect( searchResultElements ).toHaveLength( 0 );
+		// The fallback URL suggestion should not be shown when input is not URL-like
+		expect( lastSearchResultItemHTML ).not.toEqual( expect.stringContaining( 'URL' ) );
 	} );
 
-	it.each( [ [ 'couldbeurlorentitysearchterm' ], [ 'ThisCouldAlsoBeAValidURL' ] ] )( 'should always show a URL suggestion as a default fallback when the search term could potentially be a valid url', async ( searchTerm ) => {
+	// it('should not display any search result when the input is empty or has been cleared or reset', async () => {
+	// 	// Reset the search term
+	// 	act( () => {
+	// 		Simulate.change( searchInput, { target: { value: '' } } );
+	// 	} );
+
+	// 	// fetchFauxEntitySuggestions resolves on next "tick" of event loop
+	// 	await eventLoopTick();
+
+	// 	// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
+	// 	searchResultElements = container.querySelectorAll( '[role="listbox"] [role="option"]' );
+
+	// 	expect( searchResultElements ).toHaveLength( 0 );
+	// })
+
+	it.each( [
+		[ 'couldbeurlorentitysearchterm' ],
+		[ 'ThisCouldAlsoBeAValidURL' ],
+	] )( 'should display a URL suggestion as a default fallback for the search term "%s" which could potentially be a valid url.', async ( searchTerm ) => {
 		act( () => {
 			render(
 				<LinkControl
