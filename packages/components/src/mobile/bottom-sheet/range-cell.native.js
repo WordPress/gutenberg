@@ -13,7 +13,6 @@ import { Component } from '@wordpress/element';
  * Internal dependencies
  */
 import Cell from './cell';
-// import Slider from '../slider';
 import styles from './range-cell.scss';
 
 class BottomSheetRangeCell extends Component {
@@ -115,7 +114,7 @@ class BottomSheetRangeCell extends Component {
 			...cellProps
 		} = this.props;
 
-		const { hasFocus, sliderValue } = this.state;
+		const { hasFocus, sliderValue, accessible } = this.state;
 
 		const accessibilityLabel =
 		sprintf(
@@ -129,7 +128,7 @@ class BottomSheetRangeCell extends Component {
 				{ ...cellProps }
 				accessibilityRole={ 'none' }
 				editable={ true }
-				accessible={ this.state.accessible }
+				accessible={ accessible }
 				onPress={ this.onCellPress }
 				accessibilityLabel={ accessibilityLabel }
 				accessibilityHint={
@@ -154,7 +153,6 @@ class BottomSheetRangeCell extends Component {
 					} }
 					style={ styles.slider }
 					accessibilityRole={ 'adjustable' }
-					accessible={ true }
 				/>
 				<TextInput
 					style={ [ styles.sliderTextInput, hasFocus ? styles.isSelected : {} ] }
