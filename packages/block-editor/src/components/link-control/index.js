@@ -29,7 +29,9 @@ import {
 	getProtocol,
 } from '@wordpress/url';
 
-import { withInstanceId } from '@wordpress/compose';
+import { withInstanceId, compose } from '@wordpress/compose';
+import { withSelect } from '@wordpress/data';
+
 
 /**
  * Internal dependencies
@@ -236,4 +238,16 @@ function LinkControl( {
 	);
 }
 
-export default withInstanceId( LinkControl );
+export default compose(
+	withInstanceId,
+	withSelect( ( select, ownProps ) => {
+		if ( ownProps.fetchSearchSuggestions && isFunction( ownProps.fetchSearchSuggestions ) ) {
+			return;
+		}
+
+		const { getSettings } = select( 'core/block-editor' );
+		return {
+			fetchSearchSuggestions: getSettings().__experimentalFetchLinkSuggestions,
+		};
+	} )
+)( LinkControl );
