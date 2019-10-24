@@ -78,9 +78,9 @@ export function getPreferences( state ) {
  *
  * @param {Object} state         Global application state.
  * @param {string} preferenceKey Preference Key.
- * @param {Mixed}  defaultValue  Default Value.
+ * @param {*}      defaultValue  Default Value.
  *
- * @return {Mixed} Preference Value.
+ * @return {*} Preference Value.
  */
 export function getPreference( state, preferenceKey, defaultValue ) {
 	const preferences = getPreferences( state );

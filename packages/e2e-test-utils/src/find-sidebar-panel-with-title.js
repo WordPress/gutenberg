@@ -8,7 +8,7 @@ import { first } from 'lodash';
  *
  * @param {string} panelTitle The name of sidebar panel.
  *
- * @return {?ElementHandle} Object that represents an in-page DOM element.
+ * @return {?puppeteer.ElementHandle} Object that represents an in-page DOM element.
  */
 export async function findSidebarPanelWithTitle( panelTitle ) {
 	const classSelect = ( className ) => `[contains(concat(" ", @class, " "), " ${ className } ")]`;

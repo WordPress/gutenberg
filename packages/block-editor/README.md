@@ -137,7 +137,7 @@ _Parameters_
 
 _Returns_
 
--   `WPElement`: Rendered element.
+-   `WPComponent`: The component to be rendered.
 
 <a name="BlockSelectionClearer" href="#BlockSelectionClearer">#</a> **BlockSelectionClearer**
 
@@ -396,6 +396,7 @@ The default editor settings
  **experimentalEnableLegacyWidgetBlock  boolean       Whether the user has enabled the Legacy Widget Block
  **experimentalEnableMenuBlock          boolean       Whether the user has enabled the Menu Block
  **experimentalBlockDirectory           boolean       Whether the user has enabled the Block Directory
+ \_\_experimentalEnableFullSiteEditing    boolean       Whether the user has enabled Full Site Editing
 
 <a name="SkipToSelectedBlock" href="#SkipToSelectedBlock">#</a> **SkipToSelectedBlock**
 
