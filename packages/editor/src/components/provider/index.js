@@ -60,9 +60,13 @@ class EditorProvider extends Component {
 
 		props.updatePostLock( props.settings.postLock );
 		props.setupEditor(
-			props.template || props.post,
-			props.template ? undefined : props.initialEdits,
-			props.template ? undefined : props.settings.template
+			props.settings.editingMode === 'template' ? props.template : props.post,
+			props.settings.editingMode === 'template' ?
+				undefined :
+				props.initialEdits,
+			props.settings.editingMode === 'template' ?
+				undefined :
+				props.settings.template
 		);
 
 		if ( props.settings.autosave ) {
@@ -160,6 +164,18 @@ class EditorProvider extends Component {
 				unregisterBlockType( blockType.name );
 			} );
 		}
+
+		if ( this.props.editingMode !== prevProps.editingMode ) {
+			this.props.setupEditor(
+				this.props.editingMode === 'template' ?
+					this.props.template :
+					this.props.post,
+				this.props.editingMode === 'template' ?
+					undefined :
+					this.props.initialEdits,
+				this.props.editingMode === 'template' ? undefined : this.props.template
+			);
+		}
 	}
 
 	componentWillUnmount() {
@@ -222,6 +238,7 @@ export default compose( [
 			__unstableIsEditorReady: isEditorReady,
 			getEditorBlocks,
 			__experimentalGetReusableBlocks,
+			getEditorSettings,
 		} = select( 'core/editor' );
 		const { canUser } = select( 'core' );
 		const { getInstalledBlockTypes } = select( 'core/block-directory' );
@@ -236,6 +253,7 @@ export default compose( [
 			reusableBlocks: __experimentalGetReusableBlocks(),
 			hasUploadPermissions: defaultTo( canUser( 'create', 'media' ), true ),
 			downloadableBlocksToUninstall,
+			editingMode: getEditorSettings().editingMode,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

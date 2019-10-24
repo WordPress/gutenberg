@@ -42,8 +42,8 @@ export class BrowserURL extends Component {
 	}
 
 	componentDidMount() {
-		const { isTemplate, postId } = this.props;
-		if ( isTemplate ) {
+		const { editingMode, postId } = this.props;
+		if ( editingMode === 'template' ) {
 			this.setBrowserURL( postId );
 		}
 	}
@@ -100,13 +100,13 @@ export class BrowserURL extends Component {
 
 export default withSelect( ( select ) => {
 	const { getEditorSettings, getCurrentPost } = select( 'core/editor' );
-	const { postId, templateId } = getEditorSettings();
+	const { postId, editingMode } = getEditorSettings();
 	const { status, type } = getCurrentPost();
 
 	return {
 		postId,
 		postStatus: status,
 		postType: type,
-		isTemplate: templateId !== undefined,
+		editingMode,
 	};
 } )( BrowserURL );

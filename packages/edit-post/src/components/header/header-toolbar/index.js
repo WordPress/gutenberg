@@ -16,6 +16,7 @@ import {
 	TableOfContents,
 	EditorHistoryRedo,
 	EditorHistoryUndo,
+	SwitchEditingMode,
 } from '@wordpress/editor';
 
 function HeaderToolbar( { hasFixedToolbar, isLargeViewport, showInserter, isTextModeEnabled } ) {
@@ -40,6 +41,7 @@ function HeaderToolbar( { hasFixedToolbar, isLargeViewport, showInserter, isText
 			<EditorHistoryRedo />
 			<TableOfContents hasOutlineItemsDisabled={ isTextModeEnabled } />
 			<BlockNavigationDropdown isDisabled={ isTextModeEnabled } />
+			<SwitchEditingMode />
 			{ hasFixedToolbar && isLargeViewport && (
 				<div className="edit-post-header-toolbar__block-toolbar">
 					<BlockToolbar />

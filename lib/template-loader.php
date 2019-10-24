@@ -177,14 +177,14 @@ function gutenberg_strip_php_suffix( $template_file ) {
 }
 
 /**
- * Extends default editor settings to add the right template ID.
+ * Extends default editor settings to add the right template ID and enable editing modes.
  *
  * @param array $settings Default editor settings.
  *
  * @return array Filtered editor settings.
  */
 function gutenberg_template_loader_filter_block_editor_settings( $settings ) {
-	global $_wp_current_template_post;
+	global $wp_query, $_wp_current_template_post;
 
 	// Run template resolution manually to trigger our override filters.
 	$tag_templates = array(
@@ -208,6 +208,8 @@ function gutenberg_template_loader_filter_block_editor_settings( $settings ) {
 	);
 	$template      = false;
 	// Loop through each of the template conditionals, and find the appropriate template file.
+	$post = get_post();
+	$wp_query->parse_query( 'p=' . $post->ID . '&preview=true' );
 	foreach ( $tag_templates as $tag => $template_getter ) {
 		if ( call_user_func( $tag ) ) {
 			$template = call_user_func( $template_getter );
@@ -225,7 +227,8 @@ function gutenberg_template_loader_filter_block_editor_settings( $settings ) {
 	}
 	$template = apply_filters( 'template_include', $template );
 
-	$settings['templateId'] = $_wp_current_template_post->ID;
+	$settings['templateId']  = $_wp_current_template_post->ID;
+	$settings['editingMode'] = 'post-content';
 	return $settings;
 }
 add_filter( 'block_editor_settings', 'gutenberg_template_loader_filter_block_editor_settings' );

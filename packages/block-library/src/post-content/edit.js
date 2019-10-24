@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import {
+	useEntityId,
 	useEntityProp,
 	__experimentalUseEntitySaving,
 } from '@wordpress/core-data';
@@ -13,10 +14,13 @@ import { InnerBlocks } from '@wordpress/block-editor';
 import { serializeBlocks } from '@wordpress/editor';
 
 export default function PostContentEdit() {
-	const [ content, setContent ] = useEntityProp( 'postType', 'post', 'content' );
+	const postId = useEntityId( 'postType', 'post' );
+	const [ content, _setContent ] = useEntityProp( 'postType', 'post', 'content' );
 	const initialBlocks = useMemo( () => {
-		const parsedContent = parse( content );
-		return parsedContent.length ? parsedContent : undefined;
+		if ( postId && typeof content !== 'function' ) {
+			const parsedContent = parse( content );
+			return parsedContent.length ? parsedContent : undefined;
+		}
 	}, [] );
 	const [ blocks = initialBlocks, setBlocks ] = useEntityProp(
 		'postType',
@@ -28,31 +32,31 @@ export default function PostContentEdit() {
 		'post',
 		'content'
 	);
-	return (
+	const saveContent = useCallback( () => {
+		_setContent( content( { blocks } ) );
+		save();
+	}, [ content, blocks ] );
+	const setContent = useCallback( () => {
+		_setContent( ( { blocks: blocksForSerialization = [] } ) =>
+			serializeBlocks( blocksForSerialization )
+		);
+	}, [] );
+	return postId ? (
 		<>
 			<Button
 				isPrimary
 				className="wp-block-custom-entity__save-button"
 				disabled={ ! isDirty || ! content }
 				isBusy={ isSaving }
-				onClick={ useCallback( () => {
-					setContent( content( { blocks } ) );
-					save();
-				}, [ content, blocks ] ) }
+				onClick={ saveContent }
 			>
 				{ __( 'Update' ) }
 			</Button>
 			<div className="entry-content">
-				<InnerBlocks
-					value={ blocks }
-					onChange={ setBlocks }
-					onInput={ useCallback( () => {
-						setContent( ( { blocks: blocksForSerialization = [] } ) =>
-							serializeBlocks( blocksForSerialization )
-						);
-					}, [] ) }
-				/>
+				<InnerBlocks value={ blocks } onChange={ setBlocks } onInput={ setContent } />
 			</div>
 		</>
+	) : (
+		'Post Content Placeholder'
 	);
 }
