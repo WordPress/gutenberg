@@ -8,23 +8,16 @@
 	// On Mobile keep a margin for the header and admin header
 	// as both of these are fixed
 	top: 0;
-	@include break-small() {
+	@include break-medium() {
 		margin-top: 0;
 
 		// On Desktop position the container as fixed to avoid scroll bleed.
 		position: fixed;
-		top: $admin-bar-height-big;
+		top: $admin-bar-height;
 		left: 0;
 		right: 0;
 		bottom: 0;
 		height: auto;
-		.is-fullscreen-mode & {
-			top: 0;
-		}
-	}
-
-	@include break-medium() {
-		top: $admin-bar-height;
 		.is-fullscreen-mode & {
 			top: 0;
 		}
@@ -37,7 +30,7 @@
 	display: flex;
 
 	// On Mobile the header is fixed to keep HTML as scrollable.
-	@include break-small() {
+	@include break-medium() {
 		overflow: auto;
 	}
 }
@@ -46,7 +39,7 @@
 	flex-grow: 1;
 
 	// On Mobile the header is fixed to keep HTML as scrollable.
-	@include break-small() {
+	@include break-medium() {
 		overflow: auto;
 	}
 }
@@ -54,21 +47,35 @@
 .edit-post-editor-regions__sidebar {
 	width: auto; // Keep the sidebar width flexible.
 	flex-shrink: 0;
+	position: fixed !important; // Need to override the default relative positionning
+	z-index: z-index(".edit-post-editor-regions__sidebar");
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+
+	&:empty {
+		display: none;
+	}
 
 	// On Mobile the header is fixed to keep HTML as scrollable.
-	@include break-small() {
+	@include break-medium() {
 		overflow: auto;
+		border-left: $border-width solid $light-gray-500;
+		position: relative !important;
+		z-index: initial;
 	}
 }
 
 .edit-post-editor-regions__header {
 	flex-shrink: 0;
 	height: auto;  // Keep the height flexible.
+	border-bottom: $border-width solid $light-gray-500;
 
 	// On Mobile the header is sticky.
 	position: sticky;
 	top: 0;
-	@include break-small() {
+	@include break-medium() {
 		// Cancel the fixed positionning used in mobile.
 		position: initial;
 		overflow: auto;
@@ -79,10 +86,11 @@
 	height: auto;  // Keep the height flexible.
 	flex-shrink: 0;
 	overflow: auto;
+	border-top: $border-width solid $light-gray-500;
 
 	// On Mobile the footer is hidden
 	display: none;
-	@include break-small() {
+	@include break-medium() {
 		display: block;
 	}
 }
