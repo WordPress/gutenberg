@@ -27,7 +27,6 @@ const maxSpacerHeight = 500;
 
 const SpacerEdit = ( { isSelected, attributes, setAttributes, getStylesFromColorScheme } ) => {
 	const { height } = attributes;
-	const [ sliderSpacerHeight, setSpacerHeight ] = useState( height );
 	const [ sliderSpacerMaxHeight, setSpacerMaxHeight ] = useState( height );
 
 	// Height defined on the web can be higher than
@@ -36,19 +35,6 @@ const SpacerEdit = ( { isSelected, attributes, setAttributes, getStylesFromColor
 	useEffect( () => {
 		setSpacerMaxHeight( height > maxSpacerHeight ? height * 2 : maxSpacerHeight );
 	}, [] );
-
-	const changeSpacerHeight = ( value ) => {
-		let spacerHeight = value;
-		setSpacerHeight( spacerHeight );
-		if ( spacerHeight < minSpacerHeight ) {
-			spacerHeight = minSpacerHeight;
-		} else if ( spacerHeight > sliderSpacerMaxHeight ) {
-			spacerHeight = sliderSpacerMaxHeight;
-		}
-		setAttributes( {
-			height: spacerHeight,
-		} );
-	};
 
 	const defaultStyle = getStylesFromColorScheme( styles.staticSpacer, styles.staticDarkSpacer );
 
@@ -59,11 +45,12 @@ const SpacerEdit = ( { isSelected, attributes, setAttributes, getStylesFromColor
 					<BottomSheet.RangeCell
 						icon={ 'admin-settings' }
 						label={ __( 'Height in pixels' ) }
-						value={ sliderSpacerHeight }
 						minimumValue={ minSpacerHeight }
 						maximumValue={ sliderSpacerMaxHeight }
 						separatorType={ 'fullWidth' }
-						onChangeValue={ ( value ) => changeSpacerHeight( value ) }
+						value={ height }
+						attribute="height"
+						setAttributes={ setAttributes }
 						style={ styles.rangeCellContainer }
 					/>
 				</PanelBody>

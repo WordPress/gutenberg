@@ -17,8 +17,8 @@ import Slider from '../slider';
 export default function BottomSheetRangeCell( props ) {
 	const {
 		value,
+		setAttributes,
 		defaultValue,
-		onChangeValue,
 		minimumValue = 0,
 		maximumValue = 10,
 		disabled,
@@ -26,9 +26,22 @@ export default function BottomSheetRangeCell( props ) {
 		minimumTrackTintColor = '#00669b',
 		maximumTrackTintColor = Platform.OS === 'ios' ? '#e9eff3' : '#909090',
 		thumbTintColor = Platform.OS === 'android' && '#00669b',
+		attribute,
 		...cellProps
 	} = props;
 	const [ accessible, onChangeAccessible ] = useState( true );
+
+	const onChangeValue = ( initialValue ) => {
+		let sliderValue = initialValue;
+		if ( sliderValue < minimumValue ) {
+			sliderValue = minimumValue;
+		} else if ( sliderValue > maximumValue ) {
+			sliderValue = maximumValue;
+		}
+		setAttributes( {
+			[ attribute ]: sliderValue,
+		} );
+	};
 
 	const onCellPress = () => {
 		onChangeAccessible( false );
