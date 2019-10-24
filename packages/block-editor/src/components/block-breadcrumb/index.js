@@ -27,7 +27,7 @@ const BlockBreadcrumb = function() {
 		return {
 			parents: getBlockParents( selectedBlockClientId ),
 			clientId: selectedBlockClientId,
-			hasSelection: getSelectionStart(),
+			hasSelection: getSelectionStart().clientId,
 		};
 	}, [] );
 
@@ -37,17 +37,22 @@ const BlockBreadcrumb = function() {
 	 */
 	/* eslint-disable jsx-a11y/no-redundant-roles */
 	return (
-		<nav aria-label={ __( 'Blocks breadcrumb' ) }>
+		<nav aria-label={ __( 'Block breadcrumb' ) }>
 			<ul className="block-editor-block-breadcrumb" role="list">
-				<li>
-					<Button
-						className="block-editor-block-breadcrumb__button"
-						isTertiary
-						onClick={ hasSelection ? clearSelectedBlock : null }
-						aria-current={ hasSelection ? false : 'true' }
-					>
-						{ __( 'Document' ) }
-					</Button>
+				<li
+					className={ ! hasSelection ? 'block-editor-block-breadcrumb__current' : undefined }
+					aria-current={ ! hasSelection ? 'true' : undefined }
+				>
+					{ hasSelection && (
+						<Button
+							className="block-editor-block-breadcrumb__button"
+							isTertiary
+							onClick={ clearSelectedBlock }
+						>
+							{ __( 'Document' ) }
+						</Button>
+					) }
+					{ ! hasSelection && __( 'Document' ) }
 				</li>
 				{ parents.map( ( parentClientId ) => (
 					<li key={ parentClientId }>
