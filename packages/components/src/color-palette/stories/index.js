@@ -15,9 +15,18 @@ import ColorPalette from '../';
 
 export default { title: 'ColorPalette', component: ColorPalette };
 
-export const _default = () => {
-	const [ color, setColor ] = useState( '#f00' );
+const ColorPaletteWithState = ( { ...props } ) => {
+	const [ color, setColor ] = useState( '#F00' );
+	return (
+		<ColorPalette
+			{ ...props }
+			value={ color }
+			onChange={ setColor }
+		/>
+	);
+};
 
+export const _default = () => {
 	const colors = [
 		{ name: 'red', color: '#f00' },
 		{ name: 'white', color: '#fff' },
@@ -25,17 +34,13 @@ export const _default = () => {
 	];
 
 	return (
-		<ColorPalette
+		<ColorPaletteWithState
 			colors={ colors }
-			value={ color }
-			onChange={ setColor }
 		/>
 	);
 };
 
 export const withKnobs = () => {
-	const [ color, setColor ] = useState( '#f00' );
-
 	const colors = [
 		object( 'Red', { name: 'red', color: '#f00' } ),
 		object( 'White', { name: 'white', color: '#fff' } ),
@@ -43,10 +48,8 @@ export const withKnobs = () => {
 	];
 
 	return (
-		<ColorPalette
+		<ColorPaletteWithState
 			colors={ colors }
-			value={ color }
-			onChange={ setColor }
 		/>
 	);
 };
