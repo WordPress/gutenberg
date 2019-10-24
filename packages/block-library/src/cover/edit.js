@@ -21,7 +21,7 @@ import {
 	PanelRow,
 	RangeControl,
 	ToggleControl,
-	Toolbar,
+	ToolbarGroup,
 	withNotices,
 	ResizableBox,
 	BaseControl,
@@ -292,7 +292,7 @@ class CoverEdit extends Component {
 					{ !! ( url || overlayColor.color ) && (
 						<>
 							<MediaUploadCheck>
-								<Toolbar>
+								<ToolbarGroup>
 									<MediaUpload
 										onSelect={ onSelectMedia }
 										allowedTypes={ ALLOWED_MEDIA_TYPES }
@@ -306,7 +306,7 @@ class CoverEdit extends Component {
 											/>
 										) }
 									/>
-								</Toolbar>
+								</ToolbarGroup>
 							</MediaUploadCheck>
 						</>
 					) }

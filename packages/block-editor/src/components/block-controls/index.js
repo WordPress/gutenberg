@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createSlotFill, Toolbar } from '@wordpress/components';
+import { createSlotFill, ToolbarGroup } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -12,7 +12,7 @@ const { Fill, Slot } = createSlotFill( 'BlockControls' );
 
 const BlockControlsFill = ( { controls, children } ) => (
 	<Fill>
-		<Toolbar controls={ controls } />
+		<ToolbarGroup controls={ controls } />
 		{ children }
 	</Fill>
 );

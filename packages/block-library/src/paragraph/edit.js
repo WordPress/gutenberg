@@ -11,7 +11,7 @@ import { Component } from '@wordpress/element';
 import {
 	PanelBody,
 	ToggleControl,
-	Toolbar,
+	ToolbarGroup,
 	withFallbackStyles,
 } from '@wordpress/components';
 import {
@@ -98,7 +98,7 @@ class ParagraphBlock extends Component {
 						} }
 					/>
 					{ isRTL && (
-						<Toolbar
+						<ToolbarGroup
 							controls={ [
 								{
 									icon: 'editor-ltr',

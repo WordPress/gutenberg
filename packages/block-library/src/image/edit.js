@@ -33,7 +33,7 @@ import {
 	TextareaControl,
 	TextControl,
 	ToggleControl,
-	Toolbar,
+	ToolbarGroup,
 	withNotices,
 } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
@@ -595,7 +595,7 @@ export class ImageEdit extends Component {
 				/>
 				{ url && (
 					<>
-						<Toolbar>
+						<ToolbarGroup>
 							<IconButton
 								className={ classnames( 'components-icon-button components-toolbar__control', { 'is-active': this.state.isEditing } ) }
 								label={ __( 'Edit image' ) }
@@ -603,8 +603,8 @@ export class ImageEdit extends Component {
 								onClick={ this.toggleIsEditing }
 								icon={ editImageIcon }
 							/>
-						</Toolbar>
-						<Toolbar>
+						</ToolbarGroup>
+						<ToolbarGroup>
 							<ImageURLInputUI
 								url={ href || '' }
 								onChangeUrl={ this.onSetHref }
@@ -633,7 +633,7 @@ export class ImageEdit extends Component {
 									</>
 								}
 							/>
-						</Toolbar>
+						</ToolbarGroup>
 					</>
 				) }
 			</BlockControls>

@@ -9,7 +9,7 @@ import {
 	PanelBody,
 	SelectControl,
 	ToggleControl,
-	Toolbar,
+	ToolbarGroup,
 	withNotices,
 } from '@wordpress/components';
 import {
@@ -154,14 +154,14 @@ class AudioEdit extends Component {
 		return (
 			<>
 				<BlockControls>
-					<Toolbar>
+					<ToolbarGroup>
 						<IconButton
 							className="components-icon-button components-toolbar__control"
 							label={ __( 'Edit audio' ) }
 							onClick={ switchToEditing }
 							icon="edit"
 						/>
-					</Toolbar>
+					</ToolbarGroup>
 				</BlockControls>
 				<InspectorControls>
 					<PanelBody title={ __( 'Audio Settings' ) }>

@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { _x } from '@wordpress/i18n';
-import { Toolbar } from '@wordpress/components';
+import { ToolbarGroup } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -36,7 +36,7 @@ export function BlockVerticalAlignmentToolbar( { value, onChange, controls = DEF
 	const defaultAlignmentControl = BLOCK_ALIGNMENTS_CONTROLS[ DEFAULT_CONTROL ];
 
 	return (
-		<Toolbar
+		<ToolbarGroup
 			isCollapsed={ isCollapsed }
 			icon={ activeAlignment ? activeAlignment.icon : defaultAlignmentControl.icon }
 			label={ _x( 'Change vertical alignment', 'Block vertical alignment setting label' ) }

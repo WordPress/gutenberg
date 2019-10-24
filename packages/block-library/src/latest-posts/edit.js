@@ -15,7 +15,7 @@ import {
 	RangeControl,
 	Spinner,
 	ToggleControl,
-	Toolbar,
+	ToolbarGroup,
 	RadioControl,
 } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
@@ -179,7 +179,7 @@ class LatestPostsEdit extends Component {
 			<>
 				{ inspectorControls }
 				<BlockControls>
-					<Toolbar controls={ layoutControls } />
+					<ToolbarGroup controls={ layoutControls } />
 				</BlockControls>
 				<ul
 					className={ classnames( this.props.className, {

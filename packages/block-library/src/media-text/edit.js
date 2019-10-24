@@ -21,7 +21,7 @@ import {
 	PanelBody,
 	TextareaControl,
 	ToggleControl,
-	Toolbar,
+	ToolbarGroup,
 	ExternalLink,
 	FocalPointPicker,
 } from '@wordpress/components';
@@ -222,7 +222,7 @@ class MediaTextEdit extends Component {
 					/>
 				</InspectorControls>
 				<BlockControls>
-					<Toolbar
+					<ToolbarGroup
 						controls={ toolbarControls }
 					/>
 					<BlockVerticalAlignmentToolbar

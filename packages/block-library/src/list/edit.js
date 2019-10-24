@@ -9,7 +9,7 @@ import {
 	RichTextShortcut,
 } from '@wordpress/block-editor';
 import {
-	Toolbar,
+	ToolbarGroup,
 } from '@wordpress/components';
 import {
 	__unstableIndentListItems as indentListItems,
@@ -70,7 +70,7 @@ export default function ListEdit( {
 				} }
 			/>
 			<BlockControls>
-				<Toolbar
+				<ToolbarGroup
 					controls={ [
 						{
 							icon: 'editor-ul',

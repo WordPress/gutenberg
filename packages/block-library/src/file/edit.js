@@ -15,7 +15,7 @@ import {
 	Animate,
 	ClipboardButton,
 	IconButton,
-	Toolbar,
+	ToolbarGroup,
 	withNotices,
 } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
@@ -190,7 +190,7 @@ class FileEdit extends Component {
 				/>
 				<BlockControls>
 					<MediaUploadCheck>
-						<Toolbar>
+						<ToolbarGroup>
 							<MediaUpload
 								onSelect={ this.onSelectFile }
 								value={ id }
@@ -203,7 +203,7 @@ class FileEdit extends Component {
 									/>
 								) }
 							/>
-						</Toolbar>
+						</ToolbarGroup>
 					</MediaUploadCheck>
 				</BlockControls>
 				<Animate type={ isBlobURL( href ) ? 'loading' : null }>

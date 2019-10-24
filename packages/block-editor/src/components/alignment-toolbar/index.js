@@ -7,7 +7,7 @@ import { find } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Toolbar } from '@wordpress/components';
+import { ToolbarGroup } from '@wordpress/components';
 
 const DEFAULT_ALIGNMENT_CONTROLS = [
 	{
@@ -43,7 +43,7 @@ export function AlignmentToolbar( props ) {
 	const activeAlignment = find( alignmentControls, ( control ) => control.align === value );
 
 	return (
-		<Toolbar
+		<ToolbarGroup
 			isCollapsed={ isCollapsed }
 			icon={ activeAlignment ? activeAlignment.icon : 'editor-alignleft' }
 			label={ label }

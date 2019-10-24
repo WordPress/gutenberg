@@ -8,7 +8,7 @@ import { castArray, flow } from 'lodash';
  */
 import { __, _n } from '@wordpress/i18n';
 import {
-	Toolbar,
+	ToolbarGroup,
 	DropdownMenu,
 	MenuGroup,
 	MenuItem,
@@ -46,7 +46,7 @@ export function BlockSettingsMenu( { clientIds } ) {
 				onInsertBefore,
 				onRemove,
 			} ) => (
-				<Toolbar>
+				<ToolbarGroup>
 					<DropdownMenu
 						icon="ellipsis"
 						label={ __( 'More options' ) }
@@ -124,7 +124,7 @@ export function BlockSettingsMenu( { clientIds } ) {
 							</>
 						) }
 					</DropdownMenu>
-				</Toolbar>
+				</ToolbarGroup>
 			) }
 		</BlockActions>
 	);

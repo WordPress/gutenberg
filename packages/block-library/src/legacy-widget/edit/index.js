@@ -6,7 +6,7 @@ import {
 	Button,
 	IconButton,
 	PanelBody,
-	Toolbar,
+	ToolbarGroup,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { withSelect } from '@wordpress/data';
@@ -77,7 +77,7 @@ class LegacyWidgetEdit extends Component {
 		return (
 			<>
 				<BlockControls>
-					<Toolbar>
+					<ToolbarGroup>
 						{ ! widgetObject.isHidden && (
 							<IconButton
 								onClick={ this.changeWidget }
@@ -101,7 +101,7 @@ class LegacyWidgetEdit extends Component {
 								</Button>
 							</>
 						) }
-					</Toolbar>
+					</ToolbarGroup>
 				</BlockControls>
 				{ inspectorControls }
 				{ ! isCallbackWidget && (

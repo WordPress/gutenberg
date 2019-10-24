@@ -22,7 +22,7 @@ import {
 	ToggleControl,
 	TextControl,
 	Button,
-	Toolbar,
+	ToolbarGroup,
 	DropdownMenu,
 	Placeholder,
 } from '@wordpress/components';
@@ -544,14 +544,14 @@ export class TableEdit extends Component {
 		return (
 			<>
 				<BlockControls>
-					<Toolbar>
+					<ToolbarGroup>
 						<DropdownMenu
 							hasArrowIndicator
 							icon="editor-table"
 							label={ __( 'Edit table' ) }
 							controls={ this.getTableControls() }
 						/>
-					</Toolbar>
+					</ToolbarGroup>
 					<AlignmentToolbar
 						label={ __( 'Change column alignment' ) }
 						alignmentControls={ ALIGNMENT_CONTROLS }

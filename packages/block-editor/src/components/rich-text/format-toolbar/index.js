@@ -9,7 +9,7 @@ import { orderBy } from 'lodash';
  */
 
 import { __ } from '@wordpress/i18n';
-import { Toolbar, Slot, DropdownMenu } from '@wordpress/components';
+import { ToolbarGroup, Slot, DropdownMenu } from '@wordpress/components';
 
 const POPOVER_PROPS = {
 	position: 'bottom left',
@@ -18,7 +18,7 @@ const POPOVER_PROPS = {
 const FormatToolbar = () => {
 	return (
 		<div className="editor-format-toolbar block-editor-format-toolbar">
-			<Toolbar>
+			<ToolbarGroup>
 				{ [ 'bold', 'italic', 'link' ].map( ( format ) =>
 					<Slot name={ `RichText.ToolbarControls.${ format }` } key={ format } />
 				) }
@@ -32,7 +32,7 @@ const FormatToolbar = () => {
 						/>
 					}
 				</Slot>
-			</Toolbar>
+			</ToolbarGroup>
 		</div>
 	);
 };

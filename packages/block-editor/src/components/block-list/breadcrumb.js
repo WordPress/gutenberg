@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Toolbar, Button } from '@wordpress/components';
+import { ToolbarGroup, Button } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { forwardRef } from '@wordpress/element';
 
@@ -28,7 +28,7 @@ const BlockBreadcrumb = forwardRef( ( { clientId }, ref ) => {
 
 	return (
 		<div className="editor-block-list__breadcrumb block-editor-block-list__breadcrumb">
-			<Toolbar>
+			<ToolbarGroup>
 				{ rootClientId && (
 					<>
 						<BlockTitle clientId={ rootClientId } />
@@ -38,7 +38,7 @@ const BlockBreadcrumb = forwardRef( ( { clientId }, ref ) => {
 				<Button ref={ ref } onClick={ () => setNavigationMode( false ) }>
 					<BlockTitle clientId={ clientId } />
 				</Button>
-			</Toolbar>
+			</ToolbarGroup>
 		</div>
 	);
 } );
