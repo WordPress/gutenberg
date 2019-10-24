@@ -438,26 +438,24 @@ class RichTextWrapper extends Component {
 							</Popover>
 						) }
 						{ isSelected && <RemoveBrowserShortcuts /> }
-						{ Platform.OS === 'web' && (
-							<Autocomplete
-								onReplace={ onReplace }
-								completers={ autocompleters }
-								record={ value }
-								onChange={ onChange }
-								isSelected={ isSelected }
-							>
-								{ ( { listBoxId, activeId, onKeyDown } ) =>
-									<Editable
-										aria-autocomplete={ listBoxId ? 'list' : undefined }
-										aria-owns={ listBoxId }
-										aria-activedescendant={ activeId }
-										start={ start }
-										reversed={ reversed }
-										onKeyDown={ onKeyDown }
-									/>
-								}
-							</Autocomplete>
-						) }
+						<Autocomplete
+							onReplace={ onReplace }
+							completers={ autocompleters }
+							record={ value }
+							onChange={ onChange }
+							isSelected={ isSelected }
+						>
+							{ ( { listBoxId, activeId, onKeyDown } ) =>
+								<Editable
+									aria-autocomplete={ listBoxId ? 'list' : undefined }
+									aria-owns={ listBoxId }
+									aria-activedescendant={ activeId }
+									start={ start }
+									reversed={ reversed }
+									onKeyDown={ onKeyDown }
+								/>
+							}
+						</Autocomplete>
 					</>
 				}
 			</RichText>
