@@ -13,17 +13,24 @@ import {
  * WordPress dependencies
  */
 import {
+	createNewPost,
 	getAllBlocks,
 	getAvailableBlockTransforms,
 	getBlockSetting,
 	getEditedPostContent,
 	hasBlockSwitcher,
-	createNewPost,
-	enableExperimentalFeatures,
-	setPostContent,
 	selectBlockByClientId,
+	setPostContent,
 	transformBlockTo,
 } from '@wordpress/e2e-test-utils';
+
+/**
+ * Internal dependencies
+ */
+import {
+	enableExperimentalFeatures,
+	disableExperimentalFeatures,
+} from '../../experimental-features';
 
 /**
  * Internal dependencies
@@ -119,6 +126,16 @@ describe( 'Block transforms', () => {
 			await page.click( '.editor-post-title .editor-post-title__block' );
 		}
 	} );
+
+	afterAll(
+		async () => {
+			await disableExperimentalFeatures( [
+				'#gutenberg-widget-experiments',
+				'#gutenberg-menu-block',
+				'#gutenberg-full-site-editing',
+			] );
+		}
+	);
 
 	it( 'should contain the expected transforms', async () => {
 		const transforms = mapValues(
