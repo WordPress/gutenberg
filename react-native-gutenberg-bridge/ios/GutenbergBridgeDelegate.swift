@@ -1,7 +1,7 @@
 public struct MediaInfo {
-    let id: Int32?
-    let url: String?
-    let type: String?
+    public let id: Int32?
+    public let url: String?
+    public let type: String?
 
     public init(id: Int32?, url: String?, type: String?) {
         self.id = id
