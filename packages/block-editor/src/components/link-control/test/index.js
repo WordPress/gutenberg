@@ -228,37 +228,40 @@ describe( 'Manual link entry', () => {
 		expect( firstSearchResultItemHTML ).toEqual( expect.stringContaining( 'Press ENTER to add this link' ) );
 	} );
 
-	it( 'should recognise "mailto" links and handle as manual entry', async () => {
-		const searchTerm = 'mailto:example123456@wordpress.org';
-		const searchType = 'mailto';
+	describe( 'Alternative link protocols and formats', () => {
+		it.each( [
+			[ 'mailto:example123456@wordpress.org', 'mailto' ],
+			[ 'tel:example123456@wordpress.org', 'tel' ],
+			[ '#internal-anchor', 'internal' ],
+		] )( 'should recognise "%s" as a %s link and handle as manual entry by displaying a single suggestion', async ( searchTerm, searchType ) => {
+			act( () => {
+				render(
+					<LinkControl
+						fetchSearchSuggestions={ fetchFauxEntitySuggestions }
+					/>, container
+				);
+			} );
 
-		act( () => {
-			render(
-				<LinkControl
-					fetchSearchSuggestions={ fetchFauxEntitySuggestions }
-				/>, container
-			);
+			// Search Input UI
+			const searchInput = container.querySelector( 'input[aria-label="URL"]' );
+
+			// Simulate searching for a term
+			act( () => {
+				Simulate.change( searchInput, { target: { value: searchTerm } } );
+			} );
+
+			// fetchFauxEntitySuggestions resolves on next "tick" of event loop
+			await eventLoopTick();
+
+			// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
+			const searchResultElements = container.querySelectorAll( '[role="listbox"] [role="option"]' );
+			const firstSearchResultItemHTML = searchResultElements[ 0 ].innerHTML;
+			const expectedResultsLength = 1;
+
+			expect( searchResultElements ).toHaveLength( expectedResultsLength );
+			expect( firstSearchResultItemHTML ).toEqual( expect.stringContaining( searchTerm ) );
+			expect( firstSearchResultItemHTML ).toEqual( expect.stringContaining( searchType ) );
+			expect( firstSearchResultItemHTML ).toEqual( expect.stringContaining( 'Press ENTER to add this link' ) );
 		} );
-
-		// Search Input UI
-		const searchInput = container.querySelector( 'input[aria-label="URL"]' );
-
-		// Simulate searching for a term
-		act( () => {
-			Simulate.change( searchInput, { target: { value: searchTerm } } );
-		} );
-
-		// fetchFauxEntitySuggestions resolves on next "tick" of event loop
-		await eventLoopTick();
-
-		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
-		const searchResultElements = container.querySelectorAll( '[role="listbox"] [role="option"]' );
-		const firstSearchResultItemHTML = searchResultElements[ 0 ].innerHTML;
-		const expectedResultsLength = 1;
-
-		expect( searchResultElements ).toHaveLength( expectedResultsLength );
-		expect( firstSearchResultItemHTML ).toEqual( expect.stringContaining( searchTerm ) );
-		expect( firstSearchResultItemHTML ).toEqual( expect.stringContaining( searchType ) );
-		expect( firstSearchResultItemHTML ).toEqual( expect.stringContaining( 'Press ENTER to add this link' ) );
 	} );
 } );
