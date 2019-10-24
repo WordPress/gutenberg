@@ -8,7 +8,6 @@
 	align-items: center;
 	// The header should never be wider than the viewport, or buttons might be hidden. Especially relevant at high zoom levels. Related to https://core.trac.wordpress.org/ticket/47603#ticket.
 	max-width: 100vw;
-	z-index: z-index(".edit-post-header");
 
 	// Make toolbar sticky on larger breakpoints
 	@include break-zoomed-in {
