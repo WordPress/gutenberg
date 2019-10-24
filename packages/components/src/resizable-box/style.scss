@@ -9,6 +9,10 @@
 	.components-resizable-box__container.is-selected & {
 		display: block;
 	}
+	// Show the resize handle if set in props
+	.components-resizable-box__container.is-show-handle & {
+		display: block;
+	}
 }
 
 // This is the "visible" resize handle - the circle part
