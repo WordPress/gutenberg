@@ -88,6 +88,13 @@ class RCTAztecView: Aztec.TextView {
         )
     }()
 
+    private lazy var placeholderWidthConstraint: NSLayoutConstraint = {
+        // width needs to be shrunk on both the left and the right by the textInset in order for
+        // the placeholder to be appropriately positioned with right alignment.
+        let placeholderWidthInset = 2 * leftTextInset
+        return placeholderLabel.widthAnchor.constraint(equalTo: widthAnchor, constant: -placeholderWidthInset)
+    }()
+
     /// If a dictation start with an empty UITextView,
     /// the dictation engine refreshes the TextView with an empty string when the dictation finishes.
     /// This helps to avoid propagating that unwanted empty string to RN. (Solving #606)
@@ -143,8 +150,8 @@ class RCTAztecView: Aztec.TextView {
         let topConstant = contentInset.top + textContainerInset.top
         NSLayoutConstraint.activate([
             placeholderHorizontalConstraint,
-            placeholderLabel.topAnchor.constraint(equalTo: topAnchor, constant: topConstant),
-            placeholderLabel.widthAnchor.constraint(equalTo: widthAnchor),
+            placeholderWidthConstraint,
+            placeholderLabel.topAnchor.constraint(equalTo: topAnchor, constant: topConstant)
         ])
     }
 
