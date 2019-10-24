@@ -30,16 +30,6 @@ function mergeProps( defaultProps = {}, props = {} ) {
 	return mergedProps;
 }
 
-function callAll( ...fns ) {
-	return ( ...args ) => {
-		for ( const fn of fns ) {
-			if ( typeof fn === 'function' ) {
-				fn( ...args );
-			}
-		}
-	};
-}
-
 function DropdownMenu( {
 	children,
 	className,
@@ -108,8 +98,18 @@ function DropdownMenu( {
 					<IconButton
 						{ ...mergedToggleProps }
 						icon={ icon }
-						onClick={ callAll( onToggle, mergedToggleProps.onClick ) }
-						onKeyDown={ callAll( openOnArrowDown, mergedToggleProps.onKeyDown ) }
+						onClick={ ( event ) => {
+							onToggle( event );
+							if ( mergedToggleProps.onClick ) {
+								mergedToggleProps.onClick( event );
+							}
+						} }
+						onKeyDown={ ( event ) => {
+							openOnArrowDown( event );
+							if ( mergedToggleProps.onKeyDown ) {
+								mergedToggleProps.onKeyDown( event );
+							}
+						} }
 						aria-haspopup="true"
 						aria-expanded={ isOpen }
 						label={ label }
