@@ -140,8 +140,10 @@ function ButtonEdit( {
 					}
 				) }
 				style={ {
-					backgroundColor: ! customGradient && backgroundColor.color,
-					background: customGradient,
+					...( customGradient ?
+						{ background: customGradient } :
+						{ backgroundColor: backgroundColor.color }
+					),
 					color: textColor.color,
 					borderRadius: borderRadius ? borderRadius + 'px' : undefined,
 				} }
