@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Panel, PanelBody } from '@wordpress/components';
+import { Panel } from '@wordpress/components';
 import { compose, ifCondition } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { BlockInspector } from '@wordpress/block-editor';
@@ -44,9 +44,7 @@ const SettingsSidebar = ( { sidebarName } ) => (
 				</>
 			) }
 			{ sidebarName === 'edit-post/block' && (
-				<PanelBody className="edit-post-settings-sidebar__panel-block">
-					<BlockInspector />
-				</PanelBody>
+				<BlockInspector />
 			) }
 		</Panel>
 	</Sidebar>

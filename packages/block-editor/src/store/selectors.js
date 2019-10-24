@@ -29,6 +29,16 @@ import {
 } from '@wordpress/blocks';
 import { SVG, Rect, G, Path } from '@wordpress/components';
 
+/**
+ * A block selection object.
+ *
+ * @typedef {Object} WPBlockSelection
+ *
+ * @property {string} clientId     A block client ID.
+ * @property {string} attributeKey A block attribute key.
+ * @property {number} offset       A block attribute offset.
+ */
+
 // Module constants
 
 /**
@@ -237,9 +247,9 @@ export const getGlobalBlockCount = createSelector(
 		if ( ! blockName ) {
 			return clientIds.length;
 		}
-		return reduce( clientIds, ( count, clientId ) => {
+		return reduce( clientIds, ( accumulator, clientId ) => {
 			const block = state.blocks.byClientId[ clientId ];
-			return block.name === blockName ? count + 1 : count;
+			return block.name === blockName ? accumulator + 1 : accumulator;
 		}, 0 );
 	},
 	( state ) => [
@@ -280,14 +290,6 @@ export const getBlocksByClientId = createSelector(
 export function getBlockCount( state, rootClientId ) {
 	return getBlockOrder( state, rootClientId ).length;
 }
-
-/**
- * @typedef {WPBlockSelection} A block selection object.
- *
- * @property {string} clientId     A block client ID.
- * @property {string} attributeKey A block attribute key.
- * @property {number} offset       A block attribute offset.
- */
 
 /**
  * Returns the current selection start block client ID, attribute key and text
@@ -1123,9 +1125,9 @@ const canIncludeBlockTypeInInserter = ( state, blockType, rootClientId ) => {
  * @param {Object}  state        Editor state.
  * @param {?string} rootClientId Optional root client ID of block list.
  *
- * @return {Editor.InserterItem[]} Items that appear in inserter.
+ * @return {WPEditorInserterItem[]} Items that appear in inserter.
  *
- * @typedef {Object} Editor.InserterItem
+ * @typedef {Object} WPEditorInserterItem
  * @property {string}   id                Unique identifier for the item.
  * @property {string}   name              The type of block to create.
  * @property {Object}   initialAttributes Attributes to pass to the newly created block.

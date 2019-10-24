@@ -281,6 +281,11 @@ export function* savePost( options = {} ) {
 		if ( args.length ) {
 			yield dispatch( 'core/notices', 'createSuccessNotice', ...args );
 		}
+		// Make sure that any edits after saving create an undo level and are
+		// considered for change detection.
+		if ( ! options.isAutosave ) {
+			yield dispatch( 'core/block-editor', '__unstableMarkLastChangeAsPersistent' );
+		}
 	}
 }
 

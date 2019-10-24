@@ -392,8 +392,8 @@ export class InserterMenu extends Component {
 								{ ! isReusableBlock( hoveredItem ) && (
 									<BlockCard blockType={ hoveredItemBlockType } />
 								) }
-								{ ( isReusableBlock( hoveredItem ) || hoveredItemBlockType.example ) && (
-									<div className="block-editor-inserter__preview">
+								<div className="block-editor-inserter__preview">
+									{ ( isReusableBlock( hoveredItem ) || hoveredItemBlockType.example ) ? (
 										<div className="block-editor-inserter__preview-content">
 											<BlockPreview
 												padding={ 10 }
@@ -405,8 +405,12 @@ export class InserterMenu extends Component {
 												}
 											/>
 										</div>
-									</div>
-								) }
+									) : (
+										<div className="block-editor-inserter__preview-content-missing">
+											{ __( 'No Preview Available.' ) }
+										</div>
+									) }
+								</div>
 							</>
 						) }
 						{ ! hoveredItem && (

@@ -32,19 +32,19 @@ export const settings = {
 					{
 						name: 'core/paragraph',
 						attributes: {
-							content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent et eros eu felis pellentesque efficitur. Nam dapibus felis malesuada tincidunt rhoncus. Integer non malesuada tortor.',
+							content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent et eros eu felis.',
 						},
 					},
 					{
 						name: 'core/image',
 						attributes: {
-							url: 'https://upload.wikimedia.org/wikipedia/commons/9/95/Windbuchencom.jpg',
+							url: 'https://s.w.org/images/core/5.3/Windbuchencom.jpg',
 						},
 					},
 					{
 						name: 'core/paragraph',
 						attributes: {
-							content: 'Suspendisse commodo neque lacus, a dictum orci interdum et. Ut vel mi ut leo fringilla rutrum.',
+							content: 'Suspendisse commodo neque lacus, a dictum orci interdum et.',
 						},
 					},
 				],
@@ -55,13 +55,13 @@ export const settings = {
 					{
 						name: 'core/paragraph',
 						attributes: {
-							content: __( 'Etiam et egestas lorem. Vivamus sagittis sit amet dolor quis lobortis. Integer sed fermentum arcu, id vulputate lacus. Etiam fermentum sem eu quam hendrerit, eget faucibus urna pulvinar.' ),
+							content: __( 'Etiam et egestas lorem. Vivamus sagittis sit amet dolor quis lobortis. Integer sed fermentum arcu, id vulputate lacus. Etiam fermentum sem eu quam hendrerit.' ),
 						},
 					},
 					{
 						name: 'core/paragraph',
 						attributes: {
-							content: __( 'Nam risus massa, ullamcorper consectetur eros fermentum, porta aliquet ligula. Sed vel mauris nec enim ultricies commodo.' ),
+							content: __( 'Nam risus massa, ullamcorper consectetur eros fermentum, porta aliquet ligula. Sed vel mauris nec enim.' ),
 						},
 					},
 				],

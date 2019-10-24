@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { invoke } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -84,8 +85,11 @@ function NavigationMenuItemEdit( {
 			</div>
 		);
 	} else {
-		content = attributes.label;
+		content = <div className="wp-block-navigation-menu-item__container">
+			{ attributes.label }
+		</div>;
 	}
+
 	return (
 		<Fragment>
 			<InspectorControls>
@@ -138,7 +142,12 @@ function NavigationMenuItemEdit( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<div className="wp-block-navigation-menu-item">
+			<div className={ classnames(
+				'wp-block-navigation-menu-item', {
+					'is-editing': isSelected || isParentOfSelectedBlock,
+					'is-selected': isSelected,
+				} ) }
+			>
 				{ content }
 				{ ( isSelected || isParentOfSelectedBlock ) &&
 					<InnerBlocks

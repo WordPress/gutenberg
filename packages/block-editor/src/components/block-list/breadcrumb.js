@@ -16,7 +16,7 @@ import BlockTitle from '../block-title';
  * the root block.
  *
  * @param {string}   props.clientId        Client ID of block.
- * @return {WPElement} Block Breadcrumb.
+ * @return {WPComponent} The component to be rendered.
  */
 const BlockBreadcrumb = forwardRef( ( { clientId }, ref ) => {
 	const { setNavigationMode } = useDispatch( 'core/block-editor' );

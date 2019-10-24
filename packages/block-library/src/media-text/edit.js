@@ -148,8 +148,10 @@ class MediaTextEdit extends Component {
 			'is-image-fill': imageFill,
 		} );
 		const widthString = `${ temporaryMediaWidth || mediaWidth }%`;
+		const gridTemplateColumns = 'right' === mediaPosition ? `1fr ${ widthString }` : `${ widthString } 1fr`;
 		const style = {
-			gridTemplateColumns: 'right' === mediaPosition ? `auto ${ widthString }` : `${ widthString } auto`,
+			gridTemplateColumns,
+			msGridColumns: gridTemplateColumns,
 			backgroundColor: backgroundColor.color,
 		};
 		const colorSettings = [ {

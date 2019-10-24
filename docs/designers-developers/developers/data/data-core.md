@@ -512,7 +512,7 @@ a given URl has been received.
 _Parameters_
 
 -   _url_ `string`: URL to preview the embed for.
--   _preview_ `Mixed`: Preview data.
+-   _preview_ `*`: Preview data.
 
 _Returns_
 

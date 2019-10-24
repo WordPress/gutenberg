@@ -11,6 +11,22 @@ import { applyFilters, doAction } from '@wordpress/hooks';
 import { isFunction } from 'lodash';
 
 /**
+ * Defined behavior of a plugin type.
+ *
+ * @typedef {Object} WPPlugin
+ *
+ * @property {string}                    name   A string identifying the plugin. Must be
+ *                                              unique across all registered plugins.
+ *                                              unique across all registered plugins.
+ * @property {string|WPElement|Function} icon   An icon to be shown in the UI. It can
+ *                                              be a slug of the Dashicon, or an element
+ *                                              (or function returning an element) if you
+ *                                              choose to render your own SVG.
+ * @property {Function}                  render A component containing the UI elements
+ *                                              to be rendered.
+ */
+
+/**
  * Plugin definitions keyed by plugin name.
  *
  * @type {Object.<string,WPPlugin>}
@@ -20,11 +36,9 @@ const plugins = {};
 /**
  * Registers a plugin to the editor.
  *
- * @param {string}                    name            A string identifying the plugin. Must be unique across all registered plugins.
- * @param {Object}                    settings        The settings for this plugin.
- * @param {string|WPElement|Function} settings.icon   An icon to be shown in the UI. It can be a slug of the Dashicon,
- * or an element (or function returning an element) if you choose to render your own SVG.
- * @param {Function}                  settings.render A component containing the UI elements to be rendered.
+ * @param {string}   name     A string identifying the plugin.Must be
+ *                            unique across all registered plugins.
+ * @param {WPPlugin} settings The settings for this plugin.
  *
  * @example <caption>ES5</caption>
  * ```js
@@ -90,7 +104,7 @@ const plugins = {};
  * } );
  * ```
  *
- * @return {Object} The final plugin settings object.
+ * @return {WPPlugin} The final plugin settings object.
  */
 export function registerPlugin( name, settings ) {
 	if ( typeof settings !== 'object' ) {
@@ -181,7 +195,7 @@ export function unregisterPlugin( name ) {
  *
  * @param {string} name Plugin name.
  *
- * @return {?Object} Plugin setting.
+ * @return {?WPPlugin} Plugin setting.
  */
 export function getPlugin( name ) {
 	return plugins[ name ];
@@ -190,7 +204,7 @@ export function getPlugin( name ) {
 /**
  * Returns all registered plugins.
  *
- * @return {Array} Plugin settings.
+ * @return {WPPlugin[]} Plugin settings.
  */
 export function getPlugins() {
 	return Object.values( plugins );

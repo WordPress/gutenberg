@@ -226,6 +226,21 @@ describe( 'Post generator actions', () => {
 				},
 			],
 			[
+				'yields an action for marking the last change as persistent',
+				() => true,
+				() => {
+					if ( ! isAutosave ) {
+						const { value } = fulfillment.next();
+						expect( value ).toEqual(
+							dispatch(
+								'core/block-editor',
+								'__unstableMarkLastChangeAsPersistent'
+							)
+						);
+					}
+				},
+			],
+			[
 				'implicitly returns undefined',
 				() => true,
 				() => {
