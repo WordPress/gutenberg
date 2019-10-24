@@ -7,7 +7,7 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { IconButton, Dropdown, Toolbar } from '@wordpress/components';
+import { IconButton, Dropdown, ToolbarGroup } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { DOWN } from '@wordpress/keycodes';
 import { ColorPaletteControl, ContrastChecker } from '@wordpress/block-editor';
@@ -43,7 +43,7 @@ const renderToggleComponent = ( style ) => ( { onToggle, isOpen } ) => {
 	};
 
 	return (
-		<Toolbar>
+		<ToolbarGroup>
 			<IconButton
 				className="components-icon-button components-toolbar__control block-library-colors-selector__toggle"
 				label={ __( 'Open Colors Selector' ) }
@@ -51,7 +51,7 @@ const renderToggleComponent = ( style ) => ( { onToggle, isOpen } ) => {
 				onKeyDown={ openOnArrowDown }
 				icon={ <ColorSelectorIcon style={ style } /> }
 			/>
-		</Toolbar>
+		</ToolbarGroup>
 	);
 };
 

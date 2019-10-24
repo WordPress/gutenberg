@@ -21,7 +21,7 @@ import {
 	CheckboxControl,
 	PanelBody,
 	Spinner,
-	Toolbar,
+	ToolbarGroup,
 } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 
@@ -106,9 +106,9 @@ function NavigationMenu( {
 	return (
 		<Fragment>
 			<BlockControls>
-				<Toolbar>
+				<ToolbarGroup>
 					{ navigatorToolbarButton }
-				</Toolbar>
+				</ToolbarGroup>
 				<BlockColorsStyleSelector
 					style={ navigationMenuStyles }
 					className={ navigationMenuClasses }
