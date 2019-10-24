@@ -11,7 +11,10 @@ export { default as ColorIndicator } from './color-indicator';
 export { default as ColorPalette } from './color-palette';
 export { default as ColorPicker } from './color-picker';
 export { default as Dashicon } from './dashicon';
-export { DateTimePicker, DatePicker, TimePicker } from './date-time';
+export { default as DatePicker } from './date-picker';
+export { default as TimePicker } from './time-picker';
+// Keep this as named export to avoid breaking backward compatibility
+export { DateTimePicker } from './date-time';
 export { default as Disabled } from './disabled';
 export { default as Draggable } from './draggable';
 export { default as DropZone } from './drop-zone';

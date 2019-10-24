@@ -1,0 +1,135 @@
+// We can't reference this package with ~ because of how Lerna handles packages.
+// Also, don't convert styles to RTL because react-dates uses an isRTL flag instead.
+/*rtl:begin:ignore*/
+@import "node_modules/react-dates/lib/css/_datepicker";
+/*rtl:end:ignore*/
+
+.components-time-picker {
+	margin-bottom: 1em;
+
+	fieldset {
+		margin-top: 0.5em;
+		position: relative;
+	}
+
+	.components-time-picker-field-am-pm fieldset {
+		margin-top: 0;
+	}
+
+	.components-time-picker-wrapper {
+		display: flex;
+
+		.components-time-picker-separator {
+			display: inline-block;
+			padding: 0 3px 0 0;
+			color: $dark-gray-500;
+		}
+
+		.components-time-picker-am-button {
+			margin-left: 8px;
+			margin-right: -1px;
+			border-radius: 3px 0 0 3px;
+		}
+
+		.components-time-picker-pm-button {
+			margin-left: -1px;
+			border-radius: 0 3px 3px 0;
+		}
+
+		.components-time-picker-am-button:focus,
+		.components-time-picker-pm-button:focus {
+			position: relative;
+			z-index: 1;
+		}
+
+		.components-time-picker-am-button.is-toggled,
+		.components-time-picker-pm-button.is-toggled {
+			background: $light-gray-300;
+			border-color: $dark-gray-100;
+			box-shadow: inset 0 2px 5px -3px $dark-gray-500;
+			&:focus {
+				box-shadow:
+					inset 0 2px 5px -3px $dark-gray-500,
+					0 0 0 1px $white,
+					0 0 0 3px $blue-medium-focus;
+			}
+		}
+
+		.components-time-picker-field {
+
+			&-time {
+				/*rtl:ignore*/
+				direction: ltr;
+			}
+
+
+			&.am-pm button {
+				font-size: 11px;
+				font-weight: 600;
+			}
+
+			select {
+				margin-right: 4px;
+
+				&:focus {
+					position: relative;
+					z-index: 1;
+				}
+			}
+
+			input[type="number"] {
+				padding: 2px;
+				margin-right: 4px;
+				text-align: center;
+				-moz-appearance: textfield;
+
+				&:focus {
+					position: relative;
+					z-index: 1;
+				}
+
+				&::-webkit-inner-spin-button {
+					-webkit-appearance: none;
+					margin: 0;
+				}
+			}
+		}
+	}
+
+	// Makes the month appear before the day if time format uses AM/PM
+	// We are assuming MM-DD-YYY correlates with AM/PM
+	&.is-12-hour {
+		.components-time-picker-field-day input {
+			margin: 0 -4px 0 0 !important;
+			border-radius: $radius-round-rectangle 0 0 $radius-round-rectangle !important;
+		}
+		.components-time-picker-field-year input {
+			border-radius: 0 $radius-round-rectangle $radius-round-rectangle 0 !important;
+		}
+	}
+}
+
+.components-time-picker-legend {
+	font-weight: 600;
+	margin-top: 0.5em;
+
+	&.invisible {
+		position: absolute;
+		top: -999em;
+		left: -999em;
+	}
+}
+
+.components-time-picker-field-hours-input,
+.components-time-picker-field-minutes-input,
+.components-time-picker-field-day-input {
+	width: 35px;
+}
+
+.components-time-picker-field-year-input {
+	width: 55px;
+}
+
+.components-time-picker-field-month-select {
+	max-width: 145px;
+}

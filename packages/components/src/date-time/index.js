@@ -15,9 +15,10 @@ import { __, _x } from '@wordpress/i18n';
  * Internal dependencies
  */
 import Button from '../button';
-import { default as DatePicker } from './date';
-import { default as TimePicker } from './time';
+import DatePicker from '../date-picker';
+import TimePicker from '../time-picker';
 
+// Keep this export to avoid breaking backward compatibility
 export { DatePicker, TimePicker };
 
 export class DateTimePicker extends Component {

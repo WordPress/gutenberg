@@ -636,6 +636,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "DatePicker",
+		"slug": "date-picker",
+		"markdown_source": "../packages/components/src/date-picker/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "DateTime",
 		"slug": "date-time",
 		"markdown_source": "../packages/components/src/date-time/README.md",
@@ -945,6 +951,12 @@
 		"title": "TextareaControl",
 		"slug": "textarea-control",
 		"markdown_source": "../packages/components/src/textarea-control/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "TimePicker",
+		"slug": "time-picker",
+		"markdown_source": "../packages/components/src/time-picker/README.md",
 		"parent": "components"
 	},
 	{
