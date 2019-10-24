@@ -124,6 +124,8 @@ function LinkControl( { currentLink, className, fetchSearchSuggestions, onLinkCh
 			'is-loading': isLoading,
 		} );
 
+		const manualLinkEntryTypes = [ 'url', 'mailto', 'tel', 'internal' ];
+
 		return (
 			<div className="block-editor-link-control__search-results-wrapper">
 				<div { ...suggestionsListProps } className={ resultsListClasses }>
@@ -134,7 +136,7 @@ function LinkControl( { currentLink, className, fetchSearchSuggestions, onLinkCh
 							suggestion={ suggestion }
 							onClick={ onLinkSelect( suggestion ) }
 							isSelected={ index === selectedSuggestion }
-							isURL={ suggestion.type.toLowerCase() === 'url' }
+							isURL={ manualLinkEntryTypes.includes( suggestion.type.toLowerCase() ) }
 							searchTerm={ inputValue }
 						/>
 					) ) }

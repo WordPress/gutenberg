@@ -47,7 +47,7 @@ describe( 'Basic rendering', () => {
 	} );
 } );
 
-describe( 'Searching', () => {
+describe( 'Searching for a link', () => {
 	it( 'should display loading UI when input is valid but search results have yet to be returned', async () => {
 		const searchTerm = 'Hello';
 
@@ -144,40 +144,6 @@ describe( 'Searching', () => {
 		expect( searchResultElements ).toHaveLength( 0 );
 	} );
 
-	it.each( [
-		[ 'https://make.wordpress.org' ], // explicit https
-		[ 'http://make.wordpress.org' ], // explicit http
-		[ 'www.wordpress.org' ], // usage of "www"
-	] )( 'should display a single suggestion result when the current input value is URL-like (eg: %s)', async ( searchTerm ) => {
-		act( () => {
-			render(
-				<LinkControl
-					fetchSearchSuggestions={ fetchFauxEntitySuggestions }
-				/>, container
-			);
-		} );
-
-		// Search Input UI
-		const searchInput = container.querySelector( 'input[aria-label="URL"]' );
-
-		// Simulate searching for a term
-		act( () => {
-			Simulate.change( searchInput, { target: { value: searchTerm } } );
-		} );
-
-		// fetchFauxEntitySuggestions resolves on next "tick" of event loop
-		await eventLoopTick();
-
-		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
-		const searchResultElements = container.querySelectorAll( '[role="listbox"] [role="option"]' );
-		const firstSearchResultItemHTML = searchResultElements[ 0 ].innerHTML;
-		const expectedResultsLength = 1;
-
-		expect( searchResultElements ).toHaveLength( expectedResultsLength );
-		expect( firstSearchResultItemHTML ).toEqual( expect.stringContaining( searchTerm ) );
-		expect( firstSearchResultItemHTML ).toEqual( expect.stringContaining( 'Press ENTER to add this link' ) );
-	} );
-
 	it( 'should reset input and search results when search term is cleared or reset', async ( ) => {
 		const searchTerm = 'Hello world';
 
@@ -224,5 +190,75 @@ describe( 'Searching', () => {
 
 		expect( searchInput.value ).toBe( '' );
 		expect( searchResultElements ).toHaveLength( 0 );
+	} );
+} );
+
+describe( 'Manual link entry', () => {
+	it.each( [
+		[ 'https://make.wordpress.org' ], // explicit https
+		[ 'http://make.wordpress.org' ], // explicit http
+		[ 'www.wordpress.org' ], // usage of "www"
+	] )( 'should display a single suggestion result when the current input value is URL-like (eg: %s)', async ( searchTerm ) => {
+		act( () => {
+			render(
+				<LinkControl
+					fetchSearchSuggestions={ fetchFauxEntitySuggestions }
+				/>, container
+			);
+		} );
+
+		// Search Input UI
+		const searchInput = container.querySelector( 'input[aria-label="URL"]' );
+
+		// Simulate searching for a term
+		act( () => {
+			Simulate.change( searchInput, { target: { value: searchTerm } } );
+		} );
+
+		// fetchFauxEntitySuggestions resolves on next "tick" of event loop
+		await eventLoopTick();
+
+		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
+		const searchResultElements = container.querySelectorAll( '[role="listbox"] [role="option"]' );
+		const firstSearchResultItemHTML = searchResultElements[ 0 ].innerHTML;
+		const expectedResultsLength = 1;
+
+		expect( searchResultElements ).toHaveLength( expectedResultsLength );
+		expect( firstSearchResultItemHTML ).toEqual( expect.stringContaining( searchTerm ) );
+		expect( firstSearchResultItemHTML ).toEqual( expect.stringContaining( 'Press ENTER to add this link' ) );
+	} );
+
+	it( 'should recognise "mailto" links and handle as manual entry', async () => {
+		const searchTerm = 'mailto:example123456@wordpress.org';
+		const searchType = 'mailto';
+
+		act( () => {
+			render(
+				<LinkControl
+					fetchSearchSuggestions={ fetchFauxEntitySuggestions }
+				/>, container
+			);
+		} );
+
+		// Search Input UI
+		const searchInput = container.querySelector( 'input[aria-label="URL"]' );
+
+		// Simulate searching for a term
+		act( () => {
+			Simulate.change( searchInput, { target: { value: searchTerm } } );
+		} );
+
+		// fetchFauxEntitySuggestions resolves on next "tick" of event loop
+		await eventLoopTick();
+
+		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
+		const searchResultElements = container.querySelectorAll( '[role="listbox"] [role="option"]' );
+		const firstSearchResultItemHTML = searchResultElements[ 0 ].innerHTML;
+		const expectedResultsLength = 1;
+
+		expect( searchResultElements ).toHaveLength( expectedResultsLength );
+		expect( firstSearchResultItemHTML ).toEqual( expect.stringContaining( searchTerm ) );
+		expect( firstSearchResultItemHTML ).toEqual( expect.stringContaining( searchType ) );
+		expect( firstSearchResultItemHTML ).toEqual( expect.stringContaining( 'Press ENTER to add this link' ) );
 	} );
 } );
