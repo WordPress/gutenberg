@@ -37,41 +37,39 @@ const BlockBreadcrumb = function() {
 	 */
 	/* eslint-disable jsx-a11y/no-redundant-roles */
 	return (
-		<nav aria-label={ __( 'Block breadcrumb' ) }>
-			<ul className="block-editor-block-breadcrumb" role="list">
-				<li
-					className={ ! hasSelection ? 'block-editor-block-breadcrumb__current' : undefined }
-					aria-current={ ! hasSelection ? 'true' : undefined }
-				>
-					{ hasSelection && (
-						<Button
-							className="block-editor-block-breadcrumb__button"
-							isTertiary
-							onClick={ clearSelectedBlock }
-						>
-							{ __( 'Document' ) }
-						</Button>
-					) }
-					{ ! hasSelection && __( 'Document' ) }
-				</li>
-				{ parents.map( ( parentClientId ) => (
-					<li key={ parentClientId }>
-						<Button
-							className="block-editor-block-breadcrumb__button"
-							isTertiary
-							onClick={ () => selectBlock( parentClientId ) }
-						>
-							<BlockTitle clientId={ parentClientId } />
-						</Button>
-					</li>
-				) ) }
-				{ !! clientId && (
-					<li className="block-editor-block-breadcrumb__current" aria-current="true">
-						<BlockTitle clientId={ clientId } />
-					</li>
+		<ul className="block-editor-block-breadcrumb" role="list" aria-label={ __( 'Block breadcrumb' ) }>
+			<li
+				className={ ! hasSelection ? 'block-editor-block-breadcrumb__current' : undefined }
+				aria-current={ ! hasSelection ? 'true' : undefined }
+			>
+				{ hasSelection && (
+					<Button
+						className="block-editor-block-breadcrumb__button"
+						isTertiary
+						onClick={ clearSelectedBlock }
+					>
+						{ __( 'Document' ) }
+					</Button>
 				) }
-			</ul>
-		</nav>
+				{ ! hasSelection && __( 'Document' ) }
+			</li>
+			{ parents.map( ( parentClientId ) => (
+				<li key={ parentClientId }>
+					<Button
+						className="block-editor-block-breadcrumb__button"
+						isTertiary
+						onClick={ () => selectBlock( parentClientId ) }
+					>
+						<BlockTitle clientId={ parentClientId } />
+					</Button>
+				</li>
+			) ) }
+			{ !! clientId && (
+				<li className="block-editor-block-breadcrumb__current" aria-current="true">
+					<BlockTitle clientId={ clientId } />
+				</li>
+			) }
+		</ul>
 		/* eslint-enable jsx-a11y/no-redundant-roles */
 	);
 };
