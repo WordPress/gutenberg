@@ -48,9 +48,9 @@ function LinkControl( { currentLink, className, fetchSearchSuggestions, onLinkCh
 		resetInput();
 	};
 
-	const resetInput = useCallback( () => {
+	const resetInput = () => {
 		setInputValue( '' );
-	} );
+	};
 
 	const onLinkSelect = ( suggestion ) => ( event ) => {
 		event.preventDefault();
