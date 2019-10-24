@@ -137,7 +137,7 @@ _Parameters_
 
 _Returns_
 
--   `WPElement`: Rendered element.
+-   `WPComponent`: The component to be rendered.
 
 <a name="BlockSelectionClearer" href="#BlockSelectionClearer">#</a> **BlockSelectionClearer**
 
