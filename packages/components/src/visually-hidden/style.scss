@@ -13,7 +13,7 @@
 }
 
 .components-visually-hidden:focus {
-	background-color: #eee;
+	background-color: $light-gray-500;
 	clip: auto !important;
 	clip-path: none;
 	color: #444;
