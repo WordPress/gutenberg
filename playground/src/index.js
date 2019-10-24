@@ -6,6 +6,7 @@ import { uniqueId, random } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { ESCAPE } from '@wordpress/keycodes';
 import '@wordpress/editor'; // This shouldn't be necessary
 
 import { render, useState, Fragment } from '@wordpress/element';
@@ -86,16 +87,22 @@ function App() {
 		] );
 	};
 
-	const handleOnKeyDownEvent = ( { keyCode }, suggestion ) => {
-		console.log( `onKeyDown - Key code: ${ keyCode }` );
+	const handleOnKeyDownEvent = ( event, suggestion ) => {
+		console.log( `onKeyDown - Key code: ${ event.keyCode }` );
 		if ( null !== suggestion ) {
 			console.log( `suggestion: ${ suggestion }` );
 		}
+
+		// Do not stop propagation for ESCAPE key
+		if ( ESCAPE === event.keyCode ) {
+			return;
+		}
+
 		event.stopPropagation();
 	};
 
-	const handleOnKeyPressEvent = ( { keyCode } ) => {
-		console.log( `onKeyPress - Key code: ${ keyCode }` );
+	const handleOnKeyPressEvent = ( event) => {
+		console.log( `onKeyPress - Key code: ${ event.keyCode }` );
 		event.stopPropagation();
 	};
 
