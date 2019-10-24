@@ -79,6 +79,10 @@ function NavigationMenuItemEdit( {
 		closeURLPopover();
 	};
 
+	const stopPropagation = ( event ) => {
+		event.stopPropagation();
+	};
+
 	const { label, url } = attributes;
 	let content;
 	if ( isSelected ) {
@@ -119,7 +123,7 @@ function NavigationMenuItemEdit( {
 							<URLPopover.LinkEditor
 								value={ inputValue }
 								onChangeInputValue={ setUrlInput }
-								onKeyPress={ ( event ) => event.stopPropagation() }
+								onKeyPress={ stopPropagation }
 								onKeyDown={ onKeyDown }
 								onSubmit={ ( event ) => event.preventDefault() }
 								autocompleteRef={ autocompleteRef }
@@ -127,7 +131,7 @@ function NavigationMenuItemEdit( {
 							}
 							{ ( url && ! isEditingLink ) &&
 								<URLPopover.LinkViewer
-									onKeyPress={ ( event ) => event.stopPropagation() }
+									onKeyPress={ stopPropagation }
 									url={ url }
 								/>
 							}
