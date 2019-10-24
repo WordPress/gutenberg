@@ -1080,6 +1080,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/base-styles",
+		"slug": "packages-base-styles",
+		"markdown_source": "../packages/base-styles/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/blob",
 		"slug": "packages-blob",
 		"markdown_source": "../packages/blob/README.md",

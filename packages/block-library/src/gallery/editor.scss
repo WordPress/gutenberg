@@ -17,8 +17,10 @@ figure.wp-block-gallery {
 	margin: 0;
 }
 
-// need to override default editor ul styles
+// Necessary to to override default editor ul styles.
 .blocks-gallery-grid.blocks-gallery-grid {
+	padding-left: 0;
+	margin-left: 0;
 	margin-bottom: 0;
 }
 

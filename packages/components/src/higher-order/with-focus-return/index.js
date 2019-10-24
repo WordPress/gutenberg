@@ -36,11 +36,11 @@ function isComponentLike( object ) {
  * when the component is unmounted.
  *
  * @param {(WPComponent|Object)} options The component to be enhanced with
- *                                       focus return behavior, or an object
- *                                       describing the component and the
- *                                       focus return characteristics.
+ *                                      focus return behavior, or an object
+ *                                      describing the component and the
+ *                                      focus return characteristics.
  *
- * @return {Component} Component with the focus restauration behaviour.
+ * @return {WPComponent} Component with the focus restauration behaviour.
  */
 function withFocusReturn( options ) {
 	// Normalize as overloaded form `withFocusReturn( options )( Component )`

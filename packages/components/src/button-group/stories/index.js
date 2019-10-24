@@ -6,9 +6,12 @@ import ButtonGroup from '../';
 
 export default { title: 'Button Group', component: ButtonGroup };
 
-export const _default = () => (
-	<ButtonGroup>
-		<Button isPrimary>Button 1</Button>
-		<Button isPrimary>Button 2</Button>
-	</ButtonGroup>
-);
+export const _default = () => {
+	const style = { margin: '0 4px' };
+	return (
+		<ButtonGroup>
+			<Button isPrimary style={ style }>Button 1</Button>
+			<Button isPrimary style={ style }>Button 2</Button>
+		</ButtonGroup>
+	);
+};

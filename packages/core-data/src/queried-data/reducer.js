@@ -74,10 +74,10 @@ function items( state = {}, action ) {
 			const key = action.key || DEFAULT_ENTITY_KEY;
 			return {
 				...state,
-				...action.items.reduce( ( acc, value ) => {
+				...action.items.reduce( ( accumulator, value ) => {
 					const itemId = value[ key ];
-					acc[ itemId ] = conservativeMapItem( state[ itemId ], value );
-					return acc;
+					accumulator[ itemId ] = conservativeMapItem( state[ itemId ], value );
+					return accumulator;
 				}, {} ),
 			};
 	}

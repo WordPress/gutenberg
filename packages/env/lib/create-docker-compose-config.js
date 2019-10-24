@@ -11,7 +11,7 @@ module.exports = function createDockerComposeConfig(
       - ${ pluginPath }/../${ pluginName }-wordpress/:/var/www/html/${ commonVolumes }`;
 	const testsVolumes = `
       - tests-wordpress:/var/www/html/${ commonVolumes }`;
-	return `version: '2'
+	return `version: '2.1'
 volumes:
   tests-wordpress:
 services:
@@ -28,7 +28,7 @@ services:
       WORDPRESS_DB_PASSWORD: password
     image: wordpress
     ports:
-      - 8888:80
+      - \${WP_ENV_PORT:-8888}:80
     volumes:${ volumes }
   wordpress-cli:
     depends_on:
@@ -44,7 +44,7 @@ services:
       WORDPRESS_DB_PASSWORD: password
     image: wordpress
     ports:
-      - 8889:80
+      - \${WP_ENV_TESTS_PORT:-8889}:80
     volumes:${ testsVolumes }
   tests-wordpress-cli:
     depends_on:

@@ -38,7 +38,7 @@ export const settings = {
 					{
 						name: 'core/image',
 						attributes: {
-							url: 'https://upload.wikimedia.org/wikipedia/commons/9/95/Windbuchencom.jpg',
+							url: 'https://s.w.org/images/core/5.3/Windbuchencom.jpg',
 						},
 					},
 					{
