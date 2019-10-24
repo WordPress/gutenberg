@@ -43,6 +43,7 @@ function LinkControl( {
 	currentSettings,
 	onKeyDown = noop,
 	onKeyPress = noop,
+	onClose = noop,
 } ) {
 	// State
 	const [ inputValue, setInputValue ] = useState( '' );
@@ -55,6 +56,7 @@ function LinkControl( {
 
 	const closeLinkUI = () => {
 		resetInput();
+		onClose();
 	};
 
 	const resetInput = () => {
