@@ -488,8 +488,6 @@ export default compose(
 			__experimentalFetchReusableBlocks: fetchReusableBlocks,
 		} = dispatch( 'core/editor' );
 
-		const { isAppender } = ownProps;
-
 		// To avoid duplication, getInsertionIndex is extracted and used in two event handlers
 		// This breaks the withDispatch not containing any logic rule.
 		// Since it's a function only called when the event handlers are called,
@@ -502,7 +500,7 @@ export default compose(
 				getBlockOrder,
 			} = select( 'core/block-editor' );
 
-			const { clientId, destinationRootClientId } = ownProps;
+			const { clientId, destinationRootClientId, isAppender } = ownProps;
 
 			// If the clientId is defined, we insert at the position of the block.
 			if ( clientId ) {
@@ -534,6 +532,7 @@ export default compose(
 				const {
 					getSelectedBlock,
 				} = select( 'core/block-editor' );
+				const { isAppender } = ownProps;
 				const { name, initialAttributes } = item;
 				const selectedBlock = getSelectedBlock();
 				const insertedBlock = createBlock( name, initialAttributes );
