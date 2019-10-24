@@ -1,0 +1,14 @@
+[
+    {
+        "clientId": "_clientId_0",
+        "name": "core/heading",
+        "isValid": true,
+        "attributes": {
+            "content": "Text",
+            "level": 2,
+            "textColor": "accent"
+        },
+        "innerBlocks": [],
+        "originalContent": "<h2 class=\"has-accent-color has-text-color\">Text</h2>"
+    }
+]

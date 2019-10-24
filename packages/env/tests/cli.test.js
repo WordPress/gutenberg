@@ -71,7 +71,9 @@ describe( 'env cli', () => {
 		cli().parse( [ 'start' ] );
 		const { spinner } = env.start.mock.calls[ 0 ][ 0 ];
 		await env.start.mock.results[ 0 ].value;
-		expect( spinner.succeed ).toHaveBeenCalledWith( 'success message (in 0s 0ms)' );
+		expect( spinner.succeed ).toHaveBeenCalledWith(
+			expect.stringMatching( /^success message \(in \d+s \d+ms\)$/ )
+		);
 	} );
 	it( 'handles successful commands with spinner text.', async () => {
 		env.start.mockResolvedValueOnce();
@@ -80,7 +82,7 @@ describe( 'env cli', () => {
 		spinner.text = 'success spinner text';
 		await env.start.mock.results[ 0 ].value;
 		expect( spinner.succeed ).toHaveBeenCalledWith(
-			'success spinner text (in 0s 0ms)'
+			expect.stringMatching( /^success spinner text \(in \d+s \d+ms\)$/ )
 		);
 	} );
 

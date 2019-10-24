@@ -22,6 +22,7 @@ function BlockNavigationDropdown( { hasBlocks, isDisabled } ) {
 
 	return	(
 		<Dropdown
+			contentClassName="editor-block-navigation__popover block-editor-block-navigation__popover"
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<>
 					{ isEnabled && <KeyboardShortcuts

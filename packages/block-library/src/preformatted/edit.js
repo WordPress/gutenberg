@@ -21,7 +21,7 @@ export default function PreformattedEdit( { attributes, mergeBlocks, setAttribut
 				} );
 			} }
 			placeholder={ __( 'Write preformatted text…' ) }
-			wrapperClassName={ className }
+			className={ className }
 			onMerge={ mergeBlocks }
 		/>
 	);

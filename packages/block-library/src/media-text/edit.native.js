@@ -18,6 +18,8 @@ import { Component } from '@wordpress/element';
 import {
 	Toolbar,
 } from '@wordpress/components';
+import { compose } from '@wordpress/compose';
+import { withViewportMatch } from '@wordpress/viewport';
 
 /**
  * Internal dependencies
@@ -41,6 +43,7 @@ class MediaTextEdit extends Component {
 		super( ...arguments );
 
 		this.onSelectMedia = this.onSelectMedia.bind( this );
+		this.onMediaUpdate = this.onMediaUpdate.bind( this );
 		this.onWidthChange = this.onWidthChange.bind( this );
 		this.commitWidthChange = this.commitWidthChange.bind( this );
 		this.state = {
@@ -66,7 +69,7 @@ class MediaTextEdit extends Component {
 			mediaType = media.type;
 		}
 
-		if ( mediaType === 'image' ) {
+		if ( mediaType === 'image' && media.sizes ) {
 			// Try the "large" size URL, falling back to the "full" size URL below.
 			src = get( media, [ 'sizes', 'large', 'url' ] ) || get( media, [ 'media_details', 'sizes', 'large', 'source_url' ] );
 		}
@@ -78,6 +81,15 @@ class MediaTextEdit extends Component {
 			mediaUrl: src || media.url,
 			imageFill: undefined,
 			focalPoint: undefined,
+		} );
+	}
+
+	onMediaUpdate( media ) {
+		const { setAttributes } = this.props;
+
+		setAttributes( {
+			mediaId: media.id,
+			mediaUrl: media.url,
 		} );
 	}
 
@@ -99,16 +111,17 @@ class MediaTextEdit extends Component {
 	}
 
 	renderMediaArea() {
-		const { attributes } = this.props;
+		const { attributes, isSelected } = this.props;
 		const { mediaAlt, mediaId, mediaPosition, mediaType, mediaUrl, mediaWidth, imageFill, focalPoint } = attributes;
 
 		return (
 			<MediaContainer
 				onSelectMedia={ this.onSelectMedia }
+				onMediaUpdate={ this.onMediaUpdate }
 				onWidthChange={ this.onWidthChange }
 				commitWidthChange={ this.commitWidthChange }
 				onFocus={ this.props.onFocus }
-				{ ...{ mediaAlt, mediaId, mediaType, mediaUrl, mediaPosition, mediaWidth, imageFill, focalPoint } }
+				{ ...{ mediaAlt, mediaId, mediaType, mediaUrl, mediaPosition, mediaWidth, imageFill, focalPoint, isSelected } }
 			/>
 		);
 	}
@@ -118,6 +131,7 @@ class MediaTextEdit extends Component {
 			attributes,
 			backgroundColor,
 			setAttributes,
+			isMobile,
 		} = this.props;
 		const {
 			isStackedOnMobile,
@@ -125,17 +139,18 @@ class MediaTextEdit extends Component {
 			mediaWidth,
 			verticalAlignment,
 		} = attributes;
-		const temporaryMediaWidth = this.state.mediaWidth || mediaWidth;
+		const shouldStack = isStackedOnMobile && isMobile;
+		const temporaryMediaWidth = shouldStack ? 100 : ( this.state.mediaWidth || mediaWidth );
 		const widthString = `${ temporaryMediaWidth }%`;
 		const containerStyles = {
 			...styles[ 'wp-block-media-text' ],
 			...styles[ `is-vertically-aligned-${ verticalAlignment }` ],
 			...( mediaPosition === 'right' ? styles[ 'has-media-on-the-right' ] : {} ),
-			...( isStackedOnMobile ? styles[ 'is-stacked-on-mobile' ] : {} ),
-			...( isStackedOnMobile && mediaPosition === 'right' ? styles[ 'is-stacked-on-mobile.has-media-on-the-right' ] : {} ),
+			...( shouldStack ? styles[ 'is-stacked-on-mobile' ] : {} ),
+			...( shouldStack && mediaPosition === 'right' ? styles[ 'is-stacked-on-mobile.has-media-on-the-right' ] : {} ),
 			backgroundColor: backgroundColor.color,
 		};
-		const innerBlockWidth = 100 - temporaryMediaWidth;
+		const innerBlockWidth = shouldStack ? 100 : ( 100 - temporaryMediaWidth );
 		const innerBlockWidthString = `${ innerBlockWidth }%`;
 
 		const toolbarControls = [ {
@@ -183,4 +198,7 @@ class MediaTextEdit extends Component {
 	}
 }
 
-export default withColors( 'backgroundColor' )( MediaTextEdit );
+export default compose(
+	withColors( 'backgroundColor' ),
+	withViewportMatch( { isMobile: '< small' } )
+)( MediaTextEdit );

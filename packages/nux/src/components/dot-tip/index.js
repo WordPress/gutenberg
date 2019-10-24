@@ -5,6 +5,7 @@ import { compose } from '@wordpress/compose';
 import { Popover, Button, IconButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
+import { useCallback, useRef } from '@wordpress/element';
 
 function getAnchorRect( anchor ) {
 	// The default getAnchorRect() excludes an element's top and bottom padding
@@ -27,6 +28,26 @@ export function DotTip( {
 	onDismiss,
 	onDisable,
 } ) {
+	const anchorParent = useRef( null );
+	const getAnchorRectCallback = useCallback(
+		( anchor ) => {
+			anchorParent.current = anchor.parentNode;
+			return getAnchorRect( anchor );
+		},
+		[ anchorParent ]
+	);
+	const onFocusOutsideCallback = useCallback(
+		( event ) => {
+			if ( ! anchorParent.current ) {
+				return;
+			}
+			if ( anchorParent.current.contains( event.relatedTarget ) ) {
+				return;
+			}
+			onDisable();
+		},
+		[ onDisable, anchorParent ]
+	);
 	if ( ! isVisible ) {
 		return null;
 	}
@@ -37,10 +58,11 @@ export function DotTip( {
 			position={ position }
 			noArrow
 			focusOnMount="container"
-			getAnchorRect={ getAnchorRect }
+			getAnchorRect={ getAnchorRectCallback }
 			role="dialog"
 			aria-label={ __( 'Editor tips' ) }
 			onClick={ onClick }
+			onFocusOutside={ onFocusOutsideCallback }
 		>
 			<p>{ children }</p>
 			<p>

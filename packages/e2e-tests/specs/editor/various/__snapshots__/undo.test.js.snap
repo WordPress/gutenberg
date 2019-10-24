@@ -1,0 +1,31 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`undo should immediately create an undo level on typing 1`] = `
+"<!-- wp:paragraph -->
+<p>1</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`undo should undo typing after a pause 1`] = `
+"<!-- wp:paragraph -->
+<p>before pause after pause</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`undo should undo typing after a pause 2`] = `
+"<!-- wp:paragraph -->
+<p>before pause</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`undo should undo typing after non input change 1`] = `
+"<!-- wp:paragraph -->
+<p>before keyboard <strong>after keyboard</strong></p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`undo should undo typing after non input change 2`] = `
+"<!-- wp:paragraph -->
+<p>before keyboard </p>
+<!-- /wp:paragraph -->"
+`;

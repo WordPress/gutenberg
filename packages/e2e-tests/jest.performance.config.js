@@ -1,7 +1,7 @@
 module.exports = {
 	...require( '@wordpress/scripts/config/jest-e2e.config' ),
 	testMatch: [
-		'**/performance.test.js',
+		'**/performance/*.test.js',
 	],
 	setupFiles: [
 		'<rootDir>/config/gutenberg-phase.js',

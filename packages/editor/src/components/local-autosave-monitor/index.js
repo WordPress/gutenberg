@@ -49,28 +49,17 @@ function useAutosaveNotice() {
 	const {
 		postId,
 		getEditedPostAttribute,
-		remoteAutosave,
-		hasFetchedAutosave,
-	} = useSelect( ( select ) => {
-		const _postId = select( 'core/editor' ).getCurrentPostId();
-		const postType = select( 'core/editor' ).getCurrentPostType();
-		const user = select( 'core' ).getCurrentUser();
-		return {
-			postId: _postId,
-			getEditedPostAttribute: select( 'core/editor' ).getEditedPostAttribute,
-			remoteAutosave: select( 'core' ).getAutosave( postType, _postId, user.id ),
-			hasFetchedAutosave: select( 'core' ).hasFetchedAutosaves( postType, _postId ) && user.id,
-		};
-	} );
+		hasRemoteAutosave,
+	} = useSelect( ( select ) => ( {
+		postId: select( 'core/editor' ).getCurrentPostId(),
+		getEditedPostAttribute: select( 'core/editor' ).getEditedPostAttribute,
+		hasRemoteAutosave: !! select( 'core/editor' ).getEditorSettings().autosave,
+	} ) );
 
 	const { createWarningNotice, removeNotice } = useDispatch( 'core/notices' );
 	const { editPost, resetEditorBlocks } = useDispatch( 'core/editor' );
 
 	useEffect( () => {
-		if ( ! hasFetchedAutosave ) {
-			return;
-		}
-
 		let localAutosave = localAutosaveGet( postId );
 		if ( ! localAutosave ) {
 			return;
@@ -100,7 +89,7 @@ function useAutosaveNotice() {
 			}
 		}
 
-		if ( remoteAutosave ) {
+		if ( hasRemoteAutosave ) {
 			return;
 		}
 
@@ -118,7 +107,7 @@ function useAutosaveNotice() {
 				},
 			],
 		} );
-	}, [ postId, hasFetchedAutosave ] );
+	}, [ postId ] );
 }
 
 /**
@@ -132,7 +121,6 @@ function useAutosavePurge() {
 		didError,
 	} = useSelect( ( select ) => ( {
 		postId: select( 'core/editor' ).getCurrentPostId(),
-		postType: select( 'core/editor' ).getCurrentPostType(),
 		isDirty: select( 'core/editor' ).isEditedPostDirty(),
 		isAutosaving: select( 'core/editor' ).isAutosavingPost(),
 		didError: select( 'core/editor' ).didPostSaveRequestFail(),
@@ -142,7 +130,12 @@ function useAutosavePurge() {
 	const lastIsAutosaving = useRef( isAutosaving );
 
 	useEffect( () => {
-		if ( lastIsAutosaving.current && ! isAutosaving && ! didError ) {
+		if (
+			! didError && (
+				( lastIsAutosaving.current && ! isAutosaving ) ||
+				( lastIsDirty.current && ! isDirty )
+			)
+		) {
 			localAutosaveClear( postId );
 		}
 

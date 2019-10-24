@@ -9,6 +9,11 @@ import { withSelect } from '@wordpress/data';
 import BlockControls from '../block-controls';
 import BlockFormatControls from '../block-format-controls';
 
+/**
+ * Internal dependencies
+ */
+import UngroupButton from '../ungroup-button';
+
 export const BlockToolbar = ( { blockClientIds, isValid, mode } ) => {
 	if ( blockClientIds.length === 0 ) {
 		return null;
@@ -18,6 +23,7 @@ export const BlockToolbar = ( { blockClientIds, isValid, mode } ) => {
 		<>
 			{ mode === 'visual' && isValid && (
 				<>
+					<UngroupButton />
 					<BlockControls.Slot />
 					<BlockFormatControls.Slot />
 				</>

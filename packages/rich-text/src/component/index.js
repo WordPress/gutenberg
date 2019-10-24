@@ -79,6 +79,31 @@ function createPrepareEditableTree( props, prefix ) {
 }
 
 /**
+ * If the selection is set on the placeholder element, collapse the selection to
+ * the start (before the placeholder).
+ */
+function fixPlaceholderSelection() {
+	const selection = window.getSelection();
+	const { anchorNode, anchorOffset } = selection;
+
+	if ( anchorNode.nodeType !== anchorNode.ELEMENT_NODE ) {
+		return;
+	}
+
+	const targetNode = anchorNode.childNodes[ anchorOffset ];
+
+	if (
+		! targetNode ||
+		targetNode.nodeType !== targetNode.ELEMENT_NODE ||
+		! targetNode.getAttribute( 'data-rich-text-placeholder' )
+	) {
+		return;
+	}
+
+	selection.collapseToStart();
+}
+
+/**
  * See export statement below.
  */
 class RichText extends Component {
@@ -179,7 +204,7 @@ class RichText extends Component {
 	 *
 	 * Saves the pasted data as plain text in `pastedPlainText`.
 	 *
-	 * @param {PasteEvent} event The paste event.
+	 * @param {ClipboardEvent} event The paste event.
 	 */
 	onPaste( event ) {
 		const { formatTypes, onPaste } = this.props;
@@ -312,7 +337,7 @@ class RichText extends Component {
 	/**
 	 * Handle input on the next selection change event.
 	 *
-	 * @param {SyntheticEvent} event Synthetic input event.
+	 * @param {WPSyntheticEvent} event Synthetic input event.
 	 */
 	onInput( event ) {
 		// For Input Method Editor (IME), used in Chinese, Japanese, and Korean
@@ -412,7 +437,7 @@ class RichText extends Component {
 	 * native events, `keyup`, `mouseup` and `touchend` synthetic events, and
 	 * animation frames after the `focus` event.
 	 *
-	 * @param {Event|SyntheticEvent|DOMHighResTimeStamp} event
+	 * @param {Event|WPSyntheticEvent|DOMHighResTimeStamp} event
 	 */
 	onSelectionChange( event ) {
 		if (
@@ -442,14 +467,11 @@ class RichText extends Component {
 		}
 
 		if ( start === value.start && end === value.end ) {
-			// If a placeholder is set, some browsers seems to place the
-			// selection after the placeholder instead of the text node that is
-			// padding the empty container element. The internal selection is
-			// set correctly to zero, but the caret is not visible. By
-			// reapplying the value to the DOM we reset the selection to the
-			// right node, making the caret visible again.
+			// Sometimes the browser may set the selection on the placeholder
+			// element, in which case the caret is not visible. We need to set
+			// the caret before the placeholder if that's the case.
 			if ( value.text.length === 0 && start === 0 ) {
-				this.applyRecord( value );
+				fixPlaceholderSelection();
 			}
 
 			return;
@@ -557,7 +579,7 @@ class RichText extends Component {
 	 * - delete content if everything is selected,
 	 * - trigger the onDelete prop when selection is uncollapsed and at an edge.
 	 *
-	 * @param {SyntheticEvent} event A synthetic keyboard event.
+	 * @param {WPSyntheticEvent} event A synthetic keyboard event.
 	 */
 	handleDelete( event ) {
 		const { keyCode } = event;
@@ -615,7 +637,7 @@ class RichText extends Component {
 	/**
 	 * Triggers the `onEnter` prop on keydown.
 	 *
-	 * @param {SyntheticEvent} event A synthetic keyboard event.
+	 * @param {WPSyntheticEvent} event A synthetic keyboard event.
 	 */
 	handleEnter( event ) {
 		if ( event.keyCode !== ENTER ) {
@@ -640,7 +662,7 @@ class RichText extends Component {
 	/**
 	 * Indents list items on space keydown.
 	 *
-	 * @param {SyntheticEvent} event A synthetic keyboard event.
+	 * @param {WPSyntheticEvent} event A synthetic keyboard event.
 	 */
 	handleSpace( event ) {
 		const { keyCode, shiftKey, altKey, metaKey, ctrlKey } = event;
@@ -677,7 +699,7 @@ class RichText extends Component {
 	 * navigation is handled separately to move correctly around format
 	 * boundaries.
 	 *
-	 * @param  {SyntheticEvent} event A synthetic keyboard event.
+	 * @param {WPSyntheticEvent} event A synthetic keyboard event.
 	 */
 	handleHorizontalNavigation( event ) {
 		const { keyCode, shiftKey, altKey, metaKey, ctrlKey } = event;
@@ -783,7 +805,7 @@ class RichText extends Component {
 	 * Select object when they are clicked. The browser will not set any
 	 * selection when clicking e.g. an image.
 	 *
-	 * @param  {SyntheticEvent} event Synthetic mousedown or touchstart event.
+	 * @param {WPSyntheticEvent} event Synthetic mousedown or touchstart event.
 	 */
 	onPointerDown( event ) {
 		const { target } = event;
@@ -843,21 +865,11 @@ class RichText extends Component {
 		shouldReapply = shouldReapply ||
 			placeholder !== prevProps.placeholder;
 
-		const { activeFormats = [] } = this.record;
-
 		if ( shouldReapply ) {
 			this.value = value;
 			this.record = this.formatToValue( value );
 			this.record.start = selectionStart;
 			this.record.end = selectionEnd;
-
-			updateFormats( {
-				value: this.record,
-				start: this.record.start,
-				end: this.record.end,
-				formats: activeFormats,
-			} );
-
 			this.applyRecord( this.record );
 		} else if (
 			this.record.start !== selectionStart ||

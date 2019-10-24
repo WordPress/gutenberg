@@ -440,7 +440,7 @@ export class RichText extends Component {
 	/**
 	 * Handles a paste event from the native Aztec Wrapper.
 	 *
-	 * @param {PasteEvent} event The paste event which wraps `nativeEvent`.
+	 * @param {Object} event The paste event which wraps `nativeEvent`.
 	 */
 	onPaste( event ) {
 		const {
@@ -753,13 +753,19 @@ export class RichText extends Component {
 
 	getHtmlToRender( record, tagName ) {
 		// Save back to HTML from React tree
-		const value = this.valueToFormat( record );
+		let value = this.valueToFormat( record );
 
-		if ( value === undefined || value === '' ) {
+		if ( value === undefined ) {
 			this.lastEventCount = undefined; // force a refresh on the native side
-			return '';
-		} else if ( tagName ) {
-			return `<${ tagName }>${ value }</${ tagName }>`;
+			value = '';
+		}
+		// On android if content is empty we need to send no content or else the placeholder with not show.
+		if ( ! this.isIOS && value === '' ) {
+			return value;
+		}
+
+		if ( tagName ) {
+			value = `<${ tagName }>${ value }</${ tagName }>`;
 		}
 		return value;
 	}
@@ -820,8 +826,6 @@ export class RichText extends Component {
 			this.firedAfterTextChanged = false;
 		}
 
-		const dynamicStyle = getStylesFromColorScheme( style, styles.richTextDark );
-
 		return (
 			<View>
 				{ children && children( {
@@ -838,7 +842,7 @@ export class RichText extends Component {
 						}
 					} }
 					style={ {
-						...dynamicStyle,
+						...style,
 						minHeight: Math.max( minHeight, this.state.height ),
 					} }
 					text={ { text: html, eventCount: this.lastEventCount, selection } }

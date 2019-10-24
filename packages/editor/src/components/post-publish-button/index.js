@@ -113,6 +113,7 @@ export class PostPublishButton extends Component {
 		return (
 			<div>
 				<Button
+					isLarge
 					ref={ this.buttonNode }
 					{ ...componentProps }
 				>

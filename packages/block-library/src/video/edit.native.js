@@ -6,7 +6,6 @@ import { View, TouchableWithoutFeedback, Text } from 'react-native';
 /**
  * Internal dependencies
  */
-import Video from './video-player';
 import {
 	mediaUploadSync,
 	requestImageFailedRetryDialog,
@@ -29,6 +28,8 @@ import {
 	MediaUploadProgress,
 	MEDIA_TYPE_VIDEO,
 	BlockControls,
+	VIDEO_ASPECT_RATIO,
+	VideoPlayer,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { isURL } from '@wordpress/url';
@@ -40,8 +41,6 @@ import { doAction, hasAction } from '@wordpress/hooks';
 import style from './style.scss';
 import SvgIcon from './icon';
 import SvgIconRetry from './icon-retry';
-
-const VIDEO_ASPECT_RATIO = 1.7;
 
 class VideoEdit extends React.Component {
 	constructor( props ) {
@@ -225,7 +224,7 @@ class VideoEdit extends React.Component {
 								<View onLayout={ this.onVideoContanerLayout } style={ containerStyle }>
 									{ showVideo &&
 										<View style={ style.videoContainer }>
-											<Video
+											<VideoPlayer
 												isSelected={ isSelected && ! this.state.isCaptionSelected }
 												style={ videoStyle }
 												source={ { uri: src } }

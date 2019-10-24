@@ -3,6 +3,8 @@
 	justify-content: flex-start;
 	padding-left: 0;
 	padding-right: 0;
+	// Some themes give all <ul> default margin instead of padding.
+	margin-left: 0;
 }
 
 .wp-social-link {

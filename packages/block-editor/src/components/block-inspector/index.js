@@ -51,7 +51,7 @@ const BlockInspector = ( {
 	}
 
 	return (
-		<>
+		<div className="block-editor-block-inspector">
 			<BlockCard blockType={ blockType } />
 			{ hasBlockStyles && (
 				<div>
@@ -81,7 +81,7 @@ const BlockInspector = ( {
 				</InspectorAdvancedControls.Slot>
 			</div>
 			<SkipToSelectedBlock key="back" />
-		</>
+		</div>
 	);
 };
 

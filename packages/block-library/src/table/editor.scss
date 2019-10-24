@@ -36,7 +36,6 @@
 
 	td,
 	th {
-		padding: 0;
 		border: $border-width solid;
 	}
 
@@ -47,9 +46,6 @@
 		border-style: double;
 	}
 
-	&__cell-content {
-		padding: 0.5em;
-	}
 	// Extra specificity to override default Placeholder styles.
 	&__placeholder-form.wp-block-table__placeholder-form {
 		text-align: left;

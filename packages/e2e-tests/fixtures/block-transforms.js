@@ -181,6 +181,14 @@ export const EXPECTED_TRANSFORMS = {
 		originalBlock: 'Group',
 		availableTransforms: [],
 	},
+	'core__heading__h2-color': {
+		originalBlock: 'Heading',
+		availableTransforms: [
+			'Quote',
+			'Group',
+			'Paragraph',
+		],
+	},
 	'core__heading__h4-em': {
 		originalBlock: 'Heading',
 		availableTransforms: [
@@ -416,6 +424,12 @@ export const EXPECTED_TRANSFORMS = {
 		availableTransforms: [
 			'Group',
 		],
+	},
+	'core__site-title': {
+		availableTransforms: [
+			'Group',
+		],
+		originalBlock: 'Site Title',
 	},
 	'core__social-link-amazon': {
 		availableTransforms: [

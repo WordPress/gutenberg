@@ -17,6 +17,7 @@ export default function save( { attributes } ) {
 		borderRadius,
 		customBackgroundColor,
 		customTextColor,
+		customGradient,
 		linkTarget,
 		rel,
 		text,
@@ -26,18 +27,19 @@ export default function save( { attributes } ) {
 	} = attributes;
 
 	const textClass = getColorClassName( 'color', textColor );
-	const backgroundClass = getColorClassName( 'background-color', backgroundColor );
+	const backgroundClass = ! customGradient && getColorClassName( 'background-color', backgroundColor );
 
 	const buttonClasses = classnames( 'wp-block-button__link', {
 		'has-text-color': textColor || customTextColor,
 		[ textClass ]: textClass,
-		'has-background': backgroundColor || customBackgroundColor,
+		'has-background': backgroundColor || customBackgroundColor || customGradient,
 		[ backgroundClass ]: backgroundClass,
 		'no-border-radius': borderRadius === 0,
 	} );
 
 	const buttonStyle = {
-		backgroundColor: backgroundClass ? undefined : customBackgroundColor,
+		backgroundColor: backgroundClass || customGradient ? undefined : customBackgroundColor,
+		background: customGradient ? customGradient : undefined,
 		color: textClass ? undefined : customTextColor,
 		borderRadius: borderRadius ? borderRadius + 'px' : undefined,
 	};

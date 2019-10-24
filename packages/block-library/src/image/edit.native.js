@@ -9,17 +9,20 @@ import {
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
 } from 'react-native-gutenberg-bridge';
-import { isEmpty } from 'lodash';
+import { isEmpty, map } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import {
 	TextControl,
+	ToggleControl,
+	SelectControl,
 	Icon,
 	Toolbar,
 	ToolbarButton,
 	PanelBody,
+	PanelActions,
 } from '@wordpress/components';
 
 import {
@@ -42,14 +45,30 @@ import { withPreferredColorScheme } from '@wordpress/compose';
 import styles from './styles.scss';
 import SvgIcon from './icon';
 import SvgIconRetry from './icon-retry';
+import { getUpdatedLinkTargetSettings } from './utils';
 
-const LINK_DESTINATION_CUSTOM = 'custom';
-const LINK_DESTINATION_NONE = 'none';
+import {
+	LINK_DESTINATION_CUSTOM,
+	LINK_DESTINATION_NONE,
+} from './constants';
+
+const IMAGE_SIZE_THUMBNAIL = 'thumbnail';
+const IMAGE_SIZE_MEDIUM = 'medium';
+const IMAGE_SIZE_LARGE = 'large';
+const IMAGE_SIZE_FULL_SIZE = 'full';
+const DEFAULT_SIZE_SLUG = IMAGE_SIZE_LARGE;
+const sizeOptionLabels = {
+	[ IMAGE_SIZE_THUMBNAIL ]: __( 'Thumbnail' ),
+	[ IMAGE_SIZE_MEDIUM ]: __( 'Medium' ),
+	[ IMAGE_SIZE_LARGE ]: __( 'Large' ),
+	[ IMAGE_SIZE_FULL_SIZE ]: __( 'Full Size' ),
+};
+const sizeOptions = map( sizeOptionLabels, ( label, option ) => ( { value: option, label } ) );
 
 // Default Image ratio 4:3
 const IMAGE_ASPECT_RATIO = 4 / 3;
 
-class ImageEdit extends React.Component {
+export class ImageEdit extends React.Component {
 	constructor( props ) {
 		super( props );
 
@@ -65,6 +84,8 @@ class ImageEdit extends React.Component {
 		this.updateAlt = this.updateAlt.bind( this );
 		this.updateImageURL = this.updateImageURL.bind( this );
 		this.onSetLinkDestination = this.onSetLinkDestination.bind( this );
+		this.onSetNewTab = this.onSetNewTab.bind( this );
+		this.onSetSizeSlug = this.onSetSizeSlug.bind( this );
 		this.onImagePressed = this.onImagePressed.bind( this );
 		this.onClearSettings = this.onClearSettings.bind( this );
 		this.onFocusCaption = this.onFocusCaption.bind( this );
@@ -169,11 +190,25 @@ class ImageEdit extends React.Component {
 		} );
 	}
 
+	onSetNewTab( value ) {
+		const updatedLinkTarget = getUpdatedLinkTargetSettings( value, this.props.attributes );
+		this.props.setAttributes( updatedLinkTarget );
+	}
+
+	onSetSizeSlug( sizeSlug ) {
+		this.props.setAttributes( {
+			sizeSlug,
+		} );
+	}
+
 	onClearSettings() {
 		this.props.setAttributes( {
 			alt: '',
 			linkDestination: LINK_DESTINATION_NONE,
 			href: undefined,
+			linkTarget: undefined,
+			sizeSlug: DEFAULT_SIZE_SLUG,
+			rel: undefined,
 		} );
 	}
 
@@ -204,7 +239,9 @@ class ImageEdit extends React.Component {
 
 	render() {
 		const { attributes, isSelected } = this.props;
-		const { url, height, width, alt, href, id } = attributes;
+		const { url, height, width, alt, href, id, linkTarget, sizeSlug } = attributes;
+
+		const actions = [ { label: __( 'Clear All Settings' ), onPress: this.onClearSettings } ];
 
 		const getToolbarEditButton = ( open ) => (
 			<BlockControls>
@@ -231,21 +268,32 @@ class ImageEdit extends React.Component {
 						autoCorrect={ false }
 						keyboardType="url"
 					/>
+					<ToggleControl
+						icon={ 'external' }
+						label={ __( 'Open in new tab' ) }
+						checked={ linkTarget === '_blank' }
+						onChange={ this.onSetNewTab }
+					/>
+					{ // eslint-disable-next-line no-undef
+						__DEV__ &&
+						<SelectControl
+							hideCancelButton
+							icon={ 'editor-expand' }
+							label={ __( 'Size' ) }
+							value={ sizeOptionLabels[ sizeSlug || DEFAULT_SIZE_SLUG ] }
+							onChangeValue={ ( newValue ) => this.onSetSizeSlug( newValue ) }
+							options={ sizeOptions }
+						/> }
 					<TextControl
 						icon={ 'editor-textcolor' }
 						label={ __( 'Alt Text' ) }
 						value={ alt || '' }
 						valuePlaceholder={ __( 'None' ) }
-						separatorType={ 'fullWidth' }
-						onChange={ this.updateAlt }
-					/>
-					<TextControl
-						label={ __( 'Clear All Settings' ) }
-						labelStyle={ styles.clearSettingsButton }
 						separatorType={ 'none' }
-						onPress={ this.onClearSettings }
+						onChangeValue={ this.updateAlt }
 					/>
 				</PanelBody>
+				<PanelActions actions={ actions } />
 			</InspectorControls>
 		);
 

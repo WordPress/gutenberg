@@ -1,17 +1,20 @@
-@import "../../assets/stylesheets/colors";
-@import "../../assets/stylesheets/variables";
-@import "../../assets/stylesheets/mixins";
-@import "../../assets/stylesheets/breakpoints";
-@import "../../assets/stylesheets/animations";
-@import "../../assets/stylesheets/z-index";
+@import "~@wordpress/base-styles/colors";
+@import "~@wordpress/base-styles/variables";
+@import "~@wordpress/base-styles/mixins";
+@import "~@wordpress/base-styles/breakpoints";
+@import "~@wordpress/base-styles/animations";
+@import "~@wordpress/base-styles/z-index";
 
 @import "./reset";
 @import "./editor-styles";
 
 
 .playground__header {
-	padding: 20px;
+	align-items: center;
 	border-bottom: 1px solid #ddd;
+	display: flex;
+	justify-content: space-between;
+	padding: 20px;
 }
 
 .playground__logo {

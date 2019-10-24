@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isArray } from 'lodash';
+import { isArray, isString } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -27,7 +27,6 @@ function IconButton( props, ref ) {
 		labelPosition,
 		...additionalProps
 	} = props;
-	const { 'aria-pressed': ariaPressed } = additionalProps;
 	const classes = classnames( 'components-icon-button', className, {
 		'has-text': children,
 	} );
@@ -56,7 +55,7 @@ function IconButton( props, ref ) {
 			className={ classes }
 			ref={ ref }
 		>
-			<Icon icon={ icon } ariaPressed={ ariaPressed } />
+			{ isString( icon ) ? <Icon icon={ icon } /> : icon }
 			{ children }
 		</Button>
 	);

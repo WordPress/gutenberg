@@ -4,7 +4,8 @@
 	flex-wrap: wrap;
 	list-style-type: none;
 	padding: 0;
-	margin-bottom: 0;
+	// Some themes give all <ul> default margin instead of padding.
+	margin: 0;
 
 	.blocks-gallery-image,
 	.blocks-gallery-item {
@@ -143,7 +144,3 @@
 	}
 }
 
-figure.wp-block-gallery {
-	display: block;
-	margin: 0;
-}
