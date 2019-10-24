@@ -40,9 +40,36 @@ import '@wordpress/block-library/build-style/theme.css';
 import '@wordpress/format-library/build-style/style.css';
 /* eslint-enable no-restricted-syntax */
 
+const fauxEntitySuggestions = [
+	{
+		id: uniqueId(),
+		title: 'Hello Page',
+		type: 'Page',
+		url: '/hello-page/',
+	},
+	{
+		id: uniqueId(),
+		title: 'Hello Post',
+		type: 'Post',
+		url: '/hello-post/',
+	},
+	{
+		id: uniqueId(),
+		title: 'Hello Another One',
+		type: 'Page',
+		url: '/hello-another-one/',
+	},
+	{
+		id: uniqueId(),
+		title: 'This is another Post with a much longer title just to be really annoying and to try and break the UI',
+		type: 'Post',
+		url: '/this-is-another-post-with-a-much-longer-title-just-to-be-really-annoying-and-to-try-and-break-the-ui/',
+	},
+];
+
 function App() {
 	const [ blocks, updateBlocks ] = useState( [] );
-	const [ link, setLink ] = useState( null );
+	const [ link, setLink ] = useState( fauxEntitySuggestions[ 0 ] );
 	const [ linkSettings, setLinkSettings ] = useState( {
 		'new-tab': false,
 	} );
@@ -59,32 +86,7 @@ function App() {
 		// Simulate network
 		await timeout( random( 200, 1000 ) );
 
-		return ( [
-			{
-				id: uniqueId(),
-				title: 'Hello Page',
-				type: 'Page',
-				url: '/hello-page/',
-			},
-			{
-				id: uniqueId(),
-				title: 'Hello Post',
-				type: 'Post',
-				url: '/hello-post/',
-			},
-			{
-				id: uniqueId(),
-				title: 'Hello Another One',
-				type: 'Page',
-				url: '/hello-another-one/',
-			},
-			{
-				id: uniqueId(),
-				title: 'This is another Post with a much longer title just to be really annoying and to try and break the UI',
-				type: 'Post',
-				url: '/this-is-another-post-with-a-much-longer-title-just-to-be-really-annoying-and-to-try-and-break-the-ui/',
-			},
-		] );
+		return fauxEntitySuggestions;
 	};
 
 	const handleOnKeyDownEvent = ( event, suggestion ) => {
