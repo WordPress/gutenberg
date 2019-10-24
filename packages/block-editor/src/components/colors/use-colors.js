@@ -39,10 +39,10 @@ const ColorPanel = ( {
 		{ ...colorPanelProps }
 	>
 		{ contrastCheckerProps &&
-			components.map( ( Component ) => (
+			components.map( ( Component, index ) => (
 				<ContrastChecker
 					key={ Component.displayName }
-					textColor={ Component.color }
+					textColor={ colorSettings[ index ].value }
 					{ ...contrastCheckerProps }
 				/>
 			) ) }
@@ -170,7 +170,9 @@ export default function __experimentalUseColors(
 
 			const newSettingIndex =
 				colorSettings.push( {
-					value: color,
+					value: _color ?
+						_color.color :
+						attributes[ camelCase( `custom ${ name }` ) ],
 					onChange: acc[ componentName ].setColor,
 					label: panelLabel,
 					colors,
