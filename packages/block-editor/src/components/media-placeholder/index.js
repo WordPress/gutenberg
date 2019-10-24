@@ -120,6 +120,7 @@ export class MediaPlaceholder extends Component {
 			value = [],
 		} = this.props;
 		let setMedia;
+
 		if ( multiple ) {
 			if ( addToGallery ) {
 				const currentValue = value;
@@ -130,8 +131,23 @@ export class MediaPlaceholder extends Component {
 				setMedia = onSelect;
 			}
 		} else {
+			const [ file ] = files;
+
+			if ( file.type === 'image/svg+xml' ) {
+				file.text().then( ( source ) => {
+					this.props.onSelectURL(
+						`data:image/svg+xml,${
+							window.encodeURI( source )
+						}`
+					);
+				} );
+
+				return;
+			}
+
 			setMedia = ( [ media ] ) => onSelect( media );
 		}
+
 		mediaUpload( {
 			allowedTypes,
 			filesList: files,
