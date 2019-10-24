@@ -16,7 +16,7 @@ function renderAsRenderProps( { as: Component = 'div', ...props } ) {
 	if ( typeof props.children === 'function' ) {
 		return props.children( props );
 	}
-	return <T { ...props } />;
+	return <Component { ...props } />;
 }
 
 export { renderAsRenderProps };
