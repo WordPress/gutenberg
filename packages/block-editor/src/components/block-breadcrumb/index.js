@@ -37,33 +37,36 @@ const BlockBreadcrumb = function() {
 	 */
 	/* eslint-disable jsx-a11y/no-redundant-roles */
 	return (
-		<ul className="block-editor-block-breadcrumb" role="list">
-			<li>
-				<Button
-					className="block-editor-block-breadcrumb__button"
-					isTertiary
-					onClick={ hasSelection ? clearSelectedBlock : null }
-				>
-					{ __( 'Document' ) }
-				</Button>
-			</li>
-			{ parents.map( ( parentClientId ) => (
-				<li key={ parentClientId }>
+		<nav aria-label={ __( 'Blocks breadcrumb' ) }>
+			<ul className="block-editor-block-breadcrumb" role="list">
+				<li>
 					<Button
 						className="block-editor-block-breadcrumb__button"
 						isTertiary
-						onClick={ () => selectBlock( parentClientId ) }
+						onClick={ hasSelection ? clearSelectedBlock : null }
+						aria-current={ hasSelection ? false : 'true' }
 					>
-						<BlockTitle clientId={ parentClientId } />
+						{ __( 'Document' ) }
 					</Button>
 				</li>
-			) ) }
-			{ !! clientId && (
-				<li className="block-editor-block-breadcrumb__current">
-					<BlockTitle clientId={ clientId } />
-				</li>
-			) }
-		</ul>
+				{ parents.map( ( parentClientId ) => (
+					<li key={ parentClientId }>
+						<Button
+							className="block-editor-block-breadcrumb__button"
+							isTertiary
+							onClick={ () => selectBlock( parentClientId ) }
+						>
+							<BlockTitle clientId={ parentClientId } />
+						</Button>
+					</li>
+				) ) }
+				{ !! clientId && (
+					<li className="block-editor-block-breadcrumb__current" aria-current="true">
+						<BlockTitle clientId={ clientId } />
+					</li>
+				) }
+			</ul>
+		</nav>
 		/* eslint-enable jsx-a11y/no-redundant-roles */
 	);
 };
