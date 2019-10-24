@@ -21,3 +21,15 @@ export const _default = () => {
 		/>
 	);
 };
+
+export const AlphaEnabled = () => {
+	const [ color, setColor ] = useState( '#f0f' );
+	return (
+		<ColorPicker
+			color={ color }
+			onChangeComplete={ ( value ) => setColor( value.hex ) }
+			disableAlpha={ false }
+		/>
+	);
+};
+
