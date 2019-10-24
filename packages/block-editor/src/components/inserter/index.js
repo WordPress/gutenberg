@@ -1,10 +1,4 @@
 /**
- * External dependencies
- */
-import {
-	get,
-} from 'lodash';
-/**
  * WordPress dependencies
  */
 import { __, _x, sprintf } from '@wordpress/i18n';
@@ -125,29 +119,34 @@ class Inserter extends Component {
 
 export default compose( [
 	withSelect( ( select, { rootClientId } ) => {
-		const { hasInserterItems, __experimentalHasOnlyOneAllowedInserterItem, __experimentalGetTheOnlyAllowedItem } = select( 'core/block-editor' );
-		const allowedBlock = getBlockType( __experimentalGetTheOnlyAllowedItem( rootClientId ) );
+		const {
+			hasInserterItems,
+			__experimentalHasOnlyOneAllowedBlockType,
+			__experimentalGetTheOnlyAllowedBlockType,
+		} = select( 'core/block-editor' );
+		const allowedBlock = getBlockType( __experimentalGetTheOnlyAllowedBlockType( rootClientId ) );
 		return {
 			hasItems: hasInserterItems( rootClientId ),
-			hasOnlyOneAllowedInserterItem: __experimentalHasOnlyOneAllowedInserterItem( rootClientId ),
+			hasOnlyOneAllowedInserterItem: __experimentalHasOnlyOneAllowedBlockType( rootClientId ),
 			blockTitle: allowedBlock ? allowedBlock.title : '',
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {
 		return {
 			insertTheOnlyAllowedItem: () => {
-				const { rootClientId, clientId, destinationRootClientId, isAppender } = ownProps;
+				const { rootClientId, clientId, isAppender, destinationRootClientId } = ownProps;
 				const {
-					getBlockListSettings,
+					__experimentalHasOnlyOneAllowedBlockType,
+					__experimentalGetTheOnlyAllowedBlockType,
 				} = select( 'core/block-editor' );
-				const parentBlockListSettings = getBlockListSettings( rootClientId );
-				const isOnlyOneAllowedBlock = get( parentBlockListSettings, [ 'allowedBlocks', 'length' ], 0 ) === 1;
 
-				if ( ! isOnlyOneAllowedBlock ) {
+				const hasOnlyOneAllowedInserterItem = __experimentalHasOnlyOneAllowedBlockType( rootClientId );
+
+				if ( ! hasOnlyOneAllowedInserterItem ) {
 					return false;
 				}
 
-				const parentAllowedBlocks = get( parentBlockListSettings, [ 'allowedBlocks' ] );
+				const parentAllowedBlocks = __experimentalGetTheOnlyAllowedBlockType( rootClientId );
 
 				function getInsertionIndex() {
 					const {
@@ -174,10 +173,10 @@ export default compose( [
 				const {
 					insertBlock,
 				} = dispatch( 'core/block-editor' );
-				const insertedBlock = createBlock( parentAllowedBlocks[ 0 ] );
+				const insertedBlock = createBlock( parentAllowedBlocks );
 				insertBlock(
 					insertedBlock,
-					getInsertionIndex( clientId, destinationRootClientId, isAppender ),
+					getInsertionIndex(),
 					rootClientId
 				);
 			},

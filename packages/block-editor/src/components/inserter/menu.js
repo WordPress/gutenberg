@@ -478,7 +478,17 @@ export default compose(
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {
-		const { clientId, destinationRootClientId, isAppender } = ownProps;
+		const {
+			showInsertionPoint,
+			hideInsertionPoint,
+		} = dispatch( 'core/block-editor' );
+
+		// This should be an external action provided in the editor settings.
+		const {
+			__experimentalFetchReusableBlocks: fetchReusableBlocks,
+		} = dispatch( 'core/editor' );
+
+		const { isAppender } = ownProps;
 
 		// To avoid duplication, getInsertionIndex is extracted and used in two event handlers
 		// This breaks the withDispatch not containing any logic rule.
@@ -491,6 +501,8 @@ export default compose(
 				getBlockSelectionEnd,
 				getBlockOrder,
 			} = select( 'core/block-editor' );
+
+			const { clientId, destinationRootClientId } = ownProps;
 
 			// If the clientId is defined, we insert at the position of the block.
 			if ( clientId ) {
@@ -507,20 +519,10 @@ export default compose(
 			return getBlockOrder( destinationRootClientId ).length;
 		}
 
-		const {
-			showInsertionPoint,
-			hideInsertionPoint,
-		} = dispatch( 'core/block-editor' );
-
-		// This should be an external action provided in the editor settings.
-		const {
-			__experimentalFetchReusableBlocks: fetchReusableBlocks,
-		} = dispatch( 'core/editor' );
-
 		return {
 			fetchReusableBlocks,
 			showInsertionPoint() {
-				const index = getInsertionIndex( clientId, destinationRootClientId, isAppender );
+				const index = getInsertionIndex();
 				showInsertionPoint( ownProps.destinationRootClientId, index );
 			},
 			hideInsertionPoint,
