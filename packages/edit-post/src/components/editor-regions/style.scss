@@ -18,10 +18,16 @@
 		right: 0;
 		bottom: 0;
 		height: auto;
+		.is-fullscreen-mode & {
+			top: 0;
+		}
 	}
 
 	@include break-medium() {
 		top: $admin-bar-height;
+		.is-fullscreen-mode & {
+			top: 0;
+		}
 	}
 }
 @include editor-left(".edit-post-editor-regions");
