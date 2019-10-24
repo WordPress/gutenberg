@@ -15,7 +15,13 @@
 	min-width: 150px;
 	max-width: 500px;
 
-	&.components-base-control .components-base-control__field {
-		margin-bottom: 0;
+	&.components-base-control {
+		.components-base-control__field {
+			margin-bottom: 0;
+		}
+
+		.components-base-control__label {
+			display: block;
+		}
 	}
 }
