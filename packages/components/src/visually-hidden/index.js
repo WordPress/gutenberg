@@ -2,7 +2,7 @@
 /**
  * Internal dependencies
  */
-import { renderAsRenderProps } from '../utils';
+import { renderAsRenderProps } from './utils';
 
 /**
  * VisuallyHidden component to render text out non-visually
