@@ -135,21 +135,6 @@ describe( 'Searching for a link', () => {
 		expect( lastSearchResultItemHTML ).not.toEqual( expect.stringContaining( 'URL' ) );
 	} );
 
-	// it('should not display any search result when the input is empty or has been cleared or reset', async () => {
-	// 	// Reset the search term
-	// 	act( () => {
-	// 		Simulate.change( searchInput, { target: { value: '' } } );
-	// 	} );
-
-	// 	// fetchFauxEntitySuggestions resolves on next "tick" of event loop
-	// 	await eventLoopTick();
-
-	// 	// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
-	// 	searchResultElements = container.querySelectorAll( '[role="listbox"] [role="option"]' );
-
-	// 	expect( searchResultElements ).toHaveLength( 0 );
-	// })
-
 	it.each( [
 		[ 'couldbeurlorentitysearchterm' ],
 		[ 'ThisCouldAlsoBeAValidURL' ],
@@ -188,7 +173,7 @@ describe( 'Searching for a link', () => {
 		expect( lastSearchResultItemHTML ).toEqual( expect.stringContaining( 'Press ENTER to add this link' ) );
 	} );
 
-	it( 'should reset input and search results when search term is cleared or reset', async ( ) => {
+	it( 'should reset the input field and the search results when search term is cleared or reset', async ( ) => {
 		const searchTerm = 'Hello world';
 
 		act( () => {
