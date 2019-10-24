@@ -1302,7 +1302,7 @@ export const __experimentalHasOnlyOneAllowedInserterItem = ( state, rootClientId
 };
 
 /**
- * Gets the name of the only item that may be inserted.
+ * Returns the name of the only block type that may be inserted, or null if there isn't exactly one allowed type.
  *
  * @param {Object}  state        Editor state.
  * @param {?string} rootClientId Optional root client ID of block list.
