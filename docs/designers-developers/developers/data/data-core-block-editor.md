@@ -345,7 +345,7 @@ _Parameters_
 
 _Returns_
 
--   `Array<Editor.InserterItem>`: Items that appear in inserter.
+-   `Array<WPEditorInserterItem>`: Items that appear in inserter.
 
 <a name="getLastMultiSelectedBlockClientId" href="#getLastMultiSelectedBlockClientId">#</a> **getLastMultiSelectedBlockClientId**
 
