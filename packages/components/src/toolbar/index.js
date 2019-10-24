@@ -30,12 +30,10 @@ export const __unstableToolbarContext = ToolbarContext;
  * @param {string} [props.className]
  */
 function Toolbar( { className, accessibilityLabel, ...otherProps } ) {
-	const finalClassName = classnames( 'components-toolbar', className );
-
 	if ( accessibilityLabel ) {
 		return (
 			<ToolbarContainer
-				className={ finalClassName }
+				className={ classnames( 'components-accessible-toolbar', className ) }
 				accessibilityLabel={ accessibilityLabel }
 				{ ...otherProps }
 			/>
@@ -47,7 +45,7 @@ function Toolbar( { className, accessibilityLabel, ...otherProps } ) {
 		hint: 'If you want to render an accessible toolbar, pass in an `accessibilityLabel` prop.',
 	} );
 
-	return <ToolbarGroup className={ finalClassName } { ...otherProps } />;
+	return <ToolbarGroup { ...otherProps } />;
 }
 
 export default Toolbar;

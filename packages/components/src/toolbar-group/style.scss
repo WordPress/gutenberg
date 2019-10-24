@@ -1,4 +1,4 @@
-.components-toolbar-group {
+.components-toolbar {
 	margin: 0;
 	border: $border-width solid $light-gray-500;
 	background-color: $white;
@@ -6,7 +6,7 @@
 	flex-shrink: 0;
 }
 
-div.components-toolbar-group {
+div.components-toolbar {
 	& > div {
 		// IE11 does not support `position: sticky`, or Flex very well, so use block.
 		display: block;
