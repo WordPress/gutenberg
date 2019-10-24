@@ -3,6 +3,7 @@
  */
 import { render, unmountComponentAtNode } from 'react-dom';
 import { act, Simulate } from 'react-dom/test-utils';
+import { last } from 'lodash';
 
 /**
  * Internal dependencies
@@ -144,6 +145,41 @@ describe( 'Searching for a link', () => {
 		expect( searchResultElements ).toHaveLength( 0 );
 	} );
 
+	it.each( [ [ 'couldbeurlorentitysearchterm' ], [ 'ThisCouldAlsoBeAValidURL' ] ] )( 'should always show a URL suggestion as a default fallback when the search term could potentially be a valid url', async ( searchTerm ) => {
+		act( () => {
+			render(
+				<LinkControl
+					fetchSearchSuggestions={ fetchFauxEntitySuggestions }
+				/>, container
+			);
+		} );
+
+		// Search Input UI
+		const searchInput = container.querySelector( 'input[aria-label="URL"]' );
+
+		// Simulate searching for a term
+		act( () => {
+			Simulate.change( searchInput, { target: { value: searchTerm } } );
+		} );
+
+		// fetchFauxEntitySuggestions resolves on next "tick" of event loop
+		await eventLoopTick();
+
+		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
+		const searchResultElements = container.querySelectorAll( '[role="listbox"] [role="option"]' );
+		const lastSearchResultItemHTML = last( searchResultElements ).innerHTML;
+		const additionalDefaultFallbackURLSuggestionLength = 1;
+
+		// We should see a search result for each of the expect search suggestions
+		// plus 1 additional one for the fallback URL suggestion
+		expect( searchResultElements ).toHaveLength( fauxEntitySuggestions.length + additionalDefaultFallbackURLSuggestionLength );
+
+		// The last item should be a URL search suggestion
+		expect( lastSearchResultItemHTML ).toEqual( expect.stringContaining( searchTerm ) );
+		expect( lastSearchResultItemHTML ).toEqual( expect.stringContaining( 'URL' ) );
+		expect( lastSearchResultItemHTML ).toEqual( expect.stringContaining( 'Press ENTER to add this link' ) );
+	} );
+
 	it( 'should reset input and search results when search term is cleared or reset', async ( ) => {
 		const searchTerm = 'Hello world';
 
@@ -225,6 +261,7 @@ describe( 'Manual link entry', () => {
 
 		expect( searchResultElements ).toHaveLength( expectedResultsLength );
 		expect( firstSearchResultItemHTML ).toEqual( expect.stringContaining( searchTerm ) );
+		expect( firstSearchResultItemHTML ).toEqual( expect.stringContaining( 'URL' ) );
 		expect( firstSearchResultItemHTML ).toEqual( expect.stringContaining( 'Press ENTER to add this link' ) );
 	} );
 
