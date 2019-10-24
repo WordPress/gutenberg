@@ -85,9 +85,9 @@ export function getSaveElement( blockTypeOrName, attributes, innerBlocks = [] ) 
 		/**
 		 * Filters the props applied to the block save result element.
 		 *
-		 * @param {Object}      props      Props applied to save element.
-		 * @param {WPBlockType} blockType  Block type definition.
-		 * @param {Object}      attributes Block attributes.
+		 * @param {Object}  props      Props applied to save element.
+		 * @param {WPBlock} blockType  Block type definition.
+		 * @param {Object}  attributes Block attributes.
 		 */
 		const props = applyFilters(
 			'blocks.getSaveContent.extraProps',
@@ -104,9 +104,9 @@ export function getSaveElement( blockTypeOrName, attributes, innerBlocks = [] ) 
 	/**
 	 * Filters the save result of a block during serialization.
 	 *
-	 * @param {WPElement}   element    Block save result.
-	 * @param {WPBlockType} blockType  Block type definition.
-	 * @param {Object}      attributes Block attributes.
+	 * @param {WPElement} element    Block save result.
+	 * @param {WPBlock}   blockType  Block type definition.
+	 * @param {Object}    attributes Block attributes.
 	 */
 	element = applyFilters( 'blocks.getSaveElement', element, blockType, attributes );
 

@@ -73,8 +73,8 @@ class BlockEditorProvider extends Component {
 	 * This needs to be done synchronously after state changes (instead of using
 	 * `componentDidUpdate`) in order to avoid batching these changes.
 	 *
-	 * @param {WPDataRegistry} registry     Registry from which block editor
-	 *                                      dispatch is to be overriden.
+	 * @param {WPDataRegistry} registry Registry from which block editor
+	 *                                  dispatch is to be overridden.
 	 */
 	attachChangeObserver( registry ) {
 		if ( this.unsubscribe ) {
