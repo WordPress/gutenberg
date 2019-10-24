@@ -347,6 +347,23 @@ _Returns_
 
 -   `Array<WPEditorInserterItem>`: Items that appear in inserter.
 
+_Type Definition_
+
+-   _WPEditorInserterItem_ `Object`
+
+_Properties_
+
+-   _id_ `string`: Unique identifier for the item.
+-   _name_ `string`: The type of block to create.
+-   _initialAttributes_ `Object`: Attributes to pass to the newly created block.
+-   _title_ `string`: Title of the item, as it appears in the inserter.
+-   _icon_ `string`: Dashicon for the item, as it appears in the inserter.
+-   _category_ `string`: Block category that the item is associated with.
+-   _keywords_ `Array<string>`: Keywords that can be searched to find this item.
+-   _isDisabled_ `boolean`: Whether or not the user should be prevented from inserting this item.
+-   _utility_ `number`: How useful we think this item is, between 0 and 3.
+-   _frecency_ `number`: Hueristic that combines frequency and recency.
+
 <a name="getLastMultiSelectedBlockClientId" href="#getLastMultiSelectedBlockClientId">#</a> **getLastMultiSelectedBlockClientId**
 
 Returns the client ID of the last block in the multi-selection set, or null
