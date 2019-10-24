@@ -17,7 +17,7 @@ describe( 'adding blocks', () => {
 	/**
 	 * Given a Puppeteer ElementHandle, clicks below its bounding box.
 	 *
-	 * @param {Puppeteer.ElementHandle} elementHandle Element handle.
+	 * @param {puppeteer.ElementHandle} elementHandle Element handle.
 	 *
 	 * @return {Promise} Promise resolving when click occurs.
 	 */

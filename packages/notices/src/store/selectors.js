@@ -39,17 +39,6 @@ const DEFAULT_NOTICES = [];
  */
 
 /**
- * @typedef {Object} WPNoticeAction Object describing a user action option associated with a notice.
- *
- * @property {string}    label    Message to use as action label.
- * @property {?string}   url      Optional URL of resource if action incurs
- *                                browser navigation.
- * @property {?Function} onClick  Optional function to invoke when action is
- *                                triggered by user.
- *
- */
-
-/**
  * Returns all notices as an array, optionally for a given context. Defaults to
  * the global context.
  *

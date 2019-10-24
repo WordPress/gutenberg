@@ -23,13 +23,13 @@ import {
 	withFallbackStyles,
 } from '@wordpress/components';
 import {
-	URLInput,
-	RichText,
+	__experimentalGradientPickerPanel,
 	ContrastChecker,
 	InspectorControls,
-	withColors,
 	PanelColorSettings,
-	__experimentalGradientPickerControl,
+	RichText,
+	URLInput,
+	withColors,
 } from '@wordpress/block-editor';
 
 const { getComputedStyle } = window;
@@ -195,20 +195,18 @@ function ButtonEdit( {
 						} }
 					/>
 				</PanelColorSettings>
-				<PanelBody title={ __( 'Gradient' ) }>
-					<__experimentalGradientPickerControl
-						onChange={
-							( newGradient ) => {
-								setAttributes( {
-									customGradient: newGradient,
-									backgroundColor: undefined,
-									customBackgroundColor: undefined,
-								} );
-							}
+				<__experimentalGradientPickerPanel
+					onChange={
+						( newGradient ) => {
+							setAttributes( {
+								customGradient: newGradient,
+								backgroundColor: undefined,
+								customBackgroundColor: undefined,
+							} );
 						}
-						value={ customGradient }
-					/>
-				</PanelBody>
+					}
+					value={ customGradient }
+				/>
 				<BorderPanel
 					borderRadius={ borderRadius }
 					setAttributes={ setAttributes }
