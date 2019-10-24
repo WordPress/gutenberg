@@ -1307,7 +1307,7 @@ export const __experimentalHasOnlyOneAllowedInserterItem = ( state, rootClientId
  * @param {Object}  state        Editor state.
  * @param {?string} rootClientId Optional root client ID of block list.
  *
- * @return {string?} The name of the allowed block or null.
+ * @return {string?} The name of the allowed block type or null.
  */
 export const __experimentalGetTheOnlyAllowedItem = ( state, rootClientId = null ) => {
 	if ( ! rootClientId ) {
