@@ -1,4 +1,18 @@
-public typealias MediaPickerDidPickMediaCallback = (_ media: [(Int32?,String?,String?)]?) -> Void
+public struct MediaInfo {
+    let id: Int32?
+    let url: String?
+    let type: String?
+
+    public init(id: Int32?, url: String?, type: String?) {
+        self.id = id
+        self.url = url
+        self.type = type
+    }
+}
+
+public typealias MediaPickerDidPickMediaCallback = (_ media: [MediaInfo]?) -> Void
+
+public typealias MediaImportCallback = (_ media: MediaInfo?) -> Void
 
 public enum MediaPickerSource: String {
     case mediaLibrary = "SITE_MEDIA_LIBRARY"
@@ -71,7 +85,7 @@ public protocol GutenbergBridgeDelegate: class {
     ///   - url: the url to import
     ///   - callback: A callback block to be called with an array of upload mediaIdentifiers and a placeholder images file url, use nil on both parameters to signal that the action has failed.
     //
-    func gutenbergDidRequestImport(from url: URL, with callback: @escaping MediaPickerDidPickMediaCallback)
+    func gutenbergDidRequestImport(from url: URL, with callback: @escaping MediaImportCallback)
 
     /// Tells the delegate that an image block requested to reconnect with media uploads coordinator.
     ///

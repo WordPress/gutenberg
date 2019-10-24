@@ -27,17 +27,22 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
                     callback(nil)
                     return
                 }
-                if (allowMultipleSelection) {
-                    let formattedMedia = media.map { (id, url, type) in
-                        return [mediaDictKeys.IDKey: id, mediaDictKeys.URLKey: url, mediaDictKeys.TypeKey: type]
-                    }
-                    callback([formattedMedia])
+                let mediaToReturn: [MediaInfo]
+                if allowMultipleSelection {
+                    mediaToReturn = media
                 } else {
-                    guard let (mediaID, mediaURL, mediaType) = media.first else {
-                        callback(nil)
-                        return
-                    }
-                    callback([[mediaDictKeys.IDKey: mediaID, mediaDictKeys.URLKey: mediaURL, mediaDictKeys.TypeKey: mediaType]])
+                    mediaToReturn = Array(media.prefix(1))
+                }
+
+                let jsFormattedMedia = mediaToReturn.map { mediaInfo in
+                    return [mediaDictKeys.IDKey: mediaInfo.id as Any,
+                            mediaDictKeys.URLKey: mediaInfo.url as Any,
+                            mediaDictKeys.TypeKey: mediaInfo.type as Any]
+                }
+                if allowMultipleSelection {
+                    callback([jsFormattedMedia])
+                } else {
+                    callback(jsFormattedMedia)
                 }
             })
         }
@@ -50,12 +55,12 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
             return
         }
         DispatchQueue.main.async {
-            self.delegate?.gutenbergDidRequestImport(from: url, with: { mediaList in
-                guard let mediaList = mediaList else {
+            self.delegate?.gutenbergDidRequestImport(from: url, with: { mediaInfo in
+                guard let mediaInfo = mediaInfo else {
                     callback(nil)
                     return
-                }
-                callback(mediaList)
+                }                
+                callback([mediaInfo.id as Any, mediaInfo.url as Any])
             })
         }
     }
