@@ -370,7 +370,7 @@ export class RichText extends Component {
 				onChange: this.onFormatChange,
 				html: pastedHtml,
 				plainText: pastedText,
-				images: files,
+				files,
 			} );
 		}
 	}
