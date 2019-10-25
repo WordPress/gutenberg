@@ -69,7 +69,7 @@ const fauxEntitySuggestions = [
 
 function App() {
 	const [ blocks, updateBlocks ] = useState( [] );
-	const [ link, setLink ] = useState( fauxEntitySuggestions[ 0 ] );
+	const [ link, setLink ] = useState();
 	const [ linkSettings, setLinkSettings ] = useState( {
 		'new-tab': false,
 	} );
@@ -90,9 +90,7 @@ function App() {
 	};
 
 	const handleOnKeyDownEvent = ( event, suggestion ) => {
-		console.log( `onKeyDown - Key code: ${ event.keyCode }` );
 		if ( null !== suggestion ) {
-			console.log( `suggestion: ${ suggestion }` );
 		}
 
 		// Do not stop propagation for ESCAPE key
@@ -103,8 +101,7 @@ function App() {
 		event.stopPropagation();
 	};
 
-	const handleOnKeyPressEvent = ( event) => {
-		console.log( `onKeyPress - Key code: ${ event.keyCode }` );
+	const handleOnKeyPressEvent = ( event ) => {
 		event.stopPropagation();
 	};
 
@@ -141,7 +138,9 @@ function App() {
 												fetchSearchSuggestions={ fetchFauxEntitySuggestions }
 												onKeyDown={ handleOnKeyDownEvent }
 												onKeyPress={ handleOnKeyPressEvent }
-												onClose={ () => { setIsVisible( false ) } }
+												onClose={ () => {
+													setIsVisible( false );
+												} }
 											/>
 										}
 										<BlockList />
