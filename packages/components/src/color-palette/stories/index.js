@@ -15,7 +15,7 @@ import ColorPalette from '../';
 
 export default { title: 'ColorPalette', component: ColorPalette };
 
-const ColorPaletteWithState = ( { ...props } ) => {
+const ColorPaletteWithState = ( props ) => {
 	const [ color, setColor ] = useState( '#F00' );
 	return (
 		<ColorPalette
