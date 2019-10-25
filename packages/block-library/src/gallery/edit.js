@@ -26,7 +26,7 @@ import {
 	MediaPlaceholder,
 	InspectorControls,
 } from '@wordpress/block-editor';
-import { Component } from '@wordpress/element';
+import { Component, Platform } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import { withSelect } from '@wordpress/data';
@@ -264,6 +264,11 @@ class GalleryEdit extends Component {
 		const hasImages = !! images.length;
 		const hasImagesWithId = hasImages && some( images, ( { id } ) => id );
 
+		const instructions = Platform.select( {
+			web: __( 'Drag images, upload new ones or select files from your library.' ),
+			native: __( 'Add media' )
+		} );
+
 		const mediaPlaceholder = (
 			<MediaPlaceholder
 				addToGallery={ hasImagesWithId }
@@ -273,7 +278,7 @@ class GalleryEdit extends Component {
 				icon={ ! hasImages && <BlockIcon icon={ icon } /> }
 				labels={ {
 					title: ! hasImages && __( 'Gallery' ),
-					instructions: ! hasImages && __( 'Drag images, upload new ones or select files from your library.' ),
+					instructions: ! hasImages && instructions,
 				} }
 				onSelect={ this.onSelectImages }
 				accept="image/*"
