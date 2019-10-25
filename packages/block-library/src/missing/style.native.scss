@@ -36,3 +36,13 @@
 .unsupportedBlockMessageDark {
 	color: $white;
 }
+
+.unsupportedBlockSubtitle {
+	text-align: center;
+	color: $gray-darken-20;
+	font-size: 12;
+}
+
+.unsupportedBlockSubtitleDark {
+	color: $gray-lighten-20;
+}
