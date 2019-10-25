@@ -94,7 +94,7 @@ function LinkControl( {
 		setInputValue( '' );
 	};
 
-	const handleDirectEntry = async ( value ) => {
+	const handleDirectEntry = ( value ) => {
 		let type = 'URL';
 
 		const protocol = getProtocol( value ) || '';
@@ -111,12 +111,14 @@ function LinkControl( {
 			type = 'internal';
 		}
 
-		return [ {
-			id: '1',
-			title: value,
-			url: type === 'URL' ? prependHTTP( value ) : value,
-			type,
-		} ];
+		return Promise.resolve(
+			[ {
+				id: '1',
+				title: value,
+				url: type === 'URL' ? prependHTTP( value ) : value,
+				type,
+			} ]
+		);
 	};
 
 	const handleEntitySearch = async ( value ) => {

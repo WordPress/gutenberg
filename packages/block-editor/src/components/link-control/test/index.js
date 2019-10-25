@@ -371,10 +371,15 @@ describe( 'Selecting links', () => {
 		expect( currentLink ).toBeNull();
 	} );
 
-	it( 'should display the current link UI when a search suggestion is clicked', async ( ) => {
-		const searchTerm = 'Hello world';
-		const selectedLink = first( fauxEntitySuggestions );
-
+	it.each( [
+		[ 'entity', 'hello world', first( fauxEntitySuggestions ) ], // entity search
+		[ 'url', 'https://www.wordpress.org', {
+			id: '1',
+			title: 'https://www.wordpress.org',
+			url: 'https://www.wordpress.org',
+			type: 'URL',
+		} ], // url
+	] )( 'should display a current selected link UI when a %s search suggestion for input "%s" is clicked', async ( type, searchTerm, selectedLink ) => {
 		const LinkControlConsumer = () => {
 			const [ link, setLink ] = useState( null );
 
@@ -420,7 +425,6 @@ describe( 'Selecting links', () => {
 
 		// Check that this suggestion is now shown as selected
 		expect( currentLinkHTML ).toEqual( expect.stringContaining( selectedLink.title ) );
-		expect( currentLinkHTML ).toEqual( expect.stringContaining( selectedLink.type ) );
 		expect( currentLinkHTML ).toEqual( expect.stringContaining( 'Change' ) );
 		expect( currentLinkAnchor ).not.toBeNull();
 	} );
