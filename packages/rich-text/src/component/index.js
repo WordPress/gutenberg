@@ -267,7 +267,13 @@ class RichText extends Component {
 
 				const file = item.getAsFile();
 
-				if ( file && ! find( files, { name: file.name, size: file.size } ) ) {
+				if ( ! file ) {
+					return;
+				}
+
+				const { name, type, size } = file;
+
+				if ( ! find( files, { name, type, size } ) ) {
 					files.push( file );
 				}
 			} );
