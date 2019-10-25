@@ -3,9 +3,10 @@
 
 	.components-icon-button {
 		align-self: flex-end;
-		height: $grid-size * 4;
+		height: $grid-size * 4 - ($border-width * 2);
 		margin-bottom: $grid-size;
-		margin-right: $grid-size - $border-width;
+		margin-right: $grid-size;
+		padding: 0 6px;
 	}
 }
 
