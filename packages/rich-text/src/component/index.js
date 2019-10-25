@@ -3,7 +3,7 @@
  */
 import classnames from 'classnames';
 import {
-	filter,
+	find,
 	isNil,
 	pickBy,
 } from 'lodash';
@@ -258,18 +258,26 @@ class RichText extends Component {
 		}
 
 		if ( onPaste ) {
-			// Only process file if no HTML is present.
-			// Note: a pasted file may have the URL as plain text.
-			const images = filter( [ ...items, ...files ], ( { type } ) =>
-				/^image\/(?:jpe?g|png|gif)$/.test( type )
-			);
+			files = Array.from( files );
+
+			Array.from( items ).forEach( ( item ) => {
+				if ( ! item.getAsFile ) {
+					return;
+				}
+
+				const file = item.getAsFile();
+
+				if ( file && ! find( files, { name: file.name, size: file.size } ) ) {
+					files.push( file );
+				}
+			} );
 
 			onPaste( {
 				value: this.removeEditorOnlyFormats( record ),
 				onChange: this.onChange,
 				html,
 				plainText,
-				images,
+				files,
 			} );
 		}
 	}

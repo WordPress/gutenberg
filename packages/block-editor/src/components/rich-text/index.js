@@ -124,7 +124,7 @@ class RichTextWrapper extends Component {
 		}
 	}
 
-	onPaste( { value, onChange, html, plainText, images } ) {
+	onPaste( { value, onChange, html, plainText, files } ) {
 		const {
 			onReplace,
 			onSplit,
@@ -134,7 +134,7 @@ class RichTextWrapper extends Component {
 			__unstableEmbedURLOnPaste,
 		} = this.props;
 
-		const imagesHTML = filePasteHandler( images, html );
+		const imagesHTML = filePasteHandler( files, html );
 		if ( imagesHTML ) {
 			const content = pasteHandler( {
 				HTML: imagesHTML,
