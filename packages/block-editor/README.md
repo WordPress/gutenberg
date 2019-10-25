@@ -82,6 +82,14 @@ _Related_
 
 Undocumented declaration.
 
+<a name="BlockBreadcrumb" href="#BlockBreadcrumb">#</a> **BlockBreadcrumb**
+
+Block breadcrumb component, displaying the hierarchy of the current block selection as a breadcrumb.
+
+_Returns_
+
+-   `WPElement`: Block Breadcrumb.
+
 <a name="BlockControls" href="#BlockControls">#</a> **BlockControls**
 
 Undocumented declaration.
