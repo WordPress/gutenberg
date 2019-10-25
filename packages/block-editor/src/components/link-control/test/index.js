@@ -372,144 +372,156 @@ describe( 'Selecting links', () => {
 		expect( currentLink ).toBeNull();
 	} );
 
-	it.each( [
-		[ 'entity', 'hello world', first( fauxEntitySuggestions ) ], // entity search
-		[ 'url', 'https://www.wordpress.org', {
-			id: '1',
-			title: 'https://www.wordpress.org',
-			url: 'https://www.wordpress.org',
-			type: 'URL',
-		} ], // url
-	] )( 'should display a current selected link UI when a %s search suggestion for input "%s" is clicked', async ( type, searchTerm, selectedLink ) => {
-		const LinkControlConsumer = () => {
-			const [ link, setLink ] = useState( null );
+	describe( 'Selection using mouse click', () => {
+		it.each( [
+			[ 'entity', 'hello world', first( fauxEntitySuggestions ) ], // entity search
+			[ 'url', 'https://www.wordpress.org', {
+				id: '1',
+				title: 'https://www.wordpress.org',
+				url: 'https://www.wordpress.org',
+				type: 'URL',
+			} ], // url
+		] )( 'should display a current selected link UI when a %s search suggestion for input "%s" is clicked', async ( type, searchTerm, selectedLink ) => {
+			const LinkControlConsumer = () => {
+				const [ link, setLink ] = useState( null );
 
-			return (
-				<LinkControl
-					currentLink={ link }
-					onLinkChange={ ( suggestion ) => setLink( suggestion ) }
-					fetchSearchSuggestions={ fetchFauxEntitySuggestions }
-				/>
-			);
-		};
+				return (
+					<LinkControl
+						currentLink={ link }
+						onLinkChange={ ( suggestion ) => setLink( suggestion ) }
+						fetchSearchSuggestions={ fetchFauxEntitySuggestions }
+					/>
+				);
+			};
 
-		act( () => {
-			render(
-				<LinkControlConsumer />, container
-			);
+			act( () => {
+				render(
+					<LinkControlConsumer />, container
+				);
+			} );
+
+			// Search Input UI
+			const searchInput = container.querySelector( 'input[aria-label="URL"]' );
+
+			// Simulate searching for a term
+			act( () => {
+				Simulate.change( searchInput, { target: { value: searchTerm } } );
+			} );
+
+			// fetchFauxEntitySuggestions resolves on next "tick" of event loop
+			await eventLoopTick();
+
+			// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
+			const searchResultElements = container.querySelectorAll( '[role="listbox"] [role="option"]' );
+
+			const firstSearchSuggestion = first( searchResultElements );
+
+			// Simulate selecting the first of the search suggestions
+			act( () => {
+				Simulate.click( firstSearchSuggestion );
+			} );
+
+			const currentLink = container.querySelector( '.block-editor-link-control__search-item.is-current' );
+			const currentLinkHTML = currentLink.innerHTML;
+			const currentLinkAnchor = currentLink.querySelector( `[href="${ selectedLink.url }"]` );
+
+			// Check that this suggestion is now shown as selected
+			expect( currentLinkHTML ).toEqual( expect.stringContaining( selectedLink.title ) );
+			expect( currentLinkHTML ).toEqual( expect.stringContaining( 'Change' ) );
+			expect( currentLinkAnchor ).not.toBeNull();
 		} );
-
-		// Search Input UI
-		const searchInput = container.querySelector( 'input[aria-label="URL"]' );
-
-		// Simulate searching for a term
-		act( () => {
-			Simulate.change( searchInput, { target: { value: searchTerm } } );
-		} );
-
-		// fetchFauxEntitySuggestions resolves on next "tick" of event loop
-		await eventLoopTick();
-
-		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
-		const searchResultElements = container.querySelectorAll( '[role="listbox"] [role="option"]' );
-
-		const firstSearchSuggestion = first( searchResultElements );
-
-		// Simulate selecting the first of the search suggestions
-		act( () => {
-			Simulate.click( firstSearchSuggestion );
-		} );
-
-		const currentLink = container.querySelector( '.block-editor-link-control__search-item.is-current' );
-		const currentLinkHTML = currentLink.innerHTML;
-		const currentLinkAnchor = currentLink.querySelector( `[href="${ selectedLink.url }"]` );
-
-		// Check that this suggestion is now shown as selected
-		expect( currentLinkHTML ).toEqual( expect.stringContaining( selectedLink.title ) );
-		expect( currentLinkHTML ).toEqual( expect.stringContaining( 'Change' ) );
-		expect( currentLinkAnchor ).not.toBeNull();
 	} );
 
-	it( 'should display a current selected link UI when a search suggestion is selected using the keyboard', async ( ) => {
-		const searchTerm = 'Hello world';
-		const selectedLink = first( fauxEntitySuggestions );
+	describe( 'Selection using keyboard', () => {
+		it.each( [
+			[ 'entity', 'hello world', first( fauxEntitySuggestions ) ], // entity search
+			[ 'url', 'https://www.wordpress.org', {
+				id: '1',
+				title: 'https://www.wordpress.org',
+				url: 'https://www.wordpress.org',
+				type: 'URL',
+			} ], // url
+		] )( 'should display a current selected link UI when an %s search suggestion for %s is selected using the keyboard', async ( type, searchTerm, selectedLink ) => {
+			const LinkControlConsumer = () => {
+				const [ link, setLink ] = useState( null );
 
-		const LinkControlConsumer = () => {
-			const [ link, setLink ] = useState( null );
+				return (
+					<LinkControl
+						currentLink={ link }
+						onLinkChange={ ( suggestion ) => setLink( suggestion ) }
+						fetchSearchSuggestions={ fetchFauxEntitySuggestions }
+					/>
+				);
+			};
 
-			return (
-				<LinkControl
-					currentLink={ link }
-					onLinkChange={ ( suggestion ) => setLink( suggestion ) }
-					fetchSearchSuggestions={ fetchFauxEntitySuggestions }
-				/>
-			);
-		};
+			act( () => {
+				render(
+					<LinkControlConsumer />, container
+				);
+			} );
 
-		act( () => {
-			render(
-				<LinkControlConsumer />, container
-			);
+			// Search Input UI
+			const searchInput = container.querySelector( 'input[aria-label="URL"]' );
+
+			// Simulate searching for a term
+			act( () => {
+				Simulate.change( searchInput, { target: { value: searchTerm } } );
+			} );
+
+			//fetchFauxEntitySuggestions resolves on next "tick" of event loop
+			await eventLoopTick();
+
+			// Step down into the search results, highlighting the first result item
+			act( () => {
+				Simulate.keyDown( searchInput, { keyCode: DOWN } );
+			} );
+
+			// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
+			const searchResultElements = container.querySelectorAll( '[role="listbox"] [role="option"]' );
+			const firstSearchSuggestion = first( searchResultElements );
+			const secondSearchSuggestion = nth( searchResultElements, 1 );
+
+			let selectedSearchResultElement = container.querySelector( '[role="option"][aria-selected="true"]' );
+
+			// We should have highlighted the first item using the keyboard
+			expect( selectedSearchResultElement ).toEqual( firstSearchSuggestion );
+
+			// Only entity searches contain more than 1 suggestion
+			if ( type === 'entity' ) {
+				// Check we can go down again using the down arrow
+				act( () => {
+					Simulate.keyDown( searchInput, { keyCode: DOWN } );
+				} );
+
+				selectedSearchResultElement = container.querySelector( '[role="option"][aria-selected="true"]' );
+
+				// We should have highlighted the first item using the keyboard
+				expect( selectedSearchResultElement ).toEqual( secondSearchSuggestion );
+
+				// Check we can go back up via up arrow
+				act( () => {
+					Simulate.keyDown( searchInput, { keyCode: UP } );
+				} );
+
+				selectedSearchResultElement = container.querySelector( '[role="option"][aria-selected="true"]' );
+
+				// We should be back to highlighting the first search result again
+				expect( selectedSearchResultElement ).toEqual( firstSearchSuggestion );
+			}
+
+			// Commit the selected item as the current link
+			act( () => {
+				Simulate.keyDown( searchInput, { keyCode: ENTER } );
+			} );
+
+			// Check that the suggestion selected via is now shown as selected
+			const currentLink = container.querySelector( '.block-editor-link-control__search-item.is-current' );
+			const currentLinkHTML = currentLink.innerHTML;
+			const currentLinkAnchor = currentLink.querySelector( `[href="${ selectedLink.url }"]` );
+
+			expect( currentLinkHTML ).toEqual( expect.stringContaining( selectedLink.title ) );
+			expect( currentLinkHTML ).toEqual( expect.stringContaining( 'Change' ) );
+			expect( currentLinkAnchor ).not.toBeNull();
 		} );
-
-		// Search Input UI
-		const searchInput = container.querySelector( 'input[aria-label="URL"]' );
-
-		// Simulate searching for a term
-		act( () => {
-			Simulate.change( searchInput, { target: { value: searchTerm } } );
-		} );
-
-		//fetchFauxEntitySuggestions resolves on next "tick" of event loop
-		await eventLoopTick();
-
-		// Step down into the search results, highlighting the first result item
-		act( () => {
-			Simulate.keyDown( searchInput, { keyCode: DOWN } );
-		} );
-
-		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
-		const searchResultElements = container.querySelectorAll( '[role="listbox"] [role="option"]' );
-		const firstSearchSuggestion = first( searchResultElements );
-		const secondSearchSuggestion = nth( searchResultElements, 1 );
-
-		let selectedSearchResultElement = container.querySelector( '[role="option"][aria-selected="true"]' );
-
-		// We should have highlighted the first item using the keyboard
-		expect( selectedSearchResultElement ).toEqual( firstSearchSuggestion );
-
-		// Check we can go down again using the down arrow
-		act( () => {
-			Simulate.keyDown( searchInput, { keyCode: DOWN } );
-		} );
-
-		selectedSearchResultElement = container.querySelector( '[role="option"][aria-selected="true"]' );
-
-		// We should have highlighted the first item using the keyboard
-		expect( selectedSearchResultElement ).toEqual( secondSearchSuggestion );
-
-		// Check we can go back up via up arrow
-		act( () => {
-			Simulate.keyDown( searchInput, { keyCode: UP } );
-		} );
-
-		selectedSearchResultElement = container.querySelector( '[role="option"][aria-selected="true"]' );
-
-		// We should be back to highlighting the first search result again
-		expect( selectedSearchResultElement ).toEqual( firstSearchSuggestion );
-
-		// Commit the selected item as the current link
-		act( () => {
-			Simulate.keyDown( searchInput, { keyCode: ENTER } );
-		} );
-
-		// Check that the suggestion selected via is now shown as selected
-		const currentLink = container.querySelector( '.block-editor-link-control__search-item.is-current' );
-		const currentLinkHTML = currentLink.innerHTML;
-		const currentLinkAnchor = currentLink.querySelector( `[href="${ selectedLink.url }"]` );
-
-		expect( currentLinkHTML ).toEqual( expect.stringContaining( selectedLink.title ) );
-		expect( currentLinkHTML ).toEqual( expect.stringContaining( 'Change' ) );
-		expect( currentLinkAnchor ).not.toBeNull();
 	} );
 } );
