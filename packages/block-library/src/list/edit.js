@@ -124,7 +124,7 @@ export default function ListEdit( {
 			className={ className }
 			placeholder={ __( 'Write list…' ) }
 			onMerge={ mergeBlocks }
-			onSplit={ ( value ) => createBlock( name, { ordered, values: value } ) }
+			onSplit={ ( value ) => createBlock( name, { ...attributes, values: value } ) }
 			__unstableOnSplitMiddle={ () => createBlock( 'core/paragraph' ) }
 			onReplace={ onReplace }
 			onRemove={ () => onReplace( [] ) }
