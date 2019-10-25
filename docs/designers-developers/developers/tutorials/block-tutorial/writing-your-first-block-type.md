@@ -107,4 +107,6 @@ Once a block is registered, you should immediately see that it becomes available
 
 A block name must be prefixed with a namespace specific to your plugin. This helps prevent conflicts when more than one plugin registers a block with the same name. In this example, the namespace is `gutenberg-examples`.
 
+Block names _must_ include only lowercase alphanumeric characters or dashes, and start with a letter. Example: `my-plugin/my-custom-block`.
+
 The `edit` and `save` functions describe the structure of your block in the context of the editor and the saved content respectively. While the difference is not obvious in this simple example, in the following sections we'll explore how these are used to enable customization of the block in the editor preview.
