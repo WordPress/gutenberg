@@ -25,7 +25,7 @@ import {
 	toHTMLString,
 	slice,
 } from '@wordpress/rich-text';
-import { withFilters, Popover } from '@wordpress/components';
+import { withFilters } from '@wordpress/components';
 import deprecated from '@wordpress/deprecated';
 import { isURL } from '@wordpress/url';
 
@@ -33,11 +33,10 @@ import { isURL } from '@wordpress/url';
  * Internal dependencies
  */
 import Autocomplete from '../autocomplete';
-import BlockFormatControls from '../block-format-controls';
-import FormatToolbar from './format-toolbar';
 import { withBlockEditContext } from '../block-edit/context';
 import { RemoveBrowserShortcuts } from './remove-browser-shortcuts';
 import { filePasteHandler } from './file-paste-handler';
+import FormatToolbarContainer from './format-toolbar-container';
 
 const wrapperClasses = 'editor-rich-text block-editor-rich-text';
 const classes = 'editor-rich-text__editable block-editor-rich-text__editable';
@@ -66,7 +65,6 @@ class RichTextWrapper extends Component {
 		this.onPaste = this.onPaste.bind( this );
 		this.onDelete = this.onDelete.bind( this );
 		this.inputRule = this.inputRule.bind( this );
-		this.getAnchorRect = this.getAnchorRect.bind( this );
 	}
 
 	onEnter( { value, onChange, shiftKey } ) {
@@ -305,53 +303,6 @@ class RichTextWrapper extends Component {
 		return formattingControls.map( ( name ) => `core/${ name }` );
 	}
 
-	getAnchorRect() {
-		const { current } = this.ref;
-		const rect = current.getBoundingClientRect();
-
-		// Add some space.
-		const buffer = 6;
-
-		// Subtract padding if any.
-		let { paddingTop } = window.getComputedStyle( current );
-
-		paddingTop = parseInt( paddingTop, 10 );
-
-		return {
-			x: rect.left,
-			y: rect.top + paddingTop - buffer,
-			width: rect.width,
-			height: rect.height - paddingTop + buffer,
-			left: rect.left,
-			right: rect.right,
-			top: rect.top + paddingTop - buffer,
-			bottom: rect.bottom,
-		};
-	}
-
-	renderFormatToolbar( inline ) {
-		if ( inline && Platform.OS === 'web ' ) {
-			// Render in popover
-			return (
-				<Popover
-					noArrow
-					position="top center"
-					focusOnMount={ false }
-					getAnchorRect={ this.getAnchorRect }
-					className="block-editor-rich-text__inline-format-toolbar"
-				>
-					<FormatToolbar />
-				</Popover>
-			);
-		}
-		// Render regular toolbar
-		return (
-			<BlockFormatControls>
-				<FormatToolbar />
-			</BlockFormatControls>
-		);
-	}
-
 	render() {
 		const {
 			children,
@@ -449,7 +400,7 @@ class RichTextWrapper extends Component {
 				{ ( { isSelected, value, onChange, Editable } ) =>
 					<>
 						{ children && children( { value, onChange } ) }
-						{ isSelected && hasFormats && this.renderFormatToolbar( inlineToolbar ) }
+						{ isSelected && hasFormats && ( <FormatToolbarContainer inline={ inlineToolbar } anchorObj={ this.ref } /> ) }
 						{ isSelected && <RemoveBrowserShortcuts /> }
 						<Autocomplete
 							onReplace={ onReplace }
