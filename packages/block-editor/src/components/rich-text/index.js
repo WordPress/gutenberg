@@ -526,7 +526,7 @@ const RichTextContainer = compose( [
 		}
 
 		let extraProps = {};
-		if ( Platform.OS !== 'web' ) {
+		if ( Platform.OS === 'native' ) {
 			// If the block of this RichText is unmodified then it's a candidate for replacing when adding a new block.
 			// In order to fix https://github.com/wordpress-mobile/gutenberg-mobile/issues/1126, let's blur on unmount in that case.
 			// This apparently assumes functionality the BlockHlder actually
