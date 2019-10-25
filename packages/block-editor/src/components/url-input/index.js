@@ -307,7 +307,6 @@ class URLInput extends Component {
 					onInput={ stopEventPropagation }
 					placeholder={ placeholder }
 					onKeyDown={ this.onKeyDown }
-					onKeyPress={ this.props.onKeyPress || noop }
 					role="combobox"
 					aria-expanded={ showSuggestions }
 					aria-autocomplete="list"
