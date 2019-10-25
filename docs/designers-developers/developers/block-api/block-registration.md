@@ -632,6 +632,14 @@ multiple: false,
 By default all blocks can be converted to a reusable block. If supports reusable is set to false, the option to convert the block into a reusable block will not appear.
 
 ```js
+// Use the block just once per post
+removal: false,
+```
+
+- `removal` (default `true`): You may want to disable the user's ability to remove a block.
+By default, all blocks can be removed. If supports removal is set to false, UI for removing the block will not appear.
+
+```js
 // Don't allow the block to be converted into a reusable block.
 reusable: false,
 ```

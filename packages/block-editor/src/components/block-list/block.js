@@ -18,6 +18,7 @@ import { BACKSPACE, DELETE, ENTER, ESCAPE } from '@wordpress/keycodes';
 import {
 	getBlockType,
 	getSaveElement,
+	hasBlockSupport,
 	isReusableBlock,
 	isUnmodifiedDefaultBlock,
 	getUnregisteredTypeHandlerName,
@@ -718,7 +719,9 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 			insertBlocks( blocks, index + 1, rootClientId );
 		},
 		onRemove( clientId ) {
-			removeBlock( clientId );
+			if ( hasBlockSupport( clientId, 'removal', true ) ) {
+				removeBlock( clientId );
+			}
 		},
 		onMerge( forward ) {
 			const { clientId } = ownProps;

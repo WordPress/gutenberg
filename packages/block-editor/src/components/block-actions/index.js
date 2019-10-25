@@ -55,6 +55,13 @@ export default compose( [
 			);
 		} );
 
+		const canRemove = every( blocks, ( block ) => {
+			return (
+				!! block &&
+				hasBlockSupport( block.name, 'removal', true )
+			);
+		} );
+
 		const canInsertDefaultBlock = canInsertBlockType(
 			getDefaultBlockName(),
 			rootClientId
@@ -63,6 +70,7 @@ export default compose( [
 		return {
 			blocks,
 			canDuplicate,
+			canRemove,
 			canInsertDefaultBlock,
 			extraProps: props,
 			isLocked: !! getTemplateLock( rootClientId ),
@@ -76,6 +84,7 @@ export default compose( [
 			blocks,
 			isLocked,
 			canDuplicate,
+			canRemove,
 		} = props;
 
 		const {
@@ -108,7 +117,7 @@ export default compose( [
 				}
 			},
 			onRemove() {
-				if ( ! isLocked ) {
+				if ( ! isLocked && canRemove ) {
 					removeBlocks( clientIds );
 				}
 			},

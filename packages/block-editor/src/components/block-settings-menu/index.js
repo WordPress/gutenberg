@@ -45,6 +45,7 @@ export function BlockSettingsMenu( { clientIds } ) {
 				onInsertAfter,
 				onInsertBefore,
 				onRemove,
+				canRemove,
 			} ) => (
 				<Toolbar>
 					<DropdownMenu
@@ -112,6 +113,7 @@ export function BlockSettingsMenu( { clientIds } ) {
 								<MenuGroup>
 									{ ! isLocked && (
 										<MenuItem
+											disabled={ ! canRemove }
 											className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
 											onClick={ flow( onClose, onRemove ) }
 											icon="trash"
