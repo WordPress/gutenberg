@@ -302,10 +302,6 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/inspector-controls/README.md>
 
-<a name="LinkControl" href="#LinkControl">#</a> **LinkControl**
-
-Undocumented declaration.
-
 <a name="MediaPlaceholder" href="#MediaPlaceholder">#</a> **MediaPlaceholder**
 
 _Related_

@@ -22,7 +22,7 @@ export { default as __experimentalGradientPickerControl } from './gradient-picke
 export { default as InnerBlocks } from './inner-blocks';
 export { default as InspectorAdvancedControls } from './inspector-advanced-controls';
 export { default as InspectorControls } from './inspector-controls';
-export { default as LinkControl } from './link-control';
+export { default as __experimentalLinkControl } from './link-control';
 export { default as MediaPlaceholder } from './media-placeholder';
 export { default as MediaUpload } from './media-upload';
 export { default as MediaUploadCheck } from './media-upload/check';
