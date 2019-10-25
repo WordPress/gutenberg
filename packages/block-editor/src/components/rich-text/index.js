@@ -458,7 +458,6 @@ const RichTextContainer = compose( [
 		instanceId,
 		identifier = instanceId,
 		isSelected,
-		blockIsSelected,
 	} ) => {
 		const {
 			isCaretWithinFormattedText,
@@ -489,7 +488,6 @@ const RichTextContainer = compose( [
 			const block = clientId && __unstableGetBlockWithoutInnerBlocks( clientId );
 			const shouldBlurOnUnmount = block && isSelected && isUnmodifiedDefaultBlock( block );
 			extraProps = {
-				blockIsSelected,
 				shouldBlurOnUnmount,
 			};
 		}
