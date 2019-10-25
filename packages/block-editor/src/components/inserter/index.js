@@ -17,7 +17,9 @@ import {
 import InserterMenu from './menu';
 
 const defaultRenderToggle = ( { onToggle, disabled, isOpen, blockTitle, hasOnlyOneAllowedInserterItem } ) => {
-	const label = blockTitle === '' ? _x( 'Add block', 'Generic label for block inseter button' ) : sprintf( _x( 'Add %s', 'directly add the only allowed block' ), blockTitle );
+	
+	// translators: %s: the name of the block when there is only one
+	const label = blockTitle === '' ? _x( 'Add block', 'Generic label for block inserter button' ) : sprintf( _x( 'Add %s', 'directly add the only allowed block' ), blockTitle );
 
 	return (
 		<IconButton
