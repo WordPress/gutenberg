@@ -134,10 +134,11 @@ class RichTextWrapper extends Component {
 			__unstableEmbedURLOnPaste,
 		} = this.props;
 
-		const imagesHTML = filePasteHandler( files, html );
-		if ( imagesHTML ) {
+		// Only process file if no HTML is present.
+		// Note: a pasted file may have the URL as plain text.
+		if ( files.length && ! html ) {
 			const content = pasteHandler( {
-				HTML: imagesHTML,
+				HTML: filePasteHandler( files ),
 				mode: 'BLOCKS',
 				tagName,
 			} );

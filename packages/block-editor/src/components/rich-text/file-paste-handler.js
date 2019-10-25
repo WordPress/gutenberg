@@ -3,13 +3,7 @@
  */
 import { createBlobURL } from '@wordpress/blob';
 
-export function filePasteHandler( files, html ) {
-	// Only process file if no HTML is present.
-	// Note: a pasted file may have the URL as plain text.
-	if ( html || files.length === 0 ) {
-		return undefined;
-	}
-
+export function filePasteHandler( files ) {
 	// eslint-disable-next-line no-console
 	window.console.log( 'Received items:\n\n', files );
 
