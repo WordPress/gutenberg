@@ -62,7 +62,7 @@ function LinkControl( {
 		} else {
 			setIsEditingLink( true );
 		}
-	}, [ currentLink, setIsEditingLink ] );
+	}, [ currentLink ] );
 
 	// Handlers
 	const onInputChange = ( value = '' ) => {
