@@ -28,6 +28,7 @@ export { default as FormTokenField } from './form-token-field';
 export { default as __experimentalGradientPicker } from './gradient-picker';
 export { default as Icon } from './icon';
 export { default as IconButton } from './icon-button';
+export { default as Image } from './image';
 export { default as KeyboardShortcuts } from './keyboard-shortcuts';
 export { default as MenuGroup } from './menu-group';
 export { default as MenuItem } from './menu-item';
