@@ -143,6 +143,9 @@ class RichTextWrapper extends Component {
 				tagName,
 			} );
 
+			// eslint-disable-next-line no-console
+			window.console.log( 'Received items:\n\n', files );
+
 			if ( onReplace && isEmpty( value ) ) {
 				onReplace( content );
 			} else {
