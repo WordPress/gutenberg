@@ -136,7 +136,7 @@ class RichTextWrapper extends Component {
 
 		// Only process file if no HTML is present.
 		// Note: a pasted file may have the URL as plain text.
-		if ( files.length && ! html ) {
+		if ( files && files.length && ! html ) {
 			const content = pasteHandler( {
 				HTML: filePasteHandler( files ),
 				mode: 'BLOCKS',
