@@ -7,7 +7,7 @@
 ```sh
 $ npm -g i @wordpress/env
 
-$ cd path/to/gutenberg # WordPress install will be in path/to/gutenberg-wordpress.
+$ cd path/to/plugin-or-theme # WordPress install will be in path/to/plugin-or-theme-wordpress.
 
 $ wp-env --help
 
