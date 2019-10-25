@@ -459,6 +459,10 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/url-popover/README.md>
 
+<a name="useBlockEditContext" href="#useBlockEditContext">#</a> **useBlockEditContext**
+
+Undocumented declaration.
+
 <a name="Warning" href="#Warning">#</a> **Warning**
 
 Undocumented declaration.
