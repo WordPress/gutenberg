@@ -16,7 +16,7 @@ import {
  */
 import InserterMenu from './menu';
 
-const defaultRenderToggle = ( { onToggle, disabled, isOpen, blockTitle } ) => {
+const defaultRenderToggle = ( { onToggle, disabled, isOpen, blockTitle, hasOnlyOneAllowedInserterItem } ) => {
 	const label = blockTitle === '' ? _x( 'Add block', 'Generic label for block inseter button' ) : sprintf( _x( 'Add %s', 'directly add the only allowed block' ), blockTitle );
 
 	return (
@@ -26,8 +26,8 @@ const defaultRenderToggle = ( { onToggle, disabled, isOpen, blockTitle } ) => {
 			labelPosition="bottom"
 			onClick={ onToggle }
 			className="editor-inserter__toggle block-editor-inserter__toggle"
-			aria-haspopup="true"
-			aria-expanded={ isOpen }
+			aria-haspopup={ ! hasOnlyOneAllowedInserterItem ? "true" : false }
+			aria-expanded={ ! hasOnlyOneAllowedInserterItem ? isOpen : false }
 			disabled={ disabled }
 		/>
 	);
@@ -74,7 +74,7 @@ class Inserter extends Component {
 			onToggle = insertTheOnlyAllowedItem;
 		}
 
-		return renderToggle( { onToggle, isOpen, disabled, blockTitle } );
+		return renderToggle( { onToggle, isOpen, disabled, blockTitle, hasOnlyOneAllowedInserterItem } );
 	}
 
 	/**
