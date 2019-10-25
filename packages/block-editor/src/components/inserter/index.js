@@ -66,15 +66,10 @@ class Inserter extends Component {
 	renderToggle( { onToggle, isOpen } ) {
 		const {
 			disabled,
-			hasOnlyOneAllowedInserterItem,
 			blockTitle,
 			insertTheOnlyAllowedItem,
 			renderToggle = defaultRenderToggle,
 		} = this.props;
-
-		if ( hasOnlyOneAllowedInserterItem ) {
-			onToggle = insertTheOnlyAllowedItem;
-		}
 
 		return renderToggle( { onToggle, isOpen, disabled, blockTitle, hasOnlyOneAllowedInserterItem } );
 	}
@@ -103,7 +98,10 @@ class Inserter extends Component {
 	}
 
 	render() {
-		const { position } = this.props;
+		const { position, hasOnlyOneAllowedInserterItem } = this.props;
+		if ( hasOnlyOneAllowedInserterItem ) {
+			return this.renderToggle( { onToggle: insertTheOnlyAllowedItem } )
+		}
 		return (
 			<Dropdown
 				className="editor-inserter block-editor-inserter"
