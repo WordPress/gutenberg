@@ -70,12 +70,12 @@ export class BlockList extends Component {
 	}
 
 	render() {
-		const { clearSelectedBlock, blockClientIds, isFullyBordered, title, header, withFooter = true, renderAppender, isFirstBlock, selectedBlockParentId } = this.props;
+		const { clearSelectedBlock, blockClientIds, isFullyBordered, title, header, withFooter = true, renderAppender, isFirstBlock, selectedBlockParentId, isRootList } = this.props;
 
 		const showFloatingToolbar = isFirstBlock && selectedBlockParentId !== '';
 		return (
 			<View
-				style={ { flex: 1 } }
+				style={ { flex: isRootList ? 1 : 0 } }
 				onAccessibilityEscape={ clearSelectedBlock }
 			>
 				{ showFloatingToolbar && <FloatingToolbar.Slot fillProps={ { innerFloatingToolbar: showFloatingToolbar } } /> }
@@ -215,6 +215,7 @@ export default compose( [
 			selectedBlockClientId,
 			isFirstBlock,
 			selectedBlockParentId,
+			isRootList: rootClientId === undefined,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
