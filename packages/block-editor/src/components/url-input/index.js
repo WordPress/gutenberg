@@ -235,7 +235,9 @@ class URLInput extends Component {
 	static getDerivedStateFromProps( { value, disableSuggestions }, { showSuggestions, selectedSuggestion } ) {
 		let shouldShowSuggestions = showSuggestions;
 
-		if ( ! value || ! value.length ) {
+		const hasValue = value && value.length;
+
+		if ( ! hasValue ) {
 			shouldShowSuggestions = false;
 		}
 
@@ -244,7 +246,7 @@ class URLInput extends Component {
 		}
 
 		return {
-			selectedSuggestion: value && value.length ? selectedSuggestion : null,
+			selectedSuggestion: hasValue ? selectedSuggestion : null,
 			showSuggestions: shouldShowSuggestions,
 		};
 	}
