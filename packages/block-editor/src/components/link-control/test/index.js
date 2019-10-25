@@ -381,7 +381,7 @@ describe( 'Selecting links', () => {
 				url: 'https://www.wordpress.org',
 				type: 'URL',
 			} ], // url
-		] )( 'should display a current selected link UI when a %s search suggestion for input "%s" is clicked', async ( type, searchTerm, selectedLink ) => {
+		] )( 'should display a current selected link UI when a %s suggestion for the search "%s" is clicked', async ( type, searchTerm, selectedLink ) => {
 			const LinkControlConsumer = () => {
 				const [ link, setLink ] = useState( null );
 
@@ -441,7 +441,7 @@ describe( 'Selecting links', () => {
 				url: 'https://www.wordpress.org',
 				type: 'URL',
 			} ], // url
-		] )( 'should display a current selected link UI when an %s search suggestion for %s is selected using the keyboard', async ( type, searchTerm, selectedLink ) => {
+		] )( 'should display a current selected link UI when an %s suggestion for the search "%s" is selected using the keyboard', async ( type, searchTerm, selectedLink ) => {
 			const LinkControlConsumer = () => {
 				const [ link, setLink ] = useState( null );
 
