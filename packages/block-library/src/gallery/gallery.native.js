@@ -28,21 +28,25 @@ export const Gallery = ( props ) => {
 		attributes,
 		isSelected,
 	//	setAttributes,
+		isMobile,
 	} = props;
 
 	const {
 		align,
 		columns = defaultColumnsNumber( attributes ),
-		//	caption,
 		imageCrop,
 		images,
 	} = attributes;
 
-	const tilesProps = { images, columns, align, imageCrop };
+	const displayedColumns = isMobile ? Math.min( columns, 2 ) : columns;
 
 	return (
 		<View>
-			<Tiles { ...tilesProps }>
+			<Tiles
+				columns={ displayedColumns }
+				groutSpacing={ 15 }
+				align={ align }
+			>
 				{ images.map( ( img, index ) => {
 					/* translators: %1$d is the order number of the image, %2$d is the total number of images. */
 					const ariaLabel = sprintf( __( 'image %1$d of %2$d in gallery' ), ( index + 1 ), images.length );
