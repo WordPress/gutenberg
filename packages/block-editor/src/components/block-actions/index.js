@@ -13,6 +13,7 @@ import { cloneBlock, hasBlockSupport, switchToBlockType } from '@wordpress/block
 function BlockActions( {
 	canDuplicate,
 	canInsertDefaultBlock,
+	canRemove,
 	children,
 	isLocked,
 	onDuplicate,
@@ -25,6 +26,7 @@ function BlockActions( {
 	return children( {
 		canDuplicate,
 		canInsertDefaultBlock,
+		canRemove,
 		isLocked,
 		onDuplicate,
 		onGroup,

@@ -676,6 +676,7 @@ const applyWithSelect = withSelect(
 );
 
 const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
+	const { name: blockName } = ownProps;
 	const {
 		updateBlockAttributes,
 		selectBlock,
@@ -719,7 +720,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 			insertBlocks( blocks, index + 1, rootClientId );
 		},
 		onRemove( clientId ) {
-			if ( hasBlockSupport( clientId, 'removal', true ) ) {
+			if ( hasBlockSupport( blockName, 'removal', true ) ) {
 				removeBlock( clientId );
 			}
 		},
