@@ -71,14 +71,14 @@ class URLInput extends Component {
 	}
 
 	updateSuggestions( value ) {
-		const { fetchLinkSuggestions, handleURLSuggestions } = this.props;
-		if ( ! fetchLinkSuggestions ) {
+		const { __experimentalFetchLinkSuggestions, __experimentalHandleURLSuggestions } = this.props;
+		if ( ! __experimentalFetchLinkSuggestions ) {
 			return;
 		}
 
 		// Show the suggestions after typing at least 2 characters
 		// and also for URLs
-		if ( value.length < 2 || ( ! handleURLSuggestions && isURL( value ) ) ) {
+		if ( value.length < 2 || ( ! __experimentalHandleURLSuggestions && isURL( value ) ) ) {
 			this.setState( {
 				showSuggestions: false,
 				selectedSuggestion: null,
@@ -94,7 +94,7 @@ class URLInput extends Component {
 			loading: true,
 		} );
 
-		const request = fetchLinkSuggestions( value );
+		const request = __experimentalFetchLinkSuggestions( value );
 
 		request.then( ( suggestions ) => {
 			// A fetch Promise doesn't have an abort option. It's mimicked by
@@ -255,7 +255,7 @@ class URLInput extends Component {
 			id,
 			isFullWidth,
 			hasBorder,
-			renderSuggestions,
+			__experimentalRenderSuggestions,
 			placeholder = __( 'Paste URL or type to search' ),
 			value = '',
 			autoFocus = true,
@@ -314,7 +314,7 @@ class URLInput extends Component {
 
 				{ ( loading ) && <Spinner /> }
 
-				{ isFunction( renderSuggestions ) && showSuggestions && !! suggestions.length && renderSuggestions( {
+				{ isFunction( __experimentalRenderSuggestions ) && showSuggestions && !! suggestions.length && __experimentalRenderSuggestions( {
 					suggestions,
 					selectedSuggestion,
 					suggestionsListProps,
@@ -323,7 +323,7 @@ class URLInput extends Component {
 					handleSuggestionClick: this.handleOnClick,
 				} ) }
 
-				{ ! isFunction( renderSuggestions ) && showSuggestions && !! suggestions.length &&
+				{ ! isFunction( __experimentalRenderSuggestions ) && showSuggestions && !! suggestions.length &&
 					<Popover
 						position="bottom"
 						noArrow
@@ -368,12 +368,12 @@ export default compose(
 	withSelect( ( select, props ) => {
 		// If a link suggestions handler is already provided then
 		// bail
-		if ( isFunction( props.fetchLinkSuggestions ) ) {
+		if ( isFunction( props.__experimentalFetchLinkSuggestions ) ) {
 			return;
 		}
 		const { getSettings } = select( 'core/block-editor' );
 		return {
-			fetchLinkSuggestions: getSettings().__experimentalFetchLinkSuggestions,
+			__experimentalFetchLinkSuggestions: getSettings().__experimentalFetchLinkSuggestions,
 		};
 	} )
 )( URLInput );
