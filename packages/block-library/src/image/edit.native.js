@@ -342,7 +342,7 @@ export class ImageEdit extends React.Component {
 									{ icon }
 								</View>
 							);
-							
+
 							const contentStyle = ! imageWidthWithinContainer ? styles.content : styles.contentCentered;
 
 							return (
