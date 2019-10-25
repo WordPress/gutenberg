@@ -1,18 +1,75 @@
 /**
  * External dependencies
  */
-import { Image, View } from 'react-native';
+import { Image, StyleSheet, View, TouchableWithoutFeedback } from 'react-native';
 
 /**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { IconButton, Spinner } from '@wordpress/components';
+import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { withSelect } from '@wordpress/data';
 import { RichText } from '@wordpress/block-editor';
 import { isBlobURL } from '@wordpress/blob';
+
+/**
+ * Internal dependencies
+ */
+import Button from './gallery-button';
+
+// TODO: extract this to scss
+const styles = StyleSheet.create( {
+	container: {
+		flex: 1,
+		height: 150,
+	},
+	image: {
+		position: 'absolute',
+		top: 0,
+		bottom: 0,
+		left: 0,
+		right: 0,
+	},
+	overlay: {
+		position: 'absolute',
+		top: 0,
+		bottom: 0,
+		left: 0,
+		right: 0,
+		padding: 5,
+		borderWidth: 3,
+	},
+	button: {
+		width: 30,
+	},
+	moverButtons: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		borderRadius: 3,
+		backgroundColor: '#2e4453',
+	},
+	separator: {
+		borderRightColor: 'gray',
+		borderRightWidth: StyleSheet.hairlineWidth,
+		height: 20,
+	},
+	removeButton: {
+		width: 30,
+		borderRadius: 30,
+	},
+	toolbar: {
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+	},
+	caption: {
+		position: 'absolute',
+		bottom: 0,
+		left: 0,
+		right: 0,
+	},
+} );
 
 class GalleryImage extends Component {
 	constructor() {
@@ -86,8 +143,13 @@ class GalleryImage extends Component {
 	}
 
 	render() {
-		const { url, alt, id, linkTo, link, isFirstItem, isLastItem, isSelected, caption, onRemove, onMoveForward, onMoveBackward, setAttributes, 'aria-label': ariaLabel } = this.props;
+		const {
+			url, alt, id, linkTo, link, isFirstItem, isLastItem, isSelected, caption,
+			isBlockSelected, onRemove, onMoveForward, onMoveBackward, setAttributes,
+			'aria-label': ariaLabel, isCropped } = this.props;
 
+		// I'm not sure if or how we can use this on mobile
+		// eslint-disable-next-line no-unused-vars
 		let href;
 
 		switch ( linkTo ) {
@@ -99,91 +161,76 @@ class GalleryImage extends Component {
 				break;
 		}
 
-		const img = (
-			// Disable reason: Image itself is not meant to be interactive, but should
-			// direct image selection and unfocus caption fields.
-			/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
-			<>
-				<Image
-					style={ {
-						width: '100%',
-						height: '100%',
-						resizeMode: 'cover',
-					} }
-					source={ { uri: url } }
-					alt={ alt }
-					data-id={ id }
-					onClick={ this.onSelectImage }
-					onFocus={ this.onSelectImage }
-					onKeyDown={ this.onRemoveImage }
-					tabIndex="0"
-					aria-label={ ariaLabel }
-					ref={ this.bindContainer }
-				/>
-				{ isBlobURL( url ) && <Spinner /> }
-			</>
-			/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
-		);
-
 		return (
-			<View
-				style={ {
-					flex: 1,
-					height: 150,
-				} }>
-				{ href ? <a href={ href }>{ img }</a> : img }
-				<View
-					style={ {
-						position: 'absolute',
-					} }>
-					<IconButton
-						icon="arrow-left"
-						onClick={ isFirstItem ? undefined : onMoveBackward }
-						label={ __( 'Move Image Backward' ) }
-						aria-disabled={ isFirstItem }
-						disabled={ ! isSelected }
+			<TouchableWithoutFeedback
+				onPress={ this.props.onSelect }
+				disabled={ ! isBlockSelected }
+			>
+				<View style={ styles.container }>
+					<Image
+						style={ [ styles.image, {
+							resizeMode: isCropped ? 'cover' : 'contain',
+						} ] }
+						source={ { uri: url } }
+						alt={ alt }
+						data-id={ id }
+						onFocus={ this.onSelectImage }
+						onKeyDown={ this.onRemoveImage }
+						tabIndex="0"
+						aria-label={ ariaLabel }
+						ref={ this.bindContainer }
 					/>
-					<IconButton
-						icon="arrow-right"
-						onClick={ isLastItem ? undefined : onMoveForward }
-						label={ __( 'Move Image Forward' ) }
-						aria-disabled={ isLastItem }
-						disabled={ ! isSelected }
-					/>
-				</View>
-				<View
-					style={ {
-						position: 'absolute',
-						right: 0,
-					} }>
-					<IconButton
-						icon="no-alt"
-						onClick={ onRemove }
-						label={ __( 'Remove Image' ) }
-						disabled={ ! isSelected }
-					/>
-				</View>
-				<View
-					style={ {
-						flex: 1,
-						position: 'absolute',
-						bottom: 0,
-						left: 0,
-						right: 0,
-					} }
-				>
+					<View style={ [ styles.overlay, {
+						borderColor: isSelected ? '#0070ff' : '#00000000',
+					} ] }>
 
-					<RichText
-						tagName="figcaption"
-						placeholder={ isSelected ? __( 'Write caption…' ) : null }
-						value={ caption }
-						isSelected={ this.state.captionSelected }
-						onChange={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
-						unstableOnFocus={ this.onSelectCaption }
-						inlineToolbar
-					/>
+						{ isBlobURL( url ) && <Spinner /> }
+						{ isSelected && (
+							<View style={ styles.toolbar }>
+								<View style={ styles.moverButtons } >
+									<Button
+										style={ styles.button }
+										icon="arrow-left"
+										onClick={ isFirstItem ? undefined : onMoveBackward }
+										label={ __( 'Move Image Backward' ) }
+										aria-disabled={ isFirstItem }
+										disabled={ ! isSelected }
+									/>
+									<View style={ styles.separator }></View>
+									<Button
+										style={ styles.button }
+										icon="arrow-right"
+										onClick={ isLastItem ? undefined : onMoveForward }
+										label={ __( 'Move Image Forward' ) }
+										aria-disabled={ isLastItem }
+										disabled={ ! isSelected }
+									/>
+								</View>
+								<Button
+									style={ styles.removeButton }
+									icon="trash"
+									onClick={ onRemove }
+									label={ __( 'Remove Image' ) }
+									disabled={ ! isSelected }
+								/>
+							</View>
+						) }
+						{ ( isSelected || !! caption ) && (
+							<View style={ styles.caption } >
+								<RichText
+									tagName="figcaption"
+									placeholder={ isSelected ? __( 'Write caption…' ) : null }
+									value={ caption }
+									isSelected={ this.state.captionSelected }
+									onChange={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
+									unstableOnFocus={ this.onSelectCaption }
+									inlineToolbar
+								/>
+							</View>
+						) }
+					</View>
 				</View>
-			</View>
+			</TouchableWithoutFeedback>
 		);
 	}
 }
