@@ -342,6 +342,7 @@ class URLInput extends Component {
 							{ suggestions.map( ( suggestion, index ) => (
 								<button
 									{ ...buildSuggestionItemProps( suggestion, index ) }
+									key={ suggestion.id }
 									className={ classnames( 'editor-url-input__suggestion block-editor-url-input__suggestion', {
 										'is-selected': index === selectedSuggestion,
 									} ) }
