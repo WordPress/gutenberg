@@ -62,7 +62,7 @@ function LinkControl( {
 		} else {
 			setIsEditingLink( true );
 		}
-	}, [ currentLink ] );
+	}, [ currentLink, setIsEditingLink ] );
 
 	// Handlers
 	const onInputChange = ( value = '' ) => {
@@ -79,9 +79,10 @@ function LinkControl( {
 	};
 
 	// Utils
-
 	const startEditMode = () => {
-		setIsEditingLink( true );
+		if ( isFunction( onLinkChange ) ) {
+			onLinkChange();
+		}
 	};
 
 	const closeLinkUI = () => {

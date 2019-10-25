@@ -4,7 +4,10 @@
 import { render, unmountComponentAtNode } from 'react-dom';
 import { act, Simulate } from 'react-dom/test-utils';
 import { first, last } from 'lodash';
-
+/**
+ * WordPress dependencies
+ */
+import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
@@ -16,6 +19,7 @@ function eventLoopTick() {
 }
 
 let container = null;
+
 beforeEach( () => {
 	// setup a DOM element as a render target
 	container = document.createElement( 'div' );
@@ -297,15 +301,23 @@ describe( 'Manual link entry', () => {
 } );
 
 describe( 'Selecting links', () => {
-	it( 'should display a selected link corresponding to the "currentLink" prop when provided', async () => {
+	it( 'should display a selected link corresponding to the provided "currentLink" prop', () => {
 		const selectedLink = first( fauxEntitySuggestions );
+
+		const LinkControlConsumer = () => {
+			const [ link ] = useState( selectedLink );
+
+			return (
+				<LinkControl
+					currentLink={ link }
+					fetchSearchSuggestions={ fetchFauxEntitySuggestions }
+				/>
+			);
+		};
 
 		act( () => {
 			render(
-				<LinkControl
-					currentLink={ selectedLink }
-					fetchSearchSuggestions={ fetchFauxEntitySuggestions }
-				/>, container
+				<LinkControlConsumer />, container
 			);
 		} );
 
@@ -314,6 +326,99 @@ describe( 'Selecting links', () => {
 		const currentLinkHTML = currentLink.innerHTML;
 		const currentLinkAnchor = currentLink.querySelector( `[href="${ selectedLink.url }"]` );
 
+		expect( currentLinkHTML ).toEqual( expect.stringContaining( selectedLink.title ) );
+		expect( currentLinkHTML ).toEqual( expect.stringContaining( selectedLink.type ) );
+		expect( currentLinkHTML ).toEqual( expect.stringContaining( 'Change' ) );
+		expect( currentLinkAnchor ).not.toBeNull();
+	} );
+
+	it( 'should remove currently selected link and (re)display search UI when "Change" button is clicked', () => {
+		const selectedLink = first( fauxEntitySuggestions );
+
+		const LinkControlConsumer = () => {
+			const [ link, setLink ] = useState( selectedLink );
+
+			return (
+				<LinkControl
+					currentLink={ link }
+					onLinkChange={ ( suggestion ) => setLink( suggestion ) }
+					fetchSearchSuggestions={ fetchFauxEntitySuggestions }
+				/>
+			);
+		};
+
+		act( () => {
+			render(
+				<LinkControlConsumer />, container
+			);
+		} );
+
+		// TODO: select by aria role or visible text
+		let currentLink = container.querySelector( '.block-editor-link-control__search-item.is-current' );
+
+		const currentLinkBtn = currentLink.querySelector( 'button' );
+
+		// Simulate searching for a term
+		act( () => {
+			Simulate.click( currentLinkBtn );
+		} );
+
+		const searchInput = container.querySelector( 'input[aria-label="URL"]' );
+		currentLink = container.querySelector( '.block-editor-link-control__search-item.is-current' );
+
+		// We should be back to showing the search input
+		expect( searchInput ).not.toBeNull();
+		expect( currentLink ).toBeNull();
+	} );
+
+	it( 'should display the current link UI when a search suggestion is clicked', async ( ) => {
+		const searchTerm = 'Hello world';
+		const selectedLink = first( fauxEntitySuggestions );
+
+		const LinkControlConsumer = () => {
+			const [ link, setLink ] = useState( null );
+
+			return (
+				<LinkControl
+					currentLink={ link }
+					onLinkChange={ ( suggestion ) => setLink( suggestion ) }
+					fetchSearchSuggestions={ fetchFauxEntitySuggestions }
+				/>
+			);
+		};
+
+		act( () => {
+			render(
+				<LinkControlConsumer />, container
+			);
+		} );
+
+		// Search Input UI
+		const searchInput = container.querySelector( 'input[aria-label="URL"]' );
+
+		// Simulate searching for a term
+		act( () => {
+			Simulate.change( searchInput, { target: { value: searchTerm } } );
+		} );
+
+		// fetchFauxEntitySuggestions resolves on next "tick" of event loop
+		await eventLoopTick();
+
+		// TODO: select these by aria relationship to autocomplete rather than arbitary selector.
+		const searchResultElements = container.querySelectorAll( '[role="listbox"] [role="option"]' );
+
+		const firstSearchSuggestion = first( searchResultElements );
+
+		// Simulate selecting the first of the search suggestions
+		act( () => {
+			Simulate.click( firstSearchSuggestion );
+		} );
+
+		const currentLink = container.querySelector( '.block-editor-link-control__search-item.is-current' );
+		const currentLinkHTML = currentLink.innerHTML;
+		const currentLinkAnchor = currentLink.querySelector( `[href="${ selectedLink.url }"]` );
+
+		// Check that this suggestion is now shown as selected
 		expect( currentLinkHTML ).toEqual( expect.stringContaining( selectedLink.title ) );
 		expect( currentLinkHTML ).toEqual( expect.stringContaining( selectedLink.type ) );
 		expect( currentLinkHTML ).toEqual( expect.stringContaining( 'Change' ) );
