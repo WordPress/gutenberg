@@ -2,8 +2,10 @@
 	display: flex;
 
 	.components-icon-button {
-		height: $icon-button-size + $grid-size + $grid-size;
 		align-self: flex-end;
+		height: $grid-size * 4;
+		margin-bottom: $grid-size;
+		margin-right: $grid-size - $border-width;
 	}
 }
 
