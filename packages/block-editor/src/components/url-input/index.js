@@ -256,7 +256,6 @@ class URLInput extends Component {
 			isFullWidth,
 			hasBorder,
 			__experimentalRenderSuggestions,
-			__experimentalOnKeyPress,
 			placeholder = __( 'Paste URL or type to search' ),
 			value = '',
 			autoFocus = true,
