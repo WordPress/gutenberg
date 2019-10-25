@@ -295,3 +295,28 @@ describe( 'Manual link entry', () => {
 		} );
 	} );
 } );
+
+describe( 'Selecting links', () => {
+	it( 'should display a selected link corresponding to the "currentLink" prop when provided', async () => {
+		const selectedLink = first( fauxEntitySuggestions );
+
+		act( () => {
+			render(
+				<LinkControl
+					currentLink={ selectedLink }
+					fetchSearchSuggestions={ fetchFauxEntitySuggestions }
+				/>, container
+			);
+		} );
+
+		// TODO: select by aria role or visible text
+		const currentLink = container.querySelector( '.block-editor-link-control__search-item.is-current' );
+		const currentLinkHTML = currentLink.innerHTML;
+		const currentLinkAnchor = currentLink.querySelector( `[href="${ selectedLink.url }"]` );
+
+		expect( currentLinkHTML ).toEqual( expect.stringContaining( selectedLink.title ) );
+		expect( currentLinkHTML ).toEqual( expect.stringContaining( selectedLink.type ) );
+		expect( currentLinkHTML ).toEqual( expect.stringContaining( 'Change' ) );
+		expect( currentLinkAnchor ).not.toBeNull();
+	} );
+} );
