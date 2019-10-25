@@ -1,3 +1,7 @@
+1.15.2
+------
+* Fix issue where the block inserter layout wasn't correct after device rotation.
+
 1.15.0
 ------
 * Fix issue when multiple media selection adds only one image or video block on Android
