@@ -16,6 +16,7 @@ import { create, getTextContent } from '@wordpress/rich-text';
  * Internal dependencies
  */
 import BlockIcon from '../block-icon';
+import BlockListAppender from '../button-block-appender';
 
 /**
  * Get the block display name, if it has one, or the block title if it doesn't.
@@ -43,8 +44,14 @@ export default function BlockNavigationList( {
 	blocks,
 	selectedBlockClientId,
 	selectBlock,
+	showAppender,
+
+	// Internal use only.
 	showNestedBlocks,
+	parentBlockClientId,
 } ) {
+	const shouldShowAppender = showAppender && !! parentBlockClientId;
+
 	return (
 		/*
 		 * Disable reason: The `list` ARIA role is redundant but
@@ -75,12 +82,21 @@ export default function BlockNavigationList( {
 								blocks={ block.innerBlocks }
 								selectedBlockClientId={ selectedBlockClientId }
 								selectBlock={ selectBlock }
+								parentBlockClientId={ block.clientId }
+								showAppender={ showAppender }
 								showNestedBlocks
 							/>
 						) }
 					</li>
 				);
 			} ) }
+			{ shouldShowAppender && (
+				<li>
+					<div className="editor-block-navigation__item block-editor-block-navigation__item">
+						<BlockListAppender rootClientId={ parentBlockClientId } />
+					</div>
+				</li>
+			) }
 		</ul>
 		/* eslint-enable jsx-a11y/no-redundant-roles */
 	);
