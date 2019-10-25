@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { throttle, isFunction, noop } from 'lodash';
+import { throttle, isFunction } from 'lodash';
 import classnames from 'classnames';
 import scrollIntoView from 'dom-scroll-into-view';
 
@@ -256,6 +256,7 @@ class URLInput extends Component {
 			isFullWidth,
 			hasBorder,
 			__experimentalRenderSuggestions,
+			__experimentalOnKeyPress,
 			placeholder = __( 'Paste URL or type to search' ),
 			value = '',
 			autoFocus = true,
