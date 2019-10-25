@@ -53,6 +53,7 @@ export const Gallery = ( props ) => {
 							url={ img.url }
 							alt={ img.alt }
 							id={ img.id }
+							isCropped={ imageCrop }
 							isFirstItem={ index === 0 }
 							isLastItem={ ( index + 1 ) === images.length }
 							isSelected={ isSelected && selectedImage === index }
