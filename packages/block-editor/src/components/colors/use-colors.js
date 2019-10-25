@@ -89,8 +89,8 @@ export default function __experimentalUseColors(
 	const createComponent = useMemo(
 		() =>
 			memoize(
-				( attribute, color, colorValue, customColor ) => ( { children } ) =>
-					// Clone children, setting the style attribute from the color configuration,
+				( property, color, colorValue, customColor ) => ( { children } ) =>
+					// Clone children, setting the style property from the color configuration,
 					// if not already set explicitly through props.
 					Children.map( children, ( child ) => {
 						let className = child.props.className;
@@ -98,11 +98,11 @@ export default function __experimentalUseColors(
 						if ( color ) {
 							className = `${ child.props.className } has-${ kebabCase(
 								color
-							) }-${ kebabCase( attribute ) }`;
-							style = { [ attribute ]: colorValue, ...child.props.style };
+							) }-${ kebabCase( property ) }`;
+							style = { [ property ]: colorValue, ...child.props.style };
 						} else if ( customColor ) {
-							className = `${ child.props.className } has-${ kebabCase( attribute ) }`;
-							style = { [ attribute ]: customColor, ...child.props.style };
+							className = `${ child.props.className } has-${ kebabCase( property ) }`;
+							style = { [ property ]: customColor, ...child.props.style };
 						}
 						return cloneElement( child, {
 							className,
@@ -143,7 +143,7 @@ export default function __experimentalUseColors(
 			}
 			const {
 				name, // E.g. 'backgroundColor'.
-				attribute = name, // E.g. 'backgroundColor'.
+				property = name, // E.g. 'backgroundColor'.
 
 				panelLabel = startCase( name ), // E.g. 'Background Color'.
 				componentName = panelLabel.replace( /\s/g, '' ), // E.g. 'BackgroundColor'.
@@ -159,7 +159,7 @@ export default function __experimentalUseColors(
 			// when they are used as props for other components.
 			const _color = colors.find( ( __color ) => __color.slug === color );
 			acc[ componentName ] = createComponent(
-				attribute,
+				property,
 				color,
 				_color && _color.color,
 				attributes[ camelCase( `custom ${ name }` ) ]

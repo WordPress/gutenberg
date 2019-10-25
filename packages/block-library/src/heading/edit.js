@@ -36,7 +36,7 @@ function HeadingEdit( {
 	className,
 } ) {
 	const { TextColor, InspectorControlsColorPanel } = __experimentalUseColors(
-		[ { name: 'textColor', attribute: 'color' } ],
+		[ { name: 'textColor', property: 'color' } ],
 		{
 			contrastCheckerProps: { backgroundColor, isLargeText: true },
 		},
