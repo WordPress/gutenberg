@@ -432,7 +432,7 @@ describe( 'Selecting links', () => {
 
 	it( 'should display a current selected link UI when a search suggestion is selected using the keyboard', async ( ) => {
 		const searchTerm = 'Hello world';
-		// const selectedLink = first( fauxEntitySuggestions );
+		const selectedLink = first( fauxEntitySuggestions );
 
 		const LinkControlConsumer = () => {
 			const [ link, setLink ] = useState( null );
@@ -503,13 +503,13 @@ describe( 'Selecting links', () => {
 			Simulate.keyDown( searchInput, { keyCode: ENTER } );
 		} );
 
-		// // Check that the suggestion selected via is now shown as selected
-		// const currentLink = container.querySelector( '.block-editor-link-control__search-item.is-current' );
-		// const currentLinkHTML = currentLink.innerHTML;
-		// const currentLinkAnchor = currentLink.querySelector( `[href="${ selectedLink.url }"]` );
+		// Check that the suggestion selected via is now shown as selected
+		const currentLink = container.querySelector( '.block-editor-link-control__search-item.is-current' );
+		const currentLinkHTML = currentLink.innerHTML;
+		const currentLinkAnchor = currentLink.querySelector( `[href="${ selectedLink.url }"]` );
 
-		// expect( currentLinkHTML ).toEqual( expect.stringContaining( selectedLink.title ) );
-		// expect( currentLinkHTML ).toEqual( expect.stringContaining( 'Change' ) );
-		// expect( currentLinkAnchor ).not.toBeNull();
+		expect( currentLinkHTML ).toEqual( expect.stringContaining( selectedLink.title ) );
+		expect( currentLinkHTML ).toEqual( expect.stringContaining( 'Change' ) );
+		expect( currentLinkAnchor ).not.toBeNull();
 	} );
 } );

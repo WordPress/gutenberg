@@ -13,13 +13,13 @@ import { URLInput } from '../';
 
 const LinkControlInputSearch = ( {
 	value,
-    onChange,
-    onSelect,
-    renderSuggestions,
-    fetchSuggestions,
-    onReset,
-    onKeyDown,
-    onKeyPress,
+	onChange,
+	onSelect,
+	renderSuggestions,
+	fetchSuggestions,
+	onReset,
+	onKeyDown,
+	onKeyPress,
 } ) => {
 	return (
 		<form>
