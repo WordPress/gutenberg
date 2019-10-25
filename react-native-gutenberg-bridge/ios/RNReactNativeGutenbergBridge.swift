@@ -35,9 +35,7 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
                 }
 
                 let jsFormattedMedia = mediaToReturn.map { mediaInfo in
-                    return [mediaDictKeys.IDKey: mediaInfo.id as Any,
-                            mediaDictKeys.URLKey: mediaInfo.url as Any,
-                            mediaDictKeys.TypeKey: mediaInfo.type as Any]
+                    return mediaInfo.encodeForJS()
                 }
                 if allowMultipleSelection {
                     callback([jsFormattedMedia])
@@ -200,5 +198,16 @@ extension RNReactNativeGutenbergBridge {
         static let IDKey = "id"
         static let URLKey = "url"
         static let TypeKey = "type"
+    }
+}
+
+extension MediaInfo {
+
+    func encodeForJS() -> [String: Any] {
+        return [
+            RNReactNativeGutenbergBridge.mediaDictKeys.IDKey: id as Any,
+            RNReactNativeGutenbergBridge.mediaDictKeys.URLKey: url as Any,
+            RNReactNativeGutenbergBridge.mediaDictKeys.TypeKey: type as Any
+        ]
     }
 }
