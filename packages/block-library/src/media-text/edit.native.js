@@ -139,7 +139,7 @@ class MediaTextEdit extends Component {
 			mediaWidth,
 			verticalAlignment,
 		} = attributes;
-		const shouldStack = false; //We are temporarily not stacking until we fix alignment buttons
+		const shouldStack = false; // We are temporarily not stacking until we fix alignment buttons
 		// const shouldStack = isStackedOnMobile && isMobile; // <<< Original line
 		const temporaryMediaWidth = shouldStack ? 100 : ( this.state.mediaWidth || mediaWidth );
 		const widthString = `${ temporaryMediaWidth }%`;
