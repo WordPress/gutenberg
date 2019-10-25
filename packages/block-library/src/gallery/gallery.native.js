@@ -56,6 +56,7 @@ export const Gallery = ( props ) => {
 							isFirstItem={ index === 0 }
 							isLastItem={ ( index + 1 ) === images.length }
 							isSelected={ isSelected && selectedImage === index }
+							isBlockSelected={ isSelected }
 							onMoveBackward={ onMoveBackward( index ) }
 							onMoveForward={ onMoveForward( index ) }
 							onRemove={ onRemoveImage( index ) }
