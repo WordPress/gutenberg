@@ -8,6 +8,7 @@ import {
 	BlockEditorKeyboardShortcuts,
 	BlockEditorProvider,
 	BlockList,
+	BlockInspector,
 	WritingFlow,
 	ObserveTyping,
 } from '@wordpress/block-editor';
@@ -53,6 +54,9 @@ function App() {
 							onInput={ updateBlocks }
 							onChange={ updateBlocks }
 						>
+							<div className="playground__sidebar">
+								<BlockInspector />
+							</div>
 							<div className="editor-styles-wrapper">
 								<BlockEditorKeyboardShortcuts />
 								<WritingFlow>
