@@ -116,6 +116,7 @@ dependencies {
     // Make sure to put android-jsc at the the first
     implementation "org.webkit:android-jsc:r241213"
     implementation project(':react-native-aztec')
+	implementation ('org.wordpress:utils')
 
     if (rootProject.ext.buildGutenbergFromSource) {
         println "using gutenberg from source"
