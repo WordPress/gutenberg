@@ -67,6 +67,7 @@ class Inserter extends Component {
 		const {
 			disabled,
 			blockTitle,
+			hasOnlyOneAllowedInserterItem,
 			insertTheOnlyAllowedItem,
 			renderToggle = defaultRenderToggle,
 		} = this.props;
