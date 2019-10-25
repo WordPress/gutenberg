@@ -1,4 +1,8 @@
 /**
+ * External dependencies
+ */
+import { get } from 'lodash';
+/**
  * WordPress dependencies
  */
 import { __, _x, sprintf } from '@wordpress/i18n';
@@ -16,7 +20,7 @@ import {
  */
 import InserterMenu from './menu';
 
-const defaultRenderToggle = ( { onToggle, disabled, isOpen, blockTitle, hasOnlyOneAllowedInserterItem } ) => {
+const defaultRenderToggle = ( { onToggle, disabled, isOpen, blockTitle, hasOnlyOneAllowedInserterBlockType } ) => {
 	
 	// translators: %s: the name of the block when there is only one
 	const label = blockTitle === '' ? _x( 'Add block', 'Generic label for block inserter button' ) : sprintf( _x( 'Add %s', 'directly add the only allowed block' ), blockTitle );
@@ -28,8 +32,8 @@ const defaultRenderToggle = ( { onToggle, disabled, isOpen, blockTitle, hasOnlyO
 			labelPosition="bottom"
 			onClick={ onToggle }
 			className="editor-inserter__toggle block-editor-inserter__toggle"
-			aria-haspopup={ ! hasOnlyOneAllowedInserterItem ? "true" : false }
-			aria-expanded={ ! hasOnlyOneAllowedInserterItem ? isOpen : false }
+			aria-haspopup={ ! hasOnlyOneAllowedInserterBlockType ? "true" : false }
+			aria-expanded={ ! hasOnlyOneAllowedInserterBlockType ? isOpen : false }
 			disabled={ disabled }
 		/>
 	);
@@ -67,12 +71,11 @@ class Inserter extends Component {
 		const {
 			disabled,
 			blockTitle,
-			hasOnlyOneAllowedInserterItem,
-			insertTheOnlyAllowedItem,
+			hasOnlyOneAllowedInserterBlockType,
 			renderToggle = defaultRenderToggle,
 		} = this.props;
 
-		return renderToggle( { onToggle, isOpen, disabled, blockTitle, hasOnlyOneAllowedInserterItem } );
+		return renderToggle( { onToggle, isOpen, disabled, blockTitle, hasOnlyOneAllowedInserterBlockType } );
 	}
 
 	/**
@@ -99,8 +102,8 @@ class Inserter extends Component {
 	}
 
 	render() {
-		const { position, hasOnlyOneAllowedInserterItem } = this.props;
-		if ( hasOnlyOneAllowedInserterItem ) {
+		const { position, hasOnlyOneAllowedInserterBlockType, insertTheOnlyAllowedItem } = this.props;
+		if ( hasOnlyOneAllowedInserterBlockType ) {
 			return this.renderToggle( { onToggle: insertTheOnlyAllowedItem } )
 		}
 		return (
@@ -122,14 +125,22 @@ export default compose( [
 	withSelect( ( select, { rootClientId } ) => {
 		const {
 			hasInserterItems,
-			__experimentalHasOnlyOneAllowedBlockType,
-			__experimentalGetTheOnlyAllowedBlockType,
+			__experimentalGetAllowedBlocks,î
 		} = select( 'core/block-editor' );
-		const allowedBlock = getBlockType( __experimentalGetTheOnlyAllowedBlockType( rootClientId ) );
+		
+		const allowedBlocks = __experimentalGetAllowedBlocks( rootClientId );
+ 		
+ 		const hasOnlyOneAllowedInserterBlockType = allowedBlocks && ( get( allowedBlocks, [ 'length' ], 0 ) === 1 );
+		let allowedBlockType = false;
+		if ( hasOnlyOneAllowedInserterBlockType ) {
+			allowedBlockType = getBlockType( allowedBlocks );
+		}
+
 		return {
 			hasItems: hasInserterItems( rootClientId ),
-			hasOnlyOneAllowedInserterItem: __experimentalHasOnlyOneAllowedBlockType( rootClientId ),
-			blockTitle: allowedBlock ? allowedBlock.title : '',
+			hasOnlyOneAllowedInserterBlockType,
+			blockTitle: allowedBlockType ? allowedBlockType.title : '',
+			allowedBlockType: allowedBlockType,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {
@@ -137,18 +148,14 @@ export default compose( [
 			insertTheOnlyAllowedItem: () => {
 				const { rootClientId, clientId, isAppender, destinationRootClientId } = ownProps;
 				const {
-					__experimentalHasOnlyOneAllowedBlockType,
-					__experimentalGetTheOnlyAllowedBlockType,
-				} = select( 'core/block-editor' );
-
-				const hasOnlyOneAllowedInserterItem = __experimentalHasOnlyOneAllowedBlockType( rootClientId );
-
-				if ( ! hasOnlyOneAllowedInserterItem ) {
+					hasOnlyOneAllowedInserterBlockType,
+					allowedBlockType,
+				} = ownProps;
+				
+				if ( ! hasOnlyOneAllowedInserterBlockType ) {
 					return false;
 				}
-
-				const parentAllowedBlocks = __experimentalGetTheOnlyAllowedBlockType( rootClientId );
-
+				
 				function getInsertionIndex() {
 					const {
 						getBlockIndex,
@@ -174,7 +181,8 @@ export default compose( [
 				const {
 					insertBlock,
 				} = dispatch( 'core/block-editor' );
-				const insertedBlock = createBlock( parentAllowedBlocks );
+				console.log('inserting block');
+				const insertedBlock = createBlock( allowedBlockType.name );
 				insertBlock(
 					insertedBlock,
 					getInsertionIndex(),

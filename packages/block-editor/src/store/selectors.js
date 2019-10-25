@@ -1285,42 +1285,19 @@ export const hasInserterItems = createSelector(
 );
 
 /**
- * Determines whether there is only one item that may be inserted.
+ * Returns the list of allowed inserter blocks for inner blocks children
  *
  * @param {Object}  state        Editor state.
  * @param {?string} rootClientId Optional root client ID of block list.
  *
- * @return {boolean} True if there is one item available, false if zero or more than one.
+ * @return {string?} The name of the allowed block type or false.
  */
-export const __experimentalHasOnlyOneAllowedBlockType = ( state, rootClientId = null ) => {
-	if ( rootClientId ) {
-		const parentBlockListSettings = getBlockListSettings( state, rootClientId );
-		return get( parentBlockListSettings, [ 'allowedBlocks', 'length' ], 0 ) === 1;
-	}
-
-	return false;
-};
-
-/**
- * Returns the name of the only block type that may be inserted, or null if there isn't exactly one allowed type.
- *
- * @param {Object}  state        Editor state.
- * @param {?string} rootClientId Optional root client ID of block list.
- *
- * @return {string?} The name of the allowed block type or null.
- */
-export const __experimentalGetTheOnlyAllowedBlockType = ( state, rootClientId = null ) => {
+export const __experimentalGetAllowedBlocks = ( state, rootClientId = null ) => {
 	if ( ! rootClientId ) {
-		return null;
+		return false;
 	}
-	if ( ! __experimentalHasOnlyOneAllowedBlockType( state, rootClientId ) ) {
-		return null;
-	}
-
-	const parentBlockListSettings = getBlockListSettings( state, rootClientId );
-	const name = get( parentBlockListSettings, [ 'allowedBlocks', 0 ], 0 );
-
-	return name;
+	const { allowedBlocks } = getBlockListSettings( state, rootClientId );
+	return allowedBlocks;
 };
 
 /**
