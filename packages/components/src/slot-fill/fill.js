@@ -6,7 +6,7 @@ import { isFunction } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { createPortal, useLayoutEffect, useRef } from '@wordpress/element';
+import { createPortal, useLayoutEffect, useRef, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -17,10 +17,12 @@ let occurrences = 0;
 
 function FillComponent( { name, children, registerFill, unregisterFill } ) {
 	const slot = useSlot( name );
+	const [ , setState ] = useState( {} );
 
 	const ref = useRef( {
 		name,
 		children,
+		forceUpdate: () => setState( {} ),
 	} );
 
 	if ( ! ref.current.occurrence ) {

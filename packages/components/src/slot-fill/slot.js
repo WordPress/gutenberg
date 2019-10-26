@@ -11,6 +11,7 @@ import {
 /**
  * WordPress dependencies
  */
+import isShallowEqual from '@wordpress/is-shallow-equal';
 import {
 	Children,
 	Component,
@@ -43,9 +44,9 @@ class SlotComponent extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
-		const { name, unregisterSlot, registerSlot } = this.props;
+		const { name, fillProps, unregisterSlot, registerSlot } = this.props;
 
-		if ( prevProps.name !== name ) {
+		if ( prevProps.name !== name || ! isShallowEqual( prevProps.fillProps, fillProps ) ) {
 			unregisterSlot( prevProps.name );
 			registerSlot( name, this );
 		}
