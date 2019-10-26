@@ -52,6 +52,7 @@ module.exports = async function detectContext( directoryPath = cwd ) {
 				context.type = type.toLowerCase();
 				context.path = absPath;
 				context.pathName = path.basename( absPath );
+
 				// Stop the creation of new streams by mutating the iterated array. We can't `break`, because we are inside a function.
 				files.splice( 0 );
 				fileStream.destroy();
