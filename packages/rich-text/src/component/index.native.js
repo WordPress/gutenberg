@@ -28,7 +28,7 @@ import FormatEdit from './format-edit';
 import { applyFormat } from '../apply-format';
 import { getActiveFormat } from '../get-active-format';
 import { getActiveFormats } from '../get-active-formats';
-import { isEmpty } from '../is-empty';
+import { isEmpty, isEmptyLine } from '../is-empty';
 import { create } from '../create';
 import { toHTMLString } from '../to-html-string';
 import { removeLineSeparator } from '../remove-line-separator';
@@ -293,19 +293,23 @@ export class RichText extends Component {
 		const { start, end, text } = value;
 		let newValue;
 
-		if ( multilineTag ) {
-			newValue = removeLineSeparator( value, keyCode === BACKSPACE );
-			if ( newValue ) {
-				this.onFormatChange( newValue );
-				//return;
-			}
-		}
-
 		// Always handle full content deletion ourselves.
 		if ( start === 0 && end !== 0 && end >= text.length ) {
 			newValue = remove( value, start, end );
 			this.onChange( newValue );
 			return;
+		}
+
+		if ( multilineTag ) {
+			if ( isReverse && value.start === 0 && value.end === 0 && isEmptyLine( value ) ) {
+				newValue = removeLineSeparator( value, ! isReverse );
+			} else {
+				newValue = removeLineSeparator( value, isReverse );
+			}
+			if ( newValue ) {
+				this.onFormatChange( newValue );
+				return;
+			}
 		}
 
 		// Only process delete if the key press occurs at an uncollapsed edge.
@@ -588,7 +592,7 @@ export class RichText extends Component {
 			this.lastEventCount = undefined; // force a refresh on the native side
 			value = '';
 		}
-		// On android if content is empty we need to send no content or else the placeholder with not show.
+		// On android if content is empty we need to send no content or else the placeholder will not show.
 		if ( ! this.isIOS && value === '' ) {
 			return value;
 		}
