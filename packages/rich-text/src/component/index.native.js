@@ -295,8 +295,9 @@ export class RichText extends Component {
 
 		// Always handle full content deletion ourselves.
 		if ( start === 0 && end !== 0 && end >= text.length ) {
-			newValue = remove( value, start, end );
-			this.onChange( newValue );
+			newValue = remove( value );
+			this.onFormatChange( newValue );
+			event.preventDefault();
 			return;
 		}
 
@@ -308,6 +309,7 @@ export class RichText extends Component {
 			}
 			if ( newValue ) {
 				this.onFormatChange( newValue );
+				event.preventDefault();
 				return;
 			}
 		}
