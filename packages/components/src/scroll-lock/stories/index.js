@@ -6,7 +6,7 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { Button } from '../../';
+import Button from '../../button';
 import ScrollLock from '../';
 
 export default { title: 'ScrollLock', component: ScrollLock };

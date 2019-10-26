@@ -972,6 +972,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "VisuallyHidden",
+		"slug": "visually-hidden",
+		"markdown_source": "../packages/components/src/visually-hidden/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Data Module Reference",
 		"slug": "data",
 		"markdown_source": "../docs/designers-developers/developers/data/README.md",
