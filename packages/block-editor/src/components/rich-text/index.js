@@ -365,7 +365,7 @@ class RichTextWrapper extends Component {
 				__unstableCreateElement( document, newValue ).childNodes
 			) );
 		}
-		const anchorObj = this.ref;
+
 		const content = (
 			<RichText
 				{ ...experimentalProps }
@@ -400,7 +400,7 @@ class RichTextWrapper extends Component {
 				{ ( { isSelected, value, onChange, Editable } ) =>
 					<>
 						{ children && children( { value, onChange } ) }
-						{ isSelected && hasFormats && ( <FormatToolbarContainer inline={ inlineToolbar } anchorObj={ anchorObj } /> ) }
+						{ isSelected && hasFormats && ( <FormatToolbarContainer inline={ inlineToolbar } anchorObj={ this.ref } /> ) }
 						{ isSelected && <RemoveBrowserShortcuts /> }
 						<Autocomplete
 							onReplace={ onReplace }
