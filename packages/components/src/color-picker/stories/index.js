@@ -30,7 +30,7 @@ export const _default = () => {
 	);
 };
 
-export const AlphaEnabled = () => {
+export const alphaEnabled = () => {
 	return (
 		<ColorPickerWithState
 			disableAlpha={ false }
