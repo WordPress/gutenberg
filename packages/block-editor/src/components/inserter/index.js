@@ -102,9 +102,9 @@ class Inserter extends Component {
 	}
 
 	render() {
-		const { position, hasOnlyOneAllowedInserterBlockType, insertTheOnlyAllowedItem } = this.props;
+		const { position, hasOnlyOneAllowedInserterBlockType, insertOnlyAllowedBlock } = this.props;
 		if ( hasOnlyOneAllowedInserterBlockType ) {
-			return this.renderToggle( { onToggle: insertTheOnlyAllowedItem } )
+			return this.renderToggle( { onToggle: insertOnlyAllowedBlock } )
 		}
 		return (
 			<Dropdown
@@ -145,7 +145,7 @@ export default compose( [
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {
 		return {
-			insertTheOnlyAllowedItem: () => {
+			insertOnlyAllowedBlock() {
 				const { rootClientId, clientId, isAppender, destinationRootClientId } = ownProps;
 				const {
 					hasOnlyOneAllowedInserterBlockType,
@@ -153,7 +153,7 @@ export default compose( [
 				} = ownProps;
 				
 				if ( ! hasOnlyOneAllowedInserterBlockType ) {
-					return false;
+					return;
 				}
 				
 				function getInsertionIndex() {
