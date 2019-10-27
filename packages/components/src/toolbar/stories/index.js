@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { text } from '@storybook/addon-knobs';
-
-/**
  * Internal dependencies
  */
 import Toolbar from '../';
@@ -63,7 +58,7 @@ export const _default = () => {
 				title="Change text alignment"
 				isCollapsed
 				controls={ [
-					{ icon: 'editor-bold', title: 'Align left', isActive: true },
+					{ icon: 'editor-alignleft', title: 'Align left', isActive: true },
 					{ icon: 'editor-aligncenter', title: 'Align center' },
 					{ icon: 'editor-alignright', title: 'Align right' },
 				] }
@@ -72,13 +67,7 @@ export const _default = () => {
 	);
 };
 
-export const toolbarButton = () => {
-	const icon = text( 'Icon', 'wordpress' );
-	const title = text( 'Title', 'WordPress' );
-	return <ToolbarButton icon={ icon } title={ title } />;
-};
-
-export const withoutGroups = () => {
+export const withoutGroup = () => {
 	return (
 		<Toolbar accessibilityLabel="Options">
 			<ToolbarButton icon="editor-bold" title="Bold" />
@@ -103,5 +92,37 @@ export const withSlotFill = () => {
 				<ToolbarButton icon="thumbs-down" title="Thumbs down" />
 			</Fill>
 		</SlotFillProvider>
+	);
+};
+
+export const standaloneToolbarGroup = () => {
+	return (
+		<ToolbarGroup>
+			<ToolbarButton icon="editor-bold" title="Bold" isActive />
+			<ToolbarButton icon="editor-italic" title="Italic" />
+			<ToolbarButton icon="admin-links" title="Link" />
+		</ToolbarGroup>
+	);
+};
+
+export const standaloneToolbarGroupWithControlsProp = () => {
+	return (
+		<ToolbarGroup
+			controls={ [
+				{ icon: 'editor-bold', title: 'Bold', isActive: true },
+				{ icon: 'editor-italic', title: 'Italic' },
+				{ icon: 'admin-links', title: 'Link' },
+			] }
+		/>
+	);
+};
+
+export const legacyToolbar = () => {
+	return (
+		<Toolbar>
+			<ToolbarButton icon="editor-bold" title="Bold" />
+			<ToolbarButton icon="editor-italic" title="Italic" />
+			<ToolbarButton icon="admin-links" title="Link" />
+		</Toolbar>
 	);
 };
