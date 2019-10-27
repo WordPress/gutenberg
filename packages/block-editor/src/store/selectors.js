@@ -1290,7 +1290,7 @@ export const hasInserterItems = createSelector(
  * @param {Object}  state        Editor state.
  * @param {?string} rootClientId Optional root client ID of block list.
  *
- * @return {string?} The name of the allowed block type or false.
+ * @return {Array?} The list of allowed block types or false.
  */
 export const __experimentalGetAllowedBlocks = ( state, rootClientId = null ) => {
 	if ( ! rootClientId ) {
