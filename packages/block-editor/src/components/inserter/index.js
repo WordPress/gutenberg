@@ -181,9 +181,9 @@ export default compose( [
 					insertBlock,
 				} = dispatch( 'core/block-editor' );
 
-				const insertedBlock = createBlock( allowedBlockType.name );
+				const blockToInsert = createBlock( allowedBlockType.name );
 				insertBlock(
-					insertedBlock,
+					blockToInsert,
 					getInsertionIndex(),
 					rootClientId
 				);
