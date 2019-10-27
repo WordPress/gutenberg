@@ -18,7 +18,14 @@ function AccessibleToolbarButtonContainer( props ) {
 	const childButton = Children.only( props.children );
 
 	// https://reakit.io/docs/composition/#props-hooks
-	const itemHTMLProps = useToolbarItem( accessibleToolbarState, childButton.props );
+	const itemHTMLProps = useToolbarItem( accessibleToolbarState, {
+		...childButton.props,
+		// With this attribute, can check if `ToolbarButton` is used within the
+		// tree and then decide whether to use the accessible Toolbar (which only
+		// accepts `ToolbarButton` as toolbar items) or fallback to the legacy
+		// `NavigableToolbar`, which accepts any tabbable element.
+		'data-toolbar-button': true,
+	} );
 
 	return <div { ...props }>{ cloneElement( childButton, itemHTMLProps ) }</div>;
 }

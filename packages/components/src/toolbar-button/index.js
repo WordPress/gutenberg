@@ -53,11 +53,6 @@ function ToolbarButton( {
 			) }
 			aria-pressed={ isActive }
 			disabled={ isDisabled }
-			// With this attribute, can check if `ToolbarButton` is used within the
-			// tree and then decide whether to use the accessible Toolbar (which only
-			// accepts `ToolbarButton` as toolbar items) or fallback to the legacy
-			// `NavigableToolbar`
-			data-toolbar-button={ true }
 			{ ...extraProps }
 			{ ...otherProps }
 		/>
