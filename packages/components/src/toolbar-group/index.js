@@ -5,11 +5,17 @@ import classnames from 'classnames';
 import { flatMap } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import { useContext } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import ToolbarButton from '../toolbar-button';
 import ToolbarGroupContainer from './toolbar-group-container';
 import ToolbarGroupCollapsed from './toolbar-group-collapsed';
+import { ToolbarContext } from '../toolbar';
 
 /**
  * Renders a collapsible group of controls
@@ -40,14 +46,23 @@ function ToolbarGroup( {
 	className,
 	isCollapsed,
 	icon,
-	label,
+	title,
 	...otherProps
 } ) {
+	// It'll contain state if `ToolbarGroup` is being used within
+	// `<Toolbar accessibilityLabel="label" />`
+	const accessibleToolbarState = useContext( ToolbarContext );
+
 	if ( ( ! controls || ! controls.length ) && ! children ) {
 		return null;
 	}
 
-	const finalClassName = classnames( 'components-toolbar', className );
+	const finalClassName = classnames(
+		// Unfortunately, there's legacy code referencing to `.components-toolbar`
+		// So we can't get rid of it
+		accessibleToolbarState ? 'components-toolbar-group' : 'components-toolbar',
+		className
+	);
 
 	// Normalize controls to nested array of objects (sets of controls)
 	let controlSets = controls;
@@ -59,9 +74,11 @@ function ToolbarGroup( {
 		return (
 			<ToolbarGroupCollapsed
 				icon={ icon }
-				label={ label }
+				label={ title }
 				controls={ controlSets }
 				className={ finalClassName }
+				children={ children }
+				{ ...otherProps }
 			/>
 		);
 	}

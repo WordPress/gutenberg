@@ -12,10 +12,18 @@ import { useContext } from '@wordpress/element';
  * Internal dependencies
  */
 import DropdownMenu from '../dropdown-menu';
-import { __unstableToolbarContext } from '../toolbar';
+import { ToolbarContext } from '../toolbar';
 
-function ToolbarGroupCollapsed( { controls = [], className, icon, label } ) {
-	const accessibleToolbarState = useContext( __unstableToolbarContext );
+function ToolbarGroupCollapsed( {
+	controls = [],
+	className,
+	icon,
+	label,
+	...props
+} ) {
+	// It'll contain state if `ToolbarGroup` is being used within
+	// `<Toolbar accessibilityLabel="label" />`
+	const accessibleToolbarState = useContext( ToolbarContext );
 
 	const renderDropdownMenu = ( toggleProps ) => (
 		<DropdownMenu
@@ -25,6 +33,7 @@ function ToolbarGroupCollapsed( { controls = [], className, icon, label } ) {
 			controls={ controls }
 			className={ className }
 			toggleProps={ toggleProps }
+			{ ...props }
 		/>
 	);
 

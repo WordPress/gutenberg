@@ -6,6 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { forwardRef } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 
 /**
@@ -15,7 +16,7 @@ import ToolbarGroup from '../toolbar-group';
 import ToolbarContainer from './toolbar-container';
 import ToolbarContext from './toolbar-context';
 
-export const __unstableToolbarContext = ToolbarContext;
+export { ToolbarContext };
 
 /**
  * Renders an accessible toolbar that follows the
@@ -26,16 +27,19 @@ export const __unstableToolbarContext = ToolbarContext;
  * To add controls, simply pass `ToolbarButton` components as children.
  *
  * @param {Object} props
- * @param {string} props.accessibilityLabel Required label for assistive technology users
+ * @param {string} props.accessibilityLabel Required label for assistive technology users.
  * @param {string} [props.className]
+ * @param {Object} ref
  */
-function Toolbar( { className, accessibilityLabel, ...otherProps } ) {
+const Toolbar = forwardRef( ( { className, accessibilityLabel, ...props }, ref ) => {
 	if ( accessibilityLabel ) {
 		return (
 			<ToolbarContainer
+				ref={ ref }
+				// `ToolbarGroup` already uses components-toolbar for compatibility reasons
 				className={ classnames( 'components-accessible-toolbar', className ) }
 				accessibilityLabel={ accessibilityLabel }
-				{ ...otherProps }
+				{ ...props }
 			/>
 		);
 	}
@@ -45,7 +49,7 @@ function Toolbar( { className, accessibilityLabel, ...otherProps } ) {
 		hint: 'If you want to render an accessible toolbar, pass in an `accessibilityLabel` prop.',
 	} );
 
-	return <ToolbarGroup { ...otherProps } />;
-}
+	return <ToolbarGroup { ...props } />;
+} );
 
 export default Toolbar;

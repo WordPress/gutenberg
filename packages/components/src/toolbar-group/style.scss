@@ -1,3 +1,20 @@
+.components-toolbar-group {
+	border: $border-width solid $light-gray-500;
+	background-color: $white;
+	display: flex;
+	flex-shrink: 0;
+
+	& + & {
+		border-left-width: 0;
+	}
+
+	& & {
+		border-width: 0;
+	}
+}
+
+// Legacy toolbar group
+// External code references to it, so we can't change it?
 .components-toolbar {
 	margin: 0;
 	border: $border-width solid $light-gray-500;

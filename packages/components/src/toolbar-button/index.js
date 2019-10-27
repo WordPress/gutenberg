@@ -12,7 +12,7 @@ import { useContext } from '@wordpress/element';
  * Internal dependencies
  */
 import IconButton from '../icon-button';
-import { __unstableToolbarContext } from '../toolbar';
+import { ToolbarContext } from '../toolbar';
 import AccessibleToolbarButtonContainer from './accessible-toolbar-button-container';
 import ToolbarButtonContainer from './toolbar-button-container';
 
@@ -28,10 +28,13 @@ function ToolbarButton( {
 	isDisabled,
 	extraProps,
 	children,
+	...rest
 } ) {
-	const accessibleToolbarState = useContext( __unstableToolbarContext );
+	// It'll contain state if `ToolbarButton` is being used within
+	// `<Toolbar accessibilityLabel="label" />`
+	const accessibleToolbarState = useContext( ToolbarContext );
 
-	const button = (
+	const renderButton = ( otherProps ) => (
 		<IconButton
 			icon={ icon }
 			label={ title }
@@ -39,7 +42,9 @@ function ToolbarButton( {
 			data-subscript={ subscript }
 			onClick={ ( event ) => {
 				event.stopPropagation();
-				onClick( event );
+				if ( onClick ) {
+					onClick( event );
+				}
 			} }
 			className={ classnames(
 				'components-toolbar__control',
@@ -48,14 +53,20 @@ function ToolbarButton( {
 			) }
 			aria-pressed={ isActive }
 			disabled={ isDisabled }
+			// With this attribute, can check if `ToolbarButton` is used within the
+			// tree and then decide whether to use the accessible Toolbar (which only
+			// accepts `ToolbarButton` as toolbar items) or fallback to the legacy
+			// `NavigableToolbar`
+			data-toolbar-button={ true }
 			{ ...extraProps }
+			{ ...otherProps }
 		/>
 	);
 
 	if ( accessibleToolbarState ) {
 		return (
 			<AccessibleToolbarButtonContainer className={ containerClassName }>
-				{ button }
+				{ renderButton( rest ) }
 			</AccessibleToolbarButtonContainer>
 		);
 	}
@@ -63,7 +74,7 @@ function ToolbarButton( {
 	// ToolbarButton is being used outside of the accessible Toolbar
 	return (
 		<ToolbarButtonContainer className={ containerClassName }>
-			{ button }
+			{ renderButton() }
 			{ children }
 		</ToolbarButtonContainer>
 	);
