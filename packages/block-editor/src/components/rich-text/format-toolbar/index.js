@@ -9,7 +9,7 @@ import { orderBy } from 'lodash';
  */
 
 import { __ } from '@wordpress/i18n';
-import { ToolbarGroup, Slot, DropdownMenu } from '@wordpress/components';
+import { ToolbarGroup, Slot } from '@wordpress/components';
 
 const POPOVER_PROPS = {
 	position: 'bottom left',
@@ -24,7 +24,8 @@ const FormatToolbar = () => {
 				) }
 				<Slot name="RichText.ToolbarControls">
 					{ ( fills ) => fills.length !== 0 &&
-						<DropdownMenu
+						<ToolbarGroup
+							isCollapsed
 							icon={ false }
 							label={ __( 'More rich text controls' ) }
 							controls={ orderBy( fills.map( ( [ { props } ] ) => props ), 'title' ) }

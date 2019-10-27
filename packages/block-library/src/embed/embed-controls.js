@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { IconButton, ToolbarGroup, PanelBody, ToggleControl } from '@wordpress/components';
+import { ToolbarButton, ToolbarGroup, PanelBody, ToggleControl } from '@wordpress/components';
 import { BlockControls, InspectorControls } from '@wordpress/block-editor';
 
 const EmbedControls = ( props ) => {
@@ -20,7 +20,7 @@ const EmbedControls = ( props ) => {
 			<BlockControls>
 				<ToolbarGroup>
 					{ showEditButton && (
-						<IconButton
+						<ToolbarButton
 							className="components-toolbar__control"
 							label={ __( 'Edit URL' ) }
 							icon="edit"

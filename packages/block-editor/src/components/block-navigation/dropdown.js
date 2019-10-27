@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { IconButton, Dropdown, SVG, Path, KeyboardShortcuts } from '@wordpress/components';
+import { ToolbarButton, Dropdown, SVG, Path, KeyboardShortcuts } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
 import { withSelect } from '@wordpress/data';
@@ -32,7 +32,7 @@ function BlockNavigationDropdown( { hasBlocks, isDisabled } ) {
 						} }
 					/>
 					}
-					<IconButton
+					<ToolbarButton
 						icon={ MenuIcon }
 						aria-expanded={ isOpen }
 						onClick={ isEnabled ? onToggle : undefined }

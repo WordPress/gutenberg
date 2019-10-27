@@ -16,7 +16,7 @@ import {
 } from '@wordpress/element';
 import {
 	FocalPointPicker,
-	IconButton,
+	ToolbarButton,
 	PanelBody,
 	PanelRow,
 	RangeControl,
@@ -298,7 +298,7 @@ class CoverEdit extends Component {
 										allowedTypes={ ALLOWED_MEDIA_TYPES }
 										value={ id }
 										render={ ( { open } ) => (
-											<IconButton
+											<ToolbarButton
 												className="components-toolbar__control"
 												label={ __( 'Edit media' ) }
 												icon="edit"

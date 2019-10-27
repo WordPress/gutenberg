@@ -12,7 +12,7 @@ import {
 	__experimentalBlockNavigationList,
 } from '@wordpress/block-editor';
 import {
-	IconButton,
+	ToolbarButton,
 	SVG,
 	Path,
 	Modal,
@@ -47,8 +47,9 @@ export default function useBlockNavigator( clientId ) {
 		selectBlock,
 	} = useDispatch( 'core/block-editor' );
 
+	// TODO: Test this
 	const navigatorToolbarButton = (
-		<IconButton
+		<ToolbarButton
 			className="components-toolbar__control"
 			label={ __( 'Open block navigator' ) }
 			onClick={ () => setIsNavigationListOpen( true ) }

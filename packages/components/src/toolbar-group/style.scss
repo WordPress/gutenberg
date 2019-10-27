@@ -3,14 +3,14 @@
 	background-color: $white;
 	display: flex;
 	flex-shrink: 0;
-
-	& + & {
-		border-left-width: 0;
-	}
+	margin-right: -$border-width;
 
 	& & {
 		border-width: 0;
+		margin: 0;
 	}
+
+	line-height: 0;
 }
 
 // Legacy toolbar group

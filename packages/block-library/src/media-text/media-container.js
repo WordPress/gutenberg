@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { IconButton, ResizableBox, ToolbarGroup, withNotices } from '@wordpress/components';
+import { ToolbatButton, ResizableBox, ToolbarGroup, withNotices } from '@wordpress/components';
 import {
 	BlockControls,
 	BlockIcon,
@@ -32,6 +32,7 @@ export function imageFillStyles( url, focalPoint ) {
 		{};
 }
 
+// TODO Check Media & Text
 class MediaContainer extends Component {
 	constructor() {
 		super( ...arguments );
@@ -54,7 +55,7 @@ class MediaContainer extends Component {
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
 						value={ mediaId }
 						render={ ( { open } ) => (
-							<IconButton
+							<ToolbatButton
 								className="components-toolbar__control"
 								label={ __( 'Edit media' ) }
 								icon="edit"

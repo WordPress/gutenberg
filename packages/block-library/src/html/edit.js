@@ -54,6 +54,7 @@ class HTMLEdit extends Component {
 		const { attributes, setAttributes } = this.props;
 		const { isPreview, styles } = this.state;
 
+		// TODO: Accept text buttons as ToolbarButton's
 		return (
 			<div className="wp-block-html">
 				<BlockControls>

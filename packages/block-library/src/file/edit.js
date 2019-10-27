@@ -14,7 +14,7 @@ import {
 import {
 	Animate,
 	ClipboardButton,
-	IconButton,
+	ToolbarButton,
 	ToolbarGroup,
 	withNotices,
 } from '@wordpress/components';
@@ -195,7 +195,7 @@ class FileEdit extends Component {
 								onSelect={ this.onSelectFile }
 								value={ id }
 								render={ ( { open } ) => (
-									<IconButton
+									<ToolbarButton
 										className="components-toolbar__control"
 										label={ __( 'Edit file' ) }
 										onClick={ open }
