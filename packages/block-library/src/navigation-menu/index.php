@@ -102,8 +102,8 @@ function build_navigation_menu_html( $block, $colors ) {
 				class="wp-block-navigation-menu-item__link ' . $colors['text_css_classes'] . '"
 				' . $colors['text_inline_styles'];
 
-		if ( isset( $menu_item['attrs']['destination'] ) ) {
-			$html .= ' href="' . $menu_item['attrs']['destination'] . '"';
+		if ( isset( $menu_item['attrs']['url'] ) ) {
+			$html .= ' href="' . $menu_item['attrs']['url'] . '"';
 		}
 		if ( isset( $menu_item['attrs']['title'] ) ) {
 			$html .= ' title="' . $menu_item['attrs']['title'] . '"';
