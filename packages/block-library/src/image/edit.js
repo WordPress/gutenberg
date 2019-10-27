@@ -20,7 +20,7 @@ import {
 	Button,
 	ButtonGroup,
 	ExternalLink,
-	ToolbarButton,
+	IconButton,
 	MenuItem,
 	NavigableMenu,
 	PanelBody,
@@ -199,7 +199,7 @@ const ImageURLInputUI = ( {
 	).title;
 	return (
 		<>
-			<ToolbarButton
+			<IconButton
 				icon="admin-links"
 				className="components-toolbar__control"
 				label={ url ? __( 'Edit link' ) : __( 'Insert link' ) }
@@ -251,7 +251,7 @@ const ImageURLInputUI = ( {
 								onEditLinkClick={ startEditLink }
 								urlLabel={ urlLabel }
 							/>
-							<ToolbarButton
+							<IconButton
 								icon="no"
 								label={ __( 'Remove link' ) }
 								onClick={ onLinkRemove }
@@ -597,7 +597,7 @@ export class ImageEdit extends Component {
 				{ url && (
 					<>
 						<ToolbarGroup>
-							<ToolbarButton
+							<IconButton
 								className={ classnames( 'components-icon-button components-toolbar__control', { 'is-active': this.state.isEditing } ) }
 								label={ __( 'Edit image' ) }
 								aria-pressed={ this.state.isEditing }

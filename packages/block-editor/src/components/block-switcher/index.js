@@ -7,7 +7,7 @@ import { castArray, filter, first, mapKeys, orderBy, uniq, map } from 'lodash';
  * WordPress dependencies
  */
 import { __, _n, sprintf } from '@wordpress/i18n';
-import { Dropdown, ToolbarButton, ToolbarGroup, PanelBody, Path, SVG } from '@wordpress/components';
+import { Dropdown, IconButton, ToolbarGroup, PanelBody, Path, SVG } from '@wordpress/components';
 import { getBlockType, getPossibleBlockTransformations, switchToBlockType, cloneBlock, getBlockFromExample } from '@wordpress/blocks';
 import { Component } from '@wordpress/element';
 import { DOWN } from '@wordpress/keycodes';
@@ -72,7 +72,7 @@ export class BlockSwitcher extends Component {
 		if ( ! hasBlockStyles && ! possibleBlockTransformations.length ) {
 			return (
 				<ToolbarGroup>
-					<ToolbarButton
+					<IconButton
 						disabled
 						className="editor-block-switcher__no-switcher-icon block-editor-block-switcher__no-switcher-icon"
 						label={ __( 'Block icon' ) }
@@ -110,7 +110,7 @@ export class BlockSwitcher extends Component {
 
 					return (
 						<ToolbarGroup>
-							<ToolbarButton
+							<IconButton
 								className="editor-block-switcher__toggle block-editor-block-switcher__toggle"
 								onClick={ onToggle }
 								aria-haspopup="true"

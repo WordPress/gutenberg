@@ -2,14 +2,14 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { ToolbarButton } from '@wordpress/components';
+import { IconButton } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { displayShortcut } from '@wordpress/keycodes';
 
 function EditorHistoryRedo( { hasRedo, redo } ) {
 	return (
-		<ToolbarButton
+		<IconButton
 			icon="redo"
 			label={ __( 'Redo' ) }
 			shortcut={ displayShortcut.primaryShift( 'z' ) }

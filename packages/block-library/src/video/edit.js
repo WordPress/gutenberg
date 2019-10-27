@@ -6,7 +6,7 @@ import {
 	BaseControl,
 	Button,
 	Disabled,
-	ToolbarButton,
+	IconButton,
 	PanelBody,
 	SelectControl,
 	ToggleControl,
@@ -202,7 +202,7 @@ class VideoEdit extends Component {
 			<>
 				<BlockControls>
 					<ToolbarGroup>
-						<ToolbarButton
+						<IconButton
 							className="components-icon-button components-toolbar__control"
 							label={ __( 'Edit video' ) }
 							onClick={ switchToEditing }

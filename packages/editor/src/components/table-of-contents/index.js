@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Dropdown, ToolbarButton } from '@wordpress/components';
+import { Dropdown, IconButton } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 
 /**
@@ -17,7 +17,7 @@ function TableOfContents( { hasBlocks, hasOutlineItemsDisabled } ) {
 			className="table-of-contents"
 			contentClassName="table-of-contents__popover"
 			renderToggle={ ( { isOpen, onToggle } ) => (
-				<ToolbarButton
+				<IconButton
 					onClick={ hasBlocks ? onToggle : undefined }
 					icon="info-outline"
 					aria-expanded={ isOpen }

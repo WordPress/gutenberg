@@ -12,13 +12,8 @@ import { compose, ifCondition } from '@wordpress/compose';
  */
 import InserterMenu from './menu';
 
-const defaultRenderToggle = ( {
-	toggleComponent: ToggleComponent,
-	onToggle,
-	disabled,
-	isOpen,
-} ) => (
-	<ToggleComponent
+const defaultRenderToggle = ( { onToggle, disabled, isOpen } ) => (
+	<IconButton
 		icon="insert"
 		label={ __( 'Add block' ) }
 		labelPosition="bottom"
@@ -62,10 +57,9 @@ class Inserter extends Component {
 		const {
 			disabled,
 			renderToggle = defaultRenderToggle,
-			toggleComponent = IconButton,
 		} = this.props;
 
-		return renderToggle( { toggleComponent, onToggle, isOpen, disabled } );
+		return renderToggle( { onToggle, isOpen, disabled } );
 	}
 
 	/**

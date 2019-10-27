@@ -4,7 +4,7 @@
 import { Component } from '@wordpress/element';
 import {
 	Button,
-	ToolbarButton,
+	IconButton,
 	PanelBody,
 	ToolbarGroup,
 } from '@wordpress/components';
@@ -74,13 +74,12 @@ class LegacyWidgetEdit extends Component {
 			);
 		}
 
-		// TODO: ToolbarButton with text
 		return (
 			<>
 				<BlockControls>
 					<ToolbarGroup>
 						{ ! widgetObject.isHidden && (
-							<ToolbarButton
+							<IconButton
 								onClick={ this.changeWidget }
 								label={ __( 'Change widget' ) }
 								icon="update"

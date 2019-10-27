@@ -5,7 +5,7 @@ import { getBlobByURL, isBlobURL } from '@wordpress/blob';
 import { compose } from '@wordpress/compose';
 import {
 	Disabled,
-	ToolbarButton,
+	IconButton,
 	PanelBody,
 	SelectControl,
 	ToggleControl,
@@ -155,7 +155,7 @@ class AudioEdit extends Component {
 			<>
 				<BlockControls>
 					<ToolbarGroup>
-						<ToolbarButton
+						<IconButton
 							className="components-icon-button components-toolbar__control"
 							label={ __( 'Edit audio' ) }
 							onClick={ switchToEditing }
