@@ -21,7 +21,6 @@ import {
 import InserterMenu from './menu';
 
 const defaultRenderToggle = ( { onToggle, disabled, isOpen, blockTitle, hasOnlyOneAllowedInserterBlockType } ) => {
-	
 	// translators: %s: the name of the block when there is only one
 	const label = blockTitle === '' ? _x( 'Add block', 'Generic label for block inserter button' ) : sprintf( _x( 'Add %s', 'directly add the only allowed block' ), blockTitle );
 
@@ -32,7 +31,7 @@ const defaultRenderToggle = ( { onToggle, disabled, isOpen, blockTitle, hasOnlyO
 			labelPosition="bottom"
 			onClick={ onToggle }
 			className="editor-inserter__toggle block-editor-inserter__toggle"
-			aria-haspopup={ ! hasOnlyOneAllowedInserterBlockType ? "true" : false }
+			aria-haspopup={ ! hasOnlyOneAllowedInserterBlockType ? 'true' : false }
 			aria-expanded={ ! hasOnlyOneAllowedInserterBlockType ? isOpen : false }
 			disabled={ disabled }
 		/>
@@ -104,7 +103,7 @@ class Inserter extends Component {
 	render() {
 		const { position, hasOnlyOneAllowedInserterBlockType, insertOnlyAllowedBlock } = this.props;
 		if ( hasOnlyOneAllowedInserterBlockType ) {
-			return this.renderToggle( { onToggle: insertOnlyAllowedBlock } )
+			return this.renderToggle( { onToggle: insertOnlyAllowedBlock } );
 		}
 		return (
 			<Dropdown
@@ -125,12 +124,12 @@ export default compose( [
 	withSelect( ( select, { rootClientId } ) => {
 		const {
 			hasInserterItems,
-			__experimentalGetAllowedBlocks,î
+			__experimentalGetAllowedBlocks,
 		} = select( 'core/block-editor' );
-		
+
 		const allowedBlocks = __experimentalGetAllowedBlocks( rootClientId );
- 		
- 		const hasOnlyOneAllowedInserterBlockType = allowedBlocks && ( get( allowedBlocks, [ 'length' ], 0 ) === 1 );
+
+		const hasOnlyOneAllowedInserterBlockType = allowedBlocks && ( get( allowedBlocks, [ 'length' ], 0 ) === 1 );
 		let allowedBlockType = false;
 		if ( hasOnlyOneAllowedInserterBlockType ) {
 			allowedBlockType = getBlockType( allowedBlocks );
@@ -140,7 +139,7 @@ export default compose( [
 			hasItems: hasInserterItems( rootClientId ),
 			hasOnlyOneAllowedInserterBlockType,
 			blockTitle: allowedBlockType ? allowedBlockType.title : '',
-			allowedBlockType: allowedBlockType,
+			allowedBlockType,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {
@@ -151,11 +150,11 @@ export default compose( [
 					hasOnlyOneAllowedInserterBlockType,
 					allowedBlockType,
 				} = ownProps;
-				
+
 				if ( ! hasOnlyOneAllowedInserterBlockType ) {
 					return;
 				}
-				
+
 				function getInsertionIndex() {
 					const {
 						getBlockIndex,
@@ -181,7 +180,7 @@ export default compose( [
 				const {
 					insertBlock,
 				} = dispatch( 'core/block-editor' );
-				console.log('inserting block');
+
 				const insertedBlock = createBlock( allowedBlockType.name );
 				insertBlock(
 					insertedBlock,
