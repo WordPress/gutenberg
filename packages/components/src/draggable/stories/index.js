@@ -27,7 +27,7 @@ const Box = ( props ) => {
 	);
 };
 
-export const _default = () => {
+const DraggalbeExample = () => {
 	const [ isDragging, setDragging ] = useState( false );
 
 	// Allow for the use of ID in the example
@@ -62,4 +62,8 @@ export const _default = () => {
 		</div>
 	);
 	/* eslint-enable no-restricted-syntax */
+};
+
+export const _default = () => {
+	return <DraggalbeExample />;
 };
