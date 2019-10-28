@@ -12,7 +12,7 @@ export { default as ColorPalette } from './color-palette';
 export { default as ColorPicker } from './color-picker';
 export { default as Dashicon } from './dashicon';
 export { DateTimePicker, DatePicker, TimePicker } from './date-time';
-export { default as DimensionControl } from './dimension-control';
+export { default as __experimentalDimensionControl } from './dimension-control';
 export { default as Disabled } from './disabled';
 export { default as Draggable } from './draggable';
 export { default as DropZone } from './drop-zone';
