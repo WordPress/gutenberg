@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { TouchableOpacity, Text, View, TextInput, I18nManager } from 'react-native';
+import { TouchableOpacity, Text, View, TextInput, I18nManager, AccessibilityInfo } from 'react-native';
 import { isEmpty } from 'lodash';
 
 /**
@@ -23,6 +23,7 @@ class BottomSheetCell extends Component {
 		super( ...arguments );
 		this.state = {
 			isEditingValue: props.autoFocus || false,
+			isScreenReaderEnabled: false,
 		};
 	}
 
@@ -30,6 +31,13 @@ class BottomSheetCell extends Component {
 		if ( this.state.isEditingValue ) {
 			this._valueTextInput.focus();
 		}
+	}
+
+	componentDidMount() {
+		AccessibilityInfo.isScreenReaderEnabled().then(
+			( isScreenReaderEnabled ) =>
+				this.setState( { isScreenReaderEnabled } )
+		);
 	}
 
 	render() {
@@ -158,6 +166,7 @@ class BottomSheetCell extends Component {
 		};
 
 		const iconStyle = getStylesFromColorScheme( styles.icon, styles.iconDark );
+		const containerPointerEvents = this.state.isScreenReaderEnabled && accessible ? 'none' : 'auto';
 
 		return (
 			<TouchableOpacity
@@ -175,7 +184,7 @@ class BottomSheetCell extends Component {
 				{ drawTopSeparator && (
 					<View style={ separatorStyle() } />
 				) }
-				<View style={ styles.cellContainer } pointerEvents={ accessible ? 'none' : 'auto' }>
+				<View style={ styles.cellContainer } pointerEvents={ containerPointerEvents }>
 					<View style={ styles.cellRowContainer }>
 						{ icon && (
 							<View style={ styles.cellRowContainer }>
