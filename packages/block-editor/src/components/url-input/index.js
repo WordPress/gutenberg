@@ -71,14 +71,17 @@ class URLInput extends Component {
 	}
 
 	updateSuggestions( value ) {
-		const { __experimentalFetchLinkSuggestions, __experimentalHandleURLSuggestions } = this.props;
-		if ( ! __experimentalFetchLinkSuggestions ) {
+		const {
+			__experimentalFetchLinkSuggestions: fetchLinkSuggestions,
+			__experimentalHandleURLSuggestions: handleURLSuggestions,
+		} = this.props;
+		if ( ! fetchLinkSuggestions ) {
 			return;
 		}
 
 		// Show the suggestions after typing at least 2 characters
 		// and also for URLs
-		if ( value.length < 2 || ( ! __experimentalHandleURLSuggestions && isURL( value ) ) ) {
+		if ( value.length < 2 || ( ! handleURLSuggestions && isURL( value ) ) ) {
 			this.setState( {
 				showSuggestions: false,
 				selectedSuggestion: null,
@@ -94,7 +97,7 @@ class URLInput extends Component {
 			loading: true,
 		} );
 
-		const request = __experimentalFetchLinkSuggestions( value );
+		const request = fetchLinkSuggestions( value );
 
 		request.then( ( suggestions ) => {
 			// A fetch Promise doesn't have an abort option. It's mimicked by
@@ -255,7 +258,7 @@ class URLInput extends Component {
 			id,
 			isFullWidth,
 			hasBorder,
-			__experimentalRenderSuggestions,
+			__experimentalRenderSuggestions: renderSuggestions,
 			placeholder = __( 'Paste URL or type to search' ),
 			value = '',
 			autoFocus = true,
@@ -314,7 +317,7 @@ class URLInput extends Component {
 
 				{ ( loading ) && <Spinner /> }
 
-				{ isFunction( __experimentalRenderSuggestions ) && showSuggestions && !! suggestions.length && __experimentalRenderSuggestions( {
+				{ isFunction( renderSuggestions ) && showSuggestions && !! suggestions.length && renderSuggestions( {
 					suggestions,
 					selectedSuggestion,
 					suggestionsListProps,
@@ -323,7 +326,7 @@ class URLInput extends Component {
 					handleSuggestionClick: this.handleOnClick,
 				} ) }
 
-				{ ! isFunction( __experimentalRenderSuggestions ) && showSuggestions && !! suggestions.length &&
+				{ ! isFunction( renderSuggestions ) && showSuggestions && !! suggestions.length &&
 					<Popover
 						position="bottom"
 						noArrow
