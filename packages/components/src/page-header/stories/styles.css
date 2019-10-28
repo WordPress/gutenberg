@@ -18,7 +18,8 @@ body {
 	max-width: 100%;
 }
 
-.components-page-header__content {
+.components-page-header__body {
+	flex: 1;
 	padding: 0 8px;
 }
 
@@ -26,8 +27,20 @@ body {
 	margin-top: 4px;
 }
 
-.components-page-header__content > *:last-child {
+.components-page-header__body > *:last-child {
 	margin-bottom: 0;
+}
+
+.components-page-header__body > * + .components-page-header__content {
+	margin-top: 12px;
+}
+
+.components-page-header__right-actions {
+	display: flex;
+}
+.components-page-header__right-actions > * {
+	min-width: 0;
+	max-width: 100%;
 }
 
 .inline-buttons {

@@ -8,6 +8,7 @@ function PageHeader( props ) {
 		children,
 		className,
 		leftActions,
+		rightActions,
 		title,
 		subtitle,
 		...restProps
@@ -21,7 +22,7 @@ function PageHeader( props ) {
 					{ leftActions }
 				</div>
 			) }
-			<div className="components-page-header__content">
+			<div className="components-page-header__body">
 				{ title && (
 					<div className="components-page-header__title-wrapper">
 						<h1 className="components-page-header__title">
@@ -34,8 +35,19 @@ function PageHeader( props ) {
 						{ subtitle }
 					</div>
 				) }
+				{ children && (
+					<div className="components-page-header__content">
+						{ children }
+					</div>
+				) }
 			</div>
-			{ children }
+			{ rightActions && (
+				<>
+					<div className="components-page-header__right-actions">
+						{ rightActions }
+					</div>
+				</>
+			) }
 		</div>
 	);
 }

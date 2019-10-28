@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import { text } from '@storybook/addon-knobs';
-import faker from 'faker';
+import { select, text } from '@storybook/addon-knobs';
 
 /**
  * Internal dependencies
@@ -57,18 +56,38 @@ const DropdownActions = () => {
 };
 
 export const _default = () => {
+	const actionsPlacement = select(
+		'Example: Actions Placement',
+
+		{
+			Right: 'right',
+			Bottom: 'bottom',
+		},
+		'bottom'
+	);
+
 	const title = text( 'title', 'Title' );
-	const subtitle = text( 'subtitle', faker.lorem.paragraph() );
+	const subtitle = text( 'subtitle', 'Subtitle Content' );
 
 	const props = {
 		title,
 		subtitle,
 	};
 
+	const isPlacedRight = actionsPlacement === 'right';
+	const isPlacedBottom = ! isPlacedRight;
+
 	return (
-		<PageHeader { ...props }>
-			<InlineActions />
-			<DropdownActions />
+		<PageHeader
+			{ ...props }
+			rightActions={
+				<>
+					{ isPlacedRight ? <InlineActions /> : null }
+					<DropdownActions />
+				</>
+			}
+		>
+			{ isPlacedBottom ? <InlineActions /> : null }
 		</PageHeader>
 	);
 };
@@ -81,18 +100,28 @@ export const simple = () => {
 	};
 
 	return (
-		<PageHeader { ...props }>
-			<InlineActions />
-			<DropdownActions />
-		</PageHeader>
+		<PageHeader
+			{ ...props }
+			rightActions={
+				<>
+					<InlineActions />
+					<DropdownActions />
+				</>
+			}
+		/>
 	);
 };
 
 export const actionBar = () => {
 	return (
-		<PageHeader leftActions={ <IconButton icon="insert" isTertiary /> }>
-			<InlineActions />
-			<DropdownActions />
-		</PageHeader>
+		<PageHeader
+			leftActions={ <IconButton icon="insert" isTertiary /> }
+			rightActions={
+				<>
+					<InlineActions />
+					<DropdownActions />
+				</>
+			}
+		></PageHeader>
 	);
 };
