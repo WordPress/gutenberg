@@ -23,7 +23,6 @@ import InserterMenu from './menu';
 const defaultRenderToggle = ( { onToggle, disabled, isOpen, blockTitle, hasOnlyOneAllowedInserterBlockType } ) => {
 	// translators: %s: the name of the block when there is only one
 	const label = blockTitle === '' ? _x( 'Add block', 'Generic label for block inserter button' ) : sprintf( _x( 'Add %s', 'directly add the only allowed block' ), blockTitle );
-
 	return (
 		<IconButton
 			icon="insert"
@@ -134,7 +133,6 @@ export default compose( [
 		if ( hasOnlyOneAllowedInserterBlockType ) {
 			allowedBlockType = getBlockType( allowedBlocks );
 		}
-
 		return {
 			hasItems: hasInserterItems( rootClientId ),
 			hasOnlyOneAllowedInserterBlockType,
