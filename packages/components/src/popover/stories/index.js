@@ -6,12 +6,8 @@ import { boolean, select, text } from '@storybook/addon-knobs';
 /**
  * Internal dependencies
  */
+import { DraggableWrapper } from './_utils';
 import Popover from '../';
-
-/**
- * WordPress dependencies
- */
-import { useState, useEffect } from '@wordpress/element';
 
 export default { title: 'Popover', component: Popover };
 
@@ -44,34 +40,7 @@ export const _default = () => {
 };
 
 const DragExample = ( props ) => {
-	const [ position, setPosition ] = useState( { x: 0, y: 0 } );
-	const [ isDragging, setDragging ] = useState( false );
 	const { label, content, ...restProps } = props;
-
-	const updatePosition = ( event ) => {
-		if ( ! isDragging ) {
-			return false;
-		}
-		const { movementX, movementY } = event;
-		setPosition( {
-			x: position.x + movementX,
-			y: position.y + movementY,
-		} );
-	};
-
-	const startDragging = () => setDragging( true );
-	const stopDragging = () => setDragging( false );
-
-	useEffect( () => {
-		document.addEventListener( 'mousemove', updatePosition );
-		document.addEventListener( 'mouseup', stopDragging );
-		return () => {
-			document.removeEventListener( 'mousemove', updatePosition );
-			document.removeEventListener( 'mouseup', stopDragging );
-		};
-	}, [ updatePosition, stopDragging ] );
-
-	const { x, y } = position;
 
 	return (
 		<div>
@@ -105,24 +74,18 @@ const DragExample = ( props ) => {
 					justifyContent: 'center',
 				} }
 			>
-				<div
-					role="presentation"
-					onMouseDown={ startDragging }
-					onMouseUp={ stopDragging }
+				<DraggableWrapper
 					style={ {
 						background: '#ddd',
 						border: '2px solid pink',
 						borderRadius: 4,
 						padding: 10,
 						userSelect: 'none',
-						position: 'relative',
-						top: y,
-						left: x,
 					} }
 				>
 					<div style={ { border: '2px solid cyan' } }>{ label }</div>
 					<Popover { ...restProps }>{ content }</Popover>
-				</div>
+				</DraggableWrapper>
 			</div>
 		</div>
 	);
