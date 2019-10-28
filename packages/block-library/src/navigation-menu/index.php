@@ -12,49 +12,47 @@
  * @param  array $attributes NavigationMenu block attributes.
  * @return array Colors CSS classes and inline styles.
  */
-function build_css_colors( $attributes ) {
+function block_navigation_colors( $attributes ) {
 	// CSS classes.
 	$colors = array(
-		'bg_css_classes'     => '',
-		'bg_inline_styles'   => '',
-		'text_css_classes'   => '',
-		'text_inline_styles' => '',
+		'classes' => array(),
+		'style' => '',
 	);
 
 	// Background color.
 	// Background color - has text color.
 	if ( array_key_exists( 'backgroundColor', $attributes ) ) {
-		$colors['bg_css_classes'] .= ' has-background-color';
+		$colors['classes'][] = 'has-background-color';
 	}
 
 	// Background color - add custom CSS class.
 	if ( array_key_exists( 'backgroundColorCSSClass', $attributes ) ) {
-		$colors['bg_css_classes'] .= " {$attributes['backgroundColorCSSClass']}";
-
-	} elseif ( array_key_exists( 'customBackgroundColor', $attributes ) ) {
+		$colors['classes'][] = trim( $attributes['backgroundColorCSSClass'] );
+	}
+	if ( array_key_exists( 'customBackgroundColor', $attributes ) ) {
 		// Background color - or add inline `background-color` style.
-		$colors['bg_inline_styles'] = ' style="background-color: ' . esc_attr( $attributes['customBackgroundColor'] ) . ';"';
+		$colors['style'] .= "background-color:{$attributes['customBackgroundColor']};";
 	}
 
 	// Text color.
 	// Text color - has text color.
 	if ( array_key_exists( 'textColor', $attributes ) ) {
-		$colors['text_css_classes'] .= ' has-text-color';
+		$colors['classes'][] = 'has-text-color';
 	}
 	// Text color - add custom CSS class.
 	if ( array_key_exists( 'textColorCSSClass', $attributes ) ) {
-		$colors['text_css_classes'] .= " {$attributes['textColorCSSClass']}";
-
-	} elseif ( array_key_exists( 'customTextColor', $attributes ) ) {
+		$colors['classes'][] = trim( $attributes['textColorCSSClass'] );
+	}
+	if ( array_key_exists( 'textColorValue', $attributes ) ){
 		// Text color - or add inline `color` style.
-		$colors['text_inline_styles'] = ' style="color: ' . esc_attr( $attributes['customTextColor'] ) . ';"';
+		$colors['style'] .= "color:{$attributes['textColorValue']};";
 	}
 
-	$colors['bg_css_classes']   = esc_attr( trim( $colors['bg_css_classes'] ) );
-	$colors['text_css_classes'] = esc_attr( trim( $colors['text_css_classes'] ) );
+	$colors['classes'] = array_unique( array_filter( $colors['classes'] ) );
 
 	return $colors;
 }
+
 /**
  * Renders the `core/navigation-menu` block on server.
  *
@@ -65,62 +63,75 @@ function build_css_colors( $attributes ) {
  * @return string Returns the post content with the legacy widget added.
  */
 function render_block_navigation_menu( $attributes, $content, $block ) {
-	// Inline computed colors.
-	$comp_inline_styles = '';
-	if ( array_key_exists( 'backgroundColorValue', $attributes ) ) {
-		$comp_inline_styles .= ' background-color: ' . esc_attr( $attributes['backgroundColorValue'] ) . ';';
-	}
+	$colors = block_navigation_colors( $attributes );
+	$items  = setup_block_nav_items( $block, $colors );
+	$args   = (object) array(
+		'before'          => '',
+		'after'           => '',
+		'link_before'     => '',
+		'link_after'      => '',
+		'theme_location'  => 'block',
+	);
 
-	if ( array_key_exists( 'textColorValue', $attributes ) ) {
-		$comp_inline_styles .= ' color: ' . esc_attr( $attributes['textColorValue'] ) . ';';
-	}
-	$comp_inline_styles = ! empty( $comp_inline_styles )
-		? ' style="' . esc_attr( trim( $comp_inline_styles ) ) . '"'
-		: '';
-
-	$colors = build_css_colors( $attributes );
-
-	return "<nav class='wp-block-navigation-menu' {$comp_inline_styles}>" .
-		build_navigation_menu_html( $block, $colors ) .
-	'</nav>';
+	add_filter( 'nav_menu_link_attributes', 'block_navigation_link_attributes', 10, 2 );
+	return '<nav class="wp-block-navigation-menu" style="' . esc_attr( $colors['style'] ) . '"><ul class="menu">' . walk_nav_menu_tree( $items, 0, $args ) . '</ul></nav>';
 }
 
 /**
- * Walks the inner block structure and returns an HTML list for it.
+ * Adds inline styles to menu item link attributes.
  *
- * @param array $block  The block.
- * @param array $colors Contains inline styles and CSS classes to apply to menu item.
- *
- * @return string Returns  an HTML list from innerBlocks.
+ * @param array  $attributes Link attributes.
+ * @param object $item       Menu item.
+ * @return array
  */
-function build_navigation_menu_html( $block, $colors ) {
-	$html = '';
-	foreach ( (array) $block['innerBlocks'] as $key => $menu_item ) {
-
-		$html .= '<li class="wp-block-navigation-menu-item ' . $colors['bg_css_classes'] . '"' . $colors['bg_inline_styles'] . '>' .
-			'<a
-				class="wp-block-navigation-menu-item__link ' . $colors['text_css_classes'] . '"
-				' . $colors['text_inline_styles'];
-
-		if ( isset( $menu_item['attrs']['url'] ) ) {
-			$html .= ' href="' . $menu_item['attrs']['url'] . '"';
-		}
-		if ( isset( $menu_item['attrs']['title'] ) ) {
-			$html .= ' title="' . $menu_item['attrs']['title'] . '"';
-		}
-		$html .= '>';
-		if ( isset( $menu_item['attrs']['label'] ) ) {
-			$html .= $menu_item['attrs']['label'];
-		}
-		$html .= '</a>';
-
-		if ( count( (array) $menu_item['innerBlocks'] ) > 0 ) {
-			$html .= build_navigation_menu_html( $menu_item, $colors );
-		}
-
-		$html .= '</li>';
+function block_navigation_link_attributes( $attributes, $item ) {
+	if ( ! empty( $item->style ) ) {
+		$attributes['style'] = $item->style;
 	}
-	return '<ul>' . $html . '</ul>';
+
+	return $attributes;
+}
+
+/**
+ * Prepares menu items to be used in Walker_Nav_Menu.
+ *
+ * @param array $block  The parsed block.
+ * @param array $colors Custom colors classes and styles.
+ * @return array Menu items
+ */
+function setup_block_nav_items( $block, $colors ) {
+	static $menu_item_id = 1;
+	$nav_menu_items = array();
+	$nav_menu_item  = array(
+		'classes'       => $colors['classes'],
+		'current'       => false,
+		'menu_order'    => 0,
+		'post_content'  => '',
+		'post_excerpt'  => '',
+		'post_type'     => 'nav_menu_item',
+		'style'         => $colors['style'],
+	);
+
+	foreach ( $block['innerBlocks'] as $inner_block ) {
+		$sub_menu_items = setup_block_nav_items( $inner_block, $colors );
+		foreach ( $sub_menu_items as $sub_menu_item ) {
+			$sub_menu_item->menu_item_parent = $menu_item_id;
+			$nav_menu_items[]                = $sub_menu_item;
+		}
+
+		if ( empty( $inner_block['attrs']['label'] ) ) {
+			continue;
+		}
+
+		$nav_menu_item['ID']         = $menu_item_id;
+		$nav_menu_item['post_title'] = $inner_block['attrs']['label'];
+		$nav_menu_item['url']        = $inner_block['attrs']['destination'] ?? '#';
+
+		++$menu_item_id;
+		$nav_menu_items[] = (object) $nav_menu_item;
+	}
+
+	return array_map( 'wp_setup_nav_menu_item', $nav_menu_items );
 }
 
 /**
@@ -130,7 +141,6 @@ function build_navigation_menu_html( $block, $colors ) {
  * @throws WP_Error An WP_Error exception parsing the block definition.
  */
 function register_block_core_navigation_menu() {
-
 	register_block_type(
 		'core/navigation-menu',
 		array(
@@ -182,5 +192,4 @@ function register_block_core_navigation_menu() {
 		)
 	);
 }
-
 add_action( 'init', 'register_block_core_navigation_menu' );
