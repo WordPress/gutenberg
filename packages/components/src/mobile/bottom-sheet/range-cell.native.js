@@ -44,10 +44,9 @@ class BottomSheetRangeCell extends Component {
 	}
 
 	handleChange( text ) {
-		const announcement = sprintf( __( 'Current value is %s' ), text );
 		if ( ! isNaN( Number( text ) ) ) {
 			this.setState( { sliderValue: text } );
-			AccessibilityInfo.announceForAccessibility( announcement );
+			this.announceCurrentValue( text );
 		}
 	}
 
@@ -81,6 +80,7 @@ class BottomSheetRangeCell extends Component {
 		if ( ! isNaN( Number( text ) ) ) {
 			this.onChangeValue( text );
 			this.setState( { sliderValue: text } );
+			this.announceCurrentValue( text );
 		}
 	}
 
@@ -104,6 +104,11 @@ class BottomSheetRangeCell extends Component {
 			const reactTag = findNodeHandle( this.sliderRef );
 			AccessibilityInfo.setAccessibilityFocus( reactTag );
 		}
+	}
+
+	announceCurrentValue( value ) {
+		const announcement = sprintf( __( 'Current value is %s' ), value );
+		AccessibilityInfo.announceForAccessibility( announcement );
 	}
 
 	render() {
