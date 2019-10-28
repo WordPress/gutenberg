@@ -3,6 +3,7 @@
  */
 
 export * from './colors';
+export * from './gradients';
 export * from './font-sizes';
 export { default as AlignmentToolbar } from './alignment-toolbar';
 export { default as Autocomplete } from './autocomplete';
