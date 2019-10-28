@@ -80,7 +80,7 @@ function NavigationMenu( {
 	 * Set the color type according to the given values.
 	 * It propagate the color values into the attributes object.
 	 * Both `backgroundColorValue` and `textColorValue` are
-	 * using the apply inline styles.
+	 * using the inline styles.
 	 *
 	 * @param {Object}  colorsData       Arguments passed by BlockColorsStyleSelector onColorChange.
 	 * @param {string}  colorsData.attr  Color attribute.
@@ -106,7 +106,7 @@ function NavigationMenu( {
 			backgroundColorCSSClass: backgroundColor.class ? backgroundColor.class : null,
 			textColorCSSClass: textColor.class ? textColor.class : null,
 		} );
-	}, [] );
+	}, [ backgroundColor, textColor ] );
 
 	return (
 		<Fragment>
