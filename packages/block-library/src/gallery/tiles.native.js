@@ -6,20 +6,37 @@ import { View } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { Children } from '@wordpress/element';
+import { Children, useEffect, useLayoutEffect, useState } from '@wordpress/element';
 
 const containerStyle = {
-	flex: 1,
+	// flex: 1,
 	flexDirection: 'row',
 	flexWrap: 'wrap',
 };
 
 function Tiles( props ) {
+	// const [ columns, setColumns ] = useState();
+
 	const {
+		// columns: newColumns,
 		columns,
 		children,
 		groutSpacing = 10,
 	} = props;
+
+	// useEffect(() => {
+	// 	// if ( columns !== newColumns ) {
+	// 		setTimeout(() => {
+	// 			setColumns(newColumns);
+	// 		}, 1);
+	// 	// }
+	// });
+
+	// useLayoutEffect(() => {
+	// 	// setTimeout(() => {
+	// 		setColumns(newColumns);
+	// 	// }, 1);
+	// });
 
 	const tileBorderWidth = groutSpacing / 2;
 	const tileCount = Children.count( children );
@@ -49,14 +66,22 @@ function Tiles( props ) {
 		};
 
 		return (
-			<View style={ tileStyle }>
+			<View style={ tileStyle }
+				onLayout={ (e) => {
+					console.log(`Tile ${index} width: ${e.nativeEvent.layout.width}`)
+				} }
+			>
 				{ child }
 			</View>
 		);
 	}	)
 
 	return (
-		<View style={ containerStyle }>
+		<View style={ containerStyle }
+		 onLayout={ (e) => {
+			 console.log(`Tiles width: ${e.nativeEvent.layout.width}`)
+			} }
+		 >
 			{ wrappedChilren }
 		</View>
 	);
