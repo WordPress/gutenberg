@@ -26,7 +26,7 @@ import {
 import sizesTable, { findSizeBySlug } from './sizes';
 
 export function DimensionControl( props ) {
-	const { label, icon, sizes = sizesTable, value, onChange, className = '' } = props;
+	const { label, value, sizes = sizesTable, icon, onChange, className = '' } = props;
 
 	const onChangeSpacingSize = ( val ) => {
 		const theSize = findSizeBySlug( sizes, val );

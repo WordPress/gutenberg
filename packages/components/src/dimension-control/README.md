@@ -38,19 +38,12 @@ registerBlockType( 'my-plugin/my-block', {
 			} );
 		};
 
-		const resetSpacingDimension = ( dimension, device = '' ) => {
-			setAttributes( {
-				[ `${ dimension }${ device }` ]: '',
-			} );
-		};
-
 		return (
 			<DimensionControl
 				label={ __( 'Padding' ) }
 				icon={ 'desktop' }
-				onReset={ partialRight( resetSpacingDimension, 'paddingSize' ) }
-				onSpacingChange={ partialRight( updateSpacing, 'paddingSize' ) }
-				currentSize={ paddingSize }
+				onChange={ partialRight( updateSpacing, 'paddingSize' ) }
+				value={ paddingSize }
 			/>
 		);
 	}
@@ -59,7 +52,7 @@ registerBlockType( 'my-plugin/my-block', {
 
 _Note:_ it is recommended to partially apply the value of the Block attribute to be updated (eg: `paddingSize`, `marginSize`...etc) to your callback functions. This avoids the need to unnecessarily couple the component to the Block attribute schema.
 
-_Note:_ by default, if you do not provide an initial `currentSize` prop for the current dimension value, then no value will be selected (ie: there is no default dimension set). 
+_Note:_ by default, if you do not provide an initial `value` prop for the current dimension value, then no value will be selected (ie: there is no default dimension set). 
 
 ## Props
 
@@ -70,12 +63,12 @@ _Note:_ by default, if you do not provide an initial `currentSize` prop for the 
 
 The human readable label for the control. 
 
-### `currentSize`
+### `value`
 * **Type:** `String`
 * **Default:** `''`
 * **Required:** No
 
-The current value of the dimension the UI controls. If provided the UI with automatically highlight the control representing the current value.
+The current value of the dimension UI control. If provided the UI with automatically select the value.
 
 ### `sizes`
 * **Type:** `Array`
@@ -107,7 +100,7 @@ By default a set of relative sizes (`small`, `medium`...etc) are provided. See `
 
 An optional dashicon to display before to the control label.
 
-### `onSpacingChange`
+### `onChange`
 * **Type:** `Function`
 * **Default:** `undefined`
 * **Required:** No
@@ -117,12 +110,11 @@ An optional dashicon to display before to the control label.
 A callback which is triggered when a spacing size value changes (is selected/clicked).
 
 
-### `onReset`
-* **Type:** `Function`
-* **Default:** `undefined`
+### `className`
+* **Type:** `String`
+* **Default:** `''`
 * **Required:** No
-* **Arguments:**:
 
-A callback which is triggered when the "reset" UI is activated.
+A string of classes to be added to the control component.
 
 
