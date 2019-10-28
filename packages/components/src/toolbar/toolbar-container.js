@@ -11,7 +11,7 @@ import { forwardRef, useEffect, useRef, useCallback } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import ToolbarContext from './toolbar-context';
+import ToolbarContext from '../toolbar-context';
 
 // When using slots, register/unregister are called with delay, and there's a
 // chance that the toolbar is already unmounted when this happens.

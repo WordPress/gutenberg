@@ -10,7 +10,7 @@ import { createElement, forwardRef, useContext } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { ToolbarContext } from '../toolbar';
+import ToolbarContext from '../toolbar-context';
 import ToolbarButton from './toolbar-button';
 
 export function Button( props, ref ) {

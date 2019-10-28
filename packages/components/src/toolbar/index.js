@@ -14,9 +14,6 @@ import deprecated from '@wordpress/deprecated';
  */
 import ToolbarGroup from '../toolbar-group';
 import ToolbarContainer from './toolbar-container';
-import ToolbarContext from './toolbar-context';
-
-export { ToolbarContext };
 
 /**
  * Renders an accessible toolbar that follows the

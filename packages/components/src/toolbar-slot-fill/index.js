@@ -12,7 +12,7 @@ import { useContext } from '@wordpress/element';
  * Internal dependencies
  */
 import { Slot, Fill } from '../slot-fill';
-import { ToolbarContext } from '../toolbar';
+import ToolbarContext from '../toolbar-context';
 
 export function ToolbarSlot( { className, ...props } ) {
 	const accessibleToolbarState = useContext( ToolbarContext );

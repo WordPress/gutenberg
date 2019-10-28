@@ -24,7 +24,7 @@ import ScrollLock from '../scroll-lock';
 import IsolatedEventContainer from '../isolated-event-container';
 import { Slot, Fill, Consumer } from '../slot-fill';
 import Animate from '../animate';
-import { ToolbarContext } from '../toolbar';
+import ToolbarContext from '../toolbar-context';
 
 const FocusManaged = withConstrainedTabbing( withFocusReturn( ( { children } ) => children ) );
 
