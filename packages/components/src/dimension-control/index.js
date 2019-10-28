@@ -28,14 +28,6 @@ import sizesTable, { findSizeBySlug } from './sizes';
 export function DimensionControl( props ) {
 	const { label, icon, sizes = sizesTable, value, onChange, className = '' } = props;
 
-	/**
-  * Determines the size from the size slug (eg: `medium`)
-  * and decides whether to call the change or reset callback
-  * handlers
-  *
-  * @param  {string} val the DOMEvent event.target
-  * @return {void}
-  */
 	const onChangeSpacingSize = ( val ) => {
 		const theSize = findSizeBySlug( sizes, val );
 
@@ -46,14 +38,6 @@ export function DimensionControl( props ) {
 		}
 	};
 
-	/**
-  * Converts the sizes lookup tablet
-  * to a format suitable for use in the
-  * <SelectControl /> options prop
-  *
-  * @param  {Array} theSizes the array of sizes objects
-  * @return {Array}          the array of options with default option prepended
-  */
 	const formatSizesAsOptions = ( theSizes ) => {
 		const options = theSizes.map( ( { name, slug } ) => ( {
 			label: name,
