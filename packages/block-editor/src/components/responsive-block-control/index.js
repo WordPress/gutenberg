@@ -67,13 +67,17 @@ function ResponsiveBlockControl( props ) {
 					help={ toggleHelpText }
 				/>
 
-				<div className="block-editor-responsive-block-control__group block-editor-responsive-block-control__group--default" hidden={ isResponsiveMode }>
-					{ defaultControl }
-				</div>
+				{ ! isResponsiveMode && (
+					<div className="block-editor-responsive-block-control__group block-editor-responsive-block-control__group--default" >
+						{ defaultControl }
+					</div>
+				) }
 
-				<div className="block-editor-responsive-block-control__group block-editor-responsive-block-control__group--responsive" hidden={ ! isResponsiveMode }>
-					{ ( renderResponsiveControls ? renderResponsiveControls( devices ) : defaultResponsiveControls() ) }
-				</div>
+				{ isResponsiveMode && (
+					<div className="block-editor-responsive-block-control__group block-editor-responsive-block-control__group--responsive" hidden={ ! isResponsiveMode }>
+						{ ( renderResponsiveControls ? renderResponsiveControls( devices ) : defaultResponsiveControls() ) }
+					</div>
+				) }
 
 			</div>
 		</fieldset>

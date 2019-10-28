@@ -86,14 +86,14 @@ describe( 'Basic rendering', () => {
 
 		const toggleState = container.querySelector( 'input[type="checkbox"]' ).checked;
 
-		const defaultControlGroupHidden = container.querySelector( '.block-editor-responsive-block-control__group--default' ).hidden;
+		const defaultControlGroup = container.querySelector( '.block-editor-responsive-block-control__group--default' );
 
-		const responsiveControlGroupHidden = container.querySelector( '.block-editor-responsive-block-control__group--responsive' ).hidden;
+		const responsiveControlGroup = container.querySelector( '.block-editor-responsive-block-control__group--responsive' );
 
 		expect( container.innerHTML ).not.toBe( '' );
 
-		expect( defaultControlGroupHidden ).toBe( false );
-		expect( responsiveControlGroupHidden ).toBe( true );
+		expect( defaultControlGroup ).not.toBeNull();
+		expect( responsiveControlGroup ).toBeNull();
 
 		expect( activeDeviceLabel ).not.toBeNull();
 		expect( activePropertyLabel ).not.toBeNull();
@@ -196,8 +196,8 @@ describe( 'Default and Responsive modes', () => {
 		const defaultControlGroup = container.querySelector( '.block-editor-responsive-block-control__group--default' );
 		const responsiveControlGroup = container.querySelector( '.block-editor-responsive-block-control__group--responsive' );
 
-		expect( defaultControlGroup.hidden ).toBe( true );
-		expect( responsiveControlGroup.hidden ).toBe( false );
+		expect( defaultControlGroup ).toBeNull();
+		expect( responsiveControlGroup ).not.toBeNull();
 	} );
 
 	it( 'should render a set of custom devices in responsive mode when provided', () => {
@@ -241,35 +241,41 @@ describe( 'Default and Responsive modes', () => {
 			);
 		} );
 
-		const defaultControlGroup = container.querySelector( '.block-editor-responsive-block-control__group--default' );
-		const responsiveControlGroup = container.querySelector( '.block-editor-responsive-block-control__group--responsive' );
+		let defaultControlGroup = container.querySelector( '.block-editor-responsive-block-control__group--default' );
+		let responsiveControlGroup = container.querySelector( '.block-editor-responsive-block-control__group--responsive' );
 
 		// Select elements based on what the user can see
 		const toggleLabel = Array.from( container.querySelectorAll( 'label' ) ).find( ( label ) => label.innerHTML.includes( 'Use the same padding on all screensizes' ) );
 		const toggleInput = container.querySelector( `#${ toggleLabel.getAttribute( 'for' ) }` );
 
 		// Initial mode (default)
-		expect( defaultControlGroup.hidden ).toBe( false );
-		expect( responsiveControlGroup.hidden ).toBe( true );
+		expect( defaultControlGroup ).not.toBeNull();
+		expect( responsiveControlGroup ).toBeNull();
 
 		// Toggle to "responsive" mode
 		act( () => {
 			Simulate.change( toggleInput, { target: { checked: false } } );
 		} );
 
-		expect( defaultControlGroup.hidden ).toBe( true );
-		expect( responsiveControlGroup.hidden ).toBe( false );
+		defaultControlGroup = container.querySelector( '.block-editor-responsive-block-control__group--default' );
+		responsiveControlGroup = container.querySelector( '.block-editor-responsive-block-control__group--responsive' );
+
+		expect( defaultControlGroup ).toBeNull();
+		expect( responsiveControlGroup ).not.toBeNull();
 
 		// Toggle back to "default" mode
 		act( () => {
 			Simulate.change( toggleInput, { target: { checked: true } } );
 		} );
 
-		expect( defaultControlGroup.hidden ).toBe( false );
-		expect( responsiveControlGroup.hidden ).toBe( true );
+		defaultControlGroup = container.querySelector( '.block-editor-responsive-block-control__group--default' );
+		responsiveControlGroup = container.querySelector( '.block-editor-responsive-block-control__group--responsive' );
+
+		expect( defaultControlGroup ).not.toBeNull();
+		expect( responsiveControlGroup ).toBeNull();
 	} );
 
-	it( 'should render custom responsive controls when renderResponsiveControls is provided ', () => {
+	it( 'should render custom responsive controls when renderResponsiveControls is provided and in responsive mode ', () => {
 		const spyRenderDefaultControl = jest.fn();
 
 		const mockRenderResponsiveControls = jest.fn( ( devices ) => {
@@ -295,6 +301,7 @@ describe( 'Default and Responsive modes', () => {
 					property="padding"
 					renderDefaultControl={ spyRenderDefaultControl }
 					renderResponsiveControls={ mockRenderResponsiveControls }
+					responsiveControlsActive={ true }
 				/>, container
 			);
 		} );
@@ -302,7 +309,8 @@ describe( 'Default and Responsive modes', () => {
 		// The user should see "range" controls so we can legitimately query for them here
 		const customControls = Array.from( container.querySelectorAll( 'input[type="range"]' ) );
 
-		// Should be called for default control only and not for the responsive controls
+		// Also called because default control rendeer function is always called
+		// (for convenience) even though it's not displayed in output.
 		expect( spyRenderDefaultControl ).toHaveBeenCalledTimes( 1 );
 
 		expect( mockRenderResponsiveControls ).toHaveBeenCalledTimes( 1 );
