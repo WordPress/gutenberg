@@ -80,6 +80,12 @@ exports[`List can undo asterisk transform 1`] = `
 <!-- /wp:paragraph -->"
 `;
 
+exports[`List first empty list item is graciously removed 1`] = `
+"<!-- wp:list -->
+<ul><li>2</li></ul>
+<!-- /wp:list -->"
+`;
+
 exports[`List should be immeadiately saved on indentation 1`] = `
 "<!-- wp:list -->
 <ul><li>one<ul><li></li></ul></li></ul>
