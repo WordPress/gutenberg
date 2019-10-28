@@ -67,6 +67,7 @@ if ( reactNativeMinorVersion >= 59 ) {
 const autoImportIncludePaths = [
 	path.join( path.dirname( __filename ), 'src' ),
 	path.join( path.dirname( __filename ), '../../assets/stylesheets' ),
+	path.join( path.dirname( __filename ), '../base-styles' ),
 ];
 const autoImportAssets = [
 	'_colors.scss',

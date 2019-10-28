@@ -78,6 +78,7 @@
     "redux-optimist": "^1.0.0",
     "refx": "^3.0.0",
     "rememo": "^3.0.0",
+    "semver": "6.0.0",
     "shallowequal": "^1.0.2",
     "showdown": "^1.8.6",
     "simple-html-tokenizer": "^0.4.1",
