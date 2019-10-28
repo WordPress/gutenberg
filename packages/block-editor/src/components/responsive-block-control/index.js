@@ -16,7 +16,7 @@ import {
 	ToggleControl,
 } from '@wordpress/components';
 
-export const ResponsiveBlockControlLabel = withInstanceId( function ResponsiveBlockControlLabel( { instanceId, property, device } ) {
+const ResponsiveBlockControlLabel = withInstanceId( function ResponsiveBlockControlLabel( { instanceId, property, device } ) {
 	const accessibleLabel = sprintf( __( 'Controls the %s property for %s devices.' ), property, device );
 	return (
 		<Fragment>
