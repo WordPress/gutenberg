@@ -1,25 +1,16 @@
-.components-toolbar-group {
-	border: $border-width solid $light-gray-500;
-	background-color: $white;
-	display: flex;
-	flex-shrink: 0;
-	margin-right: -$border-width;
-
-	& & {
-		border-width: 0;
-		margin: 0;
-	}
-
-	line-height: 0;
-}
-
-// Legacy toolbar group
-// External code references to it, so we can't change it?
 .components-toolbar {
 	margin: 0;
 	border: $border-width solid $light-gray-500;
 	background-color: $white;
-	display: flex;
+
+	// Required for IE11.
+	display: inline-flex;
+
+	// IE11 doesn't read rules inside this query. They are applied only to modern browsers.
+	@supports (position: sticky) {
+		display: flex;
+	}
+
 	flex-shrink: 0;
 }
 

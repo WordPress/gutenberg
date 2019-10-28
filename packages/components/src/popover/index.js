@@ -24,6 +24,7 @@ import ScrollLock from '../scroll-lock';
 import IsolatedEventContainer from '../isolated-event-container';
 import { Slot, Fill, Consumer } from '../slot-fill';
 import Animate from '../animate';
+import { ToolbarContext } from '../toolbar';
 
 const FocusManaged = withConstrainedTabbing( withFocusReturn( ( { children } ) => children ) );
 
@@ -381,45 +382,47 @@ const Popover = ( {
 	// within popover as inferring close intent.
 
 	let content = (
-		<PopoverDetectOutside onFocusOutside={ handleOnFocusOutside }>
-			<Animate
-				type={ animate && isReadyToAnimate ? 'appear' : null }
-				options={ { origin: animateYAxis + ' ' + animateXAxis } }
-			>
-				{ ( { className: animateClassName } ) => (
-					<IsolatedEventContainer
-						className={ classnames( classes, animateClassName ) }
-						style={ {
-							top: ! popoverPosition.isMobile && popoverPosition.popoverTop ? popoverPosition.popoverTop + 'px' : undefined,
-							left: ! popoverPosition.isMobile && popoverPosition.popoverLeft ? popoverPosition.popoverLeft + 'px' : undefined,
-							visibility: contentSize ? undefined : 'hidden',
-						} }
-						{ ...contentProps }
-						onKeyDown={ maybeClose }
-					>
-						{ popoverPosition.isMobile && (
-							<div className="components-popover__header">
-								<span className="components-popover__header-title">
-									{ headerTitle }
-								</span>
-								<IconButton className="components-popover__close" icon="no-alt" onClick={ onClose } />
-							</div>
-						) }
-						<div
-							ref={ contentRef }
-							className="components-popover__content"
+		<ToolbarContext.Provider value={ null }>
+			<PopoverDetectOutside onFocusOutside={ handleOnFocusOutside }>
+				<Animate
+					type={ animate && isReadyToAnimate ? 'appear' : null }
+					options={ { origin: animateYAxis + ' ' + animateXAxis } }
+				>
+					{ ( { className: animateClassName } ) => (
+						<IsolatedEventContainer
+							className={ classnames( classes, animateClassName ) }
 							style={ {
-								maxHeight: ! popoverPosition.isMobile && popoverPosition.contentHeight ? popoverPosition.contentHeight + 'px' : undefined,
-								maxWidth: ! popoverPosition.isMobile && popoverPosition.contentWidth ? popoverPosition.contentWidth + 'px' : undefined,
+								top: ! popoverPosition.isMobile && popoverPosition.popoverTop ? popoverPosition.popoverTop + 'px' : undefined,
+								left: ! popoverPosition.isMobile && popoverPosition.popoverLeft ? popoverPosition.popoverLeft + 'px' : undefined,
+								visibility: contentSize ? undefined : 'hidden',
 							} }
-							tabIndex="-1"
+							{ ...contentProps }
+							onKeyDown={ maybeClose }
 						>
-							{ children }
-						</div>
-					</IsolatedEventContainer>
-				) }
-			</Animate>
-		</PopoverDetectOutside>
+							{ popoverPosition.isMobile && (
+								<div className="components-popover__header">
+									<span className="components-popover__header-title">
+										{ headerTitle }
+									</span>
+									<IconButton className="components-popover__close" icon="no-alt" onClick={ onClose } />
+								</div>
+							) }
+							<div
+								ref={ contentRef }
+								className="components-popover__content"
+								style={ {
+									maxHeight: ! popoverPosition.isMobile && popoverPosition.contentHeight ? popoverPosition.contentHeight + 'px' : undefined,
+									maxWidth: ! popoverPosition.isMobile && popoverPosition.contentWidth ? popoverPosition.contentWidth + 'px' : undefined,
+								} }
+								tabIndex="-1"
+							>
+								{ children }
+							</div>
+						</IsolatedEventContainer>
+					) }
+				</Animate>
+			</PopoverDetectOutside>
+		</ToolbarContext.Provider>
 	);
 
 	// Apply focus to element as long as focusOnMount is truthy; false is

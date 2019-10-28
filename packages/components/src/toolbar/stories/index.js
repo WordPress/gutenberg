@@ -29,7 +29,7 @@ export const _default = () => {
 			</ToolbarGroup>
 			<ToolbarGroup
 				icon="editor-alignleft"
-				title="Change text alignment"
+				label="Change text alignment"
 				isCollapsed
 				controls={ [
 					{ icon: 'editor-alignleft', title: 'Align left', isActive: true },
@@ -44,7 +44,7 @@ export const _default = () => {
 				<ToolbarGroup
 					isCollapsed
 					icon={ false }
-					title="More rich text controls"
+					label="More rich text controls"
 					controls={ [
 						{ icon: 'editor-code', title: 'Inline code' },
 						{ icon: <InlineImageIcon />, title: 'Inline image' },
@@ -55,7 +55,7 @@ export const _default = () => {
 			<ToolbarGroup
 				hasArrowIndicator={ false }
 				icon="ellipsis"
-				title="Change text alignment"
+				label="Change text alignment"
 				isCollapsed
 				controls={ [
 					{ icon: 'editor-alignleft', title: 'Align left', isActive: true },
