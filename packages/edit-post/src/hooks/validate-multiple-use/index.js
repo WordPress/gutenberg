@@ -28,9 +28,9 @@ const enhance = compose(
 	 * "original" block is not the current one. Thus, an inexisting
 	 * `originalBlockClientId` prop signals that the block is valid.
 	 *
-	 * @param {Component} WrappedBlockEdit A filtered BlockEdit instance.
+	 * @param {WPComponent} WrappedBlockEdit A filtered BlockEdit instance.
 	 *
-	 * @return {Component} Enhanced component with merged state data props.
+	 * @return {WPComponent} Enhanced component with merged state data props.
 	 */
 	withSelect( ( select, block ) => {
 		const multiple = hasBlockSupport( block.name, 'multiple', true );

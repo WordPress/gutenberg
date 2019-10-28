@@ -425,6 +425,12 @@ export const EXPECTED_TRANSFORMS = {
 			'Group',
 		],
 	},
+	'core__site-title': {
+		availableTransforms: [
+			'Group',
+		],
+		originalBlock: 'Site Title',
+	},
 	'core__social-link-amazon': {
 		availableTransforms: [
 			'Group',

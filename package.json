@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "6.7.0-rc.1",
+	"version": "6.7.0",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -85,6 +85,7 @@
 		"@wordpress/babel-plugin-import-jsx-pragma": "file:packages/babel-plugin-import-jsx-pragma",
 		"@wordpress/babel-plugin-makepot": "file:packages/babel-plugin-makepot",
 		"@wordpress/babel-preset-default": "file:packages/babel-preset-default",
+		"@wordpress/base-styles": "file:packages/base-styles",
 		"@wordpress/browserslist-config": "file:packages/browserslist-config",
 		"@wordpress/custom-templated-path-webpack-plugin": "file:packages/custom-templated-path-webpack-plugin",
 		"@wordpress/dependency-extraction-webpack-plugin": "file:packages/dependency-extraction-webpack-plugin",
@@ -142,7 +143,7 @@
 		"jest-serializer-enzyme": "1.0.0",
 		"jsc-android": "^241213.1.0",
 		"jsdom": "11.12.0",
-		"lerna": "3.16.4",
+		"lerna": "3.18.2",
 		"lint-staged": "9.2.5",
 		"lodash": "4.17.15",
 		"make-dir": "3.0.0",
@@ -152,7 +153,7 @@
 		"node-fetch": "^2.3.0",
 		"node-sass": "4.12.0",
 		"node-watch": "0.6.0",
-		"parcel-bundler": "1.12.3",
+		"parcel-bundler": "1.12.4",
 		"postcss": "7.0.13",
 		"prettier-eslint": "^8.8.2",
 		"prettier-eslint-cli": "^4.7.1",
@@ -183,34 +184,6 @@
 		"webpack": "4.41.0",
 		"worker-farm": "1.7.0"
 	},
-	"npmPackageJsonLintConfig": {
-		"extends": "@wordpress/npm-package-json-lint-config",
-		"rules": {
-			"description-format": [
-				"error",
-				{
-					"requireCapitalFirstLetter": true,
-					"requireEndingPeriod": true
-				}
-			],
-			"require-publishConfig": "error",
-			"require-repository-directory": "error",
-			"valid-values-author": [
-				"error",
-				[
-					"The WordPress Contributors"
-				]
-			],
-			"valid-values-publishConfig": [
-				"error",
-				[
-					{
-						"access": "public"
-					}
-				]
-			]
-		}
-	},
 	"scripts": {
 		"prebuild": "npm run check-engines",
 		"clean:packages": "rimraf ./packages/*/build ./packages/*/build-module ./packages/*/build-style ./packages/*/node_modules",
@@ -233,7 +206,7 @@
 		"lint-js": "wp-scripts lint-js",
 		"lint-js:fix": "npm run lint-js -- --fix",
 		"lint-php": "wp-scripts env lint-php",
-		"lint-pkg-json": "wp-scripts lint-pkg-json ./packages",
+		"lint-pkg-json": "wp-scripts lint-pkg-json . 'packages/*/package.json'",
 		"lint-css": "wp-scripts lint-style '**/*.scss'",
 		"lint-css:fix": "npm run lint-css -- --fix",
 		"lint-types": "tsc",
@@ -244,9 +217,7 @@
 		"publish:dev": "npm run build:packages && lerna publish --npm-tag next",
 		"publish:prod": "npm run build:packages && lerna publish",
 		"test": "npm run lint && npm run test-unit",
-		"pretest-e2e": "npm run env reinstall",
 		"test-e2e": "wp-scripts test-e2e --config packages/e2e-tests/jest.config.js",
-		"test-e2e:local": "wp-scripts test-e2e --config packages/e2e-tests/jest.config.js",
 		"test-e2e:watch": "npm run test-e2e:local -- --watch",
 		"test-performance": "wp-scripts test-e2e --config packages/e2e-tests/jest.performance.config.js",
 		"test-php": "npm run lint-php && npm run test-unit-php",
@@ -258,7 +229,7 @@
 		"test-unit:native": "npm run native test",
 		"test-unit:native:debug": "cd test/native/ && node --inspect ../../node_modules/.bin/jest --runInBand --config ./jest.config.js",
 		"design-system:build": "npm run build:packages && build-storybook -c ./packages/components/storybook -o ./playground/dist/design-system/components",
-		"design-system:dev": "concurrently \"npm run dev:packages\" \"start-storybook -c ./packages/components/storybook\"",
+		"design-system:dev": "npm run build:packages && concurrently \"npm run dev:packages\" \"start-storybook -c ./packages/components/storybook\"",
 		"playground:build": "npm run build:packages && parcel build playground/src/index.html -d playground/dist",
 		"playground:dev": "concurrently \"npm run dev:packages\" \"parcel playground/src/index.html -d playground/dist\"",
 		"preenv": "npm run check-engines",

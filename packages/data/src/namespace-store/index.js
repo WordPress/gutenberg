@@ -24,7 +24,7 @@ import * as metadataSelectors from './metadata/selectors';
 import * as metadataActions from './metadata/actions';
 
 /**
- * @typedef {import('../registry').WPDataRegistry} WPDataRegistry
+ * @typedef {WPDataRegistry} WPDataRegistry
  */
 
 /**

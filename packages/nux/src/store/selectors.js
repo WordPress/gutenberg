@@ -7,7 +7,7 @@ import { includes, difference, keys, has } from 'lodash';
 /**
  * An object containing information about a guide.
  *
- * @typedef {Object} NUX.GuideInfo
+ * @typedef {Object} NUXGuideInfo
  * @property {string[]} tipIds       Which tips the guide contains.
  * @property {?string}  currentTipId The guide's currently showing tip.
  * @property {?string}  nextTipId    The guide's next tip to show.
@@ -20,7 +20,7 @@ import { includes, difference, keys, has } from 'lodash';
  * @param {Object} state Global application state.
  * @param {string} tipId The tip to query.
  *
- * @return {?NUX.GuideInfo} Information about the associated guide.
+ * @return {?NUXGuideInfo} Information about the associated guide.
  */
 export const getAssociatedGuide = createSelector(
 	( state, tipId ) => {
