@@ -165,6 +165,8 @@ In the `wp-env` config block, each entry can be configured like so:
 - `lint-php`: Run PHPCS linting on your plugin. You will need to have `composer.json` configured to install PHPCS, with a `lint` script that runs your linting. You will also need to have an appropriately configured `phpcs.xml.dist` file.
 - `test-php`: Runs your plugin's PHPUnit tests. You will need to have an appropriately configured `phpunit.xml.dist` file.
 - `docker-run`: For more advanced debugging, contributors may sometimes need to run commands in the Docker containers. This is the equivalent of running `docker-compose run` within the WordPress directory.
+- `log`: Displays the last part of the error log and waits for new changes.
+- `log clean`: Empties the error log.
 
 
 ### `lint-js`
