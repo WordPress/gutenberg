@@ -55,6 +55,8 @@
 .block-editor-block-toolbar__slot {
 	// Required for IE11.
 	display: inline-block;
+	// Fix for toolbar button misalignment on IE11
+	line-height: 0;
 
 	// IE11 doesn't read rules inside this query. They are applied only to modern browsers.
 	@supports (position: sticky) {

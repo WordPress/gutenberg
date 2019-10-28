@@ -64,6 +64,7 @@ export { default as ToolbarGroup } from './toolbar-group';
 export { createToolbarSlotFill, ToolbarSlot, ToolbarFill } from './toolbar-slot-fill';
 export { default as Tooltip } from './tooltip';
 export { default as TreeSelect } from './tree-select';
+export { default as VisuallyHidden } from './visually-hidden';
 export { default as IsolatedEventContainer } from './isolated-event-container';
 export { createSlotFill, Slot, Fill, Provider as SlotFillProvider } from './slot-fill';
 
