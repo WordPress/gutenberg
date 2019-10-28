@@ -21,7 +21,7 @@ branches:
   only:
     - master
     - rnmobile/master
-    - wp/trunk
+    - /wp\/.*/
 
 env:
   global:
