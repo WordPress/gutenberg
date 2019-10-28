@@ -817,6 +817,21 @@ export class RichText extends Component {
 				} else if ( this.props.selectionStart > record.text.length || this.props.selectionEnd > record.text.length ) {
 					console.warn( 'Oops, selection will land outside the text, skipping setting it...' );
 					selection = null;
+				} else if ( html.match( /(\s*<br[^>]*>\s*)+<\/p>$/ ) ) {
+					console.warn( 'Oops, BR tag(s) at the end of content. Aztec will remove them, adapting the selection...' );
+					const brBeforeParaMatches = html.match( /(\s*<br[^>]*>\s*)+<\/p>$/g );
+					const count = ( brBeforeParaMatches[ 0 ].match( /br/g ) || [] ).length;
+					if ( count > 0 ) {
+						let newSelectionStart = 0;
+						if ( this.props.selectionStart - count > 0 ) {
+							newSelectionStart = this.props.selectionStart - count;
+						}
+						let newSelectionEnd = 0;
+						if ( this.props.selectionEnd - count > 0 ) {
+							newSelectionEnd = this.props.selectionEnd - count;
+						}
+						selection = { start: newSelectionStart, end: newSelectionEnd };
+					}
 				}
 			}
 		}
