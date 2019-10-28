@@ -20,9 +20,14 @@ import {
  */
 import InserterMenu from './menu';
 
-const defaultRenderToggle = ( { onToggle, disabled, isOpen, blockTitle, hasOnlyOneAllowedInserterBlockType } ) => {
-	// translators: %s: the name of the block when there is only one
-	const label = blockTitle === '' ? _x( 'Add block', 'Generic label for block inserter button' ) : sprintf( _x( 'Add %s', 'directly add the only allowed block' ), blockTitle );
+const defaultRenderToggle = ( { onToggle, disabled, isOpen, blockTitle, hasSingleBlockType } ) => {
+	let label;
+	if ( hasSingleBlockType ) {
+		// translators: %s: the name of the block when there is only one
+		label = sprintf( _x( 'Add %s', 'directly add the only allowed block' ), blockTitle );
+	} else {
+		label = _x( 'Add block', 'Generic label for block inserter button' );
+	}
 	return (
 		<IconButton
 			icon="insert"
@@ -30,8 +35,8 @@ const defaultRenderToggle = ( { onToggle, disabled, isOpen, blockTitle, hasOnlyO
 			labelPosition="bottom"
 			onClick={ onToggle }
 			className="editor-inserter__toggle block-editor-inserter__toggle"
-			aria-haspopup={ ! hasOnlyOneAllowedInserterBlockType ? 'true' : false }
-			aria-expanded={ ! hasOnlyOneAllowedInserterBlockType ? isOpen : false }
+			aria-haspopup={ ! hasSingleBlockType ? 'true' : false }
+			aria-expanded={ ! hasSingleBlockType ? isOpen : false }
 			disabled={ disabled }
 		/>
 	);
@@ -69,11 +74,11 @@ class Inserter extends Component {
 		const {
 			disabled,
 			blockTitle,
-			hasOnlyOneAllowedInserterBlockType,
+			hasSingleBlockType,
 			renderToggle = defaultRenderToggle,
 		} = this.props;
 
-		return renderToggle( { onToggle, isOpen, disabled, blockTitle, hasOnlyOneAllowedInserterBlockType } );
+		return renderToggle( { onToggle, isOpen, disabled, blockTitle, hasSingleBlockType } );
 	}
 
 	/**
@@ -100,8 +105,8 @@ class Inserter extends Component {
 	}
 
 	render() {
-		const { position, hasOnlyOneAllowedInserterBlockType, insertOnlyAllowedBlock } = this.props;
-		if ( hasOnlyOneAllowedInserterBlockType ) {
+		const { position, hasSingleBlockType, insertOnlyAllowedBlock } = this.props;
+		if ( hasSingleBlockType ) {
 			return this.renderToggle( { onToggle: insertOnlyAllowedBlock } );
 		}
 		return (
@@ -128,14 +133,14 @@ export default compose( [
 
 		const allowedBlocks = __experimentalGetAllowedBlocks( rootClientId );
 
-		const hasOnlyOneAllowedInserterBlockType = allowedBlocks && ( get( allowedBlocks, [ 'length' ], 0 ) === 1 );
+		const hasSingleBlockType = allowedBlocks && ( get( allowedBlocks, [ 'length' ], 0 ) === 1 );
 		let allowedBlockType = false;
-		if ( hasOnlyOneAllowedInserterBlockType ) {
+		if ( hasSingleBlockType ) {
 			allowedBlockType = getBlockType( allowedBlocks );
 		}
 		return {
 			hasItems: hasInserterItems( rootClientId ),
-			hasOnlyOneAllowedInserterBlockType,
+			hasSingleBlockType,
 			blockTitle: allowedBlockType ? allowedBlockType.title : '',
 			allowedBlockType,
 		};
@@ -145,11 +150,11 @@ export default compose( [
 			insertOnlyAllowedBlock() {
 				const { rootClientId, clientId, isAppender, destinationRootClientId } = ownProps;
 				const {
-					hasOnlyOneAllowedInserterBlockType,
+					hasSingleBlockType,
 					allowedBlockType,
 				} = ownProps;
 
-				if ( ! hasOnlyOneAllowedInserterBlockType ) {
+				if ( ! hasSingleBlockType ) {
 					return;
 				}
 

@@ -21,15 +21,22 @@ function ButtonBlockAppender( { rootClientId, className } ) {
 			<BlockDropZone rootClientId={ rootClientId } />
 			<Inserter
 				rootClientId={ rootClientId }
-				renderToggle={ ( { onToggle, disabled, isOpen, blockTitle, hasOnlyOneAllowedInserterBlockType } ) => {
-					const label = blockTitle === '' ? _x( 'Add block', 'Generic label for block inserter button' ) : sprintf( _x( 'Add %s', 'directly add the only allowed block' ), blockTitle );
+				renderToggle={ ( { onToggle, disabled, isOpen, blockTitle, hasSingleBlockType } ) => {
+					let label;
+					if ( hasSingleBlockType ) {
+						// translators: %s: the name of the block when there is only one
+						label = sprintf( _x( 'Add %s', 'directly add the only allowed block' ), blockTitle );
+					} else {
+						label = _x( 'Add block', 'Generic label for block inserter button' );
+					}
+					const isToggleButton = ! hasSingleBlockType;
 					return (
 						<Tooltip text={ label }>
 							<Button
 								className={ classnames( className, 'block-editor-button-block-appender' ) }
 								onClick={ onToggle }
-								aria-haspopup={ ! hasOnlyOneAllowedInserterBlockType ? 'true' : false }
-								aria-expanded={ ! hasOnlyOneAllowedInserterBlockType ? isOpen : false }
+								aria-haspopup={ isToggleButton ? 'true' : undefined }
+								aria-expanded={ isToggleButton ? isOpen : undefined }
 								disabled={ disabled }
 								label={ label }
 							>
