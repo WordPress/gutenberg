@@ -8,7 +8,7 @@ import { isFunction } from 'lodash';
  */
 import { __, sprintf } from '@wordpress/i18n';
 
-import { Fragment, useState, useEffect } from '@wordpress/element';
+import { Fragment, useState, useEffect, useCallback } from '@wordpress/element';
 
 import {
 	ToggleControl,
@@ -30,6 +30,10 @@ function ResponsiveBlockControl( props ) {
 		}
 	}, [ isResponsiveMode ] );
 
+	const handleToggle = useCallback( ( isChecked ) => {
+		setIsResponsiveMode( ! isChecked );
+	} );
+
 	if ( ! legend || ! property || ! renderDefaultControl ) {
 		return null;
 	}
@@ -45,12 +49,7 @@ function ResponsiveBlockControl( props ) {
 			<Fragment key={ index }>
 				{ renderDefaultControl( <ResponsiveBlockControlLabel property={ property } device={ deviceLabel } /> ) }
 			</Fragment>
-		)
-		);
-	};
-
-	const handleToggle = ( isChecked ) => {
-		setIsResponsiveMode( ! isChecked );
+		) );
 	};
 
 	return (
