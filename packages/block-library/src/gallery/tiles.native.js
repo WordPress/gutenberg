@@ -33,17 +33,17 @@ function Tiles( props ) {
 
 	const wrappedChildren = Children.map( children, ( child, index ) => {
 		const row = Math.floor( index / columns );
-		const rowLength = row === lastRow ? lastTile % columns + 1: columns;
+		const rowLength = row === lastRow ? ( lastTile % columns ) + 1 : columns;
 		const indexInRow = index % columns;
 
 		return (
 			<View style={ [ tileStyle, {
 				width: ( ( 1 / rowLength ) * 100 ) + '%',
 				borderLeftWidth: groutSpacing * ( indexInRow / rowLength ),
-				borderRightWidth: groutSpacing * ( 1 - ( indexInRow + 1 ) / rowLength ),
+				borderRightWidth: groutSpacing * ( 1 - ( ( indexInRow + 1 ) / rowLength ) ),
 				borderTopWidth: row === 0 ? 0 : groutSpacing / 2,
 				borderBottomWidth: row === lastRow ? 0 : groutSpacing / 2,
-			} ]}>
+			} ] }>
 				{ child }
 			</View>
 		);
