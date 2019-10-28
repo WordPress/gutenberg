@@ -10,7 +10,7 @@ import FormToggle from '../';
 
 export default { title: 'Form Toggle', component: FormToggle };
 
-export const _default = () => {
+const Example = () => {
 	const [ isChecked, setChecked ] = useState( true );
 	return (
 		<FormToggle
@@ -22,4 +22,8 @@ export const _default = () => {
 			}
 		/>
 	);
+};
+
+export const _default = () => {
+	return <Example />;
 };
