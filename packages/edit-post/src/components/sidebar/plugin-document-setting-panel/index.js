@@ -48,7 +48,7 @@ const PluginDocumentSettingFill = ( { isEnabled, panelName, opened, onToggle, cl
  * @param {string} [props.name] The machine-friendly name for the panel.
  * @param {string} [props.className] An optional class name added to the row.
  * @param {string} [props.title] The title of the panel
- * @param {string|Element} [props.icon=inherits from the plugin] The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
+ * @param {WPBlockTypeIconRender} [props.icon=inherits from the plugin] The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
  *
  * @example <caption>ES5</caption>
  * ```js
@@ -89,7 +89,7 @@ const PluginDocumentSettingFill = ( { isEnabled, panelName, opened, onToggle, cl
  *  registerPlugin( 'document-setting-test', { render: MyDocumentSettingTest } );
  * ```
  *
- * @return {WPElement} The WPElement to be rendered.
+ * @return {WPComponent} The component to be rendered.
  */
 const PluginDocumentSettingPanel = compose(
 	withPluginContext( ( context, ownProps ) => {

@@ -11,7 +11,6 @@ export { createURL } from './create-url';
 export { deactivatePlugin } from './deactivate-plugin';
 export { disablePrePublishChecks } from './disable-pre-publish-checks';
 export { dragAndResize } from './drag-and-resize';
-export { enableExperimentalFeatures } from './enable-experimental-features';
 export { enablePageDialogAccept } from './enable-page-dialog-accept';
 export { enablePrePublishChecks } from './enable-pre-publish-checks';
 export { ensureSidebarOpened } from './ensure-sidebar-opened';
