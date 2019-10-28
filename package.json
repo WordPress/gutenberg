@@ -113,6 +113,7 @@
 		"enzyme": "3.9.0",
 		"eslint-plugin-eslint-comments": "3.1.2",
 		"eslint-plugin-import": "2.18.2",
+		"faker": "4.1.0",
 		"fast-glob": "2.2.7",
 		"fbjs": "0.8.17",
 		"fs-extra": "8.0.1",
