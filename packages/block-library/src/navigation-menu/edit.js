@@ -9,6 +9,7 @@ import classnames from 'classnames';
 import {
 	Fragment,
 	useMemo,
+	useEffect,
 } from '@wordpress/element';
 import {
 	InnerBlocks,
@@ -99,11 +100,13 @@ function NavigationMenu( {
 		}
 	};
 
-	// Set/Unset colors CSS classes.
-	setAttributes( {
-		backgroundColorCSSClass: backgroundColor.class ? backgroundColor.class : null,
-		textColorCSSClass: textColor.class ? textColor.class : null,
-	} );
+	useEffect( () => {
+		// Set/Unset colors CSS classes.
+		setAttributes( {
+			backgroundColorCSSClass: backgroundColor.class ? backgroundColor.class : null,
+			textColorCSSClass: textColor.class ? textColor.class : null,
+		} );
+	}, [] );
 
 	return (
 		<Fragment>
