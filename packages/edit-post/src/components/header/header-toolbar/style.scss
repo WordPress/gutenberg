@@ -11,6 +11,14 @@
 		}
 	}
 
+	.components-icon-button {
+		padding: 5px;
+
+		svg {
+			margin: 3px;
+		}
+	}
+
 	// Hide table of contents and block navigation on mobile.
 	.block-editor-block-navigation,
 	.table-of-contents {
