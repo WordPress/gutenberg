@@ -77,13 +77,11 @@ class MediaTextEdit extends Component {
 		setAttributes( {
 			mediaAlt: media.alt,
 			mediaId: media.id,
+			mediaType,
 			mediaUrl: src || media.url,
 			imageFill: undefined,
 			focalPoint: undefined,
 		} );
-		if ( mediaType ) { // We don't want to delete mediaType
-			setAttributes( { mediaType } );
-		}
 	}
 
 	onMediaUpdate( media ) {

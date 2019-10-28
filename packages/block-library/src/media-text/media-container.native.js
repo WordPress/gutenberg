@@ -62,17 +62,13 @@ class MediaContainer extends Component {
 	}
 
 	componentDidMount() {
-		const { mediaId, mediaUrl, onSelectMedia } = this.props;
+		const { mediaId, mediaUrl, onMediaUpdate } = this.props;
 
 		if ( mediaId && mediaUrl && ! isURL( mediaUrl ) ) {
 			if ( mediaUrl.indexOf( 'file:' ) === 0 ) {
-				requestMediaImport( mediaUrl, ( id, url, type ) => {
+				requestMediaImport( mediaUrl, ( id, url ) => {
 					if ( url ) {
-						onSelectMedia( {
-							media_type: type,
-							id,
-							url,
-						} );
+						onMediaUpdate( { id, url } );
 					}
 				} );
 			}
