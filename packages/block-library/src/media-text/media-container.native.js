@@ -72,6 +72,7 @@ class MediaContainer extends Component {
 					}
 				} );
 			}
+
 			mediaUploadSync();
 		}
 	}
