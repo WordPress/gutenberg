@@ -42,8 +42,10 @@ class BottomSheetRangeCell extends Component {
 	}
 
 	handleChange( text ) {
+		const announcement = sprintf( __( 'Current value is %s' ), text );
 		if ( ! isNaN( Number( text ) ) ) {
 			this.setState( { sliderValue: text } );
+			AccessibilityInfo.announceForAccessibility( announcement );
 		}
 	}
 
@@ -129,7 +131,7 @@ class BottomSheetRangeCell extends Component {
 			<Cell
 				{ ...cellProps }
 				accessibilityRole={ 'none' }
-				editable={ true }
+				editable={ false }
 				accessible={ accessible }
 				onPress={ this.onCellPress }
 				accessibilityLabel={ accessibilityLabel }
