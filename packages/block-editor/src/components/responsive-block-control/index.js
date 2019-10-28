@@ -10,23 +10,14 @@ import { __, sprintf } from '@wordpress/i18n';
 
 import { Fragment, useState, useEffect } from '@wordpress/element';
 
-import { withInstanceId } from '@wordpress/compose';
-
 import {
 	ToggleControl,
 } from '@wordpress/components';
 
-const ResponsiveBlockControlLabel = withInstanceId( function ResponsiveBlockControlLabel( { instanceId, property, device } ) {
-	const accessibleLabel = sprintf( __( 'Controls the %s property for %s devices.' ), property, device );
-	return (
-		<Fragment>
-			<span aria-describedby={ `rbc-desc-${ instanceId }` }>
-				{ device }
-			</span>
-			<span className="screen-reader-text" id={ `rbc-desc-${ instanceId }` }>{ accessibleLabel }</span>
-		</Fragment>
-	);
-} );
+/**
+ * Internal dependencies
+ */
+import ResponsiveBlockControlLabel from './label';
 
 function ResponsiveBlockControl( props ) {
 	const { legend, property, toggleLabel, responsiveControlsActive = false, onIsResponsiveModeChange, renderDefaultControl, defaultLabel = __( 'All' ), devices = [ __( 'Desktop' ), __( 'Tablet' ), __( 'Mobile' ) ], renderResponsiveControls } = props;
