@@ -38,7 +38,7 @@ function Tiles( props ) {
 
 		return (
 			<View style={ [ tileStyle, {
-				flexBasis: ( ( 1 / rowLength ) * 100 ) + '%',
+				width: ( ( 1 / rowLength ) * 100 ) + '%',
 				borderLeftWidth: groutSpacing * ( indexInRow / rowLength ),
 				borderRightWidth: groutSpacing * ( 1 - ( indexInRow + 1 ) / rowLength ),
 				borderTopWidth: row === 0 ? 0 : groutSpacing / 2,
