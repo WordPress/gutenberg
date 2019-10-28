@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { TouchableOpacity, Text, View, TextInput, I18nManager } from 'react-native';
+import { TouchableOpacity, Text, View, TextInput, I18nManager, Platform } from 'react-native';
 import { isEmpty } from 'lodash';
 
 /**
@@ -46,12 +46,15 @@ class BottomSheetCell extends Component {
 			leftAlign,
 			labelStyle = {},
 			valueStyle = {},
+			cellContainerStyle = {},
+			cellRowContainerStyle = {},
 			onChangeValue,
 			children,
 			editable = true,
 			separatorType,
 			style = {},
 			getStylesFromColorScheme,
+			allowReset,
 			...valueProps
 		} = this.props;
 
@@ -65,6 +68,9 @@ class BottomSheetCell extends Component {
 
 		const drawSeparator = ( separatorType && separatorType !== 'none' ) || separatorStyle === undefined;
 		const drawTopSeparator = drawSeparator && separatorType === 'topFullWidth';
+
+		const cellContainerStyles = [ styles.cellContainer, cellContainerStyle ];
+		const rowContainerStyles = [ styles.cellRowContainer, cellRowContainerStyle ];
 
 		const onCellPress = () => {
 			if ( isValueEditable ) {
@@ -158,6 +164,7 @@ class BottomSheetCell extends Component {
 		};
 
 		const iconStyle = getStylesFromColorScheme( styles.icon, styles.iconDark );
+		const resetButtonText = Platform.OS === 'ios' ? 'RESET' : 'Reset';
 
 		return (
 			<TouchableOpacity
@@ -170,22 +177,30 @@ class BottomSheetCell extends Component {
 					accessibilityHint
 				}
 				onPress={ onCellPress }
-				style={ { ...styles.clipToBounds, ...style } }
+				style={ [ styles.clipToBounds, style ] }
 			>
 				{ drawTopSeparator && (
 					<View style={ separatorStyle() } />
 				) }
-				<View style={ styles.cellContainer } pointerEvents={ accessible ? 'none' : 'auto' }>
-					<View style={ styles.cellRowContainer }>
-						{ icon && (
-							<View style={ styles.cellRowContainer }>
-								<Dashicon icon={ icon } size={ 24 } color={ iconStyle.color } />
-								<View style={ platformStyles.labelIconSeparator } />
-							</View>
-						) }
-						<Text numberOfLines={ 1 } style={ [ defaultLabelStyle, labelStyle ] }>
-							{ label }
-						</Text>
+				<View style={ cellContainerStyles } pointerEvents={ accessible ? 'none' : 'auto' }>
+					<View style={ rowContainerStyles }>
+						<View style={ { flexDirection: 'row', alignItems: 'center' } }>
+							{ icon && (
+								<View style={ styles.cellRowContainer }>
+									<Dashicon icon={ icon } size={ 24 } color={ iconStyle.color } />
+									<View style={ platformStyles.labelIconSeparator } />
+								</View>
+							) }
+							<Text numberOfLines={ 1 } style={ [ defaultLabelStyle, labelStyle ] }>
+								{ label }
+							</Text>
+						</View>
+						{ allowReset && <TouchableOpacity onPress={ allowReset }>
+							<Text style={ styles.resetButton }>{ sprintf(
+								/* translators: %s: reset */
+								__( '%s' ), resetButtonText	) }
+							</Text>
+						</TouchableOpacity> }
 					</View>
 					{ showValue && getValueComponent() }
 					{ children }
