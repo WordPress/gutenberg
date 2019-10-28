@@ -1,0 +1,26 @@
+// WIP: Color variables need to be used
+.components-page-header {
+	background: #fff;
+	box-sizing: border-box;
+	border-bottom: 1px solid #eee;
+	padding: 20px;
+
+	* {
+		box-sizing: border-box;
+	}
+
+	&__title-wrapper {
+		margin-bottom: 8px;
+	}
+
+	&__title {
+		font-size: 20px;
+		line-height: 1.1;
+		padding: 0;
+		margin: 0;
+	}
+
+	&__subtitle {
+		color: #666;
+	}
+}
