@@ -19,6 +19,7 @@ export default function GradientPicker( {
 	gradients,
 	onChange,
 	value,
+	clearable = true,
 } ) {
 	const clearGradient = useCallback(
 		() => onChange( undefined ),
@@ -56,7 +57,7 @@ export default function GradientPicker( {
 		<CircularOptionPicker
 			className={ className }
 			options={ gradientOptions }
-			actions={ (
+			actions={ clearable && (
 				<CircularOptionPicker.ButtonAction onClick={ clearGradient }>
 					{ __( 'Clear' ) }
 				</CircularOptionPicker.ButtonAction>
