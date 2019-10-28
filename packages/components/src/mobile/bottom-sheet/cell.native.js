@@ -175,7 +175,7 @@ class BottomSheetCell extends Component {
 				{ drawTopSeparator && (
 					<View style={ separatorStyle() } />
 				) }
-				<View style={ styles.cellContainer }>
+				<View style={ styles.cellContainer } pointerEvents={ accessible ? 'none' : 'auto' }>
 					<View style={ styles.cellRowContainer }>
 						{ icon && (
 							<View style={ styles.cellRowContainer }>
