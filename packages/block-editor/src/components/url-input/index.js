@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { throttle, isFunction, noop } from 'lodash';
+import { throttle, isFunction } from 'lodash';
 import classnames from 'classnames';
 import scrollIntoView from 'dom-scroll-into-view';
 
@@ -71,7 +71,10 @@ class URLInput extends Component {
 	}
 
 	updateSuggestions( value ) {
-		const { fetchLinkSuggestions, handleURLSuggestions } = this.props;
+		const {
+			__experimentalFetchLinkSuggestions: fetchLinkSuggestions,
+			__experimentalHandleURLSuggestions: handleURLSuggestions,
+		} = this.props;
 		if ( ! fetchLinkSuggestions ) {
 			return;
 		}
@@ -255,7 +258,7 @@ class URLInput extends Component {
 			id,
 			isFullWidth,
 			hasBorder,
-			renderSuggestions,
+			__experimentalRenderSuggestions: renderSuggestions,
 			placeholder = __( 'Paste URL or type to search' ),
 			value = '',
 			autoFocus = true,
@@ -368,12 +371,12 @@ export default compose(
 	withSelect( ( select, props ) => {
 		// If a link suggestions handler is already provided then
 		// bail
-		if ( isFunction( props.fetchLinkSuggestions ) ) {
+		if ( isFunction( props.__experimentalFetchLinkSuggestions ) ) {
 			return;
 		}
 		const { getSettings } = select( 'core/block-editor' );
 		return {
-			fetchLinkSuggestions: getSettings().__experimentalFetchLinkSuggestions,
+			__experimentalFetchLinkSuggestions: getSettings().__experimentalFetchLinkSuggestions,
 		};
 	} )
 )( URLInput );

@@ -50,9 +50,9 @@ const LinkControlInputSearch = ( {
 				value={ value }
 				onChange={ selectItemHandler }
 				placeholder={ __( 'Search or type url' ) }
-				renderSuggestions={ renderSuggestions }
-				fetchLinkSuggestions={ fetchSuggestions }
-				handleURLSuggestions={ true }
+				__experimentalRenderSuggestions={ renderSuggestions }
+				__experimentalFetchLinkSuggestions={ fetchSuggestions }
+				__experimentalHandleURLSuggestions={ true }
 			/>
 
 			<IconButton
