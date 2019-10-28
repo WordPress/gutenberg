@@ -1,7 +1,7 @@
 DimensionControl
 =============================
 
-`DimensionControl` is a component designed to provide a UI to control spacing and/or dimensions. It is intended for use within the editor `InspectorControls` sidebar.
+`DimensionControl` is a component designed to provide a UI to control spacing and/or dimensions.
 
 ## Usage
 
