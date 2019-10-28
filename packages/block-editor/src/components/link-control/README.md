@@ -5,11 +5,6 @@
 - Type: `string`
 - Required: NO
 
-### defaultOpen
-
-- Type: `Boolean`
-- Required: No
-
 ### fetchSearchSuggestions
 
 - Type: `Function`
