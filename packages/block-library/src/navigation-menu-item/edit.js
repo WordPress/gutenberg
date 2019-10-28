@@ -93,6 +93,7 @@ function NavigationMenuItemEdit( {
 		const newTab = 'new-tab' === setting ? value : link.newTab;
 		setAttributes( { link: { ...link, newTab } } );
 	};
+
 	return (
 		<Fragment>
 			<BlockControls>
