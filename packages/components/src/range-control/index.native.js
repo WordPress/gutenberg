@@ -17,14 +17,13 @@ function RangeControl( {
 	initialPosition,
 	min,
 	max,
-	// setState,
 	...props
 } ) {
 	const id = `inspector-range-control-${ instanceId }`;
 
 	const currentInputValue = currentInput === null ? value : currentInput;
 
-	const initialSliderValue = isFinite( currentInputValue ) ? currentInputValue : initialPosition || '';
+	const initialSliderValue = isFinite( currentInputValue ) ? currentInputValue : initialPosition;
 
 	return (
 		<RangeCell
@@ -34,9 +33,9 @@ function RangeControl( {
 			className={ className }
 			onChangeValue={ onChange }
 			aria-describedby={ !! help ? `${ id }__help` : undefined }
-			min={ min }
-			max={ max }
-			value={ currentInputValue }
+			minimumValue={ min }
+			maximumValue={ max }
+			value={ value }
 			beforeIcon={ beforeIcon }
 			afterIcon={ afterIcon }
 			allowReset={ allowReset }
