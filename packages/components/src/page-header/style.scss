@@ -4,9 +4,14 @@
 	box-sizing: border-box;
 	border-bottom: 1px solid #eee;
 	padding: 20px;
+	display: flex;
 
 	* {
 		box-sizing: border-box;
+	}
+
+	&__content {
+		flex: 1;
 	}
 
 	&__title-wrapper {
@@ -22,5 +27,6 @@
 
 	&__subtitle {
 		color: #666;
+		max-width: 680px;
 	}
 }

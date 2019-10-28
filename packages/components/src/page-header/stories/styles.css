@@ -1,0 +1,47 @@
+/*
+CUSTOM CSS
+This CSS exists just for this story + dev.
+Please remove when submitting for PR review.
+*/
+body {
+	background: #ddd;
+	padding: 40px;
+}
+
+.components-page-header {
+	padding: 12px 12px;
+	min-height: 50px;
+}
+
+.components-page-header > * {
+	min-width: 0;
+	max-width: 100%;
+}
+
+.components-page-header__content {
+	padding: 0 8px;
+}
+
+.components-page-header__title-wrapper {
+	margin-top: 4px;
+}
+
+.components-page-header__content > *:last-child {
+	margin-bottom: 0;
+}
+
+.inline-buttons {
+	display: flex;
+}
+
+.inline-buttons > * {
+	margin-right: 8px;
+}
+
+.inline-buttons > *:last-child {
+	margin-right: 0;
+}
+
+.additional-actions {
+	margin-left: 8px;
+}
