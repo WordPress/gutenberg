@@ -8,113 +8,113 @@ describe( 'block mover', () => {
 		positiveDirection = 1;
 
 	describe( 'getBlockMoverDescription', () => {
-		const type = 'TestType';
+		const label = 'Header: Some Header Text';
 
 		it( 'generates a title for the first item moving up', () => {
 			expect( getBlockMoverDescription(
 				1,
-				type,
+				label,
 				0,
 				true,
 				false,
 				negativeDirection
 			) ).toBe(
-				`Block ${ type } is at the beginning of the content and can’t be moved up`
+				`Block ${ label } is at the beginning of the content and can’t be moved up`
 			);
 		} );
 
 		it( 'generates a title for the last item moving down', () => {
 			expect( getBlockMoverDescription(
 				1,
-				type,
+				label,
 				3,
 				false,
 				true,
-				positiveDirection
-			) ).toBe( `Block ${ type } is at the end of the content and can’t be moved down` );
+				positiveDirection,
+			) ).toBe( `Block ${ label } is at the end of the content and can’t be moved down` );
 		} );
 
 		it( 'generates a title for the second item moving up', () => {
 			expect( getBlockMoverDescription(
 				1,
-				type,
+				label,
 				1,
 				false,
 				false,
-				negativeDirection
-			) ).toBe( `Move ${ type } block from position 2 up to position 1` );
+				negativeDirection,
+			) ).toBe( `Move ${ label } block from position 2 up to position 1` );
 		} );
 
 		it( 'generates a title for the second item moving down', () => {
 			expect( getBlockMoverDescription(
 				1,
-				type,
+				label,
 				1,
 				false,
 				false,
-				positiveDirection
-			) ).toBe( `Move ${ type } block from position 2 down to position 3` );
+				positiveDirection,
+			) ).toBe( `Move ${ label } block from position 2 down to position 3` );
 		} );
 
 		it( 'generates a title for the only item in the list', () => {
 			expect( getBlockMoverDescription(
 				1,
-				type,
+				label,
 				0,
 				true,
 				true,
-				positiveDirection
-			) ).toBe( `Block ${ type } is the only block, and cannot be moved` );
+				positiveDirection,
+			) ).toBe( `Block ${ label } is the only block, and cannot be moved` );
 		} );
 
 		it( 'indicates that the block can be moved left when the orientation is horizontal and the direction is negative', () => {
 			expect( getBlockMoverDescription(
 				1,
-				type,
+				label,
 				1,
 				false,
 				false,
 				negativeDirection,
 				'horizontal'
-			) ).toBe( `Move ${ type } block from position 2 left to position 1` );
+			) ).toBe( `Move ${ label } block from position 2 left to position 1` );
 		} );
 
 		it( 'indicates that the block can be moved right when the orientation is horizontal and the direction is positive', () => {
 			expect( getBlockMoverDescription(
 				1,
-				type,
+				label,
 				1,
 				false,
 				false,
 				positiveDirection,
 				'horizontal'
-			) ).toBe( `Move ${ type } block from position 2 right to position 3` );
+			) ).toBe( `Move ${ label } block from position 2 right to position 3` );
 		} );
 
 		it( 'indicates that the block cannot be moved left when the orientation is horizontal and the block is the first block', () => {
 			expect( getBlockMoverDescription(
 				1,
-				type,
+				label,
 				0,
 				true,
 				false,
 				negativeDirection,
 				'horizontal'
 			) ).toBe(
-				`Block ${ type } is at the beginning of the content and can’t be moved left`
+				`Block ${ label } is at the beginning of the content and can’t be moved left`
 			);
 		} );
 
 		it( 'indicates that the block cannot be moved right when the orientation is horizontal and the block is the last block', () => {
 			expect( getBlockMoverDescription(
 				1,
-				type,
+				label,
 				3,
 				false,
 				true,
 				positiveDirection,
 				'horizontal'
-			) ).toBe( `Block ${ type } is at the end of the content and can’t be moved right` );
+			) ).toBe( `Block ${ label } is at the end of the content and can’t be moved right` );
 		} );
 	} );
 
