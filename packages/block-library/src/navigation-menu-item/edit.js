@@ -93,7 +93,6 @@ function NavigationMenuItemEdit( {
 		const newTab = 'new-tab' === setting ? value : link.newTab;
 		setAttributes( { link: { ...link, newTab } } );
 	};
-
 	return (
 		<Fragment>
 			<BlockControls>
@@ -110,19 +109,6 @@ function NavigationMenuItemEdit( {
 						title={ __( 'Add submenu item' ) }
 						onClick={ insertMenuItemBlock }
 					/>
-					{ isLinkOpen &&
-						<LinkControl
-							className="wp-block-navigation-menu-item__inline-link-input"
-							onKeyDown={ handleLinkControlOnKeyDown }
-							onKeyPress={ ( event ) => event.stopPropagation() }
-							currentLink={ link }
-							onLinkChange={ updateLink }
-							onClose={ () => setIsLinkOpen( false ) }
-							currentSettings={ linkSettings }
-							onSettingsChange={ updateLinkSetting }
-							fetchSearchSuggestions={ fetchSearchSuggestions }
-						/>
-					}
 				</Toolbar>
 			</BlockControls>
 			<InspectorControls>
@@ -188,6 +174,19 @@ function NavigationMenuItemEdit( {
 					placeholder={ __( 'Add item…' ) }
 					withoutInteractiveFormatting
 				/>
+				{ isLinkOpen &&
+					<LinkControl
+						className="wp-block-navigation-menu-item__inline-link-input"
+						onKeyDown={ handleLinkControlOnKeyDown }
+						onKeyPress={ ( event ) => event.stopPropagation() }
+						currentLink={ link }
+						onLinkChange={ updateLink }
+						onClose={ () => setIsLinkOpen( false ) }
+						currentSettings={ linkSettings }
+						onSettingsChange={ updateLinkSetting }
+						fetchSearchSuggestions={ fetchSearchSuggestions }
+					/>
+				}
 				<InnerBlocks
 					allowedBlocks={ [ 'core/navigation-menu-item' ] }
 					renderAppender={ hasDescendants ? InnerBlocks.ButtonBlockAppender : false }
