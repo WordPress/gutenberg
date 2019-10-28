@@ -47,7 +47,8 @@ function NavigationMenuItemEdit( {
 	insertMenuItemBlock,
 	fetchSearchSuggestions,
 } ) {
-	const { label, link } = attributes;
+	const { label, title, url } = attributes;
+	const link = { title, url };
 	const linkSettings = { 'new-tab': link.newTab };
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
 
@@ -80,6 +81,8 @@ function NavigationMenuItemEdit( {
 			return;
 		}
 		setAttributes( { link: newlink } );
+		const { newTitle, newUrl } = newlink;
+		setAttributes( { title: newTitle, url: newUrl } );
 	};
 
 	/**
@@ -90,8 +93,9 @@ function NavigationMenuItemEdit( {
 	 * @param {string} value Setting type value.
 	 */
 	const updateLinkSetting = ( setting, value ) => {
-		const newTab = 'new-tab' === setting ? value : link.newTab;
-		setAttributes( { link: { ...link, newTab } } );
+		if ( 'new-tab' ) {
+			setAttributes( { opensInNewTab: value } );
+		}
 	};
 
 	return (
@@ -118,8 +122,8 @@ function NavigationMenuItemEdit( {
 				>
 					<ToggleControl
 						checked={ attributes.opensInNewTab }
-						onChange={ ( opensInNewTab ) => {
-							setAttributes( { opensInNewTab } );
+						onChange={ ( opensInNewTabSetting ) => {
+							setAttributes( { opensInNewTabSetting } );
 						} }
 						label={ __( 'Open in new tab' ) }
 					/>
@@ -136,8 +140,8 @@ function NavigationMenuItemEdit( {
 				>
 					<TextControl
 						value={ attributes.title || '' }
-						onChange={ ( title ) => {
-							setAttributes( { title } );
+						onChange={ ( newtTitle ) => {
+							setAttributes( { newtTitle } );
 						} }
 						label={ __( 'Title Attribute' ) }
 						help={ __( 'Provide more context about where the link goes.' ) }
