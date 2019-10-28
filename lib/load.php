@@ -41,6 +41,7 @@ require dirname( __FILE__ ) . '/compat.php';
 
 require dirname( __FILE__ ) . '/blocks.php';
 require dirname( __FILE__ ) . '/templates.php';
+require dirname( __FILE__ ) . '/template-loader.php';
 require dirname( __FILE__ ) . '/client-assets.php';
 require dirname( __FILE__ ) . '/demo.php';
 require dirname( __FILE__ ) . '/widgets.php';

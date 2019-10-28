@@ -70,7 +70,7 @@ describe( 'Table', () => {
 		await clickButton( createButtonLabel );
 
 		// Click the first cell and add some text.
-		await page.click( '.wp-block-table__cell-content' );
+		await page.click( 'td' );
 		await page.keyboard.type( 'This' );
 
 		// Tab to the next cell and add some text.
@@ -114,13 +114,13 @@ describe( 'Table', () => {
 		await headerSwitch[ 0 ].click();
 		await footerSwitch[ 0 ].click();
 
-		await page.click( 'thead .wp-block-table__cell-content' );
+		await page.click( 'thead th' );
 		await page.keyboard.type( 'header' );
 
-		await page.click( 'tbody .wp-block-table__cell-content' );
+		await page.click( 'tbody td' );
 		await page.keyboard.type( 'body' );
 
-		await page.click( 'tfoot .wp-block-table__cell-content' );
+		await page.click( 'tfoot td' );
 		await page.keyboard.type( 'footer' );
 
 		// Expect the table to have a header, body and footer with written content.
@@ -146,7 +146,7 @@ describe( 'Table', () => {
 		await headerSwitch[ 0 ].click();
 		await footerSwitch[ 0 ].click();
 
-		await page.click( '.wp-block-table__cell-content' );
+		await page.click( 'td' );
 
 		// Add a column.
 		await clickBlockToolbarButton( 'Edit table' );
@@ -155,7 +155,7 @@ describe( 'Table', () => {
 		// Expect the table to have 3 columns across the header, body and footer.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
-		await page.click( '.wp-block-table__cell-content' );
+		await page.click( 'td' );
 
 		// Delete a column.
 		await clickBlockToolbarButton( 'Edit table' );
@@ -177,7 +177,7 @@ describe( 'Table', () => {
 		await clickButton( createButtonLabel );
 
 		// Click the first cell and add some text. Don't align.
-		const cells = await page.$$( '.wp-block-table__cell-content' );
+		const cells = await page.$$( 'td,th' );
 		await cells[ 0 ].click();
 		await page.keyboard.type( 'None' );
 
@@ -212,7 +212,7 @@ describe( 'Table', () => {
 		await fixedWidthSwitch.click();
 
 		// Add multiple new lines to the first cell to make it taller.
-		await page.click( '.wp-block-table__cell-content' );
+		await page.click( 'td' );
 		await page.keyboard.type( '\n\n\n\n' );
 
 		// Get the bounding client rect for the second cell.
