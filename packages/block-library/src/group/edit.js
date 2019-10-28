@@ -14,7 +14,7 @@ import {
 	InnerBlocks,
 	PanelColorSettings,
 	withColors,
-	ResponsiveBlockControl,
+	__experimentalResponsiveBlockControl as ResponsiveBlockControl,
 } from '@wordpress/block-editor';
 
 import {
