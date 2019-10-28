@@ -66,7 +66,7 @@ class MediaContainer extends Component {
 
 		if ( mediaId && mediaUrl && ! isURL( mediaUrl ) ) {
 			if ( mediaUrl.indexOf( 'file:' ) === 0 && mediaType === MEDIA_TYPE_IMAGE ) {
-				// We don't want to call this for video because it is starting a media upload for cover url of the video
+				// We don't want to call this for video because it is starting a media upload for the cover url
 				requestMediaImport( mediaUrl, ( id, url ) => {
 					if ( url ) {
 						onMediaUpdate( { id, url } );
