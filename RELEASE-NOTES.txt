@@ -1,5 +1,6 @@
 1.15.2
 ------
+* Fix issue when copy/paste photos from other apps, was not inserting an image on the post.
 * Fix issue where the block inserter layout wasn't correct after device rotation.
 
 1.15.0
