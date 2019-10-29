@@ -19,7 +19,7 @@ const readFile = util.promisify( fs.readFile );
 /**
  * Returns an array of dependencies to be mounted in the Docker image.
  *
- * Reads from the .wpenv file in the current directory and uses detect
+ * Reads from the wp-env.json file in the current directory and uses detect
  * context to make sure the specified dependencies exist and are plugins
  * and/or themes.
  *
