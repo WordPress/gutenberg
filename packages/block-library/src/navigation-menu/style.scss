@@ -92,8 +92,7 @@
 	}
 
 	// Top-level sub-menu indicators
-	// TODO: needs to apply to items with children only
-	& > ul > li > a {
+	& .has-sub-menu > a {
 
 		&::after {
 			content: "\00a0\25BC";
