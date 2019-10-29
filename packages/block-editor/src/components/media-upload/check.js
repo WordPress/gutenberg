@@ -14,6 +14,6 @@ export default withSelect( ( select ) => {
 	const { getSettings } = select( 'core/block-editor' );
 
 	return {
-		hasUploadPermissions: !! getSettings().__experimentalMediaUpload,
+		hasUploadPermissions: !! getSettings().mediaUpload,
 	};
 } )( MediaUploadCheck );

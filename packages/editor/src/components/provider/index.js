@@ -108,8 +108,8 @@ class EditorProvider extends Component {
 				'__experimentalEnableFullSiteEditing',
 				'showInserterHelpPanel',
 			] ),
+			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalReusableBlocks: reusableBlocks,
-			__experimentalMediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalFetchLinkSuggestions: fetchLinkSuggestions,
 			__experimentalCanUserUseUnfilteredHTML: canUserUseUnfilteredHTML,
 		};

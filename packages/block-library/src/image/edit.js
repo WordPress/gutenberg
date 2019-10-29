@@ -930,7 +930,7 @@ export default compose( [
 		const { getSettings } = select( 'core/block-editor' );
 		const { attributes: { id }, isSelected } = props;
 		const {
-			__experimentalMediaUpload,
+			mediaUpload,
 			imageSizes,
 			isRTL,
 			maxWidth,
@@ -941,7 +941,7 @@ export default compose( [
 			maxWidth,
 			isRTL,
 			imageSizes,
-			mediaUpload: __experimentalMediaUpload,
+			mediaUpload,
 		};
 	} ),
 	withViewportMatch( { isLargeViewport: 'medium' } ),
