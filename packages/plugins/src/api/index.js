@@ -123,10 +123,7 @@ export function registerPlugin( name, settings ) {
 		return null;
 	}
 	const { priority = 10 } = settings;
-	if (
-		priority !== 0 &&
-		( priority.length === 0 || typeof priority !== 'number' )
-	) {
+	if ( ! Number.isInteger( priority ) ) {
 		console.error( 'The "priority" property must be a number' );
 		return null;
 	}
