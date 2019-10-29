@@ -300,6 +300,7 @@ class GalleryEdit extends Component {
 					<PanelBody title={ __( 'Gallery Settings' ) }>
 						{ images.length > 1 && <RangeControl
 							label={ __( 'Columns' ) }
+							icon={ 'admin-settings' }
 							value={ columns }
 							onChange={ this.setColumnsNumber }
 							min={ 1 }
