@@ -42,7 +42,7 @@ function getBlockEditorSettings( blockEditorSettings, hasUploadPermissions ) {
 	};
 	return {
 		...blockEditorSettings,
-		__experimentalMediaUpload: mediaUploadBlockEditor,
+		mediaUpload: mediaUploadBlockEditor,
 	};
 }
 

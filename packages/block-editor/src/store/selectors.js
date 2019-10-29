@@ -421,6 +421,30 @@ export function getBlockRootClientId( state, clientId ) {
 }
 
 /**
+ * Given a block client ID, returns the list of all its parents from top to bottom.
+ *
+ * @param {Object} state    Editor state.
+ * @param {string} clientId Block from which to find root client ID.
+ *
+ * @return {Array} ClientIDs of the parent blocks.
+ */
+export const getBlockParents = createSelector(
+	( state, clientId ) => {
+		const parents = [];
+		let current = clientId;
+		while ( !! state.blocks.parents[ current ] ) {
+			current = state.blocks.parents[ current ];
+			parents.push( current );
+		}
+
+		return parents.reverse();
+	},
+	( state ) => [
+		state.blocks.parents,
+	]
+);
+
+/**
  * Given a block client ID, returns the root of the hierarchy from which the block is nested, return the block itself for root level blocks.
  *
  * @param {Object} state    Editor state.
@@ -1285,6 +1309,22 @@ export const hasInserterItems = createSelector(
 		getBlockTypes(),
 	],
 );
+
+/**
+ * Returns the list of allowed inserter blocks for inner blocks children
+ *
+ * @param {Object}  state        Editor state.
+ * @param {?string} rootClientId Optional root client ID of block list.
+ *
+ * @return {Array?} The list of allowed block types or false.
+ */
+export const __experimentalGetAllowedBlocks = ( state, rootClientId = null ) => {
+	if ( ! rootClientId ) {
+		return false;
+	}
+	const { allowedBlocks } = getBlockListSettings( state, rootClientId );
+	return allowedBlocks;
+};
 
 /**
  * Returns the Block List settings of a block, if any exist.
