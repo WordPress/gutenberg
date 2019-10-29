@@ -169,7 +169,6 @@ module.exports = {
 				resetDatabase( true )
 					.then( setupSite.bind( null, true ) )
 					.then( activateContext.bind( null, context, true ) )
-					.then( activateDependencies )
 					.catch( () => {} )
 			);
 		}
