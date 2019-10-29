@@ -104,8 +104,8 @@ function block_navigation_link_attributes( $attributes, $item ) {
  * @param array $colors Custom colors classes and styles.
  * @return array Menu items
  */
-function setup_block_nav_items( $block, $colors ) {
-	static $menu_item_id = 1;
+function setup_block_nav_items( $block, $colors, $parent_id = 0 ) {
+	static $menu_item_id = 0;
 	$nav_menu_items = array();
 	$nav_menu_item  = array(
 		'classes'       => $colors['classes'],
@@ -118,26 +118,26 @@ function setup_block_nav_items( $block, $colors ) {
 	);
 
 	foreach ( $block['innerBlocks'] as $inner_block ) {
-		$sub_menu_items = setup_block_nav_items( $inner_block, $colors );
-		foreach ( $sub_menu_items as $sub_menu_item ) {
-			$sub_menu_item->menu_item_parent = $menu_item_id;
-			$nav_menu_items[]                = $sub_menu_item;
-		}
-
 		if ( empty( $inner_block['attrs']['label'] ) ) {
 			continue;
 		}
+
+		$nav_menu_item['ID']         = ++$menu_item_id;
+		$nav_menu_item['post_title'] = $inner_block['attrs']['label'];
+		$nav_menu_item['url']        = $inner_block['attrs']['url'] ?? '#';
 
 		if ( ! empty( $sub_menu_items ) ) {
 			$nav_menu_item['classes'][] = 'menu-item-has-children';
 		}
 
-		$nav_menu_item['ID']         = $menu_item_id;
-		$nav_menu_item['post_title'] = $inner_block['attrs']['label'];
-		$nav_menu_item['url']        = $inner_block['attrs']['url'] ?? '#';
+		if ( $parent_id ) {
+			$nav_menu_item['menu_item_parent'] = $parent_id;
+		}
 
-		++$menu_item_id;
 		$nav_menu_items[] = (object) $nav_menu_item;
+
+		$sub_menu_items = setup_block_nav_items( $inner_block, $colors, $nav_menu_item['ID'] );
+		$nav_menu_items = array_merge( $nav_menu_items, $sub_menu_items );
 	}
 
 	return array_map( 'wp_setup_nav_menu_item', $nav_menu_items );
