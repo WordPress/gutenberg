@@ -9,10 +9,7 @@
  * Registers block editor 'wp_template' post type.
  */
 function gutenberg_register_template_post_type() {
-	if (
-		! get_option( 'gutenberg-experiments' ) ||
-		! array_key_exists( 'gutenberg-full-site-editing', get_option( 'gutenberg-experiments' ) )
-	) {
+	if ( ! gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing' ) ) {
 		return;
 	}
 
