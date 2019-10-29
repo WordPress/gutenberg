@@ -10,6 +10,8 @@ import { withSelect } from '@wordpress/data';
 import {
 	ExternalLink,
 	PanelBody,
+	Path,
+	SVG,
 	TextareaControl,
 	TextControl,
 	Toolbar,
@@ -40,6 +42,7 @@ import {
 
 function NavigationMenuItemEdit( {
 	attributes,
+	hasDescendants,
 	isSelected,
 	isParentOfSelectedBlock,
 	setAttributes,
@@ -47,6 +50,9 @@ function NavigationMenuItemEdit( {
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
 	const [ isEditingLink, setIsEditingLink ] = useState( false );
 	const [ urlInput, setUrlInput ] = useState( null );
+	const [ addSubmenu, setaddSubmenu ] = useState( false );
+
+	const showAppender = addSubmenu || hasDescendants;
 
 	const inputValue = urlInput !== null ? urlInput : url;
 
@@ -89,7 +95,14 @@ function NavigationMenuItemEdit( {
 						title={ __( 'Link' ) }
 						onClick={ () => setIsLinkOpen( ! isLinkOpen ) }
 					/>
-					{ isLinkOpen &&
+					{ ! hasDescendants && <ToolbarButton
+						name="submenu"
+						icon={ <SVG xmlns="http://www.w3.org/2000/svg" width="24" height="24"><Path d="M14 5h8v2h-8zm0 5.5h8v2h-8zm0 5.5h8v2h-8zM2 11.5C2 15.08 4.92 18 8.5 18H9v2l3-3-3-3v2h-.5C6.02 16 4 13.98 4 11.5S6.02 7 8.5 7H12V5H8.5C4.92 5 2 7.92 2 11.5z" /><Path fill="none" d="M0 0h24v24H0z" /></SVG> }
+						title={ __( 'Submenu' ) }
+						onClick={ () => setaddSubmenu( ! addSubmenu ) }
+					/> }
+				</Toolbar>
+				{ isLinkOpen &&
 					<>
 						<URLPopover
 							className="wp-block-navigation-menu-item__inline-link-input"
@@ -115,8 +128,7 @@ function NavigationMenuItemEdit( {
 
 						</URLPopover>
 					</>
-					}
-				</Toolbar>
+				}
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody
@@ -181,9 +193,15 @@ function NavigationMenuItemEdit( {
 					placeholder={ __( 'Add item…' ) }
 					withoutInteractiveFormatting
 				/>
-				{ ( isSelected || isParentOfSelectedBlock ) &&
+				{ ( isSelected || isParentOfSelectedBlock ) && showAppender &&
 					<InnerBlocks
 						allowedBlocks={ [ 'core/navigation-menu-item' ] }
+					/>
+				}
+				{ ( isSelected || isParentOfSelectedBlock ) && ! showAppender &&
+					<InnerBlocks
+						allowedBlocks={ [ 'core/navigation-menu-item' ] }
+						renderAppender={ false }
 					/>
 				}
 			</div>
@@ -192,10 +210,11 @@ function NavigationMenuItemEdit( {
 }
 
 export default withSelect( ( select, ownProps ) => {
-	const { hasSelectedInnerBlock } = select( 'core/block-editor' );
+	const { getClientIdsOfDescendants, hasSelectedInnerBlock } = select( 'core/block-editor' );
 	const { clientId } = ownProps;
 
 	return {
 		isParentOfSelectedBlock: hasSelectedInnerBlock( clientId, true ),
+		hasDescendants: !! getClientIdsOfDescendants( [ clientId ] ).length,
 	};
 } )( NavigationMenuItemEdit );
