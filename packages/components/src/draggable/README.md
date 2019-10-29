@@ -53,12 +53,13 @@ const MyDraggable = () => (
 				>
 				{
 					( { onDraggableStart, onDraggableEnd } ) => (
-						<Dashicon
-							icon="move"
-							onDragStart={ onDraggableStart }
-							onDragEnd={ onDraggableEnd }
-							draggable
-						/>
+						<div className="example-drag-handle" draggable>
+							<Dashicon
+								icon="move"
+								onDragStart={ onDraggableStart }
+								onDragEnd={ onDraggableEnd }
+							/>
+						</div>
 					)
 				}
 				</Draggable>
@@ -85,12 +86,13 @@ const MyDraggable = ( { onDragStart, onDragEnd } ) => (
 				>
 				{
 					( { onDraggableStart, onDraggableEnd } ) => (
-						<Dashicon
-							icon="move"
-							onDragStart={ onDraggableStart }
-							onDragEnd={ onDraggableEnd }
-							draggable
-						/>
+						<div className="example-drag-handle" draggable>
+							<Dashicon
+								icon="move"
+								onDragStart={ onDraggableStart }
+								onDragEnd={ onDraggableEnd }
+							/>
+						</div>
 					)
 				}
 				</Draggable>
