@@ -145,6 +145,8 @@ module.exports = {
 
 	async clean( { environment, spinner } ) {
 		const context = await detectContext();
+		const dependencies = await resolveDependencies();
+		const activateDependencies = () => Promise.all( dependencies.map( activateContext ) );
 
 		const description = `${ environment } environment${
 			environment === 'all' ? 's' : ''
@@ -158,6 +160,7 @@ module.exports = {
 				resetDatabase()
 					.then( setupSite )
 					.then( activateContext.bind( null, context ) )
+					.then( activateDependencies )
 					.catch( () => {} )
 			);
 		}
@@ -166,6 +169,7 @@ module.exports = {
 				resetDatabase( true )
 					.then( setupSite.bind( null, true ) )
 					.then( activateContext.bind( null, context, true ) )
+					.then( activateDependencies )
 					.catch( () => {} )
 			);
 		}
