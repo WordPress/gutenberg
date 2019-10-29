@@ -18,7 +18,7 @@ export default { title: 'ResizableBox', component: ResizableBox };
 const Example = ( props ) => {
 	const [ attributes, setAttributes ] = useState( { height: 200, width: 400 } );
 	const { height, width } = attributes;
-	const { content, ...restProps } = props;
+	const { children, ...restProps } = props;
 
 	return (
 		<div style={ { margin: 30 } }>
@@ -35,18 +35,7 @@ const Example = ( props ) => {
 					} );
 				} }
 			>
-				<div
-					style={ {
-						background: '#eee',
-						display: 'flex',
-						height: '100%',
-						width: '100%',
-						alignItems: 'center',
-						justifyContent: 'center',
-					} }
-				>
-					<span>{ content }</span>
-				</div>
+				{ children }
 			</ResizableBox>
 		</div>
 	);
@@ -69,12 +58,26 @@ export const _default = () => {
 	};
 
 	const props = {
-		content,
 		enable,
 		minHeight,
 		minWidth,
 		showHandle,
 	};
 
-	return <Example { ...props } />;
+	return (
+		<Example { ...props }>
+			<div
+				style={ {
+					background: '#eee',
+					display: 'flex',
+					height: '100%',
+					width: '100%',
+					alignItems: 'center',
+					justifyContent: 'center',
+				} }
+			>
+				<span>{ content }</span>
+			</div>
+		</Example>
+	);
 };
