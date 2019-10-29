@@ -175,8 +175,8 @@ export class RichText extends Component {
 
 		this.value = this.valueToFormat( record );
 		this.props.onChange( this.value );
-		this.props.onSelectionChange( start, end );
 		this.setState( { activeFormats } );
+		this.props.onSelectionChange( start, end );
 		this.selectionStart = start;
 		this.selectionEnd = end;
 
