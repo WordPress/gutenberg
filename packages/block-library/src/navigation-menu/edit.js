@@ -106,7 +106,7 @@ function NavigationMenu( {
 			backgroundColorCSSClass: backgroundColor.class ? backgroundColor.class : null,
 			textColorCSSClass: textColor.class ? textColor.class : null,
 		} );
-	}, [ backgroundColor, textColor ] );
+	}, [ backgroundColor.class, textColor.class ] );
 
 	return (
 		<Fragment>
