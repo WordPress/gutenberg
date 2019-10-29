@@ -11,7 +11,7 @@ import { ENTER } from '@wordpress/keycodes';
  */
 import { URLInput } from '../';
 
-const LinkControlInputSearch = ( {
+const LinkControlSearchInput = ( {
 	value,
 	onChange,
 	onSelect,
@@ -21,34 +21,32 @@ const LinkControlInputSearch = ( {
 	onKeyDown,
 	onKeyPress,
 } ) => {
-	const selectItemHandler = ( value, suggestion ) => {
-		onChange( value );
+	const selectItemHandler = ( selection, suggestion ) => {
+		onChange( selection );
 
 		if ( suggestion ) {
 			onSelect( suggestion );
 		}
 	};
 
-	const stopFormEventsPropagation = event => {
+	const stopFormEventsPropagation = ( event ) => {
 		event.preventDefault();
 		event.stopPropagation();
 	};
 
 	return (
-		<form
-			onSubmit={ stopFormEventsPropagation }
-			onKeyDown={ ( event ) => {
-				if ( event.keyCode === ENTER ) {
-					return;
-				}
-				onKeyDown( event );
-			} }
-			onKeyPress={ onKeyPress }
-		>
+		<form onSubmit={ stopFormEventsPropagation }>
 			<URLInput
 				className="block-editor-link-control__search-input"
 				value={ value }
 				onChange={ selectItemHandler }
+				onKeyDown={ ( event ) => {
+					if ( event.keyCode === ENTER ) {
+						return;
+					}
+					onKeyDown( event );
+				} }
+				onKeyPress={ onKeyPress }
 				placeholder={ __( 'Search or type url' ) }
 				__experimentalRenderSuggestions={ renderSuggestions }
 				__experimentalFetchLinkSuggestions={ fetchSuggestions }
@@ -68,4 +66,4 @@ const LinkControlInputSearch = ( {
 	);
 };
 
-export default LinkControlInputSearch;
+export default LinkControlSearchInput;

@@ -37,7 +37,7 @@ import { withSelect } from '@wordpress/data';
  */
 import LinkControlSettingsDrawer from './settings-drawer';
 import LinkControlSearchItem from './search-item';
-import LinkControlInputSearch from './input-search';
+import LinkControlSearchInput from './search-input';
 
 function LinkControl( {
 	className,
@@ -68,7 +68,7 @@ function LinkControl( {
 	// Handlers
 
 	/**
-	 * onChange LinkControlInputSearch event handler
+	 * onChange LinkControlSearchInput event handler
 	 *
 	 * @param {string} value Current value returned by the search.
 	 */
@@ -213,7 +213,7 @@ function LinkControl( {
 					) }
 
 					{ isEditingLink && (
-						<LinkControlInputSearch
+						<LinkControlSearchInput
 							value={ inputValue }
 							onChange={ onInputChange }
 							onSelect={ onLinkChange }
