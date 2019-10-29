@@ -34,10 +34,21 @@ class BottomSheetCell extends Component {
 	}
 
 	componentDidMount() {
-		AccessibilityInfo.isScreenReaderEnabled().then(
-			( isScreenReaderEnabled ) =>
-				this.setState( { isScreenReaderEnabled } )
+		AccessibilityInfo.addEventListener(
+			'screenReaderChanged',
+			this.handleScreenReaderToggled,
 		);
+	}
+
+	componentWillUnmount() {
+		AccessibilityInfo.removeEventListener(
+			'screenReaderChanged',
+			this.handleScreenReaderToggled,
+		);
+	}
+
+	handleScreenReaderToggled( isScreenReaderEnabled ) {
+		this.setState( { isScreenReaderEnabled } );
 	}
 
 	render() {
