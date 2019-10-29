@@ -24,10 +24,10 @@ export const Gallery = ( props ) => {
 		onRemoveImage,
 		onSelectImage,
 		onSetImageAttributes,
-	//	onFocusGalleryCaption,
+		//	onFocusGalleryCaption,
 		attributes,
 		isSelected,
-	//	setAttributes,
+		//	setAttributes,
 		isMobile,
 	} = props;
 
