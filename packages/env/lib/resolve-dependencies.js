@@ -26,7 +26,7 @@ const readFile = util.promisify( fs.readFile );
  * @return {Array<detectContext.Context>} An array of dependencies in the context format.
  */
 module.exports = async function resolveDependencies() {
-	const envFile = await readFile( './.wpenv' );
+	const envFile = await readFile( './.wp-env' );
 	const { themes, plugins } = JSON.parse( envFile );
 
 	const dependencyResolvers = [];

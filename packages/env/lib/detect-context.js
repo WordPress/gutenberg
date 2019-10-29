@@ -13,24 +13,22 @@ const path = require( 'path' );
 const readDir = util.promisify( fs.readdir );
 const finished = util.promisify( stream.finished );
 
-const cwd = process.cwd();
-
 /**
  * @typedef Context
  * @type {Object}
  * @property {string} type
  * @property {string} path
- * @property {string} pathName
+ * @property {string} pathBasename
  */
 
 /**
  * Detects the context of a given path.
  *
- * @param {string} directoryPath The directory to detect. Should point to a directory, defaulting to the current directory.
+ * @param {string} [directoryPath=process.cwd()] The directory to detect. Should point to a directory, defaulting to the current working directory.
  *
  * @return {Context} The context of the directory. If a theme or plugin, the type property will contain 'theme' or 'plugin'.
  */
-module.exports = async function detectContext( directoryPath = cwd ) {
+module.exports = async function detectContext( directoryPath = process.cwd() ) {
 	const context = {};
 
 	// Use absolute paths to files so that we can properly read
@@ -51,7 +49,7 @@ module.exports = async function detectContext( directoryPath = cwd ) {
 			if ( type ) {
 				context.type = type.toLowerCase();
 				context.path = absPath;
-				context.pathName = path.basename( absPath );
+				context.pathBasename = path.basename( absPath );
 
 				// Stop the creation of new streams by mutating the iterated array. We can't `break`, because we are inside a function.
 				files.splice( 0 );

@@ -39,8 +39,8 @@ const setupSite = ( isTests = false ) =>
 		} --title=${ cwdName } --admin_user=admin --admin_password=password --admin_email=admin@wordpress.org`,
 		isTests
 	);
-const activateContext = ( { type, pathName }, isTests = false ) =>
-	wpCliRun( `wp ${ type } activate ${ pathName }`, isTests );
+const activateContext = ( { type, pathBasename }, isTests = false ) =>
+	wpCliRun( `wp ${ type } activate ${ pathBasename }`, isTests );
 const resetDatabase = ( isTests = false ) =>
 	wpCliRun( 'wp db reset --yes', isTests );
 
