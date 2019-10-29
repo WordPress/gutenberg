@@ -32,7 +32,6 @@ import {
 import { withInstanceId, compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 
-
 /**
  * Internal dependencies
  */
@@ -41,16 +40,15 @@ import LinkControlSearchItem from './search-item';
 import LinkControlInputSearch from './input-search';
 
 function LinkControl( {
-	instanceId,
-	currentLink,
 	className,
+	currentLink,
 	currentSettings,
 	fetchSearchSuggestions,
-
+	instanceId,
 	onClose = noop,
-	onLinkChange = noop,
 	onKeyDown = noop,
 	onKeyPress = noop,
+	onLinkChange = noop,
 	onSettingsChange = { noop },
 } ) {
 	// State
@@ -71,10 +69,10 @@ function LinkControl( {
 
 	/**
 	 * onChange LinkControlInputSearch event handler
+	 *
 	 * @param {string} value Current value returned by the search.
-	 * @param {object} suggestion data object (post, page, ...) is it has been selected.
 	 */
-	const onInputChange = ( value = '', suggestion ) => {
+	const onInputChange = ( value = '' ) => {
 		setInputValue( value );
 	};
 

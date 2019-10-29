@@ -1,48 +1,50 @@
 # Link Control
 
+## Props
+
 ### className
 
-- Type: `string`
-- Required: NO
+- Type: `String`
+- Required: Yes
+
+### currentLink
+
+- Type: `Object`
+- Required: Yes
+
+### currentSettings
+
+- Type: `Object`
+- Required: Yes
 
 ### fetchSearchSuggestions
 
 - Type: `Function`
-- Required: YES
-
-### currentLink
-
-- Type:
-- Required:
-
-### linkSettings
-
-- Type:
-- Required:
+- Required: No
 
 ## Event handlers
 
 ### onClose
 
 - Type: `Function`
-- Required:
+- Required: No
 
 ### onKeyDown
 
 - Type: `Function`
-- Required:
+- Required: No
 
 ### onKeyPress
 
 - Type: `Function`
-- Required:
+- Required: No
 
 ### onLinkChange
 
 - Type: `Function`
-- Required:
+- Required: No
 
 ### onSettingChange
 
 - Type: `Function`
-- Required:
+- Required: No
