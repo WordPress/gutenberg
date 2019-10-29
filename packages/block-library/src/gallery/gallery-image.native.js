@@ -163,7 +163,7 @@ class GalleryImage extends Component {
 
 		return (
 			<TouchableWithoutFeedback
-				onPress={ this.props.onSelect }
+				onPress={ this.onSelectImage }
 				disabled={ ! isBlockSelected }
 			>
 				<View style={ styles.container }>
