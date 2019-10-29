@@ -71,6 +71,10 @@
 
 	&:focus {
 		color: var(--color-menu-link);
+
+		.components-external-link {
+			color: var(--color-menu-link);
+		}
 	}
 }
 
