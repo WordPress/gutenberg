@@ -1,7 +1,4 @@
 /**
- * TODO: Move this into src/components/
- * Create a dedicated component for ActionBar
- *
  * IDEA:
  * This is a general component that powers UI like PageHeader or Toolbar
  */
