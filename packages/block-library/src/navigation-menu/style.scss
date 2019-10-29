@@ -1,13 +1,17 @@
 .wp-block-navigation-menu {
 
 	& > ul {
-		display: flex;
-		flex-wrap: wrap;
+		display: block;
 		list-style: none;
 		margin: 0;
 		max-width: none;
 		padding-left: 0;
 		position: relative;
+
+		@include break-small {
+			display: flex;
+			flex-wrap: wrap;
+		}
 
 		ul {
 			padding-left: 0;
@@ -35,6 +39,15 @@
 		}
 
 		& > li {
+
+			& > a {
+				padding-left: 0;
+
+				@include break-small {
+					padding-left: 16px;
+				}
+			}
+
 			&:first-of-type > a {
 				padding-left: 0;
 			}
