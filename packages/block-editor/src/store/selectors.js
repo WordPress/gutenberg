@@ -1311,6 +1311,22 @@ export const hasInserterItems = createSelector(
 );
 
 /**
+ * Returns the list of allowed inserter blocks for inner blocks children
+ *
+ * @param {Object}  state        Editor state.
+ * @param {?string} rootClientId Optional root client ID of block list.
+ *
+ * @return {Array?} The list of allowed block types or false.
+ */
+export const __experimentalGetAllowedBlocks = ( state, rootClientId = null ) => {
+	if ( ! rootClientId ) {
+		return false;
+	}
+	const { allowedBlocks } = getBlockListSettings( state, rootClientId );
+	return allowedBlocks;
+};
+
+/**
  * Returns the Block List settings of a block, if any exist.
  *
  * @param {Object}  state    Editor state.
