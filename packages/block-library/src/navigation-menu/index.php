@@ -16,11 +16,11 @@ function block_navigation_colors( $attributes ) {
 	// CSS classes.
 	$colors = array(
 		'classes' => array(),
-		'style' => '',
+		'style'   => '',
 	);
 
 	// Background color.
-	// Background color - has text color.
+	// Background color - has background color.
 	if ( array_key_exists( 'backgroundColor', $attributes ) ) {
 		$colors['classes'][] = 'has-background-color';
 	}
@@ -74,7 +74,12 @@ function render_block_navigation_menu( $attributes, $content, $block ) {
 	);
 
 	add_filter( 'nav_menu_link_attributes', 'block_navigation_link_attributes', 10, 2 );
-	return '<nav class="wp-block-navigation-menu" style="' . esc_attr( $colors['style'] ) . '"><ul class="menu">' . walk_nav_menu_tree( $items, 0, $args ) . '</ul></nav>';
+
+	return sprintf(
+		'<nav class="wp-block-navigation-menu" style="%1$s"><ul class="menu">%2$s</ul></nav>',
+		esc_attr( $colors['style'] ),
+		walk_nav_menu_tree( $items, 0, $args )
+	);
 }
 
 /**
@@ -125,7 +130,7 @@ function setup_block_nav_items( $block, $colors ) {
 
 		$nav_menu_item['ID']         = $menu_item_id;
 		$nav_menu_item['post_title'] = $inner_block['attrs']['label'];
-		$nav_menu_item['url']        = $inner_block['attrs']['destination'] ?? '#';
+		$nav_menu_item['url']        = $inner_block['attrs']['url'] ?? '#';
 
 		++$menu_item_id;
 		$nav_menu_items[] = (object) $nav_menu_item;
