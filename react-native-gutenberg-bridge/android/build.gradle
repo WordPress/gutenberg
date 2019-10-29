@@ -117,6 +117,9 @@ dependencies {
     implementation "org.webkit:android-jsc:r241213"
     implementation project(':react-native-aztec')
 
+    // For animated GIF support
+    implementation 'com.facebook.fresco:animated-gif:2.0.0'
+
     if (rootProject.ext.buildGutenbergFromSource) {
         println "using gutenberg from source"
         implementation project(':react-native-svg')

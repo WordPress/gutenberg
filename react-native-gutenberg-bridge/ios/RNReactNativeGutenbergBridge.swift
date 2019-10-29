@@ -42,6 +42,16 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
             })
         }
     }
+    
+    @objc
+    func requestOtherMediaPickFrom(_ source: String, allowMultipleSelection: Bool, callback: @escaping RCTResponseSenderBlock) {
+        //TODO implement me
+    }
+    
+    @objc
+    func getOtherMediaOptions(_ filter: [String]?, callback: @escaping RCTResponseSenderBlock) {
+        //TODO implement me
+    }
 
     @objc
     func requestMediaImport(_ urlString: String, callback: @escaping RCTResponseSenderBlock) {
