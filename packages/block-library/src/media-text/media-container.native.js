@@ -62,17 +62,14 @@ class MediaContainer extends Component {
 	}
 
 	componentDidMount() {
-		const { mediaId, mediaUrl, onSelectMedia } = this.props;
+		const { mediaId, mediaUrl, onMediaUpdate, mediaType } = this.props;
 
 		if ( mediaId && mediaUrl && ! isURL( mediaUrl ) ) {
-			if ( mediaUrl.indexOf( 'file:' ) === 0 ) {
-				requestMediaImport( mediaUrl, ( id, url, type ) => {
+			if ( mediaUrl.indexOf( 'file:' ) === 0 && mediaType === MEDIA_TYPE_IMAGE ) {
+				// We don't want to call this for video because it is starting a media upload for the cover url
+				requestMediaImport( mediaUrl, ( id, url ) => {
 					if ( url ) {
-						onSelectMedia( {
-							media_type: type,
-							id,
-							url,
-						} );
+						onMediaUpdate( { id, url } );
 					}
 				} );
 			}
