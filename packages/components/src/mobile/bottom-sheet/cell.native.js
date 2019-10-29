@@ -172,7 +172,7 @@ class BottomSheetCell extends Component {
 		};
 
 		const iconStyle = getStylesFromColorScheme( styles.icon, styles.iconDark );
-		const resetButtonText = Platform.OS === 'ios' ? 'RESET' : 'Reset';
+		const resetButtonText = Platform.OS === 'ios' ? 'Reset' : 'RESET';
 		const containerPointerEvents = this.state.isScreenReaderEnabled && accessible ? 'none' : 'auto';
 
 		return (
@@ -193,7 +193,7 @@ class BottomSheetCell extends Component {
 				) }
 				<View style={ cellContainerStyles } pointerEvents={ containerPointerEvents }>
 					<View style={ rowContainerStyles }>
-						<View style={ { flexDirection: 'row', alignItems: 'center' } }>
+						<View style={ styles.cellRowContainer }>
 							{ icon && (
 								<View style={ styles.cellRowContainer }>
 									<Dashicon icon={ icon } size={ 24 } color={ iconStyle.color } />
@@ -204,7 +204,7 @@ class BottomSheetCell extends Component {
 								{ label }
 							</Text>
 						</View>
-						{ allowReset && <TouchableOpacity onPress={ allowReset }>
+						{ allowReset && <TouchableOpacity onPress={ allowReset } accessibilityRole={ 'button' }>
 							<Text style={ styles.resetButton }>{ sprintf(
 								/* translators: %s: reset */
 								__( '%s' ), resetButtonText	) }
