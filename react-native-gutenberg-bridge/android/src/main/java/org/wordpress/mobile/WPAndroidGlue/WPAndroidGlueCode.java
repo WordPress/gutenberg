@@ -35,7 +35,6 @@ import com.horcrux.svg.SvgPackage;
 import org.wordpress.android.util.AppLog;
 import org.wordpress.mobile.ReactNativeAztec.ReactAztecPackage;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent;
-import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaSelectedCallback;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaUploadCallback;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.RNMedia;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.RNReactNativeGutenbergBridgePackage;
@@ -59,7 +58,6 @@ public class WPAndroidGlueCode {
     private ReactInstanceManager mReactInstanceManager;
     private ReactContext mReactContext;
     private RNReactNativeGutenbergBridgePackage mRnReactNativeGutenbergBridgePackage;
-    private MediaSelectedCallback mPendingMediaSelectedCallback;
     private MediaUploadCallback mPendingMediaUploadCallback;
     private boolean mMediaPickedByUserOnBlock;
 
@@ -116,6 +114,8 @@ public class WPAndroidGlueCode {
         void onRetryUploadForMediaClicked(int mediaId);
         void onCancelUploadForMediaClicked(int mediaId);
         void onCancelUploadForMediaDueToDeletedBlock(int mediaId);
+        ArrayList<MediaOption> onGetOtherMediaImageOptions();
+        void onOtherMediaButtonClicked(String mediaSource, boolean allowMultipleSelection);
     }
 
     public interface OnReattachQueryListener {
@@ -153,9 +153,9 @@ public class WPAndroidGlueCode {
             }
 
             @Override
-            public void requestMediaPickFromMediaLibrary(MediaSelectedCallback mediaSelectedCallback, Boolean allowMultipleSelection, MediaType mediaType) {
+            public void requestMediaPickFromMediaLibrary(MediaUploadCallback mediaSelectedCallback, Boolean allowMultipleSelection, MediaType mediaType) {
                 mMediaPickedByUserOnBlock = true;
-                mPendingMediaSelectedCallback = mediaSelectedCallback;
+                mPendingMediaUploadCallback = mediaSelectedCallback;
                 if (mediaType == MediaType.IMAGE) {
                     mOnMediaLibraryButtonListener.onMediaLibraryImageButtonClicked(allowMultipleSelection);
                 } else if (mediaType == MediaType.VIDEO) {
@@ -190,7 +190,7 @@ public class WPAndroidGlueCode {
             }
 
             @Override
-            public void requestMediaImport(String url, MediaSelectedCallback mediaSelectedCallback) {
+            public void requestMediaImport(String url, MediaUploadCallback mediaSelectedCallback) {
                 // no op - we don't need to paste images on Android, but the method needs to exist
                 // to match the iOS counterpart
             }
@@ -251,6 +251,26 @@ public class WPAndroidGlueCode {
                         AppLog.e(AppLog.T.EDITOR, message);
                         break;
                 }
+            }
+
+            @Override
+            public void getOtherMediaPickerOptions(OtherMediaOptionsReceivedCallback otherMediaOptionsReceivedCallback,
+                                                   MediaType mediaType) {
+                if (mediaType == MediaType.IMAGE || mediaType == MediaType.MEDIA) {
+                    ArrayList<MediaOption> otherMediaImageOptions = mOnMediaLibraryButtonListener.onGetOtherMediaImageOptions();
+                    otherMediaOptionsReceivedCallback.onOtherMediaOptionsReceived(otherMediaImageOptions);
+                } else {
+                    otherMediaOptionsReceivedCallback.onOtherMediaOptionsReceived(new ArrayList<MediaOption>());
+                }
+            }
+
+            @Override
+            public void requestMediaPickFrom(String mediaSource,
+                                                       MediaUploadCallback mediaSelectedCallback,
+                                                       Boolean allowMultipleSelection) {
+                mPendingMediaUploadCallback = mediaSelectedCallback;
+                mMediaPickedByUserOnBlock = true;
+                mOnMediaLibraryButtonListener.onOtherMediaButtonClicked(mediaSource, allowMultipleSelection);
             }
         });
 
@@ -522,21 +542,6 @@ public class WPAndroidGlueCode {
         return isVideo ? "video" : "image";
     }
 
-    public void appendMediaFile(int mediaId, final String mediaUrl, final boolean isVideo) {
-        if (mPendingMediaSelectedCallback != null && mMediaPickedByUserOnBlock) {
-            String mediaType = getMediaType(isVideo);
-            mMediaPickedByUserOnBlock = false;
-            List<RNMedia> mediaList = new ArrayList<>();
-            mediaList.add(new Media(mediaId, mediaUrl, mediaType));
-            mPendingMediaSelectedCallback.onMediaSelected(mediaList);
-            mPendingMediaSelectedCallback = null;
-        } else {
-            // we can assume we're being passed a new image from share intent as there was no selectMedia callback
-            sendOrDeferAppendMediaSignal(mediaId, mediaUrl, isVideo);
-        }
-    }
-
-
     public void toggleEditorMode(boolean htmlModeEnabled) {
         // Turn off hardware acceleration for Oreo
         // see https://github.com/wordpress-mobile/gutenberg-mobile/issues/1268#issuecomment-535887390
@@ -548,23 +553,6 @@ public class WPAndroidGlueCode {
                 mReactRootView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
             }
         }
-        mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().toggleEditorMode();
-    }
-
-    public void appendMediaFiles(ArrayList<Media> mediaList) {
-        if (mPendingMediaSelectedCallback != null && mMediaPickedByUserOnBlock) {
-            mMediaPickedByUserOnBlock = false;
-            List<RNMedia> rnMediaList = new ArrayList<>();
-            for (Media media : mediaList) {
-                rnMediaList.add(new Media(media.getId(), media.getUrl()));
-            }
-            mPendingMediaSelectedCallback.onMediaSelected(rnMediaList);
-            mPendingMediaSelectedCallback = null;
-        }
-    }
-
-
-    public void toggleEditorMode() {
         mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().toggleEditorMode();
     }
 
