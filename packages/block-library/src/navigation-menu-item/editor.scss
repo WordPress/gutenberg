@@ -70,6 +70,7 @@
 		background-color: var(--background-color-menu-link);
 		color: var(--color-menu-link);
 		width: inherit;
+		font-weight: bold;
 
 		.components-external-link {
 			color: var(--color-menu-link);
@@ -94,6 +95,9 @@
 		box-shadow: 0 0 1px $light-gray-900 inset;
 		border-radius: 4px;
 		min-width: 30px;
+		&:focus {
+			color: var(--color-menu-link);
+		}
 	}
 }
 
