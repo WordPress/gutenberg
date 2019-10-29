@@ -174,7 +174,7 @@ export function isValidPath( path ) {
  */
 export function getQueryString( url ) {
 	const cleanUrl = removeFragment( url );
-	const matches = /^\S+?\?([^\s#]+)/.exec( cleanUrl );
+	const matches = /^\S+?\?([^\s]+)/.exec( cleanUrl );
 	if ( matches ) {
 		return matches[ 1 ];
 	}
