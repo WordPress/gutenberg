@@ -64,16 +64,24 @@
 }
 
 .wp-block-navigation-menu-item {
-	font-family: inherit;
-	font-size: inherit;
-	background-color: var(--background-color-menu-link);
-	color: var(--color-menu-link);
+	&:not(.is-editing) {
+		font-family: inherit;
+		font-size: inherit;
+		background-color: var(--background-color-menu-link);
+		color: var(--color-menu-link);
+		width: inherit;
+	}
 
-	&:focus {
+	&.is-editing .components-text-control__input {
+		width: inherit;
+		background-color: var(--background-color-menu-link);
 		color: var(--color-menu-link);
 
 		.components-external-link {
 			color: var(--color-menu-link);
+			&:focus {
+				color: var(--color-menu-link);
+			}
 		}
 	}
 }
