@@ -20,6 +20,14 @@
 		box-sizing: border-box;
 	}
 
+	& > * {
+		margin-right: 8px;
+
+		&:last-child {
+			margin-right: 0;
+		}
+	}
+
 	& > {
 		min-width: 0;
 		max-width: 100%;

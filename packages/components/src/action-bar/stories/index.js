@@ -57,7 +57,7 @@ export const backAndTitle = () => {
 	return (
 		<ActionBar>
 			<ActionBarItem>
-				<IconButton icon="insert" isTertiary />
+				<IconButton icon="arrow-left-alt" isTertiary />
 			</ActionBarItem>
 			<ActionBarItem>
 				<h3 style={ { margin: 0 } }>Title</h3>
