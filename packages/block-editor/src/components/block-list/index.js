@@ -17,7 +17,7 @@ import { Component } from '@wordpress/element';
 import {
 	withSelect,
 	withDispatch,
-	__experimentalAsyncModeProvider as AsyncModeProvider,
+	AsyncModeProvider,
 } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
