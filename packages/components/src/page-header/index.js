@@ -2,6 +2,10 @@
  * External dependencies
  */
 import classnames from 'classnames';
+/**
+ * Internal dependencies
+ */
+import { ActionBar, ActionBarBlock, ActionBarItem } from '../action-bar';
 
 function PageHeader( props ) {
 	const {
@@ -16,13 +20,13 @@ function PageHeader( props ) {
 	const classNames = classnames( className, 'components-page-header' );
 
 	return (
-		<div { ...restProps } className={ classNames }>
+		<ActionBar { ...restProps } className={ classNames }>
 			{ leftActions && (
-				<div className="components-page-header__left-actions">
+				<ActionBarItem className="components-page-header__left-actions">
 					{ leftActions }
-				</div>
+				</ActionBarItem>
 			) }
-			<div className="components-page-header__body">
+			<ActionBarBlock className="components-page-header__body">
 				{ title && (
 					<div className="components-page-header__title-wrapper">
 						<h1 className="components-page-header__title">
@@ -40,16 +44,18 @@ function PageHeader( props ) {
 						{ children }
 					</div>
 				) }
-			</div>
+			</ActionBarBlock>
 			{ rightActions && (
-				<>
-					<div className="components-page-header__right-actions">
-						{ rightActions }
-					</div>
-				</>
+				<ActionBarItem className="components-page-header__right-actions">
+					{ rightActions }
+				</ActionBarItem>
 			) }
-		</div>
+		</ActionBar>
 	);
 }
+
+PageHeader.defaultProps = {
+	align: 'top',
+};
 
 export default PageHeader;
