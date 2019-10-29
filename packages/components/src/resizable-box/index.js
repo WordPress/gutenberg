@@ -23,7 +23,7 @@ function ResizableBox( { className, showHandle = false, ...props } ) {
 		<Resizable
 			className={ classnames(
 				'components-resizable-box__container',
-				showHandle && 'is-show-handle',
+				showHandle && 'has-show-handle',
 				className
 			) }
 			handleClasses={ {

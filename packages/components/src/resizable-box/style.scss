@@ -5,12 +5,10 @@
 	width: $resize-handler-container-size;
 	height: $resize-handler-container-size;
 
-	// Show the resize handle when selected.
-	.components-resizable-box__container.is-selected & {
-		display: block;
-	}
+	// Show the resize handle when selected OR
 	// Show the resize handle if set in props
-	.components-resizable-box__container.is-show-handle & {
+	.components-resizable-box__container.is-selected &,
+	.components-resizable-box__container.has-show-handle & {
 		display: block;
 	}
 }
