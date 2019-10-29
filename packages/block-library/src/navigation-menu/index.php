@@ -128,6 +128,10 @@ function setup_block_nav_items( $block, $colors ) {
 			continue;
 		}
 
+		if ( ! empty( $sub_menu_items ) ) {
+			$nav_menu_item['classes'][] = 'menu-item-has-children';
+		}
+
 		$nav_menu_item['ID']         = $menu_item_id;
 		$nav_menu_item['post_title'] = $inner_block['attrs']['label'];
 		$nav_menu_item['url']        = $inner_block['attrs']['url'] ?? '#';
