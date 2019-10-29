@@ -161,6 +161,8 @@ class MediaContainer extends Component {
 		const { finalWidth, finalHeight, imageWidthWithinContainer, isUploadFailed, retryMessage } = params;
 		const opacity = isUploadInProgress ? 0.3 : 1;
 
+		const contentStyle = ! imageWidthWithinContainer ? styles.content : styles.contentCentered;
+
 		return (
 			<TouchableWithoutFeedback
 				accessible={ ! isSelected }
@@ -168,7 +170,7 @@ class MediaContainer extends Component {
 				onLongPress={ openMediaOptions }
 				disabled={ ! isSelected }
 			>
-				<View style={ styles.content }>
+				<View style={ contentStyle }>
 					{ ! imageWidthWithinContainer &&
 						<View style={ styles.imageContainer }>
 							{ this.getIcon( false ) }
