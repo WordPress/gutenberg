@@ -1,5 +1,8 @@
 // Components
 export * from './primitives';
+export { default as ActionBar } from './action-bar';
+export { default as ActionBarBlock } from './action-bar/block';
+export { default as ActionBarItem } from './action-bar/item';
 export { default as Animate } from './animate';
 export { default as Autocomplete } from './autocomplete';
 export { default as BaseControl } from './base-control';
