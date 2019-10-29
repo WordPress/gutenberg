@@ -17,11 +17,28 @@ import { Fragment, useState } from '@wordpress/element';
 
 export default { title: 'Modal', component: Modal };
 
-export const _default = () => {
+const ModalExample = ( props ) => {
 	const [ isOpen, setOpen ] = useState( true );
 	const openModal = () => setOpen( true );
 	const closeModal = () => setOpen( false );
 
+	return (
+		<Fragment>
+			<Button isDefault onClick={ openModal }>
+				Open Modal
+			</Button>
+			{ isOpen && (
+				<Modal { ...props } onRequestClose={ closeModal }>
+					<Button isDefault onClick={ closeModal }>
+						Close Modal
+					</Button>
+				</Modal>
+			) }
+		</Fragment>
+	);
+};
+
+export const _default = () => {
 	const title = text( 'title', 'Title' );
 	const icon = text( 'icon', '' );
 	const isDismissible = boolean( 'isDismissible', true );
@@ -32,7 +49,10 @@ export const _default = () => {
 		true
 	);
 
+	const iconComponent = icon ? <Dashicon icon={ icon } /> : null;
+
 	const modalProps = {
+		icon: iconComponent,
 		focusOnMount,
 		isDismissible,
 		shouldCloseOnEsc,
@@ -40,24 +60,5 @@ export const _default = () => {
 		title,
 	};
 
-	const iconComponent = icon ? <Dashicon icon={ icon } /> : null;
-
-	return (
-		<Fragment>
-			<Button isDefault onClick={ openModal }>
-				Open Modal
-			</Button>
-			{ isOpen && (
-				<Modal
-					{ ...modalProps }
-					icon={ iconComponent }
-					onRequestClose={ closeModal }
-				>
-					<Button isDefault onClick={ closeModal }>
-						Close Modal
-					</Button>
-				</Modal>
-			) }
-		</Fragment>
-	);
+	return <ModalExample { ...modalProps } />;
 };
