@@ -9,6 +9,10 @@
 			"type": "number",
 			"min": 0,
 			"max": 100
+		},
+		"allowedBlocks": {
+			"type": "array"
 		}
+		
 	}
 }

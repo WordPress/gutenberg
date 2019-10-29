@@ -36,7 +36,7 @@ function ColumnEdit( {
 	updateWidth,
 	hasChildBlocks,
 } ) {
-	const { verticalAlignment, width } = attributes;
+	const { verticalAlignment, width, allowedBlocks } = attributes;
 
 	const classes = classnames(
 		className,
@@ -74,6 +74,7 @@ function ColumnEdit( {
 						undefined :
 						() => <InnerBlocks.ButtonBlockAppender />
 				) }
+				allowedBlocks={ allowedBlocks }
 			/>
 		</div>
 	);
