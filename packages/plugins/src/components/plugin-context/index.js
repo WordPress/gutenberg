@@ -7,7 +7,7 @@ import { createHigherOrderComponent } from '@wordpress/compose';
 const { Consumer, Provider } = createContext( {
 	name: null,
 	icon: null,
-	priority: null,
+	priority: 10,
 } );
 
 export { Provider as PluginContextProvider };
