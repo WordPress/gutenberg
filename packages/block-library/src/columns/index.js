@@ -32,7 +32,7 @@ export const settings = {
 					{
 						name: 'core/paragraph',
 						attributes: {
-							content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent et eros eu felis.',
+							content: __( 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent et eros eu felis.' ),
 						},
 					},
 					{
@@ -44,7 +44,7 @@ export const settings = {
 					{
 						name: 'core/paragraph',
 						attributes: {
-							content: 'Suspendisse commodo neque lacus, a dictum orci interdum et.',
+							content: __( 'Suspendisse commodo neque lacus, a dictum orci interdum et.' ),
 						},
 					},
 				],
