@@ -34,13 +34,13 @@ import ToolbarContainer from './toolbar-container';
  * Either `controls` or `children` is required, otherwise this components
  * renders nothing.
  *
- * @param {Object}        props
- * @param {Array}        [props.controls]  The controls to render in this toolbar.
- * @param {ReactElement} [props.children]  Any other things to render inside the
- *                                         toolbar besides the controls.
- * @param {string}       [props.className] Class to set on the container div.
+ * @param {Object}    props
+ * @param {Array}     [props.controls]  The controls to render in this toolbar.
+ * @param {WPElement} [props.children]  Any other things to render inside the
+ *                                      toolbar besides the controls.
+ * @param {string}    [props.className] Class to set on the container div.
  *
- * @return {ReactElement} The rendered toolbar.
+ * @return {WPComponent} The rendered component.
  */
 function Toolbar( { controls = [], children, className, isCollapsed, icon, label, ...otherProps } ) {
 	if (

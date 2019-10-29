@@ -8,6 +8,7 @@
 @import "./reset";
 @import "./editor-styles";
 
+$playground-header-height: 95px;
 
 .playground__header {
 	align-items: center;
@@ -15,6 +16,25 @@
 	display: flex;
 	justify-content: space-between;
 	padding: 20px;
+	height: $playground-header-height;
+}
+
+.playground__sidebar {
+	position: fixed;
+	top: $playground-header-height;
+	right: 0;
+	bottom: 0;
+	width: $sidebar-width;
+	border-left: $border-width solid $light-gray-500;
+	height: auto;
+	overflow: auto;
+	-webkit-overflow-scrolling: touch;
+
+	// Temporarily disable the sidebar on mobile
+	display: none;
+	@include break-small() {
+		display: block;
+	}
 }
 
 .playground__logo {
@@ -23,6 +43,9 @@
 }
 
 .playground__body {
+	@include break-small() {
+		width: calc(100% - #{$sidebar-width});
+	}
 	padding-top: 20px;
 
 	img {

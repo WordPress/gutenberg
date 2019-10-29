@@ -35,7 +35,6 @@ import BlockColorsStyleSelector from './block-colors-selector';
 
 function NavigationMenu( {
 	attributes,
-	setAttributes,
 	clientId,
 	pages,
 	isRequesting,
@@ -43,6 +42,7 @@ function NavigationMenu( {
 	textColor,
 	setBackgroundColor,
 	setTextColor,
+	setAttributes,
 } ) {
 	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator( clientId );
 	const defaultMenuItems = useMemo(
@@ -51,7 +51,9 @@ function NavigationMenu( {
 				return null;
 			}
 			return pages.map( ( page ) => {
-				return [ 'core/navigation-menu-item', { label: page.title.rendered, destination: page.permalink_template } ];
+				return [ 'core/navigation-menu-item',
+					{ label: page.title.rendered, url: page.permalink_template },
+				];
 			} );
 		},
 		[ pages ]
@@ -138,6 +140,7 @@ function NavigationMenu( {
 						template={ defaultMenuItems ? defaultMenuItems : null }
 						allowedBlocks={ [ 'core/navigation-menu-item' ] }
 						templateInsertUpdatesSelection={ false }
+						__experimentalMoverDirection={ 'horizontal' }
 					/>
 				}
 			</div>
