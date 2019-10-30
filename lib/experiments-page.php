@@ -130,12 +130,11 @@ function gutenberg_display_experiment_section() {
  * @return array Filtered editor settings.
  */
 function gutenberg_experiments_editor_settings( $settings ) {
-	$experiments_exist    = get_option( 'gutenberg-experiments' );
 	$experiments_settings = array(
-		'__experimentalEnableLegacyWidgetBlock' => $experiments_exist ? array_key_exists( 'gutenberg-widget-experiments', get_option( 'gutenberg-experiments' ) ) : false,
-		'__experimentalEnableMenuBlock'         => $experiments_exist ? array_key_exists( 'gutenberg-menu-block', get_option( 'gutenberg-experiments' ) ) : false,
-		'__experimentalBlockDirectory'          => $experiments_exist ? array_key_exists( 'gutenberg-block-directory', get_option( 'gutenberg-experiments' ) ) : false,
-		'__experimentalEnableFullSiteEditing'   => $experiments_exist ? array_key_exists( 'gutenberg-full-site-editing', get_option( 'gutenberg-experiments' ) ) : false,
+		'__experimentalEnableLegacyWidgetBlock' => gutenberg_is_experiment_enabled( 'gutenberg-widget-experiments' ),
+		'__experimentalEnableMenuBlock'         => gutenberg_is_experiment_enabled( 'gutenberg-menu-block' ),
+		'__experimentalBlockDirectory'          => gutenberg_is_experiment_enabled( 'gutenberg-block-directory' ),
+		'__experimentalEnableFullSiteEditing'   => gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing' ),
 
 	);
 	return array_merge( $settings, $experiments_settings );
