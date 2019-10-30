@@ -23,13 +23,14 @@ import {
 	withFallbackStyles,
 } from '@wordpress/components';
 import {
-	URLInput,
-	RichText,
+	__experimentalGradientPickerPanel,
+	__experimentalUseGradient,
 	ContrastChecker,
 	InspectorControls,
-	withColors,
 	PanelColorSettings,
-	__experimentalGradientPickerControl,
+	RichText,
+	URLInput,
+	withColors,
 } from '@wordpress/block-editor';
 
 const { getComputedStyle } = window;
@@ -94,7 +95,6 @@ function ButtonEdit( {
 		text,
 		title,
 		url,
-		customGradient,
 	} = attributes;
 	const onSetLinkRel = useCallback(
 		( value ) => {
@@ -121,6 +121,11 @@ function ButtonEdit( {
 		},
 		[ rel, setAttributes ]
 	);
+	const {
+		gradientClass,
+		gradientValue,
+		setGradient,
+	} = __experimentalUseGradient();
 
 	const linkId = `wp-block-button__inline-link-${ instanceId }`;
 	return (
@@ -132,16 +137,19 @@ function ButtonEdit( {
 				withoutInteractiveFormatting
 				className={ classnames(
 					'wp-block-button__link', {
-						'has-background': backgroundColor.color || customGradient,
-						[ backgroundColor.class ]: ! customGradient && backgroundColor.class,
+						'has-background': backgroundColor.color || gradientValue,
+						[ backgroundColor.class ]: ! gradientValue && backgroundColor.class,
 						'has-text-color': textColor.color,
 						[ textColor.class ]: textColor.class,
+						[ gradientClass ]: gradientClass,
 						'no-border-radius': borderRadius === 0,
 					}
 				) }
 				style={ {
-					backgroundColor: ! customGradient && backgroundColor.color,
-					background: customGradient,
+					...( ! backgroundColor.color && gradientValue ?
+						{ background: gradientValue } :
+						{ backgroundColor: backgroundColor.color }
+					),
 					color: textColor.color,
 					borderRadius: borderRadius ? borderRadius + 'px' : undefined,
 				} }
@@ -195,20 +203,15 @@ function ButtonEdit( {
 						} }
 					/>
 				</PanelColorSettings>
-				<PanelBody title={ __( 'Gradient' ) }>
-					<__experimentalGradientPickerControl
-						onChange={
-							( newGradient ) => {
-								setAttributes( {
-									customGradient: newGradient,
-									backgroundColor: undefined,
-									customBackgroundColor: undefined,
-								} );
-							}
+				<__experimentalGradientPickerPanel
+					onChange={
+						( newGradient ) => {
+							setGradient( newGradient );
+							setBackgroundColor();
 						}
-						value={ customGradient }
-					/>
-				</PanelBody>
+					}
+					value={ gradientValue }
+				/>
 				<BorderPanel
 					borderRadius={ borderRadius }
 					setAttributes={ setAttributes }

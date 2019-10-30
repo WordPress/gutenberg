@@ -5,9 +5,6 @@
 		"label": {
 			"type": "string"
 		},
-		"destination": {
-			"type": "string"
-		},
 		"nofollow": {
 			"type": "boolean",
 			"default": false
@@ -21,6 +18,9 @@
 		"opensInNewTab": {
 			"type": "boolean",
 			"default": false
+		},
+		"url": {
+			"type": "string"
 		}
 	}
 }

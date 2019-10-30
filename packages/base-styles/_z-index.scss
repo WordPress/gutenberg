@@ -24,6 +24,7 @@ $z-layers: (
 	".block-editor-warning": 5,
 	".block-library-gallery-item__inline-menu": 20,
 	".block-editor-url-input__suggestions": 30,
+	".edit-post-layout__footer": 30,
 	".edit-post-header": 30,
 	".edit-widgets-header": 30,
 	".block-library-button__inline-link .block-editor-url-input__suggestions": 6, // URL suggestions for button block above sibling inserter
@@ -31,6 +32,7 @@ $z-layers: (
 	".wp-block-cover__inner-container": 1, // InnerBlocks area inside cover image block
 	".wp-block-cover.has-background-dim::before": 1, // Overlay area inside block cover need to be higher than the video background.
 	".wp-block-cover__video-background": 0, // Video background inside cover block.
+	".wp-block-site-title__save-button": 1,
 
 	// Active pill button
 	".components-button.is-button {:focus or .is-primary}": 1,

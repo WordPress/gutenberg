@@ -32,6 +32,7 @@ export const PREFERENCES_DEFAULTS = {
  *  __experimentalEnableLegacyWidgetBlock  boolean       Whether the user has enabled the Legacy Widget Block
  *  __experimentalEnableMenuBlock          boolean       Whether the user has enabled the Menu Block
  *  __experimentalBlockDirectory           boolean       Whether the user has enabled the Block Directory
+ *  __experimentalEnableFullSiteEditing    boolean       Whether the user has enabled Full Site Editing
  */
 export const SETTINGS_DEFAULTS = {
 	alignWide: false,
@@ -152,80 +153,98 @@ export const SETTINGS_DEFAULTS = {
 	__experimentalEnableLegacyWidgetBlock: false,
 	__experimentalEnableMenuBlock: false,
 	__experimentalBlockDirectory: false,
+	__experimentalEnableFullSiteEditing: false,
 	gradients: [
 		{
 			name: __( 'Vivid cyan blue to vivid purple' ),
 			gradient: 'linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%)',
+			slug: 'vivid-cyan-blue-to-vivid-purple',
 		},
 		{
 			name: __( 'Vivid green cyan to vivid cyan blue' ),
 			gradient: 'linear-gradient(135deg,rgba(0,208,132,1) 0%,rgba(6,147,227,1) 100%)',
+			slug: 'vivid-green-cyan-to-vivid-cyan-blue',
 		},
 		{
 			name: __( 'Light green cyan to vivid green cyan' ),
 			gradient: 'linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%)',
+			slug: 'light-green-cyan-to-vivid-green-cyan',
 		},
 		{
 			name: __( 'Luminous vivid amber to luminous vivid orange' ),
 			gradient: 'linear-gradient(135deg,rgba(252,185,0,1) 0%,rgba(255,105,0,1) 100%)',
+			slug: 'luminous-vivid-amber-to-luminous-vivid-orange',
 		},
 		{
 			name: __( 'Luminous vivid orange to vivid red' ),
 			gradient: 'linear-gradient(135deg,rgba(255,105,0,1) 0%,rgb(207,46,46) 100%)',
+			slug: 'luminous-vivid-orange-to-vivid-red',
 		},
 		{
 			name: __( 'Very light gray to cyan bluish gray' ),
 			gradient: 'linear-gradient(135deg,rgb(238,238,238) 0%,rgb(169,184,195) 100%)',
+			slug: 'very-light-gray-to-cyan-bluish-gray',
 		},
 		// The following use new, customized colors.
 		{
 			name: __( 'Cool to warm spectrum' ),
 			gradient: 'linear-gradient(135deg,rgb(74,234,220) 0%,rgb(151,120,209) 20%,rgb(207,42,186) 40%,rgb(238,44,130) 60%,rgb(251,105,98) 80%,rgb(254,248,76) 100%)',
+			slug: 'cool-to-warm-spectrum',
 		},
 		{
 			name: __( 'Blush light purple' ),
 			gradient: 'linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%)',
+			slug: 'blush-light-purple',
 		},
 		{
 			name: __( 'Blush bordeaux' ),
 			gradient: 'linear-gradient(135deg,rgb(254,205,165) 0%,rgb(254,45,45) 50%,rgb(107,0,62) 100%)',
+			slug: 'blush-bordeaux',
 		},
 		{
 			name: __( 'Purple crush' ),
 			gradient: 'linear-gradient(135deg,rgb(52,226,228) 0%,rgb(71,33,251) 50%,rgb(171,29,254) 100%)',
+			slug: 'purple-crush',
 		},
 		{
 			name: __( 'Luminous dusk' ),
 			gradient: 'linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%)',
+			slug: 'luminous-dusk',
 		},
 		{
 			name: __( 'Hazy dawn' ),
 			gradient: 'linear-gradient(135deg,rgb(250,172,168) 0%,rgb(218,208,236) 100%)',
+			slug: 'hazy-dawn',
 		},
 		{
 			name: __( 'Pale ocean' ),
 			gradient: 'linear-gradient(135deg,rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%)',
+			slug: 'pale-ocean',
 		},
 		{
 			name: __( 'Electric grass' ),
 			gradient: 'linear-gradient(135deg,rgb(202,248,128) 0%,rgb(113,206,126) 100%)',
+			slug: 'electric-grass',
 		},
 		{
 			name: __( 'Subdued olive' ),
 			gradient: 'linear-gradient(135deg,rgb(250,250,225) 0%,rgb(103,166,113) 100%)',
+			slug: 'subdued-olive',
 		},
 		{
 			name: __( 'Atomic cream' ),
 			gradient: 'linear-gradient(135deg,rgb(253,215,154) 0%,rgb(0,74,89) 100%)',
+			slug: 'atomic-cream',
 		},
 		{
 			name: __( 'Nightshade' ),
 			gradient: 'linear-gradient(135deg,rgb(51,9,104) 0%,rgb(49,205,207) 100%)',
+			slug: 'nightshade',
 		},
 		{
 			name: __( 'Midnight' ),
 			gradient: 'linear-gradient(135deg,rgb(2,3,129) 0%,rgb(40,116,252) 100%)',
+			slug: 'midnight',
 		},
 	],
 };
-
