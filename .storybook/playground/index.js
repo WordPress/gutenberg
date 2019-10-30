@@ -24,7 +24,7 @@ import '@wordpress/format-library';
 /**
  * Internal dependencies
  */
-// import './style.scss';
+import './style.scss';
 
 /* eslint-disable no-restricted-syntax */
 import '@wordpress/components/build-style/style.css';
