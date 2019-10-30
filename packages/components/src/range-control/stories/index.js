@@ -15,7 +15,7 @@ import RangeControl from '../';
 
 export default { title: 'RangeControl', component: RangeControl };
 
-const RangeControlWithState = ( { ...props } ) => {
+const RangeControlWithState = ( props ) => {
 	const [ value, setValue ] = useState( 5 );
 
 	return (
@@ -93,7 +93,7 @@ export const withReset = () => {
 	return (
 		<RangeControlWithState
 			label={ label }
-			allowReset={ true }
+			allowReset
 		/>
 	);
 };
