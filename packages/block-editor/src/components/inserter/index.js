@@ -12,7 +12,6 @@ import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, ifCondition } from '@wordpress/compose';
 import {
 	createBlock,
-	getBlockType,
 } from '@wordpress/blocks';
 
 /**
@@ -136,7 +135,7 @@ export default compose( [
 		const hasSingleBlockType = allowedBlocks && ( get( allowedBlocks, [ 'length' ], 0 ) === 1 );
 		let allowedBlockType = false;
 		if ( hasSingleBlockType ) {
-			allowedBlockType = getBlockType( allowedBlocks );
+			allowedBlockType = allowedBlocks[ 0 ];
 		}
 		return {
 			hasItems: hasInserterItems( rootClientId ),
