@@ -82,9 +82,9 @@ describe( 'Basic rendering', () => {
 
 		const activePropertyLabel = Array.from( container.querySelectorAll( 'legend' ) ).find( ( legend ) => legend.innerHTML === 'Padding' );
 
-		const activeDeviceLabel = Array.from( container.querySelectorAll( 'label' ) ).find( ( label ) => label.innerHTML.includes( 'All' ) );
+		const activeViewportLabel = Array.from( container.querySelectorAll( 'label' ) ).find( ( label ) => label.innerHTML.includes( 'All' ) );
 
-		const defaultControl = container.querySelector( `#${ activeDeviceLabel.getAttribute( 'for' ) }` );
+		const defaultControl = container.querySelector( `#${ activeViewportLabel.getAttribute( 'for' ) }` );
 
 		const toggleLabel = Array.from( container.querySelectorAll( 'label' ) ).filter( ( label ) => label.innerHTML.includes( 'Use the same padding on all screensizes' ) );
 
@@ -99,7 +99,7 @@ describe( 'Basic rendering', () => {
 		expect( defaultControlGroup ).not.toBeNull();
 		expect( responsiveControlGroup ).toBeNull();
 
-		expect( activeDeviceLabel ).not.toBeNull();
+		expect( activeViewportLabel ).not.toBeNull();
 		expect( activePropertyLabel ).not.toBeNull();
 		expect( defaultControl ).not.toBeNull();
 		expect( toggleLabel ).not.toBeNull();
@@ -204,8 +204,8 @@ describe( 'Default and Responsive modes', () => {
 		expect( responsiveControlGroup ).not.toBeNull();
 	} );
 
-	it( 'should render a set of custom devices in responsive mode when provided', () => {
-		const customDeviceSet = [
+	it( 'should render controls for a set of custom viewports in responsive mode when provided', () => {
+		const customViewportSet = [
 			{
 				id: 'tiny',
 				label: 'Tiny',
@@ -233,22 +233,22 @@ describe( 'Default and Responsive modes', () => {
 					property="padding"
 					responsiveControlsActive={ true }
 					renderDefaultControl={ mockRenderDefaultControl }
-					devices={ customDeviceSet }
+					viewports={ customViewportSet }
 				/>, container
 			);
 		} );
 
 		const defaultRenderControlCall = 1;
 
-		// Get array of labels which match those in the custom devices provided
-		const responsiveDevicesLabels = Array.from( container.querySelectorAll( 'label' ) ).filter( ( label ) => {
+		// Get array of labels which match those in the custom viewports provided
+		const responsiveViewportsLabels = Array.from( container.querySelectorAll( 'label' ) ).filter( ( label ) => {
 			const labelText = label.innerHTML;
 			// Is the label one of those in the custom device set?
-			return !! customDeviceSet.find( ( deviceName ) => labelText.includes( deviceName.label ) );
+			return !! customViewportSet.find( ( deviceName ) => labelText.includes( deviceName.label ) );
 		} );
 
-		expect( responsiveDevicesLabels ).toHaveLength( customDeviceSet.length );
-		expect( mockRenderDefaultControl ).toHaveBeenCalledTimes( customDeviceSet.length + defaultRenderControlCall );
+		expect( responsiveViewportsLabels ).toHaveLength( customViewportSet.length );
+		expect( mockRenderDefaultControl ).toHaveBeenCalledTimes( customViewportSet.length + defaultRenderControlCall );
 	} );
 
 	it( 'should switch between default and responsive modes when interacting with toggle control', () => {
@@ -296,14 +296,14 @@ describe( 'Default and Responsive modes', () => {
 		expect( responsiveControlGroup ).toBeNull();
 	} );
 
-	it( 'should render custom responsive controls when renderResponsiveControls is provided and in responsive mode ', () => {
+	it( 'should render custom responsive controls when renderResponsiveControls prop is provided and in responsive mode ', () => {
 		const spyRenderDefaultControl = jest.fn();
 
-		const mockRenderResponsiveControls = jest.fn( ( devices ) => {
-			return devices.map( ( { id, label } ) => {
+		const mockRenderResponsiveControls = jest.fn( ( viewports ) => {
+			return viewports.map( ( { id, label } ) => {
 				return (
 					<Fragment key={ `${ inputId }-${ id }` }>
-						<label htmlFor={ `${ inputId }-${ id }` }>Custom Device { label }</label>
+						<label htmlFor={ `${ inputId }-${ id }` }>Custom Viewport { label }</label>
 						<input
 							id={ `${ inputId }-${ id }` }
 							defaultValue={ label }

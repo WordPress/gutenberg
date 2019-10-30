@@ -68,12 +68,13 @@ function GroupEdit( {
 
 				<PanelBody title={ __( 'Spacing' ) }>
 					<ResponsiveBlockControl
-						legend="Padding"
+						title="Padding"
 						property="padding"
 						renderDefaultControl={ ( labelComponent ) => (
 							<SelectControl
 								label={ labelComponent }
 								options={ sizeOptions }
+								onChange={ () => {} }
 							/>
 						) }
 					/>

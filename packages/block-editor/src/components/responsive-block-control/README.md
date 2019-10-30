@@ -48,19 +48,19 @@ registerBlockType( 'my-plugin/my-block', {
 			// handle persisting the toggle state
 		};
 
-		const updateSpacing = ( dimension, size, device = '' ) => {
+		const updateSpacing = ( dimension, size, viewport = '' ) => {
 			setAttributes( {
-				[ `${ dimension }${ device }` ]: size,
+				[ `${ dimension }${ viewport }` ]: size,
 			} );
 		};
 		
 		// Your custom control can be anything you'd like to use.
 		// You are not restricted to `DimensionControl`s, but this
 		// makes life easier if dealing with standard CSS values.
-		const mySizeControl = ( labelComponent, device ) => {
+		const mySizeControl = ( labelComponent, viewport ) => {
 			return (
 				<DimensionControl
-					label={ device.label }
+					label={ viewport.label }
 					onChange={ partialRight( updateSpacing, 'paddingSize' ) }
 					value={ paddingSize }
 				/>
@@ -108,15 +108,15 @@ Used to build accessible labels and ARIA roles for the control group. Should rep
 * **Required:** `true`
 * **Args:** 
   - **labelComponent:** (`Function`) - a rendered `ResponsiveBlockControlLabel` component for your control.
-  - **device:** (`Object`) - an object representing device attributes for your control.
+  - **viewport:** (`Object`) - an object representing viewport attributes for your control.
 
-A render function (prop) used to render the control for which you would like to display per viewport settings. The component you return from this function will be used to render the control displayed for the (default) "All" state and (if the `renderResponsiveControls` is not provided) the individual responsive controls when in "responsive" mode. It is passed a pre-created, accessible `<label>`. Your control may also use the contextual information provided by the `device` argument to ensure your component renders appropriately depending on the `device` setting currently being rendered (eg: `All` or one of the responsive variants).
+A render function (prop) used to render the control for which you would like to display per viewport settings. The component you return from this function will be used to render the control displayed for the (default) "All" state and (if the `renderResponsiveControls` is not provided) the individual responsive controls when in "responsive" mode. It is passed a pre-created, accessible `<label>`. Your control may also use the contextual information provided by the `viewport` argument to ensure your component renders appropriately depending on the `viewport` setting currently being rendered (eg: `All` or one of the responsive variants).
 
 __Note:__ you are required to handle persisting any state produced by the component you pass as `renderDefaultControl`. `ResponsiveBlockControl` is "controlled" and does not persist state in any form.
 
 ```jsx
-const renderDefaultControl = ( labelComponent, device ) => {
-	const { id, label } = device;
+const renderDefaultControl = ( labelComponent, viewport ) => {
+	const { id, label } = viewport;
 	// eg: 
 	// {
 	// 	id: 'small',
@@ -135,19 +135,19 @@ const renderDefaultControl = ( labelComponent, device ) => {
 * **Default:** `undefined`
 * **Required:** `false`
 * **Args:** 
-  - **devices:** (`Array`) - an array of device `Object`s, each with an `id` and `label` property.
+  - **viewports:** (`Array`) - an array of viewport `Object`s, each with an `id` and `label` property.
   
 
 An optional render function (prop) used to render the controls for the _responsive_ settings. If not provioded, by default, responsive controls will be _automatically_ rendered using the component returned by the `renderDefaultControl` prop. For _complete_ control over the output of the responsive controls, you may return a suitable component here which will be rendered when the control group is in "responsive" mode.
 
 ```jsx
-const renderResponsiveControls = (devices) => {
+const renderResponsiveControls = (viewports) => {
 	const inputId = uniqueId(); // lodash 
 
-	return devices.map( ( { id, label } ) => {
+	return viewports.map( ( { id, label } ) => {
 		return (
 			<Fragment key={ `${ inputId }-${ id }` }>
-				<label htmlFor={ `${ inputId }-${ id }` }>Custom Device { label }</label>
+				<label htmlFor={ `${ inputId }-${ id }` }>Custom Viewport { label }</label>
 				<input
 					id={ `${ inputId }-${ id }` }
 					defaultValue={ label }

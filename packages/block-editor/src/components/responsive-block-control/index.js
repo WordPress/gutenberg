@@ -32,18 +32,18 @@ function ResponsiveBlockControl( props ) {
 			id: 'all',
 			label: __( 'All' ), /* translators: 'Label. Used to signify a layout property (eg: margin, padding) will apply uniformly to all screensizes.' */
 		},
-		devices = [
+		viewports = [
 			{
 				id: 'small',
-				label: __( 'Small devices' ),
+				label: __( 'Small screens' ),
 			},
 			{
 				id: 'medium',
-				label: __( 'Medium devices' ),
+				label: __( 'Medium screens' ),
 			},
 			{
 				id: 'large',
-				label: __( 'Large devices' ),
+				label: __( 'Large screens' ),
 			},
 		],
 	} = props;
@@ -70,12 +70,12 @@ function ResponsiveBlockControl( props ) {
 	/* translators: 'Help text for the responsive mode toggle control.' */
 	const toggleHelpText = __( 'Toggle between using the same value for all screen sizes or using a unique value per screen size.' );
 
-	const defaultControl = renderDefaultControl( <ResponsiveBlockControlLabel property={ property } device={ defaultLabel } />, defaultLabel );
+	const defaultControl = renderDefaultControl( <ResponsiveBlockControlLabel property={ property } viewport={ defaultLabel } />, defaultLabel );
 
 	const defaultResponsiveControls = () => {
-		return devices.map( ( device ) => (
-			<Fragment key={ device.id }>
-				{ renderDefaultControl( <ResponsiveBlockControlLabel property={ property } device={ device } />, device ) }
+		return viewports.map( ( viewport ) => (
+			<Fragment key={ viewport.id }>
+				{ renderDefaultControl( <ResponsiveBlockControlLabel property={ property } viewport={ viewport } />, viewport ) }
 			</Fragment>
 		) );
 	};
@@ -102,7 +102,7 @@ function ResponsiveBlockControl( props ) {
 
 				{ isResponsiveMode && (
 					<div className="block-editor-responsive-block-control__group block-editor-responsive-block-control__group--responsive" hidden={ ! isResponsiveMode }>
-						{ ( renderResponsiveControls ? renderResponsiveControls( devices ) : defaultResponsiveControls() ) }
+						{ ( renderResponsiveControls ? renderResponsiveControls( viewports ) : defaultResponsiveControls() ) }
 					</div>
 				) }
 
