@@ -35,9 +35,6 @@ import '@wordpress/block-library/build-style/theme.css';
 import '@wordpress/format-library/build-style/style.css';
 /* eslint-enable no-restricted-syntax */
 
-// TODO: Find a way to include those fonts.
-// <link href="https://fonts.googleapis.com/css?family=Noto+Serif:400,700" rel="stylesheet">
-
 function App() {
 	const [ blocks, updateBlocks ] = useState( [] );
 
