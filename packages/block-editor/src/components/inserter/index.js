@@ -90,7 +90,13 @@ class Inserter extends Component {
 	 * @return {WPElement} Dropdown content element.
 	 */
 	renderContent( { onClose } ) {
-		const { rootClientId, clientId, isAppender, showInserterHelpPanel } = this.props;
+		const {
+			rootClientId,
+			clientId,
+			isAppender,
+			showInserterHelpPanel,
+			__experimentalSelectBlockOnInsert: selectBlockOnInsert,
+		} = this.props;
 
 		return (
 			<InserterMenu
@@ -99,6 +105,7 @@ class Inserter extends Component {
 				clientId={ clientId }
 				isAppender={ isAppender }
 				showInserterHelpPanel={ showInserterHelpPanel }
+				__experimentalSelectBlockOnInsert={ selectBlockOnInsert }
 			/>
 		);
 	}
@@ -133,10 +140,12 @@ export default compose( [
 		const allowedBlocks = __experimentalGetAllowedBlocks( rootClientId );
 
 		const hasSingleBlockType = allowedBlocks && ( get( allowedBlocks, [ 'length' ], 0 ) === 1 );
+
 		let allowedBlockType = false;
 		if ( hasSingleBlockType ) {
 			allowedBlockType = allowedBlocks[ 0 ];
 		}
+
 		return {
 			hasItems: hasInserterItems( rootClientId ),
 			hasSingleBlockType,
@@ -151,6 +160,7 @@ export default compose( [
 				const {
 					hasSingleBlockType,
 					allowedBlockType,
+					__experimentalSelectBlockOnInsert: selectBlockOnInsert,
 				} = ownProps;
 
 				if ( ! hasSingleBlockType ) {
@@ -187,7 +197,8 @@ export default compose( [
 				insertBlock(
 					blockToInsert,
 					getInsertionIndex(),
-					rootClientId
+					rootClientId,
+					selectBlockOnInsert
 				);
 			},
 		};

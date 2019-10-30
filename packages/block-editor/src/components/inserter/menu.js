@@ -531,21 +531,27 @@ export default compose(
 				const {
 					getSelectedBlock,
 				} = select( 'core/block-editor' );
-				const { isAppender } = ownProps;
+				const {
+					isAppender,
+					onSelect,
+					__experimentalSelectBlockOnInsert: selectBlockOnInsert,
+				} = ownProps;
 				const { name, initialAttributes } = item;
 				const selectedBlock = getSelectedBlock();
 				const insertedBlock = createBlock( name, initialAttributes );
+
 				if ( ! isAppender && selectedBlock && isUnmodifiedDefaultBlock( selectedBlock ) ) {
 					replaceBlocks( selectedBlock.clientId, insertedBlock );
 				} else {
 					insertBlock(
 						insertedBlock,
 						getInsertionIndex(),
-						ownProps.destinationRootClientId
+						ownProps.destinationRootClientId,
+						selectBlockOnInsert
 					);
 				}
 
-				ownProps.onSelect();
+				onSelect();
 				return insertedBlock;
 			},
 		};
