@@ -66,27 +66,12 @@
 .wp-block-navigation-menu-item {
 	&:not(.is-editing) {
 		font-family: inherit;
-		font-size: inherit;
-		background-color: var(--background-color-menu-link);
-		color: var(--color-menu-link);
+		font-size: $text-editor-font-size;
 		font-weight: bold;
-
-		.components-external-link {
-			color: var(--color-menu-link);
-		}
 	}
 
 	&.is-editing .components-text-control__input {
 		width: inherit;
-		background-color: var(--background-color-menu-link);
-		color: var(--color-menu-link);
-
-		.components-external-link {
-			color: var(--color-menu-link);
-			&:focus {
-				color: var(--color-menu-link);
-			}
-		}
 	}
 
 	&.is-editing,
@@ -94,9 +79,6 @@
 		box-shadow: 0 0 1px $light-gray-900 inset;
 		border-radius: 4px;
 		min-width: 30px;
-		&:focus {
-			color: var(--color-menu-link);
-		}
 	}
 }
 
