@@ -111,7 +111,7 @@ function LinkControl( {
 
 		return Promise.resolve(
 			[ {
-				id: '1',
+				id: '-1',
 				title: value,
 				url: type === 'URL' ? prependHTTP( value ) : value,
 				type,
