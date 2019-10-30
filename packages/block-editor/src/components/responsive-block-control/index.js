@@ -6,7 +6,7 @@ import { isFunction } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __, _x, sprintf } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 import { Fragment, useState, useEffect, useCallback } from '@wordpress/element';
 
@@ -30,7 +30,7 @@ function ResponsiveBlockControl( props ) {
 		responsiveControlsActive = false,
 		defaultLabel = {
 			id: 'all',
-			label: _x( 'All', 'Label. Used to signify a layout property (eg: margin, padding) should apply uniformly to all screensizes.' ),
+			label: __( 'All' ), /* translators: 'Label. Used to signify a layout property (eg: margin, padding) will apply uniformly to all screensizes.' */
 		},
 		devices = [
 			{
@@ -64,9 +64,11 @@ function ResponsiveBlockControl( props ) {
 		return null;
 	}
 
-	const toggleControlLabel = toggleLabel || sprintf( _x( 'Use the same %s on all screensizes.', 'Toggle control label. Should the property be the same across all screen sizes or unique per screen size.' ), property );
+	/* translators: 'Toggle control label. Should the property be the same across all screen sizes or unique per screen size.'. %s property value for the control (eg: margin, padding...etc) */
+	const toggleControlLabel = toggleLabel || sprintf( __( 'Use the same %s on all screensizes.', ), property );
 
-	const toggleHelpText = _x( 'Toggle between using the same value for all screen sizes or using a unique value per screen size.', 'Toogle control help text.' );
+	/* translators: 'Help text for the responsive mode toggle control.' */
+	const toggleHelpText = __( 'Toggle between using the same value for all screen sizes or using a unique value per screen size.' );
 
 	const defaultControl = renderDefaultControl( <ResponsiveBlockControlLabel property={ property } device={ defaultLabel } />, defaultLabel );
 
