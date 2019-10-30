@@ -66,13 +66,13 @@ function NavigationMenu( {
 		[ pages ]
 	);
 
-	const navigationMenuStyles = {};
-	if ( textColor.color ) {
-		navigationMenuStyles[ '--color-menu-link' ] = textColor.color;
+	const navigationMenuInlineStyles = {};
+	if ( attributes.customTextColor) {
+		navigationMenuInlineStyles[ 'color' ] = attributes.customTextColor;
 	}
 
-	if ( backgroundColor.color ) {
-		navigationMenuStyles[ '--background-color-menu-link' ] = backgroundColor.color;
+	if ( attributes.customBackgroundColor ) {
+		navigationMenuInlineStyles[ 'backgroundColor' ] = attributes.customBackgroundColor;
 	}
 
 	const navigationMenuClasses = classnames(
@@ -121,7 +121,7 @@ function NavigationMenu( {
 					{ navigatorToolbarButton }
 				</Toolbar>
 				<BlockColorsStyleSelector
-					style={ navigationMenuStyles }
+					style={ navigationMenuInlineStyles }
 					className={ navigationMenuClasses }
 					backgroundColor={ backgroundColor }
 					textColor={ textColor }
@@ -147,7 +147,7 @@ function NavigationMenu( {
 				</PanelBody>
 			</InspectorControls>
 
-			<div className={ navigationMenuClasses } style={ navigationMenuStyles }>
+			<div className={ navigationMenuClasses } style={ navigationMenuInlineStyles }>
 				{ isRequesting && <><Spinner /> { __( 'Loading Navigation…' ) } </> }
 				{ pages &&
 					<InnerBlocks
