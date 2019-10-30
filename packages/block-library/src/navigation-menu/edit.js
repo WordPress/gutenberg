@@ -123,8 +123,6 @@ function NavigationMenu( {
 					{ navigatorToolbarButton }
 				</Toolbar>
 				<BlockColorsStyleSelector
-					style={ navigationMenuInlineStyles }
-					className={ navigationMenuClasses }
 					backgroundColor={ backgroundColor }
 					textColor={ textColor }
 					onColorChange={ setColorType }
