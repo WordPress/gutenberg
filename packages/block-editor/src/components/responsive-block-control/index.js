@@ -20,7 +20,33 @@ import {
 import ResponsiveBlockControlLabel from './label';
 
 function ResponsiveBlockControl( props ) {
-	const { legend, property, toggleLabel, responsiveControlsActive = false, onIsResponsiveModeChange, renderDefaultControl, defaultLabel = _x( 'All', 'Label. Used to signify a layout property (eg: margin, padding) should apply uniformly to all screensizes.' ), devices = [ __( 'Desktop' ), __( 'Tablet' ), __( 'Mobile' ) ], renderResponsiveControls } = props;
+	const {
+		legend,
+		property,
+		toggleLabel,
+		onIsResponsiveModeChange,
+		renderDefaultControl,
+		renderResponsiveControls,
+		responsiveControlsActive = false,
+		defaultLabel = {
+			id: 'all',
+			label: _x( 'All', 'Label. Used to signify a layout property (eg: margin, padding) should apply uniformly to all screensizes.' ),
+		},
+		devices = [
+			{
+				id: 'small',
+				label: __( 'Small devices' ),
+			},
+			{
+				id: 'medium',
+				label: __( 'Medium devices' ),
+			},
+			{
+				id: 'large',
+				label: __( 'Large devices' ),
+			},
+		],
+	} = props;
 
 	const [ isResponsiveMode, setIsResponsiveMode ] = useState( responsiveControlsActive );
 
@@ -45,9 +71,9 @@ function ResponsiveBlockControl( props ) {
 	const defaultControl = renderDefaultControl( <ResponsiveBlockControlLabel property={ property } device={ defaultLabel } /> );
 
 	const defaultResponsiveControls = () => {
-		return devices.map( ( deviceLabel, index ) => (
-			<Fragment key={ index }>
-				{ renderDefaultControl( <ResponsiveBlockControlLabel property={ property } device={ deviceLabel } /> ) }
+		return devices.map( ( device ) => (
+			<Fragment key={ device.id }>
+				{ renderDefaultControl( <ResponsiveBlockControlLabel property={ property } device={ device } /> ) }
 			</Fragment>
 		) );
 	};

@@ -201,7 +201,24 @@ describe( 'Default and Responsive modes', () => {
 	} );
 
 	it( 'should render a set of custom devices in responsive mode when provided', () => {
-		const customDeviceSet = [ 'Tiny', 'Small', 'Medium', 'Huge' ];
+		const customDeviceSet = [
+			{
+				id: 'tiny',
+				label: 'Tiny',
+			},
+			{
+				id: 'small',
+				label: 'Small',
+			},
+			{
+				id: 'medium',
+				label: 'Medium',
+			},
+			{
+				id: 'huge',
+				label: 'Huge',
+			},
+		];
 
 		const mockRenderDefaultControl = jest.fn( renderTestDefaultControlComponent );
 
@@ -223,7 +240,7 @@ describe( 'Default and Responsive modes', () => {
 		const responsiveDevicesLabels = Array.from( container.querySelectorAll( 'label' ) ).filter( ( label ) => {
 			const labelText = label.innerHTML;
 			// Is the label one of those in the custom device set?
-			return !! customDeviceSet.find( ( deviceName ) => labelText.includes( deviceName ) );
+			return !! customDeviceSet.find( ( deviceName ) => labelText.includes( deviceName.label ) );
 		} );
 
 		expect( responsiveDevicesLabels ).toHaveLength( customDeviceSet.length );
@@ -279,14 +296,13 @@ describe( 'Default and Responsive modes', () => {
 		const spyRenderDefaultControl = jest.fn();
 
 		const mockRenderResponsiveControls = jest.fn( ( devices ) => {
-			return devices.map( ( deviceLabel ) => {
-				const deviceLower = deviceLabel.toLowerCase();
+			return devices.map( ( { id, label } ) => {
 				return (
-					<Fragment key={ `${ inputId }-${ deviceLower }` }>
-						<label htmlFor={ `${ inputId }-${ deviceLower }` }>Custom Device { deviceLabel }</label>
+					<Fragment key={ `${ inputId }-${ id }` }>
+						<label htmlFor={ `${ inputId }-${ id }` }>Custom Device { label }</label>
 						<input
-							id={ `${ inputId }-${ deviceLower }` }
-							defaultValue={ deviceLabel }
+							id={ `${ inputId }-${ id }` }
+							defaultValue={ label }
 							type="range"
 						/>
 					</Fragment>
