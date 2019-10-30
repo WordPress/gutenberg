@@ -88,24 +88,12 @@ registerBlockType( 'my-plugin/my-block', {
 
 ## Props
 
-```
-legend,
-property,
-toggleLabel,
-onIsResponsiveModeChange,
-renderDefaultControl,
-renderResponsiveControls,
-responsiveControlsActive = false,
-defaultLabel
-devices
-```
-
-### `legend`
+### `title`
 * **Type:** `String`
 * **Default:** `undefined`
 * **Required:** `true`
 
-The title of the control group used in the `fieldset`'s `legend` element to label the entire set of controls. 
+The title of the control group used in the `fieldset`'s `legend` element to label the _entire_ set of controls. 
 
 ### `property`
 * **Type:** `String`

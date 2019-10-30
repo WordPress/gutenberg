@@ -21,7 +21,7 @@ import ResponsiveBlockControlLabel from './label';
 
 function ResponsiveBlockControl( props ) {
 	const {
-		legend,
+		title,
 		property,
 		toggleLabel,
 		onIsResponsiveModeChange,
@@ -60,7 +60,7 @@ function ResponsiveBlockControl( props ) {
 		setIsResponsiveMode( ! isChecked );
 	} );
 
-	if ( ! legend || ! property || ! renderDefaultControl ) {
+	if ( ! title || ! property || ! renderDefaultControl ) {
 		return null;
 	}
 
@@ -81,7 +81,7 @@ function ResponsiveBlockControl( props ) {
 	return (
 
 		<fieldset className="block-editor-responsive-block-control">
-			<legend className="block-editor-responsive-block-control__legend">{ legend }</legend>
+			<legend className="block-editor-responsive-block-control__title">{ title }</legend>
 
 			<div className="block-editor-responsive-block-control__inner">
 				<ToggleControl

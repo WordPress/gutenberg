@@ -73,7 +73,7 @@ describe( 'Basic rendering', () => {
 		act( () => {
 			render(
 				<ResponsiveBlockControl
-					legend="Padding"
+					title="Padding"
 					property="padding"
 					renderDefaultControl={ renderTestDefaultControlComponent }
 				/>, container
@@ -124,7 +124,7 @@ describe( 'Basic rendering', () => {
 		act( () => {
 			render(
 				<ResponsiveBlockControl
-					legend="Padding"
+					title="Padding"
 					renderDefaultControl={ renderTestDefaultControlComponent }
 				/>, container
 			);
@@ -137,7 +137,7 @@ describe( 'Basic rendering', () => {
 		act( () => {
 			render(
 				<ResponsiveBlockControl
-					legend="Padding"
+					title="Padding"
 					property="padding"
 				/>, container
 			);
@@ -151,7 +151,7 @@ describe( 'Basic rendering', () => {
 		act( () => {
 			render(
 				<ResponsiveBlockControl
-					legend="Padding"
+					title="Padding"
 					property="padding"
 					renderDefaultControl={ renderTestDefaultControlComponent }
 					toggleLabel={ customToggleLabel }
@@ -170,7 +170,7 @@ describe( 'Basic rendering', () => {
 		act( () => {
 			render(
 				<ResponsiveBlockControl
-					legend="Padding"
+					title="Padding"
 					property="padding"
 					renderDefaultControl={ renderTestDefaultControlComponent }
 					defaultLabel={ customDefaultControlGroupLabel }
@@ -189,7 +189,7 @@ describe( 'Default and Responsive modes', () => {
 		act( () => {
 			render(
 				<ResponsiveBlockControl
-					legend="Padding"
+					title="Padding"
 					property="padding"
 					responsiveControlsActive={ true }
 					renderDefaultControl={ renderTestDefaultControlComponent }
@@ -229,7 +229,7 @@ describe( 'Default and Responsive modes', () => {
 		act( () => {
 			render(
 				<ResponsiveBlockControl
-					legend="Padding"
+					title="Padding"
 					property="padding"
 					responsiveControlsActive={ true }
 					renderDefaultControl={ mockRenderDefaultControl }
@@ -255,7 +255,7 @@ describe( 'Default and Responsive modes', () => {
 		act( () => {
 			render(
 				<ResponsiveBlockControl
-					legend="Padding"
+					title="Padding"
 					property="padding"
 					renderDefaultControl={ renderTestDefaultControlComponent }
 				/>, container
@@ -317,7 +317,7 @@ describe( 'Default and Responsive modes', () => {
 		act( () => {
 			render(
 				<ResponsiveBlockControl
-					legend="Padding"
+					title="Padding"
 					property="padding"
 					renderDefaultControl={ spyRenderDefaultControl }
 					renderResponsiveControls={ mockRenderResponsiveControls }
@@ -344,7 +344,7 @@ describe( 'Default and Responsive modes', () => {
 		act( () => {
 			render(
 				<ResponsiveBlockControl
-					legend="Padding"
+					title="Padding"
 					property="padding"
 					renderDefaultControl={ renderTestDefaultControlComponent }
 					onIsResponsiveModeChange={ onIsResponsiveModeChangeSpy }
