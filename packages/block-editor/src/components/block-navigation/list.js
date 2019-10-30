@@ -16,7 +16,7 @@ import { create, getTextContent } from '@wordpress/rich-text';
  * Internal dependencies
  */
 import BlockIcon from '../block-icon';
-import BlockListAppender from '../button-block-appender';
+import ButtonBlockAppender from '../button-block-appender';
 
 /**
  * Get the block display name, if it has one, or the block title if it doesn't.
@@ -93,7 +93,7 @@ export default function BlockNavigationList( {
 			{ shouldShowAppender && (
 				<li>
 					<div className="editor-block-navigation__item block-editor-block-navigation__item">
-						<BlockListAppender rootClientId={ parentBlockClientId } />
+						<ButtonBlockAppender rootClientId={ parentBlockClientId } />
 					</div>
 				</li>
 			) }
