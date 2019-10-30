@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<!-- translators: accessibility text for blocks with invalid content. %d: localized block title -->
+	<string name="gutenberg_native_string_1">"%s block. This block has invalid content"</string>
+	<string name="gutenberg_native_string_2">"Problem displaying block"</string>
+	<!-- translators: accessibility text. %s: current block position (number). -->
+	<string name="gutenberg_native_string_3">"Remove block at row %s"</string>
+	<string name="gutenberg_native_string_4">"Double tap to remove the block"</string>
+	<!-- translators: accessibility text. %s: block name. -->
+	<string name="gutenberg_native_string_5">"%s Block"</string>
+	<string name="gutenberg_native_string_6">"Row %d."</string>
+	<string name="gutenberg_native_string_7">"Navigate Up"</string>
+	<string name="gutenberg_native_string_8">"ADD BLOCK HERE"</string>
+	<!-- translators: accessibility text. %1: current block position (number). %2: next block position (number) -->
+	<string name="gutenberg_native_string_9">"Move block up from row %1$s to row %2$s"</string>
+	<string name="gutenberg_native_string_10">"Move block up"</string>
+	<string name="gutenberg_native_string_11">"Double tap to move the block up"</string>
+	<!-- translators: accessibility text. %1: current block position (number). %2: next block position (number) -->
+	<string name="gutenberg_native_string_12">"Move block down from row %1$s to row %2$s"</string>
+	<string name="gutenberg_native_string_13">"Move block down"</string>
+	<string name="gutenberg_native_string_14">"Double tap to move the block down"</string>
+	<string name="gutenberg_native_string_15">"Open Settings"</string>
+	<string name="gutenberg_native_string_16">"Start writing…"</string>
+	<string name="gutenberg_native_string_17">"Double tap to add a block"</string>
+	<string name="gutenberg_native_string_18">"ADD IMAGE"</string>
+	<string name="gutenberg_native_string_19">"ADD VIDEO"</string>
+	<string name="gutenberg_native_string_20">"ADD IMAGE OR VIDEO"</string>
+	<string name="gutenberg_native_string_21">"Double tap to select"</string>
+	<string name="gutenberg_native_string_22">"Double tap to select an image"</string>
+	<string name="gutenberg_native_string_23">"Double tap to select a video"</string>
+	<!-- translators: accessibility text for the media block empty state. %s: media type -->
+	<string name="gutenberg_native_string_24">"%s block. Empty"</string>
+	<string name="gutenberg_native_string_25">"Failed to insert media.\nPlease tap for options."</string>
+	<string name="gutenberg_native_string_26">"Take a Video"</string>
+	<string name="gutenberg_native_string_27">"Take a Photo"</string>
+	<string name="gutenberg_native_string_28">"Take a Photo or Video"</string>
+	<string name="gutenberg_native_string_29">"Choose from device"</string>
+	<string name="gutenberg_native_string_30">"WordPress Media Library"</string>
+	<string name="gutenberg_native_string_31">"Ungroup"</string>
+	<string name="gutenberg_native_string_32">"Paste URL"</string>
+	<string name="gutenberg_native_string_33">"Problem opening the video"</string>
+	<string name="gutenberg_native_string_34">"No application can handle this request. Please install a Web browser."</string>
+	<string name="gutenberg_native_string_35">"An unknown error occurred. Please try again."</string>
+	<!-- translators: accessibility text. %s: heading level. -->
+	<string name="gutenberg_native_string_36">"Level %s. Empty."</string>
+	<!-- translators: accessibility text. 1: heading level. 2: heading content. -->
+	<string name="gutenberg_native_string_37">"Level %1$s. %2$s"</string>
+	<string name="gutenberg_native_string_38">"Clear All Settings"</string>
+	<string name="gutenberg_native_string_39">"Add URL"</string>
+	<string name="gutenberg_native_string_40">"Size"</string>
+	<string name="gutenberg_native_string_41">"Alt Text"</string>
+	<string name="gutenberg_native_string_42">"Double tap and hold to edit"</string>
+	<!-- translators: accessibility text. %s: image caption. -->
+	<string name="gutenberg_native_string_43">"Image caption. %s"</string>
+	<string name="gutenberg_native_string_44">"Empty"</string>
+	<string name="gutenberg_native_string_45">"Unsupported"</string>
+	<!-- translators: accessibility text. %s: Page break text. -->
+	<string name="gutenberg_native_string_46">"Page break block. %s"</string>
+	<!-- translators: accessibility text -->
+	<string name="gutenberg_native_string_47">"Double tap to edit this value"</string>
+	<!-- translators: accessibility text (hint for switches) -->
+	<string name="gutenberg_native_string_48">"Double tap to toggle setting"</string>
+	<string name="gutenberg_native_string_49">"Content…"</string>
+	<string name="gutenberg_native_string_50">"Reset Block"</string>
+	<string name="gutenberg_native_string_51">"Add a description"</string>
+	<string name="gutenberg_native_string_52">"Add annotation"</string>
+	<string name="gutenberg_native_string_53">"Remove annotations"</string>
+	<string name="gutenberg_native_string_54">"Annotations Sidebar"</string>
+	<string name="gutenberg_native_string_55">"My Document Setting Panel"</string>
+	<string name="gutenberg_native_string_56">"My post status info"</string>
+	<string name="gutenberg_native_string_57">"Here is the panel content!"</string>
+	<string name="gutenberg_native_string_58">"My pre publish panel"</string>
+	<string name="gutenberg_native_string_59">"My post publish panel"</string>
+	<string name="gutenberg_native_string_60">"Title:"</string>
+	<string name="gutenberg_native_string_61">"Sidebar title plugin"</string>
+	<string name="gutenberg_native_string_62">"Double tap to undo last change"</string>
+	<string name="gutenberg_native_string_63">"Double tap to redo last change"</string>
+	<string name="gutenberg_native_string_64">"Hide keyboard"</string>
+	<string name="gutenberg_native_string_65">"Tap to hide the keyboard"</string>
+	<!-- translators: Checkbox toggle label -->
+	<string name="gutenberg_native_string_66">"Show section"</string>
+	<!-- translators: accessibility text. empty post title. -->
+	<string name="gutenberg_native_string_67">"Post title. Empty"</string>
+	<!-- translators: accessibility text. %s: text content of the post title. -->
+	<string name="gutenberg_native_string_68">"Post title. %s"</string>
+	<string name="gutenberg_native_string_69">"Link inserted"</string>
+	<string name="gutenberg_native_string_70">"Link text"</string>
+	<string name="gutenberg_native_string_71">"Add link text"</string>
+	<string name="gutenberg_native_string_72">"Translate"</string>
+	<string name="gutenberg_native_string_73">"hello"</string>
+	<plurals name="gutenberg_native_string_74">
+		<item quantity="one">"%d banana"</item>
+		<item quantity="other">"%d bananas"</item>
+	</plurals>
+	<string name="gutenberg_native_string_75">"hello %s"</string>
+	<string name="gutenberg_native_string_76">"cheeseburger"</string>
+	<plurals name="gutenberg_native_string_77">
+		<item quantity="one">"%d cat"</item>
+		<item quantity="other">"%d cats"</item>
+	</plurals>
+</resources>
