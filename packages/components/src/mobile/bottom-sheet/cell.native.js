@@ -25,6 +25,8 @@ class BottomSheetCell extends Component {
 			isEditingValue: props.autoFocus || false,
 			isScreenReaderEnabled: false,
 		};
+
+		this.handleScreenReaderToggled = this.handleScreenReaderToggled.bind( this );
 	}
 
 	componentDidUpdate() {
@@ -38,6 +40,10 @@ class BottomSheetCell extends Component {
 			'screenReaderChanged',
 			this.handleScreenReaderToggled,
 		);
+
+		AccessibilityInfo.isScreenReaderEnabled().then( ( isScreenReaderEnabled ) => {
+			this.setState( { isScreenReaderEnabled } );
+		} );
 	}
 
 	componentWillUnmount() {
