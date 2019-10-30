@@ -290,7 +290,7 @@ class URLInput extends Component {
 			};
 		};
 
-		/* eslint-disable jsx-a11y/no-autofocus, react/jsx-key */
+		/* eslint-disable jsx-a11y/no-autofocus */
 		return (
 			<div className={ classnames( 'editor-url-input block-editor-url-input', className, {
 				'is-full-width': isFullWidth,
@@ -357,7 +357,7 @@ class URLInput extends Component {
 				}
 			</div>
 		);
-		/* eslint-enable jsx-a11y/no-autofocus, react/jsx-key */
+		/* eslint-enable jsx-a11y/no-autofocus */
 	}
 }
 
