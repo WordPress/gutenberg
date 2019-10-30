@@ -20,7 +20,6 @@ import {
 } from '@wordpress/components';
 import {
 	BlockControls,
-	BlockIcon,
 	MEDIA_TYPE_IMAGE,
 	MEDIA_TYPE_VIDEO,
 	MediaPlaceholder,
@@ -32,6 +31,7 @@ import {
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { isURL } from '@wordpress/url';
+import { compose, withPreferredColorScheme } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -62,17 +62,14 @@ class MediaContainer extends Component {
 	}
 
 	componentDidMount() {
-		const { mediaId, mediaUrl, onSelectMedia } = this.props;
+		const { mediaId, mediaUrl, onMediaUpdate, mediaType } = this.props;
 
 		if ( mediaId && mediaUrl && ! isURL( mediaUrl ) ) {
-			if ( mediaUrl.indexOf( 'file:' ) === 0 ) {
-				requestMediaImport( mediaUrl, ( id, url, type ) => {
+			if ( mediaUrl.indexOf( 'file:' ) === 0 && mediaType === MEDIA_TYPE_IMAGE ) {
+				// We don't want to call this for video because it is starting a media upload for the cover url
+				requestMediaImport( mediaUrl, ( id, url ) => {
 					if ( url ) {
-						onSelectMedia( {
-							media_type: type,
-							id,
-							url,
-						} );
+						onMediaUpdate( { id, url } );
 					}
 				} );
 			}
@@ -112,7 +109,8 @@ class MediaContainer extends Component {
 			return <Icon icon={ SvgIconRetry } { ...( styles.iconRetry, isVideo ? styles.iconRetryVideo : {} ) } />;
 		}
 
-		return <Icon icon={ icon } { ...styles.icon } />;
+		const iconStyle = this.props.getStylesFromColorScheme( styles.icon, styles.iconDark );
+		return <Icon icon={ icon } { ...iconStyle } />;
 	}
 
 	renderToolbarEditButton( open ) {
@@ -163,6 +161,8 @@ class MediaContainer extends Component {
 		const { finalWidth, finalHeight, imageWidthWithinContainer, isUploadFailed, retryMessage } = params;
 		const opacity = isUploadInProgress ? 0.3 : 1;
 
+		const contentStyle = ! imageWidthWithinContainer ? styles.content : styles.contentCentered;
+
 		return (
 			<TouchableWithoutFeedback
 				accessible={ ! isSelected }
@@ -170,7 +170,7 @@ class MediaContainer extends Component {
 				onLongPress={ openMediaOptions }
 				disabled={ ! isSelected }
 			>
-				<View style={ styles.content }>
+				<View style={ contentStyle }>
 					{ ! imageWidthWithinContainer &&
 						<View style={ styles.imageContainer }>
 							{ this.getIcon( false ) }
@@ -254,7 +254,7 @@ class MediaContainer extends Component {
 	renderPlaceholder() {
 		return (
 			<MediaPlaceholder
-				icon={ <BlockIcon icon={ icon } /> }
+				icon={ this.getIcon( false ) }
 				labels={ {
 					title: __( 'Media area' ),
 				} }
@@ -307,4 +307,7 @@ class MediaContainer extends Component {
 	}
 }
 
-export default withNotices( MediaContainer );
+export default compose(
+	withNotices,
+	withPreferredColorScheme,
+)( MediaContainer );

@@ -96,9 +96,9 @@ export const coreBlocks = [
 	textColumns,
 	verse,
 	video,
-].reduce( ( memo, block ) => {
-	memo[ block.name ] = block;
-	return memo;
+].reduce( ( accumulator, block ) => {
+	accumulator[ block.name ] = block;
+	return accumulator;
 }, {} );
 
 /**
@@ -141,9 +141,8 @@ export const registerCoreBlocks = () => {
 		separator,
 		list,
 		quote,
+		mediaText,
 		preformatted,
-		// eslint-disable-next-line no-undef
-		!! __DEV__ ? mediaText : null,
 		// eslint-disable-next-line no-undef
 		!! __DEV__ ? group : null,
 	].forEach( registerBlock );

@@ -96,9 +96,6 @@ export class BlockList extends Component {
 					ListHeaderComponent={ header }
 					ListEmptyComponent={ this.renderDefaultBlockAppender }
 					ListFooterComponent={ withFooter && this.renderBlockListFooter }
-					getItemLayout={ ( data, index ) => {
-						return { length: 0, offset: 0, index };
-					} }
 				/>
 
 				{ renderAppender && blockClientIds.length > 0 &&

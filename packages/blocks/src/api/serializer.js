@@ -85,9 +85,9 @@ export function getSaveElement( blockTypeOrName, attributes, innerBlocks = [] ) 
 		/**
 		 * Filters the props applied to the block save result element.
 		 *
-		 * @param {Object}      props      Props applied to save element.
-		 * @param {WPBlockType} blockType  Block type definition.
-		 * @param {Object}      attributes Block attributes.
+		 * @param {Object}  props      Props applied to save element.
+		 * @param {WPBlock} blockType  Block type definition.
+		 * @param {Object}  attributes Block attributes.
 		 */
 		const props = applyFilters(
 			'blocks.getSaveContent.extraProps',
@@ -104,9 +104,9 @@ export function getSaveElement( blockTypeOrName, attributes, innerBlocks = [] ) 
 	/**
 	 * Filters the save result of a block during serialization.
 	 *
-	 * @param {WPElement}   element    Block save result.
-	 * @param {WPBlockType} blockType  Block type definition.
-	 * @param {Object}      attributes Block attributes.
+	 * @param {WPElement} element    Block save result.
+	 * @param {WPBlock}   blockType  Block type definition.
+	 * @param {Object}    attributes Block attributes.
 	 */
 	element = applyFilters( 'blocks.getSaveElement', element, blockType, attributes );
 
@@ -150,28 +150,27 @@ export function getSaveContent( blockTypeOrName, attributes, innerBlocks ) {
  * @return {Object<string,*>} Subset of attributes for comment serialization.
  */
 export function getCommentAttributes( blockType, attributes ) {
-	return reduce( blockType.attributes, ( result, attributeSchema, key ) => {
+	return reduce( blockType.attributes, ( accumulator, attributeSchema, key ) => {
 		const value = attributes[ key ];
-
 		// Ignore undefined values.
 		if ( undefined === value ) {
-			return result;
+			return accumulator;
 		}
 
 		// Ignore all attributes but the ones with an "undefined" source
 		// "undefined" source refers to attributes saved in the block comment.
 		if ( attributeSchema.source !== undefined ) {
-			return result;
+			return accumulator;
 		}
 
 		// Ignore default value.
 		if ( 'default' in attributeSchema && attributeSchema.default === value ) {
-			return result;
+			return accumulator;
 		}
 
 		// Otherwise, include in comment set.
-		result[ key ] = value;
-		return result;
+		accumulator[ key ] = value;
+		return accumulator;
 	}, {} );
 }
 

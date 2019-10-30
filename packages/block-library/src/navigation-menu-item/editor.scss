@@ -1,39 +1,64 @@
-$menu-label-field-width: 140px;
 
-.wp-block-navigation-menu-item__edit-container {
-	display: grid;
-	grid-auto-columns: min-content;
-	grid-auto-flow: column;
-	align-items: center;
-	white-space: nowrap;
-	border: 1px solid $light-gray-500;
-	// two pixes comes from two times one pixel border
-	width: $menu-label-field-width + $icon-button-size + 2px;
-	padding-left: 1px;
+// Normalize menu items and edit containers, to look mostly the same.
+.wp-block-navigation-menu-item__field .components-text-control__input.components-text-control__input,
+.wp-block-navigation-menu-item__container {
+	border-radius: 0;
+	// Make it the same height as the appender to prevent a jump. Maybe revisit this.
+	line-height: $icon-button-size;
+	min-height: $icon-button-size;
 }
 
-.wp-block-navigation-menu-item__edit-container .wp-block-navigation-menu-item__field {
-	border-right: 1px solid $light-gray-500 !important;
-	width: $menu-label-field-width;
-	border: none;
-	border-radius: 0;
-	padding-left: $grid-size-large;
+.wp-block-navigation-menu-item {
+	margin-right: $grid-size;
 
-	min-height: $icon-button-size - 1px;
-	line-height: $icon-button-size - 1px;
+	// Provide a base menu item margin.
+	// This should be the same inside the field,
+	// and the edit container should compensate.
+	// This is to make sure the edit and view are the same.
+	padding: 0 $grid-size;
+}
 
-	&,
-	&:focus {
-		color: $dark-gray-500;
+.wp-block-navigation-menu-item__edit-container {
+	display: flex;
+	white-space: nowrap;
+
+	// Compensate for menu item base padding.
+	margin-left: -$grid-size;
+
+	.wp-block-navigation-menu-item__field {
+		margin-right: $grid-size;
+
+		// This should match the padding of the menu item.
+		padding: 0 $grid-size;
+
+		// This make it look like an input field.
+		// We may want to not style this at all, but let's try this.
+		// We don't use the mixins because they increase the size of the input, which doesn't work with PlainText.
+		box-shadow: inset 0 0 0 1px $dark-gray-200;
+		transition: box-shadow 0.1s linear;
+		border-radius: $radius-round-rectangle;
+		@include reduce-motion("transition");
+
+		&:focus {
+			color: $dark-gray-900;
+			box-shadow: inset 0 0 0 2px $blue-medium-focus;
+
+			// Windows High Contrast mode will show this outline, but not the box-shadow.
+			outline: 2px solid transparent;
+		}
 	}
 }
 
-
 .wp-block-navigation-menu-item {
 	font-family: $editor-font;
-	color: #0073af;
 	font-weight: bold;
 	font-size: $text-editor-font-size;
+	background-color: var(--background-color-menu-link);
+	color: var(--color-menu-link);
+
+	&:focus {
+		color: var(--color-menu-link);
+	}
 }
 
 .wp-block-navigation-menu-item__nofollow-external-link {
@@ -42,10 +67,7 @@ $menu-label-field-width: 140px;
 
 // Separator
 .wp-block-navigation-menu-item__separator {
-	margin-top: $grid-size;
-	margin-bottom: $grid-size;
-	margin-left: 0;
-	margin-right: 0;
+	margin: $grid-size 0 $grid-size;
 	border-top: $border-width solid $light-gray-500;
 }
 
@@ -60,10 +82,6 @@ $menu-label-field-width: 140px;
 }
 
 .wp-block-navigation-menu .block-editor-block-list__block[data-type="core/navigation-menu-item"] {
-	& > .block-editor-block-list__block-edit > div[role="toolbar"] {
-		display: none;
-	}
-
 	& > .block-editor-block-list__insertion-point {
 		display: none;
 	}
