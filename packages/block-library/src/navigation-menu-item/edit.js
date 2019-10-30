@@ -74,7 +74,7 @@ function NavigationMenuItemEdit( {
 	 * For instance, it will block to move between menu items
 	 * when the LinkOver is focused.
 	 *
-	 * @param {Object} event
+	 * @param {Event} event
 	 */
 	const handleLinkControlOnKeyDown = ( event ) => {
 		const { keyCode } = event;
@@ -89,15 +89,14 @@ function NavigationMenuItemEdit( {
 	 * Updates the link attribute when it changes
 	 * through of the `onLinkChange` LinkControl callback.
 	 *
-	 * @param {Object|null} newlink The object link if it has been selected, or null.
+	 * @param {Object|null} itemLink Link object if it has been selected. Otherwise, Null.
 	 */
-	const updateLink = ( newlink ) => {
-		if ( ! newlink ) {
+	const updateLink = ( itemLink ) => {
+		if ( ! itemLink ) {
 			return;
 		}
-		setAttributes( { link: newlink } );
-		const { newTitle, newUrl } = newlink;
-		setAttributes( { title: newTitle, url: newUrl } );
+
+		setAttributes( { title: itemLink.title, url: itemLink.url } );
 	};
 
 	/**
@@ -145,8 +144,8 @@ function NavigationMenuItemEdit( {
 				>
 					<ToggleControl
 						checked={ attributes.opensInNewTab }
-						onChange={ ( opensInNewTabSetting ) => {
-							setAttributes( { opensInNewTabSetting } );
+						onChange={ ( newTab ) => {
+							setAttributes( { opensInNewTab: newTab } );
 						} }
 						label={ __( 'Open in new tab' ) }
 					/>
@@ -163,8 +162,8 @@ function NavigationMenuItemEdit( {
 				>
 					<TextControl
 						value={ attributes.title || '' }
-						onChange={ ( newtTitle ) => {
-							setAttributes( { newtTitle } );
+						onChange={ ( itemTitle ) => {
+							setAttributes( { title: itemTitle } );
 						} }
 						label={ __( 'Title Attribute' ) }
 						help={ __( 'Provide more context about where the link goes.' ) }
