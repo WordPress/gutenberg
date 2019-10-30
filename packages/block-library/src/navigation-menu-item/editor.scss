@@ -70,6 +70,10 @@
 		background-color: var(--background-color-menu-link);
 		color: var(--color-menu-link);
 		width: inherit;
+
+		.components-external-link {
+			color: var(--color-menu-link);
+		}
 	}
 
 	&.is-editing .components-text-control__input {
