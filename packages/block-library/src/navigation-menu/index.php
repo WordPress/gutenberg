@@ -43,7 +43,7 @@ function block_navigation_colors( $attributes ) {
 	if ( array_key_exists( 'textColorCSSClass', $attributes ) ) {
 		$colors['classes'][] = trim( $attributes['textColorCSSClass'] );
 	}
-	if ( array_key_exists( 'textColorValue', $attributes ) ){
+	if ( array_key_exists( 'textColorValue', $attributes ) ) {
 		// Text color - or add inline `color` style.
 		$colors['style'] .= "color:{$attributes['textColorValue']};";
 	}
@@ -66,11 +66,11 @@ function render_block_navigation_menu( $attributes, $content, $block ) {
 	$colors = block_navigation_colors( $attributes );
 	$items  = setup_block_nav_items( $block, $colors );
 	$args   = (object) array(
-		'before'          => '',
-		'after'           => '',
-		'link_before'     => '',
-		'link_after'      => '',
-		'theme_location'  => 'block',
+		'before'         => '',
+		'after'          => '',
+		'link_before'    => '',
+		'link_after'     => '',
+		'theme_location' => 'block',
 	);
 
 	add_filter( 'nav_menu_link_attributes', 'block_navigation_link_attributes', 10, 2 );
@@ -100,33 +100,41 @@ function block_navigation_link_attributes( $attributes, $item ) {
 /**
  * Prepares menu items to be used in Walker_Nav_Menu.
  *
- * @param array $block  The parsed block.
- * @param array $colors Custom colors classes and styles.
+ * @param array $block     The parsed block.
+ * @param array $colors    Custom colors classes and styles.
+ * @param int   $parent_id Optional. Menu item ID of parent menu item.
  * @return array Menu items
  */
 function setup_block_nav_items( $block, $colors, $parent_id = 0 ) {
 	static $menu_item_id = 0;
+
 	$nav_menu_items = array();
-	$nav_menu_item  = array(
-		'classes'       => $colors['classes'],
-		'current'       => false,
-		'menu_order'    => 0,
-		'post_content'  => '',
-		'post_excerpt'  => '',
-		'post_type'     => 'nav_menu_item',
-		'style'         => $colors['style'],
-	);
 
 	foreach ( $block['innerBlocks'] as $inner_block ) {
 		if ( empty( $inner_block['attrs']['label'] ) ) {
 			continue;
 		}
 
-		$nav_menu_item['ID']         = ++$menu_item_id;
-		$nav_menu_item['post_title'] = $inner_block['attrs']['label'];
-		$nav_menu_item['url']        = $inner_block['attrs']['url'] ?? '#';
+		if ( empty( $inner_block['attrs']['url'] ) ) {
+			$inner_block['attrs']['url'] = '#';
+		}
 
+		$nav_menu_item = array(
+			'classes'      => $colors['classes'],
+			'current'      => false,
+			'ID'           => ++$menu_item_id,
+			'menu_order'   => 0,
+			'post_content' => '',
+			'post_excerpt' => '',
+			'post_title'   => $inner_block['attrs']['label'],
+			'post_type'    => 'nav_menu_item',
+			'style'        => $colors['style'],
+			'url'          => $inner_block['attrs']['url'],
+		);
+
+		$sub_menu_items = setup_block_nav_items( $inner_block, $colors, $nav_menu_item['ID'] );
 		if ( ! empty( $sub_menu_items ) ) {
+			$nav_menu_items             = array_merge( $nav_menu_items, $sub_menu_items );
 			$nav_menu_item['classes'][] = 'menu-item-has-children';
 		}
 
@@ -135,9 +143,6 @@ function setup_block_nav_items( $block, $colors, $parent_id = 0 ) {
 		}
 
 		$nav_menu_items[] = (object) $nav_menu_item;
-
-		$sub_menu_items = setup_block_nav_items( $inner_block, $colors, $nav_menu_item['ID'] );
-		$nav_menu_items = array_merge( $nav_menu_items, $sub_menu_items );
 	}
 
 	return array_map( 'wp_setup_nav_menu_item', $nav_menu_items );
