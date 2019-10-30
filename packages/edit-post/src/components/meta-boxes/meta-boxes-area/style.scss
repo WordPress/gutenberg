@@ -87,7 +87,7 @@
 	// checkboxes used in metaboxes have to be slightly unstyled here.
 	// @todo: remove this entire rule once checkboxes are the same everywhere.
 	// See: https://github.com/WordPress/gutenberg/issues/18053
-	.postbox-container .postbox input[type="checkbox"] {
+	.metabox-location-side .postbox input[type="checkbox"] {
 		border: $border-width solid $dark-gray-300;
 
 		&:checked {
