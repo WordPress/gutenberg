@@ -136,9 +136,7 @@ export const experimentToolbar = () => {
 	return (
 		<Toolbar>
 			<ToolbarItem>
-				<Flex justify="left" gap="extraSmall">
-					<IconButton icon="insert" />
-				</Flex>
+				<IconButton icon="insert" />
 			</ToolbarItem>
 			<ToolbarItem>
 				<Flex justify="left" gap="extraSmall">
