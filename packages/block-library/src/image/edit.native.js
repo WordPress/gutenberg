@@ -2,12 +2,13 @@
  * External dependencies
  */
 import React from 'react';
-import { View, ImageBackground, Text, TouchableWithoutFeedback, Dimensions } from 'react-native';
+import { View, ImageBackground, Text, TouchableWithoutFeedback, Dimensions, Platform } from 'react-native';
 import {
 	requestMediaImport,
 	mediaUploadSync,
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
+	requestImageFullscreenPreview,
 } from 'react-native-gutenberg-bridge';
 import { isEmpty, map } from 'lodash';
 
@@ -147,6 +148,9 @@ export class ImageEdit extends React.Component {
 		this.setState( {
 			isCaptionSelected: false,
 		} );
+		if ( Platform.OS === 'android' ) {
+			requestImageFullscreenPreview( attributes.url );
+		}
 	}
 
 	updateMediaProgress( payload ) {
