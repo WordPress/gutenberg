@@ -602,6 +602,19 @@
 		}
 	}
 
+	// Full and Wide Image movers inside column blocks
+	.wp-block-columns & {
+		[data-align="full"],
+		[data-align="wide"] {
+			&.is-multi-selected > .block-editor-block-mover,
+			> .block-editor-block-list__block-edit > .block-editor-block-mover {
+				width: 30px;
+				left: -$block-side-ui-width - $block-side-ui-clearance - $block-padding - $border-width - $grid-size;
+				top: -$block-padding - $border-width;
+			}
+		}
+	}
+
 	// Clear floats
 	&[data-clear="true"] {
 		float: none;
