@@ -47,8 +47,8 @@ function NavigationMenuItemEdit( {
 	insertMenuItemBlock,
 	fetchSearchSuggestions,
 } ) {
-	const { label, title, url, opensInNewTab } = attributes;
-	const link = { title, url };
+	const { label, opensInNewTab, title, url } = attributes;
+	const link = title ? { title, url } : null;
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
 	const [ wasCloseByLinkControl, setWasCloseByLinkControl ] = useState( false );
 
@@ -93,7 +93,8 @@ function NavigationMenuItemEdit( {
 	 */
 	const updateLink = ( itemLink ) => {
 		if ( ! itemLink ) {
-			return;
+			// If not link, then set empty string to link attrs.
+			return setAttributes( { title: '', url: '' } );
 		}
 
 		setAttributes( { title: itemLink.title, url: itemLink.url } );
