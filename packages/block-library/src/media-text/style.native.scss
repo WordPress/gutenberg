@@ -32,6 +32,12 @@
 	flex: 1;
 }
 
+.contentCentered {
+	flex: 1;
+	justify-content: center;
+	align-items: center;
+}
+
 .imageContainer {
 	align-items: center;
 	background-color: $gray-lighten-30;
@@ -50,6 +56,10 @@
 	fill: $gray-dark;
 	width: 24px;
 	height: 24px;
+}
+
+.iconDark {
+	fill: $white;
 }
 
 .iconRetry {

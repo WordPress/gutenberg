@@ -10,7 +10,7 @@ import { View } from 'react-native';
 import { __, _x } from '@wordpress/i18n';
 import {
 	BlockControls,
-	BlockVerticalAlignmentToolbar,
+	//	BlockVerticalAlignmentToolbar,
 	InnerBlocks,
 	withColors,
 } from '@wordpress/block-editor';
@@ -132,16 +132,17 @@ class MediaTextEdit extends Component {
 			attributes,
 			backgroundColor,
 			setAttributes,
-			isMobile,
 			isSelected,
+		//	isMobile,
 		} = this.props;
 		const {
-			isStackedOnMobile,
+		//	isStackedOnMobile,
 			mediaPosition,
 			mediaWidth,
 			verticalAlignment,
 		} = attributes;
-		const shouldStack = isStackedOnMobile && isMobile;
+		const shouldStack = false; // We are temporarily not stacking until we fix alignment buttons
+		// const shouldStack = isStackedOnMobile && isMobile; // <<< Original line
 		const temporaryMediaWidth = shouldStack ? 100 : ( this.state.mediaWidth || mediaWidth );
 		const widthString = `${ temporaryMediaWidth }%`;
 		const containerStyles = {
@@ -168,9 +169,9 @@ class MediaTextEdit extends Component {
 			onClick: () => setAttributes( { mediaPosition: 'right' } ),
 		} ];
 
-		const onVerticalAlignmentChange = ( alignment ) => {
+		/* const onVerticalAlignmentChange = ( alignment ) => {
 			setAttributes( { verticalAlignment: alignment } );
-		};
+		}; */
 
 		return (
 			<>
@@ -178,11 +179,12 @@ class MediaTextEdit extends Component {
 					<Toolbar
 						controls={ toolbarControls }
 					/>
+					{ /* // Temporarily commenting out until alignment functionality is fixed
 					<BlockVerticalAlignmentToolbar
 						onChange={ onVerticalAlignmentChange }
 						value={ verticalAlignment }
 						isCollapsed={ false }
-					/>
+					/> */ }
 				</BlockControls>
 				<View style={ containerStyles }>
 					<View style={ { width: widthString } }>

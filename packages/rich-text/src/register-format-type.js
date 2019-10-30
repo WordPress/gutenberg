@@ -11,15 +11,24 @@ import { addFilter } from '@wordpress/hooks';
 import { compose } from '@wordpress/compose';
 
 /**
+ * @typedef {Object} WPFormat
+ *
+ * @property {string}   name        A string identifying the format. Must be
+ *                                  unique across all registered formats.
+ * @property {string}   tagName     The HTML tag this format will wrap the
+ *                                  selection with.
+ * @property {string}   [className] A class to match the format.
+ * @property {string}   title       Name of the format.
+ * @property {Function} edit        Should return a component for the user to
+ *                                  interact with the new registered format.
+ */
+
+/**
  * Registers a new format provided a unique name and an object defining its
  * behavior.
  *
  * @param {string}   name                 Format name.
- * @param {Object}   settings             Format settings.
- * @param {string}   settings.tagName     The HTML tag this format will wrap the selection with.
- * @param {string}   [settings.className] A class to match the format.
- * @param {string}   settings.title       Name of the format.
- * @param {Function} settings.edit        Should return a component for the user to interact with the new registered format.
+ * @param {WPFormat} settings             Format settings.
  *
  * @return {WPFormat|undefined} The format, if it has been successfully registered;
  *                              otherwise `undefined`.

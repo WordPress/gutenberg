@@ -7,6 +7,7 @@ import Picker from '../picker';
 export default function BottomSheetPickerCell( props ) {
 	const {
 		options,
+		hideCancelButton,
 		onChangeValue,
 		...cellProps
 	} = props;
@@ -24,6 +25,8 @@ export default function BottomSheetPickerCell( props ) {
 	return (
 		<Cell onPress={ onCellPress } editable={ false } { ...cellProps } >
 			<Picker
+				leftAlign
+				hideCancelButton={ hideCancelButton }
 				ref={ ( instance ) => picker = instance }
 				options={ options }
 				onChange={ onChange }

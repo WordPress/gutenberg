@@ -30,10 +30,7 @@ import { getActiveFormat } from '../get-active-format';
 import { getActiveFormats } from '../get-active-formats';
 import { isEmpty, isEmptyLine } from '../is-empty';
 import { create } from '../create';
-import { split } from '../split';
 import { toHTMLString } from '../to-html-string';
-import { insert } from '../insert';
-import { insertLineSeparator } from '../insert-line-separator';
 import { removeLineSeparator } from '../remove-line-separator';
 import { isCollapsed } from '../is-collapsed';
 import { remove } from '../remove';
@@ -43,28 +40,6 @@ const unescapeSpaces = ( text ) => {
 	return text.replace( /&nbsp;|&#160;/gi, ' ' );
 };
 
-/**
- * Calls {@link pasteHandler} with a fallback to plain text when HTML processing
- * results in errors
- *
- * @param {Function}  originalPasteHandler  The original handler function
- * @param {Object}  [options]     The options to pass to {@link pasteHandler}
- *
- * @return {Array|string}         A list of blocks or a string, depending on
- *                                `handlerMode`.
- */
-const saferPasteHandler = ( originalPasteHandler, options ) => {
-	try {
-		return originalPasteHandler( options );
-	} catch ( error ) {
-		window.console.log( 'Pasting HTML failed:', error );
-		window.console.log( 'HTML:', options.HTML );
-		window.console.log( 'Falling back to plain text.' );
-		// fallback to plain text
-		return originalPasteHandler( { ...options, HTML: '' } );
-	}
-};
-
 const gutenbergFormatNamesToAztec = {
 	'core/bold': 'bold',
 	'core/italic': 'italic',
@@ -72,7 +47,7 @@ const gutenbergFormatNamesToAztec = {
 };
 
 export class RichText extends Component {
-	constructor( { value, __unstableMultiline: multiline, selectionStart, selectionEnd } ) {
+	constructor( { value, selectionStart, selectionEnd, __unstableMultilineTag: multiline } ) {
 		super( ...arguments );
 
 		this.isMultiline = false;
@@ -84,12 +59,12 @@ export class RichText extends Component {
 		if ( this.multilineTag === 'li' ) {
 			this.multilineWrapperTags = [ 'ul', 'ol' ];
 		}
-		this.onSplit = this.onSplit.bind( this );
+
 		this.isIOS = Platform.OS === 'ios';
 		this.createRecord = this.createRecord.bind( this );
 		this.onChange = this.onChange.bind( this );
-		this.onEnter = this.onEnter.bind( this );
-		this.onBackspace = this.onBackspace.bind( this );
+		this.handleEnter = this.handleEnter.bind( this );
+		this.handleDelete = this.handleDelete.bind( this );
 		this.onPaste = this.onPaste.bind( this );
 		this.onFocus = this.onFocus.bind( this );
 		this.onBlur = this.onBlur.bind( this );
@@ -170,63 +145,6 @@ export class RichText extends Component {
 		return { ...value, start, end };
 	}
 
-	/**
-	 * Signals to the RichText owner that the block can be replaced with two
-	 * blocks as a result of splitting the block by pressing enter, or with
-	 * blocks as a result of splitting the block by pasting block content in the
-	 * instance.
-	 *
-	 * @param  {Object} record       The rich text value to split.
-	 * @param  {Array}  pastedBlocks The pasted blocks to insert, if any.
-	 */
-	onSplit( record, pastedBlocks = [] ) {
-		const {
-			__unstableOnReplace: onReplace,
-			__unstableOnSplit: onSplit,
-			__unstableOnSplitMiddle: onSplitMiddle,
-		} = this.props;
-
-		if ( ! onReplace || ! onSplit ) {
-			return;
-		}
-
-		const blocks = [];
-		const [ before, after ] = split( record );
-		const hasPastedBlocks = pastedBlocks.length > 0;
-
-		// Create a block with the content before the caret if there's no pasted
-		// blocks, or if there are pasted blocks and the value is not empty.
-		// We do not want a leading empty block on paste, but we do if split
-		// with e.g. the enter key.
-		if ( ! hasPastedBlocks || ! isEmpty( before ) ) {
-			blocks.push( onSplit( this.valueToFormat( before ) ) );
-		}
-
-		if ( hasPastedBlocks ) {
-			blocks.push( ...pastedBlocks );
-		} else if ( onSplitMiddle ) {
-			blocks.push( onSplitMiddle() );
-		}
-
-		// If there's pasted blocks, append a block with the content after the
-		// caret. Otherwise, do append and empty block if there is no
-		// `onSplitMiddle` prop, but if there is and the content is empty, the
-		// middle block is enough to set focus in.
-		if ( hasPastedBlocks || ! onSplitMiddle || ! isEmpty( after ) ) {
-			blocks.push( onSplit( this.valueToFormat( after ) ) );
-		}
-
-		// If there are pasted blocks, set the selection to the last one.
-		// Otherwise, set the selection to the second block.
-		const indexToSelect = hasPastedBlocks ? blocks.length - 1 : 1;
-		// The onSplit event can cause a content update event for this block.  Such event should
-		// definitely be processed by our native components, since they have no knowledge of
-		// how the split works.  Setting lastEventCount to undefined forces the native component to
-		// always update when provided with new content.
-		this.lastEventCount = undefined;
-		onReplace( blocks, indexToSelect );
-	}
-
 	valueToFormat( value ) {
 		// remove the outer root tags
 		return this.removeRootTagsProduceByAztec( toHTMLString( {
@@ -246,6 +164,7 @@ export class RichText extends Component {
 	}
 
 	onFormatChange( record ) {
+		this.getRecord( record );
 		const { start, end, activeFormats = [] } = record;
 		const changeHandlers = pickBy( this.props, ( v, key ) =>
 			key.startsWith( 'format_on_change_functions_' )
@@ -347,92 +266,67 @@ export class RichText extends Component {
 		this.lastAztecEventType = 'content size change';
 	}
 
-	onEnter( event ) {
-		if ( this.props.onEnter ) {
-			this.props.onEnter();
+	handleEnter( event ) {
+		const { onEnter } = this.props;
+
+		if ( ! onEnter ) {
 			return;
 		}
-		const {
-			__unstableOnReplace: onReplace,
-			__unstableOnSplit: onSplit,
-		} = this.props;
 
-		this.lastEventCount = event.nativeEvent.eventCount;
-		this.comesFromAztec = true;
-		this.firedAfterTextChanged = event.nativeEvent.firedAfterTextChanged;
-
-		const canSplit = onReplace && onSplit;
-		const currentRecord = this.createRecord();
-		if ( this.multilineTag ) {
-			if ( event.shiftKey ) {
-				this.needsSelectionUpdate = true;
-				const insertedLineBreak = { ...insert( currentRecord, '\n' ) };
-				this.onFormatChange( insertedLineBreak );
-			} else if ( canSplit && isEmptyLine( currentRecord ) ) {
-				this.onSplit( currentRecord );
-			} else {
-				this.needsSelectionUpdate = true;
-				const insertedLineSeparator = { ...insertLineSeparator( currentRecord ) };
-				this.onFormatChange( insertedLineSeparator );
-			}
-		} else if ( event.shiftKey || ! onSplit ) {
-			this.needsSelectionUpdate = true;
-			const insertedLineBreak = { ...insert( currentRecord, '\n' ) };
-			this.onFormatChange( insertedLineBreak );
-		} else {
-			this.onSplit( currentRecord );
-		}
+		onEnter( {
+			value: this.createRecord(),
+			onChange: this.onFormatChange,
+			shiftKey: event.shiftKey,
+		} );
 		this.lastAztecEventType = 'input';
 	}
 
-	onBackspace( event ) {
-		const {
-			__unstableOnMerge: onMerge,
-			__unstableOnRemove: onRemove,
-			onChange,
-		} = this.props;
-		if ( ! onMerge && ! onRemove ) {
-			return;
-		}
-
+	handleDelete( event ) {
 		const keyCode = BACKSPACE; // TODO : should we differentiate BACKSPACE and DELETE?
 		const isReverse = keyCode === BACKSPACE;
 
+		const { onDelete, __unstableMultilineTag: multilineTag } = this.props;
+		const { activeFormats = [] } = this.state;
 		this.lastEventCount = event.nativeEvent.eventCount;
 		this.comesFromAztec = true;
 		this.firedAfterTextChanged = event.nativeEvent.firedAfterTextChanged;
 		const value = this.createRecord();
-		const { start, end } = value;
+		const { start, end, text } = value;
 		let newValue;
 
 		// Always handle full content deletion ourselves.
-		if ( start === 0 && end !== 0 && end >= value.text.length ) {
-			newValue = remove( value, start, end );
-			onChange( newValue );
+		if ( start === 0 && end !== 0 && end >= text.length ) {
+			newValue = remove( value );
+			this.onFormatChange( newValue );
+			event.preventDefault();
 			return;
 		}
 
-		if ( this.multilineTag ) {
-			newValue = removeLineSeparator( value, keyCode === BACKSPACE );
+		if ( multilineTag ) {
+			if ( isReverse && value.start === 0 && value.end === 0 && isEmptyLine( value ) ) {
+				newValue = removeLineSeparator( value, ! isReverse );
+			} else {
+				newValue = removeLineSeparator( value, isReverse );
+			}
 			if ( newValue ) {
 				this.onFormatChange( newValue );
+				event.preventDefault();
 				return;
 			}
 		}
 
-		const empty = this.isEmpty();
-
-		if ( onMerge ) {
-			onMerge( ! isReverse );
+		// Only process delete if the key press occurs at an uncollapsed edge.
+		if (
+			! onDelete ||
+			! isCollapsed( value ) ||
+			activeFormats.length ||
+			( isReverse && start !== 0 ) ||
+			( ! isReverse && end !== text.length )
+		) {
+			return;
 		}
 
-		// Only handle remove on Backspace. This serves dual-purpose of being
-		// an intentional user interaction distinguishing between Backspace and
-		// Delete to remove the empty field, but also to avoid merge & remove
-		// causing destruction of two fields (merge, then removed merged).
-		if ( onRemove && empty && isReverse ) {
-			onRemove( ! isReverse );
-		}
+		onDelete( { isReverse, value } );
 
 		event.preventDefault();
 		this.lastAztecEventType = 'input';
@@ -445,10 +339,7 @@ export class RichText extends Component {
 	 */
 	onPaste( event ) {
 		const {
-			tagName,
-			__unstablePasteHandler: pasteHandler,
-			__unstableOnReplace: onReplace,
-			__unstableOnSplit: onSplit,
+			onPaste,
 			onChange,
 		} = this.props;
 
@@ -456,30 +347,6 @@ export class RichText extends Component {
 		const currentRecord = this.createRecord();
 
 		event.preventDefault();
-
-		// Only process file if no HTML is present.
-		// Note: a pasted file may have the URL as plain text.
-		if ( files && files.length > 0 ) {
-			const uploadId = Number.MAX_SAFE_INTEGER;
-			let html = '';
-			files.forEach( ( file ) => {
-				html += `<img src="${ file }" class="wp-image-${ uploadId }">`;
-			} );
-			const content = pasteHandler( {
-				HTML: html,
-				mode: 'BLOCKS',
-				tagName,
-			} );
-			const shouldReplace = onReplace && this.isEmpty();
-
-			if ( shouldReplace ) {
-				onReplace( content );
-			} else {
-				this.onSplit( currentRecord, content );
-			}
-
-			return;
-		}
 
 		// There is a selection, check if a URL is pasted.
 		if ( ! isCollapsed( currentRecord ) ) {
@@ -504,46 +371,14 @@ export class RichText extends Component {
 			}
 		}
 
-		const shouldReplace = this.props.onReplace && this.isEmpty();
-
-		let mode = 'INLINE';
-
-		if ( shouldReplace ) {
-			mode = 'BLOCKS';
-		} else if ( onSplit ) {
-			mode = 'AUTO';
-		}
-
-		const pastedContent = saferPasteHandler( pasteHandler, {
-			HTML: pastedHtml,
-			plainText: pastedText,
-			mode,
-			tagName: this.props.tagName,
-			canUserUseUnfilteredHTML: this.props.canUserUseUnfilteredHTML,
-		} );
-
-		if ( typeof pastedContent === 'string' ) {
-			const recordToInsert = create( { html: pastedContent } );
-			const resultingRecord = insert( currentRecord, recordToInsert );
-			const resultingContent = this.valueToFormat( resultingRecord );
-
-			this.lastEventCount = undefined;
-			this.value = resultingContent;
-
-			// explicitly set selection after inline paste
-			this.onSelectionChange( resultingRecord.start, resultingRecord.end );
-
-			onChange( this.value );
-		} else if ( onSplit ) {
-			if ( ! pastedContent.length ) {
-				return;
-			}
-
-			if ( shouldReplace ) {
-				onReplace( pastedContent );
-			} else {
-				this.onSplit( currentRecord, pastedContent );
-			}
+		if ( onPaste ) {
+			onPaste( {
+				value: currentRecord,
+				onChange: this.onFormatChange,
+				html: pastedHtml,
+				plainText: pastedText,
+				files,
+			} );
 		}
 	}
 
@@ -766,7 +601,7 @@ export class RichText extends Component {
 			this.lastEventCount = undefined; // force a refresh on the native side
 			value = '';
 		}
-		// On android if content is empty we need to send no content or else the placeholder with not show.
+		// On android if content is empty we need to send no content or else the placeholder will not show.
 		if ( ! this.isIOS && value === '' ) {
 			return value;
 		}
@@ -862,8 +697,8 @@ export class RichText extends Component {
 					onChange={ this.onChange }
 					onFocus={ this.onFocus }
 					onBlur={ this.onBlur }
-					onEnter={ this.onEnter }
-					onBackspace={ this.onBackspace }
+					onEnter={ this.handleEnter }
+					onBackspace={ this.handleDelete }
 					onPaste={ this.onPaste }
 					activeFormats={ this.getActiveFormatNames( record ) }
 					onContentSizeChange={ this.onContentSizeChange }

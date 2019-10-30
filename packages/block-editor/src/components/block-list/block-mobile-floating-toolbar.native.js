@@ -8,7 +8,7 @@ import { View, TouchableWithoutFeedback } from 'react-native';
  */
 import styles from './block-mobile-floating-toolbar.scss';
 
-function FloatingToolbar( { children } ) {
+const FloatingToolbar = ( { children } ) => {
 	return (
 		<TouchableWithoutFeedback>
 			<View
@@ -17,6 +17,6 @@ function FloatingToolbar( { children } ) {
 			</View>
 		</TouchableWithoutFeedback>
 	);
-}
+};
 
 export default FloatingToolbar;
