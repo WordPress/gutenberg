@@ -102,4 +102,6 @@ public interface GutenbergBridgeJS2Parent {
     void getOtherMediaPickerOptions(OtherMediaOptionsReceivedCallback otherMediaOptionsReceivedCallback, MediaType mediaType);
 
     void requestMediaPickFrom(String mediaSource, MediaUploadCallback mediaUploadCallback, Boolean allowMultipleSelection);
+
+    void requestImageFullscreenPreview(int mediaId, String mediaSource);
 }
