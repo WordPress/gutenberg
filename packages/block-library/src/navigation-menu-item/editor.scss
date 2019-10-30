@@ -72,6 +72,12 @@
 
 	&.is-editing .components-text-control__input {
 		width: inherit;
+		background-color: inherit;
+		color: inherit;
+
+		&:focus {
+			color: inherit;
+		}
 	}
 
 	&.is-editing,
