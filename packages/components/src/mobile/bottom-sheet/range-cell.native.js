@@ -127,7 +127,7 @@ class BottomSheetRangeCell extends Component {
 
 		const accessibilityLabel =
 		sprintf(
-			/* translators: accessibility text. Inform about current value. %2$s: Current value. */
+			/* translators: accessibility text. Inform about current value. %1$s: Control label %2$s: Current value. */
 			_x( '%1$s. Current value is %2$s', 'Slider for picking a number inside a range' ),
 			cellProps.label, value
 		);
