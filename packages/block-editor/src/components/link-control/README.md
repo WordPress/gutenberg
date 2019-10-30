@@ -58,8 +58,8 @@ through of its function parameter.
 - Type: `Function`
 - Required: No
 
-Use this callback as an opportunity to know if the link has been changed because of user edition.
-The function callback will get selected item, or Null.
+Use this callback to take an action after a user set or updated a link.
+The function callback will receive the selected item, or Null.
 
 ```es6
 <LinkControl
