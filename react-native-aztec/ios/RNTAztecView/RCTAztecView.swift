@@ -319,12 +319,19 @@ class RCTAztecView: Aztec.TextView {
     }
     
     private func interceptBackspace() -> Bool {
-        guard (isNewLineBeforeSelectionAndNotEndOfContent() && selectedRange.length == 0) || (selectedRange.location == 0 && selectedRange.length == 0),
+        guard (isNewLineBeforeSelectionAndNotEndOfContent() && selectedRange.length == 0)
+            || (selectedRange.location == 0 && selectedRange.length == 0)
+            || text.count == 1 // send backspace event when cleaning all characters
+            || selectedRange == NSRange(location: 0, length: textStorage.length), // send backspace event when deleting all the text
             let onBackspace = onBackspace else {
                 return false
         }
-        
-        let caretData = packCaretDataForRN()
+        var range = selectedRange
+        if text.count == 1 {
+            range = NSRange(location: 0, length: textStorage.length)
+        }
+        let caretData = packCaretDataForRN(overrideRange: range)
+        onSelectionChange?(caretData)
         onBackspace(caretData)
         return true
     }
@@ -361,9 +368,13 @@ class RCTAztecView: Aztec.TextView {
         return [name: size]
     }
     
-    func packCaretDataForRN() -> [AnyHashable: Any] {
-        var start = selectedRange.location
-        var end = selectedRange.location + selectedRange.length
+    func packCaretDataForRN(overrideRange: NSRange? = nil) -> [AnyHashable: Any] {
+        var range = selectedRange
+        if let overrideRange = overrideRange {
+            range = overrideRange
+        }
+        var start = range.location
+        var end = range.location + range.length
         if selectionAffinity == .backward {
             (start, end) = (end, start)
         }
@@ -373,8 +384,8 @@ class RCTAztecView: Aztec.TextView {
         result["selectionStart"] = start
         result["selectionEnd"] = end
         
-        if let selectedTextRange = selectedTextRange {
-            let caretEndRect = caretRect(for: selectedTextRange.end)
+        if let range = selectedTextRange {
+            let caretEndRect = caretRect(for: range.end)
             // Sergio Estevao: Sometimes the carectRect can be invalid so we need to check before sending this to JS.
             if !(caretEndRect.isInfinite || caretEndRect.isNull) {
                 result["selectionEndCaretX"] = caretEndRect.origin.x
