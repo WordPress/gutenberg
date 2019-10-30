@@ -13,7 +13,7 @@ import Modal from '../';
 /**
  * WordPress dependencies
  */
-import { Fragment, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 
 export default { title: 'Modal', component: Modal };
 
@@ -23,7 +23,7 @@ const ModalExample = ( props ) => {
 	const closeModal = () => setOpen( false );
 
 	return (
-		<Fragment>
+		<>
 			<Button isDefault onClick={ openModal }>
 				Open Modal
 			</Button>
@@ -34,7 +34,7 @@ const ModalExample = ( props ) => {
 					</Button>
 				</Modal>
 			) }
-		</Fragment>
+		</>
 	);
 };
 
