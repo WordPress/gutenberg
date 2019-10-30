@@ -35,6 +35,8 @@ const ColorSelectorIcon = ( { backgroundColor, textColor } ) => {
 	}
 
 	const iconClasses = classnames( 'block-library-colors-selector__state-selection', {
+		'has-background-color': backgroundColor && backgroundColor.color,
+		'has-text-color': backgroundColor && backgroundColor.color,
 		[ backgroundColor.class ]: backgroundColor && backgroundColor.class,
 		[ textColor.class ]: textColor && textColor.class,
 	} );
