@@ -68,12 +68,12 @@ function ResponsiveBlockControl( props ) {
 
 	const toggleHelpText = _x( 'Toggle between using the same value for all screen sizes or using a unique value per screen size.', 'Toogle control help text.' );
 
-	const defaultControl = renderDefaultControl( <ResponsiveBlockControlLabel property={ property } device={ defaultLabel } /> );
+	const defaultControl = renderDefaultControl( <ResponsiveBlockControlLabel property={ property } device={ defaultLabel } />, defaultLabel );
 
 	const defaultResponsiveControls = () => {
 		return devices.map( ( device ) => (
 			<Fragment key={ device.id }>
-				{ renderDefaultControl( <ResponsiveBlockControlLabel property={ property } device={ device } /> ) }
+				{ renderDefaultControl( <ResponsiveBlockControlLabel property={ property } device={ device } />, device ) }
 			</Fragment>
 		) );
 	};
