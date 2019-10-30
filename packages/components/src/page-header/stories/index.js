@@ -8,6 +8,7 @@ import { select, text } from '@storybook/addon-knobs';
  */
 import Button from '../../button';
 import Dropdown from '../../dropdown';
+import Flex from '../../flex';
 import MenuGroup from '../../menu-group';
 import MenuItem from '../../menu-item';
 import IconButton from '../../icon-button';
@@ -18,13 +19,13 @@ export default { title: 'PageHeader', component: PageHeader };
 
 const InlineActions = () => {
 	return (
-		<div className="inline-buttons">
+		<Flex justify="left" gap="small">
 			<Button isDefault isPrimary>
 				Add New
 			</Button>
 			<Button isDefault>Add New</Button>
 			<Button isDefault>Add New</Button>
-		</div>
+		</Flex>
 	);
 };
 

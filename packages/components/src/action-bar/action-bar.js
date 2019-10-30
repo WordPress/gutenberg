@@ -8,15 +8,16 @@
  */
 import classnames from 'classnames';
 
-function ActionBar( props ) {
-	const { align, className, ...restProps } = props;
-	const classNames = classnames(
-		className,
-		align && `is-align-${ align }`,
-		'components-action-bar'
-	);
+/**
+ * Internal dependencies
+ */
+import Flex from '../flex';
 
-	return <div className={ classNames } { ...restProps } />;
+function ActionBar( props ) {
+	const { className, ...restProps } = props;
+	const classNames = classnames( className, 'components-action-bar' );
+
+	return <Flex className={ classNames } { ...restProps } />;
 }
 
 ActionBar.defaultProps = {

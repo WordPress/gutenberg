@@ -8,7 +8,6 @@ import IconButton from '../../icon-button';
 import ActionBar from '../';
 import ActionBarBlock from '../block';
 import ActionBarItem from '../item';
-import './styles.css';
 
 export default { title: 'ActionBar', component: ActionBar };
 

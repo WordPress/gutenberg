@@ -5,7 +5,9 @@ import classnames from 'classnames';
 /**
  * Internal dependencies
  */
-import { ActionBar, ActionBarBlock, ActionBarItem } from '../action-bar';
+import ActionBar from '../action-bar';
+import ActionBarBlock from '../action-bar/block';
+import ActionBarItem from '../action-bar/item';
 
 function PageHeader( props ) {
 	const {
