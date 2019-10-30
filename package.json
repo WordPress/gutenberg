@@ -215,7 +215,7 @@
 		"native": "npm run --prefix packages/react-native-editor",
 		"package-plugin": "./bin/build-plugin-zip.sh",
 		"pot-to-php": "./bin/pot-to-php.js",
-		"prepare": "patch-package",
+		"postinstall": "patch-package",
 		"publish:check": "npm run build:packages && lerna updated",
 		"publish:dev": "npm run build:packages && lerna publish --npm-tag next",
 		"publish:prod": "npm run build:packages && lerna publish",
