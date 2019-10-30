@@ -37,7 +37,7 @@ public class MainApplication extends Application implements ReactApplication {
             }
 
             @Override
-            public void requestMediaImport(String url, MediaSelectedCallback mediaSelectedCallback) {
+            public void requestMediaImport(String url, MediaUploadCallback mediaUploadCallback) {
             }
 
             @Override
@@ -49,7 +49,7 @@ public class MainApplication extends Application implements ReactApplication {
             }
 
             @Override
-            public void requestMediaPickFromMediaLibrary(MediaSelectedCallback mediaSelectedCallback, Boolean allowMultipleSelection, MediaType mediaType) {
+            public void requestMediaPickFromMediaLibrary(MediaUploadCallback mediaUploadCallback, Boolean allowMultipleSelection, MediaType mediaType) {
             }
 
 
@@ -75,6 +75,16 @@ public class MainApplication extends Application implements ReactApplication {
 
             @Override
             public void editorDidAutosave() {
+            }
+
+            @Override
+            public void getOtherMediaPickerOptions(OtherMediaOptionsReceivedCallback otherMediaOptionsReceivedCallback, MediaType mediaType) {
+
+            }
+
+            @Override
+            public void requestMediaPickFrom(String mediaSource, MediaUploadCallback mediaUploadCallback, Boolean allowMultipleSelection) {
+
             }
 
             @Override
