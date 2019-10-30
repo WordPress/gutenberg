@@ -44,7 +44,6 @@ function NavigationMenuItemEdit( {
 	isParentOfSelectedBlock,
 	setAttributes,
 } ) {
-	const plainTextRef = useRef( null );
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
 	const [ isEditingLink, setIsEditingLink ] = useState( false );
 	const [ urlInput, setUrlInput ] = useState( null );
@@ -176,8 +175,7 @@ function NavigationMenuItemEdit( {
 				} ) }
 			>
 				<RichText
-					ref={ plainTextRef }
-					className="wp-block-navigation-menu-item__field"
+					className="wp-block-navigation-menu-item__content"
 					value={ label }
 					onChange={ ( labelValue ) => setAttributes( { label: labelValue } ) }
 					placeholder={ __( 'Add item…' ) }
