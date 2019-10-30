@@ -14,14 +14,18 @@ import classnames from 'classnames';
 import Flex from '../flex';
 
 function ActionBar( props ) {
-	const { className, ...restProps } = props;
-	const classNames = classnames( className, 'components-action-bar' );
+	const { className, size, ...restProps } = props;
+	const classNames = classnames(
+		className,
+		size && `is-size-${ size }`,
+		'components-action-bar'
+	);
 
 	return <Flex className={ classNames } { ...restProps } />;
 }
 
 ActionBar.defaultProps = {
-	align: 'center',
+	size: 'medium',
 };
 
 export default ActionBar;

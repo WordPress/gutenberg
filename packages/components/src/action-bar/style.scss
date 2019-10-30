@@ -3,5 +3,17 @@
 	border-bottom: 1px solid #eee;
 	box-sizing: border-box;
 	min-height: 50px;
-	padding: 12px 12px;
+
+	&.is-size-large {
+		padding: 20px;
+	}
+	&.is-size-medium {
+		padding: 12px;
+	}
+	&.is-size-small {
+		padding: 8px;
+	}
+	&.is-size-extraSmall {
+		padding: 4px;
+	}
 }
