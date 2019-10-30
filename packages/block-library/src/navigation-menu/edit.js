@@ -79,6 +79,8 @@ function NavigationMenu( {
 		'wp-block-navigation-menu', {
 			'has-text-color': textColor.color,
 			'has-background-color': backgroundColor.color,
+			[ attributes.backgroundColorCSSClass ]: attributes && attributes.backgroundColorCSSClass,
+			[ attributes.textColorCSSClass ]: attributes && attributes.textColorCSSClass,
 		}
 	);
 
