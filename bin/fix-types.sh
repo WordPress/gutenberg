@@ -9,8 +9,8 @@ index_type_file="$DIRNAME""/../node_modules/@types/react-native/index.d.ts"
 # Remove duplicated types
 rm -f "$global_types_file"
 
-# Remove reference to removed global types
+# Remove reference to removed global types.
 sed -i '' 's|/// <reference path="globals.d.ts" />||' "$index_type_file"
 
-# Namespace the globals in index.d.ts file
+# Namespace the globals in index.d.ts file.
 sed -i '' 's|declare global|declare namespace IgnoreTheseGlobals|' "$index_type_file"
