@@ -25,6 +25,7 @@ import {
 	ENTER,
 } from '@wordpress/keycodes';
 import { __ } from '@wordpress/i18n';
+import { RichText } from '@wordpress/editor';
 import {
 	BlockControls,
 	InnerBlocks,
@@ -78,23 +79,6 @@ function NavigationMenuItemEdit( {
 	};
 
 	const { label, url } = attributes;
-	let content;
-	if ( isSelected ) {
-		content = (
-			<TextControl
-				ref={ plainTextRef }
-				className="wp-block-navigation-menu-item__field"
-				value={ label }
-				onChange={ ( labelValue ) => setAttributes( { label: labelValue } ) }
-				label={ __( 'Navigation Label' ) }
-				hideLabelFromVision={ true }
-			/>
-		);
-	} else {
-		content = <div className="wp-block-navigation-menu-item__container">
-			{ label }
-		</div>;
-	}
 
 	return (
 		<Fragment>
@@ -191,7 +175,14 @@ function NavigationMenuItemEdit( {
 					'is-selected': isSelected,
 				} ) }
 			>
-				{ content }
+				<RichText
+					ref={ plainTextRef }
+					className="wp-block-navigation-menu-item__field"
+					value={ label }
+					onChange={ ( labelValue ) => setAttributes( { label: labelValue } ) }
+					placeholder={ __( 'Add item…' ) }
+					withoutInteractiveFormatting
+				/>
 				{ ( isSelected || isParentOfSelectedBlock ) &&
 					<InnerBlocks
 						allowedBlocks={ [ 'core/navigation-menu-item' ] }
