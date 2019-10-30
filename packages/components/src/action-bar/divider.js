@@ -7,24 +7,24 @@ import classnames from 'classnames';
  * Internal dependencies
  */
 import { useActionBarContext } from './context';
-import FlexItem from '../flex/item';
 
 export const defaultProps = {
-	innerPadding: 'medium',
+	role: 'presentation',
+	spacing: 'medium',
 };
 
-function ActionBarItem( props ) {
+function ActionBarDivider( props ) {
 	const { className, ...restProps } = props;
 	const mergedProps = { ...defaultProps, ...useActionBarContext(), ...props };
-	const { innerPadding } = mergedProps;
+	const { spacing } = mergedProps;
 
 	const classes = classnames(
-		'components-action-bar__item',
-		innerPadding && `is-innerPadding-${ innerPadding }`,
+		'components-action-bar__divider',
+		spacing && `is-spacing-${ spacing }`,
 		className
 	);
 
-	return <FlexItem className={ classes } { ...restProps } />;
+	return <div { ...restProps } className={ classes } />;
 }
 
-export default ActionBarItem;
+export default ActionBarDivider;

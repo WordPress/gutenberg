@@ -5,9 +5,9 @@ import classnames from 'classnames';
 
 function FlexBlock( props ) {
 	const { className, ...restProps } = props;
-	const classNames = classnames( className, 'components-flex__block' );
+	const classes = classnames( 'components-flex__block', className );
 
-	return <div className={ classNames } { ...restProps } />;
+	return <div { ...restProps } className={ classes } />;
 }
 
 export default FlexBlock;

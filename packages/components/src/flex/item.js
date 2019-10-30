@@ -5,9 +5,9 @@ import classnames from 'classnames';
 
 function FlexItem( props ) {
 	const { className, ...restProps } = props;
-	const classNames = classnames( className, 'components-flex__item' );
+	const classes = classnames( 'components-flex__item', className );
 
-	return <div className={ classNames } { ...restProps } />;
+	return <div { ...restProps } className={ classes } />;
 }
 
 export default FlexItem;

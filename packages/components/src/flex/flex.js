@@ -10,15 +10,16 @@ import classnames from 'classnames';
 
 function Flex( props ) {
 	const { align, className, gap, justify, ...restProps } = props;
-	const classNames = classnames(
-		className,
+
+	const classes = classnames(
+		'components-flex',
 		align && `is-align-${ align }`,
 		gap && `is-gap-${ gap }`,
 		justify && `is-justify-${ justify }`,
-		'components-flex'
+		className
 	);
 
-	return <div className={ classNames } { ...restProps } />;
+	return <div { ...restProps } className={ classes } />;
 }
 
 Flex.defaultProps = {

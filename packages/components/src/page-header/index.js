@@ -19,10 +19,11 @@ function PageHeader( props ) {
 		subtitle,
 		...restProps
 	} = props;
-	const classNames = classnames( className, 'components-page-header' );
+
+	const classes = classnames( 'components-page-header', className );
 
 	return (
-		<ActionBar { ...restProps } className={ classNames }>
+		<ActionBar { ...restProps } className={ classes }>
 			{ leftActions && (
 				<ActionBarItem className="components-page-header__left-actions">
 					{ leftActions }

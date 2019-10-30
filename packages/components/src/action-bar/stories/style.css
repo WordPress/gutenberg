@@ -1,3 +1,16 @@
 .action-bar-story-example .components-icon-button.has-text svg {
 	margin: 0;
 }
+
+.action-bar-story-example.toolbar {
+	border: 1px solid #ddd;
+	display: inline-flex;
+}
+
+/* EXPERIMENTAL: Toolbar component styles */
+.action-bar-story-example.toolbar > * {
+	border-right: 1px solid #ddd;
+}
+.action-bar-story-example.toolbar > *:last-child {
+	border-right: none;
+}

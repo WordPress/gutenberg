@@ -1,19 +1,51 @@
 .components-action-bar {
 	background: #fff;
-	border-bottom: 1px solid #eee;
+	border-bottom: 1px solid $light-gray-500;
 	box-sizing: border-box;
-	min-height: 50px;
 
-	&.is-size-large {
-		padding: 20px;
+	// Modifiers
+	&.is-borderless {
+		border-bottom: none;
 	}
-	&.is-size-medium {
-		padding: 12px;
+
+	&__block,
+	&__item {
+		&.is-innerPadding-large {
+			padding: 20px 10px;
+		}
+		&.is-innerPadding-medium {
+			padding: 12px 6px;
+		}
+		&.is-innerPadding-small {
+			padding: 8px 4px;
+		}
+		&.is-innerPadding-extraSmall {
+			padding: 2px;
+		}
+		&.is-innerPadding-none {
+			padding: 0;
+		}
 	}
-	&.is-size-small {
-		padding: 8px;
-	}
-	&.is-size-extraSmall {
-		padding: 4px;
+
+	&__divider {
+		align-self: normal;
+		border-right: 1px solid $light-gray-500;
+		width: 0;
+
+		&.is-spacing-large {
+			margin: 0 10px;
+		}
+		&.is-spacing-medium {
+			margin: 0 6px;
+		}
+		&.is-spacing-small {
+			margin: 0 4px;
+		}
+		&.is-spacing-extraSmall {
+			margin: 0 2px;
+		}
+		&.is-spacing-none {
+			margin: 0;
+		}
 	}
 }

@@ -3,6 +3,7 @@
  */
 import ActionBar from '../';
 import ActionBarBlock from '../block';
+import ActionBarDivider from '../divider';
 import ActionBarItem from '../item';
 import Dropdown from '../../dropdown';
 import Flex from '../../flex';
@@ -66,13 +67,20 @@ export const backAndTitle = () => {
 				<h3 style={ { margin: 0 } }>Title</h3>
 			</ActionBarItem>
 			<ActionBarBlock />
+			<ActionBarItem>
+				<DropdownActions />
+			</ActionBarItem>
 		</ActionBar>
 	);
 };
 
 export const gutenbergTopBar = () => {
 	return (
-		<ActionBar className="action-bar-story-example" size="small">
+		<ActionBar className="action-bar-story-example" innerPadding="small">
+			<ActionBarItem>
+				<IconButton icon="arrow-left-alt2" />
+			</ActionBarItem>
+			<ActionBarDivider />
 			<ActionBarItem>
 				<Flex justify="left" gap="extraSmall">
 					<Tooltip text="Add block">
@@ -92,6 +100,7 @@ export const gutenbergTopBar = () => {
 					</Tooltip>
 				</Flex>
 			</ActionBarItem>
+			<ActionBarBlock />
 			<ActionBarItem>
 				<Flex justify="left" gap="extraSmall">
 					<Tooltip text="Settings">
@@ -103,5 +112,46 @@ export const gutenbergTopBar = () => {
 				</Flex>
 			</ActionBarItem>
 		</ActionBar>
+	);
+};
+
+/**
+ * EXPERIMENT:
+ * Creating a Toolbar component using ActionBar
+ */
+const Toolbar = ( props ) => {
+	return (
+		<ActionBar
+			{ ...props }
+			className="action-bar-story-example toolbar"
+			dividerSpacing="none"
+			innerPadding="extraSmall"
+			justify="left"
+		/>
+	);
+};
+const ToolbarItem = ActionBarItem;
+
+export const experimentToolbar = () => {
+	return (
+		<Toolbar>
+			<ToolbarItem>
+				<Flex justify="left" gap="extraSmall">
+					<IconButton icon="insert" />
+				</Flex>
+			</ToolbarItem>
+			<ToolbarItem>
+				<Flex justify="left" gap="extraSmall">
+					<IconButton icon="undo" />
+					<IconButton icon="redo" />
+				</Flex>
+			</ToolbarItem>
+			<ToolbarItem>
+				<Flex justify="left" gap="extraSmall">
+					<IconButton icon="info" />
+					<IconButton icon="menu" />
+				</Flex>
+			</ToolbarItem>
+		</Toolbar>
 	);
 };
