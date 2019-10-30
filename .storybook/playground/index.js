@@ -3,7 +3,7 @@
  */
 import '@wordpress/editor'; // This shouldn't be necessary
 
-import { render, useState, Fragment } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import {
 	BlockEditorKeyboardShortcuts,
 	BlockEditorProvider,
@@ -24,7 +24,7 @@ import '@wordpress/format-library';
 /**
  * Internal dependencies
  */
-import './style.scss';
+// import './style.scss';
 
 /* eslint-disable no-restricted-syntax */
 import '@wordpress/components/build-style/style.css';
@@ -35,16 +35,16 @@ import '@wordpress/block-library/build-style/theme.css';
 import '@wordpress/format-library/build-style/style.css';
 /* eslint-enable no-restricted-syntax */
 
+// TODO: Find a way to include those fonts.
+// <link href="https://fonts.googleapis.com/css?family=Noto+Serif:400,700" rel="stylesheet">
+
 function App() {
 	const [ blocks, updateBlocks ] = useState( [] );
 
 	return (
-		<Fragment>
+		<>
 			<div className="playground__header">
 				<h1 className="playground__logo">Gutenberg Playground</h1>
-				<Button isLarge href="design-system/components" target="_blank">
-					Design System Components
-				</Button>
 			</div>
 			<div className="playground__body">
 				<SlotFillProvider>
@@ -70,9 +70,16 @@ function App() {
 					</DropZoneProvider>
 				</SlotFillProvider>
 			</div>
-		</Fragment>
+		</>
 	);
 }
 
-registerCoreBlocks();
-render( <App />, document.querySelector( '#app' ) );
+export default {
+	title: 'Playground|Block Editor',
+};
+
+export const _default = () => {
+	registerCoreBlocks();
+
+	return <App />;
+};

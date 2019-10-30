@@ -8,14 +8,15 @@ import { withKnobs } from '@storybook/addon-knobs';
 /**
  * Internal dependencies
  */
-import '../build-style/style.css';
+import '@wordpress/components/build-style/style.css';
 
 addDecorator( withA11y );
 addDecorator( withKnobs );
 configure(
 	[
-		require.context( '../docs', true, /\/.+\.mdx$/ ),
-		require.context( '../src', true, /\/stories\/.+\.js$/ ),
+		require.context( './docs/', true, /\/.+\.mdx$/ ),
+		require.context( './playground/', true, /index\.js$/ ),
+		require.context( '../packages/components/src/', true, /\/stories\/.+\.js$/ ),
 	],
 	module
 );

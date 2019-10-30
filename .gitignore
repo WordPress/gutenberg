@@ -12,7 +12,6 @@ phpcs.xml
 yarn.lock
 /wordpress
 
-playground/dist
 .cache
 
 # Report generated from jest-junit
