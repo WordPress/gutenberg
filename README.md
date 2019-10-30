@@ -32,7 +32,7 @@ Here's why we're looking at the whole editing screen, as opposed to just the con
 4. **A fresh look at content creation.** Considering the whole interface lays a solid foundation for the next focus: full site customization.
 5. **Modern tooling.** Looking at the full editor screen also gives WordPress the opportunity to drastically modernize the foundation, and take steps towards a more fluid and JavaScript-powered future that fully leverages the WordPress REST API.
 
-![Writing in Gutenberg 1.6](https://make.wordpress.org/core/files/2017/10/gutenberg-typing-1_6.gif)
+![Editing layout in Gutenberg 6.8](https://cldup.com/HDcDkFoTik.gif)
 
 ## Blocks
 
