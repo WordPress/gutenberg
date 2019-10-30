@@ -89,7 +89,7 @@ class BottomSheetCell extends Component {
 		const cellLabelCenteredStyle = getStylesFromColorScheme( styles.cellLabelCentered, styles.cellTextDark );
 		const cellLabelLeftAlignNoIconStyle = getStylesFromColorScheme( styles.cellLabelLeftAlignNoIcon, styles.cellTextDark );
 		const defaultMissingIconAndValue = leftAlign ? cellLabelLeftAlignNoIconStyle : cellLabelCenteredStyle;
-		const defaultLabelStyle = showValue || icon !== undefined ? cellLabelStyle : defaultMissingIconAndValue;
+		const defaultLabelStyle = showValue || icon !== undefined || allowReset ? cellLabelStyle : defaultMissingIconAndValue;
 
 		const drawSeparator = ( separatorType && separatorType !== 'none' ) || separatorStyle === undefined;
 		const drawTopSeparator = drawSeparator && separatorType === 'topFullWidth';
@@ -189,6 +189,7 @@ class BottomSheetCell extends Component {
 		};
 
 		const iconStyle = getStylesFromColorScheme( styles.icon, styles.iconDark );
+		const resetButtonStyle = getStylesFromColorScheme( styles.resetButton, styles.resetButtonDark );
 		const resetButtonText = Platform.OS === 'ios' ? 'Reset' : 'RESET';
 		const containerPointerEvents = this.state.isScreenReaderEnabled && accessible ? 'none' : 'auto';
 
@@ -222,7 +223,7 @@ class BottomSheetCell extends Component {
 							</Text>
 						</View>
 						{ allowReset && <TouchableOpacity onPress={ allowReset } accessibilityRole={ 'button' }>
-							<Text style={ styles.resetButton }>{ sprintf(
+							<Text style={ resetButtonStyle }>{ sprintf(
 								/* translators: %s: reset */
 								__( '%s' ), resetButtonText	) }
 							</Text>
