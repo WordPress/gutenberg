@@ -18,7 +18,7 @@ import { Fragment, useState } from '@wordpress/element';
 export default { title: 'Modal', component: Modal };
 
 const ModalExample = ( props ) => {
-	const [ isOpen, setOpen ] = useState( true );
+	const [ isOpen, setOpen ] = useState( false );
 	const openModal = () => setOpen( true );
 	const closeModal = () => setOpen( false );
 
