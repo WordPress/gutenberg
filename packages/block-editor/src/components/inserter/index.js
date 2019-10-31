@@ -5,6 +5,7 @@ import { get } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { speak } from '@wordpress/a11y';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { Dropdown, IconButton } from '@wordpress/components';
 import { Component } from '@wordpress/element';
@@ -112,9 +113,11 @@ class Inserter extends Component {
 
 	render() {
 		const { position, hasSingleBlockType, insertOnlyAllowedBlock } = this.props;
+
 		if ( hasSingleBlockType ) {
 			return this.renderToggle( { onToggle: insertOnlyAllowedBlock } );
 		}
+
 		return (
 			<Dropdown
 				className="editor-inserter block-editor-inserter"
@@ -194,12 +197,19 @@ export default compose( [
 				} = dispatch( 'core/block-editor' );
 
 				const blockToInsert = createBlock( allowedBlockType.name );
+
 				insertBlock(
 					blockToInsert,
 					getInsertionIndex(),
 					rootClientId,
 					selectBlockOnInsert
 				);
+
+				if ( ! selectBlockOnInsert ) {
+					// translators: %s: the name of the block that has been added
+					const message = sprintf( __( '%s block added' ), allowedBlockType.title );
+					speak( message );
+				}
 			},
 		};
 	} ),
