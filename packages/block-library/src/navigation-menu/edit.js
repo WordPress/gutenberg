@@ -7,7 +7,6 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import {
-	Fragment,
 	useMemo,
 	useEffect,
 } from '@wordpress/element';
@@ -109,7 +108,7 @@ function NavigationMenu( {
 	}, [ backgroundColor.class, textColor.class ] );
 
 	return (
-		<Fragment>
+		<>
 			<BlockControls>
 				<Toolbar>
 					{ navigatorToolbarButton }
@@ -137,7 +136,7 @@ function NavigationMenu( {
 			</InspectorControls>
 
 			<div className={ navigationMenuClasses } style={ navigationMenuStyles }>
-				{ isRequesting && <Spinner /> }
+				{ isRequesting && <><Spinner /> { __( 'Loading Navigation…' ) } </> }
 				{ pages &&
 					<InnerBlocks
 						template={ defaultMenuItems ? defaultMenuItems : null }
@@ -147,7 +146,7 @@ function NavigationMenu( {
 					/>
 				}
 			</div>
-		</Fragment>
+		</>
 	);
 }
 
