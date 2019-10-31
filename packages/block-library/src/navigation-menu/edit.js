@@ -7,8 +7,8 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import {
-	Fragment,
 	useMemo,
+	useEffect,
 } from '@wordpress/element';
 import {
 	InnerBlocks,
@@ -35,7 +35,6 @@ import BlockColorsStyleSelector from './block-colors-selector';
 
 function NavigationMenu( {
 	attributes,
-	setAttributes,
 	clientId,
 	pages,
 	isRequesting,
@@ -43,6 +42,7 @@ function NavigationMenu( {
 	textColor,
 	setBackgroundColor,
 	setTextColor,
+	setAttributes,
 } ) {
 	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator( clientId );
 	const defaultMenuItems = useMemo(
@@ -79,7 +79,7 @@ function NavigationMenu( {
 	 * Set the color type according to the given values.
 	 * It propagate the color values into the attributes object.
 	 * Both `backgroundColorValue` and `textColorValue` are
-	 * using the apply inline styles.
+	 * using the inline styles.
 	 *
 	 * @param {Object}  colorsData       Arguments passed by BlockColorsStyleSelector onColorChange.
 	 * @param {string}  colorsData.attr  Color attribute.
@@ -99,14 +99,16 @@ function NavigationMenu( {
 		}
 	};
 
-	// Set/Unset colors CSS classes.
-	setAttributes( {
-		backgroundColorCSSClass: backgroundColor.class ? backgroundColor.class : null,
-		textColorCSSClass: textColor.class ? textColor.class : null,
-	} );
+	useEffect( () => {
+		// Set/Unset colors CSS classes.
+		setAttributes( {
+			backgroundColorCSSClass: backgroundColor.class ? backgroundColor.class : null,
+			textColorCSSClass: textColor.class ? textColor.class : null,
+		} );
+	}, [ backgroundColor.class, textColor.class ] );
 
 	return (
-		<Fragment>
+		<>
 			<BlockControls>
 				<ToolbarGroup>
 					{ navigatorToolbarButton }
@@ -134,16 +136,17 @@ function NavigationMenu( {
 			</InspectorControls>
 
 			<div className={ navigationMenuClasses } style={ navigationMenuStyles }>
-				{ isRequesting && <Spinner /> }
+				{ isRequesting && <><Spinner /> { __( 'Loading Navigation…' ) } </> }
 				{ pages &&
 					<InnerBlocks
 						template={ defaultMenuItems ? defaultMenuItems : null }
 						allowedBlocks={ [ 'core/navigation-menu-item' ] }
 						templateInsertUpdatesSelection={ false }
+						__experimentalMoverDirection={ 'horizontal' }
 					/>
 				}
 			</div>
-		</Fragment>
+		</>
 	);
 }
 

@@ -32,7 +32,7 @@ export default function ListEdit( {
 	onReplace,
 	className,
 } ) {
-	const { ordered, values, reversed, start } = attributes;
+	const { ordered, values, type, reversed, start } = attributes;
 	const tagName = ordered ? 'ol' : 'ul';
 
 	const controls = ( { value, onChange } ) => (
@@ -130,6 +130,7 @@ export default function ListEdit( {
 			onRemove={ () => onReplace( [] ) }
 			start={ start }
 			reversed={ reversed }
+			type={ type }
 		>
 			{ controls }
 		</RichText>

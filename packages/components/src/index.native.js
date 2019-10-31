@@ -1,5 +1,7 @@
 // Components
 export * from './primitives';
+export { default as ColorIndicator } from './color-indicator';
+export { default as ColorPalette } from './color-palette';
 export { default as Dashicon } from './dashicon';
 export { default as Dropdown } from './dropdown';
 export { default as Toolbar } from './toolbar';
