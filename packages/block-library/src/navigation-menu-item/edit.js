@@ -42,6 +42,11 @@ import {
 	useState,
 } from '@wordpress/element';
 
+/**
+ * Internal dependencies
+ */
+import BlockNavigationList from '../navigation-menu/block-navigation-list';
+
 function NavigationMenuItemEdit( {
 	attributes,
 	hasDescendants,
@@ -49,6 +54,7 @@ function NavigationMenuItemEdit( {
 	isParentOfSelectedBlock,
 	setAttributes,
 	insertMenuItemBlock,
+	parentNavigationClientId,
 } ) {
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
 	const [ isEditingLink, setIsEditingLink ] = useState( false );
@@ -132,6 +138,11 @@ function NavigationMenuItemEdit( {
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody
+					title={ __( 'Navigation Structure' ) }
+				>
+					<BlockNavigationList clientId={ parentNavigationClientId } />
+				</PanelBody>
+				<PanelBody
 					title={ __( 'Menu Settings' ) }
 				>
 					<ToggleControl
@@ -206,12 +217,17 @@ function NavigationMenuItemEdit( {
 
 export default compose( [
 	withSelect( ( select, ownProps ) => {
-		const { getClientIdsOfDescendants, hasSelectedInnerBlock } = select( 'core/block-editor' );
+		const {
+			getClientIdsOfDescendants,
+			hasSelectedInnerBlock,
+			__experimentalGetClosestParentWithName: getClosestParentWithName,
+		} = select( 'core/block-editor' );
 		const { clientId } = ownProps;
 
 		return {
 			isParentOfSelectedBlock: hasSelectedInnerBlock( clientId, true ),
 			hasDescendants: !! getClientIdsOfDescendants( [ clientId ] ).length,
+			parentNavigationClientId: getClosestParentWithName( clientId, 'core/navigation-menu' ),
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => {

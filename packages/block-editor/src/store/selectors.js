@@ -446,6 +446,26 @@ export const getBlockParents = createSelector(
 );
 
 /**
+ * Given a block client ID, find the closest parent with the given name.
+ *
+ * @param {Object} state    Editor state.
+ * @param {string} clientId Block from which to find root client ID.
+ * @param {string} name     The name of the block to find.
+ *
+ * @return {?Object} Block type of the parent if one exists
+ */
+export function __experimentalGetClosestParentWithName( state, clientId, name ) {
+	let current = clientId;
+	do {
+		current = state.blocks.parents[ current ];
+	} while ( current && state.blocks.byClientId[ current ].name !== name );
+
+	if ( current !== clientId ) {
+		return current;
+	}
+}
+
+/**
  * Given a block client ID, returns the root of the hierarchy from which the block is nested, return the block itself for root level blocks.
  *
  * @param {Object} state    Editor state.
