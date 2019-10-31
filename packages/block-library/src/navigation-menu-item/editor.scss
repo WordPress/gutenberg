@@ -88,6 +88,13 @@
 			}
 		}
 	}
+
+	&.is-editing,
+	&.is-selected {
+		box-shadow: 0 0 1px $light-gray-900 inset;
+		border-radius: 4px;
+		min-width: 30px;
+	}
 }
 
 .wp-block-navigation-menu-item__nofollow-external-link {
