@@ -111,47 +111,6 @@ function NavigationMenuItemEdit( {
 		}
 	};
 
-	let content;
-	if ( isSelected ) {
-		content = (
-			<div className="wp-block-navigation-menu-item__field-container">
-				<TextControl
-					ref={ plainTextRef }
-					className="wp-block-navigation-menu-item__field"
-					value={ label }
-					onChange={ ( labelValue ) => setAttributes( { label: labelValue } ) }
-					label={ __( 'Navigation Label' ) }
-					hideLabelFromVision={ true }
-				/>
-				{ isLinkOpen &&
-					<LinkControl
-						className="wp-block-navigation-menu-item__inline-link-input"
-						onKeyDown={ handleLinkControlOnKeyDown }
-						onKeyPress={ ( event ) => event.stopPropagation() }
-						currentLink={ link }
-						onLinkChange={ updateLink }
-						onClose={ () => {
-							setWasCloseByLinkControl( true );
-							setIsLinkOpen( false );
-						} }
-						currentSettings={ { 'new-tab': opensInNewTab } }
-						onSettingsChange={ updateLinkSetting }
-
-					/>
-				}
-			</div>
-		);
-	} else {
-		content = (
-			<div className="wp-block-navigation-menu-item__container">
-				{ ( link && link.url ) && (
-					<span title={ link.url }>{ label }</span>
-				) }
-				{ ( ! link || ! link.url ) && label }
-			</div>
-		);
-	}
-
 	return (
 		<Fragment>
 			<BlockControls>
