@@ -67,6 +67,12 @@ function NavigationMenuItemEdit( {
 		};
 	}, [ isSelected ] );
 
+	// Open the LinkControl popover if it's a new item.
+	useEffect( () => {
+		if( ! label && isSelected ) { setIsLinkOpen( true ) }
+	}, [] );
+
+
 	/**
 	 * `onKeyDown` LinkControl handler.
 	 * It takes over to stop the event propagation to make the
