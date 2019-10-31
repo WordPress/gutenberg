@@ -31,6 +31,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import useBlockNavigator from './use-block-navigator';
+import BlockNavigationList from './block-navigation-list';
 import BlockColorsStyleSelector from './block-colors-selector';
 
 function NavigationMenu( {
@@ -132,6 +133,11 @@ function NavigationMenu( {
 						label={ __( 'Automatically add new pages' ) }
 						help={ __( 'Automatically add new top level pages to this menu.' ) }
 					/>
+				</PanelBody>
+				<PanelBody
+					title={ __( 'Nested Blocks' ) }
+				>
+					<BlockNavigationList clientId={ clientId } />
 				</PanelBody>
 			</InspectorControls>
 
