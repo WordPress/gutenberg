@@ -212,6 +212,3 @@ jobs:
         local_dir: playground/dist
         on:
           branch: master
-
-  allow_failures:
-    - name: JavaScript native mobile tests
