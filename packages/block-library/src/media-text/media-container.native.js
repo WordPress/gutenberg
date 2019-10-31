@@ -3,7 +3,6 @@
  */
 import { View, ImageBackground, Text, TouchableWithoutFeedback } from 'react-native';
 import {
-	requestMediaImport,
 	mediaUploadSync,
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
@@ -62,7 +61,7 @@ class MediaContainer extends Component {
 	}
 
 	componentDidMount() {
-		const { mediaId, mediaUrl, onMediaUpdate, mediaType } = this.props;
+		const { mediaId, mediaUrl, mediaType } = this.props;
 
 		// Make sure we mark any temporary images as failed if they failed while
 		// the editor wasn't open
