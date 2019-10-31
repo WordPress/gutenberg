@@ -11,6 +11,11 @@
 .wp-block-navigation-menu-item {
 	margin-right: $grid-size;
 
+	.block-editor-block-list__layout {
+		display: block;
+		margin: $grid-size;
+	}
+
 	// Provide a base menu item margin.
 	// This should be the same inside the field,
 	// and the edit container should compensate.
