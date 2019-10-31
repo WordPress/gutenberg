@@ -11,6 +11,28 @@ import { IconButton, Dropdown, Toolbar } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { DOWN } from '@wordpress/keycodes';
 import { ColorPaletteControl, ContrastChecker } from '@wordpress/block-editor';
+import { SVG } from '@wordpress/components';
+
+
+const ColorSelectorSVGIcon = () => (
+	<SVG
+		xmlns="http://www.w3.org/2000/svg"
+		viewBox="0 0 20 20"
+	>
+		<text
+			transform="translate(-63 -14)"
+			fillRule="evenodd"
+			fontFamily="SFUIText-Bold, SF UI Text"
+			fontSize="12"
+			fontWeight="bold"
+			letterSpacing="-.5"
+			alignmentBaseline="middle"
+		>
+			<tspan x="63.453" y="23">Aa</tspan>
+		</text>
+	</SVG>
+);
+
 
 /**
  * Color Selector Icon component.
@@ -20,10 +42,10 @@ import { ColorPaletteControl, ContrastChecker } from '@wordpress/block-editor';
 const ColorSelectorIcon = ( { style } ) =>
 	<div className="block-library-colors-selector__icon-container">
 		<div
-			className="block-library-colors-selector__state-selection wp-block-navigation-menu-item"
+			className="block-library-colors-selector__state-selection"
 			style={ style }
 		>
-			Aa
+			<ColorSelectorSVGIcon />
 		</div>
 	</div>;
 
