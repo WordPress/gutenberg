@@ -203,8 +203,10 @@
 		"storybook:build": "build-storybook -c ./storybook -o ./playground/dist",
 		"prestorybook:dev": "npm run build:packages",
 		"storybook:dev": "concurrently \"npm run dev:packages\" \"start-storybook -c ./storybook\"",
+		"design-system:build": "echo \"Please use storybook:build instead.\"",
+		"design-system:dev": "echo \"Please use storybook:dev instead.\"",
 		"playground:build": "npm run storybook:build",
-		"playground:dev": "npm run storybook:dev",
+		"playground:dev": "echo \"Please use storybook:dev instead.\"",
 		"preenv": "npm run check-engines",
 		"env": "wp-scripts env"
 	},
