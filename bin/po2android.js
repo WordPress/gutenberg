@@ -31,13 +31,13 @@ function po2Android( poInput ) {
 			localizedEntry += `\t<!-- ${ comment.replace( '--', '—' ) } -->\n`;
 		}
 		if ( translation.msgid_plural ) {
-			localizedEntry += `\t<plurals name="gutenberg_native_string_${id}">
+			localizedEntry += `\t<plurals name="gutenberg_native_string_${id}" tools:ignore="UnusedResources">
 		<item quantity="one">${ escapedValue }</item>
 		<item quantity="other">${ escapedValuePlural }</item>
 	</plurals>
 `;
 		} else {
-			localizedEntry += `\t<string name="gutenberg_native_string_${id}">${ escapedValue }</string>\n`;
+			localizedEntry += `\t<string name="gutenberg_native_string_${id}" tools:ignore="UnusedResources">${ escapedValue }</string>\n`;
 		}
 		return localizedEntry;
 	} ).filter( Boolean );
