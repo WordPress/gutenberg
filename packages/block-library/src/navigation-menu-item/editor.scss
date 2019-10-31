@@ -25,7 +25,7 @@
 	// Compensate for menu item base padding.
 	margin-left: -$grid-size;
 
-	.wp-block-navigation-menu-item__field {
+	.wp-block-navigation-menu-item__content {
 		margin-right: $grid-size;
 
 		// This should match the padding of the menu item.
