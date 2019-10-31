@@ -354,7 +354,7 @@ export const EXPECTED_TRANSFORMS = {
 		],
 	},
 	'core__navigation-menu-item': {
-		originalBlock: 'Menu Item (Experimental)',
+		originalBlock: 'Menu Item',
 		availableTransforms: [
 			'Group',
 		],
