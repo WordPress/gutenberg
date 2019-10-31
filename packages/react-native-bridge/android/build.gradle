@@ -159,6 +159,6 @@ if (isJitPack) {
         preBuild.dependsOn(cleanupNodeModulesFolder)
         cleanupNodeModulesFolder.dependsOn(copyJSBundle)
         copyJSBundle.dependsOn(buildJSBundle)
-        buildJSBundle.dependsOn(yarn_install, ensureAssetsDirectory)
+        buildJSBundle.dependsOn(npm_install, ensureAssetsDirectory)
     }
 }
