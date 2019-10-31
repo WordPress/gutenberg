@@ -6,9 +6,9 @@ import { startCase } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { Button, CheckboxControl, Modal } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useState, useCallback } from '@wordpress/element';
-import { Button, Modal, CheckboxControl } from '@wordpress/components';
 
 const EntitiesSavedStatesCheckbox = ( {
 	id,
@@ -25,17 +25,13 @@ const EntitiesSavedStatesCheckbox = ( {
 	/>
 );
 
-export default function EntitiesSavedStates() {
+export default function EntitiesSavedStates( { isOpen, onRequestClose } ) {
 	const entityRecordChangesByRecord = useSelect( ( select ) =>
 		select( 'core' ).getEntityRecordChangesByRecord()
 	);
 	const { saveEditedEntityRecord } = useDispatch( 'core' );
 
-	const [ isOpen, setIsOpen ] = useState( false );
 	const [ checkedById, _setCheckedById ] = useState( {} );
-
-	const openModal = useCallback( setIsOpen.bind( null, true ), [] );
-	const closeModal = useCallback( setIsOpen.bind( null, false ), [] );
 	const setCheckedById = useCallback(
 		( id, checked ) =>
 			_setCheckedById( ( prevCheckedById ) => {
@@ -52,60 +48,51 @@ export default function EntitiesSavedStates() {
 		[]
 	);
 	const saveCheckedEntities = useCallback( () => {
-		closeModal();
 		Object.keys( checkedById ).forEach( ( id ) =>
-			saveEditedEntityRecord( ...id.split( ' | ' ) )
+			saveEditedEntityRecord( ...id.split( ' | ' ).filter( ( s ) => s !== 'undefined' ) )
 		);
+		onRequestClose( checkedById );
 	}, [ checkedById ] );
-
-	const changedKinds = Object.keys( entityRecordChangesByRecord );
 	return (
-		changedKinds.length > 0 && (
-			<>
-				<Button isSmall onClick={ openModal }>
-					Save Global Changes
-				</Button>
-				{ isOpen && (
-					<Modal
-						title="What do you want to save?"
-						onRequestClose={ closeModal }
-						contentLabel="Select items to save."
-					>
-						{ changedKinds.map( ( changedKind ) =>
-							Object.keys( entityRecordChangesByRecord[ changedKind ] ).map(
-								( changedName ) =>
-									Object.keys(
-										entityRecordChangesByRecord[ changedKind ][ changedName ]
-									).map( ( changedKey ) => {
-										const id = `${ changedKind } | ${ changedName } | ${ changedKey }`;
-										return (
-											<EntitiesSavedStatesCheckbox
-												key={ id }
-												id={ id }
-												name={ changedName }
-												changes={
-													entityRecordChangesByRecord[ changedKind ][ changedName ][
-														changedKey
-													]
-												}
-												checked={ checkedById[ id ] }
-												setCheckedById={ setCheckedById }
-											/>
-										);
-									} )
-							)
-						) }
-						<Button
-							isPrimary
-							disabled={ Object.keys( checkedById ).length === 0 }
-							onClick={ saveCheckedEntities }
-							className="editor-entities-saved-states__save-button"
-						>
-							Save
-						</Button>
-					</Modal>
+		isOpen && (
+			<Modal
+				title="What do you want to save?"
+				onRequestClose={ onRequestClose }
+				contentLabel="Select items to save."
+			>
+				{ Object.keys( entityRecordChangesByRecord ).map( ( changedKind ) =>
+					Object.keys( entityRecordChangesByRecord[ changedKind ] ).map(
+						( changedName ) =>
+							Object.keys(
+								entityRecordChangesByRecord[ changedKind ][ changedName ]
+							).map( ( changedKey ) => {
+								const id = `${ changedKind } | ${ changedName } | ${ changedKey }`;
+								return (
+									<EntitiesSavedStatesCheckbox
+										key={ id }
+										id={ id }
+										name={ changedName }
+										changes={
+											entityRecordChangesByRecord[ changedKind ][ changedName ][
+												changedKey
+											]
+										}
+										checked={ checkedById[ id ] }
+										setCheckedById={ setCheckedById }
+									/>
+								);
+							} )
+					)
 				) }
-			</>
+				<Button
+					isPrimary
+					disabled={ Object.keys( checkedById ).length === 0 }
+					onClick={ saveCheckedEntities }
+					className="editor-entities-saved-states__save-button"
+				>
+					Save
+				</Button>
+			</Modal>
 		)
 	);
 }
