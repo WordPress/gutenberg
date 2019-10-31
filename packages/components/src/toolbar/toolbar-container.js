@@ -48,6 +48,7 @@ function ToolbarContainer( { accessibilityLabel, ...props }, ref ) {
 			<Toolbar
 				ref={ ref }
 				aria-label={ accessibilityLabel }
+				data-toolbar={ true }
 				{ ...toolbarState }
 				{ ...props }
 			/>

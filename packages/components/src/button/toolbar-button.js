@@ -1,14 +1,21 @@
 /**
  * External dependencies
  */
-import { useToolbarItem } from 'reakit/Toolbar';
+import { useToolbarItem, useContext } from 'reakit/Toolbar';
 
 /**
  * WordPress dependencies
  */
 import { forwardRef } from '@wordpress/element';
 
-function ToolbarButton( { context, as: Component = 'button', ...props }, ref ) {
+/**
+ * Internal dependencies
+ */
+import ToolbarContext from '../toolbar-context';
+
+function ToolbarButton( { as: Component = 'button', ...props }, ref ) {
+	const context = useContext( ToolbarContext );
+
 	// https://reakit.io/docs/composition/#props-hooks
 	const itemHTMLProps = useToolbarItem( context, {
 		ref,
