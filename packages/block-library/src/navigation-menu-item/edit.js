@@ -51,7 +51,6 @@ function NavigationMenuItemEdit( {
 	const link = title ? { title, url } : null;
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
 	const [ wasClosedByLinkControl, setWasClosedByLinkControl ] = useState( false );
-	const [ showFakePlaceholder, setShowFakePlaceholder ] = useState( false );
 
 	/**
 	 * It's a kind of hack to handle closing the LinkControl popover
@@ -61,25 +60,18 @@ function NavigationMenuItemEdit( {
 		if ( ! isSelected ) {
 			setIsLinkOpen( false );
 			setWasClosedByLinkControl( false );
-			setShowFakePlaceholder( false );
 		}
 		return () => {
 			setIsLinkOpen( false );
 			setWasClosedByLinkControl( false );
-			setShowFakePlaceholder( false );
 		};
 	}, [ isSelected ] );
 
 	// Set the menu item when it's new.
 	// - Open LinkControl popover.
-	// - Show a fake placeholder.
 	useEffect( () => {
-		if ( ! label && isSelected ) {
-			setIsLinkOpen( true );
-			setShowFakePlaceholder( true );
-		}
+		if ( ! label && isSelected ) setIsLinkOpen( true );
 	}, [] );
-
 
 	/**
 	 * `onKeyDown` LinkControl handler.
@@ -114,7 +106,6 @@ function NavigationMenuItemEdit( {
 		// Set the item label as well if it isn't already defined.
 		if ( ! label ) {
 			setAttributes( { label: newTitle } );
-			setShowFakePlaceholder( false );
 		}
 	};
 
@@ -215,21 +206,13 @@ function NavigationMenuItemEdit( {
 					'is-selected': isSelected,
 				} ) }
 			>
-				{ ( ! showFakePlaceholder ) && (
-					<RichText
-						className="wp-block-navigation-menu-item__content"
-						value={ label }
-						onChange={ ( labelValue ) => setAttributes( { label: labelValue } ) }
-						placeholder={ itemLabelPlaceholder }
-						withoutInteractiveFormatting
-					/>
-				) }
-
-				{ ( showFakePlaceholder ) && (
-					<div className="wp-block-navigation-menu-item__content">
-						{ itemLabelPlaceholder }
-					</div>
-				) }
+				<RichText
+					className="wp-block-navigation-menu-item__content"
+					value={ label }
+					onChange={ ( labelValue ) => setAttributes( { label: labelValue } ) }
+					placeholder={ itemLabelPlaceholder }
+					withoutInteractiveFormatting
+				/>
 
 				{ isLinkOpen &&
 					<LinkControl
