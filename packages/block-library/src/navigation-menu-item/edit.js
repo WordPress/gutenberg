@@ -96,6 +96,11 @@ function NavigationMenuItemEdit( {
 			title: newTitle,
 			url: newURL,
 		} );
+
+		// Set the item label as well if it isn't already defined.
+		if ( ! label ) {
+			setAttributes( { label: newTitle } );
+		}
 	};
 
 	/**
