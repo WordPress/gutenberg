@@ -64,15 +64,9 @@ class MediaContainer extends Component {
 	componentDidMount() {
 		const { mediaId, mediaUrl, onMediaUpdate, mediaType } = this.props;
 
-		if ( mediaId && mediaUrl && ! isURL( mediaUrl ) ) {
-			if ( mediaUrl.indexOf( 'file:' ) === 0 && mediaType === MEDIA_TYPE_IMAGE ) {
-				// We don't want to call this for video because it is starting a media upload for the cover url
-				requestMediaImport( mediaUrl, ( id, url ) => {
-					if ( url ) {
-						onMediaUpdate( { id, url } );
-					}
-				} );
-			}
+		// Make sure we mark any temporary images as failed if they failed while
+		// the editor wasn't open
+		if ( mediaId && mediaUrl && mediaUrl.indexOf( 'file:' ) === 0 && mediaType === MEDIA_TYPE_IMAGE ) {
 			mediaUploadSync();
 		}
 	}
