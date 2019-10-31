@@ -58,7 +58,7 @@ function NavigationMenu( {
 					destination,
 					title: title.raw,
 					type,
-					link_id: id,
+					linkId: id,
 					url: link,
 					opensInNewTab: false,
 				} ]

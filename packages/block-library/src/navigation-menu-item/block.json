@@ -18,7 +18,7 @@
 		"description": {
 			"type": "string"
 		},
-		"link_id": {
+		"linkId": {
 			"type": "number"
 		},
 		"opensInNewTab": {
