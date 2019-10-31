@@ -39,9 +39,6 @@ if (isJitPack) {
         // Version of npm to use.
         npmVersion = '6.3.0'
 
-        // Version of Yarn to use.
-        yarnVersion = '1.10.1'
-
         // Base URL for fetching node distributions (change if you have a mirror).
         distBaseUrl = 'https://nodejs.org/dist'
 
@@ -57,11 +54,8 @@ if (isJitPack) {
         // Set the work directory for NPM
         npmWorkDir = file("${tmpdir}/npm")
 
-        // Set the work directory for Yarn
-        yarnWorkDir = file("${tmpdir}/yarn")
-
         // Set the work directory where node_modules should be located
-        nodeModulesDir = file("${project.projectDir}/../../")
+        nodeModulesDir = file("${project.projectDir}/../../../")
     }
 }
 
@@ -74,7 +68,7 @@ apply from: 'https://gist.githubusercontent.com/hypest/ceaf20a8e7d9b8404e4a5ff2e
 // import the `waitJitpack()` function
 apply from: 'https://gist.githubusercontent.com/hypest/f526fe0775dedce0ce0133f1400d22a4/raw/0008b271a0d28fc79957fd3c2a027f57e98f796a/wait-jitpack.gradle'
 
-group='com.github.wordpress-mobile.gutenberg-mobile'
+group='com.github.wordpress.gutenberg'
 
 // fallback flag value for when lib is compiled individually (e.g. via jitpack)
 project.ext.buildGutenbergFromSource = false
@@ -138,8 +132,8 @@ dependencies {
 if (isJitPack) {
     def assetsFolder = 'src/main/assets'
 
-    task buildJSBundle(type: YarnTask) {
-        args = ['bundle:android']
+    task buildJSBundle(type: NpmTask) {
+        args = ['native', 'bundle:android']
     }
 
     task ensureAssetsDirectory << {
@@ -148,7 +142,7 @@ if (isJitPack) {
 
     task copyJSBundle(type: Copy) {
         def origFileName = 'App.js'
-        def origWithPath = "../../bundle/android/${origFileName}"
+        def origWithPath = "../../react-native-editor/bundle/android/${origFileName}"
         def target = 'index.android.bundle'
         from origWithPath
         into assetsFolder
