@@ -2,7 +2,6 @@
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -35,15 +34,12 @@ function FontSizePicker( {
 	value,
 	withSlider = false,
 } ) {
-	const [ currentSelectValue, setCurrentSelectValue ] = useState( getSelectValueFromFontSize( fontSizes, value ) );
-
 	if ( disableCustomFontSizes && ! fontSizes.length ) {
 		return null;
 	}
 
 	const onChangeValue = ( event ) => {
 		const newValue = event.target.value;
-		setCurrentSelectValue( getSelectValueFromFontSize( fontSizes, Number( newValue ) ) );
 		if ( newValue === '' ) {
 			onChange( undefined );
 			return;
@@ -52,7 +48,6 @@ function FontSizePicker( {
 	};
 
 	const onSelectChangeValue = ( eventValue ) => {
-		setCurrentSelectValue( eventValue );
 		const selectedFont = fontSizes.find( ( font ) => font.slug === eventValue );
 		if ( selectedFont ) {
 			onChange( selectedFont.size );
@@ -70,7 +65,7 @@ function FontSizePicker( {
 						className={ 'components-font-size-picker__select' }
 						label={ 'Choose preset' }
 						hideLabelFromVision={ true }
-						value={ currentSelectValue }
+						value={ getSelectValueFromFontSize( fontSizes, value ) }
 						onChange={ onSelectChangeValue }
 						options={ getSelectOptions( fontSizes ) }
 					/>
@@ -88,10 +83,7 @@ function FontSizePicker( {
 					className="components-color-palette__clear"
 					type="button"
 					disabled={ value === undefined }
-					onClick={ () => {
-						onChange( undefined );
-						setCurrentSelectValue( getSelectValueFromFontSize( fontSizes, undefined ) );
-					} }
+					onClick={ () => onChange( undefined ) }
 					isSmall
 					isDefault
 				>
