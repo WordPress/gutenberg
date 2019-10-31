@@ -627,18 +627,6 @@ extension RCTAztecView: UITextViewDelegate {
     }
 
     func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
-        if #available(iOS 13.1, *) {
-            return false
-        } else if #available(iOS 13.0.0, *) {
-            // Sergio Estevao: This shouldn't happen in an editable textView, but it looks we have a system bug in iOS13 so we need this workaround
-            let position = characterRange.location
-            textView.selectedRange = NSRange(location: position, length: 0)
-            textView.typingAttributes = textView.attributedText.attributes(at: position, effectiveRange: nil)
-            textView.delegate?.textViewDidChangeSelection?(textView)
-        } else {
-            return false
-        }
-
         return false
     }
 }
