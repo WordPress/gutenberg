@@ -7,12 +7,10 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { IconButton, Dropdown, Toolbar } from '@wordpress/components';
+import { IconButton, Dropdown, Toolbar, SVG } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { DOWN } from '@wordpress/keycodes';
 import { ColorPaletteControl, ContrastChecker } from '@wordpress/block-editor';
-import { SVG } from '@wordpress/components';
-
 
 const ColorSelectorSVGIcon = () => (
 	<SVG
@@ -32,7 +30,6 @@ const ColorSelectorSVGIcon = () => (
 		</text>
 	</SVG>
 );
-
 
 /**
  * Color Selector Icon component.
