@@ -33,7 +33,6 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.3.1",
-    "@react-native-community/cli": "^1.5.2",
     "@wordpress/block-editor": "file:../block-editor",
     "@wordpress/block-library": "file:../block-library",
     "@wordpress/blocks": "file:../blocks",
@@ -45,7 +44,6 @@
     "@wordpress/react-native-aztec": "../react-native-aztec",
     "@wordpress/react-native-bridge": "file:../react-native-bridge",
     "classnames": "^2.2.5",
-    "css-to-react-native-transform": "^1.9.0",
     "dom-react": "^2.2.1",
     "domutils": "^1.7.0",
     "fast-average-color": "^4.3.0",
