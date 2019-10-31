@@ -50,7 +50,7 @@ function NavigationMenuItemEdit( {
 	const { label, opensInNewTab, title, url } = attributes;
 	const link = title ? { title, url } : null;
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
-	const [ wasCloseByLinkControl, setWasCloseByLinkControl ] = useState( false );
+	const [ wasClosedByLinkControl, setWasClosedByLinkControl ] = useState( false );
 	const [ showFakePlaceholder, setShowFakePlaceholder ] = useState( false );
 
 	/**
@@ -60,12 +60,12 @@ function NavigationMenuItemEdit( {
 	useEffect( () => {
 		if ( ! isSelected ) {
 			setIsLinkOpen( false );
-			setWasCloseByLinkControl( false );
+			setWasClosedByLinkControl( false );
 			setShowFakePlaceholder( false );
 		}
 		return () => {
 			setIsLinkOpen( false );
-			setWasCloseByLinkControl( false );
+			setWasClosedByLinkControl( false );
 			setShowFakePlaceholder( false );
 		};
 	}, [ isSelected ] );
@@ -144,8 +144,8 @@ function NavigationMenuItemEdit( {
 						onClick={ () => {
 							// If the popover was closed by click outside,
 							// then there is not nothing to do here.
-							if ( wasCloseByLinkControl ) {
-								setWasCloseByLinkControl( false );
+							if ( wasClosedByLinkControl ) {
+								setWasClosedByLinkControl( false );
 								return;
 							}
 							setIsLinkOpen( ! isLinkOpen );
@@ -239,7 +239,7 @@ function NavigationMenuItemEdit( {
 						currentLink={ link }
 						onLinkChange={ updateLink }
 						onClose={ () => {
-							setWasCloseByLinkControl( true );
+							setWasClosedByLinkControl( true );
 							setIsLinkOpen( false );
 						} }
 						currentSettings={ { 'new-tab': opensInNewTab } }
