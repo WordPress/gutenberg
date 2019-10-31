@@ -41,12 +41,8 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 					'callback'            => array( $this, 'get_title' ),
 					'args' => array(
 						'url' => array(
-							'validate_callback' => function( $param ) {
-								return $this->validate_url( $param );
-							},
-							'sanitize_callback' => function( $param ) {
-								return $this->sanitize_url( $param );
-							},
+							'validate_callback' => 'wp_http_validate_url',
+							'sanitize_callback' => 'esc_url_raw',
 						),
 					),
 					'permission_callback' => array( $this, 'get_remote_url_permissions_check' ),
@@ -54,9 +50,6 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 			)
 		);
 	}
-
-
-
 
 	/**
 	 * Retrieves the contents of the <title> tag from the HTML
@@ -67,62 +60,23 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	 * @return String|WP_Error          the title text or an error.
 	 */
 	public function get_title( $request ) {
+		$url   = $request->get_param( 'url' );
+		$title = $this->get_remote_url_title( $url );
 
-		$url = $request->get_param( 'url' );
-
-		$html_response = $this->get_remote_url_html( $url );
-
-		if ( is_wp_error( $html_response ) ) {
-			return new WP_Error( 'no_title', __( 'Unable to retrieve title tag.', 'gutenberg' ) . $html_response->get_error_message(), array( 'status' => 404 ) );
-		}
-
-		$title_list = $html_response->getElementsByTagName( 'title' );
-
-		$title = $title_list->item( 0 );
-
-		if ( empty( $title ) ) {
-			return new WP_Error( 'no_title', __( 'No title tag at remote url.', 'gutenberg' ), array( 'status' => 404 ) );
-		}
-
-		$title_text = $title->nodeValue;
-
-		return rest_ensure_response( $title_text );
-	}
-
-	/**
-	 * Validates a given URL
-	 *
-	 * @param  String $url the url to validate
-	 * @return Boolean      whether or not the URL is considered valid.
-	 */
-	public function validate_url( $url ) {
-		return wp_http_validate_url( $url );
-	}
-
-	/**
-	 * Sanitizes a given URL.
-	 *
-	 * @param  String $url the URL to sanitize.
-	 * @return String      the sanitized version of the URL.
-	 */
-	public function sanitize_url( $url ) {
-		return esc_url_raw( $url );
+		return rest_ensure_response( $title );
 	}
 
 	/**
 	 * Checks whether a given request has permission to read remote urls.
 	 *
+	 * phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_Error|bool True if the request has access, WP_Error object otherwise.
-	 *
-	 * This function is overloading a function defined in WP_REST_Controller so it should have the same parameters.
-	 * phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 	 */
 	public function get_remote_url_permissions_check( $request ) {
-
-		$required_cap = 'edit_posts';
-
-		if ( ! current_user_can( $required_cap ) ) {
+		/* phpcs:enable */
+		if ( ! current_user_can( 'edit_posts' ) ) {
 			return new WP_Error(
 				'rest_user_cannot_view',
 				__( 'Sorry, you are not allowed to access remote urls.', 'gutenberg' )
@@ -131,52 +85,47 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 
 		return true;
 	}
-	/* phpcs:enable */
-
 
 	/**
-	 * Retrives a DOMDocument representation of the
-	 * HTML from a remote URL
+	 * Retrieves the document title from a remote URL
 	 *
 	 * @param  String $url the website url whose HTML we want to access.
-	 * @return DOMDocument      the loaded HTML response.
+	 * @return string|WP_Error The URL's document title on success, WP_Error on failure.
 	 */
-	private function get_remote_url_html( $url ) {
+	private function get_remote_url_title( $url ) {
+		// Transient per URL.
+		$cache_key = 'g_url_details_response_' . hash( 'crc32b', $url );
 
-		$response = null;
+		// Attempt to retrieve cached response.
+		$title = null;//get_transient( $cache_key );
 
-		// Transient per URL
-		$cache_key = 'g_url_details_response_' . md5( $url );
+		if ( empty( $title ) ) {
+			$request                = wp_safe_remote_get( $url, array(
+				'timeout'             => 10,
+			//	'redirection'         => 0,
+				'limit_response_size' => 153600, // 150 KB
+			) );
+			$remote_source = wp_remote_retrieve_body( $request );
 
-		// Attempt to retrieve cached response
-		$cached_response = get_transient( $cache_key );
+			if ( ! $remote_source ) {
+				return new WP_Error( 'no_response', __( 'The source URL does not exist.', 'gutenberg' ), array( 'status' => 404 ) );
+			}
 
-		if ( ! empty( $cached_response ) ) {
-			$response = $cached_response;
-		} else {
-			$response = wp_remote_get( $url );
+			// Work around bug in strip_tags():
+			$remote_source = str_replace( '<!DOC', '<DOC', $remote_source );
+			$remote_source = preg_replace( '/[\r\n\t ]+/', ' ', $remote_source ); // Normalize spaces.
+			$remote_source = preg_replace( '/<\/*(h1|h2|h3|h4|h5|h6|p|th|td|li|dt|dd|pre|caption|input|textarea|button|body)[^>]*>/', "\n\n", $remote_source );
 
-			if ( is_wp_error( $response ) || ! is_array( $response ) ) {
-				return new WP_Error( 'no_response', __( 'Unable to contact remote url.', 'gutenberg' ) . $response->get_error_message(), array( 'status' => 404 ) );
+			preg_match( '|<title>([^<]*?)</title>|is', $remote_source, $match_title );
+			$title = isset( $match_title[1] ) ? $match_title[1] : '';
+			if ( empty( $title ) ) {
+				return new WP_Error( 'no_title', __( 'No document title at remote url.', 'gutenberg' ), array( 'status' => 404 ) );
 			}
 
 			// Only cache valid responses.
-			set_transient( $cache_key, $response, HOUR_IN_SECONDS );
+			set_transient( $cache_key, $title, HOUR_IN_SECONDS );
 		}
 
-		$body = wp_remote_retrieve_body( $response );
-
-		$dom = new DOMDocument( '1.0', 'UTF-8' );
-
-		// set error level
-		$internalErrors = libxml_use_internal_errors( true );
-
-		// load HTML
-		$dom->loadHTML( $body );
-
-		// Restore error level
-		libxml_use_internal_errors( $internalErrors );
-
-		return $dom;
+		return $title;
 	}
 }
