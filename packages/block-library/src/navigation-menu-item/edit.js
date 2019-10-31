@@ -25,12 +25,12 @@ import {
 	ENTER,
 } from '@wordpress/keycodes';
 import { __ } from '@wordpress/i18n';
-import { RichText } from '@wordpress/block-editor';
 import {
 	BlockControls,
 	InnerBlocks,
 	InspectorControls,
 	URLPopover,
+	RichText,
 } from '@wordpress/block-editor';
 import {
 	Fragment,
