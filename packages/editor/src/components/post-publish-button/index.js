@@ -2,11 +2,12 @@
  * External dependencies
  */
 import { noop, get } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
-import { Button, Dashicon } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { Component, createRef } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
@@ -152,13 +153,13 @@ export class PostPublishButton extends Component {
 					isOpen={ Boolean( entitiesSavedStatesCallback ) }
 					onRequestClose={ this.closeEntitiesSavedStates }
 				/>
-				<Button ref={ this.buttonNode } { ...componentProps }>
-					{ hasNonPostEntityChanges && (
-						<Dashicon
-							icon="layout"
-							style={ { marginRight: '3px', marginLeft: '-5px' } }
-						/>
-					) }
+				<Button
+					ref={ this.buttonNode }
+					{ ...componentProps }
+					className={ classnames( componentProps.className, {
+						'editor-post-publish-button__has-changes-dot': hasNonPostEntityChanges,
+					} ) }
+				>
 					{ componentChildren }
 				</Button>
 			</>

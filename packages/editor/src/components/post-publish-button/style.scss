@@ -1,0 +1,8 @@
+.editor-post-publish-button__has-changes-dot::before {
+	background: $white;
+	border-radius: 4px;
+	content: "";
+	height: 8px;
+	margin: auto 5px auto -3px;
+	width: 8px;
+}
