@@ -120,7 +120,6 @@ The following example shows you how to properly implement a modal. For the modal
 
 ```jsx
 import { Button, Modal } from '@wordpress/components';
-import { Fragment } from '@wordpress/element';
 import { useState } from '@wordpress/compose';
 
 const MyModal = () => {
@@ -129,7 +128,7 @@ const MyModal = () => {
 	const closeModal = () => setOpen( false );
 	
 	return (
-		<Fragment>
+		<>
 			<Button isDefault onClick={ openModal }>Open Modal</Button>
 			{ isOpen && (
 				<Modal
@@ -140,7 +139,7 @@ const MyModal = () => {
 					</Button>
 				</Modal>
 			) }
-		</Fragment>
+		</>
 	)
 }
 ```
