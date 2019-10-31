@@ -50,9 +50,8 @@
 }
 
 .wp-block-navigation-menu-item {
-	font-family: $editor-font;
-	font-weight: bold;
-	font-size: $text-editor-font-size;
+	font-family: inherit;
+	font-size: inherit;
 	background-color: var(--background-color-menu-link);
 	color: var(--color-menu-link);
 
