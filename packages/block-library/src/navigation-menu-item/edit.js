@@ -108,7 +108,7 @@ function NavigationMenuItemEdit( {
 	 * @param {string} value Setting type value.
 	 */
 	const updateLinkSetting = ( setting, value ) => {
-		if ( 'new-tab' ) {
+		if ( setting === 'new-tab' ) {
 			setAttributes( { opensInNewTab: value } );
 		}
 	};
