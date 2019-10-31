@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import { useToolbarItem, useContext } from 'reakit/Toolbar';
+import { useToolbarItem } from 'reakit/Toolbar';
 
 /**
  * WordPress dependencies
  */
-import { forwardRef } from '@wordpress/element';
+import { forwardRef, useContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
