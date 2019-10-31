@@ -60,7 +60,7 @@ function NavigationMenu( {
 					type,
 					link_id: id,
 					url: link,
-					newTab: false,
+					opensInNewTab: false,
 				} ]
 			) );
 		},
