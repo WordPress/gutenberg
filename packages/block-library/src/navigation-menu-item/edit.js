@@ -91,13 +91,11 @@ function NavigationMenuItemEdit( {
 	 *
 	 * @param {Object|null} itemLink Link object if it has been selected. Otherwise, Null.
 	 */
-	const updateLink = ( itemLink ) => {
-		if ( ! itemLink ) {
-			// If not link, then set empty string to link attrs.
-			return setAttributes( { title: '', url: '' } );
-		}
-
-		setAttributes( { title: itemLink.title, url: itemLink.url } );
+	const updateLink = ( { title: newTitle = '', url: newURL = '' } = {} ) => {
+		setAttributes( {
+			title: newTitle,
+			url: newURL,
+		} );
 	};
 
 	/**
