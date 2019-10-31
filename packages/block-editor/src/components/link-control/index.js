@@ -46,6 +46,7 @@ function LinkControl( {
 	fetchSearchSuggestions,
 	instanceId,
 	onClose = noop,
+	onEdit = noop,
 	onKeyDown = noop,
 	onKeyPress = noop,
 	onLinkChange = noop,
@@ -77,9 +78,22 @@ function LinkControl( {
 	};
 
 	// Utils
-	const startEditMode = () => {
-		if ( isFunction( onLinkChange ) ) {
-			onLinkChange();
+
+	/**
+	 * Handler function which turns edit mode ON.
+	 * Also, it calls `onEdit` prop.
+	 */
+	const onEditHandler = () => {
+		setIsEditingLink( true );
+
+		// Populate input searcher whether
+		// the current link has a title.
+		if ( currentLink && currentLink.title ) {
+			setInputValue( currentLink.title );
+		}
+
+		if ( isFunction( onEdit ) ) {
+			onEdit();
 		}
 	};
 
@@ -205,7 +219,7 @@ function LinkControl( {
 									<span className="block-editor-link-control__search-item-info">{ filterURLForDisplay( safeDecodeURI( currentLink.url ) ) || '' }</span>
 								</span>
 
-								<Button isDefault onClick={ startEditMode } className="block-editor-link-control__search-item-action block-editor-link-control__search-item-action--edit">
+								<Button isDefault onClick={ onEditHandler } className="block-editor-link-control__search-item-action block-editor-link-control__search-item-action--edit">
 									{ __( 'Change' ) }
 								</Button>
 							</div>
