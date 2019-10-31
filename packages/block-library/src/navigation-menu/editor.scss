@@ -122,13 +122,6 @@ $colors-selector-size: 22px;
 		min-height: $colors-selector-size;
 		line-height: ($colors-selector-size - 2);
 
-		// Adjust `Aa` icon position.
-		> svg {
-			position: relative;
-			top: 4px;
-			left: 2px;
-		}
-
 		background-color: var(--background-color-menu-link);
 		color: var(--color-menu-link);
 	}
