@@ -51,6 +51,7 @@ function NavigationMenuItemEdit( {
 	const link = title ? { title, url } : null;
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
 	const [ wasCloseByLinkControl, setWasCloseByLinkControl ] = useState( false );
+	const [ showFakePlaceholder, setShowFakePlaceholder ] = useState( false );
 
 	/**
 	 * It's a kind of hack to handle closing the LinkControl popover
@@ -60,16 +61,23 @@ function NavigationMenuItemEdit( {
 		if ( ! isSelected ) {
 			setIsLinkOpen( false );
 			setWasCloseByLinkControl( false );
+			setShowFakePlaceholder( false );
 		}
 		return () => {
 			setIsLinkOpen( false );
 			setWasCloseByLinkControl( false );
+			setShowFakePlaceholder( false );
 		};
 	}, [ isSelected ] );
 
-	// Open the LinkControl popover if it's a new item.
+	// Set the menu item when it's new.
+	// - Open LinkControl popover.
+	// - Show a fake placeholder.
 	useEffect( () => {
-		if( ! label && isSelected ) { setIsLinkOpen( true ) }
+		if ( ! label && isSelected ) {
+			setIsLinkOpen( true );
+			setShowFakePlaceholder( true );
+		}
 	}, [] );
 
 
@@ -106,6 +114,7 @@ function NavigationMenuItemEdit( {
 		// Set the item label as well if it isn't already defined.
 		if ( ! label ) {
 			setAttributes( { label: newTitle } );
+			setShowFakePlaceholder( false );
 		}
 	};
 
@@ -121,6 +130,8 @@ function NavigationMenuItemEdit( {
 			setAttributes( { opensInNewTab: value } );
 		}
 	};
+
+	const itemLabelPlaceholder = __( 'Add item…' );
 
 	return (
 		<Fragment>
@@ -204,13 +215,22 @@ function NavigationMenuItemEdit( {
 					'is-selected': isSelected,
 				} ) }
 			>
-				<RichText
-					className="wp-block-navigation-menu-item__content"
-					value={ label }
-					onChange={ ( labelValue ) => setAttributes( { label: labelValue } ) }
-					placeholder={ __( 'Add item…' ) }
-					withoutInteractiveFormatting
-				/>
+				{ ( ! showFakePlaceholder ) && (
+					<RichText
+						className="wp-block-navigation-menu-item__content"
+						value={ label }
+						onChange={ ( labelValue ) => setAttributes( { label: labelValue } ) }
+						placeholder={ itemLabelPlaceholder }
+						withoutInteractiveFormatting
+					/>
+				) }
+
+				{ ( showFakePlaceholder ) && (
+					<div className="wp-block-navigation-menu-item__content">
+						{ itemLabelPlaceholder }
+					</div>
+				) }
+
 				{ isLinkOpen &&
 					<LinkControl
 						className="wp-block-navigation-menu-item__inline-link-input"
