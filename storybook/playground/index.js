@@ -13,18 +13,12 @@ import {
 	ObserveTyping,
 } from '@wordpress/block-editor';
 import {
-	Button,
 	Popover,
 	SlotFillProvider,
 	DropZoneProvider,
 } from '@wordpress/components';
 import { registerCoreBlocks } from '@wordpress/block-library';
 import '@wordpress/format-library';
-
-/**
- * Internal dependencies
- */
-import './style.scss';
 
 /* eslint-disable no-restricted-syntax */
 import '@wordpress/components/build-style/style.css';
@@ -34,6 +28,11 @@ import '@wordpress/block-library/build-style/editor.css';
 import '@wordpress/block-library/build-style/theme.css';
 import '@wordpress/format-library/build-style/style.css';
 /* eslint-enable no-restricted-syntax */
+
+/**
+ * Internal dependencies
+ */
+import './style.scss';
 
 function App() {
 	const [ blocks, updateBlocks ] = useState( [] );

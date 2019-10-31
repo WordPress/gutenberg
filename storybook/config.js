@@ -6,9 +6,11 @@ import { withA11y } from '@storybook/addon-a11y';
 import { withKnobs } from '@storybook/addon-knobs';
 
 /**
- * Internal dependencies
+ * WordPress dependencies
  */
+/* eslint-disable no-restricted-syntax */
 import '@wordpress/components/build-style/style.css';
+/* eslint-enable no-restricted-syntax */
 
 addDecorator( withA11y );
 addDecorator( withKnobs );
