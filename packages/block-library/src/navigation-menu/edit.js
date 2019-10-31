@@ -135,7 +135,7 @@ function NavigationMenu( {
 					/>
 				</PanelBody>
 				<PanelBody
-					title={ __( 'Nested Blocks' ) }
+					title={ __( 'Navigation Structure' ) }
 				>
 					<BlockNavigationList clientId={ clientId } />
 				</PanelBody>
