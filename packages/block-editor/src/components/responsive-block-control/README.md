@@ -1,21 +1,35 @@
 ResponsiveBlockControl
 =============================
 
-`ResponsiveBlockControl` provides a standardised interface for Block controls that require different settings per viewport (ie: "responsive"). 
+`ResponsiveBlockControl` provides a standardised interface for the creation of Block controls that require **different settings per viewport** (ie: "responsive" settings).
 
-Complete control over rendering the controls is provided and the viewport sizes used are completely customisable. 
+For example, imagine your Block provides a control which affords the ability to change a "padding" value used in the Block display. Consider that whilst this setting may work well on "large" screens, the same value may not work well on smaller screens (it may be too large for example). As a result, you now need to provide a padding control _per viewport/screensize_. 
+
+`ResponsiveBlockControl` provides a standardised component for the creation of such interfaces within Gutenberg. 
+
+Complete control over rendering the controls is provided and the viewport sizes used are entirely customisable. 
+
+Note that `ResponsiveBlockControl` does not handle any persistence of your control values. The control you provide to `ResponsiveBlockControl` as the `renderDefaultControl` prop should take care of this.
 
 ## Usage
 
-In a block's `edit` implementation, render a `<ResponsiveBlockControl />` component passing the required props plus a `renderDefaultControl` function which renders an interface control. By default this default control will be used for the default (ie: "All") setting as well as the per-viewport responsive settings.
+In a block's `edit` implementation, render a `<ResponsiveBlockControl />` component passing the required props plus:
+
+1. a `renderDefaultControl` function which renders an interface control. 
+2. an boolean state for `isResponsive` (see "Props" below).
+3. a handler function for `onIsResponsiveChange` (see "Props" below).
+
+
+By default the default control will be used to render the default (ie: "All") setting _as well as_ the per-viewport responsive settings.
 
 ```jsx
-import { partialRight } from 'lodash';
 import { registerBlockType } from '@wordpress/blocks';
 import {
 	InspectorControls,
 	ResponsiveBlockControl,
 } from '@wordpress/block-editor';
+
+import { useState } from '@wordpress/element';
 
 import {
 	DimensionControl,
@@ -25,6 +39,8 @@ registerBlockType( 'my-plugin/my-block', {
 	// ...
 
 	edit( { attributes, setAttributes } ) {
+
+		const [ isResponsive, setIsResponsive ] = useState( false );
 		
 		// Used for example purposes only
 		const sizeOptions = [
@@ -44,24 +60,16 @@ registerBlockType( 'my-plugin/my-block', {
 
 		const { paddingSize } = attributes;
 
-		const handleResponsiveModeChange = (isResponsiveMode) => {
-			// handle persisting the toggle state
-		};
-
-		const updateSpacing = ( dimension, size, viewport = '' ) => {
-			setAttributes( {
-				[ `${ dimension }${ viewport }` ]: size,
-			} );
-		};
 		
 		// Your custom control can be anything you'd like to use.
 		// You are not restricted to `DimensionControl`s, but this
 		// makes life easier if dealing with standard CSS values.
-		const mySizeControl = ( labelComponent, viewport ) => {
+		// see `packages/components/src/dimension-control/README.md`
+		const paddingControl = ( labelComponent, viewport ) => {
 			return (
 				<DimensionControl
 					label={ viewport.label }
-					onChange={ partialRight( updateSpacing, 'paddingSize' ) }
+					onChange={ // handle update to padding value here  }
 					value={ paddingSize }
 				/>
 			);
@@ -71,10 +79,13 @@ registerBlockType( 'my-plugin/my-block', {
 			<>
 				<InspectorControls>
 					<ResponsiveBlockControl
-						legend='Block Padding'
+						title='Block Padding'
 						property='padding'
-						renderDefaultControl={mySizeControl}
-						onIsResponsiveModeChange={handleResponsiveModeChange}
+						renderDefaultControl={paddingControl}
+						isResponsive={ isResponsive }
+						onIsResponsiveChange={ () => {
+							setIsResponsive( ! isResponsive );
+						} }
 					/>
 				</InspectorControls>
 				<div>
@@ -102,6 +113,20 @@ The title of the control group used in the `fieldset`'s `legend` element to labe
 
 Used to build accessible labels and ARIA roles for the control group. Should represent the layout property which the component controls (eg: `padding`, `margin`...etc). 
 
+### `isResponsive`
+* **Type:** `Boolean`
+* **Default:** `false` )
+* **Required:** `false`
+
+Determines whether the component displays the default or responsive controls. Updates the state of the toggle control. See also `onIsResponsiveChange` below.
+
+### `onIsResponsiveChange`
+* **Type:** `Function`
+* **Default:** `undefined`
+* **Required:** `true`
+
+A callback function invoked when the component's toggle value is changed between responsive and non-responsive mode. Should be used to update the value of the `isResponsive` prop to reflect the current state of the toggle control.
+
 ### `renderDefaultControl`
 * **Type:** `Function`
 * **Default:** `undefined`
@@ -110,7 +135,13 @@ Used to build accessible labels and ARIA roles for the control group. Should rep
   - **labelComponent:** (`Function`) - a rendered `ResponsiveBlockControlLabel` component for your control.
   - **viewport:** (`Object`) - an object representing viewport attributes for your control.
 
-A render function (prop) used to render the control for which you would like to display per viewport settings. The component you return from this function will be used to render the control displayed for the (default) "All" state and (if the `renderResponsiveControls` is not provided) the individual responsive controls when in "responsive" mode. It is passed a pre-created, accessible `<label>`. Your control may also use the contextual information provided by the `viewport` argument to ensure your component renders appropriately depending on the `viewport` setting currently being rendered (eg: `All` or one of the responsive variants).
+A render function (prop) used to render the control for which you would like to display per viewport settings. 
+
+For example, if you have a `SelectControl` which controls padding size, then pass this component as `renderDefaultControl` and it will be used to render both default and "responsive" controls for "padding".
+
+The component you return from this function will be used to render the control displayed for the (default) "All" state and (if the `renderResponsiveControls` is not provided) the individual responsive controls when in "responsive" mode. 
+
+It is passed a pre-created, accessible `<label>`. Your control may also use the contextual information provided by the `viewport` argument to ensure your component renders appropriately depending on the `viewport` setting currently being rendered (eg: `All` or one of the responsive variants).
 
 __Note:__ you are required to handle persisting any state produced by the component you pass as `renderDefaultControl`. `ResponsiveBlockControl` is "controlled" and does not persist state in any form.
 
@@ -138,7 +169,7 @@ const renderDefaultControl = ( labelComponent, viewport ) => {
   - **viewports:** (`Array`) - an array of viewport `Object`s, each with an `id` and `label` property.
   
 
-An optional render function (prop) used to render the controls for the _responsive_ settings. If not provioded, by default, responsive controls will be _automatically_ rendered using the component returned by the `renderDefaultControl` prop. For _complete_ control over the output of the responsive controls, you may return a suitable component here which will be rendered when the control group is in "responsive" mode.
+An optional render function (prop) used to render the controls for the _responsive_ settings. If not provided, by default, responsive controls will be _automatically_ rendered using the component returned by the `renderDefaultControl` prop. For _complete_ control over the output of the responsive controls, you may return a component here and it will be rendered when the control group is in "responsive" mode.
 
 ```jsx
 const renderResponsiveControls = (viewports) => {
@@ -166,12 +197,41 @@ const renderResponsiveControls = (viewports) => {
 
 Optional label used for the toggle control which switches the interface between showing responsive controls or not.
 
-### `onIsResponsiveModeChange`
-* **Type:** `Function`
-* **Default:** `undefined`
+### `defaultLabel`
+* **Type:** `Object`
+* **Default:** 
+```js
+{
+	id: 'all',
+	label: 'All',
+}
+```
 * **Required:** `false`
-* **Args:** 
-  - **isResponsiveMode:** (`Boolean`) - whether or not the control is showing the responsive controls. 
 
-A callback function invoked when the component's toggle value is changed between responsive and non-responsive mode. Receives the current state of the control as an `Boolean` argument.
+Optional object describing the attributes of the default value. By default this is `All` which indicates the control will affect "all viewports/screensizes". 
+
+### `viewports`
+* **Type:** `Array`
+* **Default:** 
+```js
+[
+	{
+		id: 'small',
+		label: 'Small screens',
+	},
+	{
+		id: 'medium',
+		label: 'Medium screens',
+	},
+	{
+		id: 'large',
+		label: 'Large screens',
+	},
+]
+```
+* **Required:** `false`
+
+An array of viewport objects, each describing a configuration for a particular viewport size. These are used to determine the number of responsive controls to display and the configuration of each.
+
+
 
