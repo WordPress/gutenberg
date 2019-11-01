@@ -11,7 +11,7 @@ import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { withSelect } from '@wordpress/data';
-import { RichText } from '@wordpress/block-editor';
+import { RichText, MediaUploadProgress } from '@wordpress/block-editor';
 import { isBlobURL } from '@wordpress/blob';
 
 /**
@@ -80,8 +80,16 @@ class GalleryImage extends Component {
 		this.onRemoveImage = this.onRemoveImage.bind( this );
 		this.bindContainer = this.bindContainer.bind( this );
 
+		this.updateMediaProgress = this.updateMediaProgress.bind( this );
+		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind( this );
+		this.finishMediaUploadWithFailure = this.finishMediaUploadWithFailure.bind( this );
+		this.mediaUploadStateReset = this.mediaUploadStateReset.bind( this );
+		this.onMediaUpdate = this.onMediaUpdate.bind( this );
+		this.renderContent = this.renderContent.bind( this );
+
 		this.state = {
 			captionSelected: false,
+			isUploadInProgress: false,
 		};
 	}
 
@@ -142,7 +150,44 @@ class GalleryImage extends Component {
 		}
 	}
 
-	render() {
+	updateMediaProgress() {
+		if ( ! this.state.isUploadInProgress ) {
+			this.setState( { isUploadInProgress: true } );
+		}
+	}
+
+	finishMediaUploadWithSuccess( payload ) {
+		const { onMediaUpdate } = this;
+
+		onMediaUpdate( {
+			id: payload.mediaServerId,
+			url: payload.mediaUrl,
+		} );
+		this.setState( { isUploadInProgress: false } );
+	}
+
+	finishMediaUploadWithFailure() {
+		this.setState( { isUploadInProgress: false } );
+	}
+
+	mediaUploadStateReset() {
+		const { onMediaUpdate } = this;
+
+		onMediaUpdate( { id: null, url: null } );
+		this.setState( { isUploadInProgress: false } );
+	}
+
+	onMediaUpdate( media ) {
+		const { setAttributes } = this.props;
+
+		setAttributes( {
+			mediaId: media.id,
+			mediaUrl: media.url,
+		} );
+	}
+
+
+	renderContent( params ) {
 		const {
 			url, alt, id, linkTo, link, isFirstItem, isLastItem, isSelected, caption,
 			isBlockSelected, onRemove, onMoveForward, onMoveBackward, setAttributes,
@@ -161,6 +206,10 @@ class GalleryImage extends Component {
 				break;
 		}
 
+		const { isUploadInProgress } = this.state;
+		const { finalWidth, finalHeight, imageWidthWithinContainer, isUploadFailed, retryMessage } = params;
+		const opacity = isUploadInProgress ? 0.3 : 1;
+
 		return (
 			<TouchableWithoutFeedback
 				onPress={ this.onSelectImage }
@@ -170,6 +219,7 @@ class GalleryImage extends Component {
 					<Image
 						style={ [ styles.image, {
 							resizeMode: isCropped ? 'cover' : 'contain',
+							opacity,
 						} ] }
 						source={ { uri: url } }
 						alt={ alt }
@@ -231,6 +281,29 @@ class GalleryImage extends Component {
 					</View>
 				</View>
 			</TouchableWithoutFeedback>
+		);
+	}
+
+	render() {
+		const { url, id, } = this.props;
+
+		return (
+			<MediaUploadProgress
+				coverUrl={ url }
+				mediaId={ id }
+				onUpdateMediaProgress={ this.updateMediaProgress }
+				onFinishMediaUploadWithSuccess={ this.finishMediaUploadWithSuccess }
+				onFinishMediaUploadWithFailure={ this.finishMediaUploadWithFailure }
+				onMediaUploadStateReset={ this.mediaUploadStateReset }
+				// renderContent={ ( params ) => {
+				// 	return (
+				// 		<View style={ styles.content }>
+				// 			{ this.renderContent( params ) }
+				// 		</View>
+				// 	);
+				// } }
+				renderContent={ this.renderContent }
+			/>
 		);
 	}
 }
