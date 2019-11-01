@@ -49,7 +49,7 @@ function NavigationMenuItemEdit( {
 } ) {
 	const { label, opensInNewTab, title, url } = attributes;
 	const link = title ? { title, url } : null;
-	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
+	const [ isLinkOpen, setIsLinkOpen ] = useState( ! label && isSelected );
 	const [ wasClosedByLinkControl, setWasClosedByLinkControl ] = useState( false );
 
 	/**
@@ -66,12 +66,6 @@ function NavigationMenuItemEdit( {
 			setWasClosedByLinkControl( false );
 		};
 	}, [ isSelected ] );
-
-	// Set the menu item when it's new.
-	// - Open LinkControl popover.
-	useEffect( () => {
-		if ( ! label && isSelected ) setIsLinkOpen( true );
-	}, [] );
 
 	/**
 	 * `onKeyDown` LinkControl handler.
