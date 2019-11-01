@@ -27,6 +27,12 @@ export default function Inspector( props ) {
 		setAttributes,
 	} = props;
 
+	const viewportIconsMap = {
+		small: 'smartphone',
+		medium: 'tablet',
+		large: 'desktop',
+	};
+
 	/**
 	 * Updates the spacing attribute for a given dimension
 	 * (and optionally a given viewport)
@@ -75,6 +81,7 @@ export default function Inspector( props ) {
 			<PanelBody title={ __( 'Spacing' ) }>
 
 				<ResponsiveBlockControl
+					className="wp-block-group__dimension-control wp-block-group__dimension-control--padding"
 					title={ __( 'Padding' ) }
 					property={ 'padding' }
 					isResponsive={ attributes.responsivePadding }
@@ -101,10 +108,12 @@ export default function Inspector( props ) {
 						const dimension = 'padding';
 						const viewportSize = viewport.id !== 'all' ? upperFirst( viewport.id ) : '';
 						const value = attributes[ `paddingSize${ viewportSize }` ];
+						const icon = viewportIconsMap[ viewport.id ];
 
 						return (
 							<DimensionControl
 								label={ labelComponent }
+								icon={ icon }
 								value={ value }
 								onChange={ partialRight( updateSpacing, dimension, viewportSize ) }
 							/>
