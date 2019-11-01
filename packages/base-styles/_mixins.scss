@@ -1,4 +1,84 @@
 /**
+ * Type scale mixins
+ */
+
+@mixin text-title-large {
+	$font-size: 32px;
+	font-weight: 400;
+	font-size: $font-size;
+	line-height: (40px / $font-size); // line-height in px divided by font-size
+}
+
+@mixin text-title-medium {
+	$font-size: 24px;
+	font-weight: 400;
+	font-size: $font-size;
+	line-height: (32px / $font-size); // line-height in px divided by font-size
+}
+
+@mixin text-title-small {
+	$font-size: 20px;
+	font-weight: 400;
+	font-size: $font-size;
+	line-height: (28px / $font-size); // line-height in px divided by font-size
+}
+
+@mixin text-subtitle {
+	$font-size: 16px;
+	font-weight: 600;
+	font-size: $font-size;
+	line-height: (24px / $font-size); // line-height in px divided by font-size
+}
+
+@mixin text-subtitle-small {
+	$font-size: 14px;
+	font-weight: 600;
+	font-size: $font-size;
+	line-height: (20px / $font-size); // line-height in px divided by font-size
+}
+
+@mixin text-body {
+	$font-size: 16px;
+	font-weight: 400;
+	font-size: $font-size;
+	line-height: (24px / $font-size); // line-height in px divided by font-size
+}
+
+@mixin text-body-small {
+	$font-size: 14px;
+	font-weight: 400;
+	font-size: $font-size;
+	line-height: (20px / $font-size); // line-height in px divided by font-size
+}
+
+@mixin text-button {
+	$font-size: 14px;
+	font-weight: 600;
+	font-size: $font-size;
+	line-height: (20px / $font-size); // line-height in px divided by font-size
+}
+
+@mixin text-caption {
+	$font-size: 12px;
+	font-weight: 400;
+	font-size: $font-size;
+	line-height: (16px / $font-size); // line-height in px divided by font-size
+}
+
+@mixin text-label {
+	$font-size: 12px;
+	font-weight: 600;
+	font-size: $font-size;
+	line-height: (16px / $font-size); // line-height in px divided by font-size
+}
+
+// Utility classes
+
+.block-editor-page .text-caption {
+	@include text-caption;
+}
+
+/**
  * Breakpoint mixins
  */
 
