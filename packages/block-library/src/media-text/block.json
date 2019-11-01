@@ -32,6 +32,27 @@
 			"selector": "figure video,figure img",
 			"attribute": "src"
 		},
+		"mediaLink": {
+			"type": "string"
+		},
+		"href": {
+			"type": "string",
+			"source": "attribute",
+			"selector": "figure a",
+			"attribute": "href"
+		},
+		"rel": {
+			"type": "string",
+			"source": "attribute",
+			"selector": "figure a",
+			"attribute": "rel"
+		},
+		"linkClass": {
+			"type": "string",
+			"source": "attribute",
+			"selector": "figure a",
+			"attribute": "class"
+		},
 		"mediaType": {
 			"type": "string"
 		},

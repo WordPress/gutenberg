@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { noop } from 'lodash';
+import { noop, isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -33,9 +33,29 @@ export default function save( { attributes } ) {
 		verticalAlignment,
 		imageFill,
 		focalPoint,
+		linkClass,
+		href,
+		linkTarget,
+		rel,
 	} = attributes;
+	const newRel = isEmpty( rel ) ? undefined : rel;
+	const image = <img src={ mediaUrl } alt={ mediaAlt } className={ ( mediaId && mediaType === 'image' ) ? `wp-image-${ mediaId }` : null } />;
+	const imageMedia = (
+		<>
+			{ href ? (
+				<a
+					className={ linkClass }
+					href={ href }
+					target={ linkTarget }
+					rel={ newRel }
+				>
+					{ image }
+				</a>
+			) : image }
+		</>
+	);
 	const mediaTypeRenders = {
-		image: () => <img src={ mediaUrl } alt={ mediaAlt } className={ ( mediaId && mediaType === 'image' ) ? `wp-image-${ mediaId }` : null } />,
+		image: () => imageMedia,
 		video: () => <video controls src={ mediaUrl } />,
 	};
 	const backgroundClass = getColorClassName( 'background-color', backgroundColor );
