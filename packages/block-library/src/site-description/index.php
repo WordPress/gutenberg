@@ -21,38 +21,7 @@ function register_block_core_site_description() {
 	register_block_type(
 		'core/site-description',
 		array(
-			'attributes'      => array(
-				'className'             => array(
-					'type'    => 'string',
-					'default' => '',
-				),
-				'align'                 => array(
-					'type'    => 'string',
-				),
-				'textAlign'             => array(
-					'type'    => 'string',
-					'default' => 'center',
-				),
-				'textColor'             => array(
-					'type' => 'string',
-				),
-				'customTextColor'       => array(
-					'type' => 'string',
-				),
-				'backgroundColor'       => array(
-					'type' => 'string',
-				),
-				'customBackgroundColor' => array(
-					'type' => 'string',
-				),
-				'fontSize'              => array(
-					'type'    => 'string',
-				),
-				'customFontSize'        => array(
-					'type' => 'number',
-				),
-			),
-		'render_callback' => 'render_block_core_site_description',
+			'render_callback' => 'render_block_core_site_description',
 		)
 	);
 }

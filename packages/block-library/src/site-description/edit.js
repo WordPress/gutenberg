@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classNames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -25,6 +30,7 @@ import { ENTER } from '@wordpress/keycodes';
 function SiteDescriptionEdit( {
 	attributes,
 	backgroundColor,
+	className,
 	fontSize,
 	insertDefaultBlock,
 	setAttributes,
@@ -98,11 +104,24 @@ function SiteDescriptionEdit( {
 				{ __( 'Update' ) }
 			</Button>
 			<PlainText
-				placeholder={ __( 'Site Description' ) }
-				value={ description }
-				onChange={ setDescription }
+				className={ classNames( 'site-description', className, {
+					'has-text-color': textColor.color,
+					'has-background': backgroundColor.color,
+					[ `has-text-align-${ textAlign }` ]: textAlign,
+					[ backgroundColor.class ]: backgroundColor.class,
+					[ textColor.class ]: textColor.class,
+					[ fontSize.class ]: ! customFontSize && fontSize.class,
+				} ) }
 				isStylable
+				onChange={ setDescription }
 				onKeyDown={ preventNewlines }
+				placeholder={ __( 'Site Description' ) }
+				style={ {
+					backgroundColor: backgroundColor.color,
+					color: textColor.color,
+					fontSize: actualFontSize ? actualFontSize + 'px' : undefined,
+				} }
+				value={ description }
 			/>
 		</>
 	);
