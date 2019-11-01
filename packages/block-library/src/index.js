@@ -64,6 +64,7 @@ import * as socialLink from './social-link';
 
 // Full Site Editing Blocks
 import * as siteTitle from './site-title';
+import * as siteDescription from './site-description';
 
 /**
  * Function to register an individual block.
@@ -182,7 +183,7 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 				...socialLink.sites,
 
 				// Register Full Site Editing Blocks.
-				...( __experimentalEnableFullSiteEditing ? [ siteTitle ] : [] ),
+				...( __experimentalEnableFullSiteEditing ? [ siteTitle, siteDescription ] : [] ),
 			].forEach( registerBlock );
 		} :
 		undefined;
