@@ -13,7 +13,24 @@ import classnames from 'classnames';
 /**
  * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/plain-text/README.md
  */
-const PlainText = forwardRef( ( { onChange, className, isStylable, ...props }, ref ) => {
+const PlainText = forwardRef( ( {
+	onChange,
+	className,
+	isSingleLine,
+	isStylable,
+	...props
+}, ref ) => {
+	const handleChange = ( event ) => {
+		const { value } = event.target;
+
+		if ( ! isSingleLine ) {
+			onChange( value );
+			return;
+		}
+
+		onChange( value.replace( /[\n\r\t]+/g, ' ' ) );
+	};
+
 	return (
 		<TextareaAutosize
 			ref={ ref }
@@ -22,7 +39,7 @@ const PlainText = forwardRef( ( { onChange, className, isStylable, ...props }, r
 				className,
 				{ 'is-stylable': isStylable }
 			) }
-			onChange={ ( event ) => onChange( event.target.value ) }
+			onChange={ handleChange }
 			{ ...props }
 		/>
 	);
