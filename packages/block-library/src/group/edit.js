@@ -14,19 +14,7 @@ import {
 	InnerBlocks,
 	PanelColorSettings,
 	withColors,
-	__experimentalResponsiveBlockControl as ResponsiveBlockControl,
 } from '@wordpress/block-editor';
-
-import {
-
-	useState,
-
-} from '@wordpress/element';
-
-import {
-	PanelBody,
-	SelectControl,
-} from '@wordpress/components';
 
 function GroupEdit( {
 	className,
@@ -34,7 +22,6 @@ function GroupEdit( {
 	backgroundColor,
 	hasInnerBlocks,
 } ) {
-	const [ isResponsive, setIsResponsive ] = useState( false );
 	const styles = {
 		backgroundColor: backgroundColor.color,
 	};
@@ -42,22 +29,6 @@ function GroupEdit( {
 	const classes = classnames( className, backgroundColor.class, {
 		'has-background': !! backgroundColor.color,
 	} );
-
-	const sizeOptions = [
-		{
-			label: __( 'Please select…' ),
-			value: '',
-		},
-		{
-			label: __( 'Small' ),
-			value: 'small',
-		},
-		{
-			label: __( 'Medium' ),
-			value: 'medium',
-		},
-
-	];
 
 	return (
 		<>
@@ -72,24 +43,6 @@ function GroupEdit( {
 						},
 					] }
 				/>
-
-				<PanelBody title={ __( 'Spacing' ) }>
-					<ResponsiveBlockControl
-						title="Padding"
-						property="padding"
-						isResponsive={ isResponsive }
-						onIsResponsiveChange={ () => {
-							setIsResponsive( ! isResponsive );
-						} }
-						renderDefaultControl={ ( labelComponent ) => (
-							<SelectControl
-								label={ labelComponent }
-								options={ sizeOptions }
-								onChange={ () => {} }
-							/>
-						) }
-					/>
-				</PanelBody>
 			</InspectorControls>
 			<div className={ classes } style={ styles }>
 				<div className="wp-block-group__inner-container">
