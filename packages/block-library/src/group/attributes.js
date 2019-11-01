@@ -18,12 +18,15 @@ const DimensionsAttributes = {
 	},
 	paddingSize: {
 		type: 'string',
+		default: '',
 	},
 	paddingSizeSmall: {
 		type: 'string',
+		default: '',
 	},
 	paddingSizeMedium: {
 		type: 'string',
+		default: '',
 	},
 	marginUnit: {
 		type: 'string',
@@ -31,12 +34,15 @@ const DimensionsAttributes = {
 	},
 	marginSize: {
 		type: 'string',
+		default: '',
 	},
 	marginSizeMedium: {
 		type: 'string',
+		default: '',
 	},
 	marginSizeSmall: {
 		type: 'string',
+		default: '',
 	},
 };
 
