@@ -1,14 +1,9 @@
 /**
- * External dependencies
- */
-import { isFunction } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
 
-import { Fragment, useState, useEffect, useCallback } from '@wordpress/element';
+import { Fragment } from '@wordpress/element';
 
 import {
 	ToggleControl,
@@ -24,10 +19,10 @@ function ResponsiveBlockControl( props ) {
 		title,
 		property,
 		toggleLabel,
-		onIsResponsiveModeChange,
+		onIsResponsiveChange,
 		renderDefaultControl,
 		renderResponsiveControls,
-		responsiveControlsActive = false,
+		isResponsive = false,
 		defaultLabel = {
 			id: 'all',
 			label: __( 'All' ), /* translators: 'Label. Used to signify a layout property (eg: margin, padding) will apply uniformly to all screensizes.' */
@@ -47,18 +42,6 @@ function ResponsiveBlockControl( props ) {
 			},
 		],
 	} = props;
-
-	const [ isResponsiveMode, setIsResponsiveMode ] = useState( responsiveControlsActive );
-
-	useEffect( () => {
-		if ( isFunction( onIsResponsiveModeChange ) ) {
-			onIsResponsiveModeChange( isResponsiveMode );
-		}
-	}, [ isResponsiveMode ] );
-
-	const handleToggle = useCallback( ( isChecked ) => {
-		setIsResponsiveMode( ! isChecked );
-	} );
 
 	if ( ! title || ! property || ! renderDefaultControl ) {
 		return null;
@@ -89,19 +72,19 @@ function ResponsiveBlockControl( props ) {
 				<ToggleControl
 					className="block-editor-responsive-block-control__toggle"
 					label={ toggleControlLabel }
-					checked={ ! isResponsiveMode }
-					onChange={ handleToggle }
+					checked={ ! isResponsive }
+					onChange={ onIsResponsiveChange }
 					help={ toggleHelpText }
 				/>
 
-				{ ! isResponsiveMode && (
+				{ ! isResponsive && (
 					<div className="block-editor-responsive-block-control__group block-editor-responsive-block-control__group--default" >
 						{ defaultControl }
 					</div>
 				) }
 
-				{ isResponsiveMode && (
-					<div className="block-editor-responsive-block-control__group block-editor-responsive-block-control__group--responsive" hidden={ ! isResponsiveMode }>
+				{ isResponsive && (
+					<div className="block-editor-responsive-block-control__group block-editor-responsive-block-control__group--responsive" hidden={ ! isResponsive }>
 						{ ( renderResponsiveControls ? renderResponsiveControls( viewports ) : defaultResponsiveControls() ) }
 					</div>
 				) }

@@ -8,7 +8,8 @@ import { uniqueId } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Fragment } from '@wordpress/element';
+import { Fragment, useState } from '@wordpress/element';
+
 import {
 	SelectControl,
 } from '@wordpress/components';
@@ -185,13 +186,13 @@ describe( 'Basic rendering', () => {
 } );
 
 describe( 'Default and Responsive modes', () => {
-	it( 'should render in responsive mode when responsiveControlsActive prop is set to true', () => {
+	it( 'should render in responsive mode when isResponsive prop is set to true', () => {
 		act( () => {
 			render(
 				<ResponsiveBlockControl
 					title="Padding"
 					property="padding"
-					responsiveControlsActive={ true }
+					isResponsive={ true }
 					renderDefaultControl={ renderTestDefaultControlComponent }
 				/>, container
 			);
@@ -231,7 +232,7 @@ describe( 'Default and Responsive modes', () => {
 				<ResponsiveBlockControl
 					title="Padding"
 					property="padding"
-					responsiveControlsActive={ true }
+					isResponsive={ true }
 					renderDefaultControl={ mockRenderDefaultControl }
 					viewports={ customViewportSet }
 				/>, container
@@ -252,13 +253,25 @@ describe( 'Default and Responsive modes', () => {
 	} );
 
 	it( 'should switch between default and responsive modes when interacting with toggle control', () => {
-		act( () => {
-			render(
+		const ResponsiveBlockControlConsumer = () => {
+			const [ isResponsive, setIsResponsive ] = useState( false );
+
+			return (
 				<ResponsiveBlockControl
 					title="Padding"
 					property="padding"
+					isResponsive={ isResponsive }
+					onIsResponsiveChange={ () => {
+						setIsResponsive( ! isResponsive );
+					} }
 					renderDefaultControl={ renderTestDefaultControlComponent }
-				/>, container
+				/>
+			);
+		};
+
+		act( () => {
+			render(
+				<ResponsiveBlockControlConsumer />, container
 			);
 		} );
 
@@ -319,9 +332,9 @@ describe( 'Default and Responsive modes', () => {
 				<ResponsiveBlockControl
 					title="Padding"
 					property="padding"
+					isResponsive={ true }
 					renderDefaultControl={ spyRenderDefaultControl }
 					renderResponsiveControls={ mockRenderResponsiveControls }
-					responsiveControlsActive={ true }
 				/>, container
 			);
 		} );
@@ -336,40 +349,6 @@ describe( 'Default and Responsive modes', () => {
 		expect( mockRenderResponsiveControls ).toHaveBeenCalledTimes( 1 );
 
 		expect( customControls ).toHaveLength( 3 );
-	} );
-
-	it( 'should call onIsResponsiveModeChange callback when responsive mode is toggled on/off ', () => {
-		const onIsResponsiveModeChangeSpy = jest.fn();
-
-		act( () => {
-			render(
-				<ResponsiveBlockControl
-					title="Padding"
-					property="padding"
-					renderDefaultControl={ renderTestDefaultControlComponent }
-					onIsResponsiveModeChange={ onIsResponsiveModeChangeSpy }
-				/>, container
-			);
-		} );
-
-		const toggleInput = container.querySelector( '.block-editor-responsive-block-control__toggle input' );
-
-		// Initial render
-		expect( onIsResponsiveModeChangeSpy ).toHaveBeenCalledWith( false );
-
-		// Toggle to "responsive" mode
-		act( () => {
-			Simulate.change( toggleInput, { target: { checked: false } } );
-		} );
-
-		expect( onIsResponsiveModeChangeSpy ).toHaveBeenCalledWith( true );
-
-		// Revert to "default" mode
-		act( () => {
-			Simulate.change( toggleInput, { target: { checked: true } } );
-		} );
-
-		expect( onIsResponsiveModeChangeSpy ).toHaveBeenCalledWith( false );
 	} );
 } );
 

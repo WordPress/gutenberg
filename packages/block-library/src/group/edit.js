@@ -18,6 +18,12 @@ import {
 } from '@wordpress/block-editor';
 
 import {
+
+	useState,
+
+} from '@wordpress/element';
+
+import {
 	PanelBody,
 	SelectControl,
 } from '@wordpress/components';
@@ -28,6 +34,7 @@ function GroupEdit( {
 	backgroundColor,
 	hasInnerBlocks,
 } ) {
+	const [ isResponsive, setIsResponsive ] = useState( false );
 	const styles = {
 		backgroundColor: backgroundColor.color,
 	};
@@ -70,6 +77,10 @@ function GroupEdit( {
 					<ResponsiveBlockControl
 						title="Padding"
 						property="padding"
+						isResponsive={ isResponsive }
+						onIsResponsiveChange={ () => {
+							setIsResponsive( ! isResponsive );
+						} }
 						renderDefaultControl={ ( labelComponent ) => (
 							<SelectControl
 								label={ labelComponent }
