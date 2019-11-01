@@ -32,6 +32,7 @@
 		"wp-scripts": "./bin/wp-scripts.js"
 	},
 	"dependencies": {
+		"@svgr/webpack": "^4.3.3",
 		"@wordpress/babel-preset-default": "file:../babel-preset-default",
 		"@wordpress/dependency-extraction-webpack-plugin": "file:../dependency-extraction-webpack-plugin",
 		"@wordpress/eslint-plugin": "file:../eslint-plugin",
