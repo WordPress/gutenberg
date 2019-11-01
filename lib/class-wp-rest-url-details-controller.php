@@ -56,8 +56,8 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	 * response.
 	 *
 	 * @access public
-	 * @param  WP_REST_REQUEST $request Full details about the request.
-	 * @return String|WP_Error          the title text or an error.
+	 * @param WP_REST_REQUEST $request Full details about the request.
+	 * @return String|WP_Error The title text or an error.
 	 */
 	public function get_title( $request ) {
 		$url   = $request->get_param( 'url' );
@@ -87,9 +87,9 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Retrieves the document title from a remote URL
+	 * Retrieves the document title from a remote URL.
 	 *
-	 * @param  String $url the website url whose HTML we want to access.
+	 * @param string $url The website url whose HTML we want to access.
 	 * @return string|WP_Error The URL's document title on success, WP_Error on failure.
 	 */
 	private function get_remote_url_title( $url ) {
@@ -97,12 +97,11 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 		$cache_key = 'g_url_details_response_' . hash( 'crc32b', $url );
 
 		// Attempt to retrieve cached response.
-		$title = null;//get_transient( $cache_key );
+		$title = get_transient( $cache_key );
 
 		if ( empty( $title ) ) {
 			$request                = wp_safe_remote_get( $url, array(
 				'timeout'             => 10,
-			//	'redirection'         => 0,
 				'limit_response_size' => 153600, // 150 KB
 			) );
 			$remote_source = wp_remote_retrieve_body( $request );
