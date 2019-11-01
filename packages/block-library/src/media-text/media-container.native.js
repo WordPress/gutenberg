@@ -61,11 +61,11 @@ class MediaContainer extends Component {
 	}
 
 	componentDidMount() {
-		const { mediaId, mediaUrl, mediaType } = this.props;
+		const { mediaId, mediaUrl } = this.props;
 
 		// Make sure we mark any temporary images as failed if they failed while
 		// the editor wasn't open
-		if ( mediaId && mediaUrl && mediaUrl.indexOf( 'file:' ) === 0 && mediaType === MEDIA_TYPE_IMAGE ) {
+		if ( mediaId && mediaUrl && mediaUrl.indexOf( 'file:' ) === 0 ) {
 			mediaUploadSync();
 		}
 	}
