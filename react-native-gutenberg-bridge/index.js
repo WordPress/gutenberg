@@ -89,4 +89,12 @@ export function requestImageUploadCancel( mediaId ) {
 	return RNReactNativeGutenbergBridge.requestImageUploadCancel( mediaId );
 }
 
+export function getOtherMediaOptions( filter, callback ) {
+	return RNReactNativeGutenbergBridge.getOtherMediaOptions( filter, callback );
+}
+
+export function requestOtherMediaPickFrom( mediaSource, multiple, callback ) {
+	return RNReactNativeGutenbergBridge.requestOtherMediaPickFrom( mediaSource, multiple, callback );
+}
+
 export default RNReactNativeGutenbergBridge;

@@ -1,3 +1,8 @@
+1.16.0
+------
+* [Android] Add support for pexels images
+* Add left, center, and right image alignment controls
+
 1.15.2
 ------
 * Fix issue when copy/paste photos from other apps, was not inserting an image on the post.
