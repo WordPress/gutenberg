@@ -62,7 +62,6 @@ function NavigationMenuItemEdit( {
 			setWasClosedByLinkControl( false );
 		}
 		return () => {
-			setIsLinkOpen( false );
 			setWasClosedByLinkControl( false );
 		};
 	}, [ isSelected ] );
