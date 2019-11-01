@@ -69,13 +69,9 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	/**
 	 * Checks whether a given request has permission to read remote urls.
 	 *
-	 * phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-	 *
-	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_Error|bool True if the request has access, WP_Error object otherwise.
 	 */
-	public function get_remote_url_permissions_check( $request ) {
-		/* phpcs:enable */
+	public function get_remote_url_permissions_check() {
 		if ( ! current_user_can( 'edit_posts' ) ) {
 			return new WP_Error(
 				'rest_user_cannot_view',
@@ -102,7 +98,7 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 		if ( empty( $title ) ) {
 			$request                = wp_safe_remote_get( $url, array(
 				'timeout'             => 10,
-				'limit_response_size' => 153600, // 150 KB
+				'limit_response_size' => 153600, // 150 KB.
 			) );
 			$remote_source = wp_remote_retrieve_body( $request );
 
@@ -110,13 +106,9 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 				return new WP_Error( 'no_response', __( 'The source URL does not exist.', 'gutenberg' ), array( 'status' => 404 ) );
 			}
 
-			// Work around bug in strip_tags():
-			$remote_source = str_replace( '<!DOC', '<DOC', $remote_source );
-			$remote_source = preg_replace( '/[\r\n\t ]+/', ' ', $remote_source ); // Normalize spaces.
-			$remote_source = preg_replace( '/<\/*(h1|h2|h3|h4|h5|h6|p|th|td|li|dt|dd|pre|caption|input|textarea|button|body)[^>]*>/', "\n\n", $remote_source );
-
 			preg_match( '|<title>([^<]*?)</title>|is', $remote_source, $match_title );
-			$title = isset( $match_title[1] ) ? $match_title[1] : '';
+			$title = isset( $match_title[1] ) ? trim( $match_title[1] ) : '';
+
 			if ( empty( $title ) ) {
 				return new WP_Error( 'no_title', __( 'No document title at remote url.', 'gutenberg' ), array( 'status' => 404 ) );
 			}
