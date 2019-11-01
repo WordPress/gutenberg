@@ -10,14 +10,11 @@
 		align-items: center;
 		margin-right: 1em;
 		margin-bottom: 0;
+		width: 10em; // ensure labels and fields align right
 
 		.dashicon {
 			margin-right: 0.5em;
 			flex-shrink: 0;
 		}
-	}
-
-	&.is-manual .components-base-control__label {
-		width: 10em;
 	}
 }
