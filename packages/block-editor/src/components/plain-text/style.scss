@@ -18,9 +18,12 @@
 	}
 
 	&.is-stylable {
-		background-color: transparent;
 		border-radius: 0;
 		display: block;
+
+		&:not(.has-background) {
+			background-color: transparent;
+		}
 
 		&.has-background {
 			padding: $block-bg-padding--v $block-bg-padding--h;
