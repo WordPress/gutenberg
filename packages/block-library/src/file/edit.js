@@ -257,11 +257,11 @@ export default compose( [
 	withSelect( ( select, props ) => {
 		const { getMedia } = select( 'core' );
 		const { getSettings } = select( 'core/block-editor' );
-		const { __experimentalMediaUpload } = getSettings();
+		const { mediaUpload } = getSettings();
 		const { id } = props.attributes;
 		return {
 			media: id === undefined ? undefined : getMedia( id ),
-			mediaUpload: __experimentalMediaUpload,
+			mediaUpload,
 		};
 	} ),
 	withNotices,

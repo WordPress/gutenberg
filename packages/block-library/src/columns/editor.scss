@@ -12,18 +12,6 @@
 	}
 }
 
-// Fullwide: show margin left/right to ensure there's room for the side UI.
-// This is not a 1:1 preview with the front-end where these margins would presumably be zero.
-[data-type="core/columns"][data-align="full"] .wp-block-columns > .editor-inner-blocks {
-	padding-left: $block-padding;
-	padding-right: $block-padding;
-
-	@include break-small() {
-		padding-left: $block-container-side-padding;
-		padding-right: $block-container-side-padding;
-	}
-}
-
 .wp-block-columns {
 	display: block;
 
@@ -43,7 +31,14 @@
 		> [data-type="core/column"] > .editor-block-list__block-edit .block-core-columns {
 			display: flex;
 			flex-direction: column;
-			flex: 1 0 auto;
+
+			// This flex rule fixes an issue in IE11.
+			flex: 1 1 auto;
+
+			// IE11 does not support `position: sticky`, so we use it here to serve correct Flex rules to modern browsers.
+			@supports (position: sticky) {
+				flex: 1;
+			}
 		}
 
 		// Adjust the individual column block.
@@ -181,15 +176,28 @@ div.block-core-columns.is-vertically-aligned-bottom {
 /**
  * Add extra padding when the parent block is selected, for easier interaction.
  */
-.block-editor-block-list__layout .block-editor-block-list__block[data-type="core/columns"].is-selected > .block-editor-block-list__block-edit > [data-block] > div > .block-editor-inner-blocks,
-.block-editor-block-list__layout .block-editor-block-list__block[data-type="core/columns"].has-child-selected > .block-editor-block-list__block-edit > [data-block] > div > .block-editor-inner-blocks,
-.block-editor-block-list__layout .block-editor-block-list__block[data-type="core/column"].is-selected > .block-editor-block-list__block-edit > [data-block] > div > .block-editor-inner-blocks,
-.block-editor-block-list__layout .block-editor-block-list__block[data-type="core/column"].has-child-selected > .block-editor-block-list__block-edit > [data-block] > div > .block-editor-inner-blocks {
+[data-type="core/columns"].is-selected > .block-editor-block-list__block-edit > [data-block] > div > .block-editor-inner-blocks,
+[data-type="core/columns"].has-child-selected > .block-editor-block-list__block-edit > [data-block] > div > .block-editor-inner-blocks,
+[data-type="core/column"].is-selected > .block-editor-block-list__block-edit > [data-block] > div > .block-editor-inner-blocks,
+[data-type="core/column"].has-child-selected > .block-editor-block-list__block-edit > [data-block] > div > .block-editor-inner-blocks {
 	padding: $block-padding;
 
 	// Negate this padding for the placeholder.
 	> .components-placeholder {
 		margin: -$block-padding;
 		width: calc(100% + #{$block-padding * 2});
+	}
+}
+
+
+// Fullwide: show margin left/right to ensure there's room for the side UI.
+// This is not a 1:1 preview with the front-end where these margins would presumably be zero.
+[data-type="core/columns"][data-align="full"] .wp-block-columns {
+	padding-left: $block-padding;
+	padding-right: $block-padding;
+
+	@include break-small() {
+		padding-left: $block-container-side-padding;
+		padding-right: $block-container-side-padding;
 	}
 }

@@ -67,6 +67,7 @@ function BlockListBlock( {
 	mode,
 	isFocusMode,
 	hasFixedToolbar,
+	moverDirection,
 	isLocked,
 	clientId,
 	rootClientId,
@@ -450,6 +451,20 @@ function BlockListBlock( {
 		};
 	}
 	const blockElementId = `block-${ clientId }`;
+	const blockMover = (
+		<BlockMover
+			clientIds={ clientId }
+			blockElementId={ blockElementId }
+			isHidden={ ! isSelected }
+			isDraggable={
+				isDraggable !== false &&
+				( ! isPartOfMultiSelection && isMovable )
+			}
+			onDragStart={ onDragStart }
+			onDragEnd={ onDragEnd }
+			__experimentalOrientation={ moverDirection }
+		/>
+	);
 
 	// We wrap the BlockEdit component in a div that hides it when editing in
 	// HTML mode. This allows us to render all of the ancillary pieces
@@ -511,22 +526,18 @@ function BlockListBlock( {
 				rootClientId={ rootClientId }
 			/>
 			{ isFirstMultiSelected && (
-				<BlockMultiControls rootClientId={ rootClientId } />
+				<BlockMultiControls
+					rootClientId={ rootClientId }
+					moverDirection={ moverDirection }
+				/>
 			) }
-			<div className="editor-block-list__block-edit block-editor-block-list__block-edit">
-				{ shouldRenderMovers && (
-					<BlockMover
-						clientIds={ clientId }
-						blockElementId={ blockElementId }
-						isHidden={ ! isSelected }
-						isDraggable={
-							isDraggable !== false &&
-							( ! isPartOfMultiSelection && isMovable )
-						}
-						onDragStart={ onDragStart }
-						onDragEnd={ onDragEnd }
-					/>
+			<div
+				className={ classnames(
+					'editor-block-list__block-edit block-editor-block-list__block-edit',
+					{ 'has-mover-inside': moverDirection === 'horizontal' },
 				) }
+			>
+				{ shouldRenderMovers && ( moverDirection === 'vertical' ) && blockMover }
 				{ shouldShowBreadcrumb && (
 					<BlockBreadcrumb
 						clientId={ clientId }
@@ -566,6 +577,7 @@ function BlockListBlock( {
 						{ isValid && mode === 'html' && (
 							<BlockHtml clientId={ clientId } />
 						) }
+						{ shouldRenderMovers && ( moverDirection === 'horizontal' ) && blockMover }
 						{ ! isValid && [
 							<BlockInvalidWarning
 								key="invalid-warning"
@@ -578,7 +590,7 @@ function BlockListBlock( {
 					</BlockCrashBoundary>
 					{ !! hasError && <BlockCrashWarning /> }
 					{ shouldShowMobileToolbar && (
-						<BlockMobileToolbar clientId={ clientId } />
+						<BlockMobileToolbar clientId={ clientId } moverDirection={ moverDirection } />
 					) }
 				</IgnoreNestedEvents>
 			</div>

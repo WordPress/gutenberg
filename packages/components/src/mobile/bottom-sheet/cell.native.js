@@ -42,6 +42,7 @@ class BottomSheetCell extends Component {
 			value,
 			valuePlaceholder = '',
 			icon,
+			leftAlign,
 			labelStyle = {},
 			valueStyle = {},
 			onChangeValue,
@@ -57,8 +58,12 @@ class BottomSheetCell extends Component {
 		const isValueEditable = editable && onChangeValue !== undefined;
 		const cellLabelStyle = getStylesFromColorScheme( styles.cellLabel, styles.cellTextDark );
 		const cellLabelCenteredStyle = getStylesFromColorScheme( styles.cellLabelCentered, styles.cellTextDark );
-		const defaultLabelStyle = showValue || icon !== undefined ? cellLabelStyle : cellLabelCenteredStyle;
+		const cellLabelLeftAlignNoIconStyle = getStylesFromColorScheme( styles.cellLabelLeftAlignNoIcon, styles.cellTextDark );
+		const defaultMissingIconAndValue = leftAlign ? cellLabelLeftAlignNoIconStyle : cellLabelCenteredStyle;
+		const defaultLabelStyle = showValue || icon !== undefined ? cellLabelStyle : defaultMissingIconAndValue;
+
 		const drawSeparator = ( separatorType && separatorType !== 'none' ) || separatorStyle === undefined;
+		const drawTopSeparator = drawSeparator && separatorType === 'topFullWidth';
 
 		const onCellPress = () => {
 			if ( isValueEditable ) {
@@ -87,6 +92,7 @@ class BottomSheetCell extends Component {
 				case 'leftMargin':
 					return leftMarginStyle;
 				case 'fullWidth':
+				case 'topFullWidth':
 					return defaultSeparatorStyle;
 				case 'none':
 					return undefined;
@@ -165,6 +171,9 @@ class BottomSheetCell extends Component {
 				onPress={ onCellPress }
 				style={ { ...styles.clipToBounds, ...style } }
 			>
+				{ drawTopSeparator && (
+					<View style={ separatorStyle() } />
+				) }
 				<View style={ styles.cellContainer }>
 					<View style={ styles.cellRowContainer }>
 						{ icon && (
@@ -173,14 +182,14 @@ class BottomSheetCell extends Component {
 								<View style={ platformStyles.labelIconSeparator } />
 							</View>
 						) }
-						<Text numberOfLines={ 1 } style={ { ...defaultLabelStyle, ...labelStyle } }>
+						<Text numberOfLines={ 1 } style={ [ defaultLabelStyle, labelStyle ] }>
 							{ label }
 						</Text>
 					</View>
 					{ showValue && getValueComponent() }
 					{ children }
 				</View>
-				{ drawSeparator && (
+				{ ! drawTopSeparator && (
 					<View style={ separatorStyle() } />
 				) }
 			</TouchableOpacity>
