@@ -54,7 +54,6 @@ export default compose( [
 	withSelect( ( select, { clientId } ) => {
 		const { getBlockIndex, getBlockRootClientId } = select( 'core/block-editor' );
 		const rootClientId = getBlockRootClientId( clientId );
-
 		return {
 			blockIndex: getBlockIndex( clientId, rootClientId ),
 			rootClientId,
@@ -62,6 +61,6 @@ export default compose( [
 	} ),
 	withDispatch( ( dispatch, { blockIndex, rootClientId } ) => ( {
 		insertDefaultBlock: () =>
-			dispatch( 'core/block-editor' ).insertDefaultBlock( {}, rootClientId, blockIndex + 1 ),
+			dispatch( 'core/block-editor' ).insertDefaultBlock( undefined, rootClientId, blockIndex + 1 ),
 	} ) ),
 ] )( SiteTitleEdit );

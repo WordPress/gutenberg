@@ -11,6 +11,11 @@ import TextareaAutosize from 'react-autosize-textarea';
 import classnames from 'classnames';
 
 /**
+ * Constants
+ */
+const REGEXP_NEWLINES = /[\r\n]+/g;
+
+/**
  * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/plain-text/README.md
  */
 const PlainText = forwardRef( ( {
@@ -28,7 +33,7 @@ const PlainText = forwardRef( ( {
 			return;
 		}
 
-		onChange( value.replace( /[\n\r\t]+/g, ' ' ) );
+		onChange( value.replace( REGEXP_NEWLINES, ' ' ) );
 	};
 
 	return (

@@ -18,6 +18,14 @@ You can also pass any extra prop to the textarea rendered by this component.
 
 *Optional.* The component forwards the `ref` property to the `TextareaAutosize` component.
 
+### `isSingleLine: Boolean`
+
+*Optional.* Prevent inserting line breaks.
+
+### `isStylable: Boolean`
+
+*Optional.* Prepare the textarea to be styled with common block attributes (e.g. background color).
+
 ## Example
 
 {% codetabs %}
