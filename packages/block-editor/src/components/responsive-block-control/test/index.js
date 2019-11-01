@@ -8,7 +8,7 @@ import { uniqueId } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Fragment, useState } from '@wordpress/element';
+import { Fragment } from '@wordpress/element';
 
 import {
 	SelectControl,
@@ -18,6 +18,7 @@ import {
  * Internal dependencies
  */
 import ResponsiveBlockControl from '../index';
+import useResponsiveBlockControl from '../use-responsive-block-control';
 
 let container = null;
 beforeEach( () => {
@@ -254,16 +255,14 @@ describe( 'Default and Responsive modes', () => {
 
 	it( 'should switch between default and responsive modes when interacting with toggle control', () => {
 		const ResponsiveBlockControlConsumer = () => {
-			const [ isResponsive, setIsResponsive ] = useState( false );
+			const [ isResponsive, onIsResponsiveChange ] = useResponsiveBlockControl();
 
 			return (
 				<ResponsiveBlockControl
 					title="Padding"
 					property="padding"
 					isResponsive={ isResponsive }
-					onIsResponsiveChange={ () => {
-						setIsResponsive( ! isResponsive );
-					} }
+					onIsResponsiveChange={ onIsResponsiveChange }
 					renderDefaultControl={ renderTestDefaultControlComponent }
 				/>
 			);
