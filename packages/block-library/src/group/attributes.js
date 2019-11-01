@@ -1,5 +1,6 @@
 /**
  * Set the attributes for the Dimension Control
+ *
  * @type {Object}
  */
 const DimensionsAttributes = {
@@ -18,10 +19,10 @@ const DimensionsAttributes = {
 	paddingSize: {
 		type: 'string',
 	},
-	paddingSizeMobile: {
+	paddingSizeSmall: {
 		type: 'string',
 	},
-	paddingSizeTablet: {
+	paddingSizeMedium: {
 		type: 'string',
 	},
 	marginUnit: {
@@ -31,10 +32,10 @@ const DimensionsAttributes = {
 	marginSize: {
 		type: 'string',
 	},
-	marginSizeTablet: {
+	marginSizeMedium: {
 		type: 'string',
 	},
-	marginSizeMobile: {
+	marginSizeSmall: {
 		type: 'string',
 	},
 };
