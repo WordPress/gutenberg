@@ -12,7 +12,7 @@ import HeadingToolbar from './heading-toolbar';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PanelBody, withFallbackStyles } from '@wordpress/components';
+import { PanelBody } from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
 import {
 	AlignmentToolbar,
@@ -22,23 +22,17 @@ import {
 	__experimentalUseColors,
 } from '@wordpress/block-editor';
 
-/**
- * Browser dependencies
- */
-const { getComputedStyle } = window;
-
 function HeadingEdit( {
-	backgroundColor,
 	attributes,
 	setAttributes,
 	mergeBlocks,
 	onReplace,
 	className,
 } ) {
-	const { TextColor, InspectorControlsColorPanel } = __experimentalUseColors(
+	const { TextColor, InspectorControlsColorPanel, BackgroundColorDetector } = __experimentalUseColors(
 		[ { name: 'textColor', property: 'color' } ],
 		{
-			contrastCheckerProps: { backgroundColor, isLargeText: true },
+			contrastCheckers: { backgroundColor: true },
 		},
 		[]
 	);
@@ -61,6 +55,7 @@ function HeadingEdit( {
 				</PanelBody>
 			</InspectorControls>
 			{ InspectorControlsColorPanel }
+			<BackgroundColorDetector />
 			<TextColor>
 				<RichText
 					identifier="content"
@@ -90,11 +85,4 @@ function HeadingEdit( {
 	);
 }
 
-export default withFallbackStyles( ( node ) => {
-	let backgroundColor = getComputedStyle( node ).backgroundColor;
-	while ( backgroundColor === 'rgba(0, 0, 0, 0)' && node.parentNode ) {
-		node = node.parentNode;
-		backgroundColor = getComputedStyle( node ).backgroundColor;
-	}
-	return { backgroundColor };
-} )( HeadingEdit );
+export default HeadingEdit;
