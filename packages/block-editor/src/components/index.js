@@ -26,6 +26,7 @@ export { default as __experimentalGradientPickerPanel } from './gradient-picker/
 export { default as InnerBlocks } from './inner-blocks';
 export { default as InspectorAdvancedControls } from './inspector-advanced-controls';
 export { default as InspectorControls } from './inspector-controls';
+export { default as __experimentalParentInspectorControls } from './parent-inspector-controls';
 export { default as __experimentalLinkControl } from './link-control';
 export { default as MediaPlaceholder } from './media-placeholder';
 export { default as MediaUpload } from './media-upload';

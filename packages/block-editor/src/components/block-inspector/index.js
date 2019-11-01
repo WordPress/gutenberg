@@ -16,6 +16,7 @@ import { withSelect } from '@wordpress/data';
  */
 import SkipToSelectedBlock from '../skip-to-selected-block';
 import BlockCard from '../block-card';
+import ParentInspectorControls from '../parent-inspector-controls';
 import InspectorControls from '../inspector-controls';
 import InspectorAdvancedControls from '../inspector-advanced-controls';
 import BlockStyles from '../block-styles';
@@ -66,7 +67,10 @@ const BlockInspector = ( {
 					</PanelBody>
 				</div>
 			) }
-			<div><InspectorControls.Slot /></div>
+			<div>
+				<ParentInspectorControls.Slot />
+				<InspectorControls.Slot />
+			</div>
 			<div>
 				<InspectorAdvancedControls.Slot>
 					{ ( fills ) => ! isEmpty( fills ) && (

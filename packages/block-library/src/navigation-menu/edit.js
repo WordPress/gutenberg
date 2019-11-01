@@ -15,6 +15,7 @@ import {
 	InspectorControls,
 	BlockControls,
 	withColors,
+	__experimentalParentInspectorControls as ParentInspectorControls,
 } from '@wordpress/block-editor';
 import { withSelect } from '@wordpress/data';
 import {
@@ -123,12 +124,14 @@ function NavigationMenu( {
 				/>
 			</BlockControls>
 			{ navigatorModal }
-			<InspectorControls>
+			<ParentInspectorControls>
 				<PanelBody
 					title={ __( 'Navigation Structure' ) }
 				>
 					<BlockNavigationList clientId={ clientId } />
 				</PanelBody>
+			</ParentInspectorControls>
+			<InspectorControls>
 				<PanelBody
 					title={ __( 'Menu Settings' ) }
 				>
