@@ -138,7 +138,7 @@ function gutenberg_experiments_editor_settings( $settings ) {
 
 	);
 
-	$gradient_presets = current( (array) get_theme_support( 'editor-gradient-presets' ) );
+	$gradient_presets = current( (array) get_theme_support( '__experimental-editor-gradient-presets' ) );
 	if ( false !== $gradient_presets ) {
 		$experiments_settings['gradients'] = $gradient_presets;
 	}
