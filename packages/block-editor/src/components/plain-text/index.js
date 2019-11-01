@@ -13,11 +13,15 @@ import classnames from 'classnames';
 /**
  * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/plain-text/README.md
  */
-const PlainText = forwardRef( ( { onChange, className, ...props }, ref ) => {
+const PlainText = forwardRef( ( { onChange, className, isStylable, ...props }, ref ) => {
 	return (
 		<TextareaAutosize
 			ref={ ref }
-			className={ classnames( 'editor-plain-text block-editor-plain-text', className ) }
+			className={ classnames(
+				'editor-plain-text block-editor-plain-text',
+				className,
+				{ 'is-stylable': isStylable }
+			) }
 			onChange={ ( event ) => onChange( event.target.value ) }
 			{ ...props }
 		/>

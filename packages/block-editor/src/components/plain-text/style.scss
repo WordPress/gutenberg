@@ -8,4 +8,28 @@
 	padding: 0;
 	margin: 0;
 	width: 100%;
+
+	&:focus {
+		color: unset;
+	}
+
+	&:not(.is-stylable):focus {
+		color: $dark-gray-900;
+	}
+
+	&.is-stylable {
+		background-color: transparent;
+		border-radius: 0;
+		display: block;
+
+		&.has-background {
+			padding: $block-bg-padding--v $block-bg-padding--h;
+		}
+
+		&:focus {
+			border: none;
+			box-shadow: none;
+			outline: none;
+		}
+	}
 }
