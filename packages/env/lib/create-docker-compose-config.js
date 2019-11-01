@@ -1,11 +1,15 @@
 module.exports = function createDockerComposeConfig(
-	cwd,
-	cwdName,
 	cwdTestsPath,
-	context
+	context,
+	dependencies,
 ) {
+	const { path: cwd, pathBasename: cwdName } = context;
+
+	const dependencyMappings = [ ...dependencies, context ].map(
+		( { path, pathBasename, type } ) => `      - ${ path }/:/var/www/html/wp-content/${ type }s/${ pathBasename }/\n`
+	).join( '' );
 	const commonVolumes = `
-      - ${ cwd }/:/var/www/html/wp-content/${ context.type }s/${ cwdName }/
+${ dependencyMappings }
       - ${ cwd }${ cwdTestsPath }/e2e-tests/mu-plugins/:/var/www/html/wp-content/mu-plugins/
       - ${ cwd }${ cwdTestsPath }/e2e-tests/plugins/:/var/www/html/wp-content/plugins/${ cwdName }-test-plugins/`;
 	const volumes = `
