@@ -42,7 +42,6 @@ function SiteTitleEdit( { insertDefaultBlock } ) {
 				placeholder={ __( 'Site Title' ) }
 				value={ title }
 				onChange={ setTitle }
-				isSingleLine
 				isStylable
 				onKeyDown={ preventNewlines }
 			/>

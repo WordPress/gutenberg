@@ -18,9 +18,9 @@ You can also pass any extra prop to the textarea rendered by this component.
 
 *Optional.* The component forwards the `ref` property to the `TextareaAutosize` component.
 
-### `isSingleLine: Boolean`
+### `multiline: Boolean`
 
-*Optional.* Prevent inserting line breaks.
+*Optional.* Allows inserting line breaks.
 
 ### `isStylable: Boolean`
 
@@ -47,6 +47,7 @@ wp.blocks.registerBlockType( /* ... */, {
 			onChange: function( content ) {
 				props.setAttributes( { content: content } );
 			},
+			multiline: true,
 		} );
 	},
 } );
@@ -71,6 +72,7 @@ registerBlockType( /* ... */, {
 				className={ className }
 				value={ attributes.content }
 				onChange={ ( content ) => setAttributes( { content } ) }
+				multiline
 			/>
 		);
 	},

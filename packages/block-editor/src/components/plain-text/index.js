@@ -21,14 +21,14 @@ const REGEXP_NEWLINES = /[\r\n]+/g;
 const PlainText = forwardRef( ( {
 	onChange,
 	className,
-	isSingleLine,
+	multiline,
 	isStylable,
 	...props
 }, ref ) => {
 	const handleChange = ( event ) => {
 		const { value } = event.target;
 
-		if ( ! isSingleLine ) {
+		if ( multiline ) {
 			onChange( value );
 			return;
 		}

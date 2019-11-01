@@ -17,6 +17,7 @@ export default function CodeEdit( { attributes, setAttributes, className } ) {
 				onChange={ ( content ) => setAttributes( { content: escape( content ) } ) }
 				placeholder={ __( 'Write code…' ) }
 				aria-label={ __( 'Code' ) }
+				multiline
 			/>
 		</div>
 	);
