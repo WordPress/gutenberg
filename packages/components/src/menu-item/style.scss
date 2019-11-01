@@ -5,6 +5,7 @@
 	text-align: left;
 	color: $dark-gray-600;
 	@include menu-style__neutral;
+	@include text-body-small;
 
 	// Target plugin icons that can have arbitrary classes by using an aggressive selector.
 	.dashicon,
@@ -37,8 +38,6 @@
 }
 
 .components-menu-item__info {
-	margin-top: $grid-size-small;
-	font-size: $default-font-size - 1px;
 	color: $dark-gray-300;
 }
 

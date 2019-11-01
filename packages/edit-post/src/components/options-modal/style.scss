@@ -4,8 +4,7 @@
 	}
 
 	&__section-title {
-		font-size: 0.9rem;
-		font-weight: 600;
+		@include text-subtitle-small;
 	}
 
 	&__option {

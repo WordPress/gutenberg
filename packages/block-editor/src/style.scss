@@ -37,3 +37,11 @@
 @import "./components/warning/style.scss";
 @import "./components/writing-flow/style.scss";
 @import "./hooks/anchor.scss";
+
+body {
+	@include text-body-small;
+}
+
+body p {
+	@include text-body-small;
+}

@@ -82,8 +82,7 @@
 	}
 
 	.components-modal__header-heading {
-		font-size: 1rem;
-		font-weight: 600;
+		@include text-subtitle;
 	}
 
 	h1 {

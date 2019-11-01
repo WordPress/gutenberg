@@ -166,7 +166,6 @@
 	// Match the size of the Publish... button.
 	.components-button.is-large {
 		height: 33px;
-		line-height: 32px;
 	}
 
 	// Size the spacer flexibly to allow for different button lengths.
@@ -196,8 +195,7 @@
 		width: auto;
 		height: auto;
 		display: block;
-		font-size: 14px;
-		font-weight: 600;
+		@include text-button;
 		margin: 0 0 0 auto;
 		padding: 15px 23px 14px;
 		line-height: normal;

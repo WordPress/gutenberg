@@ -22,7 +22,6 @@
 	cursor: pointer;
 	padding: 3px 15px; // Use padding to offset the is-active border, this benefits Windows High Contrast mode
 	margin-left: 0;
-	font-weight: 400;
 	color: $dark-gray-900;
 	@include square-style__neutral;
 	transition: box-shadow 0.1s linear;

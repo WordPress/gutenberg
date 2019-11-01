@@ -5,5 +5,5 @@
 
 .block-directory-downloadable-block-author-info__content-author {
 	margin-bottom: 4px;
-	font-size: 14px;
+	@include text-body-small;
 }

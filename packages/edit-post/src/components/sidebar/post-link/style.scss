@@ -10,6 +10,7 @@
 	text-align: left;
 	word-wrap: break-word;
 	display: block;
+	@include text-caption;
 }
 
 /* rtl:begin:ignore */

@@ -158,6 +158,7 @@
 }
 
 .edit-post-sidebar__panel-tab {
+	@include text-button;
 	background: transparent;
 	border: none;
 	box-shadow: none;
@@ -165,14 +166,12 @@
 	height: 50px;
 	padding: 3px 15px; // Use padding to offset the is-active border, this benefits Windows High Contrast mode
 	margin-left: 0;
-	font-weight: 400;
 	@include square-style__neutral;
 	transition: box-shadow 0.1s linear;
 	@include reduce-motion("transition");
 
 	&.is-active {
 		box-shadow: inset 0 -3px theme(outlines);
-		font-weight: 600;
 		position: relative;
 
 		// This border appears in Windows High Contrast mode instead of the box-shadow.

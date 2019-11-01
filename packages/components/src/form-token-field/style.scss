@@ -3,7 +3,7 @@
 	flex-wrap: wrap;
 	align-items: flex-start;
 	width: 100%;
-	margin: 0 0 $grid-size 0;
+	margin: 0 0 $grid-size-small 0;
 	padding: $grid-size-small;
 	background-color: $white;
 	border: $border-width solid $light-gray-700;
@@ -51,7 +51,7 @@
 }
 
 .components-form-token-field__help {
-	font-style: italic;
+	@include text-caption;
 }
 
 // Tokens

@@ -40,7 +40,7 @@
 
 	.reusable-block-edit-panel__title {
 		flex: 1 1 100%;
-		font-size: 14px;
+		@include text-body-small;
 		height: 30px;
 		margin: $grid-size-small 0 $grid-size;
 	}

@@ -72,8 +72,7 @@
 	}
 
 	.components-checkbox-control__label {
-		font-size: 0.9rem;
-		font-weight: 600;
+		@include text-subtitle-small;
 	}
 }
 

@@ -48,15 +48,12 @@
 
 .table-of-contents__number,
 .table-of-contents__popover .word-count {
-	font-size: 21px;
-	font-weight: 400;
-	line-height: 30px;
+	@include text-title-small;
 	color: $dark-gray-500;
 }
 
 .table-of-contents__title {
 	display: block;
 	margin-top: 20px;
-	font-size: 15px;
-	font-weight: 600;
+	@include text-subtitle;
 }

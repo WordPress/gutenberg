@@ -37,11 +37,10 @@
 
 	.block-editor-block-compare__html {
 		font-family: $editor-html-font;
-		font-size: 12px;
+		@include text-caption;
 		color: $dark-gray-800;
 		border-bottom: 1px solid #ddd;
 		padding-bottom: 15px;
-		line-height: 1.7;
 
 		span {
 			background-color: #e6ffed;

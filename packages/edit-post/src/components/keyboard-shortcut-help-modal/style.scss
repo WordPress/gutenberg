@@ -1,3 +1,7 @@
+kbd.edit-post-keyboard-shortcut-help__shortcut-term {
+	@include text-body-small;
+}
+
 .edit-post-keyboard-shortcut-help {
 	&__section {
 		margin: 0 0 2rem 0;
@@ -9,8 +13,7 @@
 	}
 
 	&__section-title {
-		font-size: 0.9rem;
-		font-weight: 600;
+		@include text-subtitle-small;
 	}
 
 	&__shortcut {
@@ -26,7 +29,7 @@
 	}
 
 	&__shortcut-term {
-		font-weight: 600;
+		// @include text-body-small;
 		margin: 0 0 0 1rem;
 	}
 

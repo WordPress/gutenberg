@@ -1,18 +1,18 @@
 .components-button {
 	display: inline-flex;
+	align-items: center;
 	text-decoration: none;
-	font-size: $default-font-size;
 	margin: 0;
 	border: 0;
 	cursor: pointer;
 	-webkit-appearance: none;
 	background: none;
 	transition: box-shadow 0.1s linear;
+	@include text-button;
 	@include reduce-motion("transition");
 
 	&.is-button {
 		padding: 0 10px;
-		line-height: 2;
 		height: 28px;
 		border-radius: 3px;
 		white-space: nowrap;
@@ -193,15 +193,13 @@
 
 	&.is-large {
 		height: 30px;
-		line-height: 28px;
-		padding: 0 12px 2px;
+		padding: 0 12px 0;
 	}
 
 	&.is-small {
 		height: 24px;
-		line-height: 22px;
-		padding: 0 8px 1px;
-		font-size: 11px;
+		padding: 0 8px 0;
+		font-size: 12px;
 	}
 
 	// Buttons that are text-based.
@@ -210,7 +208,6 @@
 
 		// Matches default button in hit area. See line 11.
 		padding: 0 10px;
-		line-height: 26px;
 		height: 28px;
 
 		.dashicon {

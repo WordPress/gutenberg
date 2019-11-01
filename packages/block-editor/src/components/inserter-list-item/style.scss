@@ -9,7 +9,7 @@
 	display: flex;
 	flex-direction: column;
 	width: 100%;
-	font-size: $default-font-size;
+	@include text-caption;
 	color: $dark-gray-700;
 	padding: 0 4px;
 	align-items: stretch;
@@ -72,7 +72,7 @@
 }
 
 .block-editor-block-types-list__item-icon {
-	padding: 12px 20px;
+	padding: 8px 20px;
 	border-radius: $radius-round-rectangle;
 	color: $dark-gray-500;
 	transition: all 0.05s ease-in-out;

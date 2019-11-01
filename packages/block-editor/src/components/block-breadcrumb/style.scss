@@ -37,5 +37,5 @@
 .block-editor-block-breadcrumb__current {
 	color: $dark-gray-500;
 	padding: 0 $grid-size;
-	font-size: inherit;
+	@include text-label;
 }

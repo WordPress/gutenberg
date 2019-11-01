@@ -141,7 +141,7 @@ $block-inserter-search-height: 38px;
 	align-items: center;
 
 	h2 {
-		font-size: 13px;
+		@include text-body-small;
 	}
 
 	.block-editor-block-icon {

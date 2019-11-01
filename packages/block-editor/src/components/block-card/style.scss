@@ -17,8 +17,8 @@
 }
 
 .block-editor-block-card__title {
-	font-weight: 500;
-	margin-bottom: 5px;
+	@include text-body;
+	color: $dark-gray-900;
 }
 
 .block-editor-block-card__description {
