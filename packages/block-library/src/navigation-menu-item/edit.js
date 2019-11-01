@@ -38,6 +38,37 @@ import {
 } from '@wordpress/block-editor';
 import { Fragment, useState, useEffect } from '@wordpress/element';
 
+/**
+ * It updates the link attribute when the
+ * link settings changes.
+ *
+ * @param {string} setting Setting type, for instance, `new-tab`.
+ * @param {string} value Setting type value.
+ */
+const updateLinkSetting = ( setter ) => ( setting, value ) => {
+	if ( setting === 'new-tab' ) {
+		setter( { opensInNewTab: value } );
+	}
+};
+
+/**
+ * Updates the link attribute when it changes
+ * through of the `onLinkChange` LinkControl callback.
+ *
+ * @param {Object|null} itemLink Link object if it has been selected. Otherwise, Null.
+ */
+const updateLink = ( setter, label ) => ( { title: newTitle = '', url: newURL = '' } = {} ) => {
+	setter( {
+		title: newTitle,
+		url: newURL,
+	} );
+
+	// Set the item label as well if it isn't already defined.
+	if ( ! label ) {
+		setter( { label: newTitle } );
+	}
+};
+
 function NavigationMenuItemEdit( {
 	attributes,
 	hasDescendants,
@@ -81,37 +112,6 @@ function NavigationMenuItemEdit( {
 		if ( [ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ].indexOf( keyCode ) > -1 ) {
 			// Stop the key event from propagating up to ObserveTyping.startTypingInTextField.
 			event.stopPropagation();
-		}
-	};
-
-	/**
-	 * Updates the link attribute when it changes
-	 * through of the `onLinkChange` LinkControl callback.
-	 *
-	 * @param {Object|null} itemLink Link object if it has been selected. Otherwise, Null.
-	 */
-	const updateLink = ( { title: newTitle = '', url: newURL = '' } = {} ) => {
-		setAttributes( {
-			title: newTitle,
-			url: newURL,
-		} );
-
-		// Set the item label as well if it isn't already defined.
-		if ( ! label ) {
-			setAttributes( { label: newTitle } );
-		}
-	};
-
-	/**
-	 * It updates the link attribute when the
-	 * link settings changes.
-	 *
-	 * @param {string} setting Setting type, for instance, `new-tab`.
-	 * @param {string} value Setting type value.
-	 */
-	const updateLinkSetting = ( setting, value ) => {
-		if ( setting === 'new-tab' ) {
-			setAttributes( { opensInNewTab: value } );
 		}
 	};
 
@@ -213,13 +213,13 @@ function NavigationMenuItemEdit( {
 						onKeyDown={ handleLinkControlOnKeyDown }
 						onKeyPress={ ( event ) => event.stopPropagation() }
 						currentLink={ link }
-						onLinkChange={ updateLink }
+						onLinkChange={ updateLink( setAttributes, label ) }
 						onClose={ () => {
 							setWasClosedByLinkControl( true );
 							setIsLinkOpen( false );
 						} }
 						currentSettings={ { 'new-tab': opensInNewTab } }
-						onSettingsChange={ updateLinkSetting }
+						onSettingsChange={ updateLinkSetting( setAttributes ) }
 						fetchSearchSuggestions={ fetchSearchSuggestions }
 					/>
 				}
