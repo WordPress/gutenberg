@@ -39,7 +39,8 @@ function myguten_enqueue() {
 		'myguten-script',
 		plugins_url( 'myguten.js', __FILE__ ),
 		array( 'wp-blocks', 'wp-dom-ready', 'wp-edit-post' ),
-		filemtime( plugin_dir_path( __FILE__ ) . '/myguten.js' )
+		filemtime( plugin_dir_path( __FILE__ ) . '/myguten.js' ),
+		true
 	);
 }
 add_action( 'enqueue_block_editor_assets', 'myguten_enqueue' );
