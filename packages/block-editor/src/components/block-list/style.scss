@@ -711,37 +711,6 @@
 	&.is-multi-selected > .block-editor-block-mover {
 		left: -$block-side-ui-width - $block-side-ui-clearance;
 	}
-
-	// For floats, show block mover when block is selected, and never on hover.
-	&[data-align="left"],
-	&[data-align="right"] {
-		// Show always when the block is selected.
-		&.is-selected > .block-editor-block-list__block-edit > .block-editor-block-mover {
-			// Don't show on mobile, allow the special mobile toolbar to work there.
-			display: none;
-			@include break-small() {
-				display: block;
-				opacity: 1;
-				animation: none;
-
-				// Make wider and taller to make "safe" hover area bigger.
-				// The intent is to make it less likely that you hover float-adjacent
-				// blocks that visually appear below the block.
-				width: $block-side-ui-width + $block-side-ui-clearance + $block-padding + $border-width;
-				height: auto;
-				padding-bottom: $block-padding;
-
-				// Unset the negative top margin, or it might overlap the block toolbar.
-				margin-top: 0;
-			}
-		}
-
-		// Don't show on hover, or on the "ghost" when dragging.
-		&.is-hovered > .block-editor-block-list__block-edit > .block-editor-block-mover,
-		&.is-dragging > .block-editor-block-list__block-edit > .block-editor-block-mover {
-			display: none;
-		}
-	}
 }
 
 

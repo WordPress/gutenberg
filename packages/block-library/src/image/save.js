@@ -23,6 +23,7 @@ export default function save( { attributes } ) {
 		id,
 		linkTarget,
 		sizeSlug,
+		title,
 	} = attributes;
 
 	const newRel = isEmpty( rel ) ? undefined : rel;
@@ -40,6 +41,7 @@ export default function save( { attributes } ) {
 			className={ id ? `wp-image-${ id }` : null }
 			width={ width }
 			height={ height }
+			title={ title }
 		/>
 	);
 
