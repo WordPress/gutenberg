@@ -16,7 +16,7 @@ import {
 	SVG,
 	TextareaControl,
 	TextControl,
-	Toolbar,
+	ToolbarGroup,
 	ToggleControl,
 	ToolbarButton,
 } from '@wordpress/components';
@@ -88,7 +88,7 @@ function NavigationMenuItemEdit( {
 	return (
 		<Fragment>
 			<BlockControls>
-				<Toolbar>
+				<ToolbarGroup>
 					<ToolbarButton
 						name="link"
 						icon="admin-links"
@@ -101,7 +101,7 @@ function NavigationMenuItemEdit( {
 						title={ __( 'Add submenu item' ) }
 						onClick={ insertMenuItemBlock }
 					/> }
-				</Toolbar>
+				</ToolbarGroup>
 				{ isLinkOpen &&
 					<>
 						<URLPopover
