@@ -33,7 +33,9 @@ class NavigableToolbar extends Component {
 
 	componentDidMount() {
 		if ( this.props.focusOnMount ) {
-			this.focusToolbar();
+			window.requestAnimationFrame( () => {
+				this.focusToolbar();
+			} );
 		}
 
 		// Toolbar items added via Portal (Slot bubblesVirtually) aren't added
