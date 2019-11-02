@@ -25,23 +25,9 @@ class NavigableToolbar extends Component {
 	}
 
 	focusToolbar() {
-		// TODO: Refactor
 		const tabbables = focus.tabbable.find( this.toolbar.current );
-		const isWithinThis = this.toolbar.current.contains( document.activeElement );
-
-		if ( ! isWithinThis ) {
-			window.requestAnimationFrame( () => {
-				if ( tabbables.length ) {
-					tabbables[ 0 ].focus();
-				}
-				window.requestAnimationFrame( () => {
-					if ( this.props.highPriorityOnFocus ) {
-						if ( tabbables.length ) {
-							tabbables[ 0 ].focus();
-						}
-					}
-				} );
-			} );
+		if ( tabbables.length ) {
+			tabbables[ 0 ].focus();
 		}
 	}
 

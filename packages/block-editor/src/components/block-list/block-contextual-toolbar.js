@@ -13,8 +13,6 @@ function BlockContextualToolbar( { focusOnMount } ) {
 	return (
 		<NavigableToolbar
 			focusOnMount={ focusOnMount }
-			// TODO: Refactor
-			highPriorityOnFocus
 			className="editor-block-contextual-toolbar block-editor-block-contextual-toolbar"
 			/* translators: accessibility text for the block toolbar */
 			aria-label={ __( 'Block tools' ) }

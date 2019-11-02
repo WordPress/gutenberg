@@ -8,7 +8,7 @@ import {
 	PlainText,
 	transformStyles,
 } from '@wordpress/block-editor';
-import { Disabled, SandBox } from '@wordpress/components';
+import { Disabled, SandBox, Button } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 
 class HTMLEdit extends Component {
@@ -58,18 +58,18 @@ class HTMLEdit extends Component {
 			<div className="wp-block-html">
 				<BlockControls>
 					<div className="components-toolbar">
-						<button
+						<Button
 							className={ `components-tab-button ${ ! isPreview ? 'is-active' : '' }` }
 							onClick={ this.switchToHTML }
 						>
 							<span>HTML</span>
-						</button>
-						<button
+						</Button>
+						<Button
 							className={ `components-tab-button ${ isPreview ? 'is-active' : '' }` }
 							onClick={ this.switchToPreview }
 						>
 							<span>{ __( 'Preview' ) }</span>
-						</button>
+						</Button>
 					</div>
 				</BlockControls>
 				<Disabled.Consumer>

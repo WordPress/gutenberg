@@ -33,12 +33,14 @@ class SlotComponent extends Component {
 
 	componentDidMount() {
 		const { registerSlot } = this.props;
+		this._isMounted = true;
 
 		registerSlot( this.props.name, this );
 	}
 
 	componentWillUnmount() {
 		const { unregisterSlot } = this.props;
+		this._isMounted = false;
 
 		unregisterSlot( this.props.name, this );
 	}
@@ -54,6 +56,15 @@ class SlotComponent extends Component {
 
 	bindNode( node ) {
 		this.node = node;
+	}
+
+	forceUpdate() {
+		// Fill may call this when the Slot has been already unmounted.
+		// The overall Slot/Fill technique needs to be revisited.
+		// This only avoids React warnings.
+		if ( this._isMounted ) {
+			return super.forceUpdate();
+		}
 	}
 
 	render() {
