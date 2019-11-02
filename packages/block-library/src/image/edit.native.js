@@ -2,7 +2,7 @@
  * External dependencies
  */
 import React from 'react';
-import { View, ImageBackground, Text, TouchableWithoutFeedback, Dimensions } from 'react-native';
+import { View, ImageBackground, Text, TouchableWithoutFeedback, Dimensions, Platform } from 'react-native';
 import {
 	requestMediaImport,
 	mediaUploadSync,
@@ -142,7 +142,7 @@ export class ImageEdit extends React.Component {
 			requestImageFailedRetryDialog( attributes.id );
 		}
 		// eslint-disable-next-line no-undef
-		const enableFullscreen = __DEV__;
+		const enableFullscreen = Platform.OS === 'ios';
 		this.setState( {
 			isCaptionSelected: false,
 			showImageViewer: enableFullscreen && true,
