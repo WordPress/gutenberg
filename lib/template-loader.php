@@ -107,6 +107,42 @@ function gutenberg_find_template( $template_file ) {
 	if ( $template_query->have_posts() ) {
 		$template_posts            = $template_query->get_posts();
 		$_wp_current_template_post = array_shift( $template_posts );
+
+		// Build map of template slugs to their priority in the current hierarchy.
+		$slug_priorities = new stdClass();
+		foreach ( $slugs as $index => $slug ) {
+			$slug_priorities->{$slug} = $index;
+		}
+
+		// See if there is a theme block template with higher priority than the resolved template post.
+		$higher_priority_block_template_path     = null;
+		$higher_priority_block_template_priority = PHP_INT_MAX;
+		foreach ( glob( get_template_directory() . '/block-templates/*.html', 1 ) as $path ) {
+			$theme_block_template_priority = $slug_priorities->{basename( $path, '.html' )};
+			if (
+				$theme_block_template_priority < $higher_priority_block_template_priority &&
+				$theme_block_template_priority < $slug_priorities->{$_wp_current_template_post->post_name}
+			) {
+				$higher_priority_block_template_path     = $path;
+				$higher_priority_block_template_priority = $theme_block_template_priority;
+			}
+		}
+
+		// If there is, use it instead.
+		if ( isset( $higher_priority_block_template_path ) ) {
+			$post_name                 = basename( $path, '.html' );
+			$_wp_current_template_post = get_post(
+				wp_insert_post(
+					array(
+						'post_content' => file_get_contents( $higher_priority_block_template_path ),
+						'post_title'   => ucfirst( $post_name ),
+						'post_status'  => 'auto_draft',
+						'post_type'    => 'wp_template',
+						'post_name'    => $post_name,
+					)
+				)
+			);
+		}
 	}
 
 	// Add extra hooks for template canvas.
