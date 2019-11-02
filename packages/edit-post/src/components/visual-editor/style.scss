@@ -34,7 +34,6 @@
 		// Use specific selector to not affect nested block toolbars.
 		&[data-align="wide"] > .block-editor-block-list__block-edit > .block-editor-block-contextual-toolbar,
 		&[data-align="full"] > .block-editor-block-list__block-edit > .block-editor-block-contextual-toolbar {
-			display: block;
 			height: 0; // This collapses the container to an invisible element without margin.
 			width: calc(100% - #{$block-side-ui-width * 3} - #{$grid-size-small * 1.5}); // -90px to account for inner element left position value causing overflow-x scrollbars
 			margin-left: 0;
