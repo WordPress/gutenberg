@@ -26,11 +26,15 @@ export default {
 		return [ user.slug, user.name ];
 	},
 	getOptionLabel( user ) {
-		return [
-			<img key="avatar" className="editor-autocompleters__user-avatar" alt="" src={ user.avatar_urls[ 24 ] } />,
+		const userDetails = [
 			<span key="name" className="editor-autocompleters__user-name">{ user.name }</span>,
 			<span key="slug" className="editor-autocompleters__user-slug">{ user.slug }</span>,
 		];
+		const avatar = user.avatar_urls && user.avatar_urls[ 24 ] ?
+			<img key="avatar" className="editor-autocompleters__user-avatar" alt="" src={ user.avatar_urls[ 24 ] } /> :
+			null;
+
+		return avatar ? [ avatar, ...userDetails ] : userDetails;
 	},
 	getOptionCompletion( user ) {
 		return `@${ user.slug }`;
