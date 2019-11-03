@@ -6,7 +6,7 @@ The editor will automatically generate a class name for each block type to simpl
 
 {% codetabs %}
 {% ESNext %}
-```js
+```jsx
 import { registerBlockType } from '@wordpress/blocks';
 
 registerBlockType( 'gutenberg-examples/example-02-stylesheets', {

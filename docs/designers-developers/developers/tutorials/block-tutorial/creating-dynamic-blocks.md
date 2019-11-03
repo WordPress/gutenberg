@@ -19,7 +19,7 @@ The following code example shows how to create a dynamic block that shows only t
 
 {% codetabs %}
 {% ESNext %}
-```js
+```jsx
 import { registerBlockType } from '@wordpress/blocks';
 import { withSelect } from '@wordpress/data';
 
@@ -155,7 +155,7 @@ Gutenberg 2.8 added the [`<ServerSideRender>`](/packages/components/src/server-s
 
 {% codetabs %}
 {% ESNext %}
-```js
+```jsx
 import { registerBlockType } from '@wordpress/blocks';
 import ServerSideRender from '@wordpress/server-side-render';
 

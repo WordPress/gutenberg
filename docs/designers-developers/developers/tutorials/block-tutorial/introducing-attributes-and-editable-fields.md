@@ -54,7 +54,7 @@ Here is the complete block definition for Example 03.
 
 {% codetabs %}
 {% ESNext %}
-```js
+```jsx
 import { registerBlockType } from '@wordpress/blocks';
 import { RichText } from '@wordpress/block-editor';
 

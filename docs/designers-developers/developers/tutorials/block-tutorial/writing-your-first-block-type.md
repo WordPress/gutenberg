@@ -49,7 +49,7 @@ With the script enqueued, let's look at the implementation of the block itself:
 
 {% codetabs %}
 {% ESNext %}
-```js
+```jsx
 import { registerBlockType } from '@wordpress/blocks';
 
 const blockStyle = {

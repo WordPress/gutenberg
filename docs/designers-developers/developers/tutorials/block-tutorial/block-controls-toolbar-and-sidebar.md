@@ -12,7 +12,7 @@ You can also customize the toolbar to include controls specific to your block ty
 
 {% codetabs %}
 {% ESNext %}
-```js
+```jsx
 import { registerBlockType } from '@wordpress/blocks';
 
 import {
