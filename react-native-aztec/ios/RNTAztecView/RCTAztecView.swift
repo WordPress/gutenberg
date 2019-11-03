@@ -135,6 +135,19 @@ class RCTAztecView: Aztec.TextView {
         textDragInteraction?.isEnabled = false        
         storage.htmlConverter.characterToReplaceLastEmptyLine = Character(.zeroWidthSpace)
         shouldNotifyOfNonUserChanges = false
+        let darkPreBackgroundColor = UIColor(red: 0x1d/255.0, green: 0x23/255.0, blue: 0x27/255.0, alpha: 1)
+        let lightPreBackgroundColor = UIColor(red: 0xdc/255.0, green: 0xdc/255.0, blue: 0xde/255.0, alpha: 1)
+        if #available(iOS 13.0, *) {
+            preBackgroundColor = UIColor.init { (traits) -> UIColor in
+                if traits.userInterfaceStyle == .dark {
+                    return darkPreBackgroundColor
+                } else {
+                    return lightPreBackgroundColor
+                }
+            }
+        } else {
+            preBackgroundColor = lightPreBackgroundColor
+        }
     }
 
     func addPlaceholder() {
