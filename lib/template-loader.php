@@ -109,19 +109,19 @@ function gutenberg_find_template( $template_file ) {
 		$_wp_current_template_post = array_shift( $template_posts );
 
 		// Build map of template slugs to their priority in the current hierarchy.
-		$slug_priorities = new stdClass();
+		$slug_priorities = array();
 		foreach ( $slugs as $index => $slug ) {
-			$slug_priorities->{$slug} = $index;
+			$slug_priorities[ $slug ] = $index;
 		}
 
 		// See if there is a theme block template with higher priority than the resolved template post.
 		$higher_priority_block_template_path     = null;
 		$higher_priority_block_template_priority = PHP_INT_MAX;
-		foreach ( glob( get_template_directory() . '/block-templates/*.html', 1 ) as $path ) {
-			$theme_block_template_priority = $slug_priorities->{basename( $path, '.html' )};
+		foreach ( array_unique( array_merge( glob( get_stylesheet_directory() . '/block-templates/*.html', 1 ), glob( get_template_directory() . '/block-templates/*.html', 1 ) ) ) as $path ) {
+			$theme_block_template_priority = $slug_priorities[ basename( $path, '.html' ) ];
 			if (
 				$theme_block_template_priority < $higher_priority_block_template_priority &&
-				$theme_block_template_priority < $slug_priorities->{$_wp_current_template_post->post_name}
+				$theme_block_template_priority < $slug_priorities[ $_wp_current_template_post->post_name ]
 			) {
 				$higher_priority_block_template_path     = $path;
 				$higher_priority_block_template_priority = $theme_block_template_priority;
@@ -136,7 +136,7 @@ function gutenberg_find_template( $template_file ) {
 					array(
 						'post_content' => file_get_contents( $higher_priority_block_template_path ),
 						'post_title'   => ucfirst( $post_name ),
-						'post_status'  => 'auto_draft',
+						'post_status'  => 'auto-draft',
 						'post_type'    => 'wp_template',
 						'post_name'    => $post_name,
 					)
