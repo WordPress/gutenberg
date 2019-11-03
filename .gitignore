@@ -11,6 +11,7 @@ gutenberg.zip
 phpcs.xml
 yarn.lock
 /wordpress
+.vscode
 
 playground/dist
 .cache
