@@ -120,6 +120,7 @@ function gutenberg_find_template( $template_file ) {
 		foreach ( array_unique( array_merge( glob( get_stylesheet_directory() . '/block-templates/*.html', 1 ), glob( get_template_directory() . '/block-templates/*.html', 1 ) ) ) as $path ) {
 			$theme_block_template_priority = $slug_priorities[ basename( $path, '.html' ) ];
 			if (
+				isset( $theme_block_template_priority ) &&
 				$theme_block_template_priority < $higher_priority_block_template_priority &&
 				$theme_block_template_priority < $slug_priorities[ $_wp_current_template_post->post_name ]
 			) {
