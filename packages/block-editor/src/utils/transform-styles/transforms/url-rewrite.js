@@ -55,7 +55,6 @@ function isValidURL( meta ) {
  *
  * @param  {string} str          the url
  * @param  {string} baseURL      base URL
- * @param  {string} absolutePath the absolute path
  *
  * @return {string}              the full path to the file
  */

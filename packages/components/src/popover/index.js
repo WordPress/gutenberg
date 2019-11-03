@@ -10,6 +10,7 @@ import { useRef, useState, useEffect } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
 import { ESCAPE } from '@wordpress/keycodes';
 import isShallowEqual from '@wordpress/is-shallow-equal';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -29,34 +30,34 @@ const FocusManaged = withConstrainedTabbing( withFocusReturn( ( { children } ) =
 /**
  * Name of slot in which popover should fill.
  *
- * @type {String}
+ * @type {string}
  */
 const SLOT_NAME = 'Popover';
 
 /**
  * Hook used trigger an event handler once the window is resized or scrolled.
  *
- * @param {function} handler              Event handler.
- * @param {Object}   ignoredScrollalbeRef scroll events inside this element are ignored.
+ * @param {Function} handler              Event handler.
+ * @param {Object}   ignoredScrollableRef scroll events inside this element are ignored.
  */
-function useThrottledWindowScrollOrResize( handler, ignoredScrollalbeRef ) {
+function useThrottledWindowScrollOrResize( handler, ignoredScrollableRef ) {
 	// Refresh anchor rect on resize
 	useEffect( () => {
 		let refreshHandle;
 		const throttledRefresh = ( event ) => {
 			window.cancelAnimationFrame( refreshHandle );
-			if ( ignoredScrollalbeRef && event && event.type === 'scroll' && ignoredScrollalbeRef.current.contains( event.target ) ) {
+			if ( ignoredScrollableRef && event && event.type === 'scroll' && ignoredScrollableRef.current.contains( event.target ) ) {
 				return;
 			}
 			refreshHandle = window.requestAnimationFrame( handler );
 		};
 
 		window.addEventListener( 'resize', throttledRefresh );
-		window.addEventListener( 'scroll', throttledRefresh );
+		window.addEventListener( 'scroll', throttledRefresh, true );
 
 		return () => {
 			window.removeEventListener( 'resize', throttledRefresh );
-			window.removeEventListener( 'scroll', throttledRefresh );
+			window.removeEventListener( 'scroll', throttledRefresh, true );
 		};
 	}, [] );
 }
@@ -251,7 +252,6 @@ const Popover = ( {
 	onKeyDown,
 	children,
 	className,
-	onClickOutside = onClose,
 	noArrow = false,
 	// Disable reason: We generate the `...contentProps` rest as remainder
 	// of props which aren't explicitly handled by this component.
@@ -263,6 +263,8 @@ const Popover = ( {
 	getAnchorRect,
 	expandOnMobile,
 	animate = true,
+	onClickOutside,
+	onFocusOutside,
 	/* eslint-enable no-unused-vars */
 	...contentProps
 } ) => {
@@ -308,6 +310,47 @@ const Popover = ( {
 		}
 	};
 
+	/**
+	 * Shims an onFocusOutside callback to be compatible with a deprecated
+	 * onClickOutside prop function, if provided.
+	 *
+	 * @param {FocusEvent} event Focus event from onFocusOutside.
+	 */
+	function handleOnFocusOutside( event ) {
+		// Defer to given `onFocusOutside` if specified. Call `onClose` only if
+		// both `onFocusOutside` and `onClickOutside` are unspecified. Doing so
+		// assures backwards-compatibility for prior `onClickOutside` default.
+		if ( onFocusOutside ) {
+			onFocusOutside( event );
+			return;
+		} else if ( ! onClickOutside ) {
+			if ( onClose ) {
+				onClose();
+			}
+			return;
+		}
+
+		// Simulate MouseEvent using FocusEvent#relatedTarget as emulated click
+		// target. MouseEvent constructor is unsupported in Internet Explorer.
+		let clickEvent;
+		try {
+			clickEvent = new window.MouseEvent( 'click' );
+		} catch ( error ) {
+			clickEvent = document.createEvent( 'MouseEvent' );
+			clickEvent.initMouseEvent( 'click', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null );
+		}
+
+		Object.defineProperty( clickEvent, 'target', {
+			get: () => event.relatedTarget,
+		} );
+
+		deprecated( 'Popover onClickOutside prop', {
+			alternative: 'onFocusOutside',
+		} );
+
+		onClickOutside( clickEvent );
+	}
+
 	// Compute the animation position
 	const yAxisMapping = {
 		top: 'bottom',
@@ -337,9 +380,8 @@ const Popover = ( {
 	// Disable reason: We care to capture the _bubbled_ events from inputs
 	// within popover as inferring close intent.
 
-	/* eslint-disable jsx-a11y/no-static-element-interactions */
 	let content = (
-		<PopoverDetectOutside onClickOutside={ onClickOutside }>
+		<PopoverDetectOutside onFocusOutside={ handleOnFocusOutside }>
 			<Animate
 				type={ animate && isReadyToAnimate ? 'appear' : null }
 				options={ { origin: animateYAxis + ' ' + animateXAxis } }
@@ -379,7 +421,6 @@ const Popover = ( {
 			</Animate>
 		</PopoverDetectOutside>
 	);
-	/* eslint-enable jsx-a11y/no-static-element-interactions */
 
 	// Apply focus to element as long as focusOnMount is truthy; false is
 	// the only "disabled" value.

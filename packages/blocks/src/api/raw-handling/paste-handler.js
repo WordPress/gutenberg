@@ -113,6 +113,7 @@ function htmlToBlocks( { html, rawTransforms } ) {
 /**
  * Converts an HTML string to known blocks. Strips everything else.
  *
+ * @param {Object}  options
  * @param {string}  [options.HTML]                     The HTML to convert.
  * @param {string}  [options.plainText]                Plain text version.
  * @param {string}  [options.mode]                     Handle content as blocks or inline content.

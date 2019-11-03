@@ -8,6 +8,7 @@ import {
 	sortBy,
 	throttle,
 } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -16,7 +17,7 @@ import { Component } from '@wordpress/element';
 import {
 	withSelect,
 	withDispatch,
-	__experimentalAsyncModeProvider as AsyncModeProvider,
+	AsyncModeProvider,
 } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
@@ -87,8 +88,6 @@ class BlockList extends Component {
 	 * multi-selection.
 	 *
 	 * @param {MouseEvent} event A mousemove event object.
-	 *
-	 * @return {void}
 	 */
 	onPointerMove( { clientY } ) {
 		// We don't start multi-selection until the mouse starts moving, so as
@@ -116,8 +115,6 @@ class BlockList extends Component {
 	 * in response to a mousedown event occurring in a rendered block.
 	 *
 	 * @param {string} clientId Client ID of block where mousedown occurred.
-	 *
-	 * @return {void}
 	 */
 	onSelectionStart( clientId ) {
 		if ( ! this.props.isSelectionEnabled ) {
@@ -173,8 +170,6 @@ class BlockList extends Component {
 
 	/**
 	 * Handles a mouseup event to end the current cursor multi-selection.
-	 *
-	 * @return {void}
 	 */
 	onSelectionEnd() {
 		// Cancel throttled calls.
@@ -197,8 +192,10 @@ class BlockList extends Component {
 
 	render() {
 		const {
+			className,
 			blockClientIds,
 			rootClientId,
+			__experimentalMoverDirection: moverDirection = 'vertical',
 			isDraggable,
 			selectedBlockClientId,
 			multiSelectedBlockClientIds,
@@ -208,8 +205,13 @@ class BlockList extends Component {
 		} = this.props;
 
 		return (
-			<div className="editor-block-list__layout block-editor-block-list__layout">
-				{ blockClientIds.map( ( clientId ) => {
+			<div className={
+				classnames(
+					'editor-block-list__layout block-editor-block-list__layout',
+					className
+				)
+			}>
+				{ blockClientIds.map( ( clientId, index ) => {
 					const isBlockInSelection = hasMultiSelection ?
 						multiSelectedBlockClientIds.includes( clientId ) :
 						selectedBlockClientId === clientId;
@@ -226,11 +228,12 @@ class BlockList extends Component {
 								blockRef={ this.setBlockRef }
 								onSelectionStart={ this.onSelectionStart }
 								isDraggable={ isDraggable }
+								moverDirection={ moverDirection }
 
 								// This prop is explicitely computed and passed down
 								// to avoid being impacted by the async mode
 								// otherwise there might be a small delay to trigger the animation.
-								animateOnChange={ blockClientIds }
+								animateOnChange={ index }
 								enableAnimation={ enableAnimation }
 							/>
 						</BlockAsyncModeProvider>
@@ -262,6 +265,7 @@ export default compose( [
 			getMultiSelectedBlockClientIds,
 			hasMultiSelection,
 			getGlobalBlockCount,
+			isTyping,
 		} = select( 'core/block-editor' );
 
 		const { rootClientId } = ownProps;
@@ -275,7 +279,10 @@ export default compose( [
 			selectedBlockClientId: getSelectedBlockClientId(),
 			multiSelectedBlockClientIds: getMultiSelectedBlockClientIds(),
 			hasMultiSelection: hasMultiSelection(),
-			enableAnimation: getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD,
+			enableAnimation: (
+				! isTyping() &&
+				getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD
+			),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

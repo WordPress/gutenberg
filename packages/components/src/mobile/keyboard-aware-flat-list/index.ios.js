@@ -5,10 +5,10 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import { FlatList } from 'react-native';
 
 export const KeyboardAwareFlatList = ( {
-	blockToolbarHeight,
-	innerToolbarHeight,
+	extraScrollHeight,
 	shouldPreventAutomaticScroll,
 	innerRef,
+	autoScroll,
 	...listProps
 } ) => (
 	<KeyboardAwareScrollView
@@ -16,10 +16,9 @@ export const KeyboardAwareFlatList = ( {
 		keyboardDismissMode="none"
 		enableResetScrollToCoords={ false }
 		keyboardShouldPersistTaps="handled"
-		extraScrollHeight={ innerToolbarHeight }
-		extraBottomInset={ -listProps.safeAreaBottomInset }
-		inputAccessoryViewHeight={ blockToolbarHeight }
+		extraScrollHeight={ extraScrollHeight }
 		extraHeight={ 0 }
+		enableAutomaticScroll={ autoScroll === undefined ? false : autoScroll }
 		innerRef={ ( ref ) => {
 			this.scrollViewRef = ref;
 			innerRef( ref );
@@ -33,7 +32,9 @@ export const KeyboardAwareFlatList = ( {
 					this.latestContentOffsetY !== undefined &&
 					! shouldPreventAutomaticScroll() ) {
 					// Reset the content position if keyboard is still closed
-					this.scrollViewRef.props.scrollToPosition( 0, this.latestContentOffsetY, true );
+					if ( this.scrollViewRef ) {
+						this.scrollViewRef.props.scrollToPosition( 0, this.latestContentOffsetY, true );
+					}
 				}
 			}, 50 );
 		} }

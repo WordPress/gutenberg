@@ -3,11 +3,14 @@
  */
 import classnames from 'classnames';
 
-function BaseControl( { id, label, help, className, children } ) {
+function BaseControl( { id, label, hideLabelFromVision, help, className, children } ) {
 	return (
 		<div className={ classnames( 'components-base-control', className ) }>
 			<div className="components-base-control__field">
-				{ label && id && <label className="components-base-control__label" htmlFor={ id }>{ label }</label> }
+				{ label && id && <label
+					className={ classnames( 'components-base-control__label', { 'screen-reader-text': hideLabelFromVision } ) }
+					htmlFor={ id }>{ label }
+				</label> }
 				{ label && ! id && <BaseControl.VisualLabel>{ label }</BaseControl.VisualLabel> }
 				{ children }
 			</div>

@@ -19,7 +19,7 @@ exports[`URLPopover matches the snapshot in its default state 1`] = `
         aria-expanded={false}
         className="editor-url-popover__settings-toggle block-editor-url-popover__settings-toggle"
         icon="arrow-down-alt2"
-        label="Link Settings"
+        label="Link settings"
         onClick={[Function]}
       />
     </div>
@@ -46,7 +46,7 @@ exports[`URLPopover matches the snapshot when the settings are toggled open 1`] 
         aria-expanded={true}
         className="editor-url-popover__settings-toggle block-editor-url-popover__settings-toggle"
         icon="arrow-down-alt2"
-        label="Link Settings"
+        label="Link settings"
         onClick={[Function]}
       />
     </div>

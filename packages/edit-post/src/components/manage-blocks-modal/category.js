@@ -1,11 +1,12 @@
 /**
  * External dependencies
  */
-import { without, map } from 'lodash';
+import { includes, map, without } from 'lodash';
 
 /**
  * WordPress dependencies
  */
+import { useContext, useMemo } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose, withInstanceId } from '@wordpress/compose';
 import { CheckboxControl } from '@wordpress/components';
@@ -14,6 +15,7 @@ import { CheckboxControl } from '@wordpress/components';
  * Internal dependencies
  */
 import BlockTypesChecklist from './checklist';
+import EditPostSettings from '../edit-post-settings';
 
 function BlockManagerCategory( {
 	instanceId,
@@ -23,18 +25,32 @@ function BlockManagerCategory( {
 	toggleVisible,
 	toggleAllVisible,
 } ) {
-	if ( ! blockTypes.length ) {
+	const settings = useContext( EditPostSettings );
+	const { allowedBlockTypes } = settings;
+	const filteredBlockTypes = useMemo(
+		() => {
+			if ( allowedBlockTypes === true ) {
+				return blockTypes;
+			}
+			return blockTypes.filter( ( { name } ) => {
+				return includes( allowedBlockTypes || [], name );
+			} );
+		},
+		[ allowedBlockTypes, blockTypes ]
+	);
+
+	if ( ! filteredBlockTypes.length ) {
 		return null;
 	}
 
 	const checkedBlockNames = without(
-		map( blockTypes, 'name' ),
+		map( filteredBlockTypes, 'name' ),
 		...hiddenBlockTypes
 	);
 
 	const titleId = 'edit-post-manage-blocks-modal__category-title-' + instanceId;
 
-	const isAllChecked = checkedBlockNames.length === blockTypes.length;
+	const isAllChecked = checkedBlockNames.length === filteredBlockTypes.length;
 
 	let ariaChecked;
 	if ( isAllChecked ) {
@@ -59,7 +75,7 @@ function BlockManagerCategory( {
 				label={ <span id={ titleId }>{ category.title }</span> }
 			/>
 			<BlockTypesChecklist
-				blockTypes={ blockTypes }
+				blockTypes={ filteredBlockTypes }
 				value={ checkedBlockNames }
 				onItemChange={ toggleVisible }
 			/>

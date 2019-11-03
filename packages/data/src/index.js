@@ -19,9 +19,7 @@ export {
 } from './components/registry-provider';
 export { default as useSelect } from './components/use-select';
 export { useDispatch } from './components/use-dispatch';
-export {
-	AsyncModeProvider as __experimentalAsyncModeProvider,
-} from './components/async-mode-provider';
+export { AsyncModeProvider } from './components/async-mode-provider';
 export { createRegistry } from './registry';
 export { createRegistrySelector, createRegistryControl } from './factory';
 
@@ -133,11 +131,11 @@ export const dispatch = defaultRegistry.dispatch;
 export const subscribe = defaultRegistry.subscribe;
 
 /**
-* Registers a generic store.
-*
-* @param {string} key    Store registry key.
-* @param {Object} config Configuration (getSelectors, getActions, subscribe).
-*/
+ * Registers a generic store.
+ *
+ * @param {string} key    Store registry key.
+ * @param {Object} config Configuration (getSelectors, getActions, subscribe).
+ */
 export const registerGenericStore = defaultRegistry.registerGenericStore;
 
 /**

@@ -43,6 +43,7 @@ import { compose, pure, withInstanceId } from '@wordpress/compose';
  */
 import { calculateSaturationChange } from './utils';
 import KeyboardShortcuts from '../keyboard-shortcuts';
+import VisuallyHidden from '../visually-hidden';
 
 export class Saturation extends Component {
 	constructor( props ) {
@@ -150,7 +151,7 @@ export class Saturation extends Component {
 			home: () => this.saturate( -1 ),
 		};
 
-		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/no-noninteractive-element-interactions */
+		/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 		return (
 			<KeyboardShortcuts shortcuts={ shortcuts }>
 				<div
@@ -171,17 +172,16 @@ export class Saturation extends Component {
 						style={ pointerLocation }
 						onKeyDown={ this.preventKeyEvents }
 					/>
-					<div
-						className="screen-reader-text"
+					<VisuallyHidden
 						id={ `color-picker-saturation-${ instanceId }` }>
 						{ __(
 							'Use your arrow keys to change the base color. Move up to lighten the color, down to darken, left to decrease saturation, and right to increase saturation.'
 						) }
-					</div>
+					</VisuallyHidden>
 				</div>
 			</KeyboardShortcuts>
 		);
-		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/no-noninteractive-element-interactions */
+		/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
 	}
 }
 

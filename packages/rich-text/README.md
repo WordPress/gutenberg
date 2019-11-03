@@ -216,11 +216,7 @@ behavior.
 _Parameters_
 
 -   _name_ `string`: Format name.
--   _settings_ `Object`: Format settings.
--   _settings.tagName_ `string`: The HTML tag this format will wrap the selection with.
--   _settings.className_ `[string]`: A class to match the format.
--   _settings.title_ `string`: Name of the format.
--   _settings.edit_ `Function`: Should return a component for the user to interact with the new registered format.
+-   _settings_ `WPFormat`: Format settings.
 
 _Returns_
 
@@ -273,11 +269,6 @@ _Returns_
 
 -   `Object`: A new value with replacements applied.
 
-<a name="RichText" href="#RichText">#</a> **RichText**
-
-Renders a rich content input, providing users with the option to format the
-content.
-
 <a name="slice" href="#slice">#</a> **slice**
 
 Slice a Rich Text value from `startIndex` to `endIndex`. Indices are
@@ -302,9 +293,13 @@ Indices are retrieved from the selection if none are provided.
 
 _Parameters_
 
--   _value_ `Object`: Value to modify.
+-   _value_ `Object`: 
+-   _value.formats_ `Array<Object>`: 
+-   _value.replacements_ `Array<Object>`: 
+-   _value.text_ `string`: 
+-   _value.start_ `number`: 
+-   _value.end_ `number`: 
 -   _string_ `[(number|string)]`: Start index, or string at which to split.
--   _endStr_ `[number]`: End index.
 
 _Returns_
 

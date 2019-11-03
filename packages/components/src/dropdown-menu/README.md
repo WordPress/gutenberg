@@ -140,11 +140,21 @@ The component accepts the following props:
 
 The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug to be shown in the collapsed menu button.
 
-- Type: `String`
+- Type: `String|null`
 - Required: No
 - Default: `"menu"`
 
 See also: [https://developer.wordpress.org/resource/dashicons/](https://developer.wordpress.org/resource/dashicons/)
+
+#### hasArrowIndicator
+
+Whether to display an arrow indicator next to the icon.
+
+- Type: `Boolean`
+- Required: No
+- Default: `false`
+
+For backward compatibility, when `icon` is explicitly set to `null` then the arrow indicator will be displayed even when this flag is set to `false`.
 
 #### label
 
@@ -152,21 +162,6 @@ A human-readable label to present as accessibility text on the focused collapsed
 
 - Type: `String`
 - Required: Yes
-
-#### menuLabel
-
-A human-readable label to present as accessibility text on the expanded menu container.
-
-- Type: `String`
-- Required: No
-
-#### position
-
-The direction in which the menu should open. Specify y- and x-axis as a space-separated string. Supports `"top"`, `"middle"`, `"bottom"` y axis, and `"left"`, `"center"`, `"right"` x axis.
-
-- Type: `String`
-- Required: No
-- Default: `"top center"`
 
 #### controls
 
@@ -192,7 +187,31 @@ See also: [https://developer.wordpress.org/resource/dashicons/](https://develope
 
 #### className
 
-A class name to apply to the dropdown wrapper element.
+A class name to apply to the dropdown menu's toggle element wrapper.
 
 - Type: `String`
 - Required: No
+
+#### popoverProps
+ 
+Properties of `popoverProps` object will be passed as props to the nested `Popover` component.
+Use this object to modify props available for the `Popover` component that are not already exposed in the `DropdownMenu` component, e.g.: the direction in which the popover should open relative to its parent node set with `position` prop. 
+ 
+ - Type: `Object`
+ - Required: No
+ 
+#### toggleProps
+  
+Properties of `toggleProps` object will be passed as props to the nested `IconButton` component in the `renderToggle` implementation of the `Dropdown` component used internally.
+Use this object to modify props available for the `IconButton` component that are not already exposed in the `DropdownMenu` component, e.g.: the tooltip text displayed on hover set with `tooltip` prop. 
+  
+ - Type: `Object`
+ - Required: No
+ 
+#### menuProps
+   
+Properties of `menuProps` object will be passed as props to the nested `NavigableMenu` component in the `renderContent` implementation of the `Dropdown` component used internally.
+Use this object to modify props available for the `NavigableMenu` component that are not already exposed in the `DropdownMenu` component, e.g.: the orientation of the menu set with `orientation` prop. 
+   
+ - Type: `Object`
+ - Required: No

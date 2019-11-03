@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { parse as hpqParse } from 'hpq';
-import { flow, castArray, mapValues, omit, stubFalse } from 'lodash';
+import { flow, get, castArray, mapValues, omit, stubFalse } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -20,10 +20,11 @@ import {
 	getUnregisteredTypeHandlerName,
 } from './registration';
 import { createBlock } from './factory';
-import { isValidBlockContent } from './validation';
-import { getCommentDelimitedContent } from './serializer';
+import { getBlockContentValidationResult } from './validation';
+import { getCommentDelimitedContent, getSaveContent } from './serializer';
 import { attr, html, text, query, node, children, prop } from './matchers';
 import { normalizeBlockType } from './utils';
+import { DEPRECATED_ENTRY_KEYS } from './constants';
 
 /**
  * Sources which are guaranteed to return a string value.
@@ -324,7 +325,7 @@ export function getMigratedBlock( block, parsedAttributes ) {
 		// parsing are not considered in the deprecated block type by default,
 		// and must be explicitly provided.
 		const deprecatedBlockType = Object.assign(
-			omit( blockType, [ 'attributes', 'save', 'supports' ] ),
+			omit( blockType, DEPRECATED_ENTRY_KEYS ),
 			deprecatedDefinitions[ i ]
 		);
 
@@ -335,20 +336,22 @@ export function getMigratedBlock( block, parsedAttributes ) {
 		);
 
 		// Ignore the deprecation if it produces a block which is not valid.
-		const isValid = isValidBlockContent(
+		const { isValid, validationIssues } = getBlockContentValidationResult(
 			deprecatedBlockType,
 			migratedAttributes,
 			originalContent
 		);
 
 		if ( ! isValid ) {
+			block = {
+				...block,
+				validationIssues: [
+					...get( block, 'validationIssues', [] ),
+					...validationIssues,
+				],
+			};
 			continue;
 		}
-
-		block = {
-			...block,
-			isValid: true,
-		};
 
 		let migratedInnerBlocks = innerBlocks;
 
@@ -362,8 +365,12 @@ export function getMigratedBlock( block, parsedAttributes ) {
 			] = castArray( migrate( migratedAttributes, innerBlocks ) ) );
 		}
 
-		block.attributes = migratedAttributes;
-		block.innerBlocks = migratedInnerBlocks;
+		block = {
+			...block,
+			attributes: migratedAttributes,
+			innerBlocks: migratedInnerBlocks,
+			isValid: true,
+		};
 	}
 
 	return block;
@@ -383,6 +390,7 @@ export function createBlockWithFallback( blockNode ) {
 		innerBlocks = [],
 		innerHTML,
 	} = blockNode;
+	const { innerContent } = blockNode;
 	const freeformContentFallbackBlock = getFreeformContentHandlerName();
 	const unregisteredFallbackBlock = getUnregisteredTypeHandlerName() || freeformContentFallbackBlock;
 
@@ -416,22 +424,50 @@ export function createBlockWithFallback( blockNode ) {
 	let blockType = getBlockType( name );
 
 	if ( ! blockType ) {
-		// Preserve undelimited content for use by the unregistered type handler.
-		const originalUndelimitedContent = innerHTML;
+		// Since the constituents of the block node are extracted at the start
+		// of the present function, construct a new object rather than reuse
+		// `blockNode`.
+		const reconstitutedBlockNode = {
+			attrs: attributes,
+			blockName: originalName,
+			innerBlocks,
+			innerContent,
+		};
+
+		// Preserve undelimited content for use by the unregistered type
+		// handler. A block node's `innerHTML` isn't enough, as that field only
+		// carries the block's own HTML and not its nested blocks'.
+		const originalUndelimitedContent = serializeBlockNode(
+			reconstitutedBlockNode,
+			{ isCommentDelimited: false }
+		);
+
+		// Preserve full block content for use by the unregistered type
+		// handler, block boundaries included.
+		const originalContent = serializeBlockNode(
+			reconstitutedBlockNode,
+			{ isCommentDelimited: true }
+		);
 
 		// If detected as a block which is not registered, preserve comment
 		// delimiters in content of unregistered type handler.
 		if ( name ) {
-			innerHTML = getCommentDelimitedContent( name, attributes, innerHTML );
+			innerHTML = originalContent;
 		}
 
 		name = unregisteredFallbackBlock;
-		attributes = { originalName, originalUndelimitedContent };
+		attributes = { originalName, originalContent, originalUndelimitedContent };
 		blockType = getBlockType( name );
 	}
 
 	// Coerce inner blocks from parsed form to canonical form.
 	innerBlocks = innerBlocks.map( createBlockWithFallback );
+
+	// Remove `undefined` innerBlocks.
+	//
+	// This is a temporary fix to prevent unrecoverable TypeErrors when handling unexpectedly
+	// empty freeform block nodes. See https://github.com/WordPress/gutenberg/pull/17164.
+	innerBlocks = innerBlocks.filter( ( innerBlock ) => innerBlock );
 
 	const isFallbackBlock = (
 		name === freeformContentFallbackBlock ||
@@ -454,16 +490,71 @@ export function createBlockWithFallback( blockNode ) {
 	// provided source value with the serialized output before there are any modifications to
 	// the block. When both match, the block is marked as valid.
 	if ( ! isFallbackBlock ) {
-		block.isValid = isValidBlockContent( blockType, block.attributes, innerHTML );
+		const { isValid, validationIssues } = getBlockContentValidationResult( blockType, block.attributes, innerHTML );
+		block.isValid = isValid;
+		block.validationIssues = validationIssues;
 	}
 
-	// Preserve original content for future use in case the block is parsed as
-	// invalid, or future serialization attempt results in an error.
-	block.originalContent = innerHTML;
+	// Preserve original content for future use in case the block is parsed
+	// as invalid, or future serialization attempt results in an error.
+	block.originalContent = block.originalContent || innerHTML;
 
 	block = getMigratedBlock( block, attributes );
 
+	if ( block.validationIssues && block.validationIssues.length > 0 ) {
+		if ( block.isValid ) {
+			// eslint-disable-next-line no-console
+			console.info(
+				'Block successfully updated for `%s` (%o).\n\nNew content generated by `save` function:\n\n%s\n\nContent retrieved from post body:\n\n%s',
+				blockType.name,
+				blockType,
+				getSaveContent( blockType, block.attributes ),
+				block.originalContent
+			);
+		} else {
+			block.validationIssues.forEach( ( { log, args } ) => log( ...args ) );
+		}
+	}
+
 	return block;
+}
+
+/**
+ * Serializes a block node into the native HTML-comment-powered block format.
+ * CAVEAT: This function is intended for reserializing blocks as parsed by
+ * valid parsers and skips any validation steps. This is NOT a generic
+ * serialization function for in-memory blocks. For most purposes, see the
+ * following functions available in the `@wordpress/blocks` package:
+ *
+ * @see serializeBlock
+ * @see serialize
+ *
+ * For more on the format of block nodes as returned by valid parsers:
+ *
+ * @see `@wordpress/block-serialization-default-parser` package
+ * @see `@wordpress/block-serialization-spec-parser` package
+ *
+ * @param {Object}   blockNode                  A block node as returned by a valid parser.
+ * @param {?Object}  options                    Serialization options.
+ * @param {?boolean} options.isCommentDelimited Whether to output HTML comments around blocks.
+ *
+ * @return {string} An HTML string representing a block.
+ */
+export function serializeBlockNode( blockNode, options = {} ) {
+	const { isCommentDelimited = true } = options;
+	const { blockName, attrs = {}, innerBlocks = [], innerContent = [] } = blockNode;
+
+	let childIndex = 0;
+	const content = innerContent.map( ( item ) =>
+		// `null` denotes a nested block, otherwise we have an HTML fragment
+		item !== null ?
+			item :
+			serializeBlockNode( innerBlocks[ childIndex++ ], options )
+	).join( '\n' ).replace( /\n+/g, '\n' ).trim();
+
+	return isCommentDelimited ?
+		getCommentDelimitedContent( blockName, attrs, content ) :
+		content;
 }
 
 /**
@@ -474,12 +565,12 @@ export function createBlockWithFallback( blockNode ) {
  * @return {Function} An implementation which parses the post content.
  */
 const createParse = ( parseImplementation ) =>
-	( content ) => parseImplementation( content ).reduce( ( memo, blockNode ) => {
+	( content ) => parseImplementation( content ).reduce( ( accumulator, blockNode ) => {
 		const block = createBlockWithFallback( blockNode );
 		if ( block ) {
-			memo.push( block );
+			accumulator.push( block );
 		}
-		return memo;
+		return accumulator;
 	}, [] );
 
 /**

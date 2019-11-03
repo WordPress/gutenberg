@@ -148,8 +148,8 @@ _Related_
 
 _Parameters_
 
--   _component_ `Component`: Component
--   _target_ `Element`: DOM node into which element should be rendered
+-   _child_ `WPElement`: Any renderable child, such as an element, string, or fragment.
+-   _container_ `HTMLElement`: DOM node into which element should be rendered.
 
 <a name="createRef" href="#createRef">#</a> **createRef**
 
@@ -163,12 +163,11 @@ _Returns_
 
 <a name="findDOMNode" href="#findDOMNode">#</a> **findDOMNode**
 
-Finds the dom node of a React component
+Finds the dom node of a React component.
 
 _Parameters_
 
--   _component_ `Component`: component's instance
--   _target_ `Element`: DOM node into which element should be rendered
+-   _component_ `WPComponent`: Component's instance.
 
 <a name="forwardRef" href="#forwardRef">#</a> **forwardRef**
 
@@ -203,7 +202,7 @@ _Returns_
 
 <a name="isValidElement" href="#isValidElement">#</a> **isValidElement**
 
-Checks if an object is a valid WPElement
+Checks if an object is a valid WPElement.
 
 _Parameters_
 
@@ -225,6 +224,30 @@ _Related_
 
 -   <https://reactjs.org/docs/react-api.html#reactmemo>
 
+<a name="Platform" href="#Platform">#</a> **Platform**
+
+Component used to detect the current Platform being used.
+Use Platform.OS === 'web' to detect if running on web enviroment.
+
+This is the same concept as the React Native implementation.
+
+_Related_
+
+-   <https://facebook.github.io/react-native/docs/platform-specific-code#platform-module>
+
+Here is an example of how to use the select method:
+
+_Usage_
+
+```js
+import { Platform } from '@wordpress/element';
+
+const placeholderLabel = Platform.select( {
+  native: __( 'Add media' ),
+  web: __( 'Drag images, upload new ones or select files from your library.' ),
+} );
+```
+
 <a name="RawHTML" href="#RawHTML">#</a> **RawHTML**
 
 Component used as equivalent of Fragment with unescaped HTML, in cases where
@@ -234,11 +257,13 @@ aside from `children` are passed.
 
 _Parameters_
 
+-   _props_ `Object`: 
 -   _props.children_ `string`: HTML to render.
+-   _props.props_ `Object`: Any additonal props to be set on the containing div.
 
 _Returns_
 
--   `WPElement`: Dangerously-rendering element.
+-   `WPComponent`: Dangerously-rendering component.
 
 <a name="render" href="#render">#</a> **render**
 
@@ -246,8 +271,8 @@ Renders a given element into the target DOM node.
 
 _Parameters_
 
--   _element_ `WPElement`: Element to render
--   _target_ `Element`: DOM node into which element should be rendered
+-   _element_ `WPElement`: Element to render.
+-   _target_ `HTMLElement`: DOM node into which element should be rendered.
 
 <a name="renderToString" href="#renderToString">#</a> **renderToString**
 

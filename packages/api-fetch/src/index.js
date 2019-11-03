@@ -1,9 +1,4 @@
 /**
- * WordPress dependencies
- */
-import { __ } from '@wordpress/i18n';
-
-/**
  * Internal dependencies
  */
 import createNonceMiddleware from './middlewares/nonce';
@@ -13,6 +8,8 @@ import fetchAllMiddleware from './middlewares/fetch-all-middleware';
 import namespaceEndpointMiddleware from './middlewares/namespace-endpoint';
 import httpV1Middleware from './middlewares/http-v1';
 import userLocaleMiddleware from './middlewares/user-locale';
+import mediaUploadMiddleware from './middlewares/media-upload';
+import { parseResponseAndNormalizeError, parseAndThrowError } from './utils/response';
 
 /**
  * Default set of header values which should be sent with every request unless
@@ -49,6 +46,14 @@ function registerMiddleware( middleware ) {
 	middlewares.unshift( middleware );
 }
 
+const checkStatus = ( response ) => {
+	if ( response.status >= 200 && response.status < 300 ) {
+		return response;
+	}
+
+	throw response;
+};
+
 const defaultFetchHandler = ( nextOptions ) => {
 	const { url, path, data, parse = true, ...remainingOptions } = nextOptions;
 	let { body, headers } = nextOptions;
@@ -71,56 +76,11 @@ const defaultFetchHandler = ( nextOptions ) => {
 			headers,
 		}
 	);
-	const checkStatus = ( response ) => {
-		if ( response.status >= 200 && response.status < 300 ) {
-			return response;
-		}
-
-		throw response;
-	};
-
-	const parseResponse = ( response ) => {
-		if ( parse ) {
-			if ( response.status === 204 ) {
-				return null;
-			}
-
-			return response.json ? response.json() : Promise.reject( response );
-		}
-
-		return response;
-	};
 
 	return responsePromise
 		.then( checkStatus )
-		.then( parseResponse )
-		.catch( ( response ) => {
-			if ( ! parse ) {
-				throw response;
-			}
-
-			const invalidJsonError = {
-				code: 'invalid_json',
-				message: __( 'The response is not a valid JSON response.' ),
-			};
-
-			if ( ! response || ! response.json ) {
-				throw invalidJsonError;
-			}
-
-			return response.json()
-				.catch( () => {
-					throw invalidJsonError;
-				} )
-				.then( ( error ) => {
-					const unknownError = {
-						code: 'unknown_error',
-						message: __( 'An unknown error occurred.' ),
-					};
-
-					throw error || unknownError;
-				} );
-		} );
+		.catch( ( response ) => parseAndThrowError( response, parse ) )
+		.then( ( response ) => parseResponseAndNormalizeError( response, parse ) );
 };
 
 let fetchHandler = defaultFetchHandler;
@@ -148,7 +108,27 @@ function apiFetch( options ) {
 		return step( workingOptions, next );
 	};
 
-	return createRunStep( 0 )( options );
+	return new Promise( function( resolve, reject ) {
+		createRunStep( 0 )( options )
+			.then( resolve )
+			.catch( ( error ) => {
+				if ( error.code !== 'rest_cookie_invalid_nonce' ) {
+					return reject( error );
+				}
+
+				// If the nonce is invalid, refresh it and try again.
+				window.fetch( apiFetch.nonceEndpoint )
+					.then( checkStatus )
+					.then( ( data ) => data.text() )
+					.then( ( text ) => {
+						apiFetch.nonceMiddleware.nonce = text;
+						apiFetch( options )
+							.then( resolve )
+							.catch( reject );
+					} )
+					.catch( reject );
+			} );
+	} );
 }
 
 apiFetch.use = registerMiddleware;
@@ -158,5 +138,6 @@ apiFetch.createNonceMiddleware = createNonceMiddleware;
 apiFetch.createPreloadingMiddleware = createPreloadingMiddleware;
 apiFetch.createRootURLMiddleware = createRootURLMiddleware;
 apiFetch.fetchAllMiddleware = fetchAllMiddleware;
+apiFetch.mediaUploadMiddleware = mediaUploadMiddleware;
 
 export default apiFetch;

@@ -1,8 +1,8 @@
-## Managing Packages
+# Managing Packages
 
-This repository uses [lerna] to manage Gutenberg modules and publish them as packages to [npm].
+This repository uses [lerna] to manage WordPress modules and publish them as packages to [npm].
 
-### Creating a New Package
+## Creating a New Package
 
 When creating a new package, you need to provide at least the following:
 
@@ -48,7 +48,65 @@ When creating a new package, you need to provide at least the following:
 	- Usage example
 	- `Code is Poetry` logo (`<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>`)
 
-### Maintaining Changelogs
+## Managing Dependencies
+
+There are two types of dependencies that you might want to add to one of the existing WordPress packages.
+
+### Production Dependencies
+
+Production dependencies are stored in the `dependencies` section of the package’s `package.json` file.
+
+#### Adding New Dependencies
+ 
+The simplest way to add a production dependency to one of the packages is to run a very convenient [lerna add](https://github.com/lerna/lerna/tree/master/commands/add#readme) command from the root of the project.
+
+_Example:_
+
+```bash
+lerna add lodash packages/a11y
+```
+
+This command adds the latest version of `lodash` as a dependency to the `@wordpress/a11y` package, which is located in `packages/a11y` folder.
+
+#### Removing Existing Dependencies
+
+Removing a dependency from one of the WordPress packages requires some manual work. You need to remove the line in the corresponding `dependencies` section of the `package.json` file.
+
+_Example:_
+
+```diff
++++ b/packages/scripts/package.json
+@@ -43,7 +43,6 @@
+                "check-node-version": "^3.1.1",
+                "cross-spawn": "^5.1.0",
+                "eslint": "^5.16.0",
+-               "jest": "^24.7.1",
+                "jest-puppeteer": "^4.0.0",
+                "minimist": "^1.2.0",
+                "npm-package-json-lint": "^3.6.0",
+```
+
+Next, you need to run `npm install` in the root of the project to ensure that `package-lock.json` file gets properly regenerated.
+
+#### Updating Existing Dependencies
+
+This is the most confusing part of working with [lerna] which causes a lot of hassles for contributors. The most successful strategy so far is to do the following:
+ 1. First, remove the existing dependency as described in the previous section.
+ 2. Next, add the same dependency back as described in the first section of this chapter. This time it wil get the latest version applied unless you enforce a different version explicitly.
+ 
+### Development Dependencies
+
+In contrast to production dependencies, development dependencies shouldn't be stored in individual WordPress packages. Instead they should be installed in the project's `package.json` file using the usual `npm install` command. In effect, all development tools are configured to work with every package at the same time to ensure they share the same characteristics and integrate correctly with each other.
+
+_Example:_
+
+```bash
+npm install glob --save-dev
+```
+
+This commands adds the latest version of `glob` as a development dependency to the `package.json` file. It has to be executed from the root of the project.
+
+## Maintaining Changelogs
 
 In maintaining dozens of npm packages, it can be tough to keep track of changes. To simplify the release process, each package includes a `CHANGELOG.md` file which details all published releases and the unreleased ("Master") changes, if any exist.
 
@@ -78,13 +136,13 @@ When in doubt, refer to [Semantic Versioning specification](https://semver.org/)
 
 If you are publishing new versions of packages, note that there are versioning recommendations outlined in the [Gutenberg Release Process document](https://github.com/WordPress/gutenberg/blob/master/docs/contributors/release.md) which prescribe _minimum_ version bumps for specific types of releases. The chosen version should be the greater of the two between the semantic versioning and Gutenberg release minimum version bumps.
 
-### Releasing Packages
+## Releasing Packages
 
 Lerna automatically releases all outdated packages. To check which packages are outdated and will be released, type `npm run publish:check`.
 
 If you have the ability to publish packages, you _must_ have [2FA enabled](https://docs.npmjs.com/getting-started/using-two-factor-authentication) on your [npm account][npm].
 
-#### Before Releasing
+### Before Releasing
 
 Confirm that you're logged in to [npm], by running `npm whoami`. If you're not logged in, run `npm adduser` to login.
 
@@ -100,7 +158,7 @@ If you're publishing a new package, ensure that its `package.json` file contains
 
 You can check your package configs by running `npm run lint-pkg-json`.
 
-#### Development Release
+### Development Release
 
 Run the following command to release a dev version of the outdated packages.
 
@@ -112,7 +170,7 @@ Lerna will ask you which version number you want to choose for each package. For
 
 Lerna will then publish to [npm], commit the `package.json` changes and create the git tags.
 
-#### Production Release
+### Production Release
 
 To release a production version for the outdated packages, run the following command:
 

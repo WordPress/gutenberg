@@ -110,18 +110,14 @@ exports[`recordToDom should create a value without formatting 1`] = `
 exports[`recordToDom should create an empty value 1`] = `
 <body>
   
-  <br
-    data-rich-text-padding="true"
-  />
+  ﻿
 </body>
 `;
 
 exports[`recordToDom should create an empty value from empty tags 1`] = `
 <body>
   
-  <br
-    data-rich-text-padding="true"
-  />
+  ﻿
 </body>
 `;
 
@@ -143,9 +139,7 @@ exports[`recordToDom should handle br 1`] = `
     data-rich-text-line-break="true"
   />
   
-  <br
-    data-rich-text-padding="true"
-  />
+  ﻿
 </body>
 `;
 
@@ -161,9 +155,7 @@ exports[`recordToDom should handle br with formatting 1`] = `
     
   </em>
   
-  <br
-    data-rich-text-padding="true"
-  />
+  ﻿
 </body>
 `;
 
@@ -195,9 +187,7 @@ exports[`recordToDom should handle empty list value 1`] = `
 <body>
   <li>
     
-    <br
-      data-rich-text-padding="true"
-    />
+    ﻿
   </li>
 </body>
 `;
@@ -206,9 +196,7 @@ exports[`recordToDom should handle empty multiline value 1`] = `
 <body>
   <p>
     
-    <br
-      data-rich-text-padding="true"
-    />
+    ﻿
   </p>
 </body>
 `;
@@ -217,23 +205,15 @@ exports[`recordToDom should handle middle empty list value 1`] = `
 <body>
   <li>
     
-    <br
-      data-rich-text-padding="true"
-    />
-    
+    ﻿
   </li>
   <li>
     
-    <br
-      data-rich-text-padding="true"
-    />
-    
+    ﻿
   </li>
   <li>
     
-    <br
-      data-rich-text-padding="true"
-    />
+    ﻿
   </li>
 </body>
 `;
@@ -291,9 +271,7 @@ exports[`recordToDom should handle multiline value with empty 1`] = `
   </p>
   <p>
     
-    <br
-      data-rich-text-padding="true"
-    />
+    ﻿
   </p>
 </body>
 `;
@@ -302,15 +280,11 @@ exports[`recordToDom should handle nested empty list value 1`] = `
 <body>
   <li>
     
-    <br
-      data-rich-text-padding="true"
-    />
+    ﻿
     <ul>
       <li>
         
-        <br
-          data-rich-text-padding="true"
-        />
+        ﻿
       </li>
     </ul>
   </li>
@@ -373,9 +347,7 @@ exports[`recordToDom should preserve non breaking space 1`] = `
 exports[`recordToDom should remove padding 1`] = `
 <body>
   
-  <br
-    data-rich-text-padding="true"
-  />
+  ﻿
 </body>
 `;
 

@@ -1,9 +1,12 @@
 .edit-post-keyboard-shortcut-help {
-
 	&__section {
 		margin: 0 0 2rem 0;
 	}
 
+	&__main-shortcuts .edit-post-keyboard-shortcut-help__shortcut-list {
+		// Push the shortcut to be flush with top modal header.
+		margin-top: -$panel-padding -$border-width;
+	}
 
 	&__section-title {
 		font-size: 0.9rem;
@@ -31,7 +34,7 @@
 		flex: 1;
 		margin: 0;
 
-		// IE 11 flex item fix - ensure the item does not collapse
+		// IE 11 flex item fix - ensure the item does not collapse.
 		flex-basis: auto;
 	}
 

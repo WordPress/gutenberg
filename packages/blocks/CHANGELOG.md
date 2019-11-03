@@ -1,4 +1,8 @@
-## Master
+## 6.4.0 (2019-08-05)
+
+### Improvements
+
+- Omitting `attributes` or `keywords` settings will now stub default values (an empty object or empty array, respectively).
 
 ### Bug Fixes
 

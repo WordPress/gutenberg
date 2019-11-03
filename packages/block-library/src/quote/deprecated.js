@@ -29,6 +29,19 @@ const blockAttributes = {
 
 const deprecated = [
 	{
+		attributes: blockAttributes,
+		save( { attributes } ) {
+			const { align, value, citation } = attributes;
+
+			return (
+				<blockquote style={ { textAlign: align ? align : null } }>
+					<RichText.Content multiline value={ value } />
+					{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="cite" value={ citation } /> }
+				</blockquote>
+			);
+		},
+	},
+	{
 		attributes: {
 			...blockAttributes,
 			style: {

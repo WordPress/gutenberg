@@ -1,6 +1,6 @@
 export const IMAGE_BACKGROUND_TYPE = 'image';
 export const VIDEO_BACKGROUND_TYPE = 'video';
-
+export const COVER_MIN_HEIGHT = 50;
 export function backgroundImageStyles( url ) {
 	return url ?
 		{ backgroundImage: `url(${ url })` } :

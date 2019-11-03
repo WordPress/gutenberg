@@ -12,6 +12,9 @@ module.exports = {
 		'react-hooks',
 	],
 	rules: {
+		'@wordpress/no-unused-vars-before-return': [ 'error', {
+			excludePattern: '^use',
+		} ],
 		'react/display-name': 'off',
 		'react/jsx-curly-spacing': [ 'error', {
 			when: 'always',

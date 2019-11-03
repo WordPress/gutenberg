@@ -55,6 +55,25 @@ E.g: `{ post_id: 12 }`.
 - Type: `Object`
 - Required: No
 
+### EmptyResponsePlaceholder
+
+This is a [render prop](https://reactjs.org/docs/render-props.html). When the api response is empty, the value of this prop is rendered. The render prop will receive the value of the api response as well as all props passed into `ServerSideRenderer`.
+- Type: `WPElement`
+- Required: No
+
+### ErrorResponsePlaceholder
+
+This is a [render prop](https://reactjs.org/docs/render-props.html). When the api response is an error, the value of this prop is rendered. The render prop will receive the value of the api response as well as all props passed into `ServerSideRenderer`.
+- Type: `WPElement`
+- Required: No
+
+### LoadingResponsePlaceholder
+
+This is a [render prop](https://reactjs.org/docs/render-props.html). While the request is being processed (loading state), the value of this prop is rendered. The render prop will receive the value of the api response as well as all props passed into `ServerSideRenderer`.
+- Type: `WPElement`
+- Required: No
+
+
 ## Usage
 
 Render core/archives preview.

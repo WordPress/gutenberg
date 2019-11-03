@@ -10,24 +10,34 @@ import { compose } from '@wordpress/compose';
 import { withPluginContext } from '@wordpress/plugins';
 import { withDispatch, withSelect } from '@wordpress/data';
 
+/**
+ * Internal dependencies
+ */
+import { EnablePluginDocumentSettingPanelOption } from '../../options-modal/options';
+
 export const { Fill, Slot } = createSlotFill( 'PluginDocumentSettingPanel' );
 
-const PluginDocumentSettingFill = ( { isEnabled, opened, onToggle, className, title, icon, children } ) => {
-	if ( ! isEnabled ) {
-		return null;
-	}
+const PluginDocumentSettingFill = ( { isEnabled, panelName, opened, onToggle, className, title, icon, children } ) => {
 	return (
-		<Fill>
-			<PanelBody
-				className={ className }
-				title={ title }
-				icon={ icon }
-				opened={ opened }
-				onToggle={ onToggle }
-			>
-				{ children }
-			</PanelBody>
-		</Fill>
+		<>
+			<EnablePluginDocumentSettingPanelOption
+				label={ title }
+				panelName={ panelName }
+			/>
+			<Fill>
+				{ isEnabled && (
+					<PanelBody
+						className={ className }
+						title={ title }
+						icon={ icon }
+						opened={ opened }
+						onToggle={ onToggle }
+					>
+						{ children }
+					</PanelBody>
+				) }
+			</Fill>
+		</>
 	);
 };
 
@@ -38,7 +48,7 @@ const PluginDocumentSettingFill = ( { isEnabled, opened, onToggle, className, ti
  * @param {string} [props.name] The machine-friendly name for the panel.
  * @param {string} [props.className] An optional class name added to the row.
  * @param {string} [props.title] The title of the panel
- * @param {string|Element} [props.icon=inherits from the plugin] The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
+ * @param {WPBlockTypeIconRender} [props.icon=inherits from the plugin] The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
  *
  * @example <caption>ES5</caption>
  * ```js
@@ -53,6 +63,7 @@ const PluginDocumentSettingFill = ( { isEnabled, opened, onToggle, className, ti
  * 		PluginDocumentSettingPanel,
  * 		{
  * 			className: 'my-document-setting-plugin',
+ * 			title: 'My Panel',
  * 		},
  * 		__( 'My Document Setting Panel' )
  * 	);
@@ -70,15 +81,15 @@ const PluginDocumentSettingFill = ( { isEnabled, opened, onToggle, className, ti
  * const { PluginDocumentSettingPanel } = wp.editPost;
  *
  * const MyDocumentSettingTest = () => (
- * 		<PluginDocumentSettingPanel className="my-document-setting-plugin">
+ * 		<PluginDocumentSettingPanel className="my-document-setting-plugin" title="My Panel">
  *			<p>My Document Setting Panel</p>
- *		</PluginDocumentSetting>
+ *		</PluginDocumentSettingPanel>
  *	);
  *
  *  registerPlugin( 'document-setting-test', { render: MyDocumentSettingTest } );
  * ```
  *
- * @return {WPElement} The WPElement to be rendered.
+ * @return {WPComponent} The component to be rendered.
  */
 const PluginDocumentSettingPanel = compose(
 	withPluginContext( ( context, ownProps ) => {
@@ -103,4 +114,5 @@ const PluginDocumentSettingPanel = compose(
 )( PluginDocumentSettingFill );
 
 PluginDocumentSettingPanel.Slot = Slot;
+
 export default PluginDocumentSettingPanel;

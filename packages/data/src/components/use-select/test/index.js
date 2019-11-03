@@ -132,5 +132,91 @@ describe( 'useSelect', () => {
 			children: 'bar',
 		} );
 	} );
+	describe( 'rerenders as expected with various mapSelect return types', () => {
+		const getComponent = ( mapSelectSpy ) => () => {
+			const data = useSelect( mapSelectSpy, [] );
+			return <div data={ data } />;
+		};
+		let subscribedSpy, TestComponent;
+		const mapSelectSpy = jest.fn(
+			( select ) => select( 'testStore' ).testSelector()
+		);
+		const selectorSpy = jest.fn();
+		const subscribeCallback = ( subscription ) => {
+			subscribedSpy = subscription;
+		};
+
+		beforeEach( () => {
+			registry.registerStore( 'testStore', {
+				reducer: () => null,
+				selectors: {
+					testSelector: selectorSpy,
+				},
+			} );
+			registry.subscribe = subscribeCallback;
+			TestComponent = getComponent( mapSelectSpy );
+		} );
+		afterEach( () => {
+			selectorSpy.mockClear();
+			mapSelectSpy.mockClear();
+		} );
+
+		it.each( [
+			[
+				'boolean',
+				[ false, true ],
+			],
+			[
+				'number',
+				[ 10, 20 ],
+			],
+			[
+				'string',
+				[ 'bar', 'cheese' ],
+			],
+			[
+				'array',
+				[ [ 10, 20 ], [ 10, 30 ] ],
+			],
+			[
+				'object',
+				[ { foo: 'bar' }, { foo: 'cheese' } ],
+			],
+			[
+				'null',
+				[ null, undefined ],
+			],
+			[
+				'undefined',
+				[ undefined, 42 ],
+			],
+		] )( 'renders as expected with %s return values', (
+			type,
+			testValues,
+		) => {
+			const [ valueA, valueB ] = testValues;
+			selectorSpy.mockReturnValue( valueA );
+			let renderer;
+			act( () => {
+				renderer = TestRenderer.create(
+					<RegistryProvider value={ registry }>
+						<TestComponent />
+					</RegistryProvider>
+				);
+			} );
+			const testInstance = renderer.root;
+			// ensure expected state was rendered.
+			expect( testInstance.findByType( 'div' ).props.data ).toEqual( valueA );
+
+			// Update the returned value from the selector and trigger the
+			// subscription which should in turn trigger a re-render.
+			act( () => {
+				selectorSpy.mockReturnValue( valueB );
+				subscribedSpy();
+			} );
+			expect( testInstance.findByType( 'div' ).props.data ).toEqual( valueB );
+			expect( mapSelectSpy ).toHaveBeenCalledTimes( 3 );
+		} );
+	} );
 } );
 

@@ -1,10 +1,3 @@
-@mixin flex-full-height() {
-	display: flex;
-	flex-direction: column;
-	flex: 1;
-}
-
-
 // These margins make sure that nested blocks stack/overlay with the parent block chrome
 // This is sort of an experiment at making sure the editor looks as much like the end result as possible
 // Potentially the rules here can apply to all nested blocks and enable stacking, in which case it should be moved elsewhere
@@ -16,18 +9,6 @@
 	// This max-width is used to constrain the main editor column, it should not cascade into columns
 	.editor-block-list__block {
 		max-width: none;
-	}
-}
-
-// Fullwide: show margin left/right to ensure there's room for the side UI.
-// This is not a 1:1 preview with the front-end where these margins would presumably be zero.
-[data-type="core/columns"][data-align="full"] .wp-block-columns > .editor-inner-blocks {
-	padding-left: $block-padding;
-	padding-right: $block-padding;
-
-	@include break-small() {
-		padding-left: $block-container-side-padding;
-		padding-right: $block-container-side-padding;
 	}
 }
 
@@ -48,8 +29,18 @@
 		> [data-type="core/column"] > .editor-block-list__block-edit,
 		> [data-type="core/column"] > .editor-block-list__block-edit > div[data-block],
 		> [data-type="core/column"] > .editor-block-list__block-edit .block-core-columns {
-			@include flex-full-height();
+			display: flex;
+			flex-direction: column;
+
+			// This flex rule fixes an issue in IE11.
+			flex: 1 1 auto;
+
+			// IE11 does not support `position: sticky`, so we use it here to serve correct Flex rules to modern browsers.
+			@supports (position: sticky) {
+				flex: 1;
+			}
 		}
+
 		// Adjust the individual column block.
 		> [data-type="core/column"] {
 
@@ -132,9 +123,18 @@
  * vertical to ensure there is equal visual spacing around the inserter. Note there
  * is no formal API for a "passthrough" Block so this is an edge case overide
  */
-[data-type="core/columns"] .block-list-appender {
-	margin-top: $block-padding*2;
-	margin-bottom: $block-padding*2;
+[data-type="core/columns"] {
+
+	.block-list-appender {
+		margin-top: $block-padding*2;
+		margin-bottom: $block-padding*2;
+	}
+
+	// When the individual column block is selected, the nested padding overrules
+	// some of this margin. We need to adjust the appender spacing again as a result.
+	[data-type="core/column"].is-selected .block-list-appender {
+		margin: $block-padding 0;
+	}
 }
 
 /**
@@ -158,13 +158,11 @@ div.block-core-columns.is-vertically-aligned-bottom {
 	justify-content: flex-end;
 }
 
-
 /**
- * Fixes single Column breadcrumb to RHS of Block boundary
+ * Fixes single Column breadcrumb position.
  */
 [data-type="core/column"] > .editor-block-list__block-edit > .editor-block-list__breadcrumb {
-	right: 0;
-	left: auto;
+	left: -$block-left-border-width;
 }
 
 /**
@@ -173,4 +171,33 @@ div.block-core-columns.is-vertically-aligned-bottom {
 .block-core-columns > .block-editor-inner-blocks.has-overlay::after {
 	left: 0;
 	right: 0;
+}
+
+/**
+ * Add extra padding when the parent block is selected, for easier interaction.
+ */
+[data-type="core/columns"].is-selected > .block-editor-block-list__block-edit > [data-block] > div > .block-editor-inner-blocks,
+[data-type="core/columns"].has-child-selected > .block-editor-block-list__block-edit > [data-block] > div > .block-editor-inner-blocks,
+[data-type="core/column"].is-selected > .block-editor-block-list__block-edit > [data-block] > div > .block-editor-inner-blocks,
+[data-type="core/column"].has-child-selected > .block-editor-block-list__block-edit > [data-block] > div > .block-editor-inner-blocks {
+	padding: $block-padding;
+
+	// Negate this padding for the placeholder.
+	> .components-placeholder {
+		margin: -$block-padding;
+		width: calc(100% + #{$block-padding * 2});
+	}
+}
+
+
+// Fullwide: show margin left/right to ensure there's room for the side UI.
+// This is not a 1:1 preview with the front-end where these margins would presumably be zero.
+[data-type="core/columns"][data-align="full"] .wp-block-columns {
+	padding-left: $block-padding;
+	padding-right: $block-padding;
+
+	@include break-small() {
+		padding-left: $block-container-side-padding;
+		padding-right: $block-container-side-padding;
+	}
 }

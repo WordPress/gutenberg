@@ -8,7 +8,7 @@ import { castArray, filter, first, mapKeys, orderBy, uniq, map } from 'lodash';
  */
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { Dropdown, IconButton, Toolbar, PanelBody, Path, SVG } from '@wordpress/components';
-import { getBlockType, getPossibleBlockTransformations, switchToBlockType, hasChildBlocksWithInserterSupport } from '@wordpress/blocks';
+import { getBlockType, getPossibleBlockTransformations, switchToBlockType, cloneBlock, getBlockFromExample } from '@wordpress/blocks';
 import { Component } from '@wordpress/element';
 import { DOWN } from '@wordpress/keycodes';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -42,6 +42,9 @@ export class BlockSwitcher extends Component {
 		if ( ! blocks || ! blocks.length ) {
 			return null;
 		}
+
+		const hoveredBlock = hoveredClassName ? blocks[ 0 ] : null;
+		const hoveredBlockType = hoveredClassName ? getBlockType( hoveredBlock.name ) : null;
 
 		const itemsByName = mapKeys( inserterItems, ( { name } ) => name );
 		const possibleBlockTransformations = orderBy(
@@ -127,44 +130,55 @@ export class BlockSwitcher extends Component {
 				} }
 				renderContent={ ( { onClose } ) => (
 					<>
-						{ hasBlockStyles &&
-							<PanelBody
-								title={ __( 'Block Styles' ) }
-								initialOpen
-							>
-								<BlockStyles
-									clientId={ blocks[ 0 ].clientId }
-									onSwitch={ onClose }
-									onHoverClassName={ this.onHoverClassName }
-								/>
-							</PanelBody>
+						{ ( hasBlockStyles || possibleBlockTransformations.length !== 0 ) &&
+							<div className="block-editor-block-switcher__container">
+								{ hasBlockStyles &&
+									<PanelBody
+										title={ __( 'Block Styles' ) }
+										initialOpen
+									>
+										<BlockStyles
+											clientId={ blocks[ 0 ].clientId }
+											onSwitch={ onClose }
+											onHoverClassName={ this.onHoverClassName }
+										/>
+									</PanelBody>
+								}
+								{ possibleBlockTransformations.length !== 0 &&
+									<PanelBody
+										title={ __( 'Transform To:' ) }
+										initialOpen
+									>
+										<BlockTypesList
+											items={ possibleBlockTransformations.map( ( destinationBlockType ) => ( {
+												id: destinationBlockType.name,
+												icon: destinationBlockType.icon,
+												title: destinationBlockType.title,
+											} ) ) }
+											onSelect={ ( item ) => {
+												onTransform( blocks, item.id );
+												onClose();
+											} }
+										/>
+									</PanelBody>
+								}
+							</div>
 						}
-						{ possibleBlockTransformations.length !== 0 &&
-							<PanelBody
-								title={ __( 'Transform To:' ) }
-								initialOpen
-							>
-								<BlockTypesList
-									items={ possibleBlockTransformations.map( ( destinationBlockType ) => ( {
-										id: destinationBlockType.name,
-										icon: destinationBlockType.icon,
-										title: destinationBlockType.title,
-										hasChildBlocksWithInserterSupport: hasChildBlocksWithInserterSupport( destinationBlockType.name ),
-									} ) ) }
-									onSelect={ ( item ) => {
-										onTransform( blocks, item.id );
-										onClose();
-									} }
-								/>
-							</PanelBody>
-						}
-
 						{ ( hoveredClassName !== null ) &&
-							<BlockPreview
-								name={ blocks[ 0 ].name }
-								attributes={ { ...blocks[ 0 ].attributes, className: hoveredClassName } }
-								innerBlocks={ blocks[ 0 ].innerBlocks }
-							/>
+							<div className="block-editor-block-switcher__preview">
+								<div className="block-editor-block-switcher__preview-title">{ __( 'Preview' ) }</div>
+								<BlockPreview
+									viewportWidth={ 500 }
+									blocks={
+										hoveredBlockType.example ?
+											getBlockFromExample( hoveredBlock.name, {
+												attributes: { ...hoveredBlockType.example.attributes, className: hoveredClassName },
+												innerBlocks: hoveredBlockType.example.innerBlocks,
+											} ) :
+											cloneBlock( hoveredBlock, { className: hoveredClassName } )
+									}
+								/>
+							</div>
 						}
 					</>
 				) }

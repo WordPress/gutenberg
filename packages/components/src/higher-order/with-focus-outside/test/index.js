@@ -17,6 +17,8 @@ import ReactDOM from 'react-dom';
 let wrapper, onFocusOutside;
 
 describe( 'withFocusOutside', () => {
+	let origHasFocus;
+
 	const EnhancedComponent = withFocusOutside(
 		class extends Component {
 			handleFocusOutside() {
@@ -51,10 +53,19 @@ describe( 'withFocusOutside', () => {
 	};
 
 	beforeEach( () => {
+		// Mock document.hasFocus() to always be true for testing
+		// note: we overide this for some tests.
+		origHasFocus = document.hasFocus;
+		document.hasFocus = () => true;
+
 		onFocusOutside = jest.fn();
 		wrapper = TestUtils.renderIntoDocument(
 			getTestComponent( EnhancedComponent, { onFocusOutside } )
 		);
+	} );
+
+	afterEach( () => {
+		document.hasFocus = origHasFocus;
 	} );
 
 	it( 'should not call handler if focus shifts to element within component', () => {
@@ -89,6 +100,19 @@ describe( 'withFocusOutside', () => {
 		jest.runAllTimers();
 
 		expect( onFocusOutside ).toHaveBeenCalled();
+	} );
+
+	it( 'should not call handler if focus shifts outside the component when the document does not have focus', () => {
+		// Force document.hasFocus() to return false to simulate the window/document losing focus
+		// See https://developer.mozilla.org/en-US/docs/Web/API/Document/hasFocus.
+		document.hasFocus = () => false;
+
+		simulateEvent( 'focus' );
+		simulateEvent( 'blur' );
+
+		jest.runAllTimers();
+
+		expect( onFocusOutside ).not.toHaveBeenCalled();
 	} );
 
 	it( 'should cancel check when unmounting while queued', () => {

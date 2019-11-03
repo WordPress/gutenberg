@@ -34,6 +34,7 @@ export default function save( { attributes } ) {
 		'has-text-color': textColor || customTextColor,
 		'has-background': backgroundColor || customBackgroundColor,
 		'has-drop-cap': dropCap,
+		[ `has-text-align-${ align }` ]: align,
 		[ fontSizeClass ]: fontSizeClass,
 		[ textClass ]: textClass,
 		[ backgroundClass ]: backgroundClass,
@@ -43,7 +44,6 @@ export default function save( { attributes } ) {
 		backgroundColor: backgroundClass ? undefined : customBackgroundColor,
 		color: textClass ? undefined : customTextColor,
 		fontSize: fontSizeClass ? undefined : customFontSize,
-		textAlign: align,
 	};
 
 	return (

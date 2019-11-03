@@ -30,14 +30,34 @@ changeset and update all the widget areas in it, to store the
 new content.
 */
 
+const waitForSelectValue = ( listener, value, changeTrigger ) => {
+	return new Promise( ( resolve ) => {
+		changeTrigger();
+		if ( listener() === value ) {
+			resolve();
+			return;
+		}
+		const unsubscribe = window.wp.data.subscribe( () => {
+			if ( listener() === value ) {
+				unsubscribe();
+				resolve();
+			}
+		} );
+	} );
+};
+
 // Get widget areas from the store in an `id => blocks` mapping.
 const getWidgetAreasObject = () => {
-	const { getWidgetAreas, getBlocksFromWidgetArea } = window.wp.data.select(
-		'core/edit-widgets'
+	const { getEntityRecords, getEditedEntityRecord } = window.wp.data.select(
+		'core'
 	);
 
-	return getWidgetAreas().reduce( ( widgetAreasObject, { id } ) => {
-		widgetAreasObject[ id ] = getBlocksFromWidgetArea( id );
+	return getEntityRecords( 'root', 'widgetArea' ).reduce( ( widgetAreasObject, { id } ) => {
+		widgetAreasObject[ id ] = getEditedEntityRecord(
+			'root',
+			'widgetArea',
+			id
+		).blocks;
 		return widgetAreasObject;
 	}, {} );
 };
@@ -78,9 +98,19 @@ const updateSettingInputValue = throttle( ( nextWidgetAreas ) => {
 
 // Check that all the necessary globals are present.
 if ( window.wp && window.wp.customize && window.wp.data ) {
+	let ran = false;
 	// Wait for the Customizer to finish bootstrapping.
 	window.wp.customize.bind( 'ready', () =>
 		window.wp.customize.previewer.bind( 'ready', () => {
+			// The Customizer will call this on every preview refresh,
+			// but we only want to run it once to avoid running another
+			// store setup that would set changeset edits and save
+			// widget blocks unintentionally.
+			if ( ran ) {
+				return;
+			}
+			ran = true;
+
 			// Try to parse a previous changeset from the hidden input.
 			let widgetAreas;
 			try {
@@ -99,10 +129,22 @@ if ( window.wp && window.wp.customize && window.wp.data ) {
 			// Wait for setup to finish before overwriting sidebars with changeset data,
 			// if any, and subscribe to registry changes after that so that we can preview
 			// changes and update the hidden input's value when any of the widget areas change.
-			const { setupWidgetAreas, updateBlocksInWidgetArea } = window.wp.data
-				.dispatch( 'core/edit-widgets' );
-			setupWidgetAreas().then( () => {
-				Object.keys( widgetAreas ).forEach( ( id ) => updateBlocksInWidgetArea( id, widgetAreas[ id ] ) );
+			waitForSelectValue(
+				() => window.wp.data.select( 'core' ).hasFinishedResolution( 'getEntityRecords', [ 'root', 'widgetArea' ] ),
+				true,
+				() => window.wp.data.select( 'core' ).getEntityRecords( 'root', 'widgetArea' )
+			).then( () => {
+				Object.keys( widgetAreas ).forEach( ( id ) => {
+					window.wp.data.dispatch( 'core' ).editEntityRecord(
+						'root',
+						'widgetArea',
+						id,
+						{
+							content: serialize( widgetAreas[ id ] ),
+							blocks: widgetAreas[ id ],
+						}
+					);
+				} );
 				widgetAreas = getWidgetAreasObject();
 				window.wp.data.subscribe( () => {
 					const nextWidgetAreas = getWidgetAreasObject();

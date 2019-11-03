@@ -177,8 +177,8 @@ If locking is not set in an `InnerBlocks` area: the locking of the parent `Inner
 If the block is a top level block: the locking of the Custom Post Type is used.
 
 ### `renderAppender`
-* **Type:** `Function`
-* **Default:** - `undefined`. When `renderAppender` is not specific the `<DefaultBlockAppender>` component is as a default. It automatically inserts whichever block is configured as the default block via `wp.blocks.setDefaultBlockName` (typically `paragraph`).
+* **Type:** `Function|false`
+* **Default:** - `undefined`. When `renderAppender` is not specific the `<DefaultBlockAppender>` component is as a default. It automatically inserts whichever block is configured as the default block via `wp.blocks.setDefaultBlockName` (typically `paragraph`). If a `false` value is provider, no appender is rendered.
 
 A 'render prop' function that can be used to customize the block's appender.
 

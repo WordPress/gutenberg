@@ -30,14 +30,14 @@ export const getColorObjectByAttributeValues = ( colors, definedColor, customCol
 };
 
 /**
-* Provided an array of color objects as set by the theme or by the editor defaults, and a color value returns the color object matching that value or undefined.
-*
-* @param {Array}   colors      Array of color objects as set by the theme or by the editor defaults.
-* @param {?string} colorValue  A string containing the color value.
-*
-* @return {?Object} Color object included in the colors array whose color property equals colorValue.
-*                   Returns undefined if no color object matches this requirement.
-*/
+ * Provided an array of color objects as set by the theme or by the editor defaults, and a color value returns the color object matching that value or undefined.
+ *
+ * @param {Array}   colors      Array of color objects as set by the theme or by the editor defaults.
+ * @param {?string} colorValue  A string containing the color value.
+ *
+ * @return {?Object} Color object included in the colors array whose color property equals colorValue.
+ *                   Returns undefined if no color object matches this requirement.
+ */
 export const getColorObjectByColorValue = ( colors, colorValue ) => {
 	return find( colors, { color: colorValue } );
 };
@@ -60,13 +60,13 @@ export function getColorClassName( colorContextName, colorSlug ) {
 }
 
 /**
-* Given an array of color objects and a color value returns the color value of the most readable color in the array.
-*
-* @param {Array}   colors     Array of color objects as set by the theme or by the editor defaults.
-* @param {?string} colorValue A string containing the color value.
-*
-* @return {string} String with the color value of the most readable color.
-*/
+ * Given an array of color objects and a color value returns the color value of the most readable color in the array.
+ *
+ * @param {Array}   colors     Array of color objects as set by the theme or by the editor defaults.
+ * @param {?string} colorValue A string containing the color value.
+ *
+ * @return {string} String with the color value of the most readable color.
+ */
 export function getMostReadableColor( colors, colorValue ) {
 	return tinycolor.mostReadable(
 		colorValue,

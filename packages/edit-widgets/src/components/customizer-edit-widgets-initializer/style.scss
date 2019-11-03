@@ -11,8 +11,4 @@
 	.block-editor-block-list__empty-block-inserter {
 		left: -18px;
 	}
-
-	.block-editor-rich-text__editable[data-is-placeholder-visible="true"] + .block-editor-rich-text__editable.wp-block-paragraph {
-		padding: 0;
-	}
 }

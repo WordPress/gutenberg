@@ -4,11 +4,12 @@
 @import "./button-group/style.scss";
 @import "./button/style.scss";
 @import "./checkbox-control/style.scss";
+@import "./circular-option-picker/style.scss";
 @import "./color-indicator/style.scss";
-@import "./color-palette/style.scss";
 @import "./color-picker/style.scss";
 @import "./dashicon/style.scss";
 @import "./date-time/style.scss";
+@import "./dimension-control/style.scss";
 @import "./disabled/style.scss";
 @import "./draggable/style.scss";
 @import "./drop-zone/style.scss";
@@ -39,7 +40,9 @@
 @import "./spinner/style.scss";
 @import "./text-control/style.scss";
 @import "./textarea-control/style.scss";
+@import "./tip/style.scss";
 @import "./toggle-control/style.scss";
 @import "./toolbar/style.scss";
 @import "./toolbar-button/style.scss";
 @import "./tooltip/style.scss";
+@import "./visually-hidden/style.scss";

@@ -4,14 +4,17 @@
 import { first } from 'lodash';
 
 /**
+ * Internal dependencies
+ */
+import { toggleMoreMenu } from './toggle-more-menu';
+
+/**
  * Clicks on More Menu item, searches for the button with the text provided and clicks it.
  *
  * @param {string} buttonLabel The label to search the button for.
  */
 export async function clickOnMoreMenuItem( buttonLabel ) {
-	await expect( page ).toClick(
-		'.edit-post-more-menu [aria-label="More tools & options"]'
-	);
+	await toggleMoreMenu();
 	const moreMenuContainerSelector =
 		'//*[contains(concat(" ", @class, " "), " edit-post-more-menu__content ")]';
 	let elementToClick = first( await page.$x(

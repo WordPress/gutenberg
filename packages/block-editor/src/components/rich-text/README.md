@@ -21,6 +21,10 @@ Render a rich [`contenteditable` input](https://developer.mozilla.org/en-US/docs
 *Optional.* Placeholder text to show when the field is empty, similar to the
   [`input` and `textarea` attribute of the same name](https://developer.mozilla.org/en-US/docs/Learn/HTML/Forms/HTML5_updates#The_placeholder_attribute).
 
+### `keepPlaceholderOnFocus: Boolean`
+
+*Optional.* Show placeholder even when selected/focused, as long as there is no content.
+
 ### `multiline: Boolean | String`
 
 *Optional.* By default, a line break will be inserted on <kbd>Enter</kbd>. If the editable field can contain multiple paragraphs, this property can be set to create new paragraphs on <kbd>Enter</kbd>.
@@ -41,17 +45,17 @@ Render a rich [`contenteditable` input](https://developer.mozilla.org/en-US/docs
 
 *Optional.* Called when the block can be removed. `forward` is true when the selection is expected to move to the next block, false to the previous block.
 
-### `formattingControls: Array`
+### `allowedFormats: Array`
 
-*Optional.* By default, all formatting controls are present. This setting can be used to fine-tune formatting controls. Possible items: `[ 'bold', 'italic', 'strikethrough', 'link' ]`.
+*Optional.* By default, all registered formats are allowed. This setting can be used to fine-tune the allowed formats. Example: `[ 'core/bold', 'core/link' ]`.
+
+### `withoutInteractiveFormatting: Boolean`
+
+*Optional.* By default, all formatting controls are present. This setting can be used to remove formatting controls that would make content [interactive](https://html.spec.whatwg.org/multipage/dom.html#interactive-content). This is useful if you want to make content that is already interactive editable.
 
 ### `isSelected: Boolean`
 
 *Optional.* Whether to show the input is selected or not in order to show the formatting controls. By default it renders the controls when the block is selected.
-
-### `keepPlaceholderOnFocus: Boolean`
-
-*Optional.* By default, the placeholder will hide as soon as the editable field receives focus. With this setting it can be be kept while the field is focussed and empty.
 
 ### `autocompleters: Array<Completer>`
 

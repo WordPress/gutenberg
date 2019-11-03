@@ -3,14 +3,16 @@
  */
 import { CheckboxControl } from '@wordpress/components';
 
-function BaseOption( { label, isChecked, onChange } ) {
+function BaseOption( { label, isChecked, onChange, children } ) {
 	return (
-		<CheckboxControl
-			className="edit-post-options-modal__option"
-			label={ label }
-			checked={ isChecked }
-			onChange={ onChange }
-		/>
+		<div className="edit-post-options-modal__option">
+			<CheckboxControl
+				label={ label }
+				checked={ isChecked }
+				onChange={ onChange }
+			/>
+			{ children }
+		</div>
 	);
 }
 

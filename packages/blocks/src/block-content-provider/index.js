@@ -26,12 +26,12 @@ const { Consumer, Provider } = createContext( () => {} );
  * </BlockContentProvider>
  * ```
  *
- * @return {WPElement} Element with BlockContent injected via context.
+ * @return {WPComponent} Element with BlockContent injected via context.
  */
 const BlockContentProvider = ( { children, innerBlocks } ) => {
 	const BlockContent = () => {
 		// Value is an array of blocks, so defer to block serializer
-		const html = serialize( innerBlocks );
+		const html = serialize( innerBlocks, { isInnerBlocks: true } );
 
 		// Use special-cased raw HTML tag to avoid default escaping
 		return <RawHTML>{ html }</RawHTML>;
@@ -48,7 +48,7 @@ const BlockContentProvider = ( { children, innerBlocks } ) => {
  * A Higher Order Component used to inject BlockContent using context to the
  * wrapped component.
  *
- * @return {Component} Enhanced component with injected BlockContent as prop.
+ * @return {WPComponent} Enhanced component with injected BlockContent as prop.
  */
 export const withBlockContentContext = createHigherOrderComponent( ( OriginalComponent ) => {
 	return ( props ) => (

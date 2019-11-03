@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -21,14 +21,20 @@ export const settings = {
 	description: __( 'Prompt visitors to take action with a button-style link.' ),
 	icon,
 	keywords: [ __( 'link' ) ],
+	example: {
+		attributes: {
+			className: 'is-style-fill',
+			backgroundColor: 'vivid-green-cyan',
+			text: __( 'Call to Action' ),
+		},
+	},
 	supports: {
 		align: true,
 		alignWide: false,
 	},
 	styles: [
-		{ name: 'default', label: _x( 'Default', 'block style' ), isDefault: true },
+		{ name: 'fill', label: __( 'Fill' ), isDefault: true },
 		{ name: 'outline', label: __( 'Outline' ) },
-		{ name: 'squared', label: _x( 'Squared', 'block style' ) },
 	],
 	edit,
 	save,

@@ -3,6 +3,8 @@
 @import "./components/block-inspector/style.scss";
 @import "./components/block-list/style.scss";
 @import "./components/block-list-appender/style.scss";
+@import "./components/block-breadcrumb/style.scss";
+@import "./components/block-card/style.scss";
 @import "./components/block-compare/style.scss";
 @import "./components/block-mover/style.scss";
 @import "./components/block-navigation/style.scss";
@@ -16,7 +18,8 @@
 @import "./components/color-palette/control.scss";
 @import "./components/contrast-checker/style.scss";
 @import "./components/default-block-appender/style.scss";
-@import "./components/font-sizes/style.scss";
+@import "./components/gradient-picker/control.scss";
+@import "./components/link-control/style.scss";
 @import "./components/inner-blocks/style.scss";
 @import "./components/inserter-with-shortcuts/style.scss";
 @import "./components/inserter/style.scss";
@@ -25,6 +28,7 @@
 @import "./components/multi-selection-inspector/style.scss";
 @import "./components/panel-color-settings/style.scss";
 @import "./components/plain-text/style.scss";
+@import "./components/responsive-block-control/style.scss";
 @import "./components/rich-text/format-toolbar/style.scss";
 @import "./components/rich-text/style.scss";
 @import "./components/skip-to-selected-block/style.scss";
@@ -32,3 +36,4 @@
 @import "./components/url-popover/style.scss";
 @import "./components/warning/style.scss";
 @import "./components/writing-flow/style.scss";
+@import "./hooks/anchor.scss";

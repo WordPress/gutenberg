@@ -1,4 +1,9 @@
-## Master (unreleased)
+## 2.7.0 (2019-08-05)
+
+### Enhancements
+
+- Heading block uses `has-text-align-*` class names rather than inline style for text alignment.
+- Verse block uses `has-text-align-*` class names rather than inline style for text alignment.
 
 ### Bug Fixes
 

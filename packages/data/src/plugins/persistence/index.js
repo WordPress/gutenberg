@@ -10,14 +10,13 @@ import defaultStorage from './storage/default';
 import { combineReducers } from '../../';
 
 /**
- * Persistence plugin options.
+ * @typedef {Object} WPDataPersistencePluginOptions Persistence plugin options.
  *
  * @property {Storage} storage    Persistent storage implementation. This must
  *                                at least implement `getItem` and `setItem` of
  *                                the Web Storage API.
  * @property {string}  storageKey Key on which to set in persistent storage.
  *
- * @typedef {WPDataPersistencePluginOptions}
  */
 
 /**
@@ -139,7 +138,7 @@ const persistencePlugin = function( registry, pluginOptions ) {
 			// to leverage its behavior of returning the same object when none
 			// of the property values changes. This allows a strict reference
 			// equality to bypass a persistence set on an unchanging state.
-			const reducers = keys.reduce( ( result, key ) => Object.assign( result, {
+			const reducers = keys.reduce( ( accumulator, key ) => Object.assign( accumulator, {
 				[ key ]: ( state, action ) => action.nextState[ key ],
 			} ), {} );
 

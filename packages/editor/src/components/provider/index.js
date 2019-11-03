@@ -11,6 +11,7 @@ import { compose } from '@wordpress/compose';
 import { Component } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
+import { EntityProvider } from '@wordpress/core-data';
 import { BlockEditorProvider, transformStyles } from '@wordpress/block-editor';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
@@ -37,6 +38,7 @@ const fetchLinkSuggestions = async ( search ) => {
 		id: post.id,
 		url: post.url,
 		title: decodeEntities( post.title ) || __( '(no title)' ),
+		type: post.subtype || post.type,
 	} ) );
 };
 
@@ -72,11 +74,17 @@ class EditorProvider extends Component {
 		}
 	}
 
-	getBlockEditorSettings( settings, meta, onMetaChange, reusableBlocks, hasUploadPermissions ) {
+	getBlockEditorSettings(
+		settings,
+		reusableBlocks,
+		hasUploadPermissions,
+		canUserUseUnfilteredHTML
+	) {
 		return {
 			...pick( settings, [
 				'alignWide',
 				'allowedBlockTypes',
+				'__experimentalPreferredStyleVariations',
 				'availableLegacyWidgets',
 				'bodyPlaceholder',
 				'codeEditingEnabled',
@@ -94,14 +102,18 @@ class EditorProvider extends Component {
 				'template',
 				'templateLock',
 				'titlePlaceholder',
+				'onUpdateDefaultBlockStyles',
+				'__experimentalEnableLegacyWidgetBlock',
+				'__experimentalEnableMenuBlock',
+				'__experimentalBlockDirectory',
+				'__experimentalEnableFullSiteEditing',
+				'showInserterHelpPanel',
+				'gradients',
 			] ),
-			__experimentalMetaSource: {
-				value: meta,
-				onChange: onMetaChange,
-			},
+			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalReusableBlocks: reusableBlocks,
-			__experimentalMediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalFetchLinkSuggestions: fetchLinkSuggestions,
+			__experimentalCanUserUseUnfilteredHTML: canUserUseUnfilteredHTML,
 		};
 	}
 
@@ -129,15 +141,19 @@ class EditorProvider extends Component {
 		}
 	}
 
+	componentWillUnmount() {
+		this.props.tearDownEditor();
+	}
+
 	render() {
 		const {
+			canUserUseUnfilteredHTML,
 			children,
+			post,
 			blocks,
 			resetEditorBlocks,
 			isReady,
 			settings,
-			meta,
-			onMetaChange,
 			reusableBlocks,
 			resetEditorBlocksWithoutUndoLevel,
 			hasUploadPermissions,
@@ -148,21 +164,28 @@ class EditorProvider extends Component {
 		}
 
 		const editorSettings = this.getBlockEditorSettings(
-			settings, meta, onMetaChange, reusableBlocks, hasUploadPermissions
+			settings,
+			reusableBlocks,
+			hasUploadPermissions,
+			canUserUseUnfilteredHTML,
 		);
 
 		return (
-			<BlockEditorProvider
-				value={ blocks }
-				onInput={ resetEditorBlocksWithoutUndoLevel }
-				onChange={ resetEditorBlocks }
-				settings={ editorSettings }
-				useSubRegistry={ false }
-			>
-				{ children }
-				<ReusableBlocksButtons />
-				<ConvertToGroupButtons />
-			</BlockEditorProvider>
+			<EntityProvider kind="root" type="site">
+				<EntityProvider kind="postType" type={ post.type } id={ post.id }>
+					<BlockEditorProvider
+						value={ blocks }
+						onInput={ resetEditorBlocksWithoutUndoLevel }
+						onChange={ resetEditorBlocks }
+						settings={ editorSettings }
+						useSubRegistry={ false }
+					>
+						{ children }
+						<ReusableBlocksButtons />
+						<ConvertToGroupButtons />
+					</BlockEditorProvider>
+				</EntityProvider>
+			</EntityProvider>
 		);
 	}
 }
@@ -171,17 +194,17 @@ export default compose( [
 	withRegistryProvider,
 	withSelect( ( select ) => {
 		const {
+			canUserUseUnfilteredHTML,
 			__unstableIsEditorReady: isEditorReady,
 			getEditorBlocks,
-			getEditedPostAttribute,
 			__experimentalGetReusableBlocks,
 		} = select( 'core/editor' );
 		const { canUser } = select( 'core' );
 
 		return {
+			canUserUseUnfilteredHTML: canUserUseUnfilteredHTML(),
 			isReady: isEditorReady(),
 			blocks: getEditorBlocks(),
-			meta: getEditedPostAttribute( 'meta' ),
 			reusableBlocks: __experimentalGetReusableBlocks(),
 			hasUploadPermissions: defaultTo( canUser( 'create', 'media' ), true ),
 		};
@@ -191,8 +214,8 @@ export default compose( [
 			setupEditor,
 			updatePostLock,
 			resetEditorBlocks,
-			editPost,
 			updateEditorSettings,
+			__experimentalTearDownEditor,
 		} = dispatch( 'core/editor' );
 		const { createWarningNotice } = dispatch( 'core/notices' );
 
@@ -207,9 +230,7 @@ export default compose( [
 					__unstableShouldCreateUndoLevel: false,
 				} );
 			},
-			onMetaChange( meta ) {
-				editPost( { meta } );
-			},
+			tearDownEditor: __experimentalTearDownEditor,
 		};
 	} ),
 ] )( EditorProvider );

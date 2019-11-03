@@ -126,8 +126,9 @@ if ( files.length ) {
 		`${ PACKAGES_DIR }/*/src/*.scss`,
 	], {
 		ignore: [
-			`**/test/**`,
-			`**/__mocks__/**`,
+			`**/benchmark/**`,
+			`**/{__mocks__,__tests__,test}/**`,
+			`**/{storybook,stories}/**`,
 		],
 		onlyFiles: true,
 	} );
@@ -175,3 +176,5 @@ stream
 	} ) )
 	.on( 'end', () => ended = true )
 	.resume();
+
+/* eslint-enable no-console */

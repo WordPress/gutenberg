@@ -26,6 +26,10 @@
 	height: 2px;
 }
 
+.lineStyleAddHereDark {
+	background-color: $gray-50;
+}
+
 .labelStyleAddHere {
 	flex: 1;
 	text-align: center;
@@ -34,17 +38,12 @@
 	font-weight: bold;
 }
 
-.containerStyleAddHere {
-	flex: 1;
-	flex-direction: row;
-	background-color: $white;
+.labelStyleAddHereDark {
+	color: $gray-20;
 }
 
-.blockToolbarKeyboardAvoidingView {
-	position: absolute;
-	bottom: 0;
-	right: 0;
-	left: 0;
+.containerStyleAddHere {
+	flex-direction: row;
 }
 
 .blockHolderSemiBordered {
@@ -61,9 +60,7 @@
 	border-right-width: 1px;
 }
 
-
 .blockContainerFocused {
-	background-color: $white;
 	padding-left: 16;
 	padding-right: 16;
 	padding-top: 12;
@@ -72,4 +69,12 @@
 
 .blockHolderFocused {
 	border-color: $gray-lighten-30;
+}
+
+.blockHolderFocusedDark {
+	border-color: $gray-70;
+}
+
+.blockListFooter {
+	height: 80px;
 }

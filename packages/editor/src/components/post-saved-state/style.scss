@@ -7,10 +7,6 @@
 	overflow: hidden;
 	white-space: nowrap;
 
-	&.is-saving {
-		animation: edit-post__loading-fade-animation 0.5s infinite;
-	}
-
 	.dashicon {
 		display: inline-block;
 		flex: 0 0 auto;
@@ -31,10 +27,4 @@
 // This needs specificity to override inherited styles.
 .edit-post-header .edit-post-header__settings .components-button.editor-post-save-draft {
 	margin: 0;
-
-	@include break-small() {
-		.dashicon {
-			display: none;
-		}
-	}
 }

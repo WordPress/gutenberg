@@ -198,7 +198,6 @@ class VideoEdit extends Component {
 		}
 		const videoPosterDescription = `video-block__poster-image-description-${ instanceId }`;
 
-		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return (
 			<>
 				<BlockControls>
@@ -314,17 +313,14 @@ class VideoEdit extends Component {
 				</figure>
 			</>
 		);
-		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 	}
 }
 
 export default compose( [
 	withSelect( ( select ) => {
 		const { getSettings } = select( 'core/block-editor' );
-		const { __experimentalMediaUpload } = getSettings();
-		return {
-			mediaUpload: __experimentalMediaUpload,
-		};
+		const { mediaUpload } = getSettings();
+		return { mediaUpload };
 	} ),
 	withNotices,
 	withInstanceId,

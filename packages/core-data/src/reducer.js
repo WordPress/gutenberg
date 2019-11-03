@@ -1,12 +1,13 @@
 /**
  * External dependencies
  */
-import { keyBy, map, groupBy, flowRight } from 'lodash';
+import { keyBy, map, groupBy, flowRight, isEqual, get } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { combineReducers } from '@wordpress/data';
+import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
  * Internal dependencies
@@ -121,7 +122,9 @@ export function themeSupports( state = {}, action ) {
 /**
  * Higher Order Reducer for a given entity config. It supports:
  *
- *  - Fetching a record by primary key
+ *  - Fetching
+ *  - Editing
+ *  - Saving
  *
  * @param {Object} entityConfig  Entity config.
  *
@@ -145,7 +148,84 @@ function entity( entityConfig ) {
 				key: entityConfig.key || DEFAULT_ENTITY_KEY,
 			};
 		} ),
-	] )( queriedDataReducer );
+	] )(
+		combineReducers( {
+			queriedData: queriedDataReducer,
+
+			edits: ( state = {}, action ) => {
+				switch ( action.type ) {
+					case 'RECEIVE_ITEMS':
+						const nextState = { ...state };
+
+						for ( const record of action.items ) {
+							const recordId = record[ action.key ];
+							const edits = nextState[ recordId ];
+							if ( ! edits ) {
+								continue;
+							}
+
+							const nextEdits = Object.keys( edits ).reduce( ( acc, key ) => {
+								// If the edited value is still different to the persisted value,
+								// keep the edited value in edits.
+								if (
+									// Edits are the "raw" attribute values, but records may have
+									// objects with more properties, so we use `get` here for the
+									// comparison.
+									! isEqual( edits[ key ], get( record[ key ], 'raw', record[ key ] ) )
+								) {
+									acc[ key ] = edits[ key ];
+								}
+								return acc;
+							}, {} );
+
+							if ( Object.keys( nextEdits ).length ) {
+								nextState[ recordId ] = nextEdits;
+							} else {
+								delete nextState[ recordId ];
+							}
+						}
+
+						return nextState;
+
+					case 'EDIT_ENTITY_RECORD':
+						const nextEdits = {
+							...state[ action.recordId ],
+							...action.edits,
+						};
+						Object.keys( nextEdits ).forEach( ( key ) => {
+							// Delete cleared edits so that the properties
+							// are not considered dirty.
+							if ( nextEdits[ key ] === undefined ) {
+								delete nextEdits[ key ];
+							}
+						} );
+						return {
+							...state,
+							[ action.recordId ]: nextEdits,
+						};
+				}
+
+				return state;
+			},
+
+			saving: ( state = {}, action ) => {
+				switch ( action.type ) {
+					case 'SAVE_ENTITY_RECORD_START':
+					case 'SAVE_ENTITY_RECORD_FINISH':
+						return {
+							...state,
+							[ action.recordId ]: {
+								pending: action.type === 'SAVE_ENTITY_RECORD_START',
+								error: action.error,
+								isAutosave: action.isAutosave,
+							},
+						};
+				}
+
+				return state;
+			},
+		} )
+	);
 }
 
 /**
@@ -213,6 +293,101 @@ export const entities = ( state = {}, action ) => {
 		config: newConfig,
 	};
 };
+
+/**
+ * Reducer keeping track of entity edit undo history.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+const UNDO_INITIAL_STATE = [];
+UNDO_INITIAL_STATE.offset = 0;
+let lastEditAction;
+export function undo( state = UNDO_INITIAL_STATE, action ) {
+	switch ( action.type ) {
+		case 'EDIT_ENTITY_RECORD':
+		case 'CREATE_UNDO_LEVEL':
+			let isCreateUndoLevel = action.type === 'CREATE_UNDO_LEVEL';
+			const isUndoOrRedo =
+				! isCreateUndoLevel && ( action.meta.isUndo || action.meta.isRedo );
+			if ( isCreateUndoLevel ) {
+				action = lastEditAction;
+			} else if ( ! isUndoOrRedo ) {
+				lastEditAction = action;
+			}
+
+			let nextState;
+			if ( isUndoOrRedo ) {
+				nextState = [ ...state ];
+				nextState.offset = state.offset + ( action.meta.isUndo ? -1 : 1 );
+
+				if ( state.flattenedUndo ) {
+					// The first undo in a sequence of undos might happen while we have
+					// flattened undos in state. If this is the case, we want execution
+					// to continue as if we were creating an explicit undo level. This
+					// will result in an extra undo level being appended with the flattened
+					// undo values.
+					isCreateUndoLevel = true;
+					action = lastEditAction;
+				} else {
+					return nextState;
+				}
+			}
+
+			if ( ! action.meta.undo ) {
+				return state;
+			}
+
+			// Transient edits don't create an undo level, but are
+			// reachable in the next meaningful edit to which they
+			// are merged. They are defined in the entity's config.
+			if (
+				! isCreateUndoLevel &&
+				! Object.keys( action.edits ).some( ( key ) => ! action.transientEdits[ key ] )
+			) {
+				nextState = [ ...state ];
+				nextState.flattenedUndo = { ...state.flattenedUndo, ...action.edits };
+				nextState.offset = state.offset;
+				return nextState;
+			}
+
+			// Clear potential redos, because this only supports linear history.
+			nextState = nextState || state.slice( 0, state.offset || undefined );
+			nextState.offset = nextState.offset || 0;
+			nextState.pop();
+			if ( ! isCreateUndoLevel ) {
+				nextState.push( {
+					kind: action.meta.undo.kind,
+					name: action.meta.undo.name,
+					recordId: action.meta.undo.recordId,
+					edits: { ...state.flattenedUndo, ...action.meta.undo.edits },
+				} );
+			}
+			// When an edit is a function it's an optimization to avoid running some expensive operation.
+			// We can't rely on the function references being the same so we opt out of comparing them here.
+			const comparisonUndoEdits = Object.values( action.meta.undo.edits ).filter(
+				( edit ) => typeof edit !== 'function'
+			);
+			const comparisonEdits = Object.values( action.edits ).filter(
+				( edit ) => typeof edit !== 'function'
+			);
+			if ( ! isShallowEqual( comparisonUndoEdits, comparisonEdits ) ) {
+				nextState.push( {
+					kind: action.kind,
+					name: action.name,
+					recordId: action.recordId,
+					edits: isCreateUndoLevel ?
+						{ ...state.flattenedUndo, ...action.edits } :
+						action.edits,
+				} );
+			}
+			return nextState;
+	}
+
+	return state;
+}
 
 /**
  * Reducer managing embed preview data.
@@ -284,6 +459,7 @@ export default combineReducers( {
 	taxonomies,
 	themeSupports,
 	entities,
+	undo,
 	embedPreviews,
 	userPermissions,
 	autosaves,

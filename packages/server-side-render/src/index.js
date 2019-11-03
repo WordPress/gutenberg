@@ -1,8 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { useMemo } from '@wordpress/element';
+import { useMemo, forwardRef } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -14,7 +15,7 @@ import ServerSideRender from './server-side-render';
  */
 const EMPTY_OBJECT = {};
 
-export default withSelect(
+const ExportedServerSideRender = withSelect(
 	( select ) => {
 		const coreEditorSelect = select( 'core/editor' );
 		if ( coreEditorSelect ) {
@@ -44,3 +45,16 @@ export default withSelect(
 		);
 	}
 );
+
+if ( window && window.wp && window.wp.components ) {
+	window.wp.components.ServerSideRender = forwardRef( ( props, ref ) => {
+		deprecated( 'wp.components.ServerSideRender', {
+			alternative: 'wp.serverSideRender',
+		} );
+		return (
+			<ExportedServerSideRender { ...props } ref={ ref } />
+		);
+	} );
+}
+
+export default ExportedServerSideRender;

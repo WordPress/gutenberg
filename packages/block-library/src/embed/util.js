@@ -58,7 +58,7 @@ export const getPhotoHtml = ( photo ) => {
 	return renderToString( photoPreview );
 };
 
-/***
+/**
  * Creates a more suitable embed block based on the passed in props
  * and attributes generated from an embed block's preview.
  *
@@ -68,8 +68,8 @@ export const getPhotoHtml = ( photo ) => {
  * versions, so we require that these are generated separately.
  * See `getAttributesFromPreview` in the generated embed edit component.
  *
- * @param {Object}            props                 The block's props.
- * @param {Object}            attributesFromPreview Attributes generated from the block's most up to date preview.
+ * @param {Object} props                  The block's props.
+ * @param {Object} attributesFromPreview  Attributes generated from the block's most up to date preview.
  * @return {Object|undefined} A more suitable embed block if one exists.
  */
 export const createUpgradedEmbedBlock = ( props, attributesFromPreview ) => {
@@ -175,7 +175,7 @@ export function getClassNames( html, existingClassNames = '', allowResponsive = 
  * Creates a paragraph block containing a link to the URL, and calls `onReplace`.
  *
  * @param {string}   url       The URL that could not be embedded.
- * @param {function} onReplace Function to call with the created fallback block.
+ * @param {Function} onReplace Function to call with the created fallback block.
  */
 export function fallback( url, onReplace ) {
 	const link = <a href={ url }>{ url }</a>;

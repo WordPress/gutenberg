@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/format-library",
-	"version": "1.6.0",
+	"version": "1.9.3",
 	"description": "Format library for the WordPress editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -24,12 +24,14 @@
 		"@babel/runtime": "^7.4.4",
 		"@wordpress/block-editor": "file:../block-editor",
 		"@wordpress/components": "file:../components",
-		"@wordpress/editor": "file:../editor",
+		"@wordpress/dom": "file:../dom",
 		"@wordpress/element": "file:../element",
+		"@wordpress/html-entities": "file:../html-entities",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/rich-text": "file:../rich-text",
-		"@wordpress/url": "file:../url"
+		"@wordpress/url": "file:../url",
+		"lodash": "^4.17.15"
 	},
 	"publishConfig": {
 		"access": "public"

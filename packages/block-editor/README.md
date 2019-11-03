@@ -82,6 +82,14 @@ _Related_
 
 Undocumented declaration.
 
+<a name="BlockBreadcrumb" href="#BlockBreadcrumb">#</a> **BlockBreadcrumb**
+
+Block breadcrumb component, displaying the hierarchy of the current block selection as a breadcrumb.
+
+_Returns_
+
+-   `WPElement`: Block Breadcrumb.
+
 <a name="BlockControls" href="#BlockControls">#</a> **BlockControls**
 
 Undocumented declaration.
@@ -122,6 +130,23 @@ Undocumented declaration.
 
 Undocumented declaration.
 
+<a name="BlockPreview" href="#BlockPreview">#</a> **BlockPreview**
+
+BlockPreview renders a preview of a block or array of blocks.
+
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/block-preview/README.md>
+
+_Parameters_
+
+-   _blocks_ `(Array|Object)`: A block instance (object) or an array of blocks to be previewed.
+-   _viewportWidth_ `number`: Width of the preview container in pixels. Controls at what size the blocks will be rendered inside the preview. Default: 700.
+
+_Returns_
+
+-   `WPComponent`: The component to be rendered.
+
 <a name="BlockSelectionClearer" href="#BlockSelectionClearer">#</a> **BlockSelectionClearer**
 
 Undocumented declaration.
@@ -151,6 +176,10 @@ _Related_
 -   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/button-block-appender/README.md>
 
 <a name="ColorPalette" href="#ColorPalette">#</a> **ColorPalette**
+
+Undocumented declaration.
+
+<a name="ColorPaletteControl" href="#ColorPaletteControl">#</a> **ColorPaletteControl**
 
 Undocumented declaration.
 
@@ -353,23 +382,29 @@ Undocumented declaration.
 
 The default editor settings
 
- alignWide                     boolean       Enable/Disable Wide/Full Alignments
- availableLegacyWidgets        Array         Array of objects representing the legacy widgets available.
- colors                        Array         Palette colors
- disableCustomColors           boolean       Whether or not the custom colors are disabled
- fontSizes                     Array         Available font sizes
- disableCustomFontSizes        boolean       Whether or not the custom font sizes are disabled
- imageSizes                    Array         Available image sizes
- maxWidth                      number        Max width to constraint resizing
- allowedBlockTypes             boolean|Array Allowed block types
- hasFixedToolbar               boolean       Whether or not the editor toolbar is fixed
- hasPermissionsToManageWidgets boolean       Whether or not the user is able to manage widgets.
- focusMode                     boolean       Whether the focus mode is enabled or not
- styles                        Array         Editor Styles
- isRTL                         boolean       Whether the editor is in RTL mode
- bodyPlaceholder               string        Empty post placeholder
- titlePlaceholder              string        Empty title placeholder
- codeEditingEnabled            string        Whether or not the user can switch to the code editor
+ alignWide                              boolean       Enable/Disable Wide/Full Alignments
+ availableLegacyWidgets                 Array         Array of objects representing the legacy widgets available.
+ colors                                 Array         Palette colors
+ disableCustomColors                    boolean       Whether or not the custom colors are disabled
+ fontSizes                              Array         Available font sizes
+ disableCustomFontSizes                 boolean       Whether or not the custom font sizes are disabled
+ imageSizes                             Array         Available image sizes
+ maxWidth                               number        Max width to constraint resizing
+ allowedBlockTypes                      boolean|Array Allowed block types
+ hasFixedToolbar                        boolean       Whether or not the editor toolbar is fixed
+ hasPermissionsToManageWidgets          boolean       Whether or not the user is able to manage widgets.
+ focusMode                              boolean       Whether the focus mode is enabled or not
+ styles                                 Array         Editor Styles
+ isRTL                                  boolean       Whether the editor is in RTL mode
+ bodyPlaceholder                        string        Empty post placeholder
+ titlePlaceholder                       string        Empty title placeholder
+ codeEditingEnabled                     string        Whether or not the user can switch to the code editor
+ showInserterHelpPanel                  boolean       Whether or not the inserter help panel is shown
+ **experimentalCanUserUseUnfilteredHTML string        Whether the user should be able to use unfiltered HTML or the HTML should be filtered e.g., to remove elements considered insecure like iframes.
+ **experimentalEnableLegacyWidgetBlock  boolean       Whether the user has enabled the Legacy Widget Block
+ **experimentalEnableMenuBlock          boolean       Whether the user has enabled the Menu Block
+ **experimentalBlockDirectory           boolean       Whether the user has enabled the Block Directory
+ \_\_experimentalEnableFullSiteEditing    boolean       Whether the user has enabled Full Site Editing
 
 <a name="SkipToSelectedBlock" href="#SkipToSelectedBlock">#</a> **SkipToSelectedBlock**
 
@@ -400,6 +435,12 @@ _Returns_
 
 -   `Array`: converted rules.
 
+<a name="Typewriter" href="#Typewriter">#</a> **Typewriter**
+
+Ensures that the text selection keeps the same vertical distance from the
+viewport during keyboard events within this component. The vertical distance
+can vary. It is the last clicked or scrolled to position.
+
 <a name="URLInput" href="#URLInput">#</a> **URLInput**
 
 _Related_
@@ -417,6 +458,10 @@ _Related_
 _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/url-popover/README.md>
+
+<a name="useBlockEditContext" href="#useBlockEditContext">#</a> **useBlockEditContext**
+
+Undocumented declaration.
 
 <a name="Warning" href="#Warning">#</a> **Warning**
 
@@ -443,7 +488,7 @@ export default compose(
 
 _Parameters_
 
--   _colorTypes_ `...(object|string)`: The arguments can be strings or objects. If the argument is an object, it should contain the color attribute name as key and the color context as value. If the argument is a string the value should be the color attribute name, the color context is computed by applying a kebab case transform to the value. Color context represents the context/place where the color is going to be used. The class name of the color is generated using 'has' followed by the color name and ending with the color context all in kebab case e.g: has-green-background-color.
+-   _colorTypes_ `...(Object|string)`: The arguments can be strings or objects. If the argument is an object, it should contain the color attribute name as key and the color context as value. If the argument is a string the value should be the color attribute name, the color context is computed by applying a kebab case transform to the value. Color context represents the context/place where the color is going to be used. The class name of the color is generated using 'has' followed by the color name and ending with the color context all in kebab case e.g: has-green-background-color.
 
 _Returns_
 
@@ -456,7 +501,7 @@ font size value retrieval, and font size change handling.
 
 _Parameters_
 
--   _args_ `...(object|string)`: The arguments should all be strings Each string contains the font size attribute name e.g: 'fontSize'.
+-   _fontSizeNames_ `...(Object|string)`: The arguments should all be strings. Each string contains the font size attribute name e.g: 'fontSize'.
 
 _Returns_
 

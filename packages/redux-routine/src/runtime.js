@@ -14,9 +14,9 @@ import { isActionOfType, isAction } from './is-action';
  * Create a co-routine runtime.
  *
  * @param {Object}    controls Object of control handlers.
- * @param {function}  dispatch Unhandled action dispatch.
+ * @param {Function}  dispatch Unhandled action dispatch.
  *
- * @return {function} co-routine runtime
+ * @return {Function} co-routine runtime
  */
 export default function createRuntime( controls = {}, dispatch ) {
 	const rungenControls = map( controls, ( control, actionType ) => ( value, next, iterate, yieldNext, yieldError ) => {

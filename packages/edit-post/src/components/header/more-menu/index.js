@@ -13,14 +13,21 @@ import ToolsMoreMenuGroup from '../tools-more-menu-group';
 import OptionsMenuItem from '../options-menu-item';
 import WritingMenu from '../writing-menu';
 
+const POPOVER_PROPS = {
+	className: 'edit-post-more-menu__content',
+	position: 'bottom left',
+};
+const TOGGLE_PROPS = {
+	labelPosition: 'bottom',
+};
+
 const MoreMenu = () => (
 	<DropdownMenu
 		className="edit-post-more-menu"
-		position="bottom left"
 		icon="ellipsis"
 		label={ __( 'More tools & options' ) }
-		__unstableLabelPosition="bottom"
-		__unstablePopoverClassName="edit-post-more-menu__content"
+		popoverProps={ POPOVER_PROPS }
+		toggleProps={ TOGGLE_PROPS }
 	>
 		{ ( { onClose } ) => (
 			<>
@@ -29,7 +36,7 @@ const MoreMenu = () => (
 				<PluginMoreMenuGroup.Slot fillProps={ { onClose } } />
 				<ToolsMoreMenuGroup.Slot fillProps={ { onClose } } />
 				<MenuGroup>
-					<OptionsMenuItem onSelect={ onClose } />
+					<OptionsMenuItem />
 				</MenuGroup>
 			</>
 		) }

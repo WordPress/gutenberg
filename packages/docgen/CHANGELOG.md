@@ -1,3 +1,9 @@
+## 1.3.0 (2019-08-05)
+
+### Bug Fixes
+
+- Docblocks with CRLF endings are now parsed correctly.
+
 ## 1.2.0 (2019-05-21)
 
 ### Enhancement

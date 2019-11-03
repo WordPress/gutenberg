@@ -58,7 +58,7 @@ class BlockDropZone extends Component {
 		const { clientId, rootClientId, getBlockIndex } = this.props;
 		if ( clientId !== undefined ) {
 			const index = getBlockIndex( clientId, rootClientId );
-			return position.y === 'top' ? index : index + 1;
+			return ( position && position.y === 'top' ) ? index : index + 1;
 		}
 	}
 
@@ -111,10 +111,12 @@ class BlockDropZone extends Component {
 	}
 
 	render() {
-		const { isLockedAll, index } = this.props;
+		const { isLockedAll } = this.props;
 		if ( isLockedAll ) {
 			return null;
 		}
+
+		const index = this.getInsertIndex();
 		const isAppender = index === undefined;
 
 		return (

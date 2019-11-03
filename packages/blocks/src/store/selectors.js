@@ -177,7 +177,7 @@ export function hasBlockSupport( state, nameOrType, feature, defaultSupports ) {
  * @param {(string|Object)} nameOrType Block name or type object.
  * @param {string}          searchTerm Search term by which to filter.
  *
- * @return {Object[]} Wheter block type matches search term.
+ * @return {Object[]} Whether block type matches search term.
  */
 export function isMatchingSearchTerm( state, nameOrType, searchTerm ) {
 	const blockType = getNormalizedBlockType( state, nameOrType );

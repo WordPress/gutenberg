@@ -1,6 +1,5 @@
 // Components
 export * from './primitives';
-// eslint-disable-next-line camelcase
 export { default as Animate } from './animate';
 export { default as Autocomplete } from './autocomplete';
 export { default as BaseControl } from './base-control';
@@ -13,6 +12,7 @@ export { default as ColorPalette } from './color-palette';
 export { default as ColorPicker } from './color-picker';
 export { default as Dashicon } from './dashicon';
 export { DateTimePicker, DatePicker, TimePicker } from './date-time';
+export { default as __experimentalDimensionControl } from './dimension-control';
 export { default as Disabled } from './disabled';
 export { default as Draggable } from './draggable';
 export { default as DropZone } from './drop-zone';
@@ -26,6 +26,7 @@ export { default as FontSizePicker } from './font-size-picker';
 export { default as FormFileUpload } from './form-file-upload';
 export { default as FormToggle } from './form-toggle';
 export { default as FormTokenField } from './form-token-field';
+export { default as __experimentalGradientPicker } from './gradient-picker';
 export { default as Icon } from './icon';
 export { default as IconButton } from './icon-button';
 export { default as KeyboardShortcuts } from './keyboard-shortcuts';
@@ -56,11 +57,13 @@ export { default as Spinner } from './spinner';
 export { default as TabPanel } from './tab-panel';
 export { default as TextControl } from './text-control';
 export { default as TextareaControl } from './textarea-control';
+export { default as Tip } from './tip';
 export { default as ToggleControl } from './toggle-control';
 export { default as Toolbar } from './toolbar';
 export { default as ToolbarButton } from './toolbar-button';
 export { default as Tooltip } from './tooltip';
 export { default as TreeSelect } from './tree-select';
+export { default as VisuallyHidden } from './visually-hidden';
 export { default as IsolatedEventContainer } from './isolated-event-container';
 export { createSlotFill, Slot, Fill, Provider as SlotFillProvider } from './slot-fill';
 

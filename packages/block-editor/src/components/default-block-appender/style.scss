@@ -1,6 +1,17 @@
 .block-editor-default-block-appender {
 	clear: both; // The appender doesn't scale well to sit next to floats, so clear them.
 
+	// Default to centered and content-width, like blocks
+	margin-left: auto;
+	margin-right: auto;
+	position: relative;
+
+	&[data-root-client-id=""] .block-editor-default-block-appender__content:hover {
+		// Outline on root-level default block appender is redundant with the
+		// WritingFlow click redirector.
+		outline: 1px solid transparent;
+	}
+
 	textarea.block-editor-default-block-appender__content { // Needs specificity in order to override input field styles from WP-admin styles.
 		font-family: $editor-font;
 		font-size: $editor-font-size; // It should match the default paragraph size.
@@ -39,6 +50,12 @@
 	.components-drop-zone__content-icon {
 		display: none;
 	}
+}
+
+// Ensure that the height of the first appender, and the one between blocks, is the same as text.
+.block-editor-default-block-appender__content {
+	min-height: $empty-paragraph-height / 2;
+	line-height: $editor-line-height;
 }
 
 // Quick shortcuts, left and right.

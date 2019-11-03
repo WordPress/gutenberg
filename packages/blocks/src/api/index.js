@@ -5,6 +5,7 @@ export {
 	switchToBlockType,
 	getBlockTransforms,
 	findTransform,
+	getBlockFromExample,
 } from './factory';
 export {
 	default as parse,

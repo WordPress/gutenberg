@@ -8,6 +8,7 @@ import { flatMap, isEmpty, isFunction } from 'lodash';
  * WordPress dependencies
  */
 import { DOWN } from '@wordpress/keycodes';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -16,19 +17,47 @@ import IconButton from '../icon-button';
 import Dropdown from '../dropdown';
 import { NavigableMenu } from '../navigable-container';
 
+function mergeProps( defaultProps = {}, props = {} ) {
+	const mergedProps = {
+		...defaultProps,
+		...props,
+	};
+
+	if ( props.className && defaultProps.className ) {
+		mergedProps.className = classnames( props.className, defaultProps.className );
+	}
+
+	return mergedProps;
+}
+
 function DropdownMenu( {
 	children,
 	className,
 	controls,
+	hasArrowIndicator = false,
 	icon = 'menu',
 	label,
+	popoverProps,
+	toggleProps,
+	menuProps,
+	// The following props exist for backward compatibility.
 	menuLabel,
 	position,
-	__unstableLabelPosition,
-	__unstableMenuClassName,
-	__unstablePopoverClassName,
-	__unstableToggleClassName,
 } ) {
+	if ( menuLabel ) {
+		deprecated( '`menuLabel` prop in `DropdownComponent`', {
+			alternative: '`menuProps` object and its `aria-label` property',
+			plugin: 'Gutenberg',
+		} );
+	}
+
+	if ( position ) {
+		deprecated( '`position` prop in `DropdownComponent`', {
+			alternative: '`popoverProps` object and its `position` property',
+			plugin: 'Gutenberg',
+		} );
+	}
+
 	if ( isEmpty( controls ) && ! isFunction( children ) ) {
 		return null;
 	}
@@ -41,12 +70,15 @@ function DropdownMenu( {
 			controlSets = [ controlSets ];
 		}
 	}
+	const mergedPopoverProps = mergeProps( {
+		className: 'components-dropdown-menu__popover',
+		position,
+	}, popoverProps );
 
 	return (
 		<Dropdown
 			className={ classnames( 'components-dropdown-menu', className ) }
-			contentClassName={ classnames( 'components-dropdown-menu__popover', __unstablePopoverClassName ) }
-			position={ position }
+			popoverProps={ mergedPopoverProps }
 			renderToggle={ ( { isOpen, onToggle } ) => {
 				const openOnArrowDown = ( event ) => {
 					if ( ! isOpen && event.keyCode === DOWN ) {
@@ -55,31 +87,37 @@ function DropdownMenu( {
 						onToggle();
 					}
 				};
+				const mergedToggleProps = mergeProps( {
+					className: classnames( 'components-dropdown-menu__toggle', {
+						'is-opened': isOpen,
+					} ),
+					tooltip: label,
+				}, toggleProps );
 
 				return (
 					<IconButton
-						className={ classnames( 'components-dropdown-menu__toggle', __unstableToggleClassName, {
-							'is-opened': isOpen,
-						} ) }
+						{ ...mergedToggleProps }
 						icon={ icon }
 						onClick={ onToggle }
 						onKeyDown={ openOnArrowDown }
 						aria-haspopup="true"
 						aria-expanded={ isOpen }
 						label={ label }
-						labelPosition={ __unstableLabelPosition }
-						tooltip={ label }
 					>
-						{ ! icon && <span className="components-dropdown-menu__indicator" /> }
+						{ ( ! icon || hasArrowIndicator ) && <span className="components-dropdown-menu__indicator" /> }
 					</IconButton>
 				);
 			} }
 			renderContent={ ( props ) => {
+				const mergedMenuProps = mergeProps( {
+					'aria-label': menuLabel || label,
+					className: 'components-dropdown-menu__menu',
+				}, menuProps );
+
 				return (
 					<NavigableMenu
-						className={ classnames( 'components-dropdown-menu__menu', __unstableMenuClassName ) }
+						{ ...mergedMenuProps }
 						role="menu"
-						aria-label={ menuLabel || label }
 					>
 						{
 							isFunction( children ) ?

@@ -28,6 +28,12 @@
 		},
 		"focalPoint": {
 			"type": "object"
+		},
+		"minHeight": {
+			"type": "number"
+		},
+		"customGradient": {
+			"type": "string"
 		}
 	}
 }

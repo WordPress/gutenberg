@@ -1,17 +1,25 @@
 /**
  * External dependencies
  */
-import { noop, partial } from 'lodash';
+import { partial } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
 import { Placeholder, Spinner, Disabled } from '@wordpress/components';
-import { withSelect, withDispatch } from '@wordpress/data';
+import {
+	withSelect,
+	withDispatch,
+} from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { BlockEdit } from '@wordpress/block-editor';
+import {
+	BlockEditorProvider,
+	BlockList,
+	WritingFlow,
+} from '@wordpress/block-editor';
 import { compose } from '@wordpress/compose';
+import { parse, serialize } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -25,23 +33,23 @@ class ReusableBlockEdit extends Component {
 
 		this.startEditing = this.startEditing.bind( this );
 		this.stopEditing = this.stopEditing.bind( this );
-		this.setAttributes = this.setAttributes.bind( this );
+		this.setBlocks = this.setBlocks.bind( this );
 		this.setTitle = this.setTitle.bind( this );
 		this.save = this.save.bind( this );
 
-		if ( reusableBlock && reusableBlock.isTemporary ) {
+		if ( reusableBlock ) {
 			// Start in edit mode when we're working with a newly created reusable block
 			this.state = {
-				isEditing: true,
+				isEditing: reusableBlock.isTemporary,
 				title: reusableBlock.title,
-				changedAttributes: {},
+				blocks: parse( reusableBlock.content ),
 			};
 		} else {
 			// Start in preview mode when we're working with an existing reusable block
 			this.state = {
 				isEditing: false,
 				title: null,
-				changedAttributes: null,
+				blocks: [],
 			};
 		}
 	}
@@ -52,13 +60,21 @@ class ReusableBlockEdit extends Component {
 		}
 	}
 
+	componentDidUpdate( prevProps ) {
+		if ( prevProps.reusableBlock !== this.props.reusableBlock && this.state.title === null ) {
+			this.setState( {
+				title: this.props.reusableBlock.title,
+				blocks: parse( this.props.reusableBlock.content ),
+			} );
+		}
+	}
+
 	startEditing() {
 		const { reusableBlock } = this.props;
-
 		this.setState( {
 			isEditing: true,
 			title: reusableBlock.title,
-			changedAttributes: {},
+			blocks: parse( reusableBlock.content ),
 		} );
 	}
 
@@ -66,16 +82,12 @@ class ReusableBlockEdit extends Component {
 		this.setState( {
 			isEditing: false,
 			title: null,
-			changedAttributes: null,
+			blocks: [],
 		} );
 	}
 
-	setAttributes( attributes ) {
-		this.setState( ( prevState ) => {
-			if ( prevState.changedAttributes !== null ) {
-				return { changedAttributes: { ...prevState.changedAttributes, ...attributes } };
-			}
-		} );
+	setBlocks( blocks ) {
+		this.setState( { blocks } );
 	}
 
 	setTitle( title ) {
@@ -83,40 +95,38 @@ class ReusableBlockEdit extends Component {
 	}
 
 	save() {
-		const { reusableBlock, onUpdateTitle, updateAttributes, block, onSave } = this.props;
-		const { title, changedAttributes } = this.state;
-
-		if ( title !== reusableBlock.title ) {
-			onUpdateTitle( title );
-		}
-
-		updateAttributes( block.clientId, changedAttributes );
+		const { onChange, onSave } = this.props;
+		const { blocks, title } = this.state;
+		const content = serialize( blocks );
+		onChange( { title, content } );
 		onSave();
 
 		this.stopEditing();
 	}
 
 	render() {
-		const { isSelected, reusableBlock, block, isFetching, isSaving, canUpdateBlock } = this.props;
-		const { isEditing, title, changedAttributes } = this.state;
+		const { isSelected, reusableBlock, isFetching, isSaving, canUpdateBlock, settings } = this.props;
+		const { isEditing, title, blocks } = this.state;
 
 		if ( ! reusableBlock && isFetching ) {
 			return <Placeholder><Spinner /></Placeholder>;
 		}
 
-		if ( ! reusableBlock || ! block ) {
+		if ( ! reusableBlock ) {
 			return <Placeholder>{ __( 'Block has been deleted or is unavailable.' ) }</Placeholder>;
 		}
 
 		let element = (
-			<BlockEdit
-				{ ...this.props }
-				isSelected={ isEditing && isSelected }
-				clientId={ block.clientId }
-				name={ block.name }
-				attributes={ { ...block.attributes, ...changedAttributes } }
-				setAttributes={ isEditing ? this.setAttributes : noop }
-			/>
+			<BlockEditorProvider
+				settings={ settings }
+				value={ blocks }
+				onChange={ this.setBlocks }
+				onInput={ this.setBlocks }
+			>
+				<WritingFlow>
+					<BlockList />
+				</WritingFlow>
+			</BlockEditorProvider>
 		);
 
 		if ( ! isEditing ) {
@@ -124,7 +134,7 @@ class ReusableBlockEdit extends Component {
 		}
 
 		return (
-			<>
+			<div className="block-library-block__reusable-block-container">
 				{ ( isSelected || isEditing ) && (
 					<ReusableBlockEditPanel
 						isEditing={ isEditing }
@@ -139,7 +149,7 @@ class ReusableBlockEdit extends Component {
 				) }
 				{ ! isSelected && ! isEditing && <ReusableBlockIndicator title={ reusableBlock.title } /> }
 				{ element }
-			</>
+			</div>
 		);
 	}
 }
@@ -153,7 +163,8 @@ export default compose( [
 		} = select( 'core/editor' );
 		const { canUser } = select( 'core' );
 		const {
-			getBlock,
+			__experimentalGetParsedReusableBlock,
+			getSettings,
 		} = select( 'core/block-editor' );
 		const { ref } = ownProps.attributes;
 		const reusableBlock = getReusableBlock( ref );
@@ -162,25 +173,22 @@ export default compose( [
 			reusableBlock,
 			isFetching: isFetchingReusableBlock( ref ),
 			isSaving: isSavingReusableBlock( ref ),
-			block: reusableBlock ? getBlock( reusableBlock.clientId ) : null,
+			blocks: reusableBlock ? __experimentalGetParsedReusableBlock( reusableBlock.id ) : null,
 			canUpdateBlock: !! reusableBlock && ! reusableBlock.isTemporary && !! canUser( 'update', 'blocks', ref ),
+			settings: getSettings(),
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => {
 		const {
 			__experimentalFetchReusableBlocks: fetchReusableBlocks,
-			__experimentalUpdateReusableBlockTitle: updateReusableBlockTitle,
+			__experimentalUpdateReusableBlock: updateReusableBlock,
 			__experimentalSaveReusableBlock: saveReusableBlock,
 		} = dispatch( 'core/editor' );
-		const {
-			updateBlockAttributes,
-		} = dispatch( 'core/block-editor' );
 		const { ref } = ownProps.attributes;
 
 		return {
 			fetchReusableBlock: partial( fetchReusableBlocks, ref ),
-			updateAttributes: updateBlockAttributes,
-			onUpdateTitle: partial( updateReusableBlockTitle, ref ),
+			onChange: partial( updateReusableBlock, ref ),
 			onSave: partial( saveReusableBlock, ref ),
 		};
 	} ),

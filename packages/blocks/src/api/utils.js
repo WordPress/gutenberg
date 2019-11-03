@@ -77,17 +77,13 @@ export function isValidIcon( icon ) {
  * and returns a new icon object that is normalized so we can rely on just on possible icon structure
  * in the codebase.
  *
- * @param {(Object|string|WPElement)} icon  Slug of the Dashicon to be shown
- *                                          as the icon for the block in the
- *                                          inserter, or element or an object describing the icon.
+ * @param {WPBlockTypeIconRender} icon Render behavior of a block type icon;
+ *                                     one of a Dashicon slug, an element, or a
+ *                                     component.
  *
- * @return {Object} Object describing the icon.
+ * @return {WPBlockTypeIconDescriptor} Object describing the icon.
  */
 export function normalizeIconObject( icon ) {
-	if ( ! icon ) {
-		icon = 'block-default';
-	}
-
 	if ( isValidIcon( icon ) ) {
 		return { src: icon };
 	}

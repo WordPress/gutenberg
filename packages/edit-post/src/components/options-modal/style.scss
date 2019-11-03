@@ -21,13 +21,21 @@
 			margin: 0;
 		}
 
-		&.components-base-control + &.components-base-control {
-			margin-bottom: 0;
-		}
-
 		.components-checkbox-control__label {
 			flex-grow: 1;
 			padding: 0.6rem 0 0.6rem 10px;
+		}
+	}
+
+	&__custom-fields-confirmation-message,
+	&__custom-fields-confirmation-button {
+		margin: 0 0 0.6rem 48px;
+
+		@include break-medium() {
+			margin-left: 38px;
+		}
+		@include break-small() {
+			max-width: 300px;
 		}
 	}
 }

@@ -1,22 +1,16 @@
 /**
- * External dependencies
- */
-import { flow } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { MenuItem } from '@wordpress/components';
 import { withDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
-export function ManageBlocksMenuItem( { onSelect, openModal } ) {
+export function ManageBlocksMenuItem( { openModal } ) {
 	return (
 		<MenuItem
-			onClick={ flow( [
-				onSelect,
-				() => openModal( 'edit-post/manage-blocks' ),
-			] ) }
+			onClick={ () => {
+				openModal( 'edit-post/manage-blocks' );
+			} }
 		>
 			{ __( 'Block Manager' ) }
 		</MenuItem>

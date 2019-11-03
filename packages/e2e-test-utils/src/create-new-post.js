@@ -7,6 +7,7 @@ import { addQueryArgs } from '@wordpress/url';
  * Internal dependencies
  */
 import { visitAdminPage } from './visit-admin-page';
+import { disableNavigationMode } from './keyboard-mode';
 
 /**
  * Creates new post.
@@ -36,4 +37,6 @@ export async function createNewPost( {
 	if ( enableTips ) {
 		await page.reload();
 	}
+
+	await disableNavigationMode();
 }

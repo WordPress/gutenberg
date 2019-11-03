@@ -14,6 +14,7 @@ The editor will automatically generate a class name for each block type to simpl
 		title: 'Example: Stylesheets',
 		icon: 'universal-access-alt',
 		category: 'layout',
+		example: {},
 		edit: function( props ) {
 			return el(
 				'p',
@@ -36,7 +37,7 @@ The editor will automatically generate a class name for each block type to simpl
 ```
 {% ESNext %}
 ```js
-const { registerBlockType } = wp.blocks;
+import { registerBlockType } from '@wordpress/blocks';
 
 registerBlockType( 'gutenberg-examples/example-02-stylesheets', {
 	title: 'Example: Stylesheets',
@@ -44,6 +45,8 @@ registerBlockType( 'gutenberg-examples/example-02-stylesheets', {
 	icon: 'universal-access-alt',
 
 	category: 'layout',
+
+	example: {},
 
 	edit( { className } ) {
 		return <p className={ className }>Hello World, step 2 (from the editor, in green).</p>;

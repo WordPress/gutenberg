@@ -15,6 +15,7 @@ import {
 	uniq,
 	isFunction,
 	isEmpty,
+	map,
 } from 'lodash';
 
 /**
@@ -25,7 +26,7 @@ import { createHooks, applyFilters } from '@wordpress/hooks';
 /**
  * Internal dependencies
  */
-import { getBlockType, getBlockTypes } from './registration';
+import { getBlockType, getBlockTypes, getGroupingBlockName } from './registration';
 import { normalizeBlockType } from './utils';
 
 /**
@@ -43,26 +44,26 @@ export function createBlock( name, attributes = {}, innerBlocks = [] ) {
 
 	// Ensure attributes contains only values defined by block type, and merge
 	// default values for missing attributes.
-	const sanitizedAttributes = reduce( blockType.attributes, ( result, schema, key ) => {
+	const sanitizedAttributes = reduce( blockType.attributes, ( accumulator, schema, key ) => {
 		const value = attributes[ key ];
 
 		if ( undefined !== value ) {
-			result[ key ] = value;
+			accumulator[ key ] = value;
 		} else if ( schema.hasOwnProperty( 'default' ) ) {
-			result[ key ] = schema.default;
+			accumulator[ key ] = schema.default;
 		}
 
 		if ( [ 'node', 'children' ].indexOf( schema.source ) !== -1 ) {
 			// Ensure value passed is always an array, which we're expecting in
 			// the RichText component to handle the deprecated value.
-			if ( typeof result[ key ] === 'string' ) {
-				result[ key ] = [ result[ key ] ];
-			} else if ( ! Array.isArray( result[ key ] ) ) {
-				result[ key ] = [];
+			if ( typeof accumulator[ key ] === 'string' ) {
+				accumulator[ key ] = [ accumulator[ key ] ];
+			} else if ( ! Array.isArray( accumulator[ key ] ) ) {
+				accumulator[ key ] = [];
 			}
 		}
 
-		return result;
+		return accumulator;
 	}, {} );
 
 	const clientId = uuid();
@@ -147,8 +148,8 @@ const isPossibleTransformForSource = ( transform, direction, blocks ) => {
 		return false;
 	}
 
-	// Don't allow single 'core/group' blocks to be transformed into
-	// a 'core/group' block.
+	// Don't allow single Grouping blocks to be transformed into
+	// a Grouping block.
 	if ( ! isMultiBlock && isContainerGroupBlock( sourceBlock.name ) && isContainerGroupBlock( transform.blockName ) ) {
 		return false;
 	}
@@ -252,7 +253,7 @@ export const isWildcardBlockTransform = ( t ) => t && t.type === 'block' && Arra
  *
  * @return {boolean} whether or not the Block is the container Block type
  */
-export const isContainerGroupBlock = ( name ) => name === 'core/group';
+export const isContainerGroupBlock = ( name ) => name === getGroupingBlockName();
 
 /**
  * Determines whether the provided Blocks are of the same type
@@ -374,7 +375,7 @@ export function switchToBlockType( blocks, name ) {
 	const firstBlock = blocksArray[ 0 ];
 	const sourceName = firstBlock.name;
 
-	// Unless it's a `core/group` Block then for multi block selections
+	// Unless it's a Grouping Block then for multi block selections
 	// check that all Blocks are of the same type otherwise
 	// we can't run a conversion
 	if ( ! isContainerGroupBlock( name ) && isMultiBlock && ! isBlockSelectionOfSameType( blocksArray ) ) {
@@ -461,3 +462,17 @@ export function switchToBlockType( blocks, name ) {
 		return applyFilters( 'blocks.switchToBlockType.transformedBlock', transformedBlock, blocks );
 	} );
 }
+
+/**
+ * Create a block object from the example API.
+ *
+ * @param {string} name
+ * @param {Object} example
+ *
+ * @return {Object} block.
+ */
+export const getBlockFromExample = ( name, example ) => {
+	return createBlock( name, example.attributes, map(
+		example.innerBlocks, ( innerBlock ) => getBlockFromExample( innerBlock.name, innerBlock )
+	) );
+};

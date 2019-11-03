@@ -8,4 +8,13 @@
 	&:not(.is-style-wide):not(.is-style-dots) {
 		max-width: 100px;
 	}
+
+	&.has-background:not(.is-style-dots) {
+		border-bottom: none;
+		height: 1px;
+	}
+
+	&.has-background:not(.is-style-wide):not(.is-style-dots) {
+		height: 2px;
+	}
 }

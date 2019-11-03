@@ -19,6 +19,7 @@ import {
 	isOfTypes,
 	isValidByType,
 	isValidByEnum,
+	serializeBlockNode,
 } from '../parser';
 import {
 	registerBlockType,
@@ -483,9 +484,7 @@ describe( 'block parser', () => {
 
 			const migratedBlock = getMigratedBlock( block, parsedAttributes );
 
-			expect( migratedBlock ).toBe( block );
-			expect( console ).toHaveErrored();
-			expect( console ).toHaveWarned();
+			expect( migratedBlock ).toEqual( expect.objectContaining( block ) );
 		} );
 
 		it( 'should return with attributes parsed by the deprecated version', () => {
@@ -752,8 +751,112 @@ describe( 'block parser', () => {
 			expect( block.name ).toEqual( 'core/test-block' );
 			expect( block.attributes ).toEqual( { fruit: 'Big Bananas' } );
 			expect( block.isValid ).toBe( true );
-			expect( console ).toHaveErrored();
-			expect( console ).toHaveWarned();
+			expect( console ).toHaveInformed();
+		} );
+	} );
+
+	describe( 'serializeBlockNode', () => {
+		it( 'reserializes block nodes', () => {
+			const expected = `<!-- wp:columns -->
+				<div class="wp-block-columns has-2-columns">
+					<!-- wp:column -->
+					<div class="wp-block-column">
+						<!-- wp:paragraph -->
+						<p>A</p>
+						<!-- /wp:paragraph -->
+					</div>
+					<!-- /wp:column -->
+					<!-- wp:column -->
+					<div class="wp-block-column">
+						<!-- wp:group -->
+						<div class="wp-block-group"><div class="wp-block-group__inner-container">
+							<!-- wp:list -->
+							<ul><li>B</li><li>C</li></ul>
+							<!-- /wp:list -->
+							<!-- wp:paragraph -->
+							<p>D</p>
+							<!-- /wp:paragraph -->
+						</div></div>
+						<!-- /wp:group -->
+					</div>
+					<!-- /wp:column -->
+				</div>
+				<!-- /wp:columns -->`.replace( /\t/g, '' );
+			const input = {
+				blockName: 'core/columns',
+				attrs: {},
+				innerBlocks: [
+					{
+						blockName: 'core/column',
+						attrs: {},
+						innerBlocks: [
+							{
+								blockName: 'core/paragraph',
+								attrs: {},
+								innerBlocks: [],
+								innerHTML: '<p>A</p>',
+								innerContent: [ '<p>A</p>' ],
+							},
+						],
+						innerHTML: '<div class="wp-block-column"></div>',
+						innerContent: [
+							'<div class="wp-block-column">',
+							null,
+							'</div>',
+						],
+					},
+					{
+						blockName: 'core/column',
+						attrs: {},
+						innerBlocks: [
+							{
+								blockName: 'core/group',
+								attrs: {},
+								innerBlocks: [
+									{
+										blockName: 'core/list',
+										attrs: {},
+										innerBlocks: [],
+										innerHTML: '<ul><li>B</li><li>C</li></ul>',
+										innerContent: [ '<ul><li>B</li><li>C</li></ul>' ],
+									},
+									{
+										blockName: 'core/paragraph',
+										attrs: {},
+										innerBlocks: [],
+										innerHTML: '<p>D</p>',
+										innerContent: [ '<p>D</p>' ],
+									},
+								],
+								innerHTML: '<div class="wp-block-group"><div class="wp-block-group__inner-container"></div></div>',
+								innerContent: [
+									'<div class="wp-block-group"><div class="wp-block-group__inner-container">',
+									null,
+									'',
+									null,
+									'</div></div>' ],
+							},
+						],
+						innerHTML: '<div class="wp-block-column"></div>',
+						innerContent: [
+							'<div class="wp-block-column">',
+							null,
+							'</div>',
+						],
+					},
+				],
+				innerHTML: '<div class="wp-block-columns has-2-columns"></div>',
+				innerContent: [
+					'<div class="wp-block-columns has-2-columns">',
+					null,
+					'',
+					null,
+					'</div>',
+				],
+			};
+			const actual = serializeBlockNode( input );
+
+			expect( actual ).toEqual( expected );
 		} );
 	} );
 

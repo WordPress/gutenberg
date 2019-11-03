@@ -169,13 +169,13 @@ class LatestPostsEdit extends Component {
 		const layoutControls = [
 			{
 				icon: 'list-view',
-				title: __( 'List View' ),
+				title: __( 'List view' ),
 				onClick: () => setAttributes( { postLayout: 'list' } ),
 				isActive: postLayout === 'list',
 			},
 			{
 				icon: 'grid-view',
-				title: __( 'Grid View' ),
+				title: __( 'Grid view' ),
 				onClick: () => setAttributes( { postLayout: 'grid' } ),
 				isActive: postLayout === 'grid',
 			},
@@ -218,7 +218,7 @@ class LatestPostsEdit extends Component {
 											{ titleTrimmed }
 										</RawHTML>
 									) :
-										__( '(Untitled)' )
+										__( '(no title)' )
 									}
 								</a>
 								{ displayPostDate && post.date_gmt &&
@@ -232,7 +232,7 @@ class LatestPostsEdit extends Component {
 										key="html"
 									>
 										{ excerptLength < excerpt.trim().split( ' ' ).length ?
-											excerpt.trim().split( ' ', excerptLength ).join( ' ' ) + ' ... <a href=' + post.link + 'target="_blank" rel="noopener noreferrer">Read More</a>' :
+											excerpt.trim().split( ' ', excerptLength ).join( ' ' ) + ' ... <a href=' + post.link + 'target="_blank" rel="noopener noreferrer">' + __( 'Read more' ) + '</a>' :
 											excerpt.trim().split( ' ', excerptLength ).join( ' ' ) }
 									</RawHTML>
 								</div>

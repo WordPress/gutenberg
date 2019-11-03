@@ -81,6 +81,7 @@ function htmlToBlocks( { html, rawTransforms } ) {
 /**
  * Converts an HTML string to known blocks.
  *
+ * @param {Object} $1
  * @param {string} $1.HTML The HTML to convert.
  *
  * @return {Array} A list of blocks.

@@ -79,6 +79,11 @@
 			@include menu-style__focus();
 		}
 
+		&:hover,
+		&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover {
+			@include menu-style__hover();
+		}
+
 		// Formatting buttons
 		> svg {
 			border-radius: $radius-round-rectangle;
@@ -99,11 +104,16 @@
 		border-bottom: $border-width solid $light-gray-500;
 	}
 
-	.components-menu-item__button {
+	.components-menu-item__button,
+	.components-menu-item__button.components-icon-button {
 		padding-left: 2rem;
 
 		&.has-icon {
 			padding-left: 0.5rem;
+		}
+
+		.dashicon {
+			margin-right: 4px;
 		}
 	}
 }

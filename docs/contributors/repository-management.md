@@ -60,12 +60,16 @@ To keep the issue list healthy, it needs to be triaged regularly. *Triage* is th
 
 Anyone can help triage, although you’ll need contributor permission on the Gutenberg repository to modify an issue’s labels or edit its title.
 
-Here are a couple places you can start:
+To start simply choose from one of these filtered lists of issues:
 
-- [All Gutenberg issues without an assigned label](https://github.com/wordpress/gutenberg/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-asc+no%3Alabel).
-- [The least recently updated Gutenberg issues](https://github.com/WordPress/gutenberg/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-asc).
+- [All Gutenberg issues without an assigned label](https://github.com/wordpress/gutenberg/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-asc+no%3Alabel). Triaging by simply adding labels helps people focused on certain aspects of Gutenberg find relevant issues easier and start working on them.
+- [The least recently updated Gutenberg issues](https://github.com/WordPress/gutenberg/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-asc). Triaging issues that are getting old and possibly out of date keeps important work from being overlooked.
+- [All Gutenberg issues with no comments](https://github.com/WordPress/gutenberg/issues?q=is%3Aopen+is%3Aissue+sort%3Acomments-asc) Triaging this list helps make sure all issues are acknowledged, and can help identify issues that may need more information or discussion before they are actionable.
+- [The least commented on issues](https://github.com/WordPress/gutenberg/issues?q=is%3Aopen+is%3Aissue+sort%3Acomments-asc) Triaging this list helps the community figure out things like traction for certain proposals. 
 
-When reviewing issues, here are some steps you can perform:
+You can also create your own custom set of filters on GitHub. If you have a filter you think might be useful for the community, feel free to submit a PR to add it to this list.
+
+When triaging, either one of the lists above or issues in general, here are some steps you can perform:
 
 - First search for duplicates. If the issue is duplicate, close it by commenting with “Duplicate of #<original-id>” and add any relevant new details to the existing issue.
 - If the issue is missing labels, add some to better categorize it (requires proper permissions).
@@ -78,6 +82,10 @@ When reviewing issues, here are some steps you can perform:
   - Check that the bug report is valid by debugging it to see if you can track down the technical specifics.
   - Check if the issue is missing some detail and see if you can fill in those details. For instance, if a bug report is missing visual detail, it’s helpful to reproduce the issue locally and upload a screenshot or GIF.
 
+For triaging there are some labels which are very useful:
+- `Needs Technical Feedback` - you can apply them when you see new features or API changes proposed
+- `Needs More Info` - when it’s not clear what the issue is or it would help to provide additional details
+- `Needs Testing` - it’s useful for old bugs where it seems like they are no longer relevant
 
 ## Pull Requests
 
@@ -108,6 +116,10 @@ Every pull request goes through a manual code review, in addition to automated t
 
 *As a contributor*, your responsibility is to learn from suggestions and iterate your pull request should it be needed based on feedback. Seek to collaborate and produce the best possible contribution to the greater whole.
 
+Code reviews are encouraged by everyone who is willing to attempt one. If you review a pull request and are confident in the changes, approve it. If you don't feel totally confident it is ready for merging, add your review with a comment that says it should have another set of eyes on it before final approval. This can help filter out obvious bugs and simplify reviews for core members. Following the later reviews will also help improve your reviewing confidence in the future.
+
+If you are not yet comfortable leaving a full review, try commenting on a PR. Questions about functionality or the reasoning behind a change are helpful too. You could also comment on changes to parts of the code you understand, without leaving a full review.
+
 ### Design Review
 
 If your pull request impacts the design, you should ask for a design review. To request a design review add the [Needs Design Feedback](https://github.com/WordPress/gutenberg/labels/Needs%20Design%20Feedback) label to your PR. As a guide, changes that should be reviewed:
@@ -130,7 +142,10 @@ A pull request can generally be merged once it is:
 
 The final pull request merge decision is made by the **@wordpress/gutenberg-core** team.
 
-Please make sure to assign your merged pull request to its release milestone. Doing so creates the historical legacy of what code landed when, and makes it possible for all project contributors (even non-technical ones) to access this information.
+All members of the WordPress organization on GitHub have the ability to review and merge pull requests. If you have reviewed a PR and are confident in the code, approve the pull request and comment pinging **@wordpress/gutenberg-core** or a specific core member who has been involved in the PR. Once they confirm there are no objections, you are free to merge the PR into master.
+
+Most pull requests will be automatically assigned a release milestone, but please make sure your merged pull request was assigned one. Doing so creates the historical legacy of what code landed when, and makes it possible for all project contributors (even non-technical ones) to access this information.
+
 
 ### Closing Pull Requests
 

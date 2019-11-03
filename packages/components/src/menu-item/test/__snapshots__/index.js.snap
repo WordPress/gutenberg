@@ -17,7 +17,7 @@ exports[`MenuItem should match snapshot when all props provided 1`] = `
 `;
 
 exports[`MenuItem should match snapshot when info is provided 1`] = `
-<ForwardRef(Button)
+<ForwardRef(IconButton)
   className="components-menu-item__button"
   role="menuitem"
 >
@@ -34,7 +34,7 @@ exports[`MenuItem should match snapshot when info is provided 1`] = `
   <Shortcut
     className="components-menu-item__shortcut"
   />
-</ForwardRef(Button)>
+</ForwardRef(IconButton)>
 `;
 
 exports[`MenuItem should match snapshot when isSelected and role are optionally provided 1`] = `
@@ -53,7 +53,7 @@ exports[`MenuItem should match snapshot when isSelected and role are optionally 
 `;
 
 exports[`MenuItem should match snapshot when only label provided 1`] = `
-<ForwardRef(Button)
+<ForwardRef(IconButton)
   className="components-menu-item__button"
   role="menuitem"
 >
@@ -61,5 +61,5 @@ exports[`MenuItem should match snapshot when only label provided 1`] = `
   <Shortcut
     className="components-menu-item__shortcut"
   />
-</ForwardRef(Button)>
+</ForwardRef(IconButton)>
 `;

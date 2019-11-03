@@ -128,13 +128,13 @@ class FlatTermSelector extends Component {
 	}
 
 	updateSelectedTerms( terms = [] ) {
-		const selectedTerms = terms.reduce( ( result, termId ) => {
+		const selectedTerms = terms.reduce( ( accumulator, termId ) => {
 			const termObject = find( this.state.availableTerms, ( term ) => term.id === termId );
 			if ( termObject ) {
-				result.push( termObject.name );
+				accumulator.push( termObject.name );
 			}
 
-			return result;
+			return accumulator;
 		}, [] );
 		this.setState( {
 			selectedTerms,

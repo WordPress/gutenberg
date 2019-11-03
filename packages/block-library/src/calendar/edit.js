@@ -9,10 +9,10 @@ import memoize from 'memize';
  */
 import {
 	Disabled,
-	ServerSideRender,
 } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
+import ServerSideRender from '@wordpress/server-side-render';
 
 class CalendarEdit extends Component {
 	constructor() {

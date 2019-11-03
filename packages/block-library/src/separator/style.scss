@@ -8,7 +8,9 @@
 
 	// Dots style
 	&.is-style-dots {
-		background: none; // Override any background themes often set on the hr tag for this style.
+		// Override any background themes often set on the hr tag for this style.
+		// also override the color set in the editor since it's intented for normal HR
+		background: none !important;
 		border: none;
 		text-align: center;
 		max-width: none;
@@ -17,7 +19,7 @@
 
 		&::before {
 			content: "\00b7 \00b7 \00b7";
-			color: $dark-gray-900;
+			color: currentColor;
 			font-size: 20px;
 			letter-spacing: 2em;
 			padding-left: 2em;

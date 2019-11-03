@@ -20,7 +20,7 @@ import { Component, forwardRef, createElement } from '@wordpress/element';
  * element should stop propagation but not invoke a callback handler, since it
  * would be assumed these are invoked by the child element.
  *
- * @type {Component}
+ * @type {WPComponent}
  */
 export class IgnoreNestedEvents extends Component {
 	constructor() {
@@ -39,8 +39,6 @@ export class IgnoreNestedEvents extends Component {
 	 * it has not already been handled by a descendant IgnoreNestedEvents.
 	 *
 	 * @param {Event} event Event object.
-	 *
-	 * @return {void}
 	 */
 	proxyEvent( event ) {
 		const isHandled = !! event.nativeEvent._blockHandled;

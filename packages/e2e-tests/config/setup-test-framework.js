@@ -10,6 +10,7 @@ import {
 	activatePlugin,
 	clearLocalStorage,
 	enablePageDialogAccept,
+	isOfflineMode,
 	setBrowserViewport,
 	switchUserToAdmin,
 	switchUserToTest,
@@ -122,6 +123,12 @@ function observeConsoleLogging() {
 			return;
 		}
 
+		// Network errors are ignored only if we are intentionally testing
+		// offline mode.
+		if ( text.includes( 'net::ERR_INTERNET_DISCONNECTED' ) && isOfflineMode() ) {
+			return;
+		}
+
 		// A bug present in WordPress 5.2 will produce console warnings when
 		// loading the Dashicons font. These can be safely ignored, as they do
 		// not otherwise regress on application behavior. This logic should be
@@ -175,6 +182,8 @@ async function runAxeTestsForBlockEditor() {
 		// See: https://github.com/WordPress/gutenberg/pull/15018.
 		disabledRules: [
 			'aria-allowed-role',
+			'aria-hidden-focus',
+			'aria-input-field-name',
 			'aria-valid-attr-value',
 			'button-name',
 			'color-contrast',

@@ -15,7 +15,7 @@ import {
 	embedFlickrIcon,
 	embedVimeoIcon,
 	embedRedditIcon,
-	embedTumbrIcon,
+	embedTumblrIcon,
 	embedAmazonIcon,
 } from './icons';
 
@@ -338,7 +338,7 @@ export const others = [
 		name: 'core-embed/tumblr',
 		settings: {
 			title: 'Tumblr',
-			icon: embedTumbrIcon,
+			icon: embedTumblrIcon,
 			description: __( 'Embed a Tumblr post.' ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?tumblr\.com\/.+/i ],

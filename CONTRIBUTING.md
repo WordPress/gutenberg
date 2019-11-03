@@ -18,6 +18,12 @@ Please see the [Developer Contributions section](/docs/contributors/develop.md) 
 
 If you'd like to contribute to the design or front-end, feel free to contribute to tickets labelled [Needs Design](https://github.com/WordPress/gutenberg/issues?q=is%3Aissue+is%3Aopen+label%3A%22Needs+Design%22) or [Needs Design Feedback](https://github.com/WordPress/gutenberg/issues?q=is%3Aissue+is%3Aopen+label%3A"Needs+Design+Feedback%22). We could use your thoughtful replies, mockups, animatics, sketches, doodles. Proposed changes are best done as minimal and specific iterations on the work that precedes it so we can compare. The [WordPress Design team](http://make.wordpress.org/design/) uses [Figma](https://www.figma.com/) to collaborate and share work. If you'd like to contribute, join the [#design channel](http://wordpress.slack.com/messages/design/) in [Slack](https://make.wordpress.org/chat/) and ask the team to set you up with a free Figma account. This will give you access to a helpful [library of components](https://www.figma.com/file/ZtN5xslEVYgzU7Dd5CxgGZwq/WordPress-Components?node-id=0%3A1) used in WordPress.
 
+## Triage Contributions
+
+*Triage* is the practice of reviewing existing issues to make sure they’re relevant, actionable, and have all the information needed to reproduce and/or solve the issue. Triaging is a very important contribution because it allows the community to focus on and prioritise issues, feature proposals, discussions, and so on.
+
+If you want to learn more about triage, and why it it important, please see the [repository management section](docs/contributors/repository-management.md#triaging-issues) of the Contributor Handbook.
+
 ## Contribute to the Documentation
 
 Please see the [Documentation section](/docs/contributors/document.md) of the Contributor Handbook.

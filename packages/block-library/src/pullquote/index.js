@@ -21,6 +21,12 @@ export const settings = {
 	title: __( 'Pullquote' ),
 	description: __( 'Give special visual emphasis to a quote from your text.' ),
 	icon,
+	example: {
+		attributes: {
+			value: '<p>' + __( 'One of the hardest things to do in technology is disrupt yourself.' ) + '</p>',
+			citation: 'Matt Mullenweg',
+		},
+	},
 	styles: [
 		{ name: 'default', label: _x( 'Default', 'block style' ), isDefault: true },
 		{ name: SOLID_COLOR_STYLE_NAME, label: __( 'Solid Color' ) },

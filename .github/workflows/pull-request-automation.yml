@@ -1,0 +1,14 @@
+on: pull_request
+name: Pull request automation
+
+jobs:
+  pull-request-automation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      # Changing into the action's directory and running `npm install` is much
+      # faster than a full project-wide `npm ci`.
+      - run: cd packages/project-management-automation && npm install
+      - uses: ./packages/project-management-automation
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}

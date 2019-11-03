@@ -19,61 +19,61 @@ describe( 'deprecated', () => {
 		deprecated( 'Eating meat' );
 
 		expect( console ).toHaveWarnedWith(
-			'Eating meat is deprecated and will be removed.'
+			'Eating meat is deprecated.'
 		);
 	} );
 
 	it( 'should show a deprecation warning with a version', () => {
-		deprecated( 'Eating meat', { version: 'the future' } );
+		deprecated( 'Eating meat', { version: '2020.01.01' } );
 
 		expect( console ).toHaveWarnedWith(
-			'Eating meat is deprecated and will be removed in the future.'
+			'Eating meat is deprecated and will be removed in version 2020.01.01.'
 		);
 	} );
 
 	it( 'should show a deprecation warning with an alternative', () => {
-		deprecated( 'Eating meat', { version: 'the future', alternative: 'vegetables' } );
+		deprecated( 'Eating meat', { version: '2020.01.01', alternative: 'vegetables' } );
 
 		expect( console ).toHaveWarnedWith(
-			'Eating meat is deprecated and will be removed in the future. Please use vegetables instead.'
+			'Eating meat is deprecated and will be removed in version 2020.01.01. Please use vegetables instead.'
 		);
 	} );
 
 	it( 'should show a deprecation warning with an alternative specific to a plugin', () => {
 		deprecated( 'Eating meat', {
-			version: 'the future',
+			version: '2020.01.01',
 			alternative: 'vegetables',
 			plugin: 'the earth',
 		} );
 
 		expect( console ).toHaveWarnedWith(
-			'Eating meat is deprecated and will be removed from the earth in the future. Please use vegetables instead.'
+			'Eating meat is deprecated and will be removed from the earth in version 2020.01.01. Please use vegetables instead.'
 		);
 	} );
 
 	it( 'should show a deprecation warning with a link', () => {
 		deprecated( 'Eating meat', {
-			version: 'the future',
+			version: '2020.01.01',
 			alternative: 'vegetables',
 			plugin: 'the earth',
 			link: 'https://en.wikipedia.org/wiki/Vegetarianism',
 		} );
 
 		expect( console ).toHaveWarnedWith(
-			'Eating meat is deprecated and will be removed from the earth in the future. Please use vegetables instead. See: https://en.wikipedia.org/wiki/Vegetarianism'
+			'Eating meat is deprecated and will be removed from the earth in version 2020.01.01. Please use vegetables instead. See: https://en.wikipedia.org/wiki/Vegetarianism'
 		);
 	} );
 
 	it( 'should show a deprecation warning with a hint', () => {
 		deprecated( 'Eating meat', {
-			version: 'the future',
+			version: '2020.01.01',
 			alternative: 'vegetables',
 			plugin: 'the earth',
 			hint: 'You may find it beneficial to transition gradually.',
 		} );
 
 		expect( console ).toHaveWarnedWith(
-			'Eating meat is deprecated and will be removed from the earth in the future. Please use vegetables instead. Note: You may find it beneficial to transition gradually.'
+			'Eating meat is deprecated and will be removed from the earth in version 2020.01.01. Please use vegetables instead. Note: You may find it beneficial to transition gradually.'
 		);
 	} );
 

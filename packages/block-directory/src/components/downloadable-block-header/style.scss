@@ -1,0 +1,30 @@
+.block-directory-downloadable-block-header__row {
+	display: flex;
+	flex-grow: 1;
+
+	.block-editor-block-icon {
+		width: $icon-button-size;
+		height: $icon-button-size;
+		font-size: $icon-button-size;
+		background-color: $light-gray-300;
+	}
+
+	img {
+		width: $icon-button-size;
+		height: $icon-button-size;
+	}
+
+	.block-directory-downloadable-block-header__column {
+		display: flex;
+		flex-direction: column;
+		flex-grow: 1;
+
+		.block-directory-downloadable-block-header__title {
+			font-weight: 600;
+			margin-left: 12px;
+		}
+		.block-directory-block-ratings {
+			margin-left: 12px;
+		}
+	}
+}

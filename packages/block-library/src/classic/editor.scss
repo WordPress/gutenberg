@@ -296,6 +296,9 @@ div[data-type="core/freeform"] {
 }
 
 .block-library-classic__toolbar {
+	// Only display the classic toolbar when the classic block is selected or when the
+	// block is empty or loading and the placeholder should be displayed.
+	display: none;
 	width: auto;
 	margin: 0 #{ -$block-padding };
 	position: sticky;
@@ -306,11 +309,20 @@ div[data-type="core/freeform"] {
 	border-bottom: none;
 
 	// On mobile, toolbars go edge to edge.
-	padding: 0 $block-padding;
+	padding: 0;
 
-	.is-selected & {
+	// By using the `data-type` attribute in this selector it ensures these styles only appear
+	// when the block itself is selected, without it they would also show when a parent block
+	// is selected.
+	div[data-type="core/freeform"].is-selected &,
+	div[data-type="core/freeform"].is-typing & {
+		display: block;
 		border-color: $light-gray-800;
-		border-left-color: transparent;
+	}
+
+	// Remove the box shadow to mimic other Gutenberg UI.
+	.mce-tinymce {
+		box-shadow: none;
 	}
 
 	@include break-small() {
@@ -318,7 +330,7 @@ div[data-type="core/freeform"] {
 	}
 
 	&:empty {
-		height: $block-toolbar-height;
+		display: block;
 		background: #f5f5f5;
 		border-bottom: $border-width solid #e2e4e7;
 
@@ -366,50 +378,3 @@ div[data-type="core/freeform"] {
 	}
 }
 
-// We don't want the ellipsis to overlap the classic toolbar, which it will due to position sticky.
-// So we move it to the right, and make room for it.
-@include break-small() {
-	.block-editor-block-list__block[data-type="core/freeform"] {
-		.block-editor-block-switcher__no-switcher-icon {
-			display: none;
-		}
-		.block-editor-block-contextual-toolbar {
-			float: right;
-			margin-right: $icon-button-size - $block-padding + ($border-width * 3);
-			transform: translateY(-#{ $block-padding - $border-width });
-			top: $block-padding;
-
-			.block-editor-block-toolbar {
-				border: none;
-				box-shadow: none;
-
-				// Match the TinyMCE "mobile" breakpoint buttons alignment.
-				margin-top: 3px;
-				@include break-medium() {
-					margin-top: 0;
-				}
-
-				&::before {
-					content: "";
-					display: block;
-					border-left: 1px solid $light-gray-500;
-					margin-top: $grid-size-small;
-					margin-bottom: $grid-size-small;
-				}
-
-				.components-toolbar__control.components-button:hover {
-					background-color: transparent;
-				}
-			}
-
-			.components-toolbar {
-				background: transparent;
-				border: none;
-			}
-		}
-
-		.mce-container.mce-toolbar.mce-stack-layout-item {
-			padding-right: $icon-button-size;
-		}
-	}
-}

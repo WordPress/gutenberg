@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { last, noop } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
@@ -15,6 +20,7 @@ class BlockEditorProvider extends Component {
 		this.props.updateSettings( this.props.settings );
 		this.props.resetBlocks( this.props.value );
 		this.attachChangeObserver( this.props.registry );
+		this.isSyncingOutcomingValue = [];
 	}
 
 	componentDidUpdate( prevProps ) {
@@ -34,10 +40,23 @@ class BlockEditorProvider extends Component {
 			this.attachChangeObserver( registry );
 		}
 
-		if ( this.isSyncingOutcomingValue ) {
-			this.isSyncingOutcomingValue = false;
+		if ( this.isSyncingOutcomingValue.includes( value ) ) {
+			// Skip block reset if the value matches expected outbound sync
+			// triggered by this component by a preceding change detection.
+			// Only skip if the value matches expectation, since a reset should
+			// still occur if the value is modified (not equal by reference),
+			// to allow that the consumer may apply modifications to reflect
+			// back on the editor.
+			if ( last( this.isSyncingOutcomingValue ) === value ) {
+				this.isSyncingOutcomingValue = [];
+			}
 		} else if ( value !== prevProps.value ) {
-			this.isSyncingIncomingValue = true;
+			// Reset changing value in all other cases than the sync described
+			// above. Since this can be reached in an update following an out-
+			// bound sync, unset the outbound value to avoid considering it in
+			// subsequent renders.
+			this.isSyncingOutcomingValue = [];
+			this.isSyncingIncomingValue = value;
 			resetBlocks( value );
 		}
 	}
@@ -57,8 +76,8 @@ class BlockEditorProvider extends Component {
 	 * This needs to be done synchronously after state changes (instead of using
 	 * `componentDidUpdate`) in order to avoid batching these changes.
 	 *
-	 * @param {WPDataRegistry} registry     Registry from which block editor
-	 *                                      dispatch is to be overriden.
+	 * @param {WPDataRegistry} registry Registry from which block editor
+	 *                                  dispatch is to be overridden.
 	 */
 	attachChangeObserver( registry ) {
 		if ( this.unsubscribe ) {
@@ -76,18 +95,20 @@ class BlockEditorProvider extends Component {
 
 		this.unsubscribe = registry.subscribe( () => {
 			const {
-				onChange,
-				onInput,
+				onChange = noop,
+				onInput = noop,
 			} = this.props;
+
 			const newBlocks = getBlocks();
 			const newIsPersistent = isLastBlockChangePersistent();
+
 			if (
 				newBlocks !== blocks && (
 					this.isSyncingIncomingValue ||
 					__unstableIsLastBlockChangeIgnored()
 				)
 			) {
-				this.isSyncingIncomingValue = false;
+				this.isSyncingIncomingValue = null;
 				blocks = newBlocks;
 				isPersistent = newIsPersistent;
 				return;
@@ -101,7 +122,7 @@ class BlockEditorProvider extends Component {
 				// When knowing the blocks value is changing, assign instance
 				// value to skip reset in subsequent `componentDidUpdate`.
 				if ( newBlocks !== blocks ) {
-					this.isSyncingOutcomingValue = true;
+					this.isSyncingOutcomingValue.push( newBlocks );
 				}
 
 				blocks = newBlocks;
