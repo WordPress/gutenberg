@@ -76,15 +76,15 @@ const tabThroughBlockToolbar = async () => {
 	);
 	await expect( isFocusedBlockSwitcherControl ).toBe( true );
 
-	// Tab to focus on the 'Change text alignment' dropdown control
-	await page.keyboard.press( 'Tab' );
+	// ArrowRight to focus on the 'Change text alignment' dropdown control
+	await page.keyboard.press( 'ArrowRight' );
 	const isFocusedChangeTextAlignmentControl = await page.evaluate( () =>
 		document.activeElement.classList.contains( 'components-dropdown-menu__toggle' )
 	);
 	await expect( isFocusedChangeTextAlignmentControl ).toBe( true );
 
-	// Tab to focus on the 'More formatting' dropdown toggle
-	await page.keyboard.press( 'Tab' );
+	// ArrowRight to focus on the 'More formatting' dropdown toggle
+	await page.keyboard.press( 'ArrowRight' );
 	const isFocusedBlockSettingsDropdown = await page.evaluate( () =>
 		document.activeElement.classList.contains( 'components-dropdown-menu__toggle' )
 	);
