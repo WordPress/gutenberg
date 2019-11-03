@@ -30,8 +30,12 @@
 	}
 }
 
+.wp-block-latest-posts__post-featured-image,
 .wp-block-latest-posts__post-date {
 	display: block;
+}
+
+.wp-block-latest-posts__post-date {
 	color: $dark-gray-300;
 	font-size: $default-font-size;
 }
