@@ -80,7 +80,7 @@ function gutenberg_override_query_template( $template, $type, array $templates =
  * @return string Path to the canvas file to include.
  */
 function gutenberg_find_template( $template_file ) {
-	global $_wp_current_template_post, $_wp_current_template_hierarchy;
+	global $_wp_current_template_content, $_wp_current_template_hierarchy;
 
 	// Bail if no relevant template hierarchy was determined, or if the template file
 	// was overridden another way.
@@ -105,8 +105,8 @@ function gutenberg_find_template( $template_file ) {
 	);
 
 	if ( $template_query->have_posts() ) {
-		$template_posts            = $template_query->get_posts();
-		$_wp_current_template_post = array_shift( $template_posts );
+		$template_posts        = $template_query->get_posts();
+		$current_template_post = array_shift( $template_posts );
 
 		// Build map of template slugs to their priority in the current hierarchy.
 		$slug_priorities = array();
@@ -122,7 +122,7 @@ function gutenberg_find_template( $template_file ) {
 			if (
 				isset( $theme_block_template_priority ) &&
 				$theme_block_template_priority < $higher_priority_block_template_priority &&
-				$theme_block_template_priority < $slug_priorities[ $_wp_current_template_post->post_name ]
+				$theme_block_template_priority < $slug_priorities[ $current_template_post->post_name ]
 			) {
 				$higher_priority_block_template_path     = $path;
 				$higher_priority_block_template_priority = $theme_block_template_priority;
@@ -132,18 +132,28 @@ function gutenberg_find_template( $template_file ) {
 		// If there is, use it instead.
 		if ( isset( $higher_priority_block_template_path ) ) {
 			$post_name                 = basename( $path, '.html' );
-			$_wp_current_template_post = get_post(
-				wp_insert_post(
-					array(
-						'post_content' => file_get_contents( $higher_priority_block_template_path ),
-						'post_title'   => ucfirst( $post_name ),
-						'post_status'  => 'auto-draft',
-						'post_type'    => 'wp_template',
-						'post_name'    => $post_name,
-					)
-				)
+			$current_template_post = array(
+				'post_content' => file_get_contents( $higher_priority_block_template_path ),
+				'post_title'   => ucfirst( $post_name ),
+				'post_status'  => 'auto-draft',
+				'post_type'    => 'wp_template',
+				'post_name'    => $post_name,
 			);
+			if ( is_admin() ) {
+				// Only create auto-draft of block template for editing
+				// in admin screens, similarly to how we do it for new
+				// posts in the editor.
+				$current_template_post = get_post(
+					wp_insert_post( $current_template_post )
+				);
+			} else {
+				$current_template_post = new WP_Post(
+					(object) $current_template_post
+				);
+			}
 		}
+
+		$_wp_current_template_content = $current_template_post->post_content;
 	}
 
 	// Add extra hooks for template canvas.
@@ -168,17 +178,15 @@ function gutenberg_render_title_tag() {
  * Renders the markup for the current template.
  */
 function gutenberg_render_the_template() {
-	global $_wp_current_template_post;
+	global $_wp_current_template_content;
 	global $wp_embed;
 
-	if ( ! $_wp_current_template_post || 'wp_template' !== $_wp_current_template_post->post_type ) {
+	if ( ! $_wp_current_template_content ) {
 		echo '<h1>' . esc_html__( 'No matching template found', 'gutenberg' ) . '</h1>';
 		return;
 	}
 
-	$content = $_wp_current_template_post->post_content;
-
-	$content = $wp_embed->run_shortcode( $content );
+	$content = $wp_embed->run_shortcode( $_wp_current_template_content );
 	$content = $wp_embed->autoembed( $content );
 	$content = do_blocks( $content );
 	$content = wptexturize( $content );
