@@ -86,7 +86,7 @@ export class UnsupportedBlockEdit extends Component {
 		const titleStyle = getStylesFromColorScheme( styles.unsupportedBlockMessage, styles.unsupportedBlockMessageDark );
 
 		const subTitleStyle = getStylesFromColorScheme( styles.unsupportedBlockSubtitle, styles.unsupportedBlockSubtitleDark );
-		const subtitle = blockType ? <Text style={ subTitleStyle }>{ __( 'Unsupported' ) }</Text> : null;
+		const subtitle = <Text style={ subTitleStyle }>{ __( 'Unsupported' ) }</Text>;
 
 		const icon = blockType ? normalizeIconObject( blockType.settings.icon ) : 'admin-plugins';
 		const iconStyle = getStylesFromColorScheme( styles.unsupportedBlockIcon, styles.unsupportedBlockIconDark );
