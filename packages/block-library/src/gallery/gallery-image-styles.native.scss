@@ -1,0 +1,57 @@
+.container {
+  flex: 1;
+  height: 150px;
+}
+
+.image {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 5px;
+  border-width: 3px;
+}
+
+.button {
+  width: 30px;
+}
+
+.moverButtons {
+  flex-direction: row;
+  align-items: center;
+  border-radius: 3px;
+  background-color: #2e4453;
+}
+
+.separator {
+  border-right-color: gray;
+  // border-right-width: StyleSheet.hairlineWidth;
+  border-right-width: 1px;
+  height: 20px;
+}
+
+.removeButton {
+  width: 30px;
+  border-radius: 30px;
+}
+
+.toolbar {
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.caption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
