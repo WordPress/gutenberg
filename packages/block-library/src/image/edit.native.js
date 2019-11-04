@@ -141,7 +141,6 @@ export class ImageEdit extends React.Component {
 		} else if ( attributes.id && ! isURL( attributes.url ) ) {
 			requestImageFailedRetryDialog( attributes.id );
 		}
-		// eslint-disable-next-line no-undef
 		const enableFullscreen = Platform.OS === 'ios';
 		this.setState( {
 			isCaptionSelected: false,
