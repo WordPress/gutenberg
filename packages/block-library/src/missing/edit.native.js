@@ -67,7 +67,7 @@ export class UnsupportedBlockEdit extends Component {
 			<View style={ styles.infoContainer } >
 				<Icon icon="editor-help" style={ styles.infoIcon } size={ styles.infoIcon.size } />
 				<Text style={ [ styles.infoText, styles.infoTitle ] }>
-					{ __( title + ' isn\'t yet supported on WordPress for ' + platformText ) }
+					{ __( '\'' + title + '\' isn\'t yet supported on WordPress for ' + platformText ) }
 				</Text>
 				<Text style={ [ styles.infoText, styles.infoDescription ] }>
 					{ __( 'We are working hard to add more blocks with each release. In the meantime, you can also edit this post on the web.' ) }

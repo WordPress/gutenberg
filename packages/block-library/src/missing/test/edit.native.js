@@ -64,7 +64,7 @@ describe( 'Missing block', () => {
 			const testInstance = component.root;
 			const bottomSheet = testInstance.findByType( BottomSheet );
 			const children = bottomSheet.props.children.props.children;
-			expect( children[ 1 ].props.children ).toBe( defaultAttributes.originalName + ' isn\'t yet supported on WordPress for iOS' );
+			expect( children[ 1 ].props.children ).toBe( '\'' + defaultAttributes.originalName + '\' isn\'t yet supported on WordPress for iOS' );
 		} );
 
 		it( 'renders close button on modal', () => {
