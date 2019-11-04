@@ -11,6 +11,7 @@ import PreFormatted from '../edit';
 /**
  * WordPress dependencies
  */
+jest.mock( '@wordpress/blocks' );
 
 const getTestComponentWithContent = ( content ) => {
 	return shallow(
@@ -24,11 +25,6 @@ const getTestComponentWithContent = ( content ) => {
 describe( 'Preformatted', () => {
 	it( 'renders without crashing', () => {
 		const component = renderer.create( getTestComponentWithContent( '' ) );
-		expect( component.exists() ).toBe( true );
-	} );
-
-	it( 'renders given text without crashing', () => {
-		const component = renderer.create( getTestComponentWithContent( 'Hello world!' ) );
 		expect( component.exists() ).toBe( true );
 	} );
 } );
