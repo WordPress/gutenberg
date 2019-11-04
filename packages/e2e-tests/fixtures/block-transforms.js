@@ -368,6 +368,13 @@ export const EXPECTED_TRANSFORMS = {
 			'Group',
 		],
 	},
+	'core__pullquote__main-color': {
+		originalBlock: 'Pullquote',
+		availableTransforms: [
+			'Quote',
+			'Group',
+		],
+	},
 	'core__pullquote__multi-paragraph': {
 		originalBlock: 'Pullquote',
 		availableTransforms: [
