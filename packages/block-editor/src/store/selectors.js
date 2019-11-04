@@ -1036,6 +1036,9 @@ const canInsertBlockTypeUnmemoized = ( state, blockName, rootClientId = null ) =
 			return list;
 		}
 		if ( isArray( list ) ) {
+			if ( includes( list, 'root' ) && item === null ) {
+				return true;
+			}
 			return includes( list, item );
 		}
 		return defaultResult;
