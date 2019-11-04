@@ -66,7 +66,7 @@ class GalleryImage extends Component {
 
 		if ( this.state.isUploadInProgress ) {
 			requestImageUploadCancelDialog( id );
-		} else if ( ( this.state.didUploadFail ) || id && ! isURL( url ) ) {
+		} else if ( ( this.state.didUploadFail ) || ( id && ! isURL( url ) ) ) {
 			requestImageFailedRetryDialog( id );
 		}
 	}
@@ -128,7 +128,7 @@ class GalleryImage extends Component {
 
 	renderContent( params ) {
 		const {
-			url, alt, isFirstItem, isLastItem, isSelected, caption, onRemove,
+			url, isFirstItem, isLastItem, isSelected, caption, onRemove,
 			onMoveForward, onMoveBackward, setAttributes, 'aria-label': ariaLabel,
 			isCropped } = this.props;
 
@@ -162,13 +162,13 @@ class GalleryImage extends Component {
 				{ isUploadFailed && (
 					<View style={ styles.uploadFailedContainer }>
 						<View style={ styles.uploadFailed }>
-							<Icon icon={ "warning" } { ...styles.uploadFailedIcon } />
+							<Icon icon={ 'warning' } { ...styles.uploadFailedIcon } />
 						</View>
 						<Text style={ styles.uploadFailedText }>{ retryMessage }</Text>
 					</View>
 				) }
 				<View style={ overlayStyle }>
-				{ ! isUploadInProgress && (
+					{ ! isUploadInProgress && (
 					<>
 						{ isSelected && (
 							<View style={ styles.toolbar }>
@@ -214,14 +214,14 @@ class GalleryImage extends Component {
 							</View>
 						) }
 					</>
-				) }
+					) }
 				</View>
 			</>
 		);
 	}
 
 	render() {
-		const { url, id, isBlockSelected, onRemove } = this.props;
+		const { id, isBlockSelected, onRemove } = this.props;
 
 		return (
 			<TouchableWithoutFeedback
