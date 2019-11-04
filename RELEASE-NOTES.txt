@@ -1,6 +1,6 @@
 1.16.0
 ------
-* Add support for pexels images
+* [Android] Add support for pexels images
 * Add left, center, and right image alignment controls
 
 1.15.2
