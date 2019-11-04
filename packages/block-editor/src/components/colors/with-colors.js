@@ -49,7 +49,7 @@ const withEditorColorPalette = () => withSelect( ( select ) => {
  * @param {Array}    colorTypes       An array of color types (e.g. 'backgroundColor, borderColor).
  * @param {Function} withColorPalette A HOC for injecting the 'colors' prop into the WrappedComponent.
  *
- * @return {WPComponent} The component that can be used as a HOC.
+ * @return {Component} The component that can be used as a HOC.
  */
 function createColorHOC( colorTypes, withColorPalette ) {
 	const colorMap = reduce( colorTypes, ( colorObject, colorType ) => {

@@ -12,7 +12,7 @@ import { Component } from '@wordpress/element';
  * @param {Object} args Keyword args.
  * @param {HTMLDocument} args.htmlDocument The document to lock the scroll for.
  * @param {string} args.className The name of the class used to lock scrolling.
- * @return {WPComponent} The bound ScrollLock component.
+ * @return {Component} The bound ScrollLock component.
  */
 export function createScrollLockComponent( {
 	htmlDocument = document,

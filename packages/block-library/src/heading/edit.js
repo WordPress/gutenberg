@@ -12,37 +12,49 @@ import HeadingToolbar from './heading-toolbar';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PanelBody, withFallbackStyles } from '@wordpress/components';
+import { PanelBody } from '@wordpress/components';
+import { compose } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
 import {
 	AlignmentToolbar,
 	BlockControls,
 	InspectorControls,
 	RichText,
-	__experimentalUseColors,
+	withColors,
+	PanelColorSettings,
 } from '@wordpress/block-editor';
+import { memo } from '@wordpress/element';
 
-/**
- * Browser dependencies
- */
-const { getComputedStyle } = window;
+const HeadingColorUI = memo(
+	function( {
+		textColorValue,
+		setTextColor,
+	} ) {
+		return (
+			<PanelColorSettings
+				title={ __( 'Color Settings' ) }
+				initialOpen={ false }
+				colorSettings={ [
+					{
+						value: textColorValue,
+						onChange: setTextColor,
+						label: __( 'Text Color' ),
+					},
+				] }
+			/>
+		);
+	}
+);
 
 function HeadingEdit( {
-	backgroundColor,
 	attributes,
 	setAttributes,
 	mergeBlocks,
 	onReplace,
 	className,
+	textColor,
+	setTextColor,
 } ) {
-	const { TextColor, InspectorControlsColorPanel } = __experimentalUseColors(
-		[ { name: 'textColor', property: 'color' } ],
-		{
-			contrastCheckerProps: { backgroundColor, isLargeText: true },
-		},
-		[]
-	);
-
 	const { align, content, level, placeholder } = attributes;
 	const tagName = 'h' + level;
 
@@ -59,42 +71,43 @@ function HeadingEdit( {
 					<p>{ __( 'Level' ) }</p>
 					<HeadingToolbar isCollapsed={ false } minLevel={ 1 } maxLevel={ 7 } selectedLevel={ level } onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) } />
 				</PanelBody>
-			</InspectorControls>
-			{ InspectorControlsColorPanel }
-			<TextColor>
-				<RichText
-					identifier="content"
-					tagName={ tagName }
-					value={ content }
-					onChange={ ( value ) => setAttributes( { content: value } ) }
-					onMerge={ mergeBlocks }
-					onSplit={ ( value ) => {
-						if ( ! value ) {
-							return createBlock( 'core/paragraph' );
-						}
-
-						return createBlock( 'core/heading', {
-							...attributes,
-							content: value,
-						} );
-					} }
-					onReplace={ onReplace }
-					onRemove={ () => onReplace( [] ) }
-					className={ classnames( className, {
-						[ `has-text-align-${ align }` ]: align,
-					} ) }
-					placeholder={ placeholder || __( 'Write heading…' ) }
+				<HeadingColorUI
+					setTextColor={ setTextColor }
+					textColorValue={ textColor.color }
 				/>
-			</TextColor>
+			</InspectorControls>
+			<RichText
+				identifier="content"
+				tagName={ tagName }
+				value={ content }
+				onChange={ ( value ) => setAttributes( { content: value } ) }
+				onMerge={ mergeBlocks }
+				onSplit={ ( value ) => {
+					if ( ! value ) {
+						return createBlock( 'core/paragraph' );
+					}
+
+					return createBlock( 'core/heading', {
+						...attributes,
+						content: value,
+					} );
+				} }
+				onReplace={ onReplace }
+				onRemove={ () => onReplace( [] ) }
+				className={ classnames( className, {
+					[ `has-text-align-${ align }` ]: align,
+					'has-text-color': textColor.color,
+					[ textColor.class ]: textColor.class,
+				} ) }
+				placeholder={ placeholder || __( 'Write heading…' ) }
+				style={ {
+					color: textColor.color,
+				} }
+			/>
 		</>
 	);
 }
 
-export default withFallbackStyles( ( node ) => {
-	let backgroundColor = getComputedStyle( node ).backgroundColor;
-	while ( backgroundColor === 'rgba(0, 0, 0, 0)' && node.parentNode ) {
-		node = node.parentNode;
-		backgroundColor = getComputedStyle( node ).backgroundColor;
-	}
-	return { backgroundColor };
-} )( HeadingEdit );
+export default compose( [
+	withColors( 'backgroundColor', { textColor: 'color' } ),
+] )( HeadingEdit );

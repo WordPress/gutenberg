@@ -6,18 +6,12 @@ import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { InspectorControls } from '@wordpress/block-editor';
 
-/**
- * Internal dependencies
- */
-import styles from './container.native.scss';
-
 function BottomSheetSettings( { editorSidebarOpened, closeGeneralSidebar, ...props } ) {
 	return (
 		<BottomSheet
 			isVisible={ editorSidebarOpened }
 			onClose={ closeGeneralSidebar }
 			hideHeader
-			contentStyle={ styles.content }
 			{ ...props }
 		>
 			<InspectorControls.Slot	/>

@@ -27,24 +27,12 @@
 }
 
 .unsupportedBlockMessage {
-	margin-top: 4;
+	margin-top: 2;
 	text-align: center;
 	color: $gray-dark;
 	font-size: 14;
-	font-weight: 600;
 }
 
 .unsupportedBlockMessageDark {
 	color: $white;
-}
-
-.unsupportedBlockSubtitle {
-	margin-top: 2;
-	text-align: center;
-	color: $gray-darken-20;
-	font-size: 12;
-}
-
-.unsupportedBlockSubtitleDark {
-	color: $gray-20;
 }

@@ -14,9 +14,6 @@
 			"__unstableMultilineWrapperTags": [ "ol", "ul" ],
 			"default": ""
 		},
-		"type": {
-			"type": "string"
-		},
 		"start": {
 			"type": "number"
 		},

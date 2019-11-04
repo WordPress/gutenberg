@@ -47,7 +47,7 @@ export function* getCurrentUser() {
  * @param {string} name   Entity name.
  * @param {number} key    Record's key
  */
-export function* getEntityRecord( kind, name, key = '' ) {
+export function* getEntityRecord( kind, name, key ) {
 	const entities = yield getKindEntities( kind );
 	const entity = find( entities, { kind, name } );
 	if ( ! entity ) {

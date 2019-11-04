@@ -19,7 +19,9 @@ export {
 } from './components/registry-provider';
 export { default as useSelect } from './components/use-select';
 export { useDispatch } from './components/use-dispatch';
-export { AsyncModeProvider } from './components/async-mode-provider';
+export {
+	AsyncModeProvider as __experimentalAsyncModeProvider,
+} from './components/async-mode-provider';
 export { createRegistry } from './registry';
 export { createRegistrySelector, createRegistryControl } from './factory';
 

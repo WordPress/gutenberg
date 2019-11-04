@@ -53,17 +53,6 @@ export default function EntityProvider( { kind, type, id, children } ) {
 }
 
 /**
- * Hook that returns the ID for the nearest
- * provided entity of the specified type.
- *
- * @param {string} kind The entity kind.
- * @param {string} type The entity type.
- */
-export function useEntityId( kind, type ) {
-	return useContext( getEntity( kind, type ).context );
-}
-
-/**
  * Hook that returns the value and a setter for the
  * specified property of the nearest provided
  * entity of the specified type.
@@ -77,13 +66,11 @@ export function useEntityId( kind, type ) {
  *                          setter.
  */
 export function useEntityProp( kind, type, prop ) {
-	const id = useEntityId( kind, type );
+	const id = useContext( getEntity( kind, type ).context );
 
 	const value = useSelect(
 		( select ) => {
-			const { getEntityRecord, getEditedEntityRecord } = select( 'core' );
-			getEntityRecord( kind, type, id ); // Trigger resolver.
-			const entity = getEditedEntityRecord( kind, type, id );
+			const entity = select( 'core' ).getEditedEntityRecord( kind, type, id );
 			return entity && entity[ prop ];
 		},
 		[ kind, type, id, prop ]
@@ -100,63 +87,4 @@ export function useEntityProp( kind, type, prop ) {
 	);
 
 	return [ value, setValue ];
-}
-
-/**
- * Hook that returns whether the nearest provided
- * entity of the specified type is dirty, saving,
- * and a function to save it.
- *
- * The last, optional parameter is for scoping the
- * selection to a single property or a list properties.
- *
- * By default, dirtyness detection and saving considers
- * and handles all properties of an entity, but this
- * last parameter lets you scope it to a single property
- * or a list of properties for each instance of this hook.
- *
- * @param {string}          kind    The entity kind.
- * @param {string}          type    The entity type.
- * @param {string|[string]} [props] The property name or list of property names.
- */
-export function __experimentalUseEntitySaving( kind, type, props ) {
-	const id = useEntityId( kind, type );
-
-	const [ isDirty, isSaving, edits ] = useSelect(
-		( select ) => {
-			const { getEntityRecordNonTransientEdits, isSavingEntityRecord } = select(
-				'core'
-			);
-			const _edits = getEntityRecordNonTransientEdits( kind, type, id );
-			const editKeys = Object.keys( _edits );
-			return [
-				props ?
-					editKeys.some( ( key ) =>
-						typeof props === 'string' ? key === props : props.includes( key )
-					) :
-					editKeys.length > 0,
-				isSavingEntityRecord( kind, type, id ),
-				_edits,
-			];
-		},
-		[ kind, type, id, props ]
-	);
-
-	const { saveEntityRecord } = useDispatch( 'core' );
-	const save = useCallback( () => {
-		let filteredEdits = edits;
-		if ( typeof props === 'string' ) {
-			filteredEdits = { [ props ]: filteredEdits[ props ] };
-		} else if ( props ) {
-			filteredEdits = filteredEdits.reduce( ( acc, key ) => {
-				if ( props.includes( key ) ) {
-					acc[ key ] = filteredEdits[ key ];
-				}
-				return acc;
-			}, {} );
-		}
-		saveEntityRecord( kind, type, { id, ...filteredEdits } );
-	}, [ kind, type, id, props, edits ] );
-
-	return [ isDirty, isSaving, save ];
 }

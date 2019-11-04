@@ -80,11 +80,11 @@ _Parameters_
 
 -   _state_ `Object`: Global application state.
 -   _preferenceKey_ `string`: Preference Key.
--   _defaultValue_ `*`: Default Value.
+-   _defaultValue_ `Mixed`: Default Value.
 
 _Returns_
 
--   `*`: Preference Value.
+-   `Mixed`: Preference Value.
 
 <a name="getPreferences" href="#getPreferences">#</a> **getPreferences**
 

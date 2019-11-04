@@ -40,16 +40,16 @@ describe( 'Image Block', () => {
 
 		instance.onSetNewTab( true );
 
-		expect( setAttributes ).toHaveBeenCalledWith( { linkTarget: '_blank', rel: undefined } );
+		expect( setAttributes ).toBeCalledWith( { linkTarget: '_blank', rel: NEW_TAB_REL } );
 	} );
 
 	it( 'unset link target', () => {
-		const component = renderer.create( getImageComponent( { linkTarget: '_blank', rel: NEW_TAB_REL.join( ' ' ) } ) );
+		const component = renderer.create( getImageComponent( { linkTarget: '_blank', rel: NEW_TAB_REL } ) );
 		const instance = component.getInstance();
 
 		instance.onSetNewTab( false );
 
-		expect( setAttributes ).toHaveBeenCalledWith( { linkTarget: undefined, rel: undefined } );
+		expect( setAttributes ).toBeCalledWith( { linkTarget: undefined, rel: undefined } );
 	} );
 } );
 

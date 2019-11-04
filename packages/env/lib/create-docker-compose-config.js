@@ -1,18 +1,17 @@
 module.exports = function createDockerComposeConfig(
-	cwd,
-	cwdName,
-	cwdTestsPath,
-	context
+	pluginPath,
+	pluginName,
+	pluginTestsPath
 ) {
 	const commonVolumes = `
-      - ${ cwd }/:/var/www/html/wp-content/${ context.type }s/${ cwdName }/
-      - ${ cwd }${ cwdTestsPath }/e2e-tests/mu-plugins/:/var/www/html/wp-content/mu-plugins/
-      - ${ cwd }${ cwdTestsPath }/e2e-tests/plugins/:/var/www/html/wp-content/plugins/${ cwdName }-test-plugins/`;
+      - ${ pluginPath }/:/var/www/html/wp-content/plugins/${ pluginName }/
+      - ${ pluginPath }${ pluginTestsPath }/e2e-tests/mu-plugins/:/var/www/html/wp-content/mu-plugins/
+      - ${ pluginPath }${ pluginTestsPath }/e2e-tests/plugins/:/var/www/html/wp-content/plugins/${ pluginName }-test-plugins/`;
 	const volumes = `
-      - ${ cwd }/../${ cwdName }-wordpress/:/var/www/html/${ commonVolumes }`;
+      - ${ pluginPath }/../${ pluginName }-wordpress/:/var/www/html/${ commonVolumes }`;
 	const testsVolumes = `
       - tests-wordpress:/var/www/html/${ commonVolumes }`;
-	return `version: '2.1'
+	return `version: '2'
 volumes:
   tests-wordpress:
 services:
@@ -29,7 +28,7 @@ services:
       WORDPRESS_DB_PASSWORD: password
     image: wordpress
     ports:
-      - \${WP_ENV_PORT:-8888}:80
+      - 8888:80
     volumes:${ volumes }
   wordpress-cli:
     depends_on:
@@ -45,7 +44,7 @@ services:
       WORDPRESS_DB_PASSWORD: password
     image: wordpress
     ports:
-      - \${WP_ENV_TESTS_PORT:-8889}:80
+      - 8889:80
     volumes:${ testsVolumes }
   tests-wordpress-cli:
     depends_on:

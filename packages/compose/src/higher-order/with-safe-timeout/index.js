@@ -17,9 +17,9 @@ import createHigherOrderComponent from '../../utils/create-higher-order-componen
  * A higher-order component used to provide and manage delayed function calls
  * that ought to be bound to a component's lifecycle.
  *
- * @param {WPComponent} OriginalComponent Component requiring setTimeout
+ * @param {Component} OriginalComponent Component requiring setTimeout
  *
- * @return {WPComponent} Wrapped component.
+ * @return {Component}                  Wrapped component.
  */
 const withSafeTimeout = createHigherOrderComponent(
 	( OriginalComponent ) => {

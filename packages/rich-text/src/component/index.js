@@ -35,7 +35,6 @@ import { indentListItems } from '../indent-list-items';
 import { getActiveFormats } from '../get-active-formats';
 import { updateFormats } from '../update-formats';
 import { removeLineSeparator } from '../remove-line-separator';
-import { isEmptyLine } from '../is-empty';
 
 /**
  * Browser dependencies
@@ -205,7 +204,7 @@ class RichText extends Component {
 	 *
 	 * Saves the pasted data as plain text in `pastedPlainText`.
 	 *
-	 * @param {ClipboardEvent} event The paste event.
+	 * @param {PasteEvent} event The paste event.
 	 */
 	onPaste( event ) {
 		const { formatTypes, onPaste } = this.props;
@@ -259,32 +258,18 @@ class RichText extends Component {
 		}
 
 		if ( onPaste ) {
-			files = Array.from( files );
-
-			Array.from( items ).forEach( ( item ) => {
-				if ( ! item.getAsFile ) {
-					return;
-				}
-
-				const file = item.getAsFile();
-
-				if ( ! file ) {
-					return;
-				}
-
-				const { name, type, size } = file;
-
-				if ( ! find( files, { name, type, size } ) ) {
-					files.push( file );
-				}
-			} );
+			// Only process file if no HTML is present.
+			// Note: a pasted file may have the URL as plain text.
+			const image = find( [ ...items, ...files ], ( { type } ) =>
+				/^image\/(?:jpe?g|png|gif)$/.test( type )
+			);
 
 			onPaste( {
 				value: this.removeEditorOnlyFormats( record ),
 				onChange: this.onChange,
 				html,
 				plainText,
-				files,
+				image,
 			} );
 		}
 	}
@@ -352,7 +337,7 @@ class RichText extends Component {
 	/**
 	 * Handle input on the next selection change event.
 	 *
-	 * @param {WPSyntheticEvent} event Synthetic input event.
+	 * @param {SyntheticEvent} event Synthetic input event.
 	 */
 	onInput( event ) {
 		// For Input Method Editor (IME), used in Chinese, Japanese, and Korean
@@ -452,7 +437,7 @@ class RichText extends Component {
 	 * native events, `keyup`, `mouseup` and `touchend` synthetic events, and
 	 * animation frames after the `focus` event.
 	 *
-	 * @param {Event|WPSyntheticEvent|DOMHighResTimeStamp} event
+	 * @param {Event|SyntheticEvent|DOMHighResTimeStamp} event
 	 */
 	onSelectionChange( event ) {
 		if (
@@ -594,7 +579,7 @@ class RichText extends Component {
 	 * - delete content if everything is selected,
 	 * - trigger the onDelete prop when selection is uncollapsed and at an edge.
 	 *
-	 * @param {WPSyntheticEvent} event A synthetic keyboard event.
+	 * @param {SyntheticEvent} event A synthetic keyboard event.
 	 */
 	handleDelete( event ) {
 		const { keyCode } = event;
@@ -619,28 +604,19 @@ class RichText extends Component {
 		const { start, end, text } = value;
 		const isReverse = keyCode === BACKSPACE;
 
+		if ( multilineTag ) {
+			const newValue = removeLineSeparator( value, isReverse );
+			if ( newValue ) {
+				this.onChange( newValue );
+				event.preventDefault();
+			}
+		}
+
 		// Always handle full content deletion ourselves.
 		if ( start === 0 && end !== 0 && end === text.length ) {
 			this.onChange( remove( value ) );
 			event.preventDefault();
 			return;
-		}
-
-		if ( multilineTag ) {
-			let newValue;
-
-			// Check to see if we should remove the first item if empty.
-			if ( isReverse && value.start === 0 && value.end === 0 && isEmptyLine( value ) ) {
-				newValue = removeLineSeparator( value, ! isReverse );
-			} else {
-				newValue = removeLineSeparator( value, isReverse );
-			}
-
-			if ( newValue ) {
-				this.onChange( newValue );
-				event.preventDefault();
-				return;
-			}
 		}
 
 		// Only process delete if the key press occurs at an uncollapsed edge.
@@ -661,7 +637,7 @@ class RichText extends Component {
 	/**
 	 * Triggers the `onEnter` prop on keydown.
 	 *
-	 * @param {WPSyntheticEvent} event A synthetic keyboard event.
+	 * @param {SyntheticEvent} event A synthetic keyboard event.
 	 */
 	handleEnter( event ) {
 		if ( event.keyCode !== ENTER ) {
@@ -686,7 +662,7 @@ class RichText extends Component {
 	/**
 	 * Indents list items on space keydown.
 	 *
-	 * @param {WPSyntheticEvent} event A synthetic keyboard event.
+	 * @param {SyntheticEvent} event A synthetic keyboard event.
 	 */
 	handleSpace( event ) {
 		const { keyCode, shiftKey, altKey, metaKey, ctrlKey } = event;
@@ -723,7 +699,7 @@ class RichText extends Component {
 	 * navigation is handled separately to move correctly around format
 	 * boundaries.
 	 *
-	 * @param {WPSyntheticEvent} event A synthetic keyboard event.
+	 * @param  {SyntheticEvent} event A synthetic keyboard event.
 	 */
 	handleHorizontalNavigation( event ) {
 		const { keyCode, shiftKey, altKey, metaKey, ctrlKey } = event;
@@ -829,7 +805,7 @@ class RichText extends Component {
 	 * Select object when they are clicked. The browser will not set any
 	 * selection when clicking e.g. an image.
 	 *
-	 * @param {WPSyntheticEvent} event Synthetic mousedown or touchstart event.
+	 * @param  {SyntheticEvent} event Synthetic mousedown or touchstart event.
 	 */
 	onPointerDown( event ) {
 		const { target } = event;

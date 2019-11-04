@@ -32,7 +32,7 @@ export default function ListEdit( {
 	onReplace,
 	className,
 } ) {
-	const { ordered, values, type, reversed, start } = attributes;
+	const { ordered, values, reversed, start } = attributes;
 	const tagName = ordered ? 'ol' : 'ul';
 
 	const controls = ( { value, onChange } ) => (
@@ -124,13 +124,12 @@ export default function ListEdit( {
 			className={ className }
 			placeholder={ __( 'Write list…' ) }
 			onMerge={ mergeBlocks }
-			onSplit={ ( value ) => createBlock( name, { ...attributes, values: value } ) }
+			onSplit={ ( value ) => createBlock( name, { ordered, values: value } ) }
 			__unstableOnSplitMiddle={ () => createBlock( 'core/paragraph' ) }
 			onReplace={ onReplace }
 			onRemove={ () => onReplace( [] ) }
 			start={ start }
 			reversed={ reversed }
-			type={ type }
 		>
 			{ controls }
 		</RichText>

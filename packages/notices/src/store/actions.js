@@ -9,17 +9,6 @@ import { uniqueId } from 'lodash';
 import { DEFAULT_CONTEXT, DEFAULT_STATUS } from './constants';
 
 /**
- * @typedef {Object} WPNoticeAction Object describing a user action option associated with a notice.
- *
- * @property {string}    label    Message to use as action label.
- * @property {?string}   url      Optional URL of resource if action incurs
- *                                browser navigation.
- * @property {?Function} onClick  Optional function to invoke when action is
- *                                triggered by user.
- *
- */
-
-/**
  * Yields action objects used in signalling that a notice is to be created.
  *
  * @param {string}                [status='info']              Notice status.

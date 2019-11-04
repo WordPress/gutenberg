@@ -287,9 +287,4 @@ describe( 'rawHandler', () => {
 		const HTML = readFile( path.join( __dirname, 'fixtures/shortcode-caption-with-caption-link.html' ) );
 		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
 	} );
-
-	it( 'should convert a list with attributes', () => {
-		const HTML = readFile( path.join( __dirname, 'fixtures/list-with-attributes.html' ) );
-		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
-	} );
 } );

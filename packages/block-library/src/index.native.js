@@ -96,9 +96,9 @@ export const coreBlocks = [
 	textColumns,
 	verse,
 	video,
-].reduce( ( accumulator, block ) => {
-	accumulator[ block.name ] = block;
-	return accumulator;
+].reduce( ( memo, block ) => {
+	memo[ block.name ] = block;
+	return memo;
 }, {} );
 
 /**

@@ -14,9 +14,9 @@ import { createHigherOrderComponent } from '@wordpress/compose';
  * A Higher Order Component used to be provide a unique instance ID by
  * component.
  *
- * @param {WPComponent} WrappedComponent  The wrapped component.
+ * @param {WPElement} WrappedComponent  The wrapped component.
  *
- * @return {WPComponent} The component to be rendered.
+ * @return {Component} Component with an instanceId prop.
  */
 export default createHigherOrderComponent( ( WrappedComponent ) => {
 	return class extends Component {

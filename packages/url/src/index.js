@@ -360,10 +360,6 @@ export function removeQueryArgs( url, ...args ) {
  * @return {string} The updated URL.
  */
 export function prependHTTP( url ) {
-	if ( ! url ) {
-		return url;
-	}
-
 	url = url.trim();
 	if ( ! USABLE_HREF_REGEXP.test( url ) && ! EMAIL_REGEXP.test( url ) ) {
 		return 'http://' + url;

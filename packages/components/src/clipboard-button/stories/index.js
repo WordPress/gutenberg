@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { boolean, text } from '@storybook/addon-knobs';
-
-/**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
@@ -13,30 +8,18 @@ import { useState } from '@wordpress/element';
  */
 import ClipboardButton from '../';
 
-export default { title: 'ClipboardButton', component: ClipboardButton };
+export default { title: 'Clipboard Button', component: ClipboardButton };
 
-const ClipboardButtonWithState = ( { copied, ...props } ) => {
-	const [ isCopied, setCopied ] = useState( copied );
-
+export const _default = () => {
+	const [ copied, setCopied ] = useState( false );
 	return (
 		<ClipboardButton
-			{ ...props }
+			isPrimary
+			text="Text"
 			onCopy={ () => setCopied( true ) }
 			onFinishCopy={ () => setCopied( false ) }
 		>
-			{ isCopied ? 'Copied!' : `Copy "${ props.text }"` }
+			{ copied ? 'Copied!' : 'Copy "Text"' }
 		</ClipboardButton>
-	);
-};
-
-export const _default = () => {
-	const isPrimary = boolean( 'Is primary', true );
-	const copyText = text( 'Text', 'Text' );
-
-	return (
-		<ClipboardButtonWithState
-			isPrimary={ isPrimary }
-			text={ copyText }
-		/>
 	);
 };

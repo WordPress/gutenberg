@@ -49,9 +49,4 @@ registerStore( REDUCER_KEY, {
 	resolvers: { ...resolvers, ...entityResolvers },
 } );
 
-export {
-	default as EntityProvider,
-	useEntityId,
-	useEntityProp,
-	__experimentalUseEntitySaving,
-} from './entity-provider';
+export { default as EntityProvider, useEntityProp } from './entity-provider';

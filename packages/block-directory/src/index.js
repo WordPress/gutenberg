@@ -2,4 +2,5 @@
  * Internal dependencies
  */
 import './store';
-import './plugins';
+
+export { default as DownloadableBlocksPanel } from './components/downloadable-blocks-panel';

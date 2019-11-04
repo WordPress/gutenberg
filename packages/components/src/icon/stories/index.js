@@ -1,29 +1,19 @@
 /**
- * External dependencies
- */
-import { number, text } from '@storybook/addon-knobs';
-
-/**
  * Internal dependencies
  */
 import Icon from '../';
-import { SVG, Path } from '../../primitives/svg';
+import { SVG, Path } from '../../';
 
 export default { title: 'Icon', component: Icon };
 
 const IconSizeLabel = ( { size } ) => <div style={ { fontSize: 12 } }>{ size }px</div>;
 
-export const _default = () => {
-	const icon = text( 'Icon', 'screenoptions' );
-	const size = number( 'Size', '24' );
-
-	return (
-		<div>
-			<Icon icon={ icon } size={ size } />
-			<IconSizeLabel size={ size } />
-		</div>
-	);
-};
+export const _default = () => (
+	<div>
+		<Icon icon="screenoptions" />
+		<IconSizeLabel size={ 24 } />
+	</div>
+);
 
 export const sizes = () => {
 	const iconSizes = [ 14, 16, 20, 24, 28, 32, 40, 48, 56 ];

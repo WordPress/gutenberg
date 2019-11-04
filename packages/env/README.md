@@ -7,7 +7,7 @@
 ```sh
 $ npm -g i @wordpress/env
 
-$ cd path/to/plugin-or-theme # WordPress install will be in path/to/plugin-or-theme-wordpress.
+$ cd path/to/gutenberg # WordPress install will be in path/to/gutenberg-wordpress.
 
 $ wp-env --help
 
@@ -15,10 +15,8 @@ wp-env <command>
 
 Commands:
   wp-env start [ref]          Starts WordPress for development on port 8888
-                              (​http://localhost:8888​) (override with
-                              WP_ENV_PORT) and tests on port 8889
-                              (​http://localhost:8889​) (override with
-                              WP_ENV_TESTS_PORT). If the current working
+                              (​http://localhost:8888​) and tests on port 8889
+                              (​http://localhost:8889​). If the current working
                               directory is a plugin and/or has e2e-tests with
                               plugins and/or mu-plugins, they will be mounted
                               appropiately.
@@ -36,11 +34,10 @@ Options:
 ```sh
 wp-env start [ref]
 
-Starts WordPress for development on port 8888 (​http://localhost:8888​)
-(override with WP_ENV_PORT) and tests on port 8889 (​http://localhost:8889​)
-(override with WP_ENV_TESTS_PORT). If the current working directory is a plugin
-and/or has e2e-tests with plugins and/or mu-plugins, they will be mounted
-appropiately.
+Starts WordPress for development on port 8888 (​http://localhost:8888​) and
+tests on port 8889 (​http://localhost:8889​). If the current working directory
+is a plugin and/or has e2e-tests with plugins and/or mu-plugins, they will be
+mounted appropiately.
 
 Positionals:
   ref  A `https://github.com/WordPress/WordPress` git repo branch or commit for
@@ -66,5 +63,3 @@ Positionals:
   environment  Which environments' databases to clean.
             [string] [choices: "all", "development", "tests"] [default: "tests"]
 ```
-
-<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

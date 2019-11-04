@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { registerCoreBlocks } from '@wordpress/block-library';
-import { createBlock, registerBlockType } from '@wordpress/blocks';
+import { createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -12,34 +12,6 @@ import segmentHTMLToShortcodeBlock from '../../packages/blocks/src/api/raw-handl
 describe( 'segmentHTMLToShortcodeBlock', () => {
 	beforeAll( () => {
 		registerCoreBlocks();
-		registerBlockType( 'test/gallery', {
-			title: 'Test Gallery',
-			category: 'common',
-			attributes: {
-				ids: {
-					type: 'array',
-					default: [],
-				},
-			},
-			transforms: {
-				from: [
-					{
-						type: 'shortcode',
-						tag: [ 'my-gallery', 'my-bunch-of-images' ],
-						attributes: {
-							ids: {
-								type: 'array',
-								shortcode: ( { named: { ids } } ) =>
-									ids.split( ',' ).map( ( id ) => (
-										parseInt( id, 10 )
-									) ),
-							},
-						},
-					},
-				],
-			},
-			save: () => null,
-		} );
 	} );
 
 	it( 'should convert a standalone shortcode between two paragraphs', () => {
@@ -128,16 +100,5 @@ describe( 'segmentHTMLToShortcodeBlock', () => {
 		expect( transformed[ 7 ] ).toEqual( fourthExpectedBlock );
 		expect( transformed[ 8 ] ).toEqual( '</p>' );
 		expect( transformed ).toHaveLength( 9 );
-	} );
-
-	it( 'should convert regardless of shortcode alias', () => {
-		const original = `<p>[my-gallery ids="1,2,3"]</p>
-<p>[my-bunch-of-images ids="4,5,6"]</p>`;
-		const transformed = segmentHTMLToShortcodeBlock( original, 0 );
-		expect( transformed[ 0 ] ).toBe( '<p>' );
-		expect( transformed[ 1 ] ).toHaveProperty( 'name', 'test/gallery' );
-		expect( transformed[ 2 ] ).toBe( '</p>\n<p>' );
-		expect( transformed[ 3 ] ).toHaveProperty( 'name', 'test/gallery' );
-		expect( transformed[ 4 ] ).toBe( '</p>' );
 	} );
 } );

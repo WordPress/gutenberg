@@ -32,13 +32,4 @@ define( 'GUTENBERG_LIST_VENDOR_ASSETS', true );
 
 require_once dirname( dirname( __FILE__ ) ) . '/lib/client-assets.php';
 
-/**
- * Hi, phpcs
- */
-function run_gutenberg_register_vendor_scripts() {
-	global $wp_scripts;
-
-	gutenberg_register_vendor_scripts( $wp_scripts );
-}
-
-run_gutenberg_register_vendor_scripts();
+gutenberg_register_vendor_scripts();

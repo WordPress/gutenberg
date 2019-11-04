@@ -60,7 +60,7 @@ function FontSizePicker( {
 	};
 
 	return (
-		<fieldset className="components-font-size-picker">
+		<fieldset>
 			<legend>
 				{ __( 'Font Size' ) }
 			</legend>

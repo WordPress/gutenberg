@@ -1,140 +1,93 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import { invoke } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { withSelect } from '@wordpress/data';
 import {
+	Dropdown,
 	ExternalLink,
+	IconButton,
 	PanelBody,
 	TextareaControl,
 	TextControl,
-	Toolbar,
 	ToggleControl,
-	ToolbarButton,
 } from '@wordpress/components';
-import {
-	LEFT,
-	RIGHT,
-	UP,
-	DOWN,
-	BACKSPACE,
-	ENTER,
-} from '@wordpress/keycodes';
 import { __ } from '@wordpress/i18n';
 import {
-	BlockControls,
 	InnerBlocks,
 	InspectorControls,
-	URLPopover,
+	PlainText,
 } from '@wordpress/block-editor';
 import {
 	Fragment,
+	useCallback,
 	useRef,
-	useState,
 } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import MenuItemActions from './menu-item-actions';
+const POPOVER_PROPS = { noArrow: true };
 
 function NavigationMenuItemEdit( {
 	attributes,
+	clientId,
 	isSelected,
 	isParentOfSelectedBlock,
 	setAttributes,
 } ) {
 	const plainTextRef = useRef( null );
-	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
-	const [ isEditingLink, setIsEditingLink ] = useState( false );
-	const [ urlInput, setUrlInput ] = useState( null );
-
-	const inputValue = urlInput !== null ? urlInput : url;
-
-	const onKeyDown = ( event ) => {
-		if ( [ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ].indexOf( event.keyCode ) > -1 ) {
-			// Stop the key event from propagating up to ObserveTyping.startTypingInTextField.
-			event.stopPropagation();
-		}
-	};
-
-	const closeURLPopover = () => {
-		setIsEditingLink( false );
-		setUrlInput( null );
-		setIsLinkOpen( false );
-	};
-
-	const autocompleteRef = useRef( null );
-
-	const onFocusOutside = ( event ) => {
-		const autocompleteElement = autocompleteRef.current;
-		if ( autocompleteElement && autocompleteElement.contains( event.target ) ) {
-			return;
-		}
-		closeURLPopover();
-	};
-
-	const stopPropagation = ( event ) => {
-		event.stopPropagation();
-	};
-
-	const { label, url } = attributes;
+	const onEditLableClicked = useCallback(
+		( onClose ) => () => {
+			onClose();
+			invoke( plainTextRef, [ 'current', 'textarea', 'focus' ] );
+		},
+		[ plainTextRef ]
+	);
 	let content;
 	if ( isSelected ) {
 		content = (
-			<TextControl
-				ref={ plainTextRef }
-				className="wp-block-navigation-menu-item__field"
-				value={ label }
-				onChange={ ( labelValue ) => setAttributes( { label: labelValue } ) }
-				label={ __( 'Navigation Label' ) }
-				hideLabelFromVision={ true }
-			/>
+			<div className="wp-block-navigation-menu-item__edit-container">
+				<PlainText
+					ref={ plainTextRef }
+					className="wp-block-navigation-menu-item__field"
+					value={ attributes.label }
+					onChange={ ( label ) => setAttributes( { label } ) }
+					aria-label={ __( 'Navigation Label' ) }
+					maxRows={ 1 }
+				/>
+				<Dropdown
+					contentClassName="wp-block-navigation-menu-item__dropdown-content"
+					position="bottom left"
+					popoverProps={ POPOVER_PROPS }
+					renderToggle={ ( { isOpen, onToggle } ) => (
+						<IconButton
+							icon={ isOpen ? 'arrow-up-alt2' : 'arrow-down-alt2' }
+							label={ __( 'More options' ) }
+							onClick={ onToggle }
+							aria-expanded={ isOpen }
+						/>
+					) }
+					renderContent={ ( { onClose } ) => (
+						<MenuItemActions
+							clientId={ clientId }
+							destination={ attributes.destination }
+							onEditLableClicked={ onEditLableClicked( onClose ) }
+						/>
+					) }
+				/>
+			</div>
 		);
 	} else {
-		content = <div className="wp-block-navigation-menu-item__container">
-			{ label }
-		</div>;
+		content = attributes.label;
 	}
-
 	return (
 		<Fragment>
-			<BlockControls>
-				<Toolbar>
-					<ToolbarButton
-						name="link"
-						icon="admin-links"
-						title={ __( 'Link' ) }
-						onClick={ () => setIsLinkOpen( ! isLinkOpen ) }
-					/>
-					{ isLinkOpen &&
-					<>
-						<URLPopover
-							className="wp-block-navigation-menu-item__inline-link-input"
-							onClose={ closeURLPopover }
-							onFocusOutside={ onFocusOutside }
-						>
-							{ ( ! url || isEditingLink ) &&
-							<URLPopover.LinkEditor
-								value={ inputValue }
-								onChangeInputValue={ setUrlInput }
-								onKeyPress={ stopPropagation }
-								onKeyDown={ onKeyDown }
-								onSubmit={ ( event ) => event.preventDefault() }
-								autocompleteRef={ autocompleteRef }
-							/>
-							}
-							{ ( url && ! isEditingLink ) &&
-								<URLPopover.LinkViewer
-									onKeyPress={ stopPropagation }
-									url={ url }
-								/>
-							}
-
-						</URLPopover>
-					</>
-					}
-				</Toolbar>
-			</BlockControls>
 			<InspectorControls>
 				<PanelBody
 					title={ __( 'Menu Settings' ) }
@@ -185,12 +138,7 @@ function NavigationMenuItemEdit( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<div className={ classnames(
-				'wp-block-navigation-menu-item', {
-					'is-editing': isSelected || isParentOfSelectedBlock,
-					'is-selected': isSelected,
-				} ) }
-			>
+			<div className="wp-block-navigation-menu-item">
 				{ content }
 				{ ( isSelected || isParentOfSelectedBlock ) &&
 					<InnerBlocks

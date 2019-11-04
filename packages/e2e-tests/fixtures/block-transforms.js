@@ -118,28 +118,6 @@ export const EXPECTED_TRANSFORMS = {
 		],
 		originalBlock: 'Cover',
 	},
-	core__cover__gradient: {
-		availableTransforms: [
-			'Group',
-			'Image',
-			'Video',
-		],
-		originalBlock: 'Cover',
-	},
-	'core__cover__gradient-image': {
-		availableTransforms: [
-			'Group',
-			'Image',
-		],
-		originalBlock: 'Cover',
-	},
-	'core__cover__gradient-video': {
-		availableTransforms: [
-			'Group',
-			'Video',
-		],
-		originalBlock: 'Cover',
-	},
 	core__cover__video: {
 		availableTransforms: [
 			'Group',
@@ -446,12 +424,6 @@ export const EXPECTED_TRANSFORMS = {
 		availableTransforms: [
 			'Group',
 		],
-	},
-	'core__site-title': {
-		availableTransforms: [
-			'Group',
-		],
-		originalBlock: 'Site Title',
 	},
 	'core__social-link-amazon': {
 		availableTransforms: [

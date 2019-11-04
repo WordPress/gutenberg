@@ -39,8 +39,6 @@ import {
 	PanelColorSettings,
 	withColors,
 	ColorPalette,
-	__experimentalGradientPickerControl,
-	__experimentalGradientPicker,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { withDispatch } from '@wordpress/data';
@@ -112,7 +110,7 @@ const CoverHeightInput = withInstanceId(
 					onBlur={ onBlurEvent }
 					value={ temporaryInput !== null ? temporaryInput : value }
 					min={ COVER_MIN_HEIGHT }
-					step="1"
+					step="10"
 				/>
 			</BaseControl>
 		);
@@ -221,13 +219,12 @@ class CoverEdit extends Component {
 		} = this.props;
 		const {
 			backgroundType,
-			customGradient,
 			dimRatio,
 			focalPoint,
 			hasParallax,
 			id,
-			minHeight,
 			url,
+			minHeight,
 		} = attributes;
 		const onSelectMedia = ( media ) => {
 			if ( ! media || ! media.url ) {
@@ -285,20 +282,14 @@ class CoverEdit extends Component {
 			minHeight: ( temporaryMinHeight || minHeight ),
 		};
 
-		if ( customGradient && ! url ) {
-			style.background = customGradient;
-		}
-
 		if ( focalPoint ) {
 			style.backgroundPosition = `${ focalPoint.x * 100 }% ${ focalPoint.y * 100 }%`;
 		}
 
-		const hasBackground = !! ( url || overlayColor.color || customGradient );
-
 		const controls = (
 			<>
 				<BlockControls>
-					{ hasBackground && (
+					{ !! ( url || overlayColor.color ) && (
 						<>
 							<MediaUploadCheck>
 								<Toolbar>
@@ -357,7 +348,7 @@ class CoverEdit extends Component {
 							</PanelRow>
 						</PanelBody>
 					) }
-					{ hasBackground && (
+					{ ( url || overlayColor.color ) && (
 						<>
 							<PanelBody title={ __( 'Dimensions' ) }>
 								<CoverHeightInput
@@ -376,28 +367,10 @@ class CoverEdit extends Component {
 								initialOpen={ true }
 								colorSettings={ [ {
 									value: overlayColor.color,
-									onChange: ( ...args ) => {
-										setAttributes( {
-											customGradient: undefined,
-										} );
-										setOverlayColor( ...args );
-									},
+									onChange: setOverlayColor,
 									label: __( 'Overlay Color' ),
 								} ] }
 							>
-								<__experimentalGradientPickerControl
-									label={ __( 'Overlay Gradient' ) }
-									onChange={
-										( newGradient ) => {
-											setAttributes( {
-												customGradient: newGradient,
-												customOverlayColor: undefined,
-												overlayColor: undefined,
-											} );
-										}
-									}
-									value={ customGradient }
-								/>
 								{ !! url && (
 									<RangeControl
 										label={ __( 'Background Opacity' ) }
@@ -416,7 +389,7 @@ class CoverEdit extends Component {
 			</>
 		);
 
-		if ( ! hasBackground ) {
+		if ( ! ( url || overlayColor.color ) ) {
 			const placeholderIcon = <BlockIcon icon={ icon } />;
 			const label = __( 'Cover' );
 
@@ -436,29 +409,13 @@ class CoverEdit extends Component {
 						notices={ noticeUI }
 						onError={ this.onUploadError }
 					>
-						<div
-							className="wp-block-cover__placeholder-background-options"
-						>
-							<ColorPalette
-								disableCustomColors={ true }
-								value={ overlayColor.color }
-								onChange={ setOverlayColor }
-								clearable={ false }
-							/>
-							<__experimentalGradientPicker
-								onChange={
-									( newGradient ) => {
-										setAttributes( {
-											customGradient: newGradient,
-											customOverlayColor: undefined,
-											overlayColor: undefined,
-										} );
-									}
-								}
-								value={ customGradient }
-								clearable={ false }
-							/>
-						</div>
+						<ColorPalette
+							disableCustomColors={ true }
+							value={ overlayColor.color }
+							onChange={ setOverlayColor }
+							clearable={ false }
+							className="wp-block-cover__placeholder-color-palette"
+						/>
 					</MediaPlaceholder>
 				</>
 			);
@@ -472,7 +429,6 @@ class CoverEdit extends Component {
 				'has-background-dim': dimRatio !== 0,
 				'has-parallax': hasParallax,
 				[ overlayColor.class ]: overlayColor.class,
-				'has-background-gradient': customGradient,
 			}
 		);
 
@@ -518,13 +474,6 @@ class CoverEdit extends Component {
 									display: 'none',
 								} }
 								src={ url }
-							/>
-						) }
-						{ url && customGradient && dimRatio !== 0 && (
-							<span
-								aria-hidden="true"
-								className="wp-block-cover__gradient-background"
-								style={ { background: customGradient } }
 							/>
 						) }
 						{ VIDEO_BACKGROUND_TYPE === backgroundType && (

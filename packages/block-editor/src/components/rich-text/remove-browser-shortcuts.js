@@ -40,6 +40,6 @@ const SHORTCUTS_ELEMENT = (
  * Component which registered keyboard event handlers to prevent default
  * behaviors for key combinations otherwise handled internally by RichText.
  *
- * @return {WPComponent} The component to be rendered.
+ * @return {WPElement} WordPress element.
  */
 export const RemoveBrowserShortcuts = () => SHORTCUTS_ELEMENT;

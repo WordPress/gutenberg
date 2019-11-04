@@ -642,12 +642,6 @@
 		"parent": "components"
 	},
 	{
-		"title": "DimensionControl",
-		"slug": "dimension-control",
-		"markdown_source": "../packages/components/src/dimension-control/README.md",
-		"parent": "components"
-	},
-	{
 		"title": "Disabled",
 		"slug": "disabled",
 		"markdown_source": "../packages/components/src/disabled/README.md",
@@ -978,12 +972,6 @@
 		"parent": "components"
 	},
 	{
-		"title": "VisuallyHidden",
-		"slug": "visually-hidden",
-		"markdown_source": "../packages/components/src/visually-hidden/README.md",
-		"parent": "components"
-	},
-	{
 		"title": "Data Module Reference",
 		"slug": "data",
 		"markdown_source": "../docs/designers-developers/developers/data/README.md",
@@ -1089,12 +1077,6 @@
 		"title": "@wordpress/babel-preset-default",
 		"slug": "packages-babel-preset-default",
 		"markdown_source": "../packages/babel-preset-default/README.md",
-		"parent": "packages"
-	},
-	{
-		"title": "@wordpress/base-styles",
-		"slug": "packages-base-styles",
-		"markdown_source": "../packages/base-styles/README.md",
 		"parent": "packages"
 	},
 	{

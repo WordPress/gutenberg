@@ -1,16 +1,12 @@
 /**
  * External dependencies
  */
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
 
 /**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-/**
- * Internal dependencies
- */
-import styles from './body.scss';
 
 export class PanelBody extends Component {
 	constructor( ) {
@@ -19,11 +15,9 @@ export class PanelBody extends Component {
 	}
 
 	render() {
-		const { children, title } = this.props;
-
+		const { children } = this.props;
 		return (
-			<View style={ styles.panelContainer }>
-				{ title && <Text style={ styles.sectionHeaderText }>{ title }</Text> }
+			<View >
 				{ children }
 			</View>
 		);

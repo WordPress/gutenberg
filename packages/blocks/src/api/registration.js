@@ -60,11 +60,11 @@ import { DEPRECATED_ENTRY_KEYS } from './constants';
 /**
  * Defined behavior of a block type.
  *
- * @typedef {Object} WPBlock
+ * @typedef {Object} WPBlockType
  *
- * @property {string}          name         Block type's namespaced name.
- * @property {string}          title        Human-readable block type label.
- * @property {string}          category     Block type category classification,
+ * @property {string}           name        Block type's namespaced name.
+ * @property {string}           title       Human-readable block type label.
+ * @property {string}           category    Block type category classification,
  *                                          used in search interfaces to arrange
  *                                          block types by category.
  * @property {WPBlockTypeIcon} [icon]       Block type icon.
@@ -74,7 +74,7 @@ import { DEPRECATED_ENTRY_KEYS } from './constants';
  * @property {WPComponent}     [save]       Optional component describing
  *                                          serialized markup structure of a
  *                                          block type.
- * @property {WPComponent}     edit         Component rendering an element to
+ * @property {WPComponent}      edit        Component rendering an element to
  *                                          manipulate the attributes of a block
  *                                          in the context of an editor.
  */
@@ -114,7 +114,7 @@ export function unstable__bootstrapServerSideBlockDefinitions( definitions ) { /
  * @param {Object} settings Block settings.
  *
  * @return {?WPBlock} The block, if it has been successfully registered;
- *                    otherwise `undefined`.
+ *                     otherwise `undefined`.
  */
 export function registerBlockType( name, settings ) {
 	settings = {
@@ -234,7 +234,7 @@ export function registerBlockType( name, settings ) {
  * @param {string} name Block name.
  *
  * @return {?WPBlock} The previous block value, if it has been successfully
- *                    unregistered; otherwise `undefined`.
+ *                     unregistered; otherwise `undefined`.
  */
 export function unregisterBlockType( name ) {
 	const oldBlock = select( 'core/blocks' ).getBlockType( name );

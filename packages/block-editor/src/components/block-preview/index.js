@@ -137,7 +137,7 @@ export function BlockPreview( { blocks, viewportWidth = 700, padding, settings }
  *
  * @param {Array|Object} blocks A block instance (object) or an array of blocks to be previewed.
  * @param {number} viewportWidth Width of the preview container in pixels. Controls at what size the blocks will be rendered inside the preview. Default: 700.
- * @return {WPComponent} The component to be rendered.
+ * @return {WPElement} Rendered element.
  */
 export default withSelect( ( select ) => {
 	return {

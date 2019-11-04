@@ -22,10 +22,6 @@
 	@include break-medium() {
 		top: $admin-bar-height + $header-height;
 
-		.edit-post-layout.is-mode-visual & {
-			bottom: $footer-height;
-		}
-
 		body.is-fullscreen-mode & {
 			top: $header-height;
 		}

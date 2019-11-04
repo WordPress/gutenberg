@@ -44,26 +44,26 @@ export function createBlock( name, attributes = {}, innerBlocks = [] ) {
 
 	// Ensure attributes contains only values defined by block type, and merge
 	// default values for missing attributes.
-	const sanitizedAttributes = reduce( blockType.attributes, ( accumulator, schema, key ) => {
+	const sanitizedAttributes = reduce( blockType.attributes, ( result, schema, key ) => {
 		const value = attributes[ key ];
 
 		if ( undefined !== value ) {
-			accumulator[ key ] = value;
+			result[ key ] = value;
 		} else if ( schema.hasOwnProperty( 'default' ) ) {
-			accumulator[ key ] = schema.default;
+			result[ key ] = schema.default;
 		}
 
 		if ( [ 'node', 'children' ].indexOf( schema.source ) !== -1 ) {
 			// Ensure value passed is always an array, which we're expecting in
 			// the RichText component to handle the deprecated value.
-			if ( typeof accumulator[ key ] === 'string' ) {
-				accumulator[ key ] = [ accumulator[ key ] ];
-			} else if ( ! Array.isArray( accumulator[ key ] ) ) {
-				accumulator[ key ] = [];
+			if ( typeof result[ key ] === 'string' ) {
+				result[ key ] = [ result[ key ] ];
+			} else if ( ! Array.isArray( result[ key ] ) ) {
+				result[ key ] = [];
 			}
 		}
 
-		return accumulator;
+		return result;
 	}, {} );
 
 	const clientId = uuid();

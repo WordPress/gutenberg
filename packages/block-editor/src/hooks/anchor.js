@@ -56,9 +56,9 @@ export function addAttribute( settings ) {
  * Override the default edit UI to include a new block inspector control for
  * assigning the anchor ID, if block supports anchor.
  *
- * @param {WPComponent} BlockEdit Original component.
+ * @param {Function|Component} BlockEdit Original component.
  *
- * @return {WPComponent} Wrapped component.
+ * @return {string} Wrapped component.
  */
 export const withInspectorControl = createHigherOrderComponent( ( BlockEdit ) => {
 	return ( props ) => {

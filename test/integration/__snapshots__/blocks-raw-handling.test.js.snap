@@ -72,13 +72,3 @@ exports[`rawHandler should convert a caption shortcode with link 1`] = `
 <figure class=\\"wp-block-image alignnone\\"><a href=\\"http://build.wordpress-develop.test/wp-content/uploads/2011/07/100_5478.jpg\\"><img src=\\"http://build.wordpress-develop.test/wp-content/uploads/2011/07/100_5478.jpg?w=604\\" alt=\\"Bell on Wharf\\" class=\\"wp-image-754\\"/></a><figcaption>Bell on wharf in San Francisco</figcaption></figure>
 <!-- /wp:image -->"
 `;
-
-exports[`rawHandler should convert a list with attributes 1`] = `
-"<!-- wp:list {\\"ordered\\":true,\\"type\\":\\"i\\",\\"start\\":2,\\"reversed\\":true} -->
-<ol type=\\"i\\" reversed start=\\"2\\"><li>1
-        <ol start=\\"2\\" reversed=\\"\\" type=\\"i\\">
-            <li>1</li>
-        </ol>
-    </li></ol>
-<!-- /wp:list -->"
-`;

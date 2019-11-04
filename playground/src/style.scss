@@ -1,40 +1,17 @@
-@import "~@wordpress/base-styles/colors";
-@import "~@wordpress/base-styles/variables";
-@import "~@wordpress/base-styles/mixins";
-@import "~@wordpress/base-styles/breakpoints";
-@import "~@wordpress/base-styles/animations";
-@import "~@wordpress/base-styles/z-index";
+@import "../../assets/stylesheets/colors";
+@import "../../assets/stylesheets/variables";
+@import "../../assets/stylesheets/mixins";
+@import "../../assets/stylesheets/breakpoints";
+@import "../../assets/stylesheets/animations";
+@import "../../assets/stylesheets/z-index";
 
 @import "./reset";
 @import "./editor-styles";
 
-$playground-header-height: 95px;
 
 .playground__header {
-	align-items: center;
-	border-bottom: 1px solid #ddd;
-	display: flex;
-	justify-content: space-between;
 	padding: 20px;
-	height: $playground-header-height;
-}
-
-.playground__sidebar {
-	position: fixed;
-	top: $playground-header-height;
-	right: 0;
-	bottom: 0;
-	width: $sidebar-width;
-	border-left: $border-width solid $light-gray-500;
-	height: auto;
-	overflow: auto;
-	-webkit-overflow-scrolling: touch;
-
-	// Temporarily disable the sidebar on mobile
-	display: none;
-	@include break-small() {
-		display: block;
-	}
+	border-bottom: 1px solid #ddd;
 }
 
 .playground__logo {
@@ -43,9 +20,6 @@ $playground-header-height: 95px;
 }
 
 .playground__body {
-	@include break-small() {
-		width: calc(100% - #{$sidebar-width});
-	}
 	padding-top: 20px;
 
 	img {

@@ -6,8 +6,6 @@ import {
 	requestMediaPickFromMediaLibrary,
 	requestMediaPickFromDeviceLibrary,
 	requestMediaPickFromDeviceCamera,
-	getOtherMediaOptions,
-	requestOtherMediaPickFrom,
 } from 'react-native-gutenberg-bridge';
 
 /**
@@ -33,27 +31,7 @@ export class MediaUpload extends React.Component {
 		this.onPickerPresent = this.onPickerPresent.bind( this );
 		this.onPickerChange = this.onPickerChange.bind( this );
 		this.onPickerSelect = this.onPickerSelect.bind( this );
-
-		this.state = {
-			otherMediaOptions: undefined,
-		};
 	}
-
-	componentDidMount() {
-		const { allowedTypes = [] } = this.props;
-		getOtherMediaOptions( allowedTypes, ( otherMediaOptions ) => {
-			const otherMediaOptionsWithIcons = otherMediaOptions.map( ( option ) => {
-				return {
-					icon: this.getChooseFromDeviceIcon(),
-					value: option.value,
-					label: option.label,
-				};
-			} );
-
-			this.setState( { otherMediaOptions: otherMediaOptionsWithIcons } );
-		} );
-	}
-
 	getTakeMediaLabel() {
 		const { allowedTypes = [] } = this.props;
 
@@ -120,26 +98,15 @@ export class MediaUpload extends React.Component {
 			this.onPickerSelect( requestMediaPickFromDeviceCamera );
 		} else if ( value === MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY ) {
 			this.onPickerSelect( requestMediaPickFromMediaLibrary );
-		} else {
-			const { onSelect, multiple = false } = this.props;
-			requestOtherMediaPickFrom( value, multiple, ( media ) => {
-				if ( ( multiple && media ) || ( media && media.id ) ) {
-					onSelect( media );
-				}
-			} );
 		}
 	}
 
 	render() {
-		let mediaOptions = this.getMediaOptionsItems();
-
-		if ( this.state.otherMediaOptions ) {
-			mediaOptions = [ ...mediaOptions, ...this.state.otherMediaOptions ];
-		}
+		const mediaOptions = this.getMediaOptionsItems();
 
 		const getMediaOptions = () => (
 			<Picker
-				hideCancelButton
+				hideCancelButton={ true }
 				ref={ ( instance ) => this.picker = instance }
 				options={ mediaOptions }
 				onChange={ this.onPickerChange }

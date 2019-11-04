@@ -1,26 +1,11 @@
 /**
- * External dependencies
- */
-import { text } from '@storybook/addon-knobs';
-
-/**
  * Internal dependencies
  */
 import IconButton from '../';
 
 export default { title: 'IconButton', component: IconButton };
 
-export const _default = () => {
-	const icon = text( 'Icon', 'ellipsis' );
-	const label = text( 'Label', 'More' );
-
-	return (
-		<IconButton
-			icon={ icon }
-			label={ label }
-		/>
-	);
-};
+export const _default = () => <IconButton icon="ellipsis" label="More" />;
 
 export const grouped = () => {
 	const GroupContainer = ( { children } ) => (

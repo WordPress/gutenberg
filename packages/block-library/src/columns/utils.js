@@ -87,9 +87,9 @@ export function getTotalColumnsWidth( blocks, totalBlockCount = blocks.length ) 
  * @return {Object<string,number>} Column widths.
  */
 export function getColumnWidths( blocks, totalBlockCount = blocks.length ) {
-	return blocks.reduce( ( accumulator, block ) => {
+	return blocks.reduce( ( result, block ) => {
 		const width = getEffectiveColumnWidth( block, totalBlockCount );
-		return Object.assign( accumulator, { [ block.clientId ]: width } );
+		return Object.assign( result, { [ block.clientId ]: width } );
 	}, {} );
 }
 

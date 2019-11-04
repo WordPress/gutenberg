@@ -30,7 +30,7 @@ _Parameters_
 
 _Returns_
 
--   `?NUXGuideInfo`: Information about the associated guide.
+-   `?NUX.GuideInfo`: Information about the associated guide.
 
 <a name="isTipVisible" href="#isTipVisible">#</a> **isTipVisible**
 
