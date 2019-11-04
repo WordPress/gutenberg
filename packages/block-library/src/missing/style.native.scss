@@ -9,10 +9,14 @@
 }
 
 .helpIconContainer {
-	padding-top: 8;
-	padding-right: 0;
-	height: 24;
-	width: 100%;
+	position: absolute;
+	top: 0;
+	right: 0;
+	height: 48;
+	width: 48;
+	padding-top: 12;
+	padding-right: 12;
+	justify-content: flex-start;
 	align-items: flex-end;
 }
 
@@ -23,43 +27,47 @@
 }
 
 .infoIcon {
-	size: 32;
-	height: 32;
+	size: 36;
+	height: 36;
 	padding-top: 8;
 	padding-bottom: 8;
-	color: $gray-darken-30;
 }
 
 .infoText {
 	text-align: center;
-	font-size: 18;
 }
 
 .infoTitle {
 	padding-top: 8;
 	padding-bottom: 12;
+	font-size: 20;
 	font-weight: bold;
+	color: $gray-dark;
 }
 
 .infoDescription {
 	padding-bottom: 24;
+	font-size: 16;
+	color: $gray-darken-20;
 }
 
-.infoButton {
+.sheetButton {
+	border-top-width: 1px;
+	border-color: #f0f0f0;
 	height: 48;
 	width: 100%;
 	justify-content: center;
 }
 
-.infoButtonText {
+.sheetButtonText {
 	font-size: 16;
 	text-align: center;
-	color: $gray-darken-30;
+	color: #2271b1;
 }
 
 .unsupportedBlock {
-	background-color: #e9eff3; // grey lighten 30
-	padding-top: 0;
+	background-color: $gray-lighten-30;
+	padding-top: 24;
 	padding-bottom: 24;
 	padding-left: 8;
 	padding-right: 8;
