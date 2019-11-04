@@ -1,18 +1,24 @@
 /**
  * External dependencies
  */
-import { Image, StyleSheet, View, TouchableWithoutFeedback } from 'react-native';
+import { Image, StyleSheet, View, Text, TouchableWithoutFeedback } from 'react-native';
+import {
+	requestMediaImport,
+	mediaUploadSync,
+	requestImageFailedRetryDialog,
+	requestImageUploadCancelDialog,
+} from 'react-native-gutenberg-bridge';
 
 /**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { Spinner } from '@wordpress/components';
+import { Icon } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { withSelect } from '@wordpress/data';
 import { RichText, MediaUploadProgress } from '@wordpress/block-editor';
-import { isBlobURL } from '@wordpress/blob';
+import { isURL } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -26,6 +32,7 @@ class GalleryImage extends Component {
 
 		this.onSelectImage = this.onSelectImage.bind( this );
 		this.onSelectCaption = this.onSelectCaption.bind( this );
+		this.onMediaPressed = this.onMediaPressed.bind( this );
 		this.onRemoveImage = this.onRemoveImage.bind( this );
 		this.bindContainer = this.bindContainer.bind( this );
 
@@ -39,6 +46,7 @@ class GalleryImage extends Component {
 		this.state = {
 			captionSelected: false,
 			isUploadInProgress: false,
+			didUploadFail: false,
 		};
 	}
 
@@ -55,6 +63,18 @@ class GalleryImage extends Component {
 
 		if ( ! this.props.isSelected ) {
 			this.props.onSelect();
+		}
+	}
+
+	onMediaPressed() {
+		const { id: mediaId, url: mediaUrl } = this.props;
+
+		this.onSelectImage();
+
+		if ( this.state.isUploadInProgress ) {
+			requestImageUploadCancelDialog( mediaId );
+		} else if ( ( this.state.didUploadFail ) || mediaId && ! isURL( mediaUrl ) ) {
+			requestImageFailedRetryDialog( mediaId );
 		}
 	}
 
@@ -112,18 +132,27 @@ class GalleryImage extends Component {
 			id: payload.mediaServerId,
 			url: payload.mediaUrl,
 		} );
-		this.setState( { isUploadInProgress: false } );
+		this.setState( {
+			isUploadInProgress: false,
+			didUploadFail: false,
+		} );
 	}
 
 	finishMediaUploadWithFailure() {
-		this.setState( { isUploadInProgress: false } );
+		this.setState( {
+			isUploadInProgress: false,
+			didUploadFail: true,
+		} );
 	}
 
 	mediaUploadStateReset() {
 		const { onMediaUpdate } = this;
 
 		onMediaUpdate( { id: null, url: null } );
-		this.setState( { isUploadInProgress: false } );
+		this.setState( {
+			isUploadInProgress: false,
+			didUploadFail: false,
+		} );
 	}
 
 	onMediaUpdate( media ) {
@@ -156,34 +185,38 @@ class GalleryImage extends Component {
 		}
 
 		const { isUploadInProgress } = this.state;
-		const { finalWidth, finalHeight, imageWidthWithinContainer, isUploadFailed, retryMessage } = params;
+		const { isUploadFailed, retryMessage } = params;
 		const opacity = isUploadInProgress ? 0.3 : 1;
 
 		return (
-			<TouchableWithoutFeedback
-				onPress={ this.onSelectImage }
-				disabled={ ! isBlockSelected }
-			>
-				<View style={ styles.container }>
-					<Image
-						style={ [ styles.image, {
-							resizeMode: isCropped ? 'cover' : 'contain',
-							opacity,
-						} ] }
-						source={ { uri: url } }
-						alt={ alt }
-						data-id={ id }
-						onFocus={ this.onSelectImage }
-						onKeyDown={ this.onRemoveImage }
-						tabIndex="0"
-						aria-label={ ariaLabel }
-						ref={ this.bindContainer }
-					/>
-					<View style={ [ styles.overlay, {
-						borderColor: isSelected ? '#0070ff' : '#00000000',
-					} ] }>
-
-						{ isBlobURL( url ) && <Spinner /> }
+			<>
+				<Image
+					style={ [ styles.image, {
+						resizeMode: isCropped ? 'cover' : 'contain',
+						opacity,
+					} ] }
+					source={ { uri: url } }
+					alt={ alt }
+					data-id={ id }
+					onFocus={ this.onSelectImage }
+					onKeyDown={ this.onRemoveImage }
+					tabIndex="0"
+					aria-label={ ariaLabel }
+					ref={ this.bindContainer }
+				/>
+				{ isUploadFailed && (
+					<View style={ styles.uploadFailedContainer }>
+						<View style={ styles.uploadFailed }>
+							<Icon icon={ "warning" } { ...styles.uploadFailedIcon } />
+						</View>
+						<Text style={ styles.uploadFailedText }>{ retryMessage }</Text>
+					</View>
+				) }
+				<View style={ [ styles.overlay, {
+					borderColor: isSelected ? '#0070ff' : '#00000000',
+				} ] }>
+				{ ! isUploadInProgress && (
+					<>
 						{ isSelected && (
 							<View style={ styles.toolbar }>
 								<View style={ styles.moverButtons } >
@@ -216,7 +249,7 @@ class GalleryImage extends Component {
 								/>
 							</View>
 						) }
-						{ ( isSelected || !! caption ) && (
+						{ ! isUploadFailed && ( isSelected || !! caption ) && (
 							<View style={ styles.caption } >
 								<RichText
 									tagName="figcaption"
@@ -229,32 +262,33 @@ class GalleryImage extends Component {
 								/>
 							</View>
 						) }
-					</View>
+					</>
+				) }
 				</View>
-			</TouchableWithoutFeedback>
+			</>
 		);
 	}
 
 	render() {
-		const { url, id, } = this.props;
+		const { url, id, isBlockSelected } = this.props;
 
 		return (
-			<MediaUploadProgress
-				coverUrl={ url }
-				mediaId={ id }
-				onUpdateMediaProgress={ this.updateMediaProgress }
-				onFinishMediaUploadWithSuccess={ this.finishMediaUploadWithSuccess }
-				onFinishMediaUploadWithFailure={ this.finishMediaUploadWithFailure }
-				onMediaUploadStateReset={ this.mediaUploadStateReset }
-				// renderContent={ ( params ) => {
-				// 	return (
-				// 		<View style={ styles.content }>
-				// 			{ this.renderContent( params ) }
-				// 		</View>
-				// 	);
-				// } }
-				renderContent={ this.renderContent }
-			/>
+			<TouchableWithoutFeedback
+				onPress={ this.onMediaPressed }
+				disabled={ ! isBlockSelected }
+			>
+				<View style={ styles.container }>
+					<MediaUploadProgress
+						// coverUrl={ url }
+						mediaId={ id }
+						onUpdateMediaProgress={ this.updateMediaProgress }
+						onFinishMediaUploadWithSuccess={ this.finishMediaUploadWithSuccess }
+						onFinishMediaUploadWithFailure={ this.finishMediaUploadWithFailure }
+						onMediaUploadStateReset={ this.mediaUploadStateReset }
+						renderContent={ this.renderContent }
+					/>
+				</View>
+			</TouchableWithoutFeedback>
 		);
 	}
 }
