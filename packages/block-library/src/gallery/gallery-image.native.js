@@ -18,58 +18,7 @@ import { isBlobURL } from '@wordpress/blob';
  * Internal dependencies
  */
 import Button from './gallery-button';
-
-// TODO: extract this to scss
-const styles = StyleSheet.create( {
-	container: {
-		flex: 1,
-		height: 150,
-	},
-	image: {
-		position: 'absolute',
-		top: 0,
-		bottom: 0,
-		left: 0,
-		right: 0,
-	},
-	overlay: {
-		position: 'absolute',
-		top: 0,
-		bottom: 0,
-		left: 0,
-		right: 0,
-		padding: 5,
-		borderWidth: 3,
-	},
-	button: {
-		width: 30,
-	},
-	moverButtons: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		borderRadius: 3,
-		backgroundColor: '#2e4453',
-	},
-	separator: {
-		borderRightColor: 'gray',
-		borderRightWidth: StyleSheet.hairlineWidth,
-		height: 20,
-	},
-	removeButton: {
-		width: 30,
-		borderRadius: 30,
-	},
-	toolbar: {
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-	},
-	caption: {
-		position: 'absolute',
-		bottom: 0,
-		left: 0,
-		right: 0,
-	},
-} );
+import styles from './gallery-image-styles';
 
 class GalleryImage extends Component {
 	constructor() {
@@ -246,7 +195,9 @@ class GalleryImage extends Component {
 										aria-disabled={ isFirstItem }
 										disabled={ ! isSelected }
 									/>
-									<View style={ styles.separator }></View>
+									<View style={ [ styles.separator, {
+										borderRightWidth: StyleSheet.hairlineWidth,
+									} ] }></View>
 									<Button
 										style={ styles.button }
 										icon="arrow-right"
