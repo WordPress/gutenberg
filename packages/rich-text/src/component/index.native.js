@@ -75,6 +75,7 @@ export class RichText extends Component {
 			this.formatToValue.bind( this ),
 			{ maxSize: 1 }
 		);
+		this.makeActive = this.makeActive.bind( this );
 
 		// This prevents a bug in Aztec which triggers onSelectionChange twice on format change
 		this.onSelectionChange = this.onSelectionChange.bind( this );
@@ -542,7 +543,7 @@ export class RichText extends Component {
 		//  to determine if we should focus the RichText.
 		if ( this.props.blockIsSelected && ! this.props.__unstableMobileNoFocusOnMount ) {
 			this._editor.focus();
-			this.setState( { isActive: true } );
+			this.makeActive( true );
 			this.onSelectionChange( this.props.selectionStart || 0, this.props.selectionEnd || 0 );
 		}
 	}
@@ -550,7 +551,7 @@ export class RichText extends Component {
 	componentWillUnmount() {
 		if ( this._editor.isFocused() && this.props.shouldBlurOnUnmount ) {
 			this._editor.blur();
-			this.setState( { isActive: false } );
+			this.makeActive( false );
 		}
 	}
 
@@ -569,16 +570,20 @@ export class RichText extends Component {
 
 		if ( isSelected && ! prevIsSelected ) {
 			this._editor.focus();
-			this.setState( { isActive: true } );
+			this.makeActive( true );
 			// Update selection props explicitly when component is selected as Aztec won't call onSelectionChange
 			// if its internal value hasn't change. When created, default value is 0, 0
 			this.onSelectionChange( this.props.selectionStart || 0, this.props.selectionEnd || 0 );
 		} else if ( ! isSelected && prevIsSelected ) {
 			this._editor.blur();
 			if ( this.props.isInnerBlock ) {
-				this.setState( { isActive: false } );
+				this.makeActive( false );
 			}
 		}
+	}
+
+	makeActive( isActive ) {
+		this.setState( { isActive } );
 	}
 
 	willTrimSpaces( html ) {
