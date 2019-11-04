@@ -41,6 +41,9 @@ class UnsavedChangesWarning extends Component {
 }
 
 export default withSelect( ( select ) => ( {
-	// We need the function to avoid race conditions.
+	// We need to call the selector directly in the listener to avoid race
+	// conditions with `BrowserUrl` where `componentDidUpdate` gets the
+	// new value of `isEditedPostDirty` before this component does,
+	// causing this component to incorrectly think a trashed post is still dirty.
 	isEditedPostDirty: select( 'core/editor' ).isEditedPostDirty,
 } ) )( UnsavedChangesWarning );
