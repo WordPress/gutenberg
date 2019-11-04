@@ -236,6 +236,22 @@ const ImageURLInputUI = ( {
 	);
 };
 
+const getUpdatedLinkTargetSettings = ( value, { rel } ) => {
+	const linkTarget = value ? '_blank' : undefined;
+
+	let updatedRel;
+	if ( ! linkTarget && ! rel ) {
+		updatedRel = undefined;
+	} else {
+		updatedRel = removeNewTabRel( rel );
+	}
+
+	return {
+		linkTarget,
+		rel: updatedRel,
+	};
+};
+
 class MediaTextEdit extends Component {
 	constructor() {
 		super( ...arguments );
@@ -248,6 +264,7 @@ class MediaTextEdit extends Component {
 		};
 		this.getLinkDestinations = this.getLinkDestinations.bind( this );
 		this.onSetHref = this.onSetHref.bind( this );
+		this.onSetNewTab = this.onSetNewTab.bind( this );
 		this.onSetLinkRel = this.onSetLinkRel.bind( this );
 		this.onSetLinkClass = this.onSetLinkClass.bind( this );
 	}
@@ -293,6 +310,11 @@ class MediaTextEdit extends Component {
 			return;
 		}
 		this.props.setAttributes( { href: value } );
+	}
+
+	onSetNewTab( value ) {
+		const updatedLinkTarget = getUpdatedLinkTargetSettings( value, this.props.attributes );
+		this.props.setAttributes( updatedLinkTarget );
 	}
 
 	onSetLinkRel( value ) {

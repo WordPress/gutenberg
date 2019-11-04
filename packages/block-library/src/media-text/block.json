@@ -35,6 +35,12 @@
 		"mediaLink": {
 			"type": "string"
 		},
+		"linkTarget": {
+			"type": "string",
+			"source": "attribute",
+			"selector": "figure a",
+			"attribute": "target"
+		},
 		"href": {
 			"type": "string",
 			"source": "attribute",
