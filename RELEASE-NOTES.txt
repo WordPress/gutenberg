@@ -1,3 +1,7 @@
+1.15.3
+------
+* [iOS] Fix a layout bug in RCTAztecView in iOS 13.2
+
 1.15.2
 ------
 * Fix issue when copy/paste photos from other apps, was not inserting an image on the post.
