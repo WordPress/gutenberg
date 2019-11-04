@@ -16,7 +16,6 @@ import { Component } from '@wordpress/element';
 import { Icon } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { BACKSPACE, DELETE } from '@wordpress/keycodes';
-import { withSelect } from '@wordpress/data';
 import { RichText, MediaUploadProgress } from '@wordpress/block-editor';
 import { isURL } from '@wordpress/url';
 
@@ -293,11 +292,4 @@ class GalleryImage extends Component {
 	}
 }
 
-export default withSelect( ( select, ownProps ) => {
-	const { getMedia } = select( 'core' );
-	const { id } = ownProps;
-
-	return {
-		image: id ? getMedia( id ) : null,
-	};
-} )( GalleryImage );
+export default GalleryImage;
