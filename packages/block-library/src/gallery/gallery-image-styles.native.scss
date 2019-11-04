@@ -55,3 +55,31 @@
   left: 0;
   right: 0;
 }
+
+.uploadFailedContainer {
+  position: absolute;
+  background-color: rgba(0, 0, 0, 0.5);
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+}
+
+.uploadFailed {
+  width: 24px;
+  height: 24px;
+  justify-content: center;
+  align-items: center;
+}
+
+.uploadFailedIcon {
+  fill: #fff;
+  width: 100%;
+  height: 100%;
+}
+
+.uploadFailedText {
+  color: #fff;
+  font-size: 14px;
+  margin-top: 5px;
+}
