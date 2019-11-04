@@ -203,7 +203,15 @@ export default function __experimentalUseColors(
 				detectedBackgroundColorRef.current = backgroundColor;
 				return { backgroundColor };
 			} )( () => <></> ),
-		[ attributes ]
+		[
+			colorConfigs.reduce(
+				( acc, colorConfig ) =>
+					`${ acc } | ${ attributes[ colorConfig.name ] } | ${
+						attributes[ camelCase( `custom ${ colorConfig.name }` ) ]
+					}`,
+				''
+			),
+		]
 	);
 
 	return useMemo( () => {
@@ -276,5 +284,5 @@ export default function __experimentalUseColors(
 			),
 			BackgroundColorDetector,
 		};
-	}, [ attributes, setAttributes, ...deps ] );
+	}, [ attributes, setAttributes, detectedBackgroundColorRef.current, ...deps ] );
 }
