@@ -37,7 +37,6 @@ class GalleryImage extends Component {
 		this.updateMediaProgress = this.updateMediaProgress.bind( this );
 		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind( this );
 		this.finishMediaUploadWithFailure = this.finishMediaUploadWithFailure.bind( this );
-		this.mediaUploadStateReset = this.mediaUploadStateReset.bind( this );
 		this.renderContent = this.renderContent.bind( this );
 
 		this.state = {
@@ -127,15 +126,6 @@ class GalleryImage extends Component {
 		this.setState( {
 			isUploadInProgress: false,
 			didUploadFail: true,
-		} );
-	}
-
-	mediaUploadStateReset() {
-		this.props.setAttributes( { id: null, url: null } );
-
-		this.setState( {
-			isUploadInProgress: false,
-			didUploadFail: false,
 		} );
 	}
 
@@ -240,7 +230,7 @@ class GalleryImage extends Component {
 	}
 
 	render() {
-		const { url, id, isBlockSelected } = this.props;
+		const { url, id, isBlockSelected, onRemove } = this.props;
 
 		return (
 			<TouchableWithoutFeedback
@@ -254,7 +244,7 @@ class GalleryImage extends Component {
 						onUpdateMediaProgress={ this.updateMediaProgress }
 						onFinishMediaUploadWithSuccess={ this.finishMediaUploadWithSuccess }
 						onFinishMediaUploadWithFailure={ this.finishMediaUploadWithFailure }
-						onMediaUploadStateReset={ this.mediaUploadStateReset }
+						onMediaUploadStateReset={ onRemove }
 						renderContent={ this.renderContent }
 					/>
 				</View>
