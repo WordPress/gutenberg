@@ -475,6 +475,6 @@ export const registerBlockPattern = ( blockName, pattern ) => {
  * @param {string} blockName   Name of the block (example: “core/columns”).
  * @param {string} patternName Name of the pattern defined for the block.
  */
-export const unregisterBlockPatterns = ( blockName, patternName ) => {
+export const unregisterBlockPattern = ( blockName, patternName ) => {
 	dispatch( 'core/blocks' ).removeBlockPatterns( blockName, patternName );
 };
