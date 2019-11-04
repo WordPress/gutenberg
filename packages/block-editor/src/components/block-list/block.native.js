@@ -13,7 +13,7 @@ import {
 import { Component } from '@wordpress/element';
 import { ToolbarButton, Toolbar } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { getBlockType } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
 
@@ -136,13 +136,14 @@ class BlockListBlock extends Component {
 			isGroupType,
 			parentId,
 			isMediaTextParent,
+			getStylesFromColorScheme,
 		} = this.props;
 
 		if ( ! isDashed && isInnerBlock && ! isChildOfSameRootBlook ) {
 			return styles.blockContainerInner;
 		}
 
-		const defaultStyle = [ isDashed ? styles.blockHolderDashedBordered : styles.blockContainer ];
+		const defaultStyle = [ isDashed ? getStylesFromColorScheme( styles.blockHolderDashedBordered, styles.blockHolderDashedBorderedDark ) : styles.blockContainer ];
 
 		if ( isMediaTextParent ) {
 			return [ ...defaultStyle, styles.blockContainerMediaTextInner ];
@@ -357,4 +358,5 @@ export default compose( [
 			},
 		};
 	} ),
+	withPreferredColorScheme,
 ] )( BlockListBlock );
