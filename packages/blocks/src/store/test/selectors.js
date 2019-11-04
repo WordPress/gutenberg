@@ -5,6 +5,7 @@ import {
 	getChildBlockNames,
 	isMatchingSearchTerm,
 	getGroupingBlockName,
+
 } from '../selectors';
 
 describe( 'selectors', () => {
