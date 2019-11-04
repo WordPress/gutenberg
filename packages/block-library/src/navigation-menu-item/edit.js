@@ -42,8 +42,7 @@ import { Fragment, useState, useEffect } from '@wordpress/element';
  * It updates the link attribute when the
  * link settings changes.
  *
- * @param {string} setting Setting type, for instance, `new-tab`.
- * @param {string} value Setting type value.
+ * @param {Function} setter Setter attribute function.
  */
 const updateLinkSetting = ( setter ) => ( setting, value ) => {
 	if ( setting === 'new-tab' ) {
@@ -55,7 +54,8 @@ const updateLinkSetting = ( setter ) => ( setting, value ) => {
  * Updates the link attribute when it changes
  * through of the `onLinkChange` LinkControl callback.
  *
- * @param {Object|null} itemLink Link object if it has been selected. Otherwise, Null.
+ * @param {Function} setter Setter attribute function.
+ * @param {string} label ItemMenu link label.
  */
 const updateLink = ( setter, label ) => ( { title: newTitle = '', url: newURL = '' } = {} ) => {
 	setter( {
