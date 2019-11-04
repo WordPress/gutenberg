@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { StyleSheet, TouchableOpacity, Text, View, Platform } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { isString } from 'lodash';
 
 /**
@@ -16,26 +16,26 @@ const styles = StyleSheet.create( {
 		alignItems: 'center',
 		borderRadius: 6,
 		borderColor: '#2e4453',
-    backgroundColor: '#2e4453',
-    aspectRatio: 1,
+		backgroundColor: '#2e4453',
+		aspectRatio: 1,
 	},
 } );
 
 export function Button( props ) {
 	const {
-    icon,
+		icon,
 		onClick,
-    disabled,
-    'aria-disabled': ariaDisabled,
-    accessibilityLabel = 'button',
-    style,
-  } = props;
+		disabled,
+		'aria-disabled': ariaDisabled,
+		accessibilityLabel = 'button',
+		style,
+	} = props;
 
-  const buttonStyle = StyleSheet.compose( styles.buttonActive, style );
+	const buttonStyle = StyleSheet.compose( styles.buttonActive, style );
 
-  const isDisabled = disabled || ariaDisabled;
+	const isDisabled = disabled || ariaDisabled;
 
-  const fill = isDisabled ? "gray" : "white";
+	const fill = isDisabled ? 'gray' : 'white';
 
 	return (
 		<TouchableOpacity
@@ -47,9 +47,9 @@ export function Button( props ) {
 			disabled={ isDisabled }
 		>
 			<View style={ buttonStyle }>
-        { isString( icon )
-          ? <Icon icon={ icon } fill={ fill } size={ 24 } /> 
-          : icon }
+				{ isString( icon ) ?
+					<Icon icon={ icon } fill={ fill } size={ 24 } /> :
+					icon }
 			</View>
 		</TouchableOpacity>
 	);
