@@ -27,20 +27,33 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
                     callback(nil)
                     return
                 }
-                if (allowMultipleSelection) {
-                    let formattedMedia = media.map { (id, url, type) in
-                        return [mediaDictKeys.IDKey: id, mediaDictKeys.URLKey: url, mediaDictKeys.TypeKey: type]
-                    }
-                    callback([formattedMedia])
+                let mediaToReturn: [MediaInfo]
+                if allowMultipleSelection {
+                    mediaToReturn = media
                 } else {
-                    guard let (mediaID, mediaURL, mediaType) = media.first else {
-                        callback(nil)
-                        return
-                    }
-                    callback([[mediaDictKeys.IDKey: mediaID, mediaDictKeys.URLKey: mediaURL, mediaDictKeys.TypeKey: mediaType]])
+                    mediaToReturn = Array(media.prefix(1))
+                }
+
+                let jsFormattedMedia = mediaToReturn.map { mediaInfo in
+                    return mediaInfo.encodeForJS()
+                }
+                if allowMultipleSelection {
+                    callback([jsFormattedMedia])
+                } else {
+                    callback(jsFormattedMedia)
                 }
             })
         }
+    }
+    
+    @objc
+    func requestOtherMediaPickFrom(_ source: String, allowMultipleSelection: Bool, callback: @escaping RCTResponseSenderBlock) {
+        //TODO implement me
+    }
+    
+    @objc
+    func getOtherMediaOptions(_ filter: [String]?, callback: @escaping RCTResponseSenderBlock) {
+        //TODO implement me
     }
 
     @objc
@@ -50,12 +63,12 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
             return
         }
         DispatchQueue.main.async {
-            self.delegate?.gutenbergDidRequestImport(from: url, with: { mediaList in
-                guard let mediaList = mediaList else {
+            self.delegate?.gutenbergDidRequestImport(from: url, with: { mediaInfo in
+                guard let mediaInfo = mediaInfo else {
                     callback(nil)
                     return
-                }
-                callback(mediaList)
+                }                
+                callback([mediaInfo.id as Any, mediaInfo.url as Any])
             })
         }
     }
@@ -195,5 +208,16 @@ extension RNReactNativeGutenbergBridge {
         static let IDKey = "id"
         static let URLKey = "url"
         static let TypeKey = "type"
+    }
+}
+
+extension MediaInfo {
+
+    func encodeForJS() -> [String: Any] {
+        return [
+            RNReactNativeGutenbergBridge.mediaDictKeys.IDKey: id as Any,
+            RNReactNativeGutenbergBridge.mediaDictKeys.URLKey: url as Any,
+            RNReactNativeGutenbergBridge.mediaDictKeys.TypeKey: type as Any
+        ]
     }
 }
