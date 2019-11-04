@@ -19,6 +19,12 @@ const Context = createContext( {
 const { Provider, Consumer } = Context;
 
 export { Provider as BlockEditContextProvider };
+
+/**
+ * A hook that returns the block edit context.
+ *
+ * @return {Object} Block edit context
+ */
 export function useBlockEditContext() {
 	return useContext( Context );
 }

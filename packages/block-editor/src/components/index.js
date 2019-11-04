@@ -3,6 +3,7 @@
  */
 
 export * from './colors';
+export * from './gradients';
 export * from './font-sizes';
 export { default as AlignmentToolbar } from './alignment-toolbar';
 export { default as Autocomplete } from './autocomplete';
@@ -25,11 +26,13 @@ export { default as __experimentalGradientPickerPanel } from './gradient-picker/
 export { default as InnerBlocks } from './inner-blocks';
 export { default as InspectorAdvancedControls } from './inspector-advanced-controls';
 export { default as InspectorControls } from './inspector-controls';
+export { default as __experimentalLinkControl } from './link-control';
 export { default as MediaPlaceholder } from './media-placeholder';
 export { default as MediaUpload } from './media-upload';
 export { default as MediaUploadCheck } from './media-upload/check';
 export { default as PanelColorSettings } from './panel-color-settings';
 export { default as PlainText } from './plain-text';
+export { default as __experimentalResponsiveBlockControl } from './responsive-block-control';
 export {
 	default as RichText,
 	RichTextShortcut,
