@@ -184,6 +184,23 @@ The maximum value accepted. If higher values are inserted onChange will not be c
 - Type: `Number`
 - Required: No
 
+#### icon
+
+An icon to be shown above the slider next to it's container title.
+
+- Type: `String`
+- Required: No
+- Platform: Only Mobile
+
+#### separatorType
+
+Define if separator line under/above control row should be disabled or full width. By default it is placed below excluding underline the control icon.
+
+- Type: `String Enum`
+- Values: `none` | `fullWidth` | `topFullWidth`
+- Required: No
+- Platform: Only Mobile
+
 ## Related components
 
 - To collect a numerical input in a text field, use the `TextControl` component.
