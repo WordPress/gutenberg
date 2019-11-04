@@ -75,4 +75,7 @@ module.exports = {
 	unsupportedBlockIcon: {
 		color: 'white',
 	},
+	infoIcon: {
+		size: 36,
+	},
 };
