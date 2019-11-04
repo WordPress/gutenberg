@@ -181,7 +181,7 @@ class GalleryImage extends Component {
 										style={ styles.button }
 										icon="arrow-left"
 										onClick={ isFirstItem ? undefined : onMoveBackward }
-										label={ __( 'Move Image Backward' ) }
+										accessibilityLabel={ __( 'Move Image Backward' ) }
 										aria-disabled={ isFirstItem }
 										disabled={ ! isSelected }
 									/>
@@ -192,7 +192,7 @@ class GalleryImage extends Component {
 										style={ styles.button }
 										icon="arrow-right"
 										onClick={ isLastItem ? undefined : onMoveForward }
-										label={ __( 'Move Image Forward' ) }
+										accessibilityLabel={ __( 'Move Image Forward' ) }
 										aria-disabled={ isLastItem }
 										disabled={ ! isSelected }
 									/>
@@ -201,7 +201,7 @@ class GalleryImage extends Component {
 									style={ styles.removeButton }
 									icon="trash"
 									onClick={ onRemove }
-									label={ __( 'Remove Image' ) }
+									accessibilityLabel={ __( 'Remove Image' ) }
 									disabled={ ! isSelected }
 								/>
 							</View>
