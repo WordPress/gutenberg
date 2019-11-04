@@ -2,11 +2,11 @@
     {
         "clientId": "_clientId_0",
         "name": "core/pullquote",
-        "isValid": false,
+        "isValid": true,
         "attributes": {
             "value": "<p>pullquote</p>",
             "citation": "",
-            "mainColor": "accent",
+            "customMainColor": "#cd2653",
             "textColor": "secondary"
         },
         "innerBlocks": [],

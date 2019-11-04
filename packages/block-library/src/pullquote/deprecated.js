@@ -48,9 +48,28 @@ const blockAttributes = {
 	},
 };
 
+function parseBorderColor( styleString ) {
+	if ( ! styleString ) {
+		return;
+	}
+	const matches = styleString.match( /border-color:([^;]+)[;]?/ );
+	if ( matches && matches[ 1 ] ) {
+		return matches[ 1 ];
+	}
+}
+
 const deprecated = [
 	{
-		attributes: blockAttributes,
+		attributes: {
+			...blockAttributes,
+			// figureStyle is an attribute that never existed.
+			// We are using it as a way to access the styles previously applied to the figure.
+			figureStyle: {
+				source: 'attribute',
+				selector: 'figure',
+				attribute: 'style',
+			},
+		},
 		save( { attributes } ) {
 			const {
 				mainColor,
@@ -60,6 +79,7 @@ const deprecated = [
 				value,
 				citation,
 				className,
+				figureStyle,
 			} = attributes;
 
 			const isSolidColorStyle = includes( className, SOLID_COLOR_CLASS );
@@ -86,10 +106,14 @@ const deprecated = [
 			// If normal style and a named color are being used, we need to retrieve the color value to set the style,
 			// as there is no expectation that themes create classes that set border colors.
 			} else if ( mainColor ) {
-				const colors = get( select( 'core/block-editor' ).getSettings(), [ 'colors' ], [] );
-				const colorObject = getColorObjectByAttributeValues( colors, mainColor );
+				// Previously here we queried the color settings to know the color value
+				// of a named color. This made the save function impure and the block was refactored,
+				// because meanwhile a change in the editor made it impossible to query color settings in the save function.
+				// Here instead of querying the color settings to know the color value, we retrieve the value
+				// directly from the style previously serialized.
+				const borderColor = parseBorderColor( figureStyle );
 				figureStyles = {
-					borderColor: colorObject.color,
+					borderColor,
 				};
 			}
 
@@ -108,6 +132,27 @@ const deprecated = [
 					</blockquote>
 				</figure>
 			);
+		},
+		migrate( { className, figureStyle, mainColor, ...attributes } ) {
+			const isSolidColorStyle = includes( className, SOLID_COLOR_CLASS );
+			// If is the default style, and a main color is set,
+			// migrate the main color value into a custom color.
+			// The custom color value is retrived by parsing the figure styles.
+			if ( ! isSolidColorStyle && mainColor && figureStyle ) {
+				const borderColor = parseBorderColor( figureStyle );
+				if ( borderColor ) {
+					return {
+						...attributes,
+						className,
+						customMainColor: borderColor,
+					};
+				}
+			}
+			return {
+				className,
+				mainColor,
+				...attributes,
+			};
 		},
 	},
 	{
