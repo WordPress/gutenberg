@@ -3,8 +3,6 @@
  */
 import { Image, StyleSheet, View, Text, TouchableWithoutFeedback } from 'react-native';
 import {
-	requestMediaImport,
-	mediaUploadSync,
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
 } from 'react-native-gutenberg-bridge';
@@ -15,7 +13,6 @@ import {
 import { Component } from '@wordpress/element';
 import { Icon } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { RichText, MediaUploadProgress } from '@wordpress/block-editor';
 import { isURL } from '@wordpress/url';
 
@@ -131,8 +128,8 @@ class GalleryImage extends Component {
 
 	renderContent( params ) {
 		const {
-			url, alt, id, linkTo, link, isFirstItem, isLastItem, isSelected, caption,
-			isBlockSelected, onRemove, onMoveForward, onMoveBackward, setAttributes,
+			url, alt, linkTo, link, isFirstItem, isLastItem, isSelected, caption,
+			onRemove, onMoveForward, onMoveBackward, setAttributes,
 			'aria-label': ariaLabel, isCropped } = this.props;
 
 		// I'm not sure if or how we can use this on mobile
