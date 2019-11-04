@@ -128,22 +128,9 @@ class GalleryImage extends Component {
 
 	renderContent( params ) {
 		const {
-			url, alt, linkTo, link, isFirstItem, isLastItem, isSelected, caption,
-			onRemove, onMoveForward, onMoveBackward, setAttributes,
-			'aria-label': ariaLabel, isCropped } = this.props;
-
-		// I'm not sure if or how we can use this on mobile
-		// eslint-disable-next-line no-unused-vars
-		let href;
-
-		switch ( linkTo ) {
-			case 'media':
-				href = url;
-				break;
-			case 'attachment':
-				href = link;
-				break;
-		}
+			url, alt, isFirstItem, isLastItem, isSelected, caption, onRemove,
+			onMoveForward, onMoveBackward, setAttributes, 'aria-label': ariaLabel,
+			isCropped } = this.props;
 
 		const { isUploadInProgress } = this.state;
 		const { isUploadFailed, retryMessage } = params;
