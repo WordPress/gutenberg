@@ -1,5 +1,7 @@
 // Components
 export * from './primitives';
+export { default as ColorIndicator } from './color-indicator';
+export { default as ColorPalette } from './color-palette';
 export { default as Dashicon } from './dashicon';
 export { default as Dropdown } from './dropdown';
 export { default as Toolbar } from './toolbar';
@@ -11,7 +13,11 @@ export { createSlotFill, Slot, Fill, Provider as SlotFillProvider } from './slot
 export { default as BaseControl } from './base-control';
 export { default as TextareaControl } from './textarea-control';
 export { default as PanelBody } from './panel/body';
+export { default as PanelActions } from './panel/actions';
 export { default as Button } from './button';
+export { default as TextControl } from './text-control';
+export { default as ToggleControl } from './toggle-control';
+export { default as SelectControl } from './select-control';
 
 // Higher-Order Components
 export { default as withConstrainedTabbing } from './higher-order/with-constrained-tabbing';

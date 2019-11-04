@@ -1,9 +1,63 @@
+// Reduce the paddings, margins, and UI of inner-blocks.
+// @todo: eventually we may add a feature that lets a parent container absorb the block UI of a child block.
+// When that happens, leverage that instead of the following overrides.
+[data-type="core/navigation-menu"] {
+	// 1. Reset margins on immediate innerblocks container.
+	.wp-block-navigation-menu .block-editor-inner-blocks > .block-editor-block-list__layout {
+		margin-left: 0;
+		margin-right: 0;
+	}
+
+	// 2. Remove paddings on subsequent immediate children.
+	.wp-block-navigation-menu .block-editor-inner-blocks > .block-editor-block-list__layout > .wp-block {
+		width: auto;
+		padding-left: 0;
+		padding-right: 0;
+		margin-left: 0; // something
+	}
+
+	// 3. Remove margins on subsequent Edit container.
+	.wp-block-navigation-menu .block-editor-inner-blocks > .block-editor-block-list__layout > .wp-block > .block-editor-block-list__block-edit {
+		margin-left: 0;
+		margin-right: 0;
+	}
+
+	// 4. Remove vertical margins on subsequent block container.
+	.wp-block-navigation-menu .block-editor-inner-blocks > .block-editor-block-list__layout .wp-block > .block-editor-block-list__block-edit > [data-block] {
+		margin-top: 0;
+		margin-bottom: 0;
+	}
+
+	// Remove the dashed outlines for child blocks.
+	&.is-hovered .wp-block-navigation-menu .block-editor-block-list__block-edit::before,
+	&.is-selected .wp-block-navigation-menu .block-editor-block-list__block-edit::before,
+	&.has-child-selected .wp-block-navigation-menu .block-editor-block-list__block-edit::before {
+		border-color: transparent !important; // !important used to keep the selector from growing any more complex.
+	}
+
+	// Hide the breadcrumb.
+	// Hide the sibling inserter.
+	.wp-block-navigation-menu .block-editor-block-list__insertion-point,
+	.wp-block-navigation-menu .block-editor-block-list__breadcrumb {
+		display: none;
+	}
+
+	// Polish the Appender.
+	.wp-block-navigation-menu .block-list-appender {
+		margin: 0;
+
+		.block-editor-button-block-appender {
+			padding: $grid-size;
+			outline: none;
+			background: none;
+		}
+	}
+}
+
+
 .wp-block-navigation-menu .block-editor-block-list__layout,
 .wp-block-navigation-menu {
 	display: flex;
-	grid-auto-columns: min-content;
-	grid-auto-flow: column;
-	align-items: top;
 	white-space: nowrap;
 }
 
@@ -12,7 +66,95 @@
 }
 
 .wp-block-navigation-menu-item {
-	.wp-block-navigation-menu-item {
+	margin-left: $grid-size;
+	.wp-block-navigation-menu-item__link {
 		margin-left: $grid-size-large;
+	}
+}
+
+/**
+ * Colors Selector component
+ */
+$colors-selector-size: 22px;
+.block-library-colors-selector {
+	width: auto;
+
+	// Toolbar colors-selector button.
+	.block-library-colors-selector__toggle {
+		display: block;
+		margin: 0 auto;
+		padding: 3px;
+		width: auto;
+	}
+
+	// Button container.
+	.block-library-colors-selector__icon-container {
+		width: 42px;
+		height: 30px;
+		position: relative;
+		margin: 0 auto;
+		padding: 3px;
+		display: flex;
+		align-items: center;
+		border-radius: 4px;
+
+		// Add the button arrow.
+		&::after {
+			@include dropdown-arrow();
+		}
+
+		// Styling button states.
+		&:focus,
+		&:hover {
+			color: $dark-gray-500;
+			box-shadow: inset 0 0 0 1px $dark-gray-500, inset 0 0 0 2px #fff;
+		}
+	}
+
+	// colors-selector - selection status.
+	.block-library-colors-selector__state-selection {
+		border-radius: $colors-selector-size / 2;
+		box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
+
+		width: $colors-selector-size;
+		min-width: $colors-selector-size;
+		height: $colors-selector-size;
+		min-height: $colors-selector-size;
+		line-height: ($colors-selector-size - 2);
+		padding: 2px;
+
+		background-color: var(--background-color-menu-link);
+		color: var(--color-menu-link);
+	}
+
+	&:not(.has-background-color) .block-library-colors-selector__state-selection {
+		background-image: linear-gradient(135deg, rgba(0, 0, 0, 0.08) 25%, transparent 25%, transparent 50%, rgba(0, 0, 0, 0.08) 50%, rgba(0, 0, 0, 0.08) 75%, transparent 75%, transparent 100%);
+		background-size: 12px 12px;
+	}
+}
+
+// Colors Selector Popover.
+$color-control-label-height: 20px;
+.block-library-colors-selector__popover {
+	.color-palette-controller-container {
+		padding: 16px;
+	}
+
+	.components-base-control__label {
+		height: $color-control-label-height;
+		line-height: $color-control-label-height;
+	}
+
+	.component-color-indicator {
+		float: right;
+		margin-top: 2px;
+	}
+}
+
+.block-editor-block-mover {
+	&.is-horizontal {
+		.block-editor-block-mover__control-drag-handle {
+			display: none;
+		}
 	}
 }

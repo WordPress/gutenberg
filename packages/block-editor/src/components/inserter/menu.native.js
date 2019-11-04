@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { FlatList, View, Text, TouchableHighlight } from 'react-native';
-import { subscribeMediaAppend } from 'react-native-gutenberg-bridge';
 
 /**
  * WordPress dependencies
@@ -22,23 +21,20 @@ import { BottomSheet, Icon } from '@wordpress/components';
 import styles from './style.scss';
 
 export class InserterMenu extends Component {
+	constructor() {
+		super( ...arguments );
+
+		this.onLayout = this.onLayout.bind( this );
+		this.state = {
+			numberOfColumns: this.calculateNumberOfColumns(),
+		};
+	}
+
 	componentDidMount() {
-		this.subscriptionParentMediaAppend = subscribeMediaAppend( ( payload ) => {
-			this.props.onSelect( {
-				name: 'core/' + payload.mediaType,
-				initialAttributes: {
-					id: payload.mediaId,
-					[ payload.mediaType === 'image' ? 'url' : 'src' ]: payload.mediaUrl,
-				},
-			} );
-		} );
 		this.onOpen();
 	}
 
 	componentWillUnmount() {
-		if ( this.subscriptionParentMediaAppend ) {
-			this.subscriptionParentMediaAppend.remove();
-		}
 		this.onClose();
 	}
 
@@ -60,9 +56,13 @@ export class InserterMenu extends Component {
 		this.props.hideInsertionPoint();
 	}
 
+	onLayout() {
+		const numberOfColumns = this.calculateNumberOfColumns();
+		this.setState( { numberOfColumns } );
+	}
+
 	render() {
 		const { getStylesFromColorScheme } = this.props;
-		const numberOfColumns = this.calculateNumberOfColumns();
 		const bottomPadding = styles.contentBottomPadding;
 		const modalIconWrapperStyle = getStylesFromColorScheme( styles.modalIconWrapper, styles.modalIconWrapperDark );
 		const modalIconStyle = getStylesFromColorScheme( styles.modalIcon, styles.modalIconDark );
@@ -76,10 +76,11 @@ export class InserterMenu extends Component {
 				hideHeader
 			>
 				<FlatList
+					onLayout={ this.onLayout }
 					scrollEnabled={ false }
-					key={ `InserterUI-${ numberOfColumns }` } //re-render when numberOfColumns changes
+					key={ `InserterUI-${ this.state.numberOfColumns }` } //re-render when numberOfColumns changes
 					keyboardShouldPersistTaps="always"
-					numColumns={ numberOfColumns }
+					numColumns={ this.state.numberOfColumns }
 					data={ this.props.items }
 					ItemSeparatorComponent={ () =>
 						<View style={ styles.rowSeparator } />

@@ -118,6 +118,28 @@ export const EXPECTED_TRANSFORMS = {
 		],
 		originalBlock: 'Cover',
 	},
+	core__cover__gradient: {
+		availableTransforms: [
+			'Group',
+			'Image',
+			'Video',
+		],
+		originalBlock: 'Cover',
+	},
+	'core__cover__gradient-image': {
+		availableTransforms: [
+			'Group',
+			'Image',
+		],
+		originalBlock: 'Cover',
+	},
+	'core__cover__gradient-video': {
+		availableTransforms: [
+			'Group',
+			'Video',
+		],
+		originalBlock: 'Cover',
+	},
 	core__cover__video: {
 		availableTransforms: [
 			'Group',
@@ -180,6 +202,14 @@ export const EXPECTED_TRANSFORMS = {
 	core__group: {
 		originalBlock: 'Group',
 		availableTransforms: [],
+	},
+	'core__heading__h2-color': {
+		originalBlock: 'Heading',
+		availableTransforms: [
+			'Quote',
+			'Group',
+			'Paragraph',
+		],
 	},
 	'core__heading__h4-em': {
 		originalBlock: 'Heading',
@@ -318,13 +348,13 @@ export const EXPECTED_TRANSFORMS = {
 		],
 	},
 	'core__navigation-menu': {
-		originalBlock: 'Navigation Menu (Experimental)',
+		originalBlock: 'Navigation',
 		availableTransforms: [
 			'Group',
 		],
 	},
 	'core__navigation-menu-item': {
-		originalBlock: 'Menu Item (Experimental)',
+		originalBlock: 'Menu Item',
 		availableTransforms: [
 			'Group',
 		],
@@ -416,6 +446,12 @@ export const EXPECTED_TRANSFORMS = {
 		availableTransforms: [
 			'Group',
 		],
+	},
+	'core__site-title': {
+		availableTransforms: [
+			'Group',
+		],
+		originalBlock: 'Site Title',
 	},
 	'core__social-link-amazon': {
 		availableTransforms: [

@@ -136,14 +136,14 @@ class Experimental_WP_Widget_Blocks_Manager {
 	}
 
 	/**
-	 * Verifies if a sidabar id is valid or not.
+	 * Verifies if a sidebar id is valid or not.
 	 *
 	 * @since 5.7.0
 	 *
 	 * @param string $sidebar_id Identifier of the sidebar.
 	 * @return boolean True if the $sidebar_id value is valid and false otherwise.
 	 */
-	public static function is_valid_sidabar_id( $sidebar_id ) {
+	public static function is_valid_sidebar_id( $sidebar_id ) {
 		$wp_registered_sidebars = self::get_wp_registered_sidebars();
 		return isset( $wp_registered_sidebars[ $sidebar_id ] );
 	}

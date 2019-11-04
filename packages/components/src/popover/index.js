@@ -53,11 +53,11 @@ function useThrottledWindowScrollOrResize( handler, ignoredScrollableRef ) {
 		};
 
 		window.addEventListener( 'resize', throttledRefresh );
-		window.addEventListener( 'scroll', throttledRefresh );
+		window.addEventListener( 'scroll', throttledRefresh, true );
 
 		return () => {
 			window.removeEventListener( 'resize', throttledRefresh );
-			window.removeEventListener( 'scroll', throttledRefresh );
+			window.removeEventListener( 'scroll', throttledRefresh, true );
 		};
 	}, [] );
 }

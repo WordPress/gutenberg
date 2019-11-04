@@ -3,6 +3,12 @@
  */
 import { StyleSheet, TouchableOpacity, Text, View, Platform } from 'react-native';
 
+/**
+ * WordPress dependencies
+ */
+import { Children, cloneElement } from '@wordpress/element';
+import { withPreferredColorScheme } from '@wordpress/compose';
+
 const isAndroid = Platform.OS === 'android';
 const marginBottom = isAndroid ? -0.5 : 0;
 const marginLeft = -3;
@@ -40,6 +46,9 @@ const styles = StyleSheet.create( {
 		marginLeft,
 		marginBottom,
 	},
+	subscriptInactiveDark: {
+		color: '#a7aaad', // $gray_20
+	},
 	subscriptActive: {
 		color: 'white',
 		fontWeight: 'bold',
@@ -50,13 +59,14 @@ const styles = StyleSheet.create( {
 	},
 } );
 
-export default function Button( props ) {
+export function Button( props ) {
 	const {
 		children,
 		onClick,
 		disabled,
 		hint,
 		fixedRatio = true,
+		getStylesFromColorScheme,
 		'aria-disabled': ariaDisabled,
 		'aria-label': ariaLabel,
 		'aria-pressed': ariaPressed,
@@ -66,7 +76,7 @@ export default function Button( props ) {
 	const isDisabled = ariaDisabled || disabled;
 
 	const buttonViewStyle = {
-		opacity: isDisabled ? 0.2 : 1,
+		opacity: isDisabled ? 0.3 : 1,
 		...( fixedRatio && styles.fixedRatio ),
 		...( ariaPressed ? styles.buttonActive : styles.buttonInactive ),
 	};
@@ -79,6 +89,12 @@ export default function Button( props ) {
 	if ( isDisabled ) {
 		states.push( 'disabled' );
 	}
+
+	const subscriptInactive = getStylesFromColorScheme( styles.subscriptInactive, styles.subscriptInactiveDark );
+
+	const newChildren = Children.map( children, ( child ) => {
+		return child ? cloneElement( child, { colorScheme: props.preferredColorScheme, __unstableActive: ariaPressed } ) : child;
+	} );
 
 	return (
 		<TouchableOpacity
@@ -94,10 +110,12 @@ export default function Button( props ) {
 		>
 			<View style={ buttonViewStyle }>
 				<View style={ { flexDirection: 'row' } }>
-					{ children }
-					{ subscript && ( <Text style={ ariaPressed ? styles.subscriptActive : styles.subscriptInactive }>{ subscript }</Text> ) }
+					{ newChildren }
+					{ subscript && ( <Text style={ ariaPressed ? styles.subscriptActive : subscriptInactive }>{ subscript }</Text> ) }
 				</View>
 			</View>
 		</TouchableOpacity>
 	);
 }
+
+export default withPreferredColorScheme( Button );

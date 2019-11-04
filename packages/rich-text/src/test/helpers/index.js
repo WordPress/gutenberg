@@ -4,7 +4,7 @@
 import { ZWNBSP } from '../../special-characters';
 
 export function getSparseArrayLength( array ) {
-	return array.reduce( ( i ) => i + 1, 0 );
+	return array.reduce( ( accumulator ) => accumulator + 1, 0 );
 }
 
 const em = { type: 'em' };

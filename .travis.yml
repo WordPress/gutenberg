@@ -21,7 +21,8 @@ branches:
   only:
     - master
     - rnmobile/master
-    - wp/trunk
+    - rnmobile/releases
+    - /wp\/.*/
 
 env:
   global:
@@ -195,18 +196,23 @@ jobs:
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 3' < ~/.jest-e2e-tests )
 
+    - stage: deploy
+      if: branch = master
+      name: Deploy Playground
+      env: INSTALL_WORDPRESS=false
+      install:
+        - npm ci
+      before_deploy:
+        - npm run playground:build -- --public-url '/gutenberg'
+        - npm run design-system:build
+      deploy:
+        provider: pages
+        skip_cleanup: true
+        github_token: $GITHUB_TOKEN
+        keep_history: true
+        local_dir: playground/dist
+        on:
+          branch: master
+
   allow_failures:
     - name: JavaScript native mobile tests
-
-before_deploy:
-  - npm install
-  - npm run playground:build -- --public-url '/gutenberg'
-
-deploy:
-  provider: pages
-  skip_cleanup: true
-  github_token: $GITHUB_TOKEN
-  keep_history: true
-  local_dir: playground/dist
-  on:
-    branch: master

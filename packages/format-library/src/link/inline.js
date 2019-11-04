@@ -89,13 +89,15 @@ class InlineLinkUI extends Component {
 		const opensInNewWindow = target === '_blank';
 
 		if ( ! isShowingInput( props, state ) ) {
+			const update = {};
 			if ( url !== state.inputValue ) {
-				return { inputValue: url };
+				update.inputValue = url;
 			}
 
 			if ( opensInNewWindow !== state.opensInNewWindow ) {
-				return { opensInNewWindow };
+				update.opensInNewWindow = opensInNewWindow;
 			}
+			return Object.keys( update ).length ? update : null;
 		}
 
 		return null;

@@ -40,7 +40,7 @@
 /packages/custom-templated-path-webpack-plugin  @ntwb @nerrad @ajitbohra
 /packages/docgen                                @nosolosw
 /packages/e2e-test-utils                        @gziolo @ntwb @nerrad @ajitbohra
-/packages/e2e-tests                             @gziolo @ntwb @nerrad @ajitbohra @talldan
+/packages/e2e-tests                             @ntwb @nerrad @ajitbohra @talldan
 /packages/eslint-plugin                         @gziolo @ntwb @nerrad @ajitbohra
 /packages/jest-console                          @gziolo @ntwb @nerrad @ajitbohra
 /packages/jest-preset-default                   @gziolo @ntwb @nerrad @ajitbohra
@@ -51,9 +51,9 @@
 /packages/scripts                               @youknowriad @gziolo @ntwb @nerrad @ajitbohra
 
 # UI Components
-/packages/components                            @youknowriad @gziolo @ajitbohra @jaymanpandya @jorgefilipecosta @talldan @chrisvanpatten
-/packages/compose                               @youknowriad @gziolo @ajitbohra @jaymanpandya @jorgefilipecosta @talldan
-/packages/element                               @youknowriad @gziolo @ajitbohra @jaymanpandya @jorgefilipecosta @talldan
+/packages/components                            @youknowriad @ajitbohra @jaymanpandya @jorgefilipecosta @talldan @chrisvanpatten
+/packages/compose                               @youknowriad @ajitbohra @jaymanpandya @jorgefilipecosta @talldan
+/packages/element                               @youknowriad @ajitbohra @jaymanpandya @jorgefilipecosta @talldan
 /packages/notices                               @ajitbohra @jaymanpandya @jorgefilipecosta @talldan
 /packages/nux                                   @ajitbohra @jaymanpandya @jorgefilipecosta @talldan @noisysocks
 /packages/viewport                              @youknowriad @ajitbohra @jaymanpandya @jorgefilipecosta @talldan
