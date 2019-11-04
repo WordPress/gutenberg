@@ -13,26 +13,29 @@ import Button from '../button';
 import RangeControl from '../range-control';
 import CustomSelectControl from '../custom-select-control';
 
+const DEFAULT_FONT_SIZE = 'default';
+const CUSTOM_FONT_SIZE = 'custom';
+
 function getSelectValueFromFontSize( fontSizes, value ) {
 	if ( value ) {
 		const fontSizeValue = fontSizes.find( ( font ) => font.size === value );
-		return fontSizeValue ? fontSizeValue.slug : 'custom';
+		return fontSizeValue ? fontSizeValue.slug : CUSTOM_FONT_SIZE;
 	}
-	return 'normal';
+	return DEFAULT_FONT_SIZE;
 }
 
 function getSelectOptions( optionsArray, disableCustomFontSizes ) {
-	if ( ! disableCustomFontSizes ) {
-		optionsArray = [
-			...optionsArray,
-			{ slug: 'custom', name: __( 'Custom' ) },
-		];
-	}
+	optionsArray = [
+		{ slug: DEFAULT_FONT_SIZE, name: __( 'Default' ) },
+		...optionsArray,
+		...disableCustomFontSizes ? [] : [ { slug: CUSTOM_FONT_SIZE, name: __( 'Custom' ) } ],
+	];
 	return optionsArray.map( ( option ) => ( {
 		key: option.slug,
 		name: option.name,
 		style: { fontSize: option.size },
 	} ) );
+
 }
 
 export default function FontSizePicker( {
@@ -52,15 +55,19 @@ export default function FontSizePicker( {
 
 	const onChangeValue = ( event ) => {
 		const newValue = event.target.value;
-		setCurrentSelectValue( getSelectValueFromFontSize( fontSizes, Number( newValue ) ) );
 		if ( newValue === '' ) {
-			onChange( undefined );
+			setDefault();
 			return;
 		}
+		setCurrentSelectValue( getSelectValueFromFontSize( fontSizes, Number( newValue ) ) );
 		onChange( Number( newValue ) );
 	};
 
 	const onSelectChangeValue = ( { selectedItem } ) => {
+		if ( selectedItem.key === DEFAULT_FONT_SIZE ) {
+			setDefault();
+			return;
+		}
 		setCurrentSelectValue( selectedItem.key );
 		onChange( selectedItem.style && selectedItem.style.fontSize );
 	};
@@ -68,6 +75,11 @@ export default function FontSizePicker( {
 	const onSliderChangeValue = ( sliderValue ) => {
 		onChange( sliderValue );
 		setCurrentSelectValue( getSelectValueFromFontSize( fontSizes, sliderValue ) );
+	};
+
+	const setDefault = () => {
+		onChange( undefined );
+		setCurrentSelectValue( getSelectValueFromFontSize( fontSizes, undefined ) );
 	};
 
 	const options = getSelectOptions( fontSizes, disableCustomFontSizes );
@@ -106,10 +118,7 @@ export default function FontSizePicker( {
 				<Button
 					className="components-color-palette__clear"
 					disabled={ value === undefined }
-					onClick={ () => {
-						onChange( undefined );
-						setCurrentSelectValue( getSelectValueFromFontSize( fontSizes, undefined ) );
-					} }
+					onClick={ setDefault }
 					isSmall
 					isSecondary
 				>
