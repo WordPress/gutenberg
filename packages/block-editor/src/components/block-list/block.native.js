@@ -274,7 +274,7 @@ export default compose( [
 		const rootBlock = getBlock( rootBlockId );
 		const hasRootInnerBlocks = rootBlock.innerBlocks.length !== 0;
 
-		const showFloatingToolbar = isSelected && hasRootInnerBlocks && ! isMediaText && ! isMediaTextParent;
+		const showFloatingToolbar = isSelected && hasRootInnerBlocks;
 
 		const firstToSelectId = getFirstToSelectBlock( clientId );
 
