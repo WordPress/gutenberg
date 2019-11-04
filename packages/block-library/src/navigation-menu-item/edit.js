@@ -81,7 +81,6 @@ function NavigationMenuItemEdit( {
 	const { label, opensInNewTab, title, url } = attributes;
 	const link = title ? { title, url } : null;
 	const [ isLinkOpen, setIsLinkOpen ] = useState( ! label && isSelected );
-	const [ wasClosedByLinkControl, setWasClosedByLinkControl ] = useState( false );
 
 	/**
 	 * It's a kind of hack to handle closing the LinkControl popover
@@ -90,11 +89,7 @@ function NavigationMenuItemEdit( {
 	useEffect( () => {
 		if ( ! isSelected ) {
 			setIsLinkOpen( false );
-			setWasClosedByLinkControl( false );
 		}
-		return () => {
-			setWasClosedByLinkControl( false );
-		};
 	}, [ isSelected ] );
 
 	/**
@@ -126,10 +121,8 @@ function NavigationMenuItemEdit( {
 						icon="admin-links"
 						title={ __( 'Link' ) }
 						onClick={ () => {
-							// If the popover was closed by click outside,
-							// then there is not nothing to do here.
-							if ( wasClosedByLinkControl ) {
-								setWasClosedByLinkControl( false );
+							// It works together with LinkControl onCLose event.
+							if ( isLinkOpen ) {
 								return;
 							}
 							setIsLinkOpen( ! isLinkOpen );
@@ -214,10 +207,7 @@ function NavigationMenuItemEdit( {
 						onKeyPress={ ( event ) => event.stopPropagation() }
 						currentLink={ link }
 						onLinkChange={ updateLink( setAttributes, label ) }
-						onClose={ () => {
-							setWasClosedByLinkControl( true );
-							setIsLinkOpen( false );
-						} }
+						onClose={ () => setTimeout( () => setIsLinkOpen( false ), 100 ) }
 						currentSettings={ { 'new-tab': opensInNewTab } }
 						onSettingsChange={ updateLinkSetting( setAttributes ) }
 						fetchSearchSuggestions={ fetchSearchSuggestions }
