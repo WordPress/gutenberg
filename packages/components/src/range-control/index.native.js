@@ -31,7 +31,7 @@ function RangeControl( {
 			id={ id }
 			help={ help }
 			className={ className }
-			onChangeValue={ onChange }
+			onChange={ onChange }
 			aria-describedby={ !! help ? `${ id }__help` : undefined }
 			minimumValue={ min }
 			maximumValue={ max }
