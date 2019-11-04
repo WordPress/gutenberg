@@ -194,7 +194,10 @@ export default function __experimentalUseColors(
 	const detectedBackgroundColorRef = useRef();
 	const BackgroundColorDetector = useMemo(
 		() =>
-			withFallbackStyles( ( node ) => {
+			withFallbackStyles( ( node, { querySelector } ) => {
+				if ( querySelector ) {
+					node = node.parentNode.querySelector( querySelector );
+				}
 				let backgroundColor = getComputedStyle( node ).backgroundColor;
 				while ( backgroundColor === 'rgba(0, 0, 0, 0)' && node.parentNode ) {
 					node = node.parentNode;

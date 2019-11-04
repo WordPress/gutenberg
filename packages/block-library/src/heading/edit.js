@@ -55,8 +55,8 @@ function HeadingEdit( {
 				</PanelBody>
 			</InspectorControls>
 			{ InspectorControlsColorPanel }
-			<BackgroundColorDetector />
 			<TextColor>
+				<BackgroundColorDetector querySelector='[contenteditable="true"]' />
 				<RichText
 					identifier="content"
 					tagName={ tagName }
