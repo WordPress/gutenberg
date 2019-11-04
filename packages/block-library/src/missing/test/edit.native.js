@@ -55,8 +55,8 @@ describe( 'Missing block', () => {
 			const testInstance = component.root;
 			const bottomSheet = testInstance.findByType( BottomSheet );
 			const children = bottomSheet.props.children.props.children;
-			expect( children.length ).toBe( 3 );
-			expect( children[ 0 ].props.icon ).toBe( 'info-outline' );
+			expect( children.length ).toBe( 4 ); // 4 children in the bottom sheet: the icon, the "isn't yet supported" title, the "We are working hard..." message and the "Close" button
+			expect( children[ 0 ].props.icon ).toBe( 'editor-help' );
 		} );
 
 		it( 'renders unsupported text on modal', () => {
@@ -64,7 +64,7 @@ describe( 'Missing block', () => {
 			const testInstance = component.root;
 			const bottomSheet = testInstance.findByType( BottomSheet );
 			const children = bottomSheet.props.children.props.children;
-			expect( children[ 1 ].props.children ).toBe( 'This block isn\'t yet supported on WordPress for iOS' );
+			expect( children[ 1 ].props.children ).toBe( defaultAttributes.originalName + ' isn\'t yet supported on WordPress for iOS' );
 		} );
 
 		it( 'renders close button on modal', () => {
@@ -72,7 +72,7 @@ describe( 'Missing block', () => {
 			const testInstance = component.root;
 			const bottomSheet = testInstance.findByType( BottomSheet );
 			const children = bottomSheet.props.children.props.children;
-			expect( children[ 2 ].props.children.props.children ).toBe( 'Close' );
+			expect( children[ 3 ].props.children.props.children ).toBe( 'Close' );
 		} );
 	} );
 
@@ -87,8 +87,9 @@ describe( 'Missing block', () => {
 	it( 'renders title text without crashing', () => {
 		const component = getTestComponentWithContent();
 		const testInstance = component.root;
-		const text = testInstance.findByType( Text );
-		expect( text ).toBeTruthy();
-		expect( text.props.children ).toBe( 'missing/block/title' );
+		const texts = testInstance.findAllByType( Text );
+		expect( texts.length ).toBe( 2 );
+		expect( texts[ 0 ].props.children ).toBe( 'missing/block/title' );
+		expect( texts[ 1 ].props.children ).toBe( 'Unsupported' );
 	} );
 } );
