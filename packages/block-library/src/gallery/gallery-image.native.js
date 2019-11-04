@@ -132,17 +132,28 @@ class GalleryImage extends Component {
 			onMoveForward, onMoveBackward, setAttributes, 'aria-label': ariaLabel,
 			isCropped } = this.props;
 
+		const { compose } = StyleSheet;
+
 		const { isUploadInProgress } = this.state;
 		const { isUploadFailed, retryMessage } = params;
-		const opacity = isUploadInProgress ? 0.3 : 1;
+		const resizeMode = isCropped ? 'cover' : 'contain';
+
+		const imageStyle = [ styles.image, resizeMode,
+			isUploadInProgress ? styles.imageUploading : undefined,
+		];
+
+		const overlayStyle = compose( styles.overlay,
+			isSelected ? styles.overlaySelected : undefined,
+		);
+
+		const separatorStyle = compose( styles.separator,
+			{ borderRightWidth: StyleSheet.hairlineWidth }
+		);
 
 		return (
 			<>
 				<Image
-					style={ [ styles.image, {
-						resizeMode: isCropped ? 'cover' : 'contain',
-						opacity,
-					} ] }
+					style={ imageStyle }
 					source={ { uri: url } }
 					// alt={ alt }
 					accessibilityLabel={ ariaLabel }
@@ -156,9 +167,7 @@ class GalleryImage extends Component {
 						<Text style={ styles.uploadFailedText }>{ retryMessage }</Text>
 					</View>
 				) }
-				<View style={ [ styles.overlay, {
-					borderColor: isSelected ? '#0070ff' : '#00000000',
-				} ] }>
+				<View style={ overlayStyle }>
 				{ ! isUploadInProgress && (
 					<>
 						{ isSelected && (
@@ -172,9 +181,7 @@ class GalleryImage extends Component {
 										aria-disabled={ isFirstItem }
 										disabled={ ! isSelected }
 									/>
-									<View style={ [ styles.separator, {
-										borderRightWidth: StyleSheet.hairlineWidth,
-									} ] }></View>
+									<View style={ separatorStyle }></View>
 									<Button
 										style={ styles.button }
 										icon="arrow-right"
