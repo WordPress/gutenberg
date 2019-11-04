@@ -1,8 +1,10 @@
 @objc (RNReactNativeGutenbergBridge)
 public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     weak var delegate: GutenbergBridgeDelegate?
+    weak var dataSource: GutenbergBridgeDataSource?
     private var isJSLoading = true
     private var hasObservers = false
+
     // MARK: - Messaging methods
 
     @objc
@@ -50,10 +52,15 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     func requestOtherMediaPickFrom(_ source: String, allowMultipleSelection: Bool, callback: @escaping RCTResponseSenderBlock) {
         //TODO implement me
     }
-    
+
     @objc
     func getOtherMediaOptions(_ filter: [String]?, callback: @escaping RCTResponseSenderBlock) {
-        //TODO implement me
+        guard let dataSource = dataSource else {
+            return callback([])
+        }
+        let mediaSources = dataSource.gutenbergMediaSources()
+        let mediaSourcesString = mediaSources.map{ $0.jsRepresentation }
+        callback([mediaSourcesString])
     }
 
     @objc

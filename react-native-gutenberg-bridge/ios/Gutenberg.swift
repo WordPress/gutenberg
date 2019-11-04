@@ -71,6 +71,7 @@ public class Gutenberg: NSObject {
         self.dataSource = dataSource
         self.extraModules = extraModules
         super.init()
+        bridgeModule.dataSource = dataSource
         logThreshold = isPackagerRunning ? .trace : .error
     }
 
@@ -162,5 +163,31 @@ extension Gutenberg {
     public enum MediaType: String {
         case image
         case video
+    }
+}
+
+extension Gutenberg {
+    public struct MediaSource {
+        /// The label string that will be shown to the user.
+        let label: String
+
+        /// A unique identifier of this media source option.
+        let id: String
+
+        /// The type of media this source can provide.
+        let type: MediaType
+
+        var jsRepresentation: [String: String] {
+            return [
+                "label": label,
+                "value": id,
+            ]
+        }
+    }
+}
+
+public extension Gutenberg.MediaSource {
+    public init(id: String, label: String, type: Gutenberg.MediaType) {
+        self.init(id: id, label: label, type: type)
     }
 }

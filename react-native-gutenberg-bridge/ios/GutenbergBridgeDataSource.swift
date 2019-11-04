@@ -30,4 +30,13 @@ public protocol GutenbergBridgeDataSource: class {
     ///
     /// - Returns: Gutenberg related localization key value pairs for the current locale.
     func gutenbergTranslations() -> [String : [String]]?
+
+    /// Asks the delegate for a list of Media Sources to show on the Media Source Picker.
+    func gutenbergMediaSources() -> [Gutenberg.MediaSource]
+}
+
+public extension GutenbergBridgeDataSource {
+    func gutenbergMediaSources() -> [Gutenberg.MediaSource] {
+        return []
+    }
 }
