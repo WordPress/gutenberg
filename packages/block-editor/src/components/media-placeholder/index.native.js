@@ -35,9 +35,9 @@ function MediaPlaceholder( props ) {
 		value = [],
 	} = props;
 
-	const setMedia =  multiple && addToGallery
-		? ( selected ) => onSelect( uniqBy( [ ...value, ...selected ], 'id' ) )
-		: onSelect;
+	const setMedia = multiple && addToGallery ?
+		( selected ) => onSelect( uniqBy( [ ...value, ...selected ], 'id' ) ) :
+		onSelect;
 
 	const isOneType = allowedTypes.length === 1;
 	const isImage = isOneType && allowedTypes.includes( MEDIA_TYPE_IMAGE );
