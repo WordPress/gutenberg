@@ -32,14 +32,12 @@ class GalleryImage extends Component {
 		this.onSelectImage = this.onSelectImage.bind( this );
 		this.onSelectCaption = this.onSelectCaption.bind( this );
 		this.onMediaPressed = this.onMediaPressed.bind( this );
-		this.onRemoveImage = this.onRemoveImage.bind( this );
 		this.bindContainer = this.bindContainer.bind( this );
 
 		this.updateMediaProgress = this.updateMediaProgress.bind( this );
 		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind( this );
 		this.finishMediaUploadWithFailure = this.finishMediaUploadWithFailure.bind( this );
 		this.mediaUploadStateReset = this.mediaUploadStateReset.bind( this );
-		this.onMediaUpdate = this.onMediaUpdate.bind( this );
 		this.renderContent = this.renderContent.bind( this );
 
 		this.state = {
@@ -66,14 +64,14 @@ class GalleryImage extends Component {
 	}
 
 	onMediaPressed() {
-		const { id: mediaId, url: mediaUrl } = this.props;
+		const { id, url } = this.props;
 
 		this.onSelectImage();
 
 		if ( this.state.isUploadInProgress ) {
-			requestImageUploadCancelDialog( mediaId );
-		} else if ( ( this.state.didUploadFail ) || mediaId && ! isURL( mediaUrl ) ) {
-			requestImageFailedRetryDialog( mediaId );
+			requestImageUploadCancelDialog( id );
+		} else if ( ( this.state.didUploadFail ) || id && ! isURL( url ) ) {
+			requestImageFailedRetryDialog( id );
 		}
 	}
 
@@ -86,17 +84,6 @@ class GalleryImage extends Component {
 			this.setState( {
 				captionSelected: false,
 			} );
-		}
-	}
-
-	onRemoveImage( event ) {
-		if (
-			this.container === document.activeElement &&
-			this.props.isSelected && [ BACKSPACE, DELETE ].indexOf( event.keyCode ) !== -1
-		) {
-			event.stopPropagation();
-			event.preventDefault();
-			this.props.onRemove();
 		}
 	}
 
@@ -125,12 +112,11 @@ class GalleryImage extends Component {
 	}
 
 	finishMediaUploadWithSuccess( payload ) {
-		const { onMediaUpdate } = this;
-
-		onMediaUpdate( {
+		this.props.setAttributes( {
 			id: payload.mediaServerId,
 			url: payload.mediaUrl,
 		} );
+
 		this.setState( {
 			isUploadInProgress: false,
 			didUploadFail: false,
@@ -145,24 +131,13 @@ class GalleryImage extends Component {
 	}
 
 	mediaUploadStateReset() {
-		const { onMediaUpdate } = this;
+		this.props.setAttributes( { id: null, url: null } );
 
-		onMediaUpdate( { id: null, url: null } );
 		this.setState( {
 			isUploadInProgress: false,
 			didUploadFail: false,
 		} );
 	}
-
-	onMediaUpdate( media ) {
-		const { setAttributes } = this.props;
-
-		setAttributes( {
-			mediaId: media.id,
-			mediaUrl: media.url,
-		} );
-	}
-
 
 	renderContent( params ) {
 		const {
@@ -195,12 +170,8 @@ class GalleryImage extends Component {
 						opacity,
 					} ] }
 					source={ { uri: url } }
-					alt={ alt }
-					data-id={ id }
-					onFocus={ this.onSelectImage }
-					onKeyDown={ this.onRemoveImage }
-					tabIndex="0"
-					aria-label={ ariaLabel }
+					// alt={ alt }
+					accessibilityLabel={ ariaLabel }
 					ref={ this.bindContainer }
 				/>
 				{ isUploadFailed && (
