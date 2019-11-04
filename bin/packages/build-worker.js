@@ -94,7 +94,7 @@ const BUILD_TASK_BY_EXTENSION = {
 
 		const builtSass = await renderSass( {
 			file,
-			includePaths: [ path.join( PACKAGES_DIR, 'base-styles' ) ],
+			includePaths: [ path.resolve( __dirname, '../../assets/stylesheets' ) ],
 			data: (
 				[
 					'colors',

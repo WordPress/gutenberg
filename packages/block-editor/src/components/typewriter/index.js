@@ -100,7 +100,7 @@ class Typewriter extends Component {
 	 * Maintains the scroll position after a selection change caused by a
 	 * keyboard event.
 	 *
-	 * @param {WPSyntheticEvent} event Synthetic keyboard event.
+	 * @param {SyntheticEvent} event Synthetic keyboard event.
 	 */
 	maintainCaretPosition( { keyCode } ) {
 		if ( ! this.isSelectionEligibleForScroll() ) {

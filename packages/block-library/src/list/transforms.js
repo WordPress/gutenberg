@@ -18,7 +18,7 @@ import {
 const listContentSchema = {
 	...getPhrasingContentSchema(),
 	ul: {},
-	ol: { attributes: [ 'type', 'start', 'reversed' ] },
+	ol: { attributes: [ 'type' ] },
 };
 
 // Recursion is needed.
@@ -77,35 +77,12 @@ const transforms = {
 				ul: listContentSchema.ul,
 			},
 			transform( node ) {
-				const attributes = {
-					ordered: node.nodeName === 'OL',
-				};
-
-				if ( attributes.ordered ) {
-					const type = node.getAttribute( 'type' );
-
-					if ( type ) {
-						attributes.type = type;
-					}
-
-					if ( node.getAttribute( 'reversed' ) !== null ) {
-						attributes.reversed = true;
-					}
-
-					const start = parseInt( node.getAttribute( 'start' ), 10 );
-
-					if (
-						! isNaN( start ) &&
-						// start=1 only makes sense if the list is reversed.
-						( start !== 1 || attributes.reversed )
-					) {
-						attributes.start = start;
-					}
-				}
-
 				return createBlock( 'core/list', {
-					...getBlockAttributes( 'core/list', node.outerHTML ),
-					...attributes,
+					...getBlockAttributes(
+						'core/list',
+						node.outerHTML
+					),
+					ordered: node.nodeName === 'OL',
 				} );
 			},
 		},

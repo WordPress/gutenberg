@@ -9,7 +9,6 @@ import classnames from 'classnames';
 import {
 	RichText,
 	getColorClassName,
-	__experimentalGetGradientClass,
 } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
@@ -20,7 +19,6 @@ export default function save( { attributes } ) {
 		customTextColor,
 		customGradient,
 		linkTarget,
-		gradient,
 		rel,
 		text,
 		textColor,
@@ -30,20 +28,18 @@ export default function save( { attributes } ) {
 
 	const textClass = getColorClassName( 'color', textColor );
 	const backgroundClass = ! customGradient && getColorClassName( 'background-color', backgroundColor );
-	const gradientClass = __experimentalGetGradientClass( gradient );
 
 	const buttonClasses = classnames( 'wp-block-button__link', {
 		'has-text-color': textColor || customTextColor,
 		[ textClass ]: textClass,
-		'has-background': backgroundColor || customBackgroundColor || customGradient || gradient,
+		'has-background': backgroundColor || customBackgroundColor || customGradient,
 		[ backgroundClass ]: backgroundClass,
 		'no-border-radius': borderRadius === 0,
-		[ gradientClass ]: gradientClass,
 	} );
 
 	const buttonStyle = {
+		backgroundColor: backgroundClass || customGradient ? undefined : customBackgroundColor,
 		background: customGradient ? customGradient : undefined,
-		backgroundColor: backgroundClass || customGradient || gradient ? undefined : customBackgroundColor,
 		color: textClass ? undefined : customTextColor,
 		borderRadius: borderRadius ? borderRadius + 'px' : undefined,
 	};

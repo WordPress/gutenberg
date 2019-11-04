@@ -1,21 +1,13 @@
 /**
- * External dependencies
- */
-import { text } from '@storybook/addon-knobs';
-
-/**
  * Internal dependencies
  */
 import ColorIndicator from '../';
 
 export default {
-	title: 'ColorIndicator',
+	title: 'Color Indicator',
 	component: ColorIndicator,
 };
 
-export const _default = () => {
-	const color = text( 'Color', '#0073aa' );
-	return (
-		<ColorIndicator colorValue={ color } />
-	);
-};
+export const _default = () => (
+	<ColorIndicator colorValue="#0073aa" />
+);

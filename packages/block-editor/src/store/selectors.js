@@ -29,16 +29,6 @@ import {
 } from '@wordpress/blocks';
 import { SVG, Rect, G, Path } from '@wordpress/components';
 
-/**
- * A block selection object.
- *
- * @typedef {Object} WPBlockSelection
- *
- * @property {string} clientId     A block client ID.
- * @property {string} attributeKey A block attribute key.
- * @property {number} offset       A block attribute offset.
- */
-
 // Module constants
 
 /**
@@ -247,9 +237,9 @@ export const getGlobalBlockCount = createSelector(
 		if ( ! blockName ) {
 			return clientIds.length;
 		}
-		return reduce( clientIds, ( accumulator, clientId ) => {
+		return reduce( clientIds, ( count, clientId ) => {
 			const block = state.blocks.byClientId[ clientId ];
-			return block.name === blockName ? accumulator + 1 : accumulator;
+			return block.name === blockName ? count + 1 : count;
 		}, 0 );
 	},
 	( state ) => [
@@ -290,6 +280,14 @@ export const getBlocksByClientId = createSelector(
 export function getBlockCount( state, rootClientId ) {
 	return getBlockOrder( state, rootClientId ).length;
 }
+
+/**
+ * @typedef {WPBlockSelection} A block selection object.
+ *
+ * @property {string} clientId     A block client ID.
+ * @property {string} attributeKey A block attribute key.
+ * @property {number} offset       A block attribute offset.
+ */
 
 /**
  * Returns the current selection start block client ID, attribute key and text
@@ -419,30 +417,6 @@ export function getBlockRootClientId( state, clientId ) {
 		state.blocks.parents[ clientId ] :
 		null;
 }
-
-/**
- * Given a block client ID, returns the list of all its parents from top to bottom.
- *
- * @param {Object} state    Editor state.
- * @param {string} clientId Block from which to find root client ID.
- *
- * @return {Array} ClientIDs of the parent blocks.
- */
-export const getBlockParents = createSelector(
-	( state, clientId ) => {
-		const parents = [];
-		let current = clientId;
-		while ( !! state.blocks.parents[ current ] ) {
-			current = state.blocks.parents[ current ];
-			parents.push( current );
-		}
-
-		return parents.reverse();
-	},
-	( state ) => [
-		state.blocks.parents,
-	]
-);
 
 /**
  * Given a block client ID, returns the root of the hierarchy from which the block is nested, return the block itself for root level blocks.
@@ -1149,9 +1123,9 @@ const canIncludeBlockTypeInInserter = ( state, blockType, rootClientId ) => {
  * @param {Object}  state        Editor state.
  * @param {?string} rootClientId Optional root client ID of block list.
  *
- * @return {WPEditorInserterItem[]} Items that appear in inserter.
+ * @return {Editor.InserterItem[]} Items that appear in inserter.
  *
- * @typedef {Object} WPEditorInserterItem
+ * @typedef {Object} Editor.InserterItem
  * @property {string}   id                Unique identifier for the item.
  * @property {string}   name              The type of block to create.
  * @property {Object}   initialAttributes Attributes to pass to the newly created block.
@@ -1309,22 +1283,6 @@ export const hasInserterItems = createSelector(
 		getBlockTypes(),
 	],
 );
-
-/**
- * Returns the list of allowed inserter blocks for inner blocks children
- *
- * @param {Object}  state        Editor state.
- * @param {?string} rootClientId Optional root client ID of block list.
- *
- * @return {Array?} The list of allowed block types or false.
- */
-export const __experimentalGetAllowedBlocks = ( state, rootClientId = null ) => {
-	if ( ! rootClientId ) {
-		return false;
-	}
-	const { allowedBlocks } = getBlockListSettings( state, rootClientId );
-	return allowedBlocks;
-};
 
 /**
  * Returns the Block List settings of a block, if any exist.

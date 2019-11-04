@@ -1,9 +1,3 @@
-## Master
-
-### Breaking Changes
-- The util function `enableExperimentalFeatures` was removed. It is now available for internal usage in the `e2e-tests` package.
-
-
 ## 2.0.0 (2019-05-21)
 
 ### Requirements

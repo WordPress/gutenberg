@@ -214,8 +214,10 @@ class AudioEdit extends Component {
 export default compose( [
 	withSelect( ( select ) => {
 		const { getSettings } = select( 'core/block-editor' );
-		const { mediaUpload } = getSettings();
-		return { mediaUpload };
+		const { __experimentalMediaUpload } = getSettings();
+		return {
+			mediaUpload: __experimentalMediaUpload,
+		};
 	} ),
 	withNotices,
 ] )( AudioEdit );

@@ -216,7 +216,11 @@ behavior.
 _Parameters_
 
 -   _name_ `string`: Format name.
--   _settings_ `WPFormat`: Format settings.
+-   _settings_ `Object`: Format settings.
+-   _settings.tagName_ `string`: The HTML tag this format will wrap the selection with.
+-   _settings.className_ `[string]`: A class to match the format.
+-   _settings.title_ `string`: Name of the format.
+-   _settings.edit_ `Function`: Should return a component for the user to interact with the new registered format.
 
 _Returns_
 

@@ -52,7 +52,6 @@ export default class Picker extends Component {
 						<BottomSheet.Cell
 							icon={ option.icon }
 							key={ index }
-							leftAlign={ this.props.leftAlign }
 							label={ option.label }
 							separatorType={ 'none' }
 							onPress={ () => this.onCellPress( option.value ) }

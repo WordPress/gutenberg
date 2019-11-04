@@ -101,9 +101,6 @@
 
 	.block-editor-block-list__block-edit {
 		position: relative;
-		&.has-mover-inside > [data-block] {
-			display: flex;
-		}
 
 		&::before {
 			z-index: z-index(".block-editor-block-list__block-edit::before");

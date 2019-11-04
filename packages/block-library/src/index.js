@@ -62,9 +62,6 @@ import * as classic from './classic';
 import * as socialLinks from './social-links';
 import * as socialLink from './social-link';
 
-// Full Site Editing Blocks
-import * as siteTitle from './site-title';
-
 /**
  * Function to register an individual block.
  *
@@ -165,24 +162,14 @@ export const registerCoreBlocks = () => {
  * __experimentalRegisterExperimentalCoreBlocks( settings );
  * ```
  */
-export const __experimentalRegisterExperimentalCoreBlocks =
-	process.env.GUTENBERG_PHASE === 2 ?
-		( settings ) => {
-			const {
-				__experimentalEnableLegacyWidgetBlock,
-				__experimentalEnableMenuBlock,
-				__experimentalEnableFullSiteEditing,
-			} = settings
+export const __experimentalRegisterExperimentalCoreBlocks = process.env.GUTENBERG_PHASE === 2 ? ( settings ) => {
+	const { __experimentalEnableLegacyWidgetBlock, __experimentalEnableMenuBlock } = settings;
 
-				;[
-				__experimentalEnableLegacyWidgetBlock ? legacyWidget : null,
-				__experimentalEnableMenuBlock ? navigationMenu : null,
-				__experimentalEnableMenuBlock ? navigationMenuItem : null,
-				socialLinks,
-				...socialLink.sites,
-
-				// Register Full Site Editing Blocks.
-				...( __experimentalEnableFullSiteEditing ? [ siteTitle ] : [] ),
-			].forEach( registerBlock );
-		} :
-		undefined;
+	[
+		__experimentalEnableLegacyWidgetBlock ? legacyWidget : null,
+		__experimentalEnableMenuBlock ? navigationMenu : null,
+		__experimentalEnableMenuBlock ? navigationMenuItem : null,
+		socialLinks,
+		...socialLink.sites,
+	].forEach( registerBlock );
+} : undefined;

@@ -2,11 +2,8 @@
 	display: flex;
 
 	.components-icon-button {
+		height: $icon-button-size + $grid-size + $grid-size;
 		align-self: flex-end;
-		height: $grid-size * 4 - ($border-width * 2);
-		margin-bottom: $grid-size;
-		margin-right: $grid-size;
-		padding: 0 6px;
 	}
 }
 
@@ -18,13 +15,7 @@
 	min-width: 150px;
 	max-width: 500px;
 
-	&.components-base-control {
-		.components-base-control__field {
-			margin-bottom: 0;
-		}
-
-		.components-base-control__label {
-			display: block;
-		}
+	&.components-base-control .components-base-control__field {
+		margin-bottom: 0;
 	}
 }

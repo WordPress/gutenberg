@@ -3,6 +3,7 @@
  */
 import { View, ImageBackground, Text, TouchableWithoutFeedback } from 'react-native';
 import {
+	requestMediaImport,
 	mediaUploadSync,
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
@@ -61,11 +62,17 @@ class MediaContainer extends Component {
 	}
 
 	componentDidMount() {
-		const { mediaId, mediaUrl } = this.props;
+		const { mediaId, mediaUrl, onMediaUpdate, mediaType } = this.props;
 
-		// Make sure we mark any temporary images as failed if they failed while
-		// the editor wasn't open
-		if ( mediaId && mediaUrl && mediaUrl.indexOf( 'file:' ) === 0 ) {
+		if ( mediaId && mediaUrl && ! isURL( mediaUrl ) ) {
+			if ( mediaUrl.indexOf( 'file:' ) === 0 && mediaType === MEDIA_TYPE_IMAGE ) {
+				// We don't want to call this for video because it is starting a media upload for the cover url
+				requestMediaImport( mediaUrl, ( id, url ) => {
+					if ( url ) {
+						onMediaUpdate( { id, url } );
+					}
+				} );
+			}
 			mediaUploadSync();
 		}
 	}
@@ -154,8 +161,6 @@ class MediaContainer extends Component {
 		const { finalWidth, finalHeight, imageWidthWithinContainer, isUploadFailed, retryMessage } = params;
 		const opacity = isUploadInProgress ? 0.3 : 1;
 
-		const contentStyle = ! imageWidthWithinContainer ? styles.content : styles.contentCentered;
-
 		return (
 			<TouchableWithoutFeedback
 				accessible={ ! isSelected }
@@ -163,7 +168,7 @@ class MediaContainer extends Component {
 				onLongPress={ openMediaOptions }
 				disabled={ ! isSelected }
 			>
-				<View style={ contentStyle }>
+				<View style={ styles.content }>
 					{ ! imageWidthWithinContainer &&
 						<View style={ styles.imageContainer }>
 							{ this.getIcon( false ) }

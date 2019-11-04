@@ -9,7 +9,7 @@ import {
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
 } from 'react-native-gutenberg-bridge';
-import { isEmpty, map } from 'lodash';
+import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -17,12 +17,10 @@ import { isEmpty, map } from 'lodash';
 import {
 	TextControl,
 	ToggleControl,
-	SelectControl,
 	Icon,
 	Toolbar,
 	ToolbarButton,
 	PanelBody,
-	PanelActions,
 } from '@wordpress/components';
 
 import {
@@ -33,7 +31,6 @@ import {
 	MEDIA_TYPE_IMAGE,
 	BlockControls,
 	InspectorControls,
-	BlockAlignmentToolbar,
 } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { isURL } from '@wordpress/url';
@@ -44,7 +41,7 @@ import { withPreferredColorScheme } from '@wordpress/compose';
  * Internal dependencies
  */
 import styles from './styles.scss';
-import SvgIcon, { editImageIcon } from './icon';
+import SvgIcon from './icon';
 import SvgIconRetry from './icon-retry';
 import { getUpdatedLinkTargetSettings } from './utils';
 
@@ -52,19 +49,6 @@ import {
 	LINK_DESTINATION_CUSTOM,
 	LINK_DESTINATION_NONE,
 } from './constants';
-
-const IMAGE_SIZE_THUMBNAIL = 'thumbnail';
-const IMAGE_SIZE_MEDIUM = 'medium';
-const IMAGE_SIZE_LARGE = 'large';
-const IMAGE_SIZE_FULL_SIZE = 'full';
-const DEFAULT_SIZE_SLUG = IMAGE_SIZE_LARGE;
-const sizeOptionLabels = {
-	[ IMAGE_SIZE_THUMBNAIL ]: __( 'Thumbnail' ),
-	[ IMAGE_SIZE_MEDIUM ]: __( 'Medium' ),
-	[ IMAGE_SIZE_LARGE ]: __( 'Large' ),
-	[ IMAGE_SIZE_FULL_SIZE ]: __( 'Full Size' ),
-};
-const sizeOptions = map( sizeOptionLabels, ( label, option ) => ( { value: option, label } ) );
 
 // Default Image ratio 4:3
 const IMAGE_ASPECT_RATIO = 4 / 3;
@@ -86,11 +70,9 @@ export class ImageEdit extends React.Component {
 		this.updateImageURL = this.updateImageURL.bind( this );
 		this.onSetLinkDestination = this.onSetLinkDestination.bind( this );
 		this.onSetNewTab = this.onSetNewTab.bind( this );
-		this.onSetSizeSlug = this.onSetSizeSlug.bind( this );
 		this.onImagePressed = this.onImagePressed.bind( this );
 		this.onClearSettings = this.onClearSettings.bind( this );
 		this.onFocusCaption = this.onFocusCaption.bind( this );
-		this.updateAlignment = this.updateAlignment.bind( this );
 	}
 
 	componentDidMount() {
@@ -104,18 +86,14 @@ export class ImageEdit extends React.Component {
 			console.warn( 'Attributes has id with no url.' );
 		}
 
-		// Detect any pasted image and start an upload
-		if ( ! attributes.id && attributes.url && attributes.url.indexOf( 'file:' ) === 0 ) {
-			requestMediaImport( attributes.url, ( id, url ) => {
-				if ( url ) {
-					setAttributes( { id, url } );
-				}
-			} );
-		}
-
-		// Make sure we mark any temporary images as failed if they failed while
-		// the editor wasn't open
 		if ( attributes.id && attributes.url && ! isURL( attributes.url ) ) {
+			if ( attributes.url.indexOf( 'file:' ) === 0 ) {
+				requestMediaImport( attributes.url, ( id, url ) => {
+					if ( url ) {
+						setAttributes( { id, url } );
+					}
+				} );
+			}
 			mediaUploadSync();
 		}
 	}
@@ -189,10 +167,6 @@ export class ImageEdit extends React.Component {
 		this.props.setAttributes( { url, width: undefined, height: undefined } );
 	}
 
-	updateAlignment( nextAlign ) {
-		this.props.setAttributes( { align: nextAlign } );
-	}
-
 	onSetLinkDestination( href ) {
 		this.props.setAttributes( {
 			linkDestination: LINK_DESTINATION_CUSTOM,
@@ -205,19 +179,12 @@ export class ImageEdit extends React.Component {
 		this.props.setAttributes( updatedLinkTarget );
 	}
 
-	onSetSizeSlug( sizeSlug ) {
-		this.props.setAttributes( {
-			sizeSlug,
-		} );
-	}
-
 	onClearSettings() {
 		this.props.setAttributes( {
 			alt: '',
 			linkDestination: LINK_DESTINATION_NONE,
 			href: undefined,
 			linkTarget: undefined,
-			sizeSlug: DEFAULT_SIZE_SLUG,
 			rel: undefined,
 		} );
 	}
@@ -249,24 +216,17 @@ export class ImageEdit extends React.Component {
 
 	render() {
 		const { attributes, isSelected } = this.props;
-		const { align, url, height, width, alt, href, id, linkTarget, sizeSlug } = attributes;
-
-		const actions = [ { label: __( 'Clear All Settings' ), onPress: this.onClearSettings } ];
+		const { url, height, width, alt, href, id, linkTarget } = attributes;
 
 		const getToolbarEditButton = ( open ) => (
 			<BlockControls>
 				<Toolbar>
 					<ToolbarButton
 						title={ __( 'Edit image' ) }
-						icon={ editImageIcon }
+						icon="edit"
 						onClick={ open }
 					/>
 				</Toolbar>
-				<BlockAlignmentToolbar
-					value={ align }
-					onChange={ this.updateAlignment }
-					isCollapsed={ false }
-				/>
 			</BlockControls>
 		);
 
@@ -289,26 +249,21 @@ export class ImageEdit extends React.Component {
 						checked={ linkTarget === '_blank' }
 						onChange={ this.onSetNewTab }
 					/>
-					{ // eslint-disable-next-line no-undef
-						__DEV__ &&
-						<SelectControl
-							hideCancelButton
-							icon={ 'editor-expand' }
-							label={ __( 'Size' ) }
-							value={ sizeOptionLabels[ sizeSlug || DEFAULT_SIZE_SLUG ] }
-							onChangeValue={ ( newValue ) => this.onSetSizeSlug( newValue ) }
-							options={ sizeOptions }
-						/> }
 					<TextControl
 						icon={ 'editor-textcolor' }
 						label={ __( 'Alt Text' ) }
 						value={ alt || '' }
 						valuePlaceholder={ __( 'None' ) }
+						separatorType={ 'fullWidth' }
+						onChange={ this.updateAlt }
+					/>
+					<TextControl
+						label={ __( 'Clear All Settings' ) }
+						labelStyle={ styles.clearSettingsButton }
 						separatorType={ 'none' }
-						onChangeValue={ this.updateAlt }
+						onPress={ this.onClearSettings }
 					/>
 				</PanelBody>
-				<PanelActions actions={ actions } />
 			</InspectorControls>
 		);
 
@@ -324,14 +279,6 @@ export class ImageEdit extends React.Component {
 				</View>
 			);
 		}
-
-		const alignToFlex = {
-			left: 'flex-start',
-			center: 'center',
-			right: 'flex-end',
-			full: 'center',
-			wide: 'center',
-		};
 
 		const imageContainerHeight = Dimensions.get( 'window' ).width / IMAGE_ASPECT_RATIO;
 		const getImageComponent = ( openMediaOptions, getMediaOptions ) => (
@@ -367,7 +314,7 @@ export class ImageEdit extends React.Component {
 							);
 
 							return (
-								<View style={ { flex: 1, alignSelf: alignToFlex[ align ] } } >
+								<View style={ { flex: 1 } } >
 									{ ! imageWidthWithinContainer &&
 										<View style={ [ styles.imageContainer, { height: imageContainerHeight } ] } >
 											{ this.getIcon( false ) }

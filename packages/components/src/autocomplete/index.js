@@ -91,7 +91,7 @@ import withSpokenMessages from '../higher-order/with-spoken-messages';
  */
 
 /**
- * @typedef {Object} WPCompleter
+ * @typedef {Object} Completer
  * @property {string} name a way to identify a completer, useful for selective overriding.
  * @property {?string} className A class to apply to the popup menu.
  * @property {string} triggerPrefix the prefix that will display the menu.
@@ -232,8 +232,8 @@ export class Autocomplete extends Component {
 	/**
 	 * Load options for an autocompleter.
 	 *
-	 * @param {WPCompleter} completer The autocompleter.
-	 * @param {string}      query     The query, if any.
+	 * @param {Completer} completer The autocompleter.
+	 * @param {string}    query     The query, if any.
 	 */
 	loadOptions( completer, query ) {
 		const { options } = completer;

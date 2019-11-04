@@ -49,7 +49,7 @@ export const { Fill, Slot } = createSlotFill( 'PluginPostStatusInfo' );
  * );
  * ```
  *
- * @return {WPComponent} The component to be rendered.
+ * @return {WPElement} The WPElement to be rendered.
  */
 const PluginPostStatusInfo = ( { children, className } ) => (
 	<Fill>

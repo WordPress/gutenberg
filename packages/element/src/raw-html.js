@@ -13,7 +13,7 @@ import { createElement } from './react';
  * @param {string} props.children HTML to render.
  * @param {Object} props.props    Any additonal props to be set on the containing div.
  *
- * @return {WPComponent} Dangerously-rendering component.
+ * @return {WPElement} Dangerously-rendering element.
  */
 export default function RawHTML( { children, ...props } ) {
 	// The DIV wrapper will be stripped by serializer, unless there are

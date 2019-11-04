@@ -61,7 +61,7 @@ exports[`core/embed block edit matches snapshot 1`] = `
       >
         Learn more about embeds
         <span
-          class="components-visually-hidden"
+          class="screen-reader-text"
         >
           (opens in a new tab)
         </span>

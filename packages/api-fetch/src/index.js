@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+
+/**
  * Internal dependencies
  */
 import createNonceMiddleware from './middlewares/nonce';
@@ -8,8 +13,6 @@ import fetchAllMiddleware from './middlewares/fetch-all-middleware';
 import namespaceEndpointMiddleware from './middlewares/namespace-endpoint';
 import httpV1Middleware from './middlewares/http-v1';
 import userLocaleMiddleware from './middlewares/user-locale';
-import mediaUploadMiddleware from './middlewares/media-upload';
-import { parseResponseAndNormalizeError, parseAndThrowError } from './utils/response';
 
 /**
  * Default set of header values which should be sent with every request unless
@@ -77,10 +80,48 @@ const defaultFetchHandler = ( nextOptions ) => {
 		}
 	);
 
+	const parseResponse = ( response ) => {
+		if ( parse ) {
+			if ( response.status === 204 ) {
+				return null;
+			}
+
+			return response.json ? response.json() : Promise.reject( response );
+		}
+
+		return response;
+	};
+
 	return responsePromise
 		.then( checkStatus )
-		.catch( ( response ) => parseAndThrowError( response, parse ) )
-		.then( ( response ) => parseResponseAndNormalizeError( response, parse ) );
+		.then( parseResponse )
+		.catch( ( response ) => {
+			if ( ! parse ) {
+				throw response;
+			}
+
+			const invalidJsonError = {
+				code: 'invalid_json',
+				message: __( 'The response is not a valid JSON response.' ),
+			};
+
+			if ( ! response || ! response.json ) {
+				throw invalidJsonError;
+			}
+
+			return response.json()
+				.catch( () => {
+					throw invalidJsonError;
+				} )
+				.then( ( error ) => {
+					const unknownError = {
+						code: 'unknown_error',
+						message: __( 'An unknown error occurred.' ),
+					};
+
+					throw error || unknownError;
+				} );
+		} );
 };
 
 let fetchHandler = defaultFetchHandler;
@@ -138,6 +179,5 @@ apiFetch.createNonceMiddleware = createNonceMiddleware;
 apiFetch.createPreloadingMiddleware = createPreloadingMiddleware;
 apiFetch.createRootURLMiddleware = createRootURLMiddleware;
 apiFetch.fetchAllMiddleware = fetchAllMiddleware;
-apiFetch.mediaUploadMiddleware = mediaUploadMiddleware;
 
 export default apiFetch;

@@ -125,6 +125,9 @@ class MediaUpload extends Component {
 		} else {
 			const frameConfig = {
 				title,
+				button: {
+					text: __( 'Select' ),
+				},
 				multiple,
 			};
 			if ( !! allowedTypes ) {

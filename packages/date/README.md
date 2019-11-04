@@ -23,7 +23,7 @@ Formats a date (like `date()` in PHP), in the site's timezone.
 _Parameters_
 
 -   _dateFormat_ `string`: PHP-style formatting string. See php.net/date.
--   _dateValue_ `(Date|string|moment.Moment|null)`: Date object or string, parsable by moment.js.
+-   _dateValue_ `(Date|string|moment|null)`: Date object or string, parsable by moment.js.
 
 _Returns_
 
@@ -36,7 +36,7 @@ Formats a date (like `date_i18n()` in PHP).
 _Parameters_
 
 -   _dateFormat_ `string`: PHP-style formatting string. See php.net/date.
--   _dateValue_ `(Date|string|moment.Moment|null)`: Date object or string, parsable by moment.js.
+-   _dateValue_ `(Date|string|moment|null)`: Date object or string, parsable by moment.js.
 -   _gmt_ `boolean`: True for GMT/UTC, false for site's timezone.
 
 _Returns_
@@ -50,7 +50,7 @@ Formats a date. Does not alter the date's timezone.
 _Parameters_
 
 -   _dateFormat_ `string`: PHP-style formatting string. See php.net/date.
--   _dateValue_ `(Date|string|moment.Moment|null)`: Date object or string, parsable by moment.js.
+-   _dateValue_ `(Date|string|moment|null)`: Date object or string, parsable by moment.js.
 
 _Returns_
 
@@ -75,7 +75,7 @@ Formats a date (like `date()` in PHP), in the UTC timezone.
 _Parameters_
 
 -   _dateFormat_ `string`: PHP-style formatting string. See php.net/date.
--   _dateValue_ `(Date|string|moment.Moment|null)`: Date object or string, parsable by moment.js.
+-   _dateValue_ `(Date|string|moment|null)`: Date object or string, parsable by moment.js.
 
 _Returns_
 

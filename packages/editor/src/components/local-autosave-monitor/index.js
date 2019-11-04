@@ -130,12 +130,7 @@ function useAutosavePurge() {
 	const lastIsAutosaving = useRef( isAutosaving );
 
 	useEffect( () => {
-		if (
-			! didError && (
-				( lastIsAutosaving.current && ! isAutosaving ) ||
-				( lastIsDirty.current && ! isDirty )
-			)
-		) {
+		if ( lastIsAutosaving.current && ! isAutosaving && ! didError ) {
 			localAutosaveClear( postId );
 		}
 

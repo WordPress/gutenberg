@@ -12,6 +12,6 @@ module.exports = {
 	testPathIgnorePatterns: [
 		'/node_modules/',
 		'/wordpress/',
-		'e2e-tests/specs/performance/',
+		'e2e-tests/specs/performance.test.js',
 	],
 };

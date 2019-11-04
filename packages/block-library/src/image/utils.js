@@ -1,12 +1,4 @@
 /**
- * External dependencies
- */
-import {
-	isEmpty,
-	each,
-} from 'lodash';
-
-/**
  * Internal dependencies
  */
 import { NEW_TAB_REL } from './constants';
@@ -18,30 +10,6 @@ export function calculatePreferedImageSize( image, container ) {
 	const width = exceedMaxWidth ? maxWidth : image.width;
 	const height = exceedMaxWidth ? maxWidth * ratio : image.height;
 	return { width, height };
-}
-
-export function removeNewTabRel( currentRel ) {
-	let newRel = currentRel;
-
-	if ( currentRel !== undefined && ! isEmpty( newRel ) ) {
-		if ( ! isEmpty( newRel ) ) {
-			each( NEW_TAB_REL, function( relVal ) {
-				const regExp = new RegExp( '\\b' + relVal + '\\b', 'gi' );
-				newRel = newRel.replace( regExp, '' );
-			} );
-
-			// Only trim if NEW_TAB_REL values was replaced.
-			if ( newRel !== currentRel ) {
-				newRel = newRel.trim();
-			}
-
-			if ( isEmpty( newRel ) ) {
-				newRel = undefined;
-			}
-		}
-	}
-
-	return newRel;
 }
 
 /**
@@ -56,11 +24,11 @@ export function removeNewTabRel( currentRel ) {
 export function getUpdatedLinkTargetSettings( value, { rel } ) {
 	const linkTarget = value ? '_blank' : undefined;
 
-	let updatedRel;
-	if ( ! linkTarget && ! rel ) {
+	let updatedRel = rel;
+	if ( linkTarget && ! rel ) {
+		updatedRel = NEW_TAB_REL;
+	} else if ( ! linkTarget && rel === NEW_TAB_REL ) {
 		updatedRel = undefined;
-	} else {
-		updatedRel = removeNewTabRel( rel );
 	}
 
 	return {

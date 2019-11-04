@@ -82,14 +82,6 @@ _Related_
 
 Undocumented declaration.
 
-<a name="BlockBreadcrumb" href="#BlockBreadcrumb">#</a> **BlockBreadcrumb**
-
-Block breadcrumb component, displaying the hierarchy of the current block selection as a breadcrumb.
-
-_Returns_
-
--   `WPElement`: Block Breadcrumb.
-
 <a name="BlockControls" href="#BlockControls">#</a> **BlockControls**
 
 Undocumented declaration.
@@ -145,7 +137,7 @@ _Parameters_
 
 _Returns_
 
--   `WPComponent`: The component to be rendered.
+-   `WPElement`: Rendered element.
 
 <a name="BlockSelectionClearer" href="#BlockSelectionClearer">#</a> **BlockSelectionClearer**
 
@@ -176,10 +168,6 @@ _Related_
 -   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/button-block-appender/README.md>
 
 <a name="ColorPalette" href="#ColorPalette">#</a> **ColorPalette**
-
-Undocumented declaration.
-
-<a name="ColorPaletteControl" href="#ColorPaletteControl">#</a> **ColorPaletteControl**
 
 Undocumented declaration.
 
@@ -404,7 +392,6 @@ The default editor settings
  **experimentalEnableLegacyWidgetBlock  boolean       Whether the user has enabled the Legacy Widget Block
  **experimentalEnableMenuBlock          boolean       Whether the user has enabled the Menu Block
  **experimentalBlockDirectory           boolean       Whether the user has enabled the Block Directory
- \_\_experimentalEnableFullSiteEditing    boolean       Whether the user has enabled Full Site Editing
 
 <a name="SkipToSelectedBlock" href="#SkipToSelectedBlock">#</a> **SkipToSelectedBlock**
 
@@ -458,10 +445,6 @@ _Related_
 _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/url-popover/README.md>
-
-<a name="useBlockEditContext" href="#useBlockEditContext">#</a> **useBlockEditContext**
-
-Undocumented declaration.
 
 <a name="Warning" href="#Warning">#</a> **Warning**
 

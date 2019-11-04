@@ -123,7 +123,7 @@ module.exports = {
 				'**/*.@(android|ios|native).js',
 				'**/benchmark/**/*.js',
 				'**/@(__mocks__|__tests__|test)/**/*.js',
-				'**/@(storybook|stories)/**/*.js',
+				'**/storybook/**/*.js',
 			],
 		},
 		{

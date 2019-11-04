@@ -5,9 +5,9 @@
         "isValid": true,
         "attributes": {
             "label": "WordPress",
+            "destination": "https://wordpress.org/",
             "nofollow": false,
-            "opensInNewTab": false,
-            "url": "https://wordpress.org/"
+            "opensInNewTab": false
         },
         "innerBlocks": [],
         "originalContent": ""

@@ -25,7 +25,6 @@ import BlockEdit from '../block-edit';
 import BlockInvalidWarning from './block-invalid-warning';
 import BlockMobileToolbar from './block-mobile-toolbar';
 import FloatingToolbar from './block-mobile-floating-toolbar';
-import Breadcrumbs from './breadcrumb';
 import NavigateUpSVG from './nav-up-icon';
 
 class BlockListBlock extends Component {
@@ -137,7 +136,6 @@ class BlockListBlock extends Component {
 							/>
 							<View style={ styles.pipe } />
 						</Toolbar>
-						<Breadcrumbs clientId={ clientId } />
 					</FloatingToolbar>
 					) }
 				<TouchableWithoutFeedback

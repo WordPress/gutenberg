@@ -7,9 +7,9 @@ import { omit } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { RawHTML, Component, createRef, Platform } from '@wordpress/element';
+import { RawHTML, Component, createRef } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
-import { pasteHandler, children as childrenSource, getBlockTransforms, findTransform, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
+import { pasteHandler, children as childrenSource, getBlockTransforms, findTransform } from '@wordpress/blocks';
 import { withInstanceId, compose } from '@wordpress/compose';
 import {
 	__experimentalRichText as RichText,
@@ -25,7 +25,8 @@ import {
 	toHTMLString,
 	slice,
 } from '@wordpress/rich-text';
-import { withFilters } from '@wordpress/components';
+import { withFilters, Popover } from '@wordpress/components';
+import { createBlobURL } from '@wordpress/blob';
 import deprecated from '@wordpress/deprecated';
 import { isURL } from '@wordpress/url';
 
@@ -33,10 +34,10 @@ import { isURL } from '@wordpress/url';
  * Internal dependencies
  */
 import Autocomplete from '../autocomplete';
+import BlockFormatControls from '../block-format-controls';
+import FormatToolbar from './format-toolbar';
 import { withBlockEditContext } from '../block-edit/context';
 import { RemoveBrowserShortcuts } from './remove-browser-shortcuts';
-import { filePasteHandler } from './file-paste-handler';
-import FormatToolbarContainer from './format-toolbar-container';
 
 const wrapperClasses = 'editor-rich-text block-editor-rich-text';
 const classes = 'editor-rich-text__editable block-editor-rich-text__editable';
@@ -65,6 +66,7 @@ class RichTextWrapper extends Component {
 		this.onPaste = this.onPaste.bind( this );
 		this.onDelete = this.onDelete.bind( this );
 		this.inputRule = this.inputRule.bind( this );
+		this.getAnchorRect = this.getAnchorRect.bind( this );
 	}
 
 	onEnter( { value, onChange, shiftKey } ) {
@@ -122,7 +124,7 @@ class RichTextWrapper extends Component {
 		}
 	}
 
-	onPaste( { value, onChange, html, plainText, files } ) {
+	onPaste( { value, onChange, html, plainText, image } ) {
 		const {
 			onReplace,
 			onSplit,
@@ -132,18 +134,16 @@ class RichTextWrapper extends Component {
 			__unstableEmbedURLOnPaste,
 		} = this.props;
 
-		// Only process file if no HTML is present.
-		// Note: a pasted file may have the URL as plain text.
-		if ( files && files.length && ! html ) {
+		if ( image && ! html ) {
+			const file = image.getAsFile ? image.getAsFile() : image;
 			const content = pasteHandler( {
-				HTML: filePasteHandler( files ),
+				HTML: `<img src="${ createBlobURL( file ) }">`,
 				mode: 'BLOCKS',
 				tagName,
 			} );
 
 			// Allows us to ask for this information when we get a report.
-			// eslint-disable-next-line no-console
-			window.console.log( 'Received items:\n\n', files );
+			window.console.log( 'Received item:\n\n', file );
 
 			if ( onReplace && isEmpty( value ) ) {
 				onReplace( content );
@@ -303,6 +303,30 @@ class RichTextWrapper extends Component {
 		return formattingControls.map( ( name ) => `core/${ name }` );
 	}
 
+	getAnchorRect() {
+		const { current } = this.ref;
+		const rect = current.getBoundingClientRect();
+
+		// Add some space.
+		const buffer = 6;
+
+		// Subtract padding if any.
+		let { paddingTop } = window.getComputedStyle( current );
+
+		paddingTop = parseInt( paddingTop, 10 );
+
+		return {
+			x: rect.left,
+			y: rect.top + paddingTop - buffer,
+			width: rect.width,
+			height: rect.height - paddingTop + buffer,
+			left: rect.left,
+			right: rect.right,
+			top: rect.top + paddingTop - buffer,
+			bottom: rect.bottom,
+		};
+	}
+
 	render() {
 		const {
 			children,
@@ -400,7 +424,22 @@ class RichTextWrapper extends Component {
 				{ ( { isSelected, value, onChange, Editable } ) =>
 					<>
 						{ children && children( { value, onChange } ) }
-						{ isSelected && hasFormats && ( <FormatToolbarContainer inline={ inlineToolbar } anchorObj={ this.ref } /> ) }
+						{ isSelected && ! inlineToolbar && hasFormats && (
+							<BlockFormatControls>
+								<FormatToolbar />
+							</BlockFormatControls>
+						) }
+						{ isSelected && inlineToolbar && hasFormats && (
+							<Popover
+								noArrow
+								position="top center"
+								focusOnMount={ false }
+								getAnchorRect={ this.getAnchorRect }
+								className="block-editor-rich-text__inline-format-toolbar"
+							>
+								<FormatToolbar />
+							</Popover>
+						) }
 						{ isSelected && <RemoveBrowserShortcuts /> }
 						<Autocomplete
 							onReplace={ onReplace }
@@ -443,16 +482,7 @@ class RichTextWrapper extends Component {
 
 const RichTextContainer = compose( [
 	withInstanceId,
-	withBlockEditContext( ( { clientId, onCaretVerticalPositionChange, isSelected }, ownProps ) => {
-		if ( Platform.OS === 'web' ) {
-			return { clientId };
-		}
-		return {
-			clientId,
-			blockIsSelected: ownProps.isSelected !== undefined ? ownProps.isSelected : isSelected,
-			onCaretVerticalPositionChange,
-		};
-	} ),
+	withBlockEditContext( ( { clientId } ) => ( { clientId } ) ),
 	withSelect( ( select, {
 		clientId,
 		instanceId,
@@ -465,7 +495,6 @@ const RichTextContainer = compose( [
 			getSelectionEnd,
 			getSettings,
 			didAutomaticChange,
-			__unstableGetBlockWithoutInnerBlocks,
 		} = select( 'core/block-editor' );
 
 		const selectionStart = getSelectionStart();
@@ -480,18 +509,6 @@ const RichTextContainer = compose( [
 			isSelected = selectionStart.clientId === clientId;
 		}
 
-		let extraProps = {};
-		if ( Platform.OS === 'native' ) {
-			// If the block of this RichText is unmodified then it's a candidate for replacing when adding a new block.
-			// In order to fix https://github.com/wordpress-mobile/gutenberg-mobile/issues/1126, let's blur on unmount in that case.
-			// This apparently assumes functionality the BlockHlder actually
-			const block = clientId && __unstableGetBlockWithoutInnerBlocks( clientId );
-			const shouldBlurOnUnmount = block && isSelected && isUnmodifiedDefaultBlock( block );
-			extraProps = {
-				shouldBlurOnUnmount,
-			};
-		}
-
 		return {
 			canUserUseUnfilteredHTML: __experimentalCanUserUseUnfilteredHTML,
 			isCaretWithinFormattedText: isCaretWithinFormattedText(),
@@ -499,7 +516,6 @@ const RichTextContainer = compose( [
 			selectionEnd: isSelected ? selectionEnd.offset : undefined,
 			isSelected,
 			didAutomaticChange: didAutomaticChange(),
-			...extraProps,
 		};
 	} ),
 	withDispatch( ( dispatch, {

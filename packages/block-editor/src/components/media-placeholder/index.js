@@ -429,7 +429,7 @@ const applyWithSelect = withSelect( ( select ) => {
 	const { getSettings } = select( 'core/block-editor' );
 
 	return {
-		mediaUpload: getSettings().mediaUpload,
+		mediaUpload: getSettings().__experimentalMediaUpload,
 	};
 } );
 

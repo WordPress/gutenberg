@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { includes } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { wrap, replaceTag } from '@wordpress/dom';
@@ -16,7 +11,6 @@ export default function( node, doc ) {
 			fontWeight,
 			fontStyle,
 			textDecorationLine,
-			textDecoration,
 			verticalAlign,
 		} = node.style;
 
@@ -28,10 +22,7 @@ export default function( node, doc ) {
 			wrap( doc.createElement( 'em' ), node );
 		}
 
-		// Some DOM implementations (Safari, JSDom) don't support
-		// style.textDecorationLine, so we check style.textDecoration as a
-		// fallback.
-		if ( textDecorationLine === 'line-through' || includes( textDecoration, 'line-through' ) ) {
+		if ( textDecorationLine === 'line-through' ) {
 			wrap( doc.createElement( 's' ), node );
 		}
 

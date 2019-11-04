@@ -67,7 +67,7 @@ function getNodeByPath( node, path ) {
  * each call to `createEmpty`. Therefore, you should not hold a reference to
  * the value to operate upon asynchronously, as it may have unexpected results.
  *
- * @return {Object} RichText tree.
+ * @return {WPRichTextTree} RichText tree.
  */
 const createEmpty = () => createElement( document, '' );
 
