@@ -99,9 +99,9 @@ Because it is a dynamic block it doesn't need to override the default `save` imp
 ```php
 <?php
 
-/*
-Plugin Name: Gutenberg examples dynamic
-*/
+/**
+ * Plugin Name: Gutenberg examples dynamic
+ */
 
 function gutenberg_examples_dynamic_render_callback( $attributes, $content ) {
 	$recent_posts = wp_get_recent_posts( array(
