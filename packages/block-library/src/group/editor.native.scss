@@ -1,9 +1,25 @@
 .groupPlaceholder {
 	padding: 12px;
-	margin: 9px;
+	margin: 16px;
 	background-color: $white;
 	border: $border-width dashed $light-gray-500;
 	border-radius: 4px;
+}
+
+.groupPlaceholderInner {
+	border: 0;
+	padding: 4px;
+}
+
+.groupPlaceholderMarginVerticalNone {
+	margin-top: 0;
+	margin-bottom: 0;
+	padding: 12px;
+}
+
+.groupPlaceholderMarginHorizontalNone {
+	margin-left: 0;
+	margin-right: 0;
 }
 
 .groupPlaceholderDark {

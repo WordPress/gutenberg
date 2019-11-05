@@ -71,6 +71,9 @@ class BlockListBlock extends Component {
 				onCaretVerticalPositionChange={ this.props.onCaretVerticalPositionChange }
 				clientId={ this.props.clientId }
 				isInnerBlock={ this.props.isInnerBlock }
+				isDashed={ this.props.isDashed }
+				isChildOfSameRootBlook={ this.props.isChildOfSameRootBlook }
+				isGroupParent={ this.props.isGroupParent }
 			/>
 		);
 	}
@@ -266,6 +269,7 @@ export default compose( [
 		const selectedBlock = getSelectedBlock();
 		const parentId = getBlockRootClientId( clientId );
 		const parentBlock = getBlock( parentId );
+		const isGroupParent = parentBlock && parentBlock.name === 'core/group';
 
 		const isMediaText = selectedBlock && selectedBlock.name === 'core/media-text';
 		const isMediaTextParent = parentBlock && parentBlock.name === 'core/media-text';
@@ -313,6 +317,7 @@ export default compose( [
 			isParentSelected,
 			isMediaTextParent,
 			isMediaText,
+			isGroupParent,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {
