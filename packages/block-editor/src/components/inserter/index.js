@@ -12,7 +12,6 @@ import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, ifCondition } from '@wordpress/compose';
 import {
 	createBlock,
-	getBlockType,
 } from '@wordpress/blocks';
 
 /**
@@ -136,7 +135,7 @@ export default compose( [
 		const hasSingleBlockType = allowedBlocks && ( get( allowedBlocks, [ 'length' ], 0 ) === 1 );
 		let allowedBlockType = false;
 		if ( hasSingleBlockType ) {
-			allowedBlockType = getBlockType( allowedBlocks );
+			allowedBlockType = allowedBlocks[ 0 ];
 		}
 		return {
 			hasItems: hasInserterItems( rootClientId ),
@@ -148,7 +147,7 @@ export default compose( [
 	withDispatch( ( dispatch, ownProps, { select } ) => {
 		return {
 			insertOnlyAllowedBlock() {
-				const { rootClientId, clientId, isAppender, destinationRootClientId } = ownProps;
+				const { rootClientId, clientId, isAppender } = ownProps;
 				const {
 					hasSingleBlockType,
 					allowedBlockType,
@@ -167,17 +166,17 @@ export default compose( [
 
 					// If the clientId is defined, we insert at the position of the block.
 					if ( clientId ) {
-						return getBlockIndex( clientId, destinationRootClientId );
+						return getBlockIndex( clientId, rootClientId );
 					}
 
 					// If there a selected block, we insert after the selected block.
 					const end = getBlockSelectionEnd();
 					if ( ! isAppender && end ) {
-						return getBlockIndex( end, destinationRootClientId ) + 1;
+						return getBlockIndex( end, rootClientId ) + 1;
 					}
 
 					// Otherwise, we insert at the end of the current rootClientId
-					return getBlockOrder( destinationRootClientId ).length;
+					return getBlockOrder( rootClientId ).length;
 				}
 
 				const {

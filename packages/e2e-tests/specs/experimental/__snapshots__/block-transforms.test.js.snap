@@ -456,6 +456,12 @@ exports[`Block transforms correctly transform block Pullquote in fixture core__p
 <!-- /wp:quote -->"
 `;
 
+exports[`Block transforms correctly transform block Pullquote in fixture core__pullquote__main-color into the Quote block 1`] = `
+"<!-- wp:quote -->
+<blockquote class=\\"wp-block-quote\\"><p>Pullquote custom color</p><cite>my citation</cite></blockquote>
+<!-- /wp:quote -->"
+`;
+
 exports[`Block transforms correctly transform block Pullquote in fixture core__pullquote__multi-paragraph into the Quote block 1`] = `
 "<!-- wp:quote -->
 <blockquote class=\\"wp-block-quote\\"><p>Paragraph <strong>one</strong></p><p>Paragraph two</p><cite>by whomever</cite></blockquote>

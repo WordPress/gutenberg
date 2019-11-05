@@ -7,7 +7,6 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import {
-	Fragment,
 	useMemo,
 	useEffect,
 } from '@wordpress/element';
@@ -32,6 +31,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import useBlockNavigator from './use-block-navigator';
+import BlockNavigationList from './block-navigation-list';
 import BlockColorsStyleSelector from './block-colors-selector';
 
 function NavigationMenu( {
@@ -109,7 +109,7 @@ function NavigationMenu( {
 	}, [ backgroundColor.class, textColor.class ] );
 
 	return (
-		<Fragment>
+		<>
 			<BlockControls>
 				<Toolbar>
 					{ navigatorToolbarButton }
@@ -134,10 +134,15 @@ function NavigationMenu( {
 						help={ __( 'Automatically add new top level pages to this menu.' ) }
 					/>
 				</PanelBody>
+				<PanelBody
+					title={ __( 'Navigation Structure' ) }
+				>
+					<BlockNavigationList clientId={ clientId } />
+				</PanelBody>
 			</InspectorControls>
 
 			<div className={ navigationMenuClasses } style={ navigationMenuStyles }>
-				{ isRequesting && <Spinner /> }
+				{ isRequesting && <><Spinner /> { __( 'Loading Navigation…' ) } </> }
 				{ pages &&
 					<InnerBlocks
 						template={ defaultMenuItems ? defaultMenuItems : null }
@@ -147,7 +152,7 @@ function NavigationMenu( {
 					/>
 				}
 			</div>
-		</Fragment>
+		</>
 	);
 }
 
