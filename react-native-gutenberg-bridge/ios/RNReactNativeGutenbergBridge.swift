@@ -16,9 +16,8 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     
     @objc
     func requestMediaPickFrom(_ source: String, filter: [String]?, allowMultipleSelection: Bool, callback: @escaping RCTResponseSenderBlock) {
-        let allMediaSources = Gutenberg.MediaSource.registeredInternalSources + (dataSource?.gutenbergMediaSources() ?? [])
-        let mediaSource = allMediaSources.first{ $0.id == source } ?? .deviceLibrary
-        let mediaFilter = mediaTypes(from: filter)
+        let mediaSource = getMediaSource(withId: source)
+        let mediaFilter = getMediaTypes(from: filter)
 
         DispatchQueue.main.async {
             self.delegate?.gutenbergDidRequestMedia(from: mediaSource, filter: mediaFilter, allowMultipleSelection: allowMultipleSelection, with: { media in
@@ -45,10 +44,6 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
         }
     }
 
-    private func mediaTypes(from jsMediaTypes: [String]?) -> [Gutenberg.MediaType] {
-        return (jsMediaTypes ?? []).map { Gutenberg.MediaType(fromJSString: $0) }
-    }
-    
     @objc
     func requestOtherMediaPickFrom(_ source: String, allowMultipleSelection: Bool, callback: @escaping RCTResponseSenderBlock) {
         requestMediaPickFrom(source, filter: nil, allowMultipleSelection: allowMultipleSelection, callback: callback)
@@ -61,7 +56,7 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
         }
 
         let mediaSources = dataSource.gutenbergMediaSources()
-        let allowedTypes = mediaTypes(from: filter)
+        let allowedTypes = getMediaTypes(from: filter)
         let filteredSources = mediaSources.filter {
             return $0.types.intersection(allowedTypes).isEmpty == false
         }
@@ -207,12 +202,20 @@ extension RNReactNativeGutenbergBridge {
 // MARK: - Helpers
 
 extension RNReactNativeGutenbergBridge {
-    
     func optionalArray(from optionalString: String?) -> [String]? {
         guard let string = optionalString else {
             return nil
         }
         return [string]
+    }
+
+    private func getMediaSource(withId mediaSourceID: String) -> Gutenberg.MediaSource {
+        let allMediaSources = Gutenberg.MediaSource.registeredInternalSources + (dataSource?.gutenbergMediaSources() ?? [])
+        return allMediaSources.first{ $0.id == mediaSourceID } ?? .deviceLibrary
+    }
+
+    private func getMediaTypes(from jsMediaTypes: [String]?) -> [Gutenberg.MediaType] {
+        return (jsMediaTypes ?? []).map { Gutenberg.MediaType(fromJSString: $0) }
     }
 }
 
