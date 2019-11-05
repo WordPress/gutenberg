@@ -55,7 +55,7 @@ describe( 'Missing block', () => {
 			const testInstance = component.root;
 			const bottomSheet = testInstance.findByType( BottomSheet );
 			const children = bottomSheet.props.children.props.children;
-			expect( children.length ).toBe( 4 ); // 4 children in the bottom sheet: the icon, the "isn't yet supported" title, the "We are working hard..." message and the "Close" button
+			expect( children.length ).toBe( 3 ); // 4 children in the bottom sheet: the icon, the "isn't yet supported" title and the "We are working hard..." message
 			expect( children[ 0 ].props.icon ).toBe( 'editor-help' );
 		} );
 
@@ -65,14 +65,6 @@ describe( 'Missing block', () => {
 			const bottomSheet = testInstance.findByType( BottomSheet );
 			const children = bottomSheet.props.children.props.children;
 			expect( children[ 1 ].props.children ).toBe( '\'' + defaultAttributes.originalName + '\' isn\'t yet supported on WordPress for iOS' );
-		} );
-
-		it( 'renders close button on modal', () => {
-			const component = getTestComponentWithContent();
-			const testInstance = component.root;
-			const bottomSheet = testInstance.findByType( BottomSheet );
-			const children = bottomSheet.props.children.props.children;
-			expect( children[ 3 ].props.children.props.children ).toBe( 'Close' );
 		} );
 	} );
 
