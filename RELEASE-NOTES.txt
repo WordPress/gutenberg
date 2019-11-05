@@ -1,6 +1,6 @@
 1.17.0
 ------
-* Show new-block-indicator when no blocks at all too
+* Show new-block-indicator when no blocks at all and when at the last block
 
 1.16.0
 ------
