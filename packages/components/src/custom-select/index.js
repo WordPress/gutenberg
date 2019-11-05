@@ -96,7 +96,7 @@ export default function CustomSelect( {
 	return (
 		<div className={ classnames( 'components-custom-select', className ) }>
 			{ /* eslint-disable-next-line jsx-a11y/label-has-associated-control, jsx-a11y/label-has-for */ }
-			<span
+			<label
 				{ ...getLabelProps( {
 					className: classnames( 'components-custom-select__label', {
 						'screen-reader-text': hideLabelFromVision,
@@ -104,7 +104,7 @@ export default function CustomSelect( {
 				} ) }
 			>
 				{ label }
-			</span>
+			</label>
 			<Button
 				{ ...getToggleButtonProps( {
 					// This is needed because some speech recognition software don't support `aria-labelledby`.
