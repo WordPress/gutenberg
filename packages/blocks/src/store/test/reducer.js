@@ -7,9 +7,9 @@ import deepFreeze from 'deep-freeze';
  * Internal dependencies
  */
 import {
-	addBlockPatterns,
+	__experimentalAddBlockPatterns,
 	addBlockTypes,
-	removeBlockPatterns,
+	__experimentalRemoveBlockPatterns,
 } from '../actions';
 import {
 	blockPatterns,
@@ -168,7 +168,7 @@ describe( 'blockPatterns', () => {
 
 		const state = blockPatterns(
 			initialState,
-			addBlockPatterns( blockName, blockPattern )
+			__experimentalAddBlockPatterns( blockName, blockPattern )
 		);
 
 		expect( state ).toEqual( {
@@ -187,7 +187,7 @@ describe( 'blockPatterns', () => {
 
 		const state = blockPatterns(
 			initialState,
-			addBlockPatterns( blockName, secondBlockPattern ),
+			__experimentalAddBlockPatterns( blockName, secondBlockPattern ),
 		);
 
 		expect( state ).toEqual( {
@@ -233,7 +233,7 @@ describe( 'blockPatterns', () => {
 
 		const state = blockPatterns(
 			initialState,
-			removeBlockPatterns( blockName, blockPatternName )
+			__experimentalRemoveBlockPatterns( blockName, blockPatternName )
 		);
 
 		expect( state ).toEqual( {

@@ -71,7 +71,7 @@ export function removeBlockStyles( blockName, styleNames ) {
  *
  * @return {Object} Action object.
  */
-export function addBlockPatterns( blockName, patterns ) {
+export function __experimentalAddBlockPatterns( blockName, patterns ) {
 	return {
 		type: 'ADD_BLOCK_PATTERNS',
 		patterns: castArray( patterns ),
@@ -87,7 +87,7 @@ export function addBlockPatterns( blockName, patterns ) {
  *
  * @return {Object} Action object.
  */
-export function removeBlockPatterns( blockName, patternNames ) {
+export function __experimentalRemoveBlockPatterns( blockName, patternNames ) {
 	return {
 		type: 'REMOVE_BLOCK_PATTERNS',
 		patternNames: castArray( patternNames ),

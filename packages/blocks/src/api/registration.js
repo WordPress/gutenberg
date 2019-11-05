@@ -98,7 +98,7 @@ import { DEPRECATED_ENTRY_KEYS } from './constants';
  * @property {WPComponent}      edit         Component rendering an element to
  *                                           manipulate the attributes of a block
  *                                           in the context of an editor.
- * @property {WPBlockPattern[]} patterns
+ * @property {WPBlockPattern[]} [patterns]   The list of block patterns.
  */
 
 /**
@@ -465,7 +465,7 @@ export const unregisterBlockStyle = ( blockName, styleVariationName ) => {
  * @param {string}         blockName Name of the block (example: “core/columns”).
  * @param {WPBlockPattern} pattern   Object describing a block pattern.
  */
-export const registerBlockPattern = ( blockName, pattern ) => {
+export const __experimentalRegisterBlockPattern = ( blockName, pattern ) => {
 	dispatch( 'core/blocks' ).addBlockPatterns( blockName, pattern );
 };
 
@@ -475,6 +475,6 @@ export const registerBlockPattern = ( blockName, pattern ) => {
  * @param {string} blockName   Name of the block (example: “core/columns”).
  * @param {string} patternName Name of the pattern defined for the block.
  */
-export const unregisterBlockPattern = ( blockName, patternName ) => {
+export const __experimentalUnregisterBlockPattern = ( blockName, patternName ) => {
 	dispatch( 'core/blocks' ).removeBlockPatterns( blockName, patternName );
 };

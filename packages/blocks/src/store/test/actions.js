@@ -2,8 +2,8 @@
  * Internal dependencies
  */
 import {
-	addBlockPatterns,
-	removeBlockPatterns,
+	__experimentalAddBlockPatterns,
+	__experimentalRemoveBlockPatterns,
 } from '../actions';
 
 describe( 'actions', () => {
@@ -19,7 +19,7 @@ describe( 'actions', () => {
 					example: 'foo',
 				},
 			};
-			const result = addBlockPatterns( blockName, pattern );
+			const result = __experimentalAddBlockPatterns( blockName, pattern );
 			expect( result ).toEqual( {
 				type: 'ADD_BLOCK_PATTERNS',
 				patterns: [
@@ -30,7 +30,7 @@ describe( 'actions', () => {
 		} );
 
 		it( 'should return the REMOVE_BLOCK_PATTERNS action', () => {
-			const result = removeBlockPatterns( blockName, patternName );
+			const result = __experimentalRemoveBlockPatterns( blockName, patternName );
 			expect( result ).toEqual( {
 				type: 'REMOVE_BLOCK_PATTERNS',
 				patternNames: [

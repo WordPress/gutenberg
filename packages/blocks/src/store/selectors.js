@@ -60,13 +60,13 @@ export function getBlockStyles( state, name ) {
 /**
  * Returns block patterns by block name.
  *
- * @param {Object} state Data state.
- * @param {string} name  Block type name.
+ * @param {Object} state      Data state.
+ * @param {string} blockName  Block type name.
  *
- * @return {WPBlockPattern[]} Block Styles.
+ * @return {?(WPBlockPattern[])} Block patterns.
  */
-export function getBlockPattens( state, name ) {
-	return state.blockPatterns[ name ];
+export function __experimentalGetBlockPattens( state, blockName ) {
+	return state.blockPatterns[ blockName ];
 }
 
 /**
