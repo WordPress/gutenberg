@@ -69,22 +69,24 @@ export class UnsupportedBlockEdit extends Component {
 			title,
 		);
 
-		return <BottomSheet
-			isVisible={ this.state.showHelp }
-			hideHeader
-			onClose={ this.toggleSheet.bind( this ) }
-		>
-			<View style={ styles.infoContainer } >
-				<Icon icon="editor-help" style={ styles.infoIcon } size={ styles.infoIcon.size } />
-				<Text style={ [ infoTextStyle, infoTitleStyle ] }>
-					{ infoTitle }
-				</Text>
-				<Text style={ [ infoTextStyle, infoDescriptionStyle ] }>
-					{ __( 'We are working hard to add more blocks with each release. In the meantime, you can also edit this post on the web.' ) }
-				</Text>
-				{ this.renderSheetButton( __( 'Close' ), () => this.toggleSheet.bind( this ) ) }
-			</View>
-		</BottomSheet>;
+		return (
+			<BottomSheet
+				isVisible={ this.state.showHelp }
+				hideHeader
+				onClose={ this.toggleSheet.bind( this ) }
+			>
+				<View style={ styles.infoContainer } >
+					<Icon icon="editor-help" style={ styles.infoIcon } size={ styles.infoIcon.size } />
+					<Text style={ [ infoTextStyle, infoTitleStyle ] }>
+						{ infoTitle }
+					</Text>
+					<Text style={ [ infoTextStyle, infoDescriptionStyle ] }>
+						{ __( 'We are working hard to add more blocks with each release. In the meantime, you can also edit this post on the web.' ) }
+					</Text>
+					{ this.renderSheetButton( __( 'Close' ), () => this.toggleSheet.bind( this ) ) }
+				</View>
+			</BottomSheet>
+		);
 	}
 
 	render() {
