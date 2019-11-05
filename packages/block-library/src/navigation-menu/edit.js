@@ -52,14 +52,13 @@ function NavigationMenu( {
 				return null;
 			}
 
-			return pages.map( ( { title, permalink_template: destination, type, link, id } ) => (
+			return pages.map( ( { title, type, link: url, id: linkId } ) => (
 				[ 'core/navigation-menu-item', {
 					label: title.rendered,
-					destination,
 					title: title.raw,
 					type,
-					linkId: id,
-					url: link,
+					linkId,
+					url,
 					opensInNewTab: false,
 				} ]
 			) );
