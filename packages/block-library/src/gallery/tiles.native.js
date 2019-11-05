@@ -24,7 +24,7 @@ function Tiles( props ) {
 	const {
 		columns,
 		children,
-		groutSpacing = 10,
+		spacing = 10,
 	} = props;
 
 	const tileCount = Children.count( children );
@@ -39,10 +39,10 @@ function Tiles( props ) {
 		return (
 			<View style={ [ tileStyle, {
 				width: ( ( 1 / rowLength ) * 100 ) + '%',
-				borderLeftWidth: groutSpacing * ( indexInRow / rowLength ),
-				borderRightWidth: groutSpacing * ( 1 - ( ( indexInRow + 1 ) / rowLength ) ),
-				borderTopWidth: row === 0 ? 0 : groutSpacing / 2,
-				borderBottomWidth: row === lastRow ? 0 : groutSpacing / 2,
+				borderLeftWidth: spacing * ( indexInRow / rowLength ),
+				borderRightWidth: spacing * ( 1 - ( ( indexInRow + 1 ) / rowLength ) ),
+				borderTopWidth: row === 0 ? 0 : spacing / 2,
+				borderBottomWidth: row === lastRow ? 0 : spacing / 2,
 			} ] }>
 				{ child }
 			</View>
