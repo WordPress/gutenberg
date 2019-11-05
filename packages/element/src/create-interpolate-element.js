@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { createElement, isValidElement, Fragment } from 'react';
+import { createElement, Fragment } from 'react';
 
 let indoc,
 	offset,
@@ -36,8 +36,8 @@ const tokenizer = /<(\/)?(\w+)\s*(\/)?>/g;
  *                                   undefined or an object.
  */
 const elementCreator = ( [ element, props = {} ] ) => ( children ) => {
-	if ( ! typeof element === 'string' && ! isValidElement( element ) ) {
-		throw new Error( 'not a valid element(' + element + ')' );
+	if ( typeof element !== 'string' && typeof element !== 'function' ) {
+		throw new Error( `Not a valid element (${ element })` );
 	}
 	props.key = ++keyIndex;
 	return createElement( element, props, children );

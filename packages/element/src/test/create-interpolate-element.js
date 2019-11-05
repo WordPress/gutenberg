@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { createElement, Fragment } from '../react';
+import { createElement, Fragment, Component } from '../react';
 import createInterpolateElement from '../create-interpolate-element';
 
 describe( 'createInterpolateElement', () => {
@@ -162,10 +162,18 @@ describe( 'createInterpolateElement', () => {
 			}
 		) ) ).toEqual( JSON.stringify( expectedElement ) );
 	} );
+	it( 'throws an error with an invalid element in the conversion map', () => {
+		const test = () => (
+			createInterpolateElement( 'This is a <invalid /> string', { invalid: [ 10, {} ] } )
+		);
+		expect( test ).toThrow( /Not a valid element/ );
+	} );
 	it( 'returns expected output for complex replacement', () => {
-		const TestComponent = ( props ) => {
-			return <div { ...props } />;
-		};
+		class TestComponent extends Component {
+			render( props ) {
+				return <div { ...props } />;
+			}
+		}
 		const testString = 'This is a complex string with ' +
 			'a <a1>nested <em1>emphasized string</em1> link</a1> and value: <TestComponent/>';
 		const expectedElement = createElement(
