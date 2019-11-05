@@ -8,17 +8,10 @@ import { View } from 'react-native';
  */
 import { Children } from '@wordpress/element';
 
-const containerStyle = {
-	flexDirection: 'row',
-	flexWrap: 'wrap',
-};
-
-const tileStyle = {
-	overflow: 'hidden',
-	flexDirection: 'row',
-	alignItems: 'center',
-	borderColor: 'transparent',
-};
+/**
+ * Internal dependencies
+ */
+import styles from './tiles-styles';
 
 function Tiles( props ) {
 	const {
@@ -37,7 +30,7 @@ function Tiles( props ) {
 		const indexInRow = index % columns;
 
 		return (
-			<View style={ [ tileStyle, {
+			<View style={ [ styles.tileStyle, {
 				width: ( ( 1 / rowLength ) * 100 ) + '%',
 				borderLeftWidth: spacing * ( indexInRow / rowLength ),
 				borderRightWidth: spacing * ( 1 - ( ( indexInRow + 1 ) / rowLength ) ),
@@ -50,7 +43,7 @@ function Tiles( props ) {
 	} );
 
 	return (
-		<View style={ containerStyle }>
+		<View style={ styles.containerStyle }>
 			{ wrappedChildren }
 		</View>
 	);
