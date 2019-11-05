@@ -44,7 +44,7 @@ export const Gallery = ( props ) => {
 		<View>
 			<Tiles
 				columns={ displayedColumns }
-				groutSpacing={ 15 }
+				spacing={ 15 }
 				align={ align }
 			>
 				{ images.map( ( img, index ) => {
