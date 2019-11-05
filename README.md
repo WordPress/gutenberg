@@ -2,7 +2,7 @@
 [![Build Status](https://img.shields.io/travis/com/WordPress/gutenberg/master.svg)](https://travis-ci.com/WordPress/gutenberg)
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org)
 
-![Screenshot of the Gutenberg Editor, editing a post in WordPress](https://cldup.com/H0oKBfpidk.png)
+![Screenshot of the Gutenberg Editor, editing a post in WordPress](https://cldup.com/R84R5fNgrI.png)
 
 This repo is the development hub for the <a href="https://make.wordpress.org/core/2017/01/04/focus-tech-and-design-leads/">editor focus in WordPress Core</a>. `Gutenberg` is the project name.
 
@@ -32,7 +32,6 @@ Here's why we're looking at the whole editing screen, as opposed to just the con
 4. **A fresh look at content creation.** Considering the whole interface lays a solid foundation for the next focus: full site customization.
 5. **Modern tooling.** Looking at the full editor screen also gives WordPress the opportunity to drastically modernize the foundation, and take steps towards a more fluid and JavaScript-powered future that fully leverages the WordPress REST API.
 
-![Writing in Gutenberg 1.6](https://make.wordpress.org/core/files/2017/10/gutenberg-typing-1_6.gif)
 
 ## Blocks
 

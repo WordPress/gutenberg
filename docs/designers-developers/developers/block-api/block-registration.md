@@ -1,6 +1,6 @@
 # Block Registration
 
-## `register_block_type`
+## `registerBlockType`
 
 * **Type:** `Function`
 

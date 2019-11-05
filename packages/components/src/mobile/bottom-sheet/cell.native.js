@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { TouchableOpacity, Text, View, TextInput, I18nManager } from 'react-native';
+import { TouchableOpacity, Text, View, TextInput, I18nManager, AccessibilityInfo } from 'react-native';
 import { isEmpty } from 'lodash';
 
 /**
@@ -23,7 +23,10 @@ class BottomSheetCell extends Component {
 		super( ...arguments );
 		this.state = {
 			isEditingValue: props.autoFocus || false,
+			isScreenReaderEnabled: false,
 		};
+
+		this.handleScreenReaderToggled = this.handleScreenReaderToggled.bind( this );
 	}
 
 	componentDidUpdate() {
@@ -32,8 +35,31 @@ class BottomSheetCell extends Component {
 		}
 	}
 
+	componentDidMount() {
+		AccessibilityInfo.addEventListener(
+			'screenReaderChanged',
+			this.handleScreenReaderToggled,
+		);
+
+		AccessibilityInfo.isScreenReaderEnabled().then( ( isScreenReaderEnabled ) => {
+			this.setState( { isScreenReaderEnabled } );
+		} );
+	}
+
+	componentWillUnmount() {
+		AccessibilityInfo.removeEventListener(
+			'screenReaderChanged',
+			this.handleScreenReaderToggled,
+		);
+	}
+
+	handleScreenReaderToggled( isScreenReaderEnabled ) {
+		this.setState( { isScreenReaderEnabled } );
+	}
+
 	render() {
 		const {
+			accessible,
 			accessibilityLabel,
 			accessibilityHint,
 			accessibilityRole,
@@ -157,10 +183,11 @@ class BottomSheetCell extends Component {
 		};
 
 		const iconStyle = getStylesFromColorScheme( styles.icon, styles.iconDark );
+		const containerPointerEvents = this.state.isScreenReaderEnabled && accessible ? 'none' : 'auto';
 
 		return (
 			<TouchableOpacity
-				accessible={ ! this.state.isEditingValue }
+				accessible={ accessible !== undefined ? accessible : ! this.state.isEditingValue }
 				accessibilityLabel={ getAccessibilityLabel() }
 				accessibilityRole={ accessibilityRole || 'button' }
 				accessibilityHint={ isValueEditable ?
@@ -174,7 +201,7 @@ class BottomSheetCell extends Component {
 				{ drawTopSeparator && (
 					<View style={ separatorStyle() } />
 				) }
-				<View style={ styles.cellContainer }>
+				<View style={ styles.cellContainer } pointerEvents={ containerPointerEvents }>
 					<View style={ styles.cellRowContainer }>
 						{ icon && (
 							<View style={ styles.cellRowContainer }>

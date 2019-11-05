@@ -259,18 +259,32 @@ class RichText extends Component {
 		}
 
 		if ( onPaste ) {
-			// Only process file if no HTML is present.
-			// Note: a pasted file may have the URL as plain text.
-			const image = find( [ ...items, ...files ], ( { type } ) =>
-				/^image\/(?:jpe?g|png|gif)$/.test( type )
-			);
+			files = Array.from( files );
+
+			Array.from( items ).forEach( ( item ) => {
+				if ( ! item.getAsFile ) {
+					return;
+				}
+
+				const file = item.getAsFile();
+
+				if ( ! file ) {
+					return;
+				}
+
+				const { name, type, size } = file;
+
+				if ( ! find( files, { name, type, size } ) ) {
+					files.push( file );
+				}
+			} );
 
 			onPaste( {
 				value: this.removeEditorOnlyFormats( record ),
 				onChange: this.onChange,
 				html,
 				plainText,
-				image,
+				files,
 			} );
 		}
 	}
