@@ -9,16 +9,16 @@ describe( 'createInterpolateElement', () => {
 		const testString = 'This is a string';
 		expect(
 			createInterpolateElement( testString, [] )
-		).toEqual( 'This is a string' );
+		).toBe( 'This is a string' );
 	} );
 	it( 'returns same string when there are no tokens in the string', () => {
 		const testString = 'This is a string';
 		expect(
 			createInterpolateElement(
 				testString,
-				{ someValue: { value: 10 } }
+				{ someValue: [ 'someValue' ] }
 			)
-		).toEqual( <Fragment>{ testString }</Fragment> );
+		).toBe( testString );
 	} );
 	it( 'returns same string when there is an invalid conversion map', () => {
 		const testString = 'This is a <someValue/> string';
@@ -27,17 +27,35 @@ describe( 'createInterpolateElement', () => {
 				testString,
 				[ 'someValue', { value: 10 } ],
 			)
-		).toEqual( testString );
+		).toBe( testString );
 	} );
 	it( 'returns same string when there is an non matching token in the ' +
      'string', () => {
-		const testString = 'This is a <nonParsed/> string';
+		const testString = 'This is a <non_parsed/> string';
 		expect(
 			createInterpolateElement(
 				testString,
-				{ someValue: { value: 20 } }
+				{ someValue: [ 'someValue' ] }
 			)
-		).toEqual( <Fragment>{ testString }</Fragment> );
+		).toBe( testString );
+	} );
+	it( 'returns same string when there is spaces in the token', () => {
+		const testString = 'This is a <spaced token/>string';
+		expect(
+			createInterpolateElement(
+				testString,
+				{ 'spaced token': [ 'a' ] }
+			)
+		).toBe( testString );
+	} );
+	it( 'returns string without unbalanced tags', () => {
+		const testString = 'This is a <em>string';
+		expect(
+			createInterpolateElement(
+				testString,
+				{ em: [ 'em' ] }
+			)
+		).toBe( 'This is a string' );
 	} );
 	it( 'returns expected react element for non nested components', () => {
 		const testString = 'This is a string with <a>a link</a>.';
@@ -49,20 +67,22 @@ describe( 'createInterpolateElement', () => {
 				createElement(
 					'a',
 					{ href: 'https://github.com', className: 'some_class', key: 0 },
-					'a link'
+					[ 'a link' ]
 				),
 				'.',
 			]
 		);
-		expect( createInterpolateElement(
+		const component = createInterpolateElement(
 			testString,
 			{
-				a: {
-					tag: 'a',
-					props: { href: 'https://github.com', className: 'some_class' },
-				},
+				a: [ 'a', { href: 'https://github.com', className: 'some_class' } ],
 			}
-		) ).toEqual( expectedElement );
+		);
+		expect(
+			JSON.stringify( component )
+		).toEqual(
+			JSON.stringify( expectedElement )
+		);
 	} );
 	it( 'returns expected react element for nested components', () => {
 		const testString = 'This is a <a>string that is <em>linked</em></a>.';
@@ -73,48 +93,33 @@ describe( 'createInterpolateElement', () => {
 				'This is a ',
 				createElement(
 					'a',
-					{ key: 0 },
+					{ key: 1 },
 					[
 						'string that is ',
 						createElement(
 							'em',
-							{ key: 1 },
-							'linked'
+							{ key: 0 },
+							[ 'linked' ]
 						),
 					]
 				),
 				'.',
 			]
 		);
-		expect( createInterpolateElement(
+		expect( JSON.stringify( createInterpolateElement(
 			testString,
 			{
-				a: { tag: 'a', props: {} },
-				em: { tag: 'em', props: {} },
+				a: [ 'a' ],
+				em: [ 'em' ],
 			}
-		) ).toEqual( expectedElement );
-	} );
-	it( 'returns a value for a prop value type token replacement', () => {
-		const testString = 'This is a string with a value token: <someValue/>';
-		const expectedElement = createElement(
-			Fragment,
-			{},
-			[
-				'This is a string with a value token: ',
-				10,
-			]
-		);
-		expect( createInterpolateElement(
-			testString,
-			{ someValue: { value: 10 } }
-		) ).toEqual( expectedElement );
+		) ) ).toEqual( JSON.stringify( expectedElement ) );
 	} );
 	it( 'returns expected output for a custom component with children ' +
 		'replacement', () => {
 		const TestComponent = ( props ) => {
 			return <div { ...props } >{ props.children }</div>;
 		};
-		const testString = 'This is a string with a <span>Custom Component</span>';
+		const testString = 'This is a string with a <TestComponent>Custom Component</TestComponent>';
 		const expectedElement = createElement(
 			Fragment,
 			{},
@@ -123,22 +128,22 @@ describe( 'createInterpolateElement', () => {
 				createElement(
 					TestComponent,
 					{ key: 0 },
-					'Custom Component'
+					[ 'Custom Component' ]
 				),
 			]
 		);
-		expect( createInterpolateElement(
+		expect( JSON.stringify( createInterpolateElement(
 			testString,
 			{
-				span: { tag: TestComponent, props: {} },
+				TestComponent: [ TestComponent ],
 			}
-		) ).toEqual( expectedElement );
+		) ) ).toEqual( JSON.stringify( expectedElement ) );
 	} );
 	it( 'returns expected output for self closing custom component', () => {
 		const TestComponent = ( props ) => {
 			return <div { ...props } />;
 		};
-		const testString = 'This is a string with a self closing custom component: <span/>';
+		const testString = 'This is a string with a self closing custom component: <TestComponent/>';
 		const expectedElement = createElement(
 			Fragment,
 			{},
@@ -150,57 +155,51 @@ describe( 'createInterpolateElement', () => {
 				),
 			]
 		);
-		expect( createInterpolateElement(
+		expect( JSON.stringify( createInterpolateElement(
 			testString,
 			{
-				span: { tag: TestComponent, props: {} },
+				TestComponent: [ TestComponent ],
 			}
-		) ).toEqual( expectedElement );
+		) ) ).toEqual( JSON.stringify( expectedElement ) );
 	} );
 	it( 'returns expected output for complex replacement', () => {
 		const TestComponent = ( props ) => {
 			return <div { ...props } />;
 		};
-		const testString = 'This is a complex string having a <concrete/> value, with ' +
-			'a <a1>nested <em1><value/></em1> link</a1> and value: <TestComponent/>';
+		const testString = 'This is a complex string with ' +
+			'a <a1>nested <em1>emphasized string</em1> link</a1> and value: <TestComponent/>';
 		const expectedElement = createElement(
 			Fragment,
 			{},
 			[
-				'This is a complex string having a ',
-				'concrete',
-				' value, with a ',
+				'This is a complex string with a ',
 				createElement(
 					'a',
-					{ key: 0 },
+					{ key: 1 },
 					[
 						'nested ',
 						createElement(
 							'em',
-							{ key: 1 },
-							'value'
+							{ key: 0 },
+							[ 'emphasized string' ]
 						),
 						' link',
 					]
 				),
 				' and value: ',
 				createElement(
-					Fragment,
-					{ key: 2 },
-					<TestComponent />,
+					TestComponent,
+					{ key: 2 }
 				),
 			]
 		);
 		expect( JSON.stringify( createInterpolateElement(
 			testString,
 			{
-				TestComponent: { value: <TestComponent /> },
-				concrete: { value: 'concrete' },
-				em1: { tag: 'em', props: {} },
-				value: { value: 'value' },
-				a1: { tag: 'a', props: {} },
+				TestComponent: [ TestComponent ],
+				em1: [ 'em' ],
+				a1: [ 'a' ],
 			}
 		) ) ).toEqual( JSON.stringify( expectedElement ) );
 	} );
-	// test complex multi types replacements.
 } );

@@ -1,175 +1,97 @@
 /**
- * Internal dependencies
- */
-import { createElement, Fragment, isValidElement } from './react';
-
-/**
  * External dependencies
  */
-import { escapeRegExp, flatMap } from 'lodash';
+import { createElement, isValidElement, Fragment } from 'react';
 
-const getHasPropValue = ( config ) => !! config.value;
-const getHasChildren = ( config ) => !! config.hasChildren;
-
-const getBalancedTagsExpression = ( searchString ) => new RegExp(
-	escapeRegExp( `<${ searchString }>` ) +
-		'(.*)' + escapeRegExp( `</${ searchString }>` )
-);
-
-const getSelfClosingTagExpression = ( searchString ) => new RegExp(
-	escapeRegExp( `<${ searchString }/>` )
-);
+let indoc,
+	offset,
+	output,
+	stack,
+	keyIndex;
 
 /**
- * Generates and returns the regular expression used for splitting a string
+ * Matches tags in the localized string
  *
- * @param {string} searchString  The search string serving as the base for the
- *                               expression.
+ * This is used for extracting the tag pattern groups for parsing the localized
+ * string and along with the map converting it to a react element.
  *
- * @return {RegExp}  The generated regular expression
+ * There are four references extracted using this tokenizer:
+ *
+ * match: Full match of the tag (i.e. <strong>, </strong>, <br/>)
+ * isClosing: If the match has a closing tag (i.e. </)
+ * name: The name portion of the tag (strong, br) (if )
+ * isSelfClosed: Whether the match is for a self-closing tag (i.e. />)
+ *
+ * @type RegExp
  */
-const getSplitRegEx = ( searchString ) => new RegExp( '(' + escapeRegExp( searchString ) + ')' );
+const tokenizer = /<(\/)?(\w+)\s*(\/)?>/g;
 
 /**
- * Generates a String.prototype.match value for the incoming arguments.
+ * This receives the value for a map element which consists of an element and
+ * it's props and returns a element creator function.
  *
- * @param {string} interpolatedString  The string the match is performed on.
- * @param {string} searchString				 The string used as the base for the
- *                                     search
- * @param {Object} conversionConfig    The configuration object for the
- *                                     interpolation being performed.
- *
- * @return {Array|null}	An array if there is a match or null if not.
+ * @param {Array} [ element, props ] The first item in the array is expected to
+ *                                   be a string or a react component. The
+ *                                   second item is expected to be either
+ *                                   undefined or an object.
  */
-const getMatchFromString = (
-	interpolatedString,
-	searchString,
-	conversionConfig
-) => {
-	// first try children reg ex. If there is a match, then return.
-	const match = interpolatedString.match(
-		getBalancedTagsExpression( searchString )
-	);
-
-	if ( match !== null ) {
-		conversionConfig.hasChildren = true;
-		return match;
+const elementCreator = ( [ element, props = {} ] ) => ( children ) => {
+	if ( ! typeof element === 'string' && ! isValidElement( element ) ) {
+		throw new Error( 'not a valid element(' + element + ')' );
 	}
-
-	// no children, so just return selfClosingTag match
-	return interpolatedString.match( getSelfClosingTagExpression( searchString ) );
-};
-
-// index for keys
-// This is external to `recursiveCreateElement` and reset in
-// `createInterpolateElement` because of the recursion.
-let keyIndex = -1;
-
-/**
- * Used to recursively create elements from the interpolation string using the
- * conversion map.
- *
- * @param {string}  potentialElement  The interpolation string (or fragment)
- *                                    being processed.
- * @param {Array[]} conversionMap     The interpolation map used for converting
- *                                    the string to a react element.
- *
- * @return {Element|string|Array}  A react element, string or array.
- */
-const recursiveCreateElement = ( potentialElement, conversionMap ) => {
-	/**
-	 * If the conversion map is not a valid array or empty then just return the
-	 * element.
-	 */
-	if ( ! Array.isArray( conversionMap ) || ! conversionMap.length ) {
-		return potentialElement;
-	}
-	const [ mapItem ] = conversionMap;
-	const [ searchString, conversionConfig ] = mapItem;
-
-	/**
-	 * This short circuits the process if the conversion map has an invalid config.
-	 */
-	if ( ! searchString || ! conversionConfig ) {
-		return potentialElement;
-	}
-
-	const match = getMatchFromString(
-		potentialElement,
-		searchString,
-		conversionConfig
-	);
-
-	// if there is no match for this string, then that means it is not an element
-	// so just return as is to be used as a direct child.
-	if ( match === null ) {
-		return potentialElement;
-	}
-
-	// if the full match returned equals the potential element, then we know
-	// we can create the element and restart the conversion on any children if
-	// necessary.
-	if ( match[ 0 ] === potentialElement ) {
-		// remove this item from the conversion map because it's no longer needed.
-		conversionMap.shift();
-
-		if ( getHasPropValue( conversionConfig ) ) {
-			// if value is a react element, then need to wrap in Fragment with a key
-			// to prevent key warnings.
-			if ( isValidElement( conversionConfig.value ) ) {
-				keyIndex++;
-				return <Fragment key={ keyIndex }>{ conversionConfig.value }</Fragment>;
-			}
-			return conversionConfig.value;
-		}
-		keyIndex++;
-		return getHasChildren( conversionConfig ) ?
-			createElement(
-				conversionConfig.tag,
-				{ ...conversionConfig.props, key: keyIndex },
-				recursiveCreateElement( match[ 1 ], conversionMap )
-			) :
-			createElement(
-				conversionConfig.tag,
-				{ ...conversionConfig.props, key: keyIndex }
-			);
-	}
-
-	// still here, so we need to split on the full match and loop through each
-	return flatMap(
-		potentialElement.split( getSplitRegEx( match[ 0 ] ) )
-			.filter( ( value ) => !! value ),
-		( element ) => {
-			return recursiveCreateElement( element, conversionMap );
-		}
-	);
+	props.key = ++keyIndex;
+	return createElement( element, props, children );
 };
 
 /**
- * This reorders the conversionMap so that it's entries match the order of
- * elements in the string.
+ * An object describing a component to be created.
  *
- * This is necessary because the parser is order sensitive due to the potential
- * for nested elements (eg. <a>Some linked <em>and emphasized</em></a> string).
- * This ensures that the parsing will be done correctly yet still allow for the
- * consumer not to worry about order in the map.
+ * This is used by the string iterator to track children that get added to an
+ * element when it is created. This allows for collecting nested elements in
+ * the string before creating the parent.
  *
- * @param interpolatedString {string}  The string being parsed.
- * @param conversionMap      {Array}   The map being reordered
+ * @param   {Function}  creator An element creator that will be invoked for
+ *                              actually creating the react element with the
+ *                              provided children.
+ * @param   {Array}  children   Array of children to be provided to the element
+ *                              creator when invoked.
  *
- * @return {Array}  The new map in the correct order for the tags in the string.
+ * @return  {Object}            An object returning the creator and children.
  */
-const reorderMapByElementOrder = ( interpolatedString, conversionMap ) => {
-	// if length of map is only one then we can just return as is.
-	if ( conversionMap.length === 1 ) {
-		return conversionMap;
-	}
-	return conversionMap.sort( ( [ tagA ], [ tagB ] ) => {
-		tagA = `<${ tagA }`;
-		tagB = `<${ tagB }`;
-		return interpolatedString.indexOf( tagA ) > interpolatedString.indexOf( tagB );
-	} );
-};
+function Component( creator, children = [] ) {
+	return {
+		creator,
+		children,
+	};
+}
+
+/**
+ * This encapsulates information about the current iteration state for adding to
+ * the stack
+ *
+ * @param {Component} component
+ * @param {number}    tokenStart
+ * @param {number}    tokenLength
+ * @param {number}    prevOffset
+ * @param {number}    leadingTextStart
+ *
+ * @return {Object} Iteration info as an object.
+ */
+function Frame(
+	component,
+	tokenStart,
+	tokenLength,
+	prevOffset,
+	leadingTextStart
+) {
+	return {
+		component,
+		tokenStart,
+		tokenLength,
+		prevOffset: prevOffset || tokenStart + tokenLength,
+		leadingTextStart,
+	};
+}
 
 /**
  * This function creates an interpolated element from a passed in string with
@@ -179,17 +101,16 @@ const reorderMapByElementOrder = ( interpolatedString, conversionMap ) => {
  * @example
  * For example, for the given string:
  *
- * "This is a <span>string</span> with <a>a link</a>, a self-closing
- * <CustomComponentB/> tag and a plain value <custom value/>"
+ * "This is a <span>string</span> with <a>a link</a> and a self-closing
+ * <CustomComponentB/> tag"
  *
  * You would have something like this as the conversionMap value:
  *
  * ```js
  * {
- *     span: { tag: CustomComponent, props: {} },
- *     a: { tag: 'a', props: { href: 'https://github.com' } },
- *     CustomComponentB: { tag: CustomComponentB, props: {} },
- *     'custom value': { value: 'custom value' },
+ *     span: ['span'],
+ *     a: ['a', { href: 'https://github.com' }],
+ *     CustomComponentB: [ CustomComponentB ],
  * }
  * ```
  *
@@ -200,26 +121,27 @@ const reorderMapByElementOrder = ( interpolatedString, conversionMap ) => {
  * @return {Element}  A react element.
  */
 const createInterpolateElement = ( interpolatedString, conversionMap ) => {
+	indoc = interpolatedString;
+	offset = 0;
 	keyIndex = -1;
+	output = [];
+	stack = [];
+	tokenizer.lastIndex = 0;
 
 	if ( ! isValidConversionMap( conversionMap ) ) {
 		return interpolatedString;
 	}
 
-	// verify that the object isn't empty.
-	conversionMap = Object.entries( conversionMap );
-	if ( conversionMap.length === 0 ) {
-		return interpolatedString;
-	}
+	do {
+		// twiddle our thumbs
+	} while ( proceed( conversionMap ) );
 
-	return createElement(
-		Fragment,
-		{},
-		recursiveCreateElement(
-			interpolatedString,
-			reorderMapByElementOrder( interpolatedString, conversionMap )
-		),
-	);
+	output = output.every( ( a ) => 'string' === typeof a ) ?
+		output.join( '' ) :
+		output.filter( ( a ) => '' !== a );
+	return typeof output === 'string' ?
+		output :
+		createElement( Fragment, {}, output );
 };
 
 /**
@@ -235,5 +157,170 @@ const isValidConversionMap = ( conversionMap ) => {
 	return typeof conversionMap === 'object' &&
 		typeof conversionMap.length === 'undefined';
 };
+
+/**
+ * This is the iterator over the matches in the string.
+ *
+ * @param {Object} conversionMap The conversion map for the string.
+ *
+ * @return {boolean} true for continuing to iterate, false for finished.
+ */
+function proceed( conversionMap ) {
+	const next = nextToken();
+	const [ tokenType, name, startOffset, tokenLength ] = next;
+	const stackDepth = stack.length;
+	const leadingTextStart = startOffset > offset ? offset : null;
+	if ( ! conversionMap[ name ] ) {
+		if ( stackDepth !== 0 ) {
+			const { stackLeadingText, tokenStart } = stack.pop();
+			output.push( indoc.substr( stackLeadingText, tokenStart ) );
+		}
+		addText();
+		return false;
+	}
+	switch ( tokenType ) {
+		case 'no-more-tokens':
+			if ( stackDepth !== 0 ) {
+				const { stackLeadingText, tokenStart } = stack.pop();
+				output.push( indoc.substr( stackLeadingText, tokenStart ) );
+			}
+			addText();
+			return false;
+
+		case 'self-closed':
+			if ( 0 === stackDepth ) {
+				if ( null !== leadingTextStart ) {
+					output.push(
+						indoc.substr( leadingTextStart, startOffset - leadingTextStart )
+					);
+				}
+				output.push( elementCreator( conversionMap[ name ] )() );
+				offset = startOffset + tokenLength;
+				return true;
+			}
+
+			// otherwise we found an inner element
+			addChild(
+				new Component( elementCreator( conversionMap[ name ] ), [] ),
+				startOffset,
+				tokenLength
+			);
+			offset = startOffset + tokenLength;
+			return true;
+
+		case 'opener':
+			stack.push(
+				Frame(
+					new Component( elementCreator( conversionMap[ name ] ), [] ),
+					startOffset,
+					tokenLength,
+					startOffset + tokenLength,
+					leadingTextStart
+				)
+			);
+			offset = startOffset + tokenLength;
+			return true;
+
+		case 'closer':
+			// if we're not nesting then this is easy - close the block
+			if ( 1 === stackDepth ) {
+				addComponentFromStack( startOffset );
+				offset = startOffset + tokenLength;
+				return true;
+			}
+
+			// otherwise we're nested and we have to close out the current
+			// block and add it as a innerBlock to the parent
+			const stackTop = stack.pop();
+			const text = indoc.substr(
+				stackTop.prevOffset,
+				startOffset - stackTop.prevOffset
+			);
+			stackTop.component.children.push( text );
+			stackTop.prevOffset = startOffset + tokenLength;
+
+			addChild(
+				stackTop.component,
+				stackTop.tokenStart,
+				stackTop.tokenLength,
+				startOffset + tokenLength
+			);
+			offset = startOffset + tokenLength;
+			return true;
+
+		default:
+			addText();
+			return false;
+	}
+}
+
+/**
+ * Grabs the next token match in the string and returns it's details.
+ *
+ * @return  {Array}  An array of details for the token matched.
+ */
+function nextToken() {
+	const matches = tokenizer.exec( indoc );
+	// we have no more tokens
+	if ( null === matches ) {
+		return [ 'no-more-tokens' ];
+	}
+	const startedAt = matches.index;
+	const [ match, isClosing, name, isSelfClosed ] = matches;
+	const length = match.length;
+	if ( isSelfClosed ) {
+		return [ 'self-closed', name, startedAt, length ];
+	}
+	if ( isClosing ) {
+		return [ 'closer', name, startedAt, length ];
+	}
+	return [ 'opener', name, startedAt, length ];
+}
+
+/**
+ * Pushes text extracted from the indoc string to the output stack given the
+ * current rawLength value and offset (if rawLength is provided ) or the
+ * indoc.length and offset.
+ *
+ * @param   {number}  rawLength  If provided will be used as the length of chars
+ *                               to extract.
+ */
+function addText( rawLength ) {
+	const length = rawLength ? rawLength : indoc.length - offset;
+	if ( 0 === length ) {
+		return output.push( '' );
+	}
+	output.push( indoc.substr( offset, length ) );
+}
+
+function addChild( component, tokenStart, tokenLength, lastOffset ) {
+	const parent = stack[ stack.length - 1 ];
+	const text = indoc.substr( parent.prevOffset, tokenStart - parent.prevOffset );
+
+	if ( text ) {
+		parent.component.children.push( text );
+	}
+
+	parent.component.children.push( component.creator( component.children ) );
+	parent.prevOffset = lastOffset ? lastOffset : tokenStart + tokenLength;
+}
+
+function addComponentFromStack( endOffset ) {
+	const { component, leadingTextStart, prevOffset, tokenStart } = stack.pop();
+
+	const text = endOffset ?
+		indoc.substr( prevOffset, endOffset - prevOffset ) :
+		indoc.substr( prevOffset );
+
+	if ( text ) {
+		component.children.push( text );
+	}
+
+	if ( null !== leadingTextStart ) {
+		output.push( indoc.substr( leadingTextStart, tokenStart - leadingTextStart ) );
+	}
+
+	output.push( component.creator( component.children ) );
+}
 
 export default createInterpolateElement;
