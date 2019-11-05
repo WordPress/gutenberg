@@ -120,7 +120,7 @@ class LegacyWidgetEditHandler extends Component {
 		}
 
 		apiFetch( {
-			path: `/wp/v2/widgets/`,
+			path: `/__experimental/widget-forms/`,
 			data: {
 				identifier,
 				instance,
