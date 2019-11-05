@@ -40,7 +40,7 @@ import LinkControlSearchItem from './search-item';
 import LinkControlSearchInput from './search-input';
 
 const MODE_EDIT = 'edit';
-const MODE_SHOW = 'show';
+// const MODE_SHOW = 'show';
 
 function LinkControl( {
 	className,
@@ -85,11 +85,12 @@ function LinkControl( {
 	/**
 	 * Handler function which switches the mode of the component,
 	 * between `edit` and `show` mode.
-	 *
 	 * Also, it calls `onChangeMode` callback function.
+	 *
+	 * @param {string} mode Component mode: `show` or `edit`.
 	 */
 	const setMode = ( mode = 'show' ) => () => {
-		setIsEditingLink( MODE_EDIT === mode  );
+		setIsEditingLink( MODE_EDIT === mode );
 
 		// Populate input searcher whether
 		// the current link has a title.
