@@ -247,17 +247,3 @@
 	/*rtl:ignore*/
 	text-align: right;
 }
-
-/**
- * Vanilla Block Styles
- * These are base styles that apply across blocks, meant to provide a baseline.
- * They are applied both to the editor and the theme, so we should have as few of these as possible.
- * Please note that some styles are stored in packages/editor/src/editor-styles.scss, as they pertain to CSS bleed for the editor only.
- */
-
-// Caption styles.
-// Supply these even if the theme hasn't opted in, because the figcaption element is not likely to be styled in the majority of existing themes.
-// By providing a minimum of margin styles, we ensure it doesn't look broken or unstyled in those themes.
-figcaption {
-	margin-top: 0.5em;
-}
