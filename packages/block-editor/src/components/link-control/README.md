@@ -14,8 +14,20 @@
 
 ### currentSettings
 
-- Type: `Object`
-- Required: Yes
+- Type: `Array`
+- Required: No
+- Default: 
+```
+[
+	{
+		id: 'newTab',
+		title: 'Open in New Tab',
+		checked: false,
+	},
+];
+```
+
+An array of settings objects. Each object will used to render a `ToggleControl` for that setting.
 
 ### fetchSearchSuggestions
 
@@ -75,3 +87,5 @@ The function callback will receive the selected item, or Null.
 
 - Type: `Function`
 - Required: No
+
+Call when any of the settings supplied as `currentSettings` are changed/toggled.
