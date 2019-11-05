@@ -521,7 +521,10 @@ function BlockListBlock( {
 					rootClientId={ rootClientId }
 				/>
 			) }
-			<BlockDropZone clientId={ clientId } rootClientId={ rootClientId } />
+			<BlockDropZone
+				clientId={ clientId }
+				rootClientId={ rootClientId }
+			/>
 			{ isFirstMultiSelected && (
 				<BlockMultiControls
 					rootClientId={ rootClientId }
@@ -531,35 +534,39 @@ function BlockListBlock( {
 			<div
 				className={ classnames(
 					'editor-block-list__block-edit block-editor-block-list__block-edit',
-					{ 'has-mover-inside': moverDirection === 'horizontal' }
+					{ 'has-mover-inside': moverDirection === 'horizontal' },
 				) }
 			>
-				{ shouldRenderMovers && moverDirection === 'vertical' && blockMover }
+				{ shouldRenderMovers && ( moverDirection === 'vertical' ) && blockMover }
 				{ shouldShowBreadcrumb && (
-					<BlockBreadcrumb clientId={ clientId } ref={ breadcrumb } />
+					<BlockBreadcrumb
+						clientId={ clientId }
+						ref={ breadcrumb }
+					/>
 				) }
 				<ToolbarProvider>
-					{ ( shouldShowContextualToolbar ||
-						isForcingContextualToolbar.current ) && (
+					{ ( shouldShowContextualToolbar || isForcingContextualToolbar.current ) && (
 						<BlockContextualToolbar
-							// If the toolbar is being shown because of being forced
-							// it should focus the toolbar right after the mount.
+						// If the toolbar is being shown because of being forced
+						// it should focus the toolbar right after the mount.
 							focusOnMount={ isForcingContextualToolbar.current }
 						/>
 					) }
-					{ ! isNavigationMode &&
+					{
+						! isNavigationMode &&
 						! shouldShowContextualToolbar &&
 						isSelected &&
 						! hasFixedToolbar &&
 						! isEmptyDefaultBlock && (
-						<KeyboardShortcuts
-							bindGlobal
-							eventName="keydown"
-							shortcuts={ {
-								'alt+f10': forceFocusedContextualToolbar,
-							} }
-						/>
-					) }
+							<KeyboardShortcuts
+								bindGlobal
+								eventName="keydown"
+								shortcuts={ {
+									'alt+f10': forceFocusedContextualToolbar,
+								} }
+							/>
+						)
+					}
 					<IgnoreNestedEvents
 						ref={ blockNodeRef }
 						onDragStart={ preventDrag }
@@ -568,10 +575,10 @@ function BlockListBlock( {
 					>
 						<BlockCrashBoundary onError={ onBlockError }>
 							{ isValid && blockEdit }
-							{ isValid && mode === 'html' && <BlockHtml clientId={ clientId } /> }
-							{ shouldRenderMovers &&
-								moverDirection === 'horizontal' &&
-								blockMover }
+							{ isValid && mode === 'html' && (
+								<BlockHtml clientId={ clientId } />
+							) }
+							{ shouldRenderMovers && ( moverDirection === 'horizontal' ) && blockMover }
 							{ ! isValid && [
 								<BlockInvalidWarning
 									key="invalid-warning"
@@ -584,10 +591,7 @@ function BlockListBlock( {
 						</BlockCrashBoundary>
 						{ !! hasError && <BlockCrashWarning /> }
 						{ shouldShowMobileToolbar && (
-							<BlockMobileToolbar
-								clientId={ clientId }
-								moverDirection={ moverDirection }
-							/>
+							<BlockMobileToolbar clientId={ clientId } moverDirection={ moverDirection } />
 						) }
 					</IgnoreNestedEvents>
 				</ToolbarProvider>
