@@ -7,8 +7,12 @@ import { debounce } from 'lodash';
  * WordPress dependencies
  */
 import { __experimentalInserterMenuExtension } from '@wordpress/block-editor';
-import { DownloadableBlocksPanel } from '@wordpress/block-directory';
 import { useState } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import DownloadableBlocksPanel from '../../components/downloadable-blocks-panel';
 
 function InserterMenuDownloadableBlocksPanel() {
 	const [ debouncedFilterValue, setFilterValue ] = useState( '' );

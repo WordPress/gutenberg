@@ -62,8 +62,7 @@
 	// Hide the mover.
 	// Hide the sibling inserter.
 	.wp-block-social-links .block-editor-block-list__insertion-point,
-	.wp-block-social-links .block-editor-block-list__breadcrumb,
-	.wp-block-social-links .block-editor-block-mover.block-editor-block-mover { // Needs specificity.
+	.wp-block-social-links .block-editor-block-list__breadcrumb { // Needs specificity.
 		display: none;
 	}
 }

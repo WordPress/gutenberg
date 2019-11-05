@@ -50,6 +50,14 @@ Whether the palette should have a clearing button or not.
 - Required: No
 - Default: true
 
+### disableAlpha
+
+Whether to disable alpha channel controls or not.
+
+- Type: `Boolean`
+- Required: No
+- Default: true
+
 
 ## Usage
 ```jsx

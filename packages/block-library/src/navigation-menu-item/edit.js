@@ -6,10 +6,14 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { withSelect } from '@wordpress/data';
+import { compose } from '@wordpress/compose';
+import { createBlock } from '@wordpress/blocks';
+import { withDispatch, withSelect } from '@wordpress/data';
 import {
 	ExternalLink,
 	PanelBody,
+	Path,
+	SVG,
 	TextareaControl,
 	TextControl,
 	Toolbar,
@@ -30,6 +34,7 @@ import {
 	InnerBlocks,
 	InspectorControls,
 	URLPopover,
+	RichText,
 } from '@wordpress/block-editor';
 import {
 	Fragment,
@@ -39,11 +44,12 @@ import {
 
 function NavigationMenuItemEdit( {
 	attributes,
+	hasDescendants,
 	isSelected,
 	isParentOfSelectedBlock,
 	setAttributes,
+	insertMenuItemBlock,
 } ) {
-	const plainTextRef = useRef( null );
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
 	const [ isEditingLink, setIsEditingLink ] = useState( false );
 	const [ urlInput, setUrlInput ] = useState( null );
@@ -78,23 +84,6 @@ function NavigationMenuItemEdit( {
 	};
 
 	const { label, url } = attributes;
-	let content;
-	if ( isSelected ) {
-		content = (
-			<TextControl
-				ref={ plainTextRef }
-				className="wp-block-navigation-menu-item__field"
-				value={ label }
-				onChange={ ( labelValue ) => setAttributes( { label: labelValue } ) }
-				label={ __( 'Navigation Label' ) }
-				hideLabelFromVision={ true }
-			/>
-		);
-	} else {
-		content = <div className="wp-block-navigation-menu-item__container">
-			{ label }
-		</div>;
-	}
 
 	return (
 		<Fragment>
@@ -106,7 +95,14 @@ function NavigationMenuItemEdit( {
 						title={ __( 'Link' ) }
 						onClick={ () => setIsLinkOpen( ! isLinkOpen ) }
 					/>
-					{ isLinkOpen &&
+					{ <ToolbarButton
+						name="submenu"
+						icon={ <SVG xmlns="http://www.w3.org/2000/svg" width="24" height="24"><Path d="M14 5h8v2h-8zm0 5.5h8v2h-8zm0 5.5h8v2h-8zM2 11.5C2 15.08 4.92 18 8.5 18H9v2l3-3-3-3v2h-.5C6.02 16 4 13.98 4 11.5S6.02 7 8.5 7H12V5H8.5C4.92 5 2 7.92 2 11.5z" /><Path fill="none" d="M0 0h24v24H0z" /></SVG> }
+						title={ __( 'Add submenu item' ) }
+						onClick={ insertMenuItemBlock }
+					/> }
+				</Toolbar>
+				{ isLinkOpen &&
 					<>
 						<URLPopover
 							className="wp-block-navigation-menu-item__inline-link-input"
@@ -132,8 +128,7 @@ function NavigationMenuItemEdit( {
 
 						</URLPopover>
 					</>
-					}
-				</Toolbar>
+				}
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody
@@ -191,10 +186,17 @@ function NavigationMenuItemEdit( {
 					'is-selected': isSelected,
 				} ) }
 			>
-				{ content }
+				<RichText
+					className="wp-block-navigation-menu-item__content"
+					value={ label }
+					onChange={ ( labelValue ) => setAttributes( { label: labelValue } ) }
+					placeholder={ __( 'Add item…' ) }
+					withoutInteractiveFormatting
+				/>
 				{ ( isSelected || isParentOfSelectedBlock ) &&
 					<InnerBlocks
 						allowedBlocks={ [ 'core/navigation-menu-item' ] }
+						renderAppender={ hasDescendants ? InnerBlocks.ButtonBlockAppender : false }
 					/>
 				}
 			</div>
@@ -202,11 +204,32 @@ function NavigationMenuItemEdit( {
 	);
 }
 
-export default withSelect( ( select, ownProps ) => {
-	const { hasSelectedInnerBlock } = select( 'core/block-editor' );
-	const { clientId } = ownProps;
+export default compose( [
+	withSelect( ( select, ownProps ) => {
+		const { getClientIdsOfDescendants, hasSelectedInnerBlock } = select( 'core/block-editor' );
+		const { clientId } = ownProps;
 
-	return {
-		isParentOfSelectedBlock: hasSelectedInnerBlock( clientId, true ),
-	};
-} )( NavigationMenuItemEdit );
+		return {
+			isParentOfSelectedBlock: hasSelectedInnerBlock( clientId, true ),
+			hasDescendants: !! getClientIdsOfDescendants( [ clientId ] ).length,
+		};
+	} ),
+	withDispatch( ( dispatch, ownProps ) => {
+		return {
+			insertMenuItemBlock() {
+				const { clientId } = ownProps;
+
+				const {
+					insertBlock,
+				} = dispatch( 'core/block-editor' );
+
+				const blockToInsert = createBlock( 'core/navigation-menu-item' );
+				insertBlock(
+					blockToInsert,
+					0,
+					clientId,
+				);
+			},
+		};
+	} ),
+] )( NavigationMenuItemEdit );

@@ -14,7 +14,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Menu Item (Experimental)' ),
+	title: __( 'Menu Item' ),
 
 	parent: [ 'core/navigation-menu' ],
 
