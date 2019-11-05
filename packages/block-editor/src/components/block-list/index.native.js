@@ -59,7 +59,7 @@ export class BlockList extends Component {
 	}
 
 	renderDefaultBlockAppender() {
-		const { blockClientIds, shouldShowInsertionPointBefore } = this.props;
+		const { shouldShowInsertionPointBefore } = this.props;
 		const willShowInsertionPoint = shouldShowInsertionPointBefore(); // call without the client_id argument since this is the appender
 		return (
 			<ReadableContentView>
