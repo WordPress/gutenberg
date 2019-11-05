@@ -7,7 +7,7 @@ import { isArray, isString } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { forwardRef } from '@wordpress/element';
+import { cloneElement, forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -25,6 +25,7 @@ function IconButton( props, ref ) {
 		tooltip,
 		shortcut,
 		labelPosition,
+		size,
 		...additionalProps
 	} = props;
 	const classes = classnames( 'components-icon-button', className, {
@@ -48,6 +49,13 @@ function IconButton( props, ref ) {
 		)
 	);
 
+	let buttonIcon = isString( icon ) ?
+		<Icon icon={ icon } /> :
+		icon;
+	if ( size ) {
+		buttonIcon = cloneElement( buttonIcon, { size } );
+	}
+
 	let element = (
 		<Button
 			aria-label={ label }
@@ -55,7 +63,7 @@ function IconButton( props, ref ) {
 			className={ classes }
 			ref={ ref }
 		>
-			{ isString( icon ) ? <Icon icon={ icon } /> : icon }
+			{ buttonIcon }
 			{ children }
 		</Button>
 	);

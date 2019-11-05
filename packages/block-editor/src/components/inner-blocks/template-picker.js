@@ -42,6 +42,7 @@ function InnerBlocksTemplatePicker( {
 						<IconButton
 							isLarge
 							icon={ templateOption.icon }
+							size={ 48 }
 							onClick={ () => onSelect( templateOption.innerBlocks ) }
 							className="block-editor-inner-blocks__template-picker-option"
 							label={ templateOption.label }
