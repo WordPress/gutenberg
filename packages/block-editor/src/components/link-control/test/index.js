@@ -353,7 +353,7 @@ describe( 'Selecting links', () => {
 					currentLink={ link }
 					onLinkChange={ ( suggestion ) => setLink( suggestion ) }
 					fetchSearchSuggestions={ fetchFauxEntitySuggestions }
-					onEdit={ spyOnEditMode }
+					onChangeMode={ spyOnEditMode( 'edit' ) }
 				/>
 			);
 		};
