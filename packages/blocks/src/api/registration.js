@@ -466,7 +466,7 @@ export const unregisterBlockStyle = ( blockName, styleVariationName ) => {
  * @param {WPBlockPattern} pattern   Object describing a block pattern.
  */
 export const __experimentalRegisterBlockPattern = ( blockName, pattern ) => {
-	dispatch( 'core/blocks' ).addBlockPatterns( blockName, pattern );
+	dispatch( 'core/blocks' ).__experimentalAddBlockPatterns( blockName, pattern );
 };
 
 /**
@@ -476,5 +476,5 @@ export const __experimentalRegisterBlockPattern = ( blockName, pattern ) => {
  * @param {string} patternName Name of the pattern defined for the block.
  */
 export const __experimentalUnregisterBlockPattern = ( blockName, patternName ) => {
-	dispatch( 'core/blocks' ).removeBlockPatterns( blockName, patternName );
+	dispatch( 'core/blocks' ).__experimentalRemoveBlockPatterns( blockName, patternName );
 };
