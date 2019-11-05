@@ -8,7 +8,7 @@ import { View } from 'react-native';
  * WordPress dependencies
  */
 import { withSelect } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import {
 	InnerBlocks,
 	withColors,
@@ -21,10 +21,11 @@ import styles from './editor.scss';
 function GroupEdit( {
 	hasInnerBlocks,
 	isSelected,
+	getStylesFromColorScheme,
 } ) {
 	if ( ! isSelected && ! hasInnerBlocks ) {
 		return (
-			<View style={ styles.groupPlaceholder } />
+			<View style={ getStylesFromColorScheme( styles.groupPlaceholder, styles.groupPlaceholderDark ) } />
 		);
 	}
 
@@ -48,4 +49,5 @@ export default compose( [
 			hasInnerBlocks: !! ( block && block.innerBlocks.length ),
 		};
 	} ),
+	withPreferredColorScheme,
 ] )( GroupEdit );

@@ -9,10 +9,20 @@
 	border-radius: 4px;
 }
 
+.appenderDark {
+	background-color: $background-dark-secondary;
+	border: $border-width solid $gray-50;
+}
+
 .addBlockButton {
 	color: $white;
 	background-color: $gray;
 	border-radius: $icon-button-size-small / 2;
 	overflow: hidden;
 	size: $icon-button-size-small;
+}
+
+.addBlockButtonDark {
+	color: $background-dark-secondary;
+	background-color: $gray-50;
 }

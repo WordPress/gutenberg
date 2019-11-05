@@ -1,6 +1,12 @@
 .groupPlaceholder {
 	padding: 12px;
+	margin: 9px;
 	background-color: $white;
 	border: $border-width dashed $light-gray-500;
 	border-radius: 4px;
+}
+
+.groupPlaceholderDark {
+	background-color: $black;
+	border: $border-width dashed $gray-70;
 }
