@@ -121,7 +121,6 @@ function NavigationMenuItemEdit( {
 						icon="admin-links"
 						title={ __( 'Link' ) }
 						onClick={ () => {
-							// It works together with LinkControl onCLose event.
 							if ( isLinkOpen ) {
 								return;
 							}
