@@ -81,6 +81,8 @@ function NavigationMenuItemEdit( {
 	const link = title ? { title, url } : null;
 	const [ isLinkOpen, setIsLinkOpen ] = useState( ! label && isSelected );
 
+	let onCloseTimerId = null;
+
 	/**
 	 * It's a kind of hack to handle closing the LinkControl popover
 	 * clicking on the ToolbarButton link.
@@ -89,6 +91,13 @@ function NavigationMenuItemEdit( {
 		if ( ! isSelected ) {
 			setIsLinkOpen( false );
 		}
+
+		return () => {
+			// Clear LinkControl.OnClose timeout.
+			if ( onCloseTimerId ) {
+				clearTimeout( onCloseTimerId );
+			}
+		};
 	}, [ isSelected ] );
 
 	/**
@@ -205,7 +214,9 @@ function NavigationMenuItemEdit( {
 							onKeyPress={ ( event ) => event.stopPropagation() }
 							currentLink={ link }
 							onLinkChange={ updateLink( setAttributes, label ) }
-							onClose={ () => setTimeout( () => setIsLinkOpen( false ), 100 ) }
+							onClose={ () => {
+								onCloseTimerId = setTimeout( () => setIsLinkOpen( false ), 100 );
+							} }
 							currentSettings={ { 'new-tab': opensInNewTab } }
 							onSettingsChange={ updateLinkSetting( setAttributes ) }
 						/>
