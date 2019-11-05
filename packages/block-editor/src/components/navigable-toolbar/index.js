@@ -6,13 +6,7 @@ import { omit } from 'lodash';
 /**
  * WordPress dependencies
  */
-import {
-	NavigableMenu,
-	KeyboardShortcuts,
-	Toolbar,
-	ToolbarContext,
-	ToolbarContainer,
-} from '@wordpress/components';
+import { NavigableMenu, KeyboardShortcuts, ToolbarContainer } from '@wordpress/components';
 import { Component, createRef } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
 import deprecated from '@wordpress/deprecated';
@@ -100,16 +94,8 @@ class NavigableToolbar extends Component {
 			);
 		}
 
-		if ( this.context ) {
-			return <ToolbarContainer { ...toolbarProps } accessibilityLabel={ label } />;
-		}
-
-		return (
-			<Toolbar { ...toolbarProps } accessibilityLabel={ label } />
-		);
+		return <ToolbarContainer { ...toolbarProps } accessibilityLabel={ label } />;
 	}
 }
-
-NavigableToolbar.contextType = ToolbarContext;
 
 export default NavigableToolbar;
