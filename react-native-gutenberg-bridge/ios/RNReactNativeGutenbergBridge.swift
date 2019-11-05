@@ -18,13 +18,8 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     func requestMediaPickFrom(_ source: String, filter: [String]?, allowMultipleSelection: Bool, callback: @escaping RCTResponseSenderBlock) {
         let allMediaSources = Gutenberg.MediaSource.registeredInternalSources + (dataSource?.gutenbergMediaSources() ?? [])
         let mediaSource = allMediaSources.first{ $0.id == source } ?? .deviceLibrary
+        let mediaFilter = mediaTypes(from: filter)
 
-        let mediaFilter: [MediaFilter]? = filter?.map({
-            if let type = MediaFilter(rawValue: $0) {
-                return type
-            }
-            return MediaFilter.other
-        })
         DispatchQueue.main.async {
             self.delegate?.gutenbergDidRequestMedia(from: mediaSource, filter: mediaFilter, allowMultipleSelection: allowMultipleSelection, with: { media in
                 guard let media = media else {
@@ -49,6 +44,10 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
             })
         }
     }
+
+    private func mediaTypes(from jsMediaTypes: [String]?) -> [Gutenberg.MediaType] {
+        return (jsMediaTypes ?? []).map { Gutenberg.MediaType(fromJSString: $0) }
+    }
     
     @objc
     func requestOtherMediaPickFrom(_ source: String, allowMultipleSelection: Bool, callback: @escaping RCTResponseSenderBlock) {
@@ -60,9 +59,14 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
         guard let dataSource = dataSource else {
             return callback([])
         }
+
         let mediaSources = dataSource.gutenbergMediaSources()
-        let mediaSourcesString = mediaSources.map{ $0.jsRepresentation }
-        callback([mediaSourcesString])
+        let allowedTypes = mediaTypes(from: filter)
+        let filteredSources = mediaSources.filter {
+            return $0.types.intersection(allowedTypes).isEmpty == false
+        }
+        let jsMediaSources = filteredSources.map { $0.jsRepresentation }
+        callback([jsMediaSources])
     }
 
     @objc

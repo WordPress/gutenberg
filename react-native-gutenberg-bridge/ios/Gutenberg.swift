@@ -163,6 +163,14 @@ extension Gutenberg {
     public enum MediaType: String {
         case image
         case video
+        case audio
+        case other
+    }
+}
+
+extension Gutenberg.MediaType {
+    init(fromJSString rawValue: String) {
+        self = Gutenberg.MediaType(rawValue: rawValue) ?? .other
     }
 }
 
@@ -174,8 +182,8 @@ extension Gutenberg {
         /// A unique identifier of this media source option.
         let id: String
 
-        /// The type of media this source can provide.
-        let type: MediaType
+        /// The types of media this source can provide.
+        let types: Set<MediaType>
 
         var jsRepresentation: [String: String] {
             return [
@@ -187,9 +195,9 @@ extension Gutenberg {
 }
 
 public extension Gutenberg.MediaSource {
-    public init(id: String, label: String, type: Gutenberg.MediaType) {
+    public init(id: String, label: String, types: [Gutenberg.MediaType]) {
         self.id = id
         self.label = label
-        self.type = type
+        self.types = Set(types)
     }
 }

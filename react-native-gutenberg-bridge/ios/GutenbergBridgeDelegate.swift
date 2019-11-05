@@ -17,9 +17,9 @@ public typealias MediaImportCallback = (_ media: MediaInfo?) -> Void
 /// Label and Type are not relevant since they are delcared on the JS side.
 /// Hopefully soon, this will need to be declared on the client side.
 extension Gutenberg.MediaSource {
-    public static let mediaLibrary = Gutenberg.MediaSource(id: "SITE_MEDIA_LIBRARY", label: "", type: .image)
-    public static let deviceLibrary = Gutenberg.MediaSource(id: "DEVICE_MEDIA_LIBRARY", label: "", type: .image)
-    public static let deviceCamera = Gutenberg.MediaSource(id: "DEVICE_CAMERA", label: "", type: .image)
+    public static let mediaLibrary = Gutenberg.MediaSource(id: "SITE_MEDIA_LIBRARY", label: "", types: [.image, .video])
+    public static let deviceLibrary = Gutenberg.MediaSource(id: "DEVICE_MEDIA_LIBRARY", label: "", types: [.image, .video])
+    public static let deviceCamera = Gutenberg.MediaSource(id: "DEVICE_CAMERA", label: "", types: [.image, .video])
 
     static var registeredInternalSources: [Gutenberg.MediaSource] {
         return [
@@ -28,13 +28,6 @@ extension Gutenberg.MediaSource {
             .mediaLibrary,
         ]
     }
-}
-
-public enum MediaFilter: String {
-    case image
-    case video
-    case audio
-    case other
 }
 
 /// Ref. https://github.com/facebook/react-native/blob/master/Libraries/polyfills/console.js#L376
@@ -87,7 +80,7 @@ public protocol GutenbergBridgeDelegate: class {
     ///     - source: the source from where the picker will get the media
     ///     - callback: A callback block to be called with an array of upload mediaIdentifiers and a placeholder images file url, use nil on both parameters to signal that the action was canceled.
     ///
-    func gutenbergDidRequestMedia(from source: Gutenberg.MediaSource, filter: [MediaFilter]?, allowMultipleSelection: Bool, with callback: @escaping MediaPickerDidPickMediaCallback)
+    func gutenbergDidRequestMedia(from source: Gutenberg.MediaSource, filter: [Gutenberg.MediaType], allowMultipleSelection: Bool, with callback: @escaping MediaPickerDidPickMediaCallback)
 
     /// Tells the delegate that gutenberg JS requested the import of media item based on the provided URL
     ///
