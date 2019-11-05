@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { text } from '@storybook/addon-knobs';
+import { number, text } from '@storybook/addon-knobs';
 
 /**
  * Internal dependencies
@@ -13,11 +13,13 @@ export default { title: 'Components|IconButton', component: IconButton };
 export const _default = () => {
 	const icon = text( 'Icon', 'ellipsis' );
 	const label = text( 'Label', 'More' );
+	const size = number( 'Size', 24 );
 
 	return (
 		<IconButton
 			icon={ icon }
 			label={ label }
+			size={ size }
 		/>
 	);
 };
