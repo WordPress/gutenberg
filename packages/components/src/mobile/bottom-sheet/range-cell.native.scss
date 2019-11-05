@@ -7,35 +7,14 @@
 	height: 25px;
 	align-self: center;
 	margin-left: 10px;
-	border-color: $light-gray-400;
+	border-width: 1px;
+	border-radius: 4px;
+	border-color: $dark-gray-150;
 	padding-top: 0;
 	padding-bottom: 0;
-	text-align: center;
-}
-
-.sliderDarkTextInput {
-	border-color: $gray-70;
 }
 
 .isSelected {
 	border-width: 2px;
 	border-color: $blue-wordpress;
-}
-
-.container {
-	flex-direction: row;
-	align-items: center;
-	min-height: 48px;
-}
-
-.cellContainerStyles {
-	flex-direction: column;
-	align-items: flex-start;
-}
-
-.cellRowStyles {
-	min-height: 48px;
-	margin-bottom: -13px;
-	width: 100%;
-	justify-content: space-between;
 }

@@ -642,6 +642,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "DimensionControl",
+		"slug": "dimension-control",
+		"markdown_source": "../packages/components/src/dimension-control/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Disabled",
 		"slug": "disabled",
 		"markdown_source": "../packages/components/src/disabled/README.md",
@@ -969,6 +975,12 @@
 		"title": "TreeSelect",
 		"slug": "tree-select",
 		"markdown_source": "../packages/components/src/tree-select/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "VisuallyHidden",
+		"slug": "visually-hidden",
+		"markdown_source": "../packages/components/src/visually-hidden/README.md",
 		"parent": "components"
 	},
 	{

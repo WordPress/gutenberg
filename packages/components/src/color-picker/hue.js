@@ -43,6 +43,7 @@ import { TAB } from '@wordpress/keycodes';
  */
 import { calculateHueChange } from './utils';
 import KeyboardShortcuts from '../keyboard-shortcuts';
+import VisuallyHidden from '../visually-hidden';
 
 export class Hue extends Component {
 	constructor() {
@@ -157,12 +158,11 @@ export class Hue extends Component {
 							style={ pointerLocation }
 							onKeyDown={ this.preventKeyEvents }
 						/>
-						<p
-							className="components-color-picker__hue-description screen-reader-text"
+						<VisuallyHidden as="p"
 							id={ `components-color-picker__hue-description-${ instanceId }` }
 						>
 							{ __( 'Move the arrow left or right to change hue.' ) }
-						</p>
+						</VisuallyHidden>
 					</div>
 					{ /* eslint-enable jsx-a11y/no-static-element-interactions */ }
 				</div>

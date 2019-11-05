@@ -12,7 +12,7 @@ import save from './save';
 export const name = 'core/navigation-menu';
 
 export const settings = {
-	title: __( 'Navigation Menu (Experimental)' ),
+	title: __( 'Navigation' ),
 
 	icon: 'menu',
 

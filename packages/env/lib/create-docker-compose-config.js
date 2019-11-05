@@ -1,14 +1,19 @@
 module.exports = function createDockerComposeConfig(
-	pluginPath,
-	pluginName,
-	pluginTestsPath
+	cwdTestsPath,
+	context,
+	dependencies,
 ) {
+	const { path: cwd, pathBasename: cwdName } = context;
+
+	const dependencyMappings = [ ...dependencies, context ].map(
+		( { path, pathBasename, type } ) => `      - ${ path }/:/var/www/html/wp-content/${ type }s/${ pathBasename }/\n`
+	).join( '' );
 	const commonVolumes = `
-      - ${ pluginPath }/:/var/www/html/wp-content/plugins/${ pluginName }/
-      - ${ pluginPath }${ pluginTestsPath }/e2e-tests/mu-plugins/:/var/www/html/wp-content/mu-plugins/
-      - ${ pluginPath }${ pluginTestsPath }/e2e-tests/plugins/:/var/www/html/wp-content/plugins/${ pluginName }-test-plugins/`;
+${ dependencyMappings }
+      - ${ cwd }${ cwdTestsPath }/e2e-tests/mu-plugins/:/var/www/html/wp-content/mu-plugins/
+      - ${ cwd }${ cwdTestsPath }/e2e-tests/plugins/:/var/www/html/wp-content/plugins/${ cwdName }-test-plugins/`;
 	const volumes = `
-      - ${ pluginPath }/../${ pluginName }-wordpress/:/var/www/html/${ commonVolumes }`;
+      - ${ cwd }/../${ cwdName }-wordpress/:/var/www/html/${ commonVolumes }`;
 	const testsVolumes = `
       - tests-wordpress:/var/www/html/${ commonVolumes }`;
 	return `version: '2.1'

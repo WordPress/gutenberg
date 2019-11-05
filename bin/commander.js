@@ -17,7 +17,7 @@ const uuid = require( 'uuid/v4' );
 
 // Config
 const gitRepoOwner = 'WordPress';
-const gitRepoURL = 'git@github.com:' + gitRepoOwner + '/gutenberg.git';
+const gitRepoURL = 'https://github.com/' + gitRepoOwner + '/gutenberg.git';
 const svnRepoURL = 'https://plugins.svn.wordpress.org/gutenberg';
 
 // Working Directories
@@ -95,6 +95,7 @@ function runShellScript( script, cwd ) {
 		env: {
 			NO_CHECKS: true,
 			PATH: process.env.PATH,
+			HOME: process.env.HOME,
 		},
 		stdio: [ 'inherit', 'ignore', 'inherit' ],
 	} );
