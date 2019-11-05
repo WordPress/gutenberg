@@ -15,7 +15,7 @@ const defaultSettings = [
 	{
 		id: 'newTab',
 		title: __( 'Open in New Tab' ),
-		value: false,
+		checked: false,
 	},
 ];
 
@@ -24,13 +24,21 @@ const LinkControlSettingsDrawer = ( { settings = defaultSettings, onSettingChang
 		return null;
 	}
 
+	const theSettings = settings.map( ( setting ) => (
+		<ToggleControl
+			key={ setting.id }
+			label={ setting.title }
+			onChange={ partial( onSettingChange, setting.id ) }
+			checked={ setting.checked } />
+	) );
+
 	return (
-		<div className="block-editor-link-control__settings">
-			<ToggleControl
-				label={ settings[ 0 ].title }
-				onChange={ partial( onSettingChange, settings[ 0 ].id ) }
-				checked={ settings[ 0 ].value } />
-		</div>
+		<fieldset className="block-editor-link-control__settings">
+			<legend className="screen-reader-text">
+				{ __( 'Currently selected link settings' ) }
+			</legend>
+			{ theSettings }
+		</fieldset>
 	);
 };
 

@@ -569,4 +569,61 @@ describe( 'Addition Settings UI', () => {
 		expect( newTabSettingInput ).not.toBeNull();
 		expect( newTabSettingInput.checked ).toBe( false );
 	} );
+
+	it( 'should display a setting control with correct default state for each of the custom settings provided', async () => {
+		const selectedLink = first( fauxEntitySuggestions );
+
+		const customSettings = [
+			{
+				id: 'newTab',
+				title: 'Open in New Tab',
+				checked: false,
+			},
+			{
+				id: 'noFollow',
+				title: 'No follow',
+				checked: true,
+			},
+		];
+
+		const customSettingsLabelsText = customSettings.map( ( setting ) => setting.title );
+
+		const LinkControlConsumer = () => {
+			const [ link ] = useState( selectedLink );
+
+			return (
+				<LinkControl
+					currentLink={ link }
+					fetchSearchSuggestions={ fetchFauxEntitySuggestions }
+					currentSettings={ customSettings }
+				/>
+			);
+		};
+
+		act( () => {
+			render(
+				<LinkControlConsumer />, container
+			);
+		} );
+
+		// Grab the elements using user perceivable DOM queries
+		const settingsLegend = Array.from( container.querySelectorAll( 'legend' ) ).find( ( legend ) => legend.innerHTML && legend.innerHTML.includes( 'Currently selected link settings' ) );
+		const settingsFieldset = settingsLegend.closest( 'fieldset' );
+		const settingControlsLabels = Array.from( settingsFieldset.querySelectorAll( 'label' ) );
+		const settingControlsInputs = settingControlsLabels.map( ( label ) => {
+			return settingsFieldset.querySelector( `#${ label.getAttribute( 'for' ) }` );
+		} );
+
+		const settingControlLabelsText = Array.from( settingControlsLabels ).map( ( label ) => label.innerHTML );
+
+		// Check we have the correct number of controls
+		expect( settingControlsLabels ).toHaveLength( 2 );
+
+		// Check the labels match
+		expect( settingControlLabelsText ).toEqual( expect.arrayContaining( customSettingsLabelsText ) );
+
+		// Assert the default "checked" states match the expected
+		expect( settingControlsInputs[ 0 ].checked ).toEqual( false );
+		expect( settingControlsInputs[ 1 ].checked ).toEqual( true );
+	} );
 } );
