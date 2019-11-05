@@ -53,10 +53,11 @@ export class UnsupportedBlockEdit extends Component {
 		const infoTitleStyle = getStylesFromColorScheme( styles.infoTitle, styles.infoTitleDark );
 		const infoDescriptionStyle = getStylesFromColorScheme( styles.infoDescription, styles.infoDescriptionDark );
 
+		// translators: %s: Name of the block
+		const titleFormat = Platform.OS === 'android' ? __( '\'%s\' isn\'t yet supported on WordPress for Android' ) :
+			__( '\'%s\' isn\'t yet supported on WordPress for iOS' );
 		const infoTitle = sprintf(
-			// translators: %s: Name of the block
-			Platform.OS === 'android' ? __( '\'%s\' isn\'t yet supported on WordPress for Android' ) : 
-				__( '\'%s\' isn\'t yet supported on WordPress for iOS' ),
+			titleFormat,
 			title,
 		);
 
