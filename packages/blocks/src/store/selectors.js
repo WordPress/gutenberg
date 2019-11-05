@@ -65,7 +65,7 @@ export function getBlockStyles( state, name ) {
  *
  * @return {?(WPBlockPattern[])} Block patterns.
  */
-export function __experimentalGetBlockPattens( state, blockName ) {
+export function __experimentalGetBlockPatterns( state, blockName ) {
 	return state.blockPatterns[ blockName ];
 }
 
