@@ -9,6 +9,7 @@ import {
 	publishPost,
 	saveDraft,
 	openDocumentSettingsSidebar,
+	isCurrentURL,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Change detection', () => {
@@ -341,7 +342,8 @@ describe( 'Change detection', () => {
 		// Wait for "Saved" to confirm save complete.
 		await page.waitForSelector( '.editor-post-saved-state.is-saved' );
 
-		// Check that the dialog didn't show.
-		await assertIsDirty( false );
+		// Make sure redirection happens.
+		await page.waitForNavigation();
+		isCurrentURL( 'edit.php' );
 	} );
 } );
