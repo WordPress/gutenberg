@@ -515,30 +515,30 @@ function BlockListBlock( {
 					animationStyle
 			}
 		>
-			<ToolbarProvider>
-				{ shouldShowInsertionPoint && (
-					<BlockInsertionPoint
-						clientId={ clientId }
-						rootClientId={ rootClientId }
-					/>
+			{ shouldShowInsertionPoint && (
+				<BlockInsertionPoint
+					clientId={ clientId }
+					rootClientId={ rootClientId }
+				/>
+			) }
+			<BlockDropZone clientId={ clientId } rootClientId={ rootClientId } />
+			{ isFirstMultiSelected && (
+				<BlockMultiControls
+					rootClientId={ rootClientId }
+					moverDirection={ moverDirection }
+				/>
+			) }
+			<div
+				className={ classnames(
+					'editor-block-list__block-edit block-editor-block-list__block-edit',
+					{ 'has-mover-inside': moverDirection === 'horizontal' }
 				) }
-				<BlockDropZone clientId={ clientId } rootClientId={ rootClientId } />
-				{ isFirstMultiSelected && (
-					<BlockMultiControls
-						rootClientId={ rootClientId }
-						moverDirection={ moverDirection }
-					/>
+			>
+				{ shouldRenderMovers && moverDirection === 'vertical' && blockMover }
+				{ shouldShowBreadcrumb && (
+					<BlockBreadcrumb clientId={ clientId } ref={ breadcrumb } />
 				) }
-				<div
-					className={ classnames(
-						'editor-block-list__block-edit block-editor-block-list__block-edit',
-						{ 'has-mover-inside': moverDirection === 'horizontal' }
-					) }
-				>
-					{ shouldRenderMovers && moverDirection === 'vertical' && blockMover }
-					{ shouldShowBreadcrumb && (
-						<BlockBreadcrumb clientId={ clientId } ref={ breadcrumb } />
-					) }
+				<ToolbarProvider>
 					{ ( shouldShowContextualToolbar ||
 						isForcingContextualToolbar.current ) && (
 						<BlockContextualToolbar
@@ -590,27 +590,27 @@ function BlockListBlock( {
 							/>
 						) }
 					</IgnoreNestedEvents>
+				</ToolbarProvider>
+			</div>
+			{ showInserterShortcuts && (
+				<div className="editor-block-list__side-inserter block-editor-block-list__side-inserter">
+					<InserterWithShortcuts
+						clientId={ clientId }
+						rootClientId={ rootClientId }
+						onToggle={ selectOnOpen }
+					/>
 				</div>
-				{ showInserterShortcuts && (
-					<div className="editor-block-list__side-inserter block-editor-block-list__side-inserter">
-						<InserterWithShortcuts
-							clientId={ clientId }
-							rootClientId={ rootClientId }
-							onToggle={ selectOnOpen }
-						/>
-					</div>
-				) }
-				{ showEmptyBlockSideInserter && (
-					<div className="editor-block-list__empty-block-inserter block-editor-block-list__empty-block-inserter">
-						<Inserter
-							position="top right"
-							onToggle={ selectOnOpen }
-							rootClientId={ rootClientId }
-							clientId={ clientId }
-						/>
-					</div>
-				) }
-			</ToolbarProvider>
+			) }
+			{ showEmptyBlockSideInserter && (
+				<div className="editor-block-list__empty-block-inserter block-editor-block-list__empty-block-inserter">
+					<Inserter
+						position="top right"
+						onToggle={ selectOnOpen }
+						rootClientId={ rootClientId }
+						clientId={ clientId }
+					/>
+				</div>
+			) }
 		</IgnoreNestedEvents>
 	);
 }
