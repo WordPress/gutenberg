@@ -67,12 +67,12 @@ function NavigationMenu( {
 	);
 
 	const navigationMenuInlineStyles = {};
-	if ( attributes.customTextColor) {
-		navigationMenuInlineStyles[ 'color' ] = attributes.customTextColor;
+	if ( textColor ) {
+		navigationMenuInlineStyles[ 'color' ] = textColor.color;
 	}
 
-	if ( attributes.customBackgroundColor ) {
-		navigationMenuInlineStyles[ 'backgroundColor' ] = attributes.customBackgroundColor;
+	if ( backgroundColor ) {
+		navigationMenuInlineStyles[ 'backgroundColor' ] = backgroundColor.color;
 	}
 
 	const navigationMenuClasses = classnames(
