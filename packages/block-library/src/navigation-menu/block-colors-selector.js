@@ -27,11 +27,11 @@ const ColorSelectorSVGIcon = () => (
 const ColorSelectorIcon = ( { backgroundColor, textColor } ) => {
 	const iconStyle = {};
 	if ( textColor && ! textColor.class ) {
-		iconStyle[ 'color' ] = textColor.color;
+		iconStyle.color = textColor.color;
 	}
 
 	if ( backgroundColor && ! backgroundColor.class ) {
-		iconStyle[ 'backgroundColor' ] = backgroundColor.color;
+		iconStyle.backgroundColor = backgroundColor.color;
 	}
 
 	const iconClasses = classnames( 'block-library-colors-selector__state-selection', {

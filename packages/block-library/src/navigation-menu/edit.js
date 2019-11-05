@@ -68,11 +68,11 @@ function NavigationMenu( {
 
 	const navigationMenuInlineStyles = {};
 	if ( textColor ) {
-		navigationMenuInlineStyles[ 'color' ] = textColor.color;
+		navigationMenuInlineStyles.color = textColor.color;
 	}
 
 	if ( backgroundColor ) {
-		navigationMenuInlineStyles[ 'backgroundColor' ] = backgroundColor.color;
+		navigationMenuInlineStyles.backgroundColor = backgroundColor.color;
 	}
 
 	const navigationMenuClasses = classnames(
