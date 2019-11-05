@@ -11,15 +11,13 @@ import { withPreferredColorScheme } from '@wordpress/compose';
 import { coreBlocks } from '@wordpress/block-library';
 import { normalizeIconObject } from '@wordpress/blocks';
 import { Component } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import styles from './style.scss';
 
-const isAndroid = Platform.OS === 'android';
-const platformText = isAndroid ? 'Android' : 'iOS';
 export class UnsupportedBlockEdit extends Component {
 	constructor( props ) {
 		super( props );
@@ -64,6 +62,13 @@ export class UnsupportedBlockEdit extends Component {
 		const infoTitleStyle = getStylesFromColorScheme( styles.infoTitle, styles.infoTitleDark );
 		const infoDescriptionStyle = getStylesFromColorScheme( styles.infoDescription, styles.infoDescriptionDark );
 
+		const infoTitle = sprintf(
+			// translators: %s: Name of the block
+			Platform.OS === 'android' ? __( '\'%s\' isn\'t yet supported on WordPress for Android' ) : 
+				__( '\'%s\' isn\'t yet supported on WordPress for iOS' ),
+			title,
+		);
+
 		return <BottomSheet
 			isVisible={ this.state.showHelp }
 			hideHeader
@@ -72,7 +77,7 @@ export class UnsupportedBlockEdit extends Component {
 			<View style={ styles.infoContainer } >
 				<Icon icon="editor-help" style={ styles.infoIcon } size={ styles.infoIcon.size } />
 				<Text style={ [ infoTextStyle, infoTitleStyle ] }>
-					{ __( '\'' + title + '\' isn\'t yet supported on WordPress for ' + platformText ) }
+					{ infoTitle }
 				</Text>
 				<Text style={ [ infoTextStyle, infoDescriptionStyle ] }>
 					{ __( 'We are working hard to add more blocks with each release. In the meantime, you can also edit this post on the web.' ) }
