@@ -16,7 +16,9 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     
     @objc
     func requestMediaPickFrom(_ source: String, filter: [String]?, allowMultipleSelection: Bool, callback: @escaping RCTResponseSenderBlock) {
-        let mediaSource: MediaPickerSource = MediaPickerSource(rawValue: source) ?? .deviceLibrary
+        let allMediaSources = Gutenberg.MediaSource.registeredInternalSources + (dataSource?.gutenbergMediaSources() ?? [])
+        let mediaSource = allMediaSources.first{ $0.id == source } ?? .deviceLibrary
+
         let mediaFilter: [MediaFilter]? = filter?.map({
             if let type = MediaFilter(rawValue: $0) {
                 return type
@@ -50,7 +52,7 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     
     @objc
     func requestOtherMediaPickFrom(_ source: String, allowMultipleSelection: Bool, callback: @escaping RCTResponseSenderBlock) {
-        //TODO implement me
+        requestMediaPickFrom(source, filter: nil, allowMultipleSelection: allowMultipleSelection, callback: callback)
     }
 
     @objc

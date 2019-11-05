@@ -167,7 +167,7 @@ extension Gutenberg {
 }
 
 extension Gutenberg {
-    public struct MediaSource {
+    public struct MediaSource: Hashable {
         /// The label string that will be shown to the user.
         let label: String
 
@@ -188,6 +188,8 @@ extension Gutenberg {
 
 public extension Gutenberg.MediaSource {
     public init(id: String, label: String, type: Gutenberg.MediaType) {
-        self.init(id: id, label: label, type: type)
+        self.id = id
+        self.label = label
+        self.type = type
     }
 }
