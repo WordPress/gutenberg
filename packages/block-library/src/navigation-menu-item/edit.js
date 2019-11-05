@@ -191,27 +191,28 @@ function NavigationMenuItemEdit( {
 					'is-selected': isSelected,
 				} ) }
 			>
-				<RichText
-					className="wp-block-navigation-menu-item__content"
-					value={ label }
-					onChange={ ( labelValue ) => setAttributes( { label: labelValue } ) }
-					placeholder={ itemLabelPlaceholder }
-					withoutInteractiveFormatting
-				/>
-
-				{ isLinkOpen &&
-					<LinkControl
-						className="wp-block-navigation-menu-item__inline-link-input"
-						onKeyDown={ handleLinkControlOnKeyDown }
-						onKeyPress={ ( event ) => event.stopPropagation() }
-						currentLink={ link }
-						onLinkChange={ updateLink( setAttributes, label ) }
-						onClose={ () => setTimeout( () => setIsLinkOpen( false ), 100 ) }
-						currentSettings={ { 'new-tab': opensInNewTab } }
-						onSettingsChange={ updateLinkSetting( setAttributes ) }
-						fetchSearchSuggestions={ fetchSearchSuggestions }
+				<div className="wp-block-navigation-menu-item__inner">
+					<RichText
+						className="wp-block-navigation-menu-item__content"
+						value={ label }
+						onChange={ ( labelValue ) => setAttributes( { label: labelValue } ) }
+						placeholder={ itemLabelPlaceholder }
+						withoutInteractiveFormatting
 					/>
-				}
+					{ isLinkOpen && (
+						<LinkControl
+							className="wp-block-navigation-menu-item__inline-link-input"
+							onKeyDown={ handleLinkControlOnKeyDown }
+							onKeyPress={ ( event ) => event.stopPropagation() }
+							currentLink={ link }
+							onLinkChange={ updateLink( setAttributes, label ) }
+							onClose={ () => setTimeout( () => setIsLinkOpen( false ), 100 ) }
+							currentSettings={ { 'new-tab': opensInNewTab } }
+							onSettingsChange={ updateLinkSetting( setAttributes ) }
+							fetchSearchSuggestions={ fetchSearchSuggestions }
+						/>
+					) }
+				</div>
 				<InnerBlocks
 					allowedBlocks={ [ 'core/navigation-menu-item' ] }
 					renderAppender={ hasDescendants ? InnerBlocks.ButtonBlockAppender : false }
