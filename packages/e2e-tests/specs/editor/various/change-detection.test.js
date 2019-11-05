@@ -7,7 +7,6 @@ import {
 	pressKeyWithModifier,
 	ensureSidebarOpened,
 	publishPost,
-	openDocumentSettingsSidebar,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Change detection', () => {
@@ -347,27 +346,6 @@ describe( 'Change detection', () => {
 		expect( title ).toBe( '' );
 
 		// Verify that the post is not dirty.
-		await assertIsDirty( false );
-	} );
-
-	it( 'should not prompt to confirm unsaved changes when trashing an existing post', async () => {
-		// Enter title.
-		await page.type( '.editor-post-title__input', 'Hello World' );
-
-		// Save
-		await Promise.all( [
-			// Wait for "Saved" to confirm save complete.
-			page.waitForSelector( '.editor-post-saved-state.is-saved' ),
-
-			// Keyboard shortcut Ctrl+S save.
-			pressKeyWithModifier( 'primary', 'S' ),
-		] );
-
-		// Trash post.
-		await openDocumentSettingsSidebar();
-		await page.click( '.editor-post-trash.components-button' );
-
-		// Check that the dialog didn't show.
 		await assertIsDirty( false );
 	} );
 } );
