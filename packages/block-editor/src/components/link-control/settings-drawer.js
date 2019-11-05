@@ -11,21 +11,25 @@ import {
 	ToggleControl,
 } from '@wordpress/components';
 
-const defaultSettings = {
-	newTab: false,
-};
+const defaultSettings = [
+	{
+		id: 'newTab',
+		title: __( 'Open in New Tab' ),
+		value: false,
+	},
+];
 
 const LinkControlSettingsDrawer = ( { settings = defaultSettings, onSettingChange = noop } ) => {
-	if ( ! settings || settings.length ) {
+	if ( ! settings || ! settings.length ) {
 		return null;
 	}
 
 	return (
 		<div className="block-editor-link-control__settings">
 			<ToggleControl
-				label={ __( 'Open in New Tab' ) }
-				onChange={ partial( onSettingChange, 'newTab' ) }
-				checked={ settings.newTab } />
+				label={ settings[ 0 ].title }
+				onChange={ partial( onSettingChange, settings[ 0 ].id ) }
+				checked={ settings[ 0 ].value } />
 		</div>
 	);
 };

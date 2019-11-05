@@ -559,6 +559,8 @@ describe( 'Addition Settings UI', () => {
 			);
 		} );
 
+		// console.log( container.innerHTML );
+
 		const newTabSettingLabel = Array.from( container.querySelectorAll( 'label' ) ).find( ( label ) => label.innerHTML && label.innerHTML.includes( expectedSettingText ) );
 		expect( newTabSettingLabel ).not.toBeUndefined(); // find() returns "undefined" if not found
 
