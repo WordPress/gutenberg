@@ -114,11 +114,11 @@ export const link = {
 		async getURLFromClipboard() {
 			const clipboardText = await Clipboard.getString();
 			if ( ! clipboardText ) {
-				return '';
+				return;
 			}
 			// Check if pasted text is URL
 			if ( ! isURL( clipboardText ) ) {
-				return '';
+				return;
 			}
 			this.setState( { clipboardURL: clipboardText } );
 		}
