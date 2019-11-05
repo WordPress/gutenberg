@@ -59,6 +59,11 @@ export class UnsupportedBlockEdit extends Component {
 	}
 
 	renderSheet( title ) {
+		const { getStylesFromColorScheme } = this.props;
+		const infoTextStyle = getStylesFromColorScheme( styles.infoText, styles.infoTextDark );
+		const infoTitleStyle = getStylesFromColorScheme( styles.infoTitle, styles.infoTitleDark );
+		const infoDescriptionStyle = getStylesFromColorScheme( styles.infoDescription, styles.infoDescriptionDark );
+
 		return <BottomSheet
 			isVisible={ this.state.showHelp }
 			hideHeader
@@ -66,10 +71,10 @@ export class UnsupportedBlockEdit extends Component {
 		>
 			<View style={ styles.infoContainer } >
 				<Icon icon="editor-help" style={ styles.infoIcon } size={ styles.infoIcon.size } />
-				<Text style={ [ styles.infoText, styles.infoTitle ] }>
+				<Text style={ [ infoTextStyle, infoTitleStyle ] }>
 					{ __( '\'' + title + '\' isn\'t yet supported on WordPress for ' + platformText ) }
 				</Text>
-				<Text style={ [ styles.infoText, styles.infoDescription ] }>
+				<Text style={ [ infoTextStyle, infoDescriptionStyle ] }>
 					{ __( 'We are working hard to add more blocks with each release. In the meantime, you can also edit this post on the web.' ) }
 				</Text>
 				{ this.renderSheetButton( __( 'Close' ), () => this.toggleSheet.bind( this ) ) }

@@ -35,6 +35,11 @@
 
 .infoText {
 	text-align: center;
+	color: $gray-dark;
+}
+
+.infoTextDark {
+	color: $white;
 }
 
 .infoTitle {
@@ -45,10 +50,18 @@
 	color: $gray-dark;
 }
 
+.infoTitleDark {
+	color: $white;
+}
+
 .infoDescription {
 	padding-bottom: 24;
 	font-size: 16;
 	color: $gray-darken-20;
+}
+
+.infoDescriptionDark {
+	color: $gray-20;
 }
 
 .sheetButton {
