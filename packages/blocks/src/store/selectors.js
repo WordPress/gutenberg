@@ -2,7 +2,17 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import { filter, get, includes, map, some, flow, deburr } from 'lodash';
+import {
+	deburr,
+	filter,
+	find,
+	first,
+	flow,
+	get,
+	includes,
+	map,
+	some,
+} from 'lodash';
 
 /**
  * Given a block name or block type object, returns the corresponding
@@ -67,6 +77,21 @@ export function getBlockStyles( state, name ) {
  */
 export function __experimentalGetBlockPatterns( state, blockName ) {
 	return state.blockPatterns[ blockName ];
+}
+
+/**
+ * Returns the default block pattern for the given block type.
+ * If there is no default pattern set, it returns the first item.
+ *
+ * @param {Object} state      Data state.
+ * @param {string} blockName  Block type name.
+ *
+ * @return {?WPBlockPattern} The default block pattern.
+ */
+export function __experimentalGetDefaultBlockPattern( state, blockName ) {
+	const patterns = __experimentalGetBlockPatterns( state, blockName );
+
+	return find( patterns, 'isDefault' ) || first( patterns );
 }
 
 /**
