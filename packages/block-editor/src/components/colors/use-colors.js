@@ -31,7 +31,6 @@ import InspectorControls from '../inspector-controls';
 import { useBlockEditContext } from '../block-edit';
 
 const DEFAULT_COLORS = [];
-
 const ColorPanel = ( {
 	title,
 	colorSettings,
