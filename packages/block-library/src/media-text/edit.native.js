@@ -32,7 +32,7 @@ import styles from './style.scss';
  */
 const ALLOWED_BLOCKS = [ 'core/button', 'core/paragraph', 'core/heading', 'core/list' ];
 const TEMPLATE = [
-	[ 'core/paragraph', { fontSize: 'large', placeholder: _x( 'Content…', 'content placeholder' ) } ],
+	[ 'core/paragraph' ],
 ];
 // this limits the resize to a safe zone to avoid making broken layouts
 const WIDTH_CONSTRAINT_PERCENTAGE = 15;
