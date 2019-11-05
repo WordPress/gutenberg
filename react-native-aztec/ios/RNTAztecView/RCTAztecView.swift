@@ -135,6 +135,7 @@ class RCTAztecView: Aztec.TextView {
         textDragInteraction?.isEnabled = false        
         storage.htmlConverter.characterToReplaceLastEmptyLine = Character(.zeroWidthSpace)
         shouldNotifyOfNonUserChanges = false
+        disableLinkTapRecognizer()
     }
 
     func addPlaceholder() {
@@ -145,6 +146,13 @@ class RCTAztecView: Aztec.TextView {
             placeholderLabel.topAnchor.constraint(equalTo: topAnchor, constant: topConstant),
             placeholderLabel.widthAnchor.constraint(equalTo: widthAnchor),
         ])
+    }
+
+    func disableLinkTapRecognizer() {
+        guard let recognizer = gestureRecognizers?.first(where: { $0.name == "UITextInteractionNameLinkTap" }) else {
+            return
+        }
+        recognizer.isEnabled = false
     }
 
     // MARK - View Height: Match to content height
@@ -624,21 +632,5 @@ extension RCTAztecView: UITextViewDelegate {
 
     func textViewDidEndEditing(_ textView: UITextView) {
         onBlur?([:])
-    }
-
-    func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
-        if #available(iOS 13.1, *) {
-            return false
-        } else if #available(iOS 13.0.0, *) {
-            // Sergio Estevao: This shouldn't happen in an editable textView, but it looks we have a system bug in iOS13 so we need this workaround
-            let position = characterRange.location
-            textView.selectedRange = NSRange(location: position, length: 0)
-            textView.typingAttributes = textView.attributedText.attributes(at: position, effectiveRange: nil)
-            textView.delegate?.textViewDidChangeSelection?(textView)
-        } else {
-            return false
-        }
-
-        return false
     }
 }
