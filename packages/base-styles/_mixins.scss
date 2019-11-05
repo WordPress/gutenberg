@@ -497,10 +497,11 @@
 				// Inherited from `forms.css`.
 				// See: https://github.com/WordPress/wordpress-develop/tree/5.1.1/src/wp-admin/css/forms.css#L122-L132
 				content: "\f460";
-				float: left;
-				display: inline-block;
-				vertical-align: middle;
-				width: 16px;
+				height: 100%;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				margin: 0;
 				/* stylelint-disable */
 				font: normal 30px/1 dashicons;
 				/* stylelint-enable */
@@ -508,8 +509,7 @@
 				-webkit-font-smoothing: antialiased;
 				-moz-osx-font-smoothing: grayscale;
 
-				@include break-medium() {
-					float: none;
+				@include break-small() {
 					font-size: 21px;
 				}
 			}
