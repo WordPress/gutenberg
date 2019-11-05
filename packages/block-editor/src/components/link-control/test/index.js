@@ -536,3 +536,35 @@ describe( 'Selecting links', () => {
 		} );
 	} );
 } );
+
+describe( 'Addition Settings UI', () => {
+	it( 'should display "New Tab" setting (in "off" mode) by default when a link is selected', async () => {
+		const selectedLink = first( fauxEntitySuggestions );
+		const expectedSettingText = 'Open in New Tab';
+
+		const LinkControlConsumer = () => {
+			const [ link ] = useState( selectedLink );
+
+			return (
+				<LinkControl
+					currentLink={ link }
+					fetchSearchSuggestions={ fetchFauxEntitySuggestions }
+				/>
+			);
+		};
+
+		act( () => {
+			render(
+				<LinkControlConsumer />, container
+			);
+		} );
+
+		const newTabSettingLabel = Array.from( container.querySelectorAll( 'label' ) ).find( ( label ) => label.innerHTML && label.innerHTML.includes( expectedSettingText ) );
+		expect( newTabSettingLabel ).not.toBeUndefined(); // find() returns "undefined" if not found
+
+		const newTabSettingLabelForAttr = newTabSettingLabel.getAttribute( 'for' );
+		const newTabSettingInput = container.querySelector( `#${ newTabSettingLabelForAttr }` );
+		expect( newTabSettingInput ).not.toBeNull();
+		expect( newTabSettingInput.checked ).toBe( false );
+	} );
+} );

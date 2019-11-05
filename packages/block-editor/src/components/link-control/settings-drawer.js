@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { partial } from 'lodash';
+import { partial, noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -11,7 +11,11 @@ import {
 	ToggleControl,
 } from '@wordpress/components';
 
-const LinkControlSettingsDrawer = ( { settings, onSettingChange } ) => {
+const defaultSettings = {
+	'new-tab': false,
+};
+
+const LinkControlSettingsDrawer = ( { settings = defaultSettings, onSettingChange = noop } ) => {
 	if ( ! settings || settings.length ) {
 		return null;
 	}
