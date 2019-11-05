@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { forwardRef } from '@wordpress/element';
@@ -14,6 +9,9 @@ import deprecated from '@wordpress/deprecated';
  */
 import ToolbarGroup from '../toolbar-group';
 import ToolbarContainer from './toolbar-container';
+import { ToolbarProvider } from '../toolbar-context';
+
+export { ToolbarContainer };
 
 /**
  * Renders an accessible toolbar that follows the
@@ -28,16 +26,16 @@ import ToolbarContainer from './toolbar-container';
  * @param {string} [props.className]
  * @param {Object} ref
  */
-const Toolbar = forwardRef( ( { className, accessibilityLabel, ...props }, ref ) => {
+const Toolbar = forwardRef( ( { accessibilityLabel, ...props }, ref ) => {
 	if ( accessibilityLabel ) {
 		return (
-			<ToolbarContainer
-				ref={ ref }
-				// `ToolbarGroup` already uses components-toolbar for compatibility reasons
-				className={ classnames( 'components-accessible-toolbar', className ) }
-				accessibilityLabel={ accessibilityLabel }
-				{ ...props }
-			/>
+			<ToolbarProvider>
+				<ToolbarContainer
+					ref={ ref }
+					accessibilityLabel={ accessibilityLabel }
+					{ ...props }
+				/>
+			</ToolbarProvider>
 		);
 	}
 

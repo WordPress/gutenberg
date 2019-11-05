@@ -2,8 +2,6 @@
  * External dependencies
  */
 import { isEmpty } from 'lodash';
-import { unmountComponentAtNode, render } from 'react-dom';
-import { act } from 'react-dom/test-utils';
 import ReactTestRenderer from 'react-test-renderer';
 
 /**
@@ -16,7 +14,7 @@ import Provider from '../context';
 /**
  * WordPress dependencies
  */
-import { Component, useState } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 
 class Filler extends Component {
 	constructor() {
@@ -253,57 +251,6 @@ describe( 'Slot', () => {
 				expect( testRenderer.toJSON() ).toMatchSnapshot();
 
 				expect( testRenderer.getInstance().slots ).toHaveProperty( 'egg' );
-			} );
-
-			it( 'should re-render Fill when fillProps are updated', () => {
-				// react-test-renderer doesn't support portal
-				const container = document.createElement( 'div' );
-				document.body.appendChild( container );
-
-				// Creating a separate component so only this one will be re-rendered
-				// when its internal state (children) changes. App will not.
-				// This is necessary so we can ensure that Fill components will re-render
-				// when fillProps change even when they're in a separate tree.
-				const StatefulSlot = () => {
-					const [ children, setChildren ] = useState( 'a' );
-					return (
-						<>
-							<button data-testid="change" onClick={ () => setChildren( 'b' ) }>
-								Change
-							</button>
-							<Slot
-								name="chicken"
-								bubblesVirtually={ bubblesVirtually }
-								fillProps={ { children } }
-							/>
-						</>
-					);
-				};
-
-				const App = () => (
-					<Provider>
-						<StatefulSlot />
-						<Fill name="chicken">
-							{ ( props ) => <div data-testid="fill">{ props.children }</div> }
-						</Fill>
-					</Provider>
-				);
-
-				act( () => {
-					render( <App />, container );
-				} );
-
-				const fill = container.querySelector( '[data-testid="fill"]' );
-				const button = container.querySelector( '[data-testid="change"]' );
-
-				expect( fill.innerHTML ).toBe( 'a' );
-
-				button.click();
-
-				expect( fill.innerHTML ).toBe( 'b' );
-
-				unmountComponentAtNode( container );
-				container.remove();
 			} );
 		}
 	);

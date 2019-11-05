@@ -22,7 +22,7 @@ import {
 	isUnmodifiedDefaultBlock,
 	getUnregisteredTypeHandlerName,
 } from '@wordpress/blocks';
-import { KeyboardShortcuts, withFilters } from '@wordpress/components';
+import { KeyboardShortcuts, withFilters, ToolbarProvider } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	withDispatch,
@@ -515,48 +515,43 @@ function BlockListBlock( {
 					animationStyle
 			}
 		>
-			{ shouldShowInsertionPoint && (
-				<BlockInsertionPoint
-					clientId={ clientId }
-					rootClientId={ rootClientId }
-				/>
-			) }
-			<BlockDropZone
-				clientId={ clientId }
-				rootClientId={ rootClientId }
-			/>
-			{ isFirstMultiSelected && (
-				<BlockMultiControls
-					rootClientId={ rootClientId }
-					moverDirection={ moverDirection }
-				/>
-			) }
-			<div
-				className={ classnames(
-					'editor-block-list__block-edit block-editor-block-list__block-edit',
-					{ 'has-mover-inside': moverDirection === 'horizontal' },
-				) }
-			>
-				{ shouldRenderMovers && ( moverDirection === 'vertical' ) && blockMover }
-				{ shouldShowBreadcrumb && (
-					<BlockBreadcrumb
+			<ToolbarProvider>
+				{ shouldShowInsertionPoint && (
+					<BlockInsertionPoint
 						clientId={ clientId }
-						ref={ breadcrumb }
+						rootClientId={ rootClientId }
 					/>
 				) }
-				{ ( shouldShowContextualToolbar || isForcingContextualToolbar.current ) && (
-					<BlockContextualToolbar
-						// If the toolbar is being shown because of being forced
-						// it should focus the toolbar right after the mount.
-						focusOnMount={ isForcingContextualToolbar.current }
+				<BlockDropZone clientId={ clientId } rootClientId={ rootClientId } />
+				{ isFirstMultiSelected && (
+					<BlockMultiControls
+						rootClientId={ rootClientId }
+						moverDirection={ moverDirection }
 					/>
 				) }
-				{
-					! isNavigationMode &&
-					! shouldShowContextualToolbar &&
-					isSelected &&
-					! hasFixedToolbar &&
-					! isEmptyDefaultBlock && (
+				<div
+					className={ classnames(
+						'editor-block-list__block-edit block-editor-block-list__block-edit',
+						{ 'has-mover-inside': moverDirection === 'horizontal' }
+					) }
+				>
+					{ shouldRenderMovers && moverDirection === 'vertical' && blockMover }
+					{ shouldShowBreadcrumb && (
+						<BlockBreadcrumb clientId={ clientId } ref={ breadcrumb } />
+					) }
+					{ ( shouldShowContextualToolbar ||
+						isForcingContextualToolbar.current ) && (
+						<BlockContextualToolbar
+							// If the toolbar is being shown because of being forced
+							// it should focus the toolbar right after the mount.
+							focusOnMount={ isForcingContextualToolbar.current }
+						/>
+					) }
+					{ ! isNavigationMode &&
+						! shouldShowContextualToolbar &&
+						isSelected &&
+						! hasFixedToolbar &&
+						! isEmptyDefaultBlock && (
 						<KeyboardShortcuts
 							bindGlobal
 							eventName="keydown"
@@ -564,55 +559,58 @@ function BlockListBlock( {
 								'alt+f10': forceFocusedContextualToolbar,
 							} }
 						/>
-					)
-				}
-				<IgnoreNestedEvents
-					ref={ blockNodeRef }
-					onDragStart={ preventDrag }
-					onMouseDown={ onPointerDown }
-					data-block={ clientId }
-				>
-					<BlockCrashBoundary onError={ onBlockError }>
-						{ isValid && blockEdit }
-						{ isValid && mode === 'html' && (
-							<BlockHtml clientId={ clientId } />
-						) }
-						{ shouldRenderMovers && ( moverDirection === 'horizontal' ) && blockMover }
-						{ ! isValid && [
-							<BlockInvalidWarning
-								key="invalid-warning"
-								clientId={ clientId }
-							/>,
-							<div key="invalid-preview">
-								{ getSaveElement( blockType, attributes ) }
-							</div>,
-						] }
-					</BlockCrashBoundary>
-					{ !! hasError && <BlockCrashWarning /> }
-					{ shouldShowMobileToolbar && (
-						<BlockMobileToolbar clientId={ clientId } moverDirection={ moverDirection } />
 					) }
-				</IgnoreNestedEvents>
-			</div>
-			{ showInserterShortcuts && (
-				<div className="editor-block-list__side-inserter block-editor-block-list__side-inserter">
-					<InserterWithShortcuts
-						clientId={ clientId }
-						rootClientId={ rootClientId }
-						onToggle={ selectOnOpen }
-					/>
+					<IgnoreNestedEvents
+						ref={ blockNodeRef }
+						onDragStart={ preventDrag }
+						onMouseDown={ onPointerDown }
+						data-block={ clientId }
+					>
+						<BlockCrashBoundary onError={ onBlockError }>
+							{ isValid && blockEdit }
+							{ isValid && mode === 'html' && <BlockHtml clientId={ clientId } /> }
+							{ shouldRenderMovers &&
+								moverDirection === 'horizontal' &&
+								blockMover }
+							{ ! isValid && [
+								<BlockInvalidWarning
+									key="invalid-warning"
+									clientId={ clientId }
+								/>,
+								<div key="invalid-preview">
+									{ getSaveElement( blockType, attributes ) }
+								</div>,
+							] }
+						</BlockCrashBoundary>
+						{ !! hasError && <BlockCrashWarning /> }
+						{ shouldShowMobileToolbar && (
+							<BlockMobileToolbar
+								clientId={ clientId }
+								moverDirection={ moverDirection }
+							/>
+						) }
+					</IgnoreNestedEvents>
 				</div>
-			) }
-			{ showEmptyBlockSideInserter && (
-				<div className="editor-block-list__empty-block-inserter block-editor-block-list__empty-block-inserter">
-					<Inserter
-						position="top right"
-						onToggle={ selectOnOpen }
-						rootClientId={ rootClientId }
-						clientId={ clientId }
-					/>
-				</div>
-			) }
+				{ showInserterShortcuts && (
+					<div className="editor-block-list__side-inserter block-editor-block-list__side-inserter">
+						<InserterWithShortcuts
+							clientId={ clientId }
+							rootClientId={ rootClientId }
+							onToggle={ selectOnOpen }
+						/>
+					</div>
+				) }
+				{ showEmptyBlockSideInserter && (
+					<div className="editor-block-list__empty-block-inserter block-editor-block-list__empty-block-inserter">
+						<Inserter
+							position="top right"
+							onToggle={ selectOnOpen }
+							rootClientId={ rootClientId }
+							clientId={ clientId }
+						/>
+					</div>
+				) }
+			</ToolbarProvider>
 		</IgnoreNestedEvents>
 	);
 }

@@ -60,9 +60,6 @@ class SlotFillProvider extends Component {
 		// will be empty (the new Slot will subsume all fills for this name).
 		if ( previousSlot ) {
 			previousSlot.forceUpdate();
-
-			// See 'should re-render Fill when fillProps are updated' test.
-			this.forceUpdateFills( name );
 		}
 	}
 
@@ -120,10 +117,6 @@ class SlotFillProvider extends Component {
 		if ( slot ) {
 			slot.forceUpdate();
 		}
-	}
-
-	forceUpdateFills( name ) {
-		forEach( this.fills[ name ], ( instance ) => instance.forceUpdate() );
 	}
 
 	triggerListeners() {
