@@ -97,7 +97,7 @@ function NavigationMenuItemEdit( {
 	 * It takes over to stop the event propagation to make the
 	 * navigation work, avoiding undesired behaviors.
 	 * For instance, it will block to move between menu items
-	 * when the LinkOver is focused.
+	 * when the LinkControl is focused.
 	 *
 	 * @param {Event} event
 	 */
