@@ -22,8 +22,8 @@ class WP_REST_Widget_Updater_Controller extends WP_REST_Controller {
 	 * @access public
 	 */
 	public function __construct() {
-		$this->namespace = 'wp/v2';
-		$this->rest_base = 'widgets';
+		$this->namespace = '__experimental';
+		$this->rest_base = 'widget-forms';
 	}
 
 	/**
