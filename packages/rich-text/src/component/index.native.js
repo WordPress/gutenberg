@@ -660,13 +660,13 @@ export class RichText extends Component {
 						console.warn( 'Oops, BR tag(s) at the end of content. Aztec will remove them, adapting the selection...' );
 						const count = ( brBeforeParaMatches[ 0 ].match( /br/g ) || [] ).length;
 						if ( count > 0 ) {
-							let newSelectionStart = 0;
-							if ( this.props.selectionStart - count > 0 ) {
-								newSelectionStart = this.props.selectionStart - count;
+							let newSelectionStart = this.props.selectionStart - count;
+							if ( newSelectionStart < 0 ) {
+								newSelectionStart = 0;
 							}
-							let newSelectionEnd = 0;
-							if ( this.props.selectionEnd - count > 0 ) {
-								newSelectionEnd = this.props.selectionEnd - count;
+							let newSelectionEnd = this.props.selectionEnd - count;
+							if ( newSelectionEnd < 0 ) {
+								newSelectionEnd = 0;
 							}
 							selection = { start: newSelectionStart, end: newSelectionEnd };
 						}
