@@ -37,14 +37,14 @@ function InnerBlocksTemplatePicker( {
 				/* eslint-disable jsx-a11y/no-redundant-roles */
 			}
 			<ul className="block-editor-inner-blocks__template-picker-options" role="list">
-				{ options.map( ( templateOption, index ) => (
-					<li key={ index }>
+				{ options.map( ( templateOption ) => (
+					<li key={ templateOption.name }>
 						<IconButton
 							isLarge
 							icon={ templateOption.icon }
-							onClick={ () => onSelect( templateOption.template ) }
+							onClick={ () => onSelect( templateOption.innerBlocks ) }
 							className="block-editor-inner-blocks__template-picker-option"
-							label={ templateOption.title }
+							label={ templateOption.label }
 						/>
 					</li>
 				) ) }
