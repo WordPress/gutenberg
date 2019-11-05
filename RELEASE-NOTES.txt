@@ -2,6 +2,9 @@
 ------
 * [Android] Add support for pexels images
 * Add left, center, and right image alignment controls
+1.15.3
+------
+* [iOS] Fix a layout bug in RCTAztecView in iOS 13.2
 
 1.15.2
 ------

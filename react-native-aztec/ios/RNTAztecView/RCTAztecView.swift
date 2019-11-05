@@ -403,6 +403,8 @@ class RCTAztecView: Aztec.TextView {
             let end = selection["end"]  as? NSNumber {
             setSelection(start: start, end: end)
         }
+        // This signals the RN/JS system that the component needs to relayout
+        setNeedsLayout()
     }
 
     override var textColor: UIColor? {
