@@ -53,10 +53,11 @@ export function ColumnsEdit( {
 } ) {
 	const { verticalAlignment } = attributes;
 
-	const { count, patterns } = useSelect( ( select ) => {
+	const { count, defaultPattern, patterns } = useSelect( ( select ) => {
 		return {
 			count: select( 'core/block-editor' ).getBlockCount( clientId ),
 			patterns: select( 'core/blocks' ).__experimentalGetBlockPatterns( 'core/columns' ),
+			defaultPattern: select( 'core/blocks' ).__experimentalGetDefaultBlockPattern( 'core/columns' ),
 		};
 	} );
 	const [ template, setTemplate ] = useState( getColumnsTemplate( count ) );
@@ -106,11 +107,7 @@ export function ColumnsEdit( {
 			<div className={ classes }>
 				<InnerBlocks
 					__experimentalTemplateOptions={ patterns }
-					__experimentalOnSelectTemplateOption={ ( nextTemplate ) => {
-						if ( nextTemplate === undefined ) {
-							nextTemplate = getColumnsTemplate( 2 );
-						}
-
+					__experimentalOnSelectTemplateOption={ ( nextTemplate = defaultPattern.innerBlocks ) => {
 						setTemplate( nextTemplate );
 						setForceUseTemplate( true );
 					} }

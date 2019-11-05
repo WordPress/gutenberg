@@ -1,10 +1,16 @@
 /**
+ * External dependencies
+ */
+import deepFreeze from 'deep-freeze';
+
+/**
  * Internal dependencies
  */
 import {
 	getChildBlockNames,
-	isMatchingSearchTerm,
+	__experimentalGetDefaultBlockPattern,
 	getGroupingBlockName,
+	isMatchingSearchTerm,
 } from '../selectors';
 
 describe( 'selectors', () => {
@@ -136,6 +142,49 @@ describe( 'selectors', () => {
 
 			expect( getChildBlockNames( state, 'parent1' ) ).toEqual( [ 'child1', 'child2', 'child3' ] );
 			expect( getChildBlockNames( state, 'parent2' ) ).toEqual( [ 'child2' ] );
+		} );
+	} );
+
+	describe( '__experimentalGetDefaultBlockPattern', () => {
+		const blockName = 'block/name';
+		const createBlockPatternsState = ( patterns ) => {
+			return deepFreeze( {
+				blockPatterns: {
+					[ blockName ]: patterns,
+				},
+			} );
+		};
+		const firstBlockPattern = {
+			name: 'first-block-pattern',
+		};
+		const secondBlockPattern = {
+			name: 'second-block-pattern',
+		};
+
+		it( 'should return the default pattern when set', () => {
+			const defaultBlockPattern = {
+				...secondBlockPattern,
+				isDefault: true,
+			};
+			const state = createBlockPatternsState( [
+				firstBlockPattern,
+				defaultBlockPattern,
+			] );
+
+			const result = __experimentalGetDefaultBlockPattern( state, blockName );
+
+			expect( result ).toEqual( defaultBlockPattern );
+		} );
+
+		it( 'should return the first pattern when no default pattern set', () => {
+			const state = createBlockPatternsState( [
+				firstBlockPattern,
+				secondBlockPattern,
+			] );
+
+			const result = __experimentalGetDefaultBlockPattern( state, blockName );
+
+			expect( result ).toEqual( firstBlockPattern );
 		} );
 	} );
 
