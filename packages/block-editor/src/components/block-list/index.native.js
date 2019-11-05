@@ -59,12 +59,18 @@ export class BlockList extends Component {
 	}
 
 	renderDefaultBlockAppender() {
+		const { blockClientIds, shouldShowInsertionPoint } = this.props;
+		const willShowInsertionPoint = blockClientIds.length === 0 && shouldShowInsertionPoint();
+
 		return (
 			<ReadableContentView>
-				<BlockListAppender
-					rootClientId={ this.props.rootClientId }
-					renderAppender={ this.props.renderAppender }
-				/>
+				{ willShowInsertionPoint && this.renderAddBlockSeparator() }
+				{ ! willShowInsertionPoint &&
+					<BlockListAppender
+						rootClientId={ this.props.rootClientId }
+						renderAppender={ this.props.renderAppender }
+					/>
+				}
 			</ReadableContentView>
 		);
 	}
@@ -182,7 +188,7 @@ export default compose( [
 			return (
 				blockInsertionPointIsVisible &&
 				insertionPoint.rootClientId === rootClientId &&
-				blockClientIds[ insertionPoint.index ] === clientId
+				( blockClientIds.length === 0 || blockClientIds[ insertionPoint.index ] === clientId )
 			);
 		};
 
