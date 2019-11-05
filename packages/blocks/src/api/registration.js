@@ -25,38 +25,159 @@ import { isValidIcon, normalizeIconObject } from './utils';
 import { DEPRECATED_ENTRY_KEYS } from './constants';
 
 /**
- * TODO: Editor block attributes object.
+ * The `edit` function describes the structure of your block in the context of
+ * the editor. This represents what the editor will render when the block is
+ * used.
+ *
+ * @callback FnEditBlock
+ *
+ * @param {WPBlockEditProps} props
+ * @return {WPComponent}
+ */
+
+/**
+ * The `save` function defines the way in which the different attributes should
+ * be combined into the final markup, which is then serialized into
+ * `post_content`.
+ *
+ * @callback FnSaveBlock
+ *
+ * @param {WPBlockSaveProps} props
+ * @return {WPComponent}
+ */
+
+/**
+ * @callback FnSetAttributes
+ *
+ * @param {WPBlockAttributes} attributes Attributes to set.
+ * @return {void}
+ */
+
+/**
+ * Defined behavior of a block type.
+ *
+ * @typedef {Object} WPBlock
+ *
+ * @property {WPBlockAttributes}     [attributes]  Attributes provide the
+ *                                                 structured data needs of a
+ *                                                 block. They can exist in
+ *                                                 different forms when they are
+ *                                                 serialized, but they are
+ *                                                 declared together under a
+ *                                                 common interface.
+ * @property {WPBlockCategory}       category      Blocks are grouped into
+ *                                                 categories to help users
+ *                                                 browse and discover them.
+ * @property {WPBlockDeprecation}    [deprecated]  Array of deprecation handlers
+ *                                                 for the block.
+ * @property {string}                [description] This is a short description
+ *                                                 for your block, which can be
+ *                                                 translated with our
+ *                                                 translation functions.
+ * @property {FnEditBlock}           [edit]        Component rendering an
+ *                                                 element to manipulate the
+ *                                                 attributes of a block in the
+ *                                                 context of an editor.
+ * @property {WPBlockTypeIconRender} [icon]        An icon property should be
+ *                                                 specified to make it easier
+ *                                                 to identify a block. These
+ *                                                 can be any of the WordPress
+ *                                                 Dashicons, or a custom `svg`
+ *                                                 element.
+ * @property {string[]}              [keywords]    Sometimes a block could have
+ *                                                 aliases that help users
+ *                                                 discover it while searching.
+ *                                                 For example, an `image` block
+ *                                                 could also want to be
+ *                                                 discovered by `photo`. You
+ *                                                 can do so by providing an
+ *                                                 array of terms (which can be
+ *                                                 translated).
+ * @property {string[]}              [parent]      Setting `parent` lets a block
+ *                                                 require that it is only
+ *                                                 available when nested within
+ *                                                 the specified blocks.
+ * @property {FnSaveBlock}           save          Component describing
+ *                                                 serialized markup structure
+ *                                                 of a block type.
+ * @property {WPBlockStyle[]}        [styles]      Block styles can be used to
+ *                                                 provide alternative styles to
+ *                                                 block. It works by adding a
+ *                                                 class name to the block’s
+ *                                                 wrapper. Using CSS, a theme
+ *                                                 developer can target the
+ *                                                 class name for the style
+ *                                                 variation if it is selected.
+ * @property {WPBlockSupports}       [supports]    Optional block extended
+ *                                                 support features.
+ * @property {string}                title         This is the display title for
+ *                                                 your block, which can be
+ *                                                 translated with our
+ *                                                 translation functions. The
+ *                                                 block inserter will show this
+ *                                                 name.
+ * @property {WPBlockTransforms}     [transforms]  Block transformations.
+ */
+
+/**
+ * Editor block alignment options.
+ *
+ * @typedef {('left' | 'center' | 'right' | 'wide' | 'full')} WPBlockAlign
+ */
+
+/**
+ * Editor block attributes object.
  *
  * @typedef {Object} WPBlockAttributeOptions
  *
- * @property {WPBlockAttributeType} type ...
- * @property {string} source ...
- * @property {string} selector ...
- * @property {string} attribute ...
- * @property {string} meta Attributes may be obtained from a post’s meta rather than from the block’s representation in saved post content. For this, an attribute is required to specify its corresponding meta key under the meta key
+ * @property {string}                 attribute Use attribute to extract the
+ *                                              value of an attribute from
+ *                                              markup.
+ * @property {string}                 meta      Attributes may be obtained from
+ *                                              a post’s meta rather than from
+ *                                              the block’s representation in
+ *                                              saved post content. For this, an
+ *                                              attribute is required to specify
+ *                                              its corresponding meta key under
+ *                                              the meta key
+ * @property {string}                 selector  A CSS selector used to parse the
+ *                                              saved block's HTML. The selector
+ *                                              specified can be an HTML tag, or
+ *                                              anything queryable such as a
+ *                                              `class` or `id` attribute.
+ * @property {WPBlockAttributeSource} source    Attribute sources are used to
+ *                                              define how the block attribute
+ *                                              values are extracted from saved
+ *                                              post content. They provide a
+ *                                              mechanism to map from the saved
+ *                                              markup to a JavaScript
+ *                                              representation of a block.
+ * @property {WPBlockAttributeType}   type      The type of the attribute.
+ *
+ * @example
+ * ```js
+ * {
+ *     url: {
+ *         type: 'string',
+ *         source: 'attribute',
+ *         selector: 'img',
+ *         attribute: 'src',
+ *     }
+ * }
+ * // { "url": "https://lorempixel.com/1200/800/" }
+ * ```
  */
 
 /**
  * Editor block category options.
  *
- * @typedef {Object.<string, WPBlockAttributeOptions>} WPBlockAttributes
- */
-
-/**
- * TODO: Editor block style object.
- *
- * @typedef {Object} WPBlockStyle
- *
- * @property {string}  name      Unique key name for the style definition.
- * @property {string}  label     Label shown to the user in the editor.
- * @property {boolean} isDefault Whether or not the style is selected by
- *                               default.
+ * @typedef {Object<string, WPBlockAttributeOptions>} WPBlockAttributes
  */
 
 /**
  * Editor block category options.
  *
- * @typedef {('common'|'formatting'|'layout'|'widgets'|'embed')} WPBlockCategories
+ * @typedef {('text'|'html'|'query'|'meta'|'number'|'string'|'integer')} WPBlockAttributeSource
  */
 
 /**
@@ -68,64 +189,149 @@ import { DEPRECATED_ENTRY_KEYS } from './constants';
 /**
  * Editor block category options.
  *
- * @typedef {('text'|'html'|'query'|'meta'|'number'|'string'|'integer')} WPBlockAttributeSource
+ * @typedef {('common'|'formatting'|'layout'|'widgets'|'embed')} WPBlockCategory
  */
 
 /**
- * Editor block settings object.
+ * @typedef {Object} WPBlockEditProps
  *
- * @typedef {Object} WPBlockSettings
- *
- * @property {string}                title        This is the display title for
- *                                                your block, which can be
- *                                                translated with our
- *                                                translation functions. The
- *                                                block inserter will show this
- *                                                name.
- * @property {WPBlockCategories}     [category]   Blocks are grouped into
- *                                                categories to help users
- *                                                browse and discover them.
- * @property {string[]}              [keywords]   Sometimes a block could have
- *                                                aliases that help users
- *                                                discover it while searching.
- *                                                For example, an `image` block
- *                                                could also want to be
- *                                                discovered by `photo`. You can
- *                                                do so by providing an array of
- *                                                terms (which can be
- *                                                translated).
- * @property {WPBlockTypeIconRender} [icon]       An icon property should be
- *                                                specified to make it easier to
- *                                                identify a block. These can be
- *                                                any of the WordPress
- *                                                Dashicons, or a custom `svg`
- *                                                element.
- * @property {WPBlockAttributes}     [attributes] Attributes provide the
- *                                                structured data needs of a
- *                                                block. They can exist in
- *                                                different forms when they are
- *                                                serialized, but they are
- *                                                declared together under a
- *                                                common interface.
- * @property {WPBlockStyle[]}        [style]      Block styles can be used to
- *                                                provide alternative styles to
- *                                                block. It works by adding a
- *                                                class name to the block’s
- *                                                wrapper. Using CSS, a theme
- *                                                developer can target the class
- *                                                name for the style variation
- *                                                if it is selected.
- * @property {Function}              edit         TODO: ...
- * @property {Function}              save         TODO: ...
+ * @property {WPBlockAttributes} attributes    This property surfaces all the
+ *                                             available attributes and their
+ *                                             corresponding values, as
+ *                                             described by the attributes
+ *                                             property when the block type was
+ *                                             registered.
+ * @property {string}            [className]   This property returns the class
+ *                                             name for the wrapper element.
+ *                                             This is automatically added in
+ *                                             the `save` method, but not on
+ *                                             `edit`, as the root element may
+ *                                             not correspond to what is
+ *                                             visually the main element of the
+ *                                             block. You can request it to add
+ *                                             it to the correct element in your
+ *                                             function.
+ * @property {boolean}           [isSelected]  The `isSelected` property is an
+ *                                             object that communicates whether
+ *                                             the block is currently selected.
+ * @property {FnSetAttributes}   setAttributes This function allows the block to
+ *                                             update individual attributes
+ *                                             based on user interactions.
  */
 
 /**
- * Render behavior of a block type icon; one of a Dashicon slug, an element,
- * or a component.
  *
- * @typedef {(string|WPElement|WPComponent)} WPBlockTypeIconRender
+ * @typedef {Object} WPBlockSaveProps
  *
- * @see https://developer.wordpress.org/resource/dashicons/
+ * @property {WPBlockAttributes} attributes As with edit, the save function also
+ *                                          receives an object argument
+ *                                          including attributes which can be
+ *                                          inserted into the markup.
+ */
+
+/**
+ * Editor block style object.
+ *
+ * @typedef {Object} WPBlockStyle
+ *
+ * @property {string}  name      Unique key name for the style definition.
+ * @property {string}  label     Label shown to the user in the editor.
+ * @property {boolean} isDefault Whether or not the style is selected by
+ *                               default.
+ */
+
+/**
+ * Editor block deprecation options.
+ *
+ * @typedef {Object} WPBlockDeprecation
+ *
+ * @property {WPBlockAttributes} attributes   The attributes definition of the
+ *                                            deprecated form of the block.
+ * @property {Function}          [isEligible] A function which, given the
+ *                                            attributes and inner blocks of the
+ *                                            parsed block, returns true if the
+ *                                            deprecation can handle the block
+ *                                            migration. This is particularly
+ *                                            useful in cases where a block is
+ *                                            technically valid even once
+ *                                            deprecated, and requires updates
+ *                                            to its attributes or inner blocks.
+ * @property {Function}          [migrate]    A function which, given the old
+ *                                            attributes and inner blocks is
+ *                                            expected to return either the new
+ *                                            attributes or a tuple array of
+ *                                            `[attributes, innerBlocks]`
+ *                                            compatible with the block.
+ * @property {FnSaveBlock}       save         The save implementation of the
+ *                                            deprecated form of the block.
+ * @property {WPBlockSupports}   support      The supports definition of the
+ *                                            deprecated form of the block.
+ */
+
+/**
+ * Editor block category options.
+ *
+ * @typedef {Object} WPBlockSupports
+ *
+ *
+ * @property {boolean | WPBlockAlign[]} [align]           This property adds block
+ *                                                        controls which allow to change
+ *                                                        block's alignment. Defaults to
+ *                                                        `false`.
+ * @property {boolean}                  [alignWide]       This property enables wide
+ *                                                        alignment (depends on `align`).
+ *                                                        Defaults to `true`.
+ * @property {boolean}                  [anchor]          Anchors let you link directly to
+ *                                                        a specific block on a page. This
+ *                                                        property adds a field to define
+ *                                                        an id for the block and a button
+ *                                                        to copy the direct link.
+ *                                                        Defaults to `false`.
+ * @property {boolean}                  [customClassName] This property adds a field to
+ *                                                        define a custom className for
+ *                                                        the block's wrapper. Defaults to
+ *                                                        `true`.
+ * @property {boolean}                  [className]       This property adds a class with
+ *                                                        the form
+ *                                                        `.wp-block-your-block-name` to
+ *                                                        the root element of your saved
+ *                                                        markup. Defaults to `true`.
+ * @property {boolean}                  [html]            This property allows a block's
+ *                                                        markup to be edited
+ *                                                        individually. Defaults to
+ *                                                        `true`.
+ * @property {boolean}                  [inserter]        By default, all blocks will
+ *                                                        appear in the Gutenberg
+ *                                                        inserter. To hide a block so
+ *                                                        that it can only be inserted
+ *                                                        programmatically, set this
+ *                                                        property to `false`.
+ * @property {boolean}                  [multiple]        A non-multiple block can be
+ *                                                        inserted into each post, one
+ *                                                        time only. Defaults to `true`.
+ * @property {boolean}                  [reusable]        This property allows non-
+ *                                                        multiple block to be converted
+ *                                                        to a reusable block.. Defaults
+ *                                                        to `true`.
+ */
+
+/**
+ * Block transformations.
+ *
+ * @typedef {Object} WPBlockTransforms
+ *
+ * @property {Object<string,*>[]} from Transforms from another block type to
+ *                                     this block type.
+ * @property {Object<string,*>[]} to   Transforms from this block type to
+ *                                     another block type.
+ */
+
+/**
+ * Value to use to render the icon for a block type in an editor interface,
+ * either a Dashicon slug, an element, a component, or an object describing
+ * the icon.
+ *
+ * @typedef {(WPBlockTypeIconDescriptor|WPBlockTypeIconRender)} WPBlockTypeIcon
  */
 
 /**
@@ -145,33 +351,12 @@ import { DEPRECATED_ENTRY_KEYS } from './constants';
  */
 
 /**
- * Value to use to render the icon for a block type in an editor interface,
- * either a Dashicon slug, an element, a component, or an object describing
- * the icon.
+ * Render behavior of a block type icon; one of a Dashicon slug, an element,
+ * or a component.
  *
- * @typedef {(WPBlockTypeIconDescriptor|WPBlockTypeIconRender)} WPBlockTypeIcon
- */
-
-/**
- * Defined behavior of a block type.
+ * @typedef {(string|WPElement|WPComponent)} WPBlockTypeIconRender
  *
- * @typedef {Object} WPBlock
- *
- * @property {string}          name         Block type's namespaced name.
- * @property {string}          title        Human-readable block type label.
- * @property {string}          category     Block type category classification,
- *                                          used in search interfaces to arrange
- *                                          block types by category.
- * @property {WPBlockTypeIcon} [icon]       Block type icon.
- * @property {string[]}        [keywords]   Additional keywords to produce block
- *                                          type as result in search interfaces.
- * @property {Object}          [attributes] Block type attributes.
- * @property {WPComponent}     [save]       Optional component describing
- *                                          serialized markup structure of a
- *                                          block type.
- * @property {WPComponent}     edit         Component rendering an element to
- *                                          manipulate the attributes of a block
- *                                          in the context of an editor.
+ * @see https://developer.wordpress.org/resource/dashicons/
  */
 
 /**
@@ -205,8 +390,8 @@ export function unstable__bootstrapServerSideBlockDefinitions( definitions ) { /
  * behavior. Once registered, the block is made available as an option to any
  * editor interface where blocks are implemented.
  *
- * @param {string}          name     Block name.
- * @param {WPBlockSettings} settings Block settings.
+ * @param {string}  name     Block name.
+ * @param {WPBlock} settings Block settings.
  *
  * @return {?WPBlock} The block, if it has been successfully registered;
  *                    otherwise `undefined`.
