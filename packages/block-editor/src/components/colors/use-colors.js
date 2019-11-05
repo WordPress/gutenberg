@@ -30,6 +30,8 @@ import ContrastChecker from '../contrast-checker';
 import InspectorControls from '../inspector-controls';
 import { useBlockEditContext } from '../block-edit';
 
+const DEFAULT_COLORS = [];
+
 const ColorPanel = ( {
 	title,
 	colorSettings,
@@ -79,9 +81,10 @@ export default function __experimentalUseColors(
 	const { attributes, settingsColors } = useSelect(
 		( select ) => {
 			const { getBlockAttributes, getSettings } = select( 'core/block-editor' );
+			const colors = getSettings().colors;
 			return {
 				attributes: getBlockAttributes( clientId ),
-				settingsColors: getSettings().colors,
+				settingsColors: ! colors || colors === true ? DEFAULT_COLORS : colors,
 			};
 		},
 		[ clientId ]
