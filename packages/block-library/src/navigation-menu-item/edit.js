@@ -76,7 +76,6 @@ function NavigationMenuItemEdit( {
 	isParentOfSelectedBlock,
 	setAttributes,
 	insertMenuItemBlock,
-	fetchSearchSuggestions,
 } ) {
 	const { label, opensInNewTab, title, url } = attributes;
 	const link = title ? { title, url } : null;
@@ -209,7 +208,6 @@ function NavigationMenuItemEdit( {
 							onClose={ () => setTimeout( () => setIsLinkOpen( false ), 100 ) }
 							currentSettings={ { 'new-tab': opensInNewTab } }
 							onSettingsChange={ updateLinkSetting( setAttributes ) }
-							fetchSearchSuggestions={ fetchSearchSuggestions }
 						/>
 					) }
 				</div>
@@ -224,13 +222,12 @@ function NavigationMenuItemEdit( {
 
 export default compose( [
 	withSelect( ( select, ownProps ) => {
-		const { getClientIdsOfDescendants, hasSelectedInnerBlock, getSettings } = select( 'core/block-editor' );
+		const { getClientIdsOfDescendants, hasSelectedInnerBlock } = select( 'core/block-editor' );
 		const { clientId } = ownProps;
 
 		return {
 			isParentOfSelectedBlock: hasSelectedInnerBlock( clientId, true ),
 			hasDescendants: !! getClientIdsOfDescendants( [ clientId ] ).length,
-			fetchSearchSuggestions: getSettings().__experimentalFetchLinkSuggestions,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => {
