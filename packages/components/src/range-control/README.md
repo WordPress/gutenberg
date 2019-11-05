@@ -118,6 +118,7 @@ If this property is added, a label will be generated using label property as the
 
 - Type: `String`
 - Required: No
+- Platform: Web | Mobile
 
 #### help
 
@@ -125,6 +126,7 @@ If this property is added, a help text will be generated using help property as 
 
 - Type: `String|WPElement`
 - Required: No
+- Platform: Web
 
 #### beforeIcon
 
@@ -132,6 +134,7 @@ If this property is added, a DashIcon component will be rendered before the slid
 
 - Type: `String`
 - Required: No
+- Platform: Web
 
 #### afterIcon
 
@@ -139,6 +142,7 @@ If this property is added, a DashIcon component will be rendered after the slide
 
 - Type: `String`
 - Required: No
+- Platform: Web
 
 #### allowReset
 
@@ -146,6 +150,7 @@ If this property is true, a button to reset the the slider is rendered.
 
 - Type: `Boolean`
 - Required: No
+- Platform: Web | Mobile
 
 #### initialPosition
 
@@ -153,6 +158,7 @@ If no value exists this prop contains the slider starting position.
 
 - Type: `Number`
 - Required: No
+- Platform: Web | Mobile
 
 #### value
 
@@ -160,6 +166,7 @@ The current value of the range slider.
 
 - Type: `Number`
 - Required: Yes
+- Platform: Web | Mobile
 
 #### onChange
 
@@ -168,6 +175,7 @@ If allowReset is true, when onChange is called without any parameter passed it s
 
 - Type: `function`
 - Required: Yes
+- Platform: Web | Mobile
 
 #### min
 
@@ -175,7 +183,7 @@ The minimum value accepted. If smaller values are inserted onChange will not be 
 
 - Type: `Number`
 - Required: No
-
+- Platform: Web | Mobile
 
 #### max
 
@@ -183,6 +191,7 @@ The maximum value accepted. If higher values are inserted onChange will not be c
 
 - Type: `Number`
 - Required: No
+- Platform: Web | Mobile
 
 #### icon
 
@@ -190,7 +199,7 @@ An icon to be shown above the slider next to it's container title.
 
 - Type: `String`
 - Required: No
-- Platform: Only Mobile
+- Platform: Mobile
 
 #### separatorType
 
@@ -199,7 +208,7 @@ Define if separator line under/above control row should be disabled or full widt
 - Type: `String Enum`
 - Values: `none` | `fullWidth` | `topFullWidth`
 - Required: No
-- Platform: Only Mobile
+- Platform: Mobile
 
 ## Related components
 
