@@ -60,7 +60,7 @@ export class BlockList extends Component {
 
 	renderDefaultBlockAppender() {
 		const { blockClientIds, shouldShowInsertionPoint } = this.props;
-		const willShowInsertionPoint = blockClientIds.length === 0 && shouldShowInsertionPoint();
+		const willShowInsertionPoint = shouldShowInsertionPoint();
 
 		return (
 			<ReadableContentView>
