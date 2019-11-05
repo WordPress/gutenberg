@@ -653,7 +653,9 @@ export class RichText extends Component {
 					console.warn( 'Oops, selection will land outside the text, skipping setting it...' );
 					selection = null;
 				} else {
-					const brBeforeParaMatches = html.match( /(<br>)+<\/p>$/ );
+					// The following regular expression is used in Aztec here:
+					// https://github.com/wordpress-mobile/AztecEditor-Android/blob/b1fad439d56fa6d4aa0b78526fef355c59d00dd3/aztec/src/main/kotlin/org/wordpress/aztec/AztecParser.kt#L656
+					const brBeforeParaMatches = html.match( /(<br>)+<\/p>$/g );
 					if ( brBeforeParaMatches ) {
 						console.warn( 'Oops, BR tag(s) at the end of content. Aztec will remove them, adapting the selection...' );
 						const count = ( brBeforeParaMatches[ 0 ].match( /br/g ) || [] ).length;
