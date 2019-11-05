@@ -1,5 +1,6 @@
 .components-custom-select {
 	color: $dark-gray-500;
+	position: relative;
 }
 
 .components-custom-select__label {
@@ -31,7 +32,11 @@
 }
 
 .components-custom-select__menu {
+	background: $white;
 	padding: 0;
+	position: absolute;
+	width: 100%;
+	z-index: z-index(".components-popover");
 }
 
 .components-custom-select__item {

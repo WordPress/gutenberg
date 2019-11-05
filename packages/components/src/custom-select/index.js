@@ -57,7 +57,14 @@ const stateReducer = (
 			return changes;
 	}
 };
-export default function CustomSelect( { label, items } ) {
+export default function CustomSelect( {
+	className,
+	hideLabelFromVision,
+	label,
+	items,
+	onSelectedItemChange,
+	selectedItem: _selectedItem,
+} ) {
 	const {
 		getLabelProps,
 		getToggleButtonProps,
@@ -70,6 +77,8 @@ export default function CustomSelect( { label, items } ) {
 		initialSelectedItem: items[ 0 ],
 		items,
 		itemToString,
+		onSelectedItemChange,
+		selectedItem: _selectedItem,
 		stateReducer,
 	} );
 	const menuProps = getMenuProps( {
@@ -85,10 +94,14 @@ export default function CustomSelect( { label, items } ) {
 		delete menuProps[ 'aria-activedescendant' ];
 	}
 	return (
-		<div className="components-custom-select">
+		<div className={ classnames( 'components-custom-select', className ) }>
 			{ /* eslint-disable-next-line jsx-a11y/label-has-associated-control, jsx-a11y/label-has-for */ }
 			<span
-				{ ...getLabelProps( { className: 'components-custom-select__label' } ) }
+				{ ...getLabelProps( {
+					className: classnames( 'components-custom-select__label', {
+						'screen-reader-text': hideLabelFromVision,
+					} ),
+				} ) }
 			>
 				{ label }
 			</span>

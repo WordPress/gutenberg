@@ -25,12 +25,6 @@
 	}
 }
 
-// Needed to override CSS set in https://github.com/WordPress/gutenberg/blob/9c438f93a7215d50d1efc0492c308e4cbaa59c52/packages/edit-post/src/components/sidebar/settings-sidebar/style.scss#L6.
-.components-font-size-picker__select.components-font-size-picker__select.components-font-size-picker__select.components-font-size-picker__select,
-.components-font-size-picker__select .components-base-control__field {
-	margin-bottom: 0;
-}
-
 .components-font-size-picker__custom-input {
 	.components-range-control__slider + .dashicon {
 		width: 30px;

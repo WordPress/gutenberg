@@ -10,7 +10,7 @@ import { __ } from '@wordpress/i18n';
  */
 import Button from '../button';
 import RangeControl from '../range-control';
-import SelectControl from '../select-control';
+import CustomSelect from '../custom-select';
 
 function getSelectValueFromFontSize( fontSizes, value ) {
 	if ( value ) {
@@ -22,8 +22,12 @@ function getSelectValueFromFontSize( fontSizes, value ) {
 
 function getSelectOptions( optionsArray ) {
 	return [
-		...optionsArray.map( ( option ) => ( { value: option.slug, label: option.name } ) ),
-		{ value: 'custom', label: __( 'Custom' ) },
+		...optionsArray.map( ( option ) => ( {
+			key: option.slug,
+			name: option.name,
+			style: { fontSize: option.size },
+		} ) ),
+		{ key: 'custom', name: __( 'Custom' ) },
 	];
 }
 
@@ -51,14 +55,12 @@ function FontSizePicker( {
 		onChange( Number( newValue ) );
 	};
 
-	const onSelectChangeValue = ( eventValue ) => {
-		setCurrentSelectValue( eventValue );
-		const selectedFont = fontSizes.find( ( font ) => font.slug === eventValue );
-		if ( selectedFont ) {
-			onChange( selectedFont.size );
-		}
+	const onSelectChangeValue = ( { selectedItem } ) => {
+		setCurrentSelectValue( selectedItem.key );
+		onChange( selectedItem.style && selectedItem.style.fontSize );
 	};
 
+	const items = getSelectOptions( fontSizes );
 	return (
 		<fieldset className="components-font-size-picker">
 			<legend>
@@ -66,13 +68,13 @@ function FontSizePicker( {
 			</legend>
 			<div className="components-font-size-picker__controls">
 				{ ( fontSizes.length > 0 ) &&
-					<SelectControl
+					<CustomSelect
 						className={ 'components-font-size-picker__select' }
+						hideLabelFromVision
 						label={ 'Choose preset' }
-						hideLabelFromVision={ true }
-						value={ currentSelectValue }
-						onChange={ onSelectChangeValue }
-						options={ getSelectOptions( fontSizes ) }
+						items={ items }
+						selectedItem={ items.find( ( item ) => item.key === currentSelectValue ) || items[ 0 ] }
+						onSelectedItemChange={ onSelectChangeValue }
 					/>
 				}
 				{ ( ! withSlider && ! disableCustomFontSizes ) &&
