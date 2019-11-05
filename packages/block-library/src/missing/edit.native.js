@@ -47,15 +47,6 @@ export class UnsupportedBlockEdit extends Component {
 		</TouchableWithoutFeedback>;
 	}
 
-	renderSheetButton( text, action ) {
-		return <TouchableOpacity
-			onPress={ action() }
-			style={ styles.sheetButton }
-		>
-			<Text style={ styles.sheetButtonText } >{ text }</Text>
-		</TouchableOpacity>;
-	}
-
 	renderSheet( title ) {
 		const { getStylesFromColorScheme } = this.props;
 		const infoTextStyle = getStylesFromColorScheme( styles.infoText, styles.infoTextDark );
@@ -83,7 +74,6 @@ export class UnsupportedBlockEdit extends Component {
 					<Text style={ [ infoTextStyle, infoDescriptionStyle ] }>
 						{ __( 'We are working hard to add more blocks with each release. In the meantime, you can also edit this post on the web.' ) }
 					</Text>
-					{ this.renderSheetButton( __( 'Close' ), () => this.toggleSheet.bind( this ) ) }
 				</View>
 			</BottomSheet>
 		);
