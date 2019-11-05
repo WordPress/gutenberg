@@ -44,6 +44,7 @@ export const link = {
 			this.addLink = this.addLink.bind( this );
 			this.stopAddingLink = this.stopAddingLink.bind( this );
 			this.onRemoveFormat = this.onRemoveFormat.bind( this );
+			this.getURLFromClipboard = this.getURLFromClipboard.bind( this );
 			this.state = {
 				addingLink: false,
 			};
@@ -110,7 +111,7 @@ export const link = {
 			speak( __( 'Link removed.' ), 'assertive' );
 		}
 
-		getURLFromClipboard = async () => {
+		async getURLFromClipboard() {
 			const clipboardText = await Clipboard.getString();
 			if ( ! clipboardText ) {
 				return '';
