@@ -16,7 +16,7 @@ import {
 /**
  * Module constants
  */
-const TAG_TOKEN_SELECTOR = '.components-form-token-field__token-text span:not(.screen-reader-text)';
+const TAG_TOKEN_SELECTOR = '.components-form-token-field__token-text span:not(.components-visually-hidden)';
 
 describe( 'Taxonomies', () => {
 	const canCreatTermInTaxonomy = ( taxonomy ) => {

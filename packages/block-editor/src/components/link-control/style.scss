@@ -183,17 +183,13 @@
 	z-index: 100;
 	float: none;
 
-	&.components-spinner { // Specificity overide
+	&.components-spinner { // Specificity override.
 		position: absolute;
-		top: 70px;
-		left: 50%;
-		right: auto;
-		bottom: auto;
-		margin: 0 auto 16px auto;
-		transform: translateX(-50%);
+		top: 27px;
+		left: auto;
+		right: 60px;
+		bottom: 0;
 	}
-
-
 }
 
 .block-editor-link-control__search-item-action {

@@ -104,14 +104,18 @@ export class ImageEdit extends React.Component {
 			console.warn( 'Attributes has id with no url.' );
 		}
 
+		// Detect any pasted image and start an upload
+		if ( ! attributes.id && attributes.url && attributes.url.indexOf( 'file:' ) === 0 ) {
+			requestMediaImport( attributes.url, ( id, url ) => {
+				if ( url ) {
+					setAttributes( { id, url } );
+				}
+			} );
+		}
+
+		// Make sure we mark any temporary images as failed if they failed while
+		// the editor wasn't open
 		if ( attributes.id && attributes.url && ! isURL( attributes.url ) ) {
-			if ( attributes.url.indexOf( 'file:' ) === 0 ) {
-				requestMediaImport( attributes.url, ( id, url ) => {
-					if ( url ) {
-						setAttributes( { id, url } );
-					}
-				} );
-			}
 			mediaUploadSync();
 		}
 	}
