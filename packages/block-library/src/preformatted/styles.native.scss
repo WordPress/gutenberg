@@ -1,4 +1,4 @@
-.wpBlockPreformatted {
+.wpBlockPreformattedLight {
 	padding-left: 16;
 	padding-right: 16;
 	padding-top: 12;
@@ -10,15 +10,11 @@
 	border-bottom-right-radius: 4;
 }
 
-.wpRichText {
+.wpRichTextLight {
 	background-color: $gray-light;
 }
 
 .wpBlockPreformattedDark {
-	padding-left: 16;
-	padding-right: 16;
-	padding-top: 12;
-	padding-bottom: 12;
 	background-color: $gray-100;
 }
 
