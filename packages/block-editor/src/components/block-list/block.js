@@ -598,10 +598,7 @@ function BlockListBlock( {
 						ref={ breadcrumb }
 					/>
 				) }
-				{ ( shouldShowContextualToolbar || isForcingContextualToolbar.current ) ?
-					<ToolbarProvider>{ blockContent }</ToolbarProvider> :
-					blockContent
-				}
+				{ hasFixedToolbar ? blockContent : <ToolbarProvider>{ blockContent }</ToolbarProvider> }
 			</div>
 			{ showInserterShortcuts && (
 				<div className="editor-block-list__side-inserter block-editor-block-list__side-inserter">
