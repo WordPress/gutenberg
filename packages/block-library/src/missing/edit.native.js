@@ -31,20 +31,22 @@ export class UnsupportedBlockEdit extends Component {
 	}
 
 	renderHelpIcon() {
-		return <TouchableWithoutFeedback
-			accessibilityLabel={ __( 'Help icon' ) }
-			accessibilityRole={ 'button' }
-			accessibilityHint={ __( 'Tap here to show help' ) }
-			onPress={ this.toggleSheet.bind( this ) }
-		>
-			<View style={ styles.helpIconContainer } >
-				<Icon
-					className="unsupported-icon-help"
-					label={ __( 'Help icon' ) }
-					icon="editor-help"
-				/>
-			</View>
-		</TouchableWithoutFeedback>;
+		return (
+			<TouchableWithoutFeedback
+				accessibilityLabel={ __( 'Help icon' ) }
+				accessibilityRole={ 'button' }
+				accessibilityHint={ __( 'Tap here to show help' ) }
+				onPress={ this.toggleSheet.bind( this ) }
+			>
+				<View style={ styles.helpIconContainer } >
+					<Icon
+						className="unsupported-icon-help"
+						label={ __( 'Help icon' ) }
+						icon="editor-help"
+					/>
+				</View>
+			</TouchableWithoutFeedback>
+		);
 	}
 
 	renderSheet( title ) {
