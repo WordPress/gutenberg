@@ -265,13 +265,13 @@ class MediaContainer extends Component {
 
 		if ( mediaUrl ) {
 			return (
-				<View style={ { flex: 1 } }>
-					<MediaUpload
-						onSelect={ this.onSelectMediaUploadOption }
-						allowedTypes={ ALLOWED_MEDIA_TYPES }
-						value={ mediaId }
-						render={ ( { open, getMediaOptions } ) => {
-							return <>
+				<MediaUpload
+					onSelect={ this.onSelectMediaUploadOption }
+					allowedTypes={ ALLOWED_MEDIA_TYPES }
+					value={ mediaId }
+					render={ ( { open, getMediaOptions } ) => {
+						return (
+							<View>
 								{ getMediaOptions() }
 								{ this.renderToolbarEditButton( open ) }
 
@@ -290,10 +290,10 @@ class MediaContainer extends Component {
 										);
 									} }
 								/>
-							</>;
-						} }
-					/>
-				</View>
+							</View>
+						);
+					} }
+				/>
 			);
 		}
 		return this.renderPlaceholder();

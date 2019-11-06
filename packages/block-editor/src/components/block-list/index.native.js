@@ -70,12 +70,12 @@ export class BlockList extends Component {
 	}
 
 	render() {
-		const { clearSelectedBlock, blockClientIds, isFullyBordered, title, header, withFooter = true, renderAppender, isFirstBlock, selectedBlockParentId } = this.props;
+		const { clearSelectedBlock, blockClientIds, isFullyBordered, title, header, withFooter = true, renderAppender, isFirstBlock, selectedBlockParentId, isRootList } = this.props;
 
 		const showFloatingToolbar = isFirstBlock && selectedBlockParentId !== '';
 		return (
 			<View
-				style={ { flex: 1 } }
+				style={ { flex: isRootList ? 1 : 0 } }
 				onAccessibilityEscape={ clearSelectedBlock }
 			>
 				{ showFloatingToolbar && <FloatingToolbar.Slot fillProps={ { innerFloatingToolbar: showFloatingToolbar } } /> }
@@ -86,7 +86,7 @@ export class BlockList extends Component {
 					innerRef={ this.scrollViewInnerRef }
 					extraScrollHeight={ innerToolbarHeight + 10 }
 					keyboardShouldPersistTaps="always"
-					style={ styles.list }
+					scrollViewStyle={ { flex: isRootList ? 1 : 0 } }
 					data={ blockClientIds }
 					extraData={ [ isFullyBordered ] }
 					keyExtractor={ identity }
@@ -212,6 +212,7 @@ export default compose( [
 			selectedBlockClientId,
 			isFirstBlock,
 			selectedBlockParentId,
+			isRootList: rootClientId === undefined,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
