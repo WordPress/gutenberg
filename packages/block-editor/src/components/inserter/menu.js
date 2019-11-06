@@ -21,6 +21,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { speak } from '@wordpress/a11y';
 import { __, _n, _x, sprintf } from '@wordpress/i18n';
 import { Component, createRef } from '@wordpress/element';
 import {
@@ -531,21 +532,33 @@ export default compose(
 				const {
 					getSelectedBlock,
 				} = select( 'core/block-editor' );
-				const { isAppender } = ownProps;
-				const { name, initialAttributes } = item;
+				const {
+					isAppender,
+					onSelect,
+					__experimentalSelectBlockOnInsert: selectBlockOnInsert,
+				} = ownProps;
+				const { name, title, initialAttributes } = item;
 				const selectedBlock = getSelectedBlock();
 				const insertedBlock = createBlock( name, initialAttributes );
+
 				if ( ! isAppender && selectedBlock && isUnmodifiedDefaultBlock( selectedBlock ) ) {
 					replaceBlocks( selectedBlock.clientId, insertedBlock );
 				} else {
 					insertBlock(
 						insertedBlock,
 						getInsertionIndex(),
-						ownProps.destinationRootClientId
+						ownProps.destinationRootClientId,
+						selectBlockOnInsert
 					);
+
+					if ( ! selectBlockOnInsert ) {
+						// translators: %s: the name of the block that has been added
+						const message = sprintf( __( '%s block added' ), title );
+						speak( message );
+					}
 				}
 
-				ownProps.onSelect();
+				onSelect();
 				return insertedBlock;
 			},
 		};

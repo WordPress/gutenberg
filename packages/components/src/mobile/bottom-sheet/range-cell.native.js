@@ -85,7 +85,7 @@ class BottomSheetRangeCell extends Component {
 	}
 
 	onChangeValue( initialValue ) {
-		const { minimumValue, maximumValue, setAttributes, attribute } = this.props;
+		const { minimumValue, maximumValue, onChange } = this.props;
 
 		let sliderValue = initialValue;
 		if ( sliderValue < minimumValue ) {
@@ -93,9 +93,7 @@ class BottomSheetRangeCell extends Component {
 		} else if ( sliderValue > maximumValue ) {
 			sliderValue = maximumValue;
 		}
-		setAttributes( {
-			[ attribute ]: sliderValue,
-		} );
+		onChange( sliderValue );
 	}
 
 	onCellPress() {

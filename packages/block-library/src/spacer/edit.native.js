@@ -7,8 +7,8 @@ import { View } from 'react-native';
  * WordPress dependencies
  */
 import {
+	RangeControl,
 	PanelBody,
-	BottomSheet,
 } from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import { useState, useEffect } from '@wordpress/element';
@@ -36,20 +36,26 @@ const SpacerEdit = ( { isSelected, attributes, setAttributes, getStylesFromColor
 		setSpacerMaxHeight( height > maxSpacerHeight ? height * 2 : maxSpacerHeight );
 	}, [] );
 
+	const changeAttribute = ( value ) => {
+		setAttributes( {
+			height: value,
+		} );
+	};
+
 	const defaultStyle = getStylesFromColorScheme( styles.staticSpacer, styles.staticDarkSpacer );
 
 	return (
 		<View style={ [ defaultStyle, isSelected && styles.selectedSpacer, { height } ] }>
 			<InspectorControls>
 				<PanelBody title={ __( 'Spacer Settings' ) } >
-					<BottomSheet.RangeCell
+					<RangeControl
+						icon={ 'admin-settings' }
 						label={ __( 'Height in pixels' ) }
 						minimumValue={ minSpacerHeight }
 						maximumValue={ sliderSpacerMaxHeight }
 						separatorType={ 'none' }
 						value={ height }
-						attribute="height"
-						setAttributes={ setAttributes }
+						onChange={ changeAttribute }
 						style={ styles.rangeCellContainer }
 					/>
 				</PanelBody>
