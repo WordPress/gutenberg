@@ -5,7 +5,7 @@ import createSelector from 'rememo';
 import {
 	deburr,
 	filter,
-	find,
+	findLast,
 	first,
 	flow,
 	get,
@@ -81,7 +81,9 @@ export function __experimentalGetBlockPatterns( state, blockName ) {
 
 /**
  * Returns the default block pattern for the given block type.
- * If there is no default pattern set, it returns the first item.
+ * When there are multiple patterns annotated as the default one,
+ * the last added item is picked. This simplifies registering overrides.
+ * When there is no default pattern set, it returns the first item.
  *
  * @param {Object} state      Data state.
  * @param {string} blockName  Block type name.
@@ -91,7 +93,7 @@ export function __experimentalGetBlockPatterns( state, blockName ) {
 export function __experimentalGetDefaultBlockPattern( state, blockName ) {
 	const patterns = __experimentalGetBlockPatterns( state, blockName );
 
-	return find( patterns, 'isDefault' ) || first( patterns );
+	return findLast( patterns, 'isDefault' ) || first( patterns );
 }
 
 /**
