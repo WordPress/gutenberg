@@ -217,6 +217,7 @@ export default withDispatch( ( dispatch, ownProps, registry ) => ( {
 	 */
 	updateColumns( previousColumns, newColumns ) {
 		const { clientId } = ownProps;
+		const { allowedBlocks } = ownProps.attributes;
 		const { replaceInnerBlocks } = dispatch( 'core/block-editor' );
 		const { getBlocks } = registry.select( 'core/block-editor' );
 
@@ -240,6 +241,7 @@ export default withDispatch( ( dispatch, ownProps, registry ) => ( {
 				...times( newColumns - previousColumns, () => {
 					return createBlock( 'core/column', {
 						width: newColumnWidth,
+						allowedBlocks,
 					} );
 				} ),
 			];
@@ -247,7 +249,9 @@ export default withDispatch( ( dispatch, ownProps, registry ) => ( {
 			innerBlocks = [
 				...innerBlocks,
 				...times( newColumns - previousColumns, () => {
-					return createBlock( 'core/column' );
+					return createBlock( 'core/column', {
+						allowedBlocks,
+					} );
 				} ),
 			];
 		} else {
