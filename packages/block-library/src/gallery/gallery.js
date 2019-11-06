@@ -19,7 +19,10 @@ import { defaultColumnsNumber } from './shared';
 
 export const Gallery = ( props ) => {
 	const {
-		galleryProps,
+		attributes,
+		className,
+		isSelected,
+		setAttributes,
 		selectedImage,
 		mediaPlaceholder,
 		onMoveBackward,
@@ -29,13 +32,6 @@ export const Gallery = ( props ) => {
 		onSetImageAttributes,
 		onFocusGalleryCaption,
 	} = props;
-
-	const {
-		attributes,
-		className,
-		isSelected,
-		setAttributes,
-	} = galleryProps;
 
 	const {
 		align,
