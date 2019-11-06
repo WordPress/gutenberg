@@ -51,11 +51,17 @@ function NavigationMenu( {
 			if ( ! pages ) {
 				return null;
 			}
-			return pages.map( ( page ) => {
-				return [ 'core/navigation-menu-item',
-					{ label: page.title.rendered, url: page.permalink_template },
-				];
-			} );
+
+			return pages.map( ( { title, type, link: url, id: linkId } ) => (
+				[ 'core/navigation-menu-item', {
+					label: title.rendered,
+					title: title.raw,
+					type,
+					linkId,
+					url,
+					opensInNewTab: false,
+				} ]
+			) );
 		},
 		[ pages ]
 	);
