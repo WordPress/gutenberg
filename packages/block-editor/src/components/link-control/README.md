@@ -58,6 +58,19 @@ through of its function parameter.
 - Type: `Function`
 - Required: No
 
+Use this callback to take an action after a user set or updated a link.
+The function callback will receive the selected item, or Null.
+
+```es6
+<LinkControl
+	onLinkChange={ ( item ) => {
+		item
+			? console.log( `The item selected has the ${ item.id } id.` )
+			: console.warn( 'No Item selected.' );
+	}
+/> 
+```  
+
 ### onSettingChange
 
 - Type: `Function`
