@@ -4,9 +4,7 @@
 import { shallow } from 'enzyme';
 import { TouchableWithoutFeedback } from 'react-native';
 import {
-	requestMediaPickFromMediaLibrary,
-	requestMediaPickFromDeviceLibrary,
-	requestMediaPickFromDeviceCamera,
+	requestMediaPicker,
 } from 'react-native-gutenberg-bridge';
 
 /**
@@ -67,7 +65,7 @@ describe( 'MediaUpload component', () => {
 	} );
 
 	const expectMediaPickerForOption = ( option, allowMultiple, requestFunction ) => {
-		requestFunction.mockImplementation( ( mediaTypes, multiple, callback ) => {
+		requestFunction.mockImplementation( ( source, mediaTypes, multiple, callback ) => {
 			expect( mediaTypes[ 0 ] ).toEqual( MEDIA_TYPE_VIDEO );
 			if ( multiple ) {
 				callback( [ { id: MEDIA_ID, url: MEDIA_URL } ] );
@@ -101,22 +99,22 @@ describe( 'MediaUpload component', () => {
 	};
 
 	it( 'can select media from device library', () => {
-		expectMediaPickerForOption( MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_CHOOSE_FROM_DEVICE, false, requestMediaPickFromDeviceLibrary );
+		expectMediaPickerForOption( MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_CHOOSE_FROM_DEVICE, false, requestMediaPicker );
 	} );
 
 	it( 'can select media from WP media library', () => {
-		expectMediaPickerForOption( MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY, false, requestMediaPickFromMediaLibrary );
+		expectMediaPickerForOption( MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY, false, requestMediaPicker );
 	} );
 
 	it( 'can select media by capturig', () => {
-		expectMediaPickerForOption( MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_TAKE_MEDIA, false, requestMediaPickFromDeviceCamera );
+		expectMediaPickerForOption( MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_TAKE_MEDIA, false, requestMediaPicker );
 	} );
 
 	it( 'can select multiple media from device library', () => {
-		expectMediaPickerForOption( MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_CHOOSE_FROM_DEVICE, true, requestMediaPickFromDeviceLibrary );
+		expectMediaPickerForOption( MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_CHOOSE_FROM_DEVICE, true, requestMediaPicker );
 	} );
 
 	it( 'can select multiple media from WP media library', () => {
-		expectMediaPickerForOption( MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY, true, requestMediaPickFromMediaLibrary );
+		expectMediaPickerForOption( MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY, true, requestMediaPicker );
 	} );
 } );

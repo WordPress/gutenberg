@@ -16,11 +16,8 @@ jest.mock( 'react-native-gutenberg-bridge', () => {
 		editorDidMount: jest.fn(),
 		editorDidAutosave: jest.fn(),
 		subscribeMediaUpload: jest.fn(),
-		requestMediaPickFromMediaLibrary: jest.fn(),
-		requestMediaPickFromDeviceLibrary: jest.fn(),
-		requestMediaPickFromDeviceCamera: jest.fn(),
 		getOtherMediaOptions: jest.fn(),
-		requestOtherMediaPickFrom: jest.fn(),
+		requestMediaPicker: jest.fn(),
 	};
 } );
 
