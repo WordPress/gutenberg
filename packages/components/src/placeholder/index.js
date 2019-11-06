@@ -5,6 +5,11 @@ import classnames from 'classnames';
 import { isString } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import { cloneElement } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import Dashicon from '../dashicon';
@@ -27,7 +32,7 @@ function Placeholder( { icon, children, label, instructions, className, notices,
 				</div>
 			}
 			<div className="components-placeholder__label">
-				{ isString( icon ) ? <Dashicon icon={ icon } /> : icon }
+				{ isString( icon ) ? <Dashicon icon={ icon } /> : cloneElement( icon, { height: 24, width: 24 } ) }
 				{ label }
 			</div>
 			{ !! instructions && <div className="components-placeholder__instructions">{ instructions }</div> }

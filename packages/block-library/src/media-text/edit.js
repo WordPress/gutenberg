@@ -10,13 +10,14 @@ import { get } from 'lodash';
 import { __, _x } from '@wordpress/i18n';
 import {
 	BlockControls,
+	__experimentalBlockPatternPicker,
 	BlockVerticalAlignmentToolbar,
 	InnerBlocks,
 	InspectorControls,
 	PanelColorSettings,
 	withColors,
 } from '@wordpress/block-editor';
-import { Component } from '@wordpress/element';
+import { Component, useState } from '@wordpress/element';
 import {
 	PanelBody,
 	TextareaControl,
@@ -25,9 +26,12 @@ import {
 	ExternalLink,
 	FocalPointPicker,
 } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
+
 /**
  * Internal dependencies
  */
+import icon from './icon';
 import MediaContainer from './media-container';
 
 /**
@@ -244,4 +248,44 @@ class MediaTextEdit extends Component {
 	}
 }
 
-export default withColors( 'backgroundColor' )( MediaTextEdit );
+const MediaTextEditWithColors = withColors( 'backgroundColor' )( MediaTextEdit );
+
+const MediaTextEditPatternPicker = ( props ) => {
+	const blockName = 'core/media-text';
+	const { defaultPattern, patterns } = useSelect( ( select ) => {
+		const {
+			__experimentalGetBlockPatterns,
+			__experimentalGetDefaultBlockPattern,
+		} = select( 'core/blocks' );
+
+		return {
+			patterns: __experimentalGetBlockPatterns( blockName ),
+			defaultPattern: __experimentalGetDefaultBlockPattern( blockName ),
+		};
+	} );
+
+	const [ pattern, setPattern ] = useState( null );
+
+	if ( pattern ) {
+		return (
+			<MediaTextEditWithColors { ...props } />
+		);
+	}
+
+	return (
+		<__experimentalBlockPatternPicker
+			icon={ icon }
+			label={ __( 'Media & Text' ) }
+			patterns={ patterns }
+			onSelect={ ( nextPattern = defaultPattern ) => {
+				if ( nextPattern.attributes ) {
+					props.setAttributes( nextPattern.attributes );
+				}
+				setPattern( nextPattern );
+			} }
+			allowSkip
+		/>
+	);
+};
+
+export default MediaTextEditPatternPicker;

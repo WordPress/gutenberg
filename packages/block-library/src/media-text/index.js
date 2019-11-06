@@ -10,6 +10,7 @@ import deprecated from './deprecated';
 import edit from './edit';
 import icon from './icon';
 import metadata from './block.json';
+import patterns from './patterns';
 import save from './save';
 import transforms from './transforms';
 
@@ -26,6 +27,7 @@ export const settings = {
 		align: [ 'wide', 'full' ],
 		html: false,
 	},
+	patterns,
 	example: {
 		attributes: {
 			mediaType: 'image',
