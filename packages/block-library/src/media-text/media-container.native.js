@@ -265,35 +265,37 @@ class MediaContainer extends Component {
 
 		if ( mediaUrl ) {
 			return (
-				<MediaUpload
-					onSelect={ this.onSelectMediaUploadOption }
-					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					value={ mediaId }
-					render={ ( { open, getMediaOptions } ) => {
-						return (
-							<View>
-								{ getMediaOptions() }
-								{ this.renderToolbarEditButton( open ) }
+				<View>
+					<MediaUpload
+						onSelect={ this.onSelectMediaUploadOption }
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
+						value={ mediaId }
+						render={ ( { open, getMediaOptions } ) => {
+							return (
+								<View style={ { flex: 1 } }>
+									{ getMediaOptions() }
+									{ this.renderToolbarEditButton( open ) }
 
-								<MediaUploadProgress
-									coverUrl={ coverUrl }
-									mediaId={ mediaId }
-									onUpdateMediaProgress={ this.updateMediaProgress }
-									onFinishMediaUploadWithSuccess={ this.finishMediaUploadWithSuccess }
-									onFinishMediaUploadWithFailure={ this.finishMediaUploadWithFailure }
-									onMediaUploadStateReset={ this.mediaUploadStateReset }
-									renderContent={ ( params ) => {
-										return (
-											<View style={ styles.content }>
-												{ this.renderContent( params, open ) }
-											</View>
-										);
-									} }
-								/>
-							</View>
-						);
-					} }
-				/>
+									<MediaUploadProgress
+										coverUrl={ coverUrl }
+										mediaId={ mediaId }
+										onUpdateMediaProgress={ this.updateMediaProgress }
+										onFinishMediaUploadWithSuccess={ this.finishMediaUploadWithSuccess }
+										onFinishMediaUploadWithFailure={ this.finishMediaUploadWithFailure }
+										onMediaUploadStateReset={ this.mediaUploadStateReset }
+										renderContent={ ( params ) => {
+											return (
+												<View style={ styles.content }>
+													{ this.renderContent( params, open ) }
+												</View>
+											);
+										} }
+									/>
+								</View>
+							);
+						} }
+					/>
+				</View>
 			);
 		}
 		return this.renderPlaceholder();
