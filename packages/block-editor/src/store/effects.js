@@ -94,7 +94,7 @@ export default {
 			// is not a defined block attribute key. This can be the case if the
 			// fallback intance ID is used to store selection (and no RichText
 			// identifier is set), or when the identifier is wrong.
-			attributeDefinition
+			!! attributeDefinition
 		);
 
 		if ( ! attributeDefinition ) {
