@@ -107,11 +107,11 @@ class InnerBlocks extends Component {
 			clientId,
 			renderAppender,
 			template,
-			__experimentalTemplateOptions: templateOptions,
+			__experimentalPatterns: patterns,
 		} = this.props;
 		const { templateInProcess } = this.state;
 
-		const isPlaceholder = template === null && !! templateOptions;
+		const isPlaceholder = template === null && !! patterns;
 
 		return (
 			<>
