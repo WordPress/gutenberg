@@ -24,6 +24,20 @@
 
 ## Event handlers
 
+### onChangeMode
+
+- Type: `Function`
+- Required: No
+
+Use this callback to know when the LinkControl component changes its mode to `edit` or `show`
+through of its function parameter.
+
+```es6
+<LinkControl
+	onChangeMode={ ( mode ) => { console.log( `Mode change to ${ mode } mode.` ) }
+/> 
+```  
+
 ### onClose
 
 - Type: `Function`
