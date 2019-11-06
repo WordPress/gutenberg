@@ -193,12 +193,10 @@ function NavigationMenuItemEdit( {
 					placeholder={ __( 'Add item…' ) }
 					withoutInteractiveFormatting
 				/>
-				{ ( isSelected || isParentOfSelectedBlock ) &&
-					<InnerBlocks
-						allowedBlocks={ [ 'core/navigation-menu-item' ] }
-						renderAppender={ hasDescendants ? InnerBlocks.ButtonBlockAppender : false }
-					/>
-				}
+				<InnerBlocks
+					allowedBlocks={ [ 'core/navigation-menu-item' ] }
+					renderAppender={ hasDescendants ? InnerBlocks.ButtonBlockAppender : false }
+				/>
 			</div>
 		</Fragment>
 	);
