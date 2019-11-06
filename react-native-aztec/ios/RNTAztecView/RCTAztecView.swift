@@ -603,6 +603,15 @@ class RCTAztecView: Aztec.TextView {
         let caretData = packCaretDataForRN()
         onSelectionChange(caretData)
     }
+
+    // MARK: - Selection
+    private func correctSelectionAfterZWSP() {
+        guard selectedTextRange?.start == endOfDocument,
+            text == String(.zeroWidthSpace) else {
+            return
+        }
+        selectedTextRange = self.textRange(from: beginningOfDocument, to: beginningOfDocument)
+    }
 }
 
 // MARK: UITextView Delegate Methods
@@ -613,7 +622,12 @@ extension RCTAztecView: UITextViewDelegate {
             return
         }
 
+        correctSelectionAfterZWSP()
         propagateSelectionChanges()
+    }
+
+    func textViewDidBeginEditing(_ textView: UITextView) {
+        correctSelectionAfterZWSP()
     }
 
     func textViewDidChange(_ textView: UITextView) {
