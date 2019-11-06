@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { partial, noop } from 'lodash';
+import { noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -24,11 +24,15 @@ const LinkControlSettingsDrawer = ( { settings = defaultSettings, onSettingChang
 		return null;
 	}
 
+	const handleSettingChange = ( setting ) => ( value ) => {
+		onSettingChange( setting.id, value, settings );
+	};
+
 	const theSettings = settings.map( ( setting ) => (
 		<ToggleControl
 			key={ setting.id }
 			label={ setting.title }
-			onChange={ partial( onSettingChange, setting.id ) }
+			onChange={ handleSettingChange( setting ) }
 			checked={ setting.checked } />
 	) );
 
