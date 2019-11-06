@@ -20,7 +20,7 @@ function RadioControl( { label, className, selected, help, instanceId, onChange,
 
 	return ! isEmpty( options ) && (
 		<BaseControl label={ label } id={ id } help={ help } className={ classnames( className, 'components-radio-control' ) }>
-			{ options.map( ( option, index ) =>
+			{ options.map( ( option, index ) => (
 				<div
 					key={ `${ id }-${ index }` }
 					className="components-radio-control__option"
@@ -39,7 +39,7 @@ function RadioControl( { label, className, selected, help, instanceId, onChange,
 						{ option.label }
 					</label>
 				</div>
-			) }
+			) ) }
 		</BaseControl>
 	);
 }

@@ -114,32 +114,34 @@ export default function ListEdit( {
 		</>
 	);
 
-	return <>
-		<RichText
-			identifier="values"
-			multiline="li"
-			tagName={ tagName }
-			onChange={ ( nextValues ) => setAttributes( { values: nextValues } ) }
-			value={ values }
-			className={ className }
-			placeholder={ __( 'Write list…' ) }
-			onMerge={ mergeBlocks }
-			onSplit={ ( value ) => createBlock( name, { ...attributes, values: value } ) }
-			__unstableOnSplitMiddle={ () => createBlock( 'core/paragraph' ) }
-			onReplace={ onReplace }
-			onRemove={ () => onReplace( [] ) }
-			start={ start }
-			reversed={ reversed }
-			type={ type }
-		>
-			{ controls }
-		</RichText>
-		{ ordered && (
-			<OrderedListSettings
-				setAttributes={ setAttributes }
-				ordered={ ordered }
-				reversed={ reversed }
+	return (
+		<>
+			<RichText
+				identifier="values"
+				multiline="li"
+				tagName={ tagName }
+				onChange={ ( nextValues ) => setAttributes( { values: nextValues } ) }
+				value={ values }
+				className={ className }
+				placeholder={ __( 'Write list…' ) }
+				onMerge={ mergeBlocks }
+				onSplit={ ( value ) => createBlock( name, { ...attributes, values: value } ) }
+				__unstableOnSplitMiddle={ () => createBlock( 'core/paragraph' ) }
+				onReplace={ onReplace }
+				onRemove={ () => onReplace( [] ) }
 				start={ start }
-			/> ) }
-	</>;
+				reversed={ reversed }
+				type={ type }
+			>
+				{ controls }
+			</RichText>
+			{ ordered && (
+				<OrderedListSettings
+					setAttributes={ setAttributes }
+					ordered={ ordered }
+					reversed={ reversed }
+					start={ start }
+				/> ) }
+		</>
+	);
 }

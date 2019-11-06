@@ -397,7 +397,7 @@ class RichTextWrapper extends Component {
 				__unstableDidAutomaticChange={ didAutomaticChange }
 				__unstableUndo={ undo }
 			>
-				{ ( { isSelected, value, onChange, Editable } ) =>
+				{ ( { isSelected, value, onChange, Editable } ) => (
 					<>
 						{ children && children( { value, onChange } ) }
 						{ isSelected && hasFormats && ( <FormatToolbarContainer inline={ inlineToolbar } anchorObj={ this.ref } /> ) }
@@ -409,7 +409,7 @@ class RichTextWrapper extends Component {
 							onChange={ onChange }
 							isSelected={ isSelected }
 						>
-							{ ( { listBoxId, activeId, onKeyDown } ) =>
+							{ ( { listBoxId, activeId, onKeyDown } ) => (
 								<Editable
 									aria-autocomplete={ listBoxId ? 'list' : undefined }
 									aria-owns={ listBoxId }
@@ -418,10 +418,10 @@ class RichTextWrapper extends Component {
 									reversed={ reversed }
 									onKeyDown={ onKeyDown }
 								/>
-							}
+							) }
 						</Autocomplete>
 					</>
-				}
+				) }
 			</RichText>
 		);
 

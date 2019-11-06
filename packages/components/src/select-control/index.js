@@ -48,7 +48,7 @@ function SelectControl( {
 				multiple={ multiple }
 				{ ...props }
 			>
-				{ options.map( ( option, index ) =>
+				{ options.map( ( option, index ) => (
 					<option
 						key={ `${ option.label }-${ option.value }-${ index }` }
 						value={ option.value }
@@ -56,7 +56,7 @@ function SelectControl( {
 					>
 						{ option.label }
 					</option>
-				) }
+				) ) }
 			</select>
 		</BaseControl>
 	);

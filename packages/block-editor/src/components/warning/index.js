@@ -41,11 +41,11 @@ function Warning( { className, actions, children, secondaryActions } ) {
 					) }
 					renderContent={ () => (
 						<MenuGroup>
-							{ secondaryActions.map( ( item, pos ) =>
+							{ secondaryActions.map( ( item, pos ) => (
 								<MenuItem onClick={ item.onClick } key={ pos }>
 									{ item.title }
 								</MenuItem>
-							) }
+							) ) }
 						</MenuGroup>
 					) }
 				/>

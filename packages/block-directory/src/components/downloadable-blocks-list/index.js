@@ -27,7 +27,7 @@ function DownloadableBlocksList( { items, onHover = noop, children, downloadAndI
 		 */
 		/* eslint-disable jsx-a11y/no-redundant-roles */
 		<ul role="list" className="block-directory-downloadable-blocks-list">
-			{ items && items.map( ( item ) =>
+			{ items && items.map( ( item ) => (
 				<DownloadableBlockListItem
 					key={ item.id }
 					className={ getBlockMenuDefaultClassName( item.id ) }
@@ -42,7 +42,7 @@ function DownloadableBlocksList( { items, onHover = noop, children, downloadAndI
 					onBlur={ () => onHover( null ) }
 					item={ item }
 				/>
-			) }
+			) ) }
 			{ children }
 		</ul>
 		/* eslint-enable jsx-a11y/no-redundant-roles */

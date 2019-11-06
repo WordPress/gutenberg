@@ -34,8 +34,10 @@ export default function separatorSave( { attributes } ) {
 		color: colorClass ? undefined : customColor,
 	};
 
-	return ( <hr
-		className={ separatorClasses }
-		style={ separatorStyle }
-	/> );
+	return (
+		<hr
+			className={ separatorClasses }
+			style={ separatorStyle }
+		/>
+	);
 }

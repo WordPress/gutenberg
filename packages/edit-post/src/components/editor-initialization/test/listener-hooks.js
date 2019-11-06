@@ -60,9 +60,11 @@ describe( 'listener hook tests', () => {
 			testedHook( postId );
 			return null;
 		};
-		const TestedOutput = <RegistryProvider value={ registry }>
-			<TestComponent postId={ id } />
-		</RegistryProvider>;
+		const TestedOutput = (
+			<RegistryProvider value={ registry }>
+				<TestComponent postId={ id } />
+			</RegistryProvider>
+		);
 		return renderer === null ?
 			TestRenderer.create( TestedOutput ) :
 			renderer.update( TestedOutput );

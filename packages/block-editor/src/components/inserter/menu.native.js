@@ -86,7 +86,7 @@ export class InserterMenu extends Component {
 						<View style={ styles.rowSeparator } />
 					}
 					keyExtractor={ ( item ) => item.name }
-					renderItem={ ( { item } ) =>
+					renderItem={ ( { item } ) => (
 						<TouchableHighlight
 							style={ styles.touchableArea }
 							underlayColor="transparent"
@@ -102,7 +102,7 @@ export class InserterMenu extends Component {
 								<Text style={ modalItemLabelStyle }>{ item.title }</Text>
 							</View>
 						</TouchableHighlight>
-					}
+					) }
 				/>
 			</BottomSheet>
 		);

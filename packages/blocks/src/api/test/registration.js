@@ -273,10 +273,12 @@ describe( 'blocks', () => {
 
 		it( 'should normalize the icon containing a function', () => {
 			const MyTestIcon = () => {
-				return <svg width="20" height="20" viewBox="0 0 20 20">
-					<circle cx="10" cy="10" r="10"
-						fill="red" stroke="blue" strokeWidth="10" />
-				</svg>;
+				return (
+					<svg width="20" height="20" viewBox="0 0 20 20">
+						<circle cx="10" cy="10" r="10"
+							fill="red" stroke="blue" strokeWidth="10" />
+					</svg>
+				);
 			};
 			const blockType = {
 				save: noop,

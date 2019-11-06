@@ -38,6 +38,7 @@ const OrderedListSettings = ( { setAttributes, reversed, start } ) => (
 				} }
 			/>
 		</PanelBody>
-	</InspectorControls> );
+	</InspectorControls>
+);
 
 export default OrderedListSettings;

@@ -89,15 +89,17 @@ const PluginBlockSettingsMenuItem = ( { allowedBlocks, icon, label, onClick, sma
 			if ( ! shouldRenderItem( selectedBlocks, allowedBlocks ) ) {
 				return null;
 			}
-			return ( <MenuItem
-				className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
-				onClick={ compose( onClick, onClose ) }
-				icon={ icon || 'admin-plugins' }
-				label={ small ? label : undefined }
-				role={ role }
-			>
-				{ ! small && label }
-			</MenuItem> );
+			return (
+				<MenuItem
+					className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
+					onClick={ compose( onClick, onClose ) }
+					icon={ icon || 'admin-plugins' }
+					label={ small ? label : undefined }
+					role={ role }
+				>
+					{ ! small && label }
+				</MenuItem>
+			);
 		} }
 	</PluginBlockSettingsMenuGroup>
 );
