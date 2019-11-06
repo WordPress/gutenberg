@@ -27,7 +27,6 @@ const readFile = util.promisify( fs.readFile );
  */
 module.exports = async function resolveDependencies() {
 	let envFile;
-
 	try {
 		envFile = await readFile( './wp-env.json' );
 	} catch ( error ) {
