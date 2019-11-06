@@ -21,7 +21,7 @@ const REGEXP_NEWLINES = /[\r\n]+/g;
 const PlainText = forwardRef( ( {
 	onChange,
 	className,
-	multiline,
+	multiline = true,
 	isStylable,
 	...props
 }, ref ) => {

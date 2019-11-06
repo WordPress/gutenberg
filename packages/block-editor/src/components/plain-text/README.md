@@ -20,7 +20,7 @@ You can also pass any extra prop to the textarea rendered by this component.
 
 ### `multiline: Boolean`
 
-*Optional.* Allows inserting line breaks.
+*Optional.* Allows inserting line breaks. Default: `true`.
 
 ### `isStylable: Boolean`
 

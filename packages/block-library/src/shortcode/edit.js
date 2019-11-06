@@ -21,7 +21,6 @@ const ShortcodeEdit = ( { attributes, setAttributes, instanceId } ) => {
 				value={ attributes.text }
 				placeholder={ __( 'Write shortcode here…' ) }
 				onChange={ ( text ) => setAttributes( { text } ) }
-				multiline
 			/>
 		</div>
 	);

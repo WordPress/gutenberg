@@ -82,7 +82,6 @@ class HTMLEdit extends Component {
 								onChange={ ( content ) => setAttributes( { content } ) }
 								placeholder={ __( 'Write HTML…' ) }
 								aria-label={ __( 'HTML' ) }
-								multiline
 							/>
 						)
 					) }

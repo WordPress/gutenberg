@@ -43,6 +43,7 @@ function SiteTitleEdit( { insertDefaultBlock } ) {
 				value={ title }
 				onChange={ setTitle }
 				isStylable
+				multiline={ false }
 				onKeyDown={ preventNewlines }
 			/>
 		</>
