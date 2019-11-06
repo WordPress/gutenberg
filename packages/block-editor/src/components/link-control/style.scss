@@ -178,6 +178,14 @@
 	}
 }
 
+.block-editor-link-control__setting {
+	margin-bottom: $grid-size-large;
+
+	:last-child {
+		margin-bottom: 0;
+	}
+}
+
 .block-editor-link-control .block-editor-link-control__search-input .components-spinner {
 	display: block;
 	z-index: 100;

@@ -30,6 +30,7 @@ const LinkControlSettingsDrawer = ( { settings = defaultSettings, onSettingChang
 
 	const theSettings = settings.map( ( setting ) => (
 		<ToggleControl
+			className="block-editor-link-control__setting"
 			key={ setting.id }
 			label={ setting.title }
 			onChange={ handleSettingChange( setting ) }
