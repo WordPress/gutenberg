@@ -21,26 +21,42 @@ const ColorSelectorSVGIcon = () => (
 /**
  * Color Selector Icon component.
  *
+ * @param {Object} colorControlProps colorControl properties.
  * @return {*} React Icon component.
  */
-const ColorSelectorIcon = ( { style } ) => (
-	<div className="block-library-colors-selector__icon-container">
-		<div
-			className="block-library-colors-selector__state-selection"
-			style={ style }
-		>
-			<ColorSelectorSVGIcon />
+const ColorSelectorIcon = ( { backgroundColor, textColor } ) => {
+	const iconStyle = {};
+	if ( textColor && ! textColor.class ) {
+		iconStyle.color = textColor.color;
+	}
+
+	if ( backgroundColor && ! backgroundColor.class ) {
+		iconStyle.backgroundColor = backgroundColor.color;
+	}
+
+	const iconClasses = classnames( 'block-library-colors-selector__state-selection', {
+		'has-background-color': backgroundColor && backgroundColor.color,
+		'has-text-color': backgroundColor && backgroundColor.color,
+		[ backgroundColor.class ]: backgroundColor && backgroundColor.class,
+		[ textColor.class ]: textColor && textColor.class,
+	} );
+
+	return (
+		<div className="block-library-colors-selector__icon-container">
+			<div className={ iconClasses } style={ iconStyle }>
+				<ColorSelectorSVGIcon />
+			</div>
 		</div>
-	</div>
-);
+	);
+};
 
 /**
  * Renders the Colors Selector Toolbar with the icon button.
  *
- * @param {Object}   style           - Colors style object.
+ * @param {Object} colorControlProps colorControl properties.
  * @return {*} React toggle button component.
  */
-const renderToggleComponent = ( style ) => ( { onToggle, isOpen } ) => {
+const renderToggleComponent = ( { backgroundColor, textColor } ) => ( { onToggle, isOpen } ) => {
 	const openOnArrowDown = ( event ) => {
 		if ( ! isOpen && event.keyCode === DOWN ) {
 			event.preventDefault();
@@ -56,7 +72,7 @@ const renderToggleComponent = ( style ) => ( { onToggle, isOpen } ) => {
 				label={ __( 'Open Colors Selector' ) }
 				onClick={ onToggle }
 				onKeyDown={ openOnArrowDown }
-				icon={ <ColorSelectorIcon style={ style } /> }
+				icon={ <ColorSelectorIcon backgroundColor={ backgroundColor } textColor={ textColor } /> }
 			/>
 		</Toolbar>
 	);
@@ -92,12 +108,12 @@ const renderContent = ( { backgroundColor, textColor, onColorChange = noop } ) =
 	);
 } );
 
-export default ( { style, className, ...colorControlProps } ) => (
+export default ( colorControlProps ) => (
 	<Dropdown
 		position="bottom right"
-		className={ classnames( 'block-library-colors-selector', className ) }
+		className="block-library-colors-selector"
 		contentClassName="block-library-colors-selector__popover"
-		renderToggle={ renderToggleComponent( style ) }
+		renderToggle={ renderToggleComponent( colorControlProps ) }
 		renderContent={ renderContent( colorControlProps ) }
 	/>
 );
