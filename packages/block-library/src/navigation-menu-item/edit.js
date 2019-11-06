@@ -33,14 +33,41 @@ import {
 	BlockControls,
 	InnerBlocks,
 	InspectorControls,
-	URLPopover,
 	RichText,
+	__experimentalLinkControl as LinkControl,
 } from '@wordpress/block-editor';
-import {
-	Fragment,
-	useRef,
-	useState,
-} from '@wordpress/element';
+import { Fragment, useState, useEffect } from '@wordpress/element';
+
+/**
+ * It updates the link attribute when the
+ * link settings changes.
+ *
+ * @param {Function} setter Setter attribute function.
+ */
+const updateLinkSetting = ( setter ) => ( setting, value ) => {
+	if ( setting === 'new-tab' ) {
+		setter( { opensInNewTab: value } );
+	}
+};
+
+/**
+ * Updates the link attribute when it changes
+ * through of the `onLinkChange` LinkControl callback.
+ *
+ * @param {Function} setter Setter attribute function.
+ * @param {string} label ItemMenu link label.
+ */
+const updateLink = ( setter, label ) => ( { title: newTitle = '', url: newURL = '' } = {} ) => {
+	setter( {
+		title: newTitle,
+		url: newURL,
+	} );
+
+	// Set the item label as well if it isn't already defined.
+	if ( ! label ) {
+		setter( { label: newTitle } );
+	}
+};
 
 function NavigationMenuItemEdit( {
 	attributes,
@@ -50,40 +77,48 @@ function NavigationMenuItemEdit( {
 	setAttributes,
 	insertMenuItemBlock,
 } ) {
-	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
-	const [ isEditingLink, setIsEditingLink ] = useState( false );
-	const [ urlInput, setUrlInput ] = useState( null );
+	const { label, opensInNewTab, title, url } = attributes;
+	const link = title ? { title, url } : null;
+	const [ isLinkOpen, setIsLinkOpen ] = useState( ! label && isSelected );
 
-	const inputValue = urlInput !== null ? urlInput : url;
+	let onCloseTimerId = null;
 
-	const onKeyDown = ( event ) => {
-		if ( [ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ].indexOf( event.keyCode ) > -1 ) {
+	/**
+	 * It's a kind of hack to handle closing the LinkControl popover
+	 * clicking on the ToolbarButton link.
+	 */
+	useEffect( () => {
+		if ( ! isSelected ) {
+			setIsLinkOpen( false );
+		}
+
+		return () => {
+			// Clear LinkControl.OnClose timeout.
+			if ( onCloseTimerId ) {
+				clearTimeout( onCloseTimerId );
+			}
+		};
+	}, [ isSelected ] );
+
+	/**
+	 * `onKeyDown` LinkControl handler.
+	 * It takes over to stop the event propagation to make the
+	 * navigation work, avoiding undesired behaviors.
+	 * For instance, it will block to move between menu items
+	 * when the LinkControl is focused.
+	 *
+	 * @param {Event} event
+	 */
+	const handleLinkControlOnKeyDown = ( event ) => {
+		const { keyCode } = event;
+
+		if ( [ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ].indexOf( keyCode ) > -1 ) {
 			// Stop the key event from propagating up to ObserveTyping.startTypingInTextField.
 			event.stopPropagation();
 		}
 	};
 
-	const closeURLPopover = () => {
-		setIsEditingLink( false );
-		setUrlInput( null );
-		setIsLinkOpen( false );
-	};
-
-	const autocompleteRef = useRef( null );
-
-	const onFocusOutside = ( event ) => {
-		const autocompleteElement = autocompleteRef.current;
-		if ( autocompleteElement && autocompleteElement.contains( event.target ) ) {
-			return;
-		}
-		closeURLPopover();
-	};
-
-	const stopPropagation = ( event ) => {
-		event.stopPropagation();
-	};
-
-	const { label, url } = attributes;
+	const itemLabelPlaceholder = __( 'Add item…' );
 
 	return (
 		<Fragment>
@@ -93,42 +128,20 @@ function NavigationMenuItemEdit( {
 						name="link"
 						icon="admin-links"
 						title={ __( 'Link' ) }
-						onClick={ () => setIsLinkOpen( ! isLinkOpen ) }
+						onClick={ () => {
+							if ( isLinkOpen ) {
+								return;
+							}
+							setIsLinkOpen( ! isLinkOpen );
+						} }
 					/>
-					{ <ToolbarButton
+					<ToolbarButton
 						name="submenu"
 						icon={ <SVG xmlns="http://www.w3.org/2000/svg" width="24" height="24"><Path d="M14 5h8v2h-8zm0 5.5h8v2h-8zm0 5.5h8v2h-8zM2 11.5C2 15.08 4.92 18 8.5 18H9v2l3-3-3-3v2h-.5C6.02 16 4 13.98 4 11.5S6.02 7 8.5 7H12V5H8.5C4.92 5 2 7.92 2 11.5z" /><Path fill="none" d="M0 0h24v24H0z" /></SVG> }
 						title={ __( 'Add submenu item' ) }
 						onClick={ insertMenuItemBlock }
-					/> }
+					/>
 				</Toolbar>
-				{ isLinkOpen &&
-					<>
-						<URLPopover
-							className="wp-block-navigation-menu-item__inline-link-input"
-							onClose={ closeURLPopover }
-							onFocusOutside={ onFocusOutside }
-						>
-							{ ( ! url || isEditingLink ) &&
-							<URLPopover.LinkEditor
-								value={ inputValue }
-								onChangeInputValue={ setUrlInput }
-								onKeyPress={ stopPropagation }
-								onKeyDown={ onKeyDown }
-								onSubmit={ ( event ) => event.preventDefault() }
-								autocompleteRef={ autocompleteRef }
-							/>
-							}
-							{ ( url && ! isEditingLink ) &&
-								<URLPopover.LinkViewer
-									onKeyPress={ stopPropagation }
-									url={ url }
-								/>
-							}
-
-						</URLPopover>
-					</>
-				}
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody
@@ -136,8 +149,8 @@ function NavigationMenuItemEdit( {
 				>
 					<ToggleControl
 						checked={ attributes.opensInNewTab }
-						onChange={ ( opensInNewTab ) => {
-							setAttributes( { opensInNewTab } );
+						onChange={ ( newTab ) => {
+							setAttributes( { opensInNewTab: newTab } );
 						} }
 						label={ __( 'Open in new tab' ) }
 					/>
@@ -154,8 +167,8 @@ function NavigationMenuItemEdit( {
 				>
 					<TextControl
 						value={ attributes.title || '' }
-						onChange={ ( title ) => {
-							setAttributes( { title } );
+						onChange={ ( itemTitle ) => {
+							setAttributes( { title: itemTitle } );
 						} }
 						label={ __( 'Title Attribute' ) }
 						help={ __( 'Provide more context about where the link goes.' ) }
@@ -186,13 +199,29 @@ function NavigationMenuItemEdit( {
 					'is-selected': isSelected,
 				} ) }
 			>
-				<RichText
-					className="wp-block-navigation-menu-item__content"
-					value={ label }
-					onChange={ ( labelValue ) => setAttributes( { label: labelValue } ) }
-					placeholder={ __( 'Add item…' ) }
-					withoutInteractiveFormatting
-				/>
+				<div className="wp-block-navigation-menu-item__inner">
+					<RichText
+						className="wp-block-navigation-menu-item__content"
+						value={ label }
+						onChange={ ( labelValue ) => setAttributes( { label: labelValue } ) }
+						placeholder={ itemLabelPlaceholder }
+						withoutInteractiveFormatting
+					/>
+					{ isLinkOpen && (
+						<LinkControl
+							className="wp-block-navigation-menu-item__inline-link-input"
+							onKeyDown={ handleLinkControlOnKeyDown }
+							onKeyPress={ ( event ) => event.stopPropagation() }
+							currentLink={ link }
+							onLinkChange={ updateLink( setAttributes, label ) }
+							onClose={ () => {
+								onCloseTimerId = setTimeout( () => setIsLinkOpen( false ), 100 );
+							} }
+							currentSettings={ { 'new-tab': opensInNewTab } }
+							onSettingsChange={ updateLinkSetting( setAttributes ) }
+						/>
+					) }
+				</div>
 				<InnerBlocks
 					allowedBlocks={ [ 'core/navigation-menu-item' ] }
 					renderAppender={ hasDescendants ? InnerBlocks.ButtonBlockAppender : false }
