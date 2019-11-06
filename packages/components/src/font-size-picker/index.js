@@ -71,7 +71,7 @@ function FontSizePicker( {
 					<CustomSelect
 						className={ 'components-font-size-picker__select' }
 						hideLabelFromVision
-						label={ 'Choose preset' }
+						label={ __( 'Font Size' ) }
 						items={ items }
 						selectedItem={ items.find( ( item ) => item.key === currentSelectValue ) || items[ 0 ] }
 						onSelectedItemChange={ onSelectChangeValue }

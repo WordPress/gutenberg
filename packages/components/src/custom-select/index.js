@@ -109,6 +109,7 @@ export default function CustomSelect( {
 				{ ...getToggleButtonProps( {
 					// This is needed because some speech recognition software don't support `aria-labelledby`.
 					'aria-label': label,
+					'aria-labelledby': undefined,
 					className: 'components-custom-select__button',
 				} ) }
 			>
