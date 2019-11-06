@@ -45,9 +45,7 @@ import { Fragment, useState, useEffect } from '@wordpress/element';
  * @param {Function} setter Setter attribute function.
  */
 const updateLinkSetting = ( setter ) => ( setting, value ) => {
-	if ( setting === 'newTab' ) {
-		setter( { opensInNewTab: value } );
-	}
+	setter( { opensInNewTab: value } );
 };
 
 /**
@@ -219,7 +217,7 @@ function NavigationMenuItemEdit( {
 							} }
 							currentSettings={ [
 								{
-									id: 'newTab',
+									id: 'opensInNewTab',
 									title: __( 'Open in New Tab' ),
 									checked: opensInNewTab,
 								},
