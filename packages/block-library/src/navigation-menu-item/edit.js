@@ -45,7 +45,7 @@ import { Fragment, useState, useEffect } from '@wordpress/element';
  * @param {Function} setter Setter attribute function.
  */
 const updateLinkSetting = ( setter ) => ( setting, value ) => {
-	setter( { opensInNewTab: value } );
+	setter( { [ setting ]: value } );
 };
 
 /**
