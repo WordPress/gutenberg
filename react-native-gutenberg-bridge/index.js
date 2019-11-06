@@ -58,16 +58,14 @@ export function subscribeMediaAppend( callback ) {
 }
 
 /**
- * Request media picer for the given media source.
+ * Request media picker for the given media source.
  *
- * Types of media source can be device library, camera, etc.
+ * Kinds of media source can be device library, camera, etc.
  *
- * @param {string}         source    The media source to request from.
+ * @param {string}         source    The media source to request media from.
  * @param {Array<string>}  filter    Array of media types to filter the media to select.
- * @param {boolean}        multiple  Description of optional variable with default variable.
+ * @param {boolean}        multiple  Is multiple selection allowed?
  * @param {Function}       callback  RN Callback function to be called with the selected media objects.
- *
- * @return {Function} The RN Bridge function to be called to request media picker for the given media source.
  */
 export function requestMediaPicker( source, filter, multiple, callback ) {
 	return RNReactNativeGutenbergBridge.requestMediaPickFrom( source, filter, multiple, callback );
