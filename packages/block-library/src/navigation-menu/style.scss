@@ -117,3 +117,13 @@
 	}
 
 }
+
+
+/**
+ * Editor Only Styles
+ */
+.block-editor-block-list__block-edit {
+	.wp-block-navigation-menu {
+		overflow: auto; // allow overflowing items to cause scroll
+	}
+}
