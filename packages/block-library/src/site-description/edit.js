@@ -113,6 +113,7 @@ function SiteDescriptionEdit( {
 					[ fontSize.class ]: ! customFontSize && fontSize.class,
 				} ) }
 				isStylable
+				multiline={ false }
 				onChange={ setDescription }
 				onKeyDown={ preventNewlines }
 				placeholder={ __( 'Site Description' ) }
