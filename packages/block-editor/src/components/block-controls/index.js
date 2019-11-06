@@ -1,14 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { createSlotFill, ToolbarGroup } from '@wordpress/components';
+import { createToolbarSlotFill, ToolbarGroup } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import { ifBlockEditSelected } from '../block-edit/context';
 
-const { Fill, Slot } = createSlotFill( 'BlockControls' );
+const { Fill, Slot } = createToolbarSlotFill( 'BlockControls' );
 
 const BlockControlsFill = ( { controls, children } ) => (
 	<Fill>

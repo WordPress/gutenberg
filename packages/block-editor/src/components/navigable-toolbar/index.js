@@ -6,7 +6,7 @@ import { omit } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { NavigableMenu, KeyboardShortcuts, ToolbarContainer } from '@wordpress/components';
+import { NavigableMenu, Toolbar, KeyboardShortcuts } from '@wordpress/components';
 import { Component, createRef } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
 import deprecated from '@wordpress/deprecated';
@@ -94,7 +94,9 @@ class NavigableToolbar extends Component {
 			);
 		}
 
-		return <ToolbarContainer { ...toolbarProps } accessibilityLabel={ label } />;
+		return (
+			<Toolbar { ...toolbarProps } accessibilityLabel={ label } />
+		);
 	}
 }
 

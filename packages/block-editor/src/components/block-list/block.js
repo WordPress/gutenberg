@@ -22,7 +22,7 @@ import {
 	isUnmodifiedDefaultBlock,
 	getUnregisteredTypeHandlerName,
 } from '@wordpress/blocks';
-import { KeyboardShortcuts, withFilters, ToolbarProvider } from '@wordpress/components';
+import { KeyboardShortcuts, withFilters } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	withDispatch,
@@ -488,60 +488,6 @@ function BlockListBlock( {
 		blockEdit = <div style={ { display: 'none' } }>{ blockEdit }</div>;
 	}
 
-	const blockContent = (
-		<>
-			{ ( shouldShowContextualToolbar || isForcingContextualToolbar.current ) && (
-				<BlockContextualToolbar
-					// If the toolbar is being shown because of being forced
-					// it should focus the toolbar right after the mount.
-					focusOnMount={ isForcingContextualToolbar.current }
-				/>
-			) }
-			{
-				! isNavigationMode &&
-				! shouldShowContextualToolbar &&
-				isSelected &&
-				! hasFixedToolbar &&
-				! isEmptyDefaultBlock && (
-					<KeyboardShortcuts
-						bindGlobal
-						eventName="keydown"
-						shortcuts={ {
-							'alt+f10': forceFocusedContextualToolbar,
-						} }
-					/>
-				)
-			}
-			<IgnoreNestedEvents
-				ref={ blockNodeRef }
-				onDragStart={ preventDrag }
-				onMouseDown={ onPointerDown }
-				data-block={ clientId }
-			>
-				<BlockCrashBoundary onError={ onBlockError }>
-					{ isValid && blockEdit }
-					{ isValid && mode === 'html' && (
-						<BlockHtml clientId={ clientId } />
-					) }
-					{ shouldRenderMovers && ( moverDirection === 'horizontal' ) && blockMover }
-					{ ! isValid && [
-						<BlockInvalidWarning
-							key="invalid-warning"
-							clientId={ clientId }
-						/>,
-						<div key="invalid-preview">
-							{ getSaveElement( blockType, attributes ) }
-						</div>,
-					] }
-				</BlockCrashBoundary>
-				{ !! hasError && <BlockCrashWarning /> }
-				{ shouldShowMobileToolbar && (
-					<BlockMobileToolbar clientId={ clientId } moverDirection={ moverDirection } />
-				) }
-			</IgnoreNestedEvents>
-		</>
-	);
-
 	return (
 		<IgnoreNestedEvents
 			id={ blockElementId }
@@ -598,7 +544,55 @@ function BlockListBlock( {
 						ref={ breadcrumb }
 					/>
 				) }
-				{ hasFixedToolbar ? blockContent : <ToolbarProvider>{ blockContent }</ToolbarProvider> }
+				{ ( shouldShowContextualToolbar || isForcingContextualToolbar.current ) && (
+					<BlockContextualToolbar
+						// If the toolbar is being shown because of being forced
+						// it should focus the toolbar right after the mount.
+						focusOnMount={ isForcingContextualToolbar.current }
+					/>
+				) }
+				{
+					! isNavigationMode &&
+					! shouldShowContextualToolbar &&
+					isSelected &&
+					! hasFixedToolbar &&
+					! isEmptyDefaultBlock && (
+						<KeyboardShortcuts
+							bindGlobal
+							eventName="keydown"
+							shortcuts={ {
+								'alt+f10': forceFocusedContextualToolbar,
+							} }
+						/>
+					)
+				}
+				<IgnoreNestedEvents
+					ref={ blockNodeRef }
+					onDragStart={ preventDrag }
+					onMouseDown={ onPointerDown }
+					data-block={ clientId }
+				>
+					<BlockCrashBoundary onError={ onBlockError }>
+						{ isValid && blockEdit }
+						{ isValid && mode === 'html' && (
+							<BlockHtml clientId={ clientId } />
+						) }
+						{ shouldRenderMovers && ( moverDirection === 'horizontal' ) && blockMover }
+						{ ! isValid && [
+							<BlockInvalidWarning
+								key="invalid-warning"
+								clientId={ clientId }
+							/>,
+							<div key="invalid-preview">
+								{ getSaveElement( blockType, attributes ) }
+							</div>,
+						] }
+					</BlockCrashBoundary>
+					{ !! hasError && <BlockCrashWarning /> }
+					{ shouldShowMobileToolbar && (
+						<BlockMobileToolbar clientId={ clientId } moverDirection={ moverDirection } />
+					) }
+				</IgnoreNestedEvents>
 			</div>
 			{ showInserterShortcuts && (
 				<div className="editor-block-list__side-inserter block-editor-block-list__side-inserter">

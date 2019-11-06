@@ -7,6 +7,8 @@ import {
 	Path,
 	ToolbarButton,
 	ToolbarGroup,
+	createToolbarSlotFill,
+	SlotFillProvider,
 } from '../../';
 
 export default { title: 'Toolbar', component: Toolbar };
@@ -72,6 +74,24 @@ export const withoutGroup = () => {
 			<ToolbarButton icon="editor-italic" title="Italic" />
 			<ToolbarButton icon="admin-links" title="Link" />
 		</Toolbar>
+	);
+};
+
+export const withSlotFill = () => {
+	const { Slot, Fill } = createToolbarSlotFill( 'toolbar' );
+
+	return (
+		<SlotFillProvider>
+			<Toolbar accessibilityLabel="Options">
+				<ToolbarButton icon="testimonial" title="Testimonial" />
+				<Slot bubblesVirtually />
+				<ToolbarButton icon="text" title="Text" />
+			</Toolbar>
+			<Fill>
+				<ToolbarButton icon="thumbs-up" title="Thumbs up" />
+				<ToolbarButton icon="thumbs-down" title="Thumbs down" />
+			</Fill>
+		</SlotFillProvider>
 	);
 };
 
