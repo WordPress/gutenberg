@@ -57,16 +57,8 @@ export function subscribeMediaAppend( callback ) {
 	return gutenbergBridgeEvents.addListener( 'mediaAppend', callback );
 }
 
-export function requestMediaPickFromMediaLibrary( filter, multiple, callback ) {
-	return RNReactNativeGutenbergBridge.requestMediaPickFrom( 'SITE_MEDIA_LIBRARY', filter, multiple, callback );
-}
-
-export function requestMediaPickFromDeviceLibrary( filter, multiple, callback ) {
-	return RNReactNativeGutenbergBridge.requestMediaPickFrom( 'DEVICE_MEDIA_LIBRARY', filter, multiple, callback );
-}
-
-export function requestMediaPickFromDeviceCamera( filter, multiple, callback ) {
-	return RNReactNativeGutenbergBridge.requestMediaPickFrom( 'DEVICE_CAMERA', filter, multiple, callback );
+export function requestMediaPicker( source, filter, multiple, callback ) {
+	return RNReactNativeGutenbergBridge.requestMediaPickFrom( source, filter, multiple, callback );
 }
 
 export function requestMediaImport( url, callback ) {
@@ -91,10 +83,6 @@ export function requestImageUploadCancel( mediaId ) {
 
 export function getOtherMediaOptions( filter, callback ) {
 	return RNReactNativeGutenbergBridge.getOtherMediaOptions( filter, callback );
-}
-
-export function requestOtherMediaPickFrom( mediaSource, multiple, callback ) {
-	return RNReactNativeGutenbergBridge.requestOtherMediaPickFrom( mediaSource, multiple, callback );
 }
 
 export default RNReactNativeGutenbergBridge;
