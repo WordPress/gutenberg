@@ -4,7 +4,10 @@
 import { Panel } from '@wordpress/components';
 import { compose, ifCondition } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
-import { BlockInspector } from '@wordpress/block-editor';
+import {
+	BlockInspector,
+	__experimentalBlockNavigator as BlockNavigator,
+} from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
@@ -45,6 +48,9 @@ const SettingsSidebar = ( { sidebarName } ) => (
 			) }
 			{ sidebarName === 'edit-post/block' && (
 				<BlockInspector />
+			) }
+			{ sidebarName === 'edit-post/block-navigator' && (
+				<BlockNavigator />
 			) }
 		</Panel>
 	</Sidebar>

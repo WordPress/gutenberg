@@ -25,7 +25,11 @@ export function getEditorMode( state ) {
 export function isEditorSidebarOpened( state ) {
 	const activeGeneralSidebar = getActiveGeneralSidebarName( state );
 
-	return includes( [ 'edit-post/document', 'edit-post/block' ], activeGeneralSidebar );
+	return includes( [
+		'edit-post/document',
+		'edit-post/block',
+		'edit-post/block-navigator',
+	], activeGeneralSidebar );
 }
 
 /**
