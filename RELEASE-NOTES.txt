@@ -1,6 +1,7 @@
 1.17.0
 ------
 * Use existing links in the clipboard to prefill url field when inserting new link.
+* [iOS] Fix issue where the keyboard would not capitalize sentences correctly on some cases.
 
 1.16.0
 ------
