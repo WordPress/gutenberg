@@ -90,36 +90,39 @@ const TEMPLATE = [ [ 'core/columns', {}, [
 
 The previous example creates an InnerBlocks area containing two columns one with an image and the other with a paragraph.
 
-### `__experimentalTemplateOptions`
+### `__experimentalPatterns`
 
 * **Type:** `Array<Object>`
 
-To present the user with a set of template choices for the inner blocks, you may provide an array of template options.
+To present the user with a set of template choices for the inner blocks, you may provide an array of patterns.
 
-A template option is an object consisting of the following properties:
+A pattern is an object consisting of the following properties:
 
-- `title` (`string`): A human-readable label which describes the template. 
-- `icon` (`WPElement|string`): An element or [Dashicon](https://developer.wordpress.org/resource/dashicons/) slug to show as a visual approximation of the template.
-- `template` (`Array<Array>`): The template to apply when the option has been selected. See [`template` documentation](#template) for more information.
+- `name` (`string`): A machine-readable unique name of the pattern. 
+- `label` (`string`): A human-readable label which describes the pattern. 
+- `icon` (`WPElement|string`): An element or [Dashicon](https://developer.wordpress.org/resource/dashicons/) slug to show as a visual approximation of the pattern.
+- `innerBlocks` (`Array<Array>`): The configuration of inner blocks to apply when the pattern has been selected. See [`template` documentation](#template) for more information.
 
-For the template placeholder selection to be displayed, you must render `InnerBlocks` with a `template` prop value of `null`. You may track this as state of your component, updating its value when receiving the selected template via `__experimentalOnSelectTemplateOption`.
+For the patterns picker to be displayed, you must render `InnerBlocks` with a `template` prop value of `null`. You may track this as state of your component, updating its value when receiving the selected template via `__experimentalOnSelectPattern`.
 
 ```jsx
 import { useState } from '@wordpress/element';
 
-const TEMPLATE_OPTIONS = [
+const PATTERNS = [
 	{
-		title: 'Two Columns',
+		name: 'two-columns',
+		label: 'Two Columns',
 		icon: <svg />,
-		template: [
+		innerBlocks: [
 			[ 'core/column', { width: 50 } ],
 			[ 'core/column', { width: 50 } ],
 		],
 	},
 	{
-		title: 'Three Columns',
+		name: 'three-columns',
+		label: 'Three Columns',
 		icon: <svg />,
-		template: [
+		innerBlocks: [
 			[ 'core/column', { width: 33.33 } ],
 			[ 'core/column', { width: 33.33 } ],
 			[ 'core/column', { width: 33.33 } ],
@@ -133,25 +136,25 @@ function edit() {
 	return (
 		<InnerBlocks
 			template={ template }
-		    __experimentalTemplateOptions={ TEMPLATE_OPTIONS }
-		    __experimentalOnSelectTemplateOption={ setTemplate }
+		    __experimentalPatterns={ PATTERNS }
+		    __experimentalOnSelectPattern={ setTemplate }
 		/>
 	);
 }
 ```
 
-### `__experimentalOnSelectTemplateOption`
+### `__experimentalOnSelectPattern`
 
 * **Type:** `Function`
 
-Callback function invoked when the user makes a template selection, used in combination with the `__experimentalTemplateOptions` props. The selected template is passed as the first and only argument. The value of the template may be `undefined` if the `__experimentalAllowTemplateOptionSkip` prop is passed to `InnerBlocks` and the user opts to skip template selection.
+Callback function invoked when the user makes a pattern selection, used in combination with the `__experimentalPatterns` props. The selected pattern is passed as the first and only argument. The value of the pattern may be `undefined` if the `__experimentalAllowPatternSkip` prop is passed to `InnerBlocks` and the user opts to skip pattern selection.
 
-### `__experimentalAllowTemplateOptionSkip`
+### `__experimentalAllowPatternSkip`
 
 * **Type:** `Boolean`
 * **Default:** `false`
 
-Whether to include a button in the template selection placeholder to allow the user to skip selection, used in combination with the `__experimentalTemplateOptions` prop. When clicked, the `__experimentalOnSelectTemplateOption` callback will be passed an `undefined` value as the template.
+Whether to include a button in the pattern selection placeholder to allow the user to skip selection, used in combination with the `__experimentalPatterns` prop. When clicked, the `__experimentalOnSelectPattern` callback will be passed an `undefined` value as the pattern.
 
 ### `templateInsertUpdatesSelection`
 * **Type:** `Boolean`

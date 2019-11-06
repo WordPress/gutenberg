@@ -9,23 +9,22 @@ import classnames from 'classnames';
 import { __ } from '@wordpress/i18n';
 import { Button, IconButton, Placeholder } from '@wordpress/components';
 
-function InnerBlocksTemplatePicker( {
-	options,
+function BlockPatternPicker( {
+	icon = 'layout',
+	label = __( 'Choose pattern' ),
+	instructions = __( 'Select a pattern to start with.' ),
+	patterns,
 	onSelect,
 	allowSkip,
 } ) {
-	const classes = classnames( 'block-editor-inner-blocks__template-picker', {
-		'has-many-options': options.length > 4,
+	const classes = classnames( 'block-editor-block-pattern-picker', {
+		'has-many-patterns': patterns.length > 4,
 	} );
-
-	const instructions = allowSkip ?
-		__( 'Select a layout to start with, or make one yourself.' ) :
-		__( 'Select a layout to start with.' );
 
 	return (
 		<Placeholder
-			icon="layout"
-			label={ __( 'Choose Layout' ) }
+			icon={ icon }
+			label={ label }
 			instructions={ instructions }
 			className={ classes }
 		>
@@ -36,23 +35,23 @@ function InnerBlocksTemplatePicker( {
 				*/
 				/* eslint-disable jsx-a11y/no-redundant-roles */
 			}
-			<ul className="block-editor-inner-blocks__template-picker-options" role="list">
-				{ options.map( ( templateOption ) => (
-					<li key={ templateOption.name }>
+			<ul className="block-editor-block-pattern-picker__patterns" role="list">
+				{ patterns.map( ( pattern ) => (
+					<li key={ pattern.name }>
 						<IconButton
 							isLarge
-							icon={ templateOption.icon }
+							icon={ pattern.icon }
 							size={ 48 }
-							onClick={ () => onSelect( templateOption.innerBlocks ) }
-							className="block-editor-inner-blocks__template-picker-option"
-							label={ templateOption.label }
+							onClick={ () => onSelect( pattern.innerBlocks ) }
+							className="block-editor-block-pattern-picker__pattern"
+							label={ pattern.label }
 						/>
 					</li>
 				) ) }
 			</ul>
 			{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
 			{ allowSkip && (
-				<div className="block-editor-inner-blocks__template-picker-skip">
+				<div className="block-editor-block-pattern-picker__skip">
 					<Button
 						isLink
 						onClick={ () => onSelect( undefined ) }
@@ -65,4 +64,4 @@ function InnerBlocksTemplatePicker( {
 	);
 }
 
-export default InnerBlocksTemplatePicker;
+export default BlockPatternPicker;

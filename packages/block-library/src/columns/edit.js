@@ -106,12 +106,12 @@ export function ColumnsEdit( {
 			) }
 			<div className={ classes }>
 				<InnerBlocks
-					__experimentalTemplateOptions={ patterns }
-					__experimentalOnSelectTemplateOption={ ( nextTemplate = defaultPattern.innerBlocks ) => {
+					__experimentalPatterns={ patterns }
+					__experimentalOnSelectPattern={ ( nextTemplate = defaultPattern.innerBlocks ) => {
 						setTemplate( nextTemplate );
 						setForceUseTemplate( true );
 					} }
-					__experimentalAllowTemplateOptionSkip
+					__experimentalAllowPatternSkip
 					template={ showTemplateSelector ? null : template }
 					templateLock="all"
 					allowedBlocks={ ALLOWED_BLOCKS } />

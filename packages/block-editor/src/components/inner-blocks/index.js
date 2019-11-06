@@ -24,8 +24,8 @@ import DefaultBlockAppender from './default-block-appender';
  * Internal dependencies
  */
 import BlockList from '../block-list';
+import BlockPatternPicker from '../block-pattern-picker';
 import { withBlockEditContext } from '../block-edit/context';
-import TemplatePicker from './template-picker';
 
 class InnerBlocks extends Component {
 	constructor() {
@@ -108,13 +108,13 @@ class InnerBlocks extends Component {
 			renderAppender,
 			template,
 			__experimentalMoverDirection: moverDirection,
-			__experimentalTemplateOptions: templateOptions,
-			__experimentalOnSelectTemplateOption: onSelectTemplateOption,
-			__experimentalAllowTemplateOptionSkip: allowTemplateOptionSkip,
+			__experimentalPatterns: patterns,
+			__experimentalOnSelectPattern: onSelectPattern,
+			__experimentalAllowPatternSkip: allowPatternSkip,
 		} = this.props;
 		const { templateInProcess } = this.state;
 
-		const isPlaceholder = template === null && !! templateOptions;
+		const isPlaceholder = template === null && !! patterns;
 
 		const classes = classnames( 'editor-inner-blocks block-editor-inner-blocks', {
 			'has-overlay': isSmallScreen && ( hasOverlay && ! isPlaceholder ), // Temporary click-through disable on desktop.
@@ -124,10 +124,10 @@ class InnerBlocks extends Component {
 			<div className={ classes }>
 				{ ! templateInProcess && (
 					isPlaceholder ?
-						<TemplatePicker
-							options={ templateOptions }
-							onSelect={ onSelectTemplateOption }
-							allowSkip={ allowTemplateOptionSkip }
+						<BlockPatternPicker
+							patterns={ patterns }
+							onSelect={ onSelectPattern }
+							allowSkip={ allowPatternSkip }
 						/> :
 						<BlockList
 							rootClientId={ clientId }
