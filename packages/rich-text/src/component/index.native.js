@@ -665,6 +665,25 @@ export class RichText extends Component {
 				} else if ( this.props.selectionStart > record.text.length || this.props.selectionEnd > record.text.length ) {
 					console.warn( 'Oops, selection will land outside the text, skipping setting it...' );
 					selection = null;
+				} else {
+					// The following regular expression is used in Aztec here:
+					// https://github.com/wordpress-mobile/AztecEditor-Android/blob/b1fad439d56fa6d4aa0b78526fef355c59d00dd3/aztec/src/main/kotlin/org/wordpress/aztec/AztecParser.kt#L656
+					const brBeforeParaMatches = html.match( /(<br>)+<\/p>$/g );
+					if ( brBeforeParaMatches ) {
+						console.warn( 'Oops, BR tag(s) at the end of content. Aztec will remove them, adapting the selection...' );
+						const count = ( brBeforeParaMatches[ 0 ].match( /br/g ) || [] ).length;
+						if ( count > 0 ) {
+							let newSelectionStart = this.props.selectionStart - count;
+							if ( newSelectionStart < 0 ) {
+								newSelectionStart = 0;
+							}
+							let newSelectionEnd = this.props.selectionEnd - count;
+							if ( newSelectionEnd < 0 ) {
+								newSelectionEnd = 0;
+							}
+							selection = { start: newSelectionStart, end: newSelectionEnd };
+						}
+					}
 				}
 			}
 		}
