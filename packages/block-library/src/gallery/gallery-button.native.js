@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
-import { isString } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -47,9 +46,7 @@ export function Button( props ) {
 			disabled={ isDisabled }
 		>
 			<View style={ buttonStyle }>
-				{ isString( icon ) ?
-					<Icon icon={ icon } fill={ fill } size={ 24 } /> :
-					icon }
+				<Icon icon={ icon } fill={ fill } size={ 24 } />
 			</View>
 		</TouchableOpacity>
 	);
