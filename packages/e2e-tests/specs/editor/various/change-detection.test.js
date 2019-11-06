@@ -344,6 +344,6 @@ describe( 'Change detection', () => {
 
 		// Make sure redirection happens.
 		await page.waitForNavigation();
-		isCurrentURL( 'edit.php' );
+		expect( isCurrentURL( 'edit.php' ) ).toBe( true );
 	} );
 } );
