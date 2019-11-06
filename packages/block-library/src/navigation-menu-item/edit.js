@@ -45,9 +45,7 @@ import { Fragment, useState, useEffect } from '@wordpress/element';
  * @param {Function} setter Setter attribute function.
  */
 const updateLinkSetting = ( setter ) => ( setting, value ) => {
-	if ( setting === 'new-tab' ) {
-		setter( { opensInNewTab: value } );
-	}
+	setter( { [ setting ]: value } );
 };
 
 /**
@@ -217,7 +215,13 @@ function NavigationMenuItemEdit( {
 							onClose={ () => {
 								onCloseTimerId = setTimeout( () => setIsLinkOpen( false ), 100 );
 							} }
-							currentSettings={ { 'new-tab': opensInNewTab } }
+							currentSettings={ [
+								{
+									id: 'opensInNewTab',
+									title: __( 'Open in New Tab' ),
+									checked: opensInNewTab,
+								},
+							] }
 							onSettingsChange={ updateLinkSetting( setAttributes ) }
 						/>
 					) }
