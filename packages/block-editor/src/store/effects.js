@@ -100,7 +100,7 @@ export default {
 		if ( ! attributeDefinition ) {
 			if ( typeof attributeKey === 'number' ) {
 				window.console.error(
-					'RichText needs an identifier prop that is the block attribute key of the attribute it controls.'
+					`RichText needs an identifier prop that is the block attribute key of the attribute it controls. Its type is expected to be a string, but was ${ typeof attributeKey }`
 				);
 			} else {
 				window.console.error(
