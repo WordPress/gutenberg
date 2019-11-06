@@ -32,6 +32,7 @@ export const SocialLinksEdit = function( { className } ) {
 				allowedBlocks={ ALLOWED_BLOCKS }
 				templateLock={ false }
 				template={ TEMPLATE }
+				__experimentalMoverDirection={ 'horizontal' }
 			/>
 		</div>
 	);

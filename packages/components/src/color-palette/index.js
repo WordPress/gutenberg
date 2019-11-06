@@ -19,6 +19,7 @@ export default function ColorPalette( {
 	clearable = true,
 	className,
 	colors,
+	disableAlpha = true,
 	disableCustomColors = false,
 	onChange,
 	value,
@@ -55,7 +56,7 @@ export default function ColorPalette( {
 			<ColorPicker
 				color={ value }
 				onChangeComplete={ ( color ) => onChange( color.hex ) }
-				disableAlpha
+				disableAlpha={ disableAlpha }
 			/>
 		),
 		[ value ]

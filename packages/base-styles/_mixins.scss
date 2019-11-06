@@ -332,6 +332,11 @@
  */
 
 // These are additional styles for all captions, when the theme opts in to block styles.
+@mixin caption-style() {
+	margin-top: 0.5em;
+	margin-bottom: 1em;
+}
+
 @mixin caption-style-theme() {
 	color: $dark-gray-500;
 	font-size: $default-font-size;

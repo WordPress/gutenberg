@@ -11,8 +11,9 @@ const wait = require( 'util' ).promisify( setTimeout );
 /**
  * Internal dependencies
  */
-const detectContext = require( './detect-context' );
 const createDockerComposeConfig = require( './create-docker-compose-config' );
+const detectContext = require( './detect-context' );
+const resolveDependencies = require( './resolve-dependencies' );
 
 // Config Variables
 const cwd = process.cwd();
@@ -38,14 +39,15 @@ const setupSite = ( isTests = false ) =>
 		} --title=${ cwdName } --admin_user=admin --admin_password=password --admin_email=admin@wordpress.org`,
 		isTests
 	);
-const activateContext = ( context, isTests = false ) =>
-	wpCliRun( `wp ${ context.type } activate ${ cwdName }`, isTests );
+const activateContext = ( { type, pathBasename }, isTests = false ) =>
+	wpCliRun( `wp ${ type } activate ${ pathBasename }`, isTests );
 const resetDatabase = ( isTests = false ) =>
 	wpCliRun( 'wp db reset --yes', isTests );
 
 module.exports = {
 	async start( { ref, spinner = {} } ) {
 		const context = await detectContext();
+		const dependencies = await resolveDependencies();
 
 		spinner.text = `Downloading WordPress@${ ref } 0/100%.`;
 		const gitFetchOptions = {
@@ -100,7 +102,7 @@ module.exports = {
 		spinner.text = `Starting WordPress@${ ref }.`;
 		fs.writeFileSync(
 			dockerComposeOptions.config,
-			createDockerComposeConfig( cwd, cwdName, cwdTestsPath, context )
+			createDockerComposeConfig( cwdTestsPath, context, dependencies )
 		);
 
 		// These will bring up the database container,
@@ -127,6 +129,7 @@ module.exports = {
 		await Promise.all( [
 			activateContext( context ),
 			activateContext( context, true ),
+			...dependencies.map( activateContext ),
 		] );
 
 		// Remove dangling containers and finish.
@@ -142,6 +145,8 @@ module.exports = {
 
 	async clean( { environment, spinner } ) {
 		const context = await detectContext();
+		const dependencies = await resolveDependencies();
+		const activateDependencies = () => Promise.all( dependencies.map( activateContext ) );
 
 		const description = `${ environment } environment${
 			environment === 'all' ? 's' : ''
@@ -155,6 +160,7 @@ module.exports = {
 				resetDatabase()
 					.then( setupSite )
 					.then( activateContext.bind( null, context ) )
+					.then( activateDependencies )
 					.catch( () => {} )
 			);
 		}
