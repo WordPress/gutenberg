@@ -25,6 +25,12 @@ module.exports = {
 		'react/jsx-indent-props': [ 'error', 'tab' ],
 		'react/jsx-key': 'error',
 		'react/jsx-tag-spacing': 'error',
+		'react/jsx-wrap-multilines': [ 'error', {
+			declaration: 'parens-new-line',
+			assignment: 'parens-new-line',
+			return: 'parens-new-line',
+			arrow: 'parens-new-line',
+		} ],
 		'react/no-children-prop': 'off',
 		'react/prop-types': 'off',
 		'react/react-in-jsx-scope': 'off',
