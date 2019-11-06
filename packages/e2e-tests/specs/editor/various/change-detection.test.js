@@ -334,16 +334,22 @@ describe( 'Change detection', () => {
 
 		// Save
 		await saveDraft();
+		const postId = await page.evaluate(
+			() => window.wp.data.select( 'core/editor' ).getCurrentPostId()
+		);
 
 		// Trash post.
 		await openDocumentSettingsSidebar();
 		await page.click( '.editor-post-trash.components-button' );
 
-		// Wait for "Saved" to confirm save complete.
-		await page.waitForSelector( '.editor-post-saved-state.is-saved' );
+		await Promise.all( [
+			// Wait for "Saved" to confirm save complete.
+			await page.waitForSelector( '.editor-post-saved-state.is-saved' ),
 
-		// Make sure redirection happens.
-		await page.waitForNavigation();
-		expect( isCurrentURL( 'edit.php' ) ).toBe( true );
+			// Make sure redirection happens.
+			await page.waitForNavigation(),
+		] );
+
+		expect( isCurrentURL( '/wp-admin/edit.php', `post_type=post&ids=${ postId }` ) ).toBe( true );
 	} );
 } );
