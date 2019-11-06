@@ -1,3 +1,9 @@
+## Master
+
+### Breaking Changes
+
+- The recommended `react` configuration now enforces [`react/jsx-wrap-multilines`](https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/jsx-wrap-multilines.md).
+
 ## 3.0.0 (2019-08-29)
 
 ### Breaking Changes
