@@ -160,6 +160,9 @@ describe( 'selectors', () => {
 		const secondBlockPattern = {
 			name: 'second-block-pattern',
 		};
+		const thirdBlockPattern = {
+			name: 'third-block-pattern',
+		};
 
 		it( 'should return the default pattern when set', () => {
 			const defaultBlockPattern = {
@@ -168,6 +171,29 @@ describe( 'selectors', () => {
 			};
 			const state = createBlockPatternsState( [
 				firstBlockPattern,
+				defaultBlockPattern,
+				thirdBlockPattern,
+			] );
+
+			const result = __experimentalGetDefaultBlockPattern( state, blockName );
+
+			expect( result ).toEqual( defaultBlockPattern );
+		} );
+
+		it( 'should return the last pattern when multiple default patterns added', () => {
+			const defaultBlockPattern = {
+				...thirdBlockPattern,
+				isDefault: true,
+			};
+			const state = createBlockPatternsState( [
+				{
+					...firstBlockPattern,
+					isDefault: true,
+				},
+				{
+					...secondBlockPattern,
+					isDefault: true,
+				},
 				defaultBlockPattern,
 			] );
 
@@ -180,6 +206,7 @@ describe( 'selectors', () => {
 			const state = createBlockPatternsState( [
 				firstBlockPattern,
 				secondBlockPattern,
+				thirdBlockPattern,
 			] );
 
 			const result = __experimentalGetDefaultBlockPattern( state, blockName );
