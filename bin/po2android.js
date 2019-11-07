@@ -34,9 +34,9 @@ function po2Android( poInput ) {
 		}
 		if ( translation.msgid_plural ) {
 			localizedEntry += `${ indent }<plurals name="gutenberg_native_string_${ id }" tools:ignore="UnusedResources">
-		<item quantity="one">${ escapedValue }</item>
-		<item quantity="other">${ escapedValuePlural }</item>
-	</plurals>
+${ indent }${ indent }<item quantity="one">${ escapedValue }</item>
+${ indent }${ indent }<item quantity="other">${ escapedValuePlural }</item>
+${ indent }</plurals>
 `;
 		} else {
 			localizedEntry += `${ indent }<string name="gutenberg_native_string_${ id }" tools:ignore="UnusedResources">${ escapedValue }</string>\n`;

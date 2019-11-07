@@ -92,13 +92,13 @@
     <string name="gutenberg_native_string_74" tools:ignore="UnusedResources">"Translate"</string>
     <string name="gutenberg_native_string_75" tools:ignore="UnusedResources">"hello"</string>
     <plurals name="gutenberg_native_string_76" tools:ignore="UnusedResources">
-		<item quantity="one">"%d banana"</item>
-		<item quantity="other">"%d bananas"</item>
-	</plurals>
+        <item quantity="one">"%d banana"</item>
+        <item quantity="other">"%d bananas"</item>
+    </plurals>
     <string name="gutenberg_native_string_77" tools:ignore="UnusedResources">"hello %s"</string>
     <string name="gutenberg_native_string_78" tools:ignore="UnusedResources">"cheeseburger"</string>
     <plurals name="gutenberg_native_string_79" tools:ignore="UnusedResources">
-		<item quantity="one">"%d cat"</item>
-		<item quantity="other">"%d cats"</item>
-	</plurals>
+        <item quantity="one">"%d cat"</item>
+        <item quantity="other">"%d cats"</item>
+    </plurals>
 </resources>
