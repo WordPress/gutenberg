@@ -11,7 +11,7 @@ import { dropRight, times } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import {
 	PanelBody,
-	// RangeControl,
+	RangeControl,
 	BottomSheet,
 	SVG,
 	Path,
@@ -50,7 +50,8 @@ import styles from './editor.scss';
  * @constant
  * @type {string[]}
  */
-const ALLOWED_BLOCKS = [ 'core/column' ];
+// const ALLOWED_BLOCKS = [ 'core/column' ];
+const ALLOWED_BLOCKS = [ 'core/button', 'core/paragraph', 'core/heading', 'core/list' ];
 
 /**
  * Template option choices for predefined columns layouts.
@@ -128,6 +129,7 @@ export function ColumnsEdit( {
 	} );
 	const [ template, setTemplate ] = useState( getColumnsTemplate( count ) );
 	const [ forceUseTemplate, setForceUseTemplate ] = useState( false );
+	const [ columnCount, setColumnCount ] = useState( DEFAULT_COLUMNS );
 
 	// This is used to force the usage of the template even if the count doesn't match the template
 	// The count doesn't match the template once you use undo/redo (this is used to reset to the placeholder state).
@@ -146,28 +148,40 @@ export function ColumnsEdit( {
 	// or if there's no template available.
 	// The count === 0 trick is useful when you use undo/redo.
 	const showTemplateSelector = ( count === 0 && ! forceUseTemplate ) || ! template;
-console.log(isSelected)
 
 	if ( ! isSelected ) {
 		return (
 			<View style={ styles.columnPlaceholder } />
 		);
 	}
-console.log(count)
+
+const renderColumns = () => {
+	return [...Array(columnCount)].map((e, i) =>				
+		<InnerBlocks 
+				renderAppender={ isSelected && InnerBlocks.ButtonBlockAppender }
+				allowedBlocks={ ALLOWED_BLOCKS } 
+				listKey={(item, index) => {
+					return i+"_"+index+'_'+item.id+"_"; 
+					}}
+			/>
+		)
+	}
+
 	return (
 		<>
 			{/* { ! showTemplateSelector && ( */}
 				<>
 					<InspectorControls>
 						<PanelBody title={ __( 'Columns Settings' ) } >
-							{/* <RangeControl */}
-							<BottomSheet.RangeCell
+							<RangeControl
 								label={ __( 'Number of columns' ) }
 								value={ count }
 								defaultValue={ DEFAULT_COLUMNS }
-								onChangeValue={ ( value ) => {
+								onChange={ ( value ) => {
 									console.log(value)
-									updateColumns( count, value ) }
+									setColumnCount( value )
+									// updateColumns( count, value ) 
+								}
 								}
 								min={ 2 }
 								max={ 6 }
@@ -191,8 +205,8 @@ console.log(count)
 				</>
 			{/* ) } */}
 			{/* <View className={ classes }> */}
-				<InnerBlocks
-					listKey={'list1'}
+			{ renderColumns() }
+			 {/* <InnerBlocks
 					renderAppender={ isSelected && InnerBlocks.ButtonBlockAppender }
 					// __experimentalTemplateOptions={ TEMPLATE_OPTIONS }
 					// __experimentalOnSelectTemplateOption={ ( nextTemplate ) => {
@@ -206,7 +220,12 @@ console.log(count)
 					// __experimentalAllowTemplateOptionSkip
 					// template={ showTemplateSelector ? null : template }
 					// templateLock="all"
-					allowedBlocks={ ALLOWED_BLOCKS } />
+					allowedBlocks={ ALLOWED_BLOCKS }
+					listKey={(item, index) => {
+						return "_"+index+'_'+item.id; 
+						}}
+				/> */}
+		
 			{/* </View> */}
 		</>
 	);

@@ -101,6 +101,9 @@ export class BlockList extends Component {
 					ListHeaderComponent={ header }
 					ListEmptyComponent={ this.renderDefaultBlockAppender }
 					ListFooterComponent={ withFooter && this.renderBlockListFooter }
+					listKey={(item, index) => {
+						return clientId; 
+						}}
 				/>
 
 				{ renderAppender && blockClientIds.length > 0 &&
