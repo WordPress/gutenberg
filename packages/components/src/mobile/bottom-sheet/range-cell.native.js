@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Platform, AccessibilityInfo, findNodeHandle, TextInput, Slider, View } from 'react-native';
+import { Platform, AccessibilityInfo, findNodeHandle, TextInput, Slider, View, PixelRatio, AppState } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -26,10 +26,12 @@ class BottomSheetRangeCell extends Component {
 		this.handleReset = this.handleReset.bind( this );
 		this.onChangeValue = this.onChangeValue.bind( this );
 		this.onCellPress = this.onCellPress.bind( this );
+		this.handleChangePixelRatio = this.handleChangePixelRatio.bind( this );
 
 		const initialValue = this.validateInput( props.value || props.defaultValue || props.minimumValue );
+		const fontScale = this.getFontScale();
 
-		this.state = { accessible: true, sliderValue: initialValue, initialValue, hasFocus: false };
+		this.state = { accessible: true, sliderValue: initialValue, initialValue, hasFocus: false, fontScale };
 	}
 
 	componentDidUpdate( ) {
@@ -39,8 +41,23 @@ class BottomSheetRangeCell extends Component {
 		}
 	}
 
+	componentDidMount() {
+		AppState.addEventListener( 'change', this.handleChangePixelRatio );
+	}
+
 	componentWillUnmount() {
 		this.handleToggleFocus();
+		AppState.removeEventListener( 'change', this.handleChangePixelRatio );
+	}
+
+	getFontScale() {
+		return PixelRatio.getFontScale() < 1 ? 1 : PixelRatio.getFontScale();
+	}
+
+	handleChangePixelRatio( nextAppState ) {
+		if ( nextAppState === 'active' ) {
+			this.setState( { fontScale: this.getFontScale() } );
+		}
 	}
 
 	handleChange( text ) {
@@ -126,7 +143,7 @@ class BottomSheetRangeCell extends Component {
 			...cellProps
 		} = this.props;
 
-		const { hasFocus, sliderValue, accessible } = this.state;
+		const { hasFocus, sliderValue, accessible, fontScale } = this.state;
 
 		const accessibilityLabel =
 		sprintf(
@@ -177,6 +194,7 @@ class BottomSheetRangeCell extends Component {
 							defaultSliderStyle,
 							borderStyles.borderStyle,
 							hasFocus && borderStyles.isSelected,
+							{ width: 40 * fontScale },
 						] }
 						onChangeText={ this.handleChange }
 						onFocus={ this.handleToggleFocus }
