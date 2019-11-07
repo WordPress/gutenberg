@@ -31,6 +31,8 @@ export class UnsupportedBlockEdit extends Component {
 	}
 
 	renderHelpIcon() {
+		const infoIconStyle = this.props.getStylesFromColorScheme( styles.infoIcon, styles.infoIconDark );
+
 		return (
 			<TouchableWithoutFeedback
 				accessibilityLabel={ __( 'Help icon' ) }
@@ -43,6 +45,7 @@ export class UnsupportedBlockEdit extends Component {
 						className="unsupported-icon-help"
 						label={ __( 'Help icon' ) }
 						icon="editor-help"
+						color={ infoIconStyle.color }
 					/>
 				</View>
 			</TouchableWithoutFeedback>
@@ -54,6 +57,7 @@ export class UnsupportedBlockEdit extends Component {
 		const infoTextStyle = getStylesFromColorScheme( styles.infoText, styles.infoTextDark );
 		const infoTitleStyle = getStylesFromColorScheme( styles.infoTitle, styles.infoTitleDark );
 		const infoDescriptionStyle = getStylesFromColorScheme( styles.infoDescription, styles.infoDescriptionDark );
+		const infoIconStyle = getStylesFromColorScheme( styles.infoIcon, styles.infoIconDark );
 
 		// translators: %s: Name of the block
 		const titleFormat = Platform.OS === 'android' ? __( '\'%s\' isn\'t yet supported on WordPress for Android' ) :
@@ -70,7 +74,7 @@ export class UnsupportedBlockEdit extends Component {
 				onClose={ this.toggleSheet.bind( this ) }
 			>
 				<View style={ styles.infoContainer } >
-					<Icon icon="editor-help" style={ styles.infoIcon } size={ styles.infoIcon.size } />
+					<Icon icon="editor-help" color={ infoIconStyle.color } size={ styles.infoIcon.size } />
 					<Text style={ [ infoTextStyle, infoTitleStyle ] }>
 						{ infoTitle }
 					</Text>
