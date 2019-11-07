@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { partial } from 'lodash';
+import { noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -11,18 +11,39 @@ import {
 	ToggleControl,
 } from '@wordpress/components';
 
-const LinkControlSettingsDrawer = ( { settings, onSettingChange } ) => {
-	if ( ! settings || settings.length ) {
+const defaultSettings = [
+	{
+		id: 'newTab',
+		title: __( 'Open in New Tab' ),
+		checked: false,
+	},
+];
+
+const LinkControlSettingsDrawer = ( { settings = defaultSettings, onSettingChange = noop } ) => {
+	if ( ! settings || ! settings.length ) {
 		return null;
 	}
 
+	const handleSettingChange = ( setting ) => ( value ) => {
+		onSettingChange( setting.id, value, settings );
+	};
+
+	const theSettings = settings.map( ( setting ) => (
+		<ToggleControl
+			className="block-editor-link-control__setting"
+			key={ setting.id }
+			label={ setting.title }
+			onChange={ handleSettingChange( setting ) }
+			checked={ setting.checked } />
+	) );
+
 	return (
-		<div className="block-editor-link-control__settings">
-			<ToggleControl
-				label={ __( 'Open in New Tab' ) }
-				onChange={ partial( onSettingChange, 'new-tab' ) }
-				checked={ settings[ 'new-tab' ] } />
-		</div>
+		<fieldset className="block-editor-link-control__settings">
+			<legend className="screen-reader-text">
+				{ __( 'Currently selected link settings' ) }
+			</legend>
+			{ theSettings }
+		</fieldset>
 	);
 };
 
