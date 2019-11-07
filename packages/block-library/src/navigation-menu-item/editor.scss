@@ -67,7 +67,6 @@
 	&:not(.is-editing) {
 		font-family: inherit;
 		font-size: $text-editor-font-size;
-		font-weight: bold;
 	}
 
 	&.is-editing .components-text-control__input {
@@ -87,6 +86,9 @@
 
 	.block-editor-rich-text__editable.is-selected:not(.keep-placeholder-on-focus):not(:focus) [data-rich-text-placeholder]::after {
 		display: inherit;
+		min-width: 30px;
+		font-family: inherit;
+		font-size: $text-editor-font-size;
 	}
 }
 
