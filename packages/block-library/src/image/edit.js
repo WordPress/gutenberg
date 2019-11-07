@@ -46,7 +46,6 @@ import {
 } from '@wordpress/keycodes';
 import { withSelect, withDispatch } from '@wordpress/data';
 import {
-	BlockAlignmentToolbar,
 	BlockControls,
 	BlockIcon,
 	InspectorControls,
@@ -268,7 +267,6 @@ export class ImageEdit extends Component {
 	constructor( { attributes } ) {
 		super( ...arguments );
 		this.updateAlt = this.updateAlt.bind( this );
-		this.updateAlignment = this.updateAlignment.bind( this );
 		this.onFocusCaption = this.onFocusCaption.bind( this );
 		this.onImageClick = this.onImageClick.bind( this );
 		this.onSelectImage = this.onSelectImage.bind( this );
@@ -484,13 +482,6 @@ export class ImageEdit extends Component {
 		this.props.setAttributes( { alt: newAlt } );
 	}
 
-	updateAlignment( nextAlign ) {
-		const extraUpdatedAttributes = [ 'wide', 'full' ].indexOf( nextAlign ) !== -1 ?
-			{ width: undefined, height: undefined } :
-			{};
-		this.props.setAttributes( { ...extraUpdatedAttributes, align: nextAlign } );
-	}
-
 	updateImage( sizeSlug ) {
 		const { image } = this.props;
 
@@ -597,10 +588,6 @@ export class ImageEdit extends Component {
 		const isExternal = isExternalImage( id, url );
 		const controls = (
 			<BlockControls>
-				<BlockAlignmentToolbar
-					value={ align }
-					onChange={ this.updateAlignment }
-				/>
 				{ url && (
 					<>
 						<Toolbar>

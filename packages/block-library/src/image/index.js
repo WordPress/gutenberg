@@ -37,6 +37,9 @@ export const settings = {
 		{ name: 'circle-mask', label: _x( 'Circle Mask', 'block style' ) },
 	],
 	transforms,
+	supports: {
+		align: true,
+	},
 	getEditWrapperProps( attributes ) {
 		const { align, width } = attributes;
 		if ( 'left' === align || 'center' === align || 'right' === align || 'wide' === align || 'full' === align ) {
