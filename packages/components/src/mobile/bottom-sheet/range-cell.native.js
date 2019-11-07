@@ -122,6 +122,7 @@ class BottomSheetRangeCell extends Component {
 			maximumTrackTintColor = Platform.OS === 'ios' ? '#e9eff3' : '#909090',
 			thumbTintColor = Platform.OS === 'android' && '#00669b',
 			getStylesFromColorScheme,
+			allowReset,
 			...cellProps
 		} = this.props;
 
@@ -146,7 +147,7 @@ class BottomSheetRangeCell extends Component {
 				accessible={ accessible }
 				onPress={ this.onCellPress }
 				accessibilityLabel={ accessibilityLabel }
-				allowReset={ this.handleReset }
+				onReset={ allowReset ? this.handleReset : undefined }
 				accessibilityHint={
 					/* translators: accessibility text (hint for focusing a slider) */
 					__( 'Double tap to change the value using slider' )

@@ -79,7 +79,7 @@ class BottomSheetCell extends Component {
 			separatorType,
 			style = {},
 			getStylesFromColorScheme,
-			allowReset,
+			onReset,
 			...valueProps
 		} = this.props;
 
@@ -89,7 +89,7 @@ class BottomSheetCell extends Component {
 		const cellLabelCenteredStyle = getStylesFromColorScheme( styles.cellLabelCentered, styles.cellTextDark );
 		const cellLabelLeftAlignNoIconStyle = getStylesFromColorScheme( styles.cellLabelLeftAlignNoIcon, styles.cellTextDark );
 		const defaultMissingIconAndValue = leftAlign ? cellLabelLeftAlignNoIconStyle : cellLabelCenteredStyle;
-		const defaultLabelStyle = showValue || icon !== undefined || allowReset ? cellLabelStyle : defaultMissingIconAndValue;
+		const defaultLabelStyle = showValue || icon !== undefined || onReset ? cellLabelStyle : defaultMissingIconAndValue;
 
 		const drawSeparator = ( separatorType && separatorType !== 'none' ) || separatorStyle === undefined;
 		const drawTopSeparator = drawSeparator && separatorType === 'topFullWidth';
@@ -222,7 +222,7 @@ class BottomSheetCell extends Component {
 								{ label }
 							</Text>
 						</View>
-						{ allowReset && <TouchableOpacity onPress={ allowReset } accessibilityRole={ 'button' }>
+						{ onReset && <TouchableOpacity onPress={ onReset } accessibilityRole={ 'button' }>
 							<Text style={ resetButtonStyle }>{ resetButtonText }
 							</Text>
 						</TouchableOpacity> }
