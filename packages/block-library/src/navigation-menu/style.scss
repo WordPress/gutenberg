@@ -42,6 +42,16 @@
 
 			& > a {
 				padding-left: 0;
+				text-decoration: none;
+
+				@include break-small {
+					padding-left: 16px;
+				}
+			}
+
+			& > a:hover {
+				padding-left: 0;
+				text-decoration: underline;
 
 				@include break-small {
 					padding-left: 16px;
@@ -59,19 +69,43 @@
 
 		// Sub-menus Flyout
 		& > li > ul {
-			margin: 0;
-			position: absolute;
-			background: #fff;
-			box-shadow: 0 0 8px 2px rgba(0, 0, 0, 0.2);
+			background: #000;
+			border-radius: 0.4rem;
 			left: 0;
-			top: 100%;
+			margin: 0;
 			min-width: max-content;
 			opacity: 0;
-			transition: all 0.5s ease;
+			position: absolute;
+			top: calc(100% + 1rem);
+			transition: opacity 0.15s linear, transform 0.15s linear, right 0s 0.15s;
+			transform: translateY(0.6rem);
 			visibility: hidden;
+
+			&::before {
+				border: solid transparent;
+				border-color: rgba(0, 0, 0, 0);
+				border-bottom-color: #000;
+				border-width: 10px;
+				bottom: 100%;
+				content: " ";
+				height: 0;
+				left: 20%;
+				margin-left: -10px;
+				width: 0;
+				position: absolute;
+				pointer-events: none;
+			}
+
+			li {
+				margin: 0;
+			}
 
 			ul {
 				width: 100%;
+
+				li {
+					margin: 0.5rem 0 0 2rem;
+				}
 			}
 		}
 	}
@@ -95,12 +129,6 @@
 			padding-top: 8px;
 			padding-bottom: 8px;
 
-			&::before {
-				// Increment the dashes
-				counter-increment: nested-list;
-				// Insert dashes with spaces in between
-				content: "\2013\00a0" counters(nested-list, "\2013\00a0", none);
-			}
 		}
 	}
 
