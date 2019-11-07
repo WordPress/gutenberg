@@ -3,6 +3,8 @@
 const gettextParser = require( 'gettext-parser' ),
 	fs = require( 'fs' );
 
+const indent = '    ';
+
 function escapeResourceXML( unsafeXMLValue ) {
 	// See: https://tekeye.uk/android/examples/android-string-resources-gotchas
 	// Let's first replace XML special characters that JSON.stringify does not escape: <, > and &
@@ -28,20 +30,20 @@ function po2Android( poInput ) {
 		const comment = translation.comments.extracted || '';
 		let localizedEntry = '';
 		if ( comment ) {
-			localizedEntry += `\t<!-- ${ comment.replace( '--', '—' ) } -->\n`;
+			localizedEntry += `${ indent }<!-- ${ comment.replace( '--', '—' ) } -->\n`;
 		}
 		if ( translation.msgid_plural ) {
-			localizedEntry += `\t<plurals name="gutenberg_native_string_${id}" tools:ignore="UnusedResources">
+			localizedEntry += `${ indent }<plurals name="gutenberg_native_string_${ id }" tools:ignore="UnusedResources">
 		<item quantity="one">${ escapedValue }</item>
 		<item quantity="other">${ escapedValuePlural }</item>
 	</plurals>
 `;
 		} else {
-			localizedEntry += `\t<string name="gutenberg_native_string_${id}" tools:ignore="UnusedResources">${ escapedValue }</string>\n`;
+			localizedEntry += `${ indent }<string name="gutenberg_native_string_${ id }" tools:ignore="UnusedResources">${ escapedValue }</string>\n`;
 		}
 		return localizedEntry;
 	} ).filter( Boolean );
-	return `<?xml version="1.0" encoding="utf-8"?>\n<resources>\n${ androidResources.join( '' ) }</resources>\n`;
+	return `<?xml version="1.0" encoding="utf-8"?>\n<resources xmlns:tools="http://schemas.android.com/tools">\n${ androidResources.join( '' ) }</resources>\n`;
 }
 
 if ( require.main === module ) {
