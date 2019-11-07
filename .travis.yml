@@ -21,6 +21,7 @@ branches:
   only:
     - master
     - rnmobile/master
+    - rnmobile/releases
     - /wp\/.*/
 
 env:
