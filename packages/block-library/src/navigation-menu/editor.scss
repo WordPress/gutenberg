@@ -2,10 +2,17 @@
 // @todo: eventually we may add a feature that lets a parent container absorb the block UI of a child block.
 // When that happens, leverage that instead of the following overrides.
 [data-type="core/navigation-menu"] {
+
+	// Allow overflowing items to scroll container
+	.wp-block-navigation-menu {
+		overflow-x: auto;
+	}
+
 	// 1. Reset margins on immediate innerblocks container.
 	.wp-block-navigation-menu .block-editor-inner-blocks > .block-editor-block-list__layout {
 		margin-left: 0;
 		margin-right: 0;
+		padding-right: 25%;
 	}
 
 	// 2. Remove paddings on subsequent immediate children.
@@ -13,7 +20,7 @@
 		width: auto;
 		padding-left: 0;
 		padding-right: 0;
-		margin-left: 0; // something
+		margin-left: 0;
 	}
 
 	// 3. Remove margins on subsequent Edit container.
