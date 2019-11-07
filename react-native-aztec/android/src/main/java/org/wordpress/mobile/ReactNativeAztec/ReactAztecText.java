@@ -149,6 +149,11 @@ public class ReactAztecText extends AztecText {
     }
 
     @Override
+    public boolean shouldSkipTinying() {
+        return mTagName.equals("pre") || mTagName.equals("quote");
+    }
+
+    @Override
     public void refreshText() {
         super.refreshText();
         onContentSizeChange();
