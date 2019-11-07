@@ -170,12 +170,6 @@
 		height: 33px;
 		line-height: 32px;
 	}
-
-	// Size the spacer flexibly to allow for different button lengths.
-	.editor-post-publish-panel__spacer {
-		display: inline-flex;
-		flex: 0 1 59px; // This number is approximative to keep the publish button at the same position when opening the panel
-	}
 }
 
 .edit-post-toggle-publish-panel {
