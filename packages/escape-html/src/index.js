@@ -97,6 +97,19 @@ export function escapeHTML( value ) {
 }
 
 /**
+ * Returns an escaped Editable HTML element value. This is different from
+ * `escapeHTML`, because for editable HTML, ALL ampersands must be escaped in
+ * order to render the content correctly on the page.
+ *
+ * @param {string} value Element value.
+ *
+ * @return {string} Escaped HTML element value.
+ */
+export function escapeEditableHTML( value ) {
+	return escapeLessThan( value.replace( /&/g, '&amp;' ) );
+}
+
+/**
  * Returns true if the given attribute name is valid, or false otherwise.
  *
  * @param {string} name Attribute name to test.
