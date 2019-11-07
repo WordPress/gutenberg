@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { View, Text, TouchableWithoutFeedback } from 'react-native';
+import { uniqBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -22,6 +23,7 @@ import styles from './styles.scss';
 
 function MediaPlaceholder( props ) {
 	const {
+		addToGallery,
 		allowedTypes = [],
 		labels = {},
 		icon,
@@ -30,7 +32,12 @@ function MediaPlaceholder( props ) {
 		disableMediaButtons,
 		getStylesFromColorScheme,
 		multiple,
+		value = [],
 	} = props;
+
+	const setMedia = multiple && addToGallery ?
+		( selected ) => onSelect( uniqBy( [ ...value, ...selected ], 'id' ) ) :
+		onSelect;
 
 	const isOneType = allowedTypes.length === 1;
 	const isImage = isOneType && allowedTypes.includes( MEDIA_TYPE_IMAGE );
@@ -103,7 +110,7 @@ function MediaPlaceholder( props ) {
 		<View style={ { flex: 1 } }>
 			<MediaUpload
 				allowedTypes={ allowedTypes }
-				onSelect={ onSelect }
+				onSelect={ setMedia }
 				multiple={ multiple }
 				render={ ( { open, getMediaOptions } ) => {
 					return (
