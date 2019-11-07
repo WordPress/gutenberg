@@ -9,11 +9,16 @@
 }
 
 .wp-block-navigation-menu-item {
+	margin-left: $grid-size;
 	margin-right: $grid-size;
 
 	.block-editor-block-list__layout {
 		display: block;
 		margin: $grid-size;
+	}
+
+	.wp-block-navigation-menu-item__link {
+		margin-left: $grid-size-large;
 	}
 
 	// Provide a base menu item margin.
