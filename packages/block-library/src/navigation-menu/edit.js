@@ -67,12 +67,12 @@ function NavigationMenu( {
 	);
 
 	const navigationMenuInlineStyles = {};
-	if ( textColor ) {
-		navigationMenuInlineStyles.color = textColor.color;
+	if ( attributes.textColorValue ) {
+		navigationMenuInlineStyles.color = attributes.textColorValue;
 	}
 
-	if ( backgroundColor ) {
-		navigationMenuInlineStyles.backgroundColor = backgroundColor.color;
+	if ( attributes.backgroundColorValue ) {
+		navigationMenuInlineStyles.backgroundColor = attributes.backgroundColorValue;
 	}
 
 	const navigationMenuClasses = classnames(
@@ -125,6 +125,8 @@ function NavigationMenu( {
 				<BlockColorsStyleSelector
 					backgroundColor={ backgroundColor }
 					textColor={ textColor }
+					backgroundColorValue={ attributes.backgroundColorValue }
+					textColorValue={ attributes.textColorValue }
 					onColorChange={ setColorType }
 				/>
 			</BlockControls>
