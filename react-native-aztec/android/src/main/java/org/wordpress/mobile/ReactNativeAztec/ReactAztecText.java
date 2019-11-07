@@ -149,7 +149,7 @@ public class ReactAztecText extends AztecText {
     }
 
     @Override
-    public boolean shouldSkipTinying() {
+    public boolean shouldSkipTidying() {
         return mTagName.equals("pre") || mTagName.equals("quote");
     }
 
