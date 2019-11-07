@@ -52,12 +52,12 @@ function NavigationMenu( {
 				return null;
 			}
 
-			return pages.map( ( { title, type, link: url, id: linkId } ) => (
+			return pages.map( ( { title, type, link: url, id } ) => (
 				[ 'core/navigation-menu-item', {
 					label: title.rendered,
 					title: title.raw,
 					type,
-					linkId,
+					id,
 					url,
 					opensInNewTab: false,
 				} ]
