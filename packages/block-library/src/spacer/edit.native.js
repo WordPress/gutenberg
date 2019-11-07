@@ -56,6 +56,7 @@ const SpacerEdit = ( { isSelected, attributes, setAttributes, getStylesFromColor
 						value={ height }
 						onChange={ changeAttribute }
 						style={ styles.rangeCellContainer }
+						allowReset
 					/>
 				</PanelBody>
 			</InspectorControls>
