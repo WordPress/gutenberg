@@ -63,6 +63,21 @@
 		padding: $grid-size-large;
 	}
 
+	// Handling item colors depending on the navigation.
+	.wp-block-navigation-menu {
+		&.has-background-color {
+			.wp-block-navigation-menu-item {
+				background-color: inherit; // it inherits the color defined in the navigation.
+			}
+		}
+
+		&.has-text-color {
+			.wp-block-navigation-menu-item {
+				color: inherit; // it inherits the color defined in the navigation.
+			}
+		}
+	}
+
 	/**
 	 * Colors Selector component
 	 */
