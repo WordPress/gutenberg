@@ -15,6 +15,14 @@ import { UP, DOWN, ENTER } from '@wordpress/keycodes';
 import LinkControl from '../index';
 import { fauxEntitySuggestions, fetchFauxEntitySuggestions } from './fixtures';
 
+/**
+ * Wait for next tick of event loop. This is required
+ * because the `fetchSearchSuggestions` Promise will
+ * resolve on the next tick of the event loop (this is
+ * inline with the Promise spec). As a result we need to
+ * wait on this loop to "tick" before we can expect the UI
+ * to have updated.
+ */
 function eventLoopTick() {
 	return new Promise( ( resolve ) => setImmediate( resolve ) );
 }
@@ -333,8 +341,9 @@ describe( 'Selecting links', () => {
 		expect( currentLinkAnchor ).not.toBeNull();
 	} );
 
-	it( 'should remove currently selected link and (re)display search UI when "Change" button is clicked', () => {
+	it( 'should hide "selected" link UI and display search UI prepopulated with previously selected link title when "Change" button is clicked', () => {
 		const selectedLink = first( fauxEntitySuggestions );
+		const spyOnEditMode = jest.fn();
 
 		const LinkControlConsumer = () => {
 			const [ link, setLink ] = useState( selectedLink );
@@ -344,6 +353,7 @@ describe( 'Selecting links', () => {
 					currentLink={ link }
 					onLinkChange={ ( suggestion ) => setLink( suggestion ) }
 					fetchSearchSuggestions={ fetchFauxEntitySuggestions }
+					onChangeMode={ spyOnEditMode( 'edit' ) }
 				/>
 			);
 		};
@@ -354,10 +364,9 @@ describe( 'Selecting links', () => {
 			);
 		} );
 
-		// TODO: select by aria role or visible text
-		let currentLink = container.querySelector( '.block-editor-link-control__search-item.is-current' );
-
-		const currentLinkBtn = currentLink.querySelector( 'button' );
+		// Required in order to select the button below
+		let currentLinkUI = container.querySelector( '.block-editor-link-control__search-item.is-current' );
+		const currentLinkBtn = currentLinkUI.querySelector( 'button' );
 
 		// Simulate searching for a term
 		act( () => {
@@ -365,11 +374,13 @@ describe( 'Selecting links', () => {
 		} );
 
 		const searchInput = container.querySelector( 'input[aria-label="URL"]' );
-		currentLink = container.querySelector( '.block-editor-link-control__search-item.is-current' );
+		currentLinkUI = container.querySelector( '.block-editor-link-control__search-item.is-current' );
 
 		// We should be back to showing the search input
 		expect( searchInput ).not.toBeNull();
-		expect( currentLink ).toBeNull();
+		expect( searchInput.value ).toBe( selectedLink.title ); // prepopulated with previous link's title
+		expect( currentLinkUI ).toBeNull();
+		expect( spyOnEditMode ).toHaveBeenCalled();
 	} );
 
 	describe( 'Selection using mouse click', () => {
@@ -523,5 +534,96 @@ describe( 'Selecting links', () => {
 			expect( currentLinkHTML ).toEqual( expect.stringContaining( 'Change' ) );
 			expect( currentLinkAnchor ).not.toBeNull();
 		} );
+	} );
+} );
+
+describe( 'Addition Settings UI', () => {
+	it( 'should display "New Tab" setting (in "off" mode) by default when a link is selected', async () => {
+		const selectedLink = first( fauxEntitySuggestions );
+		const expectedSettingText = 'Open in New Tab';
+
+		const LinkControlConsumer = () => {
+			const [ link ] = useState( selectedLink );
+
+			return (
+				<LinkControl
+					currentLink={ link }
+					fetchSearchSuggestions={ fetchFauxEntitySuggestions }
+				/>
+			);
+		};
+
+		act( () => {
+			render(
+				<LinkControlConsumer />, container
+			);
+		} );
+
+		// console.log( container.innerHTML );
+
+		const newTabSettingLabel = Array.from( container.querySelectorAll( 'label' ) ).find( ( label ) => label.innerHTML && label.innerHTML.includes( expectedSettingText ) );
+		expect( newTabSettingLabel ).not.toBeUndefined(); // find() returns "undefined" if not found
+
+		const newTabSettingLabelForAttr = newTabSettingLabel.getAttribute( 'for' );
+		const newTabSettingInput = container.querySelector( `#${ newTabSettingLabelForAttr }` );
+		expect( newTabSettingInput ).not.toBeNull();
+		expect( newTabSettingInput.checked ).toBe( false );
+	} );
+
+	it( 'should display a setting control with correct default state for each of the custom settings provided', async () => {
+		const selectedLink = first( fauxEntitySuggestions );
+
+		const customSettings = [
+			{
+				id: 'newTab',
+				title: 'Open in New Tab',
+				checked: false,
+			},
+			{
+				id: 'noFollow',
+				title: 'No follow',
+				checked: true,
+			},
+		];
+
+		const customSettingsLabelsText = customSettings.map( ( setting ) => setting.title );
+
+		const LinkControlConsumer = () => {
+			const [ link ] = useState( selectedLink );
+
+			return (
+				<LinkControl
+					currentLink={ link }
+					fetchSearchSuggestions={ fetchFauxEntitySuggestions }
+					currentSettings={ customSettings }
+				/>
+			);
+		};
+
+		act( () => {
+			render(
+				<LinkControlConsumer />, container
+			);
+		} );
+
+		// Grab the elements using user perceivable DOM queries
+		const settingsLegend = Array.from( container.querySelectorAll( 'legend' ) ).find( ( legend ) => legend.innerHTML && legend.innerHTML.includes( 'Currently selected link settings' ) );
+		const settingsFieldset = settingsLegend.closest( 'fieldset' );
+		const settingControlsLabels = Array.from( settingsFieldset.querySelectorAll( 'label' ) );
+		const settingControlsInputs = settingControlsLabels.map( ( label ) => {
+			return settingsFieldset.querySelector( `#${ label.getAttribute( 'for' ) }` );
+		} );
+
+		const settingControlLabelsText = Array.from( settingControlsLabels ).map( ( label ) => label.innerHTML );
+
+		// Check we have the correct number of controls
+		expect( settingControlsLabels ).toHaveLength( 2 );
+
+		// Check the labels match
+		expect( settingControlLabelsText ).toEqual( expect.arrayContaining( customSettingsLabelsText ) );
+
+		// Assert the default "checked" states match the expected
+		expect( settingControlsInputs[ 0 ].checked ).toEqual( false );
+		expect( settingControlsInputs[ 1 ].checked ).toEqual( true );
 	} );
 } );
