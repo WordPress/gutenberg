@@ -9,6 +9,7 @@ import classnames from 'classnames';
 import {
 	useMemo,
 	useEffect,
+	useState,
 } from '@wordpress/element';
 import {
 	InnerBlocks,
@@ -22,6 +23,8 @@ import {
 	PanelBody,
 	Spinner,
 	Toolbar,
+	Placeholder,
+	Button,
 } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 
@@ -45,6 +48,7 @@ function NavigationMenu( {
 	setTextColor,
 	setAttributes,
 } ) {
+	const [ initialPlaceholder, setInitialPlaceholder ] = useState( true );
 	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator( clientId );
 	const defaultMenuItems = useMemo(
 		() => {
@@ -115,6 +119,44 @@ function NavigationMenu( {
 			textColorCSSClass: textColor.class ? textColor.class : null,
 		} );
 	}, [ backgroundColor.class, textColor.class ] );
+
+	const handleCreateEmpty = () => {
+		setInitialPlaceholder( false );
+	};
+
+	const handleCreateFromExisting = () => {
+		setInitialPlaceholder( false );
+	};
+
+	if ( initialPlaceholder ) {
+		return (
+			<Placeholder
+				className="wp-block-navigation-menu-placeholder"
+				icon="menu"
+				label={ __( 'Navigation Menu' ) }
+			>
+				<p className="wp-block-navigation-menu-placeholder__instructions">Create a Menu from all existing pages or create an empty one.</p>
+
+				<div className="wp-block-navigation-menu-placeholder__buttons">
+					<Button
+						className="wp-block-navigation-menu-placeholder__button"
+						isDefault={ true }
+						onClick={ handleCreateFromExisting }
+					>
+						Create menu from existing pages
+					</Button>
+
+					<Button
+						className="wp-block-navigation-menu-placeholder__button"
+						isLink={ true }
+						onClick={ handleCreateEmpty }
+					>
+						Create an empty menu
+					</Button>
+				</div>
+			</Placeholder>
+		);
+	}
 
 	return (
 		<>
