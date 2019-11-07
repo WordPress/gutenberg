@@ -24,14 +24,15 @@ const ColorSelectorSVGIcon = () => (
  * @param {Object} colorControlProps colorControl properties.
  * @return {*} React Icon component.
  */
-const ColorSelectorIcon = ( { backgroundColor, textColor } ) => {
+const ColorSelectorIcon = ( { backgroundColor, textColor, backgroundColorValue, textColorValue } ) => {
 	const iconStyle = {};
-	if ( textColor && ! textColor.class ) {
-		iconStyle.color = textColor.color;
+
+	if ( backgroundColorValue ) {
+		iconStyle.backgroundColor = backgroundColorValue;
 	}
 
-	if ( backgroundColor && ! backgroundColor.class ) {
-		iconStyle.backgroundColor = backgroundColor.color;
+	if ( textColorValue ) {
+		iconStyle.color = textColorValue;
 	}
 
 	const iconClasses = classnames( 'block-library-colors-selector__state-selection', {
@@ -56,7 +57,7 @@ const ColorSelectorIcon = ( { backgroundColor, textColor } ) => {
  * @param {Object} colorControlProps colorControl properties.
  * @return {*} React toggle button component.
  */
-const renderToggleComponent = ( { backgroundColor, textColor } ) => ( { onToggle, isOpen } ) => {
+const renderToggleComponent = ( { backgroundColor, textColor, backgroundColorValue, textColorValue } ) => ( { onToggle, isOpen } ) => {
 	const openOnArrowDown = ( event ) => {
 		if ( ! isOpen && event.keyCode === DOWN ) {
 			event.preventDefault();
@@ -72,7 +73,12 @@ const renderToggleComponent = ( { backgroundColor, textColor } ) => ( { onToggle
 				label={ __( 'Open Colors Selector' ) }
 				onClick={ onToggle }
 				onKeyDown={ openOnArrowDown }
-				icon={ <ColorSelectorIcon backgroundColor={ backgroundColor } textColor={ textColor } /> }
+				icon={ <ColorSelectorIcon
+					backgroundColor={ backgroundColor }
+					textColor={ textColor }
+					backgroundColorValue={ backgroundColorValue }
+					textColorValue={ textColorValue }
+				/> }
 			/>
 		</Toolbar>
 	);
