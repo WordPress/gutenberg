@@ -9,6 +9,9 @@ import classnames from 'classnames';
 import {
 	useMemo,
 	useEffect,
+	useLayoutEffect,
+	useRef,
+	useState,
 } from '@wordpress/element';
 import {
 	InnerBlocks,
@@ -45,6 +48,21 @@ function NavigationMenu( {
 	setTextColor,
 	setAttributes,
 } ) {
+	const navMenuRef = useRef();
+	const [ hasScrollX, setHasScrollX ] = useState( false );
+
+	useLayoutEffect( () => {
+		if ( navMenuRef && navMenuRef.current ) {
+			const navMenu = navMenuRef.current;
+
+			if ( navMenu.scrollWidth > navMenu.clientWidth ) {
+				setHasScrollX( true );
+			} else {
+				setHasScrollX( false );
+			}
+		}
+	} );
+
 	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator( clientId );
 	const defaultMenuItems = useMemo(
 		() => {
@@ -79,6 +97,7 @@ function NavigationMenu( {
 		'wp-block-navigation-menu', {
 			'has-text-color': textColor.color,
 			'has-background-color': backgroundColor.color,
+			'has-scroll-x': hasScrollX,
 			[ attributes.backgroundColorCSSClass ]: attributes && attributes.backgroundColorCSSClass,
 			[ attributes.textColorCSSClass ]: attributes && attributes.textColorCSSClass,
 		}
@@ -149,7 +168,7 @@ function NavigationMenu( {
 				</PanelBody>
 			</InspectorControls>
 
-			<div className={ navigationMenuClasses } style={ navigationMenuInlineStyles }>
+			<div ref={ navMenuRef } className={ navigationMenuClasses } style={ navigationMenuInlineStyles }>
 				{ isRequesting && <><Spinner /> { __( 'Loading Navigation…' ) } </> }
 				{ pages &&
 					<InnerBlocks

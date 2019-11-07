@@ -8,11 +8,15 @@
 		overflow-x: auto;
 	}
 
+	// Allow more space on RHS when scroll is present
+	.wp-block-navigation-menu.has-scroll-x .block-editor-block-list__layout {
+		padding-right: 25%;
+	}
+
 	// 1. Reset margins on immediate innerblocks container.
 	.wp-block-navigation-menu .block-editor-inner-blocks > .block-editor-block-list__layout {
 		margin-left: 0;
 		margin-right: 0;
-		padding-right: 25%;
 	}
 
 	// 2. Remove paddings on subsequent immediate children.
