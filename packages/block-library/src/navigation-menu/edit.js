@@ -51,28 +51,36 @@ function NavigationMenu( {
 			if ( ! pages ) {
 				return null;
 			}
-			return pages.map( ( page ) => {
-				return [ 'core/navigation-menu-item',
-					{ label: page.title.rendered, url: page.permalink_template },
-				];
-			} );
+
+			return pages.map( ( { title, type, link: url, id } ) => (
+				[ 'core/navigation-menu-item', {
+					label: title.rendered,
+					title: title.raw,
+					type,
+					id,
+					url,
+					opensInNewTab: false,
+				} ]
+			) );
 		},
 		[ pages ]
 	);
 
-	const navigationMenuStyles = {};
-	if ( textColor.color ) {
-		navigationMenuStyles[ '--color-menu-link' ] = textColor.color;
+	const navigationMenuInlineStyles = {};
+	if ( textColor ) {
+		navigationMenuInlineStyles.color = textColor.color;
 	}
 
-	if ( backgroundColor.color ) {
-		navigationMenuStyles[ '--background-color-menu-link' ] = backgroundColor.color;
+	if ( backgroundColor ) {
+		navigationMenuInlineStyles.backgroundColor = backgroundColor.color;
 	}
 
 	const navigationMenuClasses = classnames(
 		'wp-block-navigation-menu', {
 			'has-text-color': textColor.color,
 			'has-background-color': backgroundColor.color,
+			[ attributes.backgroundColorCSSClass ]: attributes && attributes.backgroundColorCSSClass,
+			[ attributes.textColorCSSClass ]: attributes && attributes.textColorCSSClass,
 		}
 	);
 
@@ -115,8 +123,6 @@ function NavigationMenu( {
 					{ navigatorToolbarButton }
 				</Toolbar>
 				<BlockColorsStyleSelector
-					style={ navigationMenuStyles }
-					className={ navigationMenuClasses }
 					backgroundColor={ backgroundColor }
 					textColor={ textColor }
 					onColorChange={ setColorType }
@@ -141,7 +147,7 @@ function NavigationMenu( {
 				</PanelBody>
 			</InspectorControls>
 
-			<div className={ navigationMenuClasses } style={ navigationMenuStyles }>
+			<div className={ navigationMenuClasses } style={ navigationMenuInlineStyles }>
 				{ isRequesting && <><Spinner /> { __( 'Loading Navigation…' ) } </> }
 				{ pages &&
 					<InnerBlocks

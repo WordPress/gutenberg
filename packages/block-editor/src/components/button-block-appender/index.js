@@ -15,12 +15,13 @@ import { _x, sprintf } from '@wordpress/i18n';
 import BlockDropZone from '../block-drop-zone';
 import Inserter from '../inserter';
 
-function ButtonBlockAppender( { rootClientId, className } ) {
+function ButtonBlockAppender( { rootClientId, className, __experimentalSelectBlockOnInsert: selectBlockOnInsert } ) {
 	return (
 		<>
 			<BlockDropZone rootClientId={ rootClientId } />
 			<Inserter
 				rootClientId={ rootClientId }
+				__experimentalSelectBlockOnInsert={ selectBlockOnInsert }
 				renderToggle={ ( { onToggle, disabled, isOpen, blockTitle, hasSingleBlockType } ) => {
 					let label;
 					if ( hasSingleBlockType ) {

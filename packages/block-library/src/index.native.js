@@ -144,6 +144,8 @@ export const registerCoreBlocks = () => {
 		mediaText,
 		// eslint-disable-next-line no-undef
 		!! __DEV__ ? group : null,
+		// eslint-disable-next-line no-undef
+		!! __DEV__ ? spacer : null,
 	].forEach( registerBlock );
 
 	setDefaultBlockName( paragraph.name );
