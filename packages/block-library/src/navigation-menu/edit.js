@@ -49,8 +49,22 @@ function NavigationMenu( {
 	setAttributes,
 	hasExistingNavItems,
 } ) {
+	//
+	// HOOKS
+	//
 	const [ initialPlaceholder, setInitialPlaceholder ] = useState( true );
+	const [ blocksTemplate, setBlocksTemplate ] = useState( null );
 	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator( clientId );
+
+	useEffect( () => {
+		// Set/Unset colors CSS classes.
+		setAttributes( {
+			backgroundColorCSSClass: backgroundColor.class ? backgroundColor.class : null,
+			textColorCSSClass: textColor.class ? textColor.class : null,
+		} );
+	}, [ backgroundColor.class, textColor.class ] );
+
+	// Builds default menu items
 	const defaultMenuItems = useMemo(
 		() => {
 			if ( ! pages ) {
@@ -71,23 +85,9 @@ function NavigationMenu( {
 		[ pages ]
 	);
 
-	const navigationMenuInlineStyles = {};
-	if ( attributes.textColorValue ) {
-		navigationMenuInlineStyles.color = attributes.textColorValue;
-	}
-
-	if ( attributes.backgroundColorValue ) {
-		navigationMenuInlineStyles.backgroundColor = attributes.backgroundColorValue;
-	}
-
-	const navigationMenuClasses = classnames(
-		'wp-block-navigation-menu', {
-			'has-text-color': textColor.color,
-			'has-background-color': backgroundColor.color,
-			[ attributes.backgroundColorCSSClass ]: attributes && attributes.backgroundColorCSSClass,
-			[ attributes.textColorCSSClass ]: attributes && attributes.textColorCSSClass,
-		}
-	);
+	//
+	// HANDLERS
+	//
 
 	/**
 	 * Set the color type according to the given values.
@@ -113,22 +113,37 @@ function NavigationMenu( {
 		}
 	};
 
-	useEffect( () => {
-		// Set/Unset colors CSS classes.
-		setAttributes( {
-			backgroundColorCSSClass: backgroundColor.class ? backgroundColor.class : null,
-			textColorCSSClass: textColor.class ? textColor.class : null,
-		} );
-	}, [ backgroundColor.class, textColor.class ] );
-
 	const handleCreateEmpty = () => {
+		setBlocksTemplate( null );
 		setInitialPlaceholder( false );
 	};
 
 	const handleCreateFromExisting = () => {
+		setBlocksTemplate( defaultMenuItems );
 		setInitialPlaceholder( false );
 	};
 
+	//
+	// MARKUP
+	//
+
+	// Build Inline Styles
+	const navigationMenuInlineStyles = {
+		...( textColor && { color: textColor.color } ),
+		...( backgroundColor && { backgroundColor: backgroundColor.color } ),
+	};
+
+	// Build ClassNames
+	const navigationMenuClasses = classnames(
+		'wp-block-navigation-menu', {
+			'has-text-color': textColor.color,
+			'has-background-color': backgroundColor.color,
+			[ attributes.backgroundColorCSSClass ]: attributes && attributes.backgroundColorCSSClass,
+			[ attributes.textColorCSSClass ]: attributes && attributes.textColorCSSClass,
+		}
+	);
+
+	// UI State: initial placeholder
 	if ( ! hasExistingNavItems && initialPlaceholder ) {
 		return (
 			<Placeholder
@@ -159,6 +174,7 @@ function NavigationMenu( {
 		);
 	}
 
+	// UI State: rendered Block UI
 	return (
 		<>
 			<BlockControls>
@@ -168,8 +184,6 @@ function NavigationMenu( {
 				<BlockColorsStyleSelector
 					backgroundColor={ backgroundColor }
 					textColor={ textColor }
-					backgroundColorValue={ attributes.backgroundColorValue }
-					textColorValue={ attributes.textColorValue }
 					onColorChange={ setColorType }
 				/>
 			</BlockControls>
@@ -196,7 +210,7 @@ function NavigationMenu( {
 				{ isRequesting && <><Spinner /> { __( 'Loading Navigation…' ) } </> }
 				{ pages &&
 					<InnerBlocks
-						template={ defaultMenuItems ? defaultMenuItems : null }
+						template={ blocksTemplate ? blocksTemplate : null }
 						allowedBlocks={ [ 'core/navigation-menu-item' ] }
 						templateInsertUpdatesSelection={ false }
 						__experimentalMoverDirection={ 'horizontal' }
