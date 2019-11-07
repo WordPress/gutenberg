@@ -1,5 +1,4 @@
 .wp-block-navigation-menu {
-
 	& > ul {
 		display: block;
 		list-style: none;
@@ -116,4 +115,22 @@
 		}
 	}
 
+	// Handling item colors depending on the navigation.
+	&.has-background-color {
+		li.wp-block-navigation-menu-item {
+			background-color: inherit;
+			a.wp-block-navigation-menu-item__link {
+				background-color: inherit;
+			}
+		}
+	}
+
+	&.has-text-color {
+		li.wp-block-navigation-menu-item {
+			color: inherit;
+			a.wp-block-navigation-menu-item__link {
+				color: inherit;
+			}
+		}
+	}
 }
