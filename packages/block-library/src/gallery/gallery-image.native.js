@@ -138,7 +138,7 @@ class GalleryImage extends Component {
 		const { isUploadFailed, retryMessage } = params;
 		const resizeMode = isCropped ? 'cover' : 'contain';
 
-		const imageStyle = [ styles.image, resizeMode,
+		const imageStyle = [ styles.image, { resizeMode },
 			isUploadInProgress ? styles.imageUploading : undefined,
 		];
 
