@@ -12,11 +12,13 @@ const wait = require( 'util' ).promisify( setTimeout );
  * Internal dependencies
  */
 const createDockerComposeConfig = require( './create-docker-compose-config' );
+const detectContext = require( './detect-context' );
+const resolveDependencies = require( './resolve-dependencies' );
 
 // Config Variables
-const pluginPath = process.cwd();
-const pluginName = path.basename( pluginPath );
-const pluginTestsPath = fs.existsSync( './packages' ) ? '/packages' : '';
+const cwd = process.cwd();
+const cwdName = path.basename( cwd );
+const cwdTestsPath = fs.existsSync( './packages' ) ? '/packages' : '';
 const dockerComposeOptions = {
 	config: path.join( __dirname, 'docker-compose.yml' ),
 };
@@ -30,18 +32,23 @@ const wpCliRun = ( command, isTests = false ) =>
 	);
 const setupSite = ( isTests = false ) =>
 	wpCliRun(
-		`wp core install --url=localhost:888${
-			isTests ? '9' : '8'
-		} --title=Gutenberg --admin_user=admin --admin_password=password --admin_email=admin@wordpress.org`,
+		`wp core install --url=localhost:${
+			isTests ?
+				process.env.WP_ENV_TESTS_PORT || 8889 :
+				process.env.WP_ENV_PORT || 8888
+		} --title=${ cwdName } --admin_user=admin --admin_password=password --admin_email=admin@wordpress.org`,
 		isTests
 	);
-const activatePlugin = ( isTests = false ) =>
-	wpCliRun( `wp plugin activate ${ pluginName }`, isTests );
+const activateContext = ( { type, pathBasename }, isTests = false ) =>
+	wpCliRun( `wp ${ type } activate ${ pathBasename }`, isTests );
 const resetDatabase = ( isTests = false ) =>
 	wpCliRun( 'wp db reset --yes', isTests );
 
 module.exports = {
 	async start( { ref, spinner = {} } ) {
+		const context = await detectContext();
+		const dependencies = await resolveDependencies();
+
 		spinner.text = `Downloading WordPress@${ ref } 0/100%.`;
 		const gitFetchOptions = {
 			fetchOpts: {
@@ -62,7 +69,7 @@ module.exports = {
 		};
 
 		// Clone or get the repo.
-		const repoPath = `../${ pluginName }-wordpress/`;
+		const repoPath = `../${ cwdName }-wordpress/`;
 		const repo = await NodeGit.Clone(
 			'https://github.com/WordPress/WordPress.git',
 			repoPath,
@@ -92,10 +99,10 @@ module.exports = {
 		}
 		spinner.text = `Downloading WordPress@${ ref } 100/100%.`;
 
-		spinner.text = `Installing WordPress@${ ref }.`;
+		spinner.text = `Starting WordPress@${ ref }.`;
 		fs.writeFileSync(
 			dockerComposeOptions.config,
-			createDockerComposeConfig( pluginPath, pluginName, pluginTestsPath )
+			createDockerComposeConfig( cwdTestsPath, context, dependencies )
 		);
 
 		// These will bring up the database container,
@@ -119,11 +126,15 @@ module.exports = {
 			.catch( retryableSiteSetup )
 			.catch( retryableSiteSetup );
 
-		await Promise.all( [ activatePlugin(), activatePlugin( true ) ] );
+		await Promise.all( [
+			activateContext( context ),
+			activateContext( context, true ),
+			...dependencies.map( activateContext ),
+		] );
 
 		// Remove dangling containers and finish.
 		await dockerCompose.rm( dockerComposeOptions );
-		spinner.text = `Installed WordPress@${ ref }.`;
+		spinner.text = `Started WordPress@${ ref }.`;
 	},
 
 	async stop( { spinner = {} } ) {
@@ -133,6 +144,10 @@ module.exports = {
 	},
 
 	async clean( { environment, spinner } ) {
+		const context = await detectContext();
+		const dependencies = await resolveDependencies();
+		const activateDependencies = () => Promise.all( dependencies.map( activateContext ) );
+
 		const description = `${ environment } environment${
 			environment === 'all' ? 's' : ''
 		}`;
@@ -144,7 +159,8 @@ module.exports = {
 			tasks.push(
 				resetDatabase()
 					.then( setupSite )
-					.then( activatePlugin )
+					.then( activateContext.bind( null, context ) )
+					.then( activateDependencies )
 					.catch( () => {} )
 			);
 		}
@@ -152,7 +168,7 @@ module.exports = {
 			tasks.push(
 				resetDatabase( true )
 					.then( setupSite.bind( null, true ) )
-					.then( activatePlugin.bind( null, true ) )
+					.then( activateContext.bind( null, context, true ) )
 					.catch( () => {} )
 			);
 		}

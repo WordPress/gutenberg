@@ -22,6 +22,7 @@ import {
 	EditorNotices,
 	PostPublishPanel,
 } from '@wordpress/editor';
+import { BlockBreadcrumb } from '@wordpress/block-editor';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { PluginArea } from '@wordpress/plugins';
 import { withViewportMatch } from '@wordpress/viewport';
@@ -62,7 +63,7 @@ function Layout( {
 } ) {
 	const sidebarIsOpened = editorSidebarOpened || pluginSidebarOpened || publishSidebarOpened;
 
-	const className = classnames( 'edit-post-layout', {
+	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
 		'is-sidebar-opened': sidebarIsOpened,
 		'has-fixed-toolbar': hasFixedToolbar,
 		'has-metaboxes': hasActiveMetaboxes,
@@ -84,7 +85,7 @@ function Layout( {
 			<LocalAutosaveMonitor />
 			<Header />
 			<div
-				className="edit-post-layout__content"
+				className="edit-post-layout__content edit-post-layout__scrollable-container"
 				role="region"
 				/* translators: accessibility text for the content landmark region. */
 				aria-label={ __( 'Editor content' ) }
@@ -103,7 +104,19 @@ function Layout( {
 				<div className="edit-post-layout__metaboxes">
 					<MetaBoxes location="advanced" />
 				</div>
+				{ isMobileViewport && sidebarIsOpened && <ScrollLock /> }
 			</div>
+			{ isRichEditingEnabled && mode === 'visual' && (
+				<div
+					className="edit-post-layout__footer"
+					role="region"
+					/* translators: accessibility text for the content landmark region. */
+					aria-label={ __( 'Editor footer' ) }
+					tabIndex="-1"
+				>
+					<BlockBreadcrumb />
+				</div>
+			) }
 			{ publishSidebarOpened ? (
 				<PostPublishPanel
 					{ ...publishLandmarkProps }
@@ -128,9 +141,6 @@ function Layout( {
 					</div>
 					<SettingsSidebar />
 					<Sidebar.Slot />
-					{
-						isMobileViewport && sidebarIsOpened && <ScrollLock />
-					}
 				</>
 			) }
 			<Popover.Slot />

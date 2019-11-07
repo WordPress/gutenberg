@@ -182,6 +182,8 @@ async function runAxeTestsForBlockEditor() {
 		// See: https://github.com/WordPress/gutenberg/pull/15018.
 		disabledRules: [
 			'aria-allowed-role',
+			'aria-hidden-focus',
+			'aria-input-field-name',
 			'aria-valid-attr-value',
 			'button-name',
 			'color-contrast',

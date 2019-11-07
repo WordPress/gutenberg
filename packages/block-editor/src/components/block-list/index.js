@@ -17,7 +17,7 @@ import { Component } from '@wordpress/element';
 import {
 	withSelect,
 	withDispatch,
-	__experimentalAsyncModeProvider as AsyncModeProvider,
+	AsyncModeProvider,
 } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
@@ -196,6 +196,7 @@ class BlockList extends Component {
 			className,
 			blockClientIds,
 			rootClientId,
+			__experimentalMoverDirection: moverDirection = 'vertical',
 			isDraggable,
 			selectedBlockClientId,
 			multiSelectedBlockClientIds,
@@ -228,6 +229,7 @@ class BlockList extends Component {
 								blockRef={ this.setBlockRef }
 								onSelectionStart={ this.onSelectionStart }
 								isDraggable={ isDraggable }
+								moverDirection={ moverDirection }
 
 								// This prop is explicitely computed and passed down
 								// to avoid being impacted by the async mode

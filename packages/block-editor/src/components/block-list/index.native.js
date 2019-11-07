@@ -59,12 +59,17 @@ export class BlockList extends Component {
 	}
 
 	renderDefaultBlockAppender() {
+		const { shouldShowInsertionPointBefore } = this.props;
+		const willShowInsertionPoint = shouldShowInsertionPointBefore(); // call without the client_id argument since this is the appender
 		return (
 			<ReadableContentView>
-				<BlockListAppender
-					rootClientId={ this.props.rootClientId }
-					renderAppender={ this.props.renderAppender }
-				/>
+				{ willShowInsertionPoint ?
+					this.renderAddBlockSeparator() :	// show the new-block indicator when we're inserting a block or
+					<BlockListAppender				// show the default appender, as normal, when not inserting a block
+						rootClientId={ this.props.rootClientId }
+						renderAppender={ this.props.renderAppender }
+					/>
+				}
 			</ReadableContentView>
 		);
 	}
@@ -96,9 +101,6 @@ export class BlockList extends Component {
 					ListHeaderComponent={ header }
 					ListEmptyComponent={ this.renderDefaultBlockAppender }
 					ListFooterComponent={ withFooter && this.renderBlockListFooter }
-					getItemLayout={ ( data, index ) => {
-						return { length: 0, offset: 0, index };
-					} }
 				/>
 
 				{ renderAppender && blockClientIds.length > 0 &&
@@ -120,10 +122,10 @@ export class BlockList extends Component {
 
 	renderItem( { item: clientId, index } ) {
 		const blockHolderFocusedStyle = this.props.getStylesFromColorScheme( styles.blockHolderFocused, styles.blockHolderFocusedDark );
-		const { shouldShowBlockAtIndex, shouldShowInsertionPoint } = this.props;
+		const { shouldShowBlockAtIndex, shouldShowInsertionPointBefore, shouldShowInsertionPointAfter } = this.props;
 		return (
 			<ReadableContentView>
-				{ shouldShowInsertionPoint( clientId ) && this.renderAddBlockSeparator() }
+				{ shouldShowInsertionPointBefore( clientId ) && this.renderAddBlockSeparator() }
 				{ shouldShowBlockAtIndex( index ) && (
 					<BlockListBlock
 						key={ clientId }
@@ -134,6 +136,7 @@ export class BlockList extends Component {
 						borderStyle={ this.blockHolderBorderStyle() }
 						focusedBorderColor={ blockHolderFocusedStyle.borderColor }
 					/> ) }
+				{ shouldShowInsertionPointAfter( clientId ) && this.renderAddBlockSeparator() }
 			</ReadableContentView>
 		);
 	}
@@ -181,11 +184,28 @@ export default compose( [
 		const blockInsertionPointIsVisible = isBlockInsertionPointVisible();
 		const selectedBlock = getSelectedBlock();
 		const isSelectedGroup = selectedBlock && selectedBlock.name === 'core/group';
-		const shouldShowInsertionPoint = ( clientId ) => {
+		const shouldShowInsertionPointBefore = ( clientId ) => {
 			return (
 				blockInsertionPointIsVisible &&
 				insertionPoint.rootClientId === rootClientId &&
-				blockClientIds[ insertionPoint.index ] === clientId
+				(
+					// if list is empty, show the insertion point (via the default appender)
+					blockClientIds.length === 0 ||
+					// or if the insertion point is right before the denoted block
+					blockClientIds[ insertionPoint.index ] === clientId
+				)
+			);
+		};
+		const shouldShowInsertionPointAfter = ( clientId ) => {
+			return (
+				blockInsertionPointIsVisible &&
+				insertionPoint.rootClientId === rootClientId &&
+
+				// if the insertion point is at the end of the list
+				blockClientIds.length === insertionPoint.index &&
+
+				// and the denoted block is the last one on the list, show the indicator at the end of the block
+				blockClientIds[ insertionPoint.index - 1 ] === clientId
 			);
 		};
 
@@ -211,7 +231,8 @@ export default compose( [
 			blockCount: getBlockCount( rootClientId ),
 			isBlockInsertionPointVisible: isBlockInsertionPointVisible(),
 			shouldShowBlockAtIndex,
-			shouldShowInsertionPoint,
+			shouldShowInsertionPointBefore,
+			shouldShowInsertionPointAfter,
 			selectedBlockClientId,
 			isFirstBlock,
 			selectedBlockParentId,
