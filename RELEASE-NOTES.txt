@@ -1,6 +1,7 @@
 1.17.0
 ------
 * Include block title in Unsupported block's UI
+* Show new-block-indicator when no blocks at all and when at the last block
 * Use existing links in the clipboard to prefill url field when inserting new link.
 
 1.16.0
