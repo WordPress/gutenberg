@@ -78,4 +78,7 @@ module.exports = {
 	infoIcon: {
 		size: 36,
 	},
+	infoSheetIcon: {
+		color: 'gray',
+	},
 };

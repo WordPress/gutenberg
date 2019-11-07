@@ -14,12 +14,6 @@ jest.mock( 'Platform', () => {
  */
 import { BottomSheet, Icon } from '@wordpress/components';
 jest.mock( '@wordpress/blocks' );
-jest.mock( '../styles.scss', () => {
-	return {
-		infoIcon: { size: 32 },
-		unsupportedBlockIcon: { color: 'white' },
-	};
-} );
 
 /**
  * Internal dependencies
