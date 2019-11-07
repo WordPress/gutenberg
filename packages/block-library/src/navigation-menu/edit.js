@@ -151,7 +151,9 @@ function NavigationMenu( {
 				icon="menu"
 				label={ __( 'Navigation Menu' ) }
 			>
-				<p className="wp-block-navigation-menu-placeholder__instructions">Create a Menu from all existing pages or create an empty one.</p>
+				<p className="wp-block-navigation-menu-placeholder__instructions">
+					{ __( 'Create a Menu from all existing pages, or create an empty one.' ) }
+				</p>
 
 				<div className="wp-block-navigation-menu-placeholder__buttons">
 					<Button
@@ -159,7 +161,7 @@ function NavigationMenu( {
 						isDefault={ true }
 						onClick={ handleCreateFromExisting }
 					>
-						Create menu from existing pages
+						{ __( 'Create from all top pages' ) }
 					</Button>
 
 					<Button
@@ -167,7 +169,7 @@ function NavigationMenu( {
 						isLink={ true }
 						onClick={ handleCreateEmpty }
 					>
-						Create an empty menu
+						{ __( 'Create empty' ) }
 					</Button>
 				</div>
 			</Placeholder>

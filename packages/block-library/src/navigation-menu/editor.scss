@@ -157,22 +157,12 @@ $color-control-label-height: 20px;
 
 // Initial Placeholder
 
-.wp-block-navigation-menu-placeholder {
-
-	.components-placeholder__fieldset {
-		// flex-direction: column;
-	}
-}
-
 .wp-block-navigation-menu-placeholder__buttons {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
 	padding-bottom: $grid-size-large;
 }
 
 .wp-block-navigation-menu-placeholder__button {
-	margin-bottom: $grid-size-large;
+	margin-right: $grid-size-large;
 
 	:last-child {
 		margin-bottom: 0;
