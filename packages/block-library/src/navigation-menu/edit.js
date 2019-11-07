@@ -64,8 +64,8 @@ function NavigationMenu( {
 		} );
 	}, [ backgroundColor.class, textColor.class ] );
 
-	// Builds default menu items
-	const defaultMenuItems = useMemo(
+	// Builds menu items from default Pages
+	const defaultPagesMenuItems = useMemo(
 		() => {
 			if ( ! pages ) {
 				return null;
@@ -119,7 +119,7 @@ function NavigationMenu( {
 	};
 
 	const handleCreateFromExisting = () => {
-		setBlocksTemplate( defaultMenuItems );
+		setBlocksTemplate( defaultPagesMenuItems );
 		setInitialPlaceholder( false );
 	};
 
