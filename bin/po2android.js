@@ -48,21 +48,21 @@ ${ indent }</plurals>
 
 if ( require.main === module ) {
 	if ( process.stdin.isTTY ) {
-		const potFileName = process.argv[2];
-		const destination = process.argv[3];
+		const potFileName = process.argv[ 2 ];
+		const destination = process.argv[ 3 ];
 		const potFileContent = fs.readFileSync( potFileName );
-		const swiftOutput = po2Android( potFileContent, process.argv[3] );
+		const swiftOutput = po2Android( potFileContent, process.argv[ 3 ] );
 		fs.writeFileSync( destination, swiftOutput );
 	} else {
 		let inputData = '';
 		process.stdin.on( 'readable', function() {
-			var chunk = this.read();
+			const chunk = this.read();
 			if ( chunk !== null ) {
 				inputData += chunk;
 			}
 		} );
 		process.stdin.on( 'end', function() {
-			console.log( po2Android( inputData ) );
+			process.stdout.write( po2Android( inputData ) );
 		} );
 	}
 	return;
