@@ -31,7 +31,6 @@ import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import icon from './icon';
 import MediaContainer from './media-container';
 
 /**
@@ -251,18 +250,20 @@ class MediaTextEdit extends Component {
 const MediaTextEditWithColors = withColors( 'backgroundColor' )( MediaTextEdit );
 
 const MediaTextEditPatternPicker = ( props ) => {
-	const blockName = 'core/media-text';
-	const { defaultPattern, patterns } = useSelect( ( select ) => {
+	const { name } = props;
+	const { blockType, defaultPattern, patterns } = useSelect( ( select ) => {
 		const {
 			__experimentalGetBlockPatterns,
+			getBlockType,
 			__experimentalGetDefaultBlockPattern,
 		} = select( 'core/blocks' );
 
 		return {
-			patterns: __experimentalGetBlockPatterns( blockName ),
-			defaultPattern: __experimentalGetDefaultBlockPattern( blockName ),
+			blockType: getBlockType( name ),
+			defaultPattern: __experimentalGetDefaultBlockPattern( name ),
+			patterns: __experimentalGetBlockPatterns( name ),
 		};
-	} );
+	}, [ name ] );
 
 	const [ pattern, setPattern ] = useState( null );
 
@@ -274,8 +275,8 @@ const MediaTextEditPatternPicker = ( props ) => {
 
 	return (
 		<__experimentalBlockPatternPicker
-			icon={ icon }
-			label={ __( 'Media & Text' ) }
+			icon={ get( blockType, [ 'icon', 'src' ] ) }
+			label={ get( blockType, [ 'title' ] ) }
 			patterns={ patterns }
 			onSelect={ ( nextPattern = defaultPattern ) => {
 				if ( nextPattern.attributes ) {
