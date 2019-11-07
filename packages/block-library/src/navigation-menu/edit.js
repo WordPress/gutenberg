@@ -47,6 +47,7 @@ function NavigationMenu( {
 	setBackgroundColor,
 	setTextColor,
 	setAttributes,
+	hasExistingNavItems,
 } ) {
 	const [ initialPlaceholder, setInitialPlaceholder ] = useState( true );
 	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator( clientId );
@@ -128,7 +129,7 @@ function NavigationMenu( {
 		setInitialPlaceholder( false );
 	};
 
-	if ( initialPlaceholder ) {
+	if ( ! hasExistingNavItems && initialPlaceholder ) {
 		return (
 			<Placeholder
 				className="wp-block-navigation-menu-placeholder"
@@ -208,7 +209,13 @@ function NavigationMenu( {
 
 export default compose( [
 	withColors( { backgroundColor: 'background-color', textColor: 'color' } ),
-	withSelect( ( select ) => {
+	withSelect( ( select, ownProps, registry ) => {
+		const { clientId } = ownProps;
+		const { getBlocks } = registry.select( 'core/block-editor' );
+
+		const innerBlocks = getBlocks( clientId );
+		const hasExistingNavItems = innerBlocks && innerBlocks.filter( ( block ) => block.name === 'core/navigation-menu-item' ).length;
+
 		const { getEntityRecords } = select( 'core' );
 		const { isResolving } = select( 'core/data' );
 		const filterDefaultPages = {
@@ -217,6 +224,7 @@ export default compose( [
 			orderby: 'id',
 		};
 		return {
+			hasExistingNavItems: !! hasExistingNavItems,
 			pages: getEntityRecords( 'postType', 'page', filterDefaultPages ),
 			isRequesting: isResolving( 'core', 'getEntityRecords', [ 'postType', 'page', filterDefaultPages ] ),
 		};
