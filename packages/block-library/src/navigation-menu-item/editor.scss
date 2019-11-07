@@ -71,8 +71,6 @@
 .wp-block-navigation-menu-item {
 	&:not(.is-editing) {
 		font-family: inherit;
-		font-size: $text-editor-font-size;
-		font-weight: bold;
 	}
 
 	&.is-editing .components-text-control__input {
