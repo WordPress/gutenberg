@@ -23,7 +23,7 @@ function build_css_colors( $attributes ) {
 
 	// Background color.
 	// Background color - has text color.
-	if ( array_key_exists( 'backgroundColor', $attributes ) ) {
+	if ( array_key_exists( 'backgroundColorValue', $attributes ) ) {
 		$colors['bg_css_classes'] .= ' has-background-color';
 	}
 
@@ -38,7 +38,7 @@ function build_css_colors( $attributes ) {
 
 	// Text color.
 	// Text color - has text color.
-	if ( array_key_exists( 'textColor', $attributes ) ) {
+	if ( array_key_exists( 'textColorValue', $attributes ) ) {
 		$colors['text_css_classes'] .= ' has-text-color';
 	}
 	// Text color - add custom CSS class.
@@ -80,8 +80,18 @@ function render_block_navigation_menu( $attributes, $content, $block ) {
 
 	$colors = build_css_colors( $attributes );
 
-	return "<nav class='wp-block-navigation-menu' {$comp_inline_styles}>" .
-		build_navigation_menu_html( $block, $colors ) .
+	$css_classes = "wp-block-navigation-menu";
+
+	if ( ! empty( $colors['bg_css_classes'] ) ) {
+		$css_classes .= ' ' .  $colors['bg_css_classes'];
+	}
+
+	if ( ! empty( $colors['text_css_classes'] ) ) {
+		$css_classes .= ' ' .  $colors['text_css_classes'];
+	}
+
+	return "<nav class='{$css_classes}' {$comp_inline_styles}>" .
+		build_navigation_menu_html( $block ) .
 	'</nav>';
 }
 
@@ -89,18 +99,14 @@ function render_block_navigation_menu( $attributes, $content, $block ) {
  * Walks the inner block structure and returns an HTML list for it.
  *
  * @param array $block  The block.
- * @param array $colors Contains inline styles and CSS classes to apply to menu item.
- *
  * @return string Returns  an HTML list from innerBlocks.
  */
-function build_navigation_menu_html( $block, $colors ) {
+function build_navigation_menu_html( $block ) {
 	$html = '';
 	foreach ( (array) $block['innerBlocks'] as $key => $menu_item ) {
 
-		$html .= '<li class="wp-block-navigation-menu-item ' . $colors['bg_css_classes'] . '"' . $colors['bg_inline_styles'] . '>' .
-			'<a
-				class="wp-block-navigation-menu-item__link ' . $colors['text_css_classes'] . '"
-				' . $colors['text_inline_styles'];
+		$html .= '<li class="wp-block-navigation-menu-item">' .
+			'<a class="wp-block-navigation-menu-item__link" ';
 
 		// Start appending HTML attributes to anchor tag.
 		if ( isset( $menu_item['attrs']['url'] ) ) {
@@ -124,7 +130,7 @@ function build_navigation_menu_html( $block, $colors ) {
 		// End anchor tag content.
 
 		if ( count( (array) $menu_item['innerBlocks'] ) > 0 ) {
-			$html .= build_navigation_menu_html( $menu_item, $colors );
+			$html .= build_navigation_menu_html( $menu_item );
 		}
 
 		$html .= '</li>';
