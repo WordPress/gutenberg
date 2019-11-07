@@ -131,20 +131,21 @@ class MediaTextEdit extends Component {
 			attributes,
 			backgroundColor,
 			setAttributes,
-			isMobile,
+			// isMobile,
 		} = this.props;
 		const {
-			isStackedOnMobile,
+			// isStackedOnMobile,
 			mediaPosition,
 			mediaWidth,
 			verticalAlignment,
 		} = attributes;
-		const shouldStack = isStackedOnMobile && isMobile;
+		const shouldStack = false; // We are temporarily not stacking until we fix alignment buttons
+		// const shouldStack = isStackedOnMobile && isMobile; // <<< Original line
 		const temporaryMediaWidth = shouldStack ? 100 : ( this.state.mediaWidth || mediaWidth );
 		const widthString = `${ temporaryMediaWidth }%`;
 		const containerStyles = {
 			...styles[ 'wp-block-media-text' ],
-			...styles[ `is-vertically-aligned-${ verticalAlignment }` ],
+			...styles[ `is-vertically-aligned-${ verticalAlignment || 'center' }` ],
 			...( mediaPosition === 'right' ? styles[ 'has-media-on-the-right' ] : {} ),
 			...( shouldStack ? styles[ 'is-stacked-on-mobile' ] : {} ),
 			...( shouldStack && mediaPosition === 'right' ? styles[ 'is-stacked-on-mobile.has-media-on-the-right' ] : {} ),
