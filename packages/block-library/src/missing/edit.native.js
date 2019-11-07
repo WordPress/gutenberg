@@ -57,7 +57,7 @@ export class UnsupportedBlockEdit extends Component {
 		const infoTextStyle = getStylesFromColorScheme( styles.infoText, styles.infoTextDark );
 		const infoTitleStyle = getStylesFromColorScheme( styles.infoTitle, styles.infoTitleDark );
 		const infoDescriptionStyle = getStylesFromColorScheme( styles.infoDescription, styles.infoDescriptionDark );
-		const infoIconStyle = getStylesFromColorScheme( styles.infoIcon, styles.infoIconDark );
+		const infoSheetIconStyle = getStylesFromColorScheme( styles.infoSheetIcon, styles.infoSheetIconDark );
 
 		// translators: %s: Name of the block
 		const titleFormat = Platform.OS === 'android' ? __( '\'%s\' isn\'t yet supported on WordPress for Android' ) :
@@ -74,7 +74,7 @@ export class UnsupportedBlockEdit extends Component {
 				onClose={ this.toggleSheet.bind( this ) }
 			>
 				<View style={ styles.infoContainer } >
-					<Icon icon="editor-help" color={ infoIconStyle.color } size={ styles.infoIcon.size } />
+					<Icon icon="editor-help" color={ infoSheetIconStyle.color } size={ styles.infoSheetIcon.size } />
 					<Text style={ [ infoTextStyle, infoTitleStyle ] }>
 						{ infoTitle }
 					</Text>
