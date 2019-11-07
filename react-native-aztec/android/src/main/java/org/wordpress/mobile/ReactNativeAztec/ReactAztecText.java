@@ -150,7 +150,7 @@ public class ReactAztecText extends AztecText {
 
     @Override
     public boolean shouldSkipTidying() {
-        return mTagName.equals("pre") || mTagName.equals("quote");
+        return mTagName.equals("pre");
     }
 
     @Override
