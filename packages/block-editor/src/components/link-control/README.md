@@ -14,8 +14,20 @@
 
 ### currentSettings
 
-- Type: `Object`
-- Required: Yes
+- Type: `Array`
+- Required: No
+- Default: 
+```
+[
+	{
+		id: 'newTab',
+		title: 'Open in New Tab',
+		checked: false,
+	},
+];
+```
+
+An array of settings objects. Each object will used to render a `ToggleControl` for that setting. See also `onSettingsChange`.
 
 ### fetchSearchSuggestions
 
@@ -71,7 +83,27 @@ The function callback will receive the selected item, or Null.
 /> 
 ```  
 
-### onSettingChange
+### onSettingsChange
 
 - Type: `Function`
 - Required: No
+- Args:
+  - `id` - the `id` property of the setting that changed (eg: `newTab`).
+  - `value` - the `checked` value of the control.
+  - `settings` - the current settings object.
+
+Called when any of the settings supplied as `currentSettings` are changed/toggled. May be used to attribute a Block's `attributes` with the current state of the control.
+
+```
+<LinkControl
+	currentSettings={ [
+		{
+			id: 'opensInNewTab',
+			title: __( 'Open in New Tab' ),
+			checked: attributes.opensInNewTab, // Block attributes persist control state
+		},
+	] }
+	onSettingsChange={ ( setting, value ) => setAttributes( { [ setting ]: value } ) }
+/>
+```
+
