@@ -29,6 +29,7 @@ const tokenizer = /<(\/)?(\w+)\s*(\/)?>/g;
  * This receives the value for a map element which consists of an element and
  * it's props and returns a element creator function.
  *
+ * @private
  * @param {string} name	              The name of the element (which becomes the
  *                                    key).
  * @param {Array}  [ element, props ] The first item in the array is expected to
@@ -51,6 +52,7 @@ const elementCreator = ( name, [ element, props = {} ] ) => ( children ) => {
  * element when it is created. This allows for collecting nested elements in
  * the string before creating the parent.
  *
+ * @private
  * @param   {Function}  creator An element creator that will be invoked for
  *                              actually creating the react element with the
  *                              provided children.
@@ -70,6 +72,7 @@ function Component( creator, children = [] ) {
  * This encapsulates information about the current iteration state for adding to
  * the stack
  *
+ * @private
  * @param {Component} component
  * @param {number}    tokenStart
  * @param {number}    tokenLength
@@ -149,9 +152,10 @@ const createInterpolateElement = ( interpolatedString, conversionMap ) => {
  *
  * A map is considered valid if it's an object and does not have length.
  *
- * @param conversionMap {Object}  The map being validated.
+ * @private
+ * @param {Object} conversionMap  The map being validated.
  *
- * @return boolean  True means the map is valid.
+ * @return {boolean}  True means the map is valid.
  */
 const isValidConversionMap = ( conversionMap ) => {
 	return typeof conversionMap === 'object' &&
@@ -161,6 +165,7 @@ const isValidConversionMap = ( conversionMap ) => {
 /**
  * This is the iterator over the matches in the string.
  *
+ * @private
  * @param {Object} conversionMap The conversion map for the string.
  *
  * @return {boolean} true for continuing to iterate, false for finished.
@@ -256,6 +261,8 @@ function proceed( conversionMap ) {
 
 /**
  * Grabs the next token match in the string and returns it's details.
+ *
+ * @private
  *
  * @return  {Array}  An array of details for the token matched.
  */
