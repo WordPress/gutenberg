@@ -9,6 +9,7 @@ import classnames from 'classnames';
 import {
 	useMemo,
 	useEffect,
+	Fragment,
 } from '@wordpress/element';
 import {
 	InnerBlocks,
@@ -64,8 +65,6 @@ function NavigationMenu( {
 		} );
 	}, [ backgroundColor.class, textColor.class ] );
 
-	const emptyNavItemBlock = createBlock( 'core/navigation-menu-item' );
-
 	// Builds menu items from default Pages
 	const defaultPagesMenuItems = useMemo(
 		() => {
@@ -118,6 +117,7 @@ function NavigationMenu( {
 	};
 
 	const handleCreateEmpty = () => {
+		const emptyNavItemBlock = createBlock( 'core/navigation-menu-item' );
 		updateNavItemBlocks( [ emptyNavItemBlock ] );
 	};
 
@@ -125,32 +125,52 @@ function NavigationMenu( {
 		updateNavItemBlocks( defaultPagesMenuItems );
 	};
 
+	// If we don't have existing items or the User hasn't
+	// indicated they want to automatically add top level Pages
+	// then show the Placeholder
 	if ( ! hasExistingNavItems ) {
 		return (
-			<Placeholder
-				className="wp-block-navigation-menu-placeholder"
-				icon="menu"
-				label={ __( 'Navigation Menu' ) }
-				instructions={ __( 'Create a Menu from all existing pages, or create an empty one.' ) }
-			>
-				<div className="wp-block-navigation-menu-placeholder__buttons">
-					<Button
-						isDefault
-						className="wp-block-navigation-menu-placeholder__button"
-						onClick={ handleCreateFromExistingPages }
+			<Fragment>
+				<InspectorControls>
+					<PanelBody
+						title={ __( 'Menu Settings' ) }
 					>
-						{ __( 'Create from all top pages' ) }
-					</Button>
+						<CheckboxControl
+							value={ attributes.automaticallyAdd }
+							onChange={ ( automaticallyAdd ) => {
+								setAttributes( { automaticallyAdd } );
+								handleCreateFromExistingPages();
+							} }
+							label={ __( 'Automatically add new pages' ) }
+							help={ __( 'Automatically add new top level pages to this menu.' ) }
+						/>
+					</PanelBody>
+				</InspectorControls>
+				<Placeholder
+					className="wp-block-navigation-menu-placeholder"
+					icon="menu"
+					label={ __( 'Navigation Menu' ) }
+					instructions={ __( 'Create a Menu from all existing pages, or create an empty one.' ) }
+				>
+					<div className="wp-block-navigation-menu-placeholder__buttons">
+						<Button
+							isDefault
+							className="wp-block-navigation-menu-placeholder__button"
+							onClick={ handleCreateFromExistingPages }
+						>
+							{ __( 'Create from all top pages' ) }
+						</Button>
 
-					<Button
-						isLink
-						className="wp-block-navigation-menu-placeholder__button"
-						onClick={ handleCreateEmpty }
-					>
-						{ __( 'Create empty' ) }
-					</Button>
-				</div>
-			</Placeholder>
+						<Button
+							isLink
+							className="wp-block-navigation-menu-placeholder__button"
+							onClick={ handleCreateEmpty }
+						>
+							{ __( 'Create empty' ) }
+						</Button>
+					</div>
+				</Placeholder>
+			</Fragment>
 		);
 	}
 
@@ -172,7 +192,7 @@ function NavigationMenu( {
 
 	// UI State: rendered Block UI
 	return (
-		<>
+		<Fragment>
 			<BlockControls>
 				<Toolbar>
 					{ navigatorToolbarButton }
@@ -212,7 +232,7 @@ function NavigationMenu( {
 				/>
 
 			</div>
-		</>
+		</Fragment>
 	);
 }
 
