@@ -230,7 +230,7 @@ export default compose( [
 		const { getBlocks } = registry.select( 'core/block-editor' );
 
 		const innerBlocks = getBlocks( clientId );
-		const hasExistingNavItems = innerBlocks && innerBlocks.filter( ( block ) => block.name === 'core/navigation-menu-item' ).length;
+		const hasExistingNavItems = !! innerBlocks.length;
 
 		const { getEntityRecords } = select( 'core' );
 		const { isResolving } = select( 'core/data' );
@@ -240,7 +240,7 @@ export default compose( [
 			orderby: 'id',
 		};
 		return {
-			hasExistingNavItems: !! hasExistingNavItems,
+			hasExistingNavItems,
 			pages: getEntityRecords( 'postType', 'page', filterDefaultPages ),
 			isRequesting: isResolving( 'core', 'getEntityRecords', [ 'postType', 'page', filterDefaultPages ] ),
 		};
