@@ -15,26 +15,9 @@
 function build_css_colors( $attributes ) {
 	// CSS classes.
 	$colors = array(
-		'bg_css_classes'     => '',
-		'bg_inline_styles'   => '',
 		'text_css_classes'   => '',
 		'text_inline_styles' => '',
 	);
-
-	// Background color.
-	// Background color - has text color.
-	if ( array_key_exists( 'backgroundColor', $attributes ) ) {
-		$colors['bg_css_classes'] .= ' has-background-color';
-	}
-
-	// Background color - add custom CSS class.
-	if ( array_key_exists( 'backgroundColorCSSClass', $attributes ) ) {
-		$colors['bg_css_classes'] .= " {$attributes['backgroundColorCSSClass']}";
-
-	} elseif ( array_key_exists( 'customBackgroundColor', $attributes ) ) {
-		// Background color - or add inline `background-color` style.
-		$colors['bg_inline_styles'] = ' style="background-color: ' . esc_attr( $attributes['customBackgroundColor'] ) . ';"';
-	}
 
 	// Text color.
 	// Text color - has text color.
@@ -50,7 +33,6 @@ function build_css_colors( $attributes ) {
 		$colors['text_inline_styles'] = ' style="color: ' . esc_attr( $attributes['customTextColor'] ) . ';"';
 	}
 
-	$colors['bg_css_classes']   = esc_attr( trim( $colors['bg_css_classes'] ) );
 	$colors['text_css_classes'] = esc_attr( trim( $colors['text_css_classes'] ) );
 
 	return $colors;
@@ -67,9 +49,6 @@ function build_css_colors( $attributes ) {
 function render_block_navigation_menu( $attributes, $content, $block ) {
 	// Inline computed colors.
 	$comp_inline_styles = '';
-	if ( array_key_exists( 'backgroundColorValue', $attributes ) ) {
-		$comp_inline_styles .= ' background-color: ' . esc_attr( $attributes['backgroundColorValue'] ) . ';';
-	}
 
 	if ( array_key_exists( 'textColorValue', $attributes ) ) {
 		$comp_inline_styles .= ' color: ' . esc_attr( $attributes['textColorValue'] ) . ';';
@@ -97,7 +76,7 @@ function build_navigation_menu_html( $block, $colors ) {
 	$html = '';
 	foreach ( (array) $block['innerBlocks'] as $key => $menu_item ) {
 
-		$html .= '<li class="wp-block-navigation-menu-item ' . $colors['bg_css_classes'] . '"' . $colors['bg_inline_styles'] . '>' .
+		$html .= '<li class="wp-block-navigation-menu-item">' .
 			'<a
 				class="wp-block-navigation-menu-item__link ' . $colors['text_css_classes'] . '"
 				' . $colors['text_inline_styles'];
