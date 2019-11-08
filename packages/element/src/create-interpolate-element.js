@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { createElement, Fragment } from 'react';
+import { createElement, cloneElement, Fragment, isValidElement } from 'react';
 
 let indoc,
 	offset,
@@ -32,17 +32,14 @@ const tokenizer = /<(\/)?(\w+)\s*(\/)?>/g;
  * @private
  * @param {string} name	              The name of the element (which becomes the
  *                                    key).
- * @param {Array}  [ element, props ] The first item in the array is expected to
- *                                    be a string or a react component. The
- *                                    second item is expected to be either
- *                                    undefined or an object.
+ * @param {WPElement}  element        An element created via
+ *                                    wp.element.createElement (or JSX).
  */
-const elementCreator = ( name, [ element, props = {} ] ) => ( children ) => {
-	if ( typeof element !== 'string' && typeof element !== 'function' ) {
+const elementCreator = ( name, element ) => ( children ) => {
+	if ( ! isValidElement( element ) ) {
 		throw new Error( `Not a valid element (${ element })` );
 	}
-	props.key = name;
-	return createElement( element, props, children );
+	return cloneElement( element, { key: name }, children );
 };
 
 /**

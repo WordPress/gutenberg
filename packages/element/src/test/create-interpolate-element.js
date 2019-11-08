@@ -21,7 +21,7 @@ describe( 'createInterpolateElement', () => {
 		expect(
 			createInterpolateElement(
 				testString,
-				{ someValue: [ 'someValue' ] }
+				{ someValue: <em /> }
 			)
 		).toBe( testString );
 	} );
@@ -40,7 +40,7 @@ describe( 'createInterpolateElement', () => {
 		expect(
 			createInterpolateElement(
 				testString,
-				{ someValue: [ 'someValue' ] }
+				{ someValue: <strong /> }
 			)
 		).toBe( testString );
 	} );
@@ -49,7 +49,7 @@ describe( 'createInterpolateElement', () => {
 		expect(
 			createInterpolateElement(
 				testString,
-				{ 'spaced token': [ 'a' ] }
+				{ 'spaced token': <em /> }
 			)
 		).toBe( testString );
 	} );
@@ -58,7 +58,7 @@ describe( 'createInterpolateElement', () => {
 		expect(
 			createInterpolateElement(
 				testString,
-				{ em: [ 'em' ] }
+				{ em: <em /> }
 			)
 		).toBe( 'This is a string' );
 	} );
@@ -80,7 +80,8 @@ describe( 'createInterpolateElement', () => {
 		const component = createInterpolateElement(
 			testString,
 			{
-				a: [ 'a', { href: 'https://github.com', className: 'some_class' } ],
+				// eslint-disable-next-line jsx-a11y/anchor-has-content
+				a: <a href={ 'https://github.com' } className={ 'some_class' } />,
 			}
 		);
 		expect(
@@ -114,8 +115,8 @@ describe( 'createInterpolateElement', () => {
 		expect( JSON.stringify( createInterpolateElement(
 			testString,
 			{
-				a: [ 'a' ],
-				em: [ 'em' ],
+				a: createElement( 'a' ),
+				em: <em />,
 			}
 		) ) ).toEqual( JSON.stringify( expectedElement ) );
 	} );
@@ -140,7 +141,7 @@ describe( 'createInterpolateElement', () => {
 		expect( JSON.stringify( createInterpolateElement(
 			testString,
 			{
-				TestComponent: [ TestComponent ],
+				TestComponent: <TestComponent />,
 			}
 		) ) ).toEqual( JSON.stringify( expectedElement ) );
 	} );
@@ -163,13 +164,13 @@ describe( 'createInterpolateElement', () => {
 		expect( JSON.stringify( createInterpolateElement(
 			testString,
 			{
-				TestComponent: [ TestComponent ],
+				TestComponent: <TestComponent />,
 			}
 		) ) ).toEqual( JSON.stringify( expectedElement ) );
 	} );
 	it( 'throws an error with an invalid element in the conversion map', () => {
 		const test = () => (
-			createInterpolateElement( 'This is a <invalid /> string', { invalid: [ 10, {} ] } )
+			createInterpolateElement( 'This is a <invalid /> string', { invalid: 10 } )
 		);
 		expect( test ).toThrow( /Not a valid element/ );
 	} );
@@ -209,15 +210,15 @@ describe( 'createInterpolateElement', () => {
 		expect( JSON.stringify( createInterpolateElement(
 			testString,
 			{
-				TestComponent: [ TestComponent ],
-				em1: [ 'em' ],
-				a1: [ 'a' ],
+				TestComponent: <TestComponent />,
+				em1: <em />,
+				a1: createElement( 'a' ),
 			}
 		) ) ).toEqual( JSON.stringify( expectedElement ) );
 	} );
 	it( 'renders expected components across renders for keys in use', () => {
 		const TestComponent = ( { switchKey } ) => {
-			const elementConfig = switchKey ? { item: [ 'em' ] } : { item: [ 'strong' ] };
+			const elementConfig = switchKey ? { item: <em /> } : { item: <strong /> };
 			return <div>
 				{ createInterpolateElement( 'This is a <item>string!</item>', elementConfig ) }
 			</div>;
