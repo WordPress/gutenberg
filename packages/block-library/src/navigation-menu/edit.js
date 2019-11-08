@@ -61,10 +61,9 @@ function NavigationMenu( {
 	useEffect( () => {
 		// Set/Unset colors CSS classes.
 		setAttributes( {
-			backgroundColorCSSClass: backgroundColor.class ? backgroundColor.class : null,
 			textColorCSSClass: textColor.class ? textColor.class : null,
 		} );
-	}, [ backgroundColor.class, textColor.class ] );
+	}, [ textColor.class ] );
 
 	// Builds menu items from default Pages
 	const defaultPagesMenuItems = useMemo(
