@@ -33,7 +33,6 @@ import {
 	MEDIA_TYPE_IMAGE,
 	BlockControls,
 	InspectorControls,
-	BlockAlignmentToolbar,
 } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { isURL } from '@wordpress/url';
@@ -90,7 +89,6 @@ export class ImageEdit extends React.Component {
 		this.onImagePressed = this.onImagePressed.bind( this );
 		this.onClearSettings = this.onClearSettings.bind( this );
 		this.onFocusCaption = this.onFocusCaption.bind( this );
-		this.updateAlignment = this.updateAlignment.bind( this );
 	}
 
 	componentDidMount() {
@@ -189,10 +187,6 @@ export class ImageEdit extends React.Component {
 		this.props.setAttributes( { url, width: undefined, height: undefined } );
 	}
 
-	updateAlignment( nextAlign ) {
-		this.props.setAttributes( { align: nextAlign } );
-	}
-
 	onSetLinkDestination( href ) {
 		this.props.setAttributes( {
 			linkDestination: LINK_DESTINATION_CUSTOM,
@@ -262,11 +256,6 @@ export class ImageEdit extends React.Component {
 						onClick={ open }
 					/>
 				</Toolbar>
-				<BlockAlignmentToolbar
-					value={ align }
-					onChange={ this.updateAlignment }
-					isCollapsed={ false }
-				/>
 			</BlockControls>
 		);
 
