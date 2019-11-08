@@ -10,14 +10,13 @@ import { get } from 'lodash';
 import { __, _x } from '@wordpress/i18n';
 import {
 	BlockControls,
-	__experimentalBlockPatternPicker,
 	BlockVerticalAlignmentToolbar,
 	InnerBlocks,
 	InspectorControls,
 	PanelColorSettings,
 	withColors,
 } from '@wordpress/block-editor';
-import { Component, useState } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import {
 	PanelBody,
 	TextareaControl,
@@ -26,7 +25,6 @@ import {
 	ExternalLink,
 	FocalPointPicker,
 } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -43,7 +41,7 @@ const TEMPLATE = [
 const WIDTH_CONSTRAINT_PERCENTAGE = 15;
 const applyWidthConstraints = ( width ) => Math.max( WIDTH_CONSTRAINT_PERCENTAGE, Math.min( width, 100 - WIDTH_CONSTRAINT_PERCENTAGE ) );
 
-class MediaTextEdit extends Component {
+class MediaTextContainer extends Component {
 	constructor() {
 		super( ...arguments );
 
@@ -247,46 +245,4 @@ class MediaTextEdit extends Component {
 	}
 }
 
-const MediaTextEditWithColors = withColors( 'backgroundColor' )( MediaTextEdit );
-
-const MediaTextEditPatternPicker = ( props ) => {
-	const { name } = props;
-	const { blockType, defaultPattern, patterns } = useSelect( ( select ) => {
-		const {
-			__experimentalGetBlockPatterns,
-			getBlockType,
-			__experimentalGetDefaultBlockPattern,
-		} = select( 'core/blocks' );
-
-		return {
-			blockType: getBlockType( name ),
-			defaultPattern: __experimentalGetDefaultBlockPattern( name ),
-			patterns: __experimentalGetBlockPatterns( name ),
-		};
-	}, [ name ] );
-
-	const [ pattern, setPattern ] = useState( null );
-
-	if ( pattern ) {
-		return (
-			<MediaTextEditWithColors { ...props } />
-		);
-	}
-
-	return (
-		<__experimentalBlockPatternPicker
-			icon={ get( blockType, [ 'icon', 'src' ] ) }
-			label={ get( blockType, [ 'title' ] ) }
-			patterns={ patterns }
-			onSelect={ ( nextPattern = defaultPattern ) => {
-				if ( nextPattern.attributes ) {
-					props.setAttributes( nextPattern.attributes );
-				}
-				setPattern( nextPattern );
-			} }
-			allowSkip
-		/>
-	);
-};
-
-export default MediaTextEditPatternPicker;
+export default withColors( 'backgroundColor' )( MediaTextContainer );
