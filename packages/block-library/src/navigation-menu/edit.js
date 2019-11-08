@@ -218,8 +218,8 @@ function NavigationMenu( {
 
 export default compose( [
 	withColors( { backgroundColor: 'background-color', textColor: 'color' } ),
-	withSelect( ( select, { clientId }, registry ) => {
-		const innerBlocks = registry.select( 'core/block-editor' ).getBlocks( clientId );
+	withSelect( ( select, { clientId } ) => {
+		const innerBlocks = select( 'core/block-editor' ).getBlocks( clientId );
 		const hasExistingNavItems = !! innerBlocks.length;
 
 		const filterDefaultPages = {
