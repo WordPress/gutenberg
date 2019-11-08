@@ -9,7 +9,6 @@ import classnames from 'classnames';
 import {
 	useMemo,
 	useEffect,
-	useState,
 } from '@wordpress/element';
 import {
 	InnerBlocks,
@@ -17,7 +16,9 @@ import {
 	BlockControls,
 	withColors,
 } from '@wordpress/block-editor';
-import { withSelect } from '@wordpress/data';
+
+import { createBlock } from '@wordpress/blocks';
+import { withSelect, withDispatch } from '@wordpress/data';
 import {
 	CheckboxControl,
 	PanelBody,
@@ -48,12 +49,11 @@ function NavigationMenu( {
 	setTextColor,
 	setAttributes,
 	hasExistingNavItems,
+	updateNavItemBlocks,
 } ) {
 	//
 	// HOOKS
 	//
-	const [ initialPlaceholder, setInitialPlaceholder ] = useState( true );
-	const [ blocksTemplate, setBlocksTemplate ] = useState( null );
 	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator( clientId );
 
 	useEffect( () => {
@@ -64,6 +64,8 @@ function NavigationMenu( {
 		} );
 	}, [ backgroundColor.class, textColor.class ] );
 
+	const emptyNavItemBlock = createBlock( 'core/navigation-menu-item' );
+
 	// Builds menu items from default Pages
 	const defaultPagesMenuItems = useMemo(
 		() => {
@@ -72,14 +74,16 @@ function NavigationMenu( {
 			}
 
 			return pages.map( ( { title, type, link: url, id } ) => (
-				[ 'core/navigation-menu-item', {
-					label: title.rendered,
-					title: title.raw,
-					type,
-					id,
-					url,
-					opensInNewTab: false,
-				} ]
+				createBlock( 'core/navigation-menu-item',
+					{
+						type,
+						id,
+						url,
+						label: title.rendered,
+						title: title.raw,
+						opensInNewTab: false,
+					}
+				)
 			) );
 		},
 		[ pages ]
@@ -114,17 +118,14 @@ function NavigationMenu( {
 	};
 
 	const handleCreateEmpty = () => {
-		setBlocksTemplate( null );
-		setInitialPlaceholder( false );
+		updateNavItemBlocks( [ emptyNavItemBlock ] );
 	};
 
-	const handleCreateFromExisting = () => {
-		setBlocksTemplate( defaultPagesMenuItems );
-		setInitialPlaceholder( false );
+	const handleCreateFromExistingPages = () => {
+		updateNavItemBlocks( defaultPagesMenuItems );
 	};
 
-	// UI State: initial placeholder
-	if ( ! hasExistingNavItems && initialPlaceholder ) {
+	if ( ! hasExistingNavItems ) {
 		return (
 			<Placeholder
 				className="wp-block-navigation-menu-placeholder"
@@ -136,7 +137,7 @@ function NavigationMenu( {
 					<Button
 						isDefault
 						className="wp-block-navigation-menu-placeholder__button"
-						onClick={ handleCreateFromExisting }
+						onClick={ handleCreateFromExistingPages }
 					>
 						{ __( 'Create from all top pages' ) }
 					</Button>
@@ -203,14 +204,13 @@ function NavigationMenu( {
 
 			<div className={ navigationMenuClasses } style={ navigationMenuInlineStyles }>
 				{ isRequesting && <><Spinner /> { __( 'Loading Navigation…' ) } </> }
-				{ pages &&
-					<InnerBlocks
-						template={ blocksTemplate ? blocksTemplate : null }
-						allowedBlocks={ [ 'core/navigation-menu-item' ] }
-						templateInsertUpdatesSelection={ false }
-						__experimentalMoverDirection={ 'horizontal' }
-					/>
-				}
+
+				<InnerBlocks
+					allowedBlocks={ [ 'core/navigation-menu-item' ] }
+					templateInsertUpdatesSelection={ false }
+					__experimentalMoverDirection={ 'horizontal' }
+				/>
+
 			</div>
 		</>
 	);
@@ -231,6 +231,13 @@ export default compose( [
 			hasExistingNavItems,
 			pages: select( 'core' ).getEntityRecords( 'postType', 'page', filterDefaultPages ),
 			isRequesting: select( 'core/data' ).isResolving( 'core', 'getEntityRecords', [ 'postType', 'page', filterDefaultPages ] ),
+		};
+	} ),
+	withDispatch( ( dispatch, { clientId } ) => {
+		return {
+			updateNavItemBlocks( blocks ) {
+				dispatch( 'core/block-editor' ).replaceInnerBlocks( clientId, blocks );
+			},
 		};
 	} ),
 ] )( NavigationMenu );
