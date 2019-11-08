@@ -59,7 +59,8 @@
 			{ "docs/contributors/scripts.md": [] },
 			{ "docs/contributors/managing-packages.md": [] },
 			{ "docs/contributors/release.md": [] },
-			{ "docs/contributors/localizing.md": [] }
+			{ "docs/contributors/localizing.md": [] },
+			{ "docs/contributors/native-mobile.md": [] }
 		] },
 		{ "docs/contributors/document.md": [
 			{ "docs/contributors/copy-guide.md": [] }
