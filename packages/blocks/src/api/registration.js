@@ -25,12 +25,19 @@ import { isValidIcon, normalizeIconObject } from './utils';
 import { DEPRECATED_ENTRY_KEYS } from './constants';
 
 /**
+ * An icon type definition. One of a Dashicon slug, an element,
+ * or a component.
+ *
+ * @typedef {(string|WPElement|WPComponent)} WPIcon
+ *
+ * @see https://developer.wordpress.org/resource/dashicons/
+ */
+
+/**
  * Render behavior of a block type icon; one of a Dashicon slug, an element,
  * or a component.
  *
- * @typedef {(string|WPElement|WPComponent)} WPBlockTypeIconRender
- *
- * @see https://developer.wordpress.org/resource/dashicons/
+ * @typedef {WPIcon} WPBlockTypeIconRender
  */
 
 /**
@@ -58,25 +65,40 @@ import { DEPRECATED_ENTRY_KEYS } from './constants';
  */
 
 /**
+ * An object describing a pattern defined for the block type.
+ *
+ * @typedef {Object} WPBlockPattern
+ *
+ * @property {string}  name          The unique and machine-readable name.
+ * @property {string}  label         A human-readable label.
+ * @property {WPIcon}  [icon]        An icon helping to visualize the pattern.
+ * @property {boolean} [isDefault]   Indicates whether the current pattern is the default one.
+ *                                   Defaults to `false`.
+ * @property {Object}  [attributes]  Values which override block attributes.
+ * @property {Array[]} [innerBlocks] Initial configuration of nested blocks.
+ */
+
+/**
  * Defined behavior of a block type.
  *
  * @typedef {Object} WPBlock
  *
- * @property {string}          name         Block type's namespaced name.
- * @property {string}          title        Human-readable block type label.
- * @property {string}          category     Block type category classification,
- *                                          used in search interfaces to arrange
- *                                          block types by category.
- * @property {WPBlockTypeIcon} [icon]       Block type icon.
- * @property {string[]}        [keywords]   Additional keywords to produce block
- *                                          type as result in search interfaces.
- * @property {Object}          [attributes] Block type attributes.
- * @property {WPComponent}     [save]       Optional component describing
- *                                          serialized markup structure of a
- *                                          block type.
- * @property {WPComponent}     edit         Component rendering an element to
- *                                          manipulate the attributes of a block
- *                                          in the context of an editor.
+ * @property {string}           name         Block type's namespaced name.
+ * @property {string}           title        Human-readable block type label.
+ * @property {string}           category     Block type category classification,
+ *                                           used in search interfaces to arrange
+ *                                           block types by category.
+ * @property {WPBlockTypeIcon}  [icon]       Block type icon.
+ * @property {string[]}         [keywords]   Additional keywords to produce block
+ *                                           type as result in search interfaces.
+ * @property {Object}           [attributes] Block type attributes.
+ * @property {WPComponent}      [save]       Optional component describing
+ *                                           serialized markup structure of a
+ *                                           block type.
+ * @property {WPComponent}      edit         Component rendering an element to
+ *                                           manipulate the attributes of a block
+ *                                           in the context of an editor.
+ * @property {WPBlockPattern[]} [patterns]   The list of block patterns.
  */
 
 /**
@@ -435,4 +457,24 @@ export const registerBlockStyle = ( blockName, styleVariation ) => {
  */
 export const unregisterBlockStyle = ( blockName, styleVariationName ) => {
 	dispatch( 'core/blocks' ).removeBlockStyles( blockName, styleVariationName );
+};
+
+/**
+ * Registers a new block pattern for the given block.
+ *
+ * @param {string}         blockName Name of the block (example: “core/columns”).
+ * @param {WPBlockPattern} pattern   Object describing a block pattern.
+ */
+export const __experimentalRegisterBlockPattern = ( blockName, pattern ) => {
+	dispatch( 'core/blocks' ).__experimentalAddBlockPatterns( blockName, pattern );
+};
+
+/**
+ * Unregisters a block pattern defined for the given block.
+ *
+ * @param {string} blockName   Name of the block (example: “core/columns”).
+ * @param {string} patternName Name of the pattern defined for the block.
+ */
+export const __experimentalUnregisterBlockPattern = ( blockName, patternName ) => {
+	dispatch( 'core/blocks' ).__experimentalRemoveBlockPatterns( blockName, patternName );
 };
