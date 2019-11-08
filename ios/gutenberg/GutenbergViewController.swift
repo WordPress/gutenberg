@@ -68,8 +68,8 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
         print("↳ HTML: \(html)")
     }
 
-    func gutenbergDidRequestMedia(from source: MediaPickerSource, filter: [MediaFilter]?, allowMultipleSelection: Bool, with callback: @escaping MediaPickerDidPickMediaCallback) {
-        guard let currentFilter = filter?.first else {
+    func gutenbergDidRequestMedia(from source: Gutenberg.MediaSource, filter: [Gutenberg.MediaType], allowMultipleSelection: Bool, with callback: @escaping MediaPickerDidPickMediaCallback) {
+        guard let currentFilter = filter.first else {
             return
         }
         switch source {
@@ -99,6 +99,7 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
         case .deviceCamera:
             print("Gutenberg did request a device media picker, opening the camera picker")
             pickAndUpload(from: .camera, filter: currentFilter, callback: callback)
+        default: break
         }
     }
 
@@ -107,7 +108,7 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
         callback(MediaInfo(id: id, url: url.absoluteString, type: "image"))
     }
 
-    func pickAndUpload(from source: UIImagePickerController.SourceType, filter: MediaFilter, callback: @escaping MediaPickerDidPickMediaCallback) {
+    func pickAndUpload(from source: UIImagePickerController.SourceType, filter: Gutenberg.MediaType, callback: @escaping MediaPickerDidPickMediaCallback) {
         mediaPickCoordinator = MediaPickCoordinator(presenter: self, filter: filter, callback: { (url) in
             guard let url = url, let mediaID = self.mediaUploadCoordinator.upload(url: url) else {
                 callback([MediaInfo(id: nil, url: nil, type: nil)])
