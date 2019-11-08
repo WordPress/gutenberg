@@ -154,17 +154,3 @@ $color-control-label-height: 20px;
 		}
 	}
 }
-
-// Initial Placeholder
-
-.wp-block-navigation-menu-placeholder__buttons {
-	padding-bottom: $grid-size-large;
-}
-
-.wp-block-navigation-menu-placeholder__button {
-	margin-right: 14px;
-
-	:last-child {
-		margin-bottom: 0;
-	}
-}
