@@ -154,15 +154,7 @@ function register_block_core_navigation_menu() {
 					'default' => false,
 				),
 
-				'backgroundColor'         => array(
-					'type' => 'string',
-				),
-
 				'textColor'               => array(
-					'type' => 'string',
-				),
-
-				'backgroundColorValue'    => array(
 					'type' => 'string',
 				),
 
@@ -170,15 +162,7 @@ function register_block_core_navigation_menu() {
 					'type' => 'string',
 				),
 
-				'customBackgroundColor'   => array(
-					'type' => 'string',
-				),
-
 				'customTextColor'         => array(
-					'type' => 'string',
-				),
-
-				'backgroundColorCSSClass' => array(
 					'type' => 'string',
 				),
 
