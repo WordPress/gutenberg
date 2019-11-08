@@ -188,7 +188,7 @@
 		"publish:prod": "npm run build:packages && lerna publish",
 		"test": "npm run lint && npm run test-unit",
 		"test-e2e": "wp-scripts test-e2e --config packages/e2e-tests/jest.config.js",
-		"test-e2e:watch": "npm run test-e2e:local -- --watch",
+		"test-e2e:watch": "npm run test-e2e -- --watch",
 		"test-performance": "wp-scripts test-e2e --config packages/e2e-tests/jest.performance.config.js",
 		"test-php": "npm run lint-php && npm run test-unit-php",
 		"test-unit": "wp-scripts test-unit-js --config test/unit/jest.config.js",
