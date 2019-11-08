@@ -125,19 +125,23 @@ export class PostPreviewButton extends Component {
 					onRequestClose={ this.closePreviewWindow }
 					className="editor-block-preview"
 				>
-					<button onClick={ this.setDesktopPreview }>Desktop</button>
-					<button onClick={ this.setTabletPreview }>Tablet</button>
-					<button onClick={ this.setMobilePreview }>Mobile</button>
-					<iframe
-						title="tehPreview"
-						src={ previewLink }
-						style={
-							{
-								width: this.state.previewSize.width,
-								height: this.state.previewSize.height,
+					<div className="editor-block-preview__controls">
+						<button onClick={ this.setDesktopPreview }>Desktop</button>
+						<button onClick={ this.setTabletPreview }>Tablet</button>
+						<button onClick={ this.setMobilePreview }>Mobile</button>
+					</div>
+					<div className="editor-block-preview__frame">
+						<iframe
+							title="tehPreview"
+							src={ previewLink }
+							style={
+								{
+									width: this.state.previewSize.width,
+									height: this.state.previewSize.height,
+								}
 							}
-						}
-					></iframe>
+						></iframe>
+					</div>
 				</Modal>
 				}
 			</>

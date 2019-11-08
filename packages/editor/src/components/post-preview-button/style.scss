@@ -1,0 +1,18 @@
+.editor-block-preview {
+	@include break-small() {
+		top: 5%;
+		right: 5%;
+		bottom: 5%;
+		left: 5%;
+		transform: none;
+	}
+}
+
+.editor-block-preview__controls {
+	margin: $grid-size-large 0;
+}
+
+.editor-block-preview__frame {
+	display: flex;
+	justify-content: center;
+}
