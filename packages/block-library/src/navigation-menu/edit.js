@@ -130,11 +130,8 @@ function NavigationMenu( {
 				className="wp-block-navigation-menu-placeholder"
 				icon="menu"
 				label={ __( 'Navigation Menu' ) }
+				instructions={ __( 'Create a Menu from all existing pages, or create an empty one.' ) }
 			>
-				<p className="wp-block-navigation-menu-placeholder__instructions">
-					{ __( 'Create a Menu from all existing pages, or create an empty one.' ) }
-				</p>
-
 				<div className="wp-block-navigation-menu-placeholder__buttons">
 					<Button
 						isDefault
