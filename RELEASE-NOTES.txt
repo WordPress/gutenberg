@@ -1,3 +1,7 @@
+1.16.1
+------
+*[iOS] Fix tap on links bug that reappear on iOS 13.2
+
 1.16.0
 ------
 * [Android] Add support for pexels images
