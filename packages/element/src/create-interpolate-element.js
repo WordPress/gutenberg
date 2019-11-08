@@ -117,9 +117,9 @@ function Frame(
  *
  * ```js
  * {
- *     span: ['span'],
- *     a: ['a', { href: 'https://github.com' }],
- *     CustomComponentB: [ CustomComponentB ],
+ *     span: <span />,
+ *     a: <a href={ 'https://github.com' } />,
+ *     CustomComponentB: <CustomComponent />,
  * }
  * ```
  *
