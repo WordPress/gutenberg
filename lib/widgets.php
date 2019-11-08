@@ -118,21 +118,22 @@ function gutenberg_get_legacy_widget_settings() {
 	if ( ! empty( $wp_widget_factory ) ) {
 		foreach ( $wp_widget_factory->widgets as $class => $widget_obj ) {
 			$available_legacy_widgets[ $class ] = array(
-				'name'             => html_entity_decode( $widget_obj->name ),
+				'name'              => html_entity_decode( $widget_obj->name ),
 				// wp_widget_description is not being used because its input parameter is a Widget Id.
 				// Widgets id's reference to a specific widget instance.
 				// Here we are iterating on all the available widget classes even if no widget instance exists for them.
-				'description'      => isset( $widget_obj->widget_options['description'] ) ?
+				'description'       => isset( $widget_obj->widget_options['description'] ) ?
 					html_entity_decode( $widget_obj->widget_options['description'] ) :
 					null,
-				'isCallbackWidget' => false,
-				'isHidden'         => in_array( $class, $core_widgets, true ),
+				'isReferenceWidget' => false,
+				'isHidden'          => in_array( $class, $core_widgets, true ),
 			);
 		}
 	}
 	global $wp_registered_widgets;
 	if ( ! empty( $wp_registered_widgets ) ) {
 		foreach ( $wp_registered_widgets as $widget_id => $widget_obj ) {
+
 			$block_widget_start = 'blocks-widget-';
 			if (
 				( is_array( $widget_obj['callback'] ) &&
@@ -144,9 +145,9 @@ function gutenberg_get_legacy_widget_settings() {
 				continue;
 			}
 			$available_legacy_widgets[ $widget_id ] = array(
-				'name'             => html_entity_decode( $widget_obj['name'] ),
-				'description'      => html_entity_decode( wp_widget_description( $widget_id ) ),
-				'isCallbackWidget' => true,
+				'name'              => html_entity_decode( $widget_obj['name'] ),
+				'description'       => html_entity_decode( wp_widget_description( $widget_id ) ),
+				'isReferenceWidget' => true,
 			);
 		}
 	}
