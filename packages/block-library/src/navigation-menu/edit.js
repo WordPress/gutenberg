@@ -157,16 +157,16 @@ function NavigationMenu( {
 
 				<div className="wp-block-navigation-menu-placeholder__buttons">
 					<Button
+						isDefault
 						className="wp-block-navigation-menu-placeholder__button"
-						isDefault={ true }
 						onClick={ handleCreateFromExisting }
 					>
 						{ __( 'Create from all top pages' ) }
 					</Button>
 
 					<Button
+						isLink
 						className="wp-block-navigation-menu-placeholder__button"
-						isLink={ true }
 						onClick={ handleCreateEmpty }
 					>
 						{ __( 'Create empty' ) }
@@ -225,9 +225,7 @@ function NavigationMenu( {
 
 export default compose( [
 	withColors( { backgroundColor: 'background-color', textColor: 'color' } ),
-	withSelect( ( select, ownProps, registry ) => {
-		const { clientId } = ownProps;
-
+	withSelect( ( select, { clientId }, registry ) => {
 		const innerBlocks = registry.select( 'core/block-editor' ).getBlocks( clientId );
 		const hasExistingNavItems = !! innerBlocks.length;
 
