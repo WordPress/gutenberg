@@ -605,9 +605,10 @@ class RCTAztecView: Aztec.TextView {
     }
 
     // MARK: - Selection
-    private func correctSelectionAfterZWSP() {
+    private func correctSelectionAfterLastEmptyLine() {
         guard selectedTextRange?.start == endOfDocument,
-            text == String(.zeroWidthSpace) else {
+            let characterToReplaceLastEmptyLine = storage.htmlConverter.characterToReplaceLastEmptyLine,
+            text == String(characterToReplaceLastEmptyLine) else {
             return
         }
         selectedTextRange = self.textRange(from: beginningOfDocument, to: beginningOfDocument)
@@ -622,12 +623,12 @@ extension RCTAztecView: UITextViewDelegate {
             return
         }
 
-        correctSelectionAfterZWSP()
+        correctSelectionAfterLastEmptyLine()
         propagateSelectionChanges()
     }
 
     func textViewDidBeginEditing(_ textView: UITextView) {
-        correctSelectionAfterZWSP()
+        correctSelectionAfterLastEmptyLine()
     }
 
     func textViewDidChange(_ textView: UITextView) {
