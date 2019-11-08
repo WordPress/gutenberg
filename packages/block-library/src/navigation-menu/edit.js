@@ -45,9 +45,7 @@ function NavigationMenu( {
 	pages,
 	isRequestingPages,
 	hasResolvedPages,
-	backgroundColor,
 	textColor,
-	setBackgroundColor,
 	setTextColor,
 	setAttributes,
 	hasExistingNavItems,
@@ -161,7 +159,6 @@ function NavigationMenu( {
 			color: textColor.color,
 			borderColor: textColor.color,
 		} ),
-		...( backgroundColor && { backgroundColor: backgroundColor.color } ),
 	};
 
 	// Build ClassNames
@@ -224,7 +221,7 @@ function NavigationMenu( {
 }
 
 export default compose( [
-	withColors( { backgroundColor: 'background-color', textColor: 'color' } ),
+	withColors( { textColor: 'color' } ),
 	withSelect( ( select, { clientId } ) => {
 		const innerBlocks = select( 'core/block-editor' ).getBlocks( clientId );
 		const hasExistingNavItems = !! innerBlocks.length;
