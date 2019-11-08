@@ -54,7 +54,7 @@ class LegacyWidgetEditDomManager extends Component {
 	}
 
 	render() {
-		const { id, idBase, widgetNumber, form, identifier } = this.props;
+		const { id, idBase, widgetNumber, form, isReferenceWidget } = this.props;
 		return (
 			<div className="widget open" ref={ this.containerRef }>
 				<div className="widget-inside">
@@ -63,7 +63,7 @@ class LegacyWidgetEditDomManager extends Component {
 						method="post"
 						onBlur={ () => {
 							if ( this.shouldTriggerInstanceUpdate() ) {
-								if ( identifier ) {
+								if ( isReferenceWidget ) {
 									if ( this.containerRef.current ) {
 										window.wpWidgets.save( window.jQuery( this.containerRef.current ) );
 									}
@@ -79,11 +79,12 @@ class LegacyWidgetEditDomManager extends Component {
 							className="widget-content"
 							dangerouslySetInnerHTML={ { __html: form } }
 						/>
-						<input type="hidden" name="widget-id" className="widget-id" value={ id } />
-						<input ref={ this.idBaseInputRef } type="hidden" name="id_base" className="id_base" value={ idBase } />
-						<input ref={ this.widgetNumberInputRef } type="hidden" name="widget_number" className="widget_number" value={ widgetNumber } />
-						<input type="hidden" name="multi_number" className="multi_number" value="" />
-						<input type="hidden" name="add_new" className="add_new" value="" />
+						{ isReferenceWidget && ( <><input type="hidden" name="widget-id" className="widget-id" value={ id } />
+							<input ref={ this.idBaseInputRef } type="hidden" name="id_base" className="id_base" value={ idBase } />
+							<input ref={ this.widgetNumberInputRef } type="hidden" name="widget_number" className="widget_number" value={ widgetNumber } />
+							<input type="hidden" name="multi_number" className="multi_number" value="" />
+							<input type="hidden" name="add_new" className="add_new" value="" />
+						</> ) }
 					</form>
 				</div>
 			</div>
@@ -131,21 +132,22 @@ class LegacyWidgetEditDomManager extends Component {
 			const form = this.formRef.current;
 			const formData = new window.FormData( form );
 			const updatedInstance = {};
-			for ( const key of formData.keys() ) {
+			for ( const rawKey of formData.keys() ) {
 				// This fields are added to the form because the widget JavaScript code may use this values.
 				// They are not relevant for the update mechanism.
 				if ( includes(
 					[ 'widget-id', 'id_base', 'widget_number', 'multi_number', 'add_new' ],
-					key,
+					rawKey,
 				) ) {
 					continue;
 				}
-
-				const value = formData.getAll( key );
+				const matches = rawKey.match( /[^\[]*\[[-\d]*\]\[([^\]]*)\]/ );
+				const keyParsed = matches && matches[ 1 ] ? matches[ 1 ] : rawKey;
+				const value = formData.getAll( rawKey );
 				if ( value.length > 1 ) {
-					updatedInstance[ key ] = value;
+					updatedInstance[ keyParsed ] = value;
 				} else {
-					updatedInstance[ key ] = value[ 0 ];
+					updatedInstance[ keyParsed ] = value[ 0 ];
 				}
 			}
 			return updatedInstance;

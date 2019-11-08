@@ -15,14 +15,15 @@ import { withInstanceId } from '@wordpress/compose';
  */
 import LegacyWidgetEditDomManager from './dom-manager';
 
+const { XMLHttpRequest, FormData } = window;
+
 class LegacyWidgetEditHandler extends Component {
 	constructor() {
 		super( ...arguments );
 		this.state = {
 			form: null,
-			idBase: null,
-			widgetNumber: null,
 		};
+		this.widgetNonce = null;
 		this.instanceUpdating = null;
 		this.onInstanceChange = this.onInstanceChange.bind( this );
 		this.requestWidgetUpdater = this.requestWidgetUpdater.bind( this );
@@ -30,12 +31,16 @@ class LegacyWidgetEditHandler extends Component {
 
 	componentDidMount() {
 		this.isStillMounted = true;
+		this.trySetNonce();
 		this.requestWidgetUpdater( undefined, ( response ) => {
 			this.props.onInstanceChange( null, !! response.form );
 		} );
 	}
 
 	componentDidUpdate( prevProps ) {
+		if ( ! this.widgetNonce ) {
+			this.trySetNonce();
+		}
 		if (
 			prevProps.instance !== this.props.instance &&
 			this.instanceUpdating !== this.props.instance
@@ -54,8 +59,8 @@ class LegacyWidgetEditHandler extends Component {
 	}
 
 	render() {
-		const { instanceId, identifier, instance, isSelected, widgetName } = this.props;
-		const { id, idBase, form, widgetNumber } = this.state;
+		const { instanceId, widgetId, widgetNumber, idBase, instance, isSelected, widgetName } = this.props;
+		const { form } = this.state;
 
 		if ( ! form ) {
 			return null;
@@ -91,22 +96,37 @@ class LegacyWidgetEditHandler extends Component {
 				>
 
 					<LegacyWidgetEditDomManager
+						isReferenceWidget={ !! widgetId }
 						ref={ ( ref ) => {
 							this.widgetEditDomManagerRef = ref;
 						} }
 						onInstanceChange={ this.onInstanceChange }
 						widgetNumber={ widgetNumber ? widgetNumber : instanceId * -1 }
-						id={ id }
+						id={ widgetId }
 						idBase={ idBase }
 						form={ form }
-						identifier={ identifier }
+						widgetId={ widgetId }
 					/>
 				</div>
 			</>
 		);
 	}
 
+	trySetNonce() {
+		const element = document.getElementById( '_wpnonce_widgets' );
+		if ( element && element.value ) {
+			this.widgetNonce = element.value;
+		}
+	}
+
 	onInstanceChange( instanceChanges ) {
+		const { widgetId } = this.props;
+		if ( widgetId ) {
+			// For reference widgets there is no need to query an endpoint,
+			// the widget is already saved with ajax.
+			this.props.onInstanceChange( instanceChanges, true );
+			return;
+		}
 		this.requestWidgetUpdater( instanceChanges, ( response ) => {
 			this.instanceUpdating = response.instance;
 			this.props.onInstanceChange( response.instance, !! response.form );
@@ -114,39 +134,60 @@ class LegacyWidgetEditHandler extends Component {
 	}
 
 	requestWidgetUpdater( instanceChanges, callback ) {
-		const { identifier, instanceId, instance, widgetClass } = this.props;
-		if ( ! identifier && ! widgetClass ) {
+		const { widgetId, idBase, instance, widgetClass } = this.props;
+		const { isStillMounted } = this;
+		if ( ! widgetId && ! widgetClass ) {
 			return;
 		}
 
-		apiFetch( {
-			path: `/__experimental/widget-forms/`,
-			data: {
-				identifier,
-				instance,
-				// use negative ids to make sure the id does not exist on the database.
-				id_to_use: instanceId * -1,
-				widget_class: widgetClass,
-				instance_changes: instanceChanges,
-			},
-			method: 'POST',
-		} ).then(
-			( response ) => {
-				if ( this.isStillMounted ) {
-					this.setState( {
-						form: response.form,
-						idBase: response.id_base,
-						id: response.id,
-						widgetNumber: response.number,
-					} );
+		// If we are in the presence of a reference widget, do a save ajax request
+		// with empty changes so we retrieve the widget edit form.
+		if ( widgetId ) {
+			const httpRequest = new XMLHttpRequest();
+			const formData = new FormData();
+			formData.append( 'action', 'save-widget' );
+			formData.append( 'id_base', idBase );
+			formData.append( 'widget-id', widgetId );
+			formData.append( 'widget-width', '250' );
+			formData.append( 'widget-height', '200' );
+			formData.append( 'savewidgets', this.widgetNonce );
+			httpRequest.open( 'POST', window.ajaxurl );
+			const self = this;
+			httpRequest.addEventListener( 'load', function() {
+				if ( isStillMounted ) {
+					const form = httpRequest.responseText;
+					self.setState( { form } );
 					if ( callback ) {
-						callback( response );
+						callback( { form } );
 					}
 				}
-			}
-		);
+			} );
+			httpRequest.send( formData );
+			return;
+		}
+
+		if ( widgetClass ) {
+			apiFetch( {
+				path: `/__experimental/widget-forms/${ widgetClass }/`,
+				data: {
+					instance,
+					instance_changes: instanceChanges,
+				},
+				method: 'POST',
+			} ).then(
+				( response ) => {
+					if ( isStillMounted ) {
+						this.setState( {
+							form: response.form,
+						} );
+						if ( callback ) {
+							callback( response );
+						}
+					}
+				}
+			);
+		}
 	}
 }
 
 export default withInstanceId( LegacyWidgetEditHandler );
-

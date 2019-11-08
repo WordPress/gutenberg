@@ -48,22 +48,22 @@ class LegacyWidgetEdit extends Component {
 			setAttributes,
 		} = this.props;
 		const { isPreview, hasEditForm } = this.state;
-		const { identifier, widgetClass } = attributes;
+		const { widgetId, widgetClass } = attributes;
 		const widgetObject =
-			( identifier && availableLegacyWidgets[ identifier ] ) ||
+			( widgetId && availableLegacyWidgets[ widgetId ] ) ||
 			( widgetClass && availableLegacyWidgets[ widgetClass ] );
-		if ( ! identifier && ! widgetClass ) {
+		if ( ! widgetId && ! widgetClass ) {
 			return (
 				<LegacyWidgetPlaceholder
 					availableLegacyWidgets={ availableLegacyWidgets }
-					currentWidget={ identifier }
+					currentWidget={ widgetId }
 					hasPermissionsToManageWidgets={ hasPermissionsToManageWidgets }
 					onChangeWidget={ ( newWidget ) => {
-						const { isCallbackWidget } = availableLegacyWidgets[ newWidget ];
+						const { isReferenceWidget } = availableLegacyWidgets[ newWidget ];
 						setAttributes( {
 							instance: {},
-							identifier: isCallbackWidget ? newWidget : undefined,
-							widgetClass: isCallbackWidget ? undefined : newWidget,
+							widgetId: isReferenceWidget ? newWidget : undefined,
+							widgetClass: isReferenceWidget ? undefined : newWidget,
 						} );
 					} }
 				/>
@@ -120,7 +120,9 @@ class LegacyWidgetEdit extends Component {
 					<LegacyWidgetEditHandler
 						isSelected={ isSelected }
 						isVisible={ ! isPreview }
-						identifier={ attributes.identifier }
+						widgetId={ attributes.widgetId }
+						idBase={ attributes.idBase || attributes.widgetId }
+						widgetNumber={ attributes.widgetNumber }
 						widgetName={ get( widgetObject, [ 'name' ] ) }
 						widgetClass={ attributes.widgetClass }
 						instance={ attributes.instance }
@@ -149,7 +151,7 @@ class LegacyWidgetEdit extends Component {
 		this.switchToEdit();
 		this.props.setAttributes( {
 			instance: {},
-			identifier: undefined,
+			widgetId: undefined,
 			widgetClass: undefined,
 		} );
 		this.setState( {

@@ -22,16 +22,17 @@ function render_widget_by_id( $id ) {
 	}
 	$params = array_merge(
 		array(
-			array(
-				'before_widget' => '',
-				'after_widget'  => '',
-				'class'         => '',
-				'before_title'  => '',
-				'after_title'   => '',
-			),
-			array(
-				'widget_id'   => $id,
-				'widget_name' => $wp_registered_widgets[ $id ]['name'],
+			array_merge(
+				array(
+					'before_widget' => '<div class="widget %s">',
+					'after_widget'  => '</div>',
+					'before_title'  => '<h2 class="widgettitle">',
+					'after_title'   => '</h2>',
+				),
+				array(
+					'widget_id'   => $id,
+					'widget_name' => $wp_registered_widgets[ $id ]['name'],
+				)
 			),
 		),
 		(array) $wp_registered_widgets[ $id ]['params']
@@ -49,10 +50,8 @@ function render_widget_by_id( $id ) {
 	$classname_                 = ltrim( $classname_, '_' );
 	$params[0]['before_widget'] = sprintf( $params[0]['before_widget'], $id, $classname_ );
 
-	$params = apply_filters( 'dynamic_sidebar_params', $params );
-
+	$params   = apply_filters( 'dynamic_sidebar_params', $params );
 	$callback = $wp_registered_widgets[ $id ]['callback'];
-
 	do_action( 'dynamic_sidebar', $wp_registered_widgets[ $id ] );
 
 	if ( is_callable( $callback ) ) {
@@ -73,28 +72,26 @@ function render_widget_by_id( $id ) {
  * @return string Returns the post content with the legacy widget added.
  */
 function render_block_legacy_widget( $attributes ) {
-	$identifier   = null;
+	$widget_id    = null;
 	$widget_class = null;
-	if ( isset( $attributes['identifier'] ) ) {
-		$identifier = $attributes['identifier'];
+	if ( isset( $attributes['widgetId'] ) ) {
+		$widget_id = $attributes['widgetId'];
 	}
 	if ( isset( $attributes['widgetClass'] ) ) {
 		$widget_class = $attributes['widgetClass'];
 	}
 
-	if ( ! $widget_class ) {
-		if ( ! $identifier ) {
-			return '';
-		}
-		return render_widget_by_id( $attributes['identifier'] );
+	if ( $widget_id ) {
+		return render_widget_by_id( $widget_id );
 	}
+	if ( ! $widget_class ) {
+		return '';
+	}
+
 	ob_start();
 	$instance = null;
 	if ( isset( $attributes['instance'] ) ) {
 		$instance = $attributes['instance'];
-	}
-	if ( $identifier ) {
-		$instance = Experimental_WP_Widget_Blocks_Manager::get_sidebar_widget_instance( array(), $identifier );
 	}
 	the_widget( $widget_class, $instance );
 	return ob_get_clean();
@@ -108,13 +105,19 @@ function register_block_core_legacy_widget() {
 		'core/legacy-widget',
 		array(
 			'attributes'      => array(
-				'widgetClass' => array(
+				'widgetClass'  => array(
 					'type' => 'string',
 				),
-				'identifier'  => array(
+				'widgetId'     => array(
 					'type' => 'string',
 				),
-				'instance'    => array(
+				'idBase'       => array(
+					'type' => 'string',
+				),
+				'widgetNumber' => array(
+					'type' => 'number',
+				),
+				'instance'     => array(
 					'type' => 'object',
 				),
 			),
