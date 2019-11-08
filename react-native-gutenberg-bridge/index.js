@@ -68,7 +68,7 @@ export function subscribeMediaAppend( callback ) {
  * @param {Function}       callback  RN Callback function to be called with the selected media objects.
  */
 export function requestMediaPicker( source, filter, multiple, callback ) {
-	return RNReactNativeGutenbergBridge.requestMediaPickFrom( source, filter, multiple, callback );
+	RNReactNativeGutenbergBridge.requestMediaPickFrom( source, filter, multiple, callback );
 }
 
 export function requestMediaImport( url, callback ) {
