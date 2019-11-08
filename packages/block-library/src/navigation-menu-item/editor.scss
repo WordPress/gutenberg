@@ -64,21 +64,6 @@
 }
 
 .wp-block-navigation-menu-item {
-	&:not(.is-editing) {
-		font-family: inherit;
-		font-size: inherit;
-	}
-
-	&.is-editing .components-text-control__input {
-		width: inherit;
-		background-color: inherit;
-		color: inherit;
-
-		&:focus {
-			color: inherit;
-		}
-	}
-
 	&.is-editing,
 	&.is-selected {
 		min-width: 20px;
@@ -87,8 +72,6 @@
 	.block-editor-rich-text__editable.is-selected:not(.keep-placeholder-on-focus):not(:focus) [data-rich-text-placeholder]::after {
 		display: inherit;
 		min-width: 30px;
-		font-family: inherit;
-		font-size: inherit;
 	}
 }
 
