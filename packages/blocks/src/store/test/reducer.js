@@ -7,6 +7,12 @@ import deepFreeze from 'deep-freeze';
  * Internal dependencies
  */
 import {
+	__experimentalAddBlockPatterns,
+	addBlockTypes,
+	__experimentalRemoveBlockPatterns,
+} from '../actions';
+import {
+	blockPatterns,
 	blockStyles,
 	blockTypes,
 	categories,
@@ -131,6 +137,108 @@ describe( 'blockStyles', () => {
 		expect( state ).toEqual( {
 			'core/image': [
 				{ name: 'lightbox' },
+			],
+		} );
+	} );
+} );
+
+describe( 'blockPatterns', () => {
+	const blockName = 'block/name';
+
+	const blockPatternName = 'pattern-name';
+	const blockPattern = {
+		name: blockPatternName,
+		label: 'My pattern',
+	};
+
+	const secondBlockPatternName = 'second-pattern-name';
+	const secondBlockPattern = {
+		name: secondBlockPatternName,
+		label: 'My Second Pattern',
+	};
+
+	it( 'should return an empty object as default state', () => {
+		const state = blockPatterns( undefined, {} );
+
+		expect( state ).toEqual( {} );
+	} );
+
+	it( 'should add a new block pattern when no pattern register', () => {
+		const initialState = deepFreeze( {} );
+
+		const state = blockPatterns(
+			initialState,
+			__experimentalAddBlockPatterns( blockName, blockPattern )
+		);
+
+		expect( state ).toEqual( {
+			[ blockName ]: [
+				blockPattern,
+			],
+		} );
+	} );
+
+	it( 'should add another pattern when a block pattern already present for the block', () => {
+		const initialState = deepFreeze( {
+			[ blockName ]: [
+				blockPattern,
+			],
+		} );
+
+		const state = blockPatterns(
+			initialState,
+			__experimentalAddBlockPatterns( blockName, secondBlockPattern ),
+		);
+
+		expect( state ).toEqual( {
+			[ blockName ]: [
+				blockPattern,
+				secondBlockPattern,
+			],
+		} );
+	} );
+
+	it( 'should prepend block patterns added when adding a block', () => {
+		const initialState = deepFreeze( {
+			[ blockName ]: [
+				secondBlockPattern,
+			],
+		} );
+
+		const state = blockPatterns(
+			initialState,
+			addBlockTypes( {
+				name: blockName,
+				patterns: [
+					blockPattern,
+				],
+			} )
+		);
+
+		expect( state ).toEqual( {
+			[ blockName ]: [
+				blockPattern,
+				secondBlockPattern,
+			],
+		} );
+	} );
+
+	it( 'should remove a block pattern', () => {
+		const initialState = deepFreeze( {
+			[ blockName ]: [
+				blockPattern,
+				secondBlockPattern,
+			],
+		} );
+
+		const state = blockPatterns(
+			initialState,
+			__experimentalRemoveBlockPatterns( blockName, blockPatternName )
+		);
+
+		expect( state ).toEqual( {
+			[ blockName ]: [
+				secondBlockPattern,
 			],
 		} );
 	} );
