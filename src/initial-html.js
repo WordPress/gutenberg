@@ -9,7 +9,7 @@ export default `
 <!-- /wp:image -->
 
 <!-- wp:media-text -->
-<div class="wp-block-media-text is-stacked-on-mobile"><figure class="wp-block-media-text__media"></figure><div class="wp-block-media-text__content"><!-- wp:paragraph {"placeholder":"Content…","fontSize":"large"} -->
+<div class="wp-block-media-text is-stacked-on-mobile"><figure class="wp-block-media-text__media"></figure><div class="wp-block-media-text__content"><!-- wp:paragraph -->
 <p class="has-large-font-size"></p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:media-text -->
