@@ -8,7 +8,6 @@ import deepFreeze from 'deep-freeze';
  */
 import {
 	__experimentalAddBlockPatterns,
-	addBlockTypes,
 	__experimentalRemoveBlockPatterns,
 } from '../actions';
 import {
@@ -95,31 +94,6 @@ describe( 'blockStyles', () => {
 		} );
 	} );
 
-	it( 'should add block styles when adding a block', () => {
-		const original = deepFreeze( {
-			'core/image': [
-				{ name: 'fancy' },
-			],
-		} );
-
-		const state = blockStyles( original, {
-			type: 'ADD_BLOCK_TYPES',
-			blockTypes: [ {
-				name: 'core/image',
-				styles: [
-					{ name: 'original' },
-				],
-			} ],
-		} );
-
-		expect( state ).toEqual( {
-			'core/image': [
-				{ name: 'original' },
-				{ name: 'fancy' },
-			],
-		} );
-	} );
-
 	it( 'should remove block styles', () => {
 		const original = deepFreeze( {
 			'core/image': [
@@ -163,7 +137,7 @@ describe( 'blockPatterns', () => {
 		expect( state ).toEqual( {} );
 	} );
 
-	it( 'should add a new block pattern when no pattern register', () => {
+	it( 'should add a new block pattern when no pattern registered', () => {
 		const initialState = deepFreeze( {} );
 
 		const state = blockPatterns(
@@ -188,31 +162,6 @@ describe( 'blockPatterns', () => {
 		const state = blockPatterns(
 			initialState,
 			__experimentalAddBlockPatterns( blockName, secondBlockPattern ),
-		);
-
-		expect( state ).toEqual( {
-			[ blockName ]: [
-				blockPattern,
-				secondBlockPattern,
-			],
-		} );
-	} );
-
-	it( 'should prepend block patterns added when adding a block', () => {
-		const initialState = deepFreeze( {
-			[ blockName ]: [
-				secondBlockPattern,
-			],
-		} );
-
-		const state = blockPatterns(
-			initialState,
-			addBlockTypes( {
-				name: blockName,
-				patterns: [
-					blockPattern,
-				],
-			} )
 		);
 
 		expect( state ).toEqual( {

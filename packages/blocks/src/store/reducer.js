@@ -8,7 +8,6 @@ import {
 	isEmpty,
 	keyBy,
 	map,
-	mapValues,
 	omit,
 	uniqBy,
 } from 'lodash';
@@ -66,16 +65,6 @@ export function blockTypes( state = {}, action ) {
  */
 export function blockStyles( state = {}, action ) {
 	switch ( action.type ) {
-		case 'ADD_BLOCK_TYPES':
-			return {
-				...state,
-				...mapValues( keyBy( action.blockTypes, 'name' ), ( blockType ) => {
-					return uniqBy( [
-						...get( blockType, [ 'styles' ], [] ),
-						...get( state, [ blockType.name ], [] ),
-					], ( style ) => style.name );
-				} ),
-			};
 		case 'ADD_BLOCK_STYLES':
 			return {
 				...state,
@@ -107,16 +96,6 @@ export function blockStyles( state = {}, action ) {
  */
 export function blockPatterns( state = {}, action ) {
 	switch ( action.type ) {
-		case 'ADD_BLOCK_TYPES':
-			return {
-				...state,
-				...mapValues( keyBy( action.blockTypes, 'name' ), ( blockType ) => {
-					return uniqBy( [
-						...get( blockType, [ 'patterns' ], [] ),
-						...get( state, [ blockType.name ], [] ),
-					], ( style ) => style.name );
-				} ),
-			};
 		case 'ADD_BLOCK_PATTERNS':
 			return {
 				...state,

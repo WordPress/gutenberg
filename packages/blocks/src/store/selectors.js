@@ -2,7 +2,7 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import { filter, get, includes, map, some, flow, deburr } from 'lodash';
+import { compact, concat, filter, get, includes, map, some, flow, deburr } from 'lodash';
 
 /**
  * Given a block name or block type object, returns the corresponding
@@ -47,27 +47,53 @@ export function getBlockType( state, name ) {
 
 /**
  * Returns block styles by block name.
+ * It combines styles registered with the block together with
+ * the block styles registered separately.
  *
  * @param {Object} state Data state.
- * @param {string} name  Block type name.
+ * @param {string} blockName  Block type name.
  *
  * @return {Array?} Block Styles.
  */
-export function getBlockStyles( state, name ) {
-	return state.blockStyles[ name ];
-}
+export const getBlockStyles = createSelector(
+	( state, blockName ) => {
+		const blockType = getBlockType( state, blockName );
+
+		if ( ! blockType ) {
+			return;
+		}
+
+		return compact(
+			concat( blockType.styles, state.blockStyles[ blockName ] )
+		);
+	},
+	( state ) => [ state.blockTypes, state.blockStyles ]
+);
 
 /**
  * Returns block patterns by block name.
+ * It combines patterns registered with the block together with
+ * the block patterns registered separately.
  *
  * @param {Object} state      Data state.
  * @param {string} blockName  Block type name.
  *
  * @return {(WPBlockPattern[]|void)} Block patterns.
  */
-export function __experimentalGetBlockPatterns( state, blockName ) {
-	return state.blockPatterns[ blockName ];
-}
+export const __experimentalGetBlockPatterns = createSelector(
+	( state, blockName ) => {
+		const blockType = getBlockType( state, blockName );
+
+		if ( ! blockType ) {
+			return;
+		}
+
+		return compact(
+			concat( blockType.patterns, state.blockPatterns[ blockName ] )
+		);
+	},
+	( state ) => [ state.blockTypes, state.blockPatterns ]
+);
 
 /**
  * Returns all the available categories.

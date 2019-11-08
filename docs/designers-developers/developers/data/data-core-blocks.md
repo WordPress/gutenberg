@@ -9,11 +9,13 @@ Namespace: `core/blocks`.
 <a name="getBlockStyles" href="#getBlockStyles">#</a> **getBlockStyles**
 
 Returns block styles by block name.
+It combines styles registered with the block together with
+the block styles registered separately.
 
 _Parameters_
 
 -   _state_ `Object`: Data state.
--   _name_ `string`: Block type name.
+-   _blockName_ `string`: Block type name.
 
 _Returns_
 
