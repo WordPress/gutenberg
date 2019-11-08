@@ -218,7 +218,7 @@ class BottomSheetCell extends Component {
 									<View style={ platformStyles.labelIconSeparator } />
 								</View>
 							) }
-							<Text numberOfLines={ 1 } style={ [ defaultLabelStyle, labelStyle ] }>
+							<Text style={ [ defaultLabelStyle, labelStyle ] }>
 								{ label }
 							</Text>
 						</View>
