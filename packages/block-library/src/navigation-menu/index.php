@@ -90,7 +90,12 @@ function render_block_navigation_menu( $attributes, $content, $block ) {
 		$css_classes .= ' ' .  $colors['text_css_classes'];
 	}
 
-	return "<nav class='{$css_classes}' {$comp_inline_styles}>" .
+	return sprintf(
+		'<nav class="%1$s" %2$s>%3$s</nav>',
+		esc_attr( $css_classes ),
+		$comp_inline_styles, // This should really be split out into attribute name and value to work like class above.
+		build_navigation_menu_html( $block )
+	);
 		build_navigation_menu_html( $block ) .
 	'</nav>';
 }
