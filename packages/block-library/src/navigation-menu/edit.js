@@ -50,18 +50,16 @@ function NavigationMenu( {
 } ) {
 	const navMenuRef = useRef();
 	const [ hasScrollX, setHasScrollX ] = useState( false );
+	const clientWidth = navMenuRef.current ? navMenuRef.current.clientWidth : 0;
+	const scrollWidth = navMenuRef.current ? navMenuRef.current.scrollWidth : 0;
 
 	useLayoutEffect( () => {
-		if ( navMenuRef && navMenuRef.current ) {
-			const navMenu = navMenuRef.current;
-
-			if ( navMenu.scrollWidth > navMenu.clientWidth ) {
-				setHasScrollX( true );
-			} else {
-				setHasScrollX( false );
-			}
+		if ( scrollWidth > clientWidth ) {
+			setHasScrollX( true );
+		} else {
+			setHasScrollX( false );
 		}
-	} );
+	}, [ clientWidth, scrollWidth ] );
 
 	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator( clientId );
 	const defaultMenuItems = useMemo(
