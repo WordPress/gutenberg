@@ -51,8 +51,8 @@ if ( require.main === module ) {
 		const potFileName = process.argv[ 2 ];
 		const destination = process.argv[ 3 ];
 		const potFileContent = fs.readFileSync( potFileName );
-		const swiftOutput = po2Android( potFileContent, process.argv[ 3 ] );
-		fs.writeFileSync( destination, swiftOutput );
+		const xmlOutput = po2Android( potFileContent, process.argv[ 3 ] );
+		fs.writeFileSync( destination, xmlOutput );
 	} else {
 		let inputData = '';
 		process.stdin.on( 'readable', function() {
