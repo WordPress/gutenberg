@@ -72,7 +72,7 @@ class BlockListBlock extends Component {
 				clientId={ this.props.clientId }
 				isInnerBlock={ this.props.isInnerBlock }
 				isDashed={ this.props.isDashed }
-				isChildOfSameRootBlook={ this.props.isChildOfSameRootBlook }
+				isChildOfSameRootBlock={ this.props.isChildOfSameRootBlock }
 				isGroupParent={ this.props.isGroupParent }
 			/>
 		);
@@ -115,10 +115,10 @@ class BlockListBlock extends Component {
 		const {
 			isInnerBlock,
 			isNestedInnerBlock,
-			isGroupType,
+			hasInnerBlock,
 		} = this.props;
 
-		if ( isNestedInnerBlock || isGroupType ) {
+		if ( isNestedInnerBlock || hasInnerBlock ) {
 			return styles.nestedFocusedBlock;
 		}
 
@@ -135,14 +135,14 @@ class BlockListBlock extends Component {
 			isDimmed,
 			isNestedInnerBlock,
 			isInnerBlock,
-			isChildOfSameRootBlook,
-			isGroupType,
+			isChildOfSameRootBlock,
+			hasInnerBlock,
 			parentId,
 			isMediaTextParent,
 			getStylesFromColorScheme,
 		} = this.props;
 
-		if ( ! isDashed && isInnerBlock && ! isChildOfSameRootBlook ) {
+		if ( ! isDashed && isInnerBlock && ! isChildOfSameRootBlock ) {
 			return styles.blockContainerInner;
 		}
 
@@ -159,7 +159,7 @@ class BlockListBlock extends Component {
 			return [ ...defaultStyle, styles.nestedBlockContainerInner ];
 		}
 
-		if ( isGroupType && ( ! parentId || isChildOfSameRootBlook ) ) {
+		if ( hasInnerBlock && ( ! parentId || isChildOfSameRootBlock ) ) {
 			return [ ...defaultStyle, styles.horizontalMarginNone ];
 		}
 
@@ -182,7 +182,7 @@ class BlockListBlock extends Component {
 			isDimmed,
 			isInnerBlock,
 			isNestedInnerBlock,
-			isGroupType,
+			hasInnerBlock,
 			isMediaTextParent,
 		} = this.props;
 
@@ -213,9 +213,9 @@ class BlockListBlock extends Component {
 					<View style={ [
 						styles.blockHolder,
 						borderStyle,
-						isSelected && ! isMediaTextParent && ( isGroupType || isInnerBlock || isNestedInnerBlock ) && styles.outlineBorderMargin,
+						isSelected && ! isMediaTextParent && ( hasInnerBlock || isInnerBlock || isNestedInnerBlock ) && styles.outlineBorderMargin,
 						isDashed && ! isMediaTextParent && styles.dashedBorderMargin,
-						isGroupType && styles.verticalPaddingNone,
+						hasInnerBlock && styles.verticalPaddingNone,
 						{ borderColor },
 					]
 					}>
@@ -226,7 +226,7 @@ class BlockListBlock extends Component {
 								! isSelected && this.applyUnSelectedStyle(),
 								isSelected && this.applySelectedStyle(),
 								isDimmed && styles.blockContainerDimmed,
-								isGroupType && styles.verticalPaddingNone,
+								hasInnerBlock && styles.verticalPaddingNone,
 							] }
 						>
 							{ isValid && this.getBlockForType() }
@@ -253,7 +253,6 @@ export default compose( [
 			getSelectedBlockClientId,
 			getBlock,
 			getBlockRootClientId,
-			getSelectedBlock,
 			getFirstToSelectBlock,
 		} = select( 'core/block-editor' );
 		const order = getBlockIndex( clientId, rootClientId );
@@ -266,12 +265,10 @@ export default compose( [
 		const icon = blockType.icon;
 		const getAccessibilityLabelExtra = blockType.__experimentalGetAccessibilityLabel;
 
-		const selectedBlock = getSelectedBlock();
 		const parentId = getBlockRootClientId( clientId );
 		const parentBlock = getBlock( parentId );
 		const isGroupParent = parentBlock && parentBlock.name === 'core/group';
 
-		const isMediaText = selectedBlock && selectedBlock.name === 'core/media-text';
 		const isMediaTextParent = parentBlock && parentBlock.name === 'core/media-text';
 
 		const rootBlockId = getBlockHierarchyRootClientId( clientId );
@@ -289,9 +286,9 @@ export default compose( [
 		const isDimmed = ! isSelected && ! isRootSiblingsSelected && !! selectedBlockClientId && firstToSelectId === clientId && ! isDashed;
 
 		const isInnerBlock = parentId && firstToSelectId !== parentId;
-		const isChildOfSameRootBlook = rootBlockId === getBlockHierarchyRootClientId( selectedBlockClientId );
+		const isChildOfSameRootBlock = rootBlockId === getBlockHierarchyRootClientId( selectedBlockClientId );
 		const isNestedInnerBlock = ! isDashed && selectedBlockClientId === getBlockRootClientId( firstToSelectId );
-		const isGroupType = blockType.name === 'core/group' || blockType.name === 'core/media-text';
+		const hasInnerBlock = blockType.name === 'core/group' || blockType.name === 'core/media-text';
 		const isParentSelected = parentId === selectedBlockClientId;
 
 		return {
@@ -311,12 +308,11 @@ export default compose( [
 			isDimmed,
 			firstToSelectId,
 			isInnerBlock,
-			isChildOfSameRootBlook,
+			isChildOfSameRootBlock,
 			isNestedInnerBlock,
-			isGroupType,
+			hasInnerBlock,
 			isParentSelected,
 			isMediaTextParent,
-			isMediaText,
 			isGroupParent,
 		};
 	} ),
