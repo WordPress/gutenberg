@@ -93,30 +93,6 @@ function NavigationMenu( {
 	// HANDLERS
 	//
 
-	/**
-	 * Set the color type according to the given values.
-	 * It propagate the color values into the attributes object.
-	 * Both `backgroundColorValue` and `textColorValue` are
-	 * using the inline styles.
-	 *
-	 * @param {Object}  colorsData       Arguments passed by BlockColorsStyleSelector onColorChange.
-	 * @param {string}  colorsData.attr  Color attribute.
-	 * @param {boolean} colorsData.value Color attribute value.
-	 */
-	const setColorType = ( { attr, value } ) => {
-		switch ( attr ) {
-			case 'backgroundColor':
-				setBackgroundColor( value );
-				setAttributes( { backgroundColorValue: value } );
-				break;
-
-			case 'textColor':
-				setTextColor( value );
-				setAttributes( { textColorValue: value } );
-				break;
-		}
-	};
-
 	const handleCreateEmpty = () => {
 		const emptyNavItemBlock = createBlock( 'core/navigation-menu-item' );
 		updateNavItemBlocks( [ emptyNavItemBlock ] );
@@ -209,7 +185,10 @@ function NavigationMenu( {
 				<BlockColorsStyleSelector
 					textColor={ textColor }
 					textColorValue={ attributes.textColorValue }
-					onColorChange={ setColorType }
+					onColorChange={ ( { value } ) => {
+						setTextColor( value );
+						setAttributes( { textColorValue: value } );
+					} }
 				/>
 			</BlockControls>
 			{ navigatorModal }
