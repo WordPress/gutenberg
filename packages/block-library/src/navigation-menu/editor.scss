@@ -4,13 +4,25 @@
 [data-type="core/navigation-menu"] {
 
 	// Allow overflowing items to scroll container
-	.wp-block-navigation-menu {
+	.wp-block-navigation-menu > .wp-block-navigation-menu__scroll-container {
+		// if X is "auto" or "scroll" then spec says Y must also assume this value
+		// therefore the Y overflow is effectively "clipped" meaning that the toolbar
+		// of child Blocks cannot display correctly. We "fix" this below.
+		// Note: as Y will be "auto" anyway we need to hide the scroll bars
+		// created by the artificial spacing.
 		overflow-x: auto;
+		overflow-y: hidden; // required for FF
+
+		// Hack: create artificial overflow space within the element which has its Y
+		// value clipped (see above). This value is equal to that of the positioned
+		// toolbar element (usually `top: -51px`).
+		padding-top: 51px;
+		margin-top: -51px;
 	}
 
-	// Allow more space on RHS when scroll is present
-	.wp-block-navigation-menu.has-scroll-x .block-editor-block-list__layout {
-		padding-right: 25%;
+	[data-type="core/navigation-menu-item"] > .block-editor-block-list__block-edit .block-editor-block-contextual-toolbar {
+		// Hack - see above. Reset top position value.
+		top: 0;
 	}
 
 	// 1. Reset margins on immediate innerblocks container.

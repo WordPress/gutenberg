@@ -48,10 +48,10 @@ function NavigationMenu( {
 	setTextColor,
 	setAttributes,
 } ) {
-	const navMenuRef = useRef();
+	const scrollContainerRef = useRef();
 	const [ hasScrollX, setHasScrollX ] = useState( false );
-	const clientWidth = navMenuRef.current ? navMenuRef.current.clientWidth : 0;
-	const scrollWidth = navMenuRef.current ? navMenuRef.current.scrollWidth : 0;
+	const clientWidth = scrollContainerRef.current ? scrollContainerRef.current.clientWidth : 0;
+	const scrollWidth = scrollContainerRef.current ? scrollContainerRef.current.scrollWidth : 0;
 
 	useLayoutEffect( () => {
 		if ( scrollWidth > clientWidth ) {
@@ -164,16 +164,18 @@ function NavigationMenu( {
 				</PanelBody>
 			</InspectorControls>
 
-			<div ref={ navMenuRef } className={ navigationMenuClasses } style={ navigationMenuInlineStyles }>
-				{ isRequesting && <><Spinner /> { __( 'Loading Navigation…' ) } </> }
-				{ pages &&
+			<div className={ navigationMenuClasses } style={ navigationMenuInlineStyles }>
+				<div ref={ scrollContainerRef } className="wp-block-navigation-menu__scroll-container">
+					{ isRequesting && <><Spinner /> { __( 'Loading Navigation…' ) } </> }
+					{ pages &&
 					<InnerBlocks
 						template={ defaultMenuItems ? defaultMenuItems : null }
 						allowedBlocks={ [ 'core/navigation-menu-item' ] }
 						templateInsertUpdatesSelection={ false }
 						__experimentalMoverDirection={ 'horizontal' }
 					/>
-				}
+					}
+				</div>
 			</div>
 		</>
 	);
