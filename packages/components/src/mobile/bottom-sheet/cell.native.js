@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { TouchableOpacity, Text, View, TextInput, I18nManager, Platform, AccessibilityInfo } from 'react-native';
+import { TouchableOpacity, Text, View, TextInput, I18nManager, AccessibilityInfo } from 'react-native';
 import { isEmpty } from 'lodash';
 
 /**
@@ -79,7 +79,7 @@ class BottomSheetCell extends Component {
 			separatorType,
 			style = {},
 			getStylesFromColorScheme,
-			onReset,
+			customActionButton,
 			...valueProps
 		} = this.props;
 
@@ -89,7 +89,7 @@ class BottomSheetCell extends Component {
 		const cellLabelCenteredStyle = getStylesFromColorScheme( styles.cellLabelCentered, styles.cellTextDark );
 		const cellLabelLeftAlignNoIconStyle = getStylesFromColorScheme( styles.cellLabelLeftAlignNoIcon, styles.cellTextDark );
 		const defaultMissingIconAndValue = leftAlign ? cellLabelLeftAlignNoIconStyle : cellLabelCenteredStyle;
-		const defaultLabelStyle = showValue || icon !== undefined || onReset ? cellLabelStyle : defaultMissingIconAndValue;
+		const defaultLabelStyle = showValue || icon !== undefined || customActionButton ? cellLabelStyle : defaultMissingIconAndValue;
 
 		const drawSeparator = ( separatorType && separatorType !== 'none' ) || separatorStyle === undefined;
 		const drawTopSeparator = drawSeparator && separatorType === 'topFullWidth';
@@ -190,8 +190,8 @@ class BottomSheetCell extends Component {
 
 		const iconStyle = getStylesFromColorScheme( styles.icon, styles.iconDark );
 		const resetButtonStyle = getStylesFromColorScheme( styles.resetButton, styles.resetButtonDark );
-		const resetButtonText = Platform.OS === 'ios' ? __( 'Reset' ) : __( 'RESET' );
 		const containerPointerEvents = this.state.isScreenReaderEnabled && accessible ? 'none' : 'auto';
+		const { title, handler } = customActionButton || {};
 
 		return (
 			<TouchableOpacity
@@ -222,8 +222,8 @@ class BottomSheetCell extends Component {
 								{ label }
 							</Text>
 						</View>
-						{ onReset && <TouchableOpacity onPress={ onReset } accessibilityRole={ 'button' }>
-							<Text style={ resetButtonStyle }>{ resetButtonText }
+						{ customActionButton && <TouchableOpacity onPress={ handler } accessibilityRole={ 'button' }>
+							<Text style={ resetButtonStyle }>{ title }
 							</Text>
 						</TouchableOpacity> }
 					</View>
