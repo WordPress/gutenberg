@@ -18,9 +18,9 @@ let indoc,
  * There are four references extracted using this tokenizer:
  *
  * match: Full match of the tag (i.e. <strong>, </strong>, <br/>)
- * isClosing: If the match has a closing tag (i.e. </)
+ * isClosing: The closing slash, it it exists.
  * name: The name portion of the tag (strong, br) (if )
- * isSelfClosed: Whether the match is for a self-closing tag (i.e. />)
+ * isSelfClosed: The slash on a self closing tag, if it exists.
  *
  * @type RegExp
  */
