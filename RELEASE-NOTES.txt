@@ -1,7 +1,13 @@
 1.17.0
 ------
+* Include block title in Unsupported block's UI
+* Show new-block-indicator when no blocks at all and when at the last block
 * Use existing links in the clipboard to prefill url field when inserting new link.
 * [iOS] Fix issue where the keyboard would not capitalize sentences correctly on some cases.
+
+1.16.1
+------
+* [iOS] Fix tap on links bug that reappear on iOS 13.2
 
 1.16.0
 ------

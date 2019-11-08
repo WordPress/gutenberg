@@ -1,6 +1,6 @@
 {
   "name": "gutenberg-mobile",
-  "version": "1.16.0",
+  "version": "1.16.1",
   "private": true,
   "config": {
     "jsfiles": "./*.js src/*.js src/**/*.js src/**/**/*.js",
@@ -52,9 +52,9 @@
     "wd": "^1.11.1"
   },
   "husky": {
-      "hooks": {
-          "pre-commit": "yarn prettier:check"
-      }
+    "hooks": {
+      "pre-commit": "yarn prettier:check"
+    }
   },
   "scripts": {
     "start": "react-native start",
@@ -68,7 +68,7 @@
     "prebundle": "yarn i18n-cache:force",
     "prebundle:android": "yarn patch-metro-no-file-watch",
     "postbundle:android": "yarn un-patch-metro-no-file-watch",
-    "bundle": "yarn bundle:android && yarn bundle:ios",
+    "bundle": "yarn bundle:android && yarn bundle:ios && yarn clean:pot && yarn genstrings",
     "bundle:android": "mkdir -p bundle/android && react-native bundle --platform android --dev false --entry-file index.js --assets-dest bundle/android --bundle-output bundle/android/App.js --sourcemap-output bundle/android/App.js.map",
     "bundle:ios": "mkdir -p bundle/ios && react-native bundle --platform ios --dev false --entry-file index.js --assets-dest bundle/ios --bundle-output bundle/ios/App.js --sourcemap-output bundle/ios/App.js.map",
     "i18n-cache": "node i18n-cache/index.js",
@@ -77,9 +77,15 @@
     "install:wpcli": "(test -x bin/wp-cli.phar || curl -Ls https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar -o bin/wp-cli.phar && chmod +x bin/wp-cli.phar) && bin/wp-cli.phar --info",
     "prewp": "yarn install:wpcli",
     "wp": "php -d memory_limit=512M bin/wp-cli.phar",
-    "premakepot": "( command -v xgettext >/dev/null 2>&1 || { echo \"ERROR: xgettext is required to parse our Flow code.\" >&2; exit 1; } ) && yarn makepot:gutenberg",
-    "makepot": "bash -c \"xgettext -f <( find . -path './src/*.js' ! -path 'node_modules' -print ) --from-code=UTF-8 -k__ -k_n -k_x -k_nx -x ./gutenberg.pot -o ./gutenberg-mobile.pot\"",
-    "makepot:gutenberg": "yarn clean:gutenberg && yarn wp i18n make-pot ./gutenberg --ignore-domain gutenberg.pot",
+    "makepot:android": "yarn wp i18n make-pot ./gutenberg/packages --include=*.native.js,*.android.js --subtract=./gutenberg.pot --ignore-domain gutenberg-android.pot",
+    "makepot:ios": "yarn wp i18n make-pot ./gutenberg/packages --include=*.native.js,*.ios.js --subtract=./gutenberg.pot --ignore-domain gutenberg-ios.pot",
+    "premakepot:gutenberg": "yarn clean:gutenberg && yarn build:gutenberg",
+    "makepot:gutenberg": "yarn wp i18n make-pot ./gutenberg/build --ignore-domain gutenberg.pot",
+    "postmakepot:gutenberg": "yarn clean:gutenberg",
+    "pregenstrings": "test -f gutenberg.pot || yarn makepot:gutenberg",
+    "genstrings": "yarn genstrings:android && yarn genstrings:ios",
+    "genstrings:android": "yarn makepot:android && ./bin/po2android.js gutenberg-android.pot bundle/android/strings.xml",
+    "genstrings:ios": "yarn makepot:ios && ./bin/po2swift.js gutenberg-ios.pot bundle/ios/GutenbergNativeTranslations.swift",
     "android": "react-native run-android",
     "prewpandroid": "rm -Rf $TMPDIR/gbmobile-wpandroidfakernroot && mkdir $TMPDIR/gbmobile-wpandroidfakernroot && ln -s $(cd \"$(dirname \"../../../\")\"; pwd) $TMPDIR/gbmobile-wpandroidfakernroot/android",
     "wpandroid": "yarn android --root $TMPDIR/gbmobile-wpandroidfakernroot --variant wasabiDebug --appIdSuffix beta --appFolder WordPress --main-activity=ui.WPLaunchActivity",
@@ -110,10 +116,12 @@
     "flow": "flow",
     "prettier": "prettier-eslint --write $npm_package_config_jsfiles $npm_package_config_scssfiles",
     "prettier:check": "prettier-eslint --list-different $npm_package_config_jsfiles $npm_package_config_scssfiles || { echo '\nERROR: `yarn prettier:check` found a formatting problem.\nNo files have been changed. Try running `yarn prettier` to fix any formatting issues.\n'; exit 1; }",
-    "clean": "yarn clean:aztec; yarn cache clean; yarn clean:haste; yarn clean:jest; yarn clean:metro; yarn clean:react; yarn clean:watchman; yarn clean:node;",
+    "build:gutenberg": "cd gutenberg && npm install && npm run build",
+    "clean": "yarn clean:aztec; yarn cache clean; yarn clean:haste; yarn clean:jest; yarn clean:metro; yarn clean:react; yarn clean:watchman; yarn clean:node; yarn clean:pot",
     "clean:runtime": "yarn clean:haste; yarn clean:react; yarn clean:metro; yarn clean:jest; yarn clean:watchman; yarn clean:babel-cache",
     "clean:aztec": "cd react-native-aztec && yarn clean && cd example && yarn clean",
-    "clean:gutenberg": "cd gutenberg && npm run clean:packages && rm -rf build",
+    "clean:gutenberg": "cd gutenberg && npm run clean:packages && rm -rf build && rm -rf node_modules",
+    "clean:pot": "rm -f gutenberg*.pot",
     "clean:haste": "rm -rf /tmp/haste-map-react-native-packager-*",
     "clean:install": "yarn clean; yarn",
     "clean:jest": "yarn jest --clearCache --config jest.config.js; rm -rf $TMPDIR/jest_*",
@@ -135,6 +143,7 @@
     "dom-react": "^2.2.1",
     "domutils": "^1.7.0",
     "fast-average-color": "^4.3.0",
+    "gettext-parser": "^4.0.2",
     "hpq": "^1.2.0",
     "jed": "^1.1.1",
     "jest-serializer-enzyme": "^1.0.0",
