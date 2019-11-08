@@ -12,14 +12,9 @@ function po2Swift( poInput ) {
 		}
 		const encodedValue = JSON.stringify( translation.msgid );
 		const encodedComment = JSON.stringify( translation.comments.extracted || '' );
-		let localizedStringInSwift = `let string${ id } = NSLocalizedString(${ encodedValue }, comment: ${ encodedComment })\n`;
-		if ( translation.msgid_plural ) {
-			const encodedValuePlural = JSON.stringify( translation.msgid_plural );
-			localizedStringInSwift += `let string${ id }Plural = NSLocalizedString(${ encodedValuePlural }, comment: ${ encodedComment })\n`;
-		}
-		return localizedStringInSwift;
+		return `let string${ id } = NSLocalizedString(${ encodedValue }, comment: ${ encodedComment })`;
 	} ).filter( Boolean );
-	return swiftStrings.join( '' );
+	return swiftStrings.join( '\n' ) + '\n';
 }
 
 if ( require.main === module ) {
