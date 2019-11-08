@@ -123,26 +123,6 @@ function NavigationMenu( {
 		setInitialPlaceholder( false );
 	};
 
-	//
-	// MARKUP
-	//
-
-	// Build Inline Styles
-	const navigationMenuInlineStyles = {
-		...( textColor && { color: textColor.color } ),
-		...( backgroundColor && { backgroundColor: backgroundColor.color } ),
-	};
-
-	// Build ClassNames
-	const navigationMenuClasses = classnames(
-		'wp-block-navigation-menu', {
-			'has-text-color': textColor.color,
-			'has-background-color': backgroundColor.color,
-			[ attributes.backgroundColorCSSClass ]: attributes && attributes.backgroundColorCSSClass,
-			[ attributes.textColorCSSClass ]: attributes && attributes.textColorCSSClass,
-		}
-	);
-
 	// UI State: initial placeholder
 	if ( ! hasExistingNavItems && initialPlaceholder ) {
 		return (
@@ -175,6 +155,22 @@ function NavigationMenu( {
 			</Placeholder>
 		);
 	}
+
+	// Build Inline Styles
+	const navigationMenuInlineStyles = {
+		...( textColor && { color: textColor.color } ),
+		...( backgroundColor && { backgroundColor: backgroundColor.color } ),
+	};
+
+	// Build ClassNames
+	const navigationMenuClasses = classnames(
+		'wp-block-navigation-menu', {
+			'has-text-color': textColor.color,
+			'has-background-color': backgroundColor.color,
+			[ attributes.backgroundColorCSSClass ]: attributes && attributes.backgroundColorCSSClass,
+			[ attributes.textColorCSSClass ]: attributes && attributes.textColorCSSClass,
+		}
+	);
 
 	// UI State: rendered Block UI
 	return (
