@@ -620,6 +620,16 @@ class RCTAztecView: Aztec.TextView {
         let caretData = packCaretDataForRN()
         onSelectionChange(caretData)
     }
+
+    // MARK: - Selection
+    private func correctSelectionAfterLastEmptyLine() {
+        guard selectedTextRange?.start == endOfDocument,
+            let characterToReplaceLastEmptyLine = storage.htmlConverter.characterToReplaceLastEmptyLine,
+            text == String(characterToReplaceLastEmptyLine) else {
+            return
+        }
+        selectedTextRange = self.textRange(from: beginningOfDocument, to: beginningOfDocument)
+    }
 }
 
 // MARK: UITextView Delegate Methods
@@ -630,7 +640,12 @@ extension RCTAztecView: UITextViewDelegate {
             return
         }
 
+        correctSelectionAfterLastEmptyLine()
         propagateSelectionChanges()
+    }
+
+    func textViewDidBeginEditing(_ textView: UITextView) {
+        correctSelectionAfterLastEmptyLine()
     }
 
     func textViewDidChange(_ textView: UITextView) {
