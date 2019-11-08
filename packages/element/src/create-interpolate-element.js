@@ -144,12 +144,9 @@ const createInterpolateElement = ( interpolatedString, conversionMap ) => {
 		// twiddle our thumbs
 	} while ( proceed( conversionMap ) );
 
-	output = output.every( ( a ) => 'string' === typeof a ) ?
-		output.join( '' ) :
-		output.filter( ( a ) => '' !== a );
-	return typeof output === 'string' ?
-		output :
-		createElement( Fragment, {}, output );
+	return ! output.every( ( element ) => typeof element === 'string' ) ?
+		createElement( Fragment, {}, output ) :
+		output.join( '' );
 };
 
 /**
@@ -300,7 +297,7 @@ function nextToken() {
 function addText( rawLength ) {
 	const length = rawLength ? rawLength : indoc.length - offset;
 	if ( 0 === length ) {
-		return output.push( '' );
+		return;
 	}
 	output.push( indoc.substr( offset, length ) );
 }
