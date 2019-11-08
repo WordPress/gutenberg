@@ -15,7 +15,7 @@ import {
 /**
  * Internal dependencies
  */
-import { imageFillStyles } from './media-container';
+import { imageFillStyles } from './shared';
 
 const DEFAULT_MEDIA_WIDTH = 50;
 

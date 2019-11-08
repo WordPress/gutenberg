@@ -25,7 +25,7 @@ import { withViewportMatch } from '@wordpress/viewport';
  * Internal dependencies
  */
 import MediaContainer from './media-container';
-import styles from './style.scss';
+import styles from '../style.scss';
 
 /**
  * Constants

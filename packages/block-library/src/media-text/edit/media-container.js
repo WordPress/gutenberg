@@ -17,20 +17,12 @@ import { withDispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import icon from './media-container-icon';
+import { imageFillStyles } from '../shared';
 
 /**
  * Constants
  */
 const ALLOWED_MEDIA_TYPES = [ 'image', 'video' ];
-
-export function imageFillStyles( url, focalPoint ) {
-	return url ?
-		{
-			backgroundImage: `url(${ url })`,
-			backgroundPosition: focalPoint ? `${ focalPoint.x * 100 }% ${ focalPoint.y * 100 }%` : `50% 50%`,
-		} :
-		{};
-}
 
 class MediaContainer extends Component {
 	constructor() {

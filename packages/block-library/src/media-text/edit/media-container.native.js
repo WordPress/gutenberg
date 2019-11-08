@@ -35,7 +35,7 @@ import { compose, withPreferredColorScheme } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import styles from './style.scss';
+import styles from '../style.scss';
 import icon from './media-container-icon';
 import SvgIconRetry from './icon-retry';
 
