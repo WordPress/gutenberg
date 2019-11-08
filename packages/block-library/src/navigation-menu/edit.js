@@ -51,28 +51,36 @@ function NavigationMenu( {
 			if ( ! pages ) {
 				return null;
 			}
-			return pages.map( ( page ) => {
-				return [ 'core/navigation-menu-item',
-					{ label: page.title.rendered, url: page.permalink_template },
-				];
-			} );
+
+			return pages.map( ( { title, type, link: url, id } ) => (
+				[ 'core/navigation-menu-item', {
+					label: title.rendered,
+					title: title.raw,
+					type,
+					id,
+					url,
+					opensInNewTab: false,
+				} ]
+			) );
 		},
 		[ pages ]
 	);
 
-	const navigationMenuStyles = {};
-	if ( textColor.color ) {
-		navigationMenuStyles[ '--color-menu-link' ] = textColor.color;
+	const navigationMenuInlineStyles = {};
+	if ( attributes.textColorValue ) {
+		navigationMenuInlineStyles.color = attributes.textColorValue;
 	}
 
-	if ( backgroundColor.color ) {
-		navigationMenuStyles[ '--background-color-menu-link' ] = backgroundColor.color;
+	if ( attributes.backgroundColorValue ) {
+		navigationMenuInlineStyles.backgroundColor = attributes.backgroundColorValue;
 	}
 
 	const navigationMenuClasses = classnames(
 		'wp-block-navigation-menu', {
 			'has-text-color': textColor.color,
 			'has-background-color': backgroundColor.color,
+			[ attributes.backgroundColorCSSClass ]: attributes && attributes.backgroundColorCSSClass,
+			[ attributes.textColorCSSClass ]: attributes && attributes.textColorCSSClass,
 		}
 	);
 
@@ -115,10 +123,10 @@ function NavigationMenu( {
 					{ navigatorToolbarButton }
 				</Toolbar>
 				<BlockColorsStyleSelector
-					style={ navigationMenuStyles }
-					className={ navigationMenuClasses }
 					backgroundColor={ backgroundColor }
 					textColor={ textColor }
+					backgroundColorValue={ attributes.backgroundColorValue }
+					textColorValue={ attributes.textColorValue }
 					onColorChange={ setColorType }
 				/>
 			</BlockControls>
@@ -141,7 +149,7 @@ function NavigationMenu( {
 				</PanelBody>
 			</InspectorControls>
 
-			<div className={ navigationMenuClasses } style={ navigationMenuStyles }>
+			<div className={ navigationMenuClasses } style={ navigationMenuInlineStyles }>
 				{ isRequesting && <><Spinner /> { __( 'Loading Navigation…' ) } </> }
 				{ pages &&
 					<InnerBlocks
