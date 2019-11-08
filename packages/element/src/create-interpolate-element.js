@@ -59,7 +59,7 @@ const elementCreator = ( name, [ element, props = {} ] ) => ( children ) => {
  * @param   {Array}  children   Array of children to be provided to the element
  *                              creator when invoked.
  *
- * @return  {Object}            An object returning the creator and children.
+ * @return  {Component}         An object returning the creator and children.
  */
 function Component( creator, children = [] ) {
 	return {
@@ -75,13 +75,19 @@ function Component( creator, children = [] ) {
  * parsed.
  *
  * @private
- * @param {Component} component
- * @param {number}    tokenStart
- * @param {number}    tokenLength
- * @param {number}    prevOffset
- * @param {number}    leadingTextStart
+ * @param {Component} component        A parent element which may still have
+ *                                     nested children not yet parsed.
+ * @param {number}    tokenStart       Offset at which parent element first
+ *                                     appears.
+ * @param {number}    tokenLength      Length of string marking start of parent
+ *                                     element.
+ * @param {number}    prevOffset       Running offset at which parsing should
+ *                                     continue.
+ * @param {number}    leadingTextStart Offset at which last closing element
+ *                                     finished, used for finding text between
+ *                                     elements
  *
- * @return {Object} Iteration info as an object.
+ * @return {Frame} The stack frame tracking parse progress.
  */
 function Frame(
 	component,
