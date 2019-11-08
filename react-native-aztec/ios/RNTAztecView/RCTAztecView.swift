@@ -135,6 +135,7 @@ class RCTAztecView: Aztec.TextView {
         textDragInteraction?.isEnabled = false
         storage.htmlConverter.characterToReplaceLastEmptyLine = Character(.zeroWidthSpace)
         shouldNotifyOfNonUserChanges = false
+        disableLinkTapRecognizer()
         preBackgroundColor = .clear
     }
 
@@ -146,6 +147,22 @@ class RCTAztecView: Aztec.TextView {
             placeholderLabel.topAnchor.constraint(equalTo: topAnchor, constant: topConstant),
             placeholderLabel.widthAnchor.constraint(equalTo: widthAnchor),
         ])
+    }
+
+    /**
+     This handles a bug introduced by iOS 13.0 (tested up to 13.2) where link interactions don't respect what the documentation says.
+
+     The documenatation for textView(_:shouldInteractWith:in:interaction:) says:
+
+     > Links in text views are interactive only if the text view is selectable but noneditable.
+
+     Our Aztec Text views are selectable and editable, and yet iOS was opening links on Safari when tapped.
+     */
+    func disableLinkTapRecognizer() {
+        guard let recognizer = gestureRecognizers?.first(where: { $0.name == "UITextInteractionNameLinkTap" }) else {
+            return
+        }
+        recognizer.isEnabled = false
     }
 
     // MARK - View Height: Match to content height
@@ -630,9 +647,5 @@ extension RCTAztecView: UITextViewDelegate {
 
     func textViewDidEndEditing(_ textView: UITextView) {
         onBlur?([:])
-    }
-
-    func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
-        return false
     }
 }
