@@ -1,23 +1,31 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
+import { get, map } from 'lodash';
 
 /**
  * WordPress dependencies
  */
+import { createBlock } from '@wordpress/blocks';
 import { __experimentalBlockPatternPicker } from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
-import { useState } from '@wordpress/element';
+import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import MediaTextContainer from './media-text-container';
 
+const createBlocksFromInnerBlocksTemplate = ( innerBlocksTemplate ) => {
+	return map(
+		innerBlocksTemplate,
+		( [ name, attributes, innerBlocks = [] ] ) =>
+			createBlock( name, attributes, createBlocksFromInnerBlocksTemplate( innerBlocks ) )
+	);
+};
+
 const MediaTextEdit = ( props ) => {
-	const { name } = props;
-	const { blockType, defaultPattern, patterns } = useSelect( ( select ) => {
+	const { clientId, name } = props;
+	const { blockType, defaultPattern, hasInnerBlocks, patterns } = useSelect( ( select ) => {
 		const {
 			__experimentalGetBlockPatterns,
 			getBlockType,
@@ -27,13 +35,14 @@ const MediaTextEdit = ( props ) => {
 		return {
 			blockType: getBlockType( name ),
 			defaultPattern: __experimentalGetDefaultBlockPattern( name ),
+			hasInnerBlocks: select( 'core/block-editor' ).getBlocks( clientId ).length > 0,
 			patterns: __experimentalGetBlockPatterns( name ),
 		};
-	}, [ name ] );
+	}, [ clientId, name ] );
 
-	const [ pattern, setPattern ] = useState( null );
+	const { replaceInnerBlocks } = useDispatch( 'core/block-editor' );
 
-	if ( pattern ) {
+	if ( hasInnerBlocks ) {
 		return (
 			<MediaTextContainer { ...props } />
 		);
@@ -48,7 +57,12 @@ const MediaTextEdit = ( props ) => {
 				if ( nextPattern.attributes ) {
 					props.setAttributes( nextPattern.attributes );
 				}
-				setPattern( nextPattern );
+				if ( nextPattern.innerBlocks ) {
+					replaceInnerBlocks(
+						props.clientId,
+						createBlocksFromInnerBlocksTemplate( nextPattern.innerBlocks )
+					);
+				}
 			} }
 			allowSkip
 		/>

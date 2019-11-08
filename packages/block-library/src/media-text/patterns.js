@@ -1,7 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
+
+const innerBlocks = [
+	[ 'core/paragraph', { fontSize: 'large', placeholder: _x( 'Content…', 'content placeholder' ) } ],
+];
 
 /**
  * Template option choices for predefined columns layouts.
@@ -18,6 +22,7 @@ const patterns = [
 			mediaPosition: 'left',
 			mediaWidth: 50,
 		},
+		innerBlocks,
 	},
 	{
 		name: 'media-left-one-third-two-thirds',
@@ -27,6 +32,7 @@ const patterns = [
 			mediaPosition: 'left',
 			mediaWidth: 33.33,
 		},
+		innerBlocks,
 	},
 	{
 		name: 'media-right-two-thirds-one-thirds',
@@ -36,6 +42,7 @@ const patterns = [
 			mediaPosition: 'right',
 			mediaWidth: 33.33,
 		},
+		innerBlocks,
 	},
 	{
 		name: 'media-right-equal',
@@ -45,6 +52,7 @@ const patterns = [
 			mediaPosition: 'right',
 			mediaWidth: 50,
 		},
+		innerBlocks,
 	},
 ];
 

@@ -7,7 +7,7 @@ import { get } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import {
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
@@ -31,12 +31,6 @@ import {
  */
 import MediaContainer from './media-container';
 
-/**
- * Constants
- */
-const TEMPLATE = [
-	[ 'core/paragraph', { fontSize: 'large', placeholder: _x( 'Content…', 'content placeholder' ) } ],
-];
 // this limits the resize to a safe zone to avoid making broken layouts
 const WIDTH_CONSTRAINT_PERCENTAGE = 15;
 const applyWidthConstraints = ( width ) => Math.max( WIDTH_CONSTRAINT_PERCENTAGE, Math.min( width, 100 - WIDTH_CONSTRAINT_PERCENTAGE ) );
@@ -236,7 +230,6 @@ class MediaTextContainer extends Component {
 				<div className={ classNames } style={ style } >
 					{ this.renderMediaArea() }
 					<InnerBlocks
-						template={ TEMPLATE }
 						templateInsertUpdatesSelection={ false }
 					/>
 				</div>

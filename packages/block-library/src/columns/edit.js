@@ -107,8 +107,8 @@ export function ColumnsEdit( {
 			<div className={ classes }>
 				<InnerBlocks
 					__experimentalPatterns={ patterns }
-					__experimentalOnSelectPattern={ ( nextTemplate = defaultPattern ) => {
-						setTemplate( nextTemplate.innerBlocks );
+					__experimentalOnSelectPattern={ ( nextPattern = defaultPattern ) => {
+						setTemplate( nextPattern.innerBlocks );
 						setForceUseTemplate( true );
 					} }
 					__experimentalAllowPatternSkip
