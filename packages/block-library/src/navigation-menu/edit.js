@@ -227,13 +227,10 @@ export default compose( [
 	withColors( { backgroundColor: 'background-color', textColor: 'color' } ),
 	withSelect( ( select, ownProps, registry ) => {
 		const { clientId } = ownProps;
-		const { getBlocks } = registry.select( 'core/block-editor' );
 
-		const innerBlocks = getBlocks( clientId );
+		const innerBlocks = registry.select( 'core/block-editor' ).getBlocks( clientId );
 		const hasExistingNavItems = !! innerBlocks.length;
 
-		const { getEntityRecords } = select( 'core' );
-		const { isResolving } = select( 'core/data' );
 		const filterDefaultPages = {
 			parent: 0,
 			order: 'asc',
@@ -241,8 +238,8 @@ export default compose( [
 		};
 		return {
 			hasExistingNavItems,
-			pages: getEntityRecords( 'postType', 'page', filterDefaultPages ),
-			isRequesting: isResolving( 'core', 'getEntityRecords', [ 'postType', 'page', filterDefaultPages ] ),
+			pages: select( 'core' ).getEntityRecords( 'postType', 'page', filterDefaultPages ),
+			isRequesting: select( 'core/data' ).isResolving( 'core', 'getEntityRecords', [ 'postType', 'page', filterDefaultPages ] ),
 		};
 	} ),
 ] )( NavigationMenu );
