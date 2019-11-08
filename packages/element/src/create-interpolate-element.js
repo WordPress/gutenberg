@@ -6,8 +6,7 @@ import { createElement, Fragment } from 'react';
 let indoc,
 	offset,
 	output,
-	stack,
-	keyIndex;
+	stack;
 
 /**
  * Matches tags in the localized string
@@ -30,16 +29,18 @@ const tokenizer = /<(\/)?(\w+)\s*(\/)?>/g;
  * This receives the value for a map element which consists of an element and
  * it's props and returns a element creator function.
  *
- * @param {Array} [ element, props ] The first item in the array is expected to
- *                                   be a string or a react component. The
- *                                   second item is expected to be either
- *                                   undefined or an object.
+ * @param {string} name	              The name of the element (which becomes the
+ *                                    key).
+ * @param {Array}  [ element, props ] The first item in the array is expected to
+ *                                    be a string or a react component. The
+ *                                    second item is expected to be either
+ *                                    undefined or an object.
  */
-const elementCreator = ( [ element, props = {} ] ) => ( children ) => {
+const elementCreator = ( name, [ element, props = {} ] ) => ( children ) => {
 	if ( typeof element !== 'string' && typeof element !== 'function' ) {
 		throw new Error( `Not a valid element (${ element })` );
 	}
-	props.key = ++keyIndex;
+	props.key = name;
 	return createElement( element, props, children );
 };
 
@@ -123,7 +124,6 @@ function Frame(
 const createInterpolateElement = ( interpolatedString, conversionMap ) => {
 	indoc = interpolatedString;
 	offset = 0;
-	keyIndex = -1;
 	output = [];
 	stack = [];
 	tokenizer.lastIndex = 0;
@@ -194,14 +194,14 @@ function proceed( conversionMap ) {
 						indoc.substr( leadingTextStart, startOffset - leadingTextStart )
 					);
 				}
-				output.push( elementCreator( conversionMap[ name ] )() );
+				output.push( elementCreator( name, conversionMap[ name ] )() );
 				offset = startOffset + tokenLength;
 				return true;
 			}
 
 			// otherwise we found an inner element
 			addChild(
-				new Component( elementCreator( conversionMap[ name ] ), [] ),
+				new Component( elementCreator( name, conversionMap[ name ] ), [] ),
 				startOffset,
 				tokenLength
 			);
@@ -211,7 +211,7 @@ function proceed( conversionMap ) {
 		case 'opener':
 			stack.push(
 				Frame(
-					new Component( elementCreator( conversionMap[ name ] ), [] ),
+					new Component( elementCreator( name, conversionMap[ name ] ), [] ),
 					startOffset,
 					tokenLength,
 					startOffset + tokenLength,

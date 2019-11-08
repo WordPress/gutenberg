@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import TestRenderer, { act } from 'react-test-renderer';
+
+/**
  * Internal dependencies
  */
 import { createElement, Fragment, Component } from '../react';
@@ -66,7 +71,7 @@ describe( 'createInterpolateElement', () => {
 				'This is a string with ',
 				createElement(
 					'a',
-					{ href: 'https://github.com', className: 'some_class', key: 0 },
+					{ href: 'https://github.com', className: 'some_class', key: 'a' },
 					[ 'a link' ]
 				),
 				'.',
@@ -93,12 +98,12 @@ describe( 'createInterpolateElement', () => {
 				'This is a ',
 				createElement(
 					'a',
-					{ key: 1 },
+					{ key: 'a' },
 					[
 						'string that is ',
 						createElement(
 							'em',
-							{ key: 0 },
+							{ key: 'em' },
 							[ 'linked' ]
 						),
 					]
@@ -127,7 +132,7 @@ describe( 'createInterpolateElement', () => {
 				'This is a string with a ',
 				createElement(
 					TestComponent,
-					{ key: 0 },
+					{ key: 'TestComponent' },
 					[ 'Custom Component' ]
 				),
 			]
@@ -151,7 +156,7 @@ describe( 'createInterpolateElement', () => {
 				'This is a string with a self closing custom component: ',
 				createElement(
 					TestComponent,
-					{ key: 0 }
+					{ key: 'TestComponent' }
 				),
 			]
 		);
@@ -183,12 +188,12 @@ describe( 'createInterpolateElement', () => {
 				'This is a complex string with a ',
 				createElement(
 					'a',
-					{ key: 1 },
+					{ key: 'a1' },
 					[
 						'nested ',
 						createElement(
 							'em',
-							{ key: 0 },
+							{ key: 'em1' },
 							[ 'emphasized string' ]
 						),
 						' link',
@@ -197,7 +202,7 @@ describe( 'createInterpolateElement', () => {
 				' and value: ',
 				createElement(
 					TestComponent,
-					{ key: 2 }
+					{ key: 'TestComponent' }
 				),
 			]
 		);
@@ -209,5 +214,24 @@ describe( 'createInterpolateElement', () => {
 				a1: [ 'a' ],
 			}
 		) ) ).toEqual( JSON.stringify( expectedElement ) );
+	} );
+	it( 'renders expected components across renders for keys in use', () => {
+		const TestComponent = ( { switchKey } ) => {
+			const elementConfig = switchKey ? { item: [ 'em' ] } : { item: [ 'strong' ] };
+			return <div>
+				{ createInterpolateElement( 'This is a <item>string!</item>', elementConfig ) }
+			</div>;
+		};
+		let renderer;
+		act( () => {
+			renderer = TestRenderer.create( <TestComponent switchKey={ true } /> );
+		} );
+		expect( () => renderer.root.findByType( 'em' ) ).not.toThrow();
+		expect( () => renderer.root.findByType( 'strong' ) ).toThrow();
+		act( () => {
+			renderer.update( <TestComponent switchKey={ false } /> );
+		} );
+		expect( () => renderer.root.findByType( 'strong' ) ).not.toThrow();
+		expect( () => renderer.root.findByType( 'em' ) ).toThrow();
 	} );
 } );
