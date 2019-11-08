@@ -69,8 +69,10 @@ function Component( creator, children = [] ) {
 }
 
 /**
- * This encapsulates information about the current iteration state for adding to
- * the stack
+ * Tracks recursive-descent parse state.
+ *
+ * This is a Stack element holding parent elements until all children have been
+ * parsed.
  *
  * @private
  * @param {Component} component
