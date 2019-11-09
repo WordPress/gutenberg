@@ -237,4 +237,28 @@ describe( 'createInterpolateElement', () => {
 		expect( () => renderer.root.findByType( 'strong' ) ).not.toThrow();
 		expect( () => renderer.root.findByType( 'em' ) ).toThrow();
 	} );
+	it( 'handles parsing emojii correctly', () => {
+		const testString = '👳‍♀️<icon>🚨🤷‍♂️⛈️fully</icon> here';
+		const expectedElement = createElement(
+			Fragment,
+			{},
+			[
+				'👳‍♀️',
+				createElement(
+					'strong',
+					{ key: 'icon' },
+					[
+						'🚨🤷‍♂️⛈️fully',
+					]
+				),
+				' here',
+			]
+		);
+		expect( JSON.stringify( createInterpolateElement(
+			testString,
+			{
+				icon: <strong />,
+			}
+		) ) ).toEqual( JSON.stringify( expectedElement ) );
+	} );
 } );
