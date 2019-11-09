@@ -144,9 +144,11 @@ const createInterpolateElement = ( interpolatedString, conversionMap ) => {
  * @return {boolean}  True means the map is valid.
  */
 const isValidConversionMap = ( conversionMap ) => {
-	return typeof conversionMap === 'object' &&
-		Object.values( conversionMap )
-			.some( ( element ) => isValidElement( element ) );
+	const isObject = typeof conversionMap === 'object';
+	const values = isObject && Object.values( conversionMap );
+	return isObject &&
+		values.length &&
+		values.every( ( element ) => isValidElement( element ) );
 };
 
 /**

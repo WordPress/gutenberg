@@ -34,6 +34,19 @@ describe( 'createInterpolateElement', () => {
 			)
 		).toThrow( TypeError );
 	} );
+	it( 'throws an error when there is an invalid entry in the conversion ' +
+     'map', () => {
+		const testString = 'This is a <item /> string and <somethingElse/>';
+		expect(
+			() => createInterpolateElement(
+				testString,
+				{
+					someValue: <em />,
+					somethingElse: 10,
+				}
+			)
+		).toThrow( TypeError );
+	} );
 	it( 'returns same string when there is an non matching token in the ' +
      'string', () => {
 		const testString = 'This is a <non_parsed/> string';
