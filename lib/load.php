@@ -51,7 +51,8 @@ if ( ! class_exists( 'WP_Block_Styles_Registry' ) ) {
 }
 
 require dirname( __FILE__ ) . '/compat.php';
-
+require dirname( __FILE__ ) . '/class-wp-sourced-attributes-block-parser.php';
+require dirname( __FILE__ ) . '/parser.php';
 require dirname( __FILE__ ) . '/blocks.php';
 require dirname( __FILE__ ) . '/templates.php';
 require dirname( __FILE__ ) . '/template-loader.php';
