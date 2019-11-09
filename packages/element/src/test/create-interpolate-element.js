@@ -9,12 +9,14 @@ import TestRenderer, { act } from 'react-test-renderer';
 import { createElement, Fragment, Component } from '../react';
 import createInterpolateElement from '../create-interpolate-element';
 
+const conversionError = /The conversionMap provided is not valid./;
+
 describe( 'createInterpolateElement', () => {
-	it( 'returns same string when there is no conversion map', () => {
+	it( 'throws an error when there is no conversion map', () => {
 		const testString = 'This is a string';
 		expect(
-			createInterpolateElement( testString, [] )
-		).toBe( 'This is a string' );
+			() => createInterpolateElement( testString, {} )
+		).toThrow( conversionError );
 	} );
 	it( 'returns same string when there are no tokens in the string', () => {
 		const testString = 'This is a string';
@@ -25,14 +27,14 @@ describe( 'createInterpolateElement', () => {
 			)
 		).toBe( testString );
 	} );
-	it( 'returns same string when there is an invalid conversion map', () => {
+	it( 'throws an error when there is an invalid conversion map', () => {
 		const testString = 'This is a <someValue/> string';
 		expect(
-			createInterpolateElement(
+			() => createInterpolateElement(
 				testString,
 				[ 'someValue', { value: 10 } ],
 			)
-		).toBe( testString );
+		).toThrow( conversionError );
 	} );
 	it( 'returns same string when there is an non matching token in the ' +
      'string', () => {
@@ -172,7 +174,7 @@ describe( 'createInterpolateElement', () => {
 		const test = () => (
 			createInterpolateElement( 'This is a <invalid /> string', { invalid: 10 } )
 		);
-		expect( test ).toThrow( /Not a valid element/ );
+		expect( test ).toThrow( TypeError );
 	} );
 	it( 'returns expected output for complex replacement', () => {
 		class TestComponent extends Component {

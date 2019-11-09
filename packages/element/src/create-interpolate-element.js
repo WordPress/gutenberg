@@ -26,23 +26,6 @@ let indoc,
 const tokenizer = /<(\/)?(\w+)\s*(\/)?>/g;
 
 /**
- * This receives the value for a map element which consists of an element and
- * it's props and returns a element creator function.
- *
- * @private
- * @param {string} name	              The name of the element (which becomes the
- *                                    key).
- * @param {WPElement}  element        An element created via
- *                                    wp.element.createElement (or JSX).
- */
-const elementCreator = ( name, element ) => ( children ) => {
-	if ( ! isValidElement( element ) ) {
-		throw new Error( `Not a valid element (${ element })` );
-	}
-	return cloneElement( element, { key: name }, children );
-};
-
-/**
  * An object describing a component to be created.
  *
  * This is used by the string iterator to track children that get added to an
@@ -50,18 +33,16 @@ const elementCreator = ( name, element ) => ( children ) => {
  * the string before creating the parent.
  *
  * @private
- * @param   {Function}  creator An element creator that will be invoked for
- *                              actually creating the react element with the
- *                              provided children.
- * @param   {Array}  children   Array of children to be provided to the element
- *                              creator when invoked.
+ * @param {string}    name    The name of the component.
+ * @param {WPElement} element The element
  *
- * @return  {Component}         An object returning the creator and children.
+ * @return {Component} An object returning the creator and children.
  */
-function Component( creator, children = [] ) {
+function Component( name, element ) {
 	return {
-		creator,
-		children,
+		name,
+		element,
+		children: [],
 	};
 }
 
@@ -126,7 +107,7 @@ function Frame(
  * @param {string}  interpolatedString  The interpolation string to be parsed.
  * @param {Object}  conversionMap       The map used to convert the string to
  *                                      a react element.
- *
+ * @throws {TypeError}
  * @return {Element}  A react element.
  */
 const createInterpolateElement = ( interpolatedString, conversionMap ) => {
@@ -137,7 +118,9 @@ const createInterpolateElement = ( interpolatedString, conversionMap ) => {
 	tokenizer.lastIndex = 0;
 
 	if ( ! isValidConversionMap( conversionMap ) ) {
-		return interpolatedString;
+		throw new TypeError(
+			`The conversionMap provided is not valid.  It must be an object with values that are WPElements`
+		);
 	}
 
 	do {
@@ -152,7 +135,8 @@ const createInterpolateElement = ( interpolatedString, conversionMap ) => {
 /**
  * Validate conversion map.
  *
- * A map is considered valid if it's an object and does not have length.
+ * A map is considered valid if it's an object and every value in the object
+ * is a WPElement
  *
  * @private
  * @param {Object} conversionMap  The map being validated.
@@ -161,7 +145,8 @@ const createInterpolateElement = ( interpolatedString, conversionMap ) => {
  */
 const isValidConversionMap = ( conversionMap ) => {
 	return typeof conversionMap === 'object' &&
-		typeof conversionMap.length === 'undefined';
+		Object.values( conversionMap )
+			.some( ( element ) => isValidElement( element ) );
 };
 
 /**
@@ -201,14 +186,14 @@ function proceed( conversionMap ) {
 						indoc.substr( leadingTextStart, startOffset - leadingTextStart )
 					);
 				}
-				output.push( elementCreator( name, conversionMap[ name ] )() );
+				output.push( cloneElement( conversionMap[ name ], { key: name } ) );
 				offset = startOffset + tokenLength;
 				return true;
 			}
 
 			// otherwise we found an inner element
 			addChild(
-				new Component( elementCreator( name, conversionMap[ name ] ), [] ),
+				new Component( name, conversionMap[ name ] ),
 				startOffset,
 				tokenLength
 			);
@@ -218,7 +203,7 @@ function proceed( conversionMap ) {
 		case 'opener':
 			stack.push(
 				Frame(
-					new Component( elementCreator( name, conversionMap[ name ] ), [] ),
+					new Component( name, conversionMap[ name ] ),
 					startOffset,
 					tokenLength,
 					startOffset + tokenLength,
@@ -310,7 +295,9 @@ function addChild( component, tokenStart, tokenLength, lastOffset ) {
 		parent.component.children.push( text );
 	}
 
-	parent.component.children.push( component.creator( component.children ) );
+	parent.component.children.push(
+		cloneElement( component.element, { key: component.name }, component.children )
+	);
 	parent.prevOffset = lastOffset ? lastOffset : tokenStart + tokenLength;
 }
 
@@ -329,7 +316,13 @@ function addComponentFromStack( endOffset ) {
 		output.push( indoc.substr( leadingTextStart, tokenStart - leadingTextStart ) );
 	}
 
-	output.push( component.creator( component.children ) );
+	output.push(
+		cloneElement(
+			component.element,
+			{ key: component.name },
+			component.children
+		)
+	);
 }
 
 export default createInterpolateElement;
