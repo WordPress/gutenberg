@@ -119,7 +119,7 @@ const createInterpolateElement = ( interpolatedString, conversionMap ) => {
 
 	if ( ! isValidConversionMap( conversionMap ) ) {
 		throw new TypeError(
-			`The conversionMap provided is not valid.  It must be an object with values that are WPElements`
+			`The conversionMap provided is not valid. It must be an object with values that are WPElements`
 		);
 	}
 
