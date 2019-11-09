@@ -28,6 +28,39 @@ function gutenberg_get_registered_social_link_blocks() {
 }
 
 /**
+ * Registers blocks using block manifests discovered in block library.
+ *
+ * @since 6.9.0
+ */
+function gutenberg_register_block_types() {
+	$registry = WP_Block_Type_Registry::get_instance();
+
+	$block_manifests = glob( dirname( dirname( __FILE__ ) ) . '/packages/block-library/src/*/block.json' );
+	foreach ( $block_manifests as $block_manifest ) {
+		$block_settings = json_decode( file_get_contents( $block_manifest ), true );
+		if ( is_null( $block_settings ) || ! isset( $block_settings['name'] ) ) {
+			continue;
+		}
+
+		if ( $registry->is_registered( $block_settings['name'] ) ) {
+			$block_settings = array_merge(
+				(array) $registry->get_registered( $block_settings['name'] ),
+				$block_settings
+			);
+
+			$registry->unregister( $block_settings['name'] );
+		}
+
+		register_block_type(
+			$block_settings['name'],
+			// Apply default attributes manually, as it isn't currently possible
+			// to filter block registration.
+			gutenberg_add_default_attributes( $block_settings )
+		);
+	}
+}
+
+/**
  * Substitutes the implementation of a core-registered block type, if exists,
  * with the built result from the plugin.
  */
@@ -76,6 +109,12 @@ function gutenberg_reregister_core_block_types() {
 
 		require $blocks_dir . $file;
 	}
+
+	// Add block library registration only after this is reached, since the
+	// above `require` calls may attach their own `init` actions which are
+	// deferred to run at the latest priority. Thus, to correctly merge block
+	// settings from manifests, it must be the last to run.
+	add_action( 'init', 'gutenberg_register_block_types', 20 );
 }
 add_action( 'init', 'gutenberg_reregister_core_block_types' );
 

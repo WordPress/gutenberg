@@ -17,6 +17,50 @@ function gutenberg_replace_block_parser_class() {
 add_filter( 'block_parser_class', 'gutenberg_replace_block_parser_class' );
 
 /**
+ * Given a registered block type settings array, assigns default attributes.
+ * This must be called manually, as there is currently no way to hook to block
+ * registration.
+ *
+ * @since 6.9.0
+ *
+ * @param array $block_settings Block settings.
+ * @return array                Block settings with default attributes.
+ */
+function gutenberg_add_default_attributes( $block_settings ) {
+	$supports   = isset( $block_settings['supports'] ) ? $block_settings['supports'] : array();
+	$attributes = isset( $block_settings['attributes'] ) ? $block_settings['attributes'] : array();
+
+	if ( ! empty( $supports['align'] ) ) {
+		if ( ! isset( $attributes['align'] ) ) {
+			$attributes['align'] = array();
+		}
+
+		$attributes['align']['type'] = 'string';
+	}
+
+	if ( ! empty( $supports['anchor'] ) ) {
+		if ( ! isset( $attributes['anchor'] ) ) {
+			$attributes['anchor'] = array();
+		}
+
+		$attributes['anchor']['type']      = 'string';
+		$attributes['anchor']['source']    = 'attribute';
+		$attributes['anchor']['attribute'] = 'id';
+		$attributes['anchor']['selector']  = '*';
+	}
+
+	if ( ! isset( $supports['customClassName'] ) || false !== $supports['customClassName'] ) {
+		if ( ! isset( $attributes['className'] ) ) {
+			$attributes['className'] = array();
+		}
+
+		$attributes['className']['type'] = 'string';
+	}
+
+	return $block_settings;
+}
+
+/**
  * Given a CSS selector string, returns an equivalent XPath selector.
  *
  * @access private
