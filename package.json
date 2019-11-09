@@ -18,6 +18,7 @@
 		"GUTENBERG_PHASE": 2
 	},
 	"dependencies": {
+		"@hot-loader/react-dom": "16.11.0",
 		"@wordpress/a11y": "file:packages/a11y",
 		"@wordpress/annotations": "file:packages/annotations",
 		"@wordpress/api-fetch": "file:packages/api-fetch",
@@ -62,7 +63,8 @@
 		"@wordpress/token-list": "file:packages/token-list",
 		"@wordpress/url": "file:packages/url",
 		"@wordpress/viewport": "file:packages/viewport",
-		"@wordpress/wordcount": "file:packages/wordcount"
+		"@wordpress/wordcount": "file:packages/wordcount",
+		"react-hot-loader": "4.12.16"
 	},
 	"devDependencies": {
 		"@actions/core": "1.0.0",
@@ -155,6 +157,9 @@
 		"webpack": "4.41.0",
 		"worker-farm": "1.7.0"
 	},
+	"alias": {
+    "react-dom": "@hot-loader/react-dom"
+  },
 	"scripts": {
 		"prebuild": "npm run check-engines",
 		"clean:packages": "rimraf ./packages/*/build ./packages/*/build-module ./packages/*/build-style ./packages/*/node_modules",
