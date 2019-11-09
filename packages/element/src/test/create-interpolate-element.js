@@ -9,14 +9,12 @@ import TestRenderer, { act } from 'react-test-renderer';
 import { createElement, Fragment, Component } from '../react';
 import createInterpolateElement from '../create-interpolate-element';
 
-const conversionError = /The conversionMap provided is not valid./;
-
 describe( 'createInterpolateElement', () => {
 	it( 'throws an error when there is no conversion map', () => {
 		const testString = 'This is a string';
 		expect(
 			() => createInterpolateElement( testString, {} )
-		).toThrow( conversionError );
+		).toThrow( TypeError );
 	} );
 	it( 'returns same string when there are no tokens in the string', () => {
 		const testString = 'This is a string';
@@ -34,7 +32,7 @@ describe( 'createInterpolateElement', () => {
 				testString,
 				[ 'someValue', { value: 10 } ],
 			)
-		).toThrow( conversionError );
+		).toThrow( TypeError );
 	} );
 	it( 'returns same string when there is an non matching token in the ' +
      'string', () => {
