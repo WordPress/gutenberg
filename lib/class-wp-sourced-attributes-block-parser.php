@@ -93,7 +93,9 @@ class WP_Sourced_Attributes_Block_Parser extends WP_Block_Parser {
 	function get_html_sourced_attribute( $block, $attribute_schema ) {
 		$document = new DOMDocument();
 		try {
-			$document->loadHTML( '<html><body>' . $block['innerHTML'] . '</body></html>' );
+			// loadHTML may log warnings for unexpected markup.
+			// phpcs:ignore
+			@$document->loadHTML( '<html><body>' . $block['innerHTML'] . '</body></html>' );
 		} catch ( Exception $e ) {
 			return null;
 		}
