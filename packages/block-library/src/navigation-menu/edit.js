@@ -71,7 +71,7 @@ function NavigationMenu( {
 			}
 
 			return pages.map( ( { title, type, link: url, id } ) => (
-				createBlock( 'core/navigation-menu-item',
+				createBlock( 'core/navigation-link',
 					{
 						type,
 						id,
@@ -210,7 +210,7 @@ function NavigationMenu( {
 				{ ! hasExistingNavItems && isRequestingPages && <><Spinner /> { __( 'Loading Navigation…' ) } </> }
 
 				<InnerBlocks
-					allowedBlocks={ [ 'core/navigation-menu-item' ] }
+					allowedBlocks={ [ 'core/navigation-link' ] }
 					templateInsertUpdatesSelection={ false }
 					__experimentalMoverDirection={ 'horizontal' }
 				/>
