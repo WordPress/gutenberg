@@ -1,8 +1,4 @@
-/**
- * External dependencies
- *
- * @format
- */
+/** @format */
 
 /**
  * External dependencies
@@ -18,6 +14,9 @@ const fetchHandler = ( options ) => {
 	const responsePromise = fetchRequest( options.path );
 
 	const parseResponse = ( response ) => {
+		if ( typeof response === 'string' ) {
+			response = JSON.parse( response );
+		}
 		return response;
 	};
 
