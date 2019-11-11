@@ -49,7 +49,7 @@ module.exports = function cli() {
 			) }} (override with WP_ENV_PORT) and tests on port {bold.underline ${ terminalLink(
 				'8889',
 				'http://localhost:8889'
-			) }} (override with WP_ENV_TESTS_PORT). If the current working directory is a plugin and/or has e2e-tests with plugins and/or mu-plugins, they will be mounted appropiately.`
+			) }} (override with WP_ENV_TESTS_PORT). If the current working directory is a plugin and/or has e2e-tests with plugins and/or mu-plugins, they will be mounted appropriately.`
 		),
 		( args ) => {
 			args.positional( 'ref', {

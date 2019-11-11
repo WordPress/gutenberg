@@ -21,7 +21,7 @@ Commands:
                               WP_ENV_TESTS_PORT). If the current working
                               directory is a plugin and/or has e2e-tests with
                               plugins and/or mu-plugins, they will be mounted
-                              appropiately.
+                              appropriately.
   wp-env stop                 Stops running WordPress for development and tests
                               and frees the ports.
   wp-env clean [environment]  Cleans the WordPress databases.
@@ -40,7 +40,7 @@ Starts WordPress for development on port 8888 (​http://localhost:8888​)
 (override with WP_ENV_PORT) and tests on port 8889 (​http://localhost:8889​)
 (override with WP_ENV_TESTS_PORT). If the current working directory is a plugin
 and/or has e2e-tests with plugins and/or mu-plugins, they will be mounted
-appropiately.
+appropriately.
 
 Positionals:
   ref  A `https://github.com/WordPress/WordPress` git repo branch or commit for
