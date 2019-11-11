@@ -80,7 +80,11 @@ function render_block_navigation_menu( $attributes, $content, $block ) {
 
 	$colors = build_css_colors( $attributes );
 
-	return "<nav class='wp-block-navigation-menu' {$comp_inline_styles}>" .
+	$menu_activation_css_class = ! empty( $attributes['menuEventActivation'] ) && 'onHover' === $attributes['menuEventActivation']
+		? 'is-activated-by-hover'
+		: 'is-activated-by-click';
+
+	return "<nav class='wp-block-navigation-menu {$menu_activation_css_class}' {$comp_inline_styles}>" .
 		build_navigation_menu_html( $block, $colors ) .
 	'</nav>';
 }

@@ -20,22 +20,6 @@
 		li {
 			position: relative;
 			z-index: 1;
-
-			&:hover,
-			&:focus-within {
-				cursor: pointer;
-				z-index: 99999;
-			}
-
-			// Submenu Display
-			&:hover > ul,
-			&:focus-within > ul,
-			& ul:hover,
-			& ul:focus {
-				visibility: visible;
-				opacity: 1;
-				display: block;
-			}
 		}
 
 		& > li {
@@ -106,4 +90,22 @@
 		}
 	}
 
+	// Menu event activation.
+	&.is-activated-by-hover li {
+		&:hover,
+		&:focus-within {
+			cursor: pointer;
+			z-index: 99999;
+		}
+
+		// Submenu Display
+		&:hover > ul,
+		&:focus-within > ul,
+		& ul:hover,
+		& ul:focus {
+			visibility: visible;
+			opacity: 1;
+			display: block;
+		}
+	}
 }
