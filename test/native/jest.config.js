@@ -38,7 +38,8 @@ module.exports = {
 		'/__device-tests__/',
 	],
 	testURL: 'http://localhost/',
-	moduleDirectories: [ 'node_modules' ],
+	// Add the `Libraries/Utilities` subfolder to the module directories, otherwise haste/jest doesn't find Platform.js on Travis
+	moduleDirectories: [ 'node_modules', 'node_modules/react-native/Libraries/Utilities' ],
 	moduleNameMapper: {
 		// Mock the CSS modules. See https://facebook.github.io/jest/docs/en/webpack.html#handling-static-assets
 		'\\.(scss)$': '<rootDir>/' + configPath + '/__mocks__/styleMock.js',

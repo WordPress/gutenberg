@@ -7,6 +7,9 @@ import {
 	pressKeyWithModifier,
 	ensureSidebarOpened,
 	publishPost,
+	saveDraft,
+	openDocumentSettingsSidebar,
+	isCurrentURL,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Change detection', () => {
@@ -159,13 +162,7 @@ describe( 'Change detection', () => {
 	it( 'Should not prompt if changes saved', async () => {
 		await page.type( '.editor-post-title__input', 'Hello World' );
 
-		await Promise.all( [
-			// Wait for "Saved" to confirm save complete.
-			page.waitForSelector( '.editor-post-saved-state.is-saved' ),
-
-			// Keyboard shortcut Ctrl+S save.
-			pressKeyWithModifier( 'primary', 'S' ),
-		] );
+		await saveDraft();
 
 		await assertIsDirty( false );
 	} );
@@ -174,13 +171,7 @@ describe( 'Change detection', () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'Hello World' );
 
-		await Promise.all( [
-			// Wait for "Saved" to confirm save complete.
-			page.waitForSelector( '.editor-post-saved-state.is-saved' ),
-
-			// Keyboard shortcut Ctrl+S save.
-			pressKeyWithModifier( 'primary', 'S' ),
-		] );
+		await saveDraft();
 
 		await assertIsDirty( false );
 	} );
@@ -188,13 +179,7 @@ describe( 'Change detection', () => {
 	it( 'Should not save if all changes saved', async () => {
 		await page.type( '.editor-post-title__input', 'Hello World' );
 
-		await Promise.all( [
-			// Wait for "Saved" to confirm save complete.
-			page.waitForSelector( '.editor-post-saved-state.is-saved' ),
-
-			// Keyboard shortcut Ctrl+S save.
-			pressKeyWithModifier( 'primary', 'S' ),
-		] );
+		await saveDraft();
 
 		await interceptSave();
 
@@ -330,13 +315,7 @@ describe( 'Change detection', () => {
 		await page.keyboard.type( 'Paragraph' );
 
 		// Save
-		await Promise.all( [
-			// Wait for "Saved" to confirm save complete.
-			page.waitForSelector( '.editor-post-saved-state.is-saved' ),
-
-			// Keyboard shortcut Ctrl+S save.
-			pressKeyWithModifier( 'primary', 'S' ),
-		] );
+		await saveDraft();
 
 		// Verify that the title is empty.
 		const title = await page.$eval(
@@ -347,5 +326,30 @@ describe( 'Change detection', () => {
 
 		// Verify that the post is not dirty.
 		await assertIsDirty( false );
+	} );
+
+	it( 'should not prompt to confirm unsaved changes when trashing an existing post', async () => {
+		// Enter title.
+		await page.type( '.editor-post-title__input', 'Hello World' );
+
+		// Save
+		await saveDraft();
+		const postId = await page.evaluate(
+			() => window.wp.data.select( 'core/editor' ).getCurrentPostId()
+		);
+
+		// Trash post.
+		await openDocumentSettingsSidebar();
+		await page.click( '.editor-post-trash.components-button' );
+
+		await Promise.all( [
+			// Wait for "Saved" to confirm save complete.
+			await page.waitForSelector( '.editor-post-saved-state.is-saved' ),
+
+			// Make sure redirection happens.
+			await page.waitForNavigation(),
+		] );
+
+		expect( isCurrentURL( '/wp-admin/edit.php', `post_type=post&ids=${ postId }` ) ).toBe( true );
 	} );
 } );

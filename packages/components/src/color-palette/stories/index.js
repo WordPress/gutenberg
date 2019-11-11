@@ -53,18 +53,3 @@ export const withKnobs = () => {
 		/>
 	);
 };
-
-export const withAlpha = () => {
-	const colors = [
-		object( 'Red', { name: 'red', color: '#f00' } ),
-		object( 'White', { name: 'white', color: '#fff' } ),
-		object( 'Blue', { name: 'blue', color: '#00f' } ),
-	];
-
-	return (
-		<ColorPaletteWithState
-			colors={ colors }
-			disableAlpha={ false }
-		/>
-	);
-};
