@@ -3,9 +3,6 @@
 // Potentially the rules here can apply to all nested blocks and enable stacking, in which case it should be moved elsewhere
 // When using CSS grid, margins do not collapse on the container.
 .wp-block-columns .editor-block-list__layout {
-	margin-left: 0;
-	margin-right: 0;
-
 	// This max-width is used to constrain the main editor column, it should not cascade into columns
 	.editor-block-list__block {
 		max-width: none;
@@ -62,10 +59,10 @@
 
 			// Beyond mobile, allow 2 columns.
 			@include break-small() {
-				flex-basis: calc(50% - (#{$grid-size-large} + #{$block-padding * 2}));
+				flex-basis: calc(50% - (#{$grid-size-large}));
 				flex-grow: 0;
-				margin-left: $block-padding;
-				margin-right: $block-padding;
+				margin-left: 0;
+				margin-right: 0;
 			}
 
 			// Add space between columns. Themes can customize this if they wish to work differently.
@@ -73,14 +70,14 @@
 			// Only apply this beyond the mobile breakpoint, as there's only a single column on mobile.
 			@include break-small() {
 				&:nth-child(even) {
-					margin-left: calc(#{$grid-size-large * 2} + #{$block-padding});
+					margin-left: calc(#{$grid-size-large * 2});
 				}
 			}
 
 			// When columns are in a single row, add space before all except the first.
 			@include break-medium() {
 				&:not(:first-child) {
-					margin-left: calc(#{$grid-size-large * 2} + #{$block-padding});
+					margin-left: calc(#{$grid-size-large * 2});
 				}
 			}
 
