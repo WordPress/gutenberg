@@ -211,6 +211,7 @@ function NavigationMenuItemEdit( {
 				'wp-block-navigation-menu-item', {
 					'is-editing': isSelected || isParentOfSelectedBlock,
 					'is-selected': isSelected,
+					'has-link': !! url,
 				} ) }
 			>
 				<div className="wp-block-navigation-menu-item__inner">

@@ -182,7 +182,10 @@ function NavigationMenu( {
 
 	// Build Inline Styles
 	const navigationMenuInlineStyles = {
-		...( textColor && { color: textColor.color } ),
+		...( textColor && {
+			color: textColor.color,
+			borderColor: textColor.color,
+		} ),
 		...( backgroundColor && { backgroundColor: backgroundColor.color } ),
 	};
 

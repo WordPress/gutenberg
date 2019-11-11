@@ -69,6 +69,11 @@
 		min-width: 20px;
 	}
 
+	&.has-link .wp-block-navigation-menu-item__content {
+		border-bottom-style: solid;
+		border-bottom-width: 1px;
+	}
+
 	.block-editor-rich-text__editable.is-selected:not(.keep-placeholder-on-focus):not(:focus) [data-rich-text-placeholder]::after {
 		display: inherit;
 	}
