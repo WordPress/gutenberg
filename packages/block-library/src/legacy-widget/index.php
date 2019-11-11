@@ -72,17 +72,17 @@ function render_widget_by_id( $id ) {
  * @return string Returns the post content with the legacy widget added.
  */
 function render_block_legacy_widget( $attributes ) {
-	$widget_id    = null;
+	$id           = null;
 	$widget_class = null;
-	if ( isset( $attributes['widgetId'] ) ) {
-		$widget_id = $attributes['widgetId'];
+	if ( isset( $attributes['id'] ) ) {
+		$id = $attributes['id'];
 	}
 	if ( isset( $attributes['widgetClass'] ) ) {
 		$widget_class = $attributes['widgetClass'];
 	}
 
-	if ( $widget_id ) {
-		return render_widget_by_id( $widget_id );
+	if ( $id ) {
+		return render_widget_by_id( $id );
 	}
 	if ( ! $widget_class ) {
 		return '';
@@ -105,19 +105,19 @@ function register_block_core_legacy_widget() {
 		'core/legacy-widget',
 		array(
 			'attributes'      => array(
-				'widgetClass'  => array(
+				'widgetClass' => array(
 					'type' => 'string',
 				),
-				'widgetId'     => array(
+				'id'          => array(
 					'type' => 'string',
 				),
-				'idBase'       => array(
+				'idBase'      => array(
 					'type' => 'string',
 				),
-				'widgetNumber' => array(
+				'number'      => array(
 					'type' => 'number',
 				),
-				'instance'     => array(
+				'instance'    => array(
 					'type' => 'object',
 				),
 			),

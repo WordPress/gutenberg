@@ -126,8 +126,8 @@ class Experimental_WP_Widget_Blocks_Manager {
 			$new_block               = array(
 				'blockName' => 'core/legacy-widget',
 				'attrs'     => array(
-					'widgetId'    => $item,
-					'instance'    => self::get_sidebar_widget_instance( $wp_registered_sidebars[ $sidebar_id ], $item ),
+					'id'       => $item,
+					'instance' => self::get_sidebar_widget_instance( $wp_registered_sidebars[ $sidebar_id ], $item ),
 				),
 				'innerHTML' => '',
 			);
@@ -138,7 +138,7 @@ class Experimental_WP_Widget_Blocks_Manager {
 				$new_block['attrs']['idBase'] = $object->id_base;
 			}
 			if ( is_int( $number ) ) {
-				$new_block['attrs']['widgetNumber'] = $number;
+				$new_block['attrs']['number'] = $number;
 			}
 			$blocks[] = $new_block;
 		}

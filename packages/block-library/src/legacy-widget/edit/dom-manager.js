@@ -36,8 +36,8 @@ class LegacyWidgetEditDomManager extends Component {
 			this.idBaseInputRef.current.value = nextProps.idBase;
 			shouldTriggerWidgetUpdateEvent = true;
 		}
-		if ( nextProps.widgetNumber !== this.props.widgetNumber && this.widgetNumberInputRef.current ) {
-			this.widgetNumberInputRef.current.value = nextProps.widgetNumber;
+		if ( nextProps.number !== this.props.number && this.widgetNumberInputRef.current ) {
+			this.widgetNumberInputRef.current.value = nextProps.number;
 		}
 		if ( nextProps.form !== this.props.form && this.widgetContentRef.current ) {
 			const widgetContent = this.widgetContentRef.current;
@@ -54,7 +54,7 @@ class LegacyWidgetEditDomManager extends Component {
 	}
 
 	render() {
-		const { id, idBase, widgetNumber, form, isReferenceWidget } = this.props;
+		const { id, idBase, number, form, isReferenceWidget } = this.props;
 		return (
 			<div className="widget open" ref={ this.containerRef }>
 				<div className="widget-inside">
@@ -79,12 +79,15 @@ class LegacyWidgetEditDomManager extends Component {
 							className="widget-content"
 							dangerouslySetInnerHTML={ { __html: form } }
 						/>
-						{ isReferenceWidget && ( <><input type="hidden" name="widget-id" className="widget-id" value={ id } />
-							<input ref={ this.idBaseInputRef } type="hidden" name="id_base" className="id_base" value={ idBase } />
-							<input ref={ this.widgetNumberInputRef } type="hidden" name="widget_number" className="widget_number" value={ widgetNumber } />
-							<input type="hidden" name="multi_number" className="multi_number" value="" />
-							<input type="hidden" name="add_new" className="add_new" value="" />
-						</> ) }
+						{ isReferenceWidget && (
+							<>
+								<input type="hidden" name="widget-id" className="widget-id" value={ id } />
+								<input ref={ this.idBaseInputRef } type="hidden" name="id_base" className="id_base" value={ idBase } />
+								<input ref={ this.widgetNumberInputRef } type="hidden" name="widget_number" className="widget_number" value={ number } />
+								<input type="hidden" name="multi_number" className="multi_number" value="" />
+								<input type="hidden" name="add_new" className="add_new" value="" />
+							</>
+						) }
 					</form>
 				</div>
 			</div>
