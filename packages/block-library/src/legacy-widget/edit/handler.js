@@ -59,7 +59,7 @@ class LegacyWidgetEditHandler extends Component {
 	}
 
 	render() {
-		const { instanceId, widgetId, widgetNumber, idBase, instance, isSelected, widgetName } = this.props;
+		const { instanceId, id, number, idBase, instance, isSelected, widgetName } = this.props;
 		const { form } = this.state;
 
 		if ( ! form ) {
@@ -96,16 +96,15 @@ class LegacyWidgetEditHandler extends Component {
 				>
 
 					<LegacyWidgetEditDomManager
-						isReferenceWidget={ !! widgetId }
+						isReferenceWidget={ !! id }
 						ref={ ( ref ) => {
 							this.widgetEditDomManagerRef = ref;
 						} }
 						onInstanceChange={ this.onInstanceChange }
-						widgetNumber={ widgetNumber ? widgetNumber : instanceId * -1 }
-						id={ widgetId }
+						number={ number ? number : instanceId * -1 }
+						id={ id }
 						idBase={ idBase }
 						form={ form }
-						widgetId={ widgetId }
 					/>
 				</div>
 			</>
@@ -120,8 +119,8 @@ class LegacyWidgetEditHandler extends Component {
 	}
 
 	onInstanceChange( instanceChanges ) {
-		const { widgetId } = this.props;
-		if ( widgetId ) {
+		const { id } = this.props;
+		if ( id ) {
 			// For reference widgets there is no need to query an endpoint,
 			// the widget is already saved with ajax.
 			this.props.onInstanceChange( instanceChanges, true );
@@ -134,29 +133,28 @@ class LegacyWidgetEditHandler extends Component {
 	}
 
 	requestWidgetUpdater( instanceChanges, callback ) {
-		const { widgetId, idBase, instance, widgetClass } = this.props;
+		const { id, idBase, instance, widgetClass } = this.props;
 		const { isStillMounted } = this;
-		if ( ! widgetId && ! widgetClass ) {
+		if ( ! id && ! widgetClass ) {
 			return;
 		}
 
 		// If we are in the presence of a reference widget, do a save ajax request
 		// with empty changes so we retrieve the widget edit form.
-		if ( widgetId ) {
+		if ( id ) {
 			const httpRequest = new XMLHttpRequest();
 			const formData = new FormData();
 			formData.append( 'action', 'save-widget' );
 			formData.append( 'id_base', idBase );
-			formData.append( 'widget-id', widgetId );
+			formData.append( 'widget-id', id );
 			formData.append( 'widget-width', '250' );
 			formData.append( 'widget-height', '200' );
 			formData.append( 'savewidgets', this.widgetNonce );
 			httpRequest.open( 'POST', window.ajaxurl );
-			const self = this;
-			httpRequest.addEventListener( 'load', function() {
+			httpRequest.addEventListener( 'load', () => {
 				if ( isStillMounted ) {
 					const form = httpRequest.responseText;
-					self.setState( { form } );
+					this.setState( { form } );
 					if ( callback ) {
 						callback( { form } );
 					}

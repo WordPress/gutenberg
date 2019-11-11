@@ -96,7 +96,7 @@ class WP_REST_Widget_Forms extends WP_REST_Controller {
 	 * @return boolean| True if the widget being referenced exists and false otherwise.
 	 */
 	private function is_valid_widget( $widget_class ) {
-		global $wp_widget_factory, $wp_registered_widgets;
+		global $wp_widget_factory;
 		if ( ! $widget_class ) {
 			return false;
 		}
