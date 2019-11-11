@@ -75,37 +75,38 @@ function render_block_navigation_menu( $attributes, $content, $block ) {
 function build_navigation_menu_html( $block, $colors ) {
 	$html = '';
 	foreach ( (array) $block['innerBlocks'] as $key => $block ) {
-
-		$html .= '<li class="wp-block-navigation-menu-item">' .
-			'<a
-				class="wp-block-navigation-menu-item__link ' . $colors['text_css_classes'] . '"
-				' . $colors['text_inline_styles'];
-
-		// Start appending HTML attributes to anchor tag.
+		// Creates the markup for the item content element.
 		if ( isset( $block['attrs']['url'] ) ) {
-			$html .= ' href="' . $block['attrs']['url'] . '"';
-		}
-		if ( isset( $block['attrs']['title'] ) ) {
-			$html .= ' title="' . $block['attrs']['title'] . '"';
+			$item_content_markup =
+				'<a
+					class="wp-block-navigation-menu-item__link ' . $colors['text_css_classes'] . '"
+					' . $colors['text_inline_styles'] .
+					' href="' . $block['attrs']['url'] .
+					( $block['attrs']['title'] ? ( ' title="' . $block['attrs']['title'] . '"' ) : '' ) .
+					( isset( $block['attrs']['opensInNewTab'] ) && true === $block['attrs']['opensInNewTab']
+						? ' target="_blank"'
+						: ''
+					) .
+				'>' .
+					( isset( $block['attrs']['label'] ) ? $block['attrs']['label'] : '' ) .
+				'</a>';
+		} else {
+			$item_content_markup =
+				'<span
+					class="wp-block-navigation-menu-item__label ' . $colors['text_css_classes'] . '"
+					' . $colors['text_inline_styles'] .
+				'>' .
+					( isset( $block['attrs']['label'] ) ? $block['attrs']['label'] : '' ) .
+				'</span>';
 		}
 
-		if ( isset( $block['attrs']['opensInNewTab'] ) && true === $block['attrs']['opensInNewTab'] ) {
-			$html .= ' target="_blank"  ';
-		}
-		// End appending HTML attributes to anchor tag.
-
-		// Start anchor tag content.
-		$html .= '>';
-		if ( isset( $block['attrs']['label'] ) ) {
-			$html .= $block['attrs']['label'];
-		}
-		$html .= '</a>';
-		// End anchor tag content.
+		$html .=
+			'<li class="wp-block-navigation-menu-item">' .
+				$item_content_markup;
 
 		if ( count( (array) $block['innerBlocks'] ) > 0 ) {
 			$html .= build_navigation_menu_html( $block, $colors );
 		}
-
 		$html .= '</li>';
 	}
 	return '<ul>' . $html . '</ul>';
