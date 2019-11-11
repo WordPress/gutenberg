@@ -111,7 +111,6 @@ export class BlockList extends Component {
 					/>
 				}
 
-				<__experimentalBlockListFooter.Slot />
 			</View>
 		);
 	}
@@ -159,11 +158,14 @@ export class BlockList extends Component {
 	renderBlockListFooter() {
 		const paragraphBlock = createBlock( 'core/paragraph' );
 		return (
-			<TouchableWithoutFeedback onPress={ () => {
-				this.addBlockToEndOfPost( paragraphBlock );
-			} } >
-				<View style={ styles.blockListFooter } />
-			</TouchableWithoutFeedback>
+			<>
+				<TouchableWithoutFeedback onPress={ () => {
+					this.addBlockToEndOfPost( paragraphBlock );
+				} } >
+					<View style={ styles.blockListFooter } />
+				</TouchableWithoutFeedback>
+				<__experimentalBlockListFooter.Slot />
+			</>
 		);
 	}
 }
