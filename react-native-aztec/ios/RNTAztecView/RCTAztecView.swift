@@ -135,6 +135,7 @@ class RCTAztecView: Aztec.TextView {
         textDragInteraction?.isEnabled = false
         storage.htmlConverter.characterToReplaceLastEmptyLine = Character(.zeroWidthSpace)
         shouldNotifyOfNonUserChanges = false
+        disableLinkTapRecognizer()
     }
 
     func addPlaceholder() {
@@ -145,6 +146,22 @@ class RCTAztecView: Aztec.TextView {
             placeholderLabel.topAnchor.constraint(equalTo: topAnchor, constant: topConstant),
             placeholderLabel.widthAnchor.constraint(equalTo: widthAnchor),
         ])
+    }
+
+    /**
+     This handles a bug introduced by iOS 13.0 (tested up to 13.2) where link interactions don't respect what the documentation says.
+
+     The documenatation for textView(_:shouldInteractWith:in:interaction:) says:
+
+     > Links in text views are interactive only if the text view is selectable but noneditable.
+
+     Our Aztec Text views are selectable and editable, and yet iOS was opening links on Safari when tapped.
+     */
+    func disableLinkTapRecognizer() {
+        guard let recognizer = gestureRecognizers?.first(where: { $0.name == "UITextInteractionNameLinkTap" }) else {
+            return
+        }
+        recognizer.isEnabled = false
     }
 
     // MARK - View Height: Match to content height
@@ -603,6 +620,16 @@ class RCTAztecView: Aztec.TextView {
         let caretData = packCaretDataForRN()
         onSelectionChange(caretData)
     }
+
+    // MARK: - Selection
+    private func correctSelectionAfterLastEmptyLine() {
+        guard selectedTextRange?.start == endOfDocument,
+            let characterToReplaceLastEmptyLine = storage.htmlConverter.characterToReplaceLastEmptyLine,
+            text == String(characterToReplaceLastEmptyLine) else {
+            return
+        }
+        selectedTextRange = self.textRange(from: beginningOfDocument, to: beginningOfDocument)
+    }
 }
 
 // MARK: UITextView Delegate Methods
@@ -613,7 +640,12 @@ extension RCTAztecView: UITextViewDelegate {
             return
         }
 
+        correctSelectionAfterLastEmptyLine()
         propagateSelectionChanges()
+    }
+
+    func textViewDidBeginEditing(_ textView: UITextView) {
+        correctSelectionAfterLastEmptyLine()
     }
 
     func textViewDidChange(_ textView: UITextView) {
@@ -637,9 +669,5 @@ extension RCTAztecView: UITextViewDelegate {
 
     func textViewDidEndEditing(_ textView: UITextView) {
         onBlur?([:])
-    }
-
-    func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
-        return false
     }
 }

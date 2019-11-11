@@ -3,6 +3,13 @@
 * Include block title in Unsupported block's UI
 * Show new-block-indicator when no blocks at all and when at the last block
 * Use existing links in the clipboard to prefill url field when inserting new link.
+* Media & Text block alignment options
+* [iOS] Fix issue where the keyboard would not capitalize sentences correctly on some cases.
+* [iOS] Support for Pexels image library
+
+1.16.1
+------
+* [iOS] Fix tap on links bug that reappear on iOS 13.2
 
 1.16.0
 ------
