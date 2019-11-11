@@ -3,14 +3,30 @@
 // When that happens, leverage that instead of the following overrides.
 [data-type="core/navigation-menu"] {
 
-	// Allow overflowing items to scroll container
+	// State: "unselected" - allow overflowing items to scroll container
 	.wp-block-navigation-menu {
 		overflow-x: auto;
 	}
 
-	// Allow more space on RHS when scroll is present
-	.wp-block-navigation-menu.has-scroll-x .block-editor-block-list__layout {
-		padding-right: 25%;
+	// State: "selected" - wrap all items to allow for better editing UX
+	&.is-selected,
+	&.has-child-selected {
+
+		.wp-block-navigation-menu {
+			overflow: visible; // cancel "auto" above to ensure toolbars can display correctly
+		}
+
+		.wp-block-navigation-menu .block-editor-block-list__layout {
+			display: flex;
+			flex-wrap: wrap;
+
+			.wp-block {
+				display: flex;
+				flex: 1; // grow to own content width only
+				// margin-top: $block-padding*2;
+				// margin-bottom: $block-padding*2; // push wrapped items away from toolbars
+			}
+		}
 	}
 
 	// 1. Reset margins on immediate innerblocks container.
