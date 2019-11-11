@@ -13,7 +13,8 @@
 		width: auto;
 		padding-left: 0;
 		padding-right: 0;
-		margin-left: 0; // something
+		margin-left: 0;
+		margin-bottom: 1em; // Useful for when items wrap.
 	}
 
 	// 3. Remove margins on subsequent Edit container.
@@ -57,7 +58,7 @@
 .wp-block-navigation .block-editor-block-list__layout,
 .wp-block-navigation {
 	display: flex;
-	white-space: nowrap;
+	flex-wrap: wrap;
 }
 
 .wp-block-navigation__inserter-content {
