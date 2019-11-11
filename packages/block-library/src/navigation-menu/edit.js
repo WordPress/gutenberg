@@ -125,6 +125,8 @@ function NavigationMenu( {
 		updateNavItemBlocks( defaultPagesMenuItems );
 	};
 
+	const hasPages = pages && pages.length;
+
 	// If we don't have existing items or the User hasn't
 	// indicated they want to automatically add top level Pages
 	// then show the Placeholder
@@ -157,6 +159,7 @@ function NavigationMenu( {
 							isDefault
 							className="wp-block-navigation-menu-placeholder__button"
 							onClick={ handleCreateFromExistingPages }
+							disabled={ ! hasPages }
 						>
 							{ __( 'Create from all top pages' ) }
 						</Button>
