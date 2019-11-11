@@ -57,23 +57,34 @@ const INSERTION_INPUT_TYPES_TO_IGNORE = new Set( [
 	'insertLink',
 ] );
 
-// In HTML, leading and trailing spaces are not visible, and multiple spaces
-// elsewhere are visually reduced to one space. This rule prevents spaces from
-// collapsing so all space is visible in the editor and can be removed. It also
-// prevents some browsers from inserting non-breaking spaces at the end of a
-// line to prevent the space from visually disappearing. Sometimes these non
-// breaking spaces can linger in the editor causing unwanted non breaking spaces
-// in between words. If also prevent Firefox from inserting a trailing `br` node
-// to visualise any trailing space, causing the element to be saved.
-//
-// > Authors are encouraged to set the 'white-space' property on editing hosts
-// > and on markup that was originally created through these editing mechanisms
-// > to the value 'pre-wrap'. Default HTML whitespace handling is not well
-// > suited to WYSIWYG editing, and line wrapping will not work correctly in
-// > some corner cases if 'white-space' is left at its default value.
-// >
-// > https://html.spec.whatwg.org/multipage/interaction.html#best-practices-for-in-page-editors
+/**
+ * In HTML, leading and trailing spaces are not visible, and multiple spaces
+ * elsewhere are visually reduced to one space. This rule prevents spaces from
+ * collapsing so all space is visible in the editor and can be removed. It also
+ * prevents some browsers from inserting non-breaking spaces at the end of a
+ * line to prevent the space from visually disappearing. Sometimes these non
+ * breaking spaces can linger in the editor causing unwanted non breaking spaces
+ * in between words. If also prevent Firefox from inserting a trailing `br` node
+ * to visualise any trailing space, causing the element to be saved.
+ *
+ * > Authors are encouraged to set the 'white-space' property on editing hosts
+ * > and on markup that was originally created through these editing mechanisms
+ * > to the value 'pre-wrap'. Default HTML whitespace handling is not well
+ * > suited to WYSIWYG editing, and line wrapping will not work correctly in
+ * > some corner cases if 'white-space' is left at its default value.
+ *
+ * https://html.spec.whatwg.org/multipage/interaction.html#best-practices-for-in-page-editors
+ *
+ * @type {string}
+ */
 const whiteSpace = 'pre-wrap';
+
+/**
+ * Default style object for the editable element.
+ *
+ * @type {Object}
+ */
+const defaultStyle = { whiteSpace };
 
 /**
  * Global stylesheet.
@@ -993,7 +1004,7 @@ class RichText extends Component {
 	Editable( props ) {
 		const {
 			tagName: TagName = 'div',
-			style = {},
+			style,
 			className,
 			placeholder,
 			forwardedRef,
@@ -1003,10 +1014,14 @@ class RichText extends Component {
 
 		return (
 			<TagName
+				// Overridable props.
+				role="textbox"
+				aria-multiline
+				aria-label={ placeholder }
 				{ ...props }
 				{ ...ariaProps }
 				ref={ forwardedRef }
-				style={ { ...style, whiteSpace } }
+				style={ style ? { ...style, whiteSpace } : defaultStyle }
 				className={ classnames( 'rich-text', className ) }
 				onPaste={ this.onPaste }
 				onInput={ this.onInput }
@@ -1026,9 +1041,6 @@ class RichText extends Component {
 				onKeyUp={ this.onSelectionChange }
 				onMouseUp={ this.onSelectionChange }
 				onTouchEnd={ this.onSelectionChange }
-				role="textbox"
-				aria-multiline
-				aria-label={ placeholder }
 				contentEditable
 				suppressContentEditableWarning
 			/>
