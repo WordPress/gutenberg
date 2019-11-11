@@ -11,6 +11,7 @@ import { createBlock } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import {
 	ExternalLink,
+	KeyboardShortcuts,
 	PanelBody,
 	Path,
 	SVG,
@@ -27,6 +28,8 @@ import {
 	DOWN,
 	BACKSPACE,
 	ENTER,
+	rawShortcut,
+	displayShortcut,
 } from '@wordpress/keycodes';
 import { __ } from '@wordpress/i18n';
 import {
@@ -99,6 +102,17 @@ function NavigationMenuItemEdit( {
 	}, [ isSelected ] );
 
 	/**
+	 * Opens the LinkControl popup
+	 */
+	const openLinkControl = () => {
+		if ( isLinkOpen ) {
+			return;
+		}
+
+		setIsLinkOpen( ! isLinkOpen );
+	};
+
+	/**
 	 * `onKeyDown` LinkControl handler.
 	 * It takes over to stop the event propagation to make the
 	 * navigation work, avoiding undesired behaviors.
@@ -122,16 +136,18 @@ function NavigationMenuItemEdit( {
 		<Fragment>
 			<BlockControls>
 				<Toolbar>
+					<KeyboardShortcuts
+						bindGlobal
+						shortcuts={ {
+							[ rawShortcut.primary( 'k' ) ]: openLinkControl,
+						} }
+					/>
 					<ToolbarButton
 						name="link"
 						icon="admin-links"
 						title={ __( 'Link' ) }
-						onClick={ () => {
-							if ( isLinkOpen ) {
-								return;
-							}
-							setIsLinkOpen( ! isLinkOpen );
-						} }
+						shortcut={ displayShortcut.primary( 'k' ) }
+						onClick={ openLinkControl }
 					/>
 					<ToolbarButton
 						name="submenu"
