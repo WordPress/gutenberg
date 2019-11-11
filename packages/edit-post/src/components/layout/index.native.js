@@ -103,6 +103,7 @@ class Layout extends Component {
 		const {
 			mode,
 			getStylesFromColorScheme,
+			showPageTemplatePicker,
 		} = this.props;
 
 		const isHtmlView = mode === 'text';
@@ -132,8 +133,8 @@ class Layout extends Component {
 						<Header />
 						<BottomSheetSettings />
 					</KeyboardAvoidingView> ) }
+					{ showPageTemplatePicker && <__experimentalPageTemplatePicker templates={ defaultTemplates } /> }
 			</SafeAreaView>
-			{ showPageTemplatePicker && <__experimentalPageTemplatePicker templates={ defaultTemplates } /> }
 		);
 	}
 }

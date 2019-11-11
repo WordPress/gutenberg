@@ -1,0 +1,18 @@
+/**
+ * WordPress dependencies
+ */
+import { Button } from '@wordpress/components';
+
+const PickerButton = ( props ) => {
+	const {
+		label,
+		onPress,
+	}
+	return (
+		<Button onClick={ onPress }>
+			{ label }
+		</Button>
+	);
+}
+
+export default PickerButton;
