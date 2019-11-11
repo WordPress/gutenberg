@@ -22,7 +22,7 @@ export const _default = () => {
 
 export const withActions = () => {
 	const content = text( 'Content', 'Use Snackbars with an action link to an external page.' );
-	const actions = [ { url: text( 'URL', 'https://wordpress.org' ), label: text( 'label', 'Open WP.org' ) } ];
+	const actions = [ { label: text( 'Label', 'Open WP.org' ), url: text( 'URL', 'https://wordpress.org' ) } ];
 
 	return (
 		<Snackbar actions={ actions }>
