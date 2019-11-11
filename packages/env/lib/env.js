@@ -11,6 +11,7 @@ const wait = require( 'util' ).promisify( setTimeout );
 /**
  * Internal dependencies
  */
+const detectContext = require( './detect-context' );
 const createDockerComposeConfig = require( './create-docker-compose-config' );
 const detectContext = require( './detect-context' );
 const resolveDependencies = require( './resolve-dependencies' );
