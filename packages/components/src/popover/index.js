@@ -24,6 +24,7 @@ import ScrollLock from '../scroll-lock';
 import IsolatedEventContainer from '../isolated-event-container';
 import { Slot, Fill, Consumer } from '../slot-fill';
 import Animate from '../animate';
+import ToolbarContext from '../toolbar-context';
 
 const FocusManaged = withConstrainedTabbing( withFocusReturn( ( { children } ) => children ) );
 
@@ -435,6 +436,8 @@ const Popover = ( {
 				// default to an in-place rendering.
 				if ( getSlot && getSlot( SLOT_NAME ) ) {
 					content = <Fill name={ SLOT_NAME }>{ content }</Fill>;
+				} else {
+					content = <ToolbarContext.Provider value={ null }>{ content }</ToolbarContext.Provider>;
 				}
 
 				return (
