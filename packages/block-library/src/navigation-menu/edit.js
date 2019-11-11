@@ -43,7 +43,8 @@ function NavigationMenu( {
 	attributes,
 	clientId,
 	pages,
-	isRequesting,
+	isRequestingPages,
+	hasResolvedPages,
 	backgroundColor,
 	textColor,
 	setBackgroundColor,
@@ -125,7 +126,7 @@ function NavigationMenu( {
 		updateNavItemBlocks( defaultPagesMenuItems );
 	};
 
-	const hasPages = pages && pages.length;
+	const hasPages = hasResolvedPages && pages && pages.length;
 
 	// If we don't have existing items or the User hasn't
 	// indicated they want to automatically add top level Pages
@@ -134,19 +135,21 @@ function NavigationMenu( {
 		return (
 			<Fragment>
 				<InspectorControls>
-					<PanelBody
-						title={ __( 'Menu Settings' ) }
-					>
-						<CheckboxControl
-							value={ attributes.automaticallyAdd }
-							onChange={ ( automaticallyAdd ) => {
-								setAttributes( { automaticallyAdd } );
-								handleCreateFromExistingPages();
-							} }
-							label={ __( 'Automatically add new pages' ) }
-							help={ __( 'Automatically add new top level pages to this menu.' ) }
-						/>
-					</PanelBody>
+					{ hasResolvedPages && (
+						<PanelBody
+							title={ __( 'Menu Settings' ) }
+						>
+							<CheckboxControl
+								value={ attributes.automaticallyAdd }
+								onChange={ ( automaticallyAdd ) => {
+									setAttributes( { automaticallyAdd } );
+									handleCreateFromExistingPages();
+								} }
+								label={ __( 'Automatically add new pages' ) }
+								help={ __( 'Automatically add new top level pages to this menu.' ) }
+							/>
+						</PanelBody>
+					) }
 				</InspectorControls>
 				<Placeholder
 					className="wp-block-navigation-menu-placeholder"
@@ -208,16 +211,18 @@ function NavigationMenu( {
 			</BlockControls>
 			{ navigatorModal }
 			<InspectorControls>
-				<PanelBody
-					title={ __( 'Menu Settings' ) }
-				>
-					<CheckboxControl
-						value={ attributes.automaticallyAdd }
-						onChange={ ( automaticallyAdd ) => setAttributes( { automaticallyAdd } ) }
-						label={ __( 'Automatically add new pages' ) }
-						help={ __( 'Automatically add new top level pages to this menu.' ) }
-					/>
-				</PanelBody>
+				{ hasPages && (
+					<PanelBody
+						title={ __( 'Menu Settings' ) }
+					>
+						<CheckboxControl
+							value={ attributes.automaticallyAdd }
+							onChange={ ( automaticallyAdd ) => setAttributes( { automaticallyAdd } ) }
+							label={ __( 'Automatically add new pages' ) }
+							help={ __( 'Automatically add new top level pages to this menu.' ) }
+						/>
+					</PanelBody>
+				) }
 				<PanelBody
 					title={ __( 'Navigation Structure' ) }
 				>
@@ -226,7 +231,7 @@ function NavigationMenu( {
 			</InspectorControls>
 
 			<div className={ navigationMenuClasses } style={ navigationMenuInlineStyles }>
-				{ ! hasExistingNavItems && isRequesting && <><Spinner /> { __( 'Loading Navigation…' ) } </> }
+				{ ! hasExistingNavItems && isRequestingPages && <><Spinner /> { __( 'Loading Navigation…' ) } </> }
 
 				<InnerBlocks
 					allowedBlocks={ [ 'core/navigation-menu-item' ] }
@@ -250,10 +255,14 @@ export default compose( [
 			order: 'asc',
 			orderby: 'id',
 		};
+
+		const pagesSelect = [ 'core', 'getEntityRecords', [ 'postType', 'page', filterDefaultPages ] ];
+
 		return {
 			hasExistingNavItems,
 			pages: select( 'core' ).getEntityRecords( 'postType', 'page', filterDefaultPages ),
-			isRequesting: select( 'core/data' ).isResolving( 'core', 'getEntityRecords', [ 'postType', 'page', filterDefaultPages ] ),
+			isRequestingPages: select( 'core/data' ).isResolving( ...pagesSelect ),
+			hasResolvedPages: select( 'core/data' ).hasFinishedResolution( ...pagesSelect ),
 		};
 	} ),
 	withDispatch( ( dispatch, { clientId } ) => {
