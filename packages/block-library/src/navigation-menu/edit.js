@@ -74,7 +74,7 @@ function NavigationMenu( {
 				return null;
 			}
 
-			return pages.map( ( { title, type, link: url, id } ) => (
+			return pages.map( ( { title, type, link: url, id, menuEventActivation } ) => (
 				createBlock( 'core/navigation-menu-item',
 					{
 						type,
@@ -83,6 +83,7 @@ function NavigationMenu( {
 						label: title.rendered,
 						title: title.raw,
 						opensInNewTab: false,
+						menuEventActivation,
 					}
 				)
 			) );
