@@ -16,14 +16,15 @@ describe( 'user', () => {
 			expect( userLabel[ 1 ] ).toEqual( <span key="name" className="editor-autocompleters__user-name">Smithers Jones</span> );
 			expect( userLabel[ 2 ] ).toEqual( <span key="slug" className="editor-autocompleters__user-slug">userSlug</span> );
 		} );
-		it( 'should return user details fragment without img if avatar_urls array not set', () => {
+		it( 'should return user details fragment without default avatar dashicon if avatar_urls array not set', () => {
 			const user = {
 				name: 'Smithers Jones',
 				slug: 'userSlug',
 			};
 			const userLabel = userCompleter.getOptionLabel( user );
-			expect( userLabel[ 0 ] ).toEqual( <span key="name" className="editor-autocompleters__user-name">Smithers Jones</span> );
-			expect( userLabel[ 1 ] ).toEqual( <span key="slug" className="editor-autocompleters__user-slug">userSlug</span> );
+			expect( userLabel[ 0 ] ).toEqual( <span className="editor-autocompleters__no-avatar"></span> );
+			expect( userLabel[ 1 ] ).toEqual( <span key="name" className="editor-autocompleters__user-name">Smithers Jones</span> );
+			expect( userLabel[ 2 ] ).toEqual( <span key="slug" className="editor-autocompleters__user-slug">userSlug</span> );
 		} );
 	} );
 } );
