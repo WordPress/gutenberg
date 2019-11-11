@@ -33,6 +33,7 @@
 	min-height: $block-toolbar-height;
 	border-bottom: $border-width solid $light-gray-500;
 
+	.block-editor-block-toolbar .components-toolbar-group,
 	.block-editor-block-toolbar .components-toolbar {
 		border-top: none;
 		border-bottom: none;
@@ -67,6 +68,7 @@
 			margin: -($grid-size + $border-width) 0;
 		}
 
+		.block-editor-block-toolbar .components-toolbar-group,
 		.block-editor-block-toolbar .components-toolbar {
 			padding: ($grid-size + $border-width + $border-width) $grid-size-small ($grid-size + $border-width);
 		}

@@ -879,6 +879,7 @@
 
 		// Paint the borders on the toolbar itself on mobile.
 		border-top: $border-width solid $light-gray-800;
+		.components-toolbar-group,
 		.components-toolbar {
 			border-top: none;
 			border-bottom: none;
@@ -886,6 +887,7 @@
 
 		@include break-small() {
 			border-top: none;
+			.components-toolbar-group,
 			.components-toolbar {
 				border-top: $border-width solid $light-gray-800;
 				border-bottom: $border-width solid $light-gray-800;
@@ -1029,6 +1031,7 @@
 	left: -$block-padding - $block-left-border-width;
 	top: (($block-padding * -2) - $block-left-border-width);
 
+	.components-toolbar-group,
 	.components-toolbar {
 		border: none;
 		line-height: 1;
@@ -1070,6 +1073,7 @@
 		left: -$block-padding;
 		top: -$block-toolbar-height - $block-padding;
 
+		.components-toolbar-group,
 		.components-toolbar {
 			background: $white;
 			border: $border-width solid $blue-medium-focus;

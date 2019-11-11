@@ -46,6 +46,7 @@
 		box-shadow: none;
 		border-left: $border-width solid $light-gray-500;
 
+		.components-toolbar-group,
 		.components-toolbar {
 			border-color: $light-gray-500;
 		}

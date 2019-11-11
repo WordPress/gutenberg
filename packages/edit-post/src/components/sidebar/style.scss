@@ -83,6 +83,7 @@
 		margin: 1.5em 0;
 	}
 
+	div.components-toolbar-group,
 	div.components-toolbar {
 		box-shadow: none;
 		margin-bottom: 1.5em;
@@ -91,6 +92,7 @@
 		}
 	}
 
+	p + div.components-toolbar-group,
 	p + div.components-toolbar {
 		margin-top: -1em;
 	}
