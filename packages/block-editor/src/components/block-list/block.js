@@ -431,7 +431,7 @@ function BlockListBlock( {
 		! isTypingWithinBlock;
 	const shouldShowBreadcrumb = isNavigationMode && isSelected;
 	const shouldShowContextualToolbar =
-		! proxyToolbarToParent &&
+		! shouldProxyToolbarToParent &&
 		! isNavigationMode &&
 		! hasFixedToolbar &&
 		isLargeViewport &&
@@ -665,6 +665,10 @@ const applyWithSelect = withSelect(
 			__unstableGetBlockWithoutInnerBlocks,
 			isNavigationMode,
 		} = select( 'core/block-editor' );
+
+		const {
+			getBlockSupport,
+		} = select( 'core/blocks' );
 		const block = __unstableGetBlockWithoutInnerBlocks( clientId );
 
 		const isSelected = isBlockSelected( clientId );
@@ -699,8 +703,8 @@ const applyWithSelect = withSelect(
 			hasFixedToolbar: hasFixedToolbar && isLargeViewport,
 			isLast: index === blockOrder.length - 1,
 			isNavigationMode: isNavigationMode(),
-			proxyToolbarToParent: 'core/navigation-menu-item' === block.name,
-			shouldConsumeChildToolbar: 'core/navigation-menu' === block.name,
+			shouldProxyToolbarToParent: getBlockSupport( block.name, 'proxyToolbarToParent', false ),
+			shouldConsumeChildToolbar: getBlockSupport( block.name, 'consumeChildToolbar', false ),
 			isRTL,
 
 			// Users of the editor.BlockListBlock filter used to be able to access the block prop

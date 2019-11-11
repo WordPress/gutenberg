@@ -24,6 +24,10 @@ export const settings = {
 
 	__experimentalDisplayName: 'label',
 
+	supports: {
+		proxyToolbarToParent: true,
+	},
+
 	edit,
 	save,
 };
