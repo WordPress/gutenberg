@@ -261,7 +261,7 @@ export default compose( [
 			hasDescendants: !! getClientIdsOfDescendants( [ clientId ] ).length,
 		};
 	} ),
-	withDispatch( ( dispatch, ownProps ) => {
+	withDispatch( ( dispatch, ownProps, registry ) => {
 		return {
 			insertMenuItemBlock() {
 				const { clientId } = ownProps;
@@ -270,10 +270,15 @@ export default compose( [
 					insertBlock,
 				} = dispatch( 'core/block-editor' );
 
+				const { getClientIdsOfDescendants } = registry.select( 'core/block-editor' );
+				const navItems = getClientIdsOfDescendants( [ clientId ] );
+				const insertionPoint = navItems.length ? navItems.length : 0;
+
 				const blockToInsert = createBlock( 'core/navigation-menu-item' );
+
 				insertBlock(
 					blockToInsert,
-					0,
+					insertionPoint,
 					clientId,
 				);
 			},
