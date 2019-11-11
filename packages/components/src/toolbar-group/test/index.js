@@ -26,7 +26,6 @@ describe( 'ToolbarGroup', () => {
 				{
 					icon: 'wordpress',
 					title: 'WordPress',
-					subscript: 'wp',
 					onClick: clickHandler,
 					isActive: false,
 				},
@@ -36,7 +35,6 @@ describe( 'ToolbarGroup', () => {
 			expect( button.props() ).toMatchObject( {
 				'aria-label': 'WordPress',
 				'aria-pressed': false,
-				'data-subscript': 'wp',
 				type: 'button',
 			} );
 		} );
@@ -47,7 +45,6 @@ describe( 'ToolbarGroup', () => {
 				{
 					icon: 'wordpress',
 					title: 'WordPress',
-					subscript: 'wp',
 					onClick: clickHandler,
 					isActive: true,
 				},
@@ -57,7 +54,6 @@ describe( 'ToolbarGroup', () => {
 			expect( button.props() ).toMatchObject( {
 				'aria-label': 'WordPress',
 				'aria-pressed': true,
-				'data-subscript': 'wp',
 				type: 'button',
 			} );
 		} );
@@ -92,7 +88,6 @@ describe( 'ToolbarGroup', () => {
 				{
 					icon: 'wordpress',
 					title: 'WordPress',
-					subscript: 'wp',
 					onClick: clickHandler,
 					isActive: true,
 				},
