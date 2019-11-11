@@ -4,7 +4,7 @@
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 
-const __experimentalWithPageTemplatePickerVisible = () => withSelect( ( select ) => {
+const __experimentalWithPageTemplatePickerVisible = withSelect( ( select ) => {
 	const {
 		getCurrentPostType,
 	} = select( 'core/editor' );

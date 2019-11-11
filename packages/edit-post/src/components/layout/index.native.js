@@ -10,7 +10,7 @@ import { sendNativeEditorDidLayout } from 'react-native-gutenberg-bridge';
  */
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
-import { BottomSheetSettings } from '@wordpress/block-editor';
+import { BottomSheetSettings, __experimentalPageTemplatePicker, __experimentalWithPageTemplatePickerVisible } from '@wordpress/block-editor';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { HTMLTextInput, KeyboardAvoidingView, ReadableContentView } from '@wordpress/components';
 import { AutosaveMonitor } from '@wordpress/editor';
@@ -22,6 +22,7 @@ import styles from './style.scss';
 import headerToolbarStyles from '../header/header-toolbar/style.scss';
 import Header from '../header';
 import VisualEditor from '../visual-editor';
+import defaultTemplates from '../default-templates';
 
 class Layout extends Component {
 	constructor() {
@@ -132,6 +133,7 @@ class Layout extends Component {
 						<BottomSheetSettings />
 					</KeyboardAvoidingView> ) }
 			</SafeAreaView>
+			{ showPageTemplatePicker && <__experimentalPageTemplatePicker templates={ defaultTemplates } /> }
 		);
 	}
 }
@@ -151,4 +153,5 @@ export default compose( [
 		};
 	} ),
 	withPreferredColorScheme,
+	__experimentalWithPageTemplatePickerVisible,
 ] )( Layout );
