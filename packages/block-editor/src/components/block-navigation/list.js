@@ -40,28 +40,6 @@ function getBlockDisplayName( blockType, attributes ) {
 	return formatlessDisplayName;
 }
 
-/**
- * Get the block display name, if it has one, or the block title if it doesn't.
- *
- * @param {Object} blockType  The block type.
- * @param {Object} attributes The values of the block's attributes
- *
- * @return {string} The display name value.
- */
-function getBlockDisplayName( blockType, attributes ) {
-	const displayNameAttribute = blockType.__experimentalDisplayName;
-
-	if ( ! displayNameAttribute || ! attributes[ displayNameAttribute ] ) {
-		return blockType.title;
-	}
-
-	// Strip any formatting.
-	const richTextValue = create( { html: attributes[ displayNameAttribute ] } );
-	const formatlessDisplayName = getTextContent( richTextValue );
-
-	return formatlessDisplayName;
-}
-
 export default function BlockNavigationList( {
 	blocks,
 	selectedBlockClientId,

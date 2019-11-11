@@ -149,11 +149,6 @@ export default compose( [
 			allowedBlockType = allowedBlocks[ 0 ];
 		}
 
-		const hasSingleBlockType = allowedBlocks && ( get( allowedBlocks, [ 'length' ], 0 ) === 1 );
-		let allowedBlockType = false;
-		if ( hasSingleBlockType ) {
-			allowedBlockType = getBlockType( allowedBlocks );
-		}
 		return {
 			hasItems: hasInserterItems( rootClientId ),
 			hasSingleBlockType,
