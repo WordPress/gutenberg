@@ -64,9 +64,16 @@
 }
 
 .wp-block-navigation-menu-item {
+	border: 0;
+
 	&.is-editing,
 	&.is-selected {
 		min-width: 20px;
+	}
+
+	&.has-link:not(.is-selected) {
+		border-bottom-style: solid;
+		border-bottom-width: 1px;
 	}
 
 	.block-editor-rich-text__editable.is-selected:not(.keep-placeholder-on-focus):not(:focus) [data-rich-text-placeholder]::after {
