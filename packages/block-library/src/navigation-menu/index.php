@@ -185,6 +185,11 @@ function register_block_core_navigation_menu() {
 				'textColorCSSClass'       => array(
 					'type' => 'string',
 				),
+
+				'menuEventActivation'  => array(
+					'type' => 'string',
+					'default' => 'onHover',
+				),
 			),
 
 			'render_callback' => 'render_block_navigation_menu',
