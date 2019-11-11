@@ -223,7 +223,7 @@ function NavigationMenu( {
 			</InspectorControls>
 
 			<div className={ navigationMenuClasses } style={ navigationMenuInlineStyles }>
-				{ isRequesting && <><Spinner /> { __( 'Loading Navigation…' ) } </> }
+				{ ! hasExistingNavItems && isRequesting && <><Spinner /> { __( 'Loading Navigation…' ) } </> }
 
 				<InnerBlocks
 					allowedBlocks={ [ 'core/navigation-menu-item' ] }
