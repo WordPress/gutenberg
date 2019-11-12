@@ -8,7 +8,7 @@ import { number, text } from '@storybook/addon-knobs';
  */
 import Dashicon from '../';
 
-export default { title: 'Dashicon', component: Dashicon };
+export default { title: 'Components|Dashicon', component: Dashicon };
 
 export const _default = () => {
 	const icon = text( 'Icon', 'wordpress' );
