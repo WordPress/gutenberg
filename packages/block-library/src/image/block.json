@@ -50,6 +50,9 @@
 		"height": {
 			"type": "number"
 		},
+		"sizeSlug": {
+			"type": "string"
+		},
 		"linkDestination": {
 			"type": "string",
 			"default": "none"

@@ -1,4 +1,4 @@
-## 2.1.0 (Unreleased)
+## 2.3.0 (2019-05-21)
 
 ### New features
 - The `getAutosave`, `getAutosaves` and `getCurrentUser` selectors have been added.

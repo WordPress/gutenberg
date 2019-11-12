@@ -18,7 +18,7 @@ import {
 } from '@wordpress/e2e-test-utils';
 
 describe( 'adding inline tokens', () => {
-	beforeAll( async () => {
+	beforeEach( async () => {
 		await createNewPost();
 	} );
 
@@ -27,8 +27,8 @@ describe( 'adding inline tokens', () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'a ' );
 
-		await clickBlockToolbarButton( 'More Rich Text Controls' );
-		await clickButton( 'Inline Image' );
+		await clickBlockToolbarButton( 'More rich text controls' );
+		await clickButton( 'Inline image' );
 
 		// Wait for media modal to appear and upload image.
 		await page.waitForSelector( '.media-modal input[type=file]' );

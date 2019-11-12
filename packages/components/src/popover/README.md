@@ -93,9 +93,11 @@ A callback invoked when the popover should be closed.
 - Type: `Function`
 - Required: No
 
-### onClickOutside
+### onFocusOutside
 
-A callback invoked when the user clicks outside the opened popover, passing the click event. The popover should be closed in response to this interaction. Defaults to `onClose`.
+A callback invoked when the focus leaves the opened popover. This should only be provided in advanced use-cases when a Popover should close under specific circumstances; for example, if the new `document.activeElement` is content of or otherwise controlling Popover visibility.
+
+Defaults to `onClose` when not provided.
 
 - Type: `Function`
 - Required: No

@@ -23,7 +23,7 @@ import { BlockControls, BlockAlignmentToolbar } from '../components';
  *
  * @constant
  * @type {string[]}
-*/
+ */
 const ALL_ALIGNMENTS = [ 'left', 'center', 'right', 'wide', 'full' ];
 
 /**
@@ -33,7 +33,7 @@ const ALL_ALIGNMENTS = [ 'left', 'center', 'right', 'wide', 'full' ];
  *
  * @constant
  * @type {string[]}
-*/
+ */
 const WIDE_ALIGNMENTS = [ 'wide', 'full' ];
 
 /**

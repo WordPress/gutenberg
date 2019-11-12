@@ -26,7 +26,7 @@ function gutenberg_test_templates_register_book_type() {
 			array( 'core/quote' ),
 			array(
 				'core/columns',
-				array(),
+				array( 'columns' => 2 ),
 				array(
 					array(
 						'core/column',

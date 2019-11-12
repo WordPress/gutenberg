@@ -237,6 +237,26 @@ describe( 'FormTokenField', function() {
 			expect( getSelectedSuggestion() ).toBe( null );
 			expect( getTokensHTML() ).toEqual( [ 'foo', 'bar', 'with' ] );
 		} );
+
+		it( 'should re-render when suggestions prop has changed', function() {
+			wrapper.setState( {
+				tokenSuggestions: [],
+				isExpanded: true,
+			} );
+			expect( getSuggestionsText() ).toEqual( [] );
+			setText( 'so' );
+			expect( getSuggestionsText() ).toEqual( [] );
+
+			wrapper.setState( {
+				tokenSuggestions: fixtures.specialSuggestions.default,
+			} );
+			expect( getSuggestionsText() ).toEqual( fixtures.matchingSuggestions.so );
+
+			wrapper.setState( {
+				tokenSuggestions: [],
+			} );
+			expect( getSuggestionsText() ).toEqual( [] );
+		} );
 	} );
 
 	describe( 'adding tokens', function() {

@@ -183,12 +183,8 @@ export default class ClassicEdit extends Component {
 		// jsx-a11y/no-static-element-interactions
 		//  - the toolbar itself is non-interactive, but must capture events
 		//    from the KeyboardShortcuts component to stop their propagation.
-		//
-		// jsx-a11y/no-static-element-interactions
-		//  - Clicking on this visual placeholder should create the
-		//    toolbar, it can also be created by focussing the field below.
 
-		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
+		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		return [
 			<div
 				key="toolbar"
@@ -205,6 +201,6 @@ export default class ClassicEdit extends Component {
 				className="wp-block-freeform block-library-rich-text__tinymce"
 			/>,
 		];
-		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
+		/* eslint-enable jsx-a11y/no-static-element-interactions */
 	}
 }

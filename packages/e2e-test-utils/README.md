@@ -82,7 +82,7 @@ _Parameters_
 
 _Returns_
 
--   `function`: Function that determines if a request is for the embed API, embedding a specific URL.
+-   `Function`: Function that determines if a request is for the embed API, embedding a specific URL.
 
 <a name="createJSONResponse" href="#createJSONResponse">#</a> **createJSONResponse**
 
@@ -127,7 +127,7 @@ _Parameters_
 
 _Returns_
 
--   `function`: Function that determines if a request's URL contains substring.
+-   `Function`: Function that determines if a request's URL contains substring.
 
 <a name="deactivatePlugin" href="#deactivatePlugin">#</a> **deactivatePlugin**
 
@@ -137,9 +137,32 @@ _Parameters_
 
 -   _slug_ `string`: Plugin slug.
 
+<a name="disableNavigationMode" href="#disableNavigationMode">#</a> **disableNavigationMode**
+
+Triggers edit mode if not already active.
+
+_Returns_
+
+-   `Promise`: Promise resolving after enabling the keyboard edit mode.
+
 <a name="disablePrePublishChecks" href="#disablePrePublishChecks">#</a> **disablePrePublishChecks**
 
 Disables Pre-publish checks.
+
+<a name="dragAndResize" href="#dragAndResize">#</a> **dragAndResize**
+
+Clicks an element, drags a particular distance and releases the mouse button.
+
+_Parameters_
+
+-   _element_ `Object`: The puppeteer element handle.
+-   _delta_ `Object`: Object containing movement distances.
+-   _delta.x_ `number`: Horizontal distance to drag.
+-   _delta.y_ `number`: Vertical distance to drag.
+
+_Returns_
+
+-   `Promise`: Promise resolving when drag completes.
 
 <a name="enablePageDialogAccept" href="#enablePageDialogAccept">#</a> **enablePageDialogAccept**
 
@@ -192,7 +215,7 @@ _Returns_
 
 <a name="getAllBlocks" href="#getAllBlocks">#</a> **getAllBlocks**
 
-Returns an array with all blocks; Equivalent to calling wp.data.select( 'core/editor' ).getBlocks();
+Returns an array with all blocks; Equivalent to calling wp.data.select( 'core/block-editor' ).getBlocks();
 
 _Returns_
 
@@ -276,6 +299,10 @@ _Returns_
 
 -   `Promise`: Promise resolving with a boolean indicating if the focused block is the default block.
 
+<a name="isOfflineMode" href="#isOfflineMode">#</a> **isOfflineMode**
+
+Undocumented declaration.
+
 <a name="loginUser" href="#loginUser">#</a> **loginUser**
 
 Performs log in with specified username and password.
@@ -292,9 +319,9 @@ deserialised JSON response for the request.
 
 _Parameters_
 
--   _mockCheck_ `function`: function that returns true if the request should be mocked.
+-   _mockCheck_ `Function`: function that returns true if the request should be mocked.
 -   _mock_ `Object`: A mock object to wrap in a JSON response, if the request should be mocked.
--   _responseObjectTransform_ `(function|undefined)`: An optional function that transforms the response's object before the response is used.
+-   _responseObjectTransform_ `(Function|undefined)`: An optional function that transforms the response's object before the response is used.
 
 _Returns_
 
@@ -329,10 +356,6 @@ _Parameters_
 
 -   _key_ `string`: Key to press.
 -   _count_ `number`: Number of times to press.
-
-_Returns_
-
--   `Promise`: Promise resolving when key presses complete.
 
 <a name="pressKeyWithModifier" href="#pressKeyWithModifier">#</a> **pressKeyWithModifier**
 
@@ -453,6 +476,14 @@ running the test is not already the admin user).
 
 Switches the current user to whichever user we should be
 running the tests as (if we're not already that user).
+
+<a name="toggleMoreMenu" href="#toggleMoreMenu">#</a> **toggleMoreMenu**
+
+Toggles the More Menu.
+
+<a name="toggleOfflineMode" href="#toggleOfflineMode">#</a> **toggleOfflineMode**
+
+Undocumented declaration.
 
 <a name="toggleScreenOption" href="#toggleScreenOption">#</a> **toggleScreenOption**
 

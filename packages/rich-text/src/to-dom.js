@@ -118,6 +118,7 @@ export function toDom( {
 	multilineTag,
 	prepareEditableTree,
 	isEditableTree = true,
+	placeholder,
 } ) {
 	let startPath = [];
 	let endPath = [];
@@ -147,6 +148,7 @@ export function toDom( {
 			endPath = createPathToNode( pointer, body, [ pointer.nodeValue.length ] );
 		},
 		isEditableTree,
+		placeholder,
 	} );
 
 	return {
@@ -172,12 +174,14 @@ export function apply( {
 	multilineTag,
 	prepareEditableTree,
 	__unstableDomOnly,
+	placeholder,
 } ) {
 	// Construct a new element tree in memory.
 	const { body, selection } = toDom( {
 		value,
 		multilineTag,
 		prepareEditableTree,
+		placeholder,
 	} );
 
 	applyValue( body, current );

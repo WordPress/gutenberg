@@ -2,7 +2,7 @@
 
 `withFocusReturn` is a higher-order component used typically in scenarios of short-lived elements (modals, dropdowns) where, upon the element's unmounting, focus should be restored to the focused element which had initiated it being rendered.
 
-Optionally, it can be used in combination with a `FocusRenderProvider` which, when rendered toward the top of an application, will remember a history of elements focused during a session. This can provide safeguards for scenarios where one short-lived element triggers the creation of another (e.g. a dropdown menu triggering a modal display). The combined effect of `FocusRenderProvider` and `withFocusReturn` is that focus will be returned to the most recent focused element which is still present in the document.
+Optionally, it can be used in combination with a `FocusReturnProvider` which, when rendered toward the top of an application, will remember a history of elements focused during a session. This can provide safeguards for scenarios where one short-lived element triggers the creation of another (e.g. a dropdown menu triggering a modal display). The combined effect of `FocusReturnProvider` and `withFocusReturn` is that focus will be returned to the most recent focused element which is still present in the document.
 
 ## Usage
 

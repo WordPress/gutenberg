@@ -1,6 +1,5 @@
 // Components
 export * from './primitives';
-// eslint-disable-next-line camelcase
 export { default as Animate } from './animate';
 export { default as Autocomplete } from './autocomplete';
 export { default as BaseControl } from './base-control';
@@ -26,6 +25,7 @@ export { default as FontSizePicker } from './font-size-picker';
 export { default as FormFileUpload } from './form-file-upload';
 export { default as FormToggle } from './form-toggle';
 export { default as FormTokenField } from './form-token-field';
+export { default as __experimentalGradientPicker } from './gradient-picker';
 export { default as Icon } from './icon';
 export { default as IconButton } from './icon-button';
 export { default as KeyboardShortcuts } from './keyboard-shortcuts';
@@ -50,11 +50,13 @@ export { default as ResizableBox } from './resizable-box';
 export { default as ResponsiveWrapper } from './responsive-wrapper';
 export { default as SandBox } from './sandbox';
 export { default as SelectControl } from './select-control';
+export { default as Snackbar } from './snackbar';
+export { default as SnackbarList } from './snackbar/list';
 export { default as Spinner } from './spinner';
-export { default as ServerSideRender } from './server-side-render';
 export { default as TabPanel } from './tab-panel';
 export { default as TextControl } from './text-control';
 export { default as TextareaControl } from './textarea-control';
+export { default as Tip } from './tip';
 export { default as ToggleControl } from './toggle-control';
 export { default as Toolbar } from './toolbar';
 export { default as ToolbarButton } from './toolbar-button';

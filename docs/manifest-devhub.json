@@ -102,6 +102,12 @@
 		"parent": "slotfills"
 	},
 	{
+		"title": "PluginDocumentSettingPanel",
+		"slug": "plugin-document-setting-panel",
+		"markdown_source": "../docs/designers-developers/developers/slotfills/plugin-document-setting-panel.md",
+		"parent": "slotfills"
+	},
+	{
 		"title": "PluginMoreMenuItem",
 		"slug": "plugin-more-menu-item",
 		"markdown_source": "../docs/designers-developers/developers/slotfills/plugin-more-menu-item.md",
@@ -136,6 +142,12 @@
 		"slug": "plugin-sidebar-more-menu-item",
 		"markdown_source": "../docs/designers-developers/developers/slotfills/plugin-sidebar-more-menu-item.md",
 		"parent": "slotfills"
+	},
+	{
+		"title": "RichText Reference",
+		"slug": "richtext",
+		"markdown_source": "../docs/designers-developers/developers/richtext.md",
+		"parent": "developers"
 	},
 	{
 		"title": "Internationalization",
@@ -426,9 +438,9 @@
 		"parent": "block-tutorial"
 	},
 	{
-		"title": "Block Controls: Toolbars and Inspector",
-		"slug": "block-controls-toolbars-and-inspector",
-		"markdown_source": "../docs/designers-developers/developers/tutorials/block-tutorial/block-controls-toolbars-and-inspector.md",
+		"title": "Block Controls: Block Toolbar and Settings Sidebar",
+		"slug": "block-controls-toolbar-and-sidebar",
+		"markdown_source": "../docs/designers-developers/developers/tutorials/block-tutorial/block-controls-toolbar-and-sidebar.md",
 		"parent": "block-tutorial"
 	},
 	{
@@ -834,6 +846,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "BlockQuotation",
+		"slug": "block-quotation",
+		"markdown_source": "../packages/components/src/primitives/block-quotation/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "HorizontalRule",
 		"slug": "horizontal-rule",
 		"markdown_source": "../packages/components/src/primitives/horizontal-rule/README.md",
@@ -894,15 +912,15 @@
 		"parent": "components"
 	},
 	{
-		"title": "ServerSideRender",
-		"slug": "server-side-render",
-		"markdown_source": "../packages/components/src/server-side-render/README.md",
-		"parent": "components"
-	},
-	{
 		"title": "SlotFill",
 		"slug": "slot-fill",
 		"markdown_source": "../packages/components/src/slot-fill/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "Snackbar",
+		"slug": "snackbar",
+		"markdown_source": "../packages/components/src/snackbar/README.md",
 		"parent": "components"
 	},
 	{
@@ -1068,6 +1086,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/block-directory",
+		"slug": "packages-block-directory",
+		"markdown_source": "../packages/block-directory/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/block-editor",
 		"slug": "packages-block-editor",
 		"markdown_source": "../packages/block-editor/README.md",
@@ -1212,6 +1236,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/env",
+		"slug": "packages-env",
+		"markdown_source": "../packages/env/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/escape-html",
 		"slug": "packages-escape-html",
 		"markdown_source": "../packages/escape-html/README.md",
@@ -1290,6 +1320,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/media-utils",
+		"slug": "packages-media-utils",
+		"markdown_source": "../packages/media-utils/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/notices",
 		"slug": "packages-notices",
 		"markdown_source": "../packages/notices/README.md",
@@ -1326,6 +1362,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/project-management-automation",
+		"slug": "packages-project-management-automation",
+		"markdown_source": "../packages/project-management-automation/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/redux-routine",
 		"slug": "packages-redux-routine",
 		"markdown_source": "../packages/redux-routine/README.md",
@@ -1341,6 +1383,12 @@
 		"title": "@wordpress/scripts",
 		"slug": "packages-scripts",
 		"markdown_source": "../packages/scripts/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/server-side-render",
+		"slug": "packages-server-side-render",
+		"markdown_source": "../packages/server-side-render/README.md",
 		"parent": "packages"
 	},
 	{

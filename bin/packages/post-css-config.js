@@ -4,7 +4,7 @@ module.exports = [
 			primary: '#0085ba',
 			secondary: '#11a0d2',
 			toggle: '#11a0d2',
-			button: '#0085ba',
+			button: '#007cba',
 			outlines: '#007cba',
 		},
 		themes: {

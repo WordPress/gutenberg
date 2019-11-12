@@ -3,7 +3,7 @@
  */
 const fs = require( 'fs' );
 const path = require( 'path' );
-const { overEvery } = require( 'lodash' );
+const { isEmpty, overEvery } = require( 'lodash' );
 
 /**
  * Absolute path to packages directory.
@@ -25,6 +25,19 @@ function isDirectory( file ) {
 }
 
 /**
+ * Returns true if the given packages has "module" field.
+ *
+ * @param {string} file Packages directory file.
+ *
+ * @return {boolean} Whether file is a directory.
+ */
+function hasModuleField( file ) {
+	const { module } = require( path.resolve( PACKAGES_DIR, file, 'package.json' ) );
+
+	return ! isEmpty( module );
+}
+
+/**
  * Filter predicate, returning true if the given base file name is to be
  * included in the build.
  *
@@ -32,7 +45,7 @@ function isDirectory( file ) {
  *
  * @return {boolean} Whether to include file in build.
  */
-const filterPackages = overEvery( isDirectory );
+const filterPackages = overEvery( isDirectory, hasModuleField );
 
 /**
  * Returns the absolute path of all WordPress packages

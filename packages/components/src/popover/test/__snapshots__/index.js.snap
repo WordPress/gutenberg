@@ -6,16 +6,18 @@ exports[`Popover should pass additional props to portaled element 1`] = `
     tabindex="-1"
   >
     <div>
-      <div
-        class="components-popover is-bottom is-center components-animate__appear is-from-top"
-        role="tooltip"
-        style=""
-      >
+      <div>
         <div
-          class="components-popover__content"
-          tabindex="-1"
+          class="components-popover is-bottom is-center components-animate__appear is-from-top"
+          role="tooltip"
+          style=""
         >
-          Hello
+          <div
+            class="components-popover__content"
+            tabindex="-1"
+          >
+            Hello
+          </div>
         </div>
       </div>
     </div>
@@ -29,15 +31,17 @@ exports[`Popover should render content 1`] = `
     tabindex="-1"
   >
     <div>
-      <div
-        class="components-popover is-bottom is-center components-animate__appear is-from-top"
-        style=""
-      >
+      <div>
         <div
-          class="components-popover__content"
-          tabindex="-1"
+          class="components-popover is-bottom is-center components-animate__appear is-from-top"
+          style=""
         >
-          Hello
+          <div
+            class="components-popover__content"
+            tabindex="-1"
+          >
+            Hello
+          </div>
         </div>
       </div>
     </div>

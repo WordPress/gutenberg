@@ -9,13 +9,6 @@ export const PREFERENCES_DEFAULTS = {
 };
 
 /**
- * Default initial edits state.
- *
- * @type {Object}
- */
-export const INITIAL_EDITS_DEFAULTS = {};
-
-/**
  * The default post editor settings
  *
  *  allowedBlockTypes  boolean|Array Allowed block types

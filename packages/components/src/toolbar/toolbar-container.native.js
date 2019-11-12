@@ -4,14 +4,19 @@
 import { View } from 'react-native';
 
 /**
+ * WordPress dependencies
+ */
+import { withPreferredColorScheme } from '@wordpress/compose';
+
+/**
  * Internal dependencies
  */
 import styles from './style.scss';
 
-const ToolbarContainer = ( props ) => (
-	<View style={ [ styles.container, props.passedStyle ] }>
-		{ props.children }
+const ToolbarContainer = ( { getStylesFromColorScheme, passedStyle, children } ) => (
+	<View style={ [ getStylesFromColorScheme( styles.container, styles.containerDark ), passedStyle ] }>
+		{ children }
 	</View>
 );
 
-export default ToolbarContainer;
+export default withPreferredColorScheme( ToolbarContainer );

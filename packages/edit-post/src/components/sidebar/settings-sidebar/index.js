@@ -20,6 +20,7 @@ import PostLink from '../post-link';
 import DiscussionPanel from '../discussion-panel';
 import PageAttributes from '../page-attributes';
 import MetaBoxes from '../../meta-boxes';
+import PluginDocumentSettingPanel from '../plugin-document-setting-panel';
 
 const SettingsSidebar = ( { sidebarName } ) => (
 	<Sidebar
@@ -31,6 +32,7 @@ const SettingsSidebar = ( { sidebarName } ) => (
 			{ sidebarName === 'edit-post/document' && (
 				<>
 					<PostStatus />
+					<PluginDocumentSettingPanel.Slot />
 					<LastRevision />
 					<PostLink />
 					<PostTaxonomies />

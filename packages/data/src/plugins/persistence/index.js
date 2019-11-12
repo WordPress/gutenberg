@@ -10,14 +10,13 @@ import defaultStorage from './storage/default';
 import { combineReducers } from '../../';
 
 /**
- * Persistence plugin options.
+ * @typedef {Object} WPDataPersistencePluginOptions Persistence plugin options.
  *
  * @property {Storage} storage    Persistent storage implementation. This must
  *                                at least implement `getItem` and `setItem` of
  *                                the Web Storage API.
  * @property {string}  storageKey Key on which to set in persistent storage.
  *
- * @typedef {WPDataPersistencePluginOptions}
  */
 
 /**

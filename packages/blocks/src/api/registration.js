@@ -5,6 +5,8 @@
  */
 import {
 	get,
+	omit,
+	pick,
 	isFunction,
 	isPlainObject,
 	some,
@@ -20,33 +22,76 @@ import { select, dispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import { isValidIcon, normalizeIconObject } from './utils';
+import { DEPRECATED_ENTRY_KEYS } from './constants';
+
+/**
+ * Render behavior of a block type icon; one of a Dashicon slug, an element,
+ * or a component.
+ *
+ * @typedef {(string|WPElement|WPComponent)} WPBlockTypeIconRender
+ *
+ * @see https://developer.wordpress.org/resource/dashicons/
+ */
+
+/**
+ * An object describing a normalized block type icon.
+ *
+ * @typedef {Object} WPBlockTypeIconDescriptor
+ *
+ * @property {WPBlockTypeIconRender} src         Render behavior of the icon,
+ *                                               one of a Dashicon slug, an
+ *                                               element, or a component.
+ * @property {string}                background  Optimal background hex string
+ *                                               color when displaying icon.
+ * @property {string}                foreground  Optimal foreground hex string
+ *                                               color when displaying icon.
+ * @property {string}                shadowColor Optimal shadow hex string
+ *                                               color when displaying icon.
+ */
+
+/**
+ * Value to use to render the icon for a block type in an editor interface,
+ * either a Dashicon slug, an element, a component, or an object describing
+ * the icon.
+ *
+ * @typedef {(WPBlockTypeIconDescriptor|WPBlockTypeIconRender)} WPBlockTypeIcon
+ */
 
 /**
  * Defined behavior of a block type.
  *
- * @typedef {WPBlockType}
+ * @typedef {Object} WPBlockType
  *
- * @property {string}                    name       Block's namespaced name.
- * @property {string}                    title      Human-readable label for a block.
- *                                                  Shown in the block inserter.
- * @property {string}                    category   Category classification of block,
- *                                                  impacting where block is shown in
- *                                                  inserter results.
- * @property {(Object|string|WPElement)} icon       Slug of the Dashicon to be shown
- *                                                  as the icon for the block in the
- *                                                  inserter, or element or an object describing the icon.
- * @property {?string[]}                 keywords   Additional keywords to produce
- *                                                  block as inserter search result.
- * @property {?Object}                   attributes Block attributes.
- * @property {?Function}                 save       Serialize behavior of a block,
- *                                                  returning an element describing
- *                                                  structure of the block's post
- *                                                  content markup.
- * @property {WPComponent}               edit       Component rendering element to be
- *                                                  interacted with in an editor.
+ * @property {string}           name        Block type's namespaced name.
+ * @property {string}           title       Human-readable block type label.
+ * @property {string}           category    Block type category classification,
+ *                                          used in search interfaces to arrange
+ *                                          block types by category.
+ * @property {WPBlockTypeIcon} [icon]       Block type icon.
+ * @property {string[]}        [keywords]   Additional keywords to produce block
+ *                                          type as result in search interfaces.
+ * @property {Object}          [attributes] Block type attributes.
+ * @property {WPComponent}     [save]       Optional component describing
+ *                                          serialized markup structure of a
+ *                                          block type.
+ * @property {WPComponent}      edit        Component rendering an element to
+ *                                          manipulate the attributes of a block
+ *                                          in the context of an editor.
  */
 
-let serverSideBlockDefinitions = {};
+/**
+ * Default values to assign for omitted optional block type settings.
+ *
+ * @type {Object}
+ */
+export const DEFAULT_BLOCK_TYPE_SETTINGS = {
+	icon: 'block-default',
+	attributes: {},
+	keywords: [],
+	save: () => null,
+};
+
+export let serverSideBlockDefinitions = {};
 
 /**
  * Sets the server side block definition of blocks.
@@ -74,7 +119,7 @@ export function unstable__bootstrapServerSideBlockDefinitions( definitions ) { /
 export function registerBlockType( name, settings ) {
 	settings = {
 		name,
-		save: () => null,
+		...DEFAULT_BLOCK_TYPE_SETTINGS,
 		...get( serverSideBlockDefinitions, name ),
 		...settings,
 	};
@@ -98,7 +143,30 @@ export function registerBlockType( name, settings ) {
 		return;
 	}
 
+	const preFilterSettings = { ...settings };
 	settings = applyFilters( 'blocks.registerBlockType', settings, name );
+
+	if ( settings.deprecated ) {
+		settings.deprecated = settings.deprecated.map( ( deprecation ) =>
+			pick( // Only keep valid deprecation keys.
+				applyFilters(
+					'blocks.registerBlockType',
+					// Merge deprecation keys with pre-filter settings
+					// so that filters that depend on specific keys being
+					// present don't fail.
+					{
+						// Omit deprecation keys here so that deprecations
+						// can opt out of specific keys like "supports".
+						...omit( preFilterSettings, DEPRECATED_ENTRY_KEYS ),
+						...deprecation,
+					},
+					name
+				),
+				DEPRECATED_ENTRY_KEYS
+			)
+		);
+	}
+
 	if ( ! isPlainObject( settings ) ) {
 		console.error(
 			'Block settings must be a valid object.'
@@ -193,10 +261,19 @@ export function setFreeformContentHandlerName( blockName ) {
  * Retrieves name of block handling non-block content, or undefined if no
  * handler has been defined.
  *
- * @return {?string} Blog name.
+ * @return {?string} Block name.
  */
 export function getFreeformContentHandlerName() {
 	return select( 'core/blocks' ).getFreeformFallbackBlockName();
+}
+
+/**
+ * Retrieves name of block used for handling grouping interactions.
+ *
+ * @return {?string} Block name.
+ */
+export function getGroupingBlockName() {
+	return select( 'core/blocks' ).getGroupingBlockName();
 }
 
 /**
@@ -212,7 +289,7 @@ export function setUnregisteredTypeHandlerName( blockName ) {
  * Retrieves name of block handling unregistered block types, or undefined if no
  * handler has been defined.
  *
- * @return {?string} Blog name.
+ * @return {?string} Block name.
  */
 export function getUnregisteredTypeHandlerName() {
 	return select( 'core/blocks' ).getUnregisteredFallbackBlockName();
@@ -225,6 +302,15 @@ export function getUnregisteredTypeHandlerName() {
  */
 export function setDefaultBlockName( name ) {
 	dispatch( 'core/blocks' ).setDefaultBlockName( name );
+}
+
+/**
+ * Assigns name of block for handling block grouping interactions.
+ *
+ * @param {string} name Block name.
+ */
+export function setGroupingBlockName( name ) {
+	dispatch( 'core/blocks' ).setGroupingBlockName( name );
 }
 
 /**

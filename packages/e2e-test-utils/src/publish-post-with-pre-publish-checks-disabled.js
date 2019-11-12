@@ -6,5 +6,5 @@
  */
 export async function publishPostWithPrePublishChecksDisabled() {
 	await page.click( '.editor-post-publish-button' );
-	return page.waitForSelector( '.components-notice.is-success' );
+	return page.waitForSelector( '.components-snackbar' );
 }

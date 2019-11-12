@@ -21,7 +21,8 @@ exports[`AlignmentToolbar should allow custom alignment controls to be specified
     ]
   }
   icon="editor-aligncenter"
-  label="Change Text Alignment"
+  isCollapsed={true}
+  label="Change text alignment"
 />
 `;
 
@@ -34,25 +35,26 @@ exports[`AlignmentToolbar should match snapshot 1`] = `
         "icon": "editor-alignleft",
         "isActive": true,
         "onClick": [Function],
-        "title": "Align text left",
+        "title": "Align Text Left",
       },
       Object {
         "align": "center",
         "icon": "editor-aligncenter",
         "isActive": false,
         "onClick": [Function],
-        "title": "Align text center",
+        "title": "Align Text Center",
       },
       Object {
         "align": "right",
         "icon": "editor-alignright",
         "isActive": false,
         "onClick": [Function],
-        "title": "Align text right",
+        "title": "Align Text Right",
       },
     ]
   }
   icon="editor-alignleft"
-  label="Change Text Alignment"
+  isCollapsed={true}
+  label="Change text alignment"
 />
 `;

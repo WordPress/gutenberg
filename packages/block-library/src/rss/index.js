@@ -20,5 +20,10 @@ export const settings = {
 		align: true,
 		html: false,
 	},
+	example: {
+		attributes: {
+			feedURL: 'https://wordpress.org',
+		},
+	},
 	edit,
 };

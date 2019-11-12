@@ -1,13 +1,12 @@
 /**
  * External dependencies
  */
-import { filter, every, map } from 'lodash';
+import { filter, every } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { createBlock } from '@wordpress/blocks';
-import { mediaUpload } from '@wordpress/editor';
 import { createBlobURL } from '@wordpress/blob';
 
 /**
@@ -37,7 +36,7 @@ const transforms = {
 				// Loop through all the images and check if they have the same align.
 				align = every( attributes, [ 'align', align ] ) ? align : undefined;
 
-				const validImages = filter( attributes, ( { id, url } ) => id && url );
+				const validImages = filter( attributes, ( { url } ) => url );
 
 				return createBlock( 'core/gallery', {
 					images: validImages.map( ( { id, url, alt, caption } ) => ( {
@@ -89,24 +88,11 @@ const transforms = {
 			isMatch( files ) {
 				return files.length !== 1 && every( files, ( file ) => file.type.indexOf( 'image/' ) === 0 );
 			},
-			transform( files, onChange ) {
+			transform( files ) {
 				const block = createBlock( 'core/gallery', {
 					images: files.map( ( file ) => pickRelevantMediaFiles( {
 						url: createBlobURL( file ),
 					} ) ),
-				} );
-				mediaUpload( {
-					filesList: files,
-					onFileChange: ( images ) => {
-						const imagesAttr = images.map(
-							pickRelevantMediaFiles,
-						);
-						onChange( block.clientId, {
-							ids: map( imagesAttr, 'id' ),
-							images: imagesAttr,
-						} );
-					},
-					allowedTypes: [ 'image' ],
 				} );
 				return block;
 			},

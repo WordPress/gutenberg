@@ -1,0 +1,19 @@
+
+.block-directory-downloadable-blocks-panel__description {
+	font-style: italic;
+	padding: 0;
+	margin-top: 0;
+	text-align: left;
+	color: $dark-gray-400;
+}
+
+.block-directory-downloadable-blocks-panel__description.has-no-results {
+	font-style: normal;
+	padding: 0;
+	margin-top: 100px;
+	text-align: center;
+	color: $dark-gray-400;
+	.components-spinner {
+		float: inherit;
+	}
+}

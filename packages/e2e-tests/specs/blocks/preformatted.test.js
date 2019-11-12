@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import {
+	clickBlockToolbarButton,
 	getEditedPostContent,
 	createNewPost,
 	insertBlock,
@@ -21,16 +22,12 @@ describe( 'Preformatted', () => {
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
-		await page.keyboard.press( 'Escape' );
-		await page.waitForSelector( 'button[aria-label="More options"]' );
-		await page.click( 'button[aria-label="More options"]' );
+		await clickBlockToolbarButton( 'More options' );
 		await clickButton( 'Convert to Blocks' );
 		// Once it's edited, it should be saved as BR tags.
 		await page.keyboard.type( '0' );
 		await page.keyboard.press( 'Enter' );
-		await page.keyboard.press( 'Escape' );
-		await page.waitForSelector( 'button[aria-label="More options"]' );
-		await page.click( 'button[aria-label="More options"]' );
+		await clickBlockToolbarButton( 'More options' );
 		await clickButton( 'Edit as HTML' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();

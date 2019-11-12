@@ -23,12 +23,6 @@
 		},
 		"customTextColor": {
 			"type": "string"
-		},
-		"backgroundColor": {
-			"type": "string"
-		},
-		"customBackgroundColor": {
-			"type": "string"
 		}
 	}
 }

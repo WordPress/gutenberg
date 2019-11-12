@@ -19,6 +19,7 @@ $mobile-text-min-font-size: 16px; // Any font size below 16px will cause Mobile 
 $grid-size-small: 4px;
 $grid-size: 8px;
 $grid-size-large: 16px;
+$grid-size-xlarge: 24px;
 
 // Widths, heights & dimensions
 $panel-padding: 16px;
@@ -65,3 +66,6 @@ $block-bg-padding--h: $block-side-ui-width + $block-side-ui-clearance; // paddin
 // Buttons & UI Widgets
 $radius-round-rectangle: 4px;
 $radius-round: 50%;
+
+// Widgets screen
+$widget-area-width: 700px;

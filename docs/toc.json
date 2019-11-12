@@ -18,6 +18,7 @@
 		] },
 		{"docs/designers-developers/developers/slotfills/README.md": [
 			{ "docs/designers-developers/developers/slotfills/plugin-block-settings-menu-item.md": []  },
+			{ "docs/designers-developers/developers/slotfills/plugin-document-setting-panel.md": []  },
 			{ "docs/designers-developers/developers/slotfills/plugin-more-menu-item.md": []  },
 			{ "docs/designers-developers/developers/slotfills/plugin-post-publish-panel.md": []  },
 			{ "docs/designers-developers/developers/slotfills/plugin-post-status-info.md": []  },
@@ -25,6 +26,7 @@
 			{ "docs/designers-developers/developers/slotfills/plugin-sidebar.md": [] },
 			{ "docs/designers-developers/developers/slotfills/plugin-sidebar-more-menu-item.md": []  }
 		]},
+		{ "docs/designers-developers/developers/richtext.md": [] },
 		{ "docs/designers-developers/developers/internationalization.md": [] },
 		{ "docs/designers-developers/developers/accessibility.md": [] },
 		{ "docs/designers-developers/developers/feature-flags.md": [] },
@@ -82,7 +84,7 @@
 			{ "docs/designers-developers/developers/tutorials/block-tutorial/writing-your-first-block-type.md": [] },
 			{ "docs/designers-developers/developers/tutorials/block-tutorial/applying-styles-with-stylesheets.md": [] },
 			{ "docs/designers-developers/developers/tutorials/block-tutorial/introducing-attributes-and-editable-fields.md": [] },
-			{ "docs/designers-developers/developers/tutorials/block-tutorial/block-controls-toolbars-and-inspector.md": [] },
+			{ "docs/designers-developers/developers/tutorials/block-tutorial/block-controls-toolbar-and-sidebar.md": [] },
 			{ "docs/designers-developers/developers/tutorials/block-tutorial/creating-dynamic-blocks.md": [] },
 			{ "docs/designers-developers/developers/tutorials/block-tutorial/generate-blocks-with-wp-cli.md": [] }
 		] },

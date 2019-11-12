@@ -68,56 +68,56 @@ In particular, it should…
 
 ## Benchmarks
 
-The following results were produced under Node v8.11.1 (LTS) on a MacBook Pro (Late 2016) 2.9 GHz Intel Core i7.
+The following results were produced under Node v10.15.3 (LTS) on a MacBook Pro (Late 2016) 2.9 GHz Intel Core i7.
 
->`@wordpress/is-shallow-equal (type specific) (object, equal) x 4,902,162 ops/sec ±0.40% (89 runs sampled)`  
->`@wordpress/is-shallow-equal (type specific) (object, same) x 558,234,287 ops/sec ±0.28% (92 runs sampled)`  
->`@wordpress/is-shallow-equal (type specific) (object, unequal) x 5,062,890 ops/sec ±0.71% (90 runs sampled)`  
->`@wordpress/is-shallow-equal (type specific) (array, equal) x 70,419,519 ops/sec ±0.56% (86 runs sampled)`  
->`@wordpress/is-shallow-equal (type specific) (array, same) x 561,159,444 ops/sec ±0.33% (91 runs sampled)`  
->`@wordpress/is-shallow-equal (type specific) (array, unequal) x 37,299,061 ops/sec ±0.89% (86 runs sampled)`  
+>`@wordpress/is-shallow-equal (type specific) (object, equal) x 4,519,009 ops/sec ±1.09% (90 runs sampled)`
+>`@wordpress/is-shallow-equal (type specific) (object, same) x 795,527,700 ops/sec ±0.24% (93 runs sampled)`
+>`@wordpress/is-shallow-equal (type specific) (object, unequal) x 4,841,640 ops/sec ±0.94% (93 runs sampled)`
+>`@wordpress/is-shallow-equal (type specific) (array, equal) x 106,393,795 ops/sec ±0.16% (94 runs sampled)`
+>`@wordpress/is-shallow-equal (type specific) (array, same) x 800,741,511 ops/sec ±0.22% (95 runs sampled)`
+>`@wordpress/is-shallow-equal (type specific) (array, unequal) x 49,178,977 ops/sec ±1.99% (82 runs sampled)`
 >
->`@wordpress/is-shallow-equal (object, equal) x 4,449,938 ops/sec ±0.34% (91 runs sampled)`  
->`@wordpress/is-shallow-equal (object, same) x 516,101,448 ops/sec ±0.64% (90 runs sampled)`  
->`@wordpress/is-shallow-equal (object, unequal) x 4,925,231 ops/sec ±0.28% (91 runs sampled)`  
->`@wordpress/is-shallow-equal (array, equal) x 30,432,490 ops/sec ±0.80% (86 runs sampled)`  
->`@wordpress/is-shallow-equal (array, same) x 505,206,883 ops/sec ±0.37% (93 runs sampled)`  
->`@wordpress/is-shallow-equal (array, unequal) x 33,590,955 ops/sec ±0.96% (86 runs sampled)`  
+>`@wordpress/is-shallow-equal (object, equal) x 4,449,367 ops/sec ±0.31% (91 runs sampled)`
+>`@wordpress/is-shallow-equal (object, same) x 796,677,179 ops/sec ±0.23% (94 runs sampled)`
+>`@wordpress/is-shallow-equal (object, unequal) x 4,989,529 ops/sec ±0.30% (91 runs sampled)`
+>`@wordpress/is-shallow-equal (array, equal) x 44,840,546 ops/sec ±1.18% (89 runs sampled)`
+>`@wordpress/is-shallow-equal (array, same) x 794,344,723 ops/sec ±0.24% (91 runs sampled)`
+>`@wordpress/is-shallow-equal (array, unequal) x 49,860,115 ops/sec ±1.73% (85 runs sampled)`
 >
->`shallowequal (object, equal) x 3,407,788 ops/sec ±0.46% (93 runs sampled)`  
->`shallowequal (object, same) x 494,715,603 ops/sec ±0.42% (91 runs sampled)`  
->`shallowequal (object, unequal) x 3,575,393 ops/sec ±0.54% (93 runs sampled)`  
->`shallowequal (array, equal) x 1,530,453 ops/sec ±0.32% (92 runs sampled)`  
->`shallowequal (array, same) x 489,793,575 ops/sec ±0.60% (90 runs sampled)`  
->`shallowequal (array, unequal) x 1,534,574 ops/sec ±0.32% (90 runs sampled)`  
+>`shallowequal (object, equal) x 3,702,126 ops/sec ±0.87% (92 runs sampled)`
+>`shallowequal (object, same) x 796,649,597 ops/sec ±0.21% (92 runs sampled)`
+>`shallowequal (object, unequal) x 4,027,885 ops/sec ±0.31% (96 runs sampled)`
+>`shallowequal (array, equal) x 1,684,977 ops/sec ±0.37% (94 runs sampled)`
+>`shallowequal (array, same) x 794,287,091 ops/sec ±0.26% (91 runs sampled)`
+>`shallowequal (array, unequal) x 1,738,554 ops/sec ±0.29% (91 runs sampled)`
 >
->`shallow-equal (type specific) (object, equal) x 4,708,043 ops/sec ±0.30% (92 runs sampled)`  
->`shallow-equal (type specific) (object, same) x 537,831,873 ops/sec ±0.42% (88 runs sampled)`  
->`shallow-equal (type specific) (object, unequal) x 4,859,249 ops/sec ±0.28% (90 runs sampled)`  
->`shallow-equal (type specific) (array, equal) x 63,985,372 ops/sec ±0.54% (91 runs sampled)`  
->`shallow-equal (type specific) (array, same) x 540,675,335 ops/sec ±0.43% (89 runs sampled)`  
->`shallow-equal (type specific) (array, unequal) x 34,613,490 ops/sec ±0.81% (90 runs sampled)`  
+>`shallow-equal (type specific) (object, equal) x 4,669,656 ops/sec ±0.34% (92 runs sampled)`
+>`shallow-equal (type specific) (object, same) x 799,610,214 ops/sec ±0.20% (95 runs sampled)`
+>`shallow-equal (type specific) (object, unequal) x 4,908,591 ops/sec ±0.49% (93 runs sampled)`
+>`shallow-equal (type specific) (array, equal) x 104,711,254 ops/sec ±0.65% (91 runs sampled)`
+>`shallow-equal (type specific) (array, same) x 798,454,281 ops/sec ±0.29% (94 runs sampled)`
+>`shallow-equal (type specific) (array, unequal) x 48,764,338 ops/sec ±1.48% (84 runs sampled)`
 >
->`is-equal-shallow (object, equal) x 2,798,059 ops/sec ±0.42% (93 runs sampled)`  
->`is-equal-shallow (object, same) x 2,844,934 ops/sec ±0.39% (93 runs sampled)`  
->`is-equal-shallow (object, unequal) x 3,223,288 ops/sec ±0.57% (92 runs sampled)`  
->`is-equal-shallow (array, equal) x 1,060,093 ops/sec ±0.32% (93 runs sampled)`  
->`is-equal-shallow (array, same) x 1,058,977 ops/sec ±0.31% (94 runs sampled)`  
->`is-equal-shallow (array, unequal) x 1,697,517 ops/sec ±0.28% (91 runs sampled)`  
+>`is-equal-shallow (object, equal) x 5,068,750 ops/sec ±0.28% (92 runs sampled)`
+>`is-equal-shallow (object, same) x 17,231,997 ops/sec ±0.42% (92 runs sampled)`
+>`is-equal-shallow (object, unequal) x 5,524,878 ops/sec ±0.41% (92 runs sampled)`
+>`is-equal-shallow (array, equal) x 1,067,063 ops/sec ±0.40% (92 runs sampled)`
+>`is-equal-shallow (array, same) x 1,074,356 ops/sec ±0.20% (94 runs sampled)`
+>`is-equal-shallow (array, unequal) x 1,758,859 ops/sec ±0.44% (92 runs sampled)`
 >
->`shallow-equals (object, equal) x 4,457,325 ops/sec ±0.40% (92 runs sampled)`  
->`shallow-equals (object, same) x 4,509,250 ops/sec ±0.48% (92 runs sampled)`  
->`shallow-equals (object, unequal) x 4,856,327 ops/sec ±0.41% (94 runs sampled)`  
->`shallow-equals (array, equal) x 44,915,371 ops/sec ±2.18% (79 runs sampled)`  
->`shallow-equals (array, same) x 38,514,418 ops/sec ±1.25% (83 runs sampled)`  
->`shallow-equals (array, unequal) x 24,319,893 ops/sec ±0.96% (84 runs sampled)`  
+>`shallow-equals (object, equal) x 8,380,550 ops/sec ±0.31% (90 runs sampled)`
+>`shallow-equals (object, same) x 27,583,073 ops/sec ±0.60% (91 runs sampled)`
+>`shallow-equals (object, unequal) x 8,954,268 ops/sec ±0.71% (92 runs sampled)`
+>`shallow-equals (array, equal) x 104,437,640 ops/sec ±0.22% (96 runs sampled)`
+>`shallow-equals (array, same) x 141,850,542 ops/sec ±0.25% (93 runs sampled)`
+>`shallow-equals (array, unequal) x 47,964,211 ops/sec ±1.51% (84 runs sampled)`
 >
->`fbjs/lib/shallowEqual (object, equal) x 3,388,692 ops/sec ±0.72% (92 runs sampled)`  
->`fbjs/lib/shallowEqual (object, same) x 139,559,732 ops/sec ±4.45% (32 runs sampled)`  
->`fbjs/lib/shallowEqual (object, unequal) x 3,480,571 ops/sec ±0.51% (90 runs sampled)`  
->`fbjs/lib/shallowEqual (array, equal) x 1,517,044 ops/sec ±0.42% (91 runs sampled)`  
->`fbjs/lib/shallowEqual (array, same) x 134,032,009 ops/sec ±2.82% (46 runs sampled)`  
->`fbjs/lib/shallowEqual (array, unequal) x 1,532,376 ops/sec ±0.41% (91 runs sampled)`  
+>`fbjs/lib/shallowEqual (object, equal) x 3,366,709 ops/sec ±0.35% (93 runs sampled)`
+>`fbjs/lib/shallowEqual (object, same) x 794,825,194 ops/sec ±0.24% (94 runs sampled)`
+>`fbjs/lib/shallowEqual (object, unequal) x 3,612,268 ops/sec ±0.37% (94 runs sampled)`
+>`fbjs/lib/shallowEqual (array, equal) x 1,613,800 ops/sec ±0.23% (90 runs sampled)`
+>`fbjs/lib/shallowEqual (array, same) x 794,861,384 ops/sec ±0.24% (93 runs sampled)`
+>`fbjs/lib/shallowEqual (array, unequal) x 1,648,398 ops/sec ±0.77% (92 runs sampled)`
 
 You can run the benchmarks yourselves by cloning the repository, installing dependencies, and running the `benchmark/index.js` script:
 

@@ -1,3 +1,9 @@
+## 1.5.0 (2019-08-05)
+
+### Bug Fixes
+
+- Resolved an issue where an explicit `undefined` value in the first object may wrongly report as being shallow equal when the two objects are otherwise of equal length. ([#16329](https://github.com/WordPress/gutenberg/pull/16329))
+
 ## 1.2.0 (2019-03-06)
 
 ### New Feature

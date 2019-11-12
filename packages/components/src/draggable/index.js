@@ -66,8 +66,6 @@ class Draggable extends Component {
 	 * - Adds dragover listener.
 	 *
 	 * @param  {Object} event The non-custom DragEvent.
-	 * @param  {string} elementId The HTML id of the element to be dragged.
-	 * @param  {Object} transferData The data to be set to the event's dataTransfer - to be accessible in any later drop logic.
 	 */
 	onDragStart( event ) {
 		const { elementId, transferData, onDragStart = noop } = this.props;
@@ -118,7 +116,7 @@ class Draggable extends Component {
 		}
 
 		// Hack: Remove iFrames as it's causing the embeds drag clone to freeze
-		[ ...clone.querySelectorAll( 'iframe' ) ].forEach( ( child ) => child.parentNode.removeChild( child ) );
+		Array.from( clone.querySelectorAll( 'iframe' ) ).forEach( ( child ) => child.parentNode.removeChild( child ) );
 
 		this.cloneWrapper.appendChild( clone );
 		elementWrapper.appendChild( this.cloneWrapper );

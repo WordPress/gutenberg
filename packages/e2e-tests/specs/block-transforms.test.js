@@ -19,6 +19,7 @@ import {
 	getEditedPostContent,
 	hasBlockSwitcher,
 	createNewPost,
+	enableExperimentalFeatures,
 	setPostContent,
 	selectBlockByClientId,
 	transformBlockTo,
@@ -94,17 +95,12 @@ const getTransformResult = async ( blockContent, transformName ) => {
 	return getEditedPostContent();
 };
 
-// Skipping all the tests when plugins are enabled
-// makes sure the tests are not executed, and no unused snapshots errors are thrown.
-const maybeDescribe = process.env.POPULAR_PLUGINS ?
-	describe.skip :
-	describe;
-
-maybeDescribe( 'Block transforms', () => {
+describe( 'Block transforms', () => {
 	const fileBasenames = getAvailableBlockFixturesBasenames();
 
 	const transformStructure = {};
 	beforeAll( async () => {
+		await enableExperimentalFeatures( [ '#gutenberg-widget-experiments', '#gutenberg-menu-block' ] );
 		await createNewPost();
 
 		for ( const fileBase of fileBasenames ) {
@@ -159,7 +155,12 @@ maybeDescribe( 'Block transforms', () => {
 			)
 		);
 
-		it.each( testTable )(
+		// As Group is available as a transform on *all* blocks this would create a lot of
+		// tests which would impact on the performance of the e2e test suite.
+		// To avoid this, we remove `core/group` from test table for all but 2 block types.
+		const testTableWithSomeGroupsFiltered = testTable.filter( ( transform ) => ( transform[ 2 ] !== 'Group' || transform[ 1 ] === 'core__paragraph__align-right' || transform[ 1 ] === 'core__image' ) );
+
+		it.each( testTableWithSomeGroupsFiltered )(
 			'block %s in fixture %s into the %s block',
 			async ( originalBlock, fixture, destinationBlock ) => {
 				const { content } = transformStructure[ fixture ];

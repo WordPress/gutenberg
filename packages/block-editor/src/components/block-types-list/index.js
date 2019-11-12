@@ -21,9 +21,6 @@ function BlockTypesList( { items, onSelect, onHover = () => {}, children } ) {
 					key={ item.id }
 					className={ getBlockMenuDefaultClassName( item.id ) }
 					icon={ item.icon }
-					hasChildBlocksWithInserterSupport={
-						item.hasChildBlocksWithInserterSupport
-					}
 					onClick={ () => {
 						onSelect( item );
 						onHover( null );

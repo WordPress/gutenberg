@@ -18,7 +18,7 @@ Blocks can be static or dynamic. Static blocks contain rendered content and an o
 
 Each block contains Attributes or configuration settings, which can be sourced from raw HTML in the content, via meta or other customizable origins.
 
-The Paragraph is the default Block. Instead of a new line upon typing return on a keyboard, try to think of it as an empty paragraph block (type / to trigger an autocompleting Slash Inserter -- /image will pull up Images as well as Instagram embeds).
+The Paragraph is the default block. Instead of a new line upon typing return on a keyboard, try to think of it as an empty Paragraph block (type / to trigger an autocompleting Slash Inserter -- /image will pull up Images as well as Instagram embeds).
 
 Users insert new blocks by clicking the plus button for the Block Inserter, typing / for the Slash Inserter or typing return for a blank Paragraph block.
 

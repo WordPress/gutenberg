@@ -14,6 +14,12 @@ exports[`undo Should undo to expected level intervals 1`] = `
 <!-- /wp:paragraph -->"
 `;
 
+exports[`undo should immediately create an undo level on typing 1`] = `
+"<!-- wp:paragraph -->
+<p>1</p>
+<!-- /wp:paragraph -->"
+`;
+
 exports[`undo should undo typing after a pause 1`] = `
 "<!-- wp:paragraph -->
 <p>before pause after pause</p>

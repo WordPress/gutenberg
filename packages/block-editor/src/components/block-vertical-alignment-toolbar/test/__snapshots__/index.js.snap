@@ -79,6 +79,7 @@ exports[`BlockVerticalAlignmentToolbar should match snapshot 1`] = `
       />
     </SVG>
   }
-  label="Change Alignment"
+  isCollapsed={true}
+  label="Change vertical alignment"
 />
 `;

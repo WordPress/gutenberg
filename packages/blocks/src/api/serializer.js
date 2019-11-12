@@ -22,6 +22,12 @@ import { normalizeBlockType } from './utils';
 import BlockContentProvider from '../block-content-provider';
 
 /**
+ * @typedef {Object} WPBlockSerializationOptions Serialization Options.
+ *
+ * @property {boolean} isInnerBlocks Whether we are serializing inner blocks.
+ */
+
+/**
  * Returns the block's default classname from its name.
  *
  * @param {string} blockName The block name.
@@ -255,34 +261,37 @@ export function getCommentDelimitedContent( rawBlockName, attributes, content ) 
  * Returns the content of a block, including comment delimiters, determining
  * serialized attributes and content form from the current state of the block.
  *
- * @param {Object} block Block instance.
+ * @param {Object}                      block   Block instance.
+ * @param {WPBlockSerializationOptions} options Serialization options.
  *
  * @return {string} Serialized block.
  */
-export function serializeBlock( block ) {
+export function serializeBlock( block, { isInnerBlocks = false } = {} ) {
 	const blockName = block.name;
 	const saveContent = getBlockContent( block );
 
-	switch ( blockName ) {
-		case getFreeformContentHandlerName():
-		case getUnregisteredTypeHandlerName():
-			return saveContent;
-
-		default: {
-			const blockType = getBlockType( blockName );
-			const saveAttributes = getCommentAttributes( blockType, block.attributes );
-			return getCommentDelimitedContent( blockName, saveAttributes, saveContent );
-		}
+	if (
+		( blockName === getUnregisteredTypeHandlerName() ) ||
+		( ! isInnerBlocks && blockName === getFreeformContentHandlerName() )
+	) {
+		return saveContent;
 	}
+
+	const blockType = getBlockType( blockName );
+	const saveAttributes = getCommentAttributes( blockType, block.attributes );
+	return getCommentDelimitedContent( blockName, saveAttributes, saveContent );
 }
 
 /**
  * Takes a block or set of blocks and returns the serialized post content.
  *
- * @param {Array} blocks Block(s) to serialize.
+ * @param {Array}                       blocks  Block(s) to serialize.
+ * @param {WPBlockSerializationOptions} options Serialization options.
  *
  * @return {string} The post content.
  */
-export default function serialize( blocks ) {
-	return castArray( blocks ).map( serializeBlock ).join( '\n\n' );
+export default function serialize( blocks, options ) {
+	return castArray( blocks )
+		.map( ( block ) => serializeBlock( block, options ) )
+		.join( '\n\n' );
 }

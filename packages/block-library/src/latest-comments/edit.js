@@ -8,7 +8,7 @@ import {
 	RangeControl,
 	ToggleControl,
 } from '@wordpress/components';
-import { ServerSideRender } from '@wordpress/editor';
+import ServerSideRender from '@wordpress/server-side-render';
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 

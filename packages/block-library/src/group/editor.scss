@@ -11,14 +11,14 @@
 	}
 
 	// Only applied when background is added to cancel out padding
-	> .editor-block-list__block-edit > div > .wp-block-group.has-background > .editor-inner-blocks {
+	> .editor-block-list__block-edit > div > .wp-block-group.has-background > .wp-block-group__inner-container > .editor-inner-blocks {
 		margin-top: -#{$block-padding*2 + $block-spacing};
 		margin-bottom: -#{$block-padding*2 + $block-spacing};
 	}
 
 	// Full Width Blocks
 	// specificity required to only target immediate child Blocks of a Group
-	> .editor-block-list__block-edit > div > .wp-block-group > .editor-inner-blocks > .editor-block-list__layout > .wp-block[data-align="full"] {
+	> .editor-block-list__block-edit > div > .wp-block-group > .wp-block-group__inner-container > .editor-inner-blocks > .editor-block-list__layout > .wp-block[data-align="full"] {
 		margin-left: auto;
 		margin-right: auto;
 		padding-left: $block-padding*2;
@@ -31,7 +31,7 @@
 	}
 
 	// Full Width Blocks with a background (ie: has padding)
-	> .editor-block-list__block-edit > div > .wp-block-group.has-background > .editor-inner-blocks > .editor-block-list__layout > .wp-block[data-align="full"] {
+	> .editor-block-list__block-edit > div > .wp-block-group.has-background > .wp-block-group__inner-container > .editor-inner-blocks > .editor-block-list__layout > .wp-block[data-align="full"] {
 		// note: using position `left` causes hoz scrollbars so
 		// we opt to use margin instead
 		// the 30px matches the hoz padding applied in `theme.scss`
@@ -51,7 +51,7 @@
 .wp-block[data-type="core/group"][data-align="full"] {
 
 	// First tier of InnerBlocks must act like the container of the standard canvas
-	> .editor-block-list__block-edit > div > .wp-block-group > .editor-inner-blocks {
+	> .editor-block-list__block-edit > div > .wp-block-group > .wp-block-group__inner-container > .editor-inner-blocks {
 		margin-left: auto;
 		margin-right: auto;
 		padding-left: 0;
@@ -65,7 +65,7 @@
 
 	// Full Width Blocks
 	// specificity required to only target immediate child Blocks of Group
-	> .editor-block-list__block-edit > div > .wp-block-group > .editor-inner-blocks > .editor-block-list__layout > .wp-block[data-align="full"] {
+	> .editor-block-list__block-edit > div > .wp-block-group > .wp-block-group__inner-container > .editor-inner-blocks > .editor-block-list__layout > .wp-block[data-align="full"] {
 		padding-right: 0;
 		padding-left: 0;
 		left: 0;
@@ -81,7 +81,35 @@
 
 	// Full Width Blocks with a background (ie: has padding)
 	// note: also duplicated above for all Group widths
-	> .editor-block-list__block-edit > div > .wp-block-group.has-background > .editor-inner-blocks > .editor-block-list__layout > .wp-block[data-align="full"] {
+	> .editor-block-list__block-edit > div > .wp-block-group.has-background > .wp-block-group__inner-container > .editor-inner-blocks > .editor-block-list__layout > .wp-block[data-align="full"] {
 		width: calc(100% + 60px);
+	}
+}
+
+// Add padding when the block is selected, for easier interaction.
+.block-editor-block-list__layout .block-editor-block-list__block[data-type="core/group"].has-child-selected > .block-editor-block-list__block-edit > [data-block] > .wp-block-group,
+.block-editor-block-list__layout .block-editor-block-list__block[data-type="core/group"].is-selected > .block-editor-block-list__block-edit > [data-block] > .wp-block-group {
+
+	> .wp-block-group__inner-container > .block-editor-inner-blocks {
+		padding: $block-padding;
+	}
+
+	&:not(.has-background) > .wp-block-group__inner-container > .block-editor-inner-blocks > .block-editor-block-list__layout {
+		margin-top: -$block-padding * 2;
+		margin-bottom: -$block-padding * 2;
+	}
+}
+
+// Place block list appender in the same place content will appear.
+[data-type="core/group"].is-selected {
+
+	.block-list-appender {
+		margin-left: 0;
+		margin-right: 0;
+	}
+
+	.has-background .block-list-appender {
+		margin-top: $block-padding + $grid-size-small;
+		margin-bottom: $block-padding + $grid-size-small;
 	}
 }

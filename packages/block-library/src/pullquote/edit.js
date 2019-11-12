@@ -63,22 +63,28 @@ class PullQuoteEdit extends Component {
 		const { value, citation } = attributes;
 
 		const isSolidColorStyle = includes( className, SOLID_COLOR_CLASS );
-		const figureStyle = isSolidColorStyle ?
+		const figureStyles = isSolidColorStyle ?
 			{ backgroundColor: mainColor.color } :
 			{ borderColor: mainColor.color };
-		const blockquoteStyle = {
+
+		const figureClasses = classnames( className, {
+			'has-background': isSolidColorStyle && mainColor.color,
+			[ mainColor.class ]: isSolidColorStyle && mainColor.class,
+		} );
+
+		const blockquoteStyles = {
 			color: textColor.color,
 		};
-		const blockquoteClasses = textColor.color ? classnames( 'has-text-color', {
-			[ textColor.class ]: textColor.class,
-		} ) : undefined;
+
+		const blockquoteClasses = textColor.color && classnames(
+			'has-text-color',
+			{ [ textColor.class ]: textColor.class }
+		);
+
 		return (
 			<>
-				<figure style={ figureStyle } className={ classnames(
-					className, {
-						[ mainColor.class ]: isSolidColorStyle && mainColor.class,
-					} ) }>
-					<blockquote style={ blockquoteStyle } className={ blockquoteClasses }>
+				<figure style={ figureStyles } className={ figureClasses }>
+					<blockquote style={ blockquoteStyles } className={ blockquoteClasses }>
 						<RichText
 							multiline
 							value={ value }

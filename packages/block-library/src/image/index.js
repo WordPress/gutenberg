@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -24,6 +24,17 @@ export const settings = {
 	keywords: [
 		'img', // "img" is not translated as it is intended to reflect the HTML <img> tag.
 		__( 'photo' ),
+	],
+	example: {
+		attributes: {
+			sizeSlug: 'large',
+			url: 'https://upload.wikimedia.org/wikipedia/commons/1/15/MtBlanc1.JPG',
+			caption: __( 'Mont Blanc appears—still, snowy, and serene.' ),
+		},
+	},
+	styles: [
+		{ name: 'default', label: _x( 'Default', 'block style' ), isDefault: true },
+		{ name: 'circle-mask', label: _x( 'Circle Mask', 'block style' ) },
 	],
 	transforms,
 	getEditWrapperProps( attributes ) {

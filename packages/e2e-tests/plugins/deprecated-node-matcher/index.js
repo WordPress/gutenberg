@@ -1,7 +1,6 @@
 ( function() {
 	var registerBlockType = wp.blocks.registerBlockType;
-	var RichText = wp.editor.RichText;
-	var el = wp.element.createElement;
+	var RichText = wp.blockEditor.RichText;
 	var el = wp.element.createElement;
 
 	registerBlockType( 'core/deprecated-children-matcher', {
@@ -15,7 +14,6 @@
 		},
 		category: 'formatting',
 		edit: function( { attributes, setAttributes } ) {
-			console.log(  attributes.value )
 			return el( RichText, {
 				tagName: 'p',
 				value: attributes.value,
@@ -83,4 +81,3 @@
 		},
 	} );
 } )();
-

@@ -1,0 +1,28 @@
+{
+	"name": "@wordpress/project-management-automation",
+	"version": "1.0.0",
+	"description": "GitHub Action that implements various automation to assist with managing the Gutenberg GitHub repository.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/project-management-automation/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/project-management-automation"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"main": "lib/index.js",
+	"dependencies": {
+		"@actions/core": "^1.0.0",
+		"@actions/github": "^1.0.0",
+		"@babel/runtime": "^7.4.4"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

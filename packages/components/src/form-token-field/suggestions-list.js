@@ -91,7 +91,7 @@ class SuggestionsList extends Component {
 							'is-selected': index === this.props.selectedIndex,
 						} );
 
-						/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
+						/* eslint-disable jsx-a11y/click-events-have-key-events */
 						return (
 							<li
 								id={ `components-form-token-suggestions-${ this.props.instanceId }-${ index }` }
@@ -117,7 +117,7 @@ class SuggestionsList extends Component {
 								}
 							</li>
 						);
-						/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
+						/* eslint-enable jsx-a11y/click-events-have-key-events */
 					} )
 				}
 			</ul>

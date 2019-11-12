@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import classnames from 'classnames';
 import { partial, noop, find } from 'lodash';
 
 /**
@@ -74,7 +75,7 @@ class TabPanel extends Component {
 					className="components-tab-panel__tabs"
 				>
 					{ tabs.map( ( tab ) => (
-						<TabButton className={ `${ tab.className } ${ tab.name === selected ? activeClass : '' }` }
+						<TabButton className={ classnames( tab.className, { [ activeClass ]: tab.name === selected } ) }
 							tabId={ instanceId + '-' + tab.name }
 							aria-controls={ instanceId + '-' + tab.name + '-view' }
 							selected={ tab.name === selected }

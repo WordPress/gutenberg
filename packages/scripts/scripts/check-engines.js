@@ -8,16 +8,16 @@ const { sync: resolveBin } = require( 'resolve-bin' );
  * Internal dependencies
  */
 const {
-	getCliArgs,
-	hasCliArg,
+	getArgsFromCLI,
+	hasArgInCLI,
 } = require( '../utils' );
 
-const args = getCliArgs();
+const args = getArgsFromCLI();
 
-const hasConfig = hasCliArg( '--package' ) ||
-	hasCliArg( '--node' ) ||
-	hasCliArg( '--npm' ) ||
-	hasCliArg( '--yarn' );
+const hasConfig = hasArgInCLI( '--package' ) ||
+	hasArgInCLI( '--node' ) ||
+	hasArgInCLI( '--npm' ) ||
+	hasArgInCLI( '--yarn' );
 const config = ! hasConfig ?
 	[
 		'--node', '>=10.0.0',

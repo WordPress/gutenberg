@@ -6,6 +6,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import deprecated from './deprecated';
 import edit from './edit';
 import metadata from './block.json';
 import save from './save';
@@ -24,7 +25,14 @@ export const settings = {
 		className: false,
 		anchor: true,
 	},
+	example: {
+		attributes: {
+			content: __( 'Code is Poetry' ),
+			level: 2,
+		},
+	},
 	transforms,
+	deprecated,
 	merge( attributes, attributesToMerge ) {
 		return {
 			content: ( attributes.content || '' ) + ( attributesToMerge.content || '' ),

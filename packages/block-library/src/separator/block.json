@@ -1,4 +1,12 @@
 {
 	"name": "core/separator",
-	"category": "layout"
+	"category": "layout",
+	"attributes": {
+		"color": {
+			"type": "string"
+		},
+		"customColor": {
+			"type": "string"
+		}
+	}
 }

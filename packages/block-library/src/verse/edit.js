@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -29,9 +34,11 @@ export default function VerseEdit( { attributes, setAttributes, className, merge
 						content: nextContent,
 					} );
 				} }
-				style={ { textAlign } }
 				placeholder={ __( 'Write…' ) }
 				wrapperClassName={ className }
+				className={ classnames( {
+					[ `has-text-align-${ textAlign }` ]: textAlign,
+				} ) }
 				onMerge={ mergeBlocks }
 			/>
 		</>

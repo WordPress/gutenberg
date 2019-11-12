@@ -1,3 +1,15 @@
+.block-editor-url-popover__additional-controls {
+	border-top: $border-width solid $light-gray-500;
+}
+
+.block-editor-url-popover__additional-controls > div[role="menu"] .components-icon-button:not(:disabled):not([aria-disabled="true"]):not(.is-default) > svg {
+	box-shadow: none;
+}
+
+.block-editor-url-popover__additional-controls div[role="menu"] > .components-icon-button {
+	padding-left: 2px;
+}
+
 .block-editor-url-popover__row {
 	display: flex;
 }
@@ -50,10 +62,32 @@
 }
 
 .block-editor-url-popover__settings {
+	display: block;
 	padding: $panel-padding;
 	border-top: $border-width solid $light-gray-500;
 
+	.components-base-control:last-child,
 	.components-base-control:last-child .components-base-control__field {
 		margin-bottom: 0;
+	}
+}
+
+.block-editor-url-popover__link-editor,
+.block-editor-url-popover__link-viewer {
+	display: flex;
+}
+
+.block-editor-url-popover__link-viewer-url {
+	margin: $grid-size - $border-width;
+	flex-grow: 1;
+	flex-shrink: 1;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	min-width: 150px;
+	max-width: 500px;
+
+	&.has-invalid-link {
+		color: $alert-red;
 	}
 }

@@ -208,4 +208,4 @@ We use
 
 The easiest way to use PHPCS is [local environment](/docs/contributors/getting-started.md#local-environment). Once that's installed, you can check your PHP by running `npm run lint-php`.
 
-If you prefer to install PHPCS locally, you should use `composer`. [Install `composer`](https://getcomposer.org/download/) on your computer, then run `composer install`.  This will install `phpcs` and `WordPress-Coding-Standards` which you can the run via `vendor/bin/phpcs`.
+If you prefer to install PHPCS locally, you should use `composer`. [Install `composer`](https://getcomposer.org/download/) on your computer, then run `composer install`.  This will install `phpcs` and `WordPress-Coding-Standards` which you can then run via `composer lint`.

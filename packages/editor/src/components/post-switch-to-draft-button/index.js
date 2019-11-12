@@ -5,8 +5,15 @@ import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
+import { withViewportMatch } from '@wordpress/viewport';
 
-function PostSwitchToDraftButton( { isSaving, isPublished, isScheduled, onClick } ) {
+function PostSwitchToDraftButton( {
+	isSaving,
+	isPublished,
+	isScheduled,
+	onClick,
+	isMobileViewport,
+} ) {
 	if ( ! isPublished && ! isScheduled ) {
 		return null;
 	}
@@ -31,7 +38,7 @@ function PostSwitchToDraftButton( { isSaving, isPublished, isScheduled, onClick 
 			disabled={ isSaving }
 			isTertiary
 		>
-			{ __( 'Switch to Draft' ) }
+			{ isMobileViewport ? __( 'Draft' ) : __( 'Switch to Draft' ) }
 		</Button>
 	);
 }
@@ -54,5 +61,6 @@ export default compose( [
 			},
 		};
 	} ),
+	withViewportMatch( { isMobileViewport: '< small' } ),
 ] )( PostSwitchToDraftButton );
 

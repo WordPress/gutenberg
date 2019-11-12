@@ -1,0 +1,81 @@
+/** @format */
+
+.touchableArea {
+	border-radius: 8px 8px 8px 8px;
+}
+
+.content {
+	padding: 0 0 0 0;
+	align-items: center;
+	justify-content: space-evenly;
+}
+
+.contentBottomPadding {
+	padding-bottom: 20px;
+}
+
+.rowSeparator {
+	height: 12px;
+}
+
+.modalItem {
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	padding-left: 8;
+	padding-right: 8;
+	padding-top: 0;
+	padding-bottom: 0;
+}
+
+.modalIconWrapper {
+	width: 104px;
+	height: 64px;
+	background-color: $gray-light; //#f3f6f8
+	border-radius: 8px 8px 8px 8px;
+	justify-content: center;
+	align-items: center;
+}
+
+.modalIconWrapperDark {
+	background-color: rgba($white, 0.07);
+}
+
+.modalIcon {
+	width: 32px;
+	height: 32px;
+	justify-content: center;
+	align-items: center;
+	fill: $gray-dark;
+}
+
+.modalIconDark {
+	fill: $white;
+}
+
+.modalItemLabel {
+	background-color: transparent;
+	padding-left: 2;
+	padding-right: 2;
+	padding-top: 4;
+	padding-bottom: 0;
+	justify-content: center;
+	font-size: 12;
+	color: $gray-dark;
+}
+
+.modalItemLabelDark {
+	color: $white;
+}
+
+.addBlockButton {
+	color: $blue-wordpress;
+	border: 2px;
+	border-radius: 10px;
+	border-color: $blue-wordpress;
+}
+
+.addBlockButtonDark {
+	color: $blue-30;
+	border-color: $blue-30;
+}

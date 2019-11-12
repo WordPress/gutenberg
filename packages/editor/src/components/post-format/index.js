@@ -36,7 +36,6 @@ function PostFormat( { onUpdatePostFormat, postFormat = 'standard', supportedFor
 
 	// Disable reason: We need to change the value immiediately to show/hide the suggestion if needed
 
-	/* eslint-disable jsx-a11y/no-onchange */
 	return (
 		<PostFormatCheck>
 			<div className="editor-post-format">
@@ -64,7 +63,6 @@ function PostFormat( { onUpdatePostFormat, postFormat = 'standard', supportedFor
 			</div>
 		</PostFormatCheck>
 	);
-	/* eslint-enable jsx-a11y/no-onchange */
 }
 
 export default compose( [

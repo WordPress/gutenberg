@@ -94,7 +94,14 @@ export const link = {
 		}
 
 		onRemoveFormat() {
-			const { onChange, speak } = this.props;
+			const { onChange, speak, value } = this.props;
+			const startFormat = getActiveFormat( value, 'core/link' );
+
+			// Before we try to remove anything we check if there is something at the caret position to remove.
+			if ( isCollapsed( value ) && startFormat === undefined ) {
+				return;
+			}
+
 			const linkSelection = this.getLinkSelection();
 
 			onChange( removeFormat( linkSelection, name ) );

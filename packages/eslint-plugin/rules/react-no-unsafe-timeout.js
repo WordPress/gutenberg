@@ -44,11 +44,12 @@ module.exports = {
 	create( context ) {
 		return {
 			'CallExpression[callee.name="setTimeout"]'( node ) {
-				const { references } = context.getScope();
-
 				// If the result of a `setTimeout` call is assigned to a
 				// variable, assume the timer ID is handled by a cancellation.
-				const hasAssignment = node.parent.type === 'AssignmentExpression';
+				const hasAssignment = (
+					node.parent.type === 'AssignmentExpression' ||
+					node.parent.type === 'VariableDeclarator'
+				);
 				if ( hasAssignment ) {
 					return;
 				}
@@ -71,6 +72,7 @@ module.exports = {
 				// Consider whether `setTimeout` is a reference to the global
 				// by checking references to see if `setTimeout` resolves to a
 				// variable in scope.
+				const { references } = context.getScope();
 				const hasResolvedReference = references.some( ( reference ) => (
 					reference.identifier.name === 'setTimeout' &&
 					!! reference.resolved &&

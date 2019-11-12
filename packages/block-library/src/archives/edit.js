@@ -8,7 +8,7 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/block-editor';
-import { ServerSideRender } from '@wordpress/editor';
+import ServerSideRender from '@wordpress/server-side-render';
 
 export default function ArchivesEdit( { attributes, setAttributes } ) {
 	const { showPostCounts, displayAsDropdown } = attributes;

@@ -1,21 +1,104 @@
 /**
+ * External dependencies
+ */
+import { get, defaultTo } from 'lodash';
+
+/**
  * WordPress dependencies
  */
-import { compose } from '@wordpress/compose';
+import { useMemo, useCallback, useEffect } from '@wordpress/element';
+import { uploadMedia } from '@wordpress/media-utils';
 import { Panel, PanelBody } from '@wordpress/components';
 import {
+	BlockInspector,
 	BlockEditorProvider,
 	BlockList,
+	Inserter as BlockInserter,
+	WritingFlow,
+	ObserveTyping,
+	BlockEditorKeyboardShortcuts,
+	ButtonBlockerAppender,
 } from '@wordpress/block-editor';
-import { withDispatch, withSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { parse, serialize } from '@wordpress/blocks';
+
+/**
+ * Internal dependencies
+ */
+import Sidebar from '../sidebar';
+import SelectionObserver from './selection-observer';
+import Inserter from '../inserter';
+
+function getBlockEditorSettings( blockEditorSettings, hasUploadPermissions ) {
+	if ( ! hasUploadPermissions ) {
+		return blockEditorSettings;
+	}
+	const mediaUploadBlockEditor = ( { onError, ...argumentsObject } ) => {
+		uploadMedia( {
+			wpAllowedMimeTypes: blockEditorSettings.allowedMimeTypes,
+			onError: ( { message } ) => onError( message ),
+			...argumentsObject,
+		} );
+	};
+	return {
+		...blockEditorSettings,
+		__experimentalMediaUpload: mediaUploadBlockEditor,
+	};
+}
 
 function WidgetArea( {
+	id,
 	blockEditorSettings,
-	blocks,
 	initialOpen,
-	updateBlocks,
-	widgetAreaName,
+	isSelectedArea,
+	onBlockSelected,
 } ) {
+	const { blocks, widgetAreaName, hasUploadPermissions, rawContent } = useSelect(
+		( select ) => {
+			const {
+				canUser,
+				getEditedEntityRecord,
+			} = select( 'core' );
+			const widgetArea = getEditedEntityRecord( 'root', 'widgetArea', id );
+			const widgetAreaContent = get( widgetArea, [ 'content' ], '' );
+			return {
+				blocks: widgetArea && widgetArea.blocks,
+				rawContent: widgetAreaContent.raw ? widgetAreaContent.raw : widgetAreaContent,
+				widgetAreaName: widgetArea && widgetArea.name,
+				hasUploadPermissions: defaultTo( canUser( 'create', 'media' ), true ),
+			};
+		},
+		[ id ]
+	);
+	const { editEntityRecord } = useDispatch( 'core' );
+	const onChange = useCallback(
+		( newBlocks ) => {
+			editEntityRecord( 'root', 'widgetArea', id, { blocks: newBlocks } );
+		},
+		[ editEntityRecord, id ]
+	);
+	const onInput = useCallback(
+		( newBlocks ) => {
+			editEntityRecord( 'root', 'widgetArea', id, {
+				blocks: newBlocks,
+				content: serialize( newBlocks ),
+			} );
+		},
+		[ editEntityRecord, id ]
+	);
+	const settings = useMemo(
+		() => getBlockEditorSettings( blockEditorSettings, hasUploadPermissions ),
+		[ blockEditorSettings, hasUploadPermissions ]
+	);
+	useEffect(
+		() => {
+			if ( blocks ) {
+				return;
+			}
+			onChange( parse( rawContent ) );
+		},
+		[ blocks, onChange, rawContent ]
+	);
 	return (
 		<Panel className="edit-widgets-widget-area">
 			<PanelBody
@@ -24,36 +107,39 @@ function WidgetArea( {
 			>
 				<BlockEditorProvider
 					value={ blocks }
-					onInput={ updateBlocks }
-					onChange={ updateBlocks }
-					settings={ blockEditorSettings }
+					onInput={ onInput }
+					onChange={ onChange }
+					settings={ settings }
 				>
-					<BlockList />
+					{ isSelectedArea && (
+						<>
+							<Inserter>
+								<BlockInserter />
+							</Inserter>
+							<BlockEditorKeyboardShortcuts />
+						</>
+					) }
+					<SelectionObserver
+						isSelectedArea={ isSelectedArea }
+						onBlockSelected={ onBlockSelected }
+					/>
+					<Sidebar.Inspector>
+						<BlockInspector showNoBlockSelectedMessage={ false } />
+					</Sidebar.Inspector>
+					<div className="editor-styles-wrapper">
+						<WritingFlow>
+							<ObserveTyping>
+								<BlockList
+									className="edit-widgets-main-block-list"
+									renderAppender={ ButtonBlockerAppender }
+								/>
+							</ObserveTyping>
+						</WritingFlow>
+					</div>
 				</BlockEditorProvider>
 			</PanelBody>
 		</Panel>
 	);
 }
 
-export default compose( [
-	withSelect( ( select, { id } ) => {
-		const {
-			getBlocksFromWidgetArea,
-			getWidgetArea,
-		} = select( 'core/edit-widgets' );
-		const blocks = getBlocksFromWidgetArea( id );
-		const widgetAreaName = ( getWidgetArea( id ) || {} ).name;
-		return {
-			blocks,
-			widgetAreaName,
-		};
-	} ),
-	withDispatch( ( dispatch, { id } ) => {
-		return {
-			updateBlocks( blocks ) {
-				const { updateBlocksInWidgetArea } = dispatch( 'core/edit-widgets' );
-				updateBlocksInWidgetArea( id, blocks );
-			},
-		};
-	} ),
-] )( WidgetArea );
+export default WidgetArea;

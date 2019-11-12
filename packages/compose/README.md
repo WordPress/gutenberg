@@ -1,6 +1,6 @@
 # Compose
 
-The `compose` package is a collection of handy [Higher Order Components](https://facebook.github.io/react/docs/higher-order-components.html) (HOCs) you can use to wrap your WordPress components and provide some basic features like: state, instance id, pure...
+The `compose` package is a collection of handy [Hooks](https://reactjs.org/docs/hooks-intro.html) and [Higher Order Components](https://facebook.github.io/react/docs/higher-order-components.html) (HOCs) you can use to wrap your WordPress components and provide some basic features like: state, instance id, pure...
 
 The `compose` function is an alias to [flowRight](https://lodash.com/docs/#flowRight) from Lodash. It comes from functional programming, and allows you to compose any number of functions. You might also think of this as layering functions; `compose` will execute the last function first, then sequentially move back through the previous functions passing the result of each function upward.
 
@@ -118,6 +118,26 @@ _Parameters_
 _Returns_
 
 -   `WPComponent`: Component class with generated display name assigned.
+
+<a name="useMediaQuery" href="#useMediaQuery">#</a> **useMediaQuery**
+
+Runs a media query and returns its value when it changes.
+
+_Parameters_
+
+-   _query_ `string`: Media Query.
+
+_Returns_
+
+-   `boolean`: return value of the media query.
+
+<a name="useReducedMotion" href="#useReducedMotion">#</a> **useReducedMotion**
+
+Hook returning whether the user has a preference for reduced motion.
+
+_Returns_
+
+-   `boolean`: Reduced motion preference value.
 
 <a name="withGlobalEvents" href="#withGlobalEvents">#</a> **withGlobalEvents**
 

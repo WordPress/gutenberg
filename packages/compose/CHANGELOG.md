@@ -1,3 +1,9 @@
+## 3.4.0 (2019-06-12)
+
+### New Features
+
+- Add the `useMediaQuery` and `useReducedMotion` hooks. 
+
 ## 3.0.0 (2018-11-15)
 
 ### Breaking Changes

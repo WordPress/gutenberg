@@ -156,7 +156,7 @@ class PostLockedModal extends Component {
 				focusOnMount={ true }
 				shouldCloseOnClickOutside={ false }
 				shouldCloseOnEsc={ false }
-				isDismissable={ false }
+				isDismissible={ false }
 				className="editor-post-locked-modal"
 			>
 				{ !! userAvatar && (

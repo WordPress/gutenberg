@@ -5,6 +5,6 @@
  */
 export async function selectBlockByClientId( clientId ) {
 	await page.evaluate( ( id ) => {
-		wp.data.dispatch( 'core/editor' ).selectBlock( id );
+		wp.data.dispatch( 'core/block-editor' ).selectBlock( id );
 	}, clientId );
 }

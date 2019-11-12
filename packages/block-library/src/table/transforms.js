@@ -10,6 +10,7 @@ const tableContentPasteSchema = {
 			th: {
 				allowEmpty: true,
 				children: getPhrasingContentSchema(),
+				attributes: [ 'scope' ],
 			},
 			td: {
 				allowEmpty: true,

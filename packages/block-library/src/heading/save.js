@@ -14,22 +14,19 @@ import {
 export default function save( { attributes } ) {
 	const {
 		align,
-		backgroundColor,
-		customBackgroundColor,
-		level,
 		content,
-		textColor,
 		customTextColor,
+		level,
+		textColor,
 	} = attributes;
 	const tagName = 'h' + level;
 
 	const textClass = getColorClassName( 'color', textColor );
-	const backgroundClass = getColorClassName( 'background-color', backgroundColor );
 
 	const className = classnames( {
-		'has-background': backgroundColor || customBackgroundColor,
 		[ textClass ]: textClass,
-		[ backgroundClass ]: backgroundClass,
+		'has-text-color': textColor || customTextColor,
+		[ `has-text-align-${ align }` ]: align,
 	} );
 
 	return (
@@ -37,8 +34,6 @@ export default function save( { attributes } ) {
 			className={ className ? className : undefined }
 			tagName={ tagName }
 			style={ {
-				textAlign: align,
-				backgroundColor: backgroundClass ? undefined : customBackgroundColor,
 				color: textClass ? undefined : customTextColor,
 			} }
 			value={ content }

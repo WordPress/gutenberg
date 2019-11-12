@@ -76,13 +76,6 @@ There are currently two supported actions:
 * "insert-at-caret" - Insert the `value` into the text (the default completion action).
 * "replace" - Replace the current block with the block specified in the `value` property.
 
-#### allowNode
-
-A function that takes a text node and returns a boolean indicating whether the completer should be considered for that node.
-
-- Type: `Function`
-- Required: No
-
 #### allowContext
 
 A function that takes a Range before and a Range after the autocomplete trigger and query text and returns a boolean indicating whether the completer should be considered for that context.

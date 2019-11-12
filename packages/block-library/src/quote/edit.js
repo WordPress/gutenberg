@@ -1,11 +1,19 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { AlignmentToolbar, BlockControls, RichText } from '@wordpress/block-editor';
+import { BlockQuotation } from '@wordpress/components';
+import { createBlock } from '@wordpress/blocks';
 
 export default function QuoteEdit( { attributes, setAttributes, isSelected, mergeBlocks, onReplace, className } ) {
 	const { align, value, citation } = attributes;
+
 	return (
 		<>
 			<BlockControls>
@@ -16,7 +24,11 @@ export default function QuoteEdit( { attributes, setAttributes, isSelected, merg
 					} }
 				/>
 			</BlockControls>
-			<blockquote className={ className } style={ { textAlign: align } }>
+			<BlockQuotation
+				className={ classnames( className, {
+					[ `has-text-align-${ align }` ]: align,
+				} ) }
+			>
 				<RichText
 					identifier="value"
 					multiline
@@ -37,6 +49,16 @@ export default function QuoteEdit( { attributes, setAttributes, isSelected, merg
 						// translators: placeholder text used for the quote
 						__( 'Write quote…' )
 					}
+					onReplace={ onReplace }
+					onSplit={ ( piece ) =>
+						createBlock( 'core/quote', {
+							...attributes,
+							value: piece,
+						} )
+					}
+					__unstableOnSplitMiddle={ () =>
+						createBlock( 'core/paragraph' )
+					}
 				/>
 				{ ( ! RichText.isEmpty( citation ) || isSelected ) && (
 					<RichText
@@ -47,6 +69,7 @@ export default function QuoteEdit( { attributes, setAttributes, isSelected, merg
 								citation: nextCitation,
 							} )
 						}
+						__unstableMobileNoFocusOnMount
 						placeholder={
 							// translators: placeholder text used for the citation
 							__( 'Write citation…' )
@@ -54,7 +77,7 @@ export default function QuoteEdit( { attributes, setAttributes, isSelected, merg
 						className="wp-block-quote__citation"
 					/>
 				) }
-			</blockquote>
+			</BlockQuotation>
 		</>
 	);
 }

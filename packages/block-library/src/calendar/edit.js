@@ -9,10 +9,10 @@ import memoize from 'memize';
  */
 import {
 	Disabled,
-	ServerSideRender,
 } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
+import ServerSideRender from '@wordpress/server-side-render';
 
 class CalendarEdit extends Component {
 	constructor() {
@@ -61,9 +61,13 @@ class CalendarEdit extends Component {
 }
 
 export default withSelect( ( select ) => {
+	const coreEditorSelect = select( 'core/editor' );
+	if ( ! coreEditorSelect ) {
+		return;
+	}
 	const {
 		getEditedPostAttribute,
-	} = select( 'core/editor' );
+	} = coreEditorSelect;
 	const postType = getEditedPostAttribute( 'type' );
 	// Dates are used to overwrite year and month used on the calendar.
 	// This overwrite should only happen for 'post' post types.

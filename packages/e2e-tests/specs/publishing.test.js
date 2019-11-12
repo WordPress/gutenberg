@@ -12,9 +12,11 @@ import {
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Publishing', () => {
-	[ 'post', 'page' ].forEach( ( postType ) => {
-		let werePrePublishChecksEnabled;
-		describe( `a ${ postType }`, () => {
+	describe.each( [ 'post', 'page' ] )(
+		'a %s',
+		( postType ) => {
+			let werePrePublishChecksEnabled;
+
 			beforeEach( async () => {
 				await createNewPost( postType );
 				werePrePublishChecksEnabled = await arePrePublishChecksEnabled();
@@ -43,12 +45,14 @@ describe( 'Publishing', () => {
 				// The post-publishing panel is not visible anymore.
 				expect( await page.$( '.editor-post-publish-panel' ) ).toBeNull();
 			} );
-		} );
-	} );
+		}
+	);
 
-	[ 'post', 'page' ].forEach( ( postType ) => {
-		let werePrePublishChecksEnabled;
-		describe( `a ${ postType } with pre-publish checks disabled`, () => {
+	describe.each( [ 'post', 'page' ] )(
+		'a %s with pre-publish checks disabled',
+		( postType ) => {
+			let werePrePublishChecksEnabled;
+
 			beforeEach( async () => {
 				await createNewPost( postType );
 				werePrePublishChecksEnabled = await arePrePublishChecksEnabled();
@@ -75,12 +79,14 @@ describe( 'Publishing', () => {
 				// The post-publishing panel should have been not shown.
 				expect( await page.$( '.editor-post-publish-panel' ) ).toBeNull();
 			} );
-		} );
-	} );
+		}
+	);
 
-	[ 'post', 'page' ].forEach( ( postType ) => {
-		let werePrePublishChecksEnabled;
-		describe( `a ${ postType } in small viewports`, () => {
+	describe.each( [ 'post', 'page' ] )(
+		'a %s in small viewports',
+		( postType ) => {
+			let werePrePublishChecksEnabled;
+
 			beforeEach( async () => {
 				await createNewPost( postType );
 				werePrePublishChecksEnabled = await arePrePublishChecksEnabled();
@@ -101,6 +107,6 @@ describe( 'Publishing', () => {
 				expect( await page.$( '.editor-post-publish-panel__toggle' ) ).not.toBeNull();
 				expect( await page.$( '.editor-post-publish-button' ) ).toBeNull();
 			} );
-		} );
-	} );
+		}
+	);
 } );

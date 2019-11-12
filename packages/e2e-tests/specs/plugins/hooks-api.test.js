@@ -6,6 +6,7 @@ import {
 	clickBlockAppender,
 	createNewPost,
 	deactivatePlugin,
+	getEditedPostContent,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Using Hooks API', () => {
@@ -33,7 +34,6 @@ describe( 'Using Hooks API', () => {
 		const paragraphContent = await page.$eval( 'div[data-type="core/paragraph"] p', ( element ) => element.textContent );
 		expect( paragraphContent ).toEqual( 'First paragraph' );
 		await page.click( '.edit-post-sidebar .e2e-reset-block-button' );
-		const newParagraphContent = await page.$eval( 'div[data-type="core/paragraph"] p', ( element ) => element.textContent );
-		expect( newParagraphContent ).toEqual( '' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );

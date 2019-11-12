@@ -36,32 +36,61 @@ add_action( 'init', 'myguten_block_init' );
 
 In your code, you can include the i18n functions. The most common function is **__** (a double underscore) which provides translation of a simple string. Here is a basic static block example, this is in a file called `block.js`:
 
+{% codetabs %}
+{% ES5 %}
 ```js
 const { __ } = wp.i18n;
 const el = wp.element.createElement;
 const { registerBlockType } = wp.blocks;
 
 registerBlockType( 'myguten/simple', {
-	title: __('Simple Block', 'myguten'),
+	title: __( 'Simple Block', 'myguten' ),
 	category: 'widgets',
 
 	edit: () => {
 		return el(
 			'p',
-			{ style: { color:'red'}, },
-			__('Hello World', 'myguten')
+			{ style: { color: 'red' } },
+			__( 'Hello World', 'myguten' )
 		);
 	},
 
 	save: () => {
 		return el(
 			'p',
-			{ style: { color:'red'}, },
-			__('Hello World', 'myguten')
+			{ style: { color: 'red' } },
+			__( 'Hello World', 'myguten' )
 		);
-	}
-});
+	},
+} );
 ```
+{% ESNext %}
+```js
+import { __ } from '@wordpress/i18n';
+import { registerBlockType } from '@wordpress/blocks';
+
+registerBlockType( 'myguten/simple', {
+	title: __( 'Simple Block', 'myguten' ),
+	category: 'widgets',
+
+	edit: () => {
+		return (
+			<p style="color:red">
+				{ __( 'Hello World', 'myguten' ) }
+			</p>
+		);
+	},
+
+	save: () => {
+		return (
+			<p style="color:red">
+				{ __( 'Hello World', 'myguten' ) }
+			</p>
+		);
+	},
+} );
+```
+{% end %}
 
 In the above example, the function will use the first argument for the string to be translated. The second argument is the text domain which must match the text domain slug specified by your plugin.
 
@@ -230,4 +259,3 @@ Using `make-json` automatically names the file with the md5 hash, so it is ready
 You will need to set your WordPress installation to Esperanto language. Go to Settings > General and change your site language to Esperanto.
 
 With the language set, create a new post, add the block, and you will see the translations used.
-

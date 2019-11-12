@@ -8,16 +8,20 @@
 		display: none;
 	}
 
-	&.is-close-to-bottom {
+	&.is-close-to-bottom,
+	&.is-close-to-top {
 		background: none;
+	}
+
+	&.is-close-to-top {
+		border-top: 3px solid theme(primary);
+	}
+
+	&.is-close-to-bottom {
 		border-bottom: 3px solid theme(primary);
 	}
 
-	&.is-close-to-top,
-	&.is-appender.is-close-to-top,
-	&.is-appender.is-close-to-bottom {
-		background: none;
-		border-top: 3px solid theme(primary);
+	&.is-appender.is-active.is-dragging-over-document {
 		border-bottom: none;
 	}
 }

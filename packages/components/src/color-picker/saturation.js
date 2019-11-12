@@ -150,7 +150,7 @@ export class Saturation extends Component {
 			home: () => this.saturate( -1 ),
 		};
 
-		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/no-noninteractive-element-interactions */
+		/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 		return (
 			<KeyboardShortcuts shortcuts={ shortcuts }>
 				<div
@@ -181,7 +181,7 @@ export class Saturation extends Component {
 				</div>
 			</KeyboardShortcuts>
 		);
-		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/no-noninteractive-element-interactions */
+		/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
 	}
 }
 

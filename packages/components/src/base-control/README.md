@@ -41,6 +41,13 @@ If this property is added, a label will be generated using label property as the
 - Type: `String`
 - Required: No
 
+### hideLabelFromVision
+
+If true, the label will only be visible to screen readers.
+
+- Type: `Boolean`
+- Required: No
+
 ### help
 
 If this property is added, a help text will be generated using help property as the content.

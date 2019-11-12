@@ -31,7 +31,7 @@ function HeaderToolbar( { hasFixedToolbar, isLargeViewport, showInserter, isText
 			aria-label={ toolbarAriaLabel }
 		>
 			<div>
-				<Inserter disabled={ ! showInserter } position="bottom right" />
+				<Inserter disabled={ ! showInserter } position="bottom right" showInserterHelpPanel />
 				<DotTip tipId="core/editor.inserter">
 					{ __( 'Welcome to the wonderful world of blocks! Click the “+” (“Add block”) button to add a new block. There are blocks available for all kinds of content: you can insert text, headings, images, lists, and lots more!' ) }
 				</DotTip>

@@ -45,9 +45,11 @@ function GroupEdit( {
 				/>
 			</InspectorControls>
 			<div className={ classes } style={ styles }>
-				<InnerBlocks
-					renderAppender={ ! hasInnerBlocks && InnerBlocks.ButtonBlockAppender }
-				/>
+				<div className="wp-block-group__inner-container">
+					<InnerBlocks
+						renderAppender={ ! hasInnerBlocks && InnerBlocks.ButtonBlockAppender }
+					/>
+				</div>
 			</div>
 		</>
 	);

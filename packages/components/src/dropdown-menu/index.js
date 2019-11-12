@@ -2,12 +2,13 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { flatMap } from 'lodash';
+import { flatMap, isEmpty, isFunction } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { DOWN } from '@wordpress/keycodes';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -16,29 +17,68 @@ import IconButton from '../icon-button';
 import Dropdown from '../dropdown';
 import { NavigableMenu } from '../navigable-container';
 
+function mergeProps( defaultProps = {}, props = {} ) {
+	const mergedProps = {
+		...defaultProps,
+		...props,
+	};
+
+	if ( props.className && defaultProps.className ) {
+		mergedProps.className = classnames( props.className, defaultProps.className );
+	}
+
+	return mergedProps;
+}
+
 function DropdownMenu( {
+	children,
+	className,
+	controls,
+	hasArrowIndicator = false,
 	icon = 'menu',
 	label,
+	popoverProps,
+	toggleProps,
+	menuProps,
+	// The following props exist for backward compatibility.
 	menuLabel,
-	controls,
-	className,
 	position,
 } ) {
-	if ( ! controls || ! controls.length ) {
+	if ( menuLabel ) {
+		deprecated( '`menuLabel` prop in `DropdownComponent`', {
+			alternative: '`menuProps` object and its `aria-label` property',
+			plugin: 'Gutenberg',
+		} );
+	}
+
+	if ( position ) {
+		deprecated( '`position` prop in `DropdownComponent`', {
+			alternative: '`popoverProps` object and its `position` property',
+			plugin: 'Gutenberg',
+		} );
+	}
+
+	if ( isEmpty( controls ) && ! isFunction( children ) ) {
 		return null;
 	}
 
 	// Normalize controls to nested array of objects (sets of controls)
-	let controlSets = controls;
-	if ( ! Array.isArray( controlSets[ 0 ] ) ) {
-		controlSets = [ controlSets ];
+	let controlSets;
+	if ( ! isEmpty( controls ) ) {
+		controlSets = controls;
+		if ( ! Array.isArray( controlSets[ 0 ] ) ) {
+			controlSets = [ controlSets ];
+		}
 	}
+	const mergedPopoverProps = mergeProps( {
+		className: 'components-dropdown-menu__popover',
+		position,
+	}, popoverProps );
 
 	return (
 		<Dropdown
 			className={ classnames( 'components-dropdown-menu', className ) }
-			contentClassName="components-dropdown-menu__popover"
-			position={ position }
+			popoverProps={ mergedPopoverProps }
 			renderToggle={ ( { isOpen, onToggle } ) => {
 				const openOnArrowDown = ( event ) => {
 					if ( ! isOpen && event.keyCode === DOWN ) {
@@ -47,35 +87,50 @@ function DropdownMenu( {
 						onToggle();
 					}
 				};
+				const mergedToggleProps = mergeProps( {
+					className: classnames( 'components-dropdown-menu__toggle', {
+						'is-opened': isOpen,
+					} ),
+					tooltip: label,
+				}, toggleProps );
+
 				return (
 					<IconButton
-						className="components-dropdown-menu__toggle"
+						{ ...mergedToggleProps }
 						icon={ icon }
 						onClick={ onToggle }
 						onKeyDown={ openOnArrowDown }
 						aria-haspopup="true"
 						aria-expanded={ isOpen }
 						label={ label }
-						tooltip={ label }
 					>
-						<span className="components-dropdown-menu__indicator" />
+						{ ( ! icon || hasArrowIndicator ) && <span className="components-dropdown-menu__indicator" /> }
 					</IconButton>
 				);
 			} }
-			renderContent={ ( { onClose } ) => {
+			renderContent={ ( props ) => {
+				const mergedMenuProps = mergeProps( {
+					'aria-label': menuLabel || label,
+					className: 'components-dropdown-menu__menu',
+				}, menuProps );
+
 				return (
 					<NavigableMenu
-						className="components-dropdown-menu__menu"
+						{ ...mergedMenuProps }
 						role="menu"
-						aria-label={ menuLabel }
 					>
+						{
+							isFunction( children ) ?
+								children( props ) :
+								null
+						}
 						{ flatMap( controlSets, ( controlSet, indexOfSet ) => (
 							controlSet.map( ( control, indexOfControl ) => (
 								<IconButton
 									key={ [ indexOfSet, indexOfControl ].join() }
 									onClick={ ( event ) => {
 										event.stopPropagation();
-										onClose();
+										props.onClose();
 										if ( control.onClick ) {
 											control.onClick();
 										}

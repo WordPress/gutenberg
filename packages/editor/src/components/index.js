@@ -1,6 +1,5 @@
 // Block Creation Components
 export * from './autocompleters';
-export { default as ServerSideRender } from './server-side-render';
 
 // Post Related Components
 export { default as AutosaveMonitor } from './autosave-monitor';
@@ -15,6 +14,7 @@ export { default as EditorHistoryRedo } from './editor-history/redo';
 export { default as EditorHistoryUndo } from './editor-history/undo';
 export { default as EditorNotices } from './editor-notices';
 export { default as ErrorBoundary } from './error-boundary';
+export { default as LocalAutosaveMonitor } from './local-autosave-monitor';
 export { default as PageAttributesCheck } from './page-attributes/check';
 export { default as PageAttributesOrder } from './page-attributes/order';
 export { default as PageAttributesParent } from './page-attributes/parent';

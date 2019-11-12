@@ -8,7 +8,7 @@
 
 /**
  * Class that provides a set of static abstractions to deal with widgets.
- * Itended to be used by WP_REST_Widget_Areas_Controller.
+ * Intended to be used by WP_REST_Widget_Areas_Controller.
  *
  * @since 5.7.0
  */
@@ -72,7 +72,7 @@ class Experimental_WP_Widget_Blocks_Manager {
 	 *
 	 * @since 5.7.0
 	 *
-	 * @param string $sidebar_id Indentifier of the sidebar.
+	 * @param string $sidebar_id Identifier of the sidebar.
 	 * @return integer Post id.
 	 */
 	public static function get_post_id_referenced_in_sidebar( $sidebar_id ) {
@@ -86,7 +86,7 @@ class Experimental_WP_Widget_Blocks_Manager {
 	 *
 	 * @since 5.7.0
 	 *
-	 * @param string  $sidebar_id Indentifier of the sidebar.
+	 * @param string  $sidebar_id Identifier of the sidebar.
 	 * @param integer $post_id    Post id.
 	 */
 	public static function reference_post_id_in_sidebar( $sidebar_id, $post_id ) {
@@ -111,7 +111,7 @@ class Experimental_WP_Widget_Blocks_Manager {
 	 *
 	 * @since 5.7.0
 	 *
-	 * @param string $sidebar_id Indentifier of the sidebar.
+	 * @param string $sidebar_id Identifier of the sidebar.
 	 * @return array $post_id    Post id.
 	 */
 	public static function get_sidebar_as_blocks( $sidebar_id ) {
@@ -140,7 +140,7 @@ class Experimental_WP_Widget_Blocks_Manager {
 	 *
 	 * @since 5.7.0
 	 *
-	 * @param string $sidebar_id Indentifier of the sidebar.
+	 * @param string $sidebar_id Identifier of the sidebar.
 	 * @return boolean True if the $sidebar_id value is valid and false otherwise.
 	 */
 	public static function is_valid_sidabar_id( $sidebar_id ) {
@@ -154,7 +154,7 @@ class Experimental_WP_Widget_Blocks_Manager {
 	 *
 	 * @since 5.7.0
 	 *
-	 * @param string $widget_id Indentifier of the widget.
+	 * @param string $widget_id Identifier of the widget.
 	 * @return string|null Name of the class that represents the widget or null if the widget is not represented by a class.
 	 */
 	private static function get_widget_class( $widget_id ) {
@@ -174,7 +174,7 @@ class Experimental_WP_Widget_Blocks_Manager {
 	 * @since 5.7.0
 	 *
 	 * @param array  $sidebar sidebar data available at $wp_registered_sidebars.
-	 * @param string $id Idenfitier of the widget instance.
+	 * @param string $id Identifier of the widget instance.
 	 * @return array Array containing the widget instance.
 	 */
 	private static function get_sidebar_widget_instance( $sidebar, $id ) {
@@ -221,8 +221,8 @@ class Experimental_WP_Widget_Blocks_Manager {
 	 *
 	 * @since 5.7.0
 	 *
-	 * @param string $widget_id Indentifier of the widget.
-	 * @return array Array containing the the wiget object, the number, and the name.
+	 * @param string $widget_id Identifier of the widget.
+	 * @return array Array containing the the widget object, the number, and the name.
 	 */
 	private static function get_widget_info( $widget_id ) {
 		$wp_registered_widgets = self::get_wp_registered_widgets();
@@ -308,9 +308,14 @@ class Experimental_WP_Widget_Blocks_Manager {
 	}
 
 	/**
-	 * Registers of a widget that should represent a set of blocks and returns its id.
+	 * Noop block widget control output function for the necessary call to `wp_register_widget_control`.
+	 */
+	public static function output_blocks_widget_control() {}
+
+	/**
+	 * Registers a widget that should represent a set of blocks and returns its ID.
 	 *
-	 * @param array $blocks   Array of blocks.
+	 * @param array $blocks Array of blocks.
 	 */
 	public static function convert_blocks_to_widget( $blocks ) {
 		$widget_id = 'blocks-widget-' . md5( self::serialize_blocks( $blocks ) );
@@ -320,7 +325,7 @@ class Experimental_WP_Widget_Blocks_Manager {
 		}
 		wp_register_sidebar_widget(
 			$widget_id,
-			__( 'Blocks Area ', 'gutenberg' ),
+			__( 'Blocks Area', 'gutenberg' ),
 			'Experimental_WP_Widget_Blocks_Manager::output_blocks_widget',
 			array(
 				'classname'   => 'widget-area',
@@ -329,6 +334,12 @@ class Experimental_WP_Widget_Blocks_Manager {
 			array(
 				'blocks' => $blocks,
 			)
+		);
+		wp_register_widget_control(
+			$widget_id,
+			__( 'Blocks Area', 'gutenberg' ),
+			'Experimental_WP_Widget_Blocks_Manager::output_blocks_widget_control',
+			array( 'id_base' => 'blocks-widget' )
 		);
 		return $widget_id;
 	}
@@ -340,20 +351,34 @@ class Experimental_WP_Widget_Blocks_Manager {
 	 */
 	public static function swap_out_sidebars_blocks_for_block_widgets( $sidebars_widgets_input ) {
 		global $sidebars_widgets;
+		global $wp_customize;
 		if ( null === self::$unfiltered_sidebar_widgets ) {
 			self::$unfiltered_sidebar_widgets = $sidebars_widgets;
 		}
+		$changeset_data = null;
+		if ( function_exists( 'is_customize_preview' ) && is_customize_preview() ) {
+			$changeset_data = $wp_customize->changeset_data();
+			if ( isset( $changeset_data['gutenberg_widget_blocks']['value'] ) ) {
+				$changeset_data = json_decode( $changeset_data['gutenberg_widget_blocks']['value'] );
+			}
+		}
+
 		$filtered_sidebar_widgets = array();
 		foreach ( $sidebars_widgets_input as $sidebar_id => $item ) {
-			if ( ! is_numeric( $item ) ) {
+			$changeset_value = $changeset_data && isset( $changeset_data->$sidebar_id )
+				? $changeset_data->$sidebar_id
+				: null;
+
+			if ( ! is_numeric( $item ) && ! $changeset_value ) {
 				$filtered_sidebar_widgets[ $sidebar_id ] = $item;
 				continue;
 			}
 
 			$filtered_widgets   = array();
 			$last_set_of_blocks = array();
-			$post               = get_post( $item );
-			$blocks             = parse_blocks( $post->post_content );
+			$blocks             = parse_blocks(
+				$changeset_value ? $changeset_value : get_post( $item )->post_content
+			);
 
 			foreach ( $blocks as $block ) {
 				if ( ! isset( $block['blockName'] ) ) {
@@ -379,6 +404,7 @@ class Experimental_WP_Widget_Blocks_Manager {
 			$filtered_sidebar_widgets[ $sidebar_id ] = $filtered_widgets;
 		}
 		$sidebars_widgets = $filtered_sidebar_widgets;
+
 		return $filtered_sidebar_widgets;
 	}
 }

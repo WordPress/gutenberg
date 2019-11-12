@@ -6,7 +6,7 @@ import { filter } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { NoticeList } from '@wordpress/components';
+import { NoticeList, SnackbarList } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
@@ -15,17 +15,38 @@ import { compose } from '@wordpress/compose';
  */
 import TemplateValidationNotice from '../template-validation-notice';
 
-export function EditorNotices( { dismissible, notices, ...props } ) {
-	if ( dismissible !== undefined ) {
-		notices = filter( notices, { isDismissible: dismissible } );
-	}
+export function EditorNotices( { notices, onRemove } ) {
+	const dismissibleNotices = filter( notices, {
+		isDismissible: true,
+		type: 'default',
+	} );
+	const nonDismissibleNotices = filter( notices, {
+		isDismissible: false,
+		type: 'default',
+	} );
+	const snackbarNotices = filter( notices, {
+		type: 'snackbar',
+	} );
 
 	return (
-		<NoticeList notices={ notices } { ...props }>
-			{ dismissible !== false && (
+		<>
+			<NoticeList
+				notices={ nonDismissibleNotices }
+				className="components-editor-notices__pinned"
+			/>
+			<NoticeList
+				notices={ dismissibleNotices }
+				className="components-editor-notices__dismissible"
+				onRemove={ onRemove }
+			>
 				<TemplateValidationNotice />
-			) }
-		</NoticeList>
+			</NoticeList>
+			<SnackbarList
+				notices={ snackbarNotices }
+				className="components-editor-notices__snackbar"
+				onRemove={ onRemove }
+			/>
+		</>
 	);
 }
 

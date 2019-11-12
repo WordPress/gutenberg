@@ -1,4 +1,7 @@
 module.exports = {
+	extends: [
+		require.resolve( './jsdoc.js' ),
+	],
 	rules: {
 		'array-bracket-spacing': [ 'error', 'always' ],
 		'array-callback-return': 'error',
@@ -72,30 +75,6 @@ module.exports = {
 			overrides: {
 				'!': true,
 			},
-		} ],
-		'valid-jsdoc': [ 'error', {
-			prefer: {
-				arg: 'param',
-				argument: 'param',
-				extends: 'augments',
-				returns: 'return',
-			},
-			preferType: {
-				array: 'Array',
-				bool: 'boolean',
-				Boolean: 'boolean',
-				float: 'number',
-				Float: 'number',
-				int: 'number',
-				integer: 'number',
-				Integer: 'number',
-				Number: 'number',
-				object: 'Object',
-				String: 'string',
-				Void: 'void',
-			},
-			requireParamDescription: false,
-			requireReturn: false,
 		} ],
 		'valid-typeof': 'error',
 		'vars-on-top': 'error',

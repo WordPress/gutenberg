@@ -52,6 +52,16 @@ exports[`Block transforms correctly transform block Gallery in fixture core__gal
 <!-- /wp:image -->"
 `;
 
+exports[`Block transforms correctly transform block Gallery in fixture core__gallery-with-caption into the Image block 1`] = `
+"<!-- wp:image -->
+<figure class=\\"wp-block-image\\"><img src=\\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\\" alt=\\"title\\"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:image -->
+<figure class=\\"wp-block-image\\"><img src=\\"data:image/jpeg;base64,/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=\\" alt=\\"title\\"/></figure>
+<!-- /wp:image -->"
+`;
+
 exports[`Block transforms correctly transform block Heading in fixture core__heading__h2 into the Paragraph block 1`] = `
 "<!-- wp:paragraph -->
 <p>A picture is worth a thousand words, or so the saying goes</p>
@@ -64,13 +74,25 @@ exports[`Block transforms correctly transform block Heading in fixture core__hea
 <!-- /wp:quote -->"
 `;
 
-exports[`Block transforms correctly transform block Heading in fixture core__heading__h2-em into the Paragraph block 1`] = `
+exports[`Block transforms correctly transform block Heading in fixture core__heading__h2-color into the Paragraph block 1`] = `
+"<!-- wp:paragraph -->
+<p>Text</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`Block transforms correctly transform block Heading in fixture core__heading__h2-color into the Quote block 1`] = `
+"<!-- wp:quote -->
+<blockquote class=\\"wp-block-quote\\"><p>Text</p></blockquote>
+<!-- /wp:quote -->"
+`;
+
+exports[`Block transforms correctly transform block Heading in fixture core__heading__h4-em into the Paragraph block 1`] = `
 "<!-- wp:paragraph -->
 <p>The <em>Inserter</em> Tool</p>
 <!-- /wp:paragraph -->"
 `;
 
-exports[`Block transforms correctly transform block Heading in fixture core__heading__h2-em into the Quote block 1`] = `
+exports[`Block transforms correctly transform block Heading in fixture core__heading__h4-em into the Quote block 1`] = `
 "<!-- wp:quote -->
 <blockquote class=\\"wp-block-quote\\"><p>The <em>Inserter</em> Tool</p></blockquote>
 <!-- /wp:quote -->"
@@ -79,7 +101,7 @@ exports[`Block transforms correctly transform block Heading in fixture core__hea
 exports[`Block transforms correctly transform block Image in fixture core__image into the Cover block 1`] = `
 "<!-- wp:cover {\\"url\\":\\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\\"} -->
 <div class=\\"wp-block-cover has-background-dim\\" style=\\"background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==)\\"><div class=\\"wp-block-cover__inner-container\\"><!-- wp:paragraph {\\"align\\":\\"center\\",\\"placeholder\\":\\"Write title…\\",\\"fontSize\\":\\"large\\"} -->
-<p style=\\"text-align:center\\" class=\\"has-large-font-size\\"></p>
+<p class=\\"has-text-align-center has-large-font-size\\"></p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:cover -->"
 `;
@@ -91,14 +113,22 @@ exports[`Block transforms correctly transform block Image in fixture core__image
 `;
 
 exports[`Block transforms correctly transform block Image in fixture core__image into the Gallery block 1`] = `
-"<!-- wp:gallery {\\"ids\\":[]} -->
-<ul class=\\"wp-block-gallery columns-0 is-cropped\\"></ul>
+"<!-- wp:gallery {\\"ids\\":[null]} -->
+<figure class=\\"wp-block-gallery columns-1 is-cropped\\"><ul class=\\"blocks-gallery-grid\\"><li class=\\"blocks-gallery-item\\"><figure><img src=\\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\\" alt=\\"\\"/></figure></li></ul></figure>
 <!-- /wp:gallery -->"
+`;
+
+exports[`Block transforms correctly transform block Image in fixture core__image into the Group block 1`] = `
+"<!-- wp:group -->
+<div class=\\"wp-block-group\\"><div class=\\"wp-block-group__inner-container\\"><!-- wp:image -->
+<figure class=\\"wp-block-image\\"><img src=\\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\\" alt=\\"\\"/></figure>
+<!-- /wp:image --></div></div>
+<!-- /wp:group -->"
 `;
 
 exports[`Block transforms correctly transform block Image in fixture core__image into the Media & Text block 1`] = `
 "<!-- wp:media-text {\\"mediaType\\":\\"image\\"} -->
-<div class=\\"wp-block-media-text alignwide\\"><figure class=\\"wp-block-media-text__media\\"><img src=\\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\\" alt=\\"\\"/></figure><div class=\\"wp-block-media-text__content\\"><!-- wp:paragraph {\\"placeholder\\":\\"Content…\\",\\"fontSize\\":\\"large\\"} -->
+<div class=\\"wp-block-media-text alignwide is-stacked-on-mobile\\"><figure class=\\"wp-block-media-text__media\\"><img src=\\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\\" alt=\\"\\"/></figure><div class=\\"wp-block-media-text__content\\"><!-- wp:paragraph {\\"placeholder\\":\\"Content…\\",\\"fontSize\\":\\"large\\"} -->
 <p class=\\"has-large-font-size\\"></p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:media-text -->"
@@ -107,7 +137,7 @@ exports[`Block transforms correctly transform block Image in fixture core__image
 exports[`Block transforms correctly transform block Image in fixture core__image__attachment-link into the Cover block 1`] = `
 "<!-- wp:cover {\\"url\\":\\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\\"} -->
 <div class=\\"wp-block-cover has-background-dim\\" style=\\"background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==)\\"><div class=\\"wp-block-cover__inner-container\\"><!-- wp:paragraph {\\"align\\":\\"center\\",\\"placeholder\\":\\"Write title…\\",\\"fontSize\\":\\"large\\"} -->
-<p style=\\"text-align:center\\" class=\\"has-large-font-size\\"></p>
+<p class=\\"has-text-align-center has-large-font-size\\"></p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:cover -->"
 `;
@@ -119,14 +149,14 @@ exports[`Block transforms correctly transform block Image in fixture core__image
 `;
 
 exports[`Block transforms correctly transform block Image in fixture core__image__attachment-link into the Gallery block 1`] = `
-"<!-- wp:gallery {\\"ids\\":[]} -->
-<ul class=\\"wp-block-gallery columns-0 is-cropped\\"></ul>
+"<!-- wp:gallery {\\"ids\\":[null]} -->
+<figure class=\\"wp-block-gallery columns-1 is-cropped\\"><ul class=\\"blocks-gallery-grid\\"><li class=\\"blocks-gallery-item\\"><figure><img src=\\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\\" alt=\\"\\"/></figure></li></ul></figure>
 <!-- /wp:gallery -->"
 `;
 
 exports[`Block transforms correctly transform block Image in fixture core__image__attachment-link into the Media & Text block 1`] = `
 "<!-- wp:media-text {\\"mediaType\\":\\"image\\"} -->
-<div class=\\"wp-block-media-text alignwide\\"><figure class=\\"wp-block-media-text__media\\"><img src=\\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\\" alt=\\"\\"/></figure><div class=\\"wp-block-media-text__content\\"><!-- wp:paragraph {\\"placeholder\\":\\"Content…\\",\\"fontSize\\":\\"large\\"} -->
+<div class=\\"wp-block-media-text alignwide is-stacked-on-mobile\\"><figure class=\\"wp-block-media-text__media\\"><img src=\\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\\" alt=\\"\\"/></figure><div class=\\"wp-block-media-text__content\\"><!-- wp:paragraph {\\"placeholder\\":\\"Content…\\",\\"fontSize\\":\\"large\\"} -->
 <p class=\\"has-large-font-size\\"></p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:media-text -->"
@@ -135,7 +165,7 @@ exports[`Block transforms correctly transform block Image in fixture core__image
 exports[`Block transforms correctly transform block Image in fixture core__image__center-caption into the Cover block 1`] = `
 "<!-- wp:cover {\\"url\\":\\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\\",\\"align\\":\\"center\\"} -->
 <div class=\\"wp-block-cover aligncenter has-background-dim\\" style=\\"background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==)\\"><div class=\\"wp-block-cover__inner-container\\"><!-- wp:paragraph {\\"align\\":\\"center\\",\\"placeholder\\":\\"Write title…\\",\\"fontSize\\":\\"large\\"} -->
-<p style=\\"text-align:center\\" class=\\"has-large-font-size\\"></p>
+<p class=\\"has-text-align-center has-large-font-size\\"></p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:cover -->"
 `;
@@ -147,14 +177,14 @@ exports[`Block transforms correctly transform block Image in fixture core__image
 `;
 
 exports[`Block transforms correctly transform block Image in fixture core__image__center-caption into the Gallery block 1`] = `
-"<!-- wp:gallery {\\"ids\\":[],\\"align\\":\\"center\\"} -->
-<ul class=\\"wp-block-gallery aligncenter columns-0 is-cropped\\"></ul>
+"<!-- wp:gallery {\\"ids\\":[null],\\"align\\":\\"center\\"} -->
+<figure class=\\"wp-block-gallery aligncenter columns-1 is-cropped\\"><ul class=\\"blocks-gallery-grid\\"><li class=\\"blocks-gallery-item\\"><figure><img src=\\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\\" alt=\\"\\"/><figcaption class=\\"blocks-gallery-item__caption\\">Give it a try. Press the \\"really wide\\" button on the image toolbar.</figcaption></figure></li></ul></figure>
 <!-- /wp:gallery -->"
 `;
 
 exports[`Block transforms correctly transform block Image in fixture core__image__center-caption into the Media & Text block 1`] = `
 "<!-- wp:media-text {\\"mediaType\\":\\"image\\"} -->
-<div class=\\"wp-block-media-text alignwide\\"><figure class=\\"wp-block-media-text__media\\"><img src=\\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\\" alt=\\"\\"/></figure><div class=\\"wp-block-media-text__content\\"><!-- wp:paragraph {\\"placeholder\\":\\"Content…\\",\\"fontSize\\":\\"large\\"} -->
+<div class=\\"wp-block-media-text alignwide is-stacked-on-mobile\\"><figure class=\\"wp-block-media-text__media\\"><img src=\\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\\" alt=\\"\\"/></figure><div class=\\"wp-block-media-text__content\\"><!-- wp:paragraph {\\"placeholder\\":\\"Content…\\",\\"fontSize\\":\\"large\\"} -->
 <p class=\\"has-large-font-size\\"></p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:media-text -->"
@@ -163,7 +193,7 @@ exports[`Block transforms correctly transform block Image in fixture core__image
 exports[`Block transforms correctly transform block Image in fixture core__image__custom-link into the Cover block 1`] = `
 "<!-- wp:cover {\\"url\\":\\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\\"} -->
 <div class=\\"wp-block-cover has-background-dim\\" style=\\"background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==)\\"><div class=\\"wp-block-cover__inner-container\\"><!-- wp:paragraph {\\"align\\":\\"center\\",\\"placeholder\\":\\"Write title…\\",\\"fontSize\\":\\"large\\"} -->
-<p style=\\"text-align:center\\" class=\\"has-large-font-size\\"></p>
+<p class=\\"has-text-align-center has-large-font-size\\"></p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:cover -->"
 `;
@@ -175,14 +205,14 @@ exports[`Block transforms correctly transform block Image in fixture core__image
 `;
 
 exports[`Block transforms correctly transform block Image in fixture core__image__custom-link into the Gallery block 1`] = `
-"<!-- wp:gallery {\\"ids\\":[]} -->
-<ul class=\\"wp-block-gallery columns-0 is-cropped\\"></ul>
+"<!-- wp:gallery {\\"ids\\":[null]} -->
+<figure class=\\"wp-block-gallery columns-1 is-cropped\\"><ul class=\\"blocks-gallery-grid\\"><li class=\\"blocks-gallery-item\\"><figure><img src=\\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\\" alt=\\"\\"/></figure></li></ul></figure>
 <!-- /wp:gallery -->"
 `;
 
 exports[`Block transforms correctly transform block Image in fixture core__image__custom-link into the Media & Text block 1`] = `
 "<!-- wp:media-text {\\"mediaType\\":\\"image\\"} -->
-<div class=\\"wp-block-media-text alignwide\\"><figure class=\\"wp-block-media-text__media\\"><img src=\\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\\" alt=\\"\\"/></figure><div class=\\"wp-block-media-text__content\\"><!-- wp:paragraph {\\"placeholder\\":\\"Content…\\",\\"fontSize\\":\\"large\\"} -->
+<div class=\\"wp-block-media-text alignwide is-stacked-on-mobile\\"><figure class=\\"wp-block-media-text__media\\"><img src=\\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\\" alt=\\"\\"/></figure><div class=\\"wp-block-media-text__content\\"><!-- wp:paragraph {\\"placeholder\\":\\"Content…\\",\\"fontSize\\":\\"large\\"} -->
 <p class=\\"has-large-font-size\\"></p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:media-text -->"
@@ -191,7 +221,7 @@ exports[`Block transforms correctly transform block Image in fixture core__image
 exports[`Block transforms correctly transform block Image in fixture core__image__custom-link-class into the Cover block 1`] = `
 "<!-- wp:cover {\\"url\\":\\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\\"} -->
 <div class=\\"wp-block-cover has-background-dim\\" style=\\"background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==)\\"><div class=\\"wp-block-cover__inner-container\\"><!-- wp:paragraph {\\"align\\":\\"center\\",\\"placeholder\\":\\"Write title…\\",\\"fontSize\\":\\"large\\"} -->
-<p style=\\"text-align:center\\" class=\\"has-large-font-size\\"></p>
+<p class=\\"has-text-align-center has-large-font-size\\"></p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:cover -->"
 `;
@@ -203,14 +233,14 @@ exports[`Block transforms correctly transform block Image in fixture core__image
 `;
 
 exports[`Block transforms correctly transform block Image in fixture core__image__custom-link-class into the Gallery block 1`] = `
-"<!-- wp:gallery {\\"ids\\":[]} -->
-<ul class=\\"wp-block-gallery columns-0 is-cropped\\"></ul>
+"<!-- wp:gallery {\\"ids\\":[null]} -->
+<figure class=\\"wp-block-gallery columns-1 is-cropped\\"><ul class=\\"blocks-gallery-grid\\"><li class=\\"blocks-gallery-item\\"><figure><img src=\\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\\" alt=\\"\\"/></figure></li></ul></figure>
 <!-- /wp:gallery -->"
 `;
 
 exports[`Block transforms correctly transform block Image in fixture core__image__custom-link-class into the Media & Text block 1`] = `
 "<!-- wp:media-text {\\"mediaType\\":\\"image\\"} -->
-<div class=\\"wp-block-media-text alignwide\\"><figure class=\\"wp-block-media-text__media\\"><img src=\\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\\" alt=\\"\\"/></figure><div class=\\"wp-block-media-text__content\\"><!-- wp:paragraph {\\"placeholder\\":\\"Content…\\",\\"fontSize\\":\\"large\\"} -->
+<div class=\\"wp-block-media-text alignwide is-stacked-on-mobile\\"><figure class=\\"wp-block-media-text__media\\"><img src=\\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\\" alt=\\"\\"/></figure><div class=\\"wp-block-media-text__content\\"><!-- wp:paragraph {\\"placeholder\\":\\"Content…\\",\\"fontSize\\":\\"large\\"} -->
 <p class=\\"has-large-font-size\\"></p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:media-text -->"
@@ -219,7 +249,7 @@ exports[`Block transforms correctly transform block Image in fixture core__image
 exports[`Block transforms correctly transform block Image in fixture core__image__custom-link-rel into the Cover block 1`] = `
 "<!-- wp:cover {\\"url\\":\\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\\"} -->
 <div class=\\"wp-block-cover has-background-dim\\" style=\\"background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==)\\"><div class=\\"wp-block-cover__inner-container\\"><!-- wp:paragraph {\\"align\\":\\"center\\",\\"placeholder\\":\\"Write title…\\",\\"fontSize\\":\\"large\\"} -->
-<p style=\\"text-align:center\\" class=\\"has-large-font-size\\"></p>
+<p class=\\"has-text-align-center has-large-font-size\\"></p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:cover -->"
 `;
@@ -231,14 +261,14 @@ exports[`Block transforms correctly transform block Image in fixture core__image
 `;
 
 exports[`Block transforms correctly transform block Image in fixture core__image__custom-link-rel into the Gallery block 1`] = `
-"<!-- wp:gallery {\\"ids\\":[]} -->
-<ul class=\\"wp-block-gallery columns-0 is-cropped\\"></ul>
+"<!-- wp:gallery {\\"ids\\":[null]} -->
+<figure class=\\"wp-block-gallery columns-1 is-cropped\\"><ul class=\\"blocks-gallery-grid\\"><li class=\\"blocks-gallery-item\\"><figure><img src=\\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\\" alt=\\"\\"/></figure></li></ul></figure>
 <!-- /wp:gallery -->"
 `;
 
 exports[`Block transforms correctly transform block Image in fixture core__image__custom-link-rel into the Media & Text block 1`] = `
 "<!-- wp:media-text {\\"mediaType\\":\\"image\\"} -->
-<div class=\\"wp-block-media-text alignwide\\"><figure class=\\"wp-block-media-text__media\\"><img src=\\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\\" alt=\\"\\"/></figure><div class=\\"wp-block-media-text__content\\"><!-- wp:paragraph {\\"placeholder\\":\\"Content…\\",\\"fontSize\\":\\"large\\"} -->
+<div class=\\"wp-block-media-text alignwide is-stacked-on-mobile\\"><figure class=\\"wp-block-media-text__media\\"><img src=\\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\\" alt=\\"\\"/></figure><div class=\\"wp-block-media-text__content\\"><!-- wp:paragraph {\\"placeholder\\":\\"Content…\\",\\"fontSize\\":\\"large\\"} -->
 <p class=\\"has-large-font-size\\"></p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:media-text -->"
@@ -247,7 +277,7 @@ exports[`Block transforms correctly transform block Image in fixture core__image
 exports[`Block transforms correctly transform block Image in fixture core__image__media-link into the Cover block 1`] = `
 "<!-- wp:cover {\\"url\\":\\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\\"} -->
 <div class=\\"wp-block-cover has-background-dim\\" style=\\"background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==)\\"><div class=\\"wp-block-cover__inner-container\\"><!-- wp:paragraph {\\"align\\":\\"center\\",\\"placeholder\\":\\"Write title…\\",\\"fontSize\\":\\"large\\"} -->
-<p style=\\"text-align:center\\" class=\\"has-large-font-size\\"></p>
+<p class=\\"has-text-align-center has-large-font-size\\"></p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:cover -->"
 `;
@@ -259,14 +289,14 @@ exports[`Block transforms correctly transform block Image in fixture core__image
 `;
 
 exports[`Block transforms correctly transform block Image in fixture core__image__media-link into the Gallery block 1`] = `
-"<!-- wp:gallery {\\"ids\\":[]} -->
-<ul class=\\"wp-block-gallery columns-0 is-cropped\\"></ul>
+"<!-- wp:gallery {\\"ids\\":[null]} -->
+<figure class=\\"wp-block-gallery columns-1 is-cropped\\"><ul class=\\"blocks-gallery-grid\\"><li class=\\"blocks-gallery-item\\"><figure><img src=\\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\\" alt=\\"\\"/></figure></li></ul></figure>
 <!-- /wp:gallery -->"
 `;
 
 exports[`Block transforms correctly transform block Image in fixture core__image__media-link into the Media & Text block 1`] = `
 "<!-- wp:media-text {\\"mediaType\\":\\"image\\"} -->
-<div class=\\"wp-block-media-text alignwide\\"><figure class=\\"wp-block-media-text__media\\"><img src=\\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\\" alt=\\"\\"/></figure><div class=\\"wp-block-media-text__content\\"><!-- wp:paragraph {\\"placeholder\\":\\"Content…\\",\\"fontSize\\":\\"large\\"} -->
+<div class=\\"wp-block-media-text alignwide is-stacked-on-mobile\\"><figure class=\\"wp-block-media-text__media\\"><img src=\\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\\" alt=\\"\\"/></figure><div class=\\"wp-block-media-text__content\\"><!-- wp:paragraph {\\"placeholder\\":\\"Content…\\",\\"fontSize\\":\\"large\\"} -->
 <p class=\\"has-large-font-size\\"></p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:media-text -->"
@@ -350,6 +380,14 @@ exports[`Block transforms correctly transform block Media & Text in fixture core
 "<!-- wp:video -->
 <figure class=\\"wp-block-video\\"><video controls src=\\"data:video/mp4;base64,AAAAHGZ0eXBpc29tAAACAGlzb21pc28ybXA0MQAAAAhmcmVlAAAC721kYXQhEAUgpBv/wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA3pwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAcCEQBSCkG//AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADengAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAcAAAAsJtb292AAAAbG12aGQAAAAAAAAAAAAAAAAAAAPoAAAALwABAAABAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAAAB7HRyYWsAAABcdGtoZAAAAAMAAAAAAAAAAAAAAAIAAAAAAAAALwAAAAAAAAAAAAAAAQEAAAAAAQAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAACRlZHRzAAAAHGVsc3QAAAAAAAAAAQAAAC8AAAAAAAEAAAAAAWRtZGlhAAAAIG1kaGQAAAAAAAAAAAAAAAAAAKxEAAAIAFXEAAAAAAAtaGRscgAAAAAAAAAAc291bgAAAAAAAAAAAAAAAFNvdW5kSGFuZGxlcgAAAAEPbWluZgAAABBzbWhkAAAAAAAAAAAAAAAkZGluZgAAABxkcmVmAAAAAAAAAAEAAAAMdXJsIAAAAAEAAADTc3RibAAAAGdzdHNkAAAAAAAAAAEAAABXbXA0YQAAAAAAAAABAAAAAAAAAAAAAgAQAAAAAKxEAAAAAAAzZXNkcwAAAAADgICAIgACAASAgIAUQBUAAAAAAfQAAAHz+QWAgIACEhAGgICAAQIAAAAYc3R0cwAAAAAAAAABAAAAAgAABAAAAAAcc3RzYwAAAAAAAAABAAAAAQAAAAIAAAABAAAAHHN0c3oAAAAAAAAAAAAAAAIAAAFzAAABdAAAABRzdGNvAAAAAAAAAAEAAAAsAAAAYnVkdGEAAABabWV0YQAAAAAAAAAhaGRscgAAAAAAAAAAbWRpcmFwcGwAAAAAAAAAAAAAAAAtaWxzdAAAACWpdG9vAAAAHWRhdGEAAAABAAAAAExhdmY1Ni40MC4xMDE=\\"></video></figure>
 <!-- /wp:video -->"
+`;
+
+exports[`Block transforms correctly transform block Paragraph in fixture core__paragraph__align-right into the Group block 1`] = `
+"<!-- wp:group -->
+<div class=\\"wp-block-group\\"><div class=\\"wp-block-group__inner-container\\"><!-- wp:paragraph {\\"align\\":\\"right\\"} -->
+<p class=\\"has-text-align-right\\">... like this one, which is separate from the above and right aligned.</p>
+<!-- /wp:paragraph --></div></div>
+<!-- /wp:group -->"
 `;
 
 exports[`Block transforms correctly transform block Paragraph in fixture core__paragraph__align-right into the Heading block 1`] = `
@@ -473,7 +511,7 @@ exports[`Block transforms correctly transform block Verse in fixture core__verse
 exports[`Block transforms correctly transform block Video in fixture core__video into the Cover block 1`] = `
 "<!-- wp:cover {\\"url\\":\\"data:video/mp4;base64,AAAAHGZ0eXBpc29tAAACAGlzb21pc28ybXA0MQAAAAhmcmVlAAAC721kYXQhEAUgpBv/wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA3pwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAcCEQBSCkG//AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADengAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAcAAAAsJtb292AAAAbG12aGQAAAAAAAAAAAAAAAAAAAPoAAAALwABAAABAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAAAB7HRyYWsAAABcdGtoZAAAAAMAAAAAAAAAAAAAAAIAAAAAAAAALwAAAAAAAAAAAAAAAQEAAAAAAQAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAACRlZHRzAAAAHGVsc3QAAAAAAAAAAQAAAC8AAAAAAAEAAAAAAWRtZGlhAAAAIG1kaGQAAAAAAAAAAAAAAAAAAKxEAAAIAFXEAAAAAAAtaGRscgAAAAAAAAAAc291bgAAAAAAAAAAAAAAAFNvdW5kSGFuZGxlcgAAAAEPbWluZgAAABBzbWhkAAAAAAAAAAAAAAAkZGluZgAAABxkcmVmAAAAAAAAAAEAAAAMdXJsIAAAAAEAAADTc3RibAAAAGdzdHNkAAAAAAAAAAEAAABXbXA0YQAAAAAAAAABAAAAAAAAAAAAAgAQAAAAAKxEAAAAAAAzZXNkcwAAAAADgICAIgACAASAgIAUQBUAAAAAAfQAAAHz+QWAgIACEhAGgICAAQIAAAAYc3R0cwAAAAAAAAABAAAAAgAABAAAAAAcc3RzYwAAAAAAAAABAAAAAQAAAAIAAAABAAAAHHN0c3oAAAAAAAAAAAAAAAIAAAFzAAABdAAAABRzdGNvAAAAAAAAAAEAAAAsAAAAYnVkdGEAAABabWV0YQAAAAAAAAAhaGRscgAAAAAAAAAAbWRpcmFwcGwAAAAAAAAAAAAAAAAtaWxzdAAAACWpdG9vAAAAHWRhdGEAAAABAAAAAExhdmY1Ni40MC4xMDE=\\",\\"backgroundType\\":\\"video\\"} -->
 <div class=\\"wp-block-cover has-background-dim\\"><video class=\\"wp-block-cover__video-background\\" autoplay muted loop src=\\"data:video/mp4;base64,AAAAHGZ0eXBpc29tAAACAGlzb21pc28ybXA0MQAAAAhmcmVlAAAC721kYXQhEAUgpBv/wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA3pwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAcCEQBSCkG//AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADengAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAcAAAAsJtb292AAAAbG12aGQAAAAAAAAAAAAAAAAAAAPoAAAALwABAAABAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAAAB7HRyYWsAAABcdGtoZAAAAAMAAAAAAAAAAAAAAAIAAAAAAAAALwAAAAAAAAAAAAAAAQEAAAAAAQAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAACRlZHRzAAAAHGVsc3QAAAAAAAAAAQAAAC8AAAAAAAEAAAAAAWRtZGlhAAAAIG1kaGQAAAAAAAAAAAAAAAAAAKxEAAAIAFXEAAAAAAAtaGRscgAAAAAAAAAAc291bgAAAAAAAAAAAAAAAFNvdW5kSGFuZGxlcgAAAAEPbWluZgAAABBzbWhkAAAAAAAAAAAAAAAkZGluZgAAABxkcmVmAAAAAAAAAAEAAAAMdXJsIAAAAAEAAADTc3RibAAAAGdzdHNkAAAAAAAAAAEAAABXbXA0YQAAAAAAAAABAAAAAAAAAAAAAgAQAAAAAKxEAAAAAAAzZXNkcwAAAAADgICAIgACAASAgIAUQBUAAAAAAfQAAAHz+QWAgIACEhAGgICAAQIAAAAYc3R0cwAAAAAAAAABAAAAAgAABAAAAAAcc3RzYwAAAAAAAAABAAAAAQAAAAIAAAABAAAAHHN0c3oAAAAAAAAAAAAAAAIAAAFzAAABdAAAABRzdGNvAAAAAAAAAAEAAAAsAAAAYnVkdGEAAABabWV0YQAAAAAAAAAhaGRscgAAAAAAAAAAbWRpcmFwcGwAAAAAAAAAAAAAAAAtaWxzdAAAACWpdG9vAAAAHWRhdGEAAAABAAAAAExhdmY1Ni40MC4xMDE=\\"></video><div class=\\"wp-block-cover__inner-container\\"><!-- wp:paragraph {\\"align\\":\\"center\\",\\"placeholder\\":\\"Write title…\\",\\"fontSize\\":\\"large\\"} -->
-<p style=\\"text-align:center\\" class=\\"has-large-font-size\\"></p>
+<p class=\\"has-text-align-center has-large-font-size\\"></p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:cover -->"
 `;
@@ -486,7 +524,7 @@ exports[`Block transforms correctly transform block Video in fixture core__video
 
 exports[`Block transforms correctly transform block Video in fixture core__video into the Media & Text block 1`] = `
 "<!-- wp:media-text {\\"mediaType\\":\\"video\\"} -->
-<div class=\\"wp-block-media-text alignwide\\"><figure class=\\"wp-block-media-text__media\\"><video controls src=\\"data:video/mp4;base64,AAAAHGZ0eXBpc29tAAACAGlzb21pc28ybXA0MQAAAAhmcmVlAAAC721kYXQhEAUgpBv/wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA3pwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAcCEQBSCkG//AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADengAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAcAAAAsJtb292AAAAbG12aGQAAAAAAAAAAAAAAAAAAAPoAAAALwABAAABAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAAAB7HRyYWsAAABcdGtoZAAAAAMAAAAAAAAAAAAAAAIAAAAAAAAALwAAAAAAAAAAAAAAAQEAAAAAAQAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAACRlZHRzAAAAHGVsc3QAAAAAAAAAAQAAAC8AAAAAAAEAAAAAAWRtZGlhAAAAIG1kaGQAAAAAAAAAAAAAAAAAAKxEAAAIAFXEAAAAAAAtaGRscgAAAAAAAAAAc291bgAAAAAAAAAAAAAAAFNvdW5kSGFuZGxlcgAAAAEPbWluZgAAABBzbWhkAAAAAAAAAAAAAAAkZGluZgAAABxkcmVmAAAAAAAAAAEAAAAMdXJsIAAAAAEAAADTc3RibAAAAGdzdHNkAAAAAAAAAAEAAABXbXA0YQAAAAAAAAABAAAAAAAAAAAAAgAQAAAAAKxEAAAAAAAzZXNkcwAAAAADgICAIgACAASAgIAUQBUAAAAAAfQAAAHz+QWAgIACEhAGgICAAQIAAAAYc3R0cwAAAAAAAAABAAAAAgAABAAAAAAcc3RzYwAAAAAAAAABAAAAAQAAAAIAAAABAAAAHHN0c3oAAAAAAAAAAAAAAAIAAAFzAAABdAAAABRzdGNvAAAAAAAAAAEAAAAsAAAAYnVkdGEAAABabWV0YQAAAAAAAAAhaGRscgAAAAAAAAAAbWRpcmFwcGwAAAAAAAAAAAAAAAAtaWxzdAAAACWpdG9vAAAAHWRhdGEAAAABAAAAAExhdmY1Ni40MC4xMDE=\\"></video></figure><div class=\\"wp-block-media-text__content\\"><!-- wp:paragraph {\\"placeholder\\":\\"Content…\\",\\"fontSize\\":\\"large\\"} -->
+<div class=\\"wp-block-media-text alignwide is-stacked-on-mobile\\"><figure class=\\"wp-block-media-text__media\\"><video controls src=\\"data:video/mp4;base64,AAAAHGZ0eXBpc29tAAACAGlzb21pc28ybXA0MQAAAAhmcmVlAAAC721kYXQhEAUgpBv/wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA3pwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAcCEQBSCkG//AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADengAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAcAAAAsJtb292AAAAbG12aGQAAAAAAAAAAAAAAAAAAAPoAAAALwABAAABAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAAAB7HRyYWsAAABcdGtoZAAAAAMAAAAAAAAAAAAAAAIAAAAAAAAALwAAAAAAAAAAAAAAAQEAAAAAAQAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAACRlZHRzAAAAHGVsc3QAAAAAAAAAAQAAAC8AAAAAAAEAAAAAAWRtZGlhAAAAIG1kaGQAAAAAAAAAAAAAAAAAAKxEAAAIAFXEAAAAAAAtaGRscgAAAAAAAAAAc291bgAAAAAAAAAAAAAAAFNvdW5kSGFuZGxlcgAAAAEPbWluZgAAABBzbWhkAAAAAAAAAAAAAAAkZGluZgAAABxkcmVmAAAAAAAAAAEAAAAMdXJsIAAAAAEAAADTc3RibAAAAGdzdHNkAAAAAAAAAAEAAABXbXA0YQAAAAAAAAABAAAAAAAAAAAAAgAQAAAAAKxEAAAAAAAzZXNkcwAAAAADgICAIgACAASAgIAUQBUAAAAAAfQAAAHz+QWAgIACEhAGgICAAQIAAAAYc3R0cwAAAAAAAAABAAAAAgAABAAAAAAcc3RzYwAAAAAAAAABAAAAAQAAAAIAAAABAAAAHHN0c3oAAAAAAAAAAAAAAAIAAAFzAAABdAAAABRzdGNvAAAAAAAAAAEAAAAsAAAAYnVkdGEAAABabWV0YQAAAAAAAAAhaGRscgAAAAAAAAAAbWRpcmFwcGwAAAAAAAAAAAAAAAAtaWxzdAAAACWpdG9vAAAAHWRhdGEAAAABAAAAAExhdmY1Ni40MC4xMDE=\\"></video></figure><div class=\\"wp-block-media-text__content\\"><!-- wp:paragraph {\\"placeholder\\":\\"Content…\\",\\"fontSize\\":\\"large\\"} -->
 <p class=\\"has-large-font-size\\"></p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:media-text -->"

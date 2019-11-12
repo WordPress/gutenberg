@@ -17,7 +17,7 @@ function enqueue_container_without_paragraph_plugin_script() {
 		array(
 			'wp-blocks',
 			'wp-element',
-			'wp-editor',
+			'wp-block-editor',
 		),
 		filemtime( plugin_dir_path( __FILE__ ) . 'container-without-paragraph/index.js' ),
 		true

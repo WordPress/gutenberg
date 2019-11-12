@@ -63,17 +63,17 @@ describe( 'URLInputButton', () => {
 	} );
 	it( 'should close the form when user submits it', () => {
 		const wrapper = TestUtils.renderIntoDocument( <URLInputButton /> );
-		const buttonElement = () => TestUtils.findRenderedDOMComponentWithClass(
+		const buttonElement = () => TestUtils.scryRenderedDOMComponentsWithClass(
 			wrapper,
 			'components-toolbar__control'
 		);
-		const formElement = () => TestUtils.findRenderedDOMComponentWithTag(
+		const formElement = () => TestUtils.scryRenderedDOMComponentsWithTag(
 			wrapper,
 			'form'
 		);
-		TestUtils.Simulate.click( buttonElement() );
+		TestUtils.Simulate.click( buttonElement().shift() );
 		expect( wrapper.state.expanded ).toBe( true );
-		TestUtils.Simulate.submit( formElement() );
+		TestUtils.Simulate.submit( formElement().shift() );
 		expect( wrapper.state.expanded ).toBe( false );
 		// eslint-disable-next-line react/no-find-dom-node
 		ReactDOM.unmountComponentAtNode( ReactDOM.findDOMNode( wrapper ).parentNode );

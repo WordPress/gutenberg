@@ -20,13 +20,19 @@ const {
 	ctrlShift,
 } = displayShortcutList;
 
-const globalShortcuts = {
-	title: __( 'Global shortcuts' ),
+const mainShortcut = {
+	className: 'edit-post-keyboard-shortcut-help__main-shortcuts',
 	shortcuts: [
 		{
 			keyCombination: access( 'h' ),
-			description: __( 'Display this help.' ),
+			description: __( 'Display these keyboard shortcuts.' ),
 		},
+	],
+};
+
+const globalShortcuts = {
+	title: __( 'Global shortcuts' ),
+	shortcuts: [
 		{
 			keyCombination: primary( 's' ),
 			description: __( 'Save your changes.' ),
@@ -133,10 +139,6 @@ const textFormattingShortcuts = {
 			description: __( 'Make the selected text italic.' ),
 		},
 		{
-			keyCombination: primary( 'u' ),
-			description: __( 'Underline the selected text.' ),
-		},
-		{
 			keyCombination: primary( 'k' ),
 			description: __( 'Convert the selected text into a link.' ),
 		},
@@ -145,17 +147,14 @@ const textFormattingShortcuts = {
 			description: __( 'Remove a link.' ),
 		},
 		{
-			keyCombination: access( 'd' ),
-			description: __( 'Add a strikethrough to the selected text.' ),
-		},
-		{
-			keyCombination: access( 'x' ),
-			description: __( 'Display the selected text in a monospaced font.' ),
+			keyCombination: primary( 'u' ),
+			description: __( 'Underline the selected text.' ),
 		},
 	],
 };
 
 export default [
+	mainShortcut,
 	globalShortcuts,
 	selectionShortcuts,
 	blockShortcuts,

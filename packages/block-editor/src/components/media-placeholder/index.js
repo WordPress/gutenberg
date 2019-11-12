@@ -25,6 +25,7 @@ import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -159,6 +160,7 @@ export class MediaPlaceholder extends Component {
 			notices,
 			onSelectURL,
 			mediaUpload,
+			children,
 		} = this.props;
 
 		let instructions = labels.instructions;
@@ -175,14 +177,14 @@ export class MediaPlaceholder extends Component {
 			const isVideo = isOneType && 'video' === allowedTypes[ 0 ];
 
 			if ( instructions === undefined && mediaUpload ) {
-				instructions = __( 'Drag a media file, upload a new one or select a file from your library.' );
+				instructions = __( 'Upload a media file or pick one from your media library.' );
 
 				if ( isAudio ) {
-					instructions = __( 'Drag an audio, upload a new one or select a file from your library.' );
+					instructions = __( 'Upload an audio file, pick one from your media library, or add one with a URL.' );
 				} else if ( isImage ) {
-					instructions = __( 'Drag an image, upload a new one or select a file from your library.' );
+					instructions = __( 'Upload an image file, pick one from your media library, or add one with a URL.' );
 				} else if ( isVideo ) {
-					instructions = __( 'Drag a video, upload a new one or select a file from your library.' );
+					instructions = __( 'Upload a video file, pick one from your media library, or add one with a URL.' );
 				}
 			}
 
@@ -218,12 +220,18 @@ export class MediaPlaceholder extends Component {
 				preview={ mediaPreview }
 			>
 				{ content }
+				{ children }
 			</Placeholder>
 		);
 	}
 
 	renderDropZone() {
-		const { onHTMLDrop = noop } = this.props;
+		const { disableDropZone, onHTMLDrop = noop } = this.props;
+
+		if ( disableDropZone ) {
+			return null;
+		}
+
 		return (
 			<DropZone
 				onFilesDrop={ this.onFilesUpload }
@@ -358,6 +366,7 @@ export class MediaPlaceholder extends Component {
 				</>
 			);
 		}
+
 		if ( mediaUpload ) {
 			const content = (
 				<>
@@ -382,15 +391,23 @@ export class MediaPlaceholder extends Component {
 			);
 			return this.renderPlaceholder( content );
 		}
+
 		return this.renderPlaceholder( mediaLibraryButton );
 	}
 
 	render() {
 		const {
+			disableMediaButtons,
 			dropZoneUIOnly,
 		} = this.props;
 
-		if ( dropZoneUIOnly ) {
+		if ( dropZoneUIOnly || disableMediaButtons ) {
+			if ( dropZoneUIOnly ) {
+				deprecated( 'wp.blockEditor.MediaPlaceholder dropZoneUIOnly prop', {
+					alternative: 'disableMediaButtons',
+				} );
+			}
+
 			return (
 				<MediaUploadCheck>
 					{ this.renderDropZone() }

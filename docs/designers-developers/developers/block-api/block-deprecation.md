@@ -275,6 +275,6 @@ registerBlockType( 'gutenberg/block-with-deprecated-version', {
 ```
 {% end %}
 
-In the example above we updated the block to use an inner paragraph block with a title instead of a title attribute.
+In the example above we updated the block to use an inner Paragraph block with a title instead of a title attribute.
 
 *Above are example cases of block deprecation. For more, real-world examples, check for deprecations in the [core block library](/packages/block-library/src/README.md). Core blocks have been updated across releases and contain simple and complex deprecations.*

@@ -52,12 +52,6 @@ class WP_REST_Widget_Areas_Controller extends WP_REST_Controller {
 			'validate_callback' => 'Experimental_WP_Widget_Blocks_Manager::is_valid_sidabar_id',
 		);
 
-		$content_argument = array(
-			'description' => __( 'Sidebar content.', 'gutenberg' ),
-			'type'        => 'string',
-			'required'    => true,
-		);
-
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/(?P<id>.+)',
@@ -74,14 +68,64 @@ class WP_REST_Widget_Areas_Controller extends WP_REST_Controller {
 					'methods'             => WP_REST_Server::EDITABLE,
 					'callback'            => array( $this, 'update_item' ),
 					'permission_callback' => array( $this, 'update_item_permissions_check' ),
-					'args'                => array(
-						'id'      => $id_argument,
-						'content' => $content_argument,
-					),
+					'args'                => $this->get_endpoint_args_for_item_schema( WP_REST_Server::EDITABLE ),
 				),
 				'schema' => array( $this, 'get_public_item_schema' ),
 			)
 		);
+	}
+
+	/**
+	 * Retrieves the comment's schema, conforming to JSON Schema.
+	 *
+	 * @since 6.1.0
+	 *
+	 * @return array
+	 */
+	public function get_item_schema() {
+		$schema = array(
+			'$schema'    => 'http://json-schema.org/draft-04/schema#',
+			'title'      => 'widget-area',
+			'type'       => 'object',
+			'properties' => array(
+				'id'      => array(
+					'description' => __( 'Unique identifier for the object.', 'gutenberg' ),
+					'type'        => 'string',
+					'context'     => array( 'view', 'edit', 'embed' ),
+					'readonly'    => true,
+				),
+				'content' => array(
+					'description' => __( 'The content for the object.', 'gutenberg' ),
+					'type'        => 'object',
+					'context'     => array( 'view', 'edit', 'embed' ),
+					'arg_options' => array(
+						'sanitize_callback' => null,
+						'validate_callback' => null,
+					),
+					'properties'  => array(
+						'raw'           => array(
+							'description' => __( 'Content for the object, as it exists in the database.', 'gutenberg' ),
+							'type'        => 'string',
+							'context'     => array( 'view', 'edit', 'embed' ),
+						),
+						'rendered'      => array(
+							'description' => __( 'HTML content for the object, transformed for display.', 'gutenberg' ),
+							'type'        => 'string',
+							'context'     => array( 'view', 'edit', 'embed' ),
+							'readonly'    => true,
+						),
+						'block_version' => array(
+							'description' => __( 'Version of the content block format used by the object.', 'gutenberg' ),
+							'type'        => 'integer',
+							'context'     => array( 'view', 'edit', 'embed' ),
+							'readonly'    => true,
+						),
+					),
+				),
+			),
+		);
+
+		return $schema;
 	}
 
 	/**
@@ -91,6 +135,9 @@ class WP_REST_Widget_Areas_Controller extends WP_REST_Controller {
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_Error|bool True if the request has read access, WP_Error object otherwise.
+	 *
+	 * This function is overloading a function defined in WP_REST_Controller so it should have the same parameters.
+	 * phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 	 */
 	public function get_items_permissions_check( $request ) {
 		if ( ! current_user_can( 'edit_theme_options' ) ) {
@@ -102,6 +149,7 @@ class WP_REST_Widget_Areas_Controller extends WP_REST_Controller {
 
 		return true;
 	}
+	/* phpcs:enable */
 
 	/**
 	 * Retrieves all widget areas.
@@ -142,6 +190,9 @@ class WP_REST_Widget_Areas_Controller extends WP_REST_Controller {
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_Error|bool True if the request has access to update the item, error object otherwise.
+	 *
+	 * This function is overloading a function defined in WP_REST_Controller so it should have the same parameters.
+	 * phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 	 */
 	public function update_item_permissions_check( $request ) {
 		if ( ! current_user_can( 'edit_theme_options' ) ) {
@@ -153,6 +204,7 @@ class WP_REST_Widget_Areas_Controller extends WP_REST_Controller {
 
 		return true;
 	}
+	/* phpcs:enable */
 
 	/**
 	 * Updates a single widget area.
@@ -165,6 +217,10 @@ class WP_REST_Widget_Areas_Controller extends WP_REST_Controller {
 	public function update_item( $request ) {
 		$sidebar_id      = $request->get_param( 'id' );
 		$sidebar_content = $request->get_param( 'content' );
+
+		if ( ! is_string( $sidebar_content ) && isset( $sidebar_content['raw'] ) ) {
+			$sidebar_content = $sidebar_content['raw'];
+		}
 
 		$id_referenced_in_sidebar = Experimental_WP_Widget_Blocks_Manager::get_post_id_referenced_in_sidebar( $sidebar_id );
 
@@ -189,7 +245,7 @@ class WP_REST_Widget_Areas_Controller extends WP_REST_Controller {
 	 *
 	 * @since 5.7.0
 	 *
-	 * @param string $sidebar_id Indentifier of the sidebar.
+	 * @param string $sidebar_id Identifier of the sidebar.
 	 * @return object Sidebar data with a content array.
 	 */
 	protected function get_sidebar_data( $sidebar_id ) {

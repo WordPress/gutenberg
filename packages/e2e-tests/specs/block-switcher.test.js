@@ -27,6 +27,7 @@ describe( 'adding blocks', () => {
 		expect(
 			await getAvailableBlockTransforms()
 		).toEqual( [
+			'Group',
 			'Paragraph',
 			'Quote',
 		] );
@@ -50,6 +51,7 @@ describe( 'adding blocks', () => {
 		expect(
 			await getAvailableBlockTransforms()
 		).toEqual( [
+			'Group',
 			'Paragraph',
 		] );
 	} );
@@ -60,6 +62,7 @@ describe( 'adding blocks', () => {
 			( [
 				'core/quote',
 				'core/paragraph',
+				'core/group',
 			] ).map( ( block ) => wp.blocks.unregisterBlockType( block ) );
 		} );
 

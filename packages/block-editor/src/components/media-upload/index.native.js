@@ -23,16 +23,27 @@ export const MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY = 'wordpress_med
 
 export const OPTION_TAKE_VIDEO = __( 'Take a Video' );
 export const OPTION_TAKE_PHOTO = __( 'Take a Photo' );
+export const OPTION_TAKE_PHOTO_OR_VIDEO = __( 'Take a Photo or Video' );
 
 export class MediaUpload extends React.Component {
+	constructor( props ) {
+		super( props );
+		this.onPickerPresent = this.onPickerPresent.bind( this );
+		this.onPickerChange = this.onPickerChange.bind( this );
+		this.onPickerSelect = this.onPickerSelect.bind( this );
+	}
 	getTakeMediaLabel() {
-		const { mediaType } = this.props;
+		const { allowedTypes = [] } = this.props;
 
-		if ( mediaType === MEDIA_TYPE_IMAGE ) {
+		const isOneType = allowedTypes.length === 1;
+		const isImage = isOneType && allowedTypes.includes( MEDIA_TYPE_IMAGE );
+		const isVideo = isOneType && allowedTypes.includes( MEDIA_TYPE_VIDEO );
+
+		if ( isImage ) {
 			return OPTION_TAKE_PHOTO;
-		} else if ( mediaType === MEDIA_TYPE_VIDEO ) {
+		} else if ( isVideo ) {
 			return OPTION_TAKE_VIDEO;
-		}
+		} return OPTION_TAKE_PHOTO_OR_VIDEO;
 	}
 
 	getMediaOptionsItems() {
@@ -44,11 +55,15 @@ export class MediaUpload extends React.Component {
 	}
 
 	getChooseFromDeviceIcon() {
-		const { mediaType } = this.props;
+		const { allowedTypes = [] } = this.props;
 
-		if ( mediaType === MEDIA_TYPE_IMAGE ) {
+		const isOneType = allowedTypes.length === 1;
+		const isImage = isOneType && allowedTypes.includes( MEDIA_TYPE_IMAGE );
+		const isVideo = isOneType && allowedTypes.includes( MEDIA_TYPE_VIDEO );
+
+		if ( isImage || ! isOneType ) {
 			return 'format-image';
-		} else if ( mediaType === MEDIA_TYPE_VIDEO ) {
+		} else if ( isVideo ) {
 			return 'format-video';
 		}
 	}
@@ -61,58 +76,44 @@ export class MediaUpload extends React.Component {
 		return 'wordpress-alt';
 	}
 
+	onPickerPresent() {
+		if ( this.picker ) {
+			this.picker.presentPicker();
+		}
+	}
+
+	onPickerSelect( requestFunction ) {
+		const { allowedTypes = [], onSelect, multiple = false } = this.props;
+		requestFunction( allowedTypes, multiple, ( media ) => {
+			if ( ( multiple && media ) || media.id ) {
+				onSelect( media );
+			}
+		} );
+	}
+
+	onPickerChange( value ) {
+		if ( value === MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_CHOOSE_FROM_DEVICE ) {
+			this.onPickerSelect( requestMediaPickFromDeviceLibrary );
+		} else if ( value === MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_TAKE_MEDIA ) {
+			this.onPickerSelect( requestMediaPickFromDeviceCamera );
+		} else if ( value === MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY ) {
+			this.onPickerSelect( requestMediaPickFromMediaLibrary );
+		}
+	}
+
 	render() {
-		const { mediaType } = this.props;
-
-		const onMediaLibraryButtonPressed = () => {
-			requestMediaPickFromMediaLibrary( [ mediaType ], ( mediaId, mediaUrl ) => {
-				if ( mediaId ) {
-					this.props.onSelectURL( mediaId, mediaUrl );
-				}
-			} );
-		};
-
-		const onMediaUploadButtonPressed = () => {
-			requestMediaPickFromDeviceLibrary( [ mediaType ], ( mediaId, mediaUrl ) => {
-				if ( mediaId ) {
-					this.props.onSelectURL( mediaId, mediaUrl );
-				}
-			} );
-		};
-
-		const onMediaCaptureButtonPressed = () => {
-			requestMediaPickFromDeviceCamera( [ mediaType ], ( mediaId, mediaUrl ) => {
-				if ( mediaId ) {
-					this.props.onSelectURL( mediaId, mediaUrl );
-				}
-			} );
-		};
-
 		const mediaOptions = this.getMediaOptionsItems();
-
-		let picker;
-
-		const onPickerPresent = () => {
-			picker.presentPicker();
-		};
 
 		const getMediaOptions = () => (
 			<Picker
 				hideCancelButton={ true }
-				ref={ ( instance ) => picker = instance }
+				ref={ ( instance ) => this.picker = instance }
 				options={ mediaOptions }
-				onChange={ ( value ) => {
-					if ( value === MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_CHOOSE_FROM_DEVICE ) {
-						onMediaUploadButtonPressed();
-					} else if ( value === MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_TAKE_MEDIA ) {
-						onMediaCaptureButtonPressed();
-					} else if ( value === MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY ) {
-						onMediaLibraryButtonPressed();
-					}
-				} }
+				onChange={ this.onPickerChange }
 			/>
 		);
-		return this.props.render( { open: onPickerPresent, getMediaOptions } );
+
+		return this.props.render( { open: this.onPickerPresent, getMediaOptions } );
 	}
 }
 

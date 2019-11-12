@@ -76,33 +76,17 @@ const tabThroughBlockToolbar = async () => {
 	);
 	await expect( isFocusedBlockSwitcherControl ).toBe( true );
 
-	// Tab to focus on the 'left paragraph alignment' dropdown control
+	// Tab to focus on the 'Change text alignment' dropdown control
 	await page.keyboard.press( 'Tab' );
-	const isFocusedLeftAlignmentControl = await page.evaluate( () =>
-		document.activeElement.classList.contains( 'components-toolbar__control' )
+	const isFocusedChangeTextAlignmentControl = await page.evaluate( () =>
+		document.activeElement.classList.contains( 'components-dropdown-menu__toggle' )
 	);
-	await expect( isFocusedLeftAlignmentControl ).toBe( true );
-
-	// Tab to focus on the 'center paragraph alignment' dropdown control
-	await page.keyboard.press( 'Tab' );
-	const isFocusedCenterAlignmentControl = await page.evaluate( () =>
-		document.activeElement.classList.contains( 'components-toolbar__control' )
-	);
-	await expect( isFocusedCenterAlignmentControl ).toBe( true );
-
-	// Tab to focus on the 'right paragraph alignment' dropdown control
-	await page.keyboard.press( 'Tab' );
-	const isFocusedRightAlignmentControl = await page.evaluate( () =>
-		document.activeElement.classList.contains( 'components-toolbar__control' )
-	);
-	await expect( isFocusedRightAlignmentControl ).toBe( true );
+	await expect( isFocusedChangeTextAlignmentControl ).toBe( true );
 
 	// Tab to focus on the 'More formatting' dropdown toggle
 	await page.keyboard.press( 'Tab' );
 	const isFocusedBlockSettingsDropdown = await page.evaluate( () =>
-		document.activeElement.classList.contains(
-			'block-editor-block-settings-menu__toggle'
-		)
+		document.activeElement.classList.contains( 'components-dropdown-menu__toggle' )
 	);
 	await expect( isFocusedBlockSettingsDropdown ).toBe( true );
 };

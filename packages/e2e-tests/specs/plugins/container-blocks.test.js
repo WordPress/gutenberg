@@ -31,7 +31,6 @@ describe( 'InnerBlocks Template Sync', () => {
 		`;
 		await insertBlock( blockName );
 		await switchEditorModeTo( 'Code' );
-		await page.waitForSelector( '.editor-post-text-editor' );
 		await page.$eval( '.editor-post-text-editor', ( element, _paragraph, _blockSlug ) => {
 			const blockDelimiter = `<!-- /wp:${ _blockSlug } -->`;
 			element.value = element.value.replace( blockDelimiter, `${ _paragraph }${ blockDelimiter }` );

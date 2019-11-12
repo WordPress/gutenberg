@@ -1,20 +1,20 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`adding blocks Should navigate inner blocks with arrow keys 1`] = `
+exports[`Writing Flow Should navigate inner blocks with arrow keys 1`] = `
 "<!-- wp:paragraph -->
 <p>First paragraph</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:columns -->
-<div class=\\"wp-block-columns has-2-columns\\"><!-- wp:column -->
+<div class=\\"wp-block-columns\\"><!-- wp:column -->
 <div class=\\"wp-block-column\\"><!-- wp:paragraph -->
-<p>First col</p>
+<p>1st col</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:column -->
 
 <!-- wp:column -->
 <div class=\\"wp-block-column\\"><!-- wp:paragraph -->
-<p>Second col</p>
+<p>2nd col</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:column --></div>
 <!-- /wp:columns -->
@@ -24,7 +24,7 @@ exports[`adding blocks Should navigate inner blocks with arrow keys 1`] = `
 <!-- /wp:paragraph -->"
 `;
 
-exports[`adding blocks should create valid paragraph blocks when rapidly pressing Enter 1`] = `
+exports[`Writing Flow should create valid paragraph blocks when rapidly pressing Enter 1`] = `
 "<!-- wp:paragraph -->
 <p></p>
 <!-- /wp:paragraph -->
@@ -70,43 +70,43 @@ exports[`adding blocks should create valid paragraph blocks when rapidly pressin
 <!-- /wp:paragraph -->"
 `;
 
-exports[`adding blocks should insert line break at end 1`] = `
+exports[`Writing Flow should insert line break at end 1`] = `
 "<!-- wp:paragraph -->
 <p>a<br></p>
 <!-- /wp:paragraph -->"
 `;
 
-exports[`adding blocks should insert line break at end and continue writing 1`] = `
+exports[`Writing Flow should insert line break at end and continue writing 1`] = `
 "<!-- wp:paragraph -->
 <p>a<br>b</p>
 <!-- /wp:paragraph -->"
 `;
 
-exports[`adding blocks should insert line break at start 1`] = `
+exports[`Writing Flow should insert line break at start 1`] = `
 "<!-- wp:paragraph -->
 <p><br>a</p>
 <!-- /wp:paragraph -->"
 `;
 
-exports[`adding blocks should insert line break in empty container 1`] = `
+exports[`Writing Flow should insert line break in empty container 1`] = `
 "<!-- wp:paragraph -->
 <p><br></p>
 <!-- /wp:paragraph -->"
 `;
 
-exports[`adding blocks should insert line break mid text 1`] = `
+exports[`Writing Flow should insert line break mid text 1`] = `
 "<!-- wp:paragraph -->
 <p>a<br>b</p>
 <!-- /wp:paragraph -->"
 `;
 
-exports[`adding blocks should merge forwards 1`] = `
+exports[`Writing Flow should merge forwards 1`] = `
 "<!-- wp:paragraph -->
 <p>123</p>
 <!-- /wp:paragraph -->"
 `;
 
-exports[`adding blocks should navigate around inline boundaries 1`] = `
+exports[`Writing Flow should navigate around inline boundaries 1`] = `
 "<!-- wp:paragraph -->
 <p>FirstAfter</p>
 <!-- /wp:paragraph -->
@@ -120,19 +120,19 @@ exports[`adding blocks should navigate around inline boundaries 1`] = `
 <!-- /wp:paragraph -->"
 `;
 
-exports[`adding blocks should navigate around nested inline boundaries 1`] = `
+exports[`Writing Flow should navigate around nested inline boundaries 1`] = `
 "<!-- wp:paragraph -->
 <p><strong><em>1</em> <em>2</em></strong></p>
 <!-- /wp:paragraph -->"
 `;
 
-exports[`adding blocks should navigate around nested inline boundaries 2`] = `
+exports[`Writing Flow should navigate around nested inline boundaries 2`] = `
 "<!-- wp:paragraph -->
 <p>a<strong>b<em>c1d</em>e f<em>g2h</em>i</strong>j</p>
 <!-- /wp:paragraph -->"
 `;
 
-exports[`adding blocks should navigate contenteditable with padding 1`] = `
+exports[`Writing Flow should navigate contenteditable with padding 1`] = `
 "<!-- wp:paragraph -->
 <p>1</p>
 <!-- /wp:paragraph -->
@@ -142,7 +142,21 @@ exports[`adding blocks should navigate contenteditable with padding 1`] = `
 <!-- /wp:paragraph -->"
 `;
 
-exports[`adding blocks should navigate empty paragraph 1`] = `
+exports[`Writing Flow should navigate contenteditable with side padding 1`] = `
+"<!-- wp:paragraph -->
+<p>1</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`Writing Flow should navigate empty paragraph 1`] = `
 "<!-- wp:paragraph -->
 <p>1</p>
 <!-- /wp:paragraph -->
@@ -152,49 +166,63 @@ exports[`adding blocks should navigate empty paragraph 1`] = `
 <!-- /wp:paragraph -->"
 `;
 
-exports[`adding blocks should not create extra line breaks in multiline value 1`] = `
+exports[`Writing Flow should navigate empty paragraphs 1`] = `
+"<!-- wp:paragraph -->
+<p>1</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>3</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`Writing Flow should not create extra line breaks in multiline value 1`] = `
 "<!-- wp:quote -->
 <blockquote class=\\"wp-block-quote\\"><p></p></blockquote>
 <!-- /wp:quote -->"
 `;
 
-exports[`adding blocks should not delete surrounding space when deleting a selected word 1`] = `
+exports[`Writing Flow should not delete surrounding space when deleting a selected word 1`] = `
 "<!-- wp:paragraph -->
 <p>alpha  gamma</p>
 <!-- /wp:paragraph -->"
 `;
 
-exports[`adding blocks should not delete surrounding space when deleting a selected word 2`] = `
+exports[`Writing Flow should not delete surrounding space when deleting a selected word 2`] = `
 "<!-- wp:paragraph -->
 <p>alpha beta gamma</p>
 <!-- /wp:paragraph -->"
 `;
 
-exports[`adding blocks should not delete surrounding space when deleting a word with Alt+Backspace 1`] = `
+exports[`Writing Flow should not delete surrounding space when deleting a word with Alt+Backspace 1`] = `
 "<!-- wp:paragraph -->
 <p>alpha  gamma</p>
 <!-- /wp:paragraph -->"
 `;
 
-exports[`adding blocks should not delete surrounding space when deleting a word with Alt+Backspace 2`] = `
+exports[`Writing Flow should not delete surrounding space when deleting a word with Alt+Backspace 2`] = `
 "<!-- wp:paragraph -->
 <p>alpha beta gamma</p>
 <!-- /wp:paragraph -->"
 `;
 
-exports[`adding blocks should not delete surrounding space when deleting a word with Backspace 1`] = `
+exports[`Writing Flow should not delete surrounding space when deleting a word with Backspace 1`] = `
 "<!-- wp:paragraph -->
 <p>1  3</p>
 <!-- /wp:paragraph -->"
 `;
 
-exports[`adding blocks should not delete surrounding space when deleting a word with Backspace 2`] = `
+exports[`Writing Flow should not delete surrounding space when deleting a word with Backspace 2`] = `
 "<!-- wp:paragraph -->
 <p>1 2 3</p>
 <!-- /wp:paragraph -->"
 `;
 
-exports[`adding blocks should not prematurely multi-select 1`] = `
+exports[`Writing Flow should not prematurely multi-select 1`] = `
 "<!-- wp:paragraph -->
 <p>1</p>
 <!-- /wp:paragraph -->
@@ -204,7 +232,7 @@ exports[`adding blocks should not prematurely multi-select 1`] = `
 <!-- /wp:paragraph -->"
 `;
 
-exports[`adding blocks should preserve horizontal position when navigating vertically between blocks 1`] = `
+exports[`Writing Flow should preserve horizontal position when navigating vertically between blocks 1`] = `
 "<!-- wp:paragraph -->
 <p>abc</p>
 <!-- /wp:paragraph -->
@@ -214,7 +242,7 @@ exports[`adding blocks should preserve horizontal position when navigating verti
 <!-- /wp:paragraph -->"
 `;
 
-exports[`adding blocks should remember initial vertical position 1`] = `
+exports[`Writing Flow should remember initial vertical position 1`] = `
 "<!-- wp:paragraph -->
 <p>1x</p>
 <!-- /wp:paragraph -->

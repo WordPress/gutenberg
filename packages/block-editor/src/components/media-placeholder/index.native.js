@@ -7,7 +7,13 @@ import { View, Text, TouchableWithoutFeedback } from 'react-native';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { MediaUpload, MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO } from '@wordpress/block-editor';
+import {
+	MediaUpload,
+	MEDIA_TYPE_IMAGE,
+	MEDIA_TYPE_VIDEO,
+} from '@wordpress/block-editor';
+import { Dashicon } from '@wordpress/components';
+import { withPreferredColorScheme } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -15,10 +21,20 @@ import { MediaUpload, MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO } from '@wordpress/bloc
 import styles from './styles.scss';
 
 function MediaPlaceholder( props ) {
-	const { mediaType, labels = {}, icon, onSelectURL } = props;
+	const {
+		allowedTypes = [],
+		labels = {},
+		icon,
+		onSelect,
+		isAppender,
+		disableMediaButtons,
+		getStylesFromColorScheme,
+		multiple,
+	} = props;
 
-	const isImage = MEDIA_TYPE_IMAGE === mediaType;
-	const isVideo = MEDIA_TYPE_VIDEO === mediaType;
+	const isOneType = allowedTypes.length === 1;
+	const isImage = isOneType && allowedTypes.includes( MEDIA_TYPE_IMAGE );
+	const isVideo = isOneType && allowedTypes.includes( MEDIA_TYPE_VIDEO );
 
 	let placeholderTitle = labels.title;
 	if ( placeholderTitle === undefined ) {
@@ -46,41 +62,75 @@ function MediaPlaceholder( props ) {
 		accessibilityHint = __( 'Double tap to select a video' );
 	}
 
+	const emptyStateTitleStyle = getStylesFromColorScheme( styles.emptyStateTitle, styles.emptyStateTitleDark );
+
+	const renderContent = () => {
+		if ( isAppender === undefined || ! isAppender ) {
+			return (
+				<>
+					<View style={ styles.modalIcon }>
+						{ icon }
+					</View>
+					<Text style={ emptyStateTitleStyle }>
+						{ placeholderTitle }
+					</Text>
+					<Text style={ styles.emptyStateDescription }>
+						{ instructions }
+					</Text>
+				</>
+			);
+		} else if ( isAppender && ! disableMediaButtons ) {
+			return (
+				<Dashicon
+					icon="plus-alt"
+					style={ styles.addBlockButton }
+					color={ styles.addBlockButton.color }
+					size={ styles.addBlockButton.size }
+				/>
+			);
+		}
+	};
+
+	if ( isAppender && disableMediaButtons ) {
+		return null;
+	}
+
+	const emptyStateContainerStyle = getStylesFromColorScheme( styles.emptyStateContainer, styles.emptyStateContainerDark );
+
 	return (
-		<MediaUpload
-			mediaType={ mediaType }
-			onSelectURL={ onSelectURL }
-			render={ ( { open, getMediaOptions } ) => {
-				return (
-					<TouchableWithoutFeedback
-						accessibilityLabel={ sprintf(
-							/* translators: accessibility text for the media block empty state. %s: media type */
-							__( '%s block. Empty' ),
-							placeholderTitle
-						) }
-						accessibilityRole={ 'button' }
-						accessibilityHint={ accessibilityHint }
-						onPress={ ( event ) => {
-							props.onFocus( event );
-							open();
-						} }
-					>
-						<View style={ styles.emptyStateContainer }>
-							{ getMediaOptions() }
-							<View style={ styles.modalIcon }>
-								{ icon }
+		<View style={ { flex: 1 } }>
+			<MediaUpload
+				allowedTypes={ allowedTypes }
+				onSelect={ onSelect }
+				multiple={ multiple }
+				render={ ( { open, getMediaOptions } ) => {
+					return (
+						<TouchableWithoutFeedback
+							accessibilityLabel={ sprintf(
+								/* translators: accessibility text for the media block empty state. %s: media type */
+								__( '%s block. Empty' ),
+								placeholderTitle
+							) }
+							accessibilityRole={ 'button' }
+							accessibilityHint={ accessibilityHint }
+							onPress={ ( event ) => {
+								props.onFocus( event );
+								open();
+							} }>
+							<View
+								style={ [
+									emptyStateContainerStyle,
+									isAppender && styles.isAppender,
+								] }>
+								{ getMediaOptions() }
+								{ renderContent() }
 							</View>
-							<Text style={ styles.emptyStateTitle }>
-								{ placeholderTitle }
-							</Text>
-							<Text style={ styles.emptyStateDescription }>
-								{ instructions }
-							</Text>
-						</View>
-					</TouchableWithoutFeedback>
-				);
-			} } />
+						</TouchableWithoutFeedback>
+					);
+				} }
+			/>
+		</View>
 	);
 }
 
-export default MediaPlaceholder;
+export default withPreferredColorScheme( MediaPlaceholder );

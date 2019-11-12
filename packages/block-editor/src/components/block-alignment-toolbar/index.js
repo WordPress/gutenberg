@@ -3,7 +3,6 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Toolbar } from '@wordpress/components';
-import { withViewportMatch } from '@wordpress/viewport';
 import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
@@ -15,30 +14,31 @@ import { withBlockEditContext } from '../block-edit/context';
 const BLOCK_ALIGNMENTS_CONTROLS = {
 	left: {
 		icon: 'align-left',
-		title: __( 'Align left' ),
+		title: __( 'Align Left' ),
 	},
 	center: {
 		icon: 'align-center',
-		title: __( 'Align center' ),
+		title: __( 'Align Center' ),
 	},
 	right: {
 		icon: 'align-right',
-		title: __( 'Align right' ),
+		title: __( 'Align Right' ),
 	},
 	wide: {
 		icon: 'align-wide',
-		title: __( 'Wide width' ),
+		title: __( 'Wide Width' ),
 	},
 	full: {
 		icon: 'align-full-width',
-		title: __( 'Full width' ),
+		title: __( 'Full Width' ),
 	},
 };
 
 const DEFAULT_CONTROLS = [ 'left', 'center', 'right', 'wide', 'full' ];
+const DEFAULT_CONTROL = 'center';
 const WIDE_CONTROLS = [ 'wide', 'full' ];
 
-export function BlockAlignmentToolbar( { isCollapsed, value, onChange, controls = DEFAULT_CONTROLS, wideControlsEnabled = false } ) {
+export function BlockAlignmentToolbar( { value, onChange, controls = DEFAULT_CONTROLS, isCollapsed = true, wideControlsEnabled = false } ) {
 	function applyOrUnset( align ) {
 		return () => onChange( value === align ? undefined : align );
 	}
@@ -47,13 +47,14 @@ export function BlockAlignmentToolbar( { isCollapsed, value, onChange, controls 
 		controls :
 		controls.filter( ( control ) => WIDE_CONTROLS.indexOf( control ) === -1 );
 
-	const activeAlignment = BLOCK_ALIGNMENTS_CONTROLS[ value ];
+	const activeAlignmentControl = BLOCK_ALIGNMENTS_CONTROLS[ value ];
+	const defaultAlignmentControl = BLOCK_ALIGNMENTS_CONTROLS[ DEFAULT_CONTROL ];
 
 	return (
 		<Toolbar
 			isCollapsed={ isCollapsed }
-			icon={ activeAlignment ? activeAlignment.icon : 'align-left' }
-			label={ __( 'Change Alignment' ) }
+			icon={ activeAlignmentControl ? activeAlignmentControl.icon : defaultAlignmentControl.icon }
+			label={ __( 'Change alignment' ) }
 			controls={
 				enabledControls.map( ( control ) => {
 					return {
@@ -73,16 +74,11 @@ export default compose(
 			clientId,
 		};
 	} ),
-	withViewportMatch( { isLargeViewport: 'medium' } ),
-	withSelect( ( select, { clientId, isLargeViewport, isCollapsed } ) => {
-		const { getBlockRootClientId, getSettings } = select( 'core/block-editor' );
+	withSelect( ( select ) => {
+		const { getSettings } = select( 'core/block-editor' );
 		const settings = getSettings();
 		return {
 			wideControlsEnabled: settings.alignWide,
-			isCollapsed: isCollapsed || ! isLargeViewport || (
-				! settings.hasFixedToolbar &&
-				getBlockRootClientId( clientId )
-			),
 		};
 	} ),
 )( BlockAlignmentToolbar );

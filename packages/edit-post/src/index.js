@@ -7,9 +7,8 @@ import '@wordpress/editor';
 import '@wordpress/nux';
 import '@wordpress/viewport';
 import '@wordpress/notices';
-import { registerCoreBlocks } from '@wordpress/block-library';
+import { registerCoreBlocks, __experimentalRegisterExperimentalCoreBlocks } from '@wordpress/block-library';
 import { render, unmountComponentAtNode } from '@wordpress/element';
-import { dispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -66,8 +65,10 @@ export function reinitializeEditor( postType, postId, target, settings, initialE
 export function initializeEditor( id, postType, postId, settings, initialEdits ) {
 	const target = document.getElementById( id );
 	const reboot = reinitializeEditor.bind( null, postType, postId, target, settings, initialEdits );
-
 	registerCoreBlocks();
+	if ( process.env.GUTENBERG_PHASE === 2 ) {
+		__experimentalRegisterExperimentalCoreBlocks( settings );
+	}
 
 	// Show a console log warning if the browser is not in Standards rendering mode.
 	const documentMode = document.compatMode === 'CSS1Compat' ? 'Standards' : 'Quirks';
@@ -75,14 +76,6 @@ export function initializeEditor( id, postType, postId, settings, initialEdits )
 		// eslint-disable-next-line no-console
 		console.warn( "Your browser is using Quirks Mode. \nThis can cause rendering issues such as blocks overlaying meta boxes in the editor. Quirks Mode can be triggered by PHP errors or HTML code appearing before the opening <!DOCTYPE html>. Try checking the raw page source or your site's PHP error log and resolving errors there, removing any HTML before the doctype, or disabling plugins." );
 	}
-
-	dispatch( 'core/edit-post' ).__unstableInitialize();
-	dispatch( 'core/nux' ).triggerGuide( [
-		'core/editor.inserter',
-		'core/editor.settings',
-		'core/editor.preview',
-		'core/editor.publish',
-	] );
 
 	render(
 		<Editor
@@ -97,6 +90,7 @@ export function initializeEditor( id, postType, postId, settings, initialEdits )
 }
 
 export { default as PluginBlockSettingsMenuItem } from './components/block-settings-menu/plugin-block-settings-menu-item';
+export { default as PluginDocumentSettingPanel } from './components/sidebar/plugin-document-setting-panel';
 export { default as PluginMoreMenuItem } from './components/header/plugin-more-menu-item';
 export { default as PluginPostPublishPanel } from './components/sidebar/plugin-post-publish-panel';
 export { default as PluginPostStatusInfo } from './components/sidebar/plugin-post-status-info';

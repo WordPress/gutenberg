@@ -88,7 +88,7 @@ function withFocusReturn( options ) {
 
 				const stack = [
 					...without(
-						this.props.focusHistory,
+						this.props.focus.focusHistory,
 						...ownFocusedElements
 					),
 					activeElementOnMount,
@@ -109,7 +109,7 @@ function withFocusReturn( options ) {
 						onFocus={ this.setIsFocusedTrue }
 						onBlur={ this.setIsFocusedFalse }
 					>
-						<WrappedComponent { ...this.props } />
+						<WrappedComponent { ...this.props.childProps } />
 					</div>
 				);
 			}
@@ -117,7 +117,7 @@ function withFocusReturn( options ) {
 
 		return ( props ) => (
 			<Consumer>
-				{ ( context ) => <FocusReturn { ...props } { ...context } /> }
+				{ ( context ) => <FocusReturn childProps={ props } focus={ context } /> }
 			</Consumer>
 		);
 	};

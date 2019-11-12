@@ -87,7 +87,7 @@ describe( 'New User Experience (NUX)', () => {
 		expect( nuxTipElements ).toHaveLength( 0 );
 	} );
 
-	it( 'should enable tips when the "Enable tips" option is toggled on', async () => {
+	it( 'should enable tips when the "Tips" option is toggled on', async () => {
 		// Start by disabling tips.
 		await page.click( '.nux-dot-tip__disable' );
 
@@ -99,8 +99,8 @@ describe( 'New User Experience (NUX)', () => {
 		let areTipsEnabled = await getTipsEnabled( page );
 		expect( areTipsEnabled ).toEqual( false );
 
-		// Toggle the 'Enable Tips' option to enable.
-		await toggleScreenOption( 'Enable Tips' );
+		// Toggle the 'Tips' option to enable.
+		await toggleScreenOption( 'Tips' );
 
 		// Tips should once again appear.
 		nuxTipElements = await page.$$( '.nux-dot-tip' );
@@ -117,7 +117,7 @@ describe( 'New User Experience (NUX)', () => {
 		await clickAllTips( page );
 
 		// Open the "More" menu to check the "Show Tips" element.
-		await page.click( '.edit-post-more-menu [aria-label="Show more tools & options"]' );
+		await page.click( '.edit-post-more-menu [aria-label="More tools & options"]' );
 		const showTipsButton = await page.$x( '//button[contains(text(), "Show Tips")][@aria-pressed="false"]' );
 
 		expect( showTipsButton ).toHaveLength( 1 );
@@ -132,7 +132,7 @@ describe( 'New User Experience (NUX)', () => {
 		await clickOnMoreMenuItem( 'Show Tips' );
 
 		// Open the "More" menu to check the "Show Tips" element.
-		await page.click( '.edit-post-more-menu [aria-label="Show more tools & options"]' );
+		await page.click( '.edit-post-more-menu [aria-label="More tools & options"]' );
 		const showTipsButton = await page.$x( '//button[contains(text(), "Show Tips")][@aria-pressed="true"]' );
 
 		expect( showTipsButton ).toHaveLength( 1 );

@@ -1,5 +1,6 @@
 /**
  * Returns a string containing the block title associated with the provided block name.
+ *
  * @param {string} blockName Block name.
  * @param {string} setting   Block setting e.g: title, attributes....
  *

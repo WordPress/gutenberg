@@ -2,7 +2,11 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { navigateRegions } from '@wordpress/components';
+import {
+	navigateRegions,
+	Popover,
+	SlotFillProvider,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -10,12 +14,14 @@ import { navigateRegions } from '@wordpress/components';
 import Header from '../header';
 import Sidebar from '../sidebar';
 import WidgetAreas from '../widget-areas';
+import Notices from '../notices';
 
 function Layout( { blockEditorSettings } ) {
 	return (
-		<>
+		<SlotFillProvider>
 			<Header />
 			<Sidebar />
+			<Notices />
 			<div
 				className="edit-widgets-layout__content"
 				role="region"
@@ -26,7 +32,8 @@ function Layout( { blockEditorSettings } ) {
 					blockEditorSettings={ blockEditorSettings }
 				/>
 			</div>
-		</>
+			<Popover.Slot />
+		</SlotFillProvider>
 	);
 }
 

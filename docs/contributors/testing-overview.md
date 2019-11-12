@@ -368,6 +368,10 @@ If you're using a different setup, you can provide the base URL, username and pa
 WP_BASE_URL=http://localhost:8888 WP_USERNAME=admin WP_PASSWORD=password npm run test-e2e
 ```
 
+### Core Block Testing
+
+Every core block is required to have at least one set of fixture files for its main save function and one for each deprecation. These fixtures test the parsing and serialization of the block. See [the e2e tests fixtures readme](/packages/e2e-tests/fixtures/blocks/README.md) for more information and instructions.
+
 ## PHP Testing
 
 Tests for PHP use [PHPUnit](https://phpunit.de/) as the testing framework. If you're using the built-in [local environment](/docs/contributors/getting-started.md#local-environment), you can run the PHP tests locally using this command:

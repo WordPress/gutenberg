@@ -26,17 +26,14 @@ function fireKeyDown( container, keyCode, shiftKey ) {
 		stopped: false,
 	};
 
-	container.simulate( 'keydown', {
-		stopPropagation: () => {
-			interaction.stopped = true;
-		},
-		preventDefault: () => {},
-		nativeEvent: {
-			stopImmediatePropagation: () => {},
-		},
+	const event = new window.KeyboardEvent( 'keydown', {
 		keyCode,
 		shiftKey,
 	} );
+	event.stopImmediatePropagation = () => {
+		interaction.stopped = true;
+	};
+	container.getDOMNode().dispatchEvent( event );
 
 	return interaction;
 }

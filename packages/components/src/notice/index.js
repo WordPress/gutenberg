@@ -69,7 +69,7 @@ function Notice( {
 			{ isDismissible && (
 				<IconButton
 					className="components-notice__dismiss"
-					icon="no"
+					icon="no-alt"
 					label={ __( 'Dismiss this notice' ) }
 					onClick={ onRemove }
 					tooltip={ false }

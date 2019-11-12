@@ -16,7 +16,7 @@ function enqueue_inner_blocks_allowed_blocks_script() {
 		plugins_url( 'inner-blocks-allowed-blocks/index.js', __FILE__ ),
 		array(
 			'wp-blocks',
-			'wp-editor',
+			'wp-block-editor',
 			'wp-element',
 			'wp-i18n',
 		),

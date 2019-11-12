@@ -38,12 +38,12 @@ When adding a new test, it's only necessary to create file (1) above, then
 there is a command you can run to generate (2) through (4):
 
 ```sh
-GENERATE_MISSING_FIXTURES=y npm run test-unit test/integration/full-content/full-content.spec.js
+GENERATE_MISSING_FIXTURES=y npm run test-unit test/integration/full-content/full-content.test.js
 ```
 
 However, when using this command, please be sure to manually verify that the
 contents of the `.json` and `.serialized.html` files are as expected.
 
 See the
-[`full-content.spec.js`](../full-content.spec.js)
+[`full-content.test.js`](../../../../test/integration/full-content/full-content.test.js)
 test file for the code that runs these tests.

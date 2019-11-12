@@ -7,7 +7,7 @@
 	var withSelect = wp.data.withSelect;
 	var select = wp.data.select;
 	var dispatch = wp.data.dispatch;
-	var PlainText = wp.editor.PlainText;
+	var PlainText = wp.blockEditor.PlainText;
 	var Fragment = wp.element.Fragment;
 	var el = wp.element.createElement;
 	var Component = wp.element.Component;
@@ -63,7 +63,7 @@
 						onClick: () => {
 							dispatch( 'core/annotations' ).__experimentalAddAnnotation( {
 								source: 'e2e-tests',
-								blockClientId: select( 'core/editor' ).getBlockOrder()[ 0 ],
+								blockClientId: select( 'core/block-editor' ).getBlockOrder()[ 0 ],
 								richTextIdentifier: 'content',
 								range: {
 									start: parseInt( this.state.start, 10 ),

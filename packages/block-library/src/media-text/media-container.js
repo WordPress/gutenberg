@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { IconButton, ResizableBox, Toolbar } from '@wordpress/components';
+import { IconButton, ResizableBox, Toolbar, withNotices } from '@wordpress/components';
 import {
 	BlockControls,
 	BlockIcon,
@@ -10,6 +10,8 @@ import {
 } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { compose } from '@wordpress/compose';
+import { withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -31,6 +33,17 @@ export function imageFillStyles( url, focalPoint ) {
 }
 
 class MediaContainer extends Component {
+	constructor() {
+		super( ...arguments );
+		this.onUploadError = this.onUploadError.bind( this );
+	}
+
+	onUploadError( message ) {
+		const { noticeOperations } = this.props;
+		noticeOperations.removeAllNotices();
+		noticeOperations.createErrorNotice( message );
+	}
+
 	renderToolbarEditButton() {
 		const { mediaId, onSelectMedia } = this.props;
 		return (
@@ -80,7 +93,7 @@ class MediaContainer extends Component {
 	}
 
 	renderPlaceholder() {
-		const { onSelectMedia, className } = this.props;
+		const { onSelectMedia, className, noticeUI } = this.props;
 		return (
 			<MediaPlaceholder
 				icon={ <BlockIcon icon={ icon } /> }
@@ -91,17 +104,23 @@ class MediaContainer extends Component {
 				onSelect={ onSelectMedia }
 				accept="image/*,video/*"
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
+				notices={ noticeUI }
+				onError={ this.onUploadError }
 			/>
 		);
 	}
 
 	render() {
-		const { mediaPosition, mediaUrl, mediaType, mediaWidth, commitWidthChange, onWidthChange } = this.props;
+		const { mediaPosition, mediaUrl, mediaType, mediaWidth, commitWidthChange, onWidthChange, toggleSelection } = this.props;
 		if ( mediaType && mediaUrl ) {
+			const onResizeStart = () => {
+				toggleSelection( false );
+			};
 			const onResize = ( event, direction, elt ) => {
 				onWidthChange( parseInt( elt.style.width ) );
 			};
 			const onResizeStop = ( event, direction, elt ) => {
+				toggleSelection( true );
 				commitWidthChange( parseInt( elt.style.width ) );
 			};
 			const enablePositions = {
@@ -125,6 +144,7 @@ class MediaContainer extends Component {
 					minWidth="10%"
 					maxWidth="100%"
 					enable={ enablePositions }
+					onResizeStart={ onResizeStart }
 					onResize={ onResize }
 					onResizeStop={ onResizeStop }
 					axis="x"
@@ -137,4 +157,13 @@ class MediaContainer extends Component {
 	}
 }
 
-export default MediaContainer;
+export default compose( [
+	withDispatch( ( dispatch ) => {
+		const { toggleSelection } = dispatch( 'core/block-editor' );
+
+		return {
+			toggleSelection,
+		};
+	} ),
+	withNotices,
+] )( MediaContainer );

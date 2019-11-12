@@ -12,12 +12,12 @@ import { withSelect, withDispatch } from '@wordpress/data';
 import TokenList from '@wordpress/token-list';
 import { ENTER, SPACE } from '@wordpress/keycodes';
 import { _x } from '@wordpress/i18n';
-import { getBlockType } from '@wordpress/blocks';
+import { getBlockType, cloneBlock, getBlockFromExample } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
-import { BlockPreviewContent } from '../block-preview';
+import BlockPreview from '../block-preview';
 
 /**
  * Returns the active style from the given className.
@@ -68,8 +68,6 @@ function BlockStyles( {
 	styles,
 	className,
 	onChangeClassName,
-	name,
-	attributes,
 	type,
 	block,
 	onSwitch = noop,
@@ -124,13 +122,16 @@ function BlockStyles( {
 						aria-label={ style.label || style.name }
 					>
 						<div className="editor-block-styles__item-preview block-editor-block-styles__item-preview">
-							<BlockPreviewContent
-								name={ name }
-								attributes={ {
-									...attributes,
-									className: styleClassName,
-								} }
-								innerBlocks={ block.innerBlocks }
+							<BlockPreview
+								viewportWidth={ 500 }
+								blocks={
+									type.example ?
+										getBlockFromExample( block.name, {
+											attributes: { ...type.example.attributes, className: styleClassName },
+											innerBlocks: type.example.innerBlocks,
+										} ) :
+										cloneBlock( block, { className: styleClassName } )
+								}
 							/>
 						</div>
 						<div className="editor-block-styles__item-label block-editor-block-styles__item-label">
@@ -152,8 +153,6 @@ export default compose( [
 
 		return {
 			block,
-			name: block.name,
-			attributes: block.attributes,
 			className: block.attributes.className || '',
 			styles: getBlockStyles( block.name ),
 			type: blockType,

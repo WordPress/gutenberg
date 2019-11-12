@@ -1,0 +1,145 @@
+// Editor specific styles for Social Links.
+.wp-block-social-links {
+	div.editor-url-input {
+		display: inline-block;
+		margin-left: $grid-size;
+	}
+
+	.editor-block-list__layout {
+		display: flex;
+		justify-content: flex-start;
+	}
+}
+
+// Reduce the paddings, margins, and UI of inner-blocks.
+// @todo: eventually we may add a feature that lets a parent container absorb the block UI of a child block.
+// When that happens, leverage that instead of the following overrides.
+[data-type="core/social-links"] {
+	// 1. Reset margins on immediate innerblocks container.
+	.wp-block-social-links > .block-editor-inner-blocks > .block-editor-block-list__layout {
+		margin-left: 0;
+		margin-right: 0;
+	}
+
+	// 2. Remove paddings on subsequent immediate children.
+	.wp-block-social-links > .block-editor-inner-blocks > .block-editor-block-list__layout > .wp-block {
+		width: auto;
+		padding-left: 0;
+		padding-right: 0;
+	}
+
+	// 3. Remove margins on subsequent Edit container.
+	.wp-block-social-links > .block-editor-inner-blocks > .block-editor-block-list__layout > .wp-block > .block-editor-block-list__block-edit {
+		margin-left: 0;
+		margin-right: 0;
+	}
+
+	// 4. Minimize the block outlines.
+	.wp-block-social-links > .block-editor-inner-blocks > .block-editor-block-list__layout > .wp-block > .block-editor-block-list__block-edit::before {
+		border-right: none;
+		border-top: none;
+		border-bottom: none;
+	}
+
+	.wp-block-social-links > .block-editor-inner-blocks > .block-editor-block-list__layout > .wp-block.is-hovered:not(.is-navigate-mode) > .block-editor-block-list__block-edit::before {
+		box-shadow: none;
+	}
+
+	// 5. Remove the dashed outlines for child blocks.
+	&.is-hovered .wp-block-social-links .block-editor-block-list__block-edit::before,
+	&.is-selected .wp-block-social-links .block-editor-block-list__block-edit::before,
+	&.has-child-selected .wp-block-social-links .block-editor-block-list__block-edit::before {
+		border-color: transparent !important; // !important used to keep the selector from growing any more complex.
+	}
+
+	// 6. Remove vertical margins on subsequent block container.
+	.wp-block-social-links > .block-editor-inner-blocks > .block-editor-block-list__layout > .wp-block > .block-editor-block-list__block-edit > [data-block] {
+		margin-top: 0;
+		margin-bottom: 0;
+	}
+
+	// Hide the breadcrumb.
+	// Hide the mover.
+	// Hide the sibling inserter.
+	.wp-block-social-links .block-editor-block-list__insertion-point,
+	.wp-block-social-links .block-editor-block-list__breadcrumb,
+	.wp-block-social-links .block-editor-block-mover.block-editor-block-mover { // Needs specificity.
+		display: none;
+	}
+}
+
+// Polish the Appender.
+.wp-block-social-links .block-list-appender {
+	margin: 0;
+
+	.block-editor-button-block-appender {
+		padding: $grid-size;
+		outline: none;
+		background: none;
+	}
+}
+
+// Center flex items. This has an equivalent in style.scss.
+[data-type="core/social-links"][data-align="center"] .wp-block-social-links {
+	justify-content: center;
+}
+
+// Improve the preview.
+// @todo: Look at improving the preview component to make this unnecessary.
+.block-editor-block-preview__content {
+
+	// This ensures buttons in preview are fully opaque despite being disabled.
+	.wp-social-link:disabled {
+		opacity: 1;
+	}
+
+	// This ensures the preview is of a good size.
+	[data-type="core/social-links"] {
+		width: auto !important;
+		display: inline-block;
+	}
+}
+
+// Selected/unselected states.
+// Unselected block is preview, selected has additional options.
+[data-type="core/social-links"]:not(.is-selected):not(.has-child-selected) .wp-block-social-links {
+	min-height: 36px; // This height matches the height of the buttons and ensures an empty block doesn't collapse.
+}
+
+// Disappear but show on hover or nav mode focus.
+[data-type="core/social-links"] .wp-social-link__is-incomplete {
+	transition: transform 0.1s ease;
+	transform-origin: center center;
+}
+
+[data-type="core/social-links"]:not(.is-selected):not(.has-child-selected) {
+	.wp-social-link__is-incomplete {
+		opacity: 0;
+		transform: scale(0);
+		width: 0;
+		padding: 0;
+		margin-right: 0;
+	}
+}
+
+// Unconfigured placeholder links are semitransparent.
+.wp-social-link.wp-social-link__is-incomplete {
+	opacity: 0.5;
+}
+
+.wp-block-social-links .is-selected .wp-social-link__is-incomplete,
+.wp-social-link.wp-social-link__is-incomplete:hover,
+.wp-social-link.wp-social-link__is-incomplete:focus {
+	opacity: 1;
+}
+
+
+// Focus styles for the button inside the child block.
+// The child block itself has a more generic focus style, see line 55.
+[data-type="core/social-links"] .wp-social-link:focus { // This needs specificity.
+	opacity: 1;
+	box-shadow: 0 0 0 2px $white, 0 0 0 4px $blue-medium-focus;
+
+	// Windows High Contrast mode will show this outline, but not the box-shadow.
+	outline: 2px solid transparent;
+}

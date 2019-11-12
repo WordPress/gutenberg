@@ -1,3 +1,15 @@
+## Master
+
+### Bug Fixes
+
+- Fix regression introduced by EditorInitializer component which auto-closed sidebar plugins when opened on small screens. ([#17712](https://github.com/WordPress/gutenberg/pull/17712))
+
+## 3.6.0 (2019-08-05)
+
+### Refactor
+
+- Create EditorInitializer component and implement for various things to initialize as the editor is loaded. This replaces the `__unstableInitialize` refactor done in #14740. ([#15444](https://github.com/WordPress/gutenberg/pull/15444))
+
 ## 3.4.0 (2019-05-21)
 
 ### New Feature
@@ -7,7 +19,6 @@
 ### Refactor
 
 - convert `INIT` effect to controls & actions [#14740](https://github.com/WordPress/gutenberg/pull/14740)
-
 
 ## 3.2.0 (2019-03-06)
 

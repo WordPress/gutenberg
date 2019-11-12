@@ -8,6 +8,7 @@ import {
 	getEditedPostContent,
 	insertBlock,
 	saveDraft,
+	pressKeyTimes,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Block with a meta attribute', () => {
@@ -25,7 +26,16 @@ describe( 'Block with a meta attribute', () => {
 
 	it( 'Should persist the meta attribute properly', async () => {
 		await insertBlock( 'Test Meta Attribute Block' );
-		await page.keyboard.type( 'Meta Value' );
+		await page.keyboard.type( 'Value' );
+
+		// Regression Test: Previously the caret would wrongly reset to the end
+		// of any input for meta-sourced attributes, due to syncing behavior of
+		// meta attribute updates.
+		//
+		// See: https://github.com/WordPress/gutenberg/issues/15739
+		await pressKeyTimes( 'ArrowLeft', 5 );
+		await page.keyboard.type( 'Meta ' );
+
 		await saveDraft();
 		await page.reload();
 

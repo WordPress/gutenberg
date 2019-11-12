@@ -6,12 +6,17 @@
 			"type": "array",
 			"default": [ ],
 			"source": "query",
-			"selector": "ul.wp-block-gallery .blocks-gallery-item",
+			"selector": ".blocks-gallery-item",
 			"query": {
 				"url": {
 					"source": "attribute",
 					"selector": "img",
 					"attribute": "src"
+				},
+				"fullUrl": {
+					"source": "attribute",
+					"selector": "img",
+					"attribute": "data-full-url"
 				},
 				"link": {
 					"source": "attribute",
@@ -32,7 +37,7 @@
 				"caption": {
 					"type": "string",
 					"source": "html",
-					"selector": "figcaption"
+					"selector": ".blocks-gallery-item__caption"
 				}
 			}
 		},
@@ -42,6 +47,11 @@
 		},
 		"columns": {
 			"type": "number"
+		},
+		"caption": {
+			"type": "string",
+			"source": "html",
+			"selector": ".blocks-gallery-caption"
 		},
 		"imageCrop": {
 			"type": "boolean",

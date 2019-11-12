@@ -3,6 +3,7 @@
 
 	.components-button.is-button {
 		border-radius: 0;
+		display: inline-flex;
 
 		& + .components-button.is-button {
 			margin-left: -1px;

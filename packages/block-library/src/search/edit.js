@@ -13,8 +13,7 @@ export default function SearchEdit( { className, attributes, setAttributes } ) {
 				wrapperClassName="wp-block-search__label"
 				aria-label={ __( 'Label text' ) }
 				placeholder={ __( 'Add label…' ) }
-				keepPlaceholderOnFocus
-				formattingControls={ [] }
+				withoutInteractiveFormatting
 				value={ label }
 				onChange={ ( html ) => setAttributes( { label: html } ) }
 			/>
@@ -33,8 +32,7 @@ export default function SearchEdit( { className, attributes, setAttributes } ) {
 				className="wp-block-search__button-rich-text"
 				aria-label={ __( 'Button text' ) }
 				placeholder={ __( 'Add button text…' ) }
-				keepPlaceholderOnFocus
-				formattingControls={ [] }
+				withoutInteractiveFormatting
 				value={ buttonText }
 				onChange={ ( html ) => setAttributes( { buttonText: html } ) }
 			/>

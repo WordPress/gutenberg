@@ -234,7 +234,9 @@ aside from `children` are passed.
 
 _Parameters_
 
+-   _props_ `Object`: 
 -   _props.children_ `string`: HTML to render.
+-   _props.props_ `Object`: Any additonal props to be set on the containing div.
 
 _Returns_
 

@@ -10,28 +10,28 @@
                 "blockName": "core/paragraph",
                 "attrs": {},
                 "innerBlocks": [],
-                "innerHTML": "\n\t<p>This is a group block.</p>\n\t",
+                "innerHTML": "\n\t\t<p>This is a group block.</p>\n\t\t",
                 "innerContent": [
-                    "\n\t<p>This is a group block.</p>\n\t"
+                    "\n\t\t<p>This is a group block.</p>\n\t\t"
                 ]
             },
             {
                 "blockName": "core/paragraph",
                 "attrs": {},
                 "innerBlocks": [],
-                "innerHTML": "\n\t<p>Group block content.</p>\n\t",
+                "innerHTML": "\n\t\t<p>Group block content.</p>\n\t\t",
                 "innerContent": [
-                    "\n\t<p>Group block content.</p>\n\t"
+                    "\n\t\t<p>Group block content.</p>\n\t\t"
                 ]
             }
         ],
-        "innerHTML": "\n<div class=\"wp-block-group alignfull has-secondary-background-color has-background\">\n\t\n\n\t</div>\n",
+        "innerHTML": "\n<div class=\"wp-block-group alignfull has-secondary-background-color has-background\">\n\t<div class=\"wp-block-group__inner-container\">\n\t\t\n\n\t\t</div>\n\t</div>\n",
         "innerContent": [
-            "\n<div class=\"wp-block-group alignfull has-secondary-background-color has-background\">\n\t",
+            "\n<div class=\"wp-block-group alignfull has-secondary-background-color has-background\">\n\t<div class=\"wp-block-group__inner-container\">\n\t\t",
             null,
-            "\n\n\t",
+            "\n\n\t\t",
             null,
-            "</div>\n"
+            "</div>\n\t</div>\n"
         ]
     },
     {

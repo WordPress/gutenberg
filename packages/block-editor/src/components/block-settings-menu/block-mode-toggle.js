@@ -34,9 +34,9 @@ export function BlockModeToggle( { blockType, mode, onToggleMode, small = false,
 
 export default compose( [
 	withSelect( ( select, { clientId } ) => {
-		const { getBlock, getBlockMode } = select( 'core/block-editor' );
+		const { getBlock, getBlockMode, getSettings } = select( 'core/block-editor' );
 		const block = getBlock( clientId );
-		const isCodeEditingEnabled = select( 'core/editor' ).getEditorSettings().codeEditingEnabled;
+		const isCodeEditingEnabled = getSettings().codeEditingEnabled;
 
 		return {
 			mode: getBlockMode( clientId ),

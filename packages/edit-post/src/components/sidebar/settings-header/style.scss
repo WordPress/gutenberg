@@ -26,6 +26,7 @@
 	color: $dark-gray-900;
 	@include square-style__neutral;
 	transition: box-shadow 0.1s linear;
+	@include reduce-motion("transition");
 
 	// This pseudo-element "duplicates" the tab label and sets the text to bold.
 	// This ensures that the tab doesn't change width when selected.

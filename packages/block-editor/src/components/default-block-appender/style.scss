@@ -1,6 +1,17 @@
 .block-editor-default-block-appender {
 	clear: both; // The appender doesn't scale well to sit next to floats, so clear them.
 
+	// Default to centered and content-width, like blocks
+	margin-left: auto;
+	margin-right: auto;
+	position: relative;
+
+	&[data-root-client-id=""] .block-editor-default-block-appender__content:hover {
+		// Outline on root-level default block appender is redundant with the
+		// WritingFlow click redirector.
+		outline: 1px solid transparent;
+	}
+
 	textarea.block-editor-default-block-appender__content { // Needs specificity in order to override input field styles from WP-admin styles.
 		font-family: $editor-font;
 		font-size: $editor-font-size; // It should match the default paragraph size.
@@ -12,6 +23,7 @@
 		width: 100%;
 		outline: $border-width solid transparent;
 		transition: 0.2s outline;
+		@include reduce-motion("transition");
 		resize: none;
 		margin-top: $default-block-margin;
 		margin-bottom: $default-block-margin;
@@ -28,19 +40,9 @@
 		}
 	}
 
-	// Don't show the inserter until mousing over.
-	.block-editor-inserter__toggle:not([aria-expanded="true"]) {
-		opacity: 0;
-		transition: opacity 0.2s;
-	}
-
 	&:hover {
 		.block-editor-inserter-with-shortcuts {
 			@include edit-post__fade-in-animation;
-		}
-
-		.block-editor-inserter__toggle {
-			opacity: 1;
 		}
 	}
 
@@ -48,6 +50,12 @@
 	.components-drop-zone__content-icon {
 		display: none;
 	}
+}
+
+// Ensure that the height of the first appender, and the one between blocks, is the same as text.
+.block-editor-default-block-appender__content {
+	min-height: $empty-paragraph-height / 2;
+	line-height: $editor-line-height;
 }
 
 // Quick shortcuts, left and right.
@@ -91,6 +99,9 @@
 	right: $grid-size; // Show to the right on mobile.
 
 	@include break-small {
+		display: flex;
+		align-items: center;
+		height: 100%;
 		left: -$block-side-ui-width - $block-padding - $block-side-ui-clearance;
 		right: auto;
 	}
@@ -124,7 +135,9 @@
 	z-index: z-index(".block-editor-inserter-with-shortcuts"); // Elevate above the sibling inserter.
 
 	@include break-small {
-		right: 0;
 		display: flex;
+		align-items: center;
+		height: 100%;
+		right: 0;
 	}
 }

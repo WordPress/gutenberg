@@ -20,6 +20,15 @@ export const settings = {
 	title: __( 'Code' ),
 	description: __( 'Display code snippets that respect your spacing and tabs.' ),
 	icon,
+	example: {
+		attributes: {
+			content: __( '// A "block" is the abstract term used' ) + '\n' +
+			__( '// to describe units of markup that,' ) + '\n' +
+			__( '// when composed together, form the' ) + '\n' +
+			__( '// content or layout of a page.' ) + '\n' +
+			__( 'registerBlockType( name, settings );' ),
+		},
+	},
 	supports: {
 		html: false,
 	},

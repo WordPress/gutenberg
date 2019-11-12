@@ -12,6 +12,12 @@
 			"selector": "ol,ul",
 			"multiline": "li",
 			"default": ""
+		},
+		"start": {
+			"type": "number"
+		},
+		"reversed": {
+			"type": "boolean"
 		}
 	}
 }

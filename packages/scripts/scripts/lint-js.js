@@ -9,16 +9,20 @@ const { sync: resolveBin } = require( 'resolve-bin' );
  */
 const {
 	fromConfigRoot,
-	getCliArgs,
-	hasCliArg,
+	getArgsFromCLI,
+	hasArgInCLI,
+	hasFileArgInCLI,
 	hasPackageProp,
 	hasProjectFile,
 } = require( '../utils' );
 
-const args = getCliArgs();
+const args = getArgsFromCLI();
 
-const hasLintConfig = hasCliArg( '-c' ) ||
-	hasCliArg( '--config' ) ||
+const defaultFilesArgs = hasFileArgInCLI() ? [] : [ '.' ];
+
+// See: https://eslint.org/docs/user-guide/configuring#using-configuration-files-1.
+const hasLintConfig = hasArgInCLI( '-c' ) ||
+	hasArgInCLI( '--config' ) ||
 	hasProjectFile( '.eslintrc.js' ) ||
 	hasProjectFile( '.eslintrc.yaml' ) ||
 	hasProjectFile( '.eslintrc.yml' ) ||
@@ -29,13 +33,21 @@ const hasLintConfig = hasCliArg( '-c' ) ||
 // When a configuration is not provided by the project, use from the default
 // provided with the scripts module. Instruct ESLint to avoid discovering via
 // the `--no-eslintrc` flag, as otherwise it will still merge with inherited.
-const config = ! hasLintConfig ?
+const defaultConfigArgs = ! hasLintConfig ?
 	[ '--no-eslintrc', '--config', fromConfigRoot( '.eslintrc.js' ) ] :
+	[];
+
+// See: https://eslint.org/docs/user-guide/configuring#ignoring-files-and-directories.
+const hasIgnoredFiles = hasArgInCLI( '--ignore-path' ) ||
+	hasProjectFile( '.eslintignore' );
+
+const defaultIgnoreArgs = ! hasIgnoredFiles ?
+	[ '--ignore-path', fromConfigRoot( '.eslintignore' ) ] :
 	[];
 
 const result = spawn(
 	resolveBin( 'eslint' ),
-	[ ...config, ...args ],
+	[ ...defaultConfigArgs, ...defaultIgnoreArgs, ...args, ...defaultFilesArgs ],
 	{ stdio: 'inherit' }
 );
 

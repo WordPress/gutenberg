@@ -1,0 +1,12 @@
+[
+    {
+        "clientId": "_clientId_0",
+        "name": "core/navigation-menu",
+        "isValid": true,
+        "attributes": {
+            "automaticallyAdd": false
+        },
+        "innerBlocks": [],
+        "originalContent": ""
+    }
+]

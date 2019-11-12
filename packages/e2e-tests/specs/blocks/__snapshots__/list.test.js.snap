@@ -194,10 +194,26 @@ exports[`List should insert a line break on shift+enter in a non trailing list i
 <!-- /wp:list -->"
 `;
 
+exports[`List should not indent list on space with modifier 1`] = `
+"<!-- wp:list -->
+<ul><li>1</li><li> </li></ul>
+<!-- /wp:list -->"
+`;
+
 exports[`List should not transform lines in block when transforming multiple blocks 1`] = `
 "<!-- wp:list -->
 <ul><li>one<br>...</li><li>two</li></ul>
 <!-- /wp:list -->"
+`;
+
+exports[`List should not undo asterisk transform with backspace after selection change 1`] = `""`;
+
+exports[`List should not undo asterisk transform with backspace after typing 1`] = `""`;
+
+exports[`List should only convert to list when shortcut ends with space 1`] = `
+"<!-- wp:paragraph -->
+<p>* </p>
+<!-- /wp:paragraph -->"
 `;
 
 exports[`List should outdent with children 1`] = `
@@ -209,6 +225,12 @@ exports[`List should outdent with children 1`] = `
 exports[`List should outdent with children 2`] = `
 "<!-- wp:list -->
 <ul><li>a</li><li>b<ul><li>c</li></ul></li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List should place the caret in the right place with nested list 1`] = `
+"<!-- wp:list -->
+<ul><li>1</li><li>2<ul><li>a</li></ul></li></ul>
 <!-- /wp:list -->"
 `;
 
@@ -260,4 +282,28 @@ exports[`List should split into two with paragraph and merge lists 3`] = `
 <!-- wp:list -->
 <ul><li>two</li></ul>
 <!-- /wp:list -->"
+`;
+
+exports[`List should undo asterisk transform with backspace 1`] = `
+"<!-- wp:paragraph -->
+<p>* </p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`List should undo asterisk transform with backspace after selection changes 1`] = `
+"<!-- wp:paragraph -->
+<p>* </p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`List should undo asterisk transform with backspace after selection changes without requestIdleCallback 1`] = `
+"<!-- wp:paragraph -->
+<p>* </p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`List should undo asterisk transform with escape 1`] = `
+"<!-- wp:paragraph -->
+<p>* </p>
+<!-- /wp:paragraph -->"
 `;

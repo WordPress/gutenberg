@@ -11,8 +11,13 @@
  * @return boolean True if a screen containing the block editor is being loaded.
  */
 function gutenberg_is_block_editor() {
+	// If get_current_screen does not exist, we are neither in the standard block editor for posts, or the widget block editor.
+	// We can safely return false.
+	if ( ! function_exists( 'get_current_screen' ) ) {
+		return false;
+	}
 	$screen = get_current_screen();
-	return $screen->is_block_editor() || 'gutenberg_page_gutenberg-widgets' === $screen->id;
+	return ! empty( $screen ) && ( $screen->is_block_editor() || 'gutenberg_page_gutenberg-widgets' === $screen->id );
 }
 
 /**
@@ -100,9 +105,9 @@ function gutenberg_get_legacy_widget_settings() {
 
 	$has_permissions_to_manage_widgets = current_user_can( 'edit_theme_options' );
 	$available_legacy_widgets          = array();
-	global $wp_widget_factory, $wp_registered_widgets;
-	foreach ( $wp_widget_factory->widgets as $class => $widget_obj ) {
-		if ( ! in_array( $class, $core_widgets ) ) {
+	global $wp_widget_factory;
+	if ( ! empty( $wp_widget_factory ) ) {
+		foreach ( $wp_widget_factory->widgets as $class => $widget_obj ) {
 			$available_legacy_widgets[ $class ] = array(
 				'name'             => html_entity_decode( $widget_obj->name ),
 				// wp_widget_description is not being used because its input parameter is a Widget Id.
@@ -112,22 +117,26 @@ function gutenberg_get_legacy_widget_settings() {
 					html_entity_decode( $widget_obj->widget_options['description'] ) :
 					null,
 				'isCallbackWidget' => false,
+				'isHidden'         => in_array( $class, $core_widgets, true ),
 			);
 		}
 	}
-	foreach ( $wp_registered_widgets as $widget_id => $widget_obj ) {
-		if (
-			is_array( $widget_obj['callback'] ) &&
-			isset( $widget_obj['callback'][0] ) &&
-			( $widget_obj['callback'][0] instanceof WP_Widget )
-		) {
-			continue;
+	global $wp_registered_widgets;
+	if ( ! empty( $wp_registered_widgets ) ) {
+		foreach ( $wp_registered_widgets as $widget_id => $widget_obj ) {
+			if (
+				is_array( $widget_obj['callback'] ) &&
+				isset( $widget_obj['callback'][0] ) &&
+				( $widget_obj['callback'][0] instanceof WP_Widget )
+			) {
+				continue;
+			}
+			$available_legacy_widgets[ $widget_id ] = array(
+				'name'             => html_entity_decode( $widget_obj['name'] ),
+				'description'      => html_entity_decode( wp_widget_description( $widget_id ) ),
+				'isCallbackWidget' => true,
+			);
 		}
-		$available_legacy_widgets[ $widget_id ] = array(
-			'name'             => html_entity_decode( $widget_obj['name'] ),
-			'description'      => html_entity_decode( wp_widget_description( $widget_id ) ),
-			'isCallbackWidget' => true,
-		);
 	}
 
 	$settings['hasPermissionsToManageWidgets'] = $has_permissions_to_manage_widgets;

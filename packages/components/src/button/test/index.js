@@ -27,14 +27,14 @@ describe( 'Button', () => {
 			expect( button.type() ).toBe( 'button' );
 		} );
 
-		it( 'should render a button element with button-primary class', () => {
+		it( 'should render a button element with is-primary class', () => {
 			const button = shallow( <Button isPrimary /> );
 			expect( button.hasClass( 'is-large' ) ).toBe( false );
 			expect( button.hasClass( 'is-primary' ) ).toBe( true );
 			expect( button.hasClass( 'is-button' ) ).toBe( true );
 		} );
 
-		it( 'should render a button element with button-large class', () => {
+		it( 'should render a button element with is-large class', () => {
 			const button = shallow( <Button isLarge /> );
 			expect( button.hasClass( 'is-large' ) ).toBe( true );
 			expect( button.hasClass( 'is-default' ) ).toBe( true );
@@ -42,7 +42,12 @@ describe( 'Button', () => {
 			expect( button.hasClass( 'is-primary' ) ).toBe( false );
 		} );
 
-		it( 'should render a button element with button-small class', () => {
+		it( 'should render a button element without is-default if primary', () => {
+			const button = shallow( <Button isPrimary isLarge /> );
+			expect( button.hasClass( 'is-default' ) ).toBe( false );
+		} );
+
+		it( 'should render a button element with is-small class', () => {
 			const button = shallow( <Button isSmall /> );
 			expect( button.hasClass( 'is-default' ) ).toBe( true );
 			expect( button.hasClass( 'is-button' ) ).toBe( true );

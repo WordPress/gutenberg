@@ -4,10 +4,21 @@
 	$subtle-pale-blue: #e7f5fe;
 	$subtle-pale-pink: #fcf0ef;
 
+	overflow-x: auto;
+
+	table {
+		width: 100%;
+	}
+
 	// Fixed layout toggle
-	&.has-fixed-layout {
+	.has-fixed-layout {
 		table-layout: fixed;
 		width: 100%;
+
+		td,
+		th {
+			word-break: break-word;
+		}
 	}
 
 	&.alignleft,
@@ -17,25 +28,29 @@
 		// The table element needs to be kept as display table
 		// for table features to work reliably.
 		display: table;
-
 		// Table cannot be 100% width if it is aligned, so set
 		// width as auto.
 		width: auto;
+
+		td,
+		th {
+			word-break: break-word;
+		}
 	}
 
-	&.has-subtle-light-gray-background-color {
+	.has-subtle-light-gray-background-color {
 		background-color: $subtle-light-gray;
 	}
 
-	&.has-subtle-pale-green-background-color {
+	.has-subtle-pale-green-background-color {
 		background-color: $subtle-pale-green;
 	}
 
-	&.has-subtle-pale-blue-background-color {
+	.has-subtle-pale-blue-background-color {
 		background-color: $subtle-pale-blue;
 	}
 
-	&.has-subtle-pale-pink-background-color {
+	.has-subtle-pale-pink-background-color {
 		background-color: $subtle-pale-pink;
 	}
 

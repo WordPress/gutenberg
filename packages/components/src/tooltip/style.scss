@@ -12,6 +12,10 @@
 	&.is-bottom::after {
 		border-bottom-color: $dark-gray-900;
 	}
+
+	&:not(.is-mobile) .components-popover__content {
+		min-width: 0;
+	}
 }
 
 .components-tooltip .components-popover__content {
@@ -21,10 +25,6 @@
 	color: $white;
 	white-space: nowrap;
 	text-align: center;
-}
-
-.components-tooltip:not(.is-mobile) .components-popover__content {
-	min-width: 0;
 }
 
 .components-tooltip__shortcut {

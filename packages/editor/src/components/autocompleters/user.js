@@ -4,10 +4,10 @@
 import apiFetch from '@wordpress/api-fetch';
 
 /**
-* A user mentions completer.
-*
-* @type {Completer}
-*/
+ * A user mentions completer.
+ *
+ * @type {Completer}
+ */
 export default {
 	name: 'users',
 	className: 'editor-autocompleters__user',

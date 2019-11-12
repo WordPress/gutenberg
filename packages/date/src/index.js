@@ -11,13 +11,28 @@ const WP_ZONE = 'WP';
 // well because it uses the `setSettings()` function to change these settings.
 let settings = {
 	l10n: {
-		locale: 'en_US',
+		locale: 'en',
 		months: [ 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December' ],
 		monthsShort: [ 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec' ],
 		weekdays: [ 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday' ],
 		weekdaysShort: [ 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat' ],
 		meridiem: { am: 'am', pm: 'pm', AM: 'AM', PM: 'PM' },
-		relative: { future: ' % s from now', past: '% s ago' },
+		relative: {
+			future: '%s from now',
+			past: '%s ago',
+			s: 'a few seconds',
+			ss: '%d seconds',
+			m: 'a minute',
+			mm: '%d minutes',
+			h: 'an hour',
+			hh: '%d hours',
+			d: 'a day',
+			dd: '%d days',
+			M: 'a month',
+			MM: '%d months',
+			y: 'a year',
+			yy: '%d years',
+		},
 	},
 	formats: {
 		time: 'g: i a',
@@ -61,21 +76,7 @@ export function setSettings( dateSettings ) {
 		},
 		// From human_time_diff?
 		// Set to `(number, withoutSuffix, key, isFuture) => {}` instead.
-		relativeTime: {
-			future: dateSettings.l10n.relative.future,
-			past: dateSettings.l10n.relative.past,
-			s: 'seconds',
-			m: 'a minute',
-			mm: '%d minutes',
-			h: 'an hour',
-			hh: '%d hours',
-			d: 'a day',
-			dd: '%d days',
-			M: 'a month',
-			MM: '%d months',
-			y: 'a year',
-			yy: '%d years',
-		},
+		relativeTime: dateSettings.l10n.relative,
 	} );
 	momentLib.locale( currentLocale );
 
@@ -105,19 +106,19 @@ function setupWPTimezone() {
 /**
  * Number of seconds in one minute.
  *
- * @type {Number}
+ * @type {number}
  */
 const MINUTE_IN_SECONDS = 60;
 /**
  * Number of minutes in one hour.
  *
- * @type {Number}
+ * @type {number}
  */
 const HOUR_IN_MINUTES = 60;
 /**
  * Number of seconds in one hour.
  *
- * @type {Number}
+ * @type {number}
  */
 const HOUR_IN_SECONDS = 60 * MINUTE_IN_SECONDS;
 

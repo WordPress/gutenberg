@@ -14,6 +14,7 @@ import { getBlockType } from '@wordpress/blocks';
  * <BlockTitle clientId="afd1cb17-2c08-4e7a-91be-007ba7ddc3a1" />
  * ```
  *
+ * @param {Object}  props
  * @param {?string} props.name Block name.
  *
  * @return {?string} Block title.

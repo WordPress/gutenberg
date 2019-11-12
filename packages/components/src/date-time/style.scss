@@ -19,6 +19,21 @@
 		margin-right: $grid-size;
 		margin-top: 0.5em;
 	}
+
+	fieldset {
+		border: 0;
+		padding: 0;
+		margin: 0;
+	}
+
+	select,
+	input {
+		box-sizing: border-box;
+		height: 28px;
+		vertical-align: middle;
+		padding: 0;
+		@include input-style__neutral();
+	}
 }
 
 .components-datetime__date {
@@ -52,8 +67,7 @@
 		top: 20px;
 
 		&:focus {
-			border-color: $blue-medium-focus;
-			box-shadow: 0 0 0 1px $blue-medium-focus;
+			@include input-style__focus();
 		}
 	}
 
@@ -119,9 +133,12 @@
 		}
 
 		.components-datetime__time-field {
-			align-self: center;
-			flex: 0 1 auto;
-			order: 1;
+
+			&-time {
+				/*rtl:ignore*/
+				direction: ltr;
+			}
+
 
 			&.am-pm button {
 				font-size: 11px;
@@ -129,7 +146,6 @@
 			}
 
 			select {
-				padding: 2px;
 				margin-right: 4px;
 
 				&:focus {
@@ -141,7 +157,6 @@
 			input[type="number"] {
 				padding: 2px;
 				margin-right: 4px;
-				width: 40px;
 				text-align: center;
 				-moz-appearance: textfield;
 
@@ -193,13 +208,13 @@
 }
 
 .components-datetime__time-field-month-select {
-	width: 90px;
+	max-width: 145px;
 }
 
 // Hack to center the datepicker component within the popover.
 // It sets its own styles so centering is tricky.
 .components-popover .components-datetime__date {
-	padding-left: 6px;
+	padding-left: 4px;
 }
 
 // Used to prevent z-index issues on mobile.

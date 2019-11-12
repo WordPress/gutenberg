@@ -4,8 +4,9 @@ const WORDPRESS_NAMESPACE = '@wordpress/';
  * Default request to global transformation
  *
  * Transform @wordpress dependencies:
- *   @wordpress/api-fetch -> wp.apiFetch
- *   @wordpress/i18n -> wp.i18n
+ *
+ *   request `@wordpress/api-fetch` becomes `wp.apiFetch`
+ *   request `@wordpress/i18n` becomes `wp.i18n`
  *
  * @param {string} request Requested module
  *
@@ -42,8 +43,9 @@ function defaultRequestToExternal( request ) {
  * Default request to WordPress script handle transformation
  *
  * Transform @wordpress dependencies:
- *   @wordpress/i18n -> wp-i18n
- *   @wordpress/escape-html -> wp-escape-html
+ *
+ *   request `@wordpress/i18n` becomes `wp-i18n`
+ *   request `@wordpress/escape-html` becomes `wp-escape-html`
  *
  * @param {string} request Requested module
  *

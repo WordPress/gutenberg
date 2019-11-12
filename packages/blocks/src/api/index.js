@@ -5,6 +5,7 @@ export {
 	switchToBlockType,
 	getBlockTransforms,
 	findTransform,
+	getBlockFromExample,
 } from './factory';
 export {
 	default as parse,
@@ -35,6 +36,8 @@ export {
 	getUnregisteredTypeHandlerName,
 	setDefaultBlockName,
 	getDefaultBlockName,
+	setGroupingBlockName,
+	getGroupingBlockName,
 	getBlockType,
 	getBlockTypes,
 	getBlockSupport,

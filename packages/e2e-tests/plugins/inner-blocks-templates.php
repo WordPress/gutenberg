@@ -18,7 +18,7 @@ function enqueue_container_without_paragraph_plugin_script() {
 			'wp-blocks',
 			'wp-components',
 			'wp-element',
-			'wp-editor',
+			'wp-block-editor',
 			'wp-hooks',
 			'wp-i18n',
 		),

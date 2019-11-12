@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/edit-widgets",
-	"version": "0.3.0",
+	"version": "0.7.0",
 	"private": true,
 	"description": "Widgets Page module for WordPress..",
 	"author": "The WordPress Contributors",
@@ -23,9 +23,19 @@
 	"dependencies": {
 		"@babel/runtime": "^7.4.4",
 		"@wordpress/block-editor": "file:../block-editor",
+		"@wordpress/block-library": "file:../block-library",
+		"@wordpress/blocks": "file:../blocks",
 		"@wordpress/components": "file:../components",
+		"@wordpress/compose": "file:../compose",
+		"@wordpress/data": "file:../data",
+		"@wordpress/data-controls": "file:../data-controls",
 		"@wordpress/element": "file:../element",
-		"@wordpress/i18n": "file:../i18n"
+		"@wordpress/hooks": "file:../hooks",
+		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/media-utils": "file:../media-utils",
+		"@wordpress/notices": "file:../notices",
+		"lodash": "^4.17.15",
+		"rememo": "^3.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

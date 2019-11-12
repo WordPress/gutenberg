@@ -273,6 +273,19 @@ _Returns_
 
 -   `string`: The block's default class.
 
+<a name="getBlockFromExample" href="#getBlockFromExample">#</a> **getBlockFromExample**
+
+Create a block object from the example API.
+
+_Parameters_
+
+-   _name_ `string`: 
+-   _example_ `Object`: 
+
+_Returns_
+
+-   `Object`: block.
+
 <a name="getBlockMenuDefaultClassName" href="#getBlockMenuDefaultClassName">#</a> **getBlockMenuDefaultClassName**
 
 Returns the block's default menu item classname from its name.
@@ -370,7 +383,15 @@ handler has been defined.
 
 _Returns_
 
--   `?string`: Blog name.
+-   `?string`: Block name.
+
+<a name="getGroupingBlockName" href="#getGroupingBlockName">#</a> **getGroupingBlockName**
+
+Retrieves name of block used for handling grouping interactions.
+
+_Returns_
+
+-   `?string`: Block name.
 
 <a name="getPhrasingContentSchema" href="#getPhrasingContentSchema">#</a> **getPhrasingContentSchema**
 
@@ -434,7 +455,7 @@ handler has been defined.
 
 _Returns_
 
--   `?string`: Blog name.
+-   `?string`: Block name.
 
 <a name="hasBlockSupport" href="#hasBlockSupport">#</a> **hasBlockSupport**
 
@@ -540,11 +561,11 @@ in the codebase.
 
 _Parameters_
 
--   _icon_ `(Object|string|WPElement)`: Slug of the Dashicon to be shown as the icon for the block in the inserter, or element or an object describing the icon.
+-   _icon_ `WPBlockTypeIconRender`: Render behavior of a block type icon; one of a Dashicon slug, an element, or a component.
 
 _Returns_
 
--   `Object`: Object describing the icon.
+-   `WPBlockTypeIconDescriptor`: Object describing the icon.
 
 <a name="parse" href="#parse">#</a> **parse**
 
@@ -578,6 +599,7 @@ Converts an HTML string to known blocks. Strips everything else.
 
 _Parameters_
 
+-   _options_ `Object`: 
 -   _options.HTML_ `[string]`: The HTML to convert.
 -   _options.plainText_ `[string]`: Plain text version.
 -   _options.mode_ `[string]`: Handle content as blocks or inline content. _ 'AUTO': Decide based on the content passed. _ 'INLINE': Always handle as inline content, and return string. \* 'BLOCKS': Always handle as blocks, and return array of blocks.
@@ -594,6 +616,7 @@ Converts an HTML string to known blocks.
 
 _Parameters_
 
+-   _$1_ `Object`: 
 -   _$1.HTML_ `string`: The HTML to convert.
 
 _Returns_
@@ -631,6 +654,7 @@ Takes a block or set of blocks and returns the serialized post content.
 _Parameters_
 
 -   _blocks_ `Array`: Block(s) to serialize.
+-   _options_ `WPBlockSerializationOptions`: Serialization options.
 
 _Returns_
 
@@ -660,6 +684,14 @@ _Parameters_
 
 -   _blockName_ `string`: Block name.
 
+<a name="setGroupingBlockName" href="#setGroupingBlockName">#</a> **setGroupingBlockName**
+
+Assigns name of block for handling block grouping interactions.
+
+_Parameters_
+
+-   _name_ `string`: Block name.
+
 <a name="setUnregisteredTypeHandlerName" href="#setUnregisteredTypeHandlerName">#</a> **setUnregisteredTypeHandlerName**
 
 Assigns name of block handling unregistered block types.
@@ -679,7 +711,7 @@ _Parameters_
 
 _Returns_
 
--   `Array`: Array of blocks.
+-   `?Array`: Array of blocks or null.
 
 <a name="synchronizeBlocksWithTemplate" href="#synchronizeBlocksWithTemplate">#</a> **synchronizeBlocksWithTemplate**
 

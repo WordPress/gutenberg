@@ -17,8 +17,11 @@ export {
 } from 'react-native-svg';
 
 export const SVG = ( props ) => {
+	const colorScheme = props.colorScheme || 'light';
 	const stylesFromClasses = ( props.className || '' ).split( ' ' ).map( ( element ) => styles[ element ] ).filter( Boolean );
-	const styleValues = Object.assign( {}, props.style, ...stylesFromClasses );
+	const defaultStyle = props.active ? styles[ 'is-active' ] : styles[ 'components-toolbar__control-' + colorScheme ];
+	const styleValues = Object.assign( {}, props.style, defaultStyle, ...stylesFromClasses );
+
 	const safeProps = { ...props, style: styleValues };
 
 	return (

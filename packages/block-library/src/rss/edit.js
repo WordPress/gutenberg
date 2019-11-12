@@ -8,7 +8,6 @@ import {
 	PanelBody,
 	Placeholder,
 	RangeControl,
-	ServerSideRender,
 	TextControl,
 	ToggleControl,
 	Toolbar,
@@ -18,6 +17,7 @@ import {
 	BlockControls,
 	InspectorControls,
 } from '@wordpress/block-editor';
+import ServerSideRender from '@wordpress/server-side-render';
 
 const DEFAULT_MIN_ITEMS = 1;
 const DEFAULT_MAX_ITEMS = 10;
@@ -94,13 +94,13 @@ class RSSEdit extends Component {
 			},
 			{
 				icon: 'list-view',
-				title: __( 'List View' ),
+				title: __( 'List view' ),
 				onClick: () => setAttributes( { blockLayout: 'list' } ),
 				isActive: blockLayout === 'list',
 			},
 			{
 				icon: 'grid-view',
-				title: __( 'Grid View' ),
+				title: __( 'Grid view' ),
 				onClick: () => setAttributes( { blockLayout: 'grid' } ),
 				isActive: blockLayout === 'grid',
 			},

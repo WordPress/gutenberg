@@ -7,6 +7,7 @@ import {
 } from '@wordpress/editor';
 import {
 	WritingFlow,
+	Typewriter,
 	ObserveTyping,
 	BlockList,
 	CopyHandler,
@@ -27,14 +28,16 @@ function VisualEditor() {
 		<BlockSelectionClearer className="edit-post-visual-editor editor-styles-wrapper">
 			<VisualEditorGlobalKeyboardShortcuts />
 			<MultiSelectScrollIntoView />
-			<WritingFlow>
-				<ObserveTyping>
-					<CopyHandler>
-						<PostTitle />
-						<BlockList />
-					</CopyHandler>
-				</ObserveTyping>
-			</WritingFlow>
+			<Typewriter>
+				<WritingFlow>
+					<ObserveTyping>
+						<CopyHandler>
+							<PostTitle />
+							<BlockList />
+						</CopyHandler>
+					</ObserveTyping>
+				</WritingFlow>
+			</Typewriter>
 			<__experimentalBlockSettingsMenuFirstItem>
 				{ ( { onClose } ) => <BlockInspectorButton onClick={ onClose } /> }
 			</__experimentalBlockSettingsMenuFirstItem>

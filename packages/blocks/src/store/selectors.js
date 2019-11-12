@@ -102,6 +102,17 @@ export function getUnregisteredFallbackBlockName( state ) {
 }
 
 /**
+ * Returns the name of the block for handling unregistered blocks.
+ *
+ * @param {Object} state Data state.
+ *
+ * @return {string?} Name of the block for handling unregistered blocks.
+ */
+export function getGroupingBlockName( state ) {
+	return state.groupingBlockName;
+}
+
+/**
  * Returns an array with the child blocks of a given block.
  *
  * @param {Object} state     Data state.
@@ -166,7 +177,7 @@ export function hasBlockSupport( state, nameOrType, feature, defaultSupports ) {
  * @param {(string|Object)} nameOrType Block name or type object.
  * @param {string}          searchTerm Search term by which to filter.
  *
- * @return {Object[]} Wheter block type matches search term.
+ * @return {Object[]} Whether block type matches search term.
  */
 export function isMatchingSearchTerm( state, nameOrType, searchTerm ) {
 	const blockType = getNormalizedBlockType( state, nameOrType );

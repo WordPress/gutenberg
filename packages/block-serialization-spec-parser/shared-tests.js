@@ -176,7 +176,7 @@ const hasPHP = 'test' === process.env.NODE_ENV ? ( () => {
 // skipping if `php` isn't available to us, such as in local dev without it
 // skipping preserves snapshots while commenting out or simply
 // not injecting the tests prompts `jest` to remove "obsolete snapshots"
-// eslint-disable-next-line jest/no-disabled-tests
+// eslint-disable-next-line jest/no-disabled-tests, jest/valid-describe
 const makeTest = hasPHP ? ( ...args ) => describe( ...args ) : ( ...args ) => describe.skip( ...args );
 
 export const phpTester = ( name, filename ) => makeTest(

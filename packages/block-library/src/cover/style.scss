@@ -5,6 +5,7 @@
 	background-size: cover;
 	background-position: center center;
 	min-height: 430px;
+	height: 100%;
 	width: 100%;
 	display: flex;
 	justify-content: center;
@@ -36,7 +37,6 @@
 	h2,
 	.wp-block-cover-image-text,
 	.wp-block-cover-text {
-		color: $white;
 		font-size: 2em;
 		line-height: 1.25;
 		z-index: 1;
@@ -44,7 +44,12 @@
 		max-width: $content-width;
 		padding: $block-padding;
 		text-align: center;
+	}
 
+	h2:not(.has-text-color),
+	.wp-block-cover-image-text,
+	.wp-block-cover-text {
+		color: $white;
 		a,
 		a:hover,
 		a:focus,
@@ -129,7 +134,9 @@
 	h5,
 	h6,
 	.wp-block-subhead {
-		color: inherit;
+		&:not(.has-text-color) {
+			color: inherit;
+		}
 	}
 }
 

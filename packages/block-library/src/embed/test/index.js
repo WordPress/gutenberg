@@ -4,10 +4,15 @@
 import { render } from 'enzyme';
 
 /**
+ * WordPress dependencies
+ */
+import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
+
+/**
  * Internal dependencies
  */
 import { getEmbedEditComponent } from '../edit';
-import { findBlock, getClassNames } from '../util';
+import { findBlock, getClassNames, createUpgradedEmbedBlock } from '../util';
 
 describe( 'core/embed', () => {
 	test( 'block edit matches snapshot', () => {
@@ -43,5 +48,30 @@ describe( 'core/embed', () => {
 		const html = '<iframe height="9" width="16"></iframe>';
 		const expected = 'lovely';
 		expect( getClassNames( html, 'lovely wp-embed-aspect-16-9 wp-has-aspect-ratio', false ) ).toEqual( expected );
+	} );
+
+	test( 'createUpgradedEmbedBlock bails early when block type does not exist', () => {
+		const youtubeURL = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
+
+		expect( createUpgradedEmbedBlock( { attributes: { url: youtubeURL } }, {} ) ).toBeUndefined();
+	} );
+
+	test( 'createUpgradedEmbedBlock returns a YouTube embed block when given a YouTube URL', () => {
+		const youtubeURL = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
+
+		registerBlockType(
+			'core-embed/youtube',
+			{
+				title: 'YouTube',
+				category: 'embed',
+			}
+		);
+
+		const result = createUpgradedEmbedBlock( { attributes: { url: youtubeURL } }, {} );
+
+		unregisterBlockType( 'core-embed/youtube' );
+
+		expect( result ).not.toBeUndefined();
+		expect( result.name ).toBe( 'core-embed/youtube' );
 	} );
 } );

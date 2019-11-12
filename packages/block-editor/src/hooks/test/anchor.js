@@ -39,6 +39,23 @@ describe( 'anchor', () => {
 
 			expect( settings.attributes ).toHaveProperty( 'anchor' );
 		} );
+
+		it( 'should not override attributes defined in settings', () => {
+			const settings = registerBlockType( {
+				...blockSettings,
+				supports: {
+					anchor: true,
+				},
+				attributes: {
+					anchor: {
+						type: 'string',
+						default: 'testAnchor',
+					},
+				},
+			} );
+
+			expect( settings.attributes.anchor ).toEqual( { type: 'string', default: 'testAnchor' } );
+		} );
 	} );
 
 	describe( 'addSaveProps', () => {

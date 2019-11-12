@@ -1,0 +1,14 @@
+[
+    {
+        "clientId": "_clientId_0",
+        "name": "core/heading",
+        "isValid": true,
+        "attributes": {
+            "content": "Text",
+            "level": 2,
+            "customTextColor": "#268ebb"
+        },
+        "innerBlocks": [],
+        "originalContent": "<h2 style=\"color:#268ebb\">Text</h2>"
+    }
+]

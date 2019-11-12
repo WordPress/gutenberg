@@ -40,6 +40,18 @@ ruleTester.run( 'react-no-unsafe-timeout', rule, {
 		{
 			code: `class MyComponent extends Component { componentDidMount() { this.timeoutId = setTimeout(); } }`,
 		},
+		{
+			code: `
+function MyComponent() {
+	useEffect( () => {
+		const timeoutHandle = setTimeout( () => {} );
+
+		return () => clearTimeout( timeoutHandle );
+	}, [] );
+
+	return null;
+}`,
+		},
 	],
 	invalid: [
 		{

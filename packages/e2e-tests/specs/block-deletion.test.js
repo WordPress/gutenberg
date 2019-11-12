@@ -3,10 +3,12 @@
  */
 import {
 	clickBlockAppender,
+	clickBlockToolbarButton,
 	getEditedPostContent,
 	createNewPost,
 	isInDefaultBlock,
 	pressKeyWithModifier,
+	pressKeyTimes,
 	insertBlock,
 } from '@wordpress/e2e-test-utils';
 
@@ -21,10 +23,37 @@ const addThreeParagraphsToNewPost = async () => {
 	await page.keyboard.press( 'Enter' );
 };
 
-const clickOnBlockSettingsMenuItem = async ( buttonLabel ) => {
-	await expect( page ).toClick( '.block-editor-block-settings-menu__toggle' );
-	const itemButton = ( await page.$x( `//*[contains(@class, "block-editor-block-settings-menu__popover")]//button[contains(text(), '${ buttonLabel }')]` ) )[ 0 ];
-	await itemButton.click();
+/**
+ * Due to an issue with the Popover component not being scrollable
+ * under certain conditions, Pupeteer cannot "see" the "Remove Block"
+ * button. This is a workaround until that issue is resolved.
+ *
+ * see: https://github.com/WordPress/gutenberg/pull/14908#discussion_r284725956
+ */
+const clickOnBlockSettingsMenuRemoveBlockButton = async () => {
+	await clickBlockToolbarButton( 'More options' );
+
+	let isRemoveButton = false;
+
+	let numButtons = await page.$$eval( '.block-editor-block-settings-menu__content button', ( btns ) => btns.length );
+
+	// Limit by the number of buttons available
+	while ( --numButtons ) {
+		await page.keyboard.press( 'Tab' );
+
+		isRemoveButton = await page.evaluate( () => {
+			return document.activeElement.innerText.includes( 'Remove Block' );
+		} );
+
+		// Stop looping once we find the button
+		if ( isRemoveButton ) {
+			await pressKeyTimes( 'Enter', 1 );
+			break;
+		}
+	}
+
+	// Makes failures more explicit
+	await expect( isRemoveButton ).toBe( true );
 };
 
 describe( 'block deletion -', () => {
@@ -35,10 +64,12 @@ describe( 'block deletion -', () => {
 			// The blocks can't be empty to trigger the toolbar
 			await page.keyboard.type( 'Paragraph to remove' );
 
-			// Press Escape to show the block toolbar
-			await page.keyboard.press( 'Escape' );
+			// Move the mouse to show the block toolbar
+			await page.mouse.move( 0, 0 );
+			await page.mouse.move( 10, 10 );
 
-			await clickOnBlockSettingsMenuItem( 'Remove Block' );
+			await clickOnBlockSettingsMenuRemoveBlockButton();
+
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 
 			// Type additional text and assert that caret position is correct by comparing to snapshot.
@@ -80,8 +111,8 @@ describe( 'block deletion -', () => {
 			// Click on something that's not a block.
 			await page.click( '.editor-post-title' );
 
-			// Click on the third (image) block so that its wrapper is selected and backspace to delete it.
-			await page.click( '.block-editor-block-list__block:nth-child(3) .components-placeholder__label' );
+			// Click on the image block so that its wrapper is selected and backspace to delete it.
+			await page.click( '.wp-block[data-type="core/image"] .components-placeholder__label' );
 			await page.keyboard.press( 'Backspace' );
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -113,14 +144,19 @@ describe( 'block deletion -', () => {
 } );
 
 describe( 'deleting all blocks', () => {
-	it( 'results in the default block getting selected', async () => {
+	beforeEach( async () => {
 		await createNewPost();
+	} );
+
+	it( 'results in the default block getting selected', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'Paragraph' );
 
-		await page.keyboard.press( 'Escape' );
+		// Move the mouse to show the block toolbar
+		await page.mouse.move( 0, 0 );
+		await page.mouse.move( 10, 10 );
 
-		await clickOnBlockSettingsMenuItem( 'Remove Block' );
+		await clickOnBlockSettingsMenuRemoveBlockButton();
 
 		// There is a default block:
 		expect( await page.$$( '.block-editor-block-list__block' ) ).toHaveLength( 1 );
@@ -138,7 +174,6 @@ describe( 'deleting all blocks', () => {
 		//
 		// See: https://github.com/WordPress/gutenberg/issues/15458
 		// See: https://github.com/WordPress/gutenberg/pull/15543
-		await createNewPost();
 
 		// Unregister default block type. This may happen if the editor is
 		// configured to not allow the default (paragraph) block type, either

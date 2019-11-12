@@ -117,7 +117,6 @@ export default createHigherOrderComponent(
 				// Disable reason: See `normalizeButtonFocus` for browser-specific
 				// focus event normalization.
 
-				/* eslint-disable jsx-a11y/no-static-element-interactions */
 				return (
 					<View
 						onFocus={ this.cancelBlurCheck }
@@ -132,7 +131,6 @@ export default createHigherOrderComponent(
 							{ ...this.props } />
 					</View>
 				);
-				/* eslint-enable jsx-a11y/no-static-element-interactions */
 			}
 		};
 	}, 'withFocusOutside'

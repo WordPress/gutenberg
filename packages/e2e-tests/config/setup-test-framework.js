@@ -10,6 +10,7 @@ import {
 	activatePlugin,
 	clearLocalStorage,
 	enablePageDialogAccept,
+	isOfflineMode,
 	setBrowserViewport,
 	switchUserToAdmin,
 	switchUserToTest,
@@ -119,6 +120,12 @@ function observeConsoleLogging() {
 		// Viewing posts on the front end can result in this error, which
 		// has nothing to do with Gutenberg.
 		if ( text.includes( 'net::ERR_UNKNOWN_URL_SCHEME' ) ) {
+			return;
+		}
+
+		// Network errors are ignored only if we are intentionally testing
+		// offline mode.
+		if ( text.includes( 'net::ERR_INTERNET_DISCONNECTED' ) && isOfflineMode() ) {
 			return;
 		}
 

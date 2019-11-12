@@ -42,12 +42,14 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 
 		handleIncomingPreview() {
 			this.setMergedAttributes();
-			const upgradedBlock = createUpgradedEmbedBlock(
-				this.props,
-				this.getMergedAttributes()
-			);
-			if ( upgradedBlock ) {
-				this.props.onReplace( upgradedBlock );
+			if ( this.props.onReplace ) {
+				const upgradedBlock = createUpgradedEmbedBlock(
+					this.props,
+					this.getMergedAttributes()
+				);
+				if ( upgradedBlock ) {
+					this.props.onReplace( upgradedBlock );
+				}
 			}
 		}
 

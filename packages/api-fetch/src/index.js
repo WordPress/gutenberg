@@ -49,6 +49,14 @@ function registerMiddleware( middleware ) {
 	middlewares.unshift( middleware );
 }
 
+const checkStatus = ( response ) => {
+	if ( response.status >= 200 && response.status < 300 ) {
+		return response;
+	}
+
+	throw response;
+};
+
 const defaultFetchHandler = ( nextOptions ) => {
 	const { url, path, data, parse = true, ...remainingOptions } = nextOptions;
 	let { body, headers } = nextOptions;
@@ -71,13 +79,6 @@ const defaultFetchHandler = ( nextOptions ) => {
 			headers,
 		}
 	);
-	const checkStatus = ( response ) => {
-		if ( response.status >= 200 && response.status < 300 ) {
-			return response;
-		}
-
-		throw response;
-	};
 
 	const parseResponse = ( response ) => {
 		if ( parse ) {
@@ -148,7 +149,27 @@ function apiFetch( options ) {
 		return step( workingOptions, next );
 	};
 
-	return createRunStep( 0 )( options );
+	return new Promise( function( resolve, reject ) {
+		createRunStep( 0 )( options )
+			.then( resolve )
+			.catch( ( error ) => {
+				if ( error.code !== 'rest_cookie_invalid_nonce' ) {
+					return reject( error );
+				}
+
+				// If the nonce is invalid, refresh it and try again.
+				window.fetch( apiFetch.nonceEndpoint )
+					.then( checkStatus )
+					.then( ( data ) => data.text() )
+					.then( ( text ) => {
+						apiFetch.nonceMiddleware.nonce = text;
+						apiFetch( options )
+							.then( resolve )
+							.catch( reject );
+					} )
+					.catch( reject );
+			} );
+	} );
 }
 
 apiFetch.use = registerMiddleware;

@@ -15,7 +15,7 @@ import memoize from 'memize';
  * WordPress dependencies
  */
 import { renderToString } from '@wordpress/element';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, getBlockType } from '@wordpress/blocks';
 
 /**
  * Returns true if any of the regular expressions match the URL.
@@ -58,7 +58,7 @@ export const getPhotoHtml = ( photo ) => {
 	return renderToString( photoPreview );
 };
 
-/***
+/**
  * Creates a more suitable embed block based on the passed in props
  * and attributes generated from an embed block's preview.
  *
@@ -68,8 +68,8 @@ export const getPhotoHtml = ( photo ) => {
  * versions, so we require that these are generated separately.
  * See `getAttributesFromPreview` in the generated embed edit component.
  *
- * @param {Object}            props                 The block's props.
- * @param {Object}            attributesFromPreview Attributes generated from the block's most up to date preview.
+ * @param {Object} props                  The block's props.
+ * @param {Object} attributesFromPreview  Attributes generated from the block's most up to date preview.
  * @return {Object|undefined} A more suitable embed block if one exists.
  */
 export const createUpgradedEmbedBlock = ( props, attributesFromPreview ) => {
@@ -81,6 +81,10 @@ export const createUpgradedEmbedBlock = ( props, attributesFromPreview ) => {
 	}
 
 	const matchingBlock = findBlock( url );
+
+	if ( ! getBlockType( matchingBlock ) ) {
+		return;
+	}
 
 	// WordPress blocks can work on multiple sites, and so don't have patterns,
 	// so if we're in a WordPress block, assume the user has chosen it for a WordPress URL.
@@ -171,7 +175,7 @@ export function getClassNames( html, existingClassNames = '', allowResponsive = 
  * Creates a paragraph block containing a link to the URL, and calls `onReplace`.
  *
  * @param {string}   url       The URL that could not be embedded.
- * @param {function} onReplace Function to call with the created fallback block.
+ * @param {Function} onReplace Function to call with the created fallback block.
  */
 export function fallback( url, onReplace ) {
 	const link = <a href={ url }>{ url }</a>;

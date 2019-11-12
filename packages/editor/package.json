@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/editor",
-	"version": "9.3.0",
+	"version": "9.7.0",
 	"description": "Building blocks for WordPress editors.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -23,7 +23,9 @@
 	"dependencies": {
 		"@babel/runtime": "^7.4.4",
 		"@wordpress/api-fetch": "file:../api-fetch",
+		"@wordpress/autop": "file:../autop",
 		"@wordpress/blob": "file:../blob",
+		"@wordpress/block-directory": "file:../block-directory",
 		"@wordpress/block-editor": "file:../block-editor",
 		"@wordpress/blocks": "file:../blocks",
 		"@wordpress/components": "file:../components",
@@ -37,21 +39,23 @@
 		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/html-entities": "file:../html-entities",
 		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
 		"@wordpress/keycodes": "file:../keycodes",
+		"@wordpress/media-utils": "file:../media-utils",
 		"@wordpress/notices": "file:../notices",
 		"@wordpress/nux": "file:../nux",
+		"@wordpress/rich-text": "file:../rich-text",
+		"@wordpress/server-side-render": "file:../server-side-render",
 		"@wordpress/url": "file:../url",
 		"@wordpress/viewport": "file:../viewport",
 		"@wordpress/wordcount": "file:../wordcount",
 		"classnames": "^2.2.5",
-		"inherits": "^2.0.3",
-		"lodash": "^4.17.11",
+		"lodash": "^4.17.15",
 		"memize": "^1.0.5",
 		"react-autosize-textarea": "^3.0.2",
 		"redux-optimist": "^1.0.0",
 		"refx": "^3.0.0",
-		"rememo": "^3.0.0",
-		"traverse": "^0.6.6"
+		"rememo": "^3.0.0"
 	},
 	"publishConfig": {
 		"access": "public"
