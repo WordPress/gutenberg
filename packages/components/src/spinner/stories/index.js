@@ -3,7 +3,7 @@
  */
 import Spinner from '../';
 
-export default { title: 'Spinner', component: Spinner };
+export default { title: 'Components|Spinner', component: Spinner };
 
 export const _default = () => {
 	return (

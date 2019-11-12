@@ -8,41 +8,7 @@
 @import "./reset";
 @import "./editor-styles";
 
-$playground-header-height: 95px;
-
-.playground__header {
-	align-items: center;
-	border-bottom: 1px solid #ddd;
-	display: flex;
-	justify-content: space-between;
-	padding: 20px;
-	height: $playground-header-height;
-}
-
-.playground__sidebar {
-	position: fixed;
-	top: $playground-header-height;
-	right: 0;
-	bottom: 0;
-	width: $sidebar-width;
-	border-left: $border-width solid $light-gray-500;
-	height: auto;
-	overflow: auto;
-	-webkit-overflow-scrolling: touch;
-
-	// Temporarily disable the sidebar on mobile
-	display: none;
-	@include break-small() {
-		display: block;
-	}
-}
-
-.playground__logo {
-	font-size: 20px;
-	font-weight: 300;
-}
-
-.playground__body {
+.playground {
 	@include break-small() {
 		width: calc(100% - #{$sidebar-width});
 	}
@@ -59,6 +25,24 @@ $playground-header-height: 95px;
 
 	.components-navigate-regions {
 		height: 100%;
+	}
+}
+
+.playground__sidebar {
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	width: $sidebar-width;
+	border-left: $border-width solid $light-gray-500;
+	height: auto;
+	overflow: auto;
+	-webkit-overflow-scrolling: touch;
+
+	// Temporarily disable the sidebar on mobile
+	display: none;
+	@include break-small() {
+		display: block;
 	}
 }
 
