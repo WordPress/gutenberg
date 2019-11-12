@@ -32,7 +32,7 @@ const PARTIAL_PATHS = [
 	//'format-library/style.css',
 ];
 function TestSimulateMediaQuery() {
-	const [ simulateValue, setSimulateValue ] = useState( 400 );
+	const [ simulationWidth, setSimulationWidth ] = useState( 400 );
 	const [ isSimulationEnable, setIsSimulationEnabled ] = useState( true );
 	const toggleUI = (
 		<ToggleControl
