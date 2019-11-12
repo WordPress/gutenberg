@@ -14,18 +14,14 @@ function useIsWithinToolbar( ref ) {
 	const internalRef = useRef();
 
 	// Combine internal ref with ref argument
-	if ( ref ) {
-		ref = ( instance ) => {
-			if ( typeof ref === 'function' ) {
-				ref( instance );
-			} else {
-				ref.current = instance;
-			}
-			internalRef.current = instance;
-		};
-	} else {
-		ref = internalRef;
-	}
+	const finalRef = ref ? ( ( instance ) => {
+		if ( typeof ref === 'function' ) {
+			ref( instance );
+		} else {
+			ref.current = instance;
+		}
+		internalRef.current = instance;
+	} ) : internalRef;
 
 	useEffect( () => {
 		// Context propagates through React Portal,
@@ -37,7 +33,7 @@ function useIsWithinToolbar( ref ) {
 		}
 	}, [ isWithinToolbar ] );
 
-	return { isWithinToolbar, ref };
+	return { isWithinToolbar, ref: finalRef };
 }
 
 export default useIsWithinToolbar;
