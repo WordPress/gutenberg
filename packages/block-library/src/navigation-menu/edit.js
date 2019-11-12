@@ -209,6 +209,8 @@ function NavigationMenu( {
 				<BlockColorsStyleSelector
 					backgroundColor={ backgroundColor }
 					textColor={ textColor }
+					backgroundColorValue={ attributes.backgroundColorValue }
+					textColorValue={ attributes.textColorValue }
 					onColorChange={ setColorType }
 				/>
 			</BlockControls>
