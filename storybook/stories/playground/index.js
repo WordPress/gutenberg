@@ -3,7 +3,7 @@
  */
 import '@wordpress/editor'; // This shouldn't be necessary
 
-import { useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import {
 	BlockEditorKeyboardShortcuts,
 	BlockEditorProvider,
@@ -37,36 +37,35 @@ import './style.scss';
 function App() {
 	const [ blocks, updateBlocks ] = useState( [] );
 
+	useEffect( () => {
+		registerCoreBlocks();
+	} );
+
 	return (
-		<>
-			<div className="playground__header">
-				<h1 className="playground__logo">Gutenberg Playground</h1>
-			</div>
-			<div className="playground__body">
-				<SlotFillProvider>
-					<DropZoneProvider>
-						<BlockEditorProvider
-							value={ blocks }
-							onInput={ updateBlocks }
-							onChange={ updateBlocks }
-						>
-							<div className="playground__sidebar">
-								<BlockInspector />
-							</div>
-							<div className="editor-styles-wrapper">
-								<BlockEditorKeyboardShortcuts />
-								<WritingFlow>
-									<ObserveTyping>
-										<BlockList />
-									</ObserveTyping>
-								</WritingFlow>
-							</div>
-							<Popover.Slot />
-						</BlockEditorProvider>
-					</DropZoneProvider>
-				</SlotFillProvider>
-			</div>
-		</>
+		<div className="playground">
+			<SlotFillProvider>
+				<DropZoneProvider>
+					<BlockEditorProvider
+						value={ blocks }
+						onInput={ updateBlocks }
+						onChange={ updateBlocks }
+					>
+						<div className="playground__sidebar">
+							<BlockInspector />
+						</div>
+						<div className="editor-styles-wrapper">
+							<BlockEditorKeyboardShortcuts />
+							<WritingFlow>
+								<ObserveTyping>
+									<BlockList />
+								</ObserveTyping>
+							</WritingFlow>
+						</div>
+						<Popover.Slot />
+					</BlockEditorProvider>
+				</DropZoneProvider>
+			</SlotFillProvider>
+		</div>
 	);
 }
 
@@ -75,7 +74,5 @@ export default {
 };
 
 export const _default = () => {
-	registerCoreBlocks();
-
 	return <App />;
 };
