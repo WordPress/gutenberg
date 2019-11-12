@@ -215,4 +215,4 @@ jobs:
           branch: master
 
   allow_failures:
-    - name: JavaScript native mobile tests
+    # nothing is allowed to fail at the moment
