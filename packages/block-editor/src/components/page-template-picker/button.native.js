@@ -15,6 +15,6 @@ const PickerButton = ( props ) => {
 			title={ label }
 		/>
 	);
-}
+};
 
 export default PickerButton;

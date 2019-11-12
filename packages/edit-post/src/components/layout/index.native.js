@@ -133,7 +133,7 @@ class Layout extends Component {
 						<Header />
 						<BottomSheetSettings />
 					</KeyboardAvoidingView> ) }
-					{ showPageTemplatePicker && <__experimentalPageTemplatePicker templates={ defaultTemplates } /> }
+				{ showPageTemplatePicker && <__experimentalPageTemplatePicker templates={ defaultTemplates } /> }
 			</SafeAreaView>
 		);
 	}

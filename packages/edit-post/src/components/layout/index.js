@@ -6,7 +6,6 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __experimentalPageTemplatePicker, __experimentalWithPageTemplatePickerVisible } from '@wordpress/block-editor';
 import {
 	Button,
 	Popover,
@@ -22,7 +21,11 @@ import {
 	EditorNotices,
 	PostPublishPanel,
 } from '@wordpress/editor';
-import { BlockBreadcrumb } from '@wordpress/block-editor';
+import {
+	BlockBreadcrumb,
+	__experimentalPageTemplatePicker,
+	__experimentalWithPageTemplatePickerVisible,
+} from '@wordpress/block-editor';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { PluginArea } from '@wordpress/plugins';
 import { withViewportMatch } from '@wordpress/viewport';

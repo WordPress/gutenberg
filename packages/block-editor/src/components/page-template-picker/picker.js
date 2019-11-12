@@ -4,6 +4,9 @@
 import { parse } from '@wordpress/blocks';
 import { withDispatch } from '@wordpress/data';
 
+/**
+ * Internal dependencies
+ */
 import __experimentalBlockListFooter from '../block-list-footer';
 import Button from './button';
 import Container from './container';
