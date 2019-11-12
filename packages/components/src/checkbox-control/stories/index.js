@@ -13,7 +13,7 @@ import { useState } from '@wordpress/element';
  */
 import CheckboxControl from '../';
 
-export default { title: 'CheckboxControl', component: CheckboxControl };
+export default { title: 'Components|CheckboxControl', component: CheckboxControl };
 
 const CheckboxControlWithState = ( { checked, ...props } ) => {
 	const [ isChecked, setChecked ] = useState( checked );
