@@ -3,7 +3,7 @@
  */
 import { Icon, G, Path, SVG } from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
-	
+
 /**
  * Internal dependencies
  */

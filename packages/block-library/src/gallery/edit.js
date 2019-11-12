@@ -274,7 +274,7 @@ class GalleryEdit extends Component {
 				isAppender={ hasImages }
 				className={ className }
 				disableMediaButtons={ hasImages && ! isSelected }
-				icon={ ! hasImages &&  icon }
+				icon={ ! hasImages && icon }
 				labels={ {
 					title: ! hasImages && __( 'Gallery' ),
 					instructions: ! hasImages && placeholderText,
