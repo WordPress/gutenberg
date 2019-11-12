@@ -25,12 +25,6 @@ const ColorSelectorSVGIcon = () => (
  * @return {*} React Icon component.
  */
 const ColorSelectorIcon = ( { textColor, textColorValue } ) => {
-	const iconStyle = {};
-
-	if ( textColorValue ) {
-		iconStyle.color = textColorValue;
-	}
-
 	const iconClasses = classnames( 'block-library-colors-selector__state-selection', {
 		'has-text-color': textColor && textColor.color,
 		[ textColor.class ]: textColor && textColor.class,
@@ -38,7 +32,10 @@ const ColorSelectorIcon = ( { textColor, textColorValue } ) => {
 
 	return (
 		<div className="block-library-colors-selector__icon-container">
-			<div className={ iconClasses } style={ iconStyle }>
+			<div
+				className={ iconClasses }
+				style={ { ...( textColorValue && { color: textColorValue } ) } }
+			>
 				<ColorSelectorSVGIcon />
 			</div>
 		</div>
