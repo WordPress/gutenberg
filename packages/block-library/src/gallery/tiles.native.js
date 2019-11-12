@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -18,7 +18,10 @@ function Tiles( props ) {
 		columns,
 		children,
 		spacing = 10,
+		style,
 	} = props;
+
+	const { compose } = StyleSheet;
 
 	const tileCount = Children.count( children );
 	const lastTile = tileCount - 1;
@@ -66,8 +69,10 @@ function Tiles( props ) {
 		);
 	} );
 
+	const containerStyle = compose( styles.containerStyle, style );
+
 	return (
-		<View style={ styles.containerStyle }>
+		<View style={ containerStyle }>
 			{ wrappedChildren }
 		</View>
 	);
