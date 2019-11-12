@@ -9,6 +9,6 @@ The native mobile unit tests are Jest tests written in JS and running on Node. T
 1. Run `npm run test-unit:native:debug` inside the Gutenberg root folder, on the CLI. Node is now waiting for the debugger to connect.
 2. Open `chrome://inspect` in Chrome
 3. Under the "Remote Target" section, look for a `../../node_modules/.bin/jest ` target and click on the "inspect" link. That will open a new window with the Chrome DevTools debugger attached to the process and stopped at the beginning of the `jest.js` file.
-4. You can place breakpoints of `debugger;` statements throughout the code, including the tests code, to stop and inspect
+4. You can place breakpoints or `debugger;` statements throughout the code, including the tests code, to stop and inspect
 5. Click on the "Play" button to resume execution
 6. Enjoy debugging the native mobile unit tests!
