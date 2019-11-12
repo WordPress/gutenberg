@@ -21,7 +21,7 @@ let indoc,
  * name: The name portion of the tag (strong, br) (if )
  * isSelfClosed: The slash on a self closing tag, if it exists.
  *
- * @type RegExp
+ * @type {RegExp}
  */
 const tokenizer = /<(\/)?(\w+)\s*(\/)?>/g;
 
