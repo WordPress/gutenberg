@@ -13,13 +13,12 @@ import { useState, useCallback } from '@wordpress/element';
 const EntitiesSavedStatesCheckbox = ( {
 	id,
 	name,
-	changes: { rawRecord, edits },
+	changes: { rawRecord },
 	checked,
 	setCheckedById,
 } ) => (
 	<CheckboxControl
 		label={ `${ startCase( name ) }: "${ rawRecord.title || rawRecord.name }"` }
-		help={ `Changed Properties: ${ Object.keys( edits ).join( ', ' ) }.` }
 		checked={ checked }
 		onChange={ useCallback( ( nextChecked ) => setCheckedById( id, nextChecked ), [ id ] ) }
 	/>
