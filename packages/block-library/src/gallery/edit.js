@@ -266,7 +266,7 @@ class GalleryEdit extends Component {
 
 		const instructions = Platform.select( {
 			web: __( 'Drag images, upload new ones or select files from your library.' ),
-			native: __( 'Add media' ),
+			native: __( 'ADD MEDIA' ),
 		} );
 
 		const mediaPlaceholder = (
