@@ -9,7 +9,7 @@ import { useState } from '@wordpress/element';
  */
 import ColorPicker from '../';
 
-export default { title: 'ColorPicker', component: ColorPicker };
+export default { title: 'Components|ColorPicker', component: ColorPicker };
 
 const ColorPickerWithState = ( { ...props } ) => {
 	const [ color, setColor ] = useState( '#f00' );
