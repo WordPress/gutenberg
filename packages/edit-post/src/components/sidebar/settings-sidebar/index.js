@@ -33,7 +33,7 @@ const PARTIAL_PATHS = [
 ];
 function TestSimulateMediaQuery() {
 	const [ simulationWidth, setSimulationWidth ] = useState( 400 );
-	const [ isSimulationEnable, setIsSimulationEnabled ] = useState( true );
+	const [ isSimulationEnabled, setIsSimulationEnabled ] = useState( true );
 	const toggleUI = (
 		<ToggleControl
 			label={ __( 'Enabled width simulation' ) }
