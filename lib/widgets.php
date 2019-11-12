@@ -63,6 +63,15 @@ add_action( 'admin_print_footer_scripts', 'gutenberg_block_editor_admin_print_fo
  */
 function gutenberg_block_editor_admin_footer() {
 	if ( gutenberg_is_block_editor() ) {
+		// The function wpWidgets.save needs this nonce to work as expected.
+		echo implode(
+			"\n",
+			array(
+				'<form method="post">',
+				wp_nonce_field( 'save-sidebar-widgets', '_wpnonce_widgets', false ),
+				'</form>',
+			)
+		);
 		/** This action is documented in wp-admin/admin-footer.php */
 		// phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
 		do_action( 'admin_footer-widgets.php' );
@@ -109,32 +118,36 @@ function gutenberg_get_legacy_widget_settings() {
 	if ( ! empty( $wp_widget_factory ) ) {
 		foreach ( $wp_widget_factory->widgets as $class => $widget_obj ) {
 			$available_legacy_widgets[ $class ] = array(
-				'name'             => html_entity_decode( $widget_obj->name ),
+				'name'              => html_entity_decode( $widget_obj->name ),
 				// wp_widget_description is not being used because its input parameter is a Widget Id.
 				// Widgets id's reference to a specific widget instance.
 				// Here we are iterating on all the available widget classes even if no widget instance exists for them.
-				'description'      => isset( $widget_obj->widget_options['description'] ) ?
+				'description'       => isset( $widget_obj->widget_options['description'] ) ?
 					html_entity_decode( $widget_obj->widget_options['description'] ) :
 					null,
-				'isCallbackWidget' => false,
-				'isHidden'         => in_array( $class, $core_widgets, true ),
+				'isReferenceWidget' => false,
+				'isHidden'          => in_array( $class, $core_widgets, true ),
 			);
 		}
 	}
 	global $wp_registered_widgets;
 	if ( ! empty( $wp_registered_widgets ) ) {
 		foreach ( $wp_registered_widgets as $widget_id => $widget_obj ) {
+
+			$block_widget_start = 'blocks-widget-';
 			if (
-				is_array( $widget_obj['callback'] ) &&
+				( is_array( $widget_obj['callback'] ) &&
 				isset( $widget_obj['callback'][0] ) &&
-				( $widget_obj['callback'][0] instanceof WP_Widget )
+				( $widget_obj['callback'][0] instanceof WP_Widget ) ) ||
+				// $widget_id starts with $block_widget_start.
+				strncmp( $widget_id, $block_widget_start, strlen( $block_widget_start ) ) === 0
 			) {
 				continue;
 			}
 			$available_legacy_widgets[ $widget_id ] = array(
-				'name'             => html_entity_decode( $widget_obj['name'] ),
-				'description'      => html_entity_decode( wp_widget_description( $widget_id ) ),
-				'isCallbackWidget' => true,
+				'name'              => html_entity_decode( $widget_obj['name'] ),
+				'description'       => html_entity_decode( wp_widget_description( $widget_id ) ),
+				'isReferenceWidget' => true,
 			);
 		}
 	}
@@ -142,7 +155,7 @@ function gutenberg_get_legacy_widget_settings() {
 	$settings['hasPermissionsToManageWidgets'] = $has_permissions_to_manage_widgets;
 	$settings['availableLegacyWidgets']        = $available_legacy_widgets;
 
-	return $settings;
+	return gutenberg_experiments_editor_settings( $settings );
 }
 
 /**
@@ -213,3 +226,12 @@ function gutenberg_create_wp_area_post_type() {
 add_action( 'init', 'gutenberg_create_wp_area_post_type' );
 
 add_filter( 'sidebars_widgets', 'Experimental_WP_Widget_Blocks_Manager::swap_out_sidebars_blocks_for_block_widgets' );
+
+/**
+ * Function to enqueue admin-widgets as part of the block editor assets.
+ */
+function gutenberg_enqueue_widget_scripts() {
+	wp_enqueue_script( 'admin-widgets' );
+}
+
+add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_widget_scripts' );
