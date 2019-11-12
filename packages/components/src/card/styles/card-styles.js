@@ -59,12 +59,12 @@ export const MediaUI = styled.div`
 		width: 100%;
 	}
 
-	&:first-child {
+	&:first-of-type {
 		border-top-left-radius: ${ borderRadius };
 		border-top-right-radius: ${ borderRadius };
 	}
 
-	&:last-child {
+	&:last-of-type {
 		border-bottom-left-radius: ${ borderRadius };
 		border-bottom-right-radius: ${ borderRadius };
 	}
@@ -83,7 +83,7 @@ export const FooterUI = styled.div`
 	border-bottom-right-radius: ${ borderRadius };
 	box-sizing: border-box;
 
-	&:first-child {
+	&:first-of-type {
 		border-top: none;
 	}
 
