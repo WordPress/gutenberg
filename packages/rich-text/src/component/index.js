@@ -82,7 +82,7 @@ const whiteSpace = 'pre-wrap';
 /**
  * Default style object for the editable element.
  *
- * @type {Object}
+ * @type {Object<string,string>}
  */
 const defaultStyle = { whiteSpace };
 
