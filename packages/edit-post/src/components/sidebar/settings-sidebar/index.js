@@ -37,7 +37,7 @@ function TestSimulateMediaQuery() {
 	const toggleUI = (
 		<ToggleControl
 			label={ __( 'Enabled width simulation' ) }
-			checked={ isSimulationEnable }
+			checked={ isSimulationEnabled }
 			onChange={ ( newValue ) => setIsSimulationEnabled( newValue ) }
 		/>
 	);
