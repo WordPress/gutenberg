@@ -264,7 +264,7 @@ class GalleryEdit extends Component {
 		const hasImages = !! images.length;
 		const hasImagesWithId = hasImages && some( images, ( { id } ) => id );
 
-		const instructions = Platform.select( {
+		const placeholderText = Platform.select( {
 			web: __( 'Drag images, upload new ones or select files from your library.' ),
 			native: __( 'ADD MEDIA' ),
 		} );
@@ -278,7 +278,7 @@ class GalleryEdit extends Component {
 				icon={ ! hasImages && <BlockIcon icon={ icon } /> }
 				labels={ {
 					title: ! hasImages && __( 'Gallery' ),
-					instructions: ! hasImages && instructions,
+					instructions: ! hasImages && placeholderText,
 				} }
 				onSelect={ this.onSelectImages }
 				accept="image/*"
