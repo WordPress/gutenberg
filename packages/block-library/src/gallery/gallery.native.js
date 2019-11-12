@@ -32,6 +32,7 @@ export const Gallery = ( props ) => {
 		isSelected,
 		//	setAttributes,
 		isMobile,
+		isNarrow,
 	} = props;
 
 	const {
@@ -40,7 +41,8 @@ export const Gallery = ( props ) => {
 		images,
 	} = attributes;
 
-	const displayedColumns = isMobile ? Math.min( columns, 2 ) : columns;
+	const displayedColumns = isMobile ? Math.min( columns, 2 ) :
+		isNarrow ? Math.min( columns, 4 ) : columns;
 
 	return (
 		<View>
