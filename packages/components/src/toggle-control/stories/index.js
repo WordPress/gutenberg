@@ -13,7 +13,7 @@ import { useState } from '@wordpress/element';
  */
 import ToggleControl from '../';
 
-export default { title: 'ToggleControl', component: ToggleControl };
+export default { title: 'Components|ToggleControl', component: ToggleControl };
 
 const ToggleControlWithState = ( { helpTextChecked, helpTextUnchecked, ...props } ) => {
 	const [ hasFixedBackground, setHasFixedBackground ] = useState( true );

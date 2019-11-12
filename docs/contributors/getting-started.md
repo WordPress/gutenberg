@@ -61,10 +61,14 @@ You can also type `npm run package-plugin` which will run the two commands above
 [npm]: https://www.npmjs.com/
 [nvm]: https://github.com/creationix/nvm
 
-## Playground
+## Storybook
 
-The Gutenberg repository also includes a static Gutenberg playground that allows testing and developing in a WordPress-agnostic context. This is very helpful for developing reusable components and trying generic JavaScript modules without any backend dependency.
+> Storybook is an open source tool for developing UI components in isolation for React, React Native and more. It makes building stunning UIs organized and efficient.
 
-You can launch the playground by running `npm run playground:dev` locally. The playground should be available on [http://localhost:1234](http://localhost:1234).
+The Gutenberg repository also includes [Storybook] integration that allows testing and developing in a WordPress-agnostic context. This is very helpful for developing reusable components and trying generic JavaScript modules without any backend dependency.
 
-You can also test the playground version of the current master branch on GitHub Pages: [https://wordpress.github.io/gutenberg/](https://wordpress.github.io/gutenberg/)
+You can launch Storybook by running `npm run storybook:dev` locally. It will open in your browser automatically.
+
+You can also test Storybook for the current `master` branch on GitHub Pages: [https://wordpress.github.io/gutenberg/](https://wordpress.github.io/gutenberg/)
+
+[Storybook]: https://storybook.js.org/
