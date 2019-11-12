@@ -4,7 +4,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { boolean, number, select, text } from '@storybook/addon-knobs';
 /* eslint-enable import/no-extraneous-dependencies */
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 /**
  * Internal dependencies
