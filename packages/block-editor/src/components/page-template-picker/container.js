@@ -1,6 +1,9 @@
-/**
- * WordPress dependencies
- */
-import { Fragment } from '@wordpress/element';
+const Container = ( { children } ) => {
+	return (
+		<>
+			{ children }
+		</>
+	);
+};
 
-export default Fragment;
+export default Container;
