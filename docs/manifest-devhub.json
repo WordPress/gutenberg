@@ -318,6 +318,12 @@
 		"parent": "develop"
 	},
 	{
+		"title": "React Native based mobile Gutenberg",
+		"slug": "native-mobile",
+		"markdown_source": "../docs/contributors/native-mobile.md",
+		"parent": "develop"
+	},
+	{
 		"title": "Documentation Contributions",
 		"slug": "document",
 		"markdown_source": "../docs/contributors/document.md",
@@ -639,6 +645,12 @@
 		"title": "DateTime",
 		"slug": "date-time",
 		"markdown_source": "../packages/components/src/date-time/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "DimensionControl",
+		"slug": "dimension-control",
+		"markdown_source": "../packages/components/src/dimension-control/README.md",
 		"parent": "components"
 	},
 	{
@@ -972,6 +984,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "VisuallyHidden",
+		"slug": "visually-hidden",
+		"markdown_source": "../packages/components/src/visually-hidden/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Data Module Reference",
 		"slug": "data",
 		"markdown_source": "../docs/designers-developers/developers/data/README.md",
@@ -1077,6 +1095,12 @@
 		"title": "@wordpress/babel-preset-default",
 		"slug": "packages-babel-preset-default",
 		"markdown_source": "../packages/babel-preset-default/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/base-styles",
+		"slug": "packages-base-styles",
+		"markdown_source": "../packages/base-styles/README.md",
 		"parent": "packages"
 	},
 	{

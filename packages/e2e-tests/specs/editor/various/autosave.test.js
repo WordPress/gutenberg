@@ -17,13 +17,22 @@ const AUTOSAVE_INTERVAL_SECONDS = 5;
 const AUTOSAVE_NOTICE_REMOTE = 'There is an autosave of this post that is more recent than the version below.';
 const AUTOSAVE_NOTICE_LOCAL = 'The backup of this post in your browser is different from the version below.';
 
+// Save and wait for "Saved" to confirm save complete. Preserves focus in the
+// editing area.
 async function saveDraftWithKeyboard() {
-	return pressKeyWithModifier( 'primary', 's' );
+	await page.waitForSelector( '.editor-post-save-draft' );
+	await Promise.all( [
+		page.waitForSelector( '.editor-post-saved-state.is-saved' ),
+		pressKeyWithModifier( 'primary', 'S' ),
+	] );
 }
 
 async function sleep( durationInSeconds ) {
-	return new Promise( ( resolve ) =>
-		setTimeout( resolve, durationInSeconds * 1000 ) );
+	// Rule `no-restricted-syntax` recommends `waitForSelector` against
+	// `waitFor`, which isn't apt for the use case, when provided an integer,
+	// of waiting for a given amount of time.
+	// eslint-disable-next-line no-restricted-syntax
+	await page.waitFor( durationInSeconds * 1000 );
 }
 
 async function clearSessionStorage() {
@@ -153,11 +162,11 @@ describe( 'autosave', () => {
 	} );
 
 	it( 'should clear local autosave after successful remote autosave', async () => {
+		// Edit, save draft, edit again
 		await clickBlockAppender();
 		await page.keyboard.type( 'before save' );
-		await saveDraft();
-
-		await page.keyboard.type( 'after save' );
+		await saveDraftWithKeyboard();
+		await page.keyboard.type( ' after save' );
 
 		// Trigger local autosave
 		await page.evaluate( () => window.wp.data.dispatch( 'core/editor' ).__experimentalLocalAutosave() );
@@ -169,21 +178,52 @@ describe( 'autosave', () => {
 	} );
 
 	it( 'shouldn\'t clear local autosave if remote autosave fails', async () => {
+		// Edit, save draft, edit again
 		await clickBlockAppender();
 		await page.keyboard.type( 'before save' );
-		await saveDraft();
+		await saveDraftWithKeyboard();
+		await page.keyboard.type( ' after save' );
 
-		await page.keyboard.type( 'after save' );
+		// Trigger local autosave
 		await page.evaluate( () => window.wp.data.dispatch( 'core/editor' ).__experimentalLocalAutosave() );
 		expect( await page.evaluate( () => window.sessionStorage.length ) ).toBe( 1 );
 
+		// Bring network down and attempt to autosave remotely
 		toggleOfflineMode( true );
-
-		// Trigger remote autosave
 		await page.evaluate( () => window.wp.data.dispatch( 'core/editor' ).autosave() );
 		expect( await page.evaluate( () => window.sessionStorage.length ) ).toBe( 1 );
+	} );
 
-		toggleOfflineMode( false );
+	it( 'should clear local autosave after successful save', async () => {
+		// Edit, save draft, edit again
+		await clickBlockAppender();
+		await page.keyboard.type( 'before save' );
+		await saveDraftWithKeyboard();
+		await page.keyboard.type( ' after save' );
+
+		// Trigger local autosave
+		await page.evaluate( () => window.wp.data.dispatch( 'core/editor' ).__experimentalLocalAutosave() );
+		expect( await page.evaluate( () => window.sessionStorage.length ) ).toBe( 1 );
+
+		await saveDraftWithKeyboard();
+		expect( await page.evaluate( () => window.sessionStorage.length ) ).toBe( 0 );
+	} );
+
+	it( 'shouldn\'t clear local autosave if save fails', async () => {
+		// Edit, save draft, edit again
+		await clickBlockAppender();
+		await page.keyboard.type( 'before save' );
+		await saveDraftWithKeyboard();
+		await page.keyboard.type( ' after save' );
+
+		// Trigger local autosave
+		await page.evaluate( () => window.wp.data.dispatch( 'core/editor' ).__experimentalLocalAutosave() );
+		expect( await page.evaluate( () => window.sessionStorage.length ) ).toBe( 1 );
+
+		// Bring network down and attempt to save
+		toggleOfflineMode( true );
+		saveDraftWithKeyboard();
+		expect( await page.evaluate( () => window.sessionStorage.length ) ).toBe( 1 );
 	} );
 
 	it( 'shouldn\'t conflict with server-side autosave', async () => {
@@ -221,7 +261,8 @@ describe( 'autosave', () => {
 		expect( notice ).toContain( AUTOSAVE_NOTICE_REMOTE );
 	} );
 
-	afterAll( async () => {
+	afterEach( async () => {
+		toggleOfflineMode( false );
 		await clearSessionStorage();
 	} );
 } );

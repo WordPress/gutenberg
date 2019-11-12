@@ -6,10 +6,10 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { Button } from '../../';
+import Button from '../../button';
 import ScrollLock from '../';
 
-export default { title: 'ScrollLock', component: ScrollLock };
+export default { title: 'Components|ScrollLock', component: ScrollLock };
 
 const Example = () => {
 	const [ isScrollLocked, setScrollLocked ] = useState( false );

@@ -4,7 +4,7 @@
 import Button from '../../button';
 import ButtonGroup from '../';
 
-export default { title: 'Button Group', component: ButtonGroup };
+export default { title: 'Components|ButtonGroup', component: ButtonGroup };
 
 export const _default = () => {
 	const style = { margin: '0 4px' };

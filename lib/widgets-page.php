@@ -108,6 +108,7 @@ function gutenberg_widgets_init( $hook ) {
 	);
 
 	wp_enqueue_script( 'wp-edit-widgets' );
+	wp_enqueue_script( 'admin-widgets' );
 	wp_enqueue_script( 'wp-format-library' );
 	wp_enqueue_style( 'wp-edit-widgets' );
 	wp_enqueue_style( 'wp-format-library' );

@@ -49,6 +49,8 @@ export {
 	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
 	registerBlockStyle,
 	unregisterBlockStyle,
+	__experimentalRegisterBlockPattern,
+	__experimentalUnregisterBlockPattern,
 } from './registration';
 export {
 	isUnmodifiedDefaultBlock,
