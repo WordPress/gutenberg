@@ -55,7 +55,7 @@ function Tiles( props ) {
 
 		return (
 			<View style={ [ styles.tileStyle, {
-				width: ( ( 1 / rowLength ) * 100 ) + '%',
+				width: `${ 100 / rowLength }%`,
 				borderLeftWidth: spacing * ( indexInRow / rowLength ),
 				borderRightWidth: spacing * ( 1 - ( ( indexInRow + 1 ) / rowLength ) ),
 				borderTopWidth: row === 0 ? 0 : spacing / 2,
