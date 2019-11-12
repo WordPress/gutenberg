@@ -39,4 +39,6 @@ export async function createNewPost( {
 
 		await page.reload();
 	}
+
+	await page.emulateMediaFeatures( [ { name: 'prefers-reduced-motion', value: 'reduce' } ] );
 }

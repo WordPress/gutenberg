@@ -207,6 +207,7 @@ describe( 'Preview with Custom Fields enabled', () => {
 	beforeEach( async () => {
 		await createNewPost();
 		await toggleCustomFieldsOption( true );
+		await page.emulateMediaFeatures( [ { name: 'prefers-reduced-motion', value: 'reduce' } ] );
 	} );
 
 	afterEach( async () => {
