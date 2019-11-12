@@ -15,6 +15,7 @@ import { Icon } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { RichText, MediaUploadProgress } from '@wordpress/block-editor';
 import { isURL } from '@wordpress/url';
+import { withPreferredColorScheme } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -244,4 +245,4 @@ class GalleryImage extends Component {
 	}
 }
 
-export default GalleryImage;
+export default withPreferredColorScheme( GalleryImage );
