@@ -40,7 +40,7 @@ import ToolbarContext from '../toolbar-context';
  * Either `controls` or `children` is required, otherwise this components
  * renders nothing.
  *
- * @param {Object}    						props
+ * @param {Object}    						props								Component props.
  * @param {Array}     						[props.controls]  	The controls to render in this toolbar.
  * @param {WPElement} 						[props.children]  	Any other things to render inside the toolbar besides the controls.
  * @param {string}    						[props.className] 	Class to set on the container div.

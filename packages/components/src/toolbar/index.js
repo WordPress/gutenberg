@@ -23,10 +23,9 @@ import ToolbarContainer from './toolbar-container';
  *
  * To add controls, simply pass `ToolbarButton` components as children.
  *
- * @param {Object} props
+ * @param {Object} props										Component props.
  * @param {string} props.accessibilityLabel Required label for assistive technology users.
- * @param {string} [props.className]
- * @param {Object} ref
+ * @param {string} [props.className]				Class to set on the container div.
  */
 const Toolbar = forwardRef( ( { className, accessibilityLabel, ...props }, ref ) => {
 	if ( accessibilityLabel ) {
