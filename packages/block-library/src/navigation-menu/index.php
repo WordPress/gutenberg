@@ -47,21 +47,26 @@ function build_css_colors( $attributes ) {
  * @return string Returns the post content with the legacy widget added.
  */
 function render_block_navigation_menu( $attributes, $content, $block ) {
+	$classes = 'wp-block-navigation-menu';
+	if ( ! empty( $attributes['className'] ) ) {
+		$classes = $classes . ' ' . $attributes['className'];
+	}
+
 	// Inline computed colors.
 	$comp_inline_styles = '';
 
 	if ( array_key_exists( 'textColorValue', $attributes ) ) {
 		$comp_inline_styles .= ' color: ' . esc_attr( $attributes['textColorValue'] ) . ';';
 	}
-	$comp_inline_styles = ! empty( $comp_inline_styles )
-		? ' style="' . esc_attr( trim( $comp_inline_styles ) ) . '"'
-		: '';
 
 	$colors = build_css_colors( $attributes );
 
-	return "<nav class='wp-block-navigation-menu' {$comp_inline_styles}>" .
-		build_navigation_menu_html( $block, $colors ) .
-	'</nav>';
+	return sprintf(
+		'<nav class="%1$s" style="%2$s">%3$s</nav>',
+		esc_attr( $classes ),
+		esc_attr( trim( $comp_inline_styles ) ),
+		build_navigation_menu_html( $block, $colors )
+	);
 }
 
 /**
