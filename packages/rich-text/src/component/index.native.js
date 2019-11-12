@@ -618,6 +618,7 @@ export class RichText extends Component {
 		const {
 			tagName,
 			style,
+			placeholderStyle: placeholderStyleOverride,
 			__unstableIsSelected: isSelected,
 			children,
 			getStylesFromColorScheme,
@@ -631,11 +632,13 @@ export class RichText extends Component {
 			minHeight = style.minHeight;
 		}
 
+		const { color: colorOverride } = style || {};
+
 		const placeholderStyle = getStylesFromColorScheme( styles.richTextPlaceholder, styles.richTextPlaceholderDark );
 
 		const {
 			color: defaultPlaceholderTextColor,
-		} = placeholderStyle;
+		} = placeholderStyleOverride || placeholderStyle;
 
 		const {
 			color: defaultColor,
@@ -723,7 +726,7 @@ export class RichText extends Component {
 					onCaretVerticalPositionChange={ this.props.onCaretVerticalPositionChange }
 					onSelectionChange={ this.onSelectionChangeFromAztec }
 					blockType={ { tag: tagName } }
-					color={ defaultColor }
+					color={ colorOverride || defaultColor }
 					linkTextColor={ defaultTextDecorationColor }
 					maxImagesWidth={ 200 }
 					fontFamily={ this.props.fontFamily || defaultFontFamily }
