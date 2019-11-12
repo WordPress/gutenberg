@@ -9,7 +9,6 @@ import tinycolor from 'tinycolor2';
  * WordPress dependencies
  */
 import {
-	useCallback,
 	useEffect,
 	useRef,
 	useState,
@@ -79,37 +78,29 @@ function retrieveFastAverageColor() {
 const CoverHeightInput = withInstanceId(
 	function( { value = '', instanceId, onChange } ) {
 		const [ temporaryInput, setTemporaryInput ] = useState( null );
-		const onChangeEvent = useCallback(
-			( event ) => {
-				const unprocessedValue = event.target.value;
-				const inputValue = unprocessedValue !== '' ?
-					parseInt( event.target.value, 10 ) :
-					undefined;
-				if ( ( isNaN( inputValue ) || inputValue < COVER_MIN_HEIGHT ) && inputValue !== undefined ) {
-					setTemporaryInput( event.target.value );
-					return;
-				}
-				setTemporaryInput( null );
-				onChange( inputValue );
-			},
-			[ onChange, setTemporaryInput ]
-		);
-		const onBlurEvent = useCallback(
-			() => {
-				if ( temporaryInput !== null ) {
-					setTemporaryInput( null );
-				}
-			},
-			[ temporaryInput, setTemporaryInput ]
-		);
 		const inputId = `block-cover-height-input-${ instanceId }`;
 		return (
 			<BaseControl label={ __( 'Minimum height in pixels' ) } id={ inputId }>
 				<input
 					type="number"
 					id={ inputId }
-					onChange={ onChangeEvent }
-					onBlur={ onBlurEvent }
+					onChange={ ( event ) => {
+						const unprocessedValue = event.target.value;
+						const inputValue = unprocessedValue !== '' ?
+							parseInt( event.target.value, 10 ) :
+							undefined;
+						if ( ( isNaN( inputValue ) || inputValue < COVER_MIN_HEIGHT ) && inputValue !== undefined ) {
+							setTemporaryInput( event.target.value );
+							return;
+						}
+						setTemporaryInput( null );
+						onChange( inputValue );
+					} }
+					onBlur={ () => {
+						if ( temporaryInput !== null ) {
+							setTemporaryInput( null );
+						}
+					} }
 					value={ temporaryInput !== null ? temporaryInput : value }
 					min={ COVER_MIN_HEIGHT }
 					step="1"
@@ -138,29 +129,6 @@ function ResizableCover( {
 	onResizeStop,
 } ) {
 	const [ isResizing, setIsResizing ] = useState( false );
-	const onResizeEvent = useCallback(
-		( event, direction, elt ) => {
-			onResize( elt.clientHeight );
-			if ( ! isResizing ) {
-				setIsResizing( true );
-			}
-		},
-		[ onResize, setIsResizing ],
-	);
-	const onResizeStartEvent = useCallback(
-		( event, direction, elt ) => {
-			onResizeStart( elt.clientHeight );
-			onResize( elt.clientHeight );
-		},
-		[ onResizeStart, onResize ]
-	);
-	const onResizeStopEvent = useCallback(
-		( event, direction, elt ) => {
-			onResizeStop( elt.clientHeight );
-			setIsResizing( false );
-		},
-		[ onResizeStop, setIsResizing ]
-	);
 
 	return (
 		<ResizableBox
@@ -171,9 +139,20 @@ function ResizableCover( {
 				}
 			) }
 			enable={ RESIZABLE_BOX_ENABLE_OPTION }
-			onResizeStart={ onResizeStartEvent }
-			onResize={ onResizeEvent }
-			onResizeStop={ onResizeStopEvent }
+			onResizeStart={ ( event, direction, elt ) => {
+				onResizeStart( elt.clientHeight );
+				onResize( elt.clientHeight );
+			} }
+			onResize={ ( event, direction, elt ) => {
+				onResize( elt.clientHeight );
+				if ( ! isResizing ) {
+					setIsResizing( true );
+				}
+			} }
+			onResizeStop={ ( event, direction, elt ) => {
+				onResizeStop( elt.clientHeight );
+				setIsResizing( false );
+			} }
 			minHeight={ COVER_MIN_HEIGHT }
 		>
 			{ children }
@@ -181,45 +160,42 @@ function ResizableCover( {
 	);
 }
 
-function useCoverSelectMedia( setAttributes ) {
-	return useCallback(
-		( media ) => {
-			if ( ! media || ! media.url ) {
-				setAttributes( { url: undefined, id: undefined } );
+function onCoverSelectMedia( setAttributes ) {
+	return ( media ) => {
+		if ( ! media || ! media.url ) {
+			setAttributes( { url: undefined, id: undefined } );
+			return;
+		}
+		let mediaType;
+		// for media selections originated from a file upload.
+		if ( media.media_type ) {
+			if ( media.media_type === IMAGE_BACKGROUND_TYPE ) {
+				mediaType = IMAGE_BACKGROUND_TYPE;
+			} else {
+				// only images and videos are accepted so if the media_type is not an image we can assume it is a video.
+				// Videos contain the media type of 'file' in the object returned from the rest api.
+				mediaType = VIDEO_BACKGROUND_TYPE;
+			}
+		} else { // for media selections originated from existing files in the media library.
+			if (
+				media.type !== IMAGE_BACKGROUND_TYPE &&
+				media.type !== VIDEO_BACKGROUND_TYPE
+			) {
 				return;
 			}
-			let mediaType;
-			// for media selections originated from a file upload.
-			if ( media.media_type ) {
-				if ( media.media_type === IMAGE_BACKGROUND_TYPE ) {
-					mediaType = IMAGE_BACKGROUND_TYPE;
-				} else {
-					// only images and videos are accepted so if the media_type is not an image we can assume it is a video.
-					// Videos contain the media type of 'file' in the object returned from the rest api.
-					mediaType = VIDEO_BACKGROUND_TYPE;
-				}
-			} else { // for media selections originated from existing files in the media library.
-				if (
-					media.type !== IMAGE_BACKGROUND_TYPE &&
-					media.type !== VIDEO_BACKGROUND_TYPE
-				) {
-					return;
-				}
-				mediaType = media.type;
-			}
+			mediaType = media.type;
+		}
 
-			setAttributes( {
-				url: media.url,
-				id: media.id,
-				backgroundType: mediaType,
-				...( mediaType === VIDEO_BACKGROUND_TYPE ?
-					{ focalPoint: undefined, hasParallax: undefined } :
-					{}
-				),
-			} );
-		},
-		[ setAttributes ]
-	);
+		setAttributes( {
+			url: media.url,
+			id: media.id,
+			backgroundType: mediaType,
+			...( mediaType === VIDEO_BACKGROUND_TYPE ?
+				{ focalPoint: undefined, hasParallax: undefined } :
+				{}
+			),
+		} );
+	};
 }
 
 function useCoverIsDark( url, dimRatio = 50, overlayColor, elementRef ) {
@@ -263,15 +239,6 @@ function useCoverIsDark( url, dimRatio = 50, overlayColor, elementRef ) {
 	return isDark;
 }
 
-function useAttributeSetter( attribute, setAttributes ) {
-	return useCallback(
-		( newValue ) => {
-			setAttributes( { [ attribute ]: newValue } );
-		},
-		[ attribute, setAttributes ]
-	);
-}
-
 function CoverEdit( {
 	attributes,
 	setAttributes,
@@ -293,7 +260,7 @@ function CoverEdit( {
 		minHeight,
 		url,
 	} = attributes;
-	const onSelectMedia = useCoverSelectMedia( setAttributes );
+	const onSelectMedia = onCoverSelectMedia( setAttributes );
 
 	const toggleParallax = () => {
 		setAttributes( {
@@ -301,9 +268,6 @@ function CoverEdit( {
 			...( ! hasParallax ? { focalPoint: undefined } : {} ),
 		} );
 	};
-	const setDimRatio = useAttributeSetter( 'dimRatio', setAttributes );
-	const setFocalPoint = useAttributeSetter( 'focalPoint', setAttributes );
-	const setMinHeight = useAttributeSetter( 'minHeight', setAttributes );
 
 	const isDarkElement = useRef();
 	const isDark = useCoverIsDark( url, dimRatio, overlayColor.color, isDarkElement );
@@ -311,13 +275,6 @@ function CoverEdit( {
 	const [ temporaryMinHeight, setTemporaryMinHeight ] = useState( null );
 
 	const { removeAllNotices, createErrorNotice } = noticeOperations;
-	const onUploadError = useCallback(
-		( message ) => {
-			removeAllNotices();
-			createErrorNotice( message );
-		},
-		[ removeAllNotices, createErrorNotice ]
-	);
 
 	const style = {
 		...(
@@ -379,7 +336,7 @@ function CoverEdit( {
 								label={ __( 'Focal Point Picker' ) }
 								url={ url }
 								value={ focalPoint }
-								onChange={ setFocalPoint }
+								onChange={ ( newFocalPoint ) => setAttributes( { focalPoint: newFocalPoint } ) }
 							/>
 						) }
 						<PanelRow>
@@ -406,7 +363,7 @@ function CoverEdit( {
 						<PanelBody title={ __( 'Dimensions' ) }>
 							<CoverHeightInput
 								value={ temporaryMinHeight || minHeight }
-								onChange={ setMinHeight }
+								onChange={ ( newMinHeight ) => setAttributes( { minHeight: newMinHeight } ) }
 							/>
 						</PanelBody>
 						<PanelColorSettings
@@ -440,7 +397,7 @@ function CoverEdit( {
 								<RangeControl
 									label={ __( 'Background Opacity' ) }
 									value={ dimRatio }
-									onChange={ setDimRatio }
+									onChange={ ( newDimRation ) => setAttributes( { dimRatio: newDimRation } ) }
 									min={ 0 }
 									max={ 100 }
 									step={ 10 }
@@ -472,7 +429,10 @@ function CoverEdit( {
 					accept="image/*,video/*"
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					notices={ noticeUI }
-					onError={ onUploadError }
+					onError={ ( message ) => {
+						removeAllNotices();
+						createErrorNotice( message );
+					} }
 				>
 					<div
 						className="wp-block-cover__placeholder-background-options"
@@ -527,7 +487,7 @@ function CoverEdit( {
 				onResizeStop={
 					( newMinHeight ) => {
 						toggleSelection( true );
-						setMinHeight( newMinHeight );
+						setAttributes( { minHeight: newMinHeight } );
 						setTemporaryMinHeight( null );
 					}
 				}
