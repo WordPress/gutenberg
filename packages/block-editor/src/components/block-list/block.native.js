@@ -5,6 +5,7 @@ import {
 	View,
 	Text,
 	TouchableWithoutFeedback,
+	Platform,
 } from 'react-native';
 
 /**
@@ -184,6 +185,7 @@ class BlockListBlock extends Component {
 			isNestedInnerBlock,
 			hasInnerBlock,
 			isMediaTextParent,
+			isTouchable,
 		} = this.props;
 
 		const borderColor = isSelected ? focusedBorderColor : 'transparent';
@@ -228,6 +230,7 @@ class BlockListBlock extends Component {
 								isDimmed && styles.blockContainerDimmed,
 								hasInnerBlock && styles.verticalPaddingNone,
 							] }
+							{ ...isTouchable }
 						>
 							{ isValid && this.getBlockForType() }
 							{ ! isValid &&
@@ -290,6 +293,7 @@ export default compose( [
 		const isNestedInnerBlock = ! isDashed && selectedBlockClientId === getBlockRootClientId( firstToSelectId );
 		const hasInnerBlock = blockType.name === 'core/group' || blockType.name === 'core/media-text';
 		const isParentSelected = parentId === selectedBlockClientId;
+		const isTouchable = ( Platform.OS !== 'android' || firstToSelectId !== clientId ) ? {} : { pointerEvents: 'none' };
 
 		return {
 			icon,
@@ -314,6 +318,7 @@ export default compose( [
 			isParentSelected,
 			isMediaTextParent,
 			isGroupParent,
+			isTouchable,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {
