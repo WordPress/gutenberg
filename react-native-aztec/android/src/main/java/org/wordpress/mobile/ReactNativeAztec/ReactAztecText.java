@@ -3,17 +3,17 @@ package org.wordpress.mobile.ReactNativeAztec;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.graphics.Rect;
 import android.os.Handler;
 import android.os.Looper;
-import androidx.annotation.Nullable;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.Spannable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.inputmethod.InputMethodManager;
+
+import androidx.annotation.Nullable;
 
 import com.facebook.infer.annotation.Assertions;
 import com.facebook.react.bridge.ReactContext;
@@ -24,7 +24,6 @@ import com.facebook.react.views.textinput.ContentSizeWatcher;
 import com.facebook.react.views.textinput.ReactTextInputLocalData;
 import com.facebook.react.views.textinput.ScrollWatcher;
 
-import org.jetbrains.annotations.NotNull;
 import org.wordpress.aztec.AztecText;
 import org.wordpress.aztec.AztecTextFormat;
 import org.wordpress.aztec.ITextFormat;
@@ -32,12 +31,12 @@ import org.wordpress.aztec.plugins.IAztecPlugin;
 import org.wordpress.aztec.plugins.IToolbarButton;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
-import java.util.HashSet;
-import java.util.HashMap;
 
-import static android.content.ClipData.*;
+import static android.content.ClipData.Item;
 
 public class ReactAztecText extends AztecText {
 
@@ -84,13 +83,6 @@ public class ReactAztecText extends AztecText {
             put(AztecTextFormat.FORMAT_UNDERLINE, "underline");
         }
     };
-
-    // Set preformatted background color to transparent as we want
-    // to control block background color from RN side
-    @Override
-    public float getPreformatBackgroundAlpha(@NotNull TypedArray styles) {
-        return 0;
-    }
 
     public ReactAztecText(ThemedReactContext reactContext) {
         super(reactContext);
@@ -146,11 +138,6 @@ public class ReactAztecText extends AztecText {
         // onTakeFocus adapted from the Android source code at:
         //  https://android.googlesource.com/platform/frameworks/base/+/refs/heads/pie-release/core/java/android/text/method/ArrowKeyMovementMethod.java#316
         setMovementMethod(new ReactAztecArrowKeyMovementMethod());
-    }
-
-    @Override
-    public boolean shouldSkipTidying() {
-        return mTagName.equals("pre");
     }
 
     @Override
