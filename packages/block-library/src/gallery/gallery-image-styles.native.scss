@@ -1,67 +1,67 @@
 .galleryImageContainer {
-  flex: 1;
-  height: 150px;
-  background-color: $gray-lighten-30;
+	flex: 1;
+	height: 150px;
+	background-color: $gray-lighten-30;
 }
 
 .galleryImageContainerDark {
-  background-color: $gray-90;
+	background-color: $gray-90;
 }
 
 .image {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  opacity: 1;
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	opacity: 1;
 }
 
 .imageUploading {
-  opacity: 0.3;
+	opacity: 0.3;
 }
 
 .overlay {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 5px;
-  border-width: 3px;
-  border-color: #0000;
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	padding: 5px;
+	border-width: 3px;
+	border-color: #0000;
 }
 
 .overlaySelected {
-  border-color: $blue-wordpress;
+	border-color: $blue-wordpress;
 }
 
 .button {
-  width: 30px;
+	width: 30px;
 }
 
 .moverButtons {
-  flex-direction: row;
-  align-items: center;
-  border-radius: 3px;
-  background-color: #2e4453;
+	flex-direction: row;
+	align-items: center;
+	border-radius: 3px;
+	background-color: #2e4453;
 }
 
 .separator {
-  border-right-color: gray;
-  // border-right-width: StyleSheet.hairlineWidth;
-  border-right-width: 1px;
-  height: 20px;
+	border-right-color: $gray-30;
+	// border-right-width: StyleSheet.hairlineWidth;
+	border-right-width: 1px;
+	height: 20px;
 }
 
 .removeButton {
-  width: 30px;
-  border-radius: 30px;
+	width: 30px;
+	border-radius: 30px;
 }
 
 .toolbar {
-  flex-direction: row;
-  justify-content: space-between;
+	flex-direction: row;
+	justify-content: space-between;
 }
 
 .caption {
@@ -72,29 +72,29 @@
 }
 
 .uploadFailedContainer {
-  position: absolute;
-  background-color: rgba(0, 0, 0, 0.5);
-  width: 100%;
-  height: 100%;
-  justify-content: center;
-  align-items: center;
+	position: absolute;
+	background-color: rgba(0, 0, 0, 0.5);
+	width: 100%;
+	height: 100%;
+	justify-content: center;
+	align-items: center;
 }
 
 .uploadFailed {
-  width: 24px;
-  height: 24px;
-  justify-content: center;
-  align-items: center;
+	width: 24px;
+	height: 24px;
+	justify-content: center;
+	align-items: center;
 }
 
 .uploadFailedIcon {
-  fill: #fff;
-  width: 100%;
-  height: 100%;
+	fill: #fff;
+	width: 100%;
+	height: 100%;
 }
 
 .uploadFailedText {
-  color: #fff;
-  font-size: 14px;
-  margin-top: 5px;
+	color: #fff;
+	font-size: 14px;
+	margin-top: 5px;
 }

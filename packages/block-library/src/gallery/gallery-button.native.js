@@ -8,17 +8,10 @@ import { StyleSheet, TouchableOpacity, View } from 'react-native';
  */
 import { Icon } from '@wordpress/components';
 
-const styles = StyleSheet.create( {
-	buttonActive: {
-		flexDirection: 'row',
-		justifyContent: 'center',
-		alignItems: 'center',
-		borderRadius: 6,
-		borderColor: '#2e4453',
-		backgroundColor: '#2e4453',
-		aspectRatio: 1,
-	},
-} );
+/**
+ * Internal dependencies
+ */
+import styles from './gallery-image-styles';
 
 export function Button( props ) {
 	const {
