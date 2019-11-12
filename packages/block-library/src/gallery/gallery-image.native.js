@@ -151,6 +151,14 @@ class GalleryImage extends Component {
 			{ borderRightWidth: StyleSheet.hairlineWidth }
 		);
 
+		const buttonStyle = compose( styles.button,
+			{ aspectRatio: 1 }
+		);
+
+		const removeButtonStyle = compose( styles.removeButton,
+			{ aspectRatio: 1 }
+		);
+
 		return (
 			<>
 				<Image
@@ -173,9 +181,9 @@ class GalleryImage extends Component {
 					<>
 						{ isSelected && (
 							<View style={ styles.toolbar }>
-								<View style={ styles.moverButtons } >
+								<View style={ styles.moverButtonContainer } >
 									<Button
-										style={ styles.button }
+										style={ buttonStyle }
 										icon="arrow-left"
 										onClick={ isFirstItem ? undefined : onMoveBackward }
 										accessibilityLabel={ __( 'Move Image Backward' ) }
@@ -184,7 +192,7 @@ class GalleryImage extends Component {
 									/>
 									<View style={ separatorStyle }></View>
 									<Button
-										style={ styles.button }
+										style={ buttonStyle }
 										icon="arrow-right"
 										onClick={ isLastItem ? undefined : onMoveForward }
 										accessibilityLabel={ __( 'Move Image Forward' ) }
@@ -193,7 +201,7 @@ class GalleryImage extends Component {
 									/>
 								</View>
 								<Button
-									style={ styles.removeButton }
+									style={ removeButtonStyle }
 									icon="trash"
 									onClick={ onRemove }
 									accessibilityLabel={ __( 'Remove Image' ) }

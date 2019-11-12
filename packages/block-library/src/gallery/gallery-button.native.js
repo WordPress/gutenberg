@@ -27,7 +27,7 @@ export function Button( props ) {
 
 	const isDisabled = disabled || ariaDisabled;
 
-	const fill = isDisabled ? 'gray' : 'white';
+	const { fill } = isDisabled ? styles.buttonDisabled : styles.button;
 
 	return (
 		<TouchableOpacity
