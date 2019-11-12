@@ -9,7 +9,7 @@ import {
 	ToolbarGroup,
 } from '../../';
 
-export default { title: 'Toolbar', component: Toolbar };
+export default { title: 'Components|Toolbar', component: Toolbar };
 
 function InlineImageIcon() {
 	return (
