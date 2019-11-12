@@ -7,7 +7,6 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
-import { useCallback, useMemo } from '@wordpress/element';
 import {
 	PanelBody,
 	ToggleControl,
@@ -45,35 +44,23 @@ const applyFallbackStyles = withFallbackStyles( ( node, ownProps ) => {
 	};
 } );
 
-function useAttributeSetter( attribute, setAttributes ) {
-	return useCallback(
-		( newValue ) => {
-			setAttributes( { [ attribute ]: newValue } );
-		},
-		[ attribute, setAttributes ]
-	);
-}
-
-function ParagraphToolbar( { direction, setDirection } ) {
+function ParagraphRTLToolbar( { direction, setDirection } ) {
 	const isRTL = useSelect( ( select ) => {
 		return select( 'core/block-editor' ).getSettings().isRTL;
 	} );
-	const toolbarControls = useMemo(
-		() => ( [
-			{
-				icon: 'editor-ltr',
-				title: _x( 'Left to right', 'editor button' ),
-				isActive: direction === 'ltr',
-				onClick() {
-					setDirection( direction === 'ltr' ? undefined : 'ltr' );
-				},
-			},
-		] ),
-		[ direction, setDirection ]
-	);
+
 	return ( isRTL && (
 		<Toolbar
-			controls={ toolbarControls }
+			controls={ [
+				{
+					icon: 'editor-ltr',
+					title: _x( 'Left to right', 'editor button' ),
+					isActive: direction === 'ltr',
+					onClick() {
+						setDirection( direction === 'ltr' ? undefined : 'ltr' );
+					},
+				},
+			] }
 		/>
 	) );
 }
@@ -87,26 +74,22 @@ function ParagraphPanelColor( {
 	setTextColor,
 	textColor,
 } ) {
-	const colorSettings = useMemo(
-		() => ( [
-			{
-				value: backgroundColor,
-				onChange: setBackgroundColor,
-				label: __( 'Background Color' ),
-			},
-			{
-				value: textColor,
-				onChange: setTextColor,
-				label: __( 'Text Color' ),
-			},
-		] ),
-		[ backgroundColor, textColor, setBackgroundColor, setTextColor ]
-	);
 	return (
 		<PanelColorSettings
 			title={ __( 'Color Settings' ) }
 			initialOpen={ false }
-			colorSettings={ colorSettings }
+			colorSettings={ [
+				{
+					value: backgroundColor,
+					onChange: setBackgroundColor,
+					label: __( 'Background Color' ),
+				},
+				{
+					value: textColor,
+					onChange: setTextColor,
+					label: __( 'Text Color' ),
+				},
+			] }
 		>
 			<ContrastChecker
 				{ ...{
@@ -145,55 +128,16 @@ function ParagraphBlock( {
 		direction,
 	} = attributes;
 
-	const setAlign = useAttributeSetter( 'align', setAttributes );
-	const setContent = useAttributeSetter( 'content', setAttributes );
-	const setDirection = useAttributeSetter( 'direction', setAttributes );
-	const setDropCap = useAttributeSetter( 'dropCap', setAttributes );
-
-	const toggleDropCap = useCallback(
-		() => (	setDropCap( ! dropCap ) ),
-		[ dropCap, setDropCap ]
-	);
-
-	const onSplit = useCallback(
-		( value ) => {
-			if ( ! value ) {
-				return createBlock( name );
-			}
-
-			return createBlock( name, {
-				...attributes,
-				content: value,
-			} );
-		},
-		[ attributes ]
-	);
-
-	const onRemove = useMemo(
-		() => ( onReplace ? () => onReplace( [] ) : undefined ),
-		[ onReplace ]
-	);
-
-	const richTextStyles = useMemo(
-		() => ( {
-			backgroundColor: backgroundColor.color,
-			color: textColor.color,
-			fontSize: fontSize.size ? fontSize.size + 'px' : undefined,
-			direction,
-		} ),
-		[ backgroundColor.color, textColor.color, fontSize.size, direction ]
-	);
-
 	return (
 		<>
 			<BlockControls>
 				<AlignmentToolbar
 					value={ align }
-					onChange={ setAlign }
+					onChange={ ( newAlign ) => setAttributes( { align: newAlign } ) }
 				/>
-				<ParagraphToolbar
+				<ParagraphRTLToolbar
 					direction={ direction }
-					setDirection={ setDirection }
+					setDirection={ ( newDirection ) => setAttributes( { direction: newDirection } ) }
 				/>
 			</BlockControls>
 			<InspectorControls>
@@ -206,7 +150,7 @@ function ParagraphBlock( {
 					<ToggleControl
 						label={ __( 'Drop Cap' ) }
 						checked={ !! dropCap }
-						onChange={ toggleDropCap }
+						onChange={ () => setAttributes( { dropCap: ! dropCap } ) }
 						help={ dropCap ?
 							__( 'Showing large initial letter.' ) :
 							__( 'Toggle to show a large initial letter.' )
@@ -235,13 +179,27 @@ function ParagraphBlock( {
 					[ textColor.class ]: textColor.class,
 					[ fontSize.class ]: fontSize.class,
 				} ) }
-				style={ richTextStyles }
+				style={ {
+					backgroundColor: backgroundColor.color,
+					color: textColor.color,
+					fontSize: fontSize.size ? fontSize.size + 'px' : undefined,
+					direction,
+				} }
 				value={ content }
-				onChange={ setContent }
-				onSplit={ onSplit }
+				onChange={ ( newContent ) => setAttributes( { content: newContent } ) }
+				onSplit={ ( value ) => {
+					if ( ! value ) {
+						return createBlock( name );
+					}
+
+					return createBlock( name, {
+						...attributes,
+						content: value,
+					} );
+				} }
 				onMerge={ mergeBlocks }
 				onReplace={ onReplace }
-				onRemove={ onRemove }
+				onRemove={ onReplace ? () => onReplace( [] ) : undefined }
 				aria-label={ content ? __( 'Paragraph block' ) : __( 'Empty block; start writing or type forward slash to choose a block' ) }
 				placeholder={ placeholder || __( 'Start writing or type / to choose a block' ) }
 				__unstableEmbedURLOnPaste
