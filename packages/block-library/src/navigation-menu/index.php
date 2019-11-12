@@ -98,10 +98,29 @@ function render_block_navigation_menu( $attributes, $content, $block ) {
  * @return string Returns  an HTML list from innerBlocks.
  */
 function build_navigation_menu_html( $block, $colors ) {
+	$on_hover_mode = ! empty( $attributes['menuEventActivation'] ) && 'onHover' === $attributes['menuEventActivation'];
+
 	$html = '';
+	$level = 0;
 	foreach ( (array) $block['innerBlocks'] as $key => $menu_item ) {
+		$has_sub_items = count( (array) $menu_item['innerBlocks'] ) > 0;
 
 		$html .= '<li class="wp-block-navigation-menu-item ' . $colors['bg_css_classes'] . '"' . $colors['bg_inline_styles'] . '>' .
+			(
+				( $has_sub_items && ! $on_hover_mode )
+					? (
+						'<input
+							id="toggle-handler-' . $level . '-' . $key . '"
+							class="wp-block-navigation-menu-item__toggle-handler"
+							type="checkbox"
+						>' .
+						'<label
+							for="toggle-handler-' . $level . '-' . $key . '" 
+							class="wp-block-navigation-menu-item__toggle-for"
+						>'
+					)
+					: ''
+			) .
 			'<a
 				class="wp-block-navigation-menu-item__link ' . $colors['text_css_classes'] . '"
 				' . $colors['text_inline_styles'];
@@ -117,18 +136,21 @@ function build_navigation_menu_html( $block, $colors ) {
 		if ( isset( $menu_item['attrs']['opensInNewTab'] ) && true === $menu_item['attrs']['opensInNewTab'] ) {
 			$html .= ' target="_blank"  ';
 		}
-		// End appending HTML attributes to anchor tag.
 
 		// Start anchor tag content.
 		$html .= '>';
+
 		if ( isset( $menu_item['attrs']['label'] ) ) {
 			$html .= $menu_item['attrs']['label'];
 		}
 		$html .= '</a>';
 		// End anchor tag content.
 
-		if ( count( (array) $menu_item['innerBlocks'] ) > 0 ) {
-			$html .= build_navigation_menu_html( $menu_item, $colors );
+		$html .= ( $has_sub_items && ! $on_hover_mode ) ? '</label>' : '';
+
+		if ( $has_sub_items ) {
+			$level = $level + 1;
+			$html .= build_navigation_menu_html( $menu_item, $colors, $level );
 		}
 
 		$html .= '</li>';

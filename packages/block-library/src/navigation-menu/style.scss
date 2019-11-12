@@ -108,4 +108,24 @@
 			display: block;
 		}
 	}
+
+	&.is-activated-by-click li {
+		input.wp-block-navigation-menu-item__toggle-handler {
+			display: none;
+		}
+
+		label.wp-block-navigation-menu-item__toggle-for {
+			font-size: inherit;
+			display: block;
+			padding: 0;
+			margin: 0;
+			cursor: pointer;
+		}
+
+		input.wp-block-navigation-menu-item__toggle-handler:checked + label.wp-block-navigation-menu-item__toggle-for + ul {
+			visibility: visible;
+			opacity: 1;
+			display: block;
+		}
+	}
 }
