@@ -222,14 +222,17 @@ class GalleryImage extends Component {
 	}
 
 	render() {
-		const { id, isBlockSelected, onRemove } = this.props;
+		const { id, isBlockSelected, onRemove, getStylesFromColorScheme } = this.props;
+
+		const containerStyle = getStylesFromColorScheme( styles.galleryImageContainer,
+			styles.galleryImageContainerDark );
 
 		return (
 			<TouchableWithoutFeedback
 				onPress={ this.onMediaPressed }
 				disabled={ ! isBlockSelected }
 			>
-				<View style={ styles.container }>
+				<View style={ containerStyle }>
 					<MediaUploadProgress
 						// coverUrl={ url }
 						mediaId={ id }

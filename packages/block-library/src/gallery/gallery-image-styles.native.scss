@@ -1,6 +1,11 @@
-.container {
+.galleryImageContainer {
   flex: 1;
   height: 150px;
+  background-color: $gray-lighten-30;
+}
+
+.galleryImageContainerDark {
+  background-color: $gray-90;
 }
 
 .image {
@@ -24,11 +29,11 @@
   right: 0;
   padding: 5px;
   border-width: 3px;
-  border-color: #00000000;
+  border-color: #0000;
 }
 
 .overlaySelected {
-  border-color: #0070ff;
+  border-color: $blue-wordpress;
 }
 
 .button {
