@@ -197,7 +197,7 @@
 		"test-unit-php": "wp-scripts env test-php",
 		"test-unit-php-multisite": "cross-env WP_MULTISITE=1 wp-scripts env test-php",
 		"test-unit:native": "cd test/native/ && cross-env NODE_ENV=test jest --config ./jest.config.js",
-		"test-unit:native:debug": "cd test/native/ && node --inspect ../../node_modules/.bin/jest --runInBand --config ./jest.config.js",
+		"test-unit:native:debug": "cd test/native/ && node --inspect-brk ../../node_modules/.bin/jest --runInBand --verbose --config ./jest.config.js",
 		"design-system:build": "npm run build:packages && build-storybook -c ./packages/components/storybook -o ./playground/dist/design-system/components",
 		"design-system:dev": "npm run build:packages && concurrently \"npm run dev:packages\" \"start-storybook -c ./packages/components/storybook\"",
 		"playground:build": "npm run build:packages && parcel build playground/src/index.html -d playground/dist",
