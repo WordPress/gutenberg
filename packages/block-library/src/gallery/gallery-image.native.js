@@ -159,6 +159,9 @@ class GalleryImage extends Component {
 			{ aspectRatio: 1 }
 		);
 
+		const captionStyle = getStylesFromColorScheme( styles.caption, styles.captionDark );
+		const captionPlaceholderStyle = getStylesFromColorScheme( styles.captionPlaceholder, styles.captionPlaceholderDark );
+
 		return (
 			<>
 				<Image
@@ -210,7 +213,7 @@ class GalleryImage extends Component {
 							</View>
 						) }
 						{ ! isUploadFailed && ( isSelected || !! caption ) && (
-							<View style={ styles.caption } >
+							<View style={ styles.captionContainer } >
 								<RichText
 									tagName="figcaption"
 									placeholder={ isSelected ? __( 'Write caption…' ) : null }
@@ -218,6 +221,9 @@ class GalleryImage extends Component {
 									isSelected={ this.state.captionSelected }
 									onChange={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
 									unstableOnFocus={ this.onSelectCaption }
+									// fontSize={ 36 }
+									style={ captionStyle }
+									placeholderStyle={ captionPlaceholderStyle }
 									inlineToolbar
 								/>
 							</View>

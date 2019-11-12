@@ -78,7 +78,7 @@
 	justify-content: space-between;
 }
 
-.caption {
+.captionContainer {
   position: absolute;
   bottom: 0;
   left: 0;
@@ -111,4 +111,18 @@
 	color: #fff;
 	font-size: 14px;
 	margin-top: 5px;
+}
+
+.caption {
+  // background-color: #fff7;
+  background-color: #0007;
+  color: #fff;
+}
+
+.captionPlaceholder {
+  color: #ccc;
+}
+
+.captionDark {
+  // background-color: #0007;
 }
