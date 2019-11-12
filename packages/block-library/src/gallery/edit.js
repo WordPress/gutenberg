@@ -343,5 +343,5 @@ export default compose( [
 		return { mediaUpload };
 	} ),
 	withNotices,
-	withViewportMatch( { isMobile: '< small' } ),
+	withViewportMatch( { isMobile: '< small', isNarrow: '< large' } ),
 ] )( GalleryEdit );
