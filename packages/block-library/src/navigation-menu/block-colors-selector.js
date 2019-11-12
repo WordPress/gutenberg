@@ -25,15 +25,10 @@ const ColorSelectorSVGIcon = () => (
  * @return {*} React Icon component.
  */
 const ColorSelectorIcon = ( { backgroundColor, textColor, backgroundColorValue, textColorValue } ) => {
-	const iconStyle = {};
-
-	if ( backgroundColorValue ) {
-		iconStyle.backgroundColor = backgroundColorValue;
-	}
-
-	if ( textColorValue ) {
-		iconStyle.color = textColorValue;
-	}
+	const iconStyle = {
+		...( backgroundColorValue && { backgroundColor: backgroundColorValue } ),
+		...( textColorValue && { color: textColorValue } ),
+	};
 
 	const iconClasses = classnames( 'block-library-colors-selector__state-selection', {
 		'has-background-color': backgroundColor && backgroundColor.color,
