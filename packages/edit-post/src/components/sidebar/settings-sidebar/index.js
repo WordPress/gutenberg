@@ -53,7 +53,7 @@ function TestSimulateMediaQuery() {
 				min={ 0 }
 				max={ 2000 }
 				allowReset
-				onChange={ ( newValue ) => ( setSimulateValue( newValue ) ) }
+				onChange={ ( newValue ) => ( setSimulationWidth( newValue ) ) }
 			/>
 			<__experimentalSimulateMediaQuery
 				value={ simulateValue }
