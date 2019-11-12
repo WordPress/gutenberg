@@ -22,7 +22,6 @@ import {
 	withNotices,
 } from '@wordpress/components';
 import {
-	BlockIcon,
 	MediaPlaceholder,
 	InspectorControls,
 } from '@wordpress/block-editor';
@@ -275,7 +274,7 @@ class GalleryEdit extends Component {
 				isAppender={ hasImages }
 				className={ className }
 				disableMediaButtons={ hasImages && ! isSelected }
-				icon={ ! hasImages && <BlockIcon icon={ icon } /> }
+				icon={ ! hasImages &&  icon }
 				labels={ {
 					title: ! hasImages && __( 'Gallery' ),
 					instructions: ! hasImages && placeholderText,
