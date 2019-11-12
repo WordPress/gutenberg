@@ -22,7 +22,6 @@ import styles from './style.scss';
 import headerToolbarStyles from '../header/header-toolbar/style.scss';
 import Header from '../header';
 import VisualEditor from '../visual-editor';
-import defaultTemplates from '../default-templates';
 
 class Layout extends Component {
 	constructor() {
@@ -133,7 +132,7 @@ class Layout extends Component {
 						<Header />
 						<BottomSheetSettings />
 					</KeyboardAvoidingView> ) }
-				{ showPageTemplatePicker && <__experimentalPageTemplatePicker templates={ defaultTemplates } /> }
+				{ showPageTemplatePicker && <__experimentalPageTemplatePicker /> }
 			</SafeAreaView>
 		);
 	}

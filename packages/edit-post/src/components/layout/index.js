@@ -48,7 +48,6 @@ import Sidebar from '../sidebar';
 import PluginPostPublishPanel from '../sidebar/plugin-post-publish-panel';
 import PluginPrePublishPanel from '../sidebar/plugin-pre-publish-panel';
 import FullscreenMode from '../fullscreen-mode';
-import defaultTemplates from '../default-templates';
 
 function Layout( {
 	mode,
@@ -148,7 +147,7 @@ function Layout( {
 			) }
 			<Popover.Slot />
 			<PluginArea />
-			{ showPageTemplatePicker && <__experimentalPageTemplatePicker templates={ defaultTemplates } /> }
+			{ showPageTemplatePicker && <__experimentalPageTemplatePicker /> }
 		</FocusReturnProvider>
 	);
 }

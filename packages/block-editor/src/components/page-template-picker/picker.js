@@ -10,8 +10,9 @@ import { withDispatch } from '@wordpress/data';
 import __experimentalBlockListFooter from '../block-list-footer';
 import Button from './button';
 import Container from './container';
+import defaultTemplates from './default-templates';
 
-const __experimentalPageTemplatePicker = ( { templates, resetContent } ) => {
+const __experimentalPageTemplatePicker = ( { templates = defaultTemplates, resetContent } ) => {
 	return (
 		<__experimentalBlockListFooter>
 			<Container style={ { flexDirection: 'row' } }>
