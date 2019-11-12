@@ -1,7 +1,7 @@
 <?php
 /**
  * Start: Include for phase 2
- * Widget Updater REST API: WP_REST_Widget_Updater_Controller class
+ * Widget Updater REST API: WP_REST_Widget_Forms class
  *
  * @package gutenberg
  * @since 5.2.0
@@ -14,7 +14,7 @@
  *
  * @see WP_REST_Controller
  */
-class WP_REST_Widget_Updater_Controller extends WP_REST_Controller {
+class WP_REST_Widget_Forms extends WP_REST_Controller {
 
 	/**
 	 * Constructs the controller.
@@ -22,8 +22,8 @@ class WP_REST_Widget_Updater_Controller extends WP_REST_Controller {
 	 * @access public
 	 */
 	public function __construct() {
-		$this->namespace = 'wp/v2';
-		$this->rest_base = 'widgets';
+		$this->namespace = '__experimental';
+		$this->rest_base = 'widget-forms';
 	}
 
 	/**
@@ -35,12 +35,24 @@ class WP_REST_Widget_Updater_Controller extends WP_REST_Controller {
 			register_rest_route(
 				$this->namespace,
 				// Regex representing a PHP class extracted from http://php.net/manual/en/language.oop5.basic.php.
-				'/' . $this->rest_base . '/(?P<identifier>[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)/',
+				'/' . $this->rest_base . '/(?P<widget_class>[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)/',
 				array(
 					'args' => array(
-						'identifier' => array(
-							'description' => __( 'Class name of the widget.', 'gutenberg' ),
-							'type'        => 'string',
+						'widget_class'     => array(
+							'description'       => __( 'Class name of the widget.', 'gutenberg' ),
+							'type'              => 'string',
+							'required'          => true,
+							'validate_callback' => array( $this, 'is_valid_widget' ),
+						),
+						'instance'         => array(
+							'description' => __( 'Current widget instance', 'gutenberg' ),
+							'type'        => 'object',
+							'default'     => array(),
+						),
+						'instance_changes' => array(
+							'description' => __( 'Array of instance changes', 'gutenberg' ),
+							'type'        => 'object',
+							'default'     => array(),
 						),
 					),
 					array(
@@ -76,51 +88,46 @@ class WP_REST_Widget_Updater_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Returns the new widget instance and the form that represents it.
+	 * Checks if the widget being referenced is valid.
 	 *
 	 * @since 5.2.0
+	 * @param string $widget_class Name of the class the widget references.
+	 *
+	 * @return boolean| True if the widget being referenced exists and false otherwise.
+	 */
+	private function is_valid_widget( $widget_class ) {
+		global $wp_widget_factory;
+		if ( ! $widget_class ) {
+			return false;
+		}
+		return isset( $wp_widget_factory->widgets[ $widget_class ] ) &&
+			( $wp_widget_factory->widgets[ $widget_class ] instanceof WP_Widget );
+	}
+
+	/**
+	 * Returns the new widget instance and the form that represents it.
+	 *
+	 * @since 5.7.0
 	 * @access public
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function compute_new_widget( $request ) {
-		$widget = $request->get_param( 'identifier' );
+		$widget_class     = $request->get_param( 'widget_class' );
+		$instance         = $request->get_param( 'instance' );
+		$instance_changes = $request->get_param( 'instance_changes' );
 
 		global $wp_widget_factory;
+		$widget_obj = $wp_widget_factory->widgets[ $widget_class ];
 
-		if (
-			null === $widget ||
-			! isset( $wp_widget_factory->widgets[ $widget ] ) ||
-			! ( $wp_widget_factory->widgets[ $widget ] instanceof WP_Widget )
-		) {
-			return new WP_Error(
-				'widget_invalid',
-				__( 'Invalid widget.', 'gutenberg' ),
-				array(
-					'status' => 404,
-				)
-			);
-		}
-
-		$widget_obj = $wp_widget_factory->widgets[ $widget ];
-
-		$instance = $request->get_param( 'instance' );
-		if ( null === $instance ) {
-			$instance = array();
-		}
-		$id_to_use = $request->get_param( 'id_to_use' );
-		if ( null === $id_to_use ) {
-			$id_to_use = -1;
-		}
-
-		$widget_obj->_set( $id_to_use );
+		$widget_obj->_set( -1 );
 		ob_start();
 
-		$instance_changes = $request->get_param( 'instance_changes' );
-		if ( null !== $instance_changes ) {
+		if ( ! empty( $instance_changes ) ) {
 			$old_instance = $instance;
 			$instance     = $widget_obj->update( $instance_changes, $old_instance );
+
 			/**
 			 * Filters a widget's settings before saving.
 			 *
@@ -164,17 +171,12 @@ class WP_REST_Widget_Updater_Controller extends WP_REST_Controller {
 			 */
 			do_action_ref_array( 'in_widget_form', array( &$widget_obj, &$return, $instance ) );
 		}
-
-		$id_base = $widget_obj->id_base;
-		$id      = $widget_obj->id;
-		$form    = ob_get_clean();
+		$form = ob_get_clean();
 
 		return rest_ensure_response(
 			array(
 				'instance' => $instance,
 				'form'     => $form,
-				'id_base'  => $id_base,
-				'id'       => $id,
 			)
 		);
 	}
