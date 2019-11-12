@@ -59,14 +59,14 @@ function replaceMediaQueryWithWidthEvaluation( ruleText, widthValue ) {
 	} );
 }
 
-export default function SimulateMediaQuery( { partialPaths, value } ) {
+export default function SimulateMediaQuery( { partialPaths, width } ) {
 	useEffect(
 		() => {
 			const styleSheets = getStyleSheetsThatMatchPaths( partialPaths );
 			const originalStyles = [];
 			styleSheets.forEach( ( styleSheet, styleSheetIndex ) => {
-				for ( let ruleIndex = 0; ruleIndex < styleSheet.rules.length; ++ruleIndex ) {
-					const rule = styleSheet.rules[ ruleIndex ];
+				for ( let ruleIndex = 0; ruleIndex < styleSheet.cssRules.length; ++ruleIndex ) {
+					const rule = styleSheet.cssRules[ ruleIndex ];
 					if ( ! isReplaceableMediaRule( rule ) ) {
 						continue;
 					}
@@ -77,7 +77,7 @@ export default function SimulateMediaQuery( { partialPaths, value } ) {
 					originalStyles[ styleSheetIndex ][ ruleIndex ] = ruleText;
 					replaceRule(
 						styleSheet,
-						replaceMediaQueryWithWidthEvaluation( ruleText, value ),
+						replaceMediaQueryWithWidthEvaluation( ruleText, width ),
 						ruleIndex
 					);
 				}
@@ -96,7 +96,7 @@ export default function SimulateMediaQuery( { partialPaths, value } ) {
 				} );
 			};
 		},
-		[ partialPaths, value ]
+		[ partialPaths, width ]
 	);
 	return null;
 }

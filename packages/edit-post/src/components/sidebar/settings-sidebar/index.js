@@ -41,7 +41,7 @@ function TestSimulateMediaQuery() {
 			onChange={ ( newValue ) => setIsSimulationEnabled( newValue ) }
 		/>
 	);
-	if ( ! isSimulationEnable ) {
+	if ( ! isSimulationEnabled ) {
 		return toggleUI;
 	}
 	return (
@@ -56,7 +56,7 @@ function TestSimulateMediaQuery() {
 				onChange={ ( newValue ) => ( setSimulationWidth( newValue ) ) }
 			/>
 			<__experimentalSimulateMediaQuery
-				value={ simulationWidth }
+				width={ simulationWidth }
 				partialPaths={ PARTIAL_PATHS }
 			/>
 		</>
