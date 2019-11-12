@@ -21,6 +21,7 @@ branches:
   only:
     - master
     - rnmobile/master
+    - rnmobile/releases
     - /wp\/.*/
 
 env:
@@ -202,8 +203,7 @@ jobs:
       install:
         - npm ci
       before_deploy:
-        - npm run playground:build -- --public-url '/gutenberg'
-        - npm run design-system:build
+        - npm run storybook:build
       deploy:
         provider: pages
         skip_cleanup: true

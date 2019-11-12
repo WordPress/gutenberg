@@ -42,9 +42,9 @@ It might also be a good idea to get familiar with the [JavaScript Build Setup tu
 
 ## Updating to New Release
 
-To update an existing project to a new version of `@wordpress/scripts`, open the [changelog](/packages/scripts/CHANGELOG.md), find the version you’re currently on (check `package.json` in the top-level directory of your project), and apply the migration instructions for the newer versions.
+To update an existing project to a new version of `@wordpress/scripts`, open the [changelog](https://github.com/WordPress/gutenberg/blob/master/packages/scripts/CHANGELOG.md), find the version you’re currently on (check `package.json` in the top-level directory of your project), and apply the migration instructions for the newer versions.
 
-In most cases bumping the `@wordpress/scripts` version in `package.json` and running `npm install` in the root folder of your project should be enough, but it’s good to check the [changelog](/packages/scripts/CHANGELOG.md) for potential breaking changes.
+In most cases bumping the `@wordpress/scripts` version in `package.json` and running `npm install` in the root folder of your project should be enough, but it’s good to check the [changelog](https://github.com/WordPress/gutenberg/blob/master/packages/scripts/CHANGELOG.md) for potential breaking changes.
 
 We commit to keeping the breaking changes minimal so you can upgrade `@wordpress/scripts` as seamless as possible.
 

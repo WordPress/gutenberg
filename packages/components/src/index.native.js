@@ -18,6 +18,7 @@ export { default as Button } from './button';
 export { default as TextControl } from './text-control';
 export { default as ToggleControl } from './toggle-control';
 export { default as SelectControl } from './select-control';
+export { default as RangeControl } from './range-control';
 
 // Higher-Order Components
 export { default as withConstrainedTabbing } from './higher-order/with-constrained-tabbing';

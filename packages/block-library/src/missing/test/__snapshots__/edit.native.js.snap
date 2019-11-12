@@ -1,0 +1,30 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Missing block renders without crashing 1`] = `
+<View>
+  <View
+    accessibilityHint="Tap here to show help"
+    accessibilityLabel="Help icon"
+    accessibilityRole="button"
+    accessible={true}
+    clickable={true}
+    onClick={[Function]}
+    onResponderGrant={[Function]}
+    onResponderMove={[Function]}
+    onResponderRelease={[Function]}
+    onResponderTerminate={[Function]}
+    onResponderTerminationRequest={[Function]}
+    onStartShouldSetResponder={[Function]}
+  >
+    Svg
+  </View>
+  Svg
+  <Text>
+    missing/block/title
+  </Text>
+  <Text>
+    Unsupported
+  </Text>
+  Modal
+</View>
+`;

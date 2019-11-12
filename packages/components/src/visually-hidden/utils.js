@@ -9,8 +9,8 @@
  *
  * See VisuallyHidden hidden for example.
  *
- * @param {string|Component} as A tag or component to render.
- * @return {Component} The rendered component.
+ * @param {string|WPComponent} as A tag or component to render.
+ * @return {WPComponent} The rendered component.
  */
 function renderAsRenderProps( { as: Component = 'div', ...props } ) {
 	if ( typeof props.children === 'function' ) {
