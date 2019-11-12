@@ -78,7 +78,7 @@ function Frame(
 		component,
 		tokenStart,
 		tokenLength,
-		prevOffset: prevOffset || tokenStart + tokenLength,
+		prevOffset,
 		leadingTextStart,
 	};
 }
