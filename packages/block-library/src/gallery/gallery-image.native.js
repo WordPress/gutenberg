@@ -131,7 +131,7 @@ class GalleryImage extends Component {
 		const {
 			url, isFirstItem, isLastItem, isSelected, caption, onRemove,
 			onMoveForward, onMoveBackward, setAttributes, 'aria-label': ariaLabel,
-			isCropped } = this.props;
+			isCropped, getStylesFromColorScheme } = this.props;
 
 		const { compose } = StyleSheet;
 
