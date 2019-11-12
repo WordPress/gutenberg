@@ -143,11 +143,15 @@ export class PostPublishButton extends Component {
 		};
 
 		const toggleChildren = isBeingScheduled ? __( 'Schedule…' ) : __( 'Publish…' );
-		const buttonChildren = <PublishButtonLabel forceIsSaving={ forceIsSaving } />;
+		const buttonChildren = (
+			<PublishButtonLabel
+				forceIsSaving={ forceIsSaving }
+				hasNonPostEntityChanges={ hasNonPostEntityChanges }
+			/>
+		);
 
 		const componentProps = isToggle ? toggleProps : buttonProps;
-		const componentChildren =
-			isToggle || hasNonPostEntityChanges ? toggleChildren : buttonChildren;
+		const componentChildren = isToggle ? toggleChildren : buttonChildren;
 		return (
 			<>
 				<EntitiesSavedStates
