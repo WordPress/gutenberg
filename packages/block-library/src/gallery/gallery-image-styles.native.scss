@@ -37,21 +37,21 @@
 }
 
 .button {
-  fill: $gray-0;
+	fill: $gray-0;
 	width: 30px;
 }
 
 .buttonDisabled {
-  fill: $gray-30;
+	fill: $gray-30;
 }
 
 .buttonActive {
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  border-radius: 6px;
-  border-color: $gray-70;
-  background-color: $gray-70;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	border-radius: 6px;
+	border-color: $gray-70;
+	background-color: $gray-70;
 }
 
 .moverButtonContainer {
