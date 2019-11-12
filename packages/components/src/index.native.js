@@ -6,7 +6,7 @@ export { default as Dashicon } from './dashicon';
 export { default as Dropdown } from './dropdown';
 export { default as Toolbar } from './toolbar';
 export { default as ToolbarButton } from './toolbar-button';
-export { default as ToolbarContext } from './toolbar-context';
+export { default as __experimentalToolbarContext } from './toolbar-context';
 export { default as ToolbarGroup } from './toolbar-group';
 export { default as Icon } from './icon';
 export { default as IconButton } from './icon-button';
