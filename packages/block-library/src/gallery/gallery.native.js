@@ -41,8 +41,16 @@ export const Gallery = ( props ) => {
 		images,
 	} = attributes;
 
-	const displayedColumns = isMobile ? Math.min( columns, 2 ) :
-		isNarrow ? Math.min( columns, 4 ) : columns;
+	let displayedColumns;
+
+	// limit displayed columns based on viewport width
+	if ( isMobile ) {
+		displayedColumns = Math.min( columns, 2 );
+	} else if ( isNarrow ) {
+		displayedColumns = Math.min( columns, 4 );
+	} else {
+		displayedColumns = columns;
+	}
 
 	return (
 		<View>
