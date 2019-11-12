@@ -48,7 +48,7 @@ function TestSimulateMediaQuery() {
 		<>
 			{ toggleUI }
 			<RangeControl
-				value={ simulateValue }
+				value={ simulationWidth }
 				label={ __( 'Simulated width value' ) }
 				min={ 0 }
 				max={ 2000 }
