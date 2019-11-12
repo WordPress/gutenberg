@@ -8,12 +8,15 @@ import { View } from 'react-native';
  */
 import GalleryImage from './gallery-image';
 import { defaultColumnsNumber } from './shared';
+import styles from './gallery-styles';
 import Tiles from './tiles';
 
 /**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
+
+const TILE_SPACING = 15;
 
 export const Gallery = ( props ) => {
 	const {
@@ -32,7 +35,6 @@ export const Gallery = ( props ) => {
 	} = props;
 
 	const {
-		align,
 		columns = defaultColumnsNumber( attributes ),
 		imageCrop,
 		images,
@@ -44,8 +46,8 @@ export const Gallery = ( props ) => {
 		<View>
 			<Tiles
 				columns={ displayedColumns }
-				spacing={ 15 }
-				align={ align }
+				spacing={ TILE_SPACING }
+				style={ isSelected ? styles.galleryTilesContainerSelected : undefined }
 			>
 				{ images.map( ( img, index ) => {
 					/* translators: %1$d is the order number of the image, %2$d is the total number of images. */
