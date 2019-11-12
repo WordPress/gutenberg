@@ -15,7 +15,7 @@ import IconButton from '../../icon-button';
 import PageHeader from '../';
 import './styles.css';
 
-export default { title: 'PageHeader', component: PageHeader };
+export default { title: 'Components|PageHeader', component: PageHeader };
 
 const InlineActions = () => {
 	return (

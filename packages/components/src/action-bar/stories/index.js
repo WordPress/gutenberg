@@ -14,7 +14,7 @@ import Tooltip from '../../tooltip';
 
 import './style.css';
 
-export default { title: 'ActionBar', component: ActionBar };
+export default { title: 'Components|ActionBar', component: ActionBar };
 
 const DropdownActions = () => {
 	return (

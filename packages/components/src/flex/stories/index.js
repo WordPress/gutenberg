@@ -19,7 +19,7 @@ import FlexItem from '../item';
 
 import './style.css';
 
-export default { title: 'Flex', component: Flex };
+export default { title: 'Components|Flex', component: Flex };
 
 const getStoryProps = () => {
 	const showOutline = boolean( 'Example: Show Outline', true );
