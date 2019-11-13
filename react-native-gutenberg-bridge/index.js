@@ -10,6 +10,12 @@ const isIOS = Platform.OS === 'ios';
 
 const gutenbergBridgeEvents = new NativeEventEmitter( RNReactNativeGutenbergBridge );
 
+export const mediaSources = {
+	deviceLibrary: 'DEVICE_MEDIA_LIBRARY',
+	deviceCamera: 'DEVICE_CAMERA',
+	siteMediaLibrary: 'SITE_MEDIA_LIBRARY',
+};
+
 // Console polyfill from react-native
 
 export function nativeLoggingHook( message, logLevel ) {
