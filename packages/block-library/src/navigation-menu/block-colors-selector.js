@@ -25,7 +25,9 @@ const ColorSelectorSVGIcon = () => (
  * @return {*} React Icon component.
  */
 const ColorSelectorIcon = ( { textColor, textColorValue } ) => {
-	const iconClasses = classnames( 'block-library-colors-selector__state-selection', {
+	const iconClasses = classnames(
+		'block-library-colors-selector__state-selection',
+		'editor-styles-wrapper', {
 		'has-text-color': textColor && textColor.color,
 		[ textColor.class ]: textColor && textColor.class,
 	} );
