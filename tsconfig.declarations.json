@@ -1,0 +1,15 @@
+{
+	"extends": "./tsconfig.base.js",
+	"compilerOptions": {
+		"declaration": true,
+		"emitDeclarationOnly": true
+	},
+	"include": [
+		"./packages/url/**/*.js"
+	],
+	"exclude": [
+		"./packages/**/test/**",
+		"./packages/**/build/**",
+		"./packages/**/build-module/**"
+	]
+}
