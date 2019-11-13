@@ -75,20 +75,22 @@ function render_block_navigation_menu( $attributes, $content, $block ) {
 function build_navigation_menu_html( $block, $colors ) {
 	$html = '';
 	foreach ( (array) $block['innerBlocks'] as $key => $block ) {
+		$title = isset( $block['attrs']['title'] ) ? esc_attr( $block['attrs']['title'] ) : '';
+		$label = isset( $block['attrs']['label'] ) ? esc_attr( $block['attrs']['label'] ) : '';
+		$url   = isset( $block['attrs']['url'] ) ? esc_attr( $block['attrs']['url'] ) : '';
+		$opens_in_new_tab = isset( $block['attrs']['opensInNewTab'] ) && true === $block['attrs']['opensInNewTab'];
+
 		// Creates the markup for the item content element.
 		if ( isset( $block['attrs']['url'] ) ) {
 			$item_content_markup =
 				'<a
 					class="wp-block-navigation-menu-item__link ' . $colors['text_css_classes'] . '"
 					' . $colors['text_inline_styles'] .
-					' href="' . $block['attrs']['url'] . '"' .
-					( $block['attrs']['title'] ? ( ' title="' . $block['attrs']['title'] . '"' ) : '' ) .
-					( isset( $block['attrs']['opensInNewTab'] ) && true === $block['attrs']['opensInNewTab']
-						? ' target="_blank"'
-						: ''
-					) .
+					' href="' . $url . '"' .
+					( $block['attrs']['title'] ? ( ' title="' . $title . '"' ) : '' ) .
+					( $opens_in_new_tab? ' target="_blank"' : '' ) .
 				'>' .
-					( isset( $block['attrs']['label'] ) ? $block['attrs']['label'] : '' ) .
+					( isset( $block['attrs']['label'] ) ? $label : '' ) .
 				'</a>';
 		} else {
 			$item_content_markup =
@@ -96,13 +98,11 @@ function build_navigation_menu_html( $block, $colors ) {
 					class="wp-block-navigation-menu-item__label ' . $colors['text_css_classes'] . '"
 					' . $colors['text_inline_styles'] .
 				'>' .
-					( isset( $block['attrs']['label'] ) ? $block['attrs']['label'] : '' ) .
+					( isset( $block['attrs']['label'] ) ? $label : '' ) .
 				'</span>';
 		}
 
-		$html .=
-			'<li class="wp-block-navigation-menu-item">' .
-				$item_content_markup;
+		$html .= '<li class="wp-block-navigation-menu-item">' . $item_content_markup;
 
 		if ( count( (array) $block['innerBlocks'] ) > 0 ) {
 			$html .= build_navigation_menu_html( $block, $colors );
