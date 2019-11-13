@@ -123,8 +123,11 @@ $colors-selector-size: 22px;
 		padding: 2px;
 
 		// Styling icon color.
-		> svg {
-			color: inherit;
+		&.has-text-color {
+			> svg,
+			> svg path {
+				color: inherit;
+			}
 		}
 	}
 }
