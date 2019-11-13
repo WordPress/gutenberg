@@ -14,7 +14,6 @@ import {
 } from '@wordpress/components';
 
 import {
-	requestMediaImport,
 	mediaUploadSync,
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
@@ -64,17 +63,11 @@ class MediaContainer extends Component {
 	}
 
 	componentDidMount() {
-		const { mediaId, mediaUrl, onMediaUpdate, mediaType } = this.props;
+		const { mediaId, mediaUrl } = this.props;
 
-		if ( mediaId && mediaUrl && ! isURL( mediaUrl ) ) {
-			if ( mediaUrl.indexOf( 'file:' ) === 0 && mediaType === MEDIA_TYPE_IMAGE ) {
-				// We don't want to call this for video because it is starting a media upload for the cover url
-				requestMediaImport( mediaUrl, ( id, url ) => {
-					if ( url ) {
-						onMediaUpdate( { id, url } );
-					}
-				} );
-			}
+		// Make sure we mark any temporary images as failed if they failed while
+		// the editor wasn't open
+		if ( mediaId && mediaUrl && mediaUrl.indexOf( 'file:' ) === 0 ) {
 			mediaUploadSync();
 		}
 	}
@@ -274,32 +267,34 @@ class MediaContainer extends Component {
 
 		if ( mediaUrl ) {
 			return (
-				<View style={ { flex: 1 } }>
+				<View>
 					<MediaUpload
 						onSelect={ this.onSelectMediaUploadOption }
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
 						value={ mediaId }
 						render={ ( { open, getMediaOptions } ) => {
-							return <>
-								{ getMediaOptions() }
-								{ this.renderToolbarEditButton( open ) }
+							return (
+								<View style={ { flex: 1 } }>
+									{ getMediaOptions() }
+									{ this.renderToolbarEditButton( open ) }
 
-								<MediaUploadProgress
-									coverUrl={ coverUrl }
-									mediaId={ mediaId }
-									onUpdateMediaProgress={ this.updateMediaProgress }
-									onFinishMediaUploadWithSuccess={ this.finishMediaUploadWithSuccess }
-									onFinishMediaUploadWithFailure={ this.finishMediaUploadWithFailure }
-									onMediaUploadStateReset={ this.mediaUploadStateReset }
-									renderContent={ ( params ) => {
-										return (
-											<View style={ styles.content }>
-												{ this.renderContent( params, open ) }
-											</View>
-										);
-									} }
-								/>
-							</>;
+									<MediaUploadProgress
+										coverUrl={ coverUrl }
+										mediaId={ mediaId }
+										onUpdateMediaProgress={ this.updateMediaProgress }
+										onFinishMediaUploadWithSuccess={ this.finishMediaUploadWithSuccess }
+										onFinishMediaUploadWithFailure={ this.finishMediaUploadWithFailure }
+										onMediaUploadStateReset={ this.mediaUploadStateReset }
+										renderContent={ ( params ) => {
+											return (
+												<View style={ styles.content }>
+													{ this.renderContent( params, open ) }
+												</View>
+											);
+										} }
+									/>
+								</View>
+							);
 						} }
 					/>
 				</View>

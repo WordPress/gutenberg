@@ -76,6 +76,10 @@
 		}
 	}
 
+	.has-background-color + ul {
+		background: inherit;
+	}
+
 	// Menu Link
 	a {
 		display: block;
@@ -84,23 +88,13 @@
 
 	// Sub-menu depth indicators
 	ul ul {
-
 		list-style: none;
 		margin-left: 0;
-		// Reset the counter for each UL
-		counter-reset: nested-list;
 
 		li a {
 
 			padding-top: 8px;
 			padding-bottom: 8px;
-
-			&::before {
-				// Increment the dashes
-				counter-increment: nested-list;
-				// Insert dashes with spaces in between
-				content: "\2013\00a0" counters(nested-list, "\2013\00a0", none);
-			}
 		}
 	}
 

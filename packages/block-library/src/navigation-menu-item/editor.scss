@@ -11,11 +11,25 @@
 .wp-block-navigation-menu-item {
 	margin-right: $grid-size;
 
+	.block-editor-block-list__layout {
+		display: block;
+		margin: $grid-size;
+	}
+
 	// Provide a base menu item margin.
 	// This should be the same inside the field,
 	// and the edit container should compensate.
 	// This is to make sure the edit and view are the same.
 	padding: 0 $grid-size;
+
+	// Only display inner blocks when the block is being edited.
+	.block-editor-inner-blocks {
+		display: none;
+	}
+
+	&.is-editing .block-editor-inner-blocks {
+		display: block;
+	}
 }
 
 .wp-block-navigation-menu-item__edit-container {
@@ -25,7 +39,7 @@
 	// Compensate for menu item base padding.
 	margin-left: -$grid-size;
 
-	.wp-block-navigation-menu-item__field {
+	.wp-block-navigation-menu-item__content {
 		margin-right: $grid-size;
 
 		// This should match the padding of the menu item.
@@ -50,14 +64,18 @@
 }
 
 .wp-block-navigation-menu-item {
-	font-family: $editor-font;
-	font-weight: bold;
-	font-size: $text-editor-font-size;
-	background-color: var(--background-color-menu-link);
-	color: var(--color-menu-link);
+	&.is-editing,
+	&.is-selected {
+		min-width: 20px;
+	}
 
-	&:focus {
-		color: var(--color-menu-link);
+	&.has-link .wp-block-navigation-menu-item__content {
+		border-bottom-style: solid;
+		border-bottom-width: 1px;
+	}
+
+	.block-editor-rich-text__editable.is-selected:not(.keep-placeholder-on-focus):not(:focus) [data-rich-text-placeholder]::after {
+		display: inherit;
 	}
 }
 

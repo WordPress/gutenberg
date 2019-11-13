@@ -3,7 +3,7 @@
  */
 
 import {
-	escapeHTML,
+	escapeEditableHTML,
 	escapeAttribute,
 	isValidAttributeName,
 } from '@wordpress/escape-html';
@@ -106,6 +106,6 @@ function createElementHTML( { type, attributes, object, children } ) {
 
 function createChildrenHTML( children = [] ) {
 	return children.map( ( child ) => {
-		return child.text === undefined ? createElementHTML( child ) : escapeHTML( child.text );
+		return child.text === undefined ? createElementHTML( child ) : escapeEditableHTML( child.text );
 	} ).join( '' );
 }

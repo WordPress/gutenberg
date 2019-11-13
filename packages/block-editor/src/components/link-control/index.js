@@ -39,6 +39,9 @@ import LinkControlSettingsDrawer from './settings-drawer';
 import LinkControlSearchItem from './search-item';
 import LinkControlSearchInput from './search-input';
 
+const MODE_EDIT = 'edit';
+// const MODE_SHOW = 'show';
+
 function LinkControl( {
 	className,
 	currentLink,
@@ -46,10 +49,11 @@ function LinkControl( {
 	fetchSearchSuggestions,
 	instanceId,
 	onClose = noop,
+	onChangeMode = noop,
 	onKeyDown = noop,
 	onKeyPress = noop,
 	onLinkChange = noop,
-	onSettingsChange = { noop },
+	onSettingsChange = noop,
 } ) {
 	// State
 	const [ inputValue, setInputValue ] = useState( '' );
@@ -77,9 +81,25 @@ function LinkControl( {
 	};
 
 	// Utils
-	const startEditMode = () => {
-		if ( isFunction( onLinkChange ) ) {
-			onLinkChange();
+
+	/**
+	 * Handler function which switches the mode of the component,
+	 * between `edit` and `show` mode.
+	 * Also, it calls `onChangeMode` callback function.
+	 *
+	 * @param {string} mode Component mode: `show` or `edit`.
+	 */
+	const setMode = ( mode = 'show' ) => () => {
+		setIsEditingLink( MODE_EDIT === mode );
+
+		// Populate input searcher whether
+		// the current link has a title.
+		if ( currentLink && currentLink.title ) {
+			setInputValue( currentLink.title );
+		}
+
+		if ( isFunction( onChangeMode ) ) {
+			onChangeMode( mode );
 		}
 	};
 
@@ -205,7 +225,7 @@ function LinkControl( {
 									<span className="block-editor-link-control__search-item-info">{ filterURLForDisplay( safeDecodeURI( currentLink.url ) ) || '' }</span>
 								</span>
 
-								<Button isDefault onClick={ startEditMode } className="block-editor-link-control__search-item-action block-editor-link-control__search-item-action--edit">
+								<Button isDefault onClick={ setMode( MODE_EDIT ) } className="block-editor-link-control__search-item-action block-editor-link-control__search-item-action--edit">
 									{ __( 'Change' ) }
 								</Button>
 							</div>

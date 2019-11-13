@@ -3,7 +3,7 @@
  */
 import VisuallyHidden from '../';
 
-export default { title: 'VisuallyHidden', component: VisuallyHidden };
+export default { title: 'Components|VisuallyHidden', component: VisuallyHidden };
 
 export const _default = () => (
 	<>
