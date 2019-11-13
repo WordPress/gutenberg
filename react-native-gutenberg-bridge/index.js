@@ -97,8 +97,8 @@ export function requestOtherMediaPickFrom( mediaSource, multiple, callback ) {
 	return RNReactNativeGutenbergBridge.requestOtherMediaPickFrom( mediaSource, multiple, callback );
 }
 
-export function requestImageFullscreenPreview( mediaId, mediaUrl ) {
-	return RNReactNativeGutenbergBridge.requestImageFullscreenPreview( mediaId, mediaUrl );
+export function requestImageFullscreenPreview( mediaUrl ) {
+	return RNReactNativeGutenbergBridge.requestImageFullscreenPreview( mediaUrl );
 }
 
 export default RNReactNativeGutenbergBridge;

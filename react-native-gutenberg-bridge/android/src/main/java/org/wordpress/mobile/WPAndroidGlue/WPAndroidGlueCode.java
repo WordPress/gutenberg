@@ -120,7 +120,7 @@ public class WPAndroidGlueCode {
     }
 
     public interface OnImageFullscreenPreviewListener {
-        void onImageFullscreenPreviewClicked(int mediaId, String mediaSource);
+        void onImageFullscreenPreviewClicked(String mediaSource);
     }
 
     public interface OnReattachQueryListener {
@@ -279,8 +279,8 @@ public class WPAndroidGlueCode {
             }
 
             @Override
-            public void requestImageFullscreenPreview(int mediaId, String mediaSource) {
-                mOnImageFullscreenPreviewListener.onImageFullscreenPreviewClicked(mediaId, mediaSource);
+            public void requestImageFullscreenPreview(String mediaSource) {
+                mOnImageFullscreenPreviewListener.onImageFullscreenPreviewClicked(mediaSource);
             }
         });
 

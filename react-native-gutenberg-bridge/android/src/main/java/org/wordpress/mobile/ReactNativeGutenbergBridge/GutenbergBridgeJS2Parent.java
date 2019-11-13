@@ -103,5 +103,5 @@ public interface GutenbergBridgeJS2Parent {
 
     void requestMediaPickFrom(String mediaSource, MediaUploadCallback mediaUploadCallback, Boolean allowMultipleSelection);
 
-    void requestImageFullscreenPreview(int mediaId, String mediaSource);
+    void requestImageFullscreenPreview(String mediaSource);
 }
