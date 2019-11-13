@@ -124,28 +124,28 @@ function register_block_core_navigation_menu() {
 		array(
 			'category'        => 'layout',
 			'attributes'      => array(
-				'className'               => array(
+				'className'         => array(
 					'type' => 'string',
 				),
 
-				'automaticallyAdd'        => array(
+				'automaticallyAdd'  => array(
 					'type'    => 'boolean',
 					'default' => false,
 				),
 
-				'textColor'               => array(
+				'textColor'         => array(
 					'type' => 'string',
 				),
 
-				'textColorValue'          => array(
+				'textColorValue'    => array(
 					'type' => 'string',
 				),
 
-				'customTextColor'         => array(
+				'customTextColor'   => array(
 					'type' => 'string',
 				),
 
-				'textColorCSSClass'       => array(
+				'textColorCSSClass' => array(
 					'type' => 'string',
 				),
 			),
