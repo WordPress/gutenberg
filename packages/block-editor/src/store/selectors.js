@@ -426,24 +426,16 @@ export function getBlockRootClientId( state, clientId ) {
  *
  * @param {Object} state    Editor state.
  * @param {string} clientId Block from which to find root client ID.
+ * @param {boolean} getDependants Apply createSelector function to call getDependants.
+ * @param {boolean} includeClientId Include client ID in return array.
  *
  * @return {Array} ClientIDs of the parent blocks.
  */
-export const getBlockParents = createSelector(
-	( state, clientId ) => {
-		const parents = [];
-		let current = clientId;
-		while ( !! state.blocks.parents[ current ] ) {
-			current = state.blocks.parents[ current ];
-			parents.push( current );
-		}
-
-		return parents.reverse();
-	},
-	( state ) => [
-		state.blocks.parents,
-	]
-);
+export const getBlockParents = ( state, clientId, getDependants = true, includeClientId = false ) => {
+	return getDependants ?
+		createSelector( getTree( state, clientId, true ), ( dependantState ) => [ dependantState.blocks.parents ] ) :
+		getTree( state, clientId, false, includeClientId );
+};
 
 /**
  * Given a block client ID, returns the root of the hierarchy from which the block is nested, return the block itself for root level blocks.
@@ -468,19 +460,20 @@ export function getBlockHierarchyRootClientId( state, clientId ) {
  *
  * @param {Object} state    Editor state.
  * @param {string} clientId Block from which tree will be created.
+ * @param {boolean} reverse Get parent hierarchy in reverse order (top-most hierarchy first).
+ * @param {boolean} includeClientId Include client ID in return array.
  *
  * @return {Array} Hierarchy tree of client ID.
  */
-export function getTree( state, clientId ) {
+export function getTree( state, clientId, reverse = true, includeClientId = false ) {
+	const parents = includeClientId ? [ clientId ] : [];
 	let current = clientId;
-	const tree = [ current ];
-	do {
+	while ( !! state.blocks.parents[ current ] ) {
 		current = state.blocks.parents[ current ];
-		if ( current ) {
-			tree.push( current );
-		}
-	} while ( current );
-	return tree;
+		parents.push( current );
+	}
+
+	return reverse ? parents.reverse() : parents;
 }
 
 /**
@@ -493,7 +486,7 @@ export function getTree( state, clientId ) {
  */
 export function getFirstToSelectBlock( state, clientId ) {
 	const selectedId = getSelectedBlockClientId( state );
-	const clientTree = getTree( state, clientId );
+	const clientTree = getBlockParents( state, clientId, false, true );
 	const rootParent = clientTree[ clientTree.length - 1 ];
 
 	let index = 0;
@@ -511,7 +504,7 @@ export function getFirstToSelectBlock( state, clientId ) {
 		return rootParent;
 	}
 
-	const selectedTree = getTree( state, selectedId );
+	const selectedTree = getBlockParents( state, selectedId, false, true );
 
 	do {
 		const commonParentIndex = clientTree.indexOf( selectedTree[ index ] );
