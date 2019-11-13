@@ -133,7 +133,7 @@ if (isJitPack) {
     def assetsFolder = 'src/main/assets'
 
     task buildJSBundle(type: NpmTask) {
-        args = ['run native', 'bundle:android']
+        args = ['run', 'bundle:android']
     }
 
     task ensureAssetsDirectory << {
