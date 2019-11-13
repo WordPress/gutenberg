@@ -136,6 +136,7 @@ class RCTAztecView: Aztec.TextView {
         storage.htmlConverter.characterToReplaceLastEmptyLine = Character(.zeroWidthSpace)
         shouldNotifyOfNonUserChanges = false
         disableLinkTapRecognizer()
+        preBackgroundColor = .clear
     }
 
     func addPlaceholder() {
@@ -425,7 +426,7 @@ class RCTAztecView: Aztec.TextView {
 
         setHTML(html)
         updatePlaceholderVisibility()
-        refreshFont()
+        refreshTypingAttributesAndPlaceholderFont()
         if let selection = contents["selection"] as? NSDictionary,
             let start = selection["start"] as? NSNumber,
             let end = selection["end"]  as? NSNumber {
@@ -499,16 +500,25 @@ class RCTAztecView: Aztec.TextView {
     // MARK: - Font Setters
 
     @objc func setFontFamily(_ family: String) {
+        guard fontFamily != family else {
+            return
+        }
         fontFamily = family
         refreshFont()
     }
 
     @objc func setFontSize(_ size: CGFloat) {
+        guard fontSize != size else {
+            return
+        }
         fontSize = size
         refreshFont()
     }
 
     @objc func setFontWeight(_ weight: String) {
+        guard fontWeight != weight else {
+            return
+        }
         fontWeight = weight
         refreshFont()
     }
@@ -557,33 +567,16 @@ class RCTAztecView: Aztec.TextView {
     /// were ever set.
     ///
     private func refreshFont() {
-        guard fontFamily != nil || fontSize != nil || fontWeight != nil else {
-            return
-        }
-
-        let fullRange = NSRange(location: 0, length: textStorage.length)
-
-        textStorage.beginEditing()
-        textStorage.enumerateAttributes(in: fullRange, options: []) { (attributes, subrange, stop) in
-            let oldFont = font(from: attributes)
-            let newFont = applyFontConstraints(to: oldFont)
-
-            textStorage.addAttribute(.font, value: newFont, range: subrange)
-        }
-        textStorage.endEditing()
-
-        refreshTypingAttributesAndPlaceholderFont()
+        let newFont = applyFontConstraints(to: defaultFont)
+        defaultFont = newFont
     }
 
     /// This method refreshes the font for the palceholder field and typing attributes.
     /// This method should not be called directly.  Call `refreshFont()` instead.
     ///
     private func refreshTypingAttributesAndPlaceholderFont() {
-        let oldFont = font(from: typingAttributes)
-        let newFont = applyFontConstraints(to: oldFont)
-
-        typingAttributes[.font] = newFont
-        placeholderLabel.font = newFont
+        let currentFont = font(from: typingAttributes)        
+        placeholderLabel.font = currentFont
     }
 
     // MARK: - Formatting interface
