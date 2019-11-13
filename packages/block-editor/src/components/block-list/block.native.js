@@ -75,6 +75,8 @@ class BlockListBlock extends Component {
 				isDashed={ this.props.isDashed }
 				isChildOfSameRootBlock={ this.props.isChildOfSameRootBlock }
 				isGroupParent={ this.props.isGroupParent }
+				parentId={ this.props.parentId }
+				isMediaTextChildSelected={ this.props.isMediaTextChildSelected }
 			/>
 		);
 	}
@@ -294,6 +296,7 @@ export default compose( [
 		const hasInnerBlock = blockType.name === 'core/group' || blockType.name === 'core/media-text';
 		const isParentSelected = parentId === selectedBlockClientId;
 		const isTouchable = ( Platform.OS !== 'android' || firstToSelectId !== clientId ) ? {} : { pointerEvents: 'none' };
+		const isMediaTextChildSelected = blockType.name === 'core/media-text' && getBlockRootClientId( selectedBlockClientId ) === clientId;
 
 		return {
 			icon,
@@ -319,6 +322,7 @@ export default compose( [
 			isMediaTextParent,
 			isGroupParent,
 			isTouchable,
+			isMediaTextChildSelected,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {
