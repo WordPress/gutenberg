@@ -289,6 +289,9 @@ export class ImageEdit extends React.Component {
 						checked={ linkTarget === '_blank' }
 						onChange={ this.onSetNewTab }
 					/>
+
+					{/* TO DO - is it possible to close surrounding modal, 
+					and then show another Picker, while using PickerCell (SelectControl)?  */}
 					{ // eslint-disable-next-line no-undef
 						__DEV__ &&
 						<SelectControl
