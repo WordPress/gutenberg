@@ -34,7 +34,7 @@ import { withViewportMatch } from '@wordpress/viewport';
 /**
  * Internal dependencies
  */
-import { icon } from './icons';
+import { sharedIcon } from './shared-icon';
 import { defaultColumnsNumber, pickRelevantMediaFiles } from './shared';
 import Gallery from './gallery';
 
@@ -274,7 +274,7 @@ class GalleryEdit extends Component {
 				isAppender={ hasImages }
 				className={ className }
 				disableMediaButtons={ hasImages && ! isSelected }
-				icon={ ! hasImages && icon }
+				icon={ ! hasImages && sharedIcon }
 				labels={ {
 					title: ! hasImages && __( 'Gallery' ),
 					instructions: ! hasImages && placeholderText,
