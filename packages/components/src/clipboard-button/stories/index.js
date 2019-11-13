@@ -13,7 +13,7 @@ import { useState } from '@wordpress/element';
  */
 import ClipboardButton from '../';
 
-export default { title: 'ClipboardButton', component: ClipboardButton };
+export default { title: 'Components|ClipboardButton', component: ClipboardButton };
 
 const ClipboardButtonWithState = ( { copied, ...props } ) => {
 	const [ isCopied, setCopied ] = useState( copied );

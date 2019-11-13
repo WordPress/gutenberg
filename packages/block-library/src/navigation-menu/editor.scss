@@ -121,11 +121,6 @@ $colors-selector-size: 22px;
 		min-height: $colors-selector-size;
 		line-height: ($colors-selector-size - 2);
 		padding: 2px;
-
-		&:not(.has-background-color) {
-			background-image: linear-gradient(135deg, rgba(0, 0, 0, 0.08) 25%, transparent 25%, transparent 50%, rgba(0, 0, 0, 0.08) 50%, rgba(0, 0, 0, 0.08) 75%, transparent 75%, transparent 100%);
-			background-size: 12px 12px;
-		}
 	}
 }
 

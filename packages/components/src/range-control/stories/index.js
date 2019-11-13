@@ -13,7 +13,7 @@ import { useState } from '@wordpress/element';
  */
 import RangeControl from '../';
 
-export default { title: 'RangeControl', component: RangeControl };
+export default { title: 'Components|RangeControl', component: RangeControl };
 
 const RangeControlWithState = ( props ) => {
 	const [ value, setValue ] = useState( 5 );

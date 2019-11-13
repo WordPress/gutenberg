@@ -112,7 +112,7 @@ When selected, your block may surface additional options like input fields or bu
 
 ![A Google Maps block with inline, always-accessible controls required for the block to function](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/designers/assets/block-controls-do.png)
 **Do:**
-For controls that are essential the the operation of the block, provide them directly in inside the block edit view.
+For controls that are essential for the operation of the block, provide them directly in inside the block edit view.
 
 ![A Google Maps block with essential controls moved to the sidebar where they can be contextually hidden](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/designers/assets/block-controls-dont.png)
 **Don't:**

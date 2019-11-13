@@ -9,7 +9,7 @@ import { useState } from '@wordpress/element';
 import Draggable from '../';
 import Dashicon from '../../dashicon';
 
-export default { title: 'Draggable', component: Draggable };
+export default { title: 'Components|Draggable', component: Draggable };
 
 const Box = ( props ) => {
 	return (
