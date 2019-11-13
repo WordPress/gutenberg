@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map } from 'lodash';
+import { isNil, map, omitBy } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -59,7 +59,7 @@ export default function BlockNavigationList( {
 		 */
 		/* eslint-disable jsx-a11y/no-redundant-roles */
 		<ul className="editor-block-navigation__list block-editor-block-navigation__list" role="list">
-			{ map( blocks, ( block ) => {
+			{ map( omitBy( blocks, isNil ), ( block ) => {
 				const blockType = getBlockType( block.name );
 				const isSelected = block.clientId === selectedBlockClientId;
 

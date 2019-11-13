@@ -45,9 +45,7 @@ function NavigationMenu( {
 	pages,
 	isRequestingPages,
 	hasResolvedPages,
-	backgroundColor,
 	textColor,
-	setBackgroundColor,
 	setTextColor,
 	setAttributes,
 	hasExistingNavItems,
@@ -61,10 +59,9 @@ function NavigationMenu( {
 	useEffect( () => {
 		// Set/Unset colors CSS classes.
 		setAttributes( {
-			backgroundColorCSSClass: backgroundColor.class ? backgroundColor.class : null,
 			textColorCSSClass: textColor.class ? textColor.class : null,
 		} );
-	}, [ backgroundColor.class, textColor.class ] );
+	}, [ textColor.class ] );
 
 	// Builds menu items from default Pages
 	const defaultPagesMenuItems = useMemo(
@@ -92,30 +89,6 @@ function NavigationMenu( {
 	//
 	// HANDLERS
 	//
-
-	/**
-	 * Set the color type according to the given values.
-	 * It propagate the color values into the attributes object.
-	 * Both `backgroundColorValue` and `textColorValue` are
-	 * using the inline styles.
-	 *
-	 * @param {Object}  colorsData       Arguments passed by BlockColorsStyleSelector onColorChange.
-	 * @param {string}  colorsData.attr  Color attribute.
-	 * @param {boolean} colorsData.value Color attribute value.
-	 */
-	const setColorType = ( { attr, value } ) => {
-		switch ( attr ) {
-			case 'backgroundColor':
-				setBackgroundColor( value );
-				setAttributes( { backgroundColorValue: value } );
-				break;
-
-			case 'textColor':
-				setTextColor( value );
-				setAttributes( { textColorValue: value } );
-				break;
-		}
-	};
 
 	const handleCreateEmpty = () => {
 		const emptyNavItemBlock = createBlock( 'core/navigation-menu-item' );
@@ -186,15 +159,12 @@ function NavigationMenu( {
 			color: textColor.color,
 			borderColor: textColor.color,
 		} ),
-		...( backgroundColor && { backgroundColor: backgroundColor.color } ),
 	};
 
 	// Build ClassNames
 	const navigationMenuClasses = classnames(
 		'wp-block-navigation-menu', {
 			'has-text-color': textColor.color,
-			'has-background-color': backgroundColor.color,
-			[ attributes.backgroundColorCSSClass ]: attributes && attributes.backgroundColorCSSClass,
 			[ attributes.textColorCSSClass ]: attributes && attributes.textColorCSSClass,
 		}
 	);
@@ -207,9 +177,12 @@ function NavigationMenu( {
 					{ navigatorToolbarButton }
 				</ToolbarGroup>
 				<BlockColorsStyleSelector
-					backgroundColor={ backgroundColor }
 					textColor={ textColor }
-					onColorChange={ setColorType }
+					textColorValue={ attributes.textColorValue }
+					onColorChange={ ( { value } ) => {
+						setTextColor( value );
+						setAttributes( { textColorValue: value } );
+					} }
 				/>
 			</BlockControls>
 			{ navigatorModal }
@@ -248,7 +221,7 @@ function NavigationMenu( {
 }
 
 export default compose( [
-	withColors( { backgroundColor: 'background-color', textColor: 'color' } ),
+	withColors( { textColor: 'color' } ),
 	withSelect( ( select, { clientId } ) => {
 		const innerBlocks = select( 'core/block-editor' ).getBlocks( clientId );
 		const hasExistingNavItems = !! innerBlocks.length;
