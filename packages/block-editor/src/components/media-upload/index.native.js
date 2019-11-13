@@ -5,6 +5,7 @@ import React from 'react';
 import {
 	getOtherMediaOptions,
 	requestMediaPicker,
+	mediaSources,
 } from 'react-native-gutenberg-bridge';
 
 /**
@@ -15,10 +16,6 @@ import { Picker } from '@wordpress/components';
 
 export const MEDIA_TYPE_IMAGE = 'image';
 export const MEDIA_TYPE_VIDEO = 'video';
-
-export const MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_CHOOSE_FROM_DEVICE = 'DEVICE_MEDIA_LIBRARY';
-export const MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_TAKE_MEDIA = 'DEVICE_CAMERA';
-export const MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY = 'SITE_MEDIA_LIBRARY';
 
 export const OPTION_TAKE_VIDEO = __( 'Take a Video' );
 export const OPTION_TAKE_PHOTO = __( 'Take a Photo' );
@@ -66,9 +63,9 @@ export class MediaUpload extends React.Component {
 
 	getMediaOptionsItems() {
 		return [
-			{ icon: this.getChooseFromDeviceIcon(), value: MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_CHOOSE_FROM_DEVICE, label: __( 'Choose from device' ) },
-			{ icon: this.getTakeMediaIcon(), value: MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_TAKE_MEDIA, label: this.getTakeMediaLabel() },
-			{ icon: this.getWordPressLibraryIcon(), value: MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY, label: __( 'WordPress Media Library' ) },
+			{ icon: this.getChooseFromDeviceIcon(), value: mediaSources.deviceLibrary, label: __( 'Choose from device' ) },
+			{ icon: this.getTakeMediaIcon(), value: mediaSources.deviceCamera, label: this.getTakeMediaLabel() },
+			{ icon: this.getWordPressLibraryIcon(), value: mediaSources.siteMediaLirary, label: __( 'WordPress Media Library' ) },
 		];
 	}
 
