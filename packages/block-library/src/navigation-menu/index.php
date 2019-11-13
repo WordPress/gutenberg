@@ -95,7 +95,7 @@ function build_navigation_menu_html( $block, $colors ) {
 		} else {
 			$item_content_markup =
 				'<span
-					class="wp-block-navigation-menu-item__label ' . $colors['text_css_classes'] . '"
+					class="wp-block-navigation-menu-item__text ' . $colors['text_css_classes'] . '"
 					' . $colors['text_inline_styles'] .
 				'>' .
 					( isset( $block['attrs']['label'] ) ? $label : '' ) .
