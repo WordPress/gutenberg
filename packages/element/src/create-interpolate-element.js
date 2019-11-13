@@ -126,10 +126,7 @@ const createInterpolateElement = ( interpolatedString, conversionMap ) => {
 	do {
 		// twiddle our thumbs
 	} while ( proceed( conversionMap ) );
-
-	return ! output.every( ( element ) => typeof element === 'string' ) ?
-		createElement( Fragment, {}, output ) :
-		output.join( '' );
+	return createElement( Fragment, null, ...output );
 };
 
 /**
@@ -188,7 +185,7 @@ function proceed( conversionMap ) {
 						indoc.substr( leadingTextStart, startOffset - leadingTextStart )
 					);
 				}
-				output.push( cloneElement( conversionMap[ name ], { key: name } ) );
+				output.push( conversionMap[ name ] );
 				offset = startOffset + tokenLength;
 				return true;
 			}
@@ -298,7 +295,7 @@ function addChild( component, tokenStart, tokenLength, lastOffset ) {
 	}
 
 	parent.component.children.push(
-		cloneElement( component.element, { key: component.name }, component.children )
+		cloneElement( component.element, null, ...component.children )
 	);
 	parent.prevOffset = lastOffset ? lastOffset : tokenStart + tokenLength;
 }
@@ -321,8 +318,8 @@ function addComponentFromStack( endOffset ) {
 	output.push(
 		cloneElement(
 			component.element,
-			{ key: component.name },
-			component.children
+			null,
+			...component.children
 		)
 	);
 }
