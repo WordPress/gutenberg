@@ -28,9 +28,10 @@ const ColorSelectorIcon = ( { textColor, textColorValue } ) => {
 	const iconClasses = classnames(
 		'block-library-colors-selector__state-selection',
 		'editor-styles-wrapper', {
-		'has-text-color': textColor && textColor.color,
-		[ textColor.class ]: textColor && textColor.class,
-	} );
+			'has-text-color': textColor && textColor.color,
+			[ textColor.class ]: textColor && textColor.class,
+		}
+	);
 
 	return (
 		<div className="block-library-colors-selector__icon-container">
