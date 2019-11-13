@@ -1,23 +1,22 @@
 /**
  * External dependencies
  */
-import initStoryshots from '@storybook/addon-storyshots';
+import initStoryshots, { snapshotWithOptions } from '@storybook/addon-storyshots';
 import path from 'path';
-
-/**
- * The list of components that should be skipped because they
- * don't work with the default Storyshots setup.
- *
- * @type {string[]}
- */
-const skippedComponents = [
-	'ClipboardButton',
-];
 
 initStoryshots( {
 	configPath: path.resolve( __dirname, '../' ),
-	suite: '@wordpress/components',
-	storyKindRegex: new RegExp(
-		`^((?!${ skippedComponents.join( '|' ) }).)*$`
-	),
+	test: snapshotWithOptions( ( { kind } ) => ( {
+		// We need to mock refs for some stories which use them.
+		// @see https://reactjs.org/blog/2016/11/16/react-v15.4.0.html#mocking-refs-for-snapshot-testing
+		// @see https://github.com/storybookjs/storybook/tree/master/addons/storyshots/storyshots-core#using-createnodemock-to-mock-refs
+		createNodeMock: () => {
+			if ( kind === 'Components|ClipboardButton' ) {
+				return {
+					firstChild: document.createElement( 'button' ),
+				};
+			}
+			return null;
+		},
+	} ) ),
 } );

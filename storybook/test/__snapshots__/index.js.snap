@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`@wordpress/components Components|Animate Appear Bottom Left 1`] = `
+exports[`Storyshots Components|Animate Appear Bottom Left 1`] = `
 <div
   className="components-animate__appear is-from-left is-from-bottom components-notice is-success is-dismissible"
 >
@@ -37,7 +37,7 @@ exports[`@wordpress/components Components|Animate Appear Bottom Left 1`] = `
 </div>
 `;
 
-exports[`@wordpress/components Components|Animate Appear Bottom Right 1`] = `
+exports[`Storyshots Components|Animate Appear Bottom Right 1`] = `
 <div
   className="components-animate__appear is-from-right is-from-bottom components-notice is-success is-dismissible"
 >
@@ -74,7 +74,7 @@ exports[`@wordpress/components Components|Animate Appear Bottom Right 1`] = `
 </div>
 `;
 
-exports[`@wordpress/components Components|Animate Appear Top Left 1`] = `
+exports[`Storyshots Components|Animate Appear Top Left 1`] = `
 <div
   className="components-animate__appear is-from-left is-from-top components-notice is-success is-dismissible"
 >
@@ -111,7 +111,7 @@ exports[`@wordpress/components Components|Animate Appear Top Left 1`] = `
 </div>
 `;
 
-exports[`@wordpress/components Components|Animate Appear Top Right 1`] = `
+exports[`Storyshots Components|Animate Appear Top Right 1`] = `
 <div
   className="components-animate__appear is-from-right is-from-top components-notice is-success is-dismissible"
 >
@@ -148,7 +148,7 @@ exports[`@wordpress/components Components|Animate Appear Top Right 1`] = `
 </div>
 `;
 
-exports[`@wordpress/components Components|Animate Default 1`] = `
+exports[`Storyshots Components|Animate Default 1`] = `
 <div
   className="components-notice is-success is-dismissible"
 >
@@ -183,7 +183,7 @@ exports[`@wordpress/components Components|Animate Default 1`] = `
 </div>
 `;
 
-exports[`@wordpress/components Components|Animate Loading 1`] = `
+exports[`Storyshots Components|Animate Loading 1`] = `
 <div
   className="components-animate__loading components-notice is-success is-dismissible"
 >
@@ -218,7 +218,7 @@ exports[`@wordpress/components Components|Animate Loading 1`] = `
 </div>
 `;
 
-exports[`@wordpress/components Components|Animate Slide In 1`] = `
+exports[`Storyshots Components|Animate Slide In 1`] = `
 <div
   className="components-animate__slide-in is-from-left components-notice is-success is-dismissible"
 >
@@ -253,7 +253,7 @@ exports[`@wordpress/components Components|Animate Slide In 1`] = `
 </div>
 `;
 
-exports[`@wordpress/components Components|Button Default 1`] = `
+exports[`Storyshots Components|Button Default 1`] = `
 <button
   className="components-button"
   type="button"
@@ -262,7 +262,7 @@ exports[`@wordpress/components Components|Button Default 1`] = `
 </button>
 `;
 
-exports[`@wordpress/components Components|Button Disabled 1`] = `
+exports[`Storyshots Components|Button Disabled 1`] = `
 <button
   className="components-button"
   disabled={true}
@@ -272,7 +272,7 @@ exports[`@wordpress/components Components|Button Disabled 1`] = `
 </button>
 `;
 
-exports[`@wordpress/components Components|Button Disabled Link 1`] = `
+exports[`Storyshots Components|Button Disabled Link 1`] = `
 <button
   className="components-button"
   disabled={true}
@@ -282,7 +282,7 @@ exports[`@wordpress/components Components|Button Disabled Link 1`] = `
 </button>
 `;
 
-exports[`@wordpress/components Components|Button Large 1`] = `
+exports[`Storyshots Components|Button Large 1`] = `
 <button
   className="components-button is-button is-default is-large"
   type="button"
@@ -291,7 +291,7 @@ exports[`@wordpress/components Components|Button Large 1`] = `
 </button>
 `;
 
-exports[`@wordpress/components Components|Button Large Primary 1`] = `
+exports[`Storyshots Components|Button Large Primary 1`] = `
 <button
   className="components-button is-button is-primary is-large"
   type="button"
@@ -300,7 +300,7 @@ exports[`@wordpress/components Components|Button Large Primary 1`] = `
 </button>
 `;
 
-exports[`@wordpress/components Components|Button Link 1`] = `
+exports[`Storyshots Components|Button Link 1`] = `
 <a
   className="components-button"
   href="https://wordpress.org/"
@@ -310,7 +310,7 @@ exports[`@wordpress/components Components|Button Link 1`] = `
 </a>
 `;
 
-exports[`@wordpress/components Components|Button Primary 1`] = `
+exports[`Storyshots Components|Button Primary 1`] = `
 <button
   className="components-button is-button is-primary"
   type="button"
@@ -319,7 +319,7 @@ exports[`@wordpress/components Components|Button Primary 1`] = `
 </button>
 `;
 
-exports[`@wordpress/components Components|Button Small 1`] = `
+exports[`Storyshots Components|Button Small 1`] = `
 <button
   className="components-button is-button is-default is-small"
   type="button"
@@ -328,7 +328,7 @@ exports[`@wordpress/components Components|Button Small 1`] = `
 </button>
 `;
 
-exports[`@wordpress/components Components|Button Toggled 1`] = `
+exports[`Storyshots Components|Button Toggled 1`] = `
 <button
   className="components-button is-toggled"
   type="button"
@@ -337,7 +337,7 @@ exports[`@wordpress/components Components|Button Toggled 1`] = `
 </button>
 `;
 
-exports[`@wordpress/components Components|ButtonGroup Default 1`] = `
+exports[`Storyshots Components|ButtonGroup Default 1`] = `
 <div
   className="components-button-group"
   role="group"
@@ -367,7 +367,7 @@ exports[`@wordpress/components Components|ButtonGroup Default 1`] = `
 </div>
 `;
 
-exports[`@wordpress/components Components|CheckboxControl All 1`] = `
+exports[`Storyshots Components|CheckboxControl All 1`] = `
 <div
   className="components-base-control"
 >
@@ -423,7 +423,7 @@ exports[`@wordpress/components Components|CheckboxControl All 1`] = `
 </div>
 `;
 
-exports[`@wordpress/components Components|CheckboxControl Default 1`] = `
+exports[`Storyshots Components|CheckboxControl Default 1`] = `
 <div
   className="components-base-control"
 >
@@ -466,7 +466,20 @@ exports[`@wordpress/components Components|CheckboxControl Default 1`] = `
 </div>
 `;
 
-exports[`@wordpress/components Components|ColorIndicator Default 1`] = `
+exports[`Storyshots Components|ClipboardButton Default 1`] = `
+<span
+  onCopy={[Function]}
+>
+  <button
+    className="components-button components-clipboard-button is-button is-primary"
+    type="button"
+  >
+    Copy "Text"
+  </button>
+</span>
+`;
+
+exports[`Storyshots Components|ColorIndicator Default 1`] = `
 <span
   className="component-color-indicator"
   style={
@@ -477,7 +490,7 @@ exports[`@wordpress/components Components|ColorIndicator Default 1`] = `
 />
 `;
 
-exports[`@wordpress/components Components|ColorPalette Default 1`] = `
+exports[`Storyshots Components|ColorPalette Default 1`] = `
 <div
   className="components-circular-option-picker"
 >
@@ -571,7 +584,7 @@ exports[`@wordpress/components Components|ColorPalette Default 1`] = `
 </div>
 `;
 
-exports[`@wordpress/components Components|ColorPalette With Knobs 1`] = `
+exports[`Storyshots Components|ColorPalette With Knobs 1`] = `
 <div
   className="components-circular-option-picker"
 >
@@ -665,7 +678,7 @@ exports[`@wordpress/components Components|ColorPalette With Knobs 1`] = `
 </div>
 `;
 
-exports[`@wordpress/components Components|ColorPicker Alpha Enabled 1`] = `
+exports[`Storyshots Components|ColorPicker Alpha Enabled 1`] = `
 <div
   className="components-color-picker is-alpha-enabled"
 >
@@ -876,7 +889,7 @@ exports[`@wordpress/components Components|ColorPicker Alpha Enabled 1`] = `
 </div>
 `;
 
-exports[`@wordpress/components Components|ColorPicker Default 1`] = `
+exports[`Storyshots Components|ColorPicker Default 1`] = `
 <div
   className="components-color-picker is-alpha-disabled"
 >
@@ -1050,7 +1063,7 @@ exports[`@wordpress/components Components|ColorPicker Default 1`] = `
 </div>
 `;
 
-exports[`@wordpress/components Components|Dashicon Default 1`] = `
+exports[`Storyshots Components|Dashicon Default 1`] = `
 <svg
   aria-hidden="true"
   className="dashicon dashicons-wordpress"
@@ -1068,7 +1081,7 @@ exports[`@wordpress/components Components|Dashicon Default 1`] = `
 </svg>
 `;
 
-exports[`@wordpress/components Components|Draggable Default 1`] = `
+exports[`Storyshots Components|Draggable Default 1`] = `
 <div>
   <p>
     Is Dragging? 
@@ -1116,7 +1129,7 @@ exports[`@wordpress/components Components|Draggable Default 1`] = `
 </div>
 `;
 
-exports[`@wordpress/components Components|ExternalLink Default 1`] = `
+exports[`Storyshots Components|ExternalLink Default 1`] = `
 <a
   className="components-external-link"
   href="https://wordpress.org"
@@ -1146,7 +1159,7 @@ exports[`@wordpress/components Components|ExternalLink Default 1`] = `
 </a>
 `;
 
-exports[`@wordpress/components Components|FontSizePicker Default 1`] = `
+exports[`Storyshots Components|FontSizePicker Default 1`] = `
 <fieldset
   className="components-font-size-picker"
 >
@@ -1217,7 +1230,7 @@ exports[`@wordpress/components Components|FontSizePicker Default 1`] = `
 </fieldset>
 `;
 
-exports[`@wordpress/components Components|FontSizePicker With Slider 1`] = `
+exports[`Storyshots Components|FontSizePicker With Slider 1`] = `
 <fieldset
   className="components-font-size-picker"
 >
@@ -1342,7 +1355,7 @@ exports[`@wordpress/components Components|FontSizePicker With Slider 1`] = `
 </fieldset>
 `;
 
-exports[`@wordpress/components Components|FontSizePicker Without Custom Sizes 1`] = `
+exports[`Storyshots Components|FontSizePicker Without Custom Sizes 1`] = `
 <fieldset
   className="components-font-size-picker"
 >
@@ -1406,7 +1419,7 @@ exports[`@wordpress/components Components|FontSizePicker Without Custom Sizes 1`
 </fieldset>
 `;
 
-exports[`@wordpress/components Components|Icon Colors 1`] = `
+exports[`Storyshots Components|Icon Colors 1`] = `
 Array [
   <div
     style={
@@ -1513,7 +1526,7 @@ Array [
 ]
 `;
 
-exports[`@wordpress/components Components|Icon Default 1`] = `
+exports[`Storyshots Components|Icon Default 1`] = `
 <div>
   <svg
     aria-hidden="true"
@@ -1542,7 +1555,7 @@ exports[`@wordpress/components Components|Icon Default 1`] = `
 </div>
 `;
 
-exports[`@wordpress/components Components|Icon Sizes 1`] = `
+exports[`Storyshots Components|Icon Sizes 1`] = `
 Array [
   <div
     style={
@@ -1844,7 +1857,7 @@ Array [
 ]
 `;
 
-exports[`@wordpress/components Components|Icon With A Component 1`] = `
+exports[`Storyshots Components|Icon With A Component 1`] = `
 <svg
   aria-hidden="true"
   focusable="false"
@@ -1856,7 +1869,7 @@ exports[`@wordpress/components Components|Icon With A Component 1`] = `
 </svg>
 `;
 
-exports[`@wordpress/components Components|Icon With A Function 1`] = `
+exports[`Storyshots Components|Icon With A Function 1`] = `
 <svg
   aria-hidden="true"
   focusable="false"
@@ -1868,7 +1881,7 @@ exports[`@wordpress/components Components|Icon With A Function 1`] = `
 </svg>
 `;
 
-exports[`@wordpress/components Components|Icon With An SVG 1`] = `
+exports[`Storyshots Components|Icon With An SVG 1`] = `
 <svg
   aria-hidden="true"
   focusable="false"
@@ -1882,7 +1895,7 @@ exports[`@wordpress/components Components|Icon With An SVG 1`] = `
 </svg>
 `;
 
-exports[`@wordpress/components Components|IconButton Default 1`] = `
+exports[`Storyshots Components|IconButton Default 1`] = `
 <button
   aria-label="More"
   className="components-button components-icon-button"
@@ -1911,7 +1924,7 @@ exports[`@wordpress/components Components|IconButton Default 1`] = `
 </button>
 `;
 
-exports[`@wordpress/components Components|IconButton Grouped 1`] = `
+exports[`Storyshots Components|IconButton Grouped 1`] = `
 <div
   style={
     Object {
@@ -2000,7 +2013,7 @@ exports[`@wordpress/components Components|IconButton Grouped 1`] = `
 </div>
 `;
 
-exports[`@wordpress/components Components|Modal Default 1`] = `
+exports[`Storyshots Components|Modal Default 1`] = `
 <button
   className="components-button is-button is-default"
   onClick={[Function]}
@@ -2010,7 +2023,7 @@ exports[`@wordpress/components Components|Modal Default 1`] = `
 </button>
 `;
 
-exports[`@wordpress/components Components|RangeControl Default 1`] = `
+exports[`Storyshots Components|RangeControl Default 1`] = `
 <div
   className="components-base-control components-range-control"
 >
@@ -2042,7 +2055,7 @@ exports[`@wordpress/components Components|RangeControl Default 1`] = `
 </div>
 `;
 
-exports[`@wordpress/components Components|RangeControl With Help 1`] = `
+exports[`Storyshots Components|RangeControl With Help 1`] = `
 <div
   className="components-base-control components-range-control"
 >
@@ -2081,7 +2094,7 @@ exports[`@wordpress/components Components|RangeControl With Help 1`] = `
 </div>
 `;
 
-exports[`@wordpress/components Components|RangeControl With Icon After 1`] = `
+exports[`Storyshots Components|RangeControl With Icon After 1`] = `
 <div
   className="components-base-control components-range-control"
 >
@@ -2127,7 +2140,7 @@ exports[`@wordpress/components Components|RangeControl With Icon After 1`] = `
 </div>
 `;
 
-exports[`@wordpress/components Components|RangeControl With Icon Before 1`] = `
+exports[`Storyshots Components|RangeControl With Icon Before 1`] = `
 <div
   className="components-base-control components-range-control"
 >
@@ -2173,7 +2186,7 @@ exports[`@wordpress/components Components|RangeControl With Icon Before 1`] = `
 </div>
 `;
 
-exports[`@wordpress/components Components|RangeControl With Minimum And Maximum Limits 1`] = `
+exports[`Storyshots Components|RangeControl With Minimum And Maximum Limits 1`] = `
 <div
   className="components-base-control components-range-control"
 >
@@ -2209,7 +2222,7 @@ exports[`@wordpress/components Components|RangeControl With Minimum And Maximum 
 </div>
 `;
 
-exports[`@wordpress/components Components|RangeControl With Reset 1`] = `
+exports[`Storyshots Components|RangeControl With Reset 1`] = `
 <div
   className="components-base-control components-range-control"
 >
@@ -2249,7 +2262,7 @@ exports[`@wordpress/components Components|RangeControl With Reset 1`] = `
 </div>
 `;
 
-exports[`@wordpress/components Components|ResizableBox Default 1`] = `
+exports[`Storyshots Components|ResizableBox Default 1`] = `
 <div
   style={
     Object {
@@ -2349,7 +2362,7 @@ exports[`@wordpress/components Components|ResizableBox Default 1`] = `
 </div>
 `;
 
-exports[`@wordpress/components Components|ScrollLock Default 1`] = `
+exports[`Storyshots Components|ScrollLock Default 1`] = `
 <div
   style={
     Object {
@@ -2395,7 +2408,7 @@ exports[`@wordpress/components Components|ScrollLock Default 1`] = `
 </div>
 `;
 
-exports[`@wordpress/components Components|Snackbar Default 1`] = `
+exports[`Storyshots Components|Snackbar Default 1`] = `
 <div
   className="components-snackbar"
   label="Dismiss this notice"
@@ -2412,7 +2425,7 @@ exports[`@wordpress/components Components|Snackbar Default 1`] = `
 </div>
 `;
 
-exports[`@wordpress/components Components|Snackbar With Actions 1`] = `
+exports[`Storyshots Components|Snackbar With Actions 1`] = `
 <div
   className="components-snackbar"
   label="Dismiss this notice"
@@ -2436,13 +2449,13 @@ exports[`@wordpress/components Components|Snackbar With Actions 1`] = `
 </div>
 `;
 
-exports[`@wordpress/components Components|Spinner Default 1`] = `
+exports[`Storyshots Components|Spinner Default 1`] = `
 <span
   className="components-spinner"
 />
 `;
 
-exports[`@wordpress/components Components|ToggleControl Default 1`] = `
+exports[`Storyshots Components|ToggleControl Default 1`] = `
 <div
   className="components-base-control components-toggle-control"
 >
@@ -2490,7 +2503,7 @@ exports[`@wordpress/components Components|ToggleControl Default 1`] = `
 </div>
 `;
 
-exports[`@wordpress/components Components|ToggleControl With Help Text 1`] = `
+exports[`Storyshots Components|ToggleControl With Help Text 1`] = `
 <div
   className="components-base-control components-toggle-control"
 >
@@ -2545,7 +2558,7 @@ exports[`@wordpress/components Components|ToggleControl With Help Text 1`] = `
 </div>
 `;
 
-exports[`@wordpress/components Components|VisuallyHidden Default 1`] = `
+exports[`Storyshots Components|VisuallyHidden Default 1`] = `
 Array [
   <div
     className="components-visually-hidden"
