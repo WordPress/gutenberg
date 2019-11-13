@@ -26,19 +26,19 @@ let indoc,
 const tokenizer = /<(\/)?(\w+)\s*(\/)?>/g;
 
 /**
- * An object describing a component to be created.
+ * Describes an element and it's properties.
  *
  * This is used by the string iterator to track children that get added to an
  * element when it is created. This allows for collecting nested elements in
  * the string before creating the parent.
  *
  * @private
- * @param {string}    name    The name of the component.
+ * @param {string}    name    The name of the element.
  * @param {WPElement} element The element
  *
- * @return {Component} An object returning the creator and children.
+ * @return {Element} A constructor for the Element.
  */
-function Component( name, element ) {
+function Element( name, element ) {
 	return {
 		name,
 		element,
@@ -53,7 +53,7 @@ function Component( name, element ) {
  * parsed.
  *
  * @private
- * @param {Component} component        A parent element which may still have
+ * @param {Element}   element          A parent element which may still have
  *                                     nested children not yet parsed.
  * @param {number}    tokenStart       Offset at which parent element first
  *                                     appears.
@@ -68,14 +68,14 @@ function Component( name, element ) {
  * @return {Frame} The stack frame tracking parse progress.
  */
 function Frame(
-	component,
+	element,
 	tokenStart,
 	tokenLength,
 	prevOffset,
 	leadingTextStart
 ) {
 	return {
-		component,
+		element,
 		tokenStart,
 		tokenLength,
 		prevOffset,
@@ -192,7 +192,7 @@ function proceed( conversionMap ) {
 
 			// otherwise we found an inner element
 			addChild(
-				new Component( name, conversionMap[ name ] ),
+				new Element( name, conversionMap[ name ] ),
 				startOffset,
 				tokenLength
 			);
@@ -202,7 +202,7 @@ function proceed( conversionMap ) {
 		case 'opener':
 			stack.push(
 				Frame(
-					new Component( name, conversionMap[ name ] ),
+					new Element( name, conversionMap[ name ] ),
 					startOffset,
 					tokenLength,
 					startOffset + tokenLength,
@@ -215,7 +215,7 @@ function proceed( conversionMap ) {
 		case 'closer':
 			// if we're not nesting then this is easy - close the block
 			if ( 1 === stackDepth ) {
-				addComponentFromStack( startOffset );
+				addElementFromStack( startOffset );
 				offset = startOffset + tokenLength;
 				return true;
 			}
@@ -227,11 +227,11 @@ function proceed( conversionMap ) {
 				stackTop.prevOffset,
 				startOffset - stackTop.prevOffset
 			);
-			stackTop.component.children.push( text );
+			stackTop.element.children.push( text );
 			stackTop.prevOffset = startOffset + tokenLength;
 
 			addChild(
-				stackTop.component,
+				stackTop.element,
 				stackTop.tokenStart,
 				stackTop.tokenLength,
 				startOffset + tokenLength
@@ -286,29 +286,29 @@ function addText( rawLength ) {
 	output.push( indoc.substr( offset, length ) );
 }
 
-function addChild( component, tokenStart, tokenLength, lastOffset ) {
+function addChild( element, tokenStart, tokenLength, lastOffset ) {
 	const parent = stack[ stack.length - 1 ];
 	const text = indoc.substr( parent.prevOffset, tokenStart - parent.prevOffset );
 
 	if ( text ) {
-		parent.component.children.push( text );
+		parent.element.children.push( text );
 	}
 
-	parent.component.children.push(
-		cloneElement( component.element, null, ...component.children )
+	parent.element.children.push(
+		cloneElement( element.element, null, ...element.children )
 	);
 	parent.prevOffset = lastOffset ? lastOffset : tokenStart + tokenLength;
 }
 
-function addComponentFromStack( endOffset ) {
-	const { component, leadingTextStart, prevOffset, tokenStart } = stack.pop();
+function addElementFromStack( endOffset ) {
+	const { element, leadingTextStart, prevOffset, tokenStart } = stack.pop();
 
 	const text = endOffset ?
 		indoc.substr( prevOffset, endOffset - prevOffset ) :
 		indoc.substr( prevOffset );
 
 	if ( text ) {
-		component.children.push( text );
+		element.children.push( text );
 	}
 
 	if ( null !== leadingTextStart ) {
@@ -317,9 +317,9 @@ function addComponentFromStack( endOffset ) {
 
 	output.push(
 		cloneElement(
-			component.element,
+			element.element,
 			null,
-			...component.children
+			...element.children
 		)
 	);
 }
