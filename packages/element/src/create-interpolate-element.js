@@ -201,7 +201,7 @@ function proceed( conversionMap ) {
 
 		case 'opener':
 			stack.push(
-				Frame(
+				new Frame(
 					new Element( name, conversionMap[ name ] ),
 					startOffset,
 					tokenLength,
