@@ -2,6 +2,10 @@
  * External dependencies
  */
 import { castArray, get, isEqual, find } from 'lodash';
+/**
+ * Internal dependencies
+ */
+import * as ystore from './ystore';
 
 /**
  * Internal dependencies
@@ -82,7 +86,11 @@ export function receiveEntityRecords( kind, name, records, query, invalidateCach
 	} else {
 		action = receiveItems( records );
 	}
-
+	for ( const record of castArray( records ) ) {
+		if ( record.id ) {
+			ystore.getInstance( record.id, kind, name );
+		}
+	}
 	return {
 		...action,
 		kind,
@@ -148,6 +156,11 @@ export function* editEntityRecord( kind, name, recordId, edits, options = {} ) {
 		name,
 		recordId
 	);
+
+	if ( ! options.syncIgnore && edits.blocks ) {
+		// sync edits
+		ystore.updateInstance( recordId, kind, name, edits.blocks );
+	}
 
 	const edit = {
 		kind,
