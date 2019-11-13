@@ -38,6 +38,7 @@ import { __ } from '@wordpress/i18n';
 import useBlockNavigator from './use-block-navigator';
 import BlockNavigationList from './block-navigation-list';
 import BlockColorsStyleSelector from './block-colors-selector';
+import MenuActivation from './inspector-control-menu-activation';
 
 function NavigationMenu( {
 	attributes,
@@ -73,7 +74,7 @@ function NavigationMenu( {
 				return null;
 			}
 
-			return pages.map( ( { title, type, link: url, id } ) => (
+			return pages.map( ( { title, type, link: url, id, menuEventActivation } ) => (
 				createBlock( 'core/navigation-menu-item',
 					{
 						type,
@@ -82,6 +83,7 @@ function NavigationMenu( {
 						label: title.rendered,
 						title: title.raw,
 						opensInNewTab: false,
+						menuEventActivation,
 					}
 				)
 			) );
@@ -226,11 +228,15 @@ function NavigationMenu( {
 						/>
 					</PanelBody>
 				) }
-				<PanelBody
-					title={ __( 'Navigation Structure' ) }
-				>
+				<PanelBody title={ __( 'Navigation Structure' ) }>
 					<BlockNavigationList clientId={ clientId } />
 				</PanelBody>
+
+				<MenuActivation
+					selected={ attributes.menuEventActivation }
+					onChange={ ( menuEventActivation ) => setAttributes( { menuEventActivation } ) }
+				/>
+
 			</InspectorControls>
 
 			<div className={ navigationMenuClasses } style={ navigationMenuInlineStyles }>
