@@ -1,0 +1,559 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Text looks like a "body" 1`] = `
+<emotion(Text)
+  variant="body"
+>
+  <Text
+    style={
+      Object {
+        "map": undefined,
+        "name": "1r3bdsr",
+        "next": undefined,
+        "styles": "
+	
+	
+				
+	font-weight: normal;
+	letter-spacing: 0;
+
+				
+	font-size: 16px;
+	line-height: 24px;
+
+			;
+",
+        "toString": [Function],
+      }
+    }
+    variant="body"
+  >
+    <Text
+      style={
+        Object {
+          "map": undefined,
+          "name": "1r3bdsr",
+          "next": undefined,
+          "styles": "
+	
+	
+				
+	font-weight: normal;
+	letter-spacing: 0;
+
+				
+	font-size: 16px;
+	line-height: 24px;
+
+			;
+",
+          "toString": [Function],
+        }
+      }
+      variant="body"
+    >
+      Hello World!
+    </Text>
+  </Text>
+</emotion(Text)>
+`;
+
+exports[`Text looks like a "body.small" 1`] = `
+<emotion(Text)
+  variant="body.small"
+>
+  <Text
+    style={
+      Object {
+        "map": undefined,
+        "name": "1w2y5qz",
+        "next": undefined,
+        "styles": "
+	
+	
+				
+	font-weight: normal;
+	letter-spacing: 0;
+
+				
+	font-size: 14px;
+	line-height: 20px;
+
+			;
+",
+        "toString": [Function],
+      }
+    }
+    variant="body.small"
+  >
+    <Text
+      style={
+        Object {
+          "map": undefined,
+          "name": "1w2y5qz",
+          "next": undefined,
+          "styles": "
+	
+	
+				
+	font-weight: normal;
+	letter-spacing: 0;
+
+				
+	font-size: 14px;
+	line-height: 20px;
+
+			;
+",
+          "toString": [Function],
+        }
+      }
+      variant="body.small"
+    >
+      Hello World!
+    </Text>
+  </Text>
+</emotion(Text)>
+`;
+
+exports[`Text looks like a "button" 1`] = `
+<emotion(Text)
+  variant="button"
+>
+  <Text
+    style={
+      Object {
+        "map": undefined,
+        "name": "1utnyby",
+        "next": undefined,
+        "styles": "
+	
+	
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0;
+
+",
+        "toString": [Function],
+      }
+    }
+    variant="button"
+  >
+    <Text
+      style={
+        Object {
+          "map": undefined,
+          "name": "1utnyby",
+          "next": undefined,
+          "styles": "
+	
+	
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0;
+
+",
+          "toString": [Function],
+        }
+      }
+      variant="button"
+    >
+      Hello World!
+    </Text>
+  </Text>
+</emotion(Text)>
+`;
+
+exports[`Text looks like a "caption" 1`] = `
+<emotion(Text)
+  variant="caption"
+>
+  <Text
+    style={
+      Object {
+        "map": undefined,
+        "name": "1grcora",
+        "next": undefined,
+        "styles": "
+	
+	
+	font-weight: normal;
+	font-size: 12px;
+	line-height: 16px;
+	letter-spacing: 0;
+
+",
+        "toString": [Function],
+      }
+    }
+    variant="caption"
+  >
+    <Text
+      style={
+        Object {
+          "map": undefined,
+          "name": "1grcora",
+          "next": undefined,
+          "styles": "
+	
+	
+	font-weight: normal;
+	font-size: 12px;
+	line-height: 16px;
+	letter-spacing: 0;
+
+",
+          "toString": [Function],
+        }
+      }
+      variant="caption"
+    >
+      Hello World!
+    </Text>
+  </Text>
+</emotion(Text)>
+`;
+
+exports[`Text looks like a "label" 1`] = `
+<emotion(Text)
+  variant="label"
+>
+  <Text
+    style={
+      Object {
+        "map": undefined,
+        "name": "duz52l",
+        "next": undefined,
+        "styles": "
+	
+	
+	font-weight: 600;
+	font-size: 12px;
+	line-height: 16px;
+	letter-spacing: 1;
+	text-transform: uppercase;
+
+",
+        "toString": [Function],
+      }
+    }
+    variant="label"
+  >
+    <Text
+      style={
+        Object {
+          "map": undefined,
+          "name": "duz52l",
+          "next": undefined,
+          "styles": "
+	
+	
+	font-weight: 600;
+	font-size: 12px;
+	line-height: 16px;
+	letter-spacing: 1;
+	text-transform: uppercase;
+
+",
+          "toString": [Function],
+        }
+      }
+      variant="label"
+    >
+      Hello World!
+    </Text>
+  </Text>
+</emotion(Text)>
+`;
+
+exports[`Text looks like a "subtitle" 1`] = `
+<emotion(Text)
+  variant="subtitle"
+>
+  <Text
+    style={
+      Object {
+        "map": undefined,
+        "name": "uhfpn9",
+        "next": undefined,
+        "styles": "
+	
+	
+				
+	font-weight: 600;
+	letter-spacing: 0;
+
+				
+	font-size: 16px;
+	line-height: 24px;
+
+			;
+",
+        "toString": [Function],
+      }
+    }
+    variant="subtitle"
+  >
+    <Text
+      style={
+        Object {
+          "map": undefined,
+          "name": "uhfpn9",
+          "next": undefined,
+          "styles": "
+	
+	
+				
+	font-weight: 600;
+	letter-spacing: 0;
+
+				
+	font-size: 16px;
+	line-height: 24px;
+
+			;
+",
+          "toString": [Function],
+        }
+      }
+      variant="subtitle"
+    >
+      Hello World!
+    </Text>
+  </Text>
+</emotion(Text)>
+`;
+
+exports[`Text looks like a "subtitle.small" 1`] = `
+<emotion(Text)
+  variant="subtitle.small"
+>
+  <Text
+    style={
+      Object {
+        "map": undefined,
+        "name": "1rmlrr4",
+        "next": undefined,
+        "styles": "
+	
+	
+				
+	font-weight: 600;
+	letter-spacing: 0;
+
+				
+	font-size: 14px;
+	line-height: 20px;
+
+			;
+",
+        "toString": [Function],
+      }
+    }
+    variant="subtitle.small"
+  >
+    <Text
+      style={
+        Object {
+          "map": undefined,
+          "name": "1rmlrr4",
+          "next": undefined,
+          "styles": "
+	
+	
+				
+	font-weight: 600;
+	letter-spacing: 0;
+
+				
+	font-size: 14px;
+	line-height: 20px;
+
+			;
+",
+          "toString": [Function],
+        }
+      }
+      variant="subtitle.small"
+    >
+      Hello World!
+    </Text>
+  </Text>
+</emotion(Text)>
+`;
+
+exports[`Text looks like a "title.large" 1`] = `
+<emotion(Text)
+  variant="title.large"
+>
+  <Text
+    style={
+      Object {
+        "map": undefined,
+        "name": "s0dx80",
+        "next": undefined,
+        "styles": "
+	
+	
+				
+  font-weight: normal;
+  letter-spacing: 0;
+
+				
+	font-size: 32px;
+	line-height: 40px;
+
+			;
+",
+        "toString": [Function],
+      }
+    }
+    variant="title.large"
+  >
+    <Text
+      style={
+        Object {
+          "map": undefined,
+          "name": "s0dx80",
+          "next": undefined,
+          "styles": "
+	
+	
+				
+  font-weight: normal;
+  letter-spacing: 0;
+
+				
+	font-size: 32px;
+	line-height: 40px;
+
+			;
+",
+          "toString": [Function],
+        }
+      }
+      variant="title.large"
+    >
+      Hello World!
+    </Text>
+  </Text>
+</emotion(Text)>
+`;
+
+exports[`Text looks like a "title.medium" 1`] = `
+<emotion(Text)
+  variant="title.medium"
+>
+  <Text
+    style={
+      Object {
+        "map": undefined,
+        "name": "1uffc4u",
+        "next": undefined,
+        "styles": "
+	
+	
+					
+  font-weight: normal;
+  letter-spacing: 0;
+
+					
+	font-size: 24px;
+	line-height: 32px;
+
+				;
+",
+        "toString": [Function],
+      }
+    }
+    variant="title.medium"
+  >
+    <Text
+      style={
+        Object {
+          "map": undefined,
+          "name": "1uffc4u",
+          "next": undefined,
+          "styles": "
+	
+	
+					
+  font-weight: normal;
+  letter-spacing: 0;
+
+					
+	font-size: 24px;
+	line-height: 32px;
+
+				;
+",
+          "toString": [Function],
+        }
+      }
+      variant="title.medium"
+    >
+      Hello World!
+    </Text>
+  </Text>
+</emotion(Text)>
+`;
+
+exports[`Text looks like a "title.small" 1`] = `
+<emotion(Text)
+  variant="title.small"
+>
+  <Text
+    style={
+      Object {
+        "map": undefined,
+        "name": "o0lrjf",
+        "next": undefined,
+        "styles": "
+	
+	
+				
+  font-weight: normal;
+  letter-spacing: 0;
+
+				
+	font-size: 20px;
+	line-height: 28px;
+
+			;
+",
+        "toString": [Function],
+      }
+    }
+    variant="title.small"
+  >
+    <Text
+      style={
+        Object {
+          "map": undefined,
+          "name": "o0lrjf",
+          "next": undefined,
+          "styles": "
+	
+	
+				
+  font-weight: normal;
+  letter-spacing: 0;
+
+				
+	font-size: 20px;
+	line-height: 28px;
+
+			;
+",
+          "toString": [Function],
+        }
+      }
+      variant="title.small"
+    >
+      Hello World!
+    </Text>
+  </Text>
+</emotion(Text)>
+`;
