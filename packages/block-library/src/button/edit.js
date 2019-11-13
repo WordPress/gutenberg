@@ -83,7 +83,6 @@ function ButtonEdit( {
 	fallbackTextColor,
 	setAttributes,
 	className,
-	instanceId,
 	isSelected,
 } ) {
 	const {
