@@ -81,7 +81,7 @@ function build_navigation_menu_html( $block, $colors ) {
 				'<a
 					class="wp-block-navigation-menu-item__link ' . $colors['text_css_classes'] . '"
 					' . $colors['text_inline_styles'] .
-					' href="' . $block['attrs']['url'] .
+					' href="' . $block['attrs']['url'] . '"' .
 					( $block['attrs']['title'] ? ( ' title="' . $block['attrs']['title'] . '"' ) : '' ) .
 					( isset( $block['attrs']['opensInNewTab'] ) && true === $block['attrs']['opensInNewTab']
 						? ' target="_blank"'
