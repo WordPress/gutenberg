@@ -76,6 +76,10 @@
 		}
 	}
 
+	.has-background-color + ul {
+		background: inherit;
+	}
+
 	// Menu Link
 	a {
 		display: block;
