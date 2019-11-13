@@ -135,6 +135,8 @@ class RCTAztecView: Aztec.TextView {
         textDragInteraction?.isEnabled = false
         storage.htmlConverter.characterToReplaceLastEmptyLine = Character(.zeroWidthSpace)
         shouldNotifyOfNonUserChanges = false
+        disableLinkTapRecognizer()
+        preBackgroundColor = .clear
     }
 
     func addPlaceholder() {
@@ -145,6 +147,22 @@ class RCTAztecView: Aztec.TextView {
             placeholderLabel.topAnchor.constraint(equalTo: topAnchor, constant: topConstant),
             placeholderLabel.widthAnchor.constraint(equalTo: widthAnchor),
         ])
+    }
+
+    /**
+     This handles a bug introduced by iOS 13.0 (tested up to 13.2) where link interactions don't respect what the documentation says.
+
+     The documenatation for textView(_:shouldInteractWith:in:interaction:) says:
+
+     > Links in text views are interactive only if the text view is selectable but noneditable.
+
+     Our Aztec Text views are selectable and editable, and yet iOS was opening links on Safari when tapped.
+     */
+    func disableLinkTapRecognizer() {
+        guard let recognizer = gestureRecognizers?.first(where: { $0.name == "UITextInteractionNameLinkTap" }) else {
+            return
+        }
+        recognizer.isEnabled = false
     }
 
     // MARK - View Height: Match to content height
@@ -408,7 +426,7 @@ class RCTAztecView: Aztec.TextView {
 
         setHTML(html)
         updatePlaceholderVisibility()
-        refreshFont()
+        refreshTypingAttributesAndPlaceholderFont()
         if let selection = contents["selection"] as? NSDictionary,
             let start = selection["start"] as? NSNumber,
             let end = selection["end"]  as? NSNumber {
@@ -482,16 +500,25 @@ class RCTAztecView: Aztec.TextView {
     // MARK: - Font Setters
 
     @objc func setFontFamily(_ family: String) {
+        guard fontFamily != family else {
+            return
+        }
         fontFamily = family
         refreshFont()
     }
 
     @objc func setFontSize(_ size: CGFloat) {
+        guard fontSize != size else {
+            return
+        }
         fontSize = size
         refreshFont()
     }
 
     @objc func setFontWeight(_ weight: String) {
+        guard fontWeight != weight else {
+            return
+        }
         fontWeight = weight
         refreshFont()
     }
@@ -540,33 +567,16 @@ class RCTAztecView: Aztec.TextView {
     /// were ever set.
     ///
     private func refreshFont() {
-        guard fontFamily != nil || fontSize != nil || fontWeight != nil else {
-            return
-        }
-
-        let fullRange = NSRange(location: 0, length: textStorage.length)
-
-        textStorage.beginEditing()
-        textStorage.enumerateAttributes(in: fullRange, options: []) { (attributes, subrange, stop) in
-            let oldFont = font(from: attributes)
-            let newFont = applyFontConstraints(to: oldFont)
-
-            textStorage.addAttribute(.font, value: newFont, range: subrange)
-        }
-        textStorage.endEditing()
-
-        refreshTypingAttributesAndPlaceholderFont()
+        let newFont = applyFontConstraints(to: defaultFont)
+        defaultFont = newFont
     }
 
     /// This method refreshes the font for the palceholder field and typing attributes.
     /// This method should not be called directly.  Call `refreshFont()` instead.
     ///
     private func refreshTypingAttributesAndPlaceholderFont() {
-        let oldFont = font(from: typingAttributes)
-        let newFont = applyFontConstraints(to: oldFont)
-
-        typingAttributes[.font] = newFont
-        placeholderLabel.font = newFont
+        let currentFont = font(from: typingAttributes)        
+        placeholderLabel.font = currentFont
     }
 
     // MARK: - Formatting interface
@@ -603,6 +613,16 @@ class RCTAztecView: Aztec.TextView {
         let caretData = packCaretDataForRN()
         onSelectionChange(caretData)
     }
+
+    // MARK: - Selection
+    private func correctSelectionAfterLastEmptyLine() {
+        guard selectedTextRange?.start == endOfDocument,
+            let characterToReplaceLastEmptyLine = storage.htmlConverter.characterToReplaceLastEmptyLine,
+            text == String(characterToReplaceLastEmptyLine) else {
+            return
+        }
+        selectedTextRange = self.textRange(from: beginningOfDocument, to: beginningOfDocument)
+    }
 }
 
 // MARK: UITextView Delegate Methods
@@ -613,7 +633,12 @@ extension RCTAztecView: UITextViewDelegate {
             return
         }
 
+        correctSelectionAfterLastEmptyLine()
         propagateSelectionChanges()
+    }
+
+    func textViewDidBeginEditing(_ textView: UITextView) {
+        correctSelectionAfterLastEmptyLine()
     }
 
     func textViewDidChange(_ textView: UITextView) {
@@ -637,9 +662,5 @@ extension RCTAztecView: UITextViewDelegate {
 
     func textViewDidEndEditing(_ textView: UITextView) {
         onBlur?([:])
-    }
-
-    func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
-        return false
     }
 }
