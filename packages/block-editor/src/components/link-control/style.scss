@@ -3,9 +3,10 @@
 	min-width: $modal-min-width;
 }
 
+// LinkControl popover.
 .block-editor-link-control__search .block-editor-link-control__search-input {
-	// Specificity overide
-	&.block-editor-link-control__search-input > input[type="text"] {
+	// Specificity override.
+	&.block-editor-link-control__search-input input[type="text"] {
 		width: calc(100% - #{$grid-size-large*2});
 		display: block;
 		padding: 11px $grid-size-large;
