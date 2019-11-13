@@ -106,6 +106,10 @@ class InnerBlocks extends Component {
 			hasOverlay,
 			renderAppender,
 			__experimentalMoverDirection: moverDirection,
+			__experimentalTemplateOptions: templateOptions,
+			__experimentalOnSelectTemplateOption: onSelectTemplateOption,
+			__experimentalAllowTemplateOptionSkip: allowTemplateOptionSkip,
+			__experimentalConsumeChildToolbar: consumeChildToolbar,
 		} = this.props;
 		const { templateInProcess } = this.state;
 
@@ -120,6 +124,7 @@ class InnerBlocks extends Component {
 						rootClientId={ clientId }
 						renderAppender={ renderAppender }
 						__experimentalMoverDirection={ moverDirection }
+							__experimentalConsumeChildToolbar={ consumeChildToolbar }
 					/>
 				) }
 			</div>
