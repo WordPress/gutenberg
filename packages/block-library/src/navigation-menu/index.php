@@ -87,10 +87,10 @@ function build_navigation_menu_html( $block, $colors ) {
 					class="wp-block-navigation-menu-item__link ' . $colors['text_css_classes'] . '"
 					' . $colors['text_inline_styles'] .
 					' href="' . $url . '"' .
-					( $block['attrs']['title'] ? ( ' title="' . $title . '"' ) : '' ) .
+					( $title ? ' title="' . $title . '"' : '' ) .
 					( $opens_in_new_tab ? ' target="_blank"' : '' ) .
 				'>' .
-					( isset( $block['attrs']['label'] ) ? $label : '' ) .
+					( $label ? $label : '' ) .
 				'</a>';
 		} else {
 			$item_content_markup =
