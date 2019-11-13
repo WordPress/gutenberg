@@ -115,6 +115,7 @@ class InnerBlocks extends Component {
 
 		const classes = classnames( 'block-editor-inner-blocks', {
 			'has-overlay': enableClickThrough && hasOverlay,
+			'is-consuming-toolbars': consumeChildToolbar,
 		} );
 
 		return (
