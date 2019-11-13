@@ -33,6 +33,7 @@ const tokenizer = /<(\/)?(\w+)\s*(\/)?>/g;
  * the string before creating the parent.
  *
  * @private
+ *
  * @param {string}    name    The name of the element.
  * @param {WPElement} element The element
  *
@@ -136,6 +137,7 @@ const createInterpolateElement = ( interpolatedString, conversionMap ) => {
  * is a WPElement
  *
  * @private
+ *
  * @param {Object} conversionMap  The map being validated.
  *
  * @return {boolean}  True means the map is valid.
@@ -152,6 +154,7 @@ const isValidConversionMap = ( conversionMap ) => {
  * This is the iterator over the matches in the string.
  *
  * @private
+ *
  * @param {Object} conversionMap The conversion map for the string.
  *
  * @return {boolean} true for continuing to iterate, false for finished.
@@ -250,7 +253,7 @@ function proceed( conversionMap ) {
  *
  * @private
  *
- * @return  {Array}  An array of details for the token matched.
+ * @return {Array}  An array of details for the token matched.
  */
 function nextToken() {
 	const matches = tokenizer.exec( indoc );
@@ -275,8 +278,10 @@ function nextToken() {
  * current rawLength value and offset (if rawLength is provided ) or the
  * indoc.length and offset.
  *
- * @param   {number}  rawLength  If provided will be used as the length of chars
- *                               to extract.
+ * @private
+ *
+ * @param {number} rawLength If provided will be used as the length of chars
+ *                           to extract.
  */
 function addText( rawLength ) {
 	const length = rawLength ? rawLength : indoc.length - offset;
@@ -286,6 +291,17 @@ function addText( rawLength ) {
 	output.push( indoc.substr( offset, length ) );
 }
 
+/**
+ * Pushes a child element to the associated parent element's children for the
+ * parent currently active in the stack.
+ *
+ * @private
+ *
+ * @param {Element} element     The child element to be pushed to the parent.
+ * @param {number}  tokenStart  Offset at which child element first appears.
+ * @param {number}  tokenLength Length of string marking start of child element.
+ * @param {number}  lastOffset  Running offset at which parsing should continue.
+ */
 function addChild( element, tokenStart, tokenLength, lastOffset ) {
 	const parent = stack[ stack.length - 1 ];
 	const text = indoc.substr( parent.prevOffset, tokenStart - parent.prevOffset );
@@ -300,6 +316,18 @@ function addChild( element, tokenStart, tokenLength, lastOffset ) {
 	parent.prevOffset = lastOffset ? lastOffset : tokenStart + tokenLength;
 }
 
+/**
+ * This is called for closing tags. It creates the element currently active in
+ * the stack.
+ *
+ * @private
+ *
+ * @param {number} endOffset Offset at which the closing tag for the element
+ *                           begins in the string. If this is greater than the
+ *                           prevOffset attached to the element, then this
+ *                           helps capture any remaining nested text node in
+ *                           the element.
+ */
 function addElementFromStack( endOffset ) {
 	const { element, leadingTextStart, prevOffset, tokenStart } = stack.pop();
 
