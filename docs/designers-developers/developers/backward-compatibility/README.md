@@ -54,7 +54,7 @@ Dev notes are [posts published on the make/core site](https://make.wordpress.org
 * New APIs.
 * Changes to existing APIs that might affect existing plugins and themes. (Example: classname changes...)
 * Unavoidable backward compatibility breakage, with reasoning and migration flows.
-* When important deprecations are introduced (even without breakage), explain why and how third-party developers can update their code base in consequence.
+* Important deprecations (even without breakage), with reasoning and migration flows.
 
 ### Dev Note Workflow
 
