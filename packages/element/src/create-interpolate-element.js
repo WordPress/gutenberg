@@ -277,12 +277,9 @@ function nextToken() {
  * indoc.length and offset.
  *
  * @private
- *
- * @param {number} rawLength If provided will be used as the length of chars
- *                           to extract.
  */
-function addText( rawLength ) {
-	const length = rawLength ? rawLength : indoc.length - offset;
+function addText() {
+	const length = indoc.length - offset;
 	if ( 0 === length ) {
 		return;
 	}
