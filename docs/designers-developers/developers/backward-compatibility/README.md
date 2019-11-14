@@ -34,7 +34,7 @@ Production packages use the `wp` global variable to provide APIs to third-party 
 
 * Existing usage of the block should not break or be marked as invalid when the editor is loaded.
 * The styling of the existing blocks should be guaranteed.
-* Markup changes should be limited to the minimum but If a block need to change its saved markup making previous versions invalid, a [**deprecated version**](/docs/designers-developers/developers/block-api/block-deprecation.md) for the block should be added.
+* Markup changes should be limited to the minimum possible, but if a block needs to change its saved markup, making previous versions invalid, a [**deprecated version**](/docs/designers-developers/developers/block-api/block-deprecation.md) of the block should be added.
 
 ## Class names and DOM updates
 
