@@ -88,7 +88,7 @@ public class MainApplication extends Application implements ReactApplication {
             }
 
             @Override
-            public void requestImageFullscreenPreview(String mediaSource) {
+            public void requestImageFullscreenPreview(String mediaUrl) {
 
             }
 
