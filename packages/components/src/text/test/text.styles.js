@@ -5,7 +5,7 @@ import { mount } from 'enzyme';
 /**
  * Internal dependencies
  */
-import { Text } from '../Text.styles';
+import { Text } from '../text.styles';
 
 const variants = [ 'title.large', 'title.medium', 'title.small', 'subtitle', 'subtitle.small', 'body', 'body.small', 'button', 'caption', 'label' ];
 
