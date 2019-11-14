@@ -121,6 +121,14 @@ $colors-selector-size: 22px;
 		min-height: $colors-selector-size;
 		line-height: ($colors-selector-size - 2);
 		padding: 2px;
+
+		// Styling icon color.
+		&.has-text-color {
+			> svg,
+			> svg path {
+				color: inherit;
+			}
+		}
 	}
 }
 

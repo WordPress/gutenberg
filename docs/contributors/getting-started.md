@@ -52,6 +52,10 @@ LOCAL_SCRIPT_DEBUG=false LOCAL_WP_DEBUG=false npm run env install
 ```
 By default, both flags will be set to `true`.
 
+### Troubleshooting
+
+You might find yourself stuck on a screen stating that "you are running WordPress without JavaScript and CSS files". If you tried installing WordPress via `npm run env install`, it probably means that something went wrong during the process. To fix it, try removing the `/wordpress` folder and running `npm run env install` again.
+
 ## On A Remote Server
 
 Open a terminal (or if on Windows, a command prompt) and navigate to the repository you cloned. Now type `npm install` to get the dependencies all set up. Once that finishes, you can type `npm run build`. You can now upload the entire repository to your `wp-content/plugins` directory on your web server and activate the plugin from the WordPress admin.
