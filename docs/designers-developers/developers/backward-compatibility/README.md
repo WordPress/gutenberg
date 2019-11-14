@@ -40,7 +40,7 @@ Production packages use the `wp` global variable to provide APIs to third-party 
 
 Class names and DOM nodes used inside the tree of React components are not considered part of the public API and can be modified. 
 
-Changes to these should be done with caution as it can affect the styling and behavior of third-party code (Even if they should not rely use these in first place). Keep the old ones if possible. If not, document these changes and write a dev note about the changes.
+Changes to these should be done with caution as it can affect the styling and behavior of third-party code (Even if they should not rely on these in the first place). Keep the old ones if possible. If not, document the changes and write a dev note.
 
 ## Deprecations
 
