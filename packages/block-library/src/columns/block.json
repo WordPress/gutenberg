@@ -5,7 +5,7 @@
 		"verticalAlignment": {
 			"type": "string"
 		},
-		"allowedBlocks": {
+		"childAllowedBlocks": {
 			"type": "array"
 		}
 	}
