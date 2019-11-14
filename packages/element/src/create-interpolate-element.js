@@ -26,22 +26,20 @@ let indoc,
 const tokenizer = /<(\/)?(\w+)\s*(\/)?>/g;
 
 /**
- * Describes an element and it's properties.
+ * The filament describes and element and its children.
  *
- * This is used by the string iterator to track children that get added to an
- * element when it is created. This allows for collecting nested elements in
+ * This is used by the string iterator to track children attached to an element
+ * as the string is parsed. This allows for collecting nested elements in
  * the string before creating the parent.
  *
  * @private
  *
- * @param {string}    name    The name of the element.
  * @param {WPElement} element The element
  *
- * @return {Element} A constructor for the Element.
+ * @return {Filament} A constructor for the Filament.
  */
-function Element( name, element ) {
+function Filament( element ) {
 	return {
-		name,
 		element,
 		children: [],
 	};
@@ -50,11 +48,11 @@ function Element( name, element ) {
 /**
  * Tracks recursive-descent parse state.
  *
- * This is a Stack element holding parent elements until all children have been
+ * This is a Stack frame holding parent elements until all children have been
  * parsed.
  *
  * @private
- * @param {Element}   element          A parent element which may still have
+ * @param {Filament}  filament         A parent filament which may still have
  *                                     nested children not yet parsed.
  * @param {number}    tokenStart       Offset at which parent element first
  *                                     appears.
@@ -69,14 +67,14 @@ function Element( name, element ) {
  * @return {Frame} The stack frame tracking parse progress.
  */
 function Frame(
-	element,
+	filament,
 	tokenStart,
 	tokenLength,
 	prevOffset,
 	leadingTextStart
 ) {
 	return {
-		element,
+		filament,
 		tokenStart,
 		tokenLength,
 		prevOffset,
@@ -109,7 +107,7 @@ function Frame(
  * @param {Object}  conversionMap       The map used to convert the string to
  *                                      a react element.
  * @throws {TypeError}
- * @return {Element}  A react element.
+ * @return {WPElement}  A wp element.
  */
 const createInterpolateElement = ( interpolatedString, conversionMap ) => {
 	indoc = interpolatedString;
@@ -195,7 +193,7 @@ function proceed( conversionMap ) {
 
 			// otherwise we found an inner element
 			addChild(
-				new Element( name, conversionMap[ name ] ),
+				new Filament( conversionMap[ name ] ),
 				startOffset,
 				tokenLength
 			);
@@ -205,7 +203,7 @@ function proceed( conversionMap ) {
 		case 'opener':
 			stack.push(
 				new Frame(
-					new Element( name, conversionMap[ name ] ),
+					new Filament( conversionMap[ name ] ),
 					startOffset,
 					tokenLength,
 					startOffset + tokenLength,
@@ -218,7 +216,7 @@ function proceed( conversionMap ) {
 		case 'closer':
 			// if we're not nesting then this is easy - close the block
 			if ( 1 === stackDepth ) {
-				addElementFromStack( startOffset );
+				addFilamentFromStack( startOffset );
 				offset = startOffset + tokenLength;
 				return true;
 			}
@@ -230,11 +228,11 @@ function proceed( conversionMap ) {
 				stackTop.prevOffset,
 				startOffset - stackTop.prevOffset
 			);
-			stackTop.element.children.push( text );
+			stackTop.filament.children.push( text );
 			stackTop.prevOffset = startOffset + tokenLength;
 
 			addChild(
-				stackTop.element,
+				stackTop.filament,
 				stackTop.tokenStart,
 				stackTop.tokenLength,
 				startOffset + tokenLength
@@ -292,26 +290,26 @@ function addText( rawLength ) {
 }
 
 /**
- * Pushes a child element to the associated parent element's children for the
+ * Pushes a child filament to the associated parent filament's children for the
  * parent currently active in the stack.
  *
  * @private
  *
- * @param {Element} element     The child element to be pushed to the parent.
- * @param {number}  tokenStart  Offset at which child element first appears.
- * @param {number}  tokenLength Length of string marking start of child element.
- * @param {number}  lastOffset  Running offset at which parsing should continue.
+ * @param {Filament} filament    The child filament to be pushed to the parent.
+ * @param {number}   tokenStart  Offset at which child filament first appears.
+ * @param {number}   tokenLength Length of string marking start of child filament.
+ * @param {number}   lastOffset  Running offset at which parsing should continue.
  */
-function addChild( element, tokenStart, tokenLength, lastOffset ) {
+function addChild( filament, tokenStart, tokenLength, lastOffset ) {
 	const parent = stack[ stack.length - 1 ];
 	const text = indoc.substr( parent.prevOffset, tokenStart - parent.prevOffset );
 
 	if ( text ) {
-		parent.element.children.push( text );
+		parent.filament.children.push( text );
 	}
 
-	parent.element.children.push(
-		cloneElement( element.element, null, ...element.children )
+	parent.filament.children.push(
+		cloneElement( filament.element, null, ...filament.children )
 	);
 	parent.prevOffset = lastOffset ? lastOffset : tokenStart + tokenLength;
 }
@@ -325,18 +323,18 @@ function addChild( element, tokenStart, tokenLength, lastOffset ) {
  * @param {number} endOffset Offset at which the closing tag for the element
  *                           begins in the string. If this is greater than the
  *                           prevOffset attached to the element, then this
- *                           helps capture any remaining nested text node in
+ *                           helps capture any remaining nested text nodes in
  *                           the element.
  */
-function addElementFromStack( endOffset ) {
-	const { element, leadingTextStart, prevOffset, tokenStart } = stack.pop();
+function addFilamentFromStack( endOffset ) {
+	const { filament, leadingTextStart, prevOffset, tokenStart } = stack.pop();
 
 	const text = endOffset ?
 		indoc.substr( prevOffset, endOffset - prevOffset ) :
 		indoc.substr( prevOffset );
 
 	if ( text ) {
-		element.children.push( text );
+		filament.children.push( text );
 	}
 
 	if ( null !== leadingTextStart ) {
@@ -345,9 +343,9 @@ function addElementFromStack( endOffset ) {
 
 	output.push(
 		cloneElement(
-			element.element,
+			filament.element,
 			null,
-			...element.children
+			...filament.children
 		)
 	);
 }
