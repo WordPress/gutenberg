@@ -25,12 +25,14 @@ const cameraImageSource = {
 	value: mediaSource.device,
 	label: __( 'Take a Photo' ),
 	types: [MEDIA_TYPE_IMAGE],
+	icon: 'camera',
 };
 
 const cameraVideoSource = {
 	value: mediaSource.device,
 	label: __( 'Take a Video' ),
 	type: [MEDIA_TYPE_VIDEO],
+	icon: 'camera',
 };
 
 const deviceLibrarySource = {
@@ -43,6 +45,7 @@ const siteLibrarySource = {
 	value: mediaSource.device,
 	label: __( 'WordPress Media Library' ),
 	type: [MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO],
+	icon: 'wordpress-alt',
 };
 
 const localSources = [cameraImageSource, cameraVideoSource, deviceLibrarySource, siteLibrarySource];
@@ -88,21 +91,14 @@ export class MediaUpload extends React.Component {
 		const { allowedTypes = [] } = this.props;
 
 		// multiple capture options for media text
-		const captureMediaOptionsItems = allowedTypes.filter( ( allowedType ) => {
-			return allowedType === MEDIA_TYPE_IMAGE || allowedType === MEDIA_TYPE_VIDEO;
-		} ).map( ( mediaType ) => {
+		return allowedTypes.filter( ( allowedType ) => {
+			return localSources.filter( (source) => source.types.includes( allowedType ) );
+		} ).map( ( source ) => {
 			return {
-				icon: this.getTakeMediaIcon(),
-				value: captureMediaMap.get( mediaType ),
-				label: this.getTakeMediaLabel( mediaType ),
+				...source,
+				icon: source.icon || this.getTakeMediaIcon(),
 			};
 		} );
-
-		return [
-			{ icon: this.getChooseFromDeviceIcon(), value: mediaSources.deviceLibrary, label: __( 'Choose from device' ) },
-			...captureMediaOptionsItems,
-			{ icon: this.getWordPressLibraryIcon(), value: mediaSources.siteMediaLibrary, label: __( 'WordPress Media Library' ) },
-		];
 	}
 
 	getChooseFromDeviceIcon() {
