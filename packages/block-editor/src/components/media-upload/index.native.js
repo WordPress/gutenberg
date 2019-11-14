@@ -65,7 +65,7 @@ export class MediaUpload extends React.Component {
 		return [
 			{ icon: this.getChooseFromDeviceIcon(), value: mediaSources.deviceLibrary, label: __( 'Choose from device' ) },
 			{ icon: this.getTakeMediaIcon(), value: mediaSources.deviceCamera, label: this.getTakeMediaLabel() },
-			{ icon: this.getWordPressLibraryIcon(), value: mediaSources.siteMediaLirary, label: __( 'WordPress Media Library' ) },
+			{ icon: this.getWordPressLibraryIcon(), value: mediaSources.siteMediaLibrary, label: __( 'WordPress Media Library' ) },
 		];
 	}
 
