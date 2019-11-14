@@ -25,7 +25,7 @@ Production packages use the `wp` global variable to provide APIs to third-party 
 ### How to preserve backward compatibility for a React Component
 
 * The name of the component should not change.
-* The props of the components should not be removed.
+* The props of the component should not be removed.
 * Existing prop values should continue to be supported. If a component accepts a function as prop, we can update the component to accept a new type for the same prop, but it shouldn't break existing usage.
 * Adding new props is allowed.
 * React Context dependencies can only be added or removed if we ensure the previous context contract is not breaking.
