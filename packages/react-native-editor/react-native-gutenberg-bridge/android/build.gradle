@@ -1,0 +1,172 @@
+buildscript {
+    def isJitPack = System.getenv('JITPACK').asBoolean()
+
+    repositories {
+        jcenter()
+        google()
+
+        if (isJitPack) {
+            maven {
+                url "https://plugins.gradle.org/m2/"
+            }
+        }
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.3.1'
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
+
+        if (isJitPack) {
+            classpath "com.moowork.gradle:gradle-node-plugin:1.2.0"
+        }
+    }
+}
+
+apply plugin: 'com.android.library'
+apply plugin: 'com.github.dcendents.android-maven'
+
+def isJitPack = System.getenv('JITPACK').asBoolean()
+
+if (isJitPack) {
+    println 'Building in JitPack'
+
+    apply plugin: 'com.moowork.node'
+
+    node {
+        // Version of node to use.
+        version = '8.11.3'
+
+        // Version of npm to use.
+        npmVersion = '6.3.0'
+
+        // Version of Yarn to use.
+        yarnVersion = '1.10.1'
+
+        // Base URL for fetching node distributions (change if you have a mirror).
+        distBaseUrl = 'https://nodejs.org/dist'
+
+        // If true, it will download node using above parameters.
+        // If false, it will try to use globally installed node.
+        download = true
+
+        def tmpdir = "${System.getenv('TMPDIR')}/jsbundle/${System.getenv('VERSION')}"
+
+        // Set the work directory for unpacking node
+        workDir = file("${tmpdir}/nodejs")
+
+        // Set the work directory for NPM
+        npmWorkDir = file("${tmpdir}/npm")
+
+        // Set the work directory for Yarn
+        yarnWorkDir = file("${tmpdir}/yarn")
+
+        // Set the work directory where node_modules should be located
+        nodeModulesDir = file("${project.projectDir}/../../")
+    }
+}
+
+// import the `readReactNativeVersion()` function
+apply from: 'https://gist.githubusercontent.com/hypest/742448b9588b3a0aa580a5e80ae95bdf/raw/8eb62d40ee7a5104d2fcaeff21ce6f29bd93b054/readReactNativeVersion.gradle'
+
+// import the `readHashedVersion()` function
+apply from: 'https://gist.githubusercontent.com/hypest/ceaf20a8e7d9b8404e4a5ff2e6c36650/raw/e1460a128e4b9863963410d719c7d44c3adefd02/readHashedVersion.gradle'
+
+// import the `waitJitpack()` function
+apply from: 'https://gist.githubusercontent.com/hypest/f526fe0775dedce0ce0133f1400d22a4/raw/0008b271a0d28fc79957fd3c2a027f57e98f796a/wait-jitpack.gradle'
+
+group='com.github.wordpress-mobile.gutenberg-mobile'
+
+// fallback flag value for when lib is compiled individually (e.g. via jitpack)
+project.ext.buildGutenbergFromSource = false
+
+android {
+    compileSdkVersion 28
+
+    defaultConfig {
+        minSdkVersion 21
+        targetSdkVersion 28
+        versionCode 1
+        versionName "1.0"
+    }
+    lintOptions {
+        abortOnError false
+    }
+}
+
+repositories {
+    google()
+    jcenter()
+
+    maven { url "https://jitpack.io" }
+
+    if (rootProject.ext.buildGutenbergFromSource) {
+        // If building from source, use the local sources from node_modules
+        def nodeModulesPath = "${project.buildDir}/../../../node_modules/"
+        maven { url "${nodeModulesPath}/react-native/android" }
+        maven { url "${nodeModulesPath}/jsc-android/dist" }
+    } else {
+        // If not building from source (e.g. Jitpack), use the bintray repo so a local RN setup is not needed
+        def reactNativeRepo = 'https://dl.bintray.com/wordpress-mobile/react-native-mirror/'
+        println "Will use the RN maven repo at ${reactNativeRepo}"
+        maven { url reactNativeRepo }
+    }
+}
+
+dependencies {
+    // Make sure to put android-jsc at the the first
+    implementation "org.webkit:android-jsc:r241213"
+    implementation project(':react-native-aztec')
+
+    // For animated GIF support
+    implementation 'com.facebook.fresco:animated-gif:2.0.0'
+
+    if (rootProject.ext.buildGutenbergFromSource) {
+        println "using gutenberg from source"
+        implementation project(':react-native-svg')
+        implementation project(':react-native-recyclerview-list')
+        implementation project(':react-native-video')
+
+        implementation 'com.facebook.react:react-native:+'
+    } else {
+        implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-svg', readHashedVersion('../../package.json', 'react-native-svg', 'dependencies')))
+        implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-recyclerview-list', 'f845b3c2c4411b8e97db23724bf1a535530c5435'))
+        implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-video', readHashedVersion('../../package.json', 'react-native-video', 'dependencies')))
+
+        def rnVersion = readReactNativeVersion('../package.json', 'peerDependencies')
+        implementation "com.facebook.react:react-native:${rnVersion}"
+    }
+}
+
+if (isJitPack) {
+    def assetsFolder = 'src/main/assets'
+
+    task buildJSBundle(type: YarnTask) {
+        args = ['bundle:android']
+    }
+
+    task ensureAssetsDirectory << {
+        mkdir assetsFolder
+    }
+
+    task copyJSBundle(type: Copy) {
+        def origFileName = 'App.js'
+        def origWithPath = "../../bundle/android/${origFileName}"
+        def target = 'index.android.bundle'
+        from origWithPath
+        into assetsFolder
+        rename origFileName, target
+    } << {
+        println "Done copying the Android JS bundle to assets folder"
+    }
+
+    task cleanupNodeModulesFolder(type: Delete) {
+        delete '../../node_modules'
+    }
+
+    if (isJitPack) {
+        preBuild.dependsOn(cleanupNodeModulesFolder)
+        cleanupNodeModulesFolder.dependsOn(copyJSBundle)
+        copyJSBundle.dependsOn(buildJSBundle)
+        buildJSBundle.dependsOn(yarn_install, ensureAssetsDirectory)
+    }
+}
