@@ -52,6 +52,6 @@ Dev notes are [posts published on the make/core site](https://make.wordpress.org
 
 - When working on a pull request and the need for a dev note is discovered, add the **Needs Dev Note** label to the PR.
 - If possible, add a comment to the PR explaining why the dev note is needed.
-- When the first beta of the next WordPress release is shipped, go throught the list of merged PRs included in this release and tagged with the **Needs Dev Note** label.
+- When the first beta of the upcoming WordPress release is shipped, go through the list of merged PRs included in the release and tagged with the **Needs Dev Note** label.
 - For each one of these PRs, write a Dev Note, coordinate with the WordPress release leads to publish the dev note.
 - Once the dev note for a PR is published, remove the **Needs Dev Note** label from the PR.
