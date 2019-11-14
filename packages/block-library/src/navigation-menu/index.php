@@ -53,10 +53,10 @@ function render_block_navigation_menu( $attributes, $content, $block ) {
 	}
 
 	// Inline computed colors.
-	$comp_inline_styles = '';
+	$style = '';
 
 	if ( array_key_exists( 'textColorValue', $attributes ) ) {
-		$comp_inline_styles .= ' color: ' . esc_attr( $attributes['textColorValue'] ) . ';';
+		$style .= 'color: ' . esc_attr( $attributes['textColorValue'] ) . ';';
 	}
 
 	$colors = build_css_colors( $attributes );
@@ -64,7 +64,7 @@ function render_block_navigation_menu( $attributes, $content, $block ) {
 	return sprintf(
 		'<nav class="%1$s" %2$s>%3$s</nav>',
 		esc_attr( $classes ),
-		$comp_inline_styles ? sprintf( 'style="%s"', esc_attr( $comp_inline_styles ) ) : '',
+		$style ? sprintf( 'style="%s"', esc_attr( $style ) ) : '',
 		build_navigation_menu_html( $block, $colors )
 	);
 }
