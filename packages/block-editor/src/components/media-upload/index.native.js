@@ -3,11 +3,9 @@
  */
 import React from 'react';
 import {
-	requestMediaPickFromMediaLibrary,
-	requestMediaPickFromDeviceLibrary,
-	requestMediaPickFromDeviceCamera,
 	getOtherMediaOptions,
-	requestOtherMediaPickFrom,
+	requestMediaPicker,
+	mediaSources,
 } from 'react-native-gutenberg-bridge';
 
 /**
@@ -19,10 +17,6 @@ import { Picker } from '@wordpress/components';
 export const MEDIA_TYPE_IMAGE = 'image';
 export const MEDIA_TYPE_VIDEO = 'video';
 
-export const MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_CHOOSE_FROM_DEVICE = 'choose_from_device';
-export const MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_TAKE_MEDIA = 'take_media';
-export const MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY = 'wordpress_media_library';
-
 export const OPTION_TAKE_VIDEO = __( 'Take a Video' );
 export const OPTION_TAKE_PHOTO = __( 'Take a Photo' );
 export const OPTION_TAKE_PHOTO_OR_VIDEO = __( 'Take a Photo or Video' );
@@ -31,7 +25,6 @@ export class MediaUpload extends React.Component {
 	constructor( props ) {
 		super( props );
 		this.onPickerPresent = this.onPickerPresent.bind( this );
-		this.onPickerChange = this.onPickerChange.bind( this );
 		this.onPickerSelect = this.onPickerSelect.bind( this );
 
 		this.state = {
@@ -70,9 +63,9 @@ export class MediaUpload extends React.Component {
 
 	getMediaOptionsItems() {
 		return [
-			{ icon: this.getChooseFromDeviceIcon(), value: MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_CHOOSE_FROM_DEVICE, label: __( 'Choose from device' ) },
-			{ icon: this.getTakeMediaIcon(), value: MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_TAKE_MEDIA, label: this.getTakeMediaLabel() },
-			{ icon: this.getWordPressLibraryIcon(), value: MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY, label: __( 'WordPress Media Library' ) },
+			{ icon: this.getChooseFromDeviceIcon(), value: mediaSources.deviceLibrary, label: __( 'Choose from device' ) },
+			{ icon: this.getTakeMediaIcon(), value: mediaSources.deviceCamera, label: this.getTakeMediaLabel() },
+			{ icon: this.getWordPressLibraryIcon(), value: mediaSources.siteMediaLibrary, label: __( 'WordPress Media Library' ) },
 		];
 	}
 
@@ -104,30 +97,13 @@ export class MediaUpload extends React.Component {
 		}
 	}
 
-	onPickerSelect( requestFunction ) {
+	onPickerSelect( source ) {
 		const { allowedTypes = [], onSelect, multiple = false } = this.props;
-		requestFunction( allowedTypes, multiple, ( media ) => {
+		requestMediaPicker( source, allowedTypes, multiple, ( media ) => {
 			if ( ( multiple && media ) || ( media && media.id ) ) {
 				onSelect( media );
 			}
 		} );
-	}
-
-	onPickerChange( value ) {
-		if ( value === MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_CHOOSE_FROM_DEVICE ) {
-			this.onPickerSelect( requestMediaPickFromDeviceLibrary );
-		} else if ( value === MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_TAKE_MEDIA ) {
-			this.onPickerSelect( requestMediaPickFromDeviceCamera );
-		} else if ( value === MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY ) {
-			this.onPickerSelect( requestMediaPickFromMediaLibrary );
-		} else {
-			const { onSelect, multiple = false } = this.props;
-			requestOtherMediaPickFrom( value, multiple, ( media ) => {
-				if ( ( multiple && media ) || ( media && media.id ) ) {
-					onSelect( media );
-				}
-			} );
-		}
 	}
 
 	render() {
@@ -142,7 +118,7 @@ export class MediaUpload extends React.Component {
 				hideCancelButton
 				ref={ ( instance ) => this.picker = instance }
 				options={ mediaOptions }
-				onChange={ this.onPickerChange }
+				onChange={ this.onPickerSelect }
 			/>
 		);
 
