@@ -74,7 +74,8 @@ describe( 'createInterpolateElement', () => {
 		const expectedElement = createElement(
 			Fragment,
 			null,
-			...[ 'This is a ', 'string' ]
+			'This is a ',
+			'string'
 		);
 		expect(
 			createInterpolateElement(
@@ -88,15 +89,13 @@ describe( 'createInterpolateElement', () => {
 		const expectedElement = createElement(
 			Fragment,
 			null,
-			...[
-				'This is a string with ',
-				createElement(
-					'a',
-					{ href: 'https://github.com', className: 'some_class' },
-					...[ 'a link' ]
-				),
-				'.',
-			]
+			'This is a string with ',
+			createElement(
+				'a',
+				{ href: 'https://github.com', className: 'some_class' },
+				'a link'
+			),
+			'.'
 		);
 		const component = createInterpolateElement(
 			testString,
@@ -116,22 +115,18 @@ describe( 'createInterpolateElement', () => {
 		const expectedElement = createElement(
 			Fragment,
 			{},
-			...[
-				'This is a ',
+			'This is a ',
+			createElement(
+				'a',
+				null,
+				'string that is ',
 				createElement(
-					'a',
+					'em',
 					null,
-					...[
-						'string that is ',
-						createElement(
-							'em',
-							null,
-							...[ 'linked' ]
-						),
-					]
+					'linked'
 				),
-				'.',
-			]
+			),
+			'.'
 		);
 		expect( JSON.stringify( createInterpolateElement(
 			testString,
@@ -150,14 +145,12 @@ describe( 'createInterpolateElement', () => {
 		const expectedElement = createElement(
 			Fragment,
 			null,
-			...[
-				'This is a string with a ',
-				createElement(
-					TestComponent,
-					null,
-					...[ 'Custom Component' ]
-				),
-			]
+			'This is a string with a ',
+			createElement(
+				TestComponent,
+				null,
+				'Custom Component'
+			),
 		);
 		expect( JSON.stringify( createInterpolateElement(
 			testString,
@@ -174,10 +167,8 @@ describe( 'createInterpolateElement', () => {
 		const expectedElement = createElement(
 			Fragment,
 			null,
-			...[
-				'This is a string with a self closing custom component: ',
-				createElement( TestComponent ),
-			]
+			'This is a string with a self closing custom component: ',
+			createElement( TestComponent ),
 		);
 		expect( JSON.stringify( createInterpolateElement(
 			testString,
@@ -203,24 +194,20 @@ describe( 'createInterpolateElement', () => {
 		const expectedElement = createElement(
 			Fragment,
 			null,
-			...[
-				'This is a complex string with a ',
+			'This is a complex string with a ',
+			createElement(
+				'a',
+				null,
+				'nested ',
 				createElement(
-					'a',
+					'em',
 					null,
-					...[
-						'nested ',
-						createElement(
-							'em',
-							null,
-							...[ 'emphasized string' ]
-						),
-						' link',
-					]
+					'emphasized string'
 				),
-				' and value: ',
-				createElement( TestComponent ),
-			]
+				' link',
+			),
+			' and value: ',
+			createElement( TestComponent ),
 		);
 		expect( JSON.stringify( createInterpolateElement(
 			testString,
@@ -255,17 +242,13 @@ describe( 'createInterpolateElement', () => {
 		const expectedElement = createElement(
 			Fragment,
 			null,
-			...[
-				'👳‍♀️',
-				createElement(
-					'strong',
-					null,
-					...[
-						'🚨🤷‍♂️⛈️fully',
-					]
-				),
-				' here',
-			]
+			'👳‍♀️',
+			createElement(
+				'strong',
+				null,
+				'🚨🤷‍♂️⛈️fully',
+			),
+			' here',
 		);
 		expect( JSON.stringify( createInterpolateElement(
 			testString,
