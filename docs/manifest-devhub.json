@@ -318,6 +318,12 @@
 		"parent": "develop"
 	},
 	{
+		"title": "React Native based mobile Gutenberg",
+		"slug": "native-mobile",
+		"markdown_source": "../docs/contributors/native-mobile.md",
+		"parent": "develop"
+	},
+	{
 		"title": "Documentation Contributions",
 		"slug": "document",
 		"markdown_source": "../docs/contributors/document.md",

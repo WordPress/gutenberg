@@ -98,6 +98,47 @@ export function blockStyles( state = {}, action ) {
 }
 
 /**
+ * Reducer managing the block patterns.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function blockPatterns( state = {}, action ) {
+	switch ( action.type ) {
+		case 'ADD_BLOCK_TYPES':
+			return {
+				...state,
+				...mapValues( keyBy( action.blockTypes, 'name' ), ( blockType ) => {
+					return uniqBy( [
+						...get( blockType, [ 'patterns' ], [] ),
+						...get( state, [ blockType.name ], [] ),
+					], ( style ) => style.name );
+				} ),
+			};
+		case 'ADD_BLOCK_PATTERNS':
+			return {
+				...state,
+				[ action.blockName ]: uniqBy( [
+					...get( state, [ action.blockName ], [] ),
+					...( action.patterns ),
+				], ( pattern ) => pattern.name ),
+			};
+		case 'REMOVE_BLOCK_PATTERNS':
+			return {
+				...state,
+				[ action.blockName ]: filter(
+					get( state, [ action.blockName ], [] ),
+					( pattern ) => action.patternNames.indexOf( pattern.name ) === -1,
+				),
+			};
+	}
+
+	return state;
+}
+
+/**
  * Higher-order Reducer creating a reducer keeping track of given block name.
  *
  * @param {string} setActionType  Action type.
@@ -162,6 +203,7 @@ export function categories( state = DEFAULT_CATEGORIES, action ) {
 export default combineReducers( {
 	blockTypes,
 	blockStyles,
+	blockPatterns,
 	defaultBlockName,
 	freeformFallbackBlockName,
 	unregisteredFallbackBlockName,

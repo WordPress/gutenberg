@@ -15,6 +15,7 @@ import {
 	reduce,
 	some,
 	find,
+	filter,
 } from 'lodash';
 import createSelector from 'rememo';
 
@@ -1308,6 +1309,34 @@ export const hasInserterItems = createSelector(
 		getReusableBlocks( state ),
 		getBlockTypes(),
 	],
+);
+
+/**
+ * Returns the list of allowed inserter blocks for inner blocks children
+ *
+ * @param {Object}  state        Editor state.
+ * @param {?string} rootClientId Optional root client ID of block list.
+ *
+ * @return {Array?} The list of allowed block types.
+ */
+export const __experimentalGetAllowedBlocks = createSelector(
+	( state, rootClientId = null ) => {
+		if ( ! rootClientId ) {
+			return;
+		}
+
+		return filter(
+			getBlockTypes(),
+			( blockType ) => canIncludeBlockTypeInInserter( state, blockType, rootClientId )
+		);
+	},
+	( state, rootClientId ) => [
+		state.blockListSettings[ rootClientId ],
+		state.blocks.byClientId,
+		state.settings.allowedBlockTypes,
+		state.settings.templateLock,
+		getBlockTypes(),
+	]
 );
 
 /**

@@ -9,7 +9,7 @@ import { number, text } from '@storybook/addon-knobs';
 import Icon from '../';
 import { SVG, Path } from '../../primitives/svg';
 
-export default { title: 'Icon', component: Icon };
+export default { title: 'Components|Icon', component: Icon };
 
 const IconSizeLabel = ( { size } ) => <div style={ { fontSize: 12 } }>{ size }px</div>;
 
