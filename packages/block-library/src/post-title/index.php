@@ -11,10 +11,11 @@
  * @return string Returns the filtered post title for the current post wrapped inside "h1" tags.
  */
 function render_block_core_post_title() {
-	if ( gutenberg_set_loop_post() ) {
+	$post = gutenberg_get_post_from_context();
+	if ( ! $post ) {
 		return '';
 	}
-	return the_title( '<h1>', '</h1>', false );
+	return '<h1>' . get_the_title( $post ) . '</h1>';
 }
 
 /**
