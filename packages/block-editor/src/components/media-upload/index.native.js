@@ -22,33 +22,37 @@ export const OPTION_TAKE_PHOTO = __( 'Take a Photo' );
 export const OPTION_TAKE_PHOTO_OR_VIDEO = __( 'Take a Photo or Video' );
 
 const cameraImageSource = {
-	value: mediaSource.device,
+	id: mediaSources.deviceCamera,
+	value: mediaSources.deviceCamera + '-IMAGE',
 	label: __( 'Take a Photo' ),
 	types: [MEDIA_TYPE_IMAGE],
 	icon: 'camera',
 };
 
 const cameraVideoSource = {
-	value: mediaSource.device,
+	id: mediaSources.deviceCamera,
+	value: mediaSources.deviceCamera,
 	label: __( 'Take a Video' ),
-	type: [MEDIA_TYPE_VIDEO],
+	types: [MEDIA_TYPE_VIDEO],
 	icon: 'camera',
 };
 
 const deviceLibrarySource = {
-	value: mediaSource.device,
+	id: mediaSources.deviceLibrary,
+	value: mediaSources.deviceLibrary,
 	label: __( 'Choose from device' ),
-	type: [MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO],
+	types: [MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO],
 };
 
 const siteLibrarySource = {
-	value: mediaSource.device,
+	id: mediaSources.siteMediaLibrary,
+	value: mediaSources.siteMediaLibrary,
 	label: __( 'WordPress Media Library' ),
-	type: [MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO],
+	types: [MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO],
 	icon: 'wordpress-alt',
 };
 
-const localSources = [cameraImageSource, cameraVideoSource, deviceLibrarySource, siteLibrarySource];
+const localSources = [ deviceLibrarySource, cameraImageSource, cameraVideoSource, , siteLibrarySource ];
 
 export class MediaUpload extends React.Component {
 	constructor( props ) {
@@ -91,8 +95,8 @@ export class MediaUpload extends React.Component {
 		const { allowedTypes = [] } = this.props;
 
 		// multiple capture options for media text
-		return allowedTypes.filter( ( allowedType ) => {
-			return localSources.filter( (source) => source.types.includes( allowedType ) );
+		return localSources.filter( ( source ) => {
+			return allowedTypes.filter( ( allowedType ) => source.types.includes( allowedType ) ).length > 0;
 		} ).map( ( source ) => {
 			return {
 				...source,
@@ -129,9 +133,11 @@ export class MediaUpload extends React.Component {
 		}
 	}
 
-	onPickerSelect( source ) {
+	onPickerSelect( value ) {
 		const { allowedTypes = [], onSelect, multiple = false } = this.props;
-		requestMediaPicker( source, allowedTypes, multiple, ( media ) => {
+		const source = localSources.filter( ( source ) => source.value === value ).shift();
+		const types = allowedTypes.filter( ( type ) => source.types.includes( type ) );
+		requestMediaPicker( source.id, types, multiple, ( media ) => {
 			if ( ( multiple && media ) || ( media && media.id ) ) {
 				onSelect( media );
 			}
