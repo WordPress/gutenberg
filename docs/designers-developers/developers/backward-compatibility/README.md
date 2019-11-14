@@ -5,7 +5,7 @@ Gutenberg follows the WordPress backward compatibility principles. This means ba
 ## What qualifies as a production public API:
 
 The Gutenberg code base is composed of two different types of packages: 
- - **production packages**: these are packages that are shipped in WordPress scripts (example: wp-components, wp-editor...).
+ - **production packages**: these are packages that are shipped as WordPress scripts (example: wp-components, wp-editor...).
  - **development packages**: these are made of developper tools that can be used by third-party developpers to lint, test, format and build their themes and plugins (example: @wordpress/scrips, @wordpress/env...). Typically, these are consumed as npm dependencies in third-party projects.
 
  Backward compatibility guarantee only applies to the production packages as updates happen through WordPress upgrades.
