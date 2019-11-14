@@ -8,7 +8,7 @@ The Gutenberg code base is composed of two different types of packages:
  - **production packages**: these are packages that are shipped as WordPress scripts (example: wp-components, wp-editor...).
  - **development packages**: these are made out of developer tools that can be used by third-party developers to lint, test, format and build their themes and plugins (example: @wordpress/scrips, @wordpress/env...). Typically, these are consumed as npm dependencies in third-party projects.
 
- Backward compatibility guarantee only applies to the production packages as updates happen through WordPress upgrades.
+Backward compatibility guarantee only applies to the production packages as updates happen through WordPress upgrades.
  
  Production packages use the `wp` global variable to provide APIs to third-party developpers. These APIs can be JavaScript functions, variables and React components.
 
