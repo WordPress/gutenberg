@@ -22,10 +22,10 @@ export const OPTION_TAKE_PHOTO = __( 'Take a Photo' );
 export const OPTION_TAKE_PHOTO_OR_VIDEO = __( 'Take a Photo or Video' );
 
 const cameraImageSource = {
-	id: mediaSources.deviceCamera,
-	value: mediaSources.deviceCamera + '-IMAGE',
+	id: mediaSources.deviceCamera, // ID is the value sent to native
+	value: mediaSources.deviceCamera + '-IMAGE', // This is needed to diferenciate image-camera from video-camera sources.
 	label: __( 'Take a Photo' ),
-	types: [MEDIA_TYPE_IMAGE],
+	types: [ MEDIA_TYPE_IMAGE ],
 	icon: 'camera',
 };
 
@@ -33,7 +33,7 @@ const cameraVideoSource = {
 	id: mediaSources.deviceCamera,
 	value: mediaSources.deviceCamera,
 	label: __( 'Take a Video' ),
-	types: [MEDIA_TYPE_VIDEO],
+	types: [ MEDIA_TYPE_VIDEO ],
 	icon: 'camera',
 };
 
@@ -41,14 +41,14 @@ const deviceLibrarySource = {
 	id: mediaSources.deviceLibrary,
 	value: mediaSources.deviceLibrary,
 	label: __( 'Choose from device' ),
-	types: [MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO],
+	types: [ MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO ],
 };
 
 const siteLibrarySource = {
 	id: mediaSources.siteMediaLibrary,
 	value: mediaSources.siteMediaLibrary,
 	label: __( 'WordPress Media Library' ),
-	types: [MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO],
+	types: [ MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO ],
 	icon: 'wordpress-alt',
 };
 
@@ -82,7 +82,7 @@ export class MediaUpload extends React.Component {
 	}
 
 	getAllSources() {
-		return internalSources.concat( this.state.otherMediaOptions )
+		return internalSources.concat( this.state.otherMediaOptions );
 	}
 
 	getMediaOptionsItems() {
@@ -120,21 +120,10 @@ export class MediaUpload extends React.Component {
 
 	onPickerSelect( value ) {
 		const { allowedTypes = [], onSelect, multiple = false } = this.props;
-		const source = this.getAllSources().filter( ( source ) => source.value === value ).shift();
-		const types = allowedTypes.filter( ( type ) => source.types.includes( type ) );
-		requestMediaPicker( source.id, types, multiple, ( media ) => {
+		const mediaSource = this.getAllSources().filter( ( source ) => source.value === value ).shift();
+		const types = allowedTypes.filter( ( type ) => mediaSource.types.includes( type ) );
+		requestMediaPicker( mediaSource.id, types, multiple, ( media ) => {
 			if ( ( multiple && media ) || ( media && media.id ) ) {
-				onSelect( media );
-			}
-		} );
-	}
-
-	// request a single image or video from camera
-	requestSpecificMediaTypeFromDeviceCamera( mediaType ) {
-		const { onSelect } = this.props;
-
-		requestMediaPickFromDeviceCamera( [ mediaType ], false, ( media ) => {
-			if ( media && media.id ) {
 				onSelect( media );
 			}
 		} );
