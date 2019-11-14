@@ -52,16 +52,17 @@ const siteLibrarySource = {
 	icon: 'wordpress-alt',
 };
 
-const localSources = [ deviceLibrarySource, cameraImageSource, cameraVideoSource, , siteLibrarySource ];
+const internalSources = [ deviceLibrarySource, cameraImageSource, cameraVideoSource, , siteLibrarySource ];
 
 export class MediaUpload extends React.Component {
 	constructor( props ) {
 		super( props );
 		this.onPickerPresent = this.onPickerPresent.bind( this );
 		this.onPickerSelect = this.onPickerSelect.bind( this );
+		this.getAllSources = this.getAllSources.bind( this );
 
 		this.state = {
-			otherMediaOptions: undefined,
+			otherMediaOptions: [],
 		};
 	}
 
@@ -70,9 +71,9 @@ export class MediaUpload extends React.Component {
 		getOtherMediaOptions( allowedTypes, ( otherMediaOptions ) => {
 			const otherMediaOptionsWithIcons = otherMediaOptions.map( ( option ) => {
 				return {
-					icon: this.getChooseFromDeviceIcon(),
-					value: option.value,
-					label: option.label,
+					...option,
+					types: allowedTypes,
+					id: option.value,
 				};
 			} );
 
@@ -80,27 +81,19 @@ export class MediaUpload extends React.Component {
 		} );
 	}
 
-	getTakeMediaLabel( mediaType ) {
-		switch ( mediaType ) {
-			case MEDIA_TYPE_IMAGE:
-				return OPTION_TAKE_PHOTO;
-			case MEDIA_TYPE_VIDEO:
-				return OPTION_TAKE_VIDEO;
-		}
-
-		return OPTION_TAKE_PHOTO;
+	getAllSources() {
+		return internalSources.concat( this.state.otherMediaOptions )
 	}
 
 	getMediaOptionsItems() {
 		const { allowedTypes = [] } = this.props;
 
-		// multiple capture options for media text
-		return localSources.filter( ( source ) => {
+		return this.getAllSources().filter( ( source ) => {
 			return allowedTypes.filter( ( allowedType ) => source.types.includes( allowedType ) ).length > 0;
 		} ).map( ( source ) => {
 			return {
 				...source,
-				icon: source.icon || this.getTakeMediaIcon(),
+				icon: source.icon || this.getChooseFromDeviceIcon(),
 			};
 		} );
 	}
@@ -119,14 +112,6 @@ export class MediaUpload extends React.Component {
 		}
 	}
 
-	getTakeMediaIcon() {
-		return 'camera';
-	}
-
-	getWordPressLibraryIcon() {
-		return 'wordpress-alt';
-	}
-
 	onPickerPresent() {
 		if ( this.picker ) {
 			this.picker.presentPicker();
@@ -135,7 +120,7 @@ export class MediaUpload extends React.Component {
 
 	onPickerSelect( value ) {
 		const { allowedTypes = [], onSelect, multiple = false } = this.props;
-		const source = localSources.filter( ( source ) => source.value === value ).shift();
+		const source = this.getAllSources().filter( ( source ) => source.value === value ).shift();
 		const types = allowedTypes.filter( ( type ) => source.types.includes( type ) );
 		requestMediaPicker( source.id, types, multiple, ( media ) => {
 			if ( ( multiple && media ) || ( media && media.id ) ) {
@@ -156,17 +141,11 @@ export class MediaUpload extends React.Component {
 	}
 
 	render() {
-		let mediaOptions = this.getMediaOptionsItems();
-
-		if ( this.state.otherMediaOptions ) {
-			mediaOptions = [ ...mediaOptions, ...this.state.otherMediaOptions ];
-		}
-
 		const getMediaOptions = () => (
 			<Picker
 				hideCancelButton
 				ref={ ( instance ) => this.picker = instance }
-				options={ mediaOptions }
+				options={ this.getMediaOptionsItems() }
 				onChange={ this.onPickerSelect }
 			/>
 		);
