@@ -39,7 +39,7 @@ function App() {
 
 	useEffect( () => {
 		registerCoreBlocks();
-	} );
+	}, [] );
 
 	return (
 		<div className="playground">
