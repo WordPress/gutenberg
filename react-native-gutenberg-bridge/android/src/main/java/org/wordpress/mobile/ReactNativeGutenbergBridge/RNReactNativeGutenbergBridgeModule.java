@@ -117,12 +117,9 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
             mGutenbergBridgeJS2Parent.requestMediaPickFromDeviceLibrary(getNewUploadMediaCallback(allowMultipleSelection, onUploadMediaSelected), allowMultipleSelection, mediaType);
         } else if (mediaSource.equals(MEDIA_SOURCE_DEVICE_CAMERA)) {
             mGutenbergBridgeJS2Parent.requestMediaPickerFromDeviceCamera(getNewUploadMediaCallback(false, onUploadMediaSelected), mediaType);
+        } else {
+            mGutenbergBridgeJS2Parent.requestMediaPickFrom(mediaSource, getNewUploadMediaCallback(allowMultipleSelection, onUploadMediaSelected), allowMultipleSelection);
         }
-    }
-
-    @ReactMethod
-    public void requestOtherMediaPickFrom(String mediaSource, Boolean allowMultipleSelection, final Callback onUploadMediaSelected) {
-        mGutenbergBridgeJS2Parent.requestMediaPickFrom(mediaSource, getNewUploadMediaCallback(allowMultipleSelection, onUploadMediaSelected), allowMultipleSelection);
     }
 
     private MediaType getMediaTypeFromFilter(ReadableArray filter) {
