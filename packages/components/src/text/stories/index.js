@@ -4,7 +4,7 @@
 import { Text } from '../Text.styles';
 
 export default {
-	title: 'components|Text',
+	title: 'Components|Text',
 	component: Text,
 };
 
