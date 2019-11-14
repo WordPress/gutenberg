@@ -3,7 +3,7 @@
  */
 import { NativeModules } from 'react-native';
 
-jest.mock( 'react-native-gutenberg-bridge', () => {
+jest.mock( '@wordspress/react-native-bridge', () => {
 	return {
 		addEventListener: jest.fn(),
 		removeEventListener: jest.fn(),

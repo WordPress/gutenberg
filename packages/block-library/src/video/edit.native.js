@@ -3,14 +3,6 @@
  */
 import React from 'react';
 import { View, TouchableWithoutFeedback, Text } from 'react-native';
-/**
- * Internal dependencies
- */
-import {
-	mediaUploadSync,
-	requestImageFailedRetryDialog,
-	requestImageUploadCancelDialog,
-} from 'react-native-gutenberg-bridge';
 
 /**
  * WordPress dependencies
@@ -20,6 +12,11 @@ import {
 	Toolbar,
 	ToolbarButton,
 } from '@wordpress/components';
+import {
+	mediaUploadSync,
+	requestImageFailedRetryDialog,
+	requestImageUploadCancelDialog,
+} from '@wordpress/react-native-bridge';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import {
 	Caption,

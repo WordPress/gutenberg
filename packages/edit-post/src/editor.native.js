@@ -3,7 +3,6 @@
  */
 import memize from 'memize';
 import { size, map, without } from 'lodash';
-import { subscribeSetFocusOnTitle } from 'react-native-gutenberg-bridge';
 
 /**
  * WordPress dependencies
@@ -14,6 +13,7 @@ import { parse, serialize } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { SlotFillProvider } from '@wordpress/components';
+import { subscribeSetFocusOnTitle } from '@wordpress/react-native-bridge';
 
 /**
  * Internal dependencies

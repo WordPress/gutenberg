@@ -149,7 +149,7 @@ dependencies {
     implementation project(':react-native-svg')
     implementation project(':react-native-aztec')
     implementation project(':react-native-recyclerview-list')
-    implementation project(':react-native-gutenberg-bridge')
+    implementation project(':react-native-bridge')
     implementation "org.wordpress:utils:$wordpressUtilsVersion"
     implementation 'androidx.appcompat:appcompat:1.0.0'
     implementation "com.facebook.react:react-native:+"  // From node_modules

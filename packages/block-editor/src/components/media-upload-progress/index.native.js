@@ -3,9 +3,6 @@
  */
 import React from 'react';
 import { View } from 'react-native';
-import {
-	subscribeMediaUpload,
-} from 'react-native-gutenberg-bridge';
 
 /**
  * WordPress dependencies
@@ -14,6 +11,9 @@ import {
 	Spinner,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import {
+	subscribeMediaUpload,
+} from '@wordpress/react-native-bridge';
 
 /**
  * Internal dependencies

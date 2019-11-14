@@ -12,7 +12,7 @@ command -v pod > /dev/null || ( echo Cocoapods is required to generate podspecs;
 command -v jq > /dev/null || ( echo jq is required to generate podspecs; exit 1 )
 
 WD=$(pwd)
-DEST="${WD}/react-native-gutenberg-bridge/third-party-podspecs"
+DEST="${WD}/react-native-bridge/third-party-podspecs"
 
 # Generate the external (non-RN podspecs)
 EXTERNAL_PODSPECS=$(find "node_modules/react-native/third-party-podspecs" \
