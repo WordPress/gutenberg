@@ -7,6 +7,7 @@
 * Add alignment controls for paragraph blocks
 * [iOS] Fix issue where the keyboard would not capitalize sentences correctly on some cases.
 * [iOS] Support for Pexels image library
+* [Android] Added native fullscreen preview when clicking image from Image Block
 * [iOS] Add support for Preformatted block.
 
 1.16.1

@@ -101,4 +101,8 @@ export function getOtherMediaOptions( filter, callback ) {
 	return RNReactNativeGutenbergBridge.getOtherMediaOptions( filter, callback );
 }
 
+export function requestImageFullscreenPreview( mediaUrl ) {
+	return RNReactNativeGutenbergBridge.requestImageFullscreenPreview( mediaUrl );
+}
+
 export default RNReactNativeGutenbergBridge;
