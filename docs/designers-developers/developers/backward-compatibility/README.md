@@ -1,6 +1,6 @@
 # Backward Compatibility
 
-Gutenberg follows the WordPress backwards compatibility principles. This means Backward compatibility for producation public API is guaranteed. In some rare occasions breaking backward compatibility is unavoidable, in that case, the breakage should be as small as possible and the breakage should be documented as clearly as possible to third-party developpers using devnotes.
+Gutenberg follows the WordPress backward compatibility principles. This means backward compatibility for production public API is guaranteed. In some rare occasions breaking backward compatibility is unavoidable, in that case, the breakage should be as small as possible and be documented as clearly as possible to third-party developers using dev notes.
 
 ## What qualifies as a production public API:
 
