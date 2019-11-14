@@ -38,7 +38,7 @@ Production packages use the `wp` global variable to provide APIs to third-party 
 
 As the project evolves, flaws to existing APIs are discovered, or updates are required to support new features. When this happens, we try to guarantee that existing APIs don't break and build new alternative APIs.
 
-To encourage third-party developpers to adopt the new APIs instead, we can use the **deprecated** helper to show a message explaining the deprecation and proposing the alternativewhenever the old API is used.
+To encourage third-party developers to adopt the new APIs instead, we can use the **deprecated** helper to show a message explaining the deprecation and proposing the alternative whenever the old API is used.
 
 ## Dev Notes
 
