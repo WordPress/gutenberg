@@ -62,9 +62,9 @@ function render_block_navigation_menu( $attributes, $content, $block ) {
 	$colors = build_css_colors( $attributes );
 
 	return sprintf(
-		'<nav class="%1$s" style="%2$s">%3$s</nav>',
+		'<nav class="%1$s" %2$s>%3$s</nav>',
 		esc_attr( $classes ),
-		esc_attr( trim( $comp_inline_styles ) ),
+		$comp_inline_styles ? sprintf( 'style="%s"', esc_attr( $comp_inline_styles ) ) : '',
 		build_navigation_menu_html( $block, $colors )
 	);
 }
