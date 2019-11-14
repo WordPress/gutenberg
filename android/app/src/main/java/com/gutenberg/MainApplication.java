@@ -88,6 +88,11 @@ public class MainApplication extends Application implements ReactApplication {
             }
 
             @Override
+            public void requestImageFullscreenPreview(String mediaSource) {
+
+            }
+
+            @Override
             public void editorDidEmitLog(String message, LogLevel logLevel) {
                 switch (logLevel) {
                     case TRACE:
