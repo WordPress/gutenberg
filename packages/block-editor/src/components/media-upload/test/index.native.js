@@ -5,6 +5,7 @@ import { shallow } from 'enzyme';
 import { TouchableWithoutFeedback } from 'react-native';
 import {
 	requestMediaPicker,
+	mediaSources,
 } from 'react-native-gutenberg-bridge';
 
 /**
@@ -12,9 +13,6 @@ import {
  */
 import {
 	MediaUpload,
-	MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_CHOOSE_FROM_DEVICE,
-	MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_TAKE_MEDIA,
-	MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY,
 	MEDIA_TYPE_IMAGE,
 	MEDIA_TYPE_VIDEO,
 	OPTION_TAKE_VIDEO,
@@ -99,22 +97,22 @@ describe( 'MediaUpload component', () => {
 	};
 
 	it( 'can select media from device library', () => {
-		expectMediaPickerForOption( MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_CHOOSE_FROM_DEVICE, false, requestMediaPicker );
+		expectMediaPickerForOption( mediaSources.deviceLibrary, false, requestMediaPicker );
 	} );
 
 	it( 'can select media from WP media library', () => {
-		expectMediaPickerForOption( MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY, false, requestMediaPicker );
+		expectMediaPickerForOption( mediaSources.siteMediaLibrary, false, requestMediaPicker );
 	} );
 
 	it( 'can select media by capturig', () => {
-		expectMediaPickerForOption( MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_TAKE_MEDIA, false, requestMediaPicker );
+		expectMediaPickerForOption( mediaSources.deviceCamera, false, requestMediaPicker );
 	} );
 
 	it( 'can select multiple media from device library', () => {
-		expectMediaPickerForOption( MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_CHOOSE_FROM_DEVICE, true, requestMediaPicker );
+		expectMediaPickerForOption( mediaSources.deviceLibrary, true, requestMediaPicker );
 	} );
 
 	it( 'can select multiple media from WP media library', () => {
-		expectMediaPickerForOption( MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY, true, requestMediaPicker );
+		expectMediaPickerForOption( mediaSources.siteMediaLibrary, true, requestMediaPicker );
 	} );
 } );
