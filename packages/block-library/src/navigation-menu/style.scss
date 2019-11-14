@@ -62,7 +62,6 @@
 			margin: 0;
 			position: absolute;
 			background: #fff;
-			box-shadow: 0 0 8px 2px rgba(0, 0, 0, 0.2);
 			left: 0;
 			top: 100%;
 			min-width: max-content;
@@ -74,6 +73,10 @@
 				width: 100%;
 			}
 		}
+	}
+
+	.has-background-color + ul {
+		background: inherit;
 	}
 
 	// Menu Link

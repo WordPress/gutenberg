@@ -5,7 +5,7 @@
 
 	&__main-shortcuts .edit-post-keyboard-shortcut-help__shortcut-list {
 		// Push the shortcut to be flush with top modal header.
-		margin-top: -$panel-padding -$border-width;
+		margin-top: -$grid-size-xlarge -$border-width;
 	}
 
 	&__section-title {

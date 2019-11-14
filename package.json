@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "6.9.0-rc.1",
+	"version": "6.9.0",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -98,6 +98,7 @@
 		"@wordpress/postcss-themes": "file:packages/postcss-themes",
 		"@wordpress/scripts": "file:packages/scripts",
 		"babel-loader": "8.0.6",
+		"babel-plugin-emotion": "10.0.23",
 		"babel-plugin-inline-json-import": "0.3.2",
 		"babel-plugin-react-native-classname-to-style": "1.2.2",
 		"babel-plugin-react-native-platform-specific-extensions": "1.1.1",
