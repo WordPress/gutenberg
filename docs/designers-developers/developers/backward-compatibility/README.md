@@ -2,7 +2,7 @@
 
 Historically, WordPress has been known for preserving backward compatibility across versions. Gutenberg follows this example wherever possible in its production public APIs. There are rare occasions where breaking backward compatibility is unavoidable and in those cases the breakage:
 
-* should be constrained as much as possible to a small surface area of the API.
+* Should be constrained as much as possible to a small surface area of the API.
 * Should be documented as clearly as possible to third-party developers using Dev Notes.
 
 ## What qualifies as a production public API
