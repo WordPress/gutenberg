@@ -43,9 +43,8 @@ class PostTitle extends Component {
 		this.props.onSelect();
 	}
 
-	onPaste( { value, onChange, html, plainText } ) {
+	onPaste( { value, onChange, plainText } ) {
 		const content = pasteHandler( {
-			HTML: html,
 			plainText,
 			mode: 'INLINE',
 			tagName: 'p',
