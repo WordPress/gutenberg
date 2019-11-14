@@ -1,6 +1,6 @@
 
 {
-  "name": "react-native-gutenberg-bridge",
+  "name": "@wordpress/react-native-bridge",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",

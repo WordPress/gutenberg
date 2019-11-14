@@ -1,5 +1,5 @@
 {
-  "name": "gutenberg-mobile",
+  "name": "@wordpress/react-native-editor",
   "version": "1.16.1",
   "private": true,
   "config": {
