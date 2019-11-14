@@ -143,14 +143,14 @@ export class ImageEdit extends React.Component {
 			requestImageUploadCancelDialog( attributes.id );
 		} else if ( attributes.id && ! isURL( attributes.url ) ) {
 			requestImageFailedRetryDialog( attributes.id );
+		} else if ( Platform.OS === 'android' ) {
+			requestImageFullscreenPreview( attributes.url );
 		}
 
 		this.setState( {
 			isCaptionSelected: false,
 		} );
-		if ( Platform.OS === 'android' ) {
-			requestImageFullscreenPreview( attributes.url );
-		}
+		
 	}
 
 	updateMediaProgress( payload ) {
@@ -364,7 +364,7 @@ export class ImageEdit extends React.Component {
 						renderContent={ ( { isUploadInProgress, isUploadFailed, finalWidth, finalHeight, imageWidthWithinContainer, retryMessage } ) => {
 							const opacity = isUploadInProgress ? 0.3 : 1;
 							const icon = this.getIcon( isUploadFailed );
-							const imageBorderOnSelectedStyle = isSelected ? styles.imageBorder : '';
+							const imageBorderOnSelectedStyle = isSelected && !( isUploadInProgress || isUploadFailed ) ? styles.imageBorder : '';
 
 							const iconContainer = (
 								<View style={ styles.modalIcon }>
