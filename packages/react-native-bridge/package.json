@@ -12,9 +12,8 @@
     "react-native"
   ],
   "author": "",
-  "license": "",
+  "license": "GPL-2.0-or-later",
   "peerDependencies": {
-    "react-native": "0.59.0",
-    "react-native-windows": "0.54.0"
+    "react-native": "0.59.0"
   }
 }
