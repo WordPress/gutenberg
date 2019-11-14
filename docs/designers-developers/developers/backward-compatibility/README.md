@@ -10,7 +10,7 @@ The Gutenberg code base is composed of two different types of packages:
 
 Backward compatibility guarantee only applies to the production packages as updates happen through WordPress upgrades.
  
- Production packages use the `wp` global variable to provide APIs to third-party developpers. These APIs can be JavaScript functions, variables and React components.
+Production packages use the `wp` global variable to provide APIs to third-party developers. These APIs can be JavaScript functions, variables and React components.
 
 ### How to guarantee backward compatibility for a JavaScript function
 
