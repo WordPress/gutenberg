@@ -23,7 +23,7 @@ describe( 'LinksUI', () => {
 				onRemove={ onRemove }
 				onClose={ jest.fn() }
 			/>
-		).dive(); // -> dive() removes the HOC layer that was blocking access to ModalLinkUI
+		).dive().dive(); // -> dive() removes the HOC layer that was blocking access to ModalLinkUI
 
 		// When
 
@@ -52,8 +52,9 @@ describe( 'LinksUI', () => {
 		// When
 
 		// Simulate user typing on the URL Cell.
-		const bottomSheet = wrapper.find( 'BottomSheet' ).first();
-		const cell = bottomSheet.find( 'BottomSheetCell' ).first();
+		const bottomSheet = wrapper.dive().find( 'BottomSheet' ).first();
+		const cell = bottomSheet.dive().find( 'WithPreferredColorScheme(BottomSheetCell)' ).first().dive();
+
 		cell.simulate( 'changeValue', 'wordpress.com' );
 
 		// Close the BottomSheet

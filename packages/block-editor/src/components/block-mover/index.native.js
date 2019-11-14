@@ -14,51 +14,59 @@ import { withInstanceId, compose } from '@wordpress/compose';
 const BlockMover = ( {
 	isFirst,
 	isLast,
+	isLocked,
 	onMoveDown,
 	onMoveUp,
 	firstIndex,
-} ) => (
-	<>
-		<ToolbarButton
-			title={ ! isFirst ?
-				sprintf(
-					/* translators: accessibility text. %1: current block position (number). %2: next block position (number) */
-					__( 'Move block up from row %1$s to row %2$s' ),
-					firstIndex + 1,
-					firstIndex
-				) :
-				__( 'Move block up' )
-			}
-			isDisabled={ isFirst }
-			onClick={ onMoveUp }
-			icon="arrow-up-alt"
-			extraProps={ { hint: __( 'Double tap to move the block up' ) } }
-		/>
+	rootClientId,
+} ) => {
+	if ( isLocked || ( isFirst && isLast && ! rootClientId ) ) {
+		return null;
+	}
 
-		<ToolbarButton
-			title={ ! isLast ?
-				sprintf(
-					/* translators: accessibility text. %1: current block position (number). %2: next block position (number) */
-					__( 'Move block down from row %1$s to row %2$s' ),
-					firstIndex + 1,
-					firstIndex + 2
-				) :
-				__( 'Move block down' )
-			}
-			isDisabled={ isLast }
-			onClick={ onMoveDown }
-			icon="arrow-down-alt"
-			extraProps={ { hint: __( 'Double tap to move the block down' ) } }
-		/>
-	</>
-);
+	return (
+		<>
+			<ToolbarButton
+				title={ ! isFirst ?
+					sprintf(
+						/* translators: accessibility text. %1: current block position (number). %2: next block position (number) */
+						__( 'Move block up from row %1$s to row %2$s' ),
+						firstIndex + 1,
+						firstIndex
+					) :
+					__( 'Move block up' )
+				}
+				isDisabled={ isFirst }
+				onClick={ onMoveUp }
+				icon="arrow-up-alt"
+				extraProps={ { hint: __( 'Double tap to move the block up' ) } }
+			/>
+
+			<ToolbarButton
+				title={ ! isLast ?
+					sprintf(
+						/* translators: accessibility text. %1: current block position (number). %2: next block position (number) */
+						__( 'Move block down from row %1$s to row %2$s' ),
+						firstIndex + 1,
+						firstIndex + 2
+					) :
+					__( 'Move block down' )
+				}
+				isDisabled={ isLast }
+				onClick={ onMoveDown }
+				icon="arrow-down-alt"
+				extraProps={ { hint: __( 'Double tap to move the block down' ) } }
+			/>
+		</>
+	);
+};
 
 export default compose(
 	withSelect( ( select, { clientIds } ) => {
-		const { getBlockIndex, getBlockRootClientId, getBlockOrder } = select( 'core/block-editor' );
+		const { getBlockIndex, getTemplateLock, getBlockRootClientId, getBlockOrder } = select( 'core/block-editor' );
 		const normalizedClientIds = castArray( clientIds );
 		const firstClientId = first( normalizedClientIds );
-		const rootClientId = getBlockRootClientId( first( normalizedClientIds ) );
+		const rootClientId = getBlockRootClientId( firstClientId );
 		const blockOrder = getBlockOrder( rootClientId );
 		const firstIndex = getBlockIndex( firstClientId, rootClientId );
 		const lastIndex = getBlockIndex( last( normalizedClientIds ), rootClientId );
@@ -67,6 +75,8 @@ export default compose(
 			firstIndex,
 			isFirst: firstIndex === 0,
 			isLast: lastIndex === blockOrder.length - 1,
+			isLocked: getTemplateLock( rootClientId ) === 'all',
+			rootClientId,
 		};
 	} ),
 	withDispatch( ( dispatch, { clientIds, rootClientId } ) => {

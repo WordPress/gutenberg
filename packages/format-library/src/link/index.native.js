@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { find } from 'lodash';
+import { Clipboard } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -43,6 +44,7 @@ export const link = {
 			this.addLink = this.addLink.bind( this );
 			this.stopAddingLink = this.stopAddingLink.bind( this );
 			this.onRemoveFormat = this.onRemoveFormat.bind( this );
+			this.getURLFromClipboard = this.getURLFromClipboard.bind( this );
 			this.state = {
 				addingLink: false,
 			};
@@ -56,6 +58,7 @@ export const link = {
 				onChange( applyFormat( value, { type: name, attributes: { url: text } } ) );
 			} else {
 				this.setState( { addingLink: true } );
+				this.getURLFromClipboard();
 			}
 		}
 
@@ -94,17 +97,39 @@ export const link = {
 		}
 
 		onRemoveFormat() {
-			const { onChange, speak } = this.props;
+			const { onChange, speak, value } = this.props;
+			const startFormat = getActiveFormat( value, 'core/link' );
+
+			// Before we try to remove anything we check if there is something at the caret position to remove.
+			if ( isCollapsed( value ) && startFormat === undefined ) {
+				return;
+			}
+
 			const linkSelection = this.getLinkSelection();
 
 			onChange( removeFormat( linkSelection, name ) );
 			speak( __( 'Link removed.' ), 'assertive' );
 		}
 
+		async getURLFromClipboard() {
+			const clipboardText = await Clipboard.getString();
+			if ( ! clipboardText ) {
+				return;
+			}
+			// Check if pasted text is URL
+			if ( ! isURL( clipboardText ) ) {
+				return;
+			}
+			this.setState( { clipboardURL: clipboardText } );
+		}
+
 		render() {
 			const { isActive, activeAttributes, onChange } = this.props;
 			const linkSelection = this.getLinkSelection();
-
+			// If no URL is set and we have a clipboard URL let's use it
+			if ( ! activeAttributes.url && this.state.clipboardURL ) {
+				activeAttributes.url = this.state.clipboardURL;
+			}
 			return (
 				<>
 					<ModalLinkUI

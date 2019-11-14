@@ -85,8 +85,6 @@ class WP_REST_Widget_Updater_Controller extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function compute_new_widget( $request ) {
-		$url_params = $request->get_url_params();
-
 		$widget = $request->get_param( 'identifier' );
 
 		global $wp_widget_factory;

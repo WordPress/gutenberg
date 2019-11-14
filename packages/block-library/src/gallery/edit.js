@@ -273,7 +273,7 @@ class GalleryEdit extends Component {
 				addToGallery={ hasImagesWithId }
 				isAppender={ hasImages }
 				className={ className }
-				dropZoneUIOnly={ hasImages && ! isSelected }
+				disableMediaButtons={ hasImages && ! isSelected }
 				icon={ ! hasImages && <BlockIcon icon={ icon } /> }
 				labels={ {
 					title: ! hasImages && __( 'Gallery' ),
@@ -379,13 +379,8 @@ class GalleryEdit extends Component {
 export default compose( [
 	withSelect( ( select ) => {
 		const { getSettings } = select( 'core/block-editor' );
-		const {
-			__experimentalMediaUpload,
-		} = getSettings();
-
-		return {
-			mediaUpload: __experimentalMediaUpload,
-		};
+		const { mediaUpload } = getSettings();
+		return { mediaUpload };
 	} ),
 	withNotices,
 ] )( GalleryEdit );

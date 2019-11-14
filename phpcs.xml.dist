@@ -10,6 +10,11 @@
 	<rule ref="WordPress.WP.I18n"/>
 	<config name="text_domain" value="gutenberg,default"/>
 
+	<rule ref="VariableAnalysis.CodeAnalysis.VariableAnalysis">
+		<properties>
+			<property name="allowUnusedParametersBeforeUsed" value="true"/>
+		</properties>
+	</rule>
 	<rule ref="WordPress.CodeAnalysis.EmptyStatement"/>
 
 	<rule ref="PEAR.Functions.FunctionCallSignature">

@@ -71,10 +71,9 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 	 *
 	 * @since 6.5.0
 	 *
-	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_Error|bool True if the request has permission, WP_Error object otherwise.
 	 */
-	public function permissions_check( $request ) {
+	public function permissions_check() {
 		if ( ! current_user_can( 'install_plugins' ) || ! current_user_can( 'activate_plugins' ) ) {
 			return new WP_Error(
 				'rest_user_cannot_view',
@@ -221,8 +220,8 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 
 		include( ABSPATH . WPINC . '/version.php' );
 
-		$url      = 'http://api.wordpress.org/plugins/info/1.2/';
-		$url      = add_query_arg(
+		$url = 'http://api.wordpress.org/plugins/info/1.2/';
+		$url = add_query_arg(
 			array(
 				'action'              => 'query_plugins',
 				'request[block]'      => $search_string,
@@ -231,11 +230,12 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 			),
 			$url
 		);
-		$http_url = $url;
-		$ssl      = wp_http_supports( array( 'ssl' ) );
+		$ssl = wp_http_supports( array( 'ssl' ) );
 		if ( $ssl ) {
 			$url = set_url_scheme( $url, 'https' );
 		}
+
+		global $wp_version;
 		$http_args = array(
 			'timeout'    => 15,
 			'user-agent' => 'WordPress/' . $wp_version . '; ' . home_url( '/' ),
@@ -300,7 +300,11 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 			$block->assets[] = 'https://plugins.svn.wordpress.org/' . $plugin['slug'] . $asset;
 		}
 
-		$block->humanized_updated = human_time_diff( strtotime( $plugin['last_updated'] ), current_time( 'timestamp' ) ) . __( ' ago', 'gutenberg' );
+		$block->humanized_updated = sprintf(
+			/* translators: %s: Human-readable time difference. */
+			__( '%s ago', 'gutenberg' ),
+			human_time_diff( strtotime( $plugin['last_updated'] ), current_time( 'timestamp' ) )
+		);
 
 		return $block;
 	}

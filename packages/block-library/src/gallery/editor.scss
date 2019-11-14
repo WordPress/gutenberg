@@ -17,8 +17,10 @@ figure.wp-block-gallery {
 	margin: 0;
 }
 
-// need to override default editor ul styles
+// Necessary to to override default editor ul styles.
 .blocks-gallery-grid.blocks-gallery-grid {
+	padding-left: 0;
+	margin-left: 0;
 	margin-bottom: 0;
 }
 
@@ -35,33 +37,6 @@ figure.wp-block-gallery {
 
 	figure.is-transient img {
 		opacity: 0.3;
-	}
-
-	.block-editor-rich-text {
-		position: absolute;
-		bottom: 0;
-		width: 100%;
-		max-height: 100%;
-		overflow-y: auto;
-	}
-
-	.is-selected .block-editor-rich-text {
-		// IE calculates this incorrectly, so leave it to modern browsers.
-		@supports (position: sticky) {
-			right: 0;
-			left: 0;
-			margin-top: -4px;
-		}
-
-		// Override negative margins so this toolbar isn't hidden by overflow. Overflow is needed for long captions.
-		.block-editor-rich-text__inline-toolbar {
-			top: 0;
-		}
-
-		// Make extra space for the inline toolbar.
-		figcaption {
-			padding-top: 48px;
-		}
 	}
 
 	.is-selected .block-library-gallery-item__move-menu,
@@ -99,15 +74,6 @@ figure.wp-block-gallery {
 
 		.components-button:focus {
 			color: inherit;
-		}
-	}
-
-	.block-editor-rich-text figcaption {
-		position: relative;
-		overflow: hidden;
-
-		a {
-			color: $white;
 		}
 	}
 }

@@ -118,6 +118,28 @@ export const EXPECTED_TRANSFORMS = {
 		],
 		originalBlock: 'Cover',
 	},
+	core__cover__gradient: {
+		availableTransforms: [
+			'Group',
+			'Image',
+			'Video',
+		],
+		originalBlock: 'Cover',
+	},
+	'core__cover__gradient-image': {
+		availableTransforms: [
+			'Group',
+			'Image',
+		],
+		originalBlock: 'Cover',
+	},
+	'core__cover__gradient-video': {
+		availableTransforms: [
+			'Group',
+			'Video',
+		],
+		originalBlock: 'Cover',
+	},
 	core__cover__video: {
 		availableTransforms: [
 			'Group',
@@ -326,13 +348,13 @@ export const EXPECTED_TRANSFORMS = {
 		],
 	},
 	'core__navigation-menu': {
-		originalBlock: 'Navigation Menu (Experimental)',
+		originalBlock: 'Navigation',
 		availableTransforms: [
 			'Group',
 		],
 	},
 	'core__navigation-menu-item': {
-		originalBlock: 'Menu Item (Experimental)',
+		originalBlock: 'Menu Item',
 		availableTransforms: [
 			'Group',
 		],
@@ -362,6 +384,13 @@ export const EXPECTED_TRANSFORMS = {
 		],
 	},
 	core__pullquote: {
+		originalBlock: 'Pullquote',
+		availableTransforms: [
+			'Quote',
+			'Group',
+		],
+	},
+	'core__pullquote__main-color': {
 		originalBlock: 'Pullquote',
 		availableTransforms: [
 			'Quote',
@@ -424,6 +453,12 @@ export const EXPECTED_TRANSFORMS = {
 		availableTransforms: [
 			'Group',
 		],
+	},
+	'core__site-title': {
+		availableTransforms: [
+			'Group',
+		],
+		originalBlock: 'Site Title',
 	},
 	'core__social-link-amazon': {
 		availableTransforms: [

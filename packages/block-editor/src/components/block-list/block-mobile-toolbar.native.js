@@ -16,7 +16,7 @@ import { compose } from '@wordpress/compose';
  */
 import styles from './block-mobile-toolbar.scss';
 import BlockMover from '../block-mover';
-import InspectorControls from '../inspector-controls';
+import { BlockSettingsButton } from '../block-settings';
 
 const BlockMobileToolbar = ( {
 	clientId,
@@ -28,7 +28,7 @@ const BlockMobileToolbar = ( {
 
 		<View style={ styles.spacer } />
 
-		<InspectorControls.Slot />
+		<BlockSettingsButton.Slot />
 
 		<ToolbarButton
 			title={

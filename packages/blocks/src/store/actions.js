@@ -64,6 +64,38 @@ export function removeBlockStyles( blockName, styleNames ) {
 }
 
 /**
+ * Returns an action object used in signalling that new block patterns have been added.
+ *
+ * @param {string}                          blockName Block name.
+ * @param {WPBlockPattern|WPBlockPattern[]} patterns  Block patterns.
+ *
+ * @return {Object} Action object.
+ */
+export function __experimentalAddBlockPatterns( blockName, patterns ) {
+	return {
+		type: 'ADD_BLOCK_PATTERNS',
+		patterns: castArray( patterns ),
+		blockName,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that block patterns have been removed.
+ *
+ * @param {string}          blockName    Block name.
+ * @param {string|string[]} patternNames Block pattern names.
+ *
+ * @return {Object} Action object.
+ */
+export function __experimentalRemoveBlockPatterns( blockName, patternNames ) {
+	return {
+		type: 'REMOVE_BLOCK_PATTERNS',
+		patternNames: castArray( patternNames ),
+		blockName,
+	};
+}
+
+/**
  * Returns an action object used to set the default block name.
  *
  * @param {string} name Block name.

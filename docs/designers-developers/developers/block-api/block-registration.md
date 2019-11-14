@@ -1,6 +1,6 @@
 # Block Registration
 
-## `register_block_type`
+## `registerBlockType`
 
 * **Type:** `Function`
 
@@ -167,6 +167,26 @@ attributes: {
 ```
 
 * **See: [Attributes](/docs/designers-developers/developers/block-api/block-attributes.md).**
+
+#### Example (optional)
+
+* **Type:** `Object`
+
+Example provides structured example data for the block. This data is used to construct a preview for the block to be shown in the Inspector Help Panel when the user mouses over the block.
+
+The data provided in the example object should match the attributes defined. For example:
+
+```js
+example: {
+    attributes: {
+        cover: 'https://example.com/image.jpg',
+        author: 'William Shakespeare',
+        pages: 500
+    },
+},
+```
+
+If `example` is not defined, the preview will not be shown. So even if no-attributes are defined, setting a empty example object `example: {}` will trigger the preview to show.
 
 #### Transforms (optional)
 

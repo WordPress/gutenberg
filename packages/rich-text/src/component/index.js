@@ -11,7 +11,7 @@ import {
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, forwardRef } from '@wordpress/element';
 import { BACKSPACE, DELETE, ENTER, LEFT, RIGHT, SPACE, ESCAPE } from '@wordpress/keycodes';
 import { withSelect } from '@wordpress/data';
 import { withSafeTimeout, compose } from '@wordpress/compose';
@@ -35,6 +35,7 @@ import { indentListItems } from '../indent-list-items';
 import { getActiveFormats } from '../get-active-formats';
 import { updateFormats } from '../update-formats';
 import { removeLineSeparator } from '../remove-line-separator';
+import { isEmptyLine } from '../is-empty';
 
 /**
  * Browser dependencies
@@ -129,7 +130,6 @@ class RichText extends Component {
 		this.createRecord = this.createRecord.bind( this );
 		this.applyRecord = this.applyRecord.bind( this );
 		this.valueToFormat = this.valueToFormat.bind( this );
-		this.setRef = this.setRef.bind( this );
 		this.valueToEditableHTML = this.valueToEditableHTML.bind( this );
 		this.onPointerDown = this.onPointerDown.bind( this );
 		this.formatToValue = this.formatToValue.bind( this );
@@ -161,30 +161,24 @@ class RichText extends Component {
 		window.cancelAnimationFrame( this.rafId );
 	}
 
-	setRef( node ) {
-		if ( node ) {
-			if ( process.env.NODE_ENV === 'development' ) {
-				const computedStyle = getComputedStyle( node );
+	componentDidMount() {
+		if ( process.env.NODE_ENV === 'development' ) {
+			const computedStyle = getComputedStyle( this.props.forwardedRef.current );
 
-				if ( computedStyle.display === 'inline' ) {
-					// eslint-disable-next-line no-console
-					console.warn( 'RichText cannot be used with an inline container. Please use a different tagName.' );
-				}
+			if ( computedStyle.display === 'inline' ) {
+				// eslint-disable-next-line no-console
+				console.warn( 'RichText cannot be used with an inline container. Please use a different tagName.' );
 			}
-
-			this.editableRef = node;
-		} else {
-			delete this.editableRef;
 		}
 	}
 
 	createRecord() {
-		const { __unstableMultilineTag: multilineTag } = this.props;
+		const { __unstableMultilineTag: multilineTag, forwardedRef } = this.props;
 		const selection = getSelection();
 		const range = selection.rangeCount > 0 ? selection.getRangeAt( 0 ) : null;
 
 		return create( {
-			element: this.editableRef,
+			element: forwardedRef.current,
 			range,
 			multilineTag,
 			multilineWrapperTags: multilineTag === 'li' ? [ 'ul', 'ol' ] : undefined,
@@ -193,11 +187,11 @@ class RichText extends Component {
 	}
 
 	applyRecord( record, { domOnly } = {} ) {
-		const { __unstableMultilineTag: multilineTag } = this.props;
+		const { __unstableMultilineTag: multilineTag, forwardedRef } = this.props;
 
 		apply( {
 			value: record,
-			current: this.editableRef,
+			current: forwardedRef.current,
 			multilineTag,
 			multilineWrapperTags: multilineTag === 'li' ? [ 'ul', 'ol' ] : undefined,
 			prepareEditableTree: createPrepareEditableTree( this.props, 'format_prepare_functions' ),
@@ -211,7 +205,7 @@ class RichText extends Component {
 	 *
 	 * Saves the pasted data as plain text in `pastedPlainText`.
 	 *
-	 * @param {PasteEvent} event The paste event.
+	 * @param {ClipboardEvent} event The paste event.
 	 */
 	onPaste( event ) {
 		const { formatTypes, onPaste } = this.props;
@@ -265,18 +259,32 @@ class RichText extends Component {
 		}
 
 		if ( onPaste ) {
-			// Only process file if no HTML is present.
-			// Note: a pasted file may have the URL as plain text.
-			const image = find( [ ...items, ...files ], ( { type } ) =>
-				/^image\/(?:jpe?g|png|gif)$/.test( type )
-			);
+			files = Array.from( files );
+
+			Array.from( items ).forEach( ( item ) => {
+				if ( ! item.getAsFile ) {
+					return;
+				}
+
+				const file = item.getAsFile();
+
+				if ( ! file ) {
+					return;
+				}
+
+				const { name, type, size } = file;
+
+				if ( ! find( files, { name, type, size } ) ) {
+					files.push( file );
+				}
+			} );
 
 			onPaste( {
 				value: this.removeEditorOnlyFormats( record ),
 				onChange: this.onChange,
 				html,
 				plainText,
-				image,
+				files,
 			} );
 		}
 	}
@@ -344,7 +352,7 @@ class RichText extends Component {
 	/**
 	 * Handle input on the next selection change event.
 	 *
-	 * @param {SyntheticEvent} event Synthetic input event.
+	 * @param {WPSyntheticEvent} event Synthetic input event.
 	 */
 	onInput( event ) {
 		// For Input Method Editor (IME), used in Chinese, Japanese, and Korean
@@ -444,7 +452,7 @@ class RichText extends Component {
 	 * native events, `keyup`, `mouseup` and `touchend` synthetic events, and
 	 * animation frames after the `focus` event.
 	 *
-	 * @param {Event|SyntheticEvent|DOMHighResTimeStamp} event
+	 * @param {Event|WPSyntheticEvent|DOMHighResTimeStamp} event
 	 */
 	onSelectionChange( event ) {
 		if (
@@ -522,7 +530,7 @@ class RichText extends Component {
 
 	recalculateBoundaryStyle() {
 		const boundarySelector = '*[data-rich-text-format-boundary]';
-		const element = this.editableRef.querySelector( boundarySelector );
+		const element = this.props.forwardedRef.current.querySelector( boundarySelector );
 
 		if ( ! element ) {
 			return;
@@ -586,7 +594,7 @@ class RichText extends Component {
 	 * - delete content if everything is selected,
 	 * - trigger the onDelete prop when selection is uncollapsed and at an edge.
 	 *
-	 * @param {SyntheticEvent} event A synthetic keyboard event.
+	 * @param {WPSyntheticEvent} event A synthetic keyboard event.
 	 */
 	handleDelete( event ) {
 		const { keyCode } = event;
@@ -611,19 +619,28 @@ class RichText extends Component {
 		const { start, end, text } = value;
 		const isReverse = keyCode === BACKSPACE;
 
-		if ( multilineTag ) {
-			const newValue = removeLineSeparator( value, isReverse );
-			if ( newValue ) {
-				this.onChange( newValue );
-				event.preventDefault();
-			}
-		}
-
 		// Always handle full content deletion ourselves.
 		if ( start === 0 && end !== 0 && end === text.length ) {
 			this.onChange( remove( value ) );
 			event.preventDefault();
 			return;
+		}
+
+		if ( multilineTag ) {
+			let newValue;
+
+			// Check to see if we should remove the first item if empty.
+			if ( isReverse && value.start === 0 && value.end === 0 && isEmptyLine( value ) ) {
+				newValue = removeLineSeparator( value, ! isReverse );
+			} else {
+				newValue = removeLineSeparator( value, isReverse );
+			}
+
+			if ( newValue ) {
+				this.onChange( newValue );
+				event.preventDefault();
+				return;
+			}
 		}
 
 		// Only process delete if the key press occurs at an uncollapsed edge.
@@ -644,7 +661,7 @@ class RichText extends Component {
 	/**
 	 * Triggers the `onEnter` prop on keydown.
 	 *
-	 * @param {SyntheticEvent} event A synthetic keyboard event.
+	 * @param {WPSyntheticEvent} event A synthetic keyboard event.
 	 */
 	handleEnter( event ) {
 		if ( event.keyCode !== ENTER ) {
@@ -669,7 +686,7 @@ class RichText extends Component {
 	/**
 	 * Indents list items on space keydown.
 	 *
-	 * @param {SyntheticEvent} event A synthetic keyboard event.
+	 * @param {WPSyntheticEvent} event A synthetic keyboard event.
 	 */
 	handleSpace( event ) {
 		const { keyCode, shiftKey, altKey, metaKey, ctrlKey } = event;
@@ -706,7 +723,7 @@ class RichText extends Component {
 	 * navigation is handled separately to move correctly around format
 	 * boundaries.
 	 *
-	 * @param  {SyntheticEvent} event A synthetic keyboard event.
+	 * @param {WPSyntheticEvent} event A synthetic keyboard event.
 	 */
 	handleHorizontalNavigation( event ) {
 		const { keyCode, shiftKey, altKey, metaKey, ctrlKey } = event;
@@ -723,7 +740,7 @@ class RichText extends Component {
 		const { text, formats, start, end, activeFormats = [] } = value;
 		const collapsed = isCollapsed( value );
 		// To do: ideally, we should look at visual position instead.
-		const { direction } = getComputedStyle( this.editableRef );
+		const { direction } = getComputedStyle( this.props.forwardedRef.current );
 		const reverseKey = direction === 'rtl' ? RIGHT : LEFT;
 		const isReverse = event.keyCode === reverseKey;
 
@@ -812,13 +829,13 @@ class RichText extends Component {
 	 * Select object when they are clicked. The browser will not set any
 	 * selection when clicking e.g. an image.
 	 *
-	 * @param  {SyntheticEvent} event Synthetic mousedown or touchstart event.
+	 * @param {WPSyntheticEvent} event Synthetic mousedown or touchstart event.
 	 */
 	onPointerDown( event ) {
 		const { target } = event;
 
 		// If the child element has no text content, it must be an object.
-		if ( target === this.editableRef || target.textContent ) {
+		if ( target === this.props.forwardedRef.current || target.textContent ) {
 			return;
 		}
 
@@ -970,6 +987,7 @@ class RichText extends Component {
 			style,
 			className,
 			placeholder,
+			forwardedRef,
 		} = this.props;
 		// Generating a key that includes `tagName` ensures that if the tag
 		// changes, we replace the relevant element. This is needed because we
@@ -979,6 +997,7 @@ class RichText extends Component {
 		return (
 			<Editable
 				{ ...props }
+				ref={ forwardedRef }
 				tagName={ Tagname }
 				style={ style }
 				record={ this.record }
@@ -998,7 +1017,6 @@ class RichText extends Component {
 				onBlur={ this.onBlur }
 				onMouseDown={ this.onPointerDown }
 				onTouchStart={ this.onPointerDown }
-				setRef={ this.setRef }
 				// Selection updates must be done at these events as they
 				// happen before the `selectionchange` event. In some cases,
 				// the `selectionchange` event may not even fire, for
@@ -1043,13 +1061,17 @@ RichText.defaultProps = {
 	value: '',
 };
 
-/**
- * Renders a rich content input, providing users with the option to format the
- * content.
- */
-export default compose( [
+const RichTextWrapper = compose( [
 	withSelect( ( select ) => ( {
 		formatTypes: select( 'core/rich-text' ).getFormatTypes(),
 	} ) ),
 	withSafeTimeout,
 ] )( RichText );
+
+/**
+ * Renders a rich content input, providing users with the option to format the
+ * content.
+ */
+export default forwardRef( ( props, ref ) => {
+	return <RichTextWrapper { ...props } forwardedRef={ ref } />;
+} );

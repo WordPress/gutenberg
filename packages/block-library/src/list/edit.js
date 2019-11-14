@@ -12,6 +12,8 @@ import {
 	Toolbar,
 } from '@wordpress/components';
 import {
+	__unstableCanIndentListItems as canIndentListItems,
+	__unstableCanOutdentListItems as canOutdentListItems,
 	__unstableIndentListItems as indentListItems,
 	__unstableOutdentListItems as outdentListItems,
 	__unstableChangeListType as changeListType,
@@ -32,7 +34,7 @@ export default function ListEdit( {
 	onReplace,
 	className,
 } ) {
-	const { ordered, values, reversed, start } = attributes;
+	const { ordered, values, type, reversed, start } = attributes;
 	const tagName = ordered ? 'ol' : 'ul';
 
 	const controls = ( { value, onChange } ) => (
@@ -96,6 +98,7 @@ export default function ListEdit( {
 							icon: 'editor-outdent',
 							title: __( 'Outdent list item' ),
 							shortcut: _x( 'Backspace', 'keyboard key' ),
+							isDisabled: ! canOutdentListItems( value ),
 							onClick() {
 								onChange( outdentListItems( value ) );
 							},
@@ -104,6 +107,7 @@ export default function ListEdit( {
 							icon: 'editor-indent',
 							title: __( 'Indent list item' ),
 							shortcut: _x( 'Space', 'keyboard key' ),
+							isDisabled: ! canIndentListItems( value ),
 							onClick() {
 								onChange( indentListItems( value, { type: tagName } ) );
 							},
@@ -121,16 +125,16 @@ export default function ListEdit( {
 			tagName={ tagName }
 			onChange={ ( nextValues ) => setAttributes( { values: nextValues } ) }
 			value={ values }
-			wrapperClassName="block-library-list"
 			className={ className }
 			placeholder={ __( 'Write list…' ) }
 			onMerge={ mergeBlocks }
-			onSplit={ ( value ) => createBlock( name, { ordered, values: value } ) }
+			onSplit={ ( value ) => createBlock( name, { ...attributes, values: value } ) }
 			__unstableOnSplitMiddle={ () => createBlock( 'core/paragraph' ) }
 			onReplace={ onReplace }
 			onRemove={ () => onReplace( [] ) }
 			start={ start }
 			reversed={ reversed }
+			type={ type }
 		>
 			{ controls }
 		</RichText>

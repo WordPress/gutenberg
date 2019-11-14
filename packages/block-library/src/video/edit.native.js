@@ -6,7 +6,6 @@ import { View, TouchableWithoutFeedback, Text } from 'react-native';
 /**
  * Internal dependencies
  */
-import Video from './video-player';
 import {
 	mediaUploadSync,
 	requestImageFailedRetryDialog,
@@ -21,13 +20,16 @@ import {
 	Toolbar,
 	ToolbarButton,
 } from '@wordpress/components';
+import { withPreferredColorScheme } from '@wordpress/compose';
 import {
 	Caption,
 	MediaPlaceholder,
 	MediaUpload,
+	MediaUploadProgress,
 	MEDIA_TYPE_VIDEO,
 	BlockControls,
-	InspectorControls,
+	VIDEO_ASPECT_RATIO,
+	VideoPlayer,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { isURL } from '@wordpress/url';
@@ -36,12 +38,9 @@ import { doAction, hasAction } from '@wordpress/hooks';
 /**
  * Internal dependencies
  */
-import MediaUploadProgress from '../image/media-upload-progress';
 import style from './style.scss';
 import SvgIcon from './icon';
 import SvgIconRetry from './icon-retry';
-
-const VIDEO_ASPECT_RATIO = 1.7;
 
 class VideoEdit extends React.Component {
 	constructor( props ) {
@@ -49,7 +48,6 @@ class VideoEdit extends React.Component {
 
 		this.state = {
 			isCaptionSelected: false,
-			showSettings: false,
 			videoContainerHeight: 0,
 		};
 
@@ -133,9 +131,9 @@ class VideoEdit extends React.Component {
 		this.setState( { isUploadInProgress: false } );
 	}
 
-	onSelectMediaUploadOption( mediaId, mediaUrl ) {
+	onSelectMediaUploadOption( { id, url } ) {
 		const { setAttributes } = this.props;
-		setAttributes( { id: mediaId, src: mediaUrl } );
+		setAttributes( { id, src: url } );
 	}
 
 	onVideoContanerLayout( event ) {
@@ -151,7 +149,8 @@ class VideoEdit extends React.Component {
 			return <Icon icon={ SvgIconRetry } { ...style.icon } />;
 		}
 
-		return <Icon icon={ SvgIcon } { ...( ! isMediaPlaceholder ? style.iconUploading : style.icon ) } />;
+		const iconStyle = this.props.getStylesFromColorScheme( style.icon, style.iconDark );
+		return <Icon icon={ SvgIcon } { ...( ! isMediaPlaceholder ? style.iconUploading : iconStyle ) } />;
 	}
 
 	render() {
@@ -160,8 +159,8 @@ class VideoEdit extends React.Component {
 		const { videoContainerHeight } = this.state;
 
 		const toolbarEditButton = (
-			<MediaUpload mediaType={ MEDIA_TYPE_VIDEO }
-				onSelectURL={ this.onSelectMediaUploadOption }
+			<MediaUpload allowedTypes={ [ MEDIA_TYPE_VIDEO ] }
+				onSelect={ this.onSelectMediaUploadOption }
 				render={ ( { open, getMediaOptions } ) => {
 					return (
 						<Toolbar>
@@ -181,8 +180,8 @@ class VideoEdit extends React.Component {
 			return (
 				<View style={ { flex: 1 } } >
 					<MediaPlaceholder
-						mediaType={ MEDIA_TYPE_VIDEO }
-						onSelectURL={ this.onSelectMediaUploadOption }
+						allowedTypes={ [ MEDIA_TYPE_VIDEO ] }
+						onSelect={ this.onSelectMediaUploadOption }
 						icon={ this.getIcon( false, true ) }
 						onFocus={ this.props.onFocus }
 					/>
@@ -197,13 +196,6 @@ class VideoEdit extends React.Component {
 						<BlockControls>
 							{ toolbarEditButton }
 						</BlockControls> }
-					<InspectorControls>
-						{ false && <ToolbarButton //Not rendering settings button until it has an action
-							label={ __( 'Video Settings' ) }
-							icon="admin-generic"
-							onClick={ () => ( null ) }
-						/> }
-					</InspectorControls>
 					<MediaUploadProgress
 						mediaId={ id }
 						onFinishMediaUploadWithSuccess={ this.finishMediaUploadWithSuccess }
@@ -232,7 +224,7 @@ class VideoEdit extends React.Component {
 								<View onLayout={ this.onVideoContanerLayout } style={ containerStyle }>
 									{ showVideo &&
 										<View style={ style.videoContainer }>
-											<Video
+											<VideoPlayer
 												isSelected={ isSelected && ! this.state.isCaptionSelected }
 												style={ videoStyle }
 												source={ { uri: src } }
@@ -262,4 +254,4 @@ class VideoEdit extends React.Component {
 	}
 }
 
-export default VideoEdit;
+export default withPreferredColorScheme( VideoEdit );

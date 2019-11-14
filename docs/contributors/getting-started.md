@@ -65,6 +65,6 @@ You can also type `npm run package-plugin` which will run the two commands above
 
 The Gutenberg repository also includes a static Gutenberg playground that allows testing and developing in a WordPress-agnostic context. This is very helpful for developing reusable components and trying generic JavaScript modules without any backend dependency.
 
-You can launch the playground by running `npm run playground:start` locally. The playground should be available on [http://localhost:1234](http://localhost:1234).
+You can launch the playground by running `npm run playground:dev` locally. The playground should be available on [http://localhost:1234](http://localhost:1234).
 
 You can also test the playground version of the current master branch on GitHub Pages: [https://wordpress.github.io/gutenberg/](https://wordpress.github.io/gutenberg/)

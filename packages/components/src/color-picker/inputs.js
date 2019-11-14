@@ -17,6 +17,7 @@ import { pure } from '@wordpress/compose';
  */
 import IconButton from '../icon-button';
 import TextControl from '../text-control';
+import VisuallyHidden from '../visually-hidden';
 import { isValidHex } from './utils';
 
 /* Wrapper for TextControl, only used to handle intermediate state while typing. */
@@ -175,9 +176,9 @@ export class Inputs extends Component {
 		} else if ( this.state.view === 'rgb' ) {
 			return (
 				<fieldset>
-					<legend className="screen-reader-text">
+					<VisuallyHidden as="legend">
 						{ __( 'Color value in RGB' ) }
-					</legend>
+					</VisuallyHidden>
 					<div className="components-color-picker__inputs-fields">
 						<Input
 							source={ this.state.view }
@@ -228,9 +229,9 @@ export class Inputs extends Component {
 		} else if ( this.state.view === 'hsl' ) {
 			return (
 				<fieldset>
-					<legend className="screen-reader-text">
+					<VisuallyHidden as="legend">
 						{ __( 'Color value in HSL' ) }
-					</legend>
+					</VisuallyHidden>
 					<div className="components-color-picker__inputs-fields">
 						<Input
 							source={ this.state.view }

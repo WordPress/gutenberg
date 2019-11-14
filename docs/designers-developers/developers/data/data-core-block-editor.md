@@ -189,6 +189,19 @@ _Returns_
 
 -   `Array`: Ordered client IDs of editor blocks.
 
+<a name="getBlockParents" href="#getBlockParents">#</a> **getBlockParents**
+
+Given a block client ID, returns the list of all its parents from top to bottom.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+-   _clientId_ `string`: Block from which to find root client ID.
+
+_Returns_
+
+-   `Array`: ClientIDs of the parent blocks.
+
 <a name="getBlockRootClientId" href="#getBlockRootClientId">#</a> **getBlockRootClientId**
 
 Given a block client ID, returns the root block from which the block is
@@ -345,7 +358,7 @@ _Parameters_
 
 _Returns_
 
--   `Array<Editor.InserterItem>`: Items that appear in inserter.
+-   `Array<WPEditorInserterItem>`: Items that appear in inserter.
 
 <a name="getLastMultiSelectedBlockClientId" href="#getLastMultiSelectedBlockClientId">#</a> **getLastMultiSelectedBlockClientId**
 
@@ -703,7 +716,7 @@ _Returns_
 Returns true if the block corresponding to the specified client ID is
 currently selected but isn't the last of the selected blocks. Here "last"
 refers to the block sequence in the document, _not_ the sequence of
-multi-selection, which is why `state.blockSelection.end` isn't used.
+multi-selection, which is why `state.selectionEnd` isn't used.
 
 _Parameters_
 

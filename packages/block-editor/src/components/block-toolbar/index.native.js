@@ -4,9 +4,15 @@
 import { withSelect } from '@wordpress/data';
 
 /**
- * WordPress dependencies
+ * Internal dependencies
  */
-import { BlockFormatControls, BlockControls } from '@wordpress/block-editor';
+import BlockControls from '../block-controls';
+import BlockFormatControls from '../block-format-controls';
+
+/**
+ * Internal dependencies
+ */
+import UngroupButton from '../ungroup-button';
 
 export const BlockToolbar = ( { blockClientIds, isValid, mode } ) => {
 	if ( blockClientIds.length === 0 ) {
@@ -17,6 +23,7 @@ export const BlockToolbar = ( { blockClientIds, isValid, mode } ) => {
 		<>
 			{ mode === 'visual' && isValid && (
 				<>
+					<UngroupButton />
 					<BlockControls.Slot />
 					<BlockFormatControls.Slot />
 				</>
