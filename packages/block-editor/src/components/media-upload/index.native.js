@@ -3,11 +3,9 @@
  */
 import React from 'react';
 import {
-	requestMediaPickFromMediaLibrary,
-	requestMediaPickFromDeviceLibrary,
-	requestMediaPickFromDeviceCamera,
 	getOtherMediaOptions,
-	requestOtherMediaPickFrom,
+	requestMediaPicker,
+	mediaSources,
 } from 'react-native-gutenberg-bridge';
 
 /**
@@ -19,24 +17,40 @@ import { Picker } from '@wordpress/components';
 export const MEDIA_TYPE_IMAGE = 'image';
 export const MEDIA_TYPE_VIDEO = 'video';
 
-export const MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_CHOOSE_FROM_DEVICE = 'choose_from_device';
-export const MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_TAKE_PHOTO = 'take_photo';
-export const MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_TAKE_VIDEO = 'take_video';
-export const MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY = 'wordpress_media_library';
-
 export const OPTION_TAKE_VIDEO = __( 'Take a Video' );
 export const OPTION_TAKE_PHOTO = __( 'Take a Photo' );
 export const OPTION_TAKE_PHOTO_OR_VIDEO = __( 'Take a Photo or Video' );
 
-const captureMediaMap = new Map();
-captureMediaMap.set( MEDIA_TYPE_IMAGE, MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_TAKE_PHOTO );
-captureMediaMap.set( MEDIA_TYPE_VIDEO, MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_TAKE_VIDEO );
+const cameraImageSource = {
+	value: mediaSource.device,
+	label: __( 'Take a Photo' ),
+	types: [MEDIA_TYPE_IMAGE],
+};
+
+const cameraVideoSource = {
+	value: mediaSource.device,
+	label: __( 'Take a Video' ),
+	type: [MEDIA_TYPE_VIDEO],
+};
+
+const deviceLibrarySource = {
+	value: mediaSource.device,
+	label: __( 'Choose from device' ),
+	type: [MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO],
+};
+
+const siteLibrarySource = {
+	value: mediaSource.device,
+	label: __( 'WordPress Media Library' ),
+	type: [MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO],
+};
+
+const localSources = [cameraImageSource, cameraVideoSource, deviceLibrarySource, siteLibrarySource];
 
 export class MediaUpload extends React.Component {
 	constructor( props ) {
 		super( props );
 		this.onPickerPresent = this.onPickerPresent.bind( this );
-		this.onPickerChange = this.onPickerChange.bind( this );
 		this.onPickerSelect = this.onPickerSelect.bind( this );
 
 		this.state = {
@@ -85,9 +99,9 @@ export class MediaUpload extends React.Component {
 		} );
 
 		return [
-			{ icon: this.getChooseFromDeviceIcon(), value: MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_CHOOSE_FROM_DEVICE, label: __( 'Choose from device' ) },
+			{ icon: this.getChooseFromDeviceIcon(), value: mediaSources.deviceLibrary, label: __( 'Choose from device' ) },
 			...captureMediaOptionsItems,
-			{ icon: this.getWordPressLibraryIcon(), value: MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY, label: __( 'WordPress Media Library' ) },
+			{ icon: this.getWordPressLibraryIcon(), value: mediaSources.siteMediaLibrary, label: __( 'WordPress Media Library' ) },
 		];
 	}
 
@@ -119,9 +133,9 @@ export class MediaUpload extends React.Component {
 		}
 	}
 
-	onPickerSelect( requestFunction ) {
+	onPickerSelect( source ) {
 		const { allowedTypes = [], onSelect, multiple = false } = this.props;
-		requestFunction( allowedTypes, multiple, ( media ) => {
+		requestMediaPicker( source, allowedTypes, multiple, ( media ) => {
 			if ( ( multiple && media ) || ( media && media.id ) ) {
 				onSelect( media );
 			}
@@ -139,31 +153,6 @@ export class MediaUpload extends React.Component {
 		} );
 	}
 
-	onPickerChange( value ) {
-		switch ( value ) {
-			case MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_CHOOSE_FROM_DEVICE:
-				this.onPickerSelect( requestMediaPickFromDeviceLibrary );
-				break;
-			case MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_TAKE_PHOTO:
-				this.requestSpecificMediaTypeFromDeviceCamera( MEDIA_TYPE_IMAGE );
-				break;
-			case MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_TAKE_VIDEO:
-				this.requestSpecificMediaTypeFromDeviceCamera( MEDIA_TYPE_VIDEO );
-				break;
-			case MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY:
-				this.onPickerSelect( requestMediaPickFromMediaLibrary );
-				break;
-			default:
-				const { onSelect, multiple = false } = this.props;
-				requestOtherMediaPickFrom( value, multiple, ( media ) => {
-					if ( ( multiple && media ) || ( media && media.id ) ) {
-						onSelect( media );
-					}
-				} );
-				break;
-		}
-	}
-
 	render() {
 		let mediaOptions = this.getMediaOptionsItems();
 
@@ -176,7 +165,7 @@ export class MediaUpload extends React.Component {
 				hideCancelButton
 				ref={ ( instance ) => this.picker = instance }
 				options={ mediaOptions }
-				onChange={ this.onPickerChange }
+				onChange={ this.onPickerSelect }
 			/>
 		);
 
