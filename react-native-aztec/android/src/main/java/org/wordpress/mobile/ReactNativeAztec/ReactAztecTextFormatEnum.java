@@ -13,8 +13,7 @@ public enum ReactAztecTextFormatEnum {
     H3("h3", AztecTextFormat.FORMAT_HEADING_3),
     H4("h4", AztecTextFormat.FORMAT_HEADING_4),
     H5("h5", AztecTextFormat.FORMAT_HEADING_5),
-    H6("h6", AztecTextFormat.FORMAT_HEADING_6),
-    PRE("pre", AztecTextFormat.FORMAT_PREFORMAT);
+    H6("h6", AztecTextFormat.FORMAT_HEADING_6);
 
     private final String mTag;
     private final AztecTextFormat mAztecTextFormat;
