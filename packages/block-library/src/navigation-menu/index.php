@@ -74,7 +74,7 @@ function render_block_navigation_menu( $attributes, $content, $block ) {
  */
 function build_navigation_menu_html( $block, $colors ) {
 	$html = '';
-	foreach ( (array) $block['innerBlocks'] as $key => $menu_item ) {
+	foreach ( (array) $block['innerBlocks'] as $key => $block ) {
 
 		$html .= '<li class="wp-block-navigation-menu-item">' .
 			'<a
@@ -82,28 +82,28 @@ function build_navigation_menu_html( $block, $colors ) {
 				' . $colors['text_inline_styles'];
 
 		// Start appending HTML attributes to anchor tag.
-		if ( isset( $menu_item['attrs']['url'] ) ) {
-			$html .= ' href="' . $menu_item['attrs']['url'] . '"';
+		if ( isset( $block['attrs']['url'] ) ) {
+			$html .= ' href="' . $block['attrs']['url'] . '"';
 		}
-		if ( isset( $menu_item['attrs']['title'] ) ) {
-			$html .= ' title="' . $menu_item['attrs']['title'] . '"';
+		if ( isset( $block['attrs']['title'] ) ) {
+			$html .= ' title="' . $block['attrs']['title'] . '"';
 		}
 
-		if ( isset( $menu_item['attrs']['opensInNewTab'] ) && true === $menu_item['attrs']['opensInNewTab'] ) {
+		if ( isset( $block['attrs']['opensInNewTab'] ) && true === $block['attrs']['opensInNewTab'] ) {
 			$html .= ' target="_blank"  ';
 		}
 		// End appending HTML attributes to anchor tag.
 
 		// Start anchor tag content.
 		$html .= '>';
-		if ( isset( $menu_item['attrs']['label'] ) ) {
-			$html .= $menu_item['attrs']['label'];
+		if ( isset( $block['attrs']['label'] ) ) {
+			$html .= $block['attrs']['label'];
 		}
 		$html .= '</a>';
 		// End anchor tag content.
 
-		if ( count( (array) $menu_item['innerBlocks'] ) > 0 ) {
-			$html .= build_navigation_menu_html( $menu_item, $colors );
+		if ( count( (array) $block['innerBlocks'] ) > 0 ) {
+			$html .= build_navigation_menu_html( $block, $colors );
 		}
 
 		$html .= '</li>';

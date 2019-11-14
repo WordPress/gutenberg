@@ -34,8 +34,8 @@ import * as embed from './embed';
 import * as file from './file';
 import * as html from './html';
 import * as mediaText from './media-text';
+import * as navigationLink from './navigation-link';
 import * as navigationMenu from './navigation-menu';
-import * as navigationMenuItem from './navigation-menu-item';
 import * as latestComments from './latest-comments';
 import * as latestPosts from './latest-posts';
 import * as legacyWidget from './legacy-widget';
@@ -177,7 +177,7 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 				;[
 				__experimentalEnableLegacyWidgetBlock ? legacyWidget : null,
 				__experimentalEnableMenuBlock ? navigationMenu : null,
-				__experimentalEnableMenuBlock ? navigationMenuItem : null,
+				__experimentalEnableMenuBlock ? navigationLink : null,
 				socialLinks,
 				...socialLink.sites,
 

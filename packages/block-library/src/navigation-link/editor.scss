@@ -1,14 +1,14 @@
 
 // Normalize menu items and edit containers, to look mostly the same.
-.wp-block-navigation-menu-item__field .components-text-control__input.components-text-control__input,
-.wp-block-navigation-menu-item__container {
+.wp-block-navigation-link__field .components-text-control__input.components-text-control__input,
+.wp-block-navigation-link__container {
 	border-radius: 0;
 	// Make it the same height as the appender to prevent a jump. Maybe revisit this.
 	line-height: $icon-button-size;
 	min-height: $icon-button-size;
 }
 
-.wp-block-navigation-menu-item {
+.wp-block-navigation-link {
 	margin-right: $grid-size;
 
 	.block-editor-block-list__layout {
@@ -32,14 +32,14 @@
 	}
 }
 
-.wp-block-navigation-menu-item__edit-container {
+.wp-block-navigation-link__edit-container {
 	display: flex;
 	white-space: nowrap;
 
 	// Compensate for menu item base padding.
 	margin-left: -$grid-size;
 
-	.wp-block-navigation-menu-item__content {
+	.wp-block-navigation-link__content {
 		margin-right: $grid-size;
 
 		// This should match the padding of the menu item.
@@ -63,13 +63,13 @@
 	}
 }
 
-.wp-block-navigation-menu-item {
+.wp-block-navigation-link {
 	&.is-editing,
 	&.is-selected {
 		min-width: 20px;
 	}
 
-	&.has-link .wp-block-navigation-menu-item__content {
+	&.has-link .wp-block-navigation-link__content {
 		border-bottom-style: solid;
 		border-bottom-width: 1px;
 	}
@@ -79,27 +79,27 @@
 	}
 }
 
-.wp-block-navigation-menu-item__nofollow-external-link {
+.wp-block-navigation-link__nofollow-external-link {
 	display: block;
 }
 
 // Separator
-.wp-block-navigation-menu-item__separator {
+.wp-block-navigation-link__separator {
 	margin: $grid-size 0 $grid-size;
 	border-top: $border-width solid $light-gray-500;
 }
 
 // Popover styles
-.components-popover:not(.is-mobile).wp-block-navigation-menu-item__dropdown-content {
+.components-popover:not(.is-mobile).wp-block-navigation-link__dropdown-content {
 	margin-top: -1px;
 	margin-left: -4px;
 }
 
-.wp-block-navigation-menu-item__dropdown-content .components-popover__content {
+.wp-block-navigation-link__dropdown-content .components-popover__content {
 	padding: $grid-size 0;
 }
 
-.wp-block-navigation-menu .block-editor-block-list__block[data-type="core/navigation-menu-item"] {
+.wp-block-navigation-menu .block-editor-block-list__block[data-type="core/navigation-link"] {
 	& > .block-editor-block-list__insertion-point {
 		display: none;
 	}
