@@ -5,7 +5,7 @@ import css from '@emotion/css';
 /**
  * Internal dependencies
  */
-import { fontFamily } from './fontFamily';
+import { fontFamily } from './font-family';
 
 const fontWeightNormal = `font-weight: normal;`;
 const fontWeightSemibold = `font-weight: 600;`;

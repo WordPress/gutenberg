@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { Text } from '../Text.styles';
+import { Text } from '../text.styles';
 
 export default {
 	title: 'Components|Text',
