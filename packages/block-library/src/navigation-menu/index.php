@@ -49,7 +49,7 @@ function build_css_colors( $attributes ) {
 function render_block_navigation_menu( $attributes, $content, $block ) {
 	$classes = 'wp-block-navigation-menu';
 	if ( ! empty( $attributes['className'] ) ) {
-		$classes = $classes . ' ' . $attributes['className'];
+		$classes .= ' ' . $attributes['className'];
 	}
 
 	// Inline computed colors.
