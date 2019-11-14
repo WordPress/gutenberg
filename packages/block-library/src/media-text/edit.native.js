@@ -10,7 +10,7 @@ import { View } from 'react-native';
 import { __ } from '@wordpress/i18n';
 import {
 	BlockControls,
-	//	BlockVerticalAlignmentToolbar,
+	BlockVerticalAlignmentToolbar,
 	InnerBlocks,
 	withColors,
 } from '@wordpress/block-editor';
@@ -166,9 +166,9 @@ class MediaTextEdit extends Component {
 			onClick: () => setAttributes( { mediaPosition: 'right' } ),
 		} ];
 
-		/* const onVerticalAlignmentChange = ( alignment ) => {
+		const onVerticalAlignmentChange = ( alignment ) => {
 			setAttributes( { verticalAlignment: alignment } );
-		}; */
+		};
 
 		return (
 			<>
@@ -176,12 +176,11 @@ class MediaTextEdit extends Component {
 					<Toolbar
 						controls={ toolbarControls }
 					/>
-					{ /* // Temporarily commenting out until alignment functionality is fixed
 					<BlockVerticalAlignmentToolbar
 						onChange={ onVerticalAlignmentChange }
 						value={ verticalAlignment }
 						isCollapsed={ false }
-					/> */ }
+					/>
 				</BlockControls>
 				<View style={ containerStyles }>
 					<View style={ { width: widthString } }>
