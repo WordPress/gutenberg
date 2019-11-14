@@ -16,14 +16,3 @@ const HeroPanel = () => (
 	</>
 );
 ```
-
-### Mixin
-
-```jsx
-import styled from '@emotion/components';
-import {text} from '@wordpress/components';
-
-const Button = styled.button`
-	${text({variant: 'button'})}
-`;
-```
