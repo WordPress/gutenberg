@@ -8,14 +8,13 @@ exports[`Text looks like a "body" 1`] = `
     style={
       Object {
         "map": undefined,
-        "name": "1r3bdsr",
+        "name": "13zmt60",
         "next": undefined,
         "styles": "
 	
 	
 				
-	font-weight: normal;
-	letter-spacing: 0;
+	font-weight: 400;
 
 				
 	font-size: 16px;
@@ -32,14 +31,13 @@ exports[`Text looks like a "body" 1`] = `
       style={
         Object {
           "map": undefined,
-          "name": "1r3bdsr",
+          "name": "13zmt60",
           "next": undefined,
           "styles": "
 	
 	
 				
-	font-weight: normal;
-	letter-spacing: 0;
+	font-weight: 400;
 
 				
 	font-size: 16px;
@@ -66,14 +64,13 @@ exports[`Text looks like a "body.small" 1`] = `
     style={
       Object {
         "map": undefined,
-        "name": "1w2y5qz",
+        "name": "1klnuzf",
         "next": undefined,
         "styles": "
 	
 	
 				
-	font-weight: normal;
-	letter-spacing: 0;
+	font-weight: 400;
 
 				
 	font-size: 14px;
@@ -90,14 +87,13 @@ exports[`Text looks like a "body.small" 1`] = `
       style={
         Object {
           "map": undefined,
-          "name": "1w2y5qz",
+          "name": "1klnuzf",
           "next": undefined,
           "styles": "
 	
 	
 				
-	font-weight: normal;
-	letter-spacing: 0;
+	font-weight: 400;
 
 				
 	font-size: 14px;
@@ -124,7 +120,7 @@ exports[`Text looks like a "button" 1`] = `
     style={
       Object {
         "map": undefined,
-        "name": "1utnyby",
+        "name": "41mraa",
         "next": undefined,
         "styles": "
 	
@@ -132,7 +128,6 @@ exports[`Text looks like a "button" 1`] = `
   font-weight: 600;
   font-size: 14px;
   line-height: 20px;
-  letter-spacing: 0;
 
 ",
         "toString": [Function],
@@ -144,7 +139,7 @@ exports[`Text looks like a "button" 1`] = `
       style={
         Object {
           "map": undefined,
-          "name": "1utnyby",
+          "name": "41mraa",
           "next": undefined,
           "styles": "
 	
@@ -152,7 +147,6 @@ exports[`Text looks like a "button" 1`] = `
   font-weight: 600;
   font-size: 14px;
   line-height: 20px;
-  letter-spacing: 0;
 
 ",
           "toString": [Function],
@@ -174,15 +168,14 @@ exports[`Text looks like a "caption" 1`] = `
     style={
       Object {
         "map": undefined,
-        "name": "1grcora",
+        "name": "87k3hp",
         "next": undefined,
         "styles": "
 	
 	
-	font-weight: normal;
+	font-weight: 400;
 	font-size: 12px;
 	line-height: 16px;
-	letter-spacing: 0;
 
 ",
         "toString": [Function],
@@ -194,15 +187,14 @@ exports[`Text looks like a "caption" 1`] = `
       style={
         Object {
           "map": undefined,
-          "name": "1grcora",
+          "name": "87k3hp",
           "next": undefined,
           "styles": "
 	
 	
-	font-weight: normal;
+	font-weight: 400;
 	font-size: 12px;
 	line-height: 16px;
-	letter-spacing: 0;
 
 ",
           "toString": [Function],
@@ -224,7 +216,7 @@ exports[`Text looks like a "label" 1`] = `
     style={
       Object {
         "map": undefined,
-        "name": "duz52l",
+        "name": "1ylo2m8",
         "next": undefined,
         "styles": "
 	
@@ -232,8 +224,6 @@ exports[`Text looks like a "label" 1`] = `
 	font-weight: 600;
 	font-size: 12px;
 	line-height: 16px;
-	letter-spacing: 1;
-	text-transform: uppercase;
 
 ",
         "toString": [Function],
@@ -245,7 +235,7 @@ exports[`Text looks like a "label" 1`] = `
       style={
         Object {
           "map": undefined,
-          "name": "duz52l",
+          "name": "1ylo2m8",
           "next": undefined,
           "styles": "
 	
@@ -253,8 +243,6 @@ exports[`Text looks like a "label" 1`] = `
 	font-weight: 600;
 	font-size: 12px;
 	line-height: 16px;
-	letter-spacing: 1;
-	text-transform: uppercase;
 
 ",
           "toString": [Function],
@@ -276,14 +264,15 @@ exports[`Text looks like a "subtitle" 1`] = `
     style={
       Object {
         "map": undefined,
-        "name": "uhfpn9",
+        "name": "ijsm7s",
         "next": undefined,
         "styles": "
 	
 	
 				
 	font-weight: 600;
-	letter-spacing: 0;
+	font-size: 14px;
+	line-height: 20px;
 
 				
 	font-size: 16px;
@@ -300,14 +289,15 @@ exports[`Text looks like a "subtitle" 1`] = `
       style={
         Object {
           "map": undefined,
-          "name": "uhfpn9",
+          "name": "ijsm7s",
           "next": undefined,
           "styles": "
 	
 	
 				
 	font-weight: 600;
-	letter-spacing: 0;
+	font-size: 14px;
+	line-height: 20px;
 
 				
 	font-size: 16px;
@@ -334,14 +324,15 @@ exports[`Text looks like a "subtitle.small" 1`] = `
     style={
       Object {
         "map": undefined,
-        "name": "1rmlrr4",
+        "name": "1tuyefh",
         "next": undefined,
         "styles": "
 	
 	
 				
 	font-weight: 600;
-	letter-spacing: 0;
+	font-size: 14px;
+	line-height: 20px;
 
 				
 	font-size: 14px;
@@ -358,14 +349,15 @@ exports[`Text looks like a "subtitle.small" 1`] = `
       style={
         Object {
           "map": undefined,
-          "name": "1rmlrr4",
+          "name": "1tuyefh",
           "next": undefined,
           "styles": "
 	
 	
 				
 	font-weight: 600;
-	letter-spacing: 0;
+	font-size: 14px;
+	line-height: 20px;
 
 				
 	font-size: 14px;
@@ -392,14 +384,13 @@ exports[`Text looks like a "title.large" 1`] = `
     style={
       Object {
         "map": undefined,
-        "name": "s0dx80",
+        "name": "1ue5xyy",
         "next": undefined,
         "styles": "
 	
 	
 				
-  font-weight: normal;
-  letter-spacing: 0;
+  font-weight: 400;
 
 				
 	font-size: 32px;
@@ -416,14 +407,13 @@ exports[`Text looks like a "title.large" 1`] = `
       style={
         Object {
           "map": undefined,
-          "name": "s0dx80",
+          "name": "1ue5xyy",
           "next": undefined,
           "styles": "
 	
 	
 				
-  font-weight: normal;
-  letter-spacing: 0;
+  font-weight: 400;
 
 				
 	font-size: 32px;
@@ -450,14 +440,13 @@ exports[`Text looks like a "title.medium" 1`] = `
     style={
       Object {
         "map": undefined,
-        "name": "1uffc4u",
+        "name": "mwvfmu",
         "next": undefined,
         "styles": "
 	
 	
 					
-  font-weight: normal;
-  letter-spacing: 0;
+  font-weight: 400;
 
 					
 	font-size: 24px;
@@ -474,14 +463,13 @@ exports[`Text looks like a "title.medium" 1`] = `
       style={
         Object {
           "map": undefined,
-          "name": "1uffc4u",
+          "name": "mwvfmu",
           "next": undefined,
           "styles": "
 	
 	
 					
-  font-weight: normal;
-  letter-spacing: 0;
+  font-weight: 400;
 
 					
 	font-size: 24px;
@@ -508,14 +496,13 @@ exports[`Text looks like a "title.small" 1`] = `
     style={
       Object {
         "map": undefined,
-        "name": "o0lrjf",
+        "name": "13qd1wa",
         "next": undefined,
         "styles": "
 	
 	
 				
-  font-weight: normal;
-  letter-spacing: 0;
+  font-weight: 400;
 
 				
 	font-size: 20px;
@@ -532,14 +519,13 @@ exports[`Text looks like a "title.small" 1`] = `
       style={
         Object {
           "map": undefined,
-          "name": "o0lrjf",
+          "name": "13qd1wa",
           "next": undefined,
           "styles": "
 	
 	
 				
-  font-weight: normal;
-  letter-spacing: 0;
+  font-weight: 400;
 
 				
 	font-size: 20px;
