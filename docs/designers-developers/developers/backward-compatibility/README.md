@@ -44,7 +44,7 @@ Changes to these should be done with caution as it can affect the styling and be
 
 ## Deprecations
 
-As the project evolves, flaws to existing APIs are discovered, or updates are required to support new features. When this happens, we try to guarantee that existing APIs don't break and build new alternative APIs.
+As the project evolves, flaws of existing APIs are discovered, or updates are required to support new features. When this happens, we try to guarantee that existing APIs don't break and build new alternative APIs.
 
 To encourage third-party developers to adopt the new APIs instead, we can use the [**deprecated**](/packages/deprecated/README.md) helper to show a message explaining the deprecation and proposing the alternative whenever the old API is used.
 
