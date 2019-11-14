@@ -10,8 +10,8 @@ import { noop } from 'lodash';
 import { IconButton, Dropdown, Toolbar, SVG, Path } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { DOWN } from '@wordpress/keycodes';
-import { ColorPaletteControl } from '@wordpress/block-editor';
-import { useRef, useEffect } from '@wordpress/element';
+import { ColorPaletteControl, ContrastChecker } from '@wordpress/block-editor';
+import { useRef, useEffect, useState } from '@wordpress/element';
 
 /**
  * Browser dependencies
@@ -30,16 +30,20 @@ const ColorSelectorSVGIcon = () => (
  * @param {Object} colorControlProps colorControl properties.
  * @return {*} React Icon component.
  */
-const ColorSelectorIcon = ( { textColor, textColorValue } ) => {
+const ColorSelectorIcon = ( { textColor, textColorValue, onBackgroundColorChange } ) => {
 	const ref = useRef();
 
 	useEffect( () => {
-	    if ( ! ref || ! ref.current ) {
+		if ( ! ref || ! ref.current ) {
 			return;
-	    }
+		}
 
-	    const style = getComputedStyle( ref.current );
+		const style = getComputedStyle( ref.current );
 		const backgroundColor = style.getPropertyValue( 'background-color' );
+
+		if ( backgroundColor ) {
+			onBackgroundColorChange( backgroundColor );
+		}
 	}, [] );
 
 	const iconClasses = classnames(
@@ -69,7 +73,7 @@ const ColorSelectorIcon = ( { textColor, textColorValue } ) => {
  * @param {Object} colorControlProps colorControl properties.
  * @return {*} React toggle button component.
  */
-const renderToggleComponent = ( { textColor, textColorValue } ) => ( { onToggle, isOpen } ) => {
+const renderToggleComponent = ( { textColor, textColorValue, onBackgroundColorChange } ) => ( { onToggle, isOpen } ) => {
 	const openOnArrowDown = ( event ) => {
 		if ( ! isOpen && event.keyCode === DOWN ) {
 			event.preventDefault();
@@ -88,13 +92,14 @@ const renderToggleComponent = ( { textColor, textColorValue } ) => ( { onToggle,
 				icon={ <ColorSelectorIcon
 					textColor={ textColor }
 					textColorValue={ textColorValue }
+					onBackgroundColorChange={ onBackgroundColorChange }
 				/> }
 			/>
 		</Toolbar>
 	);
 };
 
-const renderContent = ( { textColor, onColorChange = noop } ) => ( () => {
+const renderContent = ( { textColor, onColorChange = noop, editorBackgroundColor } ) => ( () => {
 	const setColor = ( attr ) => ( value ) => onColorChange( { attr, value } );
 
 	return (
@@ -106,16 +111,26 @@ const renderContent = ( { textColor, onColorChange = noop } ) => ( () => {
 					label={ __( 'Text Color' ) }
 				/>
 			</div>
+
+			<ContrastChecker
+				textColor={ textColor.color }
+				backgroundColor={ editorBackgroundColor }
+				isLargeText={ false }
+			/>
 		</>
 	);
 } );
 
-export default ( colorControlProps ) => (
-	<Dropdown
-		position="bottom right"
-		className="block-library-colors-selector"
-		contentClassName="block-library-colors-selector__popover"
-		renderToggle={ renderToggleComponent( colorControlProps ) }
-		renderContent={ renderContent( colorControlProps ) }
-	/>
-);
+export default ( colorControlProps ) => {
+	const [ editorBackgroundColor, onBackgroundColorChange ] = useState();
+
+	return (
+		<Dropdown
+			position="bottom right"
+			className="block-library-colors-selector"
+			contentClassName="block-library-colors-selector__popover"
+			renderToggle={ renderToggleComponent( { ...colorControlProps, onBackgroundColorChange } ) }
+			renderContent={ renderContent( { ...colorControlProps, editorBackgroundColor } ) }
+		/>
+	);
+};

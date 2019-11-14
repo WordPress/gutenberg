@@ -183,6 +183,7 @@ function NavigationMenu( {
 						setTextColor( value );
 						setAttributes( { textColorValue: value } );
 					} }
+
 				/>
 			</BlockControls>
 			{ navigatorModal }
