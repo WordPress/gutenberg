@@ -26,7 +26,7 @@ Production packages use the `wp` global variable to provide APIs to third-party 
 * Existing prop values should continue to be supported. If a component accept a function as prop, we can update the component to accept a new type for the same prop, but it shouldn't break existing usage.
 * Adding new props is allowed.
 * React Context dependencies can only be added or removed if we ensure the previous context contract is not breaking.
-* Classnames, DOM nodes used inside the tree of the component are not considered part of the public API and can be modified. That said, changes to these should be done with caution as it can affect the styling. When classes need to be renamed, if possible keep the old ones. When possible, document these changes and write a devnote about the changes.
+* Class names and DOM nodes used inside the tree of the component are not considered part of the public API and can be modified. That said, changes to these should be done with caution as it can affect the styling. Keep the old ones if possible. If not, document these changes and write a dev note about the changes.
 
 ### How to guarantee backward compatibility for a Block
 
