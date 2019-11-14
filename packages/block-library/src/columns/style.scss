@@ -17,7 +17,6 @@
 }
 
 .wp-block-column {
-	margin-bottom: 1em;
 	flex-grow: 1;
 
 	@media (max-width: #{ ($break-small - 1) }) {

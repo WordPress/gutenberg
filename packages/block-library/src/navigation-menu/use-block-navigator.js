@@ -5,19 +5,17 @@ import {
 	useState,
 } from '@wordpress/element';
 import {
-	useSelect,
-	useDispatch,
-} from '@wordpress/data';
-import {
-	__experimentalBlockNavigationList,
-} from '@wordpress/block-editor';
-import {
 	IconButton,
 	SVG,
 	Path,
 	Modal,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import BlockNavigationList from './block-navigation-list';
 
 const NavigatorIcon = (
 	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
@@ -27,25 +25,6 @@ const NavigatorIcon = (
 
 export default function useBlockNavigator( clientId ) {
 	const [ isNavigationListOpen, setIsNavigationListOpen ] = useState( false );
-
-	const {
-		block,
-		selectedBlockClientId,
-	} = useSelect( ( select ) => {
-		const {
-			getSelectedBlockClientId,
-			getBlock,
-		} = select( 'core/block-editor' );
-
-		return {
-			block: getBlock( clientId ),
-			selectedBlockClientId: getSelectedBlockClientId(),
-		};
-	}, [ clientId ] );
-
-	const {
-		selectBlock,
-	} = useDispatch( 'core/block-editor' );
 
 	const navigatorToolbarButton = (
 		<IconButton
@@ -64,12 +43,7 @@ export default function useBlockNavigator( clientId ) {
 				setIsNavigationListOpen( false );
 			} }
 		>
-			<__experimentalBlockNavigationList
-				blocks={ [ block ] }
-				selectedBlockClientId={ selectedBlockClientId }
-				selectBlock={ selectBlock }
-				showNestedBlocks
-			/>
+			<BlockNavigationList clientId={ clientId } />
 		</Modal>
 	);
 

@@ -121,29 +121,39 @@ class Experimental_WP_Widget_Blocks_Manager {
 		$wp_registered_sidebars = self::get_wp_registered_sidebars();
 
 		foreach ( $sidebars_items[ $sidebar_id ] as $item ) {
-			$widget_class = self::get_widget_class( $item );
-			$blocks[]     = array(
+			$widget_class            = self::get_widget_class( $item );
+			list( $object, $number ) = self::get_widget_info( $item );
+			$new_block               = array(
 				'blockName' => 'core/legacy-widget',
 				'attrs'     => array(
-					'class'      => $widget_class,
-					'identifier' => $item,
-					'instance'   => self::get_sidebar_widget_instance( $wp_registered_sidebars[ $sidebar_id ], $item ),
+					'id'       => $item,
+					'instance' => self::get_sidebar_widget_instance( $wp_registered_sidebars[ $sidebar_id ], $item ),
 				),
 				'innerHTML' => '',
 			);
+			if ( null !== $widget_class ) {
+				$new_block['attrs']['widgetClass'] = $widget_class;
+			}
+			if ( isset( $object->id_base ) ) {
+				$new_block['attrs']['idBase'] = $object->id_base;
+			}
+			if ( is_int( $number ) ) {
+				$new_block['attrs']['number'] = $number;
+			}
+			$blocks[] = $new_block;
 		}
 		return $blocks;
 	}
 
 	/**
-	 * Verifies if a sidabar id is valid or not.
+	 * Verifies if a sidebar id is valid or not.
 	 *
 	 * @since 5.7.0
 	 *
 	 * @param string $sidebar_id Identifier of the sidebar.
 	 * @return boolean True if the $sidebar_id value is valid and false otherwise.
 	 */
-	public static function is_valid_sidabar_id( $sidebar_id ) {
+	public static function is_valid_sidebar_id( $sidebar_id ) {
 		$wp_registered_sidebars = self::get_wp_registered_sidebars();
 		return isset( $wp_registered_sidebars[ $sidebar_id ] );
 	}

@@ -21,6 +21,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { speak } from '@wordpress/a11y';
 import { __, _n, _x, sprintf } from '@wordpress/i18n';
 import { Component, createRef } from '@wordpress/element';
 import {
@@ -392,10 +393,11 @@ export class InserterMenu extends Component {
 								{ ! isReusableBlock( hoveredItem ) && (
 									<BlockCard blockType={ hoveredItemBlockType } />
 								) }
-								{ ( isReusableBlock( hoveredItem ) || hoveredItemBlockType.example ) && (
-									<div className="block-editor-inserter__preview">
+								<div className="block-editor-inserter__preview">
+									{ ( isReusableBlock( hoveredItem ) || hoveredItemBlockType.example ) ? (
 										<div className="block-editor-inserter__preview-content">
 											<BlockPreview
+												padding={ 10 }
 												viewportWidth={ 500 }
 												blocks={
 													hoveredItemBlockType.example ?
@@ -404,8 +406,12 @@ export class InserterMenu extends Component {
 												}
 											/>
 										</div>
-									</div>
-								) }
+									) : (
+										<div className="block-editor-inserter__preview-content-missing">
+											{ __( 'No Preview Available.' ) }
+										</div>
+									) }
+								</div>
 							</>
 						) }
 						{ ! hoveredItem && (
@@ -526,21 +532,33 @@ export default compose(
 				const {
 					getSelectedBlock,
 				} = select( 'core/block-editor' );
-				const { isAppender } = ownProps;
-				const { name, initialAttributes } = item;
+				const {
+					isAppender,
+					onSelect,
+					__experimentalSelectBlockOnInsert: selectBlockOnInsert,
+				} = ownProps;
+				const { name, title, initialAttributes } = item;
 				const selectedBlock = getSelectedBlock();
 				const insertedBlock = createBlock( name, initialAttributes );
+
 				if ( ! isAppender && selectedBlock && isUnmodifiedDefaultBlock( selectedBlock ) ) {
 					replaceBlocks( selectedBlock.clientId, insertedBlock );
 				} else {
 					insertBlock(
 						insertedBlock,
 						getInsertionIndex(),
-						ownProps.destinationRootClientId
+						ownProps.destinationRootClientId,
+						selectBlockOnInsert
 					);
+
+					if ( ! selectBlockOnInsert ) {
+						// translators: %s: the name of the block that has been added
+						const message = sprintf( __( '%s block added' ), title );
+						speak( message );
+					}
 				}
 
-				ownProps.onSelect();
+				onSelect();
 				return insertedBlock;
 			},
 		};

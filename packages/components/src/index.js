@@ -5,6 +5,12 @@ export { default as Autocomplete } from './autocomplete';
 export { default as BaseControl } from './base-control';
 export { default as Button } from './button';
 export { default as ButtonGroup } from './button-group';
+export { default as Card } from './card';
+export { default as CardBody } from './card/body';
+export { default as CardDivider } from './card/divider';
+export { default as CardFooter } from './card/footer';
+export { default as CardHeader } from './card/header';
+export { default as CardMedia } from './card/media';
 export { default as CheckboxControl } from './checkbox-control';
 export { default as ClipboardButton } from './clipboard-button';
 export { default as ColorIndicator } from './color-indicator';
@@ -12,6 +18,7 @@ export { default as ColorPalette } from './color-palette';
 export { default as ColorPicker } from './color-picker';
 export { default as Dashicon } from './dashicon';
 export { DateTimePicker, DatePicker, TimePicker } from './date-time';
+export { default as __experimentalDimensionControl } from './dimension-control';
 export { default as Disabled } from './disabled';
 export { default as Draggable } from './draggable';
 export { default as DropZone } from './drop-zone';
@@ -62,15 +69,30 @@ export { default as Toolbar } from './toolbar';
 export { default as ToolbarButton } from './toolbar-button';
 export { default as Tooltip } from './tooltip';
 export { default as TreeSelect } from './tree-select';
+export { default as VisuallyHidden } from './visually-hidden';
 export { default as IsolatedEventContainer } from './isolated-event-container';
-export { createSlotFill, Slot, Fill, Provider as SlotFillProvider } from './slot-fill';
+export {
+	createSlotFill,
+	Slot,
+	Fill,
+	Provider as SlotFillProvider,
+} from './slot-fill';
 
 // Higher-Order Components
 export { default as navigateRegions } from './higher-order/navigate-regions';
-export { default as withConstrainedTabbing } from './higher-order/with-constrained-tabbing';
-export { default as withFallbackStyles } from './higher-order/with-fallback-styles';
+export {
+	default as withConstrainedTabbing,
+} from './higher-order/with-constrained-tabbing';
+export {
+	default as withFallbackStyles,
+} from './higher-order/with-fallback-styles';
 export { default as withFilters } from './higher-order/with-filters';
 export { default as withFocusOutside } from './higher-order/with-focus-outside';
-export { default as withFocusReturn, Provider as FocusReturnProvider } from './higher-order/with-focus-return';
+export {
+	default as withFocusReturn,
+	Provider as FocusReturnProvider,
+} from './higher-order/with-focus-return';
 export { default as withNotices } from './higher-order/with-notices';
-export { default as withSpokenMessages } from './higher-order/with-spoken-messages';
+export {
+	default as withSpokenMessages,
+} from './higher-order/with-spoken-messages';

@@ -1,6 +1,5 @@
 .editor-post-publish-panel {
 	background: $white;
-	color: $dark-gray-500;
 }
 
 .editor-post-publish-panel__content {
@@ -16,12 +15,18 @@
 
 .editor-post-publish-panel__header {
 	background: $white;
-	padding-left: 16px;
+	padding-left: 8px;
+	padding-right: 8px;
 	height: $header-height;
 	border-bottom: $border-width solid $light-gray-500;
 	display: flex;
 	align-items: center;
 	align-content: space-between;
+
+	.components-icon-button {
+		position: absolute;
+		right: 8px;
+	}
 }
 
 .editor-post-publish-panel__header-publish-button {

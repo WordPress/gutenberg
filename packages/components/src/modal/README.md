@@ -120,24 +120,28 @@ The following example shows you how to properly implement a modal. For the modal
 
 ```jsx
 import { Button, Modal } from '@wordpress/components';
-import { withState } from '@wordpress/compose';
+import { useState } from '@wordpress/element';
 
-const MyModal = withState( {
-	isOpen: false,
-} )( ( { isOpen, setState } ) => (
-	<div>
-		<Button isDefault onClick={ () => setState( { isOpen: true } ) }>Open Modal</Button>
-		{ isOpen && (
-			<Modal
-				title="This is my modal"
-				onRequestClose={ () => setState( { isOpen: false } ) }>
-				<Button isDefault onClick={ () => setState( { isOpen: false } ) }>
-					My custom close button
-				</Button>
-			</Modal>
-		) }
-	</div>
-) );
+const MyModal = () => {
+	const [ isOpen, setOpen ] = useState( false );
+	const openModal = () => setOpen( true );
+	const closeModal = () => setOpen( false );
+
+	return (
+		<>
+			<Button isDefault onClick={ openModal }>Open Modal</Button>
+			{ isOpen && (
+				<Modal
+					title="This is my modal"
+					onRequestClose={ closeModal }>
+					<Button isDefault onClick={ closeModal }>
+						My custom close button
+					</Button>
+				</Modal>
+			) }
+		</>
+	)
+}
 ```
 
 ### Props

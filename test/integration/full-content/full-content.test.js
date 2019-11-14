@@ -49,7 +49,11 @@ function normalizeParsedBlocks( blocks ) {
 describe( 'full post content fixture', () => {
 	beforeAll( () => {
 		unstable__bootstrapServerSideBlockDefinitions( require( './server-registered.json' ) );
-		const settings = { __experimentalEnableLegacyWidgetBlock: true, __experimentalEnableMenuBlock: true };
+		const settings = {
+			__experimentalEnableLegacyWidgetBlock: true,
+			__experimentalEnableMenuBlock: true,
+			__experimentalEnableFullSiteEditing: true,
+		};
 		// Load all hooks that modify blocks
 		require( '../../../packages/editor/src/hooks' );
 		registerCoreBlocks();
