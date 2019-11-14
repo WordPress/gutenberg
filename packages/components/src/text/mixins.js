@@ -7,12 +7,11 @@ import css from '@emotion/css';
  */
 import { fontFamily } from './font-family';
 
-const fontWeightNormal = `font-weight: normal;`;
+const fontWeightNormal = `font-weight: 400;`;
 const fontWeightSemibold = `font-weight: 600;`;
 
 const title = `
   ${ fontWeightNormal }
-  letter-spacing: 0;
 `;
 
 const titleLarge = `
@@ -32,7 +31,8 @@ const titleSmall = `
 
 const subtitle = `
 	${ fontWeightSemibold }
-	letter-spacing: 0;
+	font-size: 14px;
+	line-height: 20px;
 `;
 
 const subtitleLarge = `
@@ -47,12 +47,6 @@ const subtitleSmall = `
 
 const body = `
 	${ fontWeightNormal }
-	letter-spacing: 0;
-`;
-
-const bodySmall = `
-	font-size: 14px;
-	line-height: 20px;
 `;
 
 const bodyLarge = `
@@ -60,26 +54,27 @@ const bodyLarge = `
 	line-height: 24px;
 `;
 
+const bodySmall = `
+	font-size: 14px;
+	line-height: 20px;
+`;
+
 const button = `
   ${ fontWeightSemibold }
   font-size: 14px;
   line-height: 20px;
-  letter-spacing: 0;
 `;
 
 const caption = `
 	${ fontWeightNormal }
 	font-size: 12px;
 	line-height: 16px;
-	letter-spacing: 0;
 `;
 
 const label = `
 	${ fontWeightSemibold }
 	font-size: 12px;
 	line-height: 16px;
-	letter-spacing: 1;
-	text-transform: uppercase;
 `;
 
 /**

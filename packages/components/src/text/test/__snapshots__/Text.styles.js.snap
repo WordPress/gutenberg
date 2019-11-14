@@ -4,11 +4,7 @@ exports[`Text looks like a "body" 1`] = `
 .emotion-0 {
   margin: 0;
   font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
-  font-weight: normal;
-  -webkit-letter-spacing: 0;
-  -moz-letter-spacing: 0;
-  -ms-letter-spacing: 0;
-  letter-spacing: 0;
+  font-weight: 400;
   font-size: 16px;
   line-height: 24px;
 }
@@ -28,11 +24,7 @@ exports[`Text looks like a "body.small" 1`] = `
 .emotion-0 {
   margin: 0;
   font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
-  font-weight: normal;
-  -webkit-letter-spacing: 0;
-  -moz-letter-spacing: 0;
-  -ms-letter-spacing: 0;
-  letter-spacing: 0;
+  font-weight: 400;
   font-size: 14px;
   line-height: 20px;
 }
@@ -55,10 +47,6 @@ exports[`Text looks like a "button" 1`] = `
   font-weight: 600;
   font-size: 14px;
   line-height: 20px;
-  -webkit-letter-spacing: 0;
-  -moz-letter-spacing: 0;
-  -ms-letter-spacing: 0;
-  letter-spacing: 0;
 }
 
 <Text
@@ -76,13 +64,9 @@ exports[`Text looks like a "caption" 1`] = `
 .emotion-0 {
   margin: 0;
   font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
-  font-weight: normal;
+  font-weight: 400;
   font-size: 12px;
   line-height: 16px;
-  -webkit-letter-spacing: 0;
-  -moz-letter-spacing: 0;
-  -ms-letter-spacing: 0;
-  letter-spacing: 0;
 }
 
 <Text
@@ -103,11 +87,6 @@ exports[`Text looks like a "label" 1`] = `
   font-weight: 600;
   font-size: 12px;
   line-height: 16px;
-  -webkit-letter-spacing: 1;
-  -moz-letter-spacing: 1;
-  -ms-letter-spacing: 1;
-  letter-spacing: 1;
-  text-transform: uppercase;
 }
 
 <Text
@@ -126,10 +105,8 @@ exports[`Text looks like a "subtitle" 1`] = `
   margin: 0;
   font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
   font-weight: 600;
-  -webkit-letter-spacing: 0;
-  -moz-letter-spacing: 0;
-  -ms-letter-spacing: 0;
-  letter-spacing: 0;
+  font-size: 14px;
+  line-height: 20px;
   font-size: 16px;
   line-height: 24px;
 }
@@ -150,10 +127,8 @@ exports[`Text looks like a "subtitle.small" 1`] = `
   margin: 0;
   font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
   font-weight: 600;
-  -webkit-letter-spacing: 0;
-  -moz-letter-spacing: 0;
-  -ms-letter-spacing: 0;
-  letter-spacing: 0;
+  font-size: 14px;
+  line-height: 20px;
   font-size: 14px;
   line-height: 20px;
 }
@@ -173,11 +148,7 @@ exports[`Text looks like a "title.large" 1`] = `
 .emotion-0 {
   margin: 0;
   font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
-  font-weight: normal;
-  -webkit-letter-spacing: 0;
-  -moz-letter-spacing: 0;
-  -ms-letter-spacing: 0;
-  letter-spacing: 0;
+  font-weight: 400;
   font-size: 32px;
   line-height: 40px;
 }
@@ -197,11 +168,7 @@ exports[`Text looks like a "title.medium" 1`] = `
 .emotion-0 {
   margin: 0;
   font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
-  font-weight: normal;
-  -webkit-letter-spacing: 0;
-  -moz-letter-spacing: 0;
-  -ms-letter-spacing: 0;
-  letter-spacing: 0;
+  font-weight: 400;
   font-size: 24px;
   line-height: 32px;
 }
@@ -221,11 +188,7 @@ exports[`Text looks like a "title.small" 1`] = `
 .emotion-0 {
   margin: 0;
   font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
-  font-weight: normal;
-  -webkit-letter-spacing: 0;
-  -moz-letter-spacing: 0;
-  -ms-letter-spacing: 0;
-  letter-spacing: 0;
+  font-weight: 400;
   font-size: 20px;
   line-height: 28px;
 }
