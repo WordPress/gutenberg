@@ -74,3 +74,18 @@ function gutenberg_provide_render_callback_with_block_object( $pre_render, $bloc
 	return apply_filters( 'render_block', $block_content, $block );
 }
 add_filter( 'pre_render_block', 'gutenberg_provide_render_callback_with_block_object', 10, 2 );
+
+/**
+ * Sets the current post for usage in template blocks.
+ */
+function gutenberg_set_loop_post() {
+	// TODO: Without this temporary fix, an infinite loop can occur where
+	// posts with post content blocks render themselves recursively.
+	if ( is_admin() || defined( 'REST_REQUEST' ) ) {
+		return true;
+	}
+	if ( ! in_the_loop() ) {
+		rewind_posts();
+		the_post();
+	}
+}

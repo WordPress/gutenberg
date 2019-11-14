@@ -11,9 +11,8 @@
  * @return string Returns the filtered post title for the current post wrapped inside "h1" tags.
  */
 function render_block_core_post_title() {
-	if ( ! in_the_loop() ) {
-		rewind_posts();
-		the_post();
+	if ( gutenberg_set_loop_post() ) {
+		return '';
 	}
 	return the_title( '<h1>', '</h1>', false );
 }
