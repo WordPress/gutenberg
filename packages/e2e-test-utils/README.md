@@ -181,6 +181,18 @@ _Returns_
 
 -   `Promise`: Promise resolving once the edit post sidebar is opened.
 
+<a name="externalWrapperHasFocus" href="#externalWrapperHasFocus">#</a> **externalWrapperHasFocus**
+
+Asserts that the element with keyboard focus is a block's external wrapper
+
+_Parameters_
+
+-   _blockType_ `string`: The expected value of the data-type attribute of the block's external wrapper
+
+_Returns_
+
+-   `Promise`: A promise that's resolved when the active element is evaluated and asserted against the expected result.
+
 <a name="findSidebarPanelToggleButtonWithTitle" href="#findSidebarPanelToggleButtonWithTitle">#</a> **findSidebarPanelToggleButtonWithTitle**
 
 Finds a sidebar panel with the provided title.
@@ -259,6 +271,19 @@ _Returns_
 
 -   `Promise`: Promise resolving with a boolean.
 
+<a name="insertAndPopulateBlock" href="#insertAndPopulateBlock">#</a> **insertAndPopulateBlock**
+
+Inserts a content block and then, if it has text content areas, fills them with text
+
+_Parameters_
+
+-   _blockName_ `string`: The type of block to insert
+-   _content_ `string`: The text to enter into each contenteditable area
+
+_Returns_
+
+-   `Promise`: A promise that resolves when all the blocks are inserted and filled with content.
+
 <a name="insertBlock" href="#insertBlock">#</a> **insertBlock**
 
 Opens the inserter, searches for the given term, then selects the first
@@ -326,6 +351,14 @@ _Parameters_
 _Returns_
 
 -   `Promise`: Promise that uses `mockCheck` to see if a request should be mocked with `mock`, and optionally transforms the response with `responseObjectTransform`.
+
+<a name="navigateToContentEditorTop" href="#navigateToContentEditorTop">#</a> **navigateToContentEditorTop**
+
+Navigates to the top of the content editor using the keyboard.
+
+_Returns_
+
+-   `Promise`: A promise that's resolved when the browser has finished emulating the keyboard shortcut for focusing the top of the editor, and tabbed to the next focusable element.
 
 <a name="observeFocusLoss" href="#observeFocusLoss">#</a> **observeFocusLoss**
 
@@ -476,6 +509,91 @@ running the test is not already the admin user).
 
 Switches the current user to whichever user we should be
 running the tests as (if we're not already that user).
+
+<a name="tabThroughBlockControls" href="#tabThroughBlockControls">#</a> **tabThroughBlockControls**
+
+Tabs through a content block and asserts that the external wrapper, inserter toggle, mover controls, and toolbar buttons all receive keyboard focus.
+
+_Parameters_
+
+-   _blockType_ `string`: The expected value of the data-type attribute of the block's external wrapper
+
+_Returns_
+
+-   `Promise`: A promise that's resolved when the browser has finished tabbing through the major components of a common block.
+
+<a name="tabThroughBlockMovers" href="#tabThroughBlockMovers">#</a> **tabThroughBlockMovers**
+
+Navigates through the block mover control using the keyboard. Asserts that the 'move up' and 'move down' controls receive focus.
+
+_Returns_
+
+-   `Promise`: A promise that's resolved when the browser has finished tabbing throught the block mover controls.
+
+<a name="tabThroughBlockToolbar" href="#tabThroughBlockToolbar">#</a> **tabThroughBlockToolbar**
+
+Navigate through a block's toolbar using the keyboard. Asserts that each button receives focus.
+
+_Returns_
+
+-   `Promise`: A promise that resolves when it's finished tabbing through the buttons in a block's toolbar, asserting that each one received focus.
+
+<a name="tabThroughFileBlock" href="#tabThroughFileBlock">#</a> **tabThroughFileBlock**
+
+Tabs through a content block with file upload buttons, such as an Image, Gallery, Audio, or Cover block
+
+_Parameters_
+
+-   _blockType_ `string`: The expected value of the data-type attribute of the block's external wrapper
+
+_Returns_
+
+-   `Promise`: A promise that resolves when the browser has completed tabbing through the common block components, and the placeholder buttons that are unique to blocks with file-upload features.
+
+<a name="tabThroughPlaceholderButtons" href="#tabThroughPlaceholderButtons">#</a> **tabThroughPlaceholderButtons**
+
+Tabs through the file upload buttons that appear in a file content block's placeholder area
+
+_Returns_
+
+-   `Promise`: A promise that resolves when the browser has completed tabbing through the placeholder buttons that are unique to blocks with file-upload features.
+
+<a name="tabThroughTextBlock" href="#tabThroughTextBlock">#</a> **tabThroughTextBlock**
+
+Tabs through a content block with text content areas, such as a Heading, Quote, or Paragraph block. Asserts that the text content areas all receive focus.
+
+_Parameters_
+
+-   _blockType_ `string`: The expected value of the data-type attribute of the block's external wrapper
+-   _content_ `string`: The expected title of the block
+
+_Returns_
+
+-   `Promise`: A promise that resolves when the browser has completed tabbing through the focusable elements of a common block, and through the contenteditbable areas unique to text blocks.
+
+<a name="tabThroughTextContentAreas" href="#tabThroughTextContentAreas">#</a> **tabThroughTextContentAreas**
+
+Tabs through the text content areas of a block and asserts the expected values
+
+_Parameters_
+
+-   _content_ `string`: The expected value of the block's contenteditable elements
+
+_Returns_
+
+-   `Promise`: A promise that's resolved when the browser has finished tabbing throught the contenteditable areas of a block, and asserting they have keyboard focus and the expected content.
+
+<a name="textContentAreas" href="#textContentAreas">#</a> **textContentAreas**
+
+Returns a list of a block's contenteditable elements.
+
+_Parameters_
+
+-   _empty_ `boolean`: When true, restricts the list to contenteditable elements with no value
+
+_Returns_
+
+-   `Promise`: A promise that resolves when it's returned an array of classes representing the contenteditable areas of a block with keyboard focus.
 
 <a name="toggleMoreMenu" href="#toggleMoreMenu">#</a> **toggleMoreMenu**
 

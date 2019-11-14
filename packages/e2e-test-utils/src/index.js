@@ -14,28 +14,39 @@ export { dragAndResize } from './drag-and-resize';
 export { enablePageDialogAccept } from './enable-page-dialog-accept';
 export { enablePrePublishChecks } from './enable-pre-publish-checks';
 export { ensureSidebarOpened } from './ensure-sidebar-opened';
-export { findSidebarPanelToggleButtonWithTitle } from './find-sidebar-panel-toggle-button-with-title';
+export { externalWrapperHasFocus } from './external-wrapper-has-focus';
+export {
+	findSidebarPanelToggleButtonWithTitle,
+} from './find-sidebar-panel-toggle-button-with-title';
 export { findSidebarPanelWithTitle } from './find-sidebar-panel-with-title';
-export { getAllBlockInserterItemTitles } from './get-all-block-inserter-item-titles';
+export {
+	getAllBlockInserterItemTitles,
+} from './get-all-block-inserter-item-titles';
 export { getAllBlocks } from './get-all-blocks';
 export { getAvailableBlockTransforms } from './get-available-block-transforms';
 export { getBlockSetting } from './get-block-setting';
 export { getEditedPostContent } from './get-edited-post-content';
 export { hasBlockSwitcher } from './has-block-switcher';
+export { insertAndPopulateBlock } from './insert-and-populate-block';
 export { insertBlock } from './insert-block';
 export { installPlugin } from './install-plugin';
 export { isCurrentURL } from './is-current-url';
 export { isInDefaultBlock } from './is-in-default-block';
 export { loginUser } from './login-user';
+export { navigateToContentEditorTop } from './navigate-to-content-editor-top';
 export { observeFocusLoss } from './observe-focus-loss';
-export { openAllBlockInserterCategories } from './open-all-block-inserter-categories';
+export {
+	openAllBlockInserterCategories,
+} from './open-all-block-inserter-categories';
 export { openDocumentSettingsSidebar } from './open-document-settings-sidebar';
 export { openGlobalBlockInserter } from './open-global-block-inserter';
 export { openPublishPanel } from './open-publish-panel';
 export { pressKeyTimes } from './press-key-times';
 export { pressKeyWithModifier } from './press-key-with-modifier';
 export { publishPost } from './publish-post';
-export { publishPostWithPrePublishChecksDisabled } from './publish-post-with-pre-publish-checks-disabled';
+export {
+	publishPostWithPrePublishChecksDisabled,
+} from './publish-post-with-pre-publish-checks-disabled';
 export { saveDraft } from './save-draft';
 export { searchForBlock } from './search-for-block';
 export { selectBlockByClientId } from './select-block-by-client-id';
@@ -45,6 +56,16 @@ export { switchEditorModeTo } from './switch-editor-mode-to';
 export { disableNavigationMode } from './keyboard-mode';
 export { switchUserToAdmin } from './switch-user-to-admin';
 export { switchUserToTest } from './switch-user-to-test';
+export { tabThroughBlockControls } from './tab-through-block-controls';
+export { tabThroughBlockMovers } from './tab-through-block-movers';
+export { tabThroughBlockToolbar } from './tab-through-block-toolbar';
+export { tabThroughFileBlock } from './tab-through-file-block';
+export {
+	tabThroughPlaceholderButtons,
+} from './tab-through-placeholder-buttons';
+export { tabThroughTextBlock } from './tab-through-text-block';
+export { tabThroughTextContentAreas } from './tab-through-text-content-areas';
+export { textContentAreas } from './text-content-areas';
 export { toggleMoreMenu } from './toggle-more-menu';
 export { toggleOfflineMode, isOfflineMode } from './offline-mode';
 export { toggleScreenOption } from './toggle-screen-option';
