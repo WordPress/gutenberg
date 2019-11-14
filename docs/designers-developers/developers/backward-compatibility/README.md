@@ -42,7 +42,7 @@ To encourage third-party developpers to adopt the new APIs instead, we can use t
 
 ## Dev Notes
 
-Dev Notes are posts published in the make/core site prior to WordPress releases to inform third-party developpers about important changes to the developper APIs, these changes can include:
+Dev notes are [posts published on the make/core site](https://make.wordpress.org/core/tag/dev-notes/) prior to WordPress releases to inform third-party developers about important changes to the developer APIs, these changes can include:
 * Promote new APIs.
 * Explain how some changes to existing APIs might affect existing plugins and themes (Example: classname changes...)
 * When breaking backward compatibility is unavoidable, explain the reasons and the migration flow.
