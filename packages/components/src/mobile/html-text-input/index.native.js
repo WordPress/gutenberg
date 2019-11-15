@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { TextInput } from 'react-native';
-import RNReactNativeGutenbergBridge from 'react-native-gutenberg-bridge';
 
 /**
  * WordPress dependencies
@@ -11,6 +10,7 @@ import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { parse } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
+import { addAction, removeAction } from '@wordpress/hooks';
 import { withInstanceId, compose, withPreferredColorScheme } from '@wordpress/compose';
 
 /**
@@ -25,6 +25,7 @@ export class HTMLTextInput extends Component {
 
 		this.edit = this.edit.bind( this );
 		this.stopEditing = this.stopEditing.bind( this );
+		addAction( 'native-editor.persist-html', 'core/editor', this.stopEditing );
 
 		this.state = {};
 	}
@@ -41,6 +42,7 @@ export class HTMLTextInput extends Component {
 	}
 
 	componentWillUnmount() {
+		removeAction( 'native-editor.persist-html', 'core/editor' );
 		//TODO: Blocking main thread
 		this.stopEditing();
 	}
@@ -104,7 +106,7 @@ export default compose( [
 			value: getEditedPostContent(),
 		};
 	} ),
-	withDispatch( ( dispatch, ownProps ) => {
+	withDispatch( ( dispatch ) => {
 		const { editPost, resetEditorBlocks } = dispatch( 'core/editor' );
 		return {
 			editTitle( title ) {
@@ -115,9 +117,7 @@ export default compose( [
 			},
 			onPersist( content ) {
 				const blocks = parse( content );
-				const hasChanges = ownProps.value !== content;
 				resetEditorBlocks( blocks );
-				RNReactNativeGutenbergBridge.provideToNative_Html( content, ownProps.title, hasChanges );
 			},
 		};
 	} ),
