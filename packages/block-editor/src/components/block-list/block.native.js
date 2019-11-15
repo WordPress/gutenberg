@@ -151,7 +151,7 @@ class BlockListBlock extends Component {
 		const defaultStyle = [ isDashed ? getStylesFromColorScheme( styles.blockHolderDashedBordered, styles.blockHolderDashedBorderedDark ) : styles.blockContainer ];
 
 		if ( isMediaTextParent ) {
-			return [ ...defaultStyle, styles.blockContainerMediaTextInner ];
+			return [ ...defaultStyle, styles.horizontalMarginNone, styles.horizontalPaddingNone ];
 		}
 
 		if ( isNestedInnerBlock ) {
