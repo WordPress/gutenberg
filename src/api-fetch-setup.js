@@ -25,7 +25,8 @@ const fetchHandler = ( { path } ) => {
 	};
 
 	return responsePromise.then( parseResponse ).catch( ( error ) => {
-		return error;
+		console.warn( 'Network Error: ', error );
+		return Promise.resolve( error );
 	} );
 };
 
