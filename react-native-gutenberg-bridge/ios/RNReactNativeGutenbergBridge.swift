@@ -45,11 +45,6 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     }
 
     @objc
-    func requestOtherMediaPickFrom(_ source: String, allowMultipleSelection: Bool, callback: @escaping RCTResponseSenderBlock) {
-        requestMediaPickFrom(source, filter: nil, allowMultipleSelection: allowMultipleSelection, callback: callback)
-    }
-
-    @objc
     func getOtherMediaOptions(_ filter: [String]?, callback: @escaping RCTResponseSenderBlock) {
         guard let dataSource = dataSource else {
             return callback([])

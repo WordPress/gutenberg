@@ -10,6 +10,12 @@ const isIOS = Platform.OS === 'ios';
 
 const gutenbergBridgeEvents = new NativeEventEmitter( RNReactNativeGutenbergBridge );
 
+export const mediaSources = {
+	deviceLibrary: 'DEVICE_MEDIA_LIBRARY',
+	deviceCamera: 'DEVICE_CAMERA',
+	siteMediaLibrary: 'SITE_MEDIA_LIBRARY',
+};
+
 // Console polyfill from react-native
 
 export function nativeLoggingHook( message, logLevel ) {
@@ -57,16 +63,18 @@ export function subscribeMediaAppend( callback ) {
 	return gutenbergBridgeEvents.addListener( 'mediaAppend', callback );
 }
 
-export function requestMediaPickFromMediaLibrary( filter, multiple, callback ) {
-	return RNReactNativeGutenbergBridge.requestMediaPickFrom( 'SITE_MEDIA_LIBRARY', filter, multiple, callback );
-}
-
-export function requestMediaPickFromDeviceLibrary( filter, multiple, callback ) {
-	return RNReactNativeGutenbergBridge.requestMediaPickFrom( 'DEVICE_MEDIA_LIBRARY', filter, multiple, callback );
-}
-
-export function requestMediaPickFromDeviceCamera( filter, multiple, callback ) {
-	return RNReactNativeGutenbergBridge.requestMediaPickFrom( 'DEVICE_CAMERA', filter, multiple, callback );
+/**
+ * Request media picker for the given media source.
+ *
+ * Kinds of media source can be device library, camera, etc.
+ *
+ * @param {string}         source    The media source to request media from.
+ * @param {Array<string>}  filter    Array of media types to filter the media to select.
+ * @param {boolean}        multiple  Is multiple selection allowed?
+ * @param {Function}       callback  RN Callback function to be called with the selected media objects.
+ */
+export function requestMediaPicker( source, filter, multiple, callback ) {
+	RNReactNativeGutenbergBridge.requestMediaPickFrom( source, filter, multiple, callback );
 }
 
 export function requestMediaImport( url, callback ) {
@@ -93,8 +101,8 @@ export function getOtherMediaOptions( filter, callback ) {
 	return RNReactNativeGutenbergBridge.getOtherMediaOptions( filter, callback );
 }
 
-export function requestOtherMediaPickFrom( mediaSource, multiple, callback ) {
-	return RNReactNativeGutenbergBridge.requestOtherMediaPickFrom( mediaSource, multiple, callback );
+export function requestImageFullscreenPreview( mediaUrl ) {
+	return RNReactNativeGutenbergBridge.requestImageFullscreenPreview( mediaUrl );
 }
 
 export function fetchRequest( path ) {

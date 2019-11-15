@@ -67,6 +67,7 @@ public class WPAndroidGlueCode {
     private OnReattachQueryListener mOnReattachQueryListener;
     private OnEditorMountListener mOnEditorMountListener;
     private OnEditorAutosaveListener mOnEditorAutosaveListener;
+    private OnImageFullscreenPreviewListener mOnImageFullscreenPreviewListener;
     private boolean mIsEditorMounted;
 
     private String mContentHtml = "";
@@ -119,6 +120,10 @@ public class WPAndroidGlueCode {
         void onCancelUploadForMediaDueToDeletedBlock(int mediaId);
         ArrayList<MediaOption> onGetOtherMediaImageOptions();
         void onOtherMediaButtonClicked(String mediaSource, boolean allowMultipleSelection);
+    }
+
+    public interface OnImageFullscreenPreviewListener {
+        void onImageFullscreenPreviewClicked(String mediaUrl);
     }
 
     public interface OnReattachQueryListener {
@@ -280,6 +285,11 @@ public class WPAndroidGlueCode {
             public void performRequest(String pathFromJS, Consumer<String> onSuccess, Consumer<String> onError) {
                 mRequestExecutor.performRequest(pathFromJS, onSuccess, onError);
             }
+
+            @Override
+            public void requestImageFullscreenPreview(String mediaUrl) {
+                mOnImageFullscreenPreviewListener.onImageFullscreenPreviewClicked(mediaUrl);
+            }
         });
 
         return Arrays.asList(
@@ -342,7 +352,8 @@ public class WPAndroidGlueCode {
                                   OnEditorMountListener onEditorMountListener,
                                   OnEditorAutosaveListener onEditorAutosaveListener,
                                   OnAuthHeaderRequestedListener onAuthHeaderRequestedListener,
-                                  RequestExecutor fetchExecutor) {
+                                  RequestExecutor fetchExecutor,
+                                  OnImageFullscreenPreviewListener onImageFullscreenPreviewListener) {
         MutableContextWrapper contextWrapper = (MutableContextWrapper) mReactRootView.getContext();
         contextWrapper.setBaseContext(viewGroup.getContext());
 
@@ -351,6 +362,7 @@ public class WPAndroidGlueCode {
         mOnEditorMountListener = onEditorMountListener;
         mOnEditorAutosaveListener = onEditorAutosaveListener;
         mRequestExecutor = fetchExecutor;
+        mOnImageFullscreenPreviewListener = onImageFullscreenPreviewListener;
 
         sAddCookiesInterceptor.setOnAuthHeaderRequestedListener(onAuthHeaderRequestedListener);
 

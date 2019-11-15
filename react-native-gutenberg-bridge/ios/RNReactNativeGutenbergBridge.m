@@ -5,7 +5,6 @@
 
 RCT_EXTERN_METHOD(provideToNative_Html:(NSString *)html title:(NSString *)title changed:(BOOL)changed)
 RCT_EXTERN_METHOD(requestMediaPickFrom:(NSString *)source filter:(NSArray<NSString *> *)filter allowMultipleSelection:(BOOL)allowMultipleSelection callback:(RCTResponseSenderBlock)callback)
-RCT_EXTERN_METHOD(requestOtherMediaPickFrom:(NSString *)source allowMultipleSelection:(BOOL)allowMultipleSelection callback:(RCTResponseSenderBlock)callback)
 RCT_EXTERN_METHOD(getOtherMediaOptions:(NSArray<NSString *> *)filter callback:(RCTResponseSenderBlock)callback)
 RCT_EXTERN_METHOD(mediaUploadSync)
 RCT_EXTERN_METHOD(requestImageFailedRetryDialog:(int)mediaID)
