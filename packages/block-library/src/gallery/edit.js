@@ -299,6 +299,7 @@ class GalleryEdit extends Component {
 					<PanelBody title={ __( 'Gallery Settings' ) }>
 						{ images.length > 1 && <RangeControl
 							label={ __( 'Columns' ) }
+							separatorType="fullWidth"
 							value={ columns }
 							onChange={ this.setColumnsNumber }
 							min={ 1 }
@@ -307,12 +308,14 @@ class GalleryEdit extends Component {
 						/> }
 						<ToggleControl
 							label={ __( 'Crop Images' ) }
+							separatorType="fullWidth"
 							checked={ !! imageCrop }
 							onChange={ this.toggleImageCrop }
 							help={ this.getImageCropHelp }
 						/>
 						<SelectControl
 							label={ __( 'Link To' ) }
+							separatorType="fullWidth"
 							value={ linkTo }
 							onChange={ this.setLinkTo }
 							options={ linkOptions }
