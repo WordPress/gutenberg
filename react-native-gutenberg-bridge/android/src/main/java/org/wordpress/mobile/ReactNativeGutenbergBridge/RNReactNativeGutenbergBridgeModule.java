@@ -165,6 +165,11 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     }
 
     @ReactMethod
+    public void requestImageFullscreenPreview(String mediaUrl) {
+        mGutenbergBridgeJS2Parent.requestImageFullscreenPreview(mediaUrl);
+    }
+
+    @ReactMethod
     public void editorDidEmitLog(String message, int logLevel) {
         mGutenbergBridgeJS2Parent.editorDidEmitLog(message, GutenbergBridgeJS2Parent.LogLevel.valueOf(logLevel));
     }
