@@ -22,7 +22,7 @@ import {
 	isUnmodifiedDefaultBlock,
 	getUnregisteredTypeHandlerName,
 } from '@wordpress/blocks';
-import { KeyboardShortcuts, withFilters } from '@wordpress/components';
+import { KeyboardShortcuts, withFilters, createSlotFill } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	withDispatch,
@@ -509,6 +509,25 @@ function BlockListBlock( {
 		blockEdit = <div style={ { display: 'none' } }>{ blockEdit }</div>;
 	}
 
+	const { Fill, Slot } = createSlotFill( 'ChildToolbar' );
+
+	const ChildToolbar = () => (
+		<Fill>
+			<BlockContextualToolbar
+				// If the toolbar is being shown because of being forced
+				// it should focus the toolbar right after the mount.
+				focusOnMount={ isForcingContextualToolbar.current }
+			/>
+		</Fill>
+	);
+
+	const ChildToolbarSlot = () => (
+		<Slot bubblesVirtually={ true } />
+	);
+
+	// if ( name === 'core/navigation-menu' ) {
+	// 	console.log( name, isParentOfSelectedBlock, consumeChildToolbar );
+	// }
 	return (
 		<IgnoreNestedEvents
 			id={ blockElementId }
@@ -565,21 +584,29 @@ function BlockListBlock( {
 						ref={ breadcrumb }
 					/>
 				) }
+
 				{ ( ( ! consumeChildToolbar && shouldShowContextualToolbar ) || isForcingContextualToolbar.current ) && (
+
 					<BlockContextualToolbar
+						// If the toolbar is being shown because of being forced
+						// it should focus the toolbar right after the mount.
+						focusOnMount={ isForcingContextualToolbar.current }
+					/>
+
+				) }
+
+				{ name === 'core/navigation-menu-item' && shouldShowContextualToolbar && (
+					<ChildToolbar />
+				) }
+
+				{ isParentOfSelectedBlock && (
+					<ChildToolbarSlot />
 						// If the toolbar is being shown because of being forced
 						// it should focus the toolbar right after the mount.
 						focusOnMount={ isForcingContextualToolbar.current }
 					/>
 				) }
 
-				{ isParentOfSelectedBlock && isRootOfHierarchy && (
-					<BlockContextualToolbar
-						// If the toolbar is being shown because of being forced
-						// it should focus the toolbar right after the mount.
-						focusOnMount={ isForcingContextualToolbar.current }
-					/>
-				) }
 				{
 					! isNavigationMode &&
 					! shouldShowContextualToolbar &&
