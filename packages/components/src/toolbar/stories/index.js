@@ -1,9 +1,4 @@
 /**
- * WordPress dependencies
- */
-import { withInstanceId } from '@wordpress/compose';
-
-/**
  * Internal dependencies
  */
 import Toolbar from '../';
@@ -19,13 +14,11 @@ function InlineImageIcon() {
 	);
 }
 
-const ToolbarWithId = withInstanceId( ( { instanceId, ...props } ) => (
-	<Toolbar id={ `toolbar-${ instanceId }` } { ...props } />
-) );
-
+/* eslint-disable no-restricted-syntax */
 export const _default = () => {
 	return (
-		<ToolbarWithId __experimentalAccessibilityLabel="Options">
+		// id is required for server side rendering
+		<Toolbar __experimentalAccessibilityLabel="Options" id="options-toolbar">
 			<ToolbarGroup>
 				<ToolbarButton icon="editor-paragraph" title="Paragraph" />
 			</ToolbarGroup>
@@ -65,16 +58,18 @@ export const _default = () => {
 					{ icon: 'editor-alignright', title: 'Align right' },
 				] }
 			/>
-		</ToolbarWithId>
+		</Toolbar>
 	);
 };
 
 export const withoutGroup = () => {
 	return (
-		<ToolbarWithId __experimentalAccessibilityLabel="Options">
+		// id is required for server side rendering
+		<Toolbar __experimentalAccessibilityLabel="Options" id="options-toolbar-without-group">
 			<ToolbarButton icon="editor-bold" title="Bold" />
 			<ToolbarButton icon="editor-italic" title="Italic" />
 			<ToolbarButton icon="admin-links" title="Link" />
-		</ToolbarWithId>
+		</Toolbar>
 	);
 };
+/* eslint-enable no-restricted-syntax */
