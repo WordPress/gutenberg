@@ -15,28 +15,30 @@
 function build_css_colors( $attributes ) {
 	// CSS classes.
 	$colors = array(
-		'text_css_classes'   => '',
-		'text_inline_styles' => '',
+		'css_classes'   => '',
+		'inline_styles' => '',
 	);
 
-	// Text color.
-	// Text color - has text color.
-	if ( array_key_exists( 'textColor', $attributes ) ) {
-		$colors['text_css_classes'] .= ' has-text-color';
-	}
-	// Text color - add custom CSS class.
-	if ( array_key_exists( 'textColorCSSClass', $attributes ) ) {
-		$colors['text_css_classes'] .= " {$attributes['textColorCSSClass']}";
+	$has_named_text_color  = array_key_exists( 'textColor', $attributes );
+	$has_custom_text_color = array_key_exists( 'customTextColor', $attributes );
 
-	} elseif ( array_key_exists( 'customTextColor', $attributes ) ) {
-		// Text color - or add inline `color` style.
-		$colors['text_inline_styles'] = ' style="color: ' . esc_attr( $attributes['customTextColor'] ) . ';"';
+	// If has text color.
+	if ( $has_custom_text_color || $has_named_text_color ) {
+		// Add has-text-color class.
+		$colors['css_classes'] .= 'has-text-color';
 	}
 
-	$colors['text_css_classes'] = esc_attr( trim( $colors['text_css_classes'] ) );
+	if ( $has_named_text_color ) {
+		// Add the color class.
+		$colors['css_classes'] .= sprintf( ' has-%s-color', $attributes['textColor'] );
+	} elseif ( $has_custom_text_color ) {
+		// Add the custom color inline style.
+		$colors['inline_styles'] = sprintf( 'color: %s;', $attributes['customTextColor'] );
+	}
 
 	return $colors;
 }
+
 /**
  * Renders the `core/navigation-menu` block on server.
  *
@@ -47,24 +49,14 @@ function build_css_colors( $attributes ) {
  * @return string Returns the post content with the legacy widget added.
  */
 function render_block_navigation_menu( $attributes, $content, $block ) {
-	$classes = 'wp-block-navigation-menu';
-	if ( ! empty( $attributes['className'] ) ) {
-		$classes .= ' ' . $attributes['className'];
-	}
-
-	// Inline computed colors.
-	$style = '';
-
-	if ( array_key_exists( 'textColorValue', $attributes ) ) {
-		$style .= 'color: ' . esc_attr( $attributes['textColorValue'] ) . ';';
-	}
-
-	$colors = build_css_colors( $attributes );
+  $colors  = build_css_colors( $attributes );
+	$classes = array( 'wp-block-navigation-menu', $attributes['className'], $colors['css_classes'] );
+	$classes = join( ' ', array_filter( $classes ) );
 
 	return sprintf(
 		'<nav class="%1$s" %2$s>%3$s</nav>',
 		esc_attr( $classes ),
-		$style ? sprintf( 'style="%s"', esc_attr( $style ) ) : '',
+		$colors['inline_styles'] ? sprintf( 'style="%s"', esc_attr( $colors['inline_styles'] ) ) : '',
 		build_navigation_menu_html( $block, $colors )
 	);
 }
@@ -79,36 +71,38 @@ function render_block_navigation_menu( $attributes, $content, $block ) {
  */
 function build_navigation_menu_html( $block, $colors ) {
 	$html = '';
-	foreach ( (array) $block['innerBlocks'] as $key => $menu_item ) {
+
+	$class_attribute = sprintf( ' class="%s"', esc_attr( $colors['css_classes'] ? 'wp-block-navigation-menu-item__link ' . $colors['css_classes'] : 'wp-block-navigation-menu-item__link' ) );
+	$style_attribute = $colors['inline_styles'] ? sprintf( ' style="%s"', esc_attr( $colors['inline_styles'] ) ) : '';
+
+	foreach ( (array) $block['innerBlocks'] as $key => $block ) {
 
 		$html .= '<li class="wp-block-navigation-menu-item">' .
-			'<a
-				class="wp-block-navigation-menu-item__link ' . $colors['text_css_classes'] . '"
-				' . $colors['text_inline_styles'];
+			'<a' . $class_attribute . $style_attribute;
 
 		// Start appending HTML attributes to anchor tag.
-		if ( isset( $menu_item['attrs']['url'] ) ) {
-			$html .= ' href="' . $menu_item['attrs']['url'] . '"';
+		if ( isset( $block['attrs']['url'] ) ) {
+			$html .= ' href="' . $block['attrs']['url'] . '"';
 		}
-		if ( isset( $menu_item['attrs']['title'] ) ) {
-			$html .= ' title="' . $menu_item['attrs']['title'] . '"';
+		if ( isset( $block['attrs']['title'] ) ) {
+			$html .= ' title="' . $block['attrs']['title'] . '"';
 		}
 
-		if ( isset( $menu_item['attrs']['opensInNewTab'] ) && true === $menu_item['attrs']['opensInNewTab'] ) {
+		if ( isset( $block['attrs']['opensInNewTab'] ) && true === $block['attrs']['opensInNewTab'] ) {
 			$html .= ' target="_blank"  ';
 		}
 		// End appending HTML attributes to anchor tag.
 
 		// Start anchor tag content.
 		$html .= '>';
-		if ( isset( $menu_item['attrs']['label'] ) ) {
-			$html .= $menu_item['attrs']['label'];
+		if ( isset( $block['attrs']['label'] ) ) {
+			$html .= $block['attrs']['label'];
 		}
 		$html .= '</a>';
 		// End anchor tag content.
 
-		if ( count( (array) $menu_item['innerBlocks'] ) > 0 ) {
-			$html .= build_navigation_menu_html( $menu_item, $colors );
+		if ( count( (array) $block['innerBlocks'] ) > 0 ) {
+			$html .= build_navigation_menu_html( $block, $colors );
 		}
 
 		$html .= '</li>';
@@ -129,28 +123,17 @@ function register_block_core_navigation_menu() {
 		array(
 			'category'        => 'layout',
 			'attributes'      => array(
-				'className'         => array(
+				'className'        => array(
 					'type' => 'string',
 				),
-
-				'automaticallyAdd'  => array(
+				'automaticallyAdd' => array(
 					'type'    => 'boolean',
 					'default' => false,
 				),
-
-				'textColor'         => array(
+				'textColor'        => array(
 					'type' => 'string',
 				),
-
-				'textColorValue'    => array(
-					'type' => 'string',
-				),
-
-				'customTextColor'   => array(
-					'type' => 'string',
-				),
-
-				'textColorCSSClass' => array(
+				'customTextColor'  => array(
 					'type' => 'string',
 				),
 			),
