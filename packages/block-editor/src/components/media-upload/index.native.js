@@ -52,7 +52,7 @@ const siteLibrarySource = {
 	icon: 'wordpress-alt',
 };
 
-const internalSources = [ deviceLibrarySource, cameraImageSource, cameraVideoSource, , siteLibrarySource ];
+const internalSources = [ deviceLibrarySource, cameraImageSource, cameraVideoSource, siteLibrarySource ];
 
 export class MediaUpload extends React.Component {
 	constructor( props ) {
