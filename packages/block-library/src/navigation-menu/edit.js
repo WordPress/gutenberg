@@ -1,21 +1,15 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import {
 	useMemo,
-	useEffect,
 	Fragment,
 } from '@wordpress/element';
 import {
 	InnerBlocks,
 	InspectorControls,
 	BlockControls,
-	withColors,
+	__experimentalUseColors,
 } from '@wordpress/block-editor';
 
 import { createBlock } from '@wordpress/blocks';
@@ -45,8 +39,6 @@ function NavigationMenu( {
 	pages,
 	isRequestingPages,
 	hasResolvedPages,
-	textColor,
-	setTextColor,
 	setAttributes,
 	hasExistingNavItems,
 	updateNavItemBlocks,
@@ -54,14 +46,12 @@ function NavigationMenu( {
 	//
 	// HOOKS
 	//
+	/* eslint-disable @wordpress/no-unused-vars-before-return */
+	const { TextColor } = __experimentalUseColors(
+		[ { name: 'textColor', property: 'color' } ],
+	);
+	/* eslint-enable @wordpress/no-unused-vars-before-return */
 	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator( clientId );
-
-	useEffect( () => {
-		// Set/Unset colors CSS classes.
-		setAttributes( {
-			textColorCSSClass: textColor.class ? textColor.class : null,
-		} );
-	}, [ textColor.class ] );
 
 	// Builds menu items from default Pages
 	const defaultPagesMenuItems = useMemo(
@@ -153,22 +143,6 @@ function NavigationMenu( {
 		);
 	}
 
-	// Build Inline Styles
-	const navigationMenuInlineStyles = {
-		...( textColor && {
-			color: textColor.color,
-			borderColor: textColor.color,
-		} ),
-	};
-
-	// Build ClassNames
-	const navigationMenuClasses = classnames(
-		'wp-block-navigation-menu', {
-			'has-text-color': textColor.color,
-			[ attributes.textColorCSSClass ]: attributes && attributes.textColorCSSClass,
-		}
-	);
-
 	// UI State: rendered Block UI
 	return (
 		<Fragment>
@@ -177,12 +151,8 @@ function NavigationMenu( {
 					{ navigatorToolbarButton }
 				</Toolbar>
 				<BlockColorsStyleSelector
-					textColor={ textColor }
-					textColorValue={ attributes.textColorValue }
-					onColorChange={ ( { value } ) => {
-						setTextColor( value );
-						setAttributes( { textColorValue: value } );
-					} }
+					value={ TextColor.color }
+					onChange={ TextColor.setColor }
 				/>
 			</BlockControls>
 			{ navigatorModal }
@@ -205,23 +175,23 @@ function NavigationMenu( {
 					<BlockNavigationList clientId={ clientId } />
 				</PanelBody>
 			</InspectorControls>
+			<TextColor>
+				<div className="wp-block-navigation-menu">
+					{ ! hasExistingNavItems && isRequestingPages && <><Spinner /> { __( 'Loading Navigation…' ) } </> }
 
-			<div className={ navigationMenuClasses } style={ navigationMenuInlineStyles }>
-				{ ! hasExistingNavItems && isRequestingPages && <><Spinner /> { __( 'Loading Navigation…' ) } </> }
+					<InnerBlocks
+						allowedBlocks={ [ 'core/navigation-link' ] }
+						templateInsertUpdatesSelection={ false }
+						__experimentalMoverDirection={ 'horizontal' }
+					/>
 
-				<InnerBlocks
-					allowedBlocks={ [ 'core/navigation-link' ] }
-					templateInsertUpdatesSelection={ false }
-					__experimentalMoverDirection={ 'horizontal' }
-				/>
-
-			</div>
+				</div>
+			</TextColor>
 		</Fragment>
 	);
 }
 
 export default compose( [
-	withColors( { textColor: 'color' } ),
 	withSelect( ( select, { clientId } ) => {
 		const innerBlocks = select( 'core/block-editor' ).getBlocks( clientId );
 		const hasExistingNavItems = !! innerBlocks.length;

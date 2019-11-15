@@ -15,28 +15,30 @@
 function build_css_colors( $attributes ) {
 	// CSS classes.
 	$colors = array(
-		'text_css_classes'   => '',
-		'text_inline_styles' => '',
+		'css_classes'   => '',
+		'inline_styles' => '',
 	);
 
-	// Text color.
-	// Text color - has text color.
-	if ( array_key_exists( 'textColor', $attributes ) ) {
-		$colors['text_css_classes'] .= ' has-text-color';
-	}
-	// Text color - add custom CSS class.
-	if ( array_key_exists( 'textColorCSSClass', $attributes ) ) {
-		$colors['text_css_classes'] .= " {$attributes['textColorCSSClass']}";
+	$has_named_text_color  = array_key_exists( 'textColor', $attributes );
+	$has_custom_text_color = array_key_exists( 'customTextColor', $attributes );
 
-	} elseif ( array_key_exists( 'customTextColor', $attributes ) ) {
-		// Text color - or add inline `color` style.
-		$colors['text_inline_styles'] = ' style="color: ' . esc_attr( $attributes['customTextColor'] ) . ';"';
+	// If has text color.
+	if ( $has_custom_text_color || $has_named_text_color ) {
+		// Add has-text-color class.
+		$colors['css_classes'] .= 'has-text-color';
 	}
 
-	$colors['text_css_classes'] = esc_attr( trim( $colors['text_css_classes'] ) );
+	if ( $has_named_text_color ) {
+		// Add the color class.
+		$colors['css_classes'] .= sprintf( ' has-%s-color', $attributes['textColor'] );
+	} elseif ( $has_custom_text_color ) {
+		// Add the custom color inline style.
+		$colors['inline_styles'] = sprintf( 'color: %s;', $attributes['customTextColor'] );
+	}
 
 	return $colors;
 }
+
 /**
  * Renders the `core/navigation-menu` block on server.
  *
@@ -47,21 +49,22 @@ function build_css_colors( $attributes ) {
  * @return string Returns the post content with the legacy widget added.
  */
 function render_block_navigation_menu( $attributes, $content, $block ) {
-	// Inline computed colors.
-	$comp_inline_styles = '';
-
-	if ( array_key_exists( 'textColorValue', $attributes ) ) {
-		$comp_inline_styles .= ' color: ' . esc_attr( $attributes['textColorValue'] ) . ';';
-	}
-	$comp_inline_styles = ! empty( $comp_inline_styles )
-		? ' style="' . esc_attr( trim( $comp_inline_styles ) ) . '"'
-		: '';
-
-	$colors = build_css_colors( $attributes );
-
-	return "<nav class='wp-block-navigation-menu' {$comp_inline_styles}>" .
-		build_navigation_menu_html( $block, $colors ) .
-	'</nav>';
+	$colors          = build_css_colors( $attributes );
+	$class_attribute = sprintf( ' class="%s"', esc_attr( $colors['css_classes'] ? 'wp-block-navigation-menu ' . $colors['css_classes'] : 'wp-block-navigation-menu' ) );
+	$style_attribute = $colors['inline_styles'] ? sprintf( ' style="%s"', esc_attr( $colors['inline_styles'] ) ) : '';
+	return sprintf(
+		implode(
+			"\n",
+			array(
+				'<nav%s%s>',
+				'	%s',
+				'</nav>',
+			)
+		),
+		$class_attribute,
+		$style_attribute,
+		build_navigation_menu_html( $block, $colors )
+	);
 }
 
 /**
@@ -74,12 +77,14 @@ function render_block_navigation_menu( $attributes, $content, $block ) {
  */
 function build_navigation_menu_html( $block, $colors ) {
 	$html = '';
+
+	$class_attribute = sprintf( ' class="%s"', esc_attr( $colors['css_classes'] ? 'wp-block-navigation-menu-item__link ' . $colors['css_classes'] : 'wp-block-navigation-menu-item__link' ) );
+	$style_attribute = $colors['inline_styles'] ? sprintf( ' style="%s"', esc_attr( $colors['inline_styles'] ) ) : '';
+
 	foreach ( (array) $block['innerBlocks'] as $key => $block ) {
 
 		$html .= '<li class="wp-block-navigation-menu-item">' .
-			'<a
-				class="wp-block-navigation-menu-item__link ' . $colors['text_css_classes'] . '"
-				' . $colors['text_inline_styles'];
+			'<a' . $class_attribute . $style_attribute;
 
 		// Start appending HTML attributes to anchor tag.
 		if ( isset( $block['attrs']['url'] ) ) {
@@ -124,28 +129,17 @@ function register_block_core_navigation_menu() {
 		array(
 			'category'        => 'layout',
 			'attributes'      => array(
-				'className'         => array(
+				'className'        => array(
 					'type' => 'string',
 				),
-
-				'automaticallyAdd'  => array(
+				'automaticallyAdd' => array(
 					'type'    => 'boolean',
 					'default' => false,
 				),
-
-				'textColor'         => array(
+				'textColor'        => array(
 					'type' => 'string',
 				),
-
-				'textColorValue'    => array(
-					'type' => 'string',
-				),
-
-				'customTextColor'   => array(
-					'type' => 'string',
-				),
-
-				'textColorCSSClass' => array(
+				'customTextColor'  => array(
 					'type' => 'string',
 				),
 			),
