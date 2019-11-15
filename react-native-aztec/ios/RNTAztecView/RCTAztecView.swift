@@ -88,28 +88,35 @@ class RCTAztecView: Aztec.TextView {
         )
     }()
 
+    private lazy var placeholderWidthConstraint: NSLayoutConstraint = {
+        // width needs to be shrunk on both the left and the right by the textInset in order for
+        // the placeholder to be appropriately positioned with right alignment.
+        let placeholderWidthInset = 2 * leftTextInset
+        return placeholderLabel.widthAnchor.constraint(equalTo: widthAnchor, constant: -placeholderWidthInset)
+    }()
+
     /// If a dictation start with an empty UITextView,
     /// the dictation engine refreshes the TextView with an empty string when the dictation finishes.
     /// This helps to avoid propagating that unwanted empty string to RN. (Solving #606)
     /// on `textViewDidChange` and `textViewDidChangeSelection`
     private var isInsertingDictationResult = false
-    
+
     // MARK: - Font
-    
+
     /// Font family for all contents  Once this is set, it will always override the font family for all of its
     /// contents, regardless of what HTML is provided to Aztec.
     private var fontFamily: String? = nil
-    
+
     /// Font size for all contents.  Once this is set, it will always override the font size for all of its
     /// contents, regardless of what HTML is provided to Aztec.
     private var fontSize: CGFloat? = nil
-    
+
     /// Font weight for all contents.  Once this is set, it will always override the font weight for all of its
     /// contents, regardless of what HTML is provided to Aztec.
     private var fontWeight: String? = nil
 
     // MARK: - Formats
-    
+
     private let formatStringMap: [FormattingIdentifier: String] = [
         .bold: "bold",
         .italic: "italic",
@@ -132,10 +139,11 @@ class RCTAztecView: Aztec.TextView {
         textContainerInset = .zero
         contentInset = .zero
         addPlaceholder()
-        textDragInteraction?.isEnabled = false        
+        textDragInteraction?.isEnabled = false
         storage.htmlConverter.characterToReplaceLastEmptyLine = Character(.zeroWidthSpace)
         shouldNotifyOfNonUserChanges = false
         disableLinkTapRecognizer()
+        preBackgroundColor = .clear
     }
 
     func addPlaceholder() {
@@ -143,8 +151,8 @@ class RCTAztecView: Aztec.TextView {
         let topConstant = contentInset.top + textContainerInset.top
         NSLayoutConstraint.activate([
             placeholderHorizontalConstraint,
-            placeholderLabel.topAnchor.constraint(equalTo: topAnchor, constant: topConstant),
-            placeholderLabel.widthAnchor.constraint(equalTo: widthAnchor),
+            placeholderWidthConstraint,
+            placeholderLabel.topAnchor.constraint(equalTo: topAnchor, constant: topConstant)
         ])
     }
 
@@ -182,18 +190,18 @@ class RCTAztecView: Aztec.TextView {
 
     func updateContentSizeInRN() {
         let newSize = sizeThatFits(frame.size)
-        
+
         guard previousContentSize != newSize,
             let onContentSizeChange = onContentSizeChange else {
                 return
         }
-        
+
         previousContentSize = newSize
-        
+
         let body = packForRN(newSize, withName: "contentSize")
         onContentSizeChange(body)
     }
-    
+
     // MARK: - Paste handling
     private func read(from pasteboard: UIPasteboard, uti: CFString, documentType: DocumentType) -> String? {
         guard let data = pasteboard.data(forPasteboardType: uti as String),
@@ -227,7 +235,7 @@ class RCTAztecView: Aztec.TextView {
 
         return nil
     }
-    
+
     private func readText(from pasteboard: UIPasteboard) -> String? {
         var text = pasteboard.string
         // Text that comes from Aztec will have paragraphSeparator instead of line feed AKA as \n. The paste methods in GB are expecting \n so this line will fix that.
@@ -258,7 +266,7 @@ class RCTAztecView: Aztec.TextView {
         let imagesURLs = images.compactMap({ saveToDisk(image: $0)?.absoluteString })
         return imagesURLs
     }
-    
+
     override func paste(_ sender: Any?) {
         let pasteboard = UIPasteboard.general
         let text = readText(from: pasteboard) ?? ""
@@ -285,9 +293,9 @@ class RCTAztecView: Aztec.TextView {
             "pastedHtml": html,
             "files": imagesURLs] )
     }
-    
+
     // MARK: - Edits
-    
+
     open override func insertText(_ text: String) {
         guard !interceptEnter(text) else {
             return
@@ -301,7 +309,7 @@ class RCTAztecView: Aztec.TextView {
         guard !interceptBackspace() else {
             return
         }
-        
+
         super.deleteBackward()
         updatePlaceholderVisibility()
     }
@@ -319,7 +327,7 @@ class RCTAztecView: Aztec.TextView {
     }
 
     // MARK: - Custom Edit Intercepts
-    
+
     private func interceptEnter(_ text: String) -> Bool {
         if text == "\t" {
             return true
@@ -334,14 +342,21 @@ class RCTAztecView: Aztec.TextView {
         onEnter(caretData)
         return true
     }
-    
+
     private func interceptBackspace() -> Bool {
-        guard (isNewLineBeforeSelectionAndNotEndOfContent() && selectedRange.length == 0) || (selectedRange.location == 0 && selectedRange.length == 0),
+        guard (isNewLineBeforeSelectionAndNotEndOfContent() && selectedRange.length == 0)
+            || (selectedRange.location == 0 && selectedRange.length == 0)
+            || text.count == 1 // send backspace event when cleaning all characters
+            || selectedRange == NSRange(location: 0, length: textStorage.length), // send backspace event when deleting all the text
             let onBackspace = onBackspace else {
                 return false
         }
-        
-        let caretData = packCaretDataForRN()
+        var range = selectedRange
+        if text.count == 1 {
+            range = NSRange(location: 0, length: textStorage.length)
+        }
+        let caretData = packCaretDataForRN(overrideRange: range)
+        onSelectionChange?(caretData)
         onBackspace(caretData)
         return true
     }
@@ -364,34 +379,38 @@ class RCTAztecView: Aztec.TextView {
         let html = getHTML(prettify: false).replacingOccurrences(of: String(.paragraphSeparator), with: String(.lineFeed)).replacingOccurrences(of: String(.zeroWidthSpace), with: "")
         return html
     }
-    
+
     func packForRN(_ text: String, withName name: String) -> [AnyHashable: Any] {
         return [name: text,
                 "eventCount": 1]
     }
-    
+
     func packForRN(_ size: CGSize, withName name: String) -> [AnyHashable: Any] {
-        
+
         let size = ["width": size.width,
                     "height": size.height]
-        
+
         return [name: size]
     }
     
-    func packCaretDataForRN() -> [AnyHashable: Any] {
-        var start = selectedRange.location
-        var end = selectedRange.location + selectedRange.length
+    func packCaretDataForRN(overrideRange: NSRange? = nil) -> [AnyHashable: Any] {
+        var range = selectedRange
+        if let overrideRange = overrideRange {
+            range = overrideRange
+        }
+        var start = range.location
+        var end = range.location + range.length
         if selectionAffinity == .backward {
             (start, end) = (end, start)
         }
-        
+
         var result: [AnyHashable : Any] = packForRN(cleanHTML(), withName: "text")
 
         result["selectionStart"] = start
         result["selectionEnd"] = end
         
-        if let selectedTextRange = selectedTextRange {
-            let caretEndRect = caretRect(for: selectedTextRange.end)
+        if let range = selectedTextRange {
+            let caretEndRect = caretRect(for: range.end)
             // Sergio Estevao: Sometimes the carectRect can be invalid so we need to check before sending this to JS.
             if !(caretEndRect.isInfinite || caretEndRect.isNull) {
                 result["selectionEndCaretX"] = caretEndRect.origin.x
@@ -403,7 +422,7 @@ class RCTAztecView: Aztec.TextView {
     }
 
     // MARK: - RN Properties
-    
+
     @objc
     func setContents(_ contents: NSDictionary) {
         guard contents["eventCount"] == nil else {
@@ -414,7 +433,7 @@ class RCTAztecView: Aztec.TextView {
 
         setHTML(html)
         updatePlaceholderVisibility()
-        refreshFont()
+        refreshTypingAttributesAndPlaceholderFont()
         if let selection = contents["selection"] as? NSDictionary,
             let start = selection["start"] as? NSNumber,
             let end = selection["end"]  as? NSNumber {
@@ -480,99 +499,91 @@ class RCTAztecView: Aztec.TextView {
             selectedTextRange = textRange(from: startPosition, to: endPosition)
         }
     }
-    
+
     func updatePlaceholderVisibility() {
         placeholderLabel.isHidden = !self.text.replacingOccurrences(of: String(.zeroWidthSpace), with: "").isEmpty
     }
-    
+
     // MARK: - Font Setters
-    
+
     @objc func setFontFamily(_ family: String) {
+        guard fontFamily != family else {
+            return
+        }
         fontFamily = family
         refreshFont()
     }
-    
+
     @objc func setFontSize(_ size: CGFloat) {
+        guard fontSize != size else {
+            return
+        }
         fontSize = size
         refreshFont()
     }
-    
+
     @objc func setFontWeight(_ weight: String) {
+        guard fontWeight != weight else {
+            return
+        }
         fontWeight = weight
         refreshFont()
     }
-    
+
     // MARK: - Font Refreshing
-    
+
     /// Applies the family, size and weight constraints to the provided font.
     ///
     private func applyFontConstraints(to baseFont: UIFont) -> UIFont {
         let oldDescriptor = baseFont.fontDescriptor
         let newFontSize: CGFloat
-        
+
         if let fontSize = fontSize {
             newFontSize = fontSize
         } else {
             newFontSize = baseFont.pointSize
         }
-        
+
         var newTraits = oldDescriptor.symbolicTraits
-        
+
         if let fontWeight = fontWeight {
             if (fontWeight == "bold") {
                 newTraits.update(with: .traitBold)
             }
         }
-        
+
         var newDescriptor: UIFontDescriptor
-        
+
         if let fontFamily = fontFamily {
             newDescriptor = UIFontDescriptor(name: fontFamily, size: newFontSize)
             newDescriptor = newDescriptor.withSymbolicTraits(newTraits) ?? newDescriptor
         } else {
             newDescriptor = oldDescriptor
         }
-        
+
         return UIFont(descriptor: newDescriptor, size: newFontSize)
     }
-    
+
     /// Returns the font from the specified attributes, or the default font if no specific one is set.
     ///
     private func font(from attributes: [NSAttributedString.Key: Any]) -> UIFont {
         return attributes[.font] as? UIFont ?? defaultFont
     }
-    
+
     /// This method refreshes the font for the whole view if the font-family, the font-size or the font-weight
     /// were ever set.
     ///
     private func refreshFont() {
-        guard fontFamily != nil || fontSize != nil || fontWeight != nil else {
-            return
-        }
-        
-        let fullRange = NSRange(location: 0, length: textStorage.length)
-        
-        textStorage.beginEditing()
-        textStorage.enumerateAttributes(in: fullRange, options: []) { (attributes, subrange, stop) in
-            let oldFont = font(from: attributes)
-            let newFont = applyFontConstraints(to: oldFont)
-            
-            textStorage.addAttribute(.font, value: newFont, range: subrange)
-        }
-        textStorage.endEditing()
-        
-        refreshTypingAttributesAndPlaceholderFont()
+        let newFont = applyFontConstraints(to: defaultFont)
+        defaultFont = newFont
     }
-    
+
     /// This method refreshes the font for the palceholder field and typing attributes.
     /// This method should not be called directly.  Call `refreshFont()` instead.
     ///
     private func refreshTypingAttributesAndPlaceholderFont() {
-        let oldFont = font(from: typingAttributes)
-        let newFont = applyFontConstraints(to: oldFont)
-        
-        typingAttributes[.font] = newFont
-        placeholderLabel.font = newFont
+        let currentFont = font(from: typingAttributes)        
+        placeholderLabel.font = currentFont
     }
 
     // MARK: - Formatting interface
@@ -592,9 +603,9 @@ class RCTAztecView: Aztec.TextView {
             formatHandler.forceTypingFormat(on: self)
         }
     }
-    
+
     // MARK: - Event Propagation
-    
+
     func propagateContentChanges() {
         if let onChange = onChange {
             let text = packForRN(cleanHTML(), withName: "text")
@@ -609,17 +620,32 @@ class RCTAztecView: Aztec.TextView {
         let caretData = packCaretDataForRN()
         onSelectionChange(caretData)
     }
+
+    // MARK: - Selection
+    private func correctSelectionAfterLastEmptyLine() {
+        guard selectedTextRange?.start == endOfDocument,
+            let characterToReplaceLastEmptyLine = storage.htmlConverter.characterToReplaceLastEmptyLine,
+            text == String(characterToReplaceLastEmptyLine) else {
+            return
+        }
+        selectedTextRange = self.textRange(from: beginningOfDocument, to: beginningOfDocument)
+    }
 }
 
 // MARK: UITextView Delegate Methods
 extension RCTAztecView: UITextViewDelegate {
 
-    func textViewDidChangeSelection(_ textView: UITextView) {        
+    func textViewDidChangeSelection(_ textView: UITextView) {
         guard isFirstResponder, isInsertingDictationResult == false else {
             return
         }
 
+        correctSelectionAfterLastEmptyLine()
         propagateSelectionChanges()
+    }
+
+    func textViewDidBeginEditing(_ textView: UITextView) {
+        correctSelectionAfterLastEmptyLine()
     }
 
     func textViewDidChange(_ textView: UITextView) {
