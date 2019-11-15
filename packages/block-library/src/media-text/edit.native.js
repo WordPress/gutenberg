@@ -7,10 +7,10 @@ import { View } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import {
 	BlockControls,
-	//	BlockVerticalAlignmentToolbar,
+	BlockVerticalAlignmentToolbar,
 	InnerBlocks,
 	withColors,
 } from '@wordpress/block-editor';
@@ -32,7 +32,7 @@ import styles from './style.scss';
  */
 const ALLOWED_BLOCKS = [ 'core/button', 'core/paragraph', 'core/heading', 'core/list' ];
 const TEMPLATE = [
-	[ 'core/paragraph', { fontSize: 'large', placeholder: _x( 'Content…', 'content placeholder' ) } ],
+	[ 'core/paragraph' ],
 ];
 // this limits the resize to a safe zone to avoid making broken layouts
 const WIDTH_CONSTRAINT_PERCENTAGE = 15;
@@ -131,10 +131,10 @@ class MediaTextEdit extends Component {
 			attributes,
 			backgroundColor,
 			setAttributes,
-		//	isMobile,
+			// isMobile,
 		} = this.props;
 		const {
-		//	isStackedOnMobile,
+			// isStackedOnMobile,
 			mediaPosition,
 			mediaWidth,
 			verticalAlignment,
@@ -145,7 +145,7 @@ class MediaTextEdit extends Component {
 		const widthString = `${ temporaryMediaWidth }%`;
 		const containerStyles = {
 			...styles[ 'wp-block-media-text' ],
-			...styles[ `is-vertically-aligned-${ verticalAlignment }` ],
+			...styles[ `is-vertically-aligned-${ verticalAlignment || 'center' }` ],
 			...( mediaPosition === 'right' ? styles[ 'has-media-on-the-right' ] : {} ),
 			...( shouldStack ? styles[ 'is-stacked-on-mobile' ] : {} ),
 			...( shouldStack && mediaPosition === 'right' ? styles[ 'is-stacked-on-mobile.has-media-on-the-right' ] : {} ),
@@ -166,9 +166,9 @@ class MediaTextEdit extends Component {
 			onClick: () => setAttributes( { mediaPosition: 'right' } ),
 		} ];
 
-		/* const onVerticalAlignmentChange = ( alignment ) => {
+		const onVerticalAlignmentChange = ( alignment ) => {
 			setAttributes( { verticalAlignment: alignment } );
-		}; */
+		};
 
 		return (
 			<>
@@ -176,12 +176,11 @@ class MediaTextEdit extends Component {
 					<Toolbar
 						controls={ toolbarControls }
 					/>
-					{ /* // Temporarily commenting out until alignment functionality is fixed
 					<BlockVerticalAlignmentToolbar
 						onChange={ onVerticalAlignmentChange }
 						value={ verticalAlignment }
 						isCollapsed={ false }
-					/> */ }
+					/>
 				</BlockControls>
 				<View style={ containerStyles }>
 					<View style={ { width: widthString } }>

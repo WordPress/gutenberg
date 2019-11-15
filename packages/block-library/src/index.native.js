@@ -1,4 +1,8 @@
 /**
+ * External dependencies
+ */
+import { Platform } from 'react-native';
+/**
  * WordPress dependencies
  */
 import {
@@ -143,7 +147,11 @@ export const registerCoreBlocks = () => {
 		quote,
 		mediaText,
 		// eslint-disable-next-line no-undef
+		( ( Platform.OS === 'ios' ) || ( !! __DEV__ ) ) ? preformatted : null,
+		// eslint-disable-next-line no-undef
 		!! __DEV__ ? group : null,
+		// eslint-disable-next-line no-undef
+		!! __DEV__ ? spacer : null,
 	].forEach( registerBlock );
 
 	setDefaultBlockName( paragraph.name );

@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { get, includes } from 'lodash';
+import { includes } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -10,11 +10,7 @@ import { get, includes } from 'lodash';
 import {
 	getColorClassName,
 	RichText,
-	getColorObjectByAttributeValues,
 } from '@wordpress/block-editor';
-import {
-	select,
-} from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -52,14 +48,6 @@ export default function save( { attributes } ) {
 	} else if ( customMainColor ) {
 		figureStyles = {
 			borderColor: customMainColor,
-		};
-	// If normal style and a named color are being used, we need to retrieve the color value to set the style,
-	// as there is no expectation that themes create classes that set border colors.
-	} else if ( mainColor ) {
-		const colors = get( select( 'core/block-editor' ).getSettings(), [ 'colors' ], [] );
-		const colorObject = getColorObjectByAttributeValues( colors, mainColor );
-		figureStyles = {
-			borderColor: colorObject.color,
 		};
 	}
 

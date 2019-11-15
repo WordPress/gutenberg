@@ -8,6 +8,7 @@ import {
 	escapeAttribute,
 	escapeHTML,
 	isValidAttributeName,
+	escapeEditableHTML,
 } from '../';
 import __unstableEscapeGreaterThan from '../escape-greater';
 
@@ -92,5 +93,13 @@ describe( 'isValidAttributeName', () => {
 		const result = isValidAttributeName( 'good' );
 
 		expect( result ).toBe( true );
+	} );
+} );
+
+describe( 'escapeEditableHTML', () => {
+	it( 'should escape < and all ampersands', () => {
+		const result = escapeEditableHTML( '<a href="https://w.org">WP</a> & &lt;strong&gt;' );
+
+		expect( result ).toBe( '&lt;a href="https://w.org">WP&lt;/a> &amp; &amp;lt;strong&amp;gt;' );
 	} );
 } );

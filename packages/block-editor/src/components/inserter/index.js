@@ -5,6 +5,7 @@ import { get } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { speak } from '@wordpress/a11y';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { Dropdown, IconButton } from '@wordpress/components';
 import { Component } from '@wordpress/element';
@@ -12,7 +13,6 @@ import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, ifCondition } from '@wordpress/compose';
 import {
 	createBlock,
-	getBlockType,
 } from '@wordpress/blocks';
 
 /**
@@ -91,7 +91,13 @@ class Inserter extends Component {
 	 * @return {WPElement} Dropdown content element.
 	 */
 	renderContent( { onClose } ) {
-		const { rootClientId, clientId, isAppender, showInserterHelpPanel } = this.props;
+		const {
+			rootClientId,
+			clientId,
+			isAppender,
+			showInserterHelpPanel,
+			__experimentalSelectBlockOnInsert: selectBlockOnInsert,
+		} = this.props;
 
 		return (
 			<InserterMenu
@@ -100,15 +106,18 @@ class Inserter extends Component {
 				clientId={ clientId }
 				isAppender={ isAppender }
 				showInserterHelpPanel={ showInserterHelpPanel }
+				__experimentalSelectBlockOnInsert={ selectBlockOnInsert }
 			/>
 		);
 	}
 
 	render() {
 		const { position, hasSingleBlockType, insertOnlyAllowedBlock } = this.props;
+
 		if ( hasSingleBlockType ) {
 			return this.renderToggle( { onToggle: insertOnlyAllowedBlock } );
 		}
+
 		return (
 			<Dropdown
 				className="editor-inserter block-editor-inserter"
@@ -134,10 +143,12 @@ export default compose( [
 		const allowedBlocks = __experimentalGetAllowedBlocks( rootClientId );
 
 		const hasSingleBlockType = allowedBlocks && ( get( allowedBlocks, [ 'length' ], 0 ) === 1 );
+
 		let allowedBlockType = false;
 		if ( hasSingleBlockType ) {
-			allowedBlockType = getBlockType( allowedBlocks );
+			allowedBlockType = allowedBlocks[ 0 ];
 		}
+
 		return {
 			hasItems: hasInserterItems( rootClientId ),
 			hasSingleBlockType,
@@ -148,10 +159,11 @@ export default compose( [
 	withDispatch( ( dispatch, ownProps, { select } ) => {
 		return {
 			insertOnlyAllowedBlock() {
-				const { rootClientId, clientId, isAppender, destinationRootClientId } = ownProps;
+				const { rootClientId, clientId, isAppender } = ownProps;
 				const {
 					hasSingleBlockType,
 					allowedBlockType,
+					__experimentalSelectBlockOnInsert: selectBlockOnInsert,
 				} = ownProps;
 
 				if ( ! hasSingleBlockType ) {
@@ -167,17 +179,17 @@ export default compose( [
 
 					// If the clientId is defined, we insert at the position of the block.
 					if ( clientId ) {
-						return getBlockIndex( clientId, destinationRootClientId );
+						return getBlockIndex( clientId, rootClientId );
 					}
 
 					// If there a selected block, we insert after the selected block.
 					const end = getBlockSelectionEnd();
 					if ( ! isAppender && end ) {
-						return getBlockIndex( end, destinationRootClientId ) + 1;
+						return getBlockIndex( end, rootClientId ) + 1;
 					}
 
 					// Otherwise, we insert at the end of the current rootClientId
-					return getBlockOrder( destinationRootClientId ).length;
+					return getBlockOrder( rootClientId ).length;
 				}
 
 				const {
@@ -185,11 +197,19 @@ export default compose( [
 				} = dispatch( 'core/block-editor' );
 
 				const blockToInsert = createBlock( allowedBlockType.name );
+
 				insertBlock(
 					blockToInsert,
 					getInsertionIndex(),
-					rootClientId
+					rootClientId,
+					selectBlockOnInsert
 				);
+
+				if ( ! selectBlockOnInsert ) {
+					// translators: %s: the name of the block that has been added
+					const message = sprintf( __( '%s block added' ), allowedBlockType.title );
+					speak( message );
+				}
 			},
 		};
 	} ),
