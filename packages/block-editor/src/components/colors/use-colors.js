@@ -175,19 +175,23 @@ export default function __experimentalUseColors(
 				color: attributes[ colorConfig.name ],
 			};
 
+			const customColor = attributes[ camelCase( `custom ${ name }` ) ];
 			// We memoize the non-primitives to avoid unnecessary updates
 			// when they are used as props for other components.
-			const _color = colors.find( ( __color ) => __color.slug === color );
+			const _color = ! customColor ?
+				colors.find( ( __color ) => __color.slug === color ) :
+				undefined;
 			acc[ componentName ] = createComponent(
 				name,
 				property,
 				className,
 				color,
 				_color && _color.color,
-				attributes[ camelCase( `custom ${ name }` ) ]
+				customColor
 			);
 			acc[ componentName ].displayName = componentName;
-			acc[ componentName ].color = color;
+			acc[ componentName ].color = customColor ? customColor : ( _color && _color.color );
+			acc[ componentName ].slug = color;
 			acc[ componentName ].setColor = createSetColor( name, colors );
 
 			colorSettings[ componentName ] = {
