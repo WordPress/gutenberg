@@ -180,7 +180,7 @@ export default compose( [
 		const insertionPoint = getBlockInsertionPoint();
 		const blockInsertionPointIsVisible = isBlockInsertionPointVisible();
 		const selectedBlock = getSelectedBlock();
-		const isSelectedGroup = selectedBlock && ( selectedBlock.name === 'core/group' || selectedBlock.name === 'core/media-text' );
+		const hasInnerBlocks = selectedBlock && selectedBlock.innerBlocks.length;
 		const shouldShowInsertionPointBefore = ( clientId ) => {
 			return (
 				blockInsertionPointIsVisible &&
@@ -210,7 +210,7 @@ export default compose( [
 
 		const shouldShowBlockAtIndex = ( index ) => {
 			const shouldHideBlockAtIndex = (
-				! isSelectedGroup && blockInsertionPointIsVisible &&
+				! hasInnerBlocks && blockInsertionPointIsVisible &&
 				// if `index` === `insertionPoint.index`, then block is replaceable
 				index === insertionPoint.index &&
 				// only hide selected block
@@ -219,7 +219,7 @@ export default compose( [
 			return ! shouldHideBlockAtIndex;
 		};
 
-		const hasFullBorder = !! getBlockRootClientId( selectedBlockClientId ) || isSelectedGroup;
+		const hasFullBorder = !! getBlockRootClientId( selectedBlockClientId ) || hasInnerBlocks;
 
 		return {
 			blockClientIds,
