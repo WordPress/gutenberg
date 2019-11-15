@@ -376,6 +376,18 @@ export const EXPECTED_TRANSFORMS = {
 			'Verse',
 		],
 	},
+	'core__post-content': {
+		availableTransforms: [
+			'Group',
+		],
+		originalBlock: 'Post Content',
+	},
+	'core__post-title': {
+		availableTransforms: [
+			'Group',
+		],
+		originalBlock: 'Post Title',
+	},
 	core__preformatted: {
 		originalBlock: 'Preformatted',
 		availableTransforms: [
