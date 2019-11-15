@@ -33,7 +33,7 @@ import useBlockNavigator from './use-block-navigator';
 import BlockNavigationList from './block-navigation-list';
 import BlockColorsStyleSelector from './block-colors-selector';
 
-function NavigationMenu( {
+function Navigation( {
 	attributes,
 	clientId,
 	pages,
@@ -53,8 +53,8 @@ function NavigationMenu( {
 	/* eslint-enable @wordpress/no-unused-vars-before-return */
 	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator( clientId );
 
-	// Builds menu items from default Pages
-	const defaultPagesMenuItems = useMemo(
+	// Builds navigation items from default Pages
+	const defaultPagesNavigationItems = useMemo(
 		() => {
 			if ( ! pages ) {
 				return null;
@@ -86,7 +86,7 @@ function NavigationMenu( {
 	};
 
 	const handleCreateFromExistingPages = () => {
-		updateNavItemBlocks( defaultPagesMenuItems );
+		updateNavItemBlocks( defaultPagesNavigationItems );
 	};
 
 	const hasPages = hasResolvedPages && pages && pages.length;
@@ -100,7 +100,7 @@ function NavigationMenu( {
 				<InspectorControls>
 					{ hasResolvedPages && (
 						<PanelBody
-							title={ __( 'Menu Settings' ) }
+							title={ __( 'Navigation Settings' ) }
 						>
 							<CheckboxControl
 								value={ attributes.automaticallyAdd }
@@ -109,21 +109,21 @@ function NavigationMenu( {
 									handleCreateFromExistingPages();
 								} }
 								label={ __( 'Automatically add new pages' ) }
-								help={ __( 'Automatically add new top level pages to this menu.' ) }
+								help={ __( 'Automatically add new top level pages to this navigation.' ) }
 							/>
 						</PanelBody>
 					) }
 				</InspectorControls>
 				<Placeholder
-					className="wp-block-navigation-menu-placeholder"
+					className="wp-block-navigation-placeholder"
 					icon="menu"
-					label={ __( 'Navigation Menu' ) }
-					instructions={ __( 'Create a Menu from all existing pages, or create an empty one.' ) }
+					label={ __( 'Navigation' ) }
+					instructions={ __( 'Create a Navigation from all existing pages, or create an empty one.' ) }
 				>
-					<div className="wp-block-navigation-menu-placeholder__buttons">
+					<div className="wp-block-navigation-placeholder__buttons">
 						<Button
 							isDefault
-							className="wp-block-navigation-menu-placeholder__button"
+							className="wp-block-navigation-placeholder__button"
 							onClick={ handleCreateFromExistingPages }
 							disabled={ ! hasPages }
 						>
@@ -132,7 +132,7 @@ function NavigationMenu( {
 
 						<Button
 							isLink
-							className="wp-block-navigation-menu-placeholder__button"
+							className="wp-block-navigation-placeholder__button"
 							onClick={ handleCreateEmpty }
 						>
 							{ __( 'Create empty' ) }
@@ -159,13 +159,13 @@ function NavigationMenu( {
 			<InspectorControls>
 				{ hasPages && (
 					<PanelBody
-						title={ __( 'Menu Settings' ) }
+						title={ __( 'Navigation Settings' ) }
 					>
 						<CheckboxControl
 							value={ attributes.automaticallyAdd }
 							onChange={ ( automaticallyAdd ) => setAttributes( { automaticallyAdd } ) }
 							label={ __( 'Automatically add new pages' ) }
-							help={ __( 'Automatically add new top level pages to this menu.' ) }
+							help={ __( 'Automatically add new top level pages to this navigation.' ) }
 						/>
 					</PanelBody>
 				) }
@@ -176,7 +176,7 @@ function NavigationMenu( {
 				</PanelBody>
 			</InspectorControls>
 			<TextColor>
-				<div className="wp-block-navigation-menu">
+				<div className="wp-block-navigation">
 					{ ! hasExistingNavItems && isRequestingPages && <><Spinner /> { __( 'Loading Navigation…' ) } </> }
 
 					<InnerBlocks
@@ -218,4 +218,4 @@ export default compose( [
 			},
 		};
 	} ),
-] )( NavigationMenu );
+] )( Navigation );
