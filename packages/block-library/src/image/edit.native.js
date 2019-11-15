@@ -150,7 +150,6 @@ export class ImageEdit extends React.Component {
 		this.setState( {
 			isCaptionSelected: false,
 		} );
-		
 	}
 
 	updateMediaProgress( payload ) {
@@ -364,7 +363,7 @@ export class ImageEdit extends React.Component {
 						renderContent={ ( { isUploadInProgress, isUploadFailed, finalWidth, finalHeight, imageWidthWithinContainer, retryMessage } ) => {
 							const opacity = isUploadInProgress ? 0.3 : 1;
 							const icon = this.getIcon( isUploadFailed );
-							const imageBorderOnSelectedStyle = isSelected && !( isUploadInProgress || isUploadFailed ) ? styles.imageBorder : '';
+							const imageBorderOnSelectedStyle = isSelected && ! ( isUploadInProgress || isUploadFailed ) ? styles.imageBorder : '';
 
 							const iconContainer = (
 								<View style={ styles.modalIcon }>
