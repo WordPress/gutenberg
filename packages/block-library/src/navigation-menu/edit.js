@@ -91,7 +91,7 @@ function NavigationMenu( {
 	//
 
 	const handleCreateEmpty = () => {
-		const emptyNavItemBlock = createBlock( 'core/navigation-menu-item' );
+		const emptyNavItemBlock = createBlock( 'core/navigation-link' );
 		updateNavItemBlocks( [ emptyNavItemBlock ] );
 	};
 
