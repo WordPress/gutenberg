@@ -109,24 +109,24 @@ class InnerBlocks extends Component {
 			__experimentalTemplateOptions: templateOptions,
 			__experimentalOnSelectTemplateOption: onSelectTemplateOption,
 			__experimentalAllowTemplateOptionSkip: allowTemplateOptionSkip,
-			__experimentalConsumeChildToolbar: consumeChildToolbar,
+			__experimentalCaptureChildToolbar: captureChildToolbar,
 		} = this.props;
 		const { templateInProcess } = this.state;
 
 		const classes = classnames( 'block-editor-inner-blocks', {
 			'has-overlay': enableClickThrough && hasOverlay,
-			'is-consuming-toolbars': consumeChildToolbar,
+			'is-capturing-child-toolbar': captureChildToolbar,
 		} );
 
 		return (
 			<div className={ classes }>
 				{ ! templateInProcess && (
-					<BlockList
-						rootClientId={ clientId }
-						renderAppender={ renderAppender }
-						__experimentalMoverDirection={ moverDirection }
-							__experimentalConsumeChildToolbar={ consumeChildToolbar }
-					/>
+						<BlockList
+							rootClientId={ clientId }
+							renderAppender={ renderAppender }
+							__experimentalMoverDirection={ moverDirection }
+							__experimentalCaptureChildToolbar={ captureChildToolbar }
+						/>
 				) }
 			</div>
 		);

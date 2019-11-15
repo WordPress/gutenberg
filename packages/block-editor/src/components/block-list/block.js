@@ -100,9 +100,9 @@ function BlockListBlock( {
 	enableAnimation,
 	isNavigationMode,
 	setNavigationMode,
-    __experimentalConsumeChildToolbar: consumeChildToolbar,
 	isMultiSelecting,
 	isLargeViewport,
+    __experimentalCaptureChildToolbar: captureChildToolbar,
 } ) {
 	// In addition to withSelect, we should favor using useSelect in this component going forward
 	// to avoid leaking new props to the public API (editor.BlockListBlock filter)
@@ -585,7 +585,7 @@ function BlockListBlock( {
 					<ChildToolbarSlot />
 				) }
 
-				{ ( ( ! consumeChildToolbar && shouldShowContextualToolbar ) || isForcingContextualToolbar.current ) && (
+				{ ( ( ! captureChildToolbar && shouldShowContextualToolbar ) || isForcingContextualToolbar.current ) && (
 					// Standard toolbar attached directly to the Block.
 					<BlockContextualToolbar
 						// If the toolbar is being shown because of being forced
@@ -595,7 +595,7 @@ function BlockListBlock( {
 
 				) }
 
-				{ consumeChildToolbar && shouldShowContextualToolbar && (
+				{ captureChildToolbar && shouldShowContextualToolbar && (
 					// If the parent Block is set to consume toolbars of the child Blocks
 					// then render the child Block's toolbar into the Slot provided
 					// by the parent.
