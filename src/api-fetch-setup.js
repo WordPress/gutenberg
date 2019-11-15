@@ -10,8 +10,12 @@ import { fetchRequest } from 'react-native-gutenberg-bridge';
  */
 import apiFetch from '@wordpress/api-fetch';
 
-const fetchHandler = ( options ) => {
-	const responsePromise = fetchRequest( options.path );
+const fetchHandler = ( { path } ) => {
+	if ( ! isPathSupported( path ) ) {
+		return Promise.reject( `Unsupported path: ${ path }` );
+	}
+
+	const responsePromise = fetchRequest( path );
 
 	const parseResponse = ( response ) => {
 		if ( typeof response === 'string' ) {
@@ -24,6 +28,9 @@ const fetchHandler = ( options ) => {
 		return error;
 	} );
 };
+
+export const isPathSupported = ( path ) =>
+	[ /wp\/v2\/media\/\d*?.*/i ].some( ( pattern ) => pattern.test( path ) );
 
 export default () => {
 	apiFetch.setFetchHandler( ( options ) => fetchHandler( options ) );
