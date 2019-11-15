@@ -14,8 +14,8 @@ import ToolbarContainer from './toolbar-container';
  *
  * To add controls, simply pass `ToolbarButton` components as children.
  *
- * @param {Object} props							Component props.
- * @param {string} [props.className]	Class to set on the container div.
+ * @param {Object} props             Component props.
+ * @param {string} [props.className] Class to set on the container div.
  */
 function Toolbar( { className, __experimentalAccessibilityLabel, ...props } ) {
 	if ( __experimentalAccessibilityLabel ) {
@@ -29,7 +29,7 @@ function Toolbar( { className, __experimentalAccessibilityLabel, ...props } ) {
 		);
 	}
 
-	return <ToolbarGroup { ...props } />;
+	return <ToolbarGroup { ...props } className={ className } />;
 }
 
 export default Toolbar;
