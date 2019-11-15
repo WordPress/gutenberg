@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { TextInput } from 'react-native';
+import RNReactNativeGutenbergBridge from 'react-native-gutenberg-bridge';
 
 /**
  * WordPress dependencies
@@ -25,10 +26,7 @@ export class HTMLTextInput extends Component {
 		this.edit = this.edit.bind( this );
 		this.stopEditing = this.stopEditing.bind( this );
 
-		this.state = {
-			isDirty: false,
-			value: '',
-		};
+		this.state = {};
 	}
 
 	static getDerivedStateFromProps( props, state ) {
@@ -106,9 +104,8 @@ export default compose( [
 			value: getEditedPostContent(),
 		};
 	} ),
-	withDispatch( ( dispatch ) => {
-		const { resetBlocks } = dispatch( 'core/block-editor' );
-		const { editPost } = dispatch( 'core/editor' );
+	withDispatch( ( dispatch, ownProps ) => {
+		const { editPost, resetEditorBlocks } = dispatch( 'core/editor' );
 		return {
 			editTitle( title ) {
 				editPost( { title } );
@@ -117,7 +114,10 @@ export default compose( [
 				editPost( { content } );
 			},
 			onPersist( content ) {
-				resetBlocks( parse( content ) );
+				const blocks = parse( content );
+				const hasChanges = ownProps.value !== content;
+				resetEditorBlocks( blocks );
+				RNReactNativeGutenbergBridge.provideToNative_Html( content, ownProps.title, hasChanges );
 			},
 		};
 	} ),
