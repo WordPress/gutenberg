@@ -13,7 +13,7 @@ import { useState } from '@wordpress/element';
  */
 import FontSizePicker from '../';
 
-export default { title: 'FontSizePicker', component: FontSizePicker };
+export default { title: 'Components|FontSizePicker', component: FontSizePicker };
 
 const FontSizePickerWithState = ( { ...props } ) => {
 	const [ fontSize, setFontSize ] = useState( 16 );

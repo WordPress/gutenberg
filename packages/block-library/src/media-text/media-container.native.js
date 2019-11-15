@@ -265,32 +265,34 @@ class MediaContainer extends Component {
 
 		if ( mediaUrl ) {
 			return (
-				<View style={ { flex: 1 } }>
+				<View>
 					<MediaUpload
 						onSelect={ this.onSelectMediaUploadOption }
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
 						value={ mediaId }
 						render={ ( { open, getMediaOptions } ) => {
-							return <>
-								{ getMediaOptions() }
-								{ this.renderToolbarEditButton( open ) }
+							return (
+								<View style={ { flex: 1 } }>
+									{ getMediaOptions() }
+									{ this.renderToolbarEditButton( open ) }
 
-								<MediaUploadProgress
-									coverUrl={ coverUrl }
-									mediaId={ mediaId }
-									onUpdateMediaProgress={ this.updateMediaProgress }
-									onFinishMediaUploadWithSuccess={ this.finishMediaUploadWithSuccess }
-									onFinishMediaUploadWithFailure={ this.finishMediaUploadWithFailure }
-									onMediaUploadStateReset={ this.mediaUploadStateReset }
-									renderContent={ ( params ) => {
-										return (
-											<View style={ styles.content }>
-												{ this.renderContent( params, open ) }
-											</View>
-										);
-									} }
-								/>
-							</>;
+									<MediaUploadProgress
+										coverUrl={ coverUrl }
+										mediaId={ mediaId }
+										onUpdateMediaProgress={ this.updateMediaProgress }
+										onFinishMediaUploadWithSuccess={ this.finishMediaUploadWithSuccess }
+										onFinishMediaUploadWithFailure={ this.finishMediaUploadWithFailure }
+										onMediaUploadStateReset={ this.mediaUploadStateReset }
+										renderContent={ ( params ) => {
+											return (
+												<View style={ styles.content }>
+													{ this.renderContent( params, open ) }
+												</View>
+											);
+										} }
+									/>
+								</View>
+							);
 						} }
 					/>
 				</View>

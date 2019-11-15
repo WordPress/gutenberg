@@ -10,7 +10,7 @@ import { noop } from 'lodash';
 import { IconButton, Dropdown, Toolbar, SVG, Path } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { DOWN } from '@wordpress/keycodes';
-import { ColorPaletteControl, ContrastChecker } from '@wordpress/block-editor';
+import { ColorPaletteControl } from '@wordpress/block-editor';
 
 const ColorSelectorSVGIcon = () => (
 	<SVG xmlns="https://www.w3.org/2000/svg" viewBox="0 0 20 20">
@@ -21,25 +21,37 @@ const ColorSelectorSVGIcon = () => (
 /**
  * Color Selector Icon component.
  *
+ * @param {Object} colorControlProps colorControl properties.
  * @return {*} React Icon component.
  */
-const ColorSelectorIcon = ( { style } ) =>
-	<div className="block-library-colors-selector__icon-container">
-		<div
-			className="block-library-colors-selector__state-selection"
-			style={ style }
-		>
-			<ColorSelectorSVGIcon />
+const ColorSelectorIcon = ( { textColor, textColorValue } ) => {
+	const iconClasses = classnames(
+		'block-library-colors-selector__state-selection',
+		'editor-styles-wrapper', {
+			'has-text-color': textColor && textColor.color,
+			[ textColor.class ]: textColor && textColor.class,
+		}
+	);
+
+	return (
+		<div className="block-library-colors-selector__icon-container">
+			<div
+				className={ iconClasses }
+				style={ { ...( textColorValue && { color: textColorValue } ) } }
+			>
+				<ColorSelectorSVGIcon />
+			</div>
 		</div>
-	</div>;
+	);
+};
 
 /**
  * Renders the Colors Selector Toolbar with the icon button.
  *
- * @param {Object}   style           - Colors style object.
+ * @param {Object} colorControlProps colorControl properties.
  * @return {*} React toggle button component.
  */
-const renderToggleComponent = ( style ) => ( { onToggle, isOpen } ) => {
+const renderToggleComponent = ( { textColor, textColorValue } ) => ( { onToggle, isOpen } ) => {
 	const openOnArrowDown = ( event ) => {
 		if ( ! isOpen && event.keyCode === DOWN ) {
 			event.preventDefault();
@@ -55,25 +67,20 @@ const renderToggleComponent = ( style ) => ( { onToggle, isOpen } ) => {
 				label={ __( 'Open Colors Selector' ) }
 				onClick={ onToggle }
 				onKeyDown={ openOnArrowDown }
-				icon={ <ColorSelectorIcon style={ style } /> }
+				icon={ <ColorSelectorIcon
+					textColor={ textColor }
+					textColorValue={ textColorValue }
+				/> }
 			/>
 		</Toolbar>
 	);
 };
 
-const renderContent = ( { backgroundColor, textColor, onColorChange = noop } ) => ( () => {
+const renderContent = ( { textColor, onColorChange = noop } ) => ( () => {
 	const setColor = ( attr ) => ( value ) => onColorChange( { attr, value } );
 
 	return (
 		<>
-			<div className="color-palette-controller-container">
-				<ColorPaletteControl
-					value={ backgroundColor.color }
-					onChange={ setColor( 'backgroundColor' ) }
-					label={ __( 'Background Color' ) }
-				/>
-			</div>
-
 			<div className="color-palette-controller-container">
 				<ColorPaletteControl
 					value={ textColor.color }
@@ -81,21 +88,16 @@ const renderContent = ( { backgroundColor, textColor, onColorChange = noop } ) =
 					label={ __( 'Text Color' ) }
 				/>
 			</div>
-
-			<ContrastChecker
-				textColor={ textColor.color }
-				backgroundColor={ backgroundColor.color }
-				isLargeText={ false }
-			/>
 		</>
 	);
 } );
 
-export default ( { style, className, ...colorControlProps } ) =>
+export default ( colorControlProps ) => (
 	<Dropdown
 		position="bottom right"
-		className={ classnames( 'block-library-colors-selector', className ) }
+		className="block-library-colors-selector"
 		contentClassName="block-library-colors-selector__popover"
-		renderToggle={ renderToggleComponent( style ) }
+		renderToggle={ renderToggleComponent( colorControlProps ) }
 		renderContent={ renderContent( colorControlProps ) }
-	/>;
+	/>
+);

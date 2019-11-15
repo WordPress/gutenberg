@@ -54,7 +54,6 @@
 	}
 }
 
-
 .wp-block-navigation-menu .block-editor-block-list__layout,
 .wp-block-navigation-menu {
 	display: flex;
@@ -123,13 +122,13 @@ $colors-selector-size: 22px;
 		line-height: ($colors-selector-size - 2);
 		padding: 2px;
 
-		background-color: var(--background-color-menu-link);
-		color: var(--color-menu-link);
-	}
-
-	&:not(.has-background-color) .block-library-colors-selector__state-selection {
-		background-image: linear-gradient(135deg, rgba(0, 0, 0, 0.08) 25%, transparent 25%, transparent 50%, rgba(0, 0, 0, 0.08) 50%, rgba(0, 0, 0, 0.08) 75%, transparent 75%, transparent 100%);
-		background-size: 12px 12px;
+		// Styling icon color.
+		&.has-text-color {
+			> svg,
+			> svg path {
+				color: inherit;
+			}
+		}
 	}
 }
 

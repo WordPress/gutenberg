@@ -11,6 +11,7 @@ import { createBlock } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import {
 	ExternalLink,
+	KeyboardShortcuts,
 	PanelBody,
 	Path,
 	SVG,
@@ -27,6 +28,8 @@ import {
 	DOWN,
 	BACKSPACE,
 	ENTER,
+	rawShortcut,
+	displayShortcut,
 } from '@wordpress/keycodes';
 import { __ } from '@wordpress/i18n';
 import {
@@ -45,9 +48,7 @@ import { Fragment, useState, useEffect } from '@wordpress/element';
  * @param {Function} setter Setter attribute function.
  */
 const updateLinkSetting = ( setter ) => ( setting, value ) => {
-	if ( setting === 'new-tab' ) {
-		setter( { opensInNewTab: value } );
-	}
+	setter( { [ setting ]: value } );
 };
 
 /**
@@ -101,6 +102,17 @@ function NavigationMenuItemEdit( {
 	}, [ isSelected ] );
 
 	/**
+	 * Opens the LinkControl popup
+	 */
+	const openLinkControl = () => {
+		if ( isLinkOpen ) {
+			return;
+		}
+
+		setIsLinkOpen( ! isLinkOpen );
+	};
+
+	/**
 	 * `onKeyDown` LinkControl handler.
 	 * It takes over to stop the event propagation to make the
 	 * navigation work, avoiding undesired behaviors.
@@ -124,16 +136,18 @@ function NavigationMenuItemEdit( {
 		<Fragment>
 			<BlockControls>
 				<Toolbar>
+					<KeyboardShortcuts
+						bindGlobal
+						shortcuts={ {
+							[ rawShortcut.primary( 'k' ) ]: openLinkControl,
+						} }
+					/>
 					<ToolbarButton
 						name="link"
 						icon="admin-links"
 						title={ __( 'Link' ) }
-						onClick={ () => {
-							if ( isLinkOpen ) {
-								return;
-							}
-							setIsLinkOpen( ! isLinkOpen );
-						} }
+						shortcut={ displayShortcut.primary( 'k' ) }
+						onClick={ openLinkControl }
 					/>
 					<ToolbarButton
 						name="submenu"
@@ -197,6 +211,7 @@ function NavigationMenuItemEdit( {
 				'wp-block-navigation-menu-item', {
 					'is-editing': isSelected || isParentOfSelectedBlock,
 					'is-selected': isSelected,
+					'has-link': !! url,
 				} ) }
 			>
 				<div className="wp-block-navigation-menu-item__inner">
@@ -217,7 +232,13 @@ function NavigationMenuItemEdit( {
 							onClose={ () => {
 								onCloseTimerId = setTimeout( () => setIsLinkOpen( false ), 100 );
 							} }
-							currentSettings={ { 'new-tab': opensInNewTab } }
+							currentSettings={ [
+								{
+									id: 'opensInNewTab',
+									title: __( 'Open in New Tab' ),
+									checked: opensInNewTab,
+								},
+							] }
 							onSettingsChange={ updateLinkSetting( setAttributes ) }
 						/>
 					) }
@@ -241,7 +262,7 @@ export default compose( [
 			hasDescendants: !! getClientIdsOfDescendants( [ clientId ] ).length,
 		};
 	} ),
-	withDispatch( ( dispatch, ownProps ) => {
+	withDispatch( ( dispatch, ownProps, registry ) => {
 		return {
 			insertMenuItemBlock() {
 				const { clientId } = ownProps;
@@ -250,10 +271,15 @@ export default compose( [
 					insertBlock,
 				} = dispatch( 'core/block-editor' );
 
+				const { getClientIdsOfDescendants } = registry.select( 'core/block-editor' );
+				const navItems = getClientIdsOfDescendants( [ clientId ] );
+				const insertionPoint = navItems.length ? navItems.length : 0;
+
 				const blockToInsert = createBlock( 'core/navigation-menu-item' );
+
 				insertBlock(
 					blockToInsert,
-					0,
+					insertionPoint,
 					clientId,
 				);
 			},

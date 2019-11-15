@@ -13,7 +13,6 @@ import { withPreferredColorScheme } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { escape, unescape } from './utils';
 
 /**
  * Block code style
@@ -30,11 +29,11 @@ export function CodeEdit( props ) {
 	return (
 		<View>
 			<PlainText
-				value={ unescape( attributes.content ) }
+				value={ attributes.content }
 				style={ [ style, codeStyle ] }
 				multiline={ true }
 				underlineColorAndroid="transparent"
-				onChange={ ( content ) => setAttributes( { content: escape( content ) } ) }
+				onChange={ ( content ) => setAttributes( { content } ) }
 				placeholder={ __( 'Write code…' ) }
 				aria-label={ __( 'Code' ) }
 				isSelected={ props.isSelected }

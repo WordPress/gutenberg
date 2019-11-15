@@ -8,6 +8,7 @@ module.exports = {
 		},
 	},
 	plugins: [
+		'@wordpress',
 		'react',
 		'react-hooks',
 	],
