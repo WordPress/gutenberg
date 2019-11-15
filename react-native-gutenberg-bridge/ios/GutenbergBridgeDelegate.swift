@@ -124,7 +124,7 @@ public protocol GutenbergBridgeDelegate: class {
     ///
     func editorDidAutosave()
 
-    func gutenbergDidRequestFetch(path: String, response: @escaping (Swift.Result<Any, NSError>) -> Void) 
+    func gutenbergDidRequestFetch(path: String, completion: @escaping (Swift.Result<Any, NSError>) -> Void)
 }
 
 // MARK: - Optional GutenbergBridgeDelegate methods
