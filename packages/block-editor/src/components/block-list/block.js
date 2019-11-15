@@ -464,9 +464,9 @@ function BlockListBlock( {
 			'is-reusable': isReusableBlock( blockType ),
 			'is-dragging': isDragging,
 			'is-typing': isTypingWithinBlock,
-			'is-focused': isFocusMode && ( isSelected || isParentOfSelectedBlock ),
+			'is-focused': isFocusMode && ( isSelected || isAncestorOfSelectedBlock ),
 			'is-focus-mode': isFocusMode,
-			'has-child-selected': isParentOfSelectedBlock,
+			'has-child-selected': isAncestorOfSelectedBlock,
 		},
 		className
 	);
@@ -521,9 +521,6 @@ function BlockListBlock( {
 		<Slot bubblesVirtually={ true } />
 	);
 
-	// if ( name === 'core/navigation-menu' ) {
-	// 	console.log( name, isParentOfSelectedBlock, consumeChildToolbar );
-	// }
 	return (
 		<IgnoreNestedEvents
 			id={ blockElementId }
@@ -581,7 +578,7 @@ function BlockListBlock( {
 					/>
 				) }
 
-				{ isParentOfSelectedBlock && (
+				{ isAncestorOfSelectedBlock && (
 					// A slot made available on parents when a child Block is selected
 					// to allow child Blocks to render their toolbars into the DOM
 					// of the parent.
@@ -701,7 +698,7 @@ const applyWithSelect = withSelect(
 		const isSelected = isBlockSelected( clientId );
 		const { hasFixedToolbar, focusMode, isRTL } = getSettings();
 		const templateLock = getTemplateLock( rootClientId );
-		const isParentOfSelectedBlock = hasSelectedInnerBlock( clientId, true );
+		const isAncestorOfSelectedBlock = hasSelectedInnerBlock( clientId, true );
 		const index = getBlockIndex( clientId, rootClientId );
 		const blockOrder = getBlockOrder( rootClientId );
 
@@ -718,7 +715,7 @@ const applyWithSelect = withSelect(
 			// We only care about this prop when the block is selected
 			// Thus to avoid unnecessary rerenders we avoid updating the prop if the block is not selected.
 			isTypingWithinBlock:
-				( isSelected || isParentOfSelectedBlock ) && isTyping(),
+				( isSelected || isAncestorOfSelectedBlock ) && isTyping(),
 			isCaretWithinFormattedText: isCaretWithinFormattedText(),
 			mode: getBlockMode( clientId ),
 			isSelectionEnabled: isSelectionEnabled(),
@@ -741,7 +738,7 @@ const applyWithSelect = withSelect(
 			attributes,
 			isValid,
 			isSelected,
-			isParentOfSelectedBlock,
+			isAncestorOfSelectedBlock,
 		};
 	}
 );
