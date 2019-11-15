@@ -1,6 +1,6 @@
 [
     {
-        "blockName": "core/navigation-menu-item",
+        "blockName": "core/navigation-link",
         "attrs": {
             "label": "WordPress",
             "url": "https://wordpress.org/"
