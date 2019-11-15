@@ -64,10 +64,31 @@
 	padding: $grid-size-large;
 }
 
-.wp-block-navigation-menu-item {
+/*
+ * Adjust Navigation Item with Menu.
+ */
+.wp-block-navigation-menu .wp-block-navigation-link {
+	margin-right: $grid-size;
 	margin-left: $grid-size;
-	.wp-block-navigation-menu-item__link {
-		margin-left: $grid-size-large;
+
+	.block-editor-block-list__layout {
+		display: block;
+		margin: $grid-size;
+	}
+
+	// Provide a base menu item margin.
+	// This should be the same inside the field,
+	// and the edit container should compensate.
+	// This is to make sure the edit and view are the same.
+	padding: 0 $grid-size;
+
+	// Only display inner blocks when the block is being edited.
+	.block-editor-inner-blocks {
+		display: none;
+	}
+
+	&.is-editing .block-editor-inner-blocks {
+		display: block;
 	}
 }
 
