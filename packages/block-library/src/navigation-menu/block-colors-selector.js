@@ -10,7 +10,7 @@ import { noop } from 'lodash';
 import { IconButton, Dropdown, Toolbar, SVG, Path } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { DOWN } from '@wordpress/keycodes';
-import { ColorPaletteControl, ContrastChecker } from '@wordpress/block-editor';
+import { ColorPaletteControl } from '@wordpress/block-editor';
 
 const ColorSelectorSVGIcon = () => (
 	<SVG xmlns="https://www.w3.org/2000/svg" viewBox="0 0 20 20">
@@ -24,26 +24,21 @@ const ColorSelectorSVGIcon = () => (
  * @param {Object} colorControlProps colorControl properties.
  * @return {*} React Icon component.
  */
-const ColorSelectorIcon = ( { backgroundColor, textColor } ) => {
-	const iconStyle = {};
-	if ( textColor && ! textColor.class ) {
-		iconStyle.color = textColor.color;
-	}
-
-	if ( backgroundColor && ! backgroundColor.class ) {
-		iconStyle.backgroundColor = backgroundColor.color;
-	}
-
-	const iconClasses = classnames( 'block-library-colors-selector__state-selection', {
-		'has-background-color': backgroundColor && backgroundColor.color,
-		'has-text-color': backgroundColor && backgroundColor.color,
-		[ backgroundColor.class ]: backgroundColor && backgroundColor.class,
-		[ textColor.class ]: textColor && textColor.class,
-	} );
+const ColorSelectorIcon = ( { textColor, textColorValue } ) => {
+	const iconClasses = classnames(
+		'block-library-colors-selector__state-selection',
+		'editor-styles-wrapper', {
+			'has-text-color': textColor && textColor.color,
+			[ textColor.class ]: textColor && textColor.class,
+		}
+	);
 
 	return (
 		<div className="block-library-colors-selector__icon-container">
-			<div className={ iconClasses } style={ iconStyle }>
+			<div
+				className={ iconClasses }
+				style={ { ...( textColorValue && { color: textColorValue } ) } }
+			>
 				<ColorSelectorSVGIcon />
 			</div>
 		</div>
@@ -56,7 +51,7 @@ const ColorSelectorIcon = ( { backgroundColor, textColor } ) => {
  * @param {Object} colorControlProps colorControl properties.
  * @return {*} React toggle button component.
  */
-const renderToggleComponent = ( { backgroundColor, textColor } ) => ( { onToggle, isOpen } ) => {
+const renderToggleComponent = ( { textColor, textColorValue } ) => ( { onToggle, isOpen } ) => {
 	const openOnArrowDown = ( event ) => {
 		if ( ! isOpen && event.keyCode === DOWN ) {
 			event.preventDefault();
@@ -72,25 +67,20 @@ const renderToggleComponent = ( { backgroundColor, textColor } ) => ( { onToggle
 				label={ __( 'Open Colors Selector' ) }
 				onClick={ onToggle }
 				onKeyDown={ openOnArrowDown }
-				icon={ <ColorSelectorIcon backgroundColor={ backgroundColor } textColor={ textColor } /> }
+				icon={ <ColorSelectorIcon
+					textColor={ textColor }
+					textColorValue={ textColorValue }
+				/> }
 			/>
 		</Toolbar>
 	);
 };
 
-const renderContent = ( { backgroundColor, textColor, onColorChange = noop } ) => ( () => {
+const renderContent = ( { textColor, onColorChange = noop } ) => ( () => {
 	const setColor = ( attr ) => ( value ) => onColorChange( { attr, value } );
 
 	return (
 		<>
-			<div className="color-palette-controller-container">
-				<ColorPaletteControl
-					value={ backgroundColor.color }
-					onChange={ setColor( 'backgroundColor' ) }
-					label={ __( 'Background Color' ) }
-				/>
-			</div>
-
 			<div className="color-palette-controller-container">
 				<ColorPaletteControl
 					value={ textColor.color }
@@ -98,12 +88,6 @@ const renderContent = ( { backgroundColor, textColor, onColorChange = noop } ) =
 					label={ __( 'Text Color' ) }
 				/>
 			</div>
-
-			<ContrastChecker
-				textColor={ textColor.color }
-				backgroundColor={ backgroundColor.color }
-				isLargeText={ false }
-			/>
 		</>
 	);
 } );

@@ -3,9 +3,10 @@
 	min-width: $modal-min-width;
 }
 
+// LinkControl popover.
 .block-editor-link-control__search .block-editor-link-control__search-input {
-	// Specificity overide
-	&.block-editor-link-control__search-input > input[type="text"] {
+	// Specificity override.
+	&.block-editor-link-control__search-input input[type="text"] {
 		width: calc(100% - #{$grid-size-large*2});
 		display: block;
 		padding: 11px $grid-size-large;
@@ -53,14 +54,14 @@
 
 	&::before {
 		height: $grid-size-large/2;
-		top: -1px;
+		top: 0;
 		bottom: auto;
 		background: linear-gradient(to bottom, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 100%);
 	}
 
 	&::after {
-		height: 20px;
-		bottom: -1px;
+		height: $grid-size-large;
+		bottom: 0;
 		top: auto;
 		background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 100%);
 	}
@@ -68,7 +69,7 @@
 
 .block-editor-link-control__search-results {
 	margin: 0;
-	padding: $grid-size-large/2 $grid-size-large;
+	padding: $grid-size-large/2 $grid-size-large $grid-size-large;
 	max-height: 200px;
 	overflow-y: scroll; // allow results list to scroll
 

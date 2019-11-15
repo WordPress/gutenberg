@@ -4,7 +4,7 @@
 import Animate from '../';
 import Notice from '../../notice';
 
-export default { title: 'Animate', component: Animate };
+export default { title: 'Components|Animate', component: Animate };
 
 export const _default = () => (
 	<Animate>

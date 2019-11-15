@@ -52,6 +52,10 @@ LOCAL_SCRIPT_DEBUG=false LOCAL_WP_DEBUG=false npm run env install
 ```
 By default, both flags will be set to `true`.
 
+### Troubleshooting
+
+You might find yourself stuck on a screen stating that "you are running WordPress without JavaScript and CSS files". If you tried installing WordPress via `npm run env install`, it probably means that something went wrong during the process. To fix it, try removing the `/wordpress` folder and running `npm run env install` again.
+
 ## On A Remote Server
 
 Open a terminal (or if on Windows, a command prompt) and navigate to the repository you cloned. Now type `npm install` to get the dependencies all set up. Once that finishes, you can type `npm run build`. You can now upload the entire repository to your `wp-content/plugins` directory on your web server and activate the plugin from the WordPress admin.
@@ -61,10 +65,14 @@ You can also type `npm run package-plugin` which will run the two commands above
 [npm]: https://www.npmjs.com/
 [nvm]: https://github.com/creationix/nvm
 
-## Playground
+## Storybook
 
-The Gutenberg repository also includes a static Gutenberg playground that allows testing and developing in a WordPress-agnostic context. This is very helpful for developing reusable components and trying generic JavaScript modules without any backend dependency.
+> Storybook is an open source tool for developing UI components in isolation for React, React Native and more. It makes building stunning UIs organized and efficient.
 
-You can launch the playground by running `npm run playground:dev` locally. The playground should be available on [http://localhost:1234](http://localhost:1234).
+The Gutenberg repository also includes [Storybook] integration that allows testing and developing in a WordPress-agnostic context. This is very helpful for developing reusable components and trying generic JavaScript modules without any backend dependency.
 
-You can also test the playground version of the current master branch on GitHub Pages: [https://wordpress.github.io/gutenberg/](https://wordpress.github.io/gutenberg/)
+You can launch Storybook by running `npm run storybook:dev` locally. It will open in your browser automatically.
+
+You can also test Storybook for the current `master` branch on GitHub Pages: [https://wordpress.github.io/gutenberg/](https://wordpress.github.io/gutenberg/)
+
+[Storybook]: https://storybook.js.org/

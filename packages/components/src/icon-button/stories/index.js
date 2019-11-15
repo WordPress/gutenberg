@@ -8,7 +8,7 @@ import { text } from '@storybook/addon-knobs';
  */
 import IconButton from '../';
 
-export default { title: 'IconButton', component: IconButton };
+export default { title: 'Components|IconButton', component: IconButton };
 
 export const _default = () => {
 	const icon = text( 'Icon', 'ellipsis' );

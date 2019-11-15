@@ -15,7 +15,6 @@ import {
 	withInstanceId,
 } from '@wordpress/compose';
 import {
-	BaseControl,
 	PanelBody,
 	RangeControl,
 	TextControl,
@@ -84,7 +83,6 @@ function ButtonEdit( {
 	fallbackTextColor,
 	setAttributes,
 	className,
-	instanceId,
 	isSelected,
 } ) {
 	const {
@@ -127,7 +125,6 @@ function ButtonEdit( {
 		setGradient,
 	} = __experimentalUseGradient();
 
-	const linkId = `wp-block-button__inline-link-${ instanceId }`;
 	return (
 		<div className={ className } title={ title }>
 			<RichText
@@ -154,24 +151,19 @@ function ButtonEdit( {
 					borderRadius: borderRadius ? borderRadius + 'px' : undefined,
 				} }
 			/>
-			<BaseControl
+			<URLInput
 				label={ __( 'Link' ) }
 				className="wp-block-button__inline-link"
-				id={ linkId }>
-				<URLInput
-					className="wp-block-button__inline-link-input"
-					value={ url }
-					/* eslint-disable jsx-a11y/no-autofocus */
-					// Disable Reason: The rule is meant to prevent enabling auto-focus, not disabling it.
-					autoFocus={ false }
-					/* eslint-enable jsx-a11y/no-autofocus */
-					onChange={ ( value ) => setAttributes( { url: value } ) }
-					disableSuggestions={ ! isSelected }
-					id={ linkId }
-					isFullWidth
-					hasBorder
-				/>
-			</BaseControl>
+				value={ url }
+				/* eslint-disable jsx-a11y/no-autofocus */
+				// Disable Reason: The rule is meant to prevent enabling auto-focus, not disabling it.
+				autoFocus={ false }
+				/* eslint-enable jsx-a11y/no-autofocus */
+				onChange={ ( value ) => setAttributes( { url: value } ) }
+				disableSuggestions={ ! isSelected }
+				isFullWidth
+				hasBorder
+			/>
 			<InspectorControls>
 				<PanelColorSettings
 					title={ __( 'Color Settings' ) }
