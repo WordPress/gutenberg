@@ -45,8 +45,8 @@ class GutenbergViewController: UIViewController {
 }
 
 extension GutenbergViewController: GutenbergBridgeDelegate {
-    func gutenbergDidRequestFetch(path: String, response: @escaping (Result<Any, NSError>) -> Void) {
-        response(Result.success([:]))
+    func gutenbergDidRequestFetch(path: String, completion: @escaping (Result<Any, NSError>) -> Void) {
+        completion(Result.success([:]))
     }
 
     func editorDidAutosave() {
