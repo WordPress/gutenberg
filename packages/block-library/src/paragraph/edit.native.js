@@ -78,7 +78,6 @@ class ParagraphEdit extends Component {
 					onReplace={ onReplace }
 					onRemove={ onReplace ? () => onReplace( [] ) : undefined }
 					placeholder={ placeholder || __( 'Start writing…' ) }
-					isInnerBlock={ this.props.isInnerBlock }
 				/>
 			</View>
 		);

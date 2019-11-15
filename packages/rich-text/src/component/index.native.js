@@ -75,7 +75,6 @@ export class RichText extends Component {
 			this.formatToValue.bind( this ),
 			{ maxSize: 1 }
 		);
-		this.makeActive = this.makeActive.bind( this );
 
 		// This prevents a bug in Aztec which triggers onSelectionChange twice on format change
 		this.onSelectionChange = this.onSelectionChange.bind( this );
@@ -87,7 +86,6 @@ export class RichText extends Component {
 			activeFormats: [],
 			selectedFormat: null,
 			height: 0,
-			isActive: ! this.props.isInnerBlock,
 		};
 		this.needsSelectionUpdate = false;
 		this.savedContent = '';
@@ -543,7 +541,6 @@ export class RichText extends Component {
 		//  to determine if we should focus the RichText.
 		if ( this.props.blockIsSelected && ! this.props.__unstableMobileNoFocusOnMount ) {
 			this._editor.focus();
-			this.makeActive( true );
 			this.onSelectionChange( this.props.selectionStart || 0, this.props.selectionEnd || 0 );
 		}
 	}
@@ -551,7 +548,6 @@ export class RichText extends Component {
 	componentWillUnmount() {
 		if ( this._editor.isFocused() && this.props.shouldBlurOnUnmount ) {
 			this._editor.blur();
-			this.makeActive( false );
 		}
 	}
 
@@ -570,20 +566,12 @@ export class RichText extends Component {
 
 		if ( isSelected && ! prevIsSelected ) {
 			this._editor.focus();
-			this.makeActive( true );
 			// Update selection props explicitly when component is selected as Aztec won't call onSelectionChange
 			// if its internal value hasn't change. When created, default value is 0, 0
 			this.onSelectionChange( this.props.selectionStart || 0, this.props.selectionEnd || 0 );
 		} else if ( ! isSelected && prevIsSelected ) {
 			this._editor.blur();
-			if ( this.props.isInnerBlock ) {
-				this.makeActive( false );
-			}
 		}
-	}
-
-	makeActive( isActive ) {
-		this.setState( { isActive } );
 	}
 
 	willTrimSpaces( html ) {
@@ -624,7 +612,6 @@ export class RichText extends Component {
 			__unstableIsSelected: isSelected,
 			children,
 			getStylesFromColorScheme,
-			blockIsSelected,
 		} = this.props;
 
 		const record = this.getRecord();
@@ -693,8 +680,6 @@ export class RichText extends Component {
 			this.firedAfterTextChanged = false;
 		}
 
-		const lockOnFocus = blockIsSelected || this.state.isActive ? {} : { pointerEvents: 'none' };
-
 		return (
 			<View>
 				{ children && children( {
@@ -739,7 +724,6 @@ export class RichText extends Component {
 					disableEditingMenu={ this.props.disableEditingMenu }
 					isMultiline={ this.isMultiline }
 					textAlign={ this.props.textAlign }
-					{ ...lockOnFocus }
 				/>
 				{ isSelected && <FormatEdit value={ record } onChange={ this.onFormatChange } /> }
 			</View>
