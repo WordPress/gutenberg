@@ -26,33 +26,13 @@ let indoc,
 const tokenizer = /<(\/)?(\w+)\s*(\/)?>/g;
 
 /**
- * The filament describes and element and its children.
- *
- * This is used by the string iterator to track children attached to an element
- * as the string is parsed. This allows for collecting nested elements in
- * the string before creating the parent.
- *
- * @private
- *
- * @param {WPElement} element The element
- *
- * @return {Filament} A constructor for the Filament.
- */
-function Filament( element ) {
-	return {
-		element,
-		children: [],
-	};
-}
-
-/**
  * Tracks recursive-descent parse state.
  *
  * This is a Stack frame holding parent elements until all children have been
  * parsed.
  *
  * @private
- * @param {Filament}  filament         A parent filament which may still have
+ * @param {WPElement} element          A parent element which may still have
  *                                     nested children not yet parsed.
  * @param {number}    tokenStart       Offset at which parent element first
  *                                     appears.
@@ -67,18 +47,19 @@ function Filament( element ) {
  * @return {Frame} The stack frame tracking parse progress.
  */
 function Frame(
-	filament,
+	element,
 	tokenStart,
 	tokenLength,
 	prevOffset,
-	leadingTextStart
+	leadingTextStart,
 ) {
 	return {
-		filament,
+		element,
 		tokenStart,
 		tokenLength,
 		prevOffset,
 		leadingTextStart,
+		children: [],
 	};
 }
 
@@ -164,7 +145,7 @@ function proceed( conversionMap ) {
 	const leadingTextStart = startOffset > offset ? offset : null;
 	if ( ! conversionMap[ name ] ) {
 		if ( stackDepth !== 0 ) {
-			const { stackLeadingText, tokenStart } = stack.pop();
+			const { leadingTextStart: stackLeadingText, tokenStart } = stack.pop();
 			output.push( indoc.substr( stackLeadingText, tokenStart ) );
 		}
 		addText();
@@ -173,7 +154,7 @@ function proceed( conversionMap ) {
 	switch ( tokenType ) {
 		case 'no-more-tokens':
 			if ( stackDepth !== 0 ) {
-				const { stackLeadingText, tokenStart } = stack.pop();
+				const { leadingTextStart: stackLeadingText, tokenStart } = stack.pop();
 				output.push( indoc.substr( stackLeadingText, tokenStart ) );
 			}
 			addText();
@@ -193,9 +174,7 @@ function proceed( conversionMap ) {
 
 			// otherwise we found an inner element
 			addChild(
-				new Filament( conversionMap[ name ] ),
-				startOffset,
-				tokenLength
+				new Frame( conversionMap[ name ], startOffset, tokenLength )
 			);
 			offset = startOffset + tokenLength;
 			return true;
@@ -203,7 +182,7 @@ function proceed( conversionMap ) {
 		case 'opener':
 			stack.push(
 				new Frame(
-					new Filament( conversionMap[ name ] ),
+					conversionMap[ name ],
 					startOffset,
 					tokenLength,
 					startOffset + tokenLength,
@@ -216,7 +195,7 @@ function proceed( conversionMap ) {
 		case 'closer':
 			// if we're not nesting then this is easy - close the block
 			if ( 1 === stackDepth ) {
-				addFilamentFromStack( startOffset );
+				closeOuterElement( startOffset );
 				offset = startOffset + tokenLength;
 				return true;
 			}
@@ -228,15 +207,16 @@ function proceed( conversionMap ) {
 				stackTop.prevOffset,
 				startOffset - stackTop.prevOffset
 			);
-			stackTop.filament.children.push( text );
+			stackTop.children.push( text );
 			stackTop.prevOffset = startOffset + tokenLength;
-
-			addChild(
-				stackTop.filament,
+			const frame = new Frame(
+				stackTop.element,
 				stackTop.tokenStart,
 				stackTop.tokenLength,
-				startOffset + tokenLength
+				startOffset + tokenLength,
 			);
+			frame.children = stackTop.children;
+			addChild( frame );
 			offset = startOffset + tokenLength;
 			return true;
 
@@ -287,28 +267,27 @@ function addText() {
 }
 
 /**
- * Pushes a child filament to the associated parent filament's children for the
+ * Pushes a child element to the associated parent element's children for the
  * parent currently active in the stack.
  *
  * @private
  *
- * @param {Filament} filament    The child filament to be pushed to the parent.
- * @param {number}   tokenStart  Offset at which child filament first appears.
- * @param {number}   tokenLength Length of string marking start of child filament.
- * @param {number}   lastOffset  Running offset at which parsing should continue.
+ * @param {Frame}    frame       The Frame containing the child element and it's
+ *                               token information.
  */
-function addChild( filament, tokenStart, tokenLength, lastOffset ) {
+function addChild( frame ) {
+	const { element, tokenStart, tokenLength, prevOffset, children } = frame;
 	const parent = stack[ stack.length - 1 ];
 	const text = indoc.substr( parent.prevOffset, tokenStart - parent.prevOffset );
 
 	if ( text ) {
-		parent.filament.children.push( text );
+		parent.children.push( text );
 	}
 
-	parent.filament.children.push(
-		cloneElement( filament.element, null, ...filament.children )
+	parent.children.push(
+		cloneElement( element, null, ...children )
 	);
-	parent.prevOffset = lastOffset ? lastOffset : tokenStart + tokenLength;
+	parent.prevOffset = prevOffset ? prevOffset : tokenStart + tokenLength;
 }
 
 /**
@@ -323,15 +302,15 @@ function addChild( filament, tokenStart, tokenLength, lastOffset ) {
  *                           helps capture any remaining nested text nodes in
  *                           the element.
  */
-function addFilamentFromStack( endOffset ) {
-	const { filament, leadingTextStart, prevOffset, tokenStart } = stack.pop();
+function closeOuterElement( endOffset ) {
+	const { element, leadingTextStart, prevOffset, tokenStart, children } = stack.pop();
 
 	const text = endOffset ?
 		indoc.substr( prevOffset, endOffset - prevOffset ) :
 		indoc.substr( prevOffset );
 
 	if ( text ) {
-		filament.children.push( text );
+		children.push( text );
 	}
 
 	if ( null !== leadingTextStart ) {
@@ -340,9 +319,9 @@ function addFilamentFromStack( endOffset ) {
 
 	output.push(
 		cloneElement(
-			filament.element,
+			element,
 			null,
-			...filament.children
+			...children
 		)
 	);
 }
