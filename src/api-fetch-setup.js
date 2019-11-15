@@ -30,7 +30,7 @@ const fetchHandler = ( { path } ) => {
 };
 
 export const isPathSupported = ( path ) =>
-	[ /wp\/v2\/media\/\d*?.*/i ].some( ( pattern ) => pattern.test( path ) );
+	[ /wp\/v2\/media\/?\d*?.*/i ].some( ( pattern ) => pattern.test( path ) );
 
 export default () => {
 	apiFetch.setFetchHandler( ( options ) => fetchHandler( options ) );
