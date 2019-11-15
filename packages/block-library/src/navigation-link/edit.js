@@ -56,7 +56,7 @@ const updateLinkSetting = ( setter ) => ( setting, value ) => {
  * through of the `onLinkChange` LinkControl callback.
  *
  * @param {Function} setter Setter attribute function.
- * @param {string} label ItemMenu link label.
+ * @param {string} label Link label.
  */
 const updateLink = ( setter, label ) => ( { title: newTitle = '', url: newURL = '' } = {} ) => {
 	setter( {
@@ -70,13 +70,13 @@ const updateLink = ( setter, label ) => ( { title: newTitle = '', url: newURL = 
 	}
 };
 
-function NavigationMenuItemEdit( {
+function NavigationLinkEdit( {
 	attributes,
 	hasDescendants,
 	isSelected,
 	isParentOfSelectedBlock,
 	setAttributes,
-	insertMenuItemBlock,
+	insertLinkBlock,
 } ) {
 	const { label, opensInNewTab, title, url } = attributes;
 	const link = title ? { title, url } : null;
@@ -116,7 +116,7 @@ function NavigationMenuItemEdit( {
 	 * `onKeyDown` LinkControl handler.
 	 * It takes over to stop the event propagation to make the
 	 * navigation work, avoiding undesired behaviors.
-	 * For instance, it will block to move between menu items
+	 * For instance, it will block to move between link blocks
 	 * when the LinkControl is focused.
 	 *
 	 * @param {Event} event
@@ -130,7 +130,7 @@ function NavigationMenuItemEdit( {
 		}
 	};
 
-	const itemLabelPlaceholder = __( 'Add item…' );
+	const itemLabelPlaceholder = __( 'Add link…' );
 
 	return (
 		<Fragment>
@@ -152,14 +152,14 @@ function NavigationMenuItemEdit( {
 					<ToolbarButton
 						name="submenu"
 						icon={ <SVG xmlns="http://www.w3.org/2000/svg" width="24" height="24"><Path d="M14 5h8v2h-8zm0 5.5h8v2h-8zm0 5.5h8v2h-8zM2 11.5C2 15.08 4.92 18 8.5 18H9v2l3-3-3-3v2h-.5C6.02 16 4 13.98 4 11.5S6.02 7 8.5 7H12V5H8.5C4.92 5 2 7.92 2 11.5z" /><Path fill="none" d="M0 0h24v24H0z" /></SVG> }
-						title={ __( 'Add submenu item' ) }
-						onClick={ insertMenuItemBlock }
+						title={ __( 'Add Submenu' ) }
+						onClick={ insertLinkBlock }
 					/>
 				</Toolbar>
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody
-					title={ __( 'Menu Settings' ) }
+					title={ __( 'Link Settings' ) }
 				>
 					<ToggleControl
 						checked={ attributes.opensInNewTab }
@@ -192,12 +192,12 @@ function NavigationMenuItemEdit( {
 						onChange={ ( nofollow ) => {
 							setAttributes( { nofollow } );
 						} }
-						label={ __( 'Add nofollow to menu item' ) }
+						label={ __( 'Add nofollow to link' ) }
 						help={ (
 							<Fragment>
 								{ __( 'Don\'t let search engines follow this link.' ) }
 								<ExternalLink
-									className="wp-block-navigation-menu-item__nofollow-external-link"
+									className="wp-block-navigation-link__nofollow-external-link"
 									href={ __( 'https://codex.wordpress.org/Nofollow' ) }
 								>
 									{ __( 'What\'s this?' ) }
@@ -208,15 +208,15 @@ function NavigationMenuItemEdit( {
 				</PanelBody>
 			</InspectorControls>
 			<div className={ classnames(
-				'wp-block-navigation-menu-item', {
+				'wp-block-navigation-link', {
 					'is-editing': isSelected || isParentOfSelectedBlock,
 					'is-selected': isSelected,
 					'has-link': !! url,
 				} ) }
 			>
-				<div className="wp-block-navigation-menu-item__inner">
+				<div className="wp-block-navigation-link__inner">
 					<RichText
-						className="wp-block-navigation-menu-item__content"
+						className="wp-block-navigation-link__content"
 						value={ label }
 						onChange={ ( labelValue ) => setAttributes( { label: labelValue } ) }
 						placeholder={ itemLabelPlaceholder }
@@ -224,7 +224,7 @@ function NavigationMenuItemEdit( {
 					/>
 					{ isLinkOpen && (
 						<LinkControl
-							className="wp-block-navigation-menu-item__inline-link-input"
+							className="wp-block-navigation-link__inline-link-input"
 							onKeyDown={ handleLinkControlOnKeyDown }
 							onKeyPress={ ( event ) => event.stopPropagation() }
 							currentLink={ link }
@@ -244,7 +244,7 @@ function NavigationMenuItemEdit( {
 					) }
 				</div>
 				<InnerBlocks
-					allowedBlocks={ [ 'core/navigation-menu-item' ] }
+					allowedBlocks={ [ 'core/navigation-link' ] }
 					renderAppender={ hasDescendants ? InnerBlocks.ButtonBlockAppender : false }
 				/>
 			</div>
@@ -264,7 +264,7 @@ export default compose( [
 	} ),
 	withDispatch( ( dispatch, ownProps, registry ) => {
 		return {
-			insertMenuItemBlock() {
+			insertLinkBlock() {
 				const { clientId } = ownProps;
 
 				const {
@@ -275,7 +275,7 @@ export default compose( [
 				const navItems = getClientIdsOfDescendants( [ clientId ] );
 				const insertionPoint = navItems.length ? navItems.length : 0;
 
-				const blockToInsert = createBlock( 'core/navigation-menu-item' );
+				const blockToInsert = createBlock( 'core/navigation-link' );
 
 				insertBlock(
 					blockToInsert,
@@ -285,4 +285,4 @@ export default compose( [
 			},
 		};
 	} ),
-] )( NavigationMenuItemEdit );
+] )( NavigationLinkEdit );

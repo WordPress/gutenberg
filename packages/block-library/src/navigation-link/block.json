@@ -1,5 +1,5 @@
 {
-	"name": "core/navigation-menu-item",
+	"name": "core/navigation-link",
 	"category": "layout",
 	"attributes": {
 		"label": {
