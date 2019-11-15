@@ -3,7 +3,6 @@
 /**
  * External dependencies
  */
-import RCTAztecView from 'react-native-aztec';
 import { View, Platform } from 'react-native';
 import {
 	pickBy,
@@ -19,6 +18,7 @@ import { withSelect } from '@wordpress/data';
 import { childrenBlock } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/html-entities';
 import { BACKSPACE } from '@wordpress/keycodes';
+import RCTAztecView from '@wordpress/react-native-aztec';
 import { isURL } from '@wordpress/url';
 
 /**
