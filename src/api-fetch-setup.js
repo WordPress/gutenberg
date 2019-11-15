@@ -25,6 +25,7 @@ const fetchHandler = ( { path } ) => {
 	};
 
 	return responsePromise.then( parseResponse ).catch( ( error ) => {
+		// eslint-disable-next-line no-console
 		console.warn( 'Network Error: ', error );
 		return Promise.resolve( error );
 	} );
