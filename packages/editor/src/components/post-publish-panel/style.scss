@@ -80,6 +80,8 @@
 		display: none;
 	}
 
+	// The DateTime component has an intrinsic padding in order for the horizontal scrolling to function inside a popover.
+	// We unset that here when used inline.
 	.components-datetime {
 		padding: 0;
 	}

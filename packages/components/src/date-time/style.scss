@@ -5,10 +5,10 @@
 /*rtl:end:ignore*/
 
 .components-datetime {
-	padding: $grid-size;
+	padding: $grid-size-large;
 
 	.components-datetime__calendar-help {
-		padding: $grid-size;
+		padding: $grid-size-large;
 
 		h4 {
 			margin: 0;
@@ -18,8 +18,6 @@
 	.components-datetime__date-help-button {
 		display: block;
 		margin-left: auto;
-		margin-right: $grid-size;
-		margin-top: 0.5em;
 	}
 
 	fieldset {
@@ -30,21 +28,33 @@
 
 	select,
 	input {
-		box-sizing: border-box;
-		height: 28px;
-		vertical-align: middle;
-		padding: 0;
 		@include input-style__neutral();
+	}
+
+	// Override inherited conflicting styles to be consistent.
+	select,
+	input[type="number"],
+	.components-button {
+		height: 30px;
+		margin-top: 0;
+		margin-bottom: 0;
 	}
 }
 
 .components-datetime__date {
 	min-height: 236px;
 	border-top: 1px solid $light-gray-500;
-	margin-left: -$grid-size;
-	margin-right: -$grid-size;
 
 	// Override external DatePicker styles.
+	.CalendarMonthGrid {
+		// The included component contains an arbitrary 13px padding that misaligns things.
+		margin-left: -13px;
+	}
+
+	.DayPickerNavigation_leftButton__horizontalDefault {
+		left: 0;
+	}
+
 	.CalendarMonth_caption {
 		font-size: $default-font-size;
 	}
@@ -84,11 +94,15 @@
 }
 
 .components-datetime__time {
-	margin-bottom: 1em;
+	padding-bottom: $grid-size-large;
 
 	fieldset {
-		margin-top: 0.5em;
 		position: relative;
+		margin-bottom: 0.5em;
+	}
+
+	fieldset + fieldset {
+		margin-bottom: 0;
 	}
 
 	.components-datetime__time-field-am-pm fieldset {
