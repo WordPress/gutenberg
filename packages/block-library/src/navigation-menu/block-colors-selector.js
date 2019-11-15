@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
 import { noop } from 'lodash';
 
 /**
@@ -24,20 +23,12 @@ const ColorSelectorSVGIcon = () => (
  * @param {Object} colorControlProps colorControl properties.
  * @return {*} React Icon component.
  */
-const ColorSelectorIcon = ( { textColor, textColorValue } ) => {
-	const iconClasses = classnames(
-		'block-library-colors-selector__state-selection',
-		'editor-styles-wrapper', {
-			'has-text-color': textColor && textColor.color,
-			[ textColor.class ]: textColor && textColor.class,
-		}
-	);
-
+const ColorSelectorIcon = ( { color } ) => {
 	return (
 		<div className="block-library-colors-selector__icon-container">
 			<div
-				className={ iconClasses }
-				style={ { ...( textColorValue && { color: textColorValue } ) } }
+				className="block-library-colors-selector__state-selection"
+				style={ { ...( color && { color } ) } }
 			>
 				<ColorSelectorSVGIcon />
 			</div>
@@ -51,7 +42,7 @@ const ColorSelectorIcon = ( { textColor, textColorValue } ) => {
  * @param {Object} colorControlProps colorControl properties.
  * @return {*} React toggle button component.
  */
-const renderToggleComponent = ( { textColor, textColorValue } ) => ( { onToggle, isOpen } ) => {
+const renderToggleComponent = ( { value } ) => ( { onToggle, isOpen } ) => {
 	const openOnArrowDown = ( event ) => {
 		if ( ! isOpen && event.keyCode === DOWN ) {
 			event.preventDefault();
@@ -67,24 +58,19 @@ const renderToggleComponent = ( { textColor, textColorValue } ) => ( { onToggle,
 				label={ __( 'Open Colors Selector' ) }
 				onClick={ onToggle }
 				onKeyDown={ openOnArrowDown }
-				icon={ <ColorSelectorIcon
-					textColor={ textColor }
-					textColorValue={ textColorValue }
-				/> }
+				icon={ <ColorSelectorIcon color={ value } /> }
 			/>
 		</Toolbar>
 	);
 };
 
-const renderContent = ( { textColor, onColorChange = noop } ) => ( () => {
-	const setColor = ( attr ) => ( value ) => onColorChange( { attr, value } );
-
+const renderContent = ( { value, onChange = noop } ) => ( () => {
 	return (
 		<>
 			<div className="color-palette-controller-container">
 				<ColorPaletteControl
-					value={ textColor.color }
-					onChange={ setColor( 'textColor' ) }
+					value={ value }
+					onChange={ onChange }
 					label={ __( 'Text Color' ) }
 				/>
 			</div>
