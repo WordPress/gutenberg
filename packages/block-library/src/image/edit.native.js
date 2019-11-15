@@ -136,11 +136,7 @@ export class ImageEdit extends React.Component {
 	}
 
 	onImagePressed() {
-		const { attributes, isSelected } = this.props;
-
-		if ( ! isSelected ) {
-			return null;
-		}
+		const { attributes } = this.props;
 
 		if ( this.state.isUploadInProgress ) {
 			requestImageUploadCancelDialog( attributes.id );
@@ -324,7 +320,6 @@ export class ImageEdit extends React.Component {
 						onSelect={ this.onSelectMediaUploadOption }
 						icon={ this.getIcon( false ) }
 						onFocus={ this.props.onFocus }
-						isBlockSelected={ this.props.isSelected }
 					/>
 				</View>
 			);

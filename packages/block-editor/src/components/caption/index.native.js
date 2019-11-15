@@ -30,7 +30,6 @@ const Caption = ( { accessible, accessibilityLabel, onBlur, onChange, onFocus, i
 			underlineColorAndroid="transparent"
 			textAlign={ 'center' }
 			tagName={ '' }
-			isParentSelected={ shouldDisplay }
 		/>
 	</View>
 );

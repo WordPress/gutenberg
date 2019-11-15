@@ -255,7 +255,6 @@ class MediaContainer extends Component {
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				onFocus={ this.props.onFocus }
 				onError={ this.onUploadError }
-				isBlockSelected={ this.props.isSelected }
 			/>
 		);
 	}
