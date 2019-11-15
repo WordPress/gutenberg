@@ -41,7 +41,7 @@ const MySnackbarNotice = () => (
 The following props are used to control the display of the component.
 
 * `onRemove`: function called when dismissing the notice.
-* `actions`: (array) an array of action objects. Each member object should contain a `label` and either a `url` link string or `onClick` callback function. A `className` property can be used to add custom classes to the button styles.
+* `actions`: (array) an array of action objects. Each member object should contain a `label` and either a `url` link string or `onClick` callback function.
 
 ## Related components
 

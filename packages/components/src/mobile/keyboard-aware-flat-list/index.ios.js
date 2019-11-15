@@ -9,10 +9,11 @@ export const KeyboardAwareFlatList = ( {
 	shouldPreventAutomaticScroll,
 	innerRef,
 	autoScroll,
+	scrollViewStyle,
 	...listProps
 } ) => (
 	<KeyboardAwareScrollView
-		style={ { flex: 1 } }
+		style={ [ { flex: 1 }, scrollViewStyle ] }
 		keyboardDismissMode="none"
 		enableResetScrollToCoords={ false }
 		keyboardShouldPersistTaps="handled"

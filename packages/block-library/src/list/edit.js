@@ -12,6 +12,8 @@ import {
 	Toolbar,
 } from '@wordpress/components';
 import {
+	__unstableCanIndentListItems as canIndentListItems,
+	__unstableCanOutdentListItems as canOutdentListItems,
 	__unstableIndentListItems as indentListItems,
 	__unstableOutdentListItems as outdentListItems,
 	__unstableChangeListType as changeListType,
@@ -96,6 +98,7 @@ export default function ListEdit( {
 							icon: 'editor-outdent',
 							title: __( 'Outdent list item' ),
 							shortcut: _x( 'Backspace', 'keyboard key' ),
+							isDisabled: ! canOutdentListItems( value ),
 							onClick() {
 								onChange( outdentListItems( value ) );
 							},
@@ -104,6 +107,7 @@ export default function ListEdit( {
 							icon: 'editor-indent',
 							title: __( 'Indent list item' ),
 							shortcut: _x( 'Space', 'keyboard key' ),
+							isDisabled: ! canIndentListItems( value ),
 							onClick() {
 								onChange( indentListItems( value, { type: tagName } ) );
 							},

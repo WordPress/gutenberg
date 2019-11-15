@@ -29,8 +29,8 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	/**
 	* Start: Include for phase 2
 	*/
-	if ( ! class_exists( 'WP_REST_Widget_Updater_Controller' ) ) {
-		require dirname( __FILE__ ) . '/class-wp-rest-widget-updater-controller.php';
+	if ( ! class_exists( 'WP_REST_Widget_Forms' ) ) {
+		require dirname( __FILE__ ) . '/class-wp-rest-widget-forms.php';
 	}
 	if ( ! class_exists( 'WP_REST_Widget_Areas_Controller' ) ) {
 		require dirname( __FILE__ ) . '/class-experimental-wp-widget-blocks-manager.php';

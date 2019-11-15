@@ -77,3 +77,25 @@
 	margin: 3%;
 	width: 50%;
 }
+
+.components-placeholder__fieldset .components-button {
+	margin-right: 4px;
+	margin-bottom: 10px; // if buttons wrap we need vertical space between
+
+	&:last-child {
+		margin-right: 0;
+	}
+}
+
+// Any `<Button />` component with `isLink` prop will need extra spacing if placed
+// immediately after a button which is *not* an `isLink` style button. This is because
+// `isLink` has no padding so we need to account for this to avoid the buttons butting
+// up against each other. If it's the last item we don't need a right margin.
+.components-placeholder__fieldset .components-button:not(.is-link) ~ .components-button.is-link {
+	margin-left: 10px; // equal to standard button inner padding
+	margin-right: 10px; // equal to standard button inner padding
+
+	&:last-child {
+		margin-right: 0;
+	}
+}

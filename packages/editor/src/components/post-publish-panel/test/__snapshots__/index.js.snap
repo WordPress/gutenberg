@@ -84,9 +84,6 @@ exports[`PostPublishPanel should render the pre-publish panel if post status is 
         focusOnMount={true}
         onSubmit={[Function]}
       />
-      <span
-        className="editor-post-publish-panel__spacer"
-      />
     </div>
     <ForwardRef(IconButton)
       aria-expanded={true}
@@ -123,9 +120,6 @@ exports[`PostPublishPanel should render the pre-publish panel if the post is not
         focusOnMount={true}
         onSubmit={[Function]}
       />
-      <span
-        className="editor-post-publish-panel__spacer"
-      />
     </div>
     <ForwardRef(IconButton)
       aria-expanded={true}
@@ -161,9 +155,6 @@ exports[`PostPublishPanel should render the spinner if the post is being saved 1
       <WithSelect(WithDispatch(PostPublishButton))
         focusOnMount={true}
         onSubmit={[Function]}
-      />
-      <span
-        className="editor-post-publish-panel__spacer"
       />
     </div>
     <ForwardRef(IconButton)

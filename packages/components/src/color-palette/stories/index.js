@@ -13,7 +13,7 @@ import { useState } from '@wordpress/element';
  */
 import ColorPalette from '../';
 
-export default { title: 'ColorPalette', component: ColorPalette };
+export default { title: 'Components|ColorPalette', component: ColorPalette };
 
 const ColorPaletteWithState = ( props ) => {
 	const [ color, setColor ] = useState( '#F00' );
@@ -50,21 +50,6 @@ export const withKnobs = () => {
 	return (
 		<ColorPaletteWithState
 			colors={ colors }
-		/>
-	);
-};
-
-export const withAlpha = () => {
-	const colors = [
-		object( 'Red', { name: 'red', color: '#f00' } ),
-		object( 'White', { name: 'white', color: '#fff' } ),
-		object( 'Blue', { name: 'blue', color: '#00f' } ),
-	];
-
-	return (
-		<ColorPaletteWithState
-			colors={ colors }
-			disableAlpha={ false }
 		/>
 	);
 };

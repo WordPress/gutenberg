@@ -1,4 +1,8 @@
-## Master
+## 3.3.0 (2019-11-14)
+
+### New Features
+
+- Added a `label` prop to `URLInput`. This allows the label to be set without needing to wrap the `URLInput` in a `BaseControl`.
 
 ### Deprecation
 

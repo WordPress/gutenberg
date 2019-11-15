@@ -8,7 +8,7 @@ import { text } from '@storybook/addon-knobs';
  */
 import Button from '../';
 
-export default { title: 'Button', component: Button };
+export default { title: 'Components|Button', component: Button };
 
 export const _default = () => {
 	const label = text( 'Label', 'Default Button' );

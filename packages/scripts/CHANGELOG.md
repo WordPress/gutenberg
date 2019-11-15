@@ -1,4 +1,4 @@
-## Master
+## 6.0.0 (2019-11-14)
 
 ### Breaking Changes
 
