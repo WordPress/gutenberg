@@ -215,23 +215,44 @@ export default function __experimentalUseColors(
 		}
 		return (
 			( needsBackgroundColor || needsColor ) &&
-			withFallbackStyles( ( node, { querySelector } ) => {
-				if ( querySelector ) {
-					node = node.parentNode.querySelector( querySelector );
-				}
-				const computedStyle = getComputedStyle( node );
-				let backgroundColor = computedStyle.backgroundColor;
-				const color = computedStyle.color;
-				if ( needsBackgroundColor ) {
-					while ( backgroundColor === 'rgba(0, 0, 0, 0)' && node.parentNode ) {
-						node = node.parentNode;
-						backgroundColor = getComputedStyle( node ).backgroundColor;
+			withFallbackStyles(
+				(
+					node,
+					{
+						querySelector,
+						backgroundColorSelector = querySelector,
+						textColorSelector = querySelector,
 					}
+				) => {
+					let backgroundColorNode = node;
+					let textColorNode = node;
+					if ( backgroundColorSelector ) {
+						backgroundColorNode = node.parentNode.querySelector(
+							backgroundColorSelector
+						);
+					}
+					if ( textColorSelector ) {
+						textColorNode = node.parentNode.querySelector( textColorSelector );
+					}
+					let backgroundColor;
+					const color = getComputedStyle( textColorNode ).color;
+					if ( needsBackgroundColor ) {
+						backgroundColor = getComputedStyle( backgroundColorNode )
+							.backgroundColor;
+						while (
+							backgroundColor === 'rgba(0, 0, 0, 0)' &&
+							backgroundColorNode.parentNode
+						) {
+							backgroundColorNode = backgroundColorNode.parentNode;
+							backgroundColor = getComputedStyle( backgroundColorNode )
+								.backgroundColor;
+						}
+					}
+					detectedBackgroundColorRef.current = backgroundColor;
+					detectedColorRef.current = color;
+					return { backgroundColor, color };
 				}
-				detectedBackgroundColorRef.current = backgroundColor;
-				detectedColorRef.current = color;
-				return { backgroundColor };
-			} )( () => <></> )
+			)( () => <></> )
 		);
 	}, [
 		colorConfigs.reduce(
