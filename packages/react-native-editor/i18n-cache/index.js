@@ -3,6 +3,7 @@
 // External dependencies
 const fs = require( 'fs' );
 const path = require( 'path' );
+// eslint-disable-next-line import/no-extraneous-dependencies
 const fetch = require( 'node-fetch' );
 
 const supportedLocales = [
@@ -143,3 +144,4 @@ export const getTranslation = ( locale ) => translations[ locale ];
 		} );
 	} );
 }
+/* eslint-enable no-console */

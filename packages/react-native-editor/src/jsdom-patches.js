@@ -35,6 +35,7 @@ const { ATTRIBUTE_NODE, DOCUMENT_FRAGMENT_NODE } = Node;
 
 /**
  * Simple recursive implementation of Node.contains method
+ *
  * @param {number} otherNode Another node (may be the same node).
  * @return {boolean} true if otherNode is a descendant of this node, or is this
  * node, false otherwise.
@@ -55,6 +56,7 @@ Node.prototype.contains = function( otherNode ) {
 /**
  * Copy of insertBefore function from jsdom-jscore, WRONG_DOCUMENT_ERR exception
  * disabled.
+ *
  * @param {Object} newChild The node to be insterted.
  * @param {Object} refChild The node before which newChild is inserted.
  * @return {Object} the newly inserted child node
@@ -152,6 +154,7 @@ Element.prototype.matches = Element.prototype.matchesSelector;
 /**
  * Helper function to check if a node implements the NonDocumentTypeChildNode
  * interface
+ *
  * @param {Object} node Node to check
  * @return {boolean} true if node is a NonDocumentTypeChildNode, false otherwise
  *

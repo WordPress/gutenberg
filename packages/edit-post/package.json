@@ -40,6 +40,7 @@
 		"@wordpress/notices": "file:../notices",
 		"@wordpress/nux": "file:../nux",
 		"@wordpress/plugins": "file:../plugins",
+		"@wordpress/react-native-bridge": "file:../react-native-bridge",
 		"@wordpress/url": "file:../url",
 		"@wordpress/viewport": "file:../viewport",
 		"classnames": "^2.2.5",

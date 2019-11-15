@@ -1,35 +1,30 @@
-/**
- * External dependencies
- */
-const { map } = require( 'lodash' );
-
 module.exports = {
-	parser: "babel-eslint",
+	parser: 'babel-eslint',
 	env: {
 		browser: true,
-		"jest/globals": true
+		'jest/globals': true,
 	},
 	globals: {
-		__DEV__: true
+		__DEV__: true,
 	},
 	plugins: [
-		"react",
-		"react-native",
-		"jest",
-		"flowtype"
+		'react',
+		'react-native',
+		'jest',
+		'flowtype',
 	],
 	extends: [
-		"plugin:@wordpress/eslint-plugin/recommended",
-		"plugin:flowtype/recommended",
+		'plugin:@wordpress/eslint-plugin/recommended',
+		'plugin:flowtype/recommended',
 	],
 	settings: {
 		flowtype: {
 			onlyFilesWithFlowAnnotation: true,
 		},
 		react: {
-			pragma: "React",
-			version: "16.8.3",
-			flowVersion: "0.92.0",
+			pragma: 'React',
+			version: '16.8.3',
+			flowVersion: '0.92.0',
 		},
 	},
 	rules: {
@@ -71,4 +66,4 @@ module.exports = {
 			},
 		],
 	},
-}
+};

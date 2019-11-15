@@ -44,6 +44,7 @@
 		"@wordpress/media-utils": "file:../media-utils",
 		"@wordpress/notices": "file:../notices",
 		"@wordpress/nux": "file:../nux",
+		"@wordpress/react-native-bridge": "file:../react-native-bridge",
 		"@wordpress/rich-text": "file:../rich-text",
 		"@wordpress/server-side-render": "file:../server-side-render",
 		"@wordpress/url": "file:../url",
