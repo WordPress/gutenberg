@@ -144,10 +144,6 @@ function proceed( conversionMap ) {
 	const stackDepth = stack.length;
 	const leadingTextStart = startOffset > offset ? offset : null;
 	if ( ! conversionMap[ name ] ) {
-		if ( stackDepth !== 0 ) {
-			const { leadingTextStart: stackLeadingText, tokenStart } = stack.pop();
-			output.push( indoc.substr( stackLeadingText, tokenStart ) );
-		}
 		addText();
 		return false;
 	}

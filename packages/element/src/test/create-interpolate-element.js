@@ -69,21 +69,6 @@ describe( 'createInterpolateElement', () => {
 			)
 		).toEqual( expectedElement );
 	} );
-	it( 'returns string without unbalanced tags', () => {
-		const testString = 'This is a <em>string';
-		const expectedElement = createElement(
-			Fragment,
-			null,
-			'This is a ',
-			'string'
-		);
-		expect(
-			createInterpolateElement(
-				testString,
-				{ em: <em /> }
-			)
-		).toEqual( expectedElement );
-	} );
 	it( 'returns expected react element for non nested components', () => {
 		const testString = 'This is a string with <a>a link</a>.';
 		const expectedElement = createElement(
