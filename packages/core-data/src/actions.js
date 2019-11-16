@@ -136,11 +136,8 @@ export function receiveEmbedPreview( url, preview ) {
  * @return {Object} Action object.
  */
 export function* editEntityRecord( kind, name, recordId, edits, options = {} ) {
-	const { transientEdits = {}, mergedEdits = {} } = yield select(
-		'getEntity',
-		kind,
-		name
-	);
+	const { transientEdits = {}, mergedEdits = {} } =
+		( yield select( 'getEntity', kind, name ) ) || {};
 	const record = yield select( 'getRawEntityRecord', kind, name, recordId );
 	const editedRecord = yield select(
 		'getEditedEntityRecord',
