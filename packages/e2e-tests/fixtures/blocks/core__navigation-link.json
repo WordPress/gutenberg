@@ -1,7 +1,7 @@
 [
     {
         "clientId": "_clientId_0",
-        "name": "core/navigation-menu-item",
+        "name": "core/navigation-link",
         "isValid": true,
         "attributes": {
             "label": "WordPress",
