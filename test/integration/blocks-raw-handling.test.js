@@ -281,13 +281,17 @@ describe( 'Blocks raw handling', () => {
 			'markdown',
 			'wordpress',
 			'gutenberg',
-			'caption-shortcode',
 			'shortcode-matching',
 		].forEach( ( type ) => {
 			it( type, () => {
 				const HTML = readFile( path.join( __dirname, `fixtures/${ type }-in.html` ) );
 				const plainText = readFile( path.join( __dirname, `fixtures/${ type }-in.txt` ) );
 				const output = readFile( path.join( __dirname, `fixtures/${ type }-out.html` ) );
+
+				if ( ! ( HTML || plainText ) || ! output ) {
+					throw new Error( `Expected fixtures for type ${ type }` );
+				}
+
 				const converted = pasteHandler( { HTML, plainText, canUserUseUnfilteredHTML: true } );
 				const serialized = typeof converted === 'string' ? converted : serialize( converted );
 
