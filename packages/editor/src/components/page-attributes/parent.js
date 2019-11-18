@@ -54,6 +54,7 @@ const applyWithSelect = withSelect( ( select ) => {
 		parent_exclude: postId,
 		orderby: 'menu_order',
 		order: 'asc',
+		_fields: 'id,parent,title',
 	};
 
 	return {
