@@ -87,7 +87,7 @@ Also, if you look at package.json file it will include a new section:
 
 ```json
 "devDependencies": {
-  "@wordpress/scripts": "5.0.0"
+  "@wordpress/scripts": "6.0.0"
 }
 ```
 
