@@ -1,5 +1,5 @@
 
-// Normalize navigation items and edit containers, to look mostly the same.
+// Normalize navigation link and edit containers, to look mostly the same.
 .wp-block-navigation-link__field .components-text-control__input.components-text-control__input,
 .wp-block-navigation-link__container {
 	border-radius: 0;
@@ -12,13 +12,13 @@
 	display: flex;
 	white-space: nowrap;
 
-	// Compensate for navigation item base padding.
+	// Compensate for navigation link base padding.
 	margin-left: -$grid-size;
 
 	.wp-block-navigation-link__content {
 		margin-right: $grid-size;
 
-		// This should match the padding of the navigation item.
+		// This should match the padding of the navigation link.
 		padding: 0 $grid-size;
 
 		// This make it look like an input field.
