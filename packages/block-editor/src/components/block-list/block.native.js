@@ -258,6 +258,7 @@ export default compose( [
 			getBlock,
 			getBlockRootClientId,
 			getFirstToSelectBlock,
+			getBlockParents,
 		} = select( 'core/block-editor' );
 		const order = getBlockIndex( clientId, rootClientId );
 		const isSelected = isBlockSelected( clientId );
@@ -294,8 +295,9 @@ export default compose( [
 		const isNestedInnerBlock = ! isDashed && selectedBlockClientId === getBlockRootClientId( firstToSelectId );
 		const hasInnerBlock = blockType.name === 'core/group' || blockType.name === 'core/media-text';
 		const isParentSelected = parentId === selectedBlockClientId;
-		const isTouchable = firstToSelectId !== clientId;
 		const isMediaTextChildSelected = blockType.name === 'core/media-text' && getBlockRootClientId( selectedBlockClientId ) === clientId;
+		const isDescendantSelected = selectedBlockClientId && getBlockParents( selectedBlockClientId ).includes( clientId );
+		const isTouchable = isSelected || isDescendantSelected || selectedBlockClientId === parentId || parentId === '';
 
 		return {
 			icon,
