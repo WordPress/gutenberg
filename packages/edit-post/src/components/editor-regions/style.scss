@@ -85,6 +85,7 @@
 	@include break-medium() {
 		// Cancel the fixed positionning used in mobile.
 		position: initial;
+		top: 0;
 	}
 }
 
