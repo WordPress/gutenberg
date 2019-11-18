@@ -101,7 +101,7 @@ repositories {
 
     if (rootProject.ext.buildGutenbergFromSource) {
         // If building from source, use the local sources from node_modules
-        def nodeModulesPath = "${project.buildDir}/../../../node_modules/"
+        def nodeModulesPath = "${project.buildDir}/../../../../node_modules/"
         maven { url "${nodeModulesPath}/react-native/android" }
         maven { url "${nodeModulesPath}/jsc-android/dist" }
     } else {
