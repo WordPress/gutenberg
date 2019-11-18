@@ -348,6 +348,7 @@ class RichTextWrapper extends Component {
 			// To do: find a better way to implicitly inherit props.
 			start,
 			reversed,
+			style,
 			// From experimental filter. To do: pick props instead.
 			...experimentalProps
 		} = this.props;
@@ -396,6 +397,7 @@ class RichTextWrapper extends Component {
 				__unstableMarkAutomaticChange={ markAutomaticChange }
 				__unstableDidAutomaticChange={ didAutomaticChange }
 				__unstableUndo={ undo }
+				style={ style }
 			>
 				{ ( { isSelected, value, onChange, Editable } ) =>
 					<>
