@@ -431,11 +431,12 @@ export function getBlockRootClientId( state, clientId ) {
  *
  * @return {Array} ClientIDs of the parent blocks.
  */
-export const getBlockParents = ( state, clientId, getDependants = true, includeClientId = false ) => {
-	return getDependants ?
-		createSelector( getTree( state, clientId, true ), ( dependantState ) => [ dependantState.blocks.parents ] ) :
-		getTree( state, clientId, false, includeClientId );
-};
+export const getBlockParents = createSelector(
+	( state, clientId ) => getTree( state, clientId, true ),
+	( state ) => [
+		state.blocks.parents,
+	]
+);
 
 /**
  * Given a block client ID, returns the root of the hierarchy from which the block is nested, return the block itself for root level blocks.
@@ -486,7 +487,7 @@ export function getTree( state, clientId, reverse = true, includeClientId = fals
  */
 export function getFirstToSelectBlock( state, clientId ) {
 	const selectedId = getSelectedBlockClientId( state );
-	const clientTree = getBlockParents( state, clientId, false, true );
+	const clientTree = getTree( state, clientId, false, true );
 	const rootParent = clientTree[ clientTree.length - 1 ];
 
 	let index = 0;
@@ -504,7 +505,7 @@ export function getFirstToSelectBlock( state, clientId ) {
 		return rootParent;
 	}
 
-	const selectedTree = getBlockParents( state, selectedId, false, true );
+	const selectedTree = getTree( state, selectedId, false, true );
 
 	do {
 		const commonParentIndex = clientTree.indexOf( selectedTree[ index ] );
