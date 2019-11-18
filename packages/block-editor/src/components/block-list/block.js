@@ -578,10 +578,10 @@ function BlockListBlock( {
 					/>
 				) }
 
-				{ isRootOfHierarchy && isAncestorOfSelectedBlock && (
-					// A slot made available on parents when a child Block is selected
+				{ isAncestorOfSelectedBlock && (
+					// A slot made available on all ancestors of the selected Block
 					// to allow child Blocks to render their toolbars into the DOM
-					// of the parent.
+					// of the appropriate parent.
 					<ChildToolbarSlot />
 				) }
 
@@ -692,7 +692,6 @@ const applyWithSelect = withSelect(
 			getBlockOrder,
 			__unstableGetBlockWithoutInnerBlocks,
 			isNavigationMode,
-			getBlockHierarchyRootClientId,
 		} = select( 'core/block-editor' );
 
 		const block = __unstableGetBlockWithoutInnerBlocks( clientId );
@@ -704,7 +703,6 @@ const applyWithSelect = withSelect(
 		const isAncestorOfSelectedBlock = hasSelectedInnerBlock( clientId, checkDeep );
 		const index = getBlockIndex( clientId, rootClientId );
 		const blockOrder = getBlockOrder( rootClientId );
-		const isRootOfHierarchy = clientId === getBlockHierarchyRootClientId( clientId );
 
 		// The fallback to `{}` is a temporary fix.
 		// This function should never be called when a block is not present in the state.
@@ -743,7 +741,6 @@ const applyWithSelect = withSelect(
 			isValid,
 			isSelected,
 			isAncestorOfSelectedBlock,
-			isRootOfHierarchy,
 		};
 	}
 );

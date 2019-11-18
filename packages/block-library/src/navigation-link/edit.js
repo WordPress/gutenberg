@@ -240,7 +240,6 @@ function NavigationLinkEdit( {
 				<InnerBlocks
 					allowedBlocks={ [ 'core/navigation-link' ] }
 					renderAppender={ hasDescendants ? InnerBlocks.ButtonBlockAppender : false }
-					__experimentalCaptureChildToolbar={ true }
 				/>
 			</div>
 		</Fragment>
