@@ -31,13 +31,18 @@ const getSelection = async () => {
 			return { blockIndex };
 		}
 
-		const { startOffset, endOffset } = selection.getRangeAt( 0 );
+		const range = selection.getRangeAt( 0 );
+		const cloneStart = range.cloneRange();
+		const cloneEnd = range.cloneRange();
+
+		cloneStart.setStart( document.activeElement, 0 );
+		cloneEnd.setStart( document.activeElement, 0 );
 
 		return {
 			blockIndex,
 			editableIndex,
-			startOffset,
-			endOffset,
+			startOffset: cloneStart.toString().length,
+			endOffset: cloneEnd.toString().length,
 		};
 	} );
 };
