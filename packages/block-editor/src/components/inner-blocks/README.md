@@ -143,6 +143,24 @@ A 'render prop' function that can be used to customize the block's appender.
 />
 ```
 
+### `__experimentalCaptureDescendantsToolbars`
+
+* **Type:** `Boolean`
+* **Default:** `false`
+
+Determines whether the toolbars of _all_ child Blocks (applied deeply, recursive) should have their toolbars "captured" and shown on the Block which is consuming `InnerBlocks`. 
+
+For example, a button block, deeply nested in several levels of block `X` that utilises this property will see the button block's toolbar displayed on block `X`'s toolbar area.
+
+
+### `__experimentalCaptureChildToolbar`
+
+* **Type:** `Boolean`
+* **Default:** `false`
+
+Determines whether the toolbars of _immediate_ child Blocks (applied shallowly) should have their toolbars "captured" and shown on the Block which is consuming `InnerBlocks`. 
+
+For example, a button block, deeply nested in several levels of block `X` that utilises this property would _not_ see the button block's toolbar displayed on block `X`'s toolbar area. However if the button block was used as an immediate child of block X then its toolbar would be captured.
 
 
 
