@@ -33,10 +33,10 @@ function po2Android( poInput ) {
 			localizedEntry += `${ indent }<!-- ${ comment.replace( '--', '—' ) } -->\n`;
 		}
 		if ( translation.msgid_plural ) {
-			localizedEntry += `${ indent }<plurals name="gutenberg_native_string_${ id }" tools:ignore="UnusedResources">
-${ indent }${ indent }<item quantity="one">${ escapedValue }</item>
-${ indent }${ indent }<item quantity="other">${ escapedValuePlural }</item>
-${ indent }</plurals>
+			localizedEntry += `${ indent }<string-array name="gutenberg_native_string_${ id }" tools:ignore="UnusedResources">
+${ indent }${ indent }<item>${ escapedValue }</item>
+${ indent }${ indent }<item>${ escapedValuePlural }</item>
+${ indent }</string-array>
 `;
 		} else {
 			localizedEntry += `${ indent }<string name="gutenberg_native_string_${ id }" tools:ignore="UnusedResources">${ escapedValue }</string>\n`;
