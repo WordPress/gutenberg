@@ -53,7 +53,7 @@ function Navigation( {
 	/* eslint-enable @wordpress/no-unused-vars-before-return */
 	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator( clientId );
 
-	// Builds navigation items from default Pages
+	// Builds navigation links from default Pages.
 	const defaultPagesNavigationItems = useMemo(
 		() => {
 			if ( ! pages ) {
@@ -81,8 +81,8 @@ function Navigation( {
 	//
 
 	const handleCreateEmpty = () => {
-		const emptyNavItemBlock = createBlock( 'core/navigation-link' );
-		updateNavItemBlocks( [ emptyNavItemBlock ] );
+		const emptyNavLinkBlock = createBlock( 'core/navigation-link' );
+		updateNavItemBlocks( [ emptyNavLinkBlock ] );
 	};
 
 	const handleCreateFromExistingPages = () => {
@@ -194,7 +194,6 @@ function Navigation( {
 export default compose( [
 	withSelect( ( select, { clientId } ) => {
 		const innerBlocks = select( 'core/block-editor' ).getBlocks( clientId );
-		const hasExistingNavItems = !! innerBlocks.length;
 
 		const filterDefaultPages = {
 			parent: 0,
@@ -205,7 +204,7 @@ export default compose( [
 		const pagesSelect = [ 'core', 'getEntityRecords', [ 'postType', 'page', filterDefaultPages ] ];
 
 		return {
-			hasExistingNavItems,
+			hasExistingNavItems: !! innerBlocks.length,
 			pages: select( 'core' ).getEntityRecords( 'postType', 'page', filterDefaultPages ),
 			isRequestingPages: select( 'core/data' ).isResolving( ...pagesSelect ),
 			hasResolvedPages: select( 'core/data' ).hasFinishedResolution( ...pagesSelect ),
