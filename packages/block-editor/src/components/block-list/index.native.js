@@ -180,7 +180,7 @@ export default compose( [
 		const insertionPoint = getBlockInsertionPoint();
 		const blockInsertionPointIsVisible = isBlockInsertionPointVisible();
 		const selectedBlock = getSelectedBlock();
-		const hasInnerBlocks = selectedBlock && selectedBlock.innerBlocks.length;
+		const hasInnerBlocks = selectedBlock && selectedBlock.innerBlocks.length !== 0;
 		const shouldShowInsertionPointBefore = ( clientId ) => {
 			return (
 				blockInsertionPointIsVisible &&
