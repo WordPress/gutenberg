@@ -48,7 +48,6 @@ function build_css_colors( $attributes ) {
  *
  * @return string Returns the post content with the legacy widget added.
  */
-
 function render_block_navigation( $attributes, $content, $block ) {
 	$colors          = build_css_colors( $attributes );
 	$class_attribute = sprintf( ' class="%s"', esc_attr( $colors['css_classes'] ? 'wp-block-navigation ' . $colors['css_classes'] : 'wp-block-navigation' ) );
