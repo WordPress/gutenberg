@@ -6,15 +6,19 @@ const gettextParser = require( 'gettext-parser' ),
 function po2Swift( poInput ) {
 	const po = gettextParser.po.parse( poInput );
 	const translations = po.translations[ '' ];
-	const swiftStrings = Object.values( translations ).map( ( translation, id ) => {
-		if ( translation.msgid === '' ) {
-			return null;
+	const swiftStringsMap = Object.values( translations ).reduce( ( result, translation ) => {
+		if ( ! translation.msgid ) {
+			return result;
 		}
 		const encodedValue = JSON.stringify( translation.msgid );
 		const encodedComment = JSON.stringify( translation.comments.extracted || '' );
-		return `let string${ id } = NSLocalizedString(${ encodedValue }, comment: ${ encodedComment })`;
-	} ).filter( Boolean );
-	return swiftStrings.join( '\n' ) + '\n';
+		result[ translation.msgid ] = `_ = NSLocalizedString(${ encodedValue }, comment: ${ encodedComment })`;
+		return result;
+	}, {} );
+	const swiftStringsSortedList = Object.entries( swiftStringsMap )
+		.sort( ( left, right ) => left[ 0 ].localeCompare( right[ 0 ] ) )
+		.map( entry => entry[ 1 ] );
+	return `import Foundation\n\nprivate func dummy() {\n    ${ swiftStringsSortedList.join( '\n    ' ) }\n`;
 }
 
 if ( require.main === module ) {
