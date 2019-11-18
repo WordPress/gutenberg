@@ -1,0 +1,8 @@
+before_install:
+   - yes | $ANDROID_HOME/tools/bin/sdkmanager "platforms;android-27"
+   - yes | $ANDROID_HOME/tools/bin/sdkmanager "build-tools;27.0.3"
+install:
+   - export TMPDIR=`dirname $(mktemp)`
+   - echo "Changing into the android folder of the Bridge module"
+   - pushd packages/react-native-bridge/android && ./gradlew --stacktrace clean -Pgroup=com.github.wordpress.gutenberg -Pversion=$VERSION install && popd
+   - pushd packages/react-native-aztec/android && ./gradlew --stacktrace clean -Pgroup=com.github.wordpress.gutenberg -Pversion=$VERSION install && popd

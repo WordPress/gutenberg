@@ -188,6 +188,7 @@
 		"prebuild": "npm run check-engines",
 		"clean:packages": "rimraf ./packages/*/build ./packages/*/build-module ./packages/*/build-style ./packages/*/node_modules",
 		"prebuild:packages": "npm run clean:packages && lerna run build",
+		"jitpack:bundle:android": "npm run native bundle:android",
 		"build:packages": "node ./bin/packages/build.js",
 		"build": "npm run build:packages && wp-scripts build",
 		"check-engines": "wp-scripts check-engines",
