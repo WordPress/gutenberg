@@ -680,6 +680,8 @@ export class RichText extends Component {
 			this.firedAfterTextChanged = false;
 		}
 
+		const color = style && style.color;
+
 		return (
 			<View>
 				{ children && children( {
@@ -714,7 +716,7 @@ export class RichText extends Component {
 					onCaretVerticalPositionChange={ this.props.onCaretVerticalPositionChange }
 					onSelectionChange={ this.onSelectionChangeFromAztec }
 					blockType={ { tag: tagName } }
-					color={ defaultColor }
+					color={ color || defaultColor }
 					linkTextColor={ defaultTextDecorationColor }
 					maxImagesWidth={ 200 }
 					fontFamily={ this.props.fontFamily || defaultFontFamily }
