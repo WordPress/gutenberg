@@ -1397,6 +1397,14 @@ export function getBlockListSettings( state, clientId ) {
 	return state.blockListSettings[ clientId ];
 }
 
+/**
+ * Returns the Block List settings for an array of blocks, if any exist.
+ *
+ * @param {Object}  state    Editor state.
+ * @param {Array} clientIds Block client IDs.
+ *
+ * @return {Array} Block List Settings for each of the found blocks
+ */
 export function __experimentalGetBlockListSettingsForBlocks( state, clientIds ) {
 	return filter( state.blockListSettings, ( value, key ) => clientIds.includes( key ) );
 }
