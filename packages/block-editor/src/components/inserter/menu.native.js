@@ -67,7 +67,7 @@ export class InserterMenu extends Component {
 		const modalIconWrapperStyle = getStylesFromColorScheme( styles.modalIconWrapper, styles.modalIconWrapperDark );
 		const modalIconStyle = getStylesFromColorScheme( styles.modalIcon, styles.modalIconDark );
 		const modalItemLabelStyle = getStylesFromColorScheme( styles.modalItemLabel, styles.modalItemLabelDark );
-
+		const modalItemMaxWidth = BottomSheet.getWidth() / this.state.numberOfColumns;
 		return (
 			<BottomSheet
 				isVisible={ true }
@@ -75,35 +75,37 @@ export class InserterMenu extends Component {
 				contentStyle={ [ styles.content, bottomPadding ] }
 				hideHeader
 			>
-				<FlatList
-					onLayout={ this.onLayout }
-					scrollEnabled={ false }
-					key={ `InserterUI-${ this.state.numberOfColumns }` } //re-render when numberOfColumns changes
-					keyboardShouldPersistTaps="always"
-					numColumns={ this.state.numberOfColumns }
-					data={ this.props.items }
-					ItemSeparatorComponent={ () =>
-						<View style={ styles.rowSeparator } />
-					}
-					keyExtractor={ ( item ) => item.name }
-					renderItem={ ( { item } ) =>
-						<TouchableHighlight
-							style={ styles.touchableArea }
-							underlayColor="transparent"
-							activeOpacity={ .5 }
-							accessibilityLabel={ item.title }
-							onPress={ () => this.props.onSelect( item ) }>
-							<View style={ styles.modalItem }>
-								<View style={ modalIconWrapperStyle }>
-									<View style={ modalIconStyle }>
-										<Icon icon={ item.icon.src } fill={ modalIconStyle.fill } size={ modalIconStyle.width } />
+				<TouchableHighlight>
+					<FlatList
+						onLayout={ this.onLayout }
+						scrollEnabled={ true }
+						key={ `InserterUI-${ this.state.numberOfColumns }` } //re-render when numberOfColumns changes
+						keyboardShouldPersistTaps="always"
+						numColumns={ this.state.numberOfColumns }
+						data={ this.props.items }
+						ItemSeparatorComponent={ () =>
+							<View style={ styles.rowSeparator } />
+						}
+						keyExtractor={ ( item ) => item.name }
+						renderItem={ ( { item } ) =>
+							<TouchableHighlight
+								style={ styles.touchableArea }
+								underlayColor="transparent"
+								activeOpacity={ .5 }
+								accessibilityLabel={ item.title }
+								onPress={ () => this.props.onSelect( item ) }>
+								<View style={ [ styles.modalItem, { flex: 1, justifyContent: 'flex-start', maxWidth: modalItemMaxWidth } ] }>
+									<View style={ modalIconWrapperStyle }>
+										<View style={ modalIconStyle }>
+											<Icon icon={ item.icon.src } fill={ modalIconStyle.fill } size={ modalIconStyle.width } />
+										</View>
 									</View>
+									<Text style={ modalItemLabelStyle }>{ item.title }</Text>
 								</View>
-								<Text style={ modalItemLabelStyle }>{ item.title }</Text>
-							</View>
-						</TouchableHighlight>
-					}
-				/>
+							</TouchableHighlight>
+						}
+					/>
+				</TouchableHighlight>
 			</BottomSheet>
 		);
 	}

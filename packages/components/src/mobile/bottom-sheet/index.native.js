@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Text, View, Platform, PanResponder, Dimensions, Easing } from 'react-native';
+import { Text, View, Platform, PanResponder, Dimensions, Easing, ScrollView } from 'react-native';
 import Modal from 'react-native-modal';
 import SafeArea from 'react-native-safe-area';
 
@@ -26,8 +26,11 @@ class BottomSheet extends Component {
 	constructor() {
 		super( ...arguments );
 		this.onSafeAreaInsetsUpdate = this.onSafeAreaInsetsUpdate.bind( this );
+		this.onScroll = this.onScroll.bind( this );
+
 		this.state = {
 			safeAreaBottomInset: 0,
+			bounces: false,
 		};
 
 		SafeArea.getSafeAreaInsetsForRootView().then( this.onSafeAreaInsetsUpdate );
@@ -56,6 +59,23 @@ class BottomSheet extends Component {
 		}
 	}
 
+	isCloseToBottom( { layoutMeasurement, contentOffset, contentSize } ) {
+		return layoutMeasurement.height + contentOffset.y >= contentSize.height - contentOffset.y;
+	}
+
+	isCloseToTop( { contentOffset } ) {
+		return contentOffset.y < 10;
+	}
+
+	onScroll( { nativeEvent } ) {
+		if ( this.isCloseToTop( nativeEvent ) ) {
+			this.setState( { bounces: false } );
+		}
+		if ( this.isCloseToBottom( nativeEvent ) ) {
+			this.setState( { bounces: true } );
+		}
+	}
+
 	render() {
 		const {
 			title = '',
@@ -66,13 +86,14 @@ class BottomSheet extends Component {
 			style = {},
 			contentStyle = {},
 			getStylesFromColorScheme,
+			...rest
 		} = this.props;
 
 		const panResponder = PanResponder.create( {
 			onMoveShouldSetPanResponder: ( evt, gestureState ) => {
 				// Activates swipe down over child Touchables if the swipe is long enough.
 				// With this we can adjust sensibility on the swipe vs tap gestures.
-				if ( gestureState.dy > 3 ) {
+				if ( gestureState.dy > 3 && ! this.state.bounces ) {
 					gestureState.dy = 0;
 					return true;
 				}
@@ -122,6 +143,7 @@ class BottomSheet extends Component {
 		};
 
 		const backgroundStyle = getStylesFromColorScheme( styles.background, styles.backgroundDark );
+		const maxHeight = ( Dimensions.get( 'window' ).height / 2 ) - this.state.safeAreaBottomInset;
 
 		return (
 			<Modal
@@ -143,6 +165,7 @@ class BottomSheet extends Component {
 				onMoveShouldSetResponder={ panResponder.panHandlers.onMoveShouldSetResponder }
 				onMoveShouldSetResponderCapture={ panResponder.panHandlers.onMoveShouldSetResponderCapture }
 				onAccessibilityEscape={ this.props.onClose }
+				{ ...rest }
 			>
 				<KeyboardAvoidingView
 					behavior={ Platform.OS === 'ios' && 'padding' }
@@ -152,9 +175,14 @@ class BottomSheet extends Component {
 					<View style={ styles.dragIndicator } />
 					{ hideHeader && ( <View style={ styles.emptyHeaderSpace } /> ) }
 					{ ! hideHeader && getHeader() }
-					<View style={ [ styles.content, contentStyle ] }>
+					<ScrollView
+						bounces={ this.state.bounces }
+						onScroll={ this.onScroll }
+						scrollEventThrottle={ 16 }
+						style={ { maxHeight } }
+						contentContainerStyle={ [ styles.content, contentStyle ] }>
 						{ this.props.children }
-					</View>
+					</ScrollView>
 					<View style={ { height: this.state.safeAreaBottomInset } } />
 				</KeyboardAvoidingView>
 			</Modal>
