@@ -151,7 +151,9 @@ function gutenberg_find_template( $template_file ) {
 	if ( is_child_theme() ) {
 			$block_template_files = array_merge( $block_template_files, glob( get_template_directory() . '/block-templates/*.html', 1 ) ?: array() );
 	}
-	$block_template_files = array_merge( $block_template_files, glob( dirname( __FILE__ ) . '/demo-block-templates/*.html', 1 ) ?: array() );
+	if ( gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing-demo' ) ) {
+		$block_template_files = array_merge( $block_template_files, glob( dirname( __FILE__ ) . '/demo-block-templates/*.html', 1 ) ?: array() );
+	}
 	foreach ( $block_template_files as $path ) {
 		$theme_block_template_priority = $slug_priorities[ basename( $path, '.html' ) ];
 		if (
@@ -166,7 +168,7 @@ function gutenberg_find_template( $template_file ) {
 
 	// If there is, use it instead.
 	if ( isset( $higher_priority_block_template_path ) ) {
-		$post_name             = basename( $path, '.html' );
+		$post_name             = basename( $higher_priority_block_template_path, '.html' );
 		$current_template_post = array(
 			'post_content' => file_get_contents( $higher_priority_block_template_path ),
 			'post_title'   => ucfirst( $post_name ),
