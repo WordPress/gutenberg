@@ -7,10 +7,11 @@ const gettextParser = require( 'gettext-parser' ),
 const indent = '    ';
 
 /**
- * Encode a raw string into an Android-compatible value to be copied into the XML <string></string> node
+ * Encode a raw string into an Android-compatible value
  *
  * See: https://tekeye.uk/android/examples/android-string-resources-gotchas
- * @param unsafeXMLValue string
+ * @param {string} unsafeXMLValue input string to be escaped
+ * @return {string} Escaped string to be copied into the XML <string></string> node
  */
 function escapeResourceXML( unsafeXMLValue ) {
 	// Let's first replace XML special characters that JSON.stringify does not escape: <, > and &
@@ -29,6 +30,10 @@ function escapeResourceXML( unsafeXMLValue ) {
  * Try using the string first by stripping any non-alphanumeric characters and cropping it
  * Then try hashing the string and appending it to the the sanatized string
  * If none of the above makes a unique ref for our string throw an error
+ *
+ * @param {string} str raw string
+ * @param {string} prefix Optional prefix to add to the name
+ * @return {string} A unique name for this string
  */
 const getUniqueName = ( function() {
 	const names = {};
@@ -50,8 +55,8 @@ const getUniqueName = ( function() {
 		}
 		names[ name ] = true;
 		return `${ prefix }${ name }`;
-	}
-} )();
+	};
+}() );
 
 function po2Android( poInput ) {
 	const po = gettextParser.po.parse( poInput );
@@ -83,7 +88,7 @@ ${ indent }</string-array>
 	// try to minimize changes in diffs by sorting strings
 	const androidResourcesSortedList = Object.entries( androidResourcesMap )
 		.sort( ( left, right ) => left[ 0 ].localeCompare( right[ 0 ] ) )
-		.map( entry => entry[ 1 ] );
+		.map( ( entry ) => entry[ 1 ] );
 	return `<?xml version="1.0" encoding="utf-8"?>\n<resources xmlns:tools="http://schemas.android.com/tools">\n${ androidResourcesSortedList.join( '' ) }</resources>\n`;
 }
 

@@ -17,7 +17,7 @@ function po2Swift( poInput ) {
 	}, {} );
 	const swiftStringsSortedList = Object.entries( swiftStringsMap )
 		.sort( ( left, right ) => left[ 0 ].localeCompare( right[ 0 ] ) )
-		.map( entry => entry[ 1 ] );
+		.map( ( entry ) => entry[ 1 ] );
 	return `import Foundation\n\nprivate func dummy() {\n    ${ swiftStringsSortedList.join( '\n    ' ) }\n`;
 }
 
