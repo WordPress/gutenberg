@@ -87,11 +87,13 @@ class InnerBlocks extends Component {
 			updateNestedSettings,
 			templateLock,
 			parentLock,
+			__experimentalCaptureDescendantsToolbars,
 		} = this.props;
 
 		const newSettings = {
 			allowedBlocks,
 			templateLock: templateLock === undefined ? parentLock : templateLock,
+			__experimentalCaptureDescendantsToolbars: __experimentalCaptureDescendantsToolbars || false,
 		};
 
 		if ( ! isShallowEqual( blockListSettings, newSettings ) ) {
