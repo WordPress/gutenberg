@@ -137,15 +137,6 @@ export const others = [
 		patterns: [ /^https?:\/\/cloudup\.com\/.+/i ],
 	},
 	{
-		name: 'core-embed/collegehumor',
-		settings: {
-			title: 'CollegeHumor',
-			icon: embedVideoIcon,
-			description: __( 'Embed CollegeHumor content.' ),
-		},
-		patterns: [ /^https?:\/\/(www\.)?collegehumor\.com\/.+/i ],
-	},
-	{
 		name: 'core-embed/crowdsignal',
 		settings: {
 			title: 'Crowdsignal',
