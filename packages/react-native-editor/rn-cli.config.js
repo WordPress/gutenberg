@@ -6,7 +6,6 @@ const path = require( 'path' );
 const enm = require( './extra-node-modules.config.js' );
 
 module.exports = {
-	projectRoot: path.resolve( __dirname, './' ),
 	resolver: {
 		extraNodeModules: enm,
 		sourceExts: [ 'js', 'json', 'scss', 'sass' ],

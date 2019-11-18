@@ -25,6 +25,7 @@ module.exports = {
 		'<rootDir>/.*/build/',
 		'<rootDir>/.*/build-module/',
 		'<rootDir>/.+\.native\.js$',
+		'/packages/react-native-editor',
 	],
 	transform: {
 		'^.+\\.[jt]sx?$': '<rootDir>/test/unit/scripts/babel-transformer.js',
