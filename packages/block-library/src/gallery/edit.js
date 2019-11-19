@@ -61,7 +61,7 @@ const MOBILE_CONTROL_PROPS = Platform.select( {
 	native: { separatorType: 'fullWidth' },
 } );
 
-export class GalleryEdit extends Component {
+class GalleryEdit extends Component {
 	constructor() {
 		super( ...arguments );
 
@@ -248,6 +248,9 @@ export class GalleryEdit extends Component {
 		const { attributes: { images }, resizedImages } = this.props;
 
 		const updatedImages = map( images, ( image ) => {
+			if ( ! image.id ) {
+				return image;
+			}
 			const url = get( resizedImages, [ parseInt( image.id, 10 ), sizeSlug ] );
 			return {
 				...image,
