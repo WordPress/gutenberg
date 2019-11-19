@@ -14,5 +14,6 @@ RCT_EXTERN_METHOD(editorDidLayout)
 RCT_EXTERN_METHOD(editorDidMount:(NSArray *)unsupportedBlockNames)
 RCT_EXTERN_METHOD(editorDidEmitLog:(NSString *)message logLevel:(int)logLevel)
 RCT_EXTERN_METHOD(editorDidAutosave)
+RCT_EXTERN_METHOD(requestImageFullscreenPreview:(NSString *)mediaUrl)
 
 @end

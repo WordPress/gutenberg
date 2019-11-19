@@ -123,6 +123,10 @@ public protocol GutenbergBridgeDelegate: class {
     /// Tells the delegate that the editor has sent an autosave event.
     ///
     func editorDidAutosave()
+    
+    /// Tells the delegate to display a fullscreen image from a given URL
+    ///
+    func gutenbergDidRequestFullscreenImage(with mediaUrl: URL)
 }
 
 // MARK: - Optional GutenbergBridgeDelegate methods
