@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { escape } from 'lodash';
+import { escape, unescape } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -80,7 +80,7 @@ function NavigationLinkEdit( {
 	insertLinkBlock,
 } ) {
 	const { label, opensInNewTab, title, url, nofollow, description } = attributes;
-	const link = title ? { title, url } : null;
+	const link = title ? { title: unescape( title ), url } : null;
 	const [ isLinkOpen, setIsLinkOpen ] = useState( ! label && isSelected );
 
 	let onCloseTimerId = null;
