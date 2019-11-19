@@ -1,15 +1,15 @@
 // Reduce the paddings, margins, and UI of inner-blocks.
 // @todo: eventually we may add a feature that lets a parent container absorb the block UI of a child block.
 // When that happens, leverage that instead of the following overrides.
-[data-type="core/navigation-menu"] {
+[data-type="core/navigation"] {
 	// 1. Reset margins on immediate innerblocks container.
-	.wp-block-navigation-menu .block-editor-inner-blocks > .block-editor-block-list__layout {
+	.wp-block-navigation .block-editor-inner-blocks > .block-editor-block-list__layout {
 		margin-left: 0;
 		margin-right: 0;
 	}
 
 	// 2. Remove paddings on subsequent immediate children.
-	.wp-block-navigation-menu .block-editor-inner-blocks > .block-editor-block-list__layout > .wp-block {
+	.wp-block-navigation .block-editor-inner-blocks > .block-editor-block-list__layout > .wp-block {
 		width: auto;
 		padding-left: 0;
 		padding-right: 0;
@@ -17,33 +17,33 @@
 	}
 
 	// 3. Remove margins on subsequent Edit container.
-	.wp-block-navigation-menu .block-editor-inner-blocks > .block-editor-block-list__layout > .wp-block > .block-editor-block-list__block-edit {
+	.wp-block-navigation .block-editor-inner-blocks > .block-editor-block-list__layout > .wp-block > .block-editor-block-list__block-edit {
 		margin-left: 0;
 		margin-right: 0;
 	}
 
 	// 4. Remove vertical margins on subsequent block container.
-	.wp-block-navigation-menu .block-editor-inner-blocks > .block-editor-block-list__layout .wp-block > .block-editor-block-list__block-edit > [data-block] {
+	.wp-block-navigation .block-editor-inner-blocks > .block-editor-block-list__layout .wp-block > .block-editor-block-list__block-edit > [data-block] {
 		margin-top: 0;
 		margin-bottom: 0;
 	}
 
 	// Remove the dashed outlines for child blocks.
-	&.is-hovered .wp-block-navigation-menu .block-editor-block-list__block-edit::before,
-	&.is-selected .wp-block-navigation-menu .block-editor-block-list__block-edit::before,
-	&.has-child-selected .wp-block-navigation-menu .block-editor-block-list__block-edit::before {
+	&.is-hovered .wp-block-navigation .block-editor-block-list__block-edit::before,
+	&.is-selected .wp-block-navigation .block-editor-block-list__block-edit::before,
+	&.has-child-selected .wp-block-navigation .block-editor-block-list__block-edit::before {
 		border-color: transparent !important; // !important used to keep the selector from growing any more complex.
 	}
 
 	// Hide the breadcrumb.
 	// Hide the sibling inserter.
-	.wp-block-navigation-menu .block-editor-block-list__insertion-point,
-	.wp-block-navigation-menu .block-editor-block-list__breadcrumb {
+	.wp-block-navigation .block-editor-block-list__insertion-point,
+	.wp-block-navigation .block-editor-block-list__breadcrumb {
 		display: none;
 	}
 
 	// Polish the Appender.
-	.wp-block-navigation-menu .block-list-appender {
+	.wp-block-navigation .block-list-appender {
 		margin: 0;
 
 		.block-editor-button-block-appender {
@@ -54,20 +54,20 @@
 	}
 }
 
-.wp-block-navigation-menu .block-editor-block-list__layout,
-.wp-block-navigation-menu {
+.wp-block-navigation .block-editor-block-list__layout,
+.wp-block-navigation {
 	display: flex;
 	white-space: nowrap;
 }
 
-.wp-block-navigation-menu__inserter-content {
+.wp-block-navigation__inserter-content {
 	padding: $grid-size-large;
 }
 
 /*
- * Adjust Navigation Item with Menu.
+ * Adjust Navigation Item.
  */
-.wp-block-navigation-menu .wp-block-navigation-link {
+.wp-block-navigation .wp-block-navigation-link {
 	margin-right: $grid-size;
 	margin-left: $grid-size;
 
@@ -76,7 +76,7 @@
 		margin: $grid-size;
 	}
 
-	// Provide a base menu item margin.
+	// Provide a base navigation item margin.
 	// This should be the same inside the field,
 	// and the edit container should compensate.
 	// This is to make sure the edit and view are the same.

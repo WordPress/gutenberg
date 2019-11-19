@@ -8,7 +8,7 @@ import { isEmpty } from 'lodash';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { __experimentalRichText as RichText } from '@wordpress/rich-text';
+import { __experimentalRichText as RichText, create, insert } from '@wordpress/rich-text';
 import { decodeEntities } from '@wordpress/html-entities';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withFocusOutside } from '@wordpress/components';
@@ -41,6 +41,19 @@ class PostTitle extends Component {
 
 	focus() {
 		this.props.onSelect();
+	}
+
+	onPaste( { value, onChange, plainText } ) {
+		const content = pasteHandler( {
+			plainText,
+			mode: 'INLINE',
+			tagName: 'p',
+		} );
+
+		if ( typeof content === 'string' ) {
+			const valueToInsert = create( { html: content } );
+			onChange( insert( value, valueToInsert ) );
+		}
 	}
 
 	render() {
@@ -85,13 +98,14 @@ class PostTitle extends Component {
 					onChange={ ( value ) => {
 						this.props.onUpdate( value );
 					} }
+					onPaste={ this.onPaste }
 					placeholder={ decodedPlaceholder }
 					value={ title }
 					onSelectionChange={ () => { } }
 					onEnter={ this.props.onEnterPress }
 					disableEditingMenu={ true }
-					__unstablePasteHandler={ pasteHandler }
 					__unstableIsSelected={ this.props.isSelected }
+					__unstableOnCreateUndoLevel={ () => { } }
 				>
 				</RichText>
 			</View>

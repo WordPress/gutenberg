@@ -15,11 +15,12 @@ import { createBlock, getBlockTransforms, findTransform } from '../factory';
 import { getBlockType } from '../registration';
 import { getBlockAttributes } from '../parser';
 
-function segmentHTMLToShortcodeBlock( HTML, lastIndex = 0 ) {
+function segmentHTMLToShortcodeBlock( HTML, lastIndex = 0, excludedBlockNames = [] ) {
 	// Get all matches.
 	const transformsFrom = getBlockTransforms( 'from' );
 
 	const transformation = findTransform( transformsFrom, ( transform ) => (
+		excludedBlockNames.indexOf( transform.blockName ) === -1 &&
 		transform.type === 'shortcode' &&
 		some( castArray( transform.tag ), ( tag ) => regexp( tag ).test( HTML ) )
 	) );
@@ -32,6 +33,7 @@ function segmentHTMLToShortcodeBlock( HTML, lastIndex = 0 ) {
 	const transformTag = find( transformTags, ( tag ) => regexp( tag ).test( HTML ) );
 
 	let match;
+	const previousIndex = lastIndex;
 
 	if ( ( match = next( transformTag, HTML, lastIndex ) ) ) {
 		const beforeHTML = HTML.substr( 0, match.index );
@@ -47,6 +49,22 @@ function segmentHTMLToShortcodeBlock( HTML, lastIndex = 0 ) {
 			! /(\n|<p>)\s*$/.test( beforeHTML )
 		) {
 			return segmentHTMLToShortcodeBlock( HTML, lastIndex );
+		}
+
+		// If a transformation's `isMatch` predicate fails for the inbound
+		// shortcode, try again by excluding the current block type.
+		//
+		// This is the only call to `segmentHTMLToShortcodeBlock` that should
+		// ever carry over `excludedBlockNames`. Other calls in the module
+		// should skip that argument as a way to reset the exclusion state, so
+		// that one `isMatch` fail in an HTML fragment doesn't prevent any
+		// valid matches in subsequent fragments.
+		if ( transformation.isMatch && ! transformation.isMatch( match.shortcode.attrs ) ) {
+			return segmentHTMLToShortcodeBlock(
+				HTML,
+				previousIndex,
+				[ ...excludedBlockNames, transformation.blockName ],
+			);
 		}
 
 		const attributes = mapValues(

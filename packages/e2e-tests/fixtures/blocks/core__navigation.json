@@ -1,7 +1,7 @@
 [
     {
         "clientId": "_clientId_0",
-        "name": "core/navigation-menu",
+        "name": "core/navigation",
         "isValid": true,
         "attributes": {
             "automaticallyAdd": false
