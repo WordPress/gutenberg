@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isFinite } from 'lodash';
+import { isFinite, isUndefined } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -64,9 +64,12 @@ function RangeControl( {
 			parseFloat( newValue )
 		);
 	};
+
+	const initialFallbackValue = ! isUndefined( initialPosition ) ?
+		initialPosition : '';
+
 	const initialSliderValue = isFinite( currentInputValue ) ?
-		currentInputValue :
-		initialPosition || '';
+		currentInputValue : initialFallbackValue;
 
 	return (
 		<BaseControl
