@@ -147,7 +147,6 @@ class GalleryImage extends Component {
 			onMoveForward, onMoveBackward, setAttributes, 'aria-label': ariaLabel,
 			isCropped, getStylesFromColorScheme } = this.props;
 
-
 		const { isUploadInProgress } = this.state;
 		const { isUploadFailed, retryMessage } = params;
 		const resizeMode = isCropped ? 'cover' : 'contain';
@@ -162,7 +161,7 @@ class GalleryImage extends Component {
 
 		const captionStyle = getStylesFromColorScheme( style.caption, style.captionDark );
 		const captionPlaceholderStyle = getStylesFromColorScheme( style.captionPlaceholder, style.captionPlaceholderDark );
-		
+
 		const shouldShowCaptionEditable = ! isUploadFailed && isSelected;
 		const shouldShowCaptionEllipsis = ! isUploadFailed && ( ! isSelected && !! caption );
 
@@ -238,7 +237,7 @@ class GalleryImage extends Component {
 					</>
 					) }
 					{ shouldShowCaptionEllipsis && (
-						<View  style={ style.captionEllipsisContainer }>
+						<View style={ style.captionEllipsisContainer }>
 							<Text style={ style.captionEllipsis } numberOfLines={ 1 }>
 								{ caption }
 							</Text>

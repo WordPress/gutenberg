@@ -21,7 +21,7 @@
 	opacity: 0.3;
 }
 
-@function getOverlayBorderWidth() {
+@function get-overlay-border-width() {
 	@return 3px;
 }
 
@@ -31,7 +31,7 @@
 	bottom: 0;
 	left: 0;
 	right: 0;
-	border-width: getOverlayBorderWidth();
+	border-width: get-overlay-border-width();
 	border-color: #0000;
 }
 
@@ -110,7 +110,7 @@
 	margin-top: 5px;
 }
 
-@function getCaptionBackgroundColor() {
+@function get-caption-background-color() {
 	@return rgba(0, 0, 0, 0.4);
 }
 
@@ -120,7 +120,7 @@
 	align-items: flex-end;
 }
 
-@mixin captionShared {
+@mixin caption-shared {
 	font-size: 15;
 	color: #fff;
 	font-family: $default-regular-font;
@@ -128,8 +128,8 @@
 }
 
 .caption {
-	@include captionShared;
-	background-color: getCaptionBackgroundColor();
+	@include caption-shared;
+	background-color: get-caption-background-color();
 }
 
 .captionPlaceholder {
@@ -144,7 +144,7 @@
 
 // expand caption in ellipsis mode to compensate for overlay border
 .captionEllipsisContainer {
-	$width: getOverlayBorderWidth();
+	$width: get-overlay-border-width();
 	position: absolute;
 	bottom: - $width;
 	left: - $width;
@@ -153,10 +153,10 @@
 	padding-left: $width;
 	padding-right: $width;
 	// use caption background color on container in ellipsis mode
-	background-color: getCaptionBackgroundColor();
+	background-color: get-caption-background-color();
 }
 
 .captionEllipsis {
-	@include captionShared;
+	@include caption-shared;
 	padding-top: 15px;
 }
