@@ -38,8 +38,8 @@ class GalleryImage extends Component {
 		// by the figure element or any of its children but only if
 		// the element that gained focus isn't any of them.
 		//
-		// debouncedOnSelect is scheduled every time figure or any of its children
-		// is blurred and cancelled when any is focused. If neither gain focus,
+		// debouncedOnSelect is scheduled every time a figure's children
+		// is blurred and cancelled when any is focused. If none gain focus,
 		// the call to onDeselect will be executed.
 		//
 		// onBlur / onFocus events are quick operations (<5ms apart in my testing),
@@ -119,10 +119,18 @@ class GalleryImage extends Component {
 		}
 	}
 
+	/**
+	 * Note that, unlike the DOM, all React events bubble,
+	 * so this will be called after the onBlur event of any figure's children.
+	 */
 	onBlur() {
 		this.debouncedOnDeselect();
 	}
 
+	/**
+	 * Note that, unlike the DOM, all React events bubble,
+	 * so this will be called after the onBlur event of any figure's children.
+	 */
 	onFocus() {
 		this.debouncedOnDeselect.cancel();
 	}
