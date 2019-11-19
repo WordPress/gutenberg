@@ -11,6 +11,7 @@ import {
 	getBlockContent,
 	pasteHandler,
 	rawHandler,
+	registerBlockType,
 	serialize,
 } from '@wordpress/blocks';
 import { registerCoreBlocks } from '@wordpress/block-library';
@@ -24,6 +25,38 @@ describe( 'Blocks raw handling', () => {
 		// Load all hooks that modify blocks
 		require( '../../packages/editor/src/hooks' );
 		registerCoreBlocks();
+		registerBlockType( 'test/gallery', {
+			title: 'Test Gallery',
+			category: 'common',
+			attributes: {
+				ids: {
+					type: 'array',
+					default: [],
+				},
+			},
+			transforms: {
+				from: [
+					{
+						type: 'shortcode',
+						tag: 'gallery',
+						isMatch( { named: { ids } } ) {
+							return ids.indexOf( 42 ) > -1;
+						},
+						attributes: {
+							ids: {
+								type: 'array',
+								shortcode: ( { named: { ids } } ) =>
+									ids.split( ',' ).map( ( id ) => (
+										parseInt( id, 10 )
+									) ),
+							},
+						},
+						priority: 9,
+					},
+				],
+			},
+			save: () => null,
+		} );
 	} );
 
 	it( 'should filter inline content', () => {
@@ -248,12 +281,17 @@ describe( 'Blocks raw handling', () => {
 			'markdown',
 			'wordpress',
 			'gutenberg',
-			'caption-shortcode',
+			'shortcode-matching',
 		].forEach( ( type ) => {
 			it( type, () => {
 				const HTML = readFile( path.join( __dirname, `fixtures/${ type }-in.html` ) );
 				const plainText = readFile( path.join( __dirname, `fixtures/${ type }-in.txt` ) );
 				const output = readFile( path.join( __dirname, `fixtures/${ type }-out.html` ) );
+
+				if ( ! ( HTML || plainText ) || ! output ) {
+					throw new Error( `Expected fixtures for type ${ type }` );
+				}
+
 				const converted = pasteHandler( { HTML, plainText, canUserUseUnfilteredHTML: true } );
 				const serialized = typeof converted === 'string' ? converted : serialize( converted );
 
