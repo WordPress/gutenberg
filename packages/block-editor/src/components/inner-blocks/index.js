@@ -111,6 +111,7 @@ class InnerBlocks extends Component {
 			__experimentalTemplateOptions: templateOptions,
 			__experimentalOnSelectTemplateOption: onSelectTemplateOption,
 			__experimentalAllowTemplateOptionSkip: allowTemplateOptionSkip,
+			__experimentalGridMode,
 		} = this.props;
 		const { templateInProcess } = this.state;
 
@@ -133,6 +134,7 @@ class InnerBlocks extends Component {
 							rootClientId={ clientId }
 							renderAppender={ renderAppender }
 							__experimentalMoverDirection={ moverDirection }
+							__experimentalGridMode={ __experimentalGridMode }
 						/>
 				) }
 			</div>
@@ -186,7 +188,12 @@ InnerBlocks.DefaultBlockAppender = DefaultBlockAppender;
 InnerBlocks.ButtonBlockAppender = ButtonBlockAppender;
 
 InnerBlocks.Content = withBlockContentContext(
-	( { BlockContent } ) => <BlockContent />
+	( { BlockContent, __experimentalGridMode } ) =>
+		__experimentalGridMode ? (
+			<BlockList.GridContent attributes={ BlockContent.attributes } innerBlocks={ BlockContent.innerBlocks } />
+		) : (
+			<BlockContent />
+		)
 );
 
 /**

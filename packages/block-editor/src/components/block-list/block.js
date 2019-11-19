@@ -618,7 +618,7 @@ function BlockListBlock( {
 }
 
 const applyWithSelect = withSelect(
-	( select, { clientId, rootClientId, isLargeViewport } ) => {
+	( select, { clientId, rootClientId, isLargeViewport, isLocked } ) => {
 		const {
 			isBlockSelected,
 			isAncestorMultiSelected,
@@ -661,11 +661,13 @@ const applyWithSelect = withSelect(
 			isCaretWithinFormattedText: isCaretWithinFormattedText(),
 			mode: getBlockMode( clientId ),
 			isSelectionEnabled: isSelectionEnabled(),
-			initialPosition: isSelected ? getSelectedBlocksInitialCaretPosition() : null,
+			initialPosition: isSelected ?
+				getSelectedBlocksInitialCaretPosition() :
+				null,
 			isEmptyDefaultBlock:
 				name && isUnmodifiedDefaultBlock( { name, attributes } ),
 			isMovable: 'all' !== templateLock,
-			isLocked: !! templateLock,
+			isLocked: isLocked || !! templateLock,
 			isFocusMode: focusMode && isLargeViewport,
 			hasFixedToolbar: hasFixedToolbar && isLargeViewport,
 			isLast: index === blockOrder.length - 1,

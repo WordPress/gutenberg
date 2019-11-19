@@ -28,6 +28,7 @@ import BlockAsyncModeProvider from './block-async-mode-provider';
 import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
 import { getBlockDOMNode } from '../../utils/dom';
+import BlockGrid from './grid';
 
 /**
  * If the block count exceeds the threshold, we disable the reordering animation
@@ -202,7 +203,19 @@ class BlockList extends Component {
 			hasMultiSelection,
 			renderAppender,
 			enableAnimation,
+			__experimentalGridMode,
 		} = this.props;
+
+		if ( __experimentalGridMode ) {
+			return (
+				<BlockGrid
+					{ ...this.props }
+					nodes={ this.nodes }
+					setBlockRef={ this.setBlockRef }
+					onSelectionStart={ this.onSelectionStart }
+				/>
+			);
+		}
 
 		return (
 			<div className={
@@ -249,7 +262,7 @@ class BlockList extends Component {
 	}
 }
 
-export default compose( [
+BlockList = compose( [
 	// This component needs to always be synchronous
 	// as it's the one changing the async mode
 	// depending on the block selection.
@@ -299,3 +312,7 @@ export default compose( [
 		};
 	} ),
 ] )( BlockList );
+
+BlockList.GridContent = BlockGrid.Content;
+
+export default BlockList;

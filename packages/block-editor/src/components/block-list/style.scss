@@ -1153,3 +1153,33 @@
 		margin-bottom: auto;
 	}
 }
+
+/**
+ * Block Grid
+ */
+@import "node_modules/react-grid-layout/css/styles";
+@import "node_modules/react-resizable/css/styles";
+
+.block-editor-block-list__grid {
+	overflow: scroll;
+
+	.react-grid-item.react-grid-placeholder {
+		background-color: $blue-medium-highlight;
+	}
+
+	.block-list-appender {
+		&.block-list-appender {
+			margin: 0;
+		}
+
+		&,
+		& > *,
+		& > * > * {
+			height: 100%;
+		}
+	}
+}
+
+.block-editor-block-list__grid-item {
+	padding: 0 20px;
+}

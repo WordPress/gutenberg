@@ -49,12 +49,14 @@
 		"lodash": "^4.17.15",
 		"memize": "^1.0.5",
 		"react-autosize-textarea": "^3.0.2",
+		"react-grid-layout": "^0.17.1",
 		"react-spring": "^8.0.19",
 		"redux-multi": "^0.1.12",
 		"refx": "^3.0.0",
 		"rememo": "^3.0.0",
 		"tinycolor2": "^1.4.1",
-		"traverse": "^0.6.6"
+		"traverse": "^0.6.6",
+		"uuid": "^3.3.3"
 	},
 	"publishConfig": {
 		"access": "public"
