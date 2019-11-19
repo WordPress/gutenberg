@@ -6,8 +6,9 @@ import { get } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { withViewportMatch } from '@wordpress/viewport';
 import { Modal } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import {
@@ -33,7 +34,7 @@ import MetaBoxesSection from './meta-boxes-section';
 
 const MODAL_NAME = 'edit-post/options';
 
-export function OptionsModal( { isModalActive, isViewable, closeModal } ) {
+export function OptionsModal( { isModalActive, isViewable, isSmallScreen, closeModal } ) {
 	if ( ! isModalActive ) {
 		return null;
 	}
@@ -45,6 +46,25 @@ export function OptionsModal( { isModalActive, isViewable, closeModal } ) {
 			closeLabel={ __( 'Close' ) }
 			onRequestClose={ closeModal }
 		>
+			{ ! isSmallScreen && (
+				<Section title={ _x( 'View', 'noun' ) }>
+					<EnableFeature
+						feature="fixedToolbar"
+						label={ __( 'Top Toolbar' ) }
+						help={ __( 'Access all block and document tools in a single place' ) }
+					/>
+					<EnableFeature
+						feature="focusMode"
+						label={ __( 'Spotlight Mode' ) }
+						help={ __( 'Focus on one block at a time' ) }
+					/>
+					<EnableFeature
+						feature="fullscreenMode"
+						label={ __( 'Fullscreen Mode' ) }
+						help={ __( 'Work without distraction' ) }
+					/>
+				</Section>
+			) }
 			<Section title={ __( 'General' ) }>
 				<EnablePublishSidebarOption label={ __( 'Pre-publish Checks' ) } />
 				<EnableTipsOption label={ __( 'Tips' ) } />
@@ -82,6 +102,7 @@ export function OptionsModal( { isModalActive, isViewable, closeModal } ) {
 }
 
 export default compose(
+	withViewportMatch( { isSmallScreen: '< medium' } ),
 	withSelect( ( select ) => {
 		const { getEditedPostAttribute } = select( 'core/editor' );
 		const { getPostType } = select( 'core' );

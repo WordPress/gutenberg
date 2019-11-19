@@ -25,6 +25,11 @@
 			flex-grow: 1;
 			padding: 0.6rem 0 0.6rem 10px;
 		}
+
+		.components-base-control__help {
+			padding-left: 38px;
+			color: $dark-gray-300;
+		}
 	}
 
 	&__custom-fields-confirmation-message,
