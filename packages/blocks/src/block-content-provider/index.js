@@ -28,7 +28,7 @@ const { Consumer, Provider } = createContext( () => {} );
  *
  * @return {WPComponent} Element with BlockContent injected via context.
  */
-const BlockContentProvider = ( { children, innerBlocks } ) => {
+const BlockContentProvider = ( { children, attributes, innerBlocks } ) => {
 	const BlockContent = () => {
 		// Value is an array of blocks, so defer to block serializer
 		const html = serialize( innerBlocks, { isInnerBlocks: true } );
@@ -36,6 +36,8 @@ const BlockContentProvider = ( { children, innerBlocks } ) => {
 		// Use special-cased raw HTML tag to avoid default escaping
 		return <RawHTML>{ html }</RawHTML>;
 	};
+	BlockContent.attributes = attributes;
+	BlockContent.innerBlocks = innerBlocks;
 
 	return (
 		<Provider value={ BlockContent }>

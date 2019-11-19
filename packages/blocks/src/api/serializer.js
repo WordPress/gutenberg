@@ -111,7 +111,7 @@ export function getSaveElement( blockTypeOrName, attributes, innerBlocks = [] ) 
 	element = applyFilters( 'blocks.getSaveElement', element, blockType, attributes );
 
 	return (
-		<BlockContentProvider innerBlocks={ innerBlocks }>
+		<BlockContentProvider attributes={ attributes } innerBlocks={ innerBlocks }>
 			{ element }
 		</BlockContentProvider>
 	);
