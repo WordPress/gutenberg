@@ -109,7 +109,6 @@ describe( 'Block transforms', () => {
 	beforeAll( async () => {
 		await enableExperimentalFeatures( [
 			'#gutenberg-widget-experiments',
-			'#gutenberg-menu-block',
 			'#gutenberg-full-site-editing',
 		] );
 		await createNewPost();
@@ -131,7 +130,6 @@ describe( 'Block transforms', () => {
 		async () => {
 			await disableExperimentalFeatures( [
 				'#gutenberg-widget-experiments',
-				'#gutenberg-menu-block',
 				'#gutenberg-full-site-editing',
 			] );
 		}
