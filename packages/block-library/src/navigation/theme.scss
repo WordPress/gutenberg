@@ -30,3 +30,18 @@
 		}
 	}
 }
+
+.wp-block-navigation-menu.is-dark-style ul > li > ul {
+	background: #333;
+	border-radius: 4px;
+
+	& > a {
+		text-decoration: none;
+		color: #fff;
+	}
+
+	&::before {
+		border-color: rgba(24, 24, 24, 0);
+		border-bottom-color: #333;
+	}
+}
