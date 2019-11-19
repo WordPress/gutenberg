@@ -11,12 +11,11 @@
 
 	// 2. Remove paddings on subsequent immediate children.
 	.wp-block-navigation .block-editor-inner-blocks > .block-editor-block-list__layout > .wp-block {
-		display: flex;
-		flex: 1;
 		width: auto;
 		padding-left: 0;
 		padding-right: 0;
 		margin-left: 0;
+		margin-right: 0;
 		margin-bottom: 1em; // Useful for when items wrap.
 	}
 

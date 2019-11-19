@@ -67,25 +67,17 @@
 		display: block;
 	}
 
-    &.has-link .wp-block-navigation-link__content {
+	&.has-link .wp-block-navigation-link__content {
 		border-bottom-style: solid;
 		border-bottom-width: 1px;
 	}
 
-    .block-editor-rich-text__editable.is-selected:not(.keep-placeholder-on-focus):not(:focus) [data-rich-text-placeholder]::after {
+	.block-editor-rich-text__editable.is-selected:not(.keep-placeholder-on-focus):not(:focus) [data-rich-text-placeholder]::after {
 		display: inline-block;
 	}
 }
 
-[data-type="core/navigation-menu-item"] {
-
-	// Take mover out of flow to avoid layout jump on Block select
-	.block-editor-block-mover {
-		position: absolute;
-		bottom: 0;
-		right: 0;
-	}
-
+[data-type="core/navigation-link"] {
 	.block-editor-block-toolbar {
 		left: 15px;
 	}
