@@ -184,7 +184,7 @@ export function getEntityRecordEdits( state, kind, name, recordId ) {
 export const getEntityRecordNonTransientEdits = createSelector(
 	( state, kind, name, recordId ) => {
 		const { transientEdits } = getEntity( state, kind, name ) || {};
-		const edits = getEntityRecordEdits( state, kind, name, recordId ) || [];
+		const edits = getEntityRecordEdits( state, kind, name, recordId ) || {};
 		if ( ! transientEdits ) {
 			return edits;
 		}
