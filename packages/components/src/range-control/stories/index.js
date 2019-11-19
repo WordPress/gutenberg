@@ -38,7 +38,7 @@ export const _default = () => {
 	);
 };
 
-export const WithoutInitialValue = () => {
+export const InitialValueZero = () => {
 	const label = text( 'Label', 'How many columns should this use?' );
 
 	return (
