@@ -21,14 +21,17 @@
 	opacity: 0.3;
 }
 
+@function getOverlayBorderWidth() {
+	@return 3px;
+}
+
 .overlay {
 	position: absolute;
 	top: 0;
 	bottom: 0;
 	left: 0;
 	right: 0;
-	padding: 5px;
-	border-width: 3px;
+	border-width: getOverlayBorderWidth();
 	border-color: #0000;
 }
 
@@ -74,15 +77,9 @@
 }
 
 .toolbar {
+	padding: 5px;
 	flex-direction: row;
 	justify-content: space-between;
-}
-
-.captionContainer {
-	position: absolute;
-	bottom: 0;
-	left: 0;
-	right: 0;
 }
 
 .uploadFailedContainer {
@@ -113,16 +110,53 @@
 	margin-top: 5px;
 }
 
-.caption {
-	// background-color: #fff7;
-	background-color: #0007;
+@function getCaptionBackgroundColor() {
+	@return rgba(0, 0, 0, 0.4);
+}
+
+.captionContainer {
+	flex: 1;
+	flex-direction: row;
+	align-items: flex-end;
+}
+
+@mixin captionShared {
+	font-size: 15;
 	color: #fff;
+	font-family: $default-regular-font;
+	min-height: $min-height-paragraph;
+}
+
+.caption {
+	@include captionShared;
+	background-color: getCaptionBackgroundColor();
 }
 
 .captionPlaceholder {
 	color: #ccc;
 }
 
+/*
 .captionDark {
-	// background-color: #0007;
+	background-color: #0007;
+}
+*/
+
+// expand caption in ellipsis mode to compensate for overlay border
+.captionEllipsisContainer {
+	$width: getOverlayBorderWidth();
+	position: absolute;
+	bottom: - $width;
+	left: - $width;
+	right: - $width;
+	padding-bottom: $width;
+	padding-left: $width;
+	padding-right: $width;
+	// use caption background color on container in ellipsis mode
+	background-color: getCaptionBackgroundColor();
+}
+
+.captionEllipsis {
+	@include captionShared;
+	padding-top: 15px;
 }

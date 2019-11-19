@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Image, StyleSheet, View, Text, TouchableWithoutFeedback } from 'react-native';
+import { Image, StyleSheet, View, ScrollView, Text, TouchableWithoutFeedback } from 'react-native';
 import {
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
@@ -21,7 +21,21 @@ import { withPreferredColorScheme } from '@wordpress/compose';
  * Internal dependencies
  */
 import Button from './gallery-button';
-import styles from './gallery-image-styles';
+import style from './gallery-image-style';
+
+const { compose } = StyleSheet;
+
+const separatorStyle = compose( style.separator,
+	{ borderRightWidth: StyleSheet.hairlineWidth }
+);
+
+const buttonStyle = compose( style.button,
+	{ aspectRatio: 1 }
+);
+
+const removeButtonStyle = compose( style.removeButton,
+	{ aspectRatio: 1 }
+);
 
 class GalleryImage extends Component {
 	constructor() {
@@ -133,34 +147,21 @@ class GalleryImage extends Component {
 			onMoveForward, onMoveBackward, setAttributes, 'aria-label': ariaLabel,
 			isCropped, getStylesFromColorScheme } = this.props;
 
-		const { compose } = StyleSheet;
 
 		const { isUploadInProgress } = this.state;
 		const { isUploadFailed, retryMessage } = params;
 		const resizeMode = isCropped ? 'cover' : 'contain';
 
-		const imageStyle = [ styles.image, { resizeMode },
-			isUploadInProgress ? styles.imageUploading : undefined,
+		const imageStyle = [ style.image, { resizeMode },
+			isUploadInProgress ? style.imageUploading : undefined,
 		];
 
-		const overlayStyle = compose( styles.overlay,
-			isSelected ? styles.overlaySelected : undefined,
+		const overlayStyle = compose( style.overlay,
+			isSelected ? style.overlaySelected : undefined,
 		);
 
-		const separatorStyle = compose( styles.separator,
-			{ borderRightWidth: StyleSheet.hairlineWidth }
-		);
-
-		const buttonStyle = compose( styles.button,
-			{ aspectRatio: 1 }
-		);
-
-		const removeButtonStyle = compose( styles.removeButton,
-			{ aspectRatio: 1 }
-		);
-
-		const captionStyle = getStylesFromColorScheme( styles.caption, styles.captionDark );
-		const captionPlaceholderStyle = getStylesFromColorScheme( styles.captionPlaceholder, styles.captionPlaceholderDark );
+		const captionStyle = getStylesFromColorScheme( style.caption, style.captionDark );
+		const captionPlaceholderStyle = getStylesFromColorScheme( style.captionPlaceholder, style.captionPlaceholderDark );
 
 		return (
 			<>
@@ -172,19 +173,19 @@ class GalleryImage extends Component {
 					ref={ this.bindContainer }
 				/>
 				{ isUploadFailed && (
-					<View style={ styles.uploadFailedContainer }>
-						<View style={ styles.uploadFailed }>
-							<Icon icon={ 'warning' } { ...styles.uploadFailedIcon } />
+					<View style={ style.uploadFailedContainer }>
+						<View style={ style.uploadFailed }>
+							<Icon icon={ 'warning' } { ...style.uploadFailedIcon } />
 						</View>
-						<Text style={ styles.uploadFailedText }>{ retryMessage }</Text>
+						<Text style={ style.uploadFailedText }>{ retryMessage }</Text>
 					</View>
 				) }
 				<View style={ overlayStyle }>
 					{ ! isUploadInProgress && (
 					<>
 						{ isSelected && (
-							<View style={ styles.toolbar }>
-								<View style={ styles.moverButtonContainer } >
+							<View style={ style.toolbar }>
+								<View style={ style.moverButtonContainer } >
 									<Button
 										style={ buttonStyle }
 										icon="arrow-left"
@@ -238,8 +239,8 @@ class GalleryImage extends Component {
 	render() {
 		const { id, isBlockSelected, onRemove, getStylesFromColorScheme } = this.props;
 
-		const containerStyle = getStylesFromColorScheme( styles.galleryImageContainer,
-			styles.galleryImageContainerDark );
+		const containerStyle = getStylesFromColorScheme( style.galleryImageContainer,
+			style.galleryImageContainerDark );
 
 		return (
 			<TouchableWithoutFeedback
@@ -248,7 +249,6 @@ class GalleryImage extends Component {
 			>
 				<View style={ containerStyle }>
 					<MediaUploadProgress
-						// coverUrl={ url }
 						mediaId={ id }
 						onUpdateMediaProgress={ this.updateMediaProgress }
 						onFinishMediaUploadWithSuccess={ this.finishMediaUploadWithSuccess }

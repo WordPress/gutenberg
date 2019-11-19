@@ -11,7 +11,7 @@ import { Icon } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import styles from './gallery-image-styles';
+import style from './gallery-image-style';
 
 export function Button( props ) {
 	const {
@@ -20,14 +20,14 @@ export function Button( props ) {
 		disabled,
 		'aria-disabled': ariaDisabled,
 		accessibilityLabel = 'button',
-		style,
+		style: customStyle,
 	} = props;
 
-	const buttonStyle = StyleSheet.compose( styles.buttonActive, style );
+	const buttonStyle = StyleSheet.compose( style.buttonActive, customStyle );
 
 	const isDisabled = disabled || ariaDisabled;
 
-	const { fill } = isDisabled ? styles.buttonDisabled : styles.button;
+	const { fill } = isDisabled ? style.buttonDisabled : style.button;
 
 	return (
 		<TouchableOpacity
