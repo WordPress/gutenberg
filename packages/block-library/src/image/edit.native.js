@@ -143,7 +143,7 @@ export class ImageEdit extends React.Component {
 			requestImageUploadCancelDialog( attributes.id );
 		} else if ( attributes.id && ! isURL( attributes.url ) ) {
 			requestImageFailedRetryDialog( attributes.id );
-		} else {
+		} else if ( ! this.state.isCaptionSelected ) {
 			requestImageFullscreenPreview( attributes.url );
 		}
 
