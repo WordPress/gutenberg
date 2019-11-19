@@ -103,7 +103,7 @@ function build_navigation_html( $block, $colors ) {
 		// Start anchor tag content.
 		$html .= '>';
 		if ( isset( $block['attrs']['label'] ) ) {
-			$html .= esc_attr( $block['attrs']['label'] );
+			$html .= esc_html( $block['attrs']['label'] );
 		}
 		$html .= '</a>';
 		// End anchor tag content.
