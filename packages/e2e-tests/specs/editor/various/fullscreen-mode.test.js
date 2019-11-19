@@ -3,8 +3,7 @@
  */
 import {
 	createNewPost,
-	clickOnMoreMenuItem,
-	toggleMoreMenu,
+	toggleScreenOption,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Fullscreen Mode', () => {
@@ -13,8 +12,7 @@ describe( 'Fullscreen Mode', () => {
 	} );
 
 	it( 'should open the fullscreen mode from the more menu', async () => {
-		await clickOnMoreMenuItem( 'Fullscreen Mode' );
-		await toggleMoreMenu();
+		await toggleScreenOption( 'Fullscreen Mode' );
 
 		const isFullscreenEnabled = await page.$eval( 'body', ( body ) => {
 			return body.classList.contains( 'is-fullscreen-mode' );
