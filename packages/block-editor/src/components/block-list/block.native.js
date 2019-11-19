@@ -257,7 +257,7 @@ export default compose( [
 			getSelectedBlockClientId,
 			getBlock,
 			getBlockRootClientId,
-			getFirstToSelectBlock,
+			getLowestCommonAncestorWithSelectedBlock,
 			getBlockParents,
 		} = select( 'core/block-editor' );
 		const order = getBlockIndex( clientId, rootClientId );
@@ -282,7 +282,7 @@ export default compose( [
 
 		const showFloatingToolbar = isSelected && hasRootInnerBlocks;
 
-		const firstToSelectId = getFirstToSelectBlock( clientId );
+		const firstToSelectId = getLowestCommonAncestorWithSelectedBlock( clientId );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 		const isRootSiblingsSelected = getBlockRootClientId( selectedBlockClientId ) === '';

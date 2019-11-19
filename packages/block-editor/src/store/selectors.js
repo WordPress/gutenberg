@@ -426,13 +426,21 @@ export function getBlockRootClientId( state, clientId ) {
  *
  * @param {Object} state    Editor state.
  * @param {string} clientId Block from which to find root client ID.
- * @param {boolean} getDependants Apply createSelector function to call getDependants.
- * @param {boolean} includeClientId Include client ID in return array.
+ * @param {boolean} ascending Get parent hierarchy in (top-most hierarchy first).
  *
  * @return {Array} ClientIDs of the parent blocks.
  */
 export const getBlockParents = createSelector(
-	( state, clientId ) => getTree( state, clientId, true ),
+	( state, clientId, ascending = false ) => {
+		const parents = [];
+		let current = clientId;
+		while ( !! state.blocks.parents[ current ] ) {
+			current = state.blocks.parents[ current ];
+			parents.push( current );
+		}
+
+		return ascending ? parents : parents.reverse();
+	},
 	( state ) => [
 		state.blocks.parents,
 	]
@@ -457,27 +465,6 @@ export function getBlockHierarchyRootClientId( state, clientId ) {
 }
 
 /**
- * Given a block client ID, returns the hierarchy tree of client ID.
- *
- * @param {Object} state    Editor state.
- * @param {string} clientId Block from which tree will be created.
- * @param {boolean} reverse Get parent hierarchy in reverse order (top-most hierarchy first).
- * @param {boolean} includeClientId Include client ID in return array.
- *
- * @return {Array} Hierarchy tree of client ID.
- */
-export function getTree( state, clientId, reverse = true, includeClientId = false ) {
-	const parents = includeClientId ? [ clientId ] : [];
-	let current = clientId;
-	while ( !! state.blocks.parents[ current ] ) {
-		current = state.blocks.parents[ current ];
-		parents.push( current );
-	}
-
-	return reverse ? parents.reverse() : parents;
-}
-
-/**
  * Given a block client ID, returns the next element of the hierarchy from which the block is nested which should be selected onFocus, return the block itself for root level blocks.
  *
  * @param {Object} state    Editor state.
@@ -485,9 +472,9 @@ export function getTree( state, clientId, reverse = true, includeClientId = fals
  *
  * @return {string} First to select client ID
  */
-export function getFirstToSelectBlock( state, clientId ) {
+export function getLowestCommonAncestorWithSelectedBlock( state, clientId ) {
 	const selectedId = getSelectedBlockClientId( state );
-	const clientTree = getTree( state, clientId, false, true );
+	const clientTree = [ clientId, ...getBlockParents( state, clientId, true ) ];
 	const rootParent = clientTree[ clientTree.length - 1 ];
 
 	let index = 0;
@@ -505,7 +492,7 @@ export function getFirstToSelectBlock( state, clientId ) {
 		return rootParent;
 	}
 
-	const selectedTree = getTree( state, selectedId, false, true );
+	const selectedTree = [ selectedId, ...getBlockParents( state, selectedId, true ) ];
 
 	do {
 		const commonParentIndex = clientTree.indexOf( selectedTree[ index ] );
