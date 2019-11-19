@@ -9,6 +9,7 @@
 * [iOS] Support for Pexels image library
 * [Android] Added native fullscreen preview when clicking image from Image Block
 * [iOS] Add support for Preformatted block.
+* [Android] Fix issue when removing image/page break block crashes the app
 
 1.16.1
 ------
