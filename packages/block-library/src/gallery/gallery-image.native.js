@@ -162,6 +162,9 @@ class GalleryImage extends Component {
 
 		const captionStyle = getStylesFromColorScheme( style.caption, style.captionDark );
 		const captionPlaceholderStyle = getStylesFromColorScheme( style.captionPlaceholder, style.captionPlaceholderDark );
+		
+		const shouldShowCaptionEditable = ! isUploadFailed && isSelected;
+		const shouldShowCaptionEllipsis = ! isUploadFailed && ( ! isSelected && !! caption );
 
 		return (
 			<>
@@ -213,7 +216,7 @@ class GalleryImage extends Component {
 								/>
 							</View>
 						) }
-						{ ! isUploadFailed && isSelected && (
+						{ shouldShowCaptionEditable && (
 							<View style={ style.captionContainer }>
 								<ScrollView nestedScrollEnabled>
 									<RichText
@@ -233,7 +236,7 @@ class GalleryImage extends Component {
 						) }
 					</>
 					) }
-					{ ! isUploadFailed && ( ! isSelected && !! caption ) && (
+					{ shouldShowCaptionEllipsis && (
 						<View  style={ style.captionEllipsisContainer }>
 							<Text style={ style.captionEllipsis } numberOfLines={ 1 }>
 								{ caption }
