@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { escape } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -60,13 +61,13 @@ const updateLinkSetting = ( setter ) => ( setting, value ) => {
  */
 const updateLink = ( setter, label ) => ( { title: newTitle = '', url: newURL = '' } = {} ) => {
 	setter( {
-		title: newTitle,
+		title: escape( newTitle ),
 		url: newURL,
 	} );
 
 	// Set the item label as well if it isn't already defined.
 	if ( ! label ) {
-		setter( { label: newTitle } );
+		setter( { label: escape( newTitle ) } );
 	}
 };
 
