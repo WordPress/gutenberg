@@ -31,10 +31,11 @@ const transforms = {
 			isMultiBlock: true,
 			blocks: [ 'core/image' ],
 			transform: ( attributes ) => {
-				// Init the align attribute from the first item which may be either the placeholder or an image.
-				let { align } = attributes[ 0 ];
-				// Loop through all the images and check if they have the same align.
+				// Init the align and size from the first item which may be either the placeholder or an image.
+				let { align, sizeSlug } = attributes[ 0 ];
+				// Loop through all the images and check if they have the same align and size.
 				align = every( attributes, [ 'align', align ] ) ? align : undefined;
+				sizeSlug = every( attributes, [ 'sizeSlug', sizeSlug ] ) ? sizeSlug : undefined;
 
 				const validImages = filter( attributes, ( { url } ) => url );
 
@@ -47,6 +48,7 @@ const transforms = {
 					} ) ),
 					ids: validImages.map( ( { id } ) => id ),
 					align,
+					sizeSlug,
 				} );
 			},
 		},
@@ -102,7 +104,7 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/image' ],
-			transform: ( { images, align } ) => {
+			transform: ( { images, align, sizeSlug } ) => {
 				if ( images.length > 0 ) {
 					return images.map( ( { id, url, alt, caption } ) => createBlock( 'core/image', {
 						id,
@@ -110,6 +112,7 @@ const transforms = {
 						alt,
 						caption,
 						align,
+						sizeSlug,
 					} ) );
 				}
 				return createBlock( 'core/image', { align } );
