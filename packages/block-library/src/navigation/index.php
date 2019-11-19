@@ -89,7 +89,7 @@ function build_navigation_html( $block, $colors ) {
 
 		// Start appending HTML attributes to anchor tag.
 		if ( isset( $block['attrs']['url'] ) ) {
-			$html .= ' href="' . esc_attr( $block['attrs']['url'] ) . '"';
+			$html .= ' href="' . esc_url( $block['attrs']['url'] ) . '"';
 		}
 		if ( isset( $block['attrs']['title'] ) ) {
 			$html .= ' title="' . esc_attr( $block['attrs']['title'] ) . '"';
