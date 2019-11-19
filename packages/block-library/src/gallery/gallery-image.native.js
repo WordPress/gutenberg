@@ -229,6 +229,7 @@ class GalleryImage extends Component {
 										fontSize={ captionStyle.fontSize }
 										style={ captionStyle }
 										placeholderTextColor={ captionPlaceholderStyle.color }
+										__experimentalForceBlurOnUnmount
 										inlineToolbar
 									/>
 								</ScrollView>
