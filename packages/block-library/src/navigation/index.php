@@ -89,10 +89,10 @@ function build_navigation_html( $block, $colors ) {
 
 		// Start appending HTML attributes to anchor tag.
 		if ( isset( $block['attrs']['url'] ) ) {
-			$html .= ' href="' . $block['attrs']['url'] . '"';
+			$html .= ' href="' . esc_attr( $block['attrs']['url'] ) . '"';
 		}
 		if ( isset( $block['attrs']['title'] ) ) {
-			$html .= ' title="' . $block['attrs']['title'] . '"';
+			$html .= ' title="' . esc_attr( $block['attrs']['title'] ) . '"';
 		}
 
 		if ( isset( $block['attrs']['opensInNewTab'] ) && true === $block['attrs']['opensInNewTab'] ) {
@@ -103,7 +103,7 @@ function build_navigation_html( $block, $colors ) {
 		// Start anchor tag content.
 		$html .= '>';
 		if ( isset( $block['attrs']['label'] ) ) {
-			$html .= $block['attrs']['label'];
+			$html .= esc_attr( $block['attrs']['label'] );
 		}
 		$html .= '</a>';
 		// End anchor tag content.
