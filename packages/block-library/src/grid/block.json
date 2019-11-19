@@ -1,0 +1,10 @@
+{
+	"name": "core/grid",
+	"category": "layout",
+	"supports": { "align": true },
+	"attributes": {
+		"grid": {
+			"type": "object"
+		}
+	}
+}

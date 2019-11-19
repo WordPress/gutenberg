@@ -48,6 +48,7 @@ import * as pullquote from './pullquote';
 import * as reusableBlock from './block';
 import * as rss from './rss';
 import * as search from './search';
+import * as grid from './grid';
 import * as group from './group';
 import * as separator from './separator';
 import * as shortcode from './shortcode';
@@ -118,6 +119,7 @@ export const registerCoreBlocks = () => {
 		...embed.common,
 		...embed.others,
 		file,
+		grid,
 		group,
 		window.wp && window.wp.oldEditor ? classic : null, // Only add the classic block in WP Context
 		html,
