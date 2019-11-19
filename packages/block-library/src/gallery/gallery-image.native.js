@@ -213,23 +213,32 @@ class GalleryImage extends Component {
 								/>
 							</View>
 						) }
-						{ ! isUploadFailed && ( isSelected || !! caption ) && (
-							<View style={ styles.captionContainer } >
-								<RichText
-									tagName="figcaption"
-									placeholder={ isSelected ? __( 'Write caption…' ) : null }
-									value={ caption }
-									isSelected={ this.state.captionSelected }
-									onChange={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
-									unstableOnFocus={ this.onSelectCaption }
-									// fontSize={ 36 }
-									style={ captionStyle }
-									placeholderStyle={ captionPlaceholderStyle }
-									inlineToolbar
-								/>
+						{ ! isUploadFailed && isSelected && (
+							<View style={ style.captionContainer }>
+								<ScrollView nestedScrollEnabled>
+									<RichText
+										tagName="figcaption"
+										placeholder={ isSelected ? __( 'Write caption…' ) : null }
+										value={ caption }
+										isSelected={ this.state.captionSelected }
+										onChange={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
+										unstableOnFocus={ this.onSelectCaption }
+										fontSize={ captionStyle.fontSize }
+										style={ captionStyle }
+										placeholderTextColor={ captionPlaceholderStyle.color }
+										inlineToolbar
+									/>
+								</ScrollView>
 							</View>
 						) }
 					</>
+					) }
+					{ ! isUploadFailed && ( ! isSelected && !! caption ) && (
+						<View  style={ style.captionEllipsisContainer }>
+							<Text style={ style.captionEllipsis } numberOfLines={ 1 }>
+								{ caption }
+							</Text>
+						</View>
 					) }
 				</View>
 			</>
