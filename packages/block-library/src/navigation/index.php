@@ -49,21 +49,17 @@ function build_css_colors( $attributes ) {
  * @return string Returns the post content with the legacy widget added.
  */
 function render_block_navigation( $attributes, $content, $block ) {
-	$colors          = build_css_colors( $attributes );
-	$class_attribute = sprintf( ' class="%s"', esc_attr( $colors['css_classes'] ? 'wp-block-navigation ' . $colors['css_classes'] : 'wp-block-navigation' ) );
-	$style_attribute = $colors['inline_styles'] ? sprintf( ' style="%s"', esc_attr( $colors['inline_styles'] ) ) : '';
+	$colors  = build_css_colors( $attributes );
+	$classes = array( 'wp-block-navigation', $colors['css_classes'] );
+	if ( ! empty( $attributes['className'] ) ) {
+		$classes[] = $attributes['className'];
+	}
+	$classes = join( ' ', array_filter( $classes ) );
 
 	return sprintf(
-		implode(
-			"\n",
-			array(
-				'<nav%s%s>',
-				'	%s',
-				'</nav>',
-			)
-		),
-		$class_attribute,
-		$style_attribute,
+		'<nav class="%1$s" %2$s>%3$s</nav>',
+		esc_attr( $classes ),
+		$colors['inline_styles'] ? sprintf( 'style="%s"', esc_attr( $colors['inline_styles'] ) ) : '',
 		build_navigation_html( $block, $colors )
 	);
 }
