@@ -164,6 +164,18 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
         }
     }
 
+    @objc
+    func fetchRequest(_ path: String, resolver: @escaping RCTPromiseResolveBlock, rejecter: @escaping RCTPromiseRejectBlock) {
+        self.delegate?.gutenbergDidRequestFetch(path: path, completion: { (result) in
+            switch result {
+            case .success(let response):
+                resolver(response)
+            case .failure(let error):
+                rejecter("\(error.code)", error.description, error)
+            }
+        })
+    }
+
 
     /// Sends events to the JS side only if there is observers listening
     ///

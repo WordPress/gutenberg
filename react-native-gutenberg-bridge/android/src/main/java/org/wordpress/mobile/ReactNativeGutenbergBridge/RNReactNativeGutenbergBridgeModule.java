@@ -3,6 +3,7 @@ package org.wordpress.mobile.ReactNativeGutenbergBridge;
 import androidx.annotation.Nullable;
 
 import com.facebook.react.bridge.Callback;
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
@@ -184,6 +185,13 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
         OtherMediaOptionsReceivedCallback otherMediaOptionsReceivedCallback = getNewOtherMediaReceivedCallback(jsCallback);
         MediaType mediaType = getMediaTypeFromFilter(filter);
         mGutenbergBridgeJS2Parent.getOtherMediaPickerOptions(otherMediaOptionsReceivedCallback, mediaType);
+    }
+
+    @ReactMethod
+    public void fetchRequest(String path, Promise promise) {
+        mGutenbergBridgeJS2Parent.performRequest(path,
+                promise::resolve,
+                errorMessage -> promise.reject(new Error(errorMessage)));
     }
 
     private OtherMediaOptionsReceivedCallback getNewOtherMediaReceivedCallback(final Callback jsCallback) {
