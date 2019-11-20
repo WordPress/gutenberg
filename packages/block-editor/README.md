@@ -344,6 +344,10 @@ Undocumented declaration.
 
 Undocumented declaration.
 
+<a name="NavigationToolSelector" href="#NavigationToolSelector">#</a> **NavigationToolSelector**
+
+Undocumented declaration.
+
 <a name="ObserveTyping" href="#ObserveTyping">#</a> **ObserveTyping**
 
 _Related_

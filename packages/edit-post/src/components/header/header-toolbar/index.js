@@ -11,6 +11,7 @@ import {
 	BlockToolbar,
 	NavigableToolbar,
 	BlockNavigationDropdown,
+	NavigationToolSelector,
 } from '@wordpress/block-editor';
 import {
 	TableOfContents,
@@ -45,6 +46,7 @@ function HeaderToolbar( { hasFixedToolbar, isLargeViewport, showInserter, isText
 					<BlockToolbar />
 				</div>
 			) }
+			<NavigationToolSelector />
 		</NavigableToolbar>
 	);
 }

@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { withViewportMatch } from '@wordpress/viewport'; // Temporary click-through disable on desktop.
+import { withViewportMatch } from '@wordpress/viewport';
 import { Component } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { synchronizeBlocksWithTemplate, withBlockContentContext } from '@wordpress/blocks';
@@ -102,7 +102,7 @@ class InnerBlocks extends Component {
 
 	render() {
 		const {
-			isSmallScreen, // Temporary click-through disable on desktop.
+			enableClickThrough,
 			clientId,
 			hasOverlay,
 			renderAppender,
@@ -117,7 +117,7 @@ class InnerBlocks extends Component {
 		const isPlaceholder = template === null && !! templateOptions;
 
 		const classes = classnames( 'editor-inner-blocks block-editor-inner-blocks', {
-			'has-overlay': isSmallScreen && ( hasOverlay && ! isPlaceholder ), // Temporary click-through disable on desktop.
+			'has-overlay': enableClickThrough && ( hasOverlay && ! isPlaceholder ),
 		} );
 
 		return (
@@ -141,7 +141,7 @@ class InnerBlocks extends Component {
 }
 
 InnerBlocks = compose( [
-	withViewportMatch( { isSmallScreen: '< medium' } ), // Temporary click-through disable on desktop.
+	withViewportMatch( { isSmallScreen: '< medium' } ),
 	withBlockEditContext( ( context ) => pick( context, [ 'clientId' ] ) ),
 	withSelect( ( select, ownProps ) => {
 		const {
@@ -151,8 +151,9 @@ InnerBlocks = compose( [
 			getBlockListSettings,
 			getBlockRootClientId,
 			getTemplateLock,
+			isNavigationMode,
 		} = select( 'core/block-editor' );
-		const { clientId } = ownProps;
+		const { clientId, isSmallScreen } = ownProps;
 		const block = getBlock( clientId );
 		const rootClientId = getBlockRootClientId( clientId );
 
@@ -161,6 +162,7 @@ InnerBlocks = compose( [
 			blockListSettings: getBlockListSettings( clientId ),
 			hasOverlay: block.name !== 'core/template' && ! isBlockSelected( clientId ) && ! hasSelectedInnerBlock( clientId, true ),
 			parentLock: getTemplateLock( rootClientId ),
+			enableClickThrough: isNavigationMode() || isSmallScreen,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => {

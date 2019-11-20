@@ -30,6 +30,7 @@ export { default as __experimentalLinkControl } from './link-control';
 export { default as MediaPlaceholder } from './media-placeholder';
 export { default as MediaUpload } from './media-upload';
 export { default as MediaUploadCheck } from './media-upload/check';
+export { default as NavigationToolSelector } from './navigation-mode-selector';
 export { default as PanelColorSettings } from './panel-color-settings';
 export { default as PlainText } from './plain-text';
 export { default as __experimentalResponsiveBlockControl } from './responsive-block-control';
