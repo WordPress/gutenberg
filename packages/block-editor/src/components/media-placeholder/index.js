@@ -345,7 +345,6 @@ export class MediaPlaceholder extends Component {
 											'block-editor-media-placeholder__button',
 											'block-editor-media-placeholder__upload-button'
 										) }
-										icon="upload"
 									>
 										{ __( 'Upload' ) }
 									</IconButton>

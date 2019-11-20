@@ -1,15 +1,15 @@
 .components-placeholder {
+	position: relative;
 	margin-bottom: $default-block-margin;
 	padding: 1em;
 	min-height: 200px;
 	width: 100%;
-	text-align: center;
+	text-align: left;
 
 	// IE11 doesn't read rules inside this query. They are applied only to modern browsers.
 	@supports (position: sticky) {
 		display: flex;
 		flex-direction: column;
-		align-items: center;
 		justify-content: center;
 	}
 
@@ -30,8 +30,6 @@
 
 .components-placeholder__label {
 	display: flex;
-	align-items: center;
-	justify-content: center;
 	font-weight: 600;
 	margin-bottom: 1em;
 
@@ -46,9 +44,7 @@
 .components-placeholder__fieldset form {
 	display: flex;
 	flex-direction: row;
-	justify-content: center;
 	width: 100%;
-	max-width: 400px;
 	flex-wrap: wrap;
 	z-index: z-index(".components-placeholder__fieldset");
 
@@ -79,7 +75,8 @@
 }
 
 .components-placeholder__fieldset .components-button {
-	margin-right: 4px;
+	margin-right: $grid-size;
+	margin-bottom: $grid-size; // If buttons wrap we need vertical space between.
 
 	&:last-child {
 		margin-right: 0;
@@ -96,5 +93,37 @@
 
 	&:last-child {
 		margin-right: 0;
+	}
+}
+
+// Element queries to show different layouts at various sizes.
+.components-placeholder {
+
+	// Medium and small sizes.
+	&.size-md,
+	&.size-sm {
+		.components-placeholder__instructions {
+			display: none;
+		}
+
+		.components-placeholder__fieldset,
+		.components-placeholder__fieldset form {
+			flex-direction: column;
+		}
+
+		.components-placeholder__fieldset .components-button {
+			margin-right: auto;
+		}
+	}
+
+	// Small sizes.
+	&.size-sm {
+		.block-editor-block-icon {
+			display: none;
+		}
+
+		.components-button {
+			padding: 0 $grid-size 2px;
+		}
 	}
 }

@@ -1,7 +1,9 @@
+jest.mock( 'react-resize-aware' );
 /**
  * External dependencies
  */
 import { shallow } from 'enzyme';
+import useResizeAware from 'react-resize-aware';
 
 /**
  * Internal dependencies
@@ -9,6 +11,8 @@ import { shallow } from 'enzyme';
 import Placeholder from '../';
 
 describe( 'Placeholder', () => {
+	useResizeAware.mockReturnValue( [ <div key="1" />, { width: 320 } ] );
+
 	describe( 'basic rendering', () => {
 		it( 'should by default render label section and fieldset.', () => {
 			const placeholder = shallow( <Placeholder /> );
@@ -51,6 +55,16 @@ describe( 'Placeholder', () => {
 
 			expect( placeholderInstructions.exists() ).toBe( true );
 			expect( child.matchesElement( element ) ).toBe( true );
+		} );
+
+		it( 'should not display an instructions element when smaller than 320px', () => {
+			useResizeAware.mockReturnValue( [ <div key="1" />, { width: 319 } ] );
+			const element = <div>Instructions</div>;
+			const placeholder = shallow(
+				<Placeholder instructions={ element } />
+			);
+			const placeholderInstructions = placeholder.find( '.components-placeholder__instructions' );
+			expect( placeholderInstructions.exists() ).toBe( false );
 		} );
 
 		it( 'should display a fieldset from the children property', () => {
