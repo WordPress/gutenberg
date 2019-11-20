@@ -72,6 +72,7 @@ function MediaPlaceholder( props ) {
 	}
 
 	const emptyStateTitleStyle = getStylesFromColorScheme( styles.emptyStateTitle, styles.emptyStateTitleDark );
+	const addMediaButtonStyle = getStylesFromColorScheme( styles.addMediaButton, styles.addMediaButtonDark );
 
 	const renderContent = () => {
 		if ( isAppender === undefined || ! isAppender ) {
@@ -92,9 +93,9 @@ function MediaPlaceholder( props ) {
 			return (
 				<Dashicon
 					icon="plus-alt"
-					style={ styles.addBlockButton }
-					color={ styles.addBlockButton.color }
-					size={ styles.addBlockButton.size }
+					style={ addMediaButtonStyle }
+					color={ addMediaButtonStyle.color }
+					size={ addMediaButtonStyle.size }
 				/>
 			);
 		}
@@ -104,6 +105,7 @@ function MediaPlaceholder( props ) {
 		return null;
 	}
 
+	const appenderStyle = getStylesFromColorScheme( styles.appender, styles.appenderDark );
 	const emptyStateContainerStyle = getStylesFromColorScheme( styles.emptyStateContainer, styles.emptyStateContainerDark );
 
 	return (
@@ -129,7 +131,7 @@ function MediaPlaceholder( props ) {
 							<View
 								style={ [
 									emptyStateContainerStyle,
-									isAppender && styles.isAppender,
+									isAppender && appenderStyle,
 								] }>
 								{ getMediaOptions() }
 								{ renderContent() }
