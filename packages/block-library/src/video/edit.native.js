@@ -19,6 +19,9 @@ import {
 	Icon,
 	Toolbar,
 	ToolbarButton,
+	PanelBody,
+	ToggleControl,
+	SelectControl,
 } from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import {
@@ -30,6 +33,7 @@ import {
 	BlockControls,
 	VIDEO_ASPECT_RATIO,
 	VideoPlayer,
+	InspectorControls,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { isURL } from '@wordpress/url';
@@ -59,6 +63,7 @@ class VideoEdit extends React.Component {
 		this.onVideoPressed = this.onVideoPressed.bind( this );
 		this.onVideoContanerLayout = this.onVideoContanerLayout.bind( this );
 		this.onFocusCaption = this.onFocusCaption.bind( this );
+		this.toggleAttribute = this.toggleAttribute.bind( this );
 	}
 
 	componentDidMount() {
@@ -81,6 +86,16 @@ class VideoEdit extends React.Component {
 		return {
 			isCaptionSelected: props.isSelected && state.isCaptionSelected,
 		};
+	}
+
+	toggleAttribute( attribute ) {
+		return ( newValue ) => {
+			this.props.setAttributes( { [ attribute ]: newValue } );
+		};
+	}
+
+	getAutoplayHelp( checked ) {
+		return checked ? __( 'Note: Autoplaying videos may cause usability issues for some visitors.' ) : null;
 	}
 
 	onVideoPressed() {
@@ -154,8 +169,17 @@ class VideoEdit extends React.Component {
 	}
 
 	render() {
-		const { attributes, isSelected } = this.props;
-		const { id, src } = attributes;
+		const { setAttributes, attributes, isSelected } = this.props;
+		const {
+			id,
+			src,
+			autoplay,
+			controls,
+			loop,
+			muted,
+			playsInline,
+			preload,
+		} = attributes;
 		const { videoContainerHeight } = this.state;
 
 		const toolbarEditButton = (
@@ -196,6 +220,46 @@ class VideoEdit extends React.Component {
 						<BlockControls>
 							{ toolbarEditButton }
 						</BlockControls> }
+					<InspectorControls>
+						<PanelBody title={ __( 'Video Settings' ) }>
+							<ToggleControl
+								label={ __( 'Autoplay' ) }
+								onChange={ this.toggleAttribute( 'autoplay' ) }
+								checked={ autoplay }
+								help={ this.getAutoplayHelp }
+							/>
+							<ToggleControl
+								label={ __( 'Loop' ) }
+								onChange={ this.toggleAttribute( 'loop' ) }
+								checked={ loop }
+							/>
+							<ToggleControl
+								label={ __( 'Muted' ) }
+								onChange={ this.toggleAttribute( 'muted' ) }
+								checked={ muted }
+							/>
+							<ToggleControl
+								label={ __( 'Playback Controls' ) }
+								onChange={ this.toggleAttribute( 'controls' ) }
+								checked={ controls }
+							/>
+							<ToggleControl
+								label={ __( 'Play inline' ) }
+								onChange={ this.toggleAttribute( 'playsInline' ) }
+								checked={ playsInline }
+							/>
+							<SelectControl
+								label={ __( 'Preload' ) }
+								value={ preload }
+								onChange={ ( value ) => setAttributes( { preload: value } ) }
+								options={ [
+									{ value: 'auto', label: __( 'Auto' ) },
+									{ value: 'metadata', label: __( 'Metadata' ) },
+									{ value: 'none', label: __( 'None' ) },
+								] }
+							/>
+						</PanelBody>
+					</InspectorControls>
 					<MediaUploadProgress
 						mediaId={ id }
 						onFinishMediaUploadWithSuccess={ this.finishMediaUploadWithSuccess }
