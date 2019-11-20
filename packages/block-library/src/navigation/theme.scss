@@ -5,7 +5,7 @@
 	}
 
 	ul > li > ul {
-		background: #e3e3e3;
+		background: #fff;
 		border-radius: 4px;
 		transition: opacity 0.15s linear, transform 0.15s linear, right 0s 0.15s;
 		transform: translateY(0.6rem);
@@ -14,19 +14,9 @@
 			text-decoration: none;
 		}
 
-		&::before {
-			border: solid transparent;
-			border-color: rgba(227, 227, 227, 0);
-			border-bottom-color: #e3e3e3;
-			border-width: 10px;
-			bottom: 100%;
-			content: " ";
-			height: 0;
-			left: 20%;
-			margin-left: -10px;
-			width: 0;
-			position: absolute;
-			pointer-events: none;
+		&::after {
+			border-color: rgba(255, 255, 255, 0);
+			border-bottom-color: #fff;
 		}
 	}
 }
