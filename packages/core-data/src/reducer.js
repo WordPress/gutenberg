@@ -314,7 +314,13 @@ export function undo( state = UNDO_INITIAL_STATE, action ) {
 				! isCreateUndoLevel && ( action.meta.isUndo || action.meta.isRedo );
 			if ( isCreateUndoLevel ) {
 				action = lastEditAction;
-			} else if ( ! isUndoOrRedo ) {
+			} else if (
+				! isUndoOrRedo &&
+				// Don't update the last edit cache if the new one only has transient edits.
+				// Transient edits don't create new levels so updating the cache would make
+				// us skip an edit later when creating levels explicitly.
+				Object.keys( action.edits ).some( ( key ) => ! action.transientEdits[ key ] )
+			) {
 				lastEditAction = action;
 			}
 
