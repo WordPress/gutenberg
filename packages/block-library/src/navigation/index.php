@@ -128,7 +128,6 @@ function register_block_core_navigation() {
 	register_block_type(
 		'core/navigation',
 		array(
-			'category'        => 'layout',
 			'attributes'      => array(
 				'className'        => array(
 					'type' => 'string',
