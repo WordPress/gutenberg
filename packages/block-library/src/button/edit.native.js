@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View } from 'react-native';
+import { View, Platform } from 'react-native';
 /**
  * WordPress dependencies
  */
@@ -26,13 +26,34 @@ const ButtonEdit = ( { attributes, setAttributes, backgroundColor, textColor, is
 	} = attributes;
 
 	return (
-		<View style={ [ { padding: 4 }, isSelected && { borderRadius: BORDER_RADIUS * 2, borderColor: BLUE_COLOR, borderWidth: 1 } ] }>
-			<View style={ { borderRadius: borderRadius || BORDER_RADIUS, overflow: 'hidden', paddingVertical: 10, backgroundColor: backgroundColor.color || BLUE_COLOR } }>
+		<View
+			style={ [
+				{ padding: 4, backgroundColor: 'transparent', alignSelf: 'flex-start' },
+				isSelected && { borderRadius: BORDER_RADIUS * 2, borderColor: BLUE_COLOR, borderWidth: 1 },
+			] }
+		>
+			<View
+				style={ [
+					{
+						borderRadius: borderRadius || BORDER_RADIUS,
+						overflow: 'hidden',
+						backgroundColor: backgroundColor.color || BLUE_COLOR,
+						alignSelf: 'flex-start',
+					},
+					Platform.OS === 'ios' && {	paddingVertical: 10, paddingHorizontal: 16 },
+				] }
+			>
 				<RichText
 					placeholder={ placeholder || __( 'Add text…' ) }
 					value={ text }
 					onChange={ ( value ) => setAttributes( { text: value } ) }
-					style={ { textAlign: 'center', backgroundColor: 'transparent', color: textColor.color || '#fff' } }
+					style={ {
+						backgroundColor: 'transparent',
+						color: textColor.color || '#fff',
+						paddingVertical: 10,
+						paddingHorizontal: 16,
+						minWidth: 108,
+					} }
 					textAlign="center"
 				/>
 			</View>
