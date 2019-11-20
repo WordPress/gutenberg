@@ -1,3 +1,7 @@
+.components-dropdown-menu__indicator::after {
+	@include dropdown-arrow();
+}
+
 .components-dropdown-menu__popover .components-popover__content {
 	width: 200px;
 }

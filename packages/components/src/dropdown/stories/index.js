@@ -11,76 +11,73 @@ export default { title: 'Components|Dropdown', component: Dropdown };
 
 const DropdownAndDropdownMenuExample = () => {
 	return (
-		<div>
-			<DropdownMenu
-				icon="move"
-				label="Select a direction"
-				controls={ [
-					{
-						title: 'Up',
-						icon: 'arrow-up-alt',
-						onClick: () => console.log( 'up' ),
-					},
-					{
-						title: 'Right',
-						icon: 'arrow-right-alt',
-						onClick: () => console.log( 'right' ),
-					},
-					{
-						title: 'Down',
-						icon: 'arrow-down-alt',
-						onClick: () => console.log( 'down' ),
-					},
-					{
-						title: 'Left',
-						icon: 'arrow-left-alt',
-						onClick: () => console.log( 'left' ),
-					},
-				] }
-			/>
-
-			<Dropdown
-				className="my-container-class-name"
-				contentClassName="my-popover-content-classname"
-				position="bottom right"
-				renderToggle={ ( { isOpen, onToggle } ) => (
-					<IconButton
-						icon="move"
-						onClick={ onToggle }
-						aria-expanded={ isOpen }
-						label="Select a direction"
-					/>
-				) }
-				renderContent={ () => (
-					<MenuGroup>
-						<MenuItem
-							icon="arrow-up-alt"
-							onClick={ () => console.log( 'up' ) }
-						>
+		<>
+			<div>
+				<p>This is a DropdownMenu component:</p>
+				<DropdownMenu
+					icon="move"
+					label="Select a direction"
+					controls={ [
+						{
+							title: 'Up',
+							icon: 'arrow-up-alt',
+						},
+						{
+							title: 'Right',
+							icon: 'arrow-right-alt',
+						},
+						{
+							title: 'Down',
+							icon: 'arrow-down-alt',
+						},
+						{
+							title: 'Left',
+							icon: 'arrow-left-alt',
+						},
+					] }
+				/>
+			</div>
+			<div>
+				<p>This is an assembled Dropdown component:</p>
+				<Dropdown
+					className="my-container-class-name"
+					contentClassName="my-popover-content-classname"
+					position="bottom right"
+					renderToggle={ ( { isOpen, onToggle } ) => (
+						<IconButton
+							icon="move"
+							onClick={ onToggle }
+							aria-expanded={ isOpen }
+							label="Select a direction"
+						/>
+					) }
+					renderContent={ () => (
+						<MenuGroup>
+							<MenuItem
+								icon="arrow-up-alt"
+							>
 							Up
-						</MenuItem>
-						<MenuItem
-							icon="arrow-down-alt"
-							onClick={ () => console.log( 'up' ) }
-						>
+							</MenuItem>
+							<MenuItem
+								icon="arrow-down-alt"
+							>
 							Down
-						</MenuItem>
-						<MenuItem
-							icon="arrow-left-alt"
-							onClick={ () => console.log( 'up' ) }
-						>
+							</MenuItem>
+							<MenuItem
+								icon="arrow-left-alt"
+							>
 							Left
-						</MenuItem>
-						<MenuItem
-							icon="arrow-right-alt"
-							onClick={ () => console.log( 'up' ) }
-						>
+							</MenuItem>
+							<MenuItem
+								icon="arrow-right-alt"
+							>
 							Right
-						</MenuItem>
-					</MenuGroup>
-				) }
-			/>
-		</div>
+							</MenuItem>
+						</MenuGroup>
+					) }
+				/>
+			</div>
+		</>
 	);
 };
 
