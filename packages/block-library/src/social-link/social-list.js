@@ -121,7 +121,7 @@ const socialList = {
 		icon: LastfmIcon,
 	},
 	linkedin: {
-		name: 'Linkedin',
+		name: 'LinkedIn',
 		icon: LinkedinIcon,
 	},
 	mail: {
