@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout.LayoutParams;
 
+import androidx.core.util.Consumer;
 import androidx.fragment.app.Fragment;
 
 import com.brentvatne.react.ReactVideoPackage;
@@ -22,6 +23,7 @@ import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactInstanceManagerBuilder;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.ReactRootView;
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.common.LifecycleState;
@@ -77,6 +79,7 @@ public class WPAndroidGlueCode {
     private boolean mShouldUpdateContent;
     private CountDownLatch mGetContentCountDownLatch;
     private WeakReference<View> mLastFocusedView = null;
+    private RequestExecutor mRequestExecutor;
 
     private static final String PROP_NAME_INITIAL_DATA = "initialData";
     private static final String PROP_NAME_INITIAL_TITLE = "initialTitle";
@@ -279,6 +282,11 @@ public class WPAndroidGlueCode {
             }
 
             @Override
+            public void performRequest(String pathFromJS, Consumer<String> onSuccess, Consumer<String> onError) {
+                mRequestExecutor.performRequest(pathFromJS, onSuccess, onError);
+            }
+
+            @Override
             public void requestImageFullscreenPreview(String mediaUrl) {
                 mOnImageFullscreenPreviewListener.onImageFullscreenPreviewClicked(mediaUrl);
             }
@@ -344,6 +352,7 @@ public class WPAndroidGlueCode {
                                   OnEditorMountListener onEditorMountListener,
                                   OnEditorAutosaveListener onEditorAutosaveListener,
                                   OnAuthHeaderRequestedListener onAuthHeaderRequestedListener,
+                                  RequestExecutor fetchExecutor,
                                   OnImageFullscreenPreviewListener onImageFullscreenPreviewListener) {
         MutableContextWrapper contextWrapper = (MutableContextWrapper) mReactRootView.getContext();
         contextWrapper.setBaseContext(viewGroup.getContext());
@@ -352,6 +361,7 @@ public class WPAndroidGlueCode {
         mOnReattachQueryListener = onReattachQueryListener;
         mOnEditorMountListener = onEditorMountListener;
         mOnEditorAutosaveListener = onEditorAutosaveListener;
+        mRequestExecutor = fetchExecutor;
         mOnImageFullscreenPreviewListener = onImageFullscreenPreviewListener;
 
         sAddCookiesInterceptor.setOnAuthHeaderRequestedListener(onAuthHeaderRequestedListener);

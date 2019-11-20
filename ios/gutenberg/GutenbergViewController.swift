@@ -45,6 +45,10 @@ class GutenbergViewController: UIViewController {
 }
 
 extension GutenbergViewController: GutenbergBridgeDelegate {
+    func gutenbergDidRequestFetch(path: String, completion: @escaping (Result<Any, NSError>) -> Void) {
+        completion(Result.success([:]))
+    }
+
     func editorDidAutosave() {
         print("➡️ Editor Did Autosave")
     }
@@ -180,7 +184,6 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
 }
 
 extension GutenbergViewController: GutenbergBridgeDataSource {
-    
     func gutenbergLocale() -> String? {
         return Locale.preferredLanguages.first ?? "en"
     }
