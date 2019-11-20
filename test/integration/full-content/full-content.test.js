@@ -51,7 +51,6 @@ describe( 'full post content fixture', () => {
 		unstable__bootstrapServerSideBlockDefinitions( require( './server-registered.json' ) );
 		const settings = {
 			__experimentalEnableLegacyWidgetBlock: true,
-			__experimentalEnableMenuBlock: true,
 			__experimentalEnableFullSiteEditing: true,
 		};
 		// Load all hooks that modify blocks
