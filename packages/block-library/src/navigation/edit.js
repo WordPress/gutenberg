@@ -103,7 +103,8 @@ function Navigation({
 		clientId
 	);
 
-	let isStillMounted = true;
+	let isMounted = true;
+	let isRequestingPages = false;
 
 	// Builds navigation links from default Pages.
 	const defaultPagesNavigationItems = useMemo(() => {
@@ -125,29 +126,43 @@ function Navigation({
 	}, [pages]);
 
 	useEffect(() => {
+		// Indicate the fetching status
+		isRequestingPages = true;
+
 		const baseUrl = '/wp/v2/pages';
+
+		// "view" is required to ensure Pages are returned by REST API
+		// for users with lower capabilities such as "Contributor" otherwise
+		// Pages are not returned in the request if "edit" context is set
+		const context = 'view';
+
 		const filterDefaultPages = {
 			parent: 0,
 			order: 'asc',
 			orderby: 'id',
-			context: 'view',
+			context,
 		};
+
 		apiFetch({
 			path: addQueryArgs(baseUrl, filterDefaultPages),
 		})
 			.then((pagesList) => {
-				if (isStillMounted) {
+				if (isMounted) {
 					setPages(pagesList);
 				}
+				// We've stopped fetching
+				isRequestingPages = false;
 			})
 			.catch(() => {
-				if (isStillMounted) {
+				if (isMounted) {
 					setPages([]);
 				}
+				// We've stopped fetching
+				isRequestingPages = false;
 			});
 
 		return () => {
-			isStillMounted = false;
+			isMounted = false;
 		};
 	}, []);
 
@@ -174,7 +189,7 @@ function Navigation({
 		selectBlock(clientId);
 	}
 
-	const hasPages = hasResolvedPages && pages && pages.length;
+	const hasPages = pages && pages.length;
 
 	const blockClassNames = classnames(className, {
 		[`items-justified-${attributes.itemsJustification}`]: attributes.itemsJustification,
@@ -190,6 +205,23 @@ function Navigation({
 	if (!hasExistingNavItems) {
 		return (
 			<Block.div>
+				<InspectorControls>
+					{hasPages && (
+						<PanelBody title={__('Navigation Settings')}>
+							<CheckboxControl
+								value={attributes.automaticallyAdd}
+								onChange={(automaticallyAdd) => {
+									setAttributes({ automaticallyAdd });
+									handleCreateFromExistingPages();
+								}}
+								label={__('Automatically add new pages')}
+								help={__(
+									'Automatically add new top level pages to this navigation.'
+								)}
+							/>
+						</PanelBody>
+					)}
+				</InspectorControls>
 				<Placeholder
 					className="wp-block-navigation-placeholder"
 					icon={menu}
@@ -330,29 +362,8 @@ export default compose([
 	withSelect((select, { clientId }) => {
 		const innerBlocks = select('core/block-editor').getBlocks(clientId);
 
-		const filterDefaultPages = {
-			parent: 0,
-			order: 'asc',
-			orderby: 'id',
-		};
-
-		const pagesSelect = [
-			'core',
-			'getEntityRecords',
-			['postType', 'page', filterDefaultPages],
-		];
-
 		return {
 			hasExistingNavItems: !!innerBlocks.length,
-			pages: select('core').getEntityRecords(
-				'postType',
-				'page',
-				filterDefaultPages
-			),
-			isRequestingPages: select('core/data').isResolving(...pagesSelect),
-			hasResolvedPages: select('core/data').hasFinishedResolution(
-				...pagesSelect
-			),
 		};
 	}),
 	withDispatch((dispatch, { clientId }) => {
