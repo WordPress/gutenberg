@@ -24,10 +24,10 @@ const pluginPath = `./${ pluginName }`
 	await replaceInFile( {
 		files: `${ pluginPath }/**`,
 		from: [
-			/block(_|-)plugin\1block\1title/g,
-			/block(_|-)plugin\1block\1name/g,
+			/block-plugin-block-title/g,
+			/block-plugin-block-name/g,
 			/block(_|-)plugin\1name/g,
 		],
-		to: [ blockTitle, blockName, pluginName ],
+		to: [ blockTitle, blockName, pluginName.replace( /-/g, '$1' ) ],
 	} );
 } )();
