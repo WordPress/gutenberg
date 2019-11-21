@@ -112,6 +112,13 @@ function core_social_link_get_icon( $site ) {
 	return $sites['share']['icon'];
 }
 
+/**
+ * Returns the brand name for social link.
+ *
+ * @param string $site The site icon.
+ *
+ * @return string Brand label.
+ */
 function core_social_link_get_name( $site ) {
 	$sites = core_social_link_sites();
 	if ( isset( $sites[ $site ] ) && isset( $sites[ $site ]['name'] ) ) {
@@ -121,6 +128,14 @@ function core_social_link_get_name( $site ) {
 	return $sites['share']['name'];
 }
 
+/**
+ * Returns the SVG for social link.
+ *
+ * @param string $site The site slug to extract data from.
+ * @param string $field The field ('name', 'icon', etc) to extract for a site.
+ *
+ * @return array|string
+ */
 function core_social_link_sites( $site = '', $field = '' ) {
 	$sites_data = array(
 		'fivehundredpx' => array(
@@ -288,7 +303,7 @@ function core_social_link_sites( $site = '', $field = '' ) {
 	if ( ! empty( $site )
 		&& ! empty( $field )
 		&& isset( $sites_data[ $site ] )
-		&& ( 'icon' === $field || 'label' === $field )
+		&& ( 'icon' === $field || 'name' === $field )
 	) {
 		return $sites_data[ $site ][ $field ];
 	} elseif ( ! empty( $site ) && isset( $sites_data[ $site ] ) ) {
