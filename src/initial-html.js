@@ -8,6 +8,12 @@ export default `
 <figure class="wp-block-image"><img alt=""/></figure>
 <!-- /wp:image -->
 
+<!-- wp:media-text -->
+<div class="wp-block-media-text is-stacked-on-mobile"><figure class="wp-block-media-text__media"></figure><div class="wp-block-media-text__content"><!-- wp:paragraph -->
+<p class="has-large-font-size"></p>
+<!-- /wp:paragraph --></div></div>
+<!-- /wp:media-text -->
+
 <!-- wp:image -->
 <figure class="wp-block-image"><img src="https://cldup.com/cXyG__fTLN.jpg" alt=""/></figure>
 <!-- /wp:image -->
@@ -33,6 +39,9 @@ Hello World
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer tempor tincidunt sapien, quis dictum orci sollicitudin quis. Proin sed elit id est pulvinar feugiat vitae eget dolor. Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
 <!-- /wp:paragraph -->
 
+<!-- wp:preformatted -->
+<pre class="wp-block-preformatted">Some <em>preformatted</em> text...<br>And more!</pre>
+<!-- /wp:preformatted -->
 
 <!-- wp:code -->
 <pre class="wp-block-code"><code>if name == "World":

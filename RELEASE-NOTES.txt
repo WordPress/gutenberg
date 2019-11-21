@@ -1,9 +1,41 @@
+1.17.0
+------
+* Include block title in Unsupported block's UI
+* Show new-block-indicator when no blocks at all and when at the last block
+* Use existing links in the clipboard to prefill url field when inserting new link.
+* Media & Text block alignment options
+* Add alignment controls for paragraph blocks
+* [iOS] Fix issue where the keyboard would not capitalize sentences correctly on some cases.
+* [iOS] Support for Pexels image library
+* [Android] Added native fullscreen preview when clicking image from Image Block
+* [iOS] Add support for Preformatted block.
+* [Android] Fix issue when removing image/page break block crashes the app
+
+1.16.1
+------
+* [iOS] Fix tap on links bug that reappear on iOS 13.2
+
+1.16.0
+------
+* [Android] Add support for pexels images
+* Add left, center, and right image alignment controls
+1.15.3
+------
+* [iOS] Fix a layout bug in RCTAztecView in iOS 13.2
+
+1.15.2
+------
+* Fix issue when copy/paste photos from other apps, was not inserting an image on the post.
+* Fix issue where the block inserter layout wasn't correct after device rotation.
+
 1.15.0
 ------
 * Fix issue when multiple media selection adds only one image or video block on Android
 * Fix issue when force Touch app shortcut doesn't work properly selecting "New Photo Post" on iOS
 * Add Link Target (Open in new tab) to Image Block.
 * [iOS] DarkMode improvements.
+* [iOS] Update to iOS 11 and Swift 5
+* New block: Media & Text
 
 1.14.0
 ------

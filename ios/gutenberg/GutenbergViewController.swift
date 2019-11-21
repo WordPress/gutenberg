@@ -45,6 +45,10 @@ class GutenbergViewController: UIViewController {
 }
 
 extension GutenbergViewController: GutenbergBridgeDelegate {
+    func gutenbergDidRequestFetch(path: String, completion: @escaping (Result<Any, NSError>) -> Void) {
+        completion(Result.success([:]))
+    }
+
     func editorDidAutosave() {
         print("➡️ Editor Did Autosave")
     }
@@ -64,8 +68,8 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
         print("↳ HTML: \(html)")
     }
 
-    func gutenbergDidRequestMedia(from source: MediaPickerSource, filter: [MediaFilter]?, allowMultipleSelection: Bool, with callback: @escaping MediaPickerDidPickMediaCallback) {
-        guard let currentFilter = filter?.first else {
+    func gutenbergDidRequestMedia(from source: Gutenberg.MediaSource, filter: [Gutenberg.MediaType], allowMultipleSelection: Bool, with callback: @escaping MediaPickerDidPickMediaCallback) {
+        guard let currentFilter = filter.first else {
             return
         }
         switch source {
@@ -74,15 +78,17 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
             switch currentFilter {
             case .image:
                 if(allowMultipleSelection) {
-                    callback([(1, "https://cldup.com/cXyG__fTLN.jpg", "image"), (3, "https://cldup.com/cXyG__fTLN.jpg", "image")])
+                    callback([MediaInfo(id: 1, url: "https://cldup.com/cXyG__fTLN.jpg", type: "image"),
+                              MediaInfo(id: 3, url: "https://cldup.com/cXyG__fTLN.jpg", type: "image")])
                 } else {
-                    callback([(1, "https://cldup.com/cXyG__fTLN.jpg", "image")])
+                    callback([MediaInfo(id: 1, url: "https://cldup.com/cXyG__fTLN.jpg", type: "image")])
                 }
             case .video:
                 if(allowMultipleSelection) {
-                    callback([(2, "https://i.cloudup.com/YtZFJbuQCE.mov", "video"), (4, "https://i.cloudup.com/YtZFJbuQCE.mov", "video")])
+                    callback([MediaInfo(id: 2, url: "https://i.cloudup.com/YtZFJbuQCE.mov", type: "video"),
+                              MediaInfo(id: 4, url: "https://i.cloudup.com/YtZFJbuQCE.mov", type: "video")])
                 } else {
-                    callback([(2, "https://i.cloudup.com/YtZFJbuQCE.mov", "video")])
+                    callback([MediaInfo(id: 2, url: "https://i.cloudup.com/YtZFJbuQCE.mov", type: "video")])
                 }
             default:
                 break
@@ -93,21 +99,22 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
         case .deviceCamera:
             print("Gutenberg did request a device media picker, opening the camera picker")
             pickAndUpload(from: .camera, filter: currentFilter, callback: callback)
+        default: break
         }
     }
 
-    func gutenbergDidRequestImport(from url: URL, with callback: @escaping MediaPickerDidPickMediaCallback) {
+    func gutenbergDidRequestImport(from url: URL, with callback: @escaping MediaImportCallback) {
         let id = mediaUploadCoordinator.upload(url: url)
-        callback([(id, url.absoluteString, "image")])
+        callback(MediaInfo(id: id, url: url.absoluteString, type: "image"))
     }
 
-    func pickAndUpload(from source: UIImagePickerController.SourceType, filter: MediaFilter, callback: @escaping MediaPickerDidPickMediaCallback) {
+    func pickAndUpload(from source: UIImagePickerController.SourceType, filter: Gutenberg.MediaType, callback: @escaping MediaPickerDidPickMediaCallback) {
         mediaPickCoordinator = MediaPickCoordinator(presenter: self, filter: filter, callback: { (url) in
             guard let url = url, let mediaID = self.mediaUploadCoordinator.upload(url: url) else {
-                callback([(nil, nil, nil)])
+                callback([MediaInfo(id: nil, url: nil, type: nil)])
                 return
             }
-            callback([(mediaID, url.absoluteString, "image")])
+            callback([MediaInfo(id: mediaID, url: url.absoluteString, type: "image")])
             self.mediaPickCoordinator = nil
         } )
         mediaPickCoordinator?.pick(from: source)
@@ -177,7 +184,6 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
 }
 
 extension GutenbergViewController: GutenbergBridgeDataSource {
-    
     func gutenbergLocale() -> String? {
         return Locale.preferredLanguages.first ?? "en"
     }

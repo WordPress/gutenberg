@@ -12,7 +12,7 @@ buildscript {
         wordpressUtilsVersion = '1.22'
         espressoVersion = '3.0.1'
 
-        aztecVersion = 'v1.3.31'
+        aztecVersion = 'v1.3.34'
     }
 
     repositories {
@@ -97,11 +97,11 @@ dependencies {
     api ("com.github.wordpress-mobile.WordPress-Aztec-Android:wordpress-shortcodes:$aztecVersion")
     api ("com.github.wordpress-mobile.WordPress-Aztec-Android:wordpress-comments:$aztecVersion")
     api ("com.github.wordpress-mobile.WordPress-Aztec-Android:glide-loader:$aztecVersion")
+    api "org.wordpress:utils:$wordpressUtilsVersion"
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
 
     implementation 'androidx.appcompat:appcompat:1.0.0'
-    implementation "org.wordpress:utils:$wordpressUtilsVersion"
 
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.gridlayout:gridlayout:1.0.0'

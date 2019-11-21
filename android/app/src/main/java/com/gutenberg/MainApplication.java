@@ -3,6 +3,8 @@ package com.gutenberg;
 import android.app.Application;
 import android.util.Log;
 
+import androidx.core.util.Consumer;
+
 import com.facebook.react.ReactApplication;
 import com.brentvatne.react.ReactVideoPackage;
 import com.facebook.react.bridge.ReadableArray;
@@ -36,7 +38,7 @@ public class MainApplication extends Application implements ReactApplication {
             }
 
             @Override
-            public void requestMediaImport(String url, MediaSelectedCallback mediaSelectedCallback) {
+            public void requestMediaImport(String url, MediaUploadCallback mediaUploadCallback) {
             }
 
             @Override
@@ -48,7 +50,7 @@ public class MainApplication extends Application implements ReactApplication {
             }
 
             @Override
-            public void requestMediaPickFromMediaLibrary(MediaSelectedCallback mediaSelectedCallback, Boolean allowMultipleSelection, MediaType mediaType) {
+            public void requestMediaPickFromMediaLibrary(MediaUploadCallback mediaUploadCallback, Boolean allowMultipleSelection, MediaType mediaType) {
             }
 
 
@@ -77,6 +79,21 @@ public class MainApplication extends Application implements ReactApplication {
             }
 
             @Override
+            public void getOtherMediaPickerOptions(OtherMediaOptionsReceivedCallback otherMediaOptionsReceivedCallback, MediaType mediaType) {
+
+            }
+
+            @Override
+            public void requestMediaPickFrom(String mediaSource, MediaUploadCallback mediaUploadCallback, Boolean allowMultipleSelection) {
+
+            }
+
+            @Override
+            public void requestImageFullscreenPreview(String mediaUrl) {
+
+            }
+
+            @Override
             public void editorDidEmitLog(String message, LogLevel logLevel) {
                 switch (logLevel) {
                     case TRACE:
@@ -93,6 +110,9 @@ public class MainApplication extends Application implements ReactApplication {
                         break;
                 }
             }
+
+            @Override
+            public void performRequest(String path, Consumer<String> onSuccess, Consumer<String> onError) {}
         });
 
         return new ReactNativeHost(this) {
