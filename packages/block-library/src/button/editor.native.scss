@@ -1,0 +1,16 @@
+.richTextWrapper {
+	overflow: hidden;
+	align-self: flex-start;
+}
+
+.container {
+	padding: $block-spacing;
+	background-color: transparent;
+	align-self: flex-start;
+}
+
+.selected {
+	border-radius: $radius-round-rectangle * 2;
+	border-color: $blue-wordpress;
+	border-width: $border-width;
+}
