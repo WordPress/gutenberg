@@ -1,0 +1,15 @@
+{
+	"name": "block-plugin-name",
+	"version": "1.0.0",
+	"main": "plugin.php",
+	"scripts": {
+		"start": "wp-env start",
+		"dev": "wp-scripts start",
+		"build": "wp-scripts build"
+	},
+	"license": "GPL-2.0-or-later",
+	"devDependencies": {
+		"@wordpress/env": "^0.1.0",
+		"@wordpress/scripts": "^6.0.0"
+	}
+}
