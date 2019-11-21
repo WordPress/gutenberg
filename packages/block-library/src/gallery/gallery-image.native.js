@@ -222,7 +222,8 @@ class GalleryImage extends Component {
 							<View style={ style.captionContainer }>
 								<ScrollView nestedScrollEnabled>
 									<RichText
-										tagName="figcaption"
+										// tagName="figcaption"
+										tagName="" // needed to keep center alignment ?
 										placeholder={ isSelected ? __( 'Write caption…' ) : null }
 										value={ caption }
 										isSelected={ this.state.captionSelected }
@@ -230,6 +231,7 @@ class GalleryImage extends Component {
 										unstableOnFocus={ this.onSelectCaption }
 										fontSize={ captionStyle.fontSize }
 										style={ captionStyle }
+										textAlign={ captionStyle.textAlign }
 										placeholderTextColor={ captionPlaceholderStyle.color }
 										__experimentalForceBlurOnUnmount
 										inlineToolbar
