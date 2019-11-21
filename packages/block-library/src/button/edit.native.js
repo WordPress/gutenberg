@@ -19,6 +19,7 @@ import {
 	TextControl,
 	ToggleControl,
 	PanelBody,
+	RangeControl,
 } from '@wordpress/components';
 import {
 	useCallback,
@@ -61,11 +62,17 @@ const ButtonEdit = ( { attributes, setAttributes, backgroundColor, textColor, is
 		[ rel, setAttributes ]
 	);
 
+	const changeAttribute = ( value ) => {
+		setAttributes( {
+			borderRadius: value,
+		} );
+	};
+
 	return (
 		<View
 			style={ [
 				styles.container,
-				isSelected && styles.selected,
+				isSelected && { ...styles.selected, borderRadius: ( borderRadius || 4 ) + 5 },
 			] }
 		>
 			<View
@@ -89,11 +96,22 @@ const ButtonEdit = ( { attributes, setAttributes, backgroundColor, textColor, is
 				/>
 			</View>
 			<InspectorControls>
+				<PanelBody title={ __( 'Border Settings' ) } >
+					<RangeControl
+						label={ __( 'Border Radius' ) }
+						minimumValue={ 0 }
+						maximumValue={ 50 }
+						value={ borderRadius || 4 }
+						onChange={ changeAttribute }
+						separatorType="none"
+					/>
+				</PanelBody>
 				<PanelBody title={ __( 'Link Settings' ) } >
 					<ToggleControl
 						label={ __( 'Open in new tab' ) }
 						checked={ linkTarget === '_blank' }
 						onChange={ onToggleOpenInNewTab }
+						separatorType="fullWidth"
 					/>
 					<TextControl
 						label={ __( 'Link Rel' ) }
@@ -102,6 +120,7 @@ const ButtonEdit = ( { attributes, setAttributes, backgroundColor, textColor, is
 						onChange={ ( value ) => setAttributes( { url: value } ) }
 						autoCapitalize="none"
 						autoCorrect={ false }
+						separatorType="none"
 						keyboardType="url"
 					/>
 				</PanelBody>
