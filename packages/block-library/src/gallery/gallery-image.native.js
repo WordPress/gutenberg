@@ -87,6 +87,10 @@ class GalleryImage extends Component {
 	}
 
 	onSelectImage() {
+		if ( ! this.props.isBlockSelected ) {
+			this.props.onSelectBlock();
+		}
+
 		if ( ! this.props.isSelected ) {
 			this.props.onSelect();
 		}
@@ -261,7 +265,6 @@ class GalleryImage extends Component {
 		return (
 			<TouchableWithoutFeedback
 				onPress={ this.onMediaPressed }
-				disabled={ ! isBlockSelected }
 			>
 				<View style={ containerStyle }>
 					<MediaUploadProgress
