@@ -159,11 +159,18 @@ class GalleryImage extends Component {
 			isSelected ? style.overlaySelected : undefined,
 		);
 
-		const captionStyle = getStylesFromColorScheme( style.caption, style.captionDark );
 		const captionPlaceholderStyle = getStylesFromColorScheme( style.captionPlaceholder, style.captionPlaceholderDark );
 
 		const shouldShowCaptionEditable = ! isUploadFailed && isSelected;
-		const shouldShowCaptionEllipsis = ! isUploadFailed && ( ! isSelected && !! caption );
+		const shouldShowCaptionExpanded = ! isUploadFailed && ( ! isSelected && !! caption );
+
+		const captionContainerStyle = shouldShowCaptionExpanded ?
+			style.captionExpandedContainer :
+			style.captionContainer;
+
+		const captionStyle = shouldShowCaptionExpanded ?
+			style.captionExpanded :
+			getStylesFromColorScheme( style.caption, style.captionDark );
 
 		return (
 			<>
@@ -218,9 +225,9 @@ class GalleryImage extends Component {
 								/>
 							</View>
 						) }
-						{ shouldShowCaptionEditable && (
-							<View style={ style.captionContainer }>
-								<ScrollView nestedScrollEnabled>
+						{ ( shouldShowCaptionEditable || shouldShowCaptionExpanded ) && (
+							<View style={ captionContainerStyle }>
+								<ScrollView nestedScrollEnabled keyboardShouldPersistTaps="handled">
 									<RichText
 										// tagName="figcaption"
 										tagName="" // needed to keep center alignment ?
@@ -233,20 +240,12 @@ class GalleryImage extends Component {
 										style={ captionStyle }
 										textAlign={ captionStyle.textAlign }
 										placeholderTextColor={ captionPlaceholderStyle.color }
-										__experimentalForceBlurOnUnmount
 										inlineToolbar
 									/>
 								</ScrollView>
 							</View>
 						) }
 					</>
-					) }
-					{ shouldShowCaptionEllipsis && (
-						<View style={ style.captionEllipsisContainer }>
-							<Text style={ style.captionEllipsis } numberOfLines={ 1 }>
-								{ caption }
-							</Text>
-						</View>
 					) }
 				</View>
 			</>

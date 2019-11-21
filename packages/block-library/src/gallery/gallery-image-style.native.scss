@@ -143,9 +143,10 @@
 }
 */
 
-// expand caption in ellipsis mode to compensate for overlay border
-.captionEllipsisContainer {
+// expand caption container to compensate for overlay border
+.captionExpandedContainer {
 	$width: get-overlay-border-width();
+	max-height: $min-height-paragraph + $width;
 	position: absolute;
 	bottom: - $width;
 	left: - $width;
@@ -153,11 +154,10 @@
 	padding-bottom: $width;
 	padding-left: $width;
 	padding-right: $width;
-	// use caption background color on container in ellipsis mode
+	// use caption background color on container when expanded
 	background-color: get-caption-background-color();
 }
 
-.captionEllipsis {
+.captionExpanded {
 	@include caption-shared;
-	padding-top: 15px;
 }
