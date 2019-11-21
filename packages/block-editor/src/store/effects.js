@@ -123,11 +123,13 @@ export default {
 			const {
 				multiline: multilineTag,
 				__unstableMultilineWrapperTags: multilineWrapperTags,
+				__unstablePreserveWhiteSpace: preserveWhiteSpace,
 			} = attributeDefinition;
 			const value = insert( create( {
 				html,
 				multilineTag,
 				multilineWrapperTags,
+				preserveWhiteSpace,
 			} ), START_OF_SELECTED_AREA, offset, offset );
 
 			selectedBlock.attributes[ attributeKey ] = toHTMLString( {
@@ -161,11 +163,13 @@ export default {
 			const {
 				multiline: multilineTag,
 				__unstableMultilineWrapperTags: multilineWrapperTags,
+				__unstablePreserveWhiteSpace: preserveWhiteSpace,
 			} = blockAType.attributes[ newAttributeKey ];
 			const convertedValue = create( {
 				html: convertedHtml,
 				multilineTag,
 				multilineWrapperTags,
+				preserveWhiteSpace,
 			} );
 			const newOffset = convertedValue.text.indexOf( START_OF_SELECTED_AREA );
 			const newValue = remove( convertedValue, newOffset, newOffset + 1 );
