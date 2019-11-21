@@ -44,7 +44,6 @@ import BlockHtml from './block-html';
 import BlockBreadcrumb from './breadcrumb';
 import BlockContextualToolbar from './block-contextual-toolbar';
 import BlockMultiControls from './multi-controls';
-import BlockMobileToolbar from './block-mobile-toolbar';
 import BlockInsertionPoint from './insertion-point';
 import IgnoreNestedEvents from '../ignore-nested-events';
 import InserterWithShortcuts from '../inserter-with-shortcuts';
@@ -102,6 +101,7 @@ function BlockListBlock( {
 	enableAnimation,
 	isNavigationMode,
 	enableNavigationMode,
+	isLargeViewport,
 } ) {
 	// Random state used to rerender the component if needed, ideally we don't need this
 	const [ , updateRerenderState ] = useState( {} );
@@ -410,12 +410,12 @@ function BlockListBlock( {
 	const shouldShowContextualToolbar =
 		! isNavigationMode &&
 		! hasFixedToolbar &&
+		isLargeViewport &&
 		! showEmptyBlockSideInserter &&
 		(
 			( isSelected && ( ! isTypingWithinBlock || isCaretWithinFormattedText ) ) ||
 			isFirstMultiSelected
 		);
-	const shouldShowMobileToolbar = ! isNavigationMode && shouldAppearSelected;
 
 	// Insertion point can only be made visible if the block is at the
 	// the extent of a multi-selection, or not in a multi-selection.
@@ -589,9 +589,6 @@ function BlockListBlock( {
 						] }
 					</BlockCrashBoundary>
 					{ !! hasError && <BlockCrashWarning /> }
-					{ shouldShowMobileToolbar && (
-						<BlockMobileToolbar clientId={ clientId } moverDirection={ moverDirection } />
-					) }
 				</IgnoreNestedEvents>
 			</div>
 			{ showInserterShortcuts && (

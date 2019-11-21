@@ -23,7 +23,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import styles from './block.scss';
 import BlockEdit from '../block-edit';
 import BlockInvalidWarning from './block-invalid-warning';
-import BlockMobileToolbar from './block-mobile-toolbar';
+import BlockMobileToolbar from '../block-mobile-toolbar';
 import FloatingToolbar from './block-mobile-floating-toolbar';
 import Breadcrumbs from './breadcrumb';
 import NavigateUpSVG from './nav-up-icon';
