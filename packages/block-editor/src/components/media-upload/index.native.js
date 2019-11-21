@@ -89,6 +89,7 @@ export class MediaUpload extends React.Component {
 		const { allowedTypes = [], multiple = false } = this.props;
 
 		// disable upload sources for now when multiple flag is set
+		// eslint-disable-next-line no-undef
 		if ( ! __DEV__ ) {
 			if ( allowedTypes.includes( MEDIA_TYPE_IMAGE ) && multiple ) {
 				return [ siteLibrarySource ];
