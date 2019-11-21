@@ -135,6 +135,7 @@ export default {
 			selectedBlock.attributes[ attributeKey ] = toHTMLString( {
 				value,
 				multilineTag,
+				preserveWhiteSpace,
 			} );
 		}
 
@@ -173,7 +174,11 @@ export default {
 			} );
 			const newOffset = convertedValue.text.indexOf( START_OF_SELECTED_AREA );
 			const newValue = remove( convertedValue, newOffset, newOffset + 1 );
-			const newHtml = toHTMLString( { value: newValue, multilineTag } );
+			const newHtml = toHTMLString( {
+				value: newValue,
+				multilineTag,
+				preserveWhiteSpace,
+			} );
 
 			updatedAttributes[ newAttributeKey ] = newHtml;
 
