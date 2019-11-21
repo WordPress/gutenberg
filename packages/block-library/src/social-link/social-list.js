@@ -207,3 +207,7 @@ export default socialList;
 export const getIconBySite = ( site ) => {
 	return socialList[ site ].icon;
 };
+
+export const getNameBySite = ( site ) => {
+	return socialList[ site ].name;
+};
