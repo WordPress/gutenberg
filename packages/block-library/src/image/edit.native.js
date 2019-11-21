@@ -2,7 +2,7 @@
  * External dependencies
  */
 import React from 'react';
-import { View, ImageBackground, Text, TouchableWithoutFeedback, Dimensions, Platform } from 'react-native';
+import { View, ImageBackground, Text, TouchableWithoutFeedback, Dimensions } from 'react-native';
 import {
 	requestMediaImport,
 	mediaUploadSync,
@@ -144,7 +144,7 @@ export class ImageEdit extends React.Component {
 			requestImageUploadCancelDialog( attributes.id );
 		} else if ( attributes.id && ! isURL( attributes.url ) ) {
 			requestImageFailedRetryDialog( attributes.id );
-		} else if ( Platform.OS === 'android' ) {
+		} else if ( ! this.state.isCaptionSelected ) {
 			requestImageFullscreenPreview( attributes.url );
 		}
 
@@ -374,7 +374,7 @@ export class ImageEdit extends React.Component {
 						renderContent={ ( { isUploadInProgress, isUploadFailed, finalWidth, finalHeight, imageWidthWithinContainer, retryMessage } ) => {
 							const opacity = isUploadInProgress ? 0.3 : 1;
 							const icon = this.getIcon( isUploadFailed );
-							const imageBorderOnSelectedStyle = isSelected && ! ( isUploadInProgress || isUploadFailed ) ? styles.imageBorder : '';
+							const imageBorderOnSelectedStyle = isSelected && ! ( isUploadInProgress || isUploadFailed || this.state.isCaptionSelected ) ? styles.imageBorder : '';
 
 							const iconContainer = (
 								<View style={ styles.modalIcon }>
