@@ -590,7 +590,7 @@ export const EXPECTED_TRANSFORMS = {
 		availableTransforms: [
 			'Group',
 		],
-		originalBlock: 'Linkedin',
+		originalBlock: 'LinkedIn',
 	},
 	'core__social-link-mail': {
 		availableTransforms: [
