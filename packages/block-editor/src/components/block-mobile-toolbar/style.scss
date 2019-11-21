@@ -1,0 +1,29 @@
+.block-editor-block-mobile-toolbar {
+	display: flex;
+	flex-direction: row;
+	border-right: $border-width solid $light-gray-500;
+
+	.block-editor-block-mover__control {
+		width: $icon-button-size;
+		height: $icon-button-size;
+		border-radius: $radius-round-rectangle;
+		padding: 3px;
+		margin: 0;
+		justify-content: center;
+		align-items: center;
+
+		.dashicon {
+			margin: auto;
+		}
+	}
+
+	// Movers
+	.block-editor-block-mover {
+		display: flex;
+		margin-right: auto;
+
+		.block-editor-block-mover__control {
+			float: left;
+		}
+	}
+}
