@@ -232,9 +232,3 @@
 .components-popover .components-datetime__date {
 	padding-left: 4px;
 }
-
-// Used to prevent z-index issues on mobile.
-// See: https://github.com/WordPress/gutenberg/pull/7621#issuecomment-424322735
-.components-popover.edit-post-post-schedule__dialog.is-bottom.is-left {
-	z-index: 100000;
-}
