@@ -155,7 +155,7 @@ const applyWithDispatch = withDispatch( ( dispatch, { noticeOperations }, { sele
 		onDropImage( filesList ) {
 			select( 'core/block-editor' )
 				.getSettings()
-				.__experimentalMediaUpload( {
+				.mediaUpload( {
 					allowedTypes: [ 'image' ],
 					filesList,
 					onFileChange( [ image ] ) {
