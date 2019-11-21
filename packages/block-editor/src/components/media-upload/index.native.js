@@ -86,7 +86,14 @@ export class MediaUpload extends React.Component {
 	}
 
 	getMediaOptionsItems() {
-		const { allowedTypes = [] } = this.props;
+		const { allowedTypes = [], multiple = false } = this.props;
+
+		// disable upload sources for now when multiple flag is set
+		if ( ! __DEV__ ) {
+			if ( allowedTypes.includes( MEDIA_TYPE_IMAGE ) && multiple ) {
+				return [ siteLibrarySource ];
+			}
+		}
 
 		return this.getAllSources().filter( ( source ) => {
 			return allowedTypes.filter( ( allowedType ) => source.types.includes( allowedType ) ).length > 0;
