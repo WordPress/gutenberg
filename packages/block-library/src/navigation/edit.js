@@ -7,7 +7,13 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useMemo, Fragment, useRef } from '@wordpress/element';
+import {
+	useMemo,
+	Fragment,
+	useRef,
+	useState,
+	useEffect,
+} from '@wordpress/element';
 import {
 	InnerBlocks,
 	InspectorControls,
@@ -17,6 +23,8 @@ import {
 	__experimentalUseColors,
 	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
+
+import apiFetch from '@wordpress/api-fetch';
 
 import { createBlock } from '@wordpress/blocks';
 import { useDispatch, withSelect, withDispatch } from '@wordpress/data';
@@ -32,6 +40,7 @@ import {
 import { compose } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { menu } from '@wordpress/icons';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -41,7 +50,7 @@ import BlockNavigationList from './block-navigation-list';
 import BlockColorsStyleSelector from './block-colors-selector';
 import * as navIcons from './icons';
 
-function Navigation( {
+function Navigation({
 	attributes,
 	clientId,
 	fontSize,
@@ -53,13 +62,13 @@ function Navigation( {
 	setFontSize,
 	updateNavItemBlocks,
 	className,
-} ) {
+}) {
 	//
 	// HOOKS
 	//
 	/* eslint-disable @wordpress/no-unused-vars-before-return */
 	const ref = useRef();
-	const { selectBlock } = useDispatch( 'core/block-editor' );
+	const { selectBlock } = useDispatch('core/block-editor');
 
 	const {
 		TextColor,
@@ -84,62 +93,93 @@ function Navigation( {
 				initialOpen: true,
 			},
 		},
-		[ fontSize.size ]
+		[fontSize.size]
 	);
+
+	const [pages, setPages] = useState(null);
 
 	/* eslint-enable @wordpress/no-unused-vars-before-return */
 	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator(
 		clientId
 	);
 
+	let isStillMounted = true;
+
 	// Builds navigation links from default Pages.
-	const defaultPagesNavigationItems = useMemo( () => {
-		if ( ! pages ) {
+	const defaultPagesNavigationItems = useMemo(() => {
+		if (!pages) {
 			return null;
 		}
 
-		return pages.map( ( { title, type, link: url, id } ) =>
-			createBlock( 'core/navigation-link', {
+		return pages.map(({ title, type, link: url, id }) =>
+			createBlock('core/navigation-link', {
 				type,
 				id,
 				url,
-				label: ! title.rendered
-					? __( '(no title)' )
-					: escape( title.rendered ),
+				label: !title.rendered
+					? __('(no title)')
+					: escape(title.rendered),
 				opensInNewTab: false,
-			} )
+			})
 		);
-	}, [ pages ] );
+	}, [pages]);
+
+	useEffect(() => {
+		const baseUrl = '/wp/v2/pages';
+		const filterDefaultPages = {
+			parent: 0,
+			order: 'asc',
+			orderby: 'id',
+			context: 'view',
+		};
+		apiFetch({
+			path: addQueryArgs(baseUrl, filterDefaultPages),
+		})
+			.then((pagesList) => {
+				if (isStillMounted) {
+					setPages(pagesList);
+				}
+			})
+			.catch(() => {
+				if (isStillMounted) {
+					setPages([]);
+				}
+			});
+
+		return () => {
+			isStillMounted = false;
+		};
+	}, []);
 
 	//
 	// HANDLERS
 	//
-	function handleItemsAlignment( align ) {
+	function handleItemsAlignment(align) {
 		return () => {
 			const itemsJustification =
 				attributes.itemsJustification === align ? undefined : align;
-			setAttributes( {
+			setAttributes({
 				itemsJustification,
-			} );
+			});
 		};
 	}
 
 	function handleCreateEmpty() {
-		const emptyNavLinkBlock = createBlock( 'core/navigation-link' );
-		updateNavItemBlocks( [ emptyNavLinkBlock ] );
+		const emptyNavLinkBlock = createBlock('core/navigation-link');
+		updateNavItemBlocks([emptyNavLinkBlock]);
 	}
 
 	function handleCreateFromExistingPages() {
-		updateNavItemBlocks( defaultPagesNavigationItems );
-		selectBlock( clientId );
+		updateNavItemBlocks(defaultPagesNavigationItems);
+		selectBlock(clientId);
 	}
 
 	const hasPages = hasResolvedPages && pages && pages.length;
 
-	const blockClassNames = classnames( className, {
-		[ `items-justified-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
-		[ fontSize.class ]: fontSize.class,
-	} );
+	const blockClassNames = classnames(className, {
+		[`items-justified-${attributes.itemsJustification}`]: attributes.itemsJustification,
+		[fontSize.class]: fontSize.class,
+	});
 	const blockInlineStyles = {
 		fontSize: fontSize.size ? fontSize.size + 'px' : undefined,
 	};
@@ -147,36 +187,36 @@ function Navigation( {
 	// If we don't have existing items or the User hasn't
 	// indicated they want to automatically add top level Pages
 	// then show the Placeholder
-	if ( ! hasExistingNavItems ) {
+	if (!hasExistingNavItems) {
 		return (
 			<Block.div>
 				<Placeholder
 					className="wp-block-navigation-placeholder"
-					icon={ menu }
-					label={ __( 'Navigation' ) }
-					instructions={ __(
+					icon={menu}
+					label={__('Navigation')}
+					instructions={__(
 						'Create a Navigation from all existing pages, or create an empty one.'
-					) }
+					)}
 				>
 					<div
-						ref={ ref }
+						ref={ref}
 						className="wp-block-navigation-placeholder__buttons"
 					>
 						<Button
 							isPrimary
 							className="wp-block-navigation-placeholder__button"
-							onClick={ handleCreateFromExistingPages }
-							disabled={ ! hasPages }
+							onClick={handleCreateFromExistingPages}
+							disabled={!hasPages}
 						>
-							{ __( 'Create from all top-level pages' ) }
+							{__('Create from all top-level pages')}
 						</Button>
 
 						<Button
 							isLink
 							className="wp-block-navigation-placeholder__button"
-							onClick={ handleCreateEmpty }
+							onClick={handleCreateEmpty}
 						>
-							{ __( 'Create empty' ) }
+							{__('Create empty')}
 						</Button>
 					</div>
 				</Placeholder>
@@ -192,91 +232,91 @@ function Navigation( {
 					icon={
 						attributes.itemsJustification
 							? navIcons[
-									`justify${ upperFirst(
+									`justify${upperFirst(
 										attributes.itemsJustification
-									) }Icon`
+									)}Icon`
 							  ]
 							: navIcons.justifyLeftIcon
 					}
-					label={ __( 'Change items justification' ) }
+					label={__('Change items justification')}
 					isCollapsed
-					controls={ [
+					controls={[
 						{
 							icon: navIcons.justifyLeftIcon,
-							title: __( 'Justify items left' ),
+							title: __('Justify items left'),
 							isActive: 'left' === attributes.itemsJustification,
-							onClick: handleItemsAlignment( 'left' ),
+							onClick: handleItemsAlignment('left'),
 						},
 						{
 							icon: navIcons.justifyCenterIcon,
-							title: __( 'Justify items center' ),
+							title: __('Justify items center'),
 							isActive:
 								'center' === attributes.itemsJustification,
-							onClick: handleItemsAlignment( 'center' ),
+							onClick: handleItemsAlignment('center'),
 						},
 						{
 							icon: navIcons.justifyRightIcon,
-							title: __( 'Justify items right' ),
+							title: __('Justify items right'),
 							isActive: 'right' === attributes.itemsJustification,
-							onClick: handleItemsAlignment( 'right' ),
+							onClick: handleItemsAlignment('right'),
 						},
-					] }
+					]}
 				/>
-				<ToolbarGroup>{ navigatorToolbarButton }</ToolbarGroup>
+				<ToolbarGroup>{navigatorToolbarButton}</ToolbarGroup>
 
 				<BlockColorsStyleSelector
-					TextColor={ TextColor }
-					BackgroundColor={ BackgroundColor }
+					TextColor={TextColor}
+					BackgroundColor={BackgroundColor}
 				>
-					{ ColorPanel }
+					{ColorPanel}
 				</BlockColorsStyleSelector>
 			</BlockControls>
-			{ navigatorModal }
+			{navigatorModal}
 			<InspectorControls>
-				<PanelBody title={ __( 'Navigation Structure' ) }>
-					<BlockNavigationList clientId={ clientId } />
+				<PanelBody title={__('Navigation Structure')}>
+					<BlockNavigationList clientId={clientId} />
 				</PanelBody>
-				<PanelBody title={ __( 'Text settings' ) }>
+				<PanelBody title={__('Text settings')}>
 					<FontSizePicker
-						value={ fontSize.size }
-						onChange={ setFontSize }
+						value={fontSize.size}
+						onChange={setFontSize}
 					/>
 				</PanelBody>
 			</InspectorControls>
-			{ InspectorControlsColorPanel }
+			{InspectorControlsColorPanel}
 			<InspectorControls>
-				<PanelBody title={ __( 'Display settings' ) }>
+				<PanelBody title={__('Display settings')}>
 					<ToggleControl
-						checked={ attributes.showSubmenuIcon }
-						onChange={ ( value ) => {
-							setAttributes( { showSubmenuIcon: value } );
-						} }
-						label={ __( 'Show submenu indicator icons' ) }
+						checked={attributes.showSubmenuIcon}
+						onChange={(value) => {
+							setAttributes({ showSubmenuIcon: value });
+						}}
+						label={__('Show submenu indicator icons')}
 					/>
 				</PanelBody>
 			</InspectorControls>
 			<TextColor>
 				<BackgroundColor>
 					<Block.nav
-						className={ blockClassNames }
-						style={ blockInlineStyles }
+						className={blockClassNames}
+						style={blockInlineStyles}
 					>
-						{ ! hasExistingNavItems && isRequestingPages && (
+						{!hasExistingNavItems && isRequestingPages && (
 							<>
-								<Spinner /> { __( 'Loading Navigation…' ) }{ ' ' }
+								<Spinner /> {__('Loading Navigation…')}{' '}
 							</>
-						) }
+						)}
 						<InnerBlocks
-							ref={ ref }
-							allowedBlocks={ [ 'core/navigation-link' ] }
-							templateInsertUpdatesSelection={ false }
-							__experimentalMoverDirection={ 'horizontal' }
+							ref={ref}
+							allowedBlocks={['core/navigation-link']}
+							templateInsertUpdatesSelection={false}
+							__experimentalMoverDirection={'horizontal'}
 							__experimentalTagName="ul"
 							__experimentalAppenderTagName="li"
-							__experimentalPassedProps={ {
+							__experimentalPassedProps={{
 								className: 'wp-block-navigation__container',
-							} }
-							__experimentalCaptureToolbars={ true }
+							}}
+							__experimentalCaptureToolbars={true}
 						/>
 					</Block.nav>
 				</BackgroundColor>
@@ -285,10 +325,10 @@ function Navigation( {
 	);
 }
 
-export default compose( [
-	withFontSizes( 'fontSize' ),
-	withSelect( ( select, { clientId } ) => {
-		const innerBlocks = select( 'core/block-editor' ).getBlocks( clientId );
+export default compose([
+	withFontSizes('fontSize'),
+	withSelect((select, { clientId }) => {
+		const innerBlocks = select('core/block-editor').getBlocks(clientId);
 
 		const filterDefaultPages = {
 			parent: 0,
@@ -299,32 +339,30 @@ export default compose( [
 		const pagesSelect = [
 			'core',
 			'getEntityRecords',
-			[ 'postType', 'page', filterDefaultPages ],
+			['postType', 'page', filterDefaultPages],
 		];
 
 		return {
-			hasExistingNavItems: !! innerBlocks.length,
-			pages: select( 'core' ).getEntityRecords(
+			hasExistingNavItems: !!innerBlocks.length,
+			pages: select('core').getEntityRecords(
 				'postType',
 				'page',
 				filterDefaultPages
 			),
-			isRequestingPages: select( 'core/data' ).isResolving(
-				...pagesSelect
-			),
-			hasResolvedPages: select( 'core/data' ).hasFinishedResolution(
+			isRequestingPages: select('core/data').isResolving(...pagesSelect),
+			hasResolvedPages: select('core/data').hasFinishedResolution(
 				...pagesSelect
 			),
 		};
-	} ),
-	withDispatch( ( dispatch, { clientId } ) => {
+	}),
+	withDispatch((dispatch, { clientId }) => {
 		return {
-			updateNavItemBlocks( blocks ) {
-				dispatch( 'core/block-editor' ).replaceInnerBlocks(
+			updateNavItemBlocks(blocks) {
+				dispatch('core/block-editor').replaceInnerBlocks(
 					clientId,
 					blocks
 				);
 			},
 		};
-	} ),
-] )( Navigation );
+	}),
+])(Navigation);
