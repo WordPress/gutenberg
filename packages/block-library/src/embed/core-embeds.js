@@ -137,6 +137,19 @@ export const others = [
 		patterns: [ /^https?:\/\/cloudup\.com\/.+/i ],
 	},
 	{
+		// Deprecated since CollegeHumor content is now powered by YouTube
+		name: 'core-embed/collegehumor',
+		settings: {
+			title: 'CollegeHumor',
+			icon: embedVideoIcon,
+			description: __( 'Embed CollegeHumor content.' ),
+			supports: {
+				inserter: false,
+			}
+		},
+		patterns: [ /^https?:\/\/((m|www)\.)?youtube\.com\/.+/i, /^https?:\/\/youtu\.be\/.+/i ],
+	},
+	{
 		name: 'core-embed/crowdsignal',
 		settings: {
 			title: 'Crowdsignal',
