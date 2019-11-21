@@ -31,16 +31,14 @@ export function Button( props ) {
 
 	return (
 		<TouchableOpacity
+			style={ buttonStyle }
 			activeOpacity={ 0.7 }
-			accessible={ true }
 			accessibilityLabel={ accessibilityLabel }
 			accessibilityRole={ 'button' }
 			onPress={ onClick }
 			disabled={ isDisabled }
 		>
-			<View style={ buttonStyle }>
-				<Icon icon={ icon } fill={ fill } size={ 24 } />
-			</View>
+			<Icon icon={ icon } fill={ fill } size={ 24 } />
 		</TouchableOpacity>
 	);
 }
