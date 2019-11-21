@@ -70,14 +70,16 @@ export function* getEntityRecord( kind, name, key = '' ) {
  */
 export function* getEntityRecords( kind, name, query = {} ) {
 	const entities = yield getKindEntities( kind );
+
 	const entity = find( entities, { kind, name } );
 	if ( ! entity ) {
 		return;
 	}
 	const path = addQueryArgs( entity.baseURL, {
-		...query,
 		context: 'edit',
+		...query,
 	} );
+
 	const records = yield apiFetch( { path } );
 	yield receiveEntityRecords( kind, name, Object.values( records ), query );
 }
