@@ -1,7 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { Dropdown, IconButton, MenuGroup, MenuItemsChoice, SVG, Path } from '@wordpress/components';
+import {
+	Dropdown,
+	IconButton,
+	MenuItemsChoice,
+	SVG,
+	Path,
+	NavigableMenu,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 
@@ -22,13 +29,14 @@ function NavigationToolSelector() {
 					icon={ isNavigationTool ? selectIcon : editIcon }
 					aria-expanded={ isOpen }
 					onClick={ onToggle }
-					label={ __( 'Select navigation tool' ) }
+					label={ __( 'Navigation Tool' ) }
 				/>
 			) }
 			renderContent={ () => (
 				<>
-					<MenuGroup
-						label={ __( 'Navigation Tool' ) }
+					<NavigableMenu
+						role="menu"
+						aria-label={ __( 'Navigation Tool' ) }
 					>
 						<MenuItemsChoice
 							value={ isNavigationTool ? 'select' : 'edit' }
@@ -56,7 +64,7 @@ function NavigationToolSelector() {
 								},
 							] }
 						/>
-					</MenuGroup>
+					</NavigableMenu>
 					<div className="block-editor-navigation-mode-selector__help">
 						{ __( 'Tools offer different block interactions to optimize block selection & editing tasks' ) }
 					</div>

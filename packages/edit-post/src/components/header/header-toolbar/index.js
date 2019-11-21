@@ -41,12 +41,12 @@ function HeaderToolbar( { hasFixedToolbar, isLargeViewport, showInserter, isText
 			<EditorHistoryRedo />
 			<TableOfContents hasOutlineItemsDisabled={ isTextModeEnabled } />
 			<BlockNavigationDropdown isDisabled={ isTextModeEnabled } />
+			<NavigationToolSelector />
 			{ hasFixedToolbar && isLargeViewport && (
 				<div className="edit-post-header-toolbar__block-toolbar">
 					<BlockToolbar />
 				</div>
 			) }
-			<NavigationToolSelector />
 		</NavigableToolbar>
 	);
 }
