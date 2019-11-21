@@ -151,6 +151,10 @@
 		max-width: 75%;
 	}
 
+	.components-base-control__field {
+		margin-bottom: inherit;
+	}
+
 	&:empty,
 	&:first-of-type {
 		margin-top: 0;

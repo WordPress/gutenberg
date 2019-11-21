@@ -1,7 +1,7 @@
 /**
  * Allows users to opt-out of animations via OS-level preferences.
  *
- * @param {string} prop CSS Property name
+ * @param {"transition" | "animation" | undefined} prop CSS Property name
  * @return {string}
  */
 export function reduceMotion( prop = 'transition' ) {

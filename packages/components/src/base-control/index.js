@@ -7,6 +7,7 @@ import classnames from 'classnames';
  * Internal dependencies
  */
 import VisuallyHidden from '../visually-hidden';
+import { Control, Field, Label, Help } from './styles/index-styles';
 
 function BaseControl( {
 	id,
@@ -17,8 +18,10 @@ function BaseControl( {
 	children,
 } ) {
 	return (
-		<div className={ classnames( 'components-base-control', className ) }>
-			<div className="components-base-control__field">
+		<Control
+			className={ classnames( 'components-base-control', className ) }
+		>
+			<Field className="components-base-control__field">
 				{ label &&
 					id &&
 					( hideLabelFromVision ? (
@@ -26,12 +29,12 @@ function BaseControl( {
 							{ label }
 						</VisuallyHidden>
 					) : (
-						<label
+						<Label
 							className="components-base-control__label"
 							htmlFor={ id }
 						>
 							{ label }
-						</label>
+						</Label>
 					) ) }
 				{ label &&
 					! id &&
@@ -43,22 +46,26 @@ function BaseControl( {
 						</BaseControl.VisualLabel>
 					) ) }
 				{ children }
-			</div>
+			</Field>
 			{ !! help && (
-				<p
+				<Help
 					id={ id + '__help' }
 					className="components-base-control__help"
 				>
 					{ help }
-				</p>
+				</Help>
 			) }
-		</div>
+		</Control>
 	);
 }
 
 BaseControl.VisualLabel = ( { className, children } ) => {
 	className = classnames( 'components-base-control__label', className );
-	return <span className={ className }>{ children }</span>;
+	return (
+		<Label className={ className } as="span">
+			{ children }
+		</Label>
+	);
 };
 
 export default BaseControl;
