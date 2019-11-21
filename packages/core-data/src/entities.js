@@ -80,7 +80,13 @@ export const kinds = [
  * @return {Promise} Entities promise
  */
 function* loadPostTypeEntities() {
-	const postTypes = yield apiFetch( { path: '/wp/v2/types?context=edit' } );
+	// Setting "context" to "view" to work around bug whereby
+	// get_items_permissions_check in `WP_REST_Post_Types_Controller`
+	// does not pass for the "edit" context because it only checks
+	// for `edit_posts` permission
+	// wordpress/src/wp-includes/rest-api/endpoints/class-wp-rest-post-types-controller.php
+	const postTypes = yield apiFetch( { path: '/wp/v2/types?context=view' } );
+
 	return map( postTypes, ( postType, name ) => {
 		return {
 			kind: 'postType',
