@@ -362,34 +362,32 @@ describe( 'Change detection', () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'Hello, World!' );
 
-		// Save
+		// Save and wait till the post is clean.
 		await Promise.all( [
 			page.waitForSelector( '.editor-post-saved-state.is-saved' ),
 			pressKeyWithModifier( 'primary', 'S' ),
 		] );
-
-		await assertIsDirty( false );
 
 		// Increase the paragraph's font size.
 		await page.click( '[data-type="core/paragraph"]' );
 		await page.select( '.components-select-control__input', 'large' );
 		await page.click( '[data-type="core/paragraph"]' );
 
-		await assertIsDirty( true );
+		// Check that the post is dirty.
+		await page.waitForSelector( '.editor-post-save-draft' );
 
-		// Save
+		// Save and wait till the post is clean.
 		await Promise.all( [
 			page.waitForSelector( '.editor-post-saved-state.is-saved' ),
 			pressKeyWithModifier( 'primary', 'S' ),
 		] );
-
-		await assertIsDirty( false );
 
 		// Increase the paragraph's font size again.
 		await page.click( '[data-type="core/paragraph"]' );
 		await page.select( '.components-select-control__input', 'huge' );
 		await page.click( '[data-type="core/paragraph"]' );
 
-		await assertIsDirty( true );
+		// Check that the post is dirty.
+		await page.waitForSelector( '.editor-post-save-draft' );
 	} );
 } );
