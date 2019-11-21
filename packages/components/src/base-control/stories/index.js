@@ -8,7 +8,7 @@ import { boolean, text } from '@storybook/addon-knobs';
  */
 import BaseControl from '../';
 
-export default { title: 'Components|Base-control', component: BaseControl };
+export default { title: 'Components|Base Control', component: BaseControl };
 
 export const _default = () => {
 	const id = text( 'Id', 'textarea-1' );
