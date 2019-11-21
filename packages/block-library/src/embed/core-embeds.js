@@ -147,7 +147,7 @@ export const others = [
 				inserter: false,
 			}
 		},
-		patterns: [ /^https?:\/\/(www\.)?collegehumor\.com\/.+/i, /^https?:\/\/((m|www)\.)?youtube\.com\/.+/i, /^https?:\/\/youtu\.be\/.+/i ],
+		patterns: [],
 	},
 	{
 		name: 'core-embed/crowdsignal',
