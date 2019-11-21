@@ -21,6 +21,7 @@ const {
 } = require( './env' );
 const {
 	fromConfigRoot,
+	fromTemplatesRoot,
 	hasProjectFile,
 } = require( './file' );
 const {
@@ -34,6 +35,7 @@ module.exports = {
 	buildWordPress,
 	camelCaseDash,
 	fromConfigRoot,
+	fromTemplatesRoot,
 	getArgFromCLI,
 	getArgsFromCLI,
 	getFileArgsFromCLI,

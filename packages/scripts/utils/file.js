@@ -18,6 +18,9 @@ const hasProjectFile = ( fileName ) =>
 const fromConfigRoot = ( fileName ) =>
 	path.join( path.dirname( __dirname ), 'config', fileName );
 
+const fromTemplatesRoot = ( fileName ) =>
+	path.join( path.dirname( __dirname ), 'templates', fileName );
+
 const fromScriptsRoot = ( scriptName ) =>
 	path.join( path.dirname( __dirname ), 'scripts', `${ scriptName }.js` );
 
@@ -26,6 +29,7 @@ const hasScriptFile = ( scriptName ) =>
 
 module.exports = {
 	fromConfigRoot,
+	fromTemplatesRoot,
 	fromScriptsRoot,
 	hasProjectFile,
 	hasScriptFile,

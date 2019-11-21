@@ -117,6 +117,20 @@ _Flags_:
 - `--gpl2`: Validates against [GPLv2 license compatibility](https://www.gnu.org/licenses/license-list.en.html)
 - `--ignore=a,b,c`: A comma-separated set of package names to ignore for validation. This is intended to be used primarily in cases where a dependency’s `license` field is malformed. It’s assumed that any `ignored` package argument would be manually vetted for compatibility by the project owner.
 
+### `create-block`
+
+Takes a new name for a block and creates a minimal plugin development environment for it in the current working directory.
+
+_Example:_
+
+```sh
+$ wp-scripts create-block "My Fancy Block"
+$ cd ./my-fancy-block-plugin
+$ npm install
+$ npm run start # Start WordPress instance.
+$ npm run dev # Build and watch files.
+```
+
 ### `env`
 
 `env` is a family of scripts for setting up a local Docker-based development environment that plugin contributors can work in.
