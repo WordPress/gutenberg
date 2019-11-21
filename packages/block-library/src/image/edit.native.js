@@ -2,14 +2,15 @@
  * External dependencies
  */
 import React from 'react';
-import { View, ImageBackground, Text, TouchableWithoutFeedback, Dimensions } from 'react-native';
+import { View, ImageBackground, Text, TouchableWithoutFeedback, Dimensions, Platform } from 'react-native';
 import {
 	requestMediaImport,
 	mediaUploadSync,
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
+	requestImageFullscreenPreview,
 } from 'react-native-gutenberg-bridge';
-import { isEmpty, map } from 'lodash';
+import { isEmpty, map, get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -38,7 +39,8 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { isURL } from '@wordpress/url';
 import { doAction, hasAction } from '@wordpress/hooks';
-import { withPreferredColorScheme } from '@wordpress/compose';
+import { compose, withPreferredColorScheme } from '@wordpress/compose';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -142,6 +144,8 @@ export class ImageEdit extends React.Component {
 			requestImageUploadCancelDialog( attributes.id );
 		} else if ( attributes.id && ! isURL( attributes.url ) ) {
 			requestImageFailedRetryDialog( attributes.id );
+		} else if ( Platform.OS === 'android' ) {
+			requestImageFullscreenPreview( attributes.url );
 		}
 
 		this.setState( {
@@ -206,7 +210,17 @@ export class ImageEdit extends React.Component {
 	}
 
 	onSetSizeSlug( sizeSlug ) {
+		const { image } = this.props;
+
+		const url = get( image, [ 'media_details', 'sizes', sizeSlug, 'source_url' ] );
+		if ( ! url ) {
+			return null;
+		}
+
 		this.props.setAttributes( {
+			url,
+			width: undefined,
+			height: undefined,
 			sizeSlug,
 		} );
 	}
@@ -334,6 +348,7 @@ export class ImageEdit extends React.Component {
 		};
 
 		const imageContainerHeight = Dimensions.get( 'window' ).width / IMAGE_ASPECT_RATIO;
+
 		const getImageComponent = ( openMediaOptions, getMediaOptions ) => (
 			<TouchableWithoutFeedback
 				accessible={ ! isSelected }
@@ -359,6 +374,7 @@ export class ImageEdit extends React.Component {
 						renderContent={ ( { isUploadInProgress, isUploadFailed, finalWidth, finalHeight, imageWidthWithinContainer, retryMessage } ) => {
 							const opacity = isUploadInProgress ? 0.3 : 1;
 							const icon = this.getIcon( isUploadFailed );
+							const imageBorderOnSelectedStyle = isSelected && ! ( isUploadInProgress || isUploadFailed ) ? styles.imageBorder : '';
 
 							const iconContainer = (
 								<View style={ styles.modalIcon }>
@@ -378,7 +394,7 @@ export class ImageEdit extends React.Component {
 										accessibilityLabel={ alt }
 										accessibilityHint={ __( 'Double tap and hold to edit' ) }
 										accessibilityRole={ 'imagebutton' }
-										style={ { width: finalWidth, height: finalHeight, opacity } }
+										style={ [ imageBorderOnSelectedStyle, { width: finalWidth, height: finalHeight, opacity } ] }
 										resizeMethod="scale"
 										source={ { uri: url } }
 										key={ url }
@@ -425,4 +441,14 @@ export class ImageEdit extends React.Component {
 	}
 }
 
-export default withPreferredColorScheme( ImageEdit );
+export default compose( [
+	withSelect( ( select, props ) => {
+		const { getMedia } = select( 'core' );
+		const { attributes: { id }, isSelected } = props;
+
+		return {
+			image: id && isSelected ? getMedia( id ) : null,
+		};
+	} ),
+	withPreferredColorScheme,
+] )( ImageEdit );
