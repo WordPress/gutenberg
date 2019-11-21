@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, TouchableOpacity } from 'react-native';
 
 /**
  * WordPress dependencies

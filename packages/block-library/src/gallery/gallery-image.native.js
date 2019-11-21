@@ -257,7 +257,7 @@ class GalleryImage extends Component {
 	}
 
 	render() {
-		const { id, isBlockSelected, onRemove, getStylesFromColorScheme } = this.props;
+		const { id, onRemove, getStylesFromColorScheme } = this.props;
 
 		const containerStyle = getStylesFromColorScheme( style.galleryImageContainer,
 			style.galleryImageContainerDark );
