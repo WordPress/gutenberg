@@ -16,6 +16,7 @@ import style from './gallery-image-style';
 export function Button( props ) {
 	const {
 		icon,
+		iconSize = 24,
 		onClick,
 		disabled,
 		'aria-disabled': ariaDisabled,
@@ -38,7 +39,7 @@ export function Button( props ) {
 			onPress={ onClick }
 			disabled={ isDisabled }
 		>
-			<Icon icon={ icon } fill={ fill } size={ 24 } />
+			<Icon icon={ icon } fill={ fill } size={ iconSize } />
 		</TouchableOpacity>
 	);
 }

@@ -190,7 +190,8 @@ class GalleryImage extends Component {
 								<View style={ style.moverButtonContainer } >
 									<Button
 										style={ buttonStyle }
-										icon="arrow-left"
+										icon="arrow-left-alt"
+										iconSize={ 15 }
 										onClick={ isFirstItem ? undefined : onMoveBackward }
 										accessibilityLabel={ __( 'Move Image Backward' ) }
 										aria-disabled={ isFirstItem }
@@ -199,7 +200,8 @@ class GalleryImage extends Component {
 									<View style={ separatorStyle }></View>
 									<Button
 										style={ buttonStyle }
-										icon="arrow-right"
+										icon="arrow-right-alt"
+										iconSize={ 15 }
 										onClick={ isLastItem ? undefined : onMoveForward }
 										accessibilityLabel={ __( 'Move Image Forward' ) }
 										aria-disabled={ isLastItem }
@@ -208,7 +210,8 @@ class GalleryImage extends Component {
 								</View>
 								<Button
 									style={ removeButtonStyle }
-									icon="trash"
+									icon="no-alt"
+									iconSize={ 20 }
 									onClick={ onRemove }
 									accessibilityLabel={ __( 'Remove Image' ) }
 									disabled={ ! isSelected }
