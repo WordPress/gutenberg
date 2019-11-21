@@ -145,7 +145,7 @@ export const others = [
 			description: __( 'Embed CollegeHumor content.' ),
 			supports: {
 				inserter: false,
-			}
+			},
 		},
 		patterns: [],
 	},
