@@ -33,6 +33,7 @@ export const Gallery = ( props ) => {
 		//	setAttributes,
 		isMobile,
 		isNarrow,
+		onFocus,
 	} = props;
 
 	const {
@@ -78,6 +79,7 @@ export const Gallery = ( props ) => {
 							onMoveForward={ onMoveForward( index ) }
 							onRemove={ onRemoveImage( index ) }
 							onSelect={ onSelectImage( index ) }
+							onSelectBlock={ onFocus }
 							setAttributes={ ( attrs ) => onSetImageAttributes( index, attrs ) }
 							caption={ img.caption }
 							aria-label={ ariaLabel }
