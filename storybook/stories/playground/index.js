@@ -21,7 +21,6 @@ import { registerCoreBlocks } from '@wordpress/block-library';
 import '@wordpress/format-library';
 
 /* eslint-disable no-restricted-syntax */
-import '@wordpress/block-editor/build-style/style.css';
 import '@wordpress/block-library/build-style/style.css';
 import '@wordpress/block-library/build-style/editor.css';
 import '@wordpress/block-library/build-style/theme.css';

@@ -1,3 +1,5 @@
+// Loading @wordpress/base-styles as they have mixins and other dependencies
+// used within @wordpress/components/src/style.scss
 @import "~@wordpress/base-styles/animations";
 @import "~@wordpress/base-styles/breakpoints";
 @import "~@wordpress/base-styles/colors";
@@ -5,4 +7,5 @@
 @import "~@wordpress/base-styles/variables";
 @import "~@wordpress/base-styles/z-index";
 
+// @wordpress/components
 @import "../packages/components/src/style.scss";
