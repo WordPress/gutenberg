@@ -294,7 +294,6 @@ export default compose( [
 			parent: 0,
 			order: 'asc',
 			orderby: 'id',
-			context: 'view',
 		};
 
 		const pagesSelect = [
