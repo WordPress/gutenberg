@@ -281,7 +281,7 @@ describe( 'undo', () => {
 		expect( undoState ).toEqual( expectedUndoState );
 	} );
 
-	it( 'explicitly creates an undo level when undoing with pending transient edits', () => {
+	it( 'explicitly creates an undo level when undoing while there are pending transient edits', () => {
 		undoState = createNextUndoState();
 		undoState = createNextUndoState( { value: 1 } );
 		undoState = createNextUndoState(
