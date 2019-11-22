@@ -1,6 +1,7 @@
 /**
  * Internal dependencies
  */
+import { ThemeProvider } from '../../theme';
 import { Text } from '../text.styles';
 
 export default {
@@ -9,18 +10,20 @@ export default {
 };
 
 export const _default = () => (
-	<>
-		<Text variant="title.large" as="h1">Title Large</Text>
-		<Text variant="title.medium" as="h2">Title Medium</Text>
-		<Text variant="title.small" as="h3">Title Small</Text>
-		<Text variant="subtitle">Subtitle</Text>
-		<Text variant="subtitle.small">Subtitle Small</Text>
-		<Text variant="body">Body</Text>
-		<Text variant="body.small">Body Small</Text>
-		<Text variant="button">Button</Text>
-		<Text variant="caption">Caption</Text>
-		<Text variant="label">Label</Text>
-	</>
+	<ThemeProvider>
+		<>
+			<Text variant="title.large" as="h1">Title Large</Text>
+			<Text variant="title.medium" as="h2">Title Medium</Text>
+			<Text variant="title.small" as="h3">Title Small</Text>
+			<Text variant="subtitle.large">Subtitle</Text>
+			<Text variant="subtitle.small">Subtitle Small</Text>
+			<Text variant="body.large">Body</Text>
+			<Text variant="body.small">Body Small</Text>
+			<Text variant="button">Button</Text>
+			<Text variant="caption">Caption</Text>
+			<Text variant="label">Label</Text>
+		</>
+	</ThemeProvider>
 );
 
 export const TitleLarge = () => <Text variant="title.large" as="h1">Title Large</Text>;

@@ -1,545 +1,683 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Text looks like a "body" 1`] = `
-<emotion(Text)
-  variant="body"
->
-  <Text
-    style={
+<ThemeProvider>
+  <ThemeProvider
+    theme={
       Object {
-        "map": undefined,
-        "name": "13zmt60",
-        "next": undefined,
-        "styles": "
-	
-	
-				
-	font-weight: 400;
-
-				
-	font-size: 16px;
-	line-height: 24px;
-
-			;
-",
-        "toString": [Function],
+        "fontSizes": Array [
+          12,
+          14,
+          16,
+          20,
+          24,
+          32,
+        ],
+        "fontWeights": Array [
+          400,
+          600,
+          700,
+        ],
+        "fonts": Array [
+          "",
+        ],
+        "lineHeights": Array [
+          "16px",
+          "20px",
+          "24px",
+          "28px",
+          "32px",
+          "40px",
+        ],
       }
     }
-    variant="body"
   >
-    <Text
-      style={
-        Object {
-          "map": undefined,
-          "name": "13zmt60",
-          "next": undefined,
-          "styles": "
-	
-	
-				
-	font-weight: 400;
-
-				
-	font-size: 16px;
-	line-height: 24px;
-
-			;
-",
-          "toString": [Function],
-        }
-      }
+    <emotion(Text)
       variant="body"
     >
-      Hello World!
-    </Text>
-  </Text>
-</emotion(Text)>
+      <Text
+        style={
+          Object {
+            "large": Object {
+              "fontFamily": "",
+              "fontSize": 14,
+              "fontWeight": 400,
+              "lineHeight": "20px",
+            },
+            "small": Object {
+              "fontFamily": "",
+              "fontSize": 12,
+              "fontWeight": 400,
+              "lineHeight": "16px",
+            },
+          }
+        }
+        variant="body"
+      >
+        <Text
+          style={
+            Object {
+              "large": Object {
+                "fontFamily": "",
+                "fontSize": 14,
+                "fontWeight": 400,
+                "lineHeight": "20px",
+              },
+              "small": Object {
+                "fontFamily": "",
+                "fontSize": 12,
+                "fontWeight": 400,
+                "lineHeight": "16px",
+              },
+            }
+          }
+          variant="body"
+        >
+          Hello World!
+        </Text>
+      </Text>
+    </emotion(Text)>
+  </ThemeProvider>
+</ThemeProvider>
 `;
 
 exports[`Text looks like a "body.small" 1`] = `
-<emotion(Text)
-  variant="body.small"
->
-  <Text
-    style={
+<ThemeProvider>
+  <ThemeProvider
+    theme={
       Object {
-        "map": undefined,
-        "name": "1klnuzf",
-        "next": undefined,
-        "styles": "
-	
-	
-				
-	font-weight: 400;
-
-				
-	font-size: 14px;
-	line-height: 20px;
-
-			;
-",
-        "toString": [Function],
+        "fontSizes": Array [
+          12,
+          14,
+          16,
+          20,
+          24,
+          32,
+        ],
+        "fontWeights": Array [
+          400,
+          600,
+          700,
+        ],
+        "fonts": Array [
+          "",
+        ],
+        "lineHeights": Array [
+          "16px",
+          "20px",
+          "24px",
+          "28px",
+          "32px",
+          "40px",
+        ],
       }
     }
-    variant="body.small"
   >
-    <Text
-      style={
-        Object {
-          "map": undefined,
-          "name": "1klnuzf",
-          "next": undefined,
-          "styles": "
-	
-	
-				
-	font-weight: 400;
-
-				
-	font-size: 14px;
-	line-height: 20px;
-
-			;
-",
-          "toString": [Function],
-        }
-      }
+    <emotion(Text)
       variant="body.small"
     >
-      Hello World!
-    </Text>
-  </Text>
-</emotion(Text)>
+      <Text
+        style={
+          Object {
+            "fontFamily": "",
+            "fontSize": 12,
+            "fontWeight": 400,
+            "lineHeight": "16px",
+          }
+        }
+        variant="body.small"
+      >
+        <Text
+          style={
+            Object {
+              "fontFamily": "",
+              "fontSize": 12,
+              "fontWeight": 400,
+              "lineHeight": "16px",
+            }
+          }
+          variant="body.small"
+        >
+          Hello World!
+        </Text>
+      </Text>
+    </emotion(Text)>
+  </ThemeProvider>
+</ThemeProvider>
 `;
 
 exports[`Text looks like a "button" 1`] = `
-<emotion(Text)
-  variant="button"
->
-  <Text
-    style={
+<ThemeProvider>
+  <ThemeProvider
+    theme={
       Object {
-        "map": undefined,
-        "name": "41mraa",
-        "next": undefined,
-        "styles": "
-	
-	
-  font-weight: 600;
-  font-size: 14px;
-  line-height: 20px;
-
-",
-        "toString": [Function],
+        "fontSizes": Array [
+          12,
+          14,
+          16,
+          20,
+          24,
+          32,
+        ],
+        "fontWeights": Array [
+          400,
+          600,
+          700,
+        ],
+        "fonts": Array [
+          "",
+        ],
+        "lineHeights": Array [
+          "16px",
+          "20px",
+          "24px",
+          "28px",
+          "32px",
+          "40px",
+        ],
       }
     }
-    variant="button"
   >
-    <Text
-      style={
-        Object {
-          "map": undefined,
-          "name": "41mraa",
-          "next": undefined,
-          "styles": "
-	
-	
-  font-weight: 600;
-  font-size: 14px;
-  line-height: 20px;
-
-",
-          "toString": [Function],
-        }
-      }
+    <emotion(Text)
       variant="button"
     >
-      Hello World!
-    </Text>
-  </Text>
-</emotion(Text)>
+      <Text
+        style={
+          Object {
+            "fontFamily": "",
+            "fontSize": 14,
+            "fontWeight": 600,
+            "lineHeight": "20px",
+          }
+        }
+        variant="button"
+      >
+        <Text
+          style={
+            Object {
+              "fontFamily": "",
+              "fontSize": 14,
+              "fontWeight": 600,
+              "lineHeight": "20px",
+            }
+          }
+          variant="button"
+        >
+          Hello World!
+        </Text>
+      </Text>
+    </emotion(Text)>
+  </ThemeProvider>
+</ThemeProvider>
 `;
 
 exports[`Text looks like a "caption" 1`] = `
-<emotion(Text)
-  variant="caption"
->
-  <Text
-    style={
+<ThemeProvider>
+  <ThemeProvider
+    theme={
       Object {
-        "map": undefined,
-        "name": "87k3hp",
-        "next": undefined,
-        "styles": "
-	
-	
-	font-weight: 400;
-	font-size: 12px;
-	line-height: 16px;
-
-",
-        "toString": [Function],
+        "fontSizes": Array [
+          12,
+          14,
+          16,
+          20,
+          24,
+          32,
+        ],
+        "fontWeights": Array [
+          400,
+          600,
+          700,
+        ],
+        "fonts": Array [
+          "",
+        ],
+        "lineHeights": Array [
+          "16px",
+          "20px",
+          "24px",
+          "28px",
+          "32px",
+          "40px",
+        ],
       }
     }
-    variant="caption"
   >
-    <Text
-      style={
-        Object {
-          "map": undefined,
-          "name": "87k3hp",
-          "next": undefined,
-          "styles": "
-	
-	
-	font-weight: 400;
-	font-size: 12px;
-	line-height: 16px;
-
-",
-          "toString": [Function],
-        }
-      }
+    <emotion(Text)
       variant="caption"
     >
-      Hello World!
-    </Text>
-  </Text>
-</emotion(Text)>
+      <Text
+        style={
+          Object {
+            "fontFamily": "",
+            "fontSize": 12,
+            "fontWeight": 400,
+            "lineHeight": "16px",
+          }
+        }
+        variant="caption"
+      >
+        <Text
+          style={
+            Object {
+              "fontFamily": "",
+              "fontSize": 12,
+              "fontWeight": 400,
+              "lineHeight": "16px",
+            }
+          }
+          variant="caption"
+        >
+          Hello World!
+        </Text>
+      </Text>
+    </emotion(Text)>
+  </ThemeProvider>
+</ThemeProvider>
 `;
 
 exports[`Text looks like a "label" 1`] = `
-<emotion(Text)
-  variant="label"
->
-  <Text
-    style={
+<ThemeProvider>
+  <ThemeProvider
+    theme={
       Object {
-        "map": undefined,
-        "name": "1ylo2m8",
-        "next": undefined,
-        "styles": "
-	
-	
-	font-weight: 600;
-	font-size: 12px;
-	line-height: 16px;
-
-",
-        "toString": [Function],
+        "fontSizes": Array [
+          12,
+          14,
+          16,
+          20,
+          24,
+          32,
+        ],
+        "fontWeights": Array [
+          400,
+          600,
+          700,
+        ],
+        "fonts": Array [
+          "",
+        ],
+        "lineHeights": Array [
+          "16px",
+          "20px",
+          "24px",
+          "28px",
+          "32px",
+          "40px",
+        ],
       }
     }
-    variant="label"
   >
-    <Text
-      style={
-        Object {
-          "map": undefined,
-          "name": "1ylo2m8",
-          "next": undefined,
-          "styles": "
-	
-	
-	font-weight: 600;
-	font-size: 12px;
-	line-height: 16px;
-
-",
-          "toString": [Function],
-        }
-      }
+    <emotion(Text)
       variant="label"
     >
-      Hello World!
-    </Text>
-  </Text>
-</emotion(Text)>
+      <Text
+        style={
+          Object {
+            "fontFamily": "",
+            "fontSize": 12,
+            "fontWeight": 600,
+            "lineHeight": "16px",
+          }
+        }
+        variant="label"
+      >
+        <Text
+          style={
+            Object {
+              "fontFamily": "",
+              "fontSize": 12,
+              "fontWeight": 600,
+              "lineHeight": "16px",
+            }
+          }
+          variant="label"
+        >
+          Hello World!
+        </Text>
+      </Text>
+    </emotion(Text)>
+  </ThemeProvider>
+</ThemeProvider>
 `;
 
 exports[`Text looks like a "subtitle" 1`] = `
-<emotion(Text)
-  variant="subtitle"
->
-  <Text
-    style={
+<ThemeProvider>
+  <ThemeProvider
+    theme={
       Object {
-        "map": undefined,
-        "name": "ijsm7s",
-        "next": undefined,
-        "styles": "
-	
-	
-				
-	font-weight: 600;
-	font-size: 14px;
-	line-height: 20px;
-
-				
-	font-size: 16px;
-	line-height: 24px;
-
-			;
-",
-        "toString": [Function],
+        "fontSizes": Array [
+          12,
+          14,
+          16,
+          20,
+          24,
+          32,
+        ],
+        "fontWeights": Array [
+          400,
+          600,
+          700,
+        ],
+        "fonts": Array [
+          "",
+        ],
+        "lineHeights": Array [
+          "16px",
+          "20px",
+          "24px",
+          "28px",
+          "32px",
+          "40px",
+        ],
       }
     }
-    variant="subtitle"
   >
-    <Text
-      style={
-        Object {
-          "map": undefined,
-          "name": "ijsm7s",
-          "next": undefined,
-          "styles": "
-	
-	
-				
-	font-weight: 600;
-	font-size: 14px;
-	line-height: 20px;
-
-				
-	font-size: 16px;
-	line-height: 24px;
-
-			;
-",
-          "toString": [Function],
-        }
-      }
+    <emotion(Text)
       variant="subtitle"
     >
-      Hello World!
-    </Text>
-  </Text>
-</emotion(Text)>
+      <Text
+        style={
+          Object {
+            "large": Object {
+              "fontFamily": "",
+              "fontSize": 16,
+              "fontWeight": 600,
+              "lineHeight": "24px",
+            },
+            "small": Object {
+              "fontFamily": "",
+              "fontSize": 14,
+              "fontWeight": 600,
+              "lineHeight": "20px",
+            },
+          }
+        }
+        variant="subtitle"
+      >
+        <Text
+          style={
+            Object {
+              "large": Object {
+                "fontFamily": "",
+                "fontSize": 16,
+                "fontWeight": 600,
+                "lineHeight": "24px",
+              },
+              "small": Object {
+                "fontFamily": "",
+                "fontSize": 14,
+                "fontWeight": 600,
+                "lineHeight": "20px",
+              },
+            }
+          }
+          variant="subtitle"
+        >
+          Hello World!
+        </Text>
+      </Text>
+    </emotion(Text)>
+  </ThemeProvider>
+</ThemeProvider>
 `;
 
 exports[`Text looks like a "subtitle.small" 1`] = `
-<emotion(Text)
-  variant="subtitle.small"
->
-  <Text
-    style={
+<ThemeProvider>
+  <ThemeProvider
+    theme={
       Object {
-        "map": undefined,
-        "name": "1tuyefh",
-        "next": undefined,
-        "styles": "
-	
-	
-				
-	font-weight: 600;
-	font-size: 14px;
-	line-height: 20px;
-
-				
-	font-size: 14px;
-	line-height: 20px;
-
-			;
-",
-        "toString": [Function],
+        "fontSizes": Array [
+          12,
+          14,
+          16,
+          20,
+          24,
+          32,
+        ],
+        "fontWeights": Array [
+          400,
+          600,
+          700,
+        ],
+        "fonts": Array [
+          "",
+        ],
+        "lineHeights": Array [
+          "16px",
+          "20px",
+          "24px",
+          "28px",
+          "32px",
+          "40px",
+        ],
       }
     }
-    variant="subtitle.small"
   >
-    <Text
-      style={
-        Object {
-          "map": undefined,
-          "name": "1tuyefh",
-          "next": undefined,
-          "styles": "
-	
-	
-				
-	font-weight: 600;
-	font-size: 14px;
-	line-height: 20px;
-
-				
-	font-size: 14px;
-	line-height: 20px;
-
-			;
-",
-          "toString": [Function],
-        }
-      }
+    <emotion(Text)
       variant="subtitle.small"
     >
-      Hello World!
-    </Text>
-  </Text>
-</emotion(Text)>
+      <Text
+        style={
+          Object {
+            "fontFamily": "",
+            "fontSize": 14,
+            "fontWeight": 600,
+            "lineHeight": "20px",
+          }
+        }
+        variant="subtitle.small"
+      >
+        <Text
+          style={
+            Object {
+              "fontFamily": "",
+              "fontSize": 14,
+              "fontWeight": 600,
+              "lineHeight": "20px",
+            }
+          }
+          variant="subtitle.small"
+        >
+          Hello World!
+        </Text>
+      </Text>
+    </emotion(Text)>
+  </ThemeProvider>
+</ThemeProvider>
 `;
 
 exports[`Text looks like a "title.large" 1`] = `
-<emotion(Text)
-  variant="title.large"
->
-  <Text
-    style={
+<ThemeProvider>
+  <ThemeProvider
+    theme={
       Object {
-        "map": undefined,
-        "name": "1ue5xyy",
-        "next": undefined,
-        "styles": "
-	
-	
-				
-  font-weight: 400;
-
-				
-	font-size: 32px;
-	line-height: 40px;
-
-			;
-",
-        "toString": [Function],
+        "fontSizes": Array [
+          12,
+          14,
+          16,
+          20,
+          24,
+          32,
+        ],
+        "fontWeights": Array [
+          400,
+          600,
+          700,
+        ],
+        "fonts": Array [
+          "",
+        ],
+        "lineHeights": Array [
+          "16px",
+          "20px",
+          "24px",
+          "28px",
+          "32px",
+          "40px",
+        ],
       }
     }
-    variant="title.large"
   >
-    <Text
-      style={
-        Object {
-          "map": undefined,
-          "name": "1ue5xyy",
-          "next": undefined,
-          "styles": "
-	
-	
-				
-  font-weight: 400;
-
-				
-	font-size: 32px;
-	line-height: 40px;
-
-			;
-",
-          "toString": [Function],
-        }
-      }
+    <emotion(Text)
       variant="title.large"
     >
-      Hello World!
-    </Text>
-  </Text>
-</emotion(Text)>
+      <Text
+        style={
+          Object {
+            "fontFamily": "",
+            "fontSize": 32,
+            "fontWeight": 700,
+            "lineHeight": "40px",
+          }
+        }
+        variant="title.large"
+      >
+        <Text
+          style={
+            Object {
+              "fontFamily": "",
+              "fontSize": 32,
+              "fontWeight": 700,
+              "lineHeight": "40px",
+            }
+          }
+          variant="title.large"
+        >
+          Hello World!
+        </Text>
+      </Text>
+    </emotion(Text)>
+  </ThemeProvider>
+</ThemeProvider>
 `;
 
 exports[`Text looks like a "title.medium" 1`] = `
-<emotion(Text)
-  variant="title.medium"
->
-  <Text
-    style={
+<ThemeProvider>
+  <ThemeProvider
+    theme={
       Object {
-        "map": undefined,
-        "name": "mwvfmu",
-        "next": undefined,
-        "styles": "
-	
-	
-					
-  font-weight: 400;
-
-					
-	font-size: 24px;
-	line-height: 32px;
-
-				;
-",
-        "toString": [Function],
+        "fontSizes": Array [
+          12,
+          14,
+          16,
+          20,
+          24,
+          32,
+        ],
+        "fontWeights": Array [
+          400,
+          600,
+          700,
+        ],
+        "fonts": Array [
+          "",
+        ],
+        "lineHeights": Array [
+          "16px",
+          "20px",
+          "24px",
+          "28px",
+          "32px",
+          "40px",
+        ],
       }
     }
-    variant="title.medium"
   >
-    <Text
-      style={
-        Object {
-          "map": undefined,
-          "name": "mwvfmu",
-          "next": undefined,
-          "styles": "
-	
-	
-					
-  font-weight: 400;
-
-					
-	font-size: 24px;
-	line-height: 32px;
-
-				;
-",
-          "toString": [Function],
-        }
-      }
+    <emotion(Text)
       variant="title.medium"
     >
-      Hello World!
-    </Text>
-  </Text>
-</emotion(Text)>
+      <Text
+        style={
+          Object {
+            "fontFamily": "",
+            "fontSize": 24,
+            "fontWeight": 700,
+            "lineHeight": "32px",
+          }
+        }
+        variant="title.medium"
+      >
+        <Text
+          style={
+            Object {
+              "fontFamily": "",
+              "fontSize": 24,
+              "fontWeight": 700,
+              "lineHeight": "32px",
+            }
+          }
+          variant="title.medium"
+        >
+          Hello World!
+        </Text>
+      </Text>
+    </emotion(Text)>
+  </ThemeProvider>
+</ThemeProvider>
 `;
 
 exports[`Text looks like a "title.small" 1`] = `
-<emotion(Text)
-  variant="title.small"
->
-  <Text
-    style={
+<ThemeProvider>
+  <ThemeProvider
+    theme={
       Object {
-        "map": undefined,
-        "name": "13qd1wa",
-        "next": undefined,
-        "styles": "
-	
-	
-				
-  font-weight: 400;
-
-				
-	font-size: 20px;
-	line-height: 28px;
-
-			;
-",
-        "toString": [Function],
+        "fontSizes": Array [
+          12,
+          14,
+          16,
+          20,
+          24,
+          32,
+        ],
+        "fontWeights": Array [
+          400,
+          600,
+          700,
+        ],
+        "fonts": Array [
+          "",
+        ],
+        "lineHeights": Array [
+          "16px",
+          "20px",
+          "24px",
+          "28px",
+          "32px",
+          "40px",
+        ],
       }
     }
-    variant="title.small"
   >
-    <Text
-      style={
-        Object {
-          "map": undefined,
-          "name": "13qd1wa",
-          "next": undefined,
-          "styles": "
-	
-	
-				
-  font-weight: 400;
-
-				
-	font-size: 20px;
-	line-height: 28px;
-
-			;
-",
-          "toString": [Function],
-        }
-      }
+    <emotion(Text)
       variant="title.small"
     >
-      Hello World!
-    </Text>
-  </Text>
-</emotion(Text)>
+      <Text
+        style={
+          Object {
+            "fontFamily": "",
+            "fontSize": 20,
+            "fontWeight": 700,
+            "lineHeight": "28px",
+          }
+        }
+        variant="title.small"
+      >
+        <Text
+          style={
+            Object {
+              "fontFamily": "",
+              "fontSize": 20,
+              "fontWeight": 700,
+              "lineHeight": "28px",
+            }
+          }
+          variant="title.small"
+        >
+          Hello World!
+        </Text>
+      </Text>
+    </emotion(Text)>
+  </ThemeProvider>
+</ThemeProvider>
 `;

@@ -3,21 +3,65 @@
 exports[`Text looks like a "body" 1`] = `
 .emotion-0 {
   margin: 0;
-  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
-  font-weight: 400;
-  font-size: 16px;
-  line-height: 24px;
 }
 
-<Text
-  variant="body"
->
-  <p
-    className="emotion-0 emotion-1"
+.emotion-0 large {
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.emotion-0 small {
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 16px;
+}
+
+<ThemeProvider>
+  <ThemeProvider
+    theme={
+      Object {
+        "fontSizes": Array [
+          12,
+          14,
+          16,
+          20,
+          24,
+          32,
+        ],
+        "fontWeights": Array [
+          400,
+          600,
+          700,
+        ],
+        "fonts": Array [
+          "-apple-system, BlinkMacSystemFont, \\"Segoe UI\\", Roboto,
+Oxygen-Sans, Ubuntu, Cantarell, \\"Helvetica Neue\\", sans-serif;",
+        ],
+        "lineHeights": Array [
+          "16px",
+          "20px",
+          "24px",
+          "28px",
+          "32px",
+          "40px",
+        ],
+      }
+    }
   >
-    Hello World!
-  </p>
-</Text>
+    <Text
+      variant="body"
+    >
+      <p
+        className="emotion-0 emotion-1"
+      >
+        Hello World!
+      </p>
+    </Text>
+  </ThemeProvider>
+</ThemeProvider>
 `;
 
 exports[`Text looks like a "body.small" 1`] = `
@@ -25,19 +69,53 @@ exports[`Text looks like a "body.small" 1`] = `
   margin: 0;
   font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
   font-weight: 400;
-  font-size: 14px;
-  line-height: 20px;
+  font-size: 12px;
+  line-height: 16px;
 }
 
-<Text
-  variant="body.small"
->
-  <p
-    className="emotion-0 emotion-1"
+<ThemeProvider>
+  <ThemeProvider
+    theme={
+      Object {
+        "fontSizes": Array [
+          12,
+          14,
+          16,
+          20,
+          24,
+          32,
+        ],
+        "fontWeights": Array [
+          400,
+          600,
+          700,
+        ],
+        "fonts": Array [
+          "-apple-system, BlinkMacSystemFont, \\"Segoe UI\\", Roboto,
+Oxygen-Sans, Ubuntu, Cantarell, \\"Helvetica Neue\\", sans-serif;",
+        ],
+        "lineHeights": Array [
+          "16px",
+          "20px",
+          "24px",
+          "28px",
+          "32px",
+          "40px",
+        ],
+      }
+    }
   >
-    Hello World!
-  </p>
-</Text>
+    <Text
+      variant="body.small"
+    >
+      <p
+        className="emotion-0 emotion-1"
+      >
+        Hello World!
+      </p>
+    </Text>
+  </ThemeProvider>
+</ThemeProvider>
 `;
 
 exports[`Text looks like a "button" 1`] = `
@@ -49,15 +127,49 @@ exports[`Text looks like a "button" 1`] = `
   line-height: 20px;
 }
 
-<Text
-  variant="button"
->
-  <p
-    className="emotion-0 emotion-1"
+<ThemeProvider>
+  <ThemeProvider
+    theme={
+      Object {
+        "fontSizes": Array [
+          12,
+          14,
+          16,
+          20,
+          24,
+          32,
+        ],
+        "fontWeights": Array [
+          400,
+          600,
+          700,
+        ],
+        "fonts": Array [
+          "-apple-system, BlinkMacSystemFont, \\"Segoe UI\\", Roboto,
+Oxygen-Sans, Ubuntu, Cantarell, \\"Helvetica Neue\\", sans-serif;",
+        ],
+        "lineHeights": Array [
+          "16px",
+          "20px",
+          "24px",
+          "28px",
+          "32px",
+          "40px",
+        ],
+      }
+    }
   >
-    Hello World!
-  </p>
-</Text>
+    <Text
+      variant="button"
+    >
+      <p
+        className="emotion-0 emotion-1"
+      >
+        Hello World!
+      </p>
+    </Text>
+  </ThemeProvider>
+</ThemeProvider>
 `;
 
 exports[`Text looks like a "caption" 1`] = `
@@ -69,15 +181,49 @@ exports[`Text looks like a "caption" 1`] = `
   line-height: 16px;
 }
 
-<Text
-  variant="caption"
->
-  <p
-    className="emotion-0 emotion-1"
+<ThemeProvider>
+  <ThemeProvider
+    theme={
+      Object {
+        "fontSizes": Array [
+          12,
+          14,
+          16,
+          20,
+          24,
+          32,
+        ],
+        "fontWeights": Array [
+          400,
+          600,
+          700,
+        ],
+        "fonts": Array [
+          "-apple-system, BlinkMacSystemFont, \\"Segoe UI\\", Roboto,
+Oxygen-Sans, Ubuntu, Cantarell, \\"Helvetica Neue\\", sans-serif;",
+        ],
+        "lineHeights": Array [
+          "16px",
+          "20px",
+          "24px",
+          "28px",
+          "32px",
+          "40px",
+        ],
+      }
+    }
   >
-    Hello World!
-  </p>
-</Text>
+    <Text
+      variant="caption"
+    >
+      <p
+        className="emotion-0 emotion-1"
+      >
+        Hello World!
+      </p>
+    </Text>
+  </ThemeProvider>
+</ThemeProvider>
 `;
 
 exports[`Text looks like a "label" 1`] = `
@@ -89,37 +235,113 @@ exports[`Text looks like a "label" 1`] = `
   line-height: 16px;
 }
 
-<Text
-  variant="label"
->
-  <p
-    className="emotion-0 emotion-1"
+<ThemeProvider>
+  <ThemeProvider
+    theme={
+      Object {
+        "fontSizes": Array [
+          12,
+          14,
+          16,
+          20,
+          24,
+          32,
+        ],
+        "fontWeights": Array [
+          400,
+          600,
+          700,
+        ],
+        "fonts": Array [
+          "-apple-system, BlinkMacSystemFont, \\"Segoe UI\\", Roboto,
+Oxygen-Sans, Ubuntu, Cantarell, \\"Helvetica Neue\\", sans-serif;",
+        ],
+        "lineHeights": Array [
+          "16px",
+          "20px",
+          "24px",
+          "28px",
+          "32px",
+          "40px",
+        ],
+      }
+    }
   >
-    Hello World!
-  </p>
-</Text>
+    <Text
+      variant="label"
+    >
+      <p
+        className="emotion-0 emotion-1"
+      >
+        Hello World!
+      </p>
+    </Text>
+  </ThemeProvider>
+</ThemeProvider>
 `;
 
 exports[`Text looks like a "subtitle" 1`] = `
 .emotion-0 {
   margin: 0;
+}
+
+.emotion-0 large {
   font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
   font-weight: 600;
-  font-size: 14px;
-  line-height: 20px;
   font-size: 16px;
   line-height: 24px;
 }
 
-<Text
-  variant="subtitle"
->
-  <p
-    className="emotion-0 emotion-1"
+.emotion-0 small {
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+<ThemeProvider>
+  <ThemeProvider
+    theme={
+      Object {
+        "fontSizes": Array [
+          12,
+          14,
+          16,
+          20,
+          24,
+          32,
+        ],
+        "fontWeights": Array [
+          400,
+          600,
+          700,
+        ],
+        "fonts": Array [
+          "-apple-system, BlinkMacSystemFont, \\"Segoe UI\\", Roboto,
+Oxygen-Sans, Ubuntu, Cantarell, \\"Helvetica Neue\\", sans-serif;",
+        ],
+        "lineHeights": Array [
+          "16px",
+          "20px",
+          "24px",
+          "28px",
+          "32px",
+          "40px",
+        ],
+      }
+    }
   >
-    Hello World!
-  </p>
-</Text>
+    <Text
+      variant="subtitle"
+    >
+      <p
+        className="emotion-0 emotion-1"
+      >
+        Hello World!
+      </p>
+    </Text>
+  </ThemeProvider>
+</ThemeProvider>
 `;
 
 exports[`Text looks like a "subtitle.small" 1`] = `
@@ -129,77 +351,211 @@ exports[`Text looks like a "subtitle.small" 1`] = `
   font-weight: 600;
   font-size: 14px;
   line-height: 20px;
-  font-size: 14px;
-  line-height: 20px;
 }
 
-<Text
-  variant="subtitle.small"
->
-  <p
-    className="emotion-0 emotion-1"
+<ThemeProvider>
+  <ThemeProvider
+    theme={
+      Object {
+        "fontSizes": Array [
+          12,
+          14,
+          16,
+          20,
+          24,
+          32,
+        ],
+        "fontWeights": Array [
+          400,
+          600,
+          700,
+        ],
+        "fonts": Array [
+          "-apple-system, BlinkMacSystemFont, \\"Segoe UI\\", Roboto,
+Oxygen-Sans, Ubuntu, Cantarell, \\"Helvetica Neue\\", sans-serif;",
+        ],
+        "lineHeights": Array [
+          "16px",
+          "20px",
+          "24px",
+          "28px",
+          "32px",
+          "40px",
+        ],
+      }
+    }
   >
-    Hello World!
-  </p>
-</Text>
+    <Text
+      variant="subtitle.small"
+    >
+      <p
+        className="emotion-0 emotion-1"
+      >
+        Hello World!
+      </p>
+    </Text>
+  </ThemeProvider>
+</ThemeProvider>
 `;
 
 exports[`Text looks like a "title.large" 1`] = `
 .emotion-0 {
   margin: 0;
   font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
-  font-weight: 400;
+  font-weight: 700;
   font-size: 32px;
   line-height: 40px;
 }
 
-<Text
-  variant="title.large"
->
-  <p
-    className="emotion-0 emotion-1"
+<ThemeProvider>
+  <ThemeProvider
+    theme={
+      Object {
+        "fontSizes": Array [
+          12,
+          14,
+          16,
+          20,
+          24,
+          32,
+        ],
+        "fontWeights": Array [
+          400,
+          600,
+          700,
+        ],
+        "fonts": Array [
+          "-apple-system, BlinkMacSystemFont, \\"Segoe UI\\", Roboto,
+Oxygen-Sans, Ubuntu, Cantarell, \\"Helvetica Neue\\", sans-serif;",
+        ],
+        "lineHeights": Array [
+          "16px",
+          "20px",
+          "24px",
+          "28px",
+          "32px",
+          "40px",
+        ],
+      }
+    }
   >
-    Hello World!
-  </p>
-</Text>
+    <Text
+      variant="title.large"
+    >
+      <p
+        className="emotion-0 emotion-1"
+      >
+        Hello World!
+      </p>
+    </Text>
+  </ThemeProvider>
+</ThemeProvider>
 `;
 
 exports[`Text looks like a "title.medium" 1`] = `
 .emotion-0 {
   margin: 0;
   font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
-  font-weight: 400;
+  font-weight: 700;
   font-size: 24px;
   line-height: 32px;
 }
 
-<Text
-  variant="title.medium"
->
-  <p
-    className="emotion-0 emotion-1"
+<ThemeProvider>
+  <ThemeProvider
+    theme={
+      Object {
+        "fontSizes": Array [
+          12,
+          14,
+          16,
+          20,
+          24,
+          32,
+        ],
+        "fontWeights": Array [
+          400,
+          600,
+          700,
+        ],
+        "fonts": Array [
+          "-apple-system, BlinkMacSystemFont, \\"Segoe UI\\", Roboto,
+Oxygen-Sans, Ubuntu, Cantarell, \\"Helvetica Neue\\", sans-serif;",
+        ],
+        "lineHeights": Array [
+          "16px",
+          "20px",
+          "24px",
+          "28px",
+          "32px",
+          "40px",
+        ],
+      }
+    }
   >
-    Hello World!
-  </p>
-</Text>
+    <Text
+      variant="title.medium"
+    >
+      <p
+        className="emotion-0 emotion-1"
+      >
+        Hello World!
+      </p>
+    </Text>
+  </ThemeProvider>
+</ThemeProvider>
 `;
 
 exports[`Text looks like a "title.small" 1`] = `
 .emotion-0 {
   margin: 0;
   font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
-  font-weight: 400;
+  font-weight: 700;
   font-size: 20px;
   line-height: 28px;
 }
 
-<Text
-  variant="title.small"
->
-  <p
-    className="emotion-0 emotion-1"
+<ThemeProvider>
+  <ThemeProvider
+    theme={
+      Object {
+        "fontSizes": Array [
+          12,
+          14,
+          16,
+          20,
+          24,
+          32,
+        ],
+        "fontWeights": Array [
+          400,
+          600,
+          700,
+        ],
+        "fonts": Array [
+          "-apple-system, BlinkMacSystemFont, \\"Segoe UI\\", Roboto,
+Oxygen-Sans, Ubuntu, Cantarell, \\"Helvetica Neue\\", sans-serif;",
+        ],
+        "lineHeights": Array [
+          "16px",
+          "20px",
+          "24px",
+          "28px",
+          "32px",
+          "40px",
+        ],
+      }
+    }
   >
-    Hello World!
-  </p>
-</Text>
+    <Text
+      variant="title.small"
+    >
+      <p
+        className="emotion-0 emotion-1"
+      >
+        Hello World!
+      </p>
+    </Text>
+  </ThemeProvider>
+</ThemeProvider>
 `;

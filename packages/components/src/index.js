@@ -98,3 +98,4 @@ export {
 	default as withSpokenMessages,
 } from './higher-order/with-spoken-messages';
 export * from './text';
+export * from './theme';
