@@ -9,6 +9,12 @@
 	.components-modal__header {
 		background: none;
 		border-bottom: none;
+
+		.components-icon-button {
+			align-self: flex-start;
+			margin-top: $grid-size-xlarge;
+			position: static;
+		}
 	}
 
 	&__container {
