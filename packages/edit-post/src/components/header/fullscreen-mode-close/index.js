@@ -29,7 +29,9 @@ function FullscreenModeClose( { isActive, postType } ) {
 				href={ addQueryArgs( 'edit.php', { post_type: postType.slug } ) }
 				label={ label }
 			>
-				{ label }
+				<div className="edit-post-fullscreen-mode-close__label">
+					{ label }
+				</div>
 			</IconButton>
 		</Toolbar>
 	);
