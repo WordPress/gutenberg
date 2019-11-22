@@ -384,7 +384,7 @@ describe( 'Change detection', () => {
 
 		// Increase the paragraph's font size again.
 		await page.click( '[data-type="core/paragraph"]' );
-		await page.select( '.components-select-control__input', 'huge' );
+		await page.select( '.components-select-control__input', 'larger' );
 		await page.click( '[data-type="core/paragraph"]' );
 
 		// Check that the post is dirty.
