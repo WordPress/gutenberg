@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`core/more/save saves a simple content without crashing 1`] = `
+<pre>
+  <div
+    dangerouslySetInnerHTML={
+      Object {
+        "__html": "<b>Hello World!</b>",
+      }
+    }
+  />
+</pre>
+`;
