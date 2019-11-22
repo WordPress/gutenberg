@@ -136,7 +136,7 @@ export class ImageEdit extends React.Component {
 	componentDidUpdate( previousProps ) {
 		if ( ! previousProps.image && this.props.image ) {
 			const { image, attributes } = this.props;
-			const url = getUrlForSlug( image, attributes );
+			const url = getUrlForSlug( image, attributes ) || image.source_url;
 			this.props.setAttributes( { url } );
 		}
 	}
