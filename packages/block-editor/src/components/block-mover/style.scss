@@ -1,77 +1,17 @@
-@include break-small() {
-	.block-editor-block-contextual-toolbar:not([data-align="wide"]):not([data-align="full"])
-	.block-editor-block-mover:not(.is-horizontal) {
-		display: block;
-		position: absolute;
-		top: $block-toolbar-height;
-		left: - $block-side-ui-width - 10;
-		opacity: 0;
-		background: $white;
-		border: 1px solid $dark-opacity-light-800;
-		border-radius: $radius-round-rectangle;
-		transition: box-shadow 0.2s ease-out;
-		@include reduce-motion("transition");
-
-		&.is-visible {
-			@include edit-post__fade-in-animation;
-		}
-
-		.block-editor-block-mover__control {
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			padding: 0;
-			border: none;
-
-			// Carefully adjust the size of the side UI to fit one paragraph of text (56px).
-			width: $block-side-ui-width;
-			height: $icon-button-size-small;
-
-			svg {
-				width: $block-side-ui-width;
-				height: $icon-button-size-small;
-				padding: #{ ($block-side-ui-width - $icon-button-size-small) / 2 } #{ ($block-side-ui-width - 18px) / 2 }; // This makes the SVG fill the whole available area, without scaling the artwork.
-			}
-
-			&[aria-disabled="true"] {
-				cursor: default;
-				pointer-events: none;
-				color: $dark-opacity-300;
-			}
-
-			color: $dark-opacity-300;
-
-			&:focus:not(:disabled) {
-				background-color: transparent;
-			}
-		}
+.block-editor-block-mover {
+	display: inline-flex;
+	@include break-medium() {
+		cursor: grab;
 	}
 }
 
-// Don't add negative vertical margin for wide, fullwide, or mobile.
-// @todo: simplify this selector.
-@include break-small() {
-	.block-editor-block-list__block:not([data-align="wide"]):not([data-align="full"]) .block-editor-block-mover:not(.is-horizontal) {
-		margin-top: 0;
-	}
-}
+.block-editor-block-mover__control {
+	@include break-medium() {
+		cursor: grab !important;
 
-.block-editor-block-mover__control-drag-handle {
-	cursor: move; // Fallback for IE/Edge < 14
-	cursor: grab;
-	fill: currentColor;
-
-	&,
-	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):hover,
-	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):active,
-	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):focus {
-		box-shadow: none;
-		background: none;
-		color: $dark-opacity-500;
-	}
-
-	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):active {
-		cursor: grabbing;
+		&:not(:disabled):not([aria-disabled="true"]):active {
+			cursor: grabbing;
+		}
 	}
 }
 
