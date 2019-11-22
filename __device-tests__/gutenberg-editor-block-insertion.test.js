@@ -11,11 +11,12 @@ import {
 	isLocalEnvironment,
 	stopDriver,
 	isAndroid,
-	clickMiddleOfElement,
+	swipeDown,
+	clickMiddleOfElement, timer,
 } from './helpers/utils';
 import testData from './helpers/test-data';
 
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000000;
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 100000;
 
 describe( 'Gutenberg Editor tests for Block insertion', () => {
 	let driver;
@@ -39,6 +40,7 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 	} );
 
 	it( 'should be able to see visual editor', async () => {
+		// wait for the block editor to load
 		await expect( editorPage.getBlockList() ).resolves.toBe( true );
 	} );
 
@@ -100,8 +102,8 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 			await editorPage.dismissKeyboard();
 		}
 
+		await swipeDown( driver );
 		const titleElement = await editorPage.getTitleElement( { autoscroll: true } );
-		await titleElement.click();
 		await titleElement.click();
 
 		await editorPage.addNewParagraphBlock();
