@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { text } from '@storybook/addon-knobs';
+import { boolean, text } from '@storybook/addon-knobs';
 
 /**
  * Internal dependencies
@@ -14,12 +14,13 @@ export default { title: 'Components|Panel', component: Panel };
 
 export const _default = () => {
 	const bodyTitle = text( 'Body Title', 'My Block Settings' );
+	const opened = boolean( 'Opened', true );
 	const rowText = text( 'Row Text', 'My Panel Inputs and Labels' );
 	return (
 		<Panel header="My Panel">
 			<PanelBody
 				title={ bodyTitle }
-				initialOpen={ true }
+				opened={ opened }
 			>
 				<PanelRow>
 					{ rowText }
@@ -30,15 +31,17 @@ export const _default = () => {
 };
 
 export const multipleBodies = () => {
-	const body1Title = text( 'Body 1 Title', 'First Settings' );
-	const body2Title = text( 'Body 2 Title', 'Second Settings' );
-	const row1Text = text( 'Row Text', 'My Panel Inputs and Labels' );
-	const row2Text = text( 'Row Text', 'My Panel Inputs and Labels' );
+	const body1Title = text( '1: Body Title', 'First Settings' );
+	const body2Title = text( '2: Body Title', 'Second Settings' );
+	const body1Open = boolean( '1: Opened', true );
+	const body2Open = boolean( '2: Opened', false );
+	const row1Text = text( '1: Row Text', 'My Panel Inputs and Labels' );
+	const row2Text = text( '2: Row Text', 'My Panel Inputs and Labels' );
 	return (
 		<Panel header="My Panel">
 			<PanelBody
 				title={ body1Title }
-				initialOpen={ true }
+				opened={ body1Open }
 			>
 				<PanelRow>
 					{ row1Text }
@@ -46,7 +49,7 @@ export const multipleBodies = () => {
 			</PanelBody>
 			<PanelBody
 				title={ body2Title }
-				initialOpen={ false }
+				opened={ body2Open }
 			>
 				<PanelRow>
 					{ row2Text }
@@ -60,11 +63,12 @@ export const withIcon = () => {
 	const bodyTitle = text( 'Body Title', 'My Block Settings' );
 	const rowText = text( 'Row Text', 'My Panel Inputs and Labels' );
 	const icon = text( 'Icon', 'wordpress' );
+	const opened = boolean( 'Opened', true );
 	return (
 		<Panel header="My Panel">
 			<PanelBody
 				title={ bodyTitle }
-				initialOpen={ true }
+				opened={ opened }
 				icon={ icon }
 			>
 				<PanelRow>
