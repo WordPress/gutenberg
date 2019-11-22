@@ -14,6 +14,10 @@
 	@supports (position: sticky) {
 		flex-basis: 100%;
 	}
+
+	// This min-height is there to ensure the editing canvas extends at least to the full height available.
+	// This ensures a theme that uses a background color other than white doesn't look cropped without content.
+	min-height: 100%;
 }
 
 .edit-post-visual-editor .block-editor-writing-flow__click-redirect {
