@@ -71,6 +71,10 @@ const sizeOptions = map( sizeOptionLabels, ( label, option ) => ( { value: optio
 // Default Image ratio 4:3
 const IMAGE_ASPECT_RATIO = 4 / 3;
 
+const getUrlForSlug = ( image, { sizeSlug } ) => {
+	return get( image, [ 'media_details', 'sizes', sizeSlug, 'source_url' ] );
+};
+
 export class ImageEdit extends React.Component {
 	constructor( props ) {
 		super( props );
@@ -126,6 +130,14 @@ export class ImageEdit extends React.Component {
 		// this action will only exist if the user pressed the trash button on the block holder
 		if ( hasAction( 'blocks.onRemoveBlockCheckUpload' ) && this.state.isUploadInProgress ) {
 			doAction( 'blocks.onRemoveBlockCheckUpload', this.props.attributes.id );
+		}
+	}
+
+	componentDidUpdate( previousProps ) {
+		if ( ! previousProps.image && this.props.image ) {
+			const { image, attributes } = this.props;
+			const url = getUrlForSlug( image, attributes );
+			this.props.setAttributes( { url } );
 		}
 	}
 
@@ -212,7 +224,7 @@ export class ImageEdit extends React.Component {
 	onSetSizeSlug( sizeSlug ) {
 		const { image } = this.props;
 
-		const url = get( image, [ 'media_details', 'sizes', sizeSlug, 'source_url' ] );
+		const url = getUrlForSlug( image, { sizeSlug } );
 		if ( ! url ) {
 			return null;
 		}
@@ -236,9 +248,31 @@ export class ImageEdit extends React.Component {
 		} );
 	}
 
-	onSelectMediaUploadOption( { id, url } ) {
-		const { setAttributes } = this.props;
-		setAttributes( { id, url } );
+	onSelectMediaUploadOption( media ) {
+		const { id, url } = this.props.attributes;
+
+		const mediaAttributes = {
+			id: media.id,
+			url: media.url,
+		};
+
+		let additionalAttributes;
+		// Reset the dimension attributes if changing to a different image.
+		if ( ! media.id || media.id !== id ) {
+			additionalAttributes = {
+				width: undefined,
+				height: undefined,
+				sizeSlug: DEFAULT_SIZE_SLUG,
+			};
+		} else {
+			// Keep the same url when selecting the same file, so "Image Size" option is not changed.
+			additionalAttributes = { url };
+		}
+
+		this.props.setAttributes( {
+			...mediaAttributes,
+			...additionalAttributes,
+		} );
 	}
 
 	onFocusCaption() {
