@@ -33,7 +33,39 @@ $admin-sidebar-width-collapsed: 36px;
 $empty-paragraph-height: $text-editor-font-size * 4;
 $modal-min-width: 360px;
 
-// Visuals
+// Color: primary
+// Focuses attention. Use on buttons and other UI controls.
+$color-primary: $blue-50;
+$color-primary-light: $blue-40;
+$color-primary-dark: $blue-60;
+
+// Color: backgrounds
+$color-background: $gray-0; // Light gray background, usually behind scrollable content
+$color-surface: $white; // White background surface color used for UI elements
+
+// Color: text and icons
+// “On-” colors define how text and icons are colored in relation to the surface on which they appear.
+$color-on-background: $gray-80;
+$color-on-background-subtle: $gray-50;
+
+$color-on-surface: $gray-80;
+$color-on-surface-subtle: $gray-50;
+
+$color-on-error: $white;
+$color-on-success: $white;
+$color-on-warning: $white;
+
+// Color: messaging
+$color-error: $red-50;
+$color-success: $green-50;
+$color-warning: $yellow-50;
+
+// Color: borders
+$color-border: $gray-10;
+$color-border-light: $gray-5;
+$color-border-dark: $gray-30; // Meets necessary contrast (3:1) for UI controls
+
+// Elevation
 $shadow-popover: 0 3px 30px rgba($dark-gray-900, 0.1);
 $shadow-toolbar: 0 2px 10px rgba($dark-gray-900, 0.1), 0 0 2px rgba($dark-gray-900, 0.1);
 $shadow-below-only: 0 5px 10px rgba($dark-gray-900, 0.05), 0 2px 2px rgba($dark-gray-900, 0.05);
