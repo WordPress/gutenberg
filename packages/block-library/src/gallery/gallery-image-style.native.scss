@@ -1,6 +1,10 @@
+@function get-gallery-image-container-height() {
+	@return 150px;
+}
+
 .galleryImageContainer {
 	flex: 1;
-	height: 150px;
+	height: get-gallery-image-container-height();
 	background-color: $gray-lighten-30;
 }
 
@@ -146,7 +150,8 @@
 // expand caption container to compensate for overlay border
 .captionExpandedContainer {
 	$width: get-overlay-border-width();
-	max-height: $min-height-paragraph + $width;
+	// constrain height to gallery image height for caption scroll
+	max-height: get-gallery-image-container-height();
 	position: absolute;
 	bottom: - $width;
 	left: - $width;
