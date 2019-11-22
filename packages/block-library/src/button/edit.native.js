@@ -6,8 +6,8 @@ import { View } from 'react-native';
  * WordPress dependencies
  */
 import {
-	compose,
 	withInstanceId,
+	compose,
 } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import {
@@ -32,6 +32,10 @@ import richTextStyle from './richText.scss';
 import styles from './editor.scss';
 
 const NEW_TAB_REL = 'noreferrer noopener';
+const INITIAL_BORDER_RADIUS = 4;
+const MIN_BORDER_RADIUS_VALUE = 0;
+const MAX_BORDER_RADIUS_VALUE = 50;
+const BORDER_WIDTH = 1;
 
 const ButtonEdit = ( { attributes, setAttributes, backgroundColor, textColor, isSelected } ) => {
 	const {
@@ -42,6 +46,9 @@ const ButtonEdit = ( { attributes, setAttributes, backgroundColor, textColor, is
 		linkTarget,
 		rel,
 	} = attributes;
+
+	const borderRadiusValue = borderRadius || INITIAL_BORDER_RADIUS;
+	const defaultBackgroundColor = '#2271b1';
 
 	const onToggleOpenInNewTab = useCallback(
 		( value ) => {
@@ -72,15 +79,15 @@ const ButtonEdit = ( { attributes, setAttributes, backgroundColor, textColor, is
 		<View
 			style={ [
 				styles.container,
-				isSelected && { ...styles.selected, borderRadius: ( borderRadius || 4 ) + 5 },
+				isSelected && { borderColor: backgroundColor.color || defaultBackgroundColor, borderRadius: borderRadiusValue + 5, borderWidth: BORDER_WIDTH },
 			] }
 		>
 			<View
 				style={ [
 					styles.richTextWrapper,
 					{
-						borderRadius: borderRadius || 4,
-						backgroundColor: backgroundColor.color || '#0087be',
+						borderRadius: borderRadiusValue,
+						backgroundColor: backgroundColor.color || defaultBackgroundColor,
 					},
 				] }
 			>
@@ -93,15 +100,16 @@ const ButtonEdit = ( { attributes, setAttributes, backgroundColor, textColor, is
 						color: textColor.color || '#fff',
 					} }
 					textAlign="center"
+					placeholderTextColor="#668eaa"
 				/>
 			</View>
 			<InspectorControls>
 				<PanelBody title={ __( 'Border Settings' ) } >
 					<RangeControl
 						label={ __( 'Border Radius' ) }
-						minimumValue={ 0 }
-						maximumValue={ 50 }
-						value={ borderRadius || 4 }
+						minimumValue={ MIN_BORDER_RADIUS_VALUE }
+						maximumValue={ MAX_BORDER_RADIUS_VALUE }
+						value={ borderRadiusValue }
 						onChange={ changeAttribute }
 						separatorType="none"
 					/>
