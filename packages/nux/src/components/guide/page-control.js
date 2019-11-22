@@ -6,6 +6,7 @@ import { times } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { __, sprintf } from '@wordpress/i18n';
 import { IconButton } from '@wordpress/components';
 
 /**
@@ -15,14 +16,18 @@ import { PageControlIcon } from './icons';
 
 export default function PageControl( { currentPage, numberOfPages, setCurrentPage } ) {
 	return (
-		<div className="nux-guide__page-control">
+		<ul className="nux-guide__page-control" aria-label={ __( 'Guide controls' ) }>
 			{ times( numberOfPages, ( page ) => (
-				<IconButton
-					key={ page }
-					icon={ <PageControlIcon isSelected={ page === currentPage } /> }
-					onClick={ () => setCurrentPage( page ) }
-				/>
+				<li key={ page }>
+					<IconButton
+						key={ page }
+						icon={ <PageControlIcon isSelected={ page === currentPage } /> }
+						/* translators: %1$d: current page number %2$d: total number of pages */
+						aria-label={ sprintf( __( 'Page %1$d of %2$d' ), page + 1, numberOfPages ) }
+						onClick={ () => setCurrentPage( page ) }
+					/>
+				</li>
 			) ) }
-		</div>
+		</ul>
 	);
 }

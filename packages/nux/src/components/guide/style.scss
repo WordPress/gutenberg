@@ -40,10 +40,15 @@
 	}
 
 	&__page-control {
-		display: flex;
+		margin: 0;
 
-		.components-button {
+		li {
+			display: inline-block;
 			margin: 0 2px;
+		}
+
+		.components-icon-button {
+			height: 30px;
 		}
 	}
 
