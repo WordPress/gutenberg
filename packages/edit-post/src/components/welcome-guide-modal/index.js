@@ -29,7 +29,7 @@ export default function WelcomeGuideModal() {
 
 			<Guide.Page className="edit-post-welcome-guide-modal__page">
 				<h1 className="edit-post-welcome-guide-modal__heading">
-					{ __( 'Welcome to the block editor' ) }
+					{ __( 'Welcome to the Block Editor' ) }
 				</h1>
 				<CanvasImage className="edit-post-welcome-guide-modal__image" />
 				<p className="edit-post-welcome-guide-modal__text">
@@ -49,7 +49,7 @@ export default function WelcomeGuideModal() {
 
 			<Guide.Page className="edit-post-welcome-guide-modal__page">
 				<h1 className="edit-post-welcome-guide-modal__heading">
-					{ __( 'Get to know the block library' ) }
+					{ __( 'Get to know the Block Library' ) }
 				</h1>
 				<BlockLibraryImage className="edit-post-welcome-guide-modal__image" />
 				<p className="edit-post-welcome-guide-modal__text">
