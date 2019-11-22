@@ -598,8 +598,10 @@ class RichText extends Component {
 
 		this.value = this.valueToFormat( record );
 		this.record = record;
-		this.props.onChange( this.value );
+		// Selection must be updated first, so it is recorded in history when
+		// the content change happens.
 		this.props.onSelectionChange( start, end );
+		this.props.onChange( this.value );
 		this.setState( { activeFormats } );
 
 		if ( ! withoutHistory ) {

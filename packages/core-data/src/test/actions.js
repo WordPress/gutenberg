@@ -1,7 +1,34 @@
 /**
  * Internal dependencies
  */
-import { saveEntityRecord, receiveEntityRecords, receiveUserPermission, receiveAutosaves, receiveCurrentUser } from '../actions';
+import {
+	editEntityRecord,
+	saveEntityRecord,
+	receiveEntityRecords,
+	receiveUserPermission,
+	receiveAutosaves,
+	receiveCurrentUser,
+} from '../actions';
+import { select } from '../controls';
+
+describe( 'editEntityRecord', () => {
+	it( 'throws when the edited entity does not have a loaded config.', () => {
+		const entity = { kind: 'someKind', name: 'someName', id: 'someId' };
+		const fulfillment = editEntityRecord(
+			entity.kind,
+			entity.name,
+			entity.id,
+			{}
+		);
+		expect( fulfillment.next().value ).toEqual(
+			select( 'getEntity', entity.kind, entity.name )
+		);
+		// Don't pass back an entity config.
+		expect( fulfillment.next.bind( fulfillment ) ).toThrow(
+			`The entity being edited (${ entity.kind }, ${ entity.name }) does not have a loaded config.`
+		);
+	} );
+} );
 
 describe( 'saveEntityRecord', () => {
 	it( 'triggers a POST request for a new record', async () => {

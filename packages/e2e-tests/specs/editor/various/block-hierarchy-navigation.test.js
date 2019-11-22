@@ -82,7 +82,6 @@ describe( 'Navigating the block hierarchy', () => {
 		await pressKeyWithModifier( 'ctrl', '`' );
 		await pressKeyWithModifier( 'ctrl', '`' );
 		await pressKeyWithModifier( 'ctrl', '`' );
-		await pressKeyWithModifier( 'ctrl', '`' );
 		await pressKeyTimes( 'Tab', 4 );
 
 		// Tweak the columns count by increasing it by one.
