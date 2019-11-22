@@ -1,3 +1,9 @@
+// This min-height is there to ensure the editing canvas extends at least to the full height available.
+// This ensures a theme that uses a background color other than white doesn't look cropped without content.
+.edit-post-visual-editor {
+	min-height: 100%;
+}
+
 .edit-post-layout__metaboxes {
 	flex-shrink: 0;
 }
