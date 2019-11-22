@@ -57,7 +57,7 @@ module.exports = {
 		'no-with': 'error',
 		'object-curly-spacing': [ 'error', 'always' ],
 		'one-var-declaration-per-line': [ 'error', 'initializations' ],
-		'operator-linebreak': [ 'error', 'after' ],
+		'operator-linebreak': 'error',
 		'padded-blocks': [ 'error', 'never' ],
 		'quote-props': [ 'error', 'as-needed' ],
 		quotes: [ 'error', 'single', { avoidEscape: true } ],
