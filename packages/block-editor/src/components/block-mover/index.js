@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { first, last, partial, castArray } from 'lodash';
+import { first, last, partial } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -46,7 +46,7 @@ export class BlockMover extends Component {
 	render() {
 		const { onMoveUp, onMoveDown, __experimentalOrientation: orientation, isRTL, isFirst, isLast, clientIds, blockType, firstIndex, isLocked, instanceId, isHidden, rootClientId } = this.props;
 		const { isFocused } = this.state;
-		const blocksCount = castArray( clientIds ).length;
+		const blocksCount = clientIds.length;
 		if ( isLocked || ( isFirst && isLast && ! rootClientId ) ) {
 			return null;
 		}
@@ -103,7 +103,7 @@ export class BlockMover extends Component {
 					{ ( { onDraggableStart, onDraggableEnd } ) => (
 						<Button
 							icon={ dragHandle }
-							className="block-editor-block-mover__control-drag-handle block-editor-block-mover__control"
+							className="block-editor-block-mover__control-drag-handle"
 							aria-hidden="true"
 							// Should not be able to tab to drag handle as this
 							// button can only be used with a pointer device.
@@ -162,13 +162,12 @@ export class BlockMover extends Component {
 export default compose(
 	withSelect( ( select, { clientIds } ) => {
 		const { getBlock, getBlockIndex, getTemplateLock, getBlockRootClientId, getBlockOrder } = select( 'core/block-editor' );
-		const normalizedClientIds = castArray( clientIds );
-		const firstClientId = first( normalizedClientIds );
+		const firstClientId = first( clientIds );
 		const block = getBlock( firstClientId );
-		const rootClientId = getBlockRootClientId( first( normalizedClientIds ) );
+		const rootClientId = getBlockRootClientId( first( clientIds ) );
 		const blockOrder = getBlockOrder( rootClientId );
 		const firstIndex = getBlockIndex( firstClientId, rootClientId );
-		const lastIndex = getBlockIndex( last( normalizedClientIds ), rootClientId );
+		const lastIndex = getBlockIndex( last( clientIds ), rootClientId );
 		const { getSettings } = select( 'core/block-editor' );
 		const {
 			isRTL,

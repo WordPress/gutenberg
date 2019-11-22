@@ -75,7 +75,6 @@ export { default as BlockToolbar } from './block-toolbar';
 export { default as CopyHandler } from './copy-handler';
 export { default as DefaultBlockAppender } from './default-block-appender';
 export { default as Inserter } from './inserter';
-export { default as MultiBlocksSwitcher } from './block-switcher/multi-blocks-switcher';
 export { default as BlockEditorKeyboardShortcuts } from './keyboard-shortcuts';
 export { default as MultiSelectScrollIntoView } from './multi-select-scroll-into-view';
 export { default as NavigableToolbar } from './navigable-toolbar';
