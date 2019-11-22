@@ -268,10 +268,10 @@ export default compose( [
 		const isParentSelected = selectedBlockClientId && selectedBlockClientId === parents[ 0 ];
 		const isAncestorSelected = selectedBlockClientId && parents.includes( selectedBlockClientId );
 		const selectionIsNested = !! getBlockRootClientId( selectedBlockClientId );
-		const isDimmed = ! isSelected && ! isAncestorSelected && firstToSelectId === clientId && selectionIsNested;
 
 		const isDescendantSelected = selectedBlockClientId && getBlockParents( selectedBlockClientId ).includes( clientId );
 		const isTouchable = isSelected || isDescendantSelected || selectedBlockClientId === parentId || parentId === '';
+		const isDimmed = ! isSelected && selectionIsNested && ! isAncestorSelected && ! isDescendantSelected && ( firstToSelectId === clientId || rootBlockId === clientId );
 
 		return {
 			icon,
