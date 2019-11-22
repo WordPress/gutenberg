@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { get } from 'lodash';
-import { parseToRgb } from 'polished';
+import tinycolor from 'tinycolor2';
 /**
  * Internal dependencies
  */
@@ -20,8 +20,8 @@ import { COLORS } from './colors-values';
  * // rgba(0, 0, 0, 0.5)
  */
 export function rgba( hexValue = '', alpha = 1 ) {
-	const { red, green, blue } = parseToRgb( hexValue );
-	return `rgba(${ red }, ${ green }, ${ blue }, ${ alpha })`;
+	const { r, g, b } = tinycolor( hexValue ).toRgb();
+	return `rgba(${ r }, ${ g }, ${ b }, ${ alpha })`;
 }
 
 /**

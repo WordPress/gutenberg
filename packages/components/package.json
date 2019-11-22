@@ -41,7 +41,6 @@
 		"memize": "^1.0.5",
 		"moment": "^2.22.1",
 		"mousetrap": "^1.6.2",
-		"polished": "^3.4.2",
 		"re-resizable": "^6.0.0",
 		"react-dates": "^17.1.1",
 		"react-spring": "^8.0.20",
