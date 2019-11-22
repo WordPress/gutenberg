@@ -16,17 +16,21 @@ function FullscreenModeClose( { isActive, postType } ) {
 		return null;
 	}
 
+	const label = get(
+		postType,
+		[ 'labels', 'view_items' ],
+		__( 'Back' ),
+	);
+
 	return (
 		<Toolbar className="edit-post-fullscreen-mode-close__toolbar">
 			<IconButton
 				icon="arrow-left-alt2"
 				href={ addQueryArgs( 'edit.php', { post_type: postType.slug } ) }
-				label={ get(
-					postType,
-					[ 'labels', 'view_items' ],
-					__( 'Back' )
-				) }
-			/>
+				label={ label }
+			>
+				{ label }
+			</IconButton>
 		</Toolbar>
 	);
 }
