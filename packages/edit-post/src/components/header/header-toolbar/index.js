@@ -11,7 +11,7 @@ import {
 	BlockToolbar,
 	NavigableToolbar,
 	BlockNavigationDropdown,
-	NavigationToolSelector,
+	ToolSelector,
 } from '@wordpress/block-editor';
 import {
 	TableOfContents,
@@ -41,7 +41,7 @@ function HeaderToolbar( { hasFixedToolbar, isLargeViewport, showInserter, isText
 			<EditorHistoryRedo />
 			<TableOfContents hasOutlineItemsDisabled={ isTextModeEnabled } />
 			<BlockNavigationDropdown isDisabled={ isTextModeEnabled } />
-			<NavigationToolSelector />
+			<ToolSelector />
 			{ hasFixedToolbar && isLargeViewport && (
 				<div className="edit-post-header-toolbar__block-toolbar">
 					<BlockToolbar />

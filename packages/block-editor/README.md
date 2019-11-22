@@ -344,7 +344,7 @@ Undocumented declaration.
 
 Undocumented declaration.
 
-<a name="NavigationToolSelector" href="#NavigationToolSelector">#</a> **NavigationToolSelector**
+<a name="ToolSelector" href="#ToolSelector">#</a> **ToolSelector**
 
 Undocumented declaration.
 
