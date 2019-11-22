@@ -12,6 +12,11 @@
 	}
 }
 
+
+.edit-post-layout__content {
+	overflow-x: hidden;
+}
+
 // Adjust the position of the notices
 .edit-post-layout__content .components-editor-notices__snackbar {
 	position: fixed;
