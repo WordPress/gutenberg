@@ -25,6 +25,7 @@
 	"main": "index.js",
 	"dependencies": {
 		"babel-eslint": "^10.0.2",
+		"eslint-config-prettier": "^6.7.0",
 		"eslint-plugin-jest": "^22.15.1",
 		"eslint-plugin-jsdoc": "^15.8.0",
 		"eslint-plugin-jsx-a11y": "^6.2.3",
