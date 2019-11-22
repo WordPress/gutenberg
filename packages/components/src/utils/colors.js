@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { get } from 'lodash';
-import hexRgb from 'hex-rgb';
+import { parseToRgb } from 'polished';
 /**
  * Internal dependencies
  */
@@ -20,8 +20,8 @@ import { COLORS } from './colors-values';
  * // rgba(0, 0, 0, 0.5)
  */
 export function rgba( hexValue = '', alpha = 1 ) {
-	const [ r, g, b ] = hexRgb( hexValue, { format: 'array' } );
-	return `rgba(${ r }, ${ g }, ${ b }, ${ alpha })`;
+	const { red, green, blue } = parseToRgb( hexValue );
+	return `rgba(${ red }, ${ green }, ${ blue }, ${ alpha })`;
 }
 
 /**
