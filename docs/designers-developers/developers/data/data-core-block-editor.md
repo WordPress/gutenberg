@@ -197,8 +197,7 @@ _Parameters_
 
 -   _state_ `Object`: Editor state.
 -   _clientId_ `string`: Block from which to find root client ID.
--   _getDependants_ `boolean`: Apply createSelector function to call getDependants.
--   _includeClientId_ `boolean`: Include client ID in return array.
+-   _ascending_ `boolean`: Get parent hierarchy in top-most hierarchy first (false) or reversed (true).
 
 _Returns_
 
@@ -318,19 +317,6 @@ _Returns_
 
 -   `?string`: First block client ID in the multi-selection set.
 
-<a name="getFirstToSelectBlock" href="#getFirstToSelectBlock">#</a> **getFirstToSelectBlock**
-
-Given a block client ID, returns the next element of the hierarchy from which the block is nested which should be selected onFocus, return the block itself for root level blocks.
-
-_Parameters_
-
--   _state_ `Object`: Editor state.
--   _clientId_ `string`: Block from which to find first to select client ID.
-
-_Returns_
-
--   `string`: First to select client ID
-
 <a name="getGlobalBlockCount" href="#getGlobalBlockCount">#</a> **getGlobalBlockCount**
 
 Returns the total number of blocks, or the total number of blocks with a specific name in a post.
@@ -404,6 +390,19 @@ _Parameters_
 _Returns_
 
 -   `?string`: Last block client ID in the multi-selection set.
+
+<a name="getLowestCommonAncestorWithSelectedBlock" href="#getLowestCommonAncestorWithSelectedBlock">#</a> **getLowestCommonAncestorWithSelectedBlock**
+
+Given a block client ID, returns the common ancestor with selected client ID.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+-   _clientId_ `string`: Block from which to find common ancestor client ID.
+
+_Returns_
+
+-   `string`: Common ancestor client ID or undefined
 
 <a name="getMultiSelectedBlockClientIds" href="#getMultiSelectedBlockClientIds">#</a> **getMultiSelectedBlockClientIds**
 
@@ -624,21 +623,6 @@ _Parameters_
 _Returns_
 
 -   `?string`: Block Template Lock
-
-<a name="getTree" href="#getTree">#</a> **getTree**
-
-Given a block client ID, returns the hierarchy tree of client ID.
-
-_Parameters_
-
--   _state_ `Object`: Editor state.
--   _clientId_ `string`: Block from which tree will be created.
--   _reverse_ `boolean`: Get parent hierarchy in reverse order (top-most hierarchy first).
--   _includeClientId_ `boolean`: Include client ID in return array.
-
-_Returns_
-
--   `Array`: Hierarchy tree of client ID.
 
 <a name="hasInserterItems" href="#hasInserterItems">#</a> **hasInserterItems**
 

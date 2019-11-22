@@ -22,20 +22,11 @@ function GroupEdit( {
 	hasInnerBlocks,
 	isSelected,
 	getStylesFromColorScheme,
-	isInnerBlock,
-	isDashed,
-	isChildOfSameRootBlook,
-	isParentSelected,
-	isGroupParent,
 } ) {
 	if ( ! isSelected && ! hasInnerBlocks ) {
 		return (
 			<View style={ [
 				getStylesFromColorScheme( styles.groupPlaceholder, styles.groupPlaceholderDark ),
-				isDashed && styles.groupPlaceholderInner,
-				( ! isSelected && ( isInnerBlock || isGroupParent ) ) && styles.groupPlaceholderMarginHorizontalNone,
-				isChildOfSameRootBlook && styles.groupPlaceholderMarginHorizontalNone,
-				isParentSelected && styles.groupPlaceholderMarginVerticalNone,
 			] } />
 		);
 	}

@@ -41,10 +41,6 @@ export class BlockList extends Component {
 		this.props.insertBlock( newBlock, this.props.blockCount );
 	}
 
-	blockHolderBorderStyle() {
-		return this.props.isFullyBordered || this.props.hasFullBorder ? styles.blockHolderFullBordered : styles.blockHolderSemiBordered;
-	}
-
 	onCaretVerticalPositionChange( targetId, caretY, previousCaretY ) {
 		KeyboardAwareFlatList.handleCaretVerticalPositionChange( this.scrollViewRef, targetId, caretY, previousCaretY );
 	}
@@ -118,7 +114,6 @@ export class BlockList extends Component {
 	}
 
 	renderItem( { item: clientId, index } ) {
-		const blockHolderFocusedStyle = this.props.getStylesFromColorScheme( styles.blockHolderFocused, styles.blockHolderFocusedDark );
 		const { shouldShowBlockAtIndex, shouldShowInsertionPointBefore, shouldShowInsertionPointAfter } = this.props;
 		return (
 			<ReadableContentView>
@@ -130,8 +125,7 @@ export class BlockList extends Component {
 						clientId={ clientId }
 						rootClientId={ this.props.rootClientId }
 						onCaretVerticalPositionChange={ this.onCaretVerticalPositionChange }
-						borderStyle={ this.blockHolderBorderStyle() }
-						focusedBorderColor={ blockHolderFocusedStyle.borderColor }
+						isSmallScreen={ ! ReadableContentView.isContentMaxWidth() }
 					/> ) }
 				{ shouldShowInsertionPointAfter( clientId ) && this.renderAddBlockSeparator() }
 			</ReadableContentView>
@@ -172,7 +166,6 @@ export default compose( [
 			getBlockInsertionPoint,
 			isBlockInsertionPointVisible,
 			getSelectedBlock,
-			getBlockRootClientId,
 		} = select( 'core/block-editor' );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
@@ -219,8 +212,6 @@ export default compose( [
 			return ! shouldHideBlockAtIndex;
 		};
 
-		const hasFullBorder = !! getBlockRootClientId( selectedBlockClientId ) || hasInnerBlocks;
-
 		return {
 			blockClientIds,
 			blockCount: getBlockCount( rootClientId ),
@@ -229,7 +220,6 @@ export default compose( [
 			shouldShowInsertionPointBefore,
 			shouldShowInsertionPointAfter,
 			selectedBlockClientId,
-			hasFullBorder,
 			isRootList: rootClientId === undefined,
 		};
 	} ),

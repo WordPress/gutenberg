@@ -426,7 +426,7 @@ export function getBlockRootClientId( state, clientId ) {
  *
  * @param {Object} state    Editor state.
  * @param {string} clientId Block from which to find root client ID.
- * @param {boolean} ascending Get parent hierarchy in (top-most hierarchy first).
+ * @param {boolean} ascending Get parent hierarchy in top-most hierarchy first (false) or reversed (true).
  *
  * @return {Array} ClientIDs of the parent blocks.
  */
@@ -465,45 +465,30 @@ export function getBlockHierarchyRootClientId( state, clientId ) {
 }
 
 /**
- * Given a block client ID, returns the next element of the hierarchy from which the block is nested which should be selected onFocus, return the block itself for root level blocks.
+ * Given a block client ID, returns the common ancestor with selected client ID.
  *
  * @param {Object} state    Editor state.
- * @param {string} clientId Block from which to find first to select client ID.
+ * @param {string} clientId Block from which to find common ancestor client ID.
  *
- * @return {string} First to select client ID
+ * @return {string} Common ancestor client ID or undefined
  */
 export function getLowestCommonAncestorWithSelectedBlock( state, clientId ) {
 	const selectedId = getSelectedBlockClientId( state );
-	const clientTree = [ clientId, ...getBlockParents( state, clientId, true ) ];
-	const rootParent = clientTree[ clientTree.length - 1 ];
+	const clientParents = [ ...getBlockParents( state, clientId ), clientId ];
+	const selectedParents = [ ...getBlockParents( state, selectedId ), selectedId ];
 
-	let index = 0;
-	let commonParentFirstChild;
-	let hasCommonParent = false;
+	let lowestCommonAncestor;
 
-	if ( ! selectedId ) {
-		return rootParent;
-	}
-
-	const selectedRoot = getBlockHierarchyRootClientId( state, selectedId );
-	const clientRoot = getBlockHierarchyRootClientId( state, clientId );
-
-	if ( selectedRoot !== clientRoot ) {
-		return rootParent;
-	}
-
-	const selectedTree = [ selectedId, ...getBlockParents( state, selectedId, true ) ];
-
-	do {
-		const commonParentIndex = clientTree.indexOf( selectedTree[ index ] );
-		hasCommonParent = commonParentIndex >= 0;
-		if ( hasCommonParent ) {
-			commonParentFirstChild = clientTree[ commonParentIndex - 1 ];
+	const maxDepth = Math.min( clientParents.length, selectedParents.length );
+	for ( let index = 0; index < maxDepth; index++ ) {
+		if ( clientParents[ index ] === selectedParents[ index ] ) {
+			lowestCommonAncestor = clientParents[ index ];
+		} else {
+			break;
 		}
-		index++;
-	} while ( index < selectedTree.length && ! hasCommonParent );
+	}
 
-	return commonParentFirstChild;
+	return lowestCommonAncestor;
 }
 
 /**

@@ -18,6 +18,7 @@ import { Component } from '@wordpress/element';
 import {
 	Toolbar,
 } from '@wordpress/components';
+import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { withViewportMatch } from '@wordpress/viewport';
 
@@ -121,8 +122,7 @@ class MediaTextEdit extends Component {
 				onWidthChange={ this.onWidthChange }
 				commitWidthChange={ this.commitWidthChange }
 				onFocus={ this.props.onFocus }
-				isSelected={ isSelected }
-				{ ...{ mediaAlt, mediaId, mediaType, mediaUrl, mediaPosition, mediaWidth, imageFill, focalPoint } }
+				{ ...{ mediaAlt, mediaId, mediaType, mediaUrl, mediaPosition, mediaWidth, imageFill, focalPoint, isSelected } }
 			/>
 		);
 	}
@@ -132,8 +132,9 @@ class MediaTextEdit extends Component {
 			attributes,
 			backgroundColor,
 			setAttributes,
-			isSelected,
 			isMobile,
+			isSelected,
+			isParentSelected,
 		} = this.props;
 		const {
 			isStackedOnMobile,
@@ -144,8 +145,10 @@ class MediaTextEdit extends Component {
 		const shouldStack = isStackedOnMobile && isMobile;
 		const temporaryMediaWidth = shouldStack ? 100 : ( this.state.mediaWidth || mediaWidth );
 		const widthString = `${ temporaryMediaWidth }%`;
-		const mediaContainerPadding = ( ( this.props.isInnerBlock || this.props.parentId ) && ! this.props.isMediaTextChildSelected ) ? 0 : 16;
-		const mediaContainerVerticalPadding = isSelected ? 8 : 5;
+
+		// TODO
+		const parentSelectedStyle = isParentSelected ? { margin: 2 } : {	margin: 0, border: 0,	padding: 0 };
+		const selectedStyle = isSelected ? { margin: 0 } : parentSelectedStyle;
 		const containerStyles = {
 			...styles[ 'wp-block-media-text' ],
 			...styles[ `is-vertically-aligned-${ verticalAlignment || 'center' }` ],
@@ -153,9 +156,6 @@ class MediaTextEdit extends Component {
 			...( shouldStack ? styles[ 'is-stacked-on-mobile' ] : {} ),
 			...( shouldStack && mediaPosition === 'right' ? styles[ 'is-stacked-on-mobile.has-media-on-the-right' ] : {} ),
 			backgroundColor: backgroundColor.color,
-			...{ padding: isSelected ? 8 : mediaContainerPadding },
-			paddingTop: mediaContainerVerticalPadding,
-			paddingBottom: mediaContainerVerticalPadding,
 		};
 		const innerBlockWidth = shouldStack ? 100 : ( 100 - temporaryMediaWidth );
 		const innerBlockWidthString = `${ innerBlockWidth }%`;
@@ -189,23 +189,15 @@ class MediaTextEdit extends Component {
 					/>
 				</BlockControls>
 				<View style={ containerStyles }>
-					<View style={ { width: widthString } }>
+					<View style={ { width: widthString, padding: isSelected ? 8 : 16 } }>
 						{ this.renderMediaArea() }
 					</View>
-					<View style={ { width: innerBlockWidthString } }>
-						<View
-							style={ [
-								shouldStack && { marginTop: 12 },
-								! shouldStack && mediaPosition === 'right' && { marginRight: 12 },
-								! shouldStack && mediaPosition === 'left' && { marginLeft: 12 },
-							] }
-						>
-							<InnerBlocks
-								allowedBlocks={ ALLOWED_BLOCKS }
-								template={ TEMPLATE }
-								templateInsertUpdatesSelection={ false }
-							/>
-						</View>
+					<View style={ { width: innerBlockWidthString, ...selectedStyle } }>
+						<InnerBlocks
+							allowedBlocks={ ALLOWED_BLOCKS }
+							template={ TEMPLATE }
+							templateInsertUpdatesSelection={ false }
+						/>
 					</View>
 				</View>
 			</>
@@ -215,5 +207,18 @@ class MediaTextEdit extends Component {
 
 export default compose(
 	withColors( 'backgroundColor' ),
-	withViewportMatch( { isMobile: '< small' } )
+	withViewportMatch( { isMobile: '< small' } ),
+	withSelect( ( select, { clientId } ) => {
+		const {
+			getSelectedBlockClientId,
+		} = select( 'core/block-editor' );
+
+		const selectedBlockClientId = getSelectedBlockClientId();
+		const isParentSelected = selectedBlockClientId && selectedBlockClientId === clientId;
+
+		return {
+			isSelected: selectedBlockClientId === clientId,
+			isParentSelected,
+		};
+	} ),
 )( MediaTextEdit );

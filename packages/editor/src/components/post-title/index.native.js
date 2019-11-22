@@ -119,20 +119,15 @@ export default compose(
 			isPostTitleSelected,
 		} = select( 'core/editor' );
 
-		const { getSelectedBlockClientId, getBlockRootClientId, getLowestCommonAncestorWithSelectedBlock } = select( 'core/block-editor' );
+		const { getSelectedBlockClientId, getBlockRootClientId } = select( 'core/block-editor' );
 
-		const clientId = getSelectedBlockClientId();
-		const isAnyBlockSelected = !! clientId;
-		const parentId = getBlockRootClientId( clientId );
-		const firstToSelect = getLowestCommonAncestorWithSelectedBlock( clientId );
-		const isInnerBlock = parentId && firstToSelect !== parentId;
-
-		const isDimmed = isAnyBlockSelected && isInnerBlock;
+		const selectedId = getSelectedBlockClientId();
+		const selectionIsNested = !! getBlockRootClientId( selectedId );
 
 		return {
-			isAnyBlockSelected,
+			isAnyBlockSelected: !! selectedId,
 			isSelected: isPostTitleSelected(),
-			isDimmed,
+			isDimmed: selectionIsNested,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
