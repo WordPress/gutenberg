@@ -1,0 +1,40 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Guide renders when there are pages 1`] = `
+<WithInstanceId(Modal)
+  className="nux-guide"
+>
+  <KeyboardShortcuts
+    key="0"
+    shortcuts={
+      Object {
+        "left": [Function],
+        "right": [Function],
+      }
+    }
+  />
+  <div
+    className="nux-guide__container"
+  >
+    <Page>
+      Page 1
+    </Page>
+    <div
+      className="nux-guide__footer"
+    >
+      <PageControl
+        currentPage={0}
+        numberOfPages={2}
+        setCurrentPage={[Function]}
+      />
+      <ForwardRef(IconButton)
+        className="nux-guide__forward-button"
+        icon={<ForwardButtonIcon />}
+        onClick={[Function]}
+      >
+        Next
+      </ForwardRef(IconButton)>
+    </div>
+  </div>
+</WithInstanceId(Modal)>
+`;

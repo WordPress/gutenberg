@@ -6,10 +6,10 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
 import { useState, Children } from '@wordpress/element';
 import { Modal, KeyboardShortcuts, IconButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -18,10 +18,7 @@ import PageControl from './page-control';
 import { BackButtonIcon, ForwardButtonIcon } from './icons';
 import FinishButton from './finish-button';
 
-function Guide( { className, onFinish, finishButtonText, children } ) {
-	const isMobile = useSelect( ( select ) =>
-		select( 'core/viewport' ).isViewportMatch( '< small' ) );
-
+export function Guide( { children, className, finishButtonText, isMobile, onFinish } ) {
 	const [ currentPage, setCurrentPage ] = useState( 0 );
 
 	const numberOfPages = Children.count( children );
@@ -39,6 +36,10 @@ function Guide( { className, onFinish, finishButtonText, children } ) {
 			setCurrentPage( currentPage + 1 );
 		}
 	};
+
+	if ( numberOfPages === 0 ) {
+		return null;
+	}
 
 	return (
 		<Modal className={ classnames( 'nux-guide', className ) } onRequestClose={ onFinish }>
@@ -98,10 +99,14 @@ function Guide( { className, onFinish, finishButtonText, children } ) {
 	);
 }
 
-function Page( props ) {
+export function Page( props ) {
 	return <div { ...props } />;
 }
 
-Guide.Page = Page;
+const EnhancedGuide = withSelect( ( select ) => ( {
+	isMobile: select( 'core/viewport' ).isViewportMatch( '< small' ),
+} ) )( Guide );
 
-export default Guide;
+EnhancedGuide.Page = Page;
+
+export default EnhancedGuide;
