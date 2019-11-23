@@ -6,6 +6,8 @@ The first step is to install a recent version of Node. The easiest way (on MacOS
 
 Once you have Node installed, run these scripts:
 
+Note: The install scripts require [Python](https://www.python.org/) to be installed and in the path of the local system.
+
 ```
 npm install
 npm run build
