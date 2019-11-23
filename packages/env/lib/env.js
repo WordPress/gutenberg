@@ -2,11 +2,11 @@
 /**
  * External dependencies
  */
+const util = require( 'util' );
 const path = require( 'path' );
 const fs = require( 'fs' );
 const dockerCompose = require( 'docker-compose' );
 const NodeGit = require( 'nodegit' );
-const wait = require( 'util' ).promisify( setTimeout );
 
 /**
  * Internal dependencies
@@ -14,6 +14,12 @@ const wait = require( 'util' ).promisify( setTimeout );
 const createDockerComposeConfig = require( './create-docker-compose-config' );
 const detectContext = require( './detect-context' );
 const resolveDependencies = require( './resolve-dependencies' );
+
+/**
+ * Promisified dependencies
+ */
+const copyDir = util.promisify( require( 'copy-dir' ) );
+const wait = util.promisify( setTimeout );
 
 // Config Variables
 const cwd = process.cwd();
@@ -97,6 +103,15 @@ module.exports = {
 			// Some commit refs need to be set as detached.
 			await repo.setHeadDetached( ref );
 		}
+
+		// Duplicate repo for the tests container.
+		await copyDir( repoPath, `../${ cwdName }-tests-wordpress/`, {
+			filter: ( stat, filepath ) =>
+				stat !== 'symbolicLink' &&
+				( stat !== 'directory' ||
+					( filepath !== `${ repoPath }.git` &&
+						! filepath.endsWith( 'node_modules' ) ) ),
+		} );
 		spinner.text = `Downloading WordPress@${ ref } 100/100%.`;
 
 		spinner.text = `Starting WordPress@${ ref }.`;
@@ -146,7 +161,8 @@ module.exports = {
 	async clean( { environment, spinner } ) {
 		const context = await detectContext();
 		const dependencies = await resolveDependencies();
-		const activateDependencies = () => Promise.all( dependencies.map( activateContext ) );
+		const activateDependencies = () =>
+			Promise.all( dependencies.map( activateContext ) );
 
 		const description = `${ environment } environment${
 			environment === 'all' ? 's' : ''
