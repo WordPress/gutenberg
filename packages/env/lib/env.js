@@ -105,6 +105,17 @@ module.exports = {
 		}
 
 		// Duplicate repo for the tests container.
+		let stashed = true; // Stash to avoid copying config changes.
+		try {
+			await NodeGit.Stash.save(
+				repo,
+				await NodeGit.Signature.default( repo ),
+				null,
+				NodeGit.Stash.FLAGS.INCLUDE_UNTRACKED
+			);
+		} catch ( err ) {
+			stashed = false;
+		}
 		await copyDir( repoPath, `../${ cwdName }-tests-wordpress/`, {
 			filter: ( stat, filepath ) =>
 				stat !== 'symbolicLink' &&
@@ -112,6 +123,11 @@ module.exports = {
 					( filepath !== `${ repoPath }.git` &&
 						! filepath.endsWith( 'node_modules' ) ) ),
 		} );
+		if ( stashed ) {
+			try {
+				await NodeGit.Stash.pop( repo, 0 );
+			} catch ( err ) {}
+		}
 		spinner.text = `Downloading WordPress@${ ref } 100/100%.`;
 
 		spinner.text = `Starting WordPress@${ ref }.`;
