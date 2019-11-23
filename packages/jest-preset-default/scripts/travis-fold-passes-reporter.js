@@ -1,30 +1,33 @@
 /**
  * External dependencies
  */
-const { DefaultReporter } = require( '@jest/reporters' );
+const { VerboseReporter } = require( '@jest/reporters' );
 
-class TravisFoldPassesReporter extends DefaultReporter {
+class TravisFoldPassesReporter extends VerboseReporter {
 	constructor( ...args ) {
 		super( ...args );
 		this.foldedTestResults = [];
 	}
 
 	flushFoldedTestResults() {
-		if ( this.foldedTestResults.length > 0 ) {
-			this.log( 'travis_fold:start:TravisFoldPassesReporter' );
-			this.log(
-				`...${ this.foldedTestResults.length } passing test${
-					this.foldedTestResults.length === 1 ? '' : 's'
-				}.`
-			);
-			this.foldedTestResults.forEach( ( args ) => super.onTestResult( ...args ) );
-			this.log( 'travis_fold:end:TravisFoldPassesReporter' );
-			this.foldedTestResults = [];
+		if ( ! this.foldedTestResults.length ) {
+			return;
 		}
+
+		this.log( 'travis_fold:start:TravisFoldPassesReporter' );
+		this.log(
+			`...${ this.foldedTestResults.length } passing test${
+				this.foldedTestResults.length === 1 ? '' : 's'
+			}.`
+		);
+		this.foldedTestResults.forEach( ( args ) => super.onTestResult( ...args ) );
+		this.log( 'travis_fold:end:TravisFoldPassesReporter' );
+		this.foldedTestResults = [];
 	}
 
 	onTestResult( ...args ) {
-		if ( args[ 1 ].numFailingTests === 0 && ! args[ 1 ].failureMessage ) {
+		const testResult = args[ 1 ];
+		if ( testResult.numFailingTests === 0 && ! testResult.failureMessage ) {
 			this.foldedTestResults.push( args );
 		} else {
 			this.flushFoldedTestResults();
@@ -41,4 +44,4 @@ class TravisFoldPassesReporter extends DefaultReporter {
 module.exports =
 	'TRAVIS' in process.env && 'CI' in process.env ?
 		TravisFoldPassesReporter :
-		DefaultReporter;
+		VerboseReporter;
