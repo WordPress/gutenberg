@@ -12,16 +12,22 @@ function BaseControl( { id, label, hideLabelFromVision, help, className, childre
 	return (
 		<div className={ classnames( 'components-base-control', className ) }>
 			<div className="components-base-control__field">
-				{ label && id && hideLabelFromVision && <VisuallyHidden
-					as="label"
-					htmlFor={ id }>{ label }</VisuallyHidden> }
-				{ label && id && ! hideLabelFromVision && <label
-					className="components-base-control__label"
-					htmlFor={ id }>{ label }</label> }
-				{ label && ! id && hideLabelFromVision && <VisuallyHidden
-					as="label">{ label }</VisuallyHidden> }
-				{ label && ! id && ! hideLabelFromVision &&
-					<BaseControl.VisualLabel>{ label }</BaseControl.VisualLabel> }
+				{ label && id && ( hideLabelFromVision ?
+					<VisuallyHidden
+						as="label"
+						htmlFor={ id }>{ label }
+					</VisuallyHidden> :
+					<label
+						className="components-base-control__label"
+						htmlFor={ id }>{ label }
+					</label>
+				) }
+				{ label && ! id && ( hideLabelFromVision ?
+					<VisuallyHidden
+						as="label">{ label }
+					</VisuallyHidden> :
+					<BaseControl.VisualLabel>{ label }</BaseControl.VisualLabel>
+				) }
 				{ children }
 			</div>
 			{ !! help && <p id={ id + '__help' } className="components-base-control__help">{ help }</p> }
