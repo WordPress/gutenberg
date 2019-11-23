@@ -6,7 +6,6 @@ import { Dropdown, ToolbarButton, Dashicon } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
-import { getUnregisteredTypeHandlerName } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -112,7 +111,6 @@ class Inserter extends Component {
 export default compose( [
 	withSelect( ( select, { clientId, isAppender, rootClientId } ) => {
 		const {
-			getInserterItems,
 			getBlockRootClientId,
 			getBlockSelectionEnd,
 		} = select( 'core/block-editor' );
@@ -124,10 +122,9 @@ export default compose( [
 				destinationRootClientId = getBlockRootClientId( end ) || undefined;
 			}
 		}
-		const inserterItems = getInserterItems( destinationRootClientId );
 
 		return {
-			items: inserterItems.filter( ( { name } ) => name !== getUnregisteredTypeHandlerName() ),
+			destinationRootClientId,
 		};
 	} ),
 	withPreferredColorScheme,
