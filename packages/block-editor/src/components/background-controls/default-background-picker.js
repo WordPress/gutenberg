@@ -8,12 +8,10 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import {
-	BlockIcon,
-	MediaPlaceholder,
-	ColorPalette,
-	__experimentalGradientPicker,
-} from '../';
+import BlockIcon from '../block-icon';
+import MediaPlaceholder from '../media-placeholder';
+import __experimentalGradientPicker from '../gradient-picker';
+import ColorPalette from '../color-palette';
 
 const DefaultBackgroundPicker = withNotices( ( {
 	icon,

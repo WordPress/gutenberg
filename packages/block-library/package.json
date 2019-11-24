@@ -46,7 +46,6 @@
 		"@wordpress/url": "file:../url",
 		"@wordpress/viewport": "file:../viewport",
 		"classnames": "^2.2.5",
-		"fast-average-color": "4.3.0",
 		"lodash": "^4.17.15",
 		"memize": "^1.0.5",
 		"moment": "^2.22.1",

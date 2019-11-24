@@ -23,14 +23,12 @@ import {
 } from './shared';
 import HeightInput from './height-input';
 
-import {
-	BlockControls,
-	InspectorControls,
-	MediaUpload,
-	MediaUploadCheck,
-	PanelColorSettings,
-	__experimentalGradientPickerControl,
-} from '../';
+import BlockControls from '../block-controls';
+import InspectorControls from '../inspector-controls';
+import MediaUpload from '../media-upload';
+import MediaUploadCheck from '../media-upload/check';
+import PanelColorSettings from '../panel-color-settings';
+import __experimentalGradientPickerControl from '../gradient-picker/control';
 
 const BackgroundToolbarControls = ( {
 	hasBackground,
