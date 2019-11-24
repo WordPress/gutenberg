@@ -43,13 +43,8 @@
 	"devDependencies": {
 		"@commitlint/cli": "^8.2.0",
 		"@commitlint/config-conventional": "^8.2.0",
-		"@wordpress/npm-package-json-lint-config": "^2.1.0",
-		"eslint": "^6.5.1",
-		"eslint-plugin-jest": "^22.17.0",
-		"eslint-plugin-wordpress": "git://github.com/WordPress-Coding-Standards/eslint-plugin-wordpress.git#b65ae0cea1199c9714641ed3be7ea98fcb27dd6c",
+		"@wordpress/scripts": "^5.0.0",
 		"husky": "^3.0.8",
-		"jest": "^24.9.0",
-		"npm-package-json-lint": "^4.0.0",
 		"npm-run-all": "^4.1.5",
 		"npmpub": "^5.0.0",
 		"remark-cli": "^7.0.0",
@@ -62,16 +57,19 @@
 		"stylelint": "^10.1.0 || ^11.0.0"
 	},
 	"scripts": {
+		"check-engines": "wp-scripts check-engines --package",
+		"check-licenses": "wp-scripts check-licenses --production",
 		"dry-release": "npmpub --dry --verbose",
-		"jest": "jest",
-		"lint:js": "eslint . --ignore-path .gitignore",
+		"lint:css": "wp-scripts lint-style",
+		"lint:js": "wp-scripts lint-js",
 		"lint:md": "remark . --quiet --frail",
-		"lint:pkg-json": "npmPkgJsonLint .",
+		"lint:pkg-json": "wp-scripts lint-pkg-json",
 		"lint": "npm-run-all --parallel lint:*",
 		"pretest": "npm run lint",
 		"release": "npmpub --verbose",
 		"stylelint-find-unused-rules": "stylelint-find-rules --config index.js",
-		"test": "jest",
+		"test:unit": "wp-scripts test-unit-js",
+		"test": "npm run test:unit",
 		"watch": "jest --watch"
 	},
 	"commitlint": {
@@ -79,22 +77,18 @@
 			"@commitlint/config-conventional"
 		]
 	},
+	"eslintConfig": {
+		"root": true,
+		"extends": [
+			"plugin:@wordpress/eslint-plugin/recommended"
+		]
+	},
 	"husky": {
 		"hooks": {
 			"commit-msg": "commitlint -e $HUSKY_GIT_PARAMS"
 		}
 	},
-	"jest": {
-		"roots": [
-			"__tests__"
-		],
-		"testEnvironment": "node",
-		"testMatch": [
-			"**/?(*.)(spec|test).js"
-		],
-		"verbose": true
-	},
-	"npmpackagejsonlint": {
+	"npmPackageJsonLintConfig": {
 		"extends": "@wordpress/npm-package-json-lint-config",
 		"rules": {
 			"valid-values-license": [

@@ -14,9 +14,9 @@ module.exports = {
 
 		// stylelint-config-wordpress css overrides
 		'at-rule-empty-line-before': [ 'always', {
-			except: ['blockless-after-blockless'],
-			ignore: ['after-comment'],
-			ignoreAtRules: ['else'],
+			except: [ 'blockless-after-blockless' ],
+			ignore: [ 'after-comment' ],
+			ignoreAtRules: [ 'else' ],
 		} ],
 
 		'block-opening-brace-space-before': 'always',
