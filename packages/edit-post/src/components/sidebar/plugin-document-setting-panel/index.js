@@ -17,7 +17,7 @@ import { EnablePluginDocumentSettingPanelOption } from '../../options-modal/opti
 
 export const { Fill, Slot } = createSlotFill( 'PluginDocumentSettingPanel' );
 
-const PluginDocumentSettingFill = ( { isEnabled, panelName, opened, onToggle, className, title, icon, children } ) => {
+const PluginDocumentSettingFill = ( { isEnabled, panelName, opened, onToggle, className, title, icon, children, initialOpen } ) => {
 	return (
 		<>
 			<EnablePluginDocumentSettingPanelOption
@@ -30,8 +30,9 @@ const PluginDocumentSettingFill = ( { isEnabled, panelName, opened, onToggle, cl
 						className={ className }
 						title={ title }
 						icon={ icon }
-						opened={ opened }
-						onToggle={ onToggle }
+						initialOpen={ initialOpen }
+						opened={ initialOpen ? undefined : opened }
+						onToggle={ initialOpen ? undefined : onToggle }
 					>
 						{ children }
 					</PanelBody>
