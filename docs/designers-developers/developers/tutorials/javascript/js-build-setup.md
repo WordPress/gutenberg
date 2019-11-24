@@ -28,7 +28,7 @@ Both webpack and Babel are tools written in JavaScript and run using [Node.js](h
 
 First, you need to set up Node.js for your development environment. The steps required depend on your operating system, if you have a package manager installed, setup can be as straightforward as:
 
-- Ubuntu: `apt install nodejs` & `apt install npm`
+- Ubuntu: `apt install nodejs npm`
 - macOS: `brew install node`
 - Windows: `choco install node`
 
