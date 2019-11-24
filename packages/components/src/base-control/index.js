@@ -15,17 +15,14 @@ function BaseControl( { id, label, hideLabelFromVision, help, className, childre
 				{ label && id && ( hideLabelFromVision ?
 					<VisuallyHidden
 						as="label"
-						htmlFor={ id }>{ label }
-					</VisuallyHidden> :
+						htmlFor={ id }>{ label }</VisuallyHidden> :
 					<label
 						className="components-base-control__label"
-						htmlFor={ id }>{ label }
-					</label>
+						htmlFor={ id }>{ label }</label>
 				) }
 				{ label && ! id && ( hideLabelFromVision ?
 					<VisuallyHidden
-						as="label">{ label }
-					</VisuallyHidden> :
+						as="label">{ label }</VisuallyHidden> :
 					<BaseControl.VisualLabel>{ label }</BaseControl.VisualLabel>
 				) }
 				{ children }
