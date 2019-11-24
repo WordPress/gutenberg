@@ -1,10 +1,8 @@
 # Text
 
-A text component.
+A text component for styling text.
 
 ## Usage
-
-### Component
 
 ```jsx
 import {Text} from '@wordpress/components';
@@ -12,7 +10,9 @@ import {Text} from '@wordpress/components';
 const HeroPanel = () => (
 	<>
 		<Text variant="title.large" as="h1">Hello World!</Text>
-		<Text variant="body">Greetings to you!.</Text>
+		<Text variant="body">Greetings to you!</Text>
 	</>
 );
 ```
+
+> For most use-cases you can use this component instead of a `h1`, `h2`, `h3`, `h4`, `h5`, `h6` or `p`.
