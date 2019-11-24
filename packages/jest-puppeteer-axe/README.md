@@ -41,6 +41,8 @@ It is also possible to pass optional Axe API options to perform customized check
 - `include` - CSS selector(s) to to add the list of elements to include in analysis.
 - `exclude` - CSS selector(s) to to add the list of elements to exclude from analysis.
 - `disabledRules` - the list of [Axe rules](https://github.com/dequelabs/axe-core/blob/master/doc/rule-descriptions.md) to skip from verification.
+- `options` - options to be used by `axe.run`. See [axe-core API documentation](https://github.com/dequelabs/axe-core/blob/master/doc/API.md) for information on its structure.
+- `config` - axe configuration object. See [axe-core API documentation](https://github.com/dequelabs/axe-core/blob/master/doc/API.md#api-name-axeconfigure) for documentation on the object structure.
 
 ```js
 test( 'checks the test component with Axe excluding some button', async () => {

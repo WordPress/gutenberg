@@ -53,17 +53,19 @@ function formatViolations( violations ) {
  *
  * @see https://github.com/dequelabs/axe-puppeteer
  *
- * @param {puppeteer.Page} page                 Puppeteer's page instance.
- * @param {?Object}        params               Optional Axe API options.
- * @param {?string|Array}  params.include       CSS selector(s) to add to the list of elements
- *                                              to include in analysis.
- * @param {?string|Array}  params.exclude       CSS selector(s) to add to the list of elements
- *                                              to exclude from analysis.
- * @param {?Array}         params.disabledRules The list of Axe rules to skip from verification.
+ * @param {puppeteer.Page}  page                 Puppeteer's page instance.
+ * @param {?Object}         params               Optional Axe API options.
+ * @param {?string|Array}   params.include       CSS selector(s) to add to the list of elements
+ *                                               to include in analysis.
+ * @param {?string|Array}   params.exclude       CSS selector(s) to add to the list of elements
+ *                                               to exclude from analysis.
+ * @param {?Array}          params.disabledRules The list of Axe rules to skip from verification.
+ * @param {?Axe.RunOptions} params.options       Options to be used by axe.run.
+ * @param {?Axe.Spec}       params.config        Axe configuration object.
  *
  * @return {Object} A matcher object with two keys `pass` and `message`.
  */
-async function toPassAxeTests( page, { include, exclude, disabledRules } = {} ) {
+async function toPassAxeTests( page, { include, exclude, disabledRules, options, config } = {} ) {
 	const axe = new AxePuppeteer( page );
 
 	if ( include ) {
@@ -74,8 +76,16 @@ async function toPassAxeTests( page, { include, exclude, disabledRules } = {} ) 
 		axe.exclude( exclude );
 	}
 
+	if ( options ) {
+		axe.options( options );
+	}
+
 	if ( disabledRules ) {
 		axe.disableRules( disabledRules );
+	}
+
+	if ( config ) {
+		axe.configure( config );
 	}
 
 	const { violations } = await axe.analyze();
