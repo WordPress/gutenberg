@@ -84,7 +84,7 @@ export default function WithBackgroundControls( {
 				<DefaultBackgroundPicker
 					icon={ blockIcon }
 					label={ blockLabel }
-					onSelectMedia={ onSelectMedia }
+					onSelectMedia={ selectMedia }
 					allowedMediaTypes={ ALLOWED_MEDIA_TYPES }
 					className={ className }
 					overlayColor={ overlayColor }
