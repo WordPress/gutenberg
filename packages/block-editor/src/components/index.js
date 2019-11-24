@@ -2,6 +2,7 @@
  * Block Creation Components
  */
 
+export * from './background-controls';
 export * from './colors';
 export * from './gradients';
 export * from './font-sizes';
