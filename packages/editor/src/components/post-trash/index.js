@@ -14,16 +14,20 @@ function PostTrash( { isNew, postId, postType, ...props } ) {
 		return null;
 	}
 	const onClick = () => {
+		if ( disabled ) {
+			return false;
+		}
+
 		setDisabled( true );
 
-		props.trashPost( postId, postType )
+		return props.trashPost( postId, postType )
 			.then( () => {
 				setDisabled( false );
 			} );
 	};
 
 	return (
-		<Button className="editor-post-trash button-link-delete" disabled={ disabled } onClick={ onClick } isDefault isLarge>
+		<Button className="editor-post-trash button-link-delete" aria-disabled={ disabled } onClick={ onClick } isDefault isLarge>
 			{ __( 'Move to Trash' ) }
 		</Button>
 	);
