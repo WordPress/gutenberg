@@ -129,7 +129,9 @@ export default function BlockBackgroundUi( {
 						src={ url }
 					/>
 				) }
-				{ children }
+				<div className="wp-block-cover__inner-container">
+					{ children }
+				</div>
 			</div>
 		</ResizableArea>
 	);
