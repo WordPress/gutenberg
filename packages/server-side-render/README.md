@@ -91,6 +91,21 @@ const MyServerSideRender = () => (
 	/>
 );
 ```
+If imported from the `wp` global, an alias is required to work in JSX.
+
+```jsx 
+const { serverSideRender: ServerSideRender } = wp;
+
+const MyServerSideRender = () => (
+	<ServerSideRender
+		block="core/archives"
+		attributes={ {
+			showPostCounts: true,
+			displayAsDropdown: false,
+		} }
+	/>
+);
+```
 
 ## Output
 
