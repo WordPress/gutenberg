@@ -134,7 +134,6 @@ class MediaTextEdit extends Component {
 			setAttributes,
 			isMobile,
 			isSelected,
-			isParentSelected,
 		} = this.props;
 		const {
 			isStackedOnMobile,
@@ -146,9 +145,7 @@ class MediaTextEdit extends Component {
 		const temporaryMediaWidth = shouldStack ? 100 : ( this.state.mediaWidth || mediaWidth );
 		const widthString = `${ temporaryMediaWidth }%`;
 
-		// TODO
-		const parentSelectedStyle = isParentSelected ? { margin: 2 } : {	margin: 0, border: 0,	padding: 0 };
-		const selectedStyle = isSelected ? { margin: 0 } : parentSelectedStyle;
+		const selectedStyle = ! shouldStack && { paddingRight: mediaPosition === 'rigth' ? 0 : 12, paddingLeft: mediaPosition === 'left' ? 0 : 12 };
 		const containerStyles = {
 			...styles[ 'wp-block-media-text' ],
 			...styles[ `is-vertically-aligned-${ verticalAlignment || 'center' }` ],
@@ -189,7 +186,7 @@ class MediaTextEdit extends Component {
 					/>
 				</BlockControls>
 				<View style={ containerStyles }>
-					<View style={ { width: widthString, padding: isSelected ? 8 : 16 } }>
+					<View style={ { width: widthString, padding: isSelected ? 12 : 16 } }>
 						{ this.renderMediaArea() }
 					</View>
 					<View style={ { width: innerBlockWidthString, ...selectedStyle } }>

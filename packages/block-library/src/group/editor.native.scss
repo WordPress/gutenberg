@@ -1,8 +1,8 @@
 .groupPlaceholder {
 	padding: 12px;
 	margin: 16px;
-	margin-left: 2px;
-	margin-right: 2px;
+	margin-left: 0;
+	margin-right: 0;
 	background-color: $white;
 	border: $border-width dashed $gray;
 	border-radius: 4px;
@@ -11,4 +11,9 @@
 .groupPlaceholderDark {
 	background-color: $black;
 	border: $border-width dashed $gray-70;
+}
+
+.marginVerticalDense {
+	margin-top: $block-selected-child-margin;
+	margin-bottom: $block-selected-child-margin;
 }
