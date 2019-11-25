@@ -9,16 +9,18 @@ import { __ } from '@wordpress/i18n';
 import edit from './edit';
 import save from './save';
 
-export const name = 'core/navigation-menu';
+export const name = 'core/navigation';
 
 export const settings = {
 	title: __( 'Navigation' ),
 
 	icon: 'menu',
 
-	description: __( 'Add a navigation menu to your site.' ),
+	description: __( 'Add a navigation block to your site.' ),
 
 	keywords: [ __( 'menu' ), __( 'navigation' ), __( 'links' ) ],
+
+	category: 'layout',
 
 	supports: {
 		align: [ 'wide', 'full' ],

@@ -1,15 +1,15 @@
 <?php
 /**
- * Server-side rendering of the `core/navigation-menu` block.
+ * Server-side rendering of the `core/navigation` block.
  *
  * @package gutenberg
  */
 
 /**
  * Build an array with CSS classes and inline styles defining the colors
- * which will be applied to the navigation menu markup in the front-end.
+ * which will be applied to the navigation markup in the front-end.
  *
- * @param  array $attributes NavigationMenu block attributes.
+ * @param  array $attributes Navigation block attributes.
  * @return array Colors CSS classes and inline styles.
  */
 function build_css_colors( $attributes ) {
@@ -40,7 +40,7 @@ function build_css_colors( $attributes ) {
 }
 
 /**
- * Renders the `core/navigation-menu` block on server.
+ * Renders the `core/navigation` block on server.
  *
  * @param array $attributes The block attributes.
  * @param array $content The saved content.
@@ -48,20 +48,19 @@ function build_css_colors( $attributes ) {
  *
  * @return string Returns the post content with the legacy widget added.
  */
-function render_block_navigation_menu( $attributes, $content, $block ) {
+function render_block_navigation( $attributes, $content, $block ) {
 	$colors  = build_css_colors( $attributes );
-	$classes = array( 'wp-block-navigation-menu', $colors['css_classes'] );
+	$classes = array( 'wp-block-navigation', $colors['css_classes'] );
 	if ( ! empty( $attributes['className'] ) ) {
 		$classes[] = $attributes['className'];
 	}
-
 	$classes = join( ' ', array_filter( $classes ) );
 
 	return sprintf(
 		'<nav class="%1$s" %2$s>%3$s</nav>',
 		esc_attr( $classes ),
 		$colors['inline_styles'] ? sprintf( 'style="%s"', esc_attr( $colors['inline_styles'] ) ) : '',
-		build_navigation_menu_html( $block, $colors )
+		build_navigation_html( $block, $colors )
 	);
 }
 
@@ -69,27 +68,27 @@ function render_block_navigation_menu( $attributes, $content, $block ) {
  * Walks the inner block structure and returns an HTML list for it.
  *
  * @param array $block  The block.
- * @param array $colors Contains inline styles and CSS classes to apply to menu item.
+ * @param array $colors Contains inline styles and CSS classes to apply to navigation item.
  *
  * @return string Returns  an HTML list from innerBlocks.
  */
-function build_navigation_menu_html( $block, $colors ) {
+function build_navigation_html( $block, $colors ) {
 	$html = '';
 
-	$class_attribute = sprintf( ' class="%s"', esc_attr( $colors['css_classes'] ? 'wp-block-navigation-menu-item__link ' . $colors['css_classes'] : 'wp-block-navigation-menu-item__link' ) );
+	$class_attribute = sprintf( ' class="%s"', esc_attr( $colors['css_classes'] ? 'wp-block-navigation-item__link ' . $colors['css_classes'] : 'wp-block-navigation-item__link' ) );
 	$style_attribute = $colors['inline_styles'] ? sprintf( ' style="%s"', esc_attr( $colors['inline_styles'] ) ) : '';
 
 	foreach ( (array) $block['innerBlocks'] as $key => $block ) {
 
-		$html .= '<li class="wp-block-navigation-menu-item">' .
+		$html .= '<li class="wp-block-navigation-item">' .
 			'<a' . $class_attribute . $style_attribute;
 
 		// Start appending HTML attributes to anchor tag.
 		if ( isset( $block['attrs']['url'] ) ) {
-			$html .= ' href="' . $block['attrs']['url'] . '"';
+			$html .= ' href="' . esc_url( $block['attrs']['url'] ) . '"';
 		}
 		if ( isset( $block['attrs']['title'] ) ) {
-			$html .= ' title="' . $block['attrs']['title'] . '"';
+			$html .= ' title="' . esc_attr( $block['attrs']['title'] ) . '"';
 		}
 
 		if ( isset( $block['attrs']['opensInNewTab'] ) && true === $block['attrs']['opensInNewTab'] ) {
@@ -100,13 +99,13 @@ function build_navigation_menu_html( $block, $colors ) {
 		// Start anchor tag content.
 		$html .= '>';
 		if ( isset( $block['attrs']['label'] ) ) {
-			$html .= $block['attrs']['label'];
+			$html .= esc_html( $block['attrs']['label'] );
 		}
 		$html .= '</a>';
 		// End anchor tag content.
 
 		if ( count( (array) $block['innerBlocks'] ) > 0 ) {
-			$html .= build_navigation_menu_html( $block, $colors );
+			$html .= build_navigation_html( $block, $colors );
 		}
 
 		$html .= '</li>';
@@ -115,17 +114,16 @@ function build_navigation_menu_html( $block, $colors ) {
 }
 
 /**
- * Register the navigation menu block.
+ * Register the navigation block.
  *
- * @uses render_block_navigation_menu()
+ * @uses render_block_navigation()
  * @throws WP_Error An WP_Error exception parsing the block definition.
  */
-function register_block_core_navigation_menu() {
+function register_block_core_navigation() {
 
 	register_block_type(
-		'core/navigation-menu',
+		'core/navigation',
 		array(
-			'category'        => 'layout',
 			'attributes'      => array(
 				'className'        => array(
 					'type' => 'string',
@@ -142,9 +140,8 @@ function register_block_core_navigation_menu() {
 				),
 			),
 
-			'render_callback' => 'render_block_navigation_menu',
+			'render_callback' => 'render_block_navigation',
 		)
 	);
 }
-
-add_action( 'init', 'register_block_core_navigation_menu' );
+add_action( 'init', 'register_block_core_navigation' );

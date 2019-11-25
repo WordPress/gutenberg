@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { escape, unescape } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -60,13 +61,13 @@ const updateLinkSetting = ( setter ) => ( setting, value ) => {
  */
 const updateLink = ( setter, label ) => ( { title: newTitle = '', url: newURL = '' } = {} ) => {
 	setter( {
-		title: newTitle,
+		title: escape( newTitle ),
 		url: newURL,
 	} );
 
 	// Set the item label as well if it isn't already defined.
 	if ( ! label ) {
-		setter( { label: newTitle } );
+		setter( { label: escape( newTitle ) } );
 	}
 };
 
@@ -78,8 +79,8 @@ function NavigationLinkEdit( {
 	setAttributes,
 	insertLinkBlock,
 } ) {
-	const { label, opensInNewTab, title, url } = attributes;
-	const link = title ? { title, url } : null;
+	const { label, opensInNewTab, title, url, nofollow, description } = attributes;
+	const link = title ? { title: unescape( title ), url } : null;
 	const [ isLinkOpen, setIsLinkOpen ] = useState( ! label && isSelected );
 
 	let onCloseTimerId = null;
@@ -162,16 +163,16 @@ function NavigationLinkEdit( {
 					title={ __( 'Link Settings' ) }
 				>
 					<ToggleControl
-						checked={ attributes.opensInNewTab }
+						checked={ opensInNewTab }
 						onChange={ ( newTab ) => {
 							setAttributes( { opensInNewTab: newTab } );
 						} }
 						label={ __( 'Open in new tab' ) }
 					/>
 					<TextareaControl
-						value={ attributes.description || '' }
-						onChange={ ( description ) => {
-							setAttributes( { description } );
+						value={ description || '' }
+						onChange={ ( descriptionValue ) => {
+							setAttributes( { description: descriptionValue } );
 						} }
 						label={ __( 'Description' ) }
 					/>
@@ -180,17 +181,17 @@ function NavigationLinkEdit( {
 					title={ __( 'SEO Settings' ) }
 				>
 					<TextControl
-						value={ attributes.title || '' }
-						onChange={ ( itemTitle ) => {
-							setAttributes( { title: itemTitle } );
+						value={ title || '' }
+						onChange={ ( titleValue ) => {
+							setAttributes( { title: titleValue } );
 						} }
 						label={ __( 'Title Attribute' ) }
 						help={ __( 'Provide more context about where the link goes.' ) }
 					/>
 					<ToggleControl
-						checked={ attributes.nofollow }
-						onChange={ ( nofollow ) => {
-							setAttributes( { nofollow } );
+						checked={ nofollow }
+						onChange={ ( nofollowValue ) => {
+							setAttributes( { nofollow: nofollowValue } );
 						} }
 						label={ __( 'Add nofollow to link' ) }
 						help={ (
