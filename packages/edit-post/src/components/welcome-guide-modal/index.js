@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { Guide } from '@wordpress/nux';
+import { __experimentalGuide as Guide } from '@wordpress/nux';
 import { __ } from '@wordpress/i18n';
 import { __experimentalCreateInterpolateElement } from '@wordpress/element';
 
