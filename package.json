@@ -230,8 +230,7 @@
 			"node ./docs/tool/index.js"
 		],
 		"packages/**/*.js": [
-			"node ./bin/update-readmes.js",
-			"git add ."
+			"node ./bin/update-readmes.js"
 		]
 	},
 	"wp-env": {
