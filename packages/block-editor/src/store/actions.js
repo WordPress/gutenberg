@@ -49,6 +49,31 @@ export function resetBlocks( blocks ) {
 }
 
 /**
+ * @typedef {WPBlockSelection} A block selection object.
+ *
+ * @property {string} clientId     A block client ID.
+ * @property {string} attributeKey A block attribute key.
+ * @property {number} offset       A block attribute offset.
+ */
+
+/**
+ * Returns an action object used in signalling that selection state should be
+ * reset to the specified selection.
+ *
+ * @param {WPBlockSelection} selectionStart The selection start.
+ * @param {WPBlockSelection} selectionEnd   The selection end.
+ *
+ * @return {Object} Action object.
+ */
+export function resetSelection( selectionStart, selectionEnd ) {
+	return {
+		type: 'RESET_SELECTION',
+		selectionStart,
+		selectionEnd,
+	};
+}
+
+/**
  * Returns an action object used in signalling that blocks have been received.
  * Unlike resetBlocks, these should be appended to the existing known set, not
  * replacing.

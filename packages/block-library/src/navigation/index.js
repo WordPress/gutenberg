@@ -20,6 +20,8 @@ export const settings = {
 
 	keywords: [ __( 'menu' ), __( 'navigation' ), __( 'links' ) ],
 
+	category: 'layout',
+
 	supports: {
 		align: [ 'wide', 'full' ],
 		anchor: true,

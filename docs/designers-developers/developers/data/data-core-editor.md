@@ -359,6 +359,30 @@ _Returns_
 
 -   `Array`: Block list.
 
+<a name="getEditorSelectionEnd" href="#getEditorSelectionEnd">#</a> **getEditorSelectionEnd**
+
+Returns the current selection end.
+
+_Parameters_
+
+-   _state_ `Object`: 
+
+_Returns_
+
+-   `WPBlockSelection`: The selection end.
+
+<a name="getEditorSelectionStart" href="#getEditorSelectionStart">#</a> **getEditorSelectionStart**
+
+Returns the current selection start.
+
+_Parameters_
+
+-   _state_ `Object`: 
+
+_Returns_
+
+-   `WPBlockSelection`: The selection start.
+
 <a name="getEditorSettings" href="#getEditorSettings">#</a> **getEditorSettings**
 
 Returns the post editor settings.

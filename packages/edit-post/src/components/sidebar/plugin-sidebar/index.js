@@ -41,10 +41,7 @@ function PluginSidebar( props ) {
 					/> }
 				</PinnedPlugins>
 			) }
-			<Sidebar
-				name={ sidebarName }
-				label={ __( 'Editor plugins' ) }
-			>
+			<Sidebar name={ sidebarName }>
 				<SidebarHeader
 					closeLabel={ __( 'Close plugin' ) }
 				>

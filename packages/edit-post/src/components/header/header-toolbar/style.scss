@@ -26,7 +26,7 @@
 .edit-post-header-toolbar__block-toolbar {
 	// Stack toolbar below Editor Bar.
 	position: absolute;
-	top: $header-height;
+	top: $header-height + 1px;
 	left: 0;
 	right: 0;
 	background: $white;

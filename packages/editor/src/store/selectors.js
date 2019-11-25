@@ -1193,6 +1193,34 @@ export function getEditorBlocks( state ) {
 }
 
 /**
+ * @typedef {WPBlockSelection} A block selection object.
+ *
+ * @property {string} clientId     A block client ID.
+ * @property {string} attributeKey A block attribute key.
+ * @property {number} offset       A block attribute offset.
+ */
+
+/**
+ * Returns the current selection start.
+ *
+ * @param {Object} state
+ * @return {WPBlockSelection} The selection start.
+ */
+export function getEditorSelectionStart( state ) {
+	return getEditedPostAttribute( state, 'selectionStart' );
+}
+
+/**
+ * Returns the current selection end.
+ *
+ * @param {Object} state
+ * @return {WPBlockSelection} The selection end.
+ */
+export function getEditorSelectionEnd( state ) {
+	return getEditedPostAttribute( state, 'selectionEnd' );
+}
+
+/**
  * Is the editor ready
  *
  * @param {Object} state
