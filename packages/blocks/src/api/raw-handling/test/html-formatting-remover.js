@@ -88,7 +88,7 @@ describe( 'HTMLFormattingRemover', () => {
 				</strong>
 			</div>
 		`;
-		const output = '<div><strong>a</strong><strong> b</strong></div>';
+		const output = '<div><strong>a</strong> <strong>b</strong></div>';
 		expect( deepFilterHTML( input, [ filter ] ) ).toEqual( output );
 	} );
 
