@@ -105,6 +105,7 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 		await swipeDown( driver );
 		const titleElement = await editorPage.getTitleElement( { autoscroll: true } );
 		await titleElement.click();
+		await titleElement.click();
 
 		await editorPage.addNewParagraphBlock();
 		paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 1 );
