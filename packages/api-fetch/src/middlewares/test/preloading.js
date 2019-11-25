@@ -13,13 +13,13 @@ describe( 'Preloading Middleware', () => {
 				body,
 			},
 		};
-		const prelooadingMiddleware = createPreloadingMiddleware( preloadedData );
+		const preloadingMiddleware = createPreloadingMiddleware( preloadedData );
 		const requestOptions = {
 			method: 'GET',
 			path: 'wp/v2/posts',
 		};
 
-		const response = prelooadingMiddleware( requestOptions );
+		const response = preloadingMiddleware( requestOptions );
 		return response.then( ( value ) => {
 			expect( value ).toEqual( body );
 		} );
