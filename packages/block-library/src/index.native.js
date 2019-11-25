@@ -1,8 +1,4 @@
 /**
- * External dependencies
- */
-import { Platform } from 'react-native';
-/**
  * WordPress dependencies
  */
 import {
