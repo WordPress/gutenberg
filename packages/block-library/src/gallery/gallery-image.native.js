@@ -233,8 +233,8 @@ class GalleryImage extends Component {
 							<View style={ captionContainerStyle }>
 								<ScrollView nestedScrollEnabled keyboardShouldPersistTaps="handled">
 									<RichText
-										// tagName="figcaption"
-										tagName="" // needed to keep center alignment ?
+										tagName=""
+										rootTagsToEliminate={ [ 'p' ] }
 										placeholder={ isSelected ? __( 'Write caption…' ) : null }
 										value={ caption }
 										isSelected={ this.state.captionSelected }
