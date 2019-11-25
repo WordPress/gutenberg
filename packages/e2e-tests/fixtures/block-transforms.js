@@ -560,7 +560,7 @@ export const EXPECTED_TRANSFORMS = {
 		availableTransforms: [
 			'Group',
 		],
-		originalBlock: 'Github',
+		originalBlock: 'GitHub',
 	},
 	'core__social-link-goodreads': {
 		availableTransforms: [
