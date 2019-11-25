@@ -2393,7 +2393,7 @@ describe( 'selectors', () => {
 			expect( getLowestCommonAncestorWithSelectedBlock( state, 'f' ) ).not.toBeDefined();
 		} );
 
-		it( 'should return block id if selected block is ancestor of block', () => {
+		it( 'should return block id if selected block is ancestor of given block', () => {
 			const state = {
 				blocks,
 				selectionStart: { clientId: 'c' },

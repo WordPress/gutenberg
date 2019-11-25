@@ -1,8 +1,8 @@
 .groupPlaceholder {
 	padding: 12px;
 	margin: 16px;
-	margin-left: 0;
-	margin-right: 0;
+	margin-left: $block-selected-child-margin;
+	margin-right: $block-selected-child-margin;
 	background-color: $white;
 	border: $border-width dashed $gray;
 	border-radius: 4px;
