@@ -600,7 +600,16 @@ export class RichText extends Component {
 		}
 
 		if ( tagName ) {
-			value = `<${ tagName }>${ value }</${ tagName }>`;
+			let extraAttributes = ``;
+			if ( tagName === `ol` ) {
+				if ( this.props.reversed ) {
+					extraAttributes += ` reversed`;
+				}
+				if ( this.props.start ) {
+					extraAttributes += ` start=${ this.props.start }`;
+				}
+			}
+			value = `<${ tagName } ${ extraAttributes }>${ value }</${ tagName }>`;
 		}
 		return value;
 	}

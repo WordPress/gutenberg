@@ -398,6 +398,8 @@ class RichTextWrapper extends Component {
 				__unstableDidAutomaticChange={ didAutomaticChange }
 				__unstableUndo={ undo }
 				style={ style }
+				start={ start }
+				reversed={ reversed }
 			>
 				{ ( { isSelected, value, onChange, Editable } ) =>
 					<>
