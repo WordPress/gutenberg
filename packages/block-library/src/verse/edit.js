@@ -28,14 +28,11 @@ export default function VerseEdit( { attributes, setAttributes, className, merge
 			</BlockControls>
 			<RichText
 				tagName="pre"
-				// Ensure line breaks are normalised to HTML.
-				value={ content.replace( /\n/g, '<br>' ) }
+				preserveWhiteSpace
+				value={ content }
 				onChange={ ( nextContent ) => {
 					setAttributes( {
-						// Ensure line breaks are normalised to characters. This
-						// saves space, is easier to read, and ensures display
-						// filters work correctly.
-						content: nextContent.replace( /<br ?\/?>/g, '\n' ),
+						content: nextContent,
 					} );
 				} }
 				placeholder={ __( 'Write…' ) }
