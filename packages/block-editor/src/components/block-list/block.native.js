@@ -230,17 +230,19 @@ export default compose( [
 			getBlockIndex,
 			getBlocks,
 			isBlockSelected,
+			__unstableGetBlockWithoutInnerBlocks,
 			getBlockHierarchyRootClientId,
 			getSelectedBlockClientId,
 			getBlock,
 			getBlockRootClientId,
 			getLowestCommonAncestorWithSelectedBlock,
 			getBlockParents,
+			getBlockCount,
 		} = select( 'core/block-editor' );
 		const order = getBlockIndex( clientId, rootClientId );
 		const isSelected = isBlockSelected( clientId );
 		const isLastBlock = order === getBlocks().length - 1;
-		const block = getBlock( clientId );
+		const block = __unstableGetBlockWithoutInnerBlocks( clientId );
 		const { name, attributes, isValid } = block || {};
 		const blockType = getBlockType( name || 'core/missing' );
 		const title = blockType.title;
@@ -263,7 +265,7 @@ export default compose( [
 		const commonAncestorIndex = clientTree.indexOf( commonAncestor ) - 1;
 		const firstToSelectId = commonAncestor || selectedBlockClientId ? clientTree[ commonAncestorIndex ] : rootBlockId;
 
-		const hasChildren = block.innerBlocks.length !== 0;
+		const hasChildren = getBlockCount( clientId ) !== 0;
 		const hasParent = !! parents[ 0 ];
 		const isParentSelected = selectedBlockClientId && selectedBlockClientId === parents[ 0 ];
 		const isAncestorSelected = selectedBlockClientId && parents.includes( selectedBlockClientId );
