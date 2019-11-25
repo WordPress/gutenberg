@@ -440,19 +440,19 @@ exports[`Text looks like a "title.medium" 1`] = `
     style={
       Object {
         "map": undefined,
-        "name": "mwvfmu",
+        "name": "1jz2etu",
         "next": undefined,
         "styles": "
 	
 	
-					
+				
   font-weight: 400;
 
-					
+				
 	font-size: 24px;
 	line-height: 32px;
 
-				;
+			;
 ",
         "toString": [Function],
       }
@@ -463,19 +463,19 @@ exports[`Text looks like a "title.medium" 1`] = `
       style={
         Object {
           "map": undefined,
-          "name": "mwvfmu",
+          "name": "1jz2etu",
           "next": undefined,
           "styles": "
 	
 	
-					
+				
   font-weight: 400;
 
-					
+				
 	font-size: 24px;
 	line-height: 32px;
 
-				;
+			;
 ",
           "toString": [Function],
         }
