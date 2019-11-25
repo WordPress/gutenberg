@@ -3,6 +3,7 @@
 exports[`Guide renders when there are pages 1`] = `
 <WithInstanceId(Modal)
   className="nux-guide"
+  shouldCloseOnClickOutside={false}
 >
   <KeyboardShortcuts
     key="0"

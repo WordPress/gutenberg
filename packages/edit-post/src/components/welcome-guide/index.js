@@ -11,7 +11,7 @@ import { __experimentalCreateInterpolateElement } from '@wordpress/element';
  */
 import { CanvasImage, EditorImage, BlockLibraryImage, InserterIconImage } from './images';
 
-export default function WelcomeGuideModal() {
+export default function WelcomeGuide() {
 	const areTipsEnabled = useSelect( ( select ) => select( 'core/nux' ).areTipsEnabled() );
 
 	const { disableTips } = useDispatch( 'core/nux' );
@@ -27,38 +27,38 @@ export default function WelcomeGuideModal() {
 			onFinish={ disableTips }
 		>
 
-			<Guide.Page className="edit-post-welcome-guide-modal__page">
-				<h1 className="edit-post-welcome-guide-modal__heading">
+			<Guide.Page className="edit-post-welcome-guide__page">
+				<h1 className="edit-post-welcome-guide__heading">
 					{ __( 'Welcome to the Block Editor' ) }
 				</h1>
-				<CanvasImage className="edit-post-welcome-guide-modal__image" />
-				<p className="edit-post-welcome-guide-modal__text">
+				<CanvasImage className="edit-post-welcome-guide__image" />
+				<p className="edit-post-welcome-guide__text">
 					{ __( 'In the WordPress editor, each paragraph, image, or video is presented as a distinct “block” of content.' ) }
 				</p>
 			</Guide.Page>
 
-			<Guide.Page className="edit-post-welcome-guide-modal__page">
-				<h1 className="edit-post-welcome-guide-modal__heading">
+			<Guide.Page className="edit-post-welcome-guide__page">
+				<h1 className="edit-post-welcome-guide__heading">
 					{ __( 'Make each block your own' ) }
 				</h1>
-				<EditorImage className="edit-post-welcome-guide-modal__image" />
-				<p className="edit-post-welcome-guide-modal__text">
+				<EditorImage className="edit-post-welcome-guide__image" />
+				<p className="edit-post-welcome-guide__text">
 					{ __( 'Each block comes with its own set of controls for changing things like color, width, and alignment. These will show and hide automatically when you have a block selected.' ) }
 				</p>
 			</Guide.Page>
 
-			<Guide.Page className="edit-post-welcome-guide-modal__page">
-				<h1 className="edit-post-welcome-guide-modal__heading">
+			<Guide.Page className="edit-post-welcome-guide__page">
+				<h1 className="edit-post-welcome-guide__heading">
 					{ __( 'Get to know the Block Library' ) }
 				</h1>
-				<BlockLibraryImage className="edit-post-welcome-guide-modal__image" />
-				<p className="edit-post-welcome-guide-modal__text">
+				<BlockLibraryImage className="edit-post-welcome-guide__image" />
+				<p className="edit-post-welcome-guide__text">
 					{ __experimentalCreateInterpolateElement(
 						__( 'All of the blocks available to you live in the Block Library. You’ll find it wherever you see the <InserterIconImage /> icon.' ),
 						{
 							InserterIconImage: (
 								<InserterIconImage
-									className="edit-post-welcome-guide-modal__inserter-icon"
+									className="edit-post-welcome-guide__inserter-icon"
 								/>
 							),
 						}

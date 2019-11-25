@@ -47,7 +47,7 @@ import Sidebar from '../sidebar';
 import MetaBoxes from '../meta-boxes';
 import PluginPostPublishPanel from '../sidebar/plugin-post-publish-panel';
 import PluginPrePublishPanel from '../sidebar/plugin-pre-publish-panel';
-import WelcomeGuideModal from '../welcome-guide-modal';
+import WelcomeGuide from '../welcome-guide';
 
 function Layout( { isMobileViewport } ) {
 	const { closePublishSidebar, togglePublishSidebar } = useDispatch( 'core/edit-post' );
@@ -142,7 +142,7 @@ function Layout( { isMobileViewport } ) {
 				<ManageBlocksModal />
 				<OptionsModal />
 				<KeyboardShortcutHelpModal />
-				<WelcomeGuideModal />
+				<WelcomeGuide />
 				<Popover.Slot />
 				<PluginArea />
 				{ showPageTemplatePicker && <__experimentalPageTemplatePicker /> }
