@@ -1,7 +1,7 @@
 exports.ios12 = {
 	browserName: '',
 	platformName: 'iOS',
-	platformVersion: '13.1',
+	platformVersion: '12.2',
 	deviceName: 'iPhone X',
 	os: 'iOS',
 	deviceOrientation: 'portrait',

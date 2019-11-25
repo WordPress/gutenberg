@@ -10,7 +10,7 @@ import wd from 'wd';
 /**
  * Internal dependencies
  */
-import { isAndroid, swipeUp, swipeDown, typeString, toggleHtmlMode, timer } from '../helpers/utils';
+import { isAndroid, swipeUp, swipeDown, typeString, toggleHtmlMode } from '../helpers/utils';
 
 export default class EditorPage {
 	driver: wd.PromiseChainWebdriver;
@@ -40,7 +40,7 @@ export default class EditorPage {
 	}
 
 	async getBlockList() {
-		return await this.driver.elementByAccessibilityId('block-list' ).isDisplayed();
+		return await this.driver.hasElementByAccessibilityId( 'block-list' );
 	}
 
 	// Finds the wd element for new block that was added and sets the element attribute
