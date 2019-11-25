@@ -42,6 +42,18 @@
 	opacity: 0.2;
 }
 
+.horizontalSpaceNone {
+	padding-left: 0;
+	padding-right: 0;
+	margin-left: 0;
+	margin-right: 0;
+}
+
+.marginHorizontalNone {
+	margin-left: 0;
+	margin-right: 0;
+}
+
 .blockTitle {
 	background-color: $gray;
 	padding-left: 8px;
