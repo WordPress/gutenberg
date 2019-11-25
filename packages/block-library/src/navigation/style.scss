@@ -73,10 +73,11 @@
 			transition: opacity 0.15s linear, transform 0.15s linear, right 0s 0.15s;
 			transform: translateY(0.6rem);
 			visibility: hidden;
+			padding: 5px 0;
 
 
 			li {
-				margin: 10px;
+				margin: 2px 8px;
 			}
 
 			a {
@@ -124,7 +125,6 @@
 		margin-left: 0;
 
 		li a {
-
 			padding-top: 8px;
 			padding-bottom: 8px;
 		}
