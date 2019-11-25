@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { View } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 /**
  * WordPress dependencies
  */
@@ -14,6 +15,7 @@ import {
 	RichText,
 	withColors,
 	InspectorControls,
+	__experimentalUseGradient,
 } from '@wordpress/block-editor';
 import {
 	TextControl,
@@ -37,7 +39,54 @@ const MIN_BORDER_RADIUS_VALUE = 0;
 const MAX_BORDER_RADIUS_VALUE = 50;
 const BORDER_WIDTH = 1;
 
-const ButtonEdit = ( { attributes, setAttributes, backgroundColor, textColor, isSelected } ) => {
+function RichTextWrapper( { children, gradientValue, borderRadiusValue, backgroundColor, defaultBackgroundColor } ) {
+	const wrapperStyles = [
+		styles.richTextWrapper,
+		{
+			borderRadius: borderRadiusValue,
+			backgroundColor: backgroundColor.color || defaultBackgroundColor,
+		},
+	];
+
+	function transformGradient() {
+		const matchColorGroup = /(rgba|rgb|#)(.+?)[\%]/g;
+		const matchDeg = /(\d.+)deg/g;
+
+		const colorGroup = gradientValue.match( matchColorGroup ).map( ( color ) => color.split( ' ' ) );
+
+		const colors = colorGroup.map( ( color ) => color[ 0 ] );
+		const locations = colorGroup.map( ( location ) => Number( location[ 1 ].replace( '%', '' ) ) / 100 );
+		const angle = Number( matchDeg.exec( gradientValue )[ 1 ] );
+
+		return {
+			colors, locations, angle,
+		};
+	}
+
+	if ( gradientValue ) {
+		const { colors, locations, angle } = transformGradient();
+		return (
+			<LinearGradient
+				colors={ colors }
+				useAngle={ true }
+				angle={ angle }
+				locations={ locations }
+				angleCenter={ { x: 0.5, y: 0.5 } }
+				style={ wrapperStyles }
+			>
+				{ children }
+			</LinearGradient>
+		);
+	} return (
+		<View
+			style={ wrapperStyles }
+		>
+			{ children }
+		</View>
+	);
+}
+
+function ButtonEdit( { attributes, setAttributes, backgroundColor, textColor, isSelected } ) {
 	const {
 		placeholder,
 		text,
@@ -75,6 +124,10 @@ const ButtonEdit = ( { attributes, setAttributes, backgroundColor, textColor, is
 		} );
 	};
 
+	const {
+		gradientValue,
+	} = __experimentalUseGradient();
+
 	return (
 		<View
 			style={ [
@@ -82,14 +135,11 @@ const ButtonEdit = ( { attributes, setAttributes, backgroundColor, textColor, is
 				isSelected && { borderColor: backgroundColor.color || defaultBackgroundColor, borderRadius: borderRadiusValue + 5, borderWidth: BORDER_WIDTH },
 			] }
 		>
-			<View
-				style={ [
-					styles.richTextWrapper,
-					{
-						borderRadius: borderRadiusValue,
-						backgroundColor: backgroundColor.color || defaultBackgroundColor,
-					},
-				] }
+			<RichTextWrapper
+				gradientValue={ gradientValue }
+				borderRadiusValue={ borderRadiusValue }
+				backgroundColor={ backgroundColor }
+				defaultBackgroundColor={ defaultBackgroundColor }
 			>
 				<RichText
 					placeholder={ placeholder || __( 'Add text…' ) }
@@ -102,7 +152,7 @@ const ButtonEdit = ( { attributes, setAttributes, backgroundColor, textColor, is
 					textAlign="center"
 					placeholderTextColor="#668eaa"
 				/>
-			</View>
+			</RichTextWrapper>
 			<InspectorControls>
 				<PanelBody title={ __( 'Border Settings' ) } >
 					<RangeControl
@@ -136,7 +186,7 @@ const ButtonEdit = ( { attributes, setAttributes, backgroundColor, textColor, is
 		</View>
 
 	);
-};
+}
 
 export default compose( [
 	withInstanceId,
