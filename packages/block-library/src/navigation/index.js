@@ -30,7 +30,7 @@ export const settings = {
 	},
 
 	styles: [
-		{ name: 'default', label: __( 'Default' ), isDefault: true },
+		{ name: 'light', label: __( 'Light' ), isDefault: true },
 		{ name: 'dark', label: __( 'Dark' ) },
 	],
 

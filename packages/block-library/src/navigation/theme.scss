@@ -3,35 +3,4 @@
 	ul li {
 		list-style: none;
 	}
-
-	ul > li > ul {
-		background: #fff;
-		border-radius: 4px;
-		transition: opacity 0.15s linear, transform 0.15s linear, right 0s 0.15s;
-		transform: translateY(0.6rem);
-
-		& > a {
-			text-decoration: none;
-		}
-
-		&::after {
-			border-color: rgba(255, 255, 255, 0);
-			border-bottom-color: #fff;
-		}
-	}
-}
-
-.wp-block-navigation-menu.is-dark-style ul > li > ul {
-	background: #333;
-	border-radius: 4px;
-
-	& > a {
-		text-decoration: none;
-		color: #fff;
-	}
-
-	&::before {
-		border-color: rgba(24, 24, 24, 0);
-		border-bottom-color: #333;
-	}
 }
