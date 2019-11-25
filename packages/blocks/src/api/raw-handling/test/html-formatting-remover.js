@@ -5,6 +5,11 @@ import filter from '../html-formatting-remover';
 import { deepFilterHTML } from '../utils';
 
 describe( 'HTMLFormattingRemover', () => {
+	it( 'should trim text node without parent', () => {
+		const input = 'a';
+		expect( deepFilterHTML( input, [ filter ] ) ).toEqual( input );
+	} );
+
 	it( 'should remove formatting space', () => {
 		const input = `
 			<div>
