@@ -82,11 +82,10 @@ const label = `
  */
 
 /**
-	* @param {TextVariant} variant
+	* @param {TextVariant} variantName
 	*/
-// eslint-disable-next-line no-shadow
-const variant = ( variant ) => {
-	switch ( variant ) {
+const variant = ( variantName ) => {
+	switch ( variantName ) {
 		case 'title.large':
 			return css`
 				${ title }
@@ -94,9 +93,9 @@ const variant = ( variant ) => {
 			`;
 		case 'title.medium':
 			return css`
-					${ title }
-					${ titleMedium }
-				`;
+				${ title }
+				${ titleMedium }
+			`;
 		case 'title.small':
 			return css`
 				${ title }
