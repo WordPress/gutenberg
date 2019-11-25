@@ -62,6 +62,7 @@ const {
 	INSERTER_UTILITY_HIGH,
 	INSERTER_UTILITY_MEDIUM,
 	INSERTER_UTILITY_LOW,
+	getLowestCommonAncestorWithSelectedBlock,
 } = selectors;
 
 describe( 'selectors', () => {
@@ -2341,6 +2342,85 @@ describe( 'selectors', () => {
 			expect( result ).toEqual( {
 				block1: { fruit: 'bananas' },
 			} );
+		} );
+	} );
+
+	describe( 'getLowestCommonAncestorWithSelectedBlock', () => {
+		const blocks = {
+			order: {
+				'': [ 'a', 'b' ],
+				a: [ 'c', 'd' ],
+				d: [ 'e' ],
+				f: [ 'b' ],
+			},
+			parents: {
+				a: '',
+				b: '',
+				c: 'a',
+				d: 'a',
+				e: 'd',
+				f: 'b',
+			},
+		};
+
+		it( 'should not be defined if there is no block selected', () => {
+			const state = {
+				blocks,
+				selectionStart: {},
+				selectionEnd: {},
+			};
+
+			expect( getLowestCommonAncestorWithSelectedBlock( state, 'd' ) ).not.toBeDefined();
+		} );
+
+		it( 'should not be defined if selected block has no parent', () => {
+			const state = {
+				blocks,
+				selectionStart: { clientId: 'b' },
+				selectionEnd: { clientId: 'b' },
+			};
+
+			expect( getLowestCommonAncestorWithSelectedBlock( state, 'b' ) ).toBe( 'b' );
+		} );
+
+		it( 'should not be defined if selected block has no common parent with given block', () => {
+			const state = {
+				blocks,
+				selectionStart: { clientId: 'd' },
+				selectionEnd: { clientId: 'd' },
+			};
+
+			expect( getLowestCommonAncestorWithSelectedBlock( state, 'f' ) ).not.toBeDefined();
+		} );
+
+		it( 'should return block id if selected block is ancestor of block', () => {
+			const state = {
+				blocks,
+				selectionStart: { clientId: 'c' },
+				selectionEnd: { clientId: 'c' },
+			};
+
+			expect( getLowestCommonAncestorWithSelectedBlock( state, 'a' ) ).toBe( 'a' );
+		} );
+
+		it( 'should return block id if selected block is nested child of given block', () => {
+			const state = {
+				blocks,
+				selectionStart: { clientId: 'e' },
+				selectionEnd: { clientId: 'e' },
+			};
+
+			expect( getLowestCommonAncestorWithSelectedBlock( state, 'a' ) ).toBe( 'a' );
+		} );
+
+		it( 'should return block id if selected block has common parent with given block', () => {
+			const state = {
+				blocks,
+				selectionStart: { clientId: 'e' },
+				selectionEnd: { clientId: 'e' },
+			};
+
+			expect( getLowestCommonAncestorWithSelectedBlock( state, 'c' ) ).toBe( 'a' );
 		} );
 	} );
 } );
