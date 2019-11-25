@@ -357,6 +357,7 @@ export class MediaPlaceholder extends Component {
 									</IconButton>
 									{ mediaLibraryButton }
 									{ this.renderUrlSelectionUI() }
+									{ this.props.extraActions && this.props.extraActions( this.props ) }
 									{ this.renderCancelLink() }
 								</>
 							);
@@ -386,6 +387,7 @@ export class MediaPlaceholder extends Component {
 					</FormFileUpload>
 					{ mediaLibraryButton }
 					{ this.renderUrlSelectionUI() }
+					{ this.props.extraActions && this.props.extraActions( this.props ) }
 					{ this.renderCancelLink() }
 				</>
 			);

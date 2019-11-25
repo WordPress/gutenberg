@@ -663,6 +663,18 @@ export class ImageEdit extends Component {
 			className={ 'edit-image-preview' }
 			src={ url }
 		/> );
+
+		const renderLogoAction = () => {
+			return (
+				<Button
+					isLarge
+					href="https://unsplash.com"
+				>
+					{ __( 'Find an image' ) }
+				</Button>
+			);
+		};
+
 		const mediaPlaceholder = (
 			<MediaPlaceholder
 				icon={ <BlockIcon icon={ icon } /> }
@@ -679,6 +691,7 @@ export class ImageEdit extends Component {
 				value={ { id, src } }
 				mediaPreview={ mediaPreview }
 				disableMediaButtons={ ! isEditing && url }
+				extraActions={ renderLogoAction }
 			/>
 		);
 		if ( isEditing || ! url ) {
