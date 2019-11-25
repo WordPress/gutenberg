@@ -1,110 +1,97 @@
 /**
  * WordPress dependencies
  */
-import {
-	createNewPost,
-	toggleScreenOption,
-} from '@wordpress/e2e-test-utils';
+import { createNewPost, clickOnMoreMenuItem } from '@wordpress/e2e-test-utils';
 
 describe( 'New User Experience (NUX)', () => {
-	async function clickAllTips( page ) {
-		// Click through all available tips.
-		const tips = await getTips( page );
-		const numberOfTips = tips.tipIds.length;
+	it( 'should show the guide to first-time users', async () => {
+		let welcomeGuideText, welcomeGuide;
 
-		for ( let i = 1; i < numberOfTips; i++ ) {
-			await page.click( '.nux-dot-tip .components-button.is-link' );
-		}
-
-		return { numberOfTips, tips };
-	}
-
-	async function getTips( page ) {
-		return await page.evaluate( () => {
-			return wp.data.select( 'core/nux' ).getAssociatedGuide( 'core/editor.inserter' );
-		} );
-	}
-
-	async function getTipsEnabled( page ) {
-		return await page.evaluate( () => {
-			return wp.data.select( 'core/nux' ).areTipsEnabled();
-		} );
-	}
-
-	beforeEach( async () => {
+		// Create a new post as a first-time user
 		await createNewPost( { enableTips: true } );
-	} );
 
-	it( 'should show tips to a first-time user', async () => {
-		const firstTipText = await page.$eval( '.nux-dot-tip', ( element ) => element.innerText );
-		expect( firstTipText ).toContain( 'Welcome to the wonderful world of blocks!' );
+		// Guide should be on page 1 of 3
+		welcomeGuideText = await page.$eval( '.edit-post-welcome-guide', ( element ) => element.innerText );
+		expect( welcomeGuideText ).toContain( 'Welcome to the Block Editor' );
 
-		const [ nextTipButton ] = await page.$x( "//button[contains(text(), 'See next tip')]" );
-		await nextTipButton.click();
+		// Click on the 'Next' button
+		const [ nextButton ] = await page.$x( '//button[contains(text(), "Next")]' );
+		await nextButton.click();
 
-		const secondTipText = await page.$eval( '.nux-dot-tip', ( element ) => element.innerText );
-		expect( secondTipText ).toContain( 'You’ll find more settings for your page and blocks in the sidebar.' );
-	} );
+		// Guide should be on page 2 of 3
+		welcomeGuideText = await page.$eval( '.edit-post-welcome-guide', ( element ) => element.innerText );
+		expect( welcomeGuideText ).toContain( 'Make each block your own' );
 
-	it( 'should show "Got it" once all tips have been displayed', async () => {
-		await clickAllTips( page );
+		// Click on the 'Previous' button
+		const [ previousButton ] = await page.$x( '//button[contains(text(), "Previous")]' );
+		await previousButton.click();
 
-		// Make sure "Got it" button appears on the last tip.
-		const gotItButton = await page.$x( "//button[contains(text(), 'Got it')]" );
-		expect( gotItButton ).toHaveLength( 1 );
+		// Guide should be on page 1 of 3
+		welcomeGuideText = await page.$eval( '.edit-post-welcome-guide', ( element ) => element.innerText );
+		expect( welcomeGuideText ).toContain( 'Welcome to the Block Editor' );
 
-		// Click the "Got it button".
-		await page.click( '.nux-dot-tip .components-button.is-link' );
+		// Press the button for Page 2
+		await page.click( 'button[aria-label="Page 2 of 3"]' );
 
-		// Verify no more tips are visible on the page.
-		const nuxTipElements = await page.$$( '.nux-dot-tip' );
-		expect( nuxTipElements ).toHaveLength( 0 );
+		// Press the right arrow key
+		await page.keyboard.press( 'ArrowRight' );
 
-		// Tips should not be marked as disabled, but when the user has seen all
-		// of the available tips, they will not appear.
-		const areTipsEnabled = await getTipsEnabled( page );
-		expect( areTipsEnabled ).toEqual( true );
-	} );
+		// Guide should be on page 3 of 3
+		welcomeGuideText = await page.$eval( '.edit-post-welcome-guide', ( element ) => element.innerText );
+		expect( welcomeGuideText ).toContain( 'Get to know the Block Library' );
 
-	it( 'should hide and disable tips if "disable tips" button is clicked', async () => {
-		await page.click( '.nux-dot-tip__disable' );
+		// Click on the 'Get started' button
+		const [ getStartedButton ] = await page.$x( '//button[contains(text(), "Get started")]' );
+		await getStartedButton.click();
 
-		// Verify no more tips are visible on the page.
-		let nuxTipElements = await page.$$( '.nux-dot-tip' );
-		expect( nuxTipElements ).toHaveLength( 0 );
+		// Guide should be closed
+		welcomeGuide = await page.$( '.edit-post-welcome-guide' );
+		expect( welcomeGuide ).toBeNull();
 
-		// We should be disabling the tips so they don't appear again.
-		const areTipsEnabled = await getTipsEnabled( page );
-		expect( areTipsEnabled ).toEqual( false );
-
-		// Refresh the page; tips should not show because they were disabled.
+		// Reload the editor
 		await page.reload();
 
-		nuxTipElements = await page.$$( '.nux-dot-tip' );
-		expect( nuxTipElements ).toHaveLength( 0 );
+		// Guide should be closed
+		welcomeGuide = await page.$( '.edit-post-welcome-guide' );
+		expect( welcomeGuide ).toBeNull();
 	} );
 
-	it( 'should enable tips when the "Tips" option is toggled on', async () => {
-		// Start by disabling tips.
-		await page.click( '.nux-dot-tip__disable' );
+	it( 'should not show the welcome guide again if it is dismissed', async () => {
+		let welcomeGuide;
 
-		// Verify no more tips are visible on the page.
-		let nuxTipElements = await page.$$( '.nux-dot-tip' );
-		expect( nuxTipElements ).toHaveLength( 0 );
+		// Create a new post as a first-time user
+		await createNewPost( { enableTips: true } );
 
-		// Tips should be disabled in localStorage as well.
-		let areTipsEnabled = await getTipsEnabled( page );
-		expect( areTipsEnabled ).toEqual( false );
+		// Guide should be open
+		welcomeGuide = await page.$( '.edit-post-welcome-guide' );
+		expect( welcomeGuide ).not.toBeNull();
 
-		// Toggle the 'Tips' option to enable.
-		await toggleScreenOption( 'Tips' );
+		// Close the guide
+		await page.click( 'button[aria-label="Close dialog"]' );
 
-		// Tips should once again appear.
-		nuxTipElements = await page.$$( '.nux-dot-tip' );
-		expect( nuxTipElements ).toHaveLength( 1 );
+		// Reload the editor
+		await page.reload();
 
-		// Tips should be enabled in localStorage as well.
-		areTipsEnabled = await getTipsEnabled( page );
-		expect( areTipsEnabled ).toEqual( true );
+		// Guide should be closed
+		welcomeGuide = await page.$( '.edit-post-welcome-guide' );
+		expect( welcomeGuide ).toBeNull();
+	} );
+
+	it( 'should show the welcome guide if it is manually opened', async () => {
+		let welcomeGuide;
+
+		// Create a new post as a returning user
+		await createNewPost();
+
+		// Guide should be closed
+		welcomeGuide = await page.$( '.edit-post-welcome-guide' );
+		expect( welcomeGuide ).toBeNull();
+
+		// Manually open the guide
+		await clickOnMoreMenuItem( 'Welcome Guide' );
+
+		// Guide should be open
+		welcomeGuide = await page.$( '.edit-post-welcome-guide' );
+		expect( welcomeGuide ).not.toBeNull();
 	} );
 } );

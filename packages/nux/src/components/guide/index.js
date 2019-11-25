@@ -42,7 +42,11 @@ export function Guide( { children, className, finishButtonText, isMobile, onFini
 	}
 
 	return (
-		<Modal className={ classnames( 'nux-guide', className ) } onRequestClose={ onFinish }>
+		<Modal
+			className={ classnames( 'nux-guide', className ) }
+			shouldCloseOnClickOutside={ false }
+			onRequestClose={ onFinish }
+		>
 
 			<KeyboardShortcuts key={ currentPage } shortcuts={ {
 				left: goBack,
