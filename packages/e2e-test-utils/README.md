@@ -408,7 +408,7 @@ Sets browser viewport to specified type.
 
 _Parameters_
 
--   _type_ `string`: String to represent dimensions type; can be either small or large.
+-   _viewport_ `WPViewport`: Viewport name or dimensions object to assign.
 
 <a name="setPostContent" href="#setPostContent">#</a> **setPostContent**
 

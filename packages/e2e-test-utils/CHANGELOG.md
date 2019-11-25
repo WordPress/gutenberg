@@ -1,8 +1,12 @@
-## master
+## Master
 
 ### Breaking Changes
 
 - The disableNavigationMode utility was removed. By default, the editor is in edit mode now.
+
+### Improvements
+
+- `setBrowserViewport` accepts an object of `width`, `height` values, to assign a viewport of arbitrary size.
 
 ## 3.0.0 (2019-11-14)
 
