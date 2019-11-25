@@ -6,17 +6,26 @@ import { isPhrasingContent } from './phrasing-content';
 function getSibling( node, which ) {
 	const sibling = node[ `${ which }Sibling` ];
 
-	if ( ! sibling || ! isPhrasingContent( sibling ) ) {
-		return;
-	}
-
-	if ( sibling ) {
+	if ( sibling && isPhrasingContent( sibling ) ) {
 		return sibling;
 	}
 
 	const { parentNode } = node;
 
+	if ( ! parentNode || ! isPhrasingContent( parentNode ) ) {
+		return;
+	}
+
 	return getSibling( parentNode, which );
+}
+
+function isFormattingSpace( character ) {
+	return (
+		character === ' ' ||
+		character === '\r' ||
+		character === '\n' ||
+		character === '\t'
+	);
 }
 
 /**
@@ -42,7 +51,7 @@ export default function( node ) {
 
 	// Remove the leading space if the text element is at the start of a block,
 	// is preceded by a line break element, or has a space in the previous
-	// element.
+	// node.
 	if ( newData[ 0 ] === ' ' ) {
 		const previousSibling = getSibling( node, 'previous' );
 
@@ -56,13 +65,18 @@ export default function( node ) {
 	}
 
 	// Remove the trailing space if the text element is at the end of a block,
-	// or is succeded by a line break element.
+	// is succeded by a line break element, or has a space in the next text
+	// node.
 	if ( newData[ newData.length - 1 ] === ' ' ) {
 		const nextSibling = getSibling( node, 'next' );
 
 		if (
 			! nextSibling ||
-			nextSibling.nodeName === 'BR'
+			nextSibling.nodeName === 'BR' ||
+			(
+				nextSibling.nodeType === nextSibling.TEXT_NODE &&
+				isFormattingSpace( nextSibling.textContent[ 0 ] )
+			)
 		) {
 			newData = newData.slice( 0, -1 );
 		}

@@ -96,4 +96,10 @@ describe( 'HTMLFormattingRemover', () => {
 		const input = `<pre> a\n b\n</pre>`;
 		expect( deepFilterHTML( input, [ filter ] ) ).toEqual( input );
 	} );
+
+	it( 'should not remove white space if next elemnt has none', () => {
+		const input = `<div><strong>a </strong>b</div>`;
+		const output = '<div><strong>a </strong>b</div>';
+		expect( deepFilterHTML( input, [ filter ] ) ).toEqual( output );
+	} );
 } );
