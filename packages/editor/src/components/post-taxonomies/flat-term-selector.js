@@ -212,7 +212,7 @@ class FlatTermSelector extends Component {
 		const newTermLabel = get(
 			taxonomy,
 			[ 'labels', 'add_new_item' ],
-			slug === 'post_tag' ? __( 'Add New tag' ) : __( 'Add New Term' )
+			slug === 'post_tag' ? __( 'Add new tag' ) : __( 'Add new Term' )
 		);
 		const singularName = get(
 			taxonomy,
