@@ -50,7 +50,8 @@ install:
   - |
     if [[ "$INSTALL_WORDPRESS" = "true" ]]; then
       # Download and unpack WordPress.
-      curl -sL https://wordpress.org/nightly-builds/wordpress-latest.zip -o /tmp/wordpress-latest.zip
+      curl -sL https://wordpress.org/latest.zip -o /tmp/wordpress-latest.zip
+
       unzip -q /tmp/wordpress-latest.zip -d /tmp
       mkdir -p wordpress/src
       mv /tmp/wordpress/* wordpress/src
