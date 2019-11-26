@@ -4,7 +4,7 @@ Gutenberg is a Node.js-based project, built primarily in JavaScript.
 
 The first step is to install a recent version of Node. The easiest way (on MacOS, Linux, or Windows 10 with the Linux Subsystem) is by installing and running [nvm]. Once `nvm` is installed, you can install the correct version of Node by running `nvm install` in the Gutenberg directory.
 
-Once you have Node installed, run these scripts from within your local gutenberg repository:
+Once you have Node installed, run these scripts from within your local Gutenberg repository:
 
 Note: The install scripts require [Python](https://www.python.org/) to be installed and in the path of the local system.
 
@@ -17,7 +17,7 @@ This will build Gutenberg, ready to be used as a WordPress plugin!
 
 If you don't have a local WordPress environment to load Gutenberg in, we can help get that up and running, too.
 
-## Local Environment 
+## Local Environment
 
 ### Step 1: Installing a Local Environment
 #### Quickest Method: Using Docker
@@ -54,7 +54,7 @@ Whether you decided to use Docker or an existing local WordPress install, the Wo
 If this port is in use, you can override it using the `LOCAL_PORT` environment variable. For example running the below command on your computer will change the URL to
 `http://localhost:7777` .
 
-Linux/MacOS: `export LOCAL_PORT=7777`
+Linux/macOS: `export LOCAL_PORT=7777`
 Windows using Command Prompt: `setx LOCAL_PORT "7777"`
 Windows using PowerShell: `$env:LOCAL_PORT = "7777"`
 
