@@ -36,6 +36,8 @@ const buttonStyle = compose( style.button,
 const removeButtonStyle = compose( style.removeButton,
 	{ aspectRatio: 1 }
 );
+const ICON_SIZE_ARROW = 15;
+const ICON_SIZE_REMOVE = 20;
 
 class GalleryImage extends Component {
 	constructor() {
@@ -202,7 +204,7 @@ class GalleryImage extends Component {
 									<Button
 										style={ buttonStyle }
 										icon="arrow-left-alt"
-										iconSize={ 15 }
+										iconSize={ ICON_SIZE_ARROW }
 										onClick={ isFirstItem ? undefined : onMoveBackward }
 										accessibilityLabel={ __( 'Move Image Backward' ) }
 										aria-disabled={ isFirstItem }
@@ -212,7 +214,7 @@ class GalleryImage extends Component {
 									<Button
 										style={ buttonStyle }
 										icon="arrow-right-alt"
-										iconSize={ 15 }
+										iconSize={ ICON_SIZE_ARROW }
 										onClick={ isLastItem ? undefined : onMoveForward }
 										accessibilityLabel={ __( 'Move Image Forward' ) }
 										aria-disabled={ isLastItem }
@@ -222,7 +224,7 @@ class GalleryImage extends Component {
 								<Button
 									style={ removeButtonStyle }
 									icon="no-alt"
-									iconSize={ 20 }
+									iconSize={ ICON_SIZE_REMOVE }
 									onClick={ onRemove }
 									accessibilityLabel={ __( 'Remove Image' ) }
 									disabled={ ! isSelected }
