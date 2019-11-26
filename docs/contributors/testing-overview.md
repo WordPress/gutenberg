@@ -396,6 +396,25 @@ If you're using a different setup, you can provide the base URL, username and pa
 WP_BASE_URL=http://localhost:8888 WP_USERNAME=admin WP_PASSWORD=password npm run test-e2e
 ```
 
+If you find that end-to-end tests pass when run locally, but fail in Travis, you may be able to isolate a CPU- or netowrk-bound race condition by simulating a slow CPU or network:
+
+```
+THROTTLE_CPU=4 npm run test-e2e
+```
+
+`THROTTLE_CPU` is a slowdown factor (in this example, a 4x slowdown multiplier)
+
+Related: https://chromedevtools.github.io/devtools-protocol/tot/Emulation#method-setCPUThrottlingRate
+
+```
+DOWNLOAD_THROUGHPUT=125000 npm run test-e2e
+```
+
+`DOWNLOAD_THROUGHPUT` is a numeric value representing bytes-per-second network download (in this example, a 1Mbps download speed).
+
+Related: https://chromedevtools.github.io/devtools-protocol/tot/Network#method-emulateNetworkConditions
+
+
 ### Core Block Testing
 
 Every core block is required to have at least one set of fixture files for its main save function and one for each deprecation. These fixtures test the parsing and serialization of the block. See [the e2e tests fixtures readme](/packages/e2e-tests/fixtures/blocks/README.md) for more information and instructions.

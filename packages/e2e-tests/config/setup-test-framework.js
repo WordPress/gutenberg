@@ -18,9 +18,25 @@ import {
 } from '@wordpress/e2e-test-utils';
 
 /**
- * Environment variables
+ * Timeout, in seconds, that the test should be allowed to run.
+ *
+ * @type {string|undefined}
  */
-const { PUPPETEER_TIMEOUT } = process.env;
+const PUPPETEER_TIMEOUT = process.env.PUPPETEER_TIMEOUT;
+
+/**
+ * CPU slowdown factor, as a numeric multiplier.
+ *
+ * @type {string|undefined}
+ */
+const THROTTLE_CPU = process.env.THROTTLE_CPU;
+
+/**
+ * Network download speed, in bytes per second.
+ *
+ * @type {string|undefined}
+ */
+const DOWNLOAD_THROUGHPUT = process.env.DOWNLOAD_THROUGHPUT;
 
 /**
  * Set of console logging types observed to protect against unexpected yet
@@ -190,6 +206,32 @@ async function runAxeTestsForBlockEditor() {
 	} );
 }
 
+/**
+ * Simulate slow network or throttled CPU if provided via environment variables.
+ */
+async function simulateAdverseConditions() {
+	if ( ! DOWNLOAD_THROUGHPUT && ! THROTTLE_CPU ) {
+		return;
+	}
+
+	const client = await page.target().createCDPSession();
+
+	if ( DOWNLOAD_THROUGHPUT ) {
+		// See: https://chromedevtools.github.io/devtools-protocol/tot/Network#method-emulateNetworkConditions
+		await client.send( 'Network.emulateNetworkConditions', {
+			// Simulated download speed (bytes/s)
+			downloadThroughput: Number( DOWNLOAD_THROUGHPUT ),
+		} );
+	}
+
+	if ( THROTTLE_CPU ) {
+		// See: https://chromedevtools.github.io/devtools-protocol/tot/Emulation#method-setCPUThrottlingRate
+		await client.send( 'Emulation.setCPUThrottlingRate', {
+			rate: Number( THROTTLE_CPU ),
+		} );
+	}
+}
+
 // Before every test suite run, delete all content created by the test. This ensures
 // other posts/comments/etc. aren't dirtying tests and tests don't depend on
 // each other's side-effects.
@@ -197,6 +239,7 @@ beforeAll( async () => {
 	capturePageEventsForTearDown();
 	enablePageDialogAccept();
 	observeConsoleLogging();
+	simulateAdverseConditions();
 
 	await trashExistingPosts();
 	await setupBrowser();
