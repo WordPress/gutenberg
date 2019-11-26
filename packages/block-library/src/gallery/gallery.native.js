@@ -18,6 +18,10 @@ import { __, sprintf } from '@wordpress/i18n';
 
 const TILE_SPACING = 15;
 
+// we must limit displayed columns since readable content max-width is 580px
+const MAX_DISPLAYED_COLUMNS = 4;
+const MAX_DISPLAYED_COLUMNS_MOBILE = 2;
+
 export const Gallery = ( props ) => {
 	const {
 		selectedImage,
@@ -32,7 +36,6 @@ export const Gallery = ( props ) => {
 		isSelected,
 		//	setAttributes,
 		isMobile,
-		isNarrow,
 		onFocus,
 	} = props;
 
@@ -42,16 +45,10 @@ export const Gallery = ( props ) => {
 		images,
 	} = attributes;
 
-	let displayedColumns;
-
 	// limit displayed columns based on viewport width
-	if ( isMobile ) {
-		displayedColumns = Math.min( columns, 2 );
-	} else if ( isNarrow ) {
-		displayedColumns = Math.min( columns, 4 );
-	} else {
-		displayedColumns = columns;
-	}
+	const displayedColumns = isMobile ?
+		Math.min( columns, MAX_DISPLAYED_COLUMNS_MOBILE ) :
+		Math.min( columns, MAX_DISPLAYED_COLUMNS );
 
 	return (
 		<View>
