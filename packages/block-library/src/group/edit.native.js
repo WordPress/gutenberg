@@ -27,7 +27,7 @@ function GroupEdit( {
 		return (
 			<View style={ [
 				getStylesFromColorScheme( styles.groupPlaceholder, styles.groupPlaceholderDark ),
-				! hasInnerBlocks && styles.marginVerticalDense,
+				! hasInnerBlocks && { ...styles.marginVerticalDense, ...styles.marginHorizontalNone },
 			] } />
 		);
 	}
