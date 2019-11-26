@@ -1,5 +1,5 @@
 .wp-block-media-text {
-	// Unlike most explicit left/right alignments, this block's left/right direction should not be manipulated by rtl.
+	// This block's direction should not be manipulated by rtl, as the mediaPosition control does.
 	/*!rtl:begin:ignore*/
 	direction: ltr;
 	/*!rtl:end:ignore*/
