@@ -42,7 +42,7 @@ export default function( node ) {
 	}
 
 	// Ignore pre content.
-	if ( node.parentElement.closest( 'pre' ) ) {
+	if ( node.parentElement.closest && node.parentElement.closest( 'pre' ) ) {
 		return;
 	}
 
