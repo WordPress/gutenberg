@@ -1,6 +1,6 @@
 .groupPlaceholder {
-	padding: 12px;
-	margin: 16px;
+	padding: $block-selected-to-content;
+	margin: $block-edge-to-content;
 	margin-left: $block-selected-child-margin;
 	margin-right: $block-selected-child-margin;
 	background-color: $white;
