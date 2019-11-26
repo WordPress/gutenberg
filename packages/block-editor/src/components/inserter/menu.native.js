@@ -142,56 +142,13 @@ export default compose(
 			hideInsertionPoint,
 		} = dispatch( 'core/block-editor' );
 
-		// To avoid duplication, getInsertionIndex is extracted and used in two event handlers
-		// This breaks the withDispatch not containing any logic rule.
-		// Since it's a function only called when the event handlers are called,
-		// it's fine to extract it.
-		// eslint-disable-next-line no-restricted-syntax
-		function getInsertionIndex() {
-			const {
-				getBlock,
-				getBlockIndex,
-				getBlockSelectionEnd,
-				getBlockOrder,
-			} = select( 'core/block-editor' );
-			const {
-				isPostTitleSelected,
-			} = select( 'core/editor' );
-			const { clientId, destinationRootClientId, isAppender } = ownProps;
-
-			// if post title is selected insert as first block
-			if ( isPostTitleSelected() ) {
-				return 0;
-			}
-
-			// If the clientId is defined, we insert at the position of the block.
-			if ( clientId ) {
-				return getBlockIndex( clientId, destinationRootClientId );
-			}
-
-			// If there a selected block,
-			const end = getBlockSelectionEnd();
-			// `end` argument (id) can refer to the component which is removed
-			// due to pressing `undo` button, that's why we need to check
-			// if `getBlock( end) is valid, otherwise `null` is passed
-			if ( ! isAppender && end && getBlock( end ) ) {
-				// and the last selected block is unmodified (empty), it will be replaced
-				if ( isUnmodifiedDefaultBlock( getBlock( end ) ) ) {
-					return getBlockIndex( end, destinationRootClientId );
-				}
-
-				// we insert after the selected block.
-				return getBlockIndex( end, destinationRootClientId ) + 1;
-			}
-
-			// Otherwise, we insert at the end of the current rootClientId
-			return getBlockOrder( destinationRootClientId ).length;
-		}
-
 		return {
 			showInsertionPoint() {
-				const index = getInsertionIndex();
-				showInsertionPoint( ownProps.destinationRootClientId, index );
+				showInsertionPoint(
+					ownProps.destinationRootClientId,
+					ownProps.insertionIndex,
+					ownProps.isDefaultInsert
+				);
 			},
 			hideInsertionPoint,
 			onSelect( item ) {
@@ -206,12 +163,17 @@ export default compose(
 				const { name, initialAttributes } = item;
 				const selectedBlock = getSelectedBlock();
 				const insertedBlock = createBlock( name, initialAttributes );
-				if ( ! isAppender && selectedBlock && isUnmodifiedDefaultBlock( selectedBlock ) ) {
+				if (
+					ownProps.isDefaultInsert &&
+					! isAppender &&
+					selectedBlock &&
+					isUnmodifiedDefaultBlock( selectedBlock )
+				) {
 					replaceBlocks( selectedBlock.clientId, insertedBlock );
 				} else {
 					insertBlock(
 						insertedBlock,
-						getInsertionIndex(),
+						ownProps.insertionIndex,
 						ownProps.destinationRootClientId
 					);
 				}
