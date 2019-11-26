@@ -48,8 +48,8 @@ const ColorPanel = ( {
 	colorSettings,
 	colorPanelProps,
 	contrastCheckers,
-	detectedBackgroundColor,
-	detectedColor,
+	detectedBackgroundColorRef,
+	detectedColorRef,
 	panelChildren,
 } ) => (
 	<PanelColorSettings
@@ -64,12 +64,12 @@ const ColorPanel = ( {
 					backgroundColor = resolveContrastCheckerColor(
 						backgroundColor,
 						colorSettings,
-						detectedBackgroundColor
+						detectedBackgroundColorRef.current
 					);
 					textColor = resolveContrastCheckerColor(
 						textColor,
 						colorSettings,
-						detectedColor
+						detectedColorRef.current
 					);
 					return (
 						<ContrastChecker
@@ -85,12 +85,12 @@ const ColorPanel = ( {
 					backgroundColor = resolveContrastCheckerColor(
 						backgroundColor || value,
 						colorSettings,
-						detectedBackgroundColor
+						detectedBackgroundColorRef.current
 					);
 					textColor = resolveContrastCheckerColor(
 						textColor || value,
 						colorSettings,
-						detectedColor
+						detectedColorRef.current
 					);
 					return (
 						<ContrastChecker
@@ -330,8 +330,8 @@ export default function __experimentalUseColors(
 			colorSettings,
 			colorPanelProps,
 			contrastCheckers,
-			detectedBackgroundColor: detectedBackgroundColorRef.current,
-			detectedColor: detectedColorRef.current,
+			detectedBackgroundColorRef,
+			detectedColorRef,
 			panelChildren,
 		};
 		return {
@@ -342,11 +342,5 @@ export default function __experimentalUseColors(
 			),
 			ColorDetector,
 		};
-	}, [
-		attributes,
-		setAttributes,
-		detectedBackgroundColorRef.current,
-		detectedColorRef.current,
-		...deps,
-	] );
+	}, [ attributes, setAttributes, ...deps ] );
 }
