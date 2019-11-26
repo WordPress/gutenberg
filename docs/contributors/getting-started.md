@@ -6,6 +6,8 @@ The first step is to install a recent version of Node. The easiest way (on MacOS
 
 Once you have Node installed, run these scripts:
 
+Note: The install scripts require [Python](https://www.python.org/) to be installed and in the path of the local system.
+
 ```
 npm install
 npm run build
@@ -17,6 +19,8 @@ If you don't have a local WordPress environment to load Gutenberg in, we can hel
 
 ## Local Environment
 
+### Using Docker
+
 The quickest way to get up and running is to use the provided Docker setup. If you don't already have it, you'll need to install Docker by following their instructions for [Windows 10 Pro](https://docs.docker.com/docker-for-windows/install/), [all other version of Windows](https://docs.docker.com/toolbox/toolbox_install_windows/), [macOS](https://docs.docker.com/docker-for-mac/install/), or [Linux](https://docs.docker.com/v17.12/install/linux/docker-ce/ubuntu/#install-using-the-convenience-script).
 
 Once Docker is installed and running, run this script to install WordPress, and build your local environment:
@@ -25,6 +29,7 @@ Once Docker is installed and running, run this script to install WordPress, and 
 npm run env install
 ```
 
+### Using an Existing Local WordPress Install
 WordPress will be installed in the `wordpress` directory, if you need to access WordPress core files directly, you can find them there.
 
 If you already have WordPress checked out in a different directory, you can use that installation, instead, by running these commands:
@@ -40,17 +45,25 @@ In Windows, you can set the `WP_DEVELOP_DIR` environment variable using the appr
 
     CMD: set WP_DEVELOP_DIR=/path/to/wordpress-develop
     PowerShell: $env:WP_DEVELOP_DIR = "/path/to/wordpress-develop"
+	
+### Access the Local WordPress Install
 
 The WordPress installation should be available at `http://localhost:8889` (**Username**: `admin`, **Password**: `password`).
 If this port is in use, you can override it using the `LOCAL_PORT` environment variable. For example, `export LOCAL_PORT=7777` will change the URL to `http://localhost:7777` . If you're running [e2e tests](/docs/contributors/testing-overview.md#end-to-end-testing), this change will be used correctly.
 
 To bring down this local WordPress instance later run `npm run env stop`. To bring it back up again, run `npm run env start`.
 
+### Toggling Debug Systems
+
 WordPress comes with specific [debug systems](https://wordpress.org/support/article/debugging-in-wordpress/) designed to simplify the process as well as standardize code across core, plugins and themes. It is possible to use environment variables (`LOCAL_WP_DEBUG` and `LOCAL_SCRIPT_DEBUG`) to update a site's configuration constants located in `wp-config.php` file. Both flags can be disabled at any time by running the following command:
 ```
 LOCAL_SCRIPT_DEBUG=false LOCAL_WP_DEBUG=false npm run env install
 ```
 By default, both flags will be set to `true`.
+
+### Troubleshooting
+
+You might find yourself stuck on a screen stating that "you are running WordPress without JavaScript and CSS files". If you tried installing WordPress via `npm run env install`, it probably means that something went wrong during the process. To fix it, try removing the `/wordpress` folder and running `npm run env install` again.
 
 ## On A Remote Server
 

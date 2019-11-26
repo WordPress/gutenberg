@@ -1,25 +1,18 @@
 /**
  * WordPress dependencies
  */
-import { withSelect } from '@wordpress/data';
+import { createHigherOrderComponent } from '@wordpress/compose';
 
-const __experimentalWithPageTemplatePickerVisible = withSelect( ( select ) => {
-	const {
-		getCurrentPostType,
-	} = select( 'core/editor' );
+/**
+ * Internal dependencies
+ */
+import __experimentalUsePageTemplatePickerVisible from './use-page-template-picker-visible';
 
-	const {
-		getBlockCount,
-		getSettings,
-	} = select( 'core/block-editor' );
-
-	const isPageTemplatesEnabled = getSettings().__experimentalEnablePageTemplates;
-	const isEmpty = getBlockCount() === 0;
-	const isPage = getCurrentPostType() === 'page';
-
-	return {
-		showPageTemplatePicker: isPageTemplatesEnabled && isEmpty && isPage,
-	};
+const __experimentalWithPageTemplatePickerVisible = createHigherOrderComponent( ( WrappedComponent ) => {
+	const showPageTemplatePicker = __experimentalUsePageTemplatePickerVisible();
+	return (
+		<WrappedComponent showPageTemplatePicker={ showPageTemplatePicker } />
+	);
 } );
 
 export default __experimentalWithPageTemplatePickerVisible;

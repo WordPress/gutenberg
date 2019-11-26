@@ -73,6 +73,40 @@ function gutenberg_override_query_template( $template, $type, array $templates =
 }
 
 /**
+ * Recursively traverses a block tree, creating auto drafts
+ * for any encountered template parts without a fixed post.
+ *
+ * @access private
+ *
+ * @param array $block The root block to start traversing from.
+ */
+function create_auto_draft_for_template_part_block( $block ) {
+	if ( 'core/template-part' === $block['blockName'] && ! isset( $block['attrs']['id'] ) ) {
+		$template_part_file_path =
+			get_stylesheet_directory() . '/block-template-parts/' . $block['attrs']['slug'] . '.html';
+		if ( ! file_exists( $template_part_file_path ) ) {
+			return;
+		}
+		wp_insert_post(
+			array(
+				'post_content' => file_get_contents( $template_part_file_path ),
+				'post_title'   => ucfirst( $block['attrs']['slug'] ),
+				'post_status'  => 'auto-draft',
+				'post_type'    => 'wp_template_part',
+				'post_name'    => $block['attrs']['slug'],
+				'meta_input'   => array(
+					'theme' => $block['attrs']['theme'],
+				),
+			)
+		);
+	}
+
+	foreach ( $block['innerBlocks'] as $inner_block ) {
+		create_auto_draft_for_template_part_block( $inner_block );
+	}
+}
+
+/**
  * Find the correct 'wp_template' post for the current hierarchy and return the path
  * to the canvas file that will render it.
  *
@@ -147,6 +181,10 @@ function gutenberg_find_template( $template_file ) {
 				$current_template_post = get_post(
 					wp_insert_post( $current_template_post )
 				);
+
+				foreach ( parse_blocks( $current_template_post->post_content ) as $block ) {
+					create_auto_draft_for_template_part_block( $block );
+				}
 			} else {
 				$current_template_post = new WP_Post(
 					(object) $current_template_post

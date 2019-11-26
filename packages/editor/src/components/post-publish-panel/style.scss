@@ -15,12 +15,18 @@
 
 .editor-post-publish-panel__header {
 	background: $white;
-	padding-left: 16px;
+	padding-left: 8px;
+	padding-right: 8px;
 	height: $header-height;
 	border-bottom: $border-width solid $light-gray-500;
 	display: flex;
 	align-items: center;
 	align-content: space-between;
+
+	.components-icon-button {
+		position: absolute;
+		right: 8px;
+	}
 }
 
 .editor-post-publish-panel__header-publish-button {
@@ -72,6 +78,12 @@
 
 	.editor-post-visibility__dialog-legend {
 		display: none;
+	}
+
+	// The DateTime component has an intrinsic padding in order for the horizontal scrolling to function inside a popover.
+	// We unset that here when used inline.
+	.components-datetime {
+		padding: 0;
 	}
 }
 

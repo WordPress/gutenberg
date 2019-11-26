@@ -46,7 +46,7 @@ const applyFallbackStyles = withFallbackStyles( ( node, ownProps ) => {
 
 function ParagraphRTLToolbar( { direction, setDirection } ) {
 	const isRTL = useSelect( ( select ) => {
-		return select( 'core/block-editor' ).getSettings().isRTL;
+		return !! select( 'core/block-editor' ).getSettings().isRTL;
 	} );
 
 	return ( isRTL && (

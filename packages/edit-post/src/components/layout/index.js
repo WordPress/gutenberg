@@ -7,170 +7,147 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import {
-	Button,
-	Popover,
-	ScrollLock,
-	FocusReturnProvider,
-	navigateRegions,
-} from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
-import {
 	AutosaveMonitor,
 	LocalAutosaveMonitor,
 	UnsavedChangesWarning,
 	EditorNotices,
 	PostPublishPanel,
 } from '@wordpress/editor';
+import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	BlockBreadcrumb,
 	__experimentalPageTemplatePicker,
-	__experimentalWithPageTemplatePickerVisible,
+	__experimentalUsePageTemplatePickerVisible,
 } from '@wordpress/block-editor';
-import { withDispatch, withSelect } from '@wordpress/data';
-import { PluginArea } from '@wordpress/plugins';
+import {
+	Button,
+	ScrollLock,
+	Popover,
+	FocusReturnProvider,
+} from '@wordpress/components';
 import { withViewportMatch } from '@wordpress/viewport';
-import { compose } from '@wordpress/compose';
+import { PluginArea } from '@wordpress/plugins';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import BrowserURL from '../browser-url';
-import Header from '../header';
 import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
 import EditorModeKeyboardShortcuts from '../keyboard-shortcuts';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
 import ManageBlocksModal from '../manage-blocks-modal';
 import OptionsModal from '../options-modal';
-import MetaBoxes from '../meta-boxes';
+import EditorRegions from '../editor-regions';
+import FullscreenMode from '../fullscreen-mode';
+import BrowserURL from '../browser-url';
+import Header from '../header';
 import SettingsSidebar from '../sidebar/settings-sidebar';
 import Sidebar from '../sidebar';
+import MetaBoxes from '../meta-boxes';
 import PluginPostPublishPanel from '../sidebar/plugin-post-publish-panel';
 import PluginPrePublishPanel from '../sidebar/plugin-pre-publish-panel';
-import FullscreenMode from '../fullscreen-mode';
 
-function Layout( {
-	mode,
-	editorSidebarOpened,
-	pluginSidebarOpened,
-	publishSidebarOpened,
-	hasFixedToolbar,
-	closePublishSidebar,
-	togglePublishSidebar,
-	hasActiveMetaboxes,
-	isSaving,
-	isMobileViewport,
-	isRichEditingEnabled,
-	showPageTemplatePicker,
-} ) {
+function Layout( { isMobileViewport } ) {
+	const { closePublishSidebar, togglePublishSidebar } = useDispatch( 'core/edit-post' );
+	const {
+		mode,
+		isRichEditingEnabled,
+		editorSidebarOpened,
+		pluginSidebarOpened,
+		publishSidebarOpened,
+		hasActiveMetaboxes,
+		isSaving,
+		hasFixedToolbar,
+	} = useSelect( ( select ) => {
+		return ( {
+			hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' ),
+			editorSidebarOpened: select( 'core/edit-post' ).isEditorSidebarOpened(),
+			pluginSidebarOpened: select( 'core/edit-post' ).isPluginSidebarOpened(),
+			publishSidebarOpened: select( 'core/edit-post' ).isPublishSidebarOpened(),
+			mode: select( 'core/edit-post' ).getEditorMode(),
+			isRichEditingEnabled: select( 'core/editor' ).getEditorSettings().richEditingEnabled,
+			hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
+			isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
+		} );
+	} );
+	const showPageTemplatePicker = __experimentalUsePageTemplatePickerVisible();
 	const sidebarIsOpened = editorSidebarOpened || pluginSidebarOpened || publishSidebarOpened;
-
 	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
 		'is-sidebar-opened': sidebarIsOpened,
 		'has-fixed-toolbar': hasFixedToolbar,
 		'has-metaboxes': hasActiveMetaboxes,
 	} );
 
-	const publishLandmarkProps = {
-		role: 'region',
-		/* translators: accessibility text for the publish landmark region. */
-		'aria-label': __( 'Editor publish' ),
-		tabIndex: -1,
-	};
-
 	return (
-		<FocusReturnProvider className={ className }>
+		<>
 			<FullscreenMode />
 			<BrowserURL />
 			<UnsavedChangesWarning />
 			<AutosaveMonitor />
 			<LocalAutosaveMonitor />
-			<Header />
-			<div
-				className="edit-post-layout__content edit-post-layout__scrollable-container"
-				role="region"
-				/* translators: accessibility text for the content landmark region. */
-				aria-label={ __( 'Editor content' ) }
-				tabIndex="-1"
-			>
-				<EditorNotices />
-				<EditorModeKeyboardShortcuts />
-				<KeyboardShortcutHelpModal />
-				<ManageBlocksModal />
-				<OptionsModal />
-				{ ( mode === 'text' || ! isRichEditingEnabled ) && <TextEditor /> }
-				{ isRichEditingEnabled && mode === 'visual' && <VisualEditor /> }
-				<div className="edit-post-layout__metaboxes">
-					<MetaBoxes location="normal" />
-				</div>
-				<div className="edit-post-layout__metaboxes">
-					<MetaBoxes location="advanced" />
-				</div>
-				{ isMobileViewport && sidebarIsOpened && <ScrollLock /> }
-			</div>
-			{ isRichEditingEnabled && mode === 'visual' && (
-				<div
-					className="edit-post-layout__footer"
-					role="region"
-					/* translators: accessibility text for the content landmark region. */
-					aria-label={ __( 'Editor footer' ) }
-					tabIndex="-1"
-				>
-					<BlockBreadcrumb />
-				</div>
-			) }
-			{ publishSidebarOpened ? (
-				<PostPublishPanel
-					{ ...publishLandmarkProps }
-					onClose={ closePublishSidebar }
-					forceIsDirty={ hasActiveMetaboxes }
-					forceIsSaving={ isSaving }
-					PrePublishExtension={ PluginPrePublishPanel.Slot }
-					PostPublishExtension={ PluginPostPublishPanel.Slot }
-				/>
-			) : (
-				<>
-					<div className="edit-post-toggle-publish-panel" { ...publishLandmarkProps }>
-						<Button
-							isDefault
-							type="button"
-							className="edit-post-toggle-publish-panel__button"
-							onClick={ togglePublishSidebar }
-							aria-expanded={ false }
-						>
-							{ __( 'Open publish panel' ) }
-						</Button>
-					</div>
-					<SettingsSidebar />
-					<Sidebar.Slot />
-				</>
-			) }
+			<EditorModeKeyboardShortcuts />
+			<ManageBlocksModal />
+			<OptionsModal />
+			<KeyboardShortcutHelpModal />
 			<Popover.Slot />
 			<PluginArea />
-			{ showPageTemplatePicker && <__experimentalPageTemplatePicker /> }
-		</FocusReturnProvider>
+			<FocusReturnProvider className={ className }>
+				<EditorRegions
+					className={ className }
+					header={ <Header /> }
+					sidebar={ ! publishSidebarOpened && (
+						<>
+							<SettingsSidebar />
+							<Sidebar.Slot />
+						</>
+					) }
+					content={
+						<>
+							<EditorNotices />
+							{ ( mode === 'text' || ! isRichEditingEnabled ) && <TextEditor /> }
+							{ isRichEditingEnabled && mode === 'visual' && <VisualEditor /> }
+							<div className="edit-post-layout__metaboxes">
+								<MetaBoxes location="normal" />
+							</div>
+							<div className="edit-post-layout__metaboxes">
+								<MetaBoxes location="advanced" />
+							</div>
+							{ isMobileViewport && sidebarIsOpened && <ScrollLock /> }
+						</>
+					}
+					footer={ isRichEditingEnabled && mode === 'visual' && (
+						<div className="edit-post-layout__footer">
+							<BlockBreadcrumb />
+						</div>
+					) }
+					publish={ publishSidebarOpened ? (
+						<PostPublishPanel
+							onClose={ closePublishSidebar }
+							forceIsDirty={ hasActiveMetaboxes }
+							forceIsSaving={ isSaving }
+							PrePublishExtension={ PluginPrePublishPanel.Slot }
+							PostPublishExtension={ PluginPostPublishPanel.Slot }
+						/>
+					) : (
+						<div className="edit-post-toggle-publish-panel">
+							<Button
+								isDefault
+								type="button"
+								className="edit-post-toggle-publish-panel__button"
+								onClick={ togglePublishSidebar }
+								aria-expanded={ false }
+							>
+								{ __( 'Open publish panel' ) }
+							</Button>
+						</div>
+					) }
+				/>
+				{ showPageTemplatePicker && <__experimentalPageTemplatePicker /> }
+			</FocusReturnProvider>
+
+		</>
 	);
 }
 
-export default compose(
-	withSelect( ( select ) => ( {
-		mode: select( 'core/edit-post' ).getEditorMode(),
-		editorSidebarOpened: select( 'core/edit-post' ).isEditorSidebarOpened(),
-		pluginSidebarOpened: select( 'core/edit-post' ).isPluginSidebarOpened(),
-		publishSidebarOpened: select( 'core/edit-post' ).isPublishSidebarOpened(),
-		hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' ),
-		hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
-		isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
-		isRichEditingEnabled: select( 'core/editor' ).getEditorSettings().richEditingEnabled,
-	} ) ),
-	withDispatch( ( dispatch ) => {
-		const { closePublishSidebar, togglePublishSidebar } = dispatch( 'core/edit-post' );
-		return {
-			closePublishSidebar,
-			togglePublishSidebar,
-		};
-	} ),
-	navigateRegions,
-	withViewportMatch( { isMobileViewport: '< small' } ),
-	__experimentalWithPageTemplatePickerVisible,
-)( Layout );
+export default withViewportMatch( { isMobileViewport: '< small' } )( Layout );

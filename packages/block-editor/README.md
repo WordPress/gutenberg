@@ -382,30 +382,35 @@ Undocumented declaration.
 
 The default editor settings
 
- alignWide                              boolean       Enable/Disable Wide/Full Alignments
- availableLegacyWidgets                 Array         Array of objects representing the legacy widgets available.
- colors                                 Array         Palette colors
- disableCustomColors                    boolean       Whether or not the custom colors are disabled
- fontSizes                              Array         Available font sizes
- disableCustomFontSizes                 boolean       Whether or not the custom font sizes are disabled
- imageSizes                             Array         Available image sizes
- maxWidth                               number        Max width to constraint resizing
- allowedBlockTypes                      boolean|Array Allowed block types
- hasFixedToolbar                        boolean       Whether or not the editor toolbar is fixed
- hasPermissionsToManageWidgets          boolean       Whether or not the user is able to manage widgets.
- focusMode                              boolean       Whether the focus mode is enabled or not
- styles                                 Array         Editor Styles
- isRTL                                  boolean       Whether the editor is in RTL mode
- bodyPlaceholder                        string        Empty post placeholder
- titlePlaceholder                       string        Empty title placeholder
- codeEditingEnabled                     string        Whether or not the user can switch to the code editor
- showInserterHelpPanel                  boolean       Whether or not the inserter help panel is shown
- **experimentalCanUserUseUnfilteredHTML string        Whether the user should be able to use unfiltered HTML or the HTML should be filtered e.g., to remove elements considered insecure like iframes.
- **experimentalEnableLegacyWidgetBlock  boolean       Whether the user has enabled the Legacy Widget Block
- **experimentalEnableMenuBlock          boolean       Whether the user has enabled the Menu Block
- **experimentalBlockDirectory           boolean       Whether the user has enabled the Block Directory
- **experimentalEnableFullSiteEditing    boolean       Whether the user has enabled Full Site Editing
- **experimentalEnablePageTemplates      boolean       Whether the user has enabled the Page Templates
+_Type Definition_
+
+-   _SETTINGS_DEFAULT_ `Object`
+
+_Properties_
+
+-   _alignWide_ `boolean`: Enable/Disable Wide/Full Alignments
+-   _availableLegacyWidgets_ `Array`: Array of objects representing the legacy widgets available.
+-   _colors_ `Array`: Palette colors
+-   _disableCustomColors_ `boolean`: Whether or not the custom colors are disabled
+-   _fontSizes_ `Array`: Available font sizes
+-   _disableCustomFontSizes_ `boolean`: Whether or not the custom font sizes are disabled
+-   _imageSizes_ `Array`: Available image sizes
+-   _maxWidth_ `number`: Max width to constraint resizing
+-   _allowedBlockTypes_ `(boolean|Array)`: Allowed block types
+-   _hasFixedToolbar_ `boolean`: Whether or not the editor toolbar is fixed
+-   _hasPermissionsToManageWidgets_ `boolean`: Whether or not the user is able to manage widgets.
+-   _focusMode_ `boolean`: Whether the focus mode is enabled or not
+-   _styles_ `Array`: Editor Styles
+-   _isRTL_ `boolean`: Whether the editor is in RTL mode
+-   _bodyPlaceholder_ `string`: Empty post placeholder
+-   _titlePlaceholder_ `string`: Empty title placeholder
+-   _codeEditingEnabled_ `boolean`: Whether or not the user can switch to the code editor
+-   _showInserterHelpPanel_ `boolean`: Whether or not the inserter help panel is shown
+-   _\_\_experimentalCanUserUseUnfilteredHTML_ `boolean`: Whether the user should be able to use unfiltered HTML or the HTML should be filtered e.g., to remove elements considered insecure like iframes.
+-   _\_\_experimentalEnableLegacyWidgetBlock_ `boolean`: Whether the user has enabled the Legacy Widget Block
+-   _\_\_experimentalBlockDirectory_ `boolean`: Whether the user has enabled the Block Directory
+-   _\_\_experimentalEnableFullSiteEditing_ `boolean`: Whether the user has enabled Full Site Editing
+-   _\_\_experimentalEnablePageTemplates_ `boolean`: Whether the user has enabled the Page Templates
 
 <a name="SkipToSelectedBlock" href="#SkipToSelectedBlock">#</a> **SkipToSelectedBlock**
 

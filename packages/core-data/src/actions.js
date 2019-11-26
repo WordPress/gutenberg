@@ -136,11 +136,11 @@ export function receiveEmbedPreview( url, preview ) {
  * @return {Object} Action object.
  */
 export function* editEntityRecord( kind, name, recordId, edits, options = {} ) {
-	const { transientEdits = {}, mergedEdits = {} } = yield select(
-		'getEntity',
-		kind,
-		name
-	);
+	const entity = yield select( 'getEntity', kind, name );
+	if ( ! entity ) {
+		throw new Error( `The entity being edited (${ kind }, ${ name }) does not have a loaded config.` );
+	}
+	const { transientEdits = {}, mergedEdits = {} } = entity;
 	const record = yield select( 'getRawEntityRecord', kind, name, recordId );
 	const editedRecord = yield select(
 		'getEditedEntityRecord',
