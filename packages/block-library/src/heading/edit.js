@@ -32,7 +32,7 @@ function HeadingEdit( {
 	const { TextColor, InspectorControlsColorPanel, ColorDetector } = __experimentalUseColors(
 		[ { name: 'textColor', property: 'color' } ],
 		{
-			contrastCheckers: { backgroundColor: true },
+			contrastCheckers: { backgroundColor: true, textColor: true },
 		},
 		[]
 	);
