@@ -39,7 +39,6 @@ target 'gutenberg' do
   pod 'Folly', :podspec => '../node_modules/react-native/third-party-podspecs/Folly.podspec'
   pod 'RNTAztecView', :path => '../RNTAztecView.podspec'
   pod 'Gutenberg', :path => '../Gutenberg.podspec'
-  pod 'WordPress-Aztec-iOS'
 
   target 'gutenbergTests' do
     inherit! :search_paths

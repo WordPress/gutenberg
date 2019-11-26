@@ -237,7 +237,7 @@ PODS:
     - React
   - RNTAztecView (1.17.0):
     - React-Core
-    - WordPress-Aztec-iOS (~> 1.13.0)
+    - WordPress-Aztec-iOS
   - WordPress-Aztec-iOS (1.13.0)
   - Yoga (1.14.0)
 
@@ -276,7 +276,6 @@ DEPENDENCIES:
   - ReactNativeDarkMode (from `../node_modules/react-native-dark-mode`)
   - RNSVG (from `../node_modules/react-native-svg`)
   - RNTAztecView (from `../RNTAztecView.podspec`)
-  - WordPress-Aztec-iOS
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
@@ -382,10 +381,10 @@ SPEC CHECKSUMS:
   ReactCommon: 5848032ed2f274fcb40f6b9ec24067787c42d479
   ReactNativeDarkMode: f61376360c5d983907e5c316e8e1c853a8c2f348
   RNSVG: ae195d620f93865ed220d21a68db0a6c1cce3fd4
-  RNTAztecView: 505ab871f6eda7ac927b95afbae58560606445b1
+  RNTAztecView: bd09494ce0d55366488aabdaf73bd939459702db
   WordPress-Aztec-iOS: 450cb7095c6852c9c933d2062c318c4d7fa4d9a6
   Yoga: 14927e37bd25376d216b150ab2a561773d57911f
 
-PODFILE CHECKSUM: e8fc089f5f2e8939bae1ca6534c14e988350f984
+PODFILE CHECKSUM: 2ca635b0121a10753500623fbaee9edd0fe6ef92
 
 COCOAPODS: 1.8.4
