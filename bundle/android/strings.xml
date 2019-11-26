@@ -65,45 +65,46 @@
     <!-- translators: accessibility text -->
     <string name="gutenberg_native_string_52" tools:ignore="UnusedResources">"Double tap to edit this value"</string>
     <string name="gutenberg_native_string_53" tools:ignore="UnusedResources">"Current value is %s"</string>
+    <string name="gutenberg_native_string_54" tools:ignore="UnusedResources">"RESET"</string>
     <!-- translators: accessibility text (hint for focusing a slider) -->
-    <string name="gutenberg_native_string_54" tools:ignore="UnusedResources">"Double tap to change the value using slider"</string>
+    <string name="gutenberg_native_string_55" tools:ignore="UnusedResources">"Double tap to change the value using slider"</string>
     <!-- translators: accessibility text (hint for switches) -->
-    <string name="gutenberg_native_string_55" tools:ignore="UnusedResources">"Double tap to toggle setting"</string>
-    <string name="gutenberg_native_string_56" tools:ignore="UnusedResources">"Content…"</string>
-    <string name="gutenberg_native_string_57" tools:ignore="UnusedResources">"Reset Block"</string>
-    <string name="gutenberg_native_string_58" tools:ignore="UnusedResources">"Add a description"</string>
-    <string name="gutenberg_native_string_59" tools:ignore="UnusedResources">"Add annotation"</string>
-    <string name="gutenberg_native_string_60" tools:ignore="UnusedResources">"Remove annotations"</string>
-    <string name="gutenberg_native_string_61" tools:ignore="UnusedResources">"Annotations Sidebar"</string>
-    <string name="gutenberg_native_string_62" tools:ignore="UnusedResources">"My Document Setting Panel"</string>
-    <string name="gutenberg_native_string_63" tools:ignore="UnusedResources">"My post status info"</string>
-    <string name="gutenberg_native_string_64" tools:ignore="UnusedResources">"Here is the panel content!"</string>
-    <string name="gutenberg_native_string_65" tools:ignore="UnusedResources">"My pre publish panel"</string>
-    <string name="gutenberg_native_string_66" tools:ignore="UnusedResources">"My post publish panel"</string>
-    <string name="gutenberg_native_string_67" tools:ignore="UnusedResources">"Title:"</string>
-    <string name="gutenberg_native_string_68" tools:ignore="UnusedResources">"Sidebar title plugin"</string>
-    <string name="gutenberg_native_string_69" tools:ignore="UnusedResources">"Double tap to undo last change"</string>
-    <string name="gutenberg_native_string_70" tools:ignore="UnusedResources">"Double tap to redo last change"</string>
-    <string name="gutenberg_native_string_71" tools:ignore="UnusedResources">"Hide keyboard"</string>
-    <string name="gutenberg_native_string_72" tools:ignore="UnusedResources">"Tap to hide the keyboard"</string>
+    <string name="gutenberg_native_string_56" tools:ignore="UnusedResources">"Double tap to toggle setting"</string>
+    <string name="gutenberg_native_string_57" tools:ignore="UnusedResources">"Content…"</string>
+    <string name="gutenberg_native_string_58" tools:ignore="UnusedResources">"Reset Block"</string>
+    <string name="gutenberg_native_string_59" tools:ignore="UnusedResources">"Add a description"</string>
+    <string name="gutenberg_native_string_60" tools:ignore="UnusedResources">"Add annotation"</string>
+    <string name="gutenberg_native_string_61" tools:ignore="UnusedResources">"Remove annotations"</string>
+    <string name="gutenberg_native_string_62" tools:ignore="UnusedResources">"Annotations Sidebar"</string>
+    <string name="gutenberg_native_string_63" tools:ignore="UnusedResources">"My Document Setting Panel"</string>
+    <string name="gutenberg_native_string_64" tools:ignore="UnusedResources">"My post status info"</string>
+    <string name="gutenberg_native_string_65" tools:ignore="UnusedResources">"Here is the panel content!"</string>
+    <string name="gutenberg_native_string_66" tools:ignore="UnusedResources">"My pre publish panel"</string>
+    <string name="gutenberg_native_string_67" tools:ignore="UnusedResources">"My post publish panel"</string>
+    <string name="gutenberg_native_string_68" tools:ignore="UnusedResources">"Title:"</string>
+    <string name="gutenberg_native_string_69" tools:ignore="UnusedResources">"Sidebar title plugin"</string>
+    <string name="gutenberg_native_string_70" tools:ignore="UnusedResources">"Double tap to undo last change"</string>
+    <string name="gutenberg_native_string_71" tools:ignore="UnusedResources">"Double tap to redo last change"</string>
+    <string name="gutenberg_native_string_72" tools:ignore="UnusedResources">"Hide keyboard"</string>
+    <string name="gutenberg_native_string_73" tools:ignore="UnusedResources">"Tap to hide the keyboard"</string>
     <!-- translators: Checkbox toggle label -->
-    <string name="gutenberg_native_string_73" tools:ignore="UnusedResources">"Show section"</string>
+    <string name="gutenberg_native_string_74" tools:ignore="UnusedResources">"Show section"</string>
     <!-- translators: accessibility text. empty post title. -->
-    <string name="gutenberg_native_string_74" tools:ignore="UnusedResources">"Post title. Empty"</string>
+    <string name="gutenberg_native_string_75" tools:ignore="UnusedResources">"Post title. Empty"</string>
     <!-- translators: accessibility text. %s: text content of the post title. -->
-    <string name="gutenberg_native_string_75" tools:ignore="UnusedResources">"Post title. %s"</string>
-    <string name="gutenberg_native_string_76" tools:ignore="UnusedResources">"Link inserted"</string>
-    <string name="gutenberg_native_string_77" tools:ignore="UnusedResources">"Link text"</string>
-    <string name="gutenberg_native_string_78" tools:ignore="UnusedResources">"Add link text"</string>
-    <string name="gutenberg_native_string_79" tools:ignore="UnusedResources">"Translate"</string>
-    <string name="gutenberg_native_string_80" tools:ignore="UnusedResources">"hello"</string>
-    <plurals name="gutenberg_native_string_81" tools:ignore="UnusedResources">
+    <string name="gutenberg_native_string_76" tools:ignore="UnusedResources">"Post title. %s"</string>
+    <string name="gutenberg_native_string_77" tools:ignore="UnusedResources">"Link inserted"</string>
+    <string name="gutenberg_native_string_78" tools:ignore="UnusedResources">"Link text"</string>
+    <string name="gutenberg_native_string_79" tools:ignore="UnusedResources">"Add link text"</string>
+    <string name="gutenberg_native_string_80" tools:ignore="UnusedResources">"Translate"</string>
+    <string name="gutenberg_native_string_81" tools:ignore="UnusedResources">"hello"</string>
+    <plurals name="gutenberg_native_string_82" tools:ignore="UnusedResources">
         <item quantity="one">"%d banana"</item>
         <item quantity="other">"%d bananas"</item>
     </plurals>
-    <string name="gutenberg_native_string_82" tools:ignore="UnusedResources">"hello %s"</string>
-    <string name="gutenberg_native_string_83" tools:ignore="UnusedResources">"cheeseburger"</string>
-    <plurals name="gutenberg_native_string_84" tools:ignore="UnusedResources">
+    <string name="gutenberg_native_string_83" tools:ignore="UnusedResources">"hello %s"</string>
+    <string name="gutenberg_native_string_84" tools:ignore="UnusedResources">"cheeseburger"</string>
+    <plurals name="gutenberg_native_string_85" tools:ignore="UnusedResources">
         <item quantity="one">"%d cat"</item>
         <item quantity="other">"%d cats"</item>
     </plurals>
