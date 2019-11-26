@@ -62,7 +62,6 @@ class VideoEdit extends React.Component {
 		this.onVideoPressed = this.onVideoPressed.bind( this );
 		this.onVideoContanerLayout = this.onVideoContanerLayout.bind( this );
 		this.onFocusCaption = this.onFocusCaption.bind( this );
-		this.toggleAttribute = this.toggleAttribute.bind( this );
 	}
 
 	componentDidMount() {
@@ -85,16 +84,6 @@ class VideoEdit extends React.Component {
 		return {
 			isCaptionSelected: props.isSelected && state.isCaptionSelected,
 		};
-	}
-
-	toggleAttribute( attribute ) {
-		return ( newValue ) => {
-			this.props.setAttributes( { [ attribute ]: newValue } );
-		};
-	}
-
-	getAutoplayHelp( checked ) {
-		return checked ? __( 'Note: Autoplaying videos may cause usability issues for some visitors.' ) : null;
 	}
 
 	onVideoPressed() {
