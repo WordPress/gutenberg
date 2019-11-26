@@ -45,6 +45,10 @@ class GutenbergViewController: UIViewController {
 }
 
 extension GutenbergViewController: GutenbergBridgeDelegate {
+    func gutenbergDidRequestFetch(path: String, completion: @escaping (Result<Any, NSError>) -> Void) {
+        completion(Result.success([:]))
+    }
+
     func editorDidAutosave() {
         print("➡️ Editor Did Autosave")
     }
@@ -177,10 +181,13 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
             print("Fatal: \(message)")
         }
     }
+    
+    func gutenbergDidRequestFullscreenImage(with mediaUrl: URL) {
+        print("Gutenberg requested fullscreen image preview for " + mediaUrl.absoluteString)
+    }
 }
 
 extension GutenbergViewController: GutenbergBridgeDataSource {
-    
     func gutenbergLocale() -> String? {
         return Locale.preferredLanguages.first ?? "en"
     }

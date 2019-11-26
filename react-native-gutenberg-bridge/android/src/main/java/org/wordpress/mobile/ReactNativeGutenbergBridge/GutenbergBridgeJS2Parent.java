@@ -1,14 +1,16 @@
 package org.wordpress.mobile.ReactNativeGutenbergBridge;
 
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.WritableMap;
 
 import org.wordpress.mobile.WPAndroidGlue.MediaOption;
+import org.wordpress.mobile.WPAndroidGlue.RequestExecutor;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public interface GutenbergBridgeJS2Parent {
+public interface GutenbergBridgeJS2Parent extends RequestExecutor {
     interface RNMedia {
         String getUrl();
         int getId();
@@ -102,4 +104,6 @@ public interface GutenbergBridgeJS2Parent {
     void getOtherMediaPickerOptions(OtherMediaOptionsReceivedCallback otherMediaOptionsReceivedCallback, MediaType mediaType);
 
     void requestMediaPickFrom(String mediaSource, MediaUploadCallback mediaUploadCallback, Boolean allowMultipleSelection);
+
+    void requestImageFullscreenPreview(String mediaUrl);
 }
