@@ -828,6 +828,18 @@
 		"parent": "components"
 	},
 	{
+		"title": "StepperCell",
+		"slug": "stepper-cell",
+		"markdown_source": "../packages/components/src/mobile/bottom-sheet/stepper-cell/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "StepperControl",
+		"slug": "stepper-control",
+		"markdown_source": "../packages/components/src/mobile/stepper-control/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Modal",
 		"slug": "modal",
 		"markdown_source": "../packages/components/src/modal/README.md",
