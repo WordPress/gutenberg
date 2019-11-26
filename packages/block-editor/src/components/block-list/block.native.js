@@ -108,7 +108,7 @@ class BlockListBlock extends Component {
 			getStylesFromColorScheme,
 			isSmallScreen,
 			selectionIsNested,
-			isGroupType,
+			isInnerBlockHolder,
 		} = this.props;
 
 		const fullSolidBorderStyle = {
@@ -120,16 +120,12 @@ class BlockListBlock extends Component {
 			return { ...styles.selectedParent,	...fullSolidBorderStyle	};
 		}
 
-		if ( isSmallScreen && ! selectionIsNested && ! isGroupType ) {
+		if ( isSmallScreen && ! selectionIsNested && ! isInnerBlockHolder ) {
 			return {
 				...styles.selectedRootLeaf,
 				...styles.semiSolidBordered,
 				...{ borderColor: fullSolidBorderStyle.borderColor },
 			};
-		}
-
-		if ( isGroupType && ! hasChildren ) {
-			return { ...styles.selectedLeaf,	...fullSolidBorderStyle, ... { paddingHorizontal: 1 }	};
 		}
 
 		return { ...styles.selectedLeaf,	...fullSolidBorderStyle	};
@@ -142,7 +138,6 @@ class BlockListBlock extends Component {
 			isAncestorSelected,
 			hasParent,
 			getStylesFromColorScheme,
-			isGroupType,
 		} = this.props;
 
 		if ( ! hasParent ) {
@@ -156,14 +151,14 @@ class BlockListBlock extends Component {
 			};
 
 			return hasChildren ?
-				{ ...styles.childOfSelected, ...( isGroupType ? dashedBorderStyle : styles.horizontalSpaceNone ) } :
-				{ ...styles.childOfSelectedLeaf, ...( ! isGroupType ? dashedBorderStyle : styles.horizontalSpaceNone ) };
+				{ ...styles.childOfSelected, ...dashedBorderStyle } :
+				{ ...styles.childOfSelectedLeaf, ...dashedBorderStyle };
 		}
 
 		if ( isAncestorSelected ) {
 			return {
 				...styles.descendantOfSelectedLeaf,
-				...( isGroupType && styles.marginHorizontalNone ),
+				...( hasChildren && styles.marginHorizontalNone ),
 			};
 		}
 
@@ -248,6 +243,11 @@ export default compose( [
 			getBlockParents,
 			getBlockCount,
 		} = select( 'core/block-editor' );
+
+		const {
+			getGroupingBlockName,
+		} = select( 'core/blocks' );
+
 		const order = getBlockIndex( clientId, rootClientId );
 		const isSelected = isBlockSelected( clientId );
 		const isLastBlock = order === getBlocks().length - 1;
@@ -284,7 +284,7 @@ export default compose( [
 		const isTouchable = isSelected || isDescendantSelected || selectedBlockClientId === parentId || parentId === '';
 		const isDimmed = ! isSelected && selectionIsNested && ! isAncestorSelected && ! isDescendantSelected && ( firstToSelectId === clientId || rootBlockId === clientId );
 
-		const isGroupType = name === 'core/group';
+		const isInnerBlockHolder = name === getGroupingBlockName();
 
 		return {
 			icon,
@@ -307,7 +307,7 @@ export default compose( [
 			isTouchable,
 			isDimmed,
 			selectionIsNested,
-			isGroupType,
+			isInnerBlockHolder,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {
