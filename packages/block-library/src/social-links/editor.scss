@@ -124,6 +124,7 @@
 // Unconfigured placeholder links are semitransparent.
 .wp-social-link.wp-social-link__is-incomplete {
 	opacity: 0.5;
+	@include reduce-motion("transition");
 }
 
 .wp-block-social-links .is-selected .wp-social-link__is-incomplete,
