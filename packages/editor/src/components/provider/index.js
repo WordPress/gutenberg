@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map, pick, defaultTo } from 'lodash';
+import { map, pick, defaultTo, forEach, some, startsWith } from 'lodash';
 import memize from 'memize';
 
 /**
@@ -123,13 +123,21 @@ class EditorProvider extends Component {
 			return;
 		}
 
-		const updatedStyles = transformStyles( this.props.settings.styles, '.editor-styles-wrapper' );
+		forEach( document.styleSheets, ( styleSheet ) => {
+			if ( ! some(
+				this.props.settings.styles,
+				( url ) => startsWith( styleSheet.href, url )
+			) ) {
+				return;
+			}
 
-		map( updatedStyles, ( updatedCSS ) => {
-			if ( updatedCSS ) {
-				const node = document.createElement( 'style' );
-				node.innerHTML = updatedCSS;
-				document.body.appendChild( node );
+			for ( let i = 0; i < styleSheet.cssRules.length; ++i ) {
+				const rule = styleSheet.cssRules[ i ];
+				const newRuleText = transformStyles( [ { css: rule.cssText, baseURL: styleSheet.href } ], '.editor-styles-wrapper' )[ 0 ];
+				if ( newRuleText ) {
+					styleSheet.removeRule( i );
+					styleSheet.insertRule( newRuleText, i );
+				}
 			}
 		} );
 	}

@@ -445,6 +445,29 @@ function gutenberg_enqueue_block_editor_assets() {
 			$live_reload_url
 		);
 	}
+
+	$editor_styles_file = gutenberg_dir_path() . 'build/editor/editor-styles.css';
+
+	if ( file_exists( $editor_styles_file ) ) {
+		wp_enqueue_style(
+			'editor-styes',
+			gutenberg_url( '/build/editor/editor-styles.css' ),
+			array( 'wp-editor' ),
+			filemtime( gutenberg_dir_path() . 'build/editor/editor-styles.css' )
+		);
+	}
+
+	if ( current_theme_supports( 'editor-styles' ) ) {
+		$editor_styles = get_editor_stylesheets();
+		$version       = wp_get_theme()->get( 'Version' );
+		foreach ( $editor_styles as $key => $url ) {
+			wp_enqueue_style( "editor-styles-$key", $url, array( 'wp-editor' ), $version );
+		}
+	}
+
+	/* translators: Use this to specify the CSS font family for the default font. */
+	$locale_font_family = esc_html_x( 'Noto Serif', 'CSS Font Family for Editor Font' );
+	wp_add_inline_style( 'wp-editor', ".editor-styles-wrapper { font-family: '$locale_font_family' }" );
 }
 add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_block_editor_assets' );
 
@@ -567,51 +590,21 @@ function gutenberg_register_vendor_script( &$scripts, $handle, $src, $deps = arr
 function gutenberg_extend_block_editor_styles( $settings ) {
 	$editor_styles_file = gutenberg_dir_path() . 'build/editor/editor-styles.css';
 
-	/*
-	 * If, for whatever reason, the built editor styles do not exist, avoid
-	 * override and fall back to the default.
-	 */
-	if ( ! file_exists( $editor_styles_file ) ) {
-		return $settings;
+	$styles = array();
+
+	if ( file_exists( $editor_styles_file ) ) {
+		$styles[] = gutenberg_url( '/build/editor/editor-styles.css' );
 	}
 
-	if ( empty( $settings['styles'] ) ) {
-		$settings['styles'] = array();
-	} else {
-		/*
-		 * The styles setting is an array of CSS strings, so there is no direct
-		 * way to find the default styles. To maximize stability, load (again)
-		 * the default styles from disk and find its place in the array.
-		 *
-		 * See: https://github.com/WordPress/wordpress-develop/blob/5.0.3/src/wp-admin/edit-form-blocks.php#L168-L175
-		 */
-
-		$default_styles = file_get_contents(
-			ABSPATH . WPINC . '/css/dist/editor/editor-styles.css'
+	if ( current_theme_supports( 'editor-styles' ) ) {
+		$editor_styles = get_editor_stylesheets();
+		$styles = array_merge(
+			$styles,
+			get_editor_stylesheets()
 		);
-
-		/*
-		 * Iterate backwards from the end of the array since the preferred
-		 * insertion point in case not found is prepended as first entry.
-		 */
-		for ( $i = count( $settings['styles'] ) - 1; $i >= 0; $i-- ) {
-			if ( isset( $settings['styles'][ $i ]['css'] ) &&
-					$default_styles === $settings['styles'][ $i ]['css'] ) {
-				break;
-			}
-		}
 	}
 
-	$editor_styles = array(
-		'css' => file_get_contents( $editor_styles_file ),
-	);
-
-	// Substitute default styles if found. Otherwise, prepend to setting array.
-	if ( isset( $i ) && $i >= 0 ) {
-		$settings['styles'][ $i ] = $editor_styles;
-	} else {
-		array_unshift( $settings['styles'], $editor_styles );
-	}
+	$settings['styles'] = $styles;
 
 	return $settings;
 }
