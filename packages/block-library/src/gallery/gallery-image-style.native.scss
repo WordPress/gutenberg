@@ -1,10 +1,10 @@
-@function get-gallery-image-container-height() {
-	@return 150px;
-}
+$get-gallery-image-container-height: 150px;
+$get-overlay-border-width: 3px;
+$get-caption-background-color: rgba(0, 0, 0, 0.4);
 
 .galleryImageContainer {
 	flex: 1;
-	height: get-gallery-image-container-height();
+	height: $get-gallery-image-container-height;
 	background-color: $gray-lighten-30;
 }
 
@@ -25,17 +25,13 @@
 	opacity: 0.3;
 }
 
-@function get-overlay-border-width() {
-	@return 3px;
-}
-
 .overlay {
 	position: absolute;
 	top: 0;
 	bottom: 0;
 	left: 0;
 	right: 0;
-	border-width: get-overlay-border-width();
+	border-width: $get-overlay-border-width;
 	border-color: #0000;
 }
 
@@ -114,10 +110,6 @@
 	margin-top: 5px;
 }
 
-@function get-caption-background-color() {
-	@return rgba(0, 0, 0, 0.4);
-}
-
 .captionContainer {
 	flex: 1;
 	flex-direction: row;
@@ -135,7 +127,7 @@
 
 .caption {
 	@include caption-shared;
-	background-color: get-caption-background-color();
+	background-color: $get-caption-background-color;
 }
 
 .captionPlaceholder {
@@ -150,9 +142,9 @@
 
 // expand caption container to compensate for overlay border
 .captionExpandedContainer {
-	$width: get-overlay-border-width();
+	$width: $get-overlay-border-width;
 	// constrain height to gallery image height for caption scroll
-	max-height: get-gallery-image-container-height();
+	max-height: $get-gallery-image-container-height;
 	position: absolute;
 	bottom: - $width;
 	left: - $width;
@@ -161,7 +153,7 @@
 	padding-left: $width;
 	padding-right: $width;
 	// use caption background color on container when expanded
-	background-color: get-caption-background-color();
+	background-color: $get-caption-background-color;
 }
 
 .captionExpanded {
