@@ -19,6 +19,7 @@ export { metadata, name };
 export const settings = {
 	title: __( 'Audio' ),
 	description: __( 'Embed a simple audio player.' ),
+	keywords: [ __( 'music' ), __( 'sound' ), __( 'podcast' ), __( 'recording' ) ],
 	icon,
 	transforms,
 	supports: {

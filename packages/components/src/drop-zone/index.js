@@ -58,10 +58,14 @@ class DropZoneComponent extends Component {
 	}
 
 	render() {
-		const { className, label } = this.props;
+		const { className, label, onFilesDrop, onHTMLDrop, onDrop } = this.props;
 		const { isDraggingOverDocument, isDraggingOverElement, position, type } = this.state;
 		const classes = classnames( 'components-drop-zone', className, {
-			'is-active': isDraggingOverDocument || isDraggingOverElement,
+			'is-active': ( isDraggingOverDocument || isDraggingOverElement ) && (
+				( type === 'file' && onFilesDrop ) ||
+				( type === 'html' && onHTMLDrop ) ||
+				( type === 'default' && onDrop )
+			),
 			'is-dragging-over-document': isDraggingOverDocument,
 			'is-dragging-over-element': isDraggingOverElement,
 			'is-close-to-top': position && position.y === 'top',

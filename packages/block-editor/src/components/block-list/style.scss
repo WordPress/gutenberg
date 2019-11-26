@@ -565,8 +565,13 @@
 		}
 
 		> .block-editor-block-list__block-edit {
-			margin-left: -$block-padding - $block-padding - $block-side-ui-width - $border-width - $border-width;
-			margin-right: -$block-padding - $block-padding - $block-side-ui-width - $border-width - $border-width;
+			margin-left: -$block-padding;
+			margin-right: -$block-padding;
+
+			@include break-small() {
+				margin-left: -$block-padding - $block-padding - $block-side-ui-width - $border-width - $border-width;
+				margin-right: -$block-padding - $block-padding - $block-side-ui-width - $border-width - $border-width;
+			}
 		}
 
 		> .block-editor-block-list__block-edit::before {

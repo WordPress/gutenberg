@@ -1,0 +1,32 @@
+{
+	"name": "core/navigation-link",
+	"category": "layout",
+	"attributes": {
+		"label": {
+			"type": "string"
+		},
+		"nofollow": {
+			"type": "boolean",
+			"default": false
+		},
+		"title": {
+			"type": "string"
+		},
+		"type": {
+			"type": "string"
+		},
+		"description": {
+			"type": "string"
+		},
+		"id": {
+			"type": "number"
+		},
+		"opensInNewTab": {
+			"type": "boolean",
+			"default": false
+		},
+		"url": {
+			"type": "string"
+		}
+	}
+}

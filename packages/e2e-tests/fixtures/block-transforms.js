@@ -347,14 +347,14 @@ export const EXPECTED_TRANSFORMS = {
 			'Group',
 		],
 	},
-	'core__navigation-menu': {
+	core__navigation: {
 		originalBlock: 'Navigation',
 		availableTransforms: [
 			'Group',
 		],
 	},
-	'core__navigation-menu-item': {
-		originalBlock: 'Menu Item',
+	'core__navigation-link': {
+		originalBlock: 'Navigation Link',
 		availableTransforms: [
 			'Group',
 		],
@@ -375,6 +375,18 @@ export const EXPECTED_TRANSFORMS = {
 			'Preformatted',
 			'Verse',
 		],
+	},
+	'core__post-content': {
+		availableTransforms: [
+			'Group',
+		],
+		originalBlock: 'Post Content',
+	},
+	'core__post-title': {
+		availableTransforms: [
+			'Group',
+		],
+		originalBlock: 'Post Title',
 	},
 	core__preformatted: {
 		originalBlock: 'Preformatted',
@@ -548,7 +560,7 @@ export const EXPECTED_TRANSFORMS = {
 		availableTransforms: [
 			'Group',
 		],
-		originalBlock: 'Github',
+		originalBlock: 'GitHub',
 	},
 	'core__social-link-goodreads': {
 		availableTransforms: [
@@ -578,7 +590,7 @@ export const EXPECTED_TRANSFORMS = {
 		availableTransforms: [
 			'Group',
 		],
-		originalBlock: 'Linkedin',
+		originalBlock: 'LinkedIn',
 	},
 	'core__social-link-mail': {
 		availableTransforms: [

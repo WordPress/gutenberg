@@ -68,3 +68,27 @@ Positionals:
 ```
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
+
+## Additional Configuration and Running with Multiple Plugins/Themes
+
+`wp-env` also supports a configuration file. At the moment, this is only used for loading extra themes and plugins that you may be developing together with your main one. The script will attach the specified theme and plugin directories as volumes on the docker containers so that changes you make to them exist in the WordPress instance.
+
+### Example:
+
+`wp-env.json`
+```json
+{
+  "themes": [
+    "../path/to/theme/dir"
+  ],
+  "plugins": [
+    "../path/to/plugin/dir"
+  ]
+}
+```
+
+### Caveats:
+
+The file should be located in the same directory from which you run `wp-env` commands for a project. So if you are running `wp-env` in the root directory of a plugin, `wp-env.json` should also be located there. 
+
+Each item in the `themes` or `plugins` array should be an absolute or relative path to the root of a different theme or plugin directory. Relative paths will be resolved from the current working directory, which means they will be resolved from the location of the `wp-env.json` file.
