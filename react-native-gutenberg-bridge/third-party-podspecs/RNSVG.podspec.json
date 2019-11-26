@@ -1,20 +1,20 @@
 {
   "name": "RNSVG",
-  "version": "9.3.3",
+  "version": "9.12.0-gb",
   "summary": "SVG library for react-native",
   "license": "MIT",
   "homepage": "https://github.com/react-native-community/react-native-svg",
   "authors": "Horcrux Chen",
+  "platforms": {
+    "ios": "9.0",
+    "tvos": "9.2"
+  },
   "source": {
-    "git": "https://github.com/react-native-community/react-native-svg.git",
-    "tag": "9.3.3"
+    "git": "https://github.com/wordpress-mobile/react-native-svg.git",
+    "tag": "v9.12.0-gb"
   },
   "source_files": "ios/**/*.{h,m}",
   "requires_arc": true,
-  "platforms": {
-    "ios": "8.0",
-    "tvos": "9.2"
-  },
   "dependencies": {
     "React": [
 
