@@ -11,14 +11,11 @@ export default function PreformattedEdit( { attributes, mergeBlocks, setAttribut
 		<RichText
 			tagName="pre"
 			identifier="content"
-			// Ensure line breaks are normalised to HTML.
-			value={ content.replace( /\n/g, '<br>' ) }
+			preserveWhiteSpace
+			value={ content }
 			onChange={ ( nextContent ) => {
 				setAttributes( {
-					// Ensure line breaks are normalised to characters. This
-					// saves space, is easier to read, and ensures display
-					// filters work correctly.
-					content: nextContent.replace( /<br ?\/?>/g, '\n' ),
+					content: nextContent,
 				} );
 			} }
 			placeholder={ __( 'Write preformatted text…' ) }

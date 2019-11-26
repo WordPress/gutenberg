@@ -349,6 +349,7 @@ class RichTextWrapper extends Component {
 			start,
 			reversed,
 			style,
+			preserveWhiteSpace,
 			// From experimental filter. To do: pick props instead.
 			...experimentalProps
 		} = this.props;
@@ -398,6 +399,7 @@ class RichTextWrapper extends Component {
 				__unstableDidAutomaticChange={ didAutomaticChange }
 				__unstableUndo={ undo }
 				style={ style }
+				preserveWhiteSpace={ preserveWhiteSpace }
 				start={ start }
 				reversed={ reversed }
 			>
