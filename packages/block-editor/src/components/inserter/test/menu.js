@@ -163,7 +163,7 @@ describe( 'InserterMenu', () => {
 		const activeCategory = element.querySelector(
 			'.components-panel__body.is-opened > .components-panel__body-title'
 		);
-		expect( activeCategory.textContent ).toBe( 'Most Used' );
+		expect( activeCategory.textContent ).toBe( 'Most used' );
 	} );
 
 	it( 'should show nothing if there are no items', () => {

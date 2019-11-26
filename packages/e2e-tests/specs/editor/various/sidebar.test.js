@@ -117,10 +117,10 @@ describe( 'Sidebar', () => {
 
 		expect( await findSidebarPanelWithTitle( 'Categories' ) ).toBeDefined();
 		expect( await findSidebarPanelWithTitle( 'Tags' ) ).toBeDefined();
-		expect( await findSidebarPanelWithTitle( 'Featured Image' ) ).toBeDefined();
+		expect( await findSidebarPanelWithTitle( 'Featured image' ) ).toBeDefined();
 		expect( await findSidebarPanelWithTitle( 'Excerpt' ) ).toBeDefined();
 		expect( await findSidebarPanelWithTitle( 'Discussion' ) ).toBeDefined();
-		expect( await findSidebarPanelWithTitle( 'Status & Visibility' ) ).toBeDefined();
+		expect( await findSidebarPanelWithTitle( 'Status & visibility' ) ).toBeDefined();
 
 		await page.evaluate( () => {
 			const { removeEditorPanel } = wp.data.dispatch( 'core/edit-post' );
@@ -135,9 +135,9 @@ describe( 'Sidebar', () => {
 
 		expect( await findSidebarPanelWithTitle( 'Categories' ) ).toBeUndefined();
 		expect( await findSidebarPanelWithTitle( 'Tags' ) ).toBeUndefined();
-		expect( await findSidebarPanelWithTitle( 'Featured Image' ) ).toBeUndefined();
+		expect( await findSidebarPanelWithTitle( 'Featured image' ) ).toBeUndefined();
 		expect( await findSidebarPanelWithTitle( 'Excerpt' ) ).toBeUndefined();
 		expect( await findSidebarPanelWithTitle( 'Discussion' ) ).toBeUndefined();
-		expect( await findSidebarPanelWithTitle( 'Status & Visibility' ) ).toBeUndefined();
+		expect( await findSidebarPanelWithTitle( 'Status & visibility' ) ).toBeUndefined();
 	} );
 } );

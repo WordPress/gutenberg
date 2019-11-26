@@ -14,7 +14,7 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
     className="edit-post-keyboard-shortcut-help"
     closeLabel="Close"
     onRequestClose={[Function]}
-    title="Keyboard Shortcuts"
+    title="Keyboard shortcuts"
   >
     <ShortcutSection
       className="edit-post-keyboard-shortcut-help__main-shortcuts"
