@@ -13,7 +13,7 @@ export async function transformBlockTo( name ) {
 	await pressKeyWithModifier( 'alt', 'F10' );
 
 	// Press Enter in the focused toggle button.
-	const switcherToggle = await page.waitForSelector( '.editor-block-switcher__toggle:focus' );
+	const switcherToggle = await page.waitForSelector( '.block-editor-block-switcher__toggle:focus' );
 	await switcherToggle.press( 'Enter' );
 
 	// Find the block button option within the switcher popover.
