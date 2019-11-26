@@ -29,7 +29,7 @@ exports[`OptionsModal should match snapshot when the modal is active 1`] = `
     />
     <PostFeaturedImageCheck>
       <WithSelect(IfCondition(WithDispatch(BaseOption)))
-        label="Featured Image"
+        label="Featured image"
         panelName="featured-image"
       />
     </PostFeaturedImageCheck>
