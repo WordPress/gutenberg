@@ -20,8 +20,6 @@ import {
 	Toolbar,
 	ToolbarButton,
 	PanelBody,
-	ToggleControl,
-	SelectControl,
 } from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import {
@@ -45,6 +43,7 @@ import { doAction, hasAction } from '@wordpress/hooks';
 import style from './style.scss';
 import SvgIcon from './icon';
 import SvgIconRetry from './icon-retry';
+import VideoCommonSettings from './edit-common-settings';
 
 class VideoEdit extends React.Component {
 	constructor( props ) {
@@ -173,12 +172,6 @@ class VideoEdit extends React.Component {
 		const {
 			id,
 			src,
-			autoplay,
-			controls,
-			loop,
-			muted,
-			playsInline,
-			preload,
 		} = attributes;
 		const { videoContainerHeight } = this.state;
 
@@ -222,41 +215,9 @@ class VideoEdit extends React.Component {
 						</BlockControls> }
 					<InspectorControls>
 						<PanelBody title={ __( 'Video Settings' ) }>
-							<ToggleControl
-								label={ __( 'Autoplay' ) }
-								onChange={ this.toggleAttribute( 'autoplay' ) }
-								checked={ autoplay }
-								help={ this.getAutoplayHelp }
-							/>
-							<ToggleControl
-								label={ __( 'Loop' ) }
-								onChange={ this.toggleAttribute( 'loop' ) }
-								checked={ loop }
-							/>
-							<ToggleControl
-								label={ __( 'Muted' ) }
-								onChange={ this.toggleAttribute( 'muted' ) }
-								checked={ muted }
-							/>
-							<ToggleControl
-								label={ __( 'Playback Controls' ) }
-								onChange={ this.toggleAttribute( 'controls' ) }
-								checked={ controls }
-							/>
-							<ToggleControl
-								label={ __( 'Play inline' ) }
-								onChange={ this.toggleAttribute( 'playsInline' ) }
-								checked={ playsInline }
-							/>
-							<SelectControl
-								label={ __( 'Preload' ) }
-								value={ preload }
-								onChange={ ( value ) => setAttributes( { preload: value } ) }
-								options={ [
-									{ value: 'auto', label: __( 'Auto' ) },
-									{ value: 'metadata', label: __( 'Metadata' ) },
-									{ value: 'none', label: __( 'None' ) },
-								] }
+							<VideoCommonSettings
+								setAttributes={ setAttributes }
+								attributes={ attributes }
 							/>
 						</PanelBody>
 					</InspectorControls>
