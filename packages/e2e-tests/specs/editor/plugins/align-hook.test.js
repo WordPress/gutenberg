@@ -150,11 +150,11 @@ describe( 'Align Hook Works As Expected', () => {
 		const BLOCK_NAME = 'Test Align True';
 
 		createShowsTheExpectedButtonsTest( BLOCK_NAME, [
-			'Align Left',
-			'Align Center',
-			'Align Right',
-			'Wide Width',
-			'Full Width',
+			'Align left',
+			'Align center',
+			'Align right',
+			'Wide width',
+			'Full width',
 		] );
 
 		createDoesNotApplyAlignmentByDefaultTest( BLOCK_NAME );
