@@ -136,14 +136,19 @@ export function ColumnsEdit( {
 		}
 	}, [ forceUseTemplate ] );
 
-	const classes = classnames( className, backgroundColor.class, {
-		'has-background': !! backgroundColor.color,
+	const classes = classnames( className, {
+		'has-background': ( backgroundColor.class || backgroundColor.color ),
+		[ backgroundColor.class ]: backgroundColor.class,
 		[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 	} );
-
 	const styles = {
 		backgroundColor: backgroundColor.color,
 	};
+	const colorSettings = [ {
+		value: backgroundColor.color,
+		onChange: setBackgroundColor,
+		label: __( 'Background Color' ),
+	} ];
 
 	// The template selector is shown when we first insert the columns block (count === 0).
 	// or if there's no template available.
@@ -167,13 +172,7 @@ export function ColumnsEdit( {
 						<PanelColorSettings
 							title={ __( 'Color Settings' ) }
 							initialOpen={ false }
-							colorSettings={ [
-								{
-									value: backgroundColor.color,
-									onChange: setBackgroundColor,
-									label: __( 'Background Color' ),
-								},
-							] }
+							colorSettings={ colorSettings }
 						/>
 					</InspectorControls>
 					<BlockControls>

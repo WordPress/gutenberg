@@ -12,17 +12,17 @@ export default function save( { attributes } ) {
 	const { verticalAlignment, backgroundColor, customBackgroundColor } = attributes;
 
 	const backgroundClass = getColorClassName( 'background-color', backgroundColor );
-	const wrapperClasses = classnames( backgroundClass, {
-		'has-background': backgroundColor || customBackgroundColor,
+	const wrapperClasses = classnames( {
+		'has-background': ( backgroundClass || customBackgroundColor ),
+		[ backgroundClass ]: backgroundClass,
 		[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 	} );
-
-	const styles = {
+	const style = {
 		backgroundColor: backgroundClass ? undefined : customBackgroundColor,
 	};
 
 	return (
-		<div className={ wrapperClasses } style={ styles }>
+		<div className={ wrapperClasses } style={ style }>
 			<InnerBlocks.Content />
 		</div>
 	);
