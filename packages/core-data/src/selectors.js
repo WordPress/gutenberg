@@ -287,6 +287,39 @@ export function getLastEntitySaveError( state, kind, name, recordId ) {
 }
 
 /**
+ * Returns the specified entity record's locked properties object,
+ * with non-function values wrapped in a getter and function values
+ * pre-bound to `select`.
+ *
+ * @param {Object} state    State tree.
+ * @param {string} kind     Entity kind.
+ * @param {string} name     Entity name.
+ * @param {number} recordId Record ID.
+ *
+ * @return {Object} The entity record's locked properties object.
+ */
+export const getLockedEntityProps = createRegistrySelector( ( select ) =>
+	createSelector(
+		( state, kind, name, recordId ) => {
+			const { lockedProps: configLockedProps } =
+				getEntity( state, kind, name ) || {};
+			const lockedProps = {
+				...configLockedProps,
+				...get( state.entities.data, [ kind, name, 'lockedProps', recordId ], {} ),
+			};
+			return Object.keys( lockedProps ).reduce( ( acc, key ) => {
+				acc[ key ] =
+					typeof lockedProps[ key ] === 'function' ?
+						lockedProps[ key ].bind( null, select ) :
+						() => lockedProps[ key ];
+				return acc;
+			}, {} );
+		},
+		( state ) => [ state.entities.data ]
+	)
+);
+
+/**
  * Returns the current undo offset for the
  * entity records edits history. The offset
  * represents how many items from the end

@@ -1,7 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { createContext, useContext, useCallback } from '@wordpress/element';
+import {
+	createContext,
+	useContext,
+	useRef,
+	useCallback,
+} from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
@@ -79,12 +84,23 @@ export function useEntityId( kind, type ) {
 export function useEntityProp( kind, type, prop ) {
 	const id = useEntityId( kind, type );
 
-	const value = useSelect(
+	// Use a ref to avoid recreating a new `setValue` to
+	// support components that cache change handlers on
+	// mount.
+	const isLockedRef = useRef();
+	const [ value, isLocked ] = useSelect(
 		( select ) => {
-			const { getEntityRecord, getEditedEntityRecord } = select( 'core' );
+			const {
+				getEntityRecord,
+				getEditedEntityRecord,
+				getLockedEntityProps,
+			} = select( 'core' );
 			getEntityRecord( kind, type, id ); // Trigger resolver.
 			const entity = getEditedEntityRecord( kind, type, id );
-			return entity && entity[ prop ];
+			const lockedProps = getLockedEntityProps( kind, type, id );
+			const _isLocked = lockedProps[ prop ] && lockedProps[ prop ]();
+			isLockedRef.current = _isLocked;
+			return [ entity && entity[ prop ], _isLocked ];
 		},
 		[ kind, type, id, prop ]
 	);
@@ -92,6 +108,13 @@ export function useEntityProp( kind, type, prop ) {
 	const { editEntityRecord } = useDispatch( 'core' );
 	const setValue = useCallback(
 		( newValue ) => {
+			if ( isLockedRef.current ) {
+				// eslint-disable-next-line no-console
+				console.warn(
+					`Prop "${ prop }" is locked for entity of kind "${ kind }", type "${ type }", and id "${ id }".`
+				);
+				return;
+			}
 			editEntityRecord( kind, type, id, {
 				[ prop ]: newValue,
 			} );
@@ -99,7 +122,7 @@ export function useEntityProp( kind, type, prop ) {
 		[ kind, type, id, prop ]
 	);
 
-	return [ value, setValue ];
+	return [ value, setValue, isLocked ];
 }
 
 /**

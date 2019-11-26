@@ -415,6 +415,28 @@ export function* saveEditedEntityRecord( kind, name, recordId, options ) {
 }
 
 /**
+ * Action triggered to set locked props for an entity record.
+ *
+ * The values of the locked props object can be literal booleans
+ * that will be wrapped in getters in `getLockedEntityProps`,
+ * or they can be functions that will be pre-bound to `select`.
+ *
+ * @param {string} kind     Kind of the entity.
+ * @param {string} name     Name of the entity.
+ * @param {Object} recordId ID of the record.
+ * @param {Object} props    Locked props object.
+ */
+export function setLockedEntityProps( kind, name, recordId, props ) {
+	return {
+		type: 'SET_LOCKED_ENTITY_PROPS',
+		kind,
+		name,
+		recordId,
+		props,
+	};
+}
+
+/**
  * Returns an action object used in signalling that Upload permissions have been received.
  *
  * @param {boolean} hasUploadPermissions Does the user have permission to upload files?

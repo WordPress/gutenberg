@@ -217,6 +217,23 @@ _Returns_
 
 -   `?Object`: The entity record's save error.
 
+<a name="getLockedEntityProps" href="#getLockedEntityProps">#</a> **getLockedEntityProps**
+
+Returns the specified entity record's locked properties object,
+with non-function values wrapped in a getter and function values
+pre-bound to `select`.
+
+_Parameters_
+
+-   _state_ `Object`: State tree.
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _recordId_ `number`: Record ID.
+
+_Returns_
+
+-   `Object`: The entity record's locked properties object.
+
 <a name="getRawEntityRecord" href="#getRawEntityRecord">#</a> **getRawEntityRecord**
 
 Returns the entity's record object by key,
@@ -611,6 +628,21 @@ _Parameters_
 -   _name_ `string`: Name of the received entity.
 -   _record_ `Object`: Record to be saved.
 -   _options_ `Object`: Saving options.
+
+<a name="setLockedEntityProps" href="#setLockedEntityProps">#</a> **setLockedEntityProps**
+
+Action triggered to set locked props for an entity record.
+
+The values of the locked props object can be literal booleans
+that will be wrapped in getters in `getLockedEntityProps`,
+or they can be functions that will be pre-bound to `select`.
+
+_Parameters_
+
+-   _kind_ `string`: Kind of the entity.
+-   _name_ `string`: Name of the entity.
+-   _recordId_ `Object`: ID of the record.
+-   _props_ `Object`: Locked props object.
 
 <a name="undo" href="#undo">#</a> **undo**
 

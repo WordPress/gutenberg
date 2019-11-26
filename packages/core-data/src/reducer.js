@@ -224,6 +224,21 @@ function entity( entityConfig ) {
 
 				return state;
 			},
+
+			lockedProps: ( state = {}, action ) => {
+				switch ( action.type ) {
+					case 'SET_LOCKED_ENTITY_PROPS':
+						return {
+							...state,
+							[ action.recordId ]: {
+								...state[ action.recordId ],
+								...action.props,
+							},
+						};
+				}
+
+				return state;
+			},
 		} )
 	);
 }
