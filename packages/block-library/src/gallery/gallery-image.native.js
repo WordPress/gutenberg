@@ -25,17 +25,9 @@ import style from './gallery-image-style';
 
 const { compose } = StyleSheet;
 
-const separatorStyle = compose( style.separator,
-	{ borderRightWidth: StyleSheet.hairlineWidth }
-);
-
-const buttonStyle = compose( style.button,
-	{ aspectRatio: 1 }
-);
-
-const removeButtonStyle = compose( style.removeButton,
-	{ aspectRatio: 1 }
-);
+const separatorStyle = compose( style.separator, { borderRightWidth: StyleSheet.hairlineWidth } );
+const buttonStyle = compose( style.button, { aspectRatio: 1 } );
+const removeButtonStyle = compose( style.removeButton, { aspectRatio: 1 } );
 const ICON_SIZE_ARROW = 15;
 const ICON_SIZE_REMOVE = 20;
 
