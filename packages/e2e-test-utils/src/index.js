@@ -50,6 +50,7 @@ export { toggleOfflineMode, isOfflineMode } from './offline-mode';
 export { toggleScreenOption } from './toggle-screen-option';
 export { transformBlockTo } from './transform-block-to';
 export { uninstallPlugin } from './uninstall-plugin';
+export { verifyActiveTheme } from './verify-active-theme';
 export { visitAdminPage } from './visit-admin-page';
 export { waitForWindowDimensions } from './wait-for-window-dimensions';
 

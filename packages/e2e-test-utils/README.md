@@ -510,6 +510,14 @@ _Parameters_
 
 -   _slug_ `string`: Plugin slug.
 
+<a name="verifyActiveTheme" href="#verifyActiveTheme">#</a> **verifyActiveTheme**
+
+Verifies that the expected theme for the tests is active.
+
+_Parameters_
+
+-   _theme_ `string`: The expected theme's slug.
+
 <a name="visitAdminPage" href="#visitAdminPage">#</a> **visitAdminPage**
 
 Visits admin page; if user is not logged in then it logging in it first, then visits admin page.

@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import {
+	verifyActiveTheme,
 	clickBlockAppender,
 	createNewPost,
 	pressKeyWithModifier,
@@ -14,6 +15,8 @@ import {
 
 describe( 'Change detection', () => {
 	let handleInterceptedRequest, hadInterceptedSave;
+
+	beforeAll( verifyActiveTheme.bind( null, 'twentytwenty' ) );
 
 	beforeEach( async () => {
 		hadInterceptedSave = false;

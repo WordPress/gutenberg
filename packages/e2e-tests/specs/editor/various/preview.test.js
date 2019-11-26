@@ -8,6 +8,7 @@ import { parse } from 'url';
  * WordPress dependencies
  */
 import {
+	verifyActiveTheme,
 	clickOnCloseModalButton,
 	createNewPost,
 	createURL,
@@ -83,6 +84,8 @@ async function toggleCustomFieldsOption( shouldBeChecked ) {
 }
 
 describe( 'Preview', () => {
+	beforeAll( verifyActiveTheme.bind( null, 'twentytwenty' ) );
+
 	beforeEach( async () => {
 		await createNewPost();
 	} );

@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import {
+	verifyActiveTheme,
 	clickBlockAppender,
 	createNewPost,
 	getEditedPostContent,
@@ -9,6 +10,8 @@ import {
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Heading', () => {
+	beforeAll( verifyActiveTheme.bind( null, 'twentytwenty' ) );
+
 	const TEXT_COLOR_TEXT = 'Text Color';
 	const CUSTOM_COLOR_TEXT = 'Custom Color';
 	const TEXT_COLOR_UI_X_SELECTOR = `//div[./span[contains(text(),'${ TEXT_COLOR_TEXT }')]]`;
