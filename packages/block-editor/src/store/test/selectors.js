@@ -1632,12 +1632,14 @@ describe( 'selectors', () => {
 				insertionPoint: {
 					rootClientId: undefined,
 					index: 0,
+					canReplaceBlock: true,
 				},
 			};
 
 			expect( getBlockInsertionPoint( state ) ).toEqual( {
 				rootClientId: undefined,
 				index: 0,
+				canReplaceBlock: true,
 			} );
 		} );
 

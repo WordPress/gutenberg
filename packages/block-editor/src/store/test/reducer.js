@@ -1732,11 +1732,13 @@ describe( 'state', () => {
 				type: 'SHOW_INSERTION_POINT',
 				rootClientId: 'clientId1',
 				index: 0,
+				canReplaceBlock: true,
 			} );
 
 			expect( state ).toEqual( {
 				rootClientId: 'clientId1',
 				index: 0,
+				canReplaceBlock: true,
 			} );
 		} );
 
