@@ -210,7 +210,9 @@ export default compose( [
 		const shouldShowBlockAtIndex = ( index ) => {
 			const shouldHideBlockAtIndex = (
 				! hasInnerBlocks && blockInsertionPointIsVisible &&
-				// if `index` === `insertionPoint.index`, then block is replaceable
+				// if the block is replaceable
+				insertionPoint.canReplaceBlock &&
+				// if `index` === `insertionPoint.index`
 				index === insertionPoint.index &&
 				// only hide selected block
 				index === selectedBlockIndex
