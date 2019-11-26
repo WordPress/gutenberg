@@ -89,7 +89,7 @@
     "android": "react-native run-android",
     "prewpandroid": "rm -Rf $TMPDIR/gbmobile-wpandroidfakernroot && mkdir $TMPDIR/gbmobile-wpandroidfakernroot && ln -s $(cd \"$(dirname \"../../../\")\"; pwd) $TMPDIR/gbmobile-wpandroidfakernroot/android",
     "wpandroid": "yarn android --root $TMPDIR/gbmobile-wpandroidfakernroot --variant wasabiDebug --appIdSuffix beta --appFolder WordPress --main-activity=ui.WPLaunchActivity",
-    "preios": "cd ios && (bundle check --path=vendor/bundle > /dev/null || bundle install) && bundle exec pod install",
+    "preios": "cd ios && (bundle check --path=vendor/bundle > /dev/null || bundle install) && bundle exec pod repo update && bundle exec pod install",
     "ios": "react-native run-ios",
     "test": "cross-env NODE_ENV=test jest --verbose --config jest.config.js",
     "test:inside-gb": "cross-env NODE_ENV=test jest --verbose --config jest_gb.config.js",
