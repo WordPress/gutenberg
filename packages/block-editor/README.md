@@ -344,10 +344,6 @@ Undocumented declaration.
 
 Undocumented declaration.
 
-<a name="ToolSelector" href="#ToolSelector">#</a> **ToolSelector**
-
-Undocumented declaration.
-
 <a name="ObserveTyping" href="#ObserveTyping">#</a> **ObserveTyping**
 
 _Related_
@@ -430,6 +426,10 @@ _Related_
 _Type_
 
 -   `Object` 
+
+<a name="ToolSelector" href="#ToolSelector">#</a> **ToolSelector**
+
+Undocumented declaration.
 
 <a name="transformStyles" href="#transformStyles">#</a> **transformStyles**
 
