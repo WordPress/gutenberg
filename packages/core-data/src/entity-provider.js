@@ -122,13 +122,14 @@ export function useEntityProp( kind, type, prop ) {
 export function __experimentalUseEntitySaving( kind, type, props ) {
 	const id = useEntityId( kind, type );
 
-	const [ isDirty, isSaving, edits ] = useSelect(
+	const [ isDirty, isSaving, _select ] = useSelect(
 		( select ) => {
 			const { getEntityRecordNonTransientEdits, isSavingEntityRecord } = select(
 				'core'
 			);
-			const _edits = getEntityRecordNonTransientEdits( kind, type, id );
-			const editKeys = Object.keys( _edits );
+			const editKeys = Object.keys(
+				getEntityRecordNonTransientEdits( kind, type, id )
+			);
 			return [
 				props ?
 					editKeys.some( ( key ) =>
@@ -136,7 +137,7 @@ export function __experimentalUseEntitySaving( kind, type, props ) {
 					) :
 					editKeys.length > 0,
 				isSavingEntityRecord( kind, type, id ),
-				_edits,
+				select,
 			];
 		},
 		[ kind, type, id, props ]
@@ -144,11 +145,15 @@ export function __experimentalUseEntitySaving( kind, type, props ) {
 
 	const { saveEntityRecord } = useDispatch( 'core' );
 	const save = useCallback( () => {
-		let filteredEdits = edits;
+		let filteredEdits = _select( 'core' ).getEntityRecordNonTransientEdits(
+			kind,
+			type,
+			id
+		);
 		if ( typeof props === 'string' ) {
 			filteredEdits = { [ props ]: filteredEdits[ props ] };
 		} else if ( props ) {
-			filteredEdits = filteredEdits.reduce( ( acc, key ) => {
+			filteredEdits = Object.keys( filteredEdits ).reduce( ( acc, key ) => {
 				if ( props.includes( key ) ) {
 					acc[ key ] = filteredEdits[ key ];
 				}
@@ -156,7 +161,7 @@ export function __experimentalUseEntitySaving( kind, type, props ) {
 			}, {} );
 		}
 		saveEntityRecord( kind, type, { id, ...filteredEdits } );
-	}, [ kind, type, id, props, edits ] );
+	}, [ kind, type, id, props, _select ] );
 
 	return [ isDirty, isSaving, save ];
 }
