@@ -91,7 +91,7 @@ jobs:
           path: ./reports/test-results
   ios-device-checks:
     macos:
-      xcode: "10.2.0"
+      xcode: "11.2.1"
     steps:
     - checkout
     - checkout-gutenberg
