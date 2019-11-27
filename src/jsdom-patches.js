@@ -149,6 +149,16 @@ Node.prototype.insertBefore = function( /* Node */ newChild, /* Node*/ refChild 
  */
 Element.prototype.matches = Element.prototype.matchesSelector;
 
+Element.prototype.closest = function( selector ) {
+	let el = this;
+	while ( el ) {
+		if ( el.matches( selector ) ) {
+			return el;
+		}
+		el = el.parentElement;
+	}
+};
+
 /**
  * Helper function to check if a node implements the NonDocumentTypeChildNode
  * interface
