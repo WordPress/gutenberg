@@ -1,8 +1,4 @@
 /**
- * External dependencies
- */
-import { Platform } from 'react-native';
-/**
  * WordPress dependencies
  */
 import {
@@ -146,8 +142,7 @@ export const registerCoreBlocks = () => {
 		list,
 		quote,
 		mediaText,
-		// eslint-disable-next-line no-undef
-		( ( Platform.OS === 'ios' ) || ( !! __DEV__ ) ) ? preformatted : null,
+		preformatted,
 		// eslint-disable-next-line no-undef
 		!! __DEV__ ? group : null,
 		spacer,

@@ -349,6 +349,14 @@ function CoverEdit( {
 								onChange={ ( newFocalPoint ) => setAttributes( { focalPoint: newFocalPoint } ) }
 							/>
 						) }
+						{ VIDEO_BACKGROUND_TYPE === backgroundType && (
+							<video
+								autoPlay
+								muted
+								loop
+								src={ url }
+							/>
+						) }
 						<PanelRow>
 							<Button
 								isDefault
