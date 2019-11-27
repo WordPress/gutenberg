@@ -149,6 +149,10 @@ Node.prototype.insertBefore = function( /* Node */ newChild, /* Node*/ refChild 
  */
 Element.prototype.matches = Element.prototype.matchesSelector;
 
+/*
+ * Implementation of Element.prototype.closest that it's missing from the jsdom-jscore fork we're using.
+ * See https://github.com/wordpress-mobile/gutenberg-mobile/issues/1625
+ */
 Element.prototype.closest = function( selector ) {
 	let el = this;
 	while ( el ) {
