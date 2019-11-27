@@ -491,7 +491,9 @@ export class RichText extends Component {
 	}
 
 	shouldComponentUpdate( nextProps ) {
-		if ( nextProps.tagName !== this.props.tagName ) {
+		if ( nextProps.tagName !== this.props.tagName ||
+			nextProps.reversed !== this.props.reversed ||
+			nextProps.start !== this.props.start ) {
 			this.lastEventCount = undefined;
 			this.value = undefined;
 			return true;
