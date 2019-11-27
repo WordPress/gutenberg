@@ -28,7 +28,7 @@ describe( 'getNotificationArgumentsForSaveSuccess()', () => {
 		link: 'some_link',
 	};
 	const post = { ...previousPost };
-	const defaultExpectedAction = { id: SAVE_POST_NOTICE_ID, actions: [] };
+	const defaultExpectedAction = { id: SAVE_POST_NOTICE_ID, actions: [], type: 'snackbar' };
 	[
 		[
 			'when previous post is not published and post will not be published',
