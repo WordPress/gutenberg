@@ -1,6 +1,67 @@
 /**
  * Colors
  */
+// WordPress color palette
+$gray-0: #f6f7f7;
+$gray-5: #dcdcde;
+$gray-10: #c3c4c7;
+$gray-20: #a7aaad;
+$gray-30: #8c8f94;
+$gray-40: #787c82;
+$gray-50: #646970;
+$gray-60: #50575e;
+$gray-70: #3c434a;
+$gray-80: #2c3338;
+$gray-90: #1d2327;
+$gray-100: #101517;
+$blue-0: #f0f6fc;
+$blue-5: #c5d9ed;
+$blue-10: #9ec2e6;
+$blue-20: #72aee6;
+$blue-30: #4f94d4;
+$blue-40: #3582c4;
+$blue-50: #2271b1;
+$blue-60: #135e96;
+$blue-70: #0a4b78;
+$blue-80: #043959;
+$blue-90: #01263a;
+$blue-100: #00131c;
+$red-0: #fcf0f1;
+$red-5: #facfd2;
+$red-10: #ffabaf;
+$red-20: #ff8085;
+$red-30: #f86368;
+$red-40: #e65054;
+$red-50: #d63638;
+$red-60: #b32d2e;
+$red-70: #8a2424;
+$red-80: #691c1c;
+$red-90: #451313;
+$red-100: #240a0a;
+$yellow-0: #fcf9e8;
+$yellow-5: #f5e6ab;
+$yellow-10: #f2d675;
+$yellow-20: #f0c33c;
+$yellow-30: #dba617;
+$yellow-40: #bd8600;
+$yellow-50: #996b00;
+$yellow-60: #755100;
+$yellow-70: #614200;
+$yellow-80: #4a3200;
+$yellow-90: #362400;
+$yellow-100: #211600;
+$green-0: #edfaef;
+$green-5: #b8e6bf;
+$green-10: #68de7c;
+$green-20: #1ed14b;
+$green-30: #00ba37;
+$green-40: #00a32a;
+$green-50: #008a20;
+$green-60: #007017;
+$green-70: #005c12;
+$green-80: #00450c;
+$green-90: #003008;
+$green-100: #001c05;
 
 // Hugo's new WordPress shades of gray, from http://codepen.io/hugobaeta/pen/grJjVp.
 $black: #000;
@@ -88,69 +149,3 @@ $blue-medium-focus: #007cba;
 $alert-yellow: #f0b849;
 $alert-red: #d94f4f;
 $alert-green: #4ab866;
-
-// Local palette
-$gray-0: #f6f7f7;
-$gray-5: #dcdcde;
-$gray-10: #c3c4c7;
-$gray-20: #a7aaad;
-$gray-30: #8c8f94;
-$gray-40: #787c82;
-$gray-50: #646970;
-$gray-60: #50575e;
-$gray-70: #3c434a;
-$gray-80: #2c3338;
-$gray-90: #1d2327;
-$gray-100: #101517;
-
-$blue-0: #f0f6fc;
-$blue-5: #c5d9ed;
-$blue-10: #9ec2e6;
-$blue-20: #72aee6;
-$blue-30: #4f94d4;
-$blue-40: #3582c4;
-$blue-50: #2271b1;
-$blue-60: #135e96;
-$blue-70: #0a4b78;
-$blue-80: #043959;
-$blue-90: #01263a;
-$blue-100: #00131c;
-
-$red-0: #fcf0f1;
-$red-5: #facfd2;
-$red-10: #ffabaf;
-$red-20: #ff8085;
-$red-30: #f86368;
-$red-40: #e65054;
-$red-50: #d63638;
-$red-60: #b32d2e;
-$red-70: #8a2424;
-$red-80: #691c1c;
-$red-90: #451313;
-$red-100: #240a0a;
-
-$yellow-0: #fcf9e8;
-$yellow-5: #f5e6ab;
-$yellow-10: #f2d675;
-$yellow-20: #f0c33c;
-$yellow-30: #dba617;
-$yellow-40: #bd8600;
-$yellow-50: #996b00;
-$yellow-60: #755100;
-$yellow-70: #614200;
-$yellow-80: #4a3200;
-$yellow-90: #362400;
-$yellow-100: #211600;
-
-$green-0: #edfaef;
-$green-5: #b8e6bf;
-$green-10: #68de7c;
-$green-20: #1ed14b;
-$green-30: #00ba37;
-$green-40: #00a32a;
-$green-50: #008a20;
-$green-60: #007017;
-$green-70: #005c12;
-$green-80: #00450c;
-$green-90: #003008;
-$green-100: #001c05;
