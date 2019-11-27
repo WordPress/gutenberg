@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useRef, useState, useEffect } from '@wordpress/element';
-import { focus } from '@wordpress/dom';
+import { focus, getRectangleFromRange } from '@wordpress/dom';
 import { ESCAPE } from '@wordpress/keycodes';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 import deprecated from '@wordpress/deprecated';
@@ -62,48 +62,135 @@ function useThrottledWindowScrollOrResize( handler, ignoredScrollableRef ) {
 	}, [] );
 }
 
-/**
- * Hook used to compute and update the anchor position properly.
- *
- * @param {Object} anchorRef       reference to the popover anchor element.
- * @param {Object} contentRef      reference to the popover content element.
- * @param {Object} anchorRect      anchor Rect prop used to override the computed value.
- * @param {Function} getAnchorRect function used to override the anchor value computation algorithm.
- *
- * @return {Object} Anchor position.
- */
-function useAnchor( anchorRef, contentRef, anchorRect, getAnchorRect ) {
-	const [ anchor, setAnchor ] = useState( null );
-	const refreshAnchorRect = () => {
-		if ( ! anchorRef.current ) {
+function computeAnchorRect(
+	anchorRefFallback,
+	anchorRect,
+	getAnchorRect,
+	anchorRef = false,
+	anchorIncludePadding
+) {
+	if ( anchorRect ) {
+		return anchorRect;
+	}
+
+	if ( getAnchorRect ) {
+		if ( ! anchorRefFallback.current ) {
 			return;
 		}
 
-		let newAnchor;
-		if ( anchorRect ) {
-			newAnchor = anchorRect;
-		} else if ( getAnchorRect ) {
-			newAnchor = getAnchorRect( anchorRef.current );
-		} else {
-			const rect = anchorRef.current.parentNode.getBoundingClientRect();
-			// subtract padding
-			const { paddingTop, paddingBottom } = window.getComputedStyle( anchorRef.current.parentNode );
-			const topPad = parseInt( paddingTop, 10 );
-			const bottomPad = parseInt( paddingBottom, 10 );
-			newAnchor = {
-				x: rect.left,
-				y: rect.top + topPad,
-				width: rect.width,
-				height: rect.height - topPad - bottomPad,
-				left: rect.left,
-				right: rect.right,
-				top: rect.top + topPad,
-				bottom: rect.bottom - bottomPad,
-			};
+		return getAnchorRect( anchorRefFallback.current );
+	}
+
+	if ( anchorRef !== false ) {
+		if ( ! anchorRef ) {
+			return;
 		}
 
-		const didAnchorRectChange = ! isShallowEqual( newAnchor, anchor );
-		if ( didAnchorRectChange ) {
+		if ( anchorRef instanceof window.Range ) {
+			return getRectangleFromRange( anchorRef );
+		}
+
+		const rect = anchorRef.getBoundingClientRect();
+
+		if ( anchorIncludePadding ) {
+			return rect;
+		}
+
+		return withoutPadding( rect, anchorRef );
+	}
+
+	if ( ! anchorRefFallback.current ) {
+		return;
+	}
+
+	const { parentNode } = anchorRefFallback.current;
+	const rect = parentNode.getBoundingClientRect();
+
+	if ( anchorIncludePadding ) {
+		return rect;
+	}
+
+	return withoutPadding( rect, parentNode );
+}
+
+function addBuffer( rect, verticalBuffer = 0, horizontalBuffer = 0 ) {
+	return {
+		x: rect.left - horizontalBuffer,
+		y: rect.top - verticalBuffer,
+		width: rect.width + ( 2 * horizontalBuffer ),
+		height: rect.height + ( 2 * verticalBuffer ),
+		left: rect.left - horizontalBuffer,
+		right: rect.right + horizontalBuffer,
+		top: rect.top - verticalBuffer,
+		bottom: rect.bottom + verticalBuffer,
+	};
+}
+
+function withoutPadding( rect, element ) {
+	const {
+		paddingTop,
+		paddingBottom,
+		paddingLeft,
+		paddingRight,
+	} = window.getComputedStyle( element );
+	const top = paddingTop ? parseInt( paddingTop, 10 ) : 0;
+	const bottom = paddingBottom ? parseInt( paddingBottom, 10 ) : 0;
+	const left = paddingLeft ? parseInt( paddingLeft, 10 ) : 0;
+	const right = paddingRight ? parseInt( paddingRight, 10 ) : 0;
+
+	return {
+		x: rect.left + left,
+		y: rect.top + top,
+		width: rect.width - left - right,
+		height: rect.height - top - bottom,
+		left: rect.left + left,
+		right: rect.right - right,
+		top: rect.top + top,
+		bottom: rect.bottom - bottom,
+	};
+}
+
+/**
+ * Hook used to compute and update the anchor position properly.
+ *
+ * @param {Object}   anchorRefFallback      Reference to the popover anchor fallback element.
+ * @param {Object}   contentRef             Reference to the popover content element.
+ * @param {Object}   anchorRect             Anchor Rect prop used to override the computed value.
+ * @param {Function} getAnchorRect          Function used to override the anchor value computation algorithm.
+ * @param {Object}   anchorRef              Reference to the popover anchor fallback element.
+ * @param {Object}   anchorIncludePadding   Whether to include the anchor padding.
+ * @param {Object}   anchorVerticalBuffer   Vertical buffer for the anchor.
+ * @param {Object}   anchorHorizontalBuffer Horizontal buffer for the anchor.
+ *
+ * @return {Object} Anchor position.
+ */
+function useAnchor(
+	anchorRefFallback,
+	contentRef,
+	anchorRect,
+	getAnchorRect,
+	anchorRef,
+	anchorIncludePadding,
+	anchorVerticalBuffer,
+	anchorHorizontalBuffer
+) {
+	const [ anchor, setAnchor ] = useState( null );
+	const refreshAnchorRect = () => {
+		let newAnchor = computeAnchorRect(
+			anchorRefFallback,
+			anchorRect,
+			getAnchorRect,
+			anchorRef,
+			anchorIncludePadding
+		);
+
+		newAnchor = addBuffer(
+			newAnchor,
+			anchorVerticalBuffer,
+			anchorHorizontalBuffer
+		);
+
+		if ( ! isShallowEqual( newAnchor, anchor ) ) {
 			setAnchor( newAnchor );
 		}
 	};
@@ -259,6 +346,10 @@ const Popover = ( {
 	position = 'top',
 	range,
 	focusOnMount = 'firstElement',
+	anchorRef,
+	anchorIncludePadding,
+	anchorVerticalBuffer,
+	anchorHorizontalBuffer,
 	anchorRect,
 	getAnchorRect,
 	expandOnMobile,
@@ -268,14 +359,23 @@ const Popover = ( {
 	/* eslint-enable no-unused-vars */
 	...contentProps
 } ) => {
-	const anchorRef = useRef( null );
+	const anchorRefFallback = useRef( null );
 	const contentRef = useRef( null );
 
 	// Animation
 	const [ isReadyToAnimate, setIsReadyToAnimate ] = useState( false );
 
 	// Anchor position
-	const anchor = useAnchor( anchorRef, contentRef, anchorRect, getAnchorRect );
+	const anchor = useAnchor(
+		anchorRefFallback,
+		contentRef,
+		anchorRect,
+		getAnchorRect,
+		anchorRef,
+		anchorIncludePadding,
+		anchorVerticalBuffer,
+		anchorHorizontalBuffer
+	);
 
 	// Content size
 	const contentSize = useInitialContentSize( contentRef );
@@ -438,7 +538,7 @@ const Popover = ( {
 				}
 
 				return (
-					<span ref={ anchorRef }>
+					<span ref={ anchorRefFallback }>
 						{ content }
 						{ popoverPosition.isMobile && expandOnMobile && <ScrollLock /> }
 					</span>
