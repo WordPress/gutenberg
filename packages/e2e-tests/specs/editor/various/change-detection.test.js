@@ -352,4 +352,42 @@ describe( 'Change detection', () => {
 
 		expect( isCurrentURL( '/wp-admin/edit.php', `post_type=post&ids=${ postId }` ) ).toBe( true );
 	} );
+
+	it( 'consecutive edits to the same attribute should mark the post as dirty after a save', async () => {
+		// Open the sidebar block settings.
+		await openDocumentSettingsSidebar();
+		await page.click( '.edit-post-sidebar__panel-tab[data-label="Block"]' );
+
+		// Insert a paragraph.
+		await clickBlockAppender();
+		await page.keyboard.type( 'Hello, World!' );
+
+		// Save and wait till the post is clean.
+		await Promise.all( [
+			page.waitForSelector( '.editor-post-saved-state.is-saved' ),
+			pressKeyWithModifier( 'primary', 'S' ),
+		] );
+
+		// Increase the paragraph's font size.
+		await page.click( '[data-type="core/paragraph"]' );
+		await page.select( '.components-select-control__input', 'large' );
+		await page.click( '[data-type="core/paragraph"]' );
+
+		// Check that the post is dirty.
+		await page.waitForSelector( '.editor-post-save-draft' );
+
+		// Save and wait till the post is clean.
+		await Promise.all( [
+			page.waitForSelector( '.editor-post-saved-state.is-saved' ),
+			pressKeyWithModifier( 'primary', 'S' ),
+		] );
+
+		// Increase the paragraph's font size again.
+		await page.click( '[data-type="core/paragraph"]' );
+		await page.select( '.components-select-control__input', 'larger' );
+		await page.click( '[data-type="core/paragraph"]' );
+
+		// Check that the post is dirty.
+		await page.waitForSelector( '.editor-post-save-draft' );
+	} );
 } );
