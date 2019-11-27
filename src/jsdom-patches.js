@@ -161,6 +161,7 @@ Element.prototype.closest = function( selector ) {
 		}
 		el = el.parentElement;
 	}
+	return null;
 };
 
 /**
