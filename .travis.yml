@@ -197,7 +197,7 @@ jobs:
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 3' < ~/.jest-e2e-tests )
 
     - stage: deploy
-      if: branch = master
+      if: (NOT type IN (pull_request)) AND (branch = master)
       name: Deploy Playground
       env: INSTALL_WORDPRESS=false
       install:
