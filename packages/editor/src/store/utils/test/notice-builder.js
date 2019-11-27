@@ -96,7 +96,7 @@ describe( 'getNotificationArgumentsForSaveFail()', () => {
 	const error = { code: '42', message: 'Something went wrong.' };
 	const post = { status: 'publish' };
 	const edits = { status: 'publish' };
-	const defaultExpectedAction = { id: SAVE_POST_NOTICE_ID, type: 'snackbar' };
+	const defaultExpectedAction = { id: SAVE_POST_NOTICE_ID };
 	[
 		[
 			'when error code is `rest_autosave_no_changes`',
