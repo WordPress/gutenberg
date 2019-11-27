@@ -62,6 +62,7 @@ public class WPAndroidGlueCode {
     private RNReactNativeGutenbergBridgePackage mRnReactNativeGutenbergBridgePackage;
     private MediaUploadCallback mPendingMediaUploadCallback;
     private boolean mMediaPickedByUserOnBlock;
+    private boolean mAppendsMultipleSelectedToSiblingBlocks;
 
     private OnMediaLibraryButtonListener mOnMediaLibraryButtonListener;
     private OnReattachQueryListener mOnReattachQueryListener;
