@@ -67,7 +67,7 @@ function ToolSelector() {
 						/>
 					</NavigableMenu>
 					<div className="block-editor-tool-selector__help">
-						{ __( 'Tools offer different block interactions to optimize block selection & editing tasks' ) }
+						{ __( 'Tools offer different interactions for block selection & editing. To select, press Escape, to go back to editing, press Enter.' ) }
 					</div>
 				</>
 			) }
