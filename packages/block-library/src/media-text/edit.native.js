@@ -134,6 +134,8 @@ class MediaTextEdit extends Component {
 			setAttributes,
 			isMobile,
 			isSelected,
+			isParentSelected,
+			isAncestorSelected,
 		} = this.props;
 		const {
 			isStackedOnMobile,
@@ -186,7 +188,7 @@ class MediaTextEdit extends Component {
 					/>
 				</BlockControls>
 				<View style={ containerStyles }>
-					<View style={ { width: widthString, padding: isSelected ? 12 : 16 } }>
+					<View style={ { width: widthString, ...( isSelected ? { padding: 12 } : { padding: isParentSelected || isAncestorSelected ? 6 : 16 } ) } } >
 						{ this.renderMediaArea() }
 					</View>
 					<View style={ { width: innerBlockWidthString, ...selectedStyle } }>
@@ -208,14 +210,20 @@ export default compose(
 	withSelect( ( select, { clientId } ) => {
 		const {
 			getSelectedBlockClientId,
+			getBlockRootClientId,
+			getBlockParents,
 		} = select( 'core/block-editor' );
 
+		const parents = getBlockParents( clientId, true );
+
 		const selectedBlockClientId = getSelectedBlockClientId();
-		const isParentSelected = selectedBlockClientId && selectedBlockClientId === clientId;
+		const isParentSelected = selectedBlockClientId && selectedBlockClientId === getBlockRootClientId( clientId );
+		const isAncestorSelected = selectedBlockClientId && parents.includes( selectedBlockClientId );
 
 		return {
 			isSelected: selectedBlockClientId === clientId,
 			isParentSelected,
+			isAncestorSelected,
 		};
 	} ),
 )( MediaTextEdit );
