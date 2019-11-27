@@ -48,11 +48,16 @@ export default createHigherOrderComponent(
 				}
 
 				nextRegion.focus();
-				this.setState( { isFocusingRegions: true } );
+
+				if ( ! this.state.isFocusingRegions ) {
+					this.setState( { isFocusingRegions: true } );
+				}
 			}
 
 			onClick() {
-				this.setState( { isFocusingRegions: false } );
+				if ( this.state.isFocusingRegions ) {
+					this.setState( { isFocusingRegions: false } );
+				}
 			}
 
 			render() {
