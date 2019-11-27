@@ -20,12 +20,19 @@ export const settings = {
 
 	keywords: [ __( 'menu' ), __( 'navigation' ), __( 'links' ) ],
 
+	category: 'layout',
+
 	supports: {
 		align: [ 'wide', 'full' ],
 		anchor: true,
 		html: false,
 		inserter: true,
 	},
+
+	styles: [
+		{ name: 'light', label: __( 'Light' ), isDefault: true },
+		{ name: 'dark', label: __( 'Dark' ) },
+	],
 
 	edit,
 

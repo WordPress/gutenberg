@@ -646,8 +646,14 @@ export function unlockPostSaving( lockName ) {
  * @yield {Object} Action object
  */
 export function* resetEditorBlocks( blocks, options = {} ) {
-	const edits = { blocks };
-	if ( options.__unstableShouldCreateUndoLevel !== false ) {
+	const {
+		__unstableShouldCreateUndoLevel,
+		selectionStart,
+		selectionEnd,
+	} = options;
+	const edits = { blocks, selectionStart, selectionEnd };
+
+	if ( __unstableShouldCreateUndoLevel !== false ) {
 		const { id, type } = yield select( STORE_KEY, 'getCurrentPost' );
 		const noChange =
 			( yield select( 'core', 'getEditedEntityRecord', 'postType', type, id ) )

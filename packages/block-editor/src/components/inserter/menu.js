@@ -23,7 +23,11 @@ import classnames from 'classnames';
  */
 import { speak } from '@wordpress/a11y';
 import { __, _n, _x, sprintf } from '@wordpress/i18n';
-import { Component, createRef } from '@wordpress/element';
+import {
+	Component,
+	__experimentalCreateInterpolateElement,
+	createRef,
+} from '@wordpress/element';
 import {
 	PanelBody,
 	withSpokenMessages,
@@ -435,8 +439,9 @@ export class InserterMenu extends Component {
 									</p>
 								</div>
 								<Tip>
-									{ __(
-										'While writing, you can press "/" to quickly insert new blocks.'
+									{ __experimentalCreateInterpolateElement(
+										__( 'While writing, you can press <kbd>/</kbd> to quickly insert new blocks.' ),
+										{ kbd: <kbd /> }
 									) }
 								</Tip>
 							</div>
