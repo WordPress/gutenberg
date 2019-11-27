@@ -67,7 +67,7 @@ function computeAnchorRect(
 	anchorRect,
 	getAnchorRect,
 	anchorRef = false,
-	anchorIncludePadding
+	shouldAnchorIncludePadding
 ) {
 	if ( anchorRect ) {
 		return anchorRect;
@@ -92,7 +92,7 @@ function computeAnchorRect(
 
 		const rect = anchorRef.getBoundingClientRect();
 
-		if ( anchorIncludePadding ) {
+		if ( shouldAnchorIncludePadding ) {
 			return rect;
 		}
 
@@ -106,7 +106,7 @@ function computeAnchorRect(
 	const { parentNode } = anchorRefFallback.current;
 	const rect = parentNode.getBoundingClientRect();
 
-	if ( anchorIncludePadding ) {
+	if ( shouldAnchorIncludePadding ) {
 		return rect;
 	}
 
@@ -153,14 +153,14 @@ function withoutPadding( rect, element ) {
 /**
  * Hook used to compute and update the anchor position properly.
  *
- * @param {Object}   anchorRefFallback      Reference to the popover anchor fallback element.
- * @param {Object}   contentRef             Reference to the popover content element.
- * @param {Object}   anchorRect             Anchor Rect prop used to override the computed value.
- * @param {Function} getAnchorRect          Function used to override the anchor value computation algorithm.
- * @param {Object}   anchorRef              Reference to the popover anchor fallback element.
- * @param {Object}   anchorIncludePadding   Whether to include the anchor padding.
- * @param {Object}   anchorVerticalBuffer   Vertical buffer for the anchor.
- * @param {Object}   anchorHorizontalBuffer Horizontal buffer for the anchor.
+ * @param {Object}        anchorRefFallback          Reference to the popover anchor fallback element.
+ * @param {Object}        contentRef                 Reference to the popover content element.
+ * @param {Object}        anchorRect                 Anchor Rect prop used to override the computed value.
+ * @param {Function}      getAnchorRect              Function used to override the anchor value computation algorithm.
+ * @param {Element|Range} anchorRef                  Reference to the popover anchor fallback element.
+ * @param {boolean}       shouldAnchorIncludePadding Whether to include the anchor padding.
+ * @param {number}        anchorVerticalBuffer       Vertical buffer for the anchor.
+ * @param {number}        anchorHorizontalBuffer     Horizontal buffer for the anchor.
  *
  * @return {Object} Anchor position.
  */
@@ -170,7 +170,7 @@ function useAnchor(
 	anchorRect,
 	getAnchorRect,
 	anchorRef,
-	anchorIncludePadding,
+	shouldAnchorIncludePadding,
 	anchorVerticalBuffer,
 	anchorHorizontalBuffer
 ) {
@@ -181,7 +181,7 @@ function useAnchor(
 			anchorRect,
 			getAnchorRect,
 			anchorRef,
-			anchorIncludePadding
+			shouldAnchorIncludePadding
 		);
 
 		newAnchor = addBuffer(
@@ -241,11 +241,11 @@ function useInitialContentSize( ref ) {
  * Hook used to compute and update the position of the popover
  * based on the anchor position and the content size.
  *
- * @param {Object} anchor          Anchor Position.
- * @param {Object} contentSize     Content Size.
- * @param {string} position        Position prop.
- * @param {boolean} expandOnMobile Whether to show the popover full width on mobile.
- * @param {Object} contentRef      Reference to the popover content element.
+ * @param {Object}  anchor          Anchor Position.
+ * @param {Object}  contentSize     Content Size.
+ * @param {string}  position        Position prop.
+ * @param {boolean} expandOnMobile  Whether to show the popover full width on mobile.
+ * @param {Object}  contentRef      Reference to the popover content element.
  *
  * @return {Object} Popover position.
  */
@@ -293,7 +293,7 @@ function usePopoverPosition( anchor, contentSize, position, expandOnMobile, cont
  * Hook used to focus the first tabbable element on mount.
  *
  * @param {boolean|string} focusOnMount Focus on mount mode.
- * @param {Object} contentRef           Reference to the popover content element.
+ * @param {Object}         contentRef   Reference to the popover content element.
  */
 function useFocusContentOnMount( focusOnMount, contentRef ) {
 	// Focus handling
@@ -347,7 +347,7 @@ const Popover = ( {
 	range,
 	focusOnMount = 'firstElement',
 	anchorRef,
-	anchorIncludePadding,
+	shouldAnchorIncludePadding,
 	anchorVerticalBuffer,
 	anchorHorizontalBuffer,
 	anchorRect,
@@ -372,7 +372,7 @@ const Popover = ( {
 		anchorRect,
 		getAnchorRect,
 		anchorRef,
-		anchorIncludePadding,
+		shouldAnchorIncludePadding,
 		anchorVerticalBuffer,
 		anchorHorizontalBuffer
 	);

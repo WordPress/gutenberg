@@ -44,7 +44,7 @@ export function DotTip( {
 			position={ position }
 			noArrow
 			focusOnMount="container"
-			anchorIncludePadding
+			shouldAnchorIncludePadding
 			role="dialog"
 			aria-label={ __( 'Editor tips' ) }
 			onClick={ onClick }
