@@ -24,7 +24,6 @@ import DefaultBlockAppender from './default-block-appender';
  * Internal dependencies
  */
 import BlockList from '../block-list';
-import BlockPatternPicker from '../block-pattern-picker';
 import { withBlockEditContext } from '../block-edit/context';
 
 class InnerBlocks extends Component {
@@ -106,34 +105,22 @@ class InnerBlocks extends Component {
 			clientId,
 			hasOverlay,
 			renderAppender,
-			template,
 			__experimentalMoverDirection: moverDirection,
-			__experimentalPatterns: patterns,
-			__experimentalOnSelectPattern: onSelectPattern,
-			__experimentalAllowPatternSkip: allowPatternSkip,
 		} = this.props;
 		const { templateInProcess } = this.state;
 
-		const isPlaceholder = template === null && !! patterns;
-
 		const classes = classnames( 'editor-inner-blocks block-editor-inner-blocks', {
-			'has-overlay': enableClickThrough && ( hasOverlay && ! isPlaceholder ),
+			'has-overlay': enableClickThrough && hasOverlay,
 		} );
 
 		return (
 			<div className={ classes }>
 				{ ! templateInProcess && (
-					isPlaceholder ?
-						<BlockPatternPicker
-							patterns={ patterns }
-							onSelect={ onSelectPattern }
-							allowSkip={ allowPatternSkip }
-						/> :
-						<BlockList
-							rootClientId={ clientId }
-							renderAppender={ renderAppender }
-							__experimentalMoverDirection={ moverDirection }
-						/>
+					<BlockList
+						rootClientId={ clientId }
+						renderAppender={ renderAppender }
+						__experimentalMoverDirection={ moverDirection }
+					/>
 				) }
 			</div>
 		);

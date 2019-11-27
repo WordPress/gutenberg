@@ -42,7 +42,7 @@ function BlockPatternPicker( {
 							isLarge
 							icon={ pattern.icon }
 							size={ 48 }
-							onClick={ () => onSelect( pattern.innerBlocks ) }
+							onClick={ () => onSelect( pattern ) }
 							className="block-editor-block-pattern-picker__pattern"
 							label={ pattern.label }
 						/>
@@ -54,7 +54,7 @@ function BlockPatternPicker( {
 				<div className="block-editor-block-pattern-picker__skip">
 					<Button
 						isLink
-						onClick={ () => onSelect( undefined ) }
+						onClick={ () => onSelect() }
 					>
 						{ __( 'Skip' ) }
 					</Button>

@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { dropRight, times } from 'lodash';
+import { dropRight, get, map, times } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -16,17 +16,20 @@ import {
 	InspectorControls,
 	InnerBlocks,
 	BlockControls,
+	__experimentalBlockPatternPicker,
 	BlockVerticalAlignmentToolbar,
 } from '@wordpress/block-editor';
-import { withDispatch, useSelect } from '@wordpress/data';
+import {
+	withDispatch,
+	useDispatch,
+	useSelect,
+} from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
-import { useState, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import {
-	getColumnsTemplate,
 	hasExplicitColumnWidths,
 	getMappedColumnWidths,
 	getRedistributedColumnWidths,
@@ -44,7 +47,7 @@ import {
  */
 const ALLOWED_BLOCKS = [ 'core/column' ];
 
-export function ColumnsEdit( {
+function ColumnsEditContainer( {
 	attributes,
 	className,
 	updateAlignment,
@@ -53,66 +56,37 @@ export function ColumnsEdit( {
 } ) {
 	const { verticalAlignment } = attributes;
 
-	const { count, defaultPattern, patterns } = useSelect( ( select ) => {
+	const { count } = useSelect( ( select ) => {
 		return {
 			count: select( 'core/block-editor' ).getBlockCount( clientId ),
-			patterns: select( 'core/blocks' ).__experimentalGetBlockPatterns( 'core/columns' ),
-			defaultPattern: select( 'core/blocks' ).__experimentalGetDefaultBlockPattern( 'core/columns' ),
 		};
 	} );
-	const [ template, setTemplate ] = useState( getColumnsTemplate( count ) );
-	const [ forceUseTemplate, setForceUseTemplate ] = useState( false );
-
-	// This is used to force the usage of the template even if the count doesn't match the template
-	// The count doesn't match the template once you use undo/redo (this is used to reset to the placeholder state).
-	useEffect( () => {
-		// Once the template is applied, reset it.
-		if ( forceUseTemplate ) {
-			setForceUseTemplate( false );
-		}
-	}, [ forceUseTemplate ] );
 
 	const classes = classnames( className, {
 		[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 	} );
 
-	// The template selector is shown when we first insert the columns block (count === 0).
-	// or if there's no template available.
-	// The count === 0 trick is useful when you use undo/redo.
-	const showTemplateSelector = ( count === 0 && ! forceUseTemplate ) || ! template;
-
 	return (
 		<>
-			{ ! showTemplateSelector && (
-				<>
-					<InspectorControls>
-						<PanelBody>
-							<RangeControl
-								label={ __( 'Columns' ) }
-								value={ count }
-								onChange={ ( value ) => updateColumns( count, value ) }
-								min={ 2 }
-								max={ 6 }
-							/>
-						</PanelBody>
-					</InspectorControls>
-					<BlockControls>
-						<BlockVerticalAlignmentToolbar
-							onChange={ updateAlignment }
-							value={ verticalAlignment }
-						/>
-					</BlockControls>
-				</>
-			) }
+			<InspectorControls>
+				<PanelBody>
+					<RangeControl
+						label={ __( 'Columns' ) }
+						value={ count }
+						onChange={ ( value ) => updateColumns( count, value ) }
+						min={ 2 }
+						max={ 6 }
+					/>
+				</PanelBody>
+			</InspectorControls>
+			<BlockControls>
+				<BlockVerticalAlignmentToolbar
+					onChange={ updateAlignment }
+					value={ verticalAlignment }
+				/>
+			</BlockControls>
 			<div className={ classes }>
 				<InnerBlocks
-					__experimentalPatterns={ patterns }
-					__experimentalOnSelectPattern={ ( nextTemplate = defaultPattern.innerBlocks ) => {
-						setTemplate( nextTemplate );
-						setForceUseTemplate( true );
-					} }
-					__experimentalAllowPatternSkip
-					template={ showTemplateSelector ? null : template }
 					templateLock="all"
 					allowedBlocks={ ALLOWED_BLOCKS } />
 			</div>
@@ -120,7 +94,7 @@ export function ColumnsEdit( {
 	);
 }
 
-export default withDispatch( ( dispatch, ownProps, registry ) => ( {
+const ColumnsEditContainerWrapper = withDispatch( ( dispatch, ownProps, registry ) => ( {
 	/**
 	 * Update all child Column blocks with a new vertical alignment setting
 	 * based on whatever alignment is passed in. This allows change to parent
@@ -201,4 +175,59 @@ export default withDispatch( ( dispatch, ownProps, registry ) => ( {
 
 		replaceInnerBlocks( clientId, innerBlocks, false );
 	},
-} ) )( ColumnsEdit );
+} ) )( ColumnsEditContainer );
+
+const createBlocksFromInnerBlocksTemplate = ( innerBlocksTemplate ) => {
+	return map(
+		innerBlocksTemplate,
+		( [ name, attributes, innerBlocks = [] ] ) =>
+			createBlock( name, attributes, createBlocksFromInnerBlocksTemplate( innerBlocks ) )
+	);
+};
+
+const ColumnsEdit = ( props ) => {
+	const { clientId, name } = props;
+	const { blockType, defaultPattern, hasInnerBlocks, patterns } = useSelect( ( select ) => {
+		const {
+			__experimentalGetBlockPatterns,
+			getBlockType,
+			__experimentalGetDefaultBlockPattern,
+		} = select( 'core/blocks' );
+
+		return {
+			blockType: getBlockType( name ),
+			defaultPattern: __experimentalGetDefaultBlockPattern( name ),
+			hasInnerBlocks: select( 'core/block-editor' ).getBlocks( clientId ).length > 0,
+			patterns: __experimentalGetBlockPatterns( name ),
+		};
+	}, [ clientId, name ] );
+
+	const { replaceInnerBlocks } = useDispatch( 'core/block-editor' );
+
+	if ( hasInnerBlocks ) {
+		return (
+			<ColumnsEditContainerWrapper { ...props } />
+		);
+	}
+
+	return (
+		<__experimentalBlockPatternPicker
+			icon={ get( blockType, [ 'icon', 'src' ] ) }
+			label={ get( blockType, [ 'title' ] ) }
+			patterns={ patterns }
+			onSelect={ ( nextPattern = defaultPattern ) => {
+				if ( nextPattern.attributes ) {
+					props.setAttributes( nextPattern.attributes );
+				}
+				if ( nextPattern.innerBlocks ) {
+					replaceInnerBlocks(
+						props.clientId,
+						createBlocksFromInnerBlocksTemplate( nextPattern.innerBlocks )
+					);
+				}
+			} }
+			allowSkip
+		/> );
+};
+
+export default ColumnsEdit;
