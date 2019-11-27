@@ -200,7 +200,7 @@ describe( 'Change detection', () => {
 
 			// Ensure save update fails and presents button.
 			page.waitForXPath(
-				'//*[contains(@class, "components-notice") and contains(@class, "is-error")]/*[text()="Updating failed. Error message: The response is not a valid JSON response."]'
+				'//*[contains(@class, "components-notice") and contains(@class, "is-error")]/*[text()="Updating failed. You are probably offline."]'
 			),
 			page.waitForSelector( '.editor-post-save-draft' ),
 		] );

@@ -150,6 +150,17 @@ describe( 'apiFetch', () => {
 		} );
 	} );
 
+	it( 'should return offline error when fetch errors', () => {
+		window.fetch.mockReturnValue( Promise.reject() );
+
+		return apiFetch( { path: '/random' } ).catch( ( body ) => {
+			expect( body ).toEqual( {
+				code: 'fetch_error',
+				message: 'You are probably offline.',
+			} );
+		} );
+	} );
+
 	it( 'should return null if response has no content status code', () => {
 		window.fetch.mockReturnValue( Promise.resolve( {
 			status: 204,
