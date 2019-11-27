@@ -270,9 +270,8 @@ export default compose( [
 		const selectedBlockClientId = getSelectedBlockClientId();
 
 		const commonAncestor = getLowestCommonAncestorWithSelectedBlock( clientId );
-		const clientTree = [ clientId, ...parents ];
-		const commonAncestorIndex = clientTree.indexOf( commonAncestor ) - 1;
-		const firstToSelectId = commonAncestor || selectedBlockClientId ? clientTree[ commonAncestorIndex ] : rootBlockId;
+		const commonAncestorIndex = parents.indexOf( commonAncestor ) - 1;
+		const firstToSelectId = commonAncestor ? parents[ commonAncestorIndex ] : parents[ parents.length - 1 ];
 
 		const hasChildren = !! getBlockCount( clientId );
 		const hasParent = !! parents[ 0 ];
@@ -281,8 +280,9 @@ export default compose( [
 		const selectionIsNested = !! getBlockRootClientId( selectedBlockClientId );
 
 		const isDescendantSelected = selectedBlockClientId && getBlockParents( selectedBlockClientId ).includes( clientId );
-		const isTouchable = isSelected || isDescendantSelected || selectedBlockClientId === parentId || parentId === '';
-		const isDimmed = ! isSelected && selectionIsNested && ! isAncestorSelected && ! isDescendantSelected && ( firstToSelectId === clientId || rootBlockId === clientId );
+		const isDescendantOfParentSelected = selectedBlockClientId && getBlockParents( selectedBlockClientId ).includes( parentId );
+		const isTouchable = isSelected || isDescendantSelected || isDescendantOfParentSelected || isParentSelected || parentId === '';
+		const isDimmed = ! isSelected && selectionIsNested && ! isAncestorSelected && ! isDescendantSelected && ( isDescendantOfParentSelected || rootBlockId === clientId );
 
 		const isInnerBlockHolder = name === getGroupingBlockName();
 
