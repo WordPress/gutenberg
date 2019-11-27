@@ -218,7 +218,7 @@ export class RichText extends Component {
 	}
 
 	removeRootTag( tag, html ) {
-		const openingTagRegexp = RegExp( '^<' + tag + '>', 'gim' );
+		const openingTagRegexp = RegExp( '^<' + tag + '[^>]*>', 'gim' );
 		const closingTagRegexp = RegExp( '</' + tag + '>$', 'gim' );
 		return html.replace( openingTagRegexp, '' ).replace( closingTagRegexp, '' );
 	}
