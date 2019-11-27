@@ -97,7 +97,7 @@ export class BlockList extends Component {
 				/>
 
 				{ renderAppender && blockClientIds.length > 0 && (
-					<View style={ [ ! this.props.hasInnerBlocks && { paddingHorizontal: 12 } ] }>
+					<View style={ styles.paddingToContent }>
 						<BlockListAppender
 							rootClientId={ this.props.rootClientId }
 							renderAppender={ this.props.renderAppender }

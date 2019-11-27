@@ -45,3 +45,8 @@
 .blockListFooter {
 	height: 80px;
 }
+
+.paddingToContent {
+	padding-left: $block-custom-appender-to-content;
+	padding-right: $block-custom-appender-to-content;
+}
