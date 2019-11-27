@@ -105,4 +105,8 @@ export function requestImageFullscreenPreview( mediaUrl ) {
 	return RNReactNativeGutenbergBridge.requestImageFullscreenPreview( mediaUrl );
 }
 
+export function fetchRequest( path ) {
+	return RNReactNativeGutenbergBridge.fetchRequest( path );
+}
+
 export default RNReactNativeGutenbergBridge;

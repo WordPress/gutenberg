@@ -130,6 +130,18 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
 
         delegate?.gutenbergDidEmitLog(message: message, logLevel: logLevel)
     }
+    
+    @objc
+    func requestImageFullscreenPreview(_ urlString: String) {
+        guard let url = URL(string: urlString) else {
+            assertionFailure("Given String is not a URL")
+            return
+        }
+        
+        DispatchQueue.main.async {
+            self.delegate?.gutenbergDidRequestFullscreenImage(with: url)
+        }
+    }
 
     private func shouldLog(with level: Int) -> Bool {
         return level >= RCTGetLogThreshold().rawValue
@@ -150,6 +162,18 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
         DispatchQueue.main.async {
             self.delegate?.editorDidAutosave()
         }
+    }
+
+    @objc
+    func fetchRequest(_ path: String, resolver: @escaping RCTPromiseResolveBlock, rejecter: @escaping RCTPromiseRejectBlock) {
+        self.delegate?.gutenbergDidRequestFetch(path: path, completion: { (result) in
+            switch result {
+            case .success(let response):
+                resolver(response)
+            case .failure(let error):
+                rejecter("\(error.code)", error.description, error)
+            }
+        })
     }
 
 

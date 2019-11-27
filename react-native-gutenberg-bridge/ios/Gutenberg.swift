@@ -63,7 +63,7 @@ public class Gutenberg: NSObject {
         if let translations = dataSource.gutenbergTranslations() {
             initialProps["translations"] = translations
         }
-        
+
         return initialProps
     }
 
