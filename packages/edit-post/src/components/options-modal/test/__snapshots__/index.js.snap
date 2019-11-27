@@ -7,25 +7,6 @@ exports[`OptionsModal should match snapshot when the modal is active 1`] = `
   title="Options"
 >
   <Section
-    title="View"
-  >
-    <WithSelect(WithDispatch(BaseOption))
-      feature="fixedToolbar"
-      help="Access all block and document tools in a single place"
-      label="Top Toolbar"
-    />
-    <WithSelect(WithDispatch(BaseOption))
-      feature="focusMode"
-      help="Focus on one block at a time"
-      label="Spotlight Mode"
-    />
-    <WithSelect(WithDispatch(BaseOption))
-      feature="fullscreenMode"
-      help="Work without distraction"
-      label="Fullscreen Mode"
-    />
-  </Section>
-  <Section
     title="General"
   >
     <WithSelect(WithDispatch(IfViewportMatches(BaseOption)))

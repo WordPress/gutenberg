@@ -28,6 +28,7 @@ export default function VerseEdit( { attributes, setAttributes, className, merge
 			</BlockControls>
 			<RichText
 				tagName="pre"
+				preserveWhiteSpace
 				value={ content }
 				onChange={ ( nextContent ) => {
 					setAttributes( {

@@ -104,7 +104,6 @@ class EditorProvider extends Component {
 				'titlePlaceholder',
 				'onUpdateDefaultBlockStyles',
 				'__experimentalEnableLegacyWidgetBlock',
-				'__experimentalEnableMenuBlock',
 				'__experimentalBlockDirectory',
 				'__experimentalEnableFullSiteEditing',
 				'showInserterHelpPanel',
