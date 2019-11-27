@@ -1,37 +1,27 @@
-// We have to hide admin-bar in editor on mobile, in order to make the Mobile Safari experience bearable.
-// These two rules need to be moved to somewhere appropriate, and the !importants removed.
-#wpadminbar {
-	display: none;
-	@include break-small() {
-		display: initial;
-	}
-}
-#wpbody {
-	padding-top: 0 !important;
-	@include break-small() {
-		padding-top: initial !important;
+// On Mobile devices, swiping the HTML element should not scroll.
+// By making it fixed, we prevent that.
+html {
+	position: fixed;
+	width: 100%;
+
+	@include break-medium() {
+		position: initial;
+		width: initial;
 	}
 }
 
 .edit-post-editor-regions {
 	display: flex;
 	flex-direction: column;
-	height: 100%;
+	height: auto;
 	max-height: 100%;
 
-	// Fill the entire screen on Mobile.
-	// We don't show the WP-adminbar, as editing on Mobile Safari is barely usable with it present.
+	// Fill the available space on Mobile.
 	position: fixed;
-	top: 0;
+	top: $admin-bar-height-big;
 	left: 0;
 	right: 0;
 	bottom: 0;
-
-	// Unhide the admin-bar.
-	@include break-small() {
-		height: auto;
-		top: $admin-bar-height-big;
-	}
 
 	// Adjust to admin-bar going small.
 	@include break-medium() {
