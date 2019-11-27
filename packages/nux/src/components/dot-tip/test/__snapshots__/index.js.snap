@@ -2,7 +2,6 @@
 
 exports[`DotTip should render correctly 1`] = `
 <Popover
-  shouldAnchorIncludePadding={true}
   aria-label="Editor tips"
   className="nux-dot-tip"
   focusOnMount="container"
@@ -11,6 +10,7 @@ exports[`DotTip should render correctly 1`] = `
   onFocusOutside={[Function]}
   position="middle right"
   role="dialog"
+  shouldAnchorIncludePadding={true}
 >
   <p>
     It looks like you’re writing a letter. Would you like help?
