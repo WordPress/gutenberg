@@ -5,9 +5,9 @@ import {
 	useEntityProp,
 	__experimentalUseEntitySaving,
 } from '@wordpress/core-data';
-import { RichText } from '@wordpress/block-editor';
+import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { Disabled, Button } from '@wordpress/components';
+import { RichText } from '@wordpress/block-editor';
 
 export default function SiteTitleEdit() {
 	const [ title, setTitle, titleIsLocked ] = useEntityProp(
@@ -21,15 +21,6 @@ export default function SiteTitleEdit() {
 		'title'
 	);
 
-	const input = (
-		<RichText
-			tagName="h1"
-			placeholder={ __( 'Site Title' ) }
-			value={ title }
-			onChange={ setTitle }
-			allowedFormats={ [] }
-		/>
-	);
 	return (
 		<>
 			<Button
@@ -41,7 +32,14 @@ export default function SiteTitleEdit() {
 			>
 				{ __( 'Update' ) }
 			</Button>
-			{ titleIsLocked ? <Disabled>{ input }</Disabled> : input }
+			<RichText
+				tagName="h1"
+				placeholder={ __( 'Site Title' ) }
+				value={ title }
+				onChange={ setTitle }
+				allowedFormats={ [] }
+				disabled={ titleIsLocked }
+			/>
 		</>
 	);
 }
