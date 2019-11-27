@@ -41,16 +41,13 @@ export default class PlainText extends Component {
 			<TextInput
 				{ ...this.props }
 				ref={ ( x ) => this._input = x }
-				className={ [ styles[ 'block-editor-plain-text' ], this.props.className ] }
 				onChange={ ( event ) => {
 					this.props.onChange( event.nativeEvent.text );
 				} }
 				onFocus={ this.props.onFocus } // always assign onFocus as a props
 				onBlur={ this.props.onBlur } // always assign onBlur as a props
 				fontFamily={ this.props.fontFamily || ( styles[ 'block-editor-plain-text' ].fontFamily ) }
-				fontSize={ this.props.fontSize }
-				fontWeight={ this.props.fontWeight }
-				fontStyle={ this.props.fontStyle }
+				style={ this.props.style || styles[ 'block-editor-plain-text' ] }
 			/>
 		);
 	}
