@@ -1,5 +1,7 @@
 package org.wordpress.mobile.WPAndroidGlue;
 
+import androidx.annotation.NonNull;
+
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.RNMedia;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeMap;
@@ -20,6 +22,21 @@ public class Media implements RNMedia {
         this.mUrl = url;
         this.mType = "";
     }
+
+    public static Media createRNMediaUsingMimeType(final int id, final String url, @NonNull final String mimeType) {
+        String type;
+
+        if (mimeType.startsWith("image")) {
+            type =  "image";
+        } else if (mimeType.startsWith("video")) {
+            type =  "video";
+        } else {
+            type = "";
+        }
+
+        return new Media(id, url, type);
+    }
+
 
     public int getId() {
         return mId;
