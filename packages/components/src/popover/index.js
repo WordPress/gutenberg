@@ -157,7 +157,7 @@ function withoutPadding( rect, element ) {
  * @param {Object}        contentRef                 Reference to the popover content element.
  * @param {Object}        anchorRect                 Anchor Rect prop used to override the computed value.
  * @param {Function}      getAnchorRect              Function used to override the anchor value computation algorithm.
- * @param {Element|Range} anchorRef                  Reference to the popover anchor fallback element.
+ * @param {Element|Range} anchorRef                  A live element or range reference.
  * @param {boolean}       shouldAnchorIncludePadding Whether to include the anchor padding.
  * @param {number}        anchorVerticalBuffer       Vertical buffer for the anchor.
  * @param {number}        anchorHorizontalBuffer     Horizontal buffer for the anchor.
