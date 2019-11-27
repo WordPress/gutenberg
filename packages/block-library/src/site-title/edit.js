@@ -11,7 +11,7 @@ import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { RichText } from '@wordpress/block-editor';
 
-export function SiteTitleEdit( props ) {
+export function SiteTitleEdit( { canUpdate, isSelected } ) {
 	const [ title, setTitle ] = useEntityProp( 'root', 'site', 'title' );
 	const [ isDirty, isSaving, save ] = __experimentalUseEntitySaving(
 		'root',
@@ -44,7 +44,7 @@ export function SiteTitleEdit( props ) {
 		<h1>{ title }</h1>
 	);
 
-	return ( props.canUpdate && props.isSelected ) ? editMode : viewMode;
+	return ( canUpdate && isSelected ) ? editMode : viewMode;
 }
 
 export default compose( [
