@@ -106,7 +106,7 @@ jobs:
         - npm ci
         - npm run build
       script:
-        - npm run lint-es5-only
+        - npx eslint --parser-options=ecmaVersion:5 --no-eslintrc --no-ignore ./build/**/*.js
 
     - name: Build artifacts
       install:
