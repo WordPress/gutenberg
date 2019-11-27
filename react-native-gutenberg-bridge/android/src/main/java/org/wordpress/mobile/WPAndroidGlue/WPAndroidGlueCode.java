@@ -143,6 +143,10 @@ public class WPAndroidGlueCode {
         void onEditorAutosave();
     }
 
+    public void mediaSelectionCancelled() {
+        mAppendsMultipleSelectedToSiblingBlocks = false;
+    }
+
     protected List<ReactPackage> getPackages() {
         mRnReactNativeGutenbergBridgePackage = new RNReactNativeGutenbergBridgePackage(new GutenbergBridgeJS2Parent() {
             @Override
