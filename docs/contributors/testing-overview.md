@@ -355,6 +355,21 @@ Sometimes we need to mock refs for some stories which use them. Check the follow
 - [Using createNodeMock to mock refs](https://github.com/storybookjs/storybook/tree/master/addons/storyshots/storyshots-core#using-createnodemock-to-mock-refs) with StoryShots.
 
 In that case, you might see test failures and `TypeError` reported by Jest in the lines which try to access a property from `ref.current`. If this happens, search for `initStoryshots` method call, which contains all necessary configurations to adjust.
+
+### Visual Regression Testing
+
+> [@percy/storybook](https://docs.percy.io/docs/storybook) adds automattic Visual Regression Testing for [Storybook](https://storybook.js.org/).
+
+A Visual Regression Test compares an image of the UI before a change is made with an image of the UI after a change is made.
+
+Subtle changes to HTML markup or CSS rules can result in significant changes to a UI, particularly affecting layout. When the changes to HTML markup or CSS rules are subtle it is often difficult to gague what impact the change might have on the visuals from a diff.
+
+The Visual Regression Tests are setup to run across multiple browsers and can find visual flaws caused by browser inconsistencies.
+
+The tests are automated saving time and effort for a human to review all the stories in all the browsers.
+
+The visual regression tests run on CI and failing tests will need to be [reviewed](https://docs.percy.io/docs/github#section-step-3-run-and-review-builds) by a contributor.
+
 ## Native mobile testing
 
 Part of the unit-tests suite is a set of Jest tests run exercise native-mobile codepaths, developed in React Native. Since those tests run on Node, they can be launched locally on your development machine without the need for specific native Android or iOS dev tools or SDKs. It also means that they can be debugged using typical dev tools. Read on for instructions how to debug.
