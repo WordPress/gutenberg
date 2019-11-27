@@ -1,11 +1,12 @@
 .edit-post-sidebar {
 	background: $white;
 	color: $dark-gray-500;
+	overflow: visible;
 
 	@include break-small() {
 		z-index: auto;
 		height: 100%;
-		overflow: auto;
+		overflow: visible;
 		-webkit-overflow-scrolling: touch;
 	}
 

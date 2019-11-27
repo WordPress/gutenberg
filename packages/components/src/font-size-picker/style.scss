@@ -7,6 +7,8 @@
 	// Apply the same height as the isSmall Reset button.
 	.components-range-control__number {
 		height: 30px;
+		margin-bottom: 0;
+		margin-top: 5px;
 		margin-left: 0;
 		margin-right: $grid-size;
 
@@ -16,12 +18,22 @@
 			opacity: 0.3;
 			pointer-events: none;
 		}
+
+		&-container {
+			display: flex;
+			flex-direction: column;
+		}
 	}
 
 	// Allow the font-size picker dropdown to grow in width.
 	.components-font-size-picker__select {
 		margin-right: $grid-size;
 		flex-grow: 1;
+	}
+
+	.components-color-palette__clear {
+		height: 30px;
+		margin-top: 23px;
 	}
 }
 

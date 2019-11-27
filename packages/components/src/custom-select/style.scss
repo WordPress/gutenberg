@@ -13,7 +13,7 @@
 	border-radius: 4px;
 	color: $dark-gray-500;
 	display: inline;
-	min-height: 28px;
+	min-height: 30px;
 	min-width: 130px;
 	position: relative;
 	text-align: left;
@@ -50,6 +50,7 @@
 	}
 
 	&-icon {
-		margin-left: -25px;
+		margin-left: -20px;
+		margin-right: 0;
 	}
 }

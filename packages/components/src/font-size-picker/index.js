@@ -4,6 +4,7 @@
  */
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { withInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -38,6 +39,7 @@ function FontSizePicker( {
 	onChange,
 	value,
 	withSlider = false,
+	instanceId,
 } ) {
 	const [ currentSelectValue, setCurrentSelectValue ] = useState( getSelectValueFromFontSize( fontSizes, value ) );
 
@@ -61,30 +63,34 @@ function FontSizePicker( {
 	};
 
 	const items = getSelectOptions( fontSizes );
+	const rangeControlNumberId = `components-range-control__number#${ instanceId }`;
 	return (
 		<fieldset className="components-font-size-picker">
-			<legend>
+			<legend className="screen-reader-text">
 				{ __( 'Font Size' ) }
 			</legend>
 			<div className="components-font-size-picker__controls">
 				{ ( fontSizes.length > 0 ) &&
 					<CustomSelect
 						className={ 'components-font-size-picker__select' }
-						hideLabelFromVision
-						label={ __( 'Font Size' ) }
+						label={ __( 'Preset Size' ) }
 						items={ items }
 						selectedItem={ items.find( ( item ) => item.key === currentSelectValue ) || items[ 0 ] }
 						onSelectedItemChange={ onSelectChangeValue }
 					/>
 				}
 				{ ( ! withSlider && ! disableCustomFontSizes ) &&
-					<input
-						className="components-range-control__number"
-						type="number"
-						onChange={ onChangeValue }
-						aria-label={ __( 'Custom' ) }
-						value={ value || '' }
-					/>
+					<div className="components-range-control__number-container">
+						<label htmlFor={ rangeControlNumberId }>{ __( 'Custom' ) }</label>
+						<input
+							id={ rangeControlNumberId }
+							className="components-range-control__number"
+							type="number"
+							onChange={ onChangeValue }
+							aria-label={ __( 'Custom' ) }
+							value={ value || '' }
+						/>
+					</div>
 				}
 				<Button
 					className="components-color-palette__clear"
@@ -117,4 +123,4 @@ function FontSizePicker( {
 	);
 }
 
-export default FontSizePicker;
+export default withInstanceId( FontSizePicker );
