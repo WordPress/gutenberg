@@ -3,6 +3,7 @@
   "version": "0.1.11",
   "private": true,
   "description": "Aztec view for react-native.",
+  "private": true,
   "author": "The WordPress Contributors",
   "license": "GPL-2.0-or-later",
   "keywords": [
