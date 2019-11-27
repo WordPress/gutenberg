@@ -178,6 +178,7 @@
 		"fixtures:generate": "npm run fixtures:server-registered && cross-env GENERATE_MISSING_FIXTURES=y npm run test-unit",
 		"fixtures:regenerate": "npm run fixtures:clean && npm run fixtures:generate",
 		"lint": "concurrently \"npm run lint-js\" \"npm run lint-pkg-json\" \"npm run lint-css\" \"npm run lint-types\"",
+		"lint-es5-only": "npx eslint --parser-options=ecmaVersion:5 --no-eslintrc --no-ignore ./build/**/*.js",
 		"lint-js": "wp-scripts lint-js",
 		"lint-js:fix": "npm run lint-js -- --fix",
 		"lint-php": "wp-scripts env lint-php",

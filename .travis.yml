@@ -101,6 +101,13 @@ jobs:
       script:
         - npm run lint
 
+    - name: Lint ES5 only
+      install:
+        - npm ci
+        - npm run build
+      script:
+        - npm run lint-es5-only
+
     - name: Build artifacts
       install:
         # A "full" install is executed, since `npm ci` does not always exit
