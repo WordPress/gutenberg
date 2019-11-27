@@ -1,3 +1,7 @@
+1.19.0
+------
+* [iOS] Fix crash dismissing bottom-sheet after device rotation.
+
 1.18.0
 ------
 * [iOS] Added native fullscreen preview when clicking image from Image Block
