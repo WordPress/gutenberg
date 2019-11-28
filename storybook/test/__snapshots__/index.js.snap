@@ -778,8 +778,117 @@ exports[`Storyshots Components|ButtonGroup Default 1`] = `
 `;
 
 exports[`Storyshots Components|Card Default 1`] = `
+.emotion-6 {
+  background: #fff;
+  box-sizing: border-box;
+  border-radius: 3px;
+  border: 1px solid #e2e4e7;
+}
+
+.emotion-6.is-borderless {
+  border: none;
+}
+
+.emotion-6.is-elevated {
+  box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12);
+}
+
+.emotion-0 {
+  border-bottom: 1px solid #e2e4e7;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  box-sizing: border-box;
+}
+
+.emotion-0:last-child {
+  border-bottom: none;
+}
+
+.emotion-0.is-size-large {
+  padding: 20px 28px;
+}
+
+.emotion-0.is-size-medium {
+  padding: 12px 20px;
+}
+
+.emotion-0.is-size-small {
+  padding: 8px 12px;
+}
+
+.emotion-0.is-size-extraSmall {
+  padding: 4px 8px;
+}
+
+.emotion-0.is-borderless {
+  border: none;
+}
+
+.emotion-0.is-shady {
+  background: #f3f4f5;
+}
+
+.emotion-2 {
+  box-sizing: border-box;
+}
+
+.emotion-2.is-size-large {
+  padding: 28px;
+}
+
+.emotion-2.is-size-medium {
+  padding: 20px;
+}
+
+.emotion-2.is-size-small {
+  padding: 12px;
+}
+
+.emotion-2.is-size-extraSmall {
+  padding: 8px;
+}
+
+.emotion-2.is-shady {
+  background: #f3f4f5;
+}
+
+.emotion-4 {
+  border-top: 1px solid #e2e4e7;
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+  box-sizing: border-box;
+}
+
+.emotion-4:first-of-type {
+  border-top: none;
+}
+
+.emotion-4.is-size-large {
+  padding: 20px 28px;
+}
+
+.emotion-4.is-size-medium {
+  padding: 12px 20px;
+}
+
+.emotion-4.is-size-small {
+  padding: 8px 12px;
+}
+
+.emotion-4.is-size-extraSmall {
+  padding: 4px 8px;
+}
+
+.emotion-4.is-borderless {
+  border: none;
+}
+
+.emotion-4.is-shady {
+  background: #f3f4f5;
+}
+
 <div
-  className="components-card is-size-medium css-l3gor6-CardUI e1q7k77g0"
+  className="components-card is-size-medium emotion-6 emotion-7"
   style={
     Object {
       "width": "360px",
@@ -787,17 +896,17 @@ exports[`Storyshots Components|Card Default 1`] = `
   }
 >
   <div
-    className="components-card__header is-size-medium css-6qsnk-HeaderUI e1q7k77g1"
+    className="components-card__header is-size-medium emotion-0 emotion-1"
   >
     Header
   </div>
   <div
-    className="components-card__body is-size-medium css-1yyn1r2-BodyUI e1q7k77g3"
+    className="components-card__body is-size-medium emotion-2 emotion-3"
   >
     Code is Poetry
   </div>
   <div
-    className="components-card__footer is-size-medium css-wy9sfy-FooterUI e1q7k77g4"
+    className="components-card__footer is-size-medium emotion-4 emotion-5"
   >
     Footer
   </div>
@@ -805,8 +914,47 @@ exports[`Storyshots Components|Card Default 1`] = `
 `;
 
 exports[`Storyshots Components|Card/Body Default 1`] = `
+.emotion-2 {
+  background: #fff;
+  box-sizing: border-box;
+  border-radius: 3px;
+  border: 1px solid #e2e4e7;
+}
+
+.emotion-2.is-borderless {
+  border: none;
+}
+
+.emotion-2.is-elevated {
+  box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12);
+}
+
+.emotion-0 {
+  box-sizing: border-box;
+}
+
+.emotion-0.is-size-large {
+  padding: 28px;
+}
+
+.emotion-0.is-size-medium {
+  padding: 20px;
+}
+
+.emotion-0.is-size-small {
+  padding: 12px;
+}
+
+.emotion-0.is-size-extraSmall {
+  padding: 8px;
+}
+
+.emotion-0.is-shady {
+  background: #f3f4f5;
+}
+
 <div
-  className="components-card is-size-medium css-l3gor6-CardUI e1q7k77g0"
+  className="components-card is-size-medium emotion-2 emotion-3"
   style={
     Object {
       "width": "360px",
@@ -814,7 +962,7 @@ exports[`Storyshots Components|Card/Body Default 1`] = `
   }
 >
   <div
-    className="components-card__body is-size-medium css-1yyn1r2-BodyUI e1q7k77g3"
+    className="components-card__body is-size-medium emotion-0 emotion-1"
   >
     Content
   </div>
@@ -822,8 +970,56 @@ exports[`Storyshots Components|Card/Body Default 1`] = `
 `;
 
 exports[`Storyshots Components|Card/Divider Default 1`] = `
+.emotion-6 {
+  background: #fff;
+  box-sizing: border-box;
+  border-radius: 3px;
+  border: 1px solid #e2e4e7;
+}
+
+.emotion-6.is-borderless {
+  border: none;
+}
+
+.emotion-6.is-elevated {
+  box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12);
+}
+
+.emotion-0 {
+  box-sizing: border-box;
+}
+
+.emotion-0.is-size-large {
+  padding: 28px;
+}
+
+.emotion-0.is-size-medium {
+  padding: 20px;
+}
+
+.emotion-0.is-size-small {
+  padding: 12px;
+}
+
+.emotion-0.is-size-extraSmall {
+  padding: 8px;
+}
+
+.emotion-0.is-shady {
+  background: #f3f4f5;
+}
+
+.emotion-2 {
+  all: unset;
+  border-top: 1px solid #e2e4e7;
+  box-sizing: border-box;
+  display: block;
+  height: 0;
+  width: 100%;
+}
+
 <div
-  className="components-card is-size-medium css-l3gor6-CardUI e1q7k77g0"
+  className="components-card is-size-medium emotion-6 emotion-7"
   style={
     Object {
       "width": "360px",
@@ -831,16 +1027,16 @@ exports[`Storyshots Components|Card/Divider Default 1`] = `
   }
 >
   <div
-    className="components-card__body is-size-medium css-1yyn1r2-BodyUI e1q7k77g3"
+    className="components-card__body is-size-medium emotion-0 emotion-1"
   >
     ...
   </div>
   <hr
-    className="components-card__divider css-lh2anh-DividerUI e1q7k77g5"
+    className="components-card__divider emotion-2 emotion-3"
     role="separator"
   />
   <div
-    className="components-card__body is-size-medium css-1yyn1r2-BodyUI e1q7k77g3"
+    className="components-card__body is-size-medium emotion-0 emotion-1"
   >
     ...
   </div>
@@ -848,8 +1044,58 @@ exports[`Storyshots Components|Card/Divider Default 1`] = `
 `;
 
 exports[`Storyshots Components|Card/Footer Default 1`] = `
+.emotion-2 {
+  background: #fff;
+  box-sizing: border-box;
+  border-radius: 3px;
+  border: 1px solid #e2e4e7;
+}
+
+.emotion-2.is-borderless {
+  border: none;
+}
+
+.emotion-2.is-elevated {
+  box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12);
+}
+
+.emotion-0 {
+  border-top: 1px solid #e2e4e7;
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+  box-sizing: border-box;
+}
+
+.emotion-0:first-of-type {
+  border-top: none;
+}
+
+.emotion-0.is-size-large {
+  padding: 20px 28px;
+}
+
+.emotion-0.is-size-medium {
+  padding: 12px 20px;
+}
+
+.emotion-0.is-size-small {
+  padding: 8px 12px;
+}
+
+.emotion-0.is-size-extraSmall {
+  padding: 4px 8px;
+}
+
+.emotion-0.is-borderless {
+  border: none;
+}
+
+.emotion-0.is-shady {
+  background: #f3f4f5;
+}
+
 <div
-  className="components-card is-size-medium css-l3gor6-CardUI e1q7k77g0"
+  className="components-card is-size-medium emotion-2 emotion-3"
   style={
     Object {
       "width": "360px",
@@ -857,7 +1103,7 @@ exports[`Storyshots Components|Card/Footer Default 1`] = `
   }
 >
   <div
-    className="components-card__footer is-size-medium css-wy9sfy-FooterUI e1q7k77g4"
+    className="components-card__footer is-size-medium emotion-0 emotion-1"
   >
     Content
   </div>
@@ -865,8 +1111,58 @@ exports[`Storyshots Components|Card/Footer Default 1`] = `
 `;
 
 exports[`Storyshots Components|Card/Header Default 1`] = `
+.emotion-2 {
+  background: #fff;
+  box-sizing: border-box;
+  border-radius: 3px;
+  border: 1px solid #e2e4e7;
+}
+
+.emotion-2.is-borderless {
+  border: none;
+}
+
+.emotion-2.is-elevated {
+  box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12);
+}
+
+.emotion-0 {
+  border-bottom: 1px solid #e2e4e7;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  box-sizing: border-box;
+}
+
+.emotion-0:last-child {
+  border-bottom: none;
+}
+
+.emotion-0.is-size-large {
+  padding: 20px 28px;
+}
+
+.emotion-0.is-size-medium {
+  padding: 12px 20px;
+}
+
+.emotion-0.is-size-small {
+  padding: 8px 12px;
+}
+
+.emotion-0.is-size-extraSmall {
+  padding: 4px 8px;
+}
+
+.emotion-0.is-borderless {
+  border: none;
+}
+
+.emotion-0.is-shady {
+  background: #f3f4f5;
+}
+
 <div
-  className="components-card is-size-medium css-l3gor6-CardUI e1q7k77g0"
+  className="components-card is-size-medium emotion-2 emotion-3"
   style={
     Object {
       "width": "360px",
@@ -874,7 +1170,7 @@ exports[`Storyshots Components|Card/Header Default 1`] = `
   }
 >
   <div
-    className="components-card__header is-size-medium css-6qsnk-HeaderUI e1q7k77g1"
+    className="components-card__header is-size-medium emotion-0 emotion-1"
   >
     Content
   </div>
@@ -882,8 +1178,70 @@ exports[`Storyshots Components|Card/Header Default 1`] = `
 `;
 
 exports[`Storyshots Components|Card/Media Default 1`] = `
+.emotion-4 {
+  background: #fff;
+  box-sizing: border-box;
+  border-radius: 3px;
+  border: 1px solid #e2e4e7;
+}
+
+.emotion-4.is-borderless {
+  border: none;
+}
+
+.emotion-4.is-elevated {
+  box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12);
+}
+
+.emotion-2 {
+  box-sizing: border-box;
+}
+
+.emotion-2.is-size-large {
+  padding: 28px;
+}
+
+.emotion-2.is-size-medium {
+  padding: 20px;
+}
+
+.emotion-2.is-size-small {
+  padding: 12px;
+}
+
+.emotion-2.is-size-extraSmall {
+  padding: 8px;
+}
+
+.emotion-2.is-shady {
+  background: #f3f4f5;
+}
+
+.emotion-0 {
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.emotion-0 > img,
+.emotion-0 > iframe {
+  display: block;
+  height: auto;
+  max-width: 100%;
+  width: 100%;
+}
+
+.emotion-0:first-of-type {
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+
+.emotion-0:last-of-type {
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+}
+
 <div
-  className="components-card is-size-medium css-l3gor6-CardUI e1q7k77g0"
+  className="components-card is-size-medium emotion-4 emotion-5"
   style={
     Object {
       "width": "360px",
@@ -891,7 +1249,7 @@ exports[`Storyshots Components|Card/Media Default 1`] = `
   }
 >
   <div
-    className="components-card__media css-eunfqt-MediaUI e1q7k77g2"
+    className="components-card__media emotion-0 emotion-1"
   >
     <img
       alt="SMELLING MARSHMELLOW ICECREAM CONE"
@@ -899,7 +1257,7 @@ exports[`Storyshots Components|Card/Media Default 1`] = `
     />
   </div>
   <div
-    className="components-card__body is-size-medium css-1yyn1r2-BodyUI e1q7k77g3"
+    className="components-card__body is-size-medium emotion-2 emotion-3"
   >
     Content
   </div>
@@ -907,8 +1265,116 @@ exports[`Storyshots Components|Card/Media Default 1`] = `
 `;
 
 exports[`Storyshots Components|Card/Media Header And Footer 1`] = `
+.emotion-6 {
+  background: #fff;
+  box-sizing: border-box;
+  border-radius: 3px;
+  border: 1px solid #e2e4e7;
+}
+
+.emotion-6.is-borderless {
+  border: none;
+}
+
+.emotion-6.is-elevated {
+  box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12);
+}
+
+.emotion-0 {
+  border-bottom: 1px solid #e2e4e7;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  box-sizing: border-box;
+}
+
+.emotion-0:last-child {
+  border-bottom: none;
+}
+
+.emotion-0.is-size-large {
+  padding: 20px 28px;
+}
+
+.emotion-0.is-size-medium {
+  padding: 12px 20px;
+}
+
+.emotion-0.is-size-small {
+  padding: 8px 12px;
+}
+
+.emotion-0.is-size-extraSmall {
+  padding: 4px 8px;
+}
+
+.emotion-0.is-borderless {
+  border: none;
+}
+
+.emotion-0.is-shady {
+  background: #f3f4f5;
+}
+
+.emotion-4 {
+  border-top: 1px solid #e2e4e7;
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+  box-sizing: border-box;
+}
+
+.emotion-4:first-of-type {
+  border-top: none;
+}
+
+.emotion-4.is-size-large {
+  padding: 20px 28px;
+}
+
+.emotion-4.is-size-medium {
+  padding: 12px 20px;
+}
+
+.emotion-4.is-size-small {
+  padding: 8px 12px;
+}
+
+.emotion-4.is-size-extraSmall {
+  padding: 4px 8px;
+}
+
+.emotion-4.is-borderless {
+  border: none;
+}
+
+.emotion-4.is-shady {
+  background: #f3f4f5;
+}
+
+.emotion-2 {
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.emotion-2 > img,
+.emotion-2 > iframe {
+  display: block;
+  height: auto;
+  max-width: 100%;
+  width: 100%;
+}
+
+.emotion-2:first-of-type {
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+
+.emotion-2:last-of-type {
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+}
+
 <div
-  className="components-card is-size-medium css-l3gor6-CardUI e1q7k77g0"
+  className="components-card is-size-medium emotion-6 emotion-7"
   style={
     Object {
       "width": "360px",
@@ -916,12 +1382,12 @@ exports[`Storyshots Components|Card/Media Header And Footer 1`] = `
   }
 >
   <div
-    className="components-card__header is-size-medium css-6qsnk-HeaderUI e1q7k77g1"
+    className="components-card__header is-size-medium emotion-0 emotion-1"
   >
     Header Content
   </div>
   <div
-    className="components-card__media css-eunfqt-MediaUI e1q7k77g2"
+    className="components-card__media emotion-2 emotion-3"
   >
     <img
       alt="SMELLING MARSHMELLOW ICECREAM CONE"
@@ -929,7 +1395,7 @@ exports[`Storyshots Components|Card/Media Header And Footer 1`] = `
     />
   </div>
   <div
-    className="components-card__footer is-shady is-size-medium css-wy9sfy-FooterUI e1q7k77g4"
+    className="components-card__footer is-shady is-size-medium emotion-4 emotion-5"
   >
     Caption
   </div>
@@ -941,11 +1407,97 @@ Array [
   <p>
     Note: This story demonstrates how this UI may be created. It requires extra styling.
   </p>,
-  <div
-    className="components-card is-size-medium is-left e1gk3lep2 css-5mtgus-CardUI-HorizontallyAlignedCard e1q7k77g0"
+  .emotion-7 {
+  background: #fff;
+  box-sizing: border-box;
+  border-radius: 3px;
+  border: 1px solid #e2e4e7;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.emotion-7.is-borderless {
+  border: none;
+}
+
+.emotion-7.is-elevated {
+  box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12);
+}
+
+.emotion-7.is-right {
+  -webkit-flex-direction: row-reverse;
+  -ms-flex-direction: row-reverse;
+  flex-direction: row-reverse;
+}
+
+.emotion-7 .emotion-3 {
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+}
+
+.emotion-7 .emotion-0.is-left {
+  border-radius: 3px 0 0 3px;
+}
+
+.emotion-7 .emotion-0.is-right {
+  border-radius: 0 3px 3px 0;
+}
+
+.emotion-1 {
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.emotion-1 > img,
+.emotion-1 > iframe {
+  display: block;
+  height: auto;
+  max-width: 100%;
+  width: 100%;
+}
+
+.emotion-1:first-of-type {
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+
+.emotion-1:last-of-type {
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+}
+
+.emotion-4 {
+  box-sizing: border-box;
+}
+
+.emotion-4.is-size-large {
+  padding: 28px;
+}
+
+.emotion-4.is-size-medium {
+  padding: 20px;
+}
+
+.emotion-4.is-size-small {
+  padding: 12px;
+}
+
+.emotion-4.is-size-extraSmall {
+  padding: 8px;
+}
+
+.emotion-4.is-shady {
+  background: #f3f4f5;
+}
+
+<div
+    className="components-card is-size-medium is-left emotion-6 emotion-7 emotion-8"
   >
     <div
-      className="components-card__media is-left e1gk3lep0 css-7tds6a-MediaUI-StyledCardMedia e1q7k77g2"
+      className="components-card__media is-left emotion-0 emotion-1 emotion-2"
       style={
         Object {
           "maxWidth": 200,
@@ -958,7 +1510,7 @@ Array [
       />
     </div>
     <div
-      className="components-card__body is-size-medium e1gk3lep1 css-1drywz3-BodyUI-StyledCardBody e1q7k77g3"
+      className="components-card__body is-size-medium emotion-3 emotion-4 emotion-5"
     >
       Content
     </div>
@@ -967,8 +1519,81 @@ Array [
 `;
 
 exports[`Storyshots Components|Card/Media Iframe Embed 1`] = `
+.emotion-4 {
+  background: #fff;
+  box-sizing: border-box;
+  border-radius: 3px;
+  border: 1px solid #e2e4e7;
+}
+
+.emotion-4.is-borderless {
+  border: none;
+}
+
+.emotion-4.is-elevated {
+  box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12);
+}
+
+.emotion-0 {
+  border-bottom: 1px solid #e2e4e7;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  box-sizing: border-box;
+}
+
+.emotion-0:last-child {
+  border-bottom: none;
+}
+
+.emotion-0.is-size-large {
+  padding: 20px 28px;
+}
+
+.emotion-0.is-size-medium {
+  padding: 12px 20px;
+}
+
+.emotion-0.is-size-small {
+  padding: 8px 12px;
+}
+
+.emotion-0.is-size-extraSmall {
+  padding: 4px 8px;
+}
+
+.emotion-0.is-borderless {
+  border: none;
+}
+
+.emotion-0.is-shady {
+  background: #f3f4f5;
+}
+
+.emotion-2 {
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.emotion-2 > img,
+.emotion-2 > iframe {
+  display: block;
+  height: auto;
+  max-width: 100%;
+  width: 100%;
+}
+
+.emotion-2:first-of-type {
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+
+.emotion-2:last-of-type {
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+}
+
 <div
-  className="components-card is-size-medium css-l3gor6-CardUI e1q7k77g0"
+  className="components-card is-size-medium emotion-4 emotion-5"
   style={
     Object {
       "width": "360px",
@@ -976,12 +1601,12 @@ exports[`Storyshots Components|Card/Media Iframe Embed 1`] = `
   }
 >
   <div
-    className="components-card__header is-size-medium css-6qsnk-HeaderUI e1q7k77g1"
+    className="components-card__header is-size-medium emotion-0 emotion-1"
   >
     Header Content
   </div>
   <div
-    className="components-card__media css-eunfqt-MediaUI e1q7k77g2"
+    className="components-card__media emotion-2 emotion-3"
   >
     <iframe
       allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
@@ -997,8 +1622,70 @@ exports[`Storyshots Components|Card/Media Iframe Embed 1`] = `
 `;
 
 exports[`Storyshots Components|Card/Media On Bottom 1`] = `
+.emotion-4 {
+  background: #fff;
+  box-sizing: border-box;
+  border-radius: 3px;
+  border: 1px solid #e2e4e7;
+}
+
+.emotion-4.is-borderless {
+  border: none;
+}
+
+.emotion-4.is-elevated {
+  box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12);
+}
+
+.emotion-0 {
+  box-sizing: border-box;
+}
+
+.emotion-0.is-size-large {
+  padding: 28px;
+}
+
+.emotion-0.is-size-medium {
+  padding: 20px;
+}
+
+.emotion-0.is-size-small {
+  padding: 12px;
+}
+
+.emotion-0.is-size-extraSmall {
+  padding: 8px;
+}
+
+.emotion-0.is-shady {
+  background: #f3f4f5;
+}
+
+.emotion-2 {
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.emotion-2 > img,
+.emotion-2 > iframe {
+  display: block;
+  height: auto;
+  max-width: 100%;
+  width: 100%;
+}
+
+.emotion-2:first-of-type {
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+
+.emotion-2:last-of-type {
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+}
+
 <div
-  className="components-card is-size-medium css-l3gor6-CardUI e1q7k77g0"
+  className="components-card is-size-medium emotion-4 emotion-5"
   style={
     Object {
       "width": "360px",
@@ -1006,12 +1693,12 @@ exports[`Storyshots Components|Card/Media On Bottom 1`] = `
   }
 >
   <div
-    className="components-card__body is-size-medium css-1yyn1r2-BodyUI e1q7k77g3"
+    className="components-card__body is-size-medium emotion-0 emotion-1"
   >
     Content
   </div>
   <div
-    className="components-card__media css-eunfqt-MediaUI e1q7k77g2"
+    className="components-card__media emotion-2 emotion-3"
   >
     <img
       alt="SMELLING MARSHMELLOW ICECREAM CONE"
@@ -1022,8 +1709,70 @@ exports[`Storyshots Components|Card/Media On Bottom 1`] = `
 `;
 
 exports[`Storyshots Components|Card/Media On Top 1`] = `
+.emotion-4 {
+  background: #fff;
+  box-sizing: border-box;
+  border-radius: 3px;
+  border: 1px solid #e2e4e7;
+}
+
+.emotion-4.is-borderless {
+  border: none;
+}
+
+.emotion-4.is-elevated {
+  box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12);
+}
+
+.emotion-2 {
+  box-sizing: border-box;
+}
+
+.emotion-2.is-size-large {
+  padding: 28px;
+}
+
+.emotion-2.is-size-medium {
+  padding: 20px;
+}
+
+.emotion-2.is-size-small {
+  padding: 12px;
+}
+
+.emotion-2.is-size-extraSmall {
+  padding: 8px;
+}
+
+.emotion-2.is-shady {
+  background: #f3f4f5;
+}
+
+.emotion-0 {
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.emotion-0 > img,
+.emotion-0 > iframe {
+  display: block;
+  height: auto;
+  max-width: 100%;
+  width: 100%;
+}
+
+.emotion-0:first-of-type {
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+
+.emotion-0:last-of-type {
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+}
+
 <div
-  className="components-card is-size-medium css-l3gor6-CardUI e1q7k77g0"
+  className="components-card is-size-medium emotion-4 emotion-5"
   style={
     Object {
       "width": "360px",
@@ -1031,7 +1780,7 @@ exports[`Storyshots Components|Card/Media On Top 1`] = `
   }
 >
   <div
-    className="components-card__media css-eunfqt-MediaUI e1q7k77g2"
+    className="components-card__media emotion-0 emotion-1"
   >
     <img
       alt="SMELLING MARSHMELLOW ICECREAM CONE"
@@ -1039,7 +1788,7 @@ exports[`Storyshots Components|Card/Media On Top 1`] = `
     />
   </div>
   <div
-    className="components-card__body is-size-medium css-1yyn1r2-BodyUI e1q7k77g3"
+    className="components-card__body is-size-medium emotion-2 emotion-3"
   >
     <div>
       Content
@@ -3538,6 +4287,309 @@ exports[`Storyshots Components|TabPanel Default 1`] = `
     </p>
   </div>
 </div>
+`;
+
+exports[`Storyshots Components|Text Body 1`] = `
+.emotion-0 {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+}
+
+<p
+  className="emotion-0 emotion-1"
+>
+  Body
+</p>
+`;
+
+exports[`Storyshots Components|Text Body Small 1`] = `
+.emotion-0 {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+<p
+  className="emotion-0 emotion-1"
+>
+  Body Small
+</p>
+`;
+
+exports[`Storyshots Components|Text Button 1`] = `
+.emotion-0 {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+<p
+  className="emotion-0 emotion-1"
+>
+  Button
+</p>
+`;
+
+exports[`Storyshots Components|Text Caption 1`] = `
+.emotion-0 {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 16px;
+}
+
+<p
+  className="emotion-0 emotion-1"
+>
+  Caption
+</p>
+`;
+
+exports[`Storyshots Components|Text Default 1`] = `
+Array [
+  .emotion-0 {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 400;
+  font-size: 32px;
+  line-height: 40px;
+}
+
+<h1
+    className="emotion-0 emotion-1"
+  >
+    Title Large
+  </h1>,
+  .emotion-0 {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 400;
+  font-size: 24px;
+  line-height: 32px;
+}
+
+<h2
+    className="emotion-0 emotion-1"
+  >
+    Title Medium
+  </h2>,
+  .emotion-0 {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 28px;
+}
+
+<h3
+    className="emotion-0 emotion-1"
+  >
+    Title Small
+  </h3>,
+  .emotion-0 {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
+  font-size: 16px;
+  line-height: 24px;
+}
+
+<p
+    className="emotion-0 emotion-1"
+  >
+    Subtitle
+  </p>,
+  .emotion-0 {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+<p
+    className="emotion-0 emotion-1"
+  >
+    Subtitle Small
+  </p>,
+  .emotion-0 {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+}
+
+<p
+    className="emotion-0 emotion-1"
+  >
+    Body
+  </p>,
+  .emotion-0 {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+<p
+    className="emotion-0 emotion-1"
+  >
+    Body Small
+  </p>,
+  .emotion-0 {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+<p
+    className="emotion-0 emotion-1"
+  >
+    Button
+  </p>,
+  .emotion-0 {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 16px;
+}
+
+<p
+    className="emotion-0 emotion-1"
+  >
+    Caption
+  </p>,
+  .emotion-0 {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 16px;
+}
+
+<p
+    className="emotion-0 emotion-1"
+  >
+    Label
+  </p>,
+]
+`;
+
+exports[`Storyshots Components|Text Label 1`] = `
+.emotion-0 {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 16px;
+}
+
+<p
+  className="emotion-0 emotion-1"
+>
+  Label
+</p>
+`;
+
+exports[`Storyshots Components|Text Subtitle 1`] = `
+.emotion-0 {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
+  font-size: 16px;
+  line-height: 24px;
+}
+
+<p
+  className="emotion-0 emotion-1"
+>
+  Subtitle
+</p>
+`;
+
+exports[`Storyshots Components|Text Subtitle Small 1`] = `
+.emotion-0 {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+<p
+  className="emotion-0 emotion-1"
+>
+  Subtitle Small
+</p>
+`;
+
+exports[`Storyshots Components|Text Title Large 1`] = `
+.emotion-0 {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 400;
+  font-size: 32px;
+  line-height: 40px;
+}
+
+<h1
+  className="emotion-0 emotion-1"
+>
+  Title Large
+</h1>
+`;
+
+exports[`Storyshots Components|Text Title Medium 1`] = `
+.emotion-0 {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 400;
+  font-size: 24px;
+  line-height: 32px;
+}
+
+<h2
+  className="emotion-0 emotion-1"
+>
+  Title Medium
+</h2>
+`;
+
+exports[`Storyshots Components|Text Title Small 1`] = `
+.emotion-0 {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 28px;
+}
+
+<h3
+  className="emotion-0 emotion-1"
+>
+  Title Small
+</h3>
 `;
 
 exports[`Storyshots Components|TextHighlight Default 1`] = `
