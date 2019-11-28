@@ -13,7 +13,7 @@ $arrow-size: 8px;
 		bottom: 0;
 	}
 
-	&:not(.is-without-arrow):not([data-x-axis="center"][data-y-axis="middle"]):not(.is-mobile) {
+	&:not(.is-without-arrow):not(.is-mobile) {
 		margin-left: 2px;
 
 		&::before {
@@ -75,7 +75,7 @@ $arrow-size: 8px;
 			}
 		}
 
-		&.is-middle[data-x-axis="left"] {
+		&[data-y-axis="middle"][data-x-axis="left"] {
 			margin-left: -$arrow-size;
 
 			&::before {
@@ -95,7 +95,7 @@ $arrow-size: 8px;
 			}
 		}
 
-		&.is-middle[data-x-axis="right"] {
+		&[data-y-axis="middle"][data-x-axis="right"] {
 			margin-left: $arrow-size;
 
 			&::before {

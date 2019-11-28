@@ -285,6 +285,12 @@ const Popover = ( {
 			contentRef.current.style.maxWidth = contentWidth + 'px';
 		}
 
+		if ( xAxis === 'center' && yAxis === 'middle' ) {
+			contentRef.current.classList.add( 'is-without-arrow' );
+		} else {
+			contentRef.current.classList.remove( 'is-without-arrow' );
+		}
+
 		setAnimateOrigin( animateXAxis + ' ' + animateYAxis );
 	};
 
