@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, createRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -19,16 +19,16 @@ class ClipboardButton extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.bindContainer = this.bindContainer.bind( this );
+		this.containerRef = createRef();
 		this.onCopy = this.onCopy.bind( this );
 		this.getText = this.getText.bind( this );
 	}
 
 	componentDidMount() {
-		const { container, getText, onCopy } = this;
-		const button = container.firstChild;
+		const { getText, onCopy } = this;
+		const container = this.containerRef.current;
 
-		this.clipboard = new Clipboard( button,	{
+		this.clipboard = new Clipboard( container.firstChild,	{
 			text: getText,
 			container,
 		} );
@@ -40,10 +40,6 @@ class ClipboardButton extends Component {
 		this.clipboard.destroy();
 		delete this.clipboard;
 		clearTimeout( this.onCopyTimeout );
-	}
-
-	bindContainer( container ) {
-		this.container = container;
 	}
 
 	onCopy( args ) {
@@ -93,7 +89,7 @@ class ClipboardButton extends Component {
 		};
 
 		return (
-			<span ref={ this.bindContainer } onCopy={ focusOnCopyEventTarget }>
+			<span ref={ this.containerRef } onCopy={ focusOnCopyEventTarget }>
 				<ComponentToUse { ...buttonProps } className={ classes }>
 					{ children }
 				</ComponentToUse>

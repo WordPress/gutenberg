@@ -37,7 +37,8 @@ import { SVG, Rect, G, Path } from '@wordpress/components';
  *
  * @property {string} clientId     A block client ID.
  * @property {string} attributeKey A block attribute key.
- * @property {number} offset       A block attribute offset.
+ * @property {number} offset       An attribute value offset, based on the rich
+ *                                 text value. See `wp.richText.create`.
  */
 
 // Module constants

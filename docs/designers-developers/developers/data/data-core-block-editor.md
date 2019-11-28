@@ -1089,6 +1089,20 @@ _Returns_
 
 -   `Object`: Action object.
 
+<a name="resetSelection" href="#resetSelection">#</a> **resetSelection**
+
+Returns an action object used in signalling that selection state should be
+reset to the specified selection.
+
+_Parameters_
+
+-   _selectionStart_ `WPBlockSelection`: The selection start.
+-   _selectionEnd_ `WPBlockSelection`: The selection end.
+
+_Returns_
+
+-   `Object`: Action object.
+
 <a name="selectBlock" href="#selectBlock">#</a> **selectBlock**
 
 Returns an action object used in signalling that the block with the

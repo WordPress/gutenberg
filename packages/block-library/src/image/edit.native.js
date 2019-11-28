@@ -2,7 +2,7 @@
  * External dependencies
  */
 import React from 'react';
-import { View, ImageBackground, Text, TouchableWithoutFeedback, Dimensions, Platform } from 'react-native';
+import { View, ImageBackground, Text, TouchableWithoutFeedback, Dimensions } from 'react-native';
 import {
 	requestMediaImport,
 	mediaUploadSync,
@@ -10,7 +10,7 @@ import {
 	requestImageUploadCancelDialog,
 	requestImageFullscreenPreview,
 } from 'react-native-gutenberg-bridge';
-import { isEmpty, map } from 'lodash';
+import { isEmpty, map, get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -39,7 +39,8 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { isURL } from '@wordpress/url';
 import { doAction, hasAction } from '@wordpress/hooks';
-import { withPreferredColorScheme } from '@wordpress/compose';
+import { compose, withPreferredColorScheme } from '@wordpress/compose';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -69,6 +70,10 @@ const sizeOptions = map( sizeOptionLabels, ( label, option ) => ( { value: optio
 
 // Default Image ratio 4:3
 const IMAGE_ASPECT_RATIO = 4 / 3;
+
+const getUrlForSlug = ( image, { sizeSlug } ) => {
+	return get( image, [ 'media_details', 'sizes', sizeSlug, 'source_url' ] );
+};
 
 export class ImageEdit extends React.Component {
 	constructor( props ) {
@@ -128,6 +133,14 @@ export class ImageEdit extends React.Component {
 		}
 	}
 
+	componentDidUpdate( previousProps ) {
+		if ( ! previousProps.image && this.props.image ) {
+			const { image, attributes } = this.props;
+			const url = getUrlForSlug( image, attributes ) || image.source_url;
+			this.props.setAttributes( { url } );
+		}
+	}
+
 	static getDerivedStateFromProps( props, state ) {
 		// Avoid a UI flicker in the toolbar by insuring that isCaptionSelected
 		// is updated immediately any time the isSelected prop becomes false
@@ -143,7 +156,7 @@ export class ImageEdit extends React.Component {
 			requestImageUploadCancelDialog( attributes.id );
 		} else if ( attributes.id && ! isURL( attributes.url ) ) {
 			requestImageFailedRetryDialog( attributes.id );
-		} else if ( Platform.OS === 'android' ) {
+		} else if ( ! this.state.isCaptionSelected ) {
 			requestImageFullscreenPreview( attributes.url );
 		}
 
@@ -209,7 +222,17 @@ export class ImageEdit extends React.Component {
 	}
 
 	onSetSizeSlug( sizeSlug ) {
+		const { image } = this.props;
+
+		const url = getUrlForSlug( image, { sizeSlug } );
+		if ( ! url ) {
+			return null;
+		}
+
 		this.props.setAttributes( {
+			url,
+			width: undefined,
+			height: undefined,
 			sizeSlug,
 		} );
 	}
@@ -225,9 +248,31 @@ export class ImageEdit extends React.Component {
 		} );
 	}
 
-	onSelectMediaUploadOption( { id, url } ) {
-		const { setAttributes } = this.props;
-		setAttributes( { id, url } );
+	onSelectMediaUploadOption( media ) {
+		const { id, url } = this.props.attributes;
+
+		const mediaAttributes = {
+			id: media.id,
+			url: media.url,
+		};
+
+		let additionalAttributes;
+		// Reset the dimension attributes if changing to a different image.
+		if ( ! media.id || media.id !== id ) {
+			additionalAttributes = {
+				width: undefined,
+				height: undefined,
+				sizeSlug: DEFAULT_SIZE_SLUG,
+			};
+		} else {
+			// Keep the same url when selecting the same file, so "Image Size" option is not changed.
+			additionalAttributes = { url };
+		}
+
+		this.props.setAttributes( {
+			...mediaAttributes,
+			...additionalAttributes,
+		} );
 	}
 
 	onFocusCaption() {
@@ -363,7 +408,7 @@ export class ImageEdit extends React.Component {
 						renderContent={ ( { isUploadInProgress, isUploadFailed, finalWidth, finalHeight, imageWidthWithinContainer, retryMessage } ) => {
 							const opacity = isUploadInProgress ? 0.3 : 1;
 							const icon = this.getIcon( isUploadFailed );
-							const imageBorderOnSelectedStyle = isSelected && ! ( isUploadInProgress || isUploadFailed ) ? styles.imageBorder : '';
+							const imageBorderOnSelectedStyle = isSelected && ! ( isUploadInProgress || isUploadFailed || this.state.isCaptionSelected ) ? styles.imageBorder : '';
 
 							const iconContainer = (
 								<View style={ styles.modalIcon }>
@@ -430,4 +475,14 @@ export class ImageEdit extends React.Component {
 	}
 }
 
-export default withPreferredColorScheme( ImageEdit );
+export default compose( [
+	withSelect( ( select, props ) => {
+		const { getMedia } = select( 'core' );
+		const { attributes: { id }, isSelected } = props;
+
+		return {
+			image: id && isSelected ? getMedia( id ) : null,
+		};
+	} ),
+	withPreferredColorScheme,
+] )( ImageEdit );

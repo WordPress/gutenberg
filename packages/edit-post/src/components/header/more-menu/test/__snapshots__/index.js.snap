@@ -30,7 +30,7 @@ exports[`MoreMenu should match snapshot 1`] = `
       renderToggle={[Function]}
     >
       <div
-        className="components-dropdown-menu edit-post-more-menu"
+        className="components-dropdown components-dropdown-menu edit-post-more-menu"
       >
         <ForwardRef(IconButton)
           aria-expanded={false}

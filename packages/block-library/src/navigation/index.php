@@ -15,7 +15,7 @@
 function build_css_colors( $attributes ) {
 	// CSS classes.
 	$colors = array(
-		'css_classes'   => '',
+		'css_classes'   => [],
 		'inline_styles' => '',
 	);
 
@@ -25,12 +25,12 @@ function build_css_colors( $attributes ) {
 	// If has text color.
 	if ( $has_custom_text_color || $has_named_text_color ) {
 		// Add has-text-color class.
-		$colors['css_classes'] .= 'has-text-color';
+		$colors['css_classes'][] = 'has-text-color';
 	}
 
 	if ( $has_named_text_color ) {
 		// Add the color class.
-		$colors['css_classes'] .= sprintf( ' has-%s-color', $attributes['textColor'] );
+		$colors['css_classes'][] = sprintf( ' has-%s-color', $attributes['textColor'] );
 	} elseif ( $has_custom_text_color ) {
 		// Add the custom color inline style.
 		$colors['inline_styles'] = sprintf( 'color: %s;', $attributes['customTextColor'] );
@@ -50,18 +50,16 @@ function build_css_colors( $attributes ) {
  */
 function render_block_navigation( $attributes, $content, $block ) {
 	$colors          = build_css_colors( $attributes );
-	$class_attribute = sprintf( ' class="%s"', esc_attr( $colors['css_classes'] ? 'wp-block-navigation ' . $colors['css_classes'] : 'wp-block-navigation' ) );
+	$classes         = array_merge(
+		$colors['css_classes'],
+		[ 'wp-block-navigation' ],
+		isset( $attributes['className'] ) ? [ $attributes['className'] ] : []
+	);
+	$class_attribute = sprintf( ' class="%s"', esc_attr( implode( ' ', $classes ) ) );
 	$style_attribute = $colors['inline_styles'] ? sprintf( ' style="%s"', esc_attr( $colors['inline_styles'] ) ) : '';
 
 	return sprintf(
-		implode(
-			"\n",
-			array(
-				'<nav%s%s>',
-				'	%s',
-				'</nav>',
-			)
-		),
+		'<nav %1$s %2$s>%3$s</nav>',
 		$class_attribute,
 		$style_attribute,
 		build_navigation_html( $block, $colors )
@@ -89,10 +87,10 @@ function build_navigation_html( $block, $colors ) {
 
 		// Start appending HTML attributes to anchor tag.
 		if ( isset( $block['attrs']['url'] ) ) {
-			$html .= ' href="' . $block['attrs']['url'] . '"';
+			$html .= ' href="' . esc_url( $block['attrs']['url'] ) . '"';
 		}
 		if ( isset( $block['attrs']['title'] ) ) {
-			$html .= ' title="' . $block['attrs']['title'] . '"';
+			$html .= ' title="' . esc_attr( $block['attrs']['title'] ) . '"';
 		}
 
 		if ( isset( $block['attrs']['opensInNewTab'] ) && true === $block['attrs']['opensInNewTab'] ) {
@@ -103,7 +101,7 @@ function build_navigation_html( $block, $colors ) {
 		// Start anchor tag content.
 		$html .= '>';
 		if ( isset( $block['attrs']['label'] ) ) {
-			$html .= $block['attrs']['label'];
+			$html .= esc_html( $block['attrs']['label'] );
 		}
 		$html .= '</a>';
 		// End anchor tag content.
@@ -128,7 +126,6 @@ function register_block_core_navigation() {
 	register_block_type(
 		'core/navigation',
 		array(
-			'category'        => 'layout',
 			'attributes'      => array(
 				'className'        => array(
 					'type' => 'string',

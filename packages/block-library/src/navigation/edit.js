@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { escape } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -66,8 +71,8 @@ function Navigation( {
 						type,
 						id,
 						url,
-						label: title.rendered,
-						title: title.raw,
+						label: escape( title.rendered ),
+						title: escape( title.raw ),
 						opensInNewTab: false,
 					}
 				)
