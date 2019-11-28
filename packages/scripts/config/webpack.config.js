@@ -35,26 +35,65 @@ const config = {
 	module: {
 		rules: [
 			{
-				test: /\.js$/,
-				exclude: /node_modules/,
-				use: [
-					require.resolve( 'thread-loader' ),
+				oneOf: [
+					// transpile application code
 					{
-						loader: require.resolve( 'babel-loader' ),
-						options: {
-							// Babel uses a directory within local node_modules
-							// by default. Use the environment variable option
-							// to enable more persistent caching.
-							cacheDirectory: process.env.BABEL_CACHE_DIRECTORY || true,
+						test: /\.js$/,
+						exclude: /node_modules/,
+						use: [
+							require.resolve( 'thread-loader' ),
+							{
+								loader: require.resolve( 'babel-loader' ),
+								options: {
+									// Babel uses a directory within local node_modules
+									// by default. Use the environment variable option
+									// to enable more persistent caching.
+									cacheDirectory: process.env.BABEL_CACHE_DIRECTORY || true,
 
-							// Provide a fallback configuration if there's not
-							// one explicitly available in the project.
-							...( ! hasBabelConfig() && {
-								babelrc: false,
-								configFile: false,
-								presets: [ require.resolve( '@wordpress/babel-preset-default' ) ],
-							} ),
-						},
+									// Provide a fallback configuration if there's not
+									// one explicitly available in the project.
+									...( ! hasBabelConfig() && {
+										babelrc: false,
+										configFile: false,
+										presets: [ require.resolve( '@wordpress/babel-preset-default' ) ],
+									} ),
+								},
+							},
+						],
+					},
+					// transpile third-party code which might be being distributed according to the current JS standard
+					{
+						test: /\.js$/,
+						include: /node_modules/,
+						exclude: /@babel(?:\/|\\{1,2})runtime/,
+						use: [
+							require.resolve( 'thread-loader' ),
+							{
+								loader: require.resolve( 'babel-loader' ),
+								options: {
+									// Babel uses a directory within local node_modules
+									// by default. Use the environment variable option
+									// to enable more persistent caching.
+									cacheDirectory: process.env.BABEL_CACHE_DIRECTORY || true,
+									babelrc: false,
+									configFile: false,
+									presets: [
+										[
+											require.resolve( '@babel/preset-env' ),
+											{
+												modules: false,
+												targets: {
+													node: mode === 'development' ? 'current' : undefined,
+													browsers: mode === 'production' ? require( '@wordpress/browserslist-config' ) : undefined,
+												},
+											},
+										],
+									],
+									sourceMaps: true,
+									inputSourceMap: true,
+								},
+							},
+						],
 					},
 				],
 			},
