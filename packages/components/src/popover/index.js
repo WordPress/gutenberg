@@ -20,7 +20,6 @@ import withConstrainedTabbing from '../higher-order/with-constrained-tabbing';
 import PopoverDetectOutside from './detect-outside';
 import IconButton from '../icon-button';
 import ScrollLock from '../scroll-lock';
-import IsolatedEventContainer from '../isolated-event-container';
 import { Slot, Fill, Consumer } from '../slot-fill';
 import Animate from '../animate';
 
@@ -188,6 +187,10 @@ function useFocusContentOnMount( focusOnMount, contentRef ) {
 	}, [] );
 }
 
+const stopPropagation = ( event ) => {
+	event.stopPropagation();
+};
+
 const Popover = ( {
 	headerTitle,
 	onClose,
@@ -268,25 +271,19 @@ const Popover = ( {
 		};
 		const animateYAxis = yAxisMapping[ yAxis ] || 'middle';
 		const animateXAxis = xAxisMapping[ xAxis ] || 'center';
-		const classes = classnames(
-			'components-popover',
-			className,
-			'is-' + yAxis,
-			'is-' + xAxis,
-			{
-				'is-mobile': isMobileViewport,
-				'is-without-arrow': noArrow || (
-					xAxis === 'center' &&
-					yAxis === 'middle'
-				),
-			}
-		);
 
-		containerRef.current.className = classes;
+		containerRef.current.setAttribute( 'data-x-axis', xAxis );
+		containerRef.current.setAttribute( 'data-y-axis', yAxis );
 		containerRef.current.style.top = popoverTop + 'px';
 		containerRef.current.style.left = popoverLeft + 'px';
-		contentRef.current.style.maxHeight = contentHeight + 'px';
-		contentRef.current.style.maxWidth = contentWidth + 'px';
+
+		if ( contentHeight ) {
+			contentRef.current.style.maxHeight = contentHeight + 'px';
+		}
+
+		if ( contentWidth ) {
+			contentRef.current.style.maxWidth = contentWidth + 'px';
+		}
 
 		setAnimateOrigin( animateXAxis + ' ' + animateYAxis );
 	};
@@ -391,31 +388,33 @@ const Popover = ( {
 					<div
 						className={ classnames(
 							'components-popover',
-							'components-popover-not-positioned',
 							className,
-							animateClassName
+							animateClassName,
+							{
+								'is-mobile': isMobileViewport,
+								'is-without-arrow': noArrow,
+							}
 						) }
 						{ ...contentProps }
 						onKeyDown={ maybeClose }
+						onMouseDown={ stopPropagation }
 						ref={ containerRef }
 					>
-						<IsolatedEventContainer>
-							{ isMobileViewport && expandOnMobile && (
-								<div className="components-popover__header">
-									<span className="components-popover__header-title">
-										{ headerTitle }
-									</span>
-									<IconButton className="components-popover__close" icon="no-alt" onClick={ onClose } />
-								</div>
-							) }
-							<div
-								ref={ contentRef }
-								className="components-popover__content"
-								tabIndex="-1"
-							>
-								{ children }
+						{ isMobileViewport && expandOnMobile && (
+							<div className="components-popover__header">
+								<span className="components-popover__header-title">
+									{ headerTitle }
+								</span>
+								<IconButton className="components-popover__close" icon="no-alt" onClick={ onClose } />
 							</div>
-						</IsolatedEventContainer>
+						) }
+						<div
+							ref={ contentRef }
+							className="components-popover__content"
+							tabIndex="-1"
+						>
+							{ children }
+						</div>
 					</div>
 				) }
 			</Animate>

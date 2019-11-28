@@ -13,7 +13,7 @@ $arrow-size: 8px;
 		bottom: 0;
 	}
 
-	&:not(.is-without-arrow):not(.is-mobile) {
+	&:not(.is-without-arrow):not([data-x-axis="center"][data-y-axis="middle"]):not(.is-mobile) {
 		margin-left: 2px;
 
 		&::before {
@@ -33,7 +33,7 @@ $arrow-size: 8px;
 			line-height: 0;
 		}
 
-		&.is-top {
+		&[data-y-axis="top"] {
 			margin-top: - $arrow-size;
 
 			&::before {
@@ -54,7 +54,7 @@ $arrow-size: 8px;
 			}
 		}
 
-		&.is-bottom {
+		&[data-y-axis="bottom"] {
 			margin-top: $arrow-size;
 
 			&::before {
@@ -75,7 +75,7 @@ $arrow-size: 8px;
 			}
 		}
 
-		&.is-middle.is-left {
+		&.is-middle[data-x-axis="left"] {
 			margin-left: -$arrow-size;
 
 			&::before {
@@ -95,7 +95,7 @@ $arrow-size: 8px;
 			}
 		}
 
-		&.is-middle.is-right {
+		&.is-middle[data-x-axis="right"] {
 			margin-left: $arrow-size;
 
 			&::before {
@@ -117,15 +117,15 @@ $arrow-size: 8px;
 	}
 
 	&:not(.is-mobile) {
-		&.is-top {
+		&[data-y-axis="top"] {
 			bottom: 100%;
 		}
 
-		&.is-bottom {
+		&[data-y-axis="bottom"] {
 			top: 100%;
 		}
 
-		&.is-middle {
+		&[data-y-axis="middle"] {
 			align-items: center;
 			display: flex;
 		}
@@ -150,30 +150,30 @@ $arrow-size: 8px;
 		min-width: 260px;
 	}
 
-	.components-popover:not(.is-mobile).is-top & {
+	.components-popover:not(.is-mobile)[data-y-axis="top"] & {
 		bottom: 100%;
 	}
 
-	.components-popover:not(.is-mobile).is-center & {
+	.components-popover:not(.is-mobile)[data-x-axis="center"] & {
 		left: 50%;
 		transform: translateX(-50%);
 	}
 
-	.components-popover:not(.is-mobile).is-right & {
+	.components-popover:not(.is-mobile)[data-x-axis="right"] & {
 		position: absolute;
 		left: 100%;
 	}
 
-	.components-popover:not(.is-mobile):not(.is-middle).is-right & {
+	.components-popover:not(.is-mobile):not([data-y-axis="middle"])[data-x-axis="right"] & {
 		margin-left: -24px;
 	}
 
-	.components-popover:not(.is-mobile).is-left & {
+	.components-popover:not(.is-mobile)[data-x-axis="left"] & {
 		position: absolute;
 		right: 100%;
 	}
 
-	.components-popover:not(.is-mobile):not(.is-middle).is-left & {
+	.components-popover:not(.is-mobile):not([data-y-axis="middle"])[data-x-axis="left"] & {
 		margin-right: -24px;
 	}
 }
@@ -183,8 +183,12 @@ $arrow-size: 8px;
 	height: 100%;
 }
 
-.components-popover-not-positioned {
+.components-popover {
 	opacity: 0;
+}
+
+.components-popover[data-x-axis][data-y-axis] {
+	opacity: 1;
 }
 
 .components-popover__header {
