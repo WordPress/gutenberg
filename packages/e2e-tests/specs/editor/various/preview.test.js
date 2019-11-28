@@ -15,7 +15,6 @@ import {
 	saveDraft,
 	clickOnMoreMenuItem,
 	pressKeyWithModifier,
-	disableNavigationMode,
 } from '@wordpress/e2e-test-utils';
 
 async function openPreviewPage( editorPage ) {
@@ -206,7 +205,6 @@ describe( 'Preview with Custom Fields enabled', () => {
 	beforeEach( async () => {
 		await createNewPost();
 		await toggleCustomFieldsOption( true );
-		await disableNavigationMode();
 	} );
 
 	afterEach( async () => {

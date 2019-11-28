@@ -1,11 +1,12 @@
 .edit-post-sidebar {
 	background: $white;
 	color: $dark-gray-500;
+	overflow: visible;
 
 	@include break-small() {
 		z-index: auto;
 		height: 100%;
-		overflow: auto;
+		overflow: visible;
 		-webkit-overflow-scrolling: touch;
 	}
 
@@ -16,7 +17,7 @@
 	> .components-panel {
 		border-left: none;
 		border-right: none;
-		overflow: auto;
+		overflow: visible;
 		-webkit-overflow-scrolling: touch;
 		height: auto;
 		max-height: calc(100vh - #{ $admin-bar-height-big + $panel-header-height });
@@ -25,7 +26,7 @@
 		position: relative;
 
 		@include break-small() {
-			overflow: hidden;
+			overflow: visible;
 			height: auto;
 			max-height: none;
 		}

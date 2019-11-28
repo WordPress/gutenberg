@@ -8,7 +8,8 @@ const program = require( 'commander' );
 const inquirer = require( 'inquirer' );
 const semver = require( 'semver' );
 const chalk = require( 'chalk' );
-const fs = require( 'fs-extra' );
+const fs = require( 'fs' );
+const rimraf = require( 'rimraf' );
 const SimpleGit = require( 'simple-git/promise' );
 const childProcess = require( 'child_process' );
 const Octokit = require( '@octokit/rest' );
@@ -243,8 +244,8 @@ async function updateThePluginStableVersion( version, abortMessage ) {
  */
 async function runCleanLocalCloneStep( abortMessage ) {
 	await runStep( 'Cleaning the temporary folder', abortMessage, async () => {
-		await fs.remove( gitWorkingDirectoryPath );
-		await fs.remove( svnWorkingDirectoryPath );
+		await rimraf( gitWorkingDirectoryPath );
+		await rimraf( svnWorkingDirectoryPath );
 	} );
 }
 

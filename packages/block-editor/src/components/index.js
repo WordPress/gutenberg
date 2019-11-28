@@ -39,6 +39,7 @@ export {
 	RichTextToolbarButton,
 	__unstableRichTextInputEvent,
 } from './rich-text';
+export { default as ToolSelector } from './tool-selector';
 export { default as URLInput } from './url-input';
 export { default as URLInputButton } from './url-input/button';
 export { default as URLPopover } from './url-popover';

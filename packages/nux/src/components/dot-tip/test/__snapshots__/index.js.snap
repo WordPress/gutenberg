@@ -5,12 +5,12 @@ exports[`DotTip should render correctly 1`] = `
   aria-label="Editor tips"
   className="nux-dot-tip"
   focusOnMount="container"
-  getAnchorRect={[Function]}
   noArrow={true}
   onClick={[Function]}
   onFocusOutside={[Function]}
   position="middle right"
   role="dialog"
+  shouldAnchorIncludePadding={true}
 >
   <p>
     It looks like you’re writing a letter. Would you like help?
