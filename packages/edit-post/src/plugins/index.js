@@ -30,7 +30,7 @@ registerPlugin( 'edit-post', {
 								{ __( 'Manage All Reusable Blocks' ) }
 							</MenuItem>
 							<KeyboardShortcutsHelpMenuItem onSelect={ onClose } />
-							<WelcomeGuideMenuItem onSelect={ onClose } />
+							<WelcomeGuideMenuItem />
 							<CopyContentMenuItem />
 						</>
 					) }
