@@ -360,9 +360,9 @@ In that case, you might see test failures and `TypeError` reported by Jest in th
 
 > [@percy/storybook](https://docs.percy.io/docs/storybook) adds automattic Visual Regression Testing for [Storybook](https://storybook.js.org/).
 
-A Visual Regression Test compares an image of the UI before a change is made with an image of the UI after a change is made.
+A Visual Regression Test compares a screenshot of the UI before a change is made with a screenshot of the UI after a change is made.
 
-Subtle changes to HTML markup or CSS rules can result in significant changes to a UI, particularly affecting layout. When the changes to HTML markup or CSS rules are subtle it is often difficult to gague what impact the change might have on the visuals from a diff.
+Subtle changes to HTML markup or CSS rules can result in significant visual changes to a UI, particularly when layout is affected. When changes to HTML markup or CSS rules are subtle it can be difficult to assess from a diff what impact the change might have on the visuals.
 
 The Visual Regression Tests are setup to run across multiple browsers and can find visual flaws caused by browser inconsistencies.
 
