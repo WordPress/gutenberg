@@ -11,7 +11,7 @@ import { Icon } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import style from './gallery-image-style';
+import style from './gallery-image-style.scss';
 
 export function Button( props ) {
 	const {

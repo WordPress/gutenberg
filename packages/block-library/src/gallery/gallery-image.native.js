@@ -21,7 +21,7 @@ import { withPreferredColorScheme } from '@wordpress/compose';
  * Internal dependencies
  */
 import Button from './gallery-button';
-import style from './gallery-image-style';
+import style from './gallery-image-style.scss';
 
 const { compose } = StyleSheet;
 
