@@ -83,6 +83,7 @@ html {
 	bottom: 0;
 	left: 0;
 	background: $white;
+	overflow: auto;
 
 	&:empty {
 		display: none;

@@ -33,3 +33,11 @@
 		}
 	}
 }
+
+.edit-post-sidebar-header__container {
+	display: flex;
+	flex-direction: column;
+	position: sticky;
+	top: 0;
+	z-index: z-index(".components-panel__header");
+}
