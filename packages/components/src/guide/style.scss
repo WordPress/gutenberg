@@ -1,11 +1,4 @@
-.nux-guide {
-	@media (max-width: $break-small) {
-		bottom: 15%;
-		left: $grid-size-xlarge;
-		right: $grid-size-xlarge;
-		top: 15%;
-	}
-
+.components-guide {
 	.components-modal__header {
 		background: none;
 		border-bottom: none;
@@ -51,16 +44,27 @@
 			height: 30px;
 		}
 	}
+}
 
-	&__back-button,
-	&__forward-button,
-	&__finish-button {
+.components-modal__frame.components-guide {
+	@media (max-width: $break-small) {
+		bottom: 15%;
+		left: $grid-size-xlarge;
+		right: $grid-size-xlarge;
+		top: 15%;
+	}
+}
+
+.components-button {
+	&.components-guide__back-button,
+	&.components-guide__forward-button,
+	&.components-guide__finish-button {
 		height: 30px;
 		position: absolute;
 	}
 
-	&__back-button,
-	&__forward-button {
+	&.components-guide__back-button,
+	&.components-guide__forward-button {
 		font-size: 0;
 		padding: 4px 2px;
 
@@ -73,7 +77,7 @@
 		}
 	}
 
-	&__back-button {
+	&.components-guide__back-button {
 		left: 0;
 
 		@include break-small() {
@@ -85,7 +89,7 @@
 		}
 	}
 
-	&__forward-button {
+	&.components-guide__forward-button {
 		right: 0;
 
 		@include break-small() {
@@ -98,7 +102,7 @@
 		}
 	}
 
-	&__finish-button {
+	&.components-guide__finish-button {
 		right: 0;
 	}
 }

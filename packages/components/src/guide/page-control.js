@@ -7,16 +7,16 @@ import { times } from 'lodash';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { IconButton } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
+import IconButton from '../icon-button';
 import { PageControlIcon } from './icons';
 
 export default function PageControl( { currentPage, numberOfPages, setCurrentPage } ) {
 	return (
-		<ul className="nux-guide__page-control" aria-label={ __( 'Guide controls' ) }>
+		<ul className="components-guide__page-control" aria-label={ __( 'Guide controls' ) }>
 			{ times( numberOfPages, ( page ) => (
 				<li key={ page }>
 					<IconButton

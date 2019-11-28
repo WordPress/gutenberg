@@ -2,7 +2,7 @@
 
 exports[`Guide renders when there are pages 1`] = `
 <WithInstanceId(Modal)
-  className="nux-guide"
+  className="components-guide"
   shouldCloseOnClickOutside={false}
 >
   <KeyboardShortcuts
@@ -15,13 +15,13 @@ exports[`Guide renders when there are pages 1`] = `
     }
   />
   <div
-    className="nux-guide__container"
+    className="components-guide__container"
   >
     <GuidePage>
       Page 1
     </GuidePage>
     <div
-      className="nux-guide__footer"
+      className="components-guide__footer"
     >
       <PageControl
         currentPage={0}
@@ -29,7 +29,7 @@ exports[`Guide renders when there are pages 1`] = `
         setCurrentPage={[Function]}
       />
       <ForwardRef(IconButton)
-        className="nux-guide__forward-button"
+        className="components-guide__forward-button"
         icon={<ForwardButtonIcon />}
         onClick={[Function]}
       >

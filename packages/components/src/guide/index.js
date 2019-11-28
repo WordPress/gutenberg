@@ -6,19 +6,23 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { useMediaQuery } from '@wordpress/compose';
 import { useState, Children } from '@wordpress/element';
-import { Modal, KeyboardShortcuts, IconButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
+import Modal from '../modal';
+import KeyboardShortcuts from '../keyboard-shortcuts';
+import IconButton from '../icon-button';
 import PageControl from './page-control';
 import { BackButtonIcon, ForwardButtonIcon } from './icons';
 import FinishButton from './finish-button';
 
-export function Guide( { children, className, finishButtonText, isMobile, onFinish } ) {
+export default function Guide( { children, className, finishButtonText, onFinish } ) {
+	const isMobile = useMediaQuery( '(max-width: 600px)' );
+
 	const [ currentPage, setCurrentPage ] = useState( 0 );
 
 	const numberOfPages = Children.count( children );
@@ -43,7 +47,7 @@ export function Guide( { children, className, finishButtonText, isMobile, onFini
 
 	return (
 		<Modal
-			className={ classnames( 'nux-guide', className ) }
+			className={ classnames( 'components-guide', className ) }
 			shouldCloseOnClickOutside={ false }
 			onRequestClose={ onFinish }
 		>
@@ -53,7 +57,7 @@ export function Guide( { children, className, finishButtonText, isMobile, onFini
 				right: goForward,
 			} } />
 
-			<div className="nux-guide__container">
+			<div className="components-guide__container">
 
 				{ children[ currentPage ] }
 
@@ -63,10 +67,10 @@ export function Guide( { children, className, finishButtonText, isMobile, onFini
 					</FinishButton>
 				) }
 
-				<div className="nux-guide__footer">
+				<div className="components-guide__footer">
 					{ canGoBack && (
 						<IconButton
-							className="nux-guide__back-button"
+							className="components-guide__back-button"
 							icon={ <BackButtonIcon /> }
 							onClick={ goBack }
 						>
@@ -80,7 +84,7 @@ export function Guide( { children, className, finishButtonText, isMobile, onFini
 					/>
 					{ canGoForward && (
 						<IconButton
-							className="nux-guide__forward-button"
+							className="components-guide__forward-button"
 							icon={ <ForwardButtonIcon /> }
 							onClick={ goForward }
 						>
@@ -89,7 +93,7 @@ export function Guide( { children, className, finishButtonText, isMobile, onFini
 					) }
 					{ ! isMobile && ! canGoForward && (
 						<FinishButton
-							className="nux-guide__finish-button"
+							className="components-guide__finish-button"
 							onClick={ onFinish }
 						>
 							{ finishButtonText || __( 'Finish' ) }
@@ -102,7 +106,3 @@ export function Guide( { children, className, finishButtonText, isMobile, onFini
 		</Modal>
 	);
 }
-
-export default withSelect( ( select ) => ( {
-	isMobile: select( 'core/viewport' ).isViewportMatch( '< small' ),
-} ) )( Guide );

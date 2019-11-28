@@ -2,7 +2,11 @@
  * WordPress dependencies
  */
 import { useRef, useLayoutEffect } from '@wordpress/element';
-import { Button } from '@wordpress/components';
+
+/**
+ * Internal dependencies
+ */
+import Button from '../button';
 
 export default function FinishButton( { className, onClick, children } ) {
 	const button = useRef( null );
