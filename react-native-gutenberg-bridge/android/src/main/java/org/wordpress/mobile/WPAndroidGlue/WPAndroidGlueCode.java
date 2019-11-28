@@ -62,7 +62,11 @@ public class WPAndroidGlueCode {
     private RNReactNativeGutenbergBridgePackage mRnReactNativeGutenbergBridgePackage;
     private MediaUploadCallback mPendingMediaUploadCallback;
     private boolean mMediaPickedByUserOnBlock;
-    private boolean mAppendsMultipleSelectedToSiblingBlocks;
+
+    /**
+     * Flag to append as siblings when allowMultipleSelection = false is not respected
+     */
+    private boolean mAppendsMultipleSelectedToSiblingBlocks = false;
 
     private OnMediaLibraryButtonListener mOnMediaLibraryButtonListener;
     private OnReattachQueryListener mOnReattachQueryListener;
@@ -168,7 +172,6 @@ public class WPAndroidGlueCode {
             @Override
             public void requestMediaPickFromMediaLibrary(MediaUploadCallback mediaSelectedCallback, Boolean allowMultipleSelection, MediaType mediaType) {
                 mMediaPickedByUserOnBlock = true;
-                // flag to append as siblings when allowMultipleSelection = false is not respected
                 mAppendsMultipleSelectedToSiblingBlocks = !allowMultipleSelection;
                 mPendingMediaUploadCallback = mediaSelectedCallback;
                 if (mediaType == MediaType.IMAGE) {
