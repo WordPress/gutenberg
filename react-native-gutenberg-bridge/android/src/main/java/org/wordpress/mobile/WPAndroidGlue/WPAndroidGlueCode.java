@@ -590,19 +590,6 @@ public class WPAndroidGlueCode {
         mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().toggleEditorMode();
     }
 
-    public void appendUploadMediaFile(final int mediaId, final String mediaUri, final boolean isVideo) {
-//       if (isMediaUploadCallbackRegistered() && mMediaPickedByUserOnBlock) {
-//           String mediaType = getMediaType(isVideo);
-//           mMediaPickedByUserOnBlock = false;
-//           List<RNMedia> mediaList = new ArrayList<>();
-//           mediaList.add(new Media(mediaId, mediaUri, mediaType));
-//           mPendingMediaUploadCallback.onUploadMediaFileSelected(mediaList);
-//       } else {
-//           // we can assume we're being passed a new image from share intent as there was no selectMedia callback
-//           sendOrDeferAppendMediaSignal(mediaId, mediaUri, isVideo);
-//       }
-    }
-
     public void appendUploadMediaFiles(ArrayList<Media> mediaList) {
         if (isMediaUploadCallbackRegistered() && mMediaPickedByUserOnBlock) {
             mMediaPickedByUserOnBlock = false;
