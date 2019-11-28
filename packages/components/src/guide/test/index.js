@@ -31,14 +31,14 @@ describe( 'Guide', () => {
 		expect( wrapper.isEmptyRender() ).toBe( true );
 	} );
 
-	it( 'renders when there are pages', () => {
+	it( 'renders one page at a time', () => {
 		const wrapper = shallow(
 			<Guide>
 				<GuidePage>Page 1</GuidePage>
 				<GuidePage>Page 2</GuidePage>
 			</Guide>
 		);
-		expect( wrapper ).toMatchSnapshot();
+		expect( wrapper.find( GuidePage ) ).toHaveLength( 1 );
 	} );
 
 	it( 'hides back button and shows forward button on the first page', () => {
