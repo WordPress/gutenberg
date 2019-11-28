@@ -167,6 +167,7 @@ function useFocusContentOnMount( focusOnMount, contentRef ) {
 			// Find first tabbable node within content and shift focus, falling
 			// back to the popover panel itself.
 				const firstTabbable = focus.tabbable.find( contentRef.current )[ 0 ];
+
 				if ( firstTabbable ) {
 					firstTabbable.focus();
 				} else {
