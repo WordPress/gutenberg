@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { View } from 'react-native';
+import { isEmpty } from 'lodash';
 
 /**
  * Internal dependencies
@@ -15,6 +16,8 @@ import Tiles from './tiles';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
+import { Caption } from '@wordpress/block-editor';
+import { useState } from '@wordpress/element';
 
 const TILE_SPACING = 15;
 
@@ -23,18 +26,21 @@ const MAX_DISPLAYED_COLUMNS = 4;
 const MAX_DISPLAYED_COLUMNS_MOBILE = 2;
 
 export const Gallery = ( props ) => {
+	const [ isCaptionSelected, setIsCaptionSelected ] = useState( false );
+
 	const {
+		clientId,
 		selectedImage,
 		mediaPlaceholder,
+		onBlur,
 		onMoveBackward,
 		onMoveForward,
 		onRemoveImage,
 		onSelectImage,
 		onSetImageAttributes,
-		//	onFocusGalleryCaption,
+		onFocusGalleryCaption,
 		attributes,
 		isSelected,
-		//	setAttributes,
 		isMobile,
 		onFocus,
 	} = props;
@@ -49,6 +55,23 @@ export const Gallery = ( props ) => {
 	const displayedColumns = isMobile ?
 		Math.min( columns, MAX_DISPLAYED_COLUMNS_MOBILE ) :
 		Math.min( columns, MAX_DISPLAYED_COLUMNS );
+
+	const selectImage = ( index ) => {
+		return () => {
+			if ( isCaptionSelected ) {
+				setIsCaptionSelected( false );
+			}
+			// we need to fully invoke the curried function here
+			onSelectImage( index )(); 
+		};
+	};
+
+	const focusGalleryCaption = () => {
+		if ( ! isCaptionSelected ) {
+			setIsCaptionSelected( true );
+		}
+		onFocusGalleryCaption();
+	};
 
 	return (
 		<View>
@@ -75,7 +98,7 @@ export const Gallery = ( props ) => {
 							onMoveBackward={ onMoveBackward( index ) }
 							onMoveForward={ onMoveForward( index ) }
 							onRemove={ onRemoveImage( index ) }
-							onSelect={ onSelectImage( index ) }
+							onSelect={ selectImage( index ) }
 							onSelectBlock={ onFocus }
 							setAttributes={ ( attrs ) => onSetImageAttributes( index, attrs ) }
 							caption={ img.caption }
@@ -85,6 +108,22 @@ export const Gallery = ( props ) => {
 				} ) }
 			</Tiles>
 			{ mediaPlaceholder }
+			<Caption
+				clientId={ clientId }
+				isSelected={ isCaptionSelected }
+				accessible={ true }
+				accessibilityLabelCreator={ ( caption ) =>
+					isEmpty( caption ) ?
+					/* translators: accessibility text. Empty gallery caption. */
+						( 'Gallery caption. Empty' ) :
+						sprintf(
+						/* translators: accessibility text. %s: gallery caption. */
+							__( 'Gallery caption. %s' ),
+							caption )
+				}
+				onFocus={ focusGalleryCaption }
+				onBlur={ onBlur } // always assign onBlur as props
+			/>
 		</View>
 	);
 };
