@@ -128,7 +128,7 @@ export class BlockList extends Component {
 						clientId={ clientId }
 						rootClientId={ this.props.rootClientId }
 						onCaretVerticalPositionChange={ this.onCaretVerticalPositionChange }
-						isSmallScreen={ ! ReadableContentView.isContentMaxWidth() }
+						isSmallScreen={ ! this.props.isFullyBordered }
 					/> ) }
 				{ shouldShowInsertionPointAfter( clientId ) && this.renderAddBlockSeparator() }
 			</ReadableContentView>
