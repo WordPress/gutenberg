@@ -1539,61 +1539,78 @@ exports[`Storyshots Components|FontSizePicker Default 1`] = `
 <fieldset
   className="components-font-size-picker"
 >
-  <legend>
+  <legend
+    className="screen-reader-text"
+  >
     Font Size
   </legend>
   <div
     className="components-font-size-picker__controls"
   >
     <div
-      className="components-base-control components-font-size-picker__select"
+      className="components-custom-select components-font-size-picker__select"
     >
-      <div
-        className="components-base-control__field"
+      <label
+        className="components-custom-select__label"
+        htmlFor="downshift-null-toggle-button"
+        id="downshift-null-label"
       >
-        <label
-          className="components-visually-hidden"
-          htmlFor="inspector-select-control-0"
+        Preset Size
+      </label>
+      <button
+        aria-expanded={false}
+        aria-haspopup="listbox"
+        aria-label="Preset Size"
+        className="components-button components-custom-select__button"
+        id="downshift-null-toggle-button"
+        onClick={[Function]}
+        onKeyDown={[Function]}
+        type="button"
+      >
+        Normal
+        <svg
+          aria-hidden="true"
+          className="dashicon dashicons-arrow-down-alt2 components-custom-select__button-icon"
+          focusable="false"
+          height={20}
+          role="img"
+          viewBox="0 0 20 20"
+          width={20}
+          xmlns="http://www.w3.org/2000/svg"
         >
-          Choose preset
-        </label>
-        <select
-          className="components-select-control__input"
-          id="inspector-select-control-0"
-          multiple={false}
-          onChange={[Function]}
-          value="normal"
-        >
-          <option
-            value="small"
-          >
-            Small
-          </option>
-          <option
-            value="normal"
-          >
-            Normal
-          </option>
-          <option
-            value="big"
-          >
-            Big
-          </option>
-          <option
-            value="custom"
-          >
-            Custom
-          </option>
-        </select>
-      </div>
+          <path
+            d="M5 6l5 5 5-5 2 1-7 7-7-7z"
+          />
+        </svg>
+      </button>
+      <ul
+        aria-labelledby="downshift-null-label"
+        className="components-custom-select__menu"
+        id="downshift-null-menu"
+        onBlur={[Function]}
+        onKeyDown={[Function]}
+        onMouseLeave={[Function]}
+        role="listbox"
+        tabIndex={-1}
+      />
     </div>
-    <input
-      aria-label="Custom"
-      className="components-range-control__number"
-      onChange={[Function]}
-      type="number"
-      value={16}
-    />
+    <div
+      className="components-range-control__number-container"
+    >
+      <label
+        htmlFor="components-range-control__number#0"
+      >
+        Custom
+      </label>
+      <input
+        aria-label="Custom"
+        className="components-range-control__number"
+        id="components-range-control__number#0"
+        onChange={[Function]}
+        type="number"
+        value={16}
+      />
+    </div>
     <button
       className="components-button components-color-palette__clear is-button is-default is-small"
       disabled={false}
@@ -1610,53 +1627,60 @@ exports[`Storyshots Components|FontSizePicker With Slider 1`] = `
 <fieldset
   className="components-font-size-picker"
 >
-  <legend>
+  <legend
+    className="screen-reader-text"
+  >
     Font Size
   </legend>
   <div
     className="components-font-size-picker__controls"
   >
     <div
-      className="components-base-control components-font-size-picker__select"
+      className="components-custom-select components-font-size-picker__select"
     >
-      <div
-        className="components-base-control__field"
+      <label
+        className="components-custom-select__label"
+        htmlFor="downshift-null-toggle-button"
+        id="downshift-null-label"
       >
-        <label
-          className="components-visually-hidden"
-          htmlFor="inspector-select-control-1"
+        Preset Size
+      </label>
+      <button
+        aria-expanded={false}
+        aria-haspopup="listbox"
+        aria-label="Preset Size"
+        className="components-button components-custom-select__button"
+        id="downshift-null-toggle-button"
+        onClick={[Function]}
+        onKeyDown={[Function]}
+        type="button"
+      >
+        Normal
+        <svg
+          aria-hidden="true"
+          className="dashicon dashicons-arrow-down-alt2 components-custom-select__button-icon"
+          focusable="false"
+          height={20}
+          role="img"
+          viewBox="0 0 20 20"
+          width={20}
+          xmlns="http://www.w3.org/2000/svg"
         >
-          Choose preset
-        </label>
-        <select
-          className="components-select-control__input"
-          id="inspector-select-control-1"
-          multiple={false}
-          onChange={[Function]}
-          value="normal"
-        >
-          <option
-            value="small"
-          >
-            Small
-          </option>
-          <option
-            value="normal"
-          >
-            Normal
-          </option>
-          <option
-            value="big"
-          >
-            Big
-          </option>
-          <option
-            value="custom"
-          >
-            Custom
-          </option>
-        </select>
-      </div>
+          <path
+            d="M5 6l5 5 5-5 2 1-7 7-7-7z"
+          />
+        </svg>
+      </button>
+      <ul
+        aria-labelledby="downshift-null-label"
+        className="components-custom-select__menu"
+        id="downshift-null-menu"
+        onBlur={[Function]}
+        onKeyDown={[Function]}
+        onMouseLeave={[Function]}
+        role="listbox"
+        tabIndex={-1}
+      />
     </div>
     <button
       className="components-button components-color-palette__clear is-button is-default is-small"
@@ -1735,53 +1759,60 @@ exports[`Storyshots Components|FontSizePicker Without Custom Sizes 1`] = `
 <fieldset
   className="components-font-size-picker"
 >
-  <legend>
+  <legend
+    className="screen-reader-text"
+  >
     Font Size
   </legend>
   <div
     className="components-font-size-picker__controls"
   >
     <div
-      className="components-base-control components-font-size-picker__select"
+      className="components-custom-select components-font-size-picker__select"
     >
-      <div
-        className="components-base-control__field"
+      <label
+        className="components-custom-select__label"
+        htmlFor="downshift-null-toggle-button"
+        id="downshift-null-label"
       >
-        <label
-          className="components-visually-hidden"
-          htmlFor="inspector-select-control-2"
+        Preset Size
+      </label>
+      <button
+        aria-expanded={false}
+        aria-haspopup="listbox"
+        aria-label="Preset Size"
+        className="components-button components-custom-select__button"
+        id="downshift-null-toggle-button"
+        onClick={[Function]}
+        onKeyDown={[Function]}
+        type="button"
+      >
+        Normal
+        <svg
+          aria-hidden="true"
+          className="dashicon dashicons-arrow-down-alt2 components-custom-select__button-icon"
+          focusable="false"
+          height={20}
+          role="img"
+          viewBox="0 0 20 20"
+          width={20}
+          xmlns="http://www.w3.org/2000/svg"
         >
-          Choose preset
-        </label>
-        <select
-          className="components-select-control__input"
-          id="inspector-select-control-2"
-          multiple={false}
-          onChange={[Function]}
-          value="normal"
-        >
-          <option
-            value="small"
-          >
-            Small
-          </option>
-          <option
-            value="normal"
-          >
-            Normal
-          </option>
-          <option
-            value="big"
-          >
-            Big
-          </option>
-          <option
-            value="custom"
-          >
-            Custom
-          </option>
-        </select>
-      </div>
+          <path
+            d="M5 6l5 5 5-5 2 1-7 7-7-7z"
+          />
+        </svg>
+      </button>
+      <ul
+        aria-labelledby="downshift-null-label"
+        className="components-custom-select__menu"
+        id="downshift-null-menu"
+        onBlur={[Function]}
+        onKeyDown={[Function]}
+        onMouseLeave={[Function]}
+        role="listbox"
+        tabIndex={-1}
+      />
     </div>
     <button
       className="components-button components-color-palette__clear is-button is-default is-small"
@@ -3899,4 +3930,53 @@ Array [
      always show.
   </div>,
 ]
+`;
+
+exports[`Storyshots CustomSelect Default 1`] = `
+<div
+  className="components-custom-select"
+>
+  <label
+    className="components-custom-select__label"
+    htmlFor="downshift-null-toggle-button"
+    id="downshift-null-label"
+  >
+    Font Size
+  </label>
+  <button
+    aria-expanded={false}
+    aria-haspopup="listbox"
+    aria-label="Font Size"
+    className="components-button components-custom-select__button"
+    id="downshift-null-toggle-button"
+    onClick={[Function]}
+    onKeyDown={[Function]}
+    type="button"
+  >
+    <svg
+      aria-hidden="true"
+      className="dashicon dashicons-arrow-down-alt2 components-custom-select__button-icon"
+      focusable="false"
+      height={20}
+      role="img"
+      viewBox="0 0 20 20"
+      width={20}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M5 6l5 5 5-5 2 1-7 7-7-7z"
+      />
+    </svg>
+  </button>
+  <ul
+    aria-labelledby="downshift-null-label"
+    className="components-custom-select__menu"
+    id="downshift-null-menu"
+    onBlur={[Function]}
+    onKeyDown={[Function]}
+    onMouseLeave={[Function]}
+    role="listbox"
+    tabIndex={-1}
+  />
+</div>
 `;

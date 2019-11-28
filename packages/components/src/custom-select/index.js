@@ -9,7 +9,7 @@ import classnames from 'classnames';
  */
 import { Button, Dashicon } from '../';
 
-const itemToString = ( item ) => item.name;
+const itemToString = ( item ) => item && item.name;
 // This is needed so that in Windows, where
 // the menu does not necessarily open on
 // key up/down, you can still switch between
