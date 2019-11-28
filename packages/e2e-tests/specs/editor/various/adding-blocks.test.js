@@ -10,6 +10,8 @@ import {
 	setBrowserViewport,
 } from '@wordpress/e2e-test-utils';
 
+/** @typedef {import('./puppeteer').ElementHandle} ElementHandle */
+
 describe( 'adding blocks', () => {
 	beforeEach( async () => {
 		await createNewPost();
@@ -18,7 +20,7 @@ describe( 'adding blocks', () => {
 	/**
 	 * Given a Puppeteer ElementHandle, clicks below its bounding box.
 	 *
-	 * @param {puppeteer.ElementHandle} elementHandle Element handle.
+	 * @param {ElementHandle} elementHandle Element handle.
 	 *
 	 * @return {Promise} Promise resolving when click occurs.
 	 */

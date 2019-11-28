@@ -3,12 +3,14 @@
  */
 import { first } from 'lodash';
 
+/** @typedef {import('./puppeteer').ElementHandle} ElementHandle */
+
 /**
  * Finds the button responsible for toggling the sidebar panel with the provided title.
  *
  * @param {string} panelTitle The name of sidebar panel.
  *
- * @return {?puppeteer.ElementHandle} Object that represents an in-page DOM element.
+ * @return {?ElementHandle} Object that represents an in-page DOM element.
  */
 export async function findSidebarPanelWithTitle( panelTitle ) {
 	const classSelect = ( className ) => `[contains(concat(" ", @class, " "), " ${ className } ")]`;

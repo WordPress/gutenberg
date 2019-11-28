@@ -14,6 +14,8 @@ import { DEFAULT_CONTEXT } from './constants';
  */
 const DEFAULT_NOTICES = [];
 
+/** @typedef {import('./actions').WPNoticeAction} WPNoticeAction */
+
 /**
  * @typedef {Object} WPNotice Notice object.
  *
