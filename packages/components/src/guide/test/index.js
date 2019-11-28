@@ -4,11 +4,6 @@
 import { shallow } from 'enzyme';
 
 /**
- * WordPress dependencies
- */
-import { useMediaQuery } from '@wordpress/compose';
-
-/**
  * Internal dependencies
  */
 import Guide from '../';
@@ -16,16 +11,7 @@ import GuidePage from '../page';
 import PageControl from '../page-control';
 import Modal from '../../modal';
 
-jest.mock( '@wordpress/compose', () => ( {
-	...jest.requireActual( '@wordpress/compose' ),
-	useMediaQuery: jest.fn(),
-} ) );
-
 describe( 'Guide', () => {
-	beforeEach( () => {
-		useMediaQuery.mockImplementation( () => false );
-	} );
-
 	it( 'renders nothing when there are no pages', () => {
 		const wrapper = shallow( <Guide /> );
 		expect( wrapper.isEmptyRender() ).toBe( true );
@@ -66,17 +52,6 @@ describe( 'Guide', () => {
 		expect( wrapper.find( '.components-guide__back-button' ) ).toHaveLength( 1 );
 		expect( wrapper.find( '.components-guide__forward-button' ) ).toHaveLength( 0 );
 		expect( wrapper.find( '.components-guide__finish-button' ) ).toHaveLength( 1 );
-	} );
-
-	it( 'shows the finish button inline with the content on mobile', () => {
-		useMediaQuery.mockImplementation( () => true );
-		const wrapper = shallow(
-			<Guide>
-				<GuidePage>Page 1</GuidePage>
-			</Guide>
-		);
-		expect( wrapper.find( '.components-guide__finish-button' ) ).toHaveLength( 0 );
-		expect( wrapper.findWhere( ( node ) => node.text() === 'Finish' ) ).toHaveLength( 1 );
 	} );
 
 	it( 'calls onFinish when the finish button is clicked', () => {

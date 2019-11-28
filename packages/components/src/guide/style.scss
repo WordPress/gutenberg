@@ -104,5 +104,15 @@
 
 	&.components-guide__finish-button {
 		right: 0;
+
+		@media (max-width: $break-small) {
+			display: none;
+		}
+	}
+
+	&.components-guide__inline-finish-button {
+		@include break-small() {
+			display: none;
+		}
 	}
 }

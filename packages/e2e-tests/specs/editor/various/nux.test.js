@@ -40,8 +40,16 @@ describe( 'New User Experience (NUX)', () => {
 		welcomeGuideText = await page.$eval( '.edit-post-welcome-guide', ( element ) => element.innerText );
 		expect( welcomeGuideText ).toContain( 'Get to know the Block Library' );
 
-		// Click on the 'Get started' button
-		const [ getStartedButton ] = await page.$x( '//button[contains(text(), "Get started")]' );
+		// Click on the *visible* 'Get started' button. There are two in the DOM
+		// but only one is shown depending on viewport size
+		let getStartedButton;
+		for ( const buttonHandle of await page.$x( '//button[contains(text(), "Get started")]' ) ) {
+			if (
+				await page.evaluate( ( button ) => button.style.display !== 'none', buttonHandle )
+			) {
+				getStartedButton = buttonHandle;
+			}
+		}
 		await getStartedButton.click();
 
 		// Guide should be closed

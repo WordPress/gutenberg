@@ -6,7 +6,6 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useMediaQuery } from '@wordpress/compose';
 import { useState, Children } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -21,8 +20,6 @@ import { BackButtonIcon, ForwardButtonIcon } from './icons';
 import FinishButton from './finish-button';
 
 export default function Guide( { children, className, finishButtonText, onFinish } ) {
-	const isMobile = useMediaQuery( '(max-width: 600px)' );
-
 	const [ currentPage, setCurrentPage ] = useState( 0 );
 
 	const numberOfPages = Children.count( children );
@@ -61,8 +58,11 @@ export default function Guide( { children, className, finishButtonText, onFinish
 
 				{ children[ currentPage ] }
 
-				{ isMobile && ! canGoForward && (
-					<FinishButton onClick={ onFinish }>
+				{ ! canGoForward && (
+					<FinishButton
+						className="components-guide__inline-finish-button"
+						onClick={ onFinish }
+					>
 						{ finishButtonText || __( 'Finish' ) }
 					</FinishButton>
 				) }
@@ -91,7 +91,7 @@ export default function Guide( { children, className, finishButtonText, onFinish
 							{ __( 'Next' ) }
 						</IconButton>
 					) }
-					{ ! isMobile && ! canGoForward && (
+					{ ! canGoForward && (
 						<FinishButton
 							className="components-guide__finish-button"
 							onClick={ onFinish }
