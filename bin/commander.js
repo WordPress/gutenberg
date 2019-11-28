@@ -145,33 +145,14 @@ async function runUpdateTrunkContentStep( version, changelog, abortMessage ) {
 	await runStep( 'Updating trunk content', abortMessage, async () => {
 		console.log( '>> Replacing trunk content using the new plugin ZIP' );
 
-		// Delete everything except readme.txt and changelog.txt
-		runShellScript( 'find . -maxdepth 1 -not -name "changelog.txt" -not -name "readme.txt" -not -name ".svn" -not -name "." -not -name ".." -exec rm -rf {} +', svnWorkingDirectoryPath );
+		// Delete everything
+		runShellScript( 'find . -maxdepth 1 -not -name ".svn" -not -name "." -not -name ".." -exec rm -rf {} +', svnWorkingDirectoryPath );
 
 		// Update the content using the plugin ZIP
 		const gutenbergZipPath = gitWorkingDirectoryPath + '/gutenberg.zip';
 		runShellScript( 'unzip ' + gutenbergZipPath + ' -d ' + svnWorkingDirectoryPath );
 
 		console.log( '>> Updating the changelog in readme.txt and changelog.txt' );
-
-		// Update the content of the readme.txt file
-		const readmePath = svnWorkingDirectoryPath + '/readme.txt';
-		const readmeFileContent = fs.readFileSync( readmePath, 'utf8' );
-		const newReadmeContent =
-			readmeFileContent.substr( 0, readmeFileContent.indexOf( '== Changelog ==' ) ) +
-			'== Changelog ==\n\n' +
-			changelog + '\n';
-		fs.writeFileSync( readmePath, newReadmeContent );
-
-		// Update the content of the changelog.txt file
-		const changelogPath = svnWorkingDirectoryPath + '/changelog.txt';
-		const changelogFileContent = fs.readFileSync( changelogPath, 'utf8' );
-		const newChangelogContent =
-			'== Changelog ==\n\n' +
-			'= ' + version + ' =\n\n' +
-			changelog +
-			changelogFileContent.substr( changelogFileContent.indexOf( '== Changelog ==' ) + 16 );
-		fs.writeFileSync( changelogPath, newChangelogContent );
 
 		// Commit the content changes
 		runShellScript( "svn st | grep '^\?' | awk '{print $2}' | xargs svn add", svnWorkingDirectoryPath );
@@ -233,7 +214,21 @@ async function updateThePluginStableVersion( version, abortMessage ) {
 
 		runShellScript( 'svn commit -m "Releasing Gutenberg version ' + version + '"', svnWorkingDirectoryPath );
 
-		console.log( '>> Stable version updated successfully' );
+		console.log( '>> Stable version updated successfully on the svn repository' );
+
+		const readmeGitPath = gitWorkingDirectoryPath + '/readme.txt';
+		const simpleGit = SimpleGit( gitWorkingDirectoryPath );
+		await simpleGit.fetch();
+		await simpleGit.reset( 'hard' );
+		await simpleGit.checkout( 'master' );
+		await simpleGit.pull( 'origin', 'master' );
+		fs.writeFileSync( readmeGitPath, newReadmeContent );
+		await simpleGit.add( [
+			readmeGitPath,
+		] );
+		await simpleGit.commit( 'Update stable tag version to ' + version );
+		await simpleGit.push( 'origin', 'master' );
+		console.log( '>> Stable version updated successfully on the git repository' );
 	} );
 }
 
@@ -342,11 +337,12 @@ async function runReleaseBranchCheckoutStep( abortMessage ) {
  * and commit the changes.
  *
  * @param {string} version      Version to use.
+ * @param {string} changelog    Changelog to use.
  * @param {string} abortMessage Abort message.
  *
  * @return {string} hash of the version bump commit.
  */
-async function runBumpPluginVersionAndCommitStep( version, abortMessage ) {
+async function runBumpPluginVersionAndCommitStep( version, changelog, abortMessage ) {
 	let commitHash;
 	await runStep( 'Updating the plugin version', abortMessage, async () => {
 		const simpleGit = SimpleGit( gitWorkingDirectoryPath );
@@ -369,6 +365,32 @@ async function runBumpPluginVersionAndCommitStep( version, abortMessage ) {
 		fs.writeFileSync( pluginFilePath, content.replace( ' * Version: ' + packageJson.version, ' * Version: ' + version ) );
 		console.log( '>> The plugin version has been updated successfully.' );
 
+		// Update the content of the readme.txt file
+		const readmePath = gitWorkingDirectoryPath + '/readme.txt';
+		const readmeFileContent = fs.readFileSync( readmePath, 'utf8' );
+		const newReadmeContent =
+			readmeFileContent.substr( 0, readmeFileContent.indexOf( '== Changelog ==' ) ) +
+			'== Changelog ==\n\n' +
+			changelog + '\n';
+		fs.writeFileSync( readmePath, newReadmeContent );
+
+		// Update the content of the changelog.txt file
+		const stableVersion = version.match( /[0-9]+\.[0-9]+\.[0-9]+/ )[ 0 ];
+		const changelogPath = gitWorkingDirectoryPath + '/changelog.txt';
+		const changelogFileContent = fs.readFileSync( changelogPath, 'utf8' );
+		const versionHeader = '= ' + version + ' =\n\n';
+		const regexToSearch = /=\s([0-9]+\.[0-9]+\.[0-9]+)(-rc\.[0-9]+)?\s=\n\n/g;
+		let lastDifferentVersionMatch = regexToSearch.exec( changelogFileContent );
+		if ( lastDifferentVersionMatch[ 1 ] === stableVersion ) {
+			lastDifferentVersionMatch = regexToSearch.exec( changelogFileContent );
+		}
+		const newChangelogContent =
+			'== Changelog ==\n\n' +
+			versionHeader +
+			changelog + '\n\n' +
+			changelogFileContent.substr( lastDifferentVersionMatch.index );
+		fs.writeFileSync( changelogPath, newChangelogContent );
+
 		// Commit the version bump
 		await askForConfirmationToContinue(
 			'Please check the diff. Proceed with the version bump commit?',
@@ -379,6 +401,8 @@ async function runBumpPluginVersionAndCommitStep( version, abortMessage ) {
 			packageJsonPath,
 			packageLockPath,
 			pluginFilePath,
+			readmePath,
+			changelogPath,
 		] );
 		const commitData = await simpleGit.commit( 'Bump plugin version to ' + version );
 		commitHash = commitData.commit;
@@ -450,12 +474,13 @@ async function runPushGitChangesStep( releaseBranch, abortMessage ) {
  *
  * @param {string}  version      Released version.
  * @param {string}  versionLabel Label of the released Version.
+ * @param {string}  changelog    Release changelog.
  * @param {boolean} isPrerelease is a pre-release.
  * @param {string}  abortMessage Abort message.
  *
  * @return {Object} Github release object.
  */
-async function runGithubReleaseStep( version, versionLabel, isPrerelease, abortMessage ) {
+async function runGithubReleaseStep( version, versionLabel, changelog, isPrerelease, abortMessage ) {
 	let octokit;
 	let release;
 	await runStep( 'Creating the GitHub release', abortMessage, async () => {
@@ -464,11 +489,6 @@ async function runGithubReleaseStep( version, versionLabel, isPrerelease, abortM
 			true,
 			abortMessage
 		);
-		const { changelog } = await inquirer.prompt( [ {
-			type: 'editor',
-			name: 'changelog',
-			message: 'Please provide the CHANGELOG of the release (markdown)',
-		} ] );
 
 		const { token } = await inquirer.prompt( [ {
 			type: 'input',
@@ -550,6 +570,12 @@ async function releasePlugin( isRC = true ) {
 	let abortMessage = 'Aborting!';
 	await askForConfirmationToContinue( 'Ready to go? ' );
 
+	const { changelog } = await inquirer.prompt( [ {
+		type: 'editor',
+		name: 'changelog',
+		message: 'Please provide the CHANGELOG of the release (markdown)',
+	} ] );
+
 	// Cloning the Git repository
 	await runGitRepositoryCloneStep( abortMessage );
 
@@ -559,7 +585,7 @@ async function releasePlugin( isRC = true ) {
 		await runReleaseBranchCheckoutStep( abortMessage );
 
 	// Bumping the version and commit.
-	const commitHash = await runBumpPluginVersionAndCommitStep( version, abortMessage );
+	const commitHash = await runBumpPluginVersionAndCommitStep( version, changelog, abortMessage );
 
 	// Plugin ZIP creation
 	await runPluginZIPCreationStep();
@@ -572,7 +598,7 @@ async function releasePlugin( isRC = true ) {
 	abortMessage = 'Aborting! Make sure to ' + isRC ? 'remove' : 'reset' + ' the remote release branch and remove the git tag.';
 
 	// Creating the GitHub Release
-	const release = await runGithubReleaseStep( version, versionLabel, isRC, abortMessage );
+	const release = await runGithubReleaseStep( version, versionLabel, changelog, isRC, abortMessage );
 	abortMessage = 'Aborting! Make sure to manually cherry-pick the ' + success( commitHash ) + ' commit to the master branch.';
 	if ( ! isRC ) {
 		abortMessage += ' Make sure to perform the SVN release manually as well.';
