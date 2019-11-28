@@ -608,6 +608,15 @@ public class WPAndroidGlueCode {
             mMediaPickedByUserOnBlock = false;
             List<RNMedia> rnMediaList = new ArrayList<>();
 
+            // We have special handling here for the image block when the user selects multiple items from the
+            // WordPress Media Library: We pass the first image to the callback, and the remaining images will be
+            // appended as blocks via sendOrDeferAppendMediaSignal
+            //
+            // All other media selection results should be passed to the callback at once (as a collection)
+            //
+            // Note: In the future, after image block <-> gallery block transforms have been implemented, this special
+            // handling will no longer be necessary
+
             if (mAppendsMultipleSelectedToSiblingBlocks && 1 < mediaList.size()) {
                 rnMediaList.add(mediaList.get(0));
                 mPendingMediaUploadCallback.onUploadMediaFileSelected(rnMediaList);
