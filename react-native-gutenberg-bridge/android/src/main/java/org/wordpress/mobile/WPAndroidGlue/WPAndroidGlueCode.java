@@ -186,6 +186,7 @@ public class WPAndroidGlueCode {
             @Override
             public void requestMediaPickFromDeviceLibrary(MediaUploadCallback mediaUploadCallback, Boolean allowMultipleSelection, MediaType mediaType) {
                 mMediaPickedByUserOnBlock = true;
+                mAppendsMultipleSelectedToSiblingBlocks = false;
                 mPendingMediaUploadCallback = mediaUploadCallback;
                 if (mediaType == MediaType.IMAGE) {
                     mOnMediaLibraryButtonListener.onUploadPhotoButtonClicked(allowMultipleSelection);
@@ -199,6 +200,7 @@ public class WPAndroidGlueCode {
             @Override
             public void requestMediaPickerFromDeviceCamera(MediaUploadCallback mediaUploadCallback, MediaType mediaType) {
                 mMediaPickedByUserOnBlock = true;
+                mAppendsMultipleSelectedToSiblingBlocks = false;
                 mPendingMediaUploadCallback = mediaUploadCallback;
                 if (mediaType == MediaType.IMAGE) {
                     mOnMediaLibraryButtonListener.onCapturePhotoButtonClicked();
