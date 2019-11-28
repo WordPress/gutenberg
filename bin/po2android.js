@@ -3,7 +3,6 @@
 const gettextParser = require( 'gettext-parser' ),
 	fs = require( 'fs' ),
 	crypto = require( 'crypto' );
-
 const indent = '    ';
 
 /**
@@ -14,15 +13,23 @@ const indent = '    ';
  * @return {string} Escaped string to be copied into the XML <string></string> node
  */
 function escapeResourceXML( unsafeXMLValue ) {
-	// Let's first replace XML special characters that JSON.stringify does not escape: <, > and &
-	// Then let's use JSON.stringify to handle pre and post spaces as well as escaping ", \, \t and \n
-	return JSON.stringify( unsafeXMLValue.replace( /[<>&]/g, function( character ) {
+	// See: https://tekeye.uk/android/examples/android-string-resources-gotchas
+	// Let's replace XML special characters  <, >, &, ", ', \, \t and \n
+	// Note that this does not support android:textstyle attributes (<b></b>...)
+	return unsafeXMLValue.replace( /(\r?\n|\r|\t|<|>|&|'|"|\\)/gm, function( character ) {
 		switch ( character ) {
 			case '<': return '&lt;';
 			case '>': return '&gt;';
 			case '&': return '&amp;';
+			case '\'': return '\\\'';
+			case '"': return '\\\"';
+			case '\r':
+			case '\n':
+			case '\r\n': return '\\n';
+			case '\t': return '\\t';
+			case '\\': return '\\\\';
 		}
-	} ) );
+	} );
 }
 
 /**
