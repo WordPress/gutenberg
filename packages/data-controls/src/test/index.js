@@ -61,7 +61,6 @@ describe( 'controls', () => {
 		beforeEach( () => {
 			selectorWithUndefinedResolver.mockReturnValue( 'foo' );
 			selectorWithFalseResolver.mockReturnValue( 'bar' );
-			selectorWithResolver.mockReturnValue( 'resolved' );
 			hasFinishedResolution.mockReturnValue( false );
 			selectorWithResolver.mockResolvedValue( 'resolved' );
 		} );
