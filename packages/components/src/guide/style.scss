@@ -103,10 +103,11 @@
 	}
 
 	&.components-guide__finish-button {
+		display: none;
 		right: 0;
 
-		@media (max-width: $break-small) {
-			display: none;
+		@include break-small() {
+			display: unset;
 		}
 	}
 
