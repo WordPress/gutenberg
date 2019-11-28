@@ -806,7 +806,7 @@ export function * setNavigationMode( isNavigationMode = true ) {
 	};
 
 	if ( isNavigationMode ) {
-		speak( __( 'You are currently in navigation mode. Navigate blocks using arrow keys. To exit navigation mode and edit the selected block, press Enter.' ) );
+		speak( __( 'You are currently in navigation mode. Navigate blocks using the Tab key. To exit navigation mode and edit the selected block, press Enter.' ) );
 	} else {
 		speak( __( 'You are currently in edit mode. To return to the navigation mode, press Escape.' ) );
 	}
