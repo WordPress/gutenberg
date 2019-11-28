@@ -58,7 +58,7 @@ function useThrottledWindowScrollOrResize( handler, ignoredScrollableRef ) {
 			window.removeEventListener( 'resize', throttledRefresh );
 			window.removeEventListener( 'scroll', throttledRefresh, true );
 		};
-	}, [] );
+	} );
 }
 
 function computeAnchorRect(
@@ -244,28 +244,22 @@ const Popover = ( {
 	const anchorRefFallback = useRef( null );
 	const contentRef = useRef( null );
 	const containerRef = useRef();
-	const [ popoverPosition, setPopoverPosition ] = useState( {
-		popoverLeft: null,
-		popoverTop: null,
-		yAxis: 'top',
-		xAxis: 'center',
-		contentHeight: null,
-		contentWidth: null,
-		isMobile: false,
-	} );
 
 	// Animation
 	const [ isReadyToAnimate, setIsReadyToAnimate ] = useState( false );
 
 	// Content size
 	const contentSize = useInitialContentSize( contentRef );
+
 	useEffect( () => {
 		if ( contentSize ) {
 			setIsReadyToAnimate( true );
 		}
 	}, [ contentSize ] );
 
-	const computePosition = () => {
+	console.log( isReadyToAnimate );
+
+	const refresh = () => {
 		let anchor = computeAnchorRect(
 			anchorRefFallback,
 			anchorRect,
@@ -281,39 +275,47 @@ const Popover = ( {
 		);
 
 		if ( ! anchor || ! contentSize ) {
-			return {
-				popoverLeft: null,
-				popoverTop: null,
-				yAxis: 'top',
-				xAxis: 'center',
-				contentHeight: null,
-				contentWidth: null,
-				isMobile: false,
-			};
+			return;
 		}
 
-		return computePopoverPosition(
+		const {
+			isMobile,
+			popoverTop,
+			popoverLeft,
+			xAxis,
+			yAxis,
+			contentHeight,
+			contentWidth,
+		} = computePopoverPosition(
 			anchor,
 			contentSize,
 			position,
 			expandOnMobile
 		);
-	};
 
-	const refresh = () => {
-		const pos = computePosition();
-		const { isMobile, popoverTop, popoverLeft } = pos;
-
-		setPopoverPosition( pos );
-
-		if ( isMobile || ! popoverTop || ! popoverLeft ) {
+		if ( isMobile ) {
 			return;
 		}
 
-		console.log( containerRef.current );
+		const classes = classnames(
+			'components-popover',
+			className,
+			'is-' + yAxis,
+			'is-' + xAxis,
+			{
+				'is-mobile': isMobile,
+				'is-without-arrow': noArrow || (
+					xAxis === 'center' &&
+					yAxis === 'middle'
+				),
+			}
+		);
 
+		containerRef.current.className = classes;
 		containerRef.current.style.top = popoverTop + 'px';
 		containerRef.current.style.left = popoverLeft + 'px';
+		contentRef.current.style.maxHeight = contentHeight + 'px';
+		contentRef.current.style.maxWidth = contentWidth + 'px';
 	};
 
 	useEffect( refresh );
@@ -327,7 +329,6 @@ const Popover = ( {
 			* For these situations, we refresh the popover every 0.5s
 			*/
 			const intervalHandle = setInterval( refresh, 500 );
-
 			return () => clearInterval( intervalHandle );
 		}
 	}, [ anchorRect ] );
@@ -391,32 +392,6 @@ const Popover = ( {
 		onClickOutside( clickEvent );
 	}
 
-	// Compute the animation position
-	const yAxisMapping = {
-		top: 'bottom',
-		bottom: 'top',
-	};
-	const xAxisMapping = {
-		left: 'right',
-		right: 'left',
-	};
-	const animateYAxis = yAxisMapping[ popoverPosition.yAxis ] || 'middle';
-	const animateXAxis = xAxisMapping[ popoverPosition.xAxis ] || 'center';
-
-	const classes = classnames(
-		'components-popover',
-		className,
-		'is-' + popoverPosition.yAxis,
-		'is-' + popoverPosition.xAxis,
-		{
-			'is-mobile': popoverPosition.isMobile,
-			'is-without-arrow': noArrow || (
-				popoverPosition.xAxis === 'center' &&
-				popoverPosition.yAxis === 'middle'
-			),
-		}
-	);
-
 	// Disable reason: We care to capture the _bubbled_ events from inputs
 	// within popover as inferring close intent.
 
@@ -424,40 +399,34 @@ const Popover = ( {
 		<PopoverDetectOutside onFocusOutside={ handleOnFocusOutside }>
 			<Animate
 				type={ animate && isReadyToAnimate ? 'appear' : null }
-				options={ { origin: animateYAxis + ' ' + animateXAxis } }
+				// options={ { origin: animateYAxis + ' ' + animateXAxis } }
 			>
 				{ ( { className: animateClassName } ) => (
 					// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 					<div
-						className={ classnames( classes, animateClassName ) }
+						className={ classnames( 'components-popover', className, animateClassName ) }
 						style={ {
-							top: ! popoverPosition.isMobile && popoverPosition.popoverTop ? popoverPosition.popoverTop + 'px' : undefined,
-							left: ! popoverPosition.isMobile && popoverPosition.popoverLeft ? popoverPosition.popoverLeft + 'px' : undefined,
 							visibility: contentSize ? undefined : 'hidden',
 						} }
 						{ ...contentProps }
 						onKeyDown={ maybeClose }
 						ref={ containerRef }
 					>
-						{ popoverPosition.isMobile && (
+						<IsolatedEventContainer>
 							<div className="components-popover__header">
 								<span className="components-popover__header-title">
 									{ headerTitle }
 								</span>
 								<IconButton className="components-popover__close" icon="no-alt" onClick={ onClose } />
 							</div>
-						) }
-						<div
-							ref={ contentRef }
-							className="components-popover__content"
-							style={ {
-								maxHeight: ! popoverPosition.isMobile && popoverPosition.contentHeight ? popoverPosition.contentHeight + 'px' : undefined,
-								maxWidth: ! popoverPosition.isMobile && popoverPosition.contentWidth ? popoverPosition.contentWidth + 'px' : undefined,
-							} }
-							tabIndex="-1"
-						>
-							{ children }
-						</div>
+							<div
+								ref={ contentRef }
+								className="components-popover__content"
+								tabIndex="-1"
+							>
+								{ children }
+							</div>
+						</IsolatedEventContainer>
 					</div>
 				) }
 			</Animate>
@@ -482,7 +451,6 @@ const Popover = ( {
 				return (
 					<span ref={ anchorRefFallback }>
 						{ content }
-						{ popoverPosition.isMobile && expandOnMobile && <ScrollLock /> }
 					</span>
 				);
 			} }

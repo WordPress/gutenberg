@@ -183,7 +183,11 @@ $arrow-size: 8px;
 	height: 100%;
 }
 
-.components-popover__header {
+.components-popover .components-popover__header {
+	display: none;
+}
+
+.components-popover.is-mobile .components-popover__header {
 	align-items: center;
 	background: $white;
 	border: $border-width solid $light-gray-500;
