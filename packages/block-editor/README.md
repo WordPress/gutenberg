@@ -427,6 +427,10 @@ _Type_
 
 -   `Object` 
 
+<a name="ToolSelector" href="#ToolSelector">#</a> **ToolSelector**
+
+Undocumented declaration.
+
 <a name="transformStyles" href="#transformStyles">#</a> **transformStyles**
 
 Applies a series of CSS rule transforms to wrap selectors inside a given class and/or rewrite URLs depending on the parameters passed.

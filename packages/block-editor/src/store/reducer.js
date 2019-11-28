@@ -1256,7 +1256,7 @@ export const blockListSettings = ( state = {}, action ) => {
  *
  * @return {string} Updated state.
  */
-export function isNavigationMode( state = true, action ) {
+export function isNavigationMode( state = false, action ) {
 	if ( action.type === 'SET_NAVIGATION_MODE' ) {
 		return action.isNavigationMode;
 	}

@@ -101,7 +101,7 @@ function BlockListBlock( {
 	animateOnChange,
 	enableAnimation,
 	isNavigationMode,
-	enableNavigationMode,
+	setNavigationMode,
 } ) {
 	// Random state used to rerender the component if needed, ideally we don't need this
 	const [ , updateRerenderState ] = useState( {} );
@@ -326,7 +326,7 @@ function BlockListBlock( {
 					isSelected &&
 					isEditMode
 				) {
-					enableNavigationMode();
+					setNavigationMode( true );
 					wrapper.current.focus();
 				}
 				break;
@@ -343,6 +343,14 @@ function BlockListBlock( {
 		// https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
 		if ( event.button !== 0 ) {
 			return;
+		}
+
+		if (
+			isNavigationMode &&
+			isSelected &&
+			isInsideRootBlock( blockNodeRef.current, event.target )
+		) {
+			setNavigationMode( false );
 		}
 
 		if ( event.shiftKey ) {
@@ -778,9 +786,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 		toggleSelection( selectionEnabled ) {
 			toggleSelection( selectionEnabled );
 		},
-		enableNavigationMode() {
-			setNavigationMode( true );
-		},
+		setNavigationMode,
 	};
 } );
 

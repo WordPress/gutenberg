@@ -17,6 +17,7 @@ export default function MenuItemsChoice( {
 				icon={ isSelected && 'yes' }
 				isSelected={ isSelected }
 				shortcut={ item.shortcut }
+				className="components-menu-items-choice"
 				onClick={ () => {
 					if ( ! isSelected ) {
 						onSelect( item.value );
