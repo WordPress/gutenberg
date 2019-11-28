@@ -13,7 +13,7 @@ export default { title: 'Components|IconButton', component: IconButton };
 export const _default = () => {
 	const icon = text( 'Icon', 'ellipsis' );
 	const label = text( 'Label', 'More' );
-	const size = number( 'Size', 24 );
+	const size = number( 'Size' );
 
 	return (
 		<IconButton

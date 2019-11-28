@@ -2,12 +2,12 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isArray, isString } from 'lodash';
+import { isArray } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { cloneElement, forwardRef } from '@wordpress/element';
+import { forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -49,13 +49,6 @@ function IconButton( props, ref ) {
 		)
 	);
 
-	let buttonIcon = isString( icon ) ?
-		<Icon icon={ icon } /> :
-		icon;
-	if ( size ) {
-		buttonIcon = cloneElement( buttonIcon, { size } );
-	}
-
 	let element = (
 		<Button
 			aria-label={ label }
@@ -63,7 +56,7 @@ function IconButton( props, ref ) {
 			className={ classes }
 			ref={ ref }
 		>
-			{ buttonIcon }
+			<Icon icon={ icon } size={ size } />
 			{ children }
 		</Button>
 	);

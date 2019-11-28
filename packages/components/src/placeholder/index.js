@@ -2,17 +2,11 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isString } from 'lodash';
-
-/**
- * WordPress dependencies
- */
-import { cloneElement } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import Dashicon from '../dashicon';
+import Icon from '../icon';
 
 /**
  * Renders a placeholder. Normally used by blocks to render their empty state.
@@ -32,7 +26,7 @@ function Placeholder( { icon, children, label, instructions, className, notices,
 				</div>
 			}
 			<div className="components-placeholder__label">
-				{ isString( icon ) ? <Dashicon icon={ icon } /> : cloneElement( icon, { height: 24, width: 24 } ) }
+				<Icon icon={ icon } />
 				{ label }
 			</div>
 			{ !! instructions && <div className="components-placeholder__instructions">{ instructions }</div> }
