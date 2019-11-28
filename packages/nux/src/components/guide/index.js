@@ -103,14 +103,6 @@ export function Guide( { children, className, finishButtonText, isMobile, onFini
 	);
 }
 
-export function Page( props ) {
-	return <div { ...props } />;
-}
-
-const EnhancedGuide = withSelect( ( select ) => ( {
+export default withSelect( ( select ) => ( {
 	isMobile: select( 'core/viewport' ).isViewportMatch( '< small' ),
 } ) )( Guide );
-
-EnhancedGuide.Page = Page;
-
-export default EnhancedGuide;

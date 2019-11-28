@@ -11,7 +11,8 @@ import { Modal } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { Guide, Page } from '../';
+import { Guide } from '../';
+import GuidePage from '../page';
 import PageControl from '../page-control';
 
 describe( 'Guide', () => {
@@ -23,8 +24,8 @@ describe( 'Guide', () => {
 	it( 'renders when there are pages', () => {
 		const wrapper = shallow(
 			<Guide>
-				<Page>Page 1</Page>
-				<Page>Page 2</Page>
+				<GuidePage>Page 1</GuidePage>
+				<GuidePage>Page 2</GuidePage>
 			</Guide>
 		);
 		expect( wrapper ).toMatchSnapshot();
@@ -33,8 +34,8 @@ describe( 'Guide', () => {
 	it( 'hides back button and shows forward button on the first page', () => {
 		const wrapper = shallow(
 			<Guide>
-				<Page>Page 1</Page>
-				<Page>Page 2</Page>
+				<GuidePage>Page 1</GuidePage>
+				<GuidePage>Page 2</GuidePage>
 			</Guide>
 		);
 		expect( wrapper.find( PageControl ).prop( 'currentPage' ) ).toBe( 0 );
@@ -46,8 +47,8 @@ describe( 'Guide', () => {
 	it( 'shows back button and shows finish button on the last page', () => {
 		const wrapper = shallow(
 			<Guide>
-				<Page>Page 1</Page>
-				<Page>Page 2</Page>
+				<GuidePage>Page 1</GuidePage>
+				<GuidePage>Page 2</GuidePage>
 			</Guide>
 		);
 		wrapper.find( '.nux-guide__forward-button' ).simulate( 'click' );
@@ -60,7 +61,7 @@ describe( 'Guide', () => {
 	it( 'shows the finish button inline with the content on mobile', () => {
 		const wrapper = shallow(
 			<Guide isMobile>
-				<Page>Page 1</Page>
+				<GuidePage>Page 1</GuidePage>
 			</Guide>
 		);
 		expect( wrapper.find( '.nux-guide__finish-button' ) ).toHaveLength( 0 );
@@ -71,7 +72,7 @@ describe( 'Guide', () => {
 		const onFinish = jest.fn();
 		const wrapper = shallow(
 			<Guide onFinish={ onFinish }>
-				<Page>Page 1</Page>
+				<GuidePage>Page 1</GuidePage>
 			</Guide>
 		);
 		wrapper.find( '.nux-guide__finish-button' ).simulate( 'click' );
@@ -82,7 +83,7 @@ describe( 'Guide', () => {
 		const onFinish = jest.fn();
 		const wrapper = shallow(
 			<Guide onFinish={ onFinish }>
-				<Page>Page 1</Page>
+				<GuidePage>Page 1</GuidePage>
 			</Guide>
 		);
 		wrapper.find( Modal ).prop( 'onRequestClose' )();

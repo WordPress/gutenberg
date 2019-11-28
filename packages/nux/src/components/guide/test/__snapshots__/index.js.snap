@@ -17,9 +17,9 @@ exports[`Guide renders when there are pages 1`] = `
   <div
     className="nux-guide__container"
   >
-    <Page>
+    <GuidePage>
       Page 1
-    </Page>
+    </GuidePage>
     <div
       className="nux-guide__footer"
     >

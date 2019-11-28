@@ -1,7 +1,7 @@
 Guide
 ========
 
-`Guide` is a React component that renders a _user guide_ in a modal. The guide consists of several `Guide.Page` components which the user can step through one by one. The guide is finished when the modal is closed or when the user clicks _Finish_ on the last page of the guide.
+`Guide` is a React component that renders a _user guide_ in a modal. The guide consists of several `GuidePage` components which the user can step through one by one. The guide is finished when the modal is closed or when the user clicks _Finish_ on the last page of the guide.
 
 ## Usage
 
@@ -14,12 +14,12 @@ function MyTutorial() {
 	}
 
 	<Guide onFinish={ () => setIsOpen( false ) }>
-		<Guide.Page>
+		<GuidePage>
 			<p>Welcome to the ACME Store! Select a category to begin browsing our wares.</p>
-		</Guide.Page>
-		<Guide.Page>
+		</GuidePage>
+		<GuidePage>
 			<p>When you find something you love, click <i>Add to Cart</i> to add the product to your shopping cart.</p>
-		</Guide.Page>
+		</GuidePage>
 	</Guide>
 }
 ```
@@ -37,7 +37,7 @@ A function which is called when the guide is finished. The guide is finished whe
 
 ### children
 
-A list of `Guide.Page` components. One page is shown at a time.
+A list of `GuidePage` components. One page is shown at a time.
 
 - Required: Yes
 

@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { __experimentalGuide as Guide } from '@wordpress/nux';
+import { __experimentalGuide as Guide, __experimentalGuidePage as GuidePage } from '@wordpress/nux';
 import { __ } from '@wordpress/i18n';
 import { __experimentalCreateInterpolateElement } from '@wordpress/element';
 
@@ -27,7 +27,7 @@ export default function WelcomeGuide() {
 			onFinish={ disableTips }
 		>
 
-			<Guide.Page className="edit-post-welcome-guide__page">
+			<GuidePage className="edit-post-welcome-guide__page">
 				<h1 className="edit-post-welcome-guide__heading">
 					{ __( 'Welcome to the Block Editor' ) }
 				</h1>
@@ -35,9 +35,9 @@ export default function WelcomeGuide() {
 				<p className="edit-post-welcome-guide__text">
 					{ __( 'In the WordPress editor, each paragraph, image, or video is presented as a distinct “block” of content.' ) }
 				</p>
-			</Guide.Page>
+			</GuidePage>
 
-			<Guide.Page className="edit-post-welcome-guide__page">
+			<GuidePage className="edit-post-welcome-guide__page">
 				<h1 className="edit-post-welcome-guide__heading">
 					{ __( 'Make each block your own' ) }
 				</h1>
@@ -45,9 +45,9 @@ export default function WelcomeGuide() {
 				<p className="edit-post-welcome-guide__text">
 					{ __( 'Each block comes with its own set of controls for changing things like color, width, and alignment. These will show and hide automatically when you have a block selected.' ) }
 				</p>
-			</Guide.Page>
+			</GuidePage>
 
-			<Guide.Page className="edit-post-welcome-guide__page">
+			<GuidePage className="edit-post-welcome-guide__page">
 				<h1 className="edit-post-welcome-guide__heading">
 					{ __( 'Get to know the Block Library' ) }
 				</h1>
@@ -64,7 +64,7 @@ export default function WelcomeGuide() {
 						}
 					) }
 				</p>
-			</Guide.Page>
+			</GuidePage>
 
 		</Guide>
 	);
