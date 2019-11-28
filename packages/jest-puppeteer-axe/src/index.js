@@ -54,14 +54,14 @@ function formatViolations( violations ) {
  * @see https://github.com/dequelabs/axe-puppeteer
  *
  * @param {puppeteer.Page}  page                 Puppeteer's page instance.
- * @param {?Object}         params               Optional Axe API options.
+ * @param {?Object}         params               Optional params that allow better control over Axe API.
  * @param {?string|Array}   params.include       CSS selector(s) to add to the list of elements
  *                                               to include in analysis.
  * @param {?string|Array}   params.exclude       CSS selector(s) to add to the list of elements
  *                                               to exclude from analysis.
  * @param {?Array}          params.disabledRules The list of Axe rules to skip from verification.
- * @param {?Axe.RunOptions} params.options       Options to be used by axe.run.
- * @param {?Axe.Spec}       params.config        Axe configuration object.
+ * @param {?Axe.RunOptions} params.options       A flexible way to configure how Axe run operates, see https://github.com/dequelabs/axe-core/blob/master/doc/API.md#options-parameter.
+ * @param {?Axe.Spec}       params.config        Axe configuration object, see https://github.com/dequelabs/axe-core/blob/master/doc/API.md#api-name-axeconfigure.
  *
  * @return {Object} A matcher object with two keys `pass` and `message`.
  */
