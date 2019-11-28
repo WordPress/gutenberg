@@ -9,7 +9,7 @@ import { isEmpty } from 'lodash';
  */
 import GalleryImage from './gallery-image';
 import { defaultColumnsNumber } from './shared';
-import styles from './gallery-styles';
+import styles from './gallery-styles.scss';
 import Tiles from './tiles';
 
 /**
