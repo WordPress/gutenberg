@@ -11,7 +11,7 @@ import { Children } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import styles from './tiles-styles';
+import styles from './tiles-styles.scss';
 
 function Tiles( props ) {
 	const {
