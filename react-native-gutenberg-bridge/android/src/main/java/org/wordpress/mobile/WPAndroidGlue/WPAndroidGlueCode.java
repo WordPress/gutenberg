@@ -290,6 +290,7 @@ public class WPAndroidGlueCode {
                                                        Boolean allowMultipleSelection) {
                 mPendingMediaUploadCallback = mediaSelectedCallback;
                 mMediaPickedByUserOnBlock = true;
+                mAppendsMultipleSelectedToSiblingBlocks = false;
                 mOnMediaLibraryButtonListener.onOtherMediaButtonClicked(mediaSource, allowMultipleSelection);
             }
 
