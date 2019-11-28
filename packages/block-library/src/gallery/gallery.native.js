@@ -62,7 +62,7 @@ export const Gallery = ( props ) => {
 				setIsCaptionSelected( false );
 			}
 			// we need to fully invoke the curried function here
-			onSelectImage( index )(); 
+			onSelectImage( index )();
 		};
 	};
 
