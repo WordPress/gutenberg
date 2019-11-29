@@ -1,23 +1,7 @@
 /**
  * External dependencies
  */
-import memoize from 'memize';
-import { times, findIndex, sumBy, merge, mapValues } from 'lodash';
-
-/**
- * Returns the layouts configuration for a given number of columns.
- *
- * @param {number} columns Number of columns.
- *
- * @return {Object[]} Columns layout configuration.
- */
-export const getColumnsTemplate = memoize( ( columns ) => {
-	if ( columns === undefined ) {
-		return null;
-	}
-
-	return times( columns, () => [ 'core/column' ] );
-} );
+import { findIndex, sumBy, merge, mapValues } from 'lodash';
 
 /**
  * Returns a column width attribute value rounded to standard precision.
