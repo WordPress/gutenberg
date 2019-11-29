@@ -42,7 +42,6 @@ export { selectBlockByClientId } from './select-block-by-client-id';
 export { setBrowserViewport } from './set-browser-viewport';
 export { setPostContent } from './set-post-content';
 export { switchEditorModeTo } from './switch-editor-mode-to';
-export { disableNavigationMode } from './keyboard-mode';
 export { switchUserToAdmin } from './switch-user-to-admin';
 export { switchUserToTest } from './switch-user-to-test';
 export { toggleMoreMenu } from './toggle-more-menu';

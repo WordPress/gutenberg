@@ -16,6 +16,7 @@ export { default as ClipboardButton } from './clipboard-button';
 export { default as ColorIndicator } from './color-indicator';
 export { default as ColorPalette } from './color-palette';
 export { default as ColorPicker } from './color-picker';
+export { default as CustomSelect } from './custom-select';
 export { default as Dashicon } from './dashicon';
 export { DateTimePicker, DatePicker, TimePicker } from './date-time';
 export { default as __experimentalDimensionControl } from './dimension-control';
@@ -67,6 +68,7 @@ export { default as Tip } from './tip';
 export { default as ToggleControl } from './toggle-control';
 export { default as Toolbar } from './toolbar';
 export { default as ToolbarButton } from './toolbar-button';
+export { default as ToolbarGroup } from './toolbar-group';
 export { default as Tooltip } from './tooltip';
 export { default as TreeSelect } from './tree-select';
 export { default as VisuallyHidden } from './visually-hidden';
@@ -76,6 +78,7 @@ export {
 	Slot,
 	Fill,
 	Provider as SlotFillProvider,
+	Consumer as __experimentalSlotFillConsumer,
 } from './slot-fill';
 
 // Higher-Order Components

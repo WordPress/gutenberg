@@ -347,7 +347,7 @@ export const EXPECTED_TRANSFORMS = {
 			'Group',
 		],
 	},
-	'core__navigation-menu': {
+	core__navigation: {
 		originalBlock: 'Navigation',
 		availableTransforms: [
 			'Group',
@@ -560,7 +560,7 @@ export const EXPECTED_TRANSFORMS = {
 		availableTransforms: [
 			'Group',
 		],
-		originalBlock: 'Github',
+		originalBlock: 'GitHub',
 	},
 	'core__social-link-goodreads': {
 		availableTransforms: [
@@ -590,7 +590,7 @@ export const EXPECTED_TRANSFORMS = {
 		availableTransforms: [
 			'Group',
 		],
-		originalBlock: 'Linkedin',
+		originalBlock: 'LinkedIn',
 	},
 	'core__social-link-mail': {
 		availableTransforms: [

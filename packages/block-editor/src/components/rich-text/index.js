@@ -348,6 +348,9 @@ class RichTextWrapper extends Component {
 			// To do: find a better way to implicitly inherit props.
 			start,
 			reversed,
+			style,
+			preserveWhiteSpace,
+			disabled,
 			// From experimental filter. To do: pick props instead.
 			...experimentalProps
 		} = this.props;
@@ -396,11 +399,14 @@ class RichTextWrapper extends Component {
 				__unstableMarkAutomaticChange={ markAutomaticChange }
 				__unstableDidAutomaticChange={ didAutomaticChange }
 				__unstableUndo={ undo }
+				style={ style }
+				preserveWhiteSpace={ preserveWhiteSpace }
+				disabled={ disabled }
 			>
 				{ ( { isSelected, value, onChange, Editable } ) =>
 					<>
 						{ children && children( { value, onChange } ) }
-						{ isSelected && hasFormats && ( <FormatToolbarContainer inline={ inlineToolbar } anchorObj={ this.ref } /> ) }
+						{ isSelected && hasFormats && ( <FormatToolbarContainer inline={ inlineToolbar } anchorRef={ this.ref.current } /> ) }
 						{ isSelected && <RemoveBrowserShortcuts /> }
 						<Autocomplete
 							onReplace={ onReplace }

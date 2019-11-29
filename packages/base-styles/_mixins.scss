@@ -313,21 +313,6 @@
 }
 
 /**
- * Applies editor right position to the selector passed as argument
- */
-
-@mixin editor-right($selector) {
-	#{ $selector } {
-		right: 0;
-	}
-
-	.edit-post-layout.is-sidebar-opened #{ $selector } {
-		right: $sidebar-width;
-	}
-}
-
-
-/**
  * Styles that are reused verbatim in a few places
  */
 

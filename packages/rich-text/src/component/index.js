@@ -202,7 +202,11 @@ class RichText extends Component {
 	}
 
 	createRecord() {
-		const { __unstableMultilineTag: multilineTag, forwardedRef } = this.props;
+		const {
+			__unstableMultilineTag: multilineTag,
+			forwardedRef,
+			preserveWhiteSpace,
+		} = this.props;
 		const selection = getSelection();
 		const range = selection.rangeCount > 0 ? selection.getRangeAt( 0 ) : null;
 
@@ -212,6 +216,7 @@ class RichText extends Component {
 			multilineTag,
 			multilineWrapperTags: multilineTag === 'li' ? [ 'ul', 'ol' ] : undefined,
 			__unstableIsEditableTree: true,
+			preserveWhiteSpace,
 		} );
 	}
 
@@ -598,8 +603,10 @@ class RichText extends Component {
 
 		this.value = this.valueToFormat( record );
 		this.record = record;
-		this.props.onChange( this.value );
+		// Selection must be updated first, so it is recorded in history when
+		// the content change happens.
 		this.props.onSelectionChange( start, end );
+		this.props.onChange( this.value );
 		this.setState( { activeFormats } );
 
 		if ( ! withoutHistory ) {
@@ -945,7 +952,11 @@ class RichText extends Component {
 	 * @return {Object} An internal rich-text value.
 	 */
 	formatToValue( value ) {
-		const { format, __unstableMultilineTag: multilineTag } = this.props;
+		const {
+			format,
+			__unstableMultilineTag: multilineTag,
+			preserveWhiteSpace,
+		} = this.props;
 
 		if ( format !== 'string' ) {
 			return value;
@@ -957,6 +968,7 @@ class RichText extends Component {
 			html: value,
 			multilineTag,
 			multilineWrapperTags: multilineTag === 'li' ? [ 'ul', 'ol' ] : undefined,
+			preserveWhiteSpace,
 		} );
 		value.formats = prepare( value );
 
@@ -990,7 +1002,11 @@ class RichText extends Component {
 	 * @return {*} The external data format, data type depends on props.
 	 */
 	valueToFormat( value ) {
-		const { format, __unstableMultilineTag: multilineTag } = this.props;
+		const {
+			format,
+			__unstableMultilineTag: multilineTag,
+			preserveWhiteSpace,
+		} = this.props;
 
 		value = this.removeEditorOnlyFormats( value );
 
@@ -998,7 +1014,7 @@ class RichText extends Component {
 			return;
 		}
 
-		return toHTMLString( { value, multilineTag } );
+		return toHTMLString( { value, multilineTag, preserveWhiteSpace } );
 	}
 
 	Editable( props ) {
@@ -1008,6 +1024,7 @@ class RichText extends Component {
 			className,
 			placeholder,
 			forwardedRef,
+			disabled,
 		} = this.props;
 		const ariaProps = pickBy( this.props, ( value, key ) =>
 			startsWith( key, 'aria-' ) );
@@ -1041,8 +1058,9 @@ class RichText extends Component {
 				onKeyUp={ this.onSelectionChange }
 				onMouseUp={ this.onSelectionChange }
 				onTouchEnd={ this.onSelectionChange }
-				contentEditable
-				suppressContentEditableWarning
+				// Do not set the attribute if disabled.
+				contentEditable={ disabled ? undefined : true }
+				suppressContentEditableWarning={ ! disabled }
 			/>
 		);
 	}
