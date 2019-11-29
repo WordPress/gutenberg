@@ -496,6 +496,10 @@ class RichText extends Component {
 			return;
 		}
 
+		if ( this.props.disabled ) {
+			return;
+		}
+
 		// In case of a keyboard event, ignore selection changes during
 		// composition.
 		if (
