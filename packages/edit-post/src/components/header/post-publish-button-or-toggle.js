@@ -6,17 +6,15 @@ import { get } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { compose } from '@wordpress/compose';
+import { useViewportMatch, compose } from '@wordpress/compose';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { PostPublishButton } from '@wordpress/editor';
-import { withViewportMatch } from '@wordpress/viewport';
 
 export function PostPublishButtonOrToggle( {
 	forceIsDirty,
 	forceIsSaving,
 	hasPublishAction,
 	isBeingScheduled,
-	isLessThanMediumViewport,
 	isPending,
 	isPublished,
 	isPublishSidebarEnabled,
@@ -26,6 +24,7 @@ export function PostPublishButtonOrToggle( {
 } ) {
 	const IS_TOGGLE = 'toggle';
 	const IS_BUTTON = 'button';
+	const isLessThanMediumViewport = useViewportMatch( '< medium' );
 	let component;
 
 	/**
@@ -95,5 +94,4 @@ export default compose(
 			togglePublishSidebar,
 		};
 	} ),
-	withViewportMatch( { isLessThanMediumViewport: '< medium' } ),
 )( PostPublishButtonOrToggle );
