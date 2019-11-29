@@ -46,7 +46,7 @@ export default class PlainText extends Component {
 				} }
 				onFocus={ this.props.onFocus } // always assign onFocus as a props
 				onBlur={ this.props.onBlur } // always assign onBlur as a props
-				fontFamily={ this.props.style.fontFamily || ( styles[ 'block-editor-plain-text' ].fontFamily ) }
+				fontFamily={ ( this.props.style && this.props.style.fontFamily ) || ( styles[ 'block-editor-plain-text' ].fontFamily ) }
 				style={ this.props.style || styles[ 'block-editor-plain-text' ] }
 			/>
 		);
