@@ -27,12 +27,12 @@ public class Media implements RNMedia {
     public static Media createRNMediaUsingMimeType(final int id, final String url, @NonNull final String mimeType) {
         String type;
 
-        if (mimeType.startsWith(MediaType.IMAGE.name())) {
-            type =  MediaType.IMAGE.name();
-        } else if (mimeType.startsWith(MediaType.VIDEO.name())) {
-            type =  MediaType.VIDEO.name();
+        if (mimeType.startsWith(MediaType.IMAGE.name().toLowerCase())) {
+            type =  MediaType.IMAGE.name().toLowerCase();
+        } else if (mimeType.startsWith(MediaType.VIDEO.name().toLowerCase())) {
+            type =  MediaType.VIDEO.name().toLowerCase();
         } else {
-            type = MediaType.OTHER.name();
+            type = MediaType.OTHER.name().toLowerCase();
         }
 
         return new Media(id, url, type);
