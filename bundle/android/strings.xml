@@ -33,6 +33,8 @@
     <string name="gutenberg_native_double_tap_to_undo_last_change" tools:ignore="UnusedResources">"Double tap to undo last change"</string>
     <string name="gutenberg_native_empty" tools:ignore="UnusedResources">"Empty"</string>
     <string name="gutenberg_native_failed_to_insert_media_please_tap_for_options" tools:ignore="UnusedResources">"Failed to insert media.\nPlease tap for options."</string>
+    <string name="gutenberg_native_feature_activated" tools:ignore="UnusedResources">"Feature activated"</string>
+    <string name="gutenberg_native_feature_deactivated" tools:ignore="UnusedResources">"Feature deactivated"</string>
     <string name="gutenberg_native_help_icon" tools:ignore="UnusedResources">"Help icon"</string>
     <string name="gutenberg_native_here_is_the_panel_content" tools:ignore="UnusedResources">"Here is the panel content!"</string>
     <string name="gutenberg_native_hide_keyboard" tools:ignore="UnusedResources">"Hide keyboard"</string>

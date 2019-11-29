@@ -36,6 +36,8 @@ private func dummy() {
     _ = NSLocalizedString("Double tap to undo last change", comment: "")
     _ = NSLocalizedString("Empty", comment: "")
     _ = NSLocalizedString("Failed to insert media.\nPlease tap for options.", comment: "")
+    _ = NSLocalizedString("Feature activated", comment: "")
+    _ = NSLocalizedString("Feature deactivated", comment: "")
     _ = NSLocalizedString("Help icon", comment: "")
     _ = NSLocalizedString("Here is the panel content!", comment: "")
     _ = NSLocalizedString("Hide keyboard", comment: "")
