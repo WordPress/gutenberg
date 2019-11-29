@@ -51,6 +51,12 @@ const PLACEHOLDER_TEXT = Platform.select( {
 	native: __( 'ADD MEDIA' ),
 } );
 
+const SEPARATOR_TYPE = Platform.select( {
+	web: undefined,
+	native: 'fullWidth',
+} );
+
+
 class GalleryEdit extends Component {
 	constructor() {
 		super( ...arguments );
@@ -299,7 +305,7 @@ class GalleryEdit extends Component {
 					<PanelBody title={ __( 'Gallery Settings' ) }>
 						{ images.length > 1 && <RangeControl
 							label={ __( 'Columns' ) }
-							separatorType="fullWidth"
+							separatorType={ SEPARATOR_TYPE }
 							value={ columns }
 							onChange={ this.setColumnsNumber }
 							min={ 1 }
@@ -308,14 +314,14 @@ class GalleryEdit extends Component {
 						/> }
 						<ToggleControl
 							label={ __( 'Crop Images' ) }
-							separatorType="fullWidth"
+							separatorType={ SEPARATOR_TYPE }
 							checked={ !! imageCrop }
 							onChange={ this.toggleImageCrop }
 							help={ this.getImageCropHelp }
 						/>
 						<SelectControl
 							label={ __( 'Link To' ) }
-							separatorType="fullWidth"
+							separatorType={ SEPARATOR_TYPE }
 							value={ linkTo }
 							onChange={ this.setLinkTo }
 							options={ linkOptions }
