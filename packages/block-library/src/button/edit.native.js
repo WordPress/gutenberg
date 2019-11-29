@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { View } from 'react-native';
-import LinearGradient from 'react-native-linear-gradient';
 /**
  * WordPress dependencies
  */
@@ -32,59 +31,12 @@ import {
  */
 import richTextStyle from './richText.scss';
 import styles from './editor.scss';
+import RichTextWrapper from './richTextWrapper';
 
 const NEW_TAB_REL = 'noreferrer noopener';
 const INITIAL_BORDER_RADIUS = 4;
 const MIN_BORDER_RADIUS_VALUE = 0;
 const MAX_BORDER_RADIUS_VALUE = 50;
-const BORDER_WIDTH = 1;
-
-function RichTextWrapper( { children, gradientValue, borderRadiusValue, backgroundColor, defaultBackgroundColor } ) {
-	const wrapperStyles = [
-		styles.richTextWrapper,
-		{
-			borderRadius: borderRadiusValue,
-			backgroundColor: backgroundColor.color || defaultBackgroundColor,
-		},
-	];
-
-	function transformGradient() {
-		const matchColorGroup = /(rgba|rgb|#)(.+?)[\%]/g;
-		const matchDeg = /(\d.+)deg/g;
-
-		const colorGroup = gradientValue.match( matchColorGroup ).map( ( color ) => color.split( ' ' ) );
-
-		const colors = colorGroup.map( ( color ) => color[ 0 ] );
-		const locations = colorGroup.map( ( location ) => Number( location[ 1 ].replace( '%', '' ) ) / 100 );
-		const angle = Number( matchDeg.exec( gradientValue )[ 1 ] );
-
-		return {
-			colors, locations, angle,
-		};
-	}
-
-	if ( gradientValue ) {
-		const { colors, locations, angle } = transformGradient();
-		return (
-			<LinearGradient
-				colors={ colors }
-				useAngle={ true }
-				angle={ angle }
-				locations={ locations }
-				angleCenter={ { x: 0.5, y: 0.5 } }
-				style={ wrapperStyles }
-			>
-				{ children }
-			</LinearGradient>
-		);
-	} return (
-		<View
-			style={ wrapperStyles }
-		>
-			{ children }
-		</View>
-	);
-}
 
 function ButtonEdit( { attributes, setAttributes, backgroundColor, textColor, isSelected } ) {
 	const {
@@ -97,7 +49,8 @@ function ButtonEdit( { attributes, setAttributes, backgroundColor, textColor, is
 	} = attributes;
 
 	const borderRadiusValue = borderRadius || INITIAL_BORDER_RADIUS;
-	const defaultBackgroundColor = '#2271b1';
+	const mainColor = backgroundColor.color || '#2271b1';
+	const outlineBorderRadius = borderRadiusValue + styles.container.paddingTop + styles.border.borderWidth;
 
 	const onToggleOpenInNewTab = useCallback(
 		( value ) => {
@@ -118,7 +71,7 @@ function ButtonEdit( { attributes, setAttributes, backgroundColor, textColor, is
 		[ rel, setAttributes ]
 	);
 
-	const changeAttribute = ( value ) => {
+	const setBorderRadius = ( value ) => {
 		setAttributes( {
 			borderRadius: value,
 		} );
@@ -132,14 +85,17 @@ function ButtonEdit( { attributes, setAttributes, backgroundColor, textColor, is
 		<View
 			style={ [
 				styles.container,
-				isSelected && { borderColor: backgroundColor.color || defaultBackgroundColor, borderRadius: borderRadiusValue + 5, borderWidth: BORDER_WIDTH },
+				isSelected && {
+					borderColor: mainColor,
+					borderRadius: outlineBorderRadius,
+					borderWidth: styles.border.borderWidth,
+				},
 			] }
 		>
 			<RichTextWrapper
 				gradientValue={ gradientValue }
 				borderRadiusValue={ borderRadiusValue }
-				backgroundColor={ backgroundColor }
-				defaultBackgroundColor={ defaultBackgroundColor }
+				backgroundColor={ mainColor }
 			>
 				<RichText
 					placeholder={ placeholder || __( 'Add text…' ) }
@@ -150,7 +106,8 @@ function ButtonEdit( { attributes, setAttributes, backgroundColor, textColor, is
 						color: textColor.color || '#fff',
 					} }
 					textAlign="center"
-					placeholderTextColor="#668eaa"
+					placeholderTextColor={ 'lightgray' }
+					tagName="p"
 				/>
 			</RichTextWrapper>
 			<InspectorControls>
@@ -160,7 +117,7 @@ function ButtonEdit( { attributes, setAttributes, backgroundColor, textColor, is
 						minimumValue={ MIN_BORDER_RADIUS_VALUE }
 						maximumValue={ MAX_BORDER_RADIUS_VALUE }
 						value={ borderRadiusValue }
-						onChange={ changeAttribute }
+						onChange={ setBorderRadius }
 						separatorType="none"
 					/>
 				</PanelBody>
@@ -184,7 +141,6 @@ function ButtonEdit( { attributes, setAttributes, backgroundColor, textColor, is
 				</PanelBody>
 			</InspectorControls>
 		</View>
-
 	);
 }
 
