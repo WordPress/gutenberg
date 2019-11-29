@@ -154,6 +154,20 @@ export function getEntityRecords( state, kind, name, query ) {
 }
 
 /**
+ * Returns the cached Entity's records (doesn't trigger the resolver).
+ *
+ * @param {Object}  state  State tree
+ * @param {string}  kind   Entity kind.
+ * @param {string}  name   Entity name.
+ * @param {?Object} query  Optional terms query.
+ *
+ * @return {Array} Records.
+ */
+export function getCachedEntityRecords( state, kind, name, query ) {
+	return getEntityRecords( state, kind, name, query );
+}
+
+/**
  * Returns the specified entity record's edits.
  *
  * @param {Object} state    State tree.

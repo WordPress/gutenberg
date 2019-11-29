@@ -284,6 +284,21 @@ _Returns_
 
 -   `?Array`: An array of autosaves for the post, or undefined if there is none.
 
+<a name="getCachedEntityRecords" href="#getCachedEntityRecords">#</a> **getCachedEntityRecords**
+
+Returns the cached Entity's records.
+
+_Parameters_
+
+-   _state_ `Object`: State tree
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _query_ `?Object`: Optional terms query.
+
+_Returns_
+
+-   `Array`: Records.
+
 <a name="getCurrentUser" href="#getCurrentUser">#</a> **getCurrentUser**
 
 Returns the current user.

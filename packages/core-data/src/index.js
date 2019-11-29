@@ -55,3 +55,4 @@ export {
 	useEntityProp,
 	__experimentalUseEntitySaving,
 } from './entity-provider';
+export * from './hooks';
