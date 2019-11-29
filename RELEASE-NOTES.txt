@@ -6,6 +6,7 @@
 ------
 * Add support for Video block settings
 * [iOS] Added native fullscreen preview when clicking image from Image Block
+* New block: Spacer
 
 1.17.0
 ------
