@@ -1398,18 +1398,6 @@ export function getBlockListSettings( state, clientId ) {
 }
 
 /**
- * Returns the Block List settings for an array of blocks, if any exist.
- *
- * @param {Object}  state    Editor state.
- * @param {Array} clientIds Block client IDs.
- *
- * @return {Array} Block List Settings for each of the found blocks
- */
-export function __experimentalGetBlockListSettingsForBlocks( state, clientIds ) {
-	return filter( state.blockListSettings, ( value, key ) => clientIds.includes( key ) );
-}
-
-/**
  * Returns the editor settings.
  *
  * @param {Object} state Editor state.
@@ -1432,6 +1420,24 @@ export function getSettings( state ) {
 export function isLastBlockChangePersistent( state ) {
 	return state.blocks.isPersistentChange;
 }
+
+/**
+ * Returns the Block List settings for an array of blocks, if any exist.
+ *
+ * @param {Object}  state    Editor state.
+ * @param {Array} clientIds Block client IDs.
+ *
+ * @return {Array} Block List Settings for each of the found blocks
+ */
+export const __experimentalGetBlockListSettingsForBlocks = createSelector(
+	( state, clientIds ) => {
+		return filter( state.blockListSettings, ( value, key ) => clientIds.includes( key ) );
+	},
+	( state, clientIds ) => [
+		state.blockListSettings,
+		clientIds,
+	],
+);
 
 /**
  * Returns the parsed block saved as shared block with the given ID.
