@@ -3,6 +3,7 @@
 const gettextParser = require( 'gettext-parser' ),
 	fs = require( 'fs' ),
 	crypto = require( 'crypto' );
+
 const indent = '    ';
 
 /**
