@@ -42,6 +42,9 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	/**
 	* End: Include for phase 2
 	*/
+	if ( class_exists( 'WP_REST_Themes_Controller' ) ) {
+		require dirname( __FILE__ ) . '/class-wp-rest-themes-controller-overrides.php';
+	}
 
 	require dirname( __FILE__ ) . '/rest-api.php';
 }

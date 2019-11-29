@@ -93,3 +93,9 @@ function gutenberg_register_rest_block_directory() {
 	$block_directory_controller->register_routes();
 }
 add_filter( 'rest_api_init', 'gutenberg_register_rest_block_directory' );
+
+function gutenberg_override_rest_endpoints() {
+	$themes_controller = new WP_REST_Themes_Controller_Overrides();
+	$themes_controller->register_routes();
+}
+add_filter( 'rest_api_init', 'gutenberg_override_rest_endpoints' );
