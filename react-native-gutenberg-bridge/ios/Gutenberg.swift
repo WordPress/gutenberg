@@ -56,6 +56,8 @@ public class Gutenberg: NSObject {
             initialProps["initialTitle"] = initialTitle
         }
 
+        initialProps["postType"] = dataSource.gutenbergPostType()
+
         if let locale = dataSource.gutenbergLocale() {
             initialProps["locale"] = locale
         }
