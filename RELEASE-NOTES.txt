@@ -1,9 +1,11 @@
 1.19.0
 ------
 * Add support for changing Settings in List Block.
+* [iOS] Fix crash dismissing bottom-sheet after device rotation.
 
 1.18.0
 ------
+* Add support for Video block settings
 * [iOS] Added native fullscreen preview when clicking image from Image Block
 
 1.17.0

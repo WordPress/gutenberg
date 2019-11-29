@@ -84,6 +84,7 @@ public class WPAndroidGlueCode {
     private static final String PROP_NAME_INITIAL_DATA = "initialData";
     private static final String PROP_NAME_INITIAL_TITLE = "initialTitle";
     private static final String PROP_NAME_INITIAL_HTML_MODE_ENABLED = "initialHtmlModeEnabled";
+    private static final String PROP_NAME_POST_TYPE = "postType";
     private static final String PROP_NAME_LOCALE = "locale";
     private static final String PROP_NAME_TRANSLATIONS = "translations";
 
@@ -310,9 +311,17 @@ public class WPAndroidGlueCode {
                 .newBuilder(mReactRootView.getContext(), client).build();
     }
 
+    @Deprecated
     public void onCreateView(Context initContext, boolean htmlModeEnabled,
                              Application application, boolean isDebug, boolean buildGutenbergFromSource,
                              boolean isNewPost, String localeString, Bundle translations) {
+        onCreateView(initContext, htmlModeEnabled, application, isDebug, buildGutenbergFromSource, "post", isNewPost
+        , localeString, translations);
+    }
+
+    public void onCreateView(Context initContext, boolean htmlModeEnabled,
+                             Application application, boolean isDebug, boolean buildGutenbergFromSource,
+                             String postType, boolean isNewPost, String localeString, Bundle translations) {
         mReactRootView = new ReactRootView(new MutableContextWrapper(initContext));
 
         ReactInstanceManagerBuilder builder =
@@ -339,6 +348,7 @@ public class WPAndroidGlueCode {
         initialProps.putString(PROP_NAME_INITIAL_DATA, "");
         initialProps.putString(PROP_NAME_INITIAL_TITLE, "");
         initialProps.putBoolean(PROP_NAME_INITIAL_HTML_MODE_ENABLED, htmlModeEnabled);
+        initialProps.putString(PROP_NAME_POST_TYPE, postType);
         initialProps.putString(PROP_NAME_LOCALE, localeString);
         initialProps.putBundle(PROP_NAME_TRANSLATIONS, translations);
 
