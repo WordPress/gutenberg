@@ -130,6 +130,18 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
 
         delegate?.gutenbergDidEmitLog(message: message, logLevel: logLevel)
     }
+    
+    @objc
+    func requestImageFullscreenPreview(_ urlString: String) {
+        guard let url = URL(string: urlString) else {
+            assertionFailure("Given String is not a URL")
+            return
+        }
+        
+        DispatchQueue.main.async {
+            self.delegate?.gutenbergDidRequestFullscreenImage(with: url)
+        }
+    }
 
     private func shouldLog(with level: Int) -> Bool {
         return level >= RCTGetLogThreshold().rawValue

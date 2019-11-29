@@ -130,6 +130,10 @@ public protocol GutenbergBridgeDelegate: class {
     /// - Parameter path: The path to perform the request.
     /// - Parameter completion: Completion handler to be called with the result or an error.
     func gutenbergDidRequestFetch(path: String, completion: @escaping (Swift.Result<Any, NSError>) -> Void)
+
+    /// Tells the delegate to display a fullscreen image from a given URL
+    ///
+    func gutenbergDidRequestFullscreenImage(with mediaUrl: URL)
 }
 
 // MARK: - Optional GutenbergBridgeDelegate methods
