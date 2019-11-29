@@ -10,7 +10,7 @@ import { __, _x } from '@wordpress/i18n';
 import {
 	PanelBody,
 	ToggleControl,
-	Toolbar,
+	ToolbarGroup,
 	withFallbackStyles,
 } from '@wordpress/components';
 import {
@@ -50,7 +50,7 @@ function ParagraphRTLToolbar( { direction, setDirection } ) {
 	} );
 
 	return ( isRTL && (
-		<Toolbar
+		<ToolbarGroup
 			controls={ [
 				{
 					icon: 'editor-ltr',

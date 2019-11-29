@@ -8,7 +8,7 @@ import {
 	Disabled,
 	IconButton,
 	PanelBody,
-	Toolbar,
+	ToolbarGroup,
 	withNotices,
 } from '@wordpress/components';
 import {
@@ -186,14 +186,14 @@ class VideoEdit extends Component {
 		return (
 			<>
 				<BlockControls>
-					<Toolbar>
+					<ToolbarGroup>
 						<IconButton
 							className="components-icon-button components-toolbar__control"
 							label={ __( 'Edit video' ) }
 							onClick={ switchToEditing }
 							icon="edit"
 						/>
-					</Toolbar>
+					</ToolbarGroup>
 				</BlockControls>
 				<InspectorControls>
 					<PanelBody title={ __( 'Video Settings' ) }>
