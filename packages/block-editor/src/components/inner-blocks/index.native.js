@@ -106,24 +106,18 @@ class InnerBlocks extends Component {
 		const {
 			clientId,
 			renderAppender,
-			template,
-			__experimentalTemplateOptions: templateOptions,
 		} = this.props;
 		const { templateInProcess } = this.state;
-
-		const isPlaceholder = template === null && !! templateOptions;
 
 		return (
 			<>
 				{ ! templateInProcess && (
-					isPlaceholder ?
-						null :
-						<BlockList
-							rootClientId={ clientId }
-							renderAppender={ renderAppender }
-							withFooter={ false }
-							isFullyBordered={ true }
-						/>
+					<BlockList
+						rootClientId={ clientId }
+						renderAppender={ renderAppender }
+						withFooter={ false }
+						isFullyBordered={ true }
+					/>
 				) }
 			</>
 		);
