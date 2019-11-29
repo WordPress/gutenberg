@@ -127,7 +127,6 @@
 
 	// Selected style.
 	&.is-selected {
-
 		> .block-editor-block-list__block-edit::before {
 			// Use opacity to work in various editor styles.
 			border-color: $dark-opacity-light-800;
@@ -154,6 +153,28 @@
 
 			@include break-small() {
 				box-shadow: -$block-left-border-width 0 0 0 $blue-medium-focus;
+			}
+		}
+	}
+
+	// Selected style.
+	&.is-multi-selected {
+		> .block-editor-block-list__block-edit::before {
+			border-left-color: $dark-opacity-light-800;
+			box-shadow: inset $block-left-border-width 0 0 0 $dark-gray-500;
+
+			.is-dark-theme & {
+				border-left-color: $light-opacity-light-800;
+				box-shadow: inset $block-left-border-width 0 0 0 $light-gray-600;
+			}
+
+			// Switch to outset borders on larger screens.
+			@include break-small() {
+				box-shadow: -$block-left-border-width 0 0 0 $dark-gray-500;
+
+				.is-dark-theme & {
+					box-shadow: -$block-left-border-width 0 0 0 $light-gray-600;
+				}
 			}
 		}
 	}
@@ -247,36 +268,6 @@
 /**
  * Cross-block selection
  */
-
-.block-editor-block-list__layout .block-editor-block-list__block {
-	::-moz-selection {
-		background-color: $blue-medium-highlight;
-	}
-
-	::selection {
-		background-color: $blue-medium-highlight;
-	}
-
-	// Selection style for multiple blocks.
-	&.is-multi-selected *::selection {
-		background-color: transparent;
-	}
-
-	&.is-multi-selected .block-editor-block-list__block-edit::before {
-		background: $blue-medium-highlight;
-
-		// Use opacity to work in various editor styles.
-		mix-blend-mode: multiply;
-
-		// Collapse extra vertical padding on selection.
-		top: -$block-padding;
-		bottom: -$block-padding;
-
-		.is-dark-theme & {
-			mix-blend-mode: soft-light;
-		}
-	}
-}
 
 
 /**
