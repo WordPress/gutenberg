@@ -400,6 +400,9 @@ export default compose( [
 		const resizedImages = reduce(
 			ids,
 			( currentResizedImages, id ) => {
+				if ( ! id ) {
+					return currentResizedImages;
+				}
 				const image = getMedia( id );
 				const sizes = reduce( imageSizes, ( currentSizes, size ) => {
 					const defaultUrl = get( image, [ 'sizes', size.slug, 'url' ] );
