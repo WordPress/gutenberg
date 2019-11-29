@@ -46,6 +46,11 @@ const linkOptions = [
 ];
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
+const PLACEHOLDER_TEXT = Platform.select( {
+	web: __( 'Drag images, upload new ones or select files from your library.' ),
+	native: __( 'ADD MEDIA' ),
+} );
+
 class GalleryEdit extends Component {
 	constructor() {
 		super( ...arguments );
@@ -263,11 +268,6 @@ class GalleryEdit extends Component {
 		const hasImages = !! images.length;
 		const hasImagesWithId = hasImages && some( images, ( { id } ) => id );
 
-		const placeholderText = Platform.select( {
-			web: __( 'Drag images, upload new ones or select files from your library.' ),
-			native: __( 'ADD MEDIA' ),
-		} );
-
 		const mediaPlaceholder = (
 			<MediaPlaceholder
 				addToGallery={ hasImagesWithId }
@@ -277,7 +277,7 @@ class GalleryEdit extends Component {
 				icon={ ! hasImages && sharedIcon }
 				labels={ {
 					title: ! hasImages && __( 'Gallery' ),
-					instructions: ! hasImages && placeholderText,
+					instructions: ! hasImages && PLACEHOLDER_TEXT,
 				} }
 				onSelect={ this.onSelectImages }
 				accept="image/*"
