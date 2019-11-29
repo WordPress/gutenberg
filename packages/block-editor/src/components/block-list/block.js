@@ -22,7 +22,7 @@ import {
 	isUnmodifiedDefaultBlock,
 	getUnregisteredTypeHandlerName,
 } from '@wordpress/blocks';
-import { KeyboardShortcuts, withFilters, createSlotFill } from '@wordpress/components';
+import { KeyboardShortcuts, withFilters } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	withDispatch,
@@ -51,7 +51,7 @@ import InserterWithShortcuts from '../inserter-with-shortcuts';
 import Inserter from '../inserter';
 import { isInsideRootBlock } from '../../utils/dom';
 import useMovingAnimation from './moving-animation';
-
+import { ChildToolbar, ChildToolbarSlot } from './block-child-toolbar';
 /**
  * Prevents default dragging behavior within a block to allow for multi-
  * selection to take effect unhampered.
@@ -61,18 +61,6 @@ import useMovingAnimation from './moving-animation';
 const preventDrag = ( event ) => {
 	event.preventDefault();
 };
-
-const { Fill, Slot } = createSlotFill( 'ChildToolbar' );
-
-const ChildToolbar = ( { children } ) => (
-	<Fill>
-		{ children }
-	</Fill>
-);
-
-const ChildToolbarSlot = () => (
-	<Slot bubblesVirtually={ true } />
-);
 
 function BlockListBlock( {
 	mode,
