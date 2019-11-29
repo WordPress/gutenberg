@@ -14,10 +14,6 @@
 		background: $light-gray-200;
 		font-family: $editor-html-font;
 		font-size: inherit; // This is necessary to override upstream CSS.
-
-		.is-multi-selected & {
-			background: darken($blue-medium-highlight, 15%);
-		}
 	}
 
 	&:focus {
