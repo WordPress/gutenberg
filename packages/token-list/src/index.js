@@ -18,9 +18,7 @@ export default class TokenList {
 		this.value = initialValue;
 
 		[ 'entries', 'forEach', 'keys', 'values' ].forEach( ( fn ) => {
-			this[ fn ] = ( function() {
-				return this._valueAsArray[ fn ]( ...arguments );
-			} ).bind( this );
+			this[ fn ] = ( ...args ) => this._valueAsArray[ fn ]( ...args );
 		} );
 	}
 
@@ -89,7 +87,7 @@ export default class TokenList {
 	 *
 	 * @param {number} index Index at which to return token.
 	 *
-	 * @return {?string} Token at index.
+	 * @return {string|undefined} Token at index.
 	 */
 	item( index ) {
 		return this._valueAsArray[ index ];
@@ -139,7 +137,7 @@ export default class TokenList {
 	 * @see https://dom.spec.whatwg.org/#dom-domtokenlist-toggle
 	 *
 	 * @param {string}   token Token to toggle.
-	 * @param {?boolean} force Presence to force.
+	 * @param {boolean=} force Presence to force.
 	 *
 	 * @return {boolean} Whether token is present after toggle.
 	 */
