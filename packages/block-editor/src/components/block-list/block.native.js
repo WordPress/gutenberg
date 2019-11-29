@@ -107,20 +107,21 @@ class BlockListBlock extends Component {
 			hasChildren,
 			getStylesFromColorScheme,
 			isSmallScreen,
-			selectionIsNested,
-			isInnerBlockHolder,
+			isRootListInnerBlockHolder,
 		} = this.props;
 
-		const fullSolidBorderStyle = {
+		const fullSolidBorderStyle = { // define style for full border
 			...styles.fullSolidBordered,
 			...getStylesFromColorScheme( styles.solidBorderColor, styles.solidBorderColorDark ),
 		};
 
-		if ( hasChildren ) {
+		if ( hasChildren ) { // if block has children apply style for selected parent
 			return { ...styles.selectedParent,	...fullSolidBorderStyle	};
 		}
 
-		if ( isSmallScreen && ! selectionIsNested && ! isInnerBlockHolder ) {
+		// apply semi border selected style when screen is in vertical position
+		// and selected block does not have InnerBlock inside
+		if ( isSmallScreen && ! isRootListInnerBlockHolder ) {
 			return {
 				...styles.selectedRootLeaf,
 				...styles.semiSolidBordered,
@@ -128,6 +129,10 @@ class BlockListBlock extends Component {
 			};
 		}
 
+		/* selected block is one of below:
+				1. does not have children
+				2. is not on root list level
+				3. is an emty group block on root or nested level	*/
 		return { ...styles.selectedLeaf,	...fullSolidBorderStyle	};
 	}
 
@@ -140,28 +145,34 @@ class BlockListBlock extends Component {
 			getStylesFromColorScheme,
 		} = this.props;
 
+		// if block does not have parent apply neutral or full
+		// margins depending if block has children or not
 		if ( ! hasParent ) {
 			return hasChildren ? styles.neutral : styles.full;
 		}
 
-		if ( isParentSelected ) {
-			const dashedBorderStyle = {
+		if ( isParentSelected ) { // parent of a block is selected
+			const dashedBorderStyle = { // define style for dashed border
 				...styles.dashedBordered,
 				...getStylesFromColorScheme( styles.dashedBorderColor, styles.dashedBorderColorDark ),
 			};
 
+			// return apply childOfSelected or childOfSelectedLeaf
+			// margins depending if block has children or not
 			return hasChildren ?
 				{ ...styles.childOfSelected, ...dashedBorderStyle } :
 				{ ...styles.childOfSelectedLeaf, ...dashedBorderStyle };
 		}
 
-		if ( isAncestorSelected ) {
+		if ( isAncestorSelected ) { // ancestor of a block is selected
 			return {
 				...styles.descendantOfSelectedLeaf,
 				...( hasChildren && styles.marginHorizontalNone ),
 			};
 		}
 
+		// if none of above condition are met return apply neutral or full
+		// margins depending if block has children or not
 		return hasChildren ? styles.neutral : styles.full;
 	}
 
@@ -277,14 +288,15 @@ export default compose( [
 		const hasParent = !! parents[ 0 ];
 		const isParentSelected = selectedBlockClientId && selectedBlockClientId === parents[ 0 ];
 		const isAncestorSelected = selectedBlockClientId && parents.includes( selectedBlockClientId );
-		const selectionIsNested = !! getBlockRootClientId( selectedBlockClientId );
+		const isSelectedBlockNested = !! getBlockRootClientId( selectedBlockClientId );
 
 		const isDescendantSelected = selectedBlockClientId && getBlockParents( selectedBlockClientId ).includes( clientId );
 		const isDescendantOfParentSelected = selectedBlockClientId && getBlockParents( selectedBlockClientId ).includes( parentId );
-		const isTouchable = isSelected || isDescendantSelected || isDescendantOfParentSelected || isParentSelected || parentId === '';
-		const isDimmed = ! isSelected && selectionIsNested && ! isAncestorSelected && ! isDescendantSelected && ( isDescendantOfParentSelected || rootBlockId === clientId );
+		const isTouchable = isSelected || isDescendantOfParentSelected || isParentSelected || parentId === '';
+		const isDimmed = ! isSelected && isSelectedBlockNested && ! isAncestorSelected && ! isDescendantSelected && ( isDescendantOfParentSelected || rootBlockId === clientId );
 
 		const isInnerBlockHolder = name === getGroupingBlockName();
+		const isRootListInnerBlockHolder = ! isSelectedBlockNested && isInnerBlockHolder;
 
 		return {
 			icon,
@@ -306,8 +318,8 @@ export default compose( [
 			isAncestorSelected,
 			isTouchable,
 			isDimmed,
-			selectionIsNested,
-			isInnerBlockHolder,
+			isSelectedBlockNested,
+			isRootListInnerBlockHolder,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {

@@ -158,6 +158,10 @@ class MediaTextEdit extends Component {
 		};
 		const innerBlockWidth = shouldStack ? 100 : ( 100 - temporaryMediaWidth );
 		const innerBlockWidthString = `${ innerBlockWidth }%`;
+		const mediaContainerStyle = {
+			padding: isParentSelected || isAncestorSelected ? 6 : 16,
+			...( isSelected && { padding: 12 } ),
+		};
 
 		const toolbarControls = [ {
 			icon: 'align-pull-left',
@@ -188,7 +192,7 @@ class MediaTextEdit extends Component {
 					/>
 				</BlockControls>
 				<View style={ containerStyles }>
-					<View style={ { width: widthString, ...( isSelected ? { padding: 12 } : { padding: isParentSelected || isAncestorSelected ? 6 : 16 } ) } } >
+					<View style={ { width: widthString, ...mediaContainerStyle } } >
 						{ this.renderMediaArea() }
 					</View>
 					<View style={ { width: innerBlockWidthString, ...selectedStyle } }>
