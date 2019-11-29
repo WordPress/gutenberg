@@ -73,7 +73,7 @@ _Returns_
 
 <a name="getCachedEntityRecords" href="#getCachedEntityRecords">#</a> **getCachedEntityRecords**
 
-Returns the cached Entity's records.
+Returns the cached Entity's records (doesn't trigger the resolver).
 
 _Parameters_
 
