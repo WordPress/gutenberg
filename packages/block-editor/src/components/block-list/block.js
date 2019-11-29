@@ -62,6 +62,18 @@ const preventDrag = ( event ) => {
 	event.preventDefault();
 };
 
+const { Fill, Slot } = createSlotFill( 'ChildToolbar' );
+
+const ChildToolbar = ( { children } ) => (
+	<Fill>
+		{ children }
+	</Fill>
+);
+
+const ChildToolbarSlot = () => (
+	<Slot bubblesVirtually={ true } />
+);
+
 function BlockListBlock( {
 	mode,
 	isFocusMode,
@@ -510,18 +522,6 @@ function BlockListBlock( {
 	if ( mode !== 'visual' ) {
 		blockEdit = <div style={ { display: 'none' } }>{ blockEdit }</div>;
 	}
-
-	const { Fill, Slot } = createSlotFill( 'ChildToolbar' );
-
-	const ChildToolbar = ( { children } ) => (
-		<Fill>
-			{ children }
-		</Fill>
-	);
-
-	const ChildToolbarSlot = () => (
-		<Slot bubblesVirtually={ true } />
-	);
 
 	return (
 		<IgnoreNestedEvents
