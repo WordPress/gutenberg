@@ -511,6 +511,14 @@ function BlockListBlock( {
 		blockEdit = <div style={ { display: 'none' } }>{ blockEdit }</div>;
 	}
 
+	const BlocksContextualToolbar = () => (
+		<BlockContextualToolbar
+			// If the toolbar is being shown because of being forced
+			// it should focus the toolbar right after the mount.
+			focusOnMount={ isForcingContextualToolbar.current }
+		/>
+	);
+
 	return (
 		<IgnoreNestedEvents
 			id={ blockElementId }
@@ -577,12 +585,7 @@ function BlockListBlock( {
 
 				{ ( ! ( captureChildToolbar || hasAncestorCapturingToolbars ) ) && ( shouldShowContextualToolbar || isForcingContextualToolbar.current ) && (
 					// Standard toolbar attached directly to the Block.
-					<BlockContextualToolbar
-						// If the toolbar is being shown because of being forced
-						// it should focus the toolbar right after the mount.
-						focusOnMount={ isForcingContextualToolbar.current }
-					/>
-
+					<BlocksContextualToolbar />
 				) }
 
 				{ ( captureChildToolbar || hasAncestorCapturingToolbars ) && ( shouldShowContextualToolbar || isForcingContextualToolbar.current ) && (
@@ -590,11 +593,7 @@ function BlockListBlock( {
 					// then render the child Block's toolbar into the Slot provided
 					// by the parent.
 					<ChildToolbar>
-						<BlockContextualToolbar
-							// If the toolbar is being shown because of being forced
-							// it should focus the toolbar right after the mount.
-							focusOnMount={ isForcingContextualToolbar.current }
-						/>
+						<BlocksContextualToolbar />
 					</ChildToolbar>
 				) }
 
