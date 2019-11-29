@@ -1,8 +1,9 @@
 /**
  * External dependencies
  */
-import { escape, upperFirst } from 'lodash';
+import { escape, upperFirst, map } from 'lodash';
 import classnames from 'classnames';
+import useSWR from 'use-swr';
 
 /**
  * WordPress dependencies
@@ -17,11 +18,15 @@ import {
 	BlockControls,
 	__experimentalUseColors,
 } from '@wordpress/block-editor';
+import apiFetch from '@wordpress/api-fetch';
+import { addQueryArgs } from '@wordpress/url';
+import { decodeEntities } from '@wordpress/html-entities';
 
 import { createBlock } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
 import {
 	Button,
+	CheckboxControl,
 	PanelBody,
 	Placeholder,
 	Spinner,
@@ -40,25 +45,48 @@ import BlockNavigationList from './block-navigation-list';
 import BlockColorsStyleSelector from './block-colors-selector';
 import * as navIcons from './icons';
 
+/**
+ * ASync/Await fetch handler.
+ *
+ * @param {string} path fetching path.
+ * @return {Promise<*>}
+ */
+const doFetch = async function( path ) {
+	const posts = await apiFetch( { path } );
+
+	return await map( posts, ( { id, link: url, title, type, subtype } ) => ( {
+		id,
+		url,
+		title: decodeEntities( title.rendered ) || __( '(no title)' ),
+		type: subtype || type,
+	} ) );
+};
+
 function Navigation( {
 	attributes,
 	clientId,
-	pages,
-	isRequestingPages,
-	hasResolvedPages,
+	setAttributes,
 	hasExistingNavItems,
 	updateNavItemBlocks,
-	setAttributes,
 } ) {
-	//
-	// HOOKS
-	//
 	/* eslint-disable @wordpress/no-unused-vars-before-return */
 	const { TextColor } = __experimentalUseColors(
 		[ { name: 'textColor', property: 'color' } ],
 	);
 	/* eslint-enable @wordpress/no-unused-vars-before-return */
 	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator( clientId );
+
+	/**
+	 * Fetching data.
+	 */
+	const { data: pages, isValidating: isRequestingPages,  } = useSWR(
+		addQueryArgs( '/wp/v2/pages', {
+			parent: 0,
+			order: 'asc',
+			orderby: 'id',
+		} )
+		, doFetch
+	);
 
 	// Builds navigation links from default Pages.
 	const defaultPagesNavigationItems = useMemo(
@@ -67,16 +95,10 @@ function Navigation( {
 				return null;
 			}
 
-			return pages.map( ( { title, type, link: url, id } ) => (
-				createBlock( 'core/navigation-link',
-					{
-						type,
-						id,
-						url,
-						label: escape( title.rendered ),
-						title: escape( title.raw ),
-						opensInNewTab: false,
-					}
+			return pages.map( ( { title, type, url, id } ) => (
+				createBlock(
+					'core/navigation-link',
+					{ type,  id,  url,  label: escape( title ), title: escape( title ),  opensInNewTab: false }
 				)
 			) );
 		},
@@ -95,7 +117,7 @@ function Navigation( {
 		};
 	}
 
-	function handleCreateEmpty() {
+	const handleCreateEmpty = () => {
 		const emptyNavLinkBlock = createBlock( 'core/navigation-link' );
 		updateNavItemBlocks( [ emptyNavLinkBlock ] );
 	}
@@ -104,7 +126,7 @@ function Navigation( {
 		updateNavItemBlocks( defaultPagesNavigationItems );
 	}
 
-	const hasPages = hasResolvedPages && pages && pages.length;
+	const hasPages = pages && pages.length;
 
 	const blockClassNames = classnames( 'wp-block-navigation', {
 		[ `items-justification-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
@@ -116,6 +138,23 @@ function Navigation( {
 	if ( ! hasExistingNavItems ) {
 		return (
 			<Fragment>
+				<InspectorControls>
+					{ ! isRequestingPages && (
+						<PanelBody
+							title={ __( 'Navigation Settings' ) }
+						>
+							<CheckboxControl
+								value={ attributes.automaticallyAdd }
+								onChange={ ( automaticallyAdd ) => {
+									setAttributes( { automaticallyAdd } );
+									handleCreateFromExistingPages();
+								} }
+								label={ __( 'Automatically add new pages' ) }
+								help={ __( 'Automatically add new top level pages to this navigation.' ) }
+							/>
+						</PanelBody>
+					) }
+				</InspectorControls>
 				<Placeholder
 					className="wp-block-navigation-placeholder"
 					icon="menu"
@@ -196,19 +235,9 @@ export default compose( [
 	withSelect( ( select, { clientId } ) => {
 		const innerBlocks = select( 'core/block-editor' ).getBlocks( clientId );
 
-		const filterDefaultPages = {
-			parent: 0,
-			order: 'asc',
-			orderby: 'id',
-		};
-
-		const pagesSelect = [ 'core', 'getEntityRecords', [ 'postType', 'page', filterDefaultPages ] ];
-
 		return {
+			innerBlocks,
 			hasExistingNavItems: !! innerBlocks.length,
-			pages: select( 'core' ).getEntityRecords( 'postType', 'page', filterDefaultPages ),
-			isRequestingPages: select( 'core/data' ).isResolving( ...pagesSelect ),
-			hasResolvedPages: select( 'core/data' ).hasFinishedResolution( ...pagesSelect ),
 		};
 	} ),
 	withDispatch( ( dispatch, { clientId } ) => {

@@ -117,7 +117,7 @@ const URLInput = ( {
 	 * Fetching data.
 	 */
 	const shouldNotFetch = value.length < 2 || ( ! handleURLSuggestions && isURL( value ) );
-	const { data: suggestions = [], error, isValidating: loading } = useSWR(
+	const { data: suggestions = [], isValidating: loading } = useSWR(
 		shouldNotFetch ? null : value,
 		query => fetchLinkSuggestions ? doFetch( fetchLinkSuggestions, query ) : null, {
 			initialData: [],
@@ -333,27 +333,6 @@ const URLInput = ( {
 	);
 	/* eslint-enable jsx-a11y/no-autofocus */
 };
-
-//
-// static getDerivedStateFromProps( { value, disableSuggestions }, { showSuggestions, selectedSuggestion } ) {
-// 	let shouldShowSuggestions = showSuggestions;
-//
-// 	const hasValue = value && value.length;
-//
-// 	if ( ! hasValue ) {
-// 		shouldShowSuggestions = false;
-// 	}
-//
-// 	if ( disableSuggestions === true ) {
-// 		shouldShowSuggestions = false;
-// 	}
-//
-// 	return {
-// 		selectedSuggestion: hasValue ? selectedSuggestion : null,
-// 		showSuggestions: shouldShowSuggestions,
-// 	};
-// }
-// }
 
 export default compose(
 	withSafeTimeout,
