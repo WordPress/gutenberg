@@ -170,6 +170,8 @@ class BlockList extends Component {
 			return;
 		}
 
+		// The browser selection won't have updated yet at this point, so wait
+		// until the next animation frame to get the browser selection.
 		this.rafId = window.requestAnimationFrame( this.setSelection );
 	}
 
