@@ -1,6 +1,7 @@
 .components-toggle-control .components-base-control__field {
 	display: flex;
 	margin-bottom: $grid-size-small * 3;
+	line-height: initial;
 
 	.components-form-toggle {
 		margin-right: $grid-size-large;
