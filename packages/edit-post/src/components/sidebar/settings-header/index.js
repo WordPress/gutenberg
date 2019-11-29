@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { withDispatch } from '@wordpress/data';
 
@@ -31,24 +32,24 @@ const SettingsHeader = ( { openDocumentSettings, openBlockSettings, sidebarName 
 			{ /* Use a list so screen readers will announce how many tabs there are. */ }
 			<ul>
 				<li>
-					<button
+					<Button
 						onClick={ openDocumentSettings }
 						className={ `edit-post-sidebar__panel-tab ${ documentActiveClass }` }
 						aria-label={ documentAriaLabel }
 						data-label={ __( 'Document' ) }
 					>
 						{ __( 'Document' ) }
-					</button>
+					</Button>
 				</li>
 				<li>
-					<button
+					<Button
 						onClick={ openBlockSettings }
 						className={ `edit-post-sidebar__panel-tab ${ blockActiveClass }` }
 						aria-label={ blockAriaLabel }
 						data-label={ blockLabel }
 					>
 						{ blockLabel }
-					</button>
+					</Button>
 				</li>
 			</ul>
 		</SidebarHeader>

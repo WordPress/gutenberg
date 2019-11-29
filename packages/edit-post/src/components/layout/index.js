@@ -129,7 +129,6 @@ function Layout( { isMobileViewport } ) {
 						<div className="edit-post-toggle-publish-panel">
 							<Button
 								isDefault
-								type="button"
 								className="edit-post-toggle-publish-panel__button"
 								onClick={ togglePublishSidebar }
 								aria-expanded={ false }
