@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createHigherOrderComponent, pure } from '@wordpress/compose';
+import { createHigherOrderComponent } from '@wordpress/compose';
 
 /**
  * Internal dependencies
