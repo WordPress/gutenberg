@@ -78,7 +78,7 @@ function Navigation( {
 	/* eslint-enable @wordpress/no-unused-vars-before-return */
 	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator( clientId );
 
-	const [ unaddedItems, setUnaddedItems ] = useState( [] );
+	const [ pageNavigationItems, setPageNavigationItems ] = useState( [] );
 
 	const [ populateFromExistingPages, setPopulateFromExistingPages ] = useState( false );
 
@@ -128,7 +128,7 @@ function Navigation( {
 		itemsChecker.unadded = difference( map( pages, ( { id } ) => ( id ) ), itemsChecker.ids );
 
 		if ( itemsChecker.unadded.length ) {
-			setUnaddedItems(
+			setPageNavigationItems(
 				concat(
 					map( itemsChecker.unadded, ( id ) => {
 						const { type, url, title } = filter( pages, ( { id: page_id } ) => page_id === id )[0];
@@ -145,9 +145,9 @@ function Navigation( {
 
 	useEffect( () => {
 	    if ( populateFromExistingPages ) {
-		    updateNavItemBlocks( unaddedItems );
+		    updateNavItemBlocks( pageNavigationItems );
 	    }
-	}, [ populateFromExistingPages, unaddedItems ] );
+	}, [ populateFromExistingPages, pageNavigationItems ] );
 
 
 	//
