@@ -57,24 +57,3 @@
 		display: inline-flex;
 	}
 }
-
-.block-editor-block-toolbar__block-title {
-	position: absolute;
-	top: -19px;
-	left: -3px;
-	border: none;
-	line-height: 1;
-	font-family: $default-font;
-	font-size: 11px;
-	padding: 4px 4px;
-	background: $light-gray-500;
-	color: $dark-gray-900;
-	transition: box-shadow 0.1s linear;
-	@include reduce-motion("transition");
-
-	.is-dark-theme & {
-		background: $dark-gray-600;
-		color: $white;
-	}
-}
-
