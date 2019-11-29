@@ -78,6 +78,7 @@ export {
 	Slot,
 	Fill,
 	Provider as SlotFillProvider,
+	Consumer as __experimentalSlotFillConsumer,
 } from './slot-fill';
 
 // Higher-Order Components
