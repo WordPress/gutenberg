@@ -137,6 +137,10 @@ _Parameters_
 
 -   _slug_ `string`: Plugin slug.
 
+<a name="disableFocusLossObservation" href="#disableFocusLossObservation">#</a> **disableFocusLossObservation**
+
+Removes the focus loss listener that `enableFocusLossObservation()` adds.
+
 <a name="disablePrePublishChecks" href="#disablePrePublishChecks">#</a> **disablePrePublishChecks**
 
 Disables Pre-publish checks.
@@ -155,6 +159,11 @@ _Parameters_
 _Returns_
 
 -   `Promise`: Promise resolving when drag completes.
+
+<a name="enableFocusLossObservation" href="#enableFocusLossObservation">#</a> **enableFocusLossObservation**
+
+Adds an event listener to the document which throws an error if there is a
+loss of focus.
 
 <a name="enablePageDialogAccept" href="#enablePageDialogAccept">#</a> **enablePageDialogAccept**
 
@@ -318,11 +327,6 @@ _Parameters_
 _Returns_
 
 -   `Promise`: Promise that uses `mockCheck` to see if a request should be mocked with `mock`, and optionally transforms the response with `responseObjectTransform`.
-
-<a name="observeFocusLoss" href="#observeFocusLoss">#</a> **observeFocusLoss**
-
-Binds to the document on page load which throws an error if a `focusout`
-event occurs without a related target (i.e. focus loss).
 
 <a name="openAllBlockInserterCategories" href="#openAllBlockInserterCategories">#</a> **openAllBlockInserterCategories**
 
