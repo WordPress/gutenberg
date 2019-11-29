@@ -370,7 +370,8 @@ describe( 'Change detection', () => {
 
 		// Increase the paragraph's font size.
 		await page.click( '[data-type="core/paragraph"]' );
-		await page.select( '.components-select-control__input', 'large' );
+		await page.click( '.components-font-size-picker__select' );
+		await page.click( '.components-custom-select__item:nth-child(3)' );
 		await page.click( '[data-type="core/paragraph"]' );
 
 		// Check that the post is dirty.
@@ -384,7 +385,8 @@ describe( 'Change detection', () => {
 
 		// Increase the paragraph's font size again.
 		await page.click( '[data-type="core/paragraph"]' );
-		await page.select( '.components-select-control__input', 'larger' );
+		await page.click( '.components-font-size-picker__select' );
+		await page.click( '.components-custom-select__item:nth-child(4)' );
 		await page.click( '[data-type="core/paragraph"]' );
 
 		// Check that the post is dirty.

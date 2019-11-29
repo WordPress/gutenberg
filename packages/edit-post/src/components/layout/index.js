@@ -82,11 +82,6 @@ function Layout( { isMobileViewport } ) {
 			<AutosaveMonitor />
 			<LocalAutosaveMonitor />
 			<EditorModeKeyboardShortcuts />
-			<ManageBlocksModal />
-			<OptionsModal />
-			<KeyboardShortcutHelpModal />
-			<Popover.Slot />
-			<PluginArea />
 			<FocusReturnProvider className={ className }>
 				<EditorRegions
 					className={ className }
@@ -138,6 +133,12 @@ function Layout( { isMobileViewport } ) {
 						</div>
 					) }
 				/>
+
+				<ManageBlocksModal />
+				<OptionsModal />
+				<KeyboardShortcutHelpModal />
+				<Popover.Slot />
+				<PluginArea />
 			</FocusReturnProvider>
 
 		</>

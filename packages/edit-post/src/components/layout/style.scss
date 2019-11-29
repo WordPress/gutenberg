@@ -20,7 +20,7 @@
 	padding-left: 16px;
 	padding-right: 16px;
 }
-@include editor-left(".edit-post-layout.components-editor-notices__snackbar");
+@include editor-left(".edit-post-layout .components-editor-notices__snackbar");
 
 .edit-post-layout .editor-post-publish-panel {
 	position: fixed;

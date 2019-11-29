@@ -15,6 +15,7 @@ export { default as BlockFormatControls } from './block-format-controls';
 export { default as BlockIcon } from './block-icon';
 export { default as BlockNavigationDropdown } from './block-navigation/dropdown';
 export { default as __experimentalBlockNavigationList } from './block-navigation/list';
+export { default as __experimentalBlockPatternPicker } from './block-pattern-picker';
 export { default as BlockVerticalAlignmentToolbar } from './block-vertical-alignment-toolbar';
 export { default as ButtonBlockerAppender } from './button-block-appender';
 export { default as ColorPalette } from './color-palette';
@@ -39,6 +40,7 @@ export {
 	RichTextToolbarButton,
 	__unstableRichTextInputEvent,
 } from './rich-text';
+export { default as ToolSelector } from './tool-selector';
 export { default as URLInput } from './url-input';
 export { default as URLInputButton } from './url-input/button';
 export { default as URLPopover } from './url-popover';

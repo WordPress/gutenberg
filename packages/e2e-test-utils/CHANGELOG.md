@@ -1,3 +1,9 @@
+## master
+
+### Breaking Changes
+
+- The disableNavigationMode utility was removed. By default, the editor is in edit mode now.
+
 ## 3.0.0 (2019-11-14)
 
 ### Breaking Changes
