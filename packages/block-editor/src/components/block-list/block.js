@@ -575,7 +575,7 @@ function BlockListBlock( {
 					<ChildToolbarSlot />
 				) }
 
-				{ ( ( ! ( captureChildToolbar || hasAncestorCapturingToolbars ) && shouldShowContextualToolbar ) || isForcingContextualToolbar.current ) && (
+				{ ( ! ( captureChildToolbar || hasAncestorCapturingToolbars ) ) && ( shouldShowContextualToolbar || isForcingContextualToolbar.current ) && (
 					// Standard toolbar attached directly to the Block.
 					<BlockContextualToolbar
 						// If the toolbar is being shown because of being forced
@@ -585,7 +585,7 @@ function BlockListBlock( {
 
 				) }
 
-				{ ( captureChildToolbar || hasAncestorCapturingToolbars ) && shouldShowContextualToolbar && (
+				{ ( captureChildToolbar || hasAncestorCapturingToolbars ) && ( shouldShowContextualToolbar || isForcingContextualToolbar.current ) && (
 					// If the parent Block is set to consume toolbars of the child Blocks
 					// then render the child Block's toolbar into the Slot provided
 					// by the parent.
