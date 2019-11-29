@@ -446,6 +446,7 @@ function BlockListBlock( {
 		! isNavigationMode &&
 		! hasFixedToolbar &&
 		! showEmptyBlockSideInserter &&
+		! isMultiSelecting &&
 		(
 			( isSelected && ( ! isTypingWithinBlock || isCaretWithinFormattedText ) ) ||
 			isFirstMultiSelected
