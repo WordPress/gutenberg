@@ -32,7 +32,10 @@
 		"wp-scripts": "./bin/wp-scripts.js"
 	},
 	"dependencies": {
+		"@babel/plugin-syntax-dynamic-import": "^7.7.4",
+		"@babel/plugin-transform-runtime": "^7.7.4",
 		"@babel/preset-env": "^7.7.4",
+		"@babel/runtime": "^7.7.4",
 		"@wordpress/babel-preset-default": "file:../babel-preset-default",
 		"@wordpress/browserslist-config": "file:../browserslist-config",
 		"@wordpress/dependency-extraction-webpack-plugin": "file:../dependency-extraction-webpack-plugin",

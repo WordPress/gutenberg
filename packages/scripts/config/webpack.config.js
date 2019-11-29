@@ -81,13 +81,41 @@ const config = {
 										[
 											require.resolve( '@babel/preset-env' ),
 											{
+
+												// don't transform import statements so webpack can perform treeshaking
 												modules: false,
+
+												useBuiltIns: 'entry',
+												corejs: 3,
+
+												// perform the minimum transforms for the targetted platforms
 												targets: {
 													node: mode === 'development' ? 'current' : undefined,
 													browsers: mode === 'production' ? require( '@wordpress/browserslist-config' ) : undefined,
 												},
+
+												// Exclude transforms that make all code slower, see https://github.com/facebook/create-react-app/pull/5278
+												exclude: [ 'transform-typeof-symbol' ],
+
 											},
 										],
+									],
+									plugins: [
+
+										// avoid duplication of helper functions by relying on a runtime
+										[
+											require.resolve( '@babel/plugin-transform-runtime' ),
+											{
+												corejs: false,
+												helpers: true,
+												regenerator: true,
+												useESModules: true,
+											},
+										],
+
+										// support use of dynamic import()s
+										require.resolve( '@babel/plugin-syntax-dynamic-import' ),
+
 									],
 									sourceMaps: true,
 									inputSourceMap: true,
