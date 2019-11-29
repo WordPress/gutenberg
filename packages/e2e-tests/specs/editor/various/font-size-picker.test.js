@@ -17,7 +17,8 @@ describe( 'Font Size Picker', () => {
 		// Create a paragraph block with some content.
 		await clickBlockAppender();
 		await page.keyboard.type( 'Paragraph to be made "large"' );
-		await page.select( '.components-font-size-picker__select .components-select-control__input', 'large' );
+		await page.click( '.components-font-size-picker__select' );
+		await page.click( '.components-custom-select__item:nth-child(3)' );
 
 		// Ensure content matches snapshot.
 		const content = await getEditedPostContent();
@@ -56,7 +57,8 @@ describe( 'Font Size Picker', () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'Paragraph with font size reset using button' );
 
-		await page.select( '.components-font-size-picker__select .components-select-control__input', 'normal' );
+		await page.click( '.components-font-size-picker__select' );
+		await page.click( '.components-custom-select__item:nth-child(2)' );
 
 		const resetButton = ( await page.$x( '//*[contains(concat(" ", @class, " "), " components-font-size-picker__controls ")]//*[text()=\'Reset\']' ) )[ 0 ];
 		await resetButton.click();
@@ -71,7 +73,8 @@ describe( 'Font Size Picker', () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'Paragraph with font size reset using input field' );
 
-		await page.select( '.components-font-size-picker__select .components-select-control__input', 'large' );
+		await page.click( '.components-font-size-picker__select' );
+		await page.click( '.components-custom-select__item:nth-child(3)' );
 
 		// Clear the custom font size input.
 		await page.click( '.blocks-font-size .components-range-control__number' );

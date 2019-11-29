@@ -33,6 +33,7 @@ export const PREFERENCES_DEFAULTS = {
  * @property {boolean} __experimentalEnableLegacyWidgetBlock Whether the user has enabled the Legacy Widget Block
  * @property {boolean} __experimentalBlockDirectory Whether the user has enabled the Block Directory
  * @property {boolean} __experimentalEnableFullSiteEditing Whether the user has enabled Full Site Editing
+ * @property {boolean} __experimentalEnableFullSiteEditingDemo Whether the user has enabled Full Site Editing Demo Templates
  * @property {boolean} __experimentalEnablePageTemplates Whether the user has enabled the Page Templates
  */
 export const SETTINGS_DEFAULTS = {
@@ -154,6 +155,7 @@ export const SETTINGS_DEFAULTS = {
 	__experimentalEnableLegacyWidgetBlock: false,
 	__experimentalBlockDirectory: false,
 	__experimentalEnableFullSiteEditing: false,
+	__experimentalEnableFullSiteEditingDemo: false,
 	__experimentalEnablePageTemplates: false,
 	gradients: [
 		{

@@ -80,7 +80,6 @@ class MediaTextEdit extends Component {
 			mediaId: media.id,
 			mediaType,
 			mediaUrl: src || media.url,
-			imageFill: undefined,
 			focalPoint: undefined,
 		} );
 	}
