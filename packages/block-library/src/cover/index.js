@@ -23,6 +23,7 @@ export const settings = {
 	icon,
 	supports: {
 		align: true,
+		html: false,
 	},
 	example: {
 		attributes: {
