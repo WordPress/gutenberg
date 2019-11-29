@@ -62,7 +62,9 @@
 		"@wordpress/token-list": "file:packages/token-list",
 		"@wordpress/url": "file:packages/url",
 		"@wordpress/viewport": "file:packages/viewport",
-		"@wordpress/wordcount": "file:packages/wordcount"
+		"@wordpress/wordcount": "file:packages/wordcount",
+		"deep-equal": "1.1.1",
+		"use-swr": "1.0.3"
 	},
 	"devDependencies": {
 		"@actions/core": "1.0.0",

@@ -1,9 +1,10 @@
 /**
  * External dependencies
  */
-import { throttle, isFunction } from 'lodash';
+import { isFunction } from 'lodash';
 import classnames from 'classnames';
 import scrollIntoView from 'dom-scroll-into-view';
+import useSWR from 'use-swr';
 
 /**
  * WordPress dependencies
@@ -20,6 +21,18 @@ import { isURL } from '@wordpress/url';
 // considered a separate modal node, prevent keyboard events from propagating
 // as being considered from the input.
 const stopEventPropagation = ( event ) => event.stopPropagation();
+
+/**
+ * ASync/Await fetch handler.
+ *
+ * @param {function} fetch Data fetcher.
+ * @param {string} path fetching path.
+ * @return {Promise<*>}
+ */
+const doFetch = async function( fetch, path ) {
+	const posts = await fetch( path );
+	return await posts;
+};
 
 /**
  * URLInput component.
@@ -64,10 +77,8 @@ const URLInput = ( {
 	__experimentalFetchLinkSuggestions: fetchLinkSuggestions,
 	__experimentalHandleURLSuggestions: handleURLSuggestions,
 } ) => {
-	const [ suggestions, setSuggestions ] = useState( [] );
 	const [ showSuggestions, setShowSuggestions ] = useState( false );
 	const [ selectedSuggestion, setSelectedSuggestion ] = useState( null );
-	const [ loading, setLoading ] = useState( false );
 
 	const suggestionNodes = [];
 	let suggestionsRequest = null;
@@ -102,56 +113,31 @@ const URLInput = ( {
 		};
 	};
 
-	const updateSuggestionsHanlder = ( value ) => {
-		if ( ! fetchLinkSuggestions ) {
-			return;
+	/**
+	 * Fetching data.
+	 */
+	const shouldNotFetch = value.length < 2 || ( ! handleURLSuggestions && isURL( value ) );
+	const { data: suggestions = [], error, isValidating: loading } = useSWR(
+		shouldNotFetch ? null : value,
+		query => fetchLinkSuggestions ? doFetch( fetchLinkSuggestions, query ) : null, {
+			initialData: [],
 		}
+	);
 
-		// Show the suggestions after typing at least 2 characters
-		// and also for URLs
-		if ( value.length < 2 || ( ! handleURLSuggestions && isURL( value ) ) ) {
-			setShowSuggestions( false );
-			setSelectedSuggestion( null );
-			setLoading( false );
-			return;
-		}
-
-		setShowSuggestions( true );
+	useEffect( () => {
+		setShowSuggestions( !! suggestions );
 		setSelectedSuggestion( null );
-		setLoading( true );
 
-		const request = fetchLinkSuggestions( value );
-
-		request.then( ( suggestions ) => {
-			// A fetch Promise doesn't have an abort option. It's mimicked by
-			// comparing the request reference in on the instance, which is
-			// reset or deleted on subsequent requests or unmounting.
-			if ( suggestionsRequest !== request ) {
-				return;
-			}
-
-			setSuggestions( suggestions );
-			setLoading( false );
-
-			if ( !! suggestions.length ) {
-				debouncedSpeak( sprintf( _n(
-					'%d result found, use up and down arrow keys to navigate.',
-					'%d results found, use up and down arrow keys to navigate.',
-					suggestions.length
-				), suggestions.length ), 'assertive' );
-			} else {
-				debouncedSpeak( __( 'No results.' ), 'assertive' );
-			}
-		} ).catch( () => {
-			if ( suggestionsRequest === request ) {
-				setLoading( false );
-			}
-		} );
-
-		suggestionsRequest = request;
-	};
-
-	const updateSuggestions = throttle( updateSuggestionsHanlder, 200 );
+		if ( !! suggestions ) {
+			debouncedSpeak( sprintf( _n(
+				'%d result found, use up and down arrow keys to navigate.',
+				'%d results found, use up and down arrow keys to navigate.',
+				suggestions.length
+			), suggestions.length ), 'assertive' );
+		} else {
+			debouncedSpeak( __( 'No results.' ), 'assertive' );
+		}
+	}, [ suggestions ] );
 
 	const selectLink = ( suggestion ) => {
 		onChange( suggestion.url, suggestion );
@@ -168,17 +154,18 @@ const URLInput = ( {
 	const onChangeHandler = ( { target } ) => {
 		const { value } = target;
 		onChange( value );
-		if ( ! disableSuggestions ) {
-			updateSuggestions( value );
-		}
 
+		//Handled by hook!
+		// if ( ! disableSuggestions ) {
+		// 	updateSuggestions( value );
+		// }
 	};
 
 	const onKeyDownHandler = ( event ) => {
 		// If the suggestions are not shown or loading, we shouldn't handle the arrow keys
 		// We shouldn't preventDefault to allow block arrow keys navigation
 		if (
-			( ! showSuggestions || ! suggestions.length || loading ) &&
+			( ! showSuggestions || ! suggestions || loading ) &&
 			value
 		) {
 			// In the Windows version of Firefox the up and down arrows don't move the caret
@@ -216,20 +203,20 @@ const URLInput = ( {
 			return;
 		}
 
-		const suggestion = suggestions[ selectedSuggestion ];
+		const suggestion = suggestions ? suggestions[ selectedSuggestion ] : null;
 
 		switch ( event.keyCode ) {
 			case UP: {
 				event.stopPropagation();
 				event.preventDefault();
-				const previousIndex = ! selectedSuggestion ? suggestions.length - 1 : selectedSuggestion - 1;
+				const previousIndex = ! selectedSuggestion && suggestions ? suggestions.length - 1 : selectedSuggestion - 1;
 				setSelectedSuggestion( previousIndex );
 				break;
 			}
 			case DOWN: {
 				event.stopPropagation();
 				event.preventDefault();
-				const nextIndex = selectedSuggestion === null || ( selectedSuggestion === suggestions.length - 1 ) ? 0 : selectedSuggestion + 1;
+				const nextIndex = selectedSuggestion === null || ( suggestions && selectedSuggestion === suggestions.length - 1 ) ? 0 : selectedSuggestion + 1;
 				setSelectedSuggestion( nextIndex );
 				break;
 			}
@@ -305,16 +292,16 @@ const URLInput = ( {
 
 			{ ( loading ) && <Spinner /> }
 
-			{ isFunction( renderSuggestions ) && showSuggestions && !! suggestions.length && renderSuggestions( {
+			{ isFunction( renderSuggestions ) && showSuggestions && suggestions && suggestions.length && renderSuggestions( {
 				suggestions,
 				selectedSuggestion,
 				suggestionsListProps,
 				buildSuggestionItemProps,
 				isLoading: loading,
-				handleSuggestionClick: onClickHandler(),
+				handleSuggestionClick: onClickHandler,
 			} ) }
 
-			{ ! isFunction( renderSuggestions ) && showSuggestions && !! suggestions.length &&
+			{ ! isFunction( renderSuggestions ) && showSuggestions && !! suggestions && suggestions.length &&
 			<Popover
 				position="bottom"
 				noArrow
@@ -347,25 +334,25 @@ const URLInput = ( {
 	/* eslint-enable jsx-a11y/no-autofocus */
 };
 
-	//
-	// static getDerivedStateFromProps( { value, disableSuggestions }, { showSuggestions, selectedSuggestion } ) {
-	// 	let shouldShowSuggestions = showSuggestions;
-	//
-	// 	const hasValue = value && value.length;
-	//
-	// 	if ( ! hasValue ) {
-	// 		shouldShowSuggestions = false;
-	// 	}
-	//
-	// 	if ( disableSuggestions === true ) {
-	// 		shouldShowSuggestions = false;
-	// 	}
-	//
-	// 	return {
-	// 		selectedSuggestion: hasValue ? selectedSuggestion : null,
-	// 		showSuggestions: shouldShowSuggestions,
-	// 	};
-	// }
+//
+// static getDerivedStateFromProps( { value, disableSuggestions }, { showSuggestions, selectedSuggestion } ) {
+// 	let shouldShowSuggestions = showSuggestions;
+//
+// 	const hasValue = value && value.length;
+//
+// 	if ( ! hasValue ) {
+// 		shouldShowSuggestions = false;
+// 	}
+//
+// 	if ( disableSuggestions === true ) {
+// 		shouldShowSuggestions = false;
+// 	}
+//
+// 	return {
+// 		selectedSuggestion: hasValue ? selectedSuggestion : null,
+// 		showSuggestions: shouldShowSuggestions,
+// 	};
+// }
 // }
 
 export default compose(
