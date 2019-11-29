@@ -51,11 +51,12 @@ const PLACEHOLDER_TEXT = Platform.select( {
 	native: __( 'ADD MEDIA' ),
 } );
 
-const SEPARATOR_TYPE = Platform.select( {
-	web: undefined,
-	native: 'fullWidth',
+// currently this is needed for consistent controls UI on mobile
+// this can be removed after control components settle on consistent defaults
+const MOBILE_CONTROL_PROPS = Platform.select( {
+	web: {},
+	native: { separatorType: 'fullWidth' },
 } );
-
 
 class GalleryEdit extends Component {
 	constructor() {
@@ -305,7 +306,7 @@ class GalleryEdit extends Component {
 					<PanelBody title={ __( 'Gallery Settings' ) }>
 						{ images.length > 1 && <RangeControl
 							label={ __( 'Columns' ) }
-							separatorType={ SEPARATOR_TYPE }
+							{ ...MOBILE_CONTROL_PROPS }
 							value={ columns }
 							onChange={ this.setColumnsNumber }
 							min={ 1 }
@@ -314,14 +315,14 @@ class GalleryEdit extends Component {
 						/> }
 						<ToggleControl
 							label={ __( 'Crop Images' ) }
-							separatorType={ SEPARATOR_TYPE }
+							{ ...MOBILE_CONTROL_PROPS }
 							checked={ !! imageCrop }
 							onChange={ this.toggleImageCrop }
 							help={ this.getImageCropHelp }
 						/>
 						<SelectControl
 							label={ __( 'Link To' ) }
-							separatorType={ SEPARATOR_TYPE }
+							{ ...MOBILE_CONTROL_PROPS }
 							value={ linkTo }
 							onChange={ this.setLinkTo }
 							options={ linkOptions }
