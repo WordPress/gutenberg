@@ -68,15 +68,25 @@ class BlockList extends Component {
 		this.onSelectionStart = this.onSelectionStart.bind( this );
 		this.onSelectionEnd = this.onSelectionEnd.bind( this );
 		this.setSelection = this.setSelection.bind( this );
+		this.updateNativeSelection = this.updateNativeSelection.bind( this );
 
 		this.ref = createRef();
+	}
+
+	componentDidUpdate() {
+		this.updateNativeSelection();
+	}
+
+	componentWillUnmount() {
+		window.removeEventListener( 'mouseup', this.onSelectionEnd );
+		window.cancelAnimationFrame( this.rafId );
 	}
 
 	/**
 	 * When the component updates, and there is multi selection, we need to
 	 * select the entire block contents.
 	 */
-	componentDidUpdate() {
+	updateNativeSelection() {
 		const {
 			hasMultiSelection,
 			blockClientIds,
@@ -118,11 +128,6 @@ class BlockList extends Component {
 
 		selection.removeAllRanges();
 		selection.addRange( range );
-	}
-
-	componentWillUnmount() {
-		window.removeEventListener( 'mouseup', this.onSelectionEnd );
-		window.cancelAnimationFrame( this.rafId );
 	}
 
 	/**
