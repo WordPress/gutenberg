@@ -34,6 +34,8 @@ async function getSelectedFlatIndices() {
  * Tests if the native selection matches the block selection.
  */
 async function testNativeSelection() {
+	// Wait for the selection to update.
+	await page.evaluate( () => new Promise( window.requestAnimationFrame ) );
 	await page.evaluate( () => {
 		const selection = window.getSelection();
 		const elements = Array.from(
@@ -287,9 +289,8 @@ describe( 'Multi-block selection', () => {
 		await page.mouse.down();
 		await page.mouse.move( coord2.x, coord2.y, { steps: 10 } );
 		await page.mouse.up();
-		await page.evaluate( () => new Promise( window.requestAnimationFrame ) );
 
-		expect( await getSelectedFlatIndices() ).toEqual( [ 1, 2 ] );
 		await testNativeSelection();
+		expect( await getSelectedFlatIndices() ).toEqual( [ 1, 2 ] );
 	} );
 } );
