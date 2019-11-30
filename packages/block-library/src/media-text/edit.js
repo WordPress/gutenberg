@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { get, find, isEmpty, each } from 'lodash';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -16,8 +16,6 @@ import {
 	PanelColorSettings,
 	withColors,
 	__experimentalImageURLInputUI as ImageURLInputUI,
-	stopPropagation,
-	stopPropagationRelevantKeys,
 } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
 import {
@@ -28,9 +26,6 @@ import {
 	Toolbar,
 	ExternalLink,
 	FocalPointPicker,
-	TextControl,
-	SVG,
-	Path,
 } from '@wordpress/components';
 /**
  * Internal dependencies
@@ -53,48 +48,6 @@ export const LINK_DESTINATION_MEDIA = 'media';
 export const LINK_DESTINATION_ATTACHMENT = 'attachment';
 export const NEW_TAB_REL = [ 'noreferrer', 'noopener' ];
 
-const icon = <SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><Path d="M0,0h24v24H0V0z" fill="none" /><Path d="m19 5v14h-14v-14h14m0-2h-14c-1.1 0-2 0.9-2 2v14c0 1.1 0.9 2 2 2h14c1.1 0 2-0.9 2-2v-14c0-1.1-0.9-2-2-2z" /><Path d="m14.14 11.86l-3 3.87-2.14-2.59-3 3.86h12l-3.86-5.14z" /></SVG>;
-
-const removeNewTabRel = ( currentRel ) => {
-	let newRel = currentRel;
-
-	if ( currentRel !== undefined && ! isEmpty( newRel ) ) {
-		if ( ! isEmpty( newRel ) ) {
-			each( NEW_TAB_REL, function( relVal ) {
-				const regExp = new RegExp( '\\b' + relVal + '\\b', 'gi' );
-				newRel = newRel.replace( regExp, '' );
-			} );
-
-			// Only trim if NEW_TAB_REL values was replaced.
-			if ( newRel !== currentRel ) {
-				newRel = newRel.trim();
-			}
-
-			if ( isEmpty( newRel ) ) {
-				newRel = undefined;
-			}
-		}
-	}
-
-	return newRel;
-};
-
-const getUpdatedLinkTargetSettings = ( value, { rel } ) => {
-	const linkTarget = value ? '_blank' : undefined;
-
-	let updatedRel;
-	if ( ! linkTarget && ! rel ) {
-		updatedRel = undefined;
-	} else {
-		updatedRel = removeNewTabRel( rel );
-	}
-
-	return {
-		linkTarget,
-		rel: updatedRel,
-	};
-};
-
 class MediaTextEdit extends Component {
 	constructor() {
 		super( ...arguments );
@@ -105,67 +58,7 @@ class MediaTextEdit extends Component {
 		this.state = {
 			mediaWidth: null,
 		};
-		this.getLinkDestinations = this.getLinkDestinations.bind( this );
 		this.onSetHref = this.onSetHref.bind( this );
-		this.onSetNewTab = this.onSetNewTab.bind( this );
-		this.onSetLinkRel = this.onSetLinkRel.bind( this );
-		this.onSetLinkClass = this.onSetLinkClass.bind( this );
-	}
-
-	getLinkDestinations() {
-		const { mediaType, mediaUrl, mediaLink } = this.props.attributes;
-		return [
-			{
-				linkDestination: LINK_DESTINATION_MEDIA,
-				title: __( 'Media File' ),
-				url: ( mediaType === 'image' && mediaUrl ) || undefined,
-				icon,
-			},
-			{
-				linkDestination: LINK_DESTINATION_ATTACHMENT,
-				title: __( 'Attachment Page' ),
-				url: ( mediaType === 'image' && mediaLink ) || undefined,
-				icon: <SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><Path d="M0 0h24v24H0V0z" fill="none" /><Path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zM6 20V4h7v5h5v11H6z" /></SVG>,
-			},
-		];
-	}
-
-	onSetHref( value ) {
-		const linkDestinations = this.getLinkDestinations();
-		const { attributes } = this.props;
-		const { linkDestination } = attributes;
-		let linkDestinationInput;
-		if ( ! value ) {
-			linkDestinationInput = LINK_DESTINATION_NONE;
-		} else {
-			linkDestinationInput = (
-				find( linkDestinations, ( destination ) => {
-					return destination.url === value;
-				} ) ||
-				{ linkDestination: LINK_DESTINATION_CUSTOM }
-			).linkDestination;
-		}
-		if ( linkDestination !== linkDestinationInput ) {
-			this.props.setAttributes( {
-				linkDestination: linkDestinationInput,
-				href: value,
-			} );
-			return;
-		}
-		this.props.setAttributes( { href: value } );
-	}
-
-	onSetNewTab( value ) {
-		const updatedLinkTarget = getUpdatedLinkTargetSettings( value, this.props.attributes );
-		this.props.setAttributes( updatedLinkTarget );
-	}
-
-	onSetLinkRel( value ) {
-		this.props.setAttributes( { rel: value } );
-	}
-
-	onSetLinkClass( value ) {
-		this.props.setAttributes( { linkClass: value } );
 	}
 
 	onSelectMedia( media ) {
@@ -205,6 +98,10 @@ class MediaTextEdit extends Component {
 		this.setState( {
 			mediaWidth: applyWidthConstraints( width ),
 		} );
+	}
+
+	onSetHref( props ) {
+		this.props.setAttributes( props );
 	}
 
 	commitWidthChange( width ) {
@@ -250,6 +147,7 @@ class MediaTextEdit extends Component {
 			mediaWidth,
 			verticalAlignment,
 			mediaUrl,
+			mediaLink,
 			imageFill,
 			focalPoint,
 			rel,
@@ -258,8 +156,6 @@ class MediaTextEdit extends Component {
 			linkClass,
 			linkDestination,
 		} = attributes;
-
-		const cleanRel = removeNewTabRel( rel );
 
 		const temporaryMediaWidth = this.state.mediaWidth;
 		const classNames = classnames( className, {
@@ -337,6 +233,7 @@ class MediaTextEdit extends Component {
 				/> ) }
 			</PanelBody>
 		);
+
 		return (
 			<>
 				<InspectorControls>
@@ -359,30 +256,13 @@ class MediaTextEdit extends Component {
 						<ImageURLInputUI
 							url={ href || '' }
 							onChangeUrl={ this.onSetHref }
-							mediaLinks={ this.getLinkDestinations() }
 							linkDestination={ linkDestination }
-							advancedOptions={
-								<>
-									<ToggleControl
-										label={ __( 'Open in New Tab' ) }
-										onChange={ this.onSetNewTab }
-										checked={ linkTarget === '_blank' } />
-									<TextControl
-										label={ __( 'Link Rel' ) }
-										value={ cleanRel || '' }
-										onChange={ this.onSetLinkRel }
-										onKeyPress={ stopPropagation }
-										onKeyDown={ stopPropagationRelevantKeys }
-									/>
-									<TextControl
-										label={ __( 'Link CSS Class' ) }
-										value={ linkClass || '' }
-										onKeyPress={ stopPropagation }
-										onKeyDown={ stopPropagationRelevantKeys }
-										onChange={ this.onSetLinkClass }
-									/>
-								</>
-							}
+							mediaType={ mediaType }
+							mediaUrl={ mediaUrl }
+							mediaLink={ mediaLink }
+							linkTarget={ linkTarget }
+							linkClass={ linkClass }
+							rel={ rel }
 						/>
 					</Toolbar> ) }
 				</BlockControls>

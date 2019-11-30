@@ -442,14 +442,6 @@ _Properties_
 
 Undocumented declaration.
 
-<a name="stopPropagation" href="#stopPropagation">#</a> **stopPropagation**
-
-Undocumented declaration.
-
-<a name="stopPropagationRelevantKeys" href="#stopPropagationRelevantKeys">#</a> **stopPropagationRelevantKeys**
-
-Undocumented declaration.
-
 <a name="storeConfig" href="#storeConfig">#</a> **storeConfig**
 
 Block editor data store configuration.
