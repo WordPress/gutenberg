@@ -1,11 +1,13 @@
-sudo: false
-
 git:
   depth: 1
 
 branches:
   only:
     - master
+
+os:
+  - linux
+  - windows
 
 language: node_js
 
@@ -19,7 +21,7 @@ node_js:
   - '12'
 
 before_install:
-  - npm install -g npm@latest
+  - if [[ ("$TRAVIS_OS_NAME" == "linux") ]]; then npm install -g npm@latest; fi
 
 script: npm test
 

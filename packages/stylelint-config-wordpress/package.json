@@ -81,7 +81,10 @@
 		"root": true,
 		"extends": [
 			"plugin:@wordpress/eslint-plugin/recommended"
-		]
+		],
+		"rules": {
+			"linebreak-style": 0
+		}
 	},
 	"husky": {
 		"hooks": {
