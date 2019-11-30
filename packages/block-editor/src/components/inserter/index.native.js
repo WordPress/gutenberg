@@ -184,19 +184,25 @@ export default compose( [
 		}
 
 		let insertionIndexBefore = 0;
+		let insertionIndexAfter = getBlockOrder( destinationRootClientId ).length;
 
+		let isAnyBlockSelected = false;
 		const end = getBlockSelectionEnd();
 		if ( ! destinationRootClientId && ! clientId && ! isAppender ) {
 			if ( end ) {
 				destinationRootClientId = getBlockRootClientId( end );
 				insertionIndexBefore = getBlockIndex( end, destinationRootClientId );
+				insertionIndexAfter = getBlockIndex( end, destinationRootClientId ) + 1;
+				isAnyBlockSelected = true;
 			}
 		}
 
 		return {
 			destinationRootClientId,
-			insertionIndexBefore,
 			insertionIndexDefault: getDefaultInsertionIndex(),
+			insertionIndexBefore,
+			insertionIndexAfter,
+			isAnyBlockSelected,
 		};
 	} ),
 
