@@ -75,13 +75,13 @@ module.exports = {
 		'selector-attribute-operator-space-before': 'never',
 		'selector-attribute-quotes': 'always',
 		'selector-class-pattern': [
-			'^[a-z]+(-[a-z]+)*',
+			'^([a-z][a-z0-9]*)(-[a-z0-9]+)*$',
 			{
 				message: 'Selector should use lowercase and separate words with hyphens (selector-class-pattern)',
 			},
 		],
 		'selector-id-pattern': [
-			'^[a-z]+(-[a-z]+)*',
+			'^([a-z][a-z0-9]*)(-[a-z0-9]+)*$',
 			{
 				message: 'Selector should use lowercase and separate words with hyphens (selector-id-pattern)',
 			},

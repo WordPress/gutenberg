@@ -9,3 +9,11 @@ input[type="text"] {
 .selector::after {
 	color: #000;
 }
+
+.selector-class {
+	color: #000;
+}
+
+#selector-id {
+	color: #000;
+}

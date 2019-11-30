@@ -1,5 +1,7 @@
 # HEAD
 
+-   Fixed: `selector-class-pattern` rule regex to account for numerals, case detection, and ensure kebab-case over snake_case.
+-   Fixed: `selector-id-pattern` rule regex to account for numerals, case detection, and ensure kebab-case over snake_case.
 -   Updated: `stylelint-config-recommended-scss` to `4.1.0`.
 -   Updated: `stylelint-find-rules` to `2.2.0`.
 -   Updated: `stylelint-scss` to `3.13.0`.
