@@ -1,5 +1,6 @@
 # HEAD
 
+-   Updated: `stylelint-config-recommended-scss` to `4.1.0`.
 -   Updated: `stylelint-find-rules` to `2.2.0`.
 -   Updated: `stylelint-scss` to `3.13.0`.
 -   Updated: `stylelint` to `11.0.0`.
