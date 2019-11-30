@@ -1,6 +1,7 @@
 # HEAD
 
 -   Updated: `stylelint-find-rules` to `2.2.0`.
+-   Updated: `stylelint` to `11.0.0`.
 
 # 15.0.0
 
