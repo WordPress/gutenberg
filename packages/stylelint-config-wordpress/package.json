@@ -38,7 +38,7 @@
 	"dependencies": {
 		"stylelint-config-recommended": "^3.0.0",
 		"stylelint-config-recommended-scss": "^4.0.0",
-		"stylelint-scss": "^3.11.1"
+		"stylelint-scss": "^3.13.0"
 	},
 	"devDependencies": {
 		"@commitlint/cli": "^8.2.0",
