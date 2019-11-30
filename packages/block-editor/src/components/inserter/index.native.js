@@ -36,12 +36,28 @@ class Inserter extends Component {
 		super( ...arguments );
 
 		this.state = {
-			shouldInsertBefore: false,
+			insertionType: 'default',
 		};
 
 		this.onToggle = this.onToggle.bind( this );
 		this.renderToggle = this.renderToggle.bind( this );
 		this.renderContent = this.renderContent.bind( this );
+	}
+
+	getInsertionIndex() {
+		const {
+			insertionIndexDefault,
+			insertionIndexBefore,
+			insertionIndexAfter,
+		} = this.props;
+		const { insertionType } = this.state;
+		if ( insertionType === 'before' ) {
+			return insertionIndexBefore;
+		}
+		if ( insertionType === 'after' ) {
+			return insertionIndexAfter;
+		}
+		return insertionIndexDefault;
 	}
 
 	onToggle( isOpen ) {
@@ -76,13 +92,13 @@ class Inserter extends Component {
 		const style = getStylesFromColorScheme( styles.addBlockButton, styles.addBlockButtonDark );
 
 		const onPress = () => {
-			this.setState( { shouldInsertBefore: false }, () => {
+			this.setState( { insertionType: 'default' }, () => {
 				onToggle();
 			} );
 		};
 
 		const onLongPress = () => {
-			this.setState( { shouldInsertBefore: true }, () => {
+			this.setState( { insertionType: 'before' }, () => {
 				onToggle();
 			} );
 		};
@@ -104,11 +120,8 @@ class Inserter extends Component {
 			destinationRootClientId,
 			clientId,
 			isAppender,
-			insertionIndexBefore,
-			insertionIndexDefault,
 		} = this.props;
-		const { shouldInsertBefore } = this.state;
-
+		const { insertionType } = this.state;
 		return (
 			<InserterMenu
 				isOpen={ isOpen }
@@ -117,10 +130,8 @@ class Inserter extends Component {
 				rootClientId={ destinationRootClientId }
 				clientId={ clientId }
 				isAppender={ isAppender }
-				isDefaultInsert={ ! shouldInsertBefore }
-				insertionIndex={
-					shouldInsertBefore ? insertionIndexBefore : insertionIndexDefault
-				}
+				isDefaultInsert={ insertionType === 'default' }
+				insertionIndex={ this.getInsertionIndex() }
 			/>
 		);
 	}
