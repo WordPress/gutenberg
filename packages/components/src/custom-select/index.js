@@ -18,18 +18,6 @@ const stateReducer = (
 	{ selectedItem },
 	{ type, changes, props: { items } }
 ) => {
-	// TODO: Remove this.
-	// eslint-disable-next-line no-console
-	console.debug(
-		'Selected Item: ',
-		selectedItem,
-		'Type: ',
-		type,
-		'Changes: ',
-		changes,
-		'Items: ',
-		items
-	);
 	switch ( type ) {
 		case useSelect.stateChangeTypes.ToggleButtonKeyDownArrowDown:
 			// If we already have a selected item, try to select the next one,
