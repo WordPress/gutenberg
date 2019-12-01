@@ -3,7 +3,6 @@
  */
 import classnames from 'classnames';
 import {
-	find,
 	get,
 	isEmpty,
 	map,
@@ -21,14 +20,11 @@ import {
 	ButtonGroup,
 	ExternalLink,
 	PanelBody,
-	Path,
 	ResizableBox,
 	SelectControl,
 	Spinner,
-	SVG,
 	TextareaControl,
 	TextControl,
-	ToggleControl,
 	ToolbarGroup,
 	withNotices,
 } from '@wordpress/components';
@@ -44,8 +40,6 @@ import {
 	MediaReplaceFlow,
 	RichText,
 	__experimentalImageURLInputUI as ImageURLInputUI,
-	stopPropagation,
-	stopPropagationRelevantKeys,
 } from '@wordpress/block-editor';
 import {
 	Component,
@@ -60,16 +54,14 @@ import { withViewportMatch } from '@wordpress/viewport';
 import { createUpgradedEmbedBlock } from '../embed/util';
 import icon from './icon';
 import ImageSize from './image-size';
-import { getUpdatedLinkTargetSettings, removeNewTabRel } from './utils';
+import { getUpdatedLinkTargetSettings } from './utils';
 /**
  * Module constants
  */
 import {
 	MIN_SIZE,
-	LINK_DESTINATION_NONE,
 	LINK_DESTINATION_MEDIA,
 	LINK_DESTINATION_ATTACHMENT,
-	LINK_DESTINATION_CUSTOM,
 	ALLOWED_MEDIA_TYPES,
 	DEFAULT_SIZE_SLUG,
 } from './constants';
@@ -116,14 +108,10 @@ export class ImageEdit extends Component {
 		this.updateHeight = this.updateHeight.bind( this );
 		this.updateDimensions = this.updateDimensions.bind( this );
 		this.onSetHref = this.onSetHref.bind( this );
-		this.onSetLinkClass = this.onSetLinkClass.bind( this );
-		this.onSetLinkRel = this.onSetLinkRel.bind( this );
-		this.onSetNewTab = this.onSetNewTab.bind( this );
 		this.onSetTitle = this.onSetTitle.bind( this );
 		this.getFilename = this.getFilename.bind( this );
 		this.onUploadError = this.onUploadError.bind( this );
 		this.onImageError = this.onImageError.bind( this );
-		this.getLinkDestinations = this.getLinkDestinations.bind( this );
 
 		this.state = {
 			captionFocused: false,
@@ -257,42 +245,13 @@ export class ImageEdit extends Component {
 		}
 	}
 
-	onSetHref( value ) {
-		const linkDestinations = this.getLinkDestinations();
-		const { attributes } = this.props;
-		const { linkDestination } = attributes;
-		let linkDestinationInput;
-		if ( ! value ) {
-			linkDestinationInput = LINK_DESTINATION_NONE;
-		} else {
-			linkDestinationInput = (
-				find( linkDestinations, ( destination ) => {
-					return destination.url === value;
-				} ) ||
-				{ linkDestination: LINK_DESTINATION_CUSTOM }
-			).linkDestination;
-		}
-		if ( linkDestination !== linkDestinationInput ) {
-			this.props.setAttributes( {
-				linkDestination: linkDestinationInput,
-				href: value,
-			} );
-			return;
-		}
-		this.props.setAttributes( { href: value } );
+	onSetHref( props ) {
+		this.props.setAttributes( props );
 	}
 
 	onSetTitle( value ) {
 		// This is the HTML title attribute, separate from the media object title
 		this.props.setAttributes( { title: value } );
-	}
-
-	onSetLinkClass( value ) {
-		this.props.setAttributes( { linkClass: value } );
-	}
-
-	onSetLinkRel( value ) {
-		this.props.setAttributes( { rel: value } );
 	}
 
 	onSetNewTab( value ) {
@@ -364,24 +323,6 @@ export class ImageEdit extends Component {
 		}
 	}
 
-	getLinkDestinations() {
-		return [
-			{
-				linkDestination: LINK_DESTINATION_MEDIA,
-				title: __( 'Media File' ),
-				url: ( this.props.image && this.props.image.source_url ) ||
-					this.props.attributes.url,
-				icon,
-			},
-			{
-				linkDestination: LINK_DESTINATION_ATTACHMENT,
-				title: __( 'Attachment Page' ),
-				url: this.props.image && this.props.image.link,
-				icon: <SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><Path d="M0 0h24v24H0V0z" fill="none" /><Path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zM6 20V4h7v5h5v11H6z" /></SVG>,
-			},
-		];
-	}
-
 	getImageSizeOptions() {
 		const { imageSizes } = this.props;
 		return map( imageSizes, ( { name, slug } ) => ( { value: slug, label: name } ) );
@@ -417,7 +358,6 @@ export class ImageEdit extends Component {
 			sizeSlug,
 		} = attributes;
 
-		const cleanRel = removeNewTabRel( rel );
 		const isExternal = isExternalImage( id, url );
 		const controls = (
 			<BlockControls>
@@ -438,30 +378,12 @@ export class ImageEdit extends Component {
 						<ImageURLInputUI
 							url={ href || '' }
 							onChangeUrl={ this.onSetHref }
-							mediaLinks={ this.getLinkDestinations() }
 							linkDestination={ linkDestination }
-							advancedOptions={
-								<>
-									<ToggleControl
-										label={ __( 'Open in New Tab' ) }
-										onChange={ this.onSetNewTab }
-										checked={ linkTarget === '_blank' } />
-									<TextControl
-										label={ __( 'Link Rel' ) }
-										value={ cleanRel || '' }
-										onChange={ this.onSetLinkRel }
-										onKeyPress={ stopPropagation }
-										onKeyDown={ stopPropagationRelevantKeys }
-									/>
-									<TextControl
-										label={ __( 'Link CSS Class' ) }
-										value={ linkClass || '' }
-										onKeyPress={ stopPropagation }
-										onKeyDown={ stopPropagationRelevantKeys }
-										onChange={ this.onSetLinkClass }
-									/>
-								</>
-							}
+							mediaUrl={ this.props.image && this.props.image.source_url }
+							mediaLink={ this.props.image && this.props.image.link }
+							linkTarget={ linkTarget }
+							linkClass={ linkClass }
+							rel={ rel }
 						/>
 					</ToolbarGroup>
 				) }

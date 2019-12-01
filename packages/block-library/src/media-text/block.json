@@ -35,6 +35,10 @@
 		"mediaLink": {
 			"type": "string"
 		},
+		"linkDestination": {
+			"type": "string",
+			"default": "none"
+		},
 		"linkTarget": {
 			"type": "string",
 			"source": "attribute",
