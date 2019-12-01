@@ -147,7 +147,16 @@ export default compose( [
 			getBlock,
 		} = select( 'core/block-editor' );
 
-		let destinationRootClientId = rootClientId;
+		const end = getBlockSelectionEnd();
+		// `end` argument (id) can refer to the component which is removed
+		// due to pressing `undo` button, that's why we need to check
+		// if `getBlock( end) is valid, otherwise `null` is passed
+		const isAnyBlockSelected = ( ! isAppender && end && getBlock( end ) );
+		const destinationRootClientId = isAnyBlockSelected ?
+			getBlockRootClientId( end ) :
+			rootClientId;
+		const selectedBlockIndex = getBlockIndex( end, destinationRootClientId );
+		const endOfRootIndex = getBlockOrder( rootClientId ).length;
 
 		function getDefaultInsertionIndex() {
 			const {
@@ -161,41 +170,31 @@ export default compose( [
 
 			// If the clientId is defined, we insert at the position of the block.
 			if ( clientId ) {
-				return getBlockIndex( clientId, destinationRootClientId );
+				return getBlockIndex( clientId, rootClientId );
 			}
 
-			// If there a selected block,
-			const end = getBlockSelectionEnd();
-			// `end` argument (id) can refer to the component which is removed
-			// due to pressing `undo` button, that's why we need to check
-			// if `getBlock( end) is valid, otherwise `null` is passed
-			if ( ! isAppender && end && getBlock( end ) ) {
+			// If there is a selected block,
+			if ( isAnyBlockSelected ) {
 				// and the last selected block is unmodified (empty), it will be replaced
 				if ( isUnmodifiedDefaultBlock( getBlock( end ) ) ) {
-					return getBlockIndex( end, destinationRootClientId );
+					return selectedBlockIndex;
 				}
 
 				// we insert after the selected block.
-				return getBlockIndex( end, destinationRootClientId ) + 1;
+				return selectedBlockIndex + 1;
 			}
 
 			// Otherwise, we insert at the end of the current rootClientId
-			return getBlockOrder( destinationRootClientId ).length;
+			return endOfRootIndex;
 		}
 
-		let insertionIndexBefore = 0;
-		let insertionIndexAfter = getBlockOrder( destinationRootClientId ).length;
+		const insertionIndexBefore = isAnyBlockSelected ?
+			selectedBlockIndex :
+			0;
 
-		let isAnyBlockSelected = false;
-		const end = getBlockSelectionEnd();
-		if ( ! destinationRootClientId && ! clientId && ! isAppender ) {
-			if ( end ) {
-				destinationRootClientId = getBlockRootClientId( end );
-				insertionIndexBefore = getBlockIndex( end, destinationRootClientId );
-				insertionIndexAfter = getBlockIndex( end, destinationRootClientId ) + 1;
-				isAnyBlockSelected = true;
-			}
-		}
+		const insertionIndexAfter = isAnyBlockSelected ?
+			selectedBlockIndex + 1 :
+			endOfRootIndex;
 
 		return {
 			destinationRootClientId,
