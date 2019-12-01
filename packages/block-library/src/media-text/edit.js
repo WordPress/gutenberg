@@ -44,12 +44,6 @@ const TEMPLATE = [
 const WIDTH_CONSTRAINT_PERCENTAGE = 15;
 const applyWidthConstraints = ( width ) => Math.max( WIDTH_CONSTRAINT_PERCENTAGE, Math.min( width, 100 - WIDTH_CONSTRAINT_PERCENTAGE ) );
 
-export const LINK_DESTINATION_NONE = 'none';
-export const LINK_DESTINATION_CUSTOM = 'custom';
-export const LINK_DESTINATION_MEDIA = 'media';
-export const LINK_DESTINATION_ATTACHMENT = 'attachment';
-export const NEW_TAB_REL = [ 'noreferrer', 'noopener' ];
-
 class MediaTextEdit extends Component {
 	constructor() {
 		super( ...arguments );
