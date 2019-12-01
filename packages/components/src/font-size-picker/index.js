@@ -28,13 +28,11 @@ function getSelectOptions( optionsArray, disableCustomFontSizes ) {
 			{ slug: 'custom', name: __( 'Custom' ) },
 		];
 	}
-	return [
-		...optionsArray.map( ( option ) => ( {
-			key: option.slug,
-			name: option.name,
-			style: { fontSize: option.size },
-		} ) ),
-	];
+	return optionsArray.map( ( option ) => ( {
+		key: option.slug,
+		name: option.name,
+		style: { fontSize: option.size },
+	} ) );
 }
 
 function FontSizePicker( {
