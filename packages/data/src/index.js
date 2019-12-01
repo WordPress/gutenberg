@@ -109,6 +109,50 @@ export const select = defaultRegistry.select;
 export const __experimentalResolveSelect = defaultRegistry.__experimentalResolveSelect;
 
 /**
+ * Given the name of a registered store, returns an object containing the store's
+ * selectors as Suspense compatible resource creators.
+ *
+ * When a resource creator is called, the arguments are forwarded to the relevant
+ * selector and an object with a `read` and a `useRead` method is returned.
+ *
+ * `read` attempts to read the selector's resolved value, but suspends up to the
+ * nearest Suspense boundary if its resolver is still running. It will also throw
+ * any errors in the selector or resolver.
+ *
+ * `useRead` is a hook that calls and subscribes to the selector. It's useful when you
+ * expect a selector's value to change and you want a component tree to rerender
+ * when it does so that `.read` calls run again.
+ *
+ * @see https://reactjs.org/docs/concurrent-mode-suspense.html
+ *
+ * @param {string} name Store name.
+ *
+ * @example
+ * ```js
+ * const { __experimentalReadSelect } = wp.data;
+ * const { Suspense } = wp.element;
+ *
+ * const hammerPrice = __experimentalReadSelect( 'my-shop' ).getPrice( 'hammer' );
+ * function Hammer() {
+ * 	return <div>{ hammerPrice.read() }</div>;
+ * }
+ *
+ * export default function MyShop() {
+ * 	// hammerPrice.useRead() // Optionally subscribe to changes.
+ * 	return (
+ * 		<Suspense fallback={ <div>Loading...</div> }>
+ * 			<Hammer />
+ * 		</Suspense>
+ * 	);
+ * }
+ * ```
+ *
+ * @return {Object} Object containing the store's Suspense selector resource creators.
+ */
+export const __experimentalReadSelect =
+	defaultRegistry.__experimentalReadSelect;
+
+/**
  * Given the name of a registered store, returns an object of the store's action creators.
  * Calling an action creator will cause it to be dispatched, updating the state value accordingly.
  *
