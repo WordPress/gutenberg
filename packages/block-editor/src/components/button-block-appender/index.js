@@ -35,6 +35,9 @@ function ButtonBlockAppender( { rootClientId, className, __experimentalSelectBlo
 						<Tooltip text={ label }>
 							<Button
 								className={ classnames( className, 'block-editor-button-block-appender' ) }
+								onMouseDown={ ( event ) => {
+									event.preventDefault();
+								} }
 								onClick={ onToggle }
 								aria-haspopup={ isToggleButton ? 'true' : undefined }
 								aria-expanded={ isToggleButton ? isOpen : undefined }
