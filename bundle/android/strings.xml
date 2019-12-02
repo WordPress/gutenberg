@@ -15,6 +15,7 @@
     <string name="gutenberg_native_clear_all_settings" tools:ignore="UnusedResources">Clear All Settings</string>
     <string name="gutenberg_native_content" tools:ignore="UnusedResources">Content…</string>
     <string name="gutenberg_native_current_value_is_s" tools:ignore="UnusedResources">Current value is %s</string>
+    <string name="gutenberg_native_dark" tools:ignore="UnusedResources">Dark</string>
     <string name="gutenberg_native_double_tap_and_hold_to_edit" tools:ignore="UnusedResources">Double tap and hold to edit</string>
     <string name="gutenberg_native_double_tap_to_add_a_block" tools:ignore="UnusedResources">Double tap to add a block</string>
     <!-- translators: accessibility text (hint for focusing a slider) -->
@@ -35,6 +36,8 @@
     <string name="gutenberg_native_failed_to_insert_media_please_tap_for_options" tools:ignore="UnusedResources">Failed to insert media.\nPlease tap for options.</string>
     <string name="gutenberg_native_feature_activated" tools:ignore="UnusedResources">Feature activated</string>
     <string name="gutenberg_native_feature_deactivated" tools:ignore="UnusedResources">Feature deactivated</string>
+    <string name="gutenberg_native_fullscreen_mode_activated" tools:ignore="UnusedResources">Fullscreen mode activated</string>
+    <string name="gutenberg_native_fullscreen_mode_deactivated" tools:ignore="UnusedResources">Fullscreen mode deactivated</string>
     <string name="gutenberg_native_help_icon" tools:ignore="UnusedResources">Help icon</string>
     <string name="gutenberg_native_here_is_the_panel_content" tools:ignore="UnusedResources">Here is the panel content!</string>
     <string name="gutenberg_native_hide_keyboard" tools:ignore="UnusedResources">Hide keyboard</string>
@@ -44,6 +47,7 @@
     <string name="gutenberg_native_level_1_s_2_s" tools:ignore="UnusedResources">Level %1$s. %2$s</string>
     <!-- translators: accessibility text. %s: heading level. -->
     <string name="gutenberg_native_level_s_empty" tools:ignore="UnusedResources">Level %s. Empty.</string>
+    <string name="gutenberg_native_light" tools:ignore="UnusedResources">Light</string>
     <string name="gutenberg_native_link_inserted" tools:ignore="UnusedResources">Link inserted</string>
     <string name="gutenberg_native_link_text" tools:ignore="UnusedResources">Link text</string>
     <string name="gutenberg_native_move_block_down" tools:ignore="UnusedResources">Move block down</string>
@@ -62,12 +66,15 @@
     <!-- translators: accessibility text. %s: Page break text. -->
     <string name="gutenberg_native_page_break_block_s" tools:ignore="UnusedResources">Page break block. %s</string>
     <string name="gutenberg_native_paste_url" tools:ignore="UnusedResources">Paste URL</string>
+    <string name="gutenberg_native_podcast" tools:ignore="UnusedResources">podcast</string>
     <!-- translators: accessibility text. empty post title. -->
     <string name="gutenberg_native_post_title_empty" tools:ignore="UnusedResources">Post title. Empty</string>
     <!-- translators: accessibility text. %s: text content of the post title. -->
     <string name="gutenberg_native_post_title_s" tools:ignore="UnusedResources">Post title. %s</string>
+    <string name="gutenberg_native_preset_size" tools:ignore="UnusedResources">Preset Size</string>
     <string name="gutenberg_native_problem_displaying_block" tools:ignore="UnusedResources">Problem displaying block</string>
     <string name="gutenberg_native_problem_opening_the_video" tools:ignore="UnusedResources">Problem opening the video</string>
+    <string name="gutenberg_native_recording" tools:ignore="UnusedResources">recording</string>
     <string name="gutenberg_native_remove_annotations" tools:ignore="UnusedResources">Remove annotations</string>
     <!-- translators: accessibility text. %s: current block position (number). -->
     <string name="gutenberg_native_remove_block_at_row_s" tools:ignore="UnusedResources">Remove block at row %s</string>
@@ -87,6 +94,9 @@
     <string name="gutenberg_native_show_section" tools:ignore="UnusedResources">Show section</string>
     <string name="gutenberg_native_sidebar_title_plugin" tools:ignore="UnusedResources">Sidebar title plugin</string>
     <string name="gutenberg_native_size" tools:ignore="UnusedResources">Size</string>
+    <string name="gutenberg_native_sound" tools:ignore="UnusedResources">sound</string>
+    <string name="gutenberg_native_spotlight_mode_activated" tools:ignore="UnusedResources">Spotlight mode activated</string>
+    <string name="gutenberg_native_spotlight_mode_deactivated" tools:ignore="UnusedResources">Spotlight mode deactivated</string>
     <string name="gutenberg_native_start_writing" tools:ignore="UnusedResources">Start writing…</string>
     <string name="gutenberg_native_take_a_photo" tools:ignore="UnusedResources">Take a Photo</string>
     <string name="gutenberg_native_take_a_photo_or_video" tools:ignore="UnusedResources">Take a Photo or Video</string>
@@ -94,9 +104,14 @@
     <string name="gutenberg_native_tap_here_to_show_help" tools:ignore="UnusedResources">Tap here to show help</string>
     <string name="gutenberg_native_tap_to_hide_the_keyboard" tools:ignore="UnusedResources">Tap to hide the keyboard</string>
     <string name="gutenberg_native_title" tools:ignore="UnusedResources">Title:</string>
+    <string name="gutenberg_native_top_toolbar_activated" tools:ignore="UnusedResources">Top toolbar activated</string>
+    <string name="gutenberg_native_top_toolbar_deactivated" tools:ignore="UnusedResources">Top toolbar deactivated</string>
     <string name="gutenberg_native_translate" tools:ignore="UnusedResources">Translate</string>
     <string name="gutenberg_native_ungroup" tools:ignore="UnusedResources">Ungroup</string>
     <string name="gutenberg_native_unsupported" tools:ignore="UnusedResources">Unsupported</string>
     <string name="gutenberg_native_we_are_working_hard_to_add_more_blocks_with_each_release_in_the_m" tools:ignore="UnusedResources">We are working hard to add more blocks with each release. In the meantime, you can also edit this post on the web.</string>
+    <!-- translators: Sample content for the Verse block. Can be replaced with a locale-appropriate work. -->
+    <string name="gutenberg_native_what_was_he_doing_the_great_god_pan_down_in_the_reeds_by_the_rive" tools:ignore="UnusedResources">WHAT was he doing, the great god Pan,\n\tDown in the reeds by the river?\nSpreading ruin and scattering ban,\nSplashing and paddling with hoofs of a goat,\nAnd breaking the golden lilies afloat\n    With the dragon-fly on the river.</string>
     <string name="gutenberg_native_wordpress_media_library" tools:ignore="UnusedResources">WordPress Media Library</string>
+    <string name="gutenberg_native_you_are_probably_offline" tools:ignore="UnusedResources">You are probably offline.</string>
 </resources>
