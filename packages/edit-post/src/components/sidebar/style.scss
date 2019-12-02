@@ -149,7 +149,7 @@
 		}
 	}
 
-	&:focus {
+	&:focus:not(:disabled) {
 		@include square-style__focus;
 		box-shadow: none;
 	}
