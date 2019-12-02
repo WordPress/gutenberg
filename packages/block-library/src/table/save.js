@@ -67,7 +67,7 @@ export default function save( { attributes } ) {
 
 	return (
 		<figure>
-			<table className={ classes === '' ? undefined : classes }>
+			<table className={ classes }>
 				<Section type="head" rows={ head } />
 				<Section type="body" rows={ body } />
 				<Section type="foot" rows={ foot } />
