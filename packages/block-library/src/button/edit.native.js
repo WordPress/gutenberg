@@ -37,6 +37,7 @@ const NEW_TAB_REL = 'noreferrer noopener';
 const INITIAL_BORDER_RADIUS = 4;
 const MIN_BORDER_RADIUS_VALUE = 0;
 const MAX_BORDER_RADIUS_VALUE = 50;
+const BORDER_WIDTH = 1;
 
 function ButtonEdit( { attributes, setAttributes, backgroundColor, textColor, isSelected } ) {
 	const {
@@ -50,7 +51,7 @@ function ButtonEdit( { attributes, setAttributes, backgroundColor, textColor, is
 
 	const borderRadiusValue = borderRadius || INITIAL_BORDER_RADIUS;
 	const mainColor = backgroundColor.color || '#2271b1';
-	const outlineBorderRadius = borderRadiusValue + styles.container.paddingTop + styles.border.borderWidth;
+	const outlineBorderRadius = borderRadiusValue + styles.container.paddingTop + BORDER_WIDTH;
 
 	const onToggleOpenInNewTab = useCallback(
 		( value ) => {
@@ -88,7 +89,7 @@ function ButtonEdit( { attributes, setAttributes, backgroundColor, textColor, is
 				isSelected && {
 					borderColor: mainColor,
 					borderRadius: outlineBorderRadius,
-					borderWidth: styles.border.borderWidth,
+					borderWidth: BORDER_WIDTH,
 				},
 			] }
 		>
