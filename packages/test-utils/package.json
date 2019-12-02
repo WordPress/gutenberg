@@ -1,0 +1,44 @@
+{
+	"name": "@wordpress/test-utils",
+	"version": "0.0.1",
+	"description": "Integration test utils for WordPress.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"test",
+		"utils"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/test-utils/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/test-utils"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=8"
+	},
+	"files": [
+		"build",
+		"build-module",
+		"extend-expect"
+	],
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"dependencies": {
+		"@testing-library/dom": "^6.10.1",
+		"@testing-library/jest-dom": "^4.2.4",
+		"@testing-library/react": "^9.3.2",
+		"@wordpress/dom": "file:../dom"
+	},
+	"peerDependencies": {
+		"react": "^16.8.0",
+		"react-dom": "^16.8.0"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

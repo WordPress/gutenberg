@@ -1428,6 +1428,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/test-utils",
+		"slug": "packages-test-utils",
+		"markdown_source": "../packages/test-utils/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/token-list",
 		"slug": "packages-token-list",
 		"markdown_source": "../packages/token-list/README.md",

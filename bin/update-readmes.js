@@ -35,6 +35,7 @@ const packages = [
 	'redux-routine',
 	'rich-text',
 	'shortcode',
+	'test-utils',
 	'url',
 	'viewport',
 	'wordcount',

@@ -98,6 +98,7 @@
 		"@wordpress/npm-package-json-lint-config": "file:packages/npm-package-json-lint-config",
 		"@wordpress/postcss-themes": "file:packages/postcss-themes",
 		"@wordpress/scripts": "file:packages/scripts",
+		"@wordpress/test-utils": "file:packages/test-utils",
 		"babel-loader": "8.0.6",
 		"babel-plugin-emotion": "10.0.23",
 		"babel-plugin-inline-json-import": "0.3.2",

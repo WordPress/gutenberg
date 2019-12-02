@@ -17,6 +17,9 @@ module.exports = {
 		'<rootDir>/test/unit/config/gutenberg-phase.js',
 		'<rootDir>/test/unit/config/register-context.js',
 	],
+	setupFilesAfterEnv: [
+		'<rootDir>/packages/test-utils/extend-expect.js',
+	],
 	testURL: 'http://localhost',
 	testPathIgnorePatterns: [
 		'/\.git/',
