@@ -657,7 +657,6 @@ export function lockPostAutosaving( lockName ) {
 	};
 }
 
-
 /**
  * Returns an action object used to signal that post autosaving is unlocked.
  *
