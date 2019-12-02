@@ -20,13 +20,6 @@ import {
 import { registerCoreBlocks } from '@wordpress/block-library';
 import '@wordpress/format-library';
 
-/* eslint-disable no-restricted-syntax */
-import '@wordpress/block-library/build-style/style.css';
-import '@wordpress/block-library/build-style/editor.css';
-import '@wordpress/block-library/build-style/theme.css';
-import '@wordpress/format-library/build-style/style.css';
-/* eslint-enable no-restricted-syntax */
-
 /**
  * Internal dependencies
  */
