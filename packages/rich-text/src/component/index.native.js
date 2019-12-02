@@ -260,8 +260,7 @@ export class RichText extends Component {
 	 * Handles any case where the content of the AztecRN instance has changed in size
 	 */
 	onContentSizeChange( contentSize ) {
-		const contentHeight = contentSize.height;
-		this.setState( { height: contentHeight } );
+		this.setState( contentSize );
 		this.lastAztecEventType = 'content size change';
 	}
 
@@ -612,6 +611,8 @@ export class RichText extends Component {
 			__unstableIsSelected: isSelected,
 			children,
 			getStylesFromColorScheme,
+			minWidth,
+			maxWidth,
 		} = this.props;
 
 		const record = this.getRecord();
@@ -681,6 +682,7 @@ export class RichText extends Component {
 		}
 
 		const color = style && style.color;
+		const width = maxWidth && this.state.width && ( maxWidth - this.state.width ) < 10 ? maxWidth : this.state.width;
 
 		return (
 			<View>
@@ -699,6 +701,7 @@ export class RichText extends Component {
 					} }
 					style={ {
 						...style,
+						...( this.isIOS && minWidth && maxWidth ? { width } : {} ),
 						minHeight: Math.max( minHeight, this.state.height ),
 					} }
 					text={ { text: html, eventCount: this.lastEventCount, selection } }
@@ -726,6 +729,8 @@ export class RichText extends Component {
 					disableEditingMenu={ this.props.disableEditingMenu }
 					isMultiline={ this.isMultiline }
 					textAlign={ this.props.textAlign }
+					minWidth={ minWidth }
+					maxWidth={ maxWidth }
 				/>
 				{ isSelected && <FormatEdit value={ record } onChange={ this.onFormatChange } /> }
 			</View>

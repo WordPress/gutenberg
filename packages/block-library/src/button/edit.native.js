@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View } from 'react-native';
+import { View, Dimensions } from 'react-native';
 /**
  * WordPress dependencies
  */
@@ -24,6 +24,7 @@ import {
 } from '@wordpress/components';
 import {
 	useCallback,
+	useState,
 } from '@wordpress/element';
 
 /**
@@ -38,6 +39,7 @@ const INITIAL_BORDER_RADIUS = 4;
 const MIN_BORDER_RADIUS_VALUE = 0;
 const MAX_BORDER_RADIUS_VALUE = 50;
 const BORDER_WIDTH = 1;
+const BLOCK_SPACING = 4;
 
 function ButtonEdit( { attributes, setAttributes, backgroundColor, textColor, isSelected } ) {
 	const {
@@ -49,9 +51,11 @@ function ButtonEdit( { attributes, setAttributes, backgroundColor, textColor, is
 		rel,
 	} = attributes;
 
-	const borderRadiusValue = borderRadius || INITIAL_BORDER_RADIUS;
+	const [ isFocused, setRichTextFocus ] = useState( false );
+
+	const borderRadiusValue = borderRadius !== undefined ? borderRadius : INITIAL_BORDER_RADIUS;
 	const mainColor = backgroundColor.color || '#2271b1';
-	const outlineBorderRadius = borderRadiusValue + styles.container.paddingTop + BORDER_WIDTH;
+	const outlineBorderRadius = borderRadiusValue + BLOCK_SPACING + BORDER_WIDTH;
 
 	const onToggleOpenInNewTab = useCallback(
 		( value ) => {
@@ -82,6 +86,10 @@ function ButtonEdit( { attributes, setAttributes, backgroundColor, textColor, is
 		gradientValue,
 	} = __experimentalUseGradient();
 
+	const maxWidth = Dimensions.get( 'window' ).width - 74;
+	const minWidth = isFocused || ( ! isFocused && text !== '' ) ? 1 : 108;
+	const placeholderText = isFocused ? '' : ( placeholder || __( 'Add text…' ) );
+
 	return (
 		<View
 			style={ [
@@ -99,7 +107,7 @@ function ButtonEdit( { attributes, setAttributes, backgroundColor, textColor, is
 				backgroundColor={ mainColor }
 			>
 				<RichText
-					placeholder={ placeholder || __( 'Add text…' ) }
+					placeholder={ placeholderText }
 					value={ text }
 					onChange={ ( value ) => setAttributes( { text: value } ) }
 					style={ {
@@ -109,6 +117,10 @@ function ButtonEdit( { attributes, setAttributes, backgroundColor, textColor, is
 					textAlign="center"
 					placeholderTextColor={ 'lightgray' }
 					tagName="p"
+					minWidth={ minWidth }
+					maxWidth={ maxWidth }
+					unstableOnFocus={ () => setRichTextFocus( true ) }
+					onBlur={ () => setRichTextFocus( false ) }
 				/>
 			</RichTextWrapper>
 			<InspectorControls>
