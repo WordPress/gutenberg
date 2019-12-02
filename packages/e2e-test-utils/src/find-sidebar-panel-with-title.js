@@ -3,7 +3,7 @@
  */
 import { first } from 'lodash';
 
-/** @typedef {import('./puppeteer').ElementHandle} ElementHandle */
+/** @typedef {import('puppeteer').ElementHandle} ElementHandle */
 
 /**
  * Finds the button responsible for toggling the sidebar panel with the provided title.

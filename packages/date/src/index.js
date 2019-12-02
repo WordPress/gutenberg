@@ -5,7 +5,7 @@ import momentLib from 'moment';
 import 'moment-timezone/moment-timezone';
 import 'moment-timezone/moment-timezone-utils';
 
-/** @typedef {import('./moment').Moment} Moment */
+/** @typedef {import('moment').Moment} Moment */
 
 const WP_ZONE = 'WP';
 

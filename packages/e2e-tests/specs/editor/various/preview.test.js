@@ -17,7 +17,7 @@ import {
 	pressKeyWithModifier,
 } from '@wordpress/e2e-test-utils';
 
-/** @typedef {import('./puppeteer').Page} Page */
+/** @typedef {import('puppeteer').Page} Page */
 
 async function openPreviewPage( editorPage ) {
 	let openTabs = await browser.pages();

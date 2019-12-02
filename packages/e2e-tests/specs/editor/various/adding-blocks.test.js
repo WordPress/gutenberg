@@ -10,7 +10,7 @@ import {
 	setBrowserViewport,
 } from '@wordpress/e2e-test-utils';
 
-/** @typedef {import('./puppeteer').ElementHandle} ElementHandle */
+/** @typedef {import('puppeteer').ElementHandle} ElementHandle */
 
 describe( 'adding blocks', () => {
 	beforeEach( async () => {

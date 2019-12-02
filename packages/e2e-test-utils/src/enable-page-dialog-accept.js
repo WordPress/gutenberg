@@ -1,4 +1,4 @@
-/** @typedef {import('./puppeteer').Dialog} Dialog */
+/** @typedef {import('puppeteer').Dialog} Dialog */
 
 /**
  * Callback which automatically accepts dialog.

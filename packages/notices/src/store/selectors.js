@@ -3,6 +3,8 @@
  */
 import { DEFAULT_CONTEXT } from './constants';
 
+/** @typedef {import('./actions').WPNoticeAction} WPNoticeAction */
+
 /**
  * The default empty set of notices to return when there are no notices
  * assigned for a given notices context. This can occur if the getNotices
@@ -13,8 +15,6 @@ import { DEFAULT_CONTEXT } from './constants';
  * @type {Array}
  */
 const DEFAULT_NOTICES = [];
-
-/** @typedef {import('./actions').WPNoticeAction} WPNoticeAction */
 
 /**
  * @typedef {Object} WPNotice Notice object.
