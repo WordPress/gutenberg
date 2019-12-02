@@ -141,14 +141,13 @@ function register_block_core_navigation() {
 				'itemsJustification' => array(
 					'type' => 'string',
 				),
-				'items' => array(
+				'itemsIds' => array(
 					'type'    => 'array',
-					'default' => array(
-						'ids'      => array(),
-						'items'    => array(),
-						'unadded'  => array(),
-						'repeated' => array(),
-					)
+					'default' => array(),
+				),
+				'removedItemsIds' => array(
+					'type'    => 'array',
+					'default' => array(),
 				)
 			),
 

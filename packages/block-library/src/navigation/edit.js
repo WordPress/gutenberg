@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { escape, upperFirst, reduce, map, filter, difference, concat, isEqual } from 'lodash';
+import { escape, upperFirst, reduce, map, filter, difference, concat, isEqual, includes } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -73,11 +73,11 @@ function Navigation( {
 	/* eslint-enable @wordpress/no-unused-vars-before-return */
 	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator( clientId );
 
-	const { items } = attributes;
-
-	const [ pageNavigationItems, setPageNavigationItems ] = useState( [] );
+	const { itemsIds, removedItemsIds } = attributes;
 
 	const [ populateFromExistingPages, setPopulateFromExistingPages ] = useState( false );
+
+	const [ unAddedItems, setUnAddedItems ] = useState( [] );
 
 	/**
 	 * Fetching data.
@@ -90,17 +90,17 @@ function Navigation( {
 
 	/**
 	 * Items checker.
-	 * Checks if the current Navigation menu has duplicated and unadded items,
-	 * building an object with the following shape:
+	 * Checks if the current Navigation menu has duplicated and/or unAdded items,
+	 * building an object from the inner Blocks with the following shape:
 	 *
 	 *   {
-	 *     items: {
+	 *     itemsById: {
 	 *         <page-id>: <count>, -> Amount of items with this ID. Generally this value is `1`.
 	 *         ...: n,
 	 *     },
-	 *     ids: [ <page-id>, ... ], -> Current items with the pages ids,
-	 *     repeated: [ <page-id>, ... ], -> All of repeated items with the same page ID,
-	 *     unadded: [ <page-id>, ... ], -> Page IDs which have not been added to the nav.
+	 *     added: [ <page-id>, ... ], -> Current items with the pages ids,
+	 *     repeated: [ <page-id>, ... ], -> All of repeated items, by page ID,
+	 *     removed: [ <page-id>, ... ], -> Page IDs which have not been added to the nav.
 	 * }
 	 */
 	useEffect( () => {
@@ -112,23 +112,54 @@ function Navigation( {
 				} )
 			),
 			( acc, item ) => ( {
-				items: { ...acc.items, [ item.id ]: acc.items[ item.id ] ? acc.items[ item.id ] + 1 : 1 },
-				ids: [ ...acc.ids, item.id ],
-				repeated: acc.items[ item.id ] ? [ ...acc.repeated, item.id ] : acc.repeated,
+				itemsById: { ...acc.itemsById, [ item.id ]: acc.itemsById[ item.id ] ? acc.itemsById[ item.id ] + 1 : 1 },
+				added: [ ...acc.added, item.id ],
+				repeated: acc.itemsById[ item.id ] ? [ ...acc.repeated, item.id ] : acc.repeated,
 			} ),
-			{ items: {}, ids: [], repeated: [] }
+			{ itemsById: {}, added: [], repeated: [] }
 		);
 
-		itemsChecker.unadded = difference( map( pages, ( { id } ) => ( id ) ), itemsChecker.ids );
+		itemsChecker.removed = removedItemsIds;
 
-		if ( itemsChecker.unadded.length ) {
-			setPageNavigationItems( concat( mapItemsFromPagesId( itemsChecker.unadded, pages ), innerBlocks ) );
+		// Start to compute whether need to add items.
+		const pagesIds = map( pages, ( { id } ) => ( id ) );
+		const unAdded = difference( pagesIds, itemsChecker.added );
+
+		itemsChecker.unAdded = unAdded;
+
+		// Local constants. Temporary.
+		const _newItemsToAdd = [];
+		const _removedItems = [];
+
+		if ( unAdded.length ) {
+			for ( const index in unAdded ) {
+				const unAddedPageId = unAdded[ index ];
+
+				// Recently removed.
+				if ( includes( itemsIds, unAddedPageId ) ) {
+					_removedItems.push( unAddedPageId );
+					if ( itemsChecker.itemsById[ unAddedPageId ] ) {
+						delete itemsChecker.itemsById[ unAddedPageId ];
+					}
+				} else if ( ! includes( removedItemsIds, unAddedPageId ) ) {
+					_newItemsToAdd.push( unAddedPageId );
+				}
+			}
 		}
 
-		if ( ! isEqual( itemsChecker.unadded.sort(), items.unadded.sort() ) ) {
-			setAttributes( { items: itemsChecker } );
+		if ( ! isEqual( itemsChecker.added.sort(), itemsIds.sort() ) ) {
+			setAttributes( { itemsIds: itemsChecker.added } );
 		}
 
+		// Update removed items ID.
+		if ( _removedItems.length ) {
+			setAttributes( { removedItemsIds: concat( removedItemsIds, _removedItems ) } );
+		}
+
+		// Check whether need to add new items.
+		if ( _newItemsToAdd.length ) {
+			setUnAddedItems( _newItemsToAdd );
+		}
 	}, [ pages, innerBlocks ] );
 
 	/*
@@ -136,9 +167,9 @@ function Navigation( {
 	 */
 	useEffect( () => {
 		if ( populateFromExistingPages ) {
-			updateNavItemBlocks( pageNavigationItems );
+			updateNavItemBlocks( concat( mapItemsFromPagesId( unAddedItems, pages ), innerBlocks ) );
 		}
-	}, [ populateFromExistingPages, pageNavigationItems ] );
+	}, [ populateFromExistingPages, unAddedItems ] );
 
 
 	//
