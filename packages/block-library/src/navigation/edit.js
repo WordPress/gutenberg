@@ -77,7 +77,8 @@ function Navigation( {
 
 	const [ populateFromExistingPages, setPopulateFromExistingPages ] = useState( false );
 
-	const [ unAddedItems, setUnAddedItems ] = useState( [] );
+	const [ itemsToAdd, setItemsToAdd ] = useState( [] );
+	const [ itemsToRemove, setItemsToRemove ] = useState( [] );
 
 	/**
 	 * Fetching data.
@@ -124,13 +125,13 @@ function Navigation( {
 		// Start to compute whether need to add items.
 		const pagesIds = map( pages, ( { id } ) => ( id ) );
 		const unAdded = difference( pagesIds, itemsChecker.added );
-
-		itemsChecker.unAdded = unAdded;
+		const removedByAdmin = difference( itemsChecker.added, pagesIds );
 
 		// Local constants. Temporary.
 		const _newItemsToAdd = [];
 		const _removedItems = [];
 
+		// Computes to added according to the current blog pages.
 		if ( unAdded.length ) {
 			for ( const index in unAdded ) {
 				const unAddedPageId = unAdded[ index ];
@@ -147,6 +148,7 @@ function Navigation( {
 			}
 		}
 
+		// Keep removed items by user in the attr.
 		if ( ! isEqual( itemsChecker.added.sort(), itemsIds.sort() ) ) {
 			setAttributes( { itemsIds: itemsChecker.added } );
 		}
@@ -157,19 +159,33 @@ function Navigation( {
 		}
 
 		// Check whether need to add new items.
-		if ( _newItemsToAdd.length ) {
-			setUnAddedItems( _newItemsToAdd );
-		}
+		setItemsToAdd( _newItemsToAdd );
+		setItemsToRemove( filter( removedByAdmin, pageId => ! includes( itemsChecker.removed, pageId ) ) );
 	}, [ pages, innerBlocks ] );
 
 	/*
 	 * Update Navigation links.
 	 */
 	useEffect( () => {
-		if ( populateFromExistingPages ) {
-			updateNavItemBlocks( concat( mapItemsFromPagesId( unAddedItems, pages ), innerBlocks ) );
+		if ( ! populateFromExistingPages ) {
+			return;
 		}
-	}, [ populateFromExistingPages, unAddedItems ] );
+
+		let freshBlocks = [];
+		if ( itemsToAdd && itemsToAdd.length ) {
+			freshBlocks = [ ...innerBlocks, ...mapItemsFromPagesId( itemsToAdd, pages ) ];
+		}
+
+		if ( itemsToRemove && itemsToRemove.length ) {
+			freshBlocks = filter( innerBlocks, ( { attributes } ) => ! includes( itemsToRemove, attributes.id ) );
+		}
+
+		if ( ! freshBlocks.length ) {
+			return;
+		}
+
+		updateNavItemBlocks( freshBlocks );
+	}, [ populateFromExistingPages, itemsToAdd, itemsToRemove ] );
 
 
 	//
