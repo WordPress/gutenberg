@@ -192,7 +192,9 @@ function gutenberg_find_template( $template_file ) {
 				(object) $current_template_post
 			);
 		}
+	}
 
+	if ( $current_template_post ) {
 		$_wp_current_template_content = $current_template_post->post_content;
 	}
 
