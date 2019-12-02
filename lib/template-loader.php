@@ -155,6 +155,7 @@ function gutenberg_find_template( $template_file ) {
 			'post_name__in'  => $slugs,
 			'orderby'        => 'post_name__in',
 			'posts_per_page' => 1,
+			'no_found_rows'  => true,
 		)
 	);
 
