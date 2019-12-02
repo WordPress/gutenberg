@@ -158,8 +158,7 @@ function gutenberg_find_template( $template_file ) {
 		)
 	);
 
-	$template_posts        = $template_query->get_posts();
-	$current_template_post = array_shift( $template_posts );
+	$current_template_post = $template_query->next_post();
 
 	// Build map of template slugs to their priority in the current hierarchy.
 	$slug_priorities = array_flip( $slugs );
