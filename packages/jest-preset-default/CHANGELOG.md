@@ -1,3 +1,9 @@
+## master
+
+### New Features
+
+- Add `@wordpress/test-utils/extend-expect` to Jest setup ([18855](https://github.com/WordPress/gutenberg/pull/18855)).
+
 ## 5.1.0 (2019-09-03)
 
 ### Bug Fixes
