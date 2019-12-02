@@ -3,7 +3,7 @@
  */
 import memoize from 'memize';
 import classnames from 'classnames';
-import { map, kebabCase, camelCase, startCase } from 'lodash';
+import { map, kebabCase, camelCase, castArray, startCase } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -48,7 +48,8 @@ const ColorPanel = ( {
 	colorSettings,
 	colorPanelProps,
 	contrastCheckers,
-	detectedBackgroundColor,
+	detectedBackgroundColorRef,
+	detectedColorRef,
 	panelChildren,
 } ) => (
 	<PanelColorSettings
@@ -63,9 +64,13 @@ const ColorPanel = ( {
 					backgroundColor = resolveContrastCheckerColor(
 						backgroundColor,
 						colorSettings,
-						detectedBackgroundColor
+						detectedBackgroundColorRef.current
 					);
-					textColor = resolveContrastCheckerColor( textColor, colorSettings );
+					textColor = resolveContrastCheckerColor(
+						textColor,
+						colorSettings,
+						detectedColorRef.current
+					);
 					return (
 						<ContrastChecker
 							key={ `${ backgroundColor }-${ textColor }` }
@@ -80,11 +85,12 @@ const ColorPanel = ( {
 					backgroundColor = resolveContrastCheckerColor(
 						backgroundColor || value,
 						colorSettings,
-						detectedBackgroundColor
+						detectedBackgroundColorRef.current
 					);
 					textColor = resolveContrastCheckerColor(
 						textColor || value,
-						colorSettings
+						colorSettings,
+						detectedColorRef.current
 					);
 					return (
 						<ContrastChecker
@@ -192,37 +198,72 @@ export default function __experimentalUseColors(
 	);
 
 	const detectedBackgroundColorRef = useRef();
-	const BackgroundColorDetector = useMemo(
-		() =>
-			contrastCheckers &&
-			( Array.isArray( contrastCheckers ) ?
-				contrastCheckers.some(
-					( { backgroundColor } ) => backgroundColor === true
-				) :
-				contrastCheckers.backgroundColor === true ) &&
-			withFallbackStyles( ( node, { querySelector } ) => {
-				if ( querySelector ) {
-					node = node.parentNode.querySelector( querySelector );
+	const detectedColorRef = useRef();
+	const ColorDetector = useMemo( () => {
+		let needsBackgroundColor = false;
+		let needsColor = false;
+		for ( const { backgroundColor, textColor } of castArray( contrastCheckers ) ) {
+			if ( ! needsBackgroundColor ) {
+				needsBackgroundColor = backgroundColor === true;
+			}
+			if ( ! needsColor ) {
+				needsColor = textColor === true;
+			}
+			if ( needsBackgroundColor && needsColor ) {
+				break;
+			}
+		}
+		return (
+			( needsBackgroundColor || needsColor ) &&
+			withFallbackStyles(
+				(
+					node,
+					{
+						querySelector,
+						backgroundColorSelector = querySelector,
+						textColorSelector = querySelector,
+					}
+				) => {
+					let backgroundColorNode = node;
+					let textColorNode = node;
+					if ( backgroundColorSelector ) {
+						backgroundColorNode = node.parentNode.querySelector(
+							backgroundColorSelector
+						);
+					}
+					if ( textColorSelector ) {
+						textColorNode = node.parentNode.querySelector( textColorSelector );
+					}
+					let backgroundColor;
+					const color = getComputedStyle( textColorNode ).color;
+					if ( needsBackgroundColor ) {
+						backgroundColor = getComputedStyle( backgroundColorNode )
+							.backgroundColor;
+						while (
+							backgroundColor === 'rgba(0, 0, 0, 0)' &&
+							backgroundColorNode.parentNode
+						) {
+							backgroundColorNode = backgroundColorNode.parentNode;
+							backgroundColor = getComputedStyle( backgroundColorNode )
+								.backgroundColor;
+						}
+					}
+					detectedBackgroundColorRef.current = backgroundColor;
+					detectedColorRef.current = color;
+					return { backgroundColor, color };
 				}
-				let backgroundColor = getComputedStyle( node ).backgroundColor;
-				while ( backgroundColor === 'rgba(0, 0, 0, 0)' && node.parentNode ) {
-					node = node.parentNode;
-					backgroundColor = getComputedStyle( node ).backgroundColor;
-				}
-				detectedBackgroundColorRef.current = backgroundColor;
-				return { backgroundColor };
-			} )( () => <></> ),
-		[
-			colorConfigs.reduce(
-				( acc, colorConfig ) =>
-					`${ acc } | ${ attributes[ colorConfig.name ] } | ${
-						attributes[ camelCase( `custom ${ colorConfig.name }` ) ]
-					}`,
-				''
-			),
-			...deps,
-		]
-	);
+			)( () => <></> )
+		);
+	}, [
+		colorConfigs.reduce(
+			( acc, colorConfig ) =>
+				`${ acc } | ${ attributes[ colorConfig.name ] } | ${
+					attributes[ camelCase( `custom ${ colorConfig.name }` ) ]
+				}`,
+			''
+		),
+		...deps,
+	] );
 
 	return useMemo( () => {
 		const colorSettings = {};
@@ -249,9 +290,9 @@ export default function __experimentalUseColors(
 			const customColor = attributes[ camelCase( `custom ${ name }` ) ];
 			// We memoize the non-primitives to avoid unnecessary updates
 			// when they are used as props for other components.
-			const _color = ! customColor ?
-				colors.find( ( __color ) => __color.slug === color ) :
-				undefined;
+			const _color = customColor ?
+				undefined :
+				colors.find( ( __color ) => __color.slug === color );
 			acc[ componentName ] = createComponent(
 				name,
 				property,
@@ -261,7 +302,9 @@ export default function __experimentalUseColors(
 				customColor
 			);
 			acc[ componentName ].displayName = componentName;
-			acc[ componentName ].color = customColor ? customColor : ( _color && _color.color );
+			acc[ componentName ].color = customColor ?
+				customColor :
+				_color && _color.color;
 			acc[ componentName ].slug = color;
 			acc[ componentName ].setColor = createSetColor( name, colors );
 
@@ -287,7 +330,8 @@ export default function __experimentalUseColors(
 			colorSettings,
 			colorPanelProps,
 			contrastCheckers,
-			detectedBackgroundColor: detectedBackgroundColorRef.current,
+			detectedBackgroundColorRef,
+			detectedColorRef,
 			panelChildren,
 		};
 		return {
@@ -296,7 +340,7 @@ export default function __experimentalUseColors(
 			InspectorControlsColorPanel: (
 				<InspectorControlsColorPanel { ...wrappedColorPanelProps } />
 			),
-			BackgroundColorDetector,
+			ColorDetector,
 		};
-	}, [ attributes, setAttributes, detectedBackgroundColorRef.current, ...deps ] );
+	}, [ attributes, setAttributes, ...deps ] );
 }
