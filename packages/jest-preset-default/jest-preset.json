@@ -9,7 +9,8 @@
 		"<rootDir>/node_modules/@wordpress/jest-preset-default/scripts/setup-globals.js"
 	],
 	"setupFilesAfterEnv": [
-		"<rootDir>/node_modules/@wordpress/jest-preset-default/scripts/setup-test-framework.js"
+		"<rootDir>/node_modules/@wordpress/jest-preset-default/scripts/setup-test-framework.js",
+		"<rootDir>/node_modules/@wordpress/test-utils/extend-expect"
 	],
 	"snapshotSerializers": [
 		"<rootDir>/node_modules/enzyme-to-json/serializer.js"
