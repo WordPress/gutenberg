@@ -1826,6 +1826,16 @@ exports[`Storyshots Components|FontSizePicker Without Custom Sizes 1`] = `
 </fieldset>
 `;
 
+exports[`Storyshots Components|Guide Default 1`] = `
+<button
+  className="components-button is-button is-default"
+  onClick={[Function]}
+  type="button"
+>
+  Open Guide
+</button>
+`;
+
 exports[`Storyshots Components|Icon Colors 1`] = `
 Array [
   <div

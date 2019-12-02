@@ -20,6 +20,7 @@ import { compose } from '@wordpress/compose';
 import BlockAsyncModeProvider from './block-async-mode-provider';
 import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
+import __experimentalBlockListFooter from '../block-list-footer';
 
 /**
  * If the block count exceeds the threshold, we disable the reordering animation
@@ -266,6 +267,8 @@ class BlockList extends Component {
 					rootClientId={ rootClientId }
 					renderAppender={ renderAppender }
 				/>
+
+				<__experimentalBlockListFooter.Slot />
 			</div>
 		);
 	}

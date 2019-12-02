@@ -483,9 +483,16 @@ export class TableEdit extends Component {
 			className,
 			backgroundColor,
 			setBackgroundColor,
+			setAttributes,
 		} = this.props;
 		const { initialRowCount, initialColumnCount } = this.state;
-		const { hasFixedLayout, head, body, foot } = attributes;
+		const {
+			hasFixedLayout,
+			caption,
+			head,
+			body,
+			foot,
+		} = attributes;
 		const isEmpty = isEmptyTableSection( head ) && isEmptyTableSection( body ) && isEmptyTableSection( foot );
 		const Section = this.renderSection;
 
@@ -582,6 +589,14 @@ export class TableEdit extends Component {
 						<Section name="body" rows={ body } />
 						<Section name="foot" rows={ foot } />
 					</table>
+					<RichText
+						tagName="figcaption"
+						placeholder={ __( 'Write caption…' ) }
+						value={ caption }
+						onChange={ ( value ) => setAttributes( { caption: value } ) }
+						// Deselect the selected table cell when the caption is focused.
+						unstableOnFocus={ () => this.setState( { selectedCell: null } ) }
+					/>
 				</figure>
 			</>
 		);
