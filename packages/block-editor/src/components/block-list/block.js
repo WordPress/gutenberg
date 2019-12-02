@@ -104,7 +104,7 @@ function BlockListBlock( {
 	setNavigationMode,
 	isMultiSelecting,
 	isLargeViewport,
-    __experimentalCaptureChildToolbar: captureChildToolbar,
+	__experimentalCaptureChildToolbar: captureChildToolbar,
 } ) {
 	// In addition to withSelect, we should favor using useSelect in this component going forward
 	// to avoid leaking new props to the public API (editor.BlockListBlock filter)
@@ -511,7 +511,15 @@ function BlockListBlock( {
 		blockEdit = <div style={ { display: 'none' } }>{ blockEdit }</div>;
 	}
 
-	const BlocksContextualToolbar = () => (
+	/**
+	 * Renders an individual `BlockContextualToolbar` component.
+	 * This needs to be a function which generates the component
+	 * on demand as we can only have a single toolbar for each render.
+	 * This is because of the `isForcingContextualToolbar` logic which
+	 * relies on a single toolbar being rendered to update the boolean
+	 * value of the ref used to track the "force" state.
+	 */
+	const renderBlockContextualToolbar = () => (
 		<BlockContextualToolbar
 			// If the toolbar is being shown because of being forced
 			// it should focus the toolbar right after the mount.
@@ -583,17 +591,14 @@ function BlockListBlock( {
 					<ChildToolbarSlot />
 				) }
 
-				{ ( ! ( captureChildToolbar || hasAncestorCapturingToolbars ) ) && ( shouldShowContextualToolbar || isForcingContextualToolbar.current ) && (
-					// Standard toolbar attached directly to the Block.
-					<BlocksContextualToolbar />
-				) }
+				{ ( ! ( captureChildToolbar || hasAncestorCapturingToolbars ) ) && ( shouldShowContextualToolbar || isForcingContextualToolbar.current ) && renderBlockContextualToolbar() }
 
 				{ ( captureChildToolbar || hasAncestorCapturingToolbars ) && ( shouldShowContextualToolbar || isForcingContextualToolbar.current ) && (
 					// If the parent Block is set to consume toolbars of the child Blocks
 					// then render the child Block's toolbar into the Slot provided
 					// by the parent.
 					<ChildToolbar>
-						<BlocksContextualToolbar />
+						{ renderBlockContextualToolbar() }
 					</ChildToolbar>
 				) }
 
