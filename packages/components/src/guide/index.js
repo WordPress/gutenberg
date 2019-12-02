@@ -45,7 +45,6 @@ export default function Guide( { children, className, finishButtonText, onFinish
 	return (
 		<Modal
 			className={ classnames( 'components-guide', className ) }
-			shouldCloseOnClickOutside={ false }
 			onRequestClose={ onFinish }
 		>
 
