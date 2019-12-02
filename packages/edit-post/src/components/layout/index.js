@@ -105,8 +105,6 @@ function Layout( { isMobileViewport } ) {
 							{ isRichEditingEnabled && mode === 'visual' && <VisualEditor /> }
 							<div className="edit-post-layout__metaboxes">
 								<MetaBoxes location="normal" />
-							</div>
-							<div className="edit-post-layout__metaboxes">
 								<MetaBoxes location="advanced" />
 							</div>
 							{ isMobileViewport && sidebarIsOpened && <ScrollLock /> }
