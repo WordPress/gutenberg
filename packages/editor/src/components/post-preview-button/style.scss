@@ -9,10 +9,25 @@
 }
 
 .editor-block-preview__controls {
+	display: flex;
+	align-items: center;
 	margin: $grid-size-large 0;
+
+	* + * {
+		margin-left: $grid-size;
+	}
+}
+
+.editor-block-preview__new-tab {
+	margin-left: $grid-size-large;
+}
+
+.editor-block-preview__frame-container {
+	overflow-x: auto;
+	margin-bottom: 40px;
 }
 
 .editor-block-preview__frame {
-	display: flex;
-	justify-content: center;
+	display: block;
+	margin: 0 auto;
 }
