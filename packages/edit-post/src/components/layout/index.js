@@ -14,7 +14,11 @@ import {
 	PostPublishPanel,
 } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { BlockBreadcrumb } from '@wordpress/block-editor';
+import {
+	BlockBreadcrumb,
+	__experimentalPageTemplatePicker,
+	__experimentalUsePageTemplatePickerVisible,
+} from '@wordpress/block-editor';
 import {
 	Button,
 	ScrollLock,
@@ -67,6 +71,7 @@ function Layout( { isMobileViewport } ) {
 			isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
 		} );
 	} );
+	const showPageTemplatePicker = __experimentalUsePageTemplatePickerVisible();
 	const sidebarIsOpened = editorSidebarOpened || pluginSidebarOpened || publishSidebarOpened;
 	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
 		'is-sidebar-opened': sidebarIsOpened,
@@ -133,12 +138,12 @@ function Layout( { isMobileViewport } ) {
 						</div>
 					) }
 				/>
-
 				<ManageBlocksModal />
 				<OptionsModal />
 				<KeyboardShortcutHelpModal />
 				<Popover.Slot />
 				<PluginArea />
+				{ showPageTemplatePicker && <__experimentalPageTemplatePicker /> }
 			</FocusReturnProvider>
 
 		</>
