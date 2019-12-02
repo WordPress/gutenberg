@@ -60,14 +60,28 @@ export class RootComponent extends React.Component {
 
 	render() {
 		const { initialHtmlModeEnabled } = this.props;
-		const postType = 'page';
 		const settings = {
 			__experimentalEnablePageTemplates: true,
 		};
+		let initialData = this.props.initialData;
+		let initialTitle = this.props.initialTitle;
+		let postType = this.props.postType;
+
+		if ( initialData === undefined && __DEV__ ) {
+			initialData = initialHtml;
+		}
+		if ( initialTitle === undefined ) {
+			initialTitle = 'Welcome to Gutenberg!';
+		}
+		if ( postType === undefined ) {
+			postType = 'post';
+		}
 		const Editor = require( '@wordpress/edit-post' ).Editor;
 		return (
 			<Editor
+				initialHtml={ initialData }
 				initialHtmlModeEnabled={ initialHtmlModeEnabled }
+				initialTitle={ initialTitle }
 				postType={ postType }
 				settings={ settings }
 			/>

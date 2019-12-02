@@ -13,6 +13,12 @@ public protocol GutenbergBridgeDataSource: class {
     /// - Returns: The HTML initial title or nil.
     func gutenbergInitialTitle() -> String?
 
+    /// Asks the data source for the post type to be presented by the editor.
+    /// Return `nil` to assume a `post` type.
+    ///
+    /// - Returns: The post type or nil.
+    func gutenbergPostType() -> String
+
     /// Asks the data source for an object conforming to `TextViewAttachmentDelegate`
     /// to handle media loading.
     ///
@@ -38,5 +44,9 @@ public protocol GutenbergBridgeDataSource: class {
 public extension GutenbergBridgeDataSource {
     func gutenbergMediaSources() -> [Gutenberg.MediaSource] {
         return []
+    }
+
+    func gutenbergPostType() -> String {
+        return "post"
     }
 }
