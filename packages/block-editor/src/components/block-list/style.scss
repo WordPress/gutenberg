@@ -179,15 +179,6 @@
 		}
 	}
 
-	// Hover style.
-	&.is-hovered:not(.is-navigate-mode) > .block-editor-block-list__block-edit::before {
-		box-shadow: -$block-left-border-width 0 0 0 $dark-opacity-light-500;
-
-		.is-dark-theme & {
-			box-shadow: -$block-left-border-width 0 0 0 $light-opacity-light-400;
-		}
-	}
-
 	// Spotlight mode.
 	&.is-focus-mode:not(.is-multi-selected) {
 		opacity: 0.5;
