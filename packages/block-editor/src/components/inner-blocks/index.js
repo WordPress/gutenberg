@@ -108,9 +108,6 @@ class InnerBlocks extends Component {
 			hasOverlay,
 			renderAppender,
 			__experimentalMoverDirection: moverDirection,
-			__experimentalTemplateOptions: templateOptions,
-			__experimentalOnSelectTemplateOption: onSelectTemplateOption,
-			__experimentalAllowTemplateOptionSkip: allowTemplateOptionSkip,
 			__experimentalCaptureChildToolbar: captureChildToolbar,
 		} = this.props;
 		const { templateInProcess } = this.state;
@@ -123,12 +120,12 @@ class InnerBlocks extends Component {
 		return (
 			<div className={ classes }>
 				{ ! templateInProcess && (
-						<BlockList
-							rootClientId={ clientId }
-							renderAppender={ renderAppender }
-							__experimentalMoverDirection={ moverDirection }
-							__experimentalCaptureChildToolbar={ captureChildToolbar }
-						/>
+					<BlockList
+						rootClientId={ clientId }
+						renderAppender={ renderAppender }
+						__experimentalMoverDirection={ moverDirection }
+						__experimentalCaptureChildToolbar={ captureChildToolbar }
+					/>
 				) }
 			</div>
 		);

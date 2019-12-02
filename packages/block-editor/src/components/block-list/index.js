@@ -221,7 +221,7 @@ class BlockList extends Component {
 			renderAppender,
 			enableAnimation,
 			isMultiSelecting,
-            __experimentalCaptureChildToolbar: captureChildToolbar,
+			__experimentalCaptureChildToolbar: captureChildToolbar,
 		} = this.props;
 
 		return (
