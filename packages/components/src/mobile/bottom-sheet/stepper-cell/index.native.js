@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import { AccessibilityInfo } from 'react-native';
+import { AccessibilityInfo, View, Platform } from 'react-native';
 
 /**
  * WordPress dependencies
  */
-import { _x, __, sprintf } from '@wordpress/i18n';
+import { _x, sprintf } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 
 /**
@@ -16,54 +16,44 @@ import Cell from '../cell';
 import Stepper from './stepper';
 
 const STEP_SPEED = 200;
+const DEFAULT_STEP = 1;
 
 class BottomSheetStepperCell extends Component {
 	constructor( props ) {
 		super( props );
 
-		this.onIncrementValue = this.onIncrementValue.bind( this );
+		this.announceValue = this.announceValue.bind( this );
 		this.onDecrementValue = this.onDecrementValue.bind( this );
+		this.onDecrementValuePressIn = this.onDecrementValuePressIn.bind( this );
+		this.onIncrementValue = this.onIncrementValue.bind( this );
+		this.onIncrementValuePressIn = this.onIncrementValuePressIn.bind( this );
 		this.onPressOut = this.onPressOut.bind( this );
 		this.startPressInterval = this.startPressInterval.bind( this );
-		this.onIncrementValuePressIn = this.onIncrementValuePressIn.bind( this );
-		this.onDecrementValuePressIn = this.onDecrementValuePressIn.bind( this );
-
-		this.state = {
-			value: props.minValue,
-		};
 	}
 
 	componentWillUnmount() {
 		clearTimeout( this.timeout );
 		clearInterval( this.interval );
-	}
-
-	onChangeStepperValue( value ) {
-		const { onChangeValue } = this.props;
-
-		onChangeValue( value );
-		AccessibilityInfo.announceForAccessibility( this.getCurrentValueLabel() );
+		clearTimeout( this.timeoutAnnounceValue );
 	}
 
 	onIncrementValue() {
-		const { value } = this.state;
-		const { step, maxValue } = this.props;
+		const { step, maxValue, onChangeValue, value } = this.props;
 		const newValue = value + step;
 
 		if ( newValue <= maxValue ) {
-			this.setState( { value: newValue } );
-			this.onChangeStepperValue( newValue );
+			onChangeValue( newValue );
+			this.announceValue( newValue );
 		}
 	}
 
 	onDecrementValue() {
-		const { value } = this.state;
-		const { step, minValue } = this.props;
+		const { step, minValue, onChangeValue, value } = this.props;
 		const newValue = value - step;
 
 		if ( newValue >= minValue ) {
-			this.setState( { value: newValue } );
-			this.onChangeStepperValue( newValue );
+			onChangeValue( newValue );
+			this.announceValue( newValue );
 		}
 	}
 
@@ -87,63 +77,84 @@ class BottomSheetStepperCell extends Component {
 	}
 
 	startPressInterval( callback ) {
-		let i = 0;
+		let counter = 0;
 		this.interval = setInterval( () => {
 			callback();
-			i += 1;
+			counter += 1;
 
-			if ( i === 10 ) {
+			if ( counter === 10 ) {
 				clearInterval( this.interval );
 				this.startPressInterval( callback, STEP_SPEED / 2 );
 			}
 		}, STEP_SPEED );
 	}
 
-	getCurrentValueLabel() {
-		const { value } = this.state;
+	announceValue( value ) {
 		const { label } = this.props;
 
-		return 	sprintf(
+		if ( Platform.OS === 'ios' ) { // On Android it triggers the accessibilityLabel with the value change
+			clearTimeout( this.timeoutAnnounceValue );
+			this.timeoutAnnounceValue = setTimeout( () => {
+				AccessibilityInfo.announceForAccessibility( `${ value } ${ label }` );
+			}, 300 );
+		}
+	}
+
+	render() {
+		const { label, icon, minValue, maxValue, value, separatorType } = this.props;
+		const isMinValue = value === minValue;
+		const isMaxValue = value === maxValue;
+
+		const accessibilityLabel = sprintf(
 			/* translators: accessibility text. Inform about current value. %1$s: Control label %2$s: Current value. */
 			_x( '%1$s. Current value is %2$s', 'Increase or decrement to change the value' ),
 			label, value
 		);
-	}
-
-	render() {
-		const { value } = this.state;
-		const { label, icon, minValue, maxValue } = this.props;
-		const isMinValue = value === minValue;
-		const isMaxValue = value === maxValue;
 
 		return (
-			<Cell
-				label={ label }
-				icon={ icon }
-				accessibilityRole={ 'none' }
-			>
-				<Stepper
-					accessible={ true }
-					accessibilityHint={
-						/* translators: accessibility text (hint for focusing a step value control) */
-						__( 'Double tap to change the value using the step controls' )
+			<View
+				accessible={ true }
+				accessibilityRole="adjustable"
+				accessibilityLabel={ accessibilityLabel }
+				accessibilityActions={ [
+					{ name: 'increment', label: 'increment' },
+					{ name: 'decrement', label: 'decrement' },
+				] }
+				onAccessibilityAction={ ( event ) => {
+					switch ( event.nativeEvent.actionName ) {
+						case 'increment':
+							this.onIncrementValue();
+							break;
+						case 'decrement':
+							this.onDecrementValue();
+							break;
 					}
-					accessibilityLabel={ this.getCurrentValueLabel() }
-					accessibilityValue={ {
-						max: maxValue,
-						min: minValue,
-						now: value,
-					} }
-					isMaxValue={ isMaxValue }
-					isMinValue={ isMinValue }
-					onPressInDecrement={ this.onDecrementValuePressIn }
-					onPressInIncrement={ this.onIncrementValuePressIn }
-					onPressOut={ this.onPressOut }
-					value={ value }
-				/>
-			</Cell>
+				} }>
+				<Cell
+					accessibilityRole="none"
+					accessible={ false }
+					editable={ false }
+					icon={ icon }
+					label={ label }
+					separatorType={ separatorType }
+
+				>
+					<Stepper
+						isMaxValue={ isMaxValue }
+						isMinValue={ isMinValue }
+						onPressInDecrement={ this.onDecrementValuePressIn }
+						onPressInIncrement={ this.onIncrementValuePressIn }
+						onPressOut={ this.onPressOut }
+						value={ value }
+					/>
+				</Cell>
+			</View>
 		);
 	}
 }
+
+BottomSheetStepperCell.defaultProps = {
+	step: DEFAULT_STEP,
+};
 
 export default BottomSheetStepperCell;
