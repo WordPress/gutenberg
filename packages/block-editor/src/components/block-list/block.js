@@ -584,16 +584,16 @@ function BlockListBlock( {
 					/>
 				) }
 
-				{ ( isCapturingDescendantToolbars || captureChildToolbar ) && (
+				{ ( isCapturingDescendantToolbars ) && (
 					// A slot made available on all ancestors of the selected Block
 					// to allow child Blocks to render their toolbars into the DOM
 					// of the appropriate parent.
 					<ChildToolbarSlot />
 				) }
 
-				{ ( ! ( captureChildToolbar || hasAncestorCapturingToolbars ) ) && ( shouldShowContextualToolbar || isForcingContextualToolbar.current ) && renderBlockContextualToolbar() }
+				{ ( ! ( hasAncestorCapturingToolbars ) ) && ( shouldShowContextualToolbar || isForcingContextualToolbar.current ) && renderBlockContextualToolbar() }
 
-				{ ( captureChildToolbar || hasAncestorCapturingToolbars ) && ( shouldShowContextualToolbar || isForcingContextualToolbar.current ) && (
+				{ ( hasAncestorCapturingToolbars ) && ( shouldShowContextualToolbar || isForcingContextualToolbar.current ) && (
 					// If the parent Block is set to consume toolbars of the child Blocks
 					// then render the child Block's toolbar into the Slot provided
 					// by the parent.
@@ -707,7 +707,7 @@ const applyWithSelect = withSelect(
 
 		// Find the index of the first Block with the `captureDescendantsToolbars` prop defined
 		// This will be the top most ancestor because getBlockParents() returns tree from top -> bottom
-		const topmostAncestorWithCaptureDescendantsToolbarsIndex = findIndex( ancestorBlockListSettings, [ '__experimentalCaptureDescendantsToolbars', true ] );
+		const topmostAncestorWithCaptureDescendantsToolbarsIndex = findIndex( ancestorBlockListSettings, [ '__experimentalCaptureToolbars', true ] );
 
 		// Boolean to indicate whether current Block has a parent with `captureDescendantsToolbars` set
 		const hasAncestorCapturingToolbars = topmostAncestorWithCaptureDescendantsToolbarsIndex !== -1 ? true : false;
@@ -715,7 +715,7 @@ const applyWithSelect = withSelect(
 		// Is the *current* Block the one capturing all its descendant toolbars?
 		// If there is no `topmostAncestorWithCaptureDescendantsToolbarsIndex` then
 		// we're at the top of the tree
-		const isCapturingDescendantToolbars = isAncestorOfSelectedBlock && ( currentBlockListSettings && currentBlockListSettings.__experimentalCaptureDescendantsToolbars ) && ( topmostAncestorWithCaptureDescendantsToolbarsIndex === -1 );
+		const isCapturingDescendantToolbars = isAncestorOfSelectedBlock && ( currentBlockListSettings && currentBlockListSettings.__experimentalCaptureToolbars ) && ( topmostAncestorWithCaptureDescendantsToolbarsIndex === -1 );
 
 		// The fallback to `{}` is a temporary fix.
 		// This function should never be called when a block is not present in the state.
