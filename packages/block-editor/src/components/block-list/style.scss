@@ -157,9 +157,43 @@
 		}
 	}
 
-	// Selected style.
-	&.is-multi-selected {
+	// Hover style.
+	&.is-hovered:not(.is-navigate-mode) > .block-editor-block-list__block-edit::before {
+		box-shadow: -$block-left-border-width 0 0 0 $dark-opacity-light-500;
+
+		.is-dark-theme & {
+			box-shadow: -$block-left-border-width 0 0 0 $light-opacity-light-400;
+		}
+	}
+
+	// Spotlight mode.
+	&.is-focus-mode:not(.is-multi-selected) {
+		opacity: 0.5;
+		transition: opacity 0.1s linear;
+		@include reduce-motion("transition");
+
+		&:not(.is-focused) .block-editor-block-list__block,
+		&.is-focused {
+			opacity: 1;
+		}
+	}
+}
+
+
+/**
+ * Cross-Block Selection
+ */
+
+.block-editor-block-list__layout {
+
+	// The primary indicator of selection is the native selection marker.
+	// To indicate multiple blocks, we provide an additional selection indicator.
+	.block-editor-block-list__block.is-multi-selected {
+
 		> .block-editor-block-list__block-edit::before {
+			// Todo: start by limiting it to not nest
+			// Then hide selection in placeholders and do something else
+			// Then make a mockup for multi block selection for the new UI — this includes an exception for contiguous paragraphs
 			border-left-color: $dark-opacity-light-800;
 			box-shadow: inset $block-left-border-width 0 0 0 $dark-gray-500;
 
@@ -179,22 +213,11 @@
 		}
 	}
 
-	// Spotlight mode.
-	&.is-focus-mode:not(.is-multi-selected) {
-		opacity: 0.5;
-		transition: opacity 0.1s linear;
-		@include reduce-motion("transition");
-
-		&:not(.is-focused) .block-editor-block-list__block,
-		&.is-focused {
-			opacity: 1;
-		}
+	// The additional marker, we limit only to top level blocks.
+	.block-editor-block-list__block.is-multi-selected .block-editor-block-list__block.is-multi-selected > .block-editor-block-list__block-edit::before {
+		box-shadow: none;
 	}
 }
-
-/**
- * Cross-block selection
- */
 
 
 /**
