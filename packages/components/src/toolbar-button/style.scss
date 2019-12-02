@@ -21,4 +21,19 @@
 	&:not(:disabled).is-active[data-subscript]::after {
 		color: $white;
 	}
+
+	&.is-active {
+		padding: 3px;
+		outline: none;
+	}
+
+	&.is-active > svg {
+		padding: 5px;
+		border-radius: $radius-round-rectangle;
+		height: 30px;
+		width: 30px;
+		box-sizing: border-box;
+		@include formatting-button-style__active;
+	}
 }
+
