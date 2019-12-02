@@ -4,6 +4,7 @@
  * @property {Function} unsubscribe
  */
 /**
+ * Keep track of event.defaultPrevented state.
  *
  * @param {Element} element
  * @param {...string} eventNames
