@@ -151,5 +151,6 @@
 
 	&:focus {
 		@include square-style__focus;
+		box-shadow: none;
 	}
 }
