@@ -63,10 +63,10 @@ export class PostPublishButton extends Component {
 		let publishStatus;
 		if ( ! hasPublishAction ) {
 			publishStatus = 'pending';
-		} else if ( isBeingScheduled ) {
-			publishStatus = 'future';
 		} else if ( visibility === 'private' ) {
 			publishStatus = 'private';
+		} else if ( isBeingScheduled ) {
+			publishStatus = 'future';
 		} else {
 			publishStatus = 'publish';
 		}
