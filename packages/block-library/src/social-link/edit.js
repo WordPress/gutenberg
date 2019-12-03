@@ -42,7 +42,7 @@ const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
 					<PanelRow>
 						<TextControl
 							label={ __( 'Link Label' ) }
-							help={ __( 'Briefly describe the page you\'re linking to. This helps better identify the link for screen reader users.' ) }
+							help={ __( 'Briefly describe the link to help screen reader users.' ) }
 							value={ label }
 							onChange={ ( value ) => setAttributes( { label: value } ) }
 						/>
