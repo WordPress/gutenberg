@@ -6,6 +6,7 @@
 	.wp-block-navigation .block-editor-inner-blocks > .block-editor-block-list__layout {
 		margin-left: 0;
 		margin-right: 0;
+
 	}
 
 	// 2. Remove paddings on subsequent immediate children.
@@ -13,7 +14,9 @@
 		width: auto;
 		padding-left: 0;
 		padding-right: 0;
-		margin-left: 0; // something
+		margin-left: 0;
+		margin-right: 0;
+		margin-bottom: 1em; // Useful for when items wrap.
 	}
 
 	// 3. Remove margins on subsequent Edit container.
@@ -26,6 +29,11 @@
 	.wp-block-navigation .block-editor-inner-blocks > .block-editor-block-list__layout .wp-block > .block-editor-block-list__block-edit > [data-block] {
 		margin-top: 0;
 		margin-bottom: 0;
+	}
+
+	.wp-block-navigation .block-editor-block-list__block-edit::before {
+		left: 0;
+		right: 0;
 	}
 
 	// Remove the dashed outlines for child blocks.
@@ -57,7 +65,7 @@
 .wp-block-navigation .block-editor-block-list__layout,
 .wp-block-navigation {
 	display: flex;
-	white-space: nowrap;
+	flex-wrap: wrap;
 }
 
 .wp-block-navigation__inserter-content {
