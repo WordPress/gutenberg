@@ -147,7 +147,7 @@ class MediaTextEdit extends Component {
 		const temporaryMediaWidth = shouldStack ? 100 : ( this.state.mediaWidth || mediaWidth );
 		const widthString = `${ temporaryMediaWidth }%`;
 
-		const selectedStyle = ! shouldStack && { paddingRight: mediaPosition === 'rigth' ? 0 : 12, paddingLeft: mediaPosition === 'left' ? 0 : 12 };
+		const selectedStyle = ! shouldStack && { paddingRight: mediaPosition === 'right' ? 0 : 12, paddingLeft: mediaPosition === 'left' ? 0 : 12 };
 		const containerStyles = {
 			...styles[ 'wp-block-media-text' ],
 			...styles[ `is-vertically-aligned-${ verticalAlignment || 'center' }` ],
