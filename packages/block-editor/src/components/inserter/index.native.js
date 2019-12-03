@@ -27,12 +27,12 @@ const addAfterOption = {
 
 const addToBeginningOption = {
 	value: 'before',
-	label: __( 'Add to beginning' ),
+	label: __( 'Add To Beginning' ),
 };
 
 const addToEndOption = {
 	value: 'after',
-	label: __( 'Add to end' ),
+	label: __( 'Add To End' ),
 };
 
 const defaultRenderToggle = ( { onToggle, disabled, style, onLongPress } ) => (
