@@ -1433,9 +1433,8 @@ export const __experimentalGetBlockListSettingsForBlocks = createSelector(
 	( state, clientIds ) => {
 		return filter( state.blockListSettings, ( value, key ) => clientIds.includes( key ) );
 	},
-	( state, clientIds ) => [
+	( state ) => [
 		state.blockListSettings,
-		clientIds,
 	],
 );
 
