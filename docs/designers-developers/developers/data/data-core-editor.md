@@ -1127,6 +1127,23 @@ _Related_
 
 -   insertDefaultBlock in core/block-editor store.
 
+<a name="lockPostAutosaving" href="#lockPostAutosaving">#</a> **lockPostAutosaving**
+
+Returns an action object used to signal that post autosaving is locked.
+
+_Usage_
+
+    // Lock post autosaving with the lock key `mylock`:
+    wp.data.dispatch( 'core/editor' ).lockPostAutosaving( 'mylock' );
+
+_Parameters_
+
+-   _lockName_ `string`: The lock name.
+
+_Returns_
+
+-   `Object`: Action object
+
 <a name="lockPostSaving" href="#lockPostSaving">#</a> **lockPostSaving**
 
 Returns an action object used to signal that post saving is locked.
@@ -1385,6 +1402,23 @@ Action generator for trashing the current post in the editor.
 <a name="undo" href="#undo">#</a> **undo**
 
 Returns an action object used in signalling that undo history should pop.
+
+<a name="unlockPostAutosaving" href="#unlockPostAutosaving">#</a> **unlockPostAutosaving**
+
+Returns an action object used to signal that post autosaving is unlocked.
+
+_Usage_
+
+    // Unlock post saving with the lock key `mylock`:
+    wp.data.dispatch( 'core/editor' ).unlockPostAutosaving( 'mylock' );
+
+_Parameters_
+
+-   _lockName_ `string`: The lock name.
+
+_Returns_
+
+-   `Object`: Action object
 
 <a name="unlockPostSaving" href="#unlockPostSaving">#</a> **unlockPostSaving**
 
