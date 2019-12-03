@@ -19,14 +19,13 @@ const TextHighlight = ( { text = '', highlight = '' } ) => {
 	const parts = text.split( regex ).filter( ( part ) => part );
 
 	const interpolatedString = parts.map( ( part ) => {
-		return regex.test( part ) ? `<mark>${ part }</mark>` : `<span>${ part }</span>`;
+		return regex.test( part ) ? `<mark>${ part }</mark>` : part;
 	} ).join( '' );
 
 	return __experimentalCreateInterpolateElement(
 		interpolatedString,
 		{
 			mark: <mark />,
-			span: <span />,
 		}
 	);
 };
