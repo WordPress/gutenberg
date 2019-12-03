@@ -14,11 +14,12 @@
 	}
 }
 
-.edit-post-sidebar__panel-tab {
+.components-button.edit-post-sidebar__panel-tab {
 	background: transparent;
 	border: none;
 	box-shadow: none;
 	cursor: pointer;
+	display: inline-block;
 	padding: 3px 15px; // Use padding to offset the is-active border, this benefits Windows High Contrast mode
 	margin-left: 0;
 	font-weight: 400;
@@ -58,6 +59,7 @@
 	}
 
 	&:focus {
+		background-color: transparent;
 		@include square-style__focus;
 	}
 }

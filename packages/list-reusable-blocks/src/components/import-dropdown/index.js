@@ -21,7 +21,6 @@ function ImportDropdown( { onUpload } ) {
 			contentClassName="list-reusable-blocks-import-dropdown__content"
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<Button
-					type="button"
 					aria-expanded={ isOpen }
 					onClick={ onToggle }
 					isPrimary

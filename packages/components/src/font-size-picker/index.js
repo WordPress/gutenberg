@@ -94,7 +94,6 @@ function FontSizePicker( {
 				}
 				<Button
 					className="components-color-palette__clear"
-					type="button"
 					disabled={ value === undefined }
 					onClick={ () => {
 						onChange( undefined );

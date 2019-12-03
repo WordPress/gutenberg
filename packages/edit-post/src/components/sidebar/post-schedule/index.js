@@ -18,7 +18,6 @@ export function PostSchedule() {
 					renderToggle={ ( { onToggle, isOpen } ) => (
 						<>
 							<Button
-								type="button"
 								className="edit-post-post-schedule__toggle"
 								onClick={ onToggle }
 								aria-expanded={ isOpen }

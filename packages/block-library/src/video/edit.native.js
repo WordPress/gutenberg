@@ -17,8 +17,8 @@ import {
  */
 import {
 	Icon,
-	Toolbar,
 	ToolbarButton,
+	ToolbarGroup,
 	PanelBody,
 } from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
@@ -169,14 +169,14 @@ class VideoEdit extends React.Component {
 				onSelect={ this.onSelectMediaUploadOption }
 				render={ ( { open, getMediaOptions } ) => {
 					return (
-						<Toolbar>
+						<ToolbarGroup>
 							{ getMediaOptions() }
 							<ToolbarButton
 								label={ __( 'Edit video' ) }
 								icon="edit"
 								onClick={ open }
 							/>
-						</Toolbar>
+						</ToolbarGroup>
 					);
 				} } >
 			</MediaUpload>
