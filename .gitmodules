@@ -1,6 +1,6 @@
 [submodule "gutenberg"]
 	path = gutenberg
-	url = ../../WordPress/gutenberg.git
+	url = ../../ceyhun/gutenberg.git
 [submodule "react-native-aztec"]
 	path = react-native-aztec-old-submodule
 	url = ../react-native-aztec.git
