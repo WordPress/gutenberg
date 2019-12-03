@@ -204,7 +204,7 @@ _Parameters_
 
 _Returns_
 
--   `?ElementHandle`: Object that represents an in-page DOM element.
+-   `Promise<(ElementHandle|undefined)>`: Object that represents an in-page DOM element.
 
 <a name="getAllBlockInserterItemTitles" href="#getAllBlockInserterItemTitles">#</a> **getAllBlockInserterItemTitles**
 
