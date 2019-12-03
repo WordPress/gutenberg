@@ -147,7 +147,7 @@ class MediaTextEdit extends Component {
 		const temporaryMediaWidth = shouldStack ? 100 : ( this.state.mediaWidth || mediaWidth );
 		const widthString = `${ temporaryMediaWidth }%`;
 
-		const selectedStyle = ! shouldStack && { paddingRight: mediaPosition === 'right' ? 0 : styles.innerPadding.padding, paddingLeft: mediaPosition === 'left' ? 0 : styles.innerPadding.padding };
+		const selectedStyle = ! shouldStack && { paddingRight: 0, paddingLeft: 0, ...( mediaPosition === 'right' && styles.innerPaddingMediaOnRight ), ...( mediaPosition === 'left' && styles.innerPaddingMediaOnLeft ) };
 		const containerStyles = {
 			...styles[ 'wp-block-media-text' ],
 			...styles[ `is-vertically-aligned-${ verticalAlignment || 'center' }` ],
@@ -159,7 +159,7 @@ class MediaTextEdit extends Component {
 		const innerBlockWidth = shouldStack ? 100 : ( 100 - temporaryMediaWidth );
 		const innerBlockWidthString = `${ innerBlockWidth }%`;
 		const mediaContainerStyle = {
-			...( isParentSelected || isAncestorSelected ? styles.denseMediaPadding : styles.regularMediaPadding),
+			...( isParentSelected || isAncestorSelected ? styles.denseMediaPadding : styles.regularMediaPadding ),
 			...( isSelected && styles.innerPadding ),
 		};
 

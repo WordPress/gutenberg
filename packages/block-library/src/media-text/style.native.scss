@@ -109,6 +109,14 @@
 	padding: $block-selected-to-content;
 }
 
+.innerPaddingMediaOnLeft {
+	padding-right: $block-selected-to-content;
+}
+
+.innerPaddingMediaOnRight {
+	padding-left: $block-selected-to-content;
+}
+
 .regularMediaPadding {
 	padding: $block-edge-to-content;
 }
