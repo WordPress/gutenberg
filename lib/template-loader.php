@@ -147,12 +147,12 @@ function gutenberg_find_template( $template_file ) {
 	// See if there is a theme block template with higher priority than the resolved template post.
 	$higher_priority_block_template_path     = null;
 	$higher_priority_block_template_priority = PHP_INT_MAX;
-	$block_template_files                    = glob( get_stylesheet_directory() . '/block-templates/*.html', 1 ) ?: array();
+	$block_template_files                    = glob( get_stylesheet_directory() . '/block-templates/*.html', GLOB_NOSORT ) ?: array();
 	if ( is_child_theme() ) {
-			$block_template_files = array_merge( $block_template_files, glob( get_template_directory() . '/block-templates/*.html', 1 ) ?: array() );
+			$block_template_files = array_merge( $block_template_files, glob( get_template_directory() . '/block-templates/*.html', GLOB_NOSORT ) ?: array() );
 	}
 	if ( gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing-demo' ) ) {
-		$block_template_files = array_merge( $block_template_files, glob( dirname( __FILE__ ) . '/demo-block-templates/*.html', 1 ) ?: array() );
+		$block_template_files = array_merge( $block_template_files, glob( dirname( __FILE__ ) . '/demo-block-templates/*.html', GLOB_NOSORT ) ?: array() );
 	}
 	foreach ( $block_template_files as $path ) {
 		$theme_block_template_priority = $slug_priorities[ basename( $path, '.html' ) ];
