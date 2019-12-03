@@ -13,7 +13,7 @@ import { TextHighlight } from '@wordpress/components';
 
 const MyTextHighlight = () => (
 	<TextHighlight
-		text={ 'Why do we like Gutenberg? Because Gutenberg is the best!' }
+		text="Why do we like Gutenberg? Because Gutenberg is the best!"
 		highlight={ 'Gutenberg' }
 	/>
 );
