@@ -42,6 +42,8 @@ import { isEmptyLine } from '../is-empty';
 
 const { getSelection, getComputedStyle } = window;
 
+/** @typedef {import('@wordpress/element').WPSyntheticEvent} WPSyntheticEvent */
+
 /**
  * All inserting input types that would insert HTML into the DOM.
  *
