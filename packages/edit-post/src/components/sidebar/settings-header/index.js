@@ -57,11 +57,9 @@ const SettingsHeader = ( { openDocumentSettings, openBlockSettings, sidebarName 
 
 export default withDispatch( ( dispatch ) => {
 	const { openGeneralSidebar } = dispatch( 'core/edit-post' );
-	const { clearSelectedBlock } = dispatch( 'core/block-editor' );
 	return {
 		openDocumentSettings() {
 			openGeneralSidebar( 'edit-post/document' );
-			clearSelectedBlock();
 		},
 		openBlockSettings() {
 			openGeneralSidebar( 'edit-post/block' );
