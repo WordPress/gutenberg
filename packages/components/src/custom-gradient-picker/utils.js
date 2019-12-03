@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { findIndex, some } from 'lodash';
+import { findIndex, map, some } from 'lodash';
 
 /**
  * Internal dependencies
@@ -11,6 +11,10 @@ import {
 	MINIMUM_ABSOLUTE_LEFT_POSITION,
 	MINIMUM_DISTANCE_BETWEEN_POINTS,
 } from './constants';
+import {
+	serializeGradientColor,
+	serializeGradientPosition,
+} from './serializer';
 
 function tinyColorRgbToGradientColorStop( { r, g, b, a } ) {
 	if ( a === 1 ) {
@@ -25,25 +29,25 @@ function tinyColorRgbToGradientColorStop( { r, g, b, a } ) {
 	};
 }
 
-export function getGradientWithColorStopAdded( parsedGradient, relativePosition, rgbaColor ) {
+export function getGradientWithColorStopAdded( gradientAST, relativePosition, rgbaColor ) {
 	const colorStop = tinyColorRgbToGradientColorStop( rgbaColor );
 	colorStop.length = {
 		type: '%',
 		value: relativePosition,
 	};
 	return {
-		...parsedGradient,
+		...gradientAST,
 		colorStops: [
-			...parsedGradient.colorStops,
+			...gradientAST.colorStops,
 			colorStop,
 		],
 	};
 }
 
-export function getGradientWithPositionAtIndexChanged( parsedGradient, index, relativePosition ) {
+export function getGradientWithPositionAtIndexChanged( gradientAST, index, relativePosition ) {
 	return {
-		...parsedGradient,
-		colorStops: parsedGradient.colorStops.map(
+		...gradientAST,
+		colorStops: gradientAST.colorStops.map(
 			( colorStop, colorStopIndex ) => {
 				if ( colorStopIndex !== index ) {
 					return colorStop;
@@ -60,13 +64,13 @@ export function getGradientWithPositionAtIndexChanged( parsedGradient, index, re
 	};
 }
 
-export function isControlPointOverlapping( parsedGradient, position, initialIndex ) {
-	const initialPosition = parseInt( parsedGradient.colorStops[ initialIndex ].length.value );
+export function isControlPointOverlapping( gradientAST, position, initialIndex ) {
+	const initialPosition = parseInt( gradientAST.colorStops[ initialIndex ].length.value );
 	const minPosition = Math.min( initialPosition, position );
 	const maxPosition = Math.max( initialPosition, position );
 
 	return some(
-		parsedGradient.colorStops,
+		gradientAST.colorStops,
 		( { length }, index ) => {
 			const itemPosition = parseInt( length.value );
 			return index !== initialIndex && (
@@ -77,27 +81,27 @@ export function isControlPointOverlapping( parsedGradient, position, initialInde
 	);
 }
 
-function getGradientWithPositionAtIndexSummed( parsedGradient, index, valueToSum ) {
-	const currentPosition = parsedGradient.colorStops[ index ].length.value;
+function getGradientWithPositionAtIndexSummed( gradientAST, index, valueToSum ) {
+	const currentPosition = gradientAST.colorStops[ index ].length.value;
 	const newPosition = Math.max( 0, Math.min( 100, parseInt( currentPosition ) + valueToSum ) );
-	if ( isControlPointOverlapping( parsedGradient, newPosition, index ) ) {
-		return parsedGradient;
+	if ( isControlPointOverlapping( gradientAST, newPosition, index ) ) {
+		return gradientAST;
 	}
-	return getGradientWithPositionAtIndexChanged( parsedGradient, index, newPosition );
+	return getGradientWithPositionAtIndexChanged( gradientAST, index, newPosition );
 }
 
-export function getGradientWithPositionAtIndexIncreased( parsedGradient, index ) {
-	return getGradientWithPositionAtIndexSummed( parsedGradient, index, MINIMUM_DISTANCE_BETWEEN_POINTS );
+export function getGradientWithPositionAtIndexIncreased( gradientAST, index ) {
+	return getGradientWithPositionAtIndexSummed( gradientAST, index, MINIMUM_DISTANCE_BETWEEN_POINTS );
 }
 
-export function getGradientWithPositionAtIndexDecreased( parsedGradient, index ) {
-	return getGradientWithPositionAtIndexSummed( parsedGradient, index, -MINIMUM_DISTANCE_BETWEEN_POINTS );
+export function getGradientWithPositionAtIndexDecreased( gradientAST, index ) {
+	return getGradientWithPositionAtIndexSummed( gradientAST, index, -MINIMUM_DISTANCE_BETWEEN_POINTS );
 }
 
-export function getGradientWithColorAtIndexChanged( parsedGradient, index, rgbaColor ) {
+export function getGradientWithColorAtIndexChanged( gradientAST, index, rgbaColor ) {
 	return {
-		...parsedGradient,
-		colorStops: parsedGradient.colorStops.map(
+		...gradientAST,
+		colorStops: gradientAST.colorStops.map(
 			( colorStop, colorStopIndex ) => {
 				if ( colorStopIndex !== index ) {
 					return colorStop;
@@ -111,8 +115,8 @@ export function getGradientWithColorAtIndexChanged( parsedGradient, index, rgbaC
 	};
 }
 
-export function getGradientWithColorAtPositionChanged( parsedGradient, relativePositionValue, rgbaColor ) {
-	const index = findIndex( parsedGradient.colorStops, ( colorStop ) => {
+export function getGradientWithColorAtPositionChanged( gradientAST, relativePositionValue, rgbaColor ) {
+	const index = findIndex( gradientAST.colorStops, ( colorStop ) => {
 		return (
 			colorStop &&
 			colorStop.length &&
@@ -120,13 +124,13 @@ export function getGradientWithColorAtPositionChanged( parsedGradient, relativeP
 			colorStop.length.value === relativePositionValue.toString()
 		);
 	} );
-	return getGradientWithColorAtIndexChanged( parsedGradient, index, rgbaColor );
+	return getGradientWithColorAtIndexChanged( gradientAST, index, rgbaColor );
 }
 
-export function getGradientWithControlPointRemoved( parsedGradient, index ) {
+export function getGradientWithControlPointRemoved( gradientAST, index ) {
 	return {
-		...parsedGradient,
-		colorStops: parsedGradient.colorStops.filter( ( elem, elemIndex ) => {
+		...gradientAST,
+		colorStops: gradientAST.colorStops.filter( ( elem, elemIndex ) => {
 			return elemIndex !== index;
 		} ),
 	};
@@ -142,4 +146,31 @@ export function getHorizontalRelativeGradientPosition( mouseXCoordinate, contain
 	return Math.round(
 		Math.min( Math.max( ( absolutePositionValue * 100 ) / availableWidth, 0 ), 100 )
 	);
+}
+
+/**
+ * Get the connection state.
+ *
+ * @param {Object} gradientAST An object representing the gradient AST.
+ *
+ * @return {Array.<{color: string, position: string, positionValue: number}>}
+ *         An array of markerPoint objects.
+ *         color:         A string with the color code ready to be used in css style e.g: "rgba( 1, 2 , 3, 0.5)".
+ *         position:      A string with the position ready to be used in css style e.g: "70%".
+ *         positionValue: A number with the relative position value e.g: 70.
+ */
+export function getMarkerPoints( gradientAST ) {
+	if ( ! gradientAST ) {
+		return [];
+	}
+	return map( gradientAST.colorStops, ( colorStop ) => {
+		if ( ! colorStop || ! colorStop.length || colorStop.length.type !== '%' ) {
+			return null;
+		}
+		return {
+			color: serializeGradientColor( colorStop ),
+			position: serializeGradientPosition( colorStop.length ),
+			positionValue: parseInt( colorStop.length.value ),
+		};
+	} );
 }
