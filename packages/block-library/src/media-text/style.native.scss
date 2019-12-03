@@ -104,3 +104,15 @@
 .uploadFailedTextVideo {
 	color: $gray-dark;
 }
+
+.innerPadding {
+	padding: $block-selected-to-content;
+}
+
+.regularMediaPadding {
+	padding: $block-edge-to-content;
+}
+
+.denseMediaPadding {
+	padding: $block-media-container-to-content;
+}
