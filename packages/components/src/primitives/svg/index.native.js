@@ -19,7 +19,7 @@ export {
 export const SVG = ( { className = '', isToggled, ...props } ) => {
 	const colorScheme = props.colorScheme || 'light';
 	const stylesFromClasses = className.split( ' ' ).map( ( element ) => styles[ element ] ).filter( Boolean );
-	const defaultStyle = isToggled ? styles[ 'is-active' ] : styles[ 'components-toolbar__control-' + colorScheme ];
+	const defaultStyle = isToggled ? styles[ 'is-toggled' ] : styles[ 'components-toolbar__control-' + colorScheme ];
 	const styleValues = Object.assign( {}, props.style, defaultStyle, ...stylesFromClasses );
 
 	const appliedProps = { ...props, style: styleValues };

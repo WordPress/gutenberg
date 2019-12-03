@@ -66,17 +66,17 @@ $color-palette-circle-spacing: 12px;
 	@include reduce-motion("transition");
 	cursor: pointer;
 
-	&.is-active {
+	&.is-toggled {
 		box-shadow: inset 0 0 0 4px;
 		position: relative;
-		z-index: z-index(".components-circular-option-picker__option.is-active");
+		z-index: z-index(".components-circular-option-picker__option.is-toggled");
 
 		& + .dashicons-saved {
 			position: absolute;
 			left: 4px;
 			top: 4px;
 			border-radius: 50%;
-			z-index: z-index(".components-circular-option-picker__option.is-active + .dashicons-saved");
+			z-index: z-index(".components-circular-option-picker__option.is-toggled + .dashicons-saved");
 			background: $white;
 			pointer-events: none;
 		}

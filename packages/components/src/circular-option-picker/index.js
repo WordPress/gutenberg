@@ -19,11 +19,10 @@ function Option( {
 } ) {
 	const optionButton = (
 		<Button
-			aria-pressed={ isSelected }
+			isToggled={ isSelected }
 			className={ classnames(
 				className,
 				'components-circular-option-picker__option',
-				{ 'is-active': isSelected }
 			) }
 			{ ...additionalProps }
 		/>

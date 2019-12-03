@@ -121,9 +121,9 @@ $z-layers: (
 	// Needs to appear bellow other color circular picker related UI elements.
 	".components-circular-option-picker__option-wrapper::before": -1,
 
-	".components-circular-option-picker__option.is-active": 1,
-	// Needs to be higher than .components-circular-option-picker__option.is-active.
-	".components-circular-option-picker__option.is-active + .dashicons-saved": 2
+	".components-circular-option-picker__option.is-toggled": 1,
+	// Needs to be higher than .components-circular-option-picker__option.is-toggled.
+	".components-circular-option-picker__option.is-toggled + .dashicons-saved": 2
 );
 
 @function z-index( $key ) {

@@ -29,7 +29,7 @@ describe( 'ColorPalette', () => {
 	} );
 
 	test( 'should call onClick on an active button with undefined', () => {
-		const activeButton = buttons.findWhere( ( button ) => button.hasClass( 'is-active' ) );
+		const activeButton = buttons.findWhere( ( button ) => button.hasClass( 'is-toggled' ) );
 		activeButton.simulate( 'click' );
 
 		expect( onChange ).toHaveBeenCalledTimes( 1 );
@@ -37,7 +37,7 @@ describe( 'ColorPalette', () => {
 	} );
 
 	test( 'should call onClick on an inactive button', () => {
-		const inactiveButton = buttons.findWhere( ( button ) => ! button.hasClass( 'is-active' ) ).first();
+		const inactiveButton = buttons.findWhere( ( button ) => ! button.hasClass( 'is-toggled' ) ).first();
 		inactiveButton.simulate( 'click' );
 
 		expect( onChange ).toHaveBeenCalledTimes( 1 );

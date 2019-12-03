@@ -20,13 +20,13 @@ describe( 'URLInputButton', () => {
 		const wrapper = shallow( <URLInputButton /> );
 		expect( wrapper.hasClass( 'block-editor-url-input__button' ) ).toBe( true );
 	} );
-	it( 'should not have is-active class when url prop not defined', () => {
+	it( 'should have isToggled props set to false when url prop not defined', () => {
 		const wrapper = shallow( <URLInputButton /> );
-		expect( wrapper.find( 'ForwardRef(IconButton)' ).hasClass( 'is-active' ) ).toBe( false );
+		expect( wrapper.find( 'ForwardRef(IconButton)' ).prop( 'isToggled' ) ).toBe( false );
 	} );
-	it( 'should have is-active class name if url prop defined', () => {
+	it( 'should have isToggled prop set to true if url prop defined', () => {
 		const wrapper = shallow( <URLInputButton url="https://example.com" /> );
-		expect( wrapper.find( 'ForwardRef(IconButton)' ).hasClass( 'is-active' ) ).toBe( true );
+		expect( wrapper.find( 'ForwardRef(IconButton)' ).prop( 'isToggled' ) ).toBe( true );
 	} );
 	it( 'should have hidden form by default', () => {
 		const wrapper = shallow( <URLInputButton /> );

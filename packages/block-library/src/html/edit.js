@@ -64,13 +64,15 @@ class HTMLEdit extends Component {
 				<BlockControls>
 					<ToolbarGroup>
 						<Button
-							className={ `components-tab-button ${ ! isPreview ? 'is-active' : '' }` }
+							className="components-tab-button"
+							isToggled={ ! isPreview }
 							onClick={ this.switchToHTML }
 						>
 							<span>HTML</span>
 						</Button>
 						<Button
-							className={ `components-tab-button ${ isPreview ? 'is-active' : '' }` }
+							className="components-tab-button"
+							isToggled={ isPreview }
 							onClick={ this.switchToPreview }
 						>
 							<span>{ __( 'Preview' ) }</span>

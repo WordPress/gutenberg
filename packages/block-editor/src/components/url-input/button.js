@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -45,9 +40,8 @@ class URLInputButton extends Component {
 					icon="admin-links"
 					label={ buttonLabel }
 					onClick={ this.toggle }
-					className={ classnames( 'components-toolbar__control', {
-						'is-active': url,
-					} ) }
+					className="components-toolbar__control"
+					isToggled={ !! url }
 				/>
 				{ expanded &&
 					<form

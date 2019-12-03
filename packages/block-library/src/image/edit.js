@@ -631,7 +631,7 @@ export class ImageEdit extends Component {
 					<>
 						<ToolbarGroup>
 							<IconButton
-								className={ classnames( 'components-icon-button components-toolbar__control', { 'is-active': this.state.isEditing } ) }
+								className="components-toolbar__control"
 								label={ __( 'Edit image' ) }
 								isToggled={ this.state.isEditing }
 								onClick={ this.toggleIsEditing }

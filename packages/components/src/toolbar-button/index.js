@@ -48,7 +48,6 @@ function ToolbarButton( {
 			className={ classnames(
 				'components-toolbar__control',
 				className,
-				{ 'is-active': isActive }
 			) }
 			isToggled={ isActive }
 			disabled={ isDisabled }

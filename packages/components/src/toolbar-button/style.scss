@@ -18,16 +18,16 @@
 		bottom: 10px;
 	}
 
-	&:not(:disabled).is-active[data-subscript]::after {
+	&:not(:disabled).is-toggled[data-subscript]::after {
 		color: $white;
 	}
 
-	&.is-active {
+	&.is-toggled {
 		padding: 3px;
 		outline: none;
 	}
 
-	&.is-active > svg {
+	&.is-toggled > svg {
 		padding: 5px;
 		border-radius: $radius-round-rectangle;
 		height: 30px;
@@ -36,4 +36,3 @@
 		@include formatting-button-style__active;
 	}
 }
-

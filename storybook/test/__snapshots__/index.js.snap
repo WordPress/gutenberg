@@ -3728,7 +3728,7 @@ exports[`Storyshots Components|ToolbarGroup Default 1`] = `
     <button
       aria-label="Bold"
       aria-pressed={true}
-      className="components-button components-icon-button components-toolbar__control is-active is-toggled"
+      className="components-button components-icon-button components-toolbar__control is-toggled"
       onBlur={[Function]}
       onClick={[Function]}
       onFocus={[Function]}
@@ -3822,7 +3822,7 @@ exports[`Storyshots Components|ToolbarGroup With Controls Prop 1`] = `
     <button
       aria-label="Bold"
       aria-pressed={true}
-      className="components-button components-icon-button components-toolbar__control is-active is-toggled"
+      className="components-button components-icon-button components-toolbar__control is-toggled"
       onBlur={[Function]}
       onClick={[Function]}
       onFocus={[Function]}
