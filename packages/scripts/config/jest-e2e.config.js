@@ -18,6 +18,9 @@ const jestE2EConfig = {
 		'/node_modules/',
 		'/wordpress/',
 	],
+	reporters: [
+		'@wordpress/jest-preset-default/scripts/travis-fold-passes-reporter.js',
+	],
 };
 
 if ( ! hasBabelConfig() ) {
