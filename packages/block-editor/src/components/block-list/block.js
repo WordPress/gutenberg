@@ -715,7 +715,7 @@ const applyWithSelect = withSelect(
 		// Is the *current* Block the one capturing all its descendant toolbars?
 		// If there is no `topmostAncestorWithCaptureDescendantsToolbarsIndex` then
 		// we're at the top of the tree
-		const isCapturingDescendantToolbars = isAncestorOfSelectedBlock && ( currentBlockListSettings && currentBlockListSettings.__experimentalCaptureToolbars ) && ( topmostAncestorWithCaptureDescendantsToolbarsIndex === -1 );
+		const isCapturingDescendantToolbars = isAncestorOfSelectedBlock && ( currentBlockListSettings && currentBlockListSettings.__experimentalCaptureToolbars ) && ! hasAncestorCapturingToolbars;
 
 		// The fallback to `{}` is a temporary fix.
 		// This function should never be called when a block is not present in the state.
