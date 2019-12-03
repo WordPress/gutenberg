@@ -21,15 +21,18 @@ function getSelectValueFromFontSize( fontSizes, value ) {
 	return 'normal';
 }
 
-function getSelectOptions( optionsArray ) {
-	return [
-		...optionsArray.map( ( option ) => ( {
-			key: option.slug,
-			name: option.name,
-			style: { fontSize: option.size },
-		} ) ),
-		{ key: 'custom', name: __( 'Custom' ) },
-	];
+function getSelectOptions( optionsArray, disableCustomFontSizes ) {
+	if ( ! disableCustomFontSizes ) {
+		optionsArray = [
+			...optionsArray,
+			{ slug: 'custom', name: __( 'Custom' ) },
+		];
+	}
+	return optionsArray.map( ( option ) => ( {
+		key: option.slug,
+		name: option.name,
+		style: { fontSize: option.size },
+	} ) );
 }
 
 function FontSizePicker( {
@@ -62,7 +65,12 @@ function FontSizePicker( {
 		onChange( selectedItem.style && selectedItem.style.fontSize );
 	};
 
-	const items = getSelectOptions( fontSizes );
+	const onSliderChangeValue = ( sliderValue ) => {
+		onChange( sliderValue );
+		setCurrentSelectValue( getSelectValueFromFontSize( fontSizes, sliderValue ) );
+	};
+
+	const items = getSelectOptions( fontSizes, disableCustomFontSizes );
 	const rangeControlNumberId = `components-range-control__number#${ instanceId }`;
 	return (
 		<fieldset className="components-font-size-picker">
@@ -111,7 +119,7 @@ function FontSizePicker( {
 					label={ __( 'Custom Size' ) }
 					value={ value || '' }
 					initialPosition={ fallbackFontSize }
-					onChange={ onChange }
+					onChange={ onSliderChangeValue }
 					min={ 12 }
 					max={ 100 }
 					beforeIcon="editor-textcolor"
