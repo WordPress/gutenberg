@@ -1,19 +1,12 @@
 /**
  * External dependencies
  */
-import {
-	findLast,
-	invert,
-	mapValues,
-	sortBy,
-	throttle,
-} from 'lodash';
 import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, createRef } from '@wordpress/element';
 import {
 	withSelect,
 	withDispatch,
@@ -27,7 +20,7 @@ import { compose } from '@wordpress/compose';
 import BlockAsyncModeProvider from './block-async-mode-provider';
 import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
-import { getBlockDOMNode } from '../../utils/dom';
+import __experimentalBlockListFooter from '../block-list-footer';
 
 /**
  * If the block count exceeds the threshold, we disable the reordering animation
@@ -43,71 +36,99 @@ const forceSyncUpdates = ( WrappedComponent ) => ( props ) => {
 	);
 };
 
+/**
+ * Returns for the deepest node at the start or end of a container node. Ignores
+ * any text nodes that only contain HTML formatting whitespace.
+ *
+ * @param {Element} node Container to search.
+ * @param {string} type 'start' or 'end'.
+ */
+function getDeepestNode( node, type ) {
+	const child = type === 'start' ? 'firstChild' : 'lastChild';
+	const sibling = type === 'start' ? 'nextSibling' : 'previousSibling';
+
+	while ( node[ child ] ) {
+		node = node[ child ];
+
+		while (
+			node.nodeType === node.TEXT_NODE &&
+			/^[ \t\n]*$/.test( node.data ) &&
+			node[ sibling ]
+		) {
+			node = node[ sibling ];
+		}
+	}
+
+	return node;
+}
+
 class BlockList extends Component {
 	constructor( props ) {
 		super( props );
 
 		this.onSelectionStart = this.onSelectionStart.bind( this );
 		this.onSelectionEnd = this.onSelectionEnd.bind( this );
-		this.setBlockRef = this.setBlockRef.bind( this );
-		this.setLastClientY = this.setLastClientY.bind( this );
-		this.onPointerMove = throttle( this.onPointerMove.bind( this ), 100 );
-		// Browser does not fire `*move` event when the pointer position changes
-		// relative to the document, so fire it with the last known position.
-		this.onScroll = () => this.onPointerMove( { clientY: this.lastClientY } );
+		this.setSelection = this.setSelection.bind( this );
+		this.updateNativeSelection = this.updateNativeSelection.bind( this );
 
-		this.lastClientY = 0;
-		this.nodes = {};
+		this.ref = createRef();
 	}
 
-	componentDidMount() {
-		window.addEventListener( 'mousemove', this.setLastClientY );
+	componentDidUpdate() {
+		this.updateNativeSelection();
 	}
 
 	componentWillUnmount() {
-		window.removeEventListener( 'mousemove', this.setLastClientY );
-	}
-
-	setLastClientY( { clientY } ) {
-		this.lastClientY = clientY;
-	}
-
-	setBlockRef( node, clientId ) {
-		if ( node === null ) {
-			delete this.nodes[ clientId ];
-		} else {
-			this.nodes = {
-				...this.nodes,
-				[ clientId ]: node,
-			};
-		}
+		window.removeEventListener( 'mouseup', this.onSelectionEnd );
+		window.cancelAnimationFrame( this.rafId );
 	}
 
 	/**
-	 * Handles a pointer move event to update the extent of the current cursor
-	 * multi-selection.
-	 *
-	 * @param {MouseEvent} event A mousemove event object.
+	 * When the component updates, and there is multi selection, we need to
+	 * select the entire block contents.
 	 */
-	onPointerMove( { clientY } ) {
-		// We don't start multi-selection until the mouse starts moving, so as
-		// to avoid dispatching multi-selection actions on an in-place click.
-		if ( ! this.props.isMultiSelecting ) {
-			this.props.onStartMultiSelect();
-		}
+	updateNativeSelection() {
+		const {
+			hasMultiSelection,
+			blockClientIds,
+			// These must be in the right DOM order.
+			multiSelectedBlockClientIds,
+		} = this.props;
 
-		const blockContentBoundaries = getBlockDOMNode( this.selectionAtStart ).getBoundingClientRect();
-
-		// prevent multi-selection from triggering when the selected block is a float
-		// and the cursor is still between the top and the bottom of the block.
-		if ( clientY >= blockContentBoundaries.top && clientY <= blockContentBoundaries.bottom ) {
+		if ( ! hasMultiSelection ) {
 			return;
 		}
 
-		const y = clientY - blockContentBoundaries.top;
-		const key = findLast( this.coordMapKeys, ( coordY ) => coordY < y );
+		const { length } = multiSelectedBlockClientIds;
+		const start = multiSelectedBlockClientIds[ 0 ];
+		const end = multiSelectedBlockClientIds[ length - 1 ];
+		const startIndex = blockClientIds.indexOf( start );
 
-		this.onSelectionChange( this.coordMap[ key ] );
+		// The selected block is not in this block list.
+		if ( startIndex === -1 ) {
+			return;
+		}
+
+		let startNode = this.ref.current.querySelector(
+			`[data-block="${ start }"]`
+		);
+		let endNode = this.ref.current.querySelector(
+			`[data-block="${ end }"]`
+		);
+
+		const selection = window.getSelection();
+		const range = document.createRange();
+
+		// The most stable way to select the whole block contents is to start
+		// and end at the deepest points.
+		startNode = getDeepestNode( startNode, 'start' );
+		endNode = getDeepestNode( endNode, 'end' );
+
+		range.setStartBefore( startNode );
+		range.setEndAfter( endNode );
+
+		selection.removeAllRanges();
+		selection.addRange( range );
 	}
 
 	/**
@@ -121,73 +142,74 @@ class BlockList extends Component {
 			return;
 		}
 
-		const boundaries = this.nodes[ clientId ].getBoundingClientRect();
+		this.startClientId = clientId;
+		this.props.onStartMultiSelect();
 
-		// Create a clientId to Y coördinate map.
-		const clientIdToCoordMap = mapValues( this.nodes, ( node ) =>
-			node.getBoundingClientRect().top - boundaries.top );
-
-		// Cache a Y coördinate to clientId map for use in `onPointerMove`.
-		this.coordMap = invert( clientIdToCoordMap );
-		// Cache an array of the Y coördinates for use in `onPointerMove`.
-		// Sort the coördinates, as `this.nodes` will not necessarily reflect
-		// the current block sequence.
-		this.coordMapKeys = sortBy( Object.values( clientIdToCoordMap ) );
-		this.selectionAtStart = clientId;
-
-		window.addEventListener( 'mousemove', this.onPointerMove );
-		// Capture scroll on all elements.
-		window.addEventListener( 'scroll', this.onScroll, true );
+		// `onSelectionStart` is called after `mousedown` and `mouseleave`
+		// (from a block). The selection ends when `mouseup` happens anywhere
+		// in the window.
 		window.addEventListener( 'mouseup', this.onSelectionEnd );
+
+		// Removing the contenteditable attributes within the block editor is
+		// essential for selection to work across editable areas. The edible
+		// hosts are removed, allowing selection to be extended outside the
+		// DOM element. `onStartMultiSelect` sets a flag in the store so the
+		// rich text components are updated, but the rerender may happen very
+		// slowly, especially in Safari for the blocks that are asynchonously
+		// rendered. To ensure the browser instantly removes the selection
+		// boundaries, we remove the contenteditable attributes manually.
+		Array.from(
+			this.ref.current.querySelectorAll( '.rich-text' )
+		).forEach( ( node ) => {
+			node.removeAttribute( 'contenteditable' );
+		} );
 	}
 
 	/**
-	 * Handles multi-selection changes in response to pointer move.
-	 *
-	 * @param {string} clientId Client ID of block under cursor in multi-select
-	 *                          drag.
+	 * Handles a mouseup event to end the current mouse multi-selection.
 	 */
-	onSelectionChange( clientId ) {
-		const { onMultiSelect, selectionStart, selectionEnd } = this.props;
-		const { selectionAtStart } = this;
-		const isAtStart = selectionAtStart === clientId;
+	onSelectionEnd() {
+		// Equivalent to attaching the listener once.
+		window.removeEventListener( 'mouseup', this.onSelectionEnd );
 
-		if ( ! selectionAtStart || ! this.props.isSelectionEnabled ) {
+		if ( ! this.props.isMultiSelecting ) {
 			return;
 		}
 
-		// If multi-selecting and cursor extent returns to the start of
-		// selection, cancel multi-select.
-		if ( isAtStart && selectionStart ) {
-			onMultiSelect( null, null );
-		}
-
-		// Expand multi-selection to block under cursor.
-		if ( ! isAtStart && selectionEnd !== clientId ) {
-			onMultiSelect( selectionAtStart, clientId );
-		}
+		// The browser selection won't have updated yet at this point, so wait
+		// until the next animation frame to get the browser selection.
+		this.rafId = window.requestAnimationFrame( this.setSelection );
 	}
 
-	/**
-	 * Handles a mouseup event to end the current cursor multi-selection.
-	 */
-	onSelectionEnd() {
-		// Cancel throttled calls.
-		this.onPointerMove.cancel();
+	setSelection() {
+		const selection = window.getSelection();
 
-		delete this.coordMap;
-		delete this.coordMapKeys;
-		delete this.selectionAtStart;
-
-		window.removeEventListener( 'mousemove', this.onPointerMove );
-		window.removeEventListener( 'scroll', this.onScroll, true );
-		window.removeEventListener( 'mouseup', this.onSelectionEnd );
-
-		// We may or may not be in a multi-selection when mouseup occurs (e.g.
-		// an in-place mouse click), so only trigger stop if multi-selecting.
-		if ( this.props.isMultiSelecting ) {
+		// If no selection is found, end multi selection.
+		if ( ! selection.rangeCount || selection.isCollapsed ) {
 			this.props.onStopMultiSelect();
+			return;
 		}
+
+		let { focusNode } = selection;
+		let clientId;
+
+		// Find the client ID of the block where the selection ends.
+		do {
+			focusNode = focusNode.parentElement;
+		} while (
+			focusNode &&
+			! ( clientId = focusNode.getAttribute( 'data-block' ) )
+		);
+
+		// If the final selection doesn't leave the block, there is no multi
+		// selection.
+		if ( this.startClientId === clientId ) {
+			this.props.onStopMultiSelect();
+			return;
+		}
+
+		this.props.onMultiSelect( this.startClientId, clientId );
+		this.props.onStopMultiSelect();
 	}
 
 	render() {
@@ -202,15 +224,17 @@ class BlockList extends Component {
 			hasMultiSelection,
 			renderAppender,
 			enableAnimation,
+			isMultiSelecting,
 		} = this.props;
 
 		return (
-			<div className={
-				classnames(
+			<div
+				ref={ this.ref }
+				className={ classnames(
 					'editor-block-list__layout block-editor-block-list__layout',
 					className
-				)
-			}>
+				) }
+			>
 				{ blockClientIds.map( ( clientId, index ) => {
 					const isBlockInSelection = hasMultiSelection ?
 						multiSelectedBlockClientIds.includes( clientId ) :
@@ -225,11 +249,10 @@ class BlockList extends Component {
 							<BlockListBlock
 								rootClientId={ rootClientId }
 								clientId={ clientId }
-								blockRef={ this.setBlockRef }
 								onSelectionStart={ this.onSelectionStart }
 								isDraggable={ isDraggable }
 								moverDirection={ moverDirection }
-
+								isMultiSelecting={ isMultiSelecting }
 								// This prop is explicitely computed and passed down
 								// to avoid being impacted by the async mode
 								// otherwise there might be a small delay to trigger the animation.
@@ -244,6 +267,8 @@ class BlockList extends Component {
 					rootClientId={ rootClientId }
 					renderAppender={ renderAppender }
 				/>
+
+				<__experimentalBlockListFooter.Slot />
 			</div>
 		);
 	}

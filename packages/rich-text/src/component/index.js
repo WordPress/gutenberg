@@ -496,6 +496,10 @@ class RichText extends Component {
 			return;
 		}
 
+		if ( this.props.disabled ) {
+			return;
+		}
+
 		// In case of a keyboard event, ignore selection changes during
 		// composition.
 		if (
@@ -1024,6 +1028,7 @@ class RichText extends Component {
 			className,
 			placeholder,
 			forwardedRef,
+			disabled,
 		} = this.props;
 		const ariaProps = pickBy( this.props, ( value, key ) =>
 			startsWith( key, 'aria-' ) );
@@ -1057,8 +1062,9 @@ class RichText extends Component {
 				onKeyUp={ this.onSelectionChange }
 				onMouseUp={ this.onSelectionChange }
 				onTouchEnd={ this.onSelectionChange }
-				contentEditable
-				suppressContentEditableWarning
+				// Do not set the attribute if disabled.
+				contentEditable={ disabled ? undefined : true }
+				suppressContentEditableWarning={ ! disabled }
 			/>
 		);
 	}

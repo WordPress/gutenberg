@@ -388,7 +388,7 @@ dispatch( 'my-shop' ).setPrice( 'hammer', 9.75 );
 
 _Parameters_
 
--   _name_ `string`: Store name
+-   _name_ `string`: Store name.
 
 _Returns_
 
@@ -485,7 +485,7 @@ select( 'my-shop' ).getPrice( 'hammer' );
 
 _Parameters_
 
--   _name_ `string`: Store name
+-   _name_ `string`: Store name.
 
 _Returns_
 
