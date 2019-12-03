@@ -16,14 +16,9 @@ const TextHighlight = ( { text = '', highlight = '' } ) => {
 	}
 
 	const regex = new RegExp( `(${ escapeRegExp( highlight ) })`, 'gi' );
-	const parts = text.split( regex ).filter( ( part ) => part );
-
-	const interpolatedString = parts.map( ( part ) => {
-		return regex.test( part ) ? `<mark>${ part }</mark>` : part;
-	} ).join( '' );
 
 	return __experimentalCreateInterpolateElement(
-		interpolatedString,
+		text.replace( regex, '<mark>$&</mark>' ),
 		{
 			mark: <mark />,
 		}
