@@ -23,7 +23,7 @@ const TILE_SPACING = 15;
 
 // we must limit displayed columns since readable content max-width is 580px
 const MAX_DISPLAYED_COLUMNS = 4;
-const MAX_DISPLAYED_COLUMNS_MOBILE = 2;
+const MAX_DISPLAYED_COLUMNS_NARROW = 2;
 
 export const Gallery = ( props ) => {
 	const [ isCaptionSelected, setIsCaptionSelected ] = useState( false );
@@ -41,7 +41,7 @@ export const Gallery = ( props ) => {
 		onFocusGalleryCaption,
 		attributes,
 		isSelected,
-		isMobile,
+		isNarrow,
 		onFocus,
 	} = props;
 
@@ -51,9 +51,10 @@ export const Gallery = ( props ) => {
 		images,
 	} = attributes;
 
-	// limit displayed columns based on viewport width
-	const displayedColumns = isMobile ?
-		Math.min( columns, MAX_DISPLAYED_COLUMNS_MOBILE ) :
+	// limit displayed columns when isNarrow is true (i.e. when viewport width is
+	// less than "small", where small = 600)
+	const displayedColumns = isNarrow ?
+		Math.min( columns, MAX_DISPLAYED_COLUMNS_NARROW ) :
 		Math.min( columns, MAX_DISPLAYED_COLUMNS );
 
 	const selectImage = ( index ) => {
