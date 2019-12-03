@@ -179,15 +179,6 @@
 		}
 	}
 
-	// Hover style.
-	&.is-hovered:not(.is-navigate-mode) > .block-editor-block-list__block-edit::before {
-		box-shadow: -$block-left-border-width 0 0 0 $dark-opacity-light-500;
-
-		.is-dark-theme & {
-			box-shadow: -$block-left-border-width 0 0 0 $light-opacity-light-400;
-		}
-	}
-
 	// Spotlight mode.
 	&.is-focus-mode:not(.is-multi-selected) {
 		opacity: 0.5;
@@ -451,11 +442,6 @@
 			}
 		}
 
-		// If the block movers are visible, push the breadcrumb down to make room for them.
-		.block-editor-block-mover.is-visible + .block-editor-block-list__breadcrumb {
-			top: (-$block-padding - $block-left-border-width - ($grid-size-small / 2));
-		}
-
 		// Align block toolbar to floated content.
 		// Extra specificity is needed to avoid applying this to innerblocks.
 		@include break-small() {
@@ -486,11 +472,6 @@
 
 	// Full-wide.
 	&[data-align="full"] {
-		// Position hover label on the left for the top level block.
-		> .block-editor-block-list__block-edit > .block-editor-block-list__breadcrumb {
-			left: 0;
-		}
-
 		> .block-editor-block-list__block-edit {
 			margin-left: -$block-padding;
 			margin-right: -$block-padding;
@@ -945,60 +926,24 @@
 
 
 /**
- * Hover label
+ * Block Label for Navigation/Selection Mode
  */
 
 .block-editor-block-list__breadcrumb {
-	position: absolute;
-	line-height: 1;
-	z-index: z-index(".block-editor-block-list__breadcrumb");
+	display: none;
 
-	// Position in the top left of the border.
-	left: -$block-padding - $block-left-border-width;
-	top: (($block-padding * -2) - $block-left-border-width);
-
-	.components-toolbar {
-		border: none;
-		line-height: 1;
-		font-family: $default-font;
-		font-size: 11px;
-		padding: 4px 4px;
-		background: $light-gray-500;
-		color: $dark-gray-900;
-		transition: box-shadow 0.1s linear;
-		@include reduce-motion("transition");
-
-		.components-button {
-			font-size: inherit;
-			line-height: inherit;
-			padding: 0;
-		}
-
-		.is-dark-theme & {
-			background: $dark-gray-600;
-			color: $white;
-		}
-	}
-
-	// Remove negative left breadcrumb position for left aligned blocks.
-	[data-align="left"] & {
-		left: 0;
-	}
-
-	// Right-align the breadcrumb for right-aligned blocks.
-	[data-align="right"] & {
-		left: auto;
-		right: 0;
-	}
-
-	// In navigation mode, this should appear similarly to the block toolbar.
 	.is-navigate-mode & {
+		display: block;
+		position: absolute;
+		line-height: 1;
+		z-index: z-index(".block-editor-block-list__breadcrumb");
 
 		// Position in the top left of the border.
 		left: -$block-padding;
 		top: -$block-toolbar-height - $block-padding;
 
 		.components-toolbar {
+			display: flex;
 			background: $white;
 			border: $border-width solid $blue-medium-focus;
 			border-left: none;
