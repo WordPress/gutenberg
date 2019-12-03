@@ -86,8 +86,16 @@ function ButtonEdit( { attributes, setAttributes, backgroundColor, textColor, is
 		gradientValue,
 	} = __experimentalUseGradient();
 
-	const maxWidth = Dimensions.get( 'window' ).width - 74;
+	// 2 * container padding (32) + 2 * rich text padding (32) + 2 * BLOCK_SPACING (8) + 2 * BORDER_WIDTH = 74
+	// 580 is a max width when screen has horizontal orientation. Value comes from `ReadableContentView` styles.
+	const maxWidth = Math.min( Dimensions.get( 'window' ).width - 74, 580 - 74 );
+	// To achieve proper expanding and shrinking `RichText` on iOS, there is a need to set a `minWidth`
+	// value at least on 1 when `RichText` is focused or when is not focused, but `RichText` value is
+	// different than empty string.
 	const minWidth = isFocused || ( ! isFocused && text !== '' ) ? 1 : 108;
+	// To achieve proper expanding and shrinking `RichText` on Android, there is a need to set
+	// a `placeholder` as an empty string when `RichText` is focused,
+	// because `AztecView` is calculating a `minWidth` based on placeholder text.
 	const placeholderText = isFocused ? '' : ( placeholder || __( 'Add text…' ) );
 
 	return (
