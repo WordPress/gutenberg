@@ -76,8 +76,8 @@ function render_block_navigation( $attributes, $content, $block ) {
  */
 function build_navigation_html( $block, $colors ) {
 	$html = '';
-
-	$class_attribute = sprintf( ' class="%s"', esc_attr( $colors['css_classes'] ? 'wp-block-navigation-item__link ' . $colors['css_classes'] : 'wp-block-navigation-item__link' ) );
+	$css_classes = implode( ' ', $colors['css_classes'] );
+	$class_attribute = sprintf( ' class="%s"', esc_attr( ! empty ( $css_classes ) ? 'wp-block-navigation-item__link ' . $css_classes : 'wp-block-navigation-item__link' ) );
 	$style_attribute = $colors['inline_styles'] ? sprintf( ' style="%s"', esc_attr( $colors['inline_styles'] ) ) : '';
 
 	foreach ( (array) $block['innerBlocks'] as $key => $block ) {
