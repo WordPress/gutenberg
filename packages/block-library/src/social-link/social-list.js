@@ -7,7 +7,7 @@ import {
 	BehanceIcon,
 	ChainIcon,
 	CodepenIcon,
-	DeviantartIcon,
+	DeviantArtIcon,
 	DribbbleIcon,
 	DropboxIcon,
 	EtsyIcon,
@@ -18,10 +18,10 @@ import {
 	FoursquareIcon,
 	GoodreadsIcon,
 	GoogleIcon,
-	GithubIcon,
+	GitHubIcon,
 	InstagramIcon,
 	LastfmIcon,
-	LinkedinIcon,
+	LinkedInIcon,
 	MailIcon,
 	MastodonIcon,
 	MeetupIcon,
@@ -31,7 +31,7 @@ import {
 	RedditIcon,
 	SkypeIcon,
 	SnapchatIcon,
-	SoundcloudIcon,
+	SoundCloudIcon,
 	SpotifyIcon,
 	TumblrIcon,
 	TwitchIcon,
@@ -40,7 +40,7 @@ import {
 	VkIcon,
 	WordPressIcon,
 	YelpIcon,
-	YoutubeIcon,
+	YouTubeIcon,
 } from './icons';
 
 const socialList = {
@@ -70,7 +70,7 @@ const socialList = {
 	},
 	deviantart: {
 		name: 'DeviantArt',
-		icon: DeviantartIcon,
+		icon: DeviantArtIcon,
 	},
 	dribbble: {
 		name: 'Dribbble',
@@ -109,8 +109,8 @@ const socialList = {
 		icon: GoogleIcon,
 	},
 	github: {
-		name: 'Github',
-		icon: GithubIcon,
+		name: 'GitHub',
+		icon: GitHubIcon,
 	},
 	instagram: {
 		name: 'Instagram',
@@ -121,8 +121,8 @@ const socialList = {
 		icon: LastfmIcon,
 	},
 	linkedin: {
-		name: 'Linkedin',
-		icon: LinkedinIcon,
+		name: 'LinkedIn',
+		icon: LinkedInIcon,
 	},
 	mail: {
 		name: 'Mail',
@@ -161,8 +161,8 @@ const socialList = {
 		icon: SnapchatIcon,
 	},
 	soundcloud: {
-		name: 'Soundcloud',
-		icon: SoundcloudIcon,
+		name: 'SoundCloud',
+		icon: SoundCloudIcon,
 	},
 	spotify: {
 		name: 'Spotify',
@@ -198,7 +198,7 @@ const socialList = {
 	},
 	youtube: {
 		name: 'YouTube',
-		icon: YoutubeIcon,
+		icon: YouTubeIcon,
 	},
 };
 
