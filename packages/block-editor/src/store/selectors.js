@@ -427,7 +427,7 @@ export function getBlockRootClientId( state, clientId ) {
  *
  * @param {Object} state    Editor state.
  * @param {string} clientId Block from which to find root client ID.
- * @param {boolean} ascending Get parent hierarchy in top-most hierarchy first (false) or reversed (true).
+ * @param {boolean} ascending Order results from bottom to top (true) or top to bottom (false).
  *
  * @return {Array} ClientIDs of the parent blocks.
  */
