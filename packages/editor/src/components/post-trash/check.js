@@ -3,8 +3,8 @@
  */
 import { withSelect } from '@wordpress/data';
 
-function PostTrashCheck( { isNew, postId, children } ) {
-	if ( isNew || ! postId ) {
+function PostTrashCheck( { canUserTrash, isNew, postId, children } ) {
+	if ( ! canUserTrash || isNew || ! postId ) {
 		return null;
 	}
 
@@ -13,8 +13,12 @@ function PostTrashCheck( { isNew, postId, children } ) {
 
 export default withSelect( ( select ) => {
 	const { isEditedPostNew, getCurrentPostId } = select( 'core/editor' );
+	const { canUser } = select( 'core' );
+	const postId = getCurrentPostId();
+
 	return {
 		isNew: isEditedPostNew(),
-		postId: getCurrentPostId(),
+		canUserTrash: !! postId && canUser( 'delete', 'posts', postId ),
+		postId,
 	};
 } )( PostTrashCheck );
