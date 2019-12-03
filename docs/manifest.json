@@ -960,6 +960,12 @@
 		"parent": "themes"
 	},
 	{
+		"title": "Block-based themes (Experimental)",
+		"slug": "block-based-themes",
+		"markdown_source": "../docs/designers-developers/developers/themes/block-based-themes.md",
+		"parent": "themes"
+	},
+	{
 		"title": "Backward Compatibility",
 		"slug": "backward-compatibility",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/backward-compatibility/README.md",
