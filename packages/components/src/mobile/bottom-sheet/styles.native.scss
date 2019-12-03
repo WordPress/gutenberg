@@ -6,7 +6,14 @@
 	background-color: $light-gray-400;
 	width: 32px;
 	text-align: center;
-	margin: 4px;
+	margin: 1px;
+}
+
+.sizeButtonsCell {
+	margin-right: 12px;
+	text-align: right;
+	flex: 1;
+	color: #87a6bc;
 }
 
 .bottomModal {

@@ -3,6 +3,7 @@
  */
 import Cell from './cell';
 import BottomSheetButton from './button';
+import styles from './styles.scss';
 
 export default function BottomSheetButtonPickerCell( props ) {
 	const {
@@ -15,9 +16,9 @@ export default function BottomSheetButtonPickerCell( props ) {
 	};
 
 	return (
-		<Cell editable={ false } { ...cellProps } >
+		<Cell valueStyle={ styles.sizeButtonsCell } editable={ false } { ...cellProps } >
 			<BottomSheetButton
-				text={ 'T' }
+				text={ 'S' }
 				onPress={ () => onChange( 'thumbnail' ) }
 			/>
 			<BottomSheetButton
