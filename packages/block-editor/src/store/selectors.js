@@ -466,7 +466,7 @@ export function getBlockHierarchyRootClientId( state, clientId ) {
 }
 
 /**
- * Given a block client ID, returns the common ancestor with selected client ID.
+ * Given a block client ID, returns the lowest common ancestor with selected client ID.
  *
  * @param {Object} state    Editor state.
  * @param {string} clientId Block from which to find common ancestor client ID.
