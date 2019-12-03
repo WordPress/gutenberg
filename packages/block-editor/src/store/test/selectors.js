@@ -2351,7 +2351,7 @@ describe( 'selectors', () => {
 				'': [ 'a', 'b' ],
 				a: [ 'c', 'd' ],
 				d: [ 'e' ],
-				f: [ 'b' ],
+				b: [ 'f' ],
 			},
 			parents: {
 				a: '',
