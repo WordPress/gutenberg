@@ -1,9 +1,9 @@
 /**
  * External dependencies
  */
-const { VerboseReporter, DefaultReporter } = require( '@jest/reporters' );
+const { VerboseReporter } = require( '@jest/reporters' );
 
-class TravisFoldPassesReporter extends VerboseReporter {
+module.exports = class TravisFoldPassesReporter extends VerboseReporter {
 	constructor( ...args ) {
 		super( ...args );
 		this.foldedTestResults = [];
@@ -39,16 +39,4 @@ class TravisFoldPassesReporter extends VerboseReporter {
 		this.flushFoldedTestResults();
 		super.onRunComplete( ...args );
 	}
-}
-
-module.exports =
-	'TRAVIS' in process.env && 'CI' in process.env ?
-		TravisFoldPassesReporter :
-		class VerboseOrDefaultReporter {
-			constructor( globalConfig, ...args ) {
-				return new ( globalConfig.verbose ? VerboseReporter : DefaultReporter )(
-					globalConfig,
-					...args
-				);
-			}
-		};
+};
