@@ -94,7 +94,7 @@ export class PostPreviewButton extends Component {
 
 		// Open up a Preview tab if needed. This is where we'll show the preview.
 		if ( ! this.previewWindow || this.previewWindow.closed ) {
-			this.previewWindow = window.open( '', this.getWindowTarget() );
+			this.previewWindow = window.open( '', '_blank' );
 		}
 
 		// Focus the Preview tab. This might not do anything, depending on the browser's
