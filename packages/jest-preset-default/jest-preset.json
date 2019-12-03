@@ -27,5 +27,6 @@
 	"transform": {
 		"^.+\\.[jt]sx?$": "<rootDir>/node_modules/babel-jest"
 	},
-	"verbose": true
+	"verbose": true,
+	"reporters": [ "../../../@wordpress/jest-preset-default/scripts/travis-fold-passes-reporter.js" ]
 }
