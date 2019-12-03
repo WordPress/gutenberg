@@ -1,6 +1,7 @@
 1.19.0
 ------
 * [iOS] Fix crash dismissing bottom-sheet after device rotation.
+* Make inserter to show options on long-press to add before/after
 
 1.18.0
 ------
