@@ -65,6 +65,11 @@ function FontSizePicker( {
 		onChange( selectedItem.style && selectedItem.style.fontSize );
 	};
 
+	const onSliderChangeValue = ( sliderValue ) => {
+		onChange( sliderValue );
+		setCurrentSelectValue( getSelectValueFromFontSize( fontSizes, sliderValue ) );
+	};
+
 	const items = getSelectOptions( fontSizes, disableCustomFontSizes );
 	const rangeControlNumberId = `components-range-control__number#${ instanceId }`;
 	return (
@@ -115,7 +120,7 @@ function FontSizePicker( {
 					label={ __( 'Custom Size' ) }
 					value={ value || '' }
 					initialPosition={ fallbackFontSize }
-					onChange={ onChange }
+					onChange={ onSliderChangeValue }
 					min={ 12 }
 					max={ 100 }
 					beforeIcon="editor-textcolor"
