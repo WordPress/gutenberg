@@ -7,7 +7,7 @@ import { escapeRegExp } from 'lodash';
  * WordPress dependencies
  */
 import {
-	Fragment,
+	__experimentalCreateInterpolateElement,
 } from '@wordpress/element';
 
 const TextHighlight = ( { text = '', highlight = '' } ) => {
@@ -16,13 +16,18 @@ const TextHighlight = ( { text = '', highlight = '' } ) => {
 	}
 
 	const regex = new RegExp( `(${ escapeRegExp( highlight ) })`, 'gi' );
-	const parts = text.split( regex );
-	return (
-		<Fragment>
-			{ parts.filter( ( part ) => part ).map( ( part, i ) => (
-				regex.test( part ) ? <mark key={ i }>{ part }</mark> : <span key={ i }>{ part }</span>
-			) ) }
-		</Fragment>
+	const parts = text.split( regex ).filter( ( part ) => part );
+
+	const interpolatedString = parts.map( ( part ) => {
+		return regex.test( part ) ? `<mark>${ part }</mark>` : `<span>${ part }</span>`;
+	} ).join( '' );
+
+	return __experimentalCreateInterpolateElement(
+		interpolatedString,
+		{
+			mark: <mark />,
+			span: <span />,
+		}
 	);
 };
 
