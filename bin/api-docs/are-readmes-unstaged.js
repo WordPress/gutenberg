@@ -31,7 +31,7 @@ if ( unstagedReadmes.length > 0 ) {
 		'\n',
 		'Some API docs may be out of date:',
 		unstagedReadmes.toString(),
-		'Either staged them or continue with --no-verify.',
+		'Either stage them or continue with --no-verify.',
 		'\n'
 	) );
 }
