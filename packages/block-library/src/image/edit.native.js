@@ -226,6 +226,9 @@ export class ImageEdit extends React.Component {
 
 		const url = getUrlForSlug( image, { sizeSlug } );
 		if ( ! url ) {
+			this.props.setAttributes( {
+				sizeSlug,
+			} );
 			return null;
 		}
 

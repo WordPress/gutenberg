@@ -1,5 +1,14 @@
 //Bottom Sheet
 
+.buttonText {
+	font-size: 17px;
+	color: #7b9ab1;
+	background-color: $light-gray-400;
+	width: 32px;
+	text-align: center;
+	margin: 4px;
+}
+
 .bottomModal {
 	justify-content: flex-end;
 	margin: 0;
