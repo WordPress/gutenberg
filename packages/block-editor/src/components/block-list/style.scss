@@ -127,7 +127,6 @@
 
 	// Selected style.
 	&.is-selected {
-
 		> .block-editor-block-list__block-edit::before {
 			// Use opacity to work in various editor styles.
 			border-color: $dark-opacity-light-800;
@@ -158,6 +157,28 @@
 		}
 	}
 
+	// Selected style.
+	&.is-multi-selected {
+		> .block-editor-block-list__block-edit::before {
+			border-left-color: $dark-opacity-light-800;
+			box-shadow: inset $block-left-border-width 0 0 0 $dark-gray-500;
+
+			.is-dark-theme & {
+				border-left-color: $light-opacity-light-800;
+				box-shadow: inset $block-left-border-width 0 0 0 $light-gray-600;
+			}
+
+			// Switch to outset borders on larger screens.
+			@include break-small() {
+				box-shadow: -$block-left-border-width 0 0 0 $dark-gray-500;
+
+				.is-dark-theme & {
+					box-shadow: -$block-left-border-width 0 0 0 $light-gray-600;
+				}
+			}
+		}
+	}
+
 	// Hover style.
 	&.is-hovered:not(.is-navigate-mode) > .block-editor-block-list__block-edit::before {
 		box-shadow: -$block-left-border-width 0 0 0 $dark-opacity-light-500;
@@ -178,105 +199,11 @@
 			opacity: 1;
 		}
 	}
-
-	// Add extra border to parent blocks when their children are selected.
-	&.has-child-selected {
-
-		> .block-editor-block-list__block-edit::before {
-			border: $border-width dashed $dark-opacity-light-600;
-
-			.is-dark-theme & {
-				border-color: $light-opacity-light-500;
-			}
-		}
-
-		> .block-editor-block-list__block-edit > [data-block] > div > .block-editor-inner-blocks > .block-editor-block-list__layout > .block-editor-block-list__block:not(.is-selected) > .block-editor-block-list__block-edit::before,
-		> .block-editor-block-list__block-edit > [data-block] > div > .wp-block-cover__inner-container > .block-editor-inner-blocks > .block-editor-block-list__layout > .block-editor-block-list__block:not(.is-selected) > .block-editor-block-list__block-edit::before,
-		> .block-editor-block-list__block-edit > [data-block] > div > .wp-block-group__inner-container > .block-editor-inner-blocks > .block-editor-block-list__layout > .block-editor-block-list__block:not(.is-selected) > .block-editor-block-list__block-edit::before {
-			border: $border-width dashed $dark-opacity-light-600;
-
-			.is-dark-theme & {
-				border-color: $light-opacity-light-500;
-			}
-		}
-
-		&.is-hovered > .block-editor-block-list__block-edit::before,
-		> .block-editor-block-list__block-edit > [data-block] > div > .block-editor-inner-blocks > .block-editor-block-list__layout > .block-editor-block-list__block.is-hovered:not(.is-selected) > .block-editor-block-list__block-edit::before,
-		> .block-editor-block-list__block-edit > [data-block] > div > .wp-block-cover__inner-container > .block-editor-inner-blocks > .block-editor-block-list__layout > .block-editor-block-list__block.is-hovered:not(.is-selected) > .block-editor-block-list__block-edit::before,
-		> .block-editor-block-list__block-edit > [data-block] > div > .wp-block-group__inner-container > .block-editor-inner-blocks > .block-editor-block-list__layout > .block-editor-block-list__block.is-hovered:not(.is-selected) > .block-editor-block-list__block-edit::before {
-			border-style: solid;
-			border-color: $dark-opacity-light-500;
-			border-left-color: transparent;
-
-			.is-dark-theme & {
-				border-color: $light-opacity-light-400;
-				border-left-color: transparent;
-			}
-		}
-	}
-
-	// Add extra border to child blocks when they are selected.
-	&.is-selected {
-
-		> .block-editor-block-list__block-edit > [data-block] > div > .block-editor-inner-blocks > .block-editor-block-list__layout > .block-editor-block-list__block:not(.is-selected),
-		> .block-editor-block-list__block-edit > [data-block] > div > .wp-block-cover__inner-container > .block-editor-inner-blocks > .block-editor-block-list__layout > .block-editor-block-list__block:not(.is-selected),
-		> .block-editor-block-list__block-edit > [data-block] > div > .wp-block-group__inner-container > .block-editor-inner-blocks > .block-editor-block-list__layout > .block-editor-block-list__block:not(.is-selected) {
-
-			> .block-editor-block-list__block-edit::before {
-				border: $border-width dashed $dark-opacity-light-600;
-
-				.is-dark-theme & {
-					border-color: $light-opacity-light-500;
-				}
-			}
-
-			&.is-hovered > .block-editor-block-list__block-edit::before {
-				border-style: solid;
-				border-color: $dark-opacity-light-500;
-				border-left-color: transparent;
-
-				.is-dark-theme & {
-					border-color: $light-opacity-light-400;
-					border-left-color: transparent;
-				}
-			}
-		}
-	}
 }
 
 /**
  * Cross-block selection
  */
-
-.block-editor-block-list__layout .block-editor-block-list__block {
-	::-moz-selection {
-		background-color: $blue-medium-highlight;
-	}
-
-	::selection {
-		background-color: $blue-medium-highlight;
-	}
-
-	// Selection style for multiple blocks.
-	&.is-multi-selected *::selection {
-		background-color: transparent;
-	}
-
-	&.is-multi-selected .block-editor-block-list__block-edit::before {
-		background: $blue-medium-highlight;
-
-		// Use opacity to work in various editor styles.
-		mix-blend-mode: multiply;
-
-		// Collapse extra vertical padding on selection.
-		top: -$block-padding;
-		bottom: -$block-padding;
-
-		.is-dark-theme & {
-			mix-blend-mode: soft-light;
-		}
-	}
-}
 
 
 /**

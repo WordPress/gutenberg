@@ -235,6 +235,7 @@ class Typewriter extends Component {
 				onKeyUp={ this.maintainCaretPosition }
 				onMouseDown={ this.addSelectionChangeListener }
 				onTouchStart={ this.addSelectionChangeListener }
+				className="block-editor__typewriter"
 			>
 				{ this.props.children }
 			</div>

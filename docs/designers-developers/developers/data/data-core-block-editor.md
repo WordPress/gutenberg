@@ -197,7 +197,7 @@ _Parameters_
 
 -   _state_ `Object`: Editor state.
 -   _clientId_ `string`: Block from which to find root client ID.
--   _ascending_ `boolean`: Get parent hierarchy in top-most hierarchy first (false) or reversed (true).
+-   _ascending_ `boolean`: Order results from bottom to top (true) or top to bottom (false).
 
 _Returns_
 
@@ -393,7 +393,7 @@ _Returns_
 
 <a name="getLowestCommonAncestorWithSelectedBlock" href="#getLowestCommonAncestorWithSelectedBlock">#</a> **getLowestCommonAncestorWithSelectedBlock**
 
-Given a block client ID, returns the common ancestor with selected client ID.
+Given a block client ID, returns the lowest common ancestor with selected client ID.
 
 _Parameters_
 
@@ -1155,15 +1155,11 @@ _Parameters_
 
 <a name="setNavigationMode" href="#setNavigationMode">#</a> **setNavigationMode**
 
-Returns an action object used to enable or disable the navigation mode.
+Generators that triggers an action used to enable or disable the navigation mode.
 
 _Parameters_
 
 -   _isNavigationMode_ `string`: Enable/Disable navigation mode.
-
-_Returns_
-
--   `Object`: Action object
 
 <a name="setTemplateValidity" href="#setTemplateValidity">#</a> **setTemplateValidity**
 
