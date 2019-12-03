@@ -30,7 +30,7 @@ function build_css_colors( $attributes ) {
 
 	if ( $has_named_text_color ) {
 		// Add the color class.
-		$colors['css_classes'][] = sprintf( ' has-%s-color', $attributes['textColor'] );
+		$colors['css_classes'][] = sprintf( 'has-%s-color', $attributes['textColor'] );
 	} elseif ( $has_custom_text_color ) {
 		// Add the custom color inline style.
 		$colors['inline_styles'] = sprintf( 'color: %s;', $attributes['customTextColor'] );
@@ -77,7 +77,7 @@ function render_block_navigation( $attributes, $content, $block ) {
 function build_navigation_html( $block, $colors ) {
 	$html = '';
 	$css_classes = implode( ' ', $colors['css_classes'] );
-	$class_attribute = sprintf( ' class="%s"', esc_attr( ! empty ( $css_classes ) ? 'wp-block-navigation-item__link ' . $css_classes : 'wp-block-navigation-item__link' ) );
+	$class_attribute = sprintf( ' class="%s"', esc_attr( ! empty( $css_classes ) ? 'wp-block-navigation-item__link ' . $css_classes : 'wp-block-navigation-item__link' ) );
 	$style_attribute = $colors['inline_styles'] ? sprintf( ' style="%s"', esc_attr( $colors['inline_styles'] ) ) : '';
 
 	foreach ( (array) $block['innerBlocks'] as $key => $block ) {
