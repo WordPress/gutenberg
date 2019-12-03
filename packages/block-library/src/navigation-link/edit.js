@@ -18,9 +18,9 @@ import {
 	SVG,
 	TextareaControl,
 	TextControl,
-	Toolbar,
 	ToggleControl,
 	ToolbarButton,
+	ToolbarGroup,
 } from '@wordpress/components';
 import {
 	LEFT,
@@ -136,7 +136,7 @@ function NavigationLinkEdit( {
 	return (
 		<Fragment>
 			<BlockControls>
-				<Toolbar>
+				<ToolbarGroup>
 					<KeyboardShortcuts
 						bindGlobal
 						shortcuts={ {
@@ -156,19 +156,12 @@ function NavigationLinkEdit( {
 						title={ __( 'Add Submenu' ) }
 						onClick={ insertLinkBlock }
 					/>
-				</Toolbar>
+				</ToolbarGroup>
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody
 					title={ __( 'Link Settings' ) }
 				>
-					<ToggleControl
-						checked={ opensInNewTab }
-						onChange={ ( newTab ) => {
-							setAttributes( { opensInNewTab: newTab } );
-						} }
-						label={ __( 'Open in new tab' ) }
-					/>
 					<TextareaControl
 						value={ description || '' }
 						onChange={ ( descriptionValue ) => {
@@ -236,7 +229,7 @@ function NavigationLinkEdit( {
 							currentSettings={ [
 								{
 									id: 'opensInNewTab',
-									title: __( 'Open in New Tab' ),
+									title: __( 'Open in new tab' ),
 									checked: opensInNewTab,
 								},
 							] }

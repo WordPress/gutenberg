@@ -3,11 +3,10 @@
  */
 import { Path, SVG, TextControl, Popover, IconButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { Component, useMemo } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { insertObject } from '@wordpress/rich-text';
 import { MediaUpload, RichTextToolbarButton, MediaUploadCheck } from '@wordpress/block-editor';
 import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
-import { computeCaretRect } from '@wordpress/dom';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
@@ -16,16 +15,10 @@ const title = __( 'Inline image' );
 
 const stopKeyPropagation = ( event ) => event.stopPropagation();
 
-const PopoverAtImage = ( { dependencies, ...props } ) => {
-	return (
-		<Popover
-			position="bottom center"
-			focusOnMount={ false }
-			anchorRect={ useMemo( () => computeCaretRect(), dependencies ) }
-			{ ...props }
-		/>
-	);
-};
+function getRange() {
+	const selection = window.getSelection();
+	return selection.rangeCount ? selection.getRangeAt( 0 ) : null;
+}
 
 export const image = {
 	name,
@@ -93,7 +86,6 @@ export const image = {
 
 		render() {
 			const { value, onChange, isObjectActive, activeObjectAttributes } = this.props;
-			const { style } = activeObjectAttributes;
 
 			return (
 				<MediaUploadCheck>
@@ -124,10 +116,10 @@ export const image = {
 						} }
 					/> }
 					{ isObjectActive &&
-						<PopoverAtImage
-							// Reposition Popover when the selection changes or
-							// when the width changes.
-							dependencies={ [ style, value.start ] }
+						<Popover
+							position="bottom center"
+							focusOnMount={ false }
+							anchorRef={ getRange() }
 						>
 							{ // Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
 							/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */ }
@@ -165,7 +157,7 @@ export const image = {
 								<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
 							</form>
 							{ /* eslint-enable jsx-a11y/no-noninteractive-element-interactions */ }
-						</PopoverAtImage>
+						</Popover>
 					}
 				</MediaUploadCheck>
 			);

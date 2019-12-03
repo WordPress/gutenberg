@@ -14,7 +14,11 @@ import {
 	PostPublishPanel,
 } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { BlockBreadcrumb } from '@wordpress/block-editor';
+import {
+	BlockBreadcrumb,
+	__experimentalPageTemplatePicker,
+	__experimentalUsePageTemplatePickerVisible,
+} from '@wordpress/block-editor';
 import {
 	Button,
 	ScrollLock,
@@ -43,6 +47,7 @@ import Sidebar from '../sidebar';
 import MetaBoxes from '../meta-boxes';
 import PluginPostPublishPanel from '../sidebar/plugin-post-publish-panel';
 import PluginPrePublishPanel from '../sidebar/plugin-pre-publish-panel';
+import WelcomeGuide from '../welcome-guide';
 
 function Layout( { isMobileViewport } ) {
 	const { closePublishSidebar, togglePublishSidebar } = useDispatch( 'core/edit-post' );
@@ -67,6 +72,7 @@ function Layout( { isMobileViewport } ) {
 			isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
 		} );
 	} );
+	const showPageTemplatePicker = __experimentalUsePageTemplatePickerVisible();
 	const sidebarIsOpened = editorSidebarOpened || pluginSidebarOpened || publishSidebarOpened;
 	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
 		'is-sidebar-opened': sidebarIsOpened,
@@ -82,11 +88,6 @@ function Layout( { isMobileViewport } ) {
 			<AutosaveMonitor />
 			<LocalAutosaveMonitor />
 			<EditorModeKeyboardShortcuts />
-			<ManageBlocksModal />
-			<OptionsModal />
-			<KeyboardShortcutHelpModal />
-			<Popover.Slot />
-			<PluginArea />
 			<FocusReturnProvider className={ className }>
 				<EditorRegions
 					className={ className }
@@ -128,7 +129,6 @@ function Layout( { isMobileViewport } ) {
 						<div className="edit-post-toggle-publish-panel">
 							<Button
 								isDefault
-								type="button"
 								className="edit-post-toggle-publish-panel__button"
 								onClick={ togglePublishSidebar }
 								aria-expanded={ false }
@@ -138,6 +138,13 @@ function Layout( { isMobileViewport } ) {
 						</div>
 					) }
 				/>
+				<ManageBlocksModal />
+				<OptionsModal />
+				<KeyboardShortcutHelpModal />
+				<WelcomeGuide />
+				<Popover.Slot />
+				<PluginArea />
+				{ showPageTemplatePicker && <__experimentalPageTemplatePicker /> }
 			</FocusReturnProvider>
 
 		</>

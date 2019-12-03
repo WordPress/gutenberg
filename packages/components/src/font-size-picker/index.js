@@ -4,13 +4,14 @@
  */
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { withInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import Button from '../button';
 import RangeControl from '../range-control';
-import SelectControl from '../select-control';
+import CustomSelect from '../custom-select';
 
 function getSelectValueFromFontSize( fontSizes, value ) {
 	if ( value ) {
@@ -22,8 +23,12 @@ function getSelectValueFromFontSize( fontSizes, value ) {
 
 function getSelectOptions( optionsArray ) {
 	return [
-		...optionsArray.map( ( option ) => ( { value: option.slug, label: option.name } ) ),
-		{ value: 'custom', label: __( 'Custom' ) },
+		...optionsArray.map( ( option ) => ( {
+			key: option.slug,
+			name: option.name,
+			style: { fontSize: option.size },
+		} ) ),
+		{ key: 'custom', name: __( 'Custom' ) },
 	];
 }
 
@@ -34,6 +39,7 @@ function FontSizePicker( {
 	onChange,
 	value,
 	withSlider = false,
+	instanceId,
 } ) {
 	const [ currentSelectValue, setCurrentSelectValue ] = useState( getSelectValueFromFontSize( fontSizes, value ) );
 
@@ -51,42 +57,43 @@ function FontSizePicker( {
 		onChange( Number( newValue ) );
 	};
 
-	const onSelectChangeValue = ( eventValue ) => {
-		setCurrentSelectValue( eventValue );
-		const selectedFont = fontSizes.find( ( font ) => font.slug === eventValue );
-		if ( selectedFont ) {
-			onChange( selectedFont.size );
-		}
+	const onSelectChangeValue = ( { selectedItem } ) => {
+		setCurrentSelectValue( selectedItem.key );
+		onChange( selectedItem.style && selectedItem.style.fontSize );
 	};
 
+	const items = getSelectOptions( fontSizes );
+	const rangeControlNumberId = `components-range-control__number#${ instanceId }`;
 	return (
 		<fieldset className="components-font-size-picker">
-			<legend>
+			<legend className="screen-reader-text">
 				{ __( 'Font Size' ) }
 			</legend>
 			<div className="components-font-size-picker__controls">
 				{ ( fontSizes.length > 0 ) &&
-					<SelectControl
+					<CustomSelect
 						className={ 'components-font-size-picker__select' }
-						label={ 'Choose preset' }
-						hideLabelFromVision={ true }
-						value={ currentSelectValue }
-						onChange={ onSelectChangeValue }
-						options={ getSelectOptions( fontSizes ) }
+						label={ __( 'Preset Size' ) }
+						items={ items }
+						selectedItem={ items.find( ( item ) => item.key === currentSelectValue ) || items[ 0 ] }
+						onSelectedItemChange={ onSelectChangeValue }
 					/>
 				}
 				{ ( ! withSlider && ! disableCustomFontSizes ) &&
-					<input
-						className="components-range-control__number"
-						type="number"
-						onChange={ onChangeValue }
-						aria-label={ __( 'Custom' ) }
-						value={ value || '' }
-					/>
+					<div className="components-range-control__number-container">
+						<label htmlFor={ rangeControlNumberId }>{ __( 'Custom' ) }</label>
+						<input
+							id={ rangeControlNumberId }
+							className="components-range-control__number"
+							type="number"
+							onChange={ onChangeValue }
+							aria-label={ __( 'Custom' ) }
+							value={ value || '' }
+						/>
+					</div>
 				}
 				<Button
 					className="components-color-palette__clear"
-					type="button"
 					disabled={ value === undefined }
 					onClick={ () => {
 						onChange( undefined );
@@ -115,4 +122,4 @@ function FontSizePicker( {
 	);
 }
 
-export default FontSizePicker;
+export default withInstanceId( FontSizePicker );

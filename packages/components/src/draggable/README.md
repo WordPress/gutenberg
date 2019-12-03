@@ -51,16 +51,17 @@ const MyDraggable = () => (
 					elementId="draggable-panel"
 					transferData={ { } }
 				>
-				{
-					( { onDraggableStart, onDraggableEnd } ) => (
-						<Dashicon
-							icon="move"
-							onDragStart={ onDraggableStart }
-							onDragEnd={ onDraggableEnd }
-							draggable
-						/>
-					)
-				}
+					{
+						( { onDraggableStart, onDraggableEnd } ) => (
+							<div className="example-drag-handle" draggable>
+								<Dashicon
+									icon="move"
+									onDragStart={ onDraggableStart }
+									onDragEnd={ onDraggableEnd }
+								/>
+							</div>
+						)
+					}
 				</Draggable>
 			</PanelBody>
 		</Panel>
@@ -83,16 +84,17 @@ const MyDraggable = ( { onDragStart, onDragEnd } ) => (
 					onDragStart={ onDragStart }
 					onDragEnd={ onDragEnd }
 				>
-				{
-					( { onDraggableStart, onDraggableEnd } ) => (
-						<Dashicon
-							icon="move"
-							onDragStart={ onDraggableStart }
-							onDragEnd={ onDraggableEnd }
-							draggable
-						/>
-					)
-				}
+					{
+						( { onDraggableStart, onDraggableEnd } ) => (
+							<div className="example-drag-handle" draggable>
+								<Dashicon
+									icon="move"
+									onDragStart={ onDraggableStart }
+									onDragEnd={ onDraggableEnd }
+								/>
+							</div>
+						)
+					}
 				</Draggable>
 			</PanelBody>
 		</Panel>

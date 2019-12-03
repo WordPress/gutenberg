@@ -342,6 +342,19 @@ test( 'should contain mars if planets is true', () => {
 
 It's tempting to snapshot deep renders, but that makes for huge snapshots. Additionally, deep renders no longer test a single component, but an entire tree. With `shallow`, we snapshot just the components that are directly rendered by the component we want to test.
 
+### StoryShots
+
+> [StoryShots](https://www.npmjs.com/package/@storybook/addon-storyshots) adds automatic Jest Snapshot Testing for [Storybook](https://storybook.js.org/).
+
+Whenever a new story is added to Storybook, `npm run test-unit` needs to be executed to generate the corresponding snapshots. In the case when the existing story gets updated or removed, please refer to [Working with snapshots](#working-with-snapshots) section.
+
+#### Troubleshooting
+
+Sometimes we need to mock refs for some stories which use them. Check the following documents to learn more:
+- Why we need to use [Mocking Refs for Snapshot Testing](https://reactjs.org/blog/2016/11/16/react-v15.4.0.html#mocking-refs-for-snapshot-testing) with React.
+- [Using createNodeMock to mock refs](https://github.com/storybookjs/storybook/tree/master/addons/storyshots/storyshots-core#using-createnodemock-to-mock-refs) with StoryShots.
+
+In that case, you might see test failures and `TypeError` reported by Jest in the lines which try to access a property from `ref.current`. If this happens, search for `initStoryshots` method call, which contains all necessary configurations to adjust.
 ## Native mobile testing
 
 Part of the unit-tests suite is a set of Jest tests run exercise native-mobile codepaths, developed in React Native. Since those tests run on Node, they can be launched locally on your development machine without the need for specific native Android or iOS dev tools or SDKs. It also means that they can be debugged using typical dev tools. Read on for instructions how to debug.

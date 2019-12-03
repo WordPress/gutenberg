@@ -4,6 +4,11 @@
 import classnames from 'classnames';
 
 /**
+ * WordPress dependencies
+ */
+import { Button } from '@wordpress/components';
+
+/**
  * Internal dependencies
  */
 import BlockIcon from '../block-icon';
@@ -23,7 +28,7 @@ function InserterListItem( {
 
 	return (
 		<li className="editor-block-types-list__list-item block-editor-block-types-list__list-item">
-			<button
+			<Button
 				className={
 					classnames(
 						'editor-block-types-list__item block-editor-block-types-list__item',
@@ -46,7 +51,7 @@ function InserterListItem( {
 				<span className="editor-block-types-list__item-title block-editor-block-types-list__item-title">
 					{ title }
 				</span>
-			</button>
+			</Button>
 		</li>
 	);
 }

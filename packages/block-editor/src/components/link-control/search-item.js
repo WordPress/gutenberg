@@ -13,14 +13,14 @@ import TextHighlight from './text-highlight';
  */
 import { safeDecodeURI } from '@wordpress/url';
 import { __ } from '@wordpress/i18n';
-
 import {
+	Button,
 	Icon,
 } from '@wordpress/components';
 
 export const LinkControlSearchItem = ( { itemProps, suggestion, isSelected = false, onClick, isURL = false, searchTerm = '' } ) => {
 	return (
-		<button
+		<Button
 			{ ...itemProps }
 			onClick={ onClick }
 			className={ classnames( 'block-editor-link-control__search-item', {
@@ -46,7 +46,7 @@ export const LinkControlSearchItem = ( { itemProps, suggestion, isSelected = fal
 			{ suggestion.type && (
 				<span className="block-editor-link-control__search-item-type">{ suggestion.type }</span>
 			) }
-		</button>
+		</Button>
 	);
 };
 
