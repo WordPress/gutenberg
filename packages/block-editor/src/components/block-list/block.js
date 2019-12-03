@@ -289,7 +289,7 @@ function BlockListBlock( {
 	 * (via `setFocus`), typically if there is no focusable input in the block.
 	 */
 	const onFocus = () => {
-		if ( ! isSelected && ! isPartOfMultiSelection ) {
+		if ( ! isSelected && ! isParentOfSelectedBlock && ! isPartOfMultiSelection ) {
 			onSelect();
 		}
 	};
