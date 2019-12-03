@@ -3264,6 +3264,16 @@ exports[`Storyshots Components|TabPanel Default 1`] = `
 </div>
 `;
 
+exports[`Storyshots Components|TextHighlight Default 1`] = `
+Array [
+  "We call the new editor ",
+  <mark>
+    Gutenberg
+  </mark>,
+  ". The entire editing experience has been rebuilt for media rich pages and posts.",
+]
+`;
+
 exports[`Storyshots Components|Tip Default 1`] = `
 <div
   className="components-tip"

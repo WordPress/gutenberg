@@ -966,6 +966,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "TextHighlight",
+		"slug": "text-highlight",
+		"markdown_source": "../packages/components/src/text-highlight/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "TextareaControl",
 		"slug": "textarea-control",
 		"markdown_source": "../packages/components/src/textarea-control/README.md",
