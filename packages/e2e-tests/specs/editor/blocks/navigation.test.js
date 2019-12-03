@@ -13,21 +13,16 @@ describe( 'Adds Navigation links', () => {
 	} );
 
 	it( 'Should add a link with one click', async () => {
-		const navigationAppender = '.wp-block-navigation .block-list-appender';
-		const emptyOption = '.wp-block-navigation-placeholder__button.is-link';
-		const linkInput = '.block-editor-link-control__search-input';
-		const navigationLink = '.wp-block-navigation-link';
-
 		await insertBlock( 'Navigation' );
+		const [ createEmptyButton ] = await page.$x( '//button[text()="Create empty"]' );
+		await createEmptyButton.click();
+		await page.waitForSelector( 'input[placeholder="Search or type url"]' );
+		await page.type( 'input[placeholder="Search or type url"]', 'http://example.com' );
 
-		await page.waitForSelector( emptyOption );
-		await page.click( emptyOption );
-		await page.waitForSelector( linkInput );
-		await page.type( linkInput, 'http://example.com' );
 		await page.keyboard.press( 'Enter' );
-		await page.click( navigationAppender );
+		await page.click( '.wp-block-navigation .block-list-appender' );
 
-		const navigationLinkCount = await page.$$eval( navigationLink, ( navigationLinks ) => navigationLinks.length );
+		const navigationLinkCount = await page.$$eval( '.wp-block-navigation-link', ( navigationLinks ) => navigationLinks.length );
 
 		expect( navigationLinkCount ).toBe( 2 );
 	} );
