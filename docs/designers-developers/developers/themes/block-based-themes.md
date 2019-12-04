@@ -28,7 +28,7 @@ theme
     |__ ...
 ```
 
-The difference with existing WordPress themes is that the different templates in the template hierarchy are block templates instead of php files.
+The difference with existing WordPress themes is that the different templates in the template hierarchy, and template parts, are block templates instead of php files.
 
 ## What is a block template?
 
