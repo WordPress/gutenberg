@@ -20,7 +20,7 @@ function ButtonBlockAppender( { rootClientId } ) {
 			<Inserter
 				rootClientId={ rootClientId }
 				renderToggle={ ( { onToggle, disabled, isOpen } ) => (
-				!isOpen &&	<Button
+					! isOpen && <Button
 						onClick={ onToggle }
 						aria-expanded={ isOpen }
 						disabled={ disabled }
