@@ -319,6 +319,78 @@ Similar to the "Custom Types" advice concerning type unions and with literal val
 const BREAKPOINTS = { /* ... */ };
 ```
 
+### Nullable, Undefined, and Void Types
+
+You can express a nullable type using a leading `?`. Use the nullable form of a type only if you're describing either the type or an explicit `null` value. Do not use the nullable form as an indicator of an optional parameter.
+
+```js
+/**
+ * Returns a configuration value for a given key, if exists. Returns null if
+ * there is no configured value.
+ * 
+ * @param {string} key Configuration key to retrieve.
+ * 
+ * @return {?*} Configuration value, if exists.
+ */
+function getConfigurationValue( key ) {
+	return config.hasOwnProperty( key ) ? config[ key ] : null;
+}
+```
+
+Similarly, use the `undefined` type only if you're expecting an explicit value of `undefined`.
+
+```js
+/**
+ * Returns true if the next HTML token closes the current token.
+ *
+ * @param {Object}           currentToken Current token to compare with.
+ * @param {Object|undefined} nextToken    Next token to compare against.
+ *
+ * @return {boolean} True if `nextToken` closes `currentToken`, false otherwise.
+ */
+```
+
+If a parameter is optional, use the [square-bracket notation](https://jsdoc.app/tags-param.html#optional-parameters-and-default-values). If an optional parameter has a default value which can be expressed as a [default parameter](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Default_parameters) in the function expression, it is not necesssary to include the value in JSDoc. If the function parameter has an effective default value which requires complex logic and cannot be expressed using the default parameters syntax, you can choose to include the default value in the JSDoc.
+
+```js
+/**
+ * Renders a toolbar.
+ *
+ * @param {Object} props             Component props.
+ * @param {string} [props.className] Class to set on the container `<div />`.
+ */
+```
+
+When a function does not include a `return` statement, it is said to have a `void` return value. It is not necessary to include a `@return` tag if the return type is `void`.
+
+If a function has multiple code paths where some (but not all) conditions result in a `return` statement, you can document this as a union type including the `void` type.
+
+```js
+/**
+ * Returns a configuration value for a given key, if exists.
+ * 
+ * @param {string} key Configuration key to retrieve.
+ * 
+ * @return {*|void} Configuration value, if exists.
+ */
+function getConfigurationValue( key ) {
+	if ( config.hasOwnProperty( key ) ) {
+		return config[ key ];
+	}
+}
+```
+
+When documenting a [function type](https://github.com/WordPress/gutenberg/blob/add/typescript-jsdoc-guidelines/docs/contributors/coding-guidelines.md#record-types), you must always include the `void` return value type, as otherwise the function is inferred to return a mixed ("any") value, not a void result.
+
+```js
+/**
+ * An apiFetch middleware handler. Passed the fetch options, the middleware is
+ * expected to call the `next` middleware once it has completed its handling.
+ *
+ * @typedef {(options:WPAPIFetchOptions,next:WPAPIFetchMiddleware)=>void} WPAPIFetchMiddleware
+ */
+```
+
 ### Documenting Examples
 
 Because the documentation generated using the `@wordpress/docgen` tool will include `@example` tags if they are defined, it is considered a best practice to include usage examples for functions and components. This is especially important for documented members of a package's public API.
