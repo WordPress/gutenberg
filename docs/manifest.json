@@ -960,7 +960,7 @@
 		"parent": "themes"
 	},
 	{
-		"title": "Block-based themes (Experimental)",
+		"title": "Block-based Themes (Experimental)",
 		"slug": "block-based-themes",
 		"markdown_source": "../docs/designers-developers/developers/themes/block-based-themes.md",
 		"parent": "themes"
