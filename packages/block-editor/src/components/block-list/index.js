@@ -183,6 +183,11 @@ class BlockList extends Component {
 
 	setSelection() {
 		const selection = window.getSelection();
+		const {
+			onStopMultiSelect,
+			onMultiSelect,
+			getBlockParents,
+		} = this.props;
 
 		// If no selection is found, end multi selection.
 		if ( ! selection.rangeCount || selection.isCollapsed ) {
@@ -204,12 +209,16 @@ class BlockList extends Component {
 		// If the final selection doesn't leave the block, there is no multi
 		// selection.
 		if ( this.startClientId === clientId ) {
-			this.props.onStopMultiSelect();
+			onStopMultiSelect();
 			return;
 		}
 
-		this.props.onMultiSelect( this.startClientId, clientId );
-		this.props.onStopMultiSelect();
+		const startPath = [ ...getBlockParents( this.startClientId ), this.startClientId ];
+		const endPath = [ ...getBlockParents( clientId ), clientId ];
+		const depth = Math.min( startPath.length, endPath.length ) - 1;
+
+		onMultiSelect( startPath[ depth ], endPath[ depth ] );
+		onStopMultiSelect();
 	}
 
 	render() {
@@ -291,6 +300,7 @@ export default compose( [
 			hasMultiSelection,
 			getGlobalBlockCount,
 			isTyping,
+			getBlockParents,
 		} = select( 'core/block-editor' );
 
 		const { rootClientId } = ownProps;
@@ -308,6 +318,7 @@ export default compose( [
 				! isTyping() &&
 				getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD
 			),
+			getBlockParents,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
