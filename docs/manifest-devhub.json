@@ -732,6 +732,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "Guide",
+		"slug": "guide",
+		"markdown_source": "../packages/components/src/guide/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "NavigateRegions",
 		"slug": "navigate-regions",
 		"markdown_source": "../packages/components/src/higher-order/navigate-regions/README.md",
@@ -957,6 +963,12 @@
 		"title": "TextControl",
 		"slug": "text-control",
 		"markdown_source": "../packages/components/src/text-control/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "TextHighlight",
+		"slug": "text-highlight",
+		"markdown_source": "../packages/components/src/text-highlight/README.md",
 		"parent": "components"
 	},
 	{

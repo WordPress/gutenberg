@@ -85,6 +85,11 @@
 
 	.DayPicker_weekHeader {
 		top: 50px;
+		.DayPicker_weekHeader_ul {
+			margin: 1px 0;
+			padding-left: 0;
+			padding-right: 0;
+		}
 	}
 
 	&.is-description-visible .DayPicker,

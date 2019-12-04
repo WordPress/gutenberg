@@ -9,7 +9,6 @@ import classnames from 'classnames';
 import { useRef, useState, useEffect } from '@wordpress/element';
 import { focus, getRectangleFromRange } from '@wordpress/dom';
 import { ESCAPE } from '@wordpress/keycodes';
-import isShallowEqual from '@wordpress/is-shallow-equal';
 import deprecated from '@wordpress/deprecated';
 
 /**
@@ -33,34 +32,6 @@ const FocusManaged = withConstrainedTabbing( withFocusReturn( ( { children } ) =
  * @type {string}
  */
 const SLOT_NAME = 'Popover';
-
-/**
- * Hook used trigger an event handler once the window is resized or scrolled.
- *
- * @param {Function} handler              Event handler.
- * @param {Object}   ignoredScrollableRef scroll events inside this element are ignored.
- */
-function useThrottledWindowScrollOrResize( handler, ignoredScrollableRef ) {
-	// Refresh anchor rect on resize
-	useEffect( () => {
-		let refreshHandle;
-		const throttledRefresh = ( event ) => {
-			window.cancelAnimationFrame( refreshHandle );
-			if ( ignoredScrollableRef && event && event.type === 'scroll' && ignoredScrollableRef.current.contains( event.target ) ) {
-				return;
-			}
-			refreshHandle = window.requestAnimationFrame( handler );
-		};
-
-		window.addEventListener( 'resize', throttledRefresh );
-		window.addEventListener( 'scroll', throttledRefresh, true );
-
-		return () => {
-			window.removeEventListener( 'resize', throttledRefresh );
-			window.removeEventListener( 'scroll', throttledRefresh, true );
-		};
-	}, [] );
-}
 
 function computeAnchorRect(
 	anchorRefFallback,
@@ -151,145 +122,6 @@ function withoutPadding( rect, element ) {
 }
 
 /**
- * Hook used to compute and update the anchor position properly.
- *
- * @param {Object}        anchorRefFallback          Reference to the popover anchor fallback element.
- * @param {Object}        contentRef                 Reference to the popover content element.
- * @param {Object}        anchorRect                 Anchor Rect prop used to override the computed value.
- * @param {Function}      getAnchorRect              Function used to override the anchor value computation algorithm.
- * @param {Element|Range} anchorRef                  A live element or range reference.
- * @param {boolean}       shouldAnchorIncludePadding Whether to include the anchor padding.
- * @param {number}        anchorVerticalBuffer       Vertical buffer for the anchor.
- * @param {number}        anchorHorizontalBuffer     Horizontal buffer for the anchor.
- *
- * @return {Object} Anchor position.
- */
-function useAnchor(
-	anchorRefFallback,
-	contentRef,
-	anchorRect,
-	getAnchorRect,
-	anchorRef,
-	shouldAnchorIncludePadding,
-	anchorVerticalBuffer,
-	anchorHorizontalBuffer
-) {
-	const [ anchor, setAnchor ] = useState( null );
-	const refreshAnchorRect = () => {
-		let newAnchor = computeAnchorRect(
-			anchorRefFallback,
-			anchorRect,
-			getAnchorRect,
-			anchorRef,
-			shouldAnchorIncludePadding
-		);
-
-		newAnchor = addBuffer(
-			newAnchor,
-			anchorVerticalBuffer,
-			anchorHorizontalBuffer
-		);
-
-		if ( ! isShallowEqual( newAnchor, anchor ) ) {
-			setAnchor( newAnchor );
-		}
-	};
-	useEffect( refreshAnchorRect, [ anchorRect, getAnchorRect ] );
-	useEffect( () => {
-		if ( ! anchorRect ) {
-			/*
-			* There are sometimes we need to reposition or resize the popover that are not
-			* handled by the resize/scroll window events (i.e. CSS changes in the layout
-			* that changes the position of the anchor).
-			*
-			* For these situations, we refresh the popover every 0.5s
-			*/
-			const intervalHandle = setInterval( refreshAnchorRect, 500 );
-
-			return () => clearInterval( intervalHandle );
-		}
-	}, [ anchorRect ] );
-
-	useThrottledWindowScrollOrResize( refreshAnchorRect, contentRef );
-
-	return anchor;
-}
-
-/**
- * Hook used to compute the initial size of an element.
- * The popover applies styling to limit the height of the element,
- * we only care about the initial size.
- *
- * @param {Object} ref Reference to the popover content element.
- *
- * @return {Object} Content size.
- */
-function useInitialContentSize( ref ) {
-	const [ contentSize, setContentSize ] = useState( null );
-	useEffect( () => {
-		const contentRect = ref.current.getBoundingClientRect();
-		setContentSize( {
-			width: contentRect.width,
-			height: contentRect.height,
-		} );
-	}, [] );
-
-	return contentSize;
-}
-
-/**
- * Hook used to compute and update the position of the popover
- * based on the anchor position and the content size.
- *
- * @param {Object}  anchor          Anchor Position.
- * @param {Object}  contentSize     Content Size.
- * @param {string}  position        Position prop.
- * @param {boolean} expandOnMobile  Whether to show the popover full width on mobile.
- * @param {Object}  contentRef      Reference to the popover content element.
- *
- * @return {Object} Popover position.
- */
-function usePopoverPosition( anchor, contentSize, position, expandOnMobile, contentRef ) {
-	const [ popoverPosition, setPopoverPosition ] = useState( {
-		popoverLeft: null,
-		popoverTop: null,
-		yAxis: 'top',
-		xAxis: 'center',
-		contentHeight: null,
-		contentWidth: null,
-		isMobile: false,
-	} );
-	const refreshPopoverPosition = () => {
-		if ( ! anchor || ! contentSize ) {
-			return;
-		}
-
-		const newPopoverPosition = computePopoverPosition(
-			anchor,
-			contentSize,
-			position,
-			expandOnMobile
-		);
-
-		if (
-			popoverPosition.yAxis !== newPopoverPosition.yAxis ||
-			popoverPosition.xAxis !== newPopoverPosition.xAxis ||
-			popoverPosition.popoverLeft !== newPopoverPosition.popoverLeft ||
-			popoverPosition.popoverTop !== newPopoverPosition.popoverTop ||
-			popoverPosition.contentHeight !== newPopoverPosition.contentHeight ||
-			popoverPosition.contentWidth !== newPopoverPosition.contentWidth ||
-			popoverPosition.isMobile !== newPopoverPosition.isMobile
-		) {
-			setPopoverPosition( newPopoverPosition );
-		}
-	};
-	useEffect( refreshPopoverPosition, [ anchor, contentSize ] );
-	useThrottledWindowScrollOrResize( refreshPopoverPosition, contentRef );
-
-	return popoverPosition;
-}
-
-/**
  * Hook used to focus the first tabbable element on mount.
  *
  * @param {boolean|string} focusOnMount Focus on mount mode.
@@ -313,6 +145,7 @@ function useFocusContentOnMount( focusOnMount, contentRef ) {
 			// Find first tabbable node within content and shift focus, falling
 			// back to the popover panel itself.
 				const firstTabbable = focus.tabbable.find( contentRef.current )[ 0 ];
+
 				if ( firstTabbable ) {
 					firstTabbable.focus();
 				} else {
@@ -361,38 +194,110 @@ const Popover = ( {
 } ) => {
 	const anchorRefFallback = useRef( null );
 	const contentRef = useRef( null );
+	const containerRef = useRef();
+	const [ isMobileViewport, setIsMobileViewport ] = useState( false );
+	const [ animateOrigin, setAnimateOrigin ] = useState();
 
-	// Animation
-	const [ isReadyToAnimate, setIsReadyToAnimate ] = useState( false );
+	useEffect( () => {
+		const resize = () => setIsMobileViewport( window.innerWidth < 782 );
+		window.addEventListener( 'resize', resize );
+		return () => window.removeEventListener( 'resize', resize );
+	} );
 
-	// Anchor position
-	const anchor = useAnchor(
-		anchorRefFallback,
-		contentRef,
+	useEffect( () => {
+		if ( isMobileViewport && expandOnMobile ) {
+			return;
+		}
+
+		const refresh = () => {
+			let anchor = computeAnchorRect(
+				anchorRefFallback,
+				anchorRect,
+				getAnchorRect,
+				anchorRef,
+				shouldAnchorIncludePadding
+			);
+
+			if ( ! anchor ) {
+				return;
+			}
+
+			anchor = addBuffer(
+				anchor,
+				anchorVerticalBuffer,
+				anchorHorizontalBuffer
+			);
+
+			const contentSize = {
+				height: contentRef.current.scrollHeight,
+				width: contentRef.current.scrollWidth,
+			};
+			const {
+				popoverTop,
+				popoverLeft,
+				xAxis,
+				yAxis,
+				contentHeight,
+				contentWidth,
+			} = computePopoverPosition( anchor, contentSize, position );
+
+			// Compute the animation position
+			const yAxisMapping = {
+				top: 'bottom',
+				bottom: 'top',
+			};
+			const xAxisMapping = {
+				left: 'right',
+				right: 'left',
+			};
+			const animateYAxis = yAxisMapping[ yAxis ] || 'middle';
+			const animateXAxis = xAxisMapping[ xAxis ] || 'center';
+
+			containerRef.current.setAttribute( 'data-x-axis', xAxis );
+			containerRef.current.setAttribute( 'data-y-axis', yAxis );
+			containerRef.current.style.top = popoverTop + 'px';
+			containerRef.current.style.left = popoverLeft + 'px';
+			contentRef.current.style.maxHeight = contentHeight ? contentHeight + 'px' : '';
+			contentRef.current.style.maxWidth = contentWidth ? contentWidth + 'px' : '';
+
+			if ( xAxis === 'center' && yAxis === 'middle' ) {
+				contentRef.current.classList.add( 'is-without-arrow' );
+			} else {
+				contentRef.current.classList.remove( 'is-without-arrow' );
+			}
+
+			setAnimateOrigin( animateXAxis + ' ' + animateYAxis );
+		};
+
+		refresh();
+
+		/*
+		 * There are sometimes we need to reposition or resize the popover that
+		 * are not handled by the resize/scroll window events (i.e. CSS changes
+		 * in the layout that changes the position of the anchor).
+		 *
+		 * For these situations, we refresh the popover every 0.5s
+		 */
+		const intervalHandle = window.setInterval( refresh, 500 );
+		window.addEventListener( 'resize', refresh );
+		window.addEventListener( 'scroll', refresh, true );
+
+		return () => {
+			window.clearInterval( intervalHandle );
+			window.removeEventListener( 'resize', refresh );
+			window.removeEventListener( 'scroll', refresh, true );
+		};
+	}, [
+		isMobileViewport,
+		expandOnMobile,
 		anchorRect,
 		getAnchorRect,
 		anchorRef,
 		shouldAnchorIncludePadding,
 		anchorVerticalBuffer,
-		anchorHorizontalBuffer
-	);
-
-	// Content size
-	const contentSize = useInitialContentSize( contentRef );
-	useEffect( () => {
-		if ( contentSize ) {
-			setIsReadyToAnimate( true );
-		}
-	}, [ contentSize ] );
-
-	// Compute the position
-	const popoverPosition = usePopoverPosition(
-		anchor,
-		contentSize,
+		anchorHorizontalBuffer,
 		position,
-		expandOnMobile,
-		contentRef
-	);
+	] );
 
 	useFocusContentOnMount( focusOnMount, contentRef );
 
@@ -451,53 +356,31 @@ const Popover = ( {
 		onClickOutside( clickEvent );
 	}
 
-	// Compute the animation position
-	const yAxisMapping = {
-		top: 'bottom',
-		bottom: 'top',
-	};
-	const xAxisMapping = {
-		left: 'right',
-		right: 'left',
-	};
-	const animateYAxis = yAxisMapping[ popoverPosition.yAxis ] || 'middle';
-	const animateXAxis = xAxisMapping[ popoverPosition.xAxis ] || 'center';
-
-	const classes = classnames(
-		'components-popover',
-		className,
-		'is-' + popoverPosition.yAxis,
-		'is-' + popoverPosition.xAxis,
-		{
-			'is-mobile': popoverPosition.isMobile,
-			'is-without-arrow': noArrow || (
-				popoverPosition.xAxis === 'center' &&
-				popoverPosition.yAxis === 'middle'
-			),
-		}
-	);
-
 	// Disable reason: We care to capture the _bubbled_ events from inputs
 	// within popover as inferring close intent.
 
 	let content = (
 		<PopoverDetectOutside onFocusOutside={ handleOnFocusOutside }>
 			<Animate
-				type={ animate && isReadyToAnimate ? 'appear' : null }
-				options={ { origin: animateYAxis + ' ' + animateXAxis } }
+				type={ animate && animateOrigin ? 'appear' : null }
+				options={ { origin: animateOrigin } }
 			>
 				{ ( { className: animateClassName } ) => (
 					<IsolatedEventContainer
-						className={ classnames( classes, animateClassName ) }
-						style={ {
-							top: ! popoverPosition.isMobile && popoverPosition.popoverTop ? popoverPosition.popoverTop + 'px' : undefined,
-							left: ! popoverPosition.isMobile && popoverPosition.popoverLeft ? popoverPosition.popoverLeft + 'px' : undefined,
-							visibility: contentSize ? undefined : 'hidden',
-						} }
+						className={ classnames(
+							'components-popover',
+							className,
+							animateClassName,
+							{
+								'is-mobile': isMobileViewport && expandOnMobile,
+								'is-without-arrow': noArrow,
+							}
+						) }
 						{ ...contentProps }
 						onKeyDown={ maybeClose }
+						ref={ containerRef }
 					>
-						{ popoverPosition.isMobile && (
+						{ isMobileViewport && expandOnMobile && (
 							<div className="components-popover__header">
 								<span className="components-popover__header-title">
 									{ headerTitle }
@@ -508,10 +391,6 @@ const Popover = ( {
 						<div
 							ref={ contentRef }
 							className="components-popover__content"
-							style={ {
-								maxHeight: ! popoverPosition.isMobile && popoverPosition.contentHeight ? popoverPosition.contentHeight + 'px' : undefined,
-								maxWidth: ! popoverPosition.isMobile && popoverPosition.contentWidth ? popoverPosition.contentWidth + 'px' : undefined,
-							} }
 							tabIndex="-1"
 						>
 							{ children }
@@ -540,7 +419,7 @@ const Popover = ( {
 				return (
 					<span ref={ anchorRefFallback }>
 						{ content }
-						{ popoverPosition.isMobile && expandOnMobile && <ScrollLock /> }
+						{ isMobileViewport && expandOnMobile && <ScrollLock /> }
 					</span>
 				);
 			} }

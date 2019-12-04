@@ -42,6 +42,8 @@ import { isEmptyLine } from '../is-empty';
 
 const { getSelection, getComputedStyle } = window;
 
+/** @typedef {import('@wordpress/element').WPSyntheticEvent} WPSyntheticEvent */
+
 /**
  * All inserting input types that would insert HTML into the DOM.
  *
@@ -493,6 +495,10 @@ class RichText extends Component {
 			event.type !== 'selectionchange' &&
 			! this.props.__unstableIsSelected
 		) {
+			return;
+		}
+
+		if ( this.props.disabled ) {
 			return;
 		}
 

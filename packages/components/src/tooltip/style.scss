@@ -5,11 +5,11 @@
 		border-color: transparent;
 	}
 
-	&.is-top::after {
+	&[data-y-axis="top"]::after {
 		border-top-color: $dark-gray-900;
 	}
 
-	&.is-bottom::after {
+	&[data-y-axis="bottom"]::after {
 		border-bottom-color: $dark-gray-900;
 	}
 

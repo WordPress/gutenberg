@@ -10,6 +10,7 @@ import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { parse } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
+import { addAction, removeAction } from '@wordpress/hooks';
 import { withInstanceId, compose, withPreferredColorScheme } from '@wordpress/compose';
 
 /**
@@ -24,11 +25,9 @@ export class HTMLTextInput extends Component {
 
 		this.edit = this.edit.bind( this );
 		this.stopEditing = this.stopEditing.bind( this );
+		addAction( 'native-editor.persist-html', 'core/editor', this.stopEditing );
 
-		this.state = {
-			isDirty: false,
-			value: '',
-		};
+		this.state = {};
 	}
 
 	static getDerivedStateFromProps( props, state ) {
@@ -43,6 +42,7 @@ export class HTMLTextInput extends Component {
 	}
 
 	componentWillUnmount() {
+		removeAction( 'native-editor.persist-html', 'core/editor' );
 		//TODO: Blocking main thread
 		this.stopEditing();
 	}
@@ -107,8 +107,7 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { resetBlocks } = dispatch( 'core/block-editor' );
-		const { editPost } = dispatch( 'core/editor' );
+		const { editPost, resetEditorBlocks } = dispatch( 'core/editor' );
 		return {
 			editTitle( title ) {
 				editPost( { title } );
@@ -117,7 +116,8 @@ export default compose( [
 				editPost( { content } );
 			},
 			onPersist( content ) {
-				resetBlocks( parse( content ) );
+				const blocks = parse( content );
+				resetEditorBlocks( blocks );
 			},
 		};
 	} ),

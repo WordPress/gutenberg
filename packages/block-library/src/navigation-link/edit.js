@@ -18,9 +18,9 @@ import {
 	SVG,
 	TextareaControl,
 	TextControl,
-	Toolbar,
 	ToggleControl,
 	ToolbarButton,
+	ToolbarGroup,
 } from '@wordpress/components';
 import {
 	LEFT,
@@ -136,7 +136,7 @@ function NavigationLinkEdit( {
 	return (
 		<Fragment>
 			<BlockControls>
-				<Toolbar>
+				<ToolbarGroup>
 					<KeyboardShortcuts
 						bindGlobal
 						shortcuts={ {
@@ -156,7 +156,7 @@ function NavigationLinkEdit( {
 						title={ __( 'Add Submenu' ) }
 						onClick={ insertLinkBlock }
 					/>
-				</Toolbar>
+				</ToolbarGroup>
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody
