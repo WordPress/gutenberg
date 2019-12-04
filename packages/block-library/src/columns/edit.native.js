@@ -4,7 +4,7 @@
 import classnames from 'classnames';
 import { View } from 'react-native';
 import { dropRight, times } from 'lodash';
-import BlockEdit from '../block-edit';
+
 /**
  * WordPress dependencies
  */
@@ -112,7 +112,7 @@ const TEMPLATE_OPTIONS = [
  */
 const DEFAULT_COLUMNS = 2;
 
-export function ColumnsEdit( {
+function ColumnsEdit ( {
 	attributes,
 	className,
 	updateAlignment,
