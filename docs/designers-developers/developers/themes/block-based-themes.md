@@ -75,7 +75,11 @@ When ready, switch to the "Code editor" mode and grab the HTML of the template f
 
 ## Templates CPT
 
-If you save the templates directly from the temporary Templates admin menu, you'd be able to override your theme's templates. Example: By using **single** as a title for your template and saving it, this saved template will take precedence over your block theme's `single.html` file.
+If you save the templates directly from the temporary Templates admin menu, you'll be able to override your theme's templates.
+
+Example: By using **single** as the title for your template and saving it, this saved template will take precedence over your theme's `single.html` file.
+
+Note that it won't take precedence over any of your theme's templates with higher specificity in the template hierarchy. Resolution goes from most to least specific, looking first for a CPT post and then for a theme template, at each level.
 
 ## Theme Blocks
 
