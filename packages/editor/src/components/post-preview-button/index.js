@@ -154,9 +154,12 @@ export class PostPreviewButton extends Component {
 				>
 					{ _x( 'Preview', 'imperative verb' ) }
 
-					<DotTip tipId="core/editor.preview">
-						{ __( 'Click “Preview” to load a preview of this page, so you can make sure you’re happy with your blocks.' ) }
-					</DotTip>
+					<span className="screen-reader-text">
+						{
+						/* translators: accessibility text */
+							__( '(opens in a new tab)' )
+						}
+					</span>
 				</Button>
 				{ this.state.isPreviewOpen &&
 				<Modal
