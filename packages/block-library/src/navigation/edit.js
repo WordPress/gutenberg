@@ -176,12 +176,12 @@ function Navigation( {
 
 				<Toolbar
 					icon={ attributes.itemsJustification ? `editor-align${ attributes.itemsJustification }` : 'editor-alignleft' }
-					label="Change items justification"
+					label={ __( 'Change items justification' ) }
 					isCollapsed
 					controls={ [
-						{ icon: 'editor-alignleft', title: 'Justify items left', isActive: 'left' === attributes.itemsJustification, onClick: handleItemsAlignment( 'left' ) },
-						{ icon: 'editor-aligncenter', title: 'Justify items center', isActive: 'center' === attributes.itemsJustification, onClick: handleItemsAlignment( 'center' ) },
-						{ icon: 'editor-alignright', title: 'Justify items right', isActive: 'right' === attributes.itemsJustification, onClick: handleItemsAlignment( 'right' ) },
+						{ icon: 'editor-alignleft', title: __( 'Justify items left' ), isActive: 'left' === attributes.itemsJustification, onClick: handleItemsAlignment( 'left' ) },
+						{ icon: 'editor-aligncenter', title: __( 'Justify items center' ), isActive: 'center' === attributes.itemsJustification, onClick: handleItemsAlignment( 'center' ) },
+						{ icon: 'editor-alignright', title: __( 'Justify items right' ), isActive: 'right' === attributes.itemsJustification, onClick: handleItemsAlignment( 'right' ) },
 					] }
 				/>
 
