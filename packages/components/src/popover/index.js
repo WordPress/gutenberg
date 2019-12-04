@@ -322,7 +322,6 @@ const Popover = ( {
 		isMobileViewport,
 		expandOnMobile,
 		contentSize,
-		anchorRefFallback.current,
 		anchorRect,
 		getAnchorRect,
 		anchorRef,
@@ -330,7 +329,6 @@ const Popover = ( {
 		anchorVerticalBuffer,
 		anchorHorizontalBuffer,
 		position,
-		containerRef.current,
 	] );
 
 	useFocusContentOnMount( focusOnMount, contentRef );

@@ -183,6 +183,9 @@ $arrow-size: 8px;
 	height: 100%;
 }
 
+// Hide the popover element until the position has been calculated. The position
+// cannot be calculated until the popover element is rendered because the
+// position depends on the size of the popover.
 .components-popover {
 	opacity: 0;
 }
