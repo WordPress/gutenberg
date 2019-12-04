@@ -257,14 +257,8 @@ const Popover = ( {
 			containerRef.current.setAttribute( 'data-y-axis', yAxis );
 			containerRef.current.style.top = popoverTop + 'px';
 			containerRef.current.style.left = popoverLeft + 'px';
-
-			if ( contentHeight ) {
-				contentRef.current.style.maxHeight = contentHeight + 'px';
-			}
-
-			if ( contentWidth ) {
-				contentRef.current.style.maxWidth = contentWidth + 'px';
-			}
+			contentRef.current.style.maxHeight = contentHeight ? contentHeight + 'px' : '';
+			contentRef.current.style.maxWidth = contentWidth ? contentWidth + 'px' : '';
 
 			if ( xAxis === 'center' && yAxis === 'middle' ) {
 				contentRef.current.classList.add( 'is-without-arrow' );
