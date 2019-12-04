@@ -6,7 +6,7 @@
 
 ## What is a block-based theme?
 
-A block-based theme is a WordPress theme that is entirely composed of blocks. In addition to the post content of the different Post Types (pages, posts, ...), the block editor can also be used to edit all areas of the site: headers, footers, sidebars,...
+A block-based theme is a WordPress theme with templates entirely composed of blocks so that in addition to the post content of the different post types (pages, posts, ...), the block editor can also be used to edit all areas of the site: headers, footers, sidebars, etc.
 
 ## What is the structure of a block-based theme?
 
