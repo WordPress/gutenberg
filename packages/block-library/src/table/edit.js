@@ -91,7 +91,6 @@ export class TableEdit extends Component {
 		super( ...arguments );
 
 		this.onCreateTable = this.onCreateTable.bind( this );
-		this.onChangeFixedLayout = this.onChangeFixedLayout.bind( this );
 		this.onChange = this.onChange.bind( this );
 		this.onChangeInitialColumnCount = this.onChangeInitialColumnCount.bind( this );
 		this.onChangeInitialRowCount = this.onChangeInitialRowCount.bind( this );
@@ -153,16 +152,6 @@ export class TableEdit extends Component {
 			rowCount: initialRowCount,
 			columnCount: initialColumnCount,
 		} ) );
-	}
-
-	/**
-	 * Toggles whether the table has a fixed layout or not.
-	 */
-	onChangeFixedLayout() {
-		const { attributes, setAttributes } = this.props;
-		const { hasFixedLayout } = attributes;
-
-		setAttributes( { hasFixedLayout: ! hasFixedLayout } );
 	}
 
 	/**
@@ -487,7 +476,6 @@ export class TableEdit extends Component {
 		} = this.props;
 		const { initialRowCount, initialColumnCount } = this.state;
 		const {
-			hasFixedLayout,
 			caption,
 			head,
 			body,
@@ -528,7 +516,6 @@ export class TableEdit extends Component {
 		}
 
 		const tableClasses = classnames( backgroundColor.class, {
-			'has-fixed-layout': hasFixedLayout,
 			'has-background': !! backgroundColor.color,
 		} );
 
@@ -553,11 +540,6 @@ export class TableEdit extends Component {
 				</BlockControls>
 				<InspectorControls>
 					<PanelBody title={ __( 'Table Settings' ) } className="blocks-table-settings">
-						<ToggleControl
-							label={ __( 'Fixed width table cells' ) }
-							checked={ !! hasFixedLayout }
-							onChange={ this.onChangeFixedLayout }
-						/>
 						<ToggleControl
 							label={ __( 'Header section' ) }
 							checked={ !! ( head && head.length ) }

@@ -207,10 +207,6 @@ describe( 'Table', () => {
 		// Create the table.
 		await clickButton( createButtonLabel );
 
-		// Enable fixed width as it exascerbates the amount of empty space around the RichText.
-		const [ fixedWidthSwitch ] = await page.$x( "//label[text()='Fixed width table cells']" );
-		await fixedWidthSwitch.click();
-
 		// Add multiple new lines to the first cell to make it taller.
 		await page.click( 'td' );
 		await page.keyboard.type( '\n\n\n\n' );

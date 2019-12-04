@@ -11,15 +11,9 @@
 		table-layout: fixed;
 	}
 
-	// Fixed layout toggle
-	.has-fixed-layout {
-		table-layout: fixed;
-		width: 100%;
-
-		td,
-		th {
-			word-break: break-word;
-		}
+	td,
+	th {
+		word-break: break-word;
 	}
 
 	&.alignleft,

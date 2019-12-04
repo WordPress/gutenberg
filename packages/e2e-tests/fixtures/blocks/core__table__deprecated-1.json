@@ -4,7 +4,6 @@
         "name": "core/table",
         "isValid": true,
         "attributes": {
-            "hasFixedLayout": false,
             "head": [
                 {
                     "cells": [
