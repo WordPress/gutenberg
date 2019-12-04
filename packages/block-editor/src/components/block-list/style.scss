@@ -928,43 +928,38 @@
 /**
  * Block Label for Navigation/Selection Mode
  */
-
 .block-editor-block-list__breadcrumb {
-	display: none;
+	display: block;
+	position: absolute;
+	line-height: 1;
+	z-index: z-index(".block-editor-block-list__breadcrumb");
 
-	.is-navigate-mode & {
-		display: block;
-		position: absolute;
-		line-height: 1;
-		z-index: z-index(".block-editor-block-list__breadcrumb");
+	// Position in the top left of the border.
+	left: -$block-padding;
+	top: -$block-toolbar-height - $block-padding;
 
-		// Position in the top left of the border.
-		left: -$block-padding;
-		top: -$block-toolbar-height - $block-padding;
+	.components-toolbar {
+		display: flex;
+		background: $white;
+		border: $border-width solid $blue-medium-focus;
+		border-left: none;
+		box-shadow: inset $block-left-border-width 0 0 0 $blue-medium-focus;
+		height: $block-toolbar-height + $border-width;
+		font-size: $default-font-size;
+		line-height: $block-toolbar-height - $grid-size;
+		padding-left: $grid-size;
+		padding-right: $grid-size;
 
-		.components-toolbar {
-			display: flex;
-			background: $white;
-			border: $border-width solid $blue-medium-focus;
-			border-left: none;
-			box-shadow: inset $block-left-border-width 0 0 0 $blue-medium-focus;
-			height: $block-toolbar-height + $border-width;
-			font-size: $default-font-size;
-			line-height: $block-toolbar-height - $grid-size;
-			padding-left: $grid-size;
-			padding-right: $grid-size;
+		.components-button {
+			box-shadow: none;
+		}
 
-			.components-button {
-				box-shadow: none;
-			}
+		.is-dark-theme & {
+			border-color: $light-opacity-light-800;
+		}
 
-			.is-dark-theme & {
-				border-color: $light-opacity-light-800;
-			}
-
-			@include break-small() {
-				box-shadow: -$block-left-border-width 0 0 0 $blue-medium-focus;
-			}
+		@include break-small() {
+			box-shadow: -$block-left-border-width 0 0 0 $blue-medium-focus;
 		}
 	}
 }
