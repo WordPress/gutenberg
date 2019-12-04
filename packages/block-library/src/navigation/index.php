@@ -142,8 +142,7 @@ function register_block_core_navigation() {
 					'type' => 'string',
 				),
 				'itemsJustification' => array(
-					'default' => 'left',
-					'type'    => 'string',
+					'type' => 'string',
 				),
 			),
 
