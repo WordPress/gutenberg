@@ -89,7 +89,7 @@ As we're still early in the process, the number of blocks specifically dedicated
 
 ## Styling
 
-One of the most important aspects of themes (if not the most important) is the styles. While initially you'll be able to provide styles and enqueue them using the same hooks themes have always used, this is something that is still being explored.
+One of the most important aspects of themes (if not the most important) is the styling. While initially you'll be able to provide styles and enqueue them using the same hooks themes have always used, this is an area that is still being explored.
 
 ## Resources
 
