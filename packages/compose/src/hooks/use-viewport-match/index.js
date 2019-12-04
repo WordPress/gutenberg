@@ -33,7 +33,9 @@ const CONDITIONS = {
  * Returns true if the viewport matches the given query, or false otherwise.
  *
  * @param {string} query Query string. Includes operator and breakpoint name,
- *                       space separated. Operator defaults to >=.
+ *                       space separated. Operator defaults to >=. The supported
+ *                       breakpoint names are: mobile, small, medium, large, wide
+ *                       and huge.
  *
  * @example
  *

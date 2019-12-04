@@ -152,7 +152,7 @@ useViewportMatch( 'medium' );
 
 _Parameters_
 
--   _query_ `string`: Query string. Includes operator and breakpoint name, space separated. Operator defaults to >=.
+-   _query_ `string`: Query string. Includes operator and breakpoint name, space separated. Operator defaults to >=. The supported breakpoint names are: mobile, small, medium, large, wide and huge.
 
 _Returns_
 
