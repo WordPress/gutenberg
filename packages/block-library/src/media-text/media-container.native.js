@@ -44,6 +44,15 @@ import SvgIconRetry from './icon-retry';
  */
 const ALLOWED_MEDIA_TYPES = [ MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO ];
 
+export function imageFillStyles( url, focalPoint ) {
+	return url ?
+		{
+			backgroundImage: `url(${ url })`,
+			backgroundPosition: focalPoint ? `${ focalPoint.x * 100 }% ${ focalPoint.y * 100 }%` : `50% 50%`,
+		} :
+		{};
+}
+
 class MediaContainer extends Component {
 	constructor() {
 		super( ...arguments );
