@@ -15,7 +15,7 @@
 function build_css_colors( $attributes ) {
 	// CSS classes.
 	$colors = array(
-		'css_classes'   => [],
+		'css_classes'   => array(),
 		'inline_styles' => '',
 	);
 
@@ -52,8 +52,8 @@ function render_block_navigation( $attributes, $content, $block ) {
 	$colors          = build_css_colors( $attributes );
 	$classes         = array_merge(
 		$colors['css_classes'],
-		[ 'wp-block-navigation' ],
-		isset( $attributes['className'] ) ? [ $attributes['className'] ] : []
+		array( 'wp-block-navigation' ),
+		isset( $attributes['className'] ) ? array( $attributes['className'] ) : array()
 	);
 	$class_attribute = sprintf( ' class="%s"', esc_attr( implode( ' ', $classes ) ) );
 	$style_attribute = $colors['inline_styles'] ? sprintf( ' style="%s"', esc_attr( $colors['inline_styles'] ) ) : '';
@@ -139,6 +139,10 @@ function register_block_core_navigation() {
 				),
 				'customTextColor'  => array(
 					'type' => 'string',
+				),
+				'itemAlignment'    => array(
+					'default' => 'left',
+					'type'    => 'string',
 				),
 			),
 

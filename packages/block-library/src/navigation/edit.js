@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { escape } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -26,6 +27,7 @@ import {
 	Placeholder,
 	Spinner,
 	ToolbarGroup,
+	Toolbar,
 } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 
@@ -84,6 +86,14 @@ function Navigation( {
 	//
 	// HANDLERS
 	//
+	const handleItemsAlignment = ( align ) => {
+		return () => {
+			const itemAlignment = attributes.itemAlignment === align ? undefined : align;
+			setAttributes( {
+				itemAlignment,
+			} );
+		};
+	};
 
 	const handleCreateEmpty = () => {
 		const emptyNavLinkBlock = createBlock( 'core/navigation-link' );
@@ -148,6 +158,10 @@ function Navigation( {
 		);
 	}
 
+	const blockClassNames = classnames( 'wp-block-navigation', {
+		[ `items-alignment-${ attributes.itemAlignment }` ]: attributes.itemAlignment,
+	} );
+
 	// UI State: rendered Block UI
 	return (
 		<Fragment>
@@ -159,6 +173,18 @@ function Navigation( {
 					value={ TextColor.color }
 					onChange={ TextColor.setColor }
 				/>
+
+				<Toolbar
+					icon={ attributes.itemAlignment ? `editor-align${ attributes.itemAlignment }` : 'editor-alignleft' }
+					label="Change items alignment"
+					isCollapsed
+					controls={ [
+						{ icon: 'editor-alignleft', title: 'Align items left', isActive: 'left' === attributes.itemAlignment, onClick: handleItemsAlignment( 'left' ) },
+						{ icon: 'editor-aligncenter', title: 'Align items center', isActive: 'center' === attributes.itemAlignment, onClick: handleItemsAlignment( 'center' ) },
+						{ icon: 'editor-alignright', title: 'Align items right', isActive: 'right' === attributes.itemAlignment, onClick: handleItemsAlignment( 'right' ) },
+					] }
+				/>
+
 			</BlockControls>
 			{ navigatorModal }
 			<InspectorControls>
@@ -181,7 +207,7 @@ function Navigation( {
 				</PanelBody>
 			</InspectorControls>
 			<TextColor>
-				<div className="wp-block-navigation">
+				<div className={ blockClassNames }>
 					{ ! hasExistingNavItems && isRequestingPages && <><Spinner /> { __( 'Loading Navigation…' ) } </> }
 
 					<InnerBlocks

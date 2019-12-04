@@ -6,7 +6,18 @@
 	.wp-block-navigation .block-editor-inner-blocks > .block-editor-block-list__layout {
 		margin-left: 0;
 		margin-right: 0;
+	}
 
+	.wp-block-navigation.items-alignment-left .block-editor-inner-blocks > .block-editor-block-list__layout {
+		justify-content: flex-start;
+	}
+
+	.wp-block-navigation.items-alignment-center .block-editor-inner-blocks > .block-editor-block-list__layout {
+		justify-content: center;
+	}
+
+	.wp-block-navigation.items-alignment-right .block-editor-inner-blocks > .block-editor-block-list__layout {
+		justify-content: flex-end;
 	}
 
 	// 2. Remove paddings on subsequent immediate children.
