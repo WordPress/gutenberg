@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Image, StyleSheet, View, ScrollView, Text, TouchableWithoutFeedback } from 'react-native';
+import { Image, StyleSheet, View, ScrollView, Text, TouchableWithoutFeedback, Platform } from 'react-native';
 import {
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
@@ -30,6 +30,13 @@ const buttonStyle = compose( style.button, { aspectRatio: 1 } );
 const removeButtonStyle = compose( style.removeButton, { aspectRatio: 1 } );
 const ICON_SIZE_ARROW = 15;
 const ICON_SIZE_REMOVE = 20;
+
+// this platform difference is needed to avoid a regression described here:
+// https://github.com/WordPress/gutenberg/pull/18818#issuecomment-559818548
+const CAPTION_TAG_NAME = Platform.select( {
+	ios: 'p',
+	android: '',
+} );
 
 class GalleryImage extends Component {
 	constructor() {
@@ -227,7 +234,7 @@ class GalleryImage extends Component {
 							<View style={ captionContainerStyle }>
 								<ScrollView nestedScrollEnabled keyboardShouldPersistTaps="handled">
 									<RichText
-										tagName=""
+										tagName={ CAPTION_TAG_NAME }
 										rootTagsToEliminate={ [ 'p' ] }
 										placeholder={ isSelected ? __( 'Write caption…' ) : null }
 										value={ caption }
