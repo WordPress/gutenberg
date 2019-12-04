@@ -12,11 +12,11 @@ import {
 	PanelBody,
 	Placeholder,
 	QueryControls,
+	RadioControl,
 	RangeControl,
 	Spinner,
 	ToggleControl,
-	Toolbar,
-	RadioControl,
+	ToolbarGroup,
 } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
@@ -161,13 +161,13 @@ class LatestPostsEdit extends Component {
 		const layoutControls = [
 			{
 				icon: 'list-view',
-				title: __( 'List View' ),
+				title: __( 'List view' ),
 				onClick: () => setAttributes( { postLayout: 'list' } ),
 				isActive: postLayout === 'list',
 			},
 			{
 				icon: 'grid-view',
-				title: __( 'Grid View' ),
+				title: __( 'Grid view' ),
 				onClick: () => setAttributes( { postLayout: 'grid' } ),
 				isActive: postLayout === 'grid',
 			},
@@ -179,7 +179,7 @@ class LatestPostsEdit extends Component {
 			<>
 				{ inspectorControls }
 				<BlockControls>
-					<Toolbar controls={ layoutControls } />
+					<ToolbarGroup controls={ layoutControls } />
 				</BlockControls>
 				<ul
 					className={ classnames( this.props.className, {

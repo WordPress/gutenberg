@@ -31,36 +31,6 @@ function gutenberg_safe_style_css_column_flex_basis( $attr ) {
 add_filter( 'safe_style_css', 'gutenberg_safe_style_css_column_flex_basis' );
 
 /**
- * Filters inserted post data to unset any auto-draft assigned post title. The status
- * of an auto-draft should be read from its `post_status` and not inferred via its
- * title. A post with an explicit title should be created with draft status, not
- * with auto-draft status. It will also update an existing post's status to draft if
- * currently an auto-draft. This is intended to ensure that a post which is
- * explicitly updated should no longer be subject to auto-draft purge.
- *
- * @see https://core.trac.wordpress.org/ticket/43316#comment:88
- * @see https://core.trac.wordpress.org/ticket/43316#comment:89
- *
- * @param array $data    An array of slashed post data.
- * @param array $postarr An array of sanitized, but otherwise unmodified post
- *                        data.
- *
- * @return array Filtered post data.
- */
-function gutenberg_filter_wp_insert_post_data( $data, $postarr ) {
-	if ( 'auto-draft' === $postarr['post_status'] ) {
-		if ( ! empty( $postarr['ID'] ) ) {
-			$data['post_status'] = 'draft';
-		} else {
-			$data['post_title'] = '';
-		}
-	}
-	return $data;
-}
-add_filter( 'wp_insert_post_data', 'gutenberg_filter_wp_insert_post_data', 10, 2 );
-
-
-/**
  * Shim that hooks into `pre_render_block` so as to override `render_block`
  * with a function that passes `render_callback` the block object as the
  * argument.
@@ -104,3 +74,21 @@ function gutenberg_provide_render_callback_with_block_object( $pre_render, $bloc
 	return apply_filters( 'render_block', $block_content, $block );
 }
 add_filter( 'pre_render_block', 'gutenberg_provide_render_callback_with_block_object', 10, 2 );
+
+/**
+ * Sets the current post for usage in template blocks.
+ *
+ * @return WP_Post|null The post if any, or null otherwise.
+ */
+function gutenberg_get_post_from_context() {
+	// TODO: Without this temporary fix, an infinite loop can occur where
+	// posts with post content blocks render themselves recursively.
+	if ( is_admin() || defined( 'REST_REQUEST' ) ) {
+		return null;
+	}
+	if ( ! in_the_loop() ) {
+		rewind_posts();
+		the_post();
+	}
+	return get_post();
+}

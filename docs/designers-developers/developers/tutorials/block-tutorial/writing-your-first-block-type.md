@@ -55,6 +55,7 @@ With the script enqueued, let's look at the implementation of the block itself:
 		title: 'Example: Basic',
 		icon: 'universal-access-alt',
 		category: 'layout',
+		example: {},
 		edit: function() {
 			return el(
 				'p',
@@ -77,7 +78,7 @@ With the script enqueued, let's look at the implementation of the block itself:
 ```
 {% ESNext %}
 ```js
-const { registerBlockType } = wp.blocks;
+import { registerBlockType } from '@wordpress/blocks';
 
 const blockStyle = {
 	backgroundColor: '#900',
@@ -89,6 +90,7 @@ registerBlockType( 'gutenberg-examples/example-01-basic-esnext', {
 	title: 'Example: Basic (esnext)',
 	icon: 'universal-access-alt',
 	category: 'layout',
+	example: {},
 	edit() {
 		return <div style={ blockStyle }>Hello World, step 1 (from the editor).</div>;
 	},
@@ -104,5 +106,7 @@ _By now you should be able to see `Hello World, step 1 (from the editor).` in th
 Once a block is registered, you should immediately see that it becomes available as an option in the editor inserter dialog, using values from `title`, `icon`, and `category` to organize its display. You can choose an icon from any included in the built-in [Dashicons icon set](https://developer.wordpress.org/resource/dashicons/), or provide a [custom svg element](/docs/designers-developers/developers/block-api/block-registration.md#icon-optional).
 
 A block name must be prefixed with a namespace specific to your plugin. This helps prevent conflicts when more than one plugin registers a block with the same name. In this example, the namespace is `gutenberg-examples`.
+
+Block names _must_ include only lowercase alphanumeric characters or dashes and start with a letter. Example: `my-plugin/my-custom-block`.
 
 The `edit` and `save` functions describe the structure of your block in the context of the editor and the saved content respectively. While the difference is not obvious in this simple example, in the following sections we'll explore how these are used to enable customization of the block in the editor preview.

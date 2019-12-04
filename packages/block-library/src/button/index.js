@@ -21,6 +21,13 @@ export const settings = {
 	description: __( 'Prompt visitors to take action with a button-style link.' ),
 	icon,
 	keywords: [ __( 'link' ) ],
+	example: {
+		attributes: {
+			className: 'is-style-fill',
+			backgroundColor: 'vivid-green-cyan',
+			text: __( 'Call to Action' ),
+		},
+	},
 	supports: {
 		align: true,
 		alignWide: false,

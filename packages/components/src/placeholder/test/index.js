@@ -26,19 +26,19 @@ describe( 'Placeholder', () => {
 			expect( placeholderFieldset.exists() ).toBe( true );
 		} );
 
-		it( 'should render a Dashicon in the label section', () => {
+		it( 'should render an Icon in the label section', () => {
 			const placeholder = shallow( <Placeholder icon="wordpress" /> );
 			const placeholderLabel = placeholder.find( '.components-placeholder__label' );
 
 			expect( placeholderLabel.exists() ).toBe( true );
-			expect( placeholderLabel.find( 'Dashicon' ).exists() ).toBe( true );
+			expect( placeholderLabel.find( 'Icon' ).exists() ).toBe( true );
 		} );
 
 		it( 'should render a label section', () => {
 			const label = 'WordPress';
 			const placeholder = shallow( <Placeholder label={ label } /> );
 			const placeholderLabel = placeholder.find( '.components-placeholder__label' );
-			const child = placeholderLabel.childAt( 0 );
+			const child = placeholderLabel.childAt( 1 );
 
 			expect( child.text() ).toBe( label );
 		} );

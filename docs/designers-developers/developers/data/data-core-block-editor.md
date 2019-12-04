@@ -189,6 +189,19 @@ _Returns_
 
 -   `Array`: Ordered client IDs of editor blocks.
 
+<a name="getBlockParents" href="#getBlockParents">#</a> **getBlockParents**
+
+Given a block client ID, returns the list of all its parents from top to bottom.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+-   _clientId_ `string`: Block from which to find root client ID.
+
+_Returns_
+
+-   `Array`: ClientIDs of the parent blocks.
+
 <a name="getBlockRootClientId" href="#getBlockRootClientId">#</a> **getBlockRootClientId**
 
 Given a block client ID, returns the root block from which the block is
@@ -345,7 +358,24 @@ _Parameters_
 
 _Returns_
 
--   `Array<Editor.InserterItem>`: Items that appear in inserter.
+-   `Array<WPEditorInserterItem>`: Items that appear in inserter.
+
+_Type Definition_
+
+-   _WPEditorInserterItem_ `Object`
+
+_Properties_
+
+-   _id_ `string`: Unique identifier for the item.
+-   _name_ `string`: The type of block to create.
+-   _initialAttributes_ `Object`: Attributes to pass to the newly created block.
+-   _title_ `string`: Title of the item, as it appears in the inserter.
+-   _icon_ `string`: Dashicon for the item, as it appears in the inserter.
+-   _category_ `string`: Block category that the item is associated with.
+-   _keywords_ `Array<string>`: Keywords that can be searched to find this item.
+-   _isDisabled_ `boolean`: Whether or not the user should be prevented from inserting this item.
+-   _utility_ `number`: How useful we think this item is, between 0 and 3.
+-   _frecency_ `number`: Hueristic that combines frequency and recency.
 
 <a name="getLastMultiSelectedBlockClientId" href="#getLastMultiSelectedBlockClientId">#</a> **getLastMultiSelectedBlockClientId**
 
@@ -703,7 +733,7 @@ _Returns_
 Returns true if the block corresponding to the specified client ID is
 currently selected but isn't the last of the selected blocks. Here "last"
 refers to the block sequence in the document, _not_ the sequence of
-multi-selection, which is why `state.blockSelection.end` isn't used.
+multi-selection, which is why `state.selectionEnd` isn't used.
 
 _Parameters_
 
@@ -1045,6 +1075,20 @@ _Returns_
 
 -   `Object`: Action object.
 
+<a name="resetSelection" href="#resetSelection">#</a> **resetSelection**
+
+Returns an action object used in signalling that selection state should be
+reset to the specified selection.
+
+_Parameters_
+
+-   _selectionStart_ `WPBlockSelection`: The selection start.
+-   _selectionEnd_ `WPBlockSelection`: The selection end.
+
+_Returns_
+
+-   `Object`: Action object.
+
 <a name="selectBlock" href="#selectBlock">#</a> **selectBlock**
 
 Returns an action object used in signalling that the block with the
@@ -1097,15 +1141,11 @@ _Parameters_
 
 <a name="setNavigationMode" href="#setNavigationMode">#</a> **setNavigationMode**
 
-Returns an action object used to enable or disable the navigation mode.
+Generators that triggers an action used to enable or disable the navigation mode.
 
 _Parameters_
 
 -   _isNavigationMode_ `string`: Enable/Disable navigation mode.
-
-_Returns_
-
--   `Object`: Action object
 
 <a name="setTemplateValidity" href="#setTemplateValidity">#</a> **setTemplateValidity**
 

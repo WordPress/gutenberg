@@ -3,13 +3,18 @@
 	<description>Sniffs for WordPress plugins, with minor modifications for Gutenberg</description>
 
 	<rule ref="PHPCompatibility"/>
-	<config name="testVersion" value="5.2-"/>
+	<config name="testVersion" value="5.6-"/>
 
 	<rule ref="WordPress-Core"/>
 	<rule ref="WordPress-Docs"/>
 	<rule ref="WordPress.WP.I18n"/>
 	<config name="text_domain" value="gutenberg,default"/>
 
+	<rule ref="VariableAnalysis.CodeAnalysis.VariableAnalysis">
+		<properties>
+			<property name="allowUnusedParametersBeforeUsed" value="true"/>
+		</properties>
+	</rule>
 	<rule ref="WordPress.CodeAnalysis.EmptyStatement"/>
 
 	<rule ref="PEAR.Functions.FunctionCallSignature">

@@ -22,6 +22,7 @@ function BlockNavigationDropdown( { hasBlocks, isDisabled } ) {
 
 	return	(
 		<Dropdown
+			contentClassName="editor-block-navigation__popover block-editor-block-navigation__popover"
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<>
 					{ isEnabled && <KeyboardShortcuts
@@ -35,7 +36,7 @@ function BlockNavigationDropdown( { hasBlocks, isDisabled } ) {
 						icon={ MenuIcon }
 						aria-expanded={ isOpen }
 						onClick={ isEnabled ? onToggle : undefined }
-						label={ __( 'Block Navigation' ) }
+						label={ __( 'Block navigation' ) }
 						className="editor-block-navigation block-editor-block-navigation"
 						shortcut={ displayShortcut.access( 'o' ) }
 						aria-disabled={ ! isEnabled }

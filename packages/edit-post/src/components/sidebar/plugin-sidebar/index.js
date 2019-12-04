@@ -41,10 +41,7 @@ function PluginSidebar( props ) {
 					/> }
 				</PinnedPlugins>
 			) }
-			<Sidebar
-				name={ sidebarName }
-				label={ __( 'Editor plugins' ) }
-			>
+			<Sidebar name={ sidebarName }>
 				<SidebarHeader
 					closeLabel={ __( 'Close plugin' ) }
 				>
@@ -82,7 +79,7 @@ function PluginSidebar( props ) {
  * @param {string} [props.className] An optional class name added to the sidebar body.
  * @param {string} props.title Title displayed at the top of the sidebar.
  * @param {boolean} [props.isPinnable=true] Whether to allow to pin sidebar to toolbar.
- * @param {string|Element} [props.icon=inherits from the plugin] The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
+ * @param {WPBlockTypeIconRender} [props.icon=inherits from the plugin] The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
  *
  * @example <caption>ES5</caption>
  * ```js
@@ -129,7 +126,7 @@ function PluginSidebar( props ) {
  * );
  * ```
  *
- * @return {WPElement} Plugin sidebar component.
+ * @return {WPComponent} Plugin sidebar component.
  */
 export default compose(
 	withPluginContext( ( context, ownProps ) => {

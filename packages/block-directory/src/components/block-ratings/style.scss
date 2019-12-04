@@ -1,0 +1,19 @@
+.block-directory-block-ratings {
+	display: flex;
+	> div {
+		line-height: 1;
+		display: flex;
+	}
+	.dashicons {
+		font-size: ms(-2);
+		width: 1.1em;
+	}
+	.block-directory-block-ratings__rating-count {
+		color: $dark-gray-400;
+		font-size: ms(-2);
+	}
+
+	[class*="dashicons-star-"] {
+		color: #ffb900;
+	}
+}

@@ -1,13 +1,17 @@
 .components-placeholder {
 	margin-bottom: $default-block-margin;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
 	padding: 1em;
 	min-height: 200px;
 	width: 100%;
 	text-align: center;
+
+	// IE11 doesn't read rules inside this query. They are applied only to modern browsers.
+	@supports (position: sticky) {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+	}
 
 	// Use opacity to work in various editor styles.
 	background: $dark-opacity-light-200;
@@ -60,6 +64,7 @@
 }
 
 .components-placeholder__input {
+	margin-top: 0;
 	margin-right: 8px;
 	flex: 1 1 auto;
 }
@@ -71,4 +76,26 @@
 .components-placeholder__preview img {
 	margin: 3%;
 	width: 50%;
+}
+
+.components-placeholder__fieldset .components-button {
+	margin-right: 4px;
+	margin-bottom: 10px; // if buttons wrap we need vertical space between
+
+	&:last-child {
+		margin-right: 0;
+	}
+}
+
+// Any `<Button />` component with `isLink` prop will need extra spacing if placed
+// immediately after a button which is *not* an `isLink` style button. This is because
+// `isLink` has no padding so we need to account for this to avoid the buttons butting
+// up against each other. If it's the last item we don't need a right margin.
+.components-placeholder__fieldset .components-button:not(.is-link) ~ .components-button.is-link {
+	margin-left: 10px; // equal to standard button inner padding
+	margin-right: 10px; // equal to standard button inner padding
+
+	&:last-child {
+		margin-right: 0;
+	}
 }

@@ -4,7 +4,7 @@
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { withDispatch, withSelect } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { BlockList } from '@wordpress/block-editor';
 import { PostTitle } from '@wordpress/editor';
 import { ReadableContentView } from '@wordpress/components';
@@ -20,8 +20,9 @@ class VisualEditor extends Component {
 			editTitle,
 			setTitleRef,
 			title,
+			getStylesFromColorScheme,
 		} = this.props;
-
+		const blockHolderFocusedStyle = getStylesFromColorScheme( styles.blockHolderFocused, styles.blockHolderFocusedDark );
 		return (
 			<ReadableContentView>
 				<PostTitle
@@ -34,7 +35,7 @@ class VisualEditor extends Component {
 							styles.blockHolderFullBordered :
 							styles.blockHolderSemiBordered
 					}
-					focusedBorderColor={ styles.blockHolderFocused.borderColor }
+					focusedBorderColor={ blockHolderFocusedStyle.borderColor }
 					accessibilityLabel="post-title"
 				/>
 			</ReadableContentView>
@@ -52,6 +53,7 @@ class VisualEditor extends Component {
 				header={ this.renderHeader() }
 				isFullyBordered={ isFullyBordered }
 				safeAreaBottomInset={ safeAreaBottomInset }
+				autoScroll={ true }
 			/>
 		);
 	}
@@ -81,4 +83,5 @@ export default compose( [
 			},
 		};
 	} ),
+	withPreferredColorScheme,
 ] )( VisualEditor );

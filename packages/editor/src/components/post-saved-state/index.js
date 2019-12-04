@@ -156,5 +156,5 @@ export default compose( [
 		onSave: dispatch( 'core/editor' ).savePost,
 	} ) ),
 	withSafeTimeout,
-	withViewportMatch( { isLargeViewport: 'medium' } ),
+	withViewportMatch( { isLargeViewport: 'small' } ),
 ] )( PostSavedState );

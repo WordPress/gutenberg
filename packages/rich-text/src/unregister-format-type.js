@@ -4,6 +4,8 @@
 import { select, dispatch } from '@wordpress/data';
 import { removeFilter } from '@wordpress/hooks';
 
+/** @typedef {import('./register-format-type').WPFormat} WPFormat */
+
 /**
  * Unregisters a format.
  *

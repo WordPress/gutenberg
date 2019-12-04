@@ -18,7 +18,7 @@ import BlockEditorProvider from '../provider';
 import BlockList from '../block-list';
 import { getBlockPreviewContainerDOMNode } from '../../utils/dom';
 
-function ScaledBlockPreview( { blocks, viewportWidth } ) {
+function ScaledBlockPreview( { blocks, viewportWidth, padding = 0 } ) {
 	const previewRef = useRef( null );
 
 	const [ isReady, setIsReady ] = useState( false );
@@ -42,16 +42,22 @@ function ScaledBlockPreview( { blocks, viewportWidth } ) {
 					return;
 				}
 
-				const containerElementRect = containerElement.getBoundingClientRect();
+				let containerElementRect = containerElement.getBoundingClientRect();
+				containerElementRect = {
+					width: containerElementRect.width - ( padding * 2 ),
+					height: containerElementRect.height - ( padding * 2 ),
+					left: containerElementRect.left,
+					top: containerElementRect.top,
+				};
 				const scaledElementRect = previewElement.getBoundingClientRect();
 
 				const scale = containerElementRect.width / scaledElementRect.width || 1;
-				const offsetX = scaledElementRect.left - containerElementRect.left;
+				const offsetX = ( -( scaledElementRect.left - containerElementRect.left ) * scale ) + padding;
 				const offsetY = ( containerElementRect.height > scaledElementRect.height * scale ) ?
-					( containerElementRect.height - ( scaledElementRect.height * scale ) ) / 2 : 0;
+					( ( containerElementRect.height - ( scaledElementRect.height * scale ) ) / 2 ) + padding : 0;
 
 				setPreviewScale( scale );
-				setPosition( { x: offsetX * scale, y: offsetY } );
+				setPosition( { x: offsetX, y: offsetY } );
 
 				// Hack: we need  to reset the scaled elements margins
 				previewElement.style.marginTop = '0';
@@ -78,7 +84,7 @@ function ScaledBlockPreview( { blocks, viewportWidth } ) {
 	const previewStyles = {
 		transform: `scale(${ previewScale })`,
 		visibility: isReady ? 'visible' : 'hidden',
-		left: -x,
+		left: x,
 		top: y,
 		width: viewportWidth,
 	};
@@ -98,7 +104,7 @@ function ScaledBlockPreview( { blocks, viewportWidth } ) {
 	);
 }
 
-export function BlockPreview( { blocks, viewportWidth = 700, settings } ) {
+export function BlockPreview( { blocks, viewportWidth = 700, padding, settings } ) {
 	const renderedBlocks = useMemo( () => castArray( blocks ), [ blocks ] );
 	const [ recompute, triggerRecompute ] = useReducer( ( state ) => state + 1, 0 );
 	useLayoutEffect( triggerRecompute, [ blocks ] );
@@ -118,6 +124,7 @@ export function BlockPreview( { blocks, viewportWidth = 700, settings } ) {
 				key={ recompute }
 				blocks={ renderedBlocks }
 				viewportWidth={ viewportWidth }
+				padding={ padding }
 			/>
 		</BlockEditorProvider>
 	);
@@ -130,7 +137,7 @@ export function BlockPreview( { blocks, viewportWidth = 700, settings } ) {
  *
  * @param {Array|Object} blocks A block instance (object) or an array of blocks to be previewed.
  * @param {number} viewportWidth Width of the preview container in pixels. Controls at what size the blocks will be rendered inside the preview. Default: 700.
- * @return {WPElement} Rendered element.
+ * @return {WPComponent} The component to be rendered.
  */
 export default withSelect( ( select ) => {
 	return {

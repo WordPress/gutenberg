@@ -138,7 +138,7 @@ class GalleryImage extends Component {
 						icon={ leftArrow }
 						onClick={ isFirstItem ? undefined : onMoveBackward }
 						className="blocks-gallery-item__move-backward"
-						label={ __( 'Move Image Backward' ) }
+						label={ __( 'Move image backward' ) }
 						aria-disabled={ isFirstItem }
 						disabled={ ! isSelected }
 					/>
@@ -146,7 +146,7 @@ class GalleryImage extends Component {
 						icon={ rightArrow }
 						onClick={ isLastItem ? undefined : onMoveForward }
 						className="blocks-gallery-item__move-forward"
-						label={ __( 'Move Image Forward' ) }
+						label={ __( 'Move image forward' ) }
 						aria-disabled={ isLastItem }
 						disabled={ ! isSelected }
 					/>
@@ -156,19 +156,21 @@ class GalleryImage extends Component {
 						icon="no-alt"
 						onClick={ onRemove }
 						className="blocks-gallery-item__remove"
-						label={ __( 'Remove Image' ) }
+						label={ __( 'Remove image' ) }
 						disabled={ ! isSelected }
 					/>
 				</div>
-				<RichText
-					tagName="figcaption"
-					placeholder={ isSelected ? __( 'Write caption…' ) : null }
-					value={ caption }
-					isSelected={ this.state.captionSelected }
-					onChange={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
-					unstableOnFocus={ this.onSelectCaption }
-					inlineToolbar
-				/>
+				{ ( isSelected || caption ) && (
+					<RichText
+						tagName="figcaption"
+						placeholder={ isSelected ? __( 'Write caption…' ) : null }
+						value={ caption }
+						isSelected={ this.state.captionSelected }
+						onChange={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
+						unstableOnFocus={ this.onSelectCaption }
+						inlineToolbar
+					/>
+				) }
 			</figure>
 		);
 	}

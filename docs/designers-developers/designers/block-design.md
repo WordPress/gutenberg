@@ -56,7 +56,7 @@ In most cases, a block’s setup state is only shown once and then further custo
 
 A block should have a straightforward, short name so users can easily find it in the Block Library. A block named "YouTube" is easy to find and understand. The same block, named "Embedded Video (YouTube)", would be less clear and harder to find in the Block Library.
 
-When referring to a block in documentation or UI, use title case for the block title, and lowercase for the "block" descriptor. For example:
+When referring to a block in documentation or UI, use title case for the block title and lowercase for the "block" descriptor. For example:
 
 - Paragraph block
 - Latest Posts block
@@ -86,7 +86,7 @@ Stick to a single imperative sentence with an action + subject format. Examples:
 
 ![A screenshot of a short block description](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/designers/assets/block-descriptions-do.png)
 **Do:**
-Use a short, simple, block description.
+Use a short, simple block description.
 
 ![A screenshot of a long block description that includes branding](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/designers/assets/block-descriptions-dont.png)
 **Don't:**
@@ -112,11 +112,11 @@ When selected, your block may surface additional options like input fields or bu
 
 ![A Google Maps block with inline, always-accessible controls required for the block to function](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/designers/assets/block-controls-do.png)
 **Do:**
-For controls that are essential the the operation of the block, provide them directly in inside the block edit view.
+For controls that are essential for the operation of the block, provide them directly inside the block edit view.
 
 ![A Google Maps block with essential controls moved to the sidebar where they can be contextually hidden](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/designers/assets/block-controls-dont.png)
 **Don't:**
-Do not put controls that are essential to the block in the sidebar, or the block will appear non-functional to mobile users, or desktop users who have dismissed the sidebar.
+Do not put controls that are essential to the block in the sidebar, otherwise the block will appear non-functional to mobile users or desktop users who have dismissed the sidebar.
 
 ### Advanced Block Settings
 
@@ -152,7 +152,7 @@ The most basic unit of the editor. The Paragraph block is a simple input field.
 
 - Block Toolbar: Has a switcher to perform transformations to headings, etc.
 - Block Toolbar: Has basic text alignments
-- Block Toolbar: Has inline formatting options, bold, italic, strikethrough and link
+- Block Toolbar: Has inline formatting options, bold, italic, strikethrough, and link
 
 ### Image
 
@@ -178,7 +178,7 @@ Basic image block.
 - Has description: “They're worth 1,000 words! Insert a single image.”
 - Has options for changing or adding alt text and adding additional custom CSS classes.
 
-_Future improvements to the Image block could include getting rid of the media modal, in place of letting users select images directly from the placeholder itself. In general, try to avoid modals._
+_Future improvements to the Image block could include getting rid of the media modal in place of letting users select images directly from the placeholder itself. In general, try to avoid modals._
 
 ### Latest Post
 
@@ -186,7 +186,7 @@ _Future improvements to the Image block could include getting rid of the media m
 
 ### Placeholder:
 
-Has no placeholder, as it works immediately upon insertion. The default inserted state shows the last 5 posts.
+Has no placeholder as it works immediately upon insertion. The default inserted state shows the last 5 posts.
 
 ### Selected state:
 
@@ -200,4 +200,4 @@ _Note that the Block Toolbar does not include the Block Chip in this case, since
 - Has description: “Display a list of your most recent posts.”
 - Has options for post order, narrowing the list by category, changing the default number of posts to show, and showing the post date.
 
-_Latest Posts is fully functional as soon as it’s inserted, because it comes with good defaults._
+_Latest Posts is fully functional as soon as it’s inserted because it comes with good defaults._

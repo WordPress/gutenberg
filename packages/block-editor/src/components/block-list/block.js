@@ -49,7 +49,6 @@ import BlockInsertionPoint from './insertion-point';
 import IgnoreNestedEvents from '../ignore-nested-events';
 import InserterWithShortcuts from '../inserter-with-shortcuts';
 import Inserter from '../inserter';
-import useHoveredArea from './hover-area';
 import { isInsideRootBlock } from '../../utils/dom';
 import useMovingAnimation from './moving-animation';
 
@@ -64,10 +63,10 @@ const preventDrag = ( event ) => {
 };
 
 function BlockListBlock( {
-	blockRef,
 	mode,
 	isFocusMode,
 	hasFixedToolbar,
+	moverDirection,
 	isLocked,
 	clientId,
 	rootClientId,
@@ -81,7 +80,6 @@ function BlockListBlock( {
 	isParentOfSelectedBlock,
 	isDraggable,
 	isSelectionEnabled,
-	isRTL,
 	className,
 	name,
 	isValid,
@@ -102,7 +100,8 @@ function BlockListBlock( {
 	animateOnChange,
 	enableAnimation,
 	isNavigationMode,
-	enableNavigationMode,
+	setNavigationMode,
+	isMultiSelecting,
 } ) {
 	// Random state used to rerender the component if needed, ideally we don't need this
 	const [ , updateRerenderState ] = useState( {} );
@@ -110,15 +109,9 @@ function BlockListBlock( {
 
 	// Reference of the wrapper
 	const wrapper = useRef( null );
-	useEffect( () => {
-		blockRef( wrapper.current, clientId );
-	}, [] );
 
 	// Reference to the block edit node
 	const blockNodeRef = useRef();
-
-	// Hovered area of the block
-	const hoverArea = useHoveredArea( wrapper );
 
 	const breadcrumb = useRef();
 
@@ -186,7 +179,7 @@ function BlockListBlock( {
 
 	// Handling the error state
 	const [ hasError, setErrorState ] = useState( false );
-	const onBlockError = () => setErrorState( false );
+	const onBlockError = () => setErrorState( true );
 
 	// Handling of forceContextualToolbarFocus
 	const isForcingContextualToolbar = useRef( false );
@@ -211,6 +204,19 @@ function BlockListBlock( {
 	 * @param {boolean} ignoreInnerBlocks Should not focus inner blocks.
 	 */
 	const focusTabbable = ( ignoreInnerBlocks ) => {
+		const selection = window.getSelection();
+
+		if ( selection.rangeCount && ! selection.isCollapsed ) {
+			const { startContainer, endContainer } = selection.getRangeAt( 0 );
+
+			if (
+				! blockNodeRef.current.contains( startContainer ) ||
+				! blockNodeRef.current.contains( endContainer )
+			) {
+				selection.removeAllRanges();
+			}
+		}
+
 		// Focus is captured by the wrapper node, so while focus transition
 		// should only consider tabbables within editable display, since it
 		// may be the wrapper itself or a side control which triggered the
@@ -261,7 +267,7 @@ function BlockListBlock( {
 	}, [ isFirstMultiSelected ] );
 
 	// Block Reordering animation
-	const animationStyle = useMovingAnimation( wrapper, isSelected || isPartOfMultiSelection, enableAnimation, animateOnChange );
+	const animationStyle = useMovingAnimation( wrapper, isSelected || isPartOfMultiSelection, isSelected || isFirstMultiSelected, enableAnimation, animateOnChange );
 
 	// Focus the breadcrumb if the wrapper is focused on navigation mode.
 	// Focus the first editable or the wrapper if edit mode.
@@ -283,7 +289,7 @@ function BlockListBlock( {
 	 * (via `setFocus`), typically if there is no focusable input in the block.
 	 */
 	const onFocus = () => {
-		if ( ! isSelected && ! isPartOfMultiSelection ) {
+		if ( ! isSelected && ! isParentOfSelectedBlock && ! isPartOfMultiSelection ) {
 			onSelect();
 		}
 	};
@@ -330,23 +336,33 @@ function BlockListBlock( {
 					isSelected &&
 					isEditMode
 				) {
-					enableNavigationMode();
+					setNavigationMode( true );
 					wrapper.current.focus();
 				}
 				break;
 		}
 	};
 
+	const isPointerDown = useRef( false );
+
 	/**
 	 * Begins tracking cursor multi-selection when clicking down within block.
 	 *
 	 * @param {MouseEvent} event A mousedown event.
 	 */
-	const onPointerDown = ( event ) => {
+	const onMouseDown = ( event ) => {
 		// Not the main button.
 		// https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
 		if ( event.button !== 0 ) {
 			return;
+		}
+
+		if (
+			isNavigationMode &&
+			isSelected &&
+			isInsideRootBlock( blockNodeRef.current, event.target )
+		) {
+			setNavigationMode( false );
 		}
 
 		if ( event.shiftKey ) {
@@ -358,7 +374,7 @@ function BlockListBlock( {
 		// Avoid triggering multi-selection if we click toolbars/inspectors
 		// and all elements that are outside the Block Edit DOM tree.
 		} else if ( blockNodeRef.current.contains( event.target ) ) {
-			onSelectionStart( clientId );
+			isPointerDown.current = true;
 
 			// Allow user to escape out of a multi-selection to a singular
 			// selection of a block via click. This is handled here since
@@ -369,6 +385,20 @@ function BlockListBlock( {
 				onSelect();
 			}
 		}
+	};
+
+	const onMouseUp = () => {
+		isPointerDown.current = false;
+	};
+
+	const onMouseLeave = () => {
+		if ( isPointerDown.current ) {
+			onSelectionStart( clientId );
+		}
+
+		hideHoverEffects();
+
+		isPointerDown.current = false;
 	};
 
 	const selectOnOpen = ( open ) => {
@@ -404,13 +434,11 @@ function BlockListBlock( {
 	// We render block movers and block settings to keep them tabbale even if hidden
 	const shouldRenderMovers =
 		! isNavigationMode &&
-		( isSelected || hoverArea === ( isRTL ? 'right' : 'left' ) ) &&
+		isSelected &&
 		! showEmptyBlockSideInserter &&
 		! isPartOfMultiSelection &&
 		! isTypingWithinBlock;
-	const shouldShowBreadcrumb =
-		( isSelected && isNavigationMode ) ||
-		( ! isNavigationMode && ! isFocusMode && isHovered && ! isEmptyDefaultBlock );
+	const shouldShowBreadcrumb = isNavigationMode && isSelected && ! isMultiSelecting;
 	const shouldShowContextualToolbar =
 		! isNavigationMode &&
 		! hasFixedToolbar &&
@@ -423,9 +451,12 @@ function BlockListBlock( {
 
 	// Insertion point can only be made visible if the block is at the
 	// the extent of a multi-selection, or not in a multi-selection.
-	const shouldShowInsertionPoint =
+	const shouldShowInsertionPoint = ! isMultiSelecting && (
 		( isPartOfMultiSelection && isFirstMultiSelected ) ||
-		! isPartOfMultiSelection;
+		! isPartOfMultiSelection
+	);
+
+	const shouldRenderDropzone = shouldShowInsertionPoint;
 
 	// The wp-block className is important for editor styles.
 	// Generate the wrapper class names handling the different states of the block.
@@ -455,6 +486,20 @@ function BlockListBlock( {
 		};
 	}
 	const blockElementId = `block-${ clientId }`;
+	const blockMover = (
+		<BlockMover
+			clientIds={ clientId }
+			blockElementId={ blockElementId }
+			isHidden={ ! isSelected }
+			isDraggable={
+				isDraggable !== false &&
+				( ! isPartOfMultiSelection && isMovable )
+			}
+			onDragStart={ onDragStart }
+			onDragEnd={ onDragEnd }
+			__experimentalOrientation={ moverDirection }
+		/>
+	);
 
 	// We wrap the BlockEdit component in a div that hides it when editing in
 	// HTML mode. This allows us to render all of the ancillary pieces
@@ -511,27 +556,23 @@ function BlockListBlock( {
 					rootClientId={ rootClientId }
 				/>
 			) }
-			<BlockDropZone
+			{ shouldRenderDropzone && <BlockDropZone
 				clientId={ clientId }
 				rootClientId={ rootClientId }
-			/>
-			{ isFirstMultiSelected && (
-				<BlockMultiControls rootClientId={ rootClientId } />
-			) }
-			<div className="editor-block-list__block-edit block-editor-block-list__block-edit">
-				{ shouldRenderMovers && (
-					<BlockMover
-						clientIds={ clientId }
-						blockElementId={ blockElementId }
-						isHidden={ ! ( isHovered || isSelected ) || hoverArea !== ( isRTL ? 'right' : 'left' ) }
-						isDraggable={
-							isDraggable !== false &&
-							( ! isPartOfMultiSelection && isMovable )
-						}
-						onDragStart={ onDragStart }
-						onDragEnd={ onDragEnd }
+			/> }
+			<div
+				className={ classnames(
+					'editor-block-list__block-edit block-editor-block-list__block-edit',
+					{ 'has-mover-inside': moverDirection === 'horizontal' },
+				) }
+			>
+				{ isFirstMultiSelected && (
+					<BlockMultiControls
+						rootClientId={ rootClientId }
+						moverDirection={ moverDirection }
 					/>
 				) }
+				{ shouldRenderMovers && ( moverDirection === 'vertical' ) && blockMover }
 				{ shouldShowBreadcrumb && (
 					<BlockBreadcrumb
 						clientId={ clientId }
@@ -563,7 +604,9 @@ function BlockListBlock( {
 				<IgnoreNestedEvents
 					ref={ blockNodeRef }
 					onDragStart={ preventDrag }
-					onMouseDown={ onPointerDown }
+					onMouseDown={ onMouseDown }
+					onMouseUp={ onMouseUp }
+					onMouseLeave={ onMouseLeave }
 					data-block={ clientId }
 				>
 					<BlockCrashBoundary onError={ onBlockError }>
@@ -571,6 +614,7 @@ function BlockListBlock( {
 						{ isValid && mode === 'html' && (
 							<BlockHtml clientId={ clientId } />
 						) }
+						{ shouldRenderMovers && ( moverDirection === 'horizontal' ) && blockMover }
 						{ ! isValid && [
 							<BlockInvalidWarning
 								key="invalid-warning"
@@ -581,10 +625,10 @@ function BlockListBlock( {
 							</div>,
 						] }
 					</BlockCrashBoundary>
-					{ shouldShowMobileToolbar && (
-						<BlockMobileToolbar clientId={ clientId } />
-					) }
 					{ !! hasError && <BlockCrashWarning /> }
+					{ shouldShowMobileToolbar && (
+						<BlockMobileToolbar clientId={ clientId } moverDirection={ moverDirection } />
+					) }
 				</IgnoreNestedEvents>
 			</div>
 			{ showInserterShortcuts && (
@@ -771,9 +815,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 		toggleSelection( selectionEnabled ) {
 			toggleSelection( selectionEnabled );
 		},
-		enableNavigationMode() {
-			setNavigationMode( true );
-		},
+		setNavigationMode,
 	};
 } );
 

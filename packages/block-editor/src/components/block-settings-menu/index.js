@@ -6,7 +6,7 @@ import { castArray, flow } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _n } from '@wordpress/i18n';
 import {
 	Toolbar,
 	DropdownMenu,
@@ -117,7 +117,7 @@ export function BlockSettingsMenu( { clientIds } ) {
 											icon="trash"
 											shortcut={ shortcuts.removeBlock.display }
 										>
-											{ __( 'Remove Block' ) }
+											{ _n( 'Remove Block', 'Remove Blocks', count ) }
 										</MenuItem>
 									) }
 								</MenuGroup>

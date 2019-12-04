@@ -104,13 +104,6 @@ class WritingFlow extends Component {
 
 	onMouseDown() {
 		this.verticalRect = null;
-		this.disableNavigationMode();
-	}
-
-	disableNavigationMode() {
-		if ( this.props.isNavigationMode ) {
-			this.props.disableNavigationMode();
-		}
 	}
 
 	/**
@@ -444,11 +437,10 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { multiSelect, selectBlock, setNavigationMode, clearSelectedBlock } = dispatch( 'core/block-editor' );
+		const { multiSelect, selectBlock, clearSelectedBlock } = dispatch( 'core/block-editor' );
 		return {
 			onMultiSelect: multiSelect,
 			onSelectBlock: selectBlock,
-			disableNavigationMode: () => setNavigationMode( false ),
 			clearSelectedBlock,
 		};
 	} ),

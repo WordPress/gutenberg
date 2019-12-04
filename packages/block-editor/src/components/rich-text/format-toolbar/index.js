@@ -26,7 +26,7 @@ const FormatToolbar = () => {
 					{ ( fills ) => fills.length !== 0 &&
 						<DropdownMenu
 							icon={ false }
-							label={ __( 'More Rich Text Controls' ) }
+							label={ __( 'More rich text controls' ) }
 							controls={ orderBy( fills.map( ( [ { props } ] ) => props ), 'title' ) }
 							popoverProps={ POPOVER_PROPS }
 						/>

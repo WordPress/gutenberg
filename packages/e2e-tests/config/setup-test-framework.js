@@ -10,6 +10,7 @@ import {
 	activatePlugin,
 	clearLocalStorage,
 	enablePageDialogAccept,
+	isOfflineMode,
 	setBrowserViewport,
 	switchUserToAdmin,
 	switchUserToTest,
@@ -116,22 +117,25 @@ function observeConsoleLogging() {
 			return;
 		}
 
+		// A chrome advisory warning about SameSite cookies is informational
+		// about future changes, tracked separately for improvement in core.
+		//
+		// See: https://core.trac.wordpress.org/ticket/37000
+		// See: https://www.chromestatus.com/feature/5088147346030592
+		// See: https://www.chromestatus.com/feature/5633521622188032
+		if ( text.includes( 'A cookie associated with a cross-site resource' ) ) {
+			return;
+		}
+
 		// Viewing posts on the front end can result in this error, which
 		// has nothing to do with Gutenberg.
 		if ( text.includes( 'net::ERR_UNKNOWN_URL_SCHEME' ) ) {
 			return;
 		}
 
-		// A bug present in WordPress 5.2 will produce console warnings when
-		// loading the Dashicons font. These can be safely ignored, as they do
-		// not otherwise regress on application behavior. This logic should be
-		// removed once the associated ticket has been closed.
-		//
-		// See: https://core.trac.wordpress.org/ticket/47183
-		if (
-			text.startsWith( 'Failed to decode downloaded font:' ) ||
-			text.startsWith( 'OTS parsing error:' )
-		) {
+		// Network errors are ignored only if we are intentionally testing
+		// offline mode.
+		if ( text.includes( 'net::ERR_INTERNET_DISCONNECTED' ) && isOfflineMode() ) {
 			return;
 		}
 
@@ -175,6 +179,8 @@ async function runAxeTestsForBlockEditor() {
 		// See: https://github.com/WordPress/gutenberg/pull/15018.
 		disabledRules: [
 			'aria-allowed-role',
+			'aria-hidden-focus',
+			'aria-input-field-name',
 			'aria-valid-attr-value',
 			'button-name',
 			'color-contrast',

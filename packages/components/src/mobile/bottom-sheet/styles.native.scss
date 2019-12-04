@@ -21,6 +21,10 @@
 	width: 100%;
 }
 
+.separatorDark {
+	background-color: $gray-70;
+}
+
 .emptyHeaderSpace {
 	height: 14;
 }
@@ -32,6 +36,10 @@
 	width: 100%;
 	max-width: 512;
 	padding-bottom: 0;
+}
+
+.backgroundDark {
+	background-color: $background-dark-elevated;
 }
 
 .content {
@@ -68,6 +76,15 @@
 	padding: 5px;
 }
 
+.resetButton {
+	font-size: 17px;
+	color: $blue-wordpress;
+}
+
+.resetButtonDark {
+	color: $blue-30;
+}
+
 // Cell
 
 .cellContainer {
@@ -86,9 +103,14 @@
 	width: 100%;
 }
 
+.cellSeparatorDark {
+	background-color: $gray-70;
+}
+
 .cellRowContainer {
 	flex-direction: row;
 	align-items: center;
+	flex-shrink: 1;
 }
 
 .cellIcon {
@@ -108,6 +130,13 @@
 	text-align: center;
 }
 
+.cellLabelLeftAlignNoIcon {
+	font-size: 17px;
+	color: #2e4453;
+	flex: 1;
+	margin-left: 12px;
+}
+
 .cellValue {
 	font-size: 17px;
 	color: #2e4453;
@@ -115,6 +144,18 @@
 	flex: 1;
 }
 
+.cellTextDark {
+	color: $white;
+}
+
 .cellValueRTL {
 	text-align: left;
+}
+
+.icon {
+	color: #7b9ab1;
+}
+
+.iconDark {
+	color: #c3c4c7;
 }

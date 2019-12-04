@@ -25,7 +25,7 @@ jest.mock( '@wordpress/dom', () => {
 					// In JSDOM, all elements have zero'd widths and height.
 					// This is a metric for focusable's `isVisible`, so find
 					// and apply an arbitrary non-zero width.
-					[ ...context.querySelectorAll( '*' ) ].forEach( ( element ) => {
+					Array.from( context.querySelectorAll( '*' ) ).forEach( ( element ) => {
 						Object.defineProperties( element, {
 							offsetWidth: {
 								get: () => 1,

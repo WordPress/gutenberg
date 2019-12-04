@@ -1,10 +1,15 @@
 /**
+ * External dependencies
+ */
+import { Platform } from 'react-native';
+/**
  * WordPress dependencies
  */
 import {
 	registerBlockType,
 	setDefaultBlockName,
 	setUnregisteredTypeHandlerName,
+	setGroupingBlockName,
 } from '@wordpress/blocks';
 
 /**
@@ -48,6 +53,7 @@ import * as textColumns from './text-columns';
 import * as verse from './verse';
 import * as video from './video';
 import * as tagCloud from './tag-cloud';
+import * as group from './group';
 
 export const coreBlocks = [
 	// Common blocks are grouped at the top to prioritize their display
@@ -94,11 +100,38 @@ export const coreBlocks = [
 	textColumns,
 	verse,
 	video,
-].reduce( ( memo, block ) => {
-	memo[ block.name ] = block;
-	return memo;
+].reduce( ( accumulator, block ) => {
+	accumulator[ block.name ] = block;
+	return accumulator;
 }, {} );
 
+/**
+ * Function to register an individual block.
+ *
+ * @param {Object} block The block to be registered.
+ *
+ */
+const registerBlock = ( block ) => {
+	if ( ! block ) {
+		return;
+	}
+	const { metadata, settings, name } = block;
+	registerBlockType( name, {
+		...metadata,
+		...settings,
+	} );
+};
+
+/**
+ * Function to register core blocks provided by the block editor.
+ *
+ * @example
+ * ```js
+ * import { registerCoreBlocks } from '@wordpress/block-library';
+ *
+ * registerCoreBlocks();
+ * ```
+ */
 export const registerCoreBlocks = () => {
 	[
 		paragraph,
@@ -112,13 +145,17 @@ export const registerCoreBlocks = () => {
 		separator,
 		list,
 		quote,
-	].forEach( ( { metadata, name, settings } ) => {
-		registerBlockType( name, {
-			...metadata,
-			...settings,
-		} );
-	} );
-};
+		mediaText,
+		// eslint-disable-next-line no-undef
+		( ( Platform.OS === 'ios' ) || ( !! __DEV__ ) ) ? preformatted : null,
+		// eslint-disable-next-line no-undef
+		!! __DEV__ ? group : null,
+		spacer,
+	].forEach( registerBlock );
 
-setDefaultBlockName( paragraph.name );
-setUnregisteredTypeHandlerName( missing.name );
+	setDefaultBlockName( paragraph.name );
+	setUnregisteredTypeHandlerName( missing.name );
+	if ( group ) {
+		setGroupingBlockName( group.name );
+	}
+};

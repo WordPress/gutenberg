@@ -15,7 +15,7 @@ import {
 	Animate,
 	ClipboardButton,
 	IconButton,
-	Toolbar,
+	ToolbarGroup,
 	withNotices,
 } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
@@ -190,7 +190,7 @@ class FileEdit extends Component {
 				/>
 				<BlockControls>
 					<MediaUploadCheck>
-						<Toolbar>
+						<ToolbarGroup>
 							<MediaUpload
 								onSelect={ this.onSelectFile }
 								value={ id }
@@ -203,21 +203,22 @@ class FileEdit extends Component {
 									/>
 								) }
 							/>
-						</Toolbar>
+						</ToolbarGroup>
 					</MediaUploadCheck>
 				</BlockControls>
 				<Animate type={ isBlobURL( href ) ? 'loading' : null }>
 					{ ( { className: animateClassName } ) => (
 						<div className={ classnames( classes, animateClassName ) }>
 							<div className={ 'wp-block-file__content-wrapper' }>
-								<RichText
-									wrapperClassName={ 'wp-block-file__textlink' }
-									tagName="div" // must be block-level or else cursor disappears
-									value={ fileName }
-									placeholder={ __( 'Write file name…' ) }
-									withoutInteractiveFormatting
-									onChange={ ( text ) => setAttributes( { fileName: text } ) }
-								/>
+								<div className="wp-block-file__textlink">
+									<RichText
+										tagName="div" // must be block-level or else cursor disappears
+										value={ fileName }
+										placeholder={ __( 'Write file name…' ) }
+										withoutInteractiveFormatting
+										onChange={ ( text ) => setAttributes( { fileName: text } ) }
+									/>
+								</div>
 								{ showDownloadButton &&
 									<div className={ 'wp-block-file__button-richtext-wrapper' }>
 										{ /* Using RichText here instead of PlainText so that it can be styled like a button */ }
@@ -256,11 +257,11 @@ export default compose( [
 	withSelect( ( select, props ) => {
 		const { getMedia } = select( 'core' );
 		const { getSettings } = select( 'core/block-editor' );
-		const { __experimentalMediaUpload } = getSettings();
+		const { mediaUpload } = getSettings();
 		const { id } = props.attributes;
 		return {
 			media: id === undefined ? undefined : getMedia( id ),
-			mediaUpload: __experimentalMediaUpload,
+			mediaUpload,
 		};
 	} ),
 	withNotices,

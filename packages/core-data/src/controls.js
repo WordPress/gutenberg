@@ -61,25 +61,7 @@ const controls = {
 
 	RESOLVE_SELECT: createRegistryControl(
 		( registry ) => ( { selectorName, args } ) => {
-			return new Promise( ( resolve ) => {
-				const hasFinished = () => registry.select( 'core/data' )
-					.hasFinishedResolution( 'core', selectorName, args );
-				const getResult = () => registry.select( 'core' )[ selectorName ]
-					.apply( null, args );
-
-				// trigger the selector (to trigger the resolver)
-				const result = getResult();
-				if ( hasFinished() ) {
-					return resolve( result );
-				}
-
-				const unsubscribe = registry.subscribe( () => {
-					if ( hasFinished() ) {
-						unsubscribe();
-						resolve( getResult() );
-					}
-				} );
-			} );
+			return registry.__experimentalResolveSelect( 'core' )[ selectorName ]( ...args );
 		}
 	),
 };

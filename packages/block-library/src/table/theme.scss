@@ -7,4 +7,8 @@
 		border: 1px solid;
 		word-break: normal;
 	}
+
+	figcaption {
+		@include caption-style-theme();
+	}
 }

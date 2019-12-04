@@ -9,10 +9,8 @@
  * The main entry point for the Gutenberg experiments page.
  *
  * @since 6.3.0
- *
- * @param string $page The page name the function is being called for, `'gutenberg_customizer'` for the Customizer.
  */
-function the_gutenberg_experiments( $page = 'gutenberg_page_gutenberg-experiments' ) {
+function the_gutenberg_experiments() {
 	?>
 	<div
 		id="experiments-editor"
@@ -22,7 +20,7 @@ function the_gutenberg_experiments( $page = 'gutenberg_page_gutenberg-experiment
 	<?php settings_errors(); ?>
 	<form method="post" action="options.php">
 		<?php settings_fields( 'gutenberg-experiments' ); ?>
-		<?php do_settings_sections( 'gutenberg-experiments' ); ?>           
+		<?php do_settings_sections( 'gutenberg-experiments' ); ?>
 		<?php submit_button(); ?>
 	</form>
 	</div>
@@ -54,14 +52,47 @@ function gutenberg_initialize_experiments_settings() {
 		)
 	);
 	add_settings_field(
-		'gutenberg-menu-block',
-		__( 'Menu Block', 'gutenberg' ),
+		'gutenberg-block-directory',
+		__( 'Block Directory', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Enable Navigation Menu Block', 'gutenberg' ),
-			'id'    => 'gutenberg-menu-block',
+			'label' => __( 'Enable Block Directory search', 'gutenberg' ),
+			'id'    => 'gutenberg-block-directory',
+		)
+	);
+	add_settings_field(
+		'gutenberg-full-site-editing',
+		__( 'Full Site Editing', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Enable Full Site Editing', 'gutenberg' ),
+			'id'    => 'gutenberg-full-site-editing',
+		)
+	);
+	add_settings_field(
+		'gutenberg-full-site-editing-demo',
+		__( 'Full Site Editing Demo Templates', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Enable Full Site Editing Demo Templates', 'gutenberg' ),
+			'id'    => 'gutenberg-full-site-editing-demo',
+		)
+	);
+	add_settings_field(
+		'gutenberg-page-templates',
+		__( 'Page Templates', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Enable Page Templates', 'gutenberg' ),
+			'id'    => 'gutenberg-page-templates',
 		)
 	);
 	register_setting(
@@ -110,11 +141,19 @@ function gutenberg_display_experiment_section() {
  * @return array Filtered editor settings.
  */
 function gutenberg_experiments_editor_settings( $settings ) {
-	$experiments_exist    = get_option( 'gutenberg-experiments' );
 	$experiments_settings = array(
-		'__experimentalEnableLegacyWidgetBlock' => $experiments_exist ? array_key_exists( 'gutenberg-widget-experiments', get_option( 'gutenberg-experiments' ) ) : false,
-		'__experimentalEnableMenuBlock'         => $experiments_exist ? array_key_exists( 'gutenberg-menu-block', get_option( 'gutenberg-experiments' ) ) : false,
+		'__experimentalEnableLegacyWidgetBlock'   => gutenberg_is_experiment_enabled( 'gutenberg-widget-experiments' ),
+		'__experimentalBlockDirectory'            => gutenberg_is_experiment_enabled( 'gutenberg-block-directory' ),
+		'__experimentalEnableFullSiteEditing'     => gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing' ),
+		'__experimentalEnableFullSiteEditingDemo' => gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing-demo' ),
+		'__experimentalEnablePageTemplates'       => gutenberg_is_experiment_enabled( 'gutenberg-page-templates' ),
 	);
+
+	$gradient_presets = current( (array) get_theme_support( '__experimental-editor-gradient-presets' ) );
+	if ( false !== $gradient_presets ) {
+		$experiments_settings['gradients'] = $gradient_presets;
+	}
+
 	return array_merge( $settings, $experiments_settings );
 }
 add_filter( 'block_editor_settings', 'gutenberg_experiments_editor_settings' );

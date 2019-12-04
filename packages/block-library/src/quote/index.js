@@ -21,7 +21,14 @@ export const settings = {
 	title: __( 'Quote' ),
 	description: __( 'Give quoted text visual emphasis. "In quoting others, we cite ourselves." — Julio Cortázar' ),
 	icon,
-	keywords: [ __( 'blockquote' ) ],
+	keywords: [ __( 'blockquote' ), __( 'cite' ) ],
+	example: {
+		attributes: {
+			value: '<p>' + __( 'In quoting others, we cite ourselves.' ) + '</p>',
+			citation: 'Julio Cortázar',
+			className: 'is-style-large',
+		},
+	},
 	styles: [
 		{ name: 'default', label: _x( 'Default', 'block style' ), isDefault: true },
 		{ name: 'large', label: _x( 'Large', 'block style' ) },

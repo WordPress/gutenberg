@@ -17,12 +17,12 @@ const ALLOWED_BLOCKS = Object.keys( socialList ).map( ( site ) => {
 
 // Template contains the links that show when start.
 const TEMPLATE = [
+	[ 'core/social-link-wordpress', { url: 'https://wordpress.org' } ],
 	[ 'core/social-link-facebook' ],
 	[ 'core/social-link-twitter' ],
 	[ 'core/social-link-instagram' ],
 	[ 'core/social-link-linkedin' ],
 	[ 'core/social-link-youtube' ],
-	[ 'core/social-link-mail', { url: 'mailto:' } ],
 ];
 
 export const SocialLinksEdit = function( { className } ) {
@@ -32,6 +32,7 @@ export const SocialLinksEdit = function( { className } ) {
 				allowedBlocks={ ALLOWED_BLOCKS }
 				templateLock={ false }
 				template={ TEMPLATE }
+				__experimentalMoverDirection={ 'horizontal' }
 			/>
 		</div>
 	);

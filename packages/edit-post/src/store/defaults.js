@@ -13,4 +13,5 @@ export const PREFERENCES_DEFAULTS = {
 	pinnedPluginItems: {},
 	hiddenBlockTypes: [],
 	preferredStyleVariations: {},
+	localAutosaveInterval: 15,
 };

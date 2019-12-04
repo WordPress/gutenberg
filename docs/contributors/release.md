@@ -214,16 +214,17 @@ For each Gutenberg plugin release, WordPress trunk should be synchronized with t
 **Note:** The WordPress `trunk` branch can be closed or in "feature-freeze" mode. Usually, this happens between the first `beta` and the first `RC` of the WordPress release cycle. During this period, the Gutenberg plugin releases should not be synchronized with WordPress Core.
 
 1. Ensure the WordPress `trunk` branch is open for enhancements.
-2. Check out the last published Gutenberg release branch `git checkout release/x.x`
-3. Create a Pull Request from this branch targeting `wp/trunk`.
-4. Merge the Pull Request using the "Rebase and Merge" button to keep the history of the commits.
+2. Get the last published Gutenberg release branch with `git fetch`.
+2. Check out the `wp/trunk` branch.
+3. Remove all files from the current branch: `git rm -r .`.
+4. Check out all the files from the release branch: `git checkout release/x.x -- .`.
+5. Commit all changes to the `wp/trunk` branch with `git commit -m "Merge changes published in the Gutenberg plugin vX.X release"` and push to the repository.
 
 Now, the branch is ready to be used to publish the npm packages.
 
-1. Check out the `wp/trunk` branch.
-2. Run the [package release process] but when asked for the version numbers to choose for each package, (assuming the package versions are written using this format `major.minor.patch`) make sure to bump at least the `minor` version number. For example, if the CHANGELOG of the package to be released indicates that the next unreleased version is `5.6.1`, choose `5.7.0` as a version.
-3. Update the `CHANGELOG.md` files of the published packages with the new released versions and commit to the `wp/trunk` branch.
-4. Cherry-pick the "Publish" (created by Lerna) and the CHANGELOG update commits into the `master` branch of Gutenberg.
+1. Run the [package release process] but when asked for the version numbers to choose for each package, (assuming the package versions are written using this format `major.minor.patch`) make sure to bump at least the `minor` version number. For example, if the CHANGELOG of the package to be released indicates that the next unreleased version is `5.6.1`, choose `5.7.0` as a version.
+2. Update the `CHANGELOG.md` files of the published packages with the new released versions and commit to the `wp/trunk` branch.
+3. Cherry-pick the "Publish" (created by Lerna) and the CHANGELOG update commits into the `master` branch of Gutenberg.
 
 Now, the npm packages should be ready and a patch can be created and committed into WordPress `trunk`.
 

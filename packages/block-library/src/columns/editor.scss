@@ -1,33 +1,11 @@
-@mixin flex-full-height() {
-	display: flex;
-	flex-direction: column;
-	flex: 1;
-}
-
-
 // These margins make sure that nested blocks stack/overlay with the parent block chrome
 // This is sort of an experiment at making sure the editor looks as much like the end result as possible
 // Potentially the rules here can apply to all nested blocks and enable stacking, in which case it should be moved elsewhere
 // When using CSS grid, margins do not collapse on the container.
 .wp-block-columns .editor-block-list__layout {
-	margin-left: 0;
-	margin-right: 0;
-
 	// This max-width is used to constrain the main editor column, it should not cascade into columns
 	.editor-block-list__block {
 		max-width: none;
-	}
-}
-
-// Fullwide: show margin left/right to ensure there's room for the side UI.
-// This is not a 1:1 preview with the front-end where these margins would presumably be zero.
-[data-type="core/columns"][data-align="full"] .wp-block-columns > .editor-inner-blocks {
-	padding-left: $block-padding;
-	padding-right: $block-padding;
-
-	@include break-small() {
-		padding-left: $block-container-side-padding;
-		padding-right: $block-container-side-padding;
 	}
 }
 
@@ -48,8 +26,18 @@
 		> [data-type="core/column"] > .editor-block-list__block-edit,
 		> [data-type="core/column"] > .editor-block-list__block-edit > div[data-block],
 		> [data-type="core/column"] > .editor-block-list__block-edit .block-core-columns {
-			@include flex-full-height();
+			display: flex;
+			flex-direction: column;
+
+			// This flex rule fixes an issue in IE11.
+			flex: 1 1 auto;
+
+			// IE11 does not support `position: sticky`, so we use it here to serve correct Flex rules to modern browsers.
+			@supports (position: sticky) {
+				flex: 1;
+			}
 		}
+
 		// Adjust the individual column block.
 		> [data-type="core/column"] {
 
@@ -71,10 +59,10 @@
 
 			// Beyond mobile, allow 2 columns.
 			@include break-small() {
-				flex-basis: calc(50% - (#{$grid-size-large} + #{$block-padding * 2}));
+				flex-basis: calc(50% - (#{$grid-size-large}));
 				flex-grow: 0;
-				margin-left: $block-padding;
-				margin-right: $block-padding;
+				margin-left: 0;
+				margin-right: 0;
 			}
 
 			// Add space between columns. Themes can customize this if they wish to work differently.
@@ -82,14 +70,14 @@
 			// Only apply this beyond the mobile breakpoint, as there's only a single column on mobile.
 			@include break-small() {
 				&:nth-child(even) {
-					margin-left: calc(#{$grid-size-large * 2} + #{$block-padding});
+					margin-left: calc(#{$grid-size-large * 2});
 				}
 			}
 
 			// When columns are in a single row, add space before all except the first.
 			@include break-medium() {
 				&:not(:first-child) {
-					margin-left: calc(#{$grid-size-large * 2} + #{$block-padding});
+					margin-left: calc(#{$grid-size-large * 2});
 				}
 			}
 
@@ -138,12 +126,6 @@
 		margin-top: $block-padding*2;
 		margin-bottom: $block-padding*2;
 	}
-
-	// When the individual column block is selected, the nested padding overrules
-	// some of this margin. We need to adjust the appender spacing again as a result.
-	[data-type="core/column"].is-selected .block-list-appender {
-		margin: $block-padding 0;
-	}
 }
 
 /**
@@ -182,18 +164,14 @@ div.block-core-columns.is-vertically-aligned-bottom {
 	right: 0;
 }
 
-/**
- * Add extra padding when the parent block is selected, for easier interaction.
- */
-.block-editor-block-list__layout .block-editor-block-list__block[data-type="core/columns"].is-selected > .block-editor-block-list__block-edit > [data-block] > div > .block-editor-inner-blocks,
-.block-editor-block-list__layout .block-editor-block-list__block[data-type="core/columns"].has-child-selected > .block-editor-block-list__block-edit > [data-block] > div > .block-editor-inner-blocks,
-.block-editor-block-list__layout .block-editor-block-list__block[data-type="core/column"].is-selected > .block-editor-block-list__block-edit > [data-block] > div > .block-editor-inner-blocks,
-.block-editor-block-list__layout .block-editor-block-list__block[data-type="core/column"].has-child-selected > .block-editor-block-list__block-edit > [data-block] > div > .block-editor-inner-blocks {
-	padding: $block-padding;
+// Fullwide: show margin left/right to ensure there's room for the side UI.
+// This is not a 1:1 preview with the front-end where these margins would presumably be zero.
+[data-type="core/columns"][data-align="full"] .wp-block-columns {
+	padding-left: $block-padding;
+	padding-right: $block-padding;
 
-	// Negate this padding for the placeholder.
-	> .components-placeholder {
-		margin: -$block-padding;
-		width: calc(100% + #{$block-padding * 2});
+	@include break-small() {
+		padding-left: $block-container-side-padding;
+		padding-right: $block-container-side-padding;
 	}
 }

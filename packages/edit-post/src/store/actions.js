@@ -196,6 +196,13 @@ export function updatePreferredStyleVariations( blockName, blockStyle ) {
 	};
 }
 
+export function __experimentalUpdateLocalAutosaveInterval( interval ) {
+	return {
+		type: 'UPDATE_LOCAL_AUTOSAVE_INTERVAL',
+		interval,
+	};
+}
+
 /**
  * Returns an action object used in signalling that block types by the given
  * name(s) should be shown.

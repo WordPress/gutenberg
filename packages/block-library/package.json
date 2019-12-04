@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-library",
-	"version": "2.8.0",
+	"version": "2.10.0",
 	"description": "Block library for the WordPress editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -20,6 +20,7 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
+	"sideEffects": false,
 	"dependencies": {
 		"@babel/runtime": "^7.4.4",
 		"@wordpress/a11y": "file:../a11y",
@@ -36,6 +37,7 @@
 		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/editor": "file:../editor",
 		"@wordpress/element": "file:../element",
+		"@wordpress/escape-html": "file:../escape-html",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
 		"@wordpress/keycodes": "file:../keycodes",
@@ -45,7 +47,7 @@
 		"@wordpress/viewport": "file:../viewport",
 		"classnames": "^2.2.5",
 		"fast-average-color": "4.3.0",
-		"lodash": "^4.17.14",
+		"lodash": "^4.17.15",
 		"memize": "^1.0.5",
 		"moment": "^2.22.1",
 		"tinycolor2": "^1.4.1",

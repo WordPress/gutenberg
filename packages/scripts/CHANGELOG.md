@@ -1,4 +1,25 @@
-## Master
+## 6.0.0 (2019-11-14)
+
+### Breaking Changes
+
+- The bundled `npm-package-json-lint` dependency has been updated from requiring `^3.6.0` to requiring `^4.0.3` ([#18054](https://github.com/WordPress/gutenberg/pull/18054)). Please see the [migration guide](https://npmpackagejsonlint.org/docs/en/v3-to-v4). Note: `npmPackageJsonLintConfig` prop in the `package.json` file needs to be renamed to `npmpackagejsonlint`.
+- The bundled `puppeteer` dependency has been updated from requiring `^1.19.0` to requiring `^2.0.0` ([#18205](https://github.com/WordPress/gutenberg/pull/18205)). It uses Chromium v79 instead of Chromium v77. See the [full list of changes](https://github.com/GoogleChrome/puppeteer/releases/tag/v2.0.0).
+
+## 5.1.0
+
+### New Features
+
+- The bundled `webpack` dependency has been updated from requiring `4.8.3` to requiring `^4.41.0` ([#17746](https://github.com/WordPress/gutenberg/pull/17746)).
+
+### Bug Fixes
+
+- Added a temporary workaround for the default config used with `lint-js` command. It uses linting rules for both e2e and unit tests with all files until override files globbing logic is fixed when using `eslint` with `--config` (related [issue](https://github.com/eslint/eslint/issues/11558)).
+
+## 5.0.0 (2019-09-16)
+
+### Breaking Changes
+
+- The bundled `@wordpress/dependency-extraction-webpack-plugin` dependency has been updated to the next major version `^2.0.0`. `start` and `build` scripts save now the generated asset file for each entry point in the new PHP output format.
 
 ## 4.1.0 (2019-09-03)
 

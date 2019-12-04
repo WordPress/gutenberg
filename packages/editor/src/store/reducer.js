@@ -210,8 +210,8 @@ export function postLock( state = { isLocked: false }, action ) {
  *
  * When post saving is locked, the post cannot be published or updated.
  *
- * @param {PostSavingLockState} state  Current state.
- * @param {Object}              action Dispatched action.
+ * @param {PostLockState} state  Current state.
+ * @param {Object}        action Dispatched action.
  *
  * @return {PostLockState} Updated state.
  */
@@ -231,8 +231,8 @@ export function postSavingLock( state = {}, action ) {
  *
  * When post autosaving is locked, the post will not autosave.
  *
- * @param {PostAutosavingLockState} state  Current state.
- * @param {Object}                  action Dispatched action.
+ * @param {PostLockState} state  Current state.
+ * @param {Object}        action Dispatched action.
  *
  * @return {PostLockState} Updated state.
  */

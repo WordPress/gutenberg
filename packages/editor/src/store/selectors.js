@@ -235,6 +235,8 @@ export const getPostEdits = createRegistrySelector( ( select ) => ( state ) => {
  * inferring where an edit has been made between states by comparison of the
  * return values using strict equality.
  *
+ * @deprecated since Gutenberg 6.5.0.
+ *
  * @example
  *
  * ```
@@ -248,9 +250,14 @@ export const getPostEdits = createRegistrySelector( ( select ) => ( state ) => {
  *
  * @return {*} A value whose reference will change only when an edit occurs.
  */
-export const getReferenceByDistinctEdits = createSelector(
-	() => [],
-	( state ) => [ state.editor ],
+export const getReferenceByDistinctEdits = createRegistrySelector(
+	( select ) => ( /* state */ ) => {
+		deprecated( '`wp.data.select( \'core/editor\' ).getReferenceByDistinctEdits`', {
+			alternative: '`wp.data.select( \'core\' ).getReferenceByDistinctEdits`',
+		} );
+
+		return select( 'core' ).getReferenceByDistinctEdits();
+	}
 );
 
 /**
@@ -1183,6 +1190,37 @@ export function isPublishSidebarEnabled( state ) {
  */
 export function getEditorBlocks( state ) {
 	return getEditedPostAttribute( state, 'blocks' ) || EMPTY_ARRAY;
+}
+
+/**
+ * A block selection object.
+ *
+ * @typedef {Object} WPBlockSelection
+ *
+ * @property {string} clientId     A block client ID.
+ * @property {string} attributeKey A block attribute key.
+ * @property {number} offset       An attribute value offset, based on the rich
+ *                                 text value. See `wp.richText.create`.
+ */
+
+/**
+ * Returns the current selection start.
+ *
+ * @param {Object} state
+ * @return {WPBlockSelection} The selection start.
+ */
+export function getEditorSelectionStart( state ) {
+	return getEditedPostAttribute( state, 'selectionStart' );
+}
+
+/**
+ * Returns the current selection end.
+ *
+ * @param {Object} state
+ * @return {WPBlockSelection} The selection end.
+ */
+export function getEditorSelectionEnd( state ) {
+	return getEditedPostAttribute( state, 'selectionEnd' );
 }
 
 /**
