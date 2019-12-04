@@ -68,7 +68,7 @@ class BlockList extends Component {
 
 		this.onSelectionStart = this.onSelectionStart.bind( this );
 		this.onSelectionEnd = this.onSelectionEnd.bind( this );
-		this.setSelection = this.setSelection.bind( this );
+		this.onSelectionChange = this.onSelectionChange.bind( this );
 		this.updateNativeSelection = this.updateNativeSelection.bind( this );
 
 		this.ref = createRef();
@@ -80,6 +80,7 @@ class BlockList extends Component {
 
 	componentWillUnmount() {
 		window.removeEventListener( 'mouseup', this.onSelectionEnd );
+		document.removeEventListener( 'selectionchange', this.onSelectionChange );
 		window.cancelAnimationFrame( this.rafId );
 	}
 
@@ -93,9 +94,10 @@ class BlockList extends Component {
 			blockClientIds,
 			// These must be in the right DOM order.
 			multiSelectedBlockClientIds,
+			isMultiSelecting,
 		} = this.props;
 
-		if ( ! hasMultiSelection ) {
+		if ( ! hasMultiSelection || isMultiSelecting ) {
 			return;
 		}
 
@@ -149,6 +151,7 @@ class BlockList extends Component {
 		// (from a block). The selection ends when `mouseup` happens anywhere
 		// in the window.
 		window.addEventListener( 'mouseup', this.onSelectionEnd );
+		document.addEventListener( 'selectionchange', this.onSelectionChange );
 
 		// Removing the contenteditable attributes within the block editor is
 		// essential for selection to work across editable areas. The edible
@@ -171,6 +174,7 @@ class BlockList extends Component {
 	onSelectionEnd() {
 		// Equivalent to attaching the listener once.
 		window.removeEventListener( 'mouseup', this.onSelectionEnd );
+		document.removeEventListener( 'selectionchange', this.onSelectionChange );
 
 		if ( ! this.props.isMultiSelecting ) {
 			return;
@@ -178,20 +182,22 @@ class BlockList extends Component {
 
 		// The browser selection won't have updated yet at this point, so wait
 		// until the next animation frame to get the browser selection.
-		this.rafId = window.requestAnimationFrame( this.setSelection );
+		this.rafId = window.requestAnimationFrame( () => {
+			this.onSelectionChange();
+			this.props.onStopMultiSelect();
+		} );
 	}
 
-	setSelection() {
+	onSelectionChange() {
 		const selection = window.getSelection();
 		const {
-			onStopMultiSelect,
 			onMultiSelect,
 			getBlockParents,
+			onSelectBlock,
 		} = this.props;
 
 		// If no selection is found, end multi selection.
 		if ( ! selection.rangeCount || selection.isCollapsed ) {
-			this.props.onStopMultiSelect();
 			return;
 		}
 
@@ -206,19 +212,15 @@ class BlockList extends Component {
 			! ( clientId = focusNode.getAttribute( 'data-block' ) )
 		);
 
-		// If the final selection doesn't leave the block, there is no multi
-		// selection.
 		if ( this.startClientId === clientId ) {
-			onStopMultiSelect();
-			return;
+			onSelectBlock( clientId );
+		} else {
+			const startPath = [ ...getBlockParents( this.startClientId ), this.startClientId ];
+			const endPath = [ ...getBlockParents( clientId ), clientId ];
+			const depth = Math.min( startPath.length, endPath.length ) - 1;
+
+			onMultiSelect( startPath[ depth ], endPath[ depth ] );
 		}
-
-		const startPath = [ ...getBlockParents( this.startClientId ), this.startClientId ];
-		const endPath = [ ...getBlockParents( clientId ), clientId ];
-		const depth = Math.min( startPath.length, endPath.length ) - 1;
-
-		onMultiSelect( startPath[ depth ], endPath[ depth ] );
-		onStopMultiSelect();
 	}
 
 	render() {
@@ -326,12 +328,14 @@ export default compose( [
 			startMultiSelect,
 			stopMultiSelect,
 			multiSelect,
+			selectBlock,
 		} = dispatch( 'core/block-editor' );
 
 		return {
 			onStartMultiSelect: startMultiSelect,
 			onStopMultiSelect: stopMultiSelect,
 			onMultiSelect: multiSelect,
+			onSelectBlock: selectBlock,
 		};
 	} ),
 ] )( BlockList );
