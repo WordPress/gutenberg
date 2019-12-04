@@ -32,7 +32,7 @@ The difference with existing WordPress themes is that the different templates in
 
 ## What is a block template?
 
-A block template is made a list of blocks. Any WordPress block can be used in a template. Templates can also reuse parts of their content using "Template Parts". For example, all the block templates can have the same header included from a separate `header.html` template part.
+A block template is made up of a list of blocks. Any WordPress block can be used in a template. Templates can also reuse parts of their content using "Template Parts". For example, all the block templates can have the same header included from a separate `header.html` template part.
 
 Here's an example of a block template:
 
