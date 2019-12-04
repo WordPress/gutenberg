@@ -7,6 +7,8 @@ import { castArray, first, get, includes } from 'lodash';
  * WordPress dependencies
  */
 import { getDefaultBlockName, createBlock } from '@wordpress/blocks';
+import { speak } from '@wordpress/a11y';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -45,6 +47,34 @@ export function resetBlocks( blocks ) {
 	return {
 		type: 'RESET_BLOCKS',
 		blocks,
+	};
+}
+
+/**
+ * A block selection object.
+ *
+ * @typedef {Object} WPBlockSelection
+ *
+ * @property {string} clientId     A block client ID.
+ * @property {string} attributeKey A block attribute key.
+ * @property {number} offset       An attribute value offset, based on the rich
+ *                                 text value. See `wp.richText.create`.
+ */
+
+/**
+ * Returns an action object used in signalling that selection state should be
+ * reset to the specified selection.
+ *
+ * @param {WPBlockSelection} selectionStart The selection start.
+ * @param {WPBlockSelection} selectionEnd   The selection end.
+ *
+ * @return {Object} Action object.
+ */
+export function resetSelection( selectionStart, selectionEnd ) {
+	return {
+		type: 'RESET_SELECTION',
+		selectionStart,
+		selectionEnd,
 	};
 }
 
@@ -765,15 +795,19 @@ export function __unstableMarkAutomaticChange() {
 }
 
 /**
- * Returns an action object used to enable or disable the navigation mode.
+ * Generators that triggers an action used to enable or disable the navigation mode.
  *
  * @param {string} isNavigationMode Enable/Disable navigation mode.
- *
- * @return {Object} Action object
  */
-export function setNavigationMode( isNavigationMode = true ) {
-	return {
+export function * setNavigationMode( isNavigationMode = true ) {
+	yield {
 		type: 'SET_NAVIGATION_MODE',
 		isNavigationMode,
 	};
+
+	if ( isNavigationMode ) {
+		speak( __( 'You are currently in navigation mode. Navigate blocks using the Tab key. To exit navigation mode and edit the selected block, press Enter.' ) );
+	} else {
+		speak( __( 'You are currently in edit mode. To return to the navigation mode, press Escape.' ) );
+	}
 }

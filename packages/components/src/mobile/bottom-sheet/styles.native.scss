@@ -76,6 +76,15 @@
 	padding: 5px;
 }
 
+.resetButton {
+	font-size: 17px;
+	color: $blue-wordpress;
+}
+
+.resetButtonDark {
+	color: $blue-30;
+}
+
 // Cell
 
 .cellContainer {
@@ -101,6 +110,7 @@
 .cellRowContainer {
 	flex-direction: row;
 	align-items: center;
+	flex-shrink: 1;
 }
 
 .cellIcon {
@@ -118,6 +128,13 @@
 	color: #2e4453;
 	flex: 1;
 	text-align: center;
+}
+
+.cellLabelLeftAlignNoIcon {
+	font-size: 17px;
+	color: #2e4453;
+	flex: 1;
+	margin-left: 12px;
 }
 
 .cellValue {

@@ -8,9 +8,7 @@ import {
 	Disabled,
 	IconButton,
 	PanelBody,
-	SelectControl,
-	ToggleControl,
-	Toolbar,
+	ToolbarGroup,
 	withNotices,
 } from '@wordpress/components';
 import {
@@ -40,6 +38,7 @@ import {
  */
 import { createUpgradedEmbedBlock } from '../embed/util';
 import icon from './icon';
+import VideoCommonSettings from './edit-common-settings';
 
 const ALLOWED_MEDIA_TYPES = [ 'video' ];
 const VIDEO_POSTER_ALLOWED_MEDIA_TYPES = [ 'image' ];
@@ -94,12 +93,6 @@ class VideoEdit extends Component {
 		}
 	}
 
-	toggleAttribute( attribute ) {
-		return ( newValue ) => {
-			this.props.setAttributes( { [ attribute ]: newValue } );
-		};
-	}
-
 	onSelectURL( newSrc ) {
 		const { attributes, setAttributes } = this.props;
 		const { src } = attributes;
@@ -140,20 +133,11 @@ class VideoEdit extends Component {
 		noticeOperations.createErrorNotice( message );
 	}
 
-	getAutoplayHelp( checked ) {
-		return checked ? __( 'Note: Autoplaying videos may cause usability issues for some visitors.' ) : null;
-	}
-
 	render() {
 		const {
-			autoplay,
 			caption,
 			controls,
-			loop,
-			muted,
-			playsInline,
 			poster,
-			preload,
 			src,
 		} = this.props.attributes;
 		const {
@@ -161,6 +145,7 @@ class VideoEdit extends Component {
 			instanceId,
 			isSelected,
 			noticeUI,
+			attributes,
 			setAttributes,
 		} = this.props;
 		const { editing } = this.state;
@@ -201,52 +186,20 @@ class VideoEdit extends Component {
 		return (
 			<>
 				<BlockControls>
-					<Toolbar>
+					<ToolbarGroup>
 						<IconButton
 							className="components-icon-button components-toolbar__control"
 							label={ __( 'Edit video' ) }
 							onClick={ switchToEditing }
 							icon="edit"
 						/>
-					</Toolbar>
+					</ToolbarGroup>
 				</BlockControls>
 				<InspectorControls>
 					<PanelBody title={ __( 'Video Settings' ) }>
-						<ToggleControl
-							label={ __( 'Autoplay' ) }
-							onChange={ this.toggleAttribute( 'autoplay' ) }
-							checked={ autoplay }
-							help={ this.getAutoplayHelp }
-						/>
-						<ToggleControl
-							label={ __( 'Loop' ) }
-							onChange={ this.toggleAttribute( 'loop' ) }
-							checked={ loop }
-						/>
-						<ToggleControl
-							label={ __( 'Muted' ) }
-							onChange={ this.toggleAttribute( 'muted' ) }
-							checked={ muted }
-						/>
-						<ToggleControl
-							label={ __( 'Playback Controls' ) }
-							onChange={ this.toggleAttribute( 'controls' ) }
-							checked={ controls }
-						/>
-						<ToggleControl
-							label={ __( 'Play inline' ) }
-							onChange={ this.toggleAttribute( 'playsInline' ) }
-							checked={ playsInline }
-						/>
-						<SelectControl
-							label={ __( 'Preload' ) }
-							value={ preload }
-							onChange={ ( value ) => setAttributes( { preload: value } ) }
-							options={ [
-								{ value: 'auto', label: __( 'Auto' ) },
-								{ value: 'metadata', label: __( 'Metadata' ) },
-								{ value: 'none', label: __( 'None' ) },
-							] }
+						<VideoCommonSettings
+							setAttributes={ setAttributes }
+							attributes={ attributes }
 						/>
 						<MediaUploadCheck>
 							<BaseControl
@@ -319,10 +272,8 @@ class VideoEdit extends Component {
 export default compose( [
 	withSelect( ( select ) => {
 		const { getSettings } = select( 'core/block-editor' );
-		const { __experimentalMediaUpload } = getSettings();
-		return {
-			mediaUpload: __experimentalMediaUpload,
-		};
+		const { mediaUpload } = getSettings();
+		return { mediaUpload };
 	} ),
 	withNotices,
 	withInstanceId,

@@ -9,6 +9,10 @@ import { merge, isPlainObject, get } from 'lodash';
 import defaultStorage from './storage/default';
 import { combineReducers } from '../../';
 
+/** @typedef {import('../../registry').WPDataRegistry} WPDataRegistry */
+
+/** @typedef {import('../../registry').WPDataPlugin} WPDataPlugin */
+
 /**
  * @typedef {Object} WPDataPersistencePluginOptions Persistence plugin options.
  *
@@ -138,7 +142,7 @@ const persistencePlugin = function( registry, pluginOptions ) {
 			// to leverage its behavior of returning the same object when none
 			// of the property values changes. This allows a strict reference
 			// equality to bypass a persistence set on an unchanging state.
-			const reducers = keys.reduce( ( result, key ) => Object.assign( result, {
+			const reducers = keys.reduce( ( accumulator, key ) => Object.assign( accumulator, {
 				[ key ]: ( state, action ) => action.nextState[ key ],
 			} ), {} );
 

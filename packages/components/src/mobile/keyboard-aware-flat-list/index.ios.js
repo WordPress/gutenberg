@@ -9,10 +9,11 @@ export const KeyboardAwareFlatList = ( {
 	shouldPreventAutomaticScroll,
 	innerRef,
 	autoScroll,
+	scrollViewStyle,
 	...listProps
 } ) => (
 	<KeyboardAwareScrollView
-		style={ { flex: 1 } }
+		style={ [ { flex: 1 }, scrollViewStyle ] }
 		keyboardDismissMode="none"
 		enableResetScrollToCoords={ false }
 		keyboardShouldPersistTaps="handled"
@@ -32,7 +33,9 @@ export const KeyboardAwareFlatList = ( {
 					this.latestContentOffsetY !== undefined &&
 					! shouldPreventAutomaticScroll() ) {
 					// Reset the content position if keyboard is still closed
-					this.scrollViewRef.props.scrollToPosition( 0, this.latestContentOffsetY, true );
+					if ( this.scrollViewRef ) {
+						this.scrollViewRef.props.scrollToPosition( 0, this.latestContentOffsetY, true );
+					}
 				}
 			}, 50 );
 		} }

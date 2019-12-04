@@ -9,6 +9,7 @@ import deepFreeze from 'deep-freeze';
 import {
 	getEntityRecord,
 	getEntityRecords,
+	getEntityRecordNonTransientEdits,
 	getEmbedPreview,
 	isPreviewEmbedFallback,
 	canUser,
@@ -101,6 +102,17 @@ describe( 'getEntityRecords', () => {
 			{ slug: 'post' },
 			{ slug: 'page' },
 		] );
+	} );
+} );
+
+describe( 'getEntityRecordNonTransientEdits', () => {
+	it( 'should return an empty object when the entity does not have a loaded config.', () => {
+		const state = deepFreeze( {
+			entities: { config: {}, data: {} },
+		} );
+		expect(
+			getEntityRecordNonTransientEdits( state, 'someKind', 'someName', 'someId' )
+		).toEqual( {} );
 	} );
 } );
 

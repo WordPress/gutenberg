@@ -25,6 +25,7 @@ export default function save( { attributes } ) {
 
 	const className = classnames( {
 		[ textClass ]: textClass,
+		'has-text-color': textColor || customTextColor,
 		[ `has-text-align-${ align }` ]: align,
 	} );
 

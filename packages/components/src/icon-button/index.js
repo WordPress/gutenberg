@@ -25,9 +25,9 @@ function IconButton( props, ref ) {
 		tooltip,
 		shortcut,
 		labelPosition,
+		size,
 		...additionalProps
 	} = props;
-	const { 'aria-pressed': ariaPressed } = additionalProps;
 	const classes = classnames( 'components-icon-button', className, {
 		'has-text': children,
 	} );
@@ -56,7 +56,7 @@ function IconButton( props, ref ) {
 			className={ classes }
 			ref={ ref }
 		>
-			<Icon icon={ icon } ariaPressed={ ariaPressed } />
+			<Icon icon={ icon } size={ size } />
 			{ children }
 		</Button>
 	);

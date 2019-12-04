@@ -46,12 +46,15 @@ function gutenberg_reregister_core_block_types() {
 		'latest-comments.php' => 'core/latest-comments',
 		'latest-posts.php'    => 'core/latest-posts',
 		'legacy-widget.php'   => 'core/legacy-widget',
-		'navigation-menu.php' => 'core/navigation-menu',
+		'navigation.php'      => 'core/navigation',
 		'rss.php'             => 'core/rss',
 		'shortcode.php'       => 'core/shortcode',
 		'search.php'          => 'core/search',
 		'social-link.php'     => gutenberg_get_registered_social_link_blocks(),
 		'tag-cloud.php'       => 'core/tag-cloud',
+		'site-title.php'      => 'core/site-title',
+		'post-title.php'      => 'core/post-title',
+		'post-content.php'    => 'core/post-content',
 	);
 
 	$registry = WP_Block_Type_Registry::get_instance();

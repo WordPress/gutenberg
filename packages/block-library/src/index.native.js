@@ -1,10 +1,15 @@
 /**
+ * External dependencies
+ */
+import { Platform } from 'react-native';
+/**
  * WordPress dependencies
  */
 import {
 	registerBlockType,
 	setDefaultBlockName,
 	setUnregisteredTypeHandlerName,
+	setGroupingBlockName,
 } from '@wordpress/blocks';
 
 /**
@@ -95,9 +100,9 @@ export const coreBlocks = [
 	textColumns,
 	verse,
 	video,
-].reduce( ( memo, block ) => {
-	memo[ block.name ] = block;
-	return memo;
+].reduce( ( accumulator, block ) => {
+	accumulator[ block.name ] = block;
+	return accumulator;
 }, {} );
 
 /**
@@ -140,12 +145,17 @@ export const registerCoreBlocks = () => {
 		separator,
 		list,
 		quote,
+		mediaText,
 		// eslint-disable-next-line no-undef
-		!! __DEV__ ? mediaText : null,
+		( ( Platform.OS === 'ios' ) || ( !! __DEV__ ) ) ? preformatted : null,
 		// eslint-disable-next-line no-undef
 		!! __DEV__ ? group : null,
+		spacer,
 	].forEach( registerBlock );
 
 	setDefaultBlockName( paragraph.name );
 	setUnregisteredTypeHandlerName( missing.name );
+	if ( group ) {
+		setGroupingBlockName( group.name );
+	}
 };

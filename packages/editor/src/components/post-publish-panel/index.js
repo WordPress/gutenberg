@@ -75,7 +75,6 @@ export class PostPublishPanel extends Component {
 					) : (
 						<div className="editor-post-publish-panel__header-publish-button">
 							<PostPublishButton focusOnMount={ true } onSubmit={ this.onSubmit } forceIsDirty={ forceIsDirty } forceIsSaving={ forceIsSaving } />
-							<span className="editor-post-publish-panel__spacer"></span>
 						</div>
 					) }
 					<IconButton

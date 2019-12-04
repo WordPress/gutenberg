@@ -318,6 +318,12 @@
 		"parent": "develop"
 	},
 	{
+		"title": "React Native based mobile Gutenberg",
+		"slug": "native-mobile",
+		"markdown_source": "../docs/contributors/native-mobile.md",
+		"parent": "develop"
+	},
+	{
 		"title": "Documentation Contributions",
 		"slug": "document",
 		"markdown_source": "../docs/contributors/document.md",
@@ -600,6 +606,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "Card",
+		"slug": "card",
+		"markdown_source": "../packages/components/src/card/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "CheckboxControl",
 		"slug": "checkbox-control",
 		"markdown_source": "../packages/components/src/checkbox-control/README.md",
@@ -639,6 +651,12 @@
 		"title": "DateTime",
 		"slug": "date-time",
 		"markdown_source": "../packages/components/src/date-time/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "DimensionControl",
+		"slug": "dimension-control",
+		"markdown_source": "../packages/components/src/dimension-control/README.md",
 		"parent": "components"
 	},
 	{
@@ -711,6 +729,12 @@
 		"title": "FormTokenField",
 		"slug": "form-token-field",
 		"markdown_source": "../packages/components/src/form-token-field/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "Guide",
+		"slug": "guide",
+		"markdown_source": "../packages/components/src/guide/README.md",
 		"parent": "components"
 	},
 	{
@@ -942,6 +966,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "TextHighlight",
+		"slug": "text-highlight",
+		"markdown_source": "../packages/components/src/text-highlight/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "TextareaControl",
 		"slug": "textarea-control",
 		"markdown_source": "../packages/components/src/textarea-control/README.md",
@@ -969,6 +999,12 @@
 		"title": "TreeSelect",
 		"slug": "tree-select",
 		"markdown_source": "../packages/components/src/tree-select/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "VisuallyHidden",
+		"slug": "visually-hidden",
+		"markdown_source": "../packages/components/src/visually-hidden/README.md",
 		"parent": "components"
 	},
 	{
@@ -1077,6 +1113,12 @@
 		"title": "@wordpress/babel-preset-default",
 		"slug": "packages-babel-preset-default",
 		"markdown_source": "../packages/babel-preset-default/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/base-styles",
+		"slug": "packages-base-styles",
+		"markdown_source": "../packages/base-styles/README.md",
 		"parent": "packages"
 	},
 	{

@@ -12,6 +12,7 @@ import { apiFetch, select } from './controls';
 export const DEFAULT_ENTITY_KEY = 'id';
 
 export const defaultEntities = [
+	{ name: 'site', kind: 'root', baseURL: '/wp/v2/settings' },
 	{ name: 'postType', kind: 'root', key: 'slug', baseURL: '/wp/v2/types' },
 	{ name: 'media', kind: 'root', baseURL: '/wp/v2/media', plural: 'mediaItems' },
 	{ name: 'taxonomy', kind: 'root', key: 'slug', baseURL: '/wp/v2/taxonomies', plural: 'taxonomies' },
@@ -35,7 +36,11 @@ function* loadPostTypeEntities() {
 			kind: 'postType',
 			baseURL: '/wp/v2/' + postType.rest_base,
 			name,
-			transientEdits: { blocks: true },
+			transientEdits: {
+				blocks: true,
+				selectionStart: true,
+				selectionEnd: true,
+			},
 			mergedEdits: { meta: true },
 		};
 	} );

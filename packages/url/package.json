@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/url",
-	"version": "2.8.0",
+	"version": "2.8.2",
 	"description": "WordPress URL utilities.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -20,6 +20,7 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
+	"sideEffects": false,
 	"dependencies": {
 		"@babel/runtime": "^7.4.4",
 		"qs": "^6.5.2"

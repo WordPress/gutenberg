@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, get, merge, isEqual, find } from 'lodash';
+import { castArray, get, isEqual, find } from 'lodash';
 
 /**
  * Internal dependencies
@@ -109,8 +109,8 @@ export function receiveThemeSupports( themeSupports ) {
  * Returns an action object used in signalling that the preview data for
  * a given URl has been received.
  *
- * @param {string}  url      URL to preview the embed for.
- * @param {Mixed}   preview  Preview data.
+ * @param {string}  url     URL to preview the embed for.
+ * @param {*}       preview Preview data.
  *
  * @return {Object} Action object.
  */
@@ -136,11 +136,11 @@ export function receiveEmbedPreview( url, preview ) {
  * @return {Object} Action object.
  */
 export function* editEntityRecord( kind, name, recordId, edits, options = {} ) {
-	const { transientEdits = {}, mergedEdits = {} } = yield select(
-		'getEntity',
-		kind,
-		name
-	);
+	const entity = yield select( 'getEntity', kind, name );
+	if ( ! entity ) {
+		throw new Error( `The entity being edited (${ kind }, ${ name }) does not have a loaded config.` );
+	}
+	const { transientEdits = {}, mergedEdits = {} } = entity;
 	const record = yield select( 'getRawEntityRecord', kind, name, recordId );
 	const editedRecord = yield select(
 		'getEditedEntityRecord',
@@ -159,7 +159,7 @@ export function* editEntityRecord( kind, name, recordId, edits, options = {} ) {
 			const recordValue = record[ key ];
 			const editedRecordValue = editedRecord[ key ];
 			const value = mergedEdits[ key ] ?
-				merge( {}, editedRecordValue, edits[ key ] ) :
+				{ ...editedRecordValue, ...edits[ key ] } :
 				edits[ key ];
 			acc[ key ] = isEqual( recordValue, value ) ? undefined : value;
 			return acc;

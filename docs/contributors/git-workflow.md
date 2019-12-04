@@ -36,12 +36,23 @@ To sum it up, you need to fetch any new changes in the repository, rebase your b
 ```sh
 git fetch
 git rebase master
-git push --force-with-lease your-branch-name
+git push --force-with-lease origin your-branch-name
 ```
 
 ## Keeping Your Fork Up To Date
 
-Working on pull request starts with forking the Gutenberg repository, your separate working copy. Which can easily go out of sync as new pull requests are merged into the main repository. Here your working repository is a `fork` and the main Gutenberg repository is `upstream`. When working on new pull request you should always update your fork before you do `git checkout -b my-new-branch` to work on a feature or fix. 
+Working on pull request starts with forking the Gutenberg repository, your separate working copy. Which can easily go out of sync as new pull requests are merged into the main repository. Here your working repository is a `fork` and the main Gutenberg repository is `upstream`. When working on new pull request you should always update your fork before you do `git checkout -b my-new-branch` to work on a feature or fix.
+
+You will need to add an `upstream` remote in order to keep your fork updated.
+
+```sh
+git remote add upstream https://github.com/WordPress/gutenberg.git
+git remote -v
+origin	git@github.com:your-account/gutenberg.git (fetch)
+origin	git@github.com:your-account/gutenberg.git (push)
+upstream	https://github.com/WordPress/gutenberg.git (fetch)
+upstream	https://github.com/WordPress/gutenberg.git (push)
+```
 
 To sync your fork you need to fetch the upstream changes and merge them into your fork. These are the corresponding commands:
 
@@ -57,7 +68,7 @@ This will update you local copy to update your fork on github push your changes
 git push
 ```
 
-The above commands will update your `master` branch from _upstream_. To update any other branch replace `master` with the respective branch name. 
+The above commands will update your `master` branch from _upstream_. To update any other branch replace `master` with the respective branch name.
 
 
 ## References

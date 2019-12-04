@@ -3,6 +3,16 @@
 	justify-content: flex-start;
 	padding-left: 0;
 	padding-right: 0;
+	// Some themes give all <ul> default margin instead of padding.
+	margin-left: 0;
+
+	// Some themes add underlines, false underlines (via shadows), and borders to <a>.
+	.wp-social-link a,
+	.wp-social-link a:hover {
+		text-decoration: none;
+		border-bottom: 0;
+		box-shadow: none;
+	}
 }
 
 .wp-social-link {

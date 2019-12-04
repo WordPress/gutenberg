@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { TouchableOpacity, Text, View, TextInput, I18nManager } from 'react-native';
+import { TouchableOpacity, Text, View, TextInput, I18nManager, AccessibilityInfo } from 'react-native';
 import { isEmpty } from 'lodash';
 
 /**
@@ -23,7 +23,10 @@ class BottomSheetCell extends Component {
 		super( ...arguments );
 		this.state = {
 			isEditingValue: props.autoFocus || false,
+			isScreenReaderEnabled: false,
 		};
+
+		this.handleScreenReaderToggled = this.handleScreenReaderToggled.bind( this );
 	}
 
 	componentDidUpdate() {
@@ -32,8 +35,31 @@ class BottomSheetCell extends Component {
 		}
 	}
 
+	componentDidMount() {
+		AccessibilityInfo.addEventListener(
+			'screenReaderChanged',
+			this.handleScreenReaderToggled,
+		);
+
+		AccessibilityInfo.isScreenReaderEnabled().then( ( isScreenReaderEnabled ) => {
+			this.setState( { isScreenReaderEnabled } );
+		} );
+	}
+
+	componentWillUnmount() {
+		AccessibilityInfo.removeEventListener(
+			'screenReaderChanged',
+			this.handleScreenReaderToggled,
+		);
+	}
+
+	handleScreenReaderToggled( isScreenReaderEnabled ) {
+		this.setState( { isScreenReaderEnabled } );
+	}
+
 	render() {
 		const {
+			accessible,
 			accessibilityLabel,
 			accessibilityHint,
 			accessibilityRole,
@@ -42,14 +68,18 @@ class BottomSheetCell extends Component {
 			value,
 			valuePlaceholder = '',
 			icon,
+			leftAlign,
 			labelStyle = {},
 			valueStyle = {},
+			cellContainerStyle = {},
+			cellRowContainerStyle = {},
 			onChangeValue,
 			children,
 			editable = true,
 			separatorType,
 			style = {},
 			getStylesFromColorScheme,
+			customActionButton,
 			...valueProps
 		} = this.props;
 
@@ -57,8 +87,15 @@ class BottomSheetCell extends Component {
 		const isValueEditable = editable && onChangeValue !== undefined;
 		const cellLabelStyle = getStylesFromColorScheme( styles.cellLabel, styles.cellTextDark );
 		const cellLabelCenteredStyle = getStylesFromColorScheme( styles.cellLabelCentered, styles.cellTextDark );
-		const defaultLabelStyle = showValue || icon !== undefined ? cellLabelStyle : cellLabelCenteredStyle;
+		const cellLabelLeftAlignNoIconStyle = getStylesFromColorScheme( styles.cellLabelLeftAlignNoIcon, styles.cellTextDark );
+		const defaultMissingIconAndValue = leftAlign ? cellLabelLeftAlignNoIconStyle : cellLabelCenteredStyle;
+		const defaultLabelStyle = showValue || icon !== undefined || customActionButton ? cellLabelStyle : defaultMissingIconAndValue;
+
 		const drawSeparator = ( separatorType && separatorType !== 'none' ) || separatorStyle === undefined;
+		const drawTopSeparator = drawSeparator && separatorType === 'topFullWidth';
+
+		const cellContainerStyles = [ styles.cellContainer, cellContainerStyle ];
+		const rowContainerStyles = [ styles.cellRowContainer, cellRowContainerStyle ];
 
 		const onCellPress = () => {
 			if ( isValueEditable ) {
@@ -87,6 +124,7 @@ class BottomSheetCell extends Component {
 				case 'leftMargin':
 					return leftMarginStyle;
 				case 'fullWidth':
+				case 'topFullWidth':
 					return defaultSeparatorStyle;
 				case 'none':
 					return undefined;
@@ -151,10 +189,13 @@ class BottomSheetCell extends Component {
 		};
 
 		const iconStyle = getStylesFromColorScheme( styles.icon, styles.iconDark );
+		const resetButtonStyle = getStylesFromColorScheme( styles.resetButton, styles.resetButtonDark );
+		const containerPointerEvents = this.state.isScreenReaderEnabled && accessible ? 'none' : 'auto';
+		const { title, handler } = customActionButton || {};
 
 		return (
 			<TouchableOpacity
-				accessible={ ! this.state.isEditingValue }
+				accessible={ accessible !== undefined ? accessible : ! this.state.isEditingValue }
 				accessibilityLabel={ getAccessibilityLabel() }
 				accessibilityRole={ accessibilityRole || 'button' }
 				accessibilityHint={ isValueEditable ?
@@ -163,24 +204,33 @@ class BottomSheetCell extends Component {
 					accessibilityHint
 				}
 				onPress={ onCellPress }
-				style={ { ...styles.clipToBounds, ...style } }
+				style={ [ styles.clipToBounds, style ] }
 			>
-				<View style={ styles.cellContainer }>
-					<View style={ styles.cellRowContainer }>
-						{ icon && (
-							<View style={ styles.cellRowContainer }>
-								<Dashicon icon={ icon } size={ 24 } color={ iconStyle.color } />
-								<View style={ platformStyles.labelIconSeparator } />
-							</View>
-						) }
-						<Text numberOfLines={ 1 } style={ { ...defaultLabelStyle, ...labelStyle } }>
-							{ label }
-						</Text>
+				{ drawTopSeparator && (
+					<View style={ separatorStyle() } />
+				) }
+				<View style={ cellContainerStyles } pointerEvents={ containerPointerEvents }>
+					<View style={ rowContainerStyles }>
+						<View style={ styles.cellRowContainer }>
+							{ icon && (
+								<View style={ styles.cellRowContainer }>
+									<Dashicon icon={ icon } size={ 24 } color={ iconStyle.color } />
+									<View style={ platformStyles.labelIconSeparator } />
+								</View>
+							) }
+							<Text style={ [ defaultLabelStyle, labelStyle ] }>
+								{ label }
+							</Text>
+						</View>
+						{ customActionButton && <TouchableOpacity onPress={ handler } accessibilityRole={ 'button' }>
+							<Text style={ resetButtonStyle }>{ title }
+							</Text>
+						</TouchableOpacity> }
 					</View>
 					{ showValue && getValueComponent() }
 					{ children }
 				</View>
-				{ drawSeparator && (
+				{ ! drawTopSeparator && (
 					<View style={ separatorStyle() } />
 				) }
 			</TouchableOpacity>

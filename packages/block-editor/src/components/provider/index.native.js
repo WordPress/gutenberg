@@ -6,6 +6,8 @@ import { SlotFillProvider } from '@wordpress/components';
 import { withDispatch, RegistryConsumer } from '@wordpress/data';
 import { createHigherOrderComponent, compose } from '@wordpress/compose';
 
+/** @typedef {import('@wordpress/data').WPDataRegistry} WPDataRegistry */
+
 /**
  * Higher-order component which renders the original component with the current
  * registry context passed as its `registry` prop.
@@ -75,8 +77,8 @@ class BlockEditorProvider extends Component {
 	 * This needs to be done synchronously after state changes (instead of using
 	 * `componentDidUpdate`) in order to avoid batching these changes.
 	 *
-	 * @param {WPDataRegistry} registry     Registry from which block editor
-	 *                                      dispatch is to be overriden.
+	 * @param {WPDataRegistry} registry Registry from which block editor
+	 *                                  dispatch is to be overridden.
 	 */
 	attachChangeObserver( registry ) {
 		if ( this.unsubscribe ) {

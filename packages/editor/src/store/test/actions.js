@@ -226,6 +226,21 @@ describe( 'Post generator actions', () => {
 				},
 			],
 			[
+				'yields an action for marking the last change as persistent',
+				() => true,
+				() => {
+					if ( ! isAutosave ) {
+						const { value } = fulfillment.next();
+						expect( value ).toEqual(
+							dispatch(
+								'core/block-editor',
+								'__unstableMarkLastChangeAsPersistent'
+							)
+						);
+					}
+				},
+			],
+			[
 				'implicitly returns undefined',
 				() => true,
 				() => {
@@ -615,6 +630,26 @@ describe( 'Editor actions', () => {
 			const result = actions.unlockPostSaving( 'test' );
 			expect( result ).toEqual( {
 				type: 'UNLOCK_POST_SAVING',
+				lockName: 'test',
+			} );
+		} );
+	} );
+
+	describe( 'lockPostAutosaving', () => {
+		it( 'should return the LOCK_POST_AUTOSAVING action', () => {
+			const result = actions.lockPostAutosaving( 'test' );
+			expect( result ).toEqual( {
+				type: 'LOCK_POST_AUTOSAVING',
+				lockName: 'test',
+			} );
+		} );
+	} );
+
+	describe( 'unlockPostAutosaving', () => {
+		it( 'should return the UNLOCK_POST_AUTOSAVING action', () => {
+			const result = actions.unlockPostAutosaving( 'test' );
+			expect( result ).toEqual( {
+				type: 'UNLOCK_POST_AUTOSAVING',
 				lockName: 'test',
 			} );
 		} );

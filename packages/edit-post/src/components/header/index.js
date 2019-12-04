@@ -9,7 +9,6 @@ import {
 } from '@wordpress/editor';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { DotTip } from '@wordpress/nux';
 
 /**
  * Internal dependencies
@@ -32,13 +31,7 @@ function Header( {
 	const toggleGeneralSidebar = isEditorSidebarOpened ? closeGeneralSidebar : openGeneralSidebar;
 
 	return (
-		<div
-			role="region"
-			/* translators: accessibility text for the top bar landmark region. */
-			aria-label={ __( 'Editor top bar' ) }
-			className="edit-post-header"
-			tabIndex="-1"
-		>
+		<div className="edit-post-header">
 			<div className="edit-post-header__toolbar">
 				<FullscreenModeClose />
 				<HeaderToolbar />
@@ -63,19 +56,14 @@ function Header( {
 					forceIsDirty={ hasActiveMetaboxes }
 					forceIsSaving={ isSaving }
 				/>
-				<div>
-					<IconButton
-						icon="admin-generic"
-						label={ __( 'Settings' ) }
-						onClick={ toggleGeneralSidebar }
-						isToggled={ isEditorSidebarOpened }
-						aria-expanded={ isEditorSidebarOpened }
-						shortcut={ shortcuts.toggleSidebar }
-					/>
-					<DotTip tipId="core/editor.settings">
-						{ __( 'You’ll find more settings for your page and blocks in the sidebar. Click the cog icon to toggle the sidebar open and closed.' ) }
-					</DotTip>
-				</div>
+				<IconButton
+					icon="admin-generic"
+					label={ __( 'Settings' ) }
+					onClick={ toggleGeneralSidebar }
+					isToggled={ isEditorSidebarOpened }
+					aria-expanded={ isEditorSidebarOpened }
+					shortcut={ shortcuts.toggleSidebar }
+				/>
 				<PinnedPlugins.Slot />
 				<MoreMenu />
 			</div>

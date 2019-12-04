@@ -1,0 +1,110 @@
+
+// Normalize navigation link and edit containers, to look mostly the same.
+.wp-block-navigation-link__field .components-text-control__input.components-text-control__input,
+.wp-block-navigation-link__container {
+	border-radius: 0;
+	// Make it the same height as the appender to prevent a jump. Maybe revisit this.
+	line-height: $icon-button-size;
+	min-height: $icon-button-size;
+}
+
+.wp-block-navigation-link__edit-container {
+	display: flex;
+	white-space: nowrap;
+
+	// Compensate for navigation link base padding.
+	margin-left: -$grid-size;
+
+	.wp-block-navigation-link__content {
+		margin-right: $grid-size;
+
+		// This should match the padding of the navigation link.
+		padding: 0 $grid-size;
+
+		// This make it look like an input field.
+		// We may want to not style this at all, but let's try this.
+		// We don't use the mixins because they increase the size of the input, which doesn't work with PlainText.
+		box-shadow: inset 0 0 0 1px $dark-gray-200;
+		transition: box-shadow 0.1s linear;
+		border-radius: $radius-round-rectangle;
+		@include reduce-motion("transition");
+
+		&:focus {
+			color: $dark-gray-900;
+			box-shadow: inset 0 0 0 2px $blue-medium-focus;
+
+			// Windows High Contrast mode will show this outline, but not the box-shadow.
+			outline: 2px solid transparent;
+		}
+	}
+}
+
+.wp-block-navigation-link {
+	margin-right: $grid-size;
+	// Provide a base menu item margin.
+	// This should be the same inside the field,
+	// and the edit container should compensate.
+	// This is to make sure the edit and view are the same.
+	padding: 0 $grid-size;
+	padding-right: 55px; // allow space for Block "mover"
+
+	.block-editor-block-list__layout {
+		display: block;
+		margin: $grid-size;
+	}
+
+	// Only display inner blocks when the block is being edited.
+	.block-editor-inner-blocks {
+		display: none;
+	}
+
+	&.is-editing,
+	&.is-selected {
+		min-width: 20px;
+	}
+
+	&.is-editing .block-editor-inner-blocks {
+		display: block;
+	}
+
+	&.has-link .wp-block-navigation-link__content {
+		border-bottom-style: solid;
+		border-bottom-width: 1px;
+	}
+
+	.block-editor-rich-text__editable.is-selected:not(.keep-placeholder-on-focus):not(:focus) [data-rich-text-placeholder]::after {
+		display: inline-block;
+	}
+}
+
+[data-type="core/navigation-link"] {
+	.block-editor-block-toolbar {
+		left: 15px;
+	}
+}
+
+.wp-block-navigation-link__nofollow-external-link {
+	display: block;
+}
+
+// Separator
+.wp-block-navigation-link__separator {
+	margin: $grid-size 0 $grid-size;
+	border-top: $border-width solid $light-gray-500;
+}
+
+// Popover styles
+.components-popover:not(.is-mobile).wp-block-navigation-link__dropdown-content {
+	margin-top: -1px;
+	margin-left: -4px;
+}
+
+.wp-block-navigation-link__dropdown-content .components-popover__content {
+	padding: $grid-size 0;
+}
+
+.wp-block-navigation .block-editor-block-list__block[data-type="core/navigation-link"] {
+	& > .block-editor-block-list__insertion-point {
+		display: none;
+	}
+}

@@ -5,11 +5,6 @@
 		color: inherit;
 	}
 
-	&.has-right-content .block-editor-rich-text__inline-toolbar,
-	&.has-left-content .block-editor-rich-text__inline-toolbar {
-		display: inline-block;
-	}
-
 	.block-editor-block-list__layout {
 		width: 100%;
 	}
@@ -39,10 +34,11 @@
 		}
 	}
 
-	.wp-block-cover__placeholder-color-palette {
+	.wp-block-cover__placeholder-background-options {
 		// wraps about 6 color swatches
 		max-width: 290px;
 		margin-top: 1em;
+		width: 100%;
 	}
 
 	// Apply max-width to floated items that have no intrinsic width

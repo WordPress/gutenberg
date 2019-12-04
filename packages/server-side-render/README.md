@@ -79,7 +79,7 @@ This is a [render prop](https://reactjs.org/docs/render-props.html). While the r
 Render core/archives preview.
 
 ```jsx
-import { ServerSideRender } from '@wordpress/server-side-render';
+import ServerSideRender from '@wordpress/server-side-render';
 
 const MyServerSideRender = () => (
 	<ServerSideRender
