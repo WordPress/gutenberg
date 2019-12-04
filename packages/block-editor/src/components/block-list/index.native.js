@@ -176,12 +176,16 @@ export default compose( [
 			getSelectedBlock,
 		} = select( 'core/block-editor' );
 
+		const {
+			getGroupingBlockName,
+		} = select( 'core/blocks' );
+
 		const selectedBlockClientId = getSelectedBlockClientId();
 		const blockClientIds = getBlockOrder( rootClientId );
 		const insertionPoint = getBlockInsertionPoint();
 		const blockInsertionPointIsVisible = isBlockInsertionPointVisible();
 		const selectedBlock = getSelectedBlock();
-		const hasInnerBlocks = selectedBlock && selectedBlock.innerBlocks.length !== 0;
+		const hasInnerBlocks = selectedBlock && selectedBlock.name === getGroupingBlockName();
 		const shouldShowInsertionPointBefore = ( clientId ) => {
 			return (
 				blockInsertionPointIsVisible &&
