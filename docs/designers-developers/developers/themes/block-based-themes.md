@@ -1,4 +1,4 @@
-# Block-based themes (Experimental)
+# Block-based Themes (Experimental)
 
 > This is the documentation for the current implementation of the block-based themes, also known as Full Site Editing or Block Content Areas. These features are still experimental in the plugin. “Experimental” means this is just an early implementation that is subject to potential drastic and breaking changes in iterations based on feedback from users, contributors and theme authors.
 
