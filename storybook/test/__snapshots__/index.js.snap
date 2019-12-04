@@ -2461,25 +2461,12 @@ exports[`Storyshots Components|Popover Default 1`] = `
         onTouchStart={[Function]}
       >
         <div
-          className="components-popover is-top is-center"
+          className="components-popover"
           onKeyDown={[Function]}
           onMouseDown={[Function]}
-          style={
-            Object {
-              "left": undefined,
-              "top": undefined,
-              "visibility": "hidden",
-            }
-          }
         >
           <div
             className="components-popover__content"
-            style={
-              Object {
-                "maxHeight": undefined,
-                "maxWidth": undefined,
-              }
-            }
             tabIndex="-1"
           >
             Popover Content
@@ -2599,25 +2586,12 @@ exports[`Storyshots Components|Popover Positioning 1`] = `
               onTouchStart={[Function]}
             >
               <div
-                className="components-popover is-top is-center"
+                className="components-popover"
                 onKeyDown={[Function]}
                 onMouseDown={[Function]}
-                style={
-                  Object {
-                    "left": undefined,
-                    "top": undefined,
-                    "visibility": "hidden",
-                  }
-                }
               >
                 <div
                   className="components-popover__content"
-                  style={
-                    Object {
-                      "maxHeight": undefined,
-                      "maxWidth": undefined,
-                    }
-                  }
                   tabIndex="-1"
                 >
                   Popover
