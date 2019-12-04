@@ -724,6 +724,12 @@ export const EXPECTED_TRANSFORMS = {
 			'Group',
 		],
 	},
+	core__table__caption: {
+		originalBlock: 'Table',
+		availableTransforms: [
+			'Group',
+		],
+	},
 	'core__table__scope-attribute': {
 		originalBlock: 'Table',
 		availableTransforms: [

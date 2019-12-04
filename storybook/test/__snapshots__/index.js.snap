@@ -797,7 +797,7 @@ exports[`Storyshots Components|ColorPalette Default 1`] = `
     <button
       aria-label="Color: red"
       aria-pressed={false}
-      className="components-circular-option-picker__option"
+      className="components-button components-circular-option-picker__option"
       onBlur={[Function]}
       onClick={[Function]}
       onFocus={[Function]}
@@ -818,7 +818,7 @@ exports[`Storyshots Components|ColorPalette Default 1`] = `
     <button
       aria-label="Color: white"
       aria-pressed={false}
-      className="components-circular-option-picker__option"
+      className="components-button components-circular-option-picker__option"
       onBlur={[Function]}
       onClick={[Function]}
       onFocus={[Function]}
@@ -839,7 +839,7 @@ exports[`Storyshots Components|ColorPalette Default 1`] = `
     <button
       aria-label="Color: blue"
       aria-pressed={false}
-      className="components-circular-option-picker__option"
+      className="components-button components-circular-option-picker__option"
       onBlur={[Function]}
       onClick={[Function]}
       onFocus={[Function]}
@@ -891,7 +891,7 @@ exports[`Storyshots Components|ColorPalette With Knobs 1`] = `
     <button
       aria-label="Color: red"
       aria-pressed={false}
-      className="components-circular-option-picker__option"
+      className="components-button components-circular-option-picker__option"
       onBlur={[Function]}
       onClick={[Function]}
       onFocus={[Function]}
@@ -912,7 +912,7 @@ exports[`Storyshots Components|ColorPalette With Knobs 1`] = `
     <button
       aria-label="Color: white"
       aria-pressed={false}
-      className="components-circular-option-picker__option"
+      className="components-button components-circular-option-picker__option"
       onBlur={[Function]}
       onClick={[Function]}
       onFocus={[Function]}
@@ -933,7 +933,7 @@ exports[`Storyshots Components|ColorPalette With Knobs 1`] = `
     <button
       aria-label="Color: blue"
       aria-pressed={false}
-      className="components-circular-option-picker__option"
+      className="components-button components-circular-option-picker__option"
       onBlur={[Function]}
       onClick={[Function]}
       onFocus={[Function]}
@@ -1004,7 +1004,7 @@ exports[`Storyshots Components|ColorPicker Alpha Enabled 1`] = `
         <button
           aria-describedby="color-picker-saturation-1"
           aria-label="Choose a shade"
-          className="components-color-picker__saturation-pointer"
+          className="components-button components-color-picker__saturation-pointer"
           onKeyDown={[Function]}
           style={
             Object {
@@ -1012,6 +1012,7 @@ exports[`Storyshots Components|ColorPicker Alpha Enabled 1`] = `
               "top": "0%",
             }
           }
+          type="button"
         />
         <div
           className="components-visually-hidden"
@@ -1215,7 +1216,7 @@ exports[`Storyshots Components|ColorPicker Default 1`] = `
         <button
           aria-describedby="color-picker-saturation-0"
           aria-label="Choose a shade"
-          className="components-color-picker__saturation-pointer"
+          className="components-button components-color-picker__saturation-pointer"
           onKeyDown={[Function]}
           style={
             Object {
@@ -1223,6 +1224,7 @@ exports[`Storyshots Components|ColorPicker Default 1`] = `
               "top": "0%",
             }
           }
+          type="button"
         />
         <div
           className="components-visually-hidden"
@@ -1824,6 +1826,16 @@ exports[`Storyshots Components|FontSizePicker Without Custom Sizes 1`] = `
     </button>
   </div>
 </fieldset>
+`;
+
+exports[`Storyshots Components|Guide Default 1`] = `
+<button
+  className="components-button is-button is-default"
+  onClick={[Function]}
+  type="button"
+>
+  Open Guide
+</button>
 `;
 
 exports[`Storyshots Components|Icon Colors 1`] = `
@@ -3250,6 +3262,16 @@ exports[`Storyshots Components|TabPanel Default 1`] = `
     </p>
   </div>
 </div>
+`;
+
+exports[`Storyshots Components|TextHighlight Default 1`] = `
+Array [
+  "We call the new editor ",
+  <mark>
+    Gutenberg
+  </mark>,
+  ". The entire editing experience has been rebuilt for media rich pages and posts.",
+]
 `;
 
 exports[`Storyshots Components|Tip Default 1`] = `

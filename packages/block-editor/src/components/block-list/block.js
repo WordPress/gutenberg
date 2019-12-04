@@ -289,7 +289,7 @@ function BlockListBlock( {
 	 * (via `setFocus`), typically if there is no focusable input in the block.
 	 */
 	const onFocus = () => {
-		if ( ! isSelected && ! isPartOfMultiSelection ) {
+		if ( ! isSelected && ! isParentOfSelectedBlock && ! isPartOfMultiSelection ) {
 			onSelect();
 		}
 	};
@@ -438,10 +438,7 @@ function BlockListBlock( {
 		! showEmptyBlockSideInserter &&
 		! isPartOfMultiSelection &&
 		! isTypingWithinBlock;
-	const shouldShowBreadcrumb = ! isMultiSelecting && (
-		( isSelected && isNavigationMode ) ||
-		( ! isNavigationMode && ! isFocusMode && isHovered && ! isEmptyDefaultBlock )
-	);
+	const shouldShowBreadcrumb = isNavigationMode && isSelected && ! isMultiSelecting;
 	const shouldShowContextualToolbar =
 		! isNavigationMode &&
 		! hasFixedToolbar &&

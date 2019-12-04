@@ -29,10 +29,10 @@ function HeadingEdit( {
 	onReplace,
 	className,
 } ) {
-	const { TextColor, InspectorControlsColorPanel, BackgroundColorDetector } = __experimentalUseColors(
+	const { TextColor, InspectorControlsColorPanel, ColorDetector } = __experimentalUseColors(
 		[ { name: 'textColor', property: 'color' } ],
 		{
-			contrastCheckers: { backgroundColor: true },
+			contrastCheckers: { backgroundColor: true, textColor: true },
 		},
 		[]
 	);
@@ -56,7 +56,7 @@ function HeadingEdit( {
 			</InspectorControls>
 			{ InspectorControlsColorPanel }
 			<TextColor>
-				<BackgroundColorDetector querySelector='[contenteditable="true"]' />
+				<ColorDetector querySelector='[contenteditable="true"]' />
 				<RichText
 					identifier="content"
 					tagName={ tagName }

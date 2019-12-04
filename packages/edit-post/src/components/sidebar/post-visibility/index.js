@@ -17,7 +17,6 @@ export function PostVisibility() {
 						contentClassName="edit-post-post-visibility__dialog"
 						renderToggle={ ( { isOpen, onToggle } ) => (
 							<Button
-								type="button"
 								aria-expanded={ isOpen }
 								className="edit-post-post-visibility__toggle"
 								onClick={ onToggle }
