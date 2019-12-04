@@ -96,7 +96,6 @@ $color-palette-circle-spacing: 12px;
 	}
 
 	&:focus {
-		outline: none;
 		&::after {
 			content: "";
 			border: #{ $border-width * 2 } solid $dark-gray-400;
@@ -108,6 +107,12 @@ $color-palette-circle-spacing: 12px;
 			border-radius: $radius-round;
 			box-shadow: inset 0 0 0 2px $white;
 		}
+	}
+
+	&.components-button:focus {
+		background-color: transparent;
+		box-shadow: inset 0 0 0 ($color-palette-circle-size / 2);
+		outline: none;
 	}
 }
 
