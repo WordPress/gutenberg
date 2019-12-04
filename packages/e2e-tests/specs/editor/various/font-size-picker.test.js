@@ -18,7 +18,7 @@ describe( 'Font Size Picker', () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'Paragraph to be made "large"' );
 		await page.click( '.components-font-size-picker__select' );
-		await page.click( '.components-custom-select__item:nth-child(3)' );
+		await page.click( '.components-custom-select__item:nth-child(4)' );
 
 		// Ensure content matches snapshot.
 		const content = await getEditedPostContent();
@@ -31,8 +31,8 @@ describe( 'Font Size Picker', () => {
 		await page.keyboard.type( 'Paragraph to be made "small"' );
 
 		await page.click( '.blocks-font-size .components-range-control__number' );
-		// This should be the "small" font-size of the current theme.
-		await page.keyboard.type( '18' );
+		// This should be the "small" font-size of the editor defaults.
+		await page.keyboard.type( '13' );
 
 		// Ensure content matches snapshot.
 		const content = await getEditedPostContent();
