@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, Dimensions } from 'react-native';
+import { View, Dimensions, InteractionManager } from 'react-native';
 /**
  * WordPress dependencies
  */
@@ -21,11 +21,13 @@ import {
 	ToggleControl,
 	PanelBody,
 	RangeControl,
+	MissingControl,
 } from '@wordpress/components';
 import {
 	useCallback,
 	useState,
 } from '@wordpress/element';
+import { withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -33,6 +35,7 @@ import {
 import richTextStyle from './richText.scss';
 import styles from './editor.scss';
 import RichTextWrapper from './richTextWrapper';
+import NotificationSheet from '../missing/notificationSheet';
 
 const NEW_TAB_REL = 'noreferrer noopener';
 const INITIAL_BORDER_RADIUS = 4;
@@ -41,7 +44,7 @@ const MAX_BORDER_RADIUS_VALUE = 50;
 const BORDER_WIDTH = 1;
 const BLOCK_SPACING = 4;
 
-function ButtonEdit( { attributes, setAttributes, backgroundColor, textColor, isSelected } ) {
+function ButtonEdit( { attributes, setAttributes, backgroundColor, textColor, isSelected, closeGeneralSidebar } ) {
 	const {
 		placeholder,
 		text,
@@ -52,10 +55,11 @@ function ButtonEdit( { attributes, setAttributes, backgroundColor, textColor, is
 	} = attributes;
 
 	const [ isFocused, setRichTextFocus ] = useState( false );
+	const [ showHelp, setShowHelp ] = useState( false );
 
 	const borderRadiusValue = borderRadius !== undefined ? borderRadius : INITIAL_BORDER_RADIUS;
-	const mainColor = backgroundColor.color || '#2271b1';
-	const outlineBorderRadius = borderRadiusValue + BLOCK_SPACING + BORDER_WIDTH;
+	const mainColor = backgroundColor.color || '#595959';
+	const outlineBorderRadius = borderRadiusValue > 0 ? borderRadiusValue + BLOCK_SPACING + BORDER_WIDTH : 0;
 
 	const onToggleOpenInNewTab = useCallback(
 		( value ) => {
@@ -79,6 +83,17 @@ function ButtonEdit( { attributes, setAttributes, backgroundColor, textColor, is
 	const setBorderRadius = ( value ) => {
 		setAttributes( {
 			borderRadius: value,
+		} );
+	};
+
+	const toggleShowNoticationSheet = () => {
+		setShowHelp( ! showHelp );
+	};
+
+	const openNotificationSheet = () => {
+		closeGeneralSidebar();
+		InteractionManager.runAfterInteractions( () => {
+			toggleShowNoticationSheet();
 		} );
 	};
 
@@ -160,7 +175,15 @@ function ButtonEdit( { attributes, setAttributes, backgroundColor, textColor, is
 						keyboardType="url"
 					/>
 				</PanelBody>
+				<PanelBody title={ __( 'Color Settings' ) } >
+					<MissingControl
+						label={ __( 'Coming Soon' ) }
+						onPress={ openNotificationSheet }
+						separatorType="none"
+					/>
+				</PanelBody>
 			</InspectorControls>
+			<NotificationSheet title="Color Settings" isVisible={ showHelp } onClose={ toggleShowNoticationSheet } type="plural" />
 		</View>
 	);
 }
@@ -168,4 +191,11 @@ function ButtonEdit( { attributes, setAttributes, backgroundColor, textColor, is
 export default compose( [
 	withInstanceId,
 	withColors( 'backgroundColor', { textColor: 'color' } ),
+	withDispatch( ( dispatch ) => {
+		const { closeGeneralSidebar } = dispatch( 'core/edit-post' );
+
+		return {
+			closeGeneralSidebar,
+		};
+	} ),
 ] )( ButtonEdit );

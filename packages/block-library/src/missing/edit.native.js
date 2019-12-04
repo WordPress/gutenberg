@@ -1,22 +1,23 @@
 /**
  * External dependencies
  */
-import { Platform, View, Text, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, TouchableWithoutFeedback } from 'react-native';
 
 /**
  * WordPress dependencies
  */
-import { BottomSheet, Icon } from '@wordpress/components';
+import { Icon } from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import { coreBlocks } from '@wordpress/block-library';
 import { normalizeIconObject } from '@wordpress/blocks';
 import { Component } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import styles from './style.scss';
+import NotificationSheet from './notificationSheet';
 
 export class UnsupportedBlockEdit extends Component {
 	constructor( props ) {
@@ -52,40 +53,6 @@ export class UnsupportedBlockEdit extends Component {
 		);
 	}
 
-	renderSheet( title ) {
-		const { getStylesFromColorScheme } = this.props;
-		const infoTextStyle = getStylesFromColorScheme( styles.infoText, styles.infoTextDark );
-		const infoTitleStyle = getStylesFromColorScheme( styles.infoTitle, styles.infoTitleDark );
-		const infoDescriptionStyle = getStylesFromColorScheme( styles.infoDescription, styles.infoDescriptionDark );
-		const infoSheetIconStyle = getStylesFromColorScheme( styles.infoSheetIcon, styles.infoSheetIconDark );
-
-		// translators: %s: Name of the block
-		const titleFormat = Platform.OS === 'android' ? __( '\'%s\' isn\'t yet supported on WordPress for Android' ) :
-			__( '\'%s\' isn\'t yet supported on WordPress for iOS' );
-		const infoTitle = sprintf(
-			titleFormat,
-			title,
-		);
-
-		return (
-			<BottomSheet
-				isVisible={ this.state.showHelp }
-				hideHeader
-				onClose={ this.toggleSheet.bind( this ) }
-			>
-				<View style={ styles.infoContainer } >
-					<Icon icon="editor-help" color={ infoSheetIconStyle.color } size={ styles.infoSheetIcon.size } />
-					<Text style={ [ infoTextStyle, infoTitleStyle ] }>
-						{ infoTitle }
-					</Text>
-					<Text style={ [ infoTextStyle, infoDescriptionStyle ] }>
-						{ __( 'We are working hard to add more blocks with each release. In the meantime, you can also edit this post on the web.' ) }
-					</Text>
-				</View>
-			</BottomSheet>
-		);
-	}
-
 	render() {
 		const { originalName } = this.props.attributes;
 		const { getStylesFromColorScheme, preferredColorScheme } = this.props;
@@ -106,7 +73,7 @@ export class UnsupportedBlockEdit extends Component {
 				<Icon className={ iconClassName } icon={ icon && icon.src ? icon.src : icon } color={ iconStyle.color } />
 				<Text style={ titleStyle }>{ title }</Text>
 				{ subtitle }
-				{ this.renderSheet( title ) }
+				<NotificationSheet isVisible={ this.state.showHelp } onClose={ this.toggleSheet.bind( this ) } title={ title } />
 			</View>
 		);
 	}
