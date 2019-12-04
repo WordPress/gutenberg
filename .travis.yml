@@ -71,8 +71,9 @@ install:
         /tmp/wordpress-develop-master/*config-sample.php \
         /tmp/wordpress-develop-master/package.json wordpress
 
-      # Install WordPress.
+      # Install WordPress. The additional dependencies are required by the copied `wordpress-develop` tools.
       cd wordpress
+      npm install dotenv wait-on
       npm run env:start
       sleep 10
       npm run env:install
