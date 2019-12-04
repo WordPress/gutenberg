@@ -14,6 +14,7 @@ import { Component } from '@wordpress/element';
  */
 import Cell from '../cell';
 import Stepper from './stepper';
+import styles from './style.scss';
 
 const STEP_SPEED = 200;
 const DEFAULT_STEP = 1;
@@ -133,11 +134,12 @@ class BottomSheetStepperCell extends Component {
 				<Cell
 					accessibilityRole="none"
 					accessible={ false }
+					cellContainerStyle={ styles.cellContainerStyles }
+					cellRowContainerStyle={ styles.cellRowStyles }
 					editable={ false }
 					icon={ icon }
 					label={ label }
 					separatorType={ separatorType }
-
 				>
 					<Stepper
 						isMaxValue={ isMaxValue }
