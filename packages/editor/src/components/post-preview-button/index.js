@@ -190,7 +190,6 @@ export class PostPreviewButton extends Component {
 							className="editor-block-preview__new-tab"
 							href={ href }
 							target={ this.getWindowTarget() }
-							disabled={ ! isSaveable }
 							onClick={ this.openPreviewInNewTab }
 						>
 							{ _x( 'Open preview in new tab', 'imperative verb' ) }
@@ -200,7 +199,7 @@ export class PostPreviewButton extends Component {
 						<iframe
 							className="editor-block-preview__frame"
 							title={ __( 'Responsive preview frame' ) }
-							src={ previewLink }
+							src={ href }
 							style={
 								{
 									width: this.state.previewSize.width,

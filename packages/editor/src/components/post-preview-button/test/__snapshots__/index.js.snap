@@ -1,37 +1,111 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`PostPreviewButton render() should render currentPostLink otherwise 1`] = `
-<ForwardRef(Button)
-  className="editor-post-preview"
-  disabled={false}
-  href="https://wordpress.org/?p=1"
-  isLarge={true}
-  onClick={[Function]}
-  target="wp-preview-1"
->
-  Preview
-  <span
-    className="screen-reader-text"
+exports[`PostPreviewButton render() should render overlay when state is open 1`] = `
+<Fragment>
+  <ForwardRef(Button)
+    className="editor-post-preview"
+    disabled={true}
+    isLarge={true}
+    onClick={[Function]}
   >
-    (opens in a new tab)
-  </span>
-</ForwardRef(Button)>
-`;
-
-exports[`PostPreviewButton render() should render previewLink if provided 1`] = `
-<ForwardRef(Button)
-  className="editor-post-preview"
-  disabled={false}
-  href="https://wordpress.org/?p=1&preview=true"
-  isLarge={true}
-  onClick={[Function]}
-  target="wp-preview-1"
->
-  Preview
-  <span
-    className="screen-reader-text"
+    Preview
+    <WithSelect(WithDispatch(DotTip))
+      tipId="core/editor.preview"
+    >
+      Click “Preview” to load a preview of this page, so you can make sure you’re happy with your blocks.
+    </WithSelect(WithDispatch(DotTip))>
+  </ForwardRef(Button)>
+  <WithInstanceId(Modal)
+    className="editor-block-preview"
+    onRequestClose={[Function]}
+    shouldCloseOnClickOutside={false}
+    title="Preview"
   >
-    (opens in a new tab)
-  </span>
-</ForwardRef(Button)>
+    <div
+      className="editor-block-preview__controls"
+    >
+      <ForwardRef(IconButton)
+        icon={
+          <SVG
+            height="24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <Path
+              d="M0 0h24v24H0z"
+              fill="none"
+            />
+            <Path
+              d="M21 2H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h7v2H8v2h8v-2h-2v-2h7c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H3V4h18v12z"
+            />
+          </SVG>
+        }
+        label="Preview desktop screen"
+        onClick={[Function]}
+      />
+      <ForwardRef(IconButton)
+        icon={
+          <SVG
+            height="24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <Path
+              d="M0 0h24v24H0z"
+              fill="none"
+            />
+            <Path
+              d="M21 4H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h18c1.1 0 1.99-.9 1.99-2L23 6c0-1.1-.9-2-2-2zm-2 14H5V6h14v12z"
+            />
+          </SVG>
+        }
+        label="Preview tablet screen"
+        onClick={[Function]}
+      />
+      <ForwardRef(IconButton)
+        icon={
+          <SVG
+            height="24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <Path
+              d="M0 0h24v24H0z"
+              fill="none"
+            />
+            <Path
+              d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"
+            />
+          </SVG>
+        }
+        label="Preview phone screen"
+        onClick={[Function]}
+      />
+      <ForwardRef(Button)
+        className="editor-block-preview__new-tab"
+        href="https://wordpress.org/?p=1"
+        isLarge={true}
+        onClick={[Function]}
+        target="wp-preview-1"
+      >
+        Open preview in new tab
+      </ForwardRef(Button)>
+    </div>
+    <div
+      className="editor-block-preview__frame-container"
+    >
+      <iframe
+        className="editor-block-preview__frame"
+        src="https://wordpress.org/?p=1"
+        style={
+          Object {
+            "height": "800px",
+            "width": "1200px",
+          }
+        }
+        title="Responsive preview frame"
+      />
+    </div>
+  </WithInstanceId(Modal)>
+</Fragment>
 `;
