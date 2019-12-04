@@ -64,13 +64,12 @@ export class BlockList extends Component {
 		const willShowInsertionPoint = shouldShowInsertionPointBefore(); // call without the client_id argument since this is the appender
 		return (
 			<ReadableContentView>
-				{ willShowInsertionPoint ?
-					this.renderAddBlockSeparator() :	// show the new-block indicator when we're inserting a block or
+				{ willShowInsertionPoint &&
+					this.renderAddBlockSeparator()} 
 					<BlockListAppender				// show the default appender, as normal, when not inserting a block
 						rootClientId={ this.props.rootClientId }
 						renderAppender={ this.props.renderAppender }
 					/>
-				}
 			</ReadableContentView>
 		);
 	}
