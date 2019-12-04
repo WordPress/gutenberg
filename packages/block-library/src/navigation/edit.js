@@ -88,9 +88,9 @@ function Navigation( {
 	//
 	const handleItemsAlignment = ( align ) => {
 		return () => {
-			const itemAlignment = attributes.itemAlignment === align ? undefined : align;
+			const itemsJustification = attributes.itemsJustification === align ? undefined : align;
 			setAttributes( {
-				itemAlignment,
+				itemsJustification,
 			} );
 		};
 	};
@@ -159,7 +159,7 @@ function Navigation( {
 	}
 
 	const blockClassNames = classnames( 'wp-block-navigation', {
-		[ `items-alignment-${ attributes.itemAlignment }` ]: attributes.itemAlignment,
+		[ `items-justification-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
 	} );
 
 	// UI State: rendered Block UI
@@ -175,13 +175,13 @@ function Navigation( {
 				/>
 
 				<Toolbar
-					icon={ attributes.itemAlignment ? `editor-align${ attributes.itemAlignment }` : 'editor-alignleft' }
-					label="Change items alignment"
+					icon={ attributes.itemsJustification ? `editor-align${ attributes.itemsJustification }` : 'editor-alignleft' }
+					label="Change items justification"
 					isCollapsed
 					controls={ [
-						{ icon: 'editor-alignleft', title: 'Align items left', isActive: 'left' === attributes.itemAlignment, onClick: handleItemsAlignment( 'left' ) },
-						{ icon: 'editor-aligncenter', title: 'Align items center', isActive: 'center' === attributes.itemAlignment, onClick: handleItemsAlignment( 'center' ) },
-						{ icon: 'editor-alignright', title: 'Align items right', isActive: 'right' === attributes.itemAlignment, onClick: handleItemsAlignment( 'right' ) },
+						{ icon: 'editor-alignleft', title: 'Justify items left', isActive: 'left' === attributes.itemsJustification, onClick: handleItemsAlignment( 'left' ) },
+						{ icon: 'editor-aligncenter', title: 'Justify items center', isActive: 'center' === attributes.itemsJustification, onClick: handleItemsAlignment( 'center' ) },
+						{ icon: 'editor-alignright', title: 'Justify items right', isActive: 'right' === attributes.itemsJustification, onClick: handleItemsAlignment( 'right' ) },
 					] }
 				/>
 
