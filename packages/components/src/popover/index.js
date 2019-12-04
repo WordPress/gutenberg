@@ -20,6 +20,7 @@ import withConstrainedTabbing from '../higher-order/with-constrained-tabbing';
 import PopoverDetectOutside from './detect-outside';
 import IconButton from '../icon-button';
 import ScrollLock from '../scroll-lock';
+import IsolatedEventContainer from '../isolated-event-container';
 import { Slot, Fill, Consumer } from '../slot-fill';
 import Animate from '../animate';
 
@@ -186,10 +187,6 @@ function useFocusContentOnMount( focusOnMount, contentRef ) {
 		return () => clearTimeout( focusTimeout );
 	}, [] );
 }
-
-const stopPropagation = ( event ) => {
-	event.stopPropagation();
-};
 
 const Popover = ( {
 	headerTitle,
@@ -390,20 +387,18 @@ const Popover = ( {
 				options={ { origin: animateOrigin } }
 			>
 				{ ( { className: animateClassName } ) => (
-					// eslint-disable-next-line jsx-a11y/no-static-element-interactions
-					<div
+					<IsolatedEventContainer
 						className={ classnames(
 							'components-popover',
 							className,
 							animateClassName,
 							{
-								'is-mobile': isMobileViewport,
+								'is-mobile': isMobileViewport && expandOnMobile,
 								'is-without-arrow': noArrow,
 							}
 						) }
 						{ ...contentProps }
 						onKeyDown={ maybeClose }
-						onMouseDown={ stopPropagation }
 						ref={ containerRef }
 					>
 						{ isMobileViewport && expandOnMobile && (
@@ -421,7 +416,7 @@ const Popover = ( {
 						>
 							{ children }
 						</div>
-					</div>
+					</IsolatedEventContainer>
 				) }
 			</Animate>
 		</PopoverDetectOutside>
