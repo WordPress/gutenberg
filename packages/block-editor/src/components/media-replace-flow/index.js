@@ -69,6 +69,12 @@ const MediaReplaceFlow = (
 		speak( __( 'The media file has been replaced' ) );
 	};
 
+	const selectURL = ( newURL ) => {
+		onSelectURL( newURL );
+		setShowEditURLInput( false );
+		setShowURLInput( false );
+	};
+
 	const uploadFiles = ( event ) => {
 		const files = event.target.files;
 		const setMedia = ( [ media ] ) => {
@@ -84,6 +90,8 @@ const MediaReplaceFlow = (
 	};
 
 	const onClose = () => {
+		setShowEditURLInput( false );
+		setShowURLInput( false );
 		editMediaButtonRef.current.focus();
 	};
 
@@ -109,8 +117,7 @@ const MediaReplaceFlow = (
 				onChangeInputValue={ ( url ) => ( setMediaURLValue( url ) ) }
 				onSubmit={ ( event ) => {
 					event.preventDefault();
-					onSelectURL( mediaURLValue );
-					setShowEditURLInput( ! showEditURLInput );
+					selectURL( mediaURLValue );
 					editMediaButtonRef.current.focus();
 				} }
 			/>

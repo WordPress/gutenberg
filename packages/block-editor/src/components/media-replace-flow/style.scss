@@ -23,8 +23,9 @@
 
 		.components-external-link__icon {
 			position: absolute;
-			right: 50px;
-			bottom: 22px;
+			right: -4px;
+			bottom: 5px;
+			margin-right: 2px;
 		}
 
 		input {
@@ -34,9 +35,11 @@
 		}
 
 		.block-editor-url-popover__link-viewer-url {
-			padding-right: 10px;
+			padding-right: 15px;
 			padding-top: 3px;
-			max-width: 169px;
+			max-width: 179px;
+			position: relative;
+			margin-right: 0;
 		}
 
 		// Mimic toolbar component styles for the icons in this popover.
@@ -44,6 +47,7 @@
 			padding: 5px;
 			width: 40px;
 			height: 40px;
+			padding-left: 0;
 
 			> svg {
 				padding: 5px;
