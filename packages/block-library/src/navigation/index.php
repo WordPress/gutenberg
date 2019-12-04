@@ -54,7 +54,7 @@ function render_block_navigation( $attributes, $content, $block ) {
 		$colors['css_classes'],
 		array( 'wp-block-navigation' ),
 		isset( $attributes['className'] ) ? array( $attributes['className'] ) : array(),
-		isset( $attributes['itemsJustification'] ) ? array( 'items-justification-' . $attributes['itemsJustification'] ) : array(),
+		isset( $attributes['itemsJustification'] ) ? array( 'items-justification-' . $attributes['itemsJustification'] ) : array()
 	);
 	$class_attribute = sprintf( ' class="%s"', esc_attr( implode( ' ', $classes ) ) );
 	$style_attribute = $colors['inline_styles'] ? sprintf( ' style="%s"', esc_attr( $colors['inline_styles'] ) ) : '';
