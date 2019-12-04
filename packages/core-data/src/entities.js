@@ -12,6 +12,7 @@ import { apiFetch, select } from './controls';
 export const DEFAULT_ENTITY_KEY = 'id';
 
 export const defaultEntities = [
+	{ name: 'base', kind: 'root', baseURL: '/' },
 	{ name: 'site', kind: 'root', baseURL: '/wp/v2/settings' },
 	{ name: 'postType', kind: 'root', key: 'slug', baseURL: '/wp/v2/types' },
 	{ name: 'media', kind: 'root', baseURL: '/wp/v2/media', plural: 'mediaItems' },

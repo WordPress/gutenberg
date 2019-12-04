@@ -22,6 +22,8 @@ export function SiteTitleEdit( { isSelected } ) {
 		'title'
 	);
 
+	const [ viewTitle ] = useEntityProp( 'root', 'base', 'name' );
+
 	const editMode = (
 		<>
 			<Button
@@ -44,7 +46,7 @@ export function SiteTitleEdit( { isSelected } ) {
 	);
 
 	const viewMode = (
-		<h1>{ title }</h1>
+		<h1>{ title ? title : viewTitle }</h1>
 	);
 
 	return ( canUpdate && isSelected ) ? editMode : viewMode;
