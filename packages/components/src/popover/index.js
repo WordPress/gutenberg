@@ -122,28 +122,6 @@ function withoutPadding( rect, element ) {
 }
 
 /**
- * Hook used to compute the initial size of an element.
- * The popover applies styling to limit the height of the element,
- * we only care about the initial size.
- *
- * @param {Object} ref Reference to the popover content element.
- *
- * @return {Object} Content size.
- */
-function useInitialContentSize( ref ) {
-	const [ contentSize, setContentSize ] = useState( null );
-	useEffect( () => {
-		const contentRect = ref.current.getBoundingClientRect();
-		setContentSize( {
-			width: contentRect.width,
-			height: contentRect.height,
-		} );
-	}, [] );
-
-	return contentSize;
-}
-
-/**
  * Hook used to focus the first tabbable element on mount.
  *
  * @param {boolean|string} focusOnMount Focus on mount mode.
@@ -226,15 +204,8 @@ const Popover = ( {
 		return () => window.removeEventListener( 'resize', resize );
 	} );
 
-	// Content size
-	const contentSize = useInitialContentSize( contentRef );
-
 	useEffect( () => {
 		if ( isMobileViewport && expandOnMobile ) {
-			return;
-		}
-
-		if ( ! contentSize ) {
 			return;
 		}
 
@@ -257,6 +228,10 @@ const Popover = ( {
 				anchorHorizontalBuffer
 			);
 
+			const contentSize = {
+				height: contentRef.current.scrollHeight,
+				width: contentRef.current.scrollWidth,
+			};
 			const {
 				popoverTop,
 				popoverLeft,
@@ -321,7 +296,6 @@ const Popover = ( {
 	}, [
 		isMobileViewport,
 		expandOnMobile,
-		contentSize,
 		anchorRect,
 		getAnchorRect,
 		anchorRef,
