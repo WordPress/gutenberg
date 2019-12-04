@@ -166,14 +166,6 @@ function Navigation( {
 	return (
 		<Fragment>
 			<BlockControls>
-				<ToolbarGroup>
-					{ navigatorToolbarButton }
-				</ToolbarGroup>
-				<BlockColorsStyleSelector
-					value={ TextColor.color }
-					onChange={ TextColor.setColor }
-				/>
-
 				<Toolbar
 					icon={ attributes.itemsJustification ? `editor-align${ attributes.itemsJustification }` : 'editor-alignleft' }
 					label={ __( 'Change items justification' ) }
@@ -183,6 +175,13 @@ function Navigation( {
 						{ icon: 'editor-aligncenter', title: __( 'Justify items center' ), isActive: 'center' === attributes.itemsJustification, onClick: handleItemsAlignment( 'center' ) },
 						{ icon: 'editor-alignright', title: __( 'Justify items right' ), isActive: 'right' === attributes.itemsJustification, onClick: handleItemsAlignment( 'right' ) },
 					] }
+				/>
+				<ToolbarGroup>
+					{ navigatorToolbarButton }
+				</ToolbarGroup>
+				<BlockColorsStyleSelector
+					value={ TextColor.color }
+					onChange={ TextColor.setColor }
 				/>
 
 			</BlockControls>
