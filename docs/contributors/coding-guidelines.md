@@ -316,7 +316,7 @@ Similar to the "Custom Types" advice concerning type unions and with literal val
  * 
  * @type {Object<WPBreakpoint,number>}
  */
-const BREAKPOINTS = { /* ... */ };
+const BREAKPOINTS = { huge: 1440 /* , ... */ };
 ```
 
 ### Nullable, Undefined, and Void Types
