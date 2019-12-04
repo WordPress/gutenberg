@@ -71,6 +71,7 @@ function BlockListBlock( {
 	clientId,
 	rootClientId,
 	isSelected,
+	isMultiSelected,
 	isPartOfMultiSelection,
 	isFirstMultiSelected,
 	isTypingWithinBlock,
@@ -466,7 +467,7 @@ function BlockListBlock( {
 			'has-warning': ! isValid || !! hasError || isUnregisteredBlock,
 			'is-selected': shouldAppearSelected,
 			'is-navigate-mode': isNavigationMode,
-			'is-multi-selected': isPartOfMultiSelection,
+			'is-multi-selected': isMultiSelected,
 			'is-hovered': shouldAppearHovered,
 			'is-reusable': isReusableBlock( blockType ),
 			'is-dragging': isDragging,
@@ -688,6 +689,7 @@ const applyWithSelect = withSelect(
 		const { name, attributes, isValid } = block || {};
 
 		return {
+			isMultiSelected: isBlockMultiSelected( clientId ),
 			isPartOfMultiSelection:
 				isBlockMultiSelected( clientId ) || isAncestorMultiSelected( clientId ),
 			isFirstMultiSelected: isFirstMultiSelectedBlock( clientId ),

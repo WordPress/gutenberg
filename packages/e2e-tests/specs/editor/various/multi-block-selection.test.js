@@ -293,4 +293,39 @@ describe( 'Multi-block selection', () => {
 		await testNativeSelection();
 		expect( await getSelectedFlatIndices() ).toEqual( [ 1, 2 ] );
 	} );
+
+	it( 'should select by dragging into nested block', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '1' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '/cover' );
+		await page.keyboard.press( 'Enter' );
+		await page.click( '.components-circular-option-picker__option' );
+		await page.keyboard.type( '2' );
+		await page.keyboard.press( 'ArrowUp' );
+
+		const [ coord1, coord2 ] = await page.evaluate( () => {
+			const elements = Array.from( document.querySelectorAll( '.wp-block-paragraph' ) );
+			const rect1 = elements[ 0 ].getBoundingClientRect();
+			const rect2 = elements[ 1 ].getBoundingClientRect();
+			return [
+				{
+					x: rect1.x + ( rect1.width / 2 ),
+					y: rect1.y + ( rect1.height / 2 ),
+				},
+				{
+					x: rect2.x + ( rect2.width / 2 ),
+					y: rect2.y + ( rect2.height / 2 ),
+				},
+			];
+		} );
+
+		await page.mouse.move( coord1.x, coord1.y );
+		await page.mouse.down();
+		await page.mouse.move( coord2.x, coord2.y, { steps: 10 } );
+		await page.mouse.up();
+
+		await testNativeSelection();
+		expect( await getSelectedFlatIndices() ).toEqual( [ 1, 2 ] );
+	} );
 } );
