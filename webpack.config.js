@@ -33,10 +33,10 @@ const gutenbergPackages = Object.keys( dependencies )
 
 module.exports = {
 	mode,
-	entry: gutenbergPackages.reduce( ( memo, packageName ) => {
+	entry: gutenbergPackages.reduce( ( memoAccumulator, packageName ) => {
 		const name = camelCaseDash( packageName );
-		memo[ name ] = `./packages/${ packageName }`;
-		return memo;
+		memoAccumulator[ name ] = `./packages/${ packageName }`;
+		return memoAccumulator;
 	}, {} ),
 	output: {
 		devtoolNamespace: 'wp',

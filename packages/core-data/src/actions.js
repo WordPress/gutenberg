@@ -155,14 +155,14 @@ export function* editEntityRecord( kind, name, recordId, edits, options = {} ) {
 		recordId,
 		// Clear edits when they are equal to their persisted counterparts
 		// so that the property is not considered dirty.
-		edits: Object.keys( edits ).reduce( ( acc, key ) => {
+		edits: Object.keys( edits ).reduce( ( accumulator, key ) => {
 			const recordValue = record[ key ];
 			const editedRecordValue = editedRecord[ key ];
 			const value = mergedEdits[ key ] ?
 				{ ...editedRecordValue, ...edits[ key ] } :
 				edits[ key ];
-			acc[ key ] = isEqual( recordValue, value ) ? undefined : value;
-			return acc;
+			accumulator[ key ] = isEqual( recordValue, value ) ? undefined : value;
+			return accumulator;
 		}, {} ),
 		transientEdits,
 	};
@@ -173,9 +173,9 @@ export function* editEntityRecord( kind, name, recordId, edits, options = {} ) {
 			undo: ! options.undoIgnore && {
 				...edit,
 				// Send the current values for things like the first undo stack entry.
-				edits: Object.keys( edits ).reduce( ( acc, key ) => {
-					acc[ key ] = editedRecord[ key ];
-					return acc;
+				edits: Object.keys( edits ).reduce( ( accumulator, key ) => {
+					accumulator[ key ] = editedRecord[ key ];
+					return accumulator;
 				}, {} ),
 			},
 		},
@@ -282,12 +282,12 @@ export function* saveEntityRecord(
 			// have a value.
 			let data = { ...persistedRecord, ...autosavePost, ...record };
 			data = Object.keys( data ).reduce(
-				( acc, key ) => {
+				( accumulator, key ) => {
 					if ( [ 'title', 'excerpt', 'content' ].includes( key ) ) {
 						// Edits should be the "raw" attribute values.
-						acc[ key ] = get( data[ key ], 'raw', data[ key ] );
+						accumulator[ key ] = get( data[ key ], 'raw', data[ key ] );
 					}
-					return acc;
+					return accumulator;
 				},
 				{ status: data.status === 'auto-draft' ? 'draft' : data.status }
 			);
@@ -301,24 +301,24 @@ export function* saveEntityRecord(
 			// draft or auto-draft status.
 			if ( persistedRecord.id === updatedRecord.id ) {
 				let newRecord = { ...persistedRecord, ...data, ...updatedRecord };
-				newRecord = Object.keys( newRecord ).reduce( ( acc, key ) => {
+				newRecord = Object.keys( newRecord ).reduce( ( accumulator, key ) => {
 					// These properties are persisted in autosaves.
 					if ( [ 'title', 'excerpt', 'content' ].includes( key ) ) {
 						// Edits should be the "raw" attribute values.
-						acc[ key ] = get( newRecord[ key ], 'raw', newRecord[ key ] );
+						accumulator[ key ] = get( newRecord[ key ], 'raw', newRecord[ key ] );
 					} else if ( key === 'status' ) {
 						// Status is only persisted in autosaves when going from
 						// "auto-draft" to "draft".
-						acc[ key ] =
+						accumulator[ key ] =
 							persistedRecord.status === 'auto-draft' &&
 							newRecord.status === 'draft' ?
 								newRecord.status :
 								persistedRecord.status;
 					} else {
 						// These properties are not persisted in autosaves.
-						acc[ key ] = get( persistedRecord[ key ], 'raw', persistedRecord[ key ] );
+						accumulator[ key ] = get( persistedRecord[ key ], 'raw', persistedRecord[ key ] );
 					}
-					return acc;
+					return accumulator;
 				}, {} );
 				yield receiveEntityRecords( kind, name, newRecord, undefined, true );
 			} else {

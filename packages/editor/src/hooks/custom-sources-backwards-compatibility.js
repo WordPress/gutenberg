@@ -24,11 +24,11 @@ function useMetaAttributeSource( name, _attributes, _setAttributes ) {
 		attributes = useMemo(
 			() => ( {
 				..._attributes,
-				...Object.keys( attributeTypes ).reduce( ( acc, key ) => {
+				...Object.keys( attributeTypes ).reduce( ( accumulator, key ) => {
 					if ( attributeTypes[ key ].source === 'meta' ) {
-						acc[ key ] = meta[ attributeTypes[ key ].meta ];
+						accumulator[ key ] = meta[ attributeTypes[ key ].meta ];
 					}
-					return acc;
+					return accumulator;
 				}, {} ),
 			} ),
 			[ attributeTypes, meta, _attributes ]

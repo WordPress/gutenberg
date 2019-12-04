@@ -1,7 +1,7 @@
 const { readFileSync, existsSync } = require( 'fs' );
 
 function average( array ) {
-	return array.reduce( ( a, b ) => a + b ) / array.length;
+	return array.reduce( ( accumulator, b ) => accumulator + b ) / array.length;
 }
 
 class PerformanceReporter {

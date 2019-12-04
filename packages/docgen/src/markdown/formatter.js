@@ -8,7 +8,7 @@ const cleanSpaces = ( paragraph ) =>
 		paragraph.split( '\n' ).map(
 			( sentence ) => sentence.trim()
 		).reduce(
-			( acc, current ) => acc + ' ' + current,
+			( accumulator, current ) => accumulator + ' ' + current,
 			''
 		).trim() :
 		'';
