@@ -20,6 +20,7 @@ import { KeyboardAwareFlatList, ReadableContentView } from '@wordpress/component
 import styles from './style.scss';
 import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
+import __experimentalBlockListFooter from '../block-list-footer';
 import FloatingToolbar from './block-mobile-floating-toolbar';
 
 const innerToolbarHeight = 44;
@@ -112,6 +113,7 @@ export class BlockList extends Component {
 						renderAppender={ this.props.renderAppender }
 					/>
 				}
+
 			</View>
 		);
 	}
@@ -159,11 +161,14 @@ export class BlockList extends Component {
 	renderBlockListFooter() {
 		const paragraphBlock = createBlock( 'core/paragraph' );
 		return (
-			<TouchableWithoutFeedback onPress={ () => {
-				this.addBlockToEndOfPost( paragraphBlock );
-			} } >
-				<View style={ styles.blockListFooter } />
-			</TouchableWithoutFeedback>
+			<>
+				<TouchableWithoutFeedback onPress={ () => {
+					this.addBlockToEndOfPost( paragraphBlock );
+				} } >
+					<View style={ styles.blockListFooter } />
+				</TouchableWithoutFeedback>
+				<__experimentalBlockListFooter.Slot />
+			</>
 		);
 	}
 }

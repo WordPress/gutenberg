@@ -14,7 +14,7 @@ import {
 import {
 	Icon,
 	IconButton,
-	Toolbar,
+	ToolbarGroup,
 	withNotices,
 } from '@wordpress/components';
 import {
@@ -109,14 +109,14 @@ class MediaContainer extends Component {
 	renderToolbarEditButton( open ) {
 		return (
 			<BlockControls>
-				<Toolbar>
+				<ToolbarGroup>
 					<IconButton
 						className="components-toolbar__control"
 						label={ __( 'Edit media' ) }
 						icon="edit"
 						onClick={ open }
 					/>
-				</Toolbar>
+				</ToolbarGroup>
 			</BlockControls>
 		);
 	}

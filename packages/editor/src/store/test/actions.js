@@ -634,4 +634,24 @@ describe( 'Editor actions', () => {
 			} );
 		} );
 	} );
+
+	describe( 'lockPostAutosaving', () => {
+		it( 'should return the LOCK_POST_AUTOSAVING action', () => {
+			const result = actions.lockPostAutosaving( 'test' );
+			expect( result ).toEqual( {
+				type: 'LOCK_POST_AUTOSAVING',
+				lockName: 'test',
+			} );
+		} );
+	} );
+
+	describe( 'unlockPostAutosaving', () => {
+		it( 'should return the UNLOCK_POST_AUTOSAVING action', () => {
+			const result = actions.unlockPostAutosaving( 'test' );
+			expect( result ).toEqual( {
+				type: 'UNLOCK_POST_AUTOSAVING',
+				lockName: 'test',
+			} );
+		} );
+	} );
 } );

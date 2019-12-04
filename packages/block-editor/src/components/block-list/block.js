@@ -63,7 +63,6 @@ const preventDrag = ( event ) => {
 };
 
 function BlockListBlock( {
-	blockRef,
 	mode,
 	isFocusMode,
 	hasFixedToolbar,
@@ -101,7 +100,8 @@ function BlockListBlock( {
 	animateOnChange,
 	enableAnimation,
 	isNavigationMode,
-	enableNavigationMode,
+	setNavigationMode,
+	isMultiSelecting,
 } ) {
 	// Random state used to rerender the component if needed, ideally we don't need this
 	const [ , updateRerenderState ] = useState( {} );
@@ -109,9 +109,6 @@ function BlockListBlock( {
 
 	// Reference of the wrapper
 	const wrapper = useRef( null );
-	useEffect( () => {
-		blockRef( wrapper.current, clientId );
-	}, [] );
 
 	// Reference to the block edit node
 	const blockNodeRef = useRef();
@@ -207,6 +204,19 @@ function BlockListBlock( {
 	 * @param {boolean} ignoreInnerBlocks Should not focus inner blocks.
 	 */
 	const focusTabbable = ( ignoreInnerBlocks ) => {
+		const selection = window.getSelection();
+
+		if ( selection.rangeCount && ! selection.isCollapsed ) {
+			const { startContainer, endContainer } = selection.getRangeAt( 0 );
+
+			if (
+				! blockNodeRef.current.contains( startContainer ) ||
+				! blockNodeRef.current.contains( endContainer )
+			) {
+				selection.removeAllRanges();
+			}
+		}
+
 		// Focus is captured by the wrapper node, so while focus transition
 		// should only consider tabbables within editable display, since it
 		// may be the wrapper itself or a side control which triggered the
@@ -279,7 +289,7 @@ function BlockListBlock( {
 	 * (via `setFocus`), typically if there is no focusable input in the block.
 	 */
 	const onFocus = () => {
-		if ( ! isSelected && ! isPartOfMultiSelection ) {
+		if ( ! isSelected && ! isParentOfSelectedBlock && ! isPartOfMultiSelection ) {
 			onSelect();
 		}
 	};
@@ -326,23 +336,33 @@ function BlockListBlock( {
 					isSelected &&
 					isEditMode
 				) {
-					enableNavigationMode();
+					setNavigationMode( true );
 					wrapper.current.focus();
 				}
 				break;
 		}
 	};
 
+	const isPointerDown = useRef( false );
+
 	/**
 	 * Begins tracking cursor multi-selection when clicking down within block.
 	 *
 	 * @param {MouseEvent} event A mousedown event.
 	 */
-	const onPointerDown = ( event ) => {
+	const onMouseDown = ( event ) => {
 		// Not the main button.
 		// https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
 		if ( event.button !== 0 ) {
 			return;
+		}
+
+		if (
+			isNavigationMode &&
+			isSelected &&
+			isInsideRootBlock( blockNodeRef.current, event.target )
+		) {
+			setNavigationMode( false );
 		}
 
 		if ( event.shiftKey ) {
@@ -354,7 +374,7 @@ function BlockListBlock( {
 		// Avoid triggering multi-selection if we click toolbars/inspectors
 		// and all elements that are outside the Block Edit DOM tree.
 		} else if ( blockNodeRef.current.contains( event.target ) ) {
-			onSelectionStart( clientId );
+			isPointerDown.current = true;
 
 			// Allow user to escape out of a multi-selection to a singular
 			// selection of a block via click. This is handled here since
@@ -365,6 +385,20 @@ function BlockListBlock( {
 				onSelect();
 			}
 		}
+	};
+
+	const onMouseUp = () => {
+		isPointerDown.current = false;
+	};
+
+	const onMouseLeave = () => {
+		if ( isPointerDown.current ) {
+			onSelectionStart( clientId );
+		}
+
+		hideHoverEffects();
+
+		isPointerDown.current = false;
 	};
 
 	const selectOnOpen = ( open ) => {
@@ -404,9 +438,10 @@ function BlockListBlock( {
 		! showEmptyBlockSideInserter &&
 		! isPartOfMultiSelection &&
 		! isTypingWithinBlock;
-	const shouldShowBreadcrumb =
+	const shouldShowBreadcrumb = ! isMultiSelecting && (
 		( isSelected && isNavigationMode ) ||
-		( ! isNavigationMode && ! isFocusMode && isHovered && ! isEmptyDefaultBlock );
+		( ! isNavigationMode && ! isFocusMode && isHovered && ! isEmptyDefaultBlock )
+	);
 	const shouldShowContextualToolbar =
 		! isNavigationMode &&
 		! hasFixedToolbar &&
@@ -419,9 +454,12 @@ function BlockListBlock( {
 
 	// Insertion point can only be made visible if the block is at the
 	// the extent of a multi-selection, or not in a multi-selection.
-	const shouldShowInsertionPoint =
+	const shouldShowInsertionPoint = ! isMultiSelecting && (
 		( isPartOfMultiSelection && isFirstMultiSelected ) ||
-		! isPartOfMultiSelection;
+		! isPartOfMultiSelection
+	);
+
+	const shouldRenderDropzone = shouldShowInsertionPoint;
 
 	// The wp-block className is important for editor styles.
 	// Generate the wrapper class names handling the different states of the block.
@@ -521,22 +559,22 @@ function BlockListBlock( {
 					rootClientId={ rootClientId }
 				/>
 			) }
-			<BlockDropZone
+			{ shouldRenderDropzone && <BlockDropZone
 				clientId={ clientId }
 				rootClientId={ rootClientId }
-			/>
-			{ isFirstMultiSelected && (
-				<BlockMultiControls
-					rootClientId={ rootClientId }
-					moverDirection={ moverDirection }
-				/>
-			) }
+			/> }
 			<div
 				className={ classnames(
 					'editor-block-list__block-edit block-editor-block-list__block-edit',
 					{ 'has-mover-inside': moverDirection === 'horizontal' },
 				) }
 			>
+				{ isFirstMultiSelected && (
+					<BlockMultiControls
+						rootClientId={ rootClientId }
+						moverDirection={ moverDirection }
+					/>
+				) }
 				{ shouldRenderMovers && ( moverDirection === 'vertical' ) && blockMover }
 				{ shouldShowBreadcrumb && (
 					<BlockBreadcrumb
@@ -569,7 +607,9 @@ function BlockListBlock( {
 				<IgnoreNestedEvents
 					ref={ blockNodeRef }
 					onDragStart={ preventDrag }
-					onMouseDown={ onPointerDown }
+					onMouseDown={ onMouseDown }
+					onMouseUp={ onMouseUp }
+					onMouseLeave={ onMouseLeave }
 					data-block={ clientId }
 				>
 					<BlockCrashBoundary onError={ onBlockError }>
@@ -778,9 +818,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 		toggleSelection( selectionEnabled ) {
 			toggleSelection( selectionEnabled );
 		},
-		enableNavigationMode() {
-			setNavigationMode( true );
-		},
+		setNavigationMode,
 	};
 } );
 

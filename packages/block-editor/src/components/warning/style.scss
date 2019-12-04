@@ -8,11 +8,6 @@
 	text-align: left;
 	padding: 10px $block-padding $block-padding;
 
-	// Avoid conflict with the multi-selection highlight color.
-	.has-warning.is-multi-selected & {
-		background-color: transparent;
-	}
-
 	.is-selected & {
 		// Use opacity to work in various editor styles.
 		border-color: $dark-opacity-light-800;

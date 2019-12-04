@@ -79,6 +79,12 @@
 	.editor-post-visibility__dialog-legend {
 		display: none;
 	}
+
+	// The DateTime component has an intrinsic padding in order for the horizontal scrolling to function inside a popover.
+	// We unset that here when used inline.
+	.components-datetime {
+		padding: 0;
+	}
 }
 
 .post-publish-panel__postpublish .components-panel__body {

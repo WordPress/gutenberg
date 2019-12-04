@@ -10,6 +10,7 @@ import deprecated from './deprecated';
 import edit from './edit';
 import icon from './icon';
 import metadata from './block.json';
+import patterns from './patterns';
 import save from './save';
 
 const { name } = metadata;
@@ -24,6 +25,7 @@ export const settings = {
 		align: [ 'wide', 'full' ],
 		html: false,
 	},
+	patterns,
 	example: {
 		innerBlocks: [
 			{

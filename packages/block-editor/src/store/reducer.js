@@ -1256,7 +1256,7 @@ export const blockListSettings = ( state = {}, action ) => {
  *
  * @return {string} Updated state.
  */
-export function isNavigationMode( state = true, action ) {
+export function isNavigationMode( state = false, action ) {
 	if ( action.type === 'SET_NAVIGATION_MODE' ) {
 		return action.isNavigationMode;
 	}
@@ -1315,6 +1315,12 @@ export function automaticChangeStatus( state, action ) {
 			if ( state !== 'final' ) {
 				return state;
 			}
+
+			return;
+		// Undoing an automatic change should still be possible after mouse
+		// move.
+		case 'STOP_TYPING':
+			return state;
 	}
 
 	// Reset the state by default (for any action not handled).

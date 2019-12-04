@@ -5,7 +5,8 @@ import {
 	clearLocalStorage,
 	createNewPost,
 	findSidebarPanelWithTitle,
-	observeFocusLoss,
+	enableFocusLossObservation,
+	disableFocusLossObservation,
 	openDocumentSettingsSidebar,
 	pressKeyWithModifier,
 	setBrowserViewport,
@@ -16,14 +17,15 @@ const ACTIVE_SIDEBAR_TAB_SELECTOR = '.edit-post-sidebar__panel-tab.is-active';
 const ACTIVE_SIDEBAR_BUTTON_TEXT = 'Document';
 
 describe( 'Sidebar', () => {
-	beforeAll( () => {
-		observeFocusLoss();
+	afterEach( () => {
+		disableFocusLossObservation();
 	} );
 
 	it( 'should have sidebar visible at the start with document sidebar active on desktop', async () => {
 		await setBrowserViewport( 'large' );
 		await clearLocalStorage();
 		await createNewPost();
+		await enableFocusLossObservation();
 		const { nodesCount, content, height, width } = await page.$$eval( ACTIVE_SIDEBAR_TAB_SELECTOR, ( nodes ) => {
 			const firstNode = nodes[ 0 ];
 			return {
@@ -49,6 +51,7 @@ describe( 'Sidebar', () => {
 		await setBrowserViewport( 'small' );
 		await clearLocalStorage();
 		await createNewPost();
+		await enableFocusLossObservation();
 		const sidebar = await page.$( SIDEBAR_SELECTOR );
 		expect( sidebar ).toBeNull();
 	} );
@@ -57,6 +60,7 @@ describe( 'Sidebar', () => {
 		await setBrowserViewport( 'large' );
 		await clearLocalStorage();
 		await createNewPost();
+		await enableFocusLossObservation();
 
 		const sidebars = await page.$$( SIDEBAR_SELECTOR );
 		expect( sidebars ).toHaveLength( 1 );
@@ -72,6 +76,7 @@ describe( 'Sidebar', () => {
 		await setBrowserViewport( 'large' );
 		await clearLocalStorage();
 		await createNewPost();
+		await enableFocusLossObservation();
 		await setBrowserViewport( 'small' );
 
 		const sidebarsMobile = await page.$$( SIDEBAR_SELECTOR );
@@ -85,9 +90,9 @@ describe( 'Sidebar', () => {
 
 	it( 'should preserve tab order while changing active tab', async () => {
 		await createNewPost();
+		await enableFocusLossObservation();
 
 		// Region navigate to Sidebar.
-		await pressKeyWithModifier( 'ctrl', '`' );
 		await pressKeyWithModifier( 'ctrl', '`' );
 		await pressKeyWithModifier( 'ctrl', '`' );
 		await pressKeyWithModifier( 'ctrl', '`' );
@@ -113,6 +118,7 @@ describe( 'Sidebar', () => {
 
 	it( 'should be possible to programmatically remove Document Settings panels', async () => {
 		await createNewPost();
+		await enableFocusLossObservation();
 
 		await openDocumentSettingsSidebar();
 

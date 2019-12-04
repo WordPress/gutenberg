@@ -40,6 +40,60 @@ describe( 'segmentHTMLToShortcodeBlock', () => {
 			},
 			save: () => null,
 		} );
+		registerBlockType( 'test/broccoli', {
+			title: 'Test Broccoli',
+			category: 'common',
+			attributes: {
+				id: {
+					type: 'number',
+				},
+			},
+			transforms: {
+				from: [
+					{
+						type: 'shortcode',
+						tag: [ 'my-broccoli' ],
+						attributes: {
+							id: {
+								type: 'number',
+								shortcode: ( { named: { id } } ) => parseInt( id, 10 ),
+							},
+						},
+						isMatch( { named: { id } } ) {
+							return id < 1000;
+						},
+					},
+				],
+			},
+			save: () => null,
+		} );
+		registerBlockType( 'test/fallback-broccoli', {
+			title: 'Test Fallback Broccoli',
+			category: 'common',
+			attributes: {
+				id: {
+					type: 'number',
+				},
+			},
+			transforms: {
+				from: [
+					{
+						type: 'shortcode',
+						tag: [ 'my-broccoli' ],
+						attributes: {
+							id: {
+								type: 'number',
+								shortcode: ( { named: { id } } ) => parseInt( id, 10 ),
+							},
+						},
+						isMatch( { named: { id } } ) {
+							return id > 1000;
+						},
+					},
+				],
+			},
+			save: () => null,
+		} );
 	} );
 
 	it( 'should convert a standalone shortcode between two paragraphs', () => {
@@ -62,6 +116,41 @@ describe( 'segmentHTMLToShortcodeBlock', () => {
 		expect( transformed[ 2 ] ).toBe( `
 
 <p>Bar</p>` );
+	} );
+
+	it( 'should convert a shortcode to a block type with a passing `isMatch`', () => {
+		const original = `<p>[my-broccoli id="42"]</p>`;
+
+		const transformed = segmentHTMLToShortcodeBlock( original, 0 );
+		const expectedBlock = createBlock( 'test/broccoli', { id: 42 } );
+		expectedBlock.clientId = transformed[ 1 ].clientId;
+		expect( transformed[ 1 ] ).toEqual( expectedBlock );
+	} );
+
+	it( 'should not convert a shortcode to a block type with a failing `isMatch`', () => {
+		const original = `<p>[my-broccoli id="1000"]</p>`;
+
+		const transformed = segmentHTMLToShortcodeBlock( original, 0 );
+		const expectedBlock = createBlock( 'core/shortcode' );
+		expectedBlock.clientId = transformed[ 1 ].clientId;
+		expect( transformed[ 1 ] ).toEqual( expectedBlock );
+	} );
+
+	it( 'should not blindly exclude a transform in subsequent shortcodes after a failed `isMatch`', () => {
+		const original = `<p>[my-broccoli id="1001"]</p>
+		<p>[my-broccoli id="42"]</p>
+		<p>[my-broccoli id="1000"]</p>`;
+
+		const transformed = segmentHTMLToShortcodeBlock( original );
+		const firstExpectedBlock = createBlock( 'test/fallback-broccoli', { id: 1001 } );
+		firstExpectedBlock.clientId = transformed[ 1 ].clientId;
+		const secondExpectedBlock = createBlock( 'test/broccoli', { id: 42 } );
+		secondExpectedBlock.clientId = transformed[ 3 ].clientId;
+		const thirdExpectedBlock = createBlock( 'core/shortcode' );
+		thirdExpectedBlock.clientId = transformed[ 5 ].clientId;
+		expect( transformed[ 1 ] ).toEqual( firstExpectedBlock );
+		expect( transformed[ 3 ] ).toEqual( secondExpectedBlock );
+		expect( transformed[ 5 ] ).toEqual( thirdExpectedBlock );
 	} );
 
 	it( 'should convert two instances of the same shortcode', () => {

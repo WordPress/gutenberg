@@ -1,19 +1,21 @@
 /**
  * External dependencies
  */
-import { Platform, AccessibilityInfo, findNodeHandle, TextInput, Slider } from 'react-native';
+import { Platform, AccessibilityInfo, findNodeHandle, TextInput, Slider, View, PixelRatio, AppState } from 'react-native';
 
 /**
  * WordPress dependencies
  */
 import { _x, __, sprintf } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
+import { withPreferredColorScheme } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import Cell from './cell';
 import styles from './range-cell.scss';
+import borderStyles from './borderStyles.scss';
 
 class BottomSheetRangeCell extends Component {
 	constructor( props ) {
@@ -24,10 +26,12 @@ class BottomSheetRangeCell extends Component {
 		this.handleReset = this.handleReset.bind( this );
 		this.onChangeValue = this.onChangeValue.bind( this );
 		this.onCellPress = this.onCellPress.bind( this );
+		this.handleChangePixelRatio = this.handleChangePixelRatio.bind( this );
 
 		const initialValue = this.validateInput( props.value || props.defaultValue || props.minimumValue );
+		const fontScale = this.getFontScale();
 
-		this.state = { accessible: true, sliderValue: initialValue, initialValue, hasFocus: false };
+		this.state = { accessible: true, sliderValue: initialValue, initialValue, hasFocus: false, fontScale };
 	}
 
 	componentDidUpdate( ) {
@@ -37,8 +41,23 @@ class BottomSheetRangeCell extends Component {
 		}
 	}
 
+	componentDidMount() {
+		AppState.addEventListener( 'change', this.handleChangePixelRatio );
+	}
+
 	componentWillUnmount() {
 		this.handleToggleFocus();
+		AppState.removeEventListener( 'change', this.handleChangePixelRatio );
+	}
+
+	getFontScale() {
+		return PixelRatio.getFontScale() < 1 ? 1 : PixelRatio.getFontScale();
+	}
+
+	handleChangePixelRatio( nextAppState ) {
+		if ( nextAppState === 'active' ) {
+			this.setState( { fontScale: this.getFontScale() } );
+		}
 	}
 
 	handleChange( text ) {
@@ -115,13 +134,16 @@ class BottomSheetRangeCell extends Component {
 			maximumValue = 10,
 			disabled,
 			step = 1,
-			minimumTrackTintColor = '#00669b',
+			preferredColorScheme,
+			minimumTrackTintColor = preferredColorScheme === 'light' ? '#00669b' : '#5198d9',
 			maximumTrackTintColor = Platform.OS === 'ios' ? '#e9eff3' : '#909090',
 			thumbTintColor = Platform.OS === 'android' && '#00669b',
+			getStylesFromColorScheme,
+			allowReset = true,
 			...cellProps
 		} = this.props;
 
-		const { hasFocus, sliderValue, accessible } = this.state;
+		const { hasFocus, sliderValue, accessible, fontScale } = this.state;
 
 		const accessibilityLabel =
 		sprintf(
@@ -130,49 +152,63 @@ class BottomSheetRangeCell extends Component {
 			cellProps.label, value
 		);
 
+		const defaultSliderStyle = getStylesFromColorScheme( styles.sliderTextInput, styles.sliderDarkTextInput );
+		const resetButtonText = Platform.OS === 'ios' ? __( 'Reset' ) : __( 'RESET' );
+		const resetButton = { title: resetButtonText, handler: this.handleReset };
+
 		return (
 			<Cell
 				{ ...cellProps }
+				cellContainerStyle={ styles.cellContainerStyles }
+				cellRowContainerStyle={ styles.cellRowStyles }
 				accessibilityRole={ 'none' }
 				editable={ false }
 				accessible={ accessible }
 				onPress={ this.onCellPress }
 				accessibilityLabel={ accessibilityLabel }
+				customActionButton={ allowReset ? resetButton : undefined }
 				accessibilityHint={
 					/* translators: accessibility text (hint for focusing a slider) */
 					__( 'Double tap to change the value using slider' )
 				}
 			>
-				<Slider
-					value={ this.validateInput( sliderValue ) }
-					defaultValue={ defaultValue }
-					disabled={ disabled }
-					step={ step }
-					minimumValue={ minimumValue }
-					maximumValue={ maximumValue }
-					minimumTrackTintColor={ minimumTrackTintColor }
-					maximumTrackTintColor={ maximumTrackTintColor }
-					thumbTintColor={ thumbTintColor }
-					onValueChange={ this.handleChange }
-					onSlidingComplete={ this.handleValueSave }
-					ref={ ( slider ) => {
-						this.sliderRef = slider;
-					} }
-					style={ styles.slider }
-					accessibilityRole={ 'adjustable' }
-				/>
-				<TextInput
-					style={ [ styles.sliderTextInput, hasFocus ? styles.isSelected : {} ] }
-					onChangeText={ this.handleChange }
-					onFocus={ this.handleToggleFocus }
-					onBlur={ this.handleToggleFocus }
-					keyboardType="number-pad"
-					returnKeyType="done"
-					value={ `${ sliderValue }` }
-				/>
+				<View style={ styles.container }>
+					<Slider
+						value={ this.validateInput( sliderValue ) }
+						defaultValue={ defaultValue }
+						disabled={ disabled }
+						step={ step }
+						minimumValue={ minimumValue }
+						maximumValue={ maximumValue }
+						minimumTrackTintColor={ minimumTrackTintColor }
+						maximumTrackTintColor={ maximumTrackTintColor }
+						thumbTintColor={ thumbTintColor }
+						onValueChange={ this.handleChange }
+						onSlidingComplete={ this.handleValueSave }
+						ref={ ( slider ) => {
+							this.sliderRef = slider;
+						} }
+						style={ styles.slider }
+						accessibilityRole={ 'adjustable' }
+					/>
+					<TextInput
+						style={ [
+							defaultSliderStyle,
+							borderStyles.borderStyle,
+							hasFocus && borderStyles.isSelected,
+							{ width: 40 * fontScale },
+						] }
+						onChangeText={ this.handleChange }
+						onFocus={ this.handleToggleFocus }
+						onBlur={ this.handleToggleFocus }
+						keyboardType="number-pad"
+						returnKeyType="done"
+						value={ `${ sliderValue }` }
+					/>
+				</View>
 			</Cell>
 		);
 	}
 }
 
-export default BottomSheetRangeCell;
+export default withPreferredColorScheme( BottomSheetRangeCell );

@@ -46,7 +46,7 @@ Working on pull request starts with forking the Gutenberg repository, your separ
 You will need to add an `upstream` remote in order to keep your fork updated.
 
 ```sh
-git remote add origin upstream https://github.com/WordPress/gutenberg.git
+git remote add upstream https://github.com/WordPress/gutenberg.git
 git remote -v
 origin	git@github.com:your-account/gutenberg.git (fetch)
 origin	git@github.com:your-account/gutenberg.git (push)

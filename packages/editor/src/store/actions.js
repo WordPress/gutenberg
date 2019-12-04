@@ -638,6 +638,46 @@ export function unlockPostSaving( lockName ) {
 }
 
 /**
+ * Returns an action object used to signal that post autosaving is locked.
+ *
+ * @param  {string} lockName The lock name.
+ *
+ * @example
+ * ```
+ * // Lock post autosaving with the lock key `mylock`:
+ * wp.data.dispatch( 'core/editor' ).lockPostAutosaving( 'mylock' );
+ * ```
+ *
+ * @return {Object} Action object
+ */
+export function lockPostAutosaving( lockName ) {
+	return {
+		type: 'LOCK_POST_AUTOSAVING',
+		lockName,
+	};
+}
+
+/**
+ * Returns an action object used to signal that post autosaving is unlocked.
+ *
+ * @param  {string} lockName The lock name.
+ *
+ * @example
+ * ```
+ * // Unlock post saving with the lock key `mylock`:
+ * wp.data.dispatch( 'core/editor' ).unlockPostAutosaving( 'mylock' );
+ * ```
+ *
+ * @return {Object} Action object
+ */
+export function unlockPostAutosaving( lockName ) {
+	return {
+		type: 'UNLOCK_POST_AUTOSAVING',
+		lockName,
+	};
+}
+
+/**
  * Returns an action object used to signal that the blocks have been updated.
  *
  * @param {Array}   blocks  Block Array.
@@ -646,8 +686,14 @@ export function unlockPostSaving( lockName ) {
  * @yield {Object} Action object
  */
 export function* resetEditorBlocks( blocks, options = {} ) {
-	const edits = { blocks };
-	if ( options.__unstableShouldCreateUndoLevel !== false ) {
+	const {
+		__unstableShouldCreateUndoLevel,
+		selectionStart,
+		selectionEnd,
+	} = options;
+	const edits = { blocks, selectionStart, selectionEnd };
+
+	if ( __unstableShouldCreateUndoLevel !== false ) {
 		const { id, type } = yield select( STORE_KEY, 'getCurrentPost' );
 		const noChange =
 			( yield select( 'core', 'getEditedEntityRecord', 'postType', type, id ) )
