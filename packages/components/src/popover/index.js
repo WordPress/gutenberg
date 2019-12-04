@@ -229,68 +229,6 @@ const Popover = ( {
 	// Content size
 	const contentSize = useInitialContentSize( contentRef );
 
-	const refresh = () => {
-		let anchor = computeAnchorRect(
-			anchorRefFallback,
-			anchorRect,
-			getAnchorRect,
-			anchorRef,
-			shouldAnchorIncludePadding
-		);
-
-		if ( ! anchor ) {
-			return;
-		}
-
-		anchor = addBuffer(
-			anchor,
-			anchorVerticalBuffer,
-			anchorHorizontalBuffer
-		);
-
-		const {
-			popoverTop,
-			popoverLeft,
-			xAxis,
-			yAxis,
-			contentHeight,
-			contentWidth,
-		} = computePopoverPosition( anchor, contentSize, position );
-
-		// Compute the animation position
-		const yAxisMapping = {
-			top: 'bottom',
-			bottom: 'top',
-		};
-		const xAxisMapping = {
-			left: 'right',
-			right: 'left',
-		};
-		const animateYAxis = yAxisMapping[ yAxis ] || 'middle';
-		const animateXAxis = xAxisMapping[ xAxis ] || 'center';
-
-		containerRef.current.setAttribute( 'data-x-axis', xAxis );
-		containerRef.current.setAttribute( 'data-y-axis', yAxis );
-		containerRef.current.style.top = popoverTop + 'px';
-		containerRef.current.style.left = popoverLeft + 'px';
-
-		if ( contentHeight ) {
-			contentRef.current.style.maxHeight = contentHeight + 'px';
-		}
-
-		if ( contentWidth ) {
-			contentRef.current.style.maxWidth = contentWidth + 'px';
-		}
-
-		if ( xAxis === 'center' && yAxis === 'middle' ) {
-			contentRef.current.classList.add( 'is-without-arrow' );
-		} else {
-			contentRef.current.classList.remove( 'is-without-arrow' );
-		}
-
-		setAnimateOrigin( animateXAxis + ' ' + animateYAxis );
-	};
-
 	useEffect( () => {
 		if ( isMobileViewport && expandOnMobile ) {
 			return;
@@ -299,6 +237,68 @@ const Popover = ( {
 		if ( ! contentSize ) {
 			return;
 		}
+
+		const refresh = () => {
+			let anchor = computeAnchorRect(
+				anchorRefFallback,
+				anchorRect,
+				getAnchorRect,
+				anchorRef,
+				shouldAnchorIncludePadding
+			);
+
+			if ( ! anchor ) {
+				return;
+			}
+
+			anchor = addBuffer(
+				anchor,
+				anchorVerticalBuffer,
+				anchorHorizontalBuffer
+			);
+
+			const {
+				popoverTop,
+				popoverLeft,
+				xAxis,
+				yAxis,
+				contentHeight,
+				contentWidth,
+			} = computePopoverPosition( anchor, contentSize, position );
+
+			// Compute the animation position
+			const yAxisMapping = {
+				top: 'bottom',
+				bottom: 'top',
+			};
+			const xAxisMapping = {
+				left: 'right',
+				right: 'left',
+			};
+			const animateYAxis = yAxisMapping[ yAxis ] || 'middle';
+			const animateXAxis = xAxisMapping[ xAxis ] || 'center';
+
+			containerRef.current.setAttribute( 'data-x-axis', xAxis );
+			containerRef.current.setAttribute( 'data-y-axis', yAxis );
+			containerRef.current.style.top = popoverTop + 'px';
+			containerRef.current.style.left = popoverLeft + 'px';
+
+			if ( contentHeight ) {
+				contentRef.current.style.maxHeight = contentHeight + 'px';
+			}
+
+			if ( contentWidth ) {
+				contentRef.current.style.maxWidth = contentWidth + 'px';
+			}
+
+			if ( xAxis === 'center' && yAxis === 'middle' ) {
+				contentRef.current.classList.add( 'is-without-arrow' );
+			} else {
+				contentRef.current.classList.remove( 'is-without-arrow' );
+			}
+
+			setAnimateOrigin( animateXAxis + ' ' + animateYAxis );
+		};
 
 		refresh();
 
@@ -318,7 +318,20 @@ const Popover = ( {
 			window.removeEventListener( 'resize', refresh );
 			window.removeEventListener( 'scroll', refresh, true );
 		};
-	} );
+	}, [
+		isMobileViewport,
+		expandOnMobile,
+		contentSize,
+		anchorRefFallback.current,
+		anchorRect,
+		getAnchorRect,
+		anchorRef,
+		shouldAnchorIncludePadding,
+		anchorVerticalBuffer,
+		anchorHorizontalBuffer,
+		position,
+		containerRef.current,
+	] );
 
 	useFocusContentOnMount( focusOnMount, contentRef );
 
