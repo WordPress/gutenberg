@@ -138,60 +138,63 @@ function gutenberg_find_template( $template_file ) {
 		)
 	);
 
-	if ( $template_query->have_posts() ) {
-		$template_posts        = $template_query->get_posts();
-		$current_template_post = array_shift( $template_posts );
+	$template_posts        = $template_query->get_posts();
+	$current_template_post = array_shift( $template_posts );
 
-		// Build map of template slugs to their priority in the current hierarchy.
-		$slug_priorities = array_flip( $slugs );
+	// Build map of template slugs to their priority in the current hierarchy.
+	$slug_priorities = array_flip( $slugs );
 
-		// See if there is a theme block template with higher priority than the resolved template post.
-		$higher_priority_block_template_path     = null;
-		$higher_priority_block_template_priority = PHP_INT_MAX;
-		$block_template_files                    = glob( get_stylesheet_directory() . '/block-templates/*.html', 1 );
-		if ( is_child_theme() ) {
-				$block_template_files = array_merge( $block_template_files, glob( get_template_directory() . '/block-templates/*.html', 1 ) );
+	// See if there is a theme block template with higher priority than the resolved template post.
+	$higher_priority_block_template_path     = null;
+	$higher_priority_block_template_priority = PHP_INT_MAX;
+	$block_template_files                    = glob( get_stylesheet_directory() . '/block-templates/*.html' ) ?: array();
+	if ( is_child_theme() ) {
+			$block_template_files = array_merge( $block_template_files, glob( get_template_directory() . '/block-templates/*.html' ) ?: array() );
+	}
+	if ( gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing-demo' ) ) {
+		$block_template_files = array_merge( $block_template_files, glob( dirname( __FILE__ ) . '/demo-block-templates/*.html' ) ?: array() );
+	}
+	foreach ( $block_template_files as $path ) {
+		$theme_block_template_priority = $slug_priorities[ basename( $path, '.html' ) ];
+		if (
+			isset( $theme_block_template_priority ) &&
+			$theme_block_template_priority < $higher_priority_block_template_priority &&
+			( empty( $current_template_post ) || $theme_block_template_priority < $slug_priorities[ $current_template_post->post_name ] )
+		) {
+			$higher_priority_block_template_path     = $path;
+			$higher_priority_block_template_priority = $theme_block_template_priority;
 		}
-		foreach ( $block_template_files as $path ) {
-			$theme_block_template_priority = $slug_priorities[ basename( $path, '.html' ) ];
-			if (
-				isset( $theme_block_template_priority ) &&
-				$theme_block_template_priority < $higher_priority_block_template_priority &&
-				$theme_block_template_priority < $slug_priorities[ $current_template_post->post_name ]
-			) {
-				$higher_priority_block_template_path     = $path;
-				$higher_priority_block_template_priority = $theme_block_template_priority;
-			}
-		}
+	}
 
-		// If there is, use it instead.
-		if ( isset( $higher_priority_block_template_path ) ) {
-			$post_name             = basename( $path, '.html' );
-			$current_template_post = array(
-				'post_content' => file_get_contents( $higher_priority_block_template_path ),
-				'post_title'   => ucfirst( $post_name ),
-				'post_status'  => 'auto-draft',
-				'post_type'    => 'wp_template',
-				'post_name'    => $post_name,
+	// If there is, use it instead.
+	if ( isset( $higher_priority_block_template_path ) ) {
+		$post_name             = basename( $higher_priority_block_template_path, '.html' );
+		$current_template_post = array(
+			'post_content' => file_get_contents( $higher_priority_block_template_path ),
+			'post_title'   => ucfirst( $post_name ),
+			'post_status'  => 'auto-draft',
+			'post_type'    => 'wp_template',
+			'post_name'    => $post_name,
+		);
+		if ( is_admin() ) {
+			// Only create auto-draft of block template for editing
+			// in admin screens, similarly to how we do it for new
+			// posts in the editor.
+			$current_template_post = get_post(
+				wp_insert_post( $current_template_post )
 			);
-			if ( is_admin() ) {
-				// Only create auto-draft of block template for editing
-				// in admin screens, similarly to how we do it for new
-				// posts in the editor.
-				$current_template_post = get_post(
-					wp_insert_post( $current_template_post )
-				);
 
-				foreach ( parse_blocks( $current_template_post->post_content ) as $block ) {
-					create_auto_draft_for_template_part_block( $block );
-				}
-			} else {
-				$current_template_post = new WP_Post(
-					(object) $current_template_post
-				);
+			foreach ( parse_blocks( $current_template_post->post_content ) as $block ) {
+				create_auto_draft_for_template_part_block( $block );
 			}
+		} else {
+			$current_template_post = new WP_Post(
+				(object) $current_template_post
+			);
 		}
+	}
 
+	if ( $current_template_post ) {
 		$_wp_current_template_content = $current_template_post->post_content;
 	}
 

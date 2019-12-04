@@ -150,8 +150,9 @@ export const registerCoreBlocks = () => {
 		( ( Platform.OS === 'ios' ) || ( !! __DEV__ ) ) ? preformatted : null,
 		// eslint-disable-next-line no-undef
 		!! __DEV__ ? group : null,
+		spacer,
 		// eslint-disable-next-line no-undef
-		!! __DEV__ ? spacer : null,
+		!! __DEV__ ? gallery : null,
 	].forEach( registerBlock );
 
 	setDefaultBlockName( paragraph.name );

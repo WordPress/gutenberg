@@ -31,19 +31,19 @@ import { isString } from 'lodash';
 /**
  * Object containing a React element.
  *
- * @typedef {react.ReactElement} WPElement
+ * @typedef {import('react').ReactElement} WPElement
  */
 
 /**
  * Object containing a React component.
  *
- * @typedef {react.Component} WPComponent
+ * @typedef {import('react').Component} WPComponent
  */
 
 /**
  * Object containing a React synthetic event.
  *
- * @typedef {react.SyntheticEvent} WPSyntheticEvent
+ * @typedef {import('react').SyntheticEvent} WPSyntheticEvent
  */
 
 /**

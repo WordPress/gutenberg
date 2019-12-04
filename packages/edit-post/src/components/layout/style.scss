@@ -3,7 +3,6 @@
 }
 .edit-post-layout__metaboxes:not(:empty) {
 	border-top: $border-width solid $light-gray-500;
-	margin-top: 10px;
 	padding: 10px 0 10px;
 	clear: both;
 
@@ -20,7 +19,7 @@
 	padding-left: 16px;
 	padding-right: 16px;
 }
-@include editor-left(".edit-post-layout.components-editor-notices__snackbar");
+@include editor-left(".edit-post-layout .components-editor-notices__snackbar");
 
 .edit-post-layout .editor-post-publish-panel {
 	position: fixed;

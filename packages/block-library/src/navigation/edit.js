@@ -20,12 +20,12 @@ import {
 import { createBlock } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
 import {
+	Button,
 	CheckboxControl,
 	PanelBody,
-	Spinner,
-	Toolbar,
 	Placeholder,
-	Button,
+	Spinner,
+	ToolbarGroup,
 } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 
@@ -152,9 +152,9 @@ function Navigation( {
 	return (
 		<Fragment>
 			<BlockControls>
-				<Toolbar>
+				<ToolbarGroup>
 					{ navigatorToolbarButton }
-				</Toolbar>
+				</ToolbarGroup>
 				<BlockColorsStyleSelector
 					value={ TextColor.color }
 					onChange={ TextColor.setColor }

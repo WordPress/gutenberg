@@ -129,6 +129,9 @@ export class RichText extends Component {
 	 * @return {Object} A RichText value with formats and selection.
 	 */
 	createRecord() {
+		const {
+			preserveWhiteSpace,
+		} = this.props;
 		const value = {
 			start: this.selectionStart,
 			end: this.selectionEnd,
@@ -137,6 +140,7 @@ export class RichText extends Component {
 				range: null,
 				multilineTag: this.multilineTag,
 				multilineWrapperTags: this.multilineWrapperTags,
+				preserveWhiteSpace,
 			} ),
 		};
 		const start = Math.min( this.selectionStart, value.text.length );
@@ -464,12 +468,16 @@ export class RichText extends Component {
 	}
 
 	formatToValue( value ) {
+		const {
+			preserveWhiteSpace,
+		} = this.props;
 		// Handle deprecated `children` and `node` sources.
 		if ( Array.isArray( value ) ) {
 			return create( {
 				html: childrenBlock.toHTML( value ),
 				multilineTag: this.multilineTag,
 				multilineWrapperTags: this.multilineWrapperTags,
+				preserveWhiteSpace,
 			} );
 		}
 
@@ -478,6 +486,7 @@ export class RichText extends Component {
 				html: value,
 				multilineTag: this.multilineTag,
 				multilineWrapperTags: this.multilineWrapperTags,
+				preserveWhiteSpace,
 			} );
 		}
 
@@ -714,7 +723,7 @@ export class RichText extends Component {
 					onCaretVerticalPositionChange={ this.props.onCaretVerticalPositionChange }
 					onSelectionChange={ this.onSelectionChangeFromAztec }
 					blockType={ { tag: tagName } }
-					color={ defaultColor }
+					color={ ( style && style.color ) || defaultColor }
 					linkTextColor={ defaultTextDecorationColor }
 					maxImagesWidth={ 200 }
 					fontFamily={ this.props.fontFamily || defaultFontFamily }
