@@ -10,7 +10,7 @@ import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { RichText } from '@wordpress/block-editor';
 
-export function SiteTitleEdit( { isSelected } ) {
+export function SiteTitleEdit( { isSelected, className } ) {
 	const canUpdate = useSelect( ( select ) => {
 		return select( 'core' ).canUser( 'update', 'settings' );
 	} );
@@ -49,7 +49,11 @@ export function SiteTitleEdit( { isSelected } ) {
 		<h1>{ title ? title : viewTitle }</h1>
 	);
 
-	return ( canUpdate && isSelected ) ? editMode : viewMode;
+	return (
+		<div className={ className }>
+			{ ( canUpdate && isSelected ) ? editMode : viewMode }
+		</div>
+	);
 }
 
 export default SiteTitleEdit;
