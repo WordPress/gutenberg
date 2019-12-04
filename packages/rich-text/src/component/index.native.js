@@ -222,7 +222,7 @@ export class RichText extends Component {
 	}
 
 	removeRootTag( tag, html ) {
-		const openingTagRegexp = RegExp( '^<' + tag + '>', 'gim' );
+		const openingTagRegexp = RegExp( '^<' + tag + '[^>]*>', 'gim' );
 		const closingTagRegexp = RegExp( '</' + tag + '>$', 'gim' );
 		return html.replace( openingTagRegexp, '' ).replace( closingTagRegexp, '' );
 	}
@@ -500,7 +500,9 @@ export class RichText extends Component {
 	}
 
 	shouldComponentUpdate( nextProps ) {
-		if ( nextProps.tagName !== this.props.tagName ) {
+		if ( nextProps.tagName !== this.props.tagName ||
+			nextProps.reversed !== this.props.reversed ||
+			nextProps.start !== this.props.start ) {
 			this.lastEventCount = undefined;
 			this.value = undefined;
 			return true;
@@ -609,7 +611,16 @@ export class RichText extends Component {
 		}
 
 		if ( tagName ) {
-			value = `<${ tagName }>${ value }</${ tagName }>`;
+			let extraAttributes = ``;
+			if ( tagName === `ol` ) {
+				if ( this.props.reversed ) {
+					extraAttributes += ` reversed`;
+				}
+				if ( this.props.start ) {
+					extraAttributes += ` start=${ this.props.start }`;
+				}
+			}
+			value = `<${ tagName } ${ extraAttributes }>${ value }</${ tagName }>`;
 		}
 		return value;
 	}
