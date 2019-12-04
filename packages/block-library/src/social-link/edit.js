@@ -49,7 +49,7 @@ const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
 						} } >
 						<URLInput
 							value={ url }
-							onChange={ ( event ) => setAttributes( { url: event.target.value } ) }
+							onChange={ ( nextURL ) => setAttributes( { url: nextURL } ) }
 							placeholder={ __( 'Enter Address' ) }
 						/>
 						<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
