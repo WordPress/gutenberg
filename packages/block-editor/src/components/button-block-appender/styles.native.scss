@@ -1,10 +1,17 @@
 .appender {
 	align-items: center;
 	justify-content: center;
-	padding: 12px;
+	padding: 9px;
+	margin-left: 0;
+	margin-right: 0;
 	background-color: $white;
 	border: $border-width solid $light-gray-500;
 	border-radius: 4px;
+}
+
+.appenderDark {
+	background-color: $background-dark-secondary;
+	border: $border-width solid $gray-70;
 }
 
 .addBlockButton {
@@ -13,4 +20,9 @@
 	border-radius: $icon-button-size-small / 2;
 	overflow: hidden;
 	size: $icon-button-size-small;
+}
+
+.addBlockButtonDark {
+	color: $background-dark-secondary;
+	background-color: $gray-40;
 }

@@ -427,11 +427,12 @@ export function getBlockRootClientId( state, clientId ) {
  *
  * @param {Object} state    Editor state.
  * @param {string} clientId Block from which to find root client ID.
+ * @param {boolean} ascending Order results from bottom to top (true) or top to bottom (false).
  *
  * @return {Array} ClientIDs of the parent blocks.
  */
 export const getBlockParents = createSelector(
-	( state, clientId ) => {
+	( state, clientId, ascending = false ) => {
 		const parents = [];
 		let current = clientId;
 		while ( !! state.blocks.parents[ current ] ) {
@@ -439,7 +440,7 @@ export const getBlockParents = createSelector(
 			parents.push( current );
 		}
 
-		return parents.reverse();
+		return ascending ? parents : parents.reverse();
 	},
 	( state ) => [
 		state.blocks.parents,
@@ -462,6 +463,33 @@ export function getBlockHierarchyRootClientId( state, clientId ) {
 		current = state.blocks.parents[ current ];
 	} while ( current );
 	return parent;
+}
+
+/**
+ * Given a block client ID, returns the lowest common ancestor with selected client ID.
+ *
+ * @param {Object} state    Editor state.
+ * @param {string} clientId Block from which to find common ancestor client ID.
+ *
+ * @return {string} Common ancestor client ID or undefined
+ */
+export function getLowestCommonAncestorWithSelectedBlock( state, clientId ) {
+	const selectedId = getSelectedBlockClientId( state );
+	const clientParents = [ ...getBlockParents( state, clientId ), clientId ];
+	const selectedParents = [ ...getBlockParents( state, selectedId ), selectedId ];
+
+	let lowestCommonAncestor;
+
+	const maxDepth = Math.min( clientParents.length, selectedParents.length );
+	for ( let index = 0; index < maxDepth; index++ ) {
+		if ( clientParents[ index ] === selectedParents[ index ] ) {
+			lowestCommonAncestor = clientParents[ index ];
+		} else {
+			break;
+		}
+	}
+
+	return lowestCommonAncestor;
 }
 
 /**
