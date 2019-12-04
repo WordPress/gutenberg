@@ -24,7 +24,7 @@ export function PostPublishButtonOrToggle( {
 } ) {
 	const IS_TOGGLE = 'toggle';
 	const IS_BUTTON = 'button';
-	const isLessThanMediumViewport = useViewportMatch( '< medium' );
+	const isSmallerThanMediumViewport = useViewportMatch( '< medium' );
 	let component;
 
 	/**
@@ -52,10 +52,10 @@ export function PostPublishButtonOrToggle( {
 	if (
 		isPublished ||
 		( isScheduled && isBeingScheduled ) ||
-		( isPending && ! hasPublishAction && ! isLessThanMediumViewport )
+		( isPending && ! hasPublishAction && ! isSmallerThanMediumViewport )
 	) {
 		component = IS_BUTTON;
-	} else if ( isLessThanMediumViewport ) {
+	} else if ( isSmallerThanMediumViewport ) {
 		component = IS_TOGGLE;
 	} else if ( isPublishSidebarEnabled ) {
 		component = IS_TOGGLE;

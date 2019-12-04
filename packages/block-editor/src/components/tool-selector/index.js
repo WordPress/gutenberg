@@ -19,8 +19,8 @@ const selectIcon = <SVG xmlns="http://www.w3.org/2000/svg" width="20" height="20
 function ToolSelector() {
 	const isNavigationTool = useSelect( ( select ) => select( 'core/block-editor' ).isNavigationMode() );
 	const { setNavigationMode } = useDispatch( 'core/block-editor' );
-	const isLargeViewport = useViewportMatch( 'medium' );
-	if ( ! isLargeViewport ) {
+	const isMediumViewport = useViewportMatch( 'medium' );
+	if ( ! isMediumViewport ) {
 		return null;
 	}
 
