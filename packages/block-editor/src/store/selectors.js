@@ -1038,9 +1038,7 @@ const canInsertBlockTypeUnmemoized = ( state, blockName, rootClientId = null ) =
 		if ( isArray( list ) ) {
 			// TODO: when there is a canonical way to detect that we are editing a post
 			// the following check should be changed to something like:
-			// if ( includes( list, 'core/post-content' ) &&
-			//		( item === 'core/post-content' || (getEditorMode() === 'post-content' && item === null)
-			// )
+			// if (includes( list, 'core/post-content' ) && getEditorMode() === 'post-content' && item === null )
 			if ( includes( list, 'core/post-content' ) && item === null ) {
 				return true;
 			}
