@@ -73,7 +73,6 @@ install:
 
       # Install WordPress.
       cd wordpress
-      npm install dotenv wait-on
       npm run env:start
       sleep 10
       npm run env:install
