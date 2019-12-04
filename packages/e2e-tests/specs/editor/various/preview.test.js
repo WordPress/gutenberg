@@ -23,6 +23,8 @@ async function openPreviewPage( editorPage ) {
 	let openTabs = await browser.pages();
 	const expectedTabsCount = openTabs.length + 1;
 	await editorPage.click( '.editor-post-preview' );
+	await editorPage.waitForSelector( '.editor-block-preview__new-tab' );
+	await editorPage.click( '.editor-block-preview__new-tab' );
 
 	// Wait for the new tab to open.
 	while ( openTabs.length < expectedTabsCount ) {
@@ -31,9 +33,7 @@ async function openPreviewPage( editorPage ) {
 	}
 
 	const previewPage = last( openTabs );
-	// Wait for the preview to load. We can't do interstitial detection here,
-	// because it might load too quickly for us to pick up, so we wait for
-	// the preview to load by waiting for the title to appear.
+	// Wait for the preview to load by waiting for the title to appear.
 	await previewPage.waitForSelector( '.entry-title' );
 	return previewPage;
 }
@@ -48,6 +48,8 @@ async function openPreviewPage( editorPage ) {
  */
 async function waitForPreviewNavigation( previewPage ) {
 	await page.click( '.editor-post-preview' );
+	await page.waitForSelector( '.editor-block-preview__new-tab' );
+	await page.click( '.editor-block-preview__new-tab' );
 	return previewPage.waitForNavigation();
 }
 
@@ -117,6 +119,7 @@ describe( 'Preview', () => {
 
 		// Return to editor to change title.
 		await editorPage.bringToFront();
+		await editorPage.click( '[aria-label="Close dialog"' );
 		await editorPage.type( '.editor-post-title__input', '!' );
 		await waitForPreviewNavigation( previewPage );
 
@@ -127,12 +130,14 @@ describe( 'Preview', () => {
 		// Pressing preview without changes should bring same preview window to
 		// front and reload, but should not show interstitial.
 		await editorPage.bringToFront();
+		await editorPage.click( '[aria-label="Close dialog"' );
 		await waitForPreviewNavigation( previewPage );
 		previewTitle = await previewPage.$eval( '.entry-title', ( node ) => node.textContent );
 		expect( previewTitle ).toBe( 'Hello World!' );
 
 		// Preview for published post (no unsaved changes) directs to canonical URL for post.
 		await editorPage.bringToFront();
+		await editorPage.click( '[aria-label="Close dialog"' );
 		await publishPost();
 
 		// Return to editor to change title.
@@ -156,6 +161,7 @@ describe( 'Preview', () => {
 		//
 		// See: https://github.com/WordPress/gutenberg/issues/7561
 		await editorPage.bringToFront();
+		await editorPage.click( '[aria-label="Close dialog"' );
 		await waitForPreviewNavigation( previewPage );
 
 		// Title in preview should match updated input.
@@ -185,6 +191,7 @@ describe( 'Preview', () => {
 
 		// Return to editor.
 		await editorPage.bringToFront();
+		await editorPage.click( '[aria-label="Close dialog"' );
 
 		// Append bbbbb to the title, and tab away from the title so blur event is triggered.
 		await editorPage.type( '.editor-post-title__input', 'bbbbb' );
@@ -238,6 +245,7 @@ describe( 'Preview with Custom Fields enabled', () => {
 
 		// Return to editor and modify the title and content.
 		await editorPage.bringToFront();
+		await editorPage.click( '[aria-label="Close dialog"' );
 		await editorPage.click( '.editor-post-title__input' );
 		await pressKeyWithModifier( 'primary', 'a' );
 		await editorPage.keyboard.press( 'Delete' );
@@ -258,5 +266,6 @@ describe( 'Preview with Custom Fields enabled', () => {
 
 		// Make sure the editor is active for the afterEach function.
 		await editorPage.bringToFront();
+		await editorPage.click( '[aria-label="Close dialog"' );
 	} );
 } );
