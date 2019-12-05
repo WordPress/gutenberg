@@ -158,6 +158,32 @@ describe( 'canUser', () => {
 		expect( received.done ).toBe( true );
 		expect( received.value ).toBeUndefined();
 	} );
+
+	it( 'receives custom actions', () => {
+		const generator = canUser( 'publish', 'posts' );
+
+		let received = generator.next();
+		expect( received.done ).toBe( false );
+		expect( received.value ).toEqual( apiFetch( {
+			path: '/wp/v2/posts?context=edit',
+			method: 'GET',
+			parse: true,
+		} ) );
+
+		received = generator.next( {
+			_links: {
+				'wp:action-publish': [
+					{ href: 'http://localhost:8888/wp-json/wp/v2/posts' },
+				],
+			},
+		} );
+		expect( received.done ).toBe( false );
+		expect( received.value ).toEqual( receiveUserPermission( 'publish/posts', true ) );
+
+		received = generator.next();
+		expect( received.done ).toBe( true );
+		expect( received.value ).toBeUndefined();
+	} );
 } );
 
 describe( 'getAutosaves', () => {

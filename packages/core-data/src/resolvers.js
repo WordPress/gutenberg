@@ -127,8 +127,8 @@ export function* hasUploadPermissions() {
  * Checks whether the current user can perform the given action on the given
  * REST resource.
  *
- * @param {string}  action   Action to check. One of: 'create', 'read', 'update',
- *                           'delete'.
+ * @param {string}  action   Action to check. One of 'create', 'read', 'update',
+ *                           'delete', or a JSON Hyper Schema targetSchema key.
  * @param {string}  resource REST resource to check, e.g. 'media' or 'posts'.
  * @param {?string} id       ID of the rest resource to check.
  */
@@ -140,23 +140,35 @@ export function* canUser( action, resource, id ) {
 		delete: 'DELETE',
 	};
 
-	const method = methods[ action ];
-	if ( ! method ) {
-		throw new Error( `'${ action }' is not a valid action.` );
+	const isCustomAction = ! methods.hasOwnProperty( action );
+
+	let path = '/wp/v2/' + resource;
+
+	if ( id ) {
+		path += '/' + id;
 	}
 
-	const path = id ? `/wp/v2/${ resource }/${ id }` : `/wp/v2/${ resource }`;
+	if ( isCustomAction ) {
+		path = addQueryArgs( path, { context: 'edit' } );
+	}
 
 	let response;
 	try {
 		response = yield apiFetch( {
 			path,
-			// Ideally this would always be an OPTIONS request, but unfortunately there's
-			// a bug in the REST API which causes the Allow header to not be sent on
-			// OPTIONS requests to /posts/:id routes.
-			// https://core.trac.wordpress.org/ticket/45753
-			method: id ? 'GET' : 'OPTIONS',
-			parse: false,
+			// Ideally, this should only be a GET request if requesting details
+			// of a custom action. Until required WordPress support reaches 5.3
+			// or newer, the `id` condition must be included, due to a previous
+			// bug in the REST API where the Allow header was not on OPTIONS
+			// requests to /posts/:id routes.
+			//
+			// See: https://core.trac.wordpress.org/ticket/45753
+			method: id || isCustomAction ? 'GET' : 'OPTIONS',
+
+			// Only parse response as JSON if requesting permissions of a custom
+			// actions. Non-custom actions derive permissions from the response
+			// headers, which aren't available on the parsed result.
+			parse: isCustomAction,
 		} );
 	} catch ( error ) {
 		// Do nothing if our OPTIONS request comes back with an API error (4xx or
@@ -164,19 +176,25 @@ export function* canUser( action, resource, id ) {
 		return;
 	}
 
-	let allowHeader;
-	if ( hasIn( response, [ 'headers', 'get' ] ) ) {
-		// If the request is fetched using the fetch api, the header can be
-		// retrieved using the 'get' method.
-		allowHeader = response.headers.get( 'allow' );
+	let isAllowed;
+	if ( isCustomAction ) {
+		isAllowed = hasIn( response, [ '_links', 'wp:action-' + action ] );
 	} else {
-		// If the request was preloaded server-side and is returned by the
-		// preloading middleware, the header will be a simple property.
-		allowHeader = get( response, [ 'headers', 'Allow' ], '' );
+		let allowHeader;
+		if ( hasIn( response, [ 'headers', 'get' ] ) ) {
+			// If the request is fetched using the fetch api, the header can be
+			// retrieved using the 'get' method.
+			allowHeader = response.headers.get( 'allow' );
+		} else {
+			// If the request was preloaded server-side and is returned by the
+			// preloading middleware, the header will be a simple property.
+			allowHeader = get( response, [ 'headers', 'Allow' ], '' );
+		}
+
+		isAllowed = includes( allowHeader, methods[ action ] );
 	}
 
 	const key = compact( [ action, resource, id ] ).join( '/' );
-	const isAllowed = includes( allowHeader, method );
 	yield receiveUserPermission( key, isAllowed );
 }
 
