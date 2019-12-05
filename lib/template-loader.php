@@ -114,7 +114,7 @@ function create_auto_draft_for_template_part_block( $block ) {
  * @return string Path to the canvas file to include.
  */
 function gutenberg_find_template( $template_file ) {
-	global $_wp_current_template_content, $_wp_current_template_hierarchy;
+	global $_wp_current_template_id, $_wp_current_template_content, $_wp_current_template_hierarchy;
 
 	// Bail if no relevant template hierarchy was determined, or if the template file
 	// was overridden another way.
@@ -183,10 +183,6 @@ function gutenberg_find_template( $template_file ) {
 			$current_template_post = get_post(
 				wp_insert_post( $current_template_post )
 			);
-
-			foreach ( parse_blocks( $current_template_post->post_content ) as $block ) {
-				create_auto_draft_for_template_part_block( $block );
-			}
 		} else {
 			$current_template_post = new WP_Post(
 				(object) $current_template_post
@@ -195,6 +191,12 @@ function gutenberg_find_template( $template_file ) {
 	}
 
 	if ( $current_template_post ) {
+		if ( is_admin() ) {
+			foreach ( parse_blocks( $current_template_post->post_content ) as $block ) {
+				create_auto_draft_for_template_part_block( $block );
+			}
+		}
+		$_wp_current_template_id      = $current_template_post->ID;
 		$_wp_current_template_content = $current_template_post->post_content;
 	}
 
@@ -262,3 +264,57 @@ function gutenberg_viewport_meta_tag() {
 function gutenberg_strip_php_suffix( $template_file ) {
 	return preg_replace( '/\.php$/', '', $template_file );
 }
+
+/**
+ * Extends default editor settings to enable template and template part editing.
+ *
+ * @param array $settings Default editor settings.
+ *
+ * @return array Filtered editor settings.
+ */
+function gutenberg_template_loader_filter_block_editor_settings( $settings ) {
+	global $wp_query, $_wp_current_template_id;
+	// Run template resolution manually to trigger our override filters.
+	$tag_templates = array(
+		'is_embed'             => 'get_embed_template',
+		'is_404'               => 'get_404_template',
+		'is_search'            => 'get_search_template',
+		'is_front_page'        => 'get_front_page_template',
+		'is_home'              => 'get_home_template',
+		'is_privacy_policy'    => 'get_privacy_policy_template',
+		'is_post_type_archive' => 'get_post_type_archive_template',
+		'is_tax'               => 'get_taxonomy_template',
+		'is_attachment'        => 'get_attachment_template',
+		'is_single'            => 'get_single_template',
+		'is_page'              => 'get_page_template',
+		'is_singular'          => 'get_singular_template',
+		'is_category'          => 'get_category_template',
+		'is_tag'               => 'get_tag_template',
+		'is_author'            => 'get_author_template',
+		'is_date'              => 'get_date_template',
+		'is_archive'           => 'get_archive_template',
+	);
+	$template      = false;
+	// Loop through each of the template conditionals, and find the appropriate template file.
+	$post = get_post();
+	$wp_query->parse_query( 'p=' . $post->ID . '&preview=true' );
+	foreach ( $tag_templates as $tag => $template_getter ) {
+		if ( call_user_func( $tag ) ) {
+			$template = call_user_func( $template_getter );
+		}
+		if ( $template ) {
+			if ( 'is_attachment' === $tag ) {
+				remove_filter( 'the_content', 'prepend_attachment' );
+			}
+			break;
+		}
+	}
+	if ( ! $template ) {
+		$template = get_index_template();
+	}
+	$template                = apply_filters( 'template_include', $template );
+	$settings['templateId']  = $_wp_current_template_id;
+	$settings['editingMode'] = 'post-content';
+	return $settings;
+}
+add_filter( 'block_editor_settings', 'gutenberg_template_loader_filter_block_editor_settings' );
