@@ -5,7 +5,7 @@ import CustomSelect from '../';
 
 export default { title: 'CustomSelect', component: CustomSelect };
 
-const items = [
+const options = [
 	{
 		key: 'small',
 		name: 'Small',
@@ -27,4 +27,6 @@ const items = [
 		style: { fontSize: '300%' },
 	},
 ];
-export const _default = () => <CustomSelect label="Font Size" items={ items } />;
+export const _default = () => (
+	<CustomSelect label="Font Size" options={ options } />
+);
