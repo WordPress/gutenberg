@@ -729,7 +729,11 @@
 	transition: opacity 0.1s linear;
 	@include reduce-motion("transition");
 
-	&:not(.is-hidden):hover,
+	&.is-hidden {
+		pointer-events: none;
+	}
+
+	&:hover,
 	&.is-visible {
 		opacity: 1;
 	}

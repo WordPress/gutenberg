@@ -457,6 +457,10 @@ function BlockListBlock( {
 
 	const shouldRenderDropzone = shouldShowInsertionPoint;
 	const isDragging = isDraggingBlocks && ( isSelected || isPartOfMultiSelection );
+	const isFocussed = isFocusMode && ( isSelected || isParentOfSelectedBlock );
+	const hidePreviousInserter = ! hasFixedToolbar && (
+		shouldAppearSelected || isFocussed
+	);
 
 	// The wp-block className is important for editor styles.
 	// Generate the wrapper class names handling the different states of the block.
@@ -471,7 +475,7 @@ function BlockListBlock( {
 			'is-reusable': isReusableBlock( blockType ),
 			'is-dragging': isDragging,
 			'is-typing': isTypingWithinBlock,
-			'is-focused': isFocusMode && ( isSelected || isParentOfSelectedBlock ),
+			'is-focused': isFocussed,
 			'is-focus-mode': isFocusMode,
 			'has-child-selected': isParentOfSelectedBlock,
 		},
@@ -519,7 +523,7 @@ function BlockListBlock( {
 	return <>
 		{ shouldShowInsertionPoint && (
 			<BlockInsertionPoint
-				isSelected={ isSelected }
+				hidden={ hidePreviousInserter }
 				clientId={ clientId }
 				rootClientId={ rootClientId }
 			/>
