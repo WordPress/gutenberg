@@ -1,66 +1,68 @@
 /**
+ * External dependencies
+ */
+import { pickBy, mapValues, isEmpty, mapKeys } from 'lodash';
+
+/**
  * WordPress dependencies
  */
-import { getBlockType } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import { useEntityProp } from '@wordpress/core-data';
-import { useMemo, useCallback } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 
-const EMPTY_OBJECT = {};
-function useMetaAttributeSource( name, _attributes, _setAttributes ) {
-	const { attributes: attributeTypes = EMPTY_OBJECT } =
-		getBlockType( name ) || EMPTY_OBJECT;
-	let [ attributes, setAttributes ] = [ _attributes, _setAttributes ];
+/** @typedef {import('@wordpress/compose').WPHigherOrderComponent} WPHigherOrderComponent */
 
-	if ( Object.values( attributeTypes ).some( ( type ) => type.source === 'meta' ) ) {
-		// eslint-disable-next-line react-hooks/rules-of-hooks
-		const type = useSelect( ( select ) => select( 'core/editor' ).getCurrentPostType(), [] );
-		// eslint-disable-next-line react-hooks/rules-of-hooks
-		const [ meta, setMeta ] = useEntityProp( 'postType', type, 'meta' );
+/** @typedef {import('@wordpress/blocks').WPBlockSettings} WPBlockSettings */
 
-		// eslint-disable-next-line react-hooks/rules-of-hooks
-		attributes = useMemo(
+/**
+ * Object mapping an attribute key to its corresponding meta property.
+ *
+ * @typedef {Object<string,string>} WPMetaAttributeMapping
+ */
+
+/**
+ * Given a meta attribute mapping, returns a new higher-order component which
+ * manages attributes merging and updates to consume from and mirror to the
+ * associated entity record.
+ *
+ * @param {WPMetaAttributeMapping} metaKeys Meta attribute mapping.
+ *
+ * @return {WPHigherOrderComponent} Higher-order component.
+ */
+const createWithMetaAttributeSource = ( metaKeys ) => createHigherOrderComponent(
+	( BlockEdit ) => ( { attributes, setAttributes, name, ...props } ) => {
+		const postType = useSelect( ( select ) => select( 'core/editor' ).getCurrentPostType() );
+		const [ meta, setMeta ] = useEntityProp( 'postType', postType, 'meta' );
+
+		const mergedAttributes = useMemo(
 			() => ( {
-				..._attributes,
-				...Object.keys( attributeTypes ).reduce( ( acc, key ) => {
-					if ( attributeTypes[ key ].source === 'meta' ) {
-						acc[ key ] = meta[ attributeTypes[ key ].meta ];
-					}
-					return acc;
-				}, {} ),
+				...attributes,
+				...mapValues( metaKeys, ( metaKey ) => meta[ metaKey ] ),
 			} ),
-			[ attributeTypes, meta, _attributes ]
+			[ attributes, meta ]
 		);
 
-		// eslint-disable-next-line react-hooks/rules-of-hooks
-		setAttributes = useCallback(
-			( ...args ) => {
-				Object.keys( args[ 0 ] ).forEach( ( key ) => {
-					if ( attributeTypes[ key ].source === 'meta' ) {
-						setMeta( { [ attributeTypes[ key ].meta ]: args[ 0 ][ key ] } );
-					}
-				} );
-				return _setAttributes( ...args );
-			},
-			[ attributeTypes, setMeta, _setAttributes ]
-		);
-	}
-
-	return [ attributes, setAttributes ];
-}
-const withMetaAttributeSource = createHigherOrderComponent(
-	( BlockListBlock ) => ( { attributes, setAttributes, name, ...props } ) => {
-		[ attributes, setAttributes ] = useMetaAttributeSource(
-			name,
-			attributes,
-			setAttributes
-		);
 		return (
-			<BlockListBlock
-				attributes={ attributes }
-				setAttributes={ setAttributes }
+			<BlockEdit
+				attributes={ mergedAttributes }
+				setAttributes={ ( nextAttributes ) => {
+					const nextMeta = mapKeys(
+						// Filter to intersection of keys between the updated
+						// attributes and those with an associated meta key.
+						pickBy( nextAttributes, ( value, key ) => metaKeys[ key ] ),
+
+						// Rename the keys to the expected meta key name.
+						( value, attributeKey ) => metaKeys[ attributeKey ],
+					);
+
+					if ( ! isEmpty( nextMeta ) ) {
+						setMeta( nextMeta );
+					}
+
+					setAttributes( nextAttributes );
+				} }
 				name={ name }
 				{ ...props }
 			/>
@@ -69,8 +71,26 @@ const withMetaAttributeSource = createHigherOrderComponent(
 	'withMetaAttributeSource'
 );
 
+/**
+ * Filters a registered block settings to enhance a block's `edit` component to
+ * upgrade meta-sourced attributes to use the post's meta entity property.
+ *
+ * @param {WPBlockSettings} settings Registered block settings.
+ *
+ * @return {WPBlockSettings} Filtered block settings.
+ */
+function shimAttributeSource( settings ) {
+	/** @type {WPMetaAttributeMapping} */
+	const metaAttributes = mapValues( pickBy( settings.attributes, { source: 'meta' } ), 'meta' );
+	if ( ! isEmpty( metaAttributes ) ) {
+		settings.edit = createWithMetaAttributeSource( metaAttributes )( settings.edit );
+	}
+
+	return settings;
+}
+
 addFilter(
-	'editor.BlockListBlock',
-	'core/editor/custom-sources-backwards-compatibility/with-meta-attribute-source',
-	withMetaAttributeSource
+	'blocks.registerBlockType',
+	'core/editor/custom-sources-backwards-compatibility/shim-attribute-source',
+	shimAttributeSource
 );
