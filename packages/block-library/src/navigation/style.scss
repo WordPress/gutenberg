@@ -142,22 +142,16 @@
 		}
 	}
 
-	&.items-justification-left {
-		> ul {
-			justify-content: flex-start;
-		}
+	&.items-justification-left > ul {
+		justify-content: flex-start;
 	}
 
-	&.items-justification-center {
-		> ul {
-			justify-content: center;
-		}
+	&.items-justification-center > ul {
+		justify-content: center;
 	}
 
-	&.items-justification-right {
-		> ul {
-			justify-content: flex-end;
-		}
+	&.items-justification-right > ul {
+		justify-content: flex-end;
 	}
 }
 
