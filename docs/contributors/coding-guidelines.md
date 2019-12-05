@@ -237,7 +237,7 @@ Custom types can also be beneficial when describing a set of predefined options.
 /**
  * Named breakpoint sizes.
  * 
- * @typedef {"huge"|"wide"|"large"|"medium"|"small"|"mobile"} WPBreakpoint
+ * @typedef {'huge'|'wide'|'large'|'medium'|'small'|'mobile'} WPBreakpoint
  */
 ```
 
