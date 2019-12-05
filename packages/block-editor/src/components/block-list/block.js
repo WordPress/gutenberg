@@ -519,6 +519,7 @@ function BlockListBlock( {
 	return <>
 		{ shouldShowInsertionPoint && (
 			<BlockInsertionPoint
+				isSelected={ isSelected }
 				clientId={ clientId }
 				rootClientId={ rootClientId }
 			/>

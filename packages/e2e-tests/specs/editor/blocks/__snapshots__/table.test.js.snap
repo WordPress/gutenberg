@@ -20,7 +20,7 @@ exports[`Table allows adding and deleting columns across the table header, body 
 
 exports[`Table allows cells to be selected when the cell area outside of the RichText is clicked 1`] = `
 "<!-- wp:table {\\"hasFixedLayout\\":true} -->
-<figure class=\\"wp-block-table\\"><table class=\\"has-fixed-layout\\"><tbody><tr><td><br><br><br><br></td><td></td></tr><tr><td>Third cell.</td><td></td></tr></tbody></table></figure>
+<figure class=\\"wp-block-table\\"><table class=\\"has-fixed-layout\\"><tbody><tr><td><br><br><br><br></td><td>Second cell.</td></tr><tr><td></td><td></td></tr></tbody></table></figure>
 <!-- /wp:table -->"
 `;
 

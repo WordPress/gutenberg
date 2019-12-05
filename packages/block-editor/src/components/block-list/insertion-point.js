@@ -43,6 +43,7 @@ class BlockInsertionPoint extends Component {
 			showInsertionPoint,
 			rootClientId,
 			clientId,
+			isSelected,
 		} = this.props;
 
 		return (
@@ -63,6 +64,7 @@ class BlockInsertionPoint extends Component {
 					className={
 						classnames( 'editor-block-list__insertion-point-inserter block-editor-block-list__insertion-point-inserter', {
 							'is-visible': isInserterFocused,
+							'is-hidden': isSelected,
 						} )
 					}
 				>
