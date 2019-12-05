@@ -167,6 +167,32 @@ function useFocusContentOnMount( focusOnMount, contentRef ) {
 	}, [] );
 }
 
+function diffAttribute( element, name, value ) {
+	if ( ! value ) {
+		if ( element.hasAttribute( name ) ) {
+			element.removeAttribute( name );
+		}
+	} else if ( element.getAttribute( name ) !== value ) {
+		element.setAttribute( name, value );
+	}
+}
+
+function diffStyle( element, property, value = '' ) {
+	if ( element.style[ property ] !== value ) {
+		element.style[ property ] = value;
+	}
+}
+
+function diffClass( element, name, toggle ) {
+	if ( toggle ) {
+		if ( ! element.classList.contains( name ) ) {
+			element.classList.add( name );
+		}
+	} else if ( element.classList.contains( name ) ) {
+		element.classList.add( name );
+	}
+}
+
 const Popover = ( {
 	headerTitle,
 	onClose,
@@ -203,14 +229,17 @@ const Popover = ( {
 	noArrow = isExpanded || noArrow;
 
 	useEffect( () => {
+		const containerEl = containerRef.current;
+		const contentEl = contentRef.current;
+
 		if ( isExpanded ) {
-			containerRef.current.removeAttribute( 'data-x-axis' );
-			containerRef.current.removeAttribute( 'data-y-axis' );
-			containerRef.current.style.top = '';
-			containerRef.current.style.left = '';
-			contentRef.current.style.maxHeight = '';
-			contentRef.current.style.maxWidth = '';
-			contentRef.current.classList.add( 'is-without-arrow' );
+			diffClass( containerEl, 'is-without-arrow', noArrow );
+			diffAttribute( containerEl, 'data-x-axis' );
+			diffAttribute( containerEl, 'data-y-axis' );
+			diffStyle( containerEl, 'top' );
+			diffStyle( containerEl, 'left' );
+			diffStyle( contentEl, 'maxHeight' );
+			diffStyle( contentEl, 'maxWidth' );
 			return;
 		}
 
@@ -234,8 +263,8 @@ const Popover = ( {
 			);
 
 			const contentSize = {
-				height: contentRef.current.scrollHeight,
-				width: contentRef.current.scrollWidth,
+				height: contentEl.scrollHeight,
+				width: contentEl.scrollWidth,
 			};
 			const {
 				popoverTop,
@@ -245,6 +274,14 @@ const Popover = ( {
 				contentHeight,
 				contentWidth,
 			} = computePopoverPosition( anchor, contentSize, position );
+
+			diffClass( containerEl, 'is-without-arrow', noArrow || ( xAxis === 'center' && yAxis === 'middle' ) );
+			diffAttribute( containerEl, 'data-x-axis', xAxis );
+			diffAttribute( containerEl, 'data-y-axis', yAxis );
+			diffStyle( containerEl, 'top', popoverTop ? popoverTop + 'px' : '' );
+			diffStyle( containerEl, 'left', popoverLeft ? popoverLeft + 'px' : '' );
+			diffStyle( contentEl, 'maxHeight', contentHeight ? contentHeight + 'px' : '' );
+			diffStyle( contentEl, 'maxWidth', contentWidth ? contentWidth + 'px' : '' );
 
 			// Compute the animation position
 			const yAxisMapping = {
@@ -257,19 +294,6 @@ const Popover = ( {
 			};
 			const animateYAxis = yAxisMapping[ yAxis ] || 'middle';
 			const animateXAxis = xAxisMapping[ xAxis ] || 'center';
-
-			containerRef.current.setAttribute( 'data-x-axis', xAxis );
-			containerRef.current.setAttribute( 'data-y-axis', yAxis );
-			containerRef.current.style.top = popoverTop + 'px';
-			containerRef.current.style.left = popoverLeft + 'px';
-			contentRef.current.style.maxHeight = contentHeight ? contentHeight + 'px' : '';
-			contentRef.current.style.maxWidth = contentWidth ? contentWidth + 'px' : '';
-
-			if ( noArrow || ( xAxis === 'center' && yAxis === 'middle' ) ) {
-				contentRef.current.classList.add( 'is-without-arrow' );
-			} else {
-				contentRef.current.classList.remove( 'is-without-arrow' );
-			}
 
 			setAnimateOrigin( animateXAxis + ' ' + animateYAxis );
 		};
