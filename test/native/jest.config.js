@@ -31,6 +31,7 @@ module.exports = {
 	testEnvironment: 'jsdom',
 	testMatch: [
 		'**/test/*.native.[jt]s?(x)',
+		// This is temporary. In the future we should adjust test names to make it seamless for both the web and mobile.
 		'<rootDir>/packages/react-native-editor/src/**/__tests__/**/*.[jt]s?(x)',
 		'<rootDir>/packages/react-native-editor/src/**/?(*.)+(spec|test).[jt]s?(x)',
 	],
