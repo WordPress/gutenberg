@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Component, useRef } from '@wordpress/element';
+import { Component, useEffect, useRef } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { withInstanceId } from '@wordpress/compose';
 
@@ -137,7 +137,11 @@ export default function ControlPoints( {
 			gradientPickerDomRef.current,
 			GRADIENT_MARKERS_WIDTH,
 		);
-		const { gradientAST: referenceGradientAST, position, significantMoveHappened } = controlPointMoveState.current;
+		const {
+			gradientAST: referenceGradientAST,
+			position,
+			significantMoveHappened,
+		} = controlPointMoveState.current;
 		if ( ! significantMoveHappened ) {
 			const initialPosition = referenceGradientAST.colorStops[ position ].length.value;
 			if ( Math.abs( initialPosition - relativePosition ) >= MINIMUM_SIGNIFICANT_MOVE ) {
@@ -152,13 +156,23 @@ export default function ControlPoints( {
 		}
 	};
 
-	const onMouseUp = () => {
-		if ( window && window.removeEventListener ) {
+	const cleanEventListeners = () => {
+		if (
+			window && window.removeEventListener &&
+			controlPointMoveState.current && controlPointMoveState.current.listenersActivated
+		) {
 			window.removeEventListener( 'mousemove', onMouseMove );
-			window.removeEventListener( 'mouseup', onMouseUp );
+			window.removeEventListener( 'mouseup', cleanEventListeners );
 			onStopControlPointChange();
+			controlPointMoveState.current.listenersActivated = false;
 		}
 	};
+
+	useEffect( () => {
+		return () => {
+			cleanEventListeners();
+		};
+	}, [] );
 
 	return markerPoints.map(
 		( point, index ) => (
@@ -170,7 +184,10 @@ export default function ControlPoints( {
 						<ControlPointButton
 							key={ index }
 							onClick={ () => {
-								if ( controlPointMoveState.current.significantMoveHappened ) {
+								if (
+									controlPointMoveState.current &&
+									controlPointMoveState.current.significantMoveHappened
+								) {
 									return;
 								}
 								onStartControlPointChange();
@@ -182,10 +199,11 @@ export default function ControlPoints( {
 										gradientAST,
 										position: index,
 										significantMoveHappened: false,
+										listenersActivated: true,
 									};
 									onStartControlPointChange();
 									window.addEventListener( 'mousemove', onMouseMove );
-									window.addEventListener( 'mouseup', onMouseUp );
+									window.addEventListener( 'mouseup', cleanEventListeners );
 								}
 							} }
 							isOpen={ isOpen }
