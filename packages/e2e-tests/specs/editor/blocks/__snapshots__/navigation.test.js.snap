@@ -1,5 +1,13 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Navigation allows a navigation menu to be created from an empty menu using a mixture of internal and external links 1`] = `
+"<!-- wp:navigation -->
+<!-- wp:navigation-link {\\"label\\":\\"WP\\",\\"title\\":\\"https://wordpress.org\\",\\"url\\":\\"https://wordpress.org\\"} /-->
+
+<!-- wp:navigation-link {\\"label\\":\\"Sample\\",\\"title\\":\\"Sample Page\\",\\"url\\":\\"http://localhost:8889/?page_id=2\\"} /-->
+<!-- /wp:navigation -->"
+`;
+
 exports[`Navigation allows a navigation menu to be created using existing pages 1`] = `
 "<!-- wp:navigation -->
 <!-- wp:navigation-link {\\"label\\":\\"Sample Page\\",\\"title\\":\\"Sample Page\\",\\"type\\":\\"page\\",\\"id\\":2,\\"url\\":\\"http://localhost:8889/?page_id=2\\"} /-->
