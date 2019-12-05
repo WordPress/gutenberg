@@ -139,6 +139,7 @@
   "dependencies": {
     "@babel/runtime": "^7.3.1",
     "@react-native-community/cli": "^1.5.2",
+    "@react-native-community/slider": "git+https://github.com/wordpress-mobile/react-native-slider.git#e20f268e61327321a5bbd66afc5238388d65f2a4",
     "classnames": "^2.2.5",
     "dom-react": "^2.2.1",
     "domutils": "^1.7.0",
