@@ -27,6 +27,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import {
 	withDispatch,
 	withSelect,
+	useSelect,
 } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
 import { compose, pure, ifCondition } from '@wordpress/compose';
@@ -44,7 +45,6 @@ import BlockHtml from './block-html';
 import BlockBreadcrumb from './breadcrumb';
 import BlockContextualToolbar from './block-contextual-toolbar';
 import BlockMultiControls from './multi-controls';
-import BlockMobileToolbar from './block-mobile-toolbar';
 import BlockInsertionPoint from './insertion-point';
 import IgnoreNestedEvents from '../ignore-nested-events';
 import InserterWithShortcuts from '../inserter-with-shortcuts';
@@ -77,9 +77,7 @@ function BlockListBlock( {
 	isTypingWithinBlock,
 	isCaretWithinFormattedText,
 	isEmptyDefaultBlock,
-	isMovable,
 	isParentOfSelectedBlock,
-	isDraggable,
 	isSelectionEnabled,
 	className,
 	name,
@@ -103,7 +101,16 @@ function BlockListBlock( {
 	isNavigationMode,
 	setNavigationMode,
 	isMultiSelecting,
+	isLargeViewport,
 } ) {
+	// In addition to withSelect, we should favor using useSelect in this component going forward
+	// to avoid leaking new props to the public API (editor.BlockListBlock filter)
+	const { isDraggingBlocks } = useSelect( ( select ) => {
+		return {
+			isDraggingBlocks: select( 'core/block-editor' ).isDraggingBlocks(),
+		};
+	} );
+
 	// Random state used to rerender the component if needed, ideally we don't need this
 	const [ , updateRerenderState ] = useState( {} );
 	const rerender = () => updateRerenderState( {} );
@@ -168,15 +175,6 @@ function BlockListBlock( {
 			hideHoverEffects();
 		}
 	} );
-
-	// Handling the dragging state
-	const [ isDragging, setBlockDraggingState ] = useState( false );
-	const onDragStart = () => {
-		setBlockDraggingState( true );
-	};
-	const onDragEnd = () => {
-		setBlockDraggingState( false );
-	};
 
 	// Handling the error state
 	const [ hasError, setErrorState ] = useState( false );
@@ -443,12 +441,12 @@ function BlockListBlock( {
 	const shouldShowContextualToolbar =
 		! isNavigationMode &&
 		! hasFixedToolbar &&
+		isLargeViewport &&
 		! showEmptyBlockSideInserter &&
 		(
 			( isSelected && ( ! isTypingWithinBlock || isCaretWithinFormattedText ) ) ||
 			isFirstMultiSelected
 		);
-	const shouldShowMobileToolbar = ! isNavigationMode && shouldAppearSelected;
 
 	// Insertion point can only be made visible if the block is at the
 	// the extent of a multi-selection, or not in a multi-selection.
@@ -458,6 +456,7 @@ function BlockListBlock( {
 	);
 
 	const shouldRenderDropzone = shouldShowInsertionPoint;
+	const isDragging = isDraggingBlocks && ( isSelected || isPartOfMultiSelection );
 
 	// The wp-block className is important for editor styles.
 	// Generate the wrapper class names handling the different states of the block.
@@ -490,14 +489,7 @@ function BlockListBlock( {
 	const blockMover = (
 		<BlockMover
 			clientIds={ clientId }
-			blockElementId={ blockElementId }
 			isHidden={ ! isSelected }
-			isDraggable={
-				isDraggable !== false &&
-				( ! isPartOfMultiSelection && isMovable )
-			}
-			onDragStart={ onDragStart }
-			onDragEnd={ onDragEnd }
 			__experimentalOrientation={ moverDirection }
 		/>
 	);
@@ -627,9 +619,6 @@ function BlockListBlock( {
 						] }
 					</BlockCrashBoundary>
 					{ !! hasError && <BlockCrashWarning /> }
-					{ shouldShowMobileToolbar && (
-						<BlockMobileToolbar clientId={ clientId } moverDirection={ moverDirection } />
-					) }
 				</IgnoreNestedEvents>
 			</div>
 			{ showInserterShortcuts && (
@@ -703,7 +692,6 @@ const applyWithSelect = withSelect(
 			initialPosition: isSelected ? getSelectedBlocksInitialCaretPosition() : null,
 			isEmptyDefaultBlock:
 				name && isUnmodifiedDefaultBlock( { name, attributes } ),
-			isMovable: 'all' !== templateLock,
 			isLocked: !! templateLock,
 			isFocusMode: focusMode && isLargeViewport,
 			hasFixedToolbar: hasFixedToolbar && isLargeViewport,

@@ -10,6 +10,7 @@ import { useRef, useState, useEffect } from '@wordpress/element';
 import { focus, getRectangleFromRange } from '@wordpress/dom';
 import { ESCAPE } from '@wordpress/keycodes';
 import deprecated from '@wordpress/deprecated';
+import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -195,14 +196,8 @@ const Popover = ( {
 	const anchorRefFallback = useRef( null );
 	const contentRef = useRef( null );
 	const containerRef = useRef();
-	const [ isMobileViewport, setIsMobileViewport ] = useState( false );
+	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const [ animateOrigin, setAnimateOrigin ] = useState();
-
-	useEffect( () => {
-		const resize = () => setIsMobileViewport( window.innerWidth < 782 );
-		window.addEventListener( 'resize', resize );
-		return () => window.removeEventListener( 'resize', resize );
-	} );
 
 	useEffect( () => {
 		if ( isMobileViewport && expandOnMobile ) {
