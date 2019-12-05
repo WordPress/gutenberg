@@ -241,6 +241,8 @@ Custom types can also be beneficial when describing a set of predefined options.
  */
 ```
 
+Note the use of quotes when defining a set of string literals. As in the [JavaScript Coding Standards](https://make.wordpress.org/core/handbook/best-practices/coding-standards/javascript/), single quotes should be used when assigning a string literal either as the type or as a [default function parameter](#nullable-undefined-and-void-types), or when [specifying the path](#importing-and-exporting-types) of an imported type.
+
 ### Importing and Exporting Types
 
 Use the [TypeScript `import` function](https://www.typescriptlang.org/docs/handbook/type-checking-javascript-files.html#import-types) to import type declarations from other files or third-party dependencies.
