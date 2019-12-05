@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { escape } from 'lodash';
+import { escape, upperFirst } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -39,6 +39,7 @@ import { __ } from '@wordpress/i18n';
 import useBlockNavigator from './use-block-navigator';
 import BlockNavigationList from './block-navigation-list';
 import BlockColorsStyleSelector from './block-colors-selector';
+import * as navIcons from './icons';
 
 function Navigation( {
 	attributes,
@@ -167,13 +168,13 @@ function Navigation( {
 		<Fragment>
 			<BlockControls>
 				<Toolbar
-					icon={ attributes.itemsJustification ? `editor-align${ attributes.itemsJustification }` : 'editor-alignleft' }
+					icon={ attributes.itemsJustification ? navIcons[ `justify${ upperFirst( attributes.itemsJustification ) }Icon` ] : navIcons.justifyLeftIcon }
 					label={ __( 'Change items justification' ) }
 					isCollapsed
 					controls={ [
-						{ icon: 'editor-alignleft', title: __( 'Justify items left' ), isActive: 'left' === attributes.itemsJustification, onClick: handleItemsAlignment( 'left' ) },
-						{ icon: 'editor-aligncenter', title: __( 'Justify items center' ), isActive: 'center' === attributes.itemsJustification, onClick: handleItemsAlignment( 'center' ) },
-						{ icon: 'editor-alignright', title: __( 'Justify items right' ), isActive: 'right' === attributes.itemsJustification, onClick: handleItemsAlignment( 'right' ) },
+						{ icon: navIcons.justifyLeftIcon, title: __( 'Justify items left' ), isActive: 'left' === attributes.itemsJustification, onClick: handleItemsAlignment( 'left' ) },
+						{ icon: navIcons.justifyCenterIcon, title: __( 'Justify items center' ), isActive: 'center' === attributes.itemsJustification, onClick: handleItemsAlignment( 'center' ) },
+						{ icon: navIcons.justifyRightIcon, title: __( 'Justify items right' ), isActive: 'right' === attributes.itemsJustification, onClick: handleItemsAlignment( 'right' ) },
 					] }
 				/>
 				<ToolbarGroup>
