@@ -293,7 +293,9 @@ When documenting a generic type such as `Object`, `Function`, `Promise`, etc., a
 /** @type {Promise<string>} */
 ```
 
-When defining your custom types which can be described as a generic type, use the [TypeScript `@template` tag](https://www.typescriptlang.org/docs/handbook/type-checking-javascript-files.html#template).
+The function expression here uses TypeScript's syntax for function types, which can be useful in providing more detailed information about the names and types of the expected parameters. For more information, consult the [TypeScript `@type` tag function recommendations](https://www.typescriptlang.org/docs/handbook/type-checking-javascript-files.html#type).
+
+In more advanced cases, you may define your own custom types as a generic type using the [TypeScript `@template` tag](https://www.typescriptlang.org/docs/handbook/type-checking-javascript-files.html#template).
 
 Similar to the "Custom Types" advice concerning type unions and with literal values, you can consider to create a custom type `@typedef` to better describe expected key values for object records, or to extract a complex function signature.
 
