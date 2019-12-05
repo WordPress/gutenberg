@@ -13,7 +13,6 @@ import { useCallback, useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import CircularOptionPicker from '../circular-option-picker';
-import CustomGradientPicker from '../custom-gradient-picker';
 
 export default function GradientPicker( {
 	className,
@@ -21,7 +20,6 @@ export default function GradientPicker( {
 	onChange,
 	value,
 	clearable = true,
-	disableCustomGradients = false,
 } ) {
 	const clearGradient = useCallback(
 		() => onChange( undefined ),
@@ -64,11 +62,6 @@ export default function GradientPicker( {
 					{ __( 'Clear' ) }
 				</CircularOptionPicker.ButtonAction>
 			) }
-		>
-			{ ! disableCustomGradients && ( <CustomGradientPicker
-				value={ value }
-				onChange={ onChange }
-			/> ) }
-		</CircularOptionPicker>
+		/>
 	);
 }
