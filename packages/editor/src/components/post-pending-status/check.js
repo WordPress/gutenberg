@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { compose } from '@wordpress/compose';
@@ -19,9 +14,9 @@ export function PostPendingStatusCheck( { hasPublishAction, isPublished, childre
 
 export default compose(
 	withSelect( ( select ) => {
-		const { isCurrentPostPublished, getCurrentPostType, getCurrentPost } = select( 'core/editor' );
+		const { isCurrentPostPublished, getCurrentPostType, getCurrentPostId } = select( 'core/editor' );
 		return {
-			hasPublishAction: get( getCurrentPost(), [ '_links', 'wp:action-publish' ], false ),
+			hasPublishAction: select( 'core' ).canUser( 'publish', 'posts', getCurrentPostId() ),
 			isPublished: isCurrentPostPublished(),
 			postType: getCurrentPostType(),
 		};

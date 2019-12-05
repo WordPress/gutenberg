@@ -111,9 +111,9 @@ export class PostPublishPanel extends Component {
 
 export default compose( [
 	withSelect( ( select ) => {
-		const { getPostType } = select( 'core' );
+		const { canUser, getPostType } = select( 'core' );
 		const {
-			getCurrentPost,
+			getCurrentPostId,
 			getEditedPostAttribute,
 			isCurrentPostPublished,
 			isCurrentPostScheduled,
@@ -125,7 +125,7 @@ export default compose( [
 		const postType = getPostType( getEditedPostAttribute( 'type' ) );
 
 		return {
-			hasPublishAction: get( getCurrentPost(), [ '_links', 'wp:action-publish' ], false ),
+			hasPublishAction: canUser( 'publish', 'posts', getCurrentPostId() ),
 			isPostTypeViewable: get( postType, [ 'viewable' ], false ),
 			isBeingScheduled: isEditedPostBeingScheduled(),
 			isDirty: isEditedPostDirty(),

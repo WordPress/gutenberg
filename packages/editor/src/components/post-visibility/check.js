@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { compose } from '@wordpress/compose';
@@ -16,9 +11,10 @@ export function PostVisibilityCheck( { hasPublishAction, render } ) {
 
 export default compose( [
 	withSelect( ( select ) => {
-		const { getCurrentPost, getCurrentPostType } = select( 'core/editor' );
+		const { canUser } = select( 'core' );
+		const { getCurrentPostId, getCurrentPostType } = select( 'core/editor' );
 		return {
-			hasPublishAction: get( getCurrentPost(), [ '_links', 'wp:action-publish' ], false ),
+			hasPublishAction: canUser( 'publish', 'posts', getCurrentPostId() ),
 			postType: getCurrentPostType(),
 		};
 	} ),

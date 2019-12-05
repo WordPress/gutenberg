@@ -453,12 +453,13 @@ class HierarchicalTermSelector extends Component {
 
 export default compose( [
 	withSelect( ( select, { slug } ) => {
-		const { getCurrentPost } = select( 'core/editor' );
-		const { getTaxonomy } = select( 'core' );
+		const { getCurrentPostId } = select( 'core/editor' );
+		const { getTaxonomy, canUser } = select( 'core' );
+		const postId = getCurrentPostId();
 		const taxonomy = getTaxonomy( slug );
 		return {
-			hasCreateAction: taxonomy ? get( getCurrentPost(), [ '_links', 'wp:action-create-' + taxonomy.rest_base ], false ) : false,
-			hasAssignAction: taxonomy ? get( getCurrentPost(), [ '_links', 'wp:action-assign-' + taxonomy.rest_base ], false ) : false,
+			hasCreateAction: taxonomy ? canUser( 'create-' + taxonomy.rest_base, 'posts', postId ) : false,
+			hasAssignAction: taxonomy ? canUser( 'assign-' + taxonomy.rest_base, 'posts', postId ) : false,
 			terms: taxonomy ? select( 'core/editor' ).getEditedPostAttribute( taxonomy.rest_base ) : [],
 			taxonomy,
 		};

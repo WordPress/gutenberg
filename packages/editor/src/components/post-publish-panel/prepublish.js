@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -68,11 +63,12 @@ function PostPublishPanelPrepublish( {
 export default withSelect(
 	( select ) => {
 		const {
-			getCurrentPost,
+			getCurrentPostId,
 			isEditedPostBeingScheduled,
 		} = select( 'core/editor' );
+		const { canUser } = select( 'core' );
 		return {
-			hasPublishAction: get( getCurrentPost(), [ '_links', 'wp:action-publish' ], false ),
+			hasPublishAction: canUser( 'publish', 'posts', getCurrentPostId() ),
 			isBeingScheduled: isEditedPostBeingScheduled(),
 		};
 	}

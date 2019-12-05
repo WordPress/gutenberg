@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { noop, get } from 'lodash';
+import { noop } from 'lodash';
 import classnames from 'classnames';
 import memoize from 'memize';
 import EquivalentKeyMap from 'equivalent-key-map';
@@ -201,11 +201,11 @@ export default compose( [
 			isEditedPostSaveable,
 			isEditedPostPublishable,
 			isPostSavingLocked,
-			getCurrentPost,
 			getCurrentPostType,
 			getCurrentPostId,
 			hasNonPostEntityChanges,
 		} = select( 'core/editor' );
+		const { canUser } = select( 'core' );
 		return {
 			isSaving: isSavingPost(),
 			isBeingScheduled: isEditedPostBeingScheduled(),
@@ -214,7 +214,7 @@ export default compose( [
 			isPostSavingLocked: isPostSavingLocked(),
 			isPublishable: isEditedPostPublishable(),
 			isPublished: isCurrentPostPublished(),
-			hasPublishAction: get( getCurrentPost(), [ '_links', 'wp:action-publish' ], false ),
+			hasPublishAction: canUser( 'publish', 'posts', getCurrentPostId() ),
 			postType: getCurrentPostType(),
 			postId: getCurrentPostId(),
 			hasNonPostEntityChanges: hasNonPostEntityChanges(),

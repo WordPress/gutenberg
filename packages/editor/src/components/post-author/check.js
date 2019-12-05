@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { withInstanceId, compose } from '@wordpress/compose';
@@ -24,9 +19,9 @@ export function PostAuthorCheck( { hasAssignAuthorAction, authors, children } ) 
 
 export default compose( [
 	withSelect( ( select ) => {
-		const post = select( 'core/editor' ).getCurrentPost();
+		const postId = select( 'core/editor' ).getCurrentPostId();
 		return {
-			hasAssignAuthorAction: get( post, [ '_links', 'wp:action-assign-author' ], false ),
+			hasAssignAuthorAction: select( 'core' ).canUser( 'assign-author', 'posts', postId ),
 			postType: select( 'core/editor' ).getCurrentPostType(),
 			authors: select( 'core' ).getAuthors(),
 		};

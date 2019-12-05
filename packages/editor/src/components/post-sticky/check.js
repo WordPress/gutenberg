@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { compose } from '@wordpress/compose';
@@ -22,10 +17,11 @@ export function PostStickyCheck( { hasStickyAction, postType, children } ) {
 
 export default compose( [
 	withSelect( ( select ) => {
-		const post = select( 'core/editor' ).getCurrentPost();
+		const { canUser } = select( 'core' );
+		const { getCurrentPostId, getCurrentPostType } = select( 'core/editor' );
 		return {
-			hasStickyAction: get( post, [ '_links', 'wp:action-sticky' ], false ),
-			postType: select( 'core/editor' ).getCurrentPostType(),
+			hasStickyAction: canUser( 'sticky', 'posts', getCurrentPostId() ),
+			postType: getCurrentPostType(),
 		};
 	} ),
 ] )( PostStickyCheck );

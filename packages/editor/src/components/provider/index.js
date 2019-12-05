@@ -204,7 +204,7 @@ export default compose( [
 	withRegistryProvider,
 	withSelect( ( select ) => {
 		const {
-			canUserUseUnfilteredHTML,
+			getCurrentPostId,
 			__unstableIsEditorReady: isEditorReady,
 			getEditorBlocks,
 			getEditorSelectionStart,
@@ -214,7 +214,7 @@ export default compose( [
 		const { canUser } = select( 'core' );
 
 		return {
-			canUserUseUnfilteredHTML: canUserUseUnfilteredHTML(),
+			canUserUseUnfilteredHTML: canUser( 'unfiltered-html', 'posts', getCurrentPostId() ),
 			isReady: isEditorReady(),
 			blocks: getEditorBlocks(),
 			selectionStart: getEditorSelectionStart(),

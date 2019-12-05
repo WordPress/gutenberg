@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -47,16 +42,17 @@ export default compose( [
 			isEditedPostBeingScheduled,
 			isSavingPost,
 			isPublishingPost,
-			getCurrentPost,
+			getCurrentPostId,
 			getCurrentPostType,
 			isAutosavingPost,
 		} = select( 'core/editor' );
+		const { canUser } = select( 'core' );
 		return {
 			isPublished: isCurrentPostPublished(),
 			isBeingScheduled: isEditedPostBeingScheduled(),
 			isSaving: forceIsSaving || isSavingPost(),
 			isPublishing: isPublishingPost(),
-			hasPublishAction: get( getCurrentPost(), [ '_links', 'wp:action-publish' ], false ),
+			hasPublishAction: canUser( 'publish', 'posts', getCurrentPostId() ),
 			postType: getCurrentPostType(),
 			isAutosaving: isAutosavingPost(),
 		};
