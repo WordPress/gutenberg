@@ -17,6 +17,7 @@ import {
 	embedRedditIcon,
 	embedTumblrIcon,
 	embedAmazonIcon,
+	embedFigmaIcon,
 } from './icons';
 
 /**
@@ -176,6 +177,15 @@ export const others = [
 			description: __( 'Embed a Dailymotion video.' ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?dailymotion\.com\/.+/i ],
+	},
+	{
+		name: 'core-embed/figma',
+		settings: {
+			title: 'Figma',
+			icon: embedFigmaIcon,
+			description: __( 'Embed Figma content.' ),
+		},
+		patterns: [ /^https?:\/\/(www\.)?figma\.com\/.+/i ],
 	},
 	{
 		name: 'core-embed/hulu',
