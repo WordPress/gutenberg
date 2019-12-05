@@ -1,3 +1,16 @@
+.components-toolbar-button {
+	padding: 0 9px;
+	border-radius: $radius-round-rectangle;
+
+	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover {
+		@include button-style__hover;
+	}
+
+	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):active {
+		@include button-style__active;
+	}
+}
+
 .components-toolbar__control.components-button {
 	width: $icon-button-size;
 	height: $icon-button-size;
