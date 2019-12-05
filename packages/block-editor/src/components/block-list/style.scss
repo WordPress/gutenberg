@@ -677,6 +677,7 @@
 .block-editor-block-list__insertion-point {
 	position: relative;
 	z-index: z-index(".block-editor-block-list__insertion-point");
+	top: -$block-padding;
 }
 
 .block-editor-block-list__insertion-point-indicator {
@@ -697,11 +698,17 @@
 	}
 
 	position: absolute;
-	bottom: -100%;
+	bottom: auto;
 	left: 0;
 	right: 0;
 	justify-content: center;
-	height: 2 * $block-padding;
+	flex-direction: column;
+	height: $block-padding + 8px;
+	transform: translateY(-50%);
+
+	.block-editor-inserter {
+		margin: auto;
+	}
 
 	// Show a clickable plus.
 	.block-editor-inserter__toggle {
