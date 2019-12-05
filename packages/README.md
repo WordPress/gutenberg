@@ -180,5 +180,15 @@ npm run publish:prod
 
 Choose the correct version based on `CHANGELOG.md` files, confirm your choices and let Lerna do its magic.
 
+### Legacy Patch Release
+
+To release a patch for the older major or minor version of packages, run the following command:
+
+```bash
+npm run publish:legacy
+```
+
+This is usually necessary when adding bug fixes or security patches to the earlier versions of WordPress.
+
 [lerna]: https://lerna.js.org/
 [npm]: https://www.npmjs.com/
