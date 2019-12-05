@@ -1,9 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { compose } from '@wordpress/compose';
-import { withSelect } from '@wordpress/data';
-import { withViewportMatch } from '@wordpress/viewport';
+import { useViewportMatch } from '@wordpress/compose';
+import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import {
 	Inserter,
@@ -18,7 +17,15 @@ import {
 	EditorHistoryUndo,
 } from '@wordpress/editor';
 
-function HeaderToolbar( { hasFixedToolbar, isLargeViewport, showInserter, isTextModeEnabled } ) {
+function HeaderToolbar() {
+	const { hasFixedToolbar, showInserter, isTextModeEnabled } = useSelect( ( select ) => ( {
+		hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' ),
+		// This setting (richEditingEnabled) should not live in the block editor's setting.
+		showInserter: select( 'core/edit-post' ).getEditorMode() === 'visual' && select( 'core/editor' ).getEditorSettings().richEditingEnabled,
+		isTextModeEnabled: select( 'core/edit-post' ).getEditorMode() === 'text',
+	} ) );
+	const isLargeViewport = useViewportMatch( 'medium' );
+
 	const toolbarAriaLabel = hasFixedToolbar ?
 		/* translators: accessibility text for the editor toolbar when Top Toolbar is on */
 		__( 'Document and block tools' ) :
@@ -45,12 +52,4 @@ function HeaderToolbar( { hasFixedToolbar, isLargeViewport, showInserter, isText
 	);
 }
 
-export default compose( [
-	withSelect( ( select ) => ( {
-		hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' ),
-		// This setting (richEditingEnabled) should not live in the block editor's setting.
-		showInserter: select( 'core/edit-post' ).getEditorMode() === 'visual' && select( 'core/editor' ).getEditorSettings().richEditingEnabled,
-		isTextModeEnabled: select( 'core/edit-post' ).getEditorMode() === 'text',
-	} ) ),
-	withViewportMatch( { isLargeViewport: 'medium' } ),
-] )( HeaderToolbar );
+export default HeaderToolbar;
