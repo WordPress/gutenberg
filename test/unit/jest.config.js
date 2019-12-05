@@ -25,6 +25,7 @@ module.exports = {
 		'<rootDir>/.*/build/',
 		'<rootDir>/.*/build-module/',
 		'<rootDir>/.+\.native\.js$',
+		// This is temporary. In the future we should change the names of the native tests files to .native.js.
 		'/packages/react-native-editor',
 	],
 	transform: {

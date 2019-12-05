@@ -3,6 +3,6 @@ const config = process.env.MOBILE ? require( './packages/react-native-editor/bab
 	plugins: [ 'babel-plugin-inline-json-import' ],
 };
 module.exports = function( api ) {
-	api.cache( true );
+	api.cache.using( () => process.env.MOBILE ? 'mobile' : 'web' );
 	return config;
 };
