@@ -215,9 +215,9 @@ describe( 'Table', () => {
 		await page.click( 'td' );
 		await page.keyboard.type( '\n\n\n\n' );
 
-		// Get the bounding client rect for the second cell.
+		// Get the bounding client rect for the third cell.
 		const rect = await page.evaluate( () => {
-			const secondCell = document.querySelectorAll( '.wp-block-table td' )[ 1 ];
+			const secondCell = document.querySelectorAll( '.wp-block-table td' )[ 2 ];
 			// Page.evaluate can only return a serializable value to the
 			// parent process, so destructure and restructure the result
 			// into an object.
@@ -225,10 +225,9 @@ describe( 'Table', () => {
 			return { x, y, height };
 		} );
 
-		// Click in the bottom left corner of the second cell and type some text.
-		// Avoid the top as it might clash with inserter.
-		await page.mouse.click( rect.x, rect.y + rect.height );
-		await page.keyboard.type( 'Second cell.' );
+		// Click in the top left corner of the third cell and type some text.
+		await page.mouse.click( rect.x, rect.y );
+		await page.keyboard.type( 'Third cell.' );
 
 		// Expect that the snapshot shows the text in the second cell.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
