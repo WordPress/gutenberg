@@ -25,12 +25,7 @@ class BlockInsertionPoint extends Component {
 		this.onFocusInserter = this.onFocusInserter.bind( this );
 	}
 
-	onFocusInserter( event ) {
-		// Stop propagation of the focus event to avoid selecting the current
-		// block while inserting a new block, as it is not relevant to sibling
-		// insertion and conflicts with contextual toolbar placement.
-		event.stopPropagation();
-
+	onFocusInserter() {
 		this.setState( {
 			isInserterFocused: true,
 		} );
