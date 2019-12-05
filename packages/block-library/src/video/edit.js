@@ -54,7 +54,6 @@ class VideoEdit extends Component {
 
 		this.videoPlayer = createRef();
 		this.posterImageButton = createRef();
-		this.toggleAttribute = this.toggleAttribute.bind( this );
 		this.onSelectURL = this.onSelectURL.bind( this );
 		this.onSelectPoster = this.onSelectPoster.bind( this );
 		this.onRemovePoster = this.onRemovePoster.bind( this );
