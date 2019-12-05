@@ -45,7 +45,7 @@ const stateReducer = (
 			return changes;
 	}
 };
-export default function CustomSelect( {
+export default function CustomSelectControl( {
 	className,
 	hideLabelFromVision,
 	label,
@@ -70,7 +70,7 @@ export default function CustomSelect( {
 		stateReducer,
 	} );
 	const menuProps = getMenuProps( {
-		className: 'components-custom-select__menu',
+		className: 'components-custom-select-control__menu',
 	} );
 	// We need this here, because the null active descendant is not
 	// fully ARIA compliant.
@@ -82,11 +82,11 @@ export default function CustomSelect( {
 		delete menuProps[ 'aria-activedescendant' ];
 	}
 	return (
-		<div className={ classnames( 'components-custom-select', className ) }>
+		<div className={ classnames( 'components-custom-select-control', className ) }>
 			{ /* eslint-disable-next-line jsx-a11y/label-has-associated-control, jsx-a11y/label-has-for */ }
 			<label
 				{ ...getLabelProps( {
-					className: classnames( 'components-custom-select__label', {
+					className: classnames( 'components-custom-select-control__label', {
 						'screen-reader-text': hideLabelFromVision,
 					} ),
 				} ) }
@@ -98,13 +98,13 @@ export default function CustomSelect( {
 					// This is needed because some speech recognition software don't support `aria-labelledby`.
 					'aria-label': label,
 					'aria-labelledby': undefined,
-					className: 'components-custom-select__button',
+					className: 'components-custom-select-control__button',
 				} ) }
 			>
 				{ itemToString( selectedItem ) }
 				<Dashicon
 					icon="arrow-down-alt2"
-					className="components-custom-select__button-icon"
+					className="components-custom-select-control__button-icon"
 				/>
 			</Button>
 			<ul { ...menuProps }>
@@ -116,16 +116,19 @@ export default function CustomSelect( {
 								item,
 								index,
 								key: item.key,
-								className: classnames( 'components-custom-select__item', {
-									'is-highlighted': index === highlightedIndex,
-								} ),
+								className: classnames(
+									'components-custom-select-control__item',
+									{
+										'is-highlighted': index === highlightedIndex,
+									}
+								),
 								style: item.style,
 							} ) }
 						>
 							{ item === selectedItem && (
 								<Dashicon
 									icon="saved"
-									className="components-custom-select__item-icon"
+									className="components-custom-select-control__item-icon"
 								/>
 							) }
 							{ item.name }

@@ -11,7 +11,7 @@ import { withInstanceId } from '@wordpress/compose';
  */
 import Button from '../button';
 import RangeControl from '../range-control';
-import CustomSelect from '../custom-select';
+import CustomSelectControl from '../custom-select-control';
 
 function getSelectValueFromFontSize( fontSizes, value ) {
 	if ( value ) {
@@ -79,7 +79,7 @@ function FontSizePicker( {
 			</legend>
 			<div className="components-font-size-picker__controls">
 				{ fontSizes.length > 0 && (
-					<CustomSelect
+					<CustomSelectControl
 						className={ 'components-font-size-picker__select' }
 						label={ __( 'Preset Size' ) }
 						options={ options }

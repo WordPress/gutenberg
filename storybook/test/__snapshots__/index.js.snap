@@ -1550,10 +1550,10 @@ exports[`Storyshots Components|FontSizePicker Default 1`] = `
     className="components-font-size-picker__controls"
   >
     <div
-      className="components-custom-select components-font-size-picker__select"
+      className="components-custom-select-control components-font-size-picker__select"
     >
       <label
-        className="components-custom-select__label"
+        className="components-custom-select-control__label"
         htmlFor="downshift-null-toggle-button"
         id="downshift-null-label"
       >
@@ -1563,7 +1563,7 @@ exports[`Storyshots Components|FontSizePicker Default 1`] = `
         aria-expanded={false}
         aria-haspopup="listbox"
         aria-label="Preset Size"
-        className="components-button components-custom-select__button"
+        className="components-button components-custom-select-control__button"
         id="downshift-null-toggle-button"
         onClick={[Function]}
         onKeyDown={[Function]}
@@ -1572,7 +1572,7 @@ exports[`Storyshots Components|FontSizePicker Default 1`] = `
         Normal
         <svg
           aria-hidden="true"
-          className="dashicon dashicons-arrow-down-alt2 components-custom-select__button-icon"
+          className="dashicon dashicons-arrow-down-alt2 components-custom-select-control__button-icon"
           focusable="false"
           height={20}
           role="img"
@@ -1587,7 +1587,7 @@ exports[`Storyshots Components|FontSizePicker Default 1`] = `
       </button>
       <ul
         aria-labelledby="downshift-null-label"
-        className="components-custom-select__menu"
+        className="components-custom-select-control__menu"
         id="downshift-null-menu"
         onBlur={[Function]}
         onKeyDown={[Function]}
@@ -1638,10 +1638,10 @@ exports[`Storyshots Components|FontSizePicker With Slider 1`] = `
     className="components-font-size-picker__controls"
   >
     <div
-      className="components-custom-select components-font-size-picker__select"
+      className="components-custom-select-control components-font-size-picker__select"
     >
       <label
-        className="components-custom-select__label"
+        className="components-custom-select-control__label"
         htmlFor="downshift-null-toggle-button"
         id="downshift-null-label"
       >
@@ -1651,7 +1651,7 @@ exports[`Storyshots Components|FontSizePicker With Slider 1`] = `
         aria-expanded={false}
         aria-haspopup="listbox"
         aria-label="Preset Size"
-        className="components-button components-custom-select__button"
+        className="components-button components-custom-select-control__button"
         id="downshift-null-toggle-button"
         onClick={[Function]}
         onKeyDown={[Function]}
@@ -1660,7 +1660,7 @@ exports[`Storyshots Components|FontSizePicker With Slider 1`] = `
         Normal
         <svg
           aria-hidden="true"
-          className="dashicon dashicons-arrow-down-alt2 components-custom-select__button-icon"
+          className="dashicon dashicons-arrow-down-alt2 components-custom-select-control__button-icon"
           focusable="false"
           height={20}
           role="img"
@@ -1675,7 +1675,7 @@ exports[`Storyshots Components|FontSizePicker With Slider 1`] = `
       </button>
       <ul
         aria-labelledby="downshift-null-label"
-        className="components-custom-select__menu"
+        className="components-custom-select-control__menu"
         id="downshift-null-menu"
         onBlur={[Function]}
         onKeyDown={[Function]}
@@ -1770,10 +1770,10 @@ exports[`Storyshots Components|FontSizePicker Without Custom Sizes 1`] = `
     className="components-font-size-picker__controls"
   >
     <div
-      className="components-custom-select components-font-size-picker__select"
+      className="components-custom-select-control components-font-size-picker__select"
     >
       <label
-        className="components-custom-select__label"
+        className="components-custom-select-control__label"
         htmlFor="downshift-null-toggle-button"
         id="downshift-null-label"
       >
@@ -1783,7 +1783,7 @@ exports[`Storyshots Components|FontSizePicker Without Custom Sizes 1`] = `
         aria-expanded={false}
         aria-haspopup="listbox"
         aria-label="Preset Size"
-        className="components-button components-custom-select__button"
+        className="components-button components-custom-select-control__button"
         id="downshift-null-toggle-button"
         onClick={[Function]}
         onKeyDown={[Function]}
@@ -1792,7 +1792,7 @@ exports[`Storyshots Components|FontSizePicker Without Custom Sizes 1`] = `
         Normal
         <svg
           aria-hidden="true"
-          className="dashicon dashicons-arrow-down-alt2 components-custom-select__button-icon"
+          className="dashicon dashicons-arrow-down-alt2 components-custom-select-control__button-icon"
           focusable="false"
           height={20}
           role="img"
@@ -1807,7 +1807,7 @@ exports[`Storyshots Components|FontSizePicker Without Custom Sizes 1`] = `
       </button>
       <ul
         aria-labelledby="downshift-null-label"
-        className="components-custom-select__menu"
+        className="components-custom-select-control__menu"
         id="downshift-null-menu"
         onBlur={[Function]}
         onKeyDown={[Function]}
@@ -3928,12 +3928,12 @@ Array [
 ]
 `;
 
-exports[`Storyshots CustomSelect Default 1`] = `
+exports[`Storyshots CustomSelectControl Default 1`] = `
 <div
-  className="components-custom-select"
+  className="components-custom-select-control"
 >
   <label
-    className="components-custom-select__label"
+    className="components-custom-select-control__label"
     htmlFor="downshift-null-toggle-button"
     id="downshift-null-label"
   >
@@ -3943,7 +3943,7 @@ exports[`Storyshots CustomSelect Default 1`] = `
     aria-expanded={false}
     aria-haspopup="listbox"
     aria-label="Font Size"
-    className="components-button components-custom-select__button"
+    className="components-button components-custom-select-control__button"
     id="downshift-null-toggle-button"
     onClick={[Function]}
     onKeyDown={[Function]}
@@ -3951,7 +3951,7 @@ exports[`Storyshots CustomSelect Default 1`] = `
   >
     <svg
       aria-hidden="true"
-      className="dashicon dashicons-arrow-down-alt2 components-custom-select__button-icon"
+      className="dashicon dashicons-arrow-down-alt2 components-custom-select-control__button-icon"
       focusable="false"
       height={20}
       role="img"
@@ -3966,7 +3966,7 @@ exports[`Storyshots CustomSelect Default 1`] = `
   </button>
   <ul
     aria-labelledby="downshift-null-label"
-    className="components-custom-select__menu"
+    className="components-custom-select-control__menu"
     id="downshift-null-menu"
     onBlur={[Function]}
     onKeyDown={[Function]}
