@@ -142,15 +142,15 @@
 		}
 	}
 
-	&.items-justification-left > ul {
+	&.items-justified-left > ul {
 		justify-content: flex-start;
 	}
 
-	&.items-justification-center > ul {
+	&.items-justified-center > ul {
 		justify-content: center;
 	}
 
-	&.items-justification-right > ul {
+	&.items-justified-right > ul {
 		justify-content: flex-end;
 	}
 }
