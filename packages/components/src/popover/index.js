@@ -198,9 +198,19 @@ const Popover = ( {
 	const containerRef = useRef();
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const [ animateOrigin, setAnimateOrigin ] = useState();
+	const isExpanded = expandOnMobile && isMobileViewport;
+
+	noArrow = isExpanded || noArrow;
 
 	useEffect( () => {
-		if ( isMobileViewport && expandOnMobile ) {
+		if ( isExpanded ) {
+			containerRef.current.removeAttribute( 'data-x-axis' );
+			containerRef.current.removeAttribute( 'data-y-axis' );
+			containerRef.current.style.top = '';
+			containerRef.current.style.left = '';
+			contentRef.current.style.maxHeight = '';
+			contentRef.current.style.maxWidth = '';
+			contentRef.current.classList.add( 'is-without-arrow' );
 			return;
 		}
 
@@ -255,7 +265,7 @@ const Popover = ( {
 			contentRef.current.style.maxHeight = contentHeight ? contentHeight + 'px' : '';
 			contentRef.current.style.maxWidth = contentWidth ? contentWidth + 'px' : '';
 
-			if ( xAxis === 'center' && yAxis === 'middle' ) {
+			if ( noArrow || ( xAxis === 'center' && yAxis === 'middle' ) ) {
 				contentRef.current.classList.add( 'is-without-arrow' );
 			} else {
 				contentRef.current.classList.remove( 'is-without-arrow' );
@@ -283,8 +293,7 @@ const Popover = ( {
 			window.removeEventListener( 'scroll', refresh, true );
 		};
 	}, [
-		isMobileViewport,
-		expandOnMobile,
+		isExpanded,
 		anchorRect,
 		getAnchorRect,
 		anchorRef,
@@ -367,7 +376,7 @@ const Popover = ( {
 							className,
 							animateClassName,
 							{
-								'is-mobile': isMobileViewport && expandOnMobile,
+								'is-expanded': isExpanded,
 								'is-without-arrow': noArrow,
 							}
 						) }
@@ -375,7 +384,7 @@ const Popover = ( {
 						onKeyDown={ maybeClose }
 						ref={ containerRef }
 					>
-						{ isMobileViewport && expandOnMobile && (
+						{ isExpanded && (
 							<div className="components-popover__header">
 								<span className="components-popover__header-title">
 									{ headerTitle }

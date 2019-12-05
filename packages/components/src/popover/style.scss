@@ -6,14 +6,25 @@ $arrow-size: 8px;
 	z-index: z-index(".components-popover");
 	left: 50%;
 
-	&.is-mobile {
+	// Hide the popover element until the position has been calculated. The position
+	// cannot be calculated until the popover element is rendered because the
+	// position depends on the size of the popover.
+	opacity: 0;
+
+	&.is-expanded,
+	&[data-x-axis][data-y-axis] {
+		opacity: 1;
+	}
+
+	&.is-expanded {
 		top: 0;
 		left: 0;
 		right: 0;
 		bottom: 0;
+		z-index: z-index(".components-popover") !important;
 	}
 
-	&:not(.is-without-arrow):not(.is-mobile) {
+	&:not(.is-without-arrow) {
 		margin-left: 2px;
 
 		&::before {
@@ -116,19 +127,17 @@ $arrow-size: 8px;
 		}
 	}
 
-	&:not(.is-mobile) {
-		&[data-y-axis="top"] {
-			bottom: 100%;
-		}
+	&[data-y-axis="top"] {
+		bottom: 100%;
+	}
 
-		&[data-y-axis="bottom"] {
-			top: 100%;
-		}
+	&[data-y-axis="bottom"] {
+		top: 100%;
+	}
 
-		&[data-y-axis="middle"] {
-			align-items: center;
-			display: flex;
-		}
+	&[data-y-axis="middle"] {
+		align-items: center;
+		display: flex;
 	}
 }
 
@@ -138,42 +147,43 @@ $arrow-size: 8px;
 	background: $white;
 	height: 100%;
 
-	.components-popover.is-mobile & {
+	.components-popover.is-expanded & {
 		height: calc(100% - #{ $panel-header-height });
-		border-top: 0;
+		border: none;
+		border-top: $border-width solid $light-gray-500;
 	}
 
-	.components-popover:not(.is-mobile) & {
+	.components-popover[data-x-axis][data-y-axis] & {
 		position: absolute;
 		height: auto;
 		overflow-y: auto;
 		min-width: 260px;
 	}
 
-	.components-popover:not(.is-mobile)[data-y-axis="top"] & {
+	.components-popover[data-y-axis="top"] & {
 		bottom: 100%;
 	}
 
-	.components-popover:not(.is-mobile)[data-x-axis="center"] & {
+	.components-popover[data-x-axis="center"] & {
 		left: 50%;
 		transform: translateX(-50%);
 	}
 
-	.components-popover:not(.is-mobile)[data-x-axis="right"] & {
+	.components-popover[data-x-axis="right"] & {
 		position: absolute;
 		left: 100%;
 	}
 
-	.components-popover:not(.is-mobile):not([data-y-axis="middle"])[data-x-axis="right"] & {
+	.components-popover:not([data-y-axis="middle"])[data-x-axis="right"] & {
 		margin-left: -24px;
 	}
 
-	.components-popover:not(.is-mobile)[data-x-axis="left"] & {
+	.components-popover[data-x-axis="left"] & {
 		position: absolute;
 		right: 100%;
 	}
 
-	.components-popover:not(.is-mobile):not([data-y-axis="middle"])[data-x-axis="left"] & {
+	.components-popover:not([data-y-axis="middle"])[data-x-axis="left"] & {
 		margin-right: -24px;
 	}
 }
@@ -183,21 +193,9 @@ $arrow-size: 8px;
 	height: 100%;
 }
 
-// Hide the popover element until the position has been calculated. The position
-// cannot be calculated until the popover element is rendered because the
-// position depends on the size of the popover.
-.components-popover {
-	opacity: 0;
-}
-
-.components-popover[data-x-axis][data-y-axis] {
-	opacity: 1;
-}
-
 .components-popover__header {
 	align-items: center;
 	background: $white;
-	border: $border-width solid $light-gray-500;
 	display: flex;
 	height: $panel-header-height;
 	justify-content: space-between;
