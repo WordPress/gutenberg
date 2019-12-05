@@ -347,8 +347,8 @@ Similarly, use the `undefined` type only if you're expecting an explicit value o
 /**
  * Returns true if the next HTML token closes the current token.
  *
- * @param {Object}           currentToken Current token to compare with.
- * @param {Object|undefined} nextToken    Next token to compare against.
+ * @param {WPHTMLToken}           currentToken Current token to compare with.
+ * @param {WPHTMLToken|undefined} nextToken    Next token to compare against.
  *
  * @return {boolean} True if `nextToken` closes `currentToken`, false otherwise.
  */
@@ -415,7 +415,8 @@ When documenting an example, use the markdown <code>\`\`\`</code> code block to 
  * select( 'my-shop' ).getPrice( 'hammer' );
  * ```
  *
- * @return {Object} Object containing the store's selectors.
+ * @return {Object<string,WPDataSelector>} Object containing the store's
+ *                                         selectors.
  */
 ```
 
