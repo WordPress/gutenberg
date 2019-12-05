@@ -248,6 +248,11 @@ class BlockList extends Component {
 					const isBlockInSelection = hasMultiSelection ?
 						multiSelectedBlockClientIds.includes( clientId ) :
 						selectedBlockClientId === clientId;
+					const isFirstMultiSelected = multiSelectedBlockClientIds[ 0 ] === clientId;
+					const shouldShowInsertionPoint = ! isMultiSelecting && (
+						( isBlockInSelection && isFirstMultiSelected ) ||
+						! isBlockInSelection
+					);
 
 					return (
 						<BlockAsyncModeProvider
@@ -255,7 +260,7 @@ class BlockList extends Component {
 							clientId={ clientId }
 							isBlockInSelection={ isBlockInSelection }
 						>
-							{ ! isMultiSelecting && ! isBlockInSelection && (
+							{ shouldShowInsertionPoint && (
 								<BlockInsertionPoint
 									clientId={ clientId }
 									rootClientId={ rootClientId }
