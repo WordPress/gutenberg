@@ -245,6 +245,7 @@ const Popover = ( {
 	const anchorRefFallback = useRef( null );
 	const contentRef = useRef( null );
 	const containerRef = useRef();
+	const contentRect = useRef();
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const [ animateOrigin, setAnimateOrigin ] = useState();
 	const isExpanded = expandOnMobile && isMobileViewport;
@@ -266,7 +267,7 @@ const Popover = ( {
 			return;
 		}
 
-		const refresh = () => {
+		const refresh = ( event ) => {
 			let anchor = computeAnchorRect(
 				anchorRefFallback,
 				anchorRect,
@@ -285,10 +286,17 @@ const Popover = ( {
 				anchorHorizontalBuffer
 			);
 
-			const contentSize = {
-				height: contentEl.scrollHeight,
-				width: contentEl.scrollWidth,
-			};
+			// Only recheck the content rect on interval as it's unlikely to
+			// change much, but sometimes the popover content may change.
+			if ( ! event ) {
+				setStyle( contentEl, 'maxHeight' );
+				setStyle( contentEl, 'maxWidth' );
+			}
+
+			if ( ! event || ! contentRect.current ) {
+				contentRect.current = contentEl.getBoundingClientRect();
+			}
+
 			const {
 				popoverTop,
 				popoverLeft,
@@ -296,7 +304,7 @@ const Popover = ( {
 				yAxis,
 				contentHeight,
 				contentWidth,
-			} = computePopoverPosition( anchor, contentSize, position );
+			} = computePopoverPosition( anchor, contentRect.current, position );
 
 			setClass( containerEl, 'is-without-arrow', noArrow || ( xAxis === 'center' && yAxis === 'middle' ) );
 			setAttribute( containerEl, 'data-x-axis', xAxis );
