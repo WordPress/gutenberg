@@ -147,17 +147,20 @@ $arrow-size: 8px;
 	background: $white;
 	height: 100%;
 
-	.components-popover.is-expanded & {
-		height: calc(100% - #{ $panel-header-height });
-		border: none;
-		border-top: $border-width solid $light-gray-500;
-	}
-
-	.components-popover[data-x-axis][data-y-axis] & {
+	.components-popover & {
 		position: absolute;
 		height: auto;
 		overflow-y: auto;
 		min-width: 260px;
+	}
+
+	.components-popover.is-expanded & {
+		position: static;
+		height: calc(100% - #{ $panel-header-height });
+		overflow-y: visible;
+		min-width: auto;
+		border: none;
+		border-top: $border-width solid $light-gray-500;
 	}
 
 	.components-popover[data-y-axis="top"] & {
