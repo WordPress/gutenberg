@@ -47,3 +47,16 @@ export const withHelp = () => {
 	);
 };
 
+export const withDisabledOption = () => {
+	const optionsWithDisabled = [
+		...options,
+		{ label: 'Disabled Option', value: 'disabled', disabled: true },
+	];
+
+	return (
+		<RadioControlWithState
+			label="Post visibility"
+			options={ optionsWithDisabled }
+		/>
+	);
+};
