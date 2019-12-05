@@ -12,7 +12,7 @@ function PostSwitchToDraftButton( {
 	isScheduled,
 	onClick,
 } ) {
-	const isMobileViewport = useViewportMatch( '< small' );
+	const isMobileViewport = useViewportMatch( 'small', '<' );
 
 	if ( ! isPublished && ! isScheduled ) {
 		return null;

@@ -24,7 +24,7 @@ export function PostPublishButtonOrToggle( {
 } ) {
 	const IS_TOGGLE = 'toggle';
 	const IS_BUTTON = 'button';
-	const isSmallerThanMediumViewport = useViewportMatch( '< medium' );
+	const isSmallerThanMediumViewport = useViewportMatch( 'medium', '<' );
 	let component;
 
 	/**

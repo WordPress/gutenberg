@@ -50,7 +50,7 @@ import PluginPrePublishPanel from '../sidebar/plugin-pre-publish-panel';
 import WelcomeGuide from '../welcome-guide';
 
 function Layout() {
-	const isMobileViewport = useViewportMatch( '< small' );
+	const isMobileViewport = useViewportMatch( 'small', '<' );
 	const { closePublishSidebar, togglePublishSidebar } = useDispatch( 'core/edit-post' );
 	const {
 		mode,

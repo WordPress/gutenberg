@@ -146,13 +146,14 @@ Returns true if the viewport matches the given query, or false otherwise.
 _Usage_
 
 ```js
-useViewportMatch( '< huge' );
+useViewportMatch( 'huge', <' );
 useViewportMatch( 'medium' );
 ```
 
 _Parameters_
 
--   _query_ `string`: Query string. Includes operator and breakpoint name, space separated. Operator defaults to >=. The supported breakpoint names are: mobile, small, medium, large, wide and huge.
+-   _breakpoint_ `WPBreakpoint`: Breakpoint size name.
+-   _operator_ `[WPViewportOperator]`: Viewport operator.
 
 _Returns_
 

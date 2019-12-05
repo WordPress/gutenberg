@@ -4,11 +4,15 @@
 import useMediaQuery from '../use-media-query';
 
 /**
+ * @typedef {"huge"|"wide"|"large"|"medium"|"small"|"mobile"} WPBreakpoint
+ */
+
+/**
  * Hash of breakpoint names with pixel width at which it becomes effective.
  *
  * @see _breakpoints.scss
  *
- * @type {Object}
+ * @type {Object<WPBreakpoint,number>}
  */
 const BREAKPOINTS = {
 	huge: 1440,
@@ -20,9 +24,13 @@ const BREAKPOINTS = {
 };
 
 /**
+ * @typedef {">="|"<"} WPViewportOperator
+ */
+
+/**
  * Object mapping media query operators to the condition to be used.
  *
- * @type {Object}
+ * @type {Object<WPViewportOperator,string>}
  */
 const CONDITIONS = {
 	'>=': 'min-width',
@@ -32,25 +40,19 @@ const CONDITIONS = {
 /**
  * Returns true if the viewport matches the given query, or false otherwise.
  *
- * @param {string} query Query string. Includes operator and breakpoint name,
- *                       space separated. Operator defaults to >=. The supported
- *                       breakpoint names are: mobile, small, medium, large, wide
- *                       and huge.
+ * @param {WPBreakpoint}       breakpoint      Breakpoint size name.
+ * @param {WPViewportOperator} [operator=">="] Viewport operator.
  *
  * @example
  *
  * ```js
- * useViewportMatch( '< huge' );
+ * useViewportMatch( 'huge', <' );
  * useViewportMatch( 'medium' );
  * ```
  *
  * @return {boolean} Whether viewport matches query.
  */
-const useViewportMatch = ( query ) => {
-	if ( query.indexOf( ' ' ) === -1 ) {
-		query = '>= ' + query;
-	}
-	const [ operator, breakpoint ] = query.split( ' ' );
+const useViewportMatch = ( breakpoint, operator = '>=' ) => {
 	const mediaQuery = `(${ CONDITIONS[ operator ] }: ${ BREAKPOINTS[ breakpoint ] }px)`;
 	return useMediaQuery( mediaQuery );
 };

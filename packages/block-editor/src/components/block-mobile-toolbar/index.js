@@ -9,7 +9,7 @@ import { useViewportMatch } from '@wordpress/compose';
 import BlockMover from '../block-mover';
 
 function BlockMobileToolbar( { clientId, moverDirection } ) {
-	const isMobile = useViewportMatch( '< small' );
+	const isMobile = useViewportMatch( 'small', '<' );
 	if ( ! isMobile ) {
 		return null;
 	}
