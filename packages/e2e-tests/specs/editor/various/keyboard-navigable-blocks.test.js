@@ -17,6 +17,13 @@ const navigateToContentEditorTop = async () => {
 };
 
 const tabThroughParagraphBlock = async ( paragraphText ) => {
+	// Tab causes 'add block' button to receive focus
+	await page.keyboard.press( 'Tab' );
+	const isFocusedParagraphInserterToggle = await page.evaluate( () =>
+		document.activeElement.classList.contains( 'block-editor-inserter__toggle' )
+	);
+	await expect( isFocusedParagraphInserterToggle ).toBe( true );
+
 	// Tab to the next paragraph block
 	await page.keyboard.press( 'Tab' );
 
@@ -25,13 +32,6 @@ const tabThroughParagraphBlock = async ( paragraphText ) => {
 		() => document.activeElement.dataset.type
 	);
 	await expect( isFocusedParagraphBlock ).toEqual( 'core/paragraph' );
-
-	// Tab causes 'add block' button to receive focus
-	await page.keyboard.press( 'Tab' );
-	const isFocusedParagraphInserterToggle = await page.evaluate( () =>
-		document.activeElement.classList.contains( 'block-editor-inserter__toggle' )
-	);
-	await expect( isFocusedParagraphInserterToggle ).toBe( true );
 
 	await tabThroughBlockMoverControl();
 	await tabThroughBlockToolbar();
