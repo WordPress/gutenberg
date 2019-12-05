@@ -344,8 +344,6 @@ function BlockListBlock( {
 		}
 	};
 
-	const isPointerDown = useRef( false );
-
 	/**
 	 * Begins tracking cursor multi-selection when clicking down within block.
 	 *
@@ -372,34 +370,24 @@ function BlockListBlock( {
 				event.preventDefault();
 			}
 
-		// Avoid triggering multi-selection if we click toolbars/inspectors
-		// and all elements that are outside the Block Edit DOM tree.
-		} else if ( blockNodeRef.current.contains( event.target ) ) {
-			isPointerDown.current = true;
-
-			// Allow user to escape out of a multi-selection to a singular
-			// selection of a block via click. This is handled here since
-			// onFocus excludes blocks involved in a multiselection, as
-			// focus can be incurred by starting a multiselection (focus
-			// moved to first block's multi-controls).
-			if ( isPartOfMultiSelection ) {
-				onSelect();
-			}
+		// Allow user to escape out of a multi-selection to a singular
+		// selection of a block via click. This is handled here since
+		// onFocus excludes blocks involved in a multiselection, as
+		// focus can be incurred by starting a multiselection (focus
+		// moved to first block's multi-controls).
+		} else if ( isPartOfMultiSelection ) {
+			onSelect();
 		}
 	};
 
-	const onMouseUp = () => {
-		isPointerDown.current = false;
-	};
-
-	const onMouseLeave = () => {
-		if ( isPointerDown.current ) {
+	const onMouseLeave = ( event ) => {
+		// The primary button must be pressed to initiate selection.
+		// See https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/buttons
+		if ( event.buttons === 1 ) {
 			onSelectionStart( clientId );
 		}
 
 		hideHoverEffects();
-
-		isPointerDown.current = false;
 	};
 
 	const selectOnOpen = ( open ) => {
@@ -606,7 +594,6 @@ function BlockListBlock( {
 					ref={ blockNodeRef }
 					onDragStart={ preventDrag }
 					onMouseDown={ onMouseDown }
-					onMouseUp={ onMouseUp }
 					onMouseLeave={ onMouseLeave }
 					data-block={ clientId }
 				>
