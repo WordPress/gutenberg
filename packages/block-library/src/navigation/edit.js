@@ -26,8 +26,8 @@ import {
 	PanelBody,
 	Placeholder,
 	Spinner,
-	ToolbarGroup,
 	Toolbar,
+	ToolbarGroup,
 } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 
