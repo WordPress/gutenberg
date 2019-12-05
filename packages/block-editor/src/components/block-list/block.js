@@ -45,6 +45,7 @@ import BlockHtml from './block-html';
 import BlockBreadcrumb from './breadcrumb';
 import BlockContextualToolbar from './block-contextual-toolbar';
 import BlockMultiControls from './multi-controls';
+import BlockInsertionPoint from './insertion-point';
 import IgnoreNestedEvents from '../ignore-nested-events';
 import InserterWithShortcuts from '../inserter-with-shortcuts';
 import Inserter from '../inserter';
@@ -447,11 +448,14 @@ function BlockListBlock( {
 			isFirstMultiSelected
 		);
 
-	const shouldRenderDropzone = ! isMultiSelecting && (
+	// Insertion point can only be made visible if the block is at the
+	// the extent of a multi-selection, or not in a multi-selection.
+	const shouldShowInsertionPoint = ! isMultiSelecting && (
 		( isPartOfMultiSelection && isFirstMultiSelected ) ||
 		! isPartOfMultiSelection
 	);
 
+	const shouldRenderDropzone = shouldShowInsertionPoint;
 	const isDragging = isDraggingBlocks && ( isSelected || isPartOfMultiSelection );
 
 	// The wp-block className is important for editor styles.
@@ -512,7 +516,13 @@ function BlockListBlock( {
 		blockEdit = <div style={ { display: 'none' } }>{ blockEdit }</div>;
 	}
 
-	return (
+	return <>
+		{ shouldShowInsertionPoint && (
+			<BlockInsertionPoint
+				clientId={ clientId }
+				rootClientId={ rootClientId }
+			/>
+		) }
 		<IgnoreNestedEvents
 			id={ blockElementId }
 			ref={ wrapper }
@@ -631,7 +641,7 @@ function BlockListBlock( {
 				</div>
 			) }
 		</IgnoreNestedEvents>
-	);
+	</>;
 }
 
 const applyWithSelect = withSelect(

@@ -21,7 +21,6 @@ import BlockAsyncModeProvider from './block-async-mode-provider';
 import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
 import __experimentalBlockListFooter from '../block-list-footer';
-import BlockInsertionPoint from './insertion-point';
 
 /**
  * If the block count exceeds the threshold, we disable the reordering animation
@@ -248,11 +247,6 @@ class BlockList extends Component {
 					const isBlockInSelection = hasMultiSelection ?
 						multiSelectedBlockClientIds.includes( clientId ) :
 						selectedBlockClientId === clientId;
-					const isFirstMultiSelected = multiSelectedBlockClientIds[ 0 ] === clientId;
-					const shouldShowInsertionPoint = ! isMultiSelecting && (
-						( isBlockInSelection && isFirstMultiSelected ) ||
-						! isBlockInSelection
-					);
 
 					return (
 						<BlockAsyncModeProvider
@@ -260,12 +254,6 @@ class BlockList extends Component {
 							clientId={ clientId }
 							isBlockInSelection={ isBlockInSelection }
 						>
-							{ shouldShowInsertionPoint && (
-								<BlockInsertionPoint
-									clientId={ clientId }
-									rootClientId={ rootClientId }
-								/>
-							) }
 							<BlockListBlock
 								rootClientId={ rootClientId }
 								clientId={ clientId }
