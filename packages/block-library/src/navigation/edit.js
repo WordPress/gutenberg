@@ -117,23 +117,6 @@ function Navigation( {
 	if ( ! hasExistingNavItems ) {
 		return (
 			<Fragment>
-				<InspectorControls>
-					{ hasResolvedPages && (
-						<PanelBody
-							title={ __( 'Navigation Settings' ) }
-						>
-							<CheckboxControl
-								value={ attributes.automaticallyAdd }
-								onChange={ ( automaticallyAdd ) => {
-									setAttributes( { automaticallyAdd } );
-									handleCreateFromExistingPages();
-								} }
-								label={ __( 'Automatically add new pages' ) }
-								help={ __( 'Automatically add new top level pages to this navigation.' ) }
-							/>
-						</PanelBody>
-					) }
-				</InspectorControls>
 				<Placeholder
 					className="wp-block-navigation-placeholder"
 					icon="menu"
