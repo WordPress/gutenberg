@@ -33,6 +33,7 @@ $z-layers: (
 	".wp-block-cover.has-background-dim::before": 1, // Overlay area inside block cover need to be higher than the video background.
 	".wp-block-cover__video-background": 0, // Video background inside cover block.
 	".wp-block-site-title__save-button": 1,
+	".wp-block-template-part__save-button": 1,
 
 	// Active pill button
 	".components-button.is-button {:focus or .is-primary}": 1,
