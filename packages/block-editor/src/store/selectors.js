@@ -929,6 +929,17 @@ export function isTyping( state ) {
 }
 
 /**
+ * Returns true if the user is dragging blocks, or false otherwise.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether user is dragging blocks.
+ */
+export function isDraggingBlocks( state ) {
+	return state.isDraggingBlocks;
+}
+
+/**
  * Returns true if the caret is within formatted text, or false otherwise.
  *
  * @param {Object} state Global application state.

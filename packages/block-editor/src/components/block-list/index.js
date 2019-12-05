@@ -227,7 +227,6 @@ class BlockList extends Component {
 			blockClientIds,
 			rootClientId,
 			__experimentalMoverDirection: moverDirection = 'vertical',
-			isDraggable,
 			selectedBlockClientId,
 			multiSelectedBlockClientIds,
 			hasMultiSelection,
@@ -259,7 +258,6 @@ class BlockList extends Component {
 								rootClientId={ rootClientId }
 								clientId={ clientId }
 								onSelectionStart={ this.onSelectionStart }
-								isDraggable={ isDraggable }
 								moverDirection={ moverDirection }
 								isMultiSelecting={ isMultiSelecting }
 								// This prop is explicitely computed and passed down
