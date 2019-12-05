@@ -590,7 +590,7 @@ export class RichText extends Component {
 			tagName,
 		} = this.props;
 
-		// aztec won't trimm spaces in a case of <pre> block, so we are excluding it
+		// aztec won't trim spaces in a case of <pre> block, so we are excluding it
 		if ( tagName === 'pre' ) {
 			return false;
 		}
