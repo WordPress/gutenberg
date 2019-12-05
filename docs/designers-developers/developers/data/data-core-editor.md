@@ -12,18 +12,6 @@ _Related_
 
 -   canInsertBlockType in core/block-editor store.
 
-<a name="canUserUseUnfilteredHTML" href="#canUserUseUnfilteredHTML">#</a> **canUserUseUnfilteredHTML**
-
-Returns whether or not the user has the unfiltered_html capability.
-
-_Parameters_
-
--   _state_ `Object`: Editor state.
-
-_Returns_
-
--   `boolean`: Whether the user can or can't post unfiltered HTML.
-
 <a name="didPostSaveRequestFail" href="#didPostSaveRequestFail">#</a> **didPostSaveRequestFail**
 
 Returns true if a previous post save was attempted but failed, or false

@@ -4,7 +4,6 @@
 import {
 	find,
 	get,
-	has,
 	map,
 	pick,
 	mapValues,
@@ -1216,17 +1215,6 @@ export function getActivePostLock( state ) {
 }
 
 /**
- * Returns whether or not the user has the unfiltered_html capability.
- *
- * @param {Object} state Editor state.
- *
- * @return {boolean} Whether the user can or can't post unfiltered HTML.
- */
-export function canUserUseUnfilteredHTML( state ) {
-	return has( getCurrentPost( state ), [ '_links', 'wp:action-unfiltered-html' ] );
-}
-
-/**
  * Returns whether the pre-publish panel should be shown
  * or skipped when the user clicks the "publish" button.
  *
@@ -1306,6 +1294,24 @@ export function getEditorSettings( state ) {
 /*
  * Backward compatibility
  */
+
+/**
+ * Returns whether or not the user has the unfiltered_html capability.
+ *
+ * @deprecated
+ * @private
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {boolean} Whether the user can or can't post unfiltered HTML.
+ */
+export const canUserUseUnfilteredHTML = createRegistrySelector( ( select ) => ( state ) => {
+	deprecated( '`wp.data.select( \'core/editor\' ).canUserUseUnfilteredHTML`', {
+		alternative: '`wp.data.select( \'core\' ).canUser( \'unfiltered-html\', \'posts\', wp.data.select( \'core/editor\' ).getCurrentPostId() )`',
+	} );
+
+	return select( 'core' ).canUser( 'unfiltered-html', 'posts', getCurrentPostId( state ) );
+} );
 
 function getBlockEditorSelector( name ) {
 	return createRegistrySelector( ( select ) => ( state, ...args ) => {

@@ -167,7 +167,6 @@ const {
 	getPermalinkParts,
 	isPostSavingLocked,
 	isPostAutosavingLocked,
-	canUserUseUnfilteredHTML,
 } = selectors;
 
 describe( 'selectors', () => {
@@ -2839,27 +2838,6 @@ describe( 'selectors', () => {
 			};
 
 			expect( getPermalinkParts( state ) ).toBeNull();
-		} );
-	} );
-
-	describe( 'canUserUseUnfilteredHTML', () => {
-		it( 'should return true if the _links object contains the property wp:action-unfiltered-html', () => {
-			const state = {
-				currentPost: {
-					_links: {
-						'wp:action-unfiltered-html': [],
-					},
-				},
-			};
-			expect( canUserUseUnfilteredHTML( state ) ).toBe( true );
-		} );
-		it( 'should return false if the _links object doesnt contain the property wp:action-unfiltered-html', () => {
-			const state = {
-				currentPost: {
-					_links: {},
-				},
-			};
-			expect( canUserUseUnfilteredHTML( state ) ).toBe( false );
 		} );
 	} );
 } );
