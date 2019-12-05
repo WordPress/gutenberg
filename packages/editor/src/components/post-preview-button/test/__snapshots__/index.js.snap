@@ -9,20 +9,20 @@ exports[`PostPreviewButton render() should render overlay when state is open 1`]
     onClick={[Function]}
   >
     Preview
-    <WithSelect(WithDispatch(DotTip))
-      tipId="core/editor.preview"
+    <span
+      className="screen-reader-text"
     >
-      Click “Preview” to load a preview of this page, so you can make sure you’re happy with your blocks.
-    </WithSelect(WithDispatch(DotTip))>
+      (opens in a new tab)
+    </span>
   </ForwardRef(Button)>
   <WithInstanceId(Modal)
-    className="editor-block-preview"
+    className="editor-post-preview-button__preview-modal"
     onRequestClose={[Function]}
     shouldCloseOnClickOutside={false}
-    title="Preview"
+    title="Preview dialog"
   >
     <div
-      className="editor-block-preview__controls"
+      className="editor-post-preview__controls"
     >
       <ForwardRef(IconButton)
         icon={
@@ -82,7 +82,7 @@ exports[`PostPreviewButton render() should render overlay when state is open 1`]
         onClick={[Function]}
       />
       <ForwardRef(Button)
-        className="editor-block-preview__new-tab"
+        className="editor-post-preview__new-tab"
         href="https://wordpress.org/?p=1"
         isLarge={true}
         onClick={[Function]}
@@ -92,10 +92,10 @@ exports[`PostPreviewButton render() should render overlay when state is open 1`]
       </ForwardRef(Button)>
     </div>
     <div
-      className="editor-block-preview__frame-container"
+      className="editor-post-preview__frame-container"
     >
       <iframe
-        className="editor-block-preview__frame"
+        className="editor-post-preview__frame"
         src="https://wordpress.org/?p=1"
         style={
           Object {

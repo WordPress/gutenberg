@@ -71,7 +71,7 @@ describe( 'PostPreviewButton', () => {
 		} );
 	} );
 
-	describe( 'openPreviewOverlay()', () => {
+	describe( 'openPreviewModal()', () => {
 		it( 'behaves like a regular link if not autosaveable', () => {
 			const autosave = jest.fn();
 
@@ -82,7 +82,7 @@ describe( 'PostPreviewButton', () => {
 				/>
 			);
 
-			wrapper.instance().openPreviewOverlay();
+			wrapper.instance().openPreviewModal();
 
 			expect( autosave ).not.toHaveBeenCalled();
 		} );
@@ -98,7 +98,7 @@ describe( 'PostPreviewButton', () => {
 				/>
 			);
 
-			wrapper.instance().openPreviewOverlay();
+			wrapper.instance().openPreviewModal();
 
 			expect( autosave ).toHaveBeenCalled();
 		} );
@@ -165,7 +165,7 @@ describe( 'PostPreviewButton', () => {
 				/>
 			).setState( { isPreviewOpen: true } );
 
-			const frameSrc = wrapper.find( '.editor-block-preview__frame' ).prop( 'src' );
+			const frameSrc = wrapper.find( '.editor-post-preview__frame' ).prop( 'src' );
 			expect( frameSrc ).toEqual( previewLink );
 		} );
 
@@ -178,7 +178,7 @@ describe( 'PostPreviewButton', () => {
 				/>
 			).setState( { isPreviewOpen: true } );
 
-			const frameSrc = wrapper.find( '.editor-block-preview__frame' ).prop( 'src' );
+			const frameSrc = wrapper.find( '.editor-post-preview__frame' ).prop( 'src' );
 			expect( frameSrc ).toEqual( currentPostLink );
 		} );
 

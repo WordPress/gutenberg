@@ -23,8 +23,8 @@ async function openPreviewPage( editorPage ) {
 	let openTabs = await browser.pages();
 	const expectedTabsCount = openTabs.length + 1;
 	await editorPage.click( '.editor-post-preview' );
-	await editorPage.waitForSelector( '.editor-block-preview__new-tab' );
-	await editorPage.click( '.editor-block-preview__new-tab' );
+	await editorPage.waitForSelector( '.editor-post-preview__new-tab' );
+	await editorPage.click( '.editor-post-preview__new-tab' );
 
 	// Wait for the new tab to open.
 	while ( openTabs.length < expectedTabsCount ) {
@@ -48,8 +48,8 @@ async function openPreviewPage( editorPage ) {
  */
 async function waitForPreviewNavigation( previewPage ) {
 	await page.click( '.editor-post-preview' );
-	await page.waitForSelector( '.editor-block-preview__new-tab' );
-	await page.click( '.editor-block-preview__new-tab' );
+	await page.waitForSelector( '.editor-post-preview__new-tab' );
+	await page.click( '.editor-post-preview__new-tab' );
 	return previewPage.waitForNavigation();
 }
 

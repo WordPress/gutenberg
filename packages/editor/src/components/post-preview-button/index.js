@@ -30,8 +30,8 @@ export class PostPreviewButton extends Component {
 		this.openPreviewInNewTab = this.openPreviewInNewTab.bind( this );
 		this.getWindowTarget = this.getWindowTarget.bind( this );
 		this.setPreviewWindowLink = this.setPreviewWindowLink.bind( this );
-		this.openPreviewOverlay = this.openPreviewOverlay.bind( this );
-		this.closePreviewWindow = this.closePreviewWindow.bind( this );
+		this.openPreviewModal = this.openPreviewModal.bind( this );
+		this.closePreviewModal = this.closePreviewModal.bind( this );
 		this.setDesktopPreview = this.setDesktopPreview.bind( this );
 		this.setTabletPreview = this.setTabletPreview.bind( this );
 		this.setMobilePreview = this.setMobilePreview.bind( this );
@@ -67,7 +67,7 @@ export class PostPreviewButton extends Component {
 		return `wp-preview-${ postId }`;
 	}
 
-	openPreviewOverlay() {
+	openPreviewModal() {
 		this.setState( { isPreviewOpen: true } );
 
 		// If we don't need to autosave the post before previewing, do nothing.
@@ -133,7 +133,7 @@ export class PostPreviewButton extends Component {
 		} );
 	}
 
-	closePreviewWindow() {
+	closePreviewModal() {
 		this.setState( { isPreviewOpen: false } );
 	}
 
@@ -150,7 +150,7 @@ export class PostPreviewButton extends Component {
 					isLarge
 					className="editor-post-preview"
 					disabled={ ! isSaveable }
-					onClick={ this.openPreviewOverlay }
+					onClick={ this.openPreviewModal }
 				>
 					{ _x( 'Preview', 'imperative verb' ) }
 
@@ -162,56 +162,56 @@ export class PostPreviewButton extends Component {
 					</span>
 				</Button>
 				{ this.state.isPreviewOpen &&
-				<Modal
-					title={
-					// translators: Preview dialog title.
-						__( 'Preview' )
-					}
-					onRequestClose={ this.closePreviewWindow }
-					// Needed so the Modal doesn't close when tabbing into the iframe.
-					shouldCloseOnClickOutside={ false }
-					className="editor-block-preview"
-				>
-					<div className="editor-block-preview__controls">
-						<IconButton
-							icon={ DesktopIcon }
-							onClick={ this.setDesktopPreview }
-							label={ __( 'Preview desktop screen' ) }
-						/>
-						<IconButton
-							icon={ TabletIcon }
-							onClick={ this.setTabletPreview }
-							label={ __( 'Preview tablet screen' ) }
-						/>
-						<IconButton
-							icon={ MobileIcon }
-							onClick={ this.setMobilePreview }
-							label={ __( 'Preview phone screen' ) }
-						/>
-						<Button
-							isLarge
-							className="editor-block-preview__new-tab"
-							href={ href }
-							target={ this.getWindowTarget() }
-							onClick={ this.openPreviewInNewTab }
-						>
-							{ _x( 'Open preview in new tab', 'imperative verb' ) }
-						</Button>
-					</div>
-					<div className="editor-block-preview__frame-container">
-						<iframe
-							className="editor-block-preview__frame"
-							title={ __( 'Responsive preview frame' ) }
-							src={ href }
-							style={
-								{
-									width: this.state.previewSize.width,
-									height: this.state.previewSize.height,
+					<Modal
+						title={
+							// translators: Preview dialog title.
+							__( 'Preview dialog' )
+						}
+						onRequestClose={ this.closePreviewModal }
+						// Needed so the Modal doesn't close when tabbing into the iframe.
+						shouldCloseOnClickOutside={ false }
+						className="editor-post-preview-button__preview-modal"
+					>
+						<div className="editor-post-preview__controls">
+							<IconButton
+								icon={ DesktopIcon }
+								onClick={ this.setDesktopPreview }
+								label={ __( 'Preview desktop screen' ) }
+							/>
+							<IconButton
+								icon={ TabletIcon }
+								onClick={ this.setTabletPreview }
+								label={ __( 'Preview tablet screen' ) }
+							/>
+							<IconButton
+								icon={ MobileIcon }
+								onClick={ this.setMobilePreview }
+								label={ __( 'Preview phone screen' ) }
+							/>
+							<Button
+								isLarge
+								className="editor-post-preview__new-tab"
+								href={ href }
+								target={ this.getWindowTarget() }
+								onClick={ this.openPreviewInNewTab }
+							>
+								{ __( 'Open preview in new tab' ) }
+							</Button>
+						</div>
+						<div className="editor-post-preview__frame-container">
+							<iframe
+								className="editor-post-preview__frame"
+								title={ __( 'Responsive preview frame' ) }
+								src={ href }
+								style={
+									{
+										width: this.state.previewSize.width,
+										height: this.state.previewSize.height,
+									}
 								}
-							}
-						></iframe>
-					</div>
-				</Modal>
+							></iframe>
+						</div>
+					</Modal>
 				}
 			</>
 		);

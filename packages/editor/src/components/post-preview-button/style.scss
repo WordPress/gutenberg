@@ -1,4 +1,4 @@
-.editor-block-preview {
+.editor-post-preview-button__preview-modal {
 	@include break-small() {
 		top: 5%;
 		right: 5%;
@@ -8,7 +8,7 @@
 	}
 }
 
-.editor-block-preview__controls {
+.editor-post-preview__controls {
 	display: flex;
 	align-items: center;
 	margin: $grid-size-large 0;
@@ -18,16 +18,16 @@
 	}
 }
 
-.editor-block-preview__new-tab {
+.editor-post-preview__new-tab {
 	margin-left: $grid-size-large;
 }
 
-.editor-block-preview__frame-container {
+.editor-post-preview__frame-container {
 	overflow-x: auto;
 	margin-bottom: 40px;
 }
 
-.editor-block-preview__frame {
+.editor-post-preview__frame {
 	display: block;
 	margin: 0 auto;
 }
