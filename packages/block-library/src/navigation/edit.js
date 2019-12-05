@@ -87,25 +87,29 @@ function Navigation( {
 	//
 	// HANDLERS
 	//
-	const handleItemsAlignment = ( align ) => {
+	function handleItemsAlignment( align ) {
 		return () => {
 			const itemsJustification = attributes.itemsJustification === align ? undefined : align;
 			setAttributes( {
 				itemsJustification,
 			} );
 		};
-	};
+	}
 
-	const handleCreateEmpty = () => {
+	function handleCreateEmpty() {
 		const emptyNavLinkBlock = createBlock( 'core/navigation-link' );
 		updateNavItemBlocks( [ emptyNavLinkBlock ] );
-	};
+	}
 
-	const handleCreateFromExistingPages = () => {
+	function handleCreateFromExistingPages() {
 		updateNavItemBlocks( defaultPagesNavigationItems );
-	};
+	}
 
 	const hasPages = hasResolvedPages && pages && pages.length;
+
+	const blockClassNames = classnames( 'wp-block-navigation', {
+		[ `items-justification-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
+	} );
 
 	// If we don't have existing items or the User hasn't
 	// indicated they want to automatically add top level Pages
@@ -158,10 +162,6 @@ function Navigation( {
 			</Fragment>
 		);
 	}
-
-	const blockClassNames = classnames( 'wp-block-navigation', {
-		[ `items-justification-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
-	} );
 
 	// UI State: rendered Block UI
 	return (
