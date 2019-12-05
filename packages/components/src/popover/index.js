@@ -167,7 +167,15 @@ function useFocusContentOnMount( focusOnMount, contentRef ) {
 	}, [] );
 }
 
-function diffAttribute( element, name, value ) {
+/**
+ * Sets or removes an element attribute.
+ *
+ * @param {Element} element The element to modify.
+ * @param {string}  name    The attribute name to set or remove.
+ * @param {?string} value   The value to set. A falsy value will remove the
+ *                          attribute.
+ */
+function setAttribute( element, name, value ) {
 	if ( ! value ) {
 		if ( element.hasAttribute( name ) ) {
 			element.removeAttribute( name );
@@ -177,19 +185,34 @@ function diffAttribute( element, name, value ) {
 	}
 }
 
-function diffStyle( element, property, value = '' ) {
+/**
+ * Sets or removes an element style property.
+ *
+ * @param {Element} element  The element to modify.
+ * @param {string}  property The property to set or remove.
+ * @param {?string} value    The value to set. A falsy value will remove the
+ *                           property.
+ */
+function setStyle( element, property, value = '' ) {
 	if ( element.style[ property ] !== value ) {
 		element.style[ property ] = value;
 	}
 }
 
-function diffClass( element, name, toggle ) {
+/**
+ * Sets or removes an element class.
+ *
+ * @param {Element} element The element to modify.
+ * @param {string}  name    The class to set or remove.
+ * @param {boolean} toggle  True to set the class, false to remove.
+ */
+function setClass( element, name, toggle ) {
 	if ( toggle ) {
 		if ( ! element.classList.contains( name ) ) {
 			element.classList.add( name );
 		}
 	} else if ( element.classList.contains( name ) ) {
-		element.classList.add( name );
+		element.classList.remove( name );
 	}
 }
 
@@ -233,13 +256,13 @@ const Popover = ( {
 		const contentEl = contentRef.current;
 
 		if ( isExpanded ) {
-			diffClass( containerEl, 'is-without-arrow', noArrow );
-			diffAttribute( containerEl, 'data-x-axis' );
-			diffAttribute( containerEl, 'data-y-axis' );
-			diffStyle( containerEl, 'top' );
-			diffStyle( containerEl, 'left' );
-			diffStyle( contentEl, 'maxHeight' );
-			diffStyle( contentEl, 'maxWidth' );
+			setClass( containerEl, 'is-without-arrow', noArrow );
+			setAttribute( containerEl, 'data-x-axis' );
+			setAttribute( containerEl, 'data-y-axis' );
+			setStyle( containerEl, 'top' );
+			setStyle( containerEl, 'left' );
+			setStyle( contentEl, 'maxHeight' );
+			setStyle( contentEl, 'maxWidth' );
 			return;
 		}
 
@@ -275,13 +298,13 @@ const Popover = ( {
 				contentWidth,
 			} = computePopoverPosition( anchor, contentSize, position );
 
-			diffClass( containerEl, 'is-without-arrow', noArrow || ( xAxis === 'center' && yAxis === 'middle' ) );
-			diffAttribute( containerEl, 'data-x-axis', xAxis );
-			diffAttribute( containerEl, 'data-y-axis', yAxis );
-			diffStyle( containerEl, 'top', popoverTop ? popoverTop + 'px' : '' );
-			diffStyle( containerEl, 'left', popoverLeft ? popoverLeft + 'px' : '' );
-			diffStyle( contentEl, 'maxHeight', contentHeight ? contentHeight + 'px' : '' );
-			diffStyle( contentEl, 'maxWidth', contentWidth ? contentWidth + 'px' : '' );
+			setClass( containerEl, 'is-without-arrow', noArrow || ( xAxis === 'center' && yAxis === 'middle' ) );
+			setAttribute( containerEl, 'data-x-axis', xAxis );
+			setAttribute( containerEl, 'data-y-axis', yAxis );
+			setStyle( containerEl, 'top', popoverTop ? popoverTop + 'px' : '' );
+			setStyle( containerEl, 'left', popoverLeft ? popoverLeft + 'px' : '' );
+			setStyle( contentEl, 'maxHeight', contentHeight ? contentHeight + 'px' : '' );
+			setStyle( contentEl, 'maxWidth', contentWidth ? contentWidth + 'px' : '' );
 
 			// Compute the animation position
 			const yAxisMapping = {
