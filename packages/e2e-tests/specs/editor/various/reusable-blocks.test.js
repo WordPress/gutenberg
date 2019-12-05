@@ -118,6 +118,7 @@ describe( 'Reusable Blocks', () => {
 		// Tab three times to navigate to the block's content
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Tab' );
 
 		// Quickly focus the paragraph block
 		await page.keyboard.press( 'Escape' ); // Enter navigation mode
