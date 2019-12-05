@@ -7,15 +7,15 @@ import { mount } from 'enzyme';
  * Internal dependencies
  */
 import Toolbar from '../';
-import ToolbarButton from '../../toolbar-button';
+import ToolbarIconButton from '../../toolbar-icon-button';
 
 describe( 'Toolbar', () => {
 	describe( 'basic rendering', () => {
 		it( 'should render a toolbar with toolbar buttons', () => {
 			const wrapper = mount(
 				<Toolbar __experimentalAccessibilityLabel="blocks">
-					<ToolbarButton title="control1" />
-					<ToolbarButton title="control2" />
+					<ToolbarIconButton label="control1" />
+					<ToolbarIconButton label="control2" />
 				</Toolbar>
 			);
 			const control1 = wrapper.find( 'button[aria-label="control1"]' );

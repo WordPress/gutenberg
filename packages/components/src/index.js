@@ -72,6 +72,8 @@ export { default as ToggleControl } from './toggle-control';
 export { default as Toolbar } from './toolbar';
 export { default as ToolbarButton } from './toolbar-button';
 export { default as ToolbarGroup } from './toolbar-group';
+export { default as __experimentalToolbarIconButton } from './toolbar-icon-button';
+export { default as __experimentalToolbarItem } from './toolbar-item';
 export { default as Tooltip } from './tooltip';
 export { default as TreeSelect } from './tree-select';
 export { default as VisuallyHidden } from './visually-hidden';

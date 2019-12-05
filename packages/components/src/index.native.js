@@ -7,6 +7,8 @@ export { default as Dropdown } from './dropdown';
 export { default as Toolbar } from './toolbar';
 export { default as ToolbarButton } from './toolbar-button';
 export { default as ToolbarGroup } from './toolbar-group';
+export { default as __experimentalToolbarIconButton } from './toolbar-icon-button';
+export { default as __experimentalToolbarItem } from './toolbar-item';
 export { default as Icon } from './icon';
 export { default as IconButton } from './icon-button';
 export { default as Spinner } from './spinner';

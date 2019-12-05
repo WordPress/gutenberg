@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { ToolbarItem } from 'reakit/Toolbar';
-
-/**
  * WordPress dependencies
  */
 import { useContext } from '@wordpress/element';
@@ -13,6 +8,7 @@ import { useContext } from '@wordpress/element';
  */
 import DropdownMenu from '../dropdown-menu';
 import ToolbarContext from '../toolbar-context';
+import ToolbarItem from '../toolbar-item';
 
 function ToolbarGroupCollapsed( {
 	controls = [],
@@ -40,7 +36,7 @@ function ToolbarGroupCollapsed( {
 	if ( accessibleToolbarState ) {
 		return (
 			// https://reakit.io/docs/composition/#render-props
-			<ToolbarItem { ...accessibleToolbarState }>
+			<ToolbarItem>
 				{ ( toolbarItemHTMLProps ) => renderDropdownMenu( toolbarItemHTMLProps ) }
 			</ToolbarItem>
 		);
