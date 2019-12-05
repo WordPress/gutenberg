@@ -301,10 +301,10 @@ const Popover = ( {
 			setClass( containerEl, 'is-without-arrow', noArrow || ( xAxis === 'center' && yAxis === 'middle' ) );
 			setAttribute( containerEl, 'data-x-axis', xAxis );
 			setAttribute( containerEl, 'data-y-axis', yAxis );
-			setStyle( containerEl, 'top', popoverTop ? popoverTop + 'px' : '' );
-			setStyle( containerEl, 'left', popoverLeft ? popoverLeft + 'px' : '' );
-			setStyle( contentEl, 'maxHeight', contentHeight ? contentHeight + 'px' : '' );
-			setStyle( contentEl, 'maxWidth', contentWidth ? contentWidth + 'px' : '' );
+			setStyle( containerEl, 'top', typeof popoverTop === 'number' ? popoverTop + 'px' : '' );
+			setStyle( containerEl, 'left', typeof popoverLeft === 'number' ? popoverLeft + 'px' : '' );
+			setStyle( contentEl, 'maxHeight', typeof contentHeight === 'number' ? contentHeight + 'px' : '' );
+			setStyle( contentEl, 'maxWidth', typeof contentWidth === 'number' ? contentWidth + 'px' : '' );
 
 			// Compute the animation position
 			const yAxisMapping = {
