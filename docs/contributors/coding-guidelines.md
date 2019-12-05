@@ -231,7 +231,7 @@ Custom types should be named as succinctly as possible, while still retaining cl
  */
 ```
 
-Custom types can also be beneficial when describing a set of predefined options. While the [type union](https://jsdoc.app/tags-type.html) can be used with literal values as an inline type, using it in a custom type can afford the opportunity to describe the purpose of these options, and avoids a situation where aligning tags while still respecting a maximum line length of 80 characters becomes challenging due to the space occupied by a literal values union.
+Custom types can also be used to describe a set of predefined options. While the [type union](https://jsdoc.app/tags-type.html) can be used with literal values as an inline type, it can be difficult to align tags while still respecting a maximum line length of 80 characters. Using a custom type to define a union type can afford the opportunity to describe the purpose of these options, and helps to avoid these line length issues.
 
 ```js
 /**
