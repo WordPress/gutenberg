@@ -1,38 +1,60 @@
+// On Mobile devices, swiping the HTML element should not scroll.
+// By making it fixed, we prevent that.
+html {
+	position: fixed;
+	width: 100%;
+
+	@include break-medium() {
+		position: initial;
+		width: initial;
+	}
+}
+
 .edit-post-editor-regions {
 	display: flex;
 	flex-direction: column;
-	height: 100%;
+	height: auto;
 	max-height: 100%;
-	position: relative;
 
-	// On Mobile keep a margin for the header and admin header
-	// as both of these are fixed
-	top: 0;
+	// Fill the available space on Mobile.
+	position: fixed;
+	top: $admin-bar-height-big;
+	left: 0;
+	right: 0;
+	bottom: 0;
+
+	// Adjust to admin-bar going small.
 	@include break-medium() {
-		margin-top: 0;
-
-		// On Desktop position the container as fixed to avoid scroll bleed.
-		position: fixed;
 		top: $admin-bar-height;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		height: auto;
+
 		.is-fullscreen-mode & {
 			top: 0;
 		}
 	}
 }
+
 @include editor-left(".edit-post-editor-regions");
 
 .edit-post-editor-regions__body {
 	flex-grow: 1;
 	display: flex;
 
-	// On Mobile the header is fixed to keep HTML as scrollable.
-	@include break-medium() {
-		overflow: auto;
-	}
+	// Even on Mobile, we choose to scroll this element on its own.
+	// This helps enable a fixed-to-top toolbar that makes the editing experience
+	// on Mobile Safari usable.
+	// Unfortunately an issue still exists where if you swipe the top toolbar
+	// or beyond the bottom of the page when the soft keyboard is showing, you scroll
+	// the body element and can scroll the toolbar out of view.
+	// This is still preferable, though, as it allows the editor to function at all.
+	overflow: auto;
+
+	// In future versions of Mobile Safari, hopefully overscroll-behavior will be supported.
+	// This allows us to disallow the scroll-chaining and rubber-banding that is currently
+	// is the cause of the issue outlined above.
+	// In other words, the following behavior doesn't yet work in Safari, but if/when
+	// it is added, it should take care of the issue.
+	// See also: https://drafts.csswg.org/css-overscroll/
+	overscroll-behavior-y: none;
 }
 
 .edit-post-editor-regions__content {
@@ -44,6 +66,8 @@
 	flex-direction: column;
 
 	// On Mobile the header is fixed to keep HTML as scrollable.
+	// Beyond the medium breakpoint, we allow the sidebar.
+	// The sidebar should scroll independently, so enable scroll here also.
 	@include break-medium() {
 		overflow: auto;
 	}
@@ -83,12 +107,8 @@
 	position: sticky;
 	top: 0;
 
+	// Cancel the fixed positioning used on Mobile.
 	@include break-small() {
-		top: $admin-bar-height-big; // The top bar is fixed on this breakpoint.
-	}
-
-	@include break-medium() {
-		// Cancel the fixed positionning used in mobile.
 		position: initial;
 		top: 0;
 	}

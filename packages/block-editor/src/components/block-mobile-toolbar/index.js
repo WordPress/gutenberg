@@ -7,12 +7,10 @@ import { ifViewportMatches } from '@wordpress/viewport';
  * Internal dependencies
  */
 import BlockMover from '../block-mover';
-import VisualEditorInserter from '../inserter';
 
 function BlockMobileToolbar( { clientId, moverDirection } ) {
 	return (
-		<div className="editor-block-list__block-mobile-toolbar block-editor-block-list__block-mobile-toolbar">
-			<VisualEditorInserter />
+		<div className="block-editor-block-mobile-toolbar">
 			<BlockMover clientIds={ [ clientId ] } __experimentalOrientation={ moverDirection } />
 		</div>
 	);
