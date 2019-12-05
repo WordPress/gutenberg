@@ -380,10 +380,12 @@ function BlockListBlock( {
 		}
 	};
 
-	const onMouseLeave = ( event ) => {
-		// The primary button must be pressed to initiate selection.
+	const onMouseLeave = ( { which, buttons = which } ) => {
+		// The primary button must be pressed to initiate selection. Fall back
+		// to `which` if the standard `buttons` property is not supported.
 		// See https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/buttons
-		if ( event.buttons === 1 ) {
+		// See https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/which
+		if ( buttons === 1 ) {
 			onSelectionStart( clientId );
 		}
 
@@ -427,7 +429,7 @@ function BlockListBlock( {
 		! showEmptyBlockSideInserter &&
 		! isPartOfMultiSelection &&
 		! isTypingWithinBlock;
-	const shouldShowBreadcrumb = isNavigationMode && isSelected && ! isMultiSelecting;
+	const shouldShowBreadcrumb = isNavigationMode && isSelected;
 	const shouldShowContextualToolbar =
 		! isNavigationMode &&
 		! hasFixedToolbar &&
