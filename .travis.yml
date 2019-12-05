@@ -22,7 +22,6 @@ branches:
     - master
     - rnmobile/master
     - rnmobile/releases
-    - try/gallery-draft-extract-gallery
     - /wp\/.*/
 
 env:
