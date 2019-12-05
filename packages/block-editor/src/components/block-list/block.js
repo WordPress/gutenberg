@@ -380,12 +380,13 @@ function BlockListBlock( {
 		}
 	};
 
-	const onMouseLeave = ( { which, buttons = which } ) => {
+	const onMouseLeave = ( { which, buttons } ) => {
 		// The primary button must be pressed to initiate selection. Fall back
-		// to `which` if the standard `buttons` property is not supported.
+		// to `which` if the standard `buttons` property is falsy. There are
+		// cases where Firefox might always set `buttons` to `0`.
 		// See https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/buttons
 		// See https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/which
-		if ( buttons === 1 ) {
+		if ( ( buttons || which ) === 1 ) {
 			onSelectionStart( clientId );
 		}
 
