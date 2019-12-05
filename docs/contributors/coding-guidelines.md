@@ -255,7 +255,7 @@ Since an imported type declaration can occupy an excess of the available line le
 
 Note that all custom types defined in another file can be imported.
 
-When considering which types should be made available from a WordPress package, the `@typedef` statements in the package's entrypoint script should be treated as effectively the same as its public API. It is important to be aware of this, both to avoid unintentionally exposing internal types on the public interface, and as the means by which to expose the public types of a project.
+When considering which types should be made available from a WordPress package, the `@typedef` statements in the package's entrypoint script should be treated as effectively the same as its public API. It is important to be aware of this, both to avoid unintentionally exposing internal types on the public interface, and as a way to expose the public types of a project.
 
 ```js
 // packages/data/src/index.js
