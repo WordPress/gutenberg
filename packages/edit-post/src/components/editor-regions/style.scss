@@ -76,7 +76,7 @@ html {
 .edit-post-editor-regions__sidebar {
 	width: auto; // Keep the sidebar width flexible.
 	flex-shrink: 0;
-	position: fixed !important; // Need to override the default relative positionning
+	position: absolute;
 	z-index: z-index(".edit-post-editor-regions__sidebar");
 	top: 0;
 	right: 0;
