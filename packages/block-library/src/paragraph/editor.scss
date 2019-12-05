@@ -15,3 +15,8 @@
 	min-height: $empty-paragraph-height / 2;
 	line-height: $editor-line-height;
 }
+
+// Overwrite the inline style to make the height collapse when the paragraph editable gets focus.
+.block-editor-block-list__block[data-type="core/paragraph"] .has-drop-cap:focus {
+	min-height: $empty-paragraph-height / 2 !important;
+}
