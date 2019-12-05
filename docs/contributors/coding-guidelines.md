@@ -434,7 +434,7 @@ Documenting a function component should be treated the same as any other functio
  * @example
  *
  * ```jsx
- * <BlockTitle clientId="afd1cb17-2c08-4e7a-91be-007ba7ddc3a1" />
+ * <BlockTitle name="my-plugin/my-block" />
  * ```
  *
  * @param {Object}  props      Component props.
