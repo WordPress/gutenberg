@@ -149,7 +149,7 @@ export function getHorizontalRelativeGradientPosition( mouseXCoordinate, contain
 }
 
 /**
- * Get the connection state.
+ * Returns the marker points from a gradient AST.
  *
  * @param {Object} gradientAST An object representing the gradient AST.
  *
