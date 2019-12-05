@@ -386,7 +386,7 @@ function BlockListBlock( {
 		// cases where Firefox might always set `buttons` to `0`.
 		// See https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/buttons
 		// See https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/which
-		if ( ( buttons || which ) === 1 ) {
+		if ( isSelected && ( buttons || which ) === 1 ) {
 			onSelectionStart( clientId );
 		}
 
