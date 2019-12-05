@@ -216,17 +216,18 @@ describe( 'Table', () => {
 		await page.keyboard.type( '\n\n\n\n' );
 
 		// Get the bounding client rect for the second cell.
-		const { x: secondCellX, y: secondCellY } = await page.evaluate( () => {
+		const rect = await page.evaluate( () => {
 			const secondCell = document.querySelectorAll( '.wp-block-table td' )[ 1 ];
 			// Page.evaluate can only return a serializable value to the
 			// parent process, so destructure and restructure the result
 			// into an object.
-			const { x, y } = secondCell.getBoundingClientRect();
-			return { x, y };
+			const { x, y, height } = secondCell.getBoundingClientRect();
+			return { x, y, height };
 		} );
 
-		// Click in the top left corner of the second cell and type some text.
-		await page.mouse.click( secondCellX, secondCellY );
+		// Click in the bottom left corner of the second cell and type some text.
+		// Avoid the top as it might clash with inserter.
+		await page.mouse.click( rect.x, rect.y + rect.height );
 		await page.keyboard.type( 'Second cell.' );
 
 		// Expect that the snapshot shows the text in the second cell.
