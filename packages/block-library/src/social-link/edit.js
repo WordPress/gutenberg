@@ -51,6 +51,7 @@ const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
 							value={ url }
 							onChange={ ( nextURL ) => setAttributes( { url: nextURL } ) }
 							placeholder={ __( 'Enter Address' ) }
+							disableSuggestions={ true }
 						/>
 						<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
 					</form>
