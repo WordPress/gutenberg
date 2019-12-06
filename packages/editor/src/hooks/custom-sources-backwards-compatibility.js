@@ -17,7 +17,10 @@ import { addFilter } from '@wordpress/hooks';
 /** @typedef {import('@wordpress/blocks').WPBlockSettings} WPBlockSettings */
 
 /**
- * Object mapping an attribute key to its corresponding meta property.
+ * Object whose keys are the names of block attributes, where each value
+ * represents the meta key to which the block attribute is intended to save.
+ *
+ * @see https://developer.wordpress.org/reference/functions/register_meta/
  *
  * @typedef {Object<string,string>} WPMetaAttributeMapping
  */
