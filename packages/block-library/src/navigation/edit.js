@@ -114,14 +114,6 @@ function Navigation( {
 	// indicated they want to automatically add top level Pages
 	// then show the Placeholder
 	if ( ! hasExistingNavItems ) {
-		if ( isRequestingPages ) {
-			return (
-				<>
-					<Spinner /> { __( 'Loading Navigation…' ) }
-				</>
-			);
-		}
-
 		return (
 			<Fragment>
 				<Placeholder
