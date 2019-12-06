@@ -8,7 +8,7 @@ describe( 'New User Experience (NUX)', () => {
 		let welcomeGuideText, welcomeGuide;
 
 		// Create a new post as a first-time user
-		await createNewPost( { enableTips: true } );
+		await createNewPost( { showWelcomeGuide: true } );
 
 		// Guide should be on page 1 of 3
 		welcomeGuideText = await page.$eval( '.edit-post-welcome-guide', ( element ) => element.innerText );
@@ -68,7 +68,7 @@ describe( 'New User Experience (NUX)', () => {
 		let welcomeGuide;
 
 		// Create a new post as a first-time user
-		await createNewPost( { enableTips: true } );
+		await createNewPost( { showWelcomeGuide: true } );
 
 		// Guide should be open
 		welcomeGuide = await page.$( '.edit-post-welcome-guide' );

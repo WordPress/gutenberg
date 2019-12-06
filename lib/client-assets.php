@@ -402,8 +402,6 @@ add_action( 'wp_default_styles', 'gutenberg_register_packages_styles' );
  * @since 0.1.0
  */
 function gutenberg_enqueue_block_editor_assets() {
-	global $wp_scripts;
-
 	wp_add_inline_script(
 		'wp-api-fetch',
 		sprintf(
@@ -415,26 +413,6 @@ function gutenberg_enqueue_block_editor_assets() {
 			admin_url( 'admin-ajax.php?action=gutenberg_rest_nonce' )
 		),
 		'after'
-	);
-
-	// TEMPORARY: Core does not (yet) provide persistence migration from the
-	// introduction of the block editor and still calls the data plugins.
-	// We unset the existing inline scripts first.
-	$wp_scripts->registered['wp-data']->extra['after'] = array();
-	wp_add_inline_script(
-		'wp-data',
-		implode(
-			"\n",
-			array(
-				'( function() {',
-				'	var userId = ' . get_current_user_ID() . ';',
-				'	var storageKey = "WP_DATA_USER_" + userId;',
-				'	wp.data',
-				'		.use( wp.data.plugins.persistence, { storageKey: storageKey } );',
-				'	wp.data.plugins.persistence.__unstableMigrate( { storageKey: storageKey } );',
-				'} )();',
-			)
-		)
 	);
 
 	if ( defined( 'GUTENBERG_LIVE_RELOAD' ) && GUTENBERG_LIVE_RELOAD ) {
