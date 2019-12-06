@@ -6,13 +6,8 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Component, createRef } from '@wordpress/element';
-import {
-	withSelect,
-	withDispatch,
-	AsyncModeProvider,
-} from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { useEffect, useRef, useCallback } from '@wordpress/element';
+import { AsyncModeProvider, useSelect, useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -62,46 +57,72 @@ function getDeepestNode( node, type ) {
 	return node;
 }
 
-class BlockList extends Component {
-	constructor( props ) {
-		super( props );
+function BlockList( {
+	className,
+	rootClientId,
+	__experimentalMoverDirection: moverDirection = 'vertical',
+	isDraggable,
+	renderAppender,
+} ) {
+	function selector( select ) {
+		const {
+			getBlockOrder,
+			isSelectionEnabled,
+			isMultiSelecting,
+			getSelectedBlockClientId,
+			getMultiSelectedBlockClientIds,
+			hasMultiSelection,
+			getGlobalBlockCount,
+			isTyping,
+			getBlockParents,
+		} = select( 'core/block-editor' );
 
-		this.onSelectionStart = this.onSelectionStart.bind( this );
-		this.onSelectionEnd = this.onSelectionEnd.bind( this );
-		this.onSelectionChange = this.onSelectionChange.bind( this );
-		this.updateNativeSelection = this.updateNativeSelection.bind( this );
-
-		this.ref = createRef();
+		return {
+			blockClientIds: getBlockOrder( rootClientId ),
+			isSelectionEnabled: isSelectionEnabled(),
+			isMultiSelecting: isMultiSelecting(),
+			selectedBlockClientId: getSelectedBlockClientId(),
+			multiSelectedBlockClientIds: getMultiSelectedBlockClientIds(),
+			hasMultiSelection: hasMultiSelection(),
+			enableAnimation: (
+				! isTyping() &&
+				getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD
+			),
+			getBlockParents,
+		};
 	}
 
-	componentDidUpdate() {
-		this.updateNativeSelection();
-	}
-
-	componentWillUnmount() {
-		window.removeEventListener( 'mouseup', this.onSelectionEnd );
-		document.removeEventListener( 'selectionchange', this.onSelectionChange );
-		window.cancelAnimationFrame( this.rafId );
-	}
+	const {
+		blockClientIds,
+		isSelectionEnabled,
+		isMultiSelecting,
+		selectedBlockClientId,
+		multiSelectedBlockClientIds,
+		hasMultiSelection,
+		enableAnimation,
+		getBlockParents,
+	} = useSelect( selector );
+	const {
+		startMultiSelect,
+		stopMultiSelect,
+		multiSelect,
+		selectBlock,
+	} = useDispatch( 'core/block-editor' );
+	const ref = useRef();
+	const rafId = useRef();
+	const startClientId = useRef();
 
 	/**
 	 * When the component updates, and there is multi selection, we need to
 	 * select the entire block contents.
 	 */
-	updateNativeSelection() {
-		const {
-			hasMultiSelection,
-			blockClientIds,
-			// These must be in the right DOM order.
-			multiSelectedBlockClientIds,
-			isMultiSelecting,
-		} = this.props;
-
+	useEffect( () => {
 		if ( ! hasMultiSelection || isMultiSelecting ) {
 			return;
 		}
 
 		const { length } = multiSelectedBlockClientIds;
+		// These must be in the right DOM order.
 		const start = multiSelectedBlockClientIds[ 0 ];
 		const end = multiSelectedBlockClientIds[ length - 1 ];
 		const startIndex = blockClientIds.indexOf( start );
@@ -111,10 +132,10 @@ class BlockList extends Component {
 			return;
 		}
 
-		let startNode = this.ref.current.querySelector(
+		let startNode = ref.current.querySelector(
 			`[data-block="${ start }"]`
 		);
-		let endNode = this.ref.current.querySelector(
+		let endNode = ref.current.querySelector(
 			`[data-block="${ end }"]`
 		);
 
@@ -131,70 +152,16 @@ class BlockList extends Component {
 
 		selection.removeAllRanges();
 		selection.addRange( range );
-	}
+	}, [
+		hasMultiSelection,
+		isMultiSelecting,
+		multiSelectedBlockClientIds,
+		blockClientIds,
+		selectBlock,
+	] );
 
-	/**
-	 * Binds event handlers to the document for tracking a pending multi-select
-	 * in response to a mousedown event occurring in a rendered block.
-	 *
-	 * @param {string} clientId Client ID of block where mousedown occurred.
-	 */
-	onSelectionStart( clientId ) {
-		if ( ! this.props.isSelectionEnabled ) {
-			return;
-		}
-
-		this.startClientId = clientId;
-		this.props.onStartMultiSelect();
-
-		// `onSelectionStart` is called after `mousedown` and `mouseleave`
-		// (from a block). The selection ends when `mouseup` happens anywhere
-		// in the window.
-		window.addEventListener( 'mouseup', this.onSelectionEnd );
-		document.addEventListener( 'selectionchange', this.onSelectionChange );
-
-		// Removing the contenteditable attributes within the block editor is
-		// essential for selection to work across editable areas. The edible
-		// hosts are removed, allowing selection to be extended outside the
-		// DOM element. `onStartMultiSelect` sets a flag in the store so the
-		// rich text components are updated, but the rerender may happen very
-		// slowly, especially in Safari for the blocks that are asynchonously
-		// rendered. To ensure the browser instantly removes the selection
-		// boundaries, we remove the contenteditable attributes manually.
-		Array.from(
-			this.ref.current.querySelectorAll( '.rich-text' )
-		).forEach( ( node ) => {
-			node.removeAttribute( 'contenteditable' );
-		} );
-	}
-
-	/**
-	 * Handles a mouseup event to end the current mouse multi-selection.
-	 */
-	onSelectionEnd() {
-		// Equivalent to attaching the listener once.
-		window.removeEventListener( 'mouseup', this.onSelectionEnd );
-		document.removeEventListener( 'selectionchange', this.onSelectionChange );
-
-		if ( ! this.props.isMultiSelecting ) {
-			return;
-		}
-
-		// The browser selection won't have updated yet at this point, so wait
-		// until the next animation frame to get the browser selection.
-		this.rafId = window.requestAnimationFrame( () => {
-			this.onSelectionChange();
-			this.props.onStopMultiSelect();
-		} );
-	}
-
-	onSelectionChange() {
+	const onSelectionChange = useCallback( () => {
 		const selection = window.getSelection();
-		const {
-			onMultiSelect,
-			getBlockParents,
-			onSelectBlock,
-		} = this.props;
 
 		// If no selection is found, end multi selection.
 		if ( ! selection.rangeCount || selection.isCollapsed ) {
@@ -212,128 +179,116 @@ class BlockList extends Component {
 			! ( clientId = focusNode.getAttribute( 'data-block' ) )
 		);
 
-		if ( this.startClientId === clientId ) {
-			onSelectBlock( clientId );
+		console.log( startClientId.current );
+
+		if ( startClientId.current === clientId ) {
+			selectBlock( clientId );
 		} else {
-			const startPath = [ ...getBlockParents( this.startClientId ), this.startClientId ];
+			const startPath = [ ...getBlockParents( startClientId.current ), startClientId.current ];
 			const endPath = [ ...getBlockParents( clientId ), clientId ];
 			const depth = Math.min( startPath.length, endPath.length ) - 1;
 
-			onMultiSelect( startPath[ depth ], endPath[ depth ] );
+			multiSelect( startPath[ depth ], endPath[ depth ] );
 		}
-	}
+	}, [ selectBlock, getBlockParents, multiSelect ] );
 
-	render() {
-		const {
-			className,
-			blockClientIds,
-			rootClientId,
-			__experimentalMoverDirection: moverDirection = 'vertical',
-			selectedBlockClientId,
-			multiSelectedBlockClientIds,
-			hasMultiSelection,
-			renderAppender,
-			enableAnimation,
-			isMultiSelecting,
-		} = this.props;
+	/**
+	 * Handles a mouseup event to end the current mouse multi-selection.
+	 */
+	const onSelectionEnd = useCallback( () => {
+		document.removeEventListener( 'selectionchange', onSelectionChange );
+		// Equivalent to attaching the listener once.
+		window.removeEventListener( 'mouseup', onSelectionEnd );
+		// The browser selection won't have updated yet at this point, so wait
+		// until the next animation frame to get the browser selection.
+		rafId.current = window.requestAnimationFrame( () => {
+			onSelectionChange();
+			stopMultiSelect();
+		} );
+	}, [ onSelectionChange, stopMultiSelect ] );
 
-		return (
-			<div
-				ref={ this.ref }
-				className={ classnames(
-					'editor-block-list__layout block-editor-block-list__layout',
-					className
-				) }
-			>
-				{ blockClientIds.map( ( clientId, index ) => {
-					const isBlockInSelection = hasMultiSelection ?
-						multiSelectedBlockClientIds.includes( clientId ) :
-						selectedBlockClientId === clientId;
+	// Only clean up when unmounting, these are added and cleaned up elsewhere.
+	useEffect( () => () => {
+		document.removeEventListener( 'selectionchange', onSelectionChange );
+		window.removeEventListener( 'mouseup', onSelectionEnd );
+		window.cancelAnimationFrame( rafId.current );
+	}, [ onSelectionEnd ] );
 
-					return (
-						<BlockAsyncModeProvider
-							key={ 'block-' + clientId }
+	/**
+	 * Binds event handlers to the document for tracking a pending multi-select
+	 * in response to a mousedown event occurring in a rendered block.
+	 */
+	const onSelectionStart = useCallback( ( clientId ) => {
+		if ( ! isSelectionEnabled ) {
+			return;
+		}
+
+		startClientId.current = clientId;
+		startMultiSelect();
+
+		// `onSelectionStart` is called after `mousedown` and `mouseleave`
+		// (from a block). The selection ends when `mouseup` happens anywhere
+		// in the window.
+		document.addEventListener( 'selectionchange', onSelectionChange );
+		window.addEventListener( 'mouseup', onSelectionEnd );
+
+		// Removing the contenteditable attributes within the block editor is
+		// essential for selection to work across editable areas. The edible
+		// hosts are removed, allowing selection to be extended outside the
+		// DOM element. `startMultiSelect` sets a flag in the store so the rich
+		// text components are updated, but the rerender may happen very slowly,
+		// especially in Safari for the blocks that are asynchonously rendered.
+		// To ensure the browser instantly removes the selection boundaries, we
+		// remove the contenteditable attributes manually.
+		Array.from( ref.current.querySelectorAll( '.rich-text' ) )
+			.forEach( ( node ) => node.removeAttribute( 'contenteditable' ) );
+	}, [ isSelectionEnabled, startMultiSelect, onSelectionEnd ] );
+
+	return (
+		<div
+			ref={ ref }
+			className={ classnames(
+				'editor-block-list__layout block-editor-block-list__layout',
+				className
+			) }
+		>
+			{ blockClientIds.map( ( clientId, index ) => {
+				const isBlockInSelection = hasMultiSelection ?
+					multiSelectedBlockClientIds.includes( clientId ) :
+					selectedBlockClientId === clientId;
+
+				return (
+					<BlockAsyncModeProvider
+						key={ 'block-' + clientId }
+						clientId={ clientId }
+						isBlockInSelection={ isBlockInSelection }
+					>
+						<BlockListBlock
+							rootClientId={ rootClientId }
 							clientId={ clientId }
-							isBlockInSelection={ isBlockInSelection }
-						>
-							<BlockListBlock
-								rootClientId={ rootClientId }
-								clientId={ clientId }
-								onSelectionStart={ this.onSelectionStart }
-								moverDirection={ moverDirection }
-								isMultiSelecting={ isMultiSelecting }
-								// This prop is explicitely computed and passed down
-								// to avoid being impacted by the async mode
-								// otherwise there might be a small delay to trigger the animation.
-								animateOnChange={ index }
-								enableAnimation={ enableAnimation }
-							/>
-						</BlockAsyncModeProvider>
-					);
-				} ) }
-
-				<BlockListAppender
-					rootClientId={ rootClientId }
-					renderAppender={ renderAppender }
-				/>
-
-				<__experimentalBlockListFooter.Slot />
-			</div>
-		);
-	}
+							onSelectionStart={ onSelectionStart }
+							isDraggable={ isDraggable }
+							moverDirection={ moverDirection }
+							isMultiSelecting={ isMultiSelecting }
+							// This prop is explicitely computed and passed down
+							// to avoid being impacted by the async mode
+							// otherwise there might be a small delay to trigger the animation.
+							animateOnChange={ index }
+							enableAnimation={ enableAnimation }
+						/>
+					</BlockAsyncModeProvider>
+				);
+			} ) }
+			<BlockListAppender
+				rootClientId={ rootClientId }
+				renderAppender={ renderAppender }
+			/>
+			<__experimentalBlockListFooter.Slot />
+		</div>
+	);
 }
 
-export default compose( [
-	// This component needs to always be synchronous
-	// as it's the one changing the async mode
-	// depending on the block selection.
-	forceSyncUpdates,
-	withSelect( ( select, ownProps ) => {
-		const {
-			getBlockOrder,
-			isSelectionEnabled,
-			isMultiSelecting,
-			getMultiSelectedBlocksStartClientId,
-			getMultiSelectedBlocksEndClientId,
-			getSelectedBlockClientId,
-			getMultiSelectedBlockClientIds,
-			hasMultiSelection,
-			getGlobalBlockCount,
-			isTyping,
-			getBlockParents,
-		} = select( 'core/block-editor' );
-
-		const { rootClientId } = ownProps;
-
-		return {
-			blockClientIds: getBlockOrder( rootClientId ),
-			selectionStart: getMultiSelectedBlocksStartClientId(),
-			selectionEnd: getMultiSelectedBlocksEndClientId(),
-			isSelectionEnabled: isSelectionEnabled(),
-			isMultiSelecting: isMultiSelecting(),
-			selectedBlockClientId: getSelectedBlockClientId(),
-			multiSelectedBlockClientIds: getMultiSelectedBlockClientIds(),
-			hasMultiSelection: hasMultiSelection(),
-			enableAnimation: (
-				! isTyping() &&
-				getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD
-			),
-			getBlockParents,
-		};
-	} ),
-	withDispatch( ( dispatch ) => {
-		const {
-			startMultiSelect,
-			stopMultiSelect,
-			multiSelect,
-			selectBlock,
-		} = dispatch( 'core/block-editor' );
-
-		return {
-			onStartMultiSelect: startMultiSelect,
-			onStopMultiSelect: stopMultiSelect,
-			onMultiSelect: multiSelect,
-			onSelectBlock: selectBlock,
-		};
-	} ),
-] )( BlockList );
+// This component needs to always be synchronous
+// as it's the one changing the async mode
+// depending on the block selection.
+export default forceSyncUpdates( BlockList );
