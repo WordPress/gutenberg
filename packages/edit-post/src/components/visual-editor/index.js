@@ -12,7 +12,6 @@ import {
 	BlockList,
 	CopyHandler,
 	BlockSelectionClearer,
-	MultiSelectScrollIntoView,
 	__experimentalBlockSettingsMenuFirstItem,
 	__experimentalBlockSettingsMenuPluginsExtension,
 } from '@wordpress/block-editor';
@@ -27,7 +26,6 @@ function VisualEditor() {
 	return (
 		<BlockSelectionClearer className="edit-post-visual-editor editor-styles-wrapper">
 			<VisualEditorGlobalKeyboardShortcuts />
-			<MultiSelectScrollIntoView />
 			<Typewriter>
 				<WritingFlow>
 					<ObserveTyping>
