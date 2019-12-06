@@ -135,7 +135,7 @@ class URLInput extends Component {
 	onChange( event ) {
 		const inputValue = event.target.value;
 		this.props.onChange( inputValue );
-		if ( this.state.showSuggestions ) {
+		if ( ! this.props.disableSuggestions ) {
 			this.updateSuggestions( inputValue );
 		}
 	}
