@@ -3020,7 +3020,7 @@ appium-youiengine-driver@^1.2.0:
     source-map-support "^0.5.9"
     teen_process "^1.14.1"
 
-appium@^1.15.1:
+appium@^1.15.0:
   version "1.15.1"
   resolved "https://registry.yarnpkg.com/appium/-/appium-1.15.1.tgz#f51e63e3f7665b9aec3e4970624045f4b323bf15"
   integrity sha512-5gxp2Vs61GL0GSL2IzNg6OrWjuJXvdGoxxxs/NkZpzJXbT3JZ1Eo3dQSN5iprEigofeg2J98qvLxmStw64N88w==
