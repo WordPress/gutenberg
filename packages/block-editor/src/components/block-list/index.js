@@ -16,7 +16,7 @@ import BlockAsyncModeProvider from './block-async-mode-provider';
 import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
 import __experimentalBlockListFooter from '../block-list-footer';
-import useSelection from './use-selection';
+import useMultiSelection from './use-multi-selection';
 
 /**
  * If the block count exceeds the threshold, we disable the reordering animation
@@ -72,7 +72,7 @@ function BlockList( {
 		enableAnimation,
 	} = useSelect( selector );
 	const ref = useRef();
-	const onSelectionStart = useSelection( { ref, rootClientId } );
+	const onSelectionStart = useMultiSelection( { ref, rootClientId } );
 
 	return (
 		<div

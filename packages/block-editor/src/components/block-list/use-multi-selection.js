@@ -30,7 +30,7 @@ function getDeepestNode( node, type ) {
 	return node;
 }
 
-export default function useSelection( { ref, rootClientId } ) {
+export default function useMultiSelection( { ref, rootClientId } ) {
 	function selector( select ) {
 		const {
 			getBlockOrder,
