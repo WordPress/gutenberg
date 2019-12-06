@@ -12,6 +12,8 @@ import {
 async function updateActiveNavigationLink( { url, label } ) {
 	if ( url ) {
 		await page.type( 'input[placeholder="Search or type url"]', url );
+		// Wait for the autocomplete suggestion item to appear.
+		await page.waitForXPath( `//span[@class="block-editor-link-control__search-item-title"]/mark[text()="${ url }"]` );
 		await page.keyboard.press( 'Enter' );
 	}
 	if ( label ) {
@@ -30,9 +32,10 @@ describe( 'Navigation', () => {
 		// Add the navigation block.
 		await insertBlock( 'Navigation' );
 
-		// Create an empty nav block.
-		await page.waitForSelector( '.wp-block-navigation-placeholder' );
-		const [ createFromExistingButton ] = await page.$x( '//button[text()="Create from all top pages"]' );
+		// Create an empty nav block. The 'create' button is disabled until pages are loaded,
+		// so we must wait for it to become not-disabled.
+		await page.waitForXPath( '//button[text()="Create from all top pages"][not(@disabled)]' );
+		const [ createFromExistingButton ] = await page.$x( '//button[text()="Create from all top pages"][not(@disabled)]' );
 		await createFromExistingButton.click();
 
 		// Snapshot should contain the default 'Sample Page'.
