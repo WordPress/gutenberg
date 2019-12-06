@@ -287,8 +287,9 @@ export default compose( [
 		const isAncestorSelected = selectedBlockClientId && parents.includes( selectedBlockClientId );
 		const isSelectedBlockNested = !! getBlockRootClientId( selectedBlockClientId );
 
-		const isDescendantSelected = selectedBlockClientId && getBlockParents( selectedBlockClientId ).includes( clientId );
-		const isDescendantOfParentSelected = selectedBlockClientId && getBlockParents( selectedBlockClientId ).includes( parentId );
+		const selectedParents = selectedBlockClientId ? getBlockParents( selectedBlockClientId ) : [];
+		const isDescendantSelected = selectedParents.includes( clientId );
+		const isDescendantOfParentSelected = selectedParents.includes( parentId );
 		const isTouchable = isSelected || isDescendantOfParentSelected || isParentSelected || parentId === '';
 		const isDimmed = ! isSelected && isSelectedBlockNested && ! isAncestorSelected && ! isDescendantSelected && ( isDescendantOfParentSelected || rootBlockId === clientId );
 
