@@ -322,7 +322,8 @@ const Popover = ( {
 			setAnimateOrigin( animateXAxis + ' ' + animateYAxis );
 		};
 
-		const rafId = window.requestAnimationFrame( refresh );
+		// Height may still adjust between now and the next tick.
+		const timeoutId = window.setTimeout( refresh );
 
 		/*
 		 * There are sometimes we need to reposition or resize the popover that
@@ -336,7 +337,7 @@ const Popover = ( {
 		window.addEventListener( 'scroll', refresh, true );
 
 		return () => {
-			window.cancelAnimationFrame( rafId );
+			window.clearTimeout( timeoutId );
 			window.clearInterval( intervalHandle );
 			window.removeEventListener( 'resize', refresh );
 			window.removeEventListener( 'scroll', refresh, true );
