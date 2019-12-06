@@ -71,7 +71,16 @@ export class BlockList extends Component {
 	}
 
 	render() {
-		const { clearSelectedBlock, blockClientIds, isFullyBordered, title, header, withFooter = true, renderAppender, isRootList } = this.props;
+		const {
+			clearSelectedBlock,
+			blockClientIds,
+			isFullyBordered,
+			title,
+			header,
+			withFooter = true,
+			renderAppender,
+			isRootList,
+		} = this.props;
 
 		return (
 			<View
