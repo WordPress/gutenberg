@@ -1,5 +1,3 @@
-dist: trusty
-
 language: generic
 
 services:
@@ -31,6 +29,13 @@ env:
     - LOCAL_SCRIPT_DEBUG: false
     - INSTALL_COMPOSER: false
     - INSTALL_WORDPRESS: true
+
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - libstdc++-4.9-dev
 
 before_install:
   - nvm install --latest-npm
