@@ -136,8 +136,8 @@ export default class TokenList {
 	 *
 	 * @see https://dom.spec.whatwg.org/#dom-domtokenlist-toggle
 	 *
-	 * @param {string}   token Token to toggle.
-	 * @param {boolean=} force Presence to force.
+	 * @param {string}  token   Token to toggle.
+	 * @param {boolean} [force] Presence to force.
 	 *
 	 * @return {boolean} Whether token is present after toggle.
 	 */
