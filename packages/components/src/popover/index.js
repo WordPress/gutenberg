@@ -267,7 +267,7 @@ const Popover = ( {
 			return;
 		}
 
-		const refresh = ( event ) => {
+		const refresh = () => {
 			let anchor = computeAnchorRect(
 				anchorRefFallback,
 				anchorRect,
@@ -286,14 +286,7 @@ const Popover = ( {
 				anchorHorizontalBuffer
 			);
 
-			// Only recheck the content rect on interval as it's unlikely to
-			// change much, but sometimes the popover content may change.
-			if ( ! event ) {
-				setStyle( contentEl, 'maxHeight' );
-				setStyle( contentEl, 'maxWidth' );
-			}
-
-			if ( ! event || ! contentRect.current ) {
+			if ( ! contentRect.current ) {
 				contentRect.current = contentEl.getBoundingClientRect();
 			}
 
@@ -329,7 +322,7 @@ const Popover = ( {
 			setAnimateOrigin( animateXAxis + ' ' + animateYAxis );
 		};
 
-		refresh();
+		const rafId = window.requestAnimationFrame( refresh );
 
 		/*
 		 * There are sometimes we need to reposition or resize the popover that
@@ -343,6 +336,7 @@ const Popover = ( {
 		window.addEventListener( 'scroll', refresh, true );
 
 		return () => {
+			window.cancelAnimationFrame( rafId );
 			window.clearInterval( intervalHandle );
 			window.removeEventListener( 'resize', refresh );
 			window.removeEventListener( 'scroll', refresh, true );
