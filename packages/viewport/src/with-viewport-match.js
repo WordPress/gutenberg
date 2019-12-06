@@ -6,7 +6,7 @@ import { mapValues } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { createHigherOrderComponent, useViewportMatch } from '@wordpress/compose';
+import { createHigherOrderComponent, pure, useViewportMatch } from '@wordpress/compose';
 
 /**
  * Higher-order component creator, creating a new component which renders with
@@ -46,7 +46,7 @@ const withViewportMatch = ( queries ) => {
 	} );
 	return createHigherOrderComponent(
 		( WrappedComponent ) => {
-			return ( props ) => {
+			return pure( ( props ) => {
 				const queriesResult = useViewPortQueriesResult();
 				return (
 					<WrappedComponent
@@ -54,7 +54,7 @@ const withViewportMatch = ( queries ) => {
 						{ ...queriesResult }
 					/>
 				);
-			};
+			} );
 		},
 		'withViewportMatch'
 	);

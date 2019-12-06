@@ -7,6 +7,7 @@ import renderer from 'react-test-renderer';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
+import { useViewportMatch as useViewportMatchMock } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -14,27 +15,11 @@ import { Component } from '@wordpress/element';
 import '../store';
 import withViewportMatch from '../with-viewport-match';
 
-jest.mock( '@wordpress/compose', () => {
-	return {
-		...jest.requireActual( '@wordpress/compose' ),
-		useViewportMatch( breakPoint, operator ) {
-			if ( breakPoint === 'wide' && operator === '>=' ) {
-				return false;
-			}
-			if ( breakPoint === 'small' && operator === '>=' ) {
-				return true;
-			}
-			if ( breakPoint === 'large' && operator === '>=' ) {
-				return true;
-			}
-			if ( breakPoint === 'small' && operator === '<' ) {
-				return false;
-			}
-		},
-	};
-} );
-
 describe( 'withViewportMatch()', () => {
+	afterEach( () => {
+		useViewportMatchMock.mockClear();
+	} );
+
 	const ChildComponent = () => <div>Hello</div>;
 
 	// this is needed because TestUtils does not accept a stateless component.
@@ -56,7 +41,20 @@ describe( 'withViewportMatch()', () => {
 			isLessThanSmall: '< small',
 		}
 		)( ChildComponent );
+
+		useViewportMatchMock.mockReturnValueOnce( false );
+		useViewportMatchMock.mockReturnValueOnce( true );
+		useViewportMatchMock.mockReturnValueOnce( true );
+		useViewportMatchMock.mockReturnValueOnce( false );
+
 		const wrapper = renderer.create( getTestComponent( EnhancedComponent ) );
+
+		expect( useViewportMatchMock.mock.calls ).toEqual( [
+			[ 'wide', '>=' ],
+			[ 'small', '>=' ],
+			[ 'large', '>=' ],
+			[ 'small', '<' ],
+		] );
 
 		const { props } = wrapper.root.findByType( ChildComponent );
 		expect( props.isWide ).toBe( false );
