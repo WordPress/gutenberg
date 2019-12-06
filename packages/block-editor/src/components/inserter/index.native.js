@@ -150,6 +150,7 @@ class Inserter extends Component {
 					ref={ ( instance ) => ( this.picker = instance ) }
 					options={ this.getInsertionOptions() }
 					onChange={ onPickerSelect }
+					hideCancelButton
 				/>
 			</>
 		);
