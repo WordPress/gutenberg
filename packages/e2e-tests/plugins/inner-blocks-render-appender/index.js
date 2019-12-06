@@ -1,16 +1,10 @@
 ( function() {
-	var wp = window.wp;
-	var registerBlockType = wp.blocks.registerBlockType;
-	var el = wp.element.createElement;
-	var InnerBlocks = wp.blockEditor.InnerBlocks;
-	var withSelect = wp.data.withSelect;
+	const { wp } = window;
+	const { registerBlockType } = wp.blocks;
+	const { createElement: el } = wp.element;
+	const { InnerBlocks } = wp.blockEditor;
+	const { useSelect } = wp.data;
 
-	var dataSelector = withSelect( function( select, ownProps ) {
-		var getBlockOrder = select( 'core/block-editor' ).getBlockOrder;
-		return {
-			numberOfChildren: getBlockOrder( ownProps.clientId ).length,
-		};
-	} );
 	var allowedBlocks = [ 'core/quote', 'core/video' ];
 
 	function myCustomAppender() {
@@ -48,7 +42,7 @@
 		);
 	}
 
-	registerBlockType( 'test/inner-blocks-renderappender', {
+	registerBlockType( 'test/inner-blocks-render-appender', {
 		title: 'InnerBlocks renderAppender',
 		icon: 'carrot',
 		category: 'common',
@@ -69,14 +63,17 @@
 		},
 	} );
 
-	registerBlockType( 'test/inner-blocks-renderappender-dynamic', {
+	registerBlockType( 'test/inner-blocks-render-appender-dynamic', {
 		title: 'InnerBlocks renderAppender dynamic',
 		icon: 'carrot',
 		category: 'common',
 
-		edit: dataSelector( function( props ) {
-			var renderAppender;
-			switch ( props.numberOfChildren ) {
+		edit( props ) {
+			const numberOfChildren = useSelect( ( select ) => {
+				const { getBlockOrder } = select( 'core/block-editor' );
+				return getBlockOrder( props.clientId ).length;
+			}, [ props.clientId ] );
+			switch ( numberOfChildren ) {
 				case 0:
 					renderAppender = emptyBlockAppender;
 					break;
@@ -93,7 +90,7 @@
 					renderAppender,
 				} )
 			);
-		} ),
+		},
 
 		save() {
 			return el( 'div', { style: { outline: '1px solid gray', padding: 5 } },
