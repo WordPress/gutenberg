@@ -41,12 +41,14 @@ import BlockColorsStyleSelector from './block-colors-selector';
 import * as navIcons from './icons';
 
 function Navigation( {
+	attributes,
 	clientId,
 	pages,
 	isRequestingPages,
 	hasResolvedPages,
 	hasExistingNavItems,
 	updateNavItemBlocks,
+	setAttributes,
 } ) {
 	//
 	// HOOKS
