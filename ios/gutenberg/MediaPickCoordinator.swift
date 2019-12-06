@@ -8,10 +8,10 @@ class MediaPickCoordinator: NSObject, UIImagePickerControllerDelegate, UINavigat
   
   private let presenter: UIViewController
   private let callback: (URL?) -> Void
-  private let filter: MediaFilter
+  private let filter: Gutenberg.MediaType
   
   init(presenter: UIViewController,
-       filter: MediaFilter,
+       filter: Gutenberg.MediaType,
        callback: @escaping (URL?) -> Void) {
       self.presenter = presenter
       self.callback = callback
