@@ -22,6 +22,7 @@ import {
 	PanelBody,
 	RangeControl,
 	MissingControl,
+	NotificationSheet,
 } from '@wordpress/components';
 import {
 	useCallback,
@@ -35,7 +36,6 @@ import { withDispatch } from '@wordpress/data';
 import richTextStyle from './richText.scss';
 import styles from './editor.scss';
 import RichTextWrapper from './richTextWrapper';
-import NotificationSheet from '../missing/notificationSheet';
 
 const NEW_TAB_REL = 'noreferrer noopener';
 const INITIAL_BORDER_RADIUS = 4;

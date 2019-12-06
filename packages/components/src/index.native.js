@@ -38,3 +38,5 @@ export { default as KeyboardAvoidingView } from './mobile/keyboard-avoiding-view
 export { default as KeyboardAwareFlatList } from './mobile/keyboard-aware-flat-list';
 export { default as Picker } from './mobile/picker';
 export { default as ReadableContentView } from './mobile/readable-content-view';
+export { default as NotificationSheet } from './mobile/notification-sheet';
+
