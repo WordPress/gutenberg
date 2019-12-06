@@ -59,6 +59,12 @@ const IMAGE_SIZE_THUMBNAIL = 'thumbnail';
 const IMAGE_SIZE_MEDIUM = 'medium';
 const IMAGE_SIZE_LARGE = 'large';
 const IMAGE_SIZE_FULL_SIZE = 'full';
+const sizeArray = [
+	IMAGE_SIZE_THUMBNAIL,
+	IMAGE_SIZE_MEDIUM,
+	IMAGE_SIZE_LARGE,
+	IMAGE_SIZE_FULL_SIZE,
+];
 const DEFAULT_SIZE_SLUG = IMAGE_SIZE_LARGE;
 const sizeOptionLabels = {
 	[ IMAGE_SIZE_THUMBNAIL ]: __( 'Thumbnail' ),
@@ -221,9 +227,13 @@ export class ImageEdit extends React.Component {
 		this.props.setAttributes( updatedLinkTarget );
 	}
 
-	onSetSizeSlug( sizeSlug ) {
+	onSetSizeSlug( prevSizeSlug ) {
 		const { image } = this.props;
 
+		if ( prevSizeSlug === undefined ) {
+			prevSizeSlug = IMAGE_SIZE_LARGE;
+		}
+		const sizeSlug = sizeArray[ ( sizeArray.indexOf( prevSizeSlug ) + 1 ) % sizeArray.length ];
 		const url = getUrlForSlug( image, { sizeSlug } );
 		if ( ! url ) {
 			this.props.setAttributes( {
@@ -340,16 +350,14 @@ export class ImageEdit extends React.Component {
 						checked={ linkTarget === '_blank' }
 						onChange={ this.onSetNewTab }
 					/>
-					{ // eslint-disable-next-line no-undef
-						__DEV__ &&
-						<SelectControl
-							hideCancelButton
-							icon={ 'editor-expand' }
-							label={ __( 'Size' ) }
-							value={ sizeOptionLabels[ sizeSlug || DEFAULT_SIZE_SLUG ] }
-							onChangeValue={ ( newValue ) => this.onSetSizeSlug( newValue ) }
-							options={ sizeOptions }
-						/> }
+					<SelectControl
+						hideCancelButton
+						icon={ 'editor-expand' }
+						label={ __( 'Size' ) }
+						value={ sizeOptionLabels[ sizeSlug || DEFAULT_SIZE_SLUG ] }
+						onChangeValue={ () => this.onSetSizeSlug( sizeSlug ) }
+						options={ sizeOptions }
+					/>
 					<TextControl
 						icon={ 'editor-textcolor' }
 						label={ __( 'Alt Text' ) }

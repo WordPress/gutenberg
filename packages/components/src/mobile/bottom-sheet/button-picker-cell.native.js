@@ -2,7 +2,6 @@
  * Internal dependencies
  */
 import Cell from './cell';
-import BottomSheetButton from './button';
 import styles from './styles.scss';
 
 export default function BottomSheetButtonPickerCell( props ) {
@@ -11,28 +10,14 @@ export default function BottomSheetButtonPickerCell( props ) {
 		...cellProps
 	} = props;
 
-	const onChange = ( newValue ) => {
-		onChangeValue( newValue );
+	const onChange = () => {
+		onChangeValue();
 	};
 
 	return (
-		<Cell valueStyle={ styles.sizeButtonsCell } editable={ false } { ...cellProps } >
-			<BottomSheetButton
-				text={ 'S' }
-				onPress={ () => onChange( 'thumbnail' ) }
-			/>
-			<BottomSheetButton
-				text={ 'M' }
-				onPress={ () => onChange( 'medium' ) }
-			/>
-			<BottomSheetButton
-				text={ 'L' }
-				onPress={ () => onChange( 'large' ) }
-			/>
-			<BottomSheetButton
-				text={ 'F' }
-				onPress={ () => onChange( 'full' ) }
-			/>
-		</Cell>
+		<Cell
+			onPress={ () => onChange() }
+			valueStyle={ styles.sizeButtonsCell }
+			editable={ false } { ...cellProps } />
 	);
 }
