@@ -1,6 +1,7 @@
 1.19.0
 ------
 * [iOS] Fix crash dismissing bottom-sheet after device rotation.
+* New block: Gallery. You can now create image galleries using WordPress Media library. Upload feature is coming soon.
 
 1.18.0
 ------
