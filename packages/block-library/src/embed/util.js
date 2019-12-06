@@ -47,6 +47,12 @@ export const findBlock = ( url ) => {
 };
 
 export const isFromWordPress = ( html ) => {
+	// A bit of a hack because Figma includes the following class which
+	// is the determining factor if the embed is from WordPress or not
+	if ( includes( html, 'figma' ) ) {
+		return false;
+	}
+
 	return includes( html, 'class="wp-embedded-content"' );
 };
 
