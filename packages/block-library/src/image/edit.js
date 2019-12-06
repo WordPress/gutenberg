@@ -33,7 +33,6 @@ import {
 	TextControl,
 	ToggleControl,
 	ToolbarGroup,
-	withNotices,
 } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import {
@@ -297,8 +296,8 @@ export class ImageEdit extends Component {
 	componentDidMount() {
 		const {
 			attributes,
+			createNotice,
 			mediaUpload,
-			noticeOperations,
 		} = this.props;
 		const { id, url = '' } = attributes;
 
@@ -313,7 +312,14 @@ export class ImageEdit extends Component {
 					},
 					allowedTypes: ALLOWED_MEDIA_TYPES,
 					onError: ( message ) => {
-						noticeOperations.createErrorNotice( message );
+						createNotice(
+							'error',
+							message[ 2 ] ? message[ 2 ] : __( 'Sorry an error occourred.' ),
+							{
+								type: 'snackbar',
+							},
+						);
+
 						this.setState( { isEditing: true } );
 					},
 				} );
@@ -337,9 +343,15 @@ export class ImageEdit extends Component {
 	}
 
 	onUploadError( message ) {
-		const { noticeOperations } = this.props;
-		noticeOperations.removeAllNotices();
-		noticeOperations.createErrorNotice( message );
+		const { createNotice } = this.props;
+		createNotice(
+			'error',
+			message[ 2 ] ? message[ 2 ] : __( 'Sorry an error occourred.' ),
+			{
+				type: 'snackbar',
+			},
+		);
+
 		this.setState( {
 			isEditing: true,
 		} );
@@ -583,7 +595,6 @@ export class ImageEdit extends Component {
 			isSelected,
 			className,
 			maxWidth,
-			noticeUI,
 			isRTL,
 			onResizeStart,
 			onResizeStop,
@@ -678,7 +689,6 @@ export class ImageEdit extends Component {
 				onSelectURL={ this.onSelectURL }
 				onDoubleClick={ this.toggleIsEditing }
 				onCancel={ !! url && this.toggleIsEditing }
-				notices={ noticeUI }
 				onError={ this.onUploadError }
 				accept="image/*"
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
@@ -957,10 +967,12 @@ export class ImageEdit extends Component {
 export default compose( [
 	withDispatch( ( dispatch ) => {
 		const { toggleSelection } = dispatch( 'core/block-editor' );
+		const { createNotice } = dispatch( 'core/notices' );
 
 		return {
 			onResizeStart: () => toggleSelection( false ),
 			onResizeStop: () => toggleSelection( true ),
+			createNotice,
 		};
 	} ),
 	withSelect( ( select, props ) => {
@@ -983,5 +995,4 @@ export default compose( [
 		};
 	} ),
 	withViewportMatch( { isLargeViewport: 'medium' } ),
-	withNotices,
 ] )( ImageEdit );
