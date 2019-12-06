@@ -49,14 +49,14 @@
 
 .edit-post-header .components-button {
 	// Header toggle buttons.
-	&.is-toggled {
+	&.is-pressed {
 		color: $white;
 		background: $dark-gray-500;
 	}
 
 	// The !important in this ruleset need to override the pile of :not() selectors used in the icon-button.
-	&.is-toggled:hover,
-	&.is-toggled:focus {
+	&.is-pressed:hover,
+	&.is-pressed:focus {
 		box-shadow: 0 0 0 $border-width $dark-gray-500, inset 0 0 0 $border-width $white !important;
 		color: $white !important;
 		background: $dark-gray-500 !important;

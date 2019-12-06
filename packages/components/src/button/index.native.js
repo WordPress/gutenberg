@@ -67,7 +67,7 @@ export function Button( props ) {
 		hint,
 		fixedRatio = true,
 		getStylesFromColorScheme,
-		isToggled,
+		isPressed,
 		'aria-disabled': ariaDisabled,
 		'aria-label': ariaLabel,
 		'data-subscript': subscript,
@@ -78,11 +78,11 @@ export function Button( props ) {
 	const buttonViewStyle = {
 		opacity: isDisabled ? 0.3 : 1,
 		...( fixedRatio && styles.fixedRatio ),
-		...( isToggled ? styles.buttonActive : styles.buttonInactive ),
+		...( isPressed ? styles.buttonActive : styles.buttonInactive ),
 	};
 
 	const states = [];
-	if ( isToggled ) {
+	if ( isPressed ) {
 		states.push( 'selected' );
 	}
 
@@ -93,7 +93,7 @@ export function Button( props ) {
 	const subscriptInactive = getStylesFromColorScheme( styles.subscriptInactive, styles.subscriptInactiveDark );
 
 	const newChildren = Children.map( children, ( child ) => {
-		return child ? cloneElement( child, { colorScheme: props.preferredColorScheme, isToggled } ) : child;
+		return child ? cloneElement( child, { colorScheme: props.preferredColorScheme, isPressed } ) : child;
 	} );
 
 	return (
@@ -111,7 +111,7 @@ export function Button( props ) {
 			<View style={ buttonViewStyle }>
 				<View style={ { flexDirection: 'row' } }>
 					{ newChildren }
-					{ subscript && ( <Text style={ isToggled ? styles.subscriptActive : subscriptInactive }>{ subscript }</Text> ) }
+					{ subscript && ( <Text style={ isPressed ? styles.subscriptActive : subscriptInactive }>{ subscript }</Text> ) }
 				</View>
 			</View>
 		</TouchableOpacity>

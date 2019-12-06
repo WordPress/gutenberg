@@ -41,7 +41,7 @@ class URLInputButton extends Component {
 					label={ buttonLabel }
 					onClick={ this.toggle }
 					className="components-toolbar__control"
-					isToggled={ !! url }
+					isPressed={ !! url }
 				/>
 				{ expanded &&
 					<form

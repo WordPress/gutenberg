@@ -16,10 +16,10 @@ export {
 	Rect,
 } from 'react-native-svg';
 
-export const SVG = ( { className = '', isToggled, ...props } ) => {
+export const SVG = ( { className = '', isPressed, ...props } ) => {
 	const colorScheme = props.colorScheme || 'light';
 	const stylesFromClasses = className.split( ' ' ).map( ( element ) => styles[ element ] ).filter( Boolean );
-	const defaultStyle = isToggled ? styles[ 'is-toggled' ] : styles[ 'components-toolbar__control-' + colorScheme ];
+	const defaultStyle = isPressed ? styles[ 'is-pressed' ] : styles[ 'components-toolbar__control-' + colorScheme ];
 	const styleValues = Object.assign( {}, props.style, defaultStyle, ...stylesFromClasses );
 
 	const appliedProps = { ...props, style: styleValues };

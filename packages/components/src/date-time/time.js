@@ -303,7 +303,7 @@ class TimePicker extends Component {
 								<Button
 									isDefault
 									className="components-datetime__time-am-button"
-									isToggled={ am === 'AM' }
+									isPressed={ am === 'AM' }
 									onClick={ this.updateAmPm( 'AM' ) }
 								>
 									{ __( 'AM' ) }
@@ -311,7 +311,7 @@ class TimePicker extends Component {
 								<Button
 									isDefault
 									className="components-datetime__time-pm-button"
-									isToggled={ am === 'PM' }
+									isPressed={ am === 'PM' }
 									onClick={ this.updateAmPm( 'PM' ) }
 								>
 									{ __( 'PM' ) }

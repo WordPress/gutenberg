@@ -49,7 +49,7 @@ function ToolbarButton( {
 				'components-toolbar__control',
 				className,
 			) }
-			isToggled={ isActive }
+			isPressed={ isActive }
 			disabled={ isDisabled }
 			{ ...extraProps }
 		/>

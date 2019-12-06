@@ -100,14 +100,14 @@ class LegacyWidgetEdit extends Component {
 							<>
 								<Button
 									className="components-tab-button"
-									isToggled={ ! isPreview }
+									isPressed={ ! isPreview }
 									onClick={ this.switchToEdit }
 								>
 									<span>{ __( 'Edit' ) }</span>
 								</Button>
 								<Button
 									className="components-tab-button"
-									isToggled={ isPreview }
+									isPressed={ isPreview }
 									onClick={ this.switchToPreview }
 								>
 									<span>{ __( 'Preview' ) }</span>

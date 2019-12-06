@@ -336,6 +336,16 @@ exports[`Storyshots Components|Button Link 1`] = `
 </a>
 `;
 
+exports[`Storyshots Components|Button Pressed 1`] = `
+<button
+  aria-pressed={true}
+  className="components-button is-pressed"
+  type="button"
+>
+  Pressed Button
+</button>
+`;
+
 exports[`Storyshots Components|Button Primary 1`] = `
 <button
   className="components-button is-button is-primary"
@@ -351,16 +361,6 @@ exports[`Storyshots Components|Button Small 1`] = `
   type="button"
 >
   Small Button
-</button>
-`;
-
-exports[`Storyshots Components|Button Toggled 1`] = `
-<button
-  aria-pressed={true}
-  className="components-button is-toggled"
-  type="button"
->
-  Toggled Button
 </button>
 `;
 
@@ -3728,7 +3728,7 @@ exports[`Storyshots Components|ToolbarGroup Default 1`] = `
     <button
       aria-label="Bold"
       aria-pressed={true}
-      className="components-button components-icon-button components-toolbar__control is-toggled"
+      className="components-button components-icon-button components-toolbar__control is-pressed"
       onBlur={[Function]}
       onClick={[Function]}
       onFocus={[Function]}
@@ -3822,7 +3822,7 @@ exports[`Storyshots Components|ToolbarGroup With Controls Prop 1`] = `
     <button
       aria-label="Bold"
       aria-pressed={true}
-      className="components-button components-icon-button components-toolbar__control is-toggled"
+      className="components-button components-icon-button components-toolbar__control is-pressed"
       onBlur={[Function]}
       onClick={[Function]}
       onFocus={[Function]}

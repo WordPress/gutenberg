@@ -134,7 +134,7 @@ Name | Type | Default | Description
 `isDestructive` | `bool` | `false` | Renders a red text-based button style to indicate destructive behavior.
 `isLarge` | `bool` | `false` | Increases the size of the button.
 `isSmall` | `bool` | `false` | Decreases the size of the button.
-`isToggled` | `bool` | `false` | Renders a toggled button style.
+`isPressed` | `bool` | `false` | Renders a pressed button style.
 `isBusy` | `bool` | `false` | Indicates activity while a action is being performed.
 `isLink` | `bool` | `false` | Renders a button with an anchor style.
 `focus` | `bool` | `false` | Whether the button is focused.

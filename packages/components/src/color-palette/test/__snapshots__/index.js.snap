@@ -286,7 +286,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
             <ForwardRef(Button)
               aria-label="Color: red"
               className="components-circular-option-picker__option"
-              isToggled={true}
+              isPressed={true}
               onBlur={[Function]}
               onClick={[Function]}
               onFocus={[Function]}
@@ -302,7 +302,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
               <button
                 aria-label="Color: red"
                 aria-pressed={true}
-                className="components-button components-circular-option-picker__option is-toggled"
+                className="components-button components-circular-option-picker__option is-pressed"
                 onBlur={[Function]}
                 onClick={[Function]}
                 onFocus={[Function]}
@@ -374,7 +374,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
             <ForwardRef(Button)
               aria-label="Color: white"
               className="components-circular-option-picker__option"
-              isToggled={false}
+              isPressed={false}
               onBlur={[Function]}
               onClick={[Function]}
               onFocus={[Function]}
@@ -429,7 +429,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
             <ForwardRef(Button)
               aria-label="Color: blue"
               className="components-circular-option-picker__option"
-              isToggled={false}
+              isPressed={false}
               onBlur={[Function]}
               onClick={[Function]}
               onFocus={[Function]}

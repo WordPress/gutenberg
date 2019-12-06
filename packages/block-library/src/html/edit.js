@@ -65,14 +65,14 @@ class HTMLEdit extends Component {
 					<ToolbarGroup>
 						<Button
 							className="components-tab-button"
-							isToggled={ ! isPreview }
+							isPressed={ ! isPreview }
 							onClick={ this.switchToHTML }
 						>
 							<span>HTML</span>
 						</Button>
 						<Button
 							className="components-tab-button"
-							isToggled={ isPreview }
+							isPressed={ isPreview }
 							onClick={ this.switchToPreview }
 						>
 							<span>{ __( 'Preview' ) }</span>

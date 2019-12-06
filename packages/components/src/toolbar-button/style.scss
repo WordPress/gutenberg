@@ -18,16 +18,16 @@
 		bottom: 10px;
 	}
 
-	&:not(:disabled).is-toggled[data-subscript]::after {
+	&:not(:disabled).is-pressed[data-subscript]::after {
 		color: $white;
 	}
 
-	&.is-toggled {
+	&.is-pressed {
 		padding: 3px;
 		outline: none;
 	}
 
-	&.is-toggled > svg {
+	&.is-pressed > svg {
 		padding: 5px;
 		border-radius: $radius-round-rectangle;
 		height: 30px;

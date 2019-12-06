@@ -19,7 +19,7 @@ function Option( {
 } ) {
 	const optionButton = (
 		<Button
-			isToggled={ isSelected }
+			isPressed={ isSelected }
 			className={ classnames(
 				className,
 				'components-circular-option-picker__option',

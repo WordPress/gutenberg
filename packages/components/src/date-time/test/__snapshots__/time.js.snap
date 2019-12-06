@@ -323,7 +323,7 @@ exports[`TimePicker matches the snapshot when the is12hour prop is specified 1`]
         <ForwardRef(Button)
           className="components-datetime__time-am-button"
           isDefault={true}
-          isToggled={false}
+          isPressed={false}
           onClick={[Function]}
         >
           AM
@@ -331,7 +331,7 @@ exports[`TimePicker matches the snapshot when the is12hour prop is specified 1`]
         <ForwardRef(Button)
           className="components-datetime__time-pm-button"
           isDefault={true}
-          isToggled={true}
+          isPressed={true}
           onClick={[Function]}
         >
           PM
@@ -504,7 +504,7 @@ exports[`TimePicker matches the snapshot when the is12hour prop is true 1`] = `
         <ForwardRef(Button)
           className="components-datetime__time-am-button"
           isDefault={true}
-          isToggled={false}
+          isPressed={false}
           onClick={[Function]}
         >
           AM
@@ -512,7 +512,7 @@ exports[`TimePicker matches the snapshot when the is12hour prop is true 1`] = `
         <ForwardRef(Button)
           className="components-datetime__time-pm-button"
           isDefault={true}
-          isToggled={true}
+          isPressed={true}
           onClick={[Function]}
         >
           PM
