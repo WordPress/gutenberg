@@ -15,7 +15,7 @@ import path from 'path';
  * Internal dependencies
  */
 import serverConfigs from './serverConfigs';
-import { ios13, android8 } from './caps';
+import { ios12, android8 } from './caps';
 import AppiumLocal from './appium-local';
 import _ from 'underscore';
 
