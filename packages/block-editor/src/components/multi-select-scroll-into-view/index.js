@@ -27,8 +27,8 @@ class MultiSelectScrollIntoView extends Component {
 	 * visible within the nearest scrollable container.
 	 */
 	scrollIntoView() {
-		const { extentClientId } = this.props;
-		if ( ! extentClientId ) {
+		const { extentClientId, isMultiSelecting } = this.props;
+		if ( ! extentClientId || isMultiSelecting ) {
 			return;
 		}
 
@@ -56,9 +56,13 @@ class MultiSelectScrollIntoView extends Component {
 }
 
 export default withSelect( ( select ) => {
-	const { getLastMultiSelectedBlockClientId } = select( 'core/block-editor' );
+	const {
+		getLastMultiSelectedBlockClientId,
+		isMultiSelecting,
+	} = select( 'core/block-editor' );
 
 	return {
 		extentClientId: getLastMultiSelectedBlockClientId(),
+		isMultiSelecting: isMultiSelecting(),
 	};
 } )( MultiSelectScrollIntoView );

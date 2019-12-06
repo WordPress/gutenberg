@@ -143,6 +143,7 @@ export const registerCoreBlocks = () => {
 		quote,
 		mediaText,
 		preformatted,
+		gallery,
 		// eslint-disable-next-line no-undef
 		!! __DEV__ ? group : null,
 		spacer,
