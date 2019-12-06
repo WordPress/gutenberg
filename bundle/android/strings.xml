@@ -33,8 +33,8 @@
     <string name="gutenberg_native_double_tap_to_undo_last_change" tools:ignore="UnusedResources">"Double tap to undo last change"</string>
     <string name="gutenberg_native_empty" tools:ignore="UnusedResources">"Empty"</string>
     <string name="gutenberg_native_failed_to_insert_media_please_tap_for_options" tools:ignore="UnusedResources">"Failed to insert media.\nPlease tap for options."</string>
-    <string name="gutenberg_native_feature_activated" tools:ignore="UnusedResources">"Feature activated"</string>
-    <string name="gutenberg_native_feature_deactivated" tools:ignore="UnusedResources">"Feature deactivated"</string>
+    <!-- translators: accessibility text. %s: gallery caption. -->
+    <string name="gutenberg_native_gallery_caption_s" tools:ignore="UnusedResources">"Gallery caption. %s"</string>
     <string name="gutenberg_native_help_icon" tools:ignore="UnusedResources">"Help icon"</string>
     <string name="gutenberg_native_here_is_the_panel_content" tools:ignore="UnusedResources">"Here is the panel content!"</string>
     <string name="gutenberg_native_hide_keyboard" tools:ignore="UnusedResources">"Hide keyboard"</string>
@@ -52,6 +52,8 @@
     <string name="gutenberg_native_move_block_up" tools:ignore="UnusedResources">"Move block up"</string>
     <!-- translators: accessibility text. %1: current block position (number). %2: next block position (number) -->
     <string name="gutenberg_native_move_block_up_from_row_1_s_to_row_2_s" tools:ignore="UnusedResources">"Move block up from row %1$s to row %2$s"</string>
+    <string name="gutenberg_native_move_image_backward" tools:ignore="UnusedResources">"Move Image Backward"</string>
+    <string name="gutenberg_native_move_image_forward" tools:ignore="UnusedResources">"Move Image Forward"</string>
     <string name="gutenberg_native_my_document_setting_panel" tools:ignore="UnusedResources">"My Document Setting Panel"</string>
     <string name="gutenberg_native_my_post_publish_panel" tools:ignore="UnusedResources">"My post publish panel"</string>
     <string name="gutenberg_native_my_post_status_info" tools:ignore="UnusedResources">"My post status info"</string>
