@@ -150,6 +150,7 @@ _Parameters_
 -   _props.className_ `[string]`: An optional class name added to the row.
 -   _props.title_ `[string]`: The title of the panel
 -   _props.icon_ `[WPBlockTypeIconRender]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
+-   _props.initialOpen_ `[boolean]`: An optional behavior to always start with panel open.
 
 _Returns_
 
