@@ -7,10 +7,10 @@ import { assign, get, has, includes, without } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { compose, createHigherOrderComponent } from '@wordpress/compose';
+import { createHigherOrderComponent } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 import { getBlockSupport, getBlockType, hasBlockSupport } from '@wordpress/blocks';
-import { withSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -138,45 +138,38 @@ export const withToolbarControls = createHigherOrderComponent(
 	'withToolbarControls'
 );
 
-// Exported just for testing purposes, not exported outside the module.
-export const insideSelectWithDataAlign = ( BlockListBlock ) => (
-	( props ) => {
-		const { name, attributes, hasWideEnabled } = props;
-		const { align } = attributes;
-		const validAlignments = getValidAlignments(
-			getBlockSupport( name, 'align' ),
-			hasBlockSupport( name, 'alignWide', true ),
-			hasWideEnabled
-		);
-
-		let wrapperProps = props.wrapperProps;
-		if ( includes( validAlignments, align ) ) {
-			wrapperProps = { ...wrapperProps, 'data-align': align };
-		}
-
-		return <BlockListBlock { ...props } wrapperProps={ wrapperProps } />;
-	}
-);
-
 /**
  * Override the default block element to add alignment wrapper props.
  *
  * @param  {Function} BlockListBlock Original component
  * @return {Function}                Wrapped component
  */
-export const withDataAlign = createHigherOrderComponent(
-	compose( [
-		withSelect(
-			( select ) => {
-				const { getSettings } = select( 'core/block-editor' );
-				return {
-					hasWideEnabled: !! getSettings().alignWide,
-				};
-			}
-		),
-		insideSelectWithDataAlign,
-	] )
-);
+export const withDataAlign = createHigherOrderComponent( ( BlockListBlock ) => ( props ) => {
+	const { name, attributes } = props;
+	const { align } = attributes;
+	const hasWideEnabled = useSelect( ( select ) => (
+		!! select( 'core/block-editor' ).getSettings().alignWide
+	) );
+
+	// If an alignment is not assigned, there's no need to go through the
+	// effort to validate or assign its value.
+	if ( align === undefined ) {
+		return <BlockListBlock { ...props } />;
+	}
+
+	const validAlignments = getValidAlignments(
+		getBlockSupport( name, 'align' ),
+		hasBlockSupport( name, 'alignWide', true ),
+		hasWideEnabled
+	);
+
+	let wrapperProps = props.wrapperProps;
+	if ( includes( validAlignments, align ) ) {
+		wrapperProps = { ...wrapperProps, 'data-align': align };
+	}
+
+	return <BlockListBlock { ...props } wrapperProps={ wrapperProps } />;
+} );
 
 /**
  * Override props assigned to save component to inject alignment class name if
