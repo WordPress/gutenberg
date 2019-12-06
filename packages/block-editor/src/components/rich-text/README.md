@@ -123,7 +123,7 @@ registerBlockType( /* ... */, {
 				tagName="h2"
 				className={ className }
 				value={ attributes.content }
-				onChange={ ( content ) => setAttributes( { content } ) }
+				onChange={ ( content ) => setAttributes( { content: content } ) }
 			/>
 		);
 	},
