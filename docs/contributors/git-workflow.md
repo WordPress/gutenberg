@@ -62,7 +62,7 @@ git checkout master
 git merge upstream/master
 ```
 
-Once your local copy is updated, push your changes to update your fork on github:
+Once your local copy is updated, push your changes to update your fork on GitHub:
 
 ```
 git push
