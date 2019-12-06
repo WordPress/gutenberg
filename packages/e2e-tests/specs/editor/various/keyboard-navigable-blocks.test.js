@@ -58,6 +58,9 @@ const tabThroughBlockMoverControl = async () => {
 	);
 	await expect( isFocusedMoveUpControl ).toBe( true );
 
+	// Tab to focus the drag handle
+	await page.keyboard.press( 'Tab' );
+
 	// Tab to focus on the 'move down' control
 	await page.keyboard.press( 'Tab' );
 	const isFocusedMoveDownControl = await page.evaluate( () =>

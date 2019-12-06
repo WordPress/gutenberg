@@ -79,9 +79,9 @@ $dot-scale: 3;  // How much the pulse animation should scale up by in size
 	}
 
 	// Extra specificity so that we can override the styles in .component-popover
-	&:not(.is-mobile)[data-y-axis="left"],
-	&:not(.is-mobile)[data-y-axis="center"],
-	&:not(.is-mobile)[data-y-axis="right"] {
+	&[data-y-axis="left"],
+	&[data-y-axis="center"],
+	&[data-y-axis="right"] {
 		// Position tips above popovers
 		z-index: z-index(".nux-dot-tip");
 
@@ -99,22 +99,22 @@ $dot-scale: 3;  // How much the pulse animation should scale up by in size
 		}
 	}
 
-	&.components-popover:not(.is-mobile):not([data-y-axis="middle"])[data-y-axis="right"] .components-popover__content {
+	&.components-popover:not([data-y-axis="middle"])[data-y-axis="right"] .components-popover__content {
 		/*!rtl:ignore*/
 		margin-left: 0;
 	}
 
-	&.components-popover:not(.is-mobile):not([data-y-axis="middle"])[data-y-axis="left"] .components-popover__content {
+	&.components-popover:not([data-y-axis="middle"])[data-y-axis="left"] .components-popover__content {
 		/*!rtl:ignore*/
 		margin-right: 0;
 	}
 
-	&.components-popover.edit-post-more-menu__content:not(.is-mobile):not([data-y-axis="middle"])[data-y-axis="right"] .components-popover__content {
+	&.components-popover.edit-post-more-menu__content:not([data-y-axis="middle"])[data-y-axis="right"] .components-popover__content {
 		/*!rtl:ignore*/
 		margin-left: -12px;
 	}
 
-	&.components-popover.edit-post-more-menu__content:not(.is-mobile):not([data-y-axis="middle"])[data-y-axis="left"] .components-popover__content {
+	&.components-popover.edit-post-more-menu__content:not([data-y-axis="middle"])[data-y-axis="left"] .components-popover__content {
 		/*!rtl:ignore*/
 		margin-right: -12px;
 	}

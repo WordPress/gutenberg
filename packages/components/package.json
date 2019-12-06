@@ -20,6 +20,7 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
+	"sideEffects": false,
 	"dependencies": {
 		"@babel/runtime": "^7.4.4",
 		"@emotion/core": "10.0.22",
@@ -38,6 +39,7 @@
 		"clipboard": "^2.0.1",
 		"dom-scroll-into-view": "^1.2.1",
 		"downshift": "^3.3.4",
+		"gradient-parser": "^0.1.5",
 		"lodash": "^4.17.15",
 		"memize": "^1.0.5",
 		"moment": "^2.22.1",

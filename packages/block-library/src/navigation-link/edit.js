@@ -208,7 +208,7 @@ function NavigationLinkEdit( {
 					'has-link': !! url,
 				} ) }
 			>
-				<div className="wp-block-navigation-link__inner">
+				<div>
 					<RichText
 						className="wp-block-navigation-link__content"
 						value={ label }

@@ -395,6 +395,12 @@ export class ImageEdit extends Component {
 			mediaAttributes.href = media.url;
 		}
 
+		// Check if the image is linked to the attachment page.
+		if ( linkDestination === LINK_DESTINATION_ATTACHMENT ) {
+			// Update the media link.
+			mediaAttributes.href = media.link;
+		}
+
 		this.props.setAttributes( {
 			...mediaAttributes,
 			...additionalAttributes,

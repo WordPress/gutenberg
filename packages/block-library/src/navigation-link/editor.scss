@@ -94,7 +94,7 @@
 }
 
 // Popover styles
-.components-popover:not(.is-mobile).wp-block-navigation-link__dropdown-content {
+.components-popover.wp-block-navigation-link__dropdown-content {
 	margin-top: -1px;
 	margin-left: -4px;
 }

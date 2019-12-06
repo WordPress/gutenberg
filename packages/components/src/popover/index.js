@@ -10,6 +10,7 @@ import { useRef, useState, useEffect } from '@wordpress/element';
 import { focus, getRectangleFromRange } from '@wordpress/dom';
 import { ESCAPE } from '@wordpress/keycodes';
 import deprecated from '@wordpress/deprecated';
+import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -166,6 +167,55 @@ function useFocusContentOnMount( focusOnMount, contentRef ) {
 	}, [] );
 }
 
+/**
+ * Sets or removes an element attribute.
+ *
+ * @param {Element} element The element to modify.
+ * @param {string}  name    The attribute name to set or remove.
+ * @param {?string} value   The value to set. A falsy value will remove the
+ *                          attribute.
+ */
+function setAttribute( element, name, value ) {
+	if ( ! value ) {
+		if ( element.hasAttribute( name ) ) {
+			element.removeAttribute( name );
+		}
+	} else if ( element.getAttribute( name ) !== value ) {
+		element.setAttribute( name, value );
+	}
+}
+
+/**
+ * Sets or removes an element style property.
+ *
+ * @param {Element} element  The element to modify.
+ * @param {string}  property The property to set or remove.
+ * @param {?string} value    The value to set. A falsy value will remove the
+ *                           property.
+ */
+function setStyle( element, property, value = '' ) {
+	if ( element.style[ property ] !== value ) {
+		element.style[ property ] = value;
+	}
+}
+
+/**
+ * Sets or removes an element class.
+ *
+ * @param {Element} element The element to modify.
+ * @param {string}  name    The class to set or remove.
+ * @param {boolean} toggle  True to set the class, false to remove.
+ */
+function setClass( element, name, toggle ) {
+	if ( toggle ) {
+		if ( ! element.classList.contains( name ) ) {
+			element.classList.add( name );
+		}
+	} else if ( element.classList.contains( name ) ) {
+		element.classList.remove( name );
+	}
+}
+
 const Popover = ( {
 	headerTitle,
 	onClose,
@@ -195,17 +245,24 @@ const Popover = ( {
 	const anchorRefFallback = useRef( null );
 	const contentRef = useRef( null );
 	const containerRef = useRef();
-	const [ isMobileViewport, setIsMobileViewport ] = useState( false );
+	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const [ animateOrigin, setAnimateOrigin ] = useState();
+	const isExpanded = expandOnMobile && isMobileViewport;
+
+	noArrow = isExpanded || noArrow;
 
 	useEffect( () => {
-		const resize = () => setIsMobileViewport( window.innerWidth < 782 );
-		window.addEventListener( 'resize', resize );
-		return () => window.removeEventListener( 'resize', resize );
-	} );
+		const containerEl = containerRef.current;
+		const contentEl = contentRef.current;
 
-	useEffect( () => {
-		if ( isMobileViewport && expandOnMobile ) {
+		if ( isExpanded ) {
+			setClass( containerEl, 'is-without-arrow', noArrow );
+			setAttribute( containerEl, 'data-x-axis' );
+			setAttribute( containerEl, 'data-y-axis' );
+			setStyle( containerEl, 'top' );
+			setStyle( containerEl, 'left' );
+			setStyle( contentEl, 'maxHeight' );
+			setStyle( contentEl, 'maxWidth' );
 			return;
 		}
 
@@ -229,8 +286,8 @@ const Popover = ( {
 			);
 
 			const contentSize = {
-				height: contentRef.current.scrollHeight,
-				width: contentRef.current.scrollWidth,
+				height: contentEl.scrollHeight,
+				width: contentEl.scrollWidth,
 			};
 			const {
 				popoverTop,
@@ -240,6 +297,14 @@ const Popover = ( {
 				contentHeight,
 				contentWidth,
 			} = computePopoverPosition( anchor, contentSize, position );
+
+			setClass( containerEl, 'is-without-arrow', noArrow || ( xAxis === 'center' && yAxis === 'middle' ) );
+			setAttribute( containerEl, 'data-x-axis', xAxis );
+			setAttribute( containerEl, 'data-y-axis', yAxis );
+			setStyle( containerEl, 'top', typeof popoverTop === 'number' ? popoverTop + 'px' : '' );
+			setStyle( containerEl, 'left', typeof popoverLeft === 'number' ? popoverLeft + 'px' : '' );
+			setStyle( contentEl, 'maxHeight', typeof contentHeight === 'number' ? contentHeight + 'px' : '' );
+			setStyle( contentEl, 'maxWidth', typeof contentWidth === 'number' ? contentWidth + 'px' : '' );
 
 			// Compute the animation position
 			const yAxisMapping = {
@@ -252,19 +317,6 @@ const Popover = ( {
 			};
 			const animateYAxis = yAxisMapping[ yAxis ] || 'middle';
 			const animateXAxis = xAxisMapping[ xAxis ] || 'center';
-
-			containerRef.current.setAttribute( 'data-x-axis', xAxis );
-			containerRef.current.setAttribute( 'data-y-axis', yAxis );
-			containerRef.current.style.top = popoverTop + 'px';
-			containerRef.current.style.left = popoverLeft + 'px';
-			contentRef.current.style.maxHeight = contentHeight ? contentHeight + 'px' : '';
-			contentRef.current.style.maxWidth = contentWidth ? contentWidth + 'px' : '';
-
-			if ( xAxis === 'center' && yAxis === 'middle' ) {
-				contentRef.current.classList.add( 'is-without-arrow' );
-			} else {
-				contentRef.current.classList.remove( 'is-without-arrow' );
-			}
 
 			setAnimateOrigin( animateXAxis + ' ' + animateYAxis );
 		};
@@ -288,8 +340,7 @@ const Popover = ( {
 			window.removeEventListener( 'scroll', refresh, true );
 		};
 	}, [
-		isMobileViewport,
-		expandOnMobile,
+		isExpanded,
 		anchorRect,
 		getAnchorRect,
 		anchorRef,
@@ -372,7 +423,7 @@ const Popover = ( {
 							className,
 							animateClassName,
 							{
-								'is-mobile': isMobileViewport && expandOnMobile,
+								'is-expanded': isExpanded,
 								'is-without-arrow': noArrow,
 							}
 						) }
@@ -380,7 +431,7 @@ const Popover = ( {
 						onKeyDown={ maybeClose }
 						ref={ containerRef }
 					>
-						{ isMobileViewport && expandOnMobile && (
+						{ isExpanded && (
 							<div className="components-popover__header">
 								<span className="components-popover__header-title">
 									{ headerTitle }
