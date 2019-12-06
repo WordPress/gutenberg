@@ -31,11 +31,11 @@ import { addFilter } from '@wordpress/hooks';
  * `attributes` and `setAttributes` props to sync any changes with the edited
  * post's meta keys.
  *
- * @param {WPMetaAttributeMapping} metaKeys Meta attribute mapping.
+ * @param {WPMetaAttributeMapping} metaAttributes Meta attribute mapping.
  *
  * @return {WPHigherOrderComponent} Higher-order component.
  */
-const createWithMetaAttributeSource = ( metaKeys ) => createHigherOrderComponent(
+const createWithMetaAttributeSource = ( metaAttributes ) => createHigherOrderComponent(
 	( BlockEdit ) => ( { attributes, setAttributes, ...props } ) => {
 		const postType = useSelect( ( select ) => select( 'core/editor' ).getCurrentPostType(), [] );
 		const [ meta, setMeta ] = useEntityProp( 'postType', postType, 'meta' );
@@ -43,7 +43,7 @@ const createWithMetaAttributeSource = ( metaKeys ) => createHigherOrderComponent
 		const mergedAttributes = useMemo(
 			() => ( {
 				...attributes,
-				...mapValues( metaKeys, ( metaKey ) => meta[ metaKey ] ),
+				...mapValues( metaAttributes, ( metaKey ) => meta[ metaKey ] ),
 			} ),
 			[ attributes, meta ]
 		);
@@ -55,10 +55,10 @@ const createWithMetaAttributeSource = ( metaKeys ) => createHigherOrderComponent
 					const nextMeta = mapKeys(
 						// Filter to intersection of keys between the updated
 						// attributes and those with an associated meta key.
-						pickBy( nextAttributes, ( value, key ) => metaKeys[ key ] ),
+						pickBy( nextAttributes, ( value, key ) => metaAttributes[ key ] ),
 
 						// Rename the keys to the expected meta key name.
-						( value, attributeKey ) => metaKeys[ attributeKey ],
+						( value, attributeKey ) => metaAttributes[ attributeKey ],
 					);
 
 					if ( ! isEmpty( nextMeta ) ) {
