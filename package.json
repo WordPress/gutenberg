@@ -96,7 +96,7 @@
     "ios": "react-native run-ios",
     "test": "cross-env NODE_ENV=test jest --verbose --config jest.config.js",
     "test:inside-gb": "cross-env NODE_ENV=test jest --verbose --config jest_gb.config.js",
-    "test:debug": "cross-env NODE_ENV=test node --inspect-brk jest --runInBand --verbose --config jest.config.js",
+    "test:debug": "cross-env NODE_ENV=test node --inspect-brk node_modules/.bin/jest --runInBand --verbose --config jest.config.js",
     "device-tests": "cross-env NODE_ENV=test jest --no-cache --maxWorkers=3 --reporters=default --reporters=jest-junit --verbose --config jest_ui.config.js",
     "device-tests:local": "cross-env NODE_ENV=test jest --runInBand --reporters=default --reporters=jest-junit --detectOpenHandles --verbose --config jest_ui.config.js",
     "device-tests:debug": "cross-env NODE_ENV=test node $NODE_DEBUG_OPTION --inspect-brk node_modules/jest/bin/jest --runInBand --reporters=default --reporters=jest-junit --detectOpenHandles --verbose --config jest_ui.config.js",
@@ -139,6 +139,7 @@
   "dependencies": {
     "@babel/runtime": "^7.3.1",
     "@react-native-community/cli": "^1.5.2",
+    "@react-native-community/slider": "git+https://github.com/wordpress-mobile/react-native-slider.git#e20f268e61327321a5bbd66afc5238388d65f2a4",
     "classnames": "^2.2.5",
     "dom-react": "^2.2.1",
     "domutils": "^1.7.0",
