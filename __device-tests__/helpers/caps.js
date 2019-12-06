@@ -2,7 +2,7 @@ exports.ios = {
 	browserName: '',
 	platformName: 'iOS',
 	platformVersion: '13.0',
-	deviceName: 'iPhone X Simulator',
+	deviceName: 'iPhone 11 Simulator',
 	os: 'iOS',
 	deviceOrientation: 'portrait',
 	automationName: 'XCUITest',

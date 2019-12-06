@@ -96,7 +96,7 @@ const setupDriver = async () => {
 		if ( isLocalEnvironment() ) {
 			desiredCaps.app = path.resolve( localIOSAppPath );
 			delete desiredCaps.platformVersion;
-			desiredCaps.deviceName = 'iPhone X Simulator';
+			desiredCaps.deviceName = 'iPhone 11';
 		} else {
 			desiredCaps.app = `sauce-storage:Gutenberg-${ safeBranchName }.app.zip`; // App should be preloaded to sauce storage, this can also be a URL
 		}
