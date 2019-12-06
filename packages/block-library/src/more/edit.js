@@ -54,6 +54,7 @@ export default class MoreEdit extends Component {
 		const { defaultText } = this.state;
 		const value = customText !== undefined ? customText : defaultText;
 		const inputLength = value.length + 1;
+		const currentWidth = { width: inputLength + 1 + 'em' };
 
 		return (
 			<>
@@ -74,6 +75,7 @@ export default class MoreEdit extends Component {
 						size={ inputLength }
 						onChange={ this.onChangeInput }
 						onKeyDown={ this.onKeyDown }
+						style={ currentWidth }
 					/>
 				</div>
 			</>
