@@ -89,7 +89,7 @@ function Layout() {
 			<AutosaveMonitor />
 			<LocalAutosaveMonitor />
 			<EditorModeKeyboardShortcuts />
-			<FocusReturnProvider className={ className }>
+			<FocusReturnProvider>
 				<EditorRegions
 					className={ className }
 					header={ <Header /> }
