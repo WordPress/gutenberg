@@ -252,11 +252,11 @@ function BlockListBlock( {
 	// Focus the selected block's wrapper or inner input on mount and update
 	const isMounting = useRef( true );
 	useEffect( () => {
-		if ( isSelected ) {
+		if ( isSelected && ! isMultiSelecting ) {
 			focusTabbable( ! isMounting.current );
 		}
 		isMounting.current = false;
-	}, [ isSelected ] );
+	}, [ isSelected, isMultiSelecting ] );
 
 	// Focus the first multi selected block
 	useEffect( () => {
@@ -434,6 +434,7 @@ function BlockListBlock( {
 		! hasFixedToolbar &&
 		isLargeViewport &&
 		! showEmptyBlockSideInserter &&
+		! isMultiSelecting &&
 		(
 			( isSelected && ( ! isTypingWithinBlock || isCaretWithinFormattedText ) ) ||
 			isFirstMultiSelected
