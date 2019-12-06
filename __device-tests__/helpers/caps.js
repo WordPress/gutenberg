@@ -1,12 +1,12 @@
 exports.ios12 = {
 	browserName: '',
 	platformName: 'iOS',
-	platformVersion: '12.2',
+	platformVersion: '13.2',
 	deviceName: 'iPhone Simulator',
 	os: 'iOS',
 	deviceOrientation: 'portrait',
 	automationName: 'XCUITest',
-	appiumVersion: '1.13.0', // SauceLabs requires appiumVersion to be specified.
+	appiumVersion: '1.15.0', // SauceLabs requires appiumVersion to be specified.
 	app: undefined, // will be set later, locally this is relative to root of project
 };
 
@@ -20,6 +20,6 @@ exports.android8 = {
 	appPackage: 'com.gutenberg',
 	appActivity: 'com.gutenberg.MainActivity',
 	deviceOrientation: 'portrait',
-	appiumVersion: '1.13.0',
+	appiumVersion: '1.15.0',
 	app: undefined,
 };
