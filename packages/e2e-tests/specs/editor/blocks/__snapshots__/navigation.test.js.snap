@@ -10,6 +10,10 @@ exports[`Navigation allows a navigation menu to be created from an empty menu us
 
 exports[`Navigation allows a navigation menu to be created using existing pages 1`] = `
 "<!-- wp:navigation -->
-<!-- wp:navigation-link {\\"label\\":\\"Sample Page\\",\\"title\\":\\"Sample Page\\",\\"type\\":\\"page\\",\\"id\\":2,\\"url\\":\\"http://localhost:8889/?page_id=2\\"} /-->
+<!-- wp:navigation-link {\\"label\\":\\"Home\\",\\"title\\":\\"Home\\",\\"type\\":\\"page\\",\\"id\\":1,\\"url\\":\\"https://this/is/a/test/url/home\\"} /-->
+
+<!-- wp:navigation-link {\\"label\\":\\"About\\",\\"title\\":\\"About\\",\\"type\\":\\"page\\",\\"id\\":2,\\"url\\":\\"https://this/is/a/test/url/about\\"} /-->
+
+<!-- wp:navigation-link {\\"label\\":\\"Contact Us\\",\\"title\\":\\"Contact Us\\",\\"type\\":\\"page\\",\\"id\\":3,\\"url\\":\\"https://this/is/a/test/url/contact\\"} /-->
 <!-- /wp:navigation -->"
 `;

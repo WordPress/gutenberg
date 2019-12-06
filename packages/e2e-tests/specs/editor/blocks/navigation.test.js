@@ -3,11 +3,32 @@
  * WordPress dependencies
  */
 import {
+	createJSONResponse,
 	createNewPost,
 	getEditedPostContent,
 	insertBlock,
 	pressKeyWithModifier,
+	setUpResponseMocking,
 } from '@wordpress/e2e-test-utils';
+
+async function mockPagesResponse( pages ) {
+	const mappedPages = pages.map( ( { title, slug }, index ) => ( {
+		id: index + 1,
+		type: 'page',
+		link: `https://this/is/a/test/url/${ slug }`,
+		title: {
+			rendered: title,
+			raw: title,
+		},
+	} ) );
+
+	await setUpResponseMocking( [
+		{
+			match: ( request ) => request.url().includes( `rest_route=${ encodeURIComponent( '/wp/v2/pages' ) }` ),
+			onRequestMatch: createJSONResponse( mappedPages ),
+		},
+	] );
+}
 
 async function updateActiveNavigationLink( { url, label } ) {
 	if ( url ) {
@@ -29,6 +50,23 @@ describe( 'Navigation', () => {
 	} );
 
 	it( 'allows a navigation menu to be created using existing pages', async () => {
+		// Mock the response from the Pages endpoint. This is done so that the pages returned are always
+		// consistent and to test the feature more rigorously than the single default sample page.
+		await mockPagesResponse( [
+			{
+				title: 'Home',
+				slug: 'home',
+			},
+			{
+				title: 'About',
+				slug: 'about',
+			},
+			{
+				title: 'Contact Us',
+				slug: 'contact',
+			},
+		] );
+
 		// Add the navigation block.
 		await insertBlock( 'Navigation' );
 
@@ -38,7 +76,7 @@ describe( 'Navigation', () => {
 		const [ createFromExistingButton ] = await page.$x( '//button[text()="Create from all top pages"][not(@disabled)]' );
 		await createFromExistingButton.click();
 
-		// Snapshot should contain the default 'Sample Page'.
+		// Snapshot should contain the mocked pages.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
