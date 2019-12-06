@@ -26,7 +26,7 @@ describe( 'RichText Native', () => {
 
 		it( 'reports false for Preformatted block', () => {
 			const html = '<pre>Hello World <br><br><br></pre>';
-			richText.props.tagName = "pre"
+			richText.props.tagName = 'pre';
 			expect( richText.willTrimSpaces( html ) ).toBe( false );
 		} );
 	} );
