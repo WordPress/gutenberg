@@ -75,8 +75,8 @@ const createWithMetaAttributeSource = ( metaAttributes ) => createHigherOrderCom
 );
 
 /**
- * Filters a registered block settings to enhance a block's `edit` component to
- * upgrade meta-sourced attributes to use the post's meta entity property.
+ * Filters a registered block's settings to enhance a block's `edit` component
+ * to upgrade meta-sourced attributes to use the post's meta entity property.
  *
  * @param {WPBlockSettings} settings Registered block settings.
  *
