@@ -1,7 +1,7 @@
-exports.ios12 = {
+exports.ios13 = {
 	browserName: '',
 	platformName: 'iOS',
-	platformVersion: '12.2',
+	platformVersion: '13.2',
 	deviceName: 'iPhone Simulator',
 	os: 'iOS',
 	deviceOrientation: 'portrait',
