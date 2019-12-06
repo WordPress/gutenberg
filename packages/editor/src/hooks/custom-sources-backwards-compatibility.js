@@ -32,7 +32,7 @@ import { addFilter } from '@wordpress/hooks';
  * @return {WPHigherOrderComponent} Higher-order component.
  */
 const createWithMetaAttributeSource = ( metaKeys ) => createHigherOrderComponent(
-	( BlockEdit ) => ( { attributes, setAttributes, name, ...props } ) => {
+	( BlockEdit ) => ( { attributes, setAttributes, ...props } ) => {
 		const postType = useSelect( ( select ) => select( 'core/editor' ).getCurrentPostType() );
 		const [ meta, setMeta ] = useEntityProp( 'postType', postType, 'meta' );
 
@@ -63,7 +63,6 @@ const createWithMetaAttributeSource = ( metaKeys ) => createHigherOrderComponent
 
 					setAttributes( nextAttributes );
 				} }
-				name={ name }
 				{ ...props }
 			/>
 		);
