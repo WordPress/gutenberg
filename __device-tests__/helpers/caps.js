@@ -20,6 +20,6 @@ exports.android8 = {
 	appPackage: 'com.gutenberg',
 	appActivity: 'com.gutenberg.MainActivity',
 	deviceOrientation: 'portrait',
-	appiumVersion: '1.13.0',
+	appiumVersion: '1.15.0',
 	app: undefined,
 };
