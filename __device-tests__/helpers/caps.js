@@ -1,12 +1,12 @@
 exports.ios = {
 	browserName: '',
 	platformName: 'iOS',
-	platformVersion: '13.2.2',
-	deviceName: 'iPhone Simulator',
+	platformVersion: '13.0',
+	deviceName: 'iPhone X Simulator',
 	os: 'iOS',
 	deviceOrientation: 'portrait',
 	automationName: 'XCUITest',
-	appiumVersion: '1.15.1', // SauceLabs requires appiumVersion to be specified.
+	appiumVersion: '1.15.0', // SauceLabs requires appiumVersion to be specified.
 	app: undefined, // will be set later, locally this is relative to root of project
 };
 
