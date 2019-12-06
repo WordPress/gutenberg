@@ -981,6 +981,7 @@
 		"title": "TextHighlight",
 		"slug": "text-highlight",
 		"markdown_source": "../packages/components/src/text-highlight/README.md",
+		"parent": "components"
 	},
 	{
 		"title": "Text",
