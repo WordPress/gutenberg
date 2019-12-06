@@ -10,10 +10,10 @@ import { __ } from '@wordpress/i18n';
 import { RichText } from '@wordpress/block-editor';
 
 export default function SiteTitleEdit() {
-	const [ title, setTitle ] = useEntityProp( 'root', 'site', 'title' );
+	const [ title, setTitle ] = useEntityProp( 'root', 'siteTitle', 'title' );
 	const [ isDirty, isSaving, save ] = __experimentalUseEntitySaving(
 		'root',
-		'site',
+		'siteTitle',
 		'title'
 	);
 	return (
