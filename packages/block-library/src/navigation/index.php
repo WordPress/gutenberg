@@ -132,10 +132,6 @@ function register_block_core_navigation() {
 				'className'          => array(
 					'type' => 'string',
 				),
-				'automaticallyAdd'   => array(
-					'type'    => 'boolean',
-					'default' => false,
-				),
 				'textColor'          => array(
 					'type' => 'string',
 				),

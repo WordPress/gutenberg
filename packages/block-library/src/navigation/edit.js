@@ -22,7 +22,6 @@ import { createBlock } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
 import {
 	Button,
-	CheckboxControl,
 	PanelBody,
 	Placeholder,
 	Spinner,
@@ -47,9 +46,9 @@ function Navigation( {
 	pages,
 	isRequestingPages,
 	hasResolvedPages,
-	setAttributes,
 	hasExistingNavItems,
 	updateNavItemBlocks,
+	setAttributes,
 } ) {
 	//
 	// HOOKS
@@ -117,23 +116,6 @@ function Navigation( {
 	if ( ! hasExistingNavItems ) {
 		return (
 			<Fragment>
-				<InspectorControls>
-					{ hasResolvedPages && (
-						<PanelBody
-							title={ __( 'Navigation Settings' ) }
-						>
-							<CheckboxControl
-								value={ attributes.automaticallyAdd }
-								onChange={ ( automaticallyAdd ) => {
-									setAttributes( { automaticallyAdd } );
-									handleCreateFromExistingPages();
-								} }
-								label={ __( 'Automatically add new pages' ) }
-								help={ __( 'Automatically add new top level pages to this navigation.' ) }
-							/>
-						</PanelBody>
-					) }
-				</InspectorControls>
 				<Placeholder
 					className="wp-block-navigation-placeholder"
 					icon="menu"
@@ -188,18 +170,6 @@ function Navigation( {
 			</BlockControls>
 			{ navigatorModal }
 			<InspectorControls>
-				{ hasPages && (
-					<PanelBody
-						title={ __( 'Navigation Settings' ) }
-					>
-						<CheckboxControl
-							value={ attributes.automaticallyAdd }
-							onChange={ ( automaticallyAdd ) => setAttributes( { automaticallyAdd } ) }
-							label={ __( 'Automatically add new pages' ) }
-							help={ __( 'Automatically add new top level pages to this navigation.' ) }
-						/>
-					</PanelBody>
-				) }
 				<PanelBody
 					title={ __( 'Navigation Structure' ) }
 				>
