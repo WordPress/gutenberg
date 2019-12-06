@@ -26,9 +26,10 @@ import { addFilter } from '@wordpress/hooks';
  */
 
 /**
- * Given a meta attribute mapping, returns a new higher-order component which
- * manages attribute merging and updating to consume from and mirror to the
- * associated entity record.
+ * Given a mapping of attribute names (meta source attributes) to their
+ * associated meta key, returns a higher order component that overrides its
+ * `attributes` and `setAttributes` props to sync any changes with the edited
+ * post's meta keys.
  *
  * @param {WPMetaAttributeMapping} metaKeys Meta attribute mapping.
  *
