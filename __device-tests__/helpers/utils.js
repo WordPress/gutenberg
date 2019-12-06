@@ -92,7 +92,7 @@ const setupDriver = async () => {
 			desiredCaps.app = `sauce-storage:Gutenberg-${ safeBranchName }.apk`; // App should be preloaded to sauce storage, this can also be a URL
 		}
 	} else {
-		desiredCaps = _.clone( ios13 );
+		desiredCaps = _.clone( ios12 );
 		if ( isLocalEnvironment() ) {
 			desiredCaps.app = path.resolve( localIOSAppPath );
 			delete desiredCaps.platformVersion;
