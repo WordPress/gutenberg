@@ -50,6 +50,7 @@ const PluginDocumentSettingFill = ( { isEnabled, panelName, opened, onToggle, cl
  * @param {string} [props.className] An optional class name added to the row.
  * @param {string} [props.title] The title of the panel
  * @param {WPBlockTypeIconRender} [props.icon=inherits from the plugin] The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
+ * @param {boolean} [props.initialOpen] An optional behavior to always start with panel open.
  *
  * @example <caption>ES5</caption>
  * ```js
