@@ -146,6 +146,7 @@ export const registerCoreBlocks = () => {
 		list,
 		quote,
 		mediaText,
+		gallery,
 		// eslint-disable-next-line no-undef
 		( ( Platform.OS === 'ios' ) || ( !! __DEV__ ) ) ? preformatted : null,
 		// eslint-disable-next-line no-undef
