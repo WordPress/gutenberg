@@ -4,7 +4,7 @@ exports[`Navigation allows a navigation menu to be created from an empty menu us
 "<!-- wp:navigation -->
 <!-- wp:navigation-link {\\"label\\":\\"WP\\",\\"title\\":\\"https://wordpress.org\\",\\"url\\":\\"https://wordpress.org\\"} /-->
 
-<!-- wp:navigation-link {\\"label\\":\\"Sample\\",\\"title\\":\\"Sample Page\\",\\"url\\":\\"http://localhost:8889/?page_id=2\\"} /-->
+<!-- wp:navigation-link {\\"label\\":\\"Get in touch\\",\\"title\\":\\"Contact Us\\",\\"url\\":\\"https://this/is/a/test/url/contact-us\\"} /-->
 <!-- /wp:navigation -->"
 `;
 

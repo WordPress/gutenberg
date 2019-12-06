@@ -30,6 +30,23 @@ async function mockPagesResponse( pages ) {
 	] );
 }
 
+async function mockSearchResponse( items ) {
+	const mappedItems = items.map( ( { title, slug }, index ) => ( {
+		id: index + 1,
+		subtype: 'page',
+		title,
+		type: 'post',
+		url: `https://this/is/a/test/url/${ slug }`,
+	} ) );
+
+	await setUpResponseMocking( [
+		{
+			match: ( request ) => request.url().includes( `rest_route=${ encodeURIComponent( '/wp/v2/search' ) }` ),
+			onRequestMatch: createJSONResponse( mappedItems ),
+		},
+	] );
+}
+
 async function updateActiveNavigationLink( { url, label } ) {
 	if ( url ) {
 		await page.type( 'input[placeholder="Search or type url"]', url );
@@ -100,8 +117,12 @@ describe( 'Navigation', () => {
 		// an issue where the block appender requires two clicks.
 		await page.click( '.wp-block-navigation .block-list-appender' );
 
+		// For the second nav link block use an existing internal page.
+		// Mock the api response so that it's consistent.
+		await mockSearchResponse( [ { title: 'Contact Us', slug: 'contact-us' } ] );
+
 		// Add a link to the default Navigation Link block.
-		await updateActiveNavigationLink( { url: 'Sample Page', label: 'Sample' } );
+		await updateActiveNavigationLink( { url: 'Contact Us', label: 'Get in touch' } );
 
 		// Expect a Navigation Block with two Navigation Links in the snapshot.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
