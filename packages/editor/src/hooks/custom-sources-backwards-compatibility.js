@@ -37,7 +37,7 @@ import { addFilter } from '@wordpress/hooks';
  */
 const createWithMetaAttributeSource = ( metaKeys ) => createHigherOrderComponent(
 	( BlockEdit ) => ( { attributes, setAttributes, ...props } ) => {
-		const postType = useSelect( ( select ) => select( 'core/editor' ).getCurrentPostType() );
+		const postType = useSelect( ( select ) => select( 'core/editor' ).getCurrentPostType(), [] );
 		const [ meta, setMeta ] = useEntityProp( 'postType', postType, 'meta' );
 
 		const mergedAttributes = useMemo(
