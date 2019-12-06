@@ -54,9 +54,17 @@ async function updateActiveNavigationLink( { url, label } ) {
 		await page.waitForXPath( `//span[@class="block-editor-link-control__search-item-title"]/mark[text()="${ url }"]` );
 		await page.keyboard.press( 'Enter' );
 	}
+
 	if ( label ) {
 		await page.click( '.wp-block-navigation-link__content.is-selected' );
-		await pressKeyWithModifier( 'primary', 'a' );
+
+		// Ideally this would be `await pressKeyWithModifier( 'primary', 'a' )`
+		// to select all text like other tests do.
+		// Unfortunately, these tests don't seem to pass on Travis CI when
+		// using that approach, while using `Home` and `End` they do pass.
+		await page.keyboard.press( 'Home' );
+		await pressKeyWithModifier( 'shift', 'End' );
+		await page.keyboard.press( 'Backspace' );
 		await page.keyboard.type( label );
 	}
 }
@@ -110,7 +118,7 @@ describe( 'Navigation', () => {
 		await updateActiveNavigationLink( { url: 'https://wordpress.org', label: 'WP' } );
 
 		// Move the mouse to reveal the block movers. Without this the test seems to fail.
-		await page.mouse.move( 10, 10 );
+		await page.mouse.move( 100, 100 );
 
 		// Add another Navigation Link block.
 		// Using 'click' here checks for regressions of https://github.com/WordPress/gutenberg/issues/18329,

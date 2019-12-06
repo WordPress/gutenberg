@@ -75,7 +75,7 @@ async function emulateSelectAll() {
 				charCode: 0,
 				keyCode: isMac ? 93 : 17,
 				which: isMac ? 93 : 17,
-			} ),
+			} )
 		);
 	} );
 }
