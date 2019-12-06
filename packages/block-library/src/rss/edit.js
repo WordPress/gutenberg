@@ -10,7 +10,7 @@ import {
 	RangeControl,
 	TextControl,
 	ToggleControl,
-	Toolbar,
+	ToolbarGroup,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
@@ -109,7 +109,7 @@ class RSSEdit extends Component {
 		return (
 			<>
 				<BlockControls>
-					<Toolbar controls={ toolbarControls } />
+					<ToolbarGroup controls={ toolbarControls } />
 				</BlockControls>
 				<InspectorControls>
 					<PanelBody title={ __( 'RSS Settings' ) }>

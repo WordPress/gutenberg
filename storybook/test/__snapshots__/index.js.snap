@@ -797,7 +797,7 @@ exports[`Storyshots Components|ColorPalette Default 1`] = `
     <button
       aria-label="Color: red"
       aria-pressed={false}
-      className="components-circular-option-picker__option"
+      className="components-button components-circular-option-picker__option"
       onBlur={[Function]}
       onClick={[Function]}
       onFocus={[Function]}
@@ -818,7 +818,7 @@ exports[`Storyshots Components|ColorPalette Default 1`] = `
     <button
       aria-label="Color: white"
       aria-pressed={false}
-      className="components-circular-option-picker__option"
+      className="components-button components-circular-option-picker__option"
       onBlur={[Function]}
       onClick={[Function]}
       onFocus={[Function]}
@@ -839,7 +839,7 @@ exports[`Storyshots Components|ColorPalette Default 1`] = `
     <button
       aria-label="Color: blue"
       aria-pressed={false}
-      className="components-circular-option-picker__option"
+      className="components-button components-circular-option-picker__option"
       onBlur={[Function]}
       onClick={[Function]}
       onFocus={[Function]}
@@ -891,7 +891,7 @@ exports[`Storyshots Components|ColorPalette With Knobs 1`] = `
     <button
       aria-label="Color: red"
       aria-pressed={false}
-      className="components-circular-option-picker__option"
+      className="components-button components-circular-option-picker__option"
       onBlur={[Function]}
       onClick={[Function]}
       onFocus={[Function]}
@@ -912,7 +912,7 @@ exports[`Storyshots Components|ColorPalette With Knobs 1`] = `
     <button
       aria-label="Color: white"
       aria-pressed={false}
-      className="components-circular-option-picker__option"
+      className="components-button components-circular-option-picker__option"
       onBlur={[Function]}
       onClick={[Function]}
       onFocus={[Function]}
@@ -933,7 +933,7 @@ exports[`Storyshots Components|ColorPalette With Knobs 1`] = `
     <button
       aria-label="Color: blue"
       aria-pressed={false}
-      className="components-circular-option-picker__option"
+      className="components-button components-circular-option-picker__option"
       onBlur={[Function]}
       onClick={[Function]}
       onFocus={[Function]}
@@ -1004,7 +1004,7 @@ exports[`Storyshots Components|ColorPicker Alpha Enabled 1`] = `
         <button
           aria-describedby="color-picker-saturation-1"
           aria-label="Choose a shade"
-          className="components-color-picker__saturation-pointer"
+          className="components-button components-color-picker__saturation-pointer"
           onKeyDown={[Function]}
           style={
             Object {
@@ -1012,6 +1012,7 @@ exports[`Storyshots Components|ColorPicker Alpha Enabled 1`] = `
               "top": "0%",
             }
           }
+          type="button"
         />
         <div
           className="components-visually-hidden"
@@ -1215,7 +1216,7 @@ exports[`Storyshots Components|ColorPicker Default 1`] = `
         <button
           aria-describedby="color-picker-saturation-0"
           aria-label="Choose a shade"
-          className="components-color-picker__saturation-pointer"
+          className="components-button components-color-picker__saturation-pointer"
           onKeyDown={[Function]}
           style={
             Object {
@@ -1223,6 +1224,7 @@ exports[`Storyshots Components|ColorPicker Default 1`] = `
               "top": "0%",
             }
           }
+          type="button"
         />
         <div
           className="components-visually-hidden"
@@ -1548,10 +1550,10 @@ exports[`Storyshots Components|FontSizePicker Default 1`] = `
     className="components-font-size-picker__controls"
   >
     <div
-      className="components-custom-select components-font-size-picker__select"
+      className="components-custom-select-control components-font-size-picker__select"
     >
       <label
-        className="components-custom-select__label"
+        className="components-custom-select-control__label"
         htmlFor="downshift-null-toggle-button"
         id="downshift-null-label"
       >
@@ -1561,7 +1563,7 @@ exports[`Storyshots Components|FontSizePicker Default 1`] = `
         aria-expanded={false}
         aria-haspopup="listbox"
         aria-label="Preset Size"
-        className="components-button components-custom-select__button"
+        className="components-button components-custom-select-control__button"
         id="downshift-null-toggle-button"
         onClick={[Function]}
         onKeyDown={[Function]}
@@ -1570,7 +1572,7 @@ exports[`Storyshots Components|FontSizePicker Default 1`] = `
         Normal
         <svg
           aria-hidden="true"
-          className="dashicon dashicons-arrow-down-alt2 components-custom-select__button-icon"
+          className="dashicon dashicons-arrow-down-alt2 components-custom-select-control__button-icon"
           focusable="false"
           height={20}
           role="img"
@@ -1585,7 +1587,7 @@ exports[`Storyshots Components|FontSizePicker Default 1`] = `
       </button>
       <ul
         aria-labelledby="downshift-null-label"
-        className="components-custom-select__menu"
+        className="components-custom-select-control__menu"
         id="downshift-null-menu"
         onBlur={[Function]}
         onKeyDown={[Function]}
@@ -1636,10 +1638,10 @@ exports[`Storyshots Components|FontSizePicker With Slider 1`] = `
     className="components-font-size-picker__controls"
   >
     <div
-      className="components-custom-select components-font-size-picker__select"
+      className="components-custom-select-control components-font-size-picker__select"
     >
       <label
-        className="components-custom-select__label"
+        className="components-custom-select-control__label"
         htmlFor="downshift-null-toggle-button"
         id="downshift-null-label"
       >
@@ -1649,7 +1651,7 @@ exports[`Storyshots Components|FontSizePicker With Slider 1`] = `
         aria-expanded={false}
         aria-haspopup="listbox"
         aria-label="Preset Size"
-        className="components-button components-custom-select__button"
+        className="components-button components-custom-select-control__button"
         id="downshift-null-toggle-button"
         onClick={[Function]}
         onKeyDown={[Function]}
@@ -1658,7 +1660,7 @@ exports[`Storyshots Components|FontSizePicker With Slider 1`] = `
         Normal
         <svg
           aria-hidden="true"
-          className="dashicon dashicons-arrow-down-alt2 components-custom-select__button-icon"
+          className="dashicon dashicons-arrow-down-alt2 components-custom-select-control__button-icon"
           focusable="false"
           height={20}
           role="img"
@@ -1673,7 +1675,7 @@ exports[`Storyshots Components|FontSizePicker With Slider 1`] = `
       </button>
       <ul
         aria-labelledby="downshift-null-label"
-        className="components-custom-select__menu"
+        className="components-custom-select-control__menu"
         id="downshift-null-menu"
         onBlur={[Function]}
         onKeyDown={[Function]}
@@ -1768,10 +1770,10 @@ exports[`Storyshots Components|FontSizePicker Without Custom Sizes 1`] = `
     className="components-font-size-picker__controls"
   >
     <div
-      className="components-custom-select components-font-size-picker__select"
+      className="components-custom-select-control components-font-size-picker__select"
     >
       <label
-        className="components-custom-select__label"
+        className="components-custom-select-control__label"
         htmlFor="downshift-null-toggle-button"
         id="downshift-null-label"
       >
@@ -1781,7 +1783,7 @@ exports[`Storyshots Components|FontSizePicker Without Custom Sizes 1`] = `
         aria-expanded={false}
         aria-haspopup="listbox"
         aria-label="Preset Size"
-        className="components-button components-custom-select__button"
+        className="components-button components-custom-select-control__button"
         id="downshift-null-toggle-button"
         onClick={[Function]}
         onKeyDown={[Function]}
@@ -1790,7 +1792,7 @@ exports[`Storyshots Components|FontSizePicker Without Custom Sizes 1`] = `
         Normal
         <svg
           aria-hidden="true"
-          className="dashicon dashicons-arrow-down-alt2 components-custom-select__button-icon"
+          className="dashicon dashicons-arrow-down-alt2 components-custom-select-control__button-icon"
           focusable="false"
           height={20}
           role="img"
@@ -1805,7 +1807,7 @@ exports[`Storyshots Components|FontSizePicker Without Custom Sizes 1`] = `
       </button>
       <ul
         aria-labelledby="downshift-null-label"
-        className="components-custom-select__menu"
+        className="components-custom-select-control__menu"
         id="downshift-null-menu"
         onBlur={[Function]}
         onKeyDown={[Function]}
@@ -2459,25 +2461,12 @@ exports[`Storyshots Components|Popover Default 1`] = `
         onTouchStart={[Function]}
       >
         <div
-          className="components-popover is-top is-center"
+          className="components-popover"
           onKeyDown={[Function]}
           onMouseDown={[Function]}
-          style={
-            Object {
-              "left": undefined,
-              "top": undefined,
-              "visibility": "hidden",
-            }
-          }
         >
           <div
             className="components-popover__content"
-            style={
-              Object {
-                "maxHeight": undefined,
-                "maxWidth": undefined,
-              }
-            }
             tabIndex="-1"
           >
             Popover Content
@@ -2597,25 +2586,12 @@ exports[`Storyshots Components|Popover Positioning 1`] = `
               onTouchStart={[Function]}
             >
               <div
-                className="components-popover is-top is-center"
+                className="components-popover"
                 onKeyDown={[Function]}
                 onMouseDown={[Function]}
-                style={
-                  Object {
-                    "left": undefined,
-                    "top": undefined,
-                    "visibility": "hidden",
-                  }
-                }
               >
                 <div
                   className="components-popover__content"
-                  style={
-                    Object {
-                      "maxHeight": undefined,
-                      "maxWidth": undefined,
-                    }
-                  }
                   tabIndex="-1"
                 >
                   Popover
@@ -3260,6 +3236,16 @@ exports[`Storyshots Components|TabPanel Default 1`] = `
     </p>
   </div>
 </div>
+`;
+
+exports[`Storyshots Components|TextHighlight Default 1`] = `
+Array [
+  "We call the new editor ",
+  <mark>
+    Gutenberg
+  </mark>,
+  ". The entire editing experience has been rebuilt for media rich pages and posts.",
+]
 `;
 
 exports[`Storyshots Components|Tip Default 1`] = `
@@ -3942,12 +3928,12 @@ Array [
 ]
 `;
 
-exports[`Storyshots CustomSelect Default 1`] = `
+exports[`Storyshots CustomSelectControl Default 1`] = `
 <div
-  className="components-custom-select"
+  className="components-custom-select-control"
 >
   <label
-    className="components-custom-select__label"
+    className="components-custom-select-control__label"
     htmlFor="downshift-null-toggle-button"
     id="downshift-null-label"
   >
@@ -3957,7 +3943,7 @@ exports[`Storyshots CustomSelect Default 1`] = `
     aria-expanded={false}
     aria-haspopup="listbox"
     aria-label="Font Size"
-    className="components-button components-custom-select__button"
+    className="components-button components-custom-select-control__button"
     id="downshift-null-toggle-button"
     onClick={[Function]}
     onKeyDown={[Function]}
@@ -3965,7 +3951,7 @@ exports[`Storyshots CustomSelect Default 1`] = `
   >
     <svg
       aria-hidden="true"
-      className="dashicon dashicons-arrow-down-alt2 components-custom-select__button-icon"
+      className="dashicon dashicons-arrow-down-alt2 components-custom-select-control__button-icon"
       focusable="false"
       height={20}
       role="img"
@@ -3980,7 +3966,7 @@ exports[`Storyshots CustomSelect Default 1`] = `
   </button>
   <ul
     aria-labelledby="downshift-null-label"
-    className="components-custom-select__menu"
+    className="components-custom-select-control__menu"
     id="downshift-null-menu"
     onBlur={[Function]}
     onKeyDown={[Function]}

@@ -32,7 +32,7 @@ import {
 	TextareaControl,
 	TextControl,
 	ToggleControl,
-	Toolbar,
+	ToolbarGroup,
 	withNotices,
 } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
@@ -395,6 +395,12 @@ export class ImageEdit extends Component {
 			mediaAttributes.href = media.url;
 		}
 
+		// Check if the image is linked to the attachment page.
+		if ( linkDestination === LINK_DESTINATION_ATTACHMENT ) {
+			// Update the media link.
+			mediaAttributes.href = media.link;
+		}
+
 		this.props.setAttributes( {
 			...mediaAttributes,
 			...additionalAttributes,
@@ -609,7 +615,7 @@ export class ImageEdit extends Component {
 				/>
 				{ url && (
 					<>
-						<Toolbar>
+						<ToolbarGroup>
 							<IconButton
 								className={ classnames( 'components-icon-button components-toolbar__control', { 'is-active': this.state.isEditing } ) }
 								label={ __( 'Edit image' ) }
@@ -617,8 +623,8 @@ export class ImageEdit extends Component {
 								onClick={ this.toggleIsEditing }
 								icon={ editImageIcon }
 							/>
-						</Toolbar>
-						<Toolbar>
+						</ToolbarGroup>
+						<ToolbarGroup>
 							<ImageURLInputUI
 								url={ href || '' }
 								onChangeUrl={ this.onSetHref }
@@ -647,7 +653,7 @@ export class ImageEdit extends Component {
 									</>
 								}
 							/>
-						</Toolbar>
+						</ToolbarGroup>
 					</>
 				) }
 			</BlockControls>

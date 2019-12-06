@@ -200,6 +200,9 @@ export default function __experimentalUseColors(
 	const detectedBackgroundColorRef = useRef();
 	const detectedColorRef = useRef();
 	const ColorDetector = useMemo( () => {
+		if ( ! contrastCheckers ) {
+			return undefined;
+		}
 		let needsBackgroundColor = false;
 		let needsColor = false;
 		for ( const { backgroundColor, textColor } of castArray( contrastCheckers ) ) {

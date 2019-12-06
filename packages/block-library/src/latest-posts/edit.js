@@ -12,11 +12,11 @@ import {
 	PanelBody,
 	Placeholder,
 	QueryControls,
+	RadioControl,
 	RangeControl,
 	Spinner,
 	ToggleControl,
-	Toolbar,
-	RadioControl,
+	ToolbarGroup,
 } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
@@ -179,7 +179,7 @@ class LatestPostsEdit extends Component {
 			<>
 				{ inspectorControls }
 				<BlockControls>
-					<Toolbar controls={ layoutControls } />
+					<ToolbarGroup controls={ layoutControls } />
 				</BlockControls>
 				<ul
 					className={ classnames( this.props.className, {

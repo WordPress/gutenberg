@@ -142,6 +142,17 @@
 		}
 	}
 
+	&.items-justified-left > ul {
+		justify-content: flex-start;
+	}
+
+	&.items-justified-center > ul {
+		justify-content: center;
+	}
+
+	&.items-justified-right > ul {
+		justify-content: flex-end;
+	}
 }
 
 .is-style-dark > ul > li > ul {

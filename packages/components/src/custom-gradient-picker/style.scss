@@ -1,0 +1,57 @@
+$components-custom-gradient-picker__padding: 3px; // 24px container, 18px handles inside, that leaves 6px padding, half of which is 3.
+
+.components-custom-gradient-picker:not(.has-gradient) {
+	opacity: 0.4;
+}
+
+.components-custom-gradient-picker {
+	width: 100%;
+	height: $icon-button-size-small;
+	border-radius: $icon-button-size-small;
+	margin-bottom: $grid-size;
+	padding-left: $components-custom-gradient-picker__padding;
+	padding-right: $icon-button-size-small - $components-custom-gradient-picker__padding;
+
+	.components-custom-gradient-picker__markers-container {
+		position: relative;
+	}
+
+	.components-custom-gradient-picker__insert-point {
+		border-radius: 50%;
+		background: $white;
+		padding: 2px;
+		width: $icon-button-size-small;
+		height: $icon-button-size-small;
+		position: relative;
+	}
+
+	.components-custom-gradient-picker__control-point-button {
+		border: 2px solid $white;
+		border-radius: 50%;
+		height: 18px;
+		position: absolute;
+		width: 18px;
+		top: $components-custom-gradient-picker__padding;
+
+		&.is-active {
+			background: #fafafa;
+			color: #23282d;
+			border-color: #999;
+			box-shadow:
+				inset 0 -1px 0 #999,
+				0 0 0 1px $white,
+				0 0 0 3px $blue-medium-focus;
+		}
+	}
+}
+
+.components-custom-gradient-picker__color-picker-popover .components-custom-gradient-picker__remove-control-point {
+	margin-left: auto;
+	margin-right: auto;
+	display: block;
+	margin-bottom: 8px;
+}
+
+.components-custom-gradient-picker__inserter {
+	width: 100%;
+}
