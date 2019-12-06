@@ -31,6 +31,8 @@ const warning = chalk.bold.keyword( 'orange' );
 const success = chalk.bold.green;
 
 // Utils
+const STABLE_TAG_REGEX = /Stable tag: [0-9]+\.[0-9]+\.[0-9]+\s*\n/;
+const STABLE_TAG_PLACEHOLDER = 'Stable tag: V.V.V\n';
 
 /**
  * Small utility used to read an uncached version of a JSON file
@@ -145,6 +147,11 @@ async function runUpdateTrunkContentStep( version, changelog, abortMessage ) {
 	await runStep( 'Updating trunk content', abortMessage, async () => {
 		console.log( '>> Replacing trunk content using the new plugin ZIP' );
 
+		const readmePath = svnWorkingDirectoryPath + '/readme.txt';
+
+		const previousReadmeFileContent = fs.readFileSync( readmePath, 'utf8' );
+		const stableTag = previousReadmeFileContent.match( STABLE_TAG_REGEX )[ 0 ];
+
 		// Delete everything
 		runShellScript( 'find . -maxdepth 1 -not -name ".svn" -not -name "." -not -name ".." -exec rm -rf {} +', svnWorkingDirectoryPath );
 
@@ -152,7 +159,12 @@ async function runUpdateTrunkContentStep( version, changelog, abortMessage ) {
 		const gutenbergZipPath = gitWorkingDirectoryPath + '/gutenberg.zip';
 		runShellScript( 'unzip ' + gutenbergZipPath + ' -d ' + svnWorkingDirectoryPath );
 
-		console.log( '>> Updating the changelog in readme.txt and changelog.txt' );
+		// Replace the stable tag placeholder with the existing stable tag on the SVN repository.
+		const newReadmeFileContent = fs.readFileSync( readmePath, 'utf8' );
+		fs.writeFileSync(
+			readmePath,
+			newReadmeFileContent.replace( STABLE_TAG_PLACEHOLDER, stableTag )
+		);
 
 		// Commit the content changes
 		runShellScript( "svn st | grep '^\?' | awk '{print $2}' | xargs svn add", svnWorkingDirectoryPath );
@@ -200,7 +212,7 @@ async function updateThePluginStableVersion( version, abortMessage ) {
 		const readmePath = svnWorkingDirectoryPath + '/readme.txt';
 		const readmeFileContent = fs.readFileSync( readmePath, 'utf8' );
 		const newReadmeContent = readmeFileContent.replace(
-			/Stable tag: [0-9]+.[0-9]+.[0-9]+\s*\n/,
+			STABLE_TAG_REGEX,
 			'Stable tag: ' + version + '\n'
 		);
 		fs.writeFileSync( readmePath, newReadmeContent );
@@ -214,21 +226,7 @@ async function updateThePluginStableVersion( version, abortMessage ) {
 
 		runShellScript( 'svn commit -m "Releasing Gutenberg version ' + version + '"', svnWorkingDirectoryPath );
 
-		console.log( '>> Stable version updated successfully on the svn repository' );
-
-		const readmeGitPath = gitWorkingDirectoryPath + '/readme.txt';
-		const simpleGit = SimpleGit( gitWorkingDirectoryPath );
-		await simpleGit.fetch();
-		await simpleGit.reset( 'hard' );
-		await simpleGit.checkout( 'master' );
-		await simpleGit.pull( 'origin', 'master' );
-		fs.writeFileSync( readmeGitPath, newReadmeContent );
-		await simpleGit.add( [
-			readmeGitPath,
-		] );
-		await simpleGit.commit( 'Update stable tag version to ' + version );
-		await simpleGit.push( 'origin', 'master' );
-		console.log( '>> Stable version updated successfully on the git repository' );
+		console.log( '>> Stable version updated successfully' );
 	} );
 }
 
