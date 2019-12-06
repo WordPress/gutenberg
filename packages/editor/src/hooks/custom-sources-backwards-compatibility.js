@@ -13,7 +13,6 @@ import { createHigherOrderComponent } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 
 /** @typedef {import('@wordpress/compose').WPHigherOrderComponent} WPHigherOrderComponent */
-
 /** @typedef {import('@wordpress/blocks').WPBlockSettings} WPBlockSettings */
 
 /**
