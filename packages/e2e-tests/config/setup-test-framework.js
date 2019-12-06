@@ -239,7 +239,7 @@ beforeAll( async () => {
 	capturePageEventsForTearDown();
 	enablePageDialogAccept();
 	observeConsoleLogging();
-	simulateAdverseConditions();
+	await simulateAdverseConditions();
 
 	await trashExistingPosts();
 	await setupBrowser();
