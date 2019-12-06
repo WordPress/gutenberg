@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -22,10 +22,7 @@ export const settings = {
 	icon,
 	example: {
 		attributes: {
-			content: sprintf(
-				__( '// A "block" is the abstract term used%1$s// to describe units of markup that%1$s// when composed together, form the%1$s// content or layout of a page.%1$sregisterBlockType( name, settings );' ),
-				'\n'
-			),
+			content: '// A "block" is the abstract term used\n// to describe units of markup that\n// when composed together, form the\n// content or layout of a page.\nregisterBlockType( name, settings );',
 		},
 	},
 	supports: {
