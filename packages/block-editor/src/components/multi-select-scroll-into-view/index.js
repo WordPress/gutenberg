@@ -16,7 +16,8 @@ import { getScrollContainer } from '@wordpress/dom';
 import { getBlockDOMNode } from '../../utils/dom';
 
 /**
- * Scrolls the multi block selection end into view if not in view already.
+ * Scrolls the multi block selection end into view if not in view already. This
+ * is important to do after selection by keyboard.
  */
 export default function MultiSelectScrollIntoView() {
 	const selector = ( select ) => {
