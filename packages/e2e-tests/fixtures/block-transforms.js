@@ -650,7 +650,7 @@ export const EXPECTED_TRANSFORMS = {
 		availableTransforms: [
 			'Group',
 		],
-		originalBlock: 'Soundcloud',
+		originalBlock: 'SoundCloud',
 	},
 	'core__social-link-spotify': {
 		availableTransforms: [
