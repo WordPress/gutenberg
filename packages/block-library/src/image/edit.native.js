@@ -10,7 +10,7 @@ import {
 	requestImageUploadCancelDialog,
 	requestImageFullscreenPreview,
 } from 'react-native-gutenberg-bridge';
-import { isEmpty, map, get } from 'lodash';
+import { isEmpty, get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -53,26 +53,8 @@ import { getUpdatedLinkTargetSettings } from './utils';
 import {
 	LINK_DESTINATION_CUSTOM,
 	LINK_DESTINATION_NONE,
+	DEFAULT_SIZE_SLUG,
 } from './constants';
-
-const IMAGE_SIZE_THUMBNAIL = 'thumbnail';
-const IMAGE_SIZE_MEDIUM = 'medium';
-const IMAGE_SIZE_LARGE = 'large';
-const IMAGE_SIZE_FULL_SIZE = 'full';
-const sizeArray = [
-	IMAGE_SIZE_THUMBNAIL,
-	IMAGE_SIZE_MEDIUM,
-	IMAGE_SIZE_LARGE,
-	IMAGE_SIZE_FULL_SIZE,
-];
-const DEFAULT_SIZE_SLUG = IMAGE_SIZE_LARGE;
-const sizeOptionLabels = {
-	[ IMAGE_SIZE_THUMBNAIL ]: __( 'Thumbnail' ),
-	[ IMAGE_SIZE_MEDIUM ]: __( 'Medium' ),
-	[ IMAGE_SIZE_LARGE ]: __( 'Large' ),
-	[ IMAGE_SIZE_FULL_SIZE ]: __( 'Full Size' ),
-};
-const sizeOptions = map( sizeOptionLabels, ( label, option ) => ( { value: option, label } ) );
 
 // Default Image ratio 4:3
 const IMAGE_ASPECT_RATIO = 4 / 3;
@@ -227,13 +209,9 @@ export class ImageEdit extends React.Component {
 		this.props.setAttributes( updatedLinkTarget );
 	}
 
-	onSetSizeSlug( prevSizeSlug ) {
+	onSetSizeSlug( sizeSlug ) {
 		const { image } = this.props;
 
-		if ( prevSizeSlug === undefined ) {
-			prevSizeSlug = IMAGE_SIZE_LARGE;
-		}
-		const sizeSlug = sizeArray[ ( sizeArray.indexOf( prevSizeSlug ) + 1 ) % sizeArray.length ];
 		const url = getUrlForSlug( image, { sizeSlug } );
 		if ( ! url ) {
 			this.props.setAttributes( {
@@ -309,7 +287,7 @@ export class ImageEdit extends React.Component {
 	}
 
 	render() {
-		const { attributes, isSelected } = this.props;
+		const { attributes, isSelected, imageSizes } = this.props;
 		const { align, url, height, width, alt, href, id, linkTarget, sizeSlug } = attributes;
 
 		const actions = [ { label: __( 'Clear All Settings' ), onPress: this.onClearSettings } ];
@@ -354,9 +332,9 @@ export class ImageEdit extends React.Component {
 						hideCancelButton
 						icon={ 'editor-expand' }
 						label={ __( 'Size' ) }
-						value={ sizeOptionLabels[ sizeSlug || DEFAULT_SIZE_SLUG ] }
-						onChangeValue={ () => this.onSetSizeSlug( sizeSlug ) }
-						options={ sizeOptions }
+						value={ sizeSlug || DEFAULT_SIZE_SLUG }
+						onChangeValue={ ( newSizeSlug ) => this.onSetSizeSlug( newSizeSlug ) }
+						options={ imageSizes }
 					/>
 					<TextControl
 						icon={ 'editor-textcolor' }
@@ -489,10 +467,15 @@ export class ImageEdit extends React.Component {
 export default compose( [
 	withSelect( ( select, props ) => {
 		const { getMedia } = select( 'core' );
+		const { getSettings } = select( 'core/block-editor' );
 		const { attributes: { id }, isSelected } = props;
+		const {
+			imageSizes,
+		} = getSettings();
 
 		return {
 			image: id && isSelected ? getMedia( id ) : null,
+			imageSizes,
 		};
 	} ),
 	withPreferredColorScheme,
