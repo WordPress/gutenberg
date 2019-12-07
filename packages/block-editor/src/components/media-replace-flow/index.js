@@ -72,7 +72,6 @@ const MediaReplaceFlow = (
 	const selectURL = ( newURL ) => {
 		onSelectURL( newURL );
 		setShowEditURLInput( false );
-		setShowURLInput( false );
 	};
 
 	const uploadFiles = ( event ) => {
@@ -90,8 +89,6 @@ const MediaReplaceFlow = (
 	};
 
 	const onClose = () => {
-		setShowEditURLInput( false );
-		setShowURLInput( false );
 		editMediaButtonRef.current.focus();
 	};
 
