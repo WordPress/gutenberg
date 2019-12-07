@@ -79,6 +79,7 @@
 		"@storybook/addon-storysource": "5.2.4",
 		"@storybook/addon-viewport": "5.2.4",
 		"@storybook/react": "5.2.4",
+		"@types/requestidlecallback": "0.3.1",
 		"@wordpress/babel-plugin-import-jsx-pragma": "file:packages/babel-plugin-import-jsx-pragma",
 		"@wordpress/babel-plugin-makepot": "file:packages/babel-plugin-makepot",
 		"@wordpress/babel-preset-default": "file:packages/babel-preset-default",
