@@ -161,7 +161,7 @@ const socialList = {
 		icon: SnapchatIcon,
 	},
 	soundcloud: {
-		name: 'Soundcloud',
+		name: 'SoundCloud',
 		icon: SoundcloudIcon,
 	},
 	spotify: {
