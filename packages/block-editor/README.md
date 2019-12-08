@@ -342,7 +342,8 @@ Undocumented declaration.
 
 <a name="MultiSelectScrollIntoView" href="#MultiSelectScrollIntoView">#</a> **MultiSelectScrollIntoView**
 
-Undocumented declaration.
+Scrolls the multi block selection end into view if not in view already. This
+is important to do after selection by keyboard.
 
 <a name="NavigableToolbar" href="#NavigableToolbar">#</a> **NavigableToolbar**
 
