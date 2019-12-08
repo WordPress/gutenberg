@@ -6,13 +6,14 @@ import {
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
 } from 'react-native-gutenberg-bridge';
+import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
 import { Icon } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { RichText, MediaUploadProgress } from '@wordpress/block-editor';
 import { isURL } from '@wordpress/url';
 import { withPreferredColorScheme } from '@wordpress/compose';
@@ -258,7 +259,7 @@ class GalleryImage extends Component {
 	}
 
 	render() {
-		const { id, onRemove, getStylesFromColorScheme } = this.props;
+		const { id, onRemove, getStylesFromColorScheme, isSelected } = this.props;
 
 		const containerStyle = getStylesFromColorScheme( style.galleryImageContainer,
 			style.galleryImageContainerDark );
@@ -266,6 +267,9 @@ class GalleryImage extends Component {
 		return (
 			<TouchableWithoutFeedback
 				onPress={ this.onMediaPressed }
+				accessible={ ! isSelected } // We need only child views to be accessible after the selection
+				accessibilityLabel={ this.accessibilityLabelImageContainer() } // if we don't set this explicitly it reads system provided accessibilityLabels of all child components and those include pretty technical words which don't make sense
+				accessibilityRole={ 'imagebutton' } // this makes VoiceOver to read a description of image provided by system on iOS and lets user know this is a button which conveys the message of tappablity
 			>
 				<View style={ containerStyle }>
 					<MediaUploadProgress
@@ -279,6 +283,15 @@ class GalleryImage extends Component {
 				</View>
 			</TouchableWithoutFeedback>
 		);
+	}
+
+	accessibilityLabelImageContainer() {
+		const { caption, 'aria-label': ariaLabel } = this.props;
+
+		return isEmpty( caption ) ? ariaLabel : ( ariaLabel + '. ' + sprintf(
+			/* translators: accessibility text. %s: image caption. */
+			__( 'Image caption. %s' ), caption
+		) );
 	}
 }
 

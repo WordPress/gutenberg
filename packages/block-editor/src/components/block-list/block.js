@@ -252,11 +252,11 @@ function BlockListBlock( {
 	// Focus the selected block's wrapper or inner input on mount and update
 	const isMounting = useRef( true );
 	useEffect( () => {
-		if ( isSelected ) {
+		if ( isSelected && ! isMultiSelecting ) {
 			focusTabbable( ! isMounting.current );
 		}
 		isMounting.current = false;
-	}, [ isSelected ] );
+	}, [ isSelected, isMultiSelecting ] );
 
 	// Focus the first multi selected block
 	useEffect( () => {
@@ -342,8 +342,6 @@ function BlockListBlock( {
 		}
 	};
 
-	const isPointerDown = useRef( false );
-
 	/**
 	 * Begins tracking cursor multi-selection when clicking down within block.
 	 *
@@ -370,34 +368,27 @@ function BlockListBlock( {
 				event.preventDefault();
 			}
 
-		// Avoid triggering multi-selection if we click toolbars/inspectors
-		// and all elements that are outside the Block Edit DOM tree.
-		} else if ( blockNodeRef.current.contains( event.target ) ) {
-			isPointerDown.current = true;
-
-			// Allow user to escape out of a multi-selection to a singular
-			// selection of a block via click. This is handled here since
-			// onFocus excludes blocks involved in a multiselection, as
-			// focus can be incurred by starting a multiselection (focus
-			// moved to first block's multi-controls).
-			if ( isPartOfMultiSelection ) {
-				onSelect();
-			}
+		// Allow user to escape out of a multi-selection to a singular
+		// selection of a block via click. This is handled here since
+		// onFocus excludes blocks involved in a multiselection, as
+		// focus can be incurred by starting a multiselection (focus
+		// moved to first block's multi-controls).
+		} else if ( isPartOfMultiSelection ) {
+			onSelect();
 		}
 	};
 
-	const onMouseUp = () => {
-		isPointerDown.current = false;
-	};
-
-	const onMouseLeave = () => {
-		if ( isPointerDown.current ) {
+	const onMouseLeave = ( { which, buttons } ) => {
+		// The primary button must be pressed to initiate selection. Fall back
+		// to `which` if the standard `buttons` property is falsy. There are
+		// cases where Firefox might always set `buttons` to `0`.
+		// See https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/buttons
+		// See https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/which
+		if ( isSelected && ( buttons || which ) === 1 ) {
 			onSelectionStart( clientId );
 		}
 
 		hideHoverEffects();
-
-		isPointerDown.current = false;
 	};
 
 	const selectOnOpen = ( open ) => {
@@ -437,12 +428,13 @@ function BlockListBlock( {
 		! showEmptyBlockSideInserter &&
 		! isPartOfMultiSelection &&
 		! isTypingWithinBlock;
-	const shouldShowBreadcrumb = isNavigationMode && isSelected && ! isMultiSelecting;
+	const shouldShowBreadcrumb = isNavigationMode && isSelected;
 	const shouldShowContextualToolbar =
 		! isNavigationMode &&
 		! hasFixedToolbar &&
 		isLargeViewport &&
 		! showEmptyBlockSideInserter &&
+		! isMultiSelecting &&
 		(
 			( isSelected && ( ! isTypingWithinBlock || isCaretWithinFormattedText ) ) ||
 			isFirstMultiSelected
@@ -598,7 +590,6 @@ function BlockListBlock( {
 					ref={ blockNodeRef }
 					onDragStart={ preventDrag }
 					onMouseDown={ onMouseDown }
-					onMouseUp={ onMouseUp }
 					onMouseLeave={ onMouseLeave }
 					data-block={ clientId }
 				>

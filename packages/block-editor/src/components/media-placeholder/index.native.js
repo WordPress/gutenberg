@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { View, Text, TouchableWithoutFeedback } from 'react-native';
-import { uniqBy } from 'lodash';
+import { uniqWith } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -36,7 +36,9 @@ function MediaPlaceholder( props ) {
 	} = props;
 
 	const setMedia = multiple && addToGallery ?
-		( selected ) => onSelect( uniqBy( [ ...value, ...selected ], 'id' ) ) :
+		( selected ) => onSelect( uniqWith( [ ...value, ...selected ], ( media1, media2 ) => {
+			return media1.id === media2.id || media1.url === media2.url;
+		} ) ) :
 		onSelect;
 
 	const isOneType = allowedTypes.length === 1;

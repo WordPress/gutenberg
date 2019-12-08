@@ -297,11 +297,6 @@
 		border-left-color: transparent;
 		border-style: dashed;
 		border-width: $border-width;
-
-		.is-dark-theme & {
-			border-color: $light-opacity-light-800;
-			border-left-color: transparent;
-		}
 	}
 
 	// Reusable Blocks clickthrough overlays.
