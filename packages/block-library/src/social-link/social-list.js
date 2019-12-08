@@ -33,6 +33,7 @@ import {
 	SnapchatIcon,
 	SoundcloudIcon,
 	SpotifyIcon,
+	TelegramIcon,
 	TumblrIcon,
 	TwitchIcon,
 	TwitterIcon,
@@ -167,6 +168,10 @@ const socialList = {
 	spotify: {
 		name: 'Spotify',
 		icon: SpotifyIcon,
+	},
+	telegram: {
+		name: 'Telegram',
+		icon: TelegramIcon,
 	},
 	tumblr: {
 		name: 'Tumblr',
