@@ -18,21 +18,25 @@ import BlockInsertionPoint from '../block-list/insertion-point';
 const addBeforeOption = {
 	value: 'before',
 	label: __( 'Add Block Before' ),
+	icon: 'insert-before',
 };
 
 const addAfterOption = {
 	value: 'after',
 	label: __( 'Add Block After' ),
+	icon: 'insert-after',
 };
 
 const addToBeginningOption = {
 	value: 'before',
 	label: __( 'Add To Beginning' ),
+	icon: 'insert-before',
 };
 
 const addToEndOption = {
 	value: 'after',
 	label: __( 'Add To End' ),
+	icon: 'insert-after',
 };
 
 const defaultRenderToggle = ( { onToggle, disabled, style, onLongPress } ) => (
