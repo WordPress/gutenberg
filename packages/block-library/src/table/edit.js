@@ -18,13 +18,13 @@ import {
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import {
-	PanelBody,
-	ToggleControl,
-	TextControl,
 	Button,
-	Toolbar,
 	DropdownMenu,
+	PanelBody,
 	Placeholder,
+	TextControl,
+	ToggleControl,
+	ToolbarGroup,
 } from '@wordpress/components';
 
 /**
@@ -535,14 +535,14 @@ export class TableEdit extends Component {
 		return (
 			<>
 				<BlockControls>
-					<Toolbar>
+					<ToolbarGroup>
 						<DropdownMenu
 							hasArrowIndicator
 							icon="editor-table"
 							label={ __( 'Edit table' ) }
 							controls={ this.getTableControls() }
 						/>
-					</Toolbar>
+					</ToolbarGroup>
 					<AlignmentToolbar
 						label={ __( 'Change column alignment' ) }
 						alignmentControls={ ALIGNMENT_CONTROLS }

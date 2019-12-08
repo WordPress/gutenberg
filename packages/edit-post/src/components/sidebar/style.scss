@@ -17,7 +17,7 @@
 	> .components-panel {
 		border-left: none;
 		border-right: none;
-		overflow: visible;
+		overflow: auto;
 		-webkit-overflow-scrolling: touch;
 		height: auto;
 		max-height: calc(100vh - #{ $admin-bar-height-big + $panel-header-height });
@@ -149,7 +149,8 @@
 		}
 	}
 
-	&:focus {
+	&:focus:not(:disabled) {
 		@include square-style__focus;
+		box-shadow: none;
 	}
 }

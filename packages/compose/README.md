@@ -139,6 +139,26 @@ _Returns_
 
 -   `boolean`: Reduced motion preference value.
 
+<a name="useViewportMatch" href="#useViewportMatch">#</a> **useViewportMatch**
+
+Returns true if the viewport matches the given query, or false otherwise.
+
+_Usage_
+
+```js
+useViewportMatch( 'huge', <' );
+useViewportMatch( 'medium' );
+```
+
+_Parameters_
+
+-   _breakpoint_ `WPBreakpoint`: Breakpoint size name.
+-   _operator_ `[WPViewportOperator]`: Viewport operator.
+
+_Returns_
+
+-   `boolean`: Whether viewport matches query.
+
 <a name="withGlobalEvents" href="#withGlobalEvents">#</a> **withGlobalEvents**
 
 Higher-order component creator which, given an object of DOM event types and

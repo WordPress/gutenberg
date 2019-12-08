@@ -283,7 +283,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
           <Tooltip
             text="red"
           >
-            <button
+            <ForwardRef(Button)
               aria-label="Color: red"
               aria-pressed={true}
               className="components-circular-option-picker__option is-active"
@@ -298,8 +298,25 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
                   "color": "#f00",
                 }
               }
-              type="button"
-            />
+            >
+              <button
+                aria-label="Color: red"
+                aria-pressed={true}
+                className="components-button components-circular-option-picker__option is-active"
+                onBlur={[Function]}
+                onClick={[Function]}
+                onFocus={[Function]}
+                onMouseDown={[Function]}
+                onMouseEnter={[Function]}
+                onMouseLeave={[Function]}
+                style={
+                  Object {
+                    "color": "#f00",
+                  }
+                }
+                type="button"
+              />
+            </ForwardRef(Button)>
           </Tooltip>
           <Dashicon
             icon="saved"
@@ -354,7 +371,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
           <Tooltip
             text="white"
           >
-            <button
+            <ForwardRef(Button)
               aria-label="Color: white"
               aria-pressed={false}
               className="components-circular-option-picker__option"
@@ -369,8 +386,25 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
                   "color": "#fff",
                 }
               }
-              type="button"
-            />
+            >
+              <button
+                aria-label="Color: white"
+                aria-pressed={false}
+                className="components-button components-circular-option-picker__option"
+                onBlur={[Function]}
+                onClick={[Function]}
+                onFocus={[Function]}
+                onMouseDown={[Function]}
+                onMouseEnter={[Function]}
+                onMouseLeave={[Function]}
+                style={
+                  Object {
+                    "color": "#fff",
+                  }
+                }
+                type="button"
+              />
+            </ForwardRef(Button)>
           </Tooltip>
         </div>
       </Option>
@@ -392,7 +426,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
           <Tooltip
             text="blue"
           >
-            <button
+            <ForwardRef(Button)
               aria-label="Color: blue"
               aria-pressed={false}
               className="components-circular-option-picker__option"
@@ -407,8 +441,25 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
                   "color": "#00f",
                 }
               }
-              type="button"
-            />
+            >
+              <button
+                aria-label="Color: blue"
+                aria-pressed={false}
+                className="components-button components-circular-option-picker__option"
+                onBlur={[Function]}
+                onClick={[Function]}
+                onFocus={[Function]}
+                onMouseDown={[Function]}
+                onMouseEnter={[Function]}
+                onMouseLeave={[Function]}
+                style={
+                  Object {
+                    "color": "#00f",
+                  }
+                }
+                type="button"
+              />
+            </ForwardRef(Button)>
           </Tooltip>
         </div>
       </Option>
@@ -465,7 +516,6 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
             isDefault={true}
             isSmall={true}
             onClick={[Function]}
-            type="button"
           >
             <button
               className="components-button components-circular-option-picker__clear is-button is-default is-small"

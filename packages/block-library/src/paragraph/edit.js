@@ -10,39 +10,30 @@ import { __, _x } from '@wordpress/i18n';
 import {
 	PanelBody,
 	ToggleControl,
-	Toolbar,
-	withFallbackStyles,
+	ToolbarGroup,
 } from '@wordpress/components';
 import {
-	withColors,
 	AlignmentToolbar,
 	BlockControls,
-	ContrastChecker,
 	FontSizePicker,
 	InspectorControls,
-	PanelColorSettings,
 	RichText,
 	withFontSizes,
+	__experimentalUseColors,
 } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 import { compose } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
+import { useEffect, useState } from '@wordpress/element';
 
+/**
+ * Browser dependencies
+ */
 const { getComputedStyle } = window;
+const querySelector = window.document.querySelector.bind( document );
 
 const name = 'core/paragraph';
-
-const applyFallbackStyles = withFallbackStyles( ( node, ownProps ) => {
-	const { textColor, backgroundColor, fontSize, customFontSize } = ownProps.attributes;
-	const editableNode = node.querySelector( '[contenteditable="true"]' );
-	//verify if editableNode is available, before using getComputedStyle.
-	const computedStyles = editableNode ? getComputedStyle( editableNode ) : null;
-	return {
-		fallbackBackgroundColor: backgroundColor || ! computedStyles ? undefined : computedStyles.backgroundColor,
-		fallbackTextColor: textColor || ! computedStyles ? undefined : computedStyles.color,
-		fallbackFontSize: fontSize || customFontSize || ! computedStyles ? undefined : parseInt( computedStyles.fontSize ) || undefined,
-	};
-} );
+const PARAGRAPH_DROP_CAP_SELECTOR = 'p.has-drop-cap';
 
 function ParagraphRTLToolbar( { direction, setDirection } ) {
 	const isRTL = useSelect( ( select ) => {
@@ -50,7 +41,7 @@ function ParagraphRTLToolbar( { direction, setDirection } ) {
 	} );
 
 	return ( isRTL && (
-		<Toolbar
+		<ToolbarGroup
 			controls={ [
 				{
 					icon: 'editor-ltr',
@@ -65,60 +56,35 @@ function ParagraphRTLToolbar( { direction, setDirection } ) {
 	) );
 }
 
-function ParagraphPanelColor( {
-	backgroundColor,
-	fallbackBackgroundColor,
-	fallbackTextColor,
-	fontSize,
-	setBackgroundColor,
-	setTextColor,
-	textColor,
-} ) {
-	return (
-		<PanelColorSettings
-			title={ __( 'Color Settings' ) }
-			initialOpen={ false }
-			colorSettings={ [
-				{
-					value: backgroundColor,
-					onChange: setBackgroundColor,
-					label: __( 'Background Color' ),
-				},
-				{
-					value: textColor,
-					onChange: setTextColor,
-					label: __( 'Text Color' ),
-				},
-			] }
-		>
-			<ContrastChecker
-				{ ...{
-					textColor,
-					backgroundColor,
-					fallbackTextColor,
-					fallbackBackgroundColor,
-					fontSize,
-				} }
-			/>
-		</PanelColorSettings>
+function useDropCapMinimumHeight( isDropCap, deps ) {
+	const [ minimumHeight, setMinimumHeight ] = useState();
+	useEffect(
+		() => {
+			const element = querySelector( PARAGRAPH_DROP_CAP_SELECTOR );
+			if ( isDropCap && element ) {
+				setMinimumHeight(
+					getComputedStyle(
+						element,
+						'first-letter'
+					).height
+				);
+			} else if ( minimumHeight ) {
+				setMinimumHeight( undefined );
+			}
+		},
+		[ isDropCap, minimumHeight, setMinimumHeight, ...deps ]
 	);
+	return minimumHeight;
 }
 
 function ParagraphBlock( {
 	attributes,
-	backgroundColor,
 	className,
-	fallbackBackgroundColor,
-	fallbackFontSize,
-	fallbackTextColor,
 	fontSize,
 	mergeBlocks,
 	onReplace,
 	setAttributes,
-	setBackgroundColor,
 	setFontSize,
-	setTextColor,
-	textColor,
 } ) {
 	const {
 		align,
@@ -127,6 +93,23 @@ function ParagraphBlock( {
 		placeholder,
 		direction,
 	} = attributes;
+
+	const dropCapMinimumHeight = useDropCapMinimumHeight( dropCap, [ fontSize.size ] );
+	const {
+		TextColor,
+		BackgroundColor,
+		InspectorControlsColorPanel,
+		ColorDetector,
+	} = __experimentalUseColors(
+		[
+			{ name: 'textColor', property: 'color' },
+			{ name: 'backgroundColor', className: 'has-background' },
+		],
+		{
+			contrastCheckers: [ { backgroundColor: true, textColor: true, fontSize: fontSize.size } ],
+		},
+		[ fontSize.size ]
+	);
 
 	return (
 		<>
@@ -143,7 +126,6 @@ function ParagraphBlock( {
 			<InspectorControls>
 				<PanelBody title={ __( 'Text Settings' ) } className="blocks-font-size">
 					<FontSizePicker
-						fallbackFontSize={ fallbackFontSize }
 						value={ fontSize.size }
 						onChange={ setFontSize }
 					/>
@@ -157,61 +139,51 @@ function ParagraphBlock( {
 						}
 					/>
 				</PanelBody>
-				<ParagraphPanelColor
-					backgroundColor={ backgroundColor.color }
-					fallbackBackgroundColor={ fallbackBackgroundColor }
-					fallbackTextColor={ fallbackTextColor }
-					fontSize={ fontSize.size }
-					setBackgroundColor={ setBackgroundColor }
-					setTextColor={ setTextColor }
-					textColor={ textColor.color }
-				/>
 			</InspectorControls>
-			<RichText
-				identifier="content"
-				tagName="p"
-				className={ classnames( 'wp-block-paragraph', className, {
-					'has-text-color': textColor.color,
-					'has-background': backgroundColor.color,
-					'has-drop-cap': dropCap,
-					[ `has-text-align-${ align }` ]: align,
-					[ backgroundColor.class ]: backgroundColor.class,
-					[ textColor.class ]: textColor.class,
-					[ fontSize.class ]: fontSize.class,
-				} ) }
-				style={ {
-					backgroundColor: backgroundColor.color,
-					color: textColor.color,
-					fontSize: fontSize.size ? fontSize.size + 'px' : undefined,
-					direction,
-				} }
-				value={ content }
-				onChange={ ( newContent ) => setAttributes( { content: newContent } ) }
-				onSplit={ ( value ) => {
-					if ( ! value ) {
-						return createBlock( name );
-					}
+			{ InspectorControlsColorPanel }
+			<BackgroundColor>
+				<TextColor>
+					<ColorDetector querySelector='[contenteditable="true"]' />
+					<RichText
+						identifier="content"
+						tagName="p"
+						className={ classnames( 'wp-block-paragraph', className, {
+							'has-drop-cap': dropCap,
+							[ `has-text-align-${ align }` ]: align,
+							[ fontSize.class ]: fontSize.class,
+						} ) }
+						style={ {
+							fontSize: fontSize.size ? fontSize.size + 'px' : undefined,
+							direction,
+							minHeight: dropCapMinimumHeight,
+						} }
+						value={ content }
+						onChange={ ( newContent ) => setAttributes( { content: newContent } ) }
+						onSplit={ ( value ) => {
+							if ( ! value ) {
+								return createBlock( name );
+							}
 
-					return createBlock( name, {
-						...attributes,
-						content: value,
-					} );
-				} }
-				onMerge={ mergeBlocks }
-				onReplace={ onReplace }
-				onRemove={ onReplace ? () => onReplace( [] ) : undefined }
-				aria-label={ content ? __( 'Paragraph block' ) : __( 'Empty block; start writing or type forward slash to choose a block' ) }
-				placeholder={ placeholder || __( 'Start writing or type / to choose a block' ) }
-				__unstableEmbedURLOnPaste
-			/>
+							return createBlock( name, {
+								...attributes,
+								content: value,
+							} );
+						} }
+						onMerge={ mergeBlocks }
+						onReplace={ onReplace }
+						onRemove={ onReplace ? () => onReplace( [] ) : undefined }
+						aria-label={ content ? __( 'Paragraph block' ) : __( 'Empty block; start writing or type forward slash to choose a block' ) }
+						placeholder={ placeholder || __( 'Start writing or type / to choose a block' ) }
+						__unstableEmbedURLOnPaste
+					/>
+				</TextColor>
+			</BackgroundColor>
 		</>
 	);
 }
 
 const ParagraphEdit = compose( [
-	withColors( 'backgroundColor', { textColor: 'color' } ),
 	withFontSizes( 'fontSize' ),
-	applyFallbackStyles,
 ] )( ParagraphBlock );
 
 export default ParagraphEdit;
