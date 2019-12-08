@@ -7,10 +7,7 @@ import { FlatList, View, Text, TouchableHighlight } from 'react-native';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import {
-	createBlock,
-	isUnmodifiedDefaultBlock,
-} from '@wordpress/blocks';
+import { createBlock } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withInstanceId, compose, withPreferredColorScheme } from '@wordpress/compose';
 import { BottomSheet, Icon } from '@wordpress/components';
@@ -147,7 +144,7 @@ export default compose(
 				showInsertionPoint(
 					ownProps.destinationRootClientId,
 					ownProps.insertionIndex,
-					ownProps.isDefaultInsert
+					ownProps.shouldReplaceBlock
 				);
 			},
 			hideInsertionPoint,
@@ -159,16 +156,11 @@ export default compose(
 				const {
 					getSelectedBlock,
 				} = select( 'core/block-editor' );
-				const { isAppender } = ownProps;
 				const { name, initialAttributes } = item;
 				const selectedBlock = getSelectedBlock();
 				const insertedBlock = createBlock( name, initialAttributes );
-				if (
-					ownProps.isDefaultInsert &&
-					! isAppender &&
-					selectedBlock &&
-					isUnmodifiedDefaultBlock( selectedBlock )
-				) {
+
+				if ( ownProps.shouldReplaceBlock ) {
 					replaceBlocks( selectedBlock.clientId, insertedBlock );
 				} else {
 					insertBlock(
