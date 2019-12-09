@@ -228,7 +228,8 @@
 			"wp-scripts lint-js"
 		],
 		"{docs/{toc.json,tool/*.js},packages/{*/README.md,*/src/{actions,selectors}.js,components/src/*/**/README.md}}": [
-			"node ./docs/tool/index.js"
+			"node ./docs/tool/index.js",
+			"node ./docs/tool/are-data-files-unstaged.js"
 		],
 		"packages/**/*.js": [
 			"node ./bin/api-docs/update-readmes.js",
