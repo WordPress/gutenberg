@@ -2,6 +2,15 @@
 # yarn lockfile v1
 
 
+"101@^1.0.0", "101@^1.2.0":
+  version "1.6.3"
+  resolved "https://registry.yarnpkg.com/101/-/101-1.6.3.tgz#9071196e60c47e4ce327075cf49c0ad79bd822fd"
+  integrity sha512-4dmQ45yY0Dx24Qxp+zAsNLlMF6tteCyfVzgbulvSyC7tCyd3V8sW76sS0tHq8NpcbXfWTKasfyfzU1Kd86oKzw==
+  dependencies:
+    clone "^1.0.2"
+    deep-eql "^0.1.3"
+    keypather "^1.10.2"
+
 "@babel/code-frame@7.0.0-beta.44":
   version "7.0.0-beta.44"
   resolved "https://registry.yarnpkg.com/@babel/code-frame/-/code-frame-7.0.0-beta.44.tgz#2a02643368de80916162be70865c97774f3adbd9"
@@ -2365,25 +2374,6 @@ app-root-path@^2.1.0:
   resolved "https://registry.yarnpkg.com/app-root-path/-/app-root-path-2.2.1.tgz#d0df4a682ee408273583d43f6f79e9892624bc9a"
   integrity sha512-91IFKeKk7FjfmezPKkwtaRvSpnUc4gDwPAjA1YZ9Gn0q0PPeW+vbeUsZuyDwjI7+QTHhcLen2v25fi/AmhvbJA==
 
-appium-adb@^7.0.0, appium-adb@^7.8.0:
-  version "7.10.0"
-  resolved "https://registry.yarnpkg.com/appium-adb/-/appium-adb-7.10.0.tgz#6f97d06eba1d41b90155af1ff41d00f0705ed076"
-  integrity sha512-++EMuhCuZRe17XDYxLVySPSdUQCucv3AWBldrWDlu/7tiKWPRdgdNbPmGilyRPPFVtL+NidcITWlooFE18SNQQ==
-  dependencies:
-    "@babel/runtime" "^7.0.0"
-    appium-support "^2.24.0"
-    async-lock "^1.0.0"
-    asyncbox "^2.3.1"
-    bluebird "^3.4.7"
-    lodash "^4.0.0"
-    lru-cache "^5.0.0"
-    semver "^6.0.0"
-    shell-quote "^1.6.1"
-    source-map-support "^0.5.5"
-    teen_process "^1.11.0"
-    xmldom "^0.1.27"
-    xpath "^0.0.27"
-
 appium-adb@^7.15.0, appium-adb@^7.15.1:
   version "7.15.2"
   resolved "https://registry.yarnpkg.com/appium-adb/-/appium-adb-7.15.2.tgz#8e15eca259584b87556953fedb5b92bf2a2e1cac"
@@ -2401,6 +2391,25 @@ appium-adb@^7.15.0, appium-adb@^7.15.1:
     shell-quote "^1.6.1"
     source-map-support "^0.5.5"
     teen_process "^1.11.0"
+
+appium-adb@^7.8.0:
+  version "7.10.0"
+  resolved "https://registry.yarnpkg.com/appium-adb/-/appium-adb-7.10.0.tgz#6f97d06eba1d41b90155af1ff41d00f0705ed076"
+  integrity sha512-++EMuhCuZRe17XDYxLVySPSdUQCucv3AWBldrWDlu/7tiKWPRdgdNbPmGilyRPPFVtL+NidcITWlooFE18SNQQ==
+  dependencies:
+    "@babel/runtime" "^7.0.0"
+    appium-support "^2.24.0"
+    async-lock "^1.0.0"
+    asyncbox "^2.3.1"
+    bluebird "^3.4.7"
+    lodash "^4.0.0"
+    lru-cache "^5.0.0"
+    semver "^6.0.0"
+    shell-quote "^1.6.1"
+    source-map-support "^0.5.5"
+    teen_process "^1.11.0"
+    xmldom "^0.1.27"
+    xpath "^0.0.27"
 
 appium-android-driver@^4.0.0, appium-android-driver@^4.12.0:
   version "4.17.0"
@@ -2426,7 +2435,7 @@ appium-android-driver@^4.0.0, appium-android-driver@^4.12.0:
     ws "^7.0.0"
     yargs "^13.1.0"
 
-appium-android-driver@^4.19.1, appium-android-driver@^4.20.0:
+appium-android-driver@^4.19.1, appium-android-driver@^4.21.0:
   version "4.21.0"
   resolved "https://registry.yarnpkg.com/appium-android-driver/-/appium-android-driver-4.21.0.tgz#46517f5da58190fa9d78266b94d625a38539302f"
   integrity sha512-zGu0+RioeA17H2/qTVgu6hVXvuMuIUAs2IIdkkZUGvuGmySV46bL/mKUHG/rI6Syu0yvPPO48bkXIzNMqx2DKA==
@@ -2451,7 +2460,7 @@ appium-android-driver@^4.19.1, appium-android-driver@^4.20.0:
     ws "^7.0.0"
     yargs "^15.0.1"
 
-appium-base-driver@^3.0.0, appium-base-driver@^3.17.0, appium-base-driver@^3.5.0, appium-base-driver@^3.x:
+appium-base-driver@^3.0.0, appium-base-driver@^3.17.0, appium-base-driver@^3.x:
   version "3.17.1"
   resolved "https://registry.yarnpkg.com/appium-base-driver/-/appium-base-driver-3.17.1.tgz#1975e3ef348da9292321ebad8790ff27a0483d8a"
   integrity sha512-RnsDJ/dMFAY63zoIYeqOLSv2njnHhV66RRFgQxM393OOF7/sq1Qz+4mbBK2sK7wQD8tOMyh//RzO0J334iO0lw==
@@ -2480,7 +2489,7 @@ appium-base-driver@^3.0.0, appium-base-driver@^3.17.0, appium-base-driver@^3.5.0
     webdriverio "^5.10.9"
     ws "^7.0.0"
 
-appium-base-driver@^4.0.0, appium-base-driver@^4.0.3:
+appium-base-driver@^4.0.0, appium-base-driver@^4.0.1, appium-base-driver@^4.0.3:
   version "4.5.1"
   resolved "https://registry.yarnpkg.com/appium-base-driver/-/appium-base-driver-4.5.1.tgz#f1112952ce06d6eed7da170aa6b2dbb2ac53352e"
   integrity sha512-g7sI5mzmGdZhIFg3+A5f9ewtihYKS0b33wZWbN6R/PYYTEmXbNhFPGfVqzoAzFANuLjlTlvEEsqGcUtjrMO2Bw==
@@ -2559,15 +2568,15 @@ appium-chromedriver@^4.13.0:
     xmldom "^0.1.27"
     xpath "^0.0.27"
 
-appium-espresso-driver@^1.0.0:
-  version "1.14.0"
-  resolved "https://registry.yarnpkg.com/appium-espresso-driver/-/appium-espresso-driver-1.14.0.tgz#ea90fd2c3b0b94e81b213c2a8a5e5a8ef9e75be9"
-  integrity sha512-+7RHX7O3St7rw6uAHbaA4d1nt9miSLUEbYndt4KZJwd7alCPZC2cuugAAgdE1V0I7BuJ2cKa+DT5p8EI5ua88w==
+appium-espresso-driver@^1.18.0:
+  version "1.18.0"
+  resolved "https://registry.yarnpkg.com/appium-espresso-driver/-/appium-espresso-driver-1.18.0.tgz#4c3b6cf3fecde71c02c879967a583619de7ab5cf"
+  integrity sha512-XbkacTy0XwXAi9uiG1knNLzijtv0I0Rum13/DjEZDT3eiA3V+jl6hAXtz+hojWlKPCnCKRquIUJBYcMRobZ/vw==
   dependencies:
     "@babel/runtime" "^7.4.3"
-    appium-adb "^7.0.0"
+    appium-adb "^7.15.1"
     appium-android-driver "^4.12.0"
-    appium-base-driver "^3.5.0"
+    appium-base-driver "^5.0.0"
     appium-support "^2.20.0"
     asyncbox "^2.3.1"
     bluebird "^3.5.0"
@@ -2577,7 +2586,7 @@ appium-espresso-driver@^1.0.0:
     request-promise "^4.2.1"
     source-map-support "^0.5.8"
     validate.js "^0.13.0"
-    yargs "^13.1.0"
+    yargs "^15.0.1"
 
 appium-fake-driver@^0.x:
   version "0.6.2"
@@ -2594,6 +2603,16 @@ appium-fake-driver@^0.x:
     xmldom "^0.1.19"
     xpath "0.0.27"
     yargs "^12.0.1"
+
+appium-flutter-driver@^0:
+  version "0.0.20"
+  resolved "https://registry.yarnpkg.com/appium-flutter-driver/-/appium-flutter-driver-0.0.20.tgz#2df4534d70e62ea0bad2c38c24817f11b687f52f"
+  integrity sha512-Nml81ByutyQ6yyqgXf6kPJlTxj5M2bYlpJiAiO6/UrrPog+S5qrbmFgUp313MJrJjqJLryd/lrRNuhkCvkRsPQ==
+  dependencies:
+    appium-base-driver "^4.0.1"
+    appium-uiautomator2-driver "^1.35.1"
+    appium-xcuitest-driver "^2.127.0"
+    rpc-websockets "^4.5.1"
 
 appium-idb@^0:
   version "0.2.0"
@@ -2631,6 +2650,18 @@ appium-ios-device@^0.10.0, appium-ios-device@^0.10.5:
     "@babel/runtime" "^7.0.0"
     appium-support "^2.30.0"
     bluebird "^3.1.1"
+    semver "^6.1.2"
+    source-map-support "^0.5.5"
+
+appium-ios-device@^1.2.1:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/appium-ios-device/-/appium-ios-device-1.2.1.tgz#217096460c1cae6567cb5e62dde8616c0fa77e29"
+  integrity sha512-xd4Mwr1IxXlTXx6QeJ075dD75scV9ytse6XFn3eh3xEv5i6wgFXLEYz/xTxNrGk5ztTJcX8SPdAibL1UCvQRuA==
+  dependencies:
+    "@babel/runtime" "^7.0.0"
+    appium-support "^2.35.0"
+    bluebird "^3.1.1"
+    lodash "^4.17.15"
     semver "^6.1.2"
     source-map-support "^0.5.5"
 
@@ -2752,6 +2783,21 @@ appium-remote-debugger@^5.7.0:
     lodash "^4.17.11"
     source-map-support "^0.5.5"
 
+appium-remote-debugger@^7.0.0, appium-remote-debugger@^7.3.0:
+  version "7.3.0"
+  resolved "https://registry.yarnpkg.com/appium-remote-debugger/-/appium-remote-debugger-7.3.0.tgz#a512e7dc7fb5c187f00538f39e996580cea6c759"
+  integrity sha512-3dMEvuOpql2B2SXJZ25o+rW4JkQe+1AFh+xIM4ArsLjn9FzHnTr9uRlhTUOgogrzNzJ8UJDVCAWIL+IbutwsfQ==
+  dependencies:
+    "@babel/runtime" "^7.0.0"
+    appium-base-driver "^5.0.0"
+    appium-ios-device "^1.2.1"
+    appium-support "^2.35.0"
+    async-lock "^1.2.2"
+    asyncbox "^2.6.0"
+    bluebird "^3.4.7"
+    lodash "^4.17.11"
+    source-map-support "^0.5.5"
+
 appium-sdb@^1.0.1-beta:
   version "1.0.1-beta"
   resolved "https://registry.yarnpkg.com/appium-sdb/-/appium-sdb-1.0.1-beta.tgz#ecd5684ff48eb2ccb2797ebd6fe238c5ae52e929"
@@ -2796,7 +2842,7 @@ appium-support@2.x, appium-support@^2.11.1, appium-support@^2.20.0, appium-suppo
     which "^1.2.4"
     yauzl "^2.7.0"
 
-appium-support@^2.31.0, appium-support@^2.32.0, appium-support@^2.33.0, appium-support@^2.33.1:
+appium-support@^2.31.0, appium-support@^2.32.0, appium-support@^2.33.0, appium-support@^2.33.1, appium-support@^2.35.0:
   version "2.35.2"
   resolved "https://registry.yarnpkg.com/appium-support/-/appium-support-2.35.2.tgz#a825eba0343bc49c857a02cb3cfdecb721c5b2cd"
   integrity sha512-+iUCdgVtikLV598Frd2bS+Wf+9MpC6E4nG8MfbgsFNBszwKMC9VWI8O6Ob5BTec9BOwxET0DDg7e6Sk9npkD1w==
@@ -2847,7 +2893,7 @@ appium-tizen-driver@^1.1.1-beta.4:
     teen_process "^1.9.0"
     yargs "^12.0.2"
 
-appium-uiautomator2-driver@^1.37.1:
+appium-uiautomator2-driver@^1.35.1, appium-uiautomator2-driver@^1.40.0:
   version "1.40.0"
   resolved "https://registry.yarnpkg.com/appium-uiautomator2-driver/-/appium-uiautomator2-driver-1.40.0.tgz#77c304d456e63c262d74b7f01e43ada42774d0c0"
   integrity sha512-AkPQtJ8qmqAuFGAgHAc13eEDgtbY038skswjXWfhZFbYNvm0AT0motkJIT9I6iE7cVbXwZwDZnQQl1PwhAVY4Q==
@@ -2888,7 +2934,7 @@ appium-webdriveragent@^0:
     stream-equal "^1.1.1"
     teen_process "^1.14.1"
 
-appium-webdriveragent@^1.2.0, appium-webdriveragent@^1.3.5:
+appium-webdriveragent@^1.2.0:
   version "1.3.5"
   resolved "https://registry.yarnpkg.com/appium-webdriveragent/-/appium-webdriveragent-1.3.5.tgz#39ba0f85da4cc9237a01d2207f837709bfcfffec"
   integrity sha512-dEQKkcVHacirjN8gn5vbsuO+BHogcGKl9cPs8eqECn3S4qxmVR4vl/LLJyerMcu9wiUIkaZdmlGxYQqR1Evi9w==
@@ -2898,6 +2944,26 @@ appium-webdriveragent@^1.2.0, appium-webdriveragent@^1.3.5:
     bluebird "^3.5.5"
     lodash "^4.17.11"
     node-simctl "^5.0.1"
+    source-map-support "^0.5.12"
+    stream-equal "^1.1.1"
+    teen_process "^1.14.1"
+
+appium-webdriveragent@^2.3.2:
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/appium-webdriveragent/-/appium-webdriveragent-2.3.3.tgz#a52d720980d29d515cb60536c61c5136a10300e1"
+  integrity sha512-JpszLhZ5J1HN0CQcD1eA+tH9y4adXoD/D0Xlnl8hSq/+zlyphnYQPMvrIeNfPTIY8aso8dxHyXPhs5QNp6Qd1Q==
+  dependencies:
+    "@babel/runtime" "^7.0.0"
+    appium-base-driver "^4.0.3"
+    appium-ios-simulator "^3.14.0"
+    appium-support "^2.29.0"
+    async-lock "^1.0.0"
+    asyncbox "^2.5.3"
+    bluebird "^3.5.5"
+    lodash "^4.17.11"
+    node-simctl "^5.0.1"
+    request "^2.79.0"
+    request-promise "^4.1.1"
     source-map-support "^0.5.12"
     stream-equal "^1.1.1"
     teen_process "^1.14.1"
@@ -2965,7 +3031,7 @@ appium-xcuitest-driver@2.x:
     xmldom "^0.1.27"
     yargs "^13.1.0"
 
-appium-xcuitest-driver@^2.133.1:
+appium-xcuitest-driver@^2.127.0:
   version "2.133.1"
   resolved "https://registry.yarnpkg.com/appium-xcuitest-driver/-/appium-xcuitest-driver-2.133.1.tgz#c77ce9001460180e61d9baf8fe8a4eedcd7932dd"
   integrity sha512-IVoSHqkkTYRkzdZFLWNn7P7LHwum+5Xp3lI/IixxVURtCjIeJYMerk++mBvGEw4mpC/F536P6i0L3PFyxMGQ0w==
@@ -2998,6 +3064,39 @@ appium-xcuitest-driver@^2.133.1:
     xmldom "^0.1.27"
     yargs "^14.0.0"
 
+appium-xcuitest-driver@^3.8.0:
+  version "3.8.0"
+  resolved "https://registry.yarnpkg.com/appium-xcuitest-driver/-/appium-xcuitest-driver-3.8.0.tgz#11cd3c64319b6aa3ed04b53cd8a117d00782b79a"
+  integrity sha512-QXtONuWn2eY0isgIBL9sb33+jkdeSo08EPOGO4fqCfI7wperEDrfCbo7alEEF15raFQm0x8VLjao00XZJbgyzg==
+  dependencies:
+    "@babel/runtime" "^7.0.0"
+    appium-base-driver "^5.0.0"
+    appium-idb "^0"
+    appium-ios-device "^1.2.1"
+    appium-ios-driver "^4.0.0"
+    appium-ios-simulator "^3.14.0"
+    appium-remote-debugger "^7.0.0"
+    appium-support "^2.32.0"
+    appium-webdriveragent "^2.3.2"
+    appium-xcode "^3.8.0"
+    async-lock "^1.0.0"
+    asyncbox "^2.3.1"
+    bluebird "^3.1.1"
+    js2xmlparser2 "^0.2.0"
+    lodash "^4.17.10"
+    moment "^2.24.0"
+    node-simctl "^5.0.1"
+    portscanner "2.2.0"
+    request "^2.79.0"
+    request-promise "^4.1.1"
+    semver "^6.1.0"
+    source-map-support "^0.5.5"
+    teen_process "^1.14.0"
+    uuid-js "^0.7.5"
+    ws "^7.0.0"
+    xmldom "^0.1.27"
+    yargs "^15.0.1"
+
 appium-youiengine-driver@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/appium-youiengine-driver/-/appium-youiengine-driver-1.2.0.tgz#8c17f25c4a836d720f40036c065555f6c18529bf"
@@ -3020,24 +3119,25 @@ appium-youiengine-driver@^1.2.0:
     source-map-support "^0.5.9"
     teen_process "^1.14.1"
 
-appium@^1.15.0:
-  version "1.15.1"
-  resolved "https://registry.yarnpkg.com/appium/-/appium-1.15.1.tgz#f51e63e3f7665b9aec3e4970624045f4b323bf15"
-  integrity sha512-5gxp2Vs61GL0GSL2IzNg6OrWjuJXvdGoxxxs/NkZpzJXbT3JZ1Eo3dQSN5iprEigofeg2J98qvLxmStw64N88w==
+appium@1.16.0-rc.1:
+  version "1.16.0-rc.1"
+  resolved "https://registry.yarnpkg.com/appium/-/appium-1.16.0-rc.1.tgz#78b5d25937f2c89acfbcdf940902395b721b47fb"
+  integrity sha512-VxwbfZi1WTAXqQPVj0a+u+f4kc0IMoQSTewiny6xUyLvr56MBd+xxoQws5ipIOiDQiQB6QkQ7/OWw+r/lUGp9g==
   dependencies:
     "@babel/runtime" "^7.6.0"
-    appium-android-driver "^4.20.0"
-    appium-base-driver "^4.0.3"
-    appium-espresso-driver "^1.0.0"
+    appium-android-driver "^4.21.0"
+    appium-base-driver "^5.0.0"
+    appium-espresso-driver "^1.18.0"
     appium-fake-driver "^0.x"
+    appium-flutter-driver "^0"
     appium-ios-driver "4.x"
     appium-mac-driver "1.x"
-    appium-support "^2.33.1"
+    appium-remote-debugger "^7.3.0"
+    appium-support "2.x"
     appium-tizen-driver "^1.1.1-beta.4"
-    appium-uiautomator2-driver "^1.37.1"
-    appium-webdriveragent "^1.3.5"
+    appium-uiautomator2-driver "^1.40.0"
     appium-windows-driver "1.x"
-    appium-xcuitest-driver "^2.133.1"
+    appium-xcuitest-driver "^3.8.0"
     appium-youiengine-driver "^1.2.0"
     argparse "^1.0.10"
     async-lock "^1.0.0"
@@ -3317,6 +3417,18 @@ asn1@~0.2.3:
   dependencies:
     safer-buffer "~2.1.0"
 
+assert-args@^1.2.1:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/assert-args/-/assert-args-1.2.1.tgz#404103a1452a32fe77898811e54e590a8a9373bd"
+  integrity sha1-QEEDoUUqMv53iYgR5U5ZCoqTc70=
+  dependencies:
+    "101" "^1.2.0"
+    compound-subject "0.0.1"
+    debug "^2.2.0"
+    get-prototype-of "0.0.0"
+    is-capitalized "^1.0.0"
+    is-class "0.0.4"
+
 assert-plus@1.0.0, assert-plus@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/assert-plus/-/assert-plus-1.0.0.tgz#f12e0f3c5d77b0b1cdd9146942e4e96c1e4dd525"
@@ -3401,6 +3513,17 @@ asyncbox@2.x, asyncbox@^2.0.2, asyncbox@^2.0.4, asyncbox@^2.3.0, asyncbox@^2.3.1
   version "2.5.3"
   resolved "https://registry.yarnpkg.com/asyncbox/-/asyncbox-2.5.3.tgz#42234d9daeaeac09a9ba295c8e08850566030ff4"
   integrity sha512-O0fQO+m+vT3ieicyywjrfdw0vrU9ytBOimTvccn1Sz5CljG221rI3Y+kp794iJty7mwnCvTFdSUM0yguNLjtzg==
+  dependencies:
+    "@babel/runtime" "^7.0.0"
+    bluebird "^3.5.1"
+    es6-mapify "^1.1.0"
+    lodash "^4.17.4"
+    source-map-support "^0.5.5"
+
+asyncbox@^2.6.0:
+  version "2.6.0"
+  resolved "https://registry.yarnpkg.com/asyncbox/-/asyncbox-2.6.0.tgz#ded2db43b14c4d14340d18d4898e5d63de2ffb42"
+  integrity sha512-x9RDH0Dk4qZIGHQc9KbnDrUnaEbtWJW2DbuSElOFOQ2ppGsT1eFEDsiconZPpRGMW6+Uv724FYaBc8SUvyWVzA==
   dependencies:
     "@babel/runtime" "^7.0.0"
     bluebird "^3.5.1"
@@ -4157,6 +4280,11 @@ circular-json@^0.3.1:
   resolved "https://registry.yarnpkg.com/circular-json/-/circular-json-0.3.3.tgz#815c99ea84f6809529d2f45791bdf82711352d66"
   integrity sha512-UZK3NBx2Mca+b5LsG7bY183pHWt5Y1xts4P3Pz7ENTwGVnJOUWbRb3ocjvX7hx9tq/yTAdclXm9sZ38gNuem4A==
 
+circular-json@^0.5.9:
+  version "0.5.9"
+  resolved "https://registry.yarnpkg.com/circular-json/-/circular-json-0.5.9.tgz#932763ae88f4f7dead7a0d09c8a51a4743a53b1d"
+  integrity sha512-4ivwqHpIFJZBuhN3g/pEcdbnGUywkBblloGbkglyloVjjR3uT6tieI89MVOfbP2tHX5sgb01FuLgAOzebNlJNQ==
+
 cjk-regex@1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/cjk-regex/-/cjk-regex-1.0.2.tgz#86f5170ecfaef9049ec91f8068e15d63d8e10154"
@@ -4234,6 +4362,11 @@ clone@2.1.1:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/clone/-/clone-2.1.1.tgz#d217d1e961118e3ac9a4b8bba3285553bf647cdb"
   integrity sha1-0hfR6WERjjrJpLi7oyhVU79kfNs=
+
+clone@^1.0.2:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/clone/-/clone-1.0.4.tgz#da309cc263df15994c688ca902179ca3c7cd7c7e"
+  integrity sha1-2jCcwmPfFZlMaIypAheco8fNfH4=
 
 co@^4.6.0:
   version "4.6.0"
@@ -4389,6 +4522,11 @@ component-emitter@^1.2.1:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/component-emitter/-/component-emitter-1.3.0.tgz#16e4070fba8ae29b679f2215853ee181ab2eabc0"
   integrity sha512-Rd3se6QB+sO1TwqZjscQrurpEPIfO0/yYnSin6Q/rD3mOutHvUrCAhJub3r90uNb+SESBuE0QYoB90YdfatsRg==
+
+compound-subject@0.0.1:
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/compound-subject/-/compound-subject-0.0.1.tgz#271554698a15ae608b1dfcafd30b7ba1ea892c4b"
+  integrity sha1-JxVUaYoVrmCLHfyv0wt7oeqJLEs=
 
 compress-commons@^1.2.0:
   version "1.2.2"
@@ -4835,6 +4973,13 @@ decode-uri-component@^0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/decode-uri-component/-/decode-uri-component-0.2.0.tgz#eb3913333458775cb84cd1a1fae062106bb87545"
   integrity sha1-6zkTMzRYd1y4TNGh+uBiEGu4dUU=
+
+deep-eql@^0.1.3:
+  version "0.1.3"
+  resolved "https://registry.yarnpkg.com/deep-eql/-/deep-eql-0.1.3.tgz#ef558acab8de25206cd713906d74e56930eb69f2"
+  integrity sha1-71WKyrjeJSBs1xOQbXTlaTDrafI=
+  dependencies:
+    type-detect "0.1.1"
 
 deep-extend@^0.6.0:
   version "0.6.0"
@@ -5631,7 +5776,7 @@ eventemitter2@^1.0.0:
   resolved "https://registry.yarnpkg.com/eventemitter2/-/eventemitter2-1.0.5.tgz#f983610517b1737c0b9dc643beca93893c04df18"
   integrity sha1-+YNhBRexc3wLncZDvsqTiTwE3xg=
 
-eventemitter3@^3.0.0:
+eventemitter3@^3.0.0, eventemitter3@^3.1.2:
   version "3.1.2"
   resolved "https://registry.yarnpkg.com/eventemitter3/-/eventemitter3-3.1.2.tgz#2d3d48f9c346698fce83a85d7d664e98535df6e7"
   integrity sha512-tvtQIeLVHjDkJYnzf2dgVMxfuSGJeM/7UCG17TT4EumTfNtF+0nebF/4zWOIkCreAbtNqhGEboB6BWrwqNaw4Q==
@@ -6364,6 +6509,11 @@ get-params@^0.1.2:
   resolved "https://registry.yarnpkg.com/get-params/-/get-params-0.1.2.tgz#bae0dfaba588a0c60d7834c0d8dc2ff60eeef2fe"
   integrity sha1-uuDfq6WIoMYNeDTA2Nwv9g7u8v4=
 
+get-prototype-of@0.0.0:
+  version "0.0.0"
+  resolved "https://registry.yarnpkg.com/get-prototype-of/-/get-prototype-of-0.0.0.tgz#98772bd10716d16deb4b322516c469efca28ac44"
+  integrity sha1-mHcr0QcW0W3rSzIlFsRp78oorEQ=
+
 get-stdin@^4.0.1:
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/get-stdin/-/get-stdin-4.0.1.tgz#b968c6b0a04384324902e8bf1a5df32579a450fe"
@@ -7053,12 +7203,22 @@ is-callable@^1.1.3, is-callable@^1.1.4:
   resolved "https://registry.yarnpkg.com/is-callable/-/is-callable-1.1.4.tgz#1e1adf219e1eeb684d691f9d6a05ff0d30a24d75"
   integrity sha512-r5p9sxJjYnArLjObpjA4xu5EKI3CuKHkJXMhT7kwbpUyIFD1n5PMAsoPvWnvtZiNz7LjkYDRZhd7FlI0eMijEA==
 
+is-capitalized@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/is-capitalized/-/is-capitalized-1.0.0.tgz#4c8464b4d91d3e4eeb44889dd2cd8f1b0ac4c136"
+  integrity sha1-TIRktNkdPk7rRIid0s2PGwrEwTY=
+
 is-ci@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/is-ci/-/is-ci-2.0.0.tgz#6bc6334181810e04b5c22b3d589fdca55026404c"
   integrity sha512-YfJT7rkpQB0updsdHLGWrvhBJfcfzNNawYDNIyQXJz0IViGf75O8EBPKSdvw2rF+LGCsX4FZ8tcr3b19LcZq4w==
   dependencies:
     ci-info "^2.0.0"
+
+is-class@0.0.4:
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/is-class/-/is-class-0.0.4.tgz#e057451705bb34e39e3e33598c93a9837296b736"
+  integrity sha1-4FdFFwW7NOOePjNZjJOpg3KWtzY=
 
 is-data-descriptor@^0.1.4:
   version "0.1.4"
@@ -8109,6 +8269,13 @@ keymirror@^0.1.1:
   resolved "https://registry.yarnpkg.com/keymirror/-/keymirror-0.1.1.tgz#918889ea13f8d0a42e7c557250eee713adc95c35"
   integrity sha1-kYiJ6hP40KQufFVyUO7nE63JXDU=
 
+keypather@^1.10.2:
+  version "1.10.2"
+  resolved "https://registry.yarnpkg.com/keypather/-/keypather-1.10.2.tgz#e0449632d4b3e516f21cc014ce7c5644fddce614"
+  integrity sha1-4ESWMtSz5RbyHMAUznxWRP3c5hQ=
+  dependencies:
+    "101" "^1.0.0"
+
 kind-of@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/kind-of/-/kind-of-1.1.0.tgz#140a3d2d41a36d2efcfa9377b62c24f8495a5c44"
@@ -8412,6 +8579,11 @@ lodash@4.x, lodash@^4.0.0, lodash@^4.13.1, lodash@^4.15.0, lodash@^4.17.10, loda
   version "4.17.14"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.14.tgz#9ce487ae66c96254fe20b599f21b6816028078ba"
   integrity sha512-mmKYbW3GLuJeX+iGP+Y7Gp1AiGHGbXHCOh/jZmrawMmsE7MS4znI3RL2FsjbqOyMayHInjOeykW7PEajUk1/xw==
+
+lodash@^4.17.15:
+  version "4.17.15"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.15.tgz#b447f6670a0455bbfeedd11392eff330ea097548"
+  integrity sha512-8xOcRHvCjnocdS5cpwXQXVzmmh5e5+saE2QGoeQmbKmRS6J3VQppPOIt0MnmE+4xlZoumy0GPG0D0MVIQbNA1A==
 
 logform@^2.1.1:
   version "2.1.2"
@@ -11495,6 +11667,19 @@ rn-host-detect@^1.1.5:
   resolved "https://registry.yarnpkg.com/rn-host-detect/-/rn-host-detect-1.1.5.tgz#fbecb982b73932f34529e97932b9a63e58d8deb6"
   integrity sha512-ufk2dFT3QeP9HyZ/xTuMtW27KnFy815CYitJMqQm+pgG3ZAtHBsrU8nXizNKkqXGy3bQmhEoloVbrfbvMJMqkg==
 
+rpc-websockets@^4.5.1:
+  version "4.6.1"
+  resolved "https://registry.yarnpkg.com/rpc-websockets/-/rpc-websockets-4.6.1.tgz#589415223dff7669577e8a463694e1cdd0eb81bf"
+  integrity sha512-xyQC6+95hOFQJBuMRIYi2E3/ddKEMMKuql5Sd49r4578CcthP0N9nHHFkVtvrsAgz4OQH6j7zsLurLNY0nOU6g==
+  dependencies:
+    "@babel/runtime" "^7.4.5"
+    assert-args "^1.2.1"
+    babel-runtime "^6.26.0"
+    circular-json "^0.5.9"
+    eventemitter3 "^3.1.2"
+    uuid "^3.3.2"
+    ws "^5.2.2"
+
 rst-selector-parser@^2.2.3:
   version "2.2.3"
   resolved "https://registry.yarnpkg.com/rst-selector-parser/-/rst-selector-parser-2.2.3.tgz#81b230ea2fcc6066c89e3472de794285d9b03d91"
@@ -12703,6 +12888,11 @@ type-check@~0.3.2:
   dependencies:
     prelude-ls "~1.1.2"
 
+type-detect@0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/type-detect/-/type-detect-0.1.1.tgz#0ba5ec2a885640e470ea4e8505971900dac58822"
+  integrity sha1-C6XsKohWQORw6k6FBZcZANrFiCI=
+
 type-fest@^0.3.0:
   version "0.3.1"
   resolved "https://registry.yarnpkg.com/type-fest/-/type-fest-0.3.1.tgz#63d00d204e059474fe5e1b7c011112bbd1dc29e1"
@@ -13329,7 +13519,7 @@ ws@^3.3.1:
     safe-buffer "~5.1.0"
     ultron "~1.1.0"
 
-ws@^5.2.0:
+ws@^5.2.0, ws@^5.2.2:
   version "5.2.2"
   resolved "https://registry.yarnpkg.com/ws/-/ws-5.2.2.tgz#dffef14866b8e8dc9133582514d1befaf96e980f"
   integrity sha512-jaHFD6PFv6UgoIVda6qZllptQsMlDEJkTQcybzzXDYM1XO9Y8em691FGMPmM46WGyLU4z9KMgQN+qrux/nhlHA==

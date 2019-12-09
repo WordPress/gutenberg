@@ -15,7 +15,7 @@
     "@wordpress/babel-preset-default": "^4.0.0",
     "@wordpress/eslint-plugin": "^2.0.0",
     "@wordpress/jest-preset-default": "^4.0.0",
-    "appium": "^1.15.0",
+    "appium": "1.16.0-rc.1",
     "babel-core": "^7.0.0-bridge.0",
     "babel-eslint": "^8.2.2",
     "babel-jest": "^24.1.0",
