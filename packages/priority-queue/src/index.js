@@ -1,5 +1,5 @@
 /**
- * @typedef {Function} WPPriorityQueueCallback
+ * @typedef {()=>void} WPPriorityQueueCallback
  */
 
 /**
