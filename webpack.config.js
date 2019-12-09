@@ -52,6 +52,67 @@ module.exports = {
 				use: require.resolve( 'source-map-loader' ),
 				enforce: 'pre',
 			},
+			{
+				test: /\.js$/,
+				include: /node_modules/,
+				exclude: /@babel(?:\/|\\{1,2})runtime/,
+				use: [
+					require.resolve( 'thread-loader' ),
+					{
+						loader: require.resolve( 'babel-loader' ),
+						options: {
+							// Babel uses a directory within local node_modules
+							// by default. Use the environment variable option
+							// to enable more persistent caching.
+							cacheDirectory: process.env.BABEL_CACHE_DIRECTORY || true,
+							babelrc: false,
+							configFile: false,
+							presets: [
+								[
+									require.resolve( '@babel/preset-env' ),
+									{
+
+										// don't transform import statements so webpack can perform treeshaking
+										modules: false,
+
+										useBuiltIns: 'entry',
+										corejs: 3,
+
+										// perform the minimum transforms for the targetted platforms
+										targets: {
+											node: mode === 'development' ? 'current' : undefined,
+											browsers: mode === 'production' ? require( '@wordpress/browserslist-config' ) : undefined,
+										},
+
+										// Exclude transforms that make all code slower, see https://github.com/facebook/create-react-app/pull/5278
+										exclude: [ 'transform-typeof-symbol' ],
+
+									},
+								],
+							],
+							plugins: [
+
+								// avoid duplication of helper functions by relying on a runtime
+								[
+									require.resolve( '@babel/plugin-transform-runtime' ),
+									{
+										corejs: false,
+										helpers: true,
+										regenerator: true,
+										useESModules: true,
+									},
+								],
+
+								// support use of dynamic import()s
+								require.resolve( '@babel/plugin-syntax-dynamic-import' ),
+
+							],
+							sourceMaps: true,
+							inputSourceMap: true,
+						},
+					},
+				],
+			},
 		] ),
 	},
 	plugins: [
