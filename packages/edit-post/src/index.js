@@ -86,10 +86,10 @@ export function initializeEditor( id, postType, postId, settings, initialEdits )
 
 	const isIphone = window.navigator.userAgent.indexOf( 'iPhone' ) !== -1;
 	if ( isIphone ) {
-		document.addEventListener( 'focusin', function( ) {
-			setTimeout( () => {
+		window.addEventListener( 'scroll', function( event ) {
+			if ( event.target === document ) {
 				window.scrollTo( 0, 0 );
-			}, 150 );
+			}
 		} );
 	}
 
