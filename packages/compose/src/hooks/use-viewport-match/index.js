@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { createContext, useContext } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import useMediaQuery from '../use-media-query';
@@ -37,6 +42,13 @@ const CONDITIONS = {
 	'<': 'max-width',
 };
 
+const OPERATOR_EVALUATORS = {
+	'<': ( breakpointValue, width ) => ( width < breakpointValue ),
+	'>=': ( breakpointValue, width ) => ( width >= breakpointValue ),
+};
+
+const ViewportMatchWidthContext = createContext( null );
+
 /**
  * Returns true if the viewport matches the given query, or false otherwise.
  *
@@ -53,8 +65,15 @@ const CONDITIONS = {
  * @return {boolean} Whether viewport matches query.
  */
 const useViewportMatch = ( breakpoint, operator = '>=' ) => {
-	const mediaQuery = `(${ CONDITIONS[ operator ] }: ${ BREAKPOINTS[ breakpoint ] }px)`;
-	return useMediaQuery( mediaQuery );
+	const simulatedWidth = useContext( ViewportMatchWidthContext );
+	const mediaQuery = ! simulatedWidth && `(${ CONDITIONS[ operator ] }: ${ BREAKPOINTS[ breakpoint ] }px)`;
+	const mediaQueryResult = useMediaQuery( mediaQuery );
+	if ( simulatedWidth ) {
+		return OPERATOR_EVALUATORS[ operator ]( BREAKPOINTS[ breakpoint ], simulatedWidth );
+	}
+	return mediaQueryResult;
 };
+
+useViewportMatch.__experimentalWidthProvider = ViewportMatchWidthContext.Provider;
 
 export default useViewportMatch;
