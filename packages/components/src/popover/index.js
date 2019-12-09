@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useRef, useState, useEffect } from '@wordpress/element';
+import { useRef, useState, useEffect, createContext, useContext } from '@wordpress/element';
 import { focus, getRectangleFromRange } from '@wordpress/dom';
 import { ESCAPE } from '@wordpress/keycodes';
 import deprecated from '@wordpress/deprecated';
@@ -216,6 +216,7 @@ function setClass( element, name, toggle ) {
 	}
 }
 
+const Context = createContext( SLOT_NAME );
 const Popover = ( {
 	headerTitle,
 	onClose,
@@ -249,6 +250,7 @@ const Popover = ( {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const [ animateOrigin, setAnimateOrigin ] = useState();
 	const isExpanded = expandOnMobile && isMobileViewport;
+	const slotName = useContext( Context );
 
 	noArrow = isExpanded || noArrow;
 
@@ -466,8 +468,8 @@ const Popover = ( {
 			{ ( { getSlot } ) => {
 				// In case there is no slot context in which to render,
 				// default to an in-place rendering.
-				if ( getSlot && getSlot( SLOT_NAME ) ) {
-					content = <Fill name={ SLOT_NAME }>{ content }</Fill>;
+				if ( getSlot && getSlot( slotName ) ) {
+					content = <Fill name={ slotName }>{ content }</Fill>;
 				}
 
 				return (
@@ -483,6 +485,24 @@ const Popover = ( {
 
 const PopoverContainer = Popover;
 
-PopoverContainer.Slot = () => <Slot bubblesVirtually name={ SLOT_NAME } />;
+let index = 0;
+
+PopoverContainer.ContextProvider = Context.Provider;
+PopoverContainer.Slot = ( { children } ) => {
+	if ( ! children ) {
+		return <Slot bubblesVirtually name={ SLOT_NAME } />;
+	}
+
+	index++;
+
+	const slotName = SLOT_NAME + index;
+
+	return (
+		<Context.Provider value={ slotName }>
+			{ children }
+			<Slot bubblesVirtually name={ slotName } />
+		</Context.Provider>
+	);
+};
 
 export default PopoverContainer;

@@ -71,6 +71,10 @@ html {
 	@include break-medium() {
 		overflow: auto;
 	}
+
+	.components-popover {
+		z-index: z-index(".edit-post-editor-regions__content .components-popover");
+	}
 }
 
 .edit-post-editor-regions__sidebar {

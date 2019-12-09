@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { navigateRegions } from '@wordpress/components';
+import { navigateRegions, Popover } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 function EditorRegions( { footer, header, sidebar, content, publish, className } ) {
@@ -31,7 +31,9 @@ function EditorRegions( { footer, header, sidebar, content, publish, className }
 					aria-label={ __( 'Editor content' ) }
 					tabIndex="-1"
 				>
-					{ content }
+					<Popover.Slot>
+						{ content }
+					</Popover.Slot>
 				</div>
 				{ !! publish && (
 					<div
