@@ -54,7 +54,7 @@ function ButtonEdit( { attributes, setAttributes, backgroundColor, textColor, is
 		rel,
 	} = attributes;
 
-	const [ isFocused, setRichTextFocus ] = useState( false );
+	const [ isFocused, setRichTextFocus ] = useState( true );
 	const [ showHelp, setShowHelp ] = useState( false );
 
 	const borderRadiusValue = borderRadius !== undefined ? borderRadius : INITIAL_BORDER_RADIUS;
@@ -107,7 +107,7 @@ function ButtonEdit( { attributes, setAttributes, backgroundColor, textColor, is
 	// To achieve proper expanding and shrinking `RichText` on iOS, there is a need to set a `minWidth`
 	// value at least on 1 when `RichText` is focused or when is not focused, but `RichText` value is
 	// different than empty string.
-	const minWidth = isFocused || ( ! isFocused && text !== '' ) ? 1 : 108;
+	const minWidth = isFocused || ( ! isFocused && text && text !== '' ) ? 1 : 108;
 	// To achieve proper expanding and shrinking `RichText` on Android, there is a need to set
 	// a `placeholder` as an empty string when `RichText` is focused,
 	// because `AztecView` is calculating a `minWidth` based on placeholder text.
