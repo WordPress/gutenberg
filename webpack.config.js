@@ -54,7 +54,7 @@ module.exports = {
 			},
 			{
 				test: /\.js$/,
-				include: /node_modules/,
+				include: [],
 				exclude: /@babel(?:\/|\\{1,2})runtime/,
 				use: [
 					require.resolve( 'thread-loader' ),
