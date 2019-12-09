@@ -165,7 +165,7 @@ export class PostPreviewButton extends Component {
 					<Modal
 						title={
 							// translators: Preview dialog title.
-							__( 'Preview dialog' )
+							_x( 'Preview', 'noun' )
 						}
 						onRequestClose={ this.closePreviewModal }
 						// Needed so the Modal doesn't close when tabbing into the iframe.
@@ -198,10 +198,15 @@ export class PostPreviewButton extends Component {
 								{ __( 'Open preview in new tab' ) }
 							</Button>
 						</div>
-						<div className="editor-post-preview__frame-container">
+						<div
+							className="editor-post-preview__frame-container"
+							tabIndex="0"
+							role="region"
+							aria-label={ _x( 'Preview', 'noun' ) }
+						>
 							<iframe
 								className="editor-post-preview__frame"
-								title={ __( 'Responsive preview frame' ) }
+								title={ __( 'Responsive preview' ) }
 								src={ href }
 								style={
 									{
