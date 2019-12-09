@@ -120,6 +120,8 @@ zip -r gutenberg.zip \
 	post-content.php \
 	$vendor_scripts \
 	$build_files \
+	readme.txt \
+	changelog.txt \
 	README.md
 
 # Reset `gutenberg.php`.
