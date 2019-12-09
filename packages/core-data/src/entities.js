@@ -13,7 +13,7 @@ export const DEFAULT_ENTITY_KEY = 'id';
 
 export const defaultEntities = [
 	{ name: 'site', kind: 'root', baseURL: '/wp/v2/settings' },
-	{ name: 'siteTitle', kind: 'root', baseURL: '/wp/v2/settings/title' },
+	{ name: 'public', kind: 'root', baseURL: '/wp/v2/settings/public' },
 	{ name: 'postType', kind: 'root', key: 'slug', baseURL: '/wp/v2/types' },
 	{ name: 'media', kind: 'root', baseURL: '/wp/v2/media', plural: 'mediaItems' },
 	{ name: 'taxonomy', kind: 'root', key: 'slug', baseURL: '/wp/v2/taxonomies', plural: 'taxonomies' },
