@@ -142,6 +142,7 @@ describe( 'selectors', () => {
 		unregisterBlockType( 'core/test-block-c' );
 		unregisterBlockType( 'core/test-freeform' );
 		unregisterBlockType( 'core/post-content-child' );
+
 		setFreeformContentHandlerName( undefined );
 	} );
 
