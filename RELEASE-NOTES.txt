@@ -1,5 +1,6 @@
 1.19.0
 ------
+* Add support for changing Settings in List Block.
 * [iOS] Fix crash dismissing bottom-sheet after device rotation.
 * New block: Gallery. You can now create image galleries using WordPress Media library. Upload feature is coming soon.
 
