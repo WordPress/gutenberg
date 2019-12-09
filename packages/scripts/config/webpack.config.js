@@ -18,6 +18,37 @@ const { hasBabelConfig } = require( '../utils' );
 const isProduction = process.env.NODE_ENV === 'production';
 const mode = isProduction ? 'production' : 'development';
 
+/** @return {Object} */
+function getPackageOptions() {
+	try {
+		const manifest = require( path.join( process.cwd(), 'package.json' ) );
+		if ( ! manifest[ 'wp-scripts' ] ) {
+			return {};
+		}
+		return manifest[ 'wp-scripts' ];
+	} catch ( error ) {
+		return {};
+	}
+}
+
+/** @return {string[] | undefined} */
+function getTranspileDependenciesOption() {
+	const options = getPackageOptions();
+	if ( ! options.build || ! options.build[ 'transpile-dependencies' ] || ! Array.isArray( options.build[ 'transpile-dependencies' ] ) ) {
+		return undefined;
+	}
+	return options.build[ 'transpile-dependencies' ];
+}
+
+/** @returns {RegExp | RegExp[]} */
+function getTranspileDependenciesInclude() {
+	const dependencies = getTranspileDependenciesOption();
+	if ( ! dependencies ) {
+		return /node_modules/;
+	}
+	return dependencies.map( ( dependency ) => new RegExp( `node_modules\/${ dependency }\/`, 'g' ) );
+}
+
 const config = {
 	mode,
 	entry: {
@@ -64,7 +95,7 @@ const config = {
 					// transpile third-party code which might be being distributed according to the current JS standard
 					{
 						test: /\.js$/,
-						include: /node_modules/,
+						include: getTranspileDependenciesInclude(),
 						exclude: /@babel(?:\/|\\{1,2})runtime/,
 						use: [
 							require.resolve( 'thread-loader' ),
