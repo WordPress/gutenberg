@@ -147,9 +147,10 @@ export const withToolbarControls = createHigherOrderComponent(
 export const withDataAlign = createHigherOrderComponent( ( BlockListBlock ) => ( props ) => {
 	const { name, attributes } = props;
 	const { align } = attributes;
-	const hasWideEnabled = useSelect( ( select ) => (
-		!! select( 'core/block-editor' ).getSettings().alignWide
-	) );
+	const hasWideEnabled = useSelect(
+		( select ) => !! select( 'core/block-editor' ).getSettings().alignWide,
+		[]
+	);
 
 	// If an alignment is not assigned, there's no need to go through the
 	// effort to validate or assign its value.
