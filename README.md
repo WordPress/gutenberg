@@ -23,13 +23,13 @@ Note that the OS platform used by the maintainers is macOS but the tools and set
 
 * Clone the project and submodules:
 ```
-$ git clone --recurse-submodules https://github.com/wordpress-mobile/gutenberg-mobile.git
+git clone --recurse-submodules https://github.com/wordpress-mobile/gutenberg-mobile.git
 ```
 
 * Or if you already have the project cloned, initialize and update the submodules:
 ```
-$ git submodule init
-$ git submodule update
+git submodule init
+git submodule update
 ```
 
 ## Set up
