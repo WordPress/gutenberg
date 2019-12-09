@@ -121,6 +121,15 @@ describe( 'selectors', () => {
 			},
 		} );
 
+		registerBlockType( 'core/post-content-child', {
+			save: ( props ) => props.attributes.text,
+			category: 'common',
+			title: 'Test Block Post Content Child',
+			icon: 'test',
+			keywords: [ 'testing' ],
+			parent: [ 'core/post-content' ],
+		} );
+
 		setFreeformContentHandlerName( 'core/test-freeform' );
 
 		cachedSelectors.forEach( ( { clear } ) => clear() );
@@ -132,7 +141,7 @@ describe( 'selectors', () => {
 		unregisterBlockType( 'core/test-block-b' );
 		unregisterBlockType( 'core/test-block-c' );
 		unregisterBlockType( 'core/test-freeform' );
-
+		unregisterBlockType( 'core/post-content-child' );
 		setFreeformContentHandlerName( undefined );
 	} );
 
@@ -1933,6 +1942,36 @@ describe( 'selectors', () => {
 			};
 			expect( canInsertBlockType( state, 'core/test-block-c', 'block1' ) ).toBe( true );
 		} );
+
+		it( 'should deny blocks that restrict parent to core/post-content when not in editor root ', () => {
+			const state = {
+				blocks: {
+					byClientId: {
+						block1: { name: 'core/test-block-c' },
+					},
+					attributes: {
+						block1: {},
+					},
+				},
+				blockListSettings: {},
+				settings: {},
+			};
+			expect( canInsertBlockType( state, 'core/post-content-child', 'block1' ) ).toBe( false );
+		} );
+
+		it( 'should allow blocks that restrict parent to core/post-content when in editor root ', () => {
+			const state = {
+				blocks: {
+					byClientId: {},
+					attributes: {
+						block1: {},
+					},
+				},
+				blockListSettings: {},
+				settings: {},
+			};
+			expect( canInsertBlockType( state, 'core/post-content-child' ) ).toBe( true );
+		} );
 	} );
 
 	describe( 'getInserterItems', () => {
@@ -2033,6 +2072,7 @@ describe( 'selectors', () => {
 			};
 			const itemIDs = getInserterItems( state ).map( ( item ) => item.id );
 			expect( itemIDs ).toEqual( [
+				'core/post-content-child',
 				'core/block/2',
 				'core/block/1',
 				'core/test-block-b',
