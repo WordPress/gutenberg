@@ -122,7 +122,7 @@ describe( 'selectors', () => {
 		} );
 
 		registerBlockType( 'core/post-content-child', {
-			save: ( props ) => props.attributes.text,
+			save: () => null,
 			category: 'common',
 			title: 'Test Block Post Content Child',
 			icon: 'test',
@@ -1964,9 +1964,7 @@ describe( 'selectors', () => {
 			const state = {
 				blocks: {
 					byClientId: {},
-					attributes: {
-						block1: {},
-					},
+					attributes: {},
 				},
 				blockListSettings: {},
 				settings: {},
