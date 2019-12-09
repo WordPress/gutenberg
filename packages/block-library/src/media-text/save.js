@@ -39,23 +39,28 @@ export default function save( { attributes } ) {
 		rel,
 	} = attributes;
 	const newRel = isEmpty( rel ) ? undefined : rel;
-	const image = <img src={ mediaUrl } alt={ mediaAlt } className={ ( mediaId && mediaType === 'image' ) ? `wp-image-${ mediaId }` : null } />;
-	const imageMedia = (
-		<>
-			{ href ? (
-				<a
-					className={ linkClass }
-					href={ href }
-					target={ linkTarget }
-					rel={ newRel }
-				>
-					{ image }
-				</a>
-			) : image }
-		</>
-	);
+
+	let image = <img
+		src={ mediaUrl }
+		alt={ mediaAlt }
+		className={ ( mediaId && mediaType === 'image' ) ? `wp-image-${ mediaId }` : null }
+	/>;
+
+	if ( href ) {
+		image = (
+			<a
+				className={ linkClass }
+				href={ href }
+				target={ linkTarget }
+				rel={ newRel }
+			>
+				{ image }
+			</a>
+		);
+	}
+
 	const mediaTypeRenders = {
-		image: () => imageMedia,
+		image: () => image,
 		video: () => <video controls src={ mediaUrl } />,
 	};
 	const backgroundClass = getColorClassName( 'background-color', backgroundColor );
