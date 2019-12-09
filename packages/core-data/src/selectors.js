@@ -154,12 +154,14 @@ export function getEntityRecords( state, kind, name, query ) {
 }
 
 /**
- * Returns a list of objects with each edited entity
+ * Returns a map of objects with each edited entity
  * record and its corresponding edits.
+ *
+ * The map is keyed by entity `kind => name => id`.
  *
  * @param {Object} state State tree.
  *
- * @return {Array} The list of edited records with their edits.
+ * @return {Object} The map of edited records with their edits.
  */
 export const getEntityRecordChangesByRecord = createSelector(
 	( state ) => {

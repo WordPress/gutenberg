@@ -2,13 +2,15 @@
  * External dependencies
  */
 import { startCase } from 'lodash';
+import EquivalentKeyMap from 'equivalent-key-map';
 
 /**
  * WordPress dependencies
  */
-import { Button, CheckboxControl, Modal } from '@wordpress/components';
+import { CheckboxControl, Modal, Button } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useState, useCallback } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 
 const EntitiesSavedStatesCheckbox = ( {
 	id,
@@ -18,9 +20,11 @@ const EntitiesSavedStatesCheckbox = ( {
 	setCheckedById,
 } ) => (
 	<CheckboxControl
-		label={ `${ startCase( name ) }: "${ rawRecord.title || rawRecord.name }"` }
+		label={ `${ startCase( name ) }: "${ rawRecord.title ||
+			rawRecord.name ||
+			__( 'Untitled' ) }"` }
 		checked={ checked }
-		onChange={ useCallback( ( nextChecked ) => setCheckedById( id, nextChecked ), [ id ] ) }
+		onChange={ ( nextChecked ) => setCheckedById( id, nextChecked ) }
 	/>
 );
 
@@ -30,34 +34,31 @@ export default function EntitiesSavedStates( { isOpen, onRequestClose } ) {
 	);
 	const { saveEditedEntityRecord } = useDispatch( 'core' );
 
-	const [ checkedById, _setCheckedById ] = useState( {} );
-	const setCheckedById = useCallback(
-		( id, checked ) =>
-			_setCheckedById( ( prevCheckedById ) => {
-				const nextCheckedById = {
-					...prevCheckedById,
-				};
-				if ( checked ) {
-					nextCheckedById[ id ] = true;
-				} else {
-					delete nextCheckedById[ id ];
-				}
-				return nextCheckedById;
-			} ),
-		[]
-	);
-	const saveCheckedEntities = useCallback( () => {
-		Object.keys( checkedById ).forEach( ( id ) =>
-			saveEditedEntityRecord( ...id.split( ' | ' ).filter( ( s ) => s !== 'undefined' ) )
+	const [ checkedById, _setCheckedById ] = useState( new EquivalentKeyMap() );
+	const setCheckedById = ( id, checked ) =>
+		_setCheckedById( ( prevCheckedById ) => {
+			const nextCheckedById = new EquivalentKeyMap( prevCheckedById );
+			if ( checked ) {
+				nextCheckedById.set( id, true );
+			} else {
+				nextCheckedById.delete( id );
+			}
+			return nextCheckedById;
+		} );
+	const saveCheckedEntities = () => {
+		checkedById.forEach( ( _checked, id ) =>
+			saveEditedEntityRecord(
+				...id.filter( ( s, i ) => i !== id.length - 1 || s !== 'undefined' )
+			)
 		);
 		onRequestClose( checkedById );
-	}, [ checkedById ] );
+	};
 	return (
 		isOpen && (
 			<Modal
-				title="What do you want to save?"
+				title={ __( 'What do you want to save?' ) }
 				onRequestClose={ onRequestClose }
-				contentLabel="Select items to save."
+				contentLabel={ __( 'Select items to save.' ) }
 			>
 				{ Object.keys( entityRecordChangesByRecord ).map( ( changedKind ) =>
 					Object.keys( entityRecordChangesByRecord[ changedKind ] ).map(
@@ -65,10 +66,10 @@ export default function EntitiesSavedStates( { isOpen, onRequestClose } ) {
 							Object.keys(
 								entityRecordChangesByRecord[ changedKind ][ changedName ]
 							).map( ( changedKey ) => {
-								const id = `${ changedKind } | ${ changedName } | ${ changedKey }`;
+								const id = [ changedKind, changedName, changedKey ];
 								return (
 									<EntitiesSavedStatesCheckbox
-										key={ id }
+										key={ `${ changedKind } | ${ changedName } | ${ changedKey }` }
 										id={ id }
 										name={ changedName }
 										changes={
@@ -76,7 +77,7 @@ export default function EntitiesSavedStates( { isOpen, onRequestClose } ) {
 												changedKey
 											]
 										}
-										checked={ checkedById[ id ] }
+										checked={ checkedById.get( id ) }
 										setCheckedById={ setCheckedById }
 									/>
 								);
@@ -85,11 +86,11 @@ export default function EntitiesSavedStates( { isOpen, onRequestClose } ) {
 				) }
 				<Button
 					isPrimary
-					disabled={ Object.keys( checkedById ).length === 0 }
+					disabled={ checkedById.size === 0 }
 					onClick={ saveCheckedEntities }
 					className="editor-entities-saved-states__save-button"
 				>
-					Save
+					{ __( 'Save' ) }
 				</Button>
 			</Modal>
 		)

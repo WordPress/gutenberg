@@ -368,8 +368,10 @@ _Returns_
 
 <a name="getEntityRecordChangesByRecord" href="#getEntityRecordChangesByRecord">#</a> **getEntityRecordChangesByRecord**
 
-Returns a list of objects with each edited entity
+Returns a map of objects with each edited entity
 record and its corresponding edits.
+
+The map is keyed by entity `kind => name => id`.
 
 _Parameters_
 
@@ -377,7 +379,7 @@ _Parameters_
 
 _Returns_
 
--   `Array`: The list of edited records with their edits.
+-   `Object`: The map of edited records with their edits.
 
 <a name="getEntityRecordEdits" href="#getEntityRecordEdits">#</a> **getEntityRecordEdits**
 
