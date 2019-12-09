@@ -1944,7 +1944,7 @@ describe( 'selectors', () => {
 			expect( canInsertBlockType( state, 'core/test-block-c', 'block1' ) ).toBe( true );
 		} );
 
-		it( 'should deny blocks that restrict parent to core/post-content when not in editor root ', () => {
+		it( 'should deny blocks that restrict parent to core/post-content when not in editor root', () => {
 			const state = {
 				blocks: {
 					byClientId: {
