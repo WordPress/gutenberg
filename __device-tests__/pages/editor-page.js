@@ -40,7 +40,7 @@ export default class EditorPage {
 	}
 
 	async getBlockList() {
-		return this.driver.hasElementByAccessibilityId( 'block-list' );
+		return await this.driver.hasElementByAccessibilityId( 'block-list' );
 	}
 
 	// Finds the wd element for new block that was added and sets the element attribute
