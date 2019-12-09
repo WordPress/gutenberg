@@ -23,7 +23,7 @@ export const settings = {
 	example: {
 		attributes: {
 			// translators: Preserve \n markers for line breaks
-			content: '// A "block" is the abstract term used\n// to describe units of markup that\n// when composed together, form the\n// content or layout of a page.\nregisterBlockType( name, settings );',
+			content: __( '// A "block" is the abstract term used\n// to describe units of markup that\n// when composed together, form the\n// content or layout of a page.\nregisterBlockType( name, settings );' ),
 		},
 	},
 	supports: {
