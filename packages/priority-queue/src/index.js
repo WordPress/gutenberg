@@ -1,16 +1,24 @@
 /**
+ * Enqueued callback to invoke once idle time permits.
+ *
  * @typedef {()=>void} WPPriorityQueueCallback
  */
 
 /**
+ * An object used to associate callbacks in a particular context grouping.
+ *
  * @typedef {{}} WPPriorityQueueContext
  */
 
 /**
+ * Function to add callback to priority queue.
+ *
  * @typedef {(element:WPPriorityQueueContext,item:WPPriorityQueueCallback)=>void} WPPriorityQueueAdd
  */
 
 /**
+ * Function to flush callbacks from priority queue.
+ *
  * @typedef {(element:WPPriorityQueueContext)=>boolean} WPPriorityQueueFlush
  */
 
