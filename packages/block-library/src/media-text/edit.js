@@ -25,7 +25,6 @@ import {
 	TextareaControl,
 	ToggleControl,
 	ToolbarGroup,
-	Toolbar,
 	ExternalLink,
 	FocalPointPicker,
 } from '@wordpress/components';
@@ -133,6 +132,7 @@ class MediaTextEdit extends Component {
 			isSelected,
 			setAttributes,
 			setBackgroundColor,
+			image,
 		} = this.props;
 		const {
 			isStackedOnMobile,
@@ -252,8 +252,8 @@ class MediaTextEdit extends Component {
 							onChangeUrl={ this.onSetHref }
 							linkDestination={ linkDestination }
 							mediaType={ mediaType }
-							mediaUrl={ this.props.image && this.props.image.source_url }
-							mediaLink={ this.props.image && this.props.image.link }
+							mediaUrl={ image && image.source_url }
+							mediaLink={ image && image.link }
 							linkTarget={ linkTarget }
 							linkClass={ linkClass }
 							rel={ rel }
