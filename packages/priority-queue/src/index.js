@@ -62,7 +62,8 @@ export const createQueue = () => {
 	 *
 	 * @type {IdleRequestCallback & FrameRequestCallback}
 	 *
-	 * @param {IdleDeadline|number} deadline Idle callback deadline object.
+	 * @param {IdleDeadline|number} deadline Idle callback deadline object, or
+	 *                                       animation frame timestamp.
 	 */
 	const runWaitingList = ( deadline ) => {
 		const hasTimeRemaining = typeof deadline === 'number' ?
