@@ -142,7 +142,7 @@ export class Inputs extends Component {
 			return value;
 		}
 
-		if ( value > 0 ) {
+		if ( value < 0 ) {
 			return 0;
 		} else if ( value > 1 ) {
 			return 1;
