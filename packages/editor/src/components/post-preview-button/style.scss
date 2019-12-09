@@ -1,9 +1,9 @@
 .editor-post-preview-button__preview-modal {
 	@include break-small() {
-		top: 5%;
-		right: 5%;
-		bottom: 5%;
-		left: 5%;
+		top: 60px;
+		right: 60px;
+		bottom: 60px;
+		left: 60px;
 		transform: none;
 	}
 }
@@ -24,10 +24,10 @@
 
 .editor-post-preview__frame-container {
 	overflow-x: auto;
-	margin-bottom: 40px;
 }
 
 .editor-post-preview__frame {
 	display: block;
 	margin: 0 auto;
+	max-height: calc(100vh - 280px);
 }
