@@ -157,8 +157,30 @@
 		}
 	}
 
-	// Selected style.
-	&.is-multi-selected {
+	// Spotlight mode.
+	&.is-focus-mode:not(.is-multi-selected) {
+		opacity: 0.5;
+		transition: opacity 0.1s linear;
+		@include reduce-motion("transition");
+
+		&:not(.is-focused) .block-editor-block-list__block,
+		&.is-focused {
+			opacity: 1;
+		}
+	}
+}
+
+
+/**
+ * Cross-Block Selection
+ */
+
+.block-editor-block-list__layout {
+
+	// The primary indicator of selection is the native selection marker.
+	// To indicate multiple blocks, we provide an additional selection indicator.
+	.block-editor-block-list__block.is-multi-selected {
+
 		> .block-editor-block-list__block-edit::before {
 			border-left-color: $dark-opacity-light-800;
 			box-shadow: inset $block-left-border-width 0 0 0 $dark-gray-500;
@@ -179,22 +201,18 @@
 		}
 	}
 
-	// Spotlight mode.
-	&.is-focus-mode:not(.is-multi-selected) {
-		opacity: 0.5;
-		transition: opacity 0.1s linear;
-		@include reduce-motion("transition");
+	// The additional marker, we limit only to top level blocks.
+	.block-editor-block-list__block.is-multi-selected .block-editor-block-list__block.is-multi-selected > .block-editor-block-list__block-edit::before {
+		box-shadow: none;
+	}
 
-		&:not(.is-focused) .block-editor-block-list__block,
-		&.is-focused {
-			opacity: 1;
+	// Provide exceptions for placeholders.
+	.components-placeholder {
+		::selection {
+			background: transparent;
 		}
 	}
 }
-
-/**
- * Cross-block selection
- */
 
 
 /**
@@ -275,23 +293,10 @@
 	}
 
 	// Reusable blocks.
-	&.is-reusable > .block-editor-block-list__block-edit::before {
-		border: $border-width dashed $dark-opacity-light-500;
-
-		.is-dark-theme & {
-			border-color: $light-opacity-light-600;
-		}
-	}
-
 	&.is-reusable.is-selected > .block-editor-block-list__block-edit::before {
-		// Use opacity to work in various editor styles.
-		border-color: $dark-opacity-light-800;
 		border-left-color: transparent;
-
-		.is-dark-theme & {
-			border-color: $light-opacity-light-800;
-			border-left-color: transparent;
-		}
+		border-style: dashed;
+		border-width: $border-width;
 	}
 
 	// Reusable Blocks clickthrough overlays.
@@ -928,43 +933,38 @@
 /**
  * Block Label for Navigation/Selection Mode
  */
-
 .block-editor-block-list__breadcrumb {
-	display: none;
+	display: block;
+	position: absolute;
+	line-height: 1;
+	z-index: z-index(".block-editor-block-list__breadcrumb");
 
-	.is-navigate-mode & {
-		display: block;
-		position: absolute;
-		line-height: 1;
-		z-index: z-index(".block-editor-block-list__breadcrumb");
+	// Position in the top left of the border.
+	left: -$block-padding;
+	top: -$block-toolbar-height - $block-padding;
 
-		// Position in the top left of the border.
-		left: -$block-padding;
-		top: -$block-toolbar-height - $block-padding;
+	.components-toolbar {
+		display: flex;
+		background: $white;
+		border: $border-width solid $blue-medium-focus;
+		border-left: none;
+		box-shadow: inset $block-left-border-width 0 0 0 $blue-medium-focus;
+		height: $block-toolbar-height + $border-width;
+		font-size: $default-font-size;
+		line-height: $block-toolbar-height - $grid-size;
+		padding-left: $grid-size;
+		padding-right: $grid-size;
 
-		.components-toolbar {
-			display: flex;
-			background: $white;
-			border: $border-width solid $blue-medium-focus;
-			border-left: none;
-			box-shadow: inset $block-left-border-width 0 0 0 $blue-medium-focus;
-			height: $block-toolbar-height + $border-width;
-			font-size: $default-font-size;
-			line-height: $block-toolbar-height - $grid-size;
-			padding-left: $grid-size;
-			padding-right: $grid-size;
+		.components-button {
+			box-shadow: none;
+		}
 
-			.components-button {
-				box-shadow: none;
-			}
+		.is-dark-theme & {
+			border-color: $light-opacity-light-800;
+		}
 
-			.is-dark-theme & {
-				border-color: $light-opacity-light-800;
-			}
-
-			@include break-small() {
-				box-shadow: -$block-left-border-width 0 0 0 $blue-medium-focus;
-			}
+		@include break-small() {
+			box-shadow: -$block-left-border-width 0 0 0 $blue-medium-focus;
 		}
 	}
 }

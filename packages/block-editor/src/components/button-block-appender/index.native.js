@@ -16,7 +16,7 @@ import Inserter from '../inserter';
 import styles from './styles.scss';
 
 function ButtonBlockAppender( { rootClientId, getStylesFromColorScheme } ) {
-	const appenderStyle = getStylesFromColorScheme( styles.appender, styles.appenderDark );
+	const appenderStyle = { ...styles.appender, ...getStylesFromColorScheme( styles.appenderLight, styles.appenderDark ) };
 	const addBlockButtonStyle = getStylesFromColorScheme( styles.addBlockButton, styles.addBlockButtonDark );
 
 	return (
@@ -30,7 +30,7 @@ function ButtonBlockAppender( { rootClientId, getStylesFromColorScheme } ) {
 						disabled={ disabled }
 						fixedRatio={ false }
 					>
-						<View style={ [ appenderStyle, { flex: 1 } ] }>
+						<View style={ appenderStyle }>
 							<Dashicon
 								icon="plus-alt"
 								style={ addBlockButtonStyle }

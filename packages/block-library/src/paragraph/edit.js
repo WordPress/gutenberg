@@ -24,8 +24,16 @@ import {
 import { createBlock } from '@wordpress/blocks';
 import { compose } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
+import { useEffect, useState } from '@wordpress/element';
+
+/**
+ * Browser dependencies
+ */
+const { getComputedStyle } = window;
+const querySelector = window.document.querySelector.bind( document );
 
 const name = 'core/paragraph';
+const PARAGRAPH_DROP_CAP_SELECTOR = 'p.has-drop-cap';
 
 function ParagraphRTLToolbar( { direction, setDirection } ) {
 	const isRTL = useSelect( ( select ) => {
@@ -48,6 +56,27 @@ function ParagraphRTLToolbar( { direction, setDirection } ) {
 	) );
 }
 
+function useDropCapMinimumHeight( isDropCap, deps ) {
+	const [ minimumHeight, setMinimumHeight ] = useState();
+	useEffect(
+		() => {
+			const element = querySelector( PARAGRAPH_DROP_CAP_SELECTOR );
+			if ( isDropCap && element ) {
+				setMinimumHeight(
+					getComputedStyle(
+						element,
+						'first-letter'
+					).height
+				);
+			} else if ( minimumHeight ) {
+				setMinimumHeight( undefined );
+			}
+		},
+		[ isDropCap, minimumHeight, setMinimumHeight, ...deps ]
+	);
+	return minimumHeight;
+}
+
 function ParagraphBlock( {
 	attributes,
 	className,
@@ -65,6 +94,7 @@ function ParagraphBlock( {
 		direction,
 	} = attributes;
 
+	const dropCapMinimumHeight = useDropCapMinimumHeight( dropCap, [ fontSize.size ] );
 	const {
 		TextColor,
 		BackgroundColor,
@@ -125,6 +155,7 @@ function ParagraphBlock( {
 						style={ {
 							fontSize: fontSize.size ? fontSize.size + 'px' : undefined,
 							direction,
+							minHeight: dropCapMinimumHeight,
 						} }
 						value={ content }
 						onChange={ ( newContent ) => setAttributes( { content: newContent } ) }

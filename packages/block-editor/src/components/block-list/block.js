@@ -27,6 +27,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import {
 	withDispatch,
 	withSelect,
+	useSelect,
 } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
 import { compose, pure, ifCondition } from '@wordpress/compose';
@@ -44,7 +45,6 @@ import BlockHtml from './block-html';
 import BlockBreadcrumb from './breadcrumb';
 import BlockContextualToolbar from './block-contextual-toolbar';
 import BlockMultiControls from './multi-controls';
-import BlockMobileToolbar from './block-mobile-toolbar';
 import BlockInsertionPoint from './insertion-point';
 import IgnoreNestedEvents from '../ignore-nested-events';
 import InserterWithShortcuts from '../inserter-with-shortcuts';
@@ -71,14 +71,13 @@ function BlockListBlock( {
 	clientId,
 	rootClientId,
 	isSelected,
+	isMultiSelected,
 	isPartOfMultiSelection,
 	isFirstMultiSelected,
 	isTypingWithinBlock,
 	isCaretWithinFormattedText,
 	isEmptyDefaultBlock,
-	isMovable,
 	isParentOfSelectedBlock,
-	isDraggable,
 	isSelectionEnabled,
 	className,
 	name,
@@ -102,7 +101,16 @@ function BlockListBlock( {
 	isNavigationMode,
 	setNavigationMode,
 	isMultiSelecting,
+	isLargeViewport,
 } ) {
+	// In addition to withSelect, we should favor using useSelect in this component going forward
+	// to avoid leaking new props to the public API (editor.BlockListBlock filter)
+	const { isDraggingBlocks } = useSelect( ( select ) => {
+		return {
+			isDraggingBlocks: select( 'core/block-editor' ).isDraggingBlocks(),
+		};
+	} );
+
 	// Random state used to rerender the component if needed, ideally we don't need this
 	const [ , updateRerenderState ] = useState( {} );
 	const rerender = () => updateRerenderState( {} );
@@ -167,15 +175,6 @@ function BlockListBlock( {
 			hideHoverEffects();
 		}
 	} );
-
-	// Handling the dragging state
-	const [ isDragging, setBlockDraggingState ] = useState( false );
-	const onDragStart = () => {
-		setBlockDraggingState( true );
-	};
-	const onDragEnd = () => {
-		setBlockDraggingState( false );
-	};
 
 	// Handling the error state
 	const [ hasError, setErrorState ] = useState( false );
@@ -253,11 +252,11 @@ function BlockListBlock( {
 	// Focus the selected block's wrapper or inner input on mount and update
 	const isMounting = useRef( true );
 	useEffect( () => {
-		if ( isSelected ) {
+		if ( isSelected && ! isMultiSelecting ) {
 			focusTabbable( ! isMounting.current );
 		}
 		isMounting.current = false;
-	}, [ isSelected ] );
+	}, [ isSelected, isMultiSelecting ] );
 
 	// Focus the first multi selected block
 	useEffect( () => {
@@ -343,8 +342,6 @@ function BlockListBlock( {
 		}
 	};
 
-	const isPointerDown = useRef( false );
-
 	/**
 	 * Begins tracking cursor multi-selection when clicking down within block.
 	 *
@@ -371,34 +368,27 @@ function BlockListBlock( {
 				event.preventDefault();
 			}
 
-		// Avoid triggering multi-selection if we click toolbars/inspectors
-		// and all elements that are outside the Block Edit DOM tree.
-		} else if ( blockNodeRef.current.contains( event.target ) ) {
-			isPointerDown.current = true;
-
-			// Allow user to escape out of a multi-selection to a singular
-			// selection of a block via click. This is handled here since
-			// onFocus excludes blocks involved in a multiselection, as
-			// focus can be incurred by starting a multiselection (focus
-			// moved to first block's multi-controls).
-			if ( isPartOfMultiSelection ) {
-				onSelect();
-			}
+		// Allow user to escape out of a multi-selection to a singular
+		// selection of a block via click. This is handled here since
+		// onFocus excludes blocks involved in a multiselection, as
+		// focus can be incurred by starting a multiselection (focus
+		// moved to first block's multi-controls).
+		} else if ( isPartOfMultiSelection ) {
+			onSelect();
 		}
 	};
 
-	const onMouseUp = () => {
-		isPointerDown.current = false;
-	};
-
-	const onMouseLeave = () => {
-		if ( isPointerDown.current ) {
+	const onMouseLeave = ( { which, buttons } ) => {
+		// The primary button must be pressed to initiate selection. Fall back
+		// to `which` if the standard `buttons` property is falsy. There are
+		// cases where Firefox might always set `buttons` to `0`.
+		// See https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/buttons
+		// See https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/which
+		if ( isSelected && ( buttons || which ) === 1 ) {
 			onSelectionStart( clientId );
 		}
 
 		hideHoverEffects();
-
-		isPointerDown.current = false;
 	};
 
 	const selectOnOpen = ( open ) => {
@@ -438,19 +428,17 @@ function BlockListBlock( {
 		! showEmptyBlockSideInserter &&
 		! isPartOfMultiSelection &&
 		! isTypingWithinBlock;
-	const shouldShowBreadcrumb = ! isMultiSelecting && (
-		( isSelected && isNavigationMode ) ||
-		( ! isNavigationMode && ! isFocusMode && isHovered && ! isEmptyDefaultBlock )
-	);
+	const shouldShowBreadcrumb = isNavigationMode && isSelected;
 	const shouldShowContextualToolbar =
 		! isNavigationMode &&
 		! hasFixedToolbar &&
+		isLargeViewport &&
 		! showEmptyBlockSideInserter &&
+		! isMultiSelecting &&
 		(
 			( isSelected && ( ! isTypingWithinBlock || isCaretWithinFormattedText ) ) ||
 			isFirstMultiSelected
 		);
-	const shouldShowMobileToolbar = ! isNavigationMode && shouldAppearSelected;
 
 	// Insertion point can only be made visible if the block is at the
 	// the extent of a multi-selection, or not in a multi-selection.
@@ -460,6 +448,7 @@ function BlockListBlock( {
 	);
 
 	const shouldRenderDropzone = shouldShowInsertionPoint;
+	const isDragging = isDraggingBlocks && ( isSelected || isPartOfMultiSelection );
 
 	// The wp-block className is important for editor styles.
 	// Generate the wrapper class names handling the different states of the block.
@@ -469,7 +458,7 @@ function BlockListBlock( {
 			'has-warning': ! isValid || !! hasError || isUnregisteredBlock,
 			'is-selected': shouldAppearSelected,
 			'is-navigate-mode': isNavigationMode,
-			'is-multi-selected': isPartOfMultiSelection,
+			'is-multi-selected': isMultiSelected,
 			'is-hovered': shouldAppearHovered,
 			'is-reusable': isReusableBlock( blockType ),
 			'is-dragging': isDragging,
@@ -492,14 +481,7 @@ function BlockListBlock( {
 	const blockMover = (
 		<BlockMover
 			clientIds={ clientId }
-			blockElementId={ blockElementId }
 			isHidden={ ! isSelected }
-			isDraggable={
-				isDraggable !== false &&
-				( ! isPartOfMultiSelection && isMovable )
-			}
-			onDragStart={ onDragStart }
-			onDragEnd={ onDragEnd }
 			__experimentalOrientation={ moverDirection }
 		/>
 	);
@@ -608,7 +590,6 @@ function BlockListBlock( {
 					ref={ blockNodeRef }
 					onDragStart={ preventDrag }
 					onMouseDown={ onMouseDown }
-					onMouseUp={ onMouseUp }
 					onMouseLeave={ onMouseLeave }
 					data-block={ clientId }
 				>
@@ -629,9 +610,6 @@ function BlockListBlock( {
 						] }
 					</BlockCrashBoundary>
 					{ !! hasError && <BlockCrashWarning /> }
-					{ shouldShowMobileToolbar && (
-						<BlockMobileToolbar clientId={ clientId } moverDirection={ moverDirection } />
-					) }
 				</IgnoreNestedEvents>
 			</div>
 			{ showInserterShortcuts && (
@@ -691,6 +669,7 @@ const applyWithSelect = withSelect(
 		const { name, attributes, isValid } = block || {};
 
 		return {
+			isMultiSelected: isBlockMultiSelected( clientId ),
 			isPartOfMultiSelection:
 				isBlockMultiSelected( clientId ) || isAncestorMultiSelected( clientId ),
 			isFirstMultiSelected: isFirstMultiSelectedBlock( clientId ),
@@ -704,7 +683,6 @@ const applyWithSelect = withSelect(
 			initialPosition: isSelected ? getSelectedBlocksInitialCaretPosition() : null,
 			isEmptyDefaultBlock:
 				name && isUnmodifiedDefaultBlock( { name, attributes } ),
-			isMovable: 'all' !== templateLock,
 			isLocked: !! templateLock,
 			isFocusMode: focusMode && isLargeViewport,
 			hasFixedToolbar: hasFixedToolbar && isLargeViewport,

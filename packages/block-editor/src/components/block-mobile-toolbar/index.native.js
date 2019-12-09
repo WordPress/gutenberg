@@ -14,7 +14,7 @@ import { compose } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import styles from './block-mobile-toolbar.scss';
+import styles from './style.scss';
 import BlockMover from '../block-mover';
 import { BlockSettingsButton } from '../block-settings';
 

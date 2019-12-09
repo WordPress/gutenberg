@@ -2,7 +2,7 @@
 
 Gutenberg is a Node.js-based project, built primarily in JavaScript.
 
-The first step is to install a recent version of Node. The easiest way (on MacOS, Linux, or Windows 10 with the Linux Subsystem) is by installing and running [nvm]. Once `nvm` is installed, you can install the correct version of Node by running `nvm install` in the Gutenberg directory.
+The first step is to install the [latest active LTS release](https://github.com/nodejs/Release#release-schedule) of Node. The easiest way (on macOS, Linux, or Windows 10 with the Linux Subsystem) is by installing and running [nvm]. Once `nvm` is installed, you can install the correct version of Node by running `nvm install` in the Gutenberg directory.
 
 Once you have Node installed, run these scripts from within your local Gutenberg repository:
 

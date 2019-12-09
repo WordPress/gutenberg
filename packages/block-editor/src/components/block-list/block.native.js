@@ -23,7 +23,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import styles from './block.scss';
 import BlockEdit from '../block-edit';
 import BlockInvalidWarning from './block-invalid-warning';
-import BlockMobileToolbar from './block-mobile-toolbar';
+import BlockMobileToolbar from '../block-mobile-toolbar';
 import FloatingToolbar from './block-mobile-floating-toolbar';
 import Breadcrumbs from './breadcrumb';
 import NavigateUpSVG from './nav-up-icon';
@@ -133,7 +133,7 @@ class BlockListBlock extends Component {
 				1. does not have children
 				2. is not on root list level
 				3. is an emty group block on root or nested level	*/
-		return { ...styles.selectedLeaf,	...fullSolidBorderStyle	};
+		return { ...styles.selectedLeaf, ...fullSolidBorderStyle };
 	}
 
 	applyUnSelectedBlockStyle() {
@@ -227,10 +227,7 @@ class BlockListBlock extends Component {
 						accessibilityLabel={ accessibilityLabel }
 						style={ this.applyBlockStyle() }
 					>
-						{ isValid && this.getBlockForType() }
-						{ ! isValid &&
-							<BlockInvalidWarning blockTitle={ title } icon={ icon } />
-						}
+						{ isValid ? this.getBlockForType() : <BlockInvalidWarning blockTitle={ title } icon={ icon } /> }
 						{ isSelected && <BlockMobileToolbar clientId={ clientId } /> }
 					</View>
 				</TouchableWithoutFeedback>
@@ -285,13 +282,14 @@ export default compose( [
 		const firstToSelectId = commonAncestor ? parents[ commonAncestorIndex ] : parents[ parents.length - 1 ];
 
 		const hasChildren = !! getBlockCount( clientId );
-		const hasParent = !! parents[ 0 ];
-		const isParentSelected = selectedBlockClientId && selectedBlockClientId === parents[ 0 ];
+		const hasParent = !! parentId;
+		const isParentSelected = selectedBlockClientId && selectedBlockClientId === parentId;
 		const isAncestorSelected = selectedBlockClientId && parents.includes( selectedBlockClientId );
 		const isSelectedBlockNested = !! getBlockRootClientId( selectedBlockClientId );
 
-		const isDescendantSelected = selectedBlockClientId && getBlockParents( selectedBlockClientId ).includes( clientId );
-		const isDescendantOfParentSelected = selectedBlockClientId && getBlockParents( selectedBlockClientId ).includes( parentId );
+		const selectedParents = selectedBlockClientId ? getBlockParents( selectedBlockClientId ) : [];
+		const isDescendantSelected = selectedParents.includes( clientId );
+		const isDescendantOfParentSelected = selectedParents.includes( parentId );
 		const isTouchable = isSelected || isDescendantOfParentSelected || isParentSelected || parentId === '';
 		const isDimmed = ! isSelected && isSelectedBlockNested && ! isAncestorSelected && ! isDescendantSelected && ( isDescendantOfParentSelected || rootBlockId === clientId );
 
@@ -319,7 +317,6 @@ export default compose( [
 			isAncestorSelected,
 			isTouchable,
 			isDimmed,
-			isSelectedBlockNested,
 			isRootListInnerBlockHolder,
 		};
 	} ),

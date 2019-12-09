@@ -402,6 +402,8 @@ class RichTextWrapper extends Component {
 				style={ style }
 				preserveWhiteSpace={ preserveWhiteSpace }
 				disabled={ disabled }
+				start={ start }
+				reversed={ reversed }
 			>
 				{ ( { isSelected, value, onChange, Editable } ) =>
 					<>

@@ -903,6 +903,26 @@ export function isTyping( state = false, action ) {
 }
 
 /**
+ * Reducer returning dragging state.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {boolean} Updated state.
+ */
+export function isDraggingBlocks( state = false, action ) {
+	switch ( action.type ) {
+		case 'START_DRAGGING_BLOCKS':
+			return true;
+
+		case 'STOP_DRAGGING_BLOCKS':
+			return false;
+	}
+
+	return state;
+}
+
+/**
  * Reducer returning whether the caret is within formatted text.
  *
  * @param {boolean} state  Current state.
@@ -1329,6 +1349,7 @@ export function automaticChangeStatus( state, action ) {
 export default combineReducers( {
 	blocks,
 	isTyping,
+	isDraggingBlocks,
 	isCaretWithinFormattedText,
 	selectionStart,
 	selectionEnd,

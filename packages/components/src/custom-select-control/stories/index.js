@@ -1,11 +1,11 @@
 /**
  * Internal dependencies
  */
-import CustomSelect from '../';
+import CustomSelectControl from '../';
 
-export default { title: 'CustomSelect', component: CustomSelect };
+export default { title: 'CustomSelectControl', component: CustomSelectControl };
 
-const items = [
+const options = [
 	{
 		key: 'small',
 		name: 'Small',
@@ -27,4 +27,6 @@ const items = [
 		style: { fontSize: '300%' },
 	},
 ];
-export const _default = () => <CustomSelect label="Font Size" items={ items } />;
+export const _default = () => (
+	<CustomSelectControl label="Font Size" options={ options } />
+);

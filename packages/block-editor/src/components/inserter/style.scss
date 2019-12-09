@@ -16,7 +16,7 @@ $block-inserter-search-height: 38px;
 	}
 }
 
-.block-editor-inserter__popover:not(.is-mobile) > .components-popover__content {
+.block-editor-inserter__popover > .components-popover__content {
 	@include break-medium {
 		overflow-y: visible;
 		height: $block-inserter-content-height + $block-inserter-tabs-height + $block-inserter-search-height;

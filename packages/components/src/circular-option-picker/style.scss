@@ -1,12 +1,12 @@
 $color-palette-circle-size: 28px;
-$color-palette-circle-spacing: 14px;
+$color-palette-circle-spacing: 12px;
 
 .components-circular-option-picker {
-	margin-right: -14px;
-	width: calc(100% + 14px);
+	display: inline-block;
+	margin-top: 0.6rem;
+	width: 100%;
 
 	.components-circular-option-picker__custom-clear-wrapper {
-		width: calc(100% - 14px);
 		display: flex;
 		justify-content: flex-end;
 	}
@@ -22,6 +22,7 @@ $color-palette-circle-spacing: 14px;
 	transform: scale(1);
 	transition: 100ms transform ease;
 	@include reduce-motion("transition");
+
 	&:hover {
 		transform: scale(1.2);
 	}
@@ -30,6 +31,10 @@ $color-palette-circle-spacing: 14px;
 	& > div {
 		height: 100%;
 		width: 100%;
+	}
+
+	&:nth-child(6n+6) {
+		margin-right: 0;
 	}
 }
 
