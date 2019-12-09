@@ -19,7 +19,7 @@ exports[`PostPreviewButton render() should render overlay when state is open 1`]
     className="editor-post-preview-button__preview-modal"
     onRequestClose={[Function]}
     shouldCloseOnClickOutside={false}
-    title="Preview dialog"
+    title="Preview"
   >
     <div
       className="editor-post-preview__controls"
@@ -92,7 +92,10 @@ exports[`PostPreviewButton render() should render overlay when state is open 1`]
       </ForwardRef(Button)>
     </div>
     <div
+      aria-label="Preview"
       className="editor-post-preview__frame-container"
+      role="region"
+      tabIndex="0"
     >
       <iframe
         className="editor-post-preview__frame"
@@ -103,7 +106,7 @@ exports[`PostPreviewButton render() should render overlay when state is open 1`]
             "width": "1200px",
           }
         }
-        title="Responsive preview frame"
+        title="Responsive preview"
       />
     </div>
   </WithInstanceId(Modal)>
