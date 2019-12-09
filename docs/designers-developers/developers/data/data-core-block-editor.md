@@ -756,6 +756,18 @@ _Returns_
 
 -   `boolean`: Whether the caret is within formatted text.
 
+<a name="isDraggingBlocks" href="#isDraggingBlocks">#</a> **isDraggingBlocks**
+
+Returns true if the user is dragging blocks, or false otherwise.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `boolean`: Whether user is dragging blocks.
+
 <a name="isFirstMultiSelectedBlock" href="#isFirstMultiSelectedBlock">#</a> **isFirstMultiSelectedBlock**
 
 Returns true if a multi-selection exists, and the block corresponding to the
@@ -1141,15 +1153,11 @@ _Parameters_
 
 <a name="setNavigationMode" href="#setNavigationMode">#</a> **setNavigationMode**
 
-Returns an action object used to enable or disable the navigation mode.
+Generators that triggers an action used to enable or disable the navigation mode.
 
 _Parameters_
 
 -   _isNavigationMode_ `string`: Enable/Disable navigation mode.
-
-_Returns_
-
--   `Object`: Action object
 
 <a name="setTemplateValidity" href="#setTemplateValidity">#</a> **setTemplateValidity**
 
@@ -1177,6 +1185,14 @@ _Returns_
 
 -   `Object`: Action object.
 
+<a name="startDraggingBlocks" href="#startDraggingBlocks">#</a> **startDraggingBlocks**
+
+Returns an action object used in signalling that the user has begun to drag blocks.
+
+_Returns_
+
+-   `Object`: Action object.
+
 <a name="startMultiSelect" href="#startMultiSelect">#</a> **startMultiSelect**
 
 Returns an action object used in signalling that a block multi-selection has started.
@@ -1188,6 +1204,14 @@ _Returns_
 <a name="startTyping" href="#startTyping">#</a> **startTyping**
 
 Returns an action object used in signalling that the user has begun to type.
+
+_Returns_
+
+-   `Object`: Action object.
+
+<a name="stopDraggingBlocks" href="#stopDraggingBlocks">#</a> **stopDraggingBlocks**
+
+Returns an action object used in signalling that the user has stopped dragging blocks.
 
 _Returns_
 

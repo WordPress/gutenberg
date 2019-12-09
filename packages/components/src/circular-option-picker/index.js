@@ -18,8 +18,7 @@ function Option( {
 	...additionalProps
 } ) {
 	const optionButton = (
-		<button
-			type="button"
+		<Button
 			aria-pressed={ isSelected }
 			className={ classnames(
 				className,
@@ -78,7 +77,6 @@ function ButtonAction( {
 				'components-circular-option-picker__clear',
 				className
 			) }
-			type="button"
 			isSmall
 			isDefault
 			{ ...additionalProps }
@@ -92,10 +90,12 @@ export default function CircularOptionPicker( {
 	actions,
 	className,
 	options,
+	children,
 } ) {
 	return (
 		<div className={ classnames( 'components-circular-option-picker', className ) }>
 			{ options }
+			{ children }
 			{ actions && (
 				<div className="components-circular-option-picker__custom-clear-wrapper">
 					{ actions }

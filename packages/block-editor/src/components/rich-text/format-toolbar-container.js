@@ -9,31 +9,7 @@ import { Popover } from '@wordpress/components';
 import BlockFormatControls from '../block-format-controls';
 import FormatToolbar from './format-toolbar';
 
-function getAnchorRect( anchorObj ) {
-	const { current } = anchorObj;
-	const rect = current.getBoundingClientRect();
-
-	// Add some space.
-	const buffer = 6;
-
-	// Subtract padding if any.
-	let { paddingTop } = window.getComputedStyle( current );
-
-	paddingTop = parseInt( paddingTop, 10 );
-
-	return {
-		x: rect.left,
-		y: rect.top + paddingTop - buffer,
-		width: rect.width,
-		height: rect.height - paddingTop + buffer,
-		left: rect.left,
-		right: rect.right,
-		top: rect.top + paddingTop - buffer,
-		bottom: rect.bottom,
-	};
-}
-
-const FormatToolbarContainer = ( { inline, anchorObj } ) => {
+const FormatToolbarContainer = ( { inline, anchorRef } ) => {
 	if ( inline ) {
 		// Render in popover
 		return (
@@ -41,7 +17,8 @@ const FormatToolbarContainer = ( { inline, anchorObj } ) => {
 				noArrow
 				position="top center"
 				focusOnMount={ false }
-				getAnchorRect={ () => getAnchorRect( anchorObj ) }
+				anchorVerticalBuffer={ 6 }
+				anchorRef={ anchorRef }
 				className="block-editor-rich-text__inline-format-toolbar"
 			>
 				<FormatToolbar />

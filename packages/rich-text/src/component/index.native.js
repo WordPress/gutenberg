@@ -129,6 +129,9 @@ export class RichText extends Component {
 	 * @return {Object} A RichText value with formats and selection.
 	 */
 	createRecord() {
+		const {
+			preserveWhiteSpace,
+		} = this.props;
 		const value = {
 			start: this.selectionStart,
 			end: this.selectionEnd,
@@ -137,6 +140,7 @@ export class RichText extends Component {
 				range: null,
 				multilineTag: this.multilineTag,
 				multilineWrapperTags: this.multilineWrapperTags,
+				preserveWhiteSpace,
 			} ),
 		};
 		const start = Math.min( this.selectionStart, value.text.length );
@@ -218,7 +222,7 @@ export class RichText extends Component {
 	}
 
 	removeRootTag( tag, html ) {
-		const openingTagRegexp = RegExp( '^<' + tag + '>', 'gim' );
+		const openingTagRegexp = RegExp( '^<' + tag + '[^>]*>', 'gim' );
 		const closingTagRegexp = RegExp( '</' + tag + '>$', 'gim' );
 		return html.replace( openingTagRegexp, '' ).replace( closingTagRegexp, '' );
 	}
@@ -463,12 +467,16 @@ export class RichText extends Component {
 	}
 
 	formatToValue( value ) {
+		const {
+			preserveWhiteSpace,
+		} = this.props;
 		// Handle deprecated `children` and `node` sources.
 		if ( Array.isArray( value ) ) {
 			return create( {
 				html: childrenBlock.toHTML( value ),
 				multilineTag: this.multilineTag,
 				multilineWrapperTags: this.multilineWrapperTags,
+				preserveWhiteSpace,
 			} );
 		}
 
@@ -477,6 +485,7 @@ export class RichText extends Component {
 				html: value,
 				multilineTag: this.multilineTag,
 				multilineWrapperTags: this.multilineWrapperTags,
+				preserveWhiteSpace,
 			} );
 		}
 
@@ -490,7 +499,9 @@ export class RichText extends Component {
 	}
 
 	shouldComponentUpdate( nextProps ) {
-		if ( nextProps.tagName !== this.props.tagName ) {
+		if ( nextProps.tagName !== this.props.tagName ||
+			nextProps.reversed !== this.props.reversed ||
+			nextProps.start !== this.props.start ) {
 			this.lastEventCount = undefined;
 			this.value = undefined;
 			return true;
@@ -599,7 +610,16 @@ export class RichText extends Component {
 		}
 
 		if ( tagName ) {
-			value = `<${ tagName }>${ value }</${ tagName }>`;
+			let extraAttributes = ``;
+			if ( tagName === `ol` ) {
+				if ( this.props.reversed ) {
+					extraAttributes += ` reversed`;
+				}
+				if ( this.props.start ) {
+					extraAttributes += ` start=${ this.props.start }`;
+				}
+			}
+			value = `<${ tagName } ${ extraAttributes }>${ value }</${ tagName }>`;
 		}
 		return value;
 	}
@@ -681,7 +701,6 @@ export class RichText extends Component {
 			this.firedAfterTextChanged = false;
 		}
 
-		const color = style && style.color;
 		const width = maxWidth && this.state.width && ( maxWidth - this.state.width ) < 10 ? maxWidth : this.state.width;
 
 		return (
@@ -719,7 +738,7 @@ export class RichText extends Component {
 					onCaretVerticalPositionChange={ this.props.onCaretVerticalPositionChange }
 					onSelectionChange={ this.onSelectionChangeFromAztec }
 					blockType={ { tag: tagName } }
-					color={ color || defaultColor }
+					color={ ( style && style.color ) || defaultColor }
 					linkTextColor={ defaultTextDecorationColor }
 					maxImagesWidth={ 200 }
 					fontFamily={ this.props.fontFamily || defaultFontFamily }

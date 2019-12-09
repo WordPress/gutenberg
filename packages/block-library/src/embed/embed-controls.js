@@ -2,7 +2,12 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { IconButton, Toolbar, PanelBody, ToggleControl } from '@wordpress/components';
+import {
+	IconButton,
+	PanelBody,
+	ToggleControl,
+	ToolbarGroup,
+} from '@wordpress/components';
 import { BlockControls, InspectorControls } from '@wordpress/block-editor';
 
 const EmbedControls = ( props ) => {
@@ -18,7 +23,7 @@ const EmbedControls = ( props ) => {
 	return (
 		<>
 			<BlockControls>
-				<Toolbar>
+				<ToolbarGroup>
 					{ showEditButton && (
 						<IconButton
 							className="components-toolbar__control"
@@ -27,7 +32,7 @@ const EmbedControls = ( props ) => {
 							onClick={ switchBackToURLInput }
 						/>
 					) }
-				</Toolbar>
+				</ToolbarGroup>
 			</BlockControls>
 			{ themeSupportsResponsive && blockSupportsResponsive && (
 				<InspectorControls>

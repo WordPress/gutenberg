@@ -42,6 +42,8 @@ import { isEmptyLine } from '../is-empty';
 
 const { getSelection, getComputedStyle } = window;
 
+/** @typedef {import('@wordpress/element').WPSyntheticEvent} WPSyntheticEvent */
+
 /**
  * All inserting input types that would insert HTML into the DOM.
  *
@@ -242,7 +244,17 @@ class RichText extends Component {
 	 * @param {ClipboardEvent} event The paste event.
 	 */
 	onPaste( event ) {
-		const { formatTypes, onPaste } = this.props;
+		const {
+			formatTypes,
+			onPaste,
+			__unstableIsSelected: isSelected,
+		} = this.props;
+
+		if ( ! isSelected ) {
+			event.preventDefault();
+			return;
+		}
+
 		const clipboardData = event.clipboardData;
 		let { items, files } = clipboardData;
 
@@ -493,6 +505,10 @@ class RichText extends Component {
 			event.type !== 'selectionchange' &&
 			! this.props.__unstableIsSelected
 		) {
+			return;
+		}
+
+		if ( this.props.disabled ) {
 			return;
 		}
 
@@ -1024,6 +1040,7 @@ class RichText extends Component {
 			className,
 			placeholder,
 			forwardedRef,
+			disabled,
 		} = this.props;
 		const ariaProps = pickBy( this.props, ( value, key ) =>
 			startsWith( key, 'aria-' ) );
@@ -1057,8 +1074,9 @@ class RichText extends Component {
 				onKeyUp={ this.onSelectionChange }
 				onMouseUp={ this.onSelectionChange }
 				onTouchEnd={ this.onSelectionChange }
-				contentEditable
-				suppressContentEditableWarning
+				// Do not set the attribute if disabled.
+				contentEditable={ disabled ? undefined : true }
+				suppressContentEditableWarning={ ! disabled }
 			/>
 		);
 	}

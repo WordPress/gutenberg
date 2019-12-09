@@ -15,7 +15,7 @@
 function build_css_colors( $attributes ) {
 	// CSS classes.
 	$colors = array(
-		'css_classes'   => '',
+		'css_classes'   => array(),
 		'inline_styles' => '',
 	);
 
@@ -25,12 +25,12 @@ function build_css_colors( $attributes ) {
 	// If has text color.
 	if ( $has_custom_text_color || $has_named_text_color ) {
 		// Add has-text-color class.
-		$colors['css_classes'] .= 'has-text-color';
+		$colors['css_classes'][] = 'has-text-color';
 	}
 
 	if ( $has_named_text_color ) {
 		// Add the color class.
-		$colors['css_classes'] .= sprintf( ' has-%s-color', $attributes['textColor'] );
+		$colors['css_classes'][] = sprintf( 'has-%s-color', $attributes['textColor'] );
 	} elseif ( $has_custom_text_color ) {
 		// Add the custom color inline style.
 		$colors['inline_styles'] = sprintf( 'color: %s;', $attributes['customTextColor'] );
@@ -49,17 +49,21 @@ function build_css_colors( $attributes ) {
  * @return string Returns the post content with the legacy widget added.
  */
 function render_block_navigation( $attributes, $content, $block ) {
-	$colors  = build_css_colors( $attributes );
-	$classes = array( 'wp-block-navigation', $colors['css_classes'] );
-	if ( ! empty( $attributes['className'] ) ) {
-		$classes[] = $attributes['className'];
-	}
-	$classes = join( ' ', array_filter( $classes ) );
+	$colors          = build_css_colors( $attributes );
+	$classes         = array_merge(
+		$colors['css_classes'],
+		array( 'wp-block-navigation' ),
+		isset( $attributes['className'] ) ? array( $attributes['className'] ) : array(),
+		isset( $attributes['itemsJustification'] ) ? array( 'items-justified-' . $attributes['itemsJustification'] ) : array(),
+		isset( $attributes['align'] ) ? array( 'align' . $attributes['align'] ) : array()
+	);
+	$class_attribute = sprintf( ' class="%s"', esc_attr( implode( ' ', $classes ) ) );
+	$style_attribute = $colors['inline_styles'] ? sprintf( ' style="%s"', esc_attr( $colors['inline_styles'] ) ) : '';
 
 	return sprintf(
-		'<nav class="%1$s" %2$s>%3$s</nav>',
-		esc_attr( $classes ),
-		$colors['inline_styles'] ? sprintf( 'style="%s"', esc_attr( $colors['inline_styles'] ) ) : '',
+		'<nav %1$s %2$s>%3$s</nav>',
+		$class_attribute,
+		$style_attribute,
 		build_navigation_html( $block, $colors )
 	);
 }
@@ -73,14 +77,14 @@ function render_block_navigation( $attributes, $content, $block ) {
  * @return string Returns  an HTML list from innerBlocks.
  */
 function build_navigation_html( $block, $colors ) {
-	$html = '';
-
-	$class_attribute = sprintf( ' class="%s"', esc_attr( $colors['css_classes'] ? 'wp-block-navigation-item__link ' . $colors['css_classes'] : 'wp-block-navigation-item__link' ) );
+	$html            = '';
+	$css_classes     = implode( ' ', $colors['css_classes'] );
+	$class_attribute = sprintf( ' class="wp-block-navigation-link__content %s"', esc_attr( trim( $css_classes ) ) );
 	$style_attribute = $colors['inline_styles'] ? sprintf( ' style="%s"', esc_attr( $colors['inline_styles'] ) ) : '';
 
 	foreach ( (array) $block['innerBlocks'] as $key => $block ) {
 
-		$html .= '<li class="wp-block-navigation-item">' .
+		$html .= '<li class="wp-block-navigation-link">' .
 			'<a' . $class_attribute . $style_attribute;
 
 		// Start appending HTML attributes to anchor tag.
@@ -125,17 +129,16 @@ function register_block_core_navigation() {
 		'core/navigation',
 		array(
 			'attributes'      => array(
-				'className'        => array(
+				'className'          => array(
 					'type' => 'string',
 				),
-				'automaticallyAdd' => array(
-					'type'    => 'boolean',
-					'default' => false,
-				),
-				'textColor'        => array(
+				'textColor'          => array(
 					'type' => 'string',
 				),
-				'customTextColor'  => array(
+				'customTextColor'    => array(
+					'type' => 'string',
+				),
+				'itemsJustification' => array(
 					'type' => 'string',
 				),
 			),

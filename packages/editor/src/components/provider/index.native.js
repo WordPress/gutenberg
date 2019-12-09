@@ -16,6 +16,7 @@ import { Component } from '@wordpress/element';
 import { parse, serialize, getUnregisteredTypeHandlerName, createBlock } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
+import { doAction } from '@wordpress/hooks';
 
 const postTypeEntities = [
 	{ name: 'post', baseURL: '/wp/v2/posts' },
@@ -112,7 +113,9 @@ class NativeEditorProvider extends Component {
 
 	serializeToNativeAction() {
 		if ( this.props.mode === 'text' ) {
-			this.updateHtmlAction( this.props.getEditedPostContent() );
+			// The HTMLTextInput component does not update the store when user is doing changes
+			// Let's request a store update when parent is asking for it
+			doAction( 'native-editor.persist-html', 'core/editor' );
 		}
 
 		const html = serialize( this.props.blocks );

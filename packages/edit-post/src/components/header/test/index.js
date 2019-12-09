@@ -26,13 +26,8 @@ describe( 'PostPublishButtonOrToggle should render a', () => {
 		const wrapper = shallow( <PostPublishButtonOrToggle
 			isPending={ true }
 			hasPublishAction={ false }
-			isLessThanMediumViewport={ false }
 		/> );
-		expect( wrapper ).toMatchSnapshot();
-	} );
 
-	it( 'toggle when post is not published or scheduled and the viewport is < medium', () => {
-		const wrapper = shallow( <PostPublishButtonOrToggle isLessThanMediumViewport={ true } /> );
 		expect( wrapper ).toMatchSnapshot();
 	} );
 

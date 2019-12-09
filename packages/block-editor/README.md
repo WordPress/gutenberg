@@ -320,6 +320,10 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/media-placeholder/README.md>
 
+<a name="MediaReplaceFlow" href="#MediaReplaceFlow">#</a> **MediaReplaceFlow**
+
+Undocumented declaration.
+
 <a name="MediaUpload" href="#MediaUpload">#</a> **MediaUpload**
 
 _Related_
@@ -338,7 +342,8 @@ Undocumented declaration.
 
 <a name="MultiSelectScrollIntoView" href="#MultiSelectScrollIntoView">#</a> **MultiSelectScrollIntoView**
 
-Undocumented declaration.
+Scrolls the multi block selection end into view if not in view already. This
+is important to do after selection by keyboard.
 
 <a name="NavigableToolbar" href="#NavigableToolbar">#</a> **NavigableToolbar**
 
@@ -410,6 +415,8 @@ _Properties_
 -   _\_\_experimentalEnableLegacyWidgetBlock_ `boolean`: Whether the user has enabled the Legacy Widget Block
 -   _\_\_experimentalBlockDirectory_ `boolean`: Whether the user has enabled the Block Directory
 -   _\_\_experimentalEnableFullSiteEditing_ `boolean`: Whether the user has enabled Full Site Editing
+-   _\_\_experimentalEnableFullSiteEditingDemo_ `boolean`: Whether the user has enabled Full Site Editing Demo Templates
+-   _\_\_experimentalEnablePageTemplates_ `boolean`: Whether the user has enabled the Page Templates
 
 <a name="SkipToSelectedBlock" href="#SkipToSelectedBlock">#</a> **SkipToSelectedBlock**
 
@@ -426,6 +433,10 @@ _Related_
 _Type_
 
 -   `Object` 
+
+<a name="ToolSelector" href="#ToolSelector">#</a> **ToolSelector**
+
+Undocumented declaration.
 
 <a name="transformStyles" href="#transformStyles">#</a> **transformStyles**
 

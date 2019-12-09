@@ -1,4 +1,7 @@
 .components-toolbar__control.components-button {
+	width: $icon-button-size;
+	height: $icon-button-size;
+
 	// Subscript for numbered icon buttons, like headings
 	&[data-subscript] svg {
 		padding: 5px 10px 5px 0;
@@ -18,4 +21,19 @@
 	&:not(:disabled).is-active[data-subscript]::after {
 		color: $white;
 	}
+
+	&.is-active {
+		padding: 3px;
+		outline: none;
+	}
+
+	&.is-active > svg {
+		padding: 5px;
+		border-radius: $radius-round-rectangle;
+		height: 30px;
+		width: 30px;
+		box-sizing: border-box;
+		@include formatting-button-style__active;
+	}
 }
+

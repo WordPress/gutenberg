@@ -14,7 +14,9 @@ module.exports = {
 	},
 	preset: '@wordpress/jest-preset-default',
 	setupFiles: [
+		'<rootDir>/test/unit/config/global-mocks.js',
 		'<rootDir>/test/unit/config/gutenberg-phase.js',
+		'<rootDir>/test/unit/config/register-context.js',
 	],
 	testURL: 'http://localhost',
 	testPathIgnorePatterns: [

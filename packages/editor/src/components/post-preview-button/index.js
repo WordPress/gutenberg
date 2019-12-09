@@ -10,7 +10,6 @@ import { Component, renderToString } from '@wordpress/element';
 import { Button, Path, SVG } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { DotTip } from '@wordpress/nux';
 import { ifCondition, compose } from '@wordpress/compose';
 import { applyFilters } from '@wordpress/hooks';
 
@@ -191,9 +190,6 @@ export class PostPreviewButton extends Component {
 						__( '(opens in a new tab)' )
 					}
 				</span>
-				<DotTip tipId="core/editor.preview">
-					{ __( 'Click “Preview” to load a preview of this page, so you can make sure you’re happy with your blocks.' ) }
-				</DotTip>
 			</Button>
 		);
 	}
