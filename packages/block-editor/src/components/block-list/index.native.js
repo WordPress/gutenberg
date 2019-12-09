@@ -94,9 +94,6 @@ export class BlockList extends Component {
 					ListHeaderComponent={ header }
 					ListEmptyComponent={ this.renderDefaultBlockAppender }
 					ListFooterComponent={ withFooter && this.renderBlockListFooter }
-					listKey={(item, index) => {
-						return clientId; 
-						}}
 				/>
 
 				{ renderAppender && blockClientIds.length > 0 && (
@@ -187,7 +184,7 @@ export default compose( [
 		const insertionPoint = getBlockInsertionPoint();
 		const blockInsertionPointIsVisible = isBlockInsertionPointVisible();
 		const selectedBlock = getSelectedBlock();
-		const hasInnerBlocks = selectedBlock && selectedBlock.name === getGroupingBlockName();
+		const hasInnerBlocks = selectedBlock && ( selectedBlock.name === getGroupingBlockName() || selectedBlock.name === 'core/columns' );
 		const shouldShowInsertionPointBefore = ( clientId ) => {
 			return (
 				blockInsertionPointIsVisible &&

@@ -20,15 +20,23 @@ import SubdirectorSVG from './subdirectory-icon';
 import styles from './breadcrumb.scss';
 
 const BlockBreadcrumb = ( { clientId, blockIcon, rootClientId, rootBlockIcon } ) => {
+	const renderIcon = ( icon, key ) => {
+		if ( typeof icon.src === 'function' ) {
+			return <Icon icon={ icon.src( { key, size: 24, fill: styles.icon.color } ) } />;
+		}
+		return 	<Icon key={ key } size={ 24 } icon={ icon.src } fill={ styles.icon.color } />;
+	};
+
 	return (
 		<View style={ styles.breadcrumbContainer }>
 			<TouchableOpacity style={ styles.button } onPress={ () => {/* Open BottomSheet with markup */} }>
 				{ rootClientId && rootBlockIcon && (
-					[ <Icon key="parent-icon" size={ 20 } icon={ rootBlockIcon.src } fill={ styles.icon.color } />,
+					[
+						renderIcon( rootBlockIcon, 'parent-icon' ),
 						<View key="subdirectory-icon" style={ styles.arrow }><SubdirectorSVG fill={ styles.arrow.color } /></View>,
 					]
 				) }
-				<Icon size={ 24 } icon={ blockIcon.src } fill={ styles.icon.color } />
+				{ renderIcon( blockIcon ) }
 				<Text style={ styles.breadcrumbTitle }><BlockTitle clientId={ clientId } /></Text>
 			</TouchableOpacity>
 		</View>

@@ -151,6 +151,8 @@ export const registerCoreBlocks = () => {
 		// eslint-disable-next-line no-undef
 		!! __DEV__ ? columns : null,
 		// eslint-disable-next-line no-undef
+		!! __DEV__ ? column : null,
+		// eslint-disable-next-line no-undef
 		!! __DEV__ ? group : null,
 		spacer,
 	].forEach( registerBlock );

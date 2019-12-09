@@ -1,12 +1,14 @@
-.columnsPlaceholder {
-	padding: 12px;
-	margin-bottom: 12px;
+.columnPlaceholder {
+	padding: $block-selected-to-content;
+	margin: $block-edge-to-content;
+	margin-left: $block-selected-child-margin;
+	margin-right: $block-selected-child-margin;
 	background-color: $white;
 	border: $border-width dashed $gray;
 	border-radius: 4px;
 }
 
-.columnsPlaceholderDark {
+.columnPlaceholderDark {
 	background-color: $black;
 	border: $border-width dashed $gray-70;
 }

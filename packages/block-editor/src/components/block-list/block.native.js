@@ -295,7 +295,8 @@ export default compose( [
 		const isTouchable = isSelected || isDescendantOfParentSelected || isParentSelected || parentId === '';
 		const isDimmed = ! isSelected && isSelectedBlockNested && ! isAncestorSelected && ! isDescendantSelected && ( isDescendantOfParentSelected || rootBlockId === clientId );
 
-		const isInnerBlockHolder = name === getGroupingBlockName();
+		// TODO: find better way to handle full border for columns ( maybe return array from getGoupingBlockName )
+		const isInnerBlockHolder = name === getGroupingBlockName() || name === 'core/columns';
 		const isRootListInnerBlockHolder = ! isSelectedBlockNested && isInnerBlockHolder;
 
 		return {
