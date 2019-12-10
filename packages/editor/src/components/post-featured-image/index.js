@@ -21,9 +21,9 @@ import PostFeaturedImageCheck from './check';
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 // Used when labels from post type were not yet loaded or when they are not present.
-const DEFAULT_FEATURE_IMAGE_LABEL = __( 'Featured Image' );
-const DEFAULT_SET_FEATURE_IMAGE_LABEL = __( 'Set Featured Image' );
-const DEFAULT_REMOVE_FEATURE_IMAGE_LABEL = __( 'Remove Image' );
+const DEFAULT_FEATURE_IMAGE_LABEL = __( 'Featured image' );
+const DEFAULT_SET_FEATURE_IMAGE_LABEL = __( 'Set featured image' );
+const DEFAULT_REMOVE_FEATURE_IMAGE_LABEL = __( 'Remove image' );
 
 function PostFeaturedImage( { currentPostId, featuredImageId, onUpdateImage, onRemoveImage, media, postType } ) {
 	const postLabel = get( postType, [ 'labels' ], {} );
