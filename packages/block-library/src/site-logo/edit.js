@@ -108,6 +108,7 @@ export default function LogoEdit( { attributes: { align, width }, children, clas
 
 		if ( ! media.id && media.url ) { // This is a temporary blob image
 			setLogo( '' );
+			setError();
 			setUrl( media.url );
 			setIsNotEditing();
 			return;
