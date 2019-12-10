@@ -8,7 +8,7 @@ import styled from '@emotion/styled';
  */
 import { text } from './mixins';
 
-export const Text = styled.p(
+export const __experimentalText = styled.p(
 	`margin: 0;`,
 	text
 );
