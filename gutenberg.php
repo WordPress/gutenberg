@@ -43,15 +43,27 @@ function gutenberg_menu() {
 		'gutenberg'
 	);
 
-	if ( get_option( 'gutenberg-experiments' ) && array_key_exists( 'gutenberg-widget-experiments', get_option( 'gutenberg-experiments' ) ) ) {
-		add_submenu_page(
-			'gutenberg',
-			__( 'Widgets (beta)', 'gutenberg' ),
-			__( 'Widgets (beta)', 'gutenberg' ),
-			'edit_theme_options',
-			'gutenberg-widgets',
-			'the_gutenberg_widgets'
-		);
+	if ( get_option( 'gutenberg-experiments' ) ) {
+		if ( array_key_exists( 'gutenberg-widget-experiments', get_option( 'gutenberg-experiments' ) ) ) {
+			add_submenu_page(
+				'gutenberg',
+				__( 'Widgets (beta)', 'gutenberg' ),
+				__( 'Widgets (beta)', 'gutenberg' ),
+				'edit_theme_options',
+				'gutenberg-widgets',
+				'the_gutenberg_widgets'
+			);
+		}
+		if ( array_key_exists( 'gutenberg-full-site-editing', get_option( 'gutenberg-experiments' ) ) ) {
+			add_submenu_page(
+				'gutenberg',
+				__( 'Site Editor (beta)', 'gutenberg' ),
+				__( 'Site Editor (beta)', 'gutenberg' ),
+				'edit_theme_options',
+				'gutenberg-edit-site',
+				'gutenberg_edit_site_page'
+			);
+		}
 	}
 
 	if ( current_user_can( 'edit_posts' ) ) {

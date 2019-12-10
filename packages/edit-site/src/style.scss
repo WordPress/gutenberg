@@ -3,3 +3,7 @@
 html.wp-toolbar {
 	background: $white;
 }
+
+body.gutenberg_page_edit-site {
+	@include wp-admin-reset( ".edit-site" );
+}
