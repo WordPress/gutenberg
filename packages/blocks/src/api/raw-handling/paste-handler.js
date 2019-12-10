@@ -50,6 +50,7 @@ const { console } = window;
 function filterInlineHTML( HTML ) {
 	HTML = deepFilterHTML( HTML, [ googleDocsUIDRemover, phrasingContentReducer, commentRemover ] );
 	HTML = removeInvalidHTML( HTML, getPhrasingContentSchema( 'paste' ), { inline: true } );
+	HTML = deepFilterHTML( HTML, [ htmlFormattingRemover, brRemover ] );
 
 	// Allows us to ask for this information when we get a report.
 	console.log( 'Processed inline HTML:\n\n', HTML );

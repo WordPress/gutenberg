@@ -319,6 +319,12 @@ describe( 'Blocks raw handling', () => {
 			const HTML = readFile( path.join( __dirname, 'fixtures/windows.html' ) );
 			expect( serialize( pasteHandler( { HTML } ) ) ).toMatchSnapshot();
 		} );
+
+		it( 'should strip HTML formatting space from inline text', () => {
+			const HTML = readFile( path.join( __dirname, 'fixtures/inline-with-html-formatting-space.html' ) );
+			expect( pasteHandler( { HTML } ) ).toMatchSnapshot();
+			expect( console ).toHaveLogged();
+		} );
 	} );
 } );
 
