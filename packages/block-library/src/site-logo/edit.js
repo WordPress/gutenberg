@@ -19,7 +19,6 @@ import {
 	Notice,
 	PanelBody,
 	RangeControl,
-	Toolbar,
 	ResizableBox,
 } from '@wordpress/components';
 import {
@@ -28,6 +27,7 @@ import {
 	BlockIcon,
 	InspectorControls,
 	MediaPlaceholder,
+	MediaReplaceFlow,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 
@@ -38,6 +38,8 @@ import icon from './icon';
 
 import ImageSize from '../image/image-size';
 
+const ALLOWED_MEDIA_TYPES = [ 'image' ];
+const ACCEPT_MEDIA_STRING = 'image/*';
 const getHandleStates = ( align, isRTL = false ) => {
 	const defaultAlign = isRTL ? 'right' : 'left';
 	const handleStates = {
@@ -97,10 +99,6 @@ export default function LogoEdit( { attributes: { align, width }, children, clas
 		save();
 	}
 
-	const toggleIsEditing = () => setIsEditing( ! isEditing );
-
-	const setIsNotEditing = () => setIsEditing( false );
-
 	const onSelectLogo = ( media ) => {
 		if ( ! media ) {
 			return;
@@ -110,16 +108,21 @@ export default function LogoEdit( { attributes: { align, width }, children, clas
 			setLogo( '' );
 			setError();
 			setUrl( media.url );
-			setIsNotEditing();
+			setIsEditing( false );
 			return;
 		}
 
 		setLogo( media.id.toString() );
-		setIsNotEditing();
+		setIsEditing( false );
 	};
 
 	const deleteLogo = () => {
 		setLogo( '' );
+	};
+
+	const onUploadError = ( message ) => {
+		setIsEditing( true );
+		setError( message[ 2 ] ? message[ 2 ] : null );
 	};
 
 	const controls = (
@@ -129,17 +132,13 @@ export default function LogoEdit( { attributes: { align, width }, children, clas
 				onChange={ ( newAlign ) => setAttributes( { align: newAlign } ) }
 				controls={ [ 'left', 'center', 'right' ] }
 			/>
-			{ !! url && (
-				<Toolbar>
-					<IconButton
-						className={ classnames( 'components-icon-button components-toolbar__control', { 'is-active': isEditing } ) }
-						label={ __( 'Edit image' ) }
-						aria-pressed={ isEditing }
-						onClick={ toggleIsEditing }
-						icon="edit"
-					/>
-				</Toolbar>
-			) }
+			{ url && <MediaReplaceFlow
+				mediaURL={ url }
+				allowedTypes={ ALLOWED_MEDIA_TYPES }
+				accept={ ACCEPT_MEDIA_STRING }
+				onSelect={ onSelectLogo }
+				onError={ onUploadError }
+			/> }
 		</BlockControls>
 	);
 
@@ -257,14 +256,14 @@ export default function LogoEdit( { attributes: { align, width }, children, clas
 				instructions: __( 'Upload an image, or pick one from your media library, to be your site logo' ),
 			} }
 			onSelect={ onSelectLogo }
-			accept="image/*"
-			allowedTypes={ [ 'image' ] }
+			accept={ ACCEPT_MEDIA_STRING }
+			allowedTypes={ ALLOWED_MEDIA_TYPES }
 			mediaPreview={ !! url && img }
 			notices={ error && (
 				<Notice status="error" isDismissable={ false }>{ error }</Notice>
 			) }
-			onCancel={ !! url && setIsNotEditing }
-			onError={ ( message ) => setError( message[ 2 ] ? message[ 2 ] : null ) }
+			onCancel={ !! url && ( () => setIsEditing( false ) ) }
+			onError={ onUploadError }
 		>
 			{ !! url && (
 				<IconButton isLarge icon="delete" onClick={ deleteLogo }>
