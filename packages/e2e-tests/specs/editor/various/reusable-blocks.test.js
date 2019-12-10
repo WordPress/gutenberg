@@ -16,7 +16,7 @@ function waitForAndAcceptDialog() {
 	} );
 }
 
-describe( 'Reusable Blocks', () => {
+describe( 'Reusable blocks', () => {
 	beforeAll( async () => {
 		await createNewPost();
 	} );
@@ -37,7 +37,7 @@ describe( 'Reusable Blocks', () => {
 
 		await clickBlockToolbarButton( 'More options' );
 
-		const convertButton = await page.waitForXPath( '//button[text()="Add to Reusable Blocks"]' );
+		const convertButton = await page.waitForXPath( '//button[text()="Add to Reusable blocks"]' );
 		await convertButton.click();
 
 		// Wait for creation to finish
@@ -77,7 +77,7 @@ describe( 'Reusable Blocks', () => {
 
 		await clickBlockToolbarButton( 'More options' );
 
-		const convertButton = await page.waitForXPath( '//button[text()="Add to Reusable Blocks"]' );
+		const convertButton = await page.waitForXPath( '//button[text()="Add to Reusable blocks"]' );
 		await convertButton.click();
 
 		// Wait for creation to finish
@@ -178,7 +178,7 @@ describe( 'Reusable Blocks', () => {
 
 		// Delete the block and accept the confirmation dialog
 		await clickBlockToolbarButton( 'More options' );
-		const deleteButton = await page.waitForXPath( '//button[text()="Remove from Reusable Blocks"]' );
+		const deleteButton = await page.waitForXPath( '//button[text()="Remove from Reusable blocks"]' );
 		await Promise.all( [ waitForAndAcceptDialog(), deleteButton.click() ] );
 
 		// Wait for deletion to finish
@@ -214,7 +214,7 @@ describe( 'Reusable Blocks', () => {
 
 		// Convert block to a reusable block
 		await clickBlockToolbarButton( 'More options' );
-		const convertButton = await page.waitForXPath( '//button[text()="Add to Reusable Blocks"]' );
+		const convertButton = await page.waitForXPath( '//button[text()="Add to Reusable blocks"]' );
 		await convertButton.click();
 
 		// Wait for creation to finish
