@@ -11,15 +11,6 @@
 	@include break-small() {
 		// Allow overflow on desktop.
 		overflow: inherit;
-
-		// Show a left border on the parent container.
-		border-left: none;
-		box-shadow: -$block-left-border-width 0 0 0 $dark-gray-500;
-
-		// Show a lighter version for dark themes.
-		.is-dark-theme & {
-			box-shadow: -$block-left-border-width 0 0 0 $light-gray-600;
-		}
 	}
 
 	// The component is born with a border, but we only need some of them.

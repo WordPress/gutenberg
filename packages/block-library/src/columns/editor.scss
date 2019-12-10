@@ -150,13 +150,6 @@ div.block-core-columns.is-vertically-aligned-bottom {
 }
 
 /**
- * Fixes single Column breadcrumb position.
- */
-[data-type="core/column"] > .editor-block-list__block-edit > .editor-block-list__breadcrumb {
-	left: -$block-left-border-width;
-}
-
-/**
  * Make single Column overlay not extend past boundaries of parent
  */
 .block-core-columns > .block-editor-inner-blocks.has-overlay::after {

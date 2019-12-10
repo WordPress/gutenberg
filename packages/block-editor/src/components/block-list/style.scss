@@ -108,7 +108,6 @@
 			content: "";
 			position: absolute;
 			border: $border-width solid transparent;
-			border-left: none;
 			box-shadow: none;
 			pointer-events: none;
 			transition: border-color 0.1s linear, border-style 0.1s linear, box-shadow 0.1s linear;
@@ -130,30 +129,14 @@
 		> .block-editor-block-list__block-edit::before {
 			// Use opacity to work in various editor styles.
 			border-color: $dark-opacity-light-800;
-			box-shadow: inset $block-left-border-width 0 0 0 $dark-gray-500;
 
 			.is-dark-theme & {
 				border-color: $light-opacity-light-800;
-				box-shadow: inset $block-left-border-width 0 0 0 $light-gray-600;
-			}
-
-			// Switch to outset borders on larger screens.
-			@include break-small() {
-				box-shadow: -$block-left-border-width 0 0 0 $dark-gray-500;
-
-				.is-dark-theme & {
-					box-shadow: -$block-left-border-width 0 0 0 $light-gray-600;
-				}
 			}
 		}
 
 		&.is-navigate-mode > .block-editor-block-list__block-edit::before {
 			border-color: $blue-medium-focus;
-			box-shadow: inset $block-left-border-width 0 0 0 $blue-medium-focus;
-
-			@include break-small() {
-				box-shadow: -$block-left-border-width 0 0 0 $blue-medium-focus;
-			}
 		}
 	}
 
@@ -183,20 +166,9 @@
 
 		> .block-editor-block-list__block-edit::before {
 			border-left-color: $dark-opacity-light-800;
-			box-shadow: inset $block-left-border-width 0 0 0 $dark-gray-500;
 
 			.is-dark-theme & {
 				border-left-color: $light-opacity-light-800;
-				box-shadow: inset $block-left-border-width 0 0 0 $light-gray-600;
-			}
-
-			// Switch to outset borders on larger screens.
-			@include break-small() {
-				box-shadow: -$block-left-border-width 0 0 0 $dark-gray-500;
-
-				.is-dark-theme & {
-					box-shadow: -$block-left-border-width 0 0 0 $light-gray-600;
-				}
 			}
 		}
 	}
@@ -812,20 +784,6 @@
 	&[data-align="right"] .block-editor-block-contextual-toolbar {
 		margin-bottom: $border-width;
 		margin-top: -$block-toolbar-height;
-
-		// Display the box-shadow on the parent element.
-		box-shadow: -$block-left-border-width 0 0 0 $dark-gray-500;
-		.is-dark-theme & {
-			box-shadow: -$block-left-border-width 0 0 0 $light-gray-600;
-		}
-
-		@include break-small() {
-			box-shadow: none;
-		}
-
-		.block-editor-block-toolbar {
-			border-left: none;
-		}
 	}
 
 	// Make block toolbar full width on mobile.
@@ -947,24 +905,14 @@
 		display: flex;
 		background: $white;
 		border: $border-width solid $blue-medium-focus;
-		border-left: none;
-		box-shadow: inset $block-left-border-width 0 0 0 $blue-medium-focus;
 		height: $block-toolbar-height + $border-width;
 		font-size: $default-font-size;
 		line-height: $block-toolbar-height - $grid-size;
 		padding-left: $grid-size;
 		padding-right: $grid-size;
 
-		.components-button {
-			box-shadow: none;
-		}
-
 		.is-dark-theme & {
 			border-color: $light-opacity-light-800;
-		}
-
-		@include break-small() {
-			box-shadow: -$block-left-border-width 0 0 0 $blue-medium-focus;
 		}
 	}
 }
