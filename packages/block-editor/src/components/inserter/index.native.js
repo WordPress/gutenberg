@@ -13,6 +13,7 @@ import { getUnregisteredTypeHandlerName } from '@wordpress/blocks';
  */
 import styles from './style.scss';
 import InserterMenu from './menu';
+import AddBlockSeparator from '../add-block-separator';
 
 const defaultRenderToggle = ( { onToggle, disabled, style } ) => (
 	<ToolbarButton
@@ -57,7 +58,11 @@ class Inserter extends Component {
 			disabled,
 			renderToggle = defaultRenderToggle,
 			getStylesFromColorScheme,
+			showSeparator,
 		} = this.props;
+		if ( showSeparator && isOpen ) {
+			return <AddBlockSeparator />;
+		}
 		const style = getStylesFromColorScheme( styles.addBlockButton, styles.addBlockButtonDark );
 		return renderToggle( { onToggle, isOpen, disabled, style } );
 	}

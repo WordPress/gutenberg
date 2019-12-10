@@ -14,13 +14,13 @@ import { Button, Dashicon } from '@wordpress/components';
 import Inserter from '../inserter';
 import styles from './styles.scss';
 
-function ButtonBlockAppender( { rootClientId } ) {
+function ButtonBlockAppender( { rootClientId, showSeparator } ) {
 	return (
 		<>
 			<Inserter
 				rootClientId={ rootClientId }
 				renderToggle={ ( { onToggle, disabled, isOpen } ) => (
-					! isOpen && <Button
+					( <Button
 						onClick={ onToggle }
 						aria-expanded={ isOpen }
 						disabled={ disabled }
@@ -34,9 +34,10 @@ function ButtonBlockAppender( { rootClientId } ) {
 								size={ styles.addBlockButton.size }
 							/>
 						</View>
-					</Button>
+					</Button> )
 				) }
 				isAppender
+				showSeparator={ showSeparator }
 			/>
 		</>
 	);
