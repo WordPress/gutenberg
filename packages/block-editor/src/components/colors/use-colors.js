@@ -30,7 +30,7 @@ import { useBlockEditContext } from '../block-edit';
 /**
  * Browser dependencies
  */
-const { getComputedStyle } = window;
+const { getComputedStyle, Node } = window;
 
 const DEFAULT_COLORS = [];
 
@@ -244,7 +244,8 @@ export default function __experimentalUseColors(
 							.backgroundColor;
 						while (
 							backgroundColor === 'rgba(0, 0, 0, 0)' &&
-							backgroundColorNode.parentNode
+							backgroundColorNode.parentNode &&
+							backgroundColorNode.parentNode === Node.ELEMENT_NODE
 						) {
 							backgroundColorNode = backgroundColorNode.parentNode;
 							backgroundColor = getComputedStyle( backgroundColorNode )
