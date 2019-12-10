@@ -82,7 +82,7 @@ class LatestPostsEdit extends Component {
 					/>
 					{ displayPostContent &&
 					<RadioControl
-						label= __( 'Show:' )
+						label={ __( 'Show:' ) }
 						selected={ displayPostContentRadio }
 						options={ [
 							{ label: __( 'Excerpt' ), value: 'excerpt' },
