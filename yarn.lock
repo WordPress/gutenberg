@@ -2013,6 +2013,10 @@
     shell-quote "1.6.1"
     ws "^1.1.0"
 
+"@react-native-community/slider@git+https://github.com/wordpress-mobile/react-native-slider.git#e20f268e61327321a5bbd66afc5238388d65f2a4":
+  version "2.0.7"
+  resolved "git+https://github.com/wordpress-mobile/react-native-slider.git#e20f268e61327321a5bbd66afc5238388d65f2a4"
+
 "@tannin/compile@^1.0.3":
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/@tannin/compile/-/compile-1.0.3.tgz#812af915e2ac6ecc6d7518680b40ec275db7670d"
