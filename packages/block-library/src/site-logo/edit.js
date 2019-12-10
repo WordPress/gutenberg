@@ -16,6 +16,7 @@ import {
 } from '@wordpress/core-data';
 import {
 	IconButton,
+	Notice,
 	PanelBody,
 	RangeControl,
 	Toolbar,
@@ -28,7 +29,7 @@ import {
 	InspectorControls,
 	MediaPlaceholder,
 } from '@wordpress/block-editor';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -60,21 +61,12 @@ const getHandleStates = ( align, isRTL = false ) => {
 export default function LogoEdit( { attributes: { align, width }, children, className, clientId, setAttributes, isSelected } ) {
 	const [ isEditing, setIsEditing ] = useState( false );
 	const [ url, setUrl ] = useState( null );
+	const [ error, setError ] = useState();
 	const [ logo, setLogo ] = useEntityProp( 'root', 'site', 'sitelogo' );
 	const [ isDirty, , save ] = __experimentalUseEntitySaving(
 		'root',
 		'site',
 		'sitelogo'
-	);
-
-	const { createNotice } = useDispatch( 'core/notices' );
-	const onError = ( message ) => createNotice(
-		'error',
-		message[ 2 ] ? message[ 2 ] : __( 'Sorry an error occourred.' ),
-		{
-			isDismissible: true,
-			type: 'snackbar',
-		},
 	);
 
 	const mediaItemData = useSelect(
@@ -267,8 +259,11 @@ export default function LogoEdit( { attributes: { align, width }, children, clas
 			accept="image/*"
 			allowedTypes={ [ 'image' ] }
 			mediaPreview={ !! url && img }
+			notices={ error && (
+				<Notice status="error" isDismissable={ false }>{ error }</Notice>
+			) }
 			onCancel={ !! url && setIsNotEditing }
-			onError={ onError }
+			onError={ ( message ) => setError( message[ 2 ] ? message[ 2 ] : null ) }
 		>
 			{ !! url && (
 				<IconButton isLarge icon="delete" onClick={ deleteLogo }>
