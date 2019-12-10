@@ -145,6 +145,7 @@ repositories {
 
 
 dependencies {
+    implementation project(':@react-native-community_slider')
     implementation project(':react-native-video')
     implementation project(':react-native-svg')
     implementation project(':react-native-aztec')

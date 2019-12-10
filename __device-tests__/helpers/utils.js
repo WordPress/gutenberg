@@ -15,7 +15,7 @@ import path from 'path';
  * Internal dependencies
  */
 import serverConfigs from './serverConfigs';
-import { ios12, android8 } from './caps';
+import { ios, android8 } from './caps';
 import AppiumLocal from './appium-local';
 import _ from 'underscore';
 
@@ -64,7 +64,7 @@ const setupDriver = async () => {
 		} catch ( err ) {
 			// Ignore error here, Appium is probably already running (Appium desktop has its own server for instance)
 			// eslint-disable-next-line no-console
-			console.log( 'Could not start Appium server', err.toString() );
+			await console.log( 'Could not start Appium server', err.toString() );
 		}
 	}
 
@@ -92,9 +92,11 @@ const setupDriver = async () => {
 			desiredCaps.app = `sauce-storage:Gutenberg-${ safeBranchName }.apk`; // App should be preloaded to sauce storage, this can also be a URL
 		}
 	} else {
-		desiredCaps = _.clone( ios12 );
+		desiredCaps = _.clone( ios );
 		if ( isLocalEnvironment() ) {
 			desiredCaps.app = path.resolve( localIOSAppPath );
+			delete desiredCaps.platformVersion;
+			desiredCaps.deviceName = 'iPhone 11';
 		} else {
 			desiredCaps.app = `sauce-storage:Gutenberg-${ safeBranchName }.app.zip`; // App should be preloaded to sauce storage, this can also be a URL
 		}
