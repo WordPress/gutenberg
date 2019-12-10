@@ -311,8 +311,8 @@ export function removeInvalidHTML( HTML, schema, inline ) {
 /**
  * Gets a sibling within text-level context.
  *
- * @param {Element} node
- * @param {string}  which
+ * @param {Element} node  The subject node.
+ * @param {string}  which "next" or "previous".
  */
 export function getSibling( node, which ) {
 	const sibling = node[ `${ which }Sibling` ];

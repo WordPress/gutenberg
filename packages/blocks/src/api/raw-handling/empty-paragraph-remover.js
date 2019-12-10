@@ -1,5 +1,5 @@
 /**
- * Removes trailing br elements from text-level content.
+ * Removes empty paragraph elements.
  *
  * @param {Element} node Node to check.
  */
