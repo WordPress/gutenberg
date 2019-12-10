@@ -109,7 +109,7 @@ function BlockListBlock( {
 		return {
 			isDraggingBlocks: select( 'core/block-editor' ).isDraggingBlocks(),
 		};
-	} );
+	}, [] );
 
 	// Random state used to rerender the component if needed, ideally we don't need this
 	const [ , updateRerenderState ] = useState( {} );

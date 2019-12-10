@@ -23,7 +23,7 @@ function HeaderToolbar() {
 		// This setting (richEditingEnabled) should not live in the block editor's setting.
 		showInserter: select( 'core/edit-post' ).getEditorMode() === 'visual' && select( 'core/editor' ).getEditorSettings().richEditingEnabled,
 		isTextModeEnabled: select( 'core/edit-post' ).getEditorMode() === 'text',
-	} ) );
+	} ), [] );
 	const isLargeViewport = useViewportMatch( 'medium' );
 
 	const toolbarAriaLabel = hasFixedToolbar ?

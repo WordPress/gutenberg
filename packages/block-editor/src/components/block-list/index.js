@@ -70,7 +70,7 @@ function BlockList( {
 		multiSelectedBlockClientIds,
 		hasMultiSelection,
 		enableAnimation,
-	} = useSelect( selector );
+	} = useSelect( selector, [ rootClientId ] );
 	const ref = useRef();
 	const onSelectionStart = useMultiSelection( { ref, rootClientId } );
 

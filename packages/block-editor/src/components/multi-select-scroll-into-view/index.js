@@ -31,7 +31,7 @@ export default function MultiSelectScrollIntoView() {
 			isMultiSelecting: isMultiSelecting(),
 		};
 	};
-	const { selectionEnd, isMultiSelecting } = useSelect( selector );
+	const { selectionEnd, isMultiSelecting } = useSelect( selector, [] );
 
 	useEffect( () => {
 		if ( ! selectionEnd || isMultiSelecting ) {
