@@ -16,6 +16,16 @@ exports[`Blocks raw handling pasteHandler should strip some text-level elements 
 <!-- /wp:paragraph -->"
 `;
 
+exports[`Blocks raw handling pasteHandler should strip windows data 1`] = `
+"<!-- wp:heading -->
+<h2>Heading Win</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Paragraph Win</p>
+<!-- /wp:paragraph -->"
+`;
+
 exports[`rawHandler should convert HTML post to blocks with minimal content changes 1`] = `
 "<!-- wp:heading -->
 <h2>Howdy</h2>
