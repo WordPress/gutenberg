@@ -116,7 +116,7 @@ class Editor extends Component {
 				<EditPostSettings.Provider value={ settings }>
 					<SlotFillProvider>
 						<DropZoneProvider>
-							<useViewportMatch.__experimentalWidthProvider value={ 200 }>
+							<useViewportMatch.__experimentalWidthProvider value={ undefined }>
 								<EditorProvider
 									settings={ editorSettings }
 									post={ post }
