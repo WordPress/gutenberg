@@ -308,6 +308,12 @@ describe( 'Blocks raw handling', () => {
 			expect( serialize( pasteHandler( { HTML } ) ) ).toMatchSnapshot();
 			expect( console ).toHaveLogged();
 		} );
+
+		it( 'should remove extra blank lines', () => {
+			const HTML = readFile( path.join( __dirname, 'fixtures/google-docs-blank-lines.html' ) );
+			expect( serialize( pasteHandler( { HTML } ) ) ).toMatchSnapshot();
+			expect( console ).toHaveLogged();
+		} );
 	} );
 } );
 

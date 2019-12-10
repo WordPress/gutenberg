@@ -307,3 +307,25 @@ export function removeInvalidHTML( HTML, schema, inline ) {
 
 	return doc.body.innerHTML;
 }
+
+/**
+ * Gets a sibling within text-level context.
+ *
+ * @param {Element} node  The subject node.
+ * @param {string}  which "next" or "previous".
+ */
+export function getSibling( node, which ) {
+	const sibling = node[ `${ which }Sibling` ];
+
+	if ( sibling && isPhrasingContent( sibling ) ) {
+		return sibling;
+	}
+
+	const { parentNode } = node;
+
+	if ( ! parentNode || ! isPhrasingContent( parentNode ) ) {
+		return;
+	}
+
+	return getSibling( parentNode, which );
+}
