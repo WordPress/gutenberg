@@ -130,7 +130,10 @@ function htmlToBlocks( { html, rawTransforms } ) {
  */
 export function pasteHandler( { HTML = '', plainText = '', mode = 'AUTO', tagName, canUserUseUnfilteredHTML = false } ) {
 	// First of all, strip any meta tags.
-	HTML = HTML.replace( /<meta[^>]+>/, '' );
+	HTML = HTML.replace( /<meta[^>]+>/g, '' );
+	// Strip Windows markers.
+	HTML = HTML.replace( /^\s*<html[^>]*>\s*<body[^>]*>(?:\s*<!--\s*StartFragment\s*-->)?/i, '' );
+	HTML = HTML.replace( /(?:<!--\s*EndFragment\s*-->\s*)?<\/body>\s*<\/html>\s*$/i, '' );
 
 	// If we detect block delimiters in HTML, parse entirely as blocks.
 	if ( mode !== 'INLINE' ) {

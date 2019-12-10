@@ -314,6 +314,11 @@ describe( 'Blocks raw handling', () => {
 			expect( serialize( pasteHandler( { HTML } ) ) ).toMatchSnapshot();
 			expect( console ).toHaveLogged();
 		} );
+
+		it( 'should strip windows data', () => {
+			const HTML = readFile( path.join( __dirname, 'fixtures/windows.html' ) );
+			expect( serialize( pasteHandler( { HTML } ) ) ).toMatchSnapshot();
+		} );
 	} );
 } );
 
