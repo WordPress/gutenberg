@@ -78,7 +78,7 @@ function BlockList( {
 		<div
 			ref={ ref }
 			className={ classnames(
-				'editor-block-list__layout block-editor-block-list__layout',
+				'block-editor-block-list__layout',
 				className
 			) }
 		>

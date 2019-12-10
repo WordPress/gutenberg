@@ -44,9 +44,9 @@ export default function BlockInsertionPoint( { rootClientId, clientId } ) {
 	}
 
 	return (
-		<div className="editor-block-list__insertion-point block-editor-block-list__insertion-point">
+		<div className="block-editor-block-list__insertion-point">
 			{ showInsertionPoint && (
-				<div className="editor-block-list__insertion-point-indicator block-editor-block-list__insertion-point-indicator" />
+				<div className="block-editor-block-list__insertion-point-indicator" />
 			) }
 			<div
 				onFocus={ onFocus }
@@ -59,7 +59,7 @@ export default function BlockInsertionPoint( { rootClientId, clientId } ) {
 				// See: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
 				tabIndex={ -1 }
 				className={
-					classnames( 'editor-block-list__insertion-point-inserter block-editor-block-list__insertion-point-inserter', {
+					classnames( 'block-editor-block-list__insertion-point-inserter', {
 						'is-visible': isInserterFocused,
 					} )
 				}

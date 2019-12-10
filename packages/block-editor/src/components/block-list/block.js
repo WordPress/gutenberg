@@ -453,7 +453,7 @@ function BlockListBlock( {
 	// The wp-block className is important for editor styles.
 	// Generate the wrapper class names handling the different states of the block.
 	const wrapperClassName = classnames(
-		'wp-block editor-block-list__block block-editor-block-list__block',
+		'wp-block block-editor-block-list__block',
 		{
 			'has-warning': ! isValid || !! hasError || isUnregisteredBlock,
 			'is-selected': shouldAppearSelected,
@@ -547,7 +547,7 @@ function BlockListBlock( {
 			/> }
 			<div
 				className={ classnames(
-					'editor-block-list__block-edit block-editor-block-list__block-edit',
+					'block-editor-block-list__block-edit',
 					{ 'has-mover-inside': moverDirection === 'horizontal' },
 				) }
 			>
@@ -613,7 +613,7 @@ function BlockListBlock( {
 				</IgnoreNestedEvents>
 			</div>
 			{ showInserterShortcuts && (
-				<div className="editor-block-list__side-inserter block-editor-block-list__side-inserter">
+				<div className="block-editor-block-list__side-inserter">
 					<InserterWithShortcuts
 						clientId={ clientId }
 						rootClientId={ rootClientId }
@@ -622,7 +622,7 @@ function BlockListBlock( {
 				</div>
 			) }
 			{ showEmptyBlockSideInserter && (
-				<div className="editor-block-list__empty-block-inserter block-editor-block-list__empty-block-inserter">
+				<div className="block-editor-block-list__empty-block-inserter">
 					<Inserter
 						position="top right"
 						onToggle={ selectOnOpen }

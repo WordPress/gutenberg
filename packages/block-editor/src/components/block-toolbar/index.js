@@ -40,7 +40,7 @@ export default function BlockToolbar() {
 
 	if ( blockClientIds.length > 1 ) {
 		return (
-			<div className="editor-block-toolbar block-editor-block-toolbar">
+			<div className="block-editor-block-toolbar">
 				<MultiBlocksSwitcher />
 				<BlockSettingsMenu clientIds={ blockClientIds } />
 			</div>
@@ -48,7 +48,7 @@ export default function BlockToolbar() {
 	}
 
 	return (
-		<div className="editor-block-toolbar block-editor-block-toolbar">
+		<div className="block-editor-block-toolbar">
 			{ mode === 'visual' && isValid && (
 				<>
 					{ blockClientIds.length === 1 && <BlockMobileToolbar clientId={ blockClientIds[ 0 ] } /> }

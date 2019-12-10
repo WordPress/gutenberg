@@ -45,7 +45,7 @@
 // Don't add negative vertical margin for wide, fullwide, or mobile.
 // @todo: simplify this selector.
 @include break-small() {
-	.block-editor-block-list__block:not([data-align="wide"]):not([data-align="full"]) .editor-block-mover:not(.is-horizontal) {
+	.block-editor-block-list__block:not([data-align="wide"]):not([data-align="full"]) .block-editor-block-mover:not(.is-horizontal) {
 		margin-top: 0;
 	}
 }

@@ -38,8 +38,8 @@ import { RemoveBrowserShortcuts } from './remove-browser-shortcuts';
 import { filePasteHandler } from './file-paste-handler';
 import FormatToolbarContainer from './format-toolbar-container';
 
-const wrapperClasses = 'editor-rich-text block-editor-rich-text';
-const classes = 'editor-rich-text__editable block-editor-rich-text__editable';
+const wrapperClasses = 'block-editor-rich-text';
+const classes = 'block-editor-rich-text__editable';
 
 /**
  * Get the multiline tag based on the multiline prop.
