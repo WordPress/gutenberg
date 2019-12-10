@@ -39,11 +39,9 @@ import styles from './editor.scss';
 import RichTextWrapper from './richTextWrapper';
 
 const NEW_TAB_REL = 'noreferrer noopener';
-const INITIAL_BORDER_RADIUS = 4;
 const MIN_BORDER_RADIUS_VALUE = 0;
 const MAX_BORDER_RADIUS_VALUE = 50;
-const BORDER_WIDTH = 1;
-const BLOCK_SPACING = 4;
+const BUTTON_SPACINGS = 74;
 
 function ButtonEdit( { attributes, setAttributes, backgroundColor, textColor, isSelected, closeGeneralSidebar } ) {
 	const {
@@ -64,9 +62,9 @@ function ButtonEdit( { attributes, setAttributes, backgroundColor, textColor, is
 	const [ isFocused, setRichTextFocus ] = useState( true );
 	const [ showHelp, setShowHelp ] = useState( false );
 
-	const borderRadiusValue = borderRadius !== undefined ? borderRadius : INITIAL_BORDER_RADIUS;
+	const borderRadiusValue = borderRadius !== undefined ? borderRadius : styles.button.borderRadius;
 	const mainColor = backgroundColor.color || styles.button.backgroundColor;
-	const outlineBorderRadius = borderRadiusValue > 0 ? borderRadiusValue + BLOCK_SPACING + BORDER_WIDTH : 0;
+	const outlineBorderRadius = borderRadiusValue > 0 ? borderRadiusValue + styles.button.paddingTop + styles.button.borderWidth : 0;
 
 	const onToggleOpenInNewTab = useCallback(
 		( value ) => {
@@ -108,13 +106,13 @@ function ButtonEdit( { attributes, setAttributes, backgroundColor, textColor, is
 		gradientValue,
 	} = __experimentalUseGradient();
 
-	// 2 * container padding (32) + 2 * rich text padding (32) + 2 * BLOCK_SPACING (8) + 2 * BORDER_WIDTH = 74
+	// BUTTON_SPACINGS = 2 * container padding (32) + 2 * rich text padding (32) + 2 * BLOCK_SPACING (8) + 2 * BORDER_WIDTH = 74
 	// 580 is a max width when screen has horizontal orientation. Value comes from `ReadableContentView` styles.
-	const maxWidth = Math.min( Dimensions.get( 'window' ).width - 74, 580 - 74 );
+	const maxWidth = Math.min( Dimensions.get( 'window' ).width - BUTTON_SPACINGS, styles.button.maxWidth - BUTTON_SPACINGS );
 	// To achieve proper expanding and shrinking `RichText` on iOS, there is a need to set a `minWidth`
 	// value at least on 1 when `RichText` is focused or when is not focused, but `RichText` value is
 	// different than empty string.
-	const minWidth = isFocused || ( ! isFocused && text && text !== '' ) ? 1 : 108;
+	const minWidth = isFocused || ( ! isFocused && text && text !== '' ) ? 1 : styles.button.minWidth;
 	// To achieve proper expanding and shrinking `RichText` on Android, there is a need to set
 	// a `placeholder` as an empty string when `RichText` is focused,
 	// because `AztecView` is calculating a `minWidth` based on placeholder text.
@@ -127,7 +125,7 @@ function ButtonEdit( { attributes, setAttributes, backgroundColor, textColor, is
 				isSelected && {
 					borderColor: mainColor,
 					borderRadius: outlineBorderRadius,
-					borderWidth: BORDER_WIDTH,
+					borderWidth: styles.button.borderWidth,
 				},
 			] }
 		>

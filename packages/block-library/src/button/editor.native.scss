@@ -15,4 +15,9 @@
 
 .button {
 	background-color: $button-fallback-bg;
+	border-width: $border-width;
+	border-radius: $border-width * 4;
+	padding: $block-spacing;
+	max-width: 580px;
+	min-width: 108px;
 }
