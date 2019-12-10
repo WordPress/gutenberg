@@ -64,7 +64,7 @@ export function OptionsModal( { isModalActive, isViewable, closeModal } ) {
 					) }
 				/>
 				<PostFeaturedImageCheck>
-					<EnablePanelOption label={ __( 'Featured Image' ) } panelName="featured-image" />
+					<EnablePanelOption label={ __( 'Featured image' ) } panelName="featured-image" />
 				</PostFeaturedImageCheck>
 				<PostExcerptCheck>
 					<EnablePanelOption label={ __( 'Excerpt' ) } panelName="post-excerpt" />
