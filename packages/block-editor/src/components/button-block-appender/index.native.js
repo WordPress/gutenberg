@@ -20,7 +20,7 @@ function ButtonBlockAppender( { rootClientId, showSeparator } ) {
 			<Inserter
 				rootClientId={ rootClientId }
 				renderToggle={ ( { onToggle, disabled, isOpen } ) => (
-					( <Button
+					<Button
 						onClick={ onToggle }
 						aria-expanded={ isOpen }
 						disabled={ disabled }
@@ -34,7 +34,7 @@ function ButtonBlockAppender( { rootClientId, showSeparator } ) {
 								size={ styles.addBlockButton.size }
 							/>
 						</View>
-					</Button> )
+					</Button>
 				) }
 				isAppender
 				showSeparator={ showSeparator }
