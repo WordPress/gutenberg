@@ -21,9 +21,8 @@ import { Button } from '../';
  * Custom hook which announces the message with the given politeness, if a
  * valid message is provided.
  *
- * @param {?string} message    Message to announce.
- * @param {string}  politeness Politeness in which to announce, one of 'polite'
- *                             or 'assertive'.
+ * @param {string}               [message]  Message to announce.
+ * @param {'polite'|'assertive'} politeness Politeness to announce.
  */
 function useSpokenMessage( message, politeness ) {
 	useEffect( () => {
@@ -40,23 +39,23 @@ function useSpokenMessage( message, politeness ) {
 }
 
 /**
- * Given a notice status, returns an assumed default equivalent role for the
- * status. Defaults to 'alert'.
+ * Given a notice status, returns an assumed default politeness for the status.
+ * Defaults to 'assertive'.
  *
- * @param {?string} status Notice status.
+ * @param {string} [status] Notice status.
  *
- * @return {string} Notice role.
+ * @return {'polite'|'assertive'} Notice politeness.
  */
-function getDefaultRole( status ) {
+function getDefaultPoliteness( status ) {
 	switch ( status ) {
 		case 'success':
 		case 'warning':
 		case 'info':
-			return 'status';
+			return 'polite';
 
 		case 'error':
 		default:
-			return 'alert';
+			return 'assertive';
 	}
 }
 
@@ -67,10 +66,9 @@ function Notice( {
 	onRemove = noop,
 	isDismissible = true,
 	actions = [],
-	role = getDefaultRole( status ),
+	politeness = getDefaultPoliteness( status ),
 	__unstableHTML,
 } ) {
-	const politeness = role === 'status' ? 'polite' : 'assertive';
 	useSpokenMessage( children, politeness );
 
 	const classes = classnames(

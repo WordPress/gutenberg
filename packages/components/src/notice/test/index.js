@@ -61,12 +61,6 @@ describe( 'Notice', () => {
 	} );
 
 	describe( 'useSpokenMessage', () => {
-		// TODO: Current support for hooks in `react-test-renderer` is poor. In
-		// future versions, it should no longer be necessary to use `update` or
-		// the non-shallow renderer.
-		//
-		// See: https://github.com/facebook/react/issues/14050#issuecomment-447888631
-
 		it( 'should speak the given message', () => {
 			const tree = create( <Notice>FYI</Notice> );
 			tree.update();
@@ -74,23 +68,25 @@ describe( 'Notice', () => {
 			expect( speak ).toHaveBeenCalledWith( 'FYI', 'polite' );
 		} );
 
-		it( 'should speak the given message by explicit role', () => {
-			const tree = create( <Notice role="alert">Uh oh!</Notice> );
+		it( 'should speak the given message by explicit politeness', () => {
+			const tree = create(
+				<Notice politeness="assertive">Uh oh!</Notice>
+			);
 			tree.update();
 
 			expect( speak ).toHaveBeenCalledWith( 'Uh oh!', 'assertive' );
 		} );
 
-		it( 'should speak the given message by implicit role by status', () => {
+		it( 'should speak the given message by implicit politeness by status', () => {
 			const tree = create( <Notice status="error">Uh oh!</Notice> );
 			tree.update();
 
 			expect( speak ).toHaveBeenCalledWith( 'Uh oh!', 'assertive' );
 		} );
 
-		it( 'should speak the given message, preferring explicit to implicit roles', () => {
+		it( 'should speak the given message, preferring explicit to implicit politeness', () => {
 			const tree = create(
-				<Notice role="status" status="error">
+				<Notice politeness="polite" status="error">
 					No need to panic
 				</Notice>
 			);
