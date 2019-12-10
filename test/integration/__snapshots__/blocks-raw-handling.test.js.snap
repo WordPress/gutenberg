@@ -7,10 +7,6 @@ exports[`Blocks raw handling pasteHandler should remove extra blank lines 1`] = 
 
 <!-- wp:paragraph -->
 <p>2</p>
-<!-- /wp:paragraph -->
-
-<!-- wp:paragraph -->
-<p></p>
 <!-- /wp:paragraph -->"
 `;
 

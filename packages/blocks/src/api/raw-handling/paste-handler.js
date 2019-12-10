@@ -33,6 +33,7 @@ import {
 	removeInvalidHTML,
 	getBlockContentSchema,
 } from './utils';
+import emptyParagraphRemover from './empty-paragraph-remover';
 
 /**
  * Browser dependencies
@@ -230,6 +231,7 @@ export function pasteHandler( { HTML = '', plainText = '', mode = 'AUTO', tagNam
 		piece = deepFilterHTML( piece, [
 			htmlFormattingRemover,
 			brRemover,
+			emptyParagraphRemover,
 		], blockContentSchema );
 
 		// Allows us to ask for this information when we get a report.
