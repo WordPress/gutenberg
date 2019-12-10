@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { get } from 'lodash';
-import hexRgb from 'hex-rgb';
+import tinycolor from 'tinycolor2';
 /**
  * Internal dependencies
  */
@@ -20,7 +20,7 @@ import { COLORS } from './colors-values';
  * // rgba(0, 0, 0, 0.5)
  */
 export function rgba( hexValue = '', alpha = 1 ) {
-	const [ r, g, b ] = hexRgb( hexValue, { format: 'array' } );
+	const { r, g, b } = tinycolor( hexValue ).toRgb();
 	return `rgba(${ r }, ${ g }, ${ b }, ${ alpha })`;
 }
 

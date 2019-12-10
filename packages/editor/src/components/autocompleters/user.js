@@ -3,6 +3,8 @@
  */
 import apiFetch from '@wordpress/api-fetch';
 
+/** @typedef {import('@wordpress/components').WPCompleter} WPCompleter */
+
 /**
  * A user mentions completer.
  *

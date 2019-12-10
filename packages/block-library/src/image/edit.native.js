@@ -16,14 +16,14 @@ import { isEmpty, map, get } from 'lodash';
  * WordPress dependencies
  */
 import {
-	TextControl,
-	ToggleControl,
-	SelectControl,
 	Icon,
-	Toolbar,
-	ToolbarButton,
 	PanelBody,
 	PanelActions,
+	SelectControl,
+	TextControl,
+	ToggleControl,
+	ToolbarButton,
+	ToolbarGroup,
 } from '@wordpress/components';
 
 import {
@@ -136,7 +136,7 @@ export class ImageEdit extends React.Component {
 	componentDidUpdate( previousProps ) {
 		if ( ! previousProps.image && this.props.image ) {
 			const { image, attributes } = this.props;
-			const url = getUrlForSlug( image, attributes );
+			const url = getUrlForSlug( image, attributes ) || image.source_url;
 			this.props.setAttributes( { url } );
 		}
 	}
@@ -303,13 +303,13 @@ export class ImageEdit extends React.Component {
 
 		const getToolbarEditButton = ( open ) => (
 			<BlockControls>
-				<Toolbar>
+				<ToolbarGroup>
 					<ToolbarButton
 						title={ __( 'Edit image' ) }
 						icon={ editImageIcon }
 						onClick={ open }
 					/>
-				</Toolbar>
+				</ToolbarGroup>
 				<BlockAlignmentToolbar
 					value={ align }
 					onChange={ this.updateAlignment }

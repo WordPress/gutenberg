@@ -37,7 +37,8 @@ import { SVG, Rect, G, Path } from '@wordpress/components';
  *
  * @property {string} clientId     A block client ID.
  * @property {string} attributeKey A block attribute key.
- * @property {number} offset       A block attribute offset.
+ * @property {number} offset       An attribute value offset, based on the rich
+ *                                 text value. See `wp.richText.create`.
  */
 
 // Module constants
@@ -928,6 +929,17 @@ export function isTyping( state ) {
 }
 
 /**
+ * Returns true if the user is dragging blocks, or false otherwise.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether user is dragging blocks.
+ */
+export function isDraggingBlocks( state ) {
+	return state.isDraggingBlocks;
+}
+
+/**
  * Returns true if the caret is within formatted text, or false otherwise.
  *
  * @param {Object} state Global application state.
@@ -1036,6 +1048,12 @@ const canInsertBlockTypeUnmemoized = ( state, blockName, rootClientId = null ) =
 			return list;
 		}
 		if ( isArray( list ) ) {
+			// TODO: when there is a canonical way to detect that we are editing a post
+			// the following check should be changed to something like:
+			// if ( includes( list, 'core/post-content' ) && getEditorMode() === 'post-content' && item === null )
+			if ( includes( list, 'core/post-content' ) && item === null ) {
+				return true;
+			}
 			return includes( list, item );
 		}
 		return defaultResult;

@@ -232,4 +232,17 @@ describe( 'Table', () => {
 		// Expect that the snapshot shows the text in the second cell.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	it( 'allows a caption to be added', async () => {
+		await insertBlock( 'Table' );
+
+		// Create the table.
+		await clickButton( createButtonLabel );
+
+		// Click the first cell and add some text.
+		await page.click( '.wp-block-table figcaption' );
+		await page.keyboard.type( 'Caption!' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );

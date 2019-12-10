@@ -14,17 +14,17 @@ import {
 	useState,
 } from '@wordpress/element';
 import {
+	BaseControl,
+	Button,
 	FocalPointPicker,
 	IconButton,
 	PanelBody,
 	PanelRow,
 	RangeControl,
-	ToggleControl,
-	Toolbar,
-	withNotices,
 	ResizableBox,
-	BaseControl,
-	Button,
+	ToggleControl,
+	ToolbarGroup,
+	withNotices,
 } from '@wordpress/components';
 import { compose, withInstanceId } from '@wordpress/compose';
 import {
@@ -312,7 +312,7 @@ function CoverEdit( {
 				{ hasBackground && (
 					<>
 						<MediaUploadCheck>
-							<Toolbar>
+							<ToolbarGroup>
 								<MediaUpload
 									onSelect={ onSelectMedia }
 									allowedTypes={ ALLOWED_MEDIA_TYPES }
@@ -326,7 +326,7 @@ function CoverEdit( {
 										/>
 									) }
 								/>
-							</Toolbar>
+							</ToolbarGroup>
 						</MediaUploadCheck>
 					</>
 				) }
@@ -347,6 +347,14 @@ function CoverEdit( {
 								url={ url }
 								value={ focalPoint }
 								onChange={ ( newFocalPoint ) => setAttributes( { focalPoint: newFocalPoint } ) }
+							/>
+						) }
+						{ VIDEO_BACKGROUND_TYPE === backgroundType && (
+							<video
+								autoPlay
+								muted
+								loop
+								src={ url }
 							/>
 						) }
 						<PanelRow>
@@ -453,6 +461,7 @@ function CoverEdit( {
 							clearable={ false }
 						/>
 						<__experimentalGradientPicker
+							disableCustomGradients
 							onChange={
 								( newGradient ) => {
 									setGradient( newGradient );

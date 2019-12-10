@@ -16,7 +16,7 @@ import {
 } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
 import {
-	Toolbar,
+	ToolbarGroup,
 } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { withViewportMatch } from '@wordpress/viewport';
@@ -173,7 +173,7 @@ class MediaTextEdit extends Component {
 		return (
 			<>
 				<BlockControls>
-					<Toolbar
+					<ToolbarGroup
 						controls={ toolbarControls }
 					/>
 					<BlockVerticalAlignmentToolbar

@@ -3,6 +3,8 @@
  */
 import defaultRegistry from './default-registry';
 
+/** @typedef {import('./registry').WPDataRegistry} WPDataRegistry */
+
 /**
  * Mark a selector as a registry selector.
  *

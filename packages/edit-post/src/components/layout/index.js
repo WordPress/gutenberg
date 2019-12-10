@@ -14,14 +14,18 @@ import {
 	PostPublishPanel,
 } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { BlockBreadcrumb } from '@wordpress/block-editor';
+import {
+	BlockBreadcrumb,
+	__experimentalPageTemplatePicker,
+	__experimentalUsePageTemplatePickerVisible,
+} from '@wordpress/block-editor';
 import {
 	Button,
 	ScrollLock,
 	Popover,
 	FocusReturnProvider,
 } from '@wordpress/components';
-import { withViewportMatch } from '@wordpress/viewport';
+import { useViewportMatch } from '@wordpress/compose';
 import { PluginArea } from '@wordpress/plugins';
 import { __ } from '@wordpress/i18n';
 
@@ -43,8 +47,10 @@ import Sidebar from '../sidebar';
 import MetaBoxes from '../meta-boxes';
 import PluginPostPublishPanel from '../sidebar/plugin-post-publish-panel';
 import PluginPrePublishPanel from '../sidebar/plugin-pre-publish-panel';
+import WelcomeGuide from '../welcome-guide';
 
-function Layout( { isMobileViewport } ) {
+function Layout() {
+	const isMobileViewport = useViewportMatch( 'small', '<' );
 	const { closePublishSidebar, togglePublishSidebar } = useDispatch( 'core/edit-post' );
 	const {
 		mode,
@@ -67,6 +73,7 @@ function Layout( { isMobileViewport } ) {
 			isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
 		} );
 	} );
+	const showPageTemplatePicker = __experimentalUsePageTemplatePickerVisible();
 	const sidebarIsOpened = editorSidebarOpened || pluginSidebarOpened || publishSidebarOpened;
 	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
 		'is-sidebar-opened': sidebarIsOpened,
@@ -82,12 +89,7 @@ function Layout( { isMobileViewport } ) {
 			<AutosaveMonitor />
 			<LocalAutosaveMonitor />
 			<EditorModeKeyboardShortcuts />
-			<ManageBlocksModal />
-			<OptionsModal />
-			<KeyboardShortcutHelpModal />
-			<Popover.Slot />
-			<PluginArea />
-			<FocusReturnProvider className={ className }>
+			<FocusReturnProvider>
 				<EditorRegions
 					className={ className }
 					header={ <Header /> }
@@ -104,8 +106,6 @@ function Layout( { isMobileViewport } ) {
 							{ isRichEditingEnabled && mode === 'visual' && <VisualEditor /> }
 							<div className="edit-post-layout__metaboxes">
 								<MetaBoxes location="normal" />
-							</div>
-							<div className="edit-post-layout__metaboxes">
 								<MetaBoxes location="advanced" />
 							</div>
 							{ isMobileViewport && sidebarIsOpened && <ScrollLock /> }
@@ -128,7 +128,6 @@ function Layout( { isMobileViewport } ) {
 						<div className="edit-post-toggle-publish-panel">
 							<Button
 								isDefault
-								type="button"
 								className="edit-post-toggle-publish-panel__button"
 								onClick={ togglePublishSidebar }
 								aria-expanded={ false }
@@ -138,10 +137,17 @@ function Layout( { isMobileViewport } ) {
 						</div>
 					) }
 				/>
+				<ManageBlocksModal />
+				<OptionsModal />
+				<KeyboardShortcutHelpModal />
+				<WelcomeGuide />
+				<Popover.Slot />
+				<PluginArea />
+				{ showPageTemplatePicker && <__experimentalPageTemplatePicker /> }
 			</FocusReturnProvider>
 
 		</>
 	);
 }
 
-export default withViewportMatch( { isMobileViewport: '< small' } )( Layout );
+export default Layout;

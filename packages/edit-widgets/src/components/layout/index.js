@@ -7,6 +7,7 @@ import {
 	Popover,
 	SlotFillProvider,
 } from '@wordpress/components';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -17,6 +18,7 @@ import WidgetAreas from '../widget-areas';
 import Notices from '../notices';
 
 function Layout( { blockEditorSettings } ) {
+	const [ selectedArea, setSelectedArea ] = useState( null );
 	return (
 		<SlotFillProvider>
 			<Header />
@@ -27,8 +29,13 @@ function Layout( { blockEditorSettings } ) {
 				role="region"
 				aria-label={ __( 'Widgets screen content' ) }
 				tabIndex="-1"
+				onFocus={ () => {
+					setSelectedArea( null );
+				} }
 			>
 				<WidgetAreas
+					selectedArea={ selectedArea }
+					setSelectedArea={ setSelectedArea }
 					blockEditorSettings={ blockEditorSettings }
 				/>
 			</div>
