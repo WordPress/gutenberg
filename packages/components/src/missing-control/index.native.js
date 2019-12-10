@@ -5,7 +5,6 @@ import MissingCell from '../mobile/bottom-sheet/missing-cell';
 
 function MissingControl( {
 	label,
-	checked,
 	help,
 	instanceId,
 	className,
@@ -19,7 +18,6 @@ function MissingControl( {
 			id={ id }
 			help={ help }
 			className={ className }
-			value={ checked }
 			aria-describedby={ !! help ? id + '__help' : undefined }
 			{ ...props }
 		/>

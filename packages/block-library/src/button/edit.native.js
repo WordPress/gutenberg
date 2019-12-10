@@ -27,6 +27,7 @@ import {
 import {
 	useCallback,
 	useState,
+	useEffect,
 } from '@wordpress/element';
 import { withDispatch } from '@wordpress/data';
 
@@ -54,11 +55,17 @@ function ButtonEdit( { attributes, setAttributes, backgroundColor, textColor, is
 		rel,
 	} = attributes;
 
+	useEffect( () => {
+		if ( this.richTextRef && isSelected ) {
+			return this.richTextRef.focus();
+		} return this.richTextRef.blur();
+	} );
+
 	const [ isFocused, setRichTextFocus ] = useState( true );
 	const [ showHelp, setShowHelp ] = useState( false );
 
 	const borderRadiusValue = borderRadius !== undefined ? borderRadius : INITIAL_BORDER_RADIUS;
-	const mainColor = backgroundColor.color || '#595959';
+	const mainColor = backgroundColor.color || styles.button.backgroundColor;
 	const outlineBorderRadius = borderRadiusValue > 0 ? borderRadiusValue + BLOCK_SPACING + BORDER_WIDTH : 0;
 
 	const onToggleOpenInNewTab = useCallback(
@@ -130,6 +137,9 @@ function ButtonEdit( { attributes, setAttributes, backgroundColor, textColor, is
 				backgroundColor={ mainColor }
 			>
 				<RichText
+					setRef={ ( richText ) => {
+						this.richTextRef = richText;
+					} }
 					placeholder={ placeholderText }
 					value={ text }
 					onChange={ ( value ) => setAttributes( { text: value } ) }
@@ -139,6 +149,7 @@ function ButtonEdit( { attributes, setAttributes, backgroundColor, textColor, is
 					} }
 					textAlign="center"
 					placeholderTextColor={ 'lightgray' }
+					identifier="content"
 					tagName="p"
 					minWidth={ minWidth }
 					maxWidth={ maxWidth }
@@ -146,6 +157,7 @@ function ButtonEdit( { attributes, setAttributes, backgroundColor, textColor, is
 					onBlur={ () => setRichTextFocus( false ) }
 				/>
 			</RichTextWrapper>
+
 			<InspectorControls>
 				<PanelBody title={ __( 'Border Settings' ) } >
 					<RangeControl
@@ -178,11 +190,12 @@ function ButtonEdit( { attributes, setAttributes, backgroundColor, textColor, is
 				<PanelBody title={ __( 'Color Settings' ) } >
 					<MissingControl
 						label={ __( 'Coming Soon' ) }
-						onPress={ openNotificationSheet }
+						onChange={ openNotificationSheet }
 						separatorType="none"
 					/>
 				</PanelBody>
 			</InspectorControls>
+
 			<NotificationSheet title="Color Settings" isVisible={ showHelp } onClose={ toggleShowNoticationSheet } type="plural" />
 		</View>
 	);

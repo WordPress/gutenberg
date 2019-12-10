@@ -14,7 +14,7 @@ import styles from './styles.scss';
 function BottomSheetMissingCell( props ) {
 	const {
 		getStylesFromColorScheme,
-		onPress,
+		onChange,
 		...cellProps
 	} = props;
 
@@ -23,9 +23,14 @@ function BottomSheetMissingCell( props ) {
 	return (
 		<Cell
 			{ ...cellProps }
-			onPress={ onPress }
+			onPress={ onChange }
 			editable={ false }
 			value={ '' }
+			accessibilityRole={ 'button' }
+			accessibilityHint={
+				/* translators: accessibility text (hint for opening a bottom sheet with help message) */
+				__( 'Double tap to show help' )
+			}
 		>
 			<Icon
 				label={ __( 'Help icon' ) }

@@ -49,7 +49,6 @@ function NotificationSheet( { title, getStylesFromColorScheme, isVisible, onClos
 				<Text style={ [ infoTextStyle, infoDescriptionStyle ] }>
 					{ __( 'We are working hard to add more blocks with each release. In the meantime, you can also edit this post on the web.' ) }
 				</Text>
-
 			</View>
 		</BottomSheet>
 	);
