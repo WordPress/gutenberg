@@ -31,10 +31,10 @@ function useSpokenMessage( message, politeness ) {
 		typeof message === 'string' ? message : renderToString( message );
 
 	useEffect( () => {
-		if ( message ) {
+		if ( spokenMessage ) {
 			speak( spokenMessage, politeness );
 		}
-	}, [ message, politeness ] );
+	}, [ spokenMessage, politeness ] );
 }
 
 /**
