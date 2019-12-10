@@ -140,7 +140,6 @@ class BottomSheetRangeCell extends Component {
 			maximumTrackTintColor = Platform.OS === 'ios' ? '#e9eff3' : '#909090',
 			thumbTintColor = Platform.OS === 'android' && '#00669b',
 			getStylesFromColorScheme,
-			allowReset = true,
 			...cellProps
 		} = this.props;
 
@@ -154,8 +153,6 @@ class BottomSheetRangeCell extends Component {
 		);
 
 		const defaultSliderStyle = getStylesFromColorScheme( styles.sliderTextInput, styles.sliderDarkTextInput );
-		const resetButtonText = Platform.OS === 'ios' ? __( 'Reset' ) : __( 'RESET' );
-		const resetButton = { title: resetButtonText, handler: this.handleReset };
 
 		return (
 			<Cell
@@ -163,11 +160,11 @@ class BottomSheetRangeCell extends Component {
 				cellContainerStyle={ styles.cellContainerStyles }
 				cellRowContainerStyle={ styles.cellRowStyles }
 				accessibilityRole={ 'none' }
+				value={ '' }
 				editable={ false }
 				accessible={ accessible }
 				onPress={ this.onCellPress }
 				accessibilityLabel={ accessibilityLabel }
-				customActionButton={ allowReset ? resetButton : undefined }
 				accessibilityHint={
 					/* translators: accessibility text (hint for focusing a slider) */
 					__( 'Double tap to change the value using slider' )
