@@ -25,6 +25,7 @@ import markdownConverter from './markdown-converter';
 import iframeRemover from './iframe-remover';
 import googleDocsUIDRemover from './google-docs-uid-remover';
 import htmlFormattingRemover from './html-formatting-remover';
+import brRemover from './br-remover';
 import { getPhrasingContentSchema } from './phrasing-content';
 import {
 	deepFilterHTML,
@@ -225,8 +226,11 @@ export function pasteHandler( { HTML = '', plainText = '', mode = 'AUTO', tagNam
 
 		piece = deepFilterHTML( piece, filters, blockContentSchema );
 		piece = removeInvalidHTML( piece, schema );
-		piece = deepFilterHTML( piece, [ htmlFormattingRemover ], blockContentSchema );
 		piece = normaliseBlocks( piece );
+		piece = deepFilterHTML( piece, [
+			htmlFormattingRemover,
+			brRemover,
+		], blockContentSchema );
 
 		// Allows us to ask for this information when we get a report.
 		console.log( 'Processed HTML piece:\n\n', piece );
