@@ -7,6 +7,7 @@ import { debounce } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { isBlobURL } from '@wordpress/blob';
 import { useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
@@ -58,6 +59,7 @@ const getHandleStates = ( align, isRTL = false ) => {
 
 export default function LogoEdit( { attributes: { align, width }, children, className, clientId, setAttributes, isSelected } ) {
 	const [ isEditing, setIsEditing ] = useState( false );
+	const [ url, setUrl ] = useState( null );
 	const [ logo, setLogo ] = useEntityProp( 'root', 'site', 'sitelogo' );
 	const [ isDirty, , save ] = __experimentalUseEntitySaving(
 		'root',
@@ -91,11 +93,12 @@ export default function LogoEdit( { attributes: { align, width }, children, clas
 		} )
 	);
 
-	let url = null;
 	let alt = null;
 	if ( mediaItemData ) {
 		alt = mediaItemData.alt;
-		url = mediaItemData.url;
+		if ( url !== mediaItemData.url ) {
+			setUrl( mediaItemData.url );
+		}
 	}
 
 	if ( isDirty ) {
@@ -107,7 +110,14 @@ export default function LogoEdit( { attributes: { align, width }, children, clas
 	const setIsNotEditing = () => setIsEditing( false );
 
 	const onSelectLogo = ( media ) => {
-		if ( ! media || ! media.id ) {
+		if ( ! media ) {
+			return;
+		}
+
+		if ( ! media.id && media.url ) { // This is a temporary blob image
+			setLogo( '' );
+			setUrl( media.url );
+			setIsNotEditing();
 			return;
 		}
 
@@ -168,8 +178,12 @@ export default function LogoEdit( { attributes: { align, width }, children, clas
 		return () => window.removeEventListener( 'resize', calculateMaxWidth );
 	} );
 
+	const classes = classnames( 'custom-logo-link', {
+		'is-transient': isBlobURL( url ),
+	} );
+
 	const img = (
-		<a href="#home" className="custom-logo-link" rel="home">
+		<a href="#home" className={ classes } rel="home">
 			<img className="custom-logo" src={ url } alt={ alt } />
 		</a>
 	);

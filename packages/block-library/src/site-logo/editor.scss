@@ -5,6 +5,10 @@
 		&:focus {
 			box-shadow: none;
 		}
+
+		&.is-transient img {
+			opacity: 0.3;
+		}
 	}
 
 	.editor-media-placeholder__button {
