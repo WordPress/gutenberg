@@ -47,7 +47,6 @@ import BlockContextualToolbar from './block-contextual-toolbar';
 import BlockMultiControls from './multi-controls';
 import BlockInsertionPoint from './insertion-point';
 import IgnoreNestedEvents from '../ignore-nested-events';
-import InserterWithShortcuts from '../inserter-with-shortcuts';
 import Inserter from '../inserter';
 import { isInsideRootBlock } from '../../utils/dom';
 import useMovingAnimation from './moving-animation';
@@ -411,7 +410,6 @@ function BlockListBlock( {
 
 	// If the block is selected and we're typing the block should not appear.
 	// Empty paragraph blocks should always show up as unselected.
-	const showInserterShortcuts = ! isNavigationMode && ( isSelected || isHovered ) && isEmptyDefaultBlock && isValid;
 	const showEmptyBlockSideInserter = ! isNavigationMode && ( isSelected || isHovered || isLast ) && isEmptyDefaultBlock && isValid;
 	const shouldAppearSelected =
 		! isFocusMode &&
@@ -644,15 +642,6 @@ function BlockListBlock( {
 					{ !! hasError && <BlockCrashWarning /> }
 				</IgnoreNestedEvents>
 			</div>
-			{ showInserterShortcuts && (
-				<div className="block-editor-block-list__side-inserter">
-					<InserterWithShortcuts
-						clientId={ clientId }
-						rootClientId={ rootClientId }
-						onToggle={ selectOnOpen }
-					/>
-				</div>
-			) }
 			{ showEmptyBlockSideInserter && (
 				<div className="block-editor-block-list__empty-block-inserter">
 					<Inserter
