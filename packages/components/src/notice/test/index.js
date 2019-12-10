@@ -113,5 +113,20 @@ describe( 'Notice', () => {
 				'polite'
 			);
 		} );
+
+		it( 'should not re-speak an effectively equivalent element message', () => {
+			const tree = create(
+				<Notice>
+					With <em>emphasis</em> this time.
+				</Notice>
+			);
+			tree.update(
+				<Notice>
+					With <em>emphasis</em> this time.
+				</Notice>
+			);
+
+			expect( speak ).toHaveBeenCalledTimes( 1 );
+		} );
 	} );
 } );

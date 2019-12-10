@@ -19,24 +19,23 @@ import { Button } from '../';
 
 const NOTICE_TIMEOUT = 10000;
 
+/** @typedef {import('@wordpress/element').WPElement} WPElement */
+
 /**
  * Custom hook which announces the message with the given politeness, if a
  * valid message is provided.
  *
- * @param {string}               [message]  Message to announce.
+ * @param {string|WPElement}     [message]  Message to announce.
  * @param {'polite'|'assertive'} politeness Politeness to announce.
  */
 function useSpokenMessage( message, politeness ) {
+	const spokenMessage =
+		typeof message === 'string' ? message : renderToString( message );
+
 	useEffect( () => {
-		if ( ! message ) {
-			return;
+		if ( message ) {
+			speak( spokenMessage, politeness );
 		}
-
-		if ( typeof message !== 'string' ) {
-			message = renderToString( message );
-		}
-
-		speak( message, politeness );
 	}, [ message, politeness ] );
 }
 
