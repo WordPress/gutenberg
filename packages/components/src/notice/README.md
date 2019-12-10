@@ -99,6 +99,8 @@ const MyNotice = () => (
 
 The following props are used to control the behavior of the component.
 
+* `children`: (string) The displayed message of a notice. Also used as the spoken message for assistive technology, unless `spokenMessage` is provided as an alternative message.
+* `spokenMessage`: (string) Used to provide a custom spoken message in place of the `children` default.
 * `status`: (string) can be `warning` (yellow), `success` (green), `error` (red), or `info`. Defaults to `info`.
 * `onRemove`: function called when dismissing the notice
 * `politeness`: (string) A politeness level for the notice's spoken message. Should be provided as one of the valid options for [an `aria-live` attribute value](https://www.w3.org/TR/wai-aria-1.1/#aria-live). If not provided, a sensible default is used based on the notice status. Note that this value should be considered a suggestion; assistive technologies may override it based on internal heuristics.

@@ -63,13 +63,14 @@ function Notice( {
 	className,
 	status = 'info',
 	children,
+	spokenMessage = children,
 	onRemove = noop,
 	isDismissible = true,
 	actions = [],
 	politeness = getDefaultPoliteness( status ),
 	__unstableHTML,
 } ) {
-	useSpokenMessage( children, politeness );
+	useSpokenMessage( spokenMessage, politeness );
 
 	const classes = classnames(
 		className,

@@ -2,7 +2,7 @@
 
 ### Enhancements
 
-- The `Notice` component will speak its message.
+- The `Notice` component will speak its message. With this new feature, a developer can control either the `spokenMessage` spoken message, or the `politeness` politeness level of the message.
 
 ### Bug Fixes
 
