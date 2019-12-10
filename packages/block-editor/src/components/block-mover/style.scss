@@ -1,23 +1,9 @@
-.block-editor-block-mover__control-drag-handle {
-	display: none;
+.block-editor-block-mover {
+	display: inline-flex;
 	@include break-medium() {
-		display: flex;
+		cursor: grab;
 	}
-
-	cursor: move; // Fallback for IE/Edge < 14
-	cursor: grab;
-	fill: currentColor;
-
-	&,
-	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):hover,
-	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):active,
-	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):focus {
-		box-shadow: none;
-		background: none;
-		color: $dark-opacity-500;
-	}
-
-	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):active {
+	&:not(:disabled):not([aria-disabled="true"]):active {
 		cursor: grabbing;
 	}
 }
