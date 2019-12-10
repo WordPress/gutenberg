@@ -258,7 +258,7 @@ export default function LogoEdit( { attributes: { align, width }, children, clas
 	);
 	const editComponent = (
 		<MediaPlaceholder
-			icon={ <BlockIcon icon={ icon } fill="ff0000" /> }
+			icon={ <BlockIcon icon={ icon } /> }
 			labels={ {
 				title: label,
 				instructions: __( 'Upload an image, or pick one from your media library, to be your site logo' ),
