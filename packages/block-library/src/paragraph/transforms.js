@@ -1,8 +1,3 @@
-/**
- * WordPress dependencies
- */
-import { getPhrasingContentSchema } from '@wordpress/blocks';
-
 const transforms = {
 	from: [
 		{
@@ -10,11 +5,11 @@ const transforms = {
 			// Paragraph is a fallback and should be matched last.
 			priority: 20,
 			selector: 'p',
-			schema: {
+			schema: ( { phrasingContentSchema } ) => ( {
 				p: {
-					children: getPhrasingContentSchema(),
+					children: phrasingContentSchema,
 				},
-			},
+			} ),
 		},
 	],
 };

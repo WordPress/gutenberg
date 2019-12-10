@@ -47,7 +47,7 @@ const { console } = window;
  */
 function filterInlineHTML( HTML ) {
 	HTML = deepFilterHTML( HTML, [ googleDocsUIDRemover, phrasingContentReducer, commentRemover ] );
-	HTML = removeInvalidHTML( HTML, getPhrasingContentSchema(), { inline: true } );
+	HTML = removeInvalidHTML( HTML, getPhrasingContentSchema( 'paste' ), { inline: true } );
 
 	// Allows us to ask for this information when we get a report.
 	console.log( 'Processed inline HTML:\n\n', HTML );
@@ -190,8 +190,8 @@ export function pasteHandler( { HTML = '', plainText = '', mode = 'AUTO', tagNam
 	}
 
 	const rawTransforms = getRawTransformations();
-	const phrasingContentSchema = getPhrasingContentSchema();
-	const blockContentSchema = getBlockContentSchema( rawTransforms );
+	const phrasingContentSchema = getPhrasingContentSchema( 'paste' );
+	const blockContentSchema = getBlockContentSchema( rawTransforms, phrasingContentSchema );
 
 	const blocks = compact( flatMap( pieces, ( piece ) => {
 		// Already a block from shortcode.

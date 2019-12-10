@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { mapValues, mergeWith, includes, noop } from 'lodash';
+import { mapValues, mergeWith, includes, noop, isFunction } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -22,13 +22,17 @@ const { ELEMENT_NODE, TEXT_NODE } = window.Node;
 /**
  * Given raw transforms from blocks, merges all schemas into one.
  *
- * @param {Array} transforms Block transforms, of the `raw` type.
+ * @param {Array}  transforms            Block transforms, of the `raw` type.
+ * @param {Object} phrasingContentSchema The phrasing content schema.
  *
  * @return {Object} A complete block content schema.
  */
-export function getBlockContentSchema( transforms ) {
+export function getBlockContentSchema( transforms, phrasingContentSchema ) {
 	const schemas = transforms.map( ( { isMatch, blockName, schema } ) => {
 		const hasAnchorSupport = hasBlockSupport( blockName, 'anchor' );
+
+		schema = isFunction( schema ) ? schema( { phrasingContentSchema } ) : schema;
+
 		// If the block does not has anchor support and the transform does not
 		// provides an isMatch we can return the schema right away.
 		if ( ! hasAnchorSupport && ! isMatch ) {

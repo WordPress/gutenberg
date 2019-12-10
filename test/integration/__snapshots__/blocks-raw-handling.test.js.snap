@@ -1,5 +1,11 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Blocks raw handling pasteHandler should strip some text-level elements 1`] = `
+"<!-- wp:paragraph -->
+<p>This is ncorect</p>
+<!-- /wp:paragraph -->"
+`;
+
 exports[`rawHandler should convert HTML post to blocks with minimal content changes 1`] = `
 "<!-- wp:heading -->
 <h2>Howdy</h2>
@@ -81,4 +87,10 @@ exports[`rawHandler should convert a list with attributes 1`] = `
         </ol>
     </li></ol>
 <!-- /wp:list -->"
+`;
+
+exports[`rawHandler should not strip any text-level elements 1`] = `
+"<!-- wp:paragraph -->
+<p>This is <u>ncorect</u></p>
+<!-- /wp:paragraph -->"
 `;
