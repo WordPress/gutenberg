@@ -748,8 +748,8 @@ export class RichText extends Component {
 					disableEditingMenu={ this.props.disableEditingMenu }
 					isMultiline={ this.isMultiline }
 					textAlign={ this.props.textAlign }
+					{ ...( this.isIOS ? { maxWidth } : {} ) }
 					minWidth={ minWidth }
-					maxWidth={ maxWidth }
 				/>
 				{ isSelected && <FormatEdit value={ record } onChange={ this.onFormatChange } /> }
 			</View>
