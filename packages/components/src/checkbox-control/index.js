@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { withInstanceId } from '@wordpress/compose';
+import { useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -9,7 +9,8 @@ import { withInstanceId } from '@wordpress/compose';
 import BaseControl from '../base-control';
 import Dashicon from '../dashicon';
 
-function CheckboxControl( { label, className, heading, checked, help, instanceId, onChange, ...props } ) {
+export default function CheckboxControl( { label, className, heading, checked, help, onChange, ...props } ) {
+	const instanceId = useInstanceId();
 	const id = `inspector-checkbox-control-${ instanceId }`;
 	const onChangeValue = ( event ) => onChange( event.target.checked );
 
@@ -34,5 +35,3 @@ function CheckboxControl( { label, className, heading, checked, help, instanceId
 		</BaseControl>
 	);
 }
-
-export default withInstanceId( CheckboxControl );

@@ -119,6 +119,10 @@ _Returns_
 
 -   `WPComponent`: Component class with generated display name assigned.
 
+<a name="useInstanceId" href="#useInstanceId">#</a> **useInstanceId**
+
+Provide a unique instance ID.
+
 <a name="useMediaQuery" href="#useMediaQuery">#</a> **useMediaQuery**
 
 Runs a media query and returns its value when it changes.
