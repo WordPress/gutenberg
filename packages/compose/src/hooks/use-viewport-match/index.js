@@ -42,9 +42,14 @@ const CONDITIONS = {
 	'<': 'max-width',
 };
 
+/**
+ * Object mapping media query operators to a function that given a breakpointValue and a width evaluates if the operator matches the values.
+ *
+ * @type {Object<WPViewportOperator,Function>}
+ */
 const OPERATOR_EVALUATORS = {
-	'<': ( breakpointValue, width ) => ( width < breakpointValue ),
 	'>=': ( breakpointValue, width ) => ( width >= breakpointValue ),
+	'<': ( breakpointValue, width ) => ( width < breakpointValue ),
 };
 
 const ViewportMatchWidthContext = createContext( null );
