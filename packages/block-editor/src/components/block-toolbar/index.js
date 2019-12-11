@@ -32,7 +32,7 @@ export default function BlockToolbar() {
 				getBlockMode( selectedBlockClientIds[ 0 ] ) :
 				null,
 		};
-	} );
+	}, [] );
 
 	if ( blockClientIds.length === 0 ) {
 		return null;

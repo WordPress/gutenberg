@@ -49,7 +49,7 @@ const MediaReplaceFlow = (
 	const [ showMediaReplaceOptions, setShowMediaReplaceOptions ] = useState( false );
 	const mediaUpload = useSelect( ( select ) => {
 		return select( 'core/block-editor' ).getSettings().mediaUpload;
-	} );
+	}, [] );
 	const editMediaButtonRef = createRef();
 
 	const stopPropagation = ( event ) => {

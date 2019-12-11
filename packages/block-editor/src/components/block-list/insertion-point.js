@@ -29,7 +29,7 @@ export default function BlockInsertionPoint( { rootClientId, clientId } ) {
 			insertionPoint.index === blockIndex &&
 			insertionPoint.rootClientId === rootClientId
 		);
-	} );
+	}, [ clientId, rootClientId ] );
 
 	function onFocus( event ) {
 		// Stop propagation of the focus event to avoid selecting the current

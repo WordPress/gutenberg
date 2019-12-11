@@ -38,7 +38,7 @@ const PARAGRAPH_DROP_CAP_SELECTOR = 'p.has-drop-cap';
 function ParagraphRTLToolbar( { direction, setDirection } ) {
 	const isRTL = useSelect( ( select ) => {
 		return !! select( 'core/block-editor' ).getSettings().isRTL;
-	} );
+	}, [] );
 
 	return ( isRTL && (
 		<ToolbarGroup
