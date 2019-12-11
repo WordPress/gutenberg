@@ -96,3 +96,26 @@ You can launch Storybook by running `npm run storybook:dev` locally. It will ope
 You can also test Storybook for the current `master` branch on GitHub Pages: [https://wordpress.github.io/gutenberg/](https://wordpress.github.io/gutenberg/)
 
 [Storybook]: https://storybook.js.org/
+
+## Developer Tools
+
+It is recommended to configure your editor to automatically check for syntax, and lint errors. This will help you save time as you develop to fix minor formating styles. Here are some directions for setting up Visual Studio Code, a popular editor used by many of the core developers.
+
+[EditorConfig](https://editorconfig.org/) defines a standard configuration for setting up your editor, for example uses tabs instead of spaces. You should install the **EditorConfig for VS Code** extension and it will automatically configure your editor to match the rules defined in [.editorconfig](https://github.com/WordPress/gutenberg/blob/master/.editorconfig).
+
+[Prettier](https://prettier.io/) is a tool that allows you to define an opinionated format, and automate fixing the code to match that format. Work is underway to use Prettier within Gutenberg, see [PR #18048](https://github.com/WordPress/gutenberg/pull/18048).
+
+To use Prettier, you should install the **Prettier - Code formatter** extension in Visual Studio Code. You can then configure it to be the default formatter and to automatically fix issues on save, by adding the following to your settings.
+
+```json
+"[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+},
+```
+
+This will use the `.prettierrc` file. To test it out prior to PR #18048 being merged, you should:
+
+1. git switch add/prettier
+2. npm install
+3. Edit a JavaScript file and on save it will format it as defined
