@@ -16,7 +16,7 @@
 	overflow: hidden;
 	border-radius: 3px;
 
-	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):not(.is-primary):not(.is-tertiary):hover {
+	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):not(.is-primary):not(.is-tertiary):not(.is-link):hover {
 		@include button-style__hover;
 	}
 
