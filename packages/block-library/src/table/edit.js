@@ -109,6 +109,7 @@ export class TableEdit extends Component {
 		this.onToggleFooterSection = this.onToggleFooterSection.bind( this );
 		this.onChangeColumnAlignment = this.onChangeColumnAlignment.bind( this );
 		this.getCellAlignment = this.getCellAlignment.bind( this );
+		this.toggleSectionByName = this.toggleSectionByName.bind( this );
 
 		this.state = {
 			initialRowCount: 2,
@@ -232,19 +233,51 @@ export class TableEdit extends Component {
 	}
 
 	/**
+  * Get the data needed to toggle a section
+  *
+  * @param {string} sectionName the section name to hide.
+  * @return {Object} The new table state
+  */
+	toggleSectionByName( sectionName ) {
+		const { attributes } = this.props;
+		const section = attributes[ sectionName ];
+		const sectionSavedName = `${ sectionName }Saved`;
+		const sectionSaved = this.state[ sectionSavedName ];
+
+		if ( ! isEmptyTableSection( section ) ) {
+			// If the section has some data, save it to the state.
+			this.setState( {
+				[ sectionSavedName ]: [ ...section ],
+			} );
+
+			return toggleSection( attributes, sectionName );
+		} else if ( sectionSaved && sectionSaved.length ) {
+			// If there is a saved version of the section, use it instead of an empty row.
+			this.setState( ( state ) => {
+				delete state[ sectionSavedName ];
+				return state;
+			} );
+
+			return { [ sectionName ]: [ ...sectionSaved ] };
+		}
+		// If the head section never existed, or was deleted, insert an empty row.
+		return toggleSection( attributes, sectionName );
+	}
+
+	/**
 	 * Add or remove a `head` table section.
 	 */
 	onToggleHeaderSection() {
-		const { attributes, setAttributes } = this.props;
-		setAttributes( toggleSection( attributes, 'head' ) );
+		const { setAttributes } = this.props;
+		setAttributes( this.toggleSectionByName( 'head' ) );
 	}
 
 	/**
 	 * Add or remove a `foot` table section.
 	 */
 	onToggleFooterSection() {
-		const { attributes, setAttributes } = this.props;
-		setAttributes( toggleSection( attributes, 'foot' ) );
+		const { setAttributes } = this.props;
+		setAttributes( this.toggleSectionByName( 'foot' ) );
 	}
 
 	/**

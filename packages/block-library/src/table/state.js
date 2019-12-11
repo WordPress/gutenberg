@@ -276,25 +276,15 @@ export function deleteColumn( state, {
  * @return {Object} New table state.
  */
 export function toggleSection( state, sectionName ) {
-	const sectionSaved = `${ sectionName }Saved`;
-
-	// Section exists, save it and replace it with an empty row to remove it.
+	// Section exists, replace it with an empty row to remove it.
 	if ( ! isEmptyTableSection( state[ sectionName ] ) ) {
-		return { [ sectionName ]: [], [ sectionSaved ]: [ ...state[ sectionName ] ] };
-	}
-
-	// Check if we already have this section
-	if ( state[ sectionSaved ] ) {
-		return {
-			[ sectionName ]: [ ...state[ sectionSaved ] ],
-		};
+		return { [ sectionName ]: [] };
 	}
 
 	// Get the length of the first row of the body to use when creating the header.
 	const columnCount = get( state, [ 'body', 0, 'cells', 'length' ], 1 );
 	// Section doesn't exist, insert an empty row to create the section.
-	const row = insertRow( state, { sectionName, rowIndex: 0, columnCount } );
-	return row;
+	return insertRow( state, { sectionName, rowIndex: 0, columnCount } );
 }
 
 /**
