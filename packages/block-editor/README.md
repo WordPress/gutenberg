@@ -17,8 +17,11 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 ```js
 import {
 	BlockEditorProvider,
-	BlockList
+	BlockList,
+	WritingFlow,
+	ObserveTyping
 } from '@wordpress/block-editor';
+import { Popover } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 
 function MyEditorComponent () {
@@ -320,6 +323,10 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/media-placeholder/README.md>
 
+<a name="MediaReplaceFlow" href="#MediaReplaceFlow">#</a> **MediaReplaceFlow**
+
+Undocumented declaration.
+
 <a name="MediaUpload" href="#MediaUpload">#</a> **MediaUpload**
 
 _Related_
@@ -338,7 +345,8 @@ Undocumented declaration.
 
 <a name="MultiSelectScrollIntoView" href="#MultiSelectScrollIntoView">#</a> **MultiSelectScrollIntoView**
 
-Undocumented declaration.
+Scrolls the multi block selection end into view if not in view already. This
+is important to do after selection by keyboard.
 
 <a name="NavigableToolbar" href="#NavigableToolbar">#</a> **NavigableToolbar**
 

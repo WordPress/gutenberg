@@ -13,7 +13,7 @@
 		border-bottom-color: $dark-gray-900;
 	}
 
-	&:not(.is-mobile) .components-popover__content {
+	.components-popover__content {
 		min-width: 0;
 	}
 }

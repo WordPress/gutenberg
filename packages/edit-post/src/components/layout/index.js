@@ -25,7 +25,7 @@ import {
 	Popover,
 	FocusReturnProvider,
 } from '@wordpress/components';
-import { withViewportMatch } from '@wordpress/viewport';
+import { useViewportMatch } from '@wordpress/compose';
 import { PluginArea } from '@wordpress/plugins';
 import { __ } from '@wordpress/i18n';
 
@@ -49,7 +49,8 @@ import PluginPostPublishPanel from '../sidebar/plugin-post-publish-panel';
 import PluginPrePublishPanel from '../sidebar/plugin-pre-publish-panel';
 import WelcomeGuide from '../welcome-guide';
 
-function Layout( { isMobileViewport } ) {
+function Layout() {
+	const isMobileViewport = useViewportMatch( 'small', '<' );
 	const { closePublishSidebar, togglePublishSidebar } = useDispatch( 'core/edit-post' );
 	const {
 		mode,
@@ -71,7 +72,7 @@ function Layout( { isMobileViewport } ) {
 			hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
 			isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
 		} );
-	} );
+	}, [] );
 	const showPageTemplatePicker = __experimentalUsePageTemplatePickerVisible();
 	const sidebarIsOpened = editorSidebarOpened || pluginSidebarOpened || publishSidebarOpened;
 	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
@@ -88,7 +89,7 @@ function Layout( { isMobileViewport } ) {
 			<AutosaveMonitor />
 			<LocalAutosaveMonitor />
 			<EditorModeKeyboardShortcuts />
-			<FocusReturnProvider className={ className }>
+			<FocusReturnProvider>
 				<EditorRegions
 					className={ className }
 					header={ <Header /> }
@@ -149,4 +150,4 @@ function Layout( { isMobileViewport } ) {
 	);
 }
 
-export default withViewportMatch( { isMobileViewport: '< small' } )( Layout );
+export default Layout;

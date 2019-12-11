@@ -39,9 +39,7 @@ function ToolbarButton( {
 							onClick( event );
 						}
 					} }
-					className={ classnames( 'components-toolbar__control', className, {
-						'is-active': isActive,
-					} ) }
+					className={ classnames( 'components-toolbar__control', className ) }
 					aria-pressed={ isActive }
 					disabled={ isDisabled }
 					{ ...extraProps }

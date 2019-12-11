@@ -3,7 +3,6 @@
  */
 import {
 	createBlock,
-	getPhrasingContentSchema,
 	getBlockAttributes,
 } from '@wordpress/blocks';
 
@@ -26,14 +25,14 @@ const transforms = {
 		{
 			type: 'raw',
 			selector: 'h1,h2,h3,h4,h5,h6',
-			schema: {
-				h1: { children: getPhrasingContentSchema() },
-				h2: { children: getPhrasingContentSchema() },
-				h3: { children: getPhrasingContentSchema() },
-				h4: { children: getPhrasingContentSchema() },
-				h5: { children: getPhrasingContentSchema() },
-				h6: { children: getPhrasingContentSchema() },
-			},
+			schema: ( { phrasingContentSchema } ) => ( {
+				h1: { children: phrasingContentSchema },
+				h2: { children: phrasingContentSchema },
+				h3: { children: phrasingContentSchema },
+				h4: { children: phrasingContentSchema },
+				h5: { children: phrasingContentSchema },
+				h6: { children: phrasingContentSchema },
+			} ),
 			transform( node ) {
 				return createBlock( 'core/heading', {
 					...getBlockAttributes(

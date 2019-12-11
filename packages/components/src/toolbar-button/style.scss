@@ -31,16 +31,16 @@
 		bottom: 10px;
 	}
 
-	&:not(:disabled).is-active[data-subscript]::after {
+	&:not(:disabled).is-pressed[data-subscript]::after {
 		color: $white;
 	}
 
-	&.is-active {
+	&.is-pressed {
 		padding: 3px;
 		outline: none;
 	}
 
-	&.is-active > svg {
+	&.is-pressed > svg {
 		padding: 5px;
 		border-radius: $radius-round-rectangle;
 		height: 30px;
@@ -49,4 +49,3 @@
 		@include formatting-button-style__active;
 	}
 }
-

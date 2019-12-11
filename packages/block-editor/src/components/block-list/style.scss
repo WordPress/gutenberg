@@ -293,23 +293,10 @@
 	}
 
 	// Reusable blocks.
-	&.is-reusable > .block-editor-block-list__block-edit::before {
-		border: $border-width dashed $dark-opacity-light-500;
-
-		.is-dark-theme & {
-			border-color: $light-opacity-light-600;
-		}
-	}
-
 	&.is-reusable.is-selected > .block-editor-block-list__block-edit::before {
-		// Use opacity to work in various editor styles.
-		border-color: $dark-opacity-light-800;
 		border-left-color: transparent;
-
-		.is-dark-theme & {
-			border-color: $light-opacity-light-800;
-			border-left-color: transparent;
-		}
+		border-style: dashed;
+		border-width: $border-width;
 	}
 
 	// Reusable Blocks clickthrough overlays.

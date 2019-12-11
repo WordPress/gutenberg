@@ -12,7 +12,7 @@ import { __experimentalCreateInterpolateElement } from '@wordpress/element';
 import { CanvasImage, EditorImage, BlockLibraryImage, InserterIconImage } from './images';
 
 export default function WelcomeGuide() {
-	const areTipsEnabled = useSelect( ( select ) => select( 'core/nux' ).areTipsEnabled() );
+	const areTipsEnabled = useSelect( ( select ) => select( 'core/nux' ).areTipsEnabled(), [] );
 
 	const { disableTips } = useDispatch( 'core/nux' );
 

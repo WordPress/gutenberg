@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { Platform, AccessibilityInfo, findNodeHandle, TextInput, Slider, View, PixelRatio, AppState } from 'react-native';
+import { Platform, AccessibilityInfo, findNodeHandle, TextInput, View, PixelRatio, AppState } from 'react-native';
+import Slider from '@react-native-community/slider';
 
 /**
  * WordPress dependencies

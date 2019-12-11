@@ -22,6 +22,7 @@
 	border-radius: 36px; // This makes it pill-shaped instead of oval, in cases where the image fed is not perfectly sized.
 	margin-right: 8px;
 	transition: transform 0.1s ease;
+	@include reduce-motion("transition");
 
 	a {
 		padding: 6px;

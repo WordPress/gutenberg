@@ -197,6 +197,7 @@ _Parameters_
 
 -   _state_ `Object`: Editor state.
 -   _clientId_ `string`: Block from which to find root client ID.
+-   _ascending_ `boolean`: Order results from bottom to top (true) or top to bottom (false).
 
 _Returns_
 
@@ -389,6 +390,19 @@ _Parameters_
 _Returns_
 
 -   `?string`: Last block client ID in the multi-selection set.
+
+<a name="getLowestCommonAncestorWithSelectedBlock" href="#getLowestCommonAncestorWithSelectedBlock">#</a> **getLowestCommonAncestorWithSelectedBlock**
+
+Given a block client ID, returns the lowest common ancestor with selected client ID.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+-   _clientId_ `string`: Block from which to find common ancestor client ID.
+
+_Returns_
+
+-   `string`: Common ancestor client ID or undefined
 
 <a name="getMultiSelectedBlockClientIds" href="#getMultiSelectedBlockClientIds">#</a> **getMultiSelectedBlockClientIds**
 
@@ -755,6 +769,18 @@ _Parameters_
 _Returns_
 
 -   `boolean`: Whether the caret is within formatted text.
+
+<a name="isDraggingBlocks" href="#isDraggingBlocks">#</a> **isDraggingBlocks**
+
+Returns true if the user is dragging blocks, or false otherwise.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `boolean`: Whether user is dragging blocks.
 
 <a name="isFirstMultiSelectedBlock" href="#isFirstMultiSelectedBlock">#</a> **isFirstMultiSelectedBlock**
 
@@ -1173,6 +1199,14 @@ _Returns_
 
 -   `Object`: Action object.
 
+<a name="startDraggingBlocks" href="#startDraggingBlocks">#</a> **startDraggingBlocks**
+
+Returns an action object used in signalling that the user has begun to drag blocks.
+
+_Returns_
+
+-   `Object`: Action object.
+
 <a name="startMultiSelect" href="#startMultiSelect">#</a> **startMultiSelect**
 
 Returns an action object used in signalling that a block multi-selection has started.
@@ -1184,6 +1218,14 @@ _Returns_
 <a name="startTyping" href="#startTyping">#</a> **startTyping**
 
 Returns an action object used in signalling that the user has begun to type.
+
+_Returns_
+
+-   `Object`: Action object.
+
+<a name="stopDraggingBlocks" href="#stopDraggingBlocks">#</a> **stopDraggingBlocks**
+
+Returns an action object used in signalling that the user has stopped dragging blocks.
 
 _Returns_
 

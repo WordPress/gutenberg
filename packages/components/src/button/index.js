@@ -16,7 +16,7 @@ export function Button( props, ref ) {
 		isLarge,
 		isSmall,
 		isTertiary,
-		isToggled,
+		isPressed,
 		isBusy,
 		isDefault,
 		isLink,
@@ -33,14 +33,16 @@ export function Button( props, ref ) {
 		'is-large': isLarge,
 		'is-small': isSmall,
 		'is-tertiary': isTertiary,
-		'is-toggled': isToggled,
+		'is-pressed': isPressed,
 		'is-busy': isBusy,
 		'is-link': isLink,
 		'is-destructive': isDestructive,
 	} );
 
 	const tag = href !== undefined && ! disabled ? 'a' : 'button';
-	const tagProps = tag === 'a' ? { href, target } : { type: 'button', disabled };
+	const tagProps = tag === 'a' ?
+		{ href, target } :
+		{ type: 'button', disabled, 'aria-pressed': isPressed };
 
 	return createElement( tag, {
 		...tagProps,
