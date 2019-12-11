@@ -1,5 +1,11 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`RichText should apply active formatting for inline paste 1`] = `
+"<!-- wp:paragraph -->
+<p><strong>132</strong>3</p>
+<!-- /wp:paragraph -->"
+`;
+
 exports[`RichText should apply formatting when selection is collapsed 1`] = `
 "<!-- wp:paragraph -->
 <p>Some <strong>bold</strong>.</p>
