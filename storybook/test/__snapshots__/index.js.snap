@@ -674,7 +674,7 @@ exports[`Storyshots Components|CheckboxControl All 1`] = `
   >
     <label
       className="components-base-control__label"
-      htmlFor="inspector-checkbox-control-1"
+      htmlFor="inspector-checkbox-control-0"
     >
       User
     </label>
@@ -682,10 +682,10 @@ exports[`Storyshots Components|CheckboxControl All 1`] = `
       className="components-checkbox-control__input-container"
     >
       <input
-        aria-describedby="inspector-checkbox-control-1__help"
+        aria-describedby="inspector-checkbox-control-0__help"
         checked={true}
         className="components-checkbox-control__input"
-        id="inspector-checkbox-control-1"
+        id="inspector-checkbox-control-0"
         onChange={[Function]}
         type="checkbox"
         value="1"
@@ -707,14 +707,14 @@ exports[`Storyshots Components|CheckboxControl All 1`] = `
     </span>
     <label
       className="components-checkbox-control__label"
-      htmlFor="inspector-checkbox-control-1"
+      htmlFor="inspector-checkbox-control-0"
     >
       Is author
     </label>
   </div>
   <p
     className="components-base-control__help"
-    id="inspector-checkbox-control-1__help"
+    id="inspector-checkbox-control-0__help"
   >
     Is the user an author or not?
   </p>
@@ -1137,13 +1137,13 @@ exports[`Storyshots Components|ColorPicker Alpha Enabled 1`] = `
           >
             <label
               className="components-base-control__label"
-              htmlFor="inspector-text-control-1"
+              htmlFor="inspector-text-control-0"
             >
               Color value in hexadecimal
             </label>
             <input
               className="components-text-control__input"
-              id="inspector-text-control-1"
+              id="inspector-text-control-0"
               onBlur={[Function]}
               onChange={[Function]}
               onKeyDown={[Function]}
@@ -2687,7 +2687,7 @@ exports[`Storyshots Components|RadioControl With Help 1`] = `
   >
     <label
       className="components-base-control__label"
-      htmlFor="inspector-radio-control-1"
+      htmlFor="inspector-radio-control-0"
     >
       Post visibility
     </label>
@@ -2695,17 +2695,17 @@ exports[`Storyshots Components|RadioControl With Help 1`] = `
       className="components-radio-control__option"
     >
       <input
-        aria-describedby="inspector-radio-control-1__help"
+        aria-describedby="inspector-radio-control-0__help"
         checked={true}
         className="components-radio-control__input"
-        id="inspector-radio-control-1-0"
-        name="inspector-radio-control-1"
+        id="inspector-radio-control-0-0"
+        name="inspector-radio-control-0"
         onChange={[Function]}
         type="radio"
         value="public"
       />
       <label
-        htmlFor="inspector-radio-control-1-0"
+        htmlFor="inspector-radio-control-0-0"
       >
         Public
       </label>
@@ -2714,17 +2714,17 @@ exports[`Storyshots Components|RadioControl With Help 1`] = `
       className="components-radio-control__option"
     >
       <input
-        aria-describedby="inspector-radio-control-1__help"
+        aria-describedby="inspector-radio-control-0__help"
         checked={false}
         className="components-radio-control__input"
-        id="inspector-radio-control-1-1"
-        name="inspector-radio-control-1"
+        id="inspector-radio-control-0-1"
+        name="inspector-radio-control-0"
         onChange={[Function]}
         type="radio"
         value="private"
       />
       <label
-        htmlFor="inspector-radio-control-1-1"
+        htmlFor="inspector-radio-control-0-1"
       >
         Private
       </label>
@@ -2733,17 +2733,17 @@ exports[`Storyshots Components|RadioControl With Help 1`] = `
       className="components-radio-control__option"
     >
       <input
-        aria-describedby="inspector-radio-control-1__help"
+        aria-describedby="inspector-radio-control-0__help"
         checked={false}
         className="components-radio-control__input"
-        id="inspector-radio-control-1-2"
-        name="inspector-radio-control-1"
+        id="inspector-radio-control-0-2"
+        name="inspector-radio-control-0"
         onChange={[Function]}
         type="radio"
         value="password"
       />
       <label
-        htmlFor="inspector-radio-control-1-2"
+        htmlFor="inspector-radio-control-0-2"
       >
         Password Protected
       </label>
@@ -2751,7 +2751,7 @@ exports[`Storyshots Components|RadioControl With Help 1`] = `
   </div>
   <p
     className="components-base-control__help"
-    id="inspector-radio-control-1__help"
+    id="inspector-radio-control-0__help"
   >
     The visibility level for the current post
   </p>

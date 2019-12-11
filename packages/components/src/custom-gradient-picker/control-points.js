@@ -9,7 +9,7 @@ import classnames from 'classnames';
  */
 import { Component, useEffect, useRef } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { withInstanceId } from '@wordpress/compose';
+import { useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -68,57 +68,55 @@ class ControlPointKeyboardMove extends Component {
 	}
 }
 
-const ControlPointButton = withInstanceId(
-	function( {
-		instanceId,
-		isOpen,
-		position,
-		color,
-		onChange,
-		gradientIndex,
-		gradientAST,
-		...additionalProps
-	} ) {
-		const descriptionId = `components-custom-gradient-picker__control-point-button-description-${ instanceId }`;
-		return (
-			<ControlPointKeyboardMove
-				onChange={ onChange }
-				gradientIndex={ gradientIndex }
-				gradientAST={ gradientAST }
-			>
-				<Button
-					aria-label={
-						sprintf(
-							// translators: %1$s: gradient position e.g: 70%, %2$s: gradient color code e.g: rgb(52,121,151).
-							__( 'Gradient control point at position %1$s with color code %2$s.' ),
-							position,
-							color
-						)
-					}
-					aria-describedby={ descriptionId }
-					aria-expanded={ isOpen }
-					className={
-						classnames(
-							'components-custom-gradient-picker__control-point-button',
-							{ 'is-active': isOpen }
-						)
-					}
-					style={ {
-						left: position,
-					} }
-					{ ...additionalProps }
-				/>
-				<div
-					className="screen-reader-text"
-					id={ descriptionId }>
-					{ __(
-						'Use your left or right arrow keys or drag and drop with the mouse to change the gradient position. Press the button to change the color or remove the control point.'
-					) }
-				</div>
-			</ControlPointKeyboardMove>
-		);
-	}
-);
+function ControlPointButton( {
+	isOpen,
+	position,
+	color,
+	onChange,
+	gradientIndex,
+	gradientAST,
+	...additionalProps
+} ) {
+	const instanceId = useInstanceId();
+	const descriptionId = `components-custom-gradient-picker__control-point-button-description-${ instanceId }`;
+	return (
+		<ControlPointKeyboardMove
+			onChange={ onChange }
+			gradientIndex={ gradientIndex }
+			gradientAST={ gradientAST }
+		>
+			<Button
+				aria-label={
+					sprintf(
+						// translators: %1$s: gradient position e.g: 70%, %2$s: gradient color code e.g: rgb(52,121,151).
+						__( 'Gradient control point at position %1$s with color code %2$s.' ),
+						position,
+						color
+					)
+				}
+				aria-describedby={ descriptionId }
+				aria-expanded={ isOpen }
+				className={
+					classnames(
+						'components-custom-gradient-picker__control-point-button',
+						{ 'is-active': isOpen }
+					)
+				}
+				style={ {
+					left: position,
+				} }
+				{ ...additionalProps }
+			/>
+			<div
+				className="screen-reader-text"
+				id={ descriptionId }>
+				{ __(
+					'Use your left or right arrow keys or drag and drop with the mouse to change the gradient position. Press the button to change the color or remove the control point.'
+				) }
+			</div>
+		</ControlPointKeyboardMove>
+	);
+}
 
 export default function ControlPoints( {
 	gradientPickerDomRef,

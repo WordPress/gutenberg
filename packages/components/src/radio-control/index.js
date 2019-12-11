@@ -7,14 +7,15 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { withInstanceId } from '@wordpress/compose';
+import { useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import BaseControl from '../base-control';
 
-function RadioControl( { label, className, selected, help, instanceId, onChange, options = [] } ) {
+export default function RadioControl( { label, className, selected, help, onChange, options = [] } ) {
+	const instanceId = useInstanceId();
 	const id = `inspector-radio-control-${ instanceId }`;
 	const onChangeValue = ( event ) => onChange( event.target.value );
 
@@ -43,5 +44,3 @@ function RadioControl( { label, className, selected, help, instanceId, onChange,
 		</BaseControl>
 	);
 }
-
-export default withInstanceId( RadioControl );

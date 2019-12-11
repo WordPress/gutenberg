@@ -7,7 +7,7 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { withInstanceId } from '@wordpress/compose';
+import { useInstanceId } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -16,7 +16,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import IconButton from '../icon-button';
 import VisuallyHidden from '../visually-hidden';
 
-function Token( {
+export default function Token( {
 	value,
 	status,
 	title,
@@ -29,8 +29,8 @@ function Token( {
 	messages,
 	termPosition,
 	termsCount,
-	instanceId,
 } ) {
+	const instanceId = useInstanceId();
 	const tokenClasses = classnames( 'components-form-token-field__token', {
 		'is-error': 'error' === status,
 		'is-success': 'success' === status,
@@ -75,5 +75,3 @@ function Token( {
 		</span>
 	);
 }
-
-export default withInstanceId( Token );

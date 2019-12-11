@@ -6,16 +6,15 @@ import { isEmpty } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { withInstanceId } from '@wordpress/compose';
+import { useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import BaseControl from '../base-control';
 
-function SelectControl( {
+export default function SelectControl( {
 	help,
-	instanceId,
 	label,
 	multiple = false,
 	onChange,
@@ -24,6 +23,7 @@ function SelectControl( {
 	hideLabelFromVision,
 	...props
 } ) {
+	const instanceId = useInstanceId();
 	const id = `inspector-select-control-${ instanceId }`;
 	const onChangeValue = ( event ) => {
 		if ( multiple ) {
@@ -62,5 +62,3 @@ function SelectControl( {
 	);
 	/* eslint-enable jsx-a11y/no-onchange */
 }
-
-export default withInstanceId( SelectControl );
