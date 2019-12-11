@@ -4,39 +4,33 @@
 import { useMemo, useEffect } from '@wordpress/element';
 
 /**
- * Array to keep track of allocated ids.
+ * Next id to use, if there are no free ids.
  */
-const allocatedIds = [];
+let nextId = 0;
 
 /**
- * Find an unallocated id.
+ * Array to keep track of free ids.
+ */
+const freedIds = [];
+
+/**
+ * Find a free id.
  */
 function findId() {
-	let id = allocatedIds.length;
-	let index = 0;
-
-	while ( index < id ) {
-		if ( ! allocatedIds[ index ] ) {
-			id = index;
-			break;
-		}
-
-		index++;
+	if ( freedIds.length ) {
+		return freedIds.pop();
 	}
 
-	// Allocated the id.
-	allocatedIds[ id ] = true;
-
-	return id;
+	return nextId++;
 }
 
 /**
- * Free an allocated id.
+ * Free an id.
  *
  * @param {number} id Id to free.
  */
 function freeId( id ) {
-	delete allocatedIds[ id ];
+	freedIds.push( id );
 }
 
 /**
