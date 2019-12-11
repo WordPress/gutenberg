@@ -4,11 +4,17 @@
 import { omit, without } from 'lodash';
 
 /**
+ * All phrasing content elements.
+ *
+ * @see https://www.w3.org/TR/2011/WD-html5-20110525/content-models.html#phrasing-content-0
+ */
+
+/**
  * All text-level semantic elements.
  *
  * @see https://html.spec.whatwg.org/multipage/text-level-semantics.html
  */
-const phrasingContentSchema = {
+const textContentSchema = {
 	strong: {},
 	em: {},
 	s: {},
@@ -46,9 +52,34 @@ const phrasingContentSchema = {
 // Recursion is needed.
 // Possible: strong > em > strong.
 // Impossible: strong > strong.
-without( Object.keys( phrasingContentSchema ), '#text', 'br' ).forEach( ( tag ) => {
-	phrasingContentSchema[ tag ].children = omit( phrasingContentSchema, tag );
+without( Object.keys( textContentSchema ), '#text', 'br' ).forEach( ( tag ) => {
+	textContentSchema[ tag ].children = omit( textContentSchema, tag );
 } );
+
+/**
+ * Embedded content elements.
+ *
+ * @see https://www.w3.org/TR/2011/WD-html5-20110525/content-models.html#embedded-content-0
+ */
+const embeddedContentSchema = {
+	audio: { attributes: [ 'src', 'preload', 'autoplay', 'mediagroup', 'loop', 'muted' ] },
+	canvas: { attributes: [ 'width', 'height' ] },
+	embed: { attributes: [ 'src', 'type', 'width', 'height' ] },
+	iframe: { attributes: [ 'src', 'srcdoc', 'name', 'sandbox', 'seamless', 'width', 'height' ] },
+	img: { attributes: [ 'alt', 'src', 'srcset', 'usemap', 'ismap', 'width', 'height' ] },
+	object: { attributes: [ 'data', 'type', 'name', 'usemap', 'form', 'width', 'height' ] },
+	video: { attributes: [ 'src', 'poster', 'preload', 'autoplay', 'mediagroup', 'loop', 'muted', 'controls', 'width', 'height' ] },
+};
+
+/**
+ * Phrasing content elements.
+ *
+ * @see https://www.w3.org/TR/2011/WD-html5-20110525/content-models.html#phrasing-content-0
+ */
+const phrasingContentSchema = {
+	...textContentSchema,
+	...embeddedContentSchema,
+};
 
 /**
  * Get schema of possible paths for phrasing content.
@@ -94,4 +125,9 @@ export function getPhrasingContentSchema( context ) {
 export function isPhrasingContent( node ) {
 	const tag = node.nodeName.toLowerCase();
 	return getPhrasingContentSchema().hasOwnProperty( tag ) || tag === 'span';
+}
+
+export function isTextContent( node ) {
+	const tag = node.nodeName.toLowerCase();
+	return textContentSchema.hasOwnProperty( tag ) || tag === 'span';
 }
