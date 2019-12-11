@@ -128,7 +128,7 @@
 	&.is-selected {
 		> .block-editor-block-list__block-edit::before {
 			// Use opacity to work in various editor styles.
-			border-color: $dark-opacity-light-800;
+			border-color: $border-default-color;
 
 			.is-dark-theme & {
 				border-color: $light-opacity-light-800;
@@ -165,7 +165,7 @@
 	.block-editor-block-list__block.is-multi-selected {
 
 		> .block-editor-block-list__block-edit::before {
-			border-left-color: $dark-opacity-light-800;
+			border-left-color: $border-default-color;
 
 			.is-dark-theme & {
 				border-left-color: $light-opacity-light-800;
@@ -222,8 +222,7 @@
 
 	&.has-warning.is-selected .block-editor-block-list__block-edit::before {
 		// Use opacity to work in various editor styles.
-		border-color: $dark-opacity-light-800;
-		border-left-color: transparent;
+		border-color: $border-default-color;
 
 		.is-dark-theme & {
 			border-color: $light-opacity-light-800;
@@ -266,7 +265,6 @@
 
 	// Reusable blocks.
 	&.is-reusable.is-selected > .block-editor-block-list__block-edit::before {
-		border-left-color: transparent;
 		border-style: dashed;
 		border-width: $border-width;
 	}
@@ -313,7 +311,7 @@
 		// Position toolbar better on mobile.
 		.block-editor-block-contextual-toolbar {
 			width: auto;
-			border-bottom: $border-width solid $light-gray-800;
+			border-bottom: $border-width solid $border-default-color;
 			bottom: auto;
 
 			@include break-small() {
@@ -764,7 +762,7 @@
 		right: -$block-padding;
 
 		// Paint the borders on the toolbar itself on mobile.
-		border-top: $border-width solid $light-gray-800;
+		border-top: $border-width solid $border-default-color;
 		.components-toolbar {
 			border-top: none;
 			border-bottom: none;
@@ -773,8 +771,8 @@
 		@include break-small() {
 			border-top: none;
 			.components-toolbar {
-				border-top: $border-width solid $light-gray-800;
-				border-bottom: $border-width solid $light-gray-800;
+				border-top: $border-width solid $border-default-color;
+				border-bottom: $border-width solid $border-default-color;
 			}
 		}
 	}
@@ -873,6 +871,14 @@
 // Position the block toolbar when contextual.
 .block-editor-block-contextual-toolbar .block-editor-block-toolbar {
 	width: 100%;
+
+	// Remove the next four lines once all toolbars (top toolbar) use the dark borders.
+	border-left: $border-width solid $border-default-color;
+	.components-toolbar {
+		border-top: $border-width solid $border-default-color;
+		border-bottom: $border-width solid $border-default-color;
+		border-right: $border-width solid $border-default-color;
+	}
 
 	@include break-small() {
 		width: auto;

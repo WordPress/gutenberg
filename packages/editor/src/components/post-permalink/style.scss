@@ -8,7 +8,7 @@
 	font-size: $default-font-size;
 	height: 40px;
 	white-space: nowrap;
-	border: $border-width solid $light-gray-800;
+	border: $border-width solid $border-default-color;
 	background-clip: padding-box;
 
 	// Include transparent outline for Windows High Contrast mode.

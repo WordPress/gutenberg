@@ -61,7 +61,7 @@
 	&:not(.is-focus-mode) {
 		&.is-selected .editor-post-title__input {
 			// use opacity to work in various editor styles.
-			border-color: $dark-opacity-light-800;
+			border-color: $border-default-color;
 
 			.is-dark-theme & {
 				border-color: $light-opacity-light-800;
