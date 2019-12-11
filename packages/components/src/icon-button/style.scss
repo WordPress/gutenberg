@@ -1,15 +1,4 @@
 .components-icon-button {
-	display: flex;
-	align-items: center;
-	padding: 8px;
-	margin: 0;
-	border: none;
-	background: none;
-	color: $dark-gray-500;
-	position: relative;
-	overflow: hidden;
-	border-radius: $radius-round-rectangle;
-
 	.dashicon {
 		display: inline-block;
 		flex: 0 0 auto;
@@ -22,17 +11,18 @@
 	}
 
 	&.has-text svg {
-		margin-right: 4px;
+		margin-right: 8px;
 	}
 
-	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover {
+	// Ideally, we should remove these styles, but they're kept
+	// Because historically, the icon buttons have different hover styles
+	// than the regular buttons.
+	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):not(.is-primary):not(.is-tertiary):hover {
 		@include button-style__hover;
 	}
-
-	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):active {
+	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):not(.is-primary):not(.is-tertiary):active {
 		@include button-style__active;
 	}
-
 	&[aria-disabled="true"]:focus,
 	&:disabled:focus {
 		box-shadow: none;

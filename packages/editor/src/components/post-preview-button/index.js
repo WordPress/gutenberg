@@ -176,7 +176,7 @@ export class PostPreviewButton extends Component {
 
 		return (
 			<Button
-				isLarge
+				isDefault
 				className="editor-post-preview"
 				href={ href }
 				target={ this.getWindowTarget() }

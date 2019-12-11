@@ -71,6 +71,7 @@
 
 	.components-menu-item__button,
 	.components-menu-item__button.components-icon-button {
+		height: auto;
 		padding-left: 2rem;
 
 		&.has-icon {

@@ -9,19 +9,18 @@
 	background: none;
 	transition: box-shadow 0.1s linear;
 	@include reduce-motion("transition");
-
-	&.is-button {
-		padding: 0 10px;
-		line-height: 2;
-		height: 28px;
-		border-radius: 3px;
-		white-space: nowrap;
-		border-width: $border-width;
-		border-style: solid;
-	}
+	height: 36px;
+	align-items: center;
+	box-sizing: border-box;
+	padding: 0 10px;
+	overflow: hidden;
+	border-radius: 3px;
 
 	// Default button style
 	&.is-default {
+		border-width: $border-width;
+		border-style: solid;
+		white-space: nowrap;
 		color: color(theme(button) shade(6%));
 		border-color: color(theme(button) shade(6%));
 		background: #f3f5f6;
@@ -61,6 +60,9 @@
 	}
 
 	&.is-primary {
+		border-width: $border-width;
+		border-style: solid;
+		white-space: nowrap;
 		background: color(theme(button));
 		border-color: color(theme(button));
 		color: $white;
@@ -95,15 +97,6 @@
 			background: color(theme(button) tint(10%));
 			border-color: color(theme(button) tint(10%));
 			opacity: 1;
-
-			// This specificity is needed to override alternate color schemes in WP-Admin.
-			// This can presumably be removed when https://core.trac.wordpress.org/ticket/34904 lands.
-			&.is-button,
-			&.is-button:hover,
-			&:active:enabled {
-				box-shadow: none;
-				text-shadow: none;
-			}
 
 			&:focus:enabled {
 				box-shadow:
@@ -148,6 +141,7 @@
 		transition-duration: 0.05s;
 		transition-timing-function: ease-in-out;
 		@include reduce-motion("transition");
+		height: auto;
 
 		&:hover,
 		&:active {
@@ -191,27 +185,16 @@
 		opacity: 1;
 	}
 
-	&.is-large {
-		height: 30px;
-		line-height: 28px;
-		padding: 0 12px 2px;
-	}
-
 	&.is-small {
 		height: 24px;
 		line-height: 22px;
-		padding: 0 8px 1px;
+		padding: 0 8px;
 		font-size: 11px;
 	}
 
 	// Buttons that are text-based.
 	&.is-tertiary {
 		color: theme(outlines);
-
-		// Matches default button in hit area. See line 11.
-		padding: 0 10px;
-		line-height: 26px;
-		height: 28px;
 
 		.dashicon {
 			display: inline-block;

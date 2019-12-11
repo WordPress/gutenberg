@@ -88,6 +88,7 @@
 	@include menu-style__neutral;
 	transition: 0.1s background ease-in-out;
 	@include reduce-motion("transition");
+	height: auto;
 
 	&:focus:not(:disabled):not([aria-disabled="true"]) {
 		@include menu-style__focus;
