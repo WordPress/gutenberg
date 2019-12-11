@@ -25,11 +25,9 @@ import MetaBoxes from '../../meta-boxes';
 import PluginDocumentSettingPanel from '../plugin-document-setting-panel';
 
 const PARTIAL_PATHS = [
-	//'block-editor/style.css',
 	'block-library/style.css',
 	'block-library/theme.css',
 	'block-library/editor.css',
-	//'format-library/style.css',
 ];
 function TestSimulateMediaQuery() {
 	const [ simulationWidth, setSimulationWidth ] = useState( 400 );
