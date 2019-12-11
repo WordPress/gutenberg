@@ -21,7 +21,16 @@
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"dependencies": {
-		"@babel/runtime": "^7.4.4"
+		"@babel/runtime": "^7.4.4",
+		"@wordpress/block-editor": "file:../block-editor",
+		"@wordpress/block-library": "file:../block-library",
+		"@wordpress/components": "file:../components",
+		"@wordpress/data": "file:../data",
+		"@wordpress/element": "file:../element",
+		"@wordpress/hooks": "file:../hooks",
+		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/media-utils": "file:../media-utils",
+		"@wordpress/notices": "file:../notices"
 	},
 	"publishConfig": {
 		"access": "public"
