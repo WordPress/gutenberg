@@ -122,7 +122,7 @@ class RichTextWrapper extends Component {
 		}
 	}
 
-	onPaste( { value, onChange, html, plainText, files } ) {
+	onPaste( { value, onChange, html, plainText, files, activeFormats } ) {
 		const {
 			onReplace,
 			onSplit,
@@ -174,6 +174,18 @@ class RichTextWrapper extends Component {
 
 		if ( typeof content === 'string' ) {
 			let valueToInsert = create( { html: content } );
+
+			// If there are active formats, merge them with the pasted formats.
+			if ( activeFormats.length ) {
+				let index = valueToInsert.formats.length;
+
+				while ( index-- ) {
+					valueToInsert.formats[ index ] = [
+						...activeFormats,
+						...( valueToInsert.formats[ index ] || [] ),
+					];
+				}
+			}
 
 			// If the content should be multiline, we should process text
 			// separated by a line break as separate lines.

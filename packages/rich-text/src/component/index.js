@@ -249,6 +249,7 @@ class RichText extends Component {
 			onPaste,
 			__unstableIsSelected: isSelected,
 		} = this.props;
+		const { activeFormats = [] } = this.state;
 
 		if ( ! isSelected ) {
 			event.preventDefault();
@@ -331,6 +332,7 @@ class RichText extends Component {
 				html,
 				plainText,
 				files,
+				activeFormats,
 			} );
 		}
 	}
@@ -421,7 +423,7 @@ class RichText extends Component {
 			inputType = event.inputType;
 		}
 
-		if ( ! inputType ) {
+		if ( ! inputType && event && event.nativeEvent ) {
 			inputType = event.nativeEvent.inputType;
 		}
 
