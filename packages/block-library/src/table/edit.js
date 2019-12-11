@@ -521,7 +521,7 @@ export class TableEdit extends Component {
 							min="1"
 							className="wp-block-table__placeholder-input"
 						/>
-						<Button className="wp-block-table__placeholder-button" isDefault type="submit">{ __( 'Create Table' ) }</Button>
+						<Button className="wp-block-table__placeholder-button" isSecondary type="submit">{ __( 'Create Table' ) }</Button>
 					</form>
 				</Placeholder>
 			);

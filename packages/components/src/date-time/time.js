@@ -301,7 +301,7 @@ class TimePicker extends Component {
 						{ is12Hour && (
 							<div className="components-datetime__time-field components-datetime__time-field-am-pm">
 								<Button
-									isDefault
+									isSecondary
 									className="components-datetime__time-am-button"
 									isPressed={ am === 'AM' }
 									onClick={ this.updateAmPm( 'AM' ) }
@@ -309,7 +309,7 @@ class TimePicker extends Component {
 									{ __( 'AM' ) }
 								</Button>
 								<Button
-									isDefault
+									isSecondary
 									className="components-datetime__time-pm-button"
 									isPressed={ am === 'PM' }
 									onClick={ this.updateAmPm( 'PM' ) }

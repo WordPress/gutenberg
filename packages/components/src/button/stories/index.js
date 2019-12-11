@@ -28,6 +28,22 @@ export const primary = () => {
 	);
 };
 
+export const secondary = () => {
+	const label = text( 'Label', 'Secondary Button' );
+
+	return (
+		<Button isSecondary>{ label }</Button>
+	);
+};
+
+export const tertiary = () => {
+	const label = text( 'Label', 'Tertiary Button' );
+
+	return (
+		<Button isTertiary>{ label }</Button>
+	);
+};
+
 export const small = () => {
 	const label = text( 'Label', 'Small Button' );
 
@@ -79,11 +95,11 @@ export const buttons = () => {
 			<div className="story-buttons-container">
 				<Button isSmall>Button</Button>
 				<Button isPrimary isSmall>Primary Button</Button>
-				<Button isDefault isSmall>Secondary Button</Button>
+				<Button isSecondary isSmall>Secondary Button</Button>
 				<Button isTertiary isSmall>Tertiary Button</Button>
 				<IconButton isSmall icon="ellipsis" />
 				<IconButton isSmall isPrimary icon="ellipsis" />
-				<IconButton isSmall isDefault icon="ellipsis" />
+				<IconButton isSmall isSecondary icon="ellipsis" />
 				<IconButton isSmall isTertiary icon="ellipsis" />
 				<IconButton isSmall isPrimary icon="ellipsis">Icon & Text</IconButton>
 			</div>
@@ -92,11 +108,11 @@ export const buttons = () => {
 			<div className="story-buttons-container">
 				<Button>Button</Button>
 				<Button isPrimary>Primary Button</Button>
-				<Button isDefault>Secondary Button</Button>
+				<Button isSecondary>Secondary Button</Button>
 				<Button isTertiary>Tertiary Button</Button>
 				<IconButton icon="ellipsis" />
 				<IconButton isPrimary icon="ellipsis" />
-				<IconButton isDefault icon="ellipsis" />
+				<IconButton isSecondary icon="ellipsis" />
 				<IconButton isTertiary icon="ellipsis" />
 				<IconButton isPrimary icon="ellipsis">Icon & Text</IconButton>
 			</div>

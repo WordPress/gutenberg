@@ -116,7 +116,7 @@ class PostPermalink extends Component {
 				{ isEditable && ! isEditingPermalink &&
 					<Button
 						className="editor-post-permalink__edit"
-						isDefault
+						isSecondary
 						onClick={ () => this.setState( { isEditingPermalink: true } ) }
 					>
 						{ __( 'Edit' ) }

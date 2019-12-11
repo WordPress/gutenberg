@@ -111,7 +111,7 @@ function FontSizePicker( {
 						setCurrentSelectValue( getSelectValueFromFontSize( fontSizes, undefined ) );
 					} }
 					isSmall
-					isDefault
+					isSecondary
 				>
 					{ __( 'Reset' ) }
 				</Button>

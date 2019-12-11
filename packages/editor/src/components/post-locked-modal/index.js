@@ -200,7 +200,7 @@ class PostLockedModal extends Component {
 						</div>
 
 						<div className="editor-post-locked-modal__buttons">
-							<Button isDefault href={ allPostsUrl }>
+							<Button isSecondary href={ allPostsUrl }>
 								{ allPostsLabel }
 							</Button>
 							<PostPreviewButton />

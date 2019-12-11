@@ -48,7 +48,7 @@ export class BlockInvalidWarning extends Component {
 			<>
 				<Warning
 					actions={ [
-						<Button key="convert" onClick={ this.onCompare } isDefault={ hasHTMLBlock } isPrimary={ ! hasHTMLBlock }>
+						<Button key="convert" onClick={ this.onCompare } isSecondary={ hasHTMLBlock } isPrimary={ ! hasHTMLBlock }>
 							{
 								// translators: Button to fix block content
 								_x( 'Resolve', 'imperative verb' )

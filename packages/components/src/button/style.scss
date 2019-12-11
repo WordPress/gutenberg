@@ -16,12 +16,12 @@
 	overflow: hidden;
 	border-radius: 3px;
 
-	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):not(.is-primary):not(.is-tertiary):not(.is-link):hover {
+	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):not(.is-primary):not(.is-tertiary):not(.is-link):hover {
 		@include button-style__hover;
 	}
 
 	// Default button style
-	&.is-default {
+	&.is-secondary {
 		border-width: $border-width;
 		border-style: solid;
 		white-space: nowrap;
@@ -180,9 +180,9 @@
 	}
 
 	&.is-busy,
-	&.is-default.is-busy,
-	&.is-default.is-busy:disabled,
-	&.is-default.is-busy[aria-disabled="true"] {
+	&.is-secondary.is-busy,
+	&.is-secondary.is-busy:disabled,
+	&.is-secondary.is-busy[aria-disabled="true"] {
 		animation: components-button__busy-animation 2500ms infinite linear;
 		background-size: 100px 100%;
 		background-image: repeating-linear-gradient(-45deg, $light-gray-500, $white 11px, $white 10px, $light-gray-500 20px);

@@ -40,12 +40,12 @@
 		}
 
 		// Plain menu styles.
-		&:focus:not(:disabled):not([aria-disabled="true"]):not(.is-default) {
+		&:focus:not(:disabled):not([aria-disabled="true"]):not(.is-secondary) {
 			@include menu-style__focus();
 		}
 
 		&:hover,
-		&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover {
+		&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):hover {
 			@include menu-style__hover();
 		}
 
@@ -60,7 +60,7 @@
 			margin: -1px $grid-size -1px 0;
 		}
 
-		&:not(:disabled):not([aria-disabled="true"]):not(.is-default).is-active > svg {
+		&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary).is-active > svg {
 			@include formatting-button-style__active();
 		}
 	}

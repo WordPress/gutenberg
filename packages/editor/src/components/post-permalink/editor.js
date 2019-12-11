@@ -73,7 +73,7 @@ class PostPermalinkEditor extends Component {
 				</span>
 				<Button
 					className="editor-post-permalink-editor__save"
-					isDefault
+					isSecondary
 					onClick={ this.onSavePermalink }
 				>
 					{ __( 'Save' ) }

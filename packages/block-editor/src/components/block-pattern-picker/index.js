@@ -39,7 +39,7 @@ function BlockPatternPicker( {
 				{ patterns.map( ( pattern ) => (
 					<li key={ pattern.name }>
 						<IconButton
-							isDefault
+							isSecondary
 							icon={ pattern.icon }
 							size={ 48 }
 							onClick={ () => onSelect( pattern ) }

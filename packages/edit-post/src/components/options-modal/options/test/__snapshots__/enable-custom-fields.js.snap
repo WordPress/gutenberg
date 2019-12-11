@@ -48,7 +48,7 @@ exports[`EnableCustomFieldsOption renders a checked checkbox and a confirmation 
     A page reload is required for this change. Make sure your content is saved before reloading.
   </p>
   <button
-    className="components-button edit-post-options-modal__custom-fields-confirmation-button is-button is-default"
+    className="components-button edit-post-options-modal__custom-fields-confirmation-button is-secondary"
     disabled={false}
     onClick={[Function]}
     type="button"
@@ -137,7 +137,7 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox and a confirmati
     A page reload is required for this change. Make sure your content is saved before reloading.
   </p>
   <button
-    className="components-button edit-post-options-modal__custom-fields-confirmation-button is-button is-default"
+    className="components-button edit-post-options-modal__custom-fields-confirmation-button is-secondary"
     disabled={false}
     onClick={[Function]}
     type="button"

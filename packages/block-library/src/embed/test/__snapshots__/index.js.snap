@@ -44,7 +44,7 @@ exports[`core/embed block edit matches snapshot 1`] = `
         value=""
       />
       <button
-        class="components-button is-button is-default is-large"
+        class="components-button is-secondary"
         type="submit"
       >
         Embed

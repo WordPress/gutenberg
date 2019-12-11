@@ -127,7 +127,7 @@ function Layout() {
 					) : (
 						<div className="edit-post-toggle-publish-panel">
 							<Button
-								isDefault
+								isSecondary
 								className="edit-post-toggle-publish-panel__button"
 								onClick={ togglePublishSidebar }
 								aria-expanded={ false }
