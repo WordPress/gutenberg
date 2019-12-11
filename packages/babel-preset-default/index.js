@@ -31,6 +31,7 @@ module.exports = function( api ) {
 		if ( isWPBuild( wpBuildOpts.name ) ) {
 			opts.modules = wpBuildOpts.modules;
 		}
+		opts.shippedProposals = true;
 
 		return [ require.resolve( '@babel/preset-env' ), opts ];
 	};
