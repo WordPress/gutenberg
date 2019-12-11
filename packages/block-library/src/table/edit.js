@@ -260,7 +260,7 @@ export class TableEdit extends Component {
 
 			return { [ sectionName ]: [ ...sectionSaved ] };
 		}
-		// If the head section never existed, or was deleted, insert an empty row.
+		// If the section never existed, or was deleted, insert an empty row.
 		return toggleSection( attributes, sectionName );
 	}
 
