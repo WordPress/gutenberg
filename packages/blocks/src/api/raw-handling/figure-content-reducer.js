@@ -91,6 +91,7 @@ export default function( node, doc, schema ) {
 		if (
 			node.classList.contains( 'alignright' ) ||
 			node.classList.contains( 'alignleft' ) ||
+			node.classList.contains( 'aligncenter' ) ||
 			! wrapper.textContent.trim()
 		) {
 			wrapFigureContent( nodeToInsert, wrapper );
