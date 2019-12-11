@@ -63,6 +63,18 @@ $block-container-side-padding: $block-side-ui-width + $block-padding + 2 * $bloc
 $block-bg-padding--v: $block-padding + $block-spacing + $block-side-ui-clearance; // padding for Blocks with a background color (eg: paragraph or group)
 $block-bg-padding--h: $block-side-ui-width + $block-side-ui-clearance; // padding for Blocks with a background color (eg: paragraph or group)
 
+$block-edge-to-content: 16px;
+$block-selected-margin: 3px;
+$block-selected-border-width: 1px;
+$block-selected-padding: 0;
+$block-selected-child-margin: 5px;
+$block-selected-child-border-width: 1px;
+$block-selected-child-padding: 0;
+$block-selected-to-content: $block-edge-to-content - $block-selected-margin - $block-selected-border-width;
+$block-selected-child-to-content: $block-selected-to-content - $block-selected-child-margin - $block-selected-child-border-width;
+$block-custom-appender-to-content: $block-edge-to-content - $block-selected-margin - $block-selected-child-margin + $block-selected-border-width;
+$block-media-container-to-content: $block-selected-child-margin + $block-selected-border-width;
+
 // Buttons & UI Widgets
 $radius-round-rectangle: 4px;
 $radius-round: 50%;
