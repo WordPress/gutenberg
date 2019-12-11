@@ -180,7 +180,7 @@ class PostLockedModal extends Component {
 						</div>
 
 						<div className="editor-post-locked-modal__buttons">
-							<Button isPrimary isLarge href={ allPostsUrl }>
+							<Button isPrimary href={ allPostsUrl }>
 								{ allPostsLabel }
 							</Button>
 						</div>
@@ -200,11 +200,11 @@ class PostLockedModal extends Component {
 						</div>
 
 						<div className="editor-post-locked-modal__buttons">
-							<Button isDefault isLarge href={ allPostsUrl }>
+							<Button isDefault href={ allPostsUrl }>
 								{ allPostsLabel }
 							</Button>
 							<PostPreviewButton />
-							<Button isPrimary isLarge href={ unlockUrl }>
+							<Button isPrimary href={ unlockUrl }>
 								{ __( 'Take Over' ) }
 							</Button>
 						</div>

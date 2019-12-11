@@ -111,7 +111,6 @@ export class PostPublishButton extends Component {
 		const componentChildren = isToggle ? toggleChildren : buttonChildren;
 		return (
 			<Button
-				isLarge
 				ref={ this.buttonNode }
 				{ ...componentProps }
 			>

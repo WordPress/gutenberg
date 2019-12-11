@@ -27,7 +27,7 @@ exports[`BlockView should match snapshot 1`] = `
     className="block-editor-block-compare__action"
   >
     <ForwardRef(Button)
-      isLarge={true}
+      isDefault={true}
       onClick={[Function]}
       tabIndex="0"
     >

@@ -272,7 +272,7 @@ export class MediaPlaceholder extends Component {
 					className="block-editor-media-placeholder__button"
 					onClick={ this.openURLInput }
 					isPressed={ isURLInputVisible }
-					isLarge
+					isDefault
 				>
 					{ __( 'Insert from URL' ) }
 				</Button>
@@ -315,7 +315,7 @@ export class MediaPlaceholder extends Component {
 				render={ ( { open } ) => {
 					return (
 						<Button
-							isLarge
+							isDefault
 							onClick={ ( event ) => {
 								event.stopPropagation();
 								open();
@@ -340,7 +340,7 @@ export class MediaPlaceholder extends Component {
 							const content = (
 								<>
 									<IconButton
-										isLarge
+										isDefault
 										className={ classnames(
 											'block-editor-media-placeholder__button',
 											'block-editor-media-placeholder__upload-button'
@@ -366,7 +366,7 @@ export class MediaPlaceholder extends Component {
 				<>
 					{ this.renderDropZone() }
 					<FormFileUpload
-						isLarge
+						isDefault
 						className={ classnames(
 							'block-editor-media-placeholder__button',
 							'block-editor-media-placeholder__upload-button'

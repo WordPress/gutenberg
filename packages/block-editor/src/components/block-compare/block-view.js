@@ -19,7 +19,7 @@ const BlockView = ( { title, rawContent, renderedContent, action, actionText, cl
 			</div>
 
 			<div className="block-editor-block-compare__action">
-				<Button isLarge tabIndex="0" onClick={ action }>{ actionText }</Button>
+				<Button isDefault tabIndex="0" onClick={ action }>{ actionText }</Button>
 			</div>
 		</div>
 	);

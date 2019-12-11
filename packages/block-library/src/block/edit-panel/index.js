@@ -64,7 +64,7 @@ class ReusableBlockEditPanel extends Component {
 						</b>
 						<Button
 							ref={ this.editButton }
-							isLarge
+							isDefault
 							className="reusable-block-edit-panel__button"
 							disabled={ isEditDisabled }
 							onClick={ onEdit }
@@ -93,7 +93,7 @@ class ReusableBlockEditPanel extends Component {
 						/>
 						<Button
 							type="submit"
-							isLarge
+							isDefault
 							isBusy={ isSaving }
 							disabled={ ! title || isSaving }
 							className="reusable-block-edit-panel__button"

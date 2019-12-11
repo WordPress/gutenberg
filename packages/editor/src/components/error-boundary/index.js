@@ -49,13 +49,13 @@ class ErrorBoundary extends Component {
 			<Warning
 				className="editor-error-boundary"
 				actions={ [
-					<Button key="recovery" onClick={ this.reboot } isLarge>
+					<Button key="recovery" onClick={ this.reboot } isDefault>
 						{ __( 'Attempt Recovery' ) }
 					</Button>,
-					<ClipboardButton key="copy-post" text={ this.getContent } isLarge>
+					<ClipboardButton key="copy-post" text={ this.getContent } isDefault>
 						{ __( 'Copy Post Text' ) }
 					</ClipboardButton>,
-					<ClipboardButton key="copy-error" text={ error.stack } isLarge>
+					<ClipboardButton key="copy-error" text={ error.stack } isDefault>
 						{ __( 'Copy Error' ) }
 					</ClipboardButton>,
 				] }
