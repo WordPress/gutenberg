@@ -15,7 +15,7 @@ import {
 	SlotFillProvider,
 	DropZoneProvider,
 } from '@wordpress/components';
-import { compose, useViewportMatch } from '@wordpress/compose';
+import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -116,22 +116,20 @@ class Editor extends Component {
 				<EditPostSettings.Provider value={ settings }>
 					<SlotFillProvider>
 						<DropZoneProvider>
-							<useViewportMatch.__experimentalWidthProvider value={ undefined }>
-								<EditorProvider
-									settings={ editorSettings }
-									post={ post }
-									initialEdits={ initialEdits }
-									useSubRegistry={ false }
-									{ ...props }
-								>
-									<ErrorBoundary onError={ onError }>
-										<EditorInitialization postId={ postId } />
-										<Layout />
-										<KeyboardShortcuts shortcuts={ preventEventDiscovery } />
-									</ErrorBoundary>
-									<PostLockedModal />
-								</EditorProvider>
-							</useViewportMatch.__experimentalWidthProvider>
+							<EditorProvider
+								settings={ editorSettings }
+								post={ post }
+								initialEdits={ initialEdits }
+								useSubRegistry={ false }
+								{ ...props }
+							>
+								<ErrorBoundary onError={ onError }>
+									<EditorInitialization postId={ postId } />
+									<Layout />
+									<KeyboardShortcuts shortcuts={ preventEventDiscovery } />
+								</ErrorBoundary>
+								<PostLockedModal />
+							</EditorProvider>
 						</DropZoneProvider>
 					</SlotFillProvider>
 				</EditPostSettings.Provider>
