@@ -260,7 +260,7 @@ export default function LogoEdit( { attributes: { align, width }, children, clas
 			allowedTypes={ ALLOWED_MEDIA_TYPES }
 			mediaPreview={ !! url && img }
 			notices={ error && (
-				<Notice status="error" isDismissable={ false }>{ error }</Notice>
+				<Notice status="error" isDismissible={ false }>{ error }</Notice>
 			) }
 			onCancel={ !! url && ( () => setIsEditing( false ) ) }
 			onError={ onUploadError }
