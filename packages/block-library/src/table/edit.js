@@ -233,10 +233,10 @@ export class TableEdit extends Component {
 	}
 
 	/**
-  * Get the data needed to toggle a section
+  * Get the data needed to toggle a section.
   *
   * @param {string} sectionName the section name to hide.
-  * @return {Object} The new table state
+  * @return {Object} The new table state.
   */
 	toggleSectionByName( sectionName ) {
 		const { attributes } = this.props;
