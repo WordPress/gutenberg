@@ -11,6 +11,11 @@ import classnames from 'classnames';
 import { Component } from '@wordpress/element';
 import { withSafeTimeout } from '@wordpress/compose';
 
+/**
+ * Internal dependencies
+ */
+import List from '../list';
+
 class SuggestionsList extends Component {
 	constructor() {
 		super( ...arguments );
@@ -73,12 +78,8 @@ class SuggestionsList extends Component {
 	}
 
 	render() {
-		// We set `tabIndex` here because otherwise Firefox sets focus on this
-		// div when tabbing off of the input in `TokenField` -- not really sure
-		// why, since usually a div isn't focusable by default
-		// TODO does this still apply now that it's a <ul> and not a <div>?
 		return (
-			<ul
+			<List
 				ref={ this.bindList }
 				className="components-form-token-field__suggestions-list"
 				id={ `components-form-token-suggestions-${ this.props.instanceId }` }
@@ -120,7 +121,7 @@ class SuggestionsList extends Component {
 						/* eslint-enable jsx-a11y/click-events-have-key-events */
 					} )
 				}
-			</ul>
+			</List>
 		);
 	}
 }

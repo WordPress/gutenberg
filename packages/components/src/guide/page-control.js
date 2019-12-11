@@ -12,11 +12,15 @@ import { __, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import IconButton from '../icon-button';
+import List from '../list';
 import { PageControlIcon } from './icons';
 
 export default function PageControl( { currentPage, numberOfPages, setCurrentPage } ) {
 	return (
-		<ul className="components-guide__page-control" aria-label={ __( 'Guide controls' ) }>
+		<List
+			className="components-guide__page-control"
+			accessibilityLabel={ __( 'Guide controls' ) }
+		>
 			{ times( numberOfPages, ( page ) => (
 				<li key={ page }>
 					<IconButton
@@ -28,6 +32,6 @@ export default function PageControl( { currentPage, numberOfPages, setCurrentPag
 					/>
 				</li>
 			) ) }
-		</ul>
+		</List>
 	);
 }

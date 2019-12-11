@@ -7,7 +7,9 @@ import classnames from 'classnames';
 /**
  * Internal dependencies
  */
-import { Button, Dashicon } from '../';
+import Button from '../button';
+import Dashicon from '../dashicon';
+import List from '../list';
 
 const itemToString = ( item ) => item && item.name;
 // This is needed so that in Windows, where
@@ -107,7 +109,7 @@ export default function CustomSelectControl( {
 					className="components-custom-select-control__button-icon"
 				/>
 			</Button>
-			<ul { ...menuProps }>
+			<List { ...menuProps }>
 				{ isOpen &&
 					items.map( ( item, index ) => (
 						// eslint-disable-next-line react/jsx-key
@@ -134,7 +136,7 @@ export default function CustomSelectControl( {
 							{ item.name }
 						</li>
 					) ) }
-			</ul>
+			</List>
 		</div>
 	);
 }
