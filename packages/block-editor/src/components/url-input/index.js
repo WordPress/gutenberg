@@ -11,7 +11,7 @@ import scrollIntoView from 'dom-scroll-into-view';
 import { __, sprintf, _n } from '@wordpress/i18n';
 import { Component, createRef } from '@wordpress/element';
 import { UP, DOWN, ENTER, TAB } from '@wordpress/keycodes';
-import { BaseControl, Spinner, withSpokenMessages, Popover } from '@wordpress/components';
+import { BaseControl, Button, Spinner, withSpokenMessages, Popover } from '@wordpress/components';
 import { withInstanceId, withSafeTimeout, compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { isURL } from '@wordpress/url';
@@ -135,7 +135,9 @@ class URLInput extends Component {
 	onChange( event ) {
 		const inputValue = event.target.value;
 		this.props.onChange( inputValue );
-		this.updateSuggestions( inputValue );
+		if ( ! this.props.disableSuggestions ) {
+			this.updateSuggestions( inputValue );
+		}
 	}
 
 	onKeyDown( event ) {
@@ -348,7 +350,7 @@ class URLInput extends Component {
 							) }
 						>
 							{ suggestions.map( ( suggestion, index ) => (
-								<button
+								<Button
 									{ ...buildSuggestionItemProps( suggestion, index ) }
 									key={ suggestion.id }
 									className={ classnames( 'editor-url-input__suggestion block-editor-url-input__suggestion', {
@@ -357,7 +359,7 @@ class URLInput extends Component {
 									onClick={ () => this.handleOnClick( suggestion ) }
 								>
 									{ suggestion.title }
-								</button>
+								</Button>
 							) ) }
 						</div>
 					</Popover>

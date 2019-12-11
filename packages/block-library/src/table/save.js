@@ -15,6 +15,7 @@ export default function save( { attributes } ) {
 		body,
 		foot,
 		backgroundColor,
+		caption,
 	} = attributes;
 	const isEmpty = ! head.length && ! body.length && ! foot.length;
 
@@ -28,6 +29,8 @@ export default function save( { attributes } ) {
 		'has-fixed-layout': hasFixedLayout,
 		'has-background': !! backgroundClass,
 	} );
+
+	const hasCaption = ! RichText.isEmpty( caption );
 
 	const Section = ( { type, rows } ) => {
 		if ( ! rows.length ) {
@@ -64,11 +67,17 @@ export default function save( { attributes } ) {
 
 	return (
 		<figure>
-			<table className={ classes }>
+			<table className={ classes === '' ? undefined : classes }>
 				<Section type="head" rows={ head } />
 				<Section type="body" rows={ body } />
 				<Section type="foot" rows={ foot } />
 			</table>
+			{ hasCaption && (
+				<RichText.Content
+					tagName="figcaption"
+					value={ caption }
+				/>
+			) }
 		</figure>
 	);
 }

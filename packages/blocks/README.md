@@ -401,6 +401,10 @@ _Related_
 
 -   <https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Content_categories#Phrasing_content>
 
+_Parameters_
+
+-   _context_ `string`: Set to "paste" to exclude invisible elements and sensitive data.
+
 _Returns_
 
 -   `Object`: Schema.

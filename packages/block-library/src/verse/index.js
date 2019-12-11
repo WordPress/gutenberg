@@ -23,7 +23,7 @@ export const settings = {
 	icon,
 	example: {
 		attributes: {
-			// translators: Sample content for the Verse block. Can be replaced with a locale-appropriate work.
+			// translators: Sample content for the Verse block. Can be replaced with a more locale-adequate work.
 			content: __( 'WHAT was he doing, the great god Pan,\n	Down in the reeds by the river?\nSpreading ruin and scattering ban,\nSplashing and paddling with hoofs of a goat,\nAnd breaking the golden lilies afloat\n    With the dragon-fly on the river.' ),
 		},
 	},

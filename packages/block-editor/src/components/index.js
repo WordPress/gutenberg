@@ -28,6 +28,7 @@ export { default as InnerBlocks } from './inner-blocks';
 export { default as InspectorAdvancedControls } from './inspector-advanced-controls';
 export { default as InspectorControls } from './inspector-controls';
 export { default as __experimentalLinkControl } from './link-control';
+export { default as MediaReplaceFlow } from './media-replace-flow';
 export { default as MediaPlaceholder } from './media-placeholder';
 export { default as MediaUpload } from './media-upload';
 export { default as MediaUploadCheck } from './media-upload/check';
@@ -50,9 +51,15 @@ export { default as withColorContext } from './color-palette/with-color-context'
  * Content Related Components
  */
 
+export { default as __experimentalBlockListFooter } from './block-list-footer';
 export { default as __experimentalBlockSettingsMenuFirstItem } from './block-settings-menu/block-settings-menu-first-item';
 export { default as __experimentalBlockSettingsMenuPluginsExtension } from './block-settings-menu/block-settings-menu-plugins-extension';
 export { default as __experimentalInserterMenuExtension } from './inserter-menu-extension';
+export {
+	__experimentalPageTemplatePicker,
+	__experimentalWithPageTemplatePickerVisible,
+	__experimentalUsePageTemplatePickerVisible,
+} from './page-template-picker';
 export { default as BlockEditorKeyboardShortcuts } from './block-editor-keyboard-shortcuts';
 export { default as BlockInspector } from './block-inspector';
 export { default as BlockList } from './block-list';

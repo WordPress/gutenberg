@@ -33,6 +33,10 @@
 	min-height: $block-toolbar-height;
 	border-bottom: $border-width solid $light-gray-500;
 
+	&:empty {
+		display: none;
+	}
+
 	.block-editor-block-toolbar .components-toolbar {
 		border-top: none;
 		border-bottom: none;

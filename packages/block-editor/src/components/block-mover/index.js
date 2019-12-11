@@ -19,7 +19,7 @@ import { withInstanceId, compose } from '@wordpress/compose';
  */
 import { getBlockMoverDescription } from './mover-description';
 import { leftArrow, rightArrow, upArrow, downArrow, dragHandle } from './icons';
-import { IconDragHandle } from './drag-handle';
+import BlockDraggable from '../block-draggable';
 
 export class BlockMover extends Component {
 	constructor() {
@@ -44,7 +44,7 @@ export class BlockMover extends Component {
 	}
 
 	render() {
-		const { onMoveUp, onMoveDown, __experimentalOrientation: orientation, isRTL, isFirst, isLast, isDraggable, onDragStart, onDragEnd, clientIds, blockElementId, blockType, firstIndex, isLocked, instanceId, isHidden, rootClientId } = this.props;
+		const { onMoveUp, onMoveDown, __experimentalOrientation: orientation, isRTL, isFirst, isLast, clientIds, blockType, firstIndex, isLocked, instanceId, isHidden, rootClientId } = this.props;
 		const { isFocused } = this.state;
 		const blocksCount = castArray( clientIds ).length;
 		if ( isLocked || ( isFirst && isLast && ! rootClientId ) ) {
@@ -98,15 +98,20 @@ export class BlockMover extends Component {
 					onFocus={ this.onFocus }
 					onBlur={ this.onBlur }
 				/>
-				<IconDragHandle
-					className="editor-block-mover__control block-editor-block-mover__control"
-					icon={ dragHandle }
-					clientId={ clientIds }
-					blockElementId={ blockElementId }
-					isVisible={ isDraggable }
-					onDragStart={ onDragStart }
-					onDragEnd={ onDragEnd }
-				/>
+
+				<BlockDraggable clientIds={ clientIds }>
+					{ ( { onDraggableStart, onDraggableEnd } ) => (
+						<IconButton
+							icon={ dragHandle }
+							className="block-editor-block-mover__control-drag-handle editor-block-mover__control block-editor-block-mover__control"
+							aria-hidden="true"
+							onDragStart={ onDraggableStart }
+							onDragEnd={ onDraggableEnd }
+							draggable
+						/>
+					) }
+				</BlockDraggable>
+
 				<IconButton
 					className="editor-block-mover__control block-editor-block-mover__control"
 					onClick={ isLast ? null : onMoveDown }

@@ -50,11 +50,11 @@ export const small = () => {
 	);
 };
 
-export const toggled = () => {
-	const label = text( 'Label', 'Toggled Button' );
+export const pressed = () => {
+	const label = text( 'Label', 'Pressed Button' );
 
 	return (
-		<Button isToggled>{ label }</Button>
+		<Button isPressed>{ label }</Button>
 	);
 };
 
