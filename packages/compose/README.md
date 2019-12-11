@@ -121,7 +121,7 @@ _Returns_
 
 <a name="useInstanceId" href="#useInstanceId">#</a> **useInstanceId**
 
-Provide a unique instance ID.
+Provides a unique instance ID.
 
 <a name="useMediaQuery" href="#useMediaQuery">#</a> **useMediaQuery**
 

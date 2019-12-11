@@ -4,7 +4,7 @@
 import { useMemo, useEffect } from '@wordpress/element';
 
 /**
- * Array to keey track of allocated ids.
+ * Array to keep track of allocated ids.
  */
 const allocatedIds = [];
 
@@ -34,10 +34,15 @@ function freeId( id ) {
 }
 
 /**
- * Provide a unique instance ID.
+ * Provides a unique instance ID.
  */
 export default function useInstanceId() {
+	// Take advantage of useMemo to get the same id throughout the life of a
+	// component.
 	const id = useMemo( findId, [] );
-	useEffect( () => () => freeId( id ), [] );
+	// Free up the id when the comonent unmounts. This must depend on `id` since
+	// useMemo is not guaranteed to return the same id throughout the life of
+	// the component.
+	useEffect( () => () => freeId( id ), [ id ] );
 	return id;
 }
