@@ -1,0 +1,22 @@
+.columnsPlaceholder {
+	padding: 12px;
+	margin-bottom: 12px;
+	background-color: $white;
+	border: $border-width dashed $gray;
+	border-radius: 4px;
+}
+
+.columnsPlaceholderDark {
+	background-color: $black;
+	border: $border-width dashed $gray-70;
+}
+
+.marginVerticalDense {
+	margin-top: $block-selected-child-margin;
+	margin-bottom: $block-selected-child-margin;
+}
+
+.marginHorizontalNone {
+	margin-left: 0;
+	margin-right: 0;
+}

@@ -23,12 +23,13 @@ export const settings = {
 	icon,
 	supports: {
 		align: true,
+		html: false,
 	},
 	example: {
 		attributes: {
 			customOverlayColor: '#065174',
 			dimRatio: 40,
-			url: 'https://upload.wikimedia.org/wikipedia/commons/9/95/Windbuchencom.jpg',
+			url: 'https://s.w.org/images/core/5.3/Windbuchencom.jpg',
 		},
 		innerBlocks: [
 			{

@@ -16,6 +16,17 @@ const { version } = require( './package' );
  */
 const majorMinorRegExp = escapeRegExp( version.replace( /\.\d+$/, '' ) ) + '(\\.\\d+)?';
 
+/**
+ * The list of patterns matching files used only for development purposes.
+ *
+ * @type {string[]}
+ */
+const developmentFiles = [
+	'**/benchmark/**/*.js',
+	'**/@(__mocks__|__tests__|test)/**/*.js',
+	'**/@(storybook|stories)/**/*.js',
+];
+
 module.exports = {
 	root: true,
 	extends: [
@@ -97,33 +108,42 @@ module.exports = {
 				message: 'Avoid truthy checks on length property rendering, as zero length is rendered verbatim.',
 			},
 		],
-		'react/forbid-elements': [ 'error', {
-			forbid: [
-				[ 'circle', 'Circle' ],
-				[ 'g', 'G' ],
-				[ 'path', 'Path' ],
-				[ 'polygon', 'Polygon' ],
-				[ 'rect', 'Rect' ],
-				[ 'svg', 'SVG' ],
-			].map( ( [ element, componentName ] ) => {
-				return {
-					element,
-					message: `use cross-platform <${ componentName }> component instead.`,
-				};
-			} ),
-		} ],
 	},
 	overrides: [
 		{
 			files: [ 'packages/**/*.js' ],
+			excludedFiles: [
+				'**/*.@(android|ios|native).js',
+				...developmentFiles,
+			],
 			rules: {
 				'import/no-extraneous-dependencies': 'error',
 			},
+		},
+		{
+			files: [ 'packages/**/*.js' ],
 			excludedFiles: [
-				'**/*.@(android|ios|native).js',
-				'**/@(benchmark|test|__tests__)/**/*.js',
-				'**/{storybook,stories}\/*\.js',
+				'packages/block-library/src/*/save.js',
+				...developmentFiles,
 			],
+			rules: {
+				'react/forbid-elements': [ 'error', {
+					forbid: [
+						[ 'button', 'Button' ],
+						[ 'circle', 'Circle' ],
+						[ 'g', 'G' ],
+						[ 'path', 'Path' ],
+						[ 'polygon', 'Polygon' ],
+						[ 'rect', 'Rect' ],
+						[ 'svg', 'SVG' ],
+					].map( ( [ element, componentName ] ) => {
+						return {
+							element,
+							message: `use cross-platform <${ componentName } /> component instead.`,
+						};
+					} ),
+				} ],
+			},
 		},
 		{
 			files: [

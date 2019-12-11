@@ -42,7 +42,7 @@ function getBlockEditorSettings( blockEditorSettings, hasUploadPermissions ) {
 	};
 	return {
 		...blockEditorSettings,
-		__experimentalMediaUpload: mediaUploadBlockEditor,
+		mediaUpload: mediaUploadBlockEditor,
 	};
 }
 
@@ -105,38 +105,47 @@ function WidgetArea( {
 				title={ widgetAreaName }
 				initialOpen={ initialOpen }
 			>
-				<BlockEditorProvider
-					value={ blocks }
-					onInput={ onInput }
-					onChange={ onChange }
-					settings={ settings }
+				<div
+					onFocus={ ( event ) => {
+						// Stop propagation of the focus event to avoid the parent
+						// widget layout component catching the event and removing the selected area.
+						event.stopPropagation();
+						event.preventDefault();
+					} }
 				>
-					{ isSelectedArea && (
-						<>
-							<Inserter>
-								<BlockInserter />
-							</Inserter>
-							<BlockEditorKeyboardShortcuts />
-						</>
-					) }
-					<SelectionObserver
-						isSelectedArea={ isSelectedArea }
-						onBlockSelected={ onBlockSelected }
-					/>
-					<Sidebar.Inspector>
-						<BlockInspector showNoBlockSelectedMessage={ false } />
-					</Sidebar.Inspector>
-					<div className="editor-styles-wrapper">
-						<WritingFlow>
-							<ObserveTyping>
-								<BlockList
-									className="edit-widgets-main-block-list"
-									renderAppender={ ButtonBlockerAppender }
-								/>
-							</ObserveTyping>
-						</WritingFlow>
-					</div>
-				</BlockEditorProvider>
+					<BlockEditorProvider
+						value={ blocks }
+						onInput={ onInput }
+						onChange={ onChange }
+						settings={ settings }
+					>
+						{ isSelectedArea && (
+							<>
+								<Inserter>
+									<BlockInserter />
+								</Inserter>
+								<BlockEditorKeyboardShortcuts />
+							</>
+						) }
+						<SelectionObserver
+							isSelectedArea={ isSelectedArea }
+							onBlockSelected={ onBlockSelected }
+						/>
+						<Sidebar.Inspector>
+							<BlockInspector showNoBlockSelectedMessage={ false } />
+						</Sidebar.Inspector>
+						<div className="editor-styles-wrapper">
+							<WritingFlow>
+								<ObserveTyping>
+									<BlockList
+										className="edit-widgets-main-block-list"
+										renderAppender={ ButtonBlockerAppender }
+									/>
+								</ObserveTyping>
+							</WritingFlow>
+						</div>
+					</BlockEditorProvider>
+				</div>
 			</PanelBody>
 		</Panel>
 	);

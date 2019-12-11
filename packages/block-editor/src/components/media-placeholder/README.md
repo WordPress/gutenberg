@@ -8,7 +8,7 @@ MediaPlaceholder
 An example usage which sets the URL of the selected image to `theImage` attributes.
 
 ```
-const { MediaPlaceholder } = wp.editor;
+const { MediaPlaceholder } = wp.blockEditor;
 
 ...
 
@@ -155,9 +155,9 @@ The argument of the callback is an object containing the following properties:
 
 ### value
 
-Media ID (or media IDs if multiple is true) to be selected by default when opening the media library.
+An object or an array of objects that contain media ID (`id` property) to be selected by default when opening the media library.
 
-- Type: `Number|Array`
+- Type: `Object|Array`
 - Required: No
 - Platform: Web
 

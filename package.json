@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "6.6.0",
+	"version": "7.1.0",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -72,21 +72,25 @@
 		"@babel/runtime-corejs3": "7.4.5",
 		"@babel/traverse": "7.4.5",
 		"@octokit/rest": "16.26.0",
-		"@storybook/addon-a11y": "5.2.1",
-		"@storybook/addon-docs": "5.3.0-alpha.2",
-		"@storybook/addon-viewport": "5.2.1",
-		"@storybook/react": "5.2.1",
+		"@storybook/addon-a11y": "5.2.4",
+		"@storybook/addon-docs": "5.2.4",
+		"@storybook/addon-knobs": "5.2.4",
+		"@storybook/addon-storyshots": "5.2.4",
+		"@storybook/addon-storysource": "5.2.4",
+		"@storybook/addon-viewport": "5.2.4",
+		"@storybook/react": "5.2.4",
 		"@wordpress/babel-plugin-import-jsx-pragma": "file:packages/babel-plugin-import-jsx-pragma",
 		"@wordpress/babel-plugin-makepot": "file:packages/babel-plugin-makepot",
 		"@wordpress/babel-preset-default": "file:packages/babel-preset-default",
+		"@wordpress/base-styles": "file:packages/base-styles",
 		"@wordpress/browserslist-config": "file:packages/browserslist-config",
 		"@wordpress/custom-templated-path-webpack-plugin": "file:packages/custom-templated-path-webpack-plugin",
 		"@wordpress/dependency-extraction-webpack-plugin": "file:packages/dependency-extraction-webpack-plugin",
 		"@wordpress/docgen": "file:packages/docgen",
 		"@wordpress/e2e-test-utils": "file:packages/e2e-test-utils",
 		"@wordpress/e2e-tests": "file:packages/e2e-tests",
-		"@wordpress/eslint-plugin": "file:packages/eslint-plugin",
 		"@wordpress/env": "file:packages/env",
+		"@wordpress/eslint-plugin": "file:packages/eslint-plugin",
 		"@wordpress/jest-console": "file:packages/jest-console",
 		"@wordpress/jest-preset-default": "file:packages/jest-preset-default",
 		"@wordpress/jest-puppeteer-axe": "file:packages/jest-puppeteer-axe",
@@ -95,9 +99,11 @@
 		"@wordpress/postcss-themes": "file:packages/postcss-themes",
 		"@wordpress/scripts": "file:packages/scripts",
 		"babel-loader": "8.0.6",
+		"babel-plugin-emotion": "10.0.23",
 		"babel-plugin-inline-json-import": "0.3.2",
 		"babel-plugin-react-native-classname-to-style": "1.2.2",
 		"babel-plugin-react-native-platform-specific-extensions": "1.1.1",
+		"babel-plugin-require-context-hook": "1.0.0",
 		"benchmark": "2.1.4",
 		"browserslist": "4.7.0",
 		"chalk": "2.4.2",
@@ -105,6 +111,7 @@
 		"concurrently": "3.5.0",
 		"copy-webpack-plugin": "4.5.2",
 		"cross-env": "3.2.4",
+		"css-loader": "3.2.0",
 		"cssnano": "4.1.10",
 		"deep-freeze": "0.0.1",
 		"enzyme": "3.9.0",
@@ -112,7 +119,6 @@
 		"eslint-plugin-import": "2.18.2",
 		"fast-glob": "2.2.7",
 		"fbjs": "0.8.17",
-		"fs-extra": "8.0.1",
 		"glob": "7.1.2",
 		"husky": "3.0.5",
 		"inquirer": "6.3.1",
@@ -120,7 +126,7 @@
 		"jest-junit": "6.4.0",
 		"jest-serializer-enzyme": "1.0.0",
 		"jsdom": "11.12.0",
-		"lerna": "3.16.4",
+		"lerna": "3.18.2",
 		"lint-staged": "9.2.5",
 		"lodash": "4.17.15",
 		"make-dir": "3.0.0",
@@ -129,8 +135,8 @@
 		"mkdirp": "0.5.1",
 		"node-sass": "4.12.0",
 		"node-watch": "0.6.0",
-		"parcel-bundler": "1.12.3",
 		"postcss": "7.0.13",
+		"postcss-loader": "3.0.0",
 		"progress": "2.0.3",
 		"react": "16.9.0",
 		"react-dom": "16.9.0",
@@ -146,39 +152,12 @@
 		"simple-git": "1.113.0",
 		"source-map-loader": "0.2.4",
 		"sprintf-js": "1.1.1",
+		"style-loader": "1.0.0",
 		"stylelint-config-wordpress": "13.1.0",
 		"typescript": "3.5.3",
 		"uuid": "3.3.2",
 		"webpack": "4.41.0",
 		"worker-farm": "1.7.0"
-	},
-	"npmPackageJsonLintConfig": {
-		"extends": "@wordpress/npm-package-json-lint-config",
-		"rules": {
-			"description-format": [
-				"error",
-				{
-					"requireCapitalFirstLetter": true,
-					"requireEndingPeriod": true
-				}
-			],
-			"require-publishConfig": "error",
-			"require-repository-directory": "error",
-			"valid-values-author": [
-				"error",
-				[
-					"The WordPress Contributors"
-				]
-			],
-			"valid-values-publishConfig": [
-				"error",
-				[
-					{
-						"access": "public"
-					}
-				]
-			]
-		}
 	},
 	"scripts": {
 		"prebuild": "npm run check-engines",
@@ -202,20 +181,19 @@
 		"lint-js": "wp-scripts lint-js",
 		"lint-js:fix": "npm run lint-js -- --fix",
 		"lint-php": "wp-scripts env lint-php",
-		"lint-pkg-json": "wp-scripts lint-pkg-json ./packages",
+		"lint-pkg-json": "wp-scripts lint-pkg-json . 'packages/*/package.json'",
 		"lint-css": "wp-scripts lint-style '**/*.scss'",
 		"lint-css:fix": "npm run lint-css -- --fix",
 		"lint-types": "tsc",
 		"package-plugin": "./bin/build-plugin-zip.sh",
 		"pot-to-php": "./bin/pot-to-php.js",
 		"publish:check": "npm run build:packages && lerna updated",
-		"publish:dev": "npm run build:packages && lerna publish --npm-tag next",
+		"publish:dev": "npm run build:packages && lerna publish --dist-tag next",
+		"publish:legacy": "npm run build:packages && lerna publish --dist-tag legacy",
 		"publish:prod": "npm run build:packages && lerna publish",
 		"test": "npm run lint && npm run test-unit",
-		"pretest-e2e": "npm run env reinstall",
 		"test-e2e": "wp-scripts test-e2e --config packages/e2e-tests/jest.config.js",
-		"test-e2e:local": "wp-scripts test-e2e --config packages/e2e-tests/jest.config.js",
-		"test-e2e:watch": "npm run test-e2e:local -- --watch",
+		"test-e2e:watch": "npm run test-e2e -- --watch",
 		"test-performance": "wp-scripts test-e2e --config packages/e2e-tests/jest.performance.config.js",
 		"test-php": "npm run lint-php && npm run test-unit-php",
 		"test-unit": "wp-scripts test-unit-js --config test/unit/jest.config.js",
@@ -224,13 +202,17 @@
 		"test-unit-php": "wp-scripts env test-php",
 		"test-unit-php-multisite": "cross-env WP_MULTISITE=1 wp-scripts env test-php",
 		"test-unit:native": "cd test/native/ && cross-env NODE_ENV=test jest --config ./jest.config.js",
-		"test-unit:native:debug": "cd test/native/ && node --inspect ../../node_modules/.bin/jest --runInBand --config ./jest.config.js",
-		"playground:build": "npm run build:packages && parcel build playground/src/index.html -d playground/dist && npm run design-system:build",
-		"playground:dev": "concurrently \"npm run dev:packages\" \"parcel playground/src/index.html -d playground/dist\"",
+		"test-unit:native:debug": "cd test/native/ && node --inspect-brk ../../node_modules/.bin/jest --runInBand --verbose --config ./jest.config.js",
+		"prestorybook:build": "npm run build:packages",
+		"storybook:build": "build-storybook -c ./storybook -o ./playground/dist",
+		"prestorybook:dev": "npm run build:packages",
+		"storybook:dev": "concurrently \"npm run dev:packages\" \"start-storybook -c ./storybook\"",
+		"design-system:build": "echo \"Please use storybook:build instead.\"",
+		"design-system:dev": "echo \"Please use storybook:dev instead.\"",
+		"playground:build": "npm run storybook:build",
+		"playground:dev": "echo \"Please use storybook:dev instead.\"",
 		"preenv": "npm run check-engines",
-		"env": "wp-scripts env",
-		"design-system:dev": "concurrently \"npm run dev:packages\" \"start-storybook -c ./packages/components/storybook\"",
-		"design-system:build": "build-storybook -c ./packages/components/storybook -o ./playground/dist/design-system/components"
+		"env": "wp-scripts env"
 	},
 	"husky": {
 		"hooks": {

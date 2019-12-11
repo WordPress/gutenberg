@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { get } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
@@ -6,7 +11,7 @@ import {
 	Button,
 	IconButton,
 	PanelBody,
-	Toolbar,
+	ToolbarGroup,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { withSelect } from '@wordpress/data';
@@ -26,6 +31,7 @@ class LegacyWidgetEdit extends Component {
 	constructor() {
 		super( ...arguments );
 		this.state = {
+			hasEditForm: true,
 			isPreview: false,
 		};
 		this.switchToEdit = this.switchToEdit.bind( this );
@@ -38,33 +44,38 @@ class LegacyWidgetEdit extends Component {
 			attributes,
 			availableLegacyWidgets,
 			hasPermissionsToManageWidgets,
+			isSelected,
 			setAttributes,
 		} = this.props;
-		const { isPreview } = this.state;
-		const { identifier, isCallbackWidget } = attributes;
-		const widgetObject = identifier && availableLegacyWidgets[ identifier ];
-		if ( ! widgetObject ) {
+		const { isPreview, hasEditForm } = this.state;
+		const { id, widgetClass } = attributes;
+		const widgetObject =
+			( id && availableLegacyWidgets[ id ] ) ||
+			( widgetClass && availableLegacyWidgets[ widgetClass ] );
+		if ( ! id && ! widgetClass ) {
 			return (
 				<LegacyWidgetPlaceholder
 					availableLegacyWidgets={ availableLegacyWidgets }
-					currentWidget={ identifier }
 					hasPermissionsToManageWidgets={ hasPermissionsToManageWidgets }
-					onChangeWidget={ ( newWidget ) => setAttributes( {
-						instance: {},
-						identifier: newWidget,
-						isCallbackWidget: availableLegacyWidgets[ newWidget ].isCallbackWidget,
-					} ) }
+					onChangeWidget={ ( newWidget ) => {
+						const { isReferenceWidget } = availableLegacyWidgets[ newWidget ];
+						setAttributes( {
+							instance: {},
+							id: isReferenceWidget ? newWidget : undefined,
+							widgetClass: isReferenceWidget ? undefined : newWidget,
+						} );
+					} }
 				/>
 			);
 		}
 
-		const inspectorControls = (
+		const inspectorControls = widgetObject ? (
 			<InspectorControls>
 				<PanelBody title={ widgetObject.name }>
 					{ widgetObject.description }
 				</PanelBody>
 			</InspectorControls>
-		);
+		) : null;
 		if ( ! hasPermissionsToManageWidgets ) {
 			return (
 				<>
@@ -77,48 +88,62 @@ class LegacyWidgetEdit extends Component {
 		return (
 			<>
 				<BlockControls>
-					<Toolbar>
-						{ ! widgetObject.isHidden && (
+					<ToolbarGroup>
+						{ ( widgetObject && ! widgetObject.isHidden ) && (
 							<IconButton
 								onClick={ this.changeWidget }
 								label={ __( 'Change widget' ) }
 								icon="update"
 							/>
 						) }
-						{ ! isCallbackWidget && (
+						{ hasEditForm && (
 							<>
 								<Button
-									className={ `components-tab-button ${ ! isPreview ? 'is-active' : '' }` }
+									className="components-tab-button"
+									isPressed={ ! isPreview }
 									onClick={ this.switchToEdit }
 								>
 									<span>{ __( 'Edit' ) }</span>
 								</Button>
 								<Button
-									className={ `components-tab-button ${ isPreview ? 'is-active' : '' }` }
+									className="components-tab-button"
+									isPressed={ isPreview }
 									onClick={ this.switchToPreview }
 								>
 									<span>{ __( 'Preview' ) }</span>
 								</Button>
 							</>
 						) }
-					</Toolbar>
+					</ToolbarGroup>
 				</BlockControls>
 				{ inspectorControls }
-				{ ! isCallbackWidget && (
+				{ hasEditForm && (
 					<LegacyWidgetEditHandler
+						isSelected={ isSelected }
 						isVisible={ ! isPreview }
-						identifier={ attributes.identifier }
+						id={ id }
+						idBase={ attributes.idBase || attributes.id }
+						number={ attributes.number }
+						widgetName={ get( widgetObject, [ 'name' ] ) }
+						widgetClass={ attributes.widgetClass }
 						instance={ attributes.instance }
 						onInstanceChange={
-							( newInstance ) => {
-								this.props.setAttributes( {
-									instance: newInstance,
-								} );
+							( newInstance, newHasEditForm ) => {
+								if ( newInstance ) {
+									this.props.setAttributes( {
+										instance: newInstance,
+									} );
+								}
+								if ( newHasEditForm !== this.hasEditForm ) {
+									this.setState( {
+										hasEditForm: newHasEditForm,
+									} );
+								}
 							}
 						}
 					/>
 				) }
-				{ ( isPreview || isCallbackWidget ) && this.renderWidgetPreview() }
+				{ ( isPreview || ! hasEditForm ) && this.renderWidgetPreview() }
 			</>
 		);
 	}
@@ -127,7 +152,11 @@ class LegacyWidgetEdit extends Component {
 		this.switchToEdit();
 		this.props.setAttributes( {
 			instance: {},
-			identifier: undefined,
+			id: undefined,
+			widgetClass: undefined,
+		} );
+		this.setState( {
+			hasEditForm: true,
 		} );
 	}
 

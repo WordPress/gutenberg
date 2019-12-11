@@ -42,7 +42,9 @@ import { compose, pure, withInstanceId } from '@wordpress/compose';
  * Internal dependencies
  */
 import { calculateSaturationChange } from './utils';
+import Button from '../button';
 import KeyboardShortcuts from '../keyboard-shortcuts';
+import VisuallyHidden from '../visually-hidden';
 
 export class Saturation extends Component {
 	constructor( props ) {
@@ -164,20 +166,19 @@ export class Saturation extends Component {
 				>
 					<div className="components-color-picker__saturation-white" />
 					<div className="components-color-picker__saturation-black" />
-					<button
+					<Button
 						aria-label={ __( 'Choose a shade' ) }
 						aria-describedby={ `color-picker-saturation-${ instanceId }` }
 						className="components-color-picker__saturation-pointer"
 						style={ pointerLocation }
 						onKeyDown={ this.preventKeyEvents }
 					/>
-					<div
-						className="screen-reader-text"
+					<VisuallyHidden
 						id={ `color-picker-saturation-${ instanceId }` }>
 						{ __(
 							'Use your arrow keys to change the base color. Move up to lighten the color, down to darken, left to decrease saturation, and right to increase saturation.'
 						) }
-					</div>
+					</VisuallyHidden>
 				</div>
 			</KeyboardShortcuts>
 		);

@@ -109,6 +109,18 @@ module.exports = function( rootDir, docPath, symbols, headingTitle, headingStart
 				( tag ) => `\n- \`${ tag.type }\`: ${ cleanSpaces( tag.description ) }`,
 				docs
 			);
+			formatTag(
+				'Type Definition',
+				getSymbolTagsByName( symbol, 'typedef' ),
+				( tag ) => `\n- *${ tag.name }* \`${ tag.type }\``,
+				docs
+			);
+			formatTag(
+				'Properties',
+				getSymbolTagsByName( symbol, 'property' ),
+				( tag ) => `\n- *${ tag.name }* \`${ tag.type }\`: ${ cleanSpaces( tag.description ) }`,
+				docs
+			);
 			docs.push( '\n' );
 			docs.push( '\n' );
 		} );

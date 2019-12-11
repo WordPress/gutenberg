@@ -4,10 +4,6 @@
 	background-color: #fff;
 }
 
-.list {
-	flex: 1;
-}
-
 .switch {
 	flex-direction: row;
 	justify-content: flex-start;
@@ -46,35 +42,11 @@
 	flex-direction: row;
 }
 
-.blockHolderSemiBordered {
-	border-top-width: 1px;
-	border-bottom-width: 1px;
-	border-left-width: 0;
-	border-right-width: 0;
-}
-
-.blockHolderFullBordered {
-	border-top-width: 1px;
-	border-bottom-width: 1px;
-	border-left-width: 1px;
-	border-right-width: 1px;
-}
-
-.blockContainerFocused {
-	padding-left: 16;
-	padding-right: 16;
-	padding-top: 12;
-	padding-bottom: 0; // will be flushed into inline toolbar height
-}
-
-.blockHolderFocused {
-	border-color: $gray-lighten-30;
-}
-
-.blockHolderFocusedDark {
-	border-color: $gray-70;
-}
-
 .blockListFooter {
 	height: 80px;
+}
+
+.paddingToContent {
+	padding-left: $block-custom-appender-to-content;
+	padding-right: $block-custom-appender-to-content;
 }

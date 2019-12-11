@@ -1,0 +1,55 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Table allows a caption to be added 1`] = `
+"<!-- wp:table -->
+<figure class=\\"wp-block-table\\"><table><tbody><tr><td></td><td></td></tr><tr><td></td><td></td></tr></tbody></table><figcaption>Caption!</figcaption></figure>
+<!-- /wp:table -->"
+`;
+
+exports[`Table allows adding and deleting columns across the table header, body and footer 1`] = `
+"<!-- wp:table -->
+<figure class=\\"wp-block-table\\"><table><thead><tr><th></th><th></th><th></th></tr></thead><tbody><tr><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td></tr></tbody><tfoot><tr><td></td><td></td><td></td></tr></tfoot></table></figure>
+<!-- /wp:table -->"
+`;
+
+exports[`Table allows adding and deleting columns across the table header, body and footer 2`] = `
+"<!-- wp:table -->
+<figure class=\\"wp-block-table\\"><table><thead><tr><th></th><th></th></tr></thead><tbody><tr><td></td><td></td></tr><tr><td></td><td></td></tr></tbody><tfoot><tr><td></td><td></td></tr></tfoot></table></figure>
+<!-- /wp:table -->"
+`;
+
+exports[`Table allows cells to be selected when the cell area outside of the RichText is clicked 1`] = `
+"<!-- wp:table {\\"hasFixedLayout\\":true} -->
+<figure class=\\"wp-block-table\\"><table class=\\"has-fixed-layout\\"><tbody><tr><td><br><br><br><br></td><td>Second cell.</td></tr><tr><td></td><td></td></tr></tbody></table></figure>
+<!-- /wp:table -->"
+`;
+
+exports[`Table allows columns to be aligned 1`] = `
+"<!-- wp:table -->
+<figure class=\\"wp-block-table\\"><table><tbody><tr><td>None</td><td class=\\"has-text-align-left\\" data-align=\\"left\\">To the left</td><td class=\\"has-text-align-center\\" data-align=\\"center\\">Centered</td><td class=\\"has-text-align-right\\" data-align=\\"right\\">Right aligned</td></tr><tr><td></td><td class=\\"has-text-align-left\\" data-align=\\"left\\"></td><td class=\\"has-text-align-center\\" data-align=\\"center\\"></td><td class=\\"has-text-align-right\\" data-align=\\"right\\"></td></tr></tbody></table></figure>
+<!-- /wp:table -->"
+`;
+
+exports[`Table allows header and footer rows to be switched on and off 1`] = `
+"<!-- wp:table -->
+<figure class=\\"wp-block-table\\"><table><thead><tr><th>header</th><th></th></tr></thead><tbody><tr><td>body</td><td></td></tr><tr><td></td><td></td></tr></tbody><tfoot><tr><td>footer</td><td></td></tr></tfoot></table></figure>
+<!-- /wp:table -->"
+`;
+
+exports[`Table allows header and footer rows to be switched on and off 2`] = `
+"<!-- wp:table -->
+<figure class=\\"wp-block-table\\"><table><tbody><tr><td>body</td><td></td></tr><tr><td></td><td></td></tr></tbody></table></figure>
+<!-- /wp:table -->"
+`;
+
+exports[`Table allows text to by typed into cells 1`] = `
+"<!-- wp:table -->
+<figure class=\\"wp-block-table\\"><table><tbody><tr><td>This</td><td>is</td></tr><tr><td>table</td><td>block</td></tr></tbody></table></figure>
+<!-- /wp:table -->"
+`;
+
+exports[`Table displays a form for choosing the row and column count of the table 1`] = `
+"<!-- wp:table -->
+<figure class=\\"wp-block-table\\"><table><tbody><tr><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td><td></td></tr></tbody></table></figure>
+<!-- /wp:table -->"
+`;

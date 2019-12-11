@@ -4,7 +4,6 @@
 import {
 	createBlock,
 	getBlockAttributes,
-	getPhrasingContentSchema,
 } from '@wordpress/blocks';
 import {
 	__UNSTABLE_LINE_SEPARATOR,
@@ -15,22 +14,26 @@ import {
 	toHTMLString,
 } from '@wordpress/rich-text';
 
-const listContentSchema = {
-	...getPhrasingContentSchema(),
-	ul: {},
-	ol: { attributes: [ 'type' ] },
-};
-
-// Recursion is needed.
-// Possible: ul > li > ul.
-// Impossible: ul > ul.
-[ 'ul', 'ol' ].forEach( ( tag ) => {
-	listContentSchema[ tag ].children = {
-		li: {
-			children: listContentSchema,
-		},
+function getListContentSchema( { phrasingContentSchema } ) {
+	const listContentSchema = {
+		...phrasingContentSchema,
+		ul: {},
+		ol: { attributes: [ 'type', 'start', 'reversed' ] },
 	};
-} );
+
+	// Recursion is needed.
+	// Possible: ul > li > ul.
+	// Impossible: ul > ul.
+	[ 'ul', 'ol' ].forEach( ( tag ) => {
+		listContentSchema[ tag ].children = {
+			li: {
+				children: listContentSchema,
+			},
+		};
+	} );
+
+	return listContentSchema;
+}
 
 const transforms = {
 	from: [
@@ -72,17 +75,40 @@ const transforms = {
 		{
 			type: 'raw',
 			selector: 'ol,ul',
-			schema: {
-				ol: listContentSchema.ol,
-				ul: listContentSchema.ul,
-			},
+			schema: ( args ) => ( {
+				ol: getListContentSchema( args ).ol,
+				ul: getListContentSchema( args ).ul,
+			} ),
 			transform( node ) {
-				return createBlock( 'core/list', {
-					...getBlockAttributes(
-						'core/list',
-						node.outerHTML
-					),
+				const attributes = {
 					ordered: node.nodeName === 'OL',
+				};
+
+				if ( attributes.ordered ) {
+					const type = node.getAttribute( 'type' );
+
+					if ( type ) {
+						attributes.type = type;
+					}
+
+					if ( node.getAttribute( 'reversed' ) !== null ) {
+						attributes.reversed = true;
+					}
+
+					const start = parseInt( node.getAttribute( 'start' ), 10 );
+
+					if (
+						! isNaN( start ) &&
+						// start=1 only makes sense if the list is reversed.
+						( start !== 1 || attributes.reversed )
+					) {
+						attributes.start = start;
+					}
+				}
+
+				return createBlock( 'core/list', {
+					...getBlockAttributes( 'core/list', node.outerHTML ),
+					...attributes,
 				} );
 			},
 		},

@@ -5,8 +5,10 @@
 /*rtl:end:ignore*/
 
 .components-datetime {
+	padding: $grid-size-large;
+
 	.components-datetime__calendar-help {
-		padding: $grid-size;
+		padding: $grid-size-large;
 
 		h4 {
 			margin: 0;
@@ -16,8 +18,6 @@
 	.components-datetime__date-help-button {
 		display: block;
 		margin-left: auto;
-		margin-right: $grid-size;
-		margin-top: 0.5em;
 	}
 
 	fieldset {
@@ -28,21 +28,33 @@
 
 	select,
 	input {
-		box-sizing: border-box;
-		height: 28px;
-		vertical-align: middle;
-		padding: 0;
 		@include input-style__neutral();
+	}
+
+	// Override inherited conflicting styles to be consistent.
+	select,
+	input[type="number"],
+	.components-button {
+		height: 30px;
+		margin-top: 0;
+		margin-bottom: 0;
 	}
 }
 
 .components-datetime__date {
 	min-height: 236px;
 	border-top: 1px solid $light-gray-500;
-	margin-left: -$grid-size;
-	margin-right: -$grid-size;
 
 	// Override external DatePicker styles.
+	.CalendarMonthGrid {
+		// The included component contains an arbitrary 13px padding that misaligns things.
+		margin-left: -13px;
+	}
+
+	.DayPickerNavigation_leftButton__horizontalDefault {
+		left: 0;
+	}
+
 	.CalendarMonth_caption {
 		font-size: $default-font-size;
 	}
@@ -73,6 +85,11 @@
 
 	.DayPicker_weekHeader {
 		top: 50px;
+		.DayPicker_weekHeader_ul {
+			margin: 1px 0;
+			padding-left: 0;
+			padding-right: 0;
+		}
 	}
 
 	&.is-description-visible .DayPicker,
@@ -82,11 +99,15 @@
 }
 
 .components-datetime__time {
-	margin-bottom: 1em;
+	padding-bottom: $grid-size-large;
 
 	fieldset {
-		margin-top: 0.5em;
 		position: relative;
+		margin-bottom: 0.5em;
+	}
+
+	fieldset + fieldset {
+		margin-bottom: 0;
 	}
 
 	.components-datetime__time-field-am-pm fieldset {
@@ -119,8 +140,8 @@
 			z-index: 1;
 		}
 
-		.components-datetime__time-am-button.is-toggled,
-		.components-datetime__time-pm-button.is-toggled {
+		.components-datetime__time-am-button.is-pressed,
+		.components-datetime__time-pm-button.is-pressed {
 			background: $light-gray-300;
 			border-color: $dark-gray-100;
 			box-shadow: inset 0 2px 5px -3px $dark-gray-500;
@@ -215,10 +236,4 @@
 // It sets its own styles so centering is tricky.
 .components-popover .components-datetime__date {
 	padding-left: 4px;
-}
-
-// Used to prevent z-index issues on mobile.
-// See: https://github.com/WordPress/gutenberg/pull/7621#issuecomment-424322735
-.components-popover.edit-post-post-schedule__dialog.is-bottom.is-left {
-	z-index: 100000;
 }

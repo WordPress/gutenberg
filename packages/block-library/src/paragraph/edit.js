@@ -7,212 +7,183 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
 import {
 	PanelBody,
 	ToggleControl,
-	Toolbar,
-	withFallbackStyles,
+	ToolbarGroup,
 } from '@wordpress/components';
 import {
-	withColors,
 	AlignmentToolbar,
 	BlockControls,
-	ContrastChecker,
 	FontSizePicker,
 	InspectorControls,
-	PanelColorSettings,
 	RichText,
 	withFontSizes,
+	__experimentalUseColors,
 } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 import { compose } from '@wordpress/compose';
-import { withSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
+import { useEffect, useState } from '@wordpress/element';
 
+/**
+ * Browser dependencies
+ */
 const { getComputedStyle } = window;
+const querySelector = window.document.querySelector.bind( document );
 
 const name = 'core/paragraph';
+const PARAGRAPH_DROP_CAP_SELECTOR = 'p.has-drop-cap';
 
-const applyFallbackStyles = withFallbackStyles( ( node, ownProps ) => {
-	const { textColor, backgroundColor, fontSize, customFontSize } = ownProps.attributes;
-	const editableNode = node.querySelector( '[contenteditable="true"]' );
-	//verify if editableNode is available, before using getComputedStyle.
-	const computedStyles = editableNode ? getComputedStyle( editableNode ) : null;
-	return {
-		fallbackBackgroundColor: backgroundColor || ! computedStyles ? undefined : computedStyles.backgroundColor,
-		fallbackTextColor: textColor || ! computedStyles ? undefined : computedStyles.color,
-		fallbackFontSize: fontSize || customFontSize || ! computedStyles ? undefined : parseInt( computedStyles.fontSize ) || undefined,
-	};
-} );
+function ParagraphRTLToolbar( { direction, setDirection } ) {
+	const isRTL = useSelect( ( select ) => {
+		return !! select( 'core/block-editor' ).getSettings().isRTL;
+	}, [] );
 
-class ParagraphBlock extends Component {
-	constructor() {
-		super( ...arguments );
+	return ( isRTL && (
+		<ToolbarGroup
+			controls={ [
+				{
+					icon: 'editor-ltr',
+					title: _x( 'Left to right', 'editor button' ),
+					isActive: direction === 'ltr',
+					onClick() {
+						setDirection( direction === 'ltr' ? undefined : 'ltr' );
+					},
+				},
+			] }
+		/>
+	) );
+}
 
-		this.toggleDropCap = this.toggleDropCap.bind( this );
-	}
+function useDropCapMinimumHeight( isDropCap, deps ) {
+	const [ minimumHeight, setMinimumHeight ] = useState();
+	useEffect(
+		() => {
+			const element = querySelector( PARAGRAPH_DROP_CAP_SELECTOR );
+			if ( isDropCap && element ) {
+				setMinimumHeight(
+					getComputedStyle(
+						element,
+						'first-letter'
+					).height
+				);
+			} else if ( minimumHeight ) {
+				setMinimumHeight( undefined );
+			}
+		},
+		[ isDropCap, minimumHeight, setMinimumHeight, ...deps ]
+	);
+	return minimumHeight;
+}
 
-	toggleDropCap() {
-		const { attributes, setAttributes } = this.props;
-		setAttributes( { dropCap: ! attributes.dropCap } );
-	}
+function ParagraphBlock( {
+	attributes,
+	className,
+	fontSize,
+	mergeBlocks,
+	onReplace,
+	setAttributes,
+	setFontSize,
+} ) {
+	const {
+		align,
+		content,
+		dropCap,
+		placeholder,
+		direction,
+	} = attributes;
 
-	getDropCapHelp( checked ) {
-		return checked ? __( 'Showing large initial letter.' ) : __( 'Toggle to show a large initial letter.' );
-	}
+	const dropCapMinimumHeight = useDropCapMinimumHeight( dropCap, [ fontSize.size ] );
+	const {
+		TextColor,
+		BackgroundColor,
+		InspectorControlsColorPanel,
+		ColorDetector,
+	} = __experimentalUseColors(
+		[
+			{ name: 'textColor', property: 'color' },
+			{ name: 'backgroundColor', className: 'has-background' },
+		],
+		{
+			contrastCheckers: [ { backgroundColor: true, textColor: true, fontSize: fontSize.size } ],
+		},
+		[ fontSize.size ]
+	);
 
-	render() {
-		const {
-			attributes,
-			setAttributes,
-			mergeBlocks,
-			onReplace,
-			className,
-			backgroundColor,
-			textColor,
-			setBackgroundColor,
-			setTextColor,
-			fallbackBackgroundColor,
-			fallbackTextColor,
-			fallbackFontSize,
-			fontSize,
-			setFontSize,
-			isRTL,
-		} = this.props;
-
-		const {
-			align,
-			content,
-			dropCap,
-			placeholder,
-			direction,
-		} = attributes;
-
-		return (
-			<>
-				<BlockControls>
-					<AlignmentToolbar
-						value={ align }
-						onChange={ ( nextAlign ) => {
-							setAttributes( { align: nextAlign } );
-						} }
-					/>
-					{ isRTL && (
-						<Toolbar
-							controls={ [
-								{
-									icon: 'editor-ltr',
-									title: _x( 'Left to right', 'editor button' ),
-									isActive: direction === 'ltr',
-									onClick() {
-										const nextDirection = direction === 'ltr' ? undefined : 'ltr';
-										setAttributes( {
-											direction: nextDirection,
-										} );
-									},
-								},
-							] }
-						/>
-					) }
-				</BlockControls>
-				<InspectorControls>
-					<PanelBody title={ __( 'Text Settings' ) } className="blocks-font-size">
-						<FontSizePicker
-							fallbackFontSize={ fallbackFontSize }
-							value={ fontSize.size }
-							onChange={ setFontSize }
-						/>
-						<ToggleControl
-							label={ __( 'Drop Cap' ) }
-							checked={ !! dropCap }
-							onChange={ this.toggleDropCap }
-							help={ this.getDropCapHelp }
-						/>
-					</PanelBody>
-					<PanelColorSettings
-						title={ __( 'Color Settings' ) }
-						initialOpen={ false }
-						colorSettings={ [
-							{
-								value: backgroundColor.color,
-								onChange: setBackgroundColor,
-								label: __( 'Background Color' ),
-							},
-							{
-								value: textColor.color,
-								onChange: setTextColor,
-								label: __( 'Text Color' ),
-							},
-						] }
-					>
-						<ContrastChecker
-							{ ...{
-								textColor: textColor.color,
-								backgroundColor: backgroundColor.color,
-								fallbackTextColor,
-								fallbackBackgroundColor,
-							} }
-							fontSize={ fontSize.size }
-						/>
-					</PanelColorSettings>
-				</InspectorControls>
-				<RichText
-					identifier="content"
-					tagName="p"
-					className={ classnames( 'wp-block-paragraph', className, {
-						'has-text-color': textColor.color,
-						'has-background': backgroundColor.color,
-						'has-drop-cap': dropCap,
-						[ `has-text-align-${ align }` ]: align,
-						[ backgroundColor.class ]: backgroundColor.class,
-						[ textColor.class ]: textColor.class,
-						[ fontSize.class ]: fontSize.class,
-					} ) }
-					style={ {
-						backgroundColor: backgroundColor.color,
-						color: textColor.color,
-						fontSize: fontSize.size ? fontSize.size + 'px' : undefined,
-						direction,
-					} }
-					value={ content }
-					onChange={ ( nextContent ) => {
-						setAttributes( {
-							content: nextContent,
-						} );
-					} }
-					onSplit={ ( value ) => {
-						if ( ! value ) {
-							return createBlock( name );
-						}
-
-						return createBlock( name, {
-							...attributes,
-							content: value,
-						} );
-					} }
-					onMerge={ mergeBlocks }
-					onReplace={ onReplace }
-					onRemove={ onReplace ? () => onReplace( [] ) : undefined }
-					aria-label={ content ? __( 'Paragraph block' ) : __( 'Empty block; start writing or type forward slash to choose a block' ) }
-					placeholder={ placeholder || __( 'Start writing or type / to choose a block' ) }
-					__unstableEmbedURLOnPaste
+	return (
+		<>
+			<BlockControls>
+				<AlignmentToolbar
+					value={ align }
+					onChange={ ( newAlign ) => setAttributes( { align: newAlign } ) }
 				/>
-			</>
-		);
-	}
+				<ParagraphRTLToolbar
+					direction={ direction }
+					setDirection={ ( newDirection ) => setAttributes( { direction: newDirection } ) }
+				/>
+			</BlockControls>
+			<InspectorControls>
+				<PanelBody title={ __( 'Text Settings' ) } className="blocks-font-size">
+					<FontSizePicker
+						value={ fontSize.size }
+						onChange={ setFontSize }
+					/>
+					<ToggleControl
+						label={ __( 'Drop Cap' ) }
+						checked={ !! dropCap }
+						onChange={ () => setAttributes( { dropCap: ! dropCap } ) }
+						help={ dropCap ?
+							__( 'Showing large initial letter.' ) :
+							__( 'Toggle to show a large initial letter.' )
+						}
+					/>
+				</PanelBody>
+			</InspectorControls>
+			{ InspectorControlsColorPanel }
+			<BackgroundColor>
+				<TextColor>
+					<ColorDetector querySelector='[contenteditable="true"]' />
+					<RichText
+						identifier="content"
+						tagName="p"
+						className={ classnames( 'wp-block-paragraph', className, {
+							'has-drop-cap': dropCap,
+							[ `has-text-align-${ align }` ]: align,
+							[ fontSize.class ]: fontSize.class,
+						} ) }
+						style={ {
+							fontSize: fontSize.size ? fontSize.size + 'px' : undefined,
+							direction,
+							minHeight: dropCapMinimumHeight,
+						} }
+						value={ content }
+						onChange={ ( newContent ) => setAttributes( { content: newContent } ) }
+						onSplit={ ( value ) => {
+							if ( ! value ) {
+								return createBlock( name );
+							}
+
+							return createBlock( name, {
+								...attributes,
+								content: value,
+							} );
+						} }
+						onMerge={ mergeBlocks }
+						onReplace={ onReplace }
+						onRemove={ onReplace ? () => onReplace( [] ) : undefined }
+						aria-label={ content ? __( 'Paragraph block' ) : __( 'Empty block; start writing or type forward slash to choose a block' ) }
+						placeholder={ placeholder || __( 'Start writing or type / to choose a block' ) }
+						__unstableEmbedURLOnPaste
+					/>
+				</TextColor>
+			</BackgroundColor>
+		</>
+	);
 }
 
 const ParagraphEdit = compose( [
-	withColors( 'backgroundColor', { textColor: 'color' } ),
 	withFontSizes( 'fontSize' ),
-	applyFallbackStyles,
-	withSelect( ( select ) => {
-		const { getSettings } = select( 'core/block-editor' );
-
-		return {
-			isRTL: getSettings().isRTL,
-		};
-	} ),
 ] )( ParagraphBlock );
 
 export default ParagraphEdit;

@@ -1,6 +1,6 @@
 # Block Registration
 
-## `register_block_type`
+## `registerBlockType`
 
 * **Type:** `Function`
 
@@ -438,6 +438,24 @@ transforms: {
 },
 ```
 {% end %}
+
+In the case of shortcode transforms, `isMatch` receives shortcode attributes per the [Shortcode API](https://codex.wordpress.org/Shortcode_API):
+
+{% codetabs %}
+{% ES5 %}
+```js
+isMatch: function( attributes ) {
+	return attributes.named.id === 'my-id';
+},
+```
+{% ESNext %}
+```js
+isMatch( { named: { id } } ) {
+	return id === 'my-id';
+},
+```
+{% end %}
+
 
 To control the priority with which a transform is applied, define a `priority` numeric property on your transform object, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
 

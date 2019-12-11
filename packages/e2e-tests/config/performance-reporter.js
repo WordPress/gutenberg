@@ -6,7 +6,7 @@ function average( array ) {
 
 class PerformanceReporter {
 	onRunComplete() {
-		const path = __dirname + '/../specs/results.json';
+		const path = __dirname + '/../specs/performance/results.json';
 
 		if ( ! existsSync( path ) ) {
 			return;

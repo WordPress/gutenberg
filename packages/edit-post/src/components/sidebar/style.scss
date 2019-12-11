@@ -1,30 +1,17 @@
 .edit-post-sidebar {
-	position: fixed;
-	z-index: z-index(".edit-post-sidebar");
-	top: 0;
-	right: 0;
-	bottom: 0;
-	width: $sidebar-width;
-	border-left: $border-width solid $light-gray-500;
 	background: $white;
 	color: $dark-gray-500;
-	height: 100vh;
-	overflow: hidden;
+	overflow: visible;
 
 	@include break-small() {
-		top: $admin-bar-height-big + $header-height;
-		z-index: z-index(".edit-post-sidebar {greater than small}");
-		height: auto;
-		overflow: auto;
+		z-index: auto;
+		height: 100%;
+		overflow: visible;
 		-webkit-overflow-scrolling: touch;
 	}
 
 	@include break-medium() {
-		top: $admin-bar-height + $header-height;
-
-		body.is-fullscreen-mode & {
-			top: $header-height;
-		}
+		width: $sidebar-width;
 	}
 
 	> .components-panel {
@@ -37,10 +24,9 @@
 		margin-top: -1px;
 		margin-bottom: -1px;
 		position: relative;
-		z-index: z-index(".edit-post-sidebar .components-panel");
 
 		@include break-small() {
-			overflow: hidden;
+			overflow: visible;
 			height: auto;
 			max-height: none;
 		}
@@ -96,26 +82,6 @@
 		right: 10px;
 		bottom: 10px;
 		left: auto;
-	}
-}
-
-/* Visual and Text editor both */
-.edit-post-layout.is-sidebar-opened .edit-post-layout__content {
-	@include break-medium() {
-		margin-right: $sidebar-width;
-	}
-}
-
-.edit-post-layout.is-sidebar-opened {
-	.edit-post-sidebar,
-	.edit-post-plugin-sidebar__sidebar-layout {
-		/* Sidebar covers screen on mobile */
-		width: 100%;
-
-		/* Sidebar sits on the side on larger breakpoints */
-		@include break-medium() {
-			width: $sidebar-width;
-		}
 	}
 }
 
@@ -183,7 +149,8 @@
 		}
 	}
 
-	&:focus {
+	&:focus:not(:disabled) {
 		@include square-style__focus;
+		box-shadow: none;
 	}
 }

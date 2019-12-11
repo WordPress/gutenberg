@@ -272,7 +272,7 @@ export class MediaPlaceholder extends Component {
 				<Button
 					className="editor-media-placeholder__button block-editor-media-placeholder__button"
 					onClick={ this.openURLInput }
-					isToggled={ isURLInputVisible }
+					isPressed={ isURLInputVisible }
 					isLarge
 				>
 					{ __( 'Insert from URL' ) }
@@ -429,7 +429,7 @@ const applyWithSelect = withSelect( ( select ) => {
 	const { getSettings } = select( 'core/block-editor' );
 
 	return {
-		mediaUpload: getSettings().__experimentalMediaUpload,
+		mediaUpload: getSettings().mediaUpload,
 	};
 } );
 

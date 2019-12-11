@@ -1,6 +1,4 @@
 .wp-block-image {
-	max-width: 100%;
-
 	// The image block is in a `figure` element, and many themes zero this out.
 	// This rule explicitly sets it, to ensure at least some bottom-margin in the flow.
 	margin-bottom: 1em;
@@ -53,6 +51,13 @@
 	.aligncenter {
 		margin-left: auto;
 		margin-right: auto;
+	}
+
+	// Supply caption styles to images, even if the theme hasn't opted in.
+	// Reason being: the new markup, <figcaptions>, are not likely to be styled in the majority of existing themes,
+	// so we supply the styles so as to not appear broken or unstyled in those themes.
+	figcaption {
+		@include caption-style();
 	}
 }
 

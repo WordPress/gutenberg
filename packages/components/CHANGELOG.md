@@ -1,3 +1,9 @@
+# 8.3.0 (Unreleased)
+
+### New Features
+
+- Added a new `Guide` component which allows developers to easily present a user guide.
+
 ## 8.2.0 (2019-08-29)
 
 ### New Features

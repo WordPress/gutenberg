@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
+import { last, noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -15,11 +15,14 @@ import { compose } from '@wordpress/compose';
  */
 import withRegistryProvider from './with-registry-provider';
 
+/** @typedef {import('@wordpress/data').WPDataRegistry} WPDataRegistry */
+
 class BlockEditorProvider extends Component {
 	componentDidMount() {
 		this.props.updateSettings( this.props.settings );
 		this.props.resetBlocks( this.props.value );
 		this.attachChangeObserver( this.props.registry );
+		this.isSyncingOutcomingValue = [];
 	}
 
 	componentDidUpdate( prevProps ) {
@@ -28,6 +31,9 @@ class BlockEditorProvider extends Component {
 			updateSettings,
 			value,
 			resetBlocks,
+			selectionStart,
+			selectionEnd,
+			resetSelection,
 			registry,
 		} = this.props;
 
@@ -39,22 +45,28 @@ class BlockEditorProvider extends Component {
 			this.attachChangeObserver( registry );
 		}
 
-		if ( this.isSyncingOutcomingValue !== null && this.isSyncingOutcomingValue === value ) {
+		if ( this.isSyncingOutcomingValue.includes( value ) ) {
 			// Skip block reset if the value matches expected outbound sync
 			// triggered by this component by a preceding change detection.
 			// Only skip if the value matches expectation, since a reset should
 			// still occur if the value is modified (not equal by reference),
 			// to allow that the consumer may apply modifications to reflect
 			// back on the editor.
-			this.isSyncingOutcomingValue = null;
+			if ( last( this.isSyncingOutcomingValue ) === value ) {
+				this.isSyncingOutcomingValue = [];
+			}
 		} else if ( value !== prevProps.value ) {
 			// Reset changing value in all other cases than the sync described
 			// above. Since this can be reached in an update following an out-
 			// bound sync, unset the outbound value to avoid considering it in
 			// subsequent renders.
-			this.isSyncingOutcomingValue = null;
+			this.isSyncingOutcomingValue = [];
 			this.isSyncingIncomingValue = value;
 			resetBlocks( value );
+
+			if ( selectionStart && selectionEnd ) {
+				resetSelection( selectionStart, selectionEnd );
+			}
 		}
 	}
 
@@ -73,8 +85,8 @@ class BlockEditorProvider extends Component {
 	 * This needs to be done synchronously after state changes (instead of using
 	 * `componentDidUpdate`) in order to avoid batching these changes.
 	 *
-	 * @param {WPDataRegistry} registry     Registry from which block editor
-	 *                                      dispatch is to be overriden.
+	 * @param {WPDataRegistry} registry Registry from which block editor
+	 *                                  dispatch is to be overridden.
 	 */
 	attachChangeObserver( registry ) {
 		if ( this.unsubscribe ) {
@@ -83,6 +95,8 @@ class BlockEditorProvider extends Component {
 
 		const {
 			getBlocks,
+			getSelectionStart,
+			getSelectionEnd,
 			isLastBlockChangePersistent,
 			__unstableIsLastBlockChangeIgnored,
 		} = registry.select( 'core/block-editor' );
@@ -119,16 +133,19 @@ class BlockEditorProvider extends Component {
 				// When knowing the blocks value is changing, assign instance
 				// value to skip reset in subsequent `componentDidUpdate`.
 				if ( newBlocks !== blocks ) {
-					this.isSyncingOutcomingValue = newBlocks;
+					this.isSyncingOutcomingValue.push( newBlocks );
 				}
 
 				blocks = newBlocks;
 				isPersistent = newIsPersistent;
 
+				const selectionStart = getSelectionStart();
+				const selectionEnd = getSelectionEnd();
+
 				if ( isPersistent ) {
-					onChange( blocks );
+					onChange( blocks, { selectionStart, selectionEnd } );
 				} else {
-					onInput( blocks );
+					onInput( blocks, { selectionStart, selectionEnd } );
 				}
 			}
 		} );
@@ -147,11 +164,13 @@ export default compose( [
 		const {
 			updateSettings,
 			resetBlocks,
+			resetSelection,
 		} = dispatch( 'core/block-editor' );
 
 		return {
 			updateSettings,
 			resetBlocks,
+			resetSelection,
 		};
 	} ),
 ] )( BlockEditorProvider );

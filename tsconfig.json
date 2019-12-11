@@ -22,7 +22,8 @@
 
 	},
 	"include": [
-		"./packages/url/**/*.js"
+		"./packages/url/**/*.js",
+		"./packages/token-list/**/*.js"
 	],
 	"exclude": [
 		"./packages/**/test/**",

@@ -18,7 +18,6 @@ import {
 	isCollapsed,
 	getTextContent,
 } from '@wordpress/rich-text';
-import { getRectangleFromRange } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -91,7 +90,7 @@ import withSpokenMessages from '../higher-order/with-spoken-messages';
  */
 
 /**
- * @typedef {Object} Completer
+ * @typedef {Object} WPCompleter
  * @property {string} name a way to identify a completer, useful for selective overriding.
  * @property {?string} className A class to apply to the popup menu.
  * @property {string} triggerPrefix the prefix that will display the menu.
@@ -130,13 +129,9 @@ function filterOptions( search, options = [], maxResults = 10 ) {
 	return filtered;
 }
 
-function getCaretRect() {
+function getRange() {
 	const selection = window.getSelection();
-	const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
-
-	if ( range ) {
-		return getRectangleFromRange( range );
-	}
+	return selection.rangeCount ? selection.getRangeAt( 0 ) : null;
 }
 
 export class Autocomplete extends Component {
@@ -232,8 +227,8 @@ export class Autocomplete extends Component {
 	/**
 	 * Load options for an autocompleter.
 	 *
-	 * @param {Completer} completer The autocompleter.
-	 * @param {string}    query     The query, if any.
+	 * @param {WPCompleter} completer The autocompleter.
+	 * @param {string}      query     The query, if any.
 	 */
 	loadOptions( completer, query ) {
 		const { options } = completer;
@@ -426,7 +421,7 @@ export class Autocomplete extends Component {
 						onClose={ this.reset }
 						position="top right"
 						className="components-autocomplete__popover"
-						getAnchorRect={ getCaretRect }
+						anchorRef={ getRange() }
 					>
 						<div
 							id={ listBoxId }

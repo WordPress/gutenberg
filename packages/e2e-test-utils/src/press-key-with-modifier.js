@@ -80,6 +80,35 @@ async function emulateSelectAll() {
 	} );
 }
 
+async function emulateClipboard( type ) {
+	await page.evaluate( ( _type ) => {
+		if ( _type !== 'paste' ) {
+			window._clipboardData = new DataTransfer();
+
+			const selection = window.getSelection();
+			const plainText = selection.toString();
+			let html = plainText;
+
+			if ( selection.rangeCount ) {
+				const range = selection.getRangeAt( 0 );
+				const fragment = range.cloneContents();
+
+				html = Array.from( fragment.childNodes )
+					.map( ( node ) => node.outerHTML || node.nodeValue )
+					.join( '' );
+			}
+
+			window._clipboardData.setData( 'text/plain', plainText );
+			window._clipboardData.setData( 'text/html', html );
+		}
+
+		document.activeElement.dispatchEvent( new ClipboardEvent( _type, {
+			bubbles: true,
+			clipboardData: window._clipboardData,
+		} ) );
+	}, type );
+}
+
 /**
  * Performs a key press with modifier (Shift, Control, Meta, Alt), where each modifier
  * is normalized to platform-specific modifier.
@@ -90,6 +119,18 @@ async function emulateSelectAll() {
 export async function pressKeyWithModifier( modifier, key ) {
 	if ( modifier.toLowerCase() === 'primary' && key.toLowerCase() === 'a' ) {
 		return await emulateSelectAll();
+	}
+
+	if ( modifier.toLowerCase() === 'primary' && key.toLowerCase() === 'c' ) {
+		return await emulateClipboard( 'copy' );
+	}
+
+	if ( modifier.toLowerCase() === 'primary' && key.toLowerCase() === 'x' ) {
+		return await emulateClipboard( 'cut' );
+	}
+
+	if ( modifier.toLowerCase() === 'primary' && key.toLowerCase() === 'v' ) {
+		return await emulateClipboard( 'paste' );
 	}
 
 	const isAppleOS = () => process.platform === 'darwin';

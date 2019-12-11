@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { createElement } from '@wordpress/element';
@@ -9,9 +14,10 @@ export const Path = ( props ) => createElement( 'path', props );
 export const Polygon = ( props ) => createElement( 'polygon', props );
 export const Rect = ( props ) => createElement( 'rect', props );
 
-export const SVG = ( props ) => {
+export const SVG = ( { className, isPressed, ...props } ) => {
 	const appliedProps = {
 		...props,
+		className: classnames( className, { 'is-pressed': isPressed } ) || undefined,
 		role: 'img',
 		'aria-hidden': 'true',
 		focusable: 'false',

@@ -6,7 +6,7 @@ import classNames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { URLPopover } from '@wordpress/block-editor';
+import { URLPopover, URLInput } from '@wordpress/block-editor';
 import { useState } from '@wordpress/element';
 import {
 	Button,
@@ -47,13 +47,12 @@ const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
 							event.preventDefault();
 							setPopover( false );
 						} } >
-						<div className="editor-url-input block-editor-url-input">
-							<input type="text"
-								value={ url }
-								onChange={ ( event ) => setAttributes( { url: event.target.value } ) }
-								placeholder={ __( 'Enter Address' ) }
-							/>
-						</div>
+						<URLInput
+							value={ url }
+							onChange={ ( nextURL ) => setAttributes( { url: nextURL } ) }
+							placeholder={ __( 'Enter Address' ) }
+							disableSuggestions={ true }
+						/>
 						<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
 					</form>
 				</URLPopover>

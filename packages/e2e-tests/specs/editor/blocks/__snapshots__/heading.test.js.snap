@@ -1,0 +1,45 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Heading can be created by prefixing existing content with number signs and a space 1`] = `
+"<!-- wp:heading {\\"level\\":4} -->
+<h4>4</h4>
+<!-- /wp:heading -->"
+`;
+
+exports[`Heading can be created by prefixing number sign and a space 1`] = `
+"<!-- wp:heading {\\"level\\":3} -->
+<h3>3</h3>
+<!-- /wp:heading -->"
+`;
+
+exports[`Heading it should correctly apply custom colors 1`] = `
+"<!-- wp:heading {\\"level\\":3,\\"customTextColor\\":\\"#181717\\"} -->
+<h3 class=\\"has-text-color\\" style=\\"color:#181717\\">Heading</h3>
+<!-- /wp:heading -->"
+`;
+
+exports[`Heading it should correctly apply named colors 1`] = `
+"<!-- wp:heading {\\"textColor\\":\\"very-dark-gray\\"} -->
+<h2 class=\\"has-very-dark-gray-color has-text-color\\">Heading</h2>
+<!-- /wp:heading -->"
+`;
+
+exports[`Heading should create a paragraph block above when pressing enter at the start 1`] = `
+"<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2>a</h2>
+<!-- /wp:heading -->"
+`;
+
+exports[`Heading should create a paragraph block below when pressing enter at the end 1`] = `
+"<!-- wp:heading -->
+<h2>a</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->"
+`;

@@ -5,6 +5,14 @@
 	padding-right: 0;
 	// Some themes give all <ul> default margin instead of padding.
 	margin-left: 0;
+
+	// Some themes add underlines, false underlines (via shadows), and borders to <a>.
+	.wp-social-link a,
+	.wp-social-link a:hover {
+		text-decoration: none;
+		border-bottom: 0;
+		box-shadow: none;
+	}
 }
 
 .wp-social-link {
@@ -14,6 +22,7 @@
 	border-radius: 36px; // This makes it pill-shaped instead of oval, in cases where the image fed is not perfectly sized.
 	margin-right: 8px;
 	transition: transform 0.1s ease;
+	@include reduce-motion("transition");
 
 	a {
 		padding: 6px;

@@ -5,7 +5,6 @@ import { createBlobURL } from '@wordpress/blob';
 import {
 	createBlock,
 	getBlockAttributes,
-	getPhrasingContentSchema,
 } from '@wordpress/blocks';
 
 export function stripFirstImage( attributes, { shortcode } ) {
@@ -44,12 +43,12 @@ function getFirstAnchorAttributeFormHTML( html, attributeName ) {
 
 const imageSchema = {
 	img: {
-		attributes: [ 'src', 'alt' ],
+		attributes: [ 'src', 'alt', 'title' ],
 		classes: [ 'alignleft', 'aligncenter', 'alignright', 'alignnone', /^wp-image-\d+$/ ],
 	},
 };
 
-const schema = {
+const schema = ( { phrasingContentSchema } ) => ( {
 	figure: {
 		require: [ 'img' ],
 		children: {
@@ -59,11 +58,11 @@ const schema = {
 				children: imageSchema,
 			},
 			figcaption: {
-				children: getPhrasingContentSchema(),
+				children: phrasingContentSchema,
 			},
 		},
 	},
-};
+} );
 
 const transforms = {
 	from: [

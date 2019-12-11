@@ -4,7 +4,7 @@
 import { ZWNBSP } from '../../special-characters';
 
 export function getSparseArrayLength( array ) {
-	return array.reduce( ( i ) => i + 1, 0 );
+	return array.reduce( ( accumulator ) => accumulator + 1, 0 );
 }
 
 const em = { type: 'em' };
@@ -607,6 +607,44 @@ export const spec = [
 			formats: [ [ strong ], [ strong ], [ strong ], [ strong ] ],
 			replacements: [ , , , , ],
 			text: 'test',
+		},
+	},
+	{
+		description: 'should not error with overlapping formats (1)',
+		html: '<a href="#"><em>1</em><strong>2</strong></a>',
+		createRange: ( element ) => ( {
+			startOffset: 1,
+			startContainer: element.firstChild,
+			endOffset: 1,
+			endContainer: element.firstChild,
+		} ),
+		startPath: [ 0, 0, 0, 1 ],
+		endPath: [ 0, 0, 0, 1 ],
+		record: {
+			start: 1,
+			end: 1,
+			formats: [ [ a, em ], [ a, strong ] ],
+			replacements: [ , , ],
+			text: '12',
+		},
+	},
+	{
+		description: 'should not error with overlapping formats (2)',
+		html: '<em><a href="#">1</a></em><strong><a href="#">2</a></strong>',
+		createRange: ( element ) => ( {
+			startOffset: 1,
+			startContainer: element.firstChild,
+			endOffset: 1,
+			endContainer: element.firstChild,
+		} ),
+		startPath: [ 0, 0, 0, 1 ],
+		endPath: [ 0, 0, 0, 1 ],
+		record: {
+			start: 1,
+			end: 1,
+			formats: [ [ em, a ], [ strong, a ] ],
+			replacements: [ , , ],
+			text: '12',
 		},
 	},
 ];

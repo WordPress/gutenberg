@@ -59,7 +59,7 @@ export default function Notice( { children, onRemove, isDismissible } ) {
 }
 ```
 
-A component's class name should **never** be used outside its own folder (with rare exceptions such as [`_z-index.scss`](https://github.com/WordPress/gutenberg/blob/master/assets/stylesheets/_z-index.scss)). If you need to inherit styles of another component in your own components, you should render an instance of that other component. At worst, you should duplicate the styles within your own component's stylesheet. This is intended to improve maintainability by treating individual components as the isolated abstract interface.
+A component's class name should **never** be used outside its own folder (with rare exceptions such as [`_z-index.scss`](https://github.com/WordPress/gutenberg/blob/master/packages/base-styles/_z-index.scss)). If you need to inherit styles of another component in your own components, you should render an instance of that other component. At worst, you should duplicate the styles within your own component's stylesheet. This is intended to improve maintainability by isolating shared components as a reusable interface, reducing the surface area of similar UI elements by adapting a limited set of common components to support a varied set of use-cases.
 
 #### SCSS File Naming Conventions for Blocks
 
@@ -200,6 +200,251 @@ alert( 'My name is ' + name + '.' );
 // Good:
 alert( `My name is ${ name }.` );
 ```
+
+## JavaScript Documentation using JSDoc
+
+Gutenberg follows the [WordPress JavaScript Documentation Standards](https://make.wordpress.org/core/handbook/best-practices/inline-documentation-standards/javascript/), with additional guidelines relevant for its distinct use of [import semantics](https://github.com/WordPress/gutenberg/blob/master/docs/contributors/coding-guidelines.md#imports) in organizing files, the [use of TypeScript tooling](https://github.com/WordPress/gutenberg/blob/master/docs/contributors/testing-overview.md#javascript-testing) for types validation, and automated documentation generation using [`@wordpress/docgen`](https://github.com/WordPress/gutenberg/tree/master/packages/docgen).
+
+For additional guidance, consult the following resources:
+
+- [JSDoc Official Documentation](https://jsdoc.app/index.html)
+- [TypeScript Supported JSDoc](https://www.typescriptlang.org/docs/handbook/type-checking-javascript-files.html#supported-jsdoc)
+
+### Custom Types
+
+Define custom types using the [JSDoc `@typedef` tag](https://jsdoc.app/tags-typedef.html).
+
+A custom type should include a description, and should always include its base type.
+
+Custom types should be named as succinctly as possible, while still retaining clarity of meaning and avoiding conflict with other global or scoped types. A `WP` prefix should be applied to all custom types. Avoid superfluous or redundant prefixes and suffixes (for example, a `Type` suffix, or `Custom` prefix). Custom types are not global by default, so a custom type does not need to be excessively specific to a particular package. However, they should be named with enough specificity to avoid ambiguity or name collisions when brought into the same scope as another type.
+
+```js
+/**
+ * A block selection object.
+ *
+ * @typedef {Object} WPBlockSelection
+ *
+ * @property {string} clientId     A block client ID.
+ * @property {string} attributeKey A block attribute key.
+ * @property {number} offset       An attribute value offset, based on the rich
+ *                                 text value.
+ */
+```
+
+Custom types can also be used to describe a set of predefined options. While the [type union](https://jsdoc.app/tags-type.html) can be used with literal values as an inline type, it can be difficult to align tags while still respecting a maximum line length of 80 characters. Using a custom type to define a union type can afford the opportunity to describe the purpose of these options, and helps to avoid these line length issues.
+
+```js
+/**
+ * Named breakpoint sizes.
+ * 
+ * @typedef {'huge'|'wide'|'large'|'medium'|'small'|'mobile'} WPBreakpoint
+ */
+```
+
+Note the use of quotes when defining a set of string literals. As in the [JavaScript Coding Standards](https://make.wordpress.org/core/handbook/best-practices/coding-standards/javascript/), single quotes should be used when assigning a string literal either as the type or as a [default function parameter](#nullable-undefined-and-void-types), or when [specifying the path](#importing-and-exporting-types) of an imported type.
+
+### Importing and Exporting Types
+
+Use the [TypeScript `import` function](https://www.typescriptlang.org/docs/handbook/type-checking-javascript-files.html#import-types) to import type declarations from other files or third-party dependencies.
+
+Since an imported type declaration can occupy an excess of the available line length and become verbose when referenced multiple times, you are encouraged to create an alias of the external type using a `@typedef` declaration at the top of the file, immediately following [the `import` groupings](https://github.com/WordPress/gutenberg/blob/master/docs/contributors/coding-guidelines.md#imports).
+
+```js
+/** @typedef {import('@wordpress/data').WPDataRegistry} WPDataRegistry */
+```
+
+Note that all custom types defined in another file can be imported.
+
+When considering which types should be made available from a WordPress package, the `@typedef` statements in the package's entry point script should be treated as effectively the same as its public API. It is important to be aware of this, both to avoid unintentionally exposing internal types on the public interface, and as a way to expose the public types of a project.
+
+```js
+// packages/data/src/index.js
+
+/** @typedef {import('./registry').WPDataRegistry} WPDataRegistry */
+```
+
+In this snippet, the `@typedef` will support the usage of the previous example's `import('@wordpress/data')`.
+
+#### External Dependencies
+
+Many third-party dependencies will distribute their own TypeScript typings. For these, the `import` semantics should "just work".
+
+![Working Example: `import` type](https://user-images.githubusercontent.com/1779930/70167742-62198800-1695-11ea-9c21-82a91d4a60e2.png)
+
+If you use a [TypeScript integration](https://github.com/Microsoft/TypeScript/wiki/TypeScript-Editor-Support) for your editor, you can typically see that this works if the type resolves to anything other than the fallback `any` type.
+
+For packages which do not distribute their own TypeScript types, you are welcomed to install and use the [DefinitelyTyped](http://definitelytyped.org/) community-maintained types definitions, if one exists.
+
+### Record Types
+
+When documenting a generic type such as `Object`, `Function`, `Promise`, etc., always include details about the expected record types.
+
+```js
+// Incorrect:
+
+/** @type {Object} */
+/** @type {Function} */
+/** @type {Promise} */
+
+// Correct:
+
+/** @type {Object<string,number>} */
+/** @type {(key:string)=>boolean} */
+/** @type {Promise<string>} */
+```
+
+The function expression here uses TypeScript's syntax for function types, which can be useful in providing more detailed information about the names and types of the expected parameters. For more information, consult the [TypeScript `@type` tag function recommendations](https://www.typescriptlang.org/docs/handbook/type-checking-javascript-files.html#type).
+
+In more advanced cases, you may define your own custom types as a generic type using the [TypeScript `@template` tag](https://www.typescriptlang.org/docs/handbook/type-checking-javascript-files.html#template).
+
+Similar to the "Custom Types" advice concerning type unions and with literal values, you can consider to create a custom type `@typedef` to better describe expected key values for object records, or to extract a complex function signature.
+
+```js
+/**
+ * An apiFetch middleware handler. Passed the fetch options, the middleware is
+ * expected to call the `next` middleware once it has completed its handling.
+ *
+ * @typedef {(options:WPAPIFetchOptions,next:WPAPIFetchMiddleware)=>void} WPAPIFetchMiddleware
+ */
+```
+
+```js
+/**
+ * Named breakpoint sizes.
+ * 
+ * @typedef {"huge"|"wide"|"large"|"medium"|"small"|"mobile"} WPBreakpoint
+ */
+
+/**
+ * Hash of breakpoint names with pixel width at which it becomes effective.
+ * 
+ * @type {Object<WPBreakpoint,number>}
+ */
+const BREAKPOINTS = { huge: 1440 /* , ... */ };
+```
+
+### Nullable, Undefined, and Void Types
+
+You can express a nullable type using a leading `?`. Use the nullable form of a type only if you're describing either the type or an explicit `null` value. Do not use the nullable form as an indicator of an optional parameter.
+
+```js
+/**
+ * Returns a configuration value for a given key, if exists. Returns null if
+ * there is no configured value.
+ * 
+ * @param {string} key Configuration key to retrieve.
+ * 
+ * @return {?*} Configuration value, if exists.
+ */
+function getConfigurationValue( key ) {
+	return config.hasOwnProperty( key ) ? config[ key ] : null;
+}
+```
+
+Similarly, use the `undefined` type only if you're expecting an explicit value of `undefined`.
+
+```js
+/**
+ * Returns true if the next HTML token closes the current token.
+ *
+ * @param {WPHTMLToken}           currentToken Current token to compare with.
+ * @param {WPHTMLToken|undefined} nextToken    Next token to compare against.
+ *
+ * @return {boolean} True if `nextToken` closes `currentToken`, false otherwise.
+ */
+```
+
+If a parameter is optional, use the [square-bracket notation](https://jsdoc.app/tags-param.html#optional-parameters-and-default-values). If an optional parameter has a default value which can be expressed as a [default parameter](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Default_parameters) in the function expression, it is not necesssary to include the value in JSDoc. If the function parameter has an effective default value which requires complex logic and cannot be expressed using the default parameters syntax, you can choose to include the default value in the JSDoc.
+
+```js
+/**
+ * Renders a toolbar.
+ *
+ * @param {Object} props             Component props.
+ * @param {string} [props.className] Class to set on the container `<div />`.
+ */
+```
+
+When a function does not include a `return` statement, it is said to have a `void` return value. It is not necessary to include a `@return` tag if the return type is `void`.
+
+If a function has multiple code paths where some (but not all) conditions result in a `return` statement, you can document this as a union type including the `void` type.
+
+```js
+/**
+ * Returns a configuration value for a given key, if exists.
+ * 
+ * @param {string} key Configuration key to retrieve.
+ * 
+ * @return {*|void} Configuration value, if exists.
+ */
+function getConfigurationValue( key ) {
+	if ( config.hasOwnProperty( key ) ) {
+		return config[ key ];
+	}
+}
+```
+
+When documenting a [function type](https://github.com/WordPress/gutenberg/blob/add/typescript-jsdoc-guidelines/docs/contributors/coding-guidelines.md#record-types), you must always include the `void` return value type, as otherwise the function is inferred to return a mixed ("any") value, not a void result.
+
+```js
+/**
+ * An apiFetch middleware handler. Passed the fetch options, the middleware is
+ * expected to call the `next` middleware once it has completed its handling.
+ *
+ * @typedef {(options:WPAPIFetchOptions,next:WPAPIFetchMiddleware)=>void} WPAPIFetchMiddleware
+ */
+```
+
+### Documenting Examples
+
+Because the documentation generated using the `@wordpress/docgen` tool will include `@example` tags if they are defined, it is considered a best practice to include usage examples for functions and components. This is especially important for documented members of a package's public API.
+
+When documenting an example, use the markdown <code>\`\`\`</code> code block to demarcate the beginning and end of the code sample. An example can span multiple lines.
+
+```js
+/**
+ * Given the name of a registered store, returns an object of the store's
+ * selectors. The selector functions are been pre-bound to pass the current
+ * state automatically. As a consumer, you need only pass arguments of the
+ * selector, if applicable.
+ *
+ * @param {string} name Store name.
+ *
+ * @example
+ * ```js
+ * select( 'my-shop' ).getPrice( 'hammer' );
+ * ```
+ *
+ * @return {Object<string,WPDataSelector>} Object containing the store's
+ *                                         selectors.
+ */
+```
+
+### Documenting `@wordpress/element` (React) Components
+
+When possible, all components should be implemented as [function components](https://reactjs.org/docs/components-and-props.html#function-and-class-components), using [hooks](https://reactjs.org/docs/hooks-intro.html) for managing component lifecycle and state.
+
+Documenting a function component should be treated the same as any other function. The primary caveat in documenting a component is being aware that the function typically accepts only a single argument (the "props"), which may include many property members. Use the [dot syntax for parameter properties](https://jsdoc.app/tags-param.html#parameters-with-properties) to document individual prop types.
+
+```js
+/**
+ * Renders the block's configured title as a string, or empty if the title
+ * cannot be determined.
+ *
+ * @example
+ *
+ * ```jsx
+ * <BlockTitle name="my-plugin/my-block" />
+ * ```
+ *
+ * @param {Object}  props      Component props.
+ * @param {?string} props.name Block name.
+ *
+ * @return {?string} Block title.
+ */
+```
+
+For class components, there is no recommendation for documenting the props of the component. Gutenberg does not use or endorse the [`propTypes` static class member](https://reactjs.org/docs/typechecking-with-proptypes.html).
 
 ## PHP
 

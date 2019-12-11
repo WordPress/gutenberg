@@ -28,7 +28,8 @@ export const settings = {
 	example: {
 		attributes: {
 			sizeSlug: 'large',
-			url: 'https://upload.wikimedia.org/wikipedia/commons/1/15/MtBlanc1.JPG',
+			url: 'https://s.w.org/images/core/5.3/MtBlanc1.jpg',
+			// translators: Caption accompanying an image of the Mont Blanc, which serves as an example for the Image block.
 			caption: __( 'Mont Blanc appears—still, snowy, and serene.' ),
 		},
 	},

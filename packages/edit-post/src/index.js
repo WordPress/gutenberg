@@ -77,6 +77,29 @@ export function initializeEditor( id, postType, postId, settings, initialEdits )
 		console.warn( "Your browser is using Quirks Mode. \nThis can cause rendering issues such as blocks overlaying meta boxes in the editor. Quirks Mode can be triggered by PHP errors or HTML code appearing before the opening <!DOCTYPE html>. Try checking the raw page source or your site's PHP error log and resolving errors there, removing any HTML before the doctype, or disabling plugins." );
 	}
 
+	// This is a temporary fix for a couple of issues specific to Webkit on iOS.
+	// Without this hack the browser scrolls the mobile toolbar off-screen.
+	// Once supported in Safari we can replace this in favor of preventScroll.
+	// For details see issue #18632 and PR #18686
+	// Specifically, we scroll `edit-post-editor-regions__body` to enable a fixed top toolbar.
+	// But Mobile Safari forces the `html` element to scroll upwards, hiding the toolbar.
+
+	const isIphone = window.navigator.userAgent.indexOf( 'iPhone' ) !== -1;
+	if ( isIphone ) {
+		window.addEventListener( 'scroll', function( event ) {
+			const editorScrollContainer = document.getElementsByClassName( 'edit-post-editor-regions__body' )[ 0 ];
+			if ( event.target === document ) {
+				// Scroll element into view by scrolling the editor container by the same amount
+				// that Mobile Safari tried to scroll the html element upwards.
+				if ( window.scrollY > 100 ) {
+					editorScrollContainer.scrollTop = editorScrollContainer.scrollTop + window.scrollY;
+				}
+				//Undo unwanted scroll on html element
+				window.scrollTo( 0, 0 );
+			}
+		} );
+	}
+
 	render(
 		<Editor
 			settings={ settings }

@@ -6,6 +6,8 @@ import { computeCaretRect, getScrollContainer } from '@wordpress/dom';
 import { withSelect } from '@wordpress/data';
 import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
 
+/** @typedef {import('@wordpress/element').WPSyntheticEvent} WPSyntheticEvent */
+
 const isIE = window.navigator.userAgent.indexOf( 'Trident' ) !== -1;
 const arrowKeyCodes = new Set( [ UP, DOWN, LEFT, RIGHT ] );
 const initialTriggerPercentage = 0.75;
@@ -100,7 +102,7 @@ class Typewriter extends Component {
 	 * Maintains the scroll position after a selection change caused by a
 	 * keyboard event.
 	 *
-	 * @param {SyntheticEvent} event Synthetic keyboard event.
+	 * @param {WPSyntheticEvent} event Synthetic keyboard event.
 	 */
 	maintainCaretPosition( { keyCode } ) {
 		if ( ! this.isSelectionEligibleForScroll() ) {
@@ -235,6 +237,7 @@ class Typewriter extends Component {
 				onKeyUp={ this.maintainCaretPosition }
 				onMouseDown={ this.addSelectionChangeListener }
 				onTouchStart={ this.addSelectionChangeListener }
+				className="block-editor__typewriter"
 			>
 				{ this.props.children }
 			</div>

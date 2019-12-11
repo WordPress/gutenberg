@@ -21,8 +21,13 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { speak } from '@wordpress/a11y';
 import { __, _n, _x, sprintf } from '@wordpress/i18n';
-import { Component, createRef } from '@wordpress/element';
+import {
+	Component,
+	__experimentalCreateInterpolateElement,
+	createRef,
+} from '@wordpress/element';
 import {
 	PanelBody,
 	withSpokenMessages,
@@ -119,8 +124,9 @@ export class InserterMenu extends Component {
 	}
 
 	componentDidMount() {
-		// This could be replaced by a resolver.
-		this.props.fetchReusableBlocks();
+		if ( this.props.fetchReusableBlocks ) {
+			this.props.fetchReusableBlocks();
+		}
 		this.filter();
 	}
 
@@ -392,10 +398,11 @@ export class InserterMenu extends Component {
 								{ ! isReusableBlock( hoveredItem ) && (
 									<BlockCard blockType={ hoveredItemBlockType } />
 								) }
-								{ ( isReusableBlock( hoveredItem ) || hoveredItemBlockType.example ) && (
-									<div className="block-editor-inserter__preview">
+								<div className="block-editor-inserter__preview">
+									{ ( isReusableBlock( hoveredItem ) || hoveredItemBlockType.example ) ? (
 										<div className="block-editor-inserter__preview-content">
 											<BlockPreview
+												padding={ 10 }
 												viewportWidth={ 500 }
 												blocks={
 													hoveredItemBlockType.example ?
@@ -404,8 +411,12 @@ export class InserterMenu extends Component {
 												}
 											/>
 										</div>
-									</div>
-								) }
+									) : (
+										<div className="block-editor-inserter__preview-content-missing">
+											{ __( 'No Preview Available.' ) }
+										</div>
+									) }
+								</div>
 							</>
 						) }
 						{ ! hoveredItem && (
@@ -429,8 +440,9 @@ export class InserterMenu extends Component {
 									</p>
 								</div>
 								<Tip>
-									{ __(
-										'While writing, you can press "/" to quickly insert new blocks.'
+									{ __experimentalCreateInterpolateElement(
+										__( 'While writing, you can press <kbd>/</kbd> to quickly insert new blocks.' ),
+										{ kbd: <kbd /> }
 									) }
 								</Tip>
 							</div>
@@ -465,11 +477,17 @@ export default compose(
 		}
 		const destinationRootBlockName = getBlockName( destinationRootClientId );
 
+		const {
+			showInserterHelpPanel: showInserterHelpPanelSetting,
+			__experimentalFetchReusableBlocks: fetchReusableBlocks,
+		} = getSettings();
+
 		return {
 			rootChildBlocks: getChildBlockNames( destinationRootBlockName ),
 			items: getInserterItems( destinationRootClientId ),
-			showInserterHelpPanel: showInserterHelpPanel && getSettings().showInserterHelpPanel,
+			showInserterHelpPanel: showInserterHelpPanel && showInserterHelpPanelSetting,
 			destinationRootClientId,
+			fetchReusableBlocks,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {
@@ -477,11 +495,6 @@ export default compose(
 			showInsertionPoint,
 			hideInsertionPoint,
 		} = dispatch( 'core/block-editor' );
-
-		// This should be an external action provided in the editor settings.
-		const {
-			__experimentalFetchReusableBlocks: fetchReusableBlocks,
-		} = dispatch( 'core/editor' );
 
 		// To avoid duplication, getInsertionIndex is extracted and used in two event handlers
 		// This breaks the withDispatch not containing any logic rule.
@@ -512,7 +525,6 @@ export default compose(
 		}
 
 		return {
-			fetchReusableBlocks,
 			showInsertionPoint() {
 				const index = getInsertionIndex();
 				showInsertionPoint( ownProps.destinationRootClientId, index );
@@ -526,21 +538,33 @@ export default compose(
 				const {
 					getSelectedBlock,
 				} = select( 'core/block-editor' );
-				const { isAppender } = ownProps;
-				const { name, initialAttributes } = item;
+				const {
+					isAppender,
+					onSelect,
+					__experimentalSelectBlockOnInsert: selectBlockOnInsert,
+				} = ownProps;
+				const { name, title, initialAttributes } = item;
 				const selectedBlock = getSelectedBlock();
 				const insertedBlock = createBlock( name, initialAttributes );
+
 				if ( ! isAppender && selectedBlock && isUnmodifiedDefaultBlock( selectedBlock ) ) {
 					replaceBlocks( selectedBlock.clientId, insertedBlock );
 				} else {
 					insertBlock(
 						insertedBlock,
 						getInsertionIndex(),
-						ownProps.destinationRootClientId
+						ownProps.destinationRootClientId,
+						selectBlockOnInsert
 					);
+
+					if ( ! selectBlockOnInsert ) {
+						// translators: %s: the name of the block that has been added
+						const message = sprintf( __( '%s block added' ), title );
+						speak( message );
+					}
 				}
 
-				ownProps.onSelect();
+				onSelect();
 				return insertedBlock;
 			},
 		};

@@ -54,7 +54,7 @@ function useAutosaveNotice() {
 		postId: select( 'core/editor' ).getCurrentPostId(),
 		getEditedPostAttribute: select( 'core/editor' ).getEditedPostAttribute,
 		hasRemoteAutosave: !! select( 'core/editor' ).getEditorSettings().autosave,
-	} ) );
+	} ), [] );
 
 	const { createWarningNotice, removeNotice } = useDispatch( 'core/notices' );
 	const { editPost, resetEditorBlocks } = useDispatch( 'core/editor' );
@@ -124,13 +124,18 @@ function useAutosavePurge() {
 		isDirty: select( 'core/editor' ).isEditedPostDirty(),
 		isAutosaving: select( 'core/editor' ).isAutosavingPost(),
 		didError: select( 'core/editor' ).didPostSaveRequestFail(),
-	} ) );
+	} ), [] );
 
 	const lastIsDirty = useRef( isDirty );
 	const lastIsAutosaving = useRef( isAutosaving );
 
 	useEffect( () => {
-		if ( lastIsAutosaving.current && ! isAutosaving && ! didError ) {
+		if (
+			! didError && (
+				( lastIsAutosaving.current && ! isAutosaving ) ||
+				( lastIsDirty.current && ! isDirty )
+			)
+		) {
 			localAutosaveClear( postId );
 		}
 
@@ -150,7 +155,7 @@ function LocalAutosaveMonitor() {
 	const { localAutosaveInterval } = useSelect( ( select ) => ( {
 		localAutosaveInterval: select( 'core/editor' )
 			.getEditorSettings().__experimentalLocalAutosaveInterval,
-	} ) );
+	} ), [] );
 
 	return (
 		<AutosaveMonitor

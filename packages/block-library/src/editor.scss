@@ -17,10 +17,9 @@
 @import "./latest-posts/editor.scss";
 @import "./legacy-widget/editor.scss";
 @import "./media-text/editor.scss";
-@import "./list/editor.scss";
 @import "./more/editor.scss";
-@import "./navigation-menu/editor.scss";
-@import "./navigation-menu-item/editor.scss";
+@import "./navigation/editor.scss";
+@import "./navigation-link/editor.scss";
 @import "./nextpage/editor.scss";
 @import "./paragraph/editor.scss";
 @import "./pullquote/editor.scss";
@@ -37,12 +36,12 @@
 @import "./text-columns/editor.scss";
 @import "./verse/editor.scss";
 @import "./video/editor.scss";
+@import "./site-title/editor.scss";
 
 /**
  * Import styles from internal editor components used by the blocks.
  */
 @import "./block/edit-panel/editor.scss";
-@import "./block/indicator/editor.scss";
 
 /**
  * Editor Normalization Styles
