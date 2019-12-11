@@ -237,7 +237,11 @@ class GalleryEdit extends Component {
 	componentDidMount() {
 		const { attributes, mediaUpload } = this.props;
 		const { images } = attributes;
-		if ( Platform.OS === 'web' && every( images, ( { url } ) => isBlobURL( url ) ) ) {
+		if (
+			Platform.OS === 'web' &&
+			images && images.length > 0 &&
+			every( images, ( { url } ) => isBlobURL( url ) )
+		) {
 			const filesList = map( images, ( { url } ) => getBlobByURL( url ) );
 			forEach( images, ( { url } ) => revokeBlobURL( url ) );
 			mediaUpload( {
