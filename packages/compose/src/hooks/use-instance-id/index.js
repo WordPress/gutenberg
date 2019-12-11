@@ -12,10 +12,16 @@ const allocatedIds = [];
  * Find an unallocated id.
  */
 function findId() {
-	let id = allocatedIds.findIndex( ( allocated ) => ! allocated );
+	let id = allocatedIds.length;
+	let index = 0;
 
-	if ( id === -1 ) {
-		id = allocatedIds.length;
+	while ( index < id ) {
+		if ( ! allocatedIds[ index ] ) {
+			id = index;
+			break;
+		}
+
+		index++;
 	}
 
 	// Allocated the id.
