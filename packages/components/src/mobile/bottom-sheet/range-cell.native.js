@@ -24,7 +24,6 @@ class BottomSheetRangeCell extends Component {
 		this.handleToggleFocus = this.handleToggleFocus.bind( this );
 		this.handleChange = this.handleChange.bind( this );
 		this.handleValueSave = this.handleValueSave.bind( this );
-		this.handleReset = this.handleReset.bind( this );
 		this.onChangeValue = this.onChangeValue.bind( this );
 		this.onCellPress = this.onCellPress.bind( this );
 		this.handleChangePixelRatio = this.handleChangePixelRatio.bind( this );
@@ -33,13 +32,6 @@ class BottomSheetRangeCell extends Component {
 		const fontScale = this.getFontScale();
 
 		this.state = { accessible: true, sliderValue: initialValue, initialValue, hasFocus: false, fontScale };
-	}
-
-	componentDidUpdate( ) {
-		const reset = this.props.value === null;
-		if ( reset ) {
-			this.handleReset();
-		}
 	}
 
 	componentDidMount() {
@@ -66,10 +58,6 @@ class BottomSheetRangeCell extends Component {
 			this.setState( { sliderValue: text } );
 			this.announceCurrentValue( text );
 		}
-	}
-
-	handleReset() {
-		this.handleValueSave( this.props.defaultValue || this.state.initialValue );
 	}
 
 	handleToggleFocus( validateInput = true ) {
