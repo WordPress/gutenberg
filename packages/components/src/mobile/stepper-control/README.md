@@ -1,14 +1,14 @@
-StepperCell
+StepperControl
 ===================
 
-`StepperCell` shows a stepper control to change a value wrapped in a `Cell` component.
+`StepperControl` shows a stepper control to change a value wrapped in a `StepperCell` component.
 
 ## Usage
 
 Usage example
 
 ```jsx
-import StepperCell from './bottom-sheet/stepper-cell';
+import { StepperControl } from '@wordpress/components';
 
 function Stepper( { onChangeValue, value } ) {
 	return (
@@ -25,22 +25,6 @@ function Stepper( { onChangeValue, value } ) {
 ```
 
 ## Props
-
-### icon
-
-Dashicon key name of the icon.
-
-- Type: `String`
-- Required: No
-- Platform: Mobile
-
-### label
-
-Label of the component.
-
-- Type: `String`
-- Required: No
-- Platform: Mobile
 
 ### maxValue 
 
@@ -63,14 +47,6 @@ Minimum value of the stepper.
 Step increment value.
 
 - Type: `Number`
-- Required: No
-- Platform: Mobile
-
-### separatorType 
-
-Separator type for the `Cell` style.
-
-- Type: `String`
 - Required: No
 - Platform: Mobile
 

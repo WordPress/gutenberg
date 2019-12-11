@@ -6,7 +6,7 @@ import { AccessibilityInfo, View, Platform } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { _x, sprintf } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 
 /**
@@ -108,7 +108,7 @@ class BottomSheetStepperCell extends Component {
 
 		const accessibilityLabel = sprintf(
 			/* translators: accessibility text. Inform about current value. %1$s: Control label %2$s: Current value. */
-			_x( '%1$s. Current value is %2$s', 'Increase or decrement to change the value' ),
+			__( '%1$s. Current value is %2$s' ),
 			label, value
 		);
 
@@ -118,8 +118,8 @@ class BottomSheetStepperCell extends Component {
 				accessibilityRole="adjustable"
 				accessibilityLabel={ accessibilityLabel }
 				accessibilityActions={ [
-					{ name: 'increment', label: 'increment' },
-					{ name: 'decrement', label: 'decrement' },
+					{ name: 'increment' },
+					{ name: 'decrement' },
 				] }
 				onAccessibilityAction={ ( event ) => {
 					switch ( event.nativeEvent.actionName ) {
@@ -136,9 +136,11 @@ class BottomSheetStepperCell extends Component {
 					accessible={ false }
 					cellContainerStyle={ styles.cellContainerStyles }
 					cellRowContainerStyle={ styles.cellRowStyles }
+					disabled={ true }
 					editable={ false }
 					icon={ icon }
 					label={ label }
+					labelStyle={ styles.cellLabel }
 					separatorType={ separatorType }
 				>
 					<Stepper
