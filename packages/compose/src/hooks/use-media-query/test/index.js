@@ -88,4 +88,25 @@ describe( 'useMediaQuery', () => {
 		} );
 		expect( removeListener ).toHaveBeenCalled();
 	} );
+
+	it( 'should not call matchMedia if a query is not passed', async () => {
+		global.matchMedia.mockReturnValue( { addListener, removeListener, matches: false } );
+		let root;
+		await act( async () => {
+			root = create( <TestComponent /> );
+		} );
+		expect( root.toJSON() ).toBe( 'useMediaQuery: undefined' );
+
+		await act( async () => {
+			root.update( <TestComponent query={ false } /> );
+		} );
+		expect( root.toJSON() ).toBe( 'useMediaQuery: false' );
+
+		await act( async () => {
+			root.unmount();
+		} );
+		expect( global.matchMedia ).not.toHaveBeenCalled();
+		expect( addListener ).not.toHaveBeenCalled();
+		expect( removeListener ).not.toHaveBeenCalled();
+	} );
 } );
