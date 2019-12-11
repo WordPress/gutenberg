@@ -45,8 +45,9 @@
 		}
 
 		&:hover,
-		&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):hover {
+		&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):not(.is-tertiary):not(.is-primary):hover {
 			@include menu-style__hover();
+			box-shadow: none;
 		}
 
 		// Formatting buttons
