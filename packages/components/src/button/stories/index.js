@@ -77,6 +77,7 @@ export const buttons = () => {
 		<div style={ { padding: '20px' } }>
 			<h2>Small Buttons</h2>
 			<div className="story-buttons-container">
+				<Button isSmall>Button</Button>
 				<Button isPrimary isSmall>Primary Button</Button>
 				<Button isDefault isSmall>Secondary Button</Button>
 				<Button isTertiary isSmall>Tertiary Button</Button>
@@ -89,6 +90,7 @@ export const buttons = () => {
 
 			<h2>Regular Buttons</h2>
 			<div className="story-buttons-container">
+				<Button>Button</Button>
 				<Button isPrimary>Primary Button</Button>
 				<Button isDefault>Secondary Button</Button>
 				<Button isTertiary>Tertiary Button</Button>

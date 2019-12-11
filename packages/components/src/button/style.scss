@@ -16,6 +16,10 @@
 	overflow: hidden;
 	border-radius: 3px;
 
+	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):not(.is-primary):not(.is-tertiary):hover {
+		@include button-style__hover;
+	}
+
 	// Default button style
 	&.is-default {
 		border-width: $border-width;
@@ -25,7 +29,7 @@
 		border-color: color(theme(button) shade(6%));
 		background: #f3f5f6;
 
-		&:hover {
+		&:not(:disabled):not([aria-disabled="true"]):hover {
 			background: #f1f1f1;
 			border-color: color(theme(button) shade(25%));
 			color: color(theme(button) shade(25%));
@@ -69,7 +73,7 @@
 		text-decoration: none;
 		text-shadow: none;
 
-		&:hover,
+		&:not(:disabled):not([aria-disabled="true"]):hover,
 		&:focus:enabled {
 			background: color(theme(button) shade(10%));
 			border-color: color(theme(button) shade(10%));
@@ -143,7 +147,7 @@
 		@include reduce-motion("transition");
 		height: auto;
 
-		&:hover,
+		&:not(:disabled):not([aria-disabled="true"]):hover,
 		&:active {
 			color: #00a0d2;
 		}
@@ -211,7 +215,7 @@
 			box-shadow: none;
 		}
 
-		&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover {
+		&:not(:disabled):not([aria-disabled="true"]):hover {
 			color: color(theme(outlines) shade(25%));
 		}
 	}
