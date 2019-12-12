@@ -28,13 +28,17 @@ const EntitiesSavedStatesCheckbox = ( {
 	/>
 );
 
-export default function EntitiesSavedStates( { isOpen, onRequestClose } ) {
+export default function EntitiesSavedStates( {
+	isOpen,
+	onRequestClose,
+	ignoredForSave = new EquivalentKeyMap(),
+} ) {
 	const entityRecordChangesByRecord = useSelect( ( select ) =>
 		select( 'core' ).getEntityRecordChangesByRecord()
 	);
 	const { saveEditedEntityRecord } = useDispatch( 'core' );
 
-	const [ checkedById, _setCheckedById ] = useState( new EquivalentKeyMap() );
+	const [ checkedById, _setCheckedById ] = useState( () => new EquivalentKeyMap() );
 	const setCheckedById = ( id, checked ) =>
 		_setCheckedById( ( prevCheckedById ) => {
 			const nextCheckedById = new EquivalentKeyMap( prevCheckedById );
@@ -46,11 +50,13 @@ export default function EntitiesSavedStates( { isOpen, onRequestClose } ) {
 			return nextCheckedById;
 		} );
 	const saveCheckedEntities = () => {
-		checkedById.forEach( ( _checked, id ) =>
-			saveEditedEntityRecord(
-				...id.filter( ( s, i ) => i !== id.length - 1 || s !== 'undefined' )
-			)
-		);
+		checkedById.forEach( ( _checked, id ) => {
+			if ( ! ignoredForSave.has( id ) ) {
+				saveEditedEntityRecord(
+					...id.filter( ( s, i ) => i !== id.length - 1 || s !== 'undefined' )
+				);
+			}
+		} );
 		onRequestClose( checkedById );
 	};
 	return (
@@ -69,7 +75,7 @@ export default function EntitiesSavedStates( { isOpen, onRequestClose } ) {
 								const id = [ changedKind, changedName, changedKey ];
 								return (
 									<EntitiesSavedStatesCheckbox
-										key={ `${ changedKind } | ${ changedName } | ${ changedKey }` }
+										key={ id.join( ' | ' ) }
 										id={ id }
 										name={ changedName }
 										changes={
