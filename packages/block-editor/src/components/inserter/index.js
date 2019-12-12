@@ -38,6 +38,14 @@ const defaultRenderToggle = ( { onToggle, disabled, isOpen, blockTitle, hasSingl
 				event.currentTarget.focus();
 			} }
 			onClick={ onToggle }
+			display={ 'inline-flex' }
+			alignItems={ 'center' }
+			color={ 'dark-gray-500' }
+			background={ 'none' }
+			border={ 'none' }
+			outline={ 'none' }
+			padding={ 'medium' }
+			margin={ 0 }
 			className="editor-inserter__toggle block-editor-inserter__toggle"
 			aria-haspopup={ ! hasSingleBlockType ? 'true' : false }
 			aria-expanded={ ! hasSingleBlockType ? isOpen : false }

@@ -30,6 +30,7 @@ const themes = {
 		toggle: '#11a0d2',
 		button: '#0085ba',
 		outlines: '#007cba',
+		'dark-gray-500': '#555d66',
 	},
 	'admin-color-light': {
 		primary: '#0085ba',
