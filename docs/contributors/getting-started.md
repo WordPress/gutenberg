@@ -99,7 +99,7 @@ You can also test Storybook for the current `master` branch on GitHub Pages: [ht
 
 ## Developer Tools
 
-It is recommended to configure your editor to automatically check for syntax, and lint errors. This will help you save time as you develop to fix minor formating styles. Here are some directions for setting up Visual Studio Code, a popular editor used by many of the core developers.
+We recommend configuring your editor to automatically check for syntax and lint errors. This will help you save time as you develop by automatically fixing minor formatting issues. Here are some directions for setting up Visual Studio Code, a popular editor used by many of the core developers.
 
 [EditorConfig](https://editorconfig.org/) defines a standard configuration for setting up your editor, for example uses tabs instead of spaces. You should install the **EditorConfig for VS Code** extension and it will automatically configure your editor to match the rules defined in [.editorconfig](https://github.com/WordPress/gutenberg/blob/master/.editorconfig).
 
