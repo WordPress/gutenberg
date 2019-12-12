@@ -3,24 +3,24 @@
  */
 import { useMemo } from '@wordpress/element';
 
-const instancesMap = new WeakMap();
+const instanceMap = new WeakMap();
 
 /**
- * Creates a new instance id for a given function.
+ * Creates a new id for a given object.
  *
- * @param {Function} fn Function to use the id for.
+ * @param {Object} object Object reference to create an id for.
  */
-function findId( fn ) {
-	const instances = instancesMap.get( fn ) || 0;
-	instancesMap.set( fn, instances + 1 );
+function createId( object ) {
+	const instances = instanceMap.get( object ) || 0;
+	instanceMap.set( object, instances + 1 );
 	return instances;
 }
 
 /**
  * Provides a unique instance ID.
  *
- * @param {Function} fn Function to use the id for.
+ * @param {Object} object Object reference to create an id for.
  */
-export default function useInstanceId( fn ) {
-	return useMemo( () => findId( fn ), [ fn ] );
+export default function useInstanceId( object ) {
+	return useMemo( () => createId( object ), [ object ] );
 }
