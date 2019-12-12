@@ -3,7 +3,7 @@
  *
  * @param {string} ariaLive Optional. Value for the 'aria-live' attribute, default 'polite'.
  *
- * @return {HTMLDivElement} The ARIA live region jQuery object.
+ * @return {HTMLDivElement} The ARIA live region HTML element.
  */
 const addContainer = function( ariaLive ) {
 	ariaLive = ariaLive || 'polite';
