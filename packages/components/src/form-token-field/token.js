@@ -30,7 +30,7 @@ export default function Token( {
 	termPosition,
 	termsCount,
 } ) {
-	const instanceId = useInstanceId();
+	const instanceId = useInstanceId( Token );
 	const tokenClasses = classnames( 'components-form-token-field__token', {
 		'is-error': 'error' === status,
 		'is-success': 'success' === status,

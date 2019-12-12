@@ -6,7 +6,7 @@ import { FormToggle } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 export default function BlockManagerShowAll( { checked, onChange } ) {
-	const instanceId = useInstanceId();
+	const instanceId = useInstanceId( BlockManagerShowAll );
 	const id = 'edit-post-manage-blocks-modal__show-all-' + instanceId;
 
 	return (

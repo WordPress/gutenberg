@@ -15,7 +15,7 @@ import { useInstanceId } from '@wordpress/compose';
 import BaseControl from '../base-control';
 
 export default function RadioControl( { label, className, selected, help, onChange, options = [] } ) {
-	const instanceId = useInstanceId();
+	const instanceId = useInstanceId( RadioControl );
 	const id = `inspector-radio-control-${ instanceId }`;
 	const onChangeValue = ( event ) => onChange( event.target.value );
 

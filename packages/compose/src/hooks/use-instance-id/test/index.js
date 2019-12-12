@@ -10,7 +10,7 @@ import useInstanceId from '../';
 
 describe( 'useInstanceId', () => {
 	const TestComponent = () => {
-		return useInstanceId();
+		return useInstanceId( TestComponent );
 	};
 
 	it( 'should manage ids', async () => {
@@ -31,24 +31,6 @@ describe( 'useInstanceId', () => {
 		expect( test1.toJSON() ).toBe( '1' );
 
 		test0.unmount();
-
-		let test2;
-
-		await act( async () => {
-			test2 = create( <TestComponent /> );
-		} );
-
-		expect( test2.toJSON() ).toBe( '0' );
-
-		let test3;
-
-		await act( async () => {
-			test3 = create( <TestComponent /> );
-		} );
-
-		expect( test3.toJSON() ).toBe( '2' );
-
 		test1.unmount();
-		test2.unmount();
 	} );
 } );

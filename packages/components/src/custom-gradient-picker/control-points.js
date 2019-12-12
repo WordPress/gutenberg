@@ -77,7 +77,7 @@ function ControlPointButton( {
 	gradientAST,
 	...additionalProps
 } ) {
-	const instanceId = useInstanceId();
+	const instanceId = useInstanceId( ControlPointButton );
 	const descriptionId = `components-custom-gradient-picker__control-point-button-description-${ instanceId }`;
 	return (
 		<ControlPointKeyboardMove

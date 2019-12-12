@@ -10,7 +10,7 @@ import BaseControl from '../base-control';
 import Dashicon from '../dashicon';
 
 export default function CheckboxControl( { label, className, heading, checked, help, onChange, ...props } ) {
-	const instanceId = useInstanceId();
+	const instanceId = useInstanceId( CheckboxControl );
 	const id = `inspector-checkbox-control-${ instanceId }`;
 	const onChangeValue = ( event ) => onChange( event.target.checked );
 

@@ -23,7 +23,7 @@ export default function SelectControl( {
 	hideLabelFromVision,
 	...props
 } ) {
-	const instanceId = useInstanceId();
+	const instanceId = useInstanceId( SelectControl );
 	const id = `inspector-select-control-${ instanceId }`;
 	const onChangeValue = ( event ) => {
 		if ( multiple ) {

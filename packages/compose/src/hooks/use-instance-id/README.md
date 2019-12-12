@@ -12,7 +12,7 @@ Some components need to generate a unique id for each instance. This could serve
 import { useInstanceId } from '@wordpress/compose';
 
 function MyCustomElement() {
-	const instanceId = useInstanceId();
+	const instanceId = useInstanceId( MyCustomElement );
 	return (
 		<div id={ `my-custom-element-${ instanceId }` }>
 			content

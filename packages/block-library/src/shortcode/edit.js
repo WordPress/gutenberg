@@ -7,7 +7,7 @@ import { PlainText } from '@wordpress/block-editor';
 import { useInstanceId } from '@wordpress/compose';
 
 export default function ShortcodeEdit( { attributes, setAttributes } ) {
-	const instanceId = useInstanceId();
+	const instanceId = useInstanceId( ShortcodeEdit );
 	const inputId = `blocks-shortcode-input-${ instanceId }`;
 
 	return (

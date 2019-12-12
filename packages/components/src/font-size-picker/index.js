@@ -43,7 +43,7 @@ export default function FontSizePicker( {
 	value,
 	withSlider = false,
 } ) {
-	const instanceId = useInstanceId();
+	const instanceId = useInstanceId( FontSizePicker );
 	const [ currentSelectValue, setCurrentSelectValue ] = useState( getSelectValueFromFontSize( fontSizes, value ) );
 
 	if ( disableCustomFontSizes && ! fontSizes.length ) {

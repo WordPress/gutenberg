@@ -14,7 +14,7 @@ export function MenuGroup( {
 	className = '',
 	label,
 } ) {
-	const instanceId = useInstanceId();
+	const instanceId = useInstanceId( MenuGroup );
 
 	if ( ! Children.count( children ) ) {
 		return null;

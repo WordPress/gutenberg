@@ -9,7 +9,7 @@ import { useInstanceId } from '@wordpress/compose';
 import BaseControl from '../base-control';
 
 export default function TextControl( { label, hideLabelFromVision, value, help, className, onChange, type = 'text', ...props } ) {
-	const instanceId = useInstanceId();
+	const instanceId = useInstanceId( TextControl );
 	const id = `inspector-text-control-${ instanceId }`;
 	const onChangeValue = ( event ) => onChange( event.target.value );
 
