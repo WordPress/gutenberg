@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { deprecated } from '@wordpress/deprecated';
+import deprecated from '@wordpress/deprecated';
 import { forwardRef } from '@wordpress/element';
 
 /**
