@@ -57,6 +57,14 @@ html {
 	overscroll-behavior-y: none;
 }
 
+.edit-post-editor-regions__width-toggles {
+	position: absolute;
+	top: 30px;
+	z-index: 31;
+	left: 50%;
+	transform: translateX(-50%) translateY(-50%);
+}
+
 .edit-post-editor-regions__content {
 	flex-grow: 1;
 
