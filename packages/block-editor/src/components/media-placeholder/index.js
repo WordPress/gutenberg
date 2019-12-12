@@ -122,12 +122,22 @@ export class MediaPlaceholder extends Component {
 		let setMedia;
 		if ( multiple ) {
 			if ( addToGallery ) {
+				let currentValue = value;
 				if ( dynamicAlteration ) {
 					setMedia = ( newMedia ) => {
-						onSelect( this.props.value.concat( newMedia ) );
+						// If currentValue contains things not in t.p.value, remove them.
+						currentValue = currentValue.filter( ( item ) => {
+							return this.props.value.some( ( propItem ) => propItem.id === item.id );
+						} );
+						// If t.p.value has completed items not in currentValue, add them.
+						this.props.value.forEach( ( propItem ) => {
+							if ( propItem.id && ! currentValue.some( ( item ) => item.id === propItem.id ) ) {
+								currentValue.push( propItem );
+							}
+						} );
+						onSelect( currentValue.concat( newMedia ) );
 					};
 				} else {
-					const currentValue = value;
 					setMedia = ( newMedia ) => {
 						onSelect( currentValue.concat( newMedia ) );
 					};
