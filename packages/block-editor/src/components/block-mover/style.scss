@@ -3,6 +3,13 @@
 	@include break-medium() {
 		cursor: grab;
 	}
+	flex-direction: row;
+}
+
+.block-editor-block-mover .components-toolbar {
+	@include break-medium() {
+		flex-direction: column;
+	}
 }
 
 .block-editor-block-mover__control {
@@ -12,6 +19,10 @@
 		&:not(:disabled):not([aria-disabled="true"]):active {
 			cursor: grabbing;
 		}
+	}
+
+	@include break-medium() {
+		height: 18px;
 	}
 }
 
