@@ -188,29 +188,6 @@ describe( 'computePopoverPosition', () => {
 			contentHeight: null,
 			popoverTop: 30,
 			yAxis: 'bottom',
-			isMobile: false,
 		} );
-	} );
-
-	it( 'should set isMobile to true on small viewPosts', () => {
-		const originalWidth = window.innerWidth;
-
-		const anchorRect = {
-			top: 10,
-			left: 10,
-			bottom: 30,
-			right: 30,
-			width: 20,
-			height: 20,
-		};
-
-		const contentSize = {
-			width: 200,
-			height: 300,
-		};
-
-		window.innerWidth = 200;
-		expect( computePopoverPosition( anchorRect, contentSize, 'bottom right', true ).isMobile ).toBe( true );
-		window.innerWidth = originalWidth;
 	} );
 } );

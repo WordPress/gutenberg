@@ -125,7 +125,7 @@ Runs a media query and returns its value when it changes.
 
 _Parameters_
 
--   _query_ `string`: Media Query.
+-   _query_ `[string]`: Media Query.
 
 _Returns_
 
@@ -138,6 +138,26 @@ Hook returning whether the user has a preference for reduced motion.
 _Returns_
 
 -   `boolean`: Reduced motion preference value.
+
+<a name="useViewportMatch" href="#useViewportMatch">#</a> **useViewportMatch**
+
+Returns true if the viewport matches the given query, or false otherwise.
+
+_Usage_
+
+```js
+useViewportMatch( 'huge', <' );
+useViewportMatch( 'medium' );
+```
+
+_Parameters_
+
+-   _breakpoint_ `WPBreakpoint`: Breakpoint size name.
+-   _operator_ `[WPViewportOperator]`: Viewport operator.
+
+_Returns_
+
+-   `boolean`: Whether viewport matches query.
 
 <a name="withGlobalEvents" href="#withGlobalEvents">#</a> **withGlobalEvents**
 

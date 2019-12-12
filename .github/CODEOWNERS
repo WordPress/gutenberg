@@ -20,7 +20,7 @@
 /packages/block-editor                          @youknowriad @talldan @ellatrix
 /packages/block-serialization-spec-parser       @dmsnell
 /packages/block-serialization-default-parser    @dmsnell
-/packages/blocks                                @youknowriad @gziolo @ellatrix
+/packages/blocks                                @youknowriad @ellatrix
 /packages/edit-post                             @talldan
 /packages/editor                                @talldan
 /packages/list-reusable-blocks                  @youknowriad @noisysocks

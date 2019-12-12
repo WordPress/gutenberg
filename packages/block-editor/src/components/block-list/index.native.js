@@ -20,7 +20,7 @@ import { KeyboardAwareFlatList, ReadableContentView } from '@wordpress/component
 import styles from './style.scss';
 import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
-import FloatingToolbar from './block-mobile-floating-toolbar';
+import __experimentalBlockListFooter from '../block-list-footer';
 
 const innerToolbarHeight = 44;
 
@@ -40,10 +40,6 @@ export class BlockList extends Component {
 
 	addBlockToEndOfPost( newBlock ) {
 		this.props.insertBlock( newBlock, this.props.blockCount );
-	}
-
-	blockHolderBorderStyle() {
-		return this.props.isFullyBordered ? styles.blockHolderFullBordered : styles.blockHolderSemiBordered;
 	}
 
 	onCaretVerticalPositionChange( targetId, caretY, previousCaretY ) {
@@ -75,15 +71,22 @@ export class BlockList extends Component {
 	}
 
 	render() {
-		const { clearSelectedBlock, blockClientIds, isFullyBordered, title, header, withFooter = true, renderAppender, isFirstBlock, selectedBlockParentId, isRootList } = this.props;
+		const {
+			clearSelectedBlock,
+			blockClientIds,
+			isFullyBordered,
+			title,
+			header,
+			withFooter = true,
+			renderAppender,
+			isRootList,
+		} = this.props;
 
-		const showFloatingToolbar = isFirstBlock && selectedBlockParentId !== '';
 		return (
 			<View
 				style={ { flex: isRootList ? 1 : 0 } }
 				onAccessibilityEscape={ clearSelectedBlock }
 			>
-				{ showFloatingToolbar && <FloatingToolbar.Slot fillProps={ { innerFloatingToolbar: showFloatingToolbar } } /> }
 				<KeyboardAwareFlatList
 					{ ...( Platform.OS === 'android' ? { removeClippedSubviews: false } : {} ) } // Disable clipping on Android to fix focus losing. See https://github.com/wordpress-mobile/gutenberg-mobile/pull/741#issuecomment-472746541
 					accessibilityLabel="block-list"
@@ -103,12 +106,16 @@ export class BlockList extends Component {
 					ListFooterComponent={ withFooter && this.renderBlockListFooter }
 				/>
 
-				{ renderAppender && blockClientIds.length > 0 &&
-					<BlockListAppender
-						rootClientId={ this.props.rootClientId }
-						renderAppender={ this.props.renderAppender }
-					/>
+				{ renderAppender && blockClientIds.length > 0 && (
+					<View style={ styles.paddingToContent }>
+						<BlockListAppender
+							rootClientId={ this.props.rootClientId }
+							renderAppender={ this.props.renderAppender }
+						/>
+					</View>
+				)
 				}
+
 			</View>
 		);
 	}
@@ -121,7 +128,6 @@ export class BlockList extends Component {
 	}
 
 	renderItem( { item: clientId, index } ) {
-		const blockHolderFocusedStyle = this.props.getStylesFromColorScheme( styles.blockHolderFocused, styles.blockHolderFocusedDark );
 		const { shouldShowBlockAtIndex, shouldShowInsertionPointBefore, shouldShowInsertionPointAfter } = this.props;
 		return (
 			<ReadableContentView>
@@ -133,8 +139,7 @@ export class BlockList extends Component {
 						clientId={ clientId }
 						rootClientId={ this.props.rootClientId }
 						onCaretVerticalPositionChange={ this.onCaretVerticalPositionChange }
-						borderStyle={ this.blockHolderBorderStyle() }
-						focusedBorderColor={ blockHolderFocusedStyle.borderColor }
+						isSmallScreen={ ! this.props.isFullyBordered }
 					/> ) }
 				{ shouldShowInsertionPointAfter( clientId ) && this.renderAddBlockSeparator() }
 			</ReadableContentView>
@@ -156,11 +161,14 @@ export class BlockList extends Component {
 	renderBlockListFooter() {
 		const paragraphBlock = createBlock( 'core/paragraph' );
 		return (
-			<TouchableWithoutFeedback onPress={ () => {
-				this.addBlockToEndOfPost( paragraphBlock );
-			} } >
-				<View style={ styles.blockListFooter } />
-			</TouchableWithoutFeedback>
+			<>
+				<TouchableWithoutFeedback onPress={ () => {
+					this.addBlockToEndOfPost( paragraphBlock );
+				} } >
+					<View style={ styles.blockListFooter } />
+				</TouchableWithoutFeedback>
+				<__experimentalBlockListFooter.Slot />
+			</>
 		);
 	}
 }
@@ -175,15 +183,18 @@ export default compose( [
 			getBlockInsertionPoint,
 			isBlockInsertionPointVisible,
 			getSelectedBlock,
-			getBlockRootClientId,
 		} = select( 'core/block-editor' );
+
+		const {
+			getGroupingBlockName,
+		} = select( 'core/blocks' );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 		const blockClientIds = getBlockOrder( rootClientId );
 		const insertionPoint = getBlockInsertionPoint();
 		const blockInsertionPointIsVisible = isBlockInsertionPointVisible();
 		const selectedBlock = getSelectedBlock();
-		const isSelectedGroup = selectedBlock && selectedBlock.name === 'core/group';
+		const hasInnerBlocks = selectedBlock && selectedBlock.name === getGroupingBlockName();
 		const shouldShowInsertionPointBefore = ( clientId ) => {
 			return (
 				blockInsertionPointIsVisible &&
@@ -211,13 +222,9 @@ export default compose( [
 
 		const selectedBlockIndex = getBlockIndex( selectedBlockClientId, rootClientId );
 
-		const isFirstBlock = selectedBlockIndex === 0;
-
-		const selectedBlockParentId = getBlockRootClientId( selectedBlockClientId );
-
 		const shouldShowBlockAtIndex = ( index ) => {
 			const shouldHideBlockAtIndex = (
-				! isSelectedGroup && blockInsertionPointIsVisible &&
+				! hasInnerBlocks && blockInsertionPointIsVisible &&
 				// if `index` === `insertionPoint.index`, then block is replaceable
 				index === insertionPoint.index &&
 				// only hide selected block
@@ -234,8 +241,6 @@ export default compose( [
 			shouldShowInsertionPointBefore,
 			shouldShowInsertionPointAfter,
 			selectedBlockClientId,
-			isFirstBlock,
-			selectedBlockParentId,
 			isRootList: rootClientId === undefined,
 		};
 	} ),

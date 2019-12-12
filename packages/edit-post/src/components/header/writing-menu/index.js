@@ -3,7 +3,7 @@
  */
 import { MenuGroup } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
-import { ifViewportMatches } from '@wordpress/viewport';
+import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -11,6 +11,11 @@ import { ifViewportMatches } from '@wordpress/viewport';
 import FeatureToggle from '../feature-toggle';
 
 function WritingMenu() {
+	const isLargeViewport = useViewportMatch( 'medium' );
+	if ( ! isLargeViewport ) {
+		return null;
+	}
+
 	return (
 		<MenuGroup
 			label={ _x( 'View', 'noun' ) }
@@ -40,4 +45,4 @@ function WritingMenu() {
 	);
 }
 
-export default ifViewportMatches( 'medium' )( WritingMenu );
+export default WritingMenu;

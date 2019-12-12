@@ -18,9 +18,9 @@ import {
 	SVG,
 	TextareaControl,
 	TextControl,
-	Toolbar,
 	ToggleControl,
 	ToolbarButton,
+	ToolbarGroup,
 } from '@wordpress/components';
 import {
 	LEFT,
@@ -136,7 +136,7 @@ function NavigationLinkEdit( {
 	return (
 		<Fragment>
 			<BlockControls>
-				<Toolbar>
+				<ToolbarGroup>
 					<KeyboardShortcuts
 						bindGlobal
 						shortcuts={ {
@@ -156,7 +156,7 @@ function NavigationLinkEdit( {
 						title={ __( 'Add submenu' ) }
 						onClick={ insertLinkBlock }
 					/>
-				</Toolbar>
+				</ToolbarGroup>
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody
@@ -208,7 +208,7 @@ function NavigationLinkEdit( {
 					'has-link': !! url,
 				} ) }
 			>
-				<div className="wp-block-navigation-link__inner">
+				<div>
 					<RichText
 						className="wp-block-navigation-link__content"
 						value={ label }

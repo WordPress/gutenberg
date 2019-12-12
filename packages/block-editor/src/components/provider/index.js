@@ -15,6 +15,8 @@ import { compose } from '@wordpress/compose';
  */
 import withRegistryProvider from './with-registry-provider';
 
+/** @typedef {import('@wordpress/data').WPDataRegistry} WPDataRegistry */
+
 class BlockEditorProvider extends Component {
 	componentDidMount() {
 		this.props.updateSettings( this.props.settings );

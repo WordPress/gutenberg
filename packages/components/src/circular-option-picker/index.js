@@ -18,13 +18,11 @@ function Option( {
 	...additionalProps
 } ) {
 	const optionButton = (
-		<button
-			type="button"
-			aria-pressed={ isSelected }
+		<Button
+			isPressed={ isSelected }
 			className={ classnames(
 				className,
 				'components-circular-option-picker__option',
-				{ 'is-active': isSelected }
 			) }
 			{ ...additionalProps }
 		/>
@@ -78,9 +76,8 @@ function ButtonAction( {
 				'components-circular-option-picker__clear',
 				className
 			) }
-			type="button"
 			isSmall
-			isDefault
+			isSecondary
 			{ ...additionalProps }
 		>
 			{ children }
@@ -92,10 +89,12 @@ export default function CircularOptionPicker( {
 	actions,
 	className,
 	options,
+	children,
 } ) {
 	return (
 		<div className={ classnames( 'components-circular-option-picker', className ) }>
 			{ options }
+			{ children }
 			{ actions && (
 				<div className="components-circular-option-picker__custom-clear-wrapper">
 					{ actions }

@@ -104,13 +104,6 @@ class WritingFlow extends Component {
 
 	onMouseDown() {
 		this.verticalRect = null;
-		this.disableNavigationMode();
-	}
-
-	disableNavigationMode() {
-		if ( this.props.isNavigationMode ) {
-			this.props.disableNavigationMode();
-		}
 	}
 
 	/**
@@ -377,7 +370,6 @@ class WritingFlow extends Component {
 	 * Sets focus to the end of the last tabbable text field, if one exists.
 	 */
 	focusLastTextField() {
-		this.disableNavigationMode();
 		const focusableNodes = focus.focusable.find( this.container );
 		const target = findLast( focusableNodes, isTabbableTextField );
 		if ( target ) {
@@ -392,7 +384,7 @@ class WritingFlow extends Component {
 		// bubbling events from children to determine focus transition intents.
 		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		return (
-			<div className="editor-writing-flow block-editor-writing-flow">
+			<div className="block-editor-writing-flow">
 				<div
 					ref={ this.bindContainer }
 					onKeyDown={ this.onKeyDown }
@@ -405,7 +397,7 @@ class WritingFlow extends Component {
 					aria-hidden
 					tabIndex={ -1 }
 					onClick={ this.focusLastTextField }
-					className="editor-writing-flow__click-redirect block-editor-writing-flow__click-redirect"
+					className="block-editor-writing-flow__click-redirect"
 				/>
 			</div>
 		);
@@ -445,11 +437,10 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { multiSelect, selectBlock, setNavigationMode, clearSelectedBlock } = dispatch( 'core/block-editor' );
+		const { multiSelect, selectBlock, clearSelectedBlock } = dispatch( 'core/block-editor' );
 		return {
 			onMultiSelect: multiSelect,
 			onSelectBlock: selectBlock,
-			disableNavigationMode: () => setNavigationMode( false ),
 			clearSelectedBlock,
 		};
 	} ),

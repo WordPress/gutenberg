@@ -45,7 +45,6 @@ function SaveButton() {
 	return (
 		<Button
 			isPrimary
-			isLarge
 			isBusy={ isSaving }
 			aria-disabled={ isSaving }
 			onClick={ isSaving ? undefined : onClick }

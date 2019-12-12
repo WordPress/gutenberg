@@ -32,7 +32,7 @@ import {
 	TextareaControl,
 	TextControl,
 	ToggleControl,
-	Toolbar,
+	ToolbarGroup,
 	withNotices,
 } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
@@ -52,6 +52,7 @@ import {
 	InspectorControls,
 	InspectorAdvancedControls,
 	MediaPlaceholder,
+	MediaReplaceFlow,
 	URLPopover,
 	RichText,
 } from '@wordpress/block-editor';
@@ -64,13 +65,12 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { getPath } from '@wordpress/url';
 import { withViewportMatch } from '@wordpress/viewport';
-import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
  */
 import { createUpgradedEmbedBlock } from '../embed/util';
-import icon, { editImageIcon } from './icon';
+import icon from './icon';
 import ImageSize from './image-size';
 import { getUpdatedLinkTargetSettings, removeNewTabRel } from './utils';
 
@@ -265,7 +265,7 @@ const ImageURLInputUI = ( {
 };
 
 export class ImageEdit extends Component {
-	constructor( { attributes } ) {
+	constructor() {
 		super( ...arguments );
 		this.updateAlt = this.updateAlt.bind( this );
 		this.updateAlignment = this.updateAlignment.bind( this );
@@ -283,14 +283,12 @@ export class ImageEdit extends Component {
 		this.onSetNewTab = this.onSetNewTab.bind( this );
 		this.onSetTitle = this.onSetTitle.bind( this );
 		this.getFilename = this.getFilename.bind( this );
-		this.toggleIsEditing = this.toggleIsEditing.bind( this );
 		this.onUploadError = this.onUploadError.bind( this );
 		this.onImageError = this.onImageError.bind( this );
 		this.getLinkDestinations = this.getLinkDestinations.bind( this );
 
 		this.state = {
 			captionFocused: false,
-			isEditing: ! attributes.url,
 		};
 	}
 
@@ -314,7 +312,6 @@ export class ImageEdit extends Component {
 					allowedTypes: ALLOWED_MEDIA_TYPES,
 					onError: ( message ) => {
 						noticeOperations.createErrorNotice( message );
-						this.setState( { isEditing: true } );
 					},
 				} );
 			}
@@ -340,9 +337,6 @@ export class ImageEdit extends Component {
 		const { noticeOperations } = this.props;
 		noticeOperations.removeAllNotices();
 		noticeOperations.createErrorNotice( message );
-		this.setState( {
-			isEditing: true,
-		} );
 	}
 
 	onSelectImage( media ) {
@@ -356,10 +350,6 @@ export class ImageEdit extends Component {
 			} );
 			return;
 		}
-
-		this.setState( {
-			isEditing: false,
-		} );
 
 		const { id, url, alt, caption, linkDestination } = this.props.attributes;
 
@@ -395,6 +385,12 @@ export class ImageEdit extends Component {
 			mediaAttributes.href = media.url;
 		}
 
+		// Check if the image is linked to the attachment page.
+		if ( linkDestination === LINK_DESTINATION_ATTACHMENT ) {
+			// Update the media link.
+			mediaAttributes.href = media.link;
+		}
+
 		this.props.setAttributes( {
 			...mediaAttributes,
 			...additionalAttributes,
@@ -411,10 +407,6 @@ export class ImageEdit extends Component {
 				sizeSlug: DEFAULT_SIZE_SLUG,
 			} );
 		}
-
-		this.setState( {
-			isEditing: false,
-		} );
 	}
 
 	onImageError( url ) {
@@ -552,24 +544,12 @@ export class ImageEdit extends Component {
 		];
 	}
 
-	toggleIsEditing() {
-		this.setState( {
-			isEditing: ! this.state.isEditing,
-		} );
-		if ( this.state.isEditing ) {
-			speak( __( 'You are now viewing the image in the image block.' ) );
-		} else {
-			speak( __( 'You are now editing the image in the image block.' ) );
-		}
-	}
-
 	getImageSizeOptions() {
 		const { imageSizes } = this.props;
 		return map( imageSizes, ( { name, slug } ) => ( { value: slug, label: name } ) );
 	}
 
 	render() {
-		const { isEditing } = this.state;
 		const {
 			attributes,
 			setAttributes,
@@ -607,48 +587,45 @@ export class ImageEdit extends Component {
 					value={ align }
 					onChange={ this.updateAlignment }
 				/>
+				{ url && <MediaReplaceFlow
+					mediaURL={ url }
+					allowedTypes={ ALLOWED_MEDIA_TYPES }
+					accept="image/*"
+					onSelect={ this.onSelectImage }
+					onSelectURL={ this.onSelectURL }
+					onError={ this.onUploadError }
+				/> }
 				{ url && (
-					<>
-						<Toolbar>
-							<IconButton
-								className={ classnames( 'components-icon-button components-toolbar__control', { 'is-active': this.state.isEditing } ) }
-								label={ __( 'Edit image' ) }
-								aria-pressed={ this.state.isEditing }
-								onClick={ this.toggleIsEditing }
-								icon={ editImageIcon }
-							/>
-						</Toolbar>
-						<Toolbar>
-							<ImageURLInputUI
-								url={ href || '' }
-								onChangeUrl={ this.onSetHref }
-								mediaLinks={ this.getLinkDestinations() }
-								linkDestination={ linkDestination }
-								advancedOptions={
-									<>
-										<ToggleControl
-											label={ __( 'Open in New Tab' ) }
-											onChange={ this.onSetNewTab }
-											checked={ linkTarget === '_blank' } />
-										<TextControl
-											label={ __( 'Link Rel' ) }
-											value={ cleanRel || '' }
-											onChange={ this.onSetLinkRel }
-											onKeyPress={ stopPropagation }
-											onKeyDown={ stopPropagationRelevantKeys }
-										/>
-										<TextControl
-											label={ __( 'Link CSS Class' ) }
-											value={ linkClass || '' }
-											onKeyPress={ stopPropagation }
-											onKeyDown={ stopPropagationRelevantKeys }
-											onChange={ this.onSetLinkClass }
-										/>
-									</>
-								}
-							/>
-						</Toolbar>
-					</>
+					<ToolbarGroup>
+						<ImageURLInputUI
+							url={ href || '' }
+							onChangeUrl={ this.onSetHref }
+							mediaLinks={ this.getLinkDestinations() }
+							linkDestination={ linkDestination }
+							advancedOptions={
+								<>
+									<ToggleControl
+										label={ __( 'Open in New Tab' ) }
+										onChange={ this.onSetNewTab }
+										checked={ linkTarget === '_blank' } />
+									<TextControl
+										label={ __( 'Link Rel' ) }
+										value={ cleanRel || '' }
+										onChange={ this.onSetLinkRel }
+										onKeyPress={ stopPropagation }
+										onKeyDown={ stopPropagationRelevantKeys }
+									/>
+									<TextControl
+										label={ __( 'Link CSS Class' ) }
+										value={ linkClass || '' }
+										onKeyPress={ stopPropagation }
+										onKeyDown={ stopPropagationRelevantKeys }
+										onChange={ this.onSetLinkClass }
+									/>
+								</>
+							}
+						/>
+					</ToolbarGroup>
 				) }
 			</BlockControls>
 		);
@@ -670,18 +647,16 @@ export class ImageEdit extends Component {
 				labels={ labels }
 				onSelect={ this.onSelectImage }
 				onSelectURL={ this.onSelectURL }
-				onDoubleClick={ this.toggleIsEditing }
-				onCancel={ !! url && this.toggleIsEditing }
 				notices={ noticeUI }
 				onError={ this.onUploadError }
 				accept="image/*"
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				value={ { id, src } }
 				mediaPreview={ mediaPreview }
-				disableMediaButtons={ ! isEditing && url }
+				disableMediaButtons={ url }
 			/>
 		);
-		if ( isEditing || ! url ) {
+		if ( ! url ) {
 			return (
 				<>
 					{ controls }
@@ -762,7 +737,7 @@ export class ImageEdit extends Component {
 													key={ scale }
 													isSmall
 													isPrimary={ isCurrent }
-													aria-pressed={ isCurrent }
+													isPressed={ isCurrent }
 													onClick={ this.updateDimensions( scaledWidth, scaledHeight ) }
 												>
 													{ scale }%
@@ -832,7 +807,6 @@ export class ImageEdit extends Component {
 									<img
 										src={ url }
 										alt={ defaultedAlt }
-										onDoubleClick={ this.toggleIsEditing }
 										onClick={ this.onImageClick }
 										onError={ () => this.onImageError( url ) }
 									/>

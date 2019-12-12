@@ -1,0 +1,76 @@
+.media-replace-flow .components-dropdown-menu__indicator {
+	margin-left: 4px;
+
+	.components-dropdown-menu.media-flow_toolbar {
+		.components-dropdown-menu__label {
+			margin-right: 6px;
+			margin-left: 2px;
+		}
+	}
+}
+
+.media-replace-flow__options.components-popover:not(.is-mobile) {
+
+	.components-popover__content {
+		// this is a safari problem that shows scrollbars
+		// when display:flex and max-width are used together
+		overflow-x: hidden;
+	}
+
+	.block-editor-media-flow__url-input {
+
+		padding: 0 15px 10px 25px;
+
+		.components-external-link__icon {
+			position: absolute;
+			right: -4px;
+			bottom: 5px;
+			margin-right: 2px;
+		}
+
+		input {
+			max-width: 169px;
+			border: 1px solid $dark-gray-500;
+			border-radius: 4px;
+		}
+
+		.block-editor-url-popover__link-viewer-url {
+			padding-right: 15px;
+			padding-top: 3px;
+			max-width: 179px;
+			position: relative;
+			margin-right: 0;
+		}
+
+		// Mimic toolbar component styles for the icons in this popover.
+		.components-icon-button {
+			padding: 5px;
+			width: 40px;
+			height: 40px;
+			padding-left: 0;
+
+			> svg {
+				padding: 5px;
+				border-radius: $radius-round-rectangle;
+				height: 30px;
+				width: 30px;
+			}
+
+			&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):hover {
+				box-shadow: none;
+
+				> svg {
+					@include formatting-button-style__hover;
+				}
+			}
+
+			&:not(:disabled):focus {
+				box-shadow: none;
+
+				> svg {
+					@include formatting-button-style__focus;
+				}
+			}
+		}
+	}
+}

@@ -7,6 +7,8 @@ import { castArray, first, get, includes } from 'lodash';
  * WordPress dependencies
  */
 import { getDefaultBlockName, createBlock } from '@wordpress/blocks';
+import { speak } from '@wordpress/a11y';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -656,6 +658,28 @@ export function stopTyping() {
 }
 
 /**
+ * Returns an action object used in signalling that the user has begun to drag blocks.
+ *
+ * @return {Object} Action object.
+ */
+export function startDraggingBlocks() {
+	return {
+		type: 'START_DRAGGING_BLOCKS',
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the user has stopped dragging blocks.
+ *
+ * @return {Object} Action object.
+ */
+export function stopDraggingBlocks() {
+	return {
+		type: 'STOP_DRAGGING_BLOCKS',
+	};
+}
+
+/**
  * Returns an action object used in signalling that the caret has entered formatted text.
  *
  * @return {Object} Action object.
@@ -793,15 +817,19 @@ export function __unstableMarkAutomaticChange() {
 }
 
 /**
- * Returns an action object used to enable or disable the navigation mode.
+ * Generators that triggers an action used to enable or disable the navigation mode.
  *
  * @param {string} isNavigationMode Enable/Disable navigation mode.
- *
- * @return {Object} Action object
  */
-export function setNavigationMode( isNavigationMode = true ) {
-	return {
+export function * setNavigationMode( isNavigationMode = true ) {
+	yield {
 		type: 'SET_NAVIGATION_MODE',
 		isNavigationMode,
 	};
+
+	if ( isNavigationMode ) {
+		speak( __( 'You are currently in navigation mode. Navigate blocks using the Tab key. To exit navigation mode and edit the selected block, press Enter.' ) );
+	} else {
+		speak( __( 'You are currently in edit mode. To return to the navigation mode, press Escape.' ) );
+	}
 }

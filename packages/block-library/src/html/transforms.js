@@ -1,14 +1,9 @@
-/**
- * WordPress dependencies
- */
-import { getPhrasingContentSchema } from '@wordpress/blocks';
-
 const transforms = {
 	from: [
 		{
 			type: 'raw',
 			isMatch: ( node ) => node.nodeName === 'FIGURE' && !! node.querySelector( 'iframe' ),
-			schema: {
+			schema: ( { phrasingContentSchema } ) => ( {
 				figure: {
 					require: [ 'iframe' ],
 					children: {
@@ -16,11 +11,11 @@ const transforms = {
 							attributes: [ 'src', 'allowfullscreen', 'height', 'width' ],
 						},
 						figcaption: {
-							children: getPhrasingContentSchema(),
+							children: phrasingContentSchema,
 						},
 					},
 				},
-			},
+			} ),
 		},
 	],
 };

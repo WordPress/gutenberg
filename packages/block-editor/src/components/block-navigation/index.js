@@ -31,9 +31,9 @@ function BlockNavigation( { rootBlock, rootBlocks, selectedBlockClientId, select
 	return (
 		<NavigableMenu
 			role="presentation"
-			className="editor-block-navigation__container block-editor-block-navigation__container"
+			className="block-editor-block-navigation__container"
 		>
-			<p className="editor-block-navigation__label block-editor-block-navigation__label">{ __( 'Block navigation' ) }</p>
+			<p className="block-editor-block-navigation__label">{ __( 'Block navigation' ) }</p>
 			{ hasHierarchy && (
 				<BlockNavigationList
 					blocks={ [ rootBlock ] }

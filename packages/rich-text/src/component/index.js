@@ -42,6 +42,8 @@ import { isEmptyLine } from '../is-empty';
 
 const { getSelection, getComputedStyle } = window;
 
+/** @typedef {import('@wordpress/element').WPSyntheticEvent} WPSyntheticEvent */
+
 /**
  * All inserting input types that would insert HTML into the DOM.
  *
@@ -242,7 +244,18 @@ class RichText extends Component {
 	 * @param {ClipboardEvent} event The paste event.
 	 */
 	onPaste( event ) {
-		const { formatTypes, onPaste } = this.props;
+		const {
+			formatTypes,
+			onPaste,
+			__unstableIsSelected: isSelected,
+		} = this.props;
+		const { activeFormats = [] } = this.state;
+
+		if ( ! isSelected ) {
+			event.preventDefault();
+			return;
+		}
+
 		const clipboardData = event.clipboardData;
 		let { items, files } = clipboardData;
 
@@ -319,6 +332,7 @@ class RichText extends Component {
 				html,
 				plainText,
 				files,
+				activeFormats,
 			} );
 		}
 	}
@@ -409,7 +423,7 @@ class RichText extends Component {
 			inputType = event.inputType;
 		}
 
-		if ( ! inputType ) {
+		if ( ! inputType && event && event.nativeEvent ) {
 			inputType = event.nativeEvent.inputType;
 		}
 
@@ -493,6 +507,10 @@ class RichText extends Component {
 			event.type !== 'selectionchange' &&
 			! this.props.__unstableIsSelected
 		) {
+			return;
+		}
+
+		if ( this.props.disabled ) {
 			return;
 		}
 
@@ -906,12 +924,17 @@ class RichText extends Component {
 			value !== this.value
 		);
 
+		const selectionChanged = (
+			selectionStart !== prevProps.selectionStart &&
+			selectionStart !== this.record.start
+		) || (
+			selectionEnd !== prevProps.selectionEnd &&
+			selectionEnd !== this.record.end
+		);
+
 		// Check if the selection changed.
 		shouldReapply = shouldReapply || (
-			isSelected && ! prevProps.isSelected && (
-				this.record.start !== selectionStart ||
-				this.record.end !== selectionEnd
-			)
+			isSelected && ! prevProps.isSelected && selectionChanged
 		);
 
 		const prefix = 'format_prepare_props_';
@@ -933,10 +956,7 @@ class RichText extends Component {
 			this.record.start = selectionStart;
 			this.record.end = selectionEnd;
 			this.applyRecord( this.record );
-		} else if (
-			this.record.start !== selectionStart ||
-			this.record.end !== selectionEnd
-		) {
+		} else if ( selectionChanged ) {
 			this.record = {
 				...this.record,
 				start: selectionStart,
@@ -1024,6 +1044,7 @@ class RichText extends Component {
 			className,
 			placeholder,
 			forwardedRef,
+			disabled,
 		} = this.props;
 		const ariaProps = pickBy( this.props, ( value, key ) =>
 			startsWith( key, 'aria-' ) );
@@ -1057,8 +1078,9 @@ class RichText extends Component {
 				onKeyUp={ this.onSelectionChange }
 				onMouseUp={ this.onSelectionChange }
 				onTouchEnd={ this.onSelectionChange }
-				contentEditable
-				suppressContentEditableWarning
+				// Do not set the attribute if disabled.
+				contentEditable={ disabled ? undefined : true }
+				suppressContentEditableWarning={ ! disabled }
 			/>
 		);
 	}

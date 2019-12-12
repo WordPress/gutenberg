@@ -2,7 +2,6 @@
  * Internal dependencies
  */
 import {
-	getColumnsTemplate,
 	toWidthPrecision,
 	getAdjacentBlocks,
 	getEffectiveColumnWidth,
@@ -12,25 +11,6 @@ import {
 	hasExplicitColumnWidths,
 	getMappedColumnWidths,
 } from '../utils';
-
-describe( 'getColumnsTemplate', () => {
-	it( 'should return a template corresponding to columns count', () => {
-		const template = getColumnsTemplate( 4 );
-
-		expect( template ).toEqual( [
-			[ 'core/column' ],
-			[ 'core/column' ],
-			[ 'core/column' ],
-			[ 'core/column' ],
-		] );
-	} );
-
-	it( 'should return null if columns count is not defined', () => {
-		const template = getColumnsTemplate( undefined );
-
-		expect( template ).toBe( null );
-	} );
-} );
 
 describe( 'toWidthPrecision', () => {
 	it( 'should round value to standard precision', () => {
