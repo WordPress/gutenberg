@@ -3,8 +3,15 @@
 	@include break-medium() {
 		cursor: grab;
 	}
-	&:not(:disabled):not([aria-disabled="true"]):active {
-		cursor: grabbing;
+}
+
+.block-editor-block-mover__control {
+	@include break-medium() {
+		cursor: grab !important;
+
+		&:not(:disabled):not([aria-disabled="true"]):active {
+			cursor: grabbing;
+		}
 	}
 }
 
