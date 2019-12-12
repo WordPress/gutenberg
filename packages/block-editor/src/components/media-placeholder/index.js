@@ -125,11 +125,11 @@ export class MediaPlaceholder extends Component {
 				let currentValue = value;
 				if ( dynamicAlteration ) {
 					setMedia = ( newMedia ) => {
-						// If currentValue contains things not in t.p.value, remove them.
+						// If currentValue contains things not in props.value, remove them.
 						currentValue = currentValue.filter( ( item ) => {
 							return this.props.value.some( ( propItem ) => propItem.id === item.id );
 						} );
-						// If t.p.value has completed items not in currentValue, add them.
+						// If props.value has completed items not in currentValue, add them.
 						this.props.value.forEach( ( propItem ) => {
 							if ( propItem.id && ! currentValue.some( ( item ) => item.id === propItem.id ) ) {
 								currentValue.push( propItem );
