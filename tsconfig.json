@@ -12,6 +12,7 @@
 
 		/* Strict Type-Checking Options */
 		"strict": true,                        /* Enable all strict type-checking options. */
+		"strictNullChecks": true,
 		"noImplicitAny": false,                /* Raise error on expressions and declarations with an implied 'any' type. */
 
 		/* Additional Checks */
@@ -21,6 +22,7 @@
 		"noFallthroughCasesInSwitch": true,    /* Report errors for fallthrough cases in switch statement. */
 	},
 	"include": [
+		"./packages/blob/**/*.js",
 		"./packages/dom-ready/**/*.js",
 		"./packages/i18n/**/*.js",
 		"./packages/is-shallow-equal/**/*.js",
