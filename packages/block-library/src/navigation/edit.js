@@ -129,7 +129,7 @@ function Navigation( {
 							onClick={ handleCreateFromExistingPages }
 							disabled={ ! hasPages }
 						>
-							{ __( 'Create from all top pages' ) }
+							{ __( 'Create from all top-level pages' ) }
 						</Button>
 
 						<Button
