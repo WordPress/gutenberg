@@ -63,7 +63,7 @@ export default function EntitiesSavedStates( {
 		isOpen && (
 			<Modal
 				title={ __( 'What do you want to save?' ) }
-				onRequestClose={ onRequestClose }
+				onRequestClose={ () => onRequestClose() }
 				contentLabel={ __( 'Select items to save.' ) }
 			>
 				{ Object.keys( entityRecordChangesByRecord ).map( ( changedKind ) =>

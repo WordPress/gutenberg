@@ -65,7 +65,7 @@ export class PostPublishButton extends Component {
 		const { postType, postId } = this.props;
 		const { entitiesSavedStatesCallback } = this.state;
 		this.setState( { entitiesSavedStatesCallback: false }, () => {
-			if ( savedById.has( [ 'postType', postType, String( postId ) ] ) ) {
+			if ( savedById && savedById.has( [ 'postType', postType, String( postId ) ] ) ) {
 				// The post entity was checked, call the held callback from `createOnClick`.
 				entitiesSavedStatesCallback();
 			}
