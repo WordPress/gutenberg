@@ -23,14 +23,14 @@ const transforms = {
 			} ),
 			transform( node ) {
 				const attributes = getBlockAttributes( name, node.outerHTML );
-				const align = node.style.textAlign;
+				const { textAlign } = node.style;
 
 				if (
-					align === 'left' ||
-					align === 'center' ||
-					align === 'right'
+					textAlign === 'left' ||
+					textAlign === 'center' ||
+					textAlign === 'right'
 				) {
-					return createBlock( name, { ...attributes, align } );
+					attributes.align = textAlign;
 				}
 
 				return createBlock( name, attributes );
