@@ -87,11 +87,12 @@ export class BlockMover extends Component {
 		// the rendering parent, leaving it unable to react to focus out.
 		return (
 			<BlockDraggable clientIds={ clientIds }>
-				{ ( { onDraggableStart, onDraggableEnd } ) => (
+				{ ( { isDraggable, onDraggableStart, onDraggableEnd } ) => (
 					<div
 						className={ classnames( 'block-editor-block-mover', {
 							'is-visible': isFocused || ! isHidden, 'is-horizontal': orientation === 'horizontal',
-						} ) }						draggable
+						} ) }
+						draggable={ isDraggable }
 						onDragStart={ onDraggableStart }
 						onDragEnd={ onDraggableEnd }
 					>

@@ -38,7 +38,7 @@ const BlockDraggable = ( { children, clientIds } ) => {
 	}, [] );
 
 	if ( ! isDraggable ) {
-		return null;
+		return children( { isDraggable: false } );
 	}
 
 	const blockElementId = `block-${ clientIds[ 0 ] }`;
@@ -65,6 +65,7 @@ const BlockDraggable = ( { children, clientIds } ) => {
 			{
 				( { onDraggableStart, onDraggableEnd } ) => {
 					return children( {
+						isDraggable: true,
 						onDraggableStart,
 						onDraggableEnd,
 					} );
