@@ -1,0 +1,15 @@
+.badge {
+	position: absolute;
+	top: 10px;
+	left: 10px;
+	background-color: rgba(85, 85, 85, 0.7);
+	border-radius: 6px;
+	padding: 3px 6px;
+}
+
+.badgeText {
+	text-transform: uppercase;
+	color: #fff;
+	font-size: 12px;
+	font-weight: 500;
+}

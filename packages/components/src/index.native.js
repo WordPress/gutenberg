@@ -38,3 +38,4 @@ export { default as KeyboardAwareFlatList } from './mobile/keyboard-aware-flat-l
 export { default as Picker } from './mobile/picker';
 export { default as ReadableContentView } from './mobile/readable-content-view';
 export { default as StepperControl } from './mobile/stepper-control';
+export { default as Badgeable } from './mobile/badgeable';

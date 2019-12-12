@@ -24,6 +24,7 @@ import {
 	ToggleControl,
 	ToolbarButton,
 	ToolbarGroup,
+	Badgeable,
 } from '@wordpress/components';
 
 import {
@@ -49,7 +50,6 @@ import styles from './styles.scss';
 import SvgIcon, { editImageIcon } from './icon';
 import SvgIconRetry from './icon-retry';
 import { getUpdatedLinkTargetSettings } from './utils';
-
 import {
 	LINK_DESTINATION_CUSTOM,
 	LINK_DESTINATION_NONE,
@@ -382,92 +382,94 @@ export class ImageEdit extends React.Component {
 		};
 
 		const imageContainerHeight = Dimensions.get( 'window' ).width / IMAGE_ASPECT_RATIO;
-
 		const getImageComponent = ( openMediaOptions, getMediaOptions ) => (
-			<TouchableWithoutFeedback
-				accessible={ ! isSelected }
-				onPress={ this.onImagePressed }
-				onLongPress={ openMediaOptions }
-				disabled={ ! isSelected }
-			>
-				<View style={ { flex: 1 } }>
-					{ getInspectorControls() }
-					{ getMediaOptions() }
-					{ ( ! this.state.isCaptionSelected ) &&
-						getToolbarEditButton( openMediaOptions )
-					}
-					<MediaUploadProgress
-						height={ height }
-						width={ width }
-						coverUrl={ url }
-						mediaId={ id }
-						onUpdateMediaProgress={ this.updateMediaProgress }
-						onFinishMediaUploadWithSuccess={ this.finishMediaUploadWithSuccess }
-						onFinishMediaUploadWithFailure={ this.finishMediaUploadWithFailure }
-						onMediaUploadStateReset={ this.mediaUploadStateReset }
-						renderContent={ ( { isUploadInProgress, isUploadFailed, finalWidth, finalHeight, imageWidthWithinContainer, retryMessage } ) => {
-							const opacity = isUploadInProgress ? 0.3 : 1;
-							const icon = this.getIcon( isUploadFailed );
-							const imageBorderOnSelectedStyle = isSelected && ! ( isUploadInProgress || isUploadFailed || this.state.isCaptionSelected ) ? styles.imageBorder : '';
-
-							const iconContainer = (
-								<View style={ styles.modalIcon }>
-									{ icon }
-								</View>
-							);
-
-							return (
-								<View style={ {
-									flex: 1,
-									// only set alignSelf if an image exists because alignSelf causes the placeholder
-									// to disappear when an aligned image can't be downloaded
-									// https://github.com/wordpress-mobile/gutenberg-mobile/issues/1592
-									alignSelf: imageWidthWithinContainer && alignToFlex[ align ] }
-								} >
-									{ ! imageWidthWithinContainer &&
-										<View style={ [ styles.imageContainer, { height: imageContainerHeight } ] } >
-											{ this.getIcon( false ) }
-										</View> }
-									<ImageBackground
-										accessible={ true }
-										disabled={ ! isSelected }
-										accessibilityLabel={ alt }
-										accessibilityHint={ __( 'Double tap and hold to edit' ) }
-										accessibilityRole={ 'imagebutton' }
-										style={ [ imageBorderOnSelectedStyle, { width: finalWidth, height: finalHeight, opacity } ] }
-										resizeMethod="scale"
-										source={ { uri: url } }
-										key={ url }
-									>
-										{ isUploadFailed &&
-											<View style={ [ styles.imageContainer, { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.5)' } ] } >
-												{ iconContainer }
-												<Text style={ styles.uploadFailedText }>{ retryMessage }</Text>
-											</View>
-										}
-									</ImageBackground>
-								</View>
-							);
-						} }
-					/>
-					<Caption
-						clientId={ this.props.clientId }
-						isSelected={ this.state.isCaptionSelected }
-						accessible={ true }
-						accessibilityLabelCreator={ ( caption ) =>
-							isEmpty( caption ) ?
-							/* translators: accessibility text. Empty image caption. */
-								( 'Image caption. Empty' ) :
-								sprintf(
-								/* translators: accessibility text. %s: image caption. */
-									__( 'Image caption. %s' ),
-									caption )
+			<Badgeable text="gif" show={ url.includes( '.gif' ) } >
+				<TouchableWithoutFeedback
+					accessible={ ! isSelected }
+					onPress={ this.onImagePressed }
+					onLongPress={ openMediaOptions }
+					disabled={ ! isSelected }
+				>
+					<View style={ { flex: 1 } }>
+						{ getInspectorControls() }
+						{ getMediaOptions() }
+						{ ( ! this.state.isCaptionSelected ) &&
+							getToolbarEditButton( openMediaOptions )
 						}
-						onFocus={ this.onFocusCaption }
-						onBlur={ this.props.onBlur } // always assign onBlur as props
-					/>
-				</View>
-			</TouchableWithoutFeedback>
+						<MediaUploadProgress
+							height={ height }
+							width={ width }
+							coverUrl={ url }
+							mediaId={ id }
+							onUpdateMediaProgress={ this.updateMediaProgress }
+							onFinishMediaUploadWithSuccess={ this.finishMediaUploadWithSuccess }
+							onFinishMediaUploadWithFailure={ this.finishMediaUploadWithFailure }
+							onMediaUploadStateReset={ this.mediaUploadStateReset }
+							renderContent={ ( { isUploadInProgress, isUploadFailed, finalWidth, finalHeight, imageWidthWithinContainer, retryMessage } ) => {
+								const opacity = isUploadInProgress ? 0.3 : 1;
+								const icon = this.getIcon( isUploadFailed );
+								const imageBorderOnSelectedStyle = isSelected && ! ( isUploadInProgress || isUploadFailed || this.state.isCaptionSelected ) ? styles.imageBorder : '';
+
+								const iconContainer = (
+									<View style={ styles.modalIcon }>
+										{ icon }
+									</View>
+								);
+
+								return (
+									<View style={ {
+										flex: 1,
+										// only set alignSelf if an image exists because alignSelf causes the placeholder
+										// to disappear when an aligned image can't be downloaded
+										// https://github.com/wordpress-mobile/gutenberg-mobile/issues/1592
+										alignSelf: imageWidthWithinContainer && alignToFlex[ align ] }
+									} >
+										{ ! imageWidthWithinContainer &&
+											<View style={ [ styles.imageContainer, { height: imageContainerHeight } ] } >
+												{ this.getIcon( false ) }
+											</View> }
+										<ImageBackground
+											accessible={ true }
+											disabled={ ! isSelected }
+											accessibilityLabel={ alt }
+											accessibilityHint={ __( 'Double tap and hold to edit' ) }
+											accessibilityRole={ 'imagebutton' }
+											style={ [ imageBorderOnSelectedStyle, { width: finalWidth, height: finalHeight, opacity } ] }
+											resizeMethod="scale"
+											source={ { uri: url } }
+											key={ url }
+										>
+											{ isUploadFailed &&
+												<View style={ [ styles.imageContainer, { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.5)' } ] } >
+													{ iconContainer }
+													<Text style={ styles.uploadFailedText }>{ retryMessage }</Text>
+												</View>
+											}
+										</ImageBackground>
+									</View>
+								);
+							} }
+						/>
+						<Caption
+							clientId={ this.props.clientId }
+							isSelected={ this.state.isCaptionSelected }
+							accessible={ true }
+							accessibilityLabelCreator={ ( caption ) =>
+								isEmpty( caption ) ?
+								/* translators: accessibility text. Empty image caption. */
+									( 'Image caption. Empty' ) :
+									sprintf(
+									/* translators: accessibility text. %s: image caption. */
+										__( 'Image caption. %s' ),
+										caption )
+							}
+							onFocus={ this.onFocusCaption }
+							onBlur={ this.props.onBlur } // always assign onBlur as props
+						/>
+					</View>
+				</TouchableWithoutFeedback>
+
+			</Badgeable>
 		);
 
 		return (
