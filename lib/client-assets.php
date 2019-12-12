@@ -156,12 +156,12 @@ add_filter( 'load_script_translation_file', 'gutenberg_override_translation_file
  *
  * See: https://github.com/WordPress/gutenberg/pull/18758
  *
- * @param object Object with all the labels as member variables.
+ * @param object $labels Object with all the labels as member variables.
  *
  * @return object Object with all the labels, including overridden ones.
  */
 function gutenberg_override_posttype_labels( $labels ) {
-	$labels->featured_image = 'Featured image';
+	$labels->featured_image = __( 'Featured image', 'gutenberg' );
 	return $labels;
 }
 foreach ( array( 'post', 'page' ) as $post_type ) {
