@@ -176,38 +176,15 @@
  */
 
 .block-editor-block-list__layout {
-
-	// The primary indicator of selection is the native selection marker.
-	// To indicate multiple blocks, we provide an additional selection indicator.
+	// Inside a text block, the primary indicator of selection is the native selection marker.
+	// To indicate multiple blocks, we paint a similar background.
 	.block-editor-block-list__block.is-multi-selected {
-
 		> .block-editor-block-list__block-edit::before {
-			border-left-color: $dark-opacity-light-800;
-			box-shadow: inset $block-left-border-width 0 0 0 $dark-gray-500;
-
-			.is-dark-theme & {
-				border-left-color: $light-opacity-light-800;
-				box-shadow: inset $block-left-border-width 0 0 0 $light-gray-600;
-			}
-
-			// Switch to outset borders on larger screens.
-			@include break-small() {
-				box-shadow: -$block-left-border-width 0 0 0 $dark-gray-500;
-
-				.is-dark-theme & {
-					box-shadow: -$block-left-border-width 0 0 0 $light-gray-600;
-				}
-			}
+			background: rgba(#157af1, 0.4); // This color is averaged between Windows and MacOS default selection colors to feel "at home" on both.
+			mix-blend-mode: multiply;
 		}
-	}
 
-	// The additional marker, we limit only to top level blocks.
-	.block-editor-block-list__block.is-multi-selected .block-editor-block-list__block.is-multi-selected > .block-editor-block-list__block-edit::before {
-		box-shadow: none;
-	}
-
-	// Provide exceptions for placeholders.
-	.components-placeholder {
+		// When multiple blocks are selected, hide the native selection marker.
 		::selection {
 			background: transparent;
 		}
