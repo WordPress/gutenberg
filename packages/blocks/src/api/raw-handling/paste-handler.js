@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { flatMap, filter, compact } from 'lodash';
+import { flatMap, filter, compact, map } from 'lodash';
 
 /**
  * Internal dependencies
@@ -219,11 +219,6 @@ export function pasteHandler( { HTML = '', plainText = '', mode = 'AUTO', tagNam
 			blockquoteNormaliser,
 		];
 
-		if ( ! canUserUseUnfilteredHTML ) {
-			// Should run before `figureContentReducer`.
-			filters.unshift( iframeRemover );
-		}
-
 		const schema = {
 			...blockContentSchema,
 			// Keep top-level phrasing content, normalised by `normaliseBlocks`.
@@ -242,7 +237,29 @@ export function pasteHandler( { HTML = '', plainText = '', mode = 'AUTO', tagNam
 		// Allows us to ask for this information when we get a report.
 		console.log( 'Processed HTML piece:\n\n', piece );
 
-		return htmlToBlocks( { html: piece, rawTransforms } );
+		const pieceBlocks = htmlToBlocks( { html: piece, rawTransforms } );
+
+		if ( ! canUserUseUnfilteredHTML ) {
+			// Should run before `figureContentReducer`.
+			filters.unshift( iframeRemover );
+
+			return compact( map( pieceBlocks, ( pieceBlock ) => {
+				if ( pieceBlock.name !== 'core/html' ) {
+					return pieceBlock;
+				}
+
+				pieceBlock.attributes.content = deepFilterHTML( pieceBlock.attributes.content, filters, blockContentSchema );
+				pieceBlock.attributes.content = removeInvalidHTML( pieceBlock.attributes.content, schema );
+
+				if ( ! pieceBlock.attributes.content ) {
+					return false;
+				}
+
+				return pieceBlock;
+			} ) );
+		}
+
+		return pieceBlocks;
 	} ) );
 
 	// If we're allowed to return inline content, and there is only one inlineable block,
