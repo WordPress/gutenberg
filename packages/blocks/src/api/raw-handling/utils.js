@@ -24,7 +24,7 @@ const { ELEMENT_NODE, TEXT_NODE } = window.Node;
  *
  * @param {Array}  transforms            Block transforms, of the `raw` type.
  * @param {Object} phrasingContentSchema The phrasing content schema.
- * @param {Object} isPaste               Whether the conttext is pasting or not.
+ * @param {Object} isPaste               Whether the context is pasting or not.
  *
  * @return {Object} A complete block content schema.
  */
