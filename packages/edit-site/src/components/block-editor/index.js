@@ -59,9 +59,7 @@ export default function BlockEditor( { settings: _settings } ) {
 	);
 	const setContent = useCallback( ( nextBlocks ) => {
 		setBlocks( nextBlocks );
-		_setContent( ( { blocks: blocksForSerialization = nextBlocks } ) =>
-			serialize( blocksForSerialization )
-		);
+		_setContent( serialize( nextBlocks ) );
 	}, [] );
 	return (
 		<BlockEditorProvider
