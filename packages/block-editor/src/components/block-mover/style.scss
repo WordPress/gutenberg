@@ -1,8 +1,5 @@
 .block-editor-block-mover {
 	display: inline-flex;
-	@include break-medium() {
-		cursor: grab;
-	}
 	flex-direction: row;
 }
 
@@ -14,15 +11,23 @@
 
 .block-editor-block-mover__control {
 	@include break-medium() {
-		cursor: grab !important;
+		height: 18px;
+	}
+}
 
-		&:not(:disabled):not([aria-disabled="true"]):active {
-			cursor: grabbing;
-		}
+.block-editor-block-mover:not([draggable="false"]) {
+	@include break-medium() {
+		cursor: grab;
 	}
 
-	@include break-medium() {
-		height: 18px;
+	.block-editor-block-mover__control {
+		@include break-medium() {
+			cursor: grab !important;
+
+			&:not(:disabled):not([aria-disabled="true"]):active {
+				cursor: grabbing;
+			}
+		}
 	}
 }
 
