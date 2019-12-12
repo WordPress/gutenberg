@@ -1,7 +1,11 @@
 /**
+ * @typedef {() => void} Callback
+ */
+
+/**
  * Specify a function to execute when the DOM is fully loaded.
  *
- * @param {function(): void} callback A function to execute after the DOM is ready.
+ * @param {Callback} callback A function to execute after the DOM is ready.
  *
  * @example
  * ```js
