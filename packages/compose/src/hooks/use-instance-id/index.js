@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useCallback } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 
 const instancesMap = new WeakMap();
 
@@ -22,5 +22,5 @@ function findId( fn ) {
  * @param {Function} fn Function to use the id for.
  */
 export default function useInstanceId( fn ) {
-	return useCallback( () => findId( fn ), [ fn ] )();
+	return useMemo( () => findId( fn ), [ fn ] );
 }

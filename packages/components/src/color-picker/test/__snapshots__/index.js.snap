@@ -124,13 +124,13 @@ exports[`ColorPicker should commit changes to all views on blur 1`] = `
           >
             <label
               className="components-base-control__label"
-              htmlFor="inspector-text-control-5"
+              htmlFor="inspector-text-control-2"
             >
               Color value in hexadecimal
             </label>
             <input
               className="components-text-control__input"
-              id="inspector-text-control-5"
+              id="inspector-text-control-2"
               onBlur={[Function]}
               onChange={[Function]}
               onKeyDown={[Function]}
@@ -299,13 +299,13 @@ exports[`ColorPicker should commit changes to all views on keyDown = DOWN 1`] = 
           >
             <label
               className="components-base-control__label"
-              htmlFor="inspector-text-control-11"
+              htmlFor="inspector-text-control-4"
             >
               Color value in hexadecimal
             </label>
             <input
               className="components-text-control__input"
-              id="inspector-text-control-11"
+              id="inspector-text-control-4"
               onBlur={[Function]}
               onChange={[Function]}
               onKeyDown={[Function]}
@@ -474,13 +474,13 @@ exports[`ColorPicker should commit changes to all views on keyDown = ENTER 1`] =
           >
             <label
               className="components-base-control__label"
-              htmlFor="inspector-text-control-14"
+              htmlFor="inspector-text-control-5"
             >
               Color value in hexadecimal
             </label>
             <input
               className="components-text-control__input"
-              id="inspector-text-control-14"
+              id="inspector-text-control-5"
               onBlur={[Function]}
               onChange={[Function]}
               onKeyDown={[Function]}
@@ -649,13 +649,13 @@ exports[`ColorPicker should commit changes to all views on keyDown = UP 1`] = `
           >
             <label
               className="components-base-control__label"
-              htmlFor="inspector-text-control-8"
+              htmlFor="inspector-text-control-3"
             >
               Color value in hexadecimal
             </label>
             <input
               className="components-text-control__input"
-              id="inspector-text-control-8"
+              id="inspector-text-control-3"
               onBlur={[Function]}
               onChange={[Function]}
               onKeyDown={[Function]}
@@ -824,13 +824,13 @@ exports[`ColorPicker should only update input view for draft changes 1`] = `
           >
             <label
               className="components-base-control__label"
-              htmlFor="inspector-text-control-2"
+              htmlFor="inspector-text-control-1"
             >
               Color value in hexadecimal
             </label>
             <input
               className="components-text-control__input"
-              id="inspector-text-control-2"
+              id="inspector-text-control-1"
               onBlur={[Function]}
               onChange={[Function]}
               onKeyDown={[Function]}
