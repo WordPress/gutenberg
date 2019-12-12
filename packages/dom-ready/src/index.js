@@ -1,5 +1,15 @@
 /**
  * @typedef {() => void} Callback
+ *
+ * TODO: Remove this typedef and inline `() => void` type.
+ *
+ * This typedef is used so that a descriptive type is provided in our
+ * automatically generated documentation.
+ *
+ * An in-line type `() => void` would be preferable, but the generated
+ * documentation is `null` in that case.
+ *
+ * @see https://github.com/WordPress/gutenberg/issues/18045
  */
 
 /**
