@@ -117,14 +117,21 @@ export class MediaPlaceholder extends Component {
 			onError,
 			onSelect,
 			value = [],
+			dynamicAlteration,
 		} = this.props;
 		let setMedia;
 		if ( multiple ) {
 			if ( addToGallery ) {
-				const currentValue = value;
-				setMedia = ( newMedia ) => {
-					onSelect( currentValue.concat( newMedia ) );
-				};
+				if ( dynamicAlteration ) {
+					setMedia = ( newMedia ) => {
+						onSelect( this.props.value.concat( newMedia ) );
+					};
+				} else {
+					const currentValue = value;
+					setMedia = ( newMedia ) => {
+						onSelect( currentValue.concat( newMedia ) );
+					};
+				}
 			} else {
 				setMedia = onSelect;
 			}

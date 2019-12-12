@@ -372,7 +372,8 @@ class GalleryEdit extends Component {
 				accept="image/*"
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				multiple
-				value={ hasImagesWithId ? images : undefined }
+				dynamicAlteration
+				value={ hasImagesWithId ? images : [] }
 				onError={ this.onUploadError }
 				notices={ hasImages ? undefined : noticeUI }
 				onFocus={ this.props.onFocus }
