@@ -22,11 +22,13 @@
 
 	},
 	"include": [
+		"./packages/i18n/**/*.js",
 		"./packages/priority-queue/**/*.js",
 		"./packages/token-list/**/*.js",
 		"./packages/url/**/*.js"
 	],
 	"exclude": [
+		"./packages/*/benchmark",
 		"./packages/**/test/**",
 		"./packages/**/build/**",
 		"./packages/**/build-module/**"
