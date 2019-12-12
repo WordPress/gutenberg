@@ -244,10 +244,10 @@ export function pasteHandler( { HTML = '', plainText = '', mode = 'AUTO', tagNam
 		return htmlToBlocks( { html: piece, rawTransforms } );
 	} ) );
 
-	// If we're allowed to return inline content and there is only one block
+	// If we're allowed to return inline content, and there is only one paragraph block,
 	// and the original plain text content does not have any line breaks, then
 	// treat it as inline paste.
-	if ( mode === 'AUTO' && blocks.length === 1 ) {
+	if ( mode === 'AUTO' && blocks.length === 1 && blocks[ 0 ].name === 'core/paragraph' ) {
 		const trimmedPlainText = plainText.trim();
 
 		if ( trimmedPlainText !== '' && trimmedPlainText.indexOf( '\n' ) === -1 ) {
