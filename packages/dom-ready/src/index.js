@@ -1,7 +1,7 @@
 /**
  * Specify a function to execute when the DOM is fully loaded.
  *
- * @param {() => void} callback A function to execute after the DOM is ready.
+ * @param {function(): void} callback A function to execute after the DOM is ready.
  *
  * @example
  * ```js
