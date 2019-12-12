@@ -22,8 +22,9 @@
 
 	},
 	"include": [
-		"./packages/url/**/*.js",
-		"./packages/token-list/**/*.js"
+		"./packages/priority-queue/**/*.js",
+		"./packages/token-list/**/*.js",
+		"./packages/url/**/*.js"
 	],
 	"exclude": [
 		"./packages/**/test/**",

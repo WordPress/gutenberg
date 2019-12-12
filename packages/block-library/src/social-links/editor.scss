@@ -1,11 +1,11 @@
 // Editor specific styles for Social Links.
 .wp-block-social-links {
-	div.editor-url-input {
+	div.block-editor-url-input {
 		display: inline-block;
 		margin-left: $grid-size;
 	}
 
-	.editor-block-list__layout {
+	.block-editor-block-list__layout {
 		display: flex;
 		justify-content: flex-start;
 	}

@@ -2,7 +2,7 @@
 
 exports[`ColorPaletteControl matches the snapshot 1`] = `
 <BaseControl
-  className="editor-color-palette-control block-editor-color-palette-control"
+  className="block-editor-color-palette-control"
 >
   <Component>
     Test Color
@@ -12,7 +12,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
     />
   </Component>
   <WithColorContext(ColorPalette)
-    className="editor-color-palette-control__color-palette block-editor-color-palette-control__color-palette"
+    className="block-editor-color-palette-control__color-palette"
     colors={
       Array [
         Object {

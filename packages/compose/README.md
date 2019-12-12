@@ -125,7 +125,7 @@ Runs a media query and returns its value when it changes.
 
 _Parameters_
 
--   _query_ `string`: Media Query.
+-   _query_ `[string]`: Media Query.
 
 _Returns_
 

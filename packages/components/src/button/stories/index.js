@@ -6,7 +6,9 @@ import { text } from '@storybook/addon-knobs';
 /**
  * Internal dependencies
  */
+import './style.css';
 import Button from '../';
+import IconButton from '../../icon-button';
 
 export default { title: 'Components|Button', component: Button };
 
@@ -26,19 +28,19 @@ export const primary = () => {
 	);
 };
 
-export const large = () => {
-	const label = text( 'Label', 'Large Button' );
+export const secondary = () => {
+	const label = text( 'Label', 'Secondary Button' );
 
 	return (
-		<Button isLarge>{ label }</Button>
+		<Button isSecondary>{ label }</Button>
 	);
 };
 
-export const largePrimary = () => {
-	const label = text( 'Label', 'Large Primary Button' );
+export const tertiary = () => {
+	const label = text( 'Label', 'Tertiary Button' );
 
 	return (
-		<Button isPrimary isLarge>{ label }</Button>
+		<Button isTertiary>{ label }</Button>
 	);
 };
 
@@ -83,5 +85,37 @@ export const disabledLink = () => {
 		<Button href="https://wordpress.org/" target="_blank" disabled>
 			{ label }
 		</Button>
+	);
+};
+
+export const buttons = () => {
+	return (
+		<div style={ { padding: '20px' } }>
+			<h2>Small Buttons</h2>
+			<div className="story-buttons-container">
+				<Button isSmall>Button</Button>
+				<Button isPrimary isSmall>Primary Button</Button>
+				<Button isSecondary isSmall>Secondary Button</Button>
+				<Button isTertiary isSmall>Tertiary Button</Button>
+				<IconButton isSmall icon="ellipsis" />
+				<IconButton isSmall isPrimary icon="ellipsis" />
+				<IconButton isSmall isSecondary icon="ellipsis" />
+				<IconButton isSmall isTertiary icon="ellipsis" />
+				<IconButton isSmall isPrimary icon="ellipsis">Icon & Text</IconButton>
+			</div>
+
+			<h2>Regular Buttons</h2>
+			<div className="story-buttons-container">
+				<Button>Button</Button>
+				<Button isPrimary>Primary Button</Button>
+				<Button isSecondary>Secondary Button</Button>
+				<Button isTertiary>Tertiary Button</Button>
+				<IconButton icon="ellipsis" />
+				<IconButton isPrimary icon="ellipsis" />
+				<IconButton isSecondary icon="ellipsis" />
+				<IconButton isTertiary icon="ellipsis" />
+				<IconButton isPrimary icon="ellipsis">Icon & Text</IconButton>
+			</div>
+		</div>
 	);
 };

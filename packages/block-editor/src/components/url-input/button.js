@@ -35,7 +35,7 @@ class URLInputButton extends Component {
 		const buttonLabel = url ? __( 'Edit link' ) : __( 'Insert link' );
 
 		return (
-			<div className="editor-url-input__button block-editor-url-input__button">
+			<div className="block-editor-url-input__button">
 				<IconButton
 					icon="admin-links"
 					label={ buttonLabel }
@@ -45,12 +45,12 @@ class URLInputButton extends Component {
 				/>
 				{ expanded &&
 					<form
-						className="editor-url-input__button-modal block-editor-url-input__button-modal"
+						className="block-editor-url-input__button-modal"
 						onSubmit={ this.submitLink }
 					>
-						<div className="editor-url-input__button-modal-line block-editor-url-input__button-modal-line">
+						<div className="block-editor-url-input__button-modal-line">
 							<IconButton
-								className="editor-url-input__back block-editor-url-input__back"
+								className="block-editor-url-input__back"
 								icon="arrow-left-alt"
 								label={ __( 'Close' ) }
 								onClick={ this.toggle }

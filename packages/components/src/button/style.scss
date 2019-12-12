@@ -9,24 +9,27 @@
 	background: none;
 	transition: box-shadow 0.1s linear;
 	@include reduce-motion("transition");
+	height: 36px;
+	align-items: center;
+	box-sizing: border-box;
+	padding: 0 8px;
+	overflow: hidden;
+	border-radius: 3px;
 
-	&.is-button {
-		padding: 0 10px;
-		line-height: 2;
-		height: 28px;
-		border-radius: 3px;
-		white-space: nowrap;
-		border-width: $border-width;
-		border-style: solid;
+	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):not(.is-primary):not(.is-tertiary):not(.is-link):hover {
+		@include button-style__hover;
 	}
 
 	// Default button style
-	&.is-default {
+	&.is-secondary {
+		border-width: $border-width;
+		border-style: solid;
+		white-space: nowrap;
 		color: color(theme(button) shade(6%));
 		border-color: color(theme(button) shade(6%));
 		background: #f3f5f6;
 
-		&:hover {
+		&:not(:disabled):not([aria-disabled="true"]):hover {
 			background: #f1f1f1;
 			border-color: color(theme(button) shade(25%));
 			color: color(theme(button) shade(25%));
@@ -61,13 +64,16 @@
 	}
 
 	&.is-primary {
+		border-width: $border-width;
+		border-style: solid;
+		white-space: nowrap;
 		background: color(theme(button));
 		border-color: color(theme(button));
 		color: $white;
 		text-decoration: none;
 		text-shadow: none;
 
-		&:hover,
+		&:not(:disabled):not([aria-disabled="true"]):hover,
 		&:focus:enabled {
 			background: color(theme(button) shade(10%));
 			border-color: color(theme(button) shade(10%));
@@ -95,15 +101,6 @@
 			background: color(theme(button) tint(10%));
 			border-color: color(theme(button) tint(10%));
 			opacity: 1;
-
-			// This specificity is needed to override alternate color schemes in WP-Admin.
-			// This can presumably be removed when https://core.trac.wordpress.org/ticket/34904 lands.
-			&.is-button,
-			&.is-button:hover,
-			&:active:enabled {
-				box-shadow: none;
-				text-shadow: none;
-			}
 
 			&:focus:enabled {
 				box-shadow:
@@ -148,8 +145,9 @@
 		transition-duration: 0.05s;
 		transition-timing-function: ease-in-out;
 		@include reduce-motion("transition");
+		height: auto;
 
-		&:hover,
+		&:not(:disabled):not([aria-disabled="true"]):hover,
 		&:active {
 			color: #00a0d2;
 		}
@@ -182,36 +180,25 @@
 	}
 
 	&.is-busy,
-	&.is-default.is-busy,
-	&.is-default.is-busy:disabled,
-	&.is-default.is-busy[aria-disabled="true"] {
+	&.is-secondary.is-busy,
+	&.is-secondary.is-busy:disabled,
+	&.is-secondary.is-busy[aria-disabled="true"] {
 		animation: components-button__busy-animation 2500ms infinite linear;
 		background-size: 100px 100%;
 		background-image: repeating-linear-gradient(-45deg, $light-gray-500, $white 11px, $white 10px, $light-gray-500 20px);
 		opacity: 1;
 	}
 
-	&.is-large {
-		height: 30px;
-		line-height: 28px;
-		padding: 0 12px 2px;
-	}
-
 	&.is-small {
 		height: 24px;
 		line-height: 22px;
-		padding: 0 8px 1px;
+		padding: 0 8px;
 		font-size: 11px;
 	}
 
 	// Buttons that are text-based.
 	&.is-tertiary {
 		color: theme(outlines);
-
-		// Matches default button in hit area. See line 11.
-		padding: 0 10px;
-		line-height: 26px;
-		height: 28px;
 
 		.dashicon {
 			display: inline-block;
@@ -228,7 +215,7 @@
 			box-shadow: none;
 		}
 
-		&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover {
+		&:not(:disabled):not([aria-disabled="true"]):hover {
 			color: color(theme(outlines) shade(25%));
 		}
 	}

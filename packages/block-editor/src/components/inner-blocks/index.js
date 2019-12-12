@@ -109,7 +109,7 @@ class InnerBlocks extends Component {
 		} = this.props;
 		const { templateInProcess } = this.state;
 
-		const classes = classnames( 'editor-inner-blocks block-editor-inner-blocks', {
+		const classes = classnames( 'block-editor-inner-blocks', {
 			'has-overlay': enableClickThrough && hasOverlay,
 		} );
 
