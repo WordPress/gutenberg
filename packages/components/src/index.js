@@ -103,3 +103,4 @@ export { default as withNotices } from './higher-order/with-notices';
 export {
 	default as withSpokenMessages,
 } from './higher-order/with-spoken-messages';
+export { useTheme, default as ThemeProvider } from './theme-provider';

@@ -6,28 +6,31 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import deprecated from '@wordpress/deprecated';
-import { createElement, forwardRef } from '@wordpress/element';
+import { deprecated } from '@wordpress/deprecated';
+import { forwardRef } from '@wordpress/element';
 
-export function Button( props, ref ) {
-	const {
-		href,
-		target,
-		isPrimary,
-		isLarge,
-		isSmall,
-		isTertiary,
-		isPressed,
-		isBusy,
-		isDefault,
-		isSecondary,
-		isLink,
-		isDestructive,
-		className,
-		disabled,
-		...additionalProps
-	} = props;
+/**
+ * Internal dependencies
+ */
+import { Button as PrimitiveButton, A } from '../styled-primitives/button';
 
+export function Button( {
+	href,
+	target,
+	isPrimary,
+	isLarge,
+	isSmall,
+	isTertiary,
+	isPressed,
+	isBusy,
+	isDefault,
+	isSecondary,
+	isLink,
+	isDestructive,
+	className,
+	disabled,
+	...additionalProps
+}, ref ) {
 	if ( isDefault ) {
 		deprecated( 'Button isDefault prop', {
 			alternative: 'isSecondary',
@@ -50,13 +53,10 @@ export function Button( props, ref ) {
 	const tagProps = tag === 'a' ?
 		{ href, target } :
 		{ type: 'button', disabled, 'aria-pressed': isPressed };
-
-	return createElement( tag, {
-		...tagProps,
-		...additionalProps,
-		className: classes,
-		ref,
-	} );
+	const propsToPass = { ...tagProps, ...additionalProps, className: classes, ref };
+	if ( tag === 'a' ) {
+		return <A { ...propsToPass } />;
+	} return <PrimitiveButton { ...propsToPass } />;
 }
 
 export default forwardRef( Button );
