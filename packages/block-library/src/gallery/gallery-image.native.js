@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Image, StyleSheet, View, ScrollView, Text, TouchableWithoutFeedback, Platform } from 'react-native';
+import { Image, StyleSheet, View, ScrollView, Text, TouchableWithoutFeedback } from 'react-native';
 import {
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
@@ -14,7 +14,7 @@ import { isEmpty } from 'lodash';
 import { Component } from '@wordpress/element';
 import { Icon } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { RichText, MediaUploadProgress } from '@wordpress/block-editor';
+import { Caption, MediaUploadProgress } from '@wordpress/block-editor';
 import { isURL } from '@wordpress/url';
 import { withPreferredColorScheme } from '@wordpress/compose';
 
@@ -32,13 +32,6 @@ const removeButtonStyle = compose( style.removeButton, { aspectRatio: 1 } );
 const ICON_SIZE_ARROW = 15;
 const ICON_SIZE_REMOVE = 20;
 
-// this platform difference is needed to avoid a regression described here:
-// https://github.com/WordPress/gutenberg/pull/18818#issuecomment-559818548
-const CAPTION_TAG_NAME = Platform.select( {
-	ios: 'p',
-	android: '',
-} );
-
 class GalleryImage extends Component {
 	constructor() {
 		super( ...arguments );
@@ -46,6 +39,7 @@ class GalleryImage extends Component {
 		this.onSelectImage = this.onSelectImage.bind( this );
 		this.onSelectCaption = this.onSelectCaption.bind( this );
 		this.onMediaPressed = this.onMediaPressed.bind( this );
+		this.onCaptionChange = this.onCaptionChange.bind( this );
 		this.bindContainer = this.bindContainer.bind( this );
 
 		this.updateMediaProgress = this.updateMediaProgress.bind( this );
@@ -104,6 +98,11 @@ class GalleryImage extends Component {
 		}
 	}
 
+	onCaptionChange( caption ) {
+		const { setAttributes } = this.props;
+		setAttributes( { caption } );
+	}
+
 	componentDidUpdate( prevProps ) {
 		const { isSelected, image, url } = this.props;
 		if ( image && ! url ) {
@@ -150,7 +149,7 @@ class GalleryImage extends Component {
 	renderContent( params ) {
 		const {
 			url, isFirstItem, isLastItem, isSelected, caption, onRemove,
-			onMoveForward, onMoveBackward, setAttributes, 'aria-label': ariaLabel,
+			onMoveForward, onMoveBackward, 'aria-label': ariaLabel,
 			isCropped, getStylesFromColorScheme } = this.props;
 
 		const { isUploadInProgress } = this.state;
@@ -234,19 +233,15 @@ class GalleryImage extends Component {
 						{ ( shouldShowCaptionEditable || shouldShowCaptionExpanded ) && (
 							<View style={ captionContainerStyle }>
 								<ScrollView nestedScrollEnabled keyboardShouldPersistTaps="handled">
-									<RichText
-										tagName={ CAPTION_TAG_NAME }
-										rootTagsToEliminate={ [ 'p' ] }
-										placeholder={ isSelected ? __( 'Write caption…' ) : null }
-										value={ caption }
-										isSelected={ this.state.captionSelected }
-										onChange={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
-										unstableOnFocus={ this.onSelectCaption }
-										fontSize={ captionStyle.fontSize }
-										style={ captionStyle }
-										textAlign={ captionStyle.textAlign }
-										placeholderTextColor={ captionPlaceholderStyle.color }
+									<Caption
 										inlineToolbar
+										isSelected={ this.state.captionSelected }
+										onChange={ this.onCaptionChange }
+										onFocus={ this.onSelectCaption }
+										placeholder={ isSelected ? __( 'Write caption…' ) : null }
+										placeholderTextColor={ captionPlaceholderStyle.color }
+										style={ captionStyle }
+										value={ caption }
 									/>
 								</ScrollView>
 							</View>

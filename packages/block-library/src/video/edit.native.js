@@ -23,7 +23,7 @@ import {
 } from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import {
-	Caption,
+	BlockCaption,
 	MediaPlaceholder,
 	MediaUpload,
 	MediaUploadProgress,
@@ -256,7 +256,7 @@ class VideoEdit extends React.Component {
 							);
 						} }
 					/>
-					<Caption
+					<BlockCaption
 						clientId={ this.props.clientId }
 						isSelected={ this.state.isCaptionSelected }
 						onFocus={ this.onFocusCaption }

@@ -22,7 +22,9 @@ export { default as MediaUpload, MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO } from './me
 export { default as MediaUploadProgress } from './media-upload-progress';
 export { default as URLInput } from './url-input';
 export { default as BlockInvalidWarning } from './block-list/block-invalid-warning';
+export { default as BlockCaption } from './block-caption';
 export { default as Caption } from './caption';
+
 export { BottomSheetSettings, BlockSettingsButton } from './block-settings';
 export { default as VideoPlayer, VIDEO_ASPECT_RATIO } from './video-player';
 
