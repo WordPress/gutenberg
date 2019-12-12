@@ -123,25 +123,36 @@ export class MediaPlaceholder extends Component {
 		if ( multiple ) {
 			if ( addToGallery ) {
 				let currentValue = value;
-				if ( dynamicAlteration ) {
-					setMedia = ( newMedia ) => {
+				// if ( dynamicAlteration ) {
+				setMedia = ( newMedia ) => {
+					if ( dynamicAlteration ) {
 						// If currentValue contains things not in props.value, remove them.
 						currentValue = currentValue.filter( ( item ) => {
 							return this.props.value.some( ( propItem ) => propItem.id === item.id );
 						} );
+						let loadingBlobsCount = 0;
 						// If props.value has completed items not in currentValue, add them.
 						this.props.value.forEach( ( propItem ) => {
-							if ( propItem.id && ! currentValue.some( ( item ) => item.id === propItem.id ) ) {
+							if (	// Id on propItem implies uploaded item.
+								propItem.id &&
+									// Item is not in currentValue set.
+									! currentValue.some( ( item ) => item.id === propItem.id ) &&
+									// Item is not a member of our upload group.
+									! newMedia.some( ( item ) => item.id === propItem.id )
+							) {
 								currentValue.push( propItem );
+							} else if ( ! propItem.id ) {
+								// Count loading blobs.
+								loadingBlobsCount++;
 							}
 						} );
-						onSelect( currentValue.concat( newMedia ) );
-					};
-				} else {
-					setMedia = ( newMedia ) => {
-						onSelect( currentValue.concat( newMedia ) );
-					};
-				}
+						// Are there new loading blobs?
+						if ( loadingBlobsCount > newMedia.length ) {
+							// console.log( 'new loaders' );
+						}
+					}
+					onSelect( currentValue.concat( newMedia ) );
+				};
 			} else {
 				setMedia = onSelect;
 			}
