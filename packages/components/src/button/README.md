@@ -128,7 +128,7 @@ Name | Type | Default | Description
 --- | --- | --- | ---
 `disabled` | `bool` | `false` | Whether the button is disabled. If `true`, this will force a `button` element to be rendered.
 `href` | `string` | `undefined` | If provided, renders `a` instead of `button`.
-`isSecondary` | `bool` | `false` | Renders a default button style.
+`isDefault` | `bool` | `false` | Renders a default button style.
 `isPrimary` | `bool` | `false` | Renders a primary button style.
 `isTertiary` | `bool` | `false` | Renders a text-based button style.
 `isDestructive` | `bool` | `false` | Renders a red text-based button style to indicate destructive behavior.
