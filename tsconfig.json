@@ -21,6 +21,7 @@
 		"noFallthroughCasesInSwitch": true,    /* Report errors for fallthrough cases in switch statement. */
 	},
 	"include": [
+		"./packages/blob/**/*.js",
 		"./packages/dom-ready/**/*.js",
 		"./packages/i18n/**/*.js",
 		"./packages/is-shallow-equal/**/*.js",
