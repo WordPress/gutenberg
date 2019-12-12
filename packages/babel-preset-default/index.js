@@ -15,7 +15,9 @@ module.exports = function( api ) {
 	} );
 
 	const getPresetEnv = () => {
-		const opts = {};
+		const opts = {
+			shippedProposals: true,
+		};
 
 		if ( isTestEnv ) {
 			opts.targets = {
@@ -31,7 +33,6 @@ module.exports = function( api ) {
 		if ( isWPBuild( wpBuildOpts.name ) ) {
 			opts.modules = wpBuildOpts.modules;
 		}
-		opts.shippedProposals = true;
 
 		return [ require.resolve( '@babel/preset-env' ), opts ];
 	};
