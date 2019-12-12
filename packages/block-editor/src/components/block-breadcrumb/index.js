@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { Button } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
@@ -9,6 +8,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import BlockTitle from '../block-title';
+import BlockBreadcrumbButton from './block-breadcrumb-button';
 
 /**
  * Block breadcrumb component, displaying the hierarchy of the current block selection as a breadcrumb.
@@ -43,25 +43,21 @@ const BlockBreadcrumb = function() {
 				aria-current={ ! hasSelection ? 'true' : undefined }
 			>
 				{ hasSelection && (
-					<Button
-						className="block-editor-block-breadcrumb__button"
-						isTertiary
+					<BlockBreadcrumbButton
 						onClick={ clearSelectedBlock }
 					>
 						{ __( 'Document' ) }
-					</Button>
+					</BlockBreadcrumbButton>
 				) }
 				{ ! hasSelection && __( 'Document' ) }
 			</li>
 			{ parents.map( ( parentClientId ) => (
 				<li key={ parentClientId }>
-					<Button
-						className="block-editor-block-breadcrumb__button"
-						isTertiary
+					<BlockBreadcrumbButton
 						onClick={ () => selectBlock( parentClientId ) }
 					>
 						<BlockTitle clientId={ parentClientId } />
-					</Button>
+					</BlockBreadcrumbButton>
 				</li>
 			) ) }
 			{ !! clientId && (
