@@ -125,7 +125,7 @@ Provides a unique instance ID.
 
 _Parameters_
 
--   _fn_ `Function`: Function to use the id for.
+-   _object_ `Object`: Object reference to create an id for.
 
 <a name="useMediaQuery" href="#useMediaQuery">#</a> **useMediaQuery**
 
