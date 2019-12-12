@@ -116,3 +116,9 @@ exports[`rawHandler should not strip any text-level elements 1`] = `
 <p>This is <u>ncorect</u></p>
 <!-- /wp:paragraph -->"
 `;
+
+exports[`rawHandler should preserve alignment 1`] = `
+"<!-- wp:paragraph {\\"align\\":\\"center\\"} -->
+<p class=\\"has-text-align-center\\">center</p>
+<!-- /wp:paragraph -->"
+`;
