@@ -79,7 +79,7 @@
 	@include break-small() {
 		color: $dark-opacity-300;
 
-		&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover {
+		&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):hover {
 			background-color: transparent;
 			box-shadow: none;
 		}
@@ -97,15 +97,15 @@
 	fill: currentColor;
 
 	&,
-	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover,
-	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):active,
-	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):focus {
+	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):hover,
+	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):active,
+	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):focus {
 		box-shadow: none;
 		background: none;
 		color: $dark-opacity-500;
 	}
 
-	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):active {
+	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):active {
 		cursor: grabbing;
 	}
 }

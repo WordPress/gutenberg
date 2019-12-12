@@ -513,12 +513,12 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
         >
           <ForwardRef(Button)
             className="components-circular-option-picker__clear"
-            isDefault={true}
+            isSecondary={true}
             isSmall={true}
             onClick={[Function]}
           >
             <button
-              className="components-button components-circular-option-picker__clear is-button is-default is-small"
+              className="components-button components-circular-option-picker__clear is-secondary is-small"
               onClick={[Function]}
               type="button"
             >

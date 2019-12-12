@@ -56,7 +56,7 @@
 				width: 30px;
 			}
 
-			&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover {
+			&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):hover {
 				box-shadow: none;
 
 				> svg {

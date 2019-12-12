@@ -322,16 +322,16 @@ exports[`TimePicker matches the snapshot when the is12hour prop is specified 1`]
       >
         <ForwardRef(Button)
           className="components-datetime__time-am-button"
-          isDefault={true}
           isPressed={false}
+          isSecondary={true}
           onClick={[Function]}
         >
           AM
         </ForwardRef(Button)>
         <ForwardRef(Button)
           className="components-datetime__time-pm-button"
-          isDefault={true}
           isPressed={true}
+          isSecondary={true}
           onClick={[Function]}
         >
           PM
@@ -503,16 +503,16 @@ exports[`TimePicker matches the snapshot when the is12hour prop is true 1`] = `
       >
         <ForwardRef(Button)
           className="components-datetime__time-am-button"
-          isDefault={true}
           isPressed={false}
+          isSecondary={true}
           onClick={[Function]}
         >
           AM
         </ForwardRef(Button)>
         <ForwardRef(Button)
           className="components-datetime__time-pm-button"
-          isDefault={true}
           isPressed={true}
+          isSecondary={true}
           onClick={[Function]}
         >
           PM
