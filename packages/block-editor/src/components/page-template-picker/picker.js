@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { parse } from '@wordpress/blocks';
-import { withDispatch } from '@wordpress/data';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -11,32 +11,28 @@ import __experimentalBlockListFooter from '../block-list-footer';
 import Button from './button';
 import Container from './container';
 import defaultTemplates from './default-templates';
+import Preview from './preview';
 
 const __experimentalPageTemplatePicker = ( { templates = defaultTemplates, resetContent } ) => {
+	const [ templatePreview, setTemplatePreview ] = useState();
+
 	return (
 		<__experimentalBlockListFooter>
 			<Container style={ { flexDirection: 'row' } }>
 				{ templates.map( ( { name, content } ) => (
 					<Button
 						key={ name }
-						onPress={ () => resetContent( content ) }
+						onPress={ () => setTemplatePreview( content ) }
 						label={ name }
 					/>
 				) ) }
 			</Container>
+			<Preview
+				content={ templatePreview }
+				onDismiss={ () => setTemplatePreview( undefined ) }
+			/>
 		</__experimentalBlockListFooter>
 	);
 };
 
-export default withDispatch( ( dispatch ) => {
-	const {
-		resetEditorBlocks,
-	} = dispatch( 'core/editor' );
-
-	return {
-		resetContent: ( html ) => {
-			const blocks = parse( html );
-			return resetEditorBlocks( blocks );
-		},
-	};
-} )( __experimentalPageTemplatePicker );
+export default __experimentalPageTemplatePicker;
