@@ -23,6 +23,7 @@
 	},
 	"include": [
 		"./packages/i18n/**/*.js",
+		"./packages/is-shallow-equal/**/*.js",
 		"./packages/priority-queue/**/*.js",
 		"./packages/token-list/**/*.js",
 		"./packages/url/**/*.js"

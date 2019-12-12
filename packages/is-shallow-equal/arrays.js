@@ -3,8 +3,8 @@
 /**
  * Returns true if the two arrays are shallow equal, or false otherwise.
  *
- * @param {Array} a First array to compare.
- * @param {Array} b Second array to compare.
+ * @param {any[]} a First array to compare.
+ * @param {any[]} b Second array to compare.
  *
  * @return {boolean} Whether the two arrays are shallow equal.
  */
