@@ -28,6 +28,7 @@
 		"./packages/url/**/*.js"
 	],
 	"exclude": [
+		"./packages/*/benchmark",
 		"./packages/**/test/**",
 		"./packages/**/build/**",
 		"./packages/**/build-module/**"
