@@ -251,7 +251,7 @@ describe( 'Embedding content', () => {
 		await insertBlock( 'Paragraph' );
 		await page.keyboard.type( 'Hello there!' );
 		await publishPost();
-		const postUrl = await page.$eval( '.post-publish-panel__postpublish-post-address .components-text-control__input', ( el ) => el.value );
+		const postUrl = await page.$eval( '#inspector-text-control-0', ( el ) => el.value );
 
 		// Start a new post, embed the previous post.
 		await createNewPost();

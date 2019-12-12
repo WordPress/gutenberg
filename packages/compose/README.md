@@ -123,6 +123,10 @@ _Returns_
 
 Provides a unique instance ID.
 
+_Parameters_
+
+-   _fn_ `Function`: Function to use the id for.
+
 <a name="useMediaQuery" href="#useMediaQuery">#</a> **useMediaQuery**
 
 Runs a media query and returns its value when it changes.
