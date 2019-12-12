@@ -12,12 +12,12 @@ export default function useSafeTimeout() {
 	const timeouts = useRef( [] );
 
 	function clearTimeout( id ) {
-		clearTimeout( id );
+		window.clearTimeout( id );
 		timeouts.current = without( timeouts.current, id );
 	}
 
 	function setTimeout( fn, delay ) {
-		const id = setTimeout( () => {
+		const id = window.setTimeout( () => {
 			fn();
 			clearTimeout( id );
 		}, delay );
