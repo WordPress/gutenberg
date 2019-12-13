@@ -113,6 +113,7 @@ function Navigation( {
 
 	const [ itemsToAdd, setItemsToAdd ] = useState( [] );
 	const [ itemsToRemove, setItemsToRemove ] = useState( [] );
+	const [ itemsToUpdate, setItemsToUpdate ] = useState( [] );
 
 	/**
 	 * Fetching data.
@@ -201,9 +202,8 @@ function Navigation( {
 		}
 
 		setItemsToAdd( _newItemsToAdd );
-
-		// Check is there are items to remove.
 		setItemsToRemove( filter( removedByAdmin, pageId => ! includes( itemsChecker.removed, pageId ) ) );
+		setItemsToUpdate( itemsChecker.modified );
 	}, [ pages, innerBlocks ] );
 
 	/*
@@ -212,6 +212,14 @@ function Navigation( {
 	useEffect( () => {
 		if ( ! populateFromExistingPages ) {
 			return;
+		}
+
+		// Update items if pages have been modified.
+		if ( itemsToUpdate && itemsToUpdate.length ) {
+			return updateNavItemBlocks( map( innerBlocks, ( block ) => includes( itemsToUpdate, block.attributes.id )
+				? createNavigationLinkFromPages( [ block.attributes.id ], pages )[0]
+				: block
+			) );
 		}
 
 		// Add new items from new pages.
@@ -223,7 +231,7 @@ function Navigation( {
 		if ( itemsToRemove && itemsToRemove.length ) {
 			return updateNavItemBlocks( filter( innerBlocks, ( { attributes } ) => ! includes( itemsToRemove, attributes.id ) ) );
 		}
-	}, [ populateFromExistingPages, itemsToAdd, itemsToRemove ] );
+	}, [ populateFromExistingPages, itemsToAdd, itemsToRemove, itemsToUpdate ] );
 
 
 	//

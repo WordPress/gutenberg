@@ -27,6 +27,9 @@
 		},
 		"url": {
 			"type": "string"
+		},
+		"modified": {
+			"type": "string"
 		}
 	}
 }
