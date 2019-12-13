@@ -135,7 +135,6 @@ export function registerFormatType( name, settings ) {
 		addFilter( 'experimentalRichText', name, ( OriginalComponent ) => {
 			const selectPrefix = `format_prepare_props_(${ name })_`;
 			const dispatchPrefix = `format_on_change_props_(${ name })_`;
-
 			return ( props ) => {
 				const { clientId, identifier } = props;
 				const newProps = {};
@@ -165,8 +164,8 @@ export function registerFormatType( name, settings ) {
 					( value, key ) => dispatchPrefix + key
 				);
 				const args = {
-					richTextIdentifier: props.identifier,
-					blockClientId: props.clientId,
+					richTextIdentifier: identifier,
+					blockClientId: clientId,
 				};
 				const combined = { ...selectProps, ...dispatchProps };
 
