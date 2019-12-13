@@ -35,6 +35,7 @@ import { getActiveFormats } from '../get-active-formats';
 import { updateFormats } from '../update-formats';
 import { removeLineSeparator } from '../remove-line-separator';
 import { isEmptyLine } from '../is-empty';
+import withFormatTypes from './with-format-types';
 
 /**
  * Browser dependencies
@@ -1123,6 +1124,7 @@ const RichTextWrapper = compose( [
 		formatTypes: select( 'core/rich-text' ).getFormatTypes(),
 	} ) ),
 	withSafeTimeout,
+	withFormatTypes,
 ] )( RichText );
 
 /**

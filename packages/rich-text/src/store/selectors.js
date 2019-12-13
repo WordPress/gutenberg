@@ -11,6 +11,17 @@ import { find } from 'lodash';
  *
  * @return {Array} Format types.
  */
+export function getKeyedFormatTypes( state ) {
+	return state.formatTypes;
+}
+
+/**
+ * Returns all the available format types.
+ *
+ * @param {Object} state Data state.
+ *
+ * @return {Array} Format types.
+ */
 export const getFormatTypes = createSelector(
 	( state ) => Object.values( state.formatTypes ),
 	( state ) => [

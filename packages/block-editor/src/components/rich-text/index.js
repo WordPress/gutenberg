@@ -25,7 +25,6 @@ import {
 	toHTMLString,
 	slice,
 } from '@wordpress/rich-text';
-import { withFilters } from '@wordpress/components';
 import deprecated from '@wordpress/deprecated';
 import { isURL } from '@wordpress/url';
 
@@ -363,7 +362,6 @@ class RichTextWrapper extends Component {
 			style,
 			preserveWhiteSpace,
 			disabled,
-			// From experimental filter. To do: pick props instead.
 			...experimentalProps
 		} = this.props;
 		const multilineTag = getMultilineTag( multiline );
@@ -416,6 +414,8 @@ class RichTextWrapper extends Component {
 				disabled={ disabled }
 				start={ start }
 				reversed={ reversed }
+				clientId={ clientId }
+				identifier={ identifier }
 			>
 				{ ( { isSelected, value, onChange, Editable } ) =>
 					<>
@@ -550,7 +550,6 @@ const RichTextContainer = compose( [
 			undo,
 		};
 	} ),
-	withFilters( 'experimentalRichText' ),
 ] )( RichTextWrapper );
 
 RichTextContainer.Content = ( { value, tagName: Tag, multiline, ...props } ) => {
