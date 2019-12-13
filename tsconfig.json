@@ -10,6 +10,15 @@
 		"resolveJsonModule": true,
 		"target": "esnext",
 
+		/* Project Imports */
+		"baseUrl": ".",
+		"paths": {
+			"@wordpress/*": [
+				"packages/*/index.js",
+				"packages/*/src/index.js"
+			]
+		},
+
 		/* Strict Type-Checking Options */
 		"strict": true,                        /* Enable all strict type-checking options. */
 		"strictNullChecks": true,
