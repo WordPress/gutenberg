@@ -2,19 +2,21 @@
  * External dependencies
  */
 import {
-	find,
-	some,
 	deburr,
+	differenceWith,
+	find,
+	get,
+	words,
 } from 'lodash';
 
 /**
- * Converts the search term into a normalized term.
+ * Converts the search term into a list of normalized terms.
  *
  * @param {string} term The search term to normalize.
  *
- * @return {string} The normalized search term.
+ * @return {string[]} The normalized list of search terms.
  */
-export const normalizeTerm = ( term ) => {
+export const normalizeSearchTerm = ( term = '' ) => {
 	// Disregard diacritics.
 	//  Input: "média"
 	term = deburr( term );
@@ -27,29 +29,58 @@ export const normalizeTerm = ( term ) => {
 	//  Input: "MEDIA"
 	term = term.toLowerCase();
 
-	// Strip leading and trailing whitespace.
-	//  Input: " media "
-	term = term.trim();
+	// Extract words.
+	return words( term );
+};
 
-	return term;
+const removeMatchingTerms = ( unmatchedTerms, unprocessedTerms ) => {
+	return differenceWith(
+		unmatchedTerms,
+		normalizeSearchTerm( unprocessedTerms ),
+		( unmatchedTerm, unprocessedTerm ) => unprocessedTerm.includes( unmatchedTerm )
+	);
 };
 
 /**
  * Filters an item list given a search term.
  *
- * @param {Array} items        Item list
- * @param {string} categories  Available categories.
- * @param {string} searchTerm  Search term.
+ * @param {Array} items       Item list
+ * @param {Array} categories  Available categories.
+ * @param {string} searchTerm Search term.
  *
  * @return {Array}             Filtered item list.
  */
 export const searchItems = ( items, categories, searchTerm ) => {
-	const normalizedSearchTerm = normalizeTerm( searchTerm );
-	const matchSearch = ( string ) => normalizeTerm( string ).indexOf( normalizedSearchTerm ) !== -1;
+	const normalizedTerms = normalizeSearchTerm( searchTerm );
 
-	return items.filter( ( item ) => {
-		const itemCategory = find( categories, { slug: item.category } );
-		return matchSearch( item.title ) || some( item.keywords, matchSearch ) ||
-			( itemCategory && matchSearch( itemCategory.title ) );
+	if ( normalizedTerms.length === 0 ) {
+		return items;
+	}
+
+	return items.filter( ( { title, category, keywords = [] } ) => {
+		let unmatchedTerms = removeMatchingTerms(
+			normalizedTerms,
+			title
+		);
+
+		if ( unmatchedTerms.length === 0 ) {
+			return true;
+		}
+
+		unmatchedTerms = removeMatchingTerms(
+			unmatchedTerms,
+			keywords.join( ' ' ),
+		);
+
+		if ( unmatchedTerms.length === 0 ) {
+			return true;
+		}
+
+		unmatchedTerms = removeMatchingTerms(
+			unmatchedTerms,
+			get( find( categories, { slug: category } ), [ 'title' ] ),
+		);
+
+		return unmatchedTerms.length === 0;
 	} );
 };

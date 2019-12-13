@@ -53,7 +53,7 @@ export const youtubeItem = {
 	initialAttributes: {},
 	title: 'YouTube',
 	category: 'embed',
-	keywords: [ 'google' ],
+	keywords: [ 'google', 'video' ],
 	isDisabled: false,
 	utility: 0,
 };

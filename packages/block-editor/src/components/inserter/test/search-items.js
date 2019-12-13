@@ -9,36 +9,57 @@ import items, {
 	youtubeItem,
 	textEmbedItem,
 } from './fixtures';
-import { searchItems, normalizeTerm } from '../search-items';
+import {
+	normalizeSearchTerm,
+	searchItems,
+} from '../search-items';
 
-describe( 'normalizeTerm', () => {
+describe( 'normalizeSearchTerm', () => {
+	it( 'should return an empty array when no words detected', () => {
+		expect( normalizeSearchTerm( ' - !? *** ' ) ).toEqual(
+			[]
+		);
+	} );
+
 	it( 'should remove diacritics', () => {
-		expect( normalizeTerm( 'média' ) ).toEqual(
-			'media'
+		expect( normalizeSearchTerm( 'média' ) ).toEqual(
+			[ 'media' ]
 		);
 	} );
 
 	it( 'should trim whitespace', () => {
-		expect( normalizeTerm( '  média  ' ) ).toEqual(
-			'media'
+		expect( normalizeSearchTerm( '  média  ' ) ).toEqual(
+			[ 'media' ]
 		);
 	} );
 
 	it( 'should convert to lowercase', () => {
-		expect( normalizeTerm( '  Média  ' ) ).toEqual(
-			'media'
+		expect( normalizeSearchTerm( '  Média  ' ) ).toEqual(
+			[ 'media' ]
+		);
+	} );
+
+	it( 'should extract only words', () => {
+		expect( normalizeSearchTerm( '  Média  &   Text Tag-Cloud > 123' ) ).toEqual(
+			[ 'media', 'text', 'tag', 'cloud', '123' ]
 		);
 	} );
 } );
 
 describe( 'searchItems', () => {
+	it( 'should return back all items when no terms detected', () => {
+		expect( searchItems( items, categories, ' - ? * ' ) ).toBe(
+			items
+		);
+	} );
+
 	it( 'should search items using the title ignoring case', () => {
 		expect( searchItems( items, categories, 'TEXT' ) ).toEqual(
 			[ textItem, advancedTextItem, textEmbedItem ]
 		);
 	} );
 
-	it( 'should search items using the keywords', () => {
+	it( 'should search items using the keywords and partial terms', () => {
 		expect( searchItems( items, categories, 'GOOGL' ) ).toEqual(
 			[ youtubeItem ]
 		);
@@ -52,6 +73,12 @@ describe( 'searchItems', () => {
 
 	it( 'should ignore a leading slash on a search term', () => {
 		expect( searchItems( items, categories, '/GOOGL' ) ).toEqual(
+			[ youtubeItem ]
+		);
+	} );
+
+	it( 'should match words using the mix of the title, category and keywords', () => {
+		expect( searchItems( items, categories, 'youtube embed video' ) ).toEqual(
 			[ youtubeItem ]
 		);
 	} );
