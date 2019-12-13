@@ -110,7 +110,6 @@ export default function withFormatTypes( RichText ) {
 			<RichText
 				{ ...props }
 				{ ...selectProps }
-				{ ...dispatchProps }
 				{ ...newProps }
 				formatTypes={ Object.values( formatTypes ) }
 			/>
