@@ -16,10 +16,9 @@ import { Button as PrimitiveButton } from '../styled-primitives/button';
 
 const isAndroid = Platform.OS === 'android';
 const marginBottom = isAndroid ? -0.5 : 0;
-const marginLeft = -3;
 
 const styles = StyleSheet.create( {
-	buttonInactive: {
+	button: {
 		flex: 1,
 		flexDirection: 'row',
 		justifyContent: 'center',
@@ -29,32 +28,23 @@ const styles = StyleSheet.create( {
 		aspectRatio: 1,
 	},
 	buttonActive: {
-		flex: 1,
-		flexDirection: 'row',
-		justifyContent: 'center',
-		alignItems: 'center',
 		borderRadius: 6,
 		borderColor: '#2e4453',
 		backgroundColor: '#2e4453',
 	},
-	subscriptInactive: {
+	subscript: {
 		color: '#7b9ab1',
 		fontWeight: 'bold',
 		fontSize: 13,
 		alignSelf: 'flex-end',
-		marginLeft,
+		marginLeft: -3,
 		marginBottom,
 	},
-	subscriptInactiveDark: {
+	subscriptDark: {
 		color: '#a7aaad', // $gray_20
 	},
 	subscriptActive: {
 		color: 'white',
-		fontWeight: 'bold',
-		fontSize: 13,
-		alignSelf: 'flex-end',
-		marginLeft,
-		marginBottom,
 	},
 } );
 
@@ -75,11 +65,12 @@ export function Button( props ) {
 
 	const isDisabled = ariaDisabled || disabled;
 
-	const buttonViewStyle = {
-		opacity: isDisabled ? 0.3 : 1,
-		...( fixedRatio && styles.fixedRatio ),
-		...( isPressed ? styles.buttonActive : styles.buttonInactive ),
-	};
+	const buttonViewStyle = [
+		styles.button,
+		{ opacity: isDisabled ? 0.3 : 1 },
+		fixedRatio && styles.fixedRatio,
+		isPressed && styles.buttonActive,
+	];
 
 	const states = [];
 	if ( isPressed ) {
@@ -90,7 +81,7 @@ export function Button( props ) {
 		states.push( 'disabled' );
 	}
 
-	const subscriptInactive = getStylesFromColorScheme( styles.subscriptInactive, styles.subscriptInactiveDark );
+	const subscriptDefault = getStylesFromColorScheme( styles.subscript, styles.subscriptDark );
 
 	const newChildren = Children.map( children, ( child ) => {
 		return child ? cloneElement( child, { colorScheme: props.preferredColorScheme, isPressed } ) : child;
@@ -113,10 +104,12 @@ export function Button( props ) {
 			{ ...otherProps }
 		>
 			<View style={ buttonViewStyle }>
-				<View style={ { flexDirection: 'row' } }>
-					{ newChildren }
-					{ subscript && ( <Text style={ isPressed ? styles.subscriptActive : subscriptInactive }>{ subscript }</Text> ) }
-				</View>
+				{ newChildren }
+				{ subscript &&
+				( <Text style={ [ subscriptDefault, isPressed && styles.subscriptActive ] }>
+					{ subscript }
+				</Text> )
+				}
 			</View>
 		</PrimitiveButton>
 	);
