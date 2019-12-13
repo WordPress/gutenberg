@@ -44,6 +44,35 @@ import * as navIcons from './icons';
 import { useQueryPages } from './use-query';
 
 /**
+ * Return a page object according to the given id.
+ * @param {array} pages Current blog pages.
+ * @param {number} id Page id.
+ * @return {object} Page object.
+ */
+const getPageById = ( pages, id ) => filter( pages, ( { id: page_id } ) => page_id === id )[0];
+
+/**
+ * Check if the page is updating comparing the `modified`
+ * value stored in the item attribute.
+ *
+ * @param {array} pages Current blog pages.
+ * @param {object} item Navigation item object.
+ * @return {boolean|undefined} True is the page has been updated. Otherwise, False.
+ */
+const isPageUpdated = ( pages, item ) => {
+	if ( ! item || ! item.modified ) {
+		return;
+	}
+
+	const page = getPageById( pages, item.id );
+	if ( ! page || ! page.modified ) {
+		return;
+	}
+
+	return +new Date( page.modified ) > +new Date( item.modified );
+};
+
+/**
  * Create <NavigationItem> blocks from the given page objects.
  *
  * @param {array} ids Pages id to map.
@@ -51,7 +80,7 @@ import { useQueryPages } from './use-query';
  * @return {array} <NavigationLink /> collection.
  */
 const createNavigationLinkFromPages = ( ids, pages ) => map( ids, ( id ) => {
-	const { type, url, title, modified } = filter( pages, ( { id: page_id } ) => page_id === id )[0];
+	const { type, url, title, modified } = getPageById( pages, id ) ;
 	return createBlock(
 		'core/navigation-link', {
 			type, id,
@@ -128,8 +157,9 @@ function Navigation( {
 					},
 					added: [ ...acc.added, item.id ],
 					repeated: acc.itemsById[ item.id ] ? [ ...acc.repeated, item.id ] : acc.repeated,
+					modified: isPageUpdated( pages, item ) ? [ ...acc.modified, item.id ] : acc.modified,
 			} ),
-			{ itemsById: {}, added: [], repeated: [] }
+			{ itemsById: {}, added: [], repeated: [], modified: [] }
 		);
 
 		itemsChecker.removed = removedItemsByUser;
