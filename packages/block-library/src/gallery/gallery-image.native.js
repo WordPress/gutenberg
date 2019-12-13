@@ -152,7 +152,7 @@ class GalleryImage extends Component {
 			onMoveForward, onMoveBackward, 'aria-label': ariaLabel,
 			isCropped, getStylesFromColorScheme } = this.props;
 
-		const { isUploadInProgress } = this.state;
+		const { isUploadInProgress, captionSelected } = this.state;
 		const { isUploadFailed, retryMessage } = params;
 		const resizeMode = isCropped ? 'cover' : 'contain';
 
@@ -235,7 +235,7 @@ class GalleryImage extends Component {
 								<ScrollView nestedScrollEnabled keyboardShouldPersistTaps="handled">
 									<Caption
 										inlineToolbar
-										isSelected={ this.state.captionSelected }
+										isSelected={ captionSelected }
 										onChange={ this.onCaptionChange }
 										onFocus={ this.onSelectCaption }
 										placeholder={ isSelected ? __( 'Write caption…' ) : null }
