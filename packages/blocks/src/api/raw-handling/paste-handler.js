@@ -7,6 +7,7 @@ import { flatMap, filter, compact } from 'lodash';
  * Internal dependencies
  */
 import { createBlock, getBlockTransforms, findTransform } from '../factory';
+import { hasBlockSupport } from '../registration';
 import { getBlockContent } from '../serializer';
 import { getBlockAttributes, parseWithGrammar } from '../parser';
 import normaliseBlocks from './normalise-blocks';
@@ -244,17 +245,10 @@ export function pasteHandler( { HTML = '', plainText = '', mode = 'AUTO', tagNam
 		return htmlToBlocks( { html: piece, rawTransforms } );
 	} ) );
 
-	// If `blocks` contains a single entry of one of these blocks,
-	// it can potentially be treated as an inline paste.
-	const inlineableBlocks = [
-		'core/paragraph',
-		'core/list',
-	];
-
 	// If we're allowed to return inline content, and there is only one inlineable block,
 	// and the original plain text content does not have any line breaks, then
 	// treat it as inline paste.
-	if ( mode === 'AUTO' && blocks.length === 1 && inlineableBlocks.includes( blocks[ 0 ].name ) ) {
+	if ( mode === 'AUTO' && blocks.length === 1 && hasBlockSupport( blocks[ 0 ].name, 'pasteTextInline', false ) ) {
 		const trimmedPlainText = plainText.trim();
 
 		if ( trimmedPlainText !== '' && trimmedPlainText.indexOf( '\n' ) === -1 ) {

@@ -24,6 +24,7 @@ export const settings = {
 	supports: {
 		className: false,
 		anchor: true,
+		pasteTextInline: true,
 	},
 	example: {
 		attributes: {

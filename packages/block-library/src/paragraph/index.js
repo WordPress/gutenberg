@@ -31,6 +31,7 @@ export const settings = {
 	},
 	supports: {
 		className: false,
+		pasteTextInline: true,
 	},
 	transforms,
 	deprecated,

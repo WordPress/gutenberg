@@ -654,3 +654,12 @@ By default all blocks can be converted to a reusable block. If supports reusable
 reusable: false,
 ```
 
+- `pasteTextInline` (default `false`): If a single line of text is pasted into the block editor, resulting
+in this block being created, setting `pasteTextInline` to `true` will instead extract the text content of
+what is being pasted, and insert that into the currently selected block, instead.
+
+```js
+// Allow the block to be replaced by inline text when a single line of text is pasted.
+pasteTextInline: true,
+```
+
