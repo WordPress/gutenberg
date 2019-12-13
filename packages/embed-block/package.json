@@ -1,0 +1,40 @@
+{
+	"name": "@wordpress/embed-block",
+	"version": "1.0.0",
+	"description": "Embed block module for WordPress.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"embed",
+		"block"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/embed-block/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/embed-block"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"react-native": "src/index",
+	"dependencies": {
+		"@babel/runtime": "^7.4.4",
+		"@wordpress/block-editor": "file:../block-editor",
+		"@wordpress/blocks": "file:../blocks",
+		"@wordpress/components": "file:../components",
+		"@wordpress/compose": "file:../compose",
+		"@wordpress/data": "file:../data",
+		"@wordpress/element": "file:../element",
+		"@wordpress/i18n": "file:../i18n",
+		"classnames": "^2.2.6",
+		"lodash": "^4.17.15",
+		"memize": "^1.0.5"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

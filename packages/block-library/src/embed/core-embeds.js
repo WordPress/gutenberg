@@ -2,10 +2,6 @@
  * Internal dependencies
  */
 import {
-	embedContentIcon,
-	embedAudioIcon,
-	embedPhotoIcon,
-	embedVideoIcon,
 	embedTwitterIcon,
 	embedYouTubeIcon,
 	embedFacebookIcon,
@@ -24,6 +20,12 @@ import {
  */
 import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
+import {
+	embedContentIcon,
+	embedAudioIcon,
+	embedPhotoIcon,
+	embedVideoIcon,
+} from '@wordpress/embed-block';
 
 export const common = [
 	{

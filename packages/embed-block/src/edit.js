@@ -2,7 +2,6 @@
  * Internal dependencies
  */
 import {
-	createUpgradedEmbedBlock,
 	getClassNames,
 	fallback,
 	getAttributesFromPreview,
@@ -49,15 +48,15 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 
 		handleIncomingPreview() {
 			this.setMergedAttributes();
-			if ( this.props.onReplace ) {
-				const upgradedBlock = createUpgradedEmbedBlock(
-					this.props,
-					this.getMergedAttributes()
-				);
-				if ( upgradedBlock ) {
-					this.props.onReplace( upgradedBlock );
-				}
-			}
+			// if ( this.props.onReplace ) {
+			// 	const upgradedBlock = createUpgradedEmbedBlock(
+			// 		this.props,
+			// 		this.getMergedAttributes()
+			// 	);
+			// 	if ( upgradedBlock ) {
+			// 		this.props.onReplace( upgradedBlock );
+			// 	}
+			// }
 		}
 
 		componentDidUpdate( prevProps ) {
