@@ -51,7 +51,6 @@ export default function withFormatTypes( RichText ) {
 			}, {} );
 		}, [ formatTypes, clientId, identifier ] );
 
-		const newProps = {};
 		const args = {
 			richTextIdentifier: identifier,
 			blockClientId: clientId,
@@ -61,11 +60,14 @@ export default function withFormatTypes( RichText ) {
 			...dispatchProps,
 		};
 
-		Object.values( formatTypes ).forEach( ( settings ) => {
+		const newProps = reduce( formatTypes, ( acc, settings ) => {
+			if ( ! settings.__experimentalCreatePrepareEditableTree ) {
+				return acc;
+			}
+
 			const { name } = settings;
 			const selectPrefix = `format_prepare_props_(${ name })_`;
 			const dispatchPrefix = `format_on_change_props_(${ name })_`;
-
 			const propsByPrefix = Object.keys( combined ).reduce( ( accumulator, key ) => {
 				if ( key.startsWith( selectPrefix ) ) {
 					accumulator[ key.slice( selectPrefix.length ) ] = combined[ key ];
@@ -79,24 +81,30 @@ export default function withFormatTypes( RichText ) {
 			}, {} );
 
 			if ( settings.__experimentalCreateOnChangeEditableValue ) {
-				newProps[ `format_value_functions_(${ name })` ] =
-					settings.__experimentalCreatePrepareEditableTree(
-						propsByPrefix,
-						args
-					);
-				newProps[ `format_on_change_functions_(${ name })` ] =
-					settings.__experimentalCreateOnChangeEditableValue(
-						propsByPrefix,
-						args
-					);
-			} else if ( settings.__experimentalCreatePrepareEditableTree ) {
-				newProps[ `format_prepare_functions_(${ name })` ] =
-					settings.__experimentalCreatePrepareEditableTree(
-						propsByPrefix,
-						args
-					);
+				return {
+					...acc,
+					[ `format_value_functions_(${ name })` ]:
+						settings.__experimentalCreatePrepareEditableTree(
+							propsByPrefix,
+							args
+						),
+					[ `format_on_change_functions_(${ name })` ]:
+						settings.__experimentalCreateOnChangeEditableValue(
+							propsByPrefix,
+							args
+						),
+				};
 			}
-		} );
+
+			return {
+				...acc,
+				[ `format_prepare_functions_(${ name })` ]:
+					settings.__experimentalCreatePrepareEditableTree(
+						propsByPrefix,
+						args
+					),
+			};
+		}, {} );
 
 		return (
 			<RichText
