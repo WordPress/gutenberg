@@ -21,11 +21,12 @@ import { addQueryArgs } from '@wordpress/url';
 const doFetchPages = async function( path ) {
 	const pages = await apiFetch( { path } );
 
-	return await map( pages, ( { id, link: url, title, type, subtype } ) => ( {
+	return await map( pages, ( { id, link: url, title, type, subtype, modified } ) => ( {
 		id,
 		url,
 		title: decodeEntities( title.rendered ) || __( '(no title)' ),
 		type: subtype || type,
+		modified,
 	} ) );
 };
 

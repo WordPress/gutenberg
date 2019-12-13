@@ -44,17 +44,22 @@ import * as navIcons from './icons';
 import { useQueryPages } from './use-query';
 
 /**
- * Map pages IDs to <NavigationLink /> blocks.
+ * Create <NavigationItem> blocks from the given page objects.
  *
  * @param {array} ids Pages id to map.
  * @param {array} pages Pages collection.
  * @return {array} <NavigationLink /> collection.
  */
-const mapItemsFromPagesId = ( ids, pages ) => map( ids, ( id ) => {
-	const { type, url, title } = filter( pages, ( { id: page_id } ) => page_id === id )[0];
+const createNavigationLinkFromPages = ( ids, pages ) => map( ids, ( id ) => {
+	const { type, url, title, modified } = filter( pages, ( { id: page_id } ) => page_id === id )[0];
 	return createBlock(
-		'core/navigation-link',
-		{ type, id, url, label: escape(title), title: escape(title), opensInNewTab: false }
+		'core/navigation-link', {
+			type, id,
+			url, label: escape(title),
+			title: escape(title),
+			opensInNewTab: false,
+			modified,
+		}
 	)
 } );
 
@@ -182,7 +187,7 @@ function Navigation( {
 
 		let freshBlocks = [];
 		if ( itemsToAdd && itemsToAdd.length ) {
-			freshBlocks = [ ...innerBlocks, ...mapItemsFromPagesId( itemsToAdd, pages ) ];
+			freshBlocks = [ ...innerBlocks, ...createNavigationLinkFromPages( itemsToAdd, pages ) ];
 		}
 
 		if ( itemsToRemove && itemsToRemove.length ) {
