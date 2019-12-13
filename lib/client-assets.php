@@ -342,7 +342,7 @@ function gutenberg_register_packages_styles( &$styles ) {
 		$styles,
 		'wp-block-library',
 		gutenberg_url( 'build/block-library/style.css' ),
-		array(),
+		array( 'wp-embed-block' ),
 		filemtime( gutenberg_dir_path() . 'build/block-library/style.css' )
 	);
 	$styles->add_data( 'wp-block-library', 'rtl', 'replace' );
@@ -422,6 +422,15 @@ function gutenberg_register_packages_styles( &$styles ) {
 		gutenberg_url( 'build/block-directory/style.css' ),
 		array( 'wp-block-editor', 'wp-components' ),
 		filemtime( gutenberg_dir_path() . 'build/block-directory/style.css' )
+	);
+	$styles->add_data( 'wp-block-directory', 'rtl', 'replace' );
+
+	gutenberg_override_style(
+		$styles,
+		'wp-embed-block',
+		gutenberg_url( 'build/embed-block/style.css' ),
+		array( 'wp-block-editor', 'wp-components' ),
+		filemtime( gutenberg_dir_path() . 'build/block-editor/style.css' )
 	);
 	$styles->add_data( 'wp-block-directory', 'rtl', 'replace' );
 }
