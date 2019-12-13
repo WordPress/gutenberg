@@ -236,6 +236,12 @@
 		&.has-text svg {
 			margin-right: 8px;
 		}
+
+		// Icon buttons without text should be squared.
+		&:not(.has-text) {
+			width: 36px;
+			justify-content: center;
+		}
 	}
 
 	// Fixes a Safari+VoiceOver bug, where the screen reader text is announced not respecting the source order.

@@ -8,13 +8,12 @@
 	margin: 0;
 	display: block;
 	height: $icon-button-size;
-	padding: 3px;
 }
 
 .components-button.block-editor-block-switcher__no-switcher-icon {
-	width: $icon-button-size + 6px + 6px;
+	width: $icon-button-size;
 
-	.block-editor-block-icon {
+	.block-editor-blocsk-icon {
 		margin-right: auto;
 		margin-left: auto;
 	}
@@ -39,6 +38,8 @@
 // Needs specificiity to override the icon button.
 .components-button.block-editor-block-switcher__toggle {
 	width: auto;
+	padding: 0;
+
 	// Unset icon button styles.
 	&:active,
 	&:not(:disabled):not([aria-disabled="true"]):hover,
@@ -51,8 +52,8 @@
 
 	.block-editor-block-icon,
 	.block-editor-block-switcher__transform {
-		width: $icon-button-size + 3px + 3px;
-		height: $icon-button-size-small + 6px;
+		width: $icon-button-size;
+		height: $icon-button-size;
 		position: relative;
 		margin: 0 auto;
 		padding: 3px;
@@ -68,7 +69,6 @@
 	}
 
 	.block-editor-block-switcher__transform {
-		margin-top: 6px;
 		border-radius: $radius-round-rectangle;
 	}
 
@@ -147,4 +147,42 @@
 .block-editor-block-switcher__preview-title {
 	margin-bottom: 10px;
 	color: $dark-gray-300;
+}
+
+// The block switcher in the contextual toolbar should be bigger.
+.block-editor-block-contextual-toolbar {
+	.block-editor-block-switcher {
+		height: $block-toolbar-height;
+	}
+
+	.components-icon-button.block-editor-block-switcher__toggle,
+	.components-icon-button.block-editor-block-switcher__no-switcher-icon {
+		height: $block-toolbar-height;
+	}
+
+	.components-icon-button.block-editor-block-switcher__no-switcher-icon {
+		width: $block-toolbar-height;
+	}
+
+	.components-icon-button.block-editor-block-switcher__toggle {
+		.block-editor-block-icon,
+		.block-editor-block-switcher__transform {
+			width: $block-toolbar-height;
+			height: $block-toolbar-height;
+		}
+
+		.block-editor-block-switcher__transform {
+			padding: 10px;
+		}
+
+		// Block hover and focus style.
+		&[aria-expanded="true"] .block-editor-block-icon,
+		&[aria-expanded="true"] .block-editor-block-switcher__transform,
+		&:not(:disabled):hover .block-editor-block-icon,
+		&:not(:disabled):hover .block-editor-block-switcher__transform,
+		&:not(:disabled):focus .block-editor-block-icon,
+		&:not(:disabled):focus .block-editor-block-switcher__transform {
+			transform: translateY(-$block-toolbar-height);
+		}
+	}
 }
