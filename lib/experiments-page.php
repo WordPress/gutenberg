@@ -86,12 +86,12 @@ function gutenberg_initialize_experiments_settings() {
 	);
 	add_settings_field(
 		'gutenberg-page-templates',
-		__( 'Page Templates', 'gutenberg' ),
+		__( 'Page Block Templates', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Enable Page Templates', 'gutenberg' ),
+			'label' => __( 'Enable Page Block Templates', 'gutenberg' ),
 			'id'    => 'gutenberg-page-templates',
 		)
 	);
