@@ -148,7 +148,7 @@ function build_navigation_html( $block, $colors, $font_sizes ) {
 		// End anchor tag content.
 
 		if ( count( (array) $block['innerBlocks'] ) > 0 ) {
-			$html .= build_navigation_html( $block, $colors );
+			$html .= build_navigation_html( $block, $colors, $font_sizes );
 		}
 
 		$html .= '</li>';
