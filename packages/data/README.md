@@ -572,6 +572,22 @@ _Returns_
 
 -   `Function`: A custom react hook.
 
+<a name="useDispatchWithMap" href="#useDispatchWithMap">#</a> **useDispatchWithMap**
+
+Custom react hook for returning aggregate dispatch actions using the provided
+dispatchMap.
+
+Currently this is an internal api only and is implemented by `withDispatch`
+
+_Parameters_
+
+-   _dispatchMap_ `Function`: Receives the `registry.dispatch` function as the first argument and the `registry` object as the second argument.  Should return an object mapping props to functions.
+-   _deps_ `Array`: An array of dependencies for the hook.
+
+_Returns_
+
+-   `Object`: An object mapping props to functions created by the passed in dispatchMap.
+
 <a name="useRegistry" href="#useRegistry">#</a> **useRegistry**
 
 A custom react hook exposing the registry context for use.

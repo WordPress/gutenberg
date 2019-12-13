@@ -146,25 +146,29 @@ export function registerFormatType( name, settings ) {
 					settings.__experimentalGetPropsForEditableTreePreparation ||
 					noop;
 
-				newProps = { ...newProps, ...useSelect( ( sel ) => mapKeys(
-					settings.__experimentalGetPropsForEditableTreePreparation( sel, {
-						richTextIdentifier: identifier,
-						blockClientId: clientId,
-					} ),
+				const selectProps = useSelect( ( sel ) => settings.__experimentalGetPropsForEditableTreePreparation( sel, {
+					richTextIdentifier: identifier,
+					blockClientId: clientId,
+				} ), [ clientId, identifier ] );
+
+				newProps = { ...newProps, ...mapKeys(
+					selectProps,
 					( value, key ) => selectPrefix + key
-				), [ clientId, identifier ] ) };
+				) };
 
 				settings.__experimentalGetPropsForEditableTreeChangeHandler =
 					settings.__experimentalGetPropsForEditableTreeChangeHandler ||
 					noop;
 
-				newProps = { ...newProps, ...useDispatchWithMap( ( disp ) => mapKeys(
-					settings.__experimentalGetPropsForEditableTreeChangeHandler( disp, {
-						richTextIdentifier: identifier,
-						blockClientId: clientId,
-					} ),
+				const dispatchProps = useDispatchWithMap( ( disp ) => settings.__experimentalGetPropsForEditableTreeChangeHandler( disp, {
+					richTextIdentifier: identifier,
+					blockClientId: clientId,
+				} ), [ clientId, identifier ] );
+
+				newProps = { ...newProps, ...mapKeys(
+					dispatchProps,
 					( value, key ) => dispatchPrefix + key
-				), [ clientId, identifier ] ) };
+				) };
 
 				const propsByPrefix = Object.keys( newProps ).reduce( ( accumulator, key ) => {
 					if ( key.startsWith( selectPrefix ) ) {
