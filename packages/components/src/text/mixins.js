@@ -78,7 +78,7 @@ const label = `
 `;
 
 /**
- * @typedef {"title.large" | "title.medium" | "title.small" | "subtitle" | "subtitle.small" | "body" | "body.small" | "button" | "caption" | "label"} TextVariant
+ * @typedef {'title.large'|'title.medium'|'title.small'|'subtitle'|'subtitle.small'|'body'|'body.small'|'button'|'caption'|'label'} TextVariant
  */
 
 /**
