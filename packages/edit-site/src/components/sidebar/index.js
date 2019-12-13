@@ -4,6 +4,9 @@
 import { createSlotFill, Panel } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
+const { Slot: TemplatesSlot, Fill: TemplatesFill } = createSlotFill(
+	'EditSiteSidebarTemplates'
+);
 const { Slot: InspectorSlot, Fill: InspectorFill } = createSlotFill(
 	'EditSiteSidebarInspector'
 );
@@ -16,6 +19,9 @@ function Sidebar() {
 			aria-label={ __( 'Site editor advanced settings.' ) }
 			tabIndex="-1"
 		>
+			<Panel header={ __( 'Templates' ) }>
+				<TemplatesSlot bubblesVirtually />
+			</Panel>
 			<Panel header={ __( 'Inspector' ) }>
 				<InspectorSlot bubblesVirtually />
 			</Panel>
@@ -23,6 +29,7 @@ function Sidebar() {
 	);
 }
 
+Sidebar.TemplatesFill = TemplatesFill;
 Sidebar.InspectorFill = InspectorFill;
 
 export default Sidebar;
