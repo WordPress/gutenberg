@@ -240,15 +240,17 @@ export function pasteHandler( { HTML = '', plainText = '', mode = 'AUTO', tagNam
 		const pieceBlocks = htmlToBlocks( { html: piece, rawTransforms } );
 
 		if ( ! canUserUseUnfilteredHTML ) {
-			// Should run before `figureContentReducer`.
-			filters.unshift( iframeRemover );
+			const iframeFilters = [
+				iframeRemover,
+				figureContentReducer,
+			];
 
 			return compact( map( pieceBlocks, ( pieceBlock ) => {
 				if ( pieceBlock.name !== 'core/html' ) {
 					return pieceBlock;
 				}
 
-				pieceBlock.attributes.content = deepFilterHTML( pieceBlock.attributes.content, filters, blockContentSchema );
+				pieceBlock.attributes.content = deepFilterHTML( pieceBlock.attributes.content, iframeFilters, blockContentSchema );
 				pieceBlock.attributes.content = removeInvalidHTML( pieceBlock.attributes.content, schema );
 
 				if ( ! pieceBlock.attributes.content ) {
