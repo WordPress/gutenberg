@@ -3,25 +3,25 @@
 	flex-direction: row;
 }
 
-.block-editor-block-mover .components-toolbar {
-	@include break-medium() {
+.block-editor-block-mover__description {
+	display: none;
+}
+
+// Show the mover in a single button under the contextual toolbar.
+.block-editor-block-contextual-toolbar {
+	.block-editor-block-mover .components-toolbar {
 		flex-direction: column;
-	}
-}
-
-.block-editor-block-mover__control {
-	@include break-medium() {
-		height: 18px;
-	}
-}
-
-.block-editor-block-mover:not([draggable="false"]) {
-	@include break-medium() {
-		cursor: grab;
 	}
 
 	.block-editor-block-mover__control {
-		@include break-medium() {
+		height: 50%;
+	}
+
+	// Drag and drop is only enabled in contextual toolbars
+	.block-editor-block-mover:not([draggable="false"]) {
+		cursor: grab;
+
+		.block-editor-block-mover__control {
 			cursor: grab !important;
 
 			&:not(:disabled):not([aria-disabled="true"]):active {
@@ -29,12 +29,4 @@
 			}
 		}
 	}
-}
-
-.block-editor-block-mover__description {
-	display: none;
-}
-
-.block-editor-block-mover.is-horizontal .block-editor-block-mover__control-drag-handle {
-	display: none;
 }

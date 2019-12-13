@@ -471,17 +471,31 @@
 /**
  * Block Toolbar when contextual.
  */
-.block-editor-block-contextual-toolbar .block-editor-block-toolbar {
-	width: 100%;
-
-	@include break-small() {
-		width: auto;
+.block-editor-block-contextual-toolbar {
+	.block-editor-block-toolbar {
+		width: 100%;
 
 		// Hide right border on desktop, where the .components-toolbar instead has a right border.
 		border-right: none;
 	}
-}
 
+	// Adapt the height of the toolbar items.
+	.components-toolbar {
+		height: $block-toolbar-height + 1px;
+		border-top: $border-width solid $light-gray-800;
+		border-bottom: $border-width solid $light-gray-800;
+
+		// Ensure the icon buttons remain square.
+		.components-button.has-icon:not(.has-text) {
+			width: $block-toolbar-height;
+		}
+
+		// Adapt the height of all toolbar buttons.
+		.components-button {
+			height: $block-toolbar-height;
+		}
+	}
+}
 
 /**
  * Block Label for Navigation/Selection Mode
