@@ -6,7 +6,7 @@ import { mapKeys, reduce } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatchWithMap } from '@wordpress/data';
+import { useSelect, __unstableUseDispatchWithMap } from '@wordpress/data';
 
 export default function withFormatTypes( RichText ) {
 	return ( props ) => {
@@ -31,7 +31,7 @@ export default function withFormatTypes( RichText ) {
 				};
 			}, {} );
 		}, [ formatTypes, clientId, identifier ] );
-		const dispatchProps = useDispatchWithMap( ( disp ) => {
+		const dispatchProps = __unstableUseDispatchWithMap( ( disp ) => {
 			return reduce( formatTypes, ( acc, settings ) => {
 				if ( ! settings.__experimentalGetPropsForEditableTreeChangeHandler ) {
 					return acc;
