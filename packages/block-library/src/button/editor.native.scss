@@ -14,10 +14,15 @@
 }
 
 .button {
-	background-color: $button-fallback-bg;
+	background-color: $button-default-bg;
 	border-width: $border-width;
 	border-radius: $border-width * 4;
 	padding: $block-spacing;
 	max-width: 580px;
 	min-width: 108px;
+	margin: $panel-padding;
+}
+
+.fallbackButton {
+	background-color: $button-fallback-bg;
 }
