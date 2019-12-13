@@ -141,6 +141,15 @@ function register_block_core_navigation() {
 				'itemsJustification' => array(
 					'type' => 'string',
 				),
+				'items' => array(
+					'type'    => 'array',
+					'default' => array(
+						'ids'      => array(),
+						'items'    => array(),
+						'unadded'  => array(),
+						'repeated' => array(),
+					)
+				)
 			),
 
 			'render_callback' => 'render_block_navigation',

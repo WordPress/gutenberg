@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { escape, upperFirst, reduce, map, filter, difference, concat } from 'lodash';
+import { escape, upperFirst, reduce, map, filter, difference, concat, isEqual } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -43,6 +43,21 @@ import BlockColorsStyleSelector from './block-colors-selector';
 import * as navIcons from './icons';
 import { useQueryPages } from './use-query';
 
+/**
+ * Map pages IDs to <NavigationLink /> blocks.
+ *
+ * @param {array} ids Pages id to map.
+ * @param {array} pages Pages collection.
+ * @return {array} <NavigationLink /> collection.
+ */
+const mapItemsFromPagesId = ( ids, pages ) => map( ids, ( id ) => {
+	const { type, url, title } = filter( pages, ( { id: page_id } ) => page_id === id )[0];
+	return createBlock(
+		'core/navigation-link',
+		{ type, id, url, label: escape(title), title: escape(title), opensInNewTab: false }
+	)
+} );
+
 function Navigation( {
 	attributes,
 	clientId,
@@ -58,6 +73,8 @@ function Navigation( {
 	/* eslint-enable @wordpress/no-unused-vars-before-return */
 	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator( clientId );
 
+	const { items } = attributes;
+
 	const [ pageNavigationItems, setPageNavigationItems ] = useState( [] );
 
 	const [ populateFromExistingPages, setPopulateFromExistingPages ] = useState( false );
@@ -70,8 +87,6 @@ function Navigation( {
 		order: 'asc',
 		orderby: 'id',
 	} );
-
-	console.log( { pages } );
 
 	/**
 	 * Items checker.
@@ -107,25 +122,22 @@ function Navigation( {
 		itemsChecker.unadded = difference( map( pages, ( { id } ) => ( id ) ), itemsChecker.ids );
 
 		if ( itemsChecker.unadded.length ) {
-			setPageNavigationItems(
-				concat(
-					map( itemsChecker.unadded, ( id ) => {
-						const { type, url, title } = filter( pages, ( { id: page_id } ) => page_id === id )[0];
-						return createBlock(
-							'core/navigation-link',
-							{ type, id, url, label: escape(title), title: escape(title), opensInNewTab: false }
-						)
-					} ),
-					innerBlocks
-				)
-			);
+			setPageNavigationItems( concat( mapItemsFromPagesId( itemsChecker.unadded, pages ), innerBlocks ) );
 		}
+
+		if ( ! isEqual( itemsChecker.unadded.sort(), items.unadded.sort() ) ) {
+			setAttributes( { items: itemsChecker } );
+		}
+
 	}, [ pages, innerBlocks ] );
 
+	/*
+	 * Update Navigation links.
+	 */
 	useEffect( () => {
-	    if ( populateFromExistingPages ) {
-		    updateNavItemBlocks( pageNavigationItems );
-	    }
+		if ( populateFromExistingPages ) {
+			updateNavItemBlocks( pageNavigationItems );
+		}
 	}, [ populateFromExistingPages, pageNavigationItems ] );
 
 
