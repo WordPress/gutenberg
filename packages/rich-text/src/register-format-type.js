@@ -6,9 +6,8 @@ import { mapKeys } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { select, dispatch, withSelect, withDispatch } from '@wordpress/data';
+import { select, dispatch, useSelect, useDispatch } from '@wordpress/data';
 import { addFilter } from '@wordpress/hooks';
-import { compose } from '@wordpress/compose';
 
 /**
  * @typedef {Object} WPFormat
@@ -137,15 +136,43 @@ export function registerFormatType( name, settings ) {
 			const selectPrefix = `format_prepare_props_(${ name })_`;
 			const dispatchPrefix = `format_on_change_props_(${ name })_`;
 
-			const Component = ( props ) => {
-				const newProps = { ...props };
-				const propsByPrefix = Object.keys( props ).reduce( ( accumulator, key ) => {
+			return ( props ) => {
+				const { clientId, identifier } = props;
+				let newProps = { ...props };
+
+				const noop = () => ( {} );
+
+				settings.__experimentalGetPropsForEditableTreePreparation =
+					settings.__experimentalGetPropsForEditableTreePreparation ||
+					noop;
+
+				newProps = { ...newProps, ...useSelect( ( sel ) => mapKeys(
+					settings.__experimentalGetPropsForEditableTreePreparation( sel, {
+						richTextIdentifier: identifier,
+						blockClientId: clientId,
+					} ),
+					( value, key ) => selectPrefix + key
+				), [ clientId, identifier ] ) };
+
+				settings.__experimentalGetPropsForEditableTreeChangeHandler =
+					settings.__experimentalGetPropsForEditableTreeChangeHandler ||
+					noop;
+
+				newProps = { ...newProps, ...useDispatch( ( disp ) => mapKeys(
+					settings.__experimentalGetPropsForEditableTreeChangeHandler( disp, {
+						richTextIdentifier: identifier,
+						blockClientId: clientId,
+					} ),
+					( value, key ) => dispatchPrefix + key
+				), [ clientId, identifier ] ) };
+
+				const propsByPrefix = Object.keys( newProps ).reduce( ( accumulator, key ) => {
 					if ( key.startsWith( selectPrefix ) ) {
-						accumulator[ key.slice( selectPrefix.length ) ] = props[ key ];
+						accumulator[ key.slice( selectPrefix.length ) ] = newProps[ key ];
 					}
 
 					if ( key.startsWith( dispatchPrefix ) ) {
-						accumulator[ key.slice( dispatchPrefix.length ) ] = props[ key ];
+						accumulator[ key.slice( dispatchPrefix.length ) ] = newProps[ key ];
 					}
 
 					return accumulator;
@@ -174,36 +201,10 @@ export function registerFormatType( name, settings ) {
 						);
 				}
 
+				console.log( newProps );
+
 				return <OriginalComponent { ...newProps } />;
 			};
-
-			const hocs = [];
-
-			if ( settings.__experimentalGetPropsForEditableTreePreparation ) {
-				hocs.push( withSelect( ( sel, { clientId, identifier } ) =>
-					mapKeys(
-						settings.__experimentalGetPropsForEditableTreePreparation( sel, {
-							richTextIdentifier: identifier,
-							blockClientId: clientId,
-						} ),
-						( value, key ) => selectPrefix + key
-					)
-				) );
-			}
-
-			if ( settings.__experimentalGetPropsForEditableTreeChangeHandler ) {
-				hocs.push( withDispatch( ( disp, { clientId, identifier } ) =>
-					mapKeys(
-						settings.__experimentalGetPropsForEditableTreeChangeHandler( disp, {
-							richTextIdentifier: identifier,
-							blockClientId: clientId,
-						} ),
-						( value, key ) => dispatchPrefix + key
-					)
-				) );
-			}
-
-			return hocs.length ? compose( hocs )( Component ) : Component;
 		} );
 	}
 
