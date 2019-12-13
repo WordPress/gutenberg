@@ -351,10 +351,6 @@ class RichTextWrapper extends Component {
 			// eslint-disable-next-line no-unused-vars
 			canUserUseUnfilteredHTML,
 			// eslint-disable-next-line no-unused-vars
-			clientId,
-			// eslint-disable-next-line no-unused-vars
-			identifier,
-			// eslint-disable-next-line no-unused-vars
 			instanceId,
 			// To do: find a better way to implicitly inherit props.
 			start,
@@ -362,7 +358,7 @@ class RichTextWrapper extends Component {
 			style,
 			preserveWhiteSpace,
 			disabled,
-			...experimentalProps
+			...props
 		} = this.props;
 		const multilineTag = getMultilineTag( multiline );
 
@@ -381,7 +377,7 @@ class RichTextWrapper extends Component {
 
 		const content = (
 			<RichText
-				{ ...experimentalProps }
+				{ ...props }
 				ref={ this.ref }
 				value={ adjustedValue }
 				onChange={ adjustedOnChange }
@@ -414,8 +410,6 @@ class RichTextWrapper extends Component {
 				disabled={ disabled }
 				start={ start }
 				reversed={ reversed }
-				clientId={ clientId }
-				identifier={ identifier }
 			>
 				{ ( { isSelected, value, onChange, Editable } ) =>
 					<>
