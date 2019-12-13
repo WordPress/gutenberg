@@ -2640,6 +2640,309 @@ Array [
 ]
 `;
 
+exports[`Storyshots Components|Experimental/Text Body 1`] = `
+.emotion-0 {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+}
+
+<p
+  className="emotion-0 emotion-1"
+>
+  Body
+</p>
+`;
+
+exports[`Storyshots Components|Experimental/Text Body Small 1`] = `
+.emotion-0 {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+<p
+  className="emotion-0 emotion-1"
+>
+  Body Small
+</p>
+`;
+
+exports[`Storyshots Components|Experimental/Text Button 1`] = `
+.emotion-0 {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+<p
+  className="emotion-0 emotion-1"
+>
+  Button
+</p>
+`;
+
+exports[`Storyshots Components|Experimental/Text Caption 1`] = `
+.emotion-0 {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 16px;
+}
+
+<p
+  className="emotion-0 emotion-1"
+>
+  Caption
+</p>
+`;
+
+exports[`Storyshots Components|Experimental/Text Default 1`] = `
+Array [
+  .emotion-0 {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 400;
+  font-size: 32px;
+  line-height: 40px;
+}
+
+<h1
+    className="emotion-0 emotion-1"
+  >
+    Title Large
+  </h1>,
+  .emotion-0 {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 400;
+  font-size: 24px;
+  line-height: 32px;
+}
+
+<h2
+    className="emotion-0 emotion-1"
+  >
+    Title Medium
+  </h2>,
+  .emotion-0 {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 28px;
+}
+
+<h3
+    className="emotion-0 emotion-1"
+  >
+    Title Small
+  </h3>,
+  .emotion-0 {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
+  font-size: 16px;
+  line-height: 24px;
+}
+
+<p
+    className="emotion-0 emotion-1"
+  >
+    Subtitle
+  </p>,
+  .emotion-0 {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+<p
+    className="emotion-0 emotion-1"
+  >
+    Subtitle Small
+  </p>,
+  .emotion-0 {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+}
+
+<p
+    className="emotion-0 emotion-1"
+  >
+    Body
+  </p>,
+  .emotion-0 {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+<p
+    className="emotion-0 emotion-1"
+  >
+    Body Small
+  </p>,
+  .emotion-0 {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+<p
+    className="emotion-0 emotion-1"
+  >
+    Button
+  </p>,
+  .emotion-0 {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 16px;
+}
+
+<p
+    className="emotion-0 emotion-1"
+  >
+    Caption
+  </p>,
+  .emotion-0 {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 16px;
+}
+
+<p
+    className="emotion-0 emotion-1"
+  >
+    Label
+  </p>,
+]
+`;
+
+exports[`Storyshots Components|Experimental/Text Label 1`] = `
+.emotion-0 {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 16px;
+}
+
+<p
+  className="emotion-0 emotion-1"
+>
+  Label
+</p>
+`;
+
+exports[`Storyshots Components|Experimental/Text Subtitle 1`] = `
+.emotion-0 {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
+  font-size: 16px;
+  line-height: 24px;
+}
+
+<p
+  className="emotion-0 emotion-1"
+>
+  Subtitle
+</p>
+`;
+
+exports[`Storyshots Components|Experimental/Text Subtitle Small 1`] = `
+.emotion-0 {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+<p
+  className="emotion-0 emotion-1"
+>
+  Subtitle Small
+</p>
+`;
+
+exports[`Storyshots Components|Experimental/Text Title Large 1`] = `
+.emotion-0 {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 400;
+  font-size: 32px;
+  line-height: 40px;
+}
+
+<h1
+  className="emotion-0 emotion-1"
+>
+  Title Large
+</h1>
+`;
+
+exports[`Storyshots Components|Experimental/Text Title Medium 1`] = `
+.emotion-0 {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 400;
+  font-size: 24px;
+  line-height: 32px;
+}
+
+<h2
+  className="emotion-0 emotion-1"
+>
+  Title Medium
+</h2>
+`;
+
+exports[`Storyshots Components|Experimental/Text Title Small 1`] = `
+.emotion-0 {
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 28px;
+}
+
+<h3
+  className="emotion-0 emotion-1"
+>
+  Title Small
+</h3>
+`;
+
 exports[`Storyshots Components|ExternalLink Default 1`] = `
 <a
   className="components-external-link"
@@ -4287,309 +4590,6 @@ exports[`Storyshots Components|TabPanel Default 1`] = `
     </p>
   </div>
 </div>
-`;
-
-exports[`Storyshots Components|Text Body 1`] = `
-.emotion-0 {
-  margin: 0;
-  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
-  font-weight: 400;
-  font-size: 16px;
-  line-height: 24px;
-}
-
-<p
-  className="emotion-0 emotion-1"
->
-  Body
-</p>
-`;
-
-exports[`Storyshots Components|Text Body Small 1`] = `
-.emotion-0 {
-  margin: 0;
-  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 20px;
-}
-
-<p
-  className="emotion-0 emotion-1"
->
-  Body Small
-</p>
-`;
-
-exports[`Storyshots Components|Text Button 1`] = `
-.emotion-0 {
-  margin: 0;
-  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
-  font-weight: 600;
-  font-size: 14px;
-  line-height: 20px;
-}
-
-<p
-  className="emotion-0 emotion-1"
->
-  Button
-</p>
-`;
-
-exports[`Storyshots Components|Text Caption 1`] = `
-.emotion-0 {
-  margin: 0;
-  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
-  font-weight: 400;
-  font-size: 12px;
-  line-height: 16px;
-}
-
-<p
-  className="emotion-0 emotion-1"
->
-  Caption
-</p>
-`;
-
-exports[`Storyshots Components|Text Default 1`] = `
-Array [
-  .emotion-0 {
-  margin: 0;
-  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
-  font-weight: 400;
-  font-size: 32px;
-  line-height: 40px;
-}
-
-<h1
-    className="emotion-0 emotion-1"
-  >
-    Title Large
-  </h1>,
-  .emotion-0 {
-  margin: 0;
-  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
-  font-weight: 400;
-  font-size: 24px;
-  line-height: 32px;
-}
-
-<h2
-    className="emotion-0 emotion-1"
-  >
-    Title Medium
-  </h2>,
-  .emotion-0 {
-  margin: 0;
-  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
-  font-weight: 400;
-  font-size: 20px;
-  line-height: 28px;
-}
-
-<h3
-    className="emotion-0 emotion-1"
-  >
-    Title Small
-  </h3>,
-  .emotion-0 {
-  margin: 0;
-  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
-  font-weight: 600;
-  font-size: 14px;
-  line-height: 20px;
-  font-size: 16px;
-  line-height: 24px;
-}
-
-<p
-    className="emotion-0 emotion-1"
-  >
-    Subtitle
-  </p>,
-  .emotion-0 {
-  margin: 0;
-  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
-  font-weight: 600;
-  font-size: 14px;
-  line-height: 20px;
-  font-size: 14px;
-  line-height: 20px;
-}
-
-<p
-    className="emotion-0 emotion-1"
-  >
-    Subtitle Small
-  </p>,
-  .emotion-0 {
-  margin: 0;
-  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
-  font-weight: 400;
-  font-size: 16px;
-  line-height: 24px;
-}
-
-<p
-    className="emotion-0 emotion-1"
-  >
-    Body
-  </p>,
-  .emotion-0 {
-  margin: 0;
-  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 20px;
-}
-
-<p
-    className="emotion-0 emotion-1"
-  >
-    Body Small
-  </p>,
-  .emotion-0 {
-  margin: 0;
-  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
-  font-weight: 600;
-  font-size: 14px;
-  line-height: 20px;
-}
-
-<p
-    className="emotion-0 emotion-1"
-  >
-    Button
-  </p>,
-  .emotion-0 {
-  margin: 0;
-  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
-  font-weight: 400;
-  font-size: 12px;
-  line-height: 16px;
-}
-
-<p
-    className="emotion-0 emotion-1"
-  >
-    Caption
-  </p>,
-  .emotion-0 {
-  margin: 0;
-  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
-  font-weight: 600;
-  font-size: 12px;
-  line-height: 16px;
-}
-
-<p
-    className="emotion-0 emotion-1"
-  >
-    Label
-  </p>,
-]
-`;
-
-exports[`Storyshots Components|Text Label 1`] = `
-.emotion-0 {
-  margin: 0;
-  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
-  font-weight: 600;
-  font-size: 12px;
-  line-height: 16px;
-}
-
-<p
-  className="emotion-0 emotion-1"
->
-  Label
-</p>
-`;
-
-exports[`Storyshots Components|Text Subtitle 1`] = `
-.emotion-0 {
-  margin: 0;
-  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
-  font-weight: 600;
-  font-size: 14px;
-  line-height: 20px;
-  font-size: 16px;
-  line-height: 24px;
-}
-
-<p
-  className="emotion-0 emotion-1"
->
-  Subtitle
-</p>
-`;
-
-exports[`Storyshots Components|Text Subtitle Small 1`] = `
-.emotion-0 {
-  margin: 0;
-  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
-  font-weight: 600;
-  font-size: 14px;
-  line-height: 20px;
-  font-size: 14px;
-  line-height: 20px;
-}
-
-<p
-  className="emotion-0 emotion-1"
->
-  Subtitle Small
-</p>
-`;
-
-exports[`Storyshots Components|Text Title Large 1`] = `
-.emotion-0 {
-  margin: 0;
-  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
-  font-weight: 400;
-  font-size: 32px;
-  line-height: 40px;
-}
-
-<h1
-  className="emotion-0 emotion-1"
->
-  Title Large
-</h1>
-`;
-
-exports[`Storyshots Components|Text Title Medium 1`] = `
-.emotion-0 {
-  margin: 0;
-  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
-  font-weight: 400;
-  font-size: 24px;
-  line-height: 32px;
-}
-
-<h2
-  className="emotion-0 emotion-1"
->
-  Title Medium
-</h2>
-`;
-
-exports[`Storyshots Components|Text Title Small 1`] = `
-.emotion-0 {
-  margin: 0;
-  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
-  font-weight: 400;
-  font-size: 20px;
-  line-height: 28px;
-}
-
-<h3
-  className="emotion-0 emotion-1"
->
-  Title Small
-</h3>
 `;
 
 exports[`Storyshots Components|TextHighlight Default 1`] = `
