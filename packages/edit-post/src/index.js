@@ -86,10 +86,17 @@ export function initializeEditor( id, postType, postId, settings, initialEdits )
 
 	const isIphone = window.navigator.userAgent.indexOf( 'iPhone' ) !== -1;
 	if ( isIphone ) {
-		document.addEventListener( 'focusin', function( ) {
-			setTimeout( () => {
+		window.addEventListener( 'scroll', function( event ) {
+			const editorScrollContainer = document.getElementsByClassName( 'edit-post-editor-regions__body' )[ 0 ];
+			if ( event.target === document ) {
+				// Scroll element into view by scrolling the editor container by the same amount
+				// that Mobile Safari tried to scroll the html element upwards.
+				if ( window.scrollY > 100 ) {
+					editorScrollContainer.scrollTop = editorScrollContainer.scrollTop + window.scrollY;
+				}
+				//Undo unwanted scroll on html element
 				window.scrollTo( 0, 0 );
-			}, 150 );
+			}
 		} );
 	}
 

@@ -17,8 +17,11 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 ```js
 import {
 	BlockEditorProvider,
-	BlockList
+	BlockList,
+	WritingFlow,
+	ObserveTyping
 } from '@wordpress/block-editor';
+import { Popover } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 
 function MyEditorComponent () {

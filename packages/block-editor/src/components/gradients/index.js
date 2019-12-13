@@ -45,7 +45,7 @@ export function __experimentalUseGradient( {
 			customGradient: attributes[ customGradientAttribute ],
 			gradients: getSettings().gradients,
 		};
-	}, [ clientId ] );
+	}, [ clientId, gradientAttribute, customGradientAttribute ] );
 
 	const { updateBlockAttributes } = useDispatch( 'core/block-editor' );
 	const setGradient = useCallback(

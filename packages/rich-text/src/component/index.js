@@ -249,6 +249,7 @@ class RichText extends Component {
 			onPaste,
 			__unstableIsSelected: isSelected,
 		} = this.props;
+		const { activeFormats = [] } = this.state;
 
 		if ( ! isSelected ) {
 			event.preventDefault();
@@ -331,6 +332,7 @@ class RichText extends Component {
 				html,
 				plainText,
 				files,
+				activeFormats,
 			} );
 		}
 	}
@@ -421,7 +423,7 @@ class RichText extends Component {
 			inputType = event.inputType;
 		}
 
-		if ( ! inputType ) {
+		if ( ! inputType && event && event.nativeEvent ) {
 			inputType = event.nativeEvent.inputType;
 		}
 
@@ -922,12 +924,17 @@ class RichText extends Component {
 			value !== this.value
 		);
 
+		const selectionChanged = (
+			selectionStart !== prevProps.selectionStart &&
+			selectionStart !== this.record.start
+		) || (
+			selectionEnd !== prevProps.selectionEnd &&
+			selectionEnd !== this.record.end
+		);
+
 		// Check if the selection changed.
 		shouldReapply = shouldReapply || (
-			isSelected && ! prevProps.isSelected && (
-				this.record.start !== selectionStart ||
-				this.record.end !== selectionEnd
-			)
+			isSelected && ! prevProps.isSelected && selectionChanged
 		);
 
 		const prefix = 'format_prepare_props_';
@@ -949,10 +956,7 @@ class RichText extends Component {
 			this.record.start = selectionStart;
 			this.record.end = selectionEnd;
 			this.applyRecord( this.record );
-		} else if (
-			this.record.start !== selectionStart ||
-			this.record.end !== selectionEnd
-		) {
+		} else if ( selectionChanged ) {
 			this.record = {
 				...this.record,
 				start: selectionStart,

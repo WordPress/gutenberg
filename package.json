@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "7.0.0",
+	"version": "7.1.0",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -79,6 +79,7 @@
 		"@storybook/addon-storysource": "5.2.4",
 		"@storybook/addon-viewport": "5.2.4",
 		"@storybook/react": "5.2.4",
+		"@types/requestidlecallback": "0.3.1",
 		"@wordpress/babel-plugin-import-jsx-pragma": "file:packages/babel-plugin-import-jsx-pragma",
 		"@wordpress/babel-plugin-makepot": "file:packages/babel-plugin-makepot",
 		"@wordpress/babel-preset-default": "file:packages/babel-preset-default",

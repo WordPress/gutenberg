@@ -585,6 +585,15 @@ export class RichText extends Component {
 	}
 
 	willTrimSpaces( html ) {
+		const {
+			tagName,
+		} = this.props;
+
+		// aztec won't trim spaces in a case of <pre> block, so we are excluding it
+		if ( tagName === 'pre' ) {
+			return false;
+		}
+
 		// regex for detecting spaces around block element html tags
 		const blockHtmlElements = '(div|br|blockquote|ul|ol|li|p|pre|h1|h2|h3|h4|h5|h6|iframe|hr)';
 		const leadingOrTrailingSpaces = new RegExp( `(\\s+)<\/?${ blockHtmlElements }>|<\/?${ blockHtmlElements }>(\\s+)`, 'g' );

@@ -18,7 +18,7 @@ import GradientPicker from './control';
 export default function GradientPanel( props ) {
 	const gradients = useSelect( ( select ) => (
 		select( 'core/block-editor' ).getSettings().gradients
-	) );
+	), [] );
 	if ( isEmpty( gradients ) ) {
 		return null;
 	}
