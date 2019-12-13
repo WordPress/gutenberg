@@ -1,9 +1,4 @@
 /**
- * WordPress dependencies
- */
-import { withSelect } from '@wordpress/data';
-
-/**
  * Internal dependencies
  */
 import { getActiveFormat } from '../get-active-format';
@@ -28,7 +23,7 @@ const interactiveContentTags = new Set( [
 	'video',
 ] );
 
-const FormatEdit = ( {
+export default ( {
 	formatTypes,
 	onChange,
 	value,
@@ -76,7 +71,3 @@ const FormatEdit = ( {
 			/>
 		);
 	} );
-
-export default withSelect( ( select ) => ( {
-	formatTypes: select( 'core/rich-text' ).getFormatTypes(),
-} ) )( FormatEdit );

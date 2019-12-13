@@ -112,6 +112,7 @@ export default function withFormatTypes( RichText ) {
 				{ ...selectProps }
 				{ ...dispatchProps }
 				{ ...newProps }
+				formatTypes={ Object.values( formatTypes ) }
 			/>
 		);
 	};

@@ -14,7 +14,6 @@ import {
  */
 import { Component, forwardRef } from '@wordpress/element';
 import { BACKSPACE, DELETE, ENTER, LEFT, RIGHT, SPACE, ESCAPE } from '@wordpress/keycodes';
-import { withSelect } from '@wordpress/data';
 import { withSafeTimeout, compose } from '@wordpress/compose';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 import deprecated from '@wordpress/deprecated';
@@ -1092,6 +1091,7 @@ class RichText extends Component {
 			children,
 			allowedFormats,
 			withoutInteractiveFormatting,
+			formatTypes,
 		} = this.props;
 
 		return (
@@ -1101,6 +1101,7 @@ class RichText extends Component {
 					withoutInteractiveFormatting={ withoutInteractiveFormatting }
 					value={ this.record }
 					onChange={ this.onChange }
+					formatTypes={ formatTypes }
 				/> }
 				{ children && children( {
 					isSelected,
@@ -1120,9 +1121,6 @@ RichText.defaultProps = {
 };
 
 const RichTextWrapper = compose( [
-	withSelect( ( select ) => ( {
-		formatTypes: select( 'core/rich-text' ).getFormatTypes(),
-	} ) ),
 	withSafeTimeout,
 	withFormatTypes,
 ] )( RichText );
