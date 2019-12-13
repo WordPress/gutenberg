@@ -20,8 +20,9 @@ import {
  * Internal dependencies
  */
 import Sidebar from '../sidebar';
+import TemplateSwitcher from '../template-switcher';
 
-export default function BlockEditor( { settings: _settings } ) {
+export default function BlockEditor( { settings: _settings, setSettings } ) {
 	const canUserCreateMedia = useSelect( ( select ) => {
 		const _canUserCreateMedia = select( 'core' ).canUser(
 			'create',
@@ -54,16 +55,27 @@ export default function BlockEditor( { settings: _settings } ) {
 			const parsedContent = parse( content );
 			return parsedContent.length ? parsedContent : undefined;
 		}
-	}, [] );
+	}, [ settings.templateId ] );
 	const [ blocks = initialBlocks, setBlocks ] = useEntityProp(
 		'postType',
 		'wp_template',
 		'blocks'
 	);
-	const setContent = useCallback( ( nextBlocks ) => {
-		setBlocks( nextBlocks );
-		_setContent( serialize( nextBlocks ) );
-	}, [] );
+	const setContent = useCallback(
+		( nextBlocks ) => {
+			setBlocks( nextBlocks );
+			_setContent( serialize( nextBlocks ) );
+		},
+		[ setBlocks, _setContent ]
+	);
+	const setActiveTemplateId = useCallback(
+		( newTemplateId ) =>
+			setSettings( ( prevSettings ) => ( {
+				...prevSettings,
+				templateId: newTemplateId,
+			} ) ),
+		[]
+	);
 	return (
 		<BlockEditorProvider
 			settings={ settings }
@@ -72,6 +84,13 @@ export default function BlockEditor( { settings: _settings } ) {
 			onChange={ setContent }
 		>
 			<BlockEditorKeyboardShortcuts />
+			<Sidebar.TemplatesFill>
+				<TemplateSwitcher
+					ids={ settings.templateIds }
+					activeId={ settings.templateId }
+					onActiveIdChange={ setActiveTemplateId }
+				/>
+			</Sidebar.TemplatesFill>
 			<Sidebar.InspectorFill>
 				<BlockInspector />
 			</Sidebar.InspectorFill>

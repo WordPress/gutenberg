@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import {
 	SlotFillProvider,
@@ -18,7 +19,8 @@ import Header from '../header';
 import Sidebar from '../sidebar';
 import BlockEditor from '../block-editor';
 
-function Editor( { settings } ) {
+function Editor( { settings: _settings } ) {
+	const [ settings, setSettings ] = useState( _settings );
 	const template = useSelect(
 		( select ) =>
 			select( 'core' ).getEntityRecord(
@@ -26,7 +28,7 @@ function Editor( { settings } ) {
 				'wp_template',
 				settings.templateId
 			),
-		[]
+		[ settings.templateId ]
 	);
 	return template ? (
 		<SlotFillProvider>
@@ -39,7 +41,7 @@ function Editor( { settings } ) {
 					<Notices />
 					<Header />
 					<Sidebar />
-					<BlockEditor settings={ settings } />
+					<BlockEditor settings={ settings } setSettings={ setSettings } />
 					<Popover.Slot />
 				</EntityProvider>
 			</DropZoneProvider>
