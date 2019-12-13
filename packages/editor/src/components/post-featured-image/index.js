@@ -114,7 +114,7 @@ function PostFeaturedImage( {
 							allowedTypes={ ALLOWED_MEDIA_TYPES }
 							modalClass="editor-post-featured-image__media-modal"
 							render={ ( { open } ) => (
-								<Button onClick={ open } isDefault isLarge>
+								<Button onClick={ open } isSecondary>
 									{ __( 'Replace Image' ) }
 								</Button>
 							) }

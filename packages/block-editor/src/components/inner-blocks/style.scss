@@ -13,7 +13,7 @@
 }
 
 // On fullwide blocks, don't go beyond the canvas.
-[data-align="full"] > .editor-block-list__block-edit > [data-block] .has-overlay::after {
+[data-align="full"] > .block-editor-block-list__block-edit > [data-block] .has-overlay::after {
 	right: 0;
 	left: 0;
 }

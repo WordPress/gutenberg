@@ -152,11 +152,11 @@ Gutenberg 2.8 added the [`<ServerSideRender>`](/packages/components/src/server-s
 {% codetabs %}
 {% ES5 %}
 ```js
-( function( blocks, element, components ) {
+( function( blocks, element, serverSideRender ) {
 
 	var el = element.createElement,
 	registerBlockType = blocks.registerBlockType,
-	ServerSideRender = components.ServerSideRender;
+	ServerSideRender = serverSideRender;
 
 	registerBlockType( 'gutenberg-examples/example-05-dynamic', {
 		title: 'Example: last post',
@@ -176,13 +176,13 @@ Gutenberg 2.8 added the [`<ServerSideRender>`](/packages/components/src/server-s
 }(
 	window.wp.blocks,
 	window.wp.element,
-	window.wp.components,
+	window.wp.serverSideRender,
 ) );
 ```
 {% ESNext %}
 ```js
 import { registerBlockType } from '@wordpress/blocks';
-import { ServerSideRender } from '@wordpress/components';
+import ServerSideRender from '@wordpress/server-side-render';
 
 registerBlockType( 'gutenberg-examples/example-05-dynamic', {
 	title: 'Example: last post',

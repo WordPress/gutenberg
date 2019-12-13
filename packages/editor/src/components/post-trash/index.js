@@ -27,7 +27,7 @@ function PostTrash( { isNew, postId, postType, ...props } ) {
 	};
 
 	return (
-		<Button className="editor-post-trash button-link-delete" aria-disabled={ disabled } onClick={ onClick } isDefault isLarge>
+		<Button className="editor-post-trash button-link-delete" aria-disabled={ disabled } onClick={ onClick } isSecondary>
 			{ __( 'Move to Trash' ) }
 		</Button>
 	);

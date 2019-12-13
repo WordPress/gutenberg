@@ -28,7 +28,7 @@ export function ColorPaletteControl( {
 
 	return (
 		<BaseControl
-			className="editor-color-palette-control block-editor-color-palette-control"
+			className="block-editor-color-palette-control"
 		>
 			<BaseControl.VisualLabel>
 				{ label }
@@ -40,7 +40,7 @@ export function ColorPaletteControl( {
 				) }
 			</BaseControl.VisualLabel>
 			<ColorPalette
-				className="editor-color-palette-control__color-palette block-editor-color-palette-control__color-palette"
+				className="block-editor-color-palette-control__color-palette"
 				value={ value }
 				onChange={ onChange }
 				{ ... { colors, disableCustomColors } }

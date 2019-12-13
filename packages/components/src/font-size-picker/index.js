@@ -4,7 +4,7 @@
  */
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { withInstanceId } from '@wordpress/compose';
+import { useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -35,15 +35,15 @@ function getSelectOptions( optionsArray, disableCustomFontSizes ) {
 	} ) );
 }
 
-function FontSizePicker( {
+export default function FontSizePicker( {
 	fallbackFontSize,
 	fontSizes = [],
 	disableCustomFontSizes = false,
 	onChange,
 	value,
 	withSlider = false,
-	instanceId,
 } ) {
+	const instanceId = useInstanceId( FontSizePicker );
 	const [ currentSelectValue, setCurrentSelectValue ] = useState( getSelectValueFromFontSize( fontSizes, value ) );
 
 	if ( disableCustomFontSizes && ! fontSizes.length ) {
@@ -111,7 +111,7 @@ function FontSizePicker( {
 						setCurrentSelectValue( getSelectValueFromFontSize( fontSizes, undefined ) );
 					} }
 					isSmall
-					isDefault
+					isSecondary
 				>
 					{ __( 'Reset' ) }
 				</Button>
@@ -132,5 +132,3 @@ function FontSizePicker( {
 		</fieldset>
 	);
 }
-
-export default withInstanceId( FontSizePicker );

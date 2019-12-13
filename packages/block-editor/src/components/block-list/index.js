@@ -70,7 +70,7 @@ function BlockList( {
 		multiSelectedBlockClientIds,
 		hasMultiSelection,
 		enableAnimation,
-	} = useSelect( selector );
+	} = useSelect( selector, [ rootClientId ] );
 	const ref = useRef();
 	const onSelectionStart = useMultiSelection( { ref, rootClientId } );
 
@@ -78,7 +78,7 @@ function BlockList( {
 		<div
 			ref={ ref }
 			className={ classnames(
-				'editor-block-list__layout block-editor-block-list__layout',
+				'block-editor-block-list__layout',
 				className
 			) }
 		>

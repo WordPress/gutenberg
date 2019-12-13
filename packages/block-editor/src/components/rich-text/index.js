@@ -38,8 +38,8 @@ import { RemoveBrowserShortcuts } from './remove-browser-shortcuts';
 import { filePasteHandler } from './file-paste-handler';
 import FormatToolbarContainer from './format-toolbar-container';
 
-const wrapperClasses = 'editor-rich-text block-editor-rich-text';
-const classes = 'editor-rich-text__editable block-editor-rich-text__editable';
+const wrapperClasses = 'block-editor-rich-text';
+const classes = 'block-editor-rich-text__editable';
 
 /**
  * Get the multiline tag based on the multiline prop.
@@ -122,7 +122,7 @@ class RichTextWrapper extends Component {
 		}
 	}
 
-	onPaste( { value, onChange, html, plainText, files } ) {
+	onPaste( { value, onChange, html, plainText, files, activeFormats } ) {
 		const {
 			onReplace,
 			onSplit,
@@ -174,6 +174,18 @@ class RichTextWrapper extends Component {
 
 		if ( typeof content === 'string' ) {
 			let valueToInsert = create( { html: content } );
+
+			// If there are active formats, merge them with the pasted formats.
+			if ( activeFormats.length ) {
+				let index = valueToInsert.formats.length;
+
+				while ( index-- ) {
+					valueToInsert.formats[ index ] = [
+						...activeFormats,
+						...( valueToInsert.formats[ index ] || [] ),
+					];
+				}
+			}
 
 			// If the content should be multiline, we should process text
 			// separated by a line break as separate lines.

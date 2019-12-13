@@ -49,7 +49,7 @@ const MediaReplaceFlow = (
 	const [ showMediaReplaceOptions, setShowMediaReplaceOptions ] = useState( false );
 	const mediaUpload = useSelect( ( select ) => {
 		return select( 'core/block-editor' ).getSettings().mediaUpload;
-	} );
+	}, [] );
 	const editMediaButtonRef = createRef();
 
 	const stopPropagation = ( event ) => {
@@ -123,7 +123,7 @@ const MediaReplaceFlow = (
 		urlInputUIContent = (
 			<LinkViewer
 				isFullWidth={ true }
-				className="editor-format-toolbar__link-container-content block-editor-format-toolbar__link-container-content"
+				className="block-editor-format-toolbar__link-container-content"
 				url={ mediaURLValue }
 				onEditLinkClick={ () => ( setShowEditURLInput( ! showEditURLInput ) ) }
 			/>

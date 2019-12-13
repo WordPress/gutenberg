@@ -23,7 +23,7 @@ export default function( { className, value, onChange, label = __( 'Gradient Pre
 			select( 'core/block-editor' ).getSettings(),
 			[ 'gradients', 'disableCustomGradients' ]
 		)
-	) );
+	), [] );
 	if ( isEmpty( gradients ) && disableCustomGradients ) {
 		return null;
 	}

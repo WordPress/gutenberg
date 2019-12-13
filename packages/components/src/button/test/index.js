@@ -21,7 +21,7 @@ describe( 'Button', () => {
 			expect( button.hasClass( 'components-button' ) ).toBe( true );
 			expect( button.hasClass( 'is-large' ) ).toBe( false );
 			expect( button.hasClass( 'is-primary' ) ).toBe( false );
-			expect( button.hasClass( 'is-toggled' ) ).toBe( false );
+			expect( button.hasClass( 'is-pressed' ) ).toBe( false );
 			expect( button.prop( 'disabled' ) ).toBeUndefined();
 			expect( button.prop( 'type' ) ).toBe( 'button' );
 			expect( button.type() ).toBe( 'button' );
@@ -31,35 +31,26 @@ describe( 'Button', () => {
 			const button = shallow( <Button isPrimary /> );
 			expect( button.hasClass( 'is-large' ) ).toBe( false );
 			expect( button.hasClass( 'is-primary' ) ).toBe( true );
-			expect( button.hasClass( 'is-button' ) ).toBe( true );
 		} );
 
 		it( 'should render a button element with is-large class', () => {
-			const button = shallow( <Button isLarge /> );
+			const button = shallow( <Button isSecondary isLarge /> );
 			expect( button.hasClass( 'is-large' ) ).toBe( true );
-			expect( button.hasClass( 'is-default' ) ).toBe( true );
-			expect( button.hasClass( 'is-button' ) ).toBe( true );
+			expect( button.hasClass( 'is-secondary' ) ).toBe( true );
 			expect( button.hasClass( 'is-primary' ) ).toBe( false );
 		} );
 
-		it( 'should render a button element without is-default if primary', () => {
-			const button = shallow( <Button isPrimary isLarge /> );
-			expect( button.hasClass( 'is-default' ) ).toBe( false );
-		} );
-
 		it( 'should render a button element with is-small class', () => {
-			const button = shallow( <Button isSmall /> );
-			expect( button.hasClass( 'is-default' ) ).toBe( true );
-			expect( button.hasClass( 'is-button' ) ).toBe( true );
+			const button = shallow( <Button isSecondary isSmall /> );
+			expect( button.hasClass( 'is-secondary' ) ).toBe( true );
 			expect( button.hasClass( 'is-large' ) ).toBe( false );
 			expect( button.hasClass( 'is-small' ) ).toBe( true );
 			expect( button.hasClass( 'is-primary' ) ).toBe( false );
 		} );
 
-		it( 'should render a button element with is-toggled without button class', () => {
-			const button = shallow( <Button isToggled /> );
-			expect( button.hasClass( 'is-button' ) ).toBe( false );
-			expect( button.hasClass( 'is-toggled' ) ).toBe( true );
+		it( 'should render a button element with is-pressed without button class', () => {
+			const button = shallow( <Button isPressed /> );
+			expect( button.hasClass( 'is-pressed' ) ).toBe( true );
 		} );
 
 		it( 'should add a disabled prop to the button', () => {
