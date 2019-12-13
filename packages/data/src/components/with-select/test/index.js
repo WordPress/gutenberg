@@ -135,8 +135,7 @@ describe( 'withSelect', () => {
 		// - 1 on initial render
 		// - 1 on effect before subscription set.
 		// - 1 on click triggering subscription firing.
-		// - 1 on rerender.
-		expect( mapSelectToProps ).toHaveBeenCalledTimes( 4 );
+		expect( mapSelectToProps ).toHaveBeenCalledTimes( 3 );
 		// verifies component only renders twice.
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 2 );
 	} );
@@ -206,11 +205,10 @@ describe( 'withSelect', () => {
 		testInstance = testRenderer.root;
 		it( 'should rerun if had dispatched action during mount', () => {
 			expect( testInstance.findByType( 'div' ).props.children ).toBe( 2 );
-			// Expected 3 times because:
+			// Expected 2 times because:
 			// - 1 on initial render
-			// - 1 on effect before subscription set.
-			// - 1 for the rerender because of the mapOutput change detected.
-			expect( mapSelectToProps ).toHaveBeenCalledTimes( 3 );
+			// - 1 on effect before subscription set, accounting for dispatch.
+			expect( mapSelectToProps ).toHaveBeenCalledTimes( 2 );
 			expect( renderSpy ).toHaveBeenCalledTimes( 2 );
 		} );
 		it( 'should rerun on unmount and mount', () => {
@@ -220,11 +218,10 @@ describe( 'withSelect', () => {
 			} );
 			testInstance = testRenderer.root;
 			expect( testInstance.findByType( 'div' ).props.children ).toBe( 4 );
-			// Expected an additional 3 times because of the unmount and remount:
+			// Expected an additional 2 times because of the unmount and remount:
 			// - 1 on initial render
 			// - 1 on effect before subscription set.
-			// - once for the rerender because of the mapOutput change detected.
-			expect( mapSelectToProps ).toHaveBeenCalledTimes( 6 );
+			expect( mapSelectToProps ).toHaveBeenCalledTimes( 4 );
 			expect( renderSpy ).toHaveBeenCalledTimes( 4 );
 		} );
 	} );
@@ -612,7 +609,7 @@ describe( 'withSelect', () => {
 		// - 1 on effect before subscription set.
 		// - 1 child subscription fires.
 		expect( childMapSelectToProps ).toHaveBeenCalledTimes( 3 );
-		expect( parentMapSelectToProps ).toHaveBeenCalledTimes( 4 );
+		expect( parentMapSelectToProps ).toHaveBeenCalledTimes( 3 );
 		expect( ChildOriginalComponent ).toHaveBeenCalledTimes( 1 );
 		expect( ParentOriginalComponent ).toHaveBeenCalledTimes( 2 );
 	} );
@@ -671,13 +668,12 @@ describe( 'withSelect', () => {
 				</RegistryProvider>
 			);
 		} );
-		// 4 times:
+		// 3 times:
 		// - 1 on initial render
 		// - 1 on effect before subscription set.
-		// - 1 on re-render
 		// - 1 on effect before new subscription set (because registry has changed)
-		expect( mapSelectToProps ).toHaveBeenCalledTimes( 4 );
-		expect( OriginalComponent ).toHaveBeenCalledTimes( 2 );
+		expect( mapSelectToProps ).toHaveBeenCalledTimes( 3 );
+		expect( OriginalComponent ).toHaveBeenCalledTimes( 3 );
 
 		expect( testInstance.findByType( 'div' ).props ).toEqual( {
 			children: 'second',
