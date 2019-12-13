@@ -34,6 +34,14 @@
 		border-collapse: collapse;
 	}
 
+	thead {
+		border-bottom: 2px solid;
+	}
+
+	tfoot {
+		border-top: 2px solid;
+	}
+
 	td,
 	th {
 		border: $border-width solid;
