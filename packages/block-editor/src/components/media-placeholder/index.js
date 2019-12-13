@@ -125,7 +125,7 @@ export class MediaPlaceholder extends Component {
 				let currentValue = value;
 				setMedia = ( newMedia ) => {
 					if ( dynamicAlteration ) {
-						const galleryValue = this.props.value;
+						const galleryValue = this.props.value || [];
 						// If currentValue contains things not in galleryValue, remove them.
 						currentValue = currentValue.filter( ( item ) => {
 							return galleryValue.some( ( propItem ) => propItem.id === item.id && propItem.url === item.url );
