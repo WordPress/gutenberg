@@ -83,7 +83,7 @@ function Navigation( {
 	/**
 	 * Fetching data.
 	 */
-	const { data: pages, isValidating: isRequestingPages,  } = useQueryPages( {
+	const { pages, isValidating: isRequestingPages } = useQueryPages( {
 		parent: 0,
 		order: 'asc',
 		orderby: 'id',

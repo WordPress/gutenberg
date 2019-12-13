@@ -35,7 +35,8 @@ const doFetchPages = async function( path ) {
  * @return {{error: any; data: any; revalidate: () => Promise<boolean>; isValidating: boolean}}
  */
 const useQueryPages = ( query = {} ) => {
-	return useSWR( addQueryArgs( '/wp/v2/pages', query ), doFetchPages );
+	const { data: pages, ...other } = useSWR( addQueryArgs( '/wp/v2/pages', query ), doFetchPages );
+	return { pages, ...other };
 };
 
 export { useQueryPages };
