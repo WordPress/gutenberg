@@ -128,9 +128,8 @@ export class MediaPlaceholder extends Component {
 					if ( dynamicAlteration ) {
 						// If currentValue contains things not in props.value, remove them.
 						currentValue = currentValue.filter( ( item ) => {
-							return this.props.value.some( ( propItem ) => propItem.id === item.id );
+							return this.props.value.some( ( propItem ) => propItem.id === item.id && propItem.url === item.url );
 						} );
-						let loadingBlobsCount = 0;
 						// If props.value has completed items not in currentValue, add them.
 						this.props.value.forEach( ( propItem ) => {
 							if (	// Id on propItem implies uploaded item.
@@ -141,15 +140,8 @@ export class MediaPlaceholder extends Component {
 									! newMedia.some( ( item ) => item.id === propItem.id )
 							) {
 								currentValue.push( propItem );
-							} else if ( ! propItem.id ) {
-								// Count loading blobs.
-								loadingBlobsCount++;
 							}
 						} );
-						// Are there new loading blobs?
-						if ( loadingBlobsCount > newMedia.length ) {
-							// console.log( 'new loaders' );
-						}
 					}
 					onSelect( currentValue.concat( newMedia ) );
 				};
