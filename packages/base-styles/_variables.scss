@@ -49,7 +49,9 @@ $content-width: 580px; // This is optimized for 70 characters.
 $border-width: 1px;
 $block-controls-height: 36px;
 $inserter-tabs-height: 36px;
-$block-toolbar-height: $block-controls-height + $border-width;
+$block-toolbar-height: 48px;
+$resize-handler-size: 15px;
+$resize-handler-container-size: $resize-handler-size + ($grid-size-small * 2); // Make the resize handle container larger so there's a larger grabbable area.
 
 // Blocks
 $block-left-border-width: $border-width * 3;
