@@ -138,43 +138,36 @@ export function registerFormatType( name, settings ) {
 
 			return ( props ) => {
 				const { clientId, identifier } = props;
-				let newProps = { ...props };
-
-				const noop = () => ( {} );
+				const newProps = {};
+				const returnEmpty = () => ( {} );
 
 				settings.__experimentalGetPropsForEditableTreePreparation =
 					settings.__experimentalGetPropsForEditableTreePreparation ||
-					noop;
+					returnEmpty;
+				settings.__experimentalGetPropsForEditableTreeChangeHandler =
+					settings.__experimentalGetPropsForEditableTreeChangeHandler ||
+					returnEmpty;
 
 				const selectProps = useSelect( ( sel ) => settings.__experimentalGetPropsForEditableTreePreparation( sel, {
 					richTextIdentifier: identifier,
 					blockClientId: clientId,
 				} ), [ clientId, identifier ] );
-
-				newProps = { ...newProps, ...mapKeys(
-					selectProps,
-					( value, key ) => selectPrefix + key
-				) };
-
-				settings.__experimentalGetPropsForEditableTreeChangeHandler =
-					settings.__experimentalGetPropsForEditableTreeChangeHandler ||
-					noop;
-
 				const dispatchProps = useDispatchWithMap( ( disp ) => settings.__experimentalGetPropsForEditableTreeChangeHandler( disp, {
 					richTextIdentifier: identifier,
 					blockClientId: clientId,
 				} ), [ clientId, identifier ] );
-
-				newProps = { ...newProps, ...mapKeys(
+				const mappedSelectProps = mapKeys(
+					selectProps,
+					( value, key ) => selectPrefix + key
+				);
+				const mappedDispatchProps = mapKeys(
 					dispatchProps,
 					( value, key ) => dispatchPrefix + key
-				) };
-
+				);
 				const args = {
 					richTextIdentifier: props.identifier,
 					blockClientId: props.clientId,
 				};
-
 				const combined = { ...selectProps, ...dispatchProps };
 
 				if ( settings.__experimentalCreateOnChangeEditableValue ) {
@@ -196,7 +189,14 @@ export function registerFormatType( name, settings ) {
 						);
 				}
 
-				return <OriginalComponent { ...newProps } />;
+				return (
+					<OriginalComponent
+						{ ...props }
+						{ ...mappedSelectProps }
+						{ ...mappedDispatchProps }
+						{ ...newProps }
+					/>
+				);
 			};
 		} );
 	}
