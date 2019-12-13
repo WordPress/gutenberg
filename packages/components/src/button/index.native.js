@@ -70,6 +70,7 @@ export function Button( props ) {
 		'aria-disabled': ariaDisabled,
 		'aria-label': ariaLabel,
 		'data-subscript': subscript,
+		...otherProps
 	} = props;
 
 	const isDisabled = ariaDisabled || disabled;
@@ -109,6 +110,7 @@ export function Button( props ) {
 			justifyContent={ 'center' }
 			alignItems={ 'center' }
 			disabled={ isDisabled }
+			{ ...otherProps }
 		>
 			<View style={ buttonViewStyle }>
 				<View style={ { flexDirection: 'row' } }>
