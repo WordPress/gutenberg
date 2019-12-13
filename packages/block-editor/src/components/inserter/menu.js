@@ -34,7 +34,6 @@ import {
 	Tip,
 } from '@wordpress/components';
 import {
-	getCategories,
 	isReusableBlock,
 	createBlock,
 	isUnmodifiedDefaultBlock,
@@ -63,18 +62,19 @@ const stopKeyPropagation = ( event ) => event.stopPropagation();
  * Filters an item list given a search term.
  *
  * @param {Array} items        Item list
+ * @param {string} categories  Available categories.
  * @param {string} searchTerm  Search term.
  *
  * @return {Array}             Filtered item list.
  */
-export const searchItems = ( items, searchTerm ) => {
+export const searchItems = ( items, categories, searchTerm ) => {
 	const normalizedSearchTerm = normalizeTerm( searchTerm );
 	const matchSearch = ( string ) => normalizeTerm( string ).indexOf( normalizedSearchTerm ) !== -1;
-	const categories = getCategories();
 
 	return items.filter( ( item ) => {
 		const itemCategory = find( categories, { slug: item.category } );
-		return matchSearch( item.title ) || some( item.keywords, matchSearch ) || ( itemCategory && matchSearch( itemCategory.title ) );
+		return matchSearch( item.title ) || some( item.keywords, matchSearch ) ||
+			( itemCategory && matchSearch( itemCategory.title ) );
 	} );
 };
 
@@ -204,9 +204,9 @@ export class InserterMenu extends Component {
 	}
 
 	filter( filterValue = '' ) {
-		const { debouncedSpeak, items, rootChildBlocks } = this.props;
+		const { categories, debouncedSpeak, items, rootChildBlocks } = this.props;
 
-		const filteredItems = searchItems( items, filterValue );
+		const filteredItems = searchItems( items, categories, filterValue );
 
 		const childItems = filter( filteredItems, ( { name } ) => includes( rootChildBlocks, name ) );
 
@@ -219,7 +219,7 @@ export class InserterMenu extends Component {
 		const reusableItems = filter( filteredItems, { category: 'reusable' } );
 
 		const getCategoryIndex = ( item ) => {
-			return findIndex( getCategories(), ( category ) => category.slug === item.category );
+			return findIndex( categories, ( category ) => category.slug === item.category );
 		};
 		const itemsPerCategory = flow(
 			( itemList ) => filter( itemList, ( item ) => item.category !== 'reusable' ),
@@ -261,7 +261,7 @@ export class InserterMenu extends Component {
 	}
 
 	render() {
-		const { instanceId, onSelect, rootClientId, showInserterHelpPanel } = this.props;
+		const { categories, instanceId, onSelect, rootClientId, showInserterHelpPanel } = this.props;
 		const {
 			childItems,
 			hoveredItem,
@@ -330,7 +330,7 @@ export class InserterMenu extends Component {
 							</PanelBody>
 						}
 
-						{ map( getCategories(), ( category ) => {
+						{ map( categories, ( category ) => {
 							const categoryItems = itemsPerCategory[ category.slug ];
 							if ( ! categoryItems || ! categoryItems.length ) {
 								return null;
@@ -465,6 +465,7 @@ export default compose(
 			getSettings,
 		} = select( 'core/block-editor' );
 		const {
+			getCategories,
 			getChildBlockNames,
 		} = select( 'core/blocks' );
 
@@ -483,6 +484,7 @@ export default compose(
 		} = getSettings();
 
 		return {
+			categories: getCategories(),
 			rootChildBlocks: getChildBlockNames( destinationRootBlockName ),
 			items: getInserterItems( destinationRootClientId ),
 			showInserterHelpPanel: showInserterHelpPanel && showInserterHelpPanelSetting,
