@@ -134,23 +134,23 @@ function Navigation( {
 
 		itemsChecker.removed = removedItemsByUser;
 
-		// Start to compute whether need to add items.
+		// Add / Remove / Replace items.
 		const pagesIds = map( pages, ( { id } ) => ( id ) );
 		const unAdded = difference( pagesIds, itemsChecker.added );
 		const removedByAdmin = difference( itemsChecker.added, pagesIds );
 
 		// Local constants. Temporary.
 		const _newItemsToAdd = [];
-		const _removedItems = [];
+		const _itemsToRemove = [];
 
-		// Computes to added according to the current blog pages.
+		// Check if there are new pages without an associated item.
 		if ( unAdded.length ) {
 			for ( const index in unAdded ) {
 				const unAddedPageId = unAdded[ index ];
 
 				// Recently removed.
 				if ( includes( itemsIds, unAddedPageId ) ) {
-					_removedItems.push( unAddedPageId );
+					_itemsToRemove.push( unAddedPageId );
 					if ( itemsChecker.itemsById[ unAddedPageId ] ) {
 						delete itemsChecker.itemsById[ unAddedPageId ];
 					}
@@ -160,18 +160,19 @@ function Navigation( {
 			}
 		}
 
-		// Keep removed items by user in the attr.
+		// Store added-items in the block attribute.
 		if ( ! isEqual( itemsChecker.added.sort(), itemsIds.sort() ) ) {
 			setAttributes( { itemsIds: itemsChecker.added } );
 		}
 
-		// Update removed items ID.
-		if ( _removedItems.length ) {
-			setAttributes( { removedItemsByUser: concat( removedItemsByUser, _removedItems ) } );
+		// Store removed-items by user in the block attribute.
+		if ( _itemsToRemove.length ) {
+			setAttributes( { removedItemsByUser: concat( removedItemsByUser, _itemsToRemove ) } );
 		}
 
-		// Check whether need to add new items.
 		setItemsToAdd( _newItemsToAdd );
+
+		// Check is there are items to remove.
 		setItemsToRemove( filter( removedByAdmin, pageId => ! includes( itemsChecker.removed, pageId ) ) );
 	}, [ pages, innerBlocks ] );
 
@@ -183,20 +184,15 @@ function Navigation( {
 			return;
 		}
 
-		let freshBlocks = [];
+		// Add new items from new pages.
 		if ( itemsToAdd && itemsToAdd.length ) {
-			freshBlocks = [ ...innerBlocks, ...createNavigationLinkFromPages( itemsToAdd, pages ) ];
+			return updateNavItemBlocks( [ ...innerBlocks, ...createNavigationLinkFromPages( itemsToAdd, pages ) ] );
 		}
 
+		// Remove items if pages have been unpublished.
 		if ( itemsToRemove && itemsToRemove.length ) {
-			freshBlocks = filter( innerBlocks, ( { attributes } ) => ! includes( itemsToRemove, attributes.id ) );
+			return updateNavItemBlocks( filter( innerBlocks, ( { attributes } ) => ! includes( itemsToRemove, attributes.id ) ) );
 		}
-
-		if ( ! freshBlocks.length ) {
-			return;
-		}
-
-		updateNavItemBlocks( freshBlocks );
 	}, [ populateFromExistingPages, itemsToAdd, itemsToRemove ] );
 
 
