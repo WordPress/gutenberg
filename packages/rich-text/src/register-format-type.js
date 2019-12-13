@@ -1,13 +1,7 @@
 /**
- * External dependencies
- */
-import { mapKeys } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { select, dispatch, useSelect, useDispatchWithMap } from '@wordpress/data';
-import { addFilter } from '@wordpress/hooks';
+import { select, dispatch } from '@wordpress/data';
 
 /**
  * @typedef {Object} WPFormat
@@ -130,75 +124,6 @@ export function registerFormatType( name, settings ) {
 	}
 
 	dispatch( 'core/rich-text' ).addFormatTypes( settings );
-
-	if ( settings.__experimentalCreatePrepareEditableTree ) {
-		addFilter( 'experimentalRichText', name, ( OriginalComponent ) => {
-			const selectPrefix = `format_prepare_props_(${ name })_`;
-			const dispatchPrefix = `format_on_change_props_(${ name })_`;
-			return ( props ) => {
-				const { clientId, identifier } = props;
-				const newProps = {};
-				const returnEmpty = () => ( {} );
-
-				settings.__experimentalGetPropsForEditableTreePreparation =
-					settings.__experimentalGetPropsForEditableTreePreparation ||
-					returnEmpty;
-				settings.__experimentalGetPropsForEditableTreeChangeHandler =
-					settings.__experimentalGetPropsForEditableTreeChangeHandler ||
-					returnEmpty;
-
-				const selectProps = useSelect( ( sel ) => settings.__experimentalGetPropsForEditableTreePreparation( sel, {
-					richTextIdentifier: identifier,
-					blockClientId: clientId,
-				} ), [ clientId, identifier ] );
-				const dispatchProps = useDispatchWithMap( ( disp ) => settings.__experimentalGetPropsForEditableTreeChangeHandler( disp, {
-					richTextIdentifier: identifier,
-					blockClientId: clientId,
-				} ), [ clientId, identifier ] );
-				const mappedSelectProps = mapKeys(
-					selectProps,
-					( value, key ) => selectPrefix + key
-				);
-				const mappedDispatchProps = mapKeys(
-					dispatchProps,
-					( value, key ) => dispatchPrefix + key
-				);
-				const args = {
-					richTextIdentifier: identifier,
-					blockClientId: clientId,
-				};
-				const combined = { ...selectProps, ...dispatchProps };
-
-				if ( settings.__experimentalCreateOnChangeEditableValue ) {
-					newProps[ `format_value_functions_(${ name })` ] =
-						settings.__experimentalCreatePrepareEditableTree(
-							combined,
-							args
-						);
-					newProps[ `format_on_change_functions_(${ name })` ] =
-						settings.__experimentalCreateOnChangeEditableValue(
-							combined,
-							args
-						);
-				} else {
-					newProps[ `format_prepare_functions_(${ name })` ] =
-						settings.__experimentalCreatePrepareEditableTree(
-							combined,
-							args
-						);
-				}
-
-				return (
-					<OriginalComponent
-						{ ...props }
-						{ ...mappedSelectProps }
-						{ ...mappedDispatchProps }
-						{ ...newProps }
-					/>
-				);
-			};
-		} );
-	}
 
 	return settings;
 }
