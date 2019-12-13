@@ -6,7 +6,7 @@ import { mapKeys } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { select, dispatch, useSelect, useDispatch } from '@wordpress/data';
+import { select, dispatch, useSelect, useDispatchWithMap } from '@wordpress/data';
 import { addFilter } from '@wordpress/hooks';
 
 /**
@@ -158,7 +158,7 @@ export function registerFormatType( name, settings ) {
 					settings.__experimentalGetPropsForEditableTreeChangeHandler ||
 					noop;
 
-				newProps = { ...newProps, ...useDispatch( ( disp ) => mapKeys(
+				newProps = { ...newProps, ...useDispatchWithMap( ( disp ) => mapKeys(
 					settings.__experimentalGetPropsForEditableTreeChangeHandler( disp, {
 						richTextIdentifier: identifier,
 						blockClientId: clientId,
@@ -200,8 +200,6 @@ export function registerFormatType( name, settings ) {
 							args
 						);
 				}
-
-				console.log( newProps );
 
 				return <OriginalComponent { ...newProps } />;
 			};
