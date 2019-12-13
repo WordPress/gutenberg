@@ -145,7 +145,7 @@ function register_block_core_navigation() {
 					'type'    => 'array',
 					'default' => array(),
 				),
-				'removedItemsIds' => array(
+				'removedItemsByUser' => array(
 					'type'    => 'array',
 					'default' => array(),
 				)

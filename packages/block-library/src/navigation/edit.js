@@ -73,7 +73,7 @@ function Navigation( {
 	/* eslint-enable @wordpress/no-unused-vars-before-return */
 	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator( clientId );
 
-	const { itemsIds, removedItemsIds } = attributes;
+	const { itemsIds, removedItemsByUser } = attributes;
 
 	const [ populateFromExistingPages, setPopulateFromExistingPages ] = useState( false );
 
@@ -120,7 +120,7 @@ function Navigation( {
 			{ itemsById: {}, added: [], repeated: [] }
 		);
 
-		itemsChecker.removed = removedItemsIds;
+		itemsChecker.removed = removedItemsByUser;
 
 		// Start to compute whether need to add items.
 		const pagesIds = map( pages, ( { id } ) => ( id ) );
@@ -142,7 +142,7 @@ function Navigation( {
 					if ( itemsChecker.itemsById[ unAddedPageId ] ) {
 						delete itemsChecker.itemsById[ unAddedPageId ];
 					}
-				} else if ( ! includes( removedItemsIds, unAddedPageId ) ) {
+				} else if ( ! includes( removedItemsByUser, unAddedPageId ) ) {
 					_newItemsToAdd.push( unAddedPageId );
 				}
 			}
@@ -155,7 +155,7 @@ function Navigation( {
 
 		// Update removed items ID.
 		if ( _removedItems.length ) {
-			setAttributes( { removedItemsIds: concat( removedItemsIds, _removedItems ) } );
+			setAttributes( { removedItemsByUser: concat( removedItemsByUser, _removedItems ) } );
 		}
 
 		// Check whether need to add new items.
