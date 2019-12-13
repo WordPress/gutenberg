@@ -3,17 +3,14 @@
  */
 import {
 	filter,
-	find,
 	findIndex,
 	flow,
 	groupBy,
 	isEmpty,
 	map,
-	some,
 	sortBy,
 	without,
 	includes,
-	deburr,
 } from 'lodash';
 import scrollIntoView from 'dom-scroll-into-view';
 import classnames from 'classnames';
@@ -53,57 +50,11 @@ import BlockTypesList from '../block-types-list';
 import BlockCard from '../block-card';
 import ChildBlocks from './child-blocks';
 import __experimentalInserterMenuExtension from '../inserter-menu-extension';
+import { searchItems } from './search-items';
 
 const MAX_SUGGESTED_ITEMS = 9;
 
 const stopKeyPropagation = ( event ) => event.stopPropagation();
-
-/**
- * Filters an item list given a search term.
- *
- * @param {Array} items        Item list
- * @param {string} categories  Available categories.
- * @param {string} searchTerm  Search term.
- *
- * @return {Array}             Filtered item list.
- */
-export const searchItems = ( items, categories, searchTerm ) => {
-	const normalizedSearchTerm = normalizeTerm( searchTerm );
-	const matchSearch = ( string ) => normalizeTerm( string ).indexOf( normalizedSearchTerm ) !== -1;
-
-	return items.filter( ( item ) => {
-		const itemCategory = find( categories, { slug: item.category } );
-		return matchSearch( item.title ) || some( item.keywords, matchSearch ) ||
-			( itemCategory && matchSearch( itemCategory.title ) );
-	} );
-};
-
-/**
- * Converts the search term into a normalized term.
- *
- * @param {string} term The search term to normalize.
- *
- * @return {string} The normalized search term.
- */
-export const normalizeTerm = ( term ) => {
-	// Disregard diacritics.
-	//  Input: "média"
-	term = deburr( term );
-
-	// Accommodate leading slash, matching autocomplete expectations.
-	//  Input: "/media"
-	term = term.replace( /^\//, '' );
-
-	// Lowercase.
-	//  Input: "MEDIA"
-	term = term.toLowerCase();
-
-	// Strip leading and trailing whitespace.
-	//  Input: " media "
-	term = term.trim();
-
-	return term;
-};
 
 export class InserterMenu extends Component {
 	constructor() {
