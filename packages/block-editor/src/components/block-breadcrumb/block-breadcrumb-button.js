@@ -11,6 +11,8 @@ const Button = styled( StyledPrimitives.Button )`
   }
   &:focus{
 		outline: none;
+		outline-offset: -2px;
+		box-shadow: none;
 	}
 `;
 
