@@ -200,6 +200,11 @@
 			background: transparent;
 		}
 	}
+
+	// Toolbar is captured
+	&.has-toolbar-captured > .block-editor-block-list__block-edit::before {
+		left: 0; // place "selected" indicator closer to block due to no toolbar
+	}
 }
 
 
