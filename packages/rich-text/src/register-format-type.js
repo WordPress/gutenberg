@@ -170,37 +170,28 @@ export function registerFormatType( name, settings ) {
 					( value, key ) => dispatchPrefix + key
 				) };
 
-				const propsByPrefix = Object.keys( newProps ).reduce( ( accumulator, key ) => {
-					if ( key.startsWith( selectPrefix ) ) {
-						accumulator[ key.slice( selectPrefix.length ) ] = newProps[ key ];
-					}
-
-					if ( key.startsWith( dispatchPrefix ) ) {
-						accumulator[ key.slice( dispatchPrefix.length ) ] = newProps[ key ];
-					}
-
-					return accumulator;
-				}, {} );
 				const args = {
 					richTextIdentifier: props.identifier,
 					blockClientId: props.clientId,
 				};
 
+				const combined = { ...selectProps, ...dispatchProps };
+
 				if ( settings.__experimentalCreateOnChangeEditableValue ) {
 					newProps[ `format_value_functions_(${ name })` ] =
 						settings.__experimentalCreatePrepareEditableTree(
-							propsByPrefix,
+							combined,
 							args
 						);
 					newProps[ `format_on_change_functions_(${ name })` ] =
 						settings.__experimentalCreateOnChangeEditableValue(
-							propsByPrefix,
+							combined,
 							args
 						);
 				} else {
 					newProps[ `format_prepare_functions_(${ name })` ] =
 						settings.__experimentalCreatePrepareEditableTree(
-							propsByPrefix,
+							combined,
 							args
 						);
 				}
