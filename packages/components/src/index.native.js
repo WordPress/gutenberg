@@ -29,6 +29,7 @@ export { default as withFocusOutside } from './higher-order/with-focus-outside';
 export { default as withFocusReturn } from './higher-order/with-focus-return';
 export { default as withNotices } from './higher-order/with-notices';
 export { default as withSpokenMessages } from './higher-order/with-spoken-messages';
+export { withTheme, default as ThemeProvider } from './theme-provider';
 
 // Mobile Components
 export { default as BottomSheet } from './mobile/bottom-sheet';
@@ -37,3 +38,6 @@ export { default as KeyboardAvoidingView } from './mobile/keyboard-avoiding-view
 export { default as KeyboardAwareFlatList } from './mobile/keyboard-aware-flat-list';
 export { default as Picker } from './mobile/picker';
 export { default as ReadableContentView } from './mobile/readable-content-view';
+
+// Styled Primitives
+export { default as StyledPrimitives, styled } from './styled-primitives';
