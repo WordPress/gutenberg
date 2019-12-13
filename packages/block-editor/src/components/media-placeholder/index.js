@@ -123,18 +123,17 @@ export class MediaPlaceholder extends Component {
 		if ( multiple ) {
 			if ( addToGallery ) {
 				let currentValue = value;
-				// if ( dynamicAlteration ) {
 				setMedia = ( newMedia ) => {
 					if ( dynamicAlteration ) {
-						// If currentValue contains things not in props.value, remove them.
+						const galleryValue = this.props.value;
+						// If currentValue contains things not in galleryValue, remove them.
 						currentValue = currentValue.filter( ( item ) => {
-							return this.props.value.some( ( propItem ) => propItem.id === item.id && propItem.url === item.url );
+							return galleryValue.some( ( propItem ) => propItem.id === item.id && propItem.url === item.url );
 						} );
-						// If props.value has completed items not in currentValue, add them.
-						this.props.value.forEach( ( propItem ) => {
-							if (	// Id on propItem implies uploaded item.
-								propItem.id &&
-									// Item is not in currentValue set.
+						// If galleryValue has completed items not in currentValue, add them.
+						galleryValue.forEach( ( propItem ) => {
+							if ( propItem.id &&
+									// Item is not already in currentValue set.
 									! currentValue.some( ( item ) => item.id === propItem.id ) &&
 									// Item is not a member of our upload group.
 									! newMedia.some( ( item ) => item.id === propItem.id )
