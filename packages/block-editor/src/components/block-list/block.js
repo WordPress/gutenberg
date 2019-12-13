@@ -469,6 +469,7 @@ function BlockListBlock( {
 			'is-focused': isFocusMode && ( isSelected || isAncestorOfSelectedBlock ),
 			'is-focus-mode': isFocusMode,
 			'has-child-selected': isAncestorOfSelectedBlock,
+			'has-toolbar-captured': isSelected && hasAncestorCapturingToolbars,
 		},
 		className
 	);
