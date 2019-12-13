@@ -141,6 +141,14 @@ function register_block_core_navigation() {
 				'itemsJustification' => array(
 					'type' => 'string',
 				),
+				'itemsIds' => array(
+					'type'    => 'array',
+					'default' => array(),
+				),
+				'removedItemsByUser' => array(
+					'type'    => 'array',
+					'default' => array(),
+				)
 			),
 
 			'render_callback' => 'render_block_navigation',

@@ -59,16 +59,21 @@ const updateLinkSetting = ( setter ) => ( setting, value ) => {
  * @param {Function} setter Setter attribute function.
  * @param {string} label Link label.
  */
-const updateLink = ( setter, label ) => ( { title: newTitle = '', url: newURL = '' } = {} ) => {
+const updateLink = ( setter, label ) => ( { title: newTitle = '', url: newURL = '', id = -1 } = {} ) => {
 	setter( {
 		title: escape( newTitle ),
 		url: newURL,
+		id,
 	} );
+
+	const linkSetting = { title: newTitle,  url: newURL,  id };
 
 	// Set the item label as well if it isn't already defined.
 	if ( ! label ) {
-		setter( { label: escape( newTitle ) } );
+		linkSetting.label =  escape( newTitle );
 	}
+
+	setter( linkSetting );
 };
 
 function NavigationLinkEdit( {
