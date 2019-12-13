@@ -51,11 +51,11 @@ function BlockListAppender( {
 		);
 	}
 
-	// IgnoreNestedEvents is used to treat interactions within the appender the
-	// same as subject to the same conditions as those which can occur within
-	// nested blocks. Notably, this effectively prevents event bubbling to block
-	// ancestors which can otherwise interfere with the intended behavior of the
-	// appender (e.g. focus handler on the ancestor block).
+	// IgnoreNestedEvents is used to treat interactions within the appender as
+	// subject to the same conditions as those which occur within nested blocks.
+	// Notably, this effectively prevents event bubbling to block ancestors
+	// which can otherwise interfere with the intended behavior of the appender
+	// (e.g. focus handler on the ancestor block).
 	return (
 		<IgnoreNestedEvents childHandledEvents={ [ 'onFocus', 'onClick', 'onKeyDown' ] }>
 			<div className="block-list-appender">
