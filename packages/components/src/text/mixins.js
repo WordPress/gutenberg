@@ -82,8 +82,8 @@ const label = `
  */
 
 /**
-	* @param {TextVariant} variantName
-	*/
+ * @param {TextVariant} variantName
+ */
 const variant = ( variantName ) => {
 	switch ( variantName ) {
 		case 'title.large':
