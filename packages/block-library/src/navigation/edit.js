@@ -113,9 +113,18 @@ function Navigation( {
 				} )
 			),
 			( acc, item ) => ( {
-				itemsById: { ...acc.itemsById, [ item.id ]: acc.itemsById[ item.id ] ? acc.itemsById[ item.id ] + 1 : 1 },
-				added: [ ...acc.added, item.id ],
-				repeated: acc.itemsById[ item.id ] ? [ ...acc.repeated, item.id ] : acc.repeated,
+					itemsById: {
+						...acc.itemsById,
+						[ item.id ]: {
+							amount: acc.itemsById[ item.id ] ? acc.itemsById[ item.id ].amount + 1 : 1,
+							modified: item.modified,
+						}
+					},
+					added: [ ...acc.added, item.id ],
+					repeated: acc.itemsById[ item.id ] ? [ ...acc.repeated, item.id ] : acc.repeated,
+					updated: item.modified && acc.itemsById[ item.id ].modified && ( +item.modified > +acc.itemsById[ item.id ].modified )
+						? [ ...acc.updated, item.id ]
+						: acc.updated
 			} ),
 			{ itemsById: {}, added: [], repeated: [] }
 		);
