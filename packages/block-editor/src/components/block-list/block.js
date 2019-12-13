@@ -77,7 +77,7 @@ function BlockListBlock( {
 	isTypingWithinBlock,
 	isCaretWithinFormattedText,
 	isEmptyDefaultBlock,
-	isParentOfSelectedBlock,
+	isAncestorOfSelectedBlock,
 	isCapturingDescendantToolbars,
 	hasAncestorCapturingToolbars,
 	isSelectionEnabled,
@@ -104,7 +104,6 @@ function BlockListBlock( {
 	setNavigationMode,
 	isMultiSelecting,
 	isLargeViewport,
-	__experimentalCaptureChildToolbar: captureChildToolbar,
 } ) {
 	// In addition to withSelect, we should favor using useSelect in this component going forward
 	// to avoid leaking new props to the public API (editor.BlockListBlock filter)
@@ -291,7 +290,7 @@ function BlockListBlock( {
 	 * (via `setFocus`), typically if there is no focusable input in the block.
 	 */
 	const onFocus = () => {
-		if ( ! isSelected && ! isParentOfSelectedBlock && ! isPartOfMultiSelection ) {
+		if ( ! isSelected && ! isAncestorOfSelectedBlock && ! isPartOfMultiSelection ) {
 			onSelect();
 		}
 	};
@@ -697,6 +696,8 @@ const applyWithSelect = withSelect(
 		const { hasFixedToolbar, focusMode, isRTL } = getSettings();
 		const templateLock = getTemplateLock( rootClientId );
 		const checkDeep = true;
+
+		// "ancestor" is the more appropriate label due to "deep" check
 		const isAncestorOfSelectedBlock = hasSelectedInnerBlock( clientId, checkDeep );
 		const index = getBlockIndex( clientId, rootClientId );
 		const blockOrder = getBlockOrder( rootClientId );
