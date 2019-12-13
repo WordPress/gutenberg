@@ -115,6 +115,7 @@ function Navigation( {
 				filter( innerBlocks, ( { attributes: attrs } ) => attrs.id && attrs.id >= 0 ),
 				( { attributes } ) => ( {
 					id: attributes.id,
+					modified: attributes.modified,
 				} )
 			),
 			( acc, item ) => ( {
@@ -127,9 +128,6 @@ function Navigation( {
 					},
 					added: [ ...acc.added, item.id ],
 					repeated: acc.itemsById[ item.id ] ? [ ...acc.repeated, item.id ] : acc.repeated,
-					updated: item.modified && acc.itemsById[ item.id ].modified && ( +item.modified > +acc.itemsById[ item.id ].modified )
-						? [ ...acc.updated, item.id ]
-						: acc.updated
 			} ),
 			{ itemsById: {}, added: [], repeated: [] }
 		);
