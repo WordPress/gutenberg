@@ -113,7 +113,7 @@ function build_navigation_html( $block, $colors, $font_sizes ) {
 	$html            = '';
 	$classes         = array_merge(
 		$colors['css_classes'],
-		$font_sizes['css_classes'],
+		$font_sizes['css_classes']
 	);
 	$css_classes     = implode( ' ', $classes );
 	$class_attribute = sprintf( ' class="wp-block-navigation-link__content %s"', esc_attr( trim( $css_classes ) ) );
@@ -177,13 +177,13 @@ function register_block_core_navigation() {
 				'customTextColor'    => array(
 					'type' => 'string',
 				),
-				'fontSize'              => array(
+				'fontSize'           => array(
 					'type' => 'string',
 				),
-				'customFontSize'        => array(
+				'customFontSize'     => array(
 					'type' => 'number',
 				),
-				'itemsJustification'    => array(
+				'itemsJustification' => array(
 					'type' => 'string',
 				),
 			),
