@@ -85,6 +85,9 @@ export {
 	Consumer as __experimentalSlotFillConsumer,
 } from './slot-fill';
 
+// Primitives with styled-system
+export { default as StyledPrimitives, styled } from './styled-primitives';
+
 // Higher-Order Components
 export { default as navigateRegions } from './higher-order/navigate-regions';
 export {
