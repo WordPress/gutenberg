@@ -2,7 +2,11 @@
  * WordPress dependencies
  */
 import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
-import { findBlock, createUpgradedEmbedBlock } from '@wordpress/embed-block';
+
+/**
+ * Internal dependencies
+ */
+import { findBlock, createUpgradedEmbedBlock } from '../util';
 
 describe( 'core/embed', () => {
 	test( 'findBlock matches a URL to a block name', () => {
