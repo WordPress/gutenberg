@@ -90,7 +90,7 @@ function create_auto_draft_for_template_part_block( $block ) {
 		wp_insert_post(
 			array(
 				'post_content' => file_get_contents( $template_part_file_path ),
-				'post_title'   => ucfirst( $block['attrs']['slug'] ),
+				'post_title'   => $block['attrs']['slug'],
 				'post_status'  => 'auto-draft',
 				'post_type'    => 'wp_template_part',
 				'post_name'    => $block['attrs']['slug'],
@@ -173,7 +173,7 @@ function gutenberg_find_template( $template_file ) {
 		$post_name             = basename( $higher_priority_block_template_path, '.html' );
 		$current_template_post = array(
 			'post_content' => file_get_contents( $higher_priority_block_template_path ),
-			'post_title'   => ucfirst( $post_name ),
+			'post_title'   => $post_name,
 			'post_status'  => 'auto-draft',
 			'post_type'    => 'wp_template',
 			'post_name'    => $post_name,
