@@ -167,7 +167,7 @@ export class BlockList extends Component {
 				} } >
 					<View style={ styles.blockListFooter } />
 				</TouchableWithoutFeedback>
-				<__experimentalBlockListFooter.Slot />
+			{ this.props.isPreview === undefined && <__experimentalBlockListFooter.Slot /> }
 			</>
 		);
 	}

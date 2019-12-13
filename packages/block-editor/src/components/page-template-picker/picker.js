@@ -10,25 +10,25 @@ import { useState } from '@wordpress/element';
 import __experimentalBlockListFooter from '../block-list-footer';
 import Button from './button';
 import Container from './container';
-import defaultTemplates from './default-templates';
+import getDefaultTemplates from './default-templates';
 import Preview from './preview';
 
-const __experimentalPageTemplatePicker = ( { templates = defaultTemplates, resetContent } ) => {
+const __experimentalPageTemplatePicker = ( { templates = getDefaultTemplates(), resetContent } ) => {
 	const [ templatePreview, setTemplatePreview ] = useState();
 
 	return (
 		<__experimentalBlockListFooter>
 			<Container style={ { flexDirection: 'row' } }>
-				{ templates.map( ( { name, content } ) => (
+				{ templates.map( ( template ) => (
 					<Button
-						key={ name }
-						onPress={ () => setTemplatePreview( content ) }
-						label={ name }
+						key={ template.name }
+						onPress={ () => setTemplatePreview( template ) }
+						label={ template.name }
 					/>
 				) ) }
 			</Container>
 			<Preview
-				content={ templatePreview }
+				template={ templatePreview }
 				onDismiss={ () => setTemplatePreview( undefined ) }
 			/>
 		</__experimentalBlockListFooter>
