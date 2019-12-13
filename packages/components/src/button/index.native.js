@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { StyleSheet, TouchableOpacity, Text, View, Platform } from 'react-native';
+import { StyleSheet, Text, View, Platform } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -9,17 +9,16 @@ import { StyleSheet, TouchableOpacity, Text, View, Platform } from 'react-native
 import { Children, cloneElement } from '@wordpress/element';
 import { withPreferredColorScheme } from '@wordpress/compose';
 
+/**
+ * Internal dependencies
+ */
+import { Button as PrimitiveButton } from '../styled-primitives/button';
+
 const isAndroid = Platform.OS === 'android';
 const marginBottom = isAndroid ? -0.5 : 0;
 const marginLeft = -3;
 
 const styles = StyleSheet.create( {
-	container: {
-		flex: 1,
-		padding: 3,
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
 	buttonInactive: {
 		flex: 1,
 		flexDirection: 'row',
@@ -97,7 +96,7 @@ export function Button( props ) {
 	} );
 
 	return (
-		<TouchableOpacity
+		<PrimitiveButton
 			activeOpacity={ 0.7 }
 			accessible={ true }
 			accessibilityLabel={ ariaLabel }
@@ -105,7 +104,10 @@ export function Button( props ) {
 			accessibilityRole={ 'button' }
 			accessibilityHint={ hint }
 			onPress={ onClick }
-			style={ styles.container }
+			flex={ 1 }
+			pd={ 3 }
+			justifyContent={ 'center' }
+			alignItems={ 'center' }
 			disabled={ isDisabled }
 		>
 			<View style={ buttonViewStyle }>
@@ -114,7 +116,7 @@ export function Button( props ) {
 					{ subscript && ( <Text style={ isPressed ? styles.subscriptActive : subscriptInactive }>{ subscript }</Text> ) }
 				</View>
 			</View>
-		</TouchableOpacity>
+		</PrimitiveButton>
 	);
 }
 
