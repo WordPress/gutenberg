@@ -10,6 +10,8 @@ import {
 	insertBlock,
 } from '@wordpress/e2e-test-utils';
 
+const getActiveBlockName = async () => page.evaluate( () => wp.data.select( 'core/block-editor' ).getSelectedBlock().name );
+
 describe( 'Writing Flow', () => {
 	beforeEach( async () => {
 		await createNewPost();
@@ -20,7 +22,11 @@ describe( 'Writing Flow', () => {
 		// not be necessary for interactions, and exist as a stop-gap solution
 		// where rendering delays in slower CPU can cause intermittent failure.
 
-		let activeElementText;
+		// Assertions are made both against the active DOM element and the
+		// editor state, in order to protect against potential disparities.
+		//
+		// See: https://github.com/WordPress/gutenberg/issues/18928
+		let activeElementText, activeBlockName;
 
 		// Add demo content
 		await clickBlockAppender();
@@ -54,13 +60,19 @@ describe( 'Writing Flow', () => {
 
 		// Arrow up into nested context focuses last text input
 		await page.keyboard.press( 'ArrowUp' );
+		activeBlockName = await getActiveBlockName();
+		expect( activeBlockName ).toBe( 'core/paragraph' );
 		activeElementText = await page.evaluate( () => document.activeElement.textContent );
 		expect( activeElementText ).toBe( '2nd col' );
 
 		// Arrow up in inner blocks should navigate through (1) column wrapper,
 		// (2) text fields.
 		await page.keyboard.press( 'ArrowUp' );
+		activeBlockName = await getActiveBlockName();
+		expect( activeBlockName ).toBe( 'core/column' );
 		await page.keyboard.press( 'ArrowUp' );
+		activeBlockName = await getActiveBlockName();
+		expect( activeBlockName ).toBe( 'core/paragraph' );
 		activeElementText = await page.evaluate( () => document.activeElement.textContent );
 		expect( activeElementText ).toBe( '1st col' );
 
@@ -72,15 +84,21 @@ describe( 'Writing Flow', () => {
 			document.activeElement.getAttribute( 'data-type' )
 		) );
 		expect( activeElementBlockType ).toBe( 'core/column' );
+		activeBlockName = await getActiveBlockName();
+		expect( activeBlockName ).toBe( 'core/column' );
 		await page.keyboard.press( 'ArrowUp' );
 		activeElementBlockType = await page.evaluate( () => (
 			document.activeElement.getAttribute( 'data-type' )
 		) );
 		expect( activeElementBlockType ).toBe( 'core/columns' );
+		activeBlockName = await getActiveBlockName();
+		expect( activeBlockName ).toBe( 'core/columns' );
 
 		// Arrow up from focused (columns) block wrapper exits nested context
 		// to prior text input.
 		await page.keyboard.press( 'ArrowUp' );
+		activeBlockName = await getActiveBlockName();
+		expect( activeBlockName ).toBe( 'core/paragraph' );
 		activeElementText = await page.evaluate( () => document.activeElement.textContent );
 		expect( activeElementText ).toBe( 'First paragraph' );
 

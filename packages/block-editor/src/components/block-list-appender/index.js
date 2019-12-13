@@ -23,49 +23,45 @@ function BlockListAppender( {
 	isLocked,
 	renderAppender: CustomAppender,
 } ) {
-	if ( isLocked ) {
+	if ( isLocked || CustomAppender === false ) {
 		return null;
 	}
 
-	// If a render prop has been provided
-	// use it to render the appender.
+	let appender;
 	if ( CustomAppender ) {
-		return (
-			<div className="block-list-appender">
-				<CustomAppender />
-			</div>
+		// Prefer custom render prop if provided.
+		appender = <CustomAppender />;
+	} else if ( canInsertDefaultBlock ) {
+		// Render the default block appender when renderAppender has not been
+		// provided and the context supports use of the default appender.
+		appender = (
+			<DefaultBlockAppender
+				rootClientId={ rootClientId }
+				lastBlockClientId={ last( blockClientIds ) }
+			/>
 		);
-	}
-
-	// a false value means, don't render any appender.
-	if ( CustomAppender === false ) {
-		return null;
-	}
-
-	// Render the default block appender when renderAppender has not been
-	// provided and the context supports use of the default appender.
-	if ( canInsertDefaultBlock ) {
-		return (
-			<div className="block-list-appender">
-				<IgnoreNestedEvents childHandledEvents={ [ 'onFocus', 'onClick', 'onKeyDown' ] }>
-					<DefaultBlockAppender
-						rootClientId={ rootClientId }
-						lastBlockClientId={ last( blockClientIds ) }
-					/>
-				</IgnoreNestedEvents>
-			</div>
-		);
-	}
-
-	// Fallback in the case no renderAppender has been provided and the
-	// default block can't be inserted.
-	return (
-		<div className="block-list-appender">
+	} else {
+		// Fallback in the case no renderAppender has been provided and the
+		// default block can't be inserted.
+		appender = (
 			<ButtonBlockAppender
 				rootClientId={ rootClientId }
 				className="block-list-appender__toggle"
 			/>
-		</div>
+		);
+	}
+
+	// IgnoreNestedEvents is used to treat interactions within the appender the
+	// same as subject to the same conditions as those which can occur within
+	// nested blocks. Notably, this effectively prevents event bubbling to block
+	// ancestors which can otherwise interfere with the intended behavior of the
+	// appender (e.g. focus handler on the ancestor block).
+	return (
+		<IgnoreNestedEvents childHandledEvents={ [ 'onFocus', 'onClick', 'onKeyDown' ] }>
+			<div className="block-list-appender">
+				{ appender }
+			</div>
+		</IgnoreNestedEvents>
 	);
 }
 
