@@ -2,7 +2,7 @@
 
 ### Breaking Changes
 
-- The plugin now adds, for each entry point, an asset file saved by default in PHP format that declares an object with the list of WordPress script dependencies for the entry point ([#17298](https://github.com/WordPress/gutenberg/pull/17298)). There is also an option to use JSON as the output format. The shape of metadata is also different from the previous version. Read more in the [README](./README.md) file.
+- The plugin now adds, for each entry point, an asset file saved by default in PHP format that declares an object with the list of WordPress script dependencies for the entry point ([#17298](https://github.com/WordPress/gutenberg/pull/17298)). There is also an option to use JSON as the output format. The shape of metadata is also different from the previous version. Note that the file name has also changed (`*.asset.json` or `*.asset.php` instead of `*.deps.json`); references to the `*.deps.json` file will need to be updated even if you choose to use the JSON formatted file. Read more in the [README](./README.md) file.
 
 ## 1.0.1 (2019-05-22)
 
