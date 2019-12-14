@@ -59,7 +59,7 @@ export default function SaveButton() {
 				isBusy={ isSaving }
 				onClick={ disabled ? undefined : open }
 			>
-				{ __( 'Customize' ) }
+				{ __( 'Update Design' ) }
 			</Button>
 			<EntitiesSavedStates isOpen={ isOpen } onRequestClose={ close } />
 		</>
