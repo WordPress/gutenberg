@@ -28,7 +28,7 @@ describe( 'cpt locking', () => {
 	};
 
 	const shouldNotAllowBlocksToBeRemoved = async () => {
-		await page.type( '.editor-rich-text__editable.wp-block-paragraph', 'p1' );
+		await page.type( '.block-editor-rich-text__editable.wp-block-paragraph', 'p1' );
 		await clickBlockToolbarButton( 'More options' );
 		expect(
 			await page.$x( '//button[contains(text(), "Remove Block")]' )
@@ -36,12 +36,12 @@ describe( 'cpt locking', () => {
 	};
 
 	const shouldAllowBlocksToBeMoved = async () => {
-		await page.click( '.editor-rich-text__editable.wp-block-paragraph' );
+		await page.click( '.block-editor-rich-text__editable.wp-block-paragraph' );
 		expect(
 			await page.$( 'button[aria-label="Move up"]' )
 		).not.toBeNull();
 		await page.click( 'button[aria-label="Move up"]' );
-		await page.type( '.editor-rich-text__editable.wp-block-paragraph', 'p1' );
+		await page.type( '.block-editor-rich-text__editable.wp-block-paragraph', 'p1' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	};
 
@@ -55,7 +55,7 @@ describe( 'cpt locking', () => {
 		it( 'should not allow blocks to be removed', shouldNotAllowBlocksToBeRemoved );
 
 		it( 'should not allow blocks to be moved', async () => {
-			await page.click( '.editor-rich-text__editable.wp-block-paragraph' );
+			await page.click( '.block-editor-rich-text__editable.wp-block-paragraph' );
 			expect(
 				await page.$( 'button[aria-label="Move up"]' )
 			).toBeNull();
@@ -111,7 +111,7 @@ describe( 'cpt locking', () => {
 		} );
 
 		it( 'should allow blocks to be removed', async () => {
-			await page.type( '.editor-rich-text__editable.wp-block-paragraph', 'p1' );
+			await page.type( '.block-editor-rich-text__editable.wp-block-paragraph', 'p1' );
 			await clickBlockToolbarButton( 'More options' );
 			const [ removeBlock ] = await page.$x( '//button[contains(text(), "Remove Block")]' );
 			await removeBlock.click();

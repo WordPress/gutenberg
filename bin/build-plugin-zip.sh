@@ -116,6 +116,7 @@ status "Creating archive... 🎁"
 zip -r gutenberg.zip \
 	gutenberg.php \
 	lib/*.php \
+	lib/demo-block-templates/*.html \
 	packages/block-serialization-default-parser/*.php \
 	post-content.php \
 	$vendor_scripts \

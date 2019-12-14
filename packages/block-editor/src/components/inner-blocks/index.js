@@ -87,11 +87,13 @@ class InnerBlocks extends Component {
 			updateNestedSettings,
 			templateLock,
 			parentLock,
+			__experimentalCaptureToolbars,
 		} = this.props;
 
 		const newSettings = {
 			allowedBlocks,
 			templateLock: templateLock === undefined ? parentLock : templateLock,
+			__experimentalCaptureToolbars: __experimentalCaptureToolbars || false,
 		};
 
 		if ( ! isShallowEqual( blockListSettings, newSettings ) ) {
@@ -106,11 +108,14 @@ class InnerBlocks extends Component {
 			hasOverlay,
 			renderAppender,
 			__experimentalMoverDirection: moverDirection,
+			__experimentalCaptureToolbars: captureToolbars,
+
 		} = this.props;
 		const { templateInProcess } = this.state;
 
-		const classes = classnames( 'editor-inner-blocks block-editor-inner-blocks', {
+		const classes = classnames( 'block-editor-inner-blocks', {
 			'has-overlay': enableClickThrough && hasOverlay,
+			'is-capturing-toolbar': captureToolbars,
 		} );
 
 		return (

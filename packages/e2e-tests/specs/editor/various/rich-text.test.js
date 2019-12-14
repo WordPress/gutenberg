@@ -336,4 +336,21 @@ describe( 'RichText', () => {
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	it( 'should apply active formatting for inline paste', async () => {
+		await clickBlockAppender();
+		await pressKeyWithModifier( 'primary', 'b' );
+		await page.keyboard.type( '1' );
+		await page.keyboard.type( '2' );
+		await pressKeyWithModifier( 'primary', 'b' );
+		await page.keyboard.type( '3' );
+		await pressKeyWithModifier( 'shift', 'ArrowLeft' );
+		await pressKeyWithModifier( 'primary', 'c' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await pressKeyWithModifier( 'primary', 'v' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );

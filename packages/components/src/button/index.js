@@ -6,6 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import deprecated from '@wordpress/deprecated';
 import { createElement, forwardRef } from '@wordpress/element';
 
 export function Button( props, ref ) {
@@ -19,6 +20,7 @@ export function Button( props, ref ) {
 		isPressed,
 		isBusy,
 		isDefault,
+		isSecondary,
 		isLink,
 		isDestructive,
 		className,
@@ -26,9 +28,14 @@ export function Button( props, ref ) {
 		...additionalProps
 	} = props;
 
+	if ( isDefault ) {
+		deprecated( 'Button isDefault prop', {
+			alternative: 'isSecondary',
+		} );
+	}
+
 	const classes = classnames( 'components-button', className, {
-		'is-button': isDefault || isPrimary || isLarge || isSmall,
-		'is-default': isDefault || ( ! isPrimary && ( isLarge || isSmall ) ),
+		'is-secondary': isDefault || isSecondary,
 		'is-primary': isPrimary,
 		'is-large': isLarge,
 		'is-small': isSmall,

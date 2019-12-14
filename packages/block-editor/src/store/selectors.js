@@ -1422,6 +1422,23 @@ export function isLastBlockChangePersistent( state ) {
 }
 
 /**
+ * Returns the Block List settings for an array of blocks, if any exist.
+ *
+ * @param {Object}  state    Editor state.
+ * @param {Array} clientIds Block client IDs.
+ *
+ * @return {Array} Block List Settings for each of the found blocks
+ */
+export const __experimentalGetBlockListSettingsForBlocks = createSelector(
+	( state, clientIds ) => {
+		return filter( state.blockListSettings, ( value, key ) => clientIds.includes( key ) );
+	},
+	( state ) => [
+		state.blockListSettings,
+	],
+);
+
+/**
  * Returns the parsed block saved as shared block with the given ID.
  *
  * @param {Object}        state Global application state.

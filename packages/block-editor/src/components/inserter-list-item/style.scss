@@ -22,6 +22,7 @@
 	transition: all 0.05s ease-in-out;
 	@include reduce-motion("transition");
 	position: relative;
+	height: auto;
 
 	&:disabled {
 		@include block-style__disabled();
