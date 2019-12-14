@@ -18,6 +18,8 @@ const PlainText = forwardRef( ( { onChange, className, ...props }, ref ) => {
 		<TextareaAutosize
 			ref={ ref }
 			className={ classnames( 'block-editor-plain-text', className ) }
+			role="textbox"
+			aria-multiline="true"
 			onChange={ ( event ) => onChange( event.target.value ) }
 			{ ...props }
 		/>
