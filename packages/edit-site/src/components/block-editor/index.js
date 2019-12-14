@@ -21,6 +21,7 @@ import {
  */
 import Sidebar from '../sidebar';
 import TemplateSwitcher from '../template-switcher';
+import AddTemplate from '../add-template';
 
 export default function BlockEditor( { settings: _settings, setSettings } ) {
 	const canUserCreateMedia = useSelect( ( select ) => {
@@ -53,7 +54,7 @@ export default function BlockEditor( { settings: _settings, setSettings } ) {
 	const initialBlocks = useMemo( () => {
 		if ( typeof content !== 'function' ) {
 			const parsedContent = parse( content );
-			return parsedContent.length ? parsedContent : undefined;
+			return parsedContent.length ? parsedContent : [];
 		}
 	}, [ settings.templateId ] );
 	const [ blocks = initialBlocks, setBlocks ] = useEntityProp(
@@ -76,6 +77,14 @@ export default function BlockEditor( { settings: _settings, setSettings } ) {
 			} ) ),
 		[]
 	);
+	const addTemplateId = useCallback(
+		( newTemplateId ) =>
+			setSettings( ( prevSettings ) => ( {
+				...prevSettings,
+				templateIds: [ ...prevSettings.templateIds, newTemplateId ],
+			} ) ),
+		[]
+	);
 	return (
 		<BlockEditorProvider
 			settings={ settings }
@@ -89,6 +98,10 @@ export default function BlockEditor( { settings: _settings, setSettings } ) {
 					ids={ settings.templateIds }
 					activeId={ settings.templateId }
 					onActiveIdChange={ setActiveTemplateId }
+				/>
+				<AddTemplate
+					ids={ settings.templateIds }
+					onAddTemplateId={ addTemplateId }
 				/>
 			</Sidebar.TemplatesFill>
 			<Sidebar.InspectorFill>
