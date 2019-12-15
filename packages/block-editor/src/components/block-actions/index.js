@@ -137,7 +137,7 @@ export default compose( [
 				);
 			},
 			onToggleBlockMode() {
-				if ( ! isLocked ) {
+				if ( ! isLocked && ! isReusableBlock( blocks[ 0 ] ) ) {
 					toggleBlockMode( clientIds );
 				}
 			},
