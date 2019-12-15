@@ -8,7 +8,7 @@ import { castArray, first, last, every } from 'lodash';
  */
 import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { cloneBlock, hasBlockSupport, switchToBlockType } from '@wordpress/blocks';
+import { cloneBlock, hasBlockSupport, switchToBlockType, isReusableBlock } from '@wordpress/blocks';
 
 function BlockActions( {
 	canDuplicate,
@@ -168,7 +168,7 @@ export default compose( [
 				);
 			},
 			onToggleBlockMode() {
-				if ( ! isLocked ) {
+				if ( ! isLocked && ! isReusableBlock( blocks[ 0 ] ) ) {
 					toggleBlockMode( clientIds );
 				}
 			},
