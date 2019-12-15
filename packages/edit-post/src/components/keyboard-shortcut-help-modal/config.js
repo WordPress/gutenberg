@@ -126,7 +126,7 @@ const blockShortcuts = {
 		},
 		{
 			keyCombination: access( 'm' ),
-			description: __( 'Toggle between editing the block visually and editing HTML.' ),
+			description: __( 'Switch between Visual Editor and Code Editor.' ),
 		},
 	],
 };
