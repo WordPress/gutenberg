@@ -81,24 +81,44 @@ function gutenberg_override_query_template( $template, $type, array $templates =
  * @param array $block The root block to start traversing from.
  */
 function create_auto_draft_for_template_part_block( $block ) {
-	if ( 'core/template-part' === $block['blockName'] && ! isset( $block['attrs']['id'] ) ) {
-		$template_part_file_path =
-			get_stylesheet_directory() . '/block-template-parts/' . $block['attrs']['slug'] . '.html';
-		if ( ! file_exists( $template_part_file_path ) ) {
-			return;
+	global $_wp_current_template_part_ids;
+
+	if ( 'core/template-part' === $block['blockName'] ) {
+		if ( ! isset( $block['attrs']['id'] ) ) {
+			$template_part_file_path =
+				get_stylesheet_directory() . '/block-template-parts/' . $block['attrs']['slug'] . '.html';
+			if ( ! file_exists( $template_part_file_path ) ) {
+				if ( gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing-demo' ) ) {
+					$template_part_file_path =
+						dirname( __FILE__ ) . '/demo-block-template-parts/' . $block['attrs']['slug'] . '.html';
+					if ( ! file_exists( $template_part_file_path ) ) {
+						return;
+					}
+				} else {
+					return;
+				}
+			}
+			$template_part_id = wp_insert_post(
+				array(
+					'post_content' => file_get_contents( $template_part_file_path ),
+					'post_title'   => $block['attrs']['slug'],
+					'post_status'  => 'auto-draft',
+					'post_type'    => 'wp_template_part',
+					'post_name'    => $block['attrs']['slug'],
+					'meta_input'   => array(
+						'theme' => $block['attrs']['theme'],
+					),
+				)
+			);
+		} else {
+			$template_part_id = $block['attrs']['id'];
 		}
-		wp_insert_post(
-			array(
-				'post_content' => file_get_contents( $template_part_file_path ),
-				'post_title'   => $block['attrs']['slug'],
-				'post_status'  => 'auto-draft',
-				'post_type'    => 'wp_template_part',
-				'post_name'    => $block['attrs']['slug'],
-				'meta_input'   => array(
-					'theme' => $block['attrs']['theme'],
-				),
-			)
-		);
+
+		if ( isset( $_wp_current_template_part_ids ) ) {
+			$_wp_current_template_part_ids[ $template_part_id ] = true;
+		} else {
+			$_wp_current_template_part_ids = array( $template_part_id => true );
+		}
 	}
 
 	foreach ( $block['innerBlocks'] as $inner_block ) {

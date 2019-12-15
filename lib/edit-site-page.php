@@ -28,7 +28,11 @@ function gutenberg_edit_site_page() {
  * @param string $hook Page.
  */
 function gutenberg_edit_site_init( $hook ) {
-	global $_wp_current_template_id, $_wp_current_template_content, $_wp_current_template_hierarchy;
+	global
+		$_wp_current_template_id,
+		$_wp_current_template_content,
+		$_wp_current_template_hierarchy,
+		$_wp_current_template_part_ids;
 	if ( 'gutenberg_page_gutenberg-edit-site' !== $hook ) {
 		return;
 	}
@@ -93,23 +97,32 @@ function gutenberg_edit_site_init( $hook ) {
 		'get_date_template',
 		'get_archive_template',
 	);
-	$template_ids     = array();
+	$template_ids      = array();
+	$template_part_ids = array();
 	foreach ( $template_getters as $template_getter ) {
 		call_user_func( $template_getter );
 		apply_filters( 'template_include', null );
 		if ( isset( $_wp_current_template_id ) ) {
 			$template_ids[ $_wp_current_template_id ] = true;
 		}
+		if ( isset( $_wp_current_template_part_ids ) ) {
+			$template_part_ids = $template_part_ids + $_wp_current_template_part_ids;
+		}
 		$_wp_current_template_id        = null;
 		$_wp_current_template_content   = null;
 		$_wp_current_template_hierarchy = null;
+		$_wp_current_template_part_ids  = null;
 	}
 	get_front_page_template();
 	get_index_template();
 	apply_filters( 'template_include', null );
 	$template_ids[ $_wp_current_template_id ] = true;
-	$settings['templateId']                   = $_wp_current_template_id;
-	$settings['templateIds']                  = array_keys( $template_ids );
+	if ( isset( $_wp_current_template_part_ids ) ) {
+		$template_part_ids = $template_part_ids + $_wp_current_template_part_ids;
+	}
+	$settings['templateId']      = $_wp_current_template_id;
+	$settings['templateIds']     = array_keys( $template_ids );
+	$settings['templatePartIds'] = array_keys( $template_part_ids );
 
 	// This is so other parts of the code can hook their own settings.
 	// Example: Global Styles.
