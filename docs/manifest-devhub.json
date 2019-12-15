@@ -60,6 +60,12 @@
 		"parent": "block-api"
 	},
 	{
+		"title": "InnerBlocks",
+		"slug": "inner-blocks",
+		"markdown_source": "../docs/designers-developers/developers/block-api/inner-blocks/README.md",
+		"parent": "block-api"
+	},
+	{
 		"title": "Filter Reference",
 		"slug": "filters",
 		"markdown_source": "../docs/designers-developers/developers/filters/README.md",

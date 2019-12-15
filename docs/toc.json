@@ -8,7 +8,8 @@
 			{ "docs/designers-developers/developers/block-api/block-attributes.md": [] },
 			{"docs/designers-developers/developers/block-api/block-deprecation.md": [] },
 			{ "docs/designers-developers/developers/block-api/block-templates.md": [] },
-			{ "docs/designers-developers/developers/block-api/block-annotations.md": [] }
+			{ "docs/designers-developers/developers/block-api/block-annotations.md": [] },
+			{ "docs/designers-developers/developers/block-api/inner-blocks/README.md": [] }
 		] },
 		{ "docs/designers-developers/developers/filters/README.md": [
 			{ "docs/designers-developers/developers/filters/block-filters.md": [] },
