@@ -21,6 +21,7 @@ function BlockActions( {
 	onInsertBefore,
 	onRemove,
 	onUngroup,
+	onToggleBlockMode,
 } ) {
 	return children( {
 		canDuplicate,
@@ -32,6 +33,7 @@ function BlockActions( {
 		onInsertBefore,
 		onRemove,
 		onUngroup,
+		onToggleBlockMode,
 	} );
 }
 
@@ -118,7 +120,6 @@ export default compose( [
 					newBlocks
 				);
 			},
-
 			onUngroup() {
 				if ( ! blocks.length ) {
 					return;
@@ -134,6 +135,11 @@ export default compose( [
 					clientIds,
 					innerBlocks
 				);
+			},
+			onToggleBlockMode() {
+				if ( ! isLocked ) {
+					toggleBlockMode( clientIds );
+				}
 			},
 		};
 	} ),

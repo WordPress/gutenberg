@@ -124,6 +124,16 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
             "description": "Change the block type after adding a new paragraph.",
             "keyCombination": "/",
           },
+          Object {
+            "description": "Toggle between editing the block visually and editing HTML.",
+            "keyCombination": Array [
+              "Shift",
+              "+",
+              "Alt",
+              "+",
+              "M",
+            ],
+          },
         ]
       }
       title="Block shortcuts"
