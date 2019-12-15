@@ -12,6 +12,11 @@ import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
+/**
+ * Internal dependencies
+ */
+import { shortcuts } from '../block-editor-keyboard-shortcuts';
+
 export function BlockModeToggle( { blockType, mode, onToggleMode, small = false, isCodeEditingEnabled = true } ) {
 	if ( ! hasBlockSupport( blockType, 'html', true ) || ! isCodeEditingEnabled ) {
 		return null;
@@ -26,6 +31,7 @@ export function BlockModeToggle( { blockType, mode, onToggleMode, small = false,
 			className="block-editor-block-settings-menu__control"
 			onClick={ onToggleMode }
 			icon="html"
+			shortcut={ shortcuts.toggleBlockMode.display }
 		>
 			{ ! small && label }
 		</MenuItem>

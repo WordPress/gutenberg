@@ -39,6 +39,10 @@ export const shortcuts = {
 		raw: rawShortcut.primaryAlt( 'y' ),
 		display: displayShortcut.primaryAlt( 'y' ),
 	},
+	toggleBlockMode: {
+		raw: rawShortcut.access( 'm' ),
+		display: displayShortcut.access( 'm' ),
+	},
 };
 
 class BlockEditorKeyboardShortcuts extends Component {
@@ -91,7 +95,7 @@ class BlockEditorKeyboardShortcuts extends Component {
 				/>
 				{ selectedBlockClientIds.length > 0 && (
 					<BlockActions clientIds={ selectedBlockClientIds }>
-						{ ( { onDuplicate, onRemove, onInsertAfter, onInsertBefore } ) => (
+						{ ( { onDuplicate, onRemove, onInsertAfter, onInsertBefore, onToggleBlockMode } ) => (
 							<KeyboardShortcuts
 								bindGlobal
 								shortcuts={ {
@@ -109,6 +113,10 @@ class BlockEditorKeyboardShortcuts extends Component {
 									// Does not clash with any known browser/native shortcuts, but preventDefault
 									// is used to prevent any obscure unknown shortcuts from triggering.
 									[ shortcuts.insertAfter.raw ]: flow( preventDefault, onInsertAfter ),
+
+									// Does not clash with any known browser/native shortcuts, but preventDefault
+									// is used to prevent any obscure unknown shortcuts from triggering.
+									[ shortcuts.toggleBlockMode.raw ]: flow( preventDefault, onToggleBlockMode ),
 								} }
 							/>
 						) }

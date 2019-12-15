@@ -124,6 +124,10 @@ const blockShortcuts = {
 			/* translators: The forward-slash character. e.g. '/'. */
 			ariaLabel: __( 'Forward-slash' ),
 		},
+		{
+			keyCombination: access( 'm' ),
+			description: __( 'Toggle between editing the block visually and editing HTML.' ),
+		},
 	],
 };
 
