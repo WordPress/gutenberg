@@ -31,11 +31,7 @@ function getSelectOptions( optionsArray, disableCustomFontSizes ) {
 	return optionsArray.map( ( option ) => ( {
 		key: option.slug,
 		name: option.name,
-		style: {
-			fontSize: option.size,
-			paddingTop: option.size / 2,
-			paddingBottom: option.size / 2,
-		},
+		style: { fontSize: option.size },
 	} ) );
 }
 
