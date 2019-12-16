@@ -116,7 +116,7 @@ const MediaReplaceFlow = (
 		urlInputUIContent = (
 			<LinkViewer
 				isFullWidth={ true }
-				className="block-editor-format-toolbar__link-container-content"
+				className="block-editor-media-replace-flow__link-viewer"
 				url={ mediaURLValue }
 				onEditLinkClick={ () => ( setShowEditURLInput( ! showEditURLInput ) ) }
 			/>
