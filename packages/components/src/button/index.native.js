@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { StyleSheet, TouchableOpacity, Text, View, Platform } from 'react-native';
+import { StyleSheet, Text, View, Platform } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -9,18 +9,16 @@ import { StyleSheet, TouchableOpacity, Text, View, Platform } from 'react-native
 import { Children, cloneElement } from '@wordpress/element';
 import { withPreferredColorScheme } from '@wordpress/compose';
 
+/**
+ * Internal dependencies
+ */
+import { Button as PrimitiveButton } from '../styled-primitives/button';
+
 const isAndroid = Platform.OS === 'android';
 const marginBottom = isAndroid ? -0.5 : 0;
-const marginLeft = -3;
 
 const styles = StyleSheet.create( {
-	container: {
-		flex: 1,
-		padding: 3,
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
-	buttonInactive: {
+	button: {
 		flex: 1,
 		flexDirection: 'row',
 		justifyContent: 'center',
@@ -30,32 +28,23 @@ const styles = StyleSheet.create( {
 		aspectRatio: 1,
 	},
 	buttonActive: {
-		flex: 1,
-		flexDirection: 'row',
-		justifyContent: 'center',
-		alignItems: 'center',
 		borderRadius: 6,
 		borderColor: '#2e4453',
 		backgroundColor: '#2e4453',
 	},
-	subscriptInactive: {
+	subscript: {
 		color: '#7b9ab1',
 		fontWeight: 'bold',
 		fontSize: 13,
 		alignSelf: 'flex-end',
-		marginLeft,
+		marginLeft: -3,
 		marginBottom,
 	},
-	subscriptInactiveDark: {
+	subscriptDark: {
 		color: '#a7aaad', // $gray_20
 	},
 	subscriptActive: {
 		color: 'white',
-		fontWeight: 'bold',
-		fontSize: 13,
-		alignSelf: 'flex-end',
-		marginLeft,
-		marginBottom,
 	},
 } );
 
@@ -68,18 +57,32 @@ export function Button( props ) {
 		fixedRatio = true,
 		getStylesFromColorScheme,
 		isPressed,
+		isLarge,
+		isSmall,
+		isPrimary,
 		'aria-disabled': ariaDisabled,
 		'aria-label': ariaLabel,
 		'data-subscript': subscript,
+		...otherProps
 	} = props;
+
+	// Support some of props from the web just to demonstrate.
+	// The markup is a bit different than on web and we style the View inside the Touchable instead.
+	let pd = 3;
+	if ( isSmall ) {
+		pd = 8;
+	} else if ( isLarge ) {
+		pd = 12;
+	}
 
 	const isDisabled = ariaDisabled || disabled;
 
-	const buttonViewStyle = {
-		opacity: isDisabled ? 0.3 : 1,
-		...( fixedRatio && styles.fixedRatio ),
-		...( isPressed ? styles.buttonActive : styles.buttonInactive ),
-	};
+	const buttonViewStyle = [
+		styles.button,
+		{ opacity: isDisabled ? 0.3 : 1 },
+		fixedRatio && styles.fixedRatio,
+		isPressed && styles.buttonActive,
+	];
 
 	const states = [];
 	if ( isPressed ) {
@@ -90,14 +93,14 @@ export function Button( props ) {
 		states.push( 'disabled' );
 	}
 
-	const subscriptInactive = getStylesFromColorScheme( styles.subscriptInactive, styles.subscriptInactiveDark );
+	const subscriptDefault = getStylesFromColorScheme( styles.subscript, styles.subscriptDark );
 
 	const newChildren = Children.map( children, ( child ) => {
 		return child ? cloneElement( child, { colorScheme: props.preferredColorScheme, isPressed } ) : child;
 	} );
 
 	return (
-		<TouchableOpacity
+		<PrimitiveButton
 			activeOpacity={ 0.7 }
 			accessible={ true }
 			accessibilityLabel={ ariaLabel }
@@ -105,16 +108,24 @@ export function Button( props ) {
 			accessibilityRole={ 'button' }
 			accessibilityHint={ hint }
 			onPress={ onClick }
-			style={ styles.container }
+			flex={ 1 }
+			p={ pd }
+			color={ isPrimary && 'white' }
+			backgroundColor={ isPrimary && 'primary' }
+			justifyContent={ 'center' }
+			alignItems={ 'center' }
 			disabled={ isDisabled }
+			{ ...otherProps }
 		>
 			<View style={ buttonViewStyle }>
-				<View style={ { flexDirection: 'row' } }>
-					{ newChildren }
-					{ subscript && ( <Text style={ isPressed ? styles.subscriptActive : subscriptInactive }>{ subscript }</Text> ) }
-				</View>
+				{ newChildren }
+				{ subscript &&
+					( <Text style={ [ subscriptDefault, isPressed && styles.subscriptActive ] }>
+						{ subscript }
+					</Text> )
+				}
 			</View>
-		</TouchableOpacity>
+		</PrimitiveButton>
 	);
 }
 

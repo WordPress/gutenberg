@@ -13,7 +13,7 @@ import { EditorProvider } from '@wordpress/editor';
 import { parse, serialize } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { SlotFillProvider } from '@wordpress/components';
+import { SlotFillProvider, ThemeProvider } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -133,7 +133,9 @@ class Editor extends Component {
 					useSubRegistry={ false }
 					{ ...props }
 				>
-					<Layout setTitleRef={ this.setTitleRef } />
+					<ThemeProvider>
+						<Layout setTitleRef={ this.setTitleRef } />
+					</ThemeProvider>
 				</EditorProvider>
 			</SlotFillProvider>
 		);

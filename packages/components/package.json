@@ -25,6 +25,7 @@
 		"@babel/runtime": "^7.4.4",
 		"@emotion/babel-preset-css-prop": "^10.0.23",
 		"@emotion/core": "10.0.22",
+		"@emotion/native": "10.0.22",
 		"@emotion/styled": "10.0.23",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/compose": "file:../compose",

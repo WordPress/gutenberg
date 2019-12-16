@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Icon } from '@wordpress/components';
+import { Icon, StyledPrimitives } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { getBlockType } from '@wordpress/blocks';
@@ -9,7 +9,7 @@ import { getBlockType } from '@wordpress/blocks';
 /**
  * External dependencies
  */
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text } from 'react-native';
 
 /**
  * Internal dependencies
@@ -22,7 +22,11 @@ import styles from './breadcrumb.scss';
 const BlockBreadcrumb = ( { clientId, blockIcon, rootClientId, rootBlockIcon } ) => {
 	return (
 		<View style={ styles.breadcrumbContainer }>
-			<TouchableOpacity style={ styles.button } onPress={ () => {/* Open BottomSheet with markup */} }>
+			<StyledPrimitives.Button
+				flexDirection="row"
+				alignItems="center"
+				onPress={ () => {/* Open BottomSheet with markup */} }
+			>
 				{ rootClientId && rootBlockIcon && (
 					[ <Icon key="parent-icon" size={ 20 } icon={ rootBlockIcon.src } fill={ styles.icon.color } />,
 						<View key="subdirectory-icon" style={ styles.arrow }><SubdirectorSVG fill={ styles.arrow.color } /></View>,
@@ -30,7 +34,7 @@ const BlockBreadcrumb = ( { clientId, blockIcon, rootClientId, rootBlockIcon } )
 				) }
 				<Icon size={ 24 } icon={ blockIcon.src } fill={ styles.icon.color } />
 				<Text style={ styles.breadcrumbTitle }><BlockTitle clientId={ clientId } /></Text>
-			</TouchableOpacity>
+			</StyledPrimitives.Button>
 		</View>
 	);
 };
