@@ -1,7 +1,7 @@
 {
 	"name": "core/gallery",
 	"category": "common",
-	"attributes": {
+		"attributes": {
 		"images": {
 			"type": "array",
 			"default": [ ],
@@ -43,6 +43,9 @@
 		},
 		"ids": {
 			"type": "array",
+  			"items": {
+    			"type": "number"
+  			},
 			"default": [ ]
 		},
 		"columns": {
