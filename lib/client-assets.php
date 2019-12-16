@@ -430,9 +430,9 @@ function gutenberg_register_packages_styles( &$styles ) {
 		'wp-embed-block',
 		gutenberg_url( 'build/embed-block/style.css' ),
 		array( 'wp-block-editor', 'wp-components' ),
-		filemtime( gutenberg_dir_path() . 'build/block-editor/style.css' )
+		filemtime( gutenberg_dir_path() . 'build/embed-block/style.css' )
 	);
-	$styles->add_data( 'wp-block-directory', 'rtl', 'replace' );
+	$styles->add_data( 'wp-embed-block', 'rtl', 'replace' );
 }
 add_action( 'wp_default_styles', 'gutenberg_register_packages_styles' );
 
