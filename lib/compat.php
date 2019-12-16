@@ -178,11 +178,15 @@ add_filter( 'post_type_labels_wp_block', 'gutenberg_override_reusable_block_post
  * it is made accessible for read and write via the REST API.
  */
 function gutenberg_register_data_persistence_user_meta() {
-	register_meta( 'user', 'wp_data_persistence', array(
-		'type'         => 'string',
-		'single'       => true,
-		'show_in_rest' => true,
-	) );
+	register_meta(
+		'user',
+		'wp_data_persistence',
+		array(
+			'type'         => 'string',
+			'single'       => true,
+			'show_in_rest' => true,
+		)
+	);
 }
 add_action( 'init', 'gutenberg_register_data_persistence_user_meta' );
 
