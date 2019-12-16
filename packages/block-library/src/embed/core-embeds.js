@@ -354,6 +354,32 @@ export const others = [
 			icon: embedVideoIcon,
 			keywords: [ __( 'video' ) ],
 			description: __( 'Embed a VideoPress video.' ),
+			transforms: {
+				from: [
+					{
+						type: 'raw',
+						isMatch: ( node ) => {
+							if ( node.nodeName !== 'P' ) {
+								return false;
+							}
+
+							if ( node.childNodes.length !== 1 || node.childNodes[ 0 ].nodeName !== 'EMBED' ) {
+								return false;
+							}
+
+							return /^https?:\/\/v\.wordpress\.com\//i.test( node.childNodes[ 0 ].src );
+						},
+						transform: ( node ) => {
+							return createBlock( 'core-embed/videopress', {
+								url: node.childNodes[ 0 ].src.replace(
+									/^https?:\/\/v\.wordpress\.com\//,
+									'https://videopress.com/v/',
+								),
+							} );
+						},
+					},
+				],
+			},
 		},
 		patterns: [ /^https?:\/\/videopress\.com\/.+/i ],
 	},
