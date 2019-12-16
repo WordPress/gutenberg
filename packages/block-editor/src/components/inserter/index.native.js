@@ -101,7 +101,7 @@ class Inserter extends Component {
 		return insertionIndexDefault;
 	}
 
-	getShouldReplaceBlock() {
+	shouldReplaceBlock() {
 		const {
 			isSelectedBlockReplaceable,
 		} = this.props;
@@ -202,7 +202,7 @@ class Inserter extends Component {
 				rootClientId={ destinationRootClientId }
 				clientId={ clientId }
 				isAppender={ isAppender }
-				shouldReplaceBlock={ this.getShouldReplaceBlock() }
+				shouldReplaceBlock={ this.shouldReplaceBlock() }
 				insertionIndex={ this.getInsertionIndex() }
 			/>
 		);
