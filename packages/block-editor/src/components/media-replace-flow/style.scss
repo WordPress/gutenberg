@@ -1,3 +1,10 @@
+// Hack to hide when the media modal is open
+// Otherwise in Firefox the popover remains visible on top of the modal
+// Changing the z-index of Popovers have wider implications.
+.modal-open .block-editor-media-replace-flow__options {
+	display: none;
+}
+
 .block-editor-media-replace-flow__indicator {
 	margin-left: 4px;
 
@@ -30,4 +37,3 @@
 		flex-shrink: 0;
 	}
 }
-
