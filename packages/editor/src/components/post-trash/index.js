@@ -14,8 +14,8 @@ function PostTrash( { isNew, postId, postType, ...props } ) {
 	const onClick = () => props.trashPost( postId, postType );
 
 	return (
-		<Button className="editor-post-trash button-link-delete" onClick={ onClick } isSecondary>
-			{ __( 'Move to trash' ) }
+		<Button className="editor-post-trash is-link" onClick={ onClick }>
+			{ __( 'Move to Trash' ) }
 		</Button>
 	);
 }
