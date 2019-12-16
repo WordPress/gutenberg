@@ -116,11 +116,7 @@ class BlockListBlock extends Component {
 			...getStylesFromColorScheme( styles.solidBorderColor, styles.solidBorderColorDark ),
 		};
 
-		if ( isUnregisteredBlock ) {
-			return { ...styles.selectedLeaf, ...fullSolidBorderStyle };
-		}
-
-		if ( hasChildren ) { // if block has children apply style for selected parent
+		if ( hasChildren && ! isUnregisteredBlock ) { // if block has children apply style for selected parent
 			return { ...styles.selectedParent,	...fullSolidBorderStyle	};
 		}
 
