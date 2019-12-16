@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isString } from 'lodash';
 import useResizeAware from 'react-resize-aware';
 
 /**
@@ -20,9 +19,9 @@ function Placeholder( { icon, children, label, instructions, className, notices,
 	const [ resizeListener, { width } ] = useResizeAware();
 	const classes = classnames(
 		'components-placeholder',
-		( width >= 320 ? 'size-lg' : '' ),
-		( width >= 160 && width < 320 ? 'size-md' : '' ),
-		( width < 160 ? 'size-sm' : '' ),
+		( width >= 320 ? 'is-large' : '' ),
+		( width >= 160 && width < 320 ? 'is-medium' : '' ),
+		( width < 160 ? 'is-small' : '' ),
 		className
 	);
 	const fieldsetClasses = classnames( 'components-placeholder__fieldset', { 'is-column-layout': isColumnLayout } );
