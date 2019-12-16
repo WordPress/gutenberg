@@ -58,24 +58,29 @@ function GroupEdit( {
 		'has-background': !! backgroundColor.color,
 	} );
 
-	const colorSettings = [
-		{
-			value: backgroundColor.color,
-			onChange: setBackgroundColor,
-			label: __( 'Background Color' ),
-		},
-	];
+	const backgroundColorSettings = {
+		value: backgroundColor.color,
+		onChange: setBackgroundColor,
+		label: __( 'Background Color' ),
+	};
+
+	let colorSettings;
 
 	if ( ! backgroundColor.name && ! backgroundColor.class ) {
-		const textContrastColor = getTextContrast( backgroundColor.color );
+		const textContrastColor = textColor && textColor.color ? textColor.color : getTextContrast( backgroundColor.color );
 		setTextColor( textContrastColor );
-		colorSettings.push( {
-			value: textContrastColor,
-			onChange: setTextColor,
-			label: __( 'Text Color' ),
-		} );
+		colorSettings = [
+			{
+				value: textContrastColor,
+				onChange: setTextColor,
+				label: __( 'Text Color' ),
+				colors: null,
+			},
+			backgroundColorSettings,
+		];
 	} else {
 		setTextColor( null );
+		colorSettings = [ backgroundColorSettings ];
 	}
 
 	return (
