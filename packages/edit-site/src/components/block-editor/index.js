@@ -21,7 +21,6 @@ import {
  */
 import { useEditorContext } from '../editor';
 import Sidebar from '../sidebar';
-import TemplateSwitcher from '../template-switcher';
 import AddTemplate from '../add-template';
 
 export default function BlockEditor() {
@@ -71,24 +70,6 @@ export default function BlockEditor() {
 		},
 		[ setBlocks, _setContent ]
 	);
-	const setActiveTemplateId = useCallback(
-		( newTemplateId ) =>
-			setSettings( ( prevSettings ) => ( {
-				...prevSettings,
-				templateId: newTemplateId,
-				templateType: 'wp_template',
-			} ) ),
-		[]
-	);
-	const setActiveTemplatePartId = useCallback(
-		( newTemplatePartId ) =>
-			setSettings( ( prevSettings ) => ( {
-				...prevSettings,
-				templateId: newTemplatePartId,
-				templateType: 'wp_template_part',
-			} ) ),
-		[]
-	);
 	const addTemplateId = useCallback(
 		( newTemplateId ) =>
 			setSettings( ( prevSettings ) => ( {
@@ -106,14 +87,6 @@ export default function BlockEditor() {
 		>
 			<BlockEditorKeyboardShortcuts />
 			<Sidebar.TemplatesFill>
-				<TemplateSwitcher
-					ids={ settings.templateIds }
-					templatePartIds={ settings.templatePartIds }
-					activeId={ settings.templateId }
-					isTemplatePart={ settings.templateType === 'wp_template_part' }
-					onActiveIdChange={ setActiveTemplateId }
-					onActiveTemplatePartIdChange={ setActiveTemplatePartId }
-				/>
 				<AddTemplate
 					ids={ settings.templateIds }
 					onAddTemplateId={ addTemplateId }
