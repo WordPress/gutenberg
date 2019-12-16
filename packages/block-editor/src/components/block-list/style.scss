@@ -312,6 +312,10 @@
 		}
 	}
 
+	// Select tool/navigation mode shows the default cursor until an additional click edits.
+	&.is-navigate-mode {
+		cursor: default;
+	}
 
 	// Alignments.
 	&[data-align="left"],
