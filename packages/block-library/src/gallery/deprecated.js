@@ -19,7 +19,7 @@ const deprecated = [
 		attributes: {
 			images: {
 				type: 'array',
-				default: [ ],
+				default: [],
 				source: 'query',
 				selector: '.blocks-gallery-item',
 				query: {
@@ -58,7 +58,7 @@ const deprecated = [
 			},
 			ids: {
 				type: 'array',
-				default: [ ],
+				default: [],
 			},
 			columns: {
 				type: 'number',
