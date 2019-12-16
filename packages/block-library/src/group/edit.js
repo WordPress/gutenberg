@@ -67,7 +67,7 @@ function GroupEdit( {
 	let colorSettings;
 
 	if ( ! backgroundColor.name && ! backgroundColor.class ) {
-		const textContrastColor = textColor && textColor.color ? textColor.color : getTextContrast( backgroundColor.color );
+		const textContrastColor = getTextContrast( backgroundColor.color );
 		setTextColor( textContrastColor );
 		colorSettings = [
 			{
