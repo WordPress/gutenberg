@@ -29,9 +29,3 @@ exports[`PostPublishButtonOrToggle should render a toggle when post is not (1), 
   isToggle={true}
 />
 `;
-
-exports[`PostPublishButtonOrToggle should render a toggle when post is not published or scheduled and the viewport is < medium 1`] = `
-<WithSelect(WithDispatch(PostPublishButton))
-  isToggle={true}
-/>
-`;

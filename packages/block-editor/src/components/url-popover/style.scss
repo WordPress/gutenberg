@@ -2,7 +2,7 @@
 	border-top: $border-width solid $light-gray-500;
 }
 
-.block-editor-url-popover__additional-controls > div[role="menu"] .components-icon-button:not(:disabled):not([aria-disabled="true"]):not(.is-default) > svg {
+.block-editor-url-popover__additional-controls > div[role="menu"] .components-icon-button:not(:disabled):not([aria-disabled="true"]):not(.is-secondary) > svg {
 	box-shadow: none;
 }
 
@@ -31,7 +31,7 @@
 		width: 30px;
 	}
 
-	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover {
+	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):hover {
 		box-shadow: none;
 
 		> svg {

@@ -38,8 +38,8 @@ import { RemoveBrowserShortcuts } from './remove-browser-shortcuts';
 import { filePasteHandler } from './file-paste-handler';
 import FormatToolbarContainer from './format-toolbar-container';
 
-const wrapperClasses = 'editor-rich-text block-editor-rich-text';
-const classes = 'editor-rich-text__editable block-editor-rich-text__editable';
+const wrapperClasses = 'block-editor-rich-text';
+const classes = 'block-editor-rich-text__editable';
 
 /**
  * Get the multiline tag based on the multiline prop.
@@ -122,7 +122,7 @@ class RichTextWrapper extends Component {
 		}
 	}
 
-	onPaste( { value, onChange, html, plainText, files } ) {
+	onPaste( { value, onChange, html, plainText, files, activeFormats } ) {
 		const {
 			onReplace,
 			onSplit,
@@ -174,6 +174,18 @@ class RichTextWrapper extends Component {
 
 		if ( typeof content === 'string' ) {
 			let valueToInsert = create( { html: content } );
+
+			// If there are active formats, merge them with the pasted formats.
+			if ( activeFormats.length ) {
+				let index = valueToInsert.formats.length;
+
+				while ( index-- ) {
+					valueToInsert.formats[ index ] = [
+						...activeFormats,
+						...( valueToInsert.formats[ index ] || [] ),
+					];
+				}
+			}
 
 			// If the content should be multiline, we should process text
 			// separated by a line break as separate lines.
@@ -349,6 +361,8 @@ class RichTextWrapper extends Component {
 			start,
 			reversed,
 			style,
+			preserveWhiteSpace,
+			disabled,
 			// From experimental filter. To do: pick props instead.
 			...experimentalProps
 		} = this.props;
@@ -398,11 +412,15 @@ class RichTextWrapper extends Component {
 				__unstableDidAutomaticChange={ didAutomaticChange }
 				__unstableUndo={ undo }
 				style={ style }
+				preserveWhiteSpace={ preserveWhiteSpace }
+				disabled={ disabled }
+				start={ start }
+				reversed={ reversed }
 			>
 				{ ( { isSelected, value, onChange, Editable } ) =>
 					<>
 						{ children && children( { value, onChange } ) }
-						{ isSelected && hasFormats && ( <FormatToolbarContainer inline={ inlineToolbar } anchorObj={ this.ref } /> ) }
+						{ isSelected && hasFormats && ( <FormatToolbarContainer inline={ inlineToolbar } anchorRef={ this.ref.current } /> ) }
 						{ isSelected && <RemoveBrowserShortcuts /> }
 						<Autocomplete
 							onReplace={ onReplace }
@@ -468,6 +486,8 @@ const RichTextContainer = compose( [
 			getSettings,
 			didAutomaticChange,
 			__unstableGetBlockWithoutInnerBlocks,
+			isMultiSelecting,
+			hasMultiSelection,
 		} = select( 'core/block-editor' );
 
 		const selectionStart = getSelectionStart();
@@ -501,6 +521,7 @@ const RichTextContainer = compose( [
 			selectionEnd: isSelected ? selectionEnd.offset : undefined,
 			isSelected,
 			didAutomaticChange: didAutomaticChange(),
+			disabled: isMultiSelecting() || hasMultiSelection(),
 			...extraProps,
 		};
 	} ),

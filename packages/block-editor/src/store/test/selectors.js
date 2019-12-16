@@ -58,10 +58,12 @@ const {
 	getTemplate,
 	getTemplateLock,
 	getBlockListSettings,
+	__experimentalGetBlockListSettingsForBlocks,
 	__experimentalGetLastBlockAttributeChanges,
 	INSERTER_UTILITY_HIGH,
 	INSERTER_UTILITY_MEDIUM,
 	INSERTER_UTILITY_LOW,
+	getLowestCommonAncestorWithSelectedBlock,
 } = selectors;
 
 describe( 'selectors', () => {
@@ -121,6 +123,15 @@ describe( 'selectors', () => {
 			},
 		} );
 
+		registerBlockType( 'core/post-content-child', {
+			save: () => null,
+			category: 'common',
+			title: 'Test Block Post Content Child',
+			icon: 'test',
+			keywords: [ 'testing' ],
+			parent: [ 'core/post-content' ],
+		} );
+
 		setFreeformContentHandlerName( 'core/test-freeform' );
 
 		cachedSelectors.forEach( ( { clear } ) => clear() );
@@ -132,6 +143,7 @@ describe( 'selectors', () => {
 		unregisterBlockType( 'core/test-block-b' );
 		unregisterBlockType( 'core/test-block-c' );
 		unregisterBlockType( 'core/test-freeform' );
+		unregisterBlockType( 'core/post-content-child' );
 
 		setFreeformContentHandlerName( undefined );
 	} );
@@ -1933,6 +1945,34 @@ describe( 'selectors', () => {
 			};
 			expect( canInsertBlockType( state, 'core/test-block-c', 'block1' ) ).toBe( true );
 		} );
+
+		it( 'should deny blocks that restrict parent to core/post-content when not in editor root', () => {
+			const state = {
+				blocks: {
+					byClientId: {
+						block1: { name: 'core/test-block-c' },
+					},
+					attributes: {
+						block1: {},
+					},
+				},
+				blockListSettings: {},
+				settings: {},
+			};
+			expect( canInsertBlockType( state, 'core/post-content-child', 'block1' ) ).toBe( false );
+		} );
+
+		it( 'should allow blocks that restrict parent to core/post-content when in editor root', () => {
+			const state = {
+				blocks: {
+					byClientId: {},
+					attributes: {},
+				},
+				blockListSettings: {},
+				settings: {},
+			};
+			expect( canInsertBlockType( state, 'core/post-content-child' ) ).toBe( true );
+		} );
 	} );
 
 	describe( 'getInserterItems', () => {
@@ -2033,6 +2073,7 @@ describe( 'selectors', () => {
 			};
 			const itemIDs = getInserterItems( state ).map( ( item ) => item.id );
 			expect( itemIDs ).toEqual( [
+				'core/post-content-child',
 				'core/block/2',
 				'core/block/1',
 				'core/test-block-b',
@@ -2328,6 +2369,60 @@ describe( 'selectors', () => {
 		} );
 	} );
 
+	describe( '__experimentalGetBlockListSettingsForBlocks', () => {
+		it( 'should return the settings for a set of blocks', () => {
+			const state = {
+				blockListSettings: {
+					'test-1-dummy-clientId': {
+						setting1: false,
+					},
+					'test-2-dummy-clientId': {
+						setting1: true,
+						setting2: false,
+					},
+					'test-3-dummy-clientId': {
+						setting1: true,
+						setting2: false,
+					},
+					'test-4-dummy-clientId': {
+						setting1: true,
+					},
+				},
+			};
+
+			const targetBlocksClientIds = [ 'test-1-dummy-clientId', 'test-3-dummy-clientId' ];
+
+			expect( __experimentalGetBlockListSettingsForBlocks( state, targetBlocksClientIds ) ).toEqual( [
+				{
+					setting1: false,
+				},
+				{
+					setting1: true,
+					setting2: false,
+				},
+			] );
+		} );
+
+		it( 'should return empty array if settings for the blocks don’t exist', () => {
+			// Does not include target Block clientIds
+			const state = {
+				blockListSettings: {
+					'test-2-dummy-clientId': {
+						setting1: true,
+						setting2: false,
+					},
+					'test-4-dummy-clientId': {
+						setting1: true,
+					},
+				},
+			};
+
+			const targetBlocksClientIds = [ 'test-1-dummy-clientId', 'test-3-dummy-clientId' ];
+
+			expect( __experimentalGetBlockListSettingsForBlocks( state, targetBlocksClientIds ) ).toEqual( [] );
+		} );
+	} );
+
 	describe( '__experimentalGetLastBlockAttributeChanges', () => {
 		it( 'returns the last block attributes change', () => {
 			const state = {
@@ -2341,6 +2436,85 @@ describe( 'selectors', () => {
 			expect( result ).toEqual( {
 				block1: { fruit: 'bananas' },
 			} );
+		} );
+	} );
+
+	describe( 'getLowestCommonAncestorWithSelectedBlock', () => {
+		const blocks = {
+			order: {
+				'': [ 'a', 'b' ],
+				a: [ 'c', 'd' ],
+				d: [ 'e' ],
+				b: [ 'f' ],
+			},
+			parents: {
+				a: '',
+				b: '',
+				c: 'a',
+				d: 'a',
+				e: 'd',
+				f: 'b',
+			},
+		};
+
+		it( 'should not be defined if there is no block selected', () => {
+			const state = {
+				blocks,
+				selectionStart: {},
+				selectionEnd: {},
+			};
+
+			expect( getLowestCommonAncestorWithSelectedBlock( state, 'd' ) ).not.toBeDefined();
+		} );
+
+		it( 'should not be defined if selected block has no parent', () => {
+			const state = {
+				blocks,
+				selectionStart: { clientId: 'b' },
+				selectionEnd: { clientId: 'b' },
+			};
+
+			expect( getLowestCommonAncestorWithSelectedBlock( state, 'b' ) ).toBe( 'b' );
+		} );
+
+		it( 'should not be defined if selected block has no common parent with given block', () => {
+			const state = {
+				blocks,
+				selectionStart: { clientId: 'd' },
+				selectionEnd: { clientId: 'd' },
+			};
+
+			expect( getLowestCommonAncestorWithSelectedBlock( state, 'f' ) ).not.toBeDefined();
+		} );
+
+		it( 'should return block id if selected block is ancestor of given block', () => {
+			const state = {
+				blocks,
+				selectionStart: { clientId: 'c' },
+				selectionEnd: { clientId: 'c' },
+			};
+
+			expect( getLowestCommonAncestorWithSelectedBlock( state, 'a' ) ).toBe( 'a' );
+		} );
+
+		it( 'should return block id if selected block is nested child of given block', () => {
+			const state = {
+				blocks,
+				selectionStart: { clientId: 'e' },
+				selectionEnd: { clientId: 'e' },
+			};
+
+			expect( getLowestCommonAncestorWithSelectedBlock( state, 'a' ) ).toBe( 'a' );
+		} );
+
+		it( 'should return block id if selected block has common parent with given block', () => {
+			const state = {
+				blocks,
+				selectionStart: { clientId: 'e' },
+				selectionEnd: { clientId: 'e' },
+			};
+
+			expect( getLowestCommonAncestorWithSelectedBlock( state, 'c' ) ).toBe( 'a' );
 		} );
 	} );
 } );

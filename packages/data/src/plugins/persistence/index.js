@@ -9,6 +9,10 @@ import { merge, isPlainObject, get } from 'lodash';
 import defaultStorage from './storage/default';
 import { combineReducers } from '../../';
 
+/** @typedef {import('../../registry').WPDataRegistry} WPDataRegistry */
+
+/** @typedef {import('../../registry').WPDataPlugin} WPDataPlugin */
+
 /**
  * @typedef {Object} WPDataPersistencePluginOptions Persistence plugin options.
  *

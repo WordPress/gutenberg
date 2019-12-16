@@ -10,6 +10,10 @@ import { select, dispatch } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
 import { BlockIcon } from '@wordpress/block-editor';
 
+/** @typedef {import('@wordpress/block-editor').WPEditorInserterItem} WPEditorInserterItem */
+
+/** @typedef {import('@wordpress/components').WPCompleter} WPCompleter */
+
 /**
  * Returns the client ID of the parent where a newly inserted block would be
  * placed.

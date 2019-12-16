@@ -22,7 +22,7 @@ exports[`ContrastChecker should render component when the colors do not meet AA 
         "_originalInput": "#666",
         "_r": 102,
         "_roundA": 1,
-        "_tc_id": 2,
+        "_tc_id": 31,
       }
     }
     tinyTextColor={
@@ -36,12 +36,12 @@ exports[`ContrastChecker should render component when the colors do not meet AA 
         "_originalInput": "#666",
         "_r": 102,
         "_roundA": 1,
-        "_tc_id": 3,
+        "_tc_id": 32,
       }
     }
   >
     <div
-      className="editor-contrast-checker block-editor-contrast-checker"
+      className="block-editor-contrast-checker"
     >
       <Notice
         isDismissible={false}
@@ -84,7 +84,7 @@ exports[`ContrastChecker should render different message matching snapshot when 
         "_originalInput": "#555",
         "_r": 85,
         "_roundA": 1,
-        "_tc_id": 8,
+        "_tc_id": 37,
       }
     }
     tinyTextColor={
@@ -98,12 +98,12 @@ exports[`ContrastChecker should render different message matching snapshot when 
         "_originalInput": "#666",
         "_r": 102,
         "_roundA": 1,
-        "_tc_id": 9,
+        "_tc_id": 38,
       }
     }
   >
     <div
-      className="editor-contrast-checker block-editor-contrast-checker"
+      className="block-editor-contrast-checker"
     >
       <Notice
         isDismissible={false}
@@ -142,7 +142,7 @@ exports[`ContrastChecker should render messages when the textColor is valid, but
         "_originalInput": "#000000",
         "_r": 0,
         "_roundA": 1,
-        "_tc_id": 24,
+        "_tc_id": 53,
       }
     }
     tinyTextColor={
@@ -156,12 +156,12 @@ exports[`ContrastChecker should render messages when the textColor is valid, but
         "_originalInput": "#000000",
         "_r": 0,
         "_roundA": 1,
-        "_tc_id": 25,
+        "_tc_id": 54,
       }
     }
   >
     <div
-      className="editor-contrast-checker block-editor-contrast-checker"
+      className="block-editor-contrast-checker"
     >
       <Notice
         isDismissible={false}
@@ -202,7 +202,7 @@ exports[`ContrastChecker should take into consideration the font size passed 1`]
         "_originalInput": "#C44B4B",
         "_r": 196,
         "_roundA": 1,
-        "_tc_id": 14,
+        "_tc_id": 43,
       }
     }
     tinyTextColor={
@@ -216,12 +216,12 @@ exports[`ContrastChecker should take into consideration the font size passed 1`]
         "_originalInput": "#000000",
         "_r": 0,
         "_roundA": 1,
-        "_tc_id": 15,
+        "_tc_id": 44,
       }
     }
   >
     <div
-      className="editor-contrast-checker block-editor-contrast-checker"
+      className="block-editor-contrast-checker"
     >
       <Notice
         isDismissible={false}
@@ -262,7 +262,7 @@ exports[`ContrastChecker should take into consideration wherever text is large o
         "_originalInput": "#C44B4B",
         "_r": 196,
         "_roundA": 1,
-        "_tc_id": 10,
+        "_tc_id": 39,
       }
     }
     tinyTextColor={
@@ -276,12 +276,12 @@ exports[`ContrastChecker should take into consideration wherever text is large o
         "_originalInput": "#000000",
         "_r": 0,
         "_roundA": 1,
-        "_tc_id": 11,
+        "_tc_id": 40,
       }
     }
   >
     <div
-      className="editor-contrast-checker block-editor-contrast-checker"
+      className="block-editor-contrast-checker"
     >
       <Notice
         isDismissible={false}
@@ -323,7 +323,7 @@ exports[`ContrastChecker should use isLargeText to make decisions if both isLarg
         "_originalInput": "#C44B4B",
         "_r": 196,
         "_roundA": 1,
-        "_tc_id": 20,
+        "_tc_id": 49,
       }
     }
     tinyTextColor={
@@ -337,12 +337,12 @@ exports[`ContrastChecker should use isLargeText to make decisions if both isLarg
         "_originalInput": "#000000",
         "_r": 0,
         "_roundA": 1,
-        "_tc_id": 21,
+        "_tc_id": 50,
       }
     }
   >
     <div
-      className="editor-contrast-checker block-editor-contrast-checker"
+      className="block-editor-contrast-checker"
     >
       <Notice
         isDismissible={false}

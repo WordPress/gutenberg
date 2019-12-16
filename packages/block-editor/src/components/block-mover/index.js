@@ -19,7 +19,7 @@ import { withInstanceId, compose } from '@wordpress/compose';
  */
 import { getBlockMoverDescription } from './mover-description';
 import { leftArrow, rightArrow, upArrow, downArrow, dragHandle } from './icons';
-import { IconDragHandle } from './drag-handle';
+import BlockDraggable from '../block-draggable';
 
 export class BlockMover extends Component {
 	constructor() {
@@ -44,7 +44,7 @@ export class BlockMover extends Component {
 	}
 
 	render() {
-		const { onMoveUp, onMoveDown, __experimentalOrientation: orientation, isRTL, isFirst, isLast, isDraggable, onDragStart, onDragEnd, clientIds, blockElementId, blockType, firstIndex, isLocked, instanceId, isHidden, rootClientId } = this.props;
+		const { onMoveUp, onMoveDown, __experimentalOrientation: orientation, isRTL, isFirst, isLast, clientIds, blockType, firstIndex, isLocked, instanceId, isHidden, rootClientId } = this.props;
 		const { isFocused } = this.state;
 		const blocksCount = castArray( clientIds ).length;
 		if ( isLocked || ( isFirst && isLast && ! rootClientId ) ) {
@@ -86,9 +86,9 @@ export class BlockMover extends Component {
 		// to an unfocused state (body as active element) without firing blur on,
 		// the rendering parent, leaving it unable to react to focus out.
 		return (
-			<div className={ classnames( 'editor-block-mover block-editor-block-mover', { 'is-visible': isFocused || ! isHidden, 'is-horizontal': orientation === 'horizontal' } ) }>
+			<div className={ classnames( 'block-editor-block-mover', { 'is-visible': isFocused || ! isHidden, 'is-horizontal': orientation === 'horizontal' } ) }>
 				<IconButton
-					className="editor-block-mover__control block-editor-block-mover__control"
+					className="block-editor-block-mover__control"
 					onClick={ isFirst ? null : onMoveUp }
 					icon={ getArrowIcon( 'up' ) }
 					// translators: %s: Horizontal direction of block movement ( left, right )
@@ -98,17 +98,22 @@ export class BlockMover extends Component {
 					onFocus={ this.onFocus }
 					onBlur={ this.onBlur }
 				/>
-				<IconDragHandle
-					className="editor-block-mover__control block-editor-block-mover__control"
-					icon={ dragHandle }
-					clientId={ clientIds }
-					blockElementId={ blockElementId }
-					isVisible={ isDraggable }
-					onDragStart={ onDragStart }
-					onDragEnd={ onDragEnd }
-				/>
+
+				<BlockDraggable clientIds={ clientIds }>
+					{ ( { onDraggableStart, onDraggableEnd } ) => (
+						<IconButton
+							icon={ dragHandle }
+							className="block-editor-block-mover__control-drag-handle block-editor-block-mover__control"
+							aria-hidden="true"
+							onDragStart={ onDraggableStart }
+							onDragEnd={ onDraggableEnd }
+							draggable
+						/>
+					) }
+				</BlockDraggable>
+
 				<IconButton
-					className="editor-block-mover__control block-editor-block-mover__control"
+					className="block-editor-block-mover__control"
 					onClick={ isLast ? null : onMoveDown }
 					icon={ getArrowIcon( 'down' ) }
 					// translators: %s: Horizontal direction of block movement ( left, right )
@@ -118,7 +123,7 @@ export class BlockMover extends Component {
 					onFocus={ this.onFocus }
 					onBlur={ this.onBlur }
 				/>
-				<span id={ `block-editor-block-mover__up-description-${ instanceId }` } className="editor-block-mover__description block-editor-block-mover__description">
+				<span id={ `block-editor-block-mover__up-description-${ instanceId }` } className="block-editor-block-mover__description">
 					{
 						getBlockMoverDescription(
 							blocksCount,
@@ -132,7 +137,7 @@ export class BlockMover extends Component {
 						)
 					}
 				</span>
-				<span id={ `block-editor-block-mover__down-description-${ instanceId }` } className="editor-block-mover__description block-editor-block-mover__description">
+				<span id={ `block-editor-block-mover__down-description-${ instanceId }` } className="block-editor-block-mover__description">
 					{
 						getBlockMoverDescription(
 							blocksCount,

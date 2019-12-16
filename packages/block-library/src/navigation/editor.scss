@@ -2,10 +2,27 @@
 // @todo: eventually we may add a feature that lets a parent container absorb the block UI of a child block.
 // When that happens, leverage that instead of the following overrides.
 [data-type="core/navigation"] {
+
+	.wp-block-navigation .block-editor-inner-blocks {
+		flex: 1; // expand to fill available space required for justification
+	}
+
 	// 1. Reset margins on immediate innerblocks container.
 	.wp-block-navigation .block-editor-inner-blocks > .block-editor-block-list__layout {
 		margin-left: 0;
 		margin-right: 0;
+	}
+
+	.wp-block-navigation.items-justification-left .block-editor-inner-blocks > .block-editor-block-list__layout {
+		justify-content: flex-start;
+	}
+
+	.wp-block-navigation.items-justification-center .block-editor-inner-blocks > .block-editor-block-list__layout {
+		justify-content: center;
+	}
+
+	.wp-block-navigation.items-justification-right .block-editor-inner-blocks > .block-editor-block-list__layout {
+		justify-content: flex-end;
 	}
 
 	// 2. Remove paddings on subsequent immediate children.
@@ -13,7 +30,9 @@
 		width: auto;
 		padding-left: 0;
 		padding-right: 0;
-		margin-left: 0; // something
+		margin-left: 0;
+		margin-right: 0;
+		margin-bottom: 1em; // Useful for when items wrap.
 	}
 
 	// 3. Remove margins on subsequent Edit container.
@@ -28,6 +47,11 @@
 		margin-bottom: 0;
 	}
 
+	.wp-block-navigation .block-editor-block-list__block-edit::before {
+		left: 0;
+		right: 0;
+	}
+
 	// Remove the dashed outlines for child blocks.
 	&.is-hovered .wp-block-navigation .block-editor-block-list__block-edit::before,
 	&.is-selected .wp-block-navigation .block-editor-block-list__block-edit::before,
@@ -35,10 +59,8 @@
 		border-color: transparent !important; // !important used to keep the selector from growing any more complex.
 	}
 
-	// Hide the breadcrumb.
 	// Hide the sibling inserter.
-	.wp-block-navigation .block-editor-block-list__insertion-point,
-	.wp-block-navigation .block-editor-block-list__breadcrumb {
+	.wp-block-navigation .block-editor-block-list__insertion-point {
 		display: none;
 	}
 
@@ -57,7 +79,7 @@
 .wp-block-navigation .block-editor-block-list__layout,
 .wp-block-navigation {
 	display: flex;
-	white-space: nowrap;
+	flex-wrap: wrap;
 }
 
 .wp-block-navigation__inserter-content {

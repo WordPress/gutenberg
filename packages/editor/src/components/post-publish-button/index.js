@@ -2,6 +2,9 @@
  * External dependencies
  */
 import { noop, get } from 'lodash';
+import classnames from 'classnames';
+import memoize from 'memize';
+import EquivalentKeyMap from 'equivalent-key-map';
 
 /**
  * WordPress dependencies
@@ -11,21 +14,62 @@ import { Component, createRef } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import { DotTip } from '@wordpress/nux';
 
 /**
  * Internal dependencies
  */
+import EntitiesSavedStates from '../entities-saved-states';
 import PublishButtonLabel from './label';
+
 export class PostPublishButton extends Component {
 	constructor( props ) {
 		super( props );
 		this.buttonNode = createRef();
+
+		this.createOnClick = this.createOnClick.bind( this );
+		this.closeEntitiesSavedStates = this.closeEntitiesSavedStates.bind( this );
+
+		this.state = {
+			entitiesSavedStatesCallback: false,
+		};
+		this.createIgnoredForSave = memoize(
+			( postType, postId ) =>
+				new EquivalentKeyMap( [ [ [ 'postType', postType, String( postId ) ], true ] ] ),
+			{ maxSize: 1 }
+		);
 	}
 	componentDidMount() {
 		if ( this.props.focusOnMount ) {
 			this.buttonNode.current.focus();
 		}
+	}
+
+	createOnClick( callback ) {
+		return ( ...args ) => {
+			const { hasNonPostEntityChanges } = this.props;
+			if ( hasNonPostEntityChanges ) {
+				// The modal for multiple entity saving will open,
+				// hold the callback for saving/publishing the post
+				// so that we can call it if the post entity is checked.
+				this.setState( {
+					entitiesSavedStatesCallback: () => callback( ...args ),
+				} );
+				return noop;
+			}
+
+			return callback( ...args );
+		};
+	}
+
+	closeEntitiesSavedStates( savedById ) {
+		const { postType, postId } = this.props;
+		const { entitiesSavedStatesCallback } = this.state;
+		this.setState( { entitiesSavedStatesCallback: false }, () => {
+			if ( savedById && savedById.has( [ 'postType', postType, String( postId ) ] ) ) {
+				// The post entity was checked, call the held callback from `createOnClick`.
+				entitiesSavedStatesCallback();
+			}
+		} );
 	}
 
 	render() {
@@ -46,7 +90,14 @@ export class PostPublishButton extends Component {
 			onSubmit = noop,
 			onToggle,
 			visibility,
+			hasNonPostEntityChanges,
+			postType,
+			postId,
 		} = this.props;
+		const {
+			entitiesSavedStatesCallback,
+		} = this.state;
+
 		const isButtonDisabled =
 			isSaving ||
 			forceIsSaving ||
@@ -64,10 +115,10 @@ export class PostPublishButton extends Component {
 		let publishStatus;
 		if ( ! hasPublishAction ) {
 			publishStatus = 'pending';
-		} else if ( isBeingScheduled ) {
-			publishStatus = 'future';
 		} else if ( visibility === 'private' ) {
 			publishStatus = 'private';
+		} else if ( isBeingScheduled ) {
+			publishStatus = 'future';
 		} else {
 			publishStatus = 'publish';
 		}
@@ -89,41 +140,53 @@ export class PostPublishButton extends Component {
 		};
 
 		const buttonProps = {
-			'aria-disabled': isButtonDisabled,
+			'aria-disabled': isButtonDisabled && ! hasNonPostEntityChanges,
 			className: 'editor-post-publish-button',
 			isBusy: isSaving && isPublished,
 			isPrimary: true,
-			onClick: onClickButton,
+			onClick: this.createOnClick( onClickButton ),
 		};
 
 		const toggleProps = {
-			'aria-disabled': isToggleDisabled,
+			'aria-disabled': isToggleDisabled && ! hasNonPostEntityChanges,
 			'aria-expanded': isOpen,
 			className: 'editor-post-publish-panel__toggle',
 			isBusy: isSaving && isPublished,
 			isPrimary: true,
-			onClick: onClickToggle,
+			onClick: this.createOnClick( onClickToggle ),
 		};
 
 		const toggleChildren = isBeingScheduled ? __( 'Schedule…' ) : __( 'Publish…' );
-		const buttonChildren = <PublishButtonLabel forceIsSaving={ forceIsSaving } />;
+		const buttonChildren = (
+			<PublishButtonLabel
+				forceIsSaving={ forceIsSaving }
+				hasNonPostEntityChanges={ hasNonPostEntityChanges }
+			/>
+		);
 
 		const componentProps = isToggle ? toggleProps : buttonProps;
 		const componentChildren = isToggle ? toggleChildren : buttonChildren;
 		return (
-			<div>
+			<>
+				<EntitiesSavedStates
+					isOpen={ Boolean( entitiesSavedStatesCallback ) }
+					onRequestClose={ this.closeEntitiesSavedStates }
+					ignoredForSave={ this.createIgnoredForSave( postType, postId ) }
+				/>
 				<Button
-					isLarge
 					ref={ this.buttonNode }
 					{ ...componentProps }
+					className={ classnames(
+						componentProps.className,
+						'editor-post-publish-button__button',
+						{
+							'has-changes-dot': hasNonPostEntityChanges,
+						}
+					) }
 				>
 					{ componentChildren }
 				</Button>
-				{ /* Todo: Remove the wrapping div when DotTips are removed. */ }
-				<DotTip tipId="core/editor.publish">
-					{ __( 'Finished writing? That’s great, let’s get this published right now. Just click “Publish” and you’re good to go.' ) }
-				</DotTip>
-			</div>
+			</>
 		);
 	}
 }
@@ -140,6 +203,8 @@ export default compose( [
 			isPostSavingLocked,
 			getCurrentPost,
 			getCurrentPostType,
+			getCurrentPostId,
+			hasNonPostEntityChanges,
 		} = select( 'core/editor' );
 		return {
 			isSaving: isSavingPost(),
@@ -151,6 +216,8 @@ export default compose( [
 			isPublished: isCurrentPostPublished(),
 			hasPublishAction: get( getCurrentPost(), [ '_links', 'wp:action-publish' ], false ),
 			postType: getCurrentPostType(),
+			postId: getCurrentPostId(),
+			hasNonPostEntityChanges: hasNonPostEntityChanges(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

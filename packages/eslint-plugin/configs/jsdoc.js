@@ -20,22 +20,9 @@ const temporaryWordPressInternalTypes = [
 	'WPBlockTypeIcon',
 	'WPBlockTypeIconRender',
 	'WPBlockTypeIconDescriptor',
-	'WPDataPersistencePluginOptions',
-	'WPDataPlugin',
-	'WPDataRegistry',
 	'WPComponent',
-	'WPCompleter',
 	'WPElement',
-	'WPFormat',
-	'WPEditorInserterItem',
 	'WPIcon',
-	'WPNotice',
-	'WPNoticeAction',
-	'WPPlugin',
-	'WPShortcode',
-	'WPShortcodeAttrs',
-	'WPShortcodeMatch',
-	'WPSyntheticEvent',
 ];
 
 /**
@@ -47,9 +34,6 @@ const temporaryWordPressInternalTypes = [
 const temporaryExternalTypes = [
 	'DOMHighResTimeStamp',
 	'espree',
-	'moment',
-	'puppeteer',
-	'react',
 ];
 
 /**

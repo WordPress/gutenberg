@@ -57,6 +57,18 @@ class BottomSheetCell extends Component {
 		this.setState( { isScreenReaderEnabled } );
 	}
 
+	typeToKeyboardType( type, step ) {
+		let keyboardType = `default`;
+		if ( type === `number` ) {
+			if ( step && Math.abs( step ) < 1 ) {
+				keyboardType = `decimal-pad`;
+			} else {
+				keyboardType = `number-pad`;
+			}
+		}
+		return keyboardType;
+	}
+
 	render() {
 		const {
 			accessible,
@@ -80,6 +92,8 @@ class BottomSheetCell extends Component {
 			style = {},
 			getStylesFromColorScheme,
 			customActionButton,
+			type,
+			step,
 			...valueProps
 		} = this.props;
 
@@ -156,6 +170,7 @@ class BottomSheetCell extends Component {
 					pointerEvents={ this.state.isEditingValue ? 'auto' : 'none' }
 					onFocus={ startEditing }
 					onBlur={ finishEditing }
+					keyboardType={ this.typeToKeyboardType( type, step ) }
 					{ ...valueProps }
 				/>
 			) : (

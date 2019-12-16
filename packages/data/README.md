@@ -264,7 +264,7 @@ import { useSelect, AsyncModeProvider } from '@wordpress/data';
 function BlockCount() {
   const count = useSelect( ( select ) => {
     return select( 'core/block-editor' ).getBlockCount()
-  } );
+  }, [] );
 
   return count;
 }
@@ -388,7 +388,7 @@ dispatch( 'my-shop' ).setPrice( 'hammer', 9.75 );
 
 _Parameters_
 
--   _name_ `string`: Store name
+-   _name_ `string`: Store name.
 
 _Returns_
 
@@ -485,7 +485,7 @@ select( 'my-shop' ).getPrice( 'hammer' );
 
 _Parameters_
 
--   _name_ `string`: Store name
+-   _name_ `string`: Store name.
 
 _Returns_
 
@@ -548,7 +548,8 @@ function Button( { onClick, children } ) {
 
 const SaleButton = ( { children } ) => {
   const { stockNumber } = useSelect(
-    ( select ) => select( 'my-shop' ).getStockNumber()
+    ( select ) => select( 'my-shop' ).getStockNumber(),
+    []
   );
   const { startSale } = useDispatch( 'my-shop' );
   const onClick = useCallback( () => {
