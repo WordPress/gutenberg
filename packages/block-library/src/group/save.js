@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import { InnerBlocks, getColorClassName } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
-	const { backgroundColor, customBackgroundColor } = attributes;
+	const { backgroundColor, customBackgroundColor, customTextColor } = attributes;
 
 	const backgroundClass = getColorClassName( 'background-color', backgroundColor );
 	const className = classnames( backgroundClass, {
@@ -18,6 +18,7 @@ export default function save( { attributes } ) {
 
 	const styles = {
 		backgroundColor: backgroundClass ? undefined : customBackgroundColor,
+		color: customTextColor ? customTextColor : null,
 	};
 
 	return (
