@@ -134,3 +134,8 @@
 	background-color: #e9eff3;
 	opacity: 0.4;
 }
+
+.neutralToolbar {
+	margin-left: -$block-edge-to-content;
+	margin-right: -$block-edge-to-content;
+}

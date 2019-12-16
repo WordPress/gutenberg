@@ -198,6 +198,17 @@ class BlockListBlock extends Component {
 		];
 	}
 
+	applyToolbarStyle() {
+		const {
+			hasChildren,
+			isUnregisteredBlock,
+		} = this.props;
+
+		if ( ! hasChildren || isUnregisteredBlock ) {
+			return styles.neutralToolbar;
+		}
+	}
+
 	render() {
 		const {
 			clientId,
@@ -238,7 +249,7 @@ class BlockListBlock extends Component {
 						style={ this.applyBlockStyle() }
 					>
 						{ isValid ? this.getBlockForType() : <BlockInvalidWarning blockTitle={ title } icon={ icon } /> }
-						{ isSelected && <BlockMobileToolbar clientId={ clientId } /> }
+						<View style={ this.applyToolbarStyle() } >{ isSelected && <BlockMobileToolbar clientId={ clientId } /> }</View>
 					</View>
 				</TouchableWithoutFeedback>
 			</>
