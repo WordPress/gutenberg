@@ -4,7 +4,7 @@
 		"attributes": {
 		"images": {
 			"type": "array",
-			"default": [ ],
+			"default": [],
 			"source": "query",
 			"selector": ".blocks-gallery-item",
 			"query": {
@@ -46,7 +46,7 @@
   			"items": {
     			"type": "number"
   			},
-			"default": [ ]
+			"default": []
 		},
 		"columns": {
 			"type": "number"
