@@ -8,7 +8,7 @@ import {
 	FormFileUpload,
 	NavigableMenu,
 	MenuItem,
-	Toolbar,
+	ToolbarGroup,
 	Button,
 	Dropdown,
 	withNotices,
@@ -127,7 +127,7 @@ const MediaReplaceFlow = (
 		<Dropdown
 			contentClassName="media-replace-flow__options"
 			renderToggle={ ( { isOpen, onToggle } ) => (
-				<Toolbar className="media-replace-flow">
+				<ToolbarGroup className="media-replace-flow">
 					<Button
 						ref={ editMediaButtonRef }
 						aria-expanded={ isOpen }
@@ -137,7 +137,7 @@ const MediaReplaceFlow = (
 						{ name }
 						<span className="media-replace-flow__indicator" />
 					</Button>
-				</Toolbar>
+				</ToolbarGroup>
 			) }
 			renderContent={ ( { onClose } ) => (
 				<>
