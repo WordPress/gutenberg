@@ -3,4 +3,4 @@
  */
 export * from './icons';
 export * from './settings';
-export * from './util';
+export { isFromWordPress } from './util';
