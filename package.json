@@ -120,7 +120,7 @@
 		"fast-glob": "2.2.7",
 		"fbjs": "0.8.17",
 		"glob": "7.1.2",
-		"husky": "2.7.0",
+		"husky": "3.0.5",
 		"inquirer": "6.3.1",
 		"is-equal-shallow": "0.1.3",
 		"jest-junit": "6.4.0",
