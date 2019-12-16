@@ -321,7 +321,7 @@ export class InserterMenu extends Component {
 
 						{ !! suggestedItems.length &&
 							<PanelBody
-								title={ _x( 'Most Used', 'blocks' ) }
+								title={ _x( 'Most used', 'blocks' ) }
 								opened={ isPanelOpen( 'suggested' ) }
 								onToggle={ this.onTogglePanel( 'suggested' ) }
 								ref={ this.bindPanel( 'suggested' ) }
@@ -363,7 +363,7 @@ export class InserterMenu extends Component {
 									className="block-editor-inserter__manage-reusable-blocks"
 									href={ addQueryArgs( 'edit.php', { post_type: 'wp_block' } ) }
 								>
-									{ __( 'Manage All Reusable Blocks' ) }
+									{ __( 'Manage all reusable blocks' ) }
 								</a>
 							</PanelBody>
 						) }
@@ -422,7 +422,7 @@ export class InserterMenu extends Component {
 						{ ! hoveredItem && (
 							<div className="block-editor-inserter__menu-help-panel-no-block">
 								<div className="block-editor-inserter__menu-help-panel-no-block-text">
-									<div className="block-editor-inserter__menu-help-panel-title">{ __( 'Content Blocks' ) }</div>
+									<div className="block-editor-inserter__menu-help-panel-title">{ __( 'Content blocks' ) }</div>
 									<p>
 										{ __(
 											'Welcome to the wonderful world of blocks! Blocks are the basis of all content within the editor.'

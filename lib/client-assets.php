@@ -150,6 +150,25 @@ function gutenberg_override_translation_file( $file, $handle ) {
 add_filter( 'load_script_translation_file', 'gutenberg_override_translation_file', 10, 2 );
 
 /**
+ * Filters the default labels for common post types to change the case style
+ * from capitalized (e.g. "Featured Image") to sentence-style (e.g. "Featured
+ * image").
+ *
+ * See: https://github.com/WordPress/gutenberg/pull/18758
+ *
+ * @param object $labels Object with all the labels as member variables.
+ *
+ * @return object Object with all the labels, including overridden ones.
+ */
+function gutenberg_override_posttype_labels( $labels ) {
+	$labels->featured_image = __( 'Featured image', 'gutenberg' );
+	return $labels;
+}
+foreach ( array( 'post', 'page' ) as $post_type ) {
+	add_filter( "post_type_labels_{$post_type}", 'gutenberg_override_posttype_labels' );
+}
+
+/**
  * Registers a style according to `wp_register_style`. Honors this request by
  * deregistering any style by the same handler before registration.
  *

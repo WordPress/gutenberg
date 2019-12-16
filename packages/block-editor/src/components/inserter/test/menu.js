@@ -163,7 +163,7 @@ describe( 'InserterMenu', () => {
 		const activeCategory = element.querySelector(
 			'.components-panel__body.is-opened > .components-panel__body-title'
 		);
-		expect( activeCategory.textContent ).toBe( 'Most Used' );
+		expect( activeCategory.textContent ).toBe( 'Most used' );
 	} );
 
 	it( 'should show nothing if there are no items', () => {
@@ -239,7 +239,7 @@ describe( 'InserterMenu', () => {
 
 	it( 'should show the common category blocks', () => {
 		const element = initializeAllClosedMenuStateAndReturnElement();
-		const commonBlocksTab = getTabButtonWithContent( element, 'Common Blocks' );
+		const commonBlocksTab = getTabButtonWithContent( element, 'Common blocks' );
 
 		TestUtils.Simulate.click( commonBlocksTab );
 
@@ -259,7 +259,7 @@ describe( 'InserterMenu', () => {
 
 	it( 'should disable items with `isDisabled`', () => {
 		const element = initializeMenuDefaultStateAndReturnElement();
-		const layoutTab = getTabButtonWithContent( element, 'Layout Elements' );
+		const layoutTab = getTabButtonWithContent( element, 'Layout elements' );
 
 		TestUtils.Simulate.click( layoutTab );
 
@@ -282,7 +282,7 @@ describe( 'InserterMenu', () => {
 		);
 
 		expect( matchingCategories ).toHaveLength( 2 );
-		expect( matchingCategories[ 0 ].textContent ).toBe( 'Common Blocks' );
+		expect( matchingCategories[ 0 ].textContent ).toBe( 'Common blocks' );
 		expect( matchingCategories[ 1 ].textContent ).toBe( 'Embeds' );
 
 		const visibleBlocks = element.querySelectorAll(
@@ -308,7 +308,7 @@ describe( 'InserterMenu', () => {
 		);
 
 		expect( matchingCategories ).toHaveLength( 2 );
-		expect( matchingCategories[ 0 ].textContent ).toBe( 'Common Blocks' );
+		expect( matchingCategories[ 0 ].textContent ).toBe( 'Common blocks' );
 		expect( matchingCategories[ 1 ].textContent ).toBe( 'Embeds' );
 
 		const visibleBlocks = element.querySelectorAll(

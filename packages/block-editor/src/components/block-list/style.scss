@@ -299,7 +299,7 @@
 		border-width: $border-width;
 	}
 
-	// Reusable Blocks clickthrough overlays.
+	// Reusable blocks clickthrough overlays.
 	&.is-reusable > .block-editor-block-list__block-edit .block-editor-inner-blocks.has-overlay {
 		// Remove only the top click overlay.
 		&::after {
