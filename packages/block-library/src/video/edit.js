@@ -7,7 +7,6 @@ import {
 	Button,
 	Disabled,
 	PanelBody,
-	ToolbarGroup,
 	withNotices,
 } from '@wordpress/components';
 import {
@@ -17,6 +16,7 @@ import {
 	MediaPlaceholder,
 	MediaUpload,
 	MediaUploadCheck,
+	MediaReplaceFlow,
 	RichText,
 } from '@wordpress/block-editor';
 import { Component, createRef } from '@wordpress/element';
@@ -146,16 +146,11 @@ class VideoEdit extends Component {
 			attributes,
 			setAttributes,
 		} = this.props;
-		const { editing } = this.state;
-		const switchToEditing = () => {
-			this.setState( { editing: true } );
-		};
 		const onSelectVideo = ( media ) => {
 			if ( ! media || ! media.url ) {
 				// in this case there was an error and we should continue in the editing state
 				// previous attributes should be removed because they may be temporary blob urls
 				setAttributes( { src: undefined, id: undefined } );
-				switchToEditing();
 				return;
 			}
 			// sets the block's attribute and updates the edit component from the
@@ -164,7 +159,7 @@ class VideoEdit extends Component {
 			this.setState( { src: media.url, editing: false } );
 		};
 
-		if ( editing ) {
+		if ( ! src ) {
 			return (
 				<MediaPlaceholder
 					icon={ <BlockIcon icon={ icon } /> }
@@ -184,14 +179,14 @@ class VideoEdit extends Component {
 		return (
 			<>
 				<BlockControls>
-					<ToolbarGroup>
-						<Button
-							className="components-toolbar__control"
-							label={ __( 'Edit video' ) }
-							onClick={ switchToEditing }
-							icon="edit"
-						/>
-					</ToolbarGroup>
+					<MediaReplaceFlow
+						mediaURL={ src }
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
+						accept="video/*"
+						onSelect={ onSelectVideo }
+						onSelectURL={ this.onSelectURL }
+						onError={ this.onUploadError }
+					/>
 				</BlockControls>
 				<InspectorControls>
 					<PanelBody title={ __( 'Video Settings' ) }>
