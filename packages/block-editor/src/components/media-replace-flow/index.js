@@ -125,7 +125,7 @@ const MediaReplaceFlow = (
 
 	return (
 		<Dropdown
-			contentClassName="media-replace-flow__options"
+			contentClassName="block-editor-media-replace-flow__options"
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<ToolbarGroup className="media-replace-flow">
 					<Button
@@ -135,7 +135,7 @@ const MediaReplaceFlow = (
 						onKeyDown={ openOnArrowDown }
 					>
 						{ name }
-						<span className="media-replace-flow__indicator" />
+						<span className="block-editor-media-replace-flow__indicator" />
 					</Button>
 				</ToolbarGroup>
 			) }
