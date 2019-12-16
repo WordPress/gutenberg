@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { useSelect } from '@wordpress/data';
 import {
 	useEntityProp,
 	__experimentalUseEntitySaving,
@@ -9,14 +10,21 @@ import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { RichText } from '@wordpress/block-editor';
 
-export default function SiteTitleEdit() {
+export function SiteTitleEdit( { isSelected, className } ) {
+	const canUpdate = useSelect( ( select ) => {
+		return select( 'core' ).canUser( 'update', 'settings' );
+	} );
+
 	const [ title, setTitle ] = useEntityProp( 'root', 'site', 'title' );
 	const [ isDirty, isSaving, save ] = __experimentalUseEntitySaving(
 		'root',
 		'site',
 		'title'
 	);
-	return (
+
+	const [ viewTitle ] = useEntityProp( 'root', 'base', 'name' );
+
+	const editMode = (
 		<>
 			<Button
 				isPrimary
@@ -36,4 +44,16 @@ export default function SiteTitleEdit() {
 			/>
 		</>
 	);
+
+	const viewMode = (
+		<h1>{ title ? title : viewTitle }</h1>
+	);
+
+	return (
+		<div className={ className }>
+			{ ( canUpdate && isSelected ) ? editMode : viewMode }
+		</div>
+	);
 }
+
+export default SiteTitleEdit;
