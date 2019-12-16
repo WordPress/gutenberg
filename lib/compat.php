@@ -195,11 +195,17 @@ add_action( 'init', 'gutenberg_register_data_persistence_user_meta' );
 function gutenberg_user_settings_data_persistence_inline_script() {
 	global $wp_scripts;
 
-	$persisted_value = get_user_meta( get_current_user_id(), 'wp_data_persistence', true );
+	$user_id         = get_current_user_id();
+	$persisted_value = get_user_meta( $user_id, 'wp_data_persistence', true );
 	if ( empty( $persisted_value ) ) {
-		$persisted_value = '{}';
+		// If there's no explicit metadata assigned, fall back to a value which
+		// was persisted using browser storage, prior to user meta persistence.
+		$persisted_value = sprintf( 'localStorage.getItem( "WP_DATA_USER_%s" );', $user_id );
+	} else {
+		// Otherwise, encode the string value for interpolation in the storage
+		// implementation script.
+		$persisted_value = json_encode( $persisted_value );
 	}
-	$persisted_value = json_encode( $persisted_value );
 
 	$persistence_script = <<<JS
 ( function() {
