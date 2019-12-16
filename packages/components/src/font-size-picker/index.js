@@ -30,12 +30,13 @@ function getSelectOptions( optionsArray, disableCustomFontSizes ) {
 		...optionsArray,
 		...disableCustomFontSizes ? [] : [ { slug: CUSTOM_FONT_SIZE, name: __( 'Custom' ) } ],
 	];
-	return optionsArray.map( ( option ) => ( {
-		key: option.slug,
-		name: option.name,
-		style: { fontSize: option.size },
-	} ) );
-
+	return optionsArray.map( ( option ) => (
+		{
+			key: option.slug,
+			name: option.name,
+			style: { fontSize: option.size },
+		}
+	) );
 }
 
 export default function FontSizePicker( {
@@ -53,40 +54,44 @@ export default function FontSizePicker( {
 		return null;
 	}
 
-	const onChangeValue = ( event ) => {
-		const newValue = event.target.value;
-		setCurrentSelectValue( getSelectValueFromFontSize( fontSizes, newValue ) );
-		onChange( newValue ? Number( newValue ) : undefined );
-	};
+	const setFontSize = ( fontSizeKey, fontSizeValue ) => {
+		setCurrentSelectValue( fontSizeKey );
 
-	const onSelectChangeValue = ( { selectedItem } ) => {
-		setCurrentSelectValue( selectedItem.key );
-
-		if ( selectedItem.key === DEFAULT_FONT_SIZE ) {
+		if ( fontSizeKey === DEFAULT_FONT_SIZE ) {
 			onChange( undefined );
 			return;
 		}
 
-		if ( selectedItem.key === CUSTOM_FONT_SIZE ) {
+		if ( ! fontSizeValue ) {
 			return;
 		}
 
-		onChange( selectedItem.style && selectedItem.style.fontSize );
+		onChange( fontSizeValue );
+	};
+
+	const onChangeValue = ( event ) => {
+		const newValue = event.target.value;
+		const key = getSelectValueFromFontSize( fontSizes, newValue );
+		setFontSize( key, newValue );
+	};
+
+	const onSelectChangeValue = ( { selectedItem } ) => {
+		const selectedKey = selectedItem.key;
+		const selectedValue = selectedItem.style && selectedItem.style.fontSize;
+		setFontSize( selectedKey, selectedValue );
 	};
 
 	const onSliderChangeValue = ( sliderValue ) => {
-		onChange( sliderValue );
-		setCurrentSelectValue( getSelectValueFromFontSize( fontSizes, sliderValue ) );
+		const sliderKey = getSelectValueFromFontSize( fontSizes, sliderValue );
+		setFontSize( sliderKey, sliderValue );
 	};
 
 	const reset = () => {
-		const defaultFontSize = items.find( ( item ) => item.key === DEFAULT_FONT_SIZE );
-		onSelectChangeValue( {
-			selectedItem: defaultFontSize,
-		} );
+		setFontSize( DEFAULT_FONT_SIZE );
 	};
 
 	const options = getSelectOptions( fontSizes, disableCustomFontSizes );
+
 	const rangeControlNumberId = `components-range-control__number#${ instanceId }`;
 	return (
 		<fieldset className="components-font-size-picker">
