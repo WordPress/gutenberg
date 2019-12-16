@@ -19,7 +19,7 @@ import { KeyboardAwareFlatList, ReadableContentView } from '@wordpress/component
 import styles from './style.scss';
 import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
-import AddBlockSeparator from '../add-block-separator';
+import BlockInsertionPoint from './insertion-point';
 import __experimentalBlockListFooter from '../block-list-footer';
 
 const innerToolbarHeight = 44;
@@ -128,7 +128,7 @@ export class BlockList extends Component {
 		const { shouldShowBlockAtIndex, shouldShowInsertionPointBefore, shouldShowInsertionPointAfter } = this.props;
 		return (
 			<ReadableContentView>
-				{ shouldShowInsertionPointBefore( clientId ) && <AddBlockSeparator /> }
+				{ shouldShowInsertionPointBefore( clientId ) && <BlockInsertionPoint /> }
 				{ shouldShowBlockAtIndex( index ) && (
 					<BlockListBlock
 						key={ clientId }
@@ -138,7 +138,7 @@ export class BlockList extends Component {
 						onCaretVerticalPositionChange={ this.onCaretVerticalPositionChange }
 						isSmallScreen={ ! this.props.isFullyBordered }
 					/> ) }
-				{ shouldShowInsertionPointAfter( clientId ) && <AddBlockSeparator /> }
+				{ shouldShowInsertionPointAfter( clientId ) && <BlockInsertionPoint /> }
 			</ReadableContentView>
 		);
 	}
