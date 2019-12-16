@@ -14,7 +14,7 @@ import { Component } from '@wordpress/element';
 import { ToolbarButton, Toolbar } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
-import { getBlockType } from '@wordpress/blocks';
+import { getBlockType, getUnregisteredTypeHandlerName } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -108,12 +108,17 @@ class BlockListBlock extends Component {
 			getStylesFromColorScheme,
 			isSmallScreen,
 			isRootListInnerBlockHolder,
+			isUnregisteredBlock,
 		} = this.props;
 
 		const fullSolidBorderStyle = { // define style for full border
 			...styles.fullSolidBordered,
 			...getStylesFromColorScheme( styles.solidBorderColor, styles.solidBorderColorDark ),
 		};
+
+		if ( isUnregisteredBlock ) {
+			return { ...styles.selectedLeaf, ...fullSolidBorderStyle };
+		}
 
 		if ( hasChildren ) { // if block has children apply style for selected parent
 			return { ...styles.selectedParent,	...fullSolidBorderStyle	};
@@ -143,7 +148,12 @@ class BlockListBlock extends Component {
 			isAncestorSelected,
 			hasParent,
 			getStylesFromColorScheme,
+			isUnregisteredBlock,
 		} = this.props;
+
+		if ( isUnregisteredBlock ) {
+			return styles.full;
+		}
 
 		// if block does not have parent apply neutral or full
 		// margins depending if block has children or not
@@ -261,6 +271,8 @@ export default compose( [
 		const isLastBlock = order === getBlocks().length - 1;
 		const block = __unstableGetBlockWithoutInnerBlocks( clientId );
 		const { name, attributes, isValid } = block || {};
+
+		const isUnregisteredBlock = name === getUnregisteredTypeHandlerName();
 		const blockType = getBlockType( name || 'core/missing' );
 		const title = blockType.title;
 		const icon = blockType.icon;
@@ -273,7 +285,7 @@ export default compose( [
 		const rootBlock = getBlock( rootBlockId );
 		const hasRootInnerBlocks = rootBlock.innerBlocks.length !== 0;
 
-		const showFloatingToolbar = isSelected && hasRootInnerBlocks;
+		const showFloatingToolbar = isSelected && hasRootInnerBlocks && ! isUnregisteredBlock;
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 
@@ -317,6 +329,7 @@ export default compose( [
 			isTouchable,
 			isDimmed,
 			isRootListInnerBlockHolder,
+			isUnregisteredBlock,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {
