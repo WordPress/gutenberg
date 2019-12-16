@@ -57,11 +57,23 @@ export function Button( props ) {
 		fixedRatio = true,
 		getStylesFromColorScheme,
 		isPressed,
+		isLarge,
+		isSmall,
+		isPrimary,
 		'aria-disabled': ariaDisabled,
 		'aria-label': ariaLabel,
 		'data-subscript': subscript,
 		...otherProps
 	} = props;
+
+	// Support some of props from the web just to demonstrate.
+	// The markup is a bit different than on web and we style the View inside the Touchable instead.
+	let pd = 3;
+	if ( isSmall ) {
+		pd = 8;
+	} else if ( isLarge ) {
+		pd = 12;
+	}
 
 	const isDisabled = ariaDisabled || disabled;
 
@@ -97,7 +109,9 @@ export function Button( props ) {
 			accessibilityHint={ hint }
 			onPress={ onClick }
 			flex={ 1 }
-			pd={ 3 }
+			p={ pd }
+			color={ isPrimary && 'white' }
+			backgroundColor={ isPrimary && 'primary' }
 			justifyContent={ 'center' }
 			alignItems={ 'center' }
 			disabled={ isDisabled }
@@ -106,9 +120,9 @@ export function Button( props ) {
 			<View style={ buttonViewStyle }>
 				{ newChildren }
 				{ subscript &&
-				( <Text style={ [ subscriptDefault, isPressed && styles.subscriptActive ] }>
-					{ subscript }
-				</Text> )
+					( <Text style={ [ subscriptDefault, isPressed && styles.subscriptActive ] }>
+						{ subscript }
+					</Text> )
 				}
 			</View>
 		</PrimitiveButton>
