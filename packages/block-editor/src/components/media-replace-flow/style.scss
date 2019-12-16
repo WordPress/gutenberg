@@ -15,13 +15,11 @@
 
 .block-editor-media-flow__url-input {
 	padding: 0 15px;
-	max-width: 260px;
+	max-width: 255px;
 	padding-bottom: 10px;
 
 	input {
-		max-width: 169px;
-		border: 1px solid $dark-gray-500;
-		border-radius: 4px;
+		max-width: 180px;
 	}
 }
 
