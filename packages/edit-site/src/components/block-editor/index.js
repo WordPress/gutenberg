@@ -19,11 +19,13 @@ import {
 /**
  * Internal dependencies
  */
+import { useEditorContext } from '../editor';
 import Sidebar from '../sidebar';
 import TemplateSwitcher from '../template-switcher';
 import AddTemplate from '../add-template';
 
-export default function BlockEditor( { settings: _settings, setSettings } ) {
+export default function BlockEditor() {
+	const { settings: _settings, setSettings } = useEditorContext();
 	const canUserCreateMedia = useSelect( ( select ) => {
 		const _canUserCreateMedia = select( 'core' ).canUser(
 			'create',
@@ -48,7 +50,7 @@ export default function BlockEditor( { settings: _settings, setSettings } ) {
 	}, [ canUserCreateMedia, _settings ] );
 	const [ content, _setContent ] = useEntityProp(
 		'postType',
-		'wp_template',
+		settings.templateType,
 		'content'
 	);
 	const initialBlocks = useMemo( () => {
@@ -59,7 +61,7 @@ export default function BlockEditor( { settings: _settings, setSettings } ) {
 	}, [ settings.templateId ] );
 	const [ blocks = initialBlocks, setBlocks ] = useEntityProp(
 		'postType',
-		'wp_template',
+		settings.templateType,
 		'blocks'
 	);
 	const setContent = useCallback(
@@ -74,6 +76,16 @@ export default function BlockEditor( { settings: _settings, setSettings } ) {
 			setSettings( ( prevSettings ) => ( {
 				...prevSettings,
 				templateId: newTemplateId,
+				templateType: 'wp_template',
+			} ) ),
+		[]
+	);
+	const setActiveTemplatePartId = useCallback(
+		( newTemplatePartId ) =>
+			setSettings( ( prevSettings ) => ( {
+				...prevSettings,
+				templateId: newTemplatePartId,
+				templateType: 'wp_template_part',
 			} ) ),
 		[]
 	);
@@ -96,8 +108,11 @@ export default function BlockEditor( { settings: _settings, setSettings } ) {
 			<Sidebar.TemplatesFill>
 				<TemplateSwitcher
 					ids={ settings.templateIds }
+					templatePartIds={ settings.templatePartIds }
 					activeId={ settings.templateId }
+					isTemplatePart={ settings.templateType === 'wp_template_part' }
 					onActiveIdChange={ setActiveTemplateId }
+					onActiveTemplatePartIdChange={ setActiveTemplatePartId }
 				/>
 				<AddTemplate
 					ids={ settings.templateIds }

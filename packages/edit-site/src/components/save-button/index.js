@@ -8,10 +8,24 @@ import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { EntitiesSavedStates } from '@wordpress/editor';
 
+/**
+ * Internal dependencies
+ */
+import { useEditorContext } from '../editor';
+
 export default function SaveButton() {
-	const [ , setStatus ] = useEntityProp( 'postType', 'wp_template', 'status' );
-	const [ , setTitle ] = useEntityProp( 'postType', 'wp_template', 'title' );
-	const [ slug ] = useEntityProp( 'postType', 'wp_template', 'slug' );
+	const { settings } = useEditorContext();
+	const [ , setStatus ] = useEntityProp(
+		'postType',
+		settings.templateType,
+		'status'
+	);
+	const [ , setTitle ] = useEntityProp(
+		'postType',
+		settings.templateType,
+		'title'
+	);
+	const [ slug ] = useEntityProp( 'postType', settings.templateType, 'slug' );
 	// Publish template if not done yet.
 	useEffect( () => {
 		setStatus( 'publish' );

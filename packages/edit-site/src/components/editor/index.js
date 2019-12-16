@@ -1,7 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import {
+	createContext,
+	useContext,
+	useState,
+	useMemo,
+} from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import {
 	SlotFillProvider,
@@ -19,34 +24,44 @@ import Header from '../header';
 import Sidebar from '../sidebar';
 import BlockEditor from '../block-editor';
 
+const Context = createContext();
+export function useEditorContext() {
+	return useContext( Context );
+}
+
 function Editor( { settings: _settings } ) {
 	const [ settings, setSettings ] = useState( _settings );
 	const template = useSelect(
 		( select ) =>
 			select( 'core' ).getEntityRecord(
 				'postType',
-				'wp_template',
+				settings.templateType,
 				settings.templateId
 			),
-		[ settings.templateId ]
+		[ settings.templateType, settings.templateId ]
 	);
+	const context = useMemo( () => ( { settings, setSettings } ), [
+		settings,
+		setSettings,
+	] );
 	return template ? (
 		<SlotFillProvider>
 			<DropZoneProvider>
 				<EntityProvider
 					kind="postType"
-					type="wp_template"
+					type={ settings.templateType }
 					id={ settings.templateId }
 				>
-					<Notices />
-					<Header />
-					<Sidebar />
-					<BlockEditor settings={ settings } setSettings={ setSettings } />
-					<Popover.Slot />
+					<Context.Provider value={ context }>
+						<Notices />
+						<Header />
+						<Sidebar />
+						<BlockEditor />
+						<Popover.Slot />
+					</Context.Provider>
 				</EntityProvider>
 			</DropZoneProvider>
 		</SlotFillProvider>
 	) : null;
 }
-
 export default navigateRegions( Editor );

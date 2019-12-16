@@ -121,6 +121,7 @@ function gutenberg_edit_site_init( $hook ) {
 		$template_part_ids = $template_part_ids + $_wp_current_template_part_ids;
 	}
 	$settings['templateId']      = $_wp_current_template_id;
+	$settings['templateType']    = 'wp_template';
 	$settings['templateIds']     = array_keys( $template_ids );
 	$settings['templatePartIds'] = array_keys( $template_part_ids );
 
