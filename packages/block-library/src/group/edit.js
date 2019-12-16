@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import tinycolor from 'tinycolor2';
 
 /**
  * WordPress dependencies
@@ -16,29 +17,19 @@ import {
 	withColors,
 } from '@wordpress/block-editor';
 
-function getTextContrast( hexcolor ) {
-	// If a leading # is provided, remove it
-	if ( hexcolor.slice( 0, 1 ) === '#' ) {
-		hexcolor = hexcolor.slice( 1 );
+function hasCustomBackgroundColor( backgroundColor ) {
+	return ! backgroundColor.name && ! backgroundColor.class;
+}
+
+function hasCustomTextColor( textColor ) {
+	return textColor && tinycolor( textColor.color ).getFormat() === 'hex';
+}
+
+function getTextColor( textColor, backgroundColor ) {
+	if ( ! hasCustomTextColor( textColor ) ) {
+		return tinycolor( backgroundColor.color ).isDark() ? 'white' : 'black';
 	}
-
-	// If a three-character hexcode, make six-character
-	if ( hexcolor.length === 3 ) {
-		hexcolor = hexcolor.split( '' ).map( function( hex ) {
-			return hex + hex;
-		} ).join( '' );
-	}
-
-	// Convert to RGB value
-	const r = parseInt( hexcolor.substr( 0, 2 ), 16 );
-	const g = parseInt( hexcolor.substr( 2, 2 ), 16 );
-	const b = parseInt( hexcolor.substr( 4, 2 ), 16 );
-
-	// Get YIQ ratio
-	const yiq = ( ( r * 299 ) + ( g * 587 ) + ( b * 114 ) ) / 1000;
-
-	// Check contrast
-	return ( yiq >= 128 ) ? 'black' : 'white';
+	return textColor ? textColor.color : null;
 }
 
 function GroupEdit( {
@@ -58,29 +49,24 @@ function GroupEdit( {
 		'has-background': !! backgroundColor.color,
 	} );
 
-	const backgroundColorSettings = {
+	const colorSettings = [ {
 		value: backgroundColor.color,
 		onChange: setBackgroundColor,
 		label: __( 'Background Color' ),
-	};
+	} ];
 
-	let colorSettings;
-
-	if ( ! backgroundColor.name && ! backgroundColor.class ) {
-		const textContrastColor = getTextContrast( backgroundColor.color );
+	if ( hasCustomBackgroundColor( backgroundColor ) ) {
+		const textContrastColor = getTextColor( textColor, backgroundColor );
 		setTextColor( textContrastColor );
-		colorSettings = [
-			{
-				value: textContrastColor,
-				onChange: setTextColor,
-				label: __( 'Text Color' ),
-				colors: null,
-			},
-			backgroundColorSettings,
-		];
+
+		colorSettings.push( {
+			value: textContrastColor,
+			onChange: setTextColor,
+			label: __( 'Text Color' ),
+			colors: null,
+		} );
 	} else {
 		setTextColor( null );
-		colorSettings = [ backgroundColorSettings ];
 	}
 
 	return (
