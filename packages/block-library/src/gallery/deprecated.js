@@ -26,60 +26,63 @@ const deprecated = [
 					url: {
 						source: 'attribute',
 						selector: 'img',
-						attribute: 'src'
+						attribute: 'src',
 					},
 					fullUrl: {
 						source: 'attribute',
 						selector: 'img',
-						attribute: 'data-full-url'
+						attribute: 'data-full-url',
 					},
 					link: {
 						source: 'attribute',
 						selector: 'img',
-						attribute: 'data-link'
+						attribute: 'data-link',
 					},
 					alt: {
 						source: 'attribute',
 						selector: 'img',
 						attribute: 'alt',
-						default: ''
+						default: '',
 					},
 					id: {
 						source: 'attribute',
 						selector: 'img',
-						attribute: 'data-id'
+						attribute: 'data-id',
 					},
 					caption: {
 						type: 'string',
 						source: 'html',
-						selector: '.blocks-gallery-item__caption'
-					}
-				}
+						selector: '.blocks-gallery-item__caption',
+					},
+				},
 			},
 			ids: {
-				type: 'array',				  
-				default: [ ]
+				type: 'array',
+				default: [ ],
 			},
 			columns: {
-				'type': 'number'
+				type: 'number',
 			},
 			caption: {
 				type: 'string',
 				source: 'html',
-				selector: '.blocks-gallery-caption'
+				selector: '.blocks-gallery-caption',
 			},
 			imageCrop: {
 				type: 'boolean',
-				default: true
+				default: true,
 			},
 			linkTo: {
 				type: 'string',
-				default: 'none'
-			}
+				default: 'none',
+			},
 		},
 		isEligible( { ids } ) {
 			return ids &&
-				ids.length > 0 ;
+				ids.length > 0 &&
+				ids.reduce( ( state, id ) => {
+					return state || ( typeof id === 'string' );
+				}, false );
 		},
 		migrate( attributes ) {
 			return {
@@ -88,10 +91,10 @@ const deprecated = [
 					if ( ! id ) {
 						return null;
 					}
-					if ( typeof( id ) === 'string' ) {
+					if ( typeof id === 'string' ) {
 						return parseInt( id, 10 );
 					}
-					if ( typeof( id ) === 'number' ) {
+					if ( typeof id === 'number' ) {
 						return id;
 					}
 
@@ -101,13 +104,13 @@ const deprecated = [
 		},
 		save( { attributes } ) {
 			const { images, columns = defaultColumnsNumber( attributes ), imageCrop, caption, linkTo } = attributes;
-		
+
 			return (
 				<figure className={ `columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` }>
 					<ul className="blocks-gallery-grid">
 						{ images.map( ( image ) => {
 							let href;
-		
+
 							switch ( linkTo ) {
 								case 'media':
 									href = image.fullUrl || image.url;
@@ -116,7 +119,7 @@ const deprecated = [
 									href = image.link;
 									break;
 							}
-		
+
 							const img = (
 								<img
 									src={ image.url }
@@ -127,7 +130,7 @@ const deprecated = [
 									className={ image.id ? `wp-image-${ image.id }` : null }
 								/>
 							);
-		
+
 							return (
 								<li key={ image.id || image.url } className="blocks-gallery-item">
 									<figure>
@@ -143,7 +146,7 @@ const deprecated = [
 					{ ! RichText.isEmpty( caption ) && <RichText.Content tagName="figcaption" className="blocks-gallery-caption" value={ caption } /> }
 				</figure>
 			);
-		}
+		},
 	},
 	{
 		attributes: {
@@ -201,7 +204,7 @@ const deprecated = [
 				type: 'string',
 				default: 'none',
 			},
-		},		
+		},
 		save( { attributes } ) {
 			const { images, columns = defaultColumnsNumber( attributes ), imageCrop, linkTo } = attributes;
 			return (
