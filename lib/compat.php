@@ -173,6 +173,63 @@ function gutenberg_override_reusable_block_post_type_labels() {
 add_filter( 'post_type_labels_wp_block', 'gutenberg_override_reusable_block_post_type_labels', 10, 0 );
 
 /**
+ * Registers the user meta property responsible for storing preferences for the
+ * data script persistence middleware. The meta is explicitly registered so that
+ * it is made accessible for read and write via the REST API.
+ */
+function gutenberg_register_data_persistence_user_meta() {
+	register_meta( 'user', 'wp_data_persistence', array(
+		'type'         => 'string',
+		'single'       => true,
+		'show_in_rest' => true,
+	) );
+}
+add_action( 'init', 'gutenberg_register_data_persistence_user_meta' );
+
+/**
+ * Enqueues inline scripts used to provide a custom storage interface for the
+ * data script persistence middleware. The custom storage implementation stores
+ * persisted values using user meta, bootstrapped for initial read at load-time,
+ * and updated via the REST API on change.
+ */
+function gutenberg_user_settings_data_persistence_inline_script() {
+	global $wp_scripts;
+
+	$persisted_value = get_user_meta( get_current_user_id(), 'wp_data_persistence', true );
+	if ( empty( $persisted_value ) ) {
+		$persisted_value = '{}';
+	}
+	$persisted_value = json_encode( $persisted_value );
+
+	$persistence_script = <<<JS
+( function() {
+	wp.data.use( wp.data.plugins.persistence, {
+		storage: {
+			getItem: function() {
+				return {$persisted_value};
+			},
+			setItem: function( key, value ) {
+				wp.apiFetch( {
+					path: '/wp/v2/users/me',
+					method: 'POST',
+					data: {
+						meta: {
+							wp_data_persistence: value,
+						}
+					}
+				} );
+			}
+		}
+	} );
+} )();
+JS;
+
+	$wp_scripts->registered['wp-data']->extra['after'] = array();
+	wp_add_inline_script( 'wp-data', $persistence_script );
+}
+add_action( 'enqueue_block_editor_assets', 'gutenberg_user_settings_data_persistence_inline_script', 20 );
+
+/**
  * Update allowed inline style attributes list.
  *
  * Note: This should be removed when the minimum required WP version is >= 5.8.
