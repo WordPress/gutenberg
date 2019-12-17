@@ -1,11 +1,11 @@
 /**
  * Returns an action object used to register a new keyboard shortcut.
  *
- * @param {string} name
- * @param {string} category
- * @param {Object} combination
- * @param {string} description
- * @param {Array}  aliases
+ * @param {string} name        Shortcut name.
+ * @param {string} category    Shortcut category.
+ * @param {string} description Shortcut description.
+ * @param {Object} combination Shortcut keys combination.
+ * @param {Array}  aliases     Shortcut aliases.
  */
 export function registerShortcut( name, category, description, combination, aliases ) {
 	return {
@@ -21,7 +21,7 @@ export function registerShortcut( name, category, description, combination, alia
 /**
  * Returns an action object used to register a new keyboard shortcut.
  *
- * @param {string} name
+ * @param {string} name Shortcut name.
  */
 export function unregisterShortcut( name ) {
 	return {
