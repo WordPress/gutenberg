@@ -14,6 +14,8 @@ import { __ } from '@wordpress/i18n';
 import {
 	Inserter,
 	BlockToolbar,
+	__experimentalPageTemplatePicker,
+	__experimentalUsePageTemplatePickerVisible,
 } from '@wordpress/block-editor';
 import { Toolbar, ToolbarButton } from '@wordpress/components';
 
@@ -37,51 +39,55 @@ function HeaderToolbar( {
 	const scrollToStart = () => {
 		scrollViewRef.current.scrollTo( { x: 0 } );
 	};
+	const showPageTemplatePicker = __experimentalUsePageTemplatePickerVisible();
 
 	return (
-		<View style={ getStylesFromColorScheme( styles.container, styles.containerDark ) }>
-			<ScrollView
-				ref={ scrollViewRef }
-				onContentSizeChange={ scrollToStart }
-				horizontal={ true }
-				showsHorizontalScrollIndicator={ false }
-				keyboardShouldPersistTaps="always"
-				alwaysBounceHorizontal={ false }
-				contentContainerStyle={ styles.scrollableContent }
-			>
-				<Toolbar accessible={ false }>
-					<Inserter disabled={ ! showInserter } />
-					{ /* TODO: replace with EditorHistoryRedo and EditorHistoryUndo */ }
-					<ToolbarButton
-						title={ __( 'Undo' ) }
-						icon="undo"
-						isDisabled={ ! hasUndo }
-						onClick={ undo }
-						extraProps={ { hint: __( 'Double tap to undo last change' ) } }
-					/>
-					<ToolbarButton
-						title={ __( 'Redo' ) }
-						icon="redo"
-						isDisabled={ ! hasRedo }
-						onClick={ redo }
-						extraProps={ { hint: __( 'Double tap to redo last change' ) } }
-					/>
-				</Toolbar>
-				{ hasFixedToolbar &&
-					<BlockToolbar />
+		<>
+		{ showPageTemplatePicker && <__experimentalPageTemplatePicker /> }
+			<View style={ getStylesFromColorScheme( styles.container, styles.containerDark ) }>
+				<ScrollView
+					ref={ scrollViewRef }
+					onContentSizeChange={ scrollToStart }
+					horizontal={ true }
+					showsHorizontalScrollIndicator={ false }
+					keyboardShouldPersistTaps="always"
+					alwaysBounceHorizontal={ false }
+					contentContainerStyle={ styles.scrollableContent }
+				>
+					<Toolbar accessible={ false }>
+						<Inserter disabled={ ! showInserter } />
+						{ /* TODO: replace with EditorHistoryRedo and EditorHistoryUndo */ }
+						<ToolbarButton
+							title={ __( 'Undo' ) }
+							icon="undo"
+							isDisabled={ ! hasUndo }
+							onClick={ undo }
+							extraProps={ { hint: __( 'Double tap to undo last change' ) } }
+						/>
+						<ToolbarButton
+							title={ __( 'Redo' ) }
+							icon="redo"
+							isDisabled={ ! hasRedo }
+							onClick={ redo }
+							extraProps={ { hint: __( 'Double tap to redo last change' ) } }
+						/>
+					</Toolbar>
+					{ hasFixedToolbar &&
+						<BlockToolbar />
+					}
+				</ScrollView>
+				{ showKeyboardHideButton &&
+					<Toolbar passedStyle={ styles.keyboardHideContainer }>
+						<ToolbarButton
+							title={ __( 'Hide keyboard' ) }
+							icon="keyboard-hide"
+							onClick={ onHideKeyboard }
+							extraProps={ { hint: __( 'Tap to hide the keyboard' ) } }
+						/>
+					</Toolbar>
 				}
-			</ScrollView>
-			{ showKeyboardHideButton &&
-				<Toolbar passedStyle={ styles.keyboardHideContainer }>
-					<ToolbarButton
-						title={ __( 'Hide keyboard' ) }
-						icon="keyboard-hide"
-						onClick={ onHideKeyboard }
-						extraProps={ { hint: __( 'Tap to hide the keyboard' ) } }
-					/>
-				</Toolbar>
-			}
-		</View>
+			</View>
+		</>
 	);
 }
 

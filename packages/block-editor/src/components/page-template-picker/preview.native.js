@@ -51,9 +51,7 @@ const BlockPreview = ( { blocks } ) => {
 			settings={ settings }
 		>
 			<View style={ style.container }>
-				<BlockList
-					isPreview={ true }
-				/>
+				<BlockList />
 			</View>
 		</BlockEditorProvider>
 	);

@@ -2,12 +2,12 @@
  * WordPress dependencies
  */
 import { parse } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import __experimentalBlockListFooter from '../block-list-footer';
 import Button from './button';
 import Container from './container';
 import getDefaultTemplates from './default-templates';
@@ -17,7 +17,7 @@ const __experimentalPageTemplatePicker = ( { templates = getDefaultTemplates(), 
 	const [ templatePreview, setTemplatePreview ] = useState();
 
 	return (
-		<__experimentalBlockListFooter>
+		<>
 			<Container style={ { flexDirection: 'row' } }>
 				{ templates.map( ( template ) => (
 					<Button
@@ -31,7 +31,7 @@ const __experimentalPageTemplatePicker = ( { templates = getDefaultTemplates(), 
 				template={ templatePreview }
 				onDismiss={ () => setTemplatePreview( undefined ) }
 			/>
-		</__experimentalBlockListFooter>
+		</>
 	);
 };
 
