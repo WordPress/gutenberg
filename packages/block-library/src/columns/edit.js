@@ -8,7 +8,6 @@ import { dropRight, get, map, times } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { compose } from '@wordpress/compose';
 import {
 	PanelBody,
 	RangeControl,
@@ -17,10 +16,9 @@ import {
 	InspectorControls,
 	InnerBlocks,
 	BlockControls,
-	__experimentalBlockPatternPicker,
 	BlockVerticalAlignmentToolbar,
-	PanelColorSettings,
-	withColors,
+	__experimentalBlockPatternPicker,
+	__experimentalUseColors,
 } from '@wordpress/block-editor';
 import {
 	withDispatch,
@@ -55,8 +53,6 @@ function ColumnsEditContainer( {
 	className,
 	updateAlignment,
 	updateColumns,
-	setBackgroundColor,
-	backgroundColor,
 	clientId,
 } ) {
 	const { verticalAlignment } = attributes;
@@ -67,24 +63,30 @@ function ColumnsEditContainer( {
 		};
 	}, [ clientId ] );
 
+	const {
+		BackgroundColor,
+		InspectorControlsColorPanel,
+	} = __experimentalUseColors(
+		[
+			{ name: 'backgroundColor', className: 'has-background' },
+		],
+		{
+			contrastCheckers: [ { backgroundColor: false } ],
+		}
+	);
+
 	const classes = classnames( className, {
-		'has-background': ( backgroundColor.class || backgroundColor.color ),
-		[ backgroundColor.class ]: backgroundColor.class,
 		[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 	} );
 
-	const styles = {
-		backgroundColor: backgroundColor.color,
-	};
-
-	const colorSettings = [ {
-		value: backgroundColor.color,
-		onChange: setBackgroundColor,
-		label: __( 'Background Color' ),
-	} ];
-
 	return (
 		<>
+			<BlockControls>
+				<BlockVerticalAlignmentToolbar
+					onChange={ updateAlignment }
+					value={ verticalAlignment }
+				/>
+			</BlockControls>
 			<InspectorControls>
 				<PanelBody>
 					<RangeControl
@@ -95,23 +97,15 @@ function ColumnsEditContainer( {
 						max={ 6 }
 					/>
 				</PanelBody>
-				<PanelColorSettings
-					title={ __( 'Color Settings' ) }
-					initialOpen={ false }
-					colorSettings={ colorSettings }
-				/>
 			</InspectorControls>
-			<BlockControls>
-				<BlockVerticalAlignmentToolbar
-					onChange={ updateAlignment }
-					value={ verticalAlignment }
-				/>
-			</BlockControls>
-			<div className={ classes } style={ styles }>
-				<InnerBlocks
-					templateLock="all"
-					allowedBlocks={ ALLOWED_BLOCKS } />
-			</div>
+			{ InspectorControlsColorPanel }
+			<BackgroundColor>
+				<div className={ classes }>
+					<InnerBlocks
+						templateLock="all"
+						allowedBlocks={ ALLOWED_BLOCKS } />
+				</div>
+			</BackgroundColor>
 		</>
 	);
 }
@@ -252,6 +246,4 @@ const ColumnsEdit = ( props ) => {
 		/> );
 };
 
-export default compose( [
-	withColors( 'backgroundColor' ),
-] )( ColumnsEdit );
+export default ColumnsEdit;

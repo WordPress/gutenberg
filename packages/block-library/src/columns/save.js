@@ -9,20 +9,26 @@ import classnames from 'classnames';
 import { InnerBlocks, getColorClassName } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
-	const { verticalAlignment, backgroundColor, customBackgroundColor } = attributes;
+	const {
+		verticalAlignment,
+		backgroundColor,
+		customBackgroundColor,
+	} = attributes;
 
 	const backgroundClass = getColorClassName( 'background-color', backgroundColor );
-	const wrapperClasses = classnames( {
-		'has-background': ( backgroundClass || customBackgroundColor ),
+
+	const className = classnames( {
+		'has-background': backgroundColor || customBackgroundColor,
 		[ backgroundClass ]: backgroundClass,
 		[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 	} );
+
 	const style = {
 		backgroundColor: backgroundClass ? undefined : customBackgroundColor,
 	};
 
 	return (
-		<div className={ wrapperClasses } style={ style }>
+		<div className={ className ? className : undefined } style={ style }>
 			<InnerBlocks.Content />
 		</div>
 	);

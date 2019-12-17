@@ -3055,6 +3055,42 @@ exports[`Storyshots Components|RangeControl Default 1`] = `
 </div>
 `;
 
+exports[`Storyshots Components|RangeControl Initial Value Zero 1`] = `
+<div
+  className="components-base-control components-range-control"
+>
+  <div
+    className="components-base-control__field"
+  >
+    <label
+      className="components-base-control__label"
+      htmlFor="inspector-range-control-2"
+    >
+      How many columns should this use?
+    </label>
+    <input
+      className="components-range-control__slider"
+      id="inspector-range-control-2"
+      max={20}
+      min={0}
+      onChange={[Function]}
+      type="range"
+      value={0}
+    />
+    <input
+      aria-label="How many columns should this use?"
+      className="components-range-control__number"
+      max={20}
+      min={0}
+      onBlur={[Function]}
+      onChange={[Function]}
+      type="number"
+      value={null}
+    />
+  </div>
+</div>
+`;
+
 exports[`Storyshots Components|RangeControl With Help 1`] = `
 <div
   className="components-base-control components-range-control"
