@@ -123,7 +123,7 @@ class PostTitle extends Component {
 							<Textarea
 								id={ `post-title-${ instanceId }` }
 								className="editor-post-title__input"
-								value={ unescape( title ) }
+								value={ title }
 								onChange={ this.onChange }
 								placeholder={ decodedPlaceholder || __( 'Add title' ) }
 								onFocus={ this.onSelect }
