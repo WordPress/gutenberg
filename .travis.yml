@@ -30,6 +30,7 @@ env:
     - INSTALL_COMPOSER: false
     - INSTALL_WORDPRESS: true
 
+# Make sure NodeGit gets the correct C libs.
 addons:
   apt:
     sources:
