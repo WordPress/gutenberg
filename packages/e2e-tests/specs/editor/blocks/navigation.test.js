@@ -97,8 +97,8 @@ describe( 'Navigation', () => {
 
 		// Create an empty nav block. The 'create' button is disabled until pages are loaded,
 		// so we must wait for it to become not-disabled.
-		await page.waitForXPath( '//button[text()="Create from all top pages"][not(@disabled)]' );
-		const [ createFromExistingButton ] = await page.$x( '//button[text()="Create from all top pages"][not(@disabled)]' );
+		await page.waitForXPath( '//button[text()="Create from all top-level pages"][not(@disabled)]' );
+		const [ createFromExistingButton ] = await page.$x( '//button[text()="Create from all top-level pages"][not(@disabled)]' );
 		await createFromExistingButton.click();
 
 		// Snapshot should contain the mocked pages.
