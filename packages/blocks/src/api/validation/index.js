@@ -600,10 +600,11 @@ export function isEquivalentHTML( actual, expected, logger = createLogger() ) {
  * @param {Object}        attributes           Parsed block attributes.
  * @param {string}        originalBlockContent Original block content.
  * @param {Object}        logger           	   Validation logger object.
+ * @param {string}        mode           	   Validation mode.
  *
  * @return {Object} Whether block is valid and contains validation messages.
  */
-export function getBlockContentValidationResult( blockTypeOrName, attributes, originalBlockContent, logger = createQueuedLogger() ) {
+export function getBlockContentValidationResult( blockTypeOrName, attributes, originalBlockContent, logger = createQueuedLogger(), mode = 'exact-match' ) {
 	const blockType = normalizeBlockType( blockTypeOrName );
 	let generatedBlockContent;
 	try {
@@ -613,6 +614,13 @@ export function getBlockContentValidationResult( blockTypeOrName, attributes, or
 
 		return {
 			isValid: false,
+			validationIssues: logger.getItems(),
+		};
+	}
+
+	if ( mode === 'permissive' ) {
+		return {
+			isValid: true,
 			validationIssues: logger.getItems(),
 		};
 	}
@@ -644,11 +652,11 @@ export function getBlockContentValidationResult( blockTypeOrName, attributes, or
  * @param {string|Object} blockTypeOrName      Block type.
  * @param {Object}        attributes           Parsed block attributes.
  * @param {string}        originalBlockContent Original block content.
- *
+ * @param {string}        mode                 Validation mode.
  * @return {boolean} Whether block is valid.
  */
-export function isValidBlockContent( blockTypeOrName, attributes, originalBlockContent ) {
-	const { isValid } = getBlockContentValidationResult( blockTypeOrName, attributes, originalBlockContent, createLogger() );
+export function isValidBlockContent( blockTypeOrName, attributes, originalBlockContent, mode = 'exact-match' ) {
+	const { isValid } = getBlockContentValidationResult( blockTypeOrName, attributes, originalBlockContent, createLogger(), mode );
 
 	return isValid;
 }

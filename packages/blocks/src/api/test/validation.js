@@ -24,6 +24,12 @@ import {
 	getBlockTypes,
 	getBlockType,
 } from '../registration';
+import {
+	getSaveContent,
+} from '../serializer';
+import {
+	normalizeBlockType,
+} from '../utils';
 
 describe( 'validation', () => {
 	const defaultBlockSettings = {
@@ -606,60 +612,102 @@ describe( 'validation', () => {
 	} );
 
 	describe( 'isValidBlockContent()', () => {
-		it( 'returns false if block is not valid', () => {
-			registerBlockType( 'core/test-block', defaultBlockSettings );
+		describe( 'permissive', () => {
+			it( 'returns true if block serializes but does not match original content', () => {
+				const blockName = 'core/test-block';
+				const blockAttributes = { fruit: 'Bananas' };
+				registerBlockType( blockName, defaultBlockSettings );
 
-			const isValid = isValidBlockContent(
-				'core/test-block',
-				{ fruit: 'Bananas' },
-				'Apples'
-			);
+				const isValid = isValidBlockContent(
+					blockName,
+					blockAttributes,
+					'Apples',
+					'permissive',
+				);
 
-			expect( console ).toHaveWarned();
-			expect( console ).toHaveErrored();
-			expect( isValid ).toBe( false );
-		} );
+				const blockType = normalizeBlockType( blockName );
 
-		it( 'returns false if error occurs while generating block save', () => {
-			registerBlockType( 'core/test-block', {
-				...defaultBlockSettings,
-				save() {
-					throw new Error();
-				},
+				expect( console ).not.toHaveWarned();
+				expect( console ).not.toHaveErrored();
+				expect( isValid ).toBe( true );
+				expect( getSaveContent( blockType, blockAttributes ) ).toBe( 'Bananas' );
 			} );
 
-			const isValid = isValidBlockContent(
-				'core/test-block',
-				{ fruit: 'Bananas' },
-				'Bananas'
-			);
+			it( 'returns false if error occurs while generating block save', () => {
+				registerBlockType( 'core/test-block', {
+					...defaultBlockSettings,
+					save() {
+						throw new Error();
+					},
+				} );
 
-			expect( console ).toHaveErrored();
-			expect( isValid ).toBe( false );
+				const isValid = isValidBlockContent(
+					'core/test-block',
+					{ fruit: 'Bananas' },
+					'Bananas',
+					'permissive',
+				);
+
+				expect( console ).toHaveErrored();
+				expect( isValid ).toBe( false );
+			} );
 		} );
+		describe( 'exact-match', () => {
+			it( 'returns false if block is not valid', () => {
+				registerBlockType( 'core/test-block', defaultBlockSettings );
 
-		it( 'returns true is block is valid', () => {
-			registerBlockType( 'core/test-block', defaultBlockSettings );
+				const isValid = isValidBlockContent(
+					'core/test-block',
+					{ fruit: 'Bananas' },
+					'Apples'
+				);
 
-			const isValid = isValidBlockContent(
-				'core/test-block',
-				{ fruit: 'Bananas' },
-				'Bananas'
-			);
+				expect( console ).toHaveWarned();
+				expect( console ).toHaveErrored();
+				expect( isValid ).toBe( false );
+			} );
 
-			expect( isValid ).toBe( true );
-		} );
+			it( 'returns false if error occurs while generating block save', () => {
+				registerBlockType( 'core/test-block', {
+					...defaultBlockSettings,
+					save() {
+						throw new Error();
+					},
+				} );
 
-		it( 'works also when block type object is passed as object', () => {
-			registerBlockType( 'core/test-block', defaultBlockSettings );
+				const isValid = isValidBlockContent(
+					'core/test-block',
+					{ fruit: 'Bananas' },
+					'Bananas'
+				);
 
-			const isValid = isValidBlockContent(
-				getBlockType( 'core/test-block' ),
-				{ fruit: 'Bananas' },
-				'Bananas'
-			);
+				expect( console ).toHaveErrored();
+				expect( isValid ).toBe( false );
+			} );
 
-			expect( isValid ).toBe( true );
+			it( 'returns true is block is valid', () => {
+				registerBlockType( 'core/test-block', defaultBlockSettings );
+
+				const isValid = isValidBlockContent(
+					'core/test-block',
+					{ fruit: 'Bananas' },
+					'Bananas'
+				);
+
+				expect( isValid ).toBe( true );
+			} );
+
+			it( 'works also when block type object is passed as object', () => {
+				registerBlockType( 'core/test-block', defaultBlockSettings );
+
+				const isValid = isValidBlockContent(
+					getBlockType( 'core/test-block' ),
+					{ fruit: 'Bananas' },
+					'Bananas'
+				);
+
+				expect( isValid ).toBe( true );
+			} );
 		} );
 	} );
 } );
