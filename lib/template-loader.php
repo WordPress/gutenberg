@@ -262,3 +262,21 @@ function gutenberg_viewport_meta_tag() {
 function gutenberg_strip_php_suffix( $template_file ) {
 	return preg_replace( '/\.php$/', '', $template_file );
 }
+
+/**
+ * Extends default editor settings to enable template and template part editing.
+ *
+ * @param array $settings Default editor settings.
+ *
+ * @return array Filtered editor settings.
+ */
+function gutenberg_template_loader_filter_block_editor_settings( $settings ) {
+	// Create template part auto-drafts for the edited post.
+	foreach ( parse_blocks( get_post()->post_content ) as $block ) {
+		create_auto_draft_for_template_part_block( $block );
+	}
+
+	// TODO: Set editing mode and current template ID for editing modes support.
+	return $settings;
+}
+add_filter( 'block_editor_settings', 'gutenberg_template_loader_filter_block_editor_settings' );
