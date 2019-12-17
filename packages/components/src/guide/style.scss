@@ -106,7 +106,7 @@
 		right: 0;
 
 		@include break-small() {
-			display: unset;
+			display: block;
 		}
 	}
 
