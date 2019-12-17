@@ -43,7 +43,7 @@ function HeaderToolbar( {
 
 	return (
 		<>
-		{ showPageTemplatePicker && <__experimentalPageTemplatePicker /> }
+			{ showPageTemplatePicker && <__experimentalPageTemplatePicker /> }
 			<View style={ getStylesFromColorScheme( styles.container, styles.containerDark ) }>
 				<ScrollView
 					ref={ scrollViewRef }

@@ -9,15 +9,14 @@ import { useEffect, useState } from '@wordpress/element';
 /**
  * External dependencies
  */
-import { Dimensions, View, ScrollView, StyleSheet, Text } from 'react-native';
-import Modal from 'react-native-modal';
+import { Dimensions, View, StyleSheet } from 'react-native';
 
 const useScreenDimensions = ( dimension = 'window' ) => {
 	const [ dimensions, setDimensions ] = useState( Dimensions.get( dimension ) );
 
 	useEffect( () => {
-		const onChange = result => {
-		setDimensions( result[ dimension ] );
+		const onChange = ( result ) => {
+			setDimensions( result[ dimension ] );
 		};
 
 		Dimensions.addEventListener( 'change', onChange );
@@ -36,7 +35,7 @@ const useScreenDimensions = ( dimension = 'window' ) => {
 // both implementations
 const BlockPreview = ( { blocks } ) => {
 	const currentSettings = useSelect( ( select ) => {
-		return select( 'core/block-editor' ).getSettings()
+		return select( 'core/block-editor' ).getSettings();
 	} );
 	const settings = {
 		...currentSettings,

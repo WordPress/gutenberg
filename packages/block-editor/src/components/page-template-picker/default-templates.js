@@ -13,7 +13,7 @@ const defaultTemplates = [
 	{ name: 'Contact', content: '<!-- wp:paragraph {"align":"left"} --><p class="has-text-align-left">Let\'s talk 👋 Don\'t hesitate to reach out with the contact information below, or send a message using the form.</p><!-- /wp:paragraph -->' },
 ];
 
-const parsedTemplates = memoize( () => defaultTemplates.map( template => ( {
+const parsedTemplates = memoize( () => defaultTemplates.map( ( template ) => ( {
 	...template,
 	blocks: parse( template.content ),
 } ) ) );
