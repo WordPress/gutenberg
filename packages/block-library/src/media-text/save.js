@@ -40,7 +40,27 @@ export default function save( { attributes } ) {
 	} = attributes;
 	const newRel = isEmpty( rel ) ? undefined : rel;
 
-	let image = <img
+	let image;
+	if ( href ) {
+		image = () => (
+			<a
+				className={ linkClass }
+				href={ href }
+				target={ linkTarget }
+				rel={ newRel }
+			>
+				{ image }
+			</a>
+		);
+	} else {
+		image = () => (
+			<img
+				src={ mediaUrl }
+				alt={ mediaAlt }
+				className={ ( mediaId && mediaType === 'image' ) ? `wp-image-${ mediaId }` : null }
+			/>
+		);
+	}
 		src={ mediaUrl }
 		alt={ mediaAlt }
 		className={ ( mediaId && mediaType === 'image' ) ? `wp-image-${ mediaId }` : null }
