@@ -31,7 +31,7 @@ function isAppleOS( _window = window ) {
  *
  * @param {string} name       Shortcut name.
  * @param {Function} callback Shortcut callback.
- * @param {Object} options    Shorcut options.
+ * @param {Object} options    Shortcut options.
  */
 function useShortcut( name, callback, {
 	bindGlobal = false,
@@ -41,15 +41,14 @@ function useShortcut( name, callback, {
 	const { combination, aliases } = useSelect( ( select ) => {
 		return {
 			combination: select( 'core/keyboard-shortcuts' ).getShortcutKeysCombination( name ),
-			aliases: select( 'core/keyboard-shortcuts' ).getShorcutAliases( name ),
+			aliases: select( 'core/keyboard-shortcuts' ).getShortcutAliases( name ),
 		};
 	}, [ name ] );
-	console.log( aliases );
 
 	useEffect( () => {
-		const shorcuts = compact( [ combination, ...aliases ] );
+		const shortcuts = compact( [ combination, ...aliases ] );
 		const mousetrap = new Mousetrap( target ? target.current : document );
-		const shortcutKeys = shorcuts.map( ( shortcut ) => {
+		const shortcutKeys = shortcuts.map( ( shortcut ) => {
 			return shortcut.modifier ?
 				rawShortcut[ shortcut.modifier ]( shortcut.character ) :
 				shortcut.character;

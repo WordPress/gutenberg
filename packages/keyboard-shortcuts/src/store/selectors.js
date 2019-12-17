@@ -26,7 +26,7 @@ export function getShortcutKeysCombination( state, name ) {
  *
  * @return {Array} Key combination.
  */
-export function getShorcutAliases( state, name ) {
+export function getShortcutAliases( state, name ) {
 	return state[ name ] && state[ name ].aliases ?
 		state[ name ].aliases :
 		EMPTY_ARRAY;

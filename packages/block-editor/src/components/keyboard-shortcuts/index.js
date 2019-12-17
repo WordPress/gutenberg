@@ -9,7 +9,7 @@ import { useRef, useEffect, useCallback } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 
-function KeyboardShorcuts() {
+function KeyboardShortcuts() {
 	const target = useRef( null );
 
 	// Registering the shortcuts
@@ -47,7 +47,7 @@ function KeyboardShorcuts() {
 			character: 'a',
 		} );
 
-		registerShortcut( 'core/block-editor/unSelect', 'selections', {
+		registerShortcut( 'core/block-editor/unselect', 'selections', {
 			character: 'escape',
 		} );
 	}, [ registerShortcut ] );
@@ -118,4 +118,4 @@ function KeyboardShorcuts() {
 	return <div ref={ target } />;
 }
 
-export default KeyboardShorcuts;
+export default KeyboardShortcuts;
