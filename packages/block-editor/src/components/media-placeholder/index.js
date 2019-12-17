@@ -122,27 +122,27 @@ export class MediaPlaceholder extends Component {
 		let setMedia;
 		if ( multiple ) {
 			if ( addToGallery ) {
-				let currentValue = value;
+				let mediaToReturn = value;
 				setMedia = ( newMedia ) => {
 					if ( dynamicAlteration ) {
-						const galleryValue = this.props.value || [];
-						// If currentValue contains things not in galleryValue, remove them.
-						currentValue = currentValue.filter( ( item ) => {
-							return galleryValue.some( ( propItem ) => propItem.id === item.id && propItem.url === item.url );
+						const currentMedia = this.props.value || [];
+						// If mediaToReturn contains things not in currentMedia, remove them.
+						mediaToReturn = mediaToReturn.filter( ( item ) => {
+							return currentMedia.some( ( currentItem ) => currentItem.id === item.id && currentItem.url === item.url );
 						} );
-						// If galleryValue has completed items not in currentValue, add them.
-						galleryValue.forEach( ( propItem ) => {
-							if ( propItem.id &&
-									// Item is not already in currentValue set.
-									! currentValue.some( ( item ) => item.id === propItem.id ) &&
+						// If currentMedia has completed items not in mediaToReturn, add them.
+						currentMedia.forEach( ( currentItem ) => {
+							if ( currentItem.id &&
+									// Item is not already in mediaToReturn set.
+									! mediaToReturn.some( ( item ) => item.id === currentItem.id ) &&
 									// Item is not a member of our upload group.
-									! newMedia.some( ( item ) => item.id === propItem.id )
+									! newMedia.some( ( item ) => item.id === currentItem.id )
 							) {
-								currentValue.push( propItem );
+								mediaToReturn.push( currentItem );
 							}
 						} );
 					}
-					onSelect( currentValue.concat( newMedia ) );
+					onSelect( mediaToReturn.concat( newMedia ) );
 				};
 			} else {
 				setMedia = onSelect;
