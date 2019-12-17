@@ -46,4 +46,8 @@
 		position: relative;
 		top: 4px;
 	}
+
+	@include break-small() {
+		width: 600px;
+	}
 }
