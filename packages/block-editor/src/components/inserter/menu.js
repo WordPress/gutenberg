@@ -3,17 +3,14 @@
  */
 import {
 	filter,
-	find,
 	findIndex,
 	flow,
 	groupBy,
 	isEmpty,
 	map,
-	some,
 	sortBy,
 	without,
 	includes,
-	deburr,
 } from 'lodash';
 import scrollIntoView from 'dom-scroll-into-view';
 import classnames from 'classnames';
@@ -34,7 +31,6 @@ import {
 	Tip,
 } from '@wordpress/components';
 import {
-	getCategories,
 	isReusableBlock,
 	createBlock,
 	isUnmodifiedDefaultBlock,
@@ -54,56 +50,11 @@ import BlockTypesList from '../block-types-list';
 import BlockCard from '../block-card';
 import ChildBlocks from './child-blocks';
 import __experimentalInserterMenuExtension from '../inserter-menu-extension';
+import { searchItems } from './search-items';
 
 const MAX_SUGGESTED_ITEMS = 9;
 
 const stopKeyPropagation = ( event ) => event.stopPropagation();
-
-/**
- * Filters an item list given a search term.
- *
- * @param {Array} items        Item list
- * @param {string} searchTerm  Search term.
- *
- * @return {Array}             Filtered item list.
- */
-export const searchItems = ( items, searchTerm ) => {
-	const normalizedSearchTerm = normalizeTerm( searchTerm );
-	const matchSearch = ( string ) => normalizeTerm( string ).indexOf( normalizedSearchTerm ) !== -1;
-	const categories = getCategories();
-
-	return items.filter( ( item ) => {
-		const itemCategory = find( categories, { slug: item.category } );
-		return matchSearch( item.title ) || some( item.keywords, matchSearch ) || ( itemCategory && matchSearch( itemCategory.title ) );
-	} );
-};
-
-/**
- * Converts the search term into a normalized term.
- *
- * @param {string} term The search term to normalize.
- *
- * @return {string} The normalized search term.
- */
-export const normalizeTerm = ( term ) => {
-	// Disregard diacritics.
-	//  Input: "média"
-	term = deburr( term );
-
-	// Accommodate leading slash, matching autocomplete expectations.
-	//  Input: "/media"
-	term = term.replace( /^\//, '' );
-
-	// Lowercase.
-	//  Input: "MEDIA"
-	term = term.toLowerCase();
-
-	// Strip leading and trailing whitespace.
-	//  Input: " media "
-	term = term.trim();
-
-	return term;
-};
 
 export class InserterMenu extends Component {
 	constructor() {
@@ -204,9 +155,9 @@ export class InserterMenu extends Component {
 	}
 
 	filter( filterValue = '' ) {
-		const { debouncedSpeak, items, rootChildBlocks } = this.props;
+		const { categories, debouncedSpeak, items, rootChildBlocks } = this.props;
 
-		const filteredItems = searchItems( items, filterValue );
+		const filteredItems = searchItems( items, categories, filterValue );
 
 		const childItems = filter( filteredItems, ( { name } ) => includes( rootChildBlocks, name ) );
 
@@ -219,7 +170,7 @@ export class InserterMenu extends Component {
 		const reusableItems = filter( filteredItems, { category: 'reusable' } );
 
 		const getCategoryIndex = ( item ) => {
-			return findIndex( getCategories(), ( category ) => category.slug === item.category );
+			return findIndex( categories, ( category ) => category.slug === item.category );
 		};
 		const itemsPerCategory = flow(
 			( itemList ) => filter( itemList, ( item ) => item.category !== 'reusable' ),
@@ -261,7 +212,7 @@ export class InserterMenu extends Component {
 	}
 
 	render() {
-		const { instanceId, onSelect, rootClientId, showInserterHelpPanel } = this.props;
+		const { categories, instanceId, onSelect, rootClientId, showInserterHelpPanel } = this.props;
 		const {
 			childItems,
 			hoveredItem,
@@ -330,7 +281,7 @@ export class InserterMenu extends Component {
 							</PanelBody>
 						}
 
-						{ map( getCategories(), ( category ) => {
+						{ map( categories, ( category ) => {
 							const categoryItems = itemsPerCategory[ category.slug ];
 							if ( ! categoryItems || ! categoryItems.length ) {
 								return null;
@@ -465,6 +416,7 @@ export default compose(
 			getSettings,
 		} = select( 'core/block-editor' );
 		const {
+			getCategories,
 			getChildBlockNames,
 		} = select( 'core/blocks' );
 
@@ -483,6 +435,7 @@ export default compose(
 		} = getSettings();
 
 		return {
+			categories: getCategories(),
 			rootChildBlocks: getChildBlockNames( destinationRootBlockName ),
 			items: getInserterItems( destinationRootClientId ),
 			showInserterHelpPanel: showInserterHelpPanel && showInserterHelpPanelSetting,
