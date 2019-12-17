@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { Platform, AccessibilityInfo, findNodeHandle, TextInput, Slider, View, PixelRatio, AppState } from 'react-native';
+import { Platform, AccessibilityInfo, findNodeHandle, TextInput, View, PixelRatio, AppState } from 'react-native';
+import Slider from '@react-native-community/slider';
 
 /**
  * WordPress dependencies
@@ -23,7 +24,6 @@ class BottomSheetRangeCell extends Component {
 		this.handleToggleFocus = this.handleToggleFocus.bind( this );
 		this.handleChange = this.handleChange.bind( this );
 		this.handleValueSave = this.handleValueSave.bind( this );
-		this.handleReset = this.handleReset.bind( this );
 		this.onChangeValue = this.onChangeValue.bind( this );
 		this.onCellPress = this.onCellPress.bind( this );
 		this.handleChangePixelRatio = this.handleChangePixelRatio.bind( this );
@@ -32,13 +32,6 @@ class BottomSheetRangeCell extends Component {
 		const fontScale = this.getFontScale();
 
 		this.state = { accessible: true, sliderValue: initialValue, initialValue, hasFocus: false, fontScale };
-	}
-
-	componentDidUpdate( ) {
-		const reset = this.props.value === null;
-		if ( reset ) {
-			this.handleReset();
-		}
 	}
 
 	componentDidMount() {
@@ -65,10 +58,6 @@ class BottomSheetRangeCell extends Component {
 			this.setState( { sliderValue: text } );
 			this.announceCurrentValue( text );
 		}
-	}
-
-	handleReset() {
-		this.handleValueSave( this.props.defaultValue || this.state.initialValue );
 	}
 
 	handleToggleFocus( validateInput = true ) {
@@ -139,7 +128,6 @@ class BottomSheetRangeCell extends Component {
 			maximumTrackTintColor = Platform.OS === 'ios' ? '#e9eff3' : '#909090',
 			thumbTintColor = Platform.OS === 'android' && '#00669b',
 			getStylesFromColorScheme,
-			allowReset = true,
 			...cellProps
 		} = this.props;
 
@@ -153,8 +141,6 @@ class BottomSheetRangeCell extends Component {
 		);
 
 		const defaultSliderStyle = getStylesFromColorScheme( styles.sliderTextInput, styles.sliderDarkTextInput );
-		const resetButtonText = Platform.OS === 'ios' ? __( 'Reset' ) : __( 'RESET' );
-		const resetButton = { title: resetButtonText, handler: this.handleReset };
 
 		return (
 			<Cell
@@ -162,11 +148,11 @@ class BottomSheetRangeCell extends Component {
 				cellContainerStyle={ styles.cellContainerStyles }
 				cellRowContainerStyle={ styles.cellRowStyles }
 				accessibilityRole={ 'none' }
+				value={ '' }
 				editable={ false }
 				accessible={ accessible }
 				onPress={ this.onCellPress }
 				accessibilityLabel={ accessibilityLabel }
-				customActionButton={ allowReset ? resetButton : undefined }
 				accessibilityHint={
 					/* translators: accessibility text (hint for focusing a slider) */
 					__( 'Double tap to change the value using slider' )

@@ -65,7 +65,7 @@ function ColumnsEditContainer( {
 		return {
 			count: select( 'core/block-editor' ).getBlockCount( clientId ),
 		};
-	} );
+	}, [ clientId ] );
 
 	const classes = classnames( className, {
 		'has-background': ( backgroundColor.class || backgroundColor.color ),

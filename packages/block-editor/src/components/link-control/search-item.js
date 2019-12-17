@@ -4,11 +4,6 @@
 import classnames from 'classnames';
 
 /**
- * Internal dependencies
- */
-import TextHighlight from './text-highlight';
-
-/**
  * WordPress dependencies
  */
 import { safeDecodeURI } from '@wordpress/url';
@@ -16,11 +11,13 @@ import { __ } from '@wordpress/i18n';
 import {
 	Button,
 	Icon,
+	TextHighlight,
 } from '@wordpress/components';
 
 export const LinkControlSearchItem = ( { itemProps, suggestion, isSelected = false, onClick, isURL = false, searchTerm = '' } ) => {
 	return (
 		<Button
+			type="submit"
 			{ ...itemProps }
 			onClick={ onClick }
 			className={ classnames( 'block-editor-link-control__search-item', {

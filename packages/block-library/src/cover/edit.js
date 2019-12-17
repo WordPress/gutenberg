@@ -359,7 +359,7 @@ function CoverEdit( {
 						) }
 						<PanelRow>
 							<Button
-								isDefault
+								isSecondary
 								isSmall
 								className="block-library-cover__reset-button"
 								onClick={ () => setAttributes( {
@@ -461,6 +461,7 @@ function CoverEdit( {
 							clearable={ false }
 						/>
 						<__experimentalGradientPicker
+							disableCustomGradients
 							onChange={
 								( newGradient ) => {
 									setGradient( newGradient );

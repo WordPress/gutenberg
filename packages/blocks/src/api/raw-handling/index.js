@@ -19,8 +19,10 @@ import {
 	getBlockContentSchema,
 } from './utils';
 
-export { getPhrasingContentSchema } from './phrasing-content';
+import { getPhrasingContentSchema } from './phrasing-content';
+
 export { pasteHandler } from './paste-handler';
+export { getPhrasingContentSchema };
 
 function getRawTransformations() {
 	return filter( getBlockTransforms( 'from' ), { type: 'raw' } )
@@ -96,7 +98,8 @@ export function rawHandler( { HTML = '' } ) {
 	// shortcodes.
 	const pieces = shortcodeConverter( HTML );
 	const rawTransforms = getRawTransformations();
-	const blockContentSchema = getBlockContentSchema( rawTransforms );
+	const phrasingContentSchema = getPhrasingContentSchema();
+	const blockContentSchema = getBlockContentSchema( rawTransforms, phrasingContentSchema );
 
 	return compact( flatMap( pieces, ( piece ) => {
 		// Already a block from shortcode.

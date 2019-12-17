@@ -2,11 +2,11 @@
 /**
  * External dependencies
  */
+const util = require( 'util' );
 const path = require( 'path' );
 const fs = require( 'fs' );
 const dockerCompose = require( 'docker-compose' );
 const NodeGit = require( 'nodegit' );
-const wait = require( 'util' ).promisify( setTimeout );
 
 /**
  * Internal dependencies
@@ -15,6 +15,12 @@ const createDockerComposeConfig = require( './create-docker-compose-config' );
 const detectContext = require( './detect-context' );
 const resolveDependencies = require( './resolve-dependencies' );
 
+/**
+ * Promisified dependencies
+ */
+const copyDir = util.promisify( require( 'copy-dir' ) );
+const wait = util.promisify( setTimeout );
+
 // Config Variables
 const cwd = process.cwd();
 const cwdName = path.basename( cwd );
@@ -22,6 +28,7 @@ const cwdTestsPath = fs.existsSync( './packages' ) ? '/packages' : '';
 const dockerComposeOptions = {
 	config: path.join( __dirname, 'docker-compose.yml' ),
 };
+const hasConfigFile = fs.existsSync( dockerComposeOptions.config );
 
 // WP CLI Utils
 const wpCliRun = ( command, isTests = false ) =>
@@ -97,6 +104,31 @@ module.exports = {
 			// Some commit refs need to be set as detached.
 			await repo.setHeadDetached( ref );
 		}
+
+		// Duplicate repo for the tests container.
+		let stashed = true; // Stash to avoid copying config changes.
+		try {
+			await NodeGit.Stash.save(
+				repo,
+				await NodeGit.Signature.default( repo ),
+				null,
+				NodeGit.Stash.FLAGS.INCLUDE_UNTRACKED
+			);
+		} catch ( err ) {
+			stashed = false;
+		}
+		await copyDir( repoPath, `../${ cwdName }-tests-wordpress/`, {
+			filter: ( stat, filepath ) =>
+				stat !== 'symbolicLink' &&
+				( stat !== 'directory' ||
+					( filepath !== `${ repoPath }.git` &&
+						! filepath.endsWith( 'node_modules' ) ) ),
+		} );
+		if ( stashed ) {
+			try {
+				await NodeGit.Stash.pop( repo, 0 );
+			} catch ( err ) {}
+		}
 		spinner.text = `Downloading WordPress@${ ref } 100/100%.`;
 
 		spinner.text = `Starting WordPress@${ ref }.`;
@@ -146,7 +178,8 @@ module.exports = {
 	async clean( { environment, spinner } ) {
 		const context = await detectContext();
 		const dependencies = await resolveDependencies();
-		const activateDependencies = () => Promise.all( dependencies.map( activateContext ) );
+		const activateDependencies = () =>
+			Promise.all( dependencies.map( activateContext ) );
 
 		const description = `${ environment } environment${
 			environment === 'all' ? 's' : ''
@@ -177,5 +210,40 @@ module.exports = {
 		// Remove dangling containers and finish.
 		await dockerCompose.rm( dockerComposeOptions );
 		spinner.text = `Cleaned ${ description }.`;
+	},
+
+	async run( { container, command, spinner } ) {
+		command = command.join( ' ' );
+		spinner.text = `Running \`${ command }\` in "${ container }".`;
+
+		// Generate config file if we don't have one.
+		if ( ! hasConfigFile ) {
+			fs.writeFileSync(
+				dockerComposeOptions.config,
+				createDockerComposeConfig(
+					cwdTestsPath,
+					await detectContext(),
+					await resolveDependencies()
+				)
+			);
+		}
+
+		const result = await dockerCompose.run(
+			container,
+			command,
+			dockerComposeOptions
+		);
+		if ( result.out ) {
+			// eslint-disable-next-line no-console
+			console.log( `\n\n${ result.out }\n\n` );
+		} else if ( result.err ) {
+			// eslint-disable-next-line no-console
+			console.error( `\n\n${ result.err }\n\n` );
+			throw result.err;
+		}
+
+		// Remove dangling containers and finish.
+		await dockerCompose.rm( dockerComposeOptions );
+		spinner.text = `Ran \`${ command }\` in "${ container }".`;
 	},
 };
