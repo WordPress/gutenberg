@@ -892,6 +892,14 @@ _Returns_
 
 -   `Object`: Action object.
 
+<a name="duplicateBlocks" href="#duplicateBlocks">#</a> **duplicateBlocks**
+
+Generator that triggers an action used to duplicate a list of blocks.
+
+_Parameters_
+
+-   _clientIds_ `Array<string>`: 
+
 <a name="enterFormattedText" href="#enterFormattedText">#</a> **enterFormattedText**
 
 Returns an action object used in signalling that the caret has entered formatted text.
@@ -915,6 +923,22 @@ Returns an action object hiding the insertion point.
 _Returns_
 
 -   `Object`: Action object.
+
+<a name="insertAfterBlock" href="#insertAfterBlock">#</a> **insertAfterBlock**
+
+Generator used to insert an empty block before a given blck
+
+_Parameters_
+
+-   _clientId_ `string`: 
+
+<a name="insertBeforeBlock" href="#insertBeforeBlock">#</a> **insertBeforeBlock**
+
+Generator used to insert an empty block after a given blck
+
+_Parameters_
+
+-   _clientId_ `string`: 
 
 <a name="insertBlock" href="#insertBlock">#</a> **insertBlock**
 

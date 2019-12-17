@@ -1356,6 +1356,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/keyboard-shortcuts",
+		"slug": "packages-keyboard-shortcuts",
+		"markdown_source": "../packages/keyboard-shortcuts/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/keycodes",
 		"slug": "packages-keycodes",
 		"markdown_source": "../packages/keycodes/README.md",
