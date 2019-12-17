@@ -33,6 +33,14 @@ const defaultRenderToggle = ( { onToggle, disabled, isOpen, blockTitle, hasSingl
 			icon="insert"
 			label={ label }
 			labelPosition="bottom"
+			display={ 'inline-flex' }
+			alignItems={ 'center' }
+			color={ 'dark-gray-500' }
+			background={ 'none' }
+			border={ 'none' }
+			outline={ 'none' }
+			padding={ 'medium' }
+			margin={ 0 }
 			onMouseDown={ ( event ) => {
 				event.preventDefault();
 				event.currentTarget.focus();
