@@ -759,6 +759,7 @@ export class RichText extends Component {
 					textAlign={ this.props.textAlign }
 					{ ...( this.isIOS ? { maxWidth } : {} ) }
 					minWidth={ minWidth }
+					id={ this.props.id }
 				/>
 				{ isSelected && <FormatEdit value={ record } onChange={ this.onFormatChange } /> }
 			</View>

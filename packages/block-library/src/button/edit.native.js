@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, InteractionManager } from 'react-native';
+import { View, InteractionManager, AccessibilityInfo } from 'react-native';
 /**
  * WordPress dependencies
  */
@@ -14,7 +14,6 @@ import {
 	RichText,
 	withColors,
 	InspectorControls,
-	__experimentalUseGradient,
 } from '@wordpress/block-editor';
 import {
 	TextControl,
@@ -25,11 +24,9 @@ import {
 	NotificationSheet,
 } from '@wordpress/components';
 import {
-	useCallback,
-	useState,
-	useEffect,
+	Component,
 } from '@wordpress/element';
-import { withDispatch } from '@wordpress/data';
+import { withDispatch, withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -43,30 +40,42 @@ const MIN_BORDER_RADIUS_VALUE = 0;
 const MAX_BORDER_RADIUS_VALUE = 50;
 const INITIAL_MAX_WIDTH = 108;
 
-function ButtonEdit( { attributes, setAttributes, backgroundColor, textColor, isSelected, closeGeneralSidebar } ) {
-	const {
-		placeholder,
-		text,
-		borderRadius,
-		url,
-		linkTarget,
-		rel,
-	} = attributes;
+class ButtonEdit extends Component {
+	constructor( props ) {
+		super( props );
+		this.toggleShowNoticationSheet = this.toggleShowNoticationSheet.bind( this );
+		this.onLayout = this.onLayout.bind( this );
+		this.setRichTextFocus = this.setRichTextFocus.bind( this );
 
-	useEffect( () => {
-		if ( this.richTextRef && isSelected ) {
-			return this.richTextRef.focus();
-		} return this.richTextRef.blur();
-	} );
+		this.state = {
+			isFocused: false,
+			showHelp: false,
+			maxWidth: INITIAL_MAX_WIDTH,
+		};
+	}
 
-	const [ isFocused, setRichTextFocus ] = useState( true );
-	const [ showHelp, setShowHelp ] = useState( false );
-	const [ maxWidth, setMaxWidth ] = useState( INITIAL_MAX_WIDTH );
+	componentDidUpdate( prevProps ) {
+		const { selectedId } = this.props;
+		const { isFocused } = this.state;
 
-	const borderRadiusValue = borderRadius !== undefined ? borderRadius : styles.button.borderRadius;
-	const outlineBorderRadius = borderRadiusValue > 0 ? borderRadiusValue + styles.button.paddingTop + styles.button.borderWidth : 0;
+		if ( this.richTextRef ) {
+			const selectedRichText = this.richTextRef.props.id === selectedId;
 
-	const onChangeBackgroundColor = () => {
+			if ( selectedRichText && selectedId !== prevProps.selectedId && ! isFocused ) {
+				AccessibilityInfo.isScreenReaderEnabled().then(
+					( enabled ) => {
+						if ( enabled ) {
+							this.setRichTextFocus( true );
+							return this.richTextRef.focus();
+						}
+					}
+				);
+			}
+		}
+	}
+
+	onChangeBackgroundColor = () => {
+		const { backgroundColor, attributes } = this.props;
 		if ( backgroundColor.color ) {
 			// `backgroundColor` which should be set when we are able to resolve it
 			return backgroundColor.color;
@@ -78,146 +87,163 @@ function ButtonEdit( { attributes, setAttributes, backgroundColor, textColor, is
 		} return styles.button.backgroundColor;
 	};
 
-	const onToggleOpenInNewTab = useCallback(
-		( value ) => {
-			const newLinkTarget = value ? '_blank' : undefined;
-
-			let updatedRel = rel;
-			if ( newLinkTarget && ! rel ) {
-				updatedRel = NEW_TAB_REL;
-			} else if ( ! newLinkTarget && rel === NEW_TAB_REL ) {
-				updatedRel = undefined;
-			}
-
-			setAttributes( {
-				linkTarget: newLinkTarget,
-				rel: updatedRel,
-			} );
-		},
-		[ rel, setAttributes ]
-	);
-
-	const setBorderRadius = ( value ) => {
+	setBorderRadius = ( value ) => {
+		const { setAttributes } = this.props;
 		setAttributes( {
 			borderRadius: value,
 		} );
 	};
 
-	const toggleShowNoticationSheet = () => {
-		setShowHelp( ! showHelp );
+	toggleShowNoticationSheet = () => {
+		this.setState( { showHelp: ! this.state.showHelp } );
 	};
 
-	const openNotificationSheet = () => {
+	openNotificationSheet = () => {
+		const { closeGeneralSidebar } = this.props;
 		closeGeneralSidebar();
 		InteractionManager.runAfterInteractions( () => {
-			toggleShowNoticationSheet();
+			this.toggleShowNoticationSheet();
 		} );
 	};
 
-	const onLayout = ( { nativeEvent } ) => {
+	onLayout = ( { nativeEvent } ) => {
 		const { width } = nativeEvent.layout;
 		const { marginRight, paddingRight, borderWidth } = styles.button;
 		const buttonSpacing = 2 * ( marginRight + paddingRight + borderWidth );
-		setMaxWidth( width - buttonSpacing );
+		this.setState( { maxWidth: width - buttonSpacing } );
 	};
 
-	const {
-		gradientValue,
-	} = __experimentalUseGradient();
+	setRichTextFocus = ( value ) => {
+		this.setState( { isFocused: value } );
+	}
 
-	// To achieve proper expanding and shrinking `RichText` on iOS, there is a need to set a `minWidth`
-	// value at least on 1 when `RichText` is focused or when is not focused, but `RichText` value is
-	// different than empty string.
-	const minWidth = isFocused || ( ! isFocused && text && text !== '' ) ? 1 : styles.button.minWidth;
-	// To achieve proper expanding and shrinking `RichText` on Android, there is a need to set
-	// a `placeholder` as an empty string when `RichText` is focused,
-	// because `AztecView` is calculating a `minWidth` based on placeholder text.
-	const placeholderText = isFocused ? '' : ( placeholder || __( 'Add text…' ) );
+	onToggleOpenInNewTab = ( value ) => {
+		const { setAttributes, attributes } = this.props;
+		const { rel } = attributes;
 
-	return (
-		<View
-			style={ { flex: 1 } }
-			onLayout={ onLayout }
-		>
+		const newLinkTarget = value ? '_blank' : undefined;
+
+		let updatedRel = rel;
+		if ( newLinkTarget && ! rel ) {
+			updatedRel = NEW_TAB_REL;
+		} else if ( ! newLinkTarget && rel === NEW_TAB_REL ) {
+			updatedRel = undefined;
+		}
+
+		setAttributes( {
+			linkTarget: newLinkTarget,
+			rel: updatedRel,
+		} );
+	}
+
+	render() {
+		const { attributes, setAttributes, textColor, isSelected, clientId } = this.props;
+		const {
+			placeholder,
+			text,
+			borderRadius,
+			url,
+			linkTarget,
+		} = attributes;
+		const { isFocused, maxWidth, showHelp } = this.state;
+
+		const borderRadiusValue = borderRadius !== undefined ? borderRadius : styles.button.borderRadius;
+		const outlineBorderRadius = borderRadiusValue > 0 ? borderRadiusValue + styles.button.paddingTop + styles.button.borderWidth : 0;
+
+		// To achieve proper expanding and shrinking `RichText` on iOS, there is a need to set a `minWidth`
+		// value at least on 1 when `RichText` is focused or when is not focused, but `RichText` value is
+		// different than empty string.
+		const minWidth = isFocused || ( ! isFocused && text && text !== '' ) ? 1 : styles.button.minWidth;
+		// To achieve proper expanding and shrinking `RichText` on Android, there is a need to set
+		// a `placeholder` as an empty string when `RichText` is focused,
+		// because `AztecView` is calculating a `minWidth` based on placeholder text.
+		const placeholderText = isFocused ? '' : ( placeholder || __( 'Add text…' ) );
+
+		return (
 			<View
-				style={ [
-					styles.container,
-					isSelected && {
-						borderColor: onChangeBackgroundColor(),
-						borderRadius: outlineBorderRadius,
-						borderWidth: styles.button.borderWidth,
-					},
-				] }
+				style={ { flex: 1 } }
+				onLayout={ this.onLayout }
 			>
-				<RichTextWrapper
-					gradientValue={ gradientValue }
-					borderRadiusValue={ borderRadiusValue }
-					backgroundColor={ onChangeBackgroundColor() }
+				<View
+					style={ [
+						styles.container,
+						isSelected && {
+							borderColor: this.onChangeBackgroundColor(),
+							borderRadius: outlineBorderRadius,
+							borderWidth: styles.button.borderWidth,
+						},
+					] }
 				>
-					<RichText
-						setRef={ ( richText ) => {
-							this.richTextRef = richText;
-						} }
-						placeholder={ placeholderText }
-						value={ text }
-						onChange={ ( value ) => setAttributes( { text: value } ) }
-						style={ {
-							...richTextStyle.richText,
-							color: textColor.color || '#fff',
-						} }
-						textAlign="center"
-						placeholderTextColor={ 'lightgray' }
-						identifier="content"
-						tagName="p"
-						minWidth={ minWidth }
-						maxWidth={ maxWidth }
-						unstableOnFocus={ () => setRichTextFocus( true ) }
-						onBlur={ () => setRichTextFocus( false ) }
-					/>
-				</RichTextWrapper>
+					<RichTextWrapper
+						borderRadiusValue={ borderRadiusValue }
+						backgroundColor={ this.onChangeBackgroundColor() }
+					>
+						<RichText
+							setRef={ ( richText ) => {
+								this.richTextRef = richText;
+							} }
+							placeholder={ placeholderText }
+							value={ text }
+							onChange={ ( value ) => setAttributes( { text: value } ) }
+							style={ {
+								...richTextStyle.richText,
+								color: textColor.color || '#fff',
+							} }
+							textAlign="center"
+							placeholderTextColor={ 'lightgray' }
+							identifier="content"
+							tagName="p"
+							minWidth={ minWidth }
+							maxWidth={ maxWidth }
+							id={ clientId }
+							unstableOnFocus={ () => this.setRichTextFocus( true ) }
+							onBlur={ () => this.setRichTextFocus( false ) }
+						/>
+					</RichTextWrapper>
 
-				<InspectorControls>
-					<PanelBody title={ __( 'Border Settings' ) } >
-						<RangeControl
-							label={ __( 'Border Radius' ) }
-							minimumValue={ MIN_BORDER_RADIUS_VALUE }
-							maximumValue={ MAX_BORDER_RADIUS_VALUE }
-							value={ borderRadiusValue }
-							onChange={ setBorderRadius }
-							separatorType="none"
-						/>
-					</PanelBody>
-					<PanelBody title={ __( 'Link Settings' ) } >
-						<ToggleControl
-							label={ __( 'Open in new tab' ) }
-							checked={ linkTarget === '_blank' }
-							onChange={ onToggleOpenInNewTab }
-							separatorType="fullWidth"
-						/>
-						<TextControl
-							label={ __( 'Link Rel' ) }
-							value={ url || '' }
-							valuePlaceholder={ __( 'None' ) }
-							onChange={ ( value ) => setAttributes( { url: value } ) }
-							autoCapitalize="none"
-							autoCorrect={ false }
-							separatorType="none"
-							keyboardType="url"
-						/>
-					</PanelBody>
-					<PanelBody title={ __( 'Color Settings' ) } >
-						<MissingControl
-							label={ __( 'Coming Soon' ) }
-							onChange={ openNotificationSheet }
-							separatorType="none"
-						/>
-					</PanelBody>
-				</InspectorControls>
+					<InspectorControls>
+						<PanelBody title={ __( 'Border Settings' ) } >
+							<RangeControl
+								label={ __( 'Border Radius' ) }
+								minimumValue={ MIN_BORDER_RADIUS_VALUE }
+								maximumValue={ MAX_BORDER_RADIUS_VALUE }
+								value={ borderRadiusValue }
+								onChange={ this.setBorderRadius }
+								separatorType="none"
+							/>
+						</PanelBody>
+						<PanelBody title={ __( 'Link Settings' ) } >
+							<ToggleControl
+								label={ __( 'Open in new tab' ) }
+								checked={ linkTarget === '_blank' }
+								onChange={ this.onToggleOpenInNewTab }
+								separatorType="fullWidth"
+							/>
+							<TextControl
+								label={ __( 'Link Rel' ) }
+								value={ url || '' }
+								valuePlaceholder={ __( 'None' ) }
+								onChange={ ( value ) => setAttributes( { url: value } ) }
+								autoCapitalize="none"
+								autoCorrect={ false }
+								separatorType="none"
+								keyboardType="url"
+							/>
+						</PanelBody>
+						<PanelBody title={ __( 'Color Settings' ) } >
+							<MissingControl
+								label={ __( 'Coming Soon' ) }
+								onChange={ this.openNotificationSheet }
+								separatorType="none"
+							/>
+						</PanelBody>
+					</InspectorControls>
 
-				<NotificationSheet title="Color Settings" isVisible={ showHelp } onClose={ toggleShowNoticationSheet } type="plural" withMessage={ false } withQuotes={ false } />
+					<NotificationSheet title="Color Settings" isVisible={ showHelp } onClose={ this.toggleShowNoticationSheet } type="plural" withMessage={ false } withQuotes={ false } />
+				</View>
 			</View>
-		</View>
-	);
+		);
+	}
 }
 
 export default compose( [
@@ -228,6 +254,15 @@ export default compose( [
 
 		return {
 			closeGeneralSidebar,
+		};
+	} ),
+	withSelect( ( select ) => {
+		const { getSelectedBlockClientId } = select( 'core/block-editor' );
+
+		const selectedId = getSelectedBlockClientId();
+
+		return {
+			selectedId,
 		};
 	} ),
 ] )( ButtonEdit );

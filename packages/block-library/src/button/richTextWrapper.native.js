@@ -4,11 +4,17 @@
 import { View } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 /**
+ * WordPress dependencies
+ */
+import {
+	__experimentalUseGradient,
+} from '@wordpress/block-editor';
+/**
  * Internal dependencies
  */
 import styles from './editor.scss';
 
-function RichTextWrapper( { children, gradientValue, borderRadiusValue, backgroundColor } ) {
+function RichTextWrapper( { children, borderRadiusValue, backgroundColor } ) {
 	const wrapperStyles = [
 		styles.richTextWrapper,
 		{
@@ -16,6 +22,8 @@ function RichTextWrapper( { children, gradientValue, borderRadiusValue, backgrou
 			backgroundColor,
 		},
 	];
+
+	const { gradientValue } = __experimentalUseGradient();
 
 	function transformGradient() {
 		const matchColorGroup = /(rgba|rgb|#)(.+?)[\%]/g;
