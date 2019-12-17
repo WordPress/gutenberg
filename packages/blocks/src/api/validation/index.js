@@ -407,8 +407,13 @@ export function isEqualTagAttributePairs( actual, expected, logger = createLogge
 		return false;
 	}
 
-	// Convert tuples to object for ease of lookup
-	const [ actualAttributes, expectedAttributes ] = [ actual, expected ].map( fromPairs );
+	// Lower case attribute name and convert tuples to object for ease of lookup
+	const [ actualAttributes, expectedAttributes ] = [ actual, expected ]
+		.map( ( attributes ) => attributes.map( ( attribute ) => {
+			attribute[ 0 ] = attribute[ 0 ].toLowerCase();
+			return attribute;
+		} ) )
+		.map( fromPairs );
 
 	for ( const name in actualAttributes ) {
 		// As noted above, if missing member in B, assume different
@@ -444,7 +449,7 @@ export function isEqualTagAttributePairs( actual, expected, logger = createLogge
  */
 export const isEqualTokensOfType = {
 	StartTag: ( actual, expected, logger = createLogger() ) => {
-		if ( actual.tagName !== expected.tagName ) {
+		if ( actual.tagName.toLowerCase() !== expected.tagName.toLowerCase() ) {
 			logger.warning( 'Expected tag name `%s`, instead saw `%s`.', expected.tagName, actual.tagName );
 			return false;
 		}
