@@ -23,14 +23,14 @@ const interactiveContentTags = new Set( [
 	'video',
 ] );
 
-export default ( {
+export default function FormatEdit( {
 	formatTypes,
 	onChange,
 	value,
 	allowedFormats,
 	withoutInteractiveFormatting,
-} ) =>
-	formatTypes.map( ( {
+} ) {
+	return formatTypes.map( ( {
 		name,
 		edit: Edit,
 		tagName,
@@ -71,3 +71,4 @@ export default ( {
 			/>
 		);
 	} );
+}

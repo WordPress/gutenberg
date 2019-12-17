@@ -13,8 +13,16 @@ function formatTypesSelector( select ) {
 	return select( 'core/rich-text' ).getFormatTypes();
 }
 
+/**
+ * This higher-order component provides RichText with the `formatTypes` prop
+ * and its derived props from experimental format type settings.
+ *
+ * @param {WPComponent} RichText The rich text component to add props for.
+ *
+ * @return {WPComponent} New enhanced component.
+ */
 export default function withFormatTypes( RichText ) {
-	return ( props ) => {
+	return function WithFormatTypes( props ) {
 		const { clientId, identifier } = props;
 		const formatTypes = useSelect( formatTypesSelector, [] );
 		const selectProps = useSelect( ( select ) => {
