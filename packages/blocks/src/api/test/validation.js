@@ -612,7 +612,7 @@ describe( 'validation', () => {
 	} );
 
 	describe( 'isValidBlockContent()', () => {
-		describe( 'permissive', () => {
+		describe( 'no-save-error', () => {
 			it( 'returns true if block serializes but does not match original content', () => {
 				const blockName = 'core/test-block';
 				const blockAttributes = { fruit: 'Bananas' };
@@ -622,7 +622,7 @@ describe( 'validation', () => {
 					blockName,
 					blockAttributes,
 					'Apples',
-					'permissive',
+					'no-save-error',
 				);
 
 				const blockType = normalizeBlockType( blockName );
@@ -645,14 +645,14 @@ describe( 'validation', () => {
 					'core/test-block',
 					{ fruit: 'Bananas' },
 					'Bananas',
-					'permissive',
+					'no-save-error',
 				);
 
 				expect( console ).toHaveErrored();
 				expect( isValid ).toBe( false );
 			} );
 		} );
-		describe( 'exact-match', () => {
+		describe( 'strict', () => {
 			it( 'returns false if block is not valid', () => {
 				registerBlockType( 'core/test-block', defaultBlockSettings );
 

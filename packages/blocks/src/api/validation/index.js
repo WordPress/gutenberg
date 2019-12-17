@@ -604,7 +604,7 @@ export function isEquivalentHTML( actual, expected, logger = createLogger() ) {
  *
  * @return {Object} Whether block is valid and contains validation messages.
  */
-export function getBlockContentValidationResult( blockTypeOrName, attributes, originalBlockContent, logger = createQueuedLogger(), mode = 'exact-match' ) {
+export function getBlockContentValidationResult( blockTypeOrName, attributes, originalBlockContent, logger = createQueuedLogger(), mode = 'strict' ) {
 	const blockType = normalizeBlockType( blockTypeOrName );
 	let generatedBlockContent;
 	try {
@@ -618,7 +618,7 @@ export function getBlockContentValidationResult( blockTypeOrName, attributes, or
 		};
 	}
 
-	if ( mode === 'permissive' ) {
+	if ( mode === 'no-save-error' ) {
 		return {
 			isValid: true,
 			validationIssues: logger.getItems(),
@@ -655,7 +655,7 @@ export function getBlockContentValidationResult( blockTypeOrName, attributes, or
  * @param {string}        mode                 Validation mode.
  * @return {boolean} Whether block is valid.
  */
-export function isValidBlockContent( blockTypeOrName, attributes, originalBlockContent, mode = 'exact-match' ) {
+export function isValidBlockContent( blockTypeOrName, attributes, originalBlockContent, mode = 'strict' ) {
 	const { isValid } = getBlockContentValidationResult( blockTypeOrName, attributes, originalBlockContent, createLogger(), mode );
 
 	return isValid;
