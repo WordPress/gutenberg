@@ -48,11 +48,9 @@ class ButtonEdit extends Component {
 		this.openNotificationSheet = this.openNotificationSheet.bind( this );
 		this.toggleShowNoticationSheet = this.toggleShowNoticationSheet.bind( this );
 		this.onLayout = this.onLayout.bind( this );
-		this.setRichTextFocus = this.setRichTextFocus.bind( this );
 		this.onToggleOpenInNewTab = this.onToggleOpenInNewTab.bind( this );
 
 		this.state = {
-			isFocused: false,
 			showHelp: false,
 			maxWidth: INITIAL_MAX_WIDTH,
 		};
@@ -60,17 +58,16 @@ class ButtonEdit extends Component {
 
 	componentDidUpdate( prevProps ) {
 		const { selectedId } = this.props;
-		const { isFocused } = this.state;
 
 		if ( this.richTextRef ) {
 			const selectedRichText = this.richTextRef.props.id === selectedId;
+			const isFocused = this.richTextRef.isFocused();
 
 			if ( selectedRichText && selectedId !== prevProps.selectedId && ! isFocused ) {
 				AccessibilityInfo.isScreenReaderEnabled().then(
 					( enabled ) => {
 						if ( enabled ) {
-							this.setRichTextFocus( true );
-							return this.richTextRef.focus();
+							this.richTextRef.focus();
 						}
 					}
 				);
@@ -117,10 +114,6 @@ class ButtonEdit extends Component {
 		this.setState( { maxWidth: width - buttonSpacing } );
 	}
 
-	setRichTextFocus( value ) {
-		this.setState( { isFocused: value } );
-	}
-
 	onToggleOpenInNewTab( value ) {
 		const { setAttributes, attributes } = this.props;
 		const { rel } = attributes;
@@ -149,7 +142,9 @@ class ButtonEdit extends Component {
 			url,
 			linkTarget,
 		} = attributes;
-		const { isFocused, maxWidth, showHelp } = this.state;
+		const { maxWidth, showHelp } = this.state;
+
+		const isFocused = this.richTextRef && this.richTextRef.isFocused();
 
 		const borderRadiusValue = borderRadius !== undefined ? borderRadius : styles.button.borderRadius;
 		const outlineBorderRadius = borderRadiusValue > 0 ? borderRadiusValue + styles.button.paddingTop + styles.button.borderWidth : 0;
@@ -200,8 +195,6 @@ class ButtonEdit extends Component {
 							minWidth={ minWidth }
 							maxWidth={ maxWidth }
 							id={ clientId }
-							unstableOnFocus={ () => this.setRichTextFocus( true ) }
-							onBlur={ () => this.setRichTextFocus( false ) }
 						/>
 					</RichTextWrapper>
 
