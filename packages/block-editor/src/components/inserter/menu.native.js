@@ -21,6 +21,7 @@ export class InserterMenu extends Component {
 	constructor() {
 		super( ...arguments );
 
+		this.onClose = this.onClose.bind( this );
 		this.onLayout = this.onLayout.bind( this );
 		this.state = {
 			numberOfColumns: this.calculateNumberOfColumns(),
@@ -28,11 +29,11 @@ export class InserterMenu extends Component {
 	}
 
 	componentDidMount() {
-		this.onOpen();
+		this.props.showInsertionPoint();
 	}
 
 	componentWillUnmount() {
-		this.onClose();
+		this.props.hideInsertionPoint();
 	}
 
 	calculateNumberOfColumns() {
@@ -45,12 +46,13 @@ export class InserterMenu extends Component {
 		return Math.floor( containerTotalWidth / itemTotalWidth );
 	}
 
-	onOpen() {
-		this.props.showInsertionPoint();
-	}
-
 	onClose() {
-		this.props.hideInsertionPoint();
+		// if should replace but didn't insert any block
+		// re-insert default block
+		if ( this.props.shouldReplaceBlock ) {
+			this.props.insertDefaultBlock();
+		}
+		this.props.onDismiss();
 	}
 
 	onLayout() {
@@ -68,7 +70,7 @@ export class InserterMenu extends Component {
 		return (
 			<BottomSheet
 				isVisible={ true }
-				onClose={ this.props.onDismiss }
+				onClose={ this.onClose }
 				contentStyle={ [ styles.content, bottomPadding ] }
 				hideHeader
 			>
@@ -137,40 +139,45 @@ export default compose(
 		const {
 			showInsertionPoint,
 			hideInsertionPoint,
+			removeBlock,
+			insertBlock,
+			insertDefaultBlock,
 		} = dispatch( 'core/block-editor' );
 
 		return {
 			showInsertionPoint() {
+				if ( ownProps.shouldReplaceBlock ) {
+					const {
+						getSelectedBlock,
+					} = select( 'core/block-editor' );
+					const selectedBlock = getSelectedBlock();
+					removeBlock( selectedBlock.clientId, false );
+				}
 				showInsertionPoint(
 					ownProps.destinationRootClientId,
 					ownProps.insertionIndex,
-					ownProps.shouldReplaceBlock
 				);
 			},
 			hideInsertionPoint,
 			onSelect( item ) {
-				const {
-					replaceBlocks,
-					insertBlock,
-				} = dispatch( 'core/block-editor' );
-				const {
-					getSelectedBlock,
-				} = select( 'core/block-editor' );
 				const { name, initialAttributes } = item;
-				const selectedBlock = getSelectedBlock();
+
 				const insertedBlock = createBlock( name, initialAttributes );
 
-				if ( ownProps.shouldReplaceBlock ) {
-					replaceBlocks( selectedBlock.clientId, insertedBlock );
-				} else {
-					insertBlock(
-						insertedBlock,
-						ownProps.insertionIndex,
-						ownProps.destinationRootClientId
-					);
-				}
+				insertBlock(
+					insertedBlock,
+					ownProps.insertionIndex,
+					ownProps.destinationRootClientId
+				);
 
 				ownProps.onSelect();
+			},
+			insertDefaultBlock() {
+				insertDefaultBlock(
+					{},
+					ownProps.destinationRootClientId,
+					ownProps.insertionIndex,
+				);
 			},
 		};
 	} ),
