@@ -35,9 +35,13 @@ const useScreenDimensions = ( dimension = 'window' ) => {
 // We can make it work here first, then figure out the right way to consolidate
 // both implementations
 const BlockPreview = ( { blocks } ) => {
-	const settings = useSelect( ( select ) => {
+	const currentSettings = useSelect( ( select ) => {
 		return select( 'core/block-editor' ).getSettings()
 	} );
+	const settings = {
+		...currentSettings,
+		readOnly: true,
+	};
 	const { height: windowHeight } = useScreenDimensions();
 	const style = StyleSheet.create( {
 		container: {

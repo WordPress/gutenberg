@@ -79,6 +79,7 @@ export class BlockList extends Component {
 			header,
 			withFooter = true,
 			renderAppender,
+			isReadOnly,
 			isRootList,
 		} = this.props;
 
@@ -101,6 +102,7 @@ export class BlockList extends Component {
 					renderItem={ this.renderItem }
 					shouldPreventAutomaticScroll={ this.shouldFlatListPreventAutomaticScroll }
 					title={ title }
+					pointerEvents={ isReadOnly ? 'box-only' : 'auto' }
 					ListHeaderComponent={ header }
 					ListEmptyComponent={ this.renderDefaultBlockAppender }
 					ListFooterComponent={ withFooter && this.renderBlockListFooter }
@@ -183,6 +185,7 @@ export default compose( [
 			getBlockInsertionPoint,
 			isBlockInsertionPointVisible,
 			getSelectedBlock,
+			getSettings,
 		} = select( 'core/block-editor' );
 
 		const {
@@ -233,6 +236,8 @@ export default compose( [
 			return ! shouldHideBlockAtIndex;
 		};
 
+		const isReadOnly = getSettings().readOnly;
+
 		return {
 			blockClientIds,
 			blockCount: getBlockCount( rootClientId ),
@@ -241,6 +246,7 @@ export default compose( [
 			shouldShowInsertionPointBefore,
 			shouldShowInsertionPointAfter,
 			selectedBlockClientId,
+			isReadOnly,
 			isRootList: rootClientId === undefined,
 		};
 	} ),
