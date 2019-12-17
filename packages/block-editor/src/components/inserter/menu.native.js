@@ -140,6 +140,8 @@ export default compose(
 			showInsertionPoint,
 			hideInsertionPoint,
 			removeBlock,
+			resetBlocks,
+			clearSelectedBlock,
 			insertBlock,
 			insertDefaultBlock,
 		} = dispatch( 'core/block-editor' );
@@ -148,10 +150,21 @@ export default compose(
 			showInsertionPoint() {
 				if ( ownProps.shouldReplaceBlock ) {
 					const {
-						getSelectedBlock,
+						getBlockOrder,
+						getBlockCount,
 					} = select( 'core/block-editor' );
-					const selectedBlock = getSelectedBlock();
-					removeBlock( selectedBlock.clientId, false );
+
+					const count = getBlockCount();
+					if ( count === 1 ) {
+						clearSelectedBlock();
+						resetBlocks( [] );
+					}	else {
+						const blockToReplace = getBlockOrder(
+							ownProps.destinationRootClientId
+						)[ ownProps.insertionIndex ];
+
+						removeBlock( blockToReplace, false );
+					}
 				}
 				showInsertionPoint(
 					ownProps.destinationRootClientId,
