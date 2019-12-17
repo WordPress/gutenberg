@@ -10,7 +10,7 @@ import { View, Platform, TouchableWithoutFeedback } from 'react-native';
 import { Component } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
-import { createBlock, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
+import { createBlock } from '@wordpress/blocks';
 import { KeyboardAwareFlatList, ReadableContentView } from '@wordpress/components';
 
 /**
@@ -117,27 +117,19 @@ export class BlockList extends Component {
 		);
 	}
 
-	isReplaceable( block ) {
-		if ( ! block ) {
-			return false;
-		}
-		return isUnmodifiedDefaultBlock( block );
-	}
-
-	renderItem( { item: clientId, index } ) {
-		const { shouldShowBlockAtIndex, shouldShowInsertionPointBefore, shouldShowInsertionPointAfter } = this.props;
+	renderItem( { item: clientId } ) {
+		const { shouldShowInsertionPointBefore, shouldShowInsertionPointAfter } = this.props;
 		return (
 			<ReadableContentView>
 				{ shouldShowInsertionPointBefore( clientId ) && <BlockInsertionPoint /> }
-				{ shouldShowBlockAtIndex( index ) && (
-					<BlockListBlock
-						key={ clientId }
-						showTitle={ false }
-						clientId={ clientId }
-						rootClientId={ this.props.rootClientId }
-						onCaretVerticalPositionChange={ this.onCaretVerticalPositionChange }
-						isSmallScreen={ ! this.props.isFullyBordered }
-					/> ) }
+				<BlockListBlock
+					key={ clientId }
+					showTitle={ false }
+					clientId={ clientId }
+					rootClientId={ this.props.rootClientId }
+					onCaretVerticalPositionChange={ this.onCaretVerticalPositionChange }
+					isSmallScreen={ ! this.props.isFullyBordered }
+				/>
 				{ shouldShowInsertionPointAfter( clientId ) && <BlockInsertionPoint /> }
 			</ReadableContentView>
 		);
@@ -162,24 +154,16 @@ export default compose( [
 	withSelect( ( select, { rootClientId } ) => {
 		const {
 			getBlockCount,
-			getBlockIndex,
 			getBlockOrder,
 			getSelectedBlockClientId,
 			getBlockInsertionPoint,
 			isBlockInsertionPointVisible,
-			getSelectedBlock,
 		} = select( 'core/block-editor' );
-
-		const {
-			getGroupingBlockName,
-		} = select( 'core/blocks' );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 		const blockClientIds = getBlockOrder( rootClientId );
 		const insertionPoint = getBlockInsertionPoint();
 		const blockInsertionPointIsVisible = isBlockInsertionPointVisible();
-		const selectedBlock = getSelectedBlock();
-		const hasInnerBlocks = selectedBlock && selectedBlock.name === getGroupingBlockName();
 		const shouldShowInsertionPointBefore = ( clientId ) => {
 			return (
 				blockInsertionPointIsVisible &&
@@ -205,26 +189,10 @@ export default compose( [
 			);
 		};
 
-		const selectedBlockIndex = getBlockIndex( selectedBlockClientId, rootClientId );
-
-		const shouldShowBlockAtIndex = ( index ) => {
-			const shouldHideBlockAtIndex = (
-				! hasInnerBlocks && blockInsertionPointIsVisible &&
-				// if the block is replaceable
-				insertionPoint.canReplaceBlock &&
-				// if `index` === `insertionPoint.index`
-				index === insertionPoint.index &&
-				// only hide selected block
-				index === selectedBlockIndex
-			);
-			return ! shouldHideBlockAtIndex;
-		};
-
 		return {
 			blockClientIds,
 			blockCount: getBlockCount( rootClientId ),
 			isBlockInsertionPointVisible: isBlockInsertionPointVisible(),
-			shouldShowBlockAtIndex,
 			shouldShowInsertionPointBefore,
 			shouldShowInsertionPointAfter,
 			selectedBlockClientId,
