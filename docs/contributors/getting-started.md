@@ -114,8 +114,8 @@ To use Prettier, you should install the **Prettier - Code formatter** extension 
 },
 ```
 
-This will use the `.prettierrc` file. To test it out prior to PR #18048 being merged, you should:
+This will use the `.prettierrc.js` file in the root folder of the Gutenberg repository and the version of Prettier that is installed in the root `node_modules` folder. To test it out prior to PR #18048 being merged, you should:
 
 1. git switch add/prettier
-2. npm install
+2. npm ci
 3. Edit a JavaScript file and on save it will format it as defined
