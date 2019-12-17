@@ -66,7 +66,7 @@ export default function FontSizePicker( {
 			return;
 		}
 
-		onChange( fontSizeValue );
+		onChange( Number( fontSizeValue ) );
 	};
 
 	const onChangeValue = ( event ) => {
