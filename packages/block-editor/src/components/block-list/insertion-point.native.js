@@ -27,5 +27,4 @@ const BlockInsertionPoint = ( { getStylesFromColorScheme } ) => {
 	);
 };
 
-export default withPreferredColorScheme( BlockInsertionPoint )
-;
+export default withPreferredColorScheme( BlockInsertionPoint );
