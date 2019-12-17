@@ -4,16 +4,16 @@
 import { StyledPrimitives, styled } from '@wordpress/components';
 
 const Button = styled( StyledPrimitives.Button )`
-	&:hover {
-    text-decoration: underline;
-    cursor: pointer;
-    color: ${ ( props ) => props.theme.colors.primary };
-  }
-  &:focus{
-		outline: none;
-		outline-offset: -2px;
-		box-shadow: none;
-	}
+&:hover {
+	text-decoration: underline;
+	cursor: pointer;
+	color: ${ ( props ) => props.theme.colors.primary };
+}
+&:focus{
+	outline: none;
+	outline-offset: -2px;
+	box-shadow: none;
+}
 `;
 
 export default function BlockBreadcrumbButton( { children, ...props } ) {
