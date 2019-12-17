@@ -155,6 +155,7 @@ class RichText extends Component {
 		this.onPaste = this.onPaste.bind( this );
 		this.onCreateUndoLevel = this.onCreateUndoLevel.bind( this );
 		this.onInput = this.onInput.bind( this );
+		this.onCompositionStart = this.onCompositionStart.bind( this );
 		this.onCompositionEnd = this.onCompositionEnd.bind( this );
 		this.onSelectionChange = this.onSelectionChange.bind( this );
 		this.createRecord = this.createRecord.bind( this );
@@ -403,17 +404,11 @@ class RichText extends Component {
 	 * @param {WPSyntheticEvent} event Synthetic input event.
 	 */
 	onInput( event ) {
-		// For Input Method Editor (IME), used in Chinese, Japanese, and Korean
-		// (CJK), do not trigger a change if characters are being composed.
-		// Browsers setting `isComposing` to `true` will usually emit a final
-		// `input` event when the characters are composed.
-		if (
-			event &&
-			event.nativeEvent &&
-			event.nativeEvent.isComposing
-		) {
-			// Also don't update any selection.
-			document.removeEventListener( 'selectionchange', this.onSelectionChange );
+		// Do not trigger a change if characters are being composed. Browsers
+		// will usually emit a final `input` event when the characters are
+		// composed.
+		// As of December 2019, Safari doesn't support nativeEvent.isComposing.
+		if ( this.isComposing ) {
 			return;
 		}
 
@@ -487,7 +482,16 @@ class RichText extends Component {
 		}
 	}
 
+	onCompositionStart() {
+		this.isComposing = true;
+		// Do not update the selection when characters are being composed as
+		// this rerenders the component and might distroy internal browser
+		// editing state.
+		document.removeEventListener( 'selectionchange', this.onSelectionChange );
+	}
+
 	onCompositionEnd() {
+		this.isComposing = false;
 		// Ensure the value is up-to-date for browsers that don't emit a final
 		// input event after composition.
 		this.onInput( { inputType: 'insertText' } );
@@ -516,10 +520,7 @@ class RichText extends Component {
 
 		// In case of a keyboard event, ignore selection changes during
 		// composition.
-		if (
-			event.nativeEvent &&
-			event.nativeEvent.isComposing
-		) {
+		if ( this.isComposing ) {
 			return;
 		}
 
@@ -1062,6 +1063,7 @@ class RichText extends Component {
 				className={ classnames( 'rich-text', className ) }
 				onPaste={ this.onPaste }
 				onInput={ this.onInput }
+				onCompositionStart={ this.onCompositionStart }
 				onCompositionEnd={ this.onCompositionEnd }
 				onKeyDown={ props.onKeyDown ? ( event ) => {
 					props.onKeyDown( event );
