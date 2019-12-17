@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
-import { castArray } from 'lodash';
 import classnames from 'classnames';
+import { isString } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -17,28 +17,11 @@ import { compose } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import shortcutConfig from './config';
+import { globalShortcuts, mainShortcuts, textFormattingShortcuts } from './config';
+import Shortcut from './shortcut';
+import DynamicShortcut from './dynamic-shortcut';
 
 const MODAL_NAME = 'edit-post/keyboard-shortcut-help';
-
-const mapKeyCombination = ( keyCombination ) => keyCombination.map( ( character, index ) => {
-	if ( character === '+' ) {
-		return (
-			<Fragment key={ index }>
-				{ character }
-			</Fragment>
-		);
-	}
-
-	return (
-		<kbd
-			key={ index }
-			className="edit-post-keyboard-shortcut-help__shortcut-key"
-		>
-			{ character }
-		</kbd>
-	);
-} );
 
 const ShortcutList = ( { shortcuts } ) => (
 	/*
@@ -47,19 +30,15 @@ const ShortcutList = ( { shortcuts } ) => (
 	 */
 	/* eslint-disable jsx-a11y/no-redundant-roles */
 	<ul className="edit-post-keyboard-shortcut-help__shortcut-list" role="list">
-		{ shortcuts.map( ( { keyCombination, description, ariaLabel }, index ) => (
+		{ shortcuts.map( ( shortcut, index ) => (
 			<li
 				className="edit-post-keyboard-shortcut-help__shortcut"
 				key={ index }
 			>
-				<div className="edit-post-keyboard-shortcut-help__shortcut-description">
-					{ description }
-				</div>
-				<div className="edit-post-keyboard-shortcut-help__shortcut-term">
-					<kbd className="edit-post-keyboard-shortcut-help__shortcut-key-combination" aria-label={ ariaLabel }>
-						{ mapKeyCombination( castArray( keyCombination ) ) }
-					</kbd>
-				</div>
+				{ isString( shortcut ) ?
+					<DynamicShortcut name={ shortcut } /> :
+					<Shortcut { ...shortcut } />
+				}
 			</li>
 		) ) }
 	</ul>
@@ -93,9 +72,40 @@ export function KeyboardShortcutHelpModal( { isModalActive, toggleModal } ) {
 					closeLabel={ __( 'Close' ) }
 					onRequestClose={ toggleModal }
 				>
-					{ shortcutConfig.map( ( config, index ) => (
-						<ShortcutSection key={ index } { ...config } />
-					) ) }
+					<ShortcutSection
+						className="edit-post-keyboard-shortcut-help__main-shortcuts"
+						shortcuts={ mainShortcuts }
+					/>
+					<ShortcutSection
+						title={ __( 'Global shortcuts' ) }
+						shortcuts={ globalShortcuts }
+					/>
+					<ShortcutSection
+						title={ __( 'Selection shortcuts' ) }
+						shortcuts={ [
+							'core/block-editor/selectAll',
+							'core/block-editor/unselect',
+						] }
+					/>
+					<ShortcutSection
+						title={ __( 'Block shortcuts' ) }
+						shortcuts={ [
+							'core/block-editor/duplicate',
+							'core/block-editor/remove',
+							'core/block-editor/insertBefore',
+							'core/block-editor/insertAfter',
+							{
+								keyCombination: '/',
+								description: __( 'Change the block type after adding a new paragraph.' ),
+								/* translators: The forward-slash character. e.g. '/'. */
+								ariaLabel: __( 'Forward-slash' ),
+							},
+						] }
+					/>
+					<ShortcutSection
+						title={ __( 'Text formatting' ) }
+						shortcuts={ textFormattingShortcuts }
+					/>
 				</Modal>
 			) }
 		</Fragment>

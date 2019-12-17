@@ -8,6 +8,7 @@ import { first, last } from 'lodash';
 import { useRef, useEffect, useCallback } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
+import { __ } from '@wordpress/i18n';
 
 function KeyboardShortcuts() {
 	const target = useRef( null );
@@ -15,41 +16,76 @@ function KeyboardShortcuts() {
 	// Registering the shortcuts
 	const { registerShortcut } = useDispatch( 'core/keyboard-shortcuts' );
 	useEffect( () => {
-		registerShortcut( 'core/block-editor/duplicate', 'block', {
-			modifier: 'primaryShift',
-			character: 'd',
-		} );
+		registerShortcut(
+			'core/block-editor/duplicate',
+			'block',
+			__( 'Duplicate the selected block(s).' ),
+			{
+				modifier: 'primaryShift',
+				character: 'd',
+			}
+		);
 
-		registerShortcut( 'core/block-editor/remove', 'block', {
-			modifier: 'access',
-			character: 'z',
-		} );
+		registerShortcut(
+			'core/block-editor/remove',
+			'block',
+			__( 'Remove the selected block(s).' ),
+			{
+				modifier: 'access',
+				character: 'z',
+			}
+		);
 
-		registerShortcut( 'core/block-editor/insertBefore', 'block', {
-			modifier: 'primaryAlt',
-			character: 't',
-		} );
+		registerShortcut(
+			'core/block-editor/insertBefore',
+			'block',
+			__( 'Insert a new block before the selected block(s).' ),
+			{
+				modifier: 'primaryAlt',
+				character: 't',
+			}
+		);
 
-		registerShortcut( 'core/block-editor/insertAfter', 'block', {
-			modifier: 'primaryAlt',
-			character: 'y',
-		} );
+		registerShortcut(
+			'core/block-editor/insertAfter',
+			'block',
+			__( 'Insert a new block after the selected block(s).' ),
+			{
+				modifier: 'primaryAlt',
+				character: 'y',
+			}
+		);
 
-		registerShortcut( 'core/block-editor/deleteMultiSelection', 'block', {
-			character: 'del',
-			aliases: [
-				'backspace',
-			],
-		} );
+		registerShortcut(
+			'core/block-editor/deleteMultiSelection',
+			'block',
+			__( 'Remove the multi-selected blocks.' ),
+			{
+				character: 'del',
+				aliases: [
+					'backspace',
+				],
+			}
+		);
 
-		registerShortcut( 'core/block-editor/selectAll', 'selection', {
-			modifier: 'primary',
-			character: 'a',
-		} );
+		registerShortcut(
+			'core/block-editor/selectAll',
+			'selection',
+			__( 'Select all text when typing. Press again to select all blocks.' ),
+			{
+				modifier: 'primary',
+				character: 'a',
+			}
+		);
 
-		registerShortcut( 'core/block-editor/unselect', 'selections', {
-			character: 'escape',
-		} );
+		registerShortcut(
+			'core/block-editor/unselect',
+			'selections',
+			__( 'Clear selection.' ),
+			{
+				character: 'escape',
+			}
+		);
 	}, [ registerShortcut ] );
 
 	// Shortcuts Logic

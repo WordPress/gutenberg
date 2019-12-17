@@ -20,6 +20,7 @@ function reducer( state = {}, action ) {
 					category: action.category,
 					combination: action.combination,
 					aliases: action.aliases,
+					description: action.description,
 				},
 			};
 		case 'UNREGISTER_SHORTCUT':

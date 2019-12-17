@@ -23,6 +23,10 @@
 		&:last-child {
 			border-bottom: 1px solid $light-gray-500;
 		}
+
+		&:empty {
+			display: none;
+		}
 	}
 
 	&__shortcut-term {

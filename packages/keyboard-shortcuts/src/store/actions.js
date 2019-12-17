@@ -4,15 +4,17 @@
  * @param {string} name
  * @param {string} category
  * @param {Object} combination
+ * @param {string} description
  * @param {Array}  aliases
  */
-export function registerShortcut( name, category, combination, aliases ) {
+export function registerShortcut( name, category, description, combination, aliases ) {
 	return {
 		type: 'REGISTER_SHORTCUT',
 		name,
 		category,
 		combination,
 		aliases,
+		description,
 	};
 }
 
