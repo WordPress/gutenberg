@@ -292,7 +292,7 @@ export default compose( [
 		const rootBlock = getBlock( rootBlockId );
 		const hasRootInnerBlocks = rootBlock.innerBlocks.length !== 0;
 
-		const showFloatingToolbar = isSelected && hasRootInnerBlocks && ! isUnregisteredBlock;
+		const showFloatingToolbar = isSelected && hasRootInnerBlocks;
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 
