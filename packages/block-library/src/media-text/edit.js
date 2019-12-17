@@ -43,6 +43,9 @@ const TEMPLATE = [
 const WIDTH_CONSTRAINT_PERCENTAGE = 15;
 const applyWidthConstraints = ( width ) => Math.max( WIDTH_CONSTRAINT_PERCENTAGE, Math.min( width, 100 - WIDTH_CONSTRAINT_PERCENTAGE ) );
 
+export const LINK_DESTINATION_MEDIA = 'media';
+export const LINK_DESTINATION_ATTACHMENT = 'attachment';
+
 class MediaTextEdit extends Component {
 	constructor() {
 		super( ...arguments );
@@ -58,6 +61,7 @@ class MediaTextEdit extends Component {
 
 	onSelectMedia( media ) {
 		const { setAttributes } = this.props;
+		const { linkDestination, href } = this.props.attributes;
 
 		let mediaType;
 		let src;
@@ -78,12 +82,26 @@ class MediaTextEdit extends Component {
 			// Try the "large" size URL, falling back to the "full" size URL below.
 			src = get( media, [ 'sizes', 'large', 'url' ] ) || get( media, [ 'media_details', 'sizes', 'large', 'source_url' ] );
 		}
+
+		let newHref = href;
+		if ( linkDestination === LINK_DESTINATION_MEDIA ) {
+			// Update the media link.
+			newHref = media.url;
+		}
+
+		// Check if the image is linked to the attachment page.
+		if ( linkDestination === LINK_DESTINATION_ATTACHMENT ) {
+			// Update the media link.
+			newHref = media.link;
+		}
+
 		setAttributes( {
 			mediaAlt: media.alt,
 			mediaId: media.id,
 			mediaType,
 			mediaUrl: src || media.url,
 			mediaLink: media.link || undefined,
+			href: newHref,
 			imageFill: undefined,
 			focalPoint: undefined,
 		} );
