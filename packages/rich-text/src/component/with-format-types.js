@@ -1,19 +1,24 @@
 /**
  * External dependencies
  */
-import { mapKeys, reduce } from 'lodash';
+import { mapKeys } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { useSelect, __unstableUseDispatchWithMap } from '@wordpress/data';
+import { useMemo } from '@wordpress/element';
+
+function formatTypesSelector( select ) {
+	return select( 'core/rich-text' ).getFormatTypes();
+}
 
 export default function withFormatTypes( RichText ) {
 	return ( props ) => {
 		const { clientId, identifier } = props;
-		const formatTypes = useSelect( ( sel ) => sel( 'core/rich-text' ).getKeyedFormatTypes(), [] );
-		const selectProps = useSelect( ( sel ) => {
-			return reduce( formatTypes, ( acc, settings ) => {
+		const formatTypes = useSelect( formatTypesSelector, [] );
+		const selectProps = useSelect( ( select ) => {
+			return formatTypes.reduce( ( acc, settings ) => {
 				if ( ! settings.__experimentalGetPropsForEditableTreePreparation ) {
 					return acc;
 				}
@@ -22,7 +27,7 @@ export default function withFormatTypes( RichText ) {
 				return {
 					...acc,
 					...mapKeys(
-						settings.__experimentalGetPropsForEditableTreePreparation( sel, {
+						settings.__experimentalGetPropsForEditableTreePreparation( select, {
 							richTextIdentifier: identifier,
 							blockClientId: clientId,
 						} ),
@@ -31,8 +36,8 @@ export default function withFormatTypes( RichText ) {
 				};
 			}, {} );
 		}, [ formatTypes, clientId, identifier ] );
-		const dispatchProps = __unstableUseDispatchWithMap( ( disp ) => {
-			return reduce( formatTypes, ( acc, settings ) => {
+		const dispatchProps = __unstableUseDispatchWithMap( ( dispatch ) => {
+			return formatTypes.reduce( ( acc, settings ) => {
 				if ( ! settings.__experimentalGetPropsForEditableTreeChangeHandler ) {
 					return acc;
 				}
@@ -41,7 +46,7 @@ export default function withFormatTypes( RichText ) {
 				return {
 					...acc,
 					...mapKeys(
-						settings.__experimentalGetPropsForEditableTreeChangeHandler( disp, {
+						settings.__experimentalGetPropsForEditableTreeChangeHandler( dispatch, {
 							richTextIdentifier: identifier,
 							blockClientId: clientId,
 						} ),
@@ -50,68 +55,69 @@ export default function withFormatTypes( RichText ) {
 				};
 			}, {} );
 		}, [ formatTypes, clientId, identifier ] );
-
-		const args = {
-			richTextIdentifier: identifier,
-			blockClientId: clientId,
-		};
-		const combined = {
-			...selectProps,
-			...dispatchProps,
-		};
-
-		const newProps = reduce( formatTypes, ( acc, settings ) => {
-			if ( ! settings.__experimentalCreatePrepareEditableTree ) {
-				return acc;
-			}
-
-			const { name } = settings;
-			const selectPrefix = `format_prepare_props_(${ name })_`;
-			const dispatchPrefix = `format_on_change_props_(${ name })_`;
-			const propsByPrefix = Object.keys( combined ).reduce( ( accumulator, key ) => {
-				if ( key.startsWith( selectPrefix ) ) {
-					accumulator[ key.slice( selectPrefix.length ) ] = combined[ key ];
+		const newProps = useMemo( () => {
+			return formatTypes.reduce( ( acc, settings ) => {
+				if ( ! settings.__experimentalCreatePrepareEditableTree ) {
+					return acc;
 				}
 
-				if ( key.startsWith( dispatchPrefix ) ) {
-					accumulator[ key.slice( dispatchPrefix.length ) ] = combined[ key ];
+				const args = {
+					richTextIdentifier: identifier,
+					blockClientId: clientId,
+				};
+				const combined = {
+					...selectProps,
+					...dispatchProps,
+				};
+
+				const { name } = settings;
+				const selectPrefix = `format_prepare_props_(${ name })_`;
+				const dispatchPrefix = `format_on_change_props_(${ name })_`;
+				const propsByPrefix = Object.keys( combined ).reduce( ( accumulator, key ) => {
+					if ( key.startsWith( selectPrefix ) ) {
+						accumulator[ key.slice( selectPrefix.length ) ] = combined[ key ];
+					}
+
+					if ( key.startsWith( dispatchPrefix ) ) {
+						accumulator[ key.slice( dispatchPrefix.length ) ] = combined[ key ];
+					}
+
+					return accumulator;
+				}, {} );
+
+				if ( settings.__experimentalCreateOnChangeEditableValue ) {
+					return {
+						...acc,
+						[ `format_value_functions_(${ name })` ]:
+							settings.__experimentalCreatePrepareEditableTree(
+								propsByPrefix,
+								args
+							),
+						[ `format_on_change_functions_(${ name })` ]:
+							settings.__experimentalCreateOnChangeEditableValue(
+								propsByPrefix,
+								args
+							),
+					};
 				}
 
-				return accumulator;
-			}, {} );
-
-			if ( settings.__experimentalCreateOnChangeEditableValue ) {
 				return {
 					...acc,
-					[ `format_value_functions_(${ name })` ]:
+					[ `format_prepare_functions_(${ name })` ]:
 						settings.__experimentalCreatePrepareEditableTree(
 							propsByPrefix,
 							args
 						),
-					[ `format_on_change_functions_(${ name })` ]:
-						settings.__experimentalCreateOnChangeEditableValue(
-							propsByPrefix,
-							args
-						),
 				};
-			}
-
-			return {
-				...acc,
-				[ `format_prepare_functions_(${ name })` ]:
-					settings.__experimentalCreatePrepareEditableTree(
-						propsByPrefix,
-						args
-					),
-			};
-		}, {} );
+			}, {} );
+		}, [ formatTypes, clientId, identifier, selectProps, dispatchProps ] );
 
 		return (
 			<RichText
 				{ ...props }
 				{ ...selectProps }
 				{ ...newProps }
-				formatTypes={ Object.values( formatTypes ) }
+				formatTypes={ formatTypes }
 			/>
 		);
 	};
