@@ -1003,7 +1003,7 @@ export function getBlockInsertionPoint( state ) {
 		index = getBlockOrder( state ).length;
 	}
 
-	return { rootClientId, index, canReplaceBlock: true };
+	return { rootClientId, index };
 }
 
 /**

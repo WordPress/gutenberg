@@ -1218,7 +1218,6 @@ _Parameters_
 
 -   _rootClientId_ `?string`: Optional root client ID of block list on which to insert.
 -   _index_ `?number`: Index at which block should be inserted.
--   _canReplaceBlock_ `?boolean`: can the insertion point replace the block at index.
 
 _Returns_
 

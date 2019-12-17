@@ -500,16 +500,13 @@ export function* insertBlocks(
  *                               which to insert.
  * @param {?number} index        Index at which block should be inserted.
  *
- * @param {?boolean} canReplaceBlock  can the insertion point replace the block at index.
- *
  * @return {Object} Action object.
  */
-export function showInsertionPoint( rootClientId, index, canReplaceBlock ) {
+export function showInsertionPoint( rootClientId, index ) {
 	return {
 		type: 'SHOW_INSERTION_POINT',
 		rootClientId,
 		index,
-		canReplaceBlock,
 	};
 }
 

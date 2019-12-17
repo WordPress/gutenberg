@@ -1141,8 +1141,8 @@ export function blocksMode( state = {}, action ) {
 export function insertionPoint( state = null, action ) {
 	switch ( action.type ) {
 		case 'SHOW_INSERTION_POINT':
-			const { rootClientId, index, canReplaceBlock } = action;
-			return { rootClientId, index, canReplaceBlock };
+			const { rootClientId, index } = action;
+			return { rootClientId, index };
 
 		case 'HIDE_INSERTION_POINT':
 			return null;

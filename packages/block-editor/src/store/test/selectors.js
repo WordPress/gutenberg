@@ -1632,14 +1632,12 @@ describe( 'selectors', () => {
 				insertionPoint: {
 					rootClientId: undefined,
 					index: 0,
-					canReplaceBlock: true,
 				},
 			};
 
 			expect( getBlockInsertionPoint( state ) ).toEqual( {
 				rootClientId: undefined,
 				index: 0,
-				canReplaceBlock: true,
 			} );
 		} );
 
@@ -1668,7 +1666,6 @@ describe( 'selectors', () => {
 			expect( getBlockInsertionPoint( state ) ).toEqual( {
 				rootClientId: undefined,
 				index: 1,
-				canReplaceBlock: true,
 			} );
 		} );
 
@@ -1701,7 +1698,6 @@ describe( 'selectors', () => {
 			expect( getBlockInsertionPoint( state ) ).toEqual( {
 				rootClientId: 'clientId1',
 				index: 1,
-				canReplaceBlock: true,
 			} );
 		} );
 
@@ -1734,7 +1730,6 @@ describe( 'selectors', () => {
 			expect( getBlockInsertionPoint( state ) ).toEqual( {
 				rootClientId: undefined,
 				index: 2,
-				canReplaceBlock: true,
 			} );
 		} );
 
@@ -1767,7 +1762,6 @@ describe( 'selectors', () => {
 			expect( getBlockInsertionPoint( state ) ).toEqual( {
 				rootClientId: undefined,
 				index: 2,
-				canReplaceBlock: true,
 			} );
 		} );
 	} );
