@@ -15,24 +15,26 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import styles from './style.scss';
 
-function NotificationSheet( { title, getStylesFromColorScheme, isVisible, onClose, type = 'singular' } ) {
+function NotificationSheet( { title, getStylesFromColorScheme, isVisible, onClose, type = 'singular', withMessage = true, withQuotes = true } ) {
 	const infoTextStyle = getStylesFromColorScheme( styles.infoText, styles.infoTextDark );
 	const infoTitleStyle = getStylesFromColorScheme( styles.infoTitle, styles.infoTitleDark );
 	const infoDescriptionStyle = getStylesFromColorScheme( styles.infoDescription, styles.infoDescriptionDark );
 	const infoSheetIconStyle = getStylesFromColorScheme( styles.infoSheetIcon, styles.infoSheetIconDark );
 
 	// translators: %s: Name of the block
-	const titleFormatSingular = Platform.OS === 'android' ? __( '\'%s\' isn\'t yet supported on WordPress for Android' ) :
-		__( '\'%s\' isn\'t yet supported on WordPress for iOS' );
+	const titleFormatSingular = Platform.OS === 'android' ? __( '%s isn\'t yet supported on WordPress for Android' ) :
+		__( '%s isn\'t yet supported on WordPress for iOS' );
 
-	const titleFormatPlural = Platform.OS === 'android' ? __( '\'%s\' aren\'t yet supported on WordPress for Android' ) :
-		__( '\'%s\' aren\'t yet supported on WordPress for iOS' );
+	const titleFormatPlural = Platform.OS === 'android' ? __( '%s aren\'t yet supported on WordPress for Android' ) :
+		__( '%s aren\'t yet supported on WordPress for iOS' );
 
 	const titleFormat = type === 'plural' ? titleFormatPlural : titleFormatSingular;
 
+	const titleType = withQuotes ? `'${ title }'` : title;
+
 	const infoTitle = sprintf(
 		titleFormat,
-		title,
+		titleType,
 	);
 
 	return (
@@ -46,9 +48,9 @@ function NotificationSheet( { title, getStylesFromColorScheme, isVisible, onClos
 				<Text style={ [ infoTextStyle, infoTitleStyle ] }>
 					{ infoTitle }
 				</Text>
-				<Text style={ [ infoTextStyle, infoDescriptionStyle ] }>
+				{ withMessage && <Text style={ [ infoTextStyle, infoDescriptionStyle ] }>
 					{ __( 'We are working hard to add more blocks with each release. In the meantime, you can also edit this post on the web.' ) }
-				</Text>
+				</Text> }
 			</View>
 		</BottomSheet>
 	);

@@ -197,7 +197,7 @@ function ButtonEdit( { attributes, setAttributes, backgroundColor, textColor, is
 						<TextControl
 							label={ __( 'Link Rel' ) }
 							value={ url || '' }
-							valuePlaceholder={ __( 'Add URL' ) }
+							valuePlaceholder={ __( 'None' ) }
 							onChange={ ( value ) => setAttributes( { url: value } ) }
 							autoCapitalize="none"
 							autoCorrect={ false }
@@ -214,7 +214,7 @@ function ButtonEdit( { attributes, setAttributes, backgroundColor, textColor, is
 					</PanelBody>
 				</InspectorControls>
 
-				<NotificationSheet title="Color Settings" isVisible={ showHelp } onClose={ toggleShowNoticationSheet } type="plural" />
+				<NotificationSheet title="Color Settings" isVisible={ showHelp } onClose={ toggleShowNoticationSheet } type="plural" withMessage={ false } withQuotes={ false } />
 			</View>
 		</View>
 	);
