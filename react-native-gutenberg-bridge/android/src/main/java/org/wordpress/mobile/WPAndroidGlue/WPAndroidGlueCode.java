@@ -33,6 +33,7 @@ import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 import com.github.godness84.RNRecyclerViewList.RNRecyclerviewListPackage;
 import com.horcrux.svg.SvgPackage;
+import com.reactnativecommunity.slider.ReactSliderPackage;
 
 import org.wordpress.android.util.AppLog;
 import org.wordpress.mobile.ReactNativeAztec.ReactAztecPackage;
@@ -312,6 +313,7 @@ public class WPAndroidGlueCode {
                 new ReactAztecPackage(),
                 new RNRecyclerviewListPackage(),
                 new ReactVideoPackage(),
+                new ReactSliderPackage(),
                 mRnReactNativeGutenbergBridgePackage);
     }
 
