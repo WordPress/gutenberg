@@ -43,9 +43,13 @@ const INITIAL_MAX_WIDTH = 108;
 class ButtonEdit extends Component {
 	constructor( props ) {
 		super( props );
+		this.onChangeBackgroundColor = this.onChangeBackgroundColor.bind( this );
+		this.setBorderRadius = this.setBorderRadius.bind( this );
+		this.openNotificationSheet = this.openNotificationSheet.bind( this );
 		this.toggleShowNoticationSheet = this.toggleShowNoticationSheet.bind( this );
 		this.onLayout = this.onLayout.bind( this );
 		this.setRichTextFocus = this.setRichTextFocus.bind( this );
+		this.onToggleOpenInNewTab = this.onToggleOpenInNewTab.bind( this );
 
 		this.state = {
 			isFocused: false,
@@ -74,7 +78,7 @@ class ButtonEdit extends Component {
 		}
 	}
 
-	onChangeBackgroundColor = () => {
+	onChangeBackgroundColor() {
 		const { backgroundColor, attributes } = this.props;
 		if ( backgroundColor.color ) {
 			// `backgroundColor` which should be set when we are able to resolve it
@@ -85,39 +89,39 @@ class ButtonEdit extends Component {
 			return styles.fallbackButton.backgroundColor;
 		// `backgroundColor` which should be set when `Button` is created on mobile
 		} return styles.button.backgroundColor;
-	};
+	}
 
-	setBorderRadius = ( value ) => {
+	setBorderRadius( value ) {
 		const { setAttributes } = this.props;
 		setAttributes( {
 			borderRadius: value,
 		} );
-	};
+	}
 
-	toggleShowNoticationSheet = () => {
+	toggleShowNoticationSheet() {
 		this.setState( { showHelp: ! this.state.showHelp } );
-	};
+	}
 
-	openNotificationSheet = () => {
+	openNotificationSheet() {
 		const { closeGeneralSidebar } = this.props;
 		closeGeneralSidebar();
 		InteractionManager.runAfterInteractions( () => {
 			this.toggleShowNoticationSheet();
 		} );
-	};
+	}
 
-	onLayout = ( { nativeEvent } ) => {
+	onLayout( { nativeEvent } ) {
 		const { width } = nativeEvent.layout;
 		const { marginRight, paddingRight, borderWidth } = styles.button;
 		const buttonSpacing = 2 * ( marginRight + paddingRight + borderWidth );
 		this.setState( { maxWidth: width - buttonSpacing } );
-	};
+	}
 
-	setRichTextFocus = ( value ) => {
+	setRichTextFocus( value ) {
 		this.setState( { isFocused: value } );
 	}
 
-	onToggleOpenInNewTab = ( value ) => {
+	onToggleOpenInNewTab( value ) {
 		const { setAttributes, attributes } = this.props;
 		const { rel } = attributes;
 
