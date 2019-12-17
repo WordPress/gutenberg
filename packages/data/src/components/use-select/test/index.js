@@ -8,6 +8,7 @@ import TestRenderer, { act } from 'react-test-renderer';
  */
 import { createRegistry } from '../../../registry';
 import { RegistryProvider } from '../../registry-provider';
+import { AsyncModeProvider } from '../../async-mode-provider';
 import useSelect from '../index';
 
 describe( 'useSelect', () => {
@@ -132,6 +133,37 @@ describe( 'useSelect', () => {
 			children: 'bar',
 		} );
 	} );
+
+	it( 'updates when async mode changes', () => {
+		const selectSpy = jest.fn().mockImplementation( () => null );
+
+		function TestComponent() {
+			const data = useSelect( selectSpy );
+			return <div>{ data }</div>;
+		}
+
+		let renderer;
+		act( () => {
+			renderer = TestRenderer.create(
+				<AsyncModeProvider value={ true }>
+					<TestComponent />
+				</AsyncModeProvider>
+			);
+		} );
+
+		expect( selectSpy ).toHaveBeenCalledTimes( 1 );
+
+		act( () => {
+			renderer.update(
+				<AsyncModeProvider value={ false }>
+					<TestComponent />
+				</AsyncModeProvider>
+			);
+		} );
+
+		expect( selectSpy ).toHaveBeenCalledTimes( 2 );
+	} );
+
 	describe( 'rerenders as expected with various mapSelect return types', () => {
 		const getComponent = ( mapSelectSpy ) => () => {
 			const data = useSelect( mapSelectSpy, [] );

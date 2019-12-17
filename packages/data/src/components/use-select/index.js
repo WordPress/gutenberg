@@ -78,7 +78,7 @@ export default function useSelect( _mapSelect, deps ) {
 	const mapSelect = useCallback( _mapSelect, deps );
 	const registry = useRegistry();
 	const isAsync = useAsyncMode();
-	const queueContext = useMemo( () => ( { queue: true } ), [ registry ] );
+	const queueContext = useMemo( () => ( { queue: true } ), [ registry, isAsync ] );
 	const [ , forceRender ] = useReducer( ( s ) => s + 1, 0 );
 
 	const latestMapSelect = useRef();
@@ -160,7 +160,7 @@ export default function useSelect( _mapSelect, deps ) {
 			unsubscribe();
 			renderQueue.flush( queueContext );
 		};
-	}, [ registry ] );
+	}, [ registry, isAsync ] );
 
 	return mapOutput;
 }
