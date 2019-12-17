@@ -24,34 +24,9 @@ import __experimentalBlockListFooter from '../block-list-footer';
 
 const innerToolbarHeight = 44;
 
-const getScrollPositionForNewBlock = (
-	parentLayout,
-	childLayout,
-	contentOffset
-) => {
-	const positionInParent = childLayout.y - parentLayout.y + childLayout.height;
-	if ( positionInParent > 0 && positionInParent < parentLayout.height ) {
-		// Block already visible, keep the current contentOffset
-		return {
-			x: 0,
-			y: contentOffset.y,
-			animated: true,
-		};
-	}
-	const offsetInParent = childLayout.y - parentLayout.y + contentOffset.y;
-	return {
-		x: 0,
-		// Scroll to have block visible and in the middle
-		y: offsetInParent - ( ( parentLayout.height - childLayout.height ) / 2 ),
-		animated: true,
-	};
-};
-
 export class BlockList extends Component {
 	constructor() {
 		super( ...arguments );
-
-		this.blockRefs = {};
 
 		this.renderItem = this.renderItem.bind( this );
 		this.renderBlockListFooter = this.renderBlockListFooter.bind( this );
@@ -60,22 +35,6 @@ export class BlockList extends Component {
 		this.scrollViewInnerRef = this.scrollViewInnerRef.bind( this );
 		this.addBlockToEndOfPost = this.addBlockToEndOfPost.bind( this );
 		this.shouldFlatListPreventAutomaticScroll = this.shouldFlatListPreventAutomaticScroll.bind( this );
-	}
-
-	componentDidUpdate( prevProps ) {
-		if ( this.props.blockCount > prevProps.blockCount ) {
-			if ( this.props.selectedBlockClientId ) {
-				this.scrollIntoViewNewBlockTimeout = setTimeout( () => {
-					this.scrollViewRef.props.scrollIntoView( this.blockRefs[ this.props.selectedBlockClientId ],
-						{ getScrollPosition: getScrollPositionForNewBlock }
-					);
-				}, 0 );
-			}
-		}
-	}
-
-	componentWillUnmount() {
-		clearTimeout( this.scrollIntoViewNewBlockTimeout );
 	}
 
 	addBlockToEndOfPost( newBlock ) {
@@ -172,9 +131,6 @@ export class BlockList extends Component {
 				{ shouldShowInsertionPointBefore( clientId ) && <BlockInsertionPoint /> }
 				{ shouldShowBlockAtIndex( index ) && (
 					<BlockListBlock
-						ref={ ( ref ) => {
-							this.blockRefs[ clientId ] = ref;
-						} }
 						key={ clientId }
 						showTitle={ false }
 						clientId={ clientId }

@@ -1,21 +1,17 @@
 /**
  * External dependencies
  */
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { FlatList } from 'react-native';
 
-export const KeyboardAwareFlatList = ( {
-	innerRef,
-	...listProps
-} ) => (
-	<KeyboardAwareScrollView
-		style={ { flex: 1 } }
-		//On Android we only use KeyboardAwareScrollView for it's scrollIntoView method
-		enableOnAndroid={ false }
-		innerRef={ innerRef }
-	>
-		<FlatList { ...listProps } />
-	</KeyboardAwareScrollView>
+/**
+ * Internal dependencies
+ */
+import KeyboardAvoidingView from '../keyboard-avoiding-view';
+
+export const KeyboardAwareFlatList = ( props ) => (
+	<KeyboardAvoidingView style={ { flex: 1 } }>
+		<FlatList { ...props } />
+	</KeyboardAvoidingView>
 );
 
 KeyboardAwareFlatList.handleCaretVerticalPositionChange = () => {
