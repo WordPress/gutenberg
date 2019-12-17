@@ -3,7 +3,7 @@
  */
 import Textarea from 'react-autosize-textarea';
 import classnames from 'classnames';
-import { get, escape, unescape } from 'lodash';
+import { get, escape } from 'lodash';
 
 /**
  * WordPress dependencies
