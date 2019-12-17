@@ -1,10 +1,10 @@
 export const categories = [
-	{ slug: 'common', title: 'Common Blocks' },
+	{ slug: 'common', title: 'Common blocks' },
 	{ slug: 'formatting', title: 'Formatting' },
-	{ slug: 'layout', title: 'Layout Elements' },
+	{ slug: 'layout', title: 'Layout elements' },
 	{ slug: 'widgets', title: 'Widgets' },
 	{ slug: 'embed', title: 'Embeds' },
-	{ slug: 'reusable', title: 'Reusable Blocks' },
+	{ slug: 'reusable', title: 'Reusable blocks' },
 ];
 
 export const textItem = {
