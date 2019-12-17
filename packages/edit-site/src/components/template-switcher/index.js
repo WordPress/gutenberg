@@ -43,6 +43,11 @@ export default function TemplateSwitcher( {
 		<DropdownMenu
 			icon="layout"
 			label={ __( 'Switch Template' ) }
+			toggleProps={ {
+				children: ( isTemplatePart ? templateParts : templates ).find(
+					( choice ) => choice.value === activeId
+				).label,
+			} }
 			className="edit-site-template-switcher"
 		>
 			{ () => (

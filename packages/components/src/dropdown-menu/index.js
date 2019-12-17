@@ -126,6 +126,7 @@ function DropdownMenu( {
 						label={ label }
 						showTooltip
 					>
+						{ mergedToggleProps.children }
 						{ ( ! icon || hasArrowIndicator ) && (
 							<span className="components-dropdown-menu__indicator" />
 						) }
