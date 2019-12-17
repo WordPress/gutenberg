@@ -345,6 +345,7 @@ export class RichText extends Component {
 			onPaste,
 			onChange,
 		} = this.props;
+		const { activeFormats = [] } = this.state;
 
 		const { pastedText, pastedHtml, files } = event.nativeEvent;
 		const currentRecord = this.createRecord();
@@ -381,6 +382,7 @@ export class RichText extends Component {
 				html: pastedHtml,
 				plainText: pastedText,
 				files,
+				activeFormats,
 			} );
 		}
 	}
