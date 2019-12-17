@@ -407,6 +407,7 @@ class RichText extends Component {
 		// Do not trigger a change if characters are being composed. Browsers
 		// will usually emit a final `input` event when the characters are
 		// composed.
+		// As of December 2019, Safari doesn't support nativeEvent.isComposing.
 		if ( this.isComposing ) {
 			return;
 		}
