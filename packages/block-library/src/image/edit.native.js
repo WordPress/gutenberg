@@ -296,7 +296,7 @@ export class ImageEdit extends React.Component {
 	}
 
 	render() {
-		const { attributes, isSelected } = this.props;
+		const { attributes, isSelected, image } = this.props;
 		const { align, url, height, width, alt, href, id, linkTarget, sizeSlug } = attributes;
 
 		const actions = [ { label: __( 'Clear All Settings' ), onPress: this.onClearSettings } ];
@@ -338,7 +338,7 @@ export class ImageEdit extends React.Component {
 						onChange={ this.onSetNewTab }
 					/>
 					{ // eslint-disable-next-line no-undef
-						__DEV__ &&
+						image && __DEV__ &&
 						<SelectControl
 							hideCancelButton
 							icon={ 'editor-expand' }

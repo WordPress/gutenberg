@@ -63,3 +63,4 @@ require dirname( __FILE__ ) . '/widgets.php';
 require dirname( __FILE__ ) . '/widgets-page.php';
 require dirname( __FILE__ ) . '/experiments-page.php';
 require dirname( __FILE__ ) . '/customizer.php';
+require dirname( __FILE__ ) . '/edit-site-page.php';
