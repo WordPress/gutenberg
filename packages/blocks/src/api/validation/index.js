@@ -9,6 +9,7 @@ import {
 	isEqual,
 	includes,
 	stubTrue,
+	get,
 } from 'lodash';
 
 /**
@@ -604,7 +605,7 @@ export function isEquivalentHTML( actual, expected, logger = createLogger() ) {
  *
  * @return {Object} Whether block is valid and contains validation messages.
  */
-export function getBlockContentValidationResult( blockTypeOrName, attributes, originalBlockContent, logger = createQueuedLogger(), mode = 'strict' ) {
+export function getBlockContentValidationResult( blockTypeOrName, attributes, originalBlockContent, logger = createQueuedLogger(), mode = ( get( global, [ 'wp', 'blockValidationMode' ], null ) || 'strict' ) ) {
 	const blockType = normalizeBlockType( blockTypeOrName );
 	let generatedBlockContent;
 	try {
@@ -655,7 +656,7 @@ export function getBlockContentValidationResult( blockTypeOrName, attributes, or
  * @param {string}        mode                 Validation mode.
  * @return {boolean} Whether block is valid.
  */
-export function isValidBlockContent( blockTypeOrName, attributes, originalBlockContent, mode = 'strict' ) {
+export function isValidBlockContent( blockTypeOrName, attributes, originalBlockContent, mode = ( get( global, [ 'wp', 'blockValidationMode' ], null ) || 'strict' ) ) {
 	const { isValid } = getBlockContentValidationResult( blockTypeOrName, attributes, originalBlockContent, createLogger(), mode );
 
 	return isValid;

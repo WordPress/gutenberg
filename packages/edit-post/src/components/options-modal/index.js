@@ -47,6 +47,7 @@ export function OptionsModal( { isModalActive, isViewable, closeModal } ) {
 			<Section title={ __( 'General' ) }>
 				<EnablePublishSidebarOption label={ __( 'Pre-publish Checks' ) } />
 				<EnableFeature feature="showInserterHelpPanel" label={ __( 'Inserter Help Panel' ) } />
+				<EnableFeature feature="noBlockValidation" label={ __( 'Disable Block Validation' ) } />
 			</Section>
 			<Section title={ __( 'Document Panels' ) }>
 				<EnablePluginDocumentSettingPanelOption.Slot />

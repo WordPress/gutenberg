@@ -56,6 +56,10 @@ class EditorProvider extends Component {
 		}
 
 		props.updatePostLock( props.settings.postLock );
+
+		//TODO temp until we can pass through the block validation mde better. Parser is only created on load so I can't pass through properly
+		global.wp.blockValidationMode = props.settings.noBlockValidation ? 'no-save-error' : 'strict';
+
 		props.setupEditor( props.post, props.initialEdits, props.settings.template );
 
 		if ( props.settings.autosave ) {
@@ -112,6 +116,7 @@ class EditorProvider extends Component {
 				'__experimentalEnablePageTemplates',
 				'showInserterHelpPanel',
 				'gradients',
+				'noBlockValidation',
 			] ),
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalReusableBlocks: reusableBlocks,

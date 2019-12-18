@@ -44,6 +44,7 @@ class Editor extends Component {
 		preferredStyleVariations,
 		__experimentalLocalAutosaveInterval,
 		updatePreferredStyleVariations,
+		noBlockValidation,
 	) {
 		settings = {
 			...settings,
@@ -55,6 +56,7 @@ class Editor extends Component {
 			focusMode,
 			showInserterHelpPanel,
 			__experimentalLocalAutosaveInterval,
+			noBlockValidation,
 		};
 
 		// Omit hidden block types if exists and non-empty.
@@ -92,6 +94,7 @@ class Editor extends Component {
 			__experimentalLocalAutosaveInterval,
 			showInserterHelpPanel,
 			updatePreferredStyleVariations,
+			noBlockValidation,
 			...props
 		} = this.props;
 
@@ -109,6 +112,7 @@ class Editor extends Component {
 			preferredStyleVariations,
 			__experimentalLocalAutosaveInterval,
 			updatePreferredStyleVariations,
+			noBlockValidation,
 		);
 
 		return (
@@ -148,6 +152,7 @@ export default compose( [
 			showInserterHelpPanel: isFeatureActive( 'showInserterHelpPanel' ),
 			hasFixedToolbar: isFeatureActive( 'fixedToolbar' ),
 			focusMode: isFeatureActive( 'focusMode' ),
+			noBlockValidation: isFeatureActive( 'noBlockValidation' ),
 			post: getEntityRecord( 'postType', postType, postId ),
 			preferredStyleVariations: getPreference( 'preferredStyleVariations' ),
 			hiddenBlockTypes: getPreference( 'hiddenBlockTypes' ),
