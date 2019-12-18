@@ -288,6 +288,21 @@ async function runReleaseBranchCreationStep( abortMessage ) {
 }
 
 /**
+ * Finds the name of the current release branch based on the version in
+ * the package.json file.
+ *
+ * @param {string} packageJsonPath Path to the package.json file.
+ *
+ * @return {string} Name of the release branch.
+ */
+const findReleaseBranchName = ( packageJsonPath ) => {
+	const masterPackageJson = readJSONFile( packageJsonPath );
+	const masterParsedVersion = semver.parse( masterPackageJson.version );
+
+	return 'release/' + masterParsedVersion.major + '.' + masterParsedVersion.minor;
+};
+
+/**
  * Checkouts out the release branch and chooses a stable version number.
  *
  * @param {string} abortMessage Abort Message.
@@ -299,9 +314,7 @@ async function runReleaseBranchCheckoutStep( abortMessage ) {
 	await runStep( 'Getting into the release branch', abortMessage, async () => {
 		const simpleGit = SimpleGit( gitWorkingDirectoryPath );
 		const packageJsonPath = gitWorkingDirectoryPath + '/package.json';
-		const masterPackageJson = readJSONFile( packageJsonPath );
-		const masterParsedVersion = semver.parse( masterPackageJson.version );
-		releaseBranch = 'release/' + masterParsedVersion.major + '.' + masterParsedVersion.minor;
+		releaseBranch = findReleaseBranchName( packageJsonPath );
 
 		// Creating the release branch
 		await simpleGit.checkout( releaseBranch );
@@ -669,6 +682,83 @@ program
 			'You can access the GitHub release here: ' + success( release.html_url ) + '\n',
 			'In a few minutes, you\'ll be able to update the plugin from the WordPress repository.\n',
 			'Thanks for performing the release! and don\'t forget to publish the release post.'
+		);
+	} );
+
+/**
+ * Checks out the WordPress release branch and syncs it with the changes from
+ * the last plugin release.
+ *
+ * @param {string} abortMessage Abort Message.
+ */
+async function runWordPressReleaseBranchSyncStep( abortMessage ) {
+	const wordpressReleaseBranch = 'wp/trunk';
+	await runStep( 'Getting into the WordPress release branch', abortMessage, async () => {
+		const simpleGit = SimpleGit( gitWorkingDirectoryPath );
+		const packageJsonPath = gitWorkingDirectoryPath + '/package.json';
+		const pluginReleaseBranch = findReleaseBranchName( packageJsonPath );
+
+		// Creating the release branch
+		await simpleGit.checkout( wordpressReleaseBranch );
+		console.log( '>> The local release branch ' + success( wordpressReleaseBranch ) + ' has been successfully checked out.' );
+
+		await askForConfirmationToContinue(
+			`The branch is ready for sync with the latest plugin release changes applied to "${ pluginReleaseBranch }". Proceed?`,
+			true,
+			abortMessage
+		);
+
+		await simpleGit.raw( [ 'rm', '-r', '.' ] );
+		await simpleGit.raw( [ 'checkout', `origin/${ pluginReleaseBranch }`, '--', '.' ] );
+		await simpleGit.commit( `Merge changes published in the Gutenberg plugin "${ pluginReleaseBranch }" branch` );
+		console.log( '>> The local WordPress release branch ' + success( wordpressReleaseBranch ) + ' has been successfully synced.' );
+	} );
+
+	return {
+		releaseBranch: wordpressReleaseBranch,
+	};
+}
+
+/**
+ * Prepublish to npm steps for WordPress packages.
+ *
+ * @return {Object} Github release object.
+ */
+async function prepublishPackages() {
+	// This is a variable that contains the abort message shown when the script is aborted.
+	let abortMessage = 'Aborting!';
+	await askForConfirmationToContinue( 'Ready to go? ' );
+
+	// Cloning the Git repository.
+	await runGitRepositoryCloneStep( abortMessage );
+
+	// Checking out the WordPres release branch and doing sync with the last plugin relase.
+	const { releaseBranch } = await runWordPressReleaseBranchSyncStep( abortMessage );
+
+	// Push the local changes
+	abortMessage = `Aborting! Make sure to push changes applied to WordPress release branch "${ releaseBranch }" manually.`;
+	await runPushGitChangesStep( releaseBranch, abortMessage );
+
+	abortMessage = 'Aborting! The release is finished though.';
+	await runCleanLocalCloneStep( abortMessage );
+}
+
+program
+	.command( 'prepublish-packages-stable' )
+	.alias( 'npm-stable' )
+	.description( 'Prepublish to npm steps for a stable version of WordPress packages' )
+	.action( async () => {
+		console.log(
+			chalk.bold( '💃 Time to publish WordPress packages to npm 🕺\n\n' ),
+			'Welcome! This tool is going to help you with prepublish to npm steps for a new stable version of WordPress packages.\n',
+			'To perform a release you\'ll have to be a member of the WordPress Team on npm.\n'
+		);
+
+		await prepublishPackages();
+
+		console.log(
+			'\n>> 🎉 WordPress packages have been successfully published.\n',
+			'Thanks for performing the publish process! and don\'t forget to let people know on WordPress Slack.'
 		);
 	} );
 
