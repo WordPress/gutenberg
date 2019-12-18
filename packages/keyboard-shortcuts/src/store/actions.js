@@ -12,11 +12,11 @@
  *
  * @typedef {Object} WPShortcutConfig
  *
- * @property {string} name           Shortcut name.
- * @property {string} category       Shortcut category.
- * @property {string} description    Shortcut description.
- * @property {Object} keyCombination Shortcut key combination.
- * @property {Array?} aliases        Shortcut aliases.
+ * @property {string}                      name           Shortcut name.
+ * @property {string}                      category       Shortcut category.
+ * @property {string}                      description    Shortcut description.
+ * @property {WPShortcutKeyCombination}    keyCombination Shortcut key combination.
+ * @property {[WPShortcutKeyCombination]?} aliases        Shortcut aliases.
  */
 
 /**

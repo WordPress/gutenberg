@@ -1,3 +1,5 @@
+/** @typedef {import('./actions').WPShortcutKeyCombination} WPShortcutKeyCombination */
+
 /**
  * Shared reference to an empty array for cases where it is important to avoid
  * returning a new array reference on every invocation.
@@ -12,7 +14,7 @@ const EMPTY_ARRAY = [];
  * @param {Object} state Global state.
  * @param {string} name  Shortcut name.
  *
- * @return {Object?} Key combination.
+ * @return {WPShortcutKeyCombination?} Key combination.
  */
 export function getShortcutKeyCombination( state, name ) {
 	return state[ name ] ? state[ name ].keyCombination : null;
@@ -36,7 +38,7 @@ export function getShortcutDescription( state, name ) {
  * @param {Object} state Global state.
  * @param {string} name  Shortcut name.
  *
- * @return {Array} Key combination.
+ * @return {[WPShortcutKeyCombination]} Key combination.
  */
 export function getShortcutAliases( state, name ) {
 	return state[ name ] && state[ name ].aliases ?
