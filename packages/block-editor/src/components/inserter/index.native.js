@@ -20,7 +20,12 @@ const defaultRenderToggle = ( { onToggle, disabled, style } ) => (
 		title={ __( 'Add block' ) }
 		icon={ ( <Dashicon icon="plus-alt" style={ style } color={ style.color } /> ) }
 		onClick={ onToggle }
-		extraProps={ { hint: __( 'Double tap to add a block' ) } }
+		extraProps={ {
+			hint: __( 'Double tap to add a block' ),
+			// testID is present to disambiguate this element for native UI tests. It's not
+			// usually required for components. See: https://git.io/JeQ7G.
+			testID: 'add-block-button',
+		} }
 		isDisabled={ disabled }
 	/>
 );

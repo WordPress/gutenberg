@@ -197,7 +197,7 @@ export function pasteHandler( { HTML = '', plainText = '', mode = 'AUTO', tagNam
 
 	const rawTransforms = getRawTransformations();
 	const phrasingContentSchema = getPhrasingContentSchema( 'paste' );
-	const blockContentSchema = getBlockContentSchema( rawTransforms, phrasingContentSchema );
+	const blockContentSchema = getBlockContentSchema( rawTransforms, phrasingContentSchema, true );
 
 	const blocks = compact( flatMap( pieces, ( piece ) => {
 		// Already a block from shortcode.

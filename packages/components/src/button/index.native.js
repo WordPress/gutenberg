@@ -71,6 +71,7 @@ export function Button( props ) {
 		'aria-disabled': ariaDisabled,
 		'aria-label': ariaLabel,
 		'data-subscript': subscript,
+		testID,
 	} = props;
 
 	const isDisabled = ariaDisabled || disabled;
@@ -107,6 +108,7 @@ export function Button( props ) {
 			onPress={ onClick }
 			style={ styles.container }
 			disabled={ isDisabled }
+			testID={ testID }
 		>
 			<View style={ buttonViewStyle }>
 				<View style={ { flexDirection: 'row' } }>

@@ -24,14 +24,15 @@ const { ELEMENT_NODE, TEXT_NODE } = window.Node;
  *
  * @param {Array}  transforms            Block transforms, of the `raw` type.
  * @param {Object} phrasingContentSchema The phrasing content schema.
+ * @param {Object} isPaste               Whether the context is pasting or not.
  *
  * @return {Object} A complete block content schema.
  */
-export function getBlockContentSchema( transforms, phrasingContentSchema ) {
+export function getBlockContentSchema( transforms, phrasingContentSchema, isPaste ) {
 	const schemas = transforms.map( ( { isMatch, blockName, schema } ) => {
 		const hasAnchorSupport = hasBlockSupport( blockName, 'anchor' );
 
-		schema = isFunction( schema ) ? schema( { phrasingContentSchema } ) : schema;
+		schema = isFunction( schema ) ? schema( { phrasingContentSchema, isPaste } ) : schema;
 
 		// If the block does not has anchor support and the transform does not
 		// provides an isMatch we can return the schema right away.
