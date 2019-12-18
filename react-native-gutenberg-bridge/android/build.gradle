@@ -154,8 +154,10 @@ if (isJitPack) {
         args = ['bundle:android']
     }
 
-    task ensureAssetsDirectory << {
-        mkdir assetsFolder
+    task ensureAssetsDirectory { 
+        doLast {
+            mkdir assetsFolder
+        }
     }
 
     task copyJSBundle(type: Copy) {
@@ -165,8 +167,9 @@ if (isJitPack) {
         from origWithPath
         into assetsFolder
         rename origFileName, target
-    } << {
-        println "Done copying the Android JS bundle to assets folder"
+        doLast {
+            println "Done copying the Android JS bundle to assets folder"
+        }
     }
 
     task cleanupNodeModulesFolder(type: Delete) {
