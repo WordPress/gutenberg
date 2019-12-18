@@ -417,7 +417,13 @@ export class ImageEdit extends React.Component {
 							);
 
 							return (
-								<View style={ { flex: 1, alignSelf: alignToFlex[ align ] } } >
+								<View style={ {
+									flex: 1,
+									// only set alignSelf if an image exists because alignSelf causes the placeholder
+									// to disappear when an aligned image can't be downloaded
+									// https://github.com/wordpress-mobile/gutenberg-mobile/issues/1592
+									alignSelf: imageWidthWithinContainer && alignToFlex[ align ] }
+								} >
 									{ ! imageWidthWithinContainer &&
 										<View style={ [ styles.imageContainer, { height: imageContainerHeight } ] } >
 											{ this.getIcon( false ) }

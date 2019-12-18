@@ -20,6 +20,8 @@ ${ dependencyMappings }
 	const testsVolumes = `
       - ${ cwd }/../${ cwdName }-tests-wordpress/:/var/www/html/${ commonVolumes }`;
 	return `version: '2.1'
+volumes:
+  tests-wordpress-phpunit:
 services:
   mysql:
     environment:
@@ -57,5 +59,18 @@ services:
       - tests-wordpress
     image: wordpress:cli
     volumes:${ testsVolumes }
-  `;
+  tests-wordpress-phpunit:
+    depends_on:
+      - mysql
+    environment:
+      PHPUNIT_DB_HOST: mysql
+    image: chriszarate/wordpress-phpunit
+    volumes:
+      - ${ cwd }/:/app/
+      - tests-wordpress-phpunit/:/tmp/
+  composer:
+    image: composer
+    volumes:
+      - ${ cwd }/:/app/
+`;
 };

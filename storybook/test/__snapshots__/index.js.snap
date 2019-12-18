@@ -3055,7 +3055,7 @@ exports[`Storyshots Components|RangeControl Default 1`] = `
 </div>
 `;
 
-exports[`Storyshots Components|RangeControl With Help 1`] = `
+exports[`Storyshots Components|RangeControl Initial Value Zero 1`] = `
 <div
   className="components-base-control components-range-control"
 >
@@ -3069,9 +3069,45 @@ exports[`Storyshots Components|RangeControl With Help 1`] = `
       How many columns should this use?
     </label>
     <input
-      aria-describedby="inspector-range-control-2__help"
       className="components-range-control__slider"
       id="inspector-range-control-2"
+      max={20}
+      min={0}
+      onChange={[Function]}
+      type="range"
+      value={0}
+    />
+    <input
+      aria-label="How many columns should this use?"
+      className="components-range-control__number"
+      max={20}
+      min={0}
+      onBlur={[Function]}
+      onChange={[Function]}
+      type="number"
+      value={null}
+    />
+  </div>
+</div>
+`;
+
+exports[`Storyshots Components|RangeControl With Help 1`] = `
+<div
+  className="components-base-control components-range-control"
+>
+  <div
+    className="components-base-control__field"
+  >
+    <label
+      className="components-base-control__label"
+      htmlFor="inspector-range-control-3"
+    >
+      How many columns should this use?
+    </label>
+    <input
+      aria-describedby="inspector-range-control-3__help"
+      className="components-range-control__slider"
+      id="inspector-range-control-3"
       onChange={[Function]}
       type="range"
       value={5}
@@ -3087,7 +3123,7 @@ exports[`Storyshots Components|RangeControl With Help 1`] = `
   </div>
   <p
     className="components-base-control__help"
-    id="inspector-range-control-2__help"
+    id="inspector-range-control-3__help"
   >
     Please select the number of columns you would like this to contain.
   </p>
@@ -3103,13 +3139,13 @@ exports[`Storyshots Components|RangeControl With Icon After 1`] = `
   >
     <label
       className="components-base-control__label"
-      htmlFor="inspector-range-control-5"
+      htmlFor="inspector-range-control-6"
     >
       How many columns should this use?
     </label>
     <input
       className="components-range-control__slider"
-      id="inspector-range-control-5"
+      id="inspector-range-control-6"
       onChange={[Function]}
       type="range"
       value={5}
@@ -3149,7 +3185,7 @@ exports[`Storyshots Components|RangeControl With Icon Before 1`] = `
   >
     <label
       className="components-base-control__label"
-      htmlFor="inspector-range-control-4"
+      htmlFor="inspector-range-control-5"
     >
       How many columns should this use?
     </label>
@@ -3169,7 +3205,7 @@ exports[`Storyshots Components|RangeControl With Icon Before 1`] = `
     </svg>
     <input
       className="components-range-control__slider"
-      id="inspector-range-control-4"
+      id="inspector-range-control-5"
       onChange={[Function]}
       type="range"
       value={5}
@@ -3195,13 +3231,13 @@ exports[`Storyshots Components|RangeControl With Minimum And Maximum Limits 1`] 
   >
     <label
       className="components-base-control__label"
-      htmlFor="inspector-range-control-3"
+      htmlFor="inspector-range-control-4"
     >
       How many columns should this use?
     </label>
     <input
       className="components-range-control__slider"
-      id="inspector-range-control-3"
+      id="inspector-range-control-4"
       max={10}
       min={2}
       onChange={[Function]}
@@ -3231,13 +3267,13 @@ exports[`Storyshots Components|RangeControl With Reset 1`] = `
   >
     <label
       className="components-base-control__label"
-      htmlFor="inspector-range-control-6"
+      htmlFor="inspector-range-control-7"
     >
       How many columns should this use?
     </label>
     <input
       className="components-range-control__slider"
-      id="inspector-range-control-6"
+      id="inspector-range-control-7"
       onChange={[Function]}
       type="range"
       value={5}

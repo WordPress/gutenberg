@@ -840,6 +840,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "StepperControl",
+		"slug": "stepper-control",
+		"markdown_source": "../packages/components/src/mobile/stepper-control/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Modal",
 		"slug": "modal",
 		"markdown_source": "../packages/components/src/modal/README.md",

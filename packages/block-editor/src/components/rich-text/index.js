@@ -25,7 +25,6 @@ import {
 	toHTMLString,
 	slice,
 } from '@wordpress/rich-text';
-import { withFilters } from '@wordpress/components';
 import deprecated from '@wordpress/deprecated';
 import { isURL } from '@wordpress/url';
 
@@ -352,10 +351,6 @@ class RichTextWrapper extends Component {
 			// eslint-disable-next-line no-unused-vars
 			canUserUseUnfilteredHTML,
 			// eslint-disable-next-line no-unused-vars
-			clientId,
-			// eslint-disable-next-line no-unused-vars
-			identifier,
-			// eslint-disable-next-line no-unused-vars
 			instanceId,
 			// To do: find a better way to implicitly inherit props.
 			start,
@@ -363,8 +358,7 @@ class RichTextWrapper extends Component {
 			style,
 			preserveWhiteSpace,
 			disabled,
-			// From experimental filter. To do: pick props instead.
-			...experimentalProps
+			...props
 		} = this.props;
 		const multilineTag = getMultilineTag( multiline );
 
@@ -383,7 +377,7 @@ class RichTextWrapper extends Component {
 
 		const content = (
 			<RichText
-				{ ...experimentalProps }
+				{ ...props }
 				ref={ this.ref }
 				value={ adjustedValue }
 				onChange={ adjustedOnChange }
@@ -550,7 +544,6 @@ const RichTextContainer = compose( [
 			undo,
 		};
 	} ),
-	withFilters( 'experimentalRichText' ),
 ] )( RichTextWrapper );
 
 RichTextContainer.Content = ( { value, tagName: Tag, multiline, ...props } ) => {

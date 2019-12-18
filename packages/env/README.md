@@ -14,17 +14,18 @@ $ wp-env --help
 wp-env <command>
 
 Commands:
-  wp-env start [ref]          Starts WordPress for development on port 8888
-                              (​http://localhost:8888​) (override with
-                              WP_ENV_PORT) and tests on port 8889
-                              (​http://localhost:8889​) (override with
-                              WP_ENV_TESTS_PORT). If the current working
-                              directory is a plugin and/or has e2e-tests with
-                              plugins and/or mu-plugins, they will be mounted
-                              appropriately.
-  wp-env stop                 Stops running WordPress for development and tests
-                              and frees the ports.
-  wp-env clean [environment]  Cleans the WordPress databases.
+  wp-env start [ref]                  Starts WordPress for development on port
+                                      8888 (​http://localhost:8888​) and tests
+                                      on port 8889 (​http://localhost:8889​). If
+                                      the current working directory is a plugin
+                                      and/or has e2e-tests with plugins and/or
+                                      mu-plugins, they will be mounted
+                                      appropiately.
+  wp-env stop                         Stops running WordPress for development
+                                      and tests and frees the ports.
+  wp-env clean [environment]          Cleans the WordPress databases.
+  wp-env run <container> [command..]  Runs an arbitrary command in one of the
+                                      underlying Docker containers.
 
 Options:
   --help     Show help                                                 [boolean]
@@ -65,6 +66,16 @@ Cleans the WordPress databases.
 Positionals:
   environment  Which environments' databases to clean.
             [string] [choices: "all", "development", "tests"] [default: "tests"]
+```
+
+### `$ wp-env run --help`
+
+```sh
+wp-env run <container> [command..]
+Runs an arbitrary command in one of the underlying Docker containers.
+Positionals:
+  container  The container to run the command on.            [string] [required]
+  command    The command to run.                           [array] [default: []]
 ```
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
