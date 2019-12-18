@@ -1,0 +1,38 @@
+{
+	"name": "@wordpress/edit-site",
+	"version": "1.0.0-beta.0",
+	"private": true,
+	"description": "Edit Site Page module for WordPress.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/edit-site/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/edit-site"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"react-native": "src/index",
+	"dependencies": {
+		"@babel/runtime": "^7.4.4",
+		"@wordpress/block-editor": "file:../block-editor",
+		"@wordpress/block-library": "file:../block-library",
+		"@wordpress/components": "file:../components",
+		"@wordpress/data": "file:../data",
+		"@wordpress/element": "file:../element",
+		"@wordpress/hooks": "file:../hooks",
+		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/media-utils": "file:../media-utils",
+		"@wordpress/notices": "file:../notices"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}
