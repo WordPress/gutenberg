@@ -7,7 +7,7 @@ import { View } from 'react-native';
  * WordPress dependencies
  */
 import {
-	StepperControl,
+	RangeControl,
 	PanelBody,
 } from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
@@ -48,14 +48,14 @@ const SpacerEdit = ( { isSelected, attributes, setAttributes, getStylesFromColor
 		<View style={ [ defaultStyle, isSelected && styles.selectedSpacer, { height } ] }>
 			<InspectorControls>
 				<PanelBody title={ __( 'Spacer Settings' ) } >
-					<StepperControl
-						icon="screenoptions"
+					<RangeControl
 						label={ __( 'Height in pixels' ) }
-						maxValue={ sliderSpacerMaxHeight }
-						minValue={ minSpacerHeight }
-						onChangeValue={ changeAttribute }
+						minimumValue={ minSpacerHeight }
+						maximumValue={ sliderSpacerMaxHeight }
+						separatorType={ 'none' }
 						value={ height }
-						step={ 20 }
+						onChange={ changeAttribute }
+						style={ styles.rangeCellContainer }
 					/>
 				</PanelBody>
 			</InspectorControls>
