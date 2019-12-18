@@ -11,6 +11,8 @@ import Button from '../button';
 function IconButton( {
 	labelPosition,
 	size,
+	tooltip,
+	label,
 	...props
 }, ref ) {
 	return (
@@ -19,6 +21,8 @@ function IconButton( {
 			ref={ ref }
 			tooltipPosition={ labelPosition }
 			iconSize={ size }
+			showTooltip={ tooltip !== undefined ? !! tooltip : undefined }
+			label={ tooltip || label }
 		/>
 	);
 }

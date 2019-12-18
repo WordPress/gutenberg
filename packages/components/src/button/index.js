@@ -34,7 +34,7 @@ export function Button( props, ref ) {
 		disabled,
 		icon,
 		iconSize,
-		tooltip,
+		showTooltip,
 		tooltipPosition,
 		shortcut,
 		label,
@@ -69,9 +69,9 @@ export function Button( props, ref ) {
 		{ type: 'button', disabled, 'aria-pressed': isPressed };
 
 	// Should show the tooltip if...
-	const showTooltip = ! disabled && (
+	const shouldShowTooltip = ! disabled && (
 		// an explicit tooltip is passed or...
-		tooltip ||
+		( showTooltip && label ) ||
 		// there's a shortcut or...
 		shortcut ||
 		(
@@ -80,7 +80,7 @@ export function Button( props, ref ) {
 			// the children are empty and...
 			( ! children || ( isArray( children ) && ! children.length ) ) &&
 			// the tooltip is not explicitly disabled.
-			false !== tooltip
+			false !== showTooltip
 		)
 	);
 
@@ -97,14 +97,12 @@ export function Button( props, ref ) {
 		</Tag>
 	);
 
-	if ( ! showTooltip ) {
+	if ( ! shouldShowTooltip ) {
 		return element;
 	}
 
-	const tooltipText = tooltip || label;
-
 	return (
-		<Tooltip text={ tooltipText } shortcut={ shortcut } position={ tooltipPosition }>
+		<Tooltip text={ label } shortcut={ shortcut } position={ tooltipPosition }>
 			{ element }
 		</Tooltip>
 	);

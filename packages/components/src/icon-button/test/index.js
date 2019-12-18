@@ -63,10 +63,10 @@ describe( 'IconButton', () => {
 		} );
 
 		it( 'should allow custom tooltip text', () => {
-			const iconButton = shallow( <IconButton label="WordPress" tooltip="Custom" /> );
+			const iconButton = shallow( <IconButton tooltip="Custom" /> );
 			expect( iconButton.name() ).toBe( 'Tooltip' );
 			expect( iconButton.prop( 'text' ) ).toBe( 'Custom' );
-			expect( iconButton.find( 'ForwardRef(Button)' ).prop( 'aria-label' ) ).toBe( 'WordPress' );
+			expect( iconButton.find( 'ForwardRef(Button)' ).prop( 'aria-label' ) ).toBe( 'Custom' );
 		} );
 
 		it( 'should allow tooltip disable', () => {
