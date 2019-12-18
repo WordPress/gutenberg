@@ -66,6 +66,7 @@ class BottomSheet extends Component {
 			style = {},
 			contentStyle = {},
 			getStylesFromColorScheme,
+			...modalProps
 		} = this.props;
 
 		const panResponder = PanResponder.create( {
@@ -118,6 +119,7 @@ class BottomSheet extends Component {
 				onMoveShouldSetResponder={ panResponder.panHandlers.onMoveShouldSetResponder }
 				onMoveShouldSetResponderCapture={ panResponder.panHandlers.onMoveShouldSetResponderCapture }
 				onAccessibilityEscape={ this.props.onClose }
+				{ ...modalProps }
 			>
 				<KeyboardAvoidingView
 					behavior={ Platform.OS === 'ios' && 'padding' }

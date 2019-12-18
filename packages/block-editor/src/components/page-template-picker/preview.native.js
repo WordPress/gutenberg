@@ -4,7 +4,7 @@
 import { BlockEditorProvider, BlockList } from '@wordpress/block-editor';
 import { BottomSheet } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { useEffect, useState } from '@wordpress/element';
+import { forwardRef, useCallback, useEffect, useRef, useState } from '@wordpress/element';
 
 /**
  * External dependencies
@@ -33,7 +33,7 @@ const useScreenDimensions = ( dimension = 'window' ) => {
 //
 // We can make it work here first, then figure out the right way to consolidate
 // both implementations
-const BlockPreview = ( { blocks } ) => {
+const BlockPreview = forwardRef( ( { blocks, onScroll }, ref ) => {
 	const currentSettings = useSelect( ( select ) => {
 		return select( 'core/block-editor' ).getSettings();
 	} );
@@ -54,15 +54,25 @@ const BlockPreview = ( { blocks } ) => {
 			settings={ settings }
 		>
 			<View style={ style.container }>
-				<BlockList />
+				<BlockList scrollViewRef={ ref } onScroll={ onScroll } />
 			</View>
 		</BlockEditorProvider>
 	);
-};
+} );
 BlockPreview.displayName = 'BlockPreview';
 
 const Preview = ( props ) => {
 	const { template, onDismiss } = props;
+	const blockPreviewRef = useRef( null );
+	const [ scrollOffset, setScrollOffset ] = useState( null );
+	const handleScrollTo = useCallback(	( point ) => {
+		if ( ! blockPreviewRef.current ) {
+			return;
+		}
+		const scrollRef = blockPreviewRef.current._listRef ? blockPreviewRef.current._listRef.getScrollRef() : blockPreviewRef.current;
+		scrollRef.scrollTo( point );
+	}, [ blockPreviewRef ] );
+
 	if ( template === undefined ) {
 		return null;
 	}
@@ -72,8 +82,15 @@ const Preview = ( props ) => {
 			title={ template.name }
 			isVisible={ !! template }
 			onClose={ onDismiss }
+			scrollTo={ handleScrollTo }
+			scrollOffset={ scrollOffset }
+			scrollOffsetMax={ 1000 } // Not sure what this does yet, but it seems required
 		>
-			<BlockPreview blocks={ template.blocks } />
+			<BlockPreview
+				blocks={ template.blocks }
+				ref={ blockPreviewRef }
+				onScroll={ event => setScrollOffset( event.nativeEvent.contentOffset.y ) }
+			/>
 		</BottomSheet>
 	);
 };

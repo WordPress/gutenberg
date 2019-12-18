@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { identity } from 'lodash';
-import { Text, View, Platform, TouchableWithoutFeedback } from 'react-native';
+import { FlatList, Text, View, Platform, TouchableWithoutFeedback } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -48,6 +48,11 @@ export class BlockList extends Component {
 
 	scrollViewInnerRef( ref ) {
 		this.scrollViewRef = ref;
+		if ( typeof this.props.scrollViewRef === 'function' ) {
+			this.props.scrollViewRef( ref );
+		} else if ( typeof this.props.scrollViewRef === 'object' ) {
+			this.props.scrollViewRef.current = ref;
+		}
 	}
 
 	shouldFlatListPreventAutomaticScroll() {
@@ -81,31 +86,35 @@ export class BlockList extends Component {
 			renderAppender,
 			isReadOnly,
 			isRootList,
+			onScroll
 		} = this.props;
+
+		const ListComponent = isReadOnly ? FlatList : KeyboardAwareFlatList;
 
 		return (
 			<View
 				style={ { flex: isRootList ? 1 : 0 } }
 				onAccessibilityEscape={ clearSelectedBlock }
 			>
-				<KeyboardAwareFlatList
+				<ListComponent
 					{ ...( Platform.OS === 'android' ? { removeClippedSubviews: false } : {} ) } // Disable clipping on Android to fix focus losing. See https://github.com/wordpress-mobile/gutenberg-mobile/pull/741#issuecomment-472746541
 					accessibilityLabel="block-list"
 					autoScroll={ this.props.autoScroll }
 					innerRef={ this.scrollViewInnerRef }
+					ref={ this.scrollViewInnerRef }
 					extraScrollHeight={ innerToolbarHeight + 10 }
 					keyboardShouldPersistTaps="always"
 					scrollViewStyle={ { flex: isRootList ? 1 : 0 } }
+					onScroll={ onScroll }
 					data={ blockClientIds }
 					extraData={ [ isFullyBordered ] }
 					keyExtractor={ identity }
 					renderItem={ this.renderItem }
 					shouldPreventAutomaticScroll={ this.shouldFlatListPreventAutomaticScroll }
 					title={ title }
-					pointerEvents={ isReadOnly ? 'box-only' : 'auto' }
-					ListHeaderComponent={ header }
-					ListEmptyComponent={ this.renderDefaultBlockAppender }
-					ListFooterComponent={ withFooter && this.renderBlockListFooter }
+					ListHeaderComponent={ ! isReadOnly && header }
+					ListEmptyComponent={ ! isReadOnly && this.renderDefaultBlockAppender }
+					ListFooterComponent={ ! isReadOnly && withFooter && this.renderBlockListFooter }
 				/>
 
 				{ renderAppender && blockClientIds.length > 0 && (
@@ -130,20 +139,28 @@ export class BlockList extends Component {
 	}
 
 	renderItem( { item: clientId, index } ) {
-		const { shouldShowBlockAtIndex, shouldShowInsertionPointBefore, shouldShowInsertionPointAfter } = this.props;
+		const {
+			isReadOnly,
+			shouldShowBlockAtIndex,
+			shouldShowInsertionPointBefore,
+			shouldShowInsertionPointAfter
+		} = this.props;
+
 		return (
 			<ReadableContentView>
-				{ shouldShowInsertionPointBefore( clientId ) && this.renderAddBlockSeparator() }
-				{ shouldShowBlockAtIndex( index ) && (
-					<BlockListBlock
-						key={ clientId }
-						showTitle={ false }
-						clientId={ clientId }
-						rootClientId={ this.props.rootClientId }
-						onCaretVerticalPositionChange={ this.onCaretVerticalPositionChange }
-						isSmallScreen={ ! this.props.isFullyBordered }
-					/> ) }
-				{ shouldShowInsertionPointAfter( clientId ) && this.renderAddBlockSeparator() }
+				<View pointerEvents={ isReadOnly ? 'box-only' : 'auto' }>
+					{ shouldShowInsertionPointBefore( clientId ) && this.renderAddBlockSeparator() }
+					{ shouldShowBlockAtIndex( index ) && (
+						<BlockListBlock
+							key={ clientId }
+							showTitle={ false }
+							clientId={ clientId }
+							rootClientId={ this.props.rootClientId }
+							onCaretVerticalPositionChange={ this.onCaretVerticalPositionChange }
+							isSmallScreen={ ! this.props.isFullyBordered }
+						/> ) }
+					{ shouldShowInsertionPointAfter( clientId ) && this.renderAddBlockSeparator() }
+				</View>
 			</ReadableContentView>
 		);
 	}
