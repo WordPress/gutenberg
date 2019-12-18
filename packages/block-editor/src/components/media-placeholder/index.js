@@ -117,31 +117,28 @@ export class MediaPlaceholder extends Component {
 			onError,
 			onSelect,
 			value = [],
-			dynamicAlteration,
 		} = this.props;
 		let setMedia;
 		if ( multiple ) {
 			if ( addToGallery ) {
 				let mediaToReturn = value;
 				setMedia = ( newMedia ) => {
-					if ( dynamicAlteration ) {
-						const currentMedia = this.props.value || [];
-						// If mediaToReturn contains things not in currentMedia, remove them.
-						mediaToReturn = mediaToReturn.filter( ( item ) => {
-							return currentMedia.some( ( currentItem ) => currentItem.id === item.id && currentItem.url === item.url );
-						} );
-						// If currentMedia has completed items not in mediaToReturn, add them.
-						currentMedia.forEach( ( currentItem ) => {
-							if ( currentItem.id &&
-									// Item is not already in mediaToReturn set.
-									! mediaToReturn.some( ( item ) => item.id === currentItem.id ) &&
-									// Item is not a member of our upload group.
-									! newMedia.some( ( item ) => item.id === currentItem.id )
-							) {
-								mediaToReturn.push( currentItem );
-							}
-						} );
-					}
+					const currentMedia = this.props.value || [];
+					// If mediaToReturn contains things not in currentMedia, remove them.
+					mediaToReturn = mediaToReturn.filter( ( item ) => {
+						return currentMedia.some( ( currentItem ) => currentItem.id === item.id && currentItem.url === item.url );
+					} );
+					// If currentMedia has completed items not in mediaToReturn, add them.
+					currentMedia.forEach( ( currentItem ) => {
+						if ( currentItem.id &&
+								// Item is not already in mediaToReturn set.
+								! mediaToReturn.some( ( item ) => item.id === currentItem.id ) &&
+								// Item is not a member of our upload group.
+								! newMedia.some( ( item ) => item.id === currentItem.id )
+						) {
+							mediaToReturn.push( currentItem );
+						}
+					} );
 					onSelect( mediaToReturn.concat( newMedia ) );
 				};
 			} else {
