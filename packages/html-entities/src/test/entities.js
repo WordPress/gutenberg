@@ -19,9 +19,9 @@ describe( 'decodeEntities', () => {
 		const expected = 'This post&rsquo;s title.';
 		expect( decodeEntities( html ) ).toEqual( expected );
 	} );
-	it( 'should decode varitions of same entity codes, eg. single quote can be &#39s or &#039;', () => {
-		const html = 'Jim&#039;s post&#39s title.';
-		const expected = 'Jim\'s post\'s title.';
+	it( 'should not care about leading zeros on entity codes', () => {
+		const html = 'Jim&#0039;s mother&#039s post&#39s title.';
+		const expected = 'Jim\'s mother\'s post\'s title.';
 		expect( decodeEntities( html ) ).toEqual( expected );
 	} );
 } );
