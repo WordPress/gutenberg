@@ -926,7 +926,7 @@ _Returns_
 
 <a name="insertAfterBlock" href="#insertAfterBlock">#</a> **insertAfterBlock**
 
-Generator used to insert an empty block before a given blck
+Generator used to insert an empty block before a given block.
 
 _Parameters_
 
@@ -934,7 +934,7 @@ _Parameters_
 
 <a name="insertBeforeBlock" href="#insertBeforeBlock">#</a> **insertBeforeBlock**
 
-Generator used to insert an empty block after a given blck
+Generator used to insert an empty block after a given block.
 
 _Parameters_
 
