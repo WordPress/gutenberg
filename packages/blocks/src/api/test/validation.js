@@ -832,6 +832,50 @@ describe( 'validation', () => {
 				expect( getSaveContent( blockType, blockAttributes ) ).toBe( '<div class="bar foo">Bananas</div>' );
 			} );
 
+			it( 'returns false if tags do not match', () => {
+				const blockName = 'core/test-block';
+				const blockAttributes = { fruit: 'Bananas', level: 2 };
+				registerBlockType( blockName, {
+					...defaultBlockSettings,
+					save: ( { attributes } ) => {
+						if ( attributes.level === 1 ) {
+							return (
+								<h1>
+									{ attributes.fruit }
+								</h1>
+							);
+						}
+
+						if ( attributes.level === 2 ) {
+							return (
+								<h2>
+									{ attributes.fruit }
+								</h2>
+							);
+						}
+
+						return (
+							<h3>
+								{ attributes.fruit }
+							</h3>
+						);
+					},
+				} );
+
+				const isValid = isValidBlockContent(
+					blockName,
+					blockAttributes,
+					'<h3 class="foo bar" data-foo="baz">Bananas</h3>',
+				);
+
+				const blockType = normalizeBlockType( blockName );
+
+				expect( console ).toHaveWarned();
+				expect( console ).toHaveErrored();
+				expect( isValid ).toBe( false );
+				expect( getSaveContent( blockType, blockAttributes ) ).toBe( '<h2>Bananas</h2>' );
+			} );
+
 			it( 'returns false if there are floating point rounding errors', () => {
 				const blockName = 'core/test-block';
 				const blockAttributes = { fruit: 'Bananas', x: 0.07, y: 0.07 };
