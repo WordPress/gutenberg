@@ -156,6 +156,8 @@ export default compose(
 
 					const count = getBlockCount();
 					if ( count === 1 ) {
+						// removing the last block is not possible with `removeBlock` action
+						// it always inserts a default block if the last of the blocks have been removed
 						clearSelectedBlock();
 						resetBlocks( [] );
 					} else {
