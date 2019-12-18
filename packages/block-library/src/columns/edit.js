@@ -69,10 +69,7 @@ function ColumnsEditContainer( {
 	} = __experimentalUseColors(
 		[
 			{ name: 'backgroundColor', className: 'has-background' },
-		],
-		{
-			contrastCheckers: [ { backgroundColor: false } ],
-		}
+		]
 	);
 
 	const classes = classnames( className, {
