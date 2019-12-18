@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isFunction, noop, startsWith } from 'lodash';
+import { isFunction, noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -15,7 +15,6 @@ import {
 import { __ } from '@wordpress/i18n';
 
 import {
-	useCallback,
 	useState,
 	useEffect,
 	Fragment,
@@ -24,19 +23,14 @@ import {
 import {
 	safeDecodeURI,
 	filterURLForDisplay,
-	isURL,
-	prependHTTP,
-	getProtocol,
 } from '@wordpress/url';
 
 import { withInstanceId, compose } from '@wordpress/compose';
-import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import LinkControlSettingsDrawer from './settings-drawer';
-import LinkControlSearchItem from './search-item';
 import LinkControlSearchInput from './search-input';
 
 const MODE_EDIT = 'edit';
@@ -46,7 +40,6 @@ function LinkControl( {
 	className,
 	currentLink,
 	currentSettings,
-	fetchSearchSuggestions,
 	instanceId,
 	onClose = noop,
 	onChangeMode = noop,
@@ -112,86 +105,6 @@ function LinkControl( {
 		setInputValue( '' );
 	};
 
-	const handleDirectEntry = ( value ) => {
-		let type = 'URL';
-
-		const protocol = getProtocol( value ) || '';
-
-		if ( protocol.includes( 'mailto' ) ) {
-			type = 'mailto';
-		}
-
-		if ( protocol.includes( 'tel' ) ) {
-			type = 'tel';
-		}
-
-		if ( startsWith( value, '#' ) ) {
-			type = 'internal';
-		}
-
-		return Promise.resolve(
-			[ {
-				id: '-1',
-				title: value,
-				url: type === 'URL' ? prependHTTP( value ) : value,
-				type,
-			} ]
-		);
-	};
-
-	const handleEntitySearch = async ( value ) => {
-		const results = await Promise.all( [
-			fetchSearchSuggestions( value ),
-			handleDirectEntry( value ),
-		] );
-
-		const couldBeURL = ! value.includes( ' ' );
-
-		// If it's potentially a URL search then concat on a URL search suggestion
-		// just for good measure. That way once the actual results run out we always
-		// have a URL option to fallback on.
-		return couldBeURL ? results[ 0 ].concat( results[ 1 ] ) : results[ 0 ];
-	};
-
-	// Effects
-	const getSearchHandler = useCallback( ( value ) => {
-		const protocol = getProtocol( value ) || '';
-		const isMailto = protocol.includes( 'mailto' );
-		const isInternal = startsWith( value, '#' );
-		const isTel = protocol.includes( 'tel' );
-
-		const handleManualEntry = isInternal || isMailto || isTel || isURL( value ) || ( value && value.includes( 'www.' ) );
-
-		return ( handleManualEntry ) ? handleDirectEntry( value ) : handleEntitySearch( value );
-	}, [ handleDirectEntry, fetchSearchSuggestions ] );
-
-	// Render Components
-	const renderSearchResults = ( { suggestionsListProps, buildSuggestionItemProps, suggestions, selectedSuggestion, isLoading } ) => {
-		const resultsListClasses = classnames( 'block-editor-link-control__search-results', {
-			'is-loading': isLoading,
-		} );
-
-		const manualLinkEntryTypes = [ 'url', 'mailto', 'tel', 'internal' ];
-
-		return (
-			<div className="block-editor-link-control__search-results-wrapper">
-				<div { ...suggestionsListProps } className={ resultsListClasses }>
-					{ suggestions.map( ( suggestion, index ) => (
-						<LinkControlSearchItem
-							key={ `${ suggestion.id }-${ suggestion.type }` }
-							itemProps={ buildSuggestionItemProps( suggestion, index ) }
-							suggestion={ suggestion }
-							onClick={ () => onLinkChange( suggestion ) }
-							isSelected={ index === selectedSuggestion }
-							isURL={ manualLinkEntryTypes.includes( suggestion.type.toLowerCase() ) }
-							searchTerm={ inputValue }
-						/>
-					) ) }
-				</div>
-			</div>
-		);
-	};
-
 	return (
 		<Popover
 			className={ classnames( 'block-editor-link-control', className ) }
@@ -237,8 +150,6 @@ function LinkControl( {
 							value={ inputValue }
 							onChange={ onInputChange }
 							onSelect={ onLinkChange }
-							renderSuggestions={ renderSearchResults }
-							fetchSuggestions={ getSearchHandler }
 							onReset={ resetInput }
 							onKeyDown={ onKeyDown }
 							onKeyPress={ onKeyPress }
@@ -256,14 +167,4 @@ function LinkControl( {
 
 export default compose(
 	withInstanceId,
-	withSelect( ( select, ownProps ) => {
-		if ( ownProps.fetchSearchSuggestions && isFunction( ownProps.fetchSearchSuggestions ) ) {
-			return;
-		}
-
-		const { getSettings } = select( 'core/block-editor' );
-		return {
-			fetchSearchSuggestions: getSettings().__experimentalFetchLinkSuggestions,
-		};
-	} )
 )( LinkControl );

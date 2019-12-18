@@ -462,9 +462,7 @@ can vary. It is the last clicked or scrolled to position.
 
 <a name="URLInput" href="#URLInput">#</a> **URLInput**
 
-_Related_
-
--   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/url-input/README.md>
+Undocumented declaration.
 
 <a name="URLInputButton" href="#URLInputButton">#</a> **URLInputButton**
 

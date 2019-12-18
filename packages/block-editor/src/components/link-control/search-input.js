@@ -15,8 +15,6 @@ const LinkControlSearchInput = ( {
 	value,
 	onChange,
 	onSelect,
-	renderSuggestions,
-	fetchSuggestions,
 	onReset,
 	onKeyDown,
 	onKeyPress,
@@ -48,9 +46,7 @@ const LinkControlSearchInput = ( {
 				} }
 				onKeyPress={ onKeyPress }
 				placeholder={ __( 'Search or type url' ) }
-				__experimentalRenderSuggestions={ renderSuggestions }
-				__experimentalFetchLinkSuggestions={ fetchSuggestions }
-				__experimentalHandleURLSuggestions={ true }
+				__experimentalUseInlineSuggestions
 			/>
 
 			<IconButton
