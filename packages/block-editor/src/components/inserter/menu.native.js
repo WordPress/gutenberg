@@ -158,7 +158,7 @@ export default compose(
 					if ( count === 1 ) {
 						clearSelectedBlock();
 						resetBlocks( [] );
-					}	else {
+					} else {
 						const blockToReplace = getBlockOrder(
 							ownProps.destinationRootClientId
 						)[ ownProps.insertionIndex ];
