@@ -20,7 +20,7 @@ const mapKeyCombination = ( keyCombination ) => keyCombination.map( ( character,
 	return (
 		<kbd
 			key={ index }
-			className="edit-post-keyboard-shortcut-help__shortcut-key"
+			className="edit-post-keyboard-shortcut-help-modal__shortcut-key"
 		>
 			{ character }
 		</kbd>
@@ -30,11 +30,11 @@ const mapKeyCombination = ( keyCombination ) => keyCombination.map( ( character,
 function Shortcut( { description, keyCombination, ariaLabel } ) {
 	return (
 		<>
-			<div className="edit-post-keyboard-shortcut-help__shortcut-description">
+			<div className="edit-post-keyboard-shortcut-help-modal__shortcut-description">
 				{ description }
 			</div>
-			<div className="edit-post-keyboard-shortcut-help__shortcut-term">
-				<kbd className="edit-post-keyboard-shortcut-help__shortcut-key-combination" aria-label={ ariaLabel }>
+			<div className="edit-post-keyboard-shortcut-help-modal__shortcut-term">
+				<kbd className="edit-post-keyboard-shortcut-help-modal__shortcut-key-combination" aria-label={ ariaLabel }>
 					{ mapKeyCombination( castArray( keyCombination ) ) }
 				</kbd>
 			</div>

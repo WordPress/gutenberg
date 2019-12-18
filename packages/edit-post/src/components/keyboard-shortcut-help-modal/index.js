@@ -29,10 +29,10 @@ const ShortcutList = ( { shortcuts } ) => (
 	 * Safari+VoiceOver won't announce the list otherwise.
 	 */
 	/* eslint-disable jsx-a11y/no-redundant-roles */
-	<ul className="edit-post-keyboard-shortcut-help__shortcut-list" role="list">
+	<ul className="edit-post-keyboard-shortcut-help-modal__shortcut-list" role="list">
 		{ shortcuts.map( ( shortcut, index ) => (
 			<li
-				className="edit-post-keyboard-shortcut-help__shortcut"
+				className="edit-post-keyboard-shortcut-help-modal__shortcut"
 				key={ index }
 			>
 				{ isString( shortcut ) ?
@@ -46,9 +46,9 @@ const ShortcutList = ( { shortcuts } ) => (
 );
 
 const ShortcutSection = ( { title, shortcuts, className } ) => (
-	<section className={ classnames( 'edit-post-keyboard-shortcut-help__section', className ) }>
+	<section className={ classnames( 'edit-post-keyboard-shortcut-help-modal__section', className ) }>
 		{ !! title && (
-			<h2 className="edit-post-keyboard-shortcut-help__section-title">
+			<h2 className="edit-post-keyboard-shortcut-help-modal__section-title">
 				{ title }
 			</h2>
 		) }
@@ -67,13 +67,13 @@ export function KeyboardShortcutHelpModal( { isModalActive, toggleModal } ) {
 			/>
 			{ isModalActive && (
 				<Modal
-					className="edit-post-keyboard-shortcut-help"
+					className="edit-post-keyboard-shortcut-help-modal"
 					title={ __( 'Keyboard shortcuts' ) }
 					closeLabel={ __( 'Close' ) }
 					onRequestClose={ toggleModal }
 				>
 					<ShortcutSection
-						className="edit-post-keyboard-shortcut-help__main-shortcuts"
+						className="edit-post-keyboard-shortcut-help-modal__main-shortcuts"
 						shortcuts={ mainShortcuts }
 					/>
 					<ShortcutSection
