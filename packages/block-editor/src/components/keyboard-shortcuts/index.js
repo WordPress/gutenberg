@@ -16,76 +16,76 @@ function KeyboardShortcuts() {
 	// Registering the shortcuts
 	const { registerShortcut } = useDispatch( 'core/keyboard-shortcuts' );
 	useEffect( () => {
-		registerShortcut(
-			'core/block-editor/duplicate',
-			'block',
-			__( 'Duplicate the selected block(s).' ),
-			{
+		registerShortcut( {
+			name: 'core/block-editor/duplicate',
+			category: 'block',
+			description: __( 'Duplicate the selected block(s).' ),
+			keyCombination: {
 				modifier: 'primaryShift',
 				character: 'd',
-			}
-		);
+			},
+		} );
 
-		registerShortcut(
-			'core/block-editor/remove',
-			'block',
-			__( 'Remove the selected block(s).' ),
-			{
+		registerShortcut( {
+			name: 'core/block-editor/remove',
+			category: 'block',
+			description: __( 'Remove the selected block(s).' ),
+			keyCombination: {
 				modifier: 'access',
 				character: 'z',
-			}
-		);
+			},
+		} );
 
-		registerShortcut(
-			'core/block-editor/insertBefore',
-			'block',
-			__( 'Insert a new block before the selected block(s).' ),
-			{
+		registerShortcut( {
+			name: 'core/block-editor/insertBefore',
+			category: 'block',
+			description: __( 'Insert a new block before the selected block(s).' ),
+			keyCombination: {
 				modifier: 'primaryAlt',
 				character: 't',
-			}
-		);
+			},
+		} );
 
-		registerShortcut(
-			'core/block-editor/insertAfter',
-			'block',
-			__( 'Insert a new block after the selected block(s).' ),
-			{
+		registerShortcut( {
+			name: 'core/block-editor/insertAfter',
+			category: 'block',
+			description: __( 'Insert a new block after the selected block(s).' ),
+			keyCombination: {
 				modifier: 'primaryAlt',
 				character: 'y',
-			}
-		);
+			},
+		} );
 
-		registerShortcut(
-			'core/block-editor/deleteMultiSelection',
-			'block',
-			__( 'Remove the multi-selected blocks.' ),
-			{
+		registerShortcut( {
+			name: 'core/block-editor/deleteMultiSelection',
+			category: 'block',
+			description: __( 'Remove the multi-selected blocks.' ),
+			keyCombination: {
 				character: 'del',
 				aliases: [
 					'backspace',
 				],
-			}
-		);
+			},
+		} );
 
-		registerShortcut(
-			'core/block-editor/selectAll',
-			'selection',
-			__( 'Select all text when typing. Press again to select all blocks.' ),
-			{
+		registerShortcut( {
+			name: 'core/block-editor/selectAll',
+			category: 'selection',
+			description: __( 'Select all text when typing. Press again to select all blocks.' ),
+			keyCombination: {
 				modifier: 'primary',
 				character: 'a',
-			}
-		);
+			},
+		} );
 
-		registerShortcut(
-			'core/block-editor/unselect',
-			'selections',
-			__( 'Clear selection.' ),
-			{
+		registerShortcut( {
+			name: 'core/block-editor/unselect',
+			category: 'selections',
+			description: __( 'Clear selection.' ),
+			keyCombination: {
 				character: 'escape',
-			}
-		);
+			},
+		} );
 	}, [ registerShortcut ] );
 
 	// Shortcuts Logic

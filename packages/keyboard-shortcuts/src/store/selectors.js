@@ -15,7 +15,7 @@ const EMPTY_ARRAY = [];
  * @return {Object?} Key combination.
  */
 export function getShortcutKeyCombination( state, name ) {
-	return state[ name ] ? state[ name ].combination : null;
+	return state[ name ] ? state[ name ].keyCombination : null;
 }
 
 /**

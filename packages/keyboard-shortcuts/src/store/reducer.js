@@ -18,7 +18,7 @@ function reducer( state = {}, action ) {
 				...state,
 				[ action.name ]: {
 					category: action.category,
-					combination: action.combination,
+					keyCombination: action.keyCombination,
 					aliases: action.aliases,
 					description: action.description,
 				},
