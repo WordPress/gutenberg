@@ -43,8 +43,8 @@
 		},
 		"ids": {
 			"type": "array",
-  			"items": {
-    			"type": "number"
+			"items": {
+				"type": "number"
   			},
 			"default": []
 		},
