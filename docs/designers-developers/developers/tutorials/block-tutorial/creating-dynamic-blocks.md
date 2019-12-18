@@ -125,7 +125,7 @@ function gutenberg_examples_dynamic() {
 	$asset_file = include( plugin_dir_path( __FILE__ ) . 'build/index.asset.php');
 
 	wp_register_script(
-		'gutenberg-examples-05',
+		'gutenberg-examples-dynamic',
 		plugins_url( 'build/block.js', __FILE__ ),
 		$asset_file['dependencies'],
 		$asset_file['version']
@@ -206,4 +206,3 @@ registerBlockType( 'gutenberg-examples/example-dynamic', {
 {% end %}
 
 Note that this code uses the `wp-server-side-render` package but not `wp-data`. Make sure to update the dependencies in the PHP code. You can use wp-scripts and ESNext setup for auto dependencies (see the [gutenberg-examples repo](https://github.com/WordPress/gutenberg-examples/tree/master/01-basic-esnext) for PHP code setup).
-
