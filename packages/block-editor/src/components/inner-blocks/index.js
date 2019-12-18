@@ -185,7 +185,13 @@ InnerBlocks = compose( [
 
 		return {
 			replaceInnerBlocks( blocks ) {
-				replaceInnerBlocks( clientId, blocks, block.innerBlocks.length === 0 && templateInsertUpdatesSelection );
+				replaceInnerBlocks(
+					clientId,
+					blocks,
+					block.innerBlocks.length === 0 &&
+						templateInsertUpdatesSelection &&
+						blocks.length !== 0
+				);
 			},
 			updateNestedSettings( settings ) {
 				dispatch( updateBlockListSettings( clientId, settings ) );
