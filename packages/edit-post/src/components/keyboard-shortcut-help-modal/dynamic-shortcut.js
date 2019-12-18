@@ -10,22 +10,22 @@ import { displayShortcutList } from '@wordpress/keycodes';
 import Shortcut from './shortcut';
 
 function DynamicShortcut( { name } ) {
-	const { keysCombination, description } = useSelect( ( select ) => {
-		const { getShortcutKeysCombination, getShortcutDescription } = select( 'core/keyboard-shortcuts' );
+	const { keyCombination, description } = useSelect( ( select ) => {
+		const { getShortcutKeyCombination, getShortcutDescription } = select( 'core/keyboard-shortcuts' );
 
 		return {
-			keysCombination: getShortcutKeysCombination( name ),
+			keyCombination: getShortcutKeyCombination( name ),
 			description: getShortcutDescription( name ),
 		};
 	} );
 
-	if ( ! keysCombination ) {
+	if ( ! keyCombination ) {
 		return null;
 	}
 
-	const combination = keysCombination.modifier ?
-		displayShortcutList[ keysCombination.modifier ]( keysCombination.character ) :
-		keysCombination.character;
+	const combination = keyCombination.modifier ?
+		displayShortcutList[ keyCombination.modifier ]( keyCombination.character ) :
+		keyCombination.character;
 
 	return (
 		<Shortcut

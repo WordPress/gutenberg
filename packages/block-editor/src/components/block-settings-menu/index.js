@@ -37,12 +37,12 @@ export function BlockSettingsMenu( { clientIds } ) {
 	const firstBlockClientId = blockClientIds[ 0 ];
 
 	const shortcuts = useSelect( ( select ) => {
-		const { getShortcutKeysCombination } = select( 'core/keyboard-shortcuts' );
+		const { getShortcutKeyCombination } = select( 'core/keyboard-shortcuts' );
 		return {
-			duplicate: getShortcutKeysCombination( 'core/block-editor/duplicate' ),
-			remove: getShortcutKeysCombination( 'core/block-editor/remove' ),
-			insertAfter: getShortcutKeysCombination( 'core/block-editor/insertAfter' ),
-			insertBefore: getShortcutKeysCombination( 'core/block-editor/insertBefore' ),
+			duplicate: getShortcutKeyCombination( 'core/block-editor/duplicate' ),
+			remove: getShortcutKeyCombination( 'core/block-editor/remove' ),
+			insertAfter: getShortcutKeyCombination( 'core/block-editor/insertAfter' ),
+			insertBefore: getShortcutKeyCombination( 'core/block-editor/insertBefore' ),
 		};
 	}, [] );
 

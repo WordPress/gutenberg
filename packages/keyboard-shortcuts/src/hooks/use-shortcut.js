@@ -40,7 +40,7 @@ function useShortcut( name, callback, {
 } ) {
 	const { combination, aliases } = useSelect( ( select ) => {
 		return {
-			combination: select( 'core/keyboard-shortcuts' ).getShortcutKeysCombination( name ),
+			combination: select( 'core/keyboard-shortcuts' ).getShortcutKeyCombination( name ),
 			aliases: select( 'core/keyboard-shortcuts' ).getShortcutAliases( name ),
 		};
 	}, [ name ] );
