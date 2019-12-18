@@ -6,6 +6,7 @@ import {
 	get,
 	some,
 } from 'lodash';
+import { match } from 'css-mediaquery';
 
 /**
  * WordPress dependencies
@@ -47,11 +48,15 @@ function replaceRule( styleSheet, newRuleText, index ) {
 }
 
 function replaceMediaQueryWithWidthEvaluation( ruleText, widthValue ) {
-	return ruleText.replace( VALID_MEDIA_QUERY_REGEX, ( match, minOrMax, value ) => {
-		const integerValue = parseInt( value );
+	return ruleText.replace( VALID_MEDIA_QUERY_REGEX, ( matchedSubstring ) => {
 		if (
-			( minOrMax === 'min' && widthValue >= integerValue ) ||
-			( minOrMax === 'max' && widthValue <= integerValue )
+			match(
+				matchedSubstring,
+				{
+					type: 'screen',
+					width: widthValue,
+				}
+			)
 		) {
 			return ENABLED_MEDIA_QUERY;
 		}
@@ -59,7 +64,7 @@ function replaceMediaQueryWithWidthEvaluation( ruleText, widthValue ) {
 	} );
 }
 
-export default function SimulateMediaQuery( { partialPaths, width } ) {
+export default function useSimulatedMediaQuery( partialPaths, width ) {
 	useEffect(
 		() => {
 			const styleSheets = getStyleSheetsThatMatchPaths( partialPaths );
