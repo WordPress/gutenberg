@@ -1,16 +1,30 @@
 /**
  * WordPress dependencies
  */
-import { useState, useCallback } from '@wordpress/element';
-import { cleanForSlug } from '@wordpress/editor';
-import { useDispatch } from '@wordpress/data';
+import { useEntityBlockEditor, EntityProvider } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
+import { BlockPreview } from '@wordpress/block-editor';
+import { useState, useCallback } from '@wordpress/element';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { cleanForSlug } from '@wordpress/editor';
 import { Placeholder, TextControl, Button } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import useTemplatePartPost from './use-template-part-post';
+
+function TemplatePartPreview() {
+	const [ blocks ] = useEntityBlockEditor( 'postType', 'wp_template_part' );
+	return (
+		<div className="wp-block-template-part__placeholder-preview">
+			<div className="wp-block-template-part__placeholder-preview-title">
+				{ __( 'Preview' ) }
+			</div>
+			<BlockPreview blocks={ blocks } />
+		</div>
+	);
+}
 
 export default function TemplatePartPlaceholder( { setAttributes } ) {
 	const [ slug, _setSlug ] = useState();
@@ -19,6 +33,28 @@ export default function TemplatePartPlaceholder( { setAttributes } ) {
 
 	// Try to find an existing template part.
 	const postId = useTemplatePartPost( null, slug, theme );
+
+	// If found, get its preview.
+	const preview = useSelect(
+		( select ) => {
+			if ( ! postId ) {
+				return;
+			}
+			const templatePart = select( 'core' ).getEntityRecord(
+				'postType',
+				'wp_template_part',
+				postId
+			);
+			if ( templatePart ) {
+				return (
+					<EntityProvider kind="postType" type="wp_template_part" id={ postId }>
+						<TemplatePartPreview />
+					</EntityProvider>
+				);
+			}
+		},
+		[ postId ]
+	);
 
 	const setSlug = useCallback( ( nextSlug ) => {
 		_setSlug( nextSlug );
@@ -66,13 +102,16 @@ export default function TemplatePartPlaceholder( { setAttributes } ) {
 				value={ slug }
 				onChange={ setSlug }
 				help={ help }
+				className="wp-block-template-part__placeholder-input"
 			/>
 			<TextControl
 				label={ __( 'Theme' ) }
 				placeholder={ __( 'twentytwenty' ) }
 				value={ theme }
 				onChange={ setTheme }
+				className="wp-block-template-part__placeholder-input"
 			/>
+			{ preview }
 			<Button isPrimary disabled={ ! slug || ! theme } onClick={ onChooseOrCreate }>
 				{ postId ? __( 'Choose' ) : __( 'Create' ) }
 			</Button>
