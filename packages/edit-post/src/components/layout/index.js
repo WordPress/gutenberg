@@ -72,7 +72,7 @@ function Layout() {
 			hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
 			isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
 		} );
-	} );
+	}, [] );
 	const showPageTemplatePicker = __experimentalUsePageTemplatePickerVisible();
 	const sidebarIsOpened = editorSidebarOpened || pluginSidebarOpened || publishSidebarOpened;
 	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
@@ -127,7 +127,7 @@ function Layout() {
 					) : (
 						<div className="edit-post-toggle-publish-panel">
 							<Button
-								isDefault
+								isSecondary
 								className="edit-post-toggle-publish-panel__button"
 								onClick={ togglePublishSidebar }
 								aria-expanded={ false }

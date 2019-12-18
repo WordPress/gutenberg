@@ -135,7 +135,9 @@ class URLInput extends Component {
 	onChange( event ) {
 		const inputValue = event.target.value;
 		this.props.onChange( inputValue );
-		this.updateSuggestions( inputValue );
+		if ( ! this.props.disableSuggestions ) {
+			this.updateSuggestions( inputValue );
+		}
 	}
 
 	onKeyDown( event ) {
@@ -299,7 +301,7 @@ class URLInput extends Component {
 			<BaseControl
 				label={ label }
 				id={ id }
-				className={ classnames( 'editor-url-input block-editor-url-input', className, {
+				className={ classnames( 'block-editor-url-input', className, {
 					'is-full-width': isFullWidth,
 					'has-border': hasBorder,
 				} ) }
@@ -342,7 +344,6 @@ class URLInput extends Component {
 						<div
 							{ ...suggestionsListProps }
 							className={ classnames(
-								'editor-url-input__suggestions',
 								'block-editor-url-input__suggestions',
 								`${ className }__suggestions`
 							) }
@@ -351,7 +352,7 @@ class URLInput extends Component {
 								<Button
 									{ ...buildSuggestionItemProps( suggestion, index ) }
 									key={ suggestion.id }
-									className={ classnames( 'editor-url-input__suggestion block-editor-url-input__suggestion', {
+									className={ classnames( 'block-editor-url-input__suggestion', {
 										'is-selected': index === selectedSuggestion,
 									} ) }
 									onClick={ () => this.handleOnClick( suggestion ) }

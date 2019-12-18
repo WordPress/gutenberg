@@ -135,6 +135,65 @@ export const isEditedPostDirty = createRegistrySelector( ( select ) => ( state )
 } );
 
 /**
+ * Returns true if there are unsaved edits for entities other than
+ * the editor's post, and false otherwise.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether there are edits or not.
+ */
+export const hasNonPostEntityChanges = createRegistrySelector(
+	( select ) => ( state ) => {
+		const enableFullSiteEditing = getEditorSettings( state )
+			.__experimentalEnableFullSiteEditing;
+		if ( ! enableFullSiteEditing ) {
+			return false;
+		}
+
+		const entityRecordChangesByRecord = select(
+			'core'
+		).getEntityRecordChangesByRecord();
+		const changedKinds = Object.keys( entityRecordChangesByRecord );
+		if (
+			changedKinds.length > 1 ||
+			( changedKinds.length === 1 && ! entityRecordChangesByRecord.postType )
+		) {
+			// Return true if there is more than one edited entity kind
+			// or the edited entity kind is not the editor's post's kind.
+			return true;
+		} else if ( ! entityRecordChangesByRecord.postType ) {
+			// Don't continue if there are no edited entity kinds.
+			return false;
+		}
+
+		const { type, id } = getCurrentPost( state );
+		const changedPostTypes = Object.keys( entityRecordChangesByRecord.postType );
+		if (
+			changedPostTypes.length > 1 ||
+			( changedPostTypes.length === 1 &&
+				! entityRecordChangesByRecord.postType[ type ] )
+		) {
+			// Return true if there is more than one edited post type
+			// or the edited entity's post type is not the editor's post's post type.
+			return true;
+		}
+
+		const changedPosts = Object.keys( entityRecordChangesByRecord.postType[ type ] );
+		if (
+			changedPosts.length > 1 ||
+			( changedPosts.length === 1 &&
+				! entityRecordChangesByRecord.postType[ type ][ id ] )
+		) {
+			// Return true if there is more than one edited post
+			// or the edited post is not the editor's post.
+			return true;
+		}
+
+		return false;
+	}
+);
+
+/**
  * Returns true if there are no unsaved values for the current edit session and
  * if the currently edited post is new (has never been saved before).
  *

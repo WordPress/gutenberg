@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createBlock, getPhrasingContentSchema } from '@wordpress/blocks';
+import { createBlock } from '@wordpress/blocks';
 
 const transforms = {
 	from: [
@@ -22,11 +22,11 @@ const transforms = {
 					node.firstChild.nodeName === 'CODE'
 				)
 			),
-			schema: {
+			schema: ( { phrasingContentSchema } ) => ( {
 				pre: {
-					children: getPhrasingContentSchema(),
+					children: phrasingContentSchema,
 				},
-			},
+			} ),
 		},
 	],
 	to: [

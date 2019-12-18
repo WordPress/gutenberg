@@ -359,7 +359,7 @@ function CoverEdit( {
 						) }
 						<PanelRow>
 							<Button
-								isDefault
+								isSecondary
 								isSmall
 								className="block-library-cover__reset-button"
 								onClick={ () => setAttributes( {

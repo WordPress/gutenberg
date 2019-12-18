@@ -49,17 +49,17 @@ class URLPopover extends Component {
 
 		return (
 			<Popover
-				className="editor-url-popover block-editor-url-popover"
+				className="block-editor-url-popover"
 				focusOnMount={ focusOnMount }
 				position={ position }
 				{ ...popoverProps }
 			>
 				<div className="block-editor-url-popover__input-container">
-					<div className="editor-url-popover__row block-editor-url-popover__row">
+					<div className="block-editor-url-popover__row">
 						{ children }
 						{ !! renderSettings && (
 							<IconButton
-								className="editor-url-popover__settings-toggle block-editor-url-popover__settings-toggle"
+								className="block-editor-url-popover__settings-toggle"
 								icon="arrow-down-alt2"
 								label={ __( 'Link settings' ) }
 								onClick={ this.toggleSettingsVisibility }
@@ -68,7 +68,7 @@ class URLPopover extends Component {
 						) }
 					</div>
 					{ showSettings && (
-						<div className="editor-url-popover__row block-editor-url-popover__row editor-url-popover__settings block-editor-url-popover__settings">
+						<div className="block-editor-url-popover__row block-editor-url-popover__settings">
 							{ renderSettings() }
 						</div>
 					) }

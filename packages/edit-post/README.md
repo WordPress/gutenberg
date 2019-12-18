@@ -269,7 +269,7 @@ _Returns_
 
 <a name="PluginPostStatusInfo" href="#PluginPostStatusInfo">#</a> **PluginPostStatusInfo**
 
-Renders a row in the Status & Visibility panel of the Document sidebar.
+Renders a row in the Status & visibility panel of the Document sidebar.
 It should be noted that this is named and implemented around the function it serves
 and not its location, which may change in future iterations.
 

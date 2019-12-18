@@ -28,6 +28,7 @@ export { default as InnerBlocks } from './inner-blocks';
 export { default as InspectorAdvancedControls } from './inspector-advanced-controls';
 export { default as InspectorControls } from './inspector-controls';
 export { default as __experimentalLinkControl } from './link-control';
+export { default as MediaReplaceFlow } from './media-replace-flow';
 export { default as MediaPlaceholder } from './media-placeholder';
 export { default as MediaUpload } from './media-upload';
 export { default as MediaUploadCheck } from './media-upload/check';
@@ -44,6 +45,7 @@ export { default as ToolSelector } from './tool-selector';
 export { default as URLInput } from './url-input';
 export { default as URLInputButton } from './url-input/button';
 export { default as URLPopover } from './url-popover';
+export { __experimentalImageURLInputUI } from './url-popover/image-url-input-ui';
 export { default as withColorContext } from './color-palette/with-color-context';
 
 /*

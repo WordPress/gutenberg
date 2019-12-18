@@ -28,7 +28,7 @@ const ModalExample = ( { numberOfPages, ...props } ) => {
 
 	return (
 		<>
-			<Button isDefault onClick={ openGuide }>Open Guide</Button>
+			<Button isSecondary onClick={ openGuide }>Open Guide</Button>
 			{ isOpen && (
 				<Guide { ...props } onFinish={ closeGuide }>
 					{ times( numberOfPages, ( page ) => (
