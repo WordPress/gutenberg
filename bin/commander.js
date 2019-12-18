@@ -757,8 +757,8 @@ program
 		await prepublishPackages();
 
 		console.log(
-			'\n>> 🎉 WordPress packages have been successfully published.\n',
-			'Thanks for performing the publish process! and don\'t forget to let people know on WordPress Slack.'
+			'\n>> 🎉 WordPress packages are ready to publish.\n',
+			'Thanks for performing the prepublish process! and don\'t forget to run Lerna and let people know on WordPress Slack afterward.'
 		);
 	} );
 
