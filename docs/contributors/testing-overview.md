@@ -27,7 +27,12 @@ Assuming you've followed the [instructions](/docs/contributors/getting-started.m
 npm test
 ```
 
-Code style in JavaScript is enforced using [ESLint](http://eslint.org/). The above `npm test` will execute both unit tests and code linting. Code linting can be verified independently by running `npm run lint`. ESLint can also fix not all, but many issues automatically by running `npm run lint:fix`. To reduce the likelihood of unexpected build failures caused by code styling issues, you're encouraged to [install an ESLint integration for your editor](https://eslint.org/docs/user-guide/integrations) and/or create a [git pre-commit hook](https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks) containing the `npm run lint:fix` command.
+Linting is static code analysis used to enforce coding standards and to avoid potential errors. This project uses [ESLint](http://eslint.org/) and [TypeScript's JavaScript type-checking](https://www.typescriptlang.org/docs/handbook/type-checking-javascript-files.html) to capture these issues. While the above `npm test` will execute both unit tests and code linting, code linting can be verified independently by running `npm run lint`. Some issues can be fixed automatically by running `npm run lint:fix`.
+
+To improve your developer workflow, you're encouraged to install an editor linting integration.
+
+- [ESLint Editor Integrations](https://eslint.org/docs/user-guide/integrations)
+- [TypeScript Editor Support](https://github.com/Microsoft/TypeScript/wiki/TypeScript-Editor-Support)
 
 To run unit tests only, without the linter, use `npm run test-unit` instead.
 
@@ -395,6 +400,25 @@ If you're using a different setup, you can provide the base URL, username and pa
 ```bash
 WP_BASE_URL=http://localhost:8888 WP_USERNAME=admin WP_PASSWORD=password npm run test-e2e
 ```
+
+If you find that end-to-end tests pass when run locally, but fail in Travis, you may be able to isolate a CPU- or netowrk-bound race condition by simulating a slow CPU or network:
+
+```
+THROTTLE_CPU=4 npm run test-e2e
+```
+
+`THROTTLE_CPU` is a slowdown factor (in this example, a 4x slowdown multiplier)
+
+Related: https://chromedevtools.github.io/devtools-protocol/tot/Emulation#method-setCPUThrottlingRate
+
+```
+DOWNLOAD_THROUGHPUT=125000 npm run test-e2e
+```
+
+`DOWNLOAD_THROUGHPUT` is a numeric value representing bytes-per-second network download (in this example, a 1Mbps download speed).
+
+Related: https://chromedevtools.github.io/devtools-protocol/tot/Network#method-emulateNetworkConditions
+
 
 ### Core Block Testing
 

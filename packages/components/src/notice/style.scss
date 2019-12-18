@@ -39,7 +39,7 @@
 	&.is-link {
 		margin-left: 4px;
 	}
-	&.is-default {
+	&.is-secondary {
 		vertical-align: initial;
 	}
 }
@@ -51,14 +51,14 @@
 	align-self: flex-start;
 	flex-shrink: 0;
 
-	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover,
-	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):active,
+	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):hover,
+	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):active,
 	&:not(:disabled):not([aria-disabled="true"]):focus {
 		color: $dark-gray-900;
 		background-color: transparent;
 	}
 
-	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover {
+	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):hover {
 		box-shadow: none;
 	}
 }

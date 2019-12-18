@@ -36,7 +36,7 @@ export function BlockInspectorButton( {
 
 	return (
 		<MenuItem
-			className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
+			className="block-editor-block-settings-menu__control"
 			onClick={ flow( areAdvancedSettingsOpened ? closeSidebar : openEditorSidebar, speakMessage, onClick ) }
 			icon="admin-generic"
 			shortcut={ shortcuts.toggleSidebar }

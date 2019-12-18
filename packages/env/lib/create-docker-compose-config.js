@@ -1,13 +1,16 @@
 module.exports = function createDockerComposeConfig(
 	cwdTestsPath,
 	context,
-	dependencies,
+	dependencies
 ) {
 	const { path: cwd, pathBasename: cwdName } = context;
 
-	const dependencyMappings = [ ...dependencies, context ].map(
-		( { path, pathBasename, type } ) => `      - ${ path }/:/var/www/html/wp-content/${ type }s/${ pathBasename }/\n`
-	).join( '' );
+	const dependencyMappings = [ ...dependencies, context ]
+		.map(
+			( { path, pathBasename, type } ) =>
+				`      - ${ path }/:/var/www/html/wp-content/${ type }s/${ pathBasename }/\n`
+		)
+		.join( '' );
 	const commonVolumes = `
 ${ dependencyMappings }
       - ${ cwd }${ cwdTestsPath }/e2e-tests/mu-plugins/:/var/www/html/wp-content/mu-plugins/
@@ -15,10 +18,10 @@ ${ dependencyMappings }
 	const volumes = `
       - ${ cwd }/../${ cwdName }-wordpress/:/var/www/html/${ commonVolumes }`;
 	const testsVolumes = `
-      - tests-wordpress:/var/www/html/${ commonVolumes }`;
+      - ${ cwd }/../${ cwdName }-tests-wordpress/:/var/www/html/${ commonVolumes }`;
 	return `version: '2.1'
 volumes:
-  tests-wordpress:
+  tests-wordpress-phpunit:
 services:
   mysql:
     environment:
@@ -56,5 +59,18 @@ services:
       - tests-wordpress
     image: wordpress:cli
     volumes:${ testsVolumes }
-  `;
+  tests-wordpress-phpunit:
+    depends_on:
+      - mysql
+    environment:
+      PHPUNIT_DB_HOST: mysql
+    image: chriszarate/wordpress-phpunit
+    volumes:
+      - ${ cwd }/:/app/
+      - tests-wordpress-phpunit/:/tmp/
+  composer:
+    image: composer
+    volumes:
+      - ${ cwd }/:/app/
+`;
 };

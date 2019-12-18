@@ -5,6 +5,7 @@
         "isValid": true,
         "attributes": {
             "hasFixedLayout": false,
+            "caption": "",
             "head": [
                 {
                     "cells": [

@@ -3,7 +3,6 @@
  * Module constants
  */
 const HEIGHT_OFFSET = 10; // used by the arrow and a bit of empty space
-const isMobileViewport = () => window.innerWidth < 782;
 const isRTL = () => document.documentElement.dir === 'rtl';
 
 /**
@@ -144,18 +143,16 @@ export function computePopoverYAxisPosition( anchorRect, contentSize, yAxis ) {
  * @param {Object} anchorRect       Anchor Rect.
  * @param {Object} contentSize      Content Size.
  * @param {string} position         Position.
- * @param {boolean} expandOnMobile  Whether to expand the popover on mobile or not.
  *
  * @return {Object} Popover position and constraints.
  */
-export function computePopoverPosition( anchorRect, contentSize, position = 'top', expandOnMobile = false ) {
+export function computePopoverPosition( anchorRect, contentSize, position = 'top' ) {
 	const [ yAxis, xAxis = 'center' ] = position.split( ' ' );
 
 	const yAxisPosition = computePopoverYAxisPosition( anchorRect, contentSize, yAxis );
 	const xAxisPosition = computePopoverXAxisPosition( anchorRect, contentSize, xAxis, yAxisPosition.yAxis );
 
 	return {
-		isMobile: isMobileViewport() && expandOnMobile,
 		...xAxisPosition,
 		...yAxisPosition,
 	};

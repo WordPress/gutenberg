@@ -1,23 +1,7 @@
 /**
  * Internal dependencies
  */
-import { isPhrasingContent } from './phrasing-content';
-
-function getSibling( node, which ) {
-	const sibling = node[ `${ which }Sibling` ];
-
-	if ( sibling && isPhrasingContent( sibling ) ) {
-		return sibling;
-	}
-
-	const { parentNode } = node;
-
-	if ( ! parentNode || ! isPhrasingContent( parentNode ) ) {
-		return;
-	}
-
-	return getSibling( parentNode, which );
-}
+import { getSibling } from './utils';
 
 function isFormattingSpace( character ) {
 	return (

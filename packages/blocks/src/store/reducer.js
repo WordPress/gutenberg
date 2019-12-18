@@ -23,12 +23,12 @@ import { __ } from '@wordpress/i18n';
  * Module Constants
  */
 export const DEFAULT_CATEGORIES = [
-	{ slug: 'common', title: __( 'Common Blocks' ) },
+	{ slug: 'common', title: __( 'Common blocks' ) },
 	{ slug: 'formatting', title: __( 'Formatting' ) },
-	{ slug: 'layout', title: __( 'Layout Elements' ) },
+	{ slug: 'layout', title: __( 'Layout elements' ) },
 	{ slug: 'widgets', title: __( 'Widgets' ) },
 	{ slug: 'embed', title: __( 'Embeds' ) },
-	{ slug: 'reusable', title: __( 'Reusable Blocks' ) },
+	{ slug: 'reusable', title: __( 'Reusable blocks' ) },
 ];
 
 /**
@@ -114,7 +114,7 @@ export function blockPatterns( state = {}, action ) {
 					return uniqBy( [
 						...get( blockType, [ 'patterns' ], [] ),
 						...get( state, [ blockType.name ], [] ),
-					], ( style ) => style.name );
+					], ( pattern ) => pattern.name );
 				} ),
 			};
 		case 'ADD_BLOCK_PATTERNS':

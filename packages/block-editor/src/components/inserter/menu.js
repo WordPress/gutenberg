@@ -3,17 +3,14 @@
  */
 import {
 	filter,
-	find,
 	findIndex,
 	flow,
 	groupBy,
 	isEmpty,
 	map,
-	some,
 	sortBy,
 	without,
 	includes,
-	deburr,
 } from 'lodash';
 import scrollIntoView from 'dom-scroll-into-view';
 import classnames from 'classnames';
@@ -34,7 +31,6 @@ import {
 	Tip,
 } from '@wordpress/components';
 import {
-	getCategories,
 	isReusableBlock,
 	createBlock,
 	isUnmodifiedDefaultBlock,
@@ -54,56 +50,11 @@ import BlockTypesList from '../block-types-list';
 import BlockCard from '../block-card';
 import ChildBlocks from './child-blocks';
 import __experimentalInserterMenuExtension from '../inserter-menu-extension';
+import { searchItems } from './search-items';
 
 const MAX_SUGGESTED_ITEMS = 9;
 
 const stopKeyPropagation = ( event ) => event.stopPropagation();
-
-/**
- * Filters an item list given a search term.
- *
- * @param {Array} items        Item list
- * @param {string} searchTerm  Search term.
- *
- * @return {Array}             Filtered item list.
- */
-export const searchItems = ( items, searchTerm ) => {
-	const normalizedSearchTerm = normalizeTerm( searchTerm );
-	const matchSearch = ( string ) => normalizeTerm( string ).indexOf( normalizedSearchTerm ) !== -1;
-	const categories = getCategories();
-
-	return items.filter( ( item ) => {
-		const itemCategory = find( categories, { slug: item.category } );
-		return matchSearch( item.title ) || some( item.keywords, matchSearch ) || ( itemCategory && matchSearch( itemCategory.title ) );
-	} );
-};
-
-/**
- * Converts the search term into a normalized term.
- *
- * @param {string} term The search term to normalize.
- *
- * @return {string} The normalized search term.
- */
-export const normalizeTerm = ( term ) => {
-	// Disregard diacritics.
-	//  Input: "média"
-	term = deburr( term );
-
-	// Accommodate leading slash, matching autocomplete expectations.
-	//  Input: "/media"
-	term = term.replace( /^\//, '' );
-
-	// Lowercase.
-	//  Input: "MEDIA"
-	term = term.toLowerCase();
-
-	// Strip leading and trailing whitespace.
-	//  Input: " media "
-	term = term.trim();
-
-	return term;
-};
 
 export class InserterMenu extends Component {
 	constructor() {
@@ -124,8 +75,9 @@ export class InserterMenu extends Component {
 	}
 
 	componentDidMount() {
-		// This could be replaced by a resolver.
-		this.props.fetchReusableBlocks();
+		if ( this.props.fetchReusableBlocks ) {
+			this.props.fetchReusableBlocks();
+		}
 		this.filter();
 	}
 
@@ -203,9 +155,9 @@ export class InserterMenu extends Component {
 	}
 
 	filter( filterValue = '' ) {
-		const { debouncedSpeak, items, rootChildBlocks } = this.props;
+		const { categories, debouncedSpeak, items, rootChildBlocks } = this.props;
 
-		const filteredItems = searchItems( items, filterValue );
+		const filteredItems = searchItems( items, categories, filterValue );
 
 		const childItems = filter( filteredItems, ( { name } ) => includes( rootChildBlocks, name ) );
 
@@ -218,7 +170,7 @@ export class InserterMenu extends Component {
 		const reusableItems = filter( filteredItems, { category: 'reusable' } );
 
 		const getCategoryIndex = ( item ) => {
-			return findIndex( getCategories(), ( category ) => category.slug === item.category );
+			return findIndex( categories, ( category ) => category.slug === item.category );
 		};
 		const itemsPerCategory = flow(
 			( itemList ) => filter( itemList, ( item ) => item.category !== 'reusable' ),
@@ -260,7 +212,7 @@ export class InserterMenu extends Component {
 	}
 
 	render() {
-		const { instanceId, onSelect, rootClientId, showInserterHelpPanel } = this.props;
+		const { categories, instanceId, onSelect, rootClientId, showInserterHelpPanel } = this.props;
 		const {
 			childItems,
 			hoveredItem,
@@ -284,7 +236,7 @@ export class InserterMenu extends Component {
 		/* eslint-disable jsx-a11y/no-autofocus, jsx-a11y/no-static-element-interactions */
 		return (
 			<div
-				className={ classnames( 'editor-inserter__menu block-editor-inserter__menu', {
+				className={ classnames( 'block-editor-inserter__menu', {
 					'has-help-panel': hasHelpPanel,
 				} ) }
 				onKeyPress={ stopKeyPropagation }
@@ -298,13 +250,13 @@ export class InserterMenu extends Component {
 						id={ `block-editor-inserter__search-${ instanceId }` }
 						type="search"
 						placeholder={ __( 'Search for a block' ) }
-						className="editor-inserter__search block-editor-inserter__search"
+						className="block-editor-inserter__search"
 						autoFocus
 						onChange={ this.onChangeSearchInput }
 					/>
 
 					<div
-						className="editor-inserter__results block-editor-inserter__results"
+						className="block-editor-inserter__results"
 						ref={ this.inserterResults }
 						tabIndex="0"
 						role="region"
@@ -320,7 +272,7 @@ export class InserterMenu extends Component {
 
 						{ !! suggestedItems.length &&
 							<PanelBody
-								title={ _x( 'Most Used', 'blocks' ) }
+								title={ _x( 'Most used', 'blocks' ) }
 								opened={ isPanelOpen( 'suggested' ) }
 								onToggle={ this.onTogglePanel( 'suggested' ) }
 								ref={ this.bindPanel( 'suggested' ) }
@@ -329,7 +281,7 @@ export class InserterMenu extends Component {
 							</PanelBody>
 						}
 
-						{ map( getCategories(), ( category ) => {
+						{ map( categories, ( category ) => {
 							const categoryItems = itemsPerCategory[ category.slug ];
 							if ( ! categoryItems || ! categoryItems.length ) {
 								return null;
@@ -350,7 +302,7 @@ export class InserterMenu extends Component {
 
 						{ !! reusableItems.length && (
 							<PanelBody
-								className="editor-inserter__reusable-blocks-panel block-editor-inserter__reusable-blocks-panel"
+								className="block-editor-inserter__reusable-blocks-panel"
 								title={ __( 'Reusable' ) }
 								opened={ isPanelOpen( 'reusable' ) }
 								onToggle={ this.onTogglePanel( 'reusable' ) }
@@ -359,10 +311,10 @@ export class InserterMenu extends Component {
 							>
 								<BlockTypesList items={ reusableItems } onSelect={ onSelect } onHover={ this.onHover } />
 								<a
-									className="editor-inserter__manage-reusable-blocks block-editor-inserter__manage-reusable-blocks"
+									className="block-editor-inserter__manage-reusable-blocks"
 									href={ addQueryArgs( 'edit.php', { post_type: 'wp_block' } ) }
 								>
-									{ __( 'Manage All Reusable Blocks' ) }
+									{ __( 'Manage all reusable blocks' ) }
 								</a>
 							</PanelBody>
 						) }
@@ -381,7 +333,7 @@ export class InserterMenu extends Component {
 								}
 								if ( ! hasItems ) {
 									return (
-										<p className="editor-inserter__no-results block-editor-inserter__no-results">{ __( 'No blocks found.' ) }</p>
+										<p className="block-editor-inserter__no-results">{ __( 'No blocks found.' ) }</p>
 									);
 								}
 								return null;
@@ -421,7 +373,7 @@ export class InserterMenu extends Component {
 						{ ! hoveredItem && (
 							<div className="block-editor-inserter__menu-help-panel-no-block">
 								<div className="block-editor-inserter__menu-help-panel-no-block-text">
-									<div className="block-editor-inserter__menu-help-panel-title">{ __( 'Content Blocks' ) }</div>
+									<div className="block-editor-inserter__menu-help-panel-title">{ __( 'Content blocks' ) }</div>
 									<p>
 										{ __(
 											'Welcome to the wonderful world of blocks! Blocks are the basis of all content within the editor.'
@@ -464,6 +416,7 @@ export default compose(
 			getSettings,
 		} = select( 'core/block-editor' );
 		const {
+			getCategories,
 			getChildBlockNames,
 		} = select( 'core/blocks' );
 
@@ -476,11 +429,18 @@ export default compose(
 		}
 		const destinationRootBlockName = getBlockName( destinationRootClientId );
 
+		const {
+			showInserterHelpPanel: showInserterHelpPanelSetting,
+			__experimentalFetchReusableBlocks: fetchReusableBlocks,
+		} = getSettings();
+
 		return {
+			categories: getCategories(),
 			rootChildBlocks: getChildBlockNames( destinationRootBlockName ),
 			items: getInserterItems( destinationRootClientId ),
-			showInserterHelpPanel: showInserterHelpPanel && getSettings().showInserterHelpPanel,
+			showInserterHelpPanel: showInserterHelpPanel && showInserterHelpPanelSetting,
 			destinationRootClientId,
+			fetchReusableBlocks,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {
@@ -488,11 +448,6 @@ export default compose(
 			showInsertionPoint,
 			hideInsertionPoint,
 		} = dispatch( 'core/block-editor' );
-
-		// This should be an external action provided in the editor settings.
-		const {
-			__experimentalFetchReusableBlocks: fetchReusableBlocks,
-		} = dispatch( 'core/editor' );
 
 		// To avoid duplication, getInsertionIndex is extracted and used in two event handlers
 		// This breaks the withDispatch not containing any logic rule.
@@ -523,7 +478,6 @@ export default compose(
 		}
 
 		return {
-			fetchReusableBlocks,
 			showInsertionPoint() {
 				const index = getInsertionIndex();
 				showInsertionPoint( ownProps.destinationRootClientId, index );

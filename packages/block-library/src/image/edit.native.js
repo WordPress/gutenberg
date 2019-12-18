@@ -16,14 +16,14 @@ import { isEmpty, map, get } from 'lodash';
  * WordPress dependencies
  */
 import {
-	TextControl,
-	ToggleControl,
-	SelectControl,
 	Icon,
-	Toolbar,
-	ToolbarButton,
 	PanelBody,
 	PanelActions,
+	SelectControl,
+	TextControl,
+	ToggleControl,
+	ToolbarButton,
+	ToolbarGroup,
 } from '@wordpress/components';
 
 import {
@@ -296,20 +296,20 @@ export class ImageEdit extends React.Component {
 	}
 
 	render() {
-		const { attributes, isSelected } = this.props;
+		const { attributes, isSelected, image } = this.props;
 		const { align, url, height, width, alt, href, id, linkTarget, sizeSlug } = attributes;
 
 		const actions = [ { label: __( 'Clear All Settings' ), onPress: this.onClearSettings } ];
 
 		const getToolbarEditButton = ( open ) => (
 			<BlockControls>
-				<Toolbar>
+				<ToolbarGroup>
 					<ToolbarButton
 						title={ __( 'Edit image' ) }
 						icon={ editImageIcon }
 						onClick={ open }
 					/>
-				</Toolbar>
+				</ToolbarGroup>
 				<BlockAlignmentToolbar
 					value={ align }
 					onChange={ this.updateAlignment }
@@ -338,7 +338,7 @@ export class ImageEdit extends React.Component {
 						onChange={ this.onSetNewTab }
 					/>
 					{ // eslint-disable-next-line no-undef
-						__DEV__ &&
+						image && __DEV__ &&
 						<SelectControl
 							hideCancelButton
 							icon={ 'editor-expand' }
@@ -417,7 +417,13 @@ export class ImageEdit extends React.Component {
 							);
 
 							return (
-								<View style={ { flex: 1, alignSelf: alignToFlex[ align ] } } >
+								<View style={ {
+									flex: 1,
+									// only set alignSelf if an image exists because alignSelf causes the placeholder
+									// to disappear when an aligned image can't be downloaded
+									// https://github.com/wordpress-mobile/gutenberg-mobile/issues/1592
+									alignSelf: imageWidthWithinContainer && alignToFlex[ align ] }
+								} >
 									{ ! imageWidthWithinContainer &&
 										<View style={ [ styles.imageContainer, { height: imageContainerHeight } ] } >
 											{ this.getIcon( false ) }

@@ -18,12 +18,12 @@ import {
 } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
 import {
+	ExternalLink,
+	FocalPointPicker,
 	PanelBody,
 	TextareaControl,
 	ToggleControl,
-	Toolbar,
-	ExternalLink,
-	FocalPointPicker,
+	ToolbarGroup,
 } from '@wordpress/components';
 /**
  * Internal dependencies
@@ -80,7 +80,6 @@ class MediaTextEdit extends Component {
 			mediaId: media.id,
 			mediaType,
 			mediaUrl: src || media.url,
-			imageFill: undefined,
 			focalPoint: undefined,
 		} );
 	}
@@ -224,7 +223,7 @@ class MediaTextEdit extends Component {
 					/>
 				</InspectorControls>
 				<BlockControls>
-					<Toolbar
+					<ToolbarGroup
 						controls={ toolbarControls }
 					/>
 					<BlockVerticalAlignmentToolbar

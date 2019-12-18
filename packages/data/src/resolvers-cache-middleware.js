@@ -3,6 +3,8 @@
  */
 import { get } from 'lodash';
 
+/** @typedef {import('./registry').WPDataRegistry} WPDataRegistry */
+
 /**
  * Creates a middleware handling resolvers cache invalidation.
  *

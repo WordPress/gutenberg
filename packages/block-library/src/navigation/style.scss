@@ -60,10 +60,11 @@
 		// Sub-menus Flyout
 		& > li > ul {
 			background: #fff;
-			-webkit-box-shadow: -2px 4px 4px -1px rgba(97, 97, 97, 0.153);
-			-moz-box-shadow: -2px 4px 4px -1px rgba(97, 97, 97, 0.153);
-			border-radius: 4px;
-			box-shadow: -2px 4px 4px -1px rgba(97, 97, 97, 0.153);
+			-webkit-box-shadow: 0 3px 30px rgba(25, 30, 35, 0.1);
+			-moz-box-shadow: 0 3px 30px rgba(25, 30, 35, 0.1);
+			border-radius: 3px;
+			box-shadow: 0 3px 30px rgba(25, 30, 35, 0.1);
+			border: 1px solid #e2e4e7;
 			margin: 0;
 			position: absolute;
 			left: 0;
@@ -88,19 +89,30 @@
 				}
 			}
 
-			&::after {
+			&::after,
+			&::before {
 				bottom: 100%;
 				left: 50%;
 				border: solid transparent;
-				border-color: rgba(255, 255, 255, 0);
-				border-bottom-color: #fff;
 				content: " ";
 				height: 0;
 				width: 0;
 				position: absolute;
 				pointer-events: none;
+			}
+
+			&::after {
+				border-color: rgba(255, 255, 255, 0);
+				border-bottom-color: #fff;
 				border-width: 10px;
 				margin-left: -10px;
+			}
+
+			&::before {
+				border-color: rgba(226, 228, 231, 0);
+				border-bottom-color: #e2e4e7;
+				border-width: 11px;
+				margin-left: -11px;
 			}
 
 			ul {
@@ -142,11 +154,22 @@
 		}
 	}
 
+	&.items-justified-left > ul {
+		justify-content: flex-start;
+	}
+
+	&.items-justified-center > ul {
+		justify-content: center;
+	}
+
+	&.items-justified-right > ul {
+		justify-content: flex-end;
+	}
 }
 
 .is-style-dark > ul > li > ul {
 	background: #333;
-	border-radius: 4px;
+	border: 1px solid #111;
 
 	a {
 		text-decoration: none;
@@ -159,7 +182,12 @@
 	}
 
 	&::after {
-		border-color: rgba(24, 24, 24, 0);
+		border-color: rgba(51, 51, 51, 0);
 		border-bottom-color: #333;
+	}
+
+	&::before {
+		border-color: rgba(17, 17, 17, 0);
+		border-bottom-color: #111;
 	}
 }

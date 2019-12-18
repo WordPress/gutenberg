@@ -12,6 +12,11 @@ import { withKnobs } from '@storybook/addon-knobs';
 import '@wordpress/components/build-style/style.css';
 /* eslint-enable no-restricted-syntax */
 
+/**
+ * Internal dependencies
+ */
+import './style.scss';
+
 addDecorator( withA11y );
 addDecorator( withKnobs );
 configure(
