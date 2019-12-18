@@ -6,11 +6,9 @@ import {
 	useContext,
 	useCallback,
 	useMemo,
-	useEffect,
 } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { parse, serialize } from '@wordpress/blocks';
-import { useBlockEditContext } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -230,47 +228,4 @@ export function useEntityBlockEditor(
 		[ onInput, setContent ]
 	);
 	return [ blocks, onInput, onChange ];
-}
-
-/**
- * Hook that syncs a block's inner blocks with the nearest provided entity
- * of the specified type's block content. It should be called in the targeted
- * block's edit component.
- *
- * @param {string} kind                            The entity kind.
- * @param {string} type                            The entity type.
- * @param {Object} options
- * @param {Object} [options.initialEdits]          Initial edits object for the entity record.
- * @param {string} [options.blocksProp='blocks']   The name of the entity prop that holds the blocks array.
- * @param {string} [options.contentProp='content'] The name of the entity prop that holds the serialized blocks.
- */
-export function useEntitySyncedInnerBlocks( kind, type, options ) {
-	const [ blocks, onInput, onChange ] = useEntityBlockEditor( kind, type, options );
-	const { replaceInnerBlocks } = useDispatch( 'core/block-editor' );
-	// Set initial inner blocks value.
-	// TODO: Don't let this dirty the post.
-	useEffect( () => {
-		onInput( blocks );
-		replaceInnerBlocks( clientId, blocks, false );
-	}, [] );
-
-	const { clientId } = useBlockEditContext();
-	const { innerBlocks, isLastBlockChangePersistent } = useSelect( ( select ) => {
-		const {
-			getBlocks,
-			isLastBlockChangePersistent: _isLastBlockChangePersistent,
-		} = select( 'core/block-editor' );
-		return {
-			innerBlocks: getBlocks( clientId ),
-			isLastBlockChangePersistent: _isLastBlockChangePersistent(),
-		};
-	}, [] );
-	// Sync any changes to inner blocks.
-	useEffect( () => {
-		if ( isLastBlockChangePersistent ) {
-			onChange( innerBlocks );
-		} else {
-			onInput( innerBlocks );
-		}
-	}, [ isLastBlockChangePersistent, onChange, innerBlocks, onInput ] );
 }

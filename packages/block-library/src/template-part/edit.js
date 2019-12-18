@@ -1,19 +1,20 @@
 /**
  * WordPress dependencies
  */
-import {
-	useEntitySyncedInnerBlocks,
-	EntityProvider,
-} from '@wordpress/core-data';
+import { useEntityBlockEditor, EntityProvider } from '@wordpress/core-data';
 import { InnerBlocks } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { useRef, useEffect } from '@wordpress/element';
 
 function TemplatePart() {
-	useEntitySyncedInnerBlocks( 'postType', 'wp_template_part', {
-		initialEdits: { status: 'publish' },
-	} );
-	return <InnerBlocks />;
+	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
+		'postType',
+		'wp_template_part',
+		{
+			initialEdits: { status: 'publish' },
+		}
+	);
+	return <InnerBlocks blocks={ blocks } onInput={ onInput } onChange={ onChange } />;
 }
 
 export default function TemplatePartEdit( {
