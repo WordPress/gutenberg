@@ -210,7 +210,7 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
         return new GutenbergBridgeJS2Parent.MediaUploadCallback() {
             @Override
             public void onUploadMediaFileSelected(List<RNMedia> mediaList) {
-                if(allowMultipleSelection) {
+                if (allowMultipleSelection) {
                     WritableArray writableArray = new WritableNativeArray();
                     for (RNMedia media : mediaList) {
                         writableArray.pushMap(media.toMap());

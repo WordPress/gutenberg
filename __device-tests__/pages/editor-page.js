@@ -40,7 +40,7 @@ export default class EditorPage {
 	}
 
 	async getBlockList() {
-		return this.driver.hasElementByAccessibilityId( 'block-list' );
+		return await this.driver.hasElementByAccessibilityId( 'block-list' );
 	}
 
 	// Finds the wd element for new block that was added and sets the element attribute
@@ -213,8 +213,8 @@ export default class EditorPage {
 
 		const parentId = `${ blockName } Block. Row ${ position }.`;
 		const parentLocator = `//*[contains(@${ this.accessibilityIdXPathAttrib }, "${ parentId }")]`;
-		let removeBlockLocator = `${ parentLocator }/following-sibling::*`;
-		removeBlockLocator += isAndroid() ? '' : '//*';
+		let removeBlockLocator = `${ parentLocator }`;
+		removeBlockLocator += isAndroid() ? '//*' : '//XCUIElementTypeButton';
 		let removeButtonIdentifier = `Remove block at row ${ position }`;
 
 		if ( isAndroid() ) {

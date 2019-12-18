@@ -446,6 +446,7 @@ class RCTAztecView: Aztec.TextView {
     override var textColor: UIColor? {
         didSet {
             typingAttributes[NSAttributedString.Key.foregroundColor] = self.textColor
+            self.defaultTextColor = self.textColor
         }
     }
 
