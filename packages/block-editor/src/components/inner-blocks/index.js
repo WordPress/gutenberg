@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { withViewportMatch } from '@wordpress/viewport'; // Temporary click-through disable on desktop.
+import { withViewportMatch } from '@wordpress/viewport';
 import { Component } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { synchronizeBlocksWithTemplate, withBlockContentContext } from '@wordpress/blocks';
@@ -25,7 +25,6 @@ import DefaultBlockAppender from './default-block-appender';
  */
 import BlockList from '../block-list';
 import { withBlockEditContext } from '../block-edit/context';
-import TemplatePicker from './template-picker';
 
 class InnerBlocks extends Component {
 	constructor() {
@@ -102,38 +101,26 @@ class InnerBlocks extends Component {
 
 	render() {
 		const {
-			isSmallScreen, // Temporary click-through disable on desktop.
+			enableClickThrough,
 			clientId,
 			hasOverlay,
 			renderAppender,
-			template,
 			__experimentalMoverDirection: moverDirection,
-			__experimentalTemplateOptions: templateOptions,
-			__experimentalOnSelectTemplateOption: onSelectTemplateOption,
-			__experimentalAllowTemplateOptionSkip: allowTemplateOptionSkip,
 		} = this.props;
 		const { templateInProcess } = this.state;
 
-		const isPlaceholder = template === null && !! templateOptions;
-
 		const classes = classnames( 'editor-inner-blocks block-editor-inner-blocks', {
-			'has-overlay': isSmallScreen && ( hasOverlay && ! isPlaceholder ), // Temporary click-through disable on desktop.
+			'has-overlay': enableClickThrough && hasOverlay,
 		} );
 
 		return (
 			<div className={ classes }>
 				{ ! templateInProcess && (
-					isPlaceholder ?
-						<TemplatePicker
-							options={ templateOptions }
-							onSelect={ onSelectTemplateOption }
-							allowSkip={ allowTemplateOptionSkip }
-						/> :
-						<BlockList
-							rootClientId={ clientId }
-							renderAppender={ renderAppender }
-							__experimentalMoverDirection={ moverDirection }
-						/>
+					<BlockList
+						rootClientId={ clientId }
+						renderAppender={ renderAppender }
+						__experimentalMoverDirection={ moverDirection }
+					/>
 				) }
 			</div>
 		);
@@ -141,7 +128,7 @@ class InnerBlocks extends Component {
 }
 
 InnerBlocks = compose( [
-	withViewportMatch( { isSmallScreen: '< medium' } ), // Temporary click-through disable on desktop.
+	withViewportMatch( { isSmallScreen: '< medium' } ),
 	withBlockEditContext( ( context ) => pick( context, [ 'clientId' ] ) ),
 	withSelect( ( select, ownProps ) => {
 		const {
@@ -151,8 +138,9 @@ InnerBlocks = compose( [
 			getBlockListSettings,
 			getBlockRootClientId,
 			getTemplateLock,
+			isNavigationMode,
 		} = select( 'core/block-editor' );
-		const { clientId } = ownProps;
+		const { clientId, isSmallScreen } = ownProps;
 		const block = getBlock( clientId );
 		const rootClientId = getBlockRootClientId( clientId );
 
@@ -161,6 +149,7 @@ InnerBlocks = compose( [
 			blockListSettings: getBlockListSettings( clientId ),
 			hasOverlay: block.name !== 'core/template' && ! isBlockSelected( clientId ) && ! hasSelectedInnerBlock( clientId, true ),
 			parentLock: getTemplateLock( rootClientId ),
+			enableClickThrough: isNavigationMode() || isSmallScreen,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => {

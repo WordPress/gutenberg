@@ -50,10 +50,10 @@ install:
   - |
     if [[ "$INSTALL_WORDPRESS" = "true" ]]; then
       # Download and unpack WordPress.
-      curl -sL https://wordpress.org/nightly-builds/wordpress-latest.zip -o /tmp/wordpress-latest.zip
+      curl -sL https://github.com/WordPress/WordPress/archive/master.zip -o /tmp/wordpress-latest.zip
       unzip -q /tmp/wordpress-latest.zip -d /tmp
       mkdir -p wordpress/src
-      mv /tmp/wordpress/* wordpress/src
+      mv /tmp/WordPress-master/* wordpress/src
 
       # Create the upload directory with permissions that Travis can handle.
       mkdir -p wordpress/src/wp-content/uploads
@@ -71,7 +71,7 @@ install:
         /tmp/wordpress-develop-master/*config-sample.php \
         /tmp/wordpress-develop-master/package.json wordpress
 
-      # Install WordPress.
+      # Install WordPress. The additional dependencies are required by the copied `wordpress-develop` tools.
       cd wordpress
       npm install dotenv wait-on
       npm run env:start
@@ -100,6 +100,13 @@ jobs:
         - npm ci
       script:
         - npm run lint
+
+    - name: Lint ES5 only
+      install:
+        - npm ci
+        - npm run build
+      script:
+        - npx eslint --parser-options=ecmaVersion:5 --no-eslintrc --no-ignore ./build/**/*.js
 
     - name: Build artifacts
       install:
@@ -197,14 +204,13 @@ jobs:
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 3' < ~/.jest-e2e-tests )
 
     - stage: deploy
-      if: branch = master
+      if: (NOT type IN (pull_request)) AND (branch = master)
       name: Deploy Playground
       env: INSTALL_WORDPRESS=false
       install:
         - npm ci
       before_deploy:
-        - npm run playground:build -- --public-url '/gutenberg'
-        - npm run design-system:build
+        - npm run storybook:build
       deploy:
         provider: pages
         skip_cleanup: true
@@ -215,4 +221,4 @@ jobs:
           branch: master
 
   allow_failures:
-    - name: JavaScript native mobile tests
+    # nothing is allowed to fail at the moment

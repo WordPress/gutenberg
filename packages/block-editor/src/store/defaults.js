@@ -10,29 +10,31 @@ export const PREFERENCES_DEFAULTS = {
 /**
  * The default editor settings
  *
- *  alignWide                              boolean       Enable/Disable Wide/Full Alignments
- *  availableLegacyWidgets                 Array         Array of objects representing the legacy widgets available.
- *  colors                                 Array         Palette colors
- *  disableCustomColors                    boolean       Whether or not the custom colors are disabled
- *  fontSizes                              Array         Available font sizes
- *  disableCustomFontSizes                 boolean       Whether or not the custom font sizes are disabled
- *  imageSizes                             Array         Available image sizes
- *  maxWidth                               number        Max width to constraint resizing
- *  allowedBlockTypes                      boolean|Array Allowed block types
- *  hasFixedToolbar                        boolean       Whether or not the editor toolbar is fixed
- *  hasPermissionsToManageWidgets          boolean       Whether or not the user is able to manage widgets.
- *  focusMode                              boolean       Whether the focus mode is enabled or not
- *  styles                                 Array         Editor Styles
- *  isRTL                                  boolean       Whether the editor is in RTL mode
- *  bodyPlaceholder                        string        Empty post placeholder
- *  titlePlaceholder                       string        Empty title placeholder
- *  codeEditingEnabled                     string        Whether or not the user can switch to the code editor
- *  showInserterHelpPanel                  boolean       Whether or not the inserter help panel is shown
- *  __experimentalCanUserUseUnfilteredHTML string        Whether the user should be able to use unfiltered HTML or the HTML should be filtered e.g., to remove elements considered insecure like iframes.
- *  __experimentalEnableLegacyWidgetBlock  boolean       Whether the user has enabled the Legacy Widget Block
- *  __experimentalEnableMenuBlock          boolean       Whether the user has enabled the Menu Block
- *  __experimentalBlockDirectory           boolean       Whether the user has enabled the Block Directory
- *  __experimentalEnableFullSiteEditing    boolean       Whether the user has enabled Full Site Editing
+ * @typedef {Object} SETTINGS_DEFAULT
+ * @property {boolean} alignWide Enable/Disable Wide/Full Alignments
+ * @property {Array} availableLegacyWidgets Array of objects representing the legacy widgets available.
+ * @property {Array} colors Palette colors
+ * @property {boolean} disableCustomColors Whether or not the custom colors are disabled
+ * @property {Array} fontSizes Available font sizes
+ * @property {boolean} disableCustomFontSizes Whether or not the custom font sizes are disabled
+ * @property {Array} imageSizes Available image sizes
+ * @property {number} maxWidth Max width to constraint resizing
+ * @property {boolean|Array} allowedBlockTypes Allowed block types
+ * @property {boolean} hasFixedToolbar Whether or not the editor toolbar is fixed
+ * @property {boolean} hasPermissionsToManageWidgets Whether or not the user is able to manage widgets.
+ * @property {boolean} focusMode Whether the focus mode is enabled or not
+ * @property {Array} styles Editor Styles
+ * @property {boolean} isRTL Whether the editor is in RTL mode
+ * @property {string} bodyPlaceholder Empty post placeholder
+ * @property {string} titlePlaceholder Empty title placeholder
+ * @property {boolean} codeEditingEnabled Whether or not the user can switch to the code editor
+ * @property {boolean} showInserterHelpPanel Whether or not the inserter help panel is shown
+ * @property {boolean} __experimentalCanUserUseUnfilteredHTML Whether the user should be able to use unfiltered HTML or the HTML should be filtered e.g., to remove elements considered insecure like iframes.
+ * @property {boolean} __experimentalEnableLegacyWidgetBlock Whether the user has enabled the Legacy Widget Block
+ * @property {boolean} __experimentalBlockDirectory Whether the user has enabled the Block Directory
+ * @property {boolean} __experimentalEnableFullSiteEditing Whether the user has enabled Full Site Editing
+ * @property {boolean} __experimentalEnableFullSiteEditingDemo Whether the user has enabled Full Site Editing Demo Templates
+ * @property {boolean} __experimentalEnablePageTemplates Whether the user has enabled the Page Templates
  */
 export const SETTINGS_DEFAULTS = {
 	alignWide: false,
@@ -151,9 +153,10 @@ export const SETTINGS_DEFAULTS = {
 	showInserterHelpPanel: true,
 	__experimentalCanUserUseUnfilteredHTML: false,
 	__experimentalEnableLegacyWidgetBlock: false,
-	__experimentalEnableMenuBlock: false,
 	__experimentalBlockDirectory: false,
 	__experimentalEnableFullSiteEditing: false,
+	__experimentalEnableFullSiteEditingDemo: false,
+	__experimentalEnablePageTemplates: false,
 	gradients: [
 		{
 			name: __( 'Vivid cyan blue to vivid purple' ),

@@ -51,11 +51,17 @@
 		text-align: left;
 		align-items: center;
 	}
+
 	&__placeholder-input {
 		width: 100px;
 	}
+
 	&__placeholder-button {
 		min-width: 100px;
 		justify-content: center;
+	}
+
+	figcaption {
+		@include caption-style-theme();
 	}
 }

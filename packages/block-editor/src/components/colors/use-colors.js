@@ -3,12 +3,7 @@
  */
 import memoize from 'memize';
 import classnames from 'classnames';
-import {
-	camelCase,
-	kebabCase,
-	map,
-	startCase,
-} from 'lodash';
+import { map, kebabCase, camelCase, castArray, startCase } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -20,7 +15,9 @@ import {
 	useMemo,
 	Children,
 	cloneElement,
+	useRef,
 } from '@wordpress/element';
+import { withFallbackStyles } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -30,13 +27,29 @@ import ContrastChecker from '../contrast-checker';
 import InspectorControls from '../inspector-controls';
 import { useBlockEditContext } from '../block-edit';
 
+/**
+ * Browser dependencies
+ */
+const { getComputedStyle, Node } = window;
+
 const DEFAULT_COLORS = [];
+
+const resolveContrastCheckerColor = ( color, colorSettings, detectedColor ) => {
+	if ( typeof color === 'function' ) {
+		return color( colorSettings );
+	} else if ( color === true ) {
+		return detectedColor;
+	}
+	return color;
+};
+
 const ColorPanel = ( {
 	title,
 	colorSettings,
 	colorPanelProps,
-	contrastCheckerProps,
-	components,
+	contrastCheckers,
+	detectedBackgroundColorRef,
+	detectedColorRef,
 	panelChildren,
 } ) => (
 	<PanelColorSettings
@@ -45,16 +58,51 @@ const ColorPanel = ( {
 		colorSettings={ Object.values( colorSettings ) }
 		{ ...colorPanelProps }
 	>
-		{ contrastCheckerProps &&
-			map( components, ( ( Component, key ) => (
-				<ContrastChecker
-					key={ key }
-					textColor={ colorSettings[ key ].value }
-					{ ...contrastCheckerProps }
-				/>
-			) ) ) }
+		{ contrastCheckers &&
+			( Array.isArray( contrastCheckers ) ?
+				contrastCheckers.map( ( { backgroundColor, textColor, ...rest } ) => {
+					backgroundColor = resolveContrastCheckerColor(
+						backgroundColor,
+						colorSettings,
+						detectedBackgroundColorRef.current
+					);
+					textColor = resolveContrastCheckerColor(
+						textColor,
+						colorSettings,
+						detectedColorRef.current
+					);
+					return (
+						<ContrastChecker
+							key={ `${ backgroundColor }-${ textColor }` }
+							backgroundColor={ backgroundColor }
+							textColor={ textColor }
+							{ ...rest }
+						/>
+					);
+				} ) :
+				map( colorSettings, ( { value } ) => {
+					let { backgroundColor, textColor } = contrastCheckers;
+					backgroundColor = resolveContrastCheckerColor(
+						backgroundColor || value,
+						colorSettings,
+						detectedBackgroundColorRef.current
+					);
+					textColor = resolveContrastCheckerColor(
+						textColor || value,
+						colorSettings,
+						detectedColorRef.current
+					);
+					return (
+						<ContrastChecker
+							{ ...contrastCheckers }
+							key={ `${ backgroundColor }-${ textColor }` }
+							backgroundColor={ backgroundColor }
+							textColor={ textColor }
+						/>
+					);
+				} ) ) }
 		{ typeof panelChildren === 'function' ?
-			panelChildren( components ) :
+			panelChildren( colorSettings ) :
 			panelChildren }
 	</PanelColorSettings>
 );
@@ -69,7 +117,7 @@ export default function __experimentalUseColors(
 	{
 		panelTitle = __( 'Color Settings' ),
 		colorPanelProps,
-		contrastCheckerProps,
+		contrastCheckers,
 		panelChildren,
 	} = {
 		panelTitle: __( 'Color Settings' ),
@@ -113,14 +161,10 @@ export default function __experimentalUseColors(
 						}
 
 						return cloneElement( child, {
-							className: classnames(
-								componentClassName,
-								child.props.className,
-								{
-									[ `has-${ kebabCase( color ) }-${ kebabCase( property ) }` ]: color,
-									[ className || `has-${ kebabCase( name ) }` ]: color || customColor,
-								}
-							),
+							className: classnames( componentClassName, child.props.className, {
+								[ `has-${ kebabCase( color ) }-${ kebabCase( property ) }` ]: color,
+								[ className || `has-${ kebabCase( name ) }` ]: color || customColor,
+							} ),
 							style: {
 								...colorStyle,
 								...componentStyle,
@@ -153,6 +197,78 @@ export default function __experimentalUseColors(
 		[ setAttributes, colorConfigs.length ]
 	);
 
+	const detectedBackgroundColorRef = useRef();
+	const detectedColorRef = useRef();
+	const ColorDetector = useMemo( () => {
+		if ( ! contrastCheckers ) {
+			return undefined;
+		}
+		let needsBackgroundColor = false;
+		let needsColor = false;
+		for ( const { backgroundColor, textColor } of castArray( contrastCheckers ) ) {
+			if ( ! needsBackgroundColor ) {
+				needsBackgroundColor = backgroundColor === true;
+			}
+			if ( ! needsColor ) {
+				needsColor = textColor === true;
+			}
+			if ( needsBackgroundColor && needsColor ) {
+				break;
+			}
+		}
+		return (
+			( needsBackgroundColor || needsColor ) &&
+			withFallbackStyles(
+				(
+					node,
+					{
+						querySelector,
+						backgroundColorSelector = querySelector,
+						textColorSelector = querySelector,
+					}
+				) => {
+					let backgroundColorNode = node;
+					let textColorNode = node;
+					if ( backgroundColorSelector ) {
+						backgroundColorNode = node.parentNode.querySelector(
+							backgroundColorSelector
+						);
+					}
+					if ( textColorSelector ) {
+						textColorNode = node.parentNode.querySelector( textColorSelector );
+					}
+					let backgroundColor;
+					const color = getComputedStyle( textColorNode ).color;
+					if ( needsBackgroundColor ) {
+						backgroundColor = getComputedStyle( backgroundColorNode )
+							.backgroundColor;
+						while (
+							backgroundColor === 'rgba(0, 0, 0, 0)' &&
+							backgroundColorNode.parentNode &&
+							backgroundColorNode.parentNode === Node.ELEMENT_NODE
+						) {
+							backgroundColorNode = backgroundColorNode.parentNode;
+							backgroundColor = getComputedStyle( backgroundColorNode )
+								.backgroundColor;
+						}
+					}
+					detectedBackgroundColorRef.current = backgroundColor;
+					detectedColorRef.current = color;
+					return { backgroundColor, color };
+				}
+			)( () => <></> )
+		);
+	}, [
+		colorConfigs.reduce(
+			( acc, colorConfig ) =>
+				`${ acc } | ${ attributes[ colorConfig.name ] } | ${
+					attributes[ camelCase( `custom ${ colorConfig.name }` ) ]
+				}`,
+			''
+		),
+		...deps,
+	] );
+
 	return useMemo( () => {
 		const colorSettings = {};
 
@@ -175,25 +291,29 @@ export default function __experimentalUseColors(
 				color: attributes[ colorConfig.name ],
 			};
 
+			const customColor = attributes[ camelCase( `custom ${ name }` ) ];
 			// We memoize the non-primitives to avoid unnecessary updates
 			// when they are used as props for other components.
-			const _color = colors.find( ( __color ) => __color.slug === color );
+			const _color = customColor ?
+				undefined :
+				colors.find( ( __color ) => __color.slug === color );
 			acc[ componentName ] = createComponent(
 				name,
 				property,
 				className,
 				color,
 				_color && _color.color,
-				attributes[ camelCase( `custom ${ name }` ) ]
+				customColor
 			);
 			acc[ componentName ].displayName = componentName;
-			acc[ componentName ].color = color;
+			acc[ componentName ].color = customColor ?
+				customColor :
+				_color && _color.color;
+			acc[ componentName ].slug = color;
 			acc[ componentName ].setColor = createSetColor( name, colors );
 
 			colorSettings[ componentName ] = {
-				value: _color ?
-					_color.color :
-					attributes[ camelCase( `custom ${ name }` ) ],
+				value: _color ? _color.color : attributes[ camelCase( `custom ${ name }` ) ],
 				onChange: acc[ componentName ].setColor,
 				label: panelLabel,
 				colors,
@@ -213,8 +333,9 @@ export default function __experimentalUseColors(
 			title: panelTitle,
 			colorSettings,
 			colorPanelProps,
-			contrastCheckerProps,
-			components,
+			contrastCheckers,
+			detectedBackgroundColorRef,
+			detectedColorRef,
 			panelChildren,
 		};
 		return {
@@ -223,6 +344,7 @@ export default function __experimentalUseColors(
 			InspectorControlsColorPanel: (
 				<InspectorControlsColorPanel { ...wrappedColorPanelProps } />
 			),
+			ColorDetector,
 		};
 	}, [ attributes, setAttributes, ...deps ] );
 }

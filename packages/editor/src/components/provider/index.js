@@ -77,6 +77,7 @@ class EditorProvider extends Component {
 	getBlockEditorSettings(
 		settings,
 		reusableBlocks,
+		__experimentalFetchReusableBlocks,
 		hasUploadPermissions,
 		canUserUseUnfilteredHTML
 	) {
@@ -91,6 +92,7 @@ class EditorProvider extends Component {
 				'colors',
 				'disableCustomColors',
 				'disableCustomFontSizes',
+				'disableCustomGradients',
 				'focusMode',
 				'fontSizes',
 				'hasFixedToolbar',
@@ -104,14 +106,16 @@ class EditorProvider extends Component {
 				'titlePlaceholder',
 				'onUpdateDefaultBlockStyles',
 				'__experimentalEnableLegacyWidgetBlock',
-				'__experimentalEnableMenuBlock',
 				'__experimentalBlockDirectory',
 				'__experimentalEnableFullSiteEditing',
+				'__experimentalEnableFullSiteEditingDemo',
+				'__experimentalEnablePageTemplates',
 				'showInserterHelpPanel',
 				'gradients',
 			] ),
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalReusableBlocks: reusableBlocks,
+			__experimentalFetchReusableBlocks,
 			__experimentalFetchLinkSuggestions: fetchLinkSuggestions,
 			__experimentalCanUserUseUnfilteredHTML: canUserUseUnfilteredHTML,
 		};
@@ -152,11 +156,14 @@ class EditorProvider extends Component {
 			post,
 			blocks,
 			resetEditorBlocks,
+			selectionStart,
+			selectionEnd,
 			isReady,
 			settings,
 			reusableBlocks,
 			resetEditorBlocksWithoutUndoLevel,
 			hasUploadPermissions,
+			__experimentalFetchReusableBlocks,
 		} = this.props;
 
 		if ( ! isReady ) {
@@ -166,6 +173,7 @@ class EditorProvider extends Component {
 		const editorSettings = this.getBlockEditorSettings(
 			settings,
 			reusableBlocks,
+			__experimentalFetchReusableBlocks,
 			hasUploadPermissions,
 			canUserUseUnfilteredHTML,
 		);
@@ -177,6 +185,8 @@ class EditorProvider extends Component {
 						value={ blocks }
 						onInput={ resetEditorBlocksWithoutUndoLevel }
 						onChange={ resetEditorBlocks }
+						selectionStart={ selectionStart }
+						selectionEnd={ selectionEnd }
 						settings={ editorSettings }
 						useSubRegistry={ false }
 					>
@@ -197,6 +207,8 @@ export default compose( [
 			canUserUseUnfilteredHTML,
 			__unstableIsEditorReady: isEditorReady,
 			getEditorBlocks,
+			getEditorSelectionStart,
+			getEditorSelectionEnd,
 			__experimentalGetReusableBlocks,
 		} = select( 'core/editor' );
 		const { canUser } = select( 'core' );
@@ -205,6 +217,8 @@ export default compose( [
 			canUserUseUnfilteredHTML: canUserUseUnfilteredHTML(),
 			isReady: isEditorReady(),
 			blocks: getEditorBlocks(),
+			selectionStart: getEditorSelectionStart(),
+			selectionEnd: getEditorSelectionEnd(),
 			reusableBlocks: __experimentalGetReusableBlocks(),
 			hasUploadPermissions: defaultTo( canUser( 'create', 'media' ), true ),
 		};
@@ -215,6 +229,7 @@ export default compose( [
 			updatePostLock,
 			resetEditorBlocks,
 			updateEditorSettings,
+			__experimentalFetchReusableBlocks,
 			__experimentalTearDownEditor,
 		} = dispatch( 'core/editor' );
 		const { createWarningNotice } = dispatch( 'core/notices' );
@@ -225,12 +240,14 @@ export default compose( [
 			createWarningNotice,
 			resetEditorBlocks,
 			updateEditorSettings,
-			resetEditorBlocksWithoutUndoLevel( blocks ) {
+			resetEditorBlocksWithoutUndoLevel( blocks, options ) {
 				resetEditorBlocks( blocks, {
+					...options,
 					__unstableShouldCreateUndoLevel: false,
 				} );
 			},
 			tearDownEditor: __experimentalTearDownEditor,
+			__experimentalFetchReusableBlocks,
 		};
 	} ),
 ] )( EditorProvider );

@@ -16,11 +16,13 @@ jest.mock( 'react-native-gutenberg-bridge', () => {
 		editorDidMount: jest.fn(),
 		editorDidAutosave: jest.fn(),
 		subscribeMediaUpload: jest.fn(),
-		requestMediaPickFromMediaLibrary: jest.fn(),
-		requestMediaPickFromDeviceLibrary: jest.fn(),
-		requestMediaPickFromDeviceCamera: jest.fn(),
 		getOtherMediaOptions: jest.fn(),
-		requestOtherMediaPickFrom: jest.fn(),
+		requestMediaPicker: jest.fn(),
+		mediaSources: {
+			deviceLibrary: 'DEVICE_MEDIA_LIBRARY',
+			deviceCamera: 'DEVICE_CAMERA',
+			siteMediaLibrary: 'SITE_MEDIA_LIBRARY',
+		},
 	};
 } );
 
@@ -64,6 +66,8 @@ jest.mock( 'react-native-safe-area', () => {
 } );
 
 jest.mock( 'react-native-recyclerview-list' );
+
+jest.mock( '@react-native-community/slider', () => () => 'Slider', { virtual: true } );
 
 if ( ! global.window.matchMedia ) {
 	global.window.matchMedia = () => ( {

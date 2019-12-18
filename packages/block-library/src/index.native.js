@@ -142,10 +142,11 @@ export const registerCoreBlocks = () => {
 		list,
 		quote,
 		mediaText,
+		preformatted,
+		gallery,
 		// eslint-disable-next-line no-undef
 		!! __DEV__ ? group : null,
-		// eslint-disable-next-line no-undef
-		!! __DEV__ ? spacer : null,
+		spacer,
 	].forEach( registerBlock );
 
 	setDefaultBlockName( paragraph.name );

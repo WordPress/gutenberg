@@ -26,12 +26,16 @@
 .edit-post-header-toolbar__block-toolbar {
 	// Stack toolbar below Editor Bar.
 	position: absolute;
-	top: $header-height;
+	top: $header-height + 1px;
 	left: 0;
 	right: 0;
 	background: $white;
 	min-height: $block-toolbar-height;
 	border-bottom: $border-width solid $light-gray-500;
+
+	&:empty {
+		display: none;
+	}
 
 	.block-editor-block-toolbar .components-toolbar {
 		border-top: none;

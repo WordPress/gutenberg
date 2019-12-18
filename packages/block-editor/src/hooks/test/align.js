@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { noop } from 'lodash';
-import renderer from 'react-test-renderer';
+import renderer, { act } from 'react-test-renderer';
 
 /**
  * WordPress dependencies
@@ -17,10 +17,11 @@ import {
 /**
  * Internal dependencies
  */
+import BlockEditorProvider from '../../components/provider';
 import {
 	getValidAlignments,
 	withToolbarControls,
-	insideSelectWithDataAlign,
+	withDataAlign,
 	addAssignedAlign,
 } from '../align';
 
@@ -169,19 +170,24 @@ describe( 'align', () => {
 				},
 			} );
 
-			const EnhancedComponent = insideSelectWithDataAlign( ( { wrapperProps } ) => (
+			const EnhancedComponent = withDataAlign( ( { wrapperProps } ) => (
 				<div { ...wrapperProps } />
 			) );
 
-			const wrapper = renderer.create(
-				<EnhancedComponent
-					attributes={ {
-						align: 'wide',
-					} }
-					name="core/foo"
-				/>
-			);
-			expect( wrapper.toTree().rendered.props.wrapperProps ).toEqual( {
+			let wrapper;
+			act( () => {
+				wrapper = renderer.create(
+					<BlockEditorProvider settings={ { alignWide: true } } value={ [] }>
+						<EnhancedComponent
+							attributes={ {
+								align: 'wide',
+							} }
+							name="core/foo"
+						/>
+					</BlockEditorProvider>
+				);
+			} );
+			expect( wrapper.root.findByType( 'div' ).props ).toEqual( {
 				'data-align': 'wide',
 			} );
 		} );
@@ -195,20 +201,24 @@ describe( 'align', () => {
 				},
 			} );
 
-			const EnhancedComponent = insideSelectWithDataAlign( ( { wrapperProps } ) => (
+			const EnhancedComponent = withDataAlign( ( { wrapperProps } ) => (
 				<div { ...wrapperProps } />
 			) );
 
-			const wrapper = renderer.create(
-				<EnhancedComponent
-					name="core/foo"
-					attributes={ {
-						align: 'wide',
-					} }
-					hasWideEnabled={ false }
-				/>
-			);
-			expect( wrapper.toTree().rendered.props.wrapperProps ).toEqual( undefined );
+			let wrapper;
+			act( () => {
+				wrapper = renderer.create(
+					<BlockEditorProvider settings={ { alignWide: false } } value={ [] }>
+						<EnhancedComponent
+							name="core/foo"
+							attributes={ {
+								align: 'wide',
+							} }
+						/>
+					</BlockEditorProvider>
+				);
+			} );
+			expect( wrapper.root.findByType( 'div' ).props ).toEqual( {} );
 		} );
 
 		it( 'should not render invalid align', () => {
@@ -220,20 +230,24 @@ describe( 'align', () => {
 				},
 			} );
 
-			const EnhancedComponent = insideSelectWithDataAlign( ( { wrapperProps } ) => (
+			const EnhancedComponent = withDataAlign( ( { wrapperProps } ) => (
 				<div { ...wrapperProps } />
 			) );
 
-			const wrapper = renderer.create(
-				<EnhancedComponent
-					name="core/foo"
-					attributes={ {
-						align: 'wide',
-					} }
-				/>
-			);
-
-			expect( wrapper.toTree().props.wrapperProps ).toBeUndefined();
+			let wrapper;
+			act( () => {
+				wrapper = renderer.create(
+					<BlockEditorProvider settings={ { alignWide: true } } value={ [] }>
+						<EnhancedComponent
+							name="core/foo"
+							attributes={ {
+								align: 'wide',
+							} }
+						/>
+					</BlockEditorProvider>
+				);
+			} );
+			expect( wrapper.root.findByType( 'div' ).props ).toEqual( {} );
 		} );
 	} );
 

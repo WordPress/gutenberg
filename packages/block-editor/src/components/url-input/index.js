@@ -11,7 +11,7 @@ import scrollIntoView from 'dom-scroll-into-view';
 import { __, sprintf, _n } from '@wordpress/i18n';
 import { Component, createRef } from '@wordpress/element';
 import { UP, DOWN, ENTER, TAB } from '@wordpress/keycodes';
-import { Spinner, withSpokenMessages, Popover } from '@wordpress/components';
+import { BaseControl, Button, Spinner, withSpokenMessages, Popover } from '@wordpress/components';
 import { withInstanceId, withSafeTimeout, compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { isURL } from '@wordpress/url';
@@ -256,9 +256,9 @@ class URLInput extends Component {
 
 	render() {
 		const {
+			label,
 			instanceId,
 			className,
-			id,
 			isFullWidth,
 			hasBorder,
 			__experimentalRenderSuggestions: renderSuggestions,
@@ -273,6 +273,7 @@ class URLInput extends Component {
 			selectedSuggestion,
 			loading,
 		} = this.state;
+		const id = `url-input-control-${ instanceId }`;
 
 		const suggestionsListboxId = `block-editor-url-input-suggestions-${ instanceId }`;
 		const suggestionOptionIdPrefix = `block-editor-url-input-suggestion-${ instanceId }`;
@@ -295,12 +296,15 @@ class URLInput extends Component {
 
 		/* eslint-disable jsx-a11y/no-autofocus */
 		return (
-			<div className={ classnames( 'editor-url-input block-editor-url-input', className, {
-				'is-full-width': isFullWidth,
-				'has-border': hasBorder,
-			} ) }>
+			<BaseControl
+				label={ label }
+				id={ id }
+				className={ classnames( 'editor-url-input block-editor-url-input', className, {
+					'is-full-width': isFullWidth,
+					'has-border': hasBorder,
+				} ) }
+			>
 				<input
-					id={ id }
 					autoFocus={ autoFocus }
 					type="text"
 					aria-label={ __( 'URL' ) }
@@ -344,7 +348,7 @@ class URLInput extends Component {
 							) }
 						>
 							{ suggestions.map( ( suggestion, index ) => (
-								<button
+								<Button
 									{ ...buildSuggestionItemProps( suggestion, index ) }
 									key={ suggestion.id }
 									className={ classnames( 'editor-url-input__suggestion block-editor-url-input__suggestion', {
@@ -353,12 +357,12 @@ class URLInput extends Component {
 									onClick={ () => this.handleOnClick( suggestion ) }
 								>
 									{ suggestion.title }
-								</button>
+								</Button>
 							) ) }
 						</div>
 					</Popover>
 				}
-			</div>
+			</BaseControl>
 		);
 		/* eslint-enable jsx-a11y/no-autofocus */
 	}

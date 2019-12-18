@@ -20,8 +20,11 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
+	"sideEffects": false,
 	"dependencies": {
 		"@babel/runtime": "^7.4.4",
+		"@emotion/core": "10.0.22",
+		"@emotion/styled": "10.0.23",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/deprecated": "file:../deprecated",
@@ -35,6 +38,8 @@
 		"classnames": "^2.2.5",
 		"clipboard": "^2.0.1",
 		"dom-scroll-into-view": "^1.2.1",
+		"downshift": "^3.3.4",
+		"gradient-parser": "^0.1.5",
 		"lodash": "^4.17.15",
 		"memize": "^1.0.5",
 		"moment": "^2.22.1",
@@ -42,6 +47,7 @@
 		"re-resizable": "^6.0.0",
 		"react-dates": "^17.1.1",
 		"react-spring": "^8.0.20",
+		"reakit": "^1.0.0-beta.12",
 		"rememo": "^3.0.0",
 		"tinycolor2": "^1.4.1",
 		"uuid": "^3.3.2"

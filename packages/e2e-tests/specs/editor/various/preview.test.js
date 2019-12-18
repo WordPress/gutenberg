@@ -15,8 +15,9 @@ import {
 	saveDraft,
 	clickOnMoreMenuItem,
 	pressKeyWithModifier,
-	disableNavigationMode,
 } from '@wordpress/e2e-test-utils';
+
+/** @typedef {import('puppeteer').Page} Page */
 
 async function openPreviewPage( editorPage ) {
 	let openTabs = await browser.pages();
@@ -41,7 +42,7 @@ async function openPreviewPage( editorPage ) {
  * Given a Puppeteer Page instance for a preview window, clicks Preview, and
  * awaits the window navigation.
  *
- * @param {puppeteer.Page} previewPage Page on which to await navigation.
+ * @param {Page} previewPage Page on which to await navigation.
  *
  * @return {Promise} Promise resolving once navigation completes.
  */
@@ -206,7 +207,6 @@ describe( 'Preview with Custom Fields enabled', () => {
 	beforeEach( async () => {
 		await createNewPost();
 		await toggleCustomFieldsOption( true );
-		await disableNavigationMode();
 	} );
 
 	afterEach( async () => {

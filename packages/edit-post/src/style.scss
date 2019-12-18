@@ -1,5 +1,6 @@
 $footer-height: $icon-button-size-small;
 
+@import "./components/editor-regions/style.scss";
 @import "./components/fullscreen-mode/style.scss";
 @import "./components/header/style.scss";
 @import "./components/header/fullscreen-mode-close/style.scss";
@@ -23,6 +24,7 @@ $footer-height: $icon-button-size-small;
 @import "./components/text-editor/style.scss";
 @import "./components/visual-editor/style.scss";
 @import "./components/options-modal/style.scss";
+@import "./components/welcome-guide/style.scss";
 
 
 /**

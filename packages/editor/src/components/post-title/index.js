@@ -3,7 +3,7 @@
  */
 import Textarea from 'react-autosize-textarea';
 import classnames from 'classnames';
-import { get } from 'lodash';
+import { get, escape, unescape } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -123,7 +123,7 @@ class PostTitle extends Component {
 							<Textarea
 								id={ `post-title-${ instanceId }` }
 								className="editor-post-title__input"
-								value={ title }
+								value={ unescape( title ) }
 								onChange={ this.onChange }
 								placeholder={ decodedPlaceholder || __( 'Add title' ) }
 								onFocus={ this.onSelect }
@@ -181,7 +181,7 @@ const applyWithDispatch = withDispatch( ( dispatch ) => {
 			insertDefaultBlock( undefined, undefined, 0 );
 		},
 		onUpdate( title ) {
-			editPost( { title } );
+			editPost( { title: escape( title ) } );
 		},
 		onUndo: undo,
 		onRedo: redo,

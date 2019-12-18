@@ -134,9 +134,9 @@ Themes are responsible for creating the classes that apply the colors in differe
 
 The class name is built appending 'has-', followed by the class name _using_ kebab case and ending with the context name.
 
-### Block Gradient Presents
+### Block Gradient Presets
 
-Different blocks have the possibility of selecting from a list of predined of gradients. The block editor provides a default gradient presets, but a theme can overwrite them and provide its own:
+Different blocks have the possibility of selecting from a list of predefined gradients. The block editor provides a default gradient presets, but a theme can overwrite them and provide its own:
 
 ```php
 add_theme_support(

@@ -180,6 +180,12 @@
 		"parent": "themes"
 	},
 	{
+		"title": "Block-based Themes (Experimental)",
+		"slug": "block-based-themes",
+		"markdown_source": "../docs/designers-developers/developers/themes/block-based-themes.md",
+		"parent": "themes"
+	},
+	{
 		"title": "Backward Compatibility",
 		"slug": "backward-compatibility",
 		"markdown_source": "../docs/designers-developers/developers/backward-compatibility/README.md",
@@ -606,6 +612,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "Card",
+		"slug": "card",
+		"markdown_source": "../packages/components/src/card/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "CheckboxControl",
 		"slug": "checkbox-control",
 		"markdown_source": "../packages/components/src/checkbox-control/README.md",
@@ -723,6 +735,12 @@
 		"title": "FormTokenField",
 		"slug": "form-token-field",
 		"markdown_source": "../packages/components/src/form-token-field/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "Guide",
+		"slug": "guide",
+		"markdown_source": "../packages/components/src/guide/README.md",
 		"parent": "components"
 	},
 	{
@@ -951,6 +969,12 @@
 		"title": "TextControl",
 		"slug": "text-control",
 		"markdown_source": "../packages/components/src/text-control/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "TextHighlight",
+		"slug": "text-highlight",
+		"markdown_source": "../packages/components/src/text-highlight/README.md",
 		"parent": "components"
 	},
 	{

@@ -27,25 +27,25 @@ export default function LegacyWidgetPlaceholder( {
 	let placeholderContent;
 	if ( ! hasPermissionsToManageWidgets ) {
 		placeholderContent = __( 'You don\'t have permissions to use widgets on this site.' );
-	}
-	if ( isEmpty( visibleLegacyWidgets ) ) {
+	} else if ( isEmpty( visibleLegacyWidgets ) ) {
 		placeholderContent = __( 'There are no widgets available.' );
+	} else {
+		placeholderContent = (
+			<SelectControl
+				label={ __( 'Select a legacy widget to display:' ) }
+				value={ currentWidget || 'none' }
+				onChange={ onChangeWidget }
+				options={ [ { value: 'none', label: 'Select widget' } ].concat(
+					map( visibleLegacyWidgets, ( widget, key ) => {
+						return {
+							value: key,
+							label: widget.name,
+						};
+					} )
+				) }
+			/>
+		);
 	}
-	placeholderContent = (
-		<SelectControl
-			label={ __( 'Select a legacy widget to display:' ) }
-			value={ currentWidget || 'none' }
-			onChange={ onChangeWidget }
-			options={ [ { value: 'none', label: 'Select widget' } ].concat(
-				map( visibleLegacyWidgets, ( widget, key ) => {
-					return {
-						value: key,
-						label: widget.name,
-					};
-				} )
-			) }
-		/>
-	);
 	return (
 		<Placeholder
 			icon={ <BlockIcon icon="admin-customizer" /> }

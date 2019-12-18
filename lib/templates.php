@@ -86,35 +86,6 @@ function gutenberg_grant_template_caps( array $allcaps ) {
 add_filter( 'user_has_cap', 'gutenberg_grant_template_caps' );
 
 /**
- * Filters capabilities to prevent deletion of the 'wp_template' post with slug 'index'.
- *
- * Similar to today's themes, this template should always exist.
- *
- * @param array  $caps    Array of the user's capabilities.
- * @param string $cap     Capability name.
- * @param int    $user_id The user ID.
- * @param array  $args    Adds the context to the cap. Typically the object ID.
- * @return array Filtered $caps.
- */
-function gutenberg_prevent_index_template_deletion( $caps, $cap, $user_id, $args ) {
-	if ( 'delete_post' !== $cap || ! isset( $args[0] ) ) {
-		return $caps;
-	}
-
-	$post = get_post( $args[0] );
-	if ( ! $post || 'wp_template' !== $post->post_type ) {
-		return $caps;
-	}
-
-	if ( 'index' === $post->post_name ) {
-		$caps[] = 'do_not_allow';
-	}
-
-	return $caps;
-}
-add_filter( 'map_meta_cap', 'gutenberg_prevent_index_template_deletion', 10, 4 );
-
-/**
  * Fixes the label of the 'wp_template' admin menu entry.
  */
 function gutenberg_fix_template_admin_menu_entry() {

@@ -25,7 +25,6 @@ import Section from './section';
 import {
 	EnablePluginDocumentSettingPanelOption,
 	EnablePublishSidebarOption,
-	EnableTipsOption,
 	EnablePanelOption,
 	EnableFeature,
 } from './options';
@@ -47,7 +46,6 @@ export function OptionsModal( { isModalActive, isViewable, closeModal } ) {
 		>
 			<Section title={ __( 'General' ) }>
 				<EnablePublishSidebarOption label={ __( 'Pre-publish Checks' ) } />
-				<EnableTipsOption label={ __( 'Tips' ) } />
 				<EnableFeature feature="showInserterHelpPanel" label={ __( 'Inserter Help Panel' ) } />
 			</Section>
 			<Section title={ __( 'Document Panels' ) }>

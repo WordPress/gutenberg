@@ -114,7 +114,7 @@ export function blockPatterns( state = {}, action ) {
 					return uniqBy( [
 						...get( blockType, [ 'patterns' ], [] ),
 						...get( state, [ blockType.name ], [] ),
-					], ( style ) => style.name );
+					], ( pattern ) => pattern.name );
 				} ),
 			};
 		case 'ADD_BLOCK_PATTERNS':
