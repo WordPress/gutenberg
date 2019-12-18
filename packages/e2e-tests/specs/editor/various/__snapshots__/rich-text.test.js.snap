@@ -1,5 +1,11 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`RichText should apply active formatting for inline paste 1`] = `
+"<!-- wp:paragraph -->
+<p><strong>132</strong>3</p>
+<!-- /wp:paragraph -->"
+`;
+
 exports[`RichText should apply formatting when selection is collapsed 1`] = `
 "<!-- wp:paragraph -->
 <p>Some <strong>bold</strong>.</p>
@@ -31,6 +37,12 @@ exports[`RichText should handle change in tag name gracefully 1`] = `
 `;
 
 exports[`RichText should keep internal selection after blur 1`] = `
+"<!-- wp:paragraph -->
+<p>1<strong>2</strong></p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`RichText should make bold after split and merge 1`] = `
 "<!-- wp:paragraph -->
 <p>1<strong>2</strong></p>
 <!-- /wp:paragraph -->"

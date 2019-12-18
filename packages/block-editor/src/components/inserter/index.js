@@ -38,7 +38,7 @@ const defaultRenderToggle = ( { onToggle, disabled, isOpen, blockTitle, hasSingl
 				event.currentTarget.focus();
 			} }
 			onClick={ onToggle }
-			className="editor-inserter__toggle block-editor-inserter__toggle"
+			className="block-editor-inserter__toggle"
 			aria-haspopup={ ! hasSingleBlockType ? 'true' : false }
 			aria-expanded={ ! hasSingleBlockType ? isOpen : false }
 			disabled={ disabled }
@@ -124,8 +124,8 @@ class Inserter extends Component {
 
 		return (
 			<Dropdown
-				className="editor-inserter block-editor-inserter"
-				contentClassName="editor-inserter__popover block-editor-inserter__popover"
+				className="block-editor-inserter"
+				contentClassName="block-editor-inserter__popover"
 				position={ position }
 				onToggle={ this.onToggle }
 				expandOnMobile

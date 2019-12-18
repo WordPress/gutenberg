@@ -72,9 +72,10 @@
 }
 
 // Hover States
-.components-panel__body > .components-panel__body-title:hover,
-.edit-post-last-revision__panel > .components-icon-button:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover {
-	background: $light-gray-200;
+.components-panel__body > .components-panel__body-title:hover {
+	// Override the default button hover style
+	background: $light-gray-200 !important;
+	border: none !important;
 }
 
 .components-panel__body-toggle.components-button {
@@ -88,9 +89,17 @@
 	@include menu-style__neutral;
 	transition: 0.1s background ease-in-out;
 	@include reduce-motion("transition");
+	height: auto;
 
 	&:focus:not(:disabled):not([aria-disabled="true"]) {
 		@include menu-style__focus;
+	}
+
+	&:hover {
+		// Override the default button hover style
+		background: transparent !important;
+		border: none !important;
+		box-shadow: none !important;
 	}
 
 	.components-panel__arrow {

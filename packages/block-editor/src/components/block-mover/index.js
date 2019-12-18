@@ -86,9 +86,9 @@ export class BlockMover extends Component {
 		// to an unfocused state (body as active element) without firing blur on,
 		// the rendering parent, leaving it unable to react to focus out.
 		return (
-			<div className={ classnames( 'editor-block-mover block-editor-block-mover', { 'is-visible': isFocused || ! isHidden, 'is-horizontal': orientation === 'horizontal' } ) }>
+			<div className={ classnames( 'block-editor-block-mover', { 'is-visible': isFocused || ! isHidden, 'is-horizontal': orientation === 'horizontal' } ) }>
 				<IconButton
-					className="editor-block-mover__control block-editor-block-mover__control"
+					className="block-editor-block-mover__control"
 					onClick={ isFirst ? null : onMoveUp }
 					icon={ getArrowIcon( 'up' ) }
 					// translators: %s: Horizontal direction of block movement ( left, right )
@@ -103,7 +103,7 @@ export class BlockMover extends Component {
 					{ ( { onDraggableStart, onDraggableEnd } ) => (
 						<IconButton
 							icon={ dragHandle }
-							className="block-editor-block-mover__control-drag-handle editor-block-mover__control block-editor-block-mover__control"
+							className="block-editor-block-mover__control-drag-handle block-editor-block-mover__control"
 							aria-hidden="true"
 							onDragStart={ onDraggableStart }
 							onDragEnd={ onDraggableEnd }
@@ -113,7 +113,7 @@ export class BlockMover extends Component {
 				</BlockDraggable>
 
 				<IconButton
-					className="editor-block-mover__control block-editor-block-mover__control"
+					className="block-editor-block-mover__control"
 					onClick={ isLast ? null : onMoveDown }
 					icon={ getArrowIcon( 'down' ) }
 					// translators: %s: Horizontal direction of block movement ( left, right )
@@ -123,7 +123,7 @@ export class BlockMover extends Component {
 					onFocus={ this.onFocus }
 					onBlur={ this.onBlur }
 				/>
-				<span id={ `block-editor-block-mover__up-description-${ instanceId }` } className="editor-block-mover__description block-editor-block-mover__description">
+				<span id={ `block-editor-block-mover__up-description-${ instanceId }` } className="block-editor-block-mover__description">
 					{
 						getBlockMoverDescription(
 							blocksCount,
@@ -137,7 +137,7 @@ export class BlockMover extends Component {
 						)
 					}
 				</span>
-				<span id={ `block-editor-block-mover__down-description-${ instanceId }` } className="editor-block-mover__description block-editor-block-mover__description">
+				<span id={ `block-editor-block-mover__down-description-${ instanceId }` } className="block-editor-block-mover__description">
 					{
 						getBlockMoverDescription(
 							blocksCount,
