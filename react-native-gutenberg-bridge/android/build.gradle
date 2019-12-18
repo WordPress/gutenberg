@@ -108,7 +108,7 @@ repositories {
         // If building from source, use the local sources from node_modules
         def nodeModulesPath = "${project.buildDir}/../../../node_modules/"
         maven { url "${nodeModulesPath}/react-native/android" }
-        maven { url "${nodeModulesPath}/jsc-android/dist" }
+//        maven { url "${nodeModulesPath}/jsc-android/dist" }
     } else {
         // If not building from source (e.g. Jitpack), use the bintray repo so a local RN setup is not needed
         def reactNativeRepo = 'https://dl.bintray.com/wordpress-mobile/react-native-mirror/'
@@ -119,8 +119,12 @@ repositories {
 
 dependencies {
     // Make sure to put android-jsc at the the first
-    implementation "org.webkit:android-jsc:r241213"
+//    implementation "org.webkit:android-jsc:r241213"
     implementation project(':react-native-aztec')
+    def hermesPath = "../../node_modules/hermes-engine/android/";
+    debugImplementation files(hermesPath + "hermes-debug.aar")
+    releaseImplementation files(hermesPath + "hermes-release.aar")
+
     implementation "org.wordpress:utils:1.22"
 
     // For animated GIF support
