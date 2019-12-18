@@ -150,7 +150,7 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
     <ShortcutSection
       shortcuts={
         Array [
-          "core/block-editor/selectAll",
+          "core/block-editor/select-all",
           "core/block-editor/unselect",
         ]
       }
@@ -161,8 +161,8 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
         Array [
           "core/block-editor/duplicate",
           "core/block-editor/remove",
-          "core/block-editor/insertBefore",
-          "core/block-editor/insertAfter",
+          "core/block-editor/insert-before",
+          "core/block-editor/insert-after",
           Object {
             "ariaLabel": "Forward-slash",
             "description": "Change the block type after adding a new paragraph.",

@@ -83,7 +83,7 @@ export function KeyboardShortcutHelpModal( { isModalActive, toggleModal } ) {
 					<ShortcutSection
 						title={ __( 'Selection shortcuts' ) }
 						shortcuts={ [
-							'core/block-editor/selectAll',
+							'core/block-editor/select-all',
 							'core/block-editor/unselect',
 						] }
 					/>
@@ -92,8 +92,8 @@ export function KeyboardShortcutHelpModal( { isModalActive, toggleModal } ) {
 						shortcuts={ [
 							'core/block-editor/duplicate',
 							'core/block-editor/remove',
-							'core/block-editor/insertBefore',
-							'core/block-editor/insertAfter',
+							'core/block-editor/insert-before',
+							'core/block-editor/insert-after',
 							{
 								keyCombination: '/',
 								description: __( 'Change the block type after adding a new paragraph.' ),

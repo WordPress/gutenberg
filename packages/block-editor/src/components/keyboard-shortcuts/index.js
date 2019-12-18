@@ -37,7 +37,7 @@ function KeyboardShortcuts() {
 		} );
 
 		registerShortcut( {
-			name: 'core/block-editor/insertBefore',
+			name: 'core/block-editor/insert-before',
 			category: 'block',
 			description: __( 'Insert a new block before the selected block(s).' ),
 			keyCombination: {
@@ -47,7 +47,7 @@ function KeyboardShortcuts() {
 		} );
 
 		registerShortcut( {
-			name: 'core/block-editor/insertAfter',
+			name: 'core/block-editor/insert-after',
 			category: 'block',
 			description: __( 'Insert a new block after the selected block(s).' ),
 			keyCombination: {
@@ -57,7 +57,7 @@ function KeyboardShortcuts() {
 		} );
 
 		registerShortcut( {
-			name: 'core/block-editor/deleteMultiSelection',
+			name: 'core/block-editor/delete-multi-selection',
 			category: 'block',
 			description: __( 'Remove multiple selected blocks.' ),
 			keyCombination: {
@@ -69,7 +69,7 @@ function KeyboardShortcuts() {
 		} );
 
 		registerShortcut( {
-			name: 'core/block-editor/selectAll',
+			name: 'core/block-editor/select-all',
 			category: 'selection',
 			description: __( 'Select all text when typing. Press again to select all blocks.' ),
 			keyCombination: {
@@ -122,24 +122,24 @@ function KeyboardShortcuts() {
 
 	// Does not clash with any known browser/native shortcuts, but preventDefault
 	// is used to prevent any obscure unknown shortcuts from triggering.
-	useShortcut( 'core/block-editor/insertAfter', useCallback( ( event ) => {
+	useShortcut( 'core/block-editor/insert-after', useCallback( ( event ) => {
 		event.preventDefault();
 		insertAfterBlock( last( clientIds ) );
 	}, [ clientIds, insertAfterBlock ] ), { bindGlobal: true } );
 
 	// Prevent 'view recently closed tabs' in Opera using preventDefault.
-	useShortcut( 'core/block-editor/insertBefore', useCallback( ( event ) => {
+	useShortcut( 'core/block-editor/insert-before', useCallback( ( event ) => {
 		event.preventDefault();
 		insertBeforeBlock( first( clientIds ) );
 	}, [ clientIds, insertBeforeBlock ] ), { bindGlobal: true } );
 
-	useShortcut( 'core/block-editor/deleteMultiSelection', useCallback( () => {
+	useShortcut( 'core/block-editor/delete-multi-selection', useCallback( () => {
 		if ( clientIds.length > 0 ) {
 			removeBlocks( clientIds );
 		}
 	}, [ clientIds, removeBlocks ] ), { target } );
 
-	useShortcut( 'core/block-editor/selectAll', useCallback( ( event ) => {
+	useShortcut( 'core/block-editor/select-all', useCallback( ( event ) => {
 		event.preventDefault();
 		multiSelect( first( rootBlocksClientIds ), last( rootBlocksClientIds ) );
 	}, [ rootBlocksClientIds, multiSelect ] ), { target } );

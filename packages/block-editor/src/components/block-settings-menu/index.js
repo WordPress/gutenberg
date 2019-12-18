@@ -41,8 +41,8 @@ export function BlockSettingsMenu( { clientIds } ) {
 		return {
 			duplicate: getShortcutKeyCombination( 'core/block-editor/duplicate' ),
 			remove: getShortcutKeyCombination( 'core/block-editor/remove' ),
-			insertAfter: getShortcutKeyCombination( 'core/block-editor/insertAfter' ),
-			insertBefore: getShortcutKeyCombination( 'core/block-editor/insertBefore' ),
+			insertAfter: getShortcutKeyCombination( 'core/block-editor/insert-after' ),
+			insertBefore: getShortcutKeyCombination( 'core/block-editor/insert-before' ),
 		};
 	}, [] );
 
