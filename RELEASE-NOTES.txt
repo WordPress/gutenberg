@@ -1,12 +1,12 @@
 1.20.0
 ------
 * Fix bug where image placeholders would sometimes not be shown
+* Make inserter to show options on long-press to add before/after
 
 1.19.0
 ------
 * Add support for changing Settings in List Block.
 * [iOS] Fix crash dismissing bottom-sheet after device rotation.
-* Make inserter to show options on long-press to add before/after
 * [Android] Add support for Preformatted block.
 * New block: Gallery. You can now create image galleries using WordPress Media library. Upload feature is coming soon.
 
