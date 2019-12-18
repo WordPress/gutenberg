@@ -16,6 +16,10 @@ exports[`OptionsModal should match snapshot when the modal is active 1`] = `
       feature="showInserterHelpPanel"
       label="Inserter Help Panel"
     />
+    <WithSelect(WithDispatch(BaseOption))
+      feature="noBlockValidation"
+      label="Disable Block Validation"
+    />
   </Section>
   <Section
     title="Document Panels"
