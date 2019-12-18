@@ -3,6 +3,8 @@
  */
 import React from 'react';
 import { View, TouchableWithoutFeedback, Text } from 'react-native';
+import { isEmpty } from 'lodash';
+
 /**
  * Internal dependencies
  */
@@ -33,7 +35,7 @@ import {
 	VideoPlayer,
 	InspectorControls,
 } from '@wordpress/block-editor';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { isURL } from '@wordpress/url';
 import { doAction, hasAction } from '@wordpress/hooks';
 
@@ -196,7 +198,11 @@ class VideoEdit extends React.Component {
 		}
 
 		return (
-			<TouchableWithoutFeedback onPress={ this.onVideoPressed } disabled={ ! isSelected }>
+			<TouchableWithoutFeedback
+				accessible={ ! isSelected }
+				onPress={ this.onVideoPressed }
+				disabled={ ! isSelected }
+			>
 				<View style={ { flex: 1 } }>
 					{ ! this.state.isCaptionSelected &&
 						<BlockControls>
@@ -257,6 +263,16 @@ class VideoEdit extends React.Component {
 						} }
 					/>
 					<BlockCaption
+						accessible={ true }
+						accessibilityLabelCreator={ ( caption ) =>
+							isEmpty( caption ) ?
+							/* translators: accessibility text. Empty video caption. */
+								( 'Video caption. Empty' ) :
+								sprintf(
+								/* translators: accessibility text. %s: video caption. */
+									__( 'Video caption. %s' ),
+									caption )
+						}
 						clientId={ this.props.clientId }
 						isSelected={ this.state.isCaptionSelected }
 						onFocus={ this.onFocusCaption }

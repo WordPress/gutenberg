@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Platform } from 'react-native';
+import { Platform, View } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -17,6 +17,8 @@ const CAPTION_TAG_NAME = Platform.select( {
 } );
 
 const Caption = ( {
+	accessibilityLabelCreator,
+	accessible,
 	inlineToolbar,
 	isSelected,
 	onBlur,
@@ -24,26 +26,34 @@ const Caption = ( {
 	onFocus,
 	placeholder = __( 'Write caption…' ),
 	placeholderTextColor,
+	shouldDisplay = true,
 	style,
 	value,
 } ) => (
-	<RichText
-		__unstableMobileNoFocusOnMount
-		fontSize={ style && style.fontSize ? style.fontSize : 14 }
-		inlineToolbar={ inlineToolbar }
-		isSelected={ isSelected }
-		onBlur={ onBlur }
-		onChange={ onChange }
-		placeholder={ placeholder }
-		placeholderTextColor={ placeholderTextColor }
-		rootTagsToEliminate={ [ 'p' ] }
-		style={ style }
-		tagName={ CAPTION_TAG_NAME }
-		textAlign="center"
-		underlineColorAndroid="transparent"
-		unstableOnFocus={ onFocus }
-		value={ value }
-	/>
+	<View
+		accessibilityLabel={ accessibilityLabelCreator ? accessibilityLabelCreator( value ) : undefined }
+		accessibilityRole="button"
+		accessible={ accessible }
+		style={ { flex: 1, display: shouldDisplay ? 'flex' : 'none' } }
+	>
+		<RichText
+			__unstableMobileNoFocusOnMount
+			fontSize={ style && style.fontSize ? style.fontSize : 14 }
+			inlineToolbar={ inlineToolbar }
+			isSelected={ isSelected }
+			onBlur={ onBlur }
+			onChange={ onChange }
+			placeholder={ placeholder }
+			placeholderTextColor={ placeholderTextColor }
+			rootTagsToEliminate={ [ 'p' ] }
+			style={ style }
+			tagName={ CAPTION_TAG_NAME }
+			textAlign="center"
+			underlineColorAndroid="transparent"
+			unstableOnFocus={ onFocus }
+			value={ value }
+		/>
+	</View>
 );
 
 export default Caption;
