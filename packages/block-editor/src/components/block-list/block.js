@@ -542,6 +542,7 @@ function BlockListBlock( {
 			onKeyDown={ onKeyDown }
 			tabIndex="0"
 			aria-label={ blockLabel }
+			role="group"
 			childHandledEvents={ [ 'onDragStart', 'onMouseDown' ] }
 			tagName={ animated.div }
 			{ ...wrapperProps }
