@@ -195,7 +195,7 @@ export function __experimentalUseEntitySaving( kind, type, props ) {
 export function useEntityBlockEditor(
 	kind,
 	type,
-	{ initialEdits, blocksProp = 'blocks', contentProp = 'content' }
+	{ initialEdits, blocksProp = 'blocks', contentProp = 'content' } = {}
 ) {
 	const [ content, setContent ] = useEntityProp( kind, type, contentProp );
 
