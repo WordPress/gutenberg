@@ -179,8 +179,5 @@
     "traverse": "^0.6.6",
     "turbo-combine-reducers": "^1.0.2",
     "underscore": "^1.9.1"
-  },
-  "resolutions": {
-    "@react-native-community/cli": "^3.0.0-alpha.1"
   }
 }
