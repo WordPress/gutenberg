@@ -482,6 +482,10 @@ _Related_
 
 Undocumented declaration.
 
+<a name="useSimulatedMediaQuery" href="#useSimulatedMediaQuery">#</a> **useSimulatedMediaQuery**
+
+Undocumented declaration.
+
 <a name="Warning" href="#Warning">#</a> **Warning**
 
 Undocumented declaration.
