@@ -37,7 +37,7 @@ function useShortcut( name, callback, {
 	bindGlobal = false,
 	eventName = 'keydown',
 	target,
-} ) {
+} = {} ) {
 	const { combination, aliases } = useSelect( ( select ) => {
 		return {
 			combination: select( 'core/keyboard-shortcuts' ).getShortcutKeyCombination( name ),

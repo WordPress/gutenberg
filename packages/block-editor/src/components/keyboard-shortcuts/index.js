@@ -5,14 +5,12 @@ import { first, last } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useRef, useEffect, useCallback } from '@wordpress/element';
+import { useEffect, useCallback } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { __ } from '@wordpress/i18n';
 
 function KeyboardShortcuts() {
-	const target = useRef();
-
 	// Registering the shortcuts
 	const { registerShortcut } = useDispatch( 'core/keyboard-shortcuts' );
 	useEffect( () => {
@@ -137,21 +135,21 @@ function KeyboardShortcuts() {
 		if ( clientIds.length > 0 ) {
 			removeBlocks( clientIds );
 		}
-	}, [ clientIds, removeBlocks ] ), { target } );
+	}, [ clientIds, removeBlocks ] ) );
 
 	useShortcut( 'core/block-editor/select-all', useCallback( ( event ) => {
 		event.preventDefault();
 		multiSelect( first( rootBlocksClientIds ), last( rootBlocksClientIds ) );
-	}, [ rootBlocksClientIds, multiSelect ] ), { target } );
+	}, [ rootBlocksClientIds, multiSelect ] ) );
 
 	useShortcut( 'core/block-editor/unselect', useCallback( () => {
 		if ( clientIds.length > 1 ) {
 			clearSelectedBlock();
 			window.getSelection().removeAllRanges();
 		}
-	}, [ clientIds, clearSelectedBlock ] ), { target } );
+	}, [ clientIds, clearSelectedBlock ] ) );
 
-	return <div ref={ target } />;
+	return null;
 }
 
 export default KeyboardShortcuts;
