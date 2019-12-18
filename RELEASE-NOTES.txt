@@ -1,3 +1,7 @@
+1.20.0
+------
+* Fix bug where image placeholders would sometimes not be shown
+
 1.19.0
 ------
 * Add support for changing Settings in List Block.
