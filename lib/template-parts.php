@@ -44,12 +44,14 @@ function gutenberg_register_template_part_post_type() {
 		'show_in_menu'      => 'themes.php',
 		'show_in_admin_bar' => false,
 		'show_in_rest'      => true,
+		'rest_base'         => 'template-parts',
 		'map_meta_cap'      => true,
 		'supports'          => array(
 			'title',
 			'slug',
 			'editor',
 			'revisions',
+			'custom-fields',
 		),
 	);
 
