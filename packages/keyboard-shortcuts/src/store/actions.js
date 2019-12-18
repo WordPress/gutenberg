@@ -38,7 +38,7 @@ export function registerShortcut( { name, category, description, keyCombination,
 }
 
 /**
- * Returns an action object used to register a new keyboard shortcut.
+ * Returns an action object used to unregister a keyboard shortcut.
  *
  * @param {string} name Shortcut name.
  *

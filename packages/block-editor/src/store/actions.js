@@ -885,7 +885,7 @@ export function * duplicateBlocks( clientIds ) {
 }
 
 /**
- * Generator used to insert an empty block after a given blck
+ * Generator used to insert an empty block after a given block.
  *
  * @param {string} clientId
  */
@@ -904,7 +904,7 @@ export function * insertBeforeBlock( clientId ) {
 }
 
 /**
- * Generator used to insert an empty block before a given blck
+ * Generator used to insert an empty block before a given block.
  *
  * @param {string} clientId
  */

@@ -17,7 +17,7 @@ import { useEffect } from '@wordpress/element';
  *
  * @param {Object} _window   window object by default; used for DI testing.
  *
- * @return {boolean}         True if MacOS; false otherwise.
+ * @return {boolean} True if MacOS; false otherwise.
  */
 function isAppleOS( _window = window ) {
 	const { platform } = _window.navigator;
@@ -46,7 +46,7 @@ function useShortcut( name, callback, {
 	}, [ name ] );
 
 	useEffect( () => {
-		const shortcuts = [ combination, ...aliases ].filter( ( shortcut ) => !! shortcut );
+		const shortcuts = [ combination, ...aliases ].filter( Boolean );
 		const mousetrap = new Mousetrap( target ? target.current : document );
 		const shortcutKeys = shortcuts.map( ( shortcut ) => {
 			return shortcut.modifier ?

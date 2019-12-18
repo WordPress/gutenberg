@@ -11,7 +11,7 @@ import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { __ } from '@wordpress/i18n';
 
 function KeyboardShortcuts() {
-	const target = useRef( null );
+	const target = useRef();
 
 	// Registering the shortcuts
 	const { registerShortcut } = useDispatch( 'core/keyboard-shortcuts' );
@@ -59,7 +59,7 @@ function KeyboardShortcuts() {
 		registerShortcut( {
 			name: 'core/block-editor/deleteMultiSelection',
 			category: 'block',
-			description: __( 'Remove the multi-selected blocks.' ),
+			description: __( 'Remove multiple selected blocks.' ),
 			keyCombination: {
 				character: 'del',
 				aliases: [
