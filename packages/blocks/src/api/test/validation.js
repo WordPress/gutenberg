@@ -651,6 +651,66 @@ describe( 'validation', () => {
 				expect( console ).toHaveErrored();
 				expect( isValid ).toBe( false );
 			} );
+
+			it( 'returns true if original had an extra class', () => {
+				const blockName = 'core/test-block';
+				const blockAttributes = { fruit: 'Bananas', classes: [ 'foo', 'bar' ] };
+				registerBlockType( blockName, {
+					...defaultBlockSettings,
+					save: ( { attributes } ) => {
+						const sortedClasses = [ ...attributes.classes ].sort().join( ' ' );
+						return (
+							<div className={ sortedClasses }>
+								{ attributes.fruit }
+							</div>
+						);
+					},
+				} );
+
+				const isValid = isValidBlockContent(
+					blockName,
+					blockAttributes,
+					'<div class="foo bar baz">Bananas</div>',
+					'no-save-error',
+				);
+
+				const blockType = normalizeBlockType( blockName );
+
+				expect( console ).not.toHaveWarned();
+				expect( console ).not.toHaveErrored();
+				expect( isValid ).toBe( true );
+				expect( getSaveContent( blockType, blockAttributes ) ).toBe( '<div class="bar foo">Bananas</div>' );
+			} );
+
+			it( 'really does not care if serialized content does not match original content', () => {
+				const blockName = 'core/test-block';
+				const blockAttributes = { fruit: 'Bananas', classes: [ 'foo', 'bar' ] };
+				registerBlockType( blockName, {
+					...defaultBlockSettings,
+					save: ( { attributes } ) => {
+						const sortedClasses = [ ...attributes.classes ].sort().join( ' ' );
+						return (
+							<div className={ sortedClasses }>
+								{ attributes.fruit }
+							</div>
+						);
+					},
+				} );
+
+				const isValid = isValidBlockContent(
+					blockName,
+					blockAttributes,
+					'<div class="sugar">Blueberries</div>',
+					'no-save-error',
+				);
+
+				const blockType = normalizeBlockType( blockName );
+
+				expect( console ).not.toHaveWarned();
+				expect( console ).not.toHaveErrored();
+				expect( isValid ).toBe( true );
+				expect( getSaveContent( blockType, blockAttributes ) ).toBe( '<div class="bar foo">Bananas</div>' );
+			} );
 		} );
 		describe( 'strict', () => {
 			it( 'returns false if block is not valid', () => {
@@ -683,6 +743,121 @@ describe( 'validation', () => {
 
 				expect( console ).toHaveErrored();
 				expect( isValid ).toBe( false );
+			} );
+
+			it( 'returns true if class order does not match', () => {
+				const blockName = 'core/test-block';
+				const blockAttributes = { fruit: 'Bananas', classes: [ 'foo', 'bar' ] };
+				registerBlockType( blockName, {
+					...defaultBlockSettings,
+					save: ( { attributes } ) => {
+						const sortedClasses = [ ...attributes.classes ].sort().join( ' ' );
+						return (
+							<div className={ sortedClasses }>
+								{ attributes.fruit }
+							</div>
+						);
+					},
+				} );
+
+				const isValid = isValidBlockContent(
+					blockName,
+					blockAttributes,
+					'<div class="foo bar">Bananas</div>',
+				);
+
+				const blockType = normalizeBlockType( blockName );
+
+				expect( console ).not.toHaveWarned();
+				expect( console ).not.toHaveErrored();
+				expect( isValid ).toBe( true );
+				expect( getSaveContent( blockType, blockAttributes ) ).toBe( '<div class="bar foo">Bananas</div>' );
+			} );
+
+			it( 'returns false if has extra classes', () => {
+				const blockName = 'core/test-block';
+				const blockAttributes = { fruit: 'Bananas', classes: [ 'foo', 'bar' ] };
+				registerBlockType( blockName, {
+					...defaultBlockSettings,
+					save: ( { attributes } ) => {
+						const sortedClasses = [ ...attributes.classes ].sort().join( ' ' );
+						return (
+							<div className={ sortedClasses }>
+								{ attributes.fruit }
+							</div>
+						);
+					},
+				} );
+
+				const isValid = isValidBlockContent(
+					blockName,
+					blockAttributes,
+					'<div class="foo bar baz">Bananas</div>',
+				);
+
+				const blockType = normalizeBlockType( blockName );
+
+				expect( console ).toHaveWarned();
+				expect( console ).toHaveErrored();
+				expect( isValid ).toBe( false );
+				expect( getSaveContent( blockType, blockAttributes ) ).toBe( '<div class="bar foo">Bananas</div>' );
+			} );
+
+			it( 'returns false if has extra data attributes', () => {
+				const blockName = 'core/test-block';
+				const blockAttributes = { fruit: 'Bananas', classes: [ 'foo', 'bar' ] };
+				registerBlockType( blockName, {
+					...defaultBlockSettings,
+					save: ( { attributes } ) => {
+						const sortedClasses = [ ...attributes.classes ].sort().join( ' ' );
+						return (
+							<div className={ sortedClasses }>
+								{ attributes.fruit }
+							</div>
+						);
+					},
+				} );
+
+				const isValid = isValidBlockContent(
+					blockName,
+					blockAttributes,
+					'<div class="foo bar" data-foo="baz">Bananas</div>',
+				);
+
+				const blockType = normalizeBlockType( blockName );
+
+				expect( console ).toHaveWarned();
+				expect( console ).toHaveErrored();
+				expect( isValid ).toBe( false );
+				expect( getSaveContent( blockType, blockAttributes ) ).toBe( '<div class="bar foo">Bananas</div>' );
+			} );
+
+			it( 'returns false if there are floating point rounding errors', () => {
+				const blockName = 'core/test-block';
+				const blockAttributes = { fruit: 'Bananas', x: 0.07, y: 0.07 };
+				registerBlockType( blockName, {
+					...defaultBlockSettings,
+					save: ( { attributes } ) => {
+						return (
+							<div style={ `background-position:${ attributes.x * 100 }% ${ attributes.y * 100 }%` }>
+								{ attributes.fruit }
+							</div>
+						);
+					},
+				} );
+
+				const isValid = isValidBlockContent(
+					blockName,
+					blockAttributes,
+					'<div style="background-position:7% 7%">Bananas</div>',
+				);
+
+				const blockType = normalizeBlockType( blockName );
+
+				expect( console ).toHaveWarned();
+				expect( console ).toHaveErrored();
+				expect( isValid ).toBe( false );
+				expect( getSaveContent( blockType, blockAttributes ) ).toBe( '<div style="background-position:7.000000000000001% 7.000000000000001%">Bananas</div>' );
 			} );
 
 			it( 'returns true is block is valid', () => {
