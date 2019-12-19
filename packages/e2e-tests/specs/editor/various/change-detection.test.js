@@ -200,7 +200,7 @@ describe( 'Change detection', () => {
 
 			// Ensure save update fails and presents button.
 			page.waitForXPath(
-				'//*[contains(@class, "components-notice") and contains(@class, "is-error")]/*[text()="Updating failed. Error message: The response is not a valid JSON response."]'
+				'//*[contains(@class, "components-notice") and contains(@class, "is-error")]/*[text()="Updating failed. You are probably offline."]'
 			),
 			page.waitForSelector( '.editor-post-save-draft' ),
 		] );
@@ -370,7 +370,8 @@ describe( 'Change detection', () => {
 
 		// Increase the paragraph's font size.
 		await page.click( '[data-type="core/paragraph"]' );
-		await page.select( '.components-select-control__input', 'large' );
+		await page.click( '.components-font-size-picker__select' );
+		await page.click( '.components-custom-select-control__item:nth-child(3)' );
 		await page.click( '[data-type="core/paragraph"]' );
 
 		// Check that the post is dirty.
@@ -384,7 +385,8 @@ describe( 'Change detection', () => {
 
 		// Increase the paragraph's font size again.
 		await page.click( '[data-type="core/paragraph"]' );
-		await page.select( '.components-select-control__input', 'larger' );
+		await page.click( '.components-font-size-picker__select' );
+		await page.click( '.components-custom-select-control__item:nth-child(4)' );
 		await page.click( '[data-type="core/paragraph"]' );
 
 		// Check that the post is dirty.

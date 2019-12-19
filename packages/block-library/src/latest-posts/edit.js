@@ -12,11 +12,11 @@ import {
 	PanelBody,
 	Placeholder,
 	QueryControls,
+	RadioControl,
 	RangeControl,
 	Spinner,
 	ToggleControl,
-	Toolbar,
-	RadioControl,
+	ToolbarGroup,
 } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
@@ -82,11 +82,11 @@ class LatestPostsEdit extends Component {
 					/>
 					{ displayPostContent &&
 					<RadioControl
-						label="Show:"
+						label={ __( 'Show:' ) }
 						selected={ displayPostContentRadio }
 						options={ [
-							{ label: 'Excerpt', value: 'excerpt' },
-							{ label: 'Full Post', value: 'full_post' },
+							{ label: __( 'Excerpt' ), value: 'excerpt' },
+							{ label: __( 'Full Post' ), value: 'full_post' },
 						] }
 						onChange={ ( value ) => setAttributes( { displayPostContentRadio: value } ) }
 					/>
@@ -179,7 +179,7 @@ class LatestPostsEdit extends Component {
 			<>
 				{ inspectorControls }
 				<BlockControls>
-					<Toolbar controls={ layoutControls } />
+					<ToolbarGroup controls={ layoutControls } />
 				</BlockControls>
 				<ul
 					className={ classnames( this.props.className, {

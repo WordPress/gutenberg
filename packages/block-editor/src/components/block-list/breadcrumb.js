@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { Toolbar, Button } from '@wordpress/components';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
 import { forwardRef } from '@wordpress/element';
 
 /**
@@ -20,21 +20,10 @@ import BlockTitle from '../block-title';
  */
 const BlockBreadcrumb = forwardRef( ( { clientId }, ref ) => {
 	const { setNavigationMode } = useDispatch( 'core/block-editor' );
-	const { rootClientId } = useSelect( ( select ) => {
-		return {
-			rootClientId: select( 'core/block-editor' ).getBlockRootClientId( clientId ),
-		};
-	} );
 
 	return (
-		<div className="editor-block-list__breadcrumb block-editor-block-list__breadcrumb">
+		<div className="block-editor-block-list__breadcrumb">
 			<Toolbar>
-				{ rootClientId && (
-					<>
-						<BlockTitle clientId={ rootClientId } />
-						<span className="editor-block-list__descendant-arrow block-editor-block-list__descendant-arrow" />
-					</>
-				) }
 				<Button ref={ ref } onClick={ () => setNavigationMode( false ) }>
 					<BlockTitle clientId={ clientId } />
 				</Button>

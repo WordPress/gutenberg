@@ -2,7 +2,8 @@
  * WordPress dependencies
  */
 import { select, dispatch } from '@wordpress/data';
-import { removeFilter } from '@wordpress/hooks';
+
+/** @typedef {import('./register-format-type').WPFormat} WPFormat */
 
 /**
  * Unregisters a format.
@@ -20,10 +21,6 @@ export function unregisterFormatType( name ) {
 			`Format ${ name } is not registered.`
 		);
 		return;
-	}
-
-	if ( oldFormat.__experimentalCreatePrepareEditableTree ) {
-		removeFilter( 'experimentalRichText', name );
 	}
 
 	dispatch( 'core/rich-text' ).removeFormatTypes( name );

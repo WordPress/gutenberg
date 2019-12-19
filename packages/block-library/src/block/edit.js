@@ -25,7 +25,6 @@ import { parse, serialize } from '@wordpress/blocks';
  * Internal dependencies
  */
 import ReusableBlockEditPanel from './edit-panel';
-import ReusableBlockIndicator from './indicator';
 
 class ReusableBlockEdit extends Component {
 	constructor( { reusableBlock } ) {
@@ -147,7 +146,6 @@ class ReusableBlockEdit extends Component {
 						onCancel={ this.stopEditing }
 					/>
 				) }
-				{ ! isSelected && ! isEditing && <ReusableBlockIndicator title={ reusableBlock.title } /> }
 				{ element }
 			</div>
 		);

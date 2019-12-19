@@ -28,7 +28,7 @@ function CopyContentMenuItem( { createNotice, editedPostContent, hasCopied, setS
 			>
 				{ hasCopied ?
 					__( 'Copied!' ) :
-					__( 'Copy All Content' ) }
+					__( 'Copy all content' ) }
 			</ClipboardButton>
 		)
 	);

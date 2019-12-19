@@ -29,7 +29,7 @@ const Caption = ( { accessible, accessibilityLabel, onBlur, onChange, onFocus, i
 			fontSize={ 14 }
 			underlineColorAndroid="transparent"
 			textAlign={ 'center' }
-			tagName={ '' }
+			tagName={ 'p' }
 		/>
 	</View>
 );

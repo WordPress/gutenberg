@@ -17,8 +17,9 @@ import {
  */
 import {
 	Icon,
-	Toolbar,
 	ToolbarButton,
+	ToolbarGroup,
+	PanelBody,
 } from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import {
@@ -30,6 +31,7 @@ import {
 	BlockControls,
 	VIDEO_ASPECT_RATIO,
 	VideoPlayer,
+	InspectorControls,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { isURL } from '@wordpress/url';
@@ -41,6 +43,7 @@ import { doAction, hasAction } from '@wordpress/hooks';
 import style from './style.scss';
 import SvgIcon from './icon';
 import SvgIconRetry from './icon-retry';
+import VideoCommonSettings from './edit-common-settings';
 
 class VideoEdit extends React.Component {
 	constructor( props ) {
@@ -154,8 +157,11 @@ class VideoEdit extends React.Component {
 	}
 
 	render() {
-		const { attributes, isSelected } = this.props;
-		const { id, src } = attributes;
+		const { setAttributes, attributes, isSelected } = this.props;
+		const {
+			id,
+			src,
+		} = attributes;
 		const { videoContainerHeight } = this.state;
 
 		const toolbarEditButton = (
@@ -163,14 +169,14 @@ class VideoEdit extends React.Component {
 				onSelect={ this.onSelectMediaUploadOption }
 				render={ ( { open, getMediaOptions } ) => {
 					return (
-						<Toolbar>
+						<ToolbarGroup>
 							{ getMediaOptions() }
 							<ToolbarButton
 								label={ __( 'Edit video' ) }
 								icon="edit"
 								onClick={ open }
 							/>
-						</Toolbar>
+						</ToolbarGroup>
 					);
 				} } >
 			</MediaUpload>
@@ -196,6 +202,14 @@ class VideoEdit extends React.Component {
 						<BlockControls>
 							{ toolbarEditButton }
 						</BlockControls> }
+					<InspectorControls>
+						<PanelBody title={ __( 'Video Settings' ) }>
+							<VideoCommonSettings
+								setAttributes={ setAttributes }
+								attributes={ attributes }
+							/>
+						</PanelBody>
+					</InspectorControls>
 					<MediaUploadProgress
 						mediaId={ id }
 						onFinishMediaUploadWithSuccess={ this.finishMediaUploadWithSuccess }

@@ -2,9 +2,9 @@
 // This is sort of an experiment at making sure the editor looks as much like the end result as possible
 // Potentially the rules here can apply to all nested blocks and enable stacking, in which case it should be moved elsewhere
 // When using CSS grid, margins do not collapse on the container.
-.wp-block-columns .editor-block-list__layout {
+.wp-block-columns .block-editor-block-list__layout {
 	// This max-width is used to constrain the main editor column, it should not cascade into columns
-	.editor-block-list__block {
+	.block-editor-block-list__block {
 		max-width: none;
 	}
 }
@@ -12,7 +12,7 @@
 .wp-block-columns {
 	display: block;
 
-	> .editor-inner-blocks > .editor-block-list__layout {
+	> .block-editor-inner-blocks > .block-editor-block-list__layout {
 		display: flex;
 
 		// Responsiveness: Allow wrapping on mobile.
@@ -23,9 +23,9 @@
 		}
 		// Set full heights on Columns to enable vertical alignment preview
 		> [data-type="core/column"],
-		> [data-type="core/column"] > .editor-block-list__block-edit,
-		> [data-type="core/column"] > .editor-block-list__block-edit > div[data-block],
-		> [data-type="core/column"] > .editor-block-list__block-edit .block-core-columns {
+		> [data-type="core/column"] > .block-editor-block-list__block-edit,
+		> [data-type="core/column"] > .block-editor-block-list__block-edit > div[data-block],
+		> [data-type="core/column"] > .block-editor-block-list__block-edit .block-core-columns {
 			display: flex;
 			flex-direction: column;
 
@@ -81,7 +81,7 @@
 				}
 			}
 
-			> .editor-block-list__block-edit {
+			> .block-editor-block-list__block-edit {
 				margin-top: 0;
 				margin-bottom: 0;
 
@@ -91,7 +91,7 @@
 					right: 0;
 				}
 
-				> .editor-block-contextual-toolbar {
+				> .block-editor-block-contextual-toolbar {
 					margin-left: -$border-width;
 				}
 
@@ -104,7 +104,7 @@
 				// The Columns block is a flex-container, therefore it nullifies margin collapsing.
 				// Therefore, blocks inside this will appear to create a double margin.
 				// We compensate for this using negative margins.
-				> div > .block-core-columns > .editor-inner-blocks {
+				> div > .block-core-columns > .block-editor-inner-blocks {
 					margin-top: -$default-block-margin;
 					margin-bottom: -$default-block-margin;
 				}
@@ -125,12 +125,6 @@
 	.block-list-appender {
 		margin-top: $block-padding*2;
 		margin-bottom: $block-padding*2;
-	}
-
-	// When the individual column block is selected, the nested padding overrules
-	// some of this margin. We need to adjust the appender spacing again as a result.
-	[data-type="core/column"].is-selected .block-list-appender {
-		margin: $block-padding 0;
 	}
 }
 
@@ -158,7 +152,7 @@ div.block-core-columns.is-vertically-aligned-bottom {
 /**
  * Fixes single Column breadcrumb position.
  */
-[data-type="core/column"] > .editor-block-list__block-edit > .editor-block-list__breadcrumb {
+[data-type="core/column"] > .block-editor-block-list__block-edit > .editor-block-list__breadcrumb {
 	left: -$block-left-border-width;
 }
 
@@ -169,23 +163,6 @@ div.block-core-columns.is-vertically-aligned-bottom {
 	left: 0;
 	right: 0;
 }
-
-/**
- * Add extra padding when the parent block is selected, for easier interaction.
- */
-[data-type="core/columns"].is-selected > .block-editor-block-list__block-edit > [data-block] > div > .block-editor-inner-blocks,
-[data-type="core/columns"].has-child-selected > .block-editor-block-list__block-edit > [data-block] > div > .block-editor-inner-blocks,
-[data-type="core/column"].is-selected > .block-editor-block-list__block-edit > [data-block] > div > .block-editor-inner-blocks,
-[data-type="core/column"].has-child-selected > .block-editor-block-list__block-edit > [data-block] > div > .block-editor-inner-blocks {
-	padding: $block-padding;
-
-	// Negate this padding for the placeholder.
-	> .components-placeholder {
-		margin: -$block-padding;
-		width: calc(100% + #{$block-padding * 2});
-	}
-}
-
 
 // Fullwide: show margin left/right to ensure there's room for the side UI.
 // This is not a 1:1 preview with the front-end where these margins would presumably be zero.

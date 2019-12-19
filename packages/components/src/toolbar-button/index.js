@@ -48,9 +48,8 @@ function ToolbarButton( {
 			className={ classnames(
 				'components-toolbar__control',
 				className,
-				{ 'is-active': isActive }
 			) }
-			aria-pressed={ isActive }
+			isPressed={ isActive }
 			disabled={ isDisabled }
 			{ ...extraProps }
 		/>
