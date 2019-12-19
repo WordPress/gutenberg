@@ -37,9 +37,17 @@ const getNormalizedBlockType = ( state, nameOrType ) => (
  * @return {Array} Block Types.
  */
 export const getBlockTypes = createSelector(
-	( state ) => Object.values( state.blockTypes ),
+	( state ) => {
+		return Object.values( state.blockTypes ).map( ( blockType ) => {
+			return {
+				...blockType,
+				patterns: __experimentalGetBlockPatterns( state, blockType.name ),
+			};
+		} );
+	},
 	( state ) => [
 		state.blockTypes,
+		state.blockPatterns,
 	]
 );
 

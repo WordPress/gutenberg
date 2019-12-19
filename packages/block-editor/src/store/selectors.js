@@ -1264,6 +1264,7 @@ export const getInserterItems = createSelector(
 				icon: blockType.icon,
 				category: blockType.category,
 				keywords: blockType.keywords,
+				patterns: blockType.patterns,
 				isDisabled,
 				utility: calculateUtility( blockType.category, count, isContextual ),
 				frecency: calculateFrecency( time, count ),
