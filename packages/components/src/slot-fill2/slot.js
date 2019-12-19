@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useRef } from '@wordpress/element';
+import { useEffect, useRef, useLayoutEffect } from '@wordpress/element';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
@@ -9,7 +9,12 @@ import isShallowEqual from '@wordpress/is-shallow-equal';
  */
 import { useSlotFillContext, useSlot } from './context';
 
-export default function Slot( { name, fillProps = {}, ...props } ) {
+export default function Slot( {
+	name,
+	fillProps = {},
+	as: Component = 'div',
+	...props
+} ) {
 	const registry = useSlotFillContext();
 	const ref = useRef();
 	const slot = useSlot( name );
@@ -22,11 +27,11 @@ export default function Slot( { name, fillProps = {}, ...props } ) {
 		};
 	}, [ name ] );
 
-	useEffect( () => {
+	useLayoutEffect( () => {
 		if ( slot && ! propsAreEqual ) {
 			registry.update( name, ref, fillProps );
 		}
 	}, [ slot, propsAreEqual, fillProps ] );
 
-	return <div ref={ ref } { ...props } />;
+	return <Component ref={ ref } { ...props } />;
 }
