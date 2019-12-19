@@ -12,20 +12,11 @@ const execSync = require( 'child_process' ).execSync;
 const getPackages = require( './packages' );
 
 const getUnstagedFiles = () => execSync( 'git diff --name-only', { encoding: 'utf8' } ).split( '\n' ).filter( ( element ) => '' !== element );
-
 const readmeFiles = getPackages().map( ( [ packageName ] ) => `docs/designers-developers/developers/data/data-${ packageName.replace( '/', '-' ) }.md` );
-const unstagedFiles = getUnstagedFiles();
+const unstagedReadmes = getUnstagedFiles().filter( ( element ) => readmeFiles.includes( element ) );
 
-const unstagedReadmes = [];
-unstagedFiles.forEach( ( element ) => {
-	if ( readmeFiles.includes( element ) ) {
-		unstagedReadmes.push( element );
-	}
-} );
-
-let exitCode = 0;
 if ( unstagedReadmes.length > 0 ) {
-	exitCode = 1;
+	process.exitCode = 1;
 	process.stdout.write( chalk.red(
 		'\n',
 		'Some API docs may be out of date:',
@@ -34,5 +25,3 @@ if ( unstagedReadmes.length > 0 ) {
 		'\n'
 	) );
 }
-
-process.exit( exitCode );
