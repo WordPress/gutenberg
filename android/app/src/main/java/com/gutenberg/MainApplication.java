@@ -25,6 +25,7 @@ import com.facebook.soloader.SoLoader;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public class MainApplication extends Application implements ReactApplication {
 
@@ -114,7 +115,7 @@ public class MainApplication extends Application implements ReactApplication {
             }
 
             @Override
-            public void performRequest(String path, Consumer<String> onSuccess, Consumer<String> onError) {}
+            public void performRequest(String path, Consumer<String> onSuccess, Consumer<Map<String, Object>> onError) {}
         });
 
         return new ReactNativeHost(this) {
