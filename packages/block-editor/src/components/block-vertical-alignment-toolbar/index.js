@@ -45,7 +45,7 @@ export function BlockVerticalAlignmentToolbar( { value, onChange, controls = DEF
 					return {
 						...BLOCK_ALIGNMENTS_CONTROLS[ control ],
 						isActive: value === control,
-						role: 'menuitemradio',
+						role: isCollapsed ? 'menuitemradio' : undefined,
 						onClick: applyOrUnset( control ),
 					};
 				} )

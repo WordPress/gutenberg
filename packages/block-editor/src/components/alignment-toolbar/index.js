@@ -54,7 +54,7 @@ export function AlignmentToolbar( props ) {
 				return {
 					...control,
 					isActive,
-					role: 'menuitemradio',
+					role: isCollapsed ? 'menuitemradio' : undefined,
 					onClick: applyOrUnset( align ),
 				};
 			} ) }
