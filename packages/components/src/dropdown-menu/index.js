@@ -153,7 +153,7 @@ function DropdownMenu( {
 										},
 									) }
 									icon={ control.icon }
-									aria-checked={ ( role === 'menuitemcheckbox' || role === 'menuitemradio' ) ? control.isActive : undefined }
+									aria-checked={ ( control.role === 'menuitemcheckbox' || control.role === 'menuitemradio' ) ? control.isActive : undefined }
 									role={ ( control.role === 'menuitemcheckbox' || control.role === 'menuitemradio' ) ? control.role : 'menuitem' }
 									disabled={ control.isDisabled }
 								>
