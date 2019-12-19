@@ -189,7 +189,7 @@
 		"lint-types": "tsc",
 		"package-plugin": "./bin/build-plugin-zip.sh",
 		"pot-to-php": "./bin/pot-to-php.js",
-		"publish:check": "npm run build:packages && lerna updated",
+		"publish:check": "lerna updated",
 		"publish:dev": "npm run build:packages && lerna publish --dist-tag next",
 		"publish:legacy": "npm run build:packages && lerna publish --dist-tag legacy",
 		"publish:prod": "npm run build:packages && lerna publish",
