@@ -99,8 +99,9 @@ export default compose( [
 				editPost( { content } );
 			},
 			onPersist( content ) {
+				// Let's edit the post content by passing a function so it overrides
+				// `getEditedPostContent`'s default behavior which is to parse blocks
 				editPost( { content: () => content } );
-				// Now that content is safely persisted try to parse it and reset blocks
 				const blocks = parse( content );
 				resetEditorBlocks( blocks );
 			},
