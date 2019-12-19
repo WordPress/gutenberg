@@ -157,11 +157,7 @@ export class ImageEdit extends React.Component {
 		} else if ( attributes.id && ! isURL( attributes.url ) ) {
 			requestImageFailedRetryDialog( attributes.id );
 		} else if ( ! this.state.isCaptionSelected ) {
-			let originalUrl;
-			if ( image ) {
-				originalUrl = image.source_url;
-			}
-			requestImageFullscreenPreview( attributes.url, originalUrl );
+			requestImageFullscreenPreview( attributes.url, image && image.source_url );
 		}
 
 		this.setState( {
