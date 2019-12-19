@@ -411,7 +411,8 @@ export class RichText extends Component {
 	onBlur( event ) {
 		this.isTouched = false;
 
-		if ( event.nativeEvent.text !== this.props.value ) {
+		// Check if value is up to date with latest state of native AztecView
+		if ( event.nativeEvent.text && event.nativeEvent.text !== this.props.value ) {
 			this.onTextUpdate( event );
 		}
 
