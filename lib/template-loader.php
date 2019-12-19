@@ -271,6 +271,10 @@ function gutenberg_strip_php_suffix( $template_file ) {
  * @return array Filtered editor settings.
  */
 function gutenberg_template_loader_filter_block_editor_settings( $settings ) {
+	if ( ! post_type_exists( 'wp_template' ) || ! post_type_exists( 'wp_template_part' ) ) {
+		return $settings;
+	}
+
 	// Create template part auto-drafts for the edited post.
 	foreach ( parse_blocks( get_post()->post_content ) as $block ) {
 		create_auto_draft_for_template_part_block( $block );
