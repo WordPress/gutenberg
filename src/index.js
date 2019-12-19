@@ -67,6 +67,8 @@ export class RootComponent extends React.Component {
 		if ( initialData === undefined && __DEV__ ) {
 			initialData = initialHtml;
 		}
+		const isHermes = () => global.HermesInternal !== null;
+		console.log( 'Hermes is: ' + isHermes() );
 		if ( initialTitle === undefined ) {
 			initialTitle = 'Welcome to Gutenberg!';
 		}
