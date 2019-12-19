@@ -127,10 +127,10 @@ function KeyboardShortcutsRegister() {
 			description: __( 'Remove multiple selected blocks.' ),
 			keyCombination: {
 				character: 'del',
-				aliases: [ {
-					character: 'backspace',
-				} ],
 			},
+			aliases: [ {
+				character: 'backspace',
+			} ],
 		} );
 
 		registerShortcut( {
