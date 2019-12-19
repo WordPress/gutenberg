@@ -181,9 +181,9 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
             print("Fatal: \(message)")
         }
     }
-    
-    func gutenbergDidRequestFullscreenImage(with mediaUrl: URL) {
-        print("Gutenberg requested fullscreen image preview for " + mediaUrl.absoluteString)
+
+    func gutenbergDidRequestImagePreview(with fullSizeUrl: URL, thumbUrl: URL?) {
+        print("Gutenberg requested fullscreen image preview for " + fullSizeUrl.absoluteString)
     }
 }
 
