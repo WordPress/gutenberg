@@ -45,6 +45,7 @@ export { default as ToolSelector } from './tool-selector';
 export { default as URLInput } from './url-input';
 export { default as URLInputButton } from './url-input/button';
 export { default as URLPopover } from './url-popover';
+export { __experimentalImageURLInputUI } from './url-popover/image-url-input-ui';
 export { default as withColorContext } from './color-palette/with-color-context';
 
 /*

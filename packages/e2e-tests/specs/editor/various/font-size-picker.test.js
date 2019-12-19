@@ -18,7 +18,7 @@ describe( 'Font Size Picker', () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'Paragraph to be made "large"' );
 		await page.click( '.components-font-size-picker__select' );
-		await page.click( '.components-custom-select-control__item:nth-child(4)' );
+		await page.click( '.components-custom-select-control__item:nth-child(5)' );
 
 		// Ensure content matches snapshot.
 		const content = await getEditedPostContent();

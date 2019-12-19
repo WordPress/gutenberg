@@ -18,7 +18,10 @@ export {
 	useRegistry,
 } from './components/registry-provider';
 export { default as useSelect } from './components/use-select';
-export { useDispatch } from './components/use-dispatch';
+export {
+	useDispatch,
+	useDispatchWithMap as __unstableUseDispatchWithMap,
+} from './components/use-dispatch';
 export { AsyncModeProvider } from './components/async-mode-provider';
 export { createRegistry } from './registry';
 export { createRegistrySelector, createRegistryControl } from './factory';

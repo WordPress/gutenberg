@@ -27,7 +27,7 @@ registerPlugin( 'edit-post', {
 								role="menuitem"
 								href={ addQueryArgs( 'edit.php', { post_type: 'wp_block' } ) }
 							>
-								{ __( 'Manage All Reusable Blocks' ) }
+								{ __( 'Manage all reusable blocks' ) }
 							</MenuItem>
 							<KeyboardShortcutsHelpMenuItem onSelect={ onClose } />
 							<WelcomeGuideMenuItem />

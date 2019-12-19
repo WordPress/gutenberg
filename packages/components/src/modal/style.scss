@@ -68,9 +68,13 @@
 	background: $white;
 	align-items: center;
 	height: $header-height;
+	z-index: z-index(".components-modal__header");
+	// For z-index to take effect, the element must be positioned. A "sticky"
+	// element is positioned, but since this is not supported in IE11,
+	// "relative" is used as a fallback.
+	position: relative;
 	position: sticky;
 	top: 0;
-	z-index: z-index(".components-modal__header");
 	margin: 0 -#{$grid-size-xlarge} $grid-size-xlarge;
 
 	// Rules inside this query are only run by Microsoft Edge.

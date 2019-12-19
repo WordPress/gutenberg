@@ -15,6 +15,8 @@ import {
 	InnerBlocks,
 	InspectorControls,
 	BlockControls,
+	FontSizePicker,
+	withFontSizes,
 	__experimentalUseColors,
 } from '@wordpress/block-editor';
 
@@ -43,12 +45,14 @@ import * as navIcons from './icons';
 function Navigation( {
 	attributes,
 	clientId,
-	pages,
-	isRequestingPages,
-	hasResolvedPages,
+	fontSize,
 	hasExistingNavItems,
-	updateNavItemBlocks,
+	hasResolvedPages,
+	isRequestingPages,
+	pages,
 	setAttributes,
+	setFontSize,
+	updateNavItemBlocks,
 } ) {
 	//
 	// HOOKS
@@ -108,7 +112,11 @@ function Navigation( {
 
 	const blockClassNames = classnames( 'wp-block-navigation', {
 		[ `items-justification-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
+		[ fontSize.class ]: fontSize.class,
 	} );
+	const blockInlineStyles = {
+		fontSize: fontSize.size ? fontSize.size + 'px' : undefined,
+	};
 
 	// If we don't have existing items or the User hasn't
 	// indicated they want to automatically add top level Pages
@@ -175,9 +183,15 @@ function Navigation( {
 				>
 					<BlockNavigationList clientId={ clientId } />
 				</PanelBody>
+				<PanelBody title={ __( 'Text Settings' ) }>
+					<FontSizePicker
+						value={ fontSize.size }
+						onChange={ setFontSize }
+					/>
+				</PanelBody>
 			</InspectorControls>
 			<TextColor>
-				<div className={ blockClassNames }>
+				<div className={ blockClassNames } style={ blockInlineStyles }>
 					{ ! hasExistingNavItems && isRequestingPages && <><Spinner /> { __( 'Loading Navigation…' ) } </> }
 
 					<InnerBlocks
@@ -193,6 +207,7 @@ function Navigation( {
 }
 
 export default compose( [
+	withFontSizes( 'fontSize' ),
 	withSelect( ( select, { clientId } ) => {
 		const innerBlocks = select( 'core/block-editor' ).getBlocks( clientId );
 
