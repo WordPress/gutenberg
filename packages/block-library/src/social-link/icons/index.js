@@ -30,6 +30,7 @@ export * from './skype';
 export * from './snapchat';
 export * from './soundcloud';
 export * from './spotify';
+export * from './telegram';
 export * from './tumblr';
 export * from './twitch';
 export * from './twitter';
