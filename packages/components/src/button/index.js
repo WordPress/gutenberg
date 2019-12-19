@@ -89,7 +89,7 @@ export function Button( props, ref ) {
 			{ ...tagProps }
 			{ ...additionalProps }
 			className={ classes }
-			aria-label={ label }
+			aria-label={ additionalProps[ 'aria-label' ] || label }
 			ref={ ref }
 		>
 			{ icon && <Icon icon={ icon } size={ iconSize } /> }
