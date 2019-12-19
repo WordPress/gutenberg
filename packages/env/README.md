@@ -1,6 +1,13 @@
 # `@wordpress/env`
 
-> A zero-config, self contained local WordPress environment for development and testing.
+> A zero-config, self contained local WordPress environment for development and testing built on Docker.
+
+## Requirements
+One must have several software components installed on one's system before this environment can be successfully utilized.
+* [Docker](https://www.docker.com/)
+* [Node.js](https://nodejs.org/)
+* [npm](https://www.npmjs.com/) - Is bundled with Node.js.
+* Virtualization Technology - [VirtualBox](https://www.virtualbox.org/) is probably the most popular solution. Other solutions such as Microsoft Hyper-V and VMWare can work as well.
 
 ## Usage
 
