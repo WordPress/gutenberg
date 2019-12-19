@@ -6,7 +6,7 @@ import { overEvery, find, findLast, reverse, first, last } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, createRef } from '@wordpress/element';
+import { Component, createRef, useEffect } from '@wordpress/element';
 import {
 	computeCaretRect,
 	focus,
@@ -18,7 +18,7 @@ import {
 	isEntirelySelected,
 } from '@wordpress/dom';
 import { UP, DOWN, LEFT, RIGHT, TAB, isKeyboardEvent } from '@wordpress/keycodes';
-import { withSelect, withDispatch } from '@wordpress/data';
+import { withSelect, withDispatch, useDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
 /**
@@ -98,6 +98,27 @@ function FocusCapture( { isReverse, clientId, isNavigationMode } ) {
 			style={ { position: 'fixed' } }
 		/>
 	);
+}
+
+/**
+ * Enables navigation mode as soon as tab is pressed.
+ * Meant to be rendered if there is no block selected.
+ */
+function EnableNavigationModeOnTab() {
+	const { setNavigationMode } = useDispatch( 'core/block-editor' );
+	useEffect( () => {
+		function handleTab( event ) {
+			if ( event.keyCode === TAB ) {
+				setNavigationMode( true );
+			}
+		}
+
+		window.addEventListener( 'keydown', handleTab );
+		return () => {
+			window.removeEventListener( 'keydown', handleTab );
+		};
+	}, [ setNavigationMode ] );
+	return null;
 }
 
 class WritingFlow extends Component {
@@ -475,6 +496,7 @@ class WritingFlow extends Component {
 					onClick={ this.focusLastTextField }
 					className="block-editor-writing-flow__click-redirect"
 				/>
+				{ ! clientId && <EnableNavigationModeOnTab /> }
 			</div>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions */
