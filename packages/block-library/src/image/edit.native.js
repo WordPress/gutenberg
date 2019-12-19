@@ -343,7 +343,7 @@ export class ImageEdit extends React.Component {
 							hideCancelButton
 							icon={ 'editor-expand' }
 							label={ __( 'Size' ) }
-							value={ sizeOptionLabels[ sizeSlug || DEFAULT_SIZE_SLUG ] }
+							value={ sizeSlug || DEFAULT_SIZE_SLUG }
 							onChangeValue={ ( newValue ) => this.onSetSizeSlug( newValue ) }
 							options={ sizeOptions }
 						/> }

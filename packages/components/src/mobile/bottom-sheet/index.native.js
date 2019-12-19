@@ -17,7 +17,7 @@ import { withPreferredColorScheme } from '@wordpress/compose';
 import styles from './styles.scss';
 import Button from './button';
 import Cell from './cell';
-import PickerCell from './picker-cell';
+import CyclePickerCell from './cycle-picker-cell';
 import SwitchCell from './switch-cell';
 import RangeCell from './range-cell';
 import KeyboardAvoidingView from './keyboard-avoiding-view';
@@ -147,7 +147,7 @@ const ThemedBottomSheet = withPreferredColorScheme( BottomSheet );
 ThemedBottomSheet.getWidth = getWidth;
 ThemedBottomSheet.Button = Button;
 ThemedBottomSheet.Cell = Cell;
-ThemedBottomSheet.PickerCell = PickerCell;
+ThemedBottomSheet.CyclePickerCell = CyclePickerCell;
 ThemedBottomSheet.SwitchCell = SwitchCell;
 ThemedBottomSheet.RangeCell = RangeCell;
 
