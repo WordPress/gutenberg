@@ -65,7 +65,7 @@ First, check that `wp-env` is running. One way to do this is to have Docker prin
 $ docker ps
 ```
 
-In this table, by default, you should see three entries: `wordpress` with port 8888, `wordpress` with port 8889 and `mariadb` with port 3306.
+In this table, by default, you should see three entries: `wordpress` with port 8888, `tests-wordpress` with port 8889 and `mariadb` with port 3306.
 
 ### 2. Check the port number
 
