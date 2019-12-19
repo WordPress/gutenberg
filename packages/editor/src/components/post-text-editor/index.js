@@ -93,14 +93,13 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { autosave, editPost, resetEditorBlocks } = dispatch( 'core/editor' );
+		const { editPost, resetEditorBlocks } = dispatch( 'core/editor' );
 		return {
 			onChange( content ) {
 				editPost( { content } );
 			},
 			onPersist( content ) {
 				editPost( { content: () => content } );
-				autosave();
 				// Now that content is safely persisted try to parse it and reset blocks
 				const blocks = parse( content );
 				resetEditorBlocks( blocks );
