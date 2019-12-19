@@ -4,15 +4,20 @@
 
 ## Requirements
 One must have several software components installed on one's system before this environment can be successfully utilized.
-* [Docker](https://www.docker.com/)
+* [Docker](https://www.docker.com/) - Make sure this includes docker-compose.
 * [Node.js](https://nodejs.org/)
 * [npm](https://www.npmjs.com/) - Is bundled with Node.js.
-* Virtualization Technology - [VirtualBox](https://www.virtualbox.org/) is the most popular solution. Other solutions such as Microsoft Hyper-V and VMWare can work as well.
+* Virtualization Technology - On Linux you'll use the native container technology. For other OS'es you'll need virtualization software like [VirtualBox](https://virtualbox.org/), Hyper-V, or VMWare.
+
+## Installation
+Enter the following at your command prompt to install the environment:
+```sh
+$ npm -g i @wordpress/env
+```
 
 ## Usage
 
 ```sh
-$ npm -g i @wordpress/env
 
 $ cd path/to/plugin-or-theme # WordPress install will be in path/to/plugin-or-theme-wordpress.
 
