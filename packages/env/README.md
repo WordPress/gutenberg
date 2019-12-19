@@ -7,7 +7,7 @@ One must have several software components installed on one's system before this 
 * [Docker](https://www.docker.com/)
 * [Node.js](https://nodejs.org/)
 * [npm](https://www.npmjs.com/) - Is bundled with Node.js.
-* Virtualization Technology - [VirtualBox](https://www.virtualbox.org/) is probably the most popular solution. Other solutions such as Microsoft Hyper-V and VMWare can work as well.
+* Virtualization Technology - [VirtualBox](https://www.virtualbox.org/) is the most popular solution. Other solutions such as Microsoft Hyper-V and VMWare can work as well.
 
 ## Usage
 
