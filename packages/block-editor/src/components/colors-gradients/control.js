@@ -150,6 +150,7 @@ function ColorGradientControl( props ) {
 	const relevantProps = pick( props, colorsAndGradientKeys );
 	if ( isEmpty( relevantProps ) || some(
 		pick( props, colorsAndGradientKeys ),
+		relevantProps,
 		( setting ) => ( setting === undefined )
 	) ) {
 		return <ColorGradientControlSelect { ...props } />;
