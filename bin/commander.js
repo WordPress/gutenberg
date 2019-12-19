@@ -732,7 +732,7 @@ async function prepublishPackages() {
 	// Cloning the Git repository.
 	await runGitRepositoryCloneStep( abortMessage );
 
-	// Checking out the WordPres release branch and doing sync with the last plugin relase.
+	// Checking out the WordPress release branch and doing sync with the last plugin release.
 	const { releaseBranch } = await runWordPressReleaseBranchSyncStep( abortMessage );
 
 	// Push the local changes
