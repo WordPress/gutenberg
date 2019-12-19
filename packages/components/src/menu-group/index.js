@@ -7,14 +7,15 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { Children } from '@wordpress/element';
-import { withInstanceId } from '@wordpress/compose';
+import { useInstanceId } from '@wordpress/compose';
 
 export function MenuGroup( {
 	children,
 	className = '',
-	instanceId,
 	label,
 } ) {
+	const instanceId = useInstanceId( MenuGroup );
+
 	if ( ! Children.count( children ) ) {
 		return null;
 	}
@@ -43,4 +44,4 @@ export function MenuGroup( {
 	);
 }
 
-export default withInstanceId( MenuGroup );
+export default MenuGroup;

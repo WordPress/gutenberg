@@ -9,7 +9,7 @@ import { View } from 'react-native';
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { createBlock } from '@wordpress/blocks';
-import { RichText } from '@wordpress/block-editor';
+import { AlignmentToolbar, BlockControls, RichText } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -47,12 +47,22 @@ class ParagraphEdit extends Component {
 		} = this.props;
 
 		const {
-			placeholder,
+			align,
 			content,
+			placeholder,
 		} = attributes;
 
 		return (
 			<View>
+				<BlockControls>
+					<AlignmentToolbar
+						isCollapsed={ false }
+						value={ align }
+						onChange={ ( nextAlign ) => {
+							setAttributes( { align: nextAlign } );
+						} }
+					/>
+				</BlockControls>
 				<RichText
 					identifier="content"
 					tagName="p"
@@ -78,6 +88,7 @@ class ParagraphEdit extends Component {
 					onReplace={ onReplace }
 					onRemove={ onReplace ? () => onReplace( [] ) : undefined }
 					placeholder={ placeholder || __( 'Start writing…' ) }
+					textAlign={ align }
 				/>
 			</View>
 		);

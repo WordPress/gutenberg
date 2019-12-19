@@ -16,6 +16,7 @@ export { default as ClipboardButton } from './clipboard-button';
 export { default as ColorIndicator } from './color-indicator';
 export { default as ColorPalette } from './color-palette';
 export { default as ColorPicker } from './color-picker';
+export { default as CustomSelectControl } from './custom-select-control';
 export { default as Dashicon } from './dashicon';
 export { DateTimePicker, DatePicker, TimePicker } from './date-time';
 export { default as __experimentalDimensionControl } from './dimension-control';
@@ -33,6 +34,9 @@ export { default as FormFileUpload } from './form-file-upload';
 export { default as FormToggle } from './form-toggle';
 export { default as FormTokenField } from './form-token-field';
 export { default as __experimentalGradientPicker } from './gradient-picker';
+export { default as __experimentalCustomGradientPicker } from './custom-gradient-picker';
+export { default as Guide } from './guide';
+export { default as GuidePage } from './guide/page';
 export { default as Icon } from './icon';
 export { default as IconButton } from './icon-button';
 export { default as KeyboardShortcuts } from './keyboard-shortcuts';
@@ -63,10 +67,12 @@ export { default as Spinner } from './spinner';
 export { default as TabPanel } from './tab-panel';
 export { default as TextControl } from './text-control';
 export { default as TextareaControl } from './textarea-control';
+export { default as TextHighlight } from './text-highlight';
 export { default as Tip } from './tip';
 export { default as ToggleControl } from './toggle-control';
 export { default as Toolbar } from './toolbar';
 export { default as ToolbarButton } from './toolbar-button';
+export { default as ToolbarGroup } from './toolbar-group';
 export { default as Tooltip } from './tooltip';
 export { default as TreeSelect } from './tree-select';
 export { default as VisuallyHidden } from './visually-hidden';
@@ -76,6 +82,7 @@ export {
 	Slot,
 	Fill,
 	Provider as SlotFillProvider,
+	Consumer as __experimentalSlotFillConsumer,
 } from './slot-fill';
 
 // Higher-Order Components

@@ -154,6 +154,54 @@ export function getEntityRecords( state, kind, name, query ) {
 }
 
 /**
+ * Returns a map of objects with each edited
+ * raw entity record and its corresponding edits.
+ *
+ * The map is keyed by entity `kind => name => key => { rawRecord, edits }`.
+ *
+ * @param {Object} state State tree.
+ *
+ * @return {{ [kind: string]: { [name: string]: { [key: string]: { rawRecord: Object<string,*>, edits: Object<string,*> } } } }} The map of edited records with their edits.
+ */
+export const getEntityRecordChangesByRecord = createSelector(
+	( state ) => {
+		const {
+			entities: { data },
+		} = state;
+		return Object.keys( data ).reduce( ( acc, kind ) => {
+			Object.keys( data[ kind ] ).forEach( ( name ) => {
+				const editsKeys = Object.keys( data[ kind ][ name ].edits ).filter( ( editsKey ) =>
+					hasEditsForEntityRecord( state, kind, name, editsKey )
+				);
+				if ( editsKeys.length ) {
+					if ( ! acc[ kind ] ) {
+						acc[ kind ] = {};
+					}
+					if ( ! acc[ kind ][ name ] ) {
+						acc[ kind ][ name ] = {};
+					}
+					editsKeys.forEach(
+						( editsKey ) =>
+							( acc[ kind ][ name ][ editsKey ] = {
+								rawRecord: getRawEntityRecord( state, kind, name, editsKey ),
+								edits: getEntityRecordNonTransientEdits(
+									state,
+									kind,
+									name,
+									editsKey
+								),
+							} )
+					);
+				}
+			} );
+
+			return acc;
+		}, {} );
+	},
+	( state ) => [ state.entities.data ]
+);
+
+/**
  * Returns the specified entity record's edits.
  *
  * @param {Object} state    State tree.
@@ -183,8 +231,11 @@ export function getEntityRecordEdits( state, kind, name, recordId ) {
  */
 export const getEntityRecordNonTransientEdits = createSelector(
 	( state, kind, name, recordId ) => {
-		const { transientEdits = {} } = getEntity( state, kind, name );
-		const edits = getEntityRecordEdits( state, kind, name, recordId ) || [];
+		const { transientEdits } = getEntity( state, kind, name ) || {};
+		const edits = getEntityRecordEdits( state, kind, name, recordId ) || {};
+		if ( ! transientEdits ) {
+			return edits;
+		}
 		return Object.keys( edits ).reduce( ( acc, key ) => {
 			if ( ! transientEdits[ key ] ) {
 				acc[ key ] = edits[ key ];

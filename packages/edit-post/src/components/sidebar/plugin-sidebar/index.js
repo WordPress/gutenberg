@@ -36,15 +36,12 @@ function PluginSidebar( props ) {
 						icon={ icon }
 						label={ title }
 						onClick={ toggleSidebar }
-						isToggled={ isActive }
+						isPressed={ isActive }
 						aria-expanded={ isActive }
 					/> }
 				</PinnedPlugins>
 			) }
-			<Sidebar
-				name={ sidebarName }
-				label={ __( 'Editor plugins' ) }
-			>
+			<Sidebar name={ sidebarName }>
 				<SidebarHeader
 					closeLabel={ __( 'Close plugin' ) }
 				>
@@ -54,7 +51,7 @@ function PluginSidebar( props ) {
 							icon={ isPinned ? 'star-filled' : 'star-empty' }
 							label={ isPinned ? __( 'Unpin from toolbar' ) : __( 'Pin to toolbar' ) }
 							onClick={ togglePin }
-							isToggled={ isPinned }
+							isPressed={ isPinned }
 							aria-expanded={ isPinned }
 						/>
 					) }

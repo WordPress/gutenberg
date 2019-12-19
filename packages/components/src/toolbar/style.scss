@@ -1,8 +1,4 @@
-.components-toolbar {
-	margin: 0;
-	border: $border-width solid $light-gray-500;
-	background-color: $white;
-
+.components-accessible-toolbar {
 	// Required for IE11.
 	display: inline-flex;
 
@@ -14,36 +10,46 @@
 	flex-shrink: 0;
 }
 
-div.components-toolbar {
-	& > div {
-		// IE11 does not support `position: sticky`, or Flex very well, so use block.
-		display: block;
-		@supports (position: sticky) {
-			display: flex;
-		}
+// We should extract this to a separate component.
+.components-tab-button {
+	padding: 3px;
+	color: $dark-gray-500;
+	height: $icon-button-size;
+	font-weight: 500;
 
-		margin: 0;
+	&.is-pressed,
+	&.is-pressed:hover {
+		color: $white;
 	}
 
-	& > div + div {
-		margin-left: -3px;
+	&:disabled {
+		cursor: default;
+	}
 
-		&.has-left-divider {
-			margin-left: 6px;
-			position: relative;
-			overflow: visible;
-		}
+	& > span {
+		border: $border-width solid transparent;
+		padding: 0 6px;
+		box-sizing: content-box;
+		height: 28px;
+		line-height: 28px;
+	}
 
-		&.has-left-divider::before {
-			display: inline-block;
-			content: "";
-			box-sizing: content-box;
-			background-color: $light-gray-500;
-			position: absolute;
-			top: 8px;
-			left: -3px;
-			width: 1px;
-			height: $icon-button-size - 16px;
+	&:hover > span,
+	&:focus > span {
+		color: $dark-gray-500;
+	}
+
+	&:not(:disabled) {
+		&.is-pressed > span,
+		&:hover > span,
+		&:focus > span {
+			border: $border-width solid $dark-gray-500;
 		}
+	}
+
+	&.is-pressed > span,
+	&.is-pressed:hover > span {
+		background-color: $dark-gray-500;
+		color: $white;
 	}
 }

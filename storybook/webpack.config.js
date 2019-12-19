@@ -1,4 +1,5 @@
 const path = require( 'path' );
+const postCssConfigPlugins = require( '../bin/packages/post-css-config' );
 
 module.exports = ( { config } ) => {
 	config.module.rules.push(
@@ -9,7 +10,22 @@ module.exports = ( { config } ) => {
 		},
 		{
 			test: /\.scss$/,
-			use: [ 'style-loader', 'css-loader', 'sass-loader' ],
+			use: [
+				'style-loader',
+				'css-loader',
+				/**
+				 * Configuring PostCSS with Webpack
+				 * https://github.com/postcss/postcss-loader#plugins
+				 */
+				{
+					loader: 'postcss-loader',
+					options: {
+						ident: 'postcss',
+						plugins: () => postCssConfigPlugins,
+					},
+				},
+				'sass-loader',
+			],
 			include: path.resolve( __dirname ),
 		}
 	);

@@ -1,7 +1,6 @@
 .edit-post-header {
 	height: $header-height;
 	padding: $grid-size-small 2px;
-	border-bottom: $border-width solid $light-gray-500;
 	background: $white;
 	display: flex;
 	flex-wrap: wrap;
@@ -9,31 +8,14 @@
 	align-items: center;
 	// The header should never be wider than the viewport, or buttons might be hidden. Especially relevant at high zoom levels. Related to https://core.trac.wordpress.org/ticket/47603#ticket.
 	max-width: 100vw;
-	z-index: z-index(".edit-post-header");
-	left: 0;
-	right: 0;
 
 	// Make toolbar sticky on larger breakpoints
 	@include break-zoomed-in {
-		height: $header-height;
-		top: 0;
-		position: sticky;
 		flex-wrap: nowrap;
 	}
 
-	// On mobile the main content area has to scroll, otherwise you can invoke the overscroll bounce on the non-scrolling container.
 	@include break-small {
-		position: fixed;
 		padding: $grid-size;
-		top: $admin-bar-height-big;
-	}
-
-	@include break-medium() {
-		top: $admin-bar-height;
-
-		body.is-fullscreen-mode & {
-			top: 0;
-		}
 	}
 
 	// Some browsers, most notably IE11, honor an older version of the flexbox spec
@@ -55,8 +37,6 @@
 	}
 }
 
-@include editor-left(".edit-post-header");
-
 .edit-post-header__toolbar {
 	display: flex;
 }
@@ -69,16 +49,14 @@
 
 .edit-post-header .components-button {
 	// Header toggle buttons.
-	&.is-toggled {
+	&.is-pressed {
 		color: $white;
 		background: $dark-gray-500;
-		margin: 1px;
-		padding: 7px;
 	}
 
 	// The !important in this ruleset need to override the pile of :not() selectors used in the icon-button.
-	&.is-toggled:hover,
-	&.is-toggled:focus {
+	&.is-pressed:hover,
+	&.is-pressed:focus {
 		box-shadow: 0 0 0 $border-width $dark-gray-500, inset 0 0 0 $border-width $white !important;
 		color: $white !important;
 		background: $dark-gray-500 !important;
@@ -91,8 +69,6 @@
 	&.editor-post-publish-button,
 	&.editor-post-publish-panel__toggle {
 		margin: 2px;
-		height: 34px;
-		line-height: 32px;
 		font-size: $default-font-size;
 	}
 

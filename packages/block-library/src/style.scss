@@ -11,7 +11,7 @@
 @import "./latest-comments/style.scss";
 @import "./latest-posts/style.scss";
 @import "./media-text/style.scss";
-@import "./navigation-menu/style.scss";
+@import "./navigation/style.scss";
 @import "./paragraph/style.scss";
 @import "./pullquote/style.scss";
 @import "./quote/style.scss";
@@ -23,7 +23,6 @@
 @import "./subhead/style.scss";
 @import "./table/style.scss";
 @import "./text-columns/style.scss";
-@import "./verse/style.scss";
 @import "./video/style.scss";
 
 // The following selectors have increased specificity (using the :root prefix)

@@ -109,7 +109,7 @@ const socialList = {
 		icon: GoogleIcon,
 	},
 	github: {
-		name: 'Github',
+		name: 'GitHub',
 		icon: GithubIcon,
 	},
 	instagram: {
@@ -121,7 +121,7 @@ const socialList = {
 		icon: LastfmIcon,
 	},
 	linkedin: {
-		name: 'Linkedin',
+		name: 'LinkedIn',
 		icon: LinkedinIcon,
 	},
 	mail: {

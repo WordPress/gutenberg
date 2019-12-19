@@ -6,6 +6,7 @@ export { default as Dashicon } from './dashicon';
 export { default as Dropdown } from './dropdown';
 export { default as Toolbar } from './toolbar';
 export { default as ToolbarButton } from './toolbar-button';
+export { default as ToolbarGroup } from './toolbar-group';
 export { default as Icon } from './icon';
 export { default as IconButton } from './icon-button';
 export { default as Spinner } from './spinner';
@@ -36,3 +37,4 @@ export { default as KeyboardAvoidingView } from './mobile/keyboard-avoiding-view
 export { default as KeyboardAwareFlatList } from './mobile/keyboard-aware-flat-list';
 export { default as Picker } from './mobile/picker';
 export { default as ReadableContentView } from './mobile/readable-content-view';
+export { default as StepperControl } from './mobile/stepper-control';

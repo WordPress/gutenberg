@@ -10,6 +10,7 @@ import deprecated from './deprecated';
 import edit from './edit';
 import icon from './icon';
 import metadata from './block.json';
+import patterns from './patterns';
 import save from './save';
 
 const { name } = metadata;
@@ -24,6 +25,7 @@ export const settings = {
 		align: [ 'wide', 'full' ],
 		html: false,
 	},
+	patterns,
 	example: {
 		innerBlocks: [
 			{
@@ -32,7 +34,8 @@ export const settings = {
 					{
 						name: 'core/paragraph',
 						attributes: {
-							content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent et eros eu felis.',
+							/* translators: example text. */
+							content: __( 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent et eros eu felis.' ),
 						},
 					},
 					{
@@ -44,7 +47,8 @@ export const settings = {
 					{
 						name: 'core/paragraph',
 						attributes: {
-							content: 'Suspendisse commodo neque lacus, a dictum orci interdum et.',
+							/* translators: example text. */
+							content: __( 'Suspendisse commodo neque lacus, a dictum orci interdum et.' ),
 						},
 					},
 				],
@@ -55,12 +59,14 @@ export const settings = {
 					{
 						name: 'core/paragraph',
 						attributes: {
+							/* translators: example text. */
 							content: __( 'Etiam et egestas lorem. Vivamus sagittis sit amet dolor quis lobortis. Integer sed fermentum arcu, id vulputate lacus. Etiam fermentum sem eu quam hendrerit.' ),
 						},
 					},
 					{
 						name: 'core/paragraph',
 						attributes: {
+							/* translators: example text. */
 							content: __( 'Nam risus massa, ullamcorper consectetur eros fermentum, porta aliquet ligula. Sed vel mauris nec enim.' ),
 						},
 					},

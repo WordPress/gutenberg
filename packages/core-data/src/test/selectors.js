@@ -9,6 +9,8 @@ import deepFreeze from 'deep-freeze';
 import {
 	getEntityRecord,
 	getEntityRecords,
+	getEntityRecordChangesByRecord,
+	getEntityRecordNonTransientEdits,
 	getEmbedPreview,
 	isPreviewEmbedFallback,
 	canUser,
@@ -101,6 +103,70 @@ describe( 'getEntityRecords', () => {
 			{ slug: 'post' },
 			{ slug: 'page' },
 		] );
+	} );
+} );
+
+describe( 'getEntityRecordChangesByRecord', () => {
+	it( 'should return a map of objects with each raw edited entity record and its corresponding edits', () => {
+		const state = deepFreeze( {
+			entities: {
+				config: [
+					{
+						kind: 'someKind',
+						name: 'someName',
+						transientEdits: { someTransientEditProperty: true },
+					},
+				],
+				data: {
+					someKind: {
+						someName: {
+							queriedData: {
+								items: {
+									someKey: {
+										someProperty: 'somePersistedValue',
+										someRawProperty: { raw: 'somePersistedRawValue' },
+									},
+								},
+							},
+							edits: {
+								someKey: {
+									someProperty: 'someEditedValue',
+									someRawProperty: 'someEditedRawValue',
+									someTransientEditProperty: 'someEditedTransientEditValue',
+								},
+							},
+						},
+					},
+				},
+			},
+		} );
+		expect( getEntityRecordChangesByRecord( state ) ).toEqual( {
+			someKind: {
+				someName: {
+					someKey: {
+						rawRecord: {
+							someProperty: 'somePersistedValue',
+							someRawProperty: 'somePersistedRawValue',
+						},
+						edits: {
+							someProperty: 'someEditedValue',
+							someRawProperty: 'someEditedRawValue',
+						},
+					},
+				},
+			},
+		} );
+	} );
+} );
+
+describe( 'getEntityRecordNonTransientEdits', () => {
+	it( 'should return an empty object when the entity does not have a loaded config.', () => {
+		const state = deepFreeze( {
+			entities: { config: [], data: {} },
+		} );
+		expect(
+			getEntityRecordNonTransientEdits( state, 'someKind', 'someName', 'someId' )
+		).toEqual( {} );
 	} );
 } );
 

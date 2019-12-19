@@ -17,7 +17,7 @@ const POPOVER_PROPS = {
 
 const FormatToolbar = () => {
 	return (
-		<div className="editor-format-toolbar block-editor-format-toolbar">
+		<div className="block-editor-format-toolbar">
 			<Toolbar>
 				{ [ 'bold', 'italic', 'link' ].map( ( format ) =>
 					<Slot name={ `RichText.ToolbarControls.${ format }` } key={ format } />

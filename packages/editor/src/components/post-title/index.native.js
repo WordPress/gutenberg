@@ -8,7 +8,7 @@ import { isEmpty } from 'lodash';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { __experimentalRichText as RichText } from '@wordpress/rich-text';
+import { __experimentalRichText as RichText, create, insert } from '@wordpress/rich-text';
 import { decodeEntities } from '@wordpress/html-entities';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withFocusOutside } from '@wordpress/components';
@@ -43,6 +43,19 @@ class PostTitle extends Component {
 		this.props.onSelect();
 	}
 
+	onPaste( { value, onChange, plainText } ) {
+		const content = pasteHandler( {
+			plainText,
+			mode: 'INLINE',
+			tagName: 'p',
+		} );
+
+		if ( typeof content === 'string' ) {
+			const valueToInsert = create( { html: content } );
+			onChange( insert( value, valueToInsert ) );
+		}
+	}
+
 	render() {
 		const {
 			placeholder,
@@ -50,6 +63,7 @@ class PostTitle extends Component {
 			title,
 			focusedBorderColor,
 			borderStyle,
+			isDimmed,
 		} = this.props;
 
 		const decodedPlaceholder = decodeEntities( placeholder );
@@ -57,7 +71,7 @@ class PostTitle extends Component {
 
 		return (
 			<View
-				style={ [ styles.titleContainer, borderStyle, { borderColor } ] }
+				style={ [ styles.titleContainer, borderStyle, { borderColor }, isDimmed && styles.dimmed ] }
 				accessible={ ! this.props.isSelected }
 				accessibilityLabel={
 					isEmpty( title ) ?
@@ -84,13 +98,14 @@ class PostTitle extends Component {
 					onChange={ ( value ) => {
 						this.props.onUpdate( value );
 					} }
+					onPaste={ this.onPaste }
 					placeholder={ decodedPlaceholder }
 					value={ title }
 					onSelectionChange={ () => { } }
 					onEnter={ this.props.onEnterPress }
 					disableEditingMenu={ true }
-					__unstablePasteHandler={ pasteHandler }
 					__unstableIsSelected={ this.props.isSelected }
+					__unstableOnCreateUndoLevel={ () => { } }
 				>
 				</RichText>
 			</View>
@@ -104,11 +119,15 @@ export default compose(
 			isPostTitleSelected,
 		} = select( 'core/editor' );
 
-		const { getSelectedBlockClientId } = select( 'core/block-editor' );
+		const { getSelectedBlockClientId, getBlockRootClientId } = select( 'core/block-editor' );
+
+		const selectedId = getSelectedBlockClientId();
+		const selectionIsNested = !! getBlockRootClientId( selectedId );
 
 		return {
-			isAnyBlockSelected: !! getSelectedBlockClientId(),
+			isAnyBlockSelected: !! selectedId,
 			isSelected: isPostTitleSelected(),
+			isDimmed: selectionIsNested,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

@@ -8,7 +8,6 @@ import {
 	withSpokenMessages,
 } from '@wordpress/components';
 import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
-import { getRectangleFromRange } from '@wordpress/dom';
 import { prependHTTP } from '@wordpress/url';
 import {
 	create,
@@ -32,15 +31,17 @@ function isShowingInput( props, state ) {
 }
 
 const URLPopoverAtLink = ( { isActive, addingLink, value, ...props } ) => {
-	const anchorRect = useMemo( () => {
+	const anchorRef = useMemo( () => {
 		const selection = window.getSelection();
-		const range = selection.rangeCount > 0 ? selection.getRangeAt( 0 ) : null;
-		if ( ! range ) {
+
+		if ( ! selection.rangeCount ) {
 			return;
 		}
 
+		const range = selection.getRangeAt( 0 );
+
 		if ( addingLink ) {
-			return getRectangleFromRange( range );
+			return range;
 		}
 
 		let element = range.startContainer;
@@ -52,17 +53,14 @@ const URLPopoverAtLink = ( { isActive, addingLink, value, ...props } ) => {
 			element = element.parentNode;
 		}
 
-		const closest = element.closest( 'a' );
-		if ( closest ) {
-			return closest.getBoundingClientRect();
-		}
+		return element.closest( 'a' );
 	}, [ isActive, addingLink, value.start, value.end ] );
 
-	if ( ! anchorRect ) {
+	if ( ! anchorRef ) {
 		return null;
 	}
 
-	return <URLPopover anchorRect={ anchorRect } { ...props } />;
+	return <URLPopover anchorRef={ anchorRef } { ...props } />;
 };
 
 class InlineLinkUI extends Component {

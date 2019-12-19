@@ -16,7 +16,8 @@ import RangeControl from '../';
 export default { title: 'Components|RangeControl', component: RangeControl };
 
 const RangeControlWithState = ( props ) => {
-	const [ value, setValue ] = useState( 5 );
+	const initialValue = props.value === undefined ? 5 : props.value;
+	const [ value, setValue ] = useState( initialValue );
 
 	return (
 		<RangeControl
@@ -33,6 +34,20 @@ export const _default = () => {
 	return (
 		<RangeControlWithState
 			label={ label }
+		/>
+	);
+};
+
+export const InitialValueZero = () => {
+	const label = text( 'Label', 'How many columns should this use?' );
+
+	return (
+		<RangeControlWithState
+			initialPosition={ 0 }
+			label={ label }
+			max={ 20 }
+			min={ 0 }
+			value={ null }
 		/>
 	);
 };

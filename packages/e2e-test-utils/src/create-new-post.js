@@ -7,7 +7,6 @@ import { addQueryArgs } from '@wordpress/url';
  * Internal dependencies
  */
 import { visitAdminPage } from './visit-admin-page';
-import { disableNavigationMode } from './keyboard-mode';
 
 /**
  * Creates new post.
@@ -19,7 +18,7 @@ export async function createNewPost( {
 	title,
 	content,
 	excerpt,
-	enableTips = false,
+	showWelcomeGuide = false,
 } = {} ) {
 	const query = addQueryArgs( '', {
 		post_type: postType,
@@ -27,16 +26,16 @@ export async function createNewPost( {
 		content,
 		excerpt,
 	} ).slice( 1 );
+
 	await visitAdminPage( 'post-new.php', query );
 
-	await page.evaluate( ( _enableTips ) => {
-		const action = _enableTips ? 'enableTips' : 'disableTips';
-		wp.data.dispatch( 'core/nux' )[ action ]();
-	}, enableTips );
+	const isWelcomeGuideActive = await page.evaluate( () =>
+		wp.data.select( 'core/edit-post' ).isFeatureActive( 'welcomeGuide' ) );
 
-	if ( enableTips ) {
+	if ( showWelcomeGuide !== isWelcomeGuideActive ) {
+		await page.evaluate( () =>
+			wp.data.dispatch( 'core/edit-post' ).toggleFeature( 'welcomeGuide' ) );
+
 		await page.reload();
 	}
-
-	await disableNavigationMode();
 }

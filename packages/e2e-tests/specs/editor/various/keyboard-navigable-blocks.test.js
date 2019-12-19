@@ -7,88 +7,70 @@ import {
 	pressKeyWithModifier,
 } from '@wordpress/e2e-test-utils';
 
+async function getActiveLabel() {
+	return await page.evaluate( () => {
+		return (
+			document.activeElement.getAttribute( 'aria-label' ) ||
+			document.activeElement.innerHTML
+		);
+	} );
+}
+
 const navigateToContentEditorTop = async () => {
 	// Use 'Ctrl+`' to return to the top of the editor
 	await pressKeyWithModifier( 'ctrl', '`' );
 	await pressKeyWithModifier( 'ctrl', '`' );
-
-	// Tab into the Title block
-	await page.keyboard.press( 'Tab' );
 };
 
 const tabThroughParagraphBlock = async ( paragraphText ) => {
-	// Tab to the next paragraph block
 	await page.keyboard.press( 'Tab' );
+	await expect( await getActiveLabel() ).toBe( 'Block: Paragraph' );
 
-	// The block external focusable wrapper has focus
-	const isFocusedParagraphBlock = await page.evaluate(
-		() => document.activeElement.dataset.type
-	);
-	await expect( isFocusedParagraphBlock ).toEqual( 'core/paragraph' );
-
-	// Tab causes 'add block' button to receive focus
 	await page.keyboard.press( 'Tab' );
-	const isFocusedParagraphInserterToggle = await page.evaluate( () =>
-		document.activeElement.classList.contains( 'block-editor-inserter__toggle' )
-	);
-	await expect( isFocusedParagraphInserterToggle ).toBe( true );
+	await expect( await getActiveLabel() ).toBe( 'Add block' );
 
 	await tabThroughBlockMoverControl();
 	await tabThroughBlockToolbar();
 
-	// Tab causes the paragraph content to receive focus
 	await page.keyboard.press( 'Tab' );
-	const isFocusedParagraphContent = await page.evaluate(
-		() => document.activeElement.contentEditable
-	);
-	// The value of 'contentEditable' should be the string 'true'
-	await expect( isFocusedParagraphContent ).toBe( 'true' );
+	await expect( await getActiveLabel() ).toBe( 'Paragraph block' );
+	await expect( await page.evaluate( () =>
+		document.activeElement.innerHTML
+	) ).toBe( paragraphText );
 
-	const paragraphEditableContent = await page.evaluate(
-		() => document.activeElement.innerHTML
-	);
-	await expect( paragraphEditableContent ).toBe( paragraphText );
+	await page.keyboard.press( 'Tab' );
+	await expect( await getActiveLabel() ).toBe( 'Open publish panel' );
 };
 
 const tabThroughBlockMoverControl = async () => {
-	// Tab to focus on the 'move up' control
 	await page.keyboard.press( 'Tab' );
-	const isFocusedMoveUpControl = await page.evaluate( () =>
-		document.activeElement.classList.contains( 'block-editor-block-mover__control' )
-	);
-	await expect( isFocusedMoveUpControl ).toBe( true );
+	await expect( await getActiveLabel() ).toBe( 'Move up' );
 
-	// Tab to focus on the 'move down' control
 	await page.keyboard.press( 'Tab' );
-	const isFocusedMoveDownControl = await page.evaluate( () =>
-		document.activeElement.classList.contains( 'block-editor-block-mover__control' )
-	);
-	await expect( isFocusedMoveDownControl ).toBe( true );
+	await expect( await getActiveLabel() ).toBe( 'Move down' );
 };
 
 const tabThroughBlockToolbar = async () => {
-	// Tab to focus on the 'block switcher' control
 	await page.keyboard.press( 'Tab' );
-	const isFocusedBlockSwitcherControl = await page.evaluate( () =>
-		document.activeElement.classList.contains(
-			'block-editor-block-switcher__toggle'
-		)
-	);
-	await expect( isFocusedBlockSwitcherControl ).toBe( true );
+	await expect( await getActiveLabel() ).toBe( 'Change block type or style' );
 
-	// Tab to focus on the 'Change text alignment' dropdown control
 	await page.keyboard.press( 'Tab' );
-	const isFocusedChangeTextAlignmentControl = await page.evaluate( () =>
-		document.activeElement.classList.contains( 'components-dropdown-menu__toggle' )
-	);
-	await expect( isFocusedChangeTextAlignmentControl ).toBe( true );
+	await expect( await getActiveLabel() ).toBe( 'Change text alignment' );
 
-	// Tab to focus on the 'More formatting' dropdown toggle
 	await page.keyboard.press( 'Tab' );
-	const isFocusedBlockSettingsDropdown = await page.evaluate( () =>
-		document.activeElement.classList.contains( 'components-dropdown-menu__toggle' )
-	);
-	await expect( isFocusedBlockSettingsDropdown ).toBe( true );
+	await expect( await getActiveLabel() ).toBe( 'Bold' );
+
+	await page.keyboard.press( 'Tab' );
+	await expect( await getActiveLabel() ).toBe( 'Italic' );
+
+	await page.keyboard.press( 'Tab' );
+	await expect( await getActiveLabel() ).toBe( 'Link' );
+
+	await page.keyboard.press( 'Tab' );
+	await expect( await getActiveLabel() ).toBe( 'More rich text controls' );
+
+	await page.keyboard.press( 'Tab' );
+	await expect( await getActiveLabel() ).toBe( 'More options' );
 };
 
 describe( 'Order of block keyboard navigation', () => {
@@ -103,21 +85,20 @@ describe( 'Order of block keyboard navigation', () => {
 		for ( const paragraphBlock of paragraphBlocks ) {
 			await insertBlock( 'Paragraph' );
 			await page.keyboard.type( paragraphBlock );
-			await page.keyboard.press( 'Enter' );
 		}
+
+		// Select the middle block.
+		await page.keyboard.press( 'ArrowUp' );
+		// Move the mouse to show the block toolbar
+		await page.mouse.move( 0, 0 );
+		await page.mouse.move( 10, 10 );
 
 		await navigateToContentEditorTop();
-
-		for ( const paragraphBlock of paragraphBlocks ) {
-			await tabThroughParagraphBlock( paragraphBlock );
-		}
+		await tabThroughParagraphBlock( 'Paragraph 1' );
 
 		// Repeat the same steps to ensure that there is no change introduced in how the focus is handled.
 		// This prevents the previous regression explained in: https://github.com/WordPress/gutenberg/issues/11773.
 		await navigateToContentEditorTop();
-
-		for ( const paragraphBlock of paragraphBlocks ) {
-			await tabThroughParagraphBlock( paragraphBlock );
-		}
+		await tabThroughParagraphBlock( 'Paragraph 1' );
 	} );
 } );

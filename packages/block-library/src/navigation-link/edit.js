@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { escape, unescape } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -17,9 +18,9 @@ import {
 	SVG,
 	TextareaControl,
 	TextControl,
-	Toolbar,
 	ToggleControl,
 	ToolbarButton,
+	ToolbarGroup,
 } from '@wordpress/components';
 import {
 	LEFT,
@@ -60,13 +61,13 @@ const updateLinkSetting = ( setter ) => ( setting, value ) => {
  */
 const updateLink = ( setter, label ) => ( { title: newTitle = '', url: newURL = '' } = {} ) => {
 	setter( {
-		title: newTitle,
+		title: escape( newTitle ),
 		url: newURL,
 	} );
 
 	// Set the item label as well if it isn't already defined.
 	if ( ! label ) {
-		setter( { label: newTitle } );
+		setter( { label: escape( newTitle ) } );
 	}
 };
 
@@ -78,8 +79,8 @@ function NavigationLinkEdit( {
 	setAttributes,
 	insertLinkBlock,
 } ) {
-	const { label, opensInNewTab, title, url } = attributes;
-	const link = title ? { title, url } : null;
+	const { label, opensInNewTab, title, url, nofollow, description } = attributes;
+	const link = title ? { title: unescape( title ), url } : null;
 	const [ isLinkOpen, setIsLinkOpen ] = useState( ! label && isSelected );
 
 	let onCloseTimerId = null;
@@ -135,7 +136,7 @@ function NavigationLinkEdit( {
 	return (
 		<Fragment>
 			<BlockControls>
-				<Toolbar>
+				<ToolbarGroup>
 					<KeyboardShortcuts
 						bindGlobal
 						shortcuts={ {
@@ -152,26 +153,19 @@ function NavigationLinkEdit( {
 					<ToolbarButton
 						name="submenu"
 						icon={ <SVG xmlns="http://www.w3.org/2000/svg" width="24" height="24"><Path d="M14 5h8v2h-8zm0 5.5h8v2h-8zm0 5.5h8v2h-8zM2 11.5C2 15.08 4.92 18 8.5 18H9v2l3-3-3-3v2h-.5C6.02 16 4 13.98 4 11.5S6.02 7 8.5 7H12V5H8.5C4.92 5 2 7.92 2 11.5z" /><Path fill="none" d="M0 0h24v24H0z" /></SVG> }
-						title={ __( 'Add Submenu' ) }
+						title={ __( 'Add submenu' ) }
 						onClick={ insertLinkBlock }
 					/>
-				</Toolbar>
+				</ToolbarGroup>
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody
 					title={ __( 'Link Settings' ) }
 				>
-					<ToggleControl
-						checked={ attributes.opensInNewTab }
-						onChange={ ( newTab ) => {
-							setAttributes( { opensInNewTab: newTab } );
-						} }
-						label={ __( 'Open in new tab' ) }
-					/>
 					<TextareaControl
-						value={ attributes.description || '' }
-						onChange={ ( description ) => {
-							setAttributes( { description } );
+						value={ description || '' }
+						onChange={ ( descriptionValue ) => {
+							setAttributes( { description: descriptionValue } );
 						} }
 						label={ __( 'Description' ) }
 					/>
@@ -180,17 +174,17 @@ function NavigationLinkEdit( {
 					title={ __( 'SEO Settings' ) }
 				>
 					<TextControl
-						value={ attributes.title || '' }
-						onChange={ ( itemTitle ) => {
-							setAttributes( { title: itemTitle } );
+						value={ title || '' }
+						onChange={ ( titleValue ) => {
+							setAttributes( { title: titleValue } );
 						} }
 						label={ __( 'Title Attribute' ) }
 						help={ __( 'Provide more context about where the link goes.' ) }
 					/>
 					<ToggleControl
-						checked={ attributes.nofollow }
-						onChange={ ( nofollow ) => {
-							setAttributes( { nofollow } );
+						checked={ nofollow }
+						onChange={ ( nofollowValue ) => {
+							setAttributes( { nofollow: nofollowValue } );
 						} }
 						label={ __( 'Add nofollow to link' ) }
 						help={ (
@@ -214,7 +208,7 @@ function NavigationLinkEdit( {
 					'has-link': !! url,
 				} ) }
 			>
-				<div className="wp-block-navigation-link__inner">
+				<div>
 					<RichText
 						className="wp-block-navigation-link__content"
 						value={ label }
@@ -235,7 +229,7 @@ function NavigationLinkEdit( {
 							currentSettings={ [
 								{
 									id: 'opensInNewTab',
-									title: __( 'Open in New Tab' ),
+									title: __( 'Open in new tab' ),
 									checked: opensInNewTab,
 								},
 							] }

@@ -70,9 +70,27 @@ function fromFormat( { type, attributes, unregisteredAttributes, object, boundar
 	};
 }
 
+/**
+ * Checks if both arrays of formats up until a certain index are equal.
+ *
+ * @param {Array}  a     Array of formats to compare.
+ * @param {Array}  b     Array of formats to compare.
+ * @param {number} index Index to check until.
+ */
+function isEqualUntil( a, b, index ) {
+	do {
+		if ( a[ index ] !== b[ index ] ) {
+			return false;
+		}
+	} while ( index-- );
+
+	return true;
+}
+
 export function toTree( {
 	value,
 	multilineTag,
+	preserveWhiteSpace,
 	createEmpty,
 	append,
 	getLastChild,
@@ -164,7 +182,8 @@ export function toTree( {
 				if (
 					pointer &&
 					lastCharacterFormats &&
-					format === lastCharacterFormats[ formatIndex ] &&
+					// Reuse the last element if all formats remain the same.
+					isEqualUntil( characterFormats, lastCharacterFormats, formatIndex ) &&
 					// Do not reuse the last element if the character is a
 					// line separator.
 					( character !== LINE_SEPARATOR ||
@@ -223,7 +242,7 @@ export function toTree( {
 			} ) );
 			// Ensure pointer is text node.
 			pointer = append( getParent( pointer ), '' );
-		} else if ( character === '\n' ) {
+		} else if ( ! preserveWhiteSpace && character === '\n' ) {
 			pointer = append( getParent( pointer ), {
 				type: 'br',
 				attributes: isEditableTree ? {

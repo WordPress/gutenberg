@@ -180,6 +180,12 @@
 		"parent": "themes"
 	},
 	{
+		"title": "Block-based Themes (Experimental)",
+		"slug": "block-based-themes",
+		"markdown_source": "../docs/designers-developers/developers/themes/block-based-themes.md",
+		"parent": "themes"
+	},
+	{
 		"title": "Backward Compatibility",
 		"slug": "backward-compatibility",
 		"markdown_source": "../docs/designers-developers/developers/backward-compatibility/README.md",
@@ -732,6 +738,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "Guide",
+		"slug": "guide",
+		"markdown_source": "../packages/components/src/guide/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "NavigateRegions",
 		"slug": "navigate-regions",
 		"markdown_source": "../packages/components/src/higher-order/navigate-regions/README.md",
@@ -957,6 +969,12 @@
 		"title": "TextControl",
 		"slug": "text-control",
 		"markdown_source": "../packages/components/src/text-control/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "TextHighlight",
+		"slug": "text-highlight",
+		"markdown_source": "../packages/components/src/text-highlight/README.md",
 		"parent": "components"
 	},
 	{
@@ -1245,6 +1263,12 @@
 		"title": "@wordpress/edit-post",
 		"slug": "packages-edit-post",
 		"markdown_source": "../packages/edit-post/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/edit-site",
+		"slug": "packages-edit-site",
+		"markdown_source": "../packages/edit-site/README.md",
 		"parent": "packages"
 	},
 	{

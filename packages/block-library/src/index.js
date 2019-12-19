@@ -34,8 +34,8 @@ import * as embed from './embed';
 import * as file from './file';
 import * as html from './html';
 import * as mediaText from './media-text';
+import * as navigation from './navigation';
 import * as navigationLink from './navigation-link';
-import * as navigationMenu from './navigation-menu';
 import * as latestComments from './latest-comments';
 import * as latestPosts from './latest-posts';
 import * as legacyWidget from './legacy-widget';
@@ -64,6 +64,7 @@ import * as socialLink from './social-link';
 
 // Full Site Editing Blocks
 import * as siteTitle from './site-title';
+import * as templatePart from './template-part';
 import * as postTitle from './post-title';
 import * as postContent from './post-content';
 
@@ -128,6 +129,8 @@ export const registerCoreBlocks = () => {
 		latestPosts,
 		missing,
 		more,
+		navigation,
+		navigationLink,
 		nextpage,
 		preformatted,
 		pullquote,
@@ -172,20 +175,17 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 		( settings ) => {
 			const {
 				__experimentalEnableLegacyWidgetBlock,
-				__experimentalEnableMenuBlock,
 				__experimentalEnableFullSiteEditing,
-			} = settings
+			} = settings;
 
-				;[
+			[
 				__experimentalEnableLegacyWidgetBlock ? legacyWidget : null,
-				__experimentalEnableMenuBlock ? navigationMenu : null,
-				__experimentalEnableMenuBlock ? navigationLink : null,
 				socialLinks,
 				...socialLink.sites,
 
 				// Register Full Site Editing Blocks.
 				...( __experimentalEnableFullSiteEditing ?
-					[ siteTitle, postTitle, postContent ] :
+					[ siteTitle, templatePart, postTitle, postContent ] :
 					[] ),
 			].forEach( registerBlock );
 		} :

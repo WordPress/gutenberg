@@ -14,17 +14,17 @@ import {
 	useState,
 } from '@wordpress/element';
 import {
+	BaseControl,
+	Button,
 	FocalPointPicker,
 	IconButton,
 	PanelBody,
 	PanelRow,
 	RangeControl,
-	ToggleControl,
-	Toolbar,
-	withNotices,
 	ResizableBox,
-	BaseControl,
-	Button,
+	ToggleControl,
+	ToolbarGroup,
+	withNotices,
 } from '@wordpress/components';
 import { compose, withInstanceId } from '@wordpress/compose';
 import {
@@ -38,6 +38,7 @@ import {
 	PanelColorSettings,
 	withColors,
 	ColorPalette,
+	__experimentalUseGradient,
 	__experimentalGradientPickerControl,
 	__experimentalGradientPicker,
 } from '@wordpress/block-editor';
@@ -257,7 +258,6 @@ function CoverEdit( {
 } ) {
 	const {
 		backgroundType,
-		customGradient,
 		dimRatio,
 		focalPoint,
 		hasParallax,
@@ -265,6 +265,11 @@ function CoverEdit( {
 		minHeight,
 		url,
 	} = attributes;
+	const {
+		gradientClass,
+		gradientValue,
+		setGradient,
+	} = __experimentalUseGradient();
 	const onSelectMedia = onCoverSelectMedia( setAttributes );
 
 	const toggleParallax = () => {
@@ -291,15 +296,15 @@ function CoverEdit( {
 		minHeight: ( temporaryMinHeight || minHeight ),
 	};
 
-	if ( customGradient && ! url ) {
-		style.background = customGradient;
+	if ( gradientValue && ! url ) {
+		style.background = gradientValue;
 	}
 
 	if ( focalPoint ) {
 		style.backgroundPosition = `${ focalPoint.x * 100 }% ${ focalPoint.y * 100 }%`;
 	}
 
-	const hasBackground = !! ( url || overlayColor.color || customGradient );
+	const hasBackground = !! ( url || overlayColor.color || gradientValue );
 
 	const controls = (
 		<>
@@ -307,7 +312,7 @@ function CoverEdit( {
 				{ hasBackground && (
 					<>
 						<MediaUploadCheck>
-							<Toolbar>
+							<ToolbarGroup>
 								<MediaUpload
 									onSelect={ onSelectMedia }
 									allowedTypes={ ALLOWED_MEDIA_TYPES }
@@ -321,7 +326,7 @@ function CoverEdit( {
 										/>
 									) }
 								/>
-							</Toolbar>
+							</ToolbarGroup>
 						</MediaUploadCheck>
 					</>
 				) }
@@ -344,9 +349,17 @@ function CoverEdit( {
 								onChange={ ( newFocalPoint ) => setAttributes( { focalPoint: newFocalPoint } ) }
 							/>
 						) }
+						{ VIDEO_BACKGROUND_TYPE === backgroundType && (
+							<video
+								autoPlay
+								muted
+								loop
+								src={ url }
+							/>
+						) }
 						<PanelRow>
 							<Button
-								isDefault
+								isSecondary
 								isSmall
 								className="block-library-cover__reset-button"
 								onClick={ () => setAttributes( {
@@ -389,14 +402,13 @@ function CoverEdit( {
 								label={ __( 'Overlay Gradient' ) }
 								onChange={
 									( newGradient ) => {
+										setGradient( newGradient );
 										setAttributes( {
-											customGradient: newGradient,
-											customOverlayColor: undefined,
 											overlayColor: undefined,
 										} );
 									}
 								}
-								value={ customGradient }
+								value={ gradientValue }
 							/>
 							{ !! url && (
 								<RangeControl
@@ -449,16 +461,16 @@ function CoverEdit( {
 							clearable={ false }
 						/>
 						<__experimentalGradientPicker
+							disableCustomGradients
 							onChange={
 								( newGradient ) => {
+									setGradient( newGradient );
 									setAttributes( {
-										customGradient: newGradient,
-										customOverlayColor: undefined,
 										overlayColor: undefined,
 									} );
 								}
 							}
-							value={ customGradient }
+							value={ gradientValue }
 							clearable={ false }
 						/>
 					</div>
@@ -475,7 +487,8 @@ function CoverEdit( {
 			'has-background-dim': dimRatio !== 0,
 			'has-parallax': hasParallax,
 			[ overlayColor.class ]: overlayColor.class,
-			'has-background-gradient': customGradient,
+			'has-background-gradient': gradientValue,
+			[ gradientClass ]: ! url && gradientClass,
 		}
 	);
 
@@ -515,11 +528,14 @@ function CoverEdit( {
 							src={ url }
 						/>
 					) }
-					{ url && customGradient && dimRatio !== 0 && (
+					{ url && gradientValue && dimRatio !== 0 && (
 						<span
 							aria-hidden="true"
-							className="wp-block-cover__gradient-background"
-							style={ { background: customGradient } }
+							className={ classnames(
+								'wp-block-cover__gradient-background',
+								gradientClass,
+							) }
+							style={ { background: gradientValue } }
 						/>
 					) }
 					{ VIDEO_BACKGROUND_TYPE === backgroundType && (

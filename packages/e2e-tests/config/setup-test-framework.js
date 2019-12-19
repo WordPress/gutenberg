@@ -18,9 +18,25 @@ import {
 } from '@wordpress/e2e-test-utils';
 
 /**
- * Environment variables
+ * Timeout, in seconds, that the test should be allowed to run.
+ *
+ * @type {string|undefined}
  */
-const { PUPPETEER_TIMEOUT } = process.env;
+const PUPPETEER_TIMEOUT = process.env.PUPPETEER_TIMEOUT;
+
+/**
+ * CPU slowdown factor, as a numeric multiplier.
+ *
+ * @type {string|undefined}
+ */
+const THROTTLE_CPU = process.env.THROTTLE_CPU;
+
+/**
+ * Network download speed, in bytes per second.
+ *
+ * @type {string|undefined}
+ */
+const DOWNLOAD_THROUGHPUT = process.env.DOWNLOAD_THROUGHPUT;
 
 /**
  * Set of console logging types observed to protect against unexpected yet
@@ -117,6 +133,16 @@ function observeConsoleLogging() {
 			return;
 		}
 
+		// A chrome advisory warning about SameSite cookies is informational
+		// about future changes, tracked separately for improvement in core.
+		//
+		// See: https://core.trac.wordpress.org/ticket/37000
+		// See: https://www.chromestatus.com/feature/5088147346030592
+		// See: https://www.chromestatus.com/feature/5633521622188032
+		if ( text.includes( 'A cookie associated with a cross-site resource' ) ) {
+			return;
+		}
+
 		// Viewing posts on the front end can result in this error, which
 		// has nothing to do with Gutenberg.
 		if ( text.includes( 'net::ERR_UNKNOWN_URL_SCHEME' ) ) {
@@ -126,19 +152,6 @@ function observeConsoleLogging() {
 		// Network errors are ignored only if we are intentionally testing
 		// offline mode.
 		if ( text.includes( 'net::ERR_INTERNET_DISCONNECTED' ) && isOfflineMode() ) {
-			return;
-		}
-
-		// A bug present in WordPress 5.2 will produce console warnings when
-		// loading the Dashicons font. These can be safely ignored, as they do
-		// not otherwise regress on application behavior. This logic should be
-		// removed once the associated ticket has been closed.
-		//
-		// See: https://core.trac.wordpress.org/ticket/47183
-		if (
-			text.startsWith( 'Failed to decode downloaded font:' ) ||
-			text.startsWith( 'OTS parsing error:' )
-		) {
 			return;
 		}
 
@@ -203,6 +216,32 @@ async function runAxeTestsForBlockEditor() {
 	} );
 }
 
+/**
+ * Simulate slow network or throttled CPU if provided via environment variables.
+ */
+async function simulateAdverseConditions() {
+	if ( ! DOWNLOAD_THROUGHPUT && ! THROTTLE_CPU ) {
+		return;
+	}
+
+	const client = await page.target().createCDPSession();
+
+	if ( DOWNLOAD_THROUGHPUT ) {
+		// See: https://chromedevtools.github.io/devtools-protocol/tot/Network#method-emulateNetworkConditions
+		await client.send( 'Network.emulateNetworkConditions', {
+			// Simulated download speed (bytes/s)
+			downloadThroughput: Number( DOWNLOAD_THROUGHPUT ),
+		} );
+	}
+
+	if ( THROTTLE_CPU ) {
+		// See: https://chromedevtools.github.io/devtools-protocol/tot/Emulation#method-setCPUThrottlingRate
+		await client.send( 'Emulation.setCPUThrottlingRate', {
+			rate: Number( THROTTLE_CPU ),
+		} );
+	}
+}
+
 // Before every test suite run, delete all content created by the test. This ensures
 // other posts/comments/etc. aren't dirtying tests and tests don't depend on
 // each other's side-effects.
@@ -210,6 +249,7 @@ beforeAll( async () => {
 	capturePageEventsForTearDown();
 	enablePageDialogAccept();
 	observeConsoleLogging();
+	await simulateAdverseConditions();
 
 	await trashExistingPosts();
 	await setupBrowser();

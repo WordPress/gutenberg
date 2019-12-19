@@ -254,12 +254,7 @@ div[data-type="core/freeform"] {
 		border-left-color: transparent;
 	}
 
-	// Don't show block type label for classic block
-	&.is-hovered .block-editor-block-list__breadcrumb {
-		display: none;
-	}
-
-	.editor-block-contextual-toolbar + div {
+	.block-editor-block-contextual-toolbar + div {
 		margin-top: 0;
 		padding-top: 0;
 	}
