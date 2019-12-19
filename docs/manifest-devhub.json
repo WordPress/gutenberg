@@ -954,6 +954,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "SlotFill2",
+		"slug": "slot-fill2",
+		"markdown_source": "../packages/components/src/slot-fill2/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Snackbar",
 		"slug": "snackbar",
 		"markdown_source": "../packages/components/src/snackbar/README.md",
