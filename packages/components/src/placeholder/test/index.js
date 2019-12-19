@@ -57,16 +57,6 @@ describe( 'Placeholder', () => {
 			expect( child.matchesElement( element ) ).toBe( true );
 		} );
 
-		it( 'should not display an instructions element when smaller than 320px', () => {
-			useResizeAware.mockReturnValue( [ <div key="1" />, { width: 319 } ] );
-			const element = <div>Instructions</div>;
-			const placeholder = shallow(
-				<Placeholder instructions={ element } />
-			);
-			const placeholderInstructions = placeholder.find( '.components-placeholder__instructions' );
-			expect( placeholderInstructions.exists() ).toBe( false );
-		} );
-
 		it( 'should display a fieldset from the children property', () => {
 			const element = <div>Fieldset</div>;
 			const placeholder = shallow( <Placeholder children={ element } /> );
