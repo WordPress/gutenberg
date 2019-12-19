@@ -3,7 +3,7 @@
  */
 import Mousetrap from 'mousetrap';
 import 'mousetrap/plugins/global-bind/mousetrap-global-bind';
-import { includes } from 'lodash';
+import { includes, compact } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -46,7 +46,7 @@ function useShortcut( name, callback, {
 	}, [ name ] );
 
 	useEffect( () => {
-		const shortcuts = [ combination, ...aliases ].filter( Boolean );
+		const shortcuts = compact( [ combination, ...aliases ] );
 		const mousetrap = new Mousetrap( target ? target.current : document );
 		const shortcutKeys = shortcuts.map( ( shortcut ) => {
 			return shortcut.modifier ?
