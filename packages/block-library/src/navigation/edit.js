@@ -183,7 +183,7 @@ function Navigation( {
 				>
 					<BlockNavigationList clientId={ clientId } />
 				</PanelBody>
-				<PanelBody title={ __( 'Text Settings' ) } className="blocks-font-size">
+				<PanelBody title={ __( 'Text Settings' ) }>
 					<FontSizePicker
 						value={ fontSize.size }
 						onChange={ setFontSize }
