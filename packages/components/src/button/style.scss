@@ -9,7 +9,7 @@
 	background: none;
 	transition: box-shadow 0.1s linear;
 	@include reduce-motion("transition");
-	height: 36px;
+	height: $icon-button-size;
 	align-items: center;
 	box-sizing: border-box;
 	padding: 0 8px;
