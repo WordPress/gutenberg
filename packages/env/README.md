@@ -43,7 +43,7 @@ Then, start the local environment:
 $ wp-env start
 ```
 
-Finally, navigate to http://localhost:8000 in your web browser to see WordPress running with the local WordPress plugin or theme running and activated.
+Finally, navigate to http://localhost:8888 in your web browser to see WordPress running with the local WordPress plugin or theme running and activated.
 
 ### Stopping the environment
 
