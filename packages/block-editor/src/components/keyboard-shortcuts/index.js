@@ -60,9 +60,9 @@ function KeyboardShortcuts() {
 			description: __( 'Remove multiple selected blocks.' ),
 			keyCombination: {
 				character: 'del',
-				aliases: [
-					'backspace',
-				],
+				aliases: [ {
+					character: 'backspace',
+				} ],
 			},
 		} );
 
