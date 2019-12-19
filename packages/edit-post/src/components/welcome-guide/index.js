@@ -23,6 +23,7 @@ export default function WelcomeGuide() {
 	return (
 		<Guide
 			className="edit-post-welcome-guide"
+			contentLabel={ __( 'Welcome to the Block Editor' ) }
 			finishButtonText={ __( 'Get started' ) }
 			onFinish={ () => toggleFeature( 'welcomeGuide' ) }
 		>
