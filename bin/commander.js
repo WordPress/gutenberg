@@ -237,8 +237,18 @@ async function updateThePluginStableVersion( version, abortMessage ) {
  */
 async function runCleanLocalCloneStep( abortMessage ) {
 	await runStep( 'Cleaning the temporary folder', abortMessage, async () => {
-		await rimraf( gitWorkingDirectoryPath );
-		await rimraf( svnWorkingDirectoryPath );
+		await Promise.all( [
+			gitWorkingDirectoryPath,
+			svnWorkingDirectoryPath,
+		].map( async ( directoryPath ) => {
+			if ( fs.existsSync( directoryPath ) ) {
+				await rimraf( directoryPath, ( err ) => {
+					if ( err ) {
+						throw err;
+					}
+				} );
+			}
+		} ) );
 	} );
 }
 
@@ -758,7 +768,8 @@ program
 
 		console.log(
 			'\n>> 🎉 WordPress packages are ready to publish.\n',
-			'Thanks for performing the prepublish process! and don\'t forget to run Lerna and let people know on WordPress Slack afterward.'
+			'Thanks for performing the prepublish process! You still need to run "npm run publish:prod" to perform the actual release.\n',
+			'Let also people know on WordPress Slack when everything is finished.'
 		);
 	} );
 
