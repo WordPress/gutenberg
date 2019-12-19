@@ -12,15 +12,14 @@ const getPackages = require( './packages' );
 getPackages().forEach( ( entry ) => {
 	const [ packageName, targetFiles ] = entry;
 
-	Object.entries( targetFiles ).forEach( ( [ token, target ] ) => {
-		// Note that this needs to be a sync process for each output file that is updated:
-		// until docgen provides a way to update many tokens at once, we need to make sure
-		// the output file is updated before starting the second pass for the next token.
+	Object.entries( targetFiles ).forEach( ( [ token, path ] ) => {
+		// Each target operates over the same file, so it needs to be processed synchronously,
+		// as to make sure the processes don't overwrite each other.
 		const { status, stderr } = spawnSync(
 			join( __dirname, '..', '..', 'node_modules', '.bin', 'docgen' ).replace( / /g, '\\ ' ),
 			[
-				target,
-				`--output docs/designers-developers/developers/data/data-${ packageName.replace( '/', '-' ) }.md`,
+				join( 'packages', packageName, path ),
+				`--output packages/${ packageName }/README.md`,
 				'--to-token',
 				`--use-token "${ token }"`,
 				'--ignore "/unstable|experimental/i"',

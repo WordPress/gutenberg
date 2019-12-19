@@ -174,7 +174,7 @@
 		"predev": "npm run check-engines",
 		"dev": "npm run build:packages && concurrently \"wp-scripts start\" \"npm run dev:packages\"",
 		"dev:packages": "node ./bin/packages/watch.js",
-		"docs:build": "node ./docs/tool/index.js && node ./bin/update-readmes.js",
+		"docs:build": "node ./docs/tool/index.js && node ./bin/api-docs/update-readmes.js",
 		"fixtures:clean": "rimraf \"packages/e2e-tests/fixtures/blocks/*.+(json|serialized.html)\"",
 		"fixtures:server-registered": "npm run wp-env run tests-wordpress-phpunit './bin/get-server-blocks.php > test/integration/full-content/server-registered.json'",
 		"fixtures:generate": "npm run fixtures:server-registered && cross-env GENERATE_MISSING_FIXTURES=y npm run test-unit",
@@ -233,10 +233,12 @@
 			"wp-scripts lint-js"
 		],
 		"{docs/{toc.json,tool/*.js},packages/{*/README.md,*/src/{actions,selectors}.js,components/src/*/**/README.md}}": [
-			"node ./docs/tool/index.js"
+			"node ./docs/tool/index.js",
+			"node ./docs/tool/are-data-files-unstaged.js"
 		],
 		"packages/**/*.js": [
-			"node ./bin/update-readmes.js"
+			"node ./bin/api-docs/update-readmes.js",
+			"node ./bin/api-docs/are-readmes-unstaged.js"
 		]
 	},
 	"wp-env": {
