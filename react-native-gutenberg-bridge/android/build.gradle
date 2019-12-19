@@ -79,6 +79,9 @@ group='com.github.wordpress-mobile.gutenberg-mobile'
 // fallback flag value for when lib is compiled individually (e.g. via jitpack)
 project.ext.buildGutenbergFromSource = false
 
+def hermesOriginalPath = "../../node_modules/hermes-engine/android/";
+def hermesPath = "../../bundle/";
+
 android {
     compileSdkVersion 28
 
@@ -121,7 +124,7 @@ dependencies {
     // Make sure to put android-jsc at the the first
 //    implementation "org.webkit:android-jsc:r241213"
     implementation project(':react-native-aztec')
-    def hermesPath = "../../node_modules/hermes-engine/android/";
+
     debugImplementation files(hermesPath + "hermes-debug.aar")
     releaseImplementation files(hermesPath + "hermes-release.aar")
 
@@ -145,10 +148,12 @@ dependencies {
         def rnVersion = readReactNativeVersion('../package.json', 'peerDependencies')
         implementation "com.facebook.react:react-native:${rnVersion}"
     }
+
 }
 
 if (isJitPack) {
     def assetsFolder = 'src/main/assets'
+    def aarFolder = 'src/main/assets'
 
     task buildJSBundle(type: YarnTask) {
         args = ['bundle:android']
@@ -157,6 +162,26 @@ if (isJitPack) {
     task ensureAssetsDirectory { 
         doLast {
             mkdir assetsFolder
+        }
+    }
+
+    task backupHermesDebugAAR(type: Copy) {
+        def origFileName = 'hermes-debug.aar'
+        def origWithPath = hermesOriginalPath + origFileName
+        from origWithPath
+        into hermesPath
+        doLast {
+            println "Done backing up Hermes debug AARs"
+        }
+    }
+
+    task backupHermesReleaseAAR(type: Copy) {
+        def origFileName = 'hermes-release.aar'
+        def origWithPath = hermesOriginalPath + origFileName
+        from origWithPath
+        into hermesPath
+        doLast {
+            println "Done backing up Hermes release AARs"
         }
     }
 
@@ -178,7 +203,9 @@ if (isJitPack) {
 
     if (isJitPack) {
         preBuild.dependsOn(cleanupNodeModulesFolder)
-        cleanupNodeModulesFolder.dependsOn(copyJSBundle)
+        cleanupNodeModulesFolder.dependsOn(backupHermesDebugAAR)
+        backupHermesDebugAAR.dependsOn(backupHermesReleaseAAR)
+        backupHermesReleaseAAR.dependsOn(copyJSBundle)
         copyJSBundle.dependsOn(buildJSBundle)
         buildJSBundle.dependsOn(yarn_install, ensureAssetsDirectory)
     }
