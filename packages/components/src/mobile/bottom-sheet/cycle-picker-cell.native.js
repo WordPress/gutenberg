@@ -16,14 +16,14 @@ export default function BottomSheetCyclePickerCell( props ) {
 	} = props;
 
 	const cycleOptionValue = () => {
-		return options[ ( findIndex( options, [ 'slug', value ] ) + 1 ) % options.length ].slug;
+		return options[ ( findIndex( options, [ 'value', value ] ) + 1 ) % options.length ].value;
 	};
 
 	return (
 		<Cell
 			onPress={ () => onChangeValue( cycleOptionValue() ) }
 			editable={ false }
-			value={ options[ findIndex( options, [ 'slug', value ] ) ].label }
+			value={ options[ findIndex( options, [ 'value', value ] ) ].label }
 			{ ...cellProps }
 		/>
 	);

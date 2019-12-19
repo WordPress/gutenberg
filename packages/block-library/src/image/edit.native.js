@@ -10,7 +10,7 @@ import {
 	requestImageUploadCancelDialog,
 	requestImageFullscreenPreview,
 } from 'react-native-gutenberg-bridge';
-import { isEmpty, get } from 'lodash';
+import { isEmpty, map, get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -289,6 +289,13 @@ export class ImageEdit extends React.Component {
 
 		const actions = [ { label: __( 'Clear All Settings' ), onPress: this.onClearSettings } ];
 
+		const getImageSizeOptions = () => map( imageSizes, ( { label, slug } ) => {
+			return {
+				value: slug,
+				label,
+			};
+		} );
+
 		const getToolbarEditButton = ( open ) => (
 			<BlockControls>
 				<ToolbarGroup>
@@ -328,12 +335,11 @@ export class ImageEdit extends React.Component {
 					{ // eslint-disable-next-line no-undef
 						image && __DEV__ &&
 						<SelectControl
-							hideCancelButton
 							icon={ 'editor-expand' }
 							label={ __( 'Size' ) }
 							value={ sizeSlug || DEFAULT_SIZE_SLUG }
 							onChangeValue={ ( newValue ) => this.onSetSizeSlug( newValue ) }
-							options={ imageSizes }
+							options={ getImageSizeOptions() }
 						/> }
 					<TextControl
 						icon={ 'editor-textcolor' }
