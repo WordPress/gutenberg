@@ -38,7 +38,6 @@
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/media-utils": "file:../media-utils",
 		"@wordpress/notices": "file:../notices",
-		"@wordpress/nux": "file:../nux",
 		"@wordpress/plugins": "file:../plugins",
 		"@wordpress/url": "file:../url",
 		"@wordpress/viewport": "file:../viewport",
