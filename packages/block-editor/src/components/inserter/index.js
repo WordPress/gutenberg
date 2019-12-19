@@ -33,10 +33,6 @@ const defaultRenderToggle = ( { onToggle, disabled, isOpen, blockTitle, hasSingl
 			icon="insert"
 			label={ label }
 			labelPosition="bottom"
-			onMouseDown={ ( event ) => {
-				event.preventDefault();
-				event.currentTarget.focus();
-			} }
 			onClick={ onToggle }
 			className="block-editor-inserter__toggle"
 			aria-haspopup={ ! hasSingleBlockType ? 'true' : false }
