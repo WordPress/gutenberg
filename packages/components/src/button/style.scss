@@ -228,6 +228,23 @@
 	}
 }
 
+.components-icon-button {
+	.dashicon {
+		display: inline-block;
+		flex: 0 0 auto;
+	}
+
+	// Ensure that even SVG icons that don't include the .dashicon class are colored.
+	svg {
+		fill: currentColor;
+		outline: none;
+	}
+
+	&.has-text svg {
+		margin-right: 8px;
+	}
+}
+
 @keyframes components-button__busy-animation {
 	0% {
 		background-position: 200px 0;
