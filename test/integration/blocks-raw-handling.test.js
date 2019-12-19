@@ -358,4 +358,9 @@ describe( 'rawHandler', () => {
 		const HTML = '<p>This is <u>ncorect</u></p>';
 		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
 	} );
+
+	it( 'should preserve alignment', () => {
+		const HTML = '<p style="text-align:center">center</p>';
+		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
+	} );
 } );

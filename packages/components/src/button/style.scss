@@ -9,12 +9,13 @@
 	background: none;
 	transition: box-shadow 0.1s linear;
 	@include reduce-motion("transition");
-	height: 36px;
+	height: $icon-button-size;
 	align-items: center;
 	box-sizing: border-box;
 	padding: 0 8px;
 	overflow: hidden;
 	border-radius: 3px;
+	color: $dark-gray-500;
 
 	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):not(.is-primary):not(.is-tertiary):not(.is-link):hover {
 		@include button-style__hover;

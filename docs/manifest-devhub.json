@@ -840,6 +840,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "StepperControl",
+		"slug": "stepper-control",
+		"markdown_source": "../packages/components/src/mobile/stepper-control/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Modal",
 		"slug": "modal",
 		"markdown_source": "../packages/components/src/modal/README.md",
@@ -1263,6 +1269,12 @@
 		"title": "@wordpress/edit-post",
 		"slug": "packages-edit-post",
 		"markdown_source": "../packages/edit-post/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/edit-site",
+		"slug": "packages-edit-site",
+		"markdown_source": "../packages/edit-site/README.md",
 		"parent": "packages"
 	},
 	{

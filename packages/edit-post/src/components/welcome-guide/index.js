@@ -12,11 +12,11 @@ import { __experimentalCreateInterpolateElement } from '@wordpress/element';
 import { CanvasImage, EditorImage, BlockLibraryImage, InserterIconImage } from './images';
 
 export default function WelcomeGuide() {
-	const areTipsEnabled = useSelect( ( select ) => select( 'core/nux' ).areTipsEnabled(), [] );
+	const isActive = useSelect( ( select ) => select( 'core/edit-post' ).isFeatureActive( 'welcomeGuide' ), [] );
 
-	const { disableTips } = useDispatch( 'core/nux' );
+	const { toggleFeature } = useDispatch( 'core/edit-post' );
 
-	if ( ! areTipsEnabled ) {
+	if ( ! isActive ) {
 		return null;
 	}
 
@@ -24,7 +24,7 @@ export default function WelcomeGuide() {
 		<Guide
 			className="edit-post-welcome-guide"
 			finishButtonText={ __( 'Get started' ) }
-			onFinish={ disableTips }
+			onFinish={ () => toggleFeature( 'welcomeGuide' ) }
 		>
 
 			<GuidePage className="edit-post-welcome-guide__page">
