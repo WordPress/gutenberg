@@ -150,14 +150,18 @@ export class ImageEdit extends React.Component {
 	}
 
 	onImagePressed() {
-		const { attributes } = this.props;
+		const { attributes, image } = this.props;
 
 		if ( this.state.isUploadInProgress ) {
 			requestImageUploadCancelDialog( attributes.id );
 		} else if ( attributes.id && ! isURL( attributes.url ) ) {
 			requestImageFailedRetryDialog( attributes.id );
 		} else if ( ! this.state.isCaptionSelected ) {
-			requestImageFullscreenPreview( attributes.url );
+			let original_url = undefined;
+			if ( image ) {
+				original_url = image.source_url;
+			}
+			requestImageFullscreenPreview( attributes.url, original_url );
 		}
 
 		this.setState( {
