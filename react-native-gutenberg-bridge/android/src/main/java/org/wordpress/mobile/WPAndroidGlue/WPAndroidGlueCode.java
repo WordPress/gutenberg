@@ -17,6 +17,7 @@ import androidx.core.util.Consumer;
 import androidx.fragment.app.Fragment;
 
 import com.brentvatne.react.ReactVideoPackage;
+import com.facebook.hermes.reactexecutor.HermesExecutorFactory;
 import com.facebook.imagepipeline.backends.okhttp3.OkHttpImagePipelineConfigFactory;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import com.facebook.react.ReactInstanceManager;
@@ -343,6 +344,7 @@ public class WPAndroidGlueCode {
                                     .setJSMainModulePath("index")
                                     .addPackages(getPackages())
                                     .setUseDeveloperSupport(isDebug)
+                                    .setJavaScriptExecutorFactory(new HermesExecutorFactory())
                                     .setInitialLifecycleState(LifecycleState.BEFORE_CREATE);
         if (!buildGutenbergFromSource) {
             builder.setBundleAssetName("index.android.bundle");
