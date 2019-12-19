@@ -22,7 +22,7 @@ import {
 	isUnmodifiedDefaultBlock,
 	getUnregisteredTypeHandlerName,
 } from '@wordpress/blocks';
-import { KeyboardShortcuts, withFilters } from '@wordpress/components';
+import { KeyboardShortcuts, withFilters, Popover } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	withDispatch,
@@ -522,6 +522,7 @@ function BlockListBlock( {
 			// If the toolbar is being shown because of being forced
 			// it should focus the toolbar right after the mount.
 			focusOnMount={ isForcingContextualToolbar.current }
+			data-align={ wrapperProps ? wrapperProps[ 'data-align' ] : undefined }
 		/>
 	);
 
@@ -576,31 +577,44 @@ function BlockListBlock( {
 					/>
 				) }
 				{ shouldRenderMovers && ( moverDirection === 'vertical' ) && blockMover }
-				{ shouldShowBreadcrumb && (
-					<BlockBreadcrumb
-						clientId={ clientId }
-						ref={ breadcrumb }
-					/>
-				) }
-
 				{ ( isCapturingDescendantToolbars ) && (
 					// A slot made available on all ancestors of the selected Block
 					// to allow child Blocks to render their toolbars into the DOM
 					// of the appropriate parent.
 					<ChildToolbarSlot />
 				) }
-
-				{ ( ! ( hasAncestorCapturingToolbars ) ) && ( shouldShowContextualToolbar || isForcingContextualToolbar.current ) && renderBlockContextualToolbar() }
-
-				{ ( hasAncestorCapturingToolbars ) && ( shouldShowContextualToolbar || isForcingContextualToolbar.current ) && (
-					// If the parent Block is set to consume toolbars of the child Blocks
-					// then render the child Block's toolbar into the Slot provided
-					// by the parent.
-					<ChildToolbar>
-						{ renderBlockContextualToolbar() }
-					</ChildToolbar>
+				{ ( shouldShowBreadcrumb || shouldShowContextualToolbar || isForcingContextualToolbar.current ) && (
+					<Popover
+						noArrow
+						animate={ false }
+						// Position above the anchor, pop out towards the right,
+						// and position in the left corner.
+						// To do: refactor `Popover` to make this prop clearer.
+						position="top right left"
+						focusOnMount={ false }
+						anchorRef={ blockNodeRef.current }
+						className="block-editor-block-list__block-popover"
+						__unstableSticky={ isPartOfMultiSelection ? '.wp-block.is-multi-selected' : true }
+						__unstableSlotName="block-toolbar"
+					>
+						{ ! hasAncestorCapturingToolbars && ( shouldShowContextualToolbar || isForcingContextualToolbar.current ) && renderBlockContextualToolbar() }
+						{ hasAncestorCapturingToolbars && ( shouldShowContextualToolbar || isForcingContextualToolbar.current ) && (
+							// If the parent Block is set to consume toolbars of the child Blocks
+							// then render the child Block's toolbar into the Slot provided
+							// by the parent.
+							<ChildToolbar>
+								{ renderBlockContextualToolbar() }
+							</ChildToolbar>
+						) }
+						{ shouldShowBreadcrumb && (
+							<BlockBreadcrumb
+								clientId={ clientId }
+								ref={ breadcrumb }
+								data-align={ wrapperProps ? wrapperProps[ 'data-align' ] : undefined }
+							/>
+						) }
+					</Popover>
 				) }
-
 				{
 					! isNavigationMode &&
 					! shouldShowContextualToolbar &&

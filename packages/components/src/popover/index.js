@@ -224,6 +224,8 @@ const Popover = ( {
 	animate = true,
 	onClickOutside,
 	onFocusOutside,
+	__unstableSticky,
+	__unstableSlotName = SLOT_NAME,
 	/* eslint-enable no-unused-vars */
 	...contentProps
 } ) => {
@@ -276,7 +278,7 @@ const Popover = ( {
 				yAxis,
 				contentHeight,
 				contentWidth,
-			} = computePopoverPosition( anchor, contentRect.current, position );
+			} = computePopoverPosition( anchor, contentRect.current, position, __unstableSticky, anchorRef );
 
 			setClass( containerEl, 'is-without-arrow', noArrow || ( xAxis === 'center' && yAxis === 'middle' ) );
 			setAttribute( containerEl, 'data-x-axis', xAxis );
@@ -337,6 +339,7 @@ const Popover = ( {
 		anchorRef,
 		shouldAnchorIncludePadding,
 		position,
+		__unstableSticky,
 	] );
 
 	useFocusContentOnMount( focusOnMount, contentRef );
@@ -452,8 +455,8 @@ const Popover = ( {
 			{ ( { getSlot } ) => {
 				// In case there is no slot context in which to render,
 				// default to an in-place rendering.
-				if ( getSlot && getSlot( SLOT_NAME ) ) {
-					content = <Fill name={ SLOT_NAME }>{ content }</Fill>;
+				if ( getSlot && getSlot( __unstableSlotName ) ) {
+					content = <Fill name={ __unstableSlotName }>{ content }</Fill>;
 				}
 
 				return (
@@ -469,6 +472,7 @@ const Popover = ( {
 
 const PopoverContainer = Popover;
 
-PopoverContainer.Slot = () => <Slot bubblesVirtually name={ SLOT_NAME } />;
+PopoverContainer.Slot = ( { name = SLOT_NAME } ) =>
+	<Slot bubblesVirtually name={ name } />;
 
 export default PopoverContainer;

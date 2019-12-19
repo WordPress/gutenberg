@@ -9,6 +9,10 @@
 	}
 }
 
+.components-popover .editor-block-contextual-toolbar[data-type="core/column"] {
+	margin-left: 0;
+}
+
 .wp-block-columns {
 	display: block;
 
@@ -89,10 +93,6 @@
 				&::before {
 					left: 0;
 					right: 0;
-				}
-
-				> .block-editor-block-contextual-toolbar {
-					margin-left: -$border-width;
 				}
 
 				// Zero out margins.

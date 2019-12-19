@@ -23,6 +23,8 @@ const navigateToContentEditorTop = async () => {
 };
 
 const tabThroughParagraphBlock = async ( paragraphText ) => {
+	await tabThroughBlockToolbar();
+
 	await page.keyboard.press( 'Tab' );
 	await expect( await getActiveLabel() ).toBe( 'Block: Paragraph' );
 
@@ -30,7 +32,6 @@ const tabThroughParagraphBlock = async ( paragraphText ) => {
 	await expect( await getActiveLabel() ).toBe( 'Add block' );
 
 	await tabThroughBlockMoverControl();
-	await tabThroughBlockToolbar();
 
 	await page.keyboard.press( 'Tab' );
 	await expect( await getActiveLabel() ).toBe( 'Paragraph block' );
