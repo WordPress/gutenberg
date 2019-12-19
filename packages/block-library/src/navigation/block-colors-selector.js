@@ -54,7 +54,7 @@ const renderToggleComponent = ( { value } ) => ( { onToggle, isOpen } ) => {
 	return (
 		<ToolbarGroup>
 			<IconButton
-				className="components-icon-button components-toolbar__control block-library-colors-selector__toggle"
+				className="components-toolbar__control block-library-colors-selector__toggle"
 				label={ __( 'Open Colors Selector' ) }
 				onClick={ onToggle }
 				onKeyDown={ openOnArrowDown }

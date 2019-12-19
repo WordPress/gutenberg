@@ -221,27 +221,27 @@
 		}
 	}
 
+	&.has-icon {
+		.dashicon {
+			display: inline-block;
+			flex: 0 0 auto;
+		}
+
+		// Ensure that even SVG icons that don't include the .dashicon class are colored.
+		svg {
+			fill: currentColor;
+			outline: none;
+		}
+
+		&.has-text svg {
+			margin-right: 8px;
+		}
+	}
+
 	// Fixes a Safari+VoiceOver bug, where the screen reader text is announced not respecting the source order.
 	// See https://core.trac.wordpress.org/ticket/42006 and https://github.com/h5bp/html5-boilerplate/issues/1985
 	.screen-reader-text {
 		height: auto;
-	}
-}
-
-.components-icon-button {
-	.dashicon {
-		display: inline-block;
-		flex: 0 0 auto;
-	}
-
-	// Ensure that even SVG icons that don't include the .dashicon class are colored.
-	svg {
-		fill: currentColor;
-		outline: none;
-	}
-
-	&.has-text svg {
-		margin-right: 8px;
 	}
 }
 
