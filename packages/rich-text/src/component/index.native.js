@@ -411,6 +411,10 @@ export class RichText extends Component {
 	onBlur( event ) {
 		this.isTouched = false;
 
+		if ( event.nativeEvent.text !== this.props.value ) {
+			this.onTextUpdate( event );
+		}
+
 		if ( this.props.onBlur ) {
 			this.props.onBlur( event );
 		}
