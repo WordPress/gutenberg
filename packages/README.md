@@ -1,6 +1,6 @@
 # Managing Packages
 
-This repository uses [lerna] to manage WordPress modules and publish them as packages to [npm].
+This repository consists of JavaScript packages used in Gutenberg and uses [lerna] to manage WordPress modules and publish them as packages to [npm].
 
 ## Creating a New Package
 
