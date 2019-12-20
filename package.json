@@ -179,5 +179,8 @@
     "traverse": "^0.6.6",
     "turbo-combine-reducers": "^1.0.2",
     "underscore": "^1.9.1"
+  },
+  "resolutions": {
+    "lodash": "4.17.13"
   }
 }
