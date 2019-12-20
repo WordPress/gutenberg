@@ -324,6 +324,9 @@ const Popover = ( {
 
 		// Height may still adjust between now and the next tick.
 		const timeoutId = window.setTimeout( refresh );
+		const refreshOnAnimationFrame = () => {
+			window.requestAnimationFrame( refresh );
+		};
 
 		/*
 		 * There are sometimes we need to reposition or resize the popover that
@@ -335,12 +338,14 @@ const Popover = ( {
 		const intervalHandle = window.setInterval( refresh, 500 );
 		window.addEventListener( 'resize', refresh );
 		window.addEventListener( 'scroll', refresh, true );
+		window.addEventListener( 'click', refreshOnAnimationFrame );
 
 		return () => {
 			window.clearTimeout( timeoutId );
 			window.clearInterval( intervalHandle );
 			window.removeEventListener( 'resize', refresh );
 			window.removeEventListener( 'scroll', refresh, true );
+			window.addEventListener( 'click', refreshOnAnimationFrame );
 		};
 	}, [
 		isExpanded,
