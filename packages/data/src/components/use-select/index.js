@@ -92,7 +92,7 @@ export default function useSelect( _mapSelect, deps ) {
 	const latestIsAsync = useRef( isAsync );
 	const latestMapOutput = useRef();
 	const latestMapOutputError = useRef();
-	const isMounted = useRef();
+	const isMountedAndNotUnsubscribing = useRef();
 
 	let mapOutput;
 
@@ -118,7 +118,7 @@ export default function useSelect( _mapSelect, deps ) {
 		latestMapSelect.current = mapSelect;
 		latestMapOutput.current = mapOutput;
 		latestMapOutputError.current = undefined;
-		isMounted.current = true;
+		isMountedAndNotUnsubscribing.current = true;
 
 		// This has to run after the other ref updates
 		// to avoid using stale values in the flushed
@@ -132,7 +132,7 @@ export default function useSelect( _mapSelect, deps ) {
 
 	useIsomorphicLayoutEffect( () => {
 		const onStoreChange = () => {
-			if ( isMounted.current ) {
+			if ( isMountedAndNotUnsubscribing.current ) {
 				try {
 					const newMapOutput = latestMapSelect.current(
 						registry.select,
@@ -166,7 +166,7 @@ export default function useSelect( _mapSelect, deps ) {
 		} );
 
 		return () => {
-			isMounted.current = false;
+			isMountedAndNotUnsubscribing.current = false;
 			unsubscribe();
 			renderQueue.flush( queueContext );
 		};
