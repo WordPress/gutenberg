@@ -354,7 +354,7 @@ Returns all the block categories.
 
 _Returns_
 
--   `Array<Object>`: Block categories.
+-   `Array<WPBlockCategory>`: Block categories.
 
 <a name="getChildBlockNames" href="#getChildBlockNames">#</a> **getChildBlockNames**
 
@@ -687,7 +687,7 @@ Sets the block categories.
 
 _Parameters_
 
--   _categories_ `Array<Object>`: Block categories.
+-   _categories_ `Array<WPBlockCategory>`: Block categories.
 
 <a name="setDefaultBlockName" href="#setDefaultBlockName">#</a> **setDefaultBlockName**
 
@@ -789,7 +789,7 @@ Updates a category.
 _Parameters_
 
 -   _slug_ `string`: Block category slug.
--   _category_ `Object`: Object containing the category properties that should be updated.
+-   _category_ `WPBlockCategory`: Object containing the category properties that should be updated.
 
 <a name="withBlockContentContext" href="#withBlockContentContext">#</a> **withBlockContentContext**
 
