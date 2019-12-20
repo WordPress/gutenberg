@@ -1913,9 +1913,9 @@
     xcode "^2.0.0"
     xmldoc "^0.4.0"
 
-"@react-native-community/slider@git+https://github.com/wordpress-mobile/react-native-slider.git#e20f268e61327321a5bbd66afc5238388d65f2a4":
+"@react-native-community/slider@git+https://github.com/wordpress-mobile/react-native-slider.git#1ac7533fad0eb7f091d1ea501010b113efa2e5f8":
   version "2.0.7"
-  resolved "git+https://github.com/wordpress-mobile/react-native-slider.git#e20f268e61327321a5bbd66afc5238388d65f2a4"
+  resolved "git+https://github.com/wordpress-mobile/react-native-slider.git#1ac7533fad0eb7f091d1ea501010b113efa2e5f8"
 
 "@tannin/compile@^1.0.3":
   version "1.0.3"
@@ -11012,13 +11012,13 @@ react-native-sass-transformer@^1.1.1:
     css-to-react-native-transform "^1.8.1"
     semver "^5.6.0"
 
-"react-native-svg@git+https://github.com/wordpress-mobile/react-native-svg.git#f16e9adae71c6cf3158f2356cf95fff5c2075e0f":
+"react-native-svg@git+https://github.com/wordpress-mobile/react-native-svg.git#a3f32b1af83e0100d10516fe58ba8a0096362b62":
   version "9.3.3-gb"
-  resolved "git+https://github.com/wordpress-mobile/react-native-svg.git#f16e9adae71c6cf3158f2356cf95fff5c2075e0f"
+  resolved "git+https://github.com/wordpress-mobile/react-native-svg.git#a3f32b1af83e0100d10516fe58ba8a0096362b62"
 
-"react-native-video@git+https://github.com/wordpress-mobile/react-native-video.git#3a0e2fa6fc6bf1fe1a54adb2dbf94545b28c2bc4":
+"react-native-video@git+https://github.com/wordpress-mobile/react-native-video.git#a0bb36a1ad684c2c1ba591c44f7e4d89502bf2d0":
   version "4.4.1"
-  resolved "git+https://github.com/wordpress-mobile/react-native-video.git#3a0e2fa6fc6bf1fe1a54adb2dbf94545b28c2bc4"
+  resolved "git+https://github.com/wordpress-mobile/react-native-video.git#a0bb36a1ad684c2c1ba591c44f7e4d89502bf2d0"
   dependencies:
     keymirror "^0.1.1"
     prop-types "^15.5.10"
