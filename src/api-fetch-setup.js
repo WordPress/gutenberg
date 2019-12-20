@@ -28,7 +28,7 @@ const fetchHandler = ( { path }, retries = 20 ) => {
 
 	return responsePromise.then( parseResponse ).catch( ( error ) => {
 		// eslint-disable-next-line no-console
-		console.warn( 'Network Error: ', JSON.stringify( error, null, 2) );
+		console.warn( 'Network Error: ', JSON.stringify( error, null, 2 ) );
 		if ( error.code >= 400 && error.code < 600 ) {
 			return Promise.reject( error );
 		} else if ( retries === 0 ) {
