@@ -1,6 +1,6 @@
 {
   "name": "gutenberg-mobile",
-  "version": "1.18.0",
+  "version": "1.19.0",
   "private": true,
   "config": {
     "jsfiles": "./*.js src/*.js src/**/*.js src/**/**/*.js",
@@ -139,7 +139,7 @@
   "dependencies": {
     "@babel/runtime": "^7.3.1",
     "@react-native-community/cli": "^1.5.2",
-    "@react-native-community/slider": "git+https://github.com/wordpress-mobile/react-native-slider.git#e20f268e61327321a5bbd66afc5238388d65f2a4",
+    "@react-native-community/slider": "git+https://github.com/wordpress-mobile/react-native-slider.git#f5d8685ffa389c78a8713162b1e2821067ad214f",
     "classnames": "^2.2.5",
     "dom-react": "^2.2.1",
     "domutils": "^1.7.0",
@@ -166,8 +166,8 @@
     "react-native-modal": "^6.5.0",
     "react-native-recyclerview-list": "git+https://github.com/wordpress-mobile/react-native-recyclerview-list.git#eadaa2f62d2f488d4dc80f9148e52b62047297ab",
     "react-native-safe-area": "^0.5.0",
-    "react-native-svg": "git+https://github.com/wordpress-mobile/react-native-svg.git#f16e9adae71c6cf3158f2356cf95fff5c2075e0f",
-    "react-native-video": "git+https://github.com/wordpress-mobile/react-native-video.git#3a0e2fa6fc6bf1fe1a54adb2dbf94545b28c2bc4",
+    "react-native-svg": "git+https://github.com/wordpress-mobile/react-native-svg.git#d466eb06a38e6f553f08666f0ca784d47fd6f724",
+    "react-native-video": "git+https://github.com/wordpress-mobile/react-native-video.git#6c75579a95a6ddb3762b6e11ef004c2cd0bed537",
     "react-redux": "^5.0.7",
     "redux": "^3.7.2",
     "redux-multi": "^0.1.12",
