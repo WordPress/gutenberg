@@ -85,6 +85,13 @@ export {
 	Consumer as __experimentalSlotFillConsumer,
 } from './slot-fill';
 
+export {
+	createSlotFill as __experimentalCreateSlotFill,
+	Slot as __experimentalSlot,
+	Fill as __experimentalFill,
+	SlotFillProvider as __experimentalSlotFillProvider,
+} from './slot-fill2';
+
 // Higher-Order Components
 export { default as navigateRegions } from './higher-order/navigate-regions';
 export {
