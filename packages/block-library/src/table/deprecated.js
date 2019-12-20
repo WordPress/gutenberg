@@ -15,6 +15,10 @@ const supports = {
 const deprecated = [
 	{
 		attributes: {
+			hasFixedLayout: {
+				type: 'boolean',
+				default: false,
+			},
 			backgroundColor: {
 				type: 'string',
 			},
