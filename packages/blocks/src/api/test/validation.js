@@ -274,6 +274,23 @@ describe( 'validation', () => {
 
 			expect( isEqual ).toBe( true );
 		} );
+
+		it( 'returns true if case-insensitive equal pairs', () => {
+			const isEqual = isEqualTagAttributePairs(
+				[
+					[ 'ID', 'foo' ],
+					[ 'class', 'a b' ],
+					[ 'Style', 'color: red;' ],
+				],
+				[
+					[ 'id', 'foo' ],
+					[ 'CLASS', 'a b' ],
+					[ 'style', 'color: red;' ],
+				]
+			);
+
+			expect( isEqual ).toBe( true );
+		} );
 	} );
 
 	describe( 'isEqualTokensOfType', () => {
@@ -323,6 +340,27 @@ describe( 'validation', () => {
 						attributes: [
 							[ 'class', 'c  a b' ],
 							[ 'style', 'background-image: url( "https://wordpress.org/img.png" ); color: red;' ],
+						],
+					}
+				);
+
+				expect( isEqual ).toBe( true );
+			} );
+
+			it( 'returns true if tag and attributes names are case insensitive the same', () => {
+				const isEqual = isEqualTokensOfType.StartTag(
+					{
+						tagName: 'P',
+						attributes: [
+							[ 'CLASS', 'a b' ],
+							[ 'style', 'color: red;' ],
+						],
+					},
+					{
+						tagName: 'p',
+						attributes: [
+							[ 'class', 'a b' ],
+							[ 'Style', 'color: red;' ],
 						],
 					}
 				);
