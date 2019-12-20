@@ -643,6 +643,7 @@ export class RichText extends Component {
 			__unstableIsSelected: isSelected,
 			children,
 			getStylesFromColorScheme,
+			formatTypes,
 		} = this.props;
 
 		const record = this.getRecord();
@@ -756,7 +757,11 @@ export class RichText extends Component {
 					isMultiline={ this.isMultiline }
 					textAlign={ this.props.textAlign }
 				/>
-				{ isSelected && <FormatEdit value={ record } onChange={ this.onFormatChange } /> }
+				{ isSelected && <FormatEdit
+					formatTypes={ formatTypes }
+					value={ record }
+					onChange={ this.onFormatChange }
+				/> }
 			</View>
 		);
 	}

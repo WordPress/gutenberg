@@ -1,6 +1,6 @@
 # PluginPostStatusInfo
 
-This slots allows for the insertion of items in the Status & Visibility panel of the document sidebar.
+This slots allows for the insertion of items in the Status & visibility panel of the document sidebar.
 
 ## Example
 
@@ -22,5 +22,5 @@ registerPlugin( 'post-status-info-test', { render: PluginPostStatusInfoTest } );
 
 ## Location
 
-![Location in the Status & Visibility panel](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/assets/plugin-post-status-info-location.png?raw=true)
+![Location in the Status & visibility panel](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/assets/plugin-post-status-info-location.png?raw=true)
 

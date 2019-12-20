@@ -1,14 +1,7 @@
 /**
- * External dependencies
- */
-import { mapKeys } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { select, dispatch, withSelect, withDispatch } from '@wordpress/data';
-import { addFilter } from '@wordpress/hooks';
-import { compose } from '@wordpress/compose';
+import { select, dispatch } from '@wordpress/data';
 
 /**
  * @typedef {Object} WPFormat
@@ -131,81 +124,6 @@ export function registerFormatType( name, settings ) {
 	}
 
 	dispatch( 'core/rich-text' ).addFormatTypes( settings );
-
-	if ( settings.__experimentalCreatePrepareEditableTree ) {
-		addFilter( 'experimentalRichText', name, ( OriginalComponent ) => {
-			const selectPrefix = `format_prepare_props_(${ name })_`;
-			const dispatchPrefix = `format_on_change_props_(${ name })_`;
-
-			const Component = ( props ) => {
-				const newProps = { ...props };
-				const propsByPrefix = Object.keys( props ).reduce( ( accumulator, key ) => {
-					if ( key.startsWith( selectPrefix ) ) {
-						accumulator[ key.slice( selectPrefix.length ) ] = props[ key ];
-					}
-
-					if ( key.startsWith( dispatchPrefix ) ) {
-						accumulator[ key.slice( dispatchPrefix.length ) ] = props[ key ];
-					}
-
-					return accumulator;
-				}, {} );
-				const args = {
-					richTextIdentifier: props.identifier,
-					blockClientId: props.clientId,
-				};
-
-				if ( settings.__experimentalCreateOnChangeEditableValue ) {
-					newProps[ `format_value_functions_(${ name })` ] =
-						settings.__experimentalCreatePrepareEditableTree(
-							propsByPrefix,
-							args
-						);
-					newProps[ `format_on_change_functions_(${ name })` ] =
-						settings.__experimentalCreateOnChangeEditableValue(
-							propsByPrefix,
-							args
-						);
-				} else {
-					newProps[ `format_prepare_functions_(${ name })` ] =
-						settings.__experimentalCreatePrepareEditableTree(
-							propsByPrefix,
-							args
-						);
-				}
-
-				return <OriginalComponent { ...newProps } />;
-			};
-
-			const hocs = [];
-
-			if ( settings.__experimentalGetPropsForEditableTreePreparation ) {
-				hocs.push( withSelect( ( sel, { clientId, identifier } ) =>
-					mapKeys(
-						settings.__experimentalGetPropsForEditableTreePreparation( sel, {
-							richTextIdentifier: identifier,
-							blockClientId: clientId,
-						} ),
-						( value, key ) => selectPrefix + key
-					)
-				) );
-			}
-
-			if ( settings.__experimentalGetPropsForEditableTreeChangeHandler ) {
-				hocs.push( withDispatch( ( disp, { clientId, identifier } ) =>
-					mapKeys(
-						settings.__experimentalGetPropsForEditableTreeChangeHandler( disp, {
-							richTextIdentifier: identifier,
-							blockClientId: clientId,
-						} ),
-						( value, key ) => dispatchPrefix + key
-					)
-				) );
-			}
-
-			return hocs.length ? compose( hocs )( Component ) : Component;
-		} );
-	}
 
 	return settings;
 }
