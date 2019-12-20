@@ -1,9 +1,9 @@
 package org.wordpress.mobile.WPAndroidGlue;
 
+import android.os.Bundle;
+
 import androidx.core.util.Consumer;
 
-import java.util.Map;
-
 public interface RequestExecutor {
-    void performRequest(String path, Consumer<String> onSuccess, Consumer<Map<String, Object>> onError);
+    void performRequest(String path, Consumer<String> onSuccess, Consumer<Bundle> onError);
 }

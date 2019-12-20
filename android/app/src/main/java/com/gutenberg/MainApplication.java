@@ -1,6 +1,7 @@
 package com.gutenberg;
 
 import android.app.Application;
+import android.os.Bundle;
 import android.util.Log;
 
 import androidx.core.util.Consumer;
@@ -25,7 +26,6 @@ import com.facebook.soloader.SoLoader;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 public class MainApplication extends Application implements ReactApplication {
 
@@ -115,7 +115,7 @@ public class MainApplication extends Application implements ReactApplication {
             }
 
             @Override
-            public void performRequest(String path, Consumer<String> onSuccess, Consumer<Map<String, Object>> onError) {}
+            public void performRequest(String path, Consumer<String> onSuccess, Consumer<Bundle> onError) {}
         });
 
         return new ReactNativeHost(this) {

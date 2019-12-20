@@ -192,13 +192,13 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     public void fetchRequest(String path, Promise promise) {
         mGutenbergBridgeJS2Parent.performRequest(path,
                 promise::resolve,
-                errorMap -> {
-                    Object code = errorMap.remove("code");
-                    WritableMap writableMap = Arguments.makeNativeMap(errorMap);
-                    if (code == null) {
-                        promise.reject(new Error(), writableMap);
+                errorBundle -> {
+                    WritableMap writableMap = Arguments.makeNativeMap(errorBundle);
+                    if (writableMap.hasKey("code")) {
+                        String code = String.valueOf(writableMap.getInt("code"));
+                        promise.reject(code, new Error(), writableMap);
                     } else {
-                        promise.reject(String.valueOf(code), new Error(), writableMap);
+                        promise.reject(new Error(), writableMap);
                     }
                 });
     }

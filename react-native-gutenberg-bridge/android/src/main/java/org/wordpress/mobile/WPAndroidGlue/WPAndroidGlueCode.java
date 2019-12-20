@@ -296,7 +296,7 @@ public class WPAndroidGlueCode {
             }
 
             @Override
-            public void performRequest(String pathFromJS, Consumer<String> onSuccess, Consumer<Map<String, Object>> onError) {
+            public void performRequest(String pathFromJS, Consumer<String> onSuccess, Consumer<Bundle> onError) {
                 mRequestExecutor.performRequest(pathFromJS, onSuccess, onError);
             }
 
