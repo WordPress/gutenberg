@@ -85,19 +85,6 @@ function computeAnchorRect(
 	return withoutPadding( rect, parentNode );
 }
 
-function addBuffer( rect, verticalBuffer = 0, horizontalBuffer = 0 ) {
-	return {
-		x: rect.left - horizontalBuffer,
-		y: rect.top - verticalBuffer,
-		width: rect.width + ( 2 * horizontalBuffer ),
-		height: rect.height + ( 2 * verticalBuffer ),
-		left: rect.left - horizontalBuffer,
-		right: rect.right + horizontalBuffer,
-		top: rect.top - verticalBuffer,
-		bottom: rect.bottom + verticalBuffer,
-	};
-}
-
 function withoutPadding( rect, element ) {
 	const {
 		paddingTop,
@@ -231,8 +218,6 @@ const Popover = ( {
 	focusOnMount = 'firstElement',
 	anchorRef,
 	shouldAnchorIncludePadding,
-	anchorVerticalBuffer,
-	anchorHorizontalBuffer,
 	anchorRect,
 	getAnchorRect,
 	expandOnMobile,
@@ -268,7 +253,7 @@ const Popover = ( {
 		}
 
 		const refresh = () => {
-			let anchor = computeAnchorRect(
+			const anchor = computeAnchorRect(
 				anchorRefFallback,
 				anchorRect,
 				getAnchorRect,
@@ -279,12 +264,6 @@ const Popover = ( {
 			if ( ! anchor ) {
 				return;
 			}
-
-			anchor = addBuffer(
-				anchor,
-				anchorVerticalBuffer,
-				anchorHorizontalBuffer
-			);
 
 			if ( ! contentRect.current ) {
 				contentRect.current = contentEl.getBoundingClientRect();
@@ -357,8 +336,6 @@ const Popover = ( {
 		getAnchorRect,
 		anchorRef,
 		shouldAnchorIncludePadding,
-		anchorVerticalBuffer,
-		anchorHorizontalBuffer,
 		position,
 	] );
 
