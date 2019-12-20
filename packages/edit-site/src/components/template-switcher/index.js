@@ -1,10 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
 import { useState, useCallback } from '@wordpress/element';
 import {
+	Tooltip,
+	Icon,
 	DropdownMenu,
 	MenuGroup,
 	MenuItemsChoice,
@@ -15,6 +17,24 @@ import {
  * Internal dependencies
  */
 import AddTemplate from '../add-template';
+
+function TemplateLabel( { template } ) {
+	return (
+		<div className="edit-site-template-switcher__label">
+			{ template.slug }{ ' ' }
+			{ template.status !== 'auto-draft' && (
+				<Tooltip text={ __( 'Customized' ) }>
+					<div className="edit-site-template-switcher__label-customized-icon-container">
+						<Icon
+							icon="marker"
+							className="edit-site-template-switcher__label-customized-icon-icon"
+						/>
+					</div>
+				</Tooltip>
+			) }
+		</div>
+	);
+}
 
 export default function TemplateSwitcher( {
 	ids,
@@ -32,15 +52,25 @@ export default function TemplateSwitcher( {
 				templates: ids.map( ( id ) => {
 					const template = getEntityRecord( 'postType', 'wp_template', id );
 					return {
-						label: template ? template.slug : __( 'loading…' ),
+						label: template ? (
+							<TemplateLabel template={ template } />
+						) : (
+							__( 'loading…' )
+						),
 						value: id,
+						slug: template ? template.slug : __( 'loading…' ),
 					};
 				} ),
 				templateParts: templatePartIds.map( ( id ) => {
 					const template = getEntityRecord( 'postType', 'wp_template_part', id );
 					return {
-						label: template ? template.slug : __( 'loading…' ),
+						label: template ? (
+							<TemplateLabel template={ template } />
+						) : (
+							__( 'loading…' )
+						),
 						value: id,
+						slug: template ? template.slug : __( 'loading…' ),
 					};
 				} ),
 			};
@@ -56,7 +86,7 @@ export default function TemplateSwitcher( {
 				toggleProps={ {
 					children: ( isTemplatePart ? templateParts : templates ).find(
 						( choice ) => choice.value === activeId
-					).label,
+					).slug,
 				} }
 			>
 				{ ( { onClose } ) => (
