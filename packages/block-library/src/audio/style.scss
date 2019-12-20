@@ -1,0 +1,17 @@
+.wp-block-audio {
+	// Supply caption styles to audio blocks, even if the theme hasn't opted in.
+	// Reason being: the new markup, <figcaptions>, are not likely to be styled in the majority of existing themes,
+	// so we supply the styles so as to not appear broken or unstyled in those themes.
+	figcaption {
+		@include caption-style();
+	}
+
+	// Show full-width when not aligned.
+	audio {
+		width: 100%;
+
+		// The browser natively applies a 300px width to the audio block.
+		// We restore this as a min-width instead, for alignments.
+		min-width: 300px;
+	}
+}

@@ -1,0 +1,22 @@
+.floatingToolbar {
+	background-color: $dark-gray-500;
+	margin: auto;
+	min-width: 100;
+	max-height: $floating-toolbar-height;
+	border-radius: 22px;
+	flex-direction: row;
+	z-index: 100;
+	height: $floating-toolbar-height;
+	align-items: center;
+	justify-content: center;
+	align-self: center;
+	margin-bottom: 8px;
+}
+
+.floatingToolbarFillColor {
+	background-color: rgba(#1d2327, 0.85);
+}
+
+.floatingToolbarFillColorDark {
+	background-color: rgba(#3c434a, 0.85);
+}

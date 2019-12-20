@@ -1,0 +1,14 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`PostSavedState returns a switch to draft link if the post is published 1`] = `<WithSelect(WithDispatch(PostSwitchToDraftButton)) />`;
+
+exports[`PostSavedState should return Save button if edits to be saved 1`] = `
+<ForwardRef(Button)
+  className="editor-post-save-draft"
+  isTertiary={true}
+  onClick={[Function]}
+  shortcut="Ctrl+S"
+>
+  Save Draft
+</ForwardRef(Button)>
+`;

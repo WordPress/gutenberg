@@ -1,0 +1,55 @@
+.components-accessible-toolbar {
+	// Required for IE11.
+	display: inline-flex;
+
+	// IE11 doesn't read rules inside this query. They are applied only to modern browsers.
+	@supports (position: sticky) {
+		display: flex;
+	}
+
+	flex-shrink: 0;
+}
+
+// We should extract this to a separate component.
+.components-tab-button {
+	padding: 3px;
+	color: $dark-gray-500;
+	height: $icon-button-size;
+	font-weight: 500;
+
+	&.is-pressed,
+	&.is-pressed:hover {
+		color: $white;
+	}
+
+	&:disabled {
+		cursor: default;
+	}
+
+	& > span {
+		border: $border-width solid transparent;
+		padding: 0 6px;
+		box-sizing: content-box;
+		height: 28px;
+		line-height: 28px;
+	}
+
+	&:hover > span,
+	&:focus > span {
+		color: $dark-gray-500;
+	}
+
+	&:not(:disabled) {
+		&.is-pressed > span,
+		&:hover > span,
+		&:focus > span {
+			border: $border-width solid $dark-gray-500;
+		}
+	}
+
+	&.is-pressed > span,
+	&.is-pressed:hover > span {
+		background-color: $dark-gray-500;
+		color: $white;
+	}
+}

@@ -1,0 +1,161 @@
+$get-gallery-image-container-height: 150px;
+$get-overlay-border-width: 3px;
+$get-caption-background-color: rgba(0, 0, 0, 0.4);
+
+.galleryImageContainer {
+	flex: 1;
+	height: $get-gallery-image-container-height;
+	background-color: $gray-lighten-30;
+}
+
+.galleryImageContainerDark {
+	background-color: $gray-90;
+}
+
+.image {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	opacity: 1;
+}
+
+.imageUploading {
+	opacity: 0.3;
+}
+
+.overlay {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	border-width: $get-overlay-border-width;
+	border-color: #0000;
+}
+
+.overlaySelected {
+	border-color: $blue-wordpress;
+}
+
+.button {
+	fill: $gray-0;
+	width: 30px;
+}
+
+.buttonDisabled {
+	fill: $gray-30;
+}
+
+.buttonActive {
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	border-radius: 6px;
+	border-color: $gray-70;
+	background-color: $gray-70;
+}
+
+.moverButtonContainer {
+	flex-direction: row;
+	align-items: center;
+	border-radius: 3px;
+	background-color: $gray-70;
+}
+
+.separator {
+	border-right-color: $gray-30;
+	// border-right-width: StyleSheet.hairlineWidth;
+	border-right-width: 1px;
+	height: 20px;
+}
+
+.removeButton {
+	width: 30px;
+	border-radius: 30px;
+}
+
+.toolbar {
+	padding: 5px;
+	flex-direction: row;
+	justify-content: space-between;
+}
+
+.uploadFailedContainer {
+	position: absolute;
+	background-color: rgba(0, 0, 0, 0.5);
+	width: 100%;
+	height: 100%;
+	justify-content: center;
+	align-items: center;
+}
+
+.uploadFailed {
+	width: 24px;
+	height: 24px;
+	justify-content: center;
+	align-items: center;
+}
+
+.uploadFailedIcon {
+	fill: #fff;
+	width: 100%;
+	height: 100%;
+}
+
+.uploadFailedText {
+	color: #fff;
+	font-size: 14px;
+	margin-top: 5px;
+}
+
+.captionContainer {
+	flex: 1;
+	flex-direction: row;
+	align-items: flex-end;
+}
+
+@mixin caption-shared {
+	font-size: 12px;
+	background-color: #0000;
+	color: #fff;
+	font-family: $default-regular-font;
+	min-height: $min-height-paragraph;
+	text-align: center;
+}
+
+.caption {
+	@include caption-shared;
+	background-color: $get-caption-background-color;
+}
+
+.captionPlaceholder {
+	color: #ccc;
+}
+
+/*
+.captionDark {
+	background-color: #0007;
+}
+*/
+
+// expand caption container to compensate for overlay border
+.captionExpandedContainer {
+	$width: $get-overlay-border-width;
+	// constrain height to gallery image height for caption scroll
+	max-height: $get-gallery-image-container-height;
+	position: absolute;
+	bottom: - $width;
+	left: - $width;
+	right: - $width;
+	padding-bottom: $width;
+	padding-left: $width;
+	padding-right: $width;
+	// use caption background color on container when expanded
+	background-color: $get-caption-background-color;
+}
+
+.captionExpanded {
+	@include caption-shared;
+}

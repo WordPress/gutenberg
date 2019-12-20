@@ -11,83 +11,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Registers the REST API routes needed by the Gutenberg editor.
+ * Handle a failing oEmbed proxy request to try embedding as a shortcode.
  *
- * @since 2.8.0
- */
-function gutenberg_register_rest_routes() {
-	$controller = new WP_REST_Block_Renderer_Controller();
-	$controller->register_routes();
-}
-add_action( 'rest_api_init', 'gutenberg_register_rest_routes' );
-
-/**
- * Includes the value for the custom field `post_type_capabities` inside the REST API response of user.
- *
- * TODO: This is a temporary solution. Next step would be to edit the WP_REST_Users_Controller,
- * once merged into Core.
- *
- * @since ?
- *
- * @param array           $user An array containing user properties.
- * @param string          $name The name of the custom field.
- * @param WP_REST_Request $request Full details about the REST API request.
- * @return object The Post Type capabilities.
- */
-function gutenberg_get_post_type_capabilities( $user, $name, $request ) {
-	$post_type = $request->get_param( 'post_type' );
-	$value     = new stdClass;
-
-	if ( ! empty( $user['id'] ) && $post_type && post_type_exists( $post_type ) ) {
-		// The Post Type object contains the Post Type's specific caps.
-		$post_type_object = get_post_type_object( $post_type );
-
-		// Loop in the Post Type's caps to validate the User's caps for it.
-		foreach ( $post_type_object->cap as $post_cap => $post_type_cap ) {
-			// Ignore caps requiring a post ID.
-			if ( in_array( $post_cap, array( 'edit_post', 'read_post', 'delete_post' ) ) ) {
-				continue;
-			}
-
-			// Set the User's post type capability.
-			$value->{$post_cap} = user_can( $user['id'], $post_type_cap );
-		}
-	}
-
-	return $value;
-}
-
-/**
- * Adds the custom field `post_type_capabities` to the REST API response of user.
- *
- * TODO: This is a temporary solution. Next step would be to edit the WP_REST_Users_Controller,
- * once merged into Core.
- *
- * @since ?
- */
-function gutenberg_register_rest_api_post_type_capabilities() {
-	register_rest_field( 'user',
-		'post_type_capabilities',
-		array(
-			'get_callback' => 'gutenberg_get_post_type_capabilities',
-			'schema'       => array(
-				'description' => __( 'Post Type capabilities for the user.', 'gutenberg' ),
-				'type'        => 'object',
-				'context'     => array( 'edit' ),
-				'readonly'    => true,
-			),
-		)
-	);
-}
-add_action( 'rest_api_init', 'gutenberg_register_rest_api_post_type_capabilities' );
-
-/**
- * Make sure oEmbed REST Requests apply the WP Embed security mechanism for WordPress embeds.
- *
- * @see  https://core.trac.wordpress.org/ticket/32522
- *
- * TODO: This is a temporary solution. Next step would be to edit the WP_oEmbed_Controller,
- * once merged into Core.
+ * @see https://core.trac.wordpress.org/ticket/45447
  *
  * @since 2.3.0
  *
@@ -97,491 +23,73 @@ add_action( 'rest_api_init', 'gutenberg_register_rest_api_post_type_capabilities
  * @return WP_HTTP_Response|object|WP_Error    The REST Request response.
  */
 function gutenberg_filter_oembed_result( $response, $handler, $request ) {
-	if ( 'GET' !== $request->get_method() ) {
+	if ( ! is_wp_error( $response ) || 'oembed_invalid_url' !== $response->get_error_code() ||
+			'/oembed/1.0/proxy' !== $request->get_route() ) {
 		return $response;
 	}
 
-	if ( is_wp_error( $response ) && 'oembed_invalid_url' !== $response->get_error_code() ) {
+	// Try using a classic embed instead.
+	global $wp_embed;
+	$html = $wp_embed->shortcode( array(), $_GET['url'] );
+	if ( ! $html ) {
 		return $response;
 	}
 
-	// External embeds.
-	if ( '/oembed/1.0/proxy' === $request->get_route() ) {
-		if ( is_wp_error( $response ) ) {
-			// It's possibly a local post, so lets try and retrieve it that way.
-			$post_id = url_to_postid( $_GET['url'] );
-			$data    = get_oembed_response_data( $post_id, apply_filters( 'oembed_default_width', 600 ) );
+	global $wp_scripts;
 
-			if ( $data ) {
-				// It's a local post!
-				$response = (object) $data;
-			} else {
-				// Try using a classic embed, instead.
-				global $wp_embed;
-				$html = $wp_embed->shortcode( array(), $_GET['url'] );
-				if ( $html ) {
-					return array(
-						'provider_name' => __( 'Embed Handler', 'gutenberg' ),
-						'html'          => $html,
-					);
-				}
-			}
-		}
-
-		// Make sure the HTML is run through the oembed sanitisation routines.
-		$response->html = wp_oembed_get( $_GET['url'], $_GET );
+	// Check if any scripts were enqueued by the shortcode, and include them in
+	// the response.
+	$enqueued_scripts = array();
+	foreach ( $wp_scripts->queue as $script ) {
+		$enqueued_scripts[] = $wp_scripts->registered[ $script ]->src;
 	}
 
-	return $response;
+	return array(
+		'provider_name' => __( 'Embed Handler', 'gutenberg' ),
+		'html'          => $html,
+		'scripts'       => $enqueued_scripts,
+	);
 }
 add_filter( 'rest_request_after_callbacks', 'gutenberg_filter_oembed_result', 10, 3 );
 
-/**
- * Add additional 'visibility' rest api field to taxonomies.
- *
- * Used so private taxonomies are not displayed in the UI.
- *
- * @see https://core.trac.wordpress.org/ticket/42707
- */
-function gutenberg_add_taxonomy_visibility_field() {
-	register_rest_field(
-		'taxonomy',
-		'visibility',
-		array(
-			'get_callback' => 'gutenberg_get_taxonomy_visibility_data',
-			'schema'       => array(
-				'description' => __( 'The visibility settings for the taxonomy.', 'gutenberg' ),
-				'type'        => 'object',
-				'context'     => array( 'edit' ),
-				'readonly'    => true,
-				'properties'  => array(
-					'public'             => array(
-						'description' => __( 'Whether a taxonomy is intended for use publicly either via the admin interface or by front-end users.', 'gutenberg' ),
-						'type'        => 'boolean',
-					),
-					'publicly_queryable' => array(
-						'description' => __( 'Whether the taxonomy is publicly queryable.', 'gutenberg' ),
-						'type'        => 'boolean',
-					),
-					'show_ui'            => array(
-						'description' => __( 'Whether to generate a default UI for managing this taxonomy.', 'gutenberg' ),
-						'type'        => 'boolean',
-					),
-					'show_admin_column'  => array(
-						'description' => __( 'Whether to allow automatic creation of taxonomy columns on associated post-types table.', 'gutenberg' ),
-						'type'        => 'boolean',
-					),
-					'show_in_nav_menus'  => array(
-						'description' => __( 'Whether to make the taxonomy available for selection in navigation menus.', 'gutenberg' ),
-						'type'        => 'boolean',
-					),
-					'show_in_quick_edit' => array(
-						'description' => __( 'Whether to show the taxonomy in the quick/bulk edit panel.', 'gutenberg' ),
-						'type'        => 'boolean',
-					),
-				),
-			),
-		)
-	);
-}
+
 
 /**
- * Gets taxonomy visibility property data.
- *
- * @see https://core.trac.wordpress.org/ticket/42707
- *
- * @param array $object Taxonomy data from REST API.
- * @return array Array of taxonomy visibility data.
+ * Start: Include for phase 2
  */
-function gutenberg_get_taxonomy_visibility_data( $object ) {
-	// Just return existing data for up-to-date Core.
-	if ( isset( $object['visibility'] ) ) {
-		return $object['visibility'];
-	}
-
-	$taxonomy = get_taxonomy( $object['slug'] );
-
-	return array(
-		'public'             => $taxonomy->public,
-		'publicly_queryable' => $taxonomy->publicly_queryable,
-		'show_ui'            => $taxonomy->show_ui,
-		'show_admin_column'  => $taxonomy->show_admin_column,
-		'show_in_nav_menus'  => $taxonomy->show_in_nav_menus,
-		'show_in_quick_edit' => $taxonomy->show_ui,
-	);
+/**
+ * Registers the REST API routes needed by the legacy widget block.
+ *
+ * @since 5.0.0
+ */
+function gutenberg_register_rest_widget_updater_routes() {
+	$widget_forms = new WP_REST_Widget_Forms();
+	$widget_forms->register_routes();
 }
-
-add_action( 'rest_api_init', 'gutenberg_add_taxonomy_visibility_field' );
+add_action( 'rest_api_init', 'gutenberg_register_rest_widget_updater_routes' );
 
 /**
- * Add a permalink template to posts in the post REST API response.
+ * Registers the widget area REST API routes.
  *
- * @param WP_REST_Response $response WP REST API response of a post.
- * @param WP_Post          $post The post being returned.
- * @param WP_REST_Request  $request WP REST API request.
- * @return WP_REST_Response Response containing the permalink_template.
+ * @since 5.7.0
  */
-function gutenberg_add_permalink_template_to_posts( $response, $post, $request ) {
-	if ( 'edit' !== $request['context'] ) {
-		return $response;
-	}
-
-	if ( ! function_exists( 'get_sample_permalink' ) ) {
-		require_once ABSPATH . '/wp-admin/includes/post.php';
-	}
-
-	$sample_permalink = get_sample_permalink( $post->ID, $post->post_title, '' );
-
-	$response->data['permalink_template'] = $sample_permalink[0];
-	$response->data['generated_slug']     = $sample_permalink[1];
-
-	return $response;
+function gutenberg_register_rest_widget_areas() {
+	$widget_areas_controller = new WP_REST_Widget_Areas_Controller();
+	$widget_areas_controller->register_routes();
 }
+add_action( 'rest_api_init', 'gutenberg_register_rest_widget_areas' );
 
 /**
- * Add the block format version to post content in the post REST API response.
+ * Registers the block directory.
  *
- * @todo This will need to be registered to the schema too.
- *
- * @param WP_REST_Response $response WP REST API response of a post.
- * @param WP_Post          $post The post being returned.
- * @param WP_REST_Request  $request WP REST API request.
- * @return WP_REST_Response Response containing the block_format.
+ * @since 6.5.0
  */
-function gutenberg_add_block_format_to_post_content( $response, $post, $request ) {
-	if ( 'edit' !== $request['context'] ) {
-		return $response;
+function gutenberg_register_rest_block_directory() {
+	if ( ! gutenberg_is_experiment_enabled( 'gutenberg-block-directory' ) ) {
+		return;
 	}
 
-	$response_data = $response->get_data();
-	if ( isset( $response_data['content'] ) && is_array( $response_data['content'] ) && isset( $response_data['content']['raw'] ) ) {
-		$response_data['content']['block_format'] = gutenberg_content_block_version( $response_data['content']['raw'] );
-		$response->set_data( $response_data );
-	}
-
-	return $response;
+	$block_directory_controller = new WP_REST_Block_Directory_Controller();
+	$block_directory_controller->register_routes();
 }
-
-/**
- * Include target schema attributes to links, based on whether the user can.
- *
- * @param WP_REST_Response $response WP REST API response of a post.
- * @param WP_Post          $post The post being returned.
- * @param WP_REST_Request  $request WP REST API request.
- * @return WP_REST_Response Response containing the new links.
- */
-function gutenberg_add_target_schema_to_links( $response, $post, $request ) {
-	$new_links  = array();
-	$orig_links = $response->get_links();
-	$post_type  = get_post_type_object( $post->post_type );
-	$orig_href  = ! empty( $orig_links['self'][0]['href'] ) ? $orig_links['self'][0]['href'] : null;
-	if ( 'edit' === $request['context'] && post_type_supports( $post_type->name, 'author' ) ) {
-		if ( current_user_can( $post_type->cap->edit_others_posts ) ) {
-			$new_links['https://api.w.org/action-assign-author'] = array(
-				array(
-					'title'        => __( 'The current user can change the author on this post.', 'gutenberg' ),
-					'href'         => $orig_href,
-					'targetSchema' => array(
-						'type'       => 'object',
-						'properties' => array(
-							'author' => array(
-								'type' => 'integer',
-							),
-						),
-					),
-				),
-			);
-		}
-	}
-	if ( 'edit' === $request['context'] ) {
-		if ( current_user_can( $post_type->cap->publish_posts ) ) {
-			$new_links['https://api.w.org/action-publish'] = array(
-				array(
-					'title'        => __( 'The current user can publish this post.', 'gutenberg' ),
-					'href'         => $orig_href,
-					'targetSchema' => array(
-						'type'       => 'object',
-						'properties' => array(
-							'status' => array(
-								'type' => 'string',
-								'enum' => array( 'publish', 'future' ),
-							),
-						),
-					),
-				),
-			);
-		}
-	}
-	// Only Posts can be sticky.
-	if ( 'post' === $post->post_type && 'edit' === $request['context'] ) {
-		if ( current_user_can( $post_type->cap->edit_others_posts )
-			&& current_user_can( $post_type->cap->publish_posts ) ) {
-			$new_links['https://api.w.org/action-sticky'] = array(
-				array(
-					'title'        => __( 'The current user can sticky this post.', 'gutenberg' ),
-					'href'         => $orig_href,
-					'targetSchema' => array(
-						'type'       => 'object',
-						'properties' => array(
-							'sticky' => array(
-								'type' => 'boolean',
-							),
-						),
-					),
-				),
-			);
-		}
-	}
-
-	$response->add_links( $new_links );
-	return $response;
-}
-
-/**
- * Whenever a post type is registered, ensure we're hooked into it's WP REST API response.
- *
- * @param string $post_type The newly registered post type.
- * @return string That same post type.
- */
-function gutenberg_register_post_prepare_functions( $post_type ) {
-	add_filter( "rest_prepare_{$post_type}", 'gutenberg_add_permalink_template_to_posts', 10, 3 );
-	add_filter( "rest_prepare_{$post_type}", 'gutenberg_add_block_format_to_post_content', 10, 3 );
-	add_filter( "rest_prepare_{$post_type}", 'gutenberg_add_target_schema_to_links', 10, 3 );
-	add_filter( "rest_{$post_type}_collection_params", 'gutenberg_filter_post_collection_parameters', 10, 2 );
-	add_filter( "rest_{$post_type}_query", 'gutenberg_filter_post_query_arguments', 10, 2 );
-	return $post_type;
-}
-add_filter( 'registered_post_type', 'gutenberg_register_post_prepare_functions' );
-
-/**
- * Includes the value for the 'viewable' attribute of a post type resource.
- *
- * @see https://core.trac.wordpress.org/ticket/43739
- *
- * @param object $post_type Post type response object.
- * @return boolean Whether or not the post type can be viewed.
- */
-function gutenberg_get_post_type_viewable( $post_type ) {
-	return is_post_type_viewable( $post_type['slug'] );
-}
-
-/**
- * Adds the 'viewable' attribute to the REST API response of a post type.
- *
- * @see https://core.trac.wordpress.org/ticket/43739
- */
-function gutenberg_register_rest_api_post_type_viewable() {
-	register_rest_field( 'type',
-		'viewable',
-		array(
-			'get_callback' => 'gutenberg_get_post_type_viewable',
-			'schema'       => array(
-				'description' => __( 'Whether or not the post type can be viewed', 'gutenberg' ),
-				'type'        => 'boolean',
-				'context'     => array( 'edit' ),
-				'readonly'    => true,
-			),
-		)
-	);
-}
-add_action( 'rest_api_init', 'gutenberg_register_rest_api_post_type_viewable' );
-
-/**
- * Gets revisions details for the selected post.
- *
- * @since 1.6.0
- *
- * @param array $post The post object from the response.
- * @return array|null Revisions details or null when no revisions present.
- */
-function gutenberg_get_post_revisions( $post ) {
-	$revisions       = wp_get_post_revisions( $post['id'] );
-	$revisions_count = count( $revisions );
-	if ( 0 === $revisions_count ) {
-		return null;
-	}
-
-	$last_revision = array_shift( $revisions );
-
-	return array(
-		'count'   => $revisions_count,
-		'last_id' => $last_revision->ID,
-	);
-}
-
-/**
- * Adds the custom field `revisions` to the REST API response of post.
- *
- * TODO: This is a temporary solution. Next step would be to find a solution that is limited to the editor.
- *
- * @since 1.6.0
- */
-function gutenberg_register_rest_api_post_revisions() {
-	register_rest_field( get_post_types( '', 'names' ),
-		'revisions',
-		array(
-			'get_callback' => 'gutenberg_get_post_revisions',
-		)
-	);
-}
-add_action( 'rest_api_init', 'gutenberg_register_rest_api_post_revisions' );
-
-/**
- * Ensure that the wp-json index contains the 'theme-supports' setting as
- * part of its site info elements.
- *
- * @param WP_REST_Response $response WP REST API response of the wp-json index.
- * @return WP_REST_Response Response that contains theme-supports.
- */
-function gutenberg_ensure_wp_json_has_theme_supports( $response ) {
-	$site_info = $response->get_data();
-	if ( ! array_key_exists( 'theme_supports', $site_info ) ) {
-		$site_info['theme_supports'] = array();
-	}
-	if ( ! array_key_exists( 'formats', $site_info['theme_supports'] ) ) {
-		$formats = get_theme_support( 'post-formats' );
-		$formats = is_array( $formats ) ? array_values( $formats[0] ) : array();
-		$formats = array_merge( array( 'standard' ), $formats );
-
-		$site_info['theme_supports']['formats'] = $formats;
-	}
-	if ( ! array_key_exists( 'post-thumbnails', $site_info['theme_supports'] ) ) {
-		if ( get_theme_support( 'post-thumbnails' ) ) {
-			$site_info['theme_supports']['post-thumbnails'] = true;
-		}
-	}
-	$response->set_data( $site_info );
-	return $response;
-}
-add_filter( 'rest_index', 'gutenberg_ensure_wp_json_has_theme_supports' );
-
-/**
- * Handle any necessary checks early.
- *
- * @param WP_HTTP_Response $response Result to send to the client. Usually a WP_REST_Response.
- * @param WP_REST_Server   $handler  ResponseHandler instance (usually WP_REST_Server).
- * @param WP_REST_Request  $request  Request used to generate the response.
- */
-function gutenberg_handle_early_callback_checks( $response, $handler, $request ) {
-	$routes = array(
-		'/wp/v2/blocks',
-		'/wp/v2/pages',
-		'/wp/v2/users',
-	);
-	if ( in_array( $request->get_route(), $routes, true ) ) {
-		$can_view_authors    = false;
-		$can_unbounded_query = false;
-		$types               = get_post_types( array( 'show_in_rest' => true ), 'objects' );
-		foreach ( $types as $type ) {
-			if ( current_user_can( $type->cap->edit_posts ) ) {
-				$can_unbounded_query = true;
-				if ( post_type_supports( $type->name, 'author' ) ) {
-					$can_view_authors = true;
-				}
-			}
-		}
-		if ( $request['per_page'] < 0 ) {
-			if ( ! $can_unbounded_query ) {
-				return new WP_Error( 'rest_forbidden_per_page', __( 'Sorry, you are not allowed make unbounded queries.', 'gutenberg' ), array( 'status' => rest_authorization_required_code() ) );
-			}
-		}
-		if ( '/wp/v2/users' === $request->get_route()
-			&& ! empty( $request['who'] ) && 'authors' === $request['who'] ) {
-			if ( ! $can_view_authors ) {
-				return new WP_Error( 'rest_forbidden_who', __( 'Sorry, you are not allowed to query users by this parameter.', 'gutenberg' ), array( 'status' => rest_authorization_required_code() ) );
-			}
-		}
-	}
-	return $response;
-}
-add_filter( 'rest_request_before_callbacks', 'gutenberg_handle_early_callback_checks', 10, 3 );
-
-/**
- * Include additional query parameters on the posts query endpoint.
- *
- * @see https://core.trac.wordpress.org/ticket/43998
- *
- * @param array  $query_params JSON Schema-formatted collection parameters.
- * @param string $post_type    Post type being accessed.
- * @return array
- */
-function gutenberg_filter_post_collection_parameters( $query_params, $post_type ) {
-	$post_types = array( 'page', 'wp_block' );
-	if ( in_array( $post_type->name, $post_types, true )
-		&& isset( $query_params['per_page'] ) ) {
-		// Change from '1' to '-1', which means unlimited.
-		$query_params['per_page']['minimum'] = -1;
-		// Default sanitize callback is 'absint', which won't work in our case.
-		$query_params['per_page']['sanitize_callback'] = 'rest_sanitize_request_arg';
-	}
-	return $query_params;
-}
-
-/**
- * Filter post collection query parameters to include specific behavior.
- *
- * @see https://core.trac.wordpress.org/ticket/43998
- *
- * @param array           $prepared_args Array of arguments for WP_Query.
- * @param WP_REST_Request $request       The current request.
- * @return array
- */
-function gutenberg_filter_post_query_arguments( $prepared_args, $request ) {
-	$post_types = array( 'page', 'wp_block' );
-	if ( in_array( $prepared_args['post_type'], $post_types, true ) ) {
-		// Avoid triggering 'rest_post_invalid_page_number' error
-		// which will need to be addressed in https://core.trac.wordpress.org/ticket/43998.
-		if ( -1 === $prepared_args['posts_per_page'] ) {
-			$prepared_args['posts_per_page'] = 100000;
-		}
-	}
-	return $prepared_args;
-}
-
-/**
- * Include additional query parameters on the user query endpoint.
- *
- * @see https://core.trac.wordpress.org/ticket/42202
- * @see https://core.trac.wordpress.org/ticket/43998
- *
- * @param array $query_params JSON Schema-formatted collection parameters.
- * @return array
- */
-function gutenberg_filter_user_collection_parameters( $query_params ) {
-	if ( isset( $query_params['per_page'] ) ) {
-		// Change from '1' to '-1', which means unlimited.
-		$query_params['per_page']['minimum'] = -1;
-		// Default sanitize callback is 'absint', which won't work in our case.
-		$query_params['per_page']['sanitize_callback'] = 'rest_sanitize_request_arg';
-	}
-	// Support for 'who' query param.
-	$query_params['who'] = array(
-		'description' => __( 'Limit result set to users who are considered authors.', 'gutenberg' ),
-		'type'        => 'string',
-		'enum'        => array(
-			'authors',
-		),
-	);
-	return $query_params;
-}
-add_filter( 'rest_user_collection_params', 'gutenberg_filter_user_collection_parameters' );
-
-/**
- * Filter user collection query parameters to include specific behavior.
- *
- * @see https://core.trac.wordpress.org/ticket/42202
- *
- * @param array           $prepared_args Array of arguments for WP_User_Query.
- * @param WP_REST_Request $request       The current request.
- * @return array
- */
-function gutenberg_filter_user_query_arguments( $prepared_args, $request ) {
-	if ( ! empty( $request['who'] ) && 'authors' === $request['who'] ) {
-		$prepared_args['who'] = 'authors';
-		if ( isset( $prepared_args['has_published_posts'] ) ) {
-			unset( $prepared_args['has_published_posts'] );
-		}
-	}
-	return $prepared_args;
-}
-add_filter( 'rest_user_query', 'gutenberg_filter_user_query_arguments', 10, 2 );
+add_filter( 'rest_api_init', 'gutenberg_register_rest_block_directory' );

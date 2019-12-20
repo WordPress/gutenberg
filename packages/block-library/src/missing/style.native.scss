@@ -1,0 +1,131 @@
+/** @format */
+.content {
+	padding-top: 8;
+	padding-bottom: 0;
+	padding-left: 24;
+	padding-right: 24;
+	align-items: center;
+	justify-content: space-evenly;
+}
+
+.helpIconContainer {
+	position: absolute;
+	top: 0;
+	right: 0;
+	height: 48;
+	width: 48;
+	padding-top: 12;
+	padding-right: 12;
+	justify-content: flex-start;
+	align-items: flex-end;
+}
+
+.infoContainer {
+	flex-direction: column;
+	align-items: center;
+	justify-content: flex-end;
+}
+
+.infoIcon {
+	size: 36;
+	height: 36;
+	padding-top: 8;
+	padding-bottom: 8;
+	color: $gray-darken-20;
+}
+
+.infoIconDark {
+	color: $gray-20;
+}
+
+.infoSheetIcon {
+	size: 36;
+	height: 36;
+	padding-top: 8;
+	padding-bottom: 8;
+	color: $gray;
+}
+
+.infoSheetIconDark {
+	color: $gray-20;
+}
+
+.infoText {
+	text-align: center;
+	color: $gray-dark;
+}
+
+.infoTextDark {
+	color: $white;
+}
+
+.infoTitle {
+	padding-top: 8;
+	padding-bottom: 12;
+	font-size: 20;
+	font-weight: bold;
+	color: $gray-dark;
+}
+
+.infoTitleDark {
+	color: $white;
+}
+
+.infoDescription {
+	padding-bottom: 24;
+	font-size: 16;
+	color: $gray-darken-20;
+}
+
+.infoDescriptionDark {
+	color: $gray-20;
+}
+
+.unsupportedBlock {
+	background-color: $gray-lighten-30;
+	padding-top: 24;
+	padding-bottom: 24;
+	padding-left: 8;
+	padding-right: 8;
+	border-top-left-radius: 4;
+	border-top-right-radius: 4;
+	border-bottom-left-radius: 4;
+	border-bottom-right-radius: 4;
+	align-items: center;
+	justify-content: center;
+}
+
+.unsupportedBlockDark {
+	background-color: $background-dark-secondary;
+}
+
+.unsupportedBlockIcon {
+	color: $gray-dark;
+}
+
+.unsupportedBlockIconDark {
+	color: $white;
+}
+
+.unsupportedBlockMessage {
+	margin-top: 4;
+	text-align: center;
+	color: $gray-dark;
+	font-size: 14;
+	font-weight: 600;
+}
+
+.unsupportedBlockMessageDark {
+	color: $white;
+}
+
+.unsupportedBlockSubtitle {
+	margin-top: 2;
+	text-align: center;
+	color: $gray-darken-20;
+	font-size: 12;
+}
+
+.unsupportedBlockSubtitleDark {
+	color: $gray-20;
+}

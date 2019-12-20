@@ -1,0 +1,42 @@
+{
+	"name": "@wordpress/eslint-plugin",
+	"version": "3.3.0",
+	"description": "ESLint plugin for WordPress development.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"eslint"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/eslint-plugin/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/eslint-plugin"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"files": [
+		"configs",
+		"rules",
+		"index.js"
+	],
+	"main": "index.js",
+	"dependencies": {
+		"babel-eslint": "^10.0.2",
+		"eslint-plugin-jest": "^22.15.1",
+		"eslint-plugin-jsdoc": "^15.8.0",
+		"eslint-plugin-jsx-a11y": "^6.2.3",
+		"eslint-plugin-react": "^7.14.3",
+		"eslint-plugin-react-hooks": "^1.6.1",
+		"globals": "^12.0.0",
+		"requireindex": "^1.2.0"
+	},
+	"peerDependencies": {
+		"eslint": "6.x"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

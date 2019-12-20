@@ -1,0 +1,31 @@
+{
+	"name": "@wordpress/block-serialization-default-parser",
+	"version": "3.4.1",
+	"description": "Block serialization specification parser for WordPress posts.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"block",
+		"parser"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/block-serialization-default-parser/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/block-serialization-default-parser"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"react-native": "src/index",
+	"sideEffects": false,
+	"dependencies": {
+		"@babel/runtime": "^7.4.4"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

@@ -1,0 +1,22 @@
+// Specific to the empty paragraph placeholder:
+// when shown on mobile and in nested contexts, one or more icons show up on the right.
+// This padding makes sure it doesn't overlap text.
+.block-editor-rich-text__editable.wp-block-paragraph:not(.is-selected) [data-rich-text-placeholder]::after {
+	display: inline-block;
+	padding-right: $icon-button-size * 3;
+
+	// In nested contexts only one icon shows up.
+	.wp-block .wp-block & {
+		padding-right: $icon-button-size;
+	}
+}
+
+.block-editor-block-list__block[data-type="core/paragraph"] p {
+	min-height: $empty-paragraph-height / 2;
+	line-height: $editor-line-height;
+}
+
+// Overwrite the inline style to make the height collapse when the paragraph editable gets focus.
+.block-editor-block-list__block[data-type="core/paragraph"] .has-drop-cap:focus {
+	min-height: $empty-paragraph-height / 2 !important;
+}

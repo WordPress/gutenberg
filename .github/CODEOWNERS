@@ -1,0 +1,99 @@
+# Documentation
+/docs                                           @chrisvanpatten @ajitbohra
+/docs/designers-developers/developers           @youknowriad @chrisvanpatten @mkaz @ajitbohra
+/docs/designers-developers/designers            @chrisvanpatten @mkaz @ajitbohra
+
+# Data
+/packages/api-fetch                             @youknowriad @nerrad @mmtr
+/packages/core-data                             @youknowriad @nerrad
+/packages/data                                  @youknowriad @nerrad @coderkevin
+/packages/redux-routine                         @youknowriad @nerrad
+
+# Blocks
+/packages/block-library                         @Soean @ajitbohra @jorgefilipecosta @talldan
+/packages/block-library/src/social-links        @mkaz
+/packages/block-library/src/social-link         @mkaz
+
+# Editor
+/packages/annotations                           @atimmer @ellatrix
+/packages/autop                                 @aduth
+/packages/block-editor                          @youknowriad @talldan @ellatrix
+/packages/block-serialization-spec-parser       @dmsnell
+/packages/block-serialization-default-parser    @dmsnell
+/packages/blocks                                @youknowriad @ellatrix
+/packages/edit-post                             @talldan
+/packages/editor                                @talldan
+/packages/list-reusable-blocks                  @youknowriad @noisysocks
+/packages/shortcode                             @aduth
+
+# Widgets
+/packages/edit-widgets                          @youknowriad
+
+# Tooling
+/bin                                            @ntwb @nerrad @ajitbohra
+/bin/api-docs                                   @ntwb @nerrad @ajitbohra @nosolosw
+/docs/tool                                      @youknowriad @chrisvanpatten @ajitbohra @nosolosw
+/packages/babel-plugin-import-jsx-pragma        @gziolo @ntwb @nerrad @ajitbohra
+/packages/babel-plugin-makepot                  @ntwb @nerrad @ajitbohra
+/packages/babel-preset-default                  @youknowriad @gziolo @ntwb @nerrad @ajitbohra
+/packages/browserslist-config                   @gziolo @ntwb @nerrad @ajitbohra
+/packages/custom-templated-path-webpack-plugin  @ntwb @nerrad @ajitbohra
+/packages/docgen                                @nosolosw
+/packages/e2e-test-utils                        @gziolo @ntwb @nerrad @ajitbohra
+/packages/e2e-tests                             @ntwb @nerrad @ajitbohra @talldan
+/packages/eslint-plugin                         @gziolo @ntwb @nerrad @ajitbohra
+/packages/jest-console                          @gziolo @ntwb @nerrad @ajitbohra
+/packages/jest-preset-default                   @gziolo @ntwb @nerrad @ajitbohra
+/packages/jest-puppeteer-axe                    @gziolo @ntwb @nerrad @ajitbohra
+/packages/library-export-default-webpack-plugin @gziolo @ntwb @nerrad @ajitbohra
+/packages/npm-package-json-lint-config          @gziolo @ntwb @nerrad @ajitbohra
+/packages/postcss-themes                        @youknowriad @ntwb @nerrad @ajitbohra
+/packages/scripts                               @youknowriad @gziolo @ntwb @nerrad @ajitbohra
+
+# UI Components
+/packages/components                            @youknowriad @ajitbohra @jaymanpandya @jorgefilipecosta @talldan @chrisvanpatten
+/packages/compose                               @youknowriad @ajitbohra @jaymanpandya @jorgefilipecosta @talldan
+/packages/element                               @youknowriad @ajitbohra @jaymanpandya @jorgefilipecosta @talldan
+/packages/notices                               @ajitbohra @jaymanpandya @jorgefilipecosta @talldan
+/packages/nux                                   @ajitbohra @jaymanpandya @jorgefilipecosta @talldan @noisysocks
+/packages/viewport                              @youknowriad @ajitbohra @jaymanpandya @jorgefilipecosta @talldan
+
+# Utilities
+/packages/a11y                                  @youknowriad @aduth
+/packages/blob                                  @aduth
+/packages/date                                  @aduth
+/packages/deprecated                            @aduth
+/packages/dom                                   @ellatrix
+/packages/dom-ready                             @aduth
+/packages/escape-html                           @aduth
+/packages/html-entities                         @aduth
+/packages/i18n                                  @swissspidy
+/packages/is-shallow-equal                      @aduth
+/packages/keycodes                              @talldan @ellatrix
+/packages/priority-queue                        @youknowriad @aduth
+/packages/token-list                            @aduth
+/packages/url                                   @talldan
+/packages/wordcount                             @aduth
+
+# Extensibility
+/packages/hooks                                 @gziolo @adamsilverstein
+/packages/plugins                               @gziolo @adamsilverstein
+
+# Rich Text
+/packages/format-library                        @ellatrix @jorgefilipecosta @daniloercoli @sergioestevao @etoledom
+/packages/rich-text                             @ellatrix @jorgefilipecosta @daniloercoli @sergioestevao @etoledom
+/packages/block-editor/src/components/rich-text @ellatrix @jorgefilipecosta @daniloercoli @sergioestevao @etoledom
+
+# PHP
+/lib                                            @timothybjacobs
+
+# Native (Unowned)
+*.native.js                                     @ghost
+*.android.js                                    @ghost
+*.ios.js                                        @ghost
+*.native.scss                                   @ghost
+*.android.scss                                  @ghost
+*.ios.scss                                      @ghost
+
+# Project Management
+/.github                                        @youknowriad @mapk @karmatosed

@@ -1,0 +1,57 @@
+@import "./archives/editor.scss";
+@import "./audio/editor.scss";
+@import "./block/editor.scss";
+@import "./button/editor.scss";
+@import "./categories/editor.scss";
+@import "./code/editor.scss";
+@import "./columns/editor.scss";
+@import "./cover/editor.scss";
+@import "./embed/editor.scss";
+@import "./file/editor.scss";
+@import "./classic/editor.scss";
+@import "./gallery/editor.scss";
+@import "./group/editor.scss";
+@import "./html/editor.scss";
+@import "./image/editor.scss";
+@import "./latest-comments/editor.scss";
+@import "./latest-posts/editor.scss";
+@import "./legacy-widget/editor.scss";
+@import "./media-text/editor.scss";
+@import "./more/editor.scss";
+@import "./navigation/editor.scss";
+@import "./navigation-link/editor.scss";
+@import "./nextpage/editor.scss";
+@import "./paragraph/editor.scss";
+@import "./pullquote/editor.scss";
+@import "./quote/editor.scss";
+@import "./rss/editor.scss";
+@import "./search/editor.scss";
+@import "./shortcode/editor.scss";
+@import "./social-link/editor.scss";
+@import "./social-links/editor.scss";
+@import "./spacer/editor.scss";
+@import "./subhead/editor.scss";
+@import "./table/editor.scss";
+@import "./tag-cloud/editor.scss";
+@import "./text-columns/editor.scss";
+@import "./verse/editor.scss";
+@import "./video/editor.scss";
+
+/**
+ * Import styles from internal editor components used by the blocks.
+ */
+@import "./block/edit-panel/editor.scss";
+
+/**
+ * Editor Normalization Styles
+ *
+ * These are only output in the editor, but styles here are NOT prefixed .editor-styles-wrapper.
+ * This allows us to create normalization styles that are easily overridden by editor styles.
+ */
+
+// Provide every block with a default base margin. This margin provides a consistent spacing
+// between blocks in the editor.
+.editor-styles-wrapper [data-block] {
+	margin-top: $default-block-margin;
+	margin-bottom: $default-block-margin;
+}

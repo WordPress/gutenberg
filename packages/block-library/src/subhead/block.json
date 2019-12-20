@@ -1,0 +1,14 @@
+{
+	"name": "core/subhead",
+	"category": "common",
+	"attributes": {
+		"align": {
+			"type": "string"
+		},
+		"content": {
+			"type": "string",
+			"source": "html",
+			"selector": "p"
+		}
+	}
+}

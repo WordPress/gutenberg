@@ -1,0 +1,20 @@
+[
+    {
+        "blockName": "core/subhead",
+        "attrs": {},
+        "innerBlocks": [],
+        "innerHTML": "\n<p class=\"wp-block-subhead\">This is a <em>subhead</em>.</p>\n",
+        "innerContent": [
+            "\n<p class=\"wp-block-subhead\">This is a <em>subhead</em>.</p>\n"
+        ]
+    },
+    {
+        "blockName": null,
+        "attrs": {},
+        "innerBlocks": [],
+        "innerHTML": "\n",
+        "innerContent": [
+            "\n"
+        ]
+    }
+]

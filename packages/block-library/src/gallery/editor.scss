@@ -1,0 +1,124 @@
+.wp-block-gallery {
+	// Override the default list style type _only in the editor_
+	// to avoid :not() selector specificity issues.
+	// See https://github.com/WordPress/gutenberg/pull/10358
+	li {
+		list-style-type: none;
+	}
+
+	// Override the bottom margin every block gets.
+	.is-selected & {
+		margin-bottom: 0;
+	}
+}
+
+figure.wp-block-gallery {
+	display: block;
+	margin: 0;
+}
+
+// Necessary to to override default editor ul styles.
+.blocks-gallery-grid.blocks-gallery-grid {
+	padding-left: 0;
+	margin-left: 0;
+	margin-bottom: 0;
+}
+
+.blocks-gallery-item {
+
+	// Hide the focus outline that otherwise briefly appears when selecting a block.
+	figure:not(.is-selected):focus {
+		outline: none;
+	}
+
+	figure.is-selected {
+		outline: 4px solid theme(primary);
+	}
+
+	figure.is-transient img {
+		opacity: 0.3;
+	}
+
+	.is-selected .block-library-gallery-item__move-menu,
+	.is-selected .block-library-gallery-item__inline-menu {
+		background: $white;
+		border: 1px solid $dark-opacity-light-800;
+		border-radius: $radius-round-rectangle;
+		transition: box-shadow 0.2s ease-out;
+		@include reduce-motion("transition");
+
+		&:hover {
+			box-shadow: $shadow-toolbar;
+		}
+
+		.components-button {
+			color: $dark-opacity-300;
+			padding: 2px;
+			height: $icon-button-size-small;
+
+			// Remove hover box shadows, since they clash with the container.
+			&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):hover {
+				box-shadow: none;
+			}
+
+			@include break-small() {
+				// Use smaller buttons to fit when there are many columns.
+				.columns-7 &,
+				.columns-8 & {
+					padding: 0;
+					width: inherit;
+					height: inherit;
+				}
+			}
+		}
+
+		.components-button:focus {
+			color: inherit;
+		}
+	}
+}
+
+.block-library-gallery-item__move-menu,
+.block-library-gallery-item__inline-menu {
+	margin: $grid-size;
+	display: inline-flex;
+	z-index: z-index(".block-library-gallery-item__inline-menu");
+
+	.components-button {
+		color: transparent;
+	}
+
+	@include break-small() {
+		// Use smaller buttons to fit when there are many columns.
+		.columns-7 &,
+		.columns-8 & {
+			padding: $grid-size-small / 2;
+		}
+	}
+}
+
+.block-library-gallery-item__inline-menu {
+	position: absolute;
+	top: -2px;
+	right: -2px;
+}
+
+.block-library-gallery-item__move-menu {
+	position: absolute;
+	top: -2px;
+	left: -2px;
+}
+
+.blocks-gallery-item__move-backward,
+.blocks-gallery-item__move-forward,
+.blocks-gallery-item__remove {
+	padding: 0;
+}
+
+.blocks-gallery-item .components-spinner {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	margin-top: -9px;
+	margin-left: -9px;
+}

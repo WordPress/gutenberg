@@ -1,0 +1,125 @@
+{
+	"type": "ExportNamedDeclaration",
+	"start": 111,
+	"end": 141,
+	"loc": {
+		"start": {
+			"line": 7,
+			"column": 0
+		},
+		"end": {
+			"line": 7,
+			"column": 30
+		}
+	},
+	"range": [
+		111,
+		141
+	],
+	"declaration": {
+		"type": "VariableDeclaration",
+		"start": 118,
+		"end": 141,
+		"loc": {
+			"start": {
+				"line": 7,
+				"column": 7
+			},
+			"end": {
+				"line": 7,
+				"column": 30
+			}
+		},
+		"range": [
+			118,
+			141
+		],
+		"declarations": [
+			{
+				"type": "VariableDeclarator",
+				"start": 124,
+				"end": 140,
+				"loc": {
+					"start": {
+						"line": 7,
+						"column": 13
+					},
+					"end": {
+						"line": 7,
+						"column": 29
+					}
+				},
+				"range": [
+					124,
+					140
+				],
+				"id": {
+					"type": "Identifier",
+					"start": 124,
+					"end": 135,
+					"loc": {
+						"start": {
+							"line": 7,
+							"column": 13
+						},
+						"end": {
+							"line": 7,
+							"column": 24
+						}
+					},
+					"range": [
+						124,
+						135
+					],
+					"name": "THE_MEANING"
+				},
+				"init": {
+					"type": "Literal",
+					"start": 138,
+					"end": 140,
+					"loc": {
+						"start": {
+							"line": 7,
+							"column": 27
+						},
+						"end": {
+							"line": 7,
+							"column": 29
+						}
+					},
+					"range": [
+						138,
+						140
+					],
+					"value": 42,
+					"raw": "42"
+				}
+			}
+		],
+		"kind": "const"
+	},
+	"specifiers": [],
+	"source": null,
+	"leadingComments": [
+		{
+			"type": "Block",
+			"value": "*\n * Constant to document the meaning of life,\n * the universe and everything else.\n *\n * @type {number}\n ",
+			"start": 0,
+			"end": 110,
+			"range": [
+				0,
+				110
+			],
+			"loc": {
+				"start": {
+					"line": 1,
+					"column": 0
+				},
+				"end": {
+					"line": 6,
+					"column": 3
+				}
+			}
+		}
+	]
+}

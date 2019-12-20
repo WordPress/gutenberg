@@ -1,0 +1,35 @@
+.editor-post-taxonomies__hierarchical-terms-list {
+	max-height: 14em;
+	overflow: auto;
+
+	// Extra left padding prevents checkbox focus borders from being cut off.
+	padding-left: 2px;
+}
+
+.editor-post-taxonomies__hierarchical-terms-choice {
+	margin-bottom: 8px;
+}
+
+.editor-post-taxonomies__hierarchical-terms-subchoices {
+	margin-top: 8px;
+	margin-left: $panel-padding;
+}
+
+.components-button.editor-post-taxonomies__hierarchical-terms-submit,
+.components-button.editor-post-taxonomies__hierarchical-terms-add {
+	margin-top: 12px;
+}
+
+.editor-post-taxonomies__hierarchical-terms-label {
+	display: inline-block;
+	margin-top: 12px;
+}
+
+.editor-post-taxonomies__hierarchical-terms-input {
+	margin-top: 8px;
+	width: 100%;
+}
+.editor-post-taxonomies__hierarchical-terms-filter {
+	margin-bottom: 8px;
+	width: 100%;
+}

@@ -1,207 +1,163 @@
 <?php
 /**
- * Functions related to editor blocks for the Gutenberg editor plugin.
+ * Block and style registration functions.
  *
  * @package gutenberg
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
-	die( 'Silence is golden.' );
-}
-
 /**
- * Registers a block type.
+ * Retrieves registered social link blocks
  *
- * @since 0.1.0
- * @since 0.6.0 Now also accepts a WP_Block_Type instance as first parameter.
- *
- * @param string|WP_Block_Type $name Block type name including namespace, or alternatively a
- *                                   complete WP_Block_Type instance. In case a WP_Block_Type
- *                                   is provided, the $args parameter will be ignored.
- * @param array                $args {
- *     Optional. Array of block type arguments. Any arguments may be defined, however the
- *     ones described below are supported by default. Default empty array.
- *
- *     @type callable $render_callback Callback used to render blocks of this block type.
- * }
- * @return WP_Block_Type|false The registered block type on success, or false on failure.
+ * @return array Array of strings containing the registered social link block names.
  */
-function register_block_type( $name, $args = array() ) {
-	return WP_Block_Type_Registry::get_instance()->register( $name, $args );
-}
+function gutenberg_get_registered_social_link_blocks() {
+	$social_link_prefix        = 'core/social-link';
+	$social_link_prefix_length = strlen( $social_link_prefix );
 
-/**
- * Unregisters a block type.
- *
- * @since 0.1.0
- * @since 0.6.0 Now also accepts a WP_Block_Type instance as first parameter.
- *
- * @param string|WP_Block_Type $name Block type name including namespace, or alternatively a
- *                                   complete WP_Block_Type instance.
- * @return WP_Block_Type|false The unregistered block type on success, or false on failure.
- */
-function unregister_block_type( $name ) {
-	return WP_Block_Type_Registry::get_instance()->unregister( $name );
-}
+	$registry    = WP_Block_Type_Registry::get_instance();
+	$block_types = $registry->get_all_registered();
 
-/**
- * Parses blocks out of a content string.
- *
- * @since 0.5.0
- *
- * @param  string $content Post content.
- * @return array  Array of parsed block objects.
- */
-function gutenberg_parse_blocks( $content ) {
-	/*
-	 * If there are no blocks in the content, return a single block, rather
-	 * than wasting time trying to parse the string.
-	 */
-	if ( ! gutenberg_content_has_blocks( $content ) ) {
-		return array(
-			array(
-				'attrs'     => array(),
-				'innerHTML' => $content,
-			),
-		);
-	}
-
-	$parser = new Gutenberg_PEG_Parser;
-	return $parser->parse( _gutenberg_utf8_split( $content ) );
-}
-
-/**
- * Returns an array of the names of all registered dynamic block types.
- *
- * @return array Array of dynamic block names.
- */
-function get_dynamic_block_names() {
-	$dynamic_block_names = array();
-
-	$block_types = WP_Block_Type_Registry::get_instance()->get_all_registered();
+	$registered_social_link_blocks = array();
 	foreach ( $block_types as $block_type ) {
-		if ( $block_type->is_dynamic() ) {
-			$dynamic_block_names[] = $block_type->name;
+		// Block type name starts with $social_link_prefix.
+		if ( strncmp( $block_type->name, $social_link_prefix, $social_link_prefix_length ) === 0 ) {
+			$registered_social_link_blocks[] = $block_type->name;
 		}
 	}
-
-	return $dynamic_block_names;
+	return $registered_social_link_blocks;
 }
 
 /**
- * Renders a single block into a HTML string.
- *
- * @since 1.9.0
- *
- * @param  array $block A single parsed block object.
- * @return string String of rendered HTML.
+ * Substitutes the implementation of a core-registered block type, if exists,
+ * with the built result from the plugin.
  */
-function gutenberg_render_block( $block ) {
-	$block_name  = isset( $block['blockName'] ) ? $block['blockName'] : null;
-	$attributes  = is_array( $block['attrs'] ) ? $block['attrs'] : array();
-	$raw_content = isset( $block['innerHTML'] ) ? $block['innerHTML'] : null;
-
-	if ( $block_name ) {
-		$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
-		if ( null !== $block_type && $block_type->is_dynamic() ) {
-			return $block_type->render( $attributes );
-		}
+function gutenberg_reregister_core_block_types() {
+	// Blocks directory may not exist if working from a fresh clone.
+	$blocks_dir = dirname( __FILE__ ) . '/../build/block-library/blocks/';
+	if ( ! file_exists( $blocks_dir ) ) {
+		return;
 	}
 
-	if ( $raw_content ) {
-		return $raw_content;
-	}
-
-	return '';
-}
-
-/**
- * Parses dynamic blocks out of `post_content` and re-renders them.
- *
- * @since 0.1.0
- *
- * @param  string $content Post content.
- * @return string          Updated post content.
- */
-function do_blocks( $content ) {
-	$rendered_content = '';
-
-	$dynamic_block_names   = get_dynamic_block_names();
-	$dynamic_block_pattern = (
-		'/<!--\s+wp:(' .
-		str_replace( '/', '\/',                 // Escape namespace, not handled by preg_quote.
-			str_replace( 'core/', '(?:core/)?', // Allow implicit core namespace, but don't capture.
-				implode( '|',                   // Join block names into capture group alternation.
-					array_map( 'preg_quote',    // Escape block name for regular expression.
-						$dynamic_block_names
-					)
-				)
-			)
-		) .
-		')(\s+(\{.*?\}))?\s+(\/)?-->/'
+	$block_names = array(
+		'archives.php'        => 'core/archives',
+		'block.php'           => 'core/block',
+		'calendar.php'        => 'core/calendar',
+		'categories.php'      => 'core/categories',
+		'latest-comments.php' => 'core/latest-comments',
+		'latest-posts.php'    => 'core/latest-posts',
+		'legacy-widget.php'   => 'core/legacy-widget',
+		'navigation.php'      => 'core/navigation',
+		'rss.php'             => 'core/rss',
+		'shortcode.php'       => 'core/shortcode',
+		'search.php'          => 'core/search',
+		'social-link.php'     => gutenberg_get_registered_social_link_blocks(),
+		'tag-cloud.php'       => 'core/tag-cloud',
+		'site-title.php'      => 'core/site-title',
+		'template-part.php'   => 'core/template-part',
+		'post-title.php'      => 'core/post-title',
+		'post-content.php'    => 'core/post-content',
 	);
 
-	while ( preg_match( $dynamic_block_pattern, $content, $block_match, PREG_OFFSET_CAPTURE ) ) {
-		$opening_tag     = $block_match[0][0];
-		$offset          = $block_match[0][1];
-		$block_name      = $block_match[1][0];
-		$is_self_closing = isset( $block_match[4] );
+	$registry = WP_Block_Type_Registry::get_instance();
 
-		// Reset attributes JSON to prevent scope bleed from last iteration.
-		$block_attributes_json = null;
-		if ( isset( $block_match[3] ) ) {
-			$block_attributes_json = $block_match[3][0];
+	foreach ( $block_names as $file => $block_names ) {
+		if ( ! file_exists( $blocks_dir . $file ) ) {
+			return;
 		}
 
-		// Since content is a working copy since the last match, append to
-		// rendered content up to the matched offset...
-		$rendered_content .= substr( $content, 0, $offset );
-
-		// ...then update the working copy of content.
-		$content = substr( $content, $offset + strlen( $opening_tag ) );
-
-		// Make implicit core namespace explicit.
-		$is_implicit_core_namespace = ( false === strpos( $block_name, '/' ) );
-		$normalized_block_name      = $is_implicit_core_namespace ? 'core/' . $block_name : $block_name;
-
-		// Find registered block type. We can assume it exists since we use the
-		// `get_dynamic_block_names` function as a source for pattern matching.
-		$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $normalized_block_name );
-
-		// Attempt to parse attributes JSON, if available.
-		$attributes = array();
-		if ( ! empty( $block_attributes_json ) ) {
-			$decoded_attributes = json_decode( $block_attributes_json, true );
-			if ( ! is_null( $decoded_attributes ) ) {
-				$attributes = $decoded_attributes;
+		if ( is_string( $block_names ) ) {
+			if ( $registry->is_registered( $block_names ) ) {
+				$registry->unregister( $block_names );
+			}
+		} elseif ( is_array( $block_names ) ) {
+			foreach ( $block_names as $block_name ) {
+				if ( $registry->is_registered( $block_name ) ) {
+					$registry->unregister( $block_name );
+				}
 			}
 		}
 
-		// Replace dynamic block with server-rendered output.
-		$rendered_content .= $block_type->render( $attributes );
+		require $blocks_dir . $file;
+	}
+}
+add_action( 'init', 'gutenberg_reregister_core_block_types' );
 
-		if ( ! $is_self_closing ) {
-			$end_tag_pattern = '/<!--\s+\/wp:' . str_replace( '/', '\/', preg_quote( $block_name ) ) . '\s+-->/';
-			if ( ! preg_match( $end_tag_pattern, $content, $block_match_end, PREG_OFFSET_CAPTURE ) ) {
-				// If no closing tag is found, abort all matching, and continue
-				// to append remainder of content to rendered output.
-				break;
+if ( ! function_exists( 'register_block_style' ) ) {
+	/**
+	 * Registers a new block style.
+	 *
+	 * @param string $block_name       Block type name including namespace.
+	 * @param array  $style_properties Array containing the properties of the style name, label, style (name of the stylesheet to be enqueued), inline_style (string containing the CSS to be added).
+	 *
+	 * @return boolean True if the block style was registered with success and false otherwise.
+	 */
+	function register_block_style( $block_name, $style_properties ) {
+		return WP_Block_Styles_Registry::get_instance()->register( $block_name, $style_properties );
+	}
+}
+
+if ( ! function_exists( 'unregister_block_style' ) ) {
+	/**
+	 * Unregisters a block style.
+	 *
+	 * @param string $block_name       Block type name including namespace.
+	 * @param array  $block_style_name Block style name.
+	 *
+	 * @return boolean True if the block style was unregistered with success and false otherwise.
+	 */
+	function unregister_block_style( $block_name, $block_style_name ) {
+		return WP_Block_Styles_Registry::get_instance()->unregister( $block_name, $block_style_name );
+	}
+}
+
+if ( ! has_action( 'enqueue_block_assets', 'enqueue_block_styles_assets' ) ) {
+	/**
+	 * Function responsible for enqueuing the styles required for block styles functionality on the editor and on the frontend.
+	 */
+	function gutenberg_enqueue_block_styles_assets() {
+		$block_styles = WP_Block_Styles_Registry::get_instance()->get_all_registered();
+
+		foreach ( $block_styles as $styles ) {
+			foreach ( $styles as $style_properties ) {
+				if ( isset( $style_properties['style_handle'] ) ) {
+					wp_enqueue_style( $style_properties['style_handle'] );
+				}
+				if ( isset( $style_properties['inline_style'] ) ) {
+					wp_add_inline_style( 'wp-block-library', $style_properties['inline_style'] );
+				}
 			}
-
-			// Update content to omit text up to and including closing tag.
-			$end_tag    = $block_match_end[0][0];
-			$end_offset = $block_match_end[0][1];
-
-			$content = substr( $content, $end_offset + strlen( $end_tag ) );
 		}
 	}
-
-	// Append remaining unmatched content.
-	$rendered_content .= $content;
-
-	// Strip remaining block comment demarcations.
-	$rendered_content = preg_replace( '/<!--\s+\/?wp:.*?-->\r?\n?/m', '', $rendered_content );
-
-	return $rendered_content;
+	add_action( 'enqueue_block_assets', 'gutenberg_enqueue_block_styles_assets', 30 );
 }
-add_filter( 'the_content', 'do_blocks', 9 ); // BEFORE do_shortcode().
+if ( ! has_action( 'enqueue_block_editor_assets', 'enqueue_editor_block_styles_assets' ) ) {
+	/**
+	 * Function responsible for enqueuing the assets required for block styles functionality on the editor.
+	 */
+	function gutenberg_enqueue_editor_block_styles_assets() {
+		$block_styles = WP_Block_Styles_Registry::get_instance()->get_all_registered();
+
+		$register_script_lines = array( '( function() {' );
+		foreach ( $block_styles as $block_name => $styles ) {
+			foreach ( $styles as $style_properties ) {
+				$register_script_lines[] = sprintf(
+					'	wp.blocks.registerBlockStyle( \'%s\', %s );',
+					$block_name,
+					wp_json_encode(
+						array(
+							'name'  => $style_properties['name'],
+							'label' => $style_properties['label'],
+						)
+					)
+				);
+			}
+		}
+		$register_script_lines[] = '} )();';
+		$inline_script           = implode( "\n", $register_script_lines );
+
+		wp_register_script( 'wp-block-styles', false, array( 'wp-blocks' ), true, true );
+		wp_add_inline_script( 'wp-block-styles', $inline_script );
+		wp_enqueue_script( 'wp-block-styles' );
+	}
+	add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_editor_block_styles_assets' );
+}

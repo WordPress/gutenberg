@@ -1,0 +1,45 @@
+{
+	"name": "@wordpress/babel-preset-default",
+	"version": "4.8.0",
+	"description": "Default Babel preset for WordPress development.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"babel",
+		"preset",
+		"default"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/babel-preset-default/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/babel-preset-default"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=8"
+	},
+	"files": [
+		"index.js"
+	],
+	"main": "index.js",
+	"dependencies": {
+		"@babel/core": "^7.4.5",
+		"@babel/plugin-proposal-async-generator-functions": "^7.2.0",
+		"@babel/plugin-proposal-object-rest-spread": "^7.4.4",
+		"@babel/plugin-transform-react-jsx": "^7.3.0",
+		"@babel/plugin-transform-runtime": "^7.4.4",
+		"@babel/preset-env": "^7.4.5",
+		"@babel/runtime": "^7.4.5",
+		"@wordpress/babel-plugin-import-jsx-pragma": "file:../babel-plugin-import-jsx-pragma",
+		"@wordpress/browserslist-config": "file:../browserslist-config",
+		"@wordpress/element": "file:../element",
+		"core-js": "^3.1.4"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

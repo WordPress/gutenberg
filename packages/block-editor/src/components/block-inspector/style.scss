@@ -1,0 +1,25 @@
+.block-editor-block-inspector {
+	.components-base-control {
+		margin-bottom: #{ $grid-size * 3 };
+
+		&:last-child {
+			margin-bottom: $grid-size;
+		}
+	}
+	.components-panel__body {
+		border: none;
+		border-top: $border-width solid $light-gray-500;
+	}
+
+	.block-editor-block-card {
+		padding: $grid-size-large;
+	}
+}
+
+.block-editor-block-inspector__no-blocks {
+	display: block;
+	font-size: $default-font-size;
+	background: $white;
+	padding: ($panel-padding * 2) $panel-padding;
+	text-align: center;
+}

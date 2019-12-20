@@ -1,0 +1,35 @@
+.components-spinner {
+	display: inline-block;
+	background-color: $dark-gray-200;
+	width: 18px;
+	height: 18px;
+	opacity: 0.7;
+	float: right;
+	margin: 5px 11px 0;
+	border-radius: 100%;
+	position: relative;
+
+	&::before {
+		/* rtl:begin:ignore */
+		content: "";
+		position: absolute;
+		background-color: $white;
+		top: 3px;
+		left: 3px;
+		width: 4px;
+		height: 4px;
+		border-radius: 100%;
+		transform-origin: 6px 6px;
+		animation: components-spinner__animation 1s infinite linear;
+		/* rtl:end:ignore */
+	}
+}
+
+@keyframes components-spinner__animation {
+	from {
+		transform: rotate(0deg);
+	}
+	to {
+		transform: rotate(360deg);
+	}
+}

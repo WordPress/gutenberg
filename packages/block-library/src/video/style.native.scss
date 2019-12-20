@@ -1,0 +1,70 @@
+// @format
+
+.video {
+	width: 100%;
+}
+
+.videoContainer {
+	flex: 1;
+	background-color: #000;
+}
+
+.placeholder {
+	flex: 1;
+	justify-content: center;
+	align-items: center;
+}
+
+.placeholderIcon {
+	justify-content: center;
+	align-items: center;
+	fill: $gray-dark;
+	background-color: $gray-lighten-30;
+}
+
+.uploadFailedText {
+	color: $gray-dark;
+	font-size: 14;
+	margin-top: 5;
+}
+
+.modalIcon {
+	width: 40px;
+	height: 40px;
+	justify-content: center;
+	align-items: center;
+}
+
+.modalIconRetry {
+	width: 80px;
+	height: 80px;
+	justify-content: center;
+	align-items: center;
+}
+
+.container {
+	flex: 1;
+}
+
+.containerFocused {
+	flex: 1;
+	border-color: $blue-medium;
+	border-width: 2px;
+	border-style: solid;
+}
+
+.icon {
+	fill: $gray-dark;
+	width: 100%;
+	height: 100%;
+}
+
+.iconDark {
+	fill: $white;
+}
+
+.iconUploading {
+	fill: $gray-lighten-20;
+	width: 100%;
+	height: 100%;
+}

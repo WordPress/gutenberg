@@ -1,0 +1,115 @@
+.block-editor-block-mover {
+	@include break-small() {
+		opacity: 0;
+		background: $white;
+		border: 1px solid $dark-opacity-light-800;
+		border-radius: $radius-round-rectangle;
+		transition: box-shadow 0.2s ease-out;
+		@include reduce-motion("transition");
+
+		&.is-visible {
+			@include edit-post__fade-in-animation;
+		}
+
+		&:hover {
+			box-shadow: $shadow-toolbar;
+		}
+
+		// 24px is the smallest size of a good pressable button.
+		// With 3 pieces of side UI, that comes to a total of 72px.
+		// To vertically center against a 56px paragraph, move upwards 72px - 56px / 2.
+		margin-top: -$grid-size;
+	}
+
+	&.is-horizontal {
+		margin-top: 5px; // The height of the appender is 36px. This pushes down the mover to be centered according to that.
+		margin-right: $grid-size;
+		padding-right: 0;
+		min-height: auto;
+		width: ($icon-button-size-small * 2) + ($border-width * 2);
+		height: $icon-button-size-small + ($border-width * 2);
+		display: flex;
+
+		.block-editor-block-mover__control {
+			width: $icon-button-size-small;
+			height: $icon-button-size-small;
+
+			svg {
+				width: $icon-button-size-small;
+				padding: 3px;
+			}
+		}
+	}
+}
+
+// Don't add negative vertical margin for wide, fullwide, or mobile.
+// @todo: simplify this selector.
+@include break-small() {
+	.block-editor-block-list__block:not([data-align="wide"]):not([data-align="full"]) .block-editor-block-mover:not(.is-horizontal) {
+		margin-top: 0;
+	}
+}
+
+// Mover icon buttons.
+.block-editor-block-mover__control {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	padding: 0;
+	border: none;
+	box-shadow: none;
+
+	// Carefully adjust the size of the side UI to fit one paragraph of text (56px).
+	width: $block-side-ui-width;
+	height: $icon-button-size-small;
+
+	svg {
+		width: $block-side-ui-width;
+		height: $icon-button-size-small;
+		padding: #{ ($block-side-ui-width - $icon-button-size-small) / 2 } #{ ($block-side-ui-width - 18px) / 2 }; // This makes the SVG fill the whole available area, without scaling the artwork.
+	}
+
+	&[aria-disabled="true"] {
+		cursor: default;
+		pointer-events: none;
+		color: $dark-opacity-300;
+	}
+
+	@include break-small() {
+		color: $dark-opacity-300;
+
+		&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):hover {
+			background-color: transparent;
+			box-shadow: none;
+		}
+
+		&:focus:not(:disabled) {
+			background-color: transparent;
+		}
+	}
+
+}
+
+.block-editor-block-mover__control-drag-handle {
+	cursor: move; // Fallback for IE/Edge < 14
+	cursor: grab;
+	fill: currentColor;
+
+	&,
+	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):hover,
+	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):active,
+	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):focus {
+		box-shadow: none;
+		background: none;
+		color: $dark-opacity-500;
+	}
+
+	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):active {
+		cursor: grabbing;
+	}
+}
+
+.block-editor-block-mover__description {
+	display: none;
+}

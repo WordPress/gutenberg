@@ -1,0 +1,50 @@
+
+/**
+ * External dependencies
+ */
+import TextareaAutosize from 'react-autosize-textarea';
+
+/**
+ * WordPress dependencies
+ */
+import { useEffect, useState } from '@wordpress/element';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { getBlockAttributes, getBlockContent, getBlockType, isValidBlockContent, getSaveContent } from '@wordpress/blocks';
+
+function BlockHTML( { clientId } ) {
+	const [ html, setHtml ] = useState( '' );
+	const { block } = useSelect( ( select ) => ( {
+		block: select( 'core/block-editor' ).getBlock( clientId ),
+	} ), [ clientId ] );
+	const { updateBlock } = useDispatch( 'core/block-editor' );
+	const onChange = () => {
+		const blockType = getBlockType( block.name );
+		const attributes = getBlockAttributes( blockType, html, block.attributes );
+
+		// If html is empty  we reset the block to the default HTML and mark it as valid to avoid triggering an error
+		const content = html ? html : getSaveContent( blockType, attributes );
+		const isValid = html ? isValidBlockContent( blockType, attributes, content ) : true;
+
+		updateBlock( clientId, { attributes, originalContent: content, isValid } );
+
+		// Ensure the state is updated if we reset so it displays the default content
+		if ( ! html ) {
+			setHtml( { content } );
+		}
+	};
+
+	useEffect( () => {
+		setHtml( getBlockContent( block ) );
+	}, [ block ] );
+
+	return (
+		<TextareaAutosize
+			className="block-editor-block-list__block-html-textarea"
+			value={ html }
+			onBlur={ onChange }
+			onChange={ ( event ) => setHtml( event.target.value ) }
+		/>
+	);
+}
+
+export default BlockHTML;

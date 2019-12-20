@@ -1,0 +1,102 @@
+{
+	"type": "ExportNamedDeclaration",
+	"start": 0,
+	"end": 49,
+	"loc": {
+		"start": {
+			"line": 1,
+			"column": 0
+		},
+		"end": {
+			"line": 1,
+			"column": 49
+		}
+	},
+	"range": [
+		0,
+		49
+	],
+	"declaration": null,
+	"specifiers": [
+		{
+			"type": "ExportSpecifier",
+			"start": 9,
+			"end": 16,
+			"loc": {
+				"start": {
+					"line": 1,
+					"column": 9
+				},
+				"end": {
+					"line": 1,
+					"column": 16
+				}
+			},
+			"range": [
+				9,
+				16
+			],
+			"local": {
+				"type": "Identifier",
+				"start": 9,
+				"end": 16,
+				"loc": {
+					"start": {
+						"line": 1,
+						"column": 9
+					},
+					"end": {
+						"line": 1,
+						"column": 16
+					}
+				},
+				"range": [
+					9,
+					16
+				],
+				"name": "default"
+			},
+			"exported": {
+				"type": "Identifier",
+				"start": 9,
+				"end": 16,
+				"loc": {
+					"start": {
+						"line": 1,
+						"column": 9
+					},
+					"end": {
+						"line": 1,
+						"column": 16
+					}
+				},
+				"range": [
+					9,
+					16
+				],
+				"name": "default"
+			}
+		}
+	],
+	"source": {
+		"type": "Literal",
+		"start": 24,
+		"end": 48,
+		"loc": {
+			"start": {
+				"line": 1,
+				"column": 24
+			},
+			"end": {
+				"line": 1,
+				"column": 48
+			}
+		},
+		"range": [
+			24,
+			48
+		],
+		"value": "./named-default-module",
+		"raw": "'./named-default-module'"
+	}
+}

@@ -1,233 +1,96 @@
 <?php
 /**
- * PHP and WordPress configuration compatibility functions for the Gutenberg
- * editor plugin.
+ * Temporary compatibility shims for features present in Gutenberg, pending
+ * upstream commit to the WordPress core source repository. Functions here
+ * exist only as long as necessary for corresponding WordPress support, and
+ * each should be associated with a Trac ticket.
  *
  * @package gutenberg
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
-	die( 'Silence is golden.' );
+/**
+ * Filters allowed CSS attributes to include `flex-basis`, included in saved
+ * markup of the Column block.
+ *
+ * This can be removed when plugin support requires WordPress 5.3.0+.
+ *
+ * @see https://core.trac.wordpress.org/ticket/47281
+ * @see https://core.trac.wordpress.org/changeset/45363
+ *
+ * @since 5.7.0
+ *
+ * @param string[] $attr Array of allowed CSS attributes.
+ *
+ * @return string[] Filtered array of allowed CSS attributes.
+ */
+function gutenberg_safe_style_css_column_flex_basis( $attr ) {
+	$attr[] = 'flex-basis';
+
+	return $attr;
 }
+add_filter( 'safe_style_css', 'gutenberg_safe_style_css_column_flex_basis' );
 
 /**
- * Splits a UTF-8 string into an array of UTF-8-encoded codepoints.
+ * Shim that hooks into `pre_render_block` so as to override `render_block`
+ * with a function that passes `render_callback` the block object as the
+ * argument.
  *
- * @since 0.5.0
+ * @see https://core.trac.wordpress.org/ticket/48104
  *
- * Based on WordPress' _mb_substr() compat function.
+ * @param string $pre_render The pre-rendered content. Default null.
+ * @param array  $block The block being rendered.
  *
- * @param string $str        The string to split.
- * @return array
+ * @return string String of rendered HTML.
  */
-function _gutenberg_utf8_split( $str ) {
-	if ( _wp_can_use_pcre_u() ) {
-		// Use the regex unicode support to separate the UTF-8 characters into
-		// an array.
-		preg_match_all( '/./us', $str, $match );
-		return $match[0];
+function gutenberg_provide_render_callback_with_block_object( $pre_render, $block ) {
+	global $post;
+
+	$source_block = $block;
+
+	/** This filter is documented in src/wp-includes/blocks.php */
+	$block = apply_filters( 'render_block_data', $block, $source_block );
+
+	$block_type    = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
+	$is_dynamic    = $block['blockName'] && null !== $block_type && $block_type->is_dynamic();
+	$block_content = '';
+	$index         = 0;
+
+	foreach ( $block['innerContent'] as $chunk ) {
+		$block_content .= is_string( $chunk ) ? $chunk : render_block( $block['innerBlocks'][ $index++ ] );
 	}
 
-	$regex = '/(
-		  [\x00-\x7F]                  # single-byte sequences   0xxxxxxx
-		| [\xC2-\xDF][\x80-\xBF]       # double-byte sequences   110xxxxx 10xxxxxx
-		| \xE0[\xA0-\xBF][\x80-\xBF]   # triple-byte sequences   1110xxxx 10xxxxxx * 2
-		| [\xE1-\xEC][\x80-\xBF]{2}
-		| \xED[\x80-\x9F][\x80-\xBF]
-		| [\xEE-\xEF][\x80-\xBF]{2}
-		| \xF0[\x90-\xBF][\x80-\xBF]{2} # four-byte sequences   11110xxx 10xxxxxx * 3
-		| [\xF1-\xF3][\x80-\xBF]{3}
-		| \xF4[\x80-\x8F][\x80-\xBF]{2}
-	)/x';
+	if ( ! is_array( $block['attrs'] ) ) {
+		$block['attrs'] = array();
+	}
 
-	// Start with 1 element instead of 0 since the first thing we do is pop.
-	$chars = array( '' );
-	do {
-		// We had some string left over from the last round, but we counted it
-		// in that last round.
-		array_pop( $chars );
+	if ( $is_dynamic ) {
+		$global_post = $post;
 
-		// Split by UTF-8 character, limit to 1000 characters (last array
-		// element will contain the rest of the string).
-		$pieces = preg_split(
-			$regex,
-			$str,
-			1000,
-			PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY
-		);
+		$prepared_attributes = $block_type->prepare_attributes_for_render( $block['attrs'] );
+		$block_content       = (string) call_user_func( $block_type->render_callback, $prepared_attributes, $block_content, $block );
 
-		$chars = array_merge( $chars, $pieces );
+		$post = $global_post;
+	}
 
-		// If there's anything left over, repeat the loop.
-		if ( count( $pieces ) > 1 ) {
-			$str = array_pop( $pieces );
-		} else {
-			break;
-		}
-	} while ( $str );
-
-	return $chars;
+	/** This filter is documented in src/wp-includes/blocks.php */
+	return apply_filters( 'render_block', $block_content, $block );
 }
+add_filter( 'pre_render_block', 'gutenberg_provide_render_callback_with_block_object', 10, 2 );
 
 /**
- * Shims fix for apiRequest on sites configured to use plain permalinks and add Preloading support.
+ * Sets the current post for usage in template blocks.
  *
- * @see https://core.trac.wordpress.org/ticket/42382
- *
- * @param WP_Scripts $scripts WP_Scripts instance (passed by reference).
+ * @return WP_Post|null The post if any, or null otherwise.
  */
-function gutenberg_shim_api_request( $scripts ) {
-	$api_request_fix = <<<JS
-( function( wp, wpApiSettings ) {
-
-	// Fix plain permalinks sites
-	var buildAjaxOptions;
-	if ( 'string' === typeof wpApiSettings.root && -1 !== wpApiSettings.root.indexOf( '?' ) ) {
-		buildAjaxOptions = wp.apiRequest.buildAjaxOptions;
-		wp.apiRequest.buildAjaxOptions = function( options ) {
-			if ( 'string' === typeof options.path ) {
-				options.path = options.path.replace( '?', '&' );
-			}
-
-			return buildAjaxOptions.call( wp.apiRequest, options );
-		};
+function gutenberg_get_post_from_context() {
+	// TODO: Without this temporary fix, an infinite loop can occur where
+	// posts with post content blocks render themselves recursively.
+	if ( is_admin() || defined( 'REST_REQUEST' ) ) {
+		return null;
 	}
-
-	function getStablePath( path ) {
-		var splitted = path.split( '?' );
-		var query = splitted[ 1 ];
-		var base = splitted[ 0 ];
-		if ( ! query ) {
-			return base;
-		}
-
-		// 'b=1&c=2&a=5'
-		return base + '?' + query
-			// [ 'b=1', 'c=2', 'a=5' ]
-			.split( '&' )
-			// [ [ 'b, '1' ], [ 'c', '2' ], [ 'a', '5' ] ]
-			.map( function ( entry ) {
-				return entry.split( '=' );
-			 } )
-			// [ [ 'a', '5' ], [ 'b, '1' ], [ 'c', '2' ] ]
-			.sort( function ( a, b ) {
-				return a[ 0 ].localeCompare( b[ 0 ] );
-			 } )
-			// [ 'a=5', 'b=1', 'c=2' ]
-			.map( function ( pair ) {
-				return pair.join( '=' );
-			 } )
-			// 'a=5&b=1&c=2'
-			.join( '&' );
-	};
-
-	// Add preloading support
-	var previousApiRequest = wp.apiRequest;
-	wp.apiRequest = function( request ) {
-		var method, path;
-
-		if ( typeof request.path === 'string' && window._wpAPIDataPreload ) {
-			method = request.method || 'GET';
-			path = getStablePath( request.path );
-
-			if ( 'GET' === method && window._wpAPIDataPreload[ path ] ) {
-				var deferred = jQuery.Deferred();
-				deferred.resolve( window._wpAPIDataPreload[ path ].body );
-				return deferred.promise();
-			}
-		}
-
-		return previousApiRequest.call( previousApiRequest, request );
+	if ( ! in_the_loop() ) {
+		rewind_posts();
+		the_post();
 	}
-	for ( var name in previousApiRequest ) {
-		if ( previousApiRequest.hasOwnProperty( name ) ) {
-			wp.apiRequest[ name ] = previousApiRequest[ name ];
-		}
-	}
-
-} )( window.wp, window.wpApiSettings );
-JS;
-
-	$scripts->add_inline_script( 'wp-api-request', $api_request_fix, 'after' );
+	return get_post();
 }
-add_action( 'wp_default_scripts', 'gutenberg_shim_api_request' );
-
-/**
- * Shims support for emulating HTTP/1.0 requests in wp.apiRequest
- *
- * @see https://core.trac.wordpress.org/ticket/43605
- *
- * @param WP_Scripts $scripts WP_Scripts instance (passed by reference).
- */
-function gutenberg_shim_api_request_emulate_http( $scripts ) {
-	$api_request_fix = <<<JS
-( function( wp ) {
-	var oldApiRequest = wp.apiRequest;
-	wp.apiRequest = function ( options ) {
-		if ( options.method ) {
-			if ( [ 'PATCH', 'PUT', 'DELETE' ].indexOf( options.method.toUpperCase() ) >= 0 ) {
-				if ( ! options.headers ) {
-					options.headers = {};
-				}
-				options.headers['X-HTTP-Method-Override'] = options.method;
-				options.method = 'POST';
-
-				options.contentType = 'application/json';
-				options.data = JSON.stringify( options.data );
-			}
-		}
-
-		return oldApiRequest( options );
-	}
-} )( window.wp );
-JS;
-
-	$scripts->add_inline_script( 'wp-api-request', $api_request_fix, 'after' );
-}
-add_action( 'wp_default_scripts', 'gutenberg_shim_api_request_emulate_http' );
-
-/**
- * Disables wpautop behavior in classic editor when post contains blocks, to
- * prevent removep from invalidating paragraph blocks.
- *
- * @param  array $settings Original editor settings.
- * @return array           Filtered settings.
- */
-function gutenberg_disable_editor_settings_wpautop( $settings ) {
-	$post = get_post();
-	if ( is_object( $post ) && gutenberg_post_has_blocks( $post ) ) {
-		$settings['wpautop'] = false;
-	}
-
-	return $settings;
-}
-add_filter( 'wp_editor_settings', 'gutenberg_disable_editor_settings_wpautop' );
-
-/**
- * Add rest nonce to the heartbeat response.
- *
- * @param  array $response Original heartbeat response.
- * @return array           New heartbeat response.
- */
-function gutenberg_add_rest_nonce_to_heartbeat_response_headers( $response ) {
-	$response['rest-nonce'] = wp_create_nonce( 'wp_rest' );
-	return $response;
-}
-add_filter( 'wp_refresh_nonces', 'gutenberg_add_rest_nonce_to_heartbeat_response_headers' );
-
-/**
- * As a substitute for the default content `wpautop` filter, applies autop
- * behavior only for posts where content does not contain blocks.
- *
- * @param  string $content Post content.
- * @return string          Paragraph-converted text if non-block content.
- */
-function gutenberg_wpautop( $content ) {
-	if ( gutenberg_content_has_blocks( $content ) ) {
-		return $content;
-	}
-
-	return wpautop( $content );
-}
-remove_filter( 'the_content', 'wpautop' );
-add_filter( 'the_content', 'gutenberg_wpautop', 8 );

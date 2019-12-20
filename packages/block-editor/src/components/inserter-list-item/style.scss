@@ -1,0 +1,96 @@
+.block-editor-block-types-list__list-item {
+	display: block;
+	width: 33.33%;
+	padding: 0;
+	margin: 0 0 12px;
+}
+
+.components-button.block-editor-block-types-list__item {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	font-size: $default-font-size;
+	color: $dark-gray-700;
+	padding: 0 4px;
+	align-items: stretch;
+	justify-content: center;
+	cursor: pointer;
+	background: transparent;
+	word-break: break-word;
+	border-radius: $radius-round-rectangle;
+	border: $border-width solid transparent;
+	transition: all 0.05s ease-in-out;
+	@include reduce-motion("transition");
+	position: relative;
+	height: auto;
+
+	&:disabled {
+		@include block-style__disabled();
+	}
+
+	&:not(:disabled) {
+
+		// Show the hover background in a pseudo selector so it can be below "stacked" icons, like Columns.
+		&:hover::before {
+			content: "";
+			display: block;
+			@include block-style__hover();
+			position: absolute;
+			z-index: -1;
+			border-radius: $radius-round-rectangle;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
+		}
+
+		&:hover {
+			.block-editor-block-types-list__item-icon,
+			.block-editor-block-types-list__item-title {
+				color: inherit;
+			}
+		}
+
+		&:active,
+		&:focus {
+			position: relative;
+			@include block-style__focus();
+			background: transparent;
+
+			.block-editor-block-types-list__item-icon,
+			.block-editor-block-types-list__item-title {
+				color: inherit;
+			}
+		}
+
+		&.is-active {
+			@include block-style__is-active();
+
+			&:focus {
+				@include block-style__is-active-focus();
+			}
+		}
+	}
+}
+
+.block-editor-block-types-list__item-icon {
+	padding: 12px 20px;
+	border-radius: $radius-round-rectangle;
+	color: $dark-gray-500;
+	transition: all 0.05s ease-in-out;
+	@include reduce-motion("transition");
+
+	.block-editor-block-icon {
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	svg {
+		transition: all 0.15s ease-out;
+		@include reduce-motion("transition");
+	}
+}
+
+.block-editor-block-types-list__item-title {
+	padding: 4px 2px 8px;
+}

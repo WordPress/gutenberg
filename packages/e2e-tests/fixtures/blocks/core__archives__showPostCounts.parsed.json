@@ -1,0 +1,12 @@
+[
+    {
+        "blockName": "core/archives",
+        "attrs": {
+            "displayAsDropdown": false,
+            "showPostCounts": true
+        },
+        "innerBlocks": [],
+        "innerHTML": "",
+        "innerContent": []
+    }
+]

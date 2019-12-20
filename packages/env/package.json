@@ -1,0 +1,49 @@
+{
+	"name": "@wordpress/env",
+	"version": "0.2.0",
+	"description": "A zero-config, self contained local WordPress environment for development and testing.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"environment",
+		"wordpress-environment",
+		"docker"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/env#readme",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/env"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"directories": {
+		"lib": "lib",
+		"test": "tests"
+	},
+	"files": [
+		"bin",
+		"lib"
+	],
+	"main": "lib/env.js",
+	"bin": {
+		"wp-env": "bin/wp-env"
+	},
+	"dependencies": {
+		"chalk": "^2.4.2",
+		"copy-dir": "^1.2.0",
+		"docker-compose": "^0.22.2",
+		"nodegit": "^0.26.2",
+		"ora": "^4.0.2",
+		"terminal-link": "^2.0.0",
+		"yargs": "^14.0.0"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"scripts": {
+		"test": "echo \"Error: run tests from root\" && exit 1"
+	}
+}

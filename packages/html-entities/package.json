@@ -1,0 +1,30 @@
+{
+	"name": "@wordpress/html-entities",
+	"version": "2.5.0",
+	"description": "HTML entity utilities for WordPress.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"html",
+		"entities"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/html-entities/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/html-entities"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"react-native": "src/index",
+	"dependencies": {
+		"@babel/runtime": "^7.4.4"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

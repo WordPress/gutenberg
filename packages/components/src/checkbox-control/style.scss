@@ -1,0 +1,81 @@
+$checkbox-input-size: 16px;
+$checkbox-input-size-sm: 25px; // width + height for small viewports
+
+.components-checkbox-control__input[type="checkbox"] {
+	border: 1px solid #b4b9be;
+	background: #fff;
+	color: #555;
+	clear: none;
+	cursor: pointer;
+	display: inline-block;
+	line-height: 0;
+	margin: 0 4px 0 0;
+	outline: 0;
+	padding: 0 !important;
+	text-align: center;
+	vertical-align: top;
+	width: $checkbox-input-size-sm;
+	height: $checkbox-input-size-sm;
+	@include break-small() {
+		height: $checkbox-input-size;
+		width: $checkbox-input-size;
+	}
+	-webkit-appearance: none;
+	box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+	transition: 0.05s border-color ease-in-out;
+
+	&:focus {
+		border-color: #5b9dd9;
+		box-shadow: 0 0 2px rgba(30, 140, 190, 0.8);
+		// Only visible in Windows High Contrast mode.
+		outline: 2px solid transparent;
+	}
+
+	&:checked {
+		background: #11a0d2;
+		border-color: #11a0d2;
+
+		// Hide default checkbox styles in IE.
+		&::-ms-check {
+			opacity: 0;
+		}
+	}
+
+	&:focus:checked {
+		border: none;
+	}
+
+	&:checked::before {
+		content: none;
+	}
+}
+
+.components-checkbox-control__input-container {
+	position: relative;
+	display: inline-block;
+	margin-right: 12px;
+	vertical-align: middle;
+	width: $checkbox-input-size-sm;
+	height: $checkbox-input-size-sm;
+	@include break-small() {
+		width: $checkbox-input-size;
+		height: $checkbox-input-size;
+	}
+}
+
+svg.dashicon.components-checkbox-control__checked {
+	fill: #fff;
+	cursor: pointer;
+	position: absolute;
+	left: -4px;
+	top: -2px;
+	width: 31px;
+	height: 31px;
+	@include break-small() {
+		width: 21px;
+		height: 21px;
+		left: -3px;
+	}
+	user-select: none;
+	pointer-events: none;
+}

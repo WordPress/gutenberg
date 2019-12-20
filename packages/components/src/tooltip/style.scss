@@ -1,0 +1,33 @@
+.components-tooltip.components-popover {
+	z-index: z-index(".components-tooltip");
+
+	&::before {
+		border-color: transparent;
+	}
+
+	&[data-y-axis="top"]::after {
+		border-top-color: $dark-gray-900;
+	}
+
+	&[data-y-axis="bottom"]::after {
+		border-bottom-color: $dark-gray-900;
+	}
+
+	.components-popover__content {
+		min-width: 0;
+	}
+}
+
+.components-tooltip .components-popover__content {
+	padding: 4px 12px;
+	background: $dark-gray-900;
+	border-width: 0;
+	color: $white;
+	white-space: nowrap;
+	text-align: center;
+}
+
+.components-tooltip__shortcut {
+	display: block;
+	color: $dark-gray-200;
+}

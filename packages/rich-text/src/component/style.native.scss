@@ -1,0 +1,20 @@
+
+.richText {
+	font-family: $default-regular-font;
+	min-height: $min-height-paragraph;
+	color: $gray-900;
+	text-decoration-color: $blue-500;
+}
+
+.richTextDark {
+	color: $white;
+	text-decoration-color: $blue-30;
+}
+
+.richTextPlaceholder {
+	color: $gray;
+}
+
+.richTextPlaceholderDark {
+	color: $gray-50;
+}

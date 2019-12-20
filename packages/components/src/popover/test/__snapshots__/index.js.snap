@@ -1,0 +1,48 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Popover should pass additional props to portaled element 1`] = `
+<span>
+  <div
+    tabindex="-1"
+  >
+    <div>
+      <div>
+        <div
+          class="components-popover"
+          role="tooltip"
+        >
+          <div
+            class="components-popover__content"
+            tabindex="-1"
+          >
+            Hello
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</span>
+`;
+
+exports[`Popover should render content 1`] = `
+<span>
+  <div
+    tabindex="-1"
+  >
+    <div>
+      <div>
+        <div
+          class="components-popover"
+        >
+          <div
+            class="components-popover__content"
+            tabindex="-1"
+          >
+            Hello
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</span>
+`;

@@ -1,0 +1,38 @@
+.components-toolbar__control.components-button {
+	width: $icon-button-size;
+	height: $icon-button-size;
+
+	// Subscript for numbered icon buttons, like headings
+	&[data-subscript] svg {
+		padding: 5px 10px 5px 0;
+	}
+
+	&[data-subscript]::after {
+		content: attr(data-subscript);
+		font-family: $default-font;
+		font-size: $default-font-size;
+		font-weight: 600;
+		line-height: 12px;
+		position: absolute;
+		right: 8px;
+		bottom: 10px;
+	}
+
+	&:not(:disabled).is-pressed[data-subscript]::after {
+		color: $white;
+	}
+
+	&.is-pressed {
+		padding: 3px;
+		outline: none;
+	}
+
+	&.is-pressed > svg {
+		padding: 5px;
+		border-radius: $radius-round-rectangle;
+		height: 30px;
+		width: 30px;
+		box-sizing: border-box;
+		@include formatting-button-style__active;
+	}
+}

@@ -1,0 +1,5 @@
+.wp-block-text-columns {
+	.block-editor-rich-text__editable:focus {
+		outline: $border-width solid $light-gray-500;
+	}
+}

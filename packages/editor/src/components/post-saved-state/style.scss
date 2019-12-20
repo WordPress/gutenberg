@@ -1,0 +1,30 @@
+.editor-post-saved-state {
+	display: flex;
+	align-items: center;
+	width: $icon-button-size - 8px;
+	padding: #{ $grid-size-small * 3 } $grid-size-small;
+	color: $dark-gray-500;
+	overflow: hidden;
+	white-space: nowrap;
+
+	.dashicon {
+		display: inline-block;
+		flex: 0 0 auto;
+		margin-right: $grid-size;
+	}
+
+	@include break-small() {
+		width: auto;
+		padding: $grid-size #{ $grid-size-small * 3 };
+		text-indent: inherit;
+
+		.dashicon {
+			margin-right: $grid-size-small;
+		}
+	}
+}
+
+// This needs specificity to override inherited styles.
+.edit-post-header .edit-post-header__settings .components-button.editor-post-save-draft {
+	margin: 0;
+}

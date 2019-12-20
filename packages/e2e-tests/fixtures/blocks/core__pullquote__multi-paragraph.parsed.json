@@ -1,0 +1,20 @@
+[
+    {
+        "blockName": "core/pullquote",
+        "attrs": {},
+        "innerBlocks": [],
+        "innerHTML": "\n<figure class=\"wp-block-pullquote\">\n    <blockquote>\n        <p>Paragraph <strong>one</strong></p>\n        <p>Paragraph two</p>\n        <cite>by whomever</cite>\n\t</blockquote>\n</figure>\n",
+        "innerContent": [
+            "\n<figure class=\"wp-block-pullquote\">\n    <blockquote>\n        <p>Paragraph <strong>one</strong></p>\n        <p>Paragraph two</p>\n        <cite>by whomever</cite>\n\t</blockquote>\n</figure>\n"
+        ]
+    },
+    {
+        "blockName": null,
+        "attrs": {},
+        "innerBlocks": [],
+        "innerHTML": "\n",
+        "innerContent": [
+            "\n"
+        ]
+    }
+]

@@ -1,192 +1,64 @@
 /**
  * External dependencies
  */
-const ExtractTextPlugin = require( 'extract-text-webpack-plugin' );
-const WebpackRTLPlugin = require( 'webpack-rtl-plugin' );
-const { get } = require( 'lodash' );
-const { basename } = require( 'path' );
+const { DefinePlugin } = require( 'webpack' );
+const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
+const postcss = require( 'postcss' );
+const { get, escapeRegExp, compact } = require( 'lodash' );
+const { basename, sep } = require( 'path' );
 
 /**
  * WordPress dependencies
  */
 const CustomTemplatedPathPlugin = require( '@wordpress/custom-templated-path-webpack-plugin' );
-
-// Main CSS loader for everything but blocks..
-const mainCSSExtractTextPlugin = new ExtractTextPlugin( {
-	filename: './build/[basename]/style.css',
-} );
-
-// CSS loader for styles specific to block editing.
-const editBlocksCSSPlugin = new ExtractTextPlugin( {
-	filename: './build/core-blocks/edit-blocks.css',
-} );
-
-// CSS loader for styles specific to blocks in general.
-const blocksCSSPlugin = new ExtractTextPlugin( {
-	filename: './build/core-blocks/style.css',
-} );
-
-// Configuration for the ExtractTextPlugin.
-const extractConfig = {
-	use: [
-		{ loader: 'raw-loader' },
-		{
-			loader: 'postcss-loader',
-			options: {
-				plugins: [
-					require( 'autoprefixer' ),
-				],
-			},
-		},
-		{
-			loader: 'sass-loader',
-			query: {
-				includePaths: [ 'edit-post/assets/stylesheets' ],
-				data: '@import "colors"; @import "admin-schemes"; @import "breakpoints"; @import "variables"; @import "mixins"; @import "animations";@import "z-index";',
-				outputStyle: 'production' === process.env.NODE_ENV ?
-					'compressed' : 'nested',
-			},
-		},
-	],
-};
+const LibraryExportDefaultPlugin = require( '@wordpress/library-export-default-webpack-plugin' );
+const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extraction-webpack-plugin' );
+const { camelCaseDash } = require( '@wordpress/scripts/utils' );
 
 /**
- * Given a string, returns a new string with dash separators converedd to
- * camel-case equivalent. This is not as aggressive as `_.camelCase` in
- * converting to uppercase, where Lodash will convert letters following
- * numbers.
- *
- * @param {string} string Input dash-delimited string.
- *
- * @return {string} Camel-cased string.
+ * Internal dependencies
  */
-function camelCaseDash( string ) {
-	return string.replace(
-		/-([a-z])/g,
-		( match, letter ) => letter.toUpperCase()
-	);
-}
+const { dependencies } = require( './package' );
 
-const entryPointNames = [
-	'blocks',
-	'components',
-	'date',
-	'editor',
-	'element',
-	'utils',
-	'data',
-	'viewport',
-	'core-data',
-	'plugins',
-	'edit-post',
-	'core-blocks',
-];
+const {
+	NODE_ENV: mode = 'development',
+	WP_DEVTOOL: devtool = ( mode === 'production' ? false : 'source-map' ),
+} = process.env;
 
-const packageNames = [
-	'a11y',
-	'dom-ready',
-	'hooks',
-	'i18n',
-	'is-shallow-equal',
-];
+const WORDPRESS_NAMESPACE = '@wordpress/';
 
-const coreGlobals = [
-	'api-request',
-];
+const gutenbergPackages = Object.keys( dependencies )
+	.filter( ( packageName ) => packageName.startsWith( WORDPRESS_NAMESPACE ) )
+	.map( ( packageName ) => packageName.replace( WORDPRESS_NAMESPACE, '' ) );
 
-const externals = {
-	react: 'React',
-	'react-dom': 'ReactDOM',
-	tinymce: 'tinymce',
-	moment: 'moment',
-	jquery: 'jQuery',
-	lodash: 'lodash',
-	'lodash-es': 'lodash',
-};
-
-[
-	...entryPointNames,
-	...packageNames,
-	...coreGlobals,
-].forEach( ( name ) => {
-	externals[ `@wordpress/${ name }` ] = {
-		this: [ 'wp', camelCaseDash( name ) ],
-	};
-} );
-
-const config = {
-	mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
-
-	entry: Object.assign(
-		entryPointNames.reduce( ( memo, path ) => {
-			const name = camelCaseDash( path );
-			memo[ name ] = `./${ path }`;
-			return memo;
-		}, {} ),
-		packageNames.reduce( ( memo, packageName ) => {
-			const name = camelCaseDash( packageName );
-			memo[ name ] = `./node_modules/@wordpress/${ packageName }`;
-			return memo;
-		}, {} )
-	),
+module.exports = {
+	mode,
+	entry: gutenbergPackages.reduce( ( memo, packageName ) => {
+		const name = camelCaseDash( packageName );
+		memo[ name ] = `./packages/${ packageName }`;
+		return memo;
+	}, {} ),
 	output: {
+		devtoolNamespace: 'wp',
 		filename: './build/[basename]/index.js',
 		path: __dirname,
 		library: [ 'wp', '[name]' ],
 		libraryTarget: 'this',
 	},
-	externals,
-	resolve: {
-		modules: [
-			__dirname,
-			'node_modules',
-		],
-		alias: {
-			'lodash-es': 'lodash',
-		},
-	},
 	module: {
-		rules: [
-			{
-				test: /\.pegjs/,
-				use: 'pegjs-loader',
-			},
-			{
+		rules: compact( [
+			mode !== 'production' && {
 				test: /\.js$/,
-				exclude: /node_modules/,
-				use: 'babel-loader',
+				use: require.resolve( 'source-map-loader' ),
+				enforce: 'pre',
 			},
-			{
-				test: /style\.s?css$/,
-				include: [
-					/core-blocks/,
-				],
-				use: blocksCSSPlugin.extract( extractConfig ),
-			},
-			{
-				test: /editor\.s?css$/,
-				include: [
-					/core-blocks/,
-				],
-				use: editBlocksCSSPlugin.extract( extractConfig ),
-			},
-			{
-				test: /\.s?css$/,
-				exclude: [
-					/core-blocks/,
-				],
-				use: mainCSSExtractTextPlugin.extract( extractConfig ),
-			},
-		],
+		] ),
 	},
 	plugins: [
-		blocksCSSPlugin,
-		editBlocksCSSPlugin,
-		mainCSSExtractTextPlugin,
-		// Create RTL files with a -rtl suffix
-		new WebpackRTLPlugin( {
-			suffix: '-rtl',
-			minify: process.env.NODE_ENV === 'production' ? { safe: true } : false,
+		new DefinePlugin( {
+			// Inject the `GUTENBERG_PHASE` global, used for feature flagging.
+			'process.env.GUTENBERG_PHASE': JSON.stringify( parseInt( process.env.npm_package_config_GUTENBERG_PHASE, 10 ) || 1 ),
+			'process.env.FORCE_REDUCED_MOTION': JSON.stringify( process.env.FORCE_REDUCED_MOTION ),
 		} ),
 		new CustomTemplatedPathPlugin( {
 			basename( path, data ) {
@@ -210,14 +82,74 @@ const config = {
 				return path;
 			},
 		} ),
+		new LibraryExportDefaultPlugin( [
+			'api-fetch',
+			'deprecated',
+			'dom-ready',
+			'redux-routine',
+			'token-list',
+			'server-side-render',
+			'shortcode',
+		].map( camelCaseDash ) ),
+		new CopyWebpackPlugin(
+			gutenbergPackages.map( ( packageName ) => ( {
+				from: `./packages/${ packageName }/build-style/*.css`,
+				to: `./build/${ packageName }/`,
+				flatten: true,
+				transform: ( content ) => {
+					if ( mode === 'production' ) {
+						return postcss( [
+							require( 'cssnano' )( {
+								preset: [ 'default', {
+									discardComments: {
+										removeAll: true,
+									},
+								} ],
+							} ),
+						] )
+							.process( content, { from: 'src/app.css', to: 'dest/app.css' } )
+							.then( ( result ) => result.css );
+					}
+					return content;
+				},
+			} ) )
+		),
+		new CopyWebpackPlugin( [
+			{
+				from: './packages/block-library/src/**/index.php',
+				test: new RegExp( `([\\w-]+)${ escapeRegExp( sep ) }index\\.php$` ),
+				to: 'build/block-library/blocks/[1].php',
+				transform( content ) {
+					content = content.toString();
+
+					// Within content, search for any function definitions. For
+					// each, replace every other reference to it in the file.
+					return content
+						.match( /^function [^\(]+/gm )
+						.reduce( ( result, functionName ) => {
+							// Trim leading "function " prefix from match.
+							functionName = functionName.slice( 9 );
+
+							// Prepend the Gutenberg prefix, substituting any
+							// other core prefix (e.g. "wp_").
+							return result.replace(
+								new RegExp( functionName, 'g' ),
+								( match ) => 'gutenberg_' + match.replace( /^wp_/, '' )
+							);
+						}, content )
+						// The core blocks override procedure takes place in
+						// the init action default priority to ensure that core
+						// blocks would have been registered already. Since the
+						// blocks implementations occur at the default priority
+						// and due to WordPress hooks behavior not considering
+						// mutations to the same priority during another's
+						// callback, the Gutenberg build blocks are modified
+						// to occur at a later priority.
+						.replace( /(add_action\(\s*'init',\s*'gutenberg_register_block_[^']+'(?!,))/, '$1, 20' );
+				},
+			},
+		] ),
+		new DependencyExtractionWebpackPlugin( { injectPolyfill: true } ),
 	],
-	stats: {
-		children: false,
-	},
+	devtool,
 };
-
-if ( config.mode !== 'production' ) {
-	config.devtool = process.env.SOURCEMAP || 'source-map';
-}
-
-module.exports = config;

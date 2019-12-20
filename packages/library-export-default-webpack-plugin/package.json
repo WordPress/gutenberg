@@ -1,0 +1,38 @@
+{
+	"name": "@wordpress/library-export-default-webpack-plugin",
+	"version": "1.5.0",
+	"description": "Webpack plugin for exporting default property for selected libraries.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"webpack",
+		"webpack-plugin"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/library-export-default-webpack-plugin/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/library-export-default-webpack-plugin"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=8"
+	},
+	"files": [
+		"index.js"
+	],
+	"main": "index.js",
+	"dependencies": {
+		"lodash": "^4.17.15",
+		"webpack-sources": "^1.1.0"
+	},
+	"peerDependencies": {
+		"webpack": "^4.0.0"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

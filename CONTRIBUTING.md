@@ -1,81 +1,39 @@
 # Contributing
 
-## Getting Started
+Thank you for thinking about contributing to WordPress' Gutenberg project! If you're unsure of anything, know that you're 💯 welcome to submit an issue or pull request on any topic. The worst that can happen is that you'll be politely directed to the best location to ask your question or to change something in your pull request. We appreciate any sort of contribution and don't want a wall of rules to get in the way of that.
 
-Gutenberg is a Node.js-based project, built primarily in JavaScript.
+As with all WordPress projects, we want to ensure a welcoming environment for everyone. With that in mind, all contributors are expected to follow our [Code of Conduct](/CODE_OF_CONDUCT.md).
 
-The easiest way to get started is by running the Local Environment setup script, `./bin/setup-local-env.sh`. This will check if you have everything installed and updated, and help you download any extra tools you need.
+Before contributing, we encourage you to review the [Contributor Handbook](https://developer.wordpress.org/block-editor/contributors/). If you have any questions, please ask, either in Slack or open an issue in GitHub so we can help clarify.
 
-If you prefer to set things up manually, be sure to have <a href="https://nodejs.org/en/">Node.js installed first</a>. You should be running a Node version matching the [current active LTS release](https://github.com/nodejs/Release#release-schedule) or newer for this plugin to work correctly. You can check your Node.js version by typing `node -v` in the Terminal prompt.
+All WordPress projects are [licensed under the GPLv2+](/LICENSE.md), and all contributions to Gutenberg will be released under the GPLv2+ license. You maintain copyright over any contribution you make, and by submitting a pull request, you are agreeing to release that contribution under the GPLv2+ license.
 
-You should also have the latest release of <a href="https://npmjs.org">npm installed</a>, npm is a separate project from Node.js and is updated frequently. If you've just installed Node.js which includes a version of npm within the installation you most likely will need to also update your npm install. To update npm, type this into your terminal: `npm install npm@latest -g`
+This document covers the technical details around setup, and submitting your contribution to the Gutenberg project.
 
-To test the plugin, or to contribute to it, you can clone this repository and build the plugin files using Node. How you do that depends on whether you're developing locally or uploading the plugin to a remote host.
+## Developer Contributions
 
-### Local Environment
+Please see the [Developer Contributions section](/docs/contributors/develop.md) of the Contributor Handbook.
 
-First, you need a WordPress Environment to run the plugin on. The quickest way to get up and running is to use the provided docker setup. Just install [docker](https://www.docker.com/) and [docker-compose](https://docs.docker.com/compose/) on your machine and run `./bin/setup-local-env.sh`.
+## How Can Designers Contribute?
 
-The WordPress installation should be available at `http://localhost:8888` (username: `admin`, password: `password`).
-Inside the "docker" directory, you can use any docker command to interact with your containers. If this port is in use, you can override it in your `docker-compose.override.yml` file. If you're running [e2e tests](https://wordpress.org/gutenberg/handbook/reference/testing-overview/#end-to-end-testing), this change will be used correctly.
+If you'd like to contribute to the design or front-end, feel free to contribute to tickets labelled [Needs Design](https://github.com/WordPress/gutenberg/issues?q=is%3Aissue+is%3Aopen+label%3A%22Needs+Design%22) or [Needs Design Feedback](https://github.com/WordPress/gutenberg/issues?q=is%3Aissue+is%3Aopen+label%3A"Needs+Design+Feedback%22). We could use your thoughtful replies, mockups, animatics, sketches, doodles. Proposed changes are best done as minimal and specific iterations on the work that precedes it so we can compare. The [WordPress Design team](http://make.wordpress.org/design/) uses [Figma](https://www.figma.com/) to collaborate and share work. If you'd like to contribute, join the [#design channel](http://wordpress.slack.com/messages/design/) in [Slack](https://make.wordpress.org/chat/) and ask the team to set you up with a free Figma account. This will give you access to a helpful [library of components](https://www.figma.com/file/ZtN5xslEVYgzU7Dd5CxgGZwq/WordPress-Components?node-id=0%3A1) used in WordPress.
 
-Alternatively, you can use your own local WordPress environment and clone this repository right into your `wp-content/plugins` directory.
+## Triage Contributions
 
-Next, open a terminal (or if on Windows, a command prompt) and navigate to the repository you cloned. Now type `npm install` to get the dependencies all set up. Then you can type `npm run dev` in your terminal or command prompt to keep the plugin building in the background as you work on it.
+*Triage* is the practice of reviewing existing issues to make sure they’re relevant, actionable, and have all the information needed to reproduce and/or solve the issue. Triaging is a very important contribution because it allows the community to focus on and prioritise issues, feature proposals, discussions, and so on.
 
-### On A Remote Server
-
-Open a terminal (or if on Windows, a command prompt) and navigate to the repository you cloned. Now type `npm install` to get the dependencies all set up. Once that finishes, you can type `npm run build`. You can now upload the entire repository to your `wp-content/plugins` directory on your webserver and activate the plugin from the WordPress admin.
-
-You can also type `npm run package-plugin` which will run the two commands above and create a zip file automatically for you which you can use to install Gutenberg through the WordPress admin.
-
-## Workflow
-
-A good workflow for new contributors to follow is listed below:
-- Fork Gutenberg repository
-- Clone forked repository
-- Create new branch
-- Make code changes
-- Commit code changes within newly created branch
-- Push branch to forked repository
-- Submit Pull Request to Gutenberg repository
-
-Ideally name your branches with prefixes and descriptions, like this: `[type]/[change]`. A good prefix would be:
-
-- `add/` = add a new feature
-- `try/` = experimental feature, "tentatively add"
-- `update/` = update an existing feature
-
-For example, `add/gallery-block` means you're working on adding a new gallery block.
-
-You can pick among all the <a href="https://github.com/WordPress/gutenberg/issues">tickets</a>, or some of the ones labelled <a href="https://github.com/WordPress/gutenberg/labels/Good%20First%20Issue">Good First Issue</a>.
-
-The workflow is documented in greater detail in the [repository management](./docs/reference/repository-management.md) document.
-
-## Testing
-
-Gutenberg contains both PHP and JavaScript code, and encourages testing and code style linting for both. It also incorporates end-to-end testing using [Google Puppeteer](https://developers.google.com/web/tools/puppeteer/). You can find out more details in [Testing Overview document](./docs/reference/testing-overview.md).
-
-## How Designers Can Contribute
-
-If you'd like to contribute to the design or front-end, feel free to contribute to tickets labelled <a href="https://github.com/WordPress/gutenberg/issues?q=is%3Aissue+is%3Aopen+label%3ADesign">Design</a>. We could use your thoughtful replies, mockups, animatics, sketches, doodles. Proposed changes are best done as minimal and specific iterations on the work that precedes it so we can compare. If you use <a href="https://www.sketchapp.com/">Sketch</a>, you can grab <a href="https://cloudup.com/cMPXM8Va2cy">the source file for the mockups</a> (updated April 6th).
+If you want to learn more about triage, and why it it important, please see the [repository management section](docs/contributors/repository-management.md#triaging-issues) of the Contributor Handbook.
 
 ## Contribute to the Documentation
 
-Documentation is automatically synced from master to the [Gutenberg Documentation Website](https://wordpress.org/gutenberg/handbook/) every 15 minutes.
+Please see the [Documentation section](/docs/contributors/document.md) of the Contributor Handbook.
 
-To add a new documentation page, you'll have to create a Markdown file in the [docs](https://github.com/WordPress/gutenberg/tree/master/docs) folder and add an item to the [manifest file](https://github.com/WordPress/gutenberg/blob/master/docs/manifest.json).
+Documentation is automatically synced from `master` to the [Block Editor Handbook](https://developer.wordpress.org/block-editor/) every 15 minutes.
+
+### `@wordpress/component`
+
+If you're contributing to the documentation of any component from the `@wordpress/component` package, take a look at its [guidelines for contributing](/packages/components/CONTRIBUTING.md).
 
 ## Reporting Security Issues
 
-Please see [SECURITY.md](./SECURITY.md).
-
-## Localizing Gutenberg Plugin
-
-To translate Gutenburg in your locale or language, [select your locale here](https://translate.wordpress.org/projects/wp-plugins/gutenberg) and translate *Development* (which contains the plugin's string) and/or *Development Readme* (please translate what you see in the Details tab of the [plugin page](https://wordpress.org/plugins/gutenberg/)).
-
-A Global Translation Editor (GTE) or Project Translation Editor (PTE) with suitable rights will process your translations in due time.
-
-Language packs are automatically generated once 95% of the plugin's strings are translated and approved for a locale.
-
-The eventual inclusion of Gutenburg into WordPress core means that more than 51% of WordPress installations running a translated WordPress installation will have Gutenburg's translated strings compiled into the core language pack as well.
+Please see [SECURITY.md](/SECURITY.md).

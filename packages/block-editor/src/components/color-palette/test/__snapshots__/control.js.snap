@@ -1,0 +1,89 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ColorPaletteControl matches the snapshot 1`] = `
+<div
+  className="components-base-control block-editor-color-gradient-control"
+>
+  <div
+    className="components-base-control__field"
+  >
+    <span
+      className="components-base-control__label"
+    >
+      Test Color
+      <span
+        aria-label="(Color: #f00)"
+        className="component-color-indicator"
+        style={
+          Object {
+            "background": "#f00",
+          }
+        }
+      />
+    </span>
+    <div
+      className="components-circular-option-picker"
+    >
+      <div
+        className="components-circular-option-picker__option-wrapper"
+      >
+        <button
+          aria-label="Color: red"
+          aria-pressed={true}
+          className="components-button components-circular-option-picker__option is-pressed"
+          onBlur={[Function]}
+          onClick={[Function]}
+          onFocus={[Function]}
+          onMouseDown={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          style={
+            Object {
+              "color": "#f00",
+            }
+          }
+          type="button"
+        />
+        <svg
+          aria-hidden="true"
+          className="dashicon dashicons-saved"
+          focusable="false"
+          height={20}
+          role="img"
+          viewBox="0 0 20 20"
+          width={20}
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M15.3 5.3l-6.8 6.8-2.8-2.8-1.4 1.4 4.2 4.2 8.2-8.2"
+          />
+        </svg>
+      </div>
+      <div
+        className="components-circular-option-picker__custom-clear-wrapper"
+      >
+        <div
+          className="components-dropdown components-circular-option-picker__dropdown-link-action"
+        >
+          <button
+            aria-expanded={false}
+            aria-label="Custom color picker"
+            className="components-button is-link"
+            onClick={[Function]}
+            type="button"
+          >
+            Custom Color
+          </button>
+        </div>
+        <button
+          className="components-button components-circular-option-picker__clear is-secondary is-small"
+          onClick={[Function]}
+          type="button"
+        >
+          Clear
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+`;

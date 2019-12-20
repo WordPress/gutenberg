@@ -1,0 +1,33 @@
+.block-editor-block-list__block[data-type="core/pullquote"] {
+	&[data-align="left"],
+	&[data-align="right"] {
+		& p {
+			font-size: 20px;
+		}
+	}
+}
+
+.wp-block-pullquote {
+	& blockquote p {
+		font-size: 28px;
+		line-height: 1.6;
+	}
+}
+
+.wp-block-pullquote.is-style-solid-color {
+	margin-left: 0;
+	margin-right: 0;
+
+	& blockquote p {
+		font-size: 32px;
+	}
+
+	.wp-block-pullquote__citation {
+		text-transform: none;
+		font-style: normal;
+	}
+}
+
+.wp-block-pullquote .wp-block-pullquote__citation {
+	color: inherit;
+}

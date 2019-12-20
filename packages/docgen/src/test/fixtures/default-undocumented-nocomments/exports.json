@@ -1,0 +1,39 @@
+{
+	"type": "ExportDefaultDeclaration",
+	"start": 38,
+	"end": 67,
+	"loc": {
+		"start": {
+			"line": 3,
+			"column": 0
+		},
+		"end": {
+			"line": 3,
+			"column": 29
+		}
+	},
+	"range": [
+		38,
+		67
+	],
+	"declaration": {
+		"type": "Identifier",
+		"start": 53,
+		"end": 66,
+		"loc": {
+			"start": {
+				"line": 3,
+				"column": 15
+			},
+			"end": {
+				"line": 3,
+				"column": 28
+			}
+		},
+		"range": [
+			53,
+			66
+		],
+		"name": "myDeclaration"
+	}
+}

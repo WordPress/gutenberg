@@ -1,0 +1,49 @@
+{
+	"compilerOptions": {
+		"allowJs": true,
+		"allowSyntheticDefaultImports": true,
+		"checkJs": true,
+		"jsx": "preserve",
+		"lib": ["dom", "esnext"],
+		"module": "commonjs",
+		"noEmit": true,
+		"resolveJsonModule": true,
+		"target": "esnext",
+
+		/* Project Imports */
+		"baseUrl": ".",
+		"paths": {
+			"@wordpress/*": [
+				"packages/*/index.js",
+				"packages/*/src/index.js"
+			]
+		},
+
+		/* Strict Type-Checking Options */
+		"strict": true,                        /* Enable all strict type-checking options. */
+		"strictNullChecks": true,
+		"noImplicitAny": false,                /* Raise error on expressions and declarations with an implied 'any' type. */
+
+		/* Additional Checks */
+		"noUnusedLocals": true,                /* Report errors on unused locals. */
+		"noUnusedParameters": true,            /* Report errors on unused parameters. */
+		"noImplicitReturns": true,             /* Report error when not all code paths in function return a value. */
+		"noFallthroughCasesInSwitch": true,    /* Report errors for fallthrough cases in switch statement. */
+	},
+	"include": [
+		"./packages/a11y/**/*.js",
+		"./packages/blob/**/*.js",
+		"./packages/dom-ready/**/*.js",
+		"./packages/i18n/**/*.js",
+		"./packages/is-shallow-equal/**/*.js",
+		"./packages/priority-queue/**/*.js",
+		"./packages/token-list/**/*.js",
+		"./packages/url/**/*.js"
+	],
+	"exclude": [
+		"./packages/*/benchmark",
+		"./packages/**/test/**",
+		"./packages/**/build/**",
+		"./packages/**/build-module/**"
+	]
+}

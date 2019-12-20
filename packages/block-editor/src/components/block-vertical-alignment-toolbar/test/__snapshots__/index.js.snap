@@ -1,0 +1,88 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`BlockVerticalAlignmentToolbar should match snapshot 1`] = `
+<Toolbar
+  controls={
+    Array [
+      Object {
+        "icon": <SVG
+          height="20"
+          viewBox="0 0 24 24"
+          width="20"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <Path
+            d="M0 0h24v24H0V0z"
+            fill="none"
+          />
+          <Path
+            d="M8 11h3v10h2V11h3l-4-4-4 4zM4 3v2h16V3H4z"
+          />
+        </SVG>,
+        "isActive": true,
+        "onClick": [Function],
+        "role": "menuitemradio",
+        "title": "Vertically Align Top",
+      },
+      Object {
+        "icon": <SVG
+          height="20"
+          viewBox="0 0 24 24"
+          width="20"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <Path
+            d="M0 0h24v24H0V0z"
+            fill="none"
+          />
+          <Path
+            d="M8 19h3v4h2v-4h3l-4-4-4 4zm8-14h-3V1h-2v4H8l4 4 4-4zM4 11v2h16v-2H4z"
+          />
+        </SVG>,
+        "isActive": false,
+        "onClick": [Function],
+        "role": "menuitemradio",
+        "title": "Vertically Align Middle",
+      },
+      Object {
+        "icon": <SVG
+          height="20"
+          viewBox="0 0 24 24"
+          width="20"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <Path
+            d="M0 0h24v24H0V0z"
+            fill="none"
+          />
+          <Path
+            d="M16 13h-3V3h-2v10H8l4 4 4-4zM4 19v2h16v-2H4z"
+          />
+        </SVG>,
+        "isActive": false,
+        "onClick": [Function],
+        "role": "menuitemradio",
+        "title": "Vertically Align Bottom",
+      },
+    ]
+  }
+  icon={
+    <SVG
+      height="20"
+      viewBox="0 0 24 24"
+      width="20"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <Path
+        d="M0 0h24v24H0V0z"
+        fill="none"
+      />
+      <Path
+        d="M8 11h3v10h2V11h3l-4-4-4 4zM4 3v2h16V3H4z"
+      />
+    </SVG>
+  }
+  isCollapsed={true}
+  label="Change vertical alignment"
+/>
+`;

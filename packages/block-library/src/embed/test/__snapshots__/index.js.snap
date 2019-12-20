@@ -1,0 +1,94 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`core/embed block edit matches snapshot 1`] = `
+<div
+  class="components-placeholder is-small wp-block-embed"
+>
+  <iframe
+    aria-hidden="true"
+    aria-label="resize-listener"
+    frameborder="0"
+    src="about:blank"
+    style="display:block;opacity:0;position:absolute;top:0;left:0;height:100%;width:100%;overflow:hidden;pointer-events:none;z-index:-1"
+    tabindex="-1"
+  />
+  <div
+    class="components-placeholder__label"
+  >
+    <span
+      class="block-editor-block-icon has-colors"
+    >
+      <svg
+        aria-hidden="true"
+        class="dashicon dashicons-embed-generic"
+        focusable="false"
+        height="20"
+        role="img"
+        viewBox="0 0 20 20"
+        width="20"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M17 4H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-3 6.5L12.5 12l1.5 1.5V15l-3-3 3-3v1.5zm1 4.5v-1.5l1.5-1.5-1.5-1.5V9l3 3-3 3z"
+        />
+      </svg>
+    </span>
+    Embed URL
+  </div>
+  <div
+    class="components-placeholder__instructions"
+  >
+    Paste a link to the content you want to display on your site.
+  </div>
+  <div
+    class="components-placeholder__fieldset"
+  >
+    <form>
+      <input
+        aria-label="Embed URL"
+        class="components-placeholder__input"
+        placeholder="Enter URL to embed here…"
+        type="url"
+        value=""
+      />
+      <button
+        class="components-button is-secondary"
+        type="submit"
+      >
+        Embed
+      </button>
+    </form>
+    <div
+      class="components-placeholder__learn-more"
+    >
+      <a
+        class="components-external-link"
+        href="https://wordpress.org/support/article/embeds/"
+        rel="external noreferrer noopener"
+        target="_blank"
+      >
+        Learn more about embeds
+        <span
+          class="components-visually-hidden"
+        >
+          (opens in a new tab)
+        </span>
+        <svg
+          aria-hidden="true"
+          class="dashicon dashicons-external components-external-link__icon"
+          focusable="false"
+          height="20"
+          role="img"
+          viewBox="0 0 20 20"
+          width="20"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M9 3h8v8l-2-1V6.92l-5.6 5.59-1.41-1.41L14.08 5H10zm3 12v-3l2-2v7H3V6h8L9 8H5v7h7z"
+          />
+        </svg>
+      </a>
+    </div>
+  </div>
+</div>
+`;

@@ -1,0 +1,52 @@
+.components-font-size-picker__controls {
+	max-width: $sidebar-width - ( 2 * $panel-padding );
+	display: flex;
+	align-items: center;
+	margin-bottom: $grid-size * 3;
+
+	// Apply the same height as the isSmall Reset button.
+	.components-range-control__number {
+		height: 30px;
+		margin-bottom: 0;
+		margin-top: 5px;
+		margin-left: 0;
+		margin-right: $grid-size;
+
+		// Show the reset button as disabled until a value is entered.
+		&[value=""] + .components-button {
+			cursor: default;
+			opacity: 0.3;
+			pointer-events: none;
+		}
+
+		&-container {
+			display: flex;
+			flex-direction: column;
+		}
+	}
+
+	// Allow the font-size picker dropdown to grow in width.
+	.components-font-size-picker__select {
+		margin-right: $grid-size;
+		flex-grow: 1;
+	}
+
+	.components-color-palette__clear {
+		height: 30px;
+		margin-top: 23px;
+	}
+}
+
+.components-font-size-picker__custom-input {
+	.components-range-control__slider + .dashicon {
+		width: 30px;
+		height: 30px;
+	}
+}
+
+.components-font-size-picker {
+	border: 0;
+	padding: 0;
+	margin: 0;
+}
+

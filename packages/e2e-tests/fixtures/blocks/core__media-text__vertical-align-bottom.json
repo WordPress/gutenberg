@@ -1,0 +1,33 @@
+[
+    {
+        "clientId": "_clientId_0",
+        "name": "core/media-text",
+        "isValid": true,
+        "attributes": {
+            "align": "wide",
+            "mediaAlt": "My alt text",
+            "mediaPosition": "left",
+            "mediaUrl": "data:image/jpeg;base64,/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=",
+            "mediaType": "image",
+            "mediaWidth": 50,
+            "isStackedOnMobile": true,
+            "verticalAlignment": "bottom"
+        },
+        "innerBlocks": [
+            {
+                "clientId": "_clientId_0",
+                "name": "core/paragraph",
+                "isValid": true,
+                "attributes": {
+                    "content": "My content",
+                    "dropCap": false,
+                    "placeholder": "Content…",
+                    "fontSize": "large"
+                },
+                "innerBlocks": [],
+                "originalContent": "<p class=\"has-large-font-size\">My content</p>"
+            }
+        ],
+        "originalContent": "<div class=\"wp-block-media-text alignwide is-vertically-aligned-bottom is-stacked-on-mobile\">\n\t<figure class=\"wp-block-media-text__media\"><img\n\t\t\tsrc=\"data:image/jpeg;base64,/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=\" alt=\"My alt text\"\n\t\t\t/></figure>\n\t<div class=\"wp-block-media-text__content\">\n\t\t\n\t</div>\n</div>"
+    }
+]

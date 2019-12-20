@@ -1,0 +1,32 @@
+{
+	"name": "@wordpress/viewport",
+	"version": "2.10.0",
+	"description": "Viewport module for WordPress.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"viewport"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/viewport/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/viewport"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"react-native": "src/index",
+	"dependencies": {
+		"@babel/runtime": "^7.4.4",
+		"@wordpress/compose": "file:../compose",
+		"@wordpress/data": "file:../data",
+		"lodash": "^4.17.15"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

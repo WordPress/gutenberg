@@ -1,0 +1,142 @@
+// Link input
+$input-padding: 8px;
+$input-size: 300px;
+
+.block-editor-block-list__block .block-editor-url-input,
+.components-popover .block-editor-url-input,
+.block-editor-url-input {
+	flex-grow: 1;
+	position: relative;
+	padding: 1px;
+
+	input[type="text"] {
+		width: 100%;
+		@include break-small() {
+			width: $input-size;
+		}
+		padding: $input-padding;
+		border: none;
+		border-radius: 0;
+		margin-left: 0;
+		margin-right: 0;
+
+		/* Fonts smaller than 16px causes mobile safari to zoom. */
+		font-size: $mobile-text-min-font-size;
+		@include break-small {
+			font-size: $default-font-size;
+		}
+
+		&::-ms-clear {
+			display: none;
+		}
+	}
+
+	&.has-border input[type="text"] {
+		border: 1px solid $dark-gray-500;
+		border-radius: 4px;
+	}
+
+	&.is-full-width {
+		width: 100%;
+
+		input[type="text"] {
+			width: 100%;
+		}
+
+		&__suggestions {
+			width: 100%;
+		}
+	}
+
+	.components-spinner {
+		position: absolute;
+		right: $input-padding;
+		bottom: $input-padding + $grid-size + 1;
+		margin: 0;
+	}
+}
+
+// Suggestions
+.block-editor-url-input__suggestions {
+	max-height: 200px;
+	transition: all 0.15s ease-in-out;
+	@include reduce-motion("transition");
+	padding: 4px 0;
+	// To match the url-input width: input width + padding + 2 buttons.
+	width: $input-size + 2;
+	overflow-y: auto;
+}
+
+// Hide suggestions on mobile until we @todo find a better way to show them
+.block-editor-url-input__suggestions,
+.block-editor-url-input .components-spinner {
+	display: none;
+	@include break-small() {
+		display: inherit;
+	}
+}
+
+.block-editor-url-input__suggestion {
+	padding: 4px $input-padding;
+	color: $dark-gray-300; // lightest we can use for contrast
+	display: block;
+	font-size: $default-font-size;
+	cursor: pointer;
+	background: $white;
+	width: 100%;
+	border: none;
+	text-align: left;
+	@include menu-style__neutral();
+
+	&:hover {
+		background: $light-gray-500;
+	}
+
+	&:focus,
+	&.is-selected {
+		background: color(theme(primary) shade(15%));
+		color: $white;
+		outline: none;
+	}
+}
+
+// Toolbar button
+.components-toolbar > .block-editor-url-input__button {
+	position: inherit; // Let the dialog position according to parent.
+}
+
+.block-editor-url-input__button .block-editor-url-input__back {
+	margin-right: 4px;
+	overflow: visible;
+
+	&::after {
+		content: "";
+		position: absolute;
+		display: block;
+		width: 1px;
+		height: 24px;
+		right: -1px;
+		background: $light-gray-500;
+	}
+}
+
+.block-editor-url-input__button-modal {
+	box-shadow: $shadow-popover;
+	border: 1px solid $light-gray-500;
+	background: $white;
+}
+
+.block-editor-url-input__button-modal-line {
+	display: flex;
+	flex-direction: row;
+	flex-grow: 1;
+	flex-shrink: 1;
+	min-width: 0;
+	align-items: flex-start;
+
+	.components-button {
+		flex-shrink: 0;
+		width: $icon-button-size;
+		height: $icon-button-size;
+	}
+}

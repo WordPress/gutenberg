@@ -1,0 +1,34 @@
+.wp-block-quote {
+	border-left: 4px solid $black;
+	margin: 0 0 $default-block-margin 0;
+	padding-left: 1em;
+
+	cite,
+	footer,
+	&__citation {
+		color: $dark-gray-300;
+		font-size: $default-font-size;
+		margin-top: 1em;
+		position: relative;
+		font-style: normal;
+	}
+
+	&.has-text-align-right,
+	&.has-text-align-right {
+		border-left: none;
+		border-right: 4px solid $black;
+		padding-left: 0;
+		padding-right: 1em;
+	}
+
+	&.has-text-align-center,
+	&.has-text-align-center {
+		border: none;
+		padding-left: 0;
+	}
+
+	&.is-style-large,
+	&.is-large {
+		border: none;
+	}
+}

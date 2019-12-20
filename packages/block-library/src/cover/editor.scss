@@ -1,0 +1,47 @@
+.wp-block-cover-image,
+.wp-block-cover {
+
+	&.components-placeholder h2 {
+		color: inherit;
+	}
+
+	.block-editor-block-list__layout {
+		width: 100%;
+	}
+
+	.block-editor-block-list__block {
+		color: $light-gray-100;
+	}
+
+	// The .wp-block-cover class is used just to increase selector specificity.
+	.wp-block-cover__inner-container {
+		// Avoid text align inherit from cover image align.
+		text-align: left;
+	}
+
+	.wp-block-cover__inner-container > .block-editor-inner-blocks > .block-editor-block-list__layout {
+		margin-left: 0;
+		margin-right: 0;
+	}
+
+	.wp-block-cover__placeholder-background-options {
+		margin-top: 1em;
+		width: 100%;
+	}
+
+	// Apply max-width to floated items that have no intrinsic width.
+	[data-align="left"] &,
+	[data-align="right"] & {
+		max-width: $content-width / 2;
+		width: 100%;
+	}
+}
+
+.block-library-cover__reset-button {
+	margin-left: auto;
+}
+
+.block-library-cover__resize-container:not(.is-resizing) {
+	// Important is used to have higher specificity than the inline style set by re-resizable library.
+	height: auto !important;
+}

@@ -1,0 +1,59 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Multi-block selection should allow selecting outer edge if there is no sibling block 1`] = `
+"<!-- wp:paragraph -->
+<p>2</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`Multi-block selection should always expand single line selection 1`] = `""`;
+
+exports[`Multi-block selection should copy and paste 1`] = `
+"<!-- wp:paragraph -->
+<p>1</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>2</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`Multi-block selection should copy and paste 2`] = `""`;
+
+exports[`Multi-block selection should copy and paste 3`] = `
+"<!-- wp:paragraph -->
+<p>1</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>2</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`Multi-block selection should cut and paste 1`] = `""`;
+
+exports[`Multi-block selection should cut and paste 2`] = `
+"<!-- wp:paragraph -->
+<p>1</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>2</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`Multi-block selection should only trigger multi-selection when at the end 1`] = `
+"<!-- wp:paragraph -->
+<p>1.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`Multi-block selection should use selection direction to determine vertical edge 1`] = `
+"<!-- wp:paragraph -->
+<p>1<br>2.</p>
+<!-- /wp:paragraph -->"
+`;

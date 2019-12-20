@@ -1,7 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`CodeEditor should render without an error 1`] = `
-<textarea
-  value="<b>wowee</b>"
-/>
-`;

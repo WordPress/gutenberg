@@ -1,0 +1,55 @@
+.edit-post-welcome-guide {
+	$image-height: 300px;
+	$image-width: 320px;
+
+	&__page {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		position: relative;
+
+		@include break-small() {
+			min-height: $image-height;
+			padding-left: $image-width + $grid-size-xlarge;
+		}
+	}
+
+	&__heading {
+		font-family: $editor-font;
+		font-size: 21px;
+		line-height: 1.4;
+		margin: $grid-size 0;
+	}
+
+	&__image {
+		background: #66c6e4;
+		border-radius: $radius-round-rectangle;
+		height: 200px;
+		margin: $grid-size 0;
+
+		@include break-small() {
+			position: absolute;
+			left: 0;
+			top: 50%;
+			height: $image-height;
+			width: $image-width;
+			margin-top: -0.5 * $image-height;
+		}
+	}
+
+	&__text {
+		font-size: $editor-font-size;
+		line-height: 1.4;
+		margin: $grid-size 0;
+	}
+
+	&__inserter-icon {
+		margin: 0 4px;
+		position: relative;
+		top: 4px;
+	}
+
+	@include break-small() {
+		width: 600px;
+	}
+}

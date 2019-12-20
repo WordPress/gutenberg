@@ -1,0 +1,17 @@
+// @format
+
+.blockHolder {
+	flex: 1 1 auto;
+}
+
+.blockContainer {
+	padding-top: 0;
+	padding-left: 16px;
+	padding-right: 16px;
+}
+
+.textView {
+	color: $gray;
+	font-size: 16px;
+	font-family: $default-regular-font;
+}

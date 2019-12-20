@@ -1,21 +1,11 @@
-# Introduction
+# Block Editor Handbook
 
-"Gutenberg" is the codename for the 2017 WordPress editor focus. The goal of this focus is to create a new post and page editing experience that makes it easy for anyone to create rich post layouts. This was the kickoff goal:
+The Gutenberg project is transforming the way content is created on WordPress. A block editor was the first product launched creating a new methodology for working with content. This handbook provides documentation for how designers and developers can extend the editor, and also how you can start contributing to the project.
 
-> The editor will endeavour to create a new page and post building experience that makes writing rich posts effortless, and has “blocks” to make it easy what today might take shortcodes, custom HTML, or “mystery meat” embed discovery.
+![Gutenberg Demo](https://cldup.com/kZXGDcGPMU.gif)
 
-Key take-aways from parsing that paragraph:
+Using a system of Blocks to compose and format content, the new block-based editor is designed to create rich, flexible layouts for websites and digital products. Content is created in the unit of blocks instead of freeform text with inserted media, embeds and Shortcodes (there's a Shortcode block though).
 
-- Authoring richly laid out posts is a key strength of WordPress.
-- By embracing "the block", we can potentially unify multiple different interfaces into one. Instead of learning how to write shortcodes, custom HTML, or paste URLs to embed, you should do with just learning the block, and all the pieces should fall in place.
-- "Mystery meat" refers to hidden features in software, features that you have to discover. WordPress already supports a large number of blocks and 30+ embeds, so let's surface them.
+Blocks treat Paragraphs, Headings, Media, and Embeds all as components that, when strung together, make up the content stored in the WordPress database, replacing the traditional concept of freeform text with embedded media and shortcodes. The new editor is designed with progressive enhancement, meaning that it is back-compatible with all legacy content, and it also offers a process to try to convert and split a Classic block into equivalent blocks using client-side parsing. Finally, the blocks offer enhanced editing and format controls.
 
-Gutenberg is being developed on [GitHub](https://github.com/WordPress/gutenberg), and you can try [an early beta version today from the plugin repository](https://wordpress.org/plugins/gutenberg/). Though keep in mind it's not fully functional, feature complete, or production ready.
-
-## Logo
-Released under GPL license, made by [Cristel Rossignol](https://twitter.com/cristelrossi).
-[Gutenberg logo](https://github.com/WordPress/gutenberg/blob/master/docs/final-g-wapuu-black.svg).
-
-## Mockups
-
-Mockup Sketch files are available in <a href="https://wordpress.org/gutenberg/handbook/reference/design-principles/#more-resources">the Design section</a>.
+The Editor offers rich new value to users with visual, drag-and-drop creation tools and powerful developer enhancements with modern vendor packages, reusable components, rich APIs and hooks to modify and extend the editor through Custom Blocks, Custom Block Styles and Plugins.

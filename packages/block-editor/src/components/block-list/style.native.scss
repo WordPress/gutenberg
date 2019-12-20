@@ -1,0 +1,52 @@
+.container {
+	flex: 1;
+	justify-content: flex-start;
+	background-color: #fff;
+}
+
+.switch {
+	flex-direction: row;
+	justify-content: flex-start;
+	align-items: center;
+	margin: 10px;
+}
+
+.switchLabel {
+	margin-left: 10px;
+}
+
+.lineStyleAddHere {
+	flex: 1;
+	background-color: #0087be; // blue_wordpress
+	align-self: center;
+	height: 2px;
+}
+
+.lineStyleAddHereDark {
+	background-color: $gray-50;
+}
+
+.labelStyleAddHere {
+	flex: 1;
+	text-align: center;
+	font-family: $default-monospace-font;
+	font-size: 12px;
+	font-weight: bold;
+}
+
+.labelStyleAddHereDark {
+	color: $gray-20;
+}
+
+.containerStyleAddHere {
+	flex-direction: row;
+}
+
+.blockListFooter {
+	height: 80px;
+}
+
+.paddingToContent {
+	padding-left: $block-custom-appender-to-content;
+	padding-right: $block-custom-appender-to-content;
+}

@@ -1,0 +1,83 @@
+.wp-block-columns {
+	display: flex;
+	margin-bottom: $default-block-margin;
+
+	// Responsiveness: Allow wrapping on mobile.
+	flex-wrap: wrap;
+
+	@include break-medium() {
+		flex-wrap: nowrap;
+	}
+}
+
+.wp-block-column {
+	flex-grow: 1;
+
+	@media (max-width: #{ ($break-small - 1) }) {
+		// Responsiveness: Show at most one columns on mobile. This must be
+		// important since the Column assigns its own width as an inline style.
+		flex-basis: 100% !important;
+	}
+
+	// Prevent the columns from growing wider than their distributed sizes.
+	min-width: 0;
+
+	// Prevent long unbroken words from overflowing.
+	word-break: break-word; // For back-compat.
+	overflow-wrap: break-word; // New standard.
+
+	@include break-small() {
+
+		// Beyond mobile, allow 2 columns.
+		flex-basis: calc(50% - #{$grid-size-large});
+		flex-grow: 0;
+
+		// Add space between the multiple columns. Themes can customize this if they wish to work differently.
+		// Only apply this beyond the mobile breakpoint, as there's only a single column on mobile.
+		&:nth-child(even) {
+			margin-left: $grid-size-large * 2;
+		}
+	}
+
+	@include break-medium() {
+
+		// When columns are in a single row, add space before all except the first.
+		&:not(:first-child) {
+			margin-left: $grid-size-large * 2;
+		}
+	}
+}
+
+/**
+ * All Columns Alignment
+ */
+.wp-block-columns {
+	&.are-vertically-aligned-top {
+		align-items: flex-start;
+	}
+
+	&.are-vertically-aligned-center {
+		align-items: center;
+	}
+
+	&.are-vertically-aligned-bottom {
+		align-items: flex-end;
+	}
+}
+
+/**
+ * Individual Column Alignment
+ */
+.wp-block-column {
+	&.is-vertically-aligned-top {
+		align-self: flex-start;
+	}
+
+	&.is-vertically-aligned-center {
+		align-self: center;
+	}
+
+	&.is-vertically-aligned-bottom {
+		align-self: flex-end;
+	}
+}

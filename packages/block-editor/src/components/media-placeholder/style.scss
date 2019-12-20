@@ -1,0 +1,73 @@
+.block-editor-media-placeholder__url-input-container {
+	// Reset the margin to ensure the url popover is adjacent to the button.
+	.block-editor-media-placeholder__button {
+		margin-bottom: 0;
+	}
+}
+
+.block-editor-media-placeholder__url-input-form {
+	display: flex;
+
+	// Selector requires a lot of specificity to override base styles.
+	input[type="url"].block-editor-media-placeholder__url-input-field {
+		width: 100%;
+		@include break-small() {
+			width: 300px;
+		}
+
+		flex-grow: 1;
+		border: none;
+		border-radius: 0;
+		margin: 2px;
+
+	}
+}
+
+.block-editor-media-placeholder__url-input-submit-button {
+	flex-shrink: 1;
+}
+
+.block-editor-media-placeholder__button {
+	margin-bottom: 0.5rem;
+
+	.dashicon {
+		vertical-align: middle;
+		margin-bottom: 3px;
+	}
+
+	&:hover {
+		color: $dark-gray-800;
+	}
+}
+
+.block-editor-media-placeholder__cancel-button.is-link {
+	margin: 1em;
+	display: block;
+}
+
+.block-editor-media-placeholder.is-appender {
+	min-height: 100px;
+	outline: $border-width dashed $dark-gray-150;
+
+	&:hover {
+		outline: $border-width dashed $dark-gray-500;
+		cursor: pointer;
+	}
+
+	.is-dark-theme & {
+
+		&:hover {
+			outline: $border-width dashed $white;
+		}
+	}
+
+	.block-editor-media-placeholder__upload-button {
+		margin-right: $grid-size-small;
+		&.components-button:hover,
+		&.components-button:focus {
+			box-shadow: none;
+			border: $border-width solid $dark-gray-500;
+		}
+	}
+
+}

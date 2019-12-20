@@ -1,0 +1,9 @@
+.block-editor .wp-block-rss {
+	padding-left: 2.5em;
+	&.is-grid {
+		padding-left: 0;
+	}
+}
+.wp-block-rss li a > div {
+	display: inline;
+}

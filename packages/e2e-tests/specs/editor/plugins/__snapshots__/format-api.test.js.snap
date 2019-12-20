@@ -1,0 +1,7 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Using Format API Clicking the control wraps the selected text properly with HTML code 1`] = `
+"<!-- wp:paragraph -->
+<p>First <a href=\\"https://example.com\\" class=\\"my-plugin-link\\">paragraph</a></p>
+<!-- /wp:paragraph -->"
+`;

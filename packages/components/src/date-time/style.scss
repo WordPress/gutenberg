@@ -1,0 +1,239 @@
+// We can't reference this package with ~ because of how Lerna handles packages.
+// Also, don't convert styles to RTL because react-dates uses an isRTL flag instead.
+/*rtl:begin:ignore*/
+@import "node_modules/react-dates/lib/css/_datepicker";
+/*rtl:end:ignore*/
+
+.components-datetime {
+	padding: $grid-size-large;
+
+	.components-datetime__calendar-help {
+		padding: $grid-size-large;
+
+		h4 {
+			margin: 0;
+		}
+	}
+
+	.components-datetime__date-help-button {
+		display: block;
+		margin-left: auto;
+	}
+
+	fieldset {
+		border: 0;
+		padding: 0;
+		margin: 0;
+	}
+
+	select,
+	input {
+		@include input-style__neutral();
+	}
+
+	// Override inherited conflicting styles to be consistent.
+	select,
+	input[type="number"],
+	.components-button {
+		height: 30px;
+		margin-top: 0;
+		margin-bottom: 0;
+	}
+}
+
+.components-datetime__date {
+	min-height: 236px;
+	border-top: 1px solid $light-gray-500;
+
+	// Override external DatePicker styles.
+	.CalendarMonthGrid {
+		// The included component contains an arbitrary 13px padding that misaligns things.
+		margin-left: -13px;
+	}
+
+	.DayPickerNavigation_leftButton__horizontalDefault {
+		left: 0;
+	}
+
+	.CalendarMonth_caption {
+		font-size: $default-font-size;
+	}
+
+	.CalendarDay {
+		font-size: $default-font-size;
+		border: 1px solid transparent;
+		border-radius: $radius-round;
+		text-align: center;
+	}
+
+	.CalendarDay__selected {
+		background: theme(primary);
+
+		&:hover {
+			background: color(theme(primary) shade(15%));
+		}
+	}
+
+	.DayPickerNavigation_button__horizontalDefault {
+		padding: 2px 8px;
+		top: 20px;
+
+		&:focus {
+			@include input-style__focus();
+		}
+	}
+
+	.DayPicker_weekHeader {
+		top: 50px;
+		.DayPicker_weekHeader_ul {
+			margin: 1px 0;
+			padding-left: 0;
+			padding-right: 0;
+		}
+	}
+
+	&.is-description-visible .DayPicker,
+	&.is-description-visible .components-datetime__date-help-button {
+		visibility: hidden;
+	}
+}
+
+.components-datetime__time {
+	padding-bottom: $grid-size-large;
+
+	fieldset {
+		position: relative;
+		margin-bottom: 0.5em;
+	}
+
+	fieldset + fieldset {
+		margin-bottom: 0;
+	}
+
+	.components-datetime__time-field-am-pm fieldset {
+		margin-top: 0;
+	}
+
+	.components-datetime__time-wrapper {
+		display: flex;
+
+		.components-datetime__time-separator {
+			display: inline-block;
+			padding: 0 3px 0 0;
+			color: $dark-gray-500;
+		}
+
+		.components-datetime__time-am-button {
+			margin-left: 8px;
+			margin-right: -1px;
+			border-radius: 3px 0 0 3px;
+		}
+
+		.components-datetime__time-pm-button {
+			margin-left: -1px;
+			border-radius: 0 3px 3px 0;
+		}
+
+		.components-datetime__time-am-button:focus,
+		.components-datetime__time-pm-button:focus {
+			position: relative;
+			z-index: 1;
+		}
+
+		.components-datetime__time-am-button.is-pressed,
+		.components-datetime__time-pm-button.is-pressed {
+			background: $light-gray-300;
+			border-color: $dark-gray-100;
+			box-shadow: inset 0 2px 5px -3px $dark-gray-500;
+			&:focus {
+				box-shadow:
+					inset 0 2px 5px -3px $dark-gray-500,
+					0 0 0 1px $white,
+					0 0 0 3px $blue-medium-focus;
+			}
+		}
+
+		.components-datetime__time-field {
+
+			&-time {
+				/*rtl:ignore*/
+				direction: ltr;
+			}
+
+
+			&.am-pm button {
+				font-size: 11px;
+				font-weight: 600;
+			}
+
+			select {
+				margin-right: 4px;
+
+				&:focus {
+					position: relative;
+					z-index: 1;
+				}
+			}
+
+			input[type="number"] {
+				padding: 2px;
+				margin-right: 4px;
+				text-align: center;
+				-moz-appearance: textfield;
+
+				&:focus {
+					position: relative;
+					z-index: 1;
+				}
+
+				&::-webkit-inner-spin-button {
+					-webkit-appearance: none;
+					margin: 0;
+				}
+			}
+		}
+	}
+
+	// Makes the month appear before the day if time format uses AM/PM
+	// We are assuming MM-DD-YYY correlates with AM/PM
+	&.is-12-hour {
+		.components-datetime__time-field-day input {
+			margin: 0 -4px 0 0 !important;
+			border-radius: $radius-round-rectangle 0 0 $radius-round-rectangle !important;
+		}
+		.components-datetime__time-field-year input {
+			border-radius: 0 $radius-round-rectangle $radius-round-rectangle 0 !important;
+		}
+	}
+}
+
+.components-datetime__time-legend {
+	font-weight: 600;
+	margin-top: 0.5em;
+
+	&.invisible {
+		position: absolute;
+		top: -999em;
+		left: -999em;
+	}
+}
+
+.components-datetime__time-field-hours-input,
+.components-datetime__time-field-minutes-input,
+.components-datetime__time-field-day-input {
+	width: 35px;
+}
+
+.components-datetime__time-field-year-input {
+	width: 55px;
+}
+
+.components-datetime__time-field-month-select {
+	max-width: 145px;
+}
+
+// Hack to center the datepicker component within the popover.
+// It sets its own styles so centering is tricky.
+.components-popover .components-datetime__date {
+	padding-left: 4px;
+}

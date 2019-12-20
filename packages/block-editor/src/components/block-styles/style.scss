@@ -1,0 +1,56 @@
+.block-editor-block-styles {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+}
+
+.block-editor-block-styles__item {
+	width: calc(50% - #{ $grid-size-small });
+	margin: $grid-size-small 0;
+	flex-shrink: 0;
+	cursor: pointer;
+	overflow: hidden;
+	border-radius: $radius-round-rectangle;
+	padding: $grid-size-small * 1.5;
+	padding-top: calc(50% * 0.75 - #{ $grid-size-small } * 1.5);
+
+	&:focus {
+		@include block-style__focus();
+	}
+
+	&:hover {
+		@include block-style__hover;
+	}
+
+	&.is-active {
+		@include block-style__is-active();
+
+		&:focus {
+			@include block-style__is-active-focus();
+		}
+	}
+}
+
+// Show a little preview thumbnail for style variations.
+.block-editor-block-styles__item-preview {
+	outline: $border-width solid transparent; // Shown in Windows High Contrast mode.
+	padding: 0;
+	border: $border-width solid rgba($dark-gray-900, 0.2);
+	border-radius: $radius-round-rectangle;
+	display: flex;
+	overflow: hidden;
+	background: $white;
+	padding-top: 75%;
+	margin-top: -75%;
+
+	.block-editor-block-preview__container {
+		padding-top: 0;
+		margin: 0;
+		margin-top: -75%;
+	}
+}
+
+.block-editor-block-styles__item-label {
+	text-align: center;
+	padding: 4px 2px;
+}

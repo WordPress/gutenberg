@@ -1,0 +1,48 @@
+{
+	"name": "@wordpress/blocks",
+	"version": "6.9.0",
+	"description": "Block API for WordPress.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"blocks"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/blocks/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/blocks"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"react-native": "src/index",
+	"dependencies": {
+		"@babel/runtime": "^7.4.4",
+		"@wordpress/autop": "file:../autop",
+		"@wordpress/blob": "file:../blob",
+		"@wordpress/block-serialization-default-parser": "file:../block-serialization-default-parser",
+		"@wordpress/compose": "file:../compose",
+		"@wordpress/data": "file:../data",
+		"@wordpress/dom": "file:../dom",
+		"@wordpress/element": "file:../element",
+		"@wordpress/hooks": "file:../hooks",
+		"@wordpress/html-entities": "file:../html-entities",
+		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
+		"@wordpress/shortcode": "file:../shortcode",
+		"hpq": "^1.3.0",
+		"lodash": "^4.17.15",
+		"rememo": "^3.0.0",
+		"showdown": "^1.8.6",
+		"simple-html-tokenizer": "^0.5.7",
+		"tinycolor2": "^1.4.1",
+		"uuid": "^3.3.2"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

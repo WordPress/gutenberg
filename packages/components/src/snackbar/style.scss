@@ -1,0 +1,71 @@
+.components-snackbar {
+	font-family: $default-font;
+	font-size: $default-font-size;
+	background-color: $dark-gray-700;
+	border-radius: $radius-round-rectangle;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+	color: $white;
+	padding: 16px 24px;
+	width: 100%;
+	max-width: 600px;
+	box-sizing: border-box;
+	cursor: pointer;
+
+	@include break-small() {
+		width: fit-content;
+	}
+
+	&:hover {
+		background-color: $dark-gray-900;
+	}
+
+	&:focus {
+		background-color: $dark-gray-900;
+		box-shadow:
+			0 0 0 1px $white,
+			0 0 0 3px $blue-medium-focus;
+	}
+}
+
+.components-snackbar__action.components-button {
+	margin-left: $grid-size * 4;
+	color: $white;
+	height: auto;
+	flex-shrink: 0;
+	line-height: $default-line-height;
+	padding: 0;
+
+	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary) {
+		text-decoration: underline;
+		background-color: transparent;
+
+		&:focus {
+			color: $white;
+			box-shadow: none;
+			outline: 1px dotted $white;
+		}
+
+		&:hover {
+			color: $blue-medium-400;
+		}
+	}
+}
+
+.components-snackbar__content {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	line-height: $default-line-height;
+}
+
+.components-snackbar-list {
+	position: absolute;
+	z-index: z-index(".components-snackbar-list");
+	width: 100%;
+	box-sizing: border-box;
+}
+
+.components-snackbar-list__notice-container {
+	position: relative;
+	padding-top: 8px;
+}

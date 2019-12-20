@@ -1,0 +1,83 @@
+.components-notice {
+	display: flex;
+	font-family: $default-font;
+	font-size: $default-font-size;
+	background-color: $blue-medium-100;
+	border-left: 4px solid $blue-medium-500;
+	margin: 5px 15px 2px;
+	padding: 8px 12px;
+	align-items: center;
+
+	&.is-dismissible {
+		padding-right: 36px;
+		position: relative;
+	}
+
+	&.is-success {
+		border-left-color: $alert-green;
+		background-color: lighten($alert-green, 45%);
+	}
+
+	&.is-warning {
+		border-left-color: $alert-yellow;
+		background-color: lighten($alert-yellow, 35%);
+	}
+
+	&.is-error {
+		border-left-color: $alert-red;
+		background-color: lighten($alert-red, 35%);
+	}
+}
+
+.components-notice__content {
+	flex-grow: 1;
+	margin: $grid-size-small #{ $icon-button-size-small + $border-width } $grid-size-small 0;
+}
+
+.components-notice__action.components-button {
+	&,
+	&.is-link {
+		margin-left: 4px;
+	}
+	&.is-secondary {
+		vertical-align: initial;
+	}
+}
+
+.components-notice__dismiss {
+	color: $dark-gray-300;
+
+	// Place the dismiss button at the top of the container, even when text wraps onto two lines.
+	align-self: flex-start;
+	flex-shrink: 0;
+
+	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):hover,
+	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):active,
+	&:not(:disabled):not([aria-disabled="true"]):focus {
+		color: $dark-gray-900;
+		background-color: transparent;
+	}
+
+	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):hover {
+		box-shadow: none;
+	}
+}
+
+.components-notice-list {
+	// The notice should never be wider than the viewport, or the close button might be hidden. Especially relevant at high zoom levels. Related to https://core.trac.wordpress.org/ticket/47603#ticket.
+	max-width: 100vw;
+	box-sizing: border-box;
+	z-index: z-index(".components-notice-list");
+
+	.components-notice__content {
+		margin-top: $grid-size + $grid-size-small;
+		margin-bottom: $grid-size + $grid-size-small;
+		line-height: 1.6;
+	}
+
+	// Reduce margins on inline buttons so that they don't add too much extra line-height.
+	.components-notice__action.components-button {
+		margin-top: -2px;
+		margin-bottom: -2px;
+	}
+}

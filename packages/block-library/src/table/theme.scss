@@ -1,0 +1,14 @@
+.wp-block-table {
+	border-collapse: collapse;
+
+	td,
+	th {
+		padding: 0.5em;
+		border: 1px solid;
+		word-break: normal;
+	}
+
+	figcaption {
+		@include caption-style-theme();
+	}
+}

@@ -1,0 +1,34 @@
+.wp-block-legacy-widget__edit-container,
+.wp-block-legacy-widget__preview {
+	padding-left: 2.5em;
+	padding-right: 2.5em;
+}
+
+.wp-block-legacy-widget__edit-container {
+	.widget-inside {
+		border: none;
+		display: block;
+		box-shadow: none;
+	}
+}
+
+.wp-block-legacy-widget__update-button {
+	margin-left: auto;
+	display: block;
+}
+
+.wp-block-legacy-widget__preview {
+	overflow: auto;
+}
+
+.wp-block-legacy-widget__edit-widget-title {
+	margin: 0 -$block-padding 0 -$block-padding+1px 0;
+	background: $light-gray-100;
+	color: $dark-gray-500;
+	top: -$block-padding+1px;
+	position: relative;
+	font-family: $default-font;
+	font-size: $default-font-size;
+	padding: $grid-size $block-padding;
+	font-weight: 600;
+}

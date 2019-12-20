@@ -1,0 +1,13 @@
+[
+    {
+        "clientId": "_clientId_0",
+        "name": "core/social-link-dribbble",
+        "isValid": true,
+        "attributes": {
+            "url": "https://example.com/",
+            "site": "dribbble"
+        },
+        "innerBlocks": [],
+        "originalContent": ""
+    }
+]

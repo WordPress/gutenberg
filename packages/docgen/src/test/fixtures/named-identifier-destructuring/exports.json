@@ -1,0 +1,82 @@
+{
+	"type": "ExportNamedDeclaration",
+	"start": 96,
+	"end": 140,
+	"loc": {
+		"start": {
+			"line": 6,
+			"column": 0
+		},
+		"end": {
+			"line": 6,
+			"column": 44
+		}
+	},
+	"range": [
+		96,
+		140
+	],
+	"declaration": null,
+	"specifiers": [
+		{
+			"type": "ExportSpecifier",
+			"start": 105,
+			"end": 137,
+			"loc": {
+				"start": {
+					"line": 6,
+					"column": 9
+				},
+				"end": {
+					"line": 6,
+					"column": 41
+				}
+			},
+			"range": [
+				105,
+				137
+			],
+			"local": {
+				"type": "Identifier",
+				"start": 105,
+				"end": 120,
+				"loc": {
+					"start": {
+						"line": 6,
+						"column": 9
+					},
+					"end": {
+						"line": 6,
+						"column": 24
+					}
+				},
+				"range": [
+					105,
+					120
+				],
+				"name": "someDeclaration"
+			},
+			"exported": {
+				"type": "Identifier",
+				"start": 124,
+				"end": 137,
+				"loc": {
+					"start": {
+						"line": 6,
+						"column": 28
+					},
+					"end": {
+						"line": 6,
+						"column": 41
+					}
+				},
+				"range": [
+					124,
+					137
+				],
+				"name": "myDeclaration"
+			}
+		}
+	],
+	"source": null
+}

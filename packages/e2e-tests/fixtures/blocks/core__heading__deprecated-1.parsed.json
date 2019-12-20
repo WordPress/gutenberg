@@ -1,0 +1,23 @@
+[
+    {
+        "blockName": "core/heading",
+        "attrs": {
+            "align": "right",
+            "level": 3
+        },
+        "innerBlocks": [],
+        "innerHTML": "\n<h3 style=\"text-align:right\">A picture is worth a thousand words, or so the saying goes</h3>\n",
+        "innerContent": [
+            "\n<h3 style=\"text-align:right\">A picture is worth a thousand words, or so the saying goes</h3>\n"
+        ]
+    },
+    {
+        "blockName": null,
+        "attrs": {},
+        "innerBlocks": [],
+        "innerHTML": "\n",
+        "innerContent": [
+            "\n"
+        ]
+    }
+]

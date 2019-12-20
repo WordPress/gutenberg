@@ -1,0 +1,25 @@
+.editor-post-last-revision__title {
+	width: 100%;
+	font-weight: 600;
+
+	.dashicon {
+		margin-right: 5px;
+	}
+}
+
+// Needs specificity
+.components-icon-button:not(:disabled):not([aria-disabled="true"]).editor-post-last-revision__title {
+	height: auto;
+
+	&:hover,
+	&:active {
+		// Override the default button hover style
+		background: $light-gray-200 !important;
+		border: none !important;
+		box-shadow: none !important;
+	}
+
+	&:focus {
+		@include menu-style__focus;
+	}
+}

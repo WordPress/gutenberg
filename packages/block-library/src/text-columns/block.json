@@ -1,0 +1,26 @@
+{
+	"name": "core/text-columns",
+	"icon": "columns",
+	"category": "layout",
+	"attributes": {
+		"content": {
+			"type": "array",
+			"source": "query",
+			"selector": "p",
+			"query": {
+				"children": {
+					"type": "string",
+					"source": "html"
+				}
+			},
+			"default": [ {}, {} ]
+		},
+		"columns": {
+			"type": "number",
+			"default": 2
+		},
+		"width": {
+			"type": "string"
+		}
+	}
+}

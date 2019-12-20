@@ -1,0 +1,14 @@
+.container {
+	align-items: center;
+}
+
+.centeredContent {
+	width: 100%;
+	max-width: 580;
+}
+
+.reversedCenteredContent {
+	flex-direction: column-reverse;
+	width: 100%;
+	max-width: 580;
+}

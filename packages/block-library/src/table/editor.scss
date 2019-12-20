@@ -1,0 +1,70 @@
+.block-editor-block-list__block[data-type="core/table"] {
+	&[data-align="left"],
+	&[data-align="right"],
+	&[data-align="center"] {
+		// Stop table block from collapsing when tables are floated.
+		height: auto;
+
+		table {
+			// Ensure the table element is not full-width when aligned.
+			width: auto;
+		}
+
+		td,
+		th {
+			word-break: break-word;
+		}
+	}
+
+	&[data-align="center"] {
+		text-align: initial;
+
+		table {
+			margin: 0 auto;
+		}
+	}
+}
+
+
+.wp-block-table {
+	// Remove default <figure> style.
+	margin: 0;
+
+	table {
+		border-collapse: collapse;
+	}
+
+	td,
+	th {
+		border: $border-width solid;
+	}
+
+	td.is-selected,
+	th.is-selected {
+		border-color: $blue-medium-500;
+		box-shadow: inset 0 0 0 1px $blue-medium-500;
+		border-style: double;
+	}
+
+	figcaption {
+		@include caption-style-theme();
+	}
+}
+
+// Extra specificity to override default Placeholder styles.
+.wp-block-table__placeholder-form.wp-block-table__placeholder-form {
+	.wp-block-table__placeholder-input {
+		width: $grid-size * 14;
+		margin-right: $grid-size;
+		margin-bottom: 0;
+
+		input {
+			height: $icon-button-size;
+		}
+	}
+
+	.wp-block-table__placeholder-button {
+		margin-top: auto;
+		margin-right: auto;
+	}
+}

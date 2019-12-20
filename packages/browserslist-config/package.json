@@ -1,0 +1,31 @@
+{
+	"name": "@wordpress/browserslist-config",
+	"version": "2.6.0",
+	"description": "WordPress Browserslist shared configuration.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"browserslist",
+		"browserslist-config"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/browserslist-config/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/browserslist-config"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=8"
+	},
+	"files": [
+		"index.js"
+	],
+	"main": "index.js",
+	"publishConfig": {
+		"access": "public"
+	}
+}

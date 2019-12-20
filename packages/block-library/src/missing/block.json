@@ -1,0 +1,16 @@
+{
+	"name": "core/missing",
+	"category": "common",
+	"attributes": {
+		"originalName": {
+			"type": "string"
+		},
+		"originalUndelimitedContent": {
+			"type": "string"
+		},
+		"originalContent": {
+			"type": "string",
+			"source": "html"
+		}
+	}
+}

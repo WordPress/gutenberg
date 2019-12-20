@@ -1,0 +1,31 @@
+{
+	"name": "@wordpress/deprecated",
+	"version": "2.6.1",
+	"description": "Deprecation utility for WordPress.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"deprecated"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/deprecated/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/deprecated"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"react-native": "src/index",
+	"sideEffects": false,
+	"dependencies": {
+		"@babel/runtime": "^7.4.4",
+		"@wordpress/hooks": "file:../hooks"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}
