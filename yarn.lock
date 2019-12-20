@@ -11012,9 +11012,9 @@ react-native-sass-transformer@^1.1.1:
     css-to-react-native-transform "^1.8.1"
     semver "^5.6.0"
 
-"react-native-svg@git+https://github.com/wordpress-mobile/react-native-svg.git#f16e9adae71c6cf3158f2356cf95fff5c2075e0f":
+"react-native-svg@git+https://github.com/wordpress-mobile/react-native-svg.git#a3f32b1af83e0100d10516fe58ba8a0096362b62":
   version "9.3.3-gb"
-  resolved "git+https://github.com/wordpress-mobile/react-native-svg.git#f16e9adae71c6cf3158f2356cf95fff5c2075e0f"
+  resolved "git+https://github.com/wordpress-mobile/react-native-svg.git#a3f32b1af83e0100d10516fe58ba8a0096362b62"
 
 "react-native-video@git+https://github.com/wordpress-mobile/react-native-video.git#3a0e2fa6fc6bf1fe1a54adb2dbf94545b28c2bc4":
   version "4.4.1"
