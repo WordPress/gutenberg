@@ -166,8 +166,8 @@ describe( 'Align Hook Works As Expected', () => {
 		const BLOCK_NAME = 'Test Align Array';
 
 		createShowsTheExpectedButtonsTest( BLOCK_NAME, [
-			'Align Left',
-			'Align Center',
+			'Align left',
+			'Align center',
 		] );
 
 		createDoesNotApplyAlignmentByDefaultTest( BLOCK_NAME );
@@ -179,11 +179,11 @@ describe( 'Align Hook Works As Expected', () => {
 		const BLOCK_NAME = 'Test Default Align';
 		const SELECTED_ALIGNMENT_CONTROL_SELECTOR = '//div[contains(@class, "components-dropdown-menu__menu")]//button[contains(@class, "is-active")][text()="Align Right"]';
 		createShowsTheExpectedButtonsTest( BLOCK_NAME, [
-			'Align Left',
-			'Align Center',
-			'Align Right',
-			'Wide Width',
-			'Full Width',
+			'Align left',
+			'Align center',
+			'Align right',
+			'Wide width',
+			'Full width',
 		] );
 
 		it( 'Applies the selected alignment by default', async () => {
