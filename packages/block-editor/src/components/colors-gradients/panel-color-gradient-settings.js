@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { every, isEmpty, pick, some } from 'lodash';
+import { every, isEmpty, pick } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -139,14 +139,10 @@ const PanelColorGradientSettingsSelect = ( props ) => {
 };
 
 const PanelColorGradientSettings = ( props ) => {
-	const relevantProps = pick( props, colorsAndGradientKeys );
-	if ( isEmpty( relevantProps ) || some(
-		pick( props, colorsAndGradientKeys ),
-		( setting ) => ( setting === undefined )
-	) ) {
-		return <PanelColorGradientSettingsSelect { ...props } />;
+	if ( every( colorsAndGradientKeys, ( key ) => ( props.hasOwnProperty( key ) ) ) ) {
+		return <PanelColorGradientSettingsInner { ...props } />;
 	}
-	return <PanelColorGradientSettingsInner { ...props } />;
+	return <PanelColorGradientSettingsSelect { ...props } />;
 };
 
 export default PanelColorGradientSettings;

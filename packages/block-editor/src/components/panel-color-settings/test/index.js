@@ -100,6 +100,7 @@ describe( 'PanelColorSettings', () => {
 			root = create(
 				<PanelColorSettings
 					title="Test Title"
+					colors={ [] }
 					disableCustomColors={ false }
 					colorSettings={ [
 						{

@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isEmpty, pick, some } from 'lodash';
+import { every, isEmpty, pick } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -122,12 +122,12 @@ function ColorGradientControlInner( {
 			{ currentTab === 'gradient' && (
 				<GradientPicker
 					value={ gradientValue }
-					onChange={ canChooseAGradient ?
+					onChange={ canChooseAColor ?
 						( newGradient ) => {
 							onGradientChange( newGradient );
 							onColorChange();
 						} :
-						onColorChange
+						onGradientChange
 					}
 					{ ... { gradients, disableCustomGradients } }
 				/>
@@ -147,15 +147,10 @@ function ColorGradientControlSelect( props ) {
 }
 
 function ColorGradientControl( props ) {
-	const relevantProps = pick( props, colorsAndGradientKeys );
-	if ( isEmpty( relevantProps ) || some(
-		pick( props, colorsAndGradientKeys ),
-		relevantProps,
-		( setting ) => ( setting === undefined )
-	) ) {
-		return <ColorGradientControlSelect { ...props } />;
+	if ( every( colorsAndGradientKeys, ( key ) => ( props.hasOwnProperty( key ) ) ) ) {
+		return <ColorGradientControlInner { ...props } />;
 	}
-	return <ColorGradientControlInner { ...props } />;
+	return <ColorGradientControlSelect { ...props } />;
 }
 
 export default ColorGradientControl;
