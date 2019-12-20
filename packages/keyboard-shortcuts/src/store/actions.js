@@ -4,7 +4,7 @@
  * @typedef {Object} WPShortcutKeyCombination
  *
  * @property {string}  character Character.
- * @property {string?} modifier  Modifier.
+ * @property {string} [modifier]  Modifier.
  */
 
 /**
