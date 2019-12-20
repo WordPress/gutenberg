@@ -17,7 +17,7 @@ _Parameters_
 
 _Returns_
 
--   `(WPShortcutKeyCombination)`: Key combination.
+-   `Array<WPShortcutKeyCombination>`: Key combinations.
 
 <a name="getShortcutDescription" href="#getShortcutDescription">#</a> **getShortcutDescription**
 
