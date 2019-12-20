@@ -1913,9 +1913,9 @@
     xcode "^2.0.0"
     xmldoc "^0.4.0"
 
-"@react-native-community/slider@git+https://github.com/wordpress-mobile/react-native-slider.git#1ac7533fad0eb7f091d1ea501010b113efa2e5f8":
+"@react-native-community/slider@git+https://github.com/wordpress-mobile/react-native-slider.git#f5d8685ffa389c78a8713162b1e2821067ad214f":
   version "2.0.7"
-  resolved "git+https://github.com/wordpress-mobile/react-native-slider.git#1ac7533fad0eb7f091d1ea501010b113efa2e5f8"
+  resolved "git+https://github.com/wordpress-mobile/react-native-slider.git#f5d8685ffa389c78a8713162b1e2821067ad214f"
 
 "@tannin/compile@^1.0.3":
   version "1.0.3"
