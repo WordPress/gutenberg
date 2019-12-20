@@ -281,20 +281,15 @@ const Popover = ( {
 			} = computePopoverPosition( anchor, contentRect.current, position, __unstableSticky, anchorRef );
 
 			if ( typeof popoverTop === 'number' && typeof popoverLeft === 'number' ) {
-				// Translate clashes with animated popovers.
-				if ( animate ) {
+				// Translate clashes with animated and arrow popovers.
+				if ( animate || ! noArrow || noSubpixels ) {
 					setStyle( containerEl, 'top', popoverTop + 'px' );
 					setStyle( containerEl, 'left', popoverLeft + 'px' );
+					setStyle( containerEl, 'transform' );
 				} else {
-					let x = popoverLeft;
-					let y = popoverTop;
-
-					if ( noSubpixels === true ) {
-						x = Math.round( x );
-						y = Math.round( y );
-					}
-
-					setStyle( containerEl, 'transform', `translate(${ x }px, ${ y }px)` );
+					setStyle( containerEl, 'top' );
+					setStyle( containerEl, 'left' );
+					setStyle( containerEl, 'transform', `translate(${ popoverLeft }px, ${ popoverTop }px)` );
 				}
 			}
 
