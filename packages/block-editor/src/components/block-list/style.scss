@@ -99,9 +99,6 @@
 
 	.block-editor-block-list__block-edit {
 		position: relative;
-		&.has-mover-inside > [data-block] {
-			display: flex;
-		}
 
 		&::before {
 			z-index: z-index(".block-editor-block-list__block-edit::before");
@@ -554,81 +551,6 @@
 
 
 /**
- * Mobile unified toolbar.
- */
-
-.block-editor-block-list__block {
-
-	// Show side UI inline below the block on mobile.
-	.block-editor-block-list__block-mobile-toolbar {
-		display: flex;
-		flex-direction: row;
-
-		// Make room for the height of the block toolbar above.
-		transform: translateY($block-padding + $border-width);
-		margin-top: $block-toolbar-height;
-		margin-right: -$block-padding;
-		margin-left: -$block-padding;
-		border-top: $border-width solid $light-gray-800;
-		height: $block-toolbar-height;
-
-		@include break-small() {
-			display: none;
-		}
-
-		// Add a white background to prevent the block's left border from showing through.
-		background-color: $white;
-
-		// Show a shadow below the selected block to imply separation.
-		box-shadow: $shadow-below-only;
-		@include break-small() {
-			box-shadow: none;
-		}
-
-		// Movers, inserter, trash, and ellipsis.
-		.block-editor-inserter {
-			position: relative;
-			left: auto;
-			top: auto;
-			margin: 0;
-		}
-
-		.block-editor-inserter__toggle,
-		.block-editor-block-mover__control {
-			width: $icon-button-size;
-			height: $icon-button-size;
-			border-radius: $radius-round-rectangle;
-			padding: 3px;
-			margin: 0;
-			justify-content: center;
-			align-items: center;
-
-			.dashicon {
-				margin: auto;
-			}
-		}
-
-		// Movers
-		.block-editor-block-mover {
-			display: flex;
-			margin-right: auto;
-
-			.block-editor-inserter,
-			.block-editor-block-mover__control {
-				float: left;
-			}
-		}
-	}
-
-	// Reset negative margins on mobile for full-width.
-	&[data-align="full"] .block-editor-block-list__block-mobile-toolbar {
-		margin-left: 0;
-		margin-right: 0;
-	}
-}
-
-
-/**
  * In-Canvas Inserter
  */
 
@@ -990,13 +912,6 @@
 		border: none;
 		box-shadow: none;
 		overflow-y: visible;
-		// Allow clicks through the wrapper for the block movers, which may be
-		// positioned next to the toolbar.
-		pointer-events: none;
-
-		> * {
-			pointer-events: all;
-		}
 
 		.block-editor-block-contextual-toolbar,
 		.block-editor-block-list__breadcrumb {
@@ -1004,16 +919,12 @@
 			margin-left: - $block-padding;
 		}
 
-		// Make space for the block movers. Ideally they should move within the
-		// toolbar.
-		.block-editor-block-contextual-toolbar {
-			&[data-align="wide"] {
-				margin-left: 86px;
-			}
-
-			&[data-align="full"] {
-				margin-left: 86 + 2 * $block-padding;
-			}
+		.block-editor-block-contextual-toolbar[data-align="full"] {
+			margin-left: 0;
 		}
+	}
+
+	.is-dragging-components-draggable & {
+		opacity: 0;
 	}
 }

@@ -9,7 +9,7 @@ import { __ } from '@wordpress/i18n';
 import NavigableToolbar from '../navigable-toolbar';
 import { BlockToolbar } from '../';
 
-function BlockContextualToolbar( { focusOnMount, ...props } ) {
+function BlockContextualToolbar( { focusOnMount, moverDirection, ...props } ) {
 	return (
 		<NavigableToolbar
 			focusOnMount={ focusOnMount }
@@ -18,7 +18,7 @@ function BlockContextualToolbar( { focusOnMount, ...props } ) {
 			aria-label={ __( 'Block tools' ) }
 			{ ...props }
 		>
-			<BlockToolbar />
+			<BlockToolbar moverDirection={ moverDirection } />
 		</NavigableToolbar>
 	);
 }
