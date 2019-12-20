@@ -540,7 +540,6 @@ _Parameters_
 -   _blockTypeOrName_ `(string|Object)`: Block type.
 -   _attributes_ `Object`: Parsed block attributes.
 -   _originalBlockContent_ `string`: Original block content.
--   _mode_ `string`: Validation mode.
 
 _Returns_
 

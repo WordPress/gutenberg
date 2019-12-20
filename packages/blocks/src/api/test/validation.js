@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { addFilter, removeFilter } from '@wordpress/hooks';
+
+/**
  * Internal dependencies
  */
 import {
@@ -613,6 +618,14 @@ describe( 'validation', () => {
 
 	describe( 'isValidBlockContent()', () => {
 		describe( 'no-save-error', () => {
+			beforeAll( () => {
+				addFilter( 'editor.blockValidationMode', 'testNoSaveError', () => ( 'no-save-error' ) );
+			} );
+
+			afterAll( () => {
+				removeFilter( 'editor.blockValidationMode', 'testNoSaveError' );
+			} );
+
 			it( 'returns true if block serializes but does not match original content', () => {
 				const blockName = 'core/test-block';
 				const blockAttributes = { fruit: 'Bananas' };
@@ -622,7 +635,6 @@ describe( 'validation', () => {
 					blockName,
 					blockAttributes,
 					'Apples',
-					'no-save-error',
 				);
 
 				const blockType = normalizeBlockType( blockName );
@@ -645,7 +657,6 @@ describe( 'validation', () => {
 					'core/test-block',
 					{ fruit: 'Bananas' },
 					'Bananas',
-					'no-save-error',
 				);
 
 				expect( console ).toHaveErrored();
@@ -671,7 +682,6 @@ describe( 'validation', () => {
 					blockName,
 					blockAttributes,
 					'<div class="foo bar baz">Bananas</div>',
-					'no-save-error',
 				);
 
 				const blockType = normalizeBlockType( blockName );
@@ -701,7 +711,6 @@ describe( 'validation', () => {
 					blockName,
 					blockAttributes,
 					'<div class="sugar">Blueberries</div>',
-					'no-save-error',
 				);
 
 				const blockType = normalizeBlockType( blockName );

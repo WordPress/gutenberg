@@ -16,6 +16,7 @@ import { BlockEditorProvider, transformStyles } from '@wordpress/block-editor';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
+import { addFilter } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -57,8 +58,9 @@ class EditorProvider extends Component {
 
 		props.updatePostLock( props.settings.postLock );
 
-		//TODO temp until we can pass through the block validation mde better. Parser is only created on load so I can't pass through properly
-		global.wp.blockValidationMode = props.settings.noBlockValidation ? 'no-save-error' : 'strict';
+		addFilter( 'editor.blockValidationMode', 'editorProviderSetMode', () => {
+			return props.settings.noBlockValidation ? 'no-save-error' : 'strict';
+		} );
 
 		props.setupEditor( props.post, props.initialEdits, props.settings.template );
 

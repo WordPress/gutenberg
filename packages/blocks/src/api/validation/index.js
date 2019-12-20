@@ -9,13 +9,13 @@ import {
 	isEqual,
 	includes,
 	stubTrue,
-	get,
 } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { decodeEntities } from '@wordpress/html-entities';
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -601,11 +601,10 @@ export function isEquivalentHTML( actual, expected, logger = createLogger() ) {
  * @param {Object}        attributes           Parsed block attributes.
  * @param {string}        originalBlockContent Original block content.
  * @param {Object}        logger           	   Validation logger object.
- * @param {string}        mode           	   Validation mode.
  *
  * @return {Object} Whether block is valid and contains validation messages.
  */
-export function getBlockContentValidationResult( blockTypeOrName, attributes, originalBlockContent, logger = createQueuedLogger(), mode = ( get( global, [ 'wp', 'blockValidationMode' ], null ) || 'strict' ) ) {
+export function getBlockContentValidationResult( blockTypeOrName, attributes, originalBlockContent, logger = createQueuedLogger() ) {
 	const blockType = normalizeBlockType( blockTypeOrName );
 	let generatedBlockContent;
 	try {
@@ -618,6 +617,13 @@ export function getBlockContentValidationResult( blockTypeOrName, attributes, or
 			validationIssues: logger.getItems(),
 		};
 	}
+
+	/**
+	 * Filters the current block validation mode
+	 *
+	 * @param {string} Validation Mode
+	 */
+	const mode = applyFilters( 'editor.blockValidationMode', 'strict' );
 
 	if ( mode === 'no-save-error' ) {
 		return {
@@ -653,11 +659,10 @@ export function getBlockContentValidationResult( blockTypeOrName, attributes, or
  * @param {string|Object} blockTypeOrName      Block type.
  * @param {Object}        attributes           Parsed block attributes.
  * @param {string}        originalBlockContent Original block content.
- * @param {string}        mode                 Validation mode.
  * @return {boolean} Whether block is valid.
  */
-export function isValidBlockContent( blockTypeOrName, attributes, originalBlockContent, mode = ( get( global, [ 'wp', 'blockValidationMode' ], null ) || 'strict' ) ) {
-	const { isValid } = getBlockContentValidationResult( blockTypeOrName, attributes, originalBlockContent, createLogger(), mode );
+export function isValidBlockContent( blockTypeOrName, attributes, originalBlockContent ) {
+	const { isValid } = getBlockContentValidationResult( blockTypeOrName, attributes, originalBlockContent, createLogger() );
 
 	return isValid;
 }
