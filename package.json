@@ -164,7 +164,7 @@
     "react-native-modal": "^6.5.0",
     "react-native-safe-area": "^0.5.0",
     "react-native-svg": "git+https://github.com/wordpress-mobile/react-native-svg.git#a3cc606c3d4dbaac1695270b03201fcb830e6952",
-    "react-native-video": "git+https://github.com/wordpress-mobile/react-native-video.git#c85e060a45897b64284f58264d332d42a2142d9f",
+    "react-native-video": "git+https://github.com/wordpress-mobile/react-native-video.git#a243cfdff1d30baca8fa2b708c00860c3b82750f",
     "react-redux": "^5.0.7",
     "redux": "^3.7.2",
     "redux-multi": "^0.1.12",
