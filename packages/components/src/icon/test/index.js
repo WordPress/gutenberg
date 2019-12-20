@@ -11,6 +11,7 @@ import { Component } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import Dashicon from '../../dashicon';
 import Icon from '../';
 import { Path, SVG } from '../../';
 
@@ -31,8 +32,14 @@ describe( 'Icon', () => {
 		expect( wrapper.find( 'Dashicon' ).prop( 'icon' ) ).toBe( 'format-image' );
 	} );
 
-	it( 'renders a dashicon and with a default size of 20', () => {
+	it( 'renders a dashicon by slug and with a default size of 20', () => {
 		const wrapper = shallow( <Icon icon="format-image" /> );
+
+		expect( wrapper.find( 'Dashicon' ).prop( 'size' ) ).toBe( 20 );
+	} );
+
+	it( 'renders a dashicon by element and with a default size of 20', () => {
+		const wrapper = shallow( <Icon icon={ <Dashicon icon="format-image" /> } /> );
 
 		expect( wrapper.find( 'Dashicon' ).prop( 'size' ) ).toBe( 20 );
 	} );
@@ -98,6 +105,7 @@ describe( 'Icon', () => {
 
 		describe.each( [
 			[ 'dashicon', { icon: 'format-image' } ],
+			[ 'dashicon element', { icon: <Dashicon icon="format-image" /> } ],
 			[ 'element', { icon: <span /> } ],
 			[ 'svg element', { icon: svg } ],
 			[ 'component', { icon: MyComponent } ],

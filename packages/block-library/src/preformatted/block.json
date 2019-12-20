@@ -6,7 +6,8 @@
 			"type": "string",
 			"source": "html",
 			"selector": "pre",
-			"default": ""
+			"default": "",
+			"__unstablePreserveWhiteSpace": true
 		}
 	}
 }

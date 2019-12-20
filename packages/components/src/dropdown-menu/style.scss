@@ -1,40 +1,5 @@
-.components-dropdown-menu {
-	padding: 3px;
-	display: flex;
-
-	.components-dropdown-menu__toggle {
-		width: auto;
-		margin: 0;
-		padding: 4px;
-		border: $border-width solid transparent;
-		display: flex;
-		flex-direction: row;
-
-		&.is-active,
-		&.is-active:hover {
-			box-shadow: none;
-			background-color: $dark-gray-500;
-			color: $white;
-		}
-
-		&:focus::before {
-			top: -3px;
-			right: -3px;
-			bottom: -3px;
-			left: -3px;
-		}
-
-		&:hover,
-		&:focus,
-		&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover {
-			@include formatting-button-style__hover();
-		}
-
-		// Add a dropdown arrow indicator.
-		.components-dropdown-menu__indicator::after {
-			@include dropdown-arrow();
-		}
-	}
+.components-dropdown-menu__indicator::after {
+	@include dropdown-arrow();
 }
 
 .components-dropdown-menu__popover .components-popover__content {
@@ -75,8 +40,14 @@
 		}
 
 		// Plain menu styles.
-		&:focus:not(:disabled):not([aria-disabled="true"]):not(.is-default) {
+		&:focus:not(:disabled):not([aria-disabled="true"]):not(.is-secondary) {
 			@include menu-style__focus();
+		}
+
+		&:hover,
+		&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):not(.is-tertiary):not(.is-primary):hover {
+			@include menu-style__hover();
+			box-shadow: none;
 		}
 
 		// Formatting buttons
@@ -90,7 +61,7 @@
 			margin: -1px $grid-size -1px 0;
 		}
 
-		&:not(:disabled):not([aria-disabled="true"]):not(.is-default).is-active > svg {
+		&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary).is-active > svg {
 			@include formatting-button-style__active();
 		}
 	}
@@ -101,6 +72,7 @@
 
 	.components-menu-item__button,
 	.components-menu-item__button.components-icon-button {
+		height: auto;
 		padding-left: 2rem;
 
 		&.has-icon {

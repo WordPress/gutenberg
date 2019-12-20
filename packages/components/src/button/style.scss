@@ -7,49 +7,50 @@
 	cursor: pointer;
 	-webkit-appearance: none;
 	background: none;
+	transition: box-shadow 0.1s linear;
+	@include reduce-motion("transition");
+	height: $icon-button-size;
+	align-items: center;
+	box-sizing: border-box;
+	padding: 0 8px;
+	overflow: hidden;
+	border-radius: 3px;
+	color: $dark-gray-500;
 
-	&.is-button {
-		padding: 0 10px 1px;
-		line-height: 26px;
-		height: 28px;
-		border-radius: 3px;
-		white-space: nowrap;
-		border-width: $border-width;
-		border-style: solid;
+	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):not(.is-primary):not(.is-tertiary):not(.is-link):hover {
+		@include button-style__hover;
 	}
 
 	// Default button style
-	&.is-default {
-		color: #555;
-		border-color: #ccc;
-		background: #f7f7f7;
-		box-shadow: inset 0 -1px 0 #ccc;
-		vertical-align: top;
+	&.is-secondary {
+		border-width: $border-width;
+		border-style: solid;
+		white-space: nowrap;
+		color: color(theme(button) shade(6%));
+		border-color: color(theme(button) shade(6%));
+		background: #f3f5f6;
 
-		&:hover {
-			background: #fafafa;
-			border-color: #999;
-			box-shadow: inset 0 -1px 0 #999;
-			color: #23282d;
+		&:not(:disabled):not([aria-disabled="true"]):hover {
+			background: #f1f1f1;
+			border-color: color(theme(button) shade(25%));
+			color: color(theme(button) shade(25%));
 			text-decoration: none;
 		}
 
 		&:focus:enabled {
-			background: #fafafa;
-			color: #23282d;
-			border-color: #999;
-			box-shadow:
-				inset 0 -1px 0 #999,
-				0 0 0 1px $white,
-				0 0 0 3px $blue-medium-focus;
+			background: #f3f5f6;
+			color: color(theme(button) shade(25%));
+			border-color: color(theme(button) shade(5%));
+			box-shadow: 0 0 0 $border-width color(theme(button) shade(5%));
 			text-decoration: none;
 
 		}
 
 		&:active:enabled {
-			background: #eee;
-			border-color: #999;
-			box-shadow: inset 0 1px 0 #999,;
+			background: #f3f5f6;
+			color: color(theme(button) shade(5%));
+			border-color: #7e8993;
+			box-shadow: none;
 		}
 
 		&:disabled,
@@ -57,75 +58,55 @@
 			color: #a0a5aa;
 			border-color: #ddd;
 			background: #f7f7f7;
-			box-shadow: none;
-			text-shadow: 0 1px 0 #fff;
+			text-shadow: 0 $border-width 0 #fff;
 			transform: none;
 			opacity: 1;
 		}
 	}
 
 	&.is-primary {
+		border-width: $border-width;
+		border-style: solid;
+		white-space: nowrap;
 		background: color(theme(button));
-		border-color: color(theme(button) shade(20%)) color(theme(button) shade(25%)) color(theme(button) shade(25%));
-		box-shadow: inset 0 -1px 0 color(theme(button) shade(25%));
+		border-color: color(theme(button));
 		color: $white;
 		text-decoration: none;
-		text-shadow:
-			0 -1px 1px color(theme(button) shade(30%)),
-			1px 0 1px color(theme(button) shade(30%)),
-			0 1px 1px color(theme(button) shade(30%)),
-			-1px 0 1px color(theme(button) shade(30%));
+		text-shadow: none;
 
-		&:hover,
+		&:not(:disabled):not([aria-disabled="true"]):hover,
 		&:focus:enabled {
-			background: color(theme(button) shade(5%));
-			border-color: color(theme(button) shade(50%));
+			background: color(theme(button) shade(10%));
+			border-color: color(theme(button) shade(10%));
 			color: $white;
-		}
-
-		&:hover {
-			box-shadow: inset 0 -1px 0 color(theme(button) shade(50%));
 		}
 
 		&:focus:enabled {
 			box-shadow:
-				inset 0 -1px 0 color(theme(button) shade(50%)),
-				0 0 0 1px $white,
-				0 0 0 3px color(theme(button) shade(5%));
+				0 0 0 $border-width $white,
+				0 0 0 3px color(theme(button));
 		}
 
 		&:active:enabled {
 			background: color(theme(button) shade(20%));
-			border-color: color(theme(button) shade(50%));
-			box-shadow: inset 0 1px 0 color(theme(button) shade(50%));
-			vertical-align: top;
+			border-color: color(theme(button) shade(20%));
+			color: $white;
 		}
 
 		&:disabled,
 		&:disabled:active:enabled,
 		&[aria-disabled="true"],
+		&[aria-disabled="true"]:enabled, // This catches a situation where a Button is aria-disabled, but not disabled.
 		&[aria-disabled="true"]:active:enabled {
 			color: color(theme(button) tint(40%));
-			background: color(theme(button));
-			border-color: color(theme(button) shade(7%));
-			box-shadow: none;
-			text-shadow: none;
+			background: color(theme(button) tint(10%));
+			border-color: color(theme(button) tint(10%));
 			opacity: 1;
 
-			// This specificity is needed to override alternate color schemes in WP-Admin.
-			&.is-button,
-			&.is-button:hover,
-			&:active:enabled {
-				box-shadow: none;
-				text-shadow: none;
-			}
-
 			&:focus:enabled {
-				color: color(theme(button) tint(40%));
-				border-color: color(theme(button) shade(7%));
 				box-shadow:
-					0 0 0 1px $white,
-					0 0 0 3px $blue-medium-focus;
+					0 0 0 $border-width $white,
+					0 0 0 3px color(theme(button));
 			}
 		}
 
@@ -138,13 +119,13 @@
 			/* stylelint-disable */
 			background-image: linear-gradient(
 				-45deg,
-				theme(primary) 28%,
-				color(theme(primary) shade(30%)) 28%,
-				color(theme(primary) shade(30%)) 72%,
-				theme(primary) 72%
+				theme(button) 28%,
+				color(theme(button) shade(20%)) 28%,
+				color(theme(button) shade(20%)) 72%,
+				theme(button) 72%
 			);
 			/* stylelint-enable */
-			border-color: color(theme(primary) shade(50%));
+			border-color: color(theme(button));
 		}
 	}
 
@@ -165,8 +146,9 @@
 		transition-duration: 0.05s;
 		transition-timing-function: ease-in-out;
 		@include reduce-motion("transition");
+		height: auto;
 
-		&:hover,
+		&:not(:disabled):not([aria-disabled="true"]):hover,
 		&:active {
 			color: #00a0d2;
 		}
@@ -174,8 +156,8 @@
 		&:focus {
 			color: #124964;
 			box-shadow:
-				0 0 0 1px #5b9dd9,
-				0 0 2px 1px rgba(30, 140, 190, 0.8);
+				0 0 0 $border-width #5b9dd9,
+				0 0 2px $border-width rgba(30, 140, 190, 0.8);
 		}
 	}
 
@@ -199,36 +181,25 @@
 	}
 
 	&.is-busy,
-	&.is-default.is-busy,
-	&.is-default.is-busy:disabled,
-	&.is-default.is-busy[aria-disabled="true"] {
+	&.is-secondary.is-busy,
+	&.is-secondary.is-busy:disabled,
+	&.is-secondary.is-busy[aria-disabled="true"] {
 		animation: components-button__busy-animation 2500ms infinite linear;
 		background-size: 100px 100%;
 		background-image: repeating-linear-gradient(-45deg, $light-gray-500, $white 11px, $white 10px, $light-gray-500 20px);
 		opacity: 1;
 	}
 
-	&.is-large {
-		height: 30px;
-		line-height: 28px;
-		padding: 0 12px 2px;
-	}
-
 	&.is-small {
 		height: 24px;
 		line-height: 22px;
-		padding: 0 8px 1px;
+		padding: 0 8px;
 		font-size: 11px;
 	}
 
 	// Buttons that are text-based.
 	&.is-tertiary {
 		color: theme(outlines);
-
-		// Matches default button in hit area. See line 11.
-		padding: 0 10px;
-		line-height: 26px;
-		height: 28px;
 
 		.dashicon {
 			display: inline-block;
@@ -245,7 +216,7 @@
 			box-shadow: none;
 		}
 
-		&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover {
+		&:not(:disabled):not([aria-disabled="true"]):hover {
 			color: color(theme(outlines) shade(25%));
 		}
 	}
@@ -254,6 +225,23 @@
 	// See https://core.trac.wordpress.org/ticket/42006 and https://github.com/h5bp/html5-boilerplate/issues/1985
 	.screen-reader-text {
 		height: auto;
+	}
+}
+
+.components-icon-button {
+	.dashicon {
+		display: inline-block;
+		flex: 0 0 auto;
+	}
+
+	// Ensure that even SVG icons that don't include the .dashicon class are colored.
+	svg {
+		fill: currentColor;
+		outline: none;
+	}
+
+	&.has-text svg {
+		margin-right: 8px;
 	}
 }
 

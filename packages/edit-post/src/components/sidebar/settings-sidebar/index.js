@@ -1,11 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { Panel, PanelBody } from '@wordpress/components';
+import { Panel } from '@wordpress/components';
 import { compose, ifCondition } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { BlockInspector } from '@wordpress/block-editor';
-import { __ } from '@wordpress/i18n';
+
 /**
  * Internal dependencies
  */
@@ -23,10 +23,7 @@ import MetaBoxes from '../../meta-boxes';
 import PluginDocumentSettingPanel from '../plugin-document-setting-panel';
 
 const SettingsSidebar = ( { sidebarName } ) => (
-	<Sidebar
-		name={ sidebarName }
-		label={ __( 'Editor settings' ) }
-	>
+	<Sidebar name={ sidebarName }>
 		<SettingsHeader sidebarName={ sidebarName } />
 		<Panel>
 			{ sidebarName === 'edit-post/document' && (
@@ -44,9 +41,7 @@ const SettingsSidebar = ( { sidebarName } ) => (
 				</>
 			) }
 			{ sidebarName === 'edit-post/block' && (
-				<PanelBody className="edit-post-settings-sidebar__panel-block">
-					<BlockInspector />
-				</PanelBody>
+				<BlockInspector />
 			) }
 		</Panel>
 	</Sidebar>

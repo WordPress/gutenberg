@@ -37,12 +37,20 @@
 	align-items: center;
 }
 
+.modalIconWrapperDark {
+	background-color: rgba($white, 0.07);
+}
+
 .modalIcon {
 	width: 32px;
 	height: 32px;
 	justify-content: center;
 	align-items: center;
 	fill: $gray-dark;
+}
+
+.modalIconDark {
+	fill: $white;
 }
 
 .modalItemLabel {
@@ -56,9 +64,18 @@
 	color: $gray-dark;
 }
 
+.modalItemLabelDark {
+	color: $white;
+}
+
 .addBlockButton {
 	color: $blue-wordpress;
 	border: 2px;
 	border-radius: 10px;
 	border-color: $blue-wordpress;
+}
+
+.addBlockButtonDark {
+	color: $blue-30;
+	border-color: $blue-30;
 }

@@ -1,0 +1,13 @@
+[
+    {
+        "clientId": "_clientId_0",
+        "name": "core/social-link-twitter",
+        "isValid": true,
+        "attributes": {
+            "url": "https://example.com/",
+            "site": "twitter"
+        },
+        "innerBlocks": [],
+        "originalContent": ""
+    }
+]

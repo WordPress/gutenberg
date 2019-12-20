@@ -5,7 +5,7 @@ import { __ } from '@wordpress/i18n';
 import { Dropdown, ToolbarButton, Dashicon } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { getUnregisteredTypeHandlerName } from '@wordpress/blocks';
 
 /**
@@ -13,13 +13,19 @@ import { getUnregisteredTypeHandlerName } from '@wordpress/blocks';
  */
 import styles from './style.scss';
 import InserterMenu from './menu';
+import BlockInsertionPoint from '../block-list/insertion-point';
 
-const defaultRenderToggle = ( { onToggle, disabled } ) => (
+const defaultRenderToggle = ( { onToggle, disabled, style } ) => (
 	<ToolbarButton
 		title={ __( 'Add block' ) }
-		icon={ ( <Dashicon icon="plus-alt" style={ styles.addBlockButton } color={ styles.addBlockButton.color } /> ) }
+		icon={ ( <Dashicon icon="plus-alt" style={ style } color={ style.color } /> ) }
 		onClick={ onToggle }
-		extraProps={ { hint: __( 'Double tap to add a block' ) } }
+		extraProps={ {
+			hint: __( 'Double tap to add a block' ),
+			// testID is present to disambiguate this element for native UI tests. It's not
+			// usually required for components. See: https://git.io/JeQ7G.
+			testID: 'add-block-button',
+		} }
 		isDisabled={ disabled }
 	/>
 );
@@ -56,9 +62,14 @@ class Inserter extends Component {
 		const {
 			disabled,
 			renderToggle = defaultRenderToggle,
+			getStylesFromColorScheme,
+			showSeparator,
 		} = this.props;
-
-		return renderToggle( { onToggle, isOpen, disabled } );
+		if ( showSeparator && isOpen ) {
+			return <BlockInsertionPoint />;
+		}
+		const style = getStylesFromColorScheme( styles.addBlockButton, styles.addBlockButtonDark );
+		return renderToggle( { onToggle, isOpen, disabled, style } );
 	}
 
 	/**
@@ -118,4 +129,5 @@ export default compose( [
 			items: inserterItems.filter( ( { name } ) => name !== getUnregisteredTypeHandlerName() ),
 		};
 	} ),
+	withPreferredColorScheme,
 ] )( Inserter );

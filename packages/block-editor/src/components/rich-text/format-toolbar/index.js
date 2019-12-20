@@ -17,7 +17,7 @@ const POPOVER_PROPS = {
 
 const FormatToolbar = () => {
 	return (
-		<div className="editor-format-toolbar block-editor-format-toolbar">
+		<div className="block-editor-format-toolbar">
 			<Toolbar>
 				{ [ 'bold', 'italic', 'link' ].map( ( format ) =>
 					<Slot name={ `RichText.ToolbarControls.${ format }` } key={ format } />
@@ -26,7 +26,7 @@ const FormatToolbar = () => {
 					{ ( fills ) => fills.length !== 0 &&
 						<DropdownMenu
 							icon={ false }
-							label={ __( 'More Rich Text Controls' ) }
+							label={ __( 'More rich text controls' ) }
 							controls={ orderBy( fills.map( ( [ { props } ] ) => props ), 'title' ) }
 							popoverProps={ POPOVER_PROPS }
 						/>

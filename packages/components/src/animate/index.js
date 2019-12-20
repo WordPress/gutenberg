@@ -30,6 +30,14 @@ function Animate( { type, options = {}, children } ) {
 		} );
 	}
 
+	if ( type === 'loading' ) {
+		return children( {
+			className: classnames(
+				'components-animate__loading',
+			),
+		} );
+	}
+
 	return children( {} );
 }
 

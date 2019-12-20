@@ -1,3 +1,7 @@
+/**
+ * External dependencies
+ */
+import RNReactNativeGutenbergBridge from 'react-native-gutenberg-bridge';
 
 export * from './actions.js';
 
@@ -13,4 +17,11 @@ export function togglePostTitleSelection( isSelected = true ) {
 		type: 'TOGGLE_POST_TITLE_SELECTION',
 		isSelected,
 	};
+}
+
+/**
+ * Action generator used in signalling that the post should autosave.
+ */
+export function* autosave() {
+	RNReactNativeGutenbergBridge.editorDidAutosave();
 }

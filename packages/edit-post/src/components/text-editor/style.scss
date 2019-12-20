@@ -1,30 +1,6 @@
-.edit-post-text-editor__body {
-	padding-top: $grid-size * 5;
-
-	@include break-small() {
-		padding-top: ($grid-size * 5) + $admin-bar-height-big;
-	}
-
-	@include break-medium() {
-		padding-top: $grid-size * 5;
-
-		body.is-fullscreen-mode & {
-			padding-top: $grid-size * 5;
-		}
-	}
-}
-
 .edit-post-text-editor {
+	position: relative;
 	width: 100%;
-	max-width: calc(100% - #{$grid-size-large * 2});
-	margin-left: $grid-size-large;
-	margin-right: $grid-size-large;
-
-	@include break-small() {
-		max-width: $content-width;
-		margin-left: auto;
-		margin-right: auto;
-	}
 
 	// Always show outlines in code editor
 	.editor-post-title__block {
@@ -67,34 +43,41 @@
 		}
 	}
 
-	.editor-post-text-editor {
-		padding: $block-padding;
-		min-height: 200px;
-		line-height: 1.8;
-	}
-
 	// Make room for toolbar.
 	padding-top: $block-controls-height + $grid-size;
+}
 
-	// Exit Code Editor toolbar.
-	.edit-post-text-editor__toolbar {
-		position: absolute;
-		top: $grid-size;
-		left: 0;
-		right: 0;
-		height: $block-controls-height;
-		line-height: $block-controls-height;
-		padding: 0 $grid-size 0 $grid-size-large;
-		display: flex;
+// Exit Code Editor toolbar.
+.edit-post-text-editor__toolbar {
+	position: absolute;
+	top: $grid-size;
+	left: 0;
+	right: 0;
+	height: $block-controls-height;
+	line-height: $block-controls-height;
+	padding: 0 $grid-size 0 $grid-size-large;
+	display: flex;
 
-		h2 {
-			margin: 0 auto 0 0;
-			font-size: $default-font-size;
-			color: $dark-gray-500;
-		}
+	h2 {
+		margin: 0 auto 0 0;
+		font-size: $default-font-size;
+		color: $dark-gray-500;
+	}
 
-		.components-icon-button svg {
-			order: 1;
-		}
+	.components-icon-button svg {
+		order: 1;
+	}
+}
+
+.edit-post-text-editor__body {
+	max-width: calc(100% - #{$grid-size-large * 2});
+	margin-left: $grid-size-large;
+	margin-right: $grid-size-large;
+	padding-top: $grid-size * 5;
+
+	@include break-small() {
+		max-width: $content-width;
+		margin-left: auto;
+		margin-right: auto;
 	}
 }

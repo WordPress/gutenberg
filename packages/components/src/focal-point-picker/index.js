@@ -102,8 +102,8 @@ export class FocalPointPicker extends Component {
 				)
 			);
 			const percentages = {
-				x: ( left - bounds.left ) / ( pickerDimensions.width - ( bounds.left * 2 ) ),
-				y: ( top - bounds.top ) / ( pickerDimensions.height - ( bounds.top * 2 ) ),
+				x: ( ( left - bounds.left ) / ( pickerDimensions.width - ( bounds.left * 2 ) ) ).toFixed( 2 ),
+				y: ( ( top - bounds.top ) / ( pickerDimensions.height - ( bounds.top * 2 ) ) ).toFixed( 2 ),
 			};
 			this.setState( { percentages }, function() {
 				onChange( {
@@ -126,7 +126,7 @@ export class FocalPointPicker extends Component {
 		const { onChange } = this.props;
 		const { percentages } = this.state;
 		const cleanValue = Math.max( Math.min( parseInt( value ), 100 ), 0 );
-		percentages[ axis ] = cleanValue ? cleanValue / 100 : 0;
+		percentages[ axis ] = ( cleanValue ? cleanValue / 100 : 0 ).toFixed( 2 );
 		this.setState( { percentages }, function() {
 			onChange( {
 				x: this.state.percentages.x,

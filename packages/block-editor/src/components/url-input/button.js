@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -37,26 +32,25 @@ class URLInputButton extends Component {
 	render() {
 		const { url, onChange } = this.props;
 		const { expanded } = this.state;
-		const buttonLabel = url ? __( 'Edit Link' ) : __( 'Insert Link' );
+		const buttonLabel = url ? __( 'Edit link' ) : __( 'Insert link' );
 
 		return (
-			<div className="editor-url-input__button block-editor-url-input__button">
+			<div className="block-editor-url-input__button">
 				<IconButton
 					icon="admin-links"
 					label={ buttonLabel }
 					onClick={ this.toggle }
-					className={ classnames( 'components-toolbar__control', {
-						'is-active': url,
-					} ) }
+					className="components-toolbar__control"
+					isPressed={ !! url }
 				/>
 				{ expanded &&
 					<form
-						className="editor-url-input__button-modal block-editor-url-input__button-modal"
+						className="block-editor-url-input__button-modal"
 						onSubmit={ this.submitLink }
 					>
-						<div className="editor-url-input__button-modal-line block-editor-url-input__button-modal-line">
+						<div className="block-editor-url-input__button-modal-line">
 							<IconButton
-								className="editor-url-input__back block-editor-url-input__back"
+								className="block-editor-url-input__back"
 								icon="arrow-left-alt"
 								label={ __( 'Close' ) }
 								onClick={ this.toggle }

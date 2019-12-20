@@ -39,6 +39,7 @@ module.exports = {
 		return memo;
 	}, {} ),
 	output: {
+		devtoolNamespace: 'wp',
 		filename: './build/[basename]/index.js',
 		path: __dirname,
 		library: [ 'wp', '[name]' ],

@@ -23,12 +23,12 @@ import { __ } from '@wordpress/i18n';
  * Module Constants
  */
 export const DEFAULT_CATEGORIES = [
-	{ slug: 'common', title: __( 'Common Blocks' ) },
+	{ slug: 'common', title: __( 'Common blocks' ) },
 	{ slug: 'formatting', title: __( 'Formatting' ) },
-	{ slug: 'layout', title: __( 'Layout Elements' ) },
+	{ slug: 'layout', title: __( 'Layout elements' ) },
 	{ slug: 'widgets', title: __( 'Widgets' ) },
 	{ slug: 'embed', title: __( 'Embeds' ) },
-	{ slug: 'reusable', title: __( 'Reusable Blocks' ) },
+	{ slug: 'reusable', title: __( 'Reusable blocks' ) },
 ];
 
 /**
@@ -90,6 +90,47 @@ export function blockStyles( state = {}, action ) {
 				[ action.blockName ]: filter(
 					get( state, [ action.blockName ], [] ),
 					( style ) => action.styleNames.indexOf( style.name ) === -1,
+				),
+			};
+	}
+
+	return state;
+}
+
+/**
+ * Reducer managing the block patterns.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function blockPatterns( state = {}, action ) {
+	switch ( action.type ) {
+		case 'ADD_BLOCK_TYPES':
+			return {
+				...state,
+				...mapValues( keyBy( action.blockTypes, 'name' ), ( blockType ) => {
+					return uniqBy( [
+						...get( blockType, [ 'patterns' ], [] ),
+						...get( state, [ blockType.name ], [] ),
+					], ( pattern ) => pattern.name );
+				} ),
+			};
+		case 'ADD_BLOCK_PATTERNS':
+			return {
+				...state,
+				[ action.blockName ]: uniqBy( [
+					...get( state, [ action.blockName ], [] ),
+					...( action.patterns ),
+				], ( pattern ) => pattern.name ),
+			};
+		case 'REMOVE_BLOCK_PATTERNS':
+			return {
+				...state,
+				[ action.blockName ]: filter(
+					get( state, [ action.blockName ], [] ),
+					( pattern ) => action.patternNames.indexOf( pattern.name ) === -1,
 				),
 			};
 	}
@@ -162,6 +203,7 @@ export function categories( state = DEFAULT_CATEGORIES, action ) {
 export default combineReducers( {
 	blockTypes,
 	blockStyles,
+	blockPatterns,
 	defaultBlockName,
 	freeformFallbackBlockName,
 	unregisteredFallbackBlockName,

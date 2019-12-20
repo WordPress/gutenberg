@@ -11,6 +11,7 @@ import {
 	getBlockContent,
 	pasteHandler,
 	rawHandler,
+	registerBlockType,
 	serialize,
 } from '@wordpress/blocks';
 import { registerCoreBlocks } from '@wordpress/block-library';
@@ -24,6 +25,38 @@ describe( 'Blocks raw handling', () => {
 		// Load all hooks that modify blocks
 		require( '../../packages/editor/src/hooks' );
 		registerCoreBlocks();
+		registerBlockType( 'test/gallery', {
+			title: 'Test Gallery',
+			category: 'common',
+			attributes: {
+				ids: {
+					type: 'array',
+					default: [],
+				},
+			},
+			transforms: {
+				from: [
+					{
+						type: 'shortcode',
+						tag: 'gallery',
+						isMatch( { named: { ids } } ) {
+							return ids.indexOf( 42 ) > -1;
+						},
+						attributes: {
+							ids: {
+								type: 'array',
+								shortcode: ( { named: { ids } } ) =>
+									ids.split( ',' ).map( ( id ) => (
+										parseInt( id, 10 )
+									) ),
+							},
+						},
+						priority: 9,
+					},
+				],
+			},
+			save: () => null,
+		} );
 	} );
 
 	it( 'should filter inline content', () => {
@@ -40,9 +73,9 @@ describe( 'Blocks raw handling', () => {
 		const filtered = pasteHandler( {
 			HTML: '<b id="docs-internal-guid-0"><em>test</em></b>',
 			mode: 'AUTO',
-		} ).map( getBlockContent ).join( '' );
+		} );
 
-		expect( filtered ).toBe( '<p><em>test</em></p>' );
+		expect( filtered ).toBe( '<em>test</em>' );
 		expect( console ).toHaveLogged();
 	} );
 
@@ -248,12 +281,17 @@ describe( 'Blocks raw handling', () => {
 			'markdown',
 			'wordpress',
 			'gutenberg',
-			'caption-shortcode',
+			'shortcode-matching',
 		].forEach( ( type ) => {
 			it( type, () => {
 				const HTML = readFile( path.join( __dirname, `fixtures/${ type }-in.html` ) );
 				const plainText = readFile( path.join( __dirname, `fixtures/${ type }-in.txt` ) );
 				const output = readFile( path.join( __dirname, `fixtures/${ type }-out.html` ) );
+
+				if ( ! ( HTML || plainText ) || ! output ) {
+					throw new Error( `Expected fixtures for type ${ type }` );
+				}
+
 				const converted = pasteHandler( { HTML, plainText, canUserUseUnfilteredHTML: true } );
 				const serialized = typeof converted === 'string' ? converted : serialize( converted );
 
@@ -263,6 +301,29 @@ describe( 'Blocks raw handling', () => {
 					expect( console ).toHaveLogged();
 				}
 			} );
+		} );
+
+		it( 'should strip some text-level elements', () => {
+			const HTML = '<p>This is <u>ncorect</u></p>';
+			expect( serialize( pasteHandler( { HTML } ) ) ).toMatchSnapshot();
+			expect( console ).toHaveLogged();
+		} );
+
+		it( 'should remove extra blank lines', () => {
+			const HTML = readFile( path.join( __dirname, 'fixtures/google-docs-blank-lines.html' ) );
+			expect( serialize( pasteHandler( { HTML } ) ) ).toMatchSnapshot();
+			expect( console ).toHaveLogged();
+		} );
+
+		it( 'should strip windows data', () => {
+			const HTML = readFile( path.join( __dirname, 'fixtures/windows.html' ) );
+			expect( serialize( pasteHandler( { HTML } ) ) ).toMatchSnapshot();
+		} );
+
+		it( 'should strip HTML formatting space from inline text', () => {
+			const HTML = readFile( path.join( __dirname, 'fixtures/inline-with-html-formatting-space.html' ) );
+			expect( pasteHandler( { HTML } ) ).toMatchSnapshot();
+			expect( console ).toHaveLogged();
 		} );
 	} );
 } );
@@ -285,6 +346,21 @@ describe( 'rawHandler', () => {
 
 	it( 'should convert a caption shortcode with caption', () => {
 		const HTML = readFile( path.join( __dirname, 'fixtures/shortcode-caption-with-caption-link.html' ) );
+		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
+	} );
+
+	it( 'should convert a list with attributes', () => {
+		const HTML = readFile( path.join( __dirname, 'fixtures/list-with-attributes.html' ) );
+		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
+	} );
+
+	it( 'should not strip any text-level elements', () => {
+		const HTML = '<p>This is <u>ncorect</u></p>';
+		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
+	} );
+
+	it( 'should preserve alignment', () => {
+		const HTML = '<p style="text-align:center">center</p>';
 		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
 	} );
 } );

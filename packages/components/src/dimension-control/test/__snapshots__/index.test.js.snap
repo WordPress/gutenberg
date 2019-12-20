@@ -1,0 +1,163 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`DimensionControl rendering renders with custom sizes 1`] = `
+<SelectControl
+  className="block-editor-dimension-control"
+  hideLabelFromVision={false}
+  label={
+    <React.Fragment>
+      Custom Dimension
+    </React.Fragment>
+  }
+  onChange={[Function]}
+  options={
+    Array [
+      Object {
+        "label": "Default",
+        "value": "",
+      },
+      Object {
+        "label": "Mini",
+        "value": "mini",
+      },
+      Object {
+        "label": "Middle",
+        "value": "middle",
+      },
+      Object {
+        "label": "Giant",
+        "value": "giant",
+      },
+    ]
+  }
+/>
+`;
+
+exports[`DimensionControl rendering renders with defaults 1`] = `
+<SelectControl
+  className="block-editor-dimension-control"
+  hideLabelFromVision={false}
+  label={
+    <React.Fragment>
+      Padding
+    </React.Fragment>
+  }
+  onChange={[Function]}
+  options={
+    Array [
+      Object {
+        "label": "Default",
+        "value": "",
+      },
+      Object {
+        "label": "None",
+        "value": "none",
+      },
+      Object {
+        "label": "Small",
+        "value": "small",
+      },
+      Object {
+        "label": "Medium",
+        "value": "medium",
+      },
+      Object {
+        "label": "Large",
+        "value": "large",
+      },
+      Object {
+        "label": "Extra Large",
+        "value": "xlarge",
+      },
+    ]
+  }
+/>
+`;
+
+exports[`DimensionControl rendering renders with icon and custom icon label 1`] = `
+<SelectControl
+  className="block-editor-dimension-control"
+  hideLabelFromVision={false}
+  label={
+    <React.Fragment>
+      <Icon
+        icon="tablet"
+      />
+      Margin
+    </React.Fragment>
+  }
+  onChange={[Function]}
+  options={
+    Array [
+      Object {
+        "label": "Default",
+        "value": "",
+      },
+      Object {
+        "label": "None",
+        "value": "none",
+      },
+      Object {
+        "label": "Small",
+        "value": "small",
+      },
+      Object {
+        "label": "Medium",
+        "value": "medium",
+      },
+      Object {
+        "label": "Large",
+        "value": "large",
+      },
+      Object {
+        "label": "Extra Large",
+        "value": "xlarge",
+      },
+    ]
+  }
+/>
+`;
+
+exports[`DimensionControl rendering renders with icon and default icon label 1`] = `
+<SelectControl
+  className="block-editor-dimension-control"
+  hideLabelFromVision={false}
+  label={
+    <React.Fragment>
+      <Icon
+        icon="tablet"
+      />
+      Margin
+    </React.Fragment>
+  }
+  onChange={[Function]}
+  options={
+    Array [
+      Object {
+        "label": "Default",
+        "value": "",
+      },
+      Object {
+        "label": "None",
+        "value": "none",
+      },
+      Object {
+        "label": "Small",
+        "value": "small",
+      },
+      Object {
+        "label": "Medium",
+        "value": "medium",
+      },
+      Object {
+        "label": "Large",
+        "value": "large",
+      },
+      Object {
+        "label": "Extra Large",
+        "value": "xlarge",
+      },
+    ]
+  }
+/>
+`;

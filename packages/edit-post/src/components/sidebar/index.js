@@ -17,14 +17,9 @@ const { Fill, Slot } = createSlotFill( 'Sidebar' );
  *
  * @return {Object} The rendered sidebar.
  */
-function Sidebar( { children, label, className } ) {
+function Sidebar( { children, className } ) {
 	return (
-		<div
-			className={ classnames( 'edit-post-sidebar', className ) }
-			role="region"
-			aria-label={ label }
-			tabIndex="-1"
-		>
+		<div className={ classnames( 'edit-post-sidebar', className ) }>
 			{ children }
 		</div>
 	);

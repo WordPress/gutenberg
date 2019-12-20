@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { FlatList, View, Text, TouchableHighlight } from 'react-native';
-import { subscribeMediaAppend } from 'react-native-gutenberg-bridge';
 
 /**
  * WordPress dependencies
@@ -13,7 +12,7 @@ import {
 	isUnmodifiedDefaultBlock,
 } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
-import { withInstanceId, compose } from '@wordpress/compose';
+import { withInstanceId, compose, withPreferredColorScheme } from '@wordpress/compose';
 import { BottomSheet, Icon } from '@wordpress/components';
 
 /**
@@ -22,23 +21,20 @@ import { BottomSheet, Icon } from '@wordpress/components';
 import styles from './style.scss';
 
 export class InserterMenu extends Component {
+	constructor() {
+		super( ...arguments );
+
+		this.onLayout = this.onLayout.bind( this );
+		this.state = {
+			numberOfColumns: this.calculateNumberOfColumns(),
+		};
+	}
+
 	componentDidMount() {
-		this.subscriptionParentMediaAppend = subscribeMediaAppend( ( payload ) => {
-			this.props.onSelect( {
-				name: 'core/' + payload.mediaType,
-				initialAttributes: {
-					id: payload.mediaId,
-					[ payload.mediaType === 'image' ? 'url' : 'src' ]: payload.mediaUrl,
-				},
-			} );
-		} );
 		this.onOpen();
 	}
 
 	componentWillUnmount() {
-		if ( this.subscriptionParentMediaAppend ) {
-			this.subscriptionParentMediaAppend.remove();
-		}
 		this.onClose();
 	}
 
@@ -60,9 +56,17 @@ export class InserterMenu extends Component {
 		this.props.hideInsertionPoint();
 	}
 
-	render() {
+	onLayout() {
 		const numberOfColumns = this.calculateNumberOfColumns();
+		this.setState( { numberOfColumns } );
+	}
+
+	render() {
+		const { getStylesFromColorScheme } = this.props;
 		const bottomPadding = styles.contentBottomPadding;
+		const modalIconWrapperStyle = getStylesFromColorScheme( styles.modalIconWrapper, styles.modalIconWrapperDark );
+		const modalIconStyle = getStylesFromColorScheme( styles.modalIcon, styles.modalIconDark );
+		const modalItemLabelStyle = getStylesFromColorScheme( styles.modalItemLabel, styles.modalItemLabelDark );
 
 		return (
 			<BottomSheet
@@ -72,10 +76,11 @@ export class InserterMenu extends Component {
 				hideHeader
 			>
 				<FlatList
+					onLayout={ this.onLayout }
 					scrollEnabled={ false }
-					key={ `InserterUI-${ numberOfColumns }` } //re-render when numberOfColumns changes
+					key={ `InserterUI-${ this.state.numberOfColumns }` } //re-render when numberOfColumns changes
 					keyboardShouldPersistTaps="always"
-					numColumns={ numberOfColumns }
+					numColumns={ this.state.numberOfColumns }
 					data={ this.props.items }
 					ItemSeparatorComponent={ () =>
 						<View style={ styles.rowSeparator } />
@@ -89,12 +94,12 @@ export class InserterMenu extends Component {
 							accessibilityLabel={ item.title }
 							onPress={ () => this.props.onSelect( item ) }>
 							<View style={ styles.modalItem }>
-								<View style={ styles.modalIconWrapper }>
-									<View style={ styles.modalIcon }>
-										<Icon icon={ item.icon.src } fill={ styles.modalIcon.fill } size={ styles.modalIcon.width } />
+								<View style={ modalIconWrapperStyle }>
+									<View style={ modalIconStyle }>
+										<Icon icon={ item.icon.src } fill={ modalIconStyle.fill } size={ modalIconStyle.width } />
 									</View>
 								</View>
-								<Text style={ styles.modalItemLabel }>{ item.title }</Text>
+								<Text style={ modalItemLabelStyle }>{ item.title }</Text>
 							</View>
 						</TouchableHighlight>
 					}
@@ -213,4 +218,5 @@ export default compose(
 		};
 	} ),
 	withInstanceId,
+	withPreferredColorScheme,
 )( InserterMenu );

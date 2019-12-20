@@ -15,14 +15,21 @@
 function render_block_core_search( $attributes ) {
 	static $instance_id = 0;
 
-	$input_id     = 'wp-block-search__input-' . ++$instance_id;
-	$label_markup = '';
+	$input_id      = 'wp-block-search__input-' . ++$instance_id;
+	$label_markup  = '';
+	$button_markup = '';
 
 	if ( ! empty( $attributes['label'] ) ) {
 		$label_markup = sprintf(
 			'<label for="%s" class="wp-block-search__label">%s</label>',
 			$input_id,
 			$attributes['label']
+		);
+	} else {
+		$label_markup = sprintf(
+			'<label for="%s" class="wp-block-search__label screen-reader-text">%s</label>',
+			$input_id,
+			__( 'Search' )
 		);
 	}
 
@@ -44,7 +51,6 @@ function render_block_core_search( $attributes ) {
 	if ( isset( $attributes['className'] ) ) {
 		$class .= ' ' . $attributes['className'];
 	}
-
 	if ( isset( $attributes['align'] ) ) {
 		$class .= ' align' . $attributes['align'];
 	}

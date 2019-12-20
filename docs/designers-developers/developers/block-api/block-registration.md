@@ -1,6 +1,6 @@
 # Block Registration
 
-## `register_block_type`
+## `registerBlockType`
 
 * **Type:** `Function`
 
@@ -55,6 +55,7 @@ description: __( 'Block showing a Book card.' )
 Blocks are grouped into categories to help users browse and discover them.
 
 The core provided categories are:
+
 * common
 * formatting
 * layout
@@ -85,11 +86,10 @@ icon: <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="no
 **Note:** Custom SVG icons are automatically wrapped in the [`wp.components.SVG` component](/packages/components/src/primitives/svg/) to add accessibility attributes (`aria-hidden`, `role`, and `focusable`).
 
 An object can also be passed as icon, in this case, icon, as specified above, should be included in the src property.
-Besides src the object can contain background and foreground colors, this colors will appear with the icon
-when they are applicable e.g.: in the inserter.
+
+Besides src the object can contain background and foreground colors, this colors will appear with the icon when they are applicable e.g.: in the inserter.
 
 ```js
-
 icon: {
 	// Specifying a background color to appear with the icon e.g.: in the inserter.
 	background: '#7e70af',
@@ -168,13 +168,33 @@ attributes: {
 
 * **See: [Attributes](/docs/designers-developers/developers/block-api/block-attributes.md).**
 
+#### Example (optional)
+
+* **Type:** `Object`
+
+Example provides structured example data for the block. This data is used to construct a preview for the block to be shown in the Inspector Help Panel when the user mouses over the block.
+
+The data provided in the example object should match the attributes defined. For example:
+
+```js
+example: {
+    attributes: {
+        cover: 'https://example.com/image.jpg',
+        author: 'William Shakespeare',
+        pages: 500
+    },
+},
+```
+
+If `example` is not defined, the preview will not be shown. So even if no-attributes are defined, setting a empty example object `example: {}` will trigger the preview to show.
+
 #### Transforms (optional)
 
 * **Type:** `Array`
 
 Transforms provide rules for what a block can be transformed from and what it can be transformed to. A block can be transformed from another block, a shortcode, a regular expression, a file or a raw DOM node.
 
-For example, a Paragraph block can be transformed into a Heading block. This uses the `createBlock` function from the [`wp-blocks` package](/packages/blocks/README.md#createBlock)
+For example, a Paragraph block can be transformed into a Heading block. This uses the `createBlock` function from the [`wp-blocks` package](/packages/blocks/README.md#createBlock).
 
 {% codetabs %}
 {% ES5 %}
@@ -418,6 +438,24 @@ transforms: {
 },
 ```
 {% end %}
+
+In the case of shortcode transforms, `isMatch` receives shortcode attributes per the [Shortcode API](https://codex.wordpress.org/Shortcode_API):
+
+{% codetabs %}
+{% ES5 %}
+```js
+isMatch: function( attributes ) {
+	return attributes.named.id === 'my-id';
+},
+```
+{% ESNext %}
+```js
+isMatch( { named: { id } } ) {
+	return id === 'my-id';
+},
+```
+{% end %}
+
 
 To control the priority with which a transform is applied, define a `priority` numeric property on your transform object, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
 

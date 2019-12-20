@@ -3,9 +3,6 @@
 	padding-left: 0;
 	padding-right: $grid-size-small;
 	border-top: 0;
-	position: sticky;
-	z-index: z-index(".components-panel__header.edit-post-sidebar__panel-tabs");
-	top: 0;
 
 	ul {
 		display: flex;
@@ -15,11 +12,12 @@
 	}
 }
 
-.edit-post-sidebar__panel-tab {
+.components-button.edit-post-sidebar__panel-tab {
 	background: transparent;
 	border: none;
 	box-shadow: none;
 	cursor: pointer;
+	display: inline-block;
 	padding: 3px 15px; // Use padding to offset the is-active border, this benefits Windows High Contrast mode
 	margin-left: 0;
 	font-weight: 400;
@@ -59,6 +57,7 @@
 	}
 
 	&:focus {
+		background-color: transparent;
 		@include square-style__focus;
 	}
 }

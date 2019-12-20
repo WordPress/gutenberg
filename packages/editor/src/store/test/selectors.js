@@ -33,6 +33,13 @@ selectorNames.forEach( ( name ) => {
 				return state.currentPost;
 			},
 
+			getEntityRecordChangesByRecord() {
+				return (
+					state.getEntityRecordChangesByRecord &&
+					state.getEntityRecordChangesByRecord()
+				);
+			},
+
 			getEntityRecordEdits() {
 				const present = state.editor && state.editor.present;
 				let edits = present && present.edits;
@@ -123,6 +130,7 @@ const {
 	isEditedPostNew,
 	hasChangedContent,
 	isEditedPostDirty,
+	hasNonPostEntityChanges,
 	isCleanNewPost,
 	getCurrentPost,
 	getCurrentPostId,
@@ -130,7 +138,6 @@ const {
 	getCurrentPostRevisionsCount,
 	getCurrentPostType,
 	getPostEdits,
-	getReferenceByDistinctEdits,
 	getEditedPostVisibility,
 	isCurrentPostPending,
 	isCurrentPostPublished,
@@ -159,6 +166,7 @@ const {
 	getPermalink,
 	getPermalinkParts,
 	isPostSavingLocked,
+	isPostAutosavingLocked,
 	canUserUseUnfilteredHTML,
 } = selectors;
 
@@ -441,6 +449,69 @@ describe( 'selectors', () => {
 			};
 
 			expect( isEditedPostDirty( state ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'hasNonPostEntityChanges', () => {
+		it( 'should return false if the full site editing experiment is disabled.', () => {
+			const state = {
+				currentPost: { id: 1, type: 'post' },
+				editorSettings: {
+					__experimentalEnableFullSiteEditing: false,
+				},
+				getEntityRecordChangesByRecord() {
+					return { someKind: { someName: { someKey: {} } } };
+				},
+			};
+			expect( hasNonPostEntityChanges( state ) ).toBe( false );
+		} );
+		it( 'should return true if there are changes to an arbitrary entity', () => {
+			const state = {
+				currentPost: { id: 1, type: 'post' },
+				editorSettings: {
+					__experimentalEnableFullSiteEditing: true,
+				},
+				getEntityRecordChangesByRecord() {
+					return { someKind: { someName: { someKey: {} } } };
+				},
+			};
+			expect( hasNonPostEntityChanges( state ) ).toBe( true );
+		} );
+		it( 'should return false if there are only changes for the current post', () => {
+			const state = {
+				currentPost: { id: 1, type: 'post' },
+				editorSettings: {
+					__experimentalEnableFullSiteEditing: true,
+				},
+				getEntityRecordChangesByRecord() {
+					return { postType: { post: { 1: {} } } };
+				},
+			};
+			expect( hasNonPostEntityChanges( state ) ).toBe( false );
+		} );
+		it( 'should return true if there are changes to multiple posts', () => {
+			const state = {
+				currentPost: { id: 1, type: 'post' },
+				editorSettings: {
+					__experimentalEnableFullSiteEditing: true,
+				},
+				getEntityRecordChangesByRecord() {
+					return { postType: { post: { 1: {}, 2: {} } } };
+				},
+			};
+			expect( hasNonPostEntityChanges( state ) ).toBe( true );
+		} );
+		it( 'should return true if there are changes to multiple posts of different post types', () => {
+			const state = {
+				currentPost: { id: 1, type: 'post' },
+				editorSettings: {
+					__experimentalEnableFullSiteEditing: true,
+				},
+				getEntityRecordChangesByRecord() {
+					return { postType: { post: { 1: {} }, wp_template: { 1: {} } } };
+				},
+			};
+			expect( hasNonPostEntityChanges( state ) ).toBe( true );
 		} );
 	} );
 
@@ -775,21 +846,6 @@ describe( 'selectors', () => {
 			};
 
 			expect( getPostEdits( state ) ).toEqual( { title: 'werga' } );
-		} );
-	} );
-
-	describe( 'getReferenceByDistinctEdits', () => {
-		it( 'should return referentially equal values across unchanging state', () => {
-			const state = { editor: {} };
-
-			expect( getReferenceByDistinctEdits( state ) ).toBe( getReferenceByDistinctEdits( state ) );
-		} );
-
-		it( 'should return referentially unequal values across changing state', () => {
-			const beforeState = { editor: {} };
-			const afterState = { editor: {} };
-
-			expect( getReferenceByDistinctEdits( beforeState ) ).not.toBe( getReferenceByDistinctEdits( afterState ) );
 		} );
 	} );
 
@@ -1157,6 +1213,28 @@ describe( 'selectors', () => {
 		} );
 	} );
 
+	describe( 'isPostAutosavingLocked', () => {
+		it( 'should return true if the post has postAutosavingLocks', () => {
+			const state = {
+				postAutosavingLock: { example: true },
+				currentPost: {},
+				saving: {},
+			};
+
+			expect( isPostAutosavingLocked( state ) ).toBe( true );
+		} );
+
+		it( 'should return false if the post has no postAutosavingLocks', () => {
+			const state = {
+				postAutosavingLock: {},
+				currentPost: {},
+				saving: {},
+			};
+
+			expect( isPostAutosavingLocked( state ) ).toBe( false );
+		} );
+	} );
+
 	describe( 'isEditedPostSaveable', () => {
 		it( 'should return false if the post has no title, excerpt, content', () => {
 			const state = {
@@ -1408,6 +1486,7 @@ describe( 'selectors', () => {
 					return true;
 				},
 				getAutosave() {},
+				postAutosavingLock: {},
 			};
 
 			expect( isEditedPostAutosaveable( state ) ).toBe( true );
@@ -1440,6 +1519,7 @@ describe( 'selectors', () => {
 						excerpt: 'foo',
 					};
 				},
+				postAutosavingLock: {},
 			};
 
 			expect( isEditedPostAutosaveable( state ) ).toBe( false );
@@ -1471,6 +1551,7 @@ describe( 'selectors', () => {
 						excerpt: 'foo',
 					};
 				},
+				postAutosavingLock: {},
 			};
 
 			expect( isEditedPostAutosaveable( state ) ).toBe( true );
@@ -1505,11 +1586,22 @@ describe( 'selectors', () => {
 								[ variantField ]: 'bar',
 							};
 						},
+						postAutosavingLock: {},
 					};
 
 					expect( isEditedPostAutosaveable( state ) ).toBe( true );
 				}
 			}
+		} );
+
+		it( 'should return false if autosaving is locked', () => {
+			const state = {
+				currentPost: {},
+				saving: {},
+				postAutosavingLock: { example: true },
+			};
+
+			expect( isEditedPostAutosaveable( state ) ).toBe( false );
 		} );
 	} );
 

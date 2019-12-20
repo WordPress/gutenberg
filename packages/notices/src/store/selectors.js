@@ -3,6 +3,8 @@
  */
 import { DEFAULT_CONTEXT } from './constants';
 
+/** @typedef {import('./actions').WPNoticeAction} WPNoticeAction */
+
 /**
  * The default empty set of notices to return when there are no notices
  * assigned for a given notices context. This can occur if the getNotices
@@ -29,18 +31,12 @@ const DEFAULT_NOTICES = [];
  *                                      removal without notice.
  * @property {boolean} isDismissible    Whether the notice can be dismissed by
  *                                      user. Defaults to `true`.
+ * @property {string}  type             Type of notice, one of `default`,
+ *                                      or `snackbar`. Defaults to `default`.
+ * @property {boolean} speak            Whether the notice content should be
+ *                                      announced to screen readers. Defaults to
+ *                                      `true`.
  * @property {WPNoticeAction[]} actions User actions to present with notice.
- *
- */
-
-/**
- * @typedef {Object} WPNoticeAction Object describing a user action option associated with a notice.
- *
- * @property {string}    label    Message to use as action label.
- * @property {?string}   url      Optional URL of resource if action incurs
- *                                browser navigation.
- * @property {?Function} callback Optional function to invoke when action is
- *                                triggered by user.
  *
  */
 

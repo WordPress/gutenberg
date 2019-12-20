@@ -7,15 +7,16 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { withInstanceId } from '@wordpress/compose';
+import { useInstanceId } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import IconButton from '../icon-button';
+import VisuallyHidden from '../visually-hidden';
 
-function Token( {
+export default function Token( {
 	value,
 	status,
 	title,
@@ -28,8 +29,8 @@ function Token( {
 	messages,
 	termPosition,
 	termsCount,
-	instanceId,
 } ) {
+	const instanceId = useInstanceId( Token );
 	const tokenClasses = classnames( 'components-form-token-field__token', {
 		'is-error': 'error' === status,
 		'is-success': 'success' === status,
@@ -60,7 +61,7 @@ function Token( {
 				className="components-form-token-field__token-text"
 				id={ `components-form-token-field__token-text-${ instanceId }` }
 			>
-				<span className="screen-reader-text">{ termPositionAndCount }</span>
+				<VisuallyHidden as="span">{ termPositionAndCount }</VisuallyHidden>
 				<span aria-hidden="true">{ transformedValue }</span>
 			</span>
 
@@ -74,5 +75,3 @@ function Token( {
 		</span>
 	);
 }
-
-export default withInstanceId( Token );

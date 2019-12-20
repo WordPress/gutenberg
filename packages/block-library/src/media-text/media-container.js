@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { IconButton, ResizableBox, Toolbar, withNotices } from '@wordpress/components';
+import { IconButton, ResizableBox, ToolbarGroup, withNotices } from '@wordpress/components';
 import {
 	BlockControls,
 	BlockIcon,
@@ -10,6 +10,8 @@ import {
 } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { compose } from '@wordpress/compose';
+import { withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -46,7 +48,7 @@ class MediaContainer extends Component {
 		const { mediaId, onSelectMedia } = this.props;
 		return (
 			<BlockControls>
-				<Toolbar>
+				<ToolbarGroup>
 					<MediaUpload
 						onSelect={ onSelectMedia }
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
@@ -60,7 +62,7 @@ class MediaContainer extends Component {
 							/>
 						) }
 					/>
-				</Toolbar>
+				</ToolbarGroup>
 			</BlockControls>
 		);
 	}
@@ -109,12 +111,16 @@ class MediaContainer extends Component {
 	}
 
 	render() {
-		const { mediaPosition, mediaUrl, mediaType, mediaWidth, commitWidthChange, onWidthChange } = this.props;
+		const { mediaPosition, mediaUrl, mediaType, mediaWidth, commitWidthChange, onWidthChange, toggleSelection } = this.props;
 		if ( mediaType && mediaUrl ) {
+			const onResizeStart = () => {
+				toggleSelection( false );
+			};
 			const onResize = ( event, direction, elt ) => {
 				onWidthChange( parseInt( elt.style.width ) );
 			};
 			const onResizeStop = ( event, direction, elt ) => {
+				toggleSelection( true );
 				commitWidthChange( parseInt( elt.style.width ) );
 			};
 			const enablePositions = {
@@ -138,6 +144,7 @@ class MediaContainer extends Component {
 					minWidth="10%"
 					maxWidth="100%"
 					enable={ enablePositions }
+					onResizeStart={ onResizeStart }
 					onResize={ onResize }
 					onResizeStop={ onResizeStop }
 					axis="x"
@@ -150,4 +157,13 @@ class MediaContainer extends Component {
 	}
 }
 
-export default withNotices( MediaContainer );
+export default compose( [
+	withDispatch( ( dispatch ) => {
+		const { toggleSelection } = dispatch( 'core/block-editor' );
+
+		return {
+			toggleSelection,
+		};
+	} ),
+	withNotices,
+] )( MediaContainer );

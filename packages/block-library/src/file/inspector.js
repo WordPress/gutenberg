@@ -23,14 +23,14 @@ export default function FileBlockInspector( {
 	if ( attachmentPage ) {
 		linkDestinationOptions = [
 			{ value: href, label: __( 'Media File' ) },
-			{ value: attachmentPage, label: __( 'Attachment Page' ) },
+			{ value: attachmentPage, label: __( 'Attachment page' ) },
 		];
 	}
 
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody title={ __( 'Text Link Settings' ) }>
+				<PanelBody title={ __( 'Text link settings' ) }>
 					<SelectControl
 						label={ __( 'Link To' ) }
 						value={ textLinkHref }
@@ -38,14 +38,14 @@ export default function FileBlockInspector( {
 						onChange={ changeLinkDestinationOption }
 					/>
 					<ToggleControl
-						label={ __( 'Open in New Tab' ) }
+						label={ __( 'Open in new tab' ) }
 						checked={ openInNewWindow }
 						onChange={ changeOpenInNewWindow }
 					/>
 				</PanelBody>
-				<PanelBody title={ __( 'Download Button Settings' ) }>
+				<PanelBody title={ __( 'Download button settings' ) }>
 					<ToggleControl
-						label={ __( 'Show Download Button' ) }
+						label={ __( 'Show download button' ) }
 						checked={ showDownloadButton }
 						onChange={ changeShowDownloadButton }
 					/>

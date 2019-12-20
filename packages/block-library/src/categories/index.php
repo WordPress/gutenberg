@@ -51,13 +51,11 @@ function render_block_core_categories( $attributes ) {
 		$class .= " {$attributes['className']}";
 	}
 
-	$block_content = sprintf(
+	return sprintf(
 		$wrapper_markup,
 		esc_attr( $class ),
 		$items_markup
 	);
-
-	return $block_content;
 }
 
 /**

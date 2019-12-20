@@ -2,13 +2,21 @@
 
 exports[`core/embed block edit matches snapshot 1`] = `
 <div
-  class="components-placeholder wp-block-embed"
+  class="components-placeholder is-small wp-block-embed"
 >
+  <iframe
+    aria-hidden="true"
+    aria-label="resize-listener"
+    frameborder="0"
+    src="about:blank"
+    style="display:block;opacity:0;position:absolute;top:0;left:0;height:100%;width:100%;overflow:hidden;pointer-events:none;z-index:-1"
+    tabindex="-1"
+  />
   <div
     class="components-placeholder__label"
   >
     <span
-      class="editor-block-icon block-editor-block-icon has-colors"
+      class="block-editor-block-icon has-colors"
     >
       <svg
         aria-hidden="true"
@@ -44,7 +52,7 @@ exports[`core/embed block edit matches snapshot 1`] = `
         value=""
       />
       <button
-        class="components-button is-button is-default is-large"
+        class="components-button is-secondary"
         type="submit"
       >
         Embed
@@ -61,7 +69,7 @@ exports[`core/embed block edit matches snapshot 1`] = `
       >
         Learn more about embeds
         <span
-          class="screen-reader-text"
+          class="components-visually-hidden"
         >
           (opens in a new tab)
         </span>

@@ -15,6 +15,11 @@ const {
 	hasJestConfig,
 } = require( './config' );
 const {
+	buildWordPress,
+	downloadWordPressZip,
+	mergeYAMLConfigs,
+} = require( './env' );
+const {
 	fromConfigRoot,
 	hasProjectFile,
 } = require( './file' );
@@ -26,6 +31,7 @@ const {
 } = require( './string' );
 
 module.exports = {
+	buildWordPress,
 	camelCaseDash,
 	fromConfigRoot,
 	getArgFromCLI,
@@ -38,5 +44,7 @@ module.exports = {
 	hasJestConfig,
 	hasPackageProp,
 	hasProjectFile,
+	downloadWordPressZip,
+	mergeYAMLConfigs,
 	spawnScript,
 };

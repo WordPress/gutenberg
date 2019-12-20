@@ -30,7 +30,8 @@ function BlockManager( {
 	// value reference on each call.
 	blockTypes = blockTypes.filter( ( blockType ) => (
 		hasBlockSupport( blockType, 'inserter', true ) &&
-		( ! search || isMatchingSearchTerm( blockType, search ) )
+		( ! search || isMatchingSearchTerm( blockType, search ) ) &&
+		! blockType.parent
 	) );
 
 	return (

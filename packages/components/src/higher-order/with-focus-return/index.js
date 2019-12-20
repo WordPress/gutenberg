@@ -36,11 +36,11 @@ function isComponentLike( object ) {
  * when the component is unmounted.
  *
  * @param {(WPComponent|Object)} options The component to be enhanced with
- *                                       focus return behavior, or an object
- *                                       describing the component and the
- *                                       focus return characteristics.
+ *                                      focus return behavior, or an object
+ *                                      describing the component and the
+ *                                      focus return characteristics.
  *
- * @return {Component} Component with the focus restauration behaviour.
+ * @return {WPComponent} Component with the focus restauration behaviour.
  */
 function withFocusReturn( options ) {
 	// Normalize as overloaded form `withFocusReturn( options )( Component )`
@@ -88,7 +88,7 @@ function withFocusReturn( options ) {
 
 				const stack = [
 					...without(
-						this.props.focusHistory,
+						this.props.focus.focusHistory,
 						...ownFocusedElements
 					),
 					activeElementOnMount,
@@ -109,7 +109,7 @@ function withFocusReturn( options ) {
 						onFocus={ this.setIsFocusedTrue }
 						onBlur={ this.setIsFocusedFalse }
 					>
-						<WrappedComponent { ...this.props } />
+						<WrappedComponent { ...this.props.childProps } />
 					</div>
 				);
 			}
@@ -117,7 +117,7 @@ function withFocusReturn( options ) {
 
 		return ( props ) => (
 			<Consumer>
-				{ ( context ) => <FocusReturn { ...props } { ...context } /> }
+				{ ( context ) => <FocusReturn childProps={ props } focus={ context } /> }
 			</Consumer>
 		);
 	};

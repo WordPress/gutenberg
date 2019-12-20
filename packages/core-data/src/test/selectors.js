@@ -9,12 +9,15 @@ import deepFreeze from 'deep-freeze';
 import {
 	getEntityRecord,
 	getEntityRecords,
+	getEntityRecordChangesByRecord,
+	getEntityRecordNonTransientEdits,
 	getEmbedPreview,
 	isPreviewEmbedFallback,
 	canUser,
 	getAutosave,
 	getAutosaves,
 	getCurrentUser,
+	getReferenceByDistinctEdits,
 } from '../selectors';
 
 describe( 'getEntityRecord', () => {
@@ -100,6 +103,70 @@ describe( 'getEntityRecords', () => {
 			{ slug: 'post' },
 			{ slug: 'page' },
 		] );
+	} );
+} );
+
+describe( 'getEntityRecordChangesByRecord', () => {
+	it( 'should return a map of objects with each raw edited entity record and its corresponding edits', () => {
+		const state = deepFreeze( {
+			entities: {
+				config: [
+					{
+						kind: 'someKind',
+						name: 'someName',
+						transientEdits: { someTransientEditProperty: true },
+					},
+				],
+				data: {
+					someKind: {
+						someName: {
+							queriedData: {
+								items: {
+									someKey: {
+										someProperty: 'somePersistedValue',
+										someRawProperty: { raw: 'somePersistedRawValue' },
+									},
+								},
+							},
+							edits: {
+								someKey: {
+									someProperty: 'someEditedValue',
+									someRawProperty: 'someEditedRawValue',
+									someTransientEditProperty: 'someEditedTransientEditValue',
+								},
+							},
+						},
+					},
+				},
+			},
+		} );
+		expect( getEntityRecordChangesByRecord( state ) ).toEqual( {
+			someKind: {
+				someName: {
+					someKey: {
+						rawRecord: {
+							someProperty: 'somePersistedValue',
+							someRawProperty: 'somePersistedRawValue',
+						},
+						edits: {
+							someProperty: 'someEditedValue',
+							someRawProperty: 'someEditedRawValue',
+						},
+					},
+				},
+			},
+		} );
+	} );
+} );
+
+describe( 'getEntityRecordNonTransientEdits', () => {
+	it( 'should return an empty object when the entity does not have a loaded config.', () => {
+		const state = deepFreeze( {
+			entities: { config: [], data: {} },
+		} );
+		expect(
+			getEntityRecordNonTransientEdits( state, 'someKind', 'someName', 'someId' )
+		).toEqual( {} );
 	} );
 } );
 
@@ -275,3 +342,45 @@ describe( 'getCurrentUser', () => {
 		expect( getCurrentUser( state ) ).toEqual( currentUser );
 	} );
 } );
+
+describe( 'getReferenceByDistinctEdits', () => {
+	it( 'should return referentially equal values across empty states', () => {
+		const state = { undo: [] };
+		expect( getReferenceByDistinctEdits( state ) ).toBe( getReferenceByDistinctEdits( state ) );
+
+		const beforeState = { undo: [] };
+		const afterState = { undo: [] };
+		expect( getReferenceByDistinctEdits( beforeState ) ).toBe( getReferenceByDistinctEdits( afterState ) );
+	} );
+
+	it( 'should return referentially equal values across unchanging non-empty state', () => {
+		const undoStates = [ {} ];
+		const state = { undo: undoStates };
+		expect( getReferenceByDistinctEdits( state ) ).toBe( getReferenceByDistinctEdits( state ) );
+
+		const beforeState = { undo: undoStates };
+		const afterState = { undo: undoStates };
+		expect( getReferenceByDistinctEdits( beforeState ) ).toBe( getReferenceByDistinctEdits( afterState ) );
+	} );
+
+	describe( 'when adding edits', () => {
+		it( 'should return referentially different values across changing states', () => {
+			const beforeState = { undo: [ {} ] };
+			beforeState.undo.offset = 0;
+			const afterState = { undo: [ {}, {} ] };
+			afterState.undo.offset = 1;
+			expect( getReferenceByDistinctEdits( beforeState ) ).not.toBe( getReferenceByDistinctEdits( afterState ) );
+		} );
+	} );
+
+	describe( 'when using undo', () => {
+		it( 'should return referentially different values across changing states', () => {
+			const beforeState = { undo: [ {}, {} ] };
+			beforeState.undo.offset = 1;
+			const afterState = { undo: [ {}, {} ] };
+			afterState.undo.offset = 0;
+			expect( getReferenceByDistinctEdits( beforeState ) ).not.toBe( getReferenceByDistinctEdits( afterState ) );
+		} );
+	} );
+} );
+

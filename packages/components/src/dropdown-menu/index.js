@@ -98,8 +98,18 @@ function DropdownMenu( {
 					<IconButton
 						{ ...mergedToggleProps }
 						icon={ icon }
-						onClick={ onToggle }
-						onKeyDown={ openOnArrowDown }
+						onClick={ ( event ) => {
+							onToggle( event );
+							if ( mergedToggleProps.onClick ) {
+								mergedToggleProps.onClick( event );
+							}
+						} }
+						onKeyDown={ ( event ) => {
+							openOnArrowDown( event );
+							if ( mergedToggleProps.onKeyDown ) {
+								mergedToggleProps.onKeyDown( event );
+							}
+						} }
 						aria-haspopup="true"
 						aria-expanded={ isOpen }
 						label={ label }
@@ -143,7 +153,8 @@ function DropdownMenu( {
 										},
 									) }
 									icon={ control.icon }
-									role="menuitem"
+									aria-checked={ ( control.role === 'menuitemcheckbox' || control.role === 'menuitemradio' ) ? control.isActive : undefined }
+									role={ ( control.role === 'menuitemcheckbox' || control.role === 'menuitemradio' ) ? control.role : 'menuitem' }
 									disabled={ control.isDisabled }
 								>
 									{ control.title }

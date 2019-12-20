@@ -8,4 +8,4 @@ All blocks must be registered before they can be used in the editor. You can lea
 
 ## Block `edit` and `save`
 
-The `edit` and `save` functions define the editor interface with which a user would interact, and the markup to be serialized back when a post is saved. They are the heart of how a block operates, so they are [covered separately](/docs/designers-developers/developers/block-api/block-edit-save.md).
+The `edit` function defines the components for the block in the editor interface the user interacts with. The `save` function defines the markup to be serialized back when a post is saved. They are the heart of how a block operates, so they are [covered separately](/docs/designers-developers/developers/block-api/block-edit-save.md).

@@ -9,7 +9,6 @@ import { registerCoreBlocks, __experimentalRegisterExperimentalCoreBlocks } from
  * Internal dependencies
  */
 import './hooks';
-import './store';
 import EditWidgetsInitializer from './components/edit-widgets-initializer';
 import CustomizerEditWidgetsInitializer from './components/customizer-edit-widgets-initializer';
 
@@ -40,6 +39,9 @@ export function initialize( id, settings ) {
  */
 export function customizerInitialize( id, settings ) {
 	registerCoreBlocks();
+	if ( process.env.GUTENBERG_PHASE === 2 ) {
+		__experimentalRegisterExperimentalCoreBlocks( settings );
+	}
 	render(
 		<CustomizerEditWidgetsInitializer
 			settings={ settings }

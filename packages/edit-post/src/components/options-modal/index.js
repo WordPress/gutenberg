@@ -25,7 +25,6 @@ import Section from './section';
 import {
 	EnablePluginDocumentSettingPanelOption,
 	EnablePublishSidebarOption,
-	EnableTipsOption,
 	EnablePanelOption,
 	EnableFeature,
 } from './options';
@@ -46,9 +45,8 @@ export function OptionsModal( { isModalActive, isViewable, closeModal } ) {
 			onRequestClose={ closeModal }
 		>
 			<Section title={ __( 'General' ) }>
-				<EnablePublishSidebarOption label={ __( 'Enable Pre-publish Checks' ) } />
-				<EnableTipsOption label={ __( 'Enable Tips' ) } />
-				<EnableFeature feature="showInserterHelpPanel" label={ __( 'Enable Inserter Help Panel' ) } />
+				<EnablePublishSidebarOption label={ __( 'Pre-publish Checks' ) } />
+				<EnableFeature feature="showInserterHelpPanel" label={ __( 'Inserter Help Panel' ) } />
 			</Section>
 			<Section title={ __( 'Document Panels' ) }>
 				<EnablePluginDocumentSettingPanelOption.Slot />
@@ -64,7 +62,7 @@ export function OptionsModal( { isModalActive, isViewable, closeModal } ) {
 					) }
 				/>
 				<PostFeaturedImageCheck>
-					<EnablePanelOption label={ __( 'Featured Image' ) } panelName="featured-image" />
+					<EnablePanelOption label={ __( 'Featured image' ) } panelName="featured-image" />
 				</PostFeaturedImageCheck>
 				<PostExcerptCheck>
 					<EnablePanelOption label={ __( 'Excerpt' ) } panelName="post-excerpt" />

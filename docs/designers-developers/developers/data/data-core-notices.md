@@ -39,7 +39,7 @@ _Related_
 _Parameters_
 
 -   _content_ `string`: Notice message.
--   _options_ `?Object`: Optional notice options.
+-   _options_ `[Object]`: Optional notice options.
 
 _Returns_
 
@@ -57,7 +57,7 @@ _Related_
 _Parameters_
 
 -   _content_ `string`: Notice message.
--   _options_ `?Object`: Optional notice options.
+-   _options_ `[Object]`: Optional notice options.
 
 _Returns_
 
@@ -69,14 +69,15 @@ Yields action objects used in signalling that a notice is to be created.
 
 _Parameters_
 
--   _status_ `?string`: Notice status. Defaults to `info`.
+-   _status_ `[string]`: Notice status.
 -   _content_ `string`: Notice message.
--   _options_ `?Object`: Notice options.
--   _options.context_ `?string`: Context under which to group notice.
--   _options.id_ `?string`: Identifier for notice. Automatically assigned if not specified.
--   _options.isDismissible_ `?boolean`: Whether the notice can be dismissed by user. Defaults to `true`.
--   _options.speak_ `?boolean`: Whether the notice content should be announced to screen readers. Defaults to `true`.
--   _options.actions_ `?Array<WPNoticeAction>`: User actions to be presented with notice.
+-   _options_ `[Object]`: Notice options.
+-   _options.context_ `[string]`: Context under which to group notice.
+-   _options.id_ `[string]`: Identifier for notice. Automatically assigned if not specified.
+-   _options.isDismissible_ `[boolean]`: Whether the notice can be dismissed by user.
+-   _options.type_ `[string]`: Type of notice, one of `default`, or `snackbar`.
+-   _options.speak_ `[boolean]`: Whether the notice content should be announced to screen readers.
+-   _options.actions_ `[Array<WPNoticeAction>]`: User actions to be presented with notice.
 
 <a name="createSuccessNotice" href="#createSuccessNotice">#</a> **createSuccessNotice**
 
@@ -90,7 +91,7 @@ _Related_
 _Parameters_
 
 -   _content_ `string`: Notice message.
--   _options_ `?Object`: Optional notice options.
+-   _options_ `[Object]`: Optional notice options.
 
 _Returns_
 
@@ -108,7 +109,7 @@ _Related_
 _Parameters_
 
 -   _content_ `string`: Notice message.
--   _options_ `?Object`: Optional notice options.
+-   _options_ `[Object]`: Optional notice options.
 
 _Returns_
 
@@ -121,7 +122,7 @@ Returns an action object used in signalling that a notice is to be removed.
 _Parameters_
 
 -   _id_ `string`: Notice unique identifier.
--   _context_ `?string`: Optional context (grouping) in which the notice is intended to appear. Defaults to default context.
+-   _context_ `[string]`: Optional context (grouping) in which the notice is intended to appear. Defaults to default context.
 
 _Returns_
 

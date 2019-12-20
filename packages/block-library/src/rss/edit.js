@@ -10,7 +10,7 @@ import {
 	RangeControl,
 	TextControl,
 	ToggleControl,
-	Toolbar,
+	ToolbarGroup,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
@@ -78,7 +78,7 @@ class RSSEdit extends Component {
 							onChange={ ( value ) => setAttributes( { feedURL: value } ) }
 							className={ 'components-placeholder__input' }
 						/>
-						<Button isLarge type="submit">
+						<Button isSecondary type="submit">
 							{ __( 'Use URL' ) }
 						</Button>
 					</form>
@@ -94,13 +94,13 @@ class RSSEdit extends Component {
 			},
 			{
 				icon: 'list-view',
-				title: __( 'List View' ),
+				title: __( 'List view' ),
 				onClick: () => setAttributes( { blockLayout: 'list' } ),
 				isActive: blockLayout === 'list',
 			},
 			{
 				icon: 'grid-view',
-				title: __( 'Grid View' ),
+				title: __( 'Grid view' ),
 				onClick: () => setAttributes( { blockLayout: 'grid' } ),
 				isActive: blockLayout === 'grid',
 			},
@@ -109,7 +109,7 @@ class RSSEdit extends Component {
 		return (
 			<>
 				<BlockControls>
-					<Toolbar controls={ toolbarControls } />
+					<ToolbarGroup controls={ toolbarControls } />
 				</BlockControls>
 				<InspectorControls>
 					<PanelBody title={ __( 'RSS Settings' ) }>

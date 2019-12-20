@@ -1,0 +1,13 @@
+[
+    {
+        "clientId": "_clientId_0",
+        "name": "core/social-link-vimeo",
+        "isValid": true,
+        "attributes": {
+            "url": "https://example.com/",
+            "site": "vimeo"
+        },
+        "innerBlocks": [],
+        "originalContent": ""
+    }
+]

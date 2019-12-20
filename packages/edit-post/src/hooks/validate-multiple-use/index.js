@@ -28,9 +28,9 @@ const enhance = compose(
 	 * "original" block is not the current one. Thus, an inexisting
 	 * `originalBlockClientId` prop signals that the block is valid.
 	 *
-	 * @param {Component} WrappedBlockEdit A filtered BlockEdit instance.
+	 * @param {WPComponent} WrappedBlockEdit A filtered BlockEdit instance.
 	 *
-	 * @return {Component} Enhanced component with merged state data props.
+	 * @return {WPComponent} Enhanced component with merged state data props.
 	 */
 	withSelect( ( select, block ) => {
 		const multiple = hasBlockSupport( block.name, 'multiple', true );
@@ -75,16 +75,16 @@ const withMultipleValidation = createHigherOrderComponent( ( BlockEdit ) => {
 			<Warning
 				key="multiple-use-warning"
 				actions={ [
-					<Button key="find-original" isLarge onClick={ selectFirst }>
+					<Button key="find-original" isSecondary onClick={ selectFirst }>
 						{ __( 'Find original' ) }
 					</Button>,
-					<Button key="remove" isLarge onClick={ () => props.onReplace( [] ) }>
+					<Button key="remove" isSecondary onClick={ () => props.onReplace( [] ) }>
 						{ __( 'Remove' ) }
 					</Button>,
 					outboundType && (
 						<Button
 							key="transform"
-							isLarge
+							isSecondary
 							onClick={ () => props.onReplace(
 								createBlock( outboundType.name, props.attributes )
 							) }

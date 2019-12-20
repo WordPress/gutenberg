@@ -11,6 +11,8 @@
 
 # Blocks
 /packages/block-library                         @Soean @ajitbohra @jorgefilipecosta @talldan
+/packages/block-library/src/social-links        @mkaz
+/packages/block-library/src/social-link         @mkaz
 
 # Editor
 /packages/annotations                           @atimmer @ellatrix
@@ -18,7 +20,7 @@
 /packages/block-editor                          @youknowriad @talldan @ellatrix
 /packages/block-serialization-spec-parser       @dmsnell
 /packages/block-serialization-default-parser    @dmsnell
-/packages/blocks                                @youknowriad @gziolo @ellatrix
+/packages/blocks                                @youknowriad @ellatrix
 /packages/edit-post                             @talldan
 /packages/editor                                @talldan
 /packages/list-reusable-blocks                  @youknowriad @noisysocks
@@ -29,7 +31,7 @@
 
 # Tooling
 /bin                                            @ntwb @nerrad @ajitbohra
-/bin/update-readmes.js                          @ntwb @nerrad @ajitbohra @nosolosw
+/bin/api-docs                                   @ntwb @nerrad @ajitbohra @nosolosw
 /docs/tool                                      @youknowriad @chrisvanpatten @ajitbohra @nosolosw
 /packages/babel-plugin-import-jsx-pragma        @gziolo @ntwb @nerrad @ajitbohra
 /packages/babel-plugin-makepot                  @ntwb @nerrad @ajitbohra
@@ -38,7 +40,7 @@
 /packages/custom-templated-path-webpack-plugin  @ntwb @nerrad @ajitbohra
 /packages/docgen                                @nosolosw
 /packages/e2e-test-utils                        @gziolo @ntwb @nerrad @ajitbohra
-/packages/e2e-tests                             @gziolo @ntwb @nerrad @ajitbohra @talldan
+/packages/e2e-tests                             @ntwb @nerrad @ajitbohra @talldan
 /packages/eslint-plugin                         @gziolo @ntwb @nerrad @ajitbohra
 /packages/jest-console                          @gziolo @ntwb @nerrad @ajitbohra
 /packages/jest-preset-default                   @gziolo @ntwb @nerrad @ajitbohra
@@ -49,9 +51,9 @@
 /packages/scripts                               @youknowriad @gziolo @ntwb @nerrad @ajitbohra
 
 # UI Components
-/packages/components                            @youknowriad @gziolo @ajitbohra @jaymanpandya @jorgefilipecosta @talldan @chrisvanpatten
-/packages/compose                               @youknowriad @gziolo @ajitbohra @jaymanpandya @jorgefilipecosta @talldan
-/packages/element                               @youknowriad @gziolo @ajitbohra @jaymanpandya @jorgefilipecosta @talldan
+/packages/components                            @youknowriad @ajitbohra @jaymanpandya @jorgefilipecosta @talldan @chrisvanpatten
+/packages/compose                               @youknowriad @ajitbohra @jaymanpandya @jorgefilipecosta @talldan
+/packages/element                               @youknowriad @ajitbohra @jaymanpandya @jorgefilipecosta @talldan
 /packages/notices                               @ajitbohra @jaymanpandya @jorgefilipecosta @talldan
 /packages/nux                                   @ajitbohra @jaymanpandya @jorgefilipecosta @talldan @noisysocks
 /packages/viewport                              @youknowriad @ajitbohra @jaymanpandya @jorgefilipecosta @talldan

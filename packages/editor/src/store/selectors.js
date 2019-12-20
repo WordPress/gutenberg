@@ -135,6 +135,65 @@ export const isEditedPostDirty = createRegistrySelector( ( select ) => ( state )
 } );
 
 /**
+ * Returns true if there are unsaved edits for entities other than
+ * the editor's post, and false otherwise.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether there are edits or not.
+ */
+export const hasNonPostEntityChanges = createRegistrySelector(
+	( select ) => ( state ) => {
+		const enableFullSiteEditing = getEditorSettings( state )
+			.__experimentalEnableFullSiteEditing;
+		if ( ! enableFullSiteEditing ) {
+			return false;
+		}
+
+		const entityRecordChangesByRecord = select(
+			'core'
+		).getEntityRecordChangesByRecord();
+		const changedKinds = Object.keys( entityRecordChangesByRecord );
+		if (
+			changedKinds.length > 1 ||
+			( changedKinds.length === 1 && ! entityRecordChangesByRecord.postType )
+		) {
+			// Return true if there is more than one edited entity kind
+			// or the edited entity kind is not the editor's post's kind.
+			return true;
+		} else if ( ! entityRecordChangesByRecord.postType ) {
+			// Don't continue if there are no edited entity kinds.
+			return false;
+		}
+
+		const { type, id } = getCurrentPost( state );
+		const changedPostTypes = Object.keys( entityRecordChangesByRecord.postType );
+		if (
+			changedPostTypes.length > 1 ||
+			( changedPostTypes.length === 1 &&
+				! entityRecordChangesByRecord.postType[ type ] )
+		) {
+			// Return true if there is more than one edited post type
+			// or the edited entity's post type is not the editor's post's post type.
+			return true;
+		}
+
+		const changedPosts = Object.keys( entityRecordChangesByRecord.postType[ type ] );
+		if (
+			changedPosts.length > 1 ||
+			( changedPosts.length === 1 &&
+				! entityRecordChangesByRecord.postType[ type ][ id ] )
+		) {
+			// Return true if there is more than one edited post
+			// or the edited post is not the editor's post.
+			return true;
+		}
+
+		return false;
+	}
+);
+
+/**
  * Returns true if there are no unsaved values for the current edit session and
  * if the currently edited post is new (has never been saved before).
  *
@@ -235,6 +294,8 @@ export const getPostEdits = createRegistrySelector( ( select ) => ( state ) => {
  * inferring where an edit has been made between states by comparison of the
  * return values using strict equality.
  *
+ * @deprecated since Gutenberg 6.5.0.
+ *
  * @example
  *
  * ```
@@ -248,9 +309,14 @@ export const getPostEdits = createRegistrySelector( ( select ) => ( state ) => {
  *
  * @return {*} A value whose reference will change only when an edit occurs.
  */
-export const getReferenceByDistinctEdits = createSelector(
-	() => [],
-	( state ) => [ state.editor ],
+export const getReferenceByDistinctEdits = createRegistrySelector(
+	( select ) => ( /* state */ ) => {
+		deprecated( '`wp.data.select( \'core/editor\' ).getReferenceByDistinctEdits`', {
+			alternative: '`wp.data.select( \'core\' ).getReferenceByDistinctEdits`',
+		} );
+
+		return select( 'core' ).getReferenceByDistinctEdits();
+	}
 );
 
 /**
@@ -532,6 +598,11 @@ export function isEditedPostEmpty( state ) {
 export const isEditedPostAutosaveable = createRegistrySelector( ( select ) => function( state ) {
 	// A post must contain a title, an excerpt, or non-empty content to be valid for autosaving.
 	if ( ! isEditedPostSaveable( state ) ) {
+		return false;
+	}
+
+	// A post is not autosavable when there is a post autosave lock.
+	if ( isPostAutosavingLocked( state ) ) {
 		return false;
 	}
 
@@ -1101,6 +1172,17 @@ export function isPostSavingLocked( state ) {
 }
 
 /**
+ * Returns whether post autosaving is locked.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Is locked.
+ */
+export function isPostAutosavingLocked( state ) {
+	return Object.keys( state.postAutosavingLock ).length > 0;
+}
+
+/**
  * Returns whether the edition of the post has been taken over.
  *
  * @param {Object} state Global application state.
@@ -1167,6 +1249,37 @@ export function isPublishSidebarEnabled( state ) {
  */
 export function getEditorBlocks( state ) {
 	return getEditedPostAttribute( state, 'blocks' ) || EMPTY_ARRAY;
+}
+
+/**
+ * A block selection object.
+ *
+ * @typedef {Object} WPBlockSelection
+ *
+ * @property {string} clientId     A block client ID.
+ * @property {string} attributeKey A block attribute key.
+ * @property {number} offset       An attribute value offset, based on the rich
+ *                                 text value. See `wp.richText.create`.
+ */
+
+/**
+ * Returns the current selection start.
+ *
+ * @param {Object} state
+ * @return {WPBlockSelection} The selection start.
+ */
+export function getEditorSelectionStart( state ) {
+	return getEditedPostAttribute( state, 'selectionStart' );
+}
+
+/**
+ * Returns the current selection end.
+ *
+ * @param {Object} state
+ * @return {WPBlockSelection} The selection end.
+ */
+export function getEditorSelectionEnd( state ) {
+	return getEditedPostAttribute( state, 'selectionEnd' );
 }
 
 /**

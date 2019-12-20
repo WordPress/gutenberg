@@ -1,5 +1,9 @@
-.table-of-contents__popover.components-popover:not(.is-mobile) .components-popover__content {
+.table-of-contents__popover.components-popover .components-popover__content {
 	min-width: 380px;
+}
+
+.components-popover.table-of-contents__popover {
+	z-index: z-index(".components-popover.table-of-contents__popover");
 }
 
 .table-of-contents__popover {

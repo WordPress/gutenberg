@@ -1,4 +1,10 @@
-## Master
+## 3.3.0 (2019-12-19)
+
+### Bug Fixes
+
+- The React ruleset now correctly references the WordPress ESLint plugin, resolving an error about an unfound rule.
+
+## 3.0.0 (2019-08-29)
 
 ### Breaking Changes
 

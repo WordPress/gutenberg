@@ -17,7 +17,7 @@ function CopyContentMenuItem( { createNotice, editedPostContent, hasCopied, setS
 					setState( { hasCopied: true } );
 					createNotice(
 						'info',
-						'All content copied.',
+						__( 'All content copied.' ),
 						{
 							isDismissible: true,
 							type: 'snackbar',
@@ -28,7 +28,7 @@ function CopyContentMenuItem( { createNotice, editedPostContent, hasCopied, setS
 			>
 				{ hasCopied ?
 					__( 'Copied!' ) :
-					__( 'Copy All Content' ) }
+					__( 'Copy all content' ) }
 			</ClipboardButton>
 		)
 	);

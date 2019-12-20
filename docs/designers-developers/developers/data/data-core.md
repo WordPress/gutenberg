@@ -153,6 +153,21 @@ _Returns_
 
 -   `?Object`: Record.
 
+<a name="getEntityRecordChangesByRecord" href="#getEntityRecordChangesByRecord">#</a> **getEntityRecordChangesByRecord**
+
+Returns a map of objects with each edited
+raw entity record and its corresponding edits.
+
+The map is keyed by entity `kind => name => key => { rawRecord, edits }`.
+
+_Parameters_
+
+-   _state_ `Object`: State tree.
+
+_Returns_
+
+-   `null`: The map of edited records with their edits.
+
 <a name="getEntityRecordEdits" href="#getEntityRecordEdits">#</a> **getEntityRecordEdits**
 
 Returns the specified entity record's edits.
@@ -245,6 +260,27 @@ _Parameters_
 _Returns_
 
 -   `?Object`: The edit.
+
+<a name="getReferenceByDistinctEdits" href="#getReferenceByDistinctEdits">#</a> **getReferenceByDistinctEdits**
+
+Returns a new reference when edited values have changed. This is useful in
+inferring where an edit has been made between states by comparison of the
+return values using strict equality.
+
+_Usage_
+
+    const hasEditOccurred = (
+       getReferenceByDistinctEdits( beforeState ) !==
+       getReferenceByDistinctEdits( afterState )
+    );
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+
+_Returns_
+
+-   `*`: A value whose reference will change only when an edit occurs.
 
 <a name="getThemeSupports" href="#getThemeSupports">#</a> **getThemeSupports**
 
@@ -450,6 +486,8 @@ _Parameters_
 -   _name_ `string`: Name of the edited entity record.
 -   _recordId_ `number`: Record ID of the edited entity record.
 -   _edits_ `Object`: The edits.
+-   _options_ `Object`: Options for the edit.
+-   _options.undoIgnore_ `boolean`: Whether to ignore the edit in undo history or not.
 
 _Returns_
 
@@ -489,7 +527,7 @@ a given URl has been received.
 _Parameters_
 
 -   _url_ `string`: URL to preview the embed for.
--   _preview_ `Mixed`: Preview data.
+-   _preview_ `*`: Preview data.
 
 _Returns_
 

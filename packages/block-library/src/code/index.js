@@ -20,6 +20,12 @@ export const settings = {
 	title: __( 'Code' ),
 	description: __( 'Display code snippets that respect your spacing and tabs.' ),
 	icon,
+	example: {
+		attributes: {
+			// translators: Preserve \n markers for line breaks
+			content: __( '// A "block" is the abstract term used\n// to describe units of markup that\n// when composed together, form the\n// content or layout of a page.\nregisterBlockType( name, settings );' ),
+		},
+	},
 	supports: {
 		html: false,
 	},

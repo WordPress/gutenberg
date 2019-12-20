@@ -34,7 +34,7 @@ export default createHigherOrderComponent(
 			}
 
 			focusRegion( offset ) {
-				const regions = [ ...this.container.querySelectorAll( '[role="region"]' ) ];
+				const regions = Array.from( this.container.querySelectorAll( '[role="region"]' ) );
 				if ( ! regions.length ) {
 					return;
 				}
@@ -48,11 +48,16 @@ export default createHigherOrderComponent(
 				}
 
 				nextRegion.focus();
-				this.setState( { isFocusingRegions: true } );
+
+				if ( ! this.state.isFocusingRegions ) {
+					this.setState( { isFocusingRegions: true } );
+				}
 			}
 
 			onClick() {
-				this.setState( { isFocusingRegions: false } );
+				if ( this.state.isFocusingRegions ) {
+					this.setState( { isFocusingRegions: false } );
+				}
 			}
 
 			render() {

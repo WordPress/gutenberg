@@ -1,14 +1,12 @@
 /**
- * External dependencies
- */
-import { isEmpty } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { getBlockType, getUnregisteredTypeHandlerName } from '@wordpress/blocks';
-import { PanelBody } from '@wordpress/components';
+import {
+	PanelBody,
+	__experimentalSlotFillConsumer,
+} from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 
 /**
@@ -42,7 +40,7 @@ const BlockInspector = ( {
 	if ( ! blockType || ! selectedBlockClientId || isSelectedBlockUnregistered ) {
 		if ( showNoBlockSelectedMessage ) {
 			return (
-				<span className="editor-block-inspector__no-blocks block-editor-block-inspector__no-blocks">
+				<span className="block-editor-block-inspector__no-blocks">
 					{ __( 'No block selected.' ) }
 				</span>
 			);
@@ -51,7 +49,7 @@ const BlockInspector = ( {
 	}
 
 	return (
-		<>
+		<div className="block-editor-block-inspector">
 			<BlockCard blockType={ blockType } />
 			{ hasBlockStyles && (
 				<div>
@@ -66,22 +64,24 @@ const BlockInspector = ( {
 					</PanelBody>
 				</div>
 			) }
-			<div><InspectorControls.Slot /></div>
+			<InspectorControls.Slot bubblesVirtually />
 			<div>
-				<InspectorAdvancedControls.Slot>
-					{ ( fills ) => ! isEmpty( fills ) && (
-						<PanelBody
-							className="editor-block-inspector__advanced block-editor-block-inspector__advanced"
-							title={ __( 'Advanced' ) }
-							initialOpen={ false }
-						>
-							{ fills }
-						</PanelBody>
-					) }
-				</InspectorAdvancedControls.Slot>
+				<__experimentalSlotFillConsumer>
+					{ ( { hasFills } ) =>
+						hasFills( InspectorAdvancedControls.slotName ) && (
+							<PanelBody
+								className="block-editor-block-inspector__advanced"
+								title={ __( 'Advanced' ) }
+								initialOpen={ false }
+							>
+								<InspectorAdvancedControls.Slot bubblesVirtually />
+							</PanelBody>
+						)
+					}
+				</__experimentalSlotFillConsumer>
 			</div>
 			<SkipToSelectedBlock key="back" />
-		</>
+		</div>
 	);
 };
 

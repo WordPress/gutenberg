@@ -1,9 +1,4 @@
 /**
- * WordPress dependencies
- */
-import { withSelect } from '@wordpress/data';
-
-/**
  * Internal dependencies
  */
 import { getActiveFormat } from '../get-active-format';
@@ -28,14 +23,14 @@ const interactiveContentTags = new Set( [
 	'video',
 ] );
 
-const FormatEdit = ( {
+export default function FormatEdit( {
 	formatTypes,
 	onChange,
 	value,
 	allowedFormats,
 	withoutInteractiveFormatting,
-} ) =>
-	formatTypes.map( ( {
+} ) {
+	return formatTypes.map( ( {
 		name,
 		edit: Edit,
 		tagName,
@@ -58,7 +53,7 @@ const FormatEdit = ( {
 		const activeFormat = getActiveFormat( value, name );
 		const isActive = activeFormat !== undefined;
 		const activeObject = getActiveObject( value );
-		const isObjectActive = activeObject !== undefined;
+		const isObjectActive = activeObject !== undefined && activeObject.type === name;
 
 		return (
 			<Edit
@@ -76,7 +71,4 @@ const FormatEdit = ( {
 			/>
 		);
 	} );
-
-export default withSelect( ( select ) => ( {
-	formatTypes: select( 'core/rich-text' ).getFormatTypes(),
-} ) )( FormatEdit );
+}

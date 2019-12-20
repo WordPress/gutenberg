@@ -1,0 +1,20 @@
+.block-directory-downloadable-block-info__content {
+	font-size: $default-font-size;
+}
+
+.block-directory-downloadable-block-info__row {
+	display: flex;
+	justify-content: space-between;
+	color: $dark-gray-400;
+	margin-top: $grid-size;
+
+	.block-directory-downloadable-block-info__column {
+		display: flex;
+		align-items: flex-start;
+
+		.dashicon {
+			font-size: 16px;
+			margin-right: 4px;
+		}
+	}
+}

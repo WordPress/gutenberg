@@ -108,13 +108,11 @@ function render_block_core_latest_posts( $attributes ) {
 		$class .= ' ' . $attributes['className'];
 	}
 
-	$block_content = sprintf(
+	return sprintf(
 		'<ul class="%1$s">%2$s</ul>',
 		esc_attr( $class ),
 		$list_items_markup
 	);
-
-	return $block_content;
 }
 
 /**

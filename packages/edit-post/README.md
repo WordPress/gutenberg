@@ -92,13 +92,13 @@ _Parameters_
 
 -   _props_ `Object`: Component props.
 -   _props.allowedBlocks_ `[Array]`: An array containing a list of block names for which the item should be shown. If not present, it'll be rendered for any block. If multiple blocks are selected, it'll be shown if and only if all of them are in the whitelist.
--   _props.icon_ `[(string|Element)]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element.
+-   _props.icon_ `[WPBlockTypeIconRender]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element.
 -   _props.label_ `string`: The menu item text.
 -   _props.onClick_ `Function`: Callback function to be executed when the user click the menu item.
 
 _Returns_
 
--   `WPElement`: The WPElement to be rendered.
+-   `WPComponent`: The component to be rendered.
 
 <a name="PluginDocumentSettingPanel" href="#PluginDocumentSettingPanel">#</a> **PluginDocumentSettingPanel**
 
@@ -149,11 +149,11 @@ _Parameters_
 -   _props.name_ `[string]`: The machine-friendly name for the panel.
 -   _props.className_ `[string]`: An optional class name added to the row.
 -   _props.title_ `[string]`: The title of the panel
--   _props.icon_ `[(string|Element)]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
+-   _props.icon_ `[WPBlockTypeIconRender]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
 
 _Returns_
 
--   `WPElement`: The WPElement to be rendered.
+-   `WPComponent`: The component to be rendered.
 
 <a name="PluginMoreMenuItem" href="#PluginMoreMenuItem">#</a> **PluginMoreMenuItem**
 
@@ -206,13 +206,13 @@ _Parameters_
 
 -   _props_ `Object`: Component properties.
 -   _props.href_ `[string]`: When `href` is provided then the menu item is represented as an anchor rather than button. It corresponds to the `href` attribute of the anchor.
--   _props.icon_ `[(string|Element)]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered to the left of the menu item label.
+-   _props.icon_ `[WPBlockTypeIconRender]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered to the left of the menu item label.
 -   _props.onClick_ `[Function]`: The callback function to be executed when the user clicks the menu item.
 -   _props.other_ `[...*]`: Any additional props are passed through to the underlying [MenuItem](/packages/components/src/menu-item/README.md) component.
 
 _Returns_
 
--   `WPElement`: The element to be rendered.
+-   `WPComponent`: The component to be rendered.
 
 <a name="PluginPostPublishPanel" href="#PluginPostPublishPanel">#</a> **PluginPostPublishPanel**
 
@@ -261,14 +261,15 @@ _Parameters_
 -   _props.className_ `[string]`: An optional class name added to the panel.
 -   _props.title_ `[string]`: Title displayed at the top of the panel.
 -   _props.initialOpen_ `[boolean]`: Whether to have the panel initially opened. When no title is provided it is always opened.
+-   _props.icon_ `[WPBlockTypeIconRender]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
 
 _Returns_
 
--   `WPElement`: The WPElement to be rendered.
+-   `WPComponent`: The component to be rendered.
 
 <a name="PluginPostStatusInfo" href="#PluginPostStatusInfo">#</a> **PluginPostStatusInfo**
 
-Renders a row in the Status & Visibility panel of the Document sidebar.
+Renders a row in the Status & visibility panel of the Document sidebar.
 It should be noted that this is named and implemented around the function it serves
 and not its location, which may change in future iterations.
 
@@ -311,7 +312,7 @@ _Parameters_
 
 _Returns_
 
--   `WPElement`: The WPElement to be rendered.
+-   `WPComponent`: The component to be rendered.
 
 <a name="PluginPrePublishPanel" href="#PluginPrePublishPanel">#</a> **PluginPrePublishPanel**
 
@@ -360,10 +361,11 @@ _Parameters_
 -   _props.className_ `[string]`: An optional class name added to the panel.
 -   _props.title_ `[string]`: Title displayed at the top of the panel.
 -   _props.initialOpen_ `[boolean]`: Whether to have the panel initially opened. When no title is provided it is always opened.
+-   _props.icon_ `[WPBlockTypeIconRender]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
 
 _Returns_
 
--   `WPElement`: The WPElement to be rendered.
+-   `WPComponent`: The component to be rendered.
 
 <a name="PluginSidebar" href="#PluginSidebar">#</a> **PluginSidebar**
 
@@ -430,11 +432,11 @@ _Parameters_
 -   _props.className_ `[string]`: An optional class name added to the sidebar body.
 -   _props.title_ `string`: Title displayed at the top of the sidebar.
 -   _props.isPinnable_ `[boolean]`: Whether to allow to pin sidebar to toolbar.
--   _props.icon_ `[(string|Element)]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
+-   _props.icon_ `[WPBlockTypeIconRender]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
 
 _Returns_
 
--   `WPElement`: Plugin sidebar component.
+-   `WPComponent`: Plugin sidebar component.
 
 <a name="PluginSidebarMoreMenuItem" href="#PluginSidebarMoreMenuItem">#</a> **PluginSidebarMoreMenuItem**
 
@@ -480,11 +482,11 @@ _Parameters_
 
 -   _props_ `Object`: Component props.
 -   _props.target_ `string`: A string identifying the target sidebar you wish to be activated by this menu item. Must be the same as the `name` prop you have given to that sidebar.
--   _props.icon_ `[(string|Element)]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered to the left of the menu item label.
+-   _props.icon_ `[WPBlockTypeIconRender]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered to the left of the menu item label.
 
 _Returns_
 
--   `WPElement`: The element to be rendered.
+-   `WPComponent`: The component to be rendered.
 
 <a name="reinitializeEditor" href="#reinitializeEditor">#</a> **reinitializeEditor**
 

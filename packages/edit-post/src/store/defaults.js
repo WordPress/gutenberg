@@ -9,8 +9,10 @@ export const PREFERENCES_DEFAULTS = {
 	features: {
 		fixedToolbar: false,
 		showInserterHelpPanel: true,
+		welcomeGuide: true,
 	},
 	pinnedPluginItems: {},
 	hiddenBlockTypes: [],
 	preferredStyleVariations: {},
+	localAutosaveInterval: 15,
 };

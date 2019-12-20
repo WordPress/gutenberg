@@ -15,7 +15,7 @@ import {
 	embedFlickrIcon,
 	embedVimeoIcon,
 	embedRedditIcon,
-	embedTumbrIcon,
+	embedTumblrIcon,
 	embedAmazonIcon,
 } from './icons';
 
@@ -137,13 +137,17 @@ export const others = [
 		patterns: [ /^https?:\/\/cloudup\.com\/.+/i ],
 	},
 	{
+		// Deprecated since CollegeHumor content is now powered by YouTube
 		name: 'core-embed/collegehumor',
 		settings: {
 			title: 'CollegeHumor',
 			icon: embedVideoIcon,
 			description: __( 'Embed CollegeHumor content.' ),
+			supports: {
+				inserter: false,
+			},
 		},
-		patterns: [ /^https?:\/\/(www\.)?collegehumor\.com\/.+/i ],
+		patterns: [],
 	},
 	{
 		name: 'core-embed/crowdsignal',
@@ -338,7 +342,7 @@ export const others = [
 		name: 'core-embed/tumblr',
 		settings: {
 			title: 'Tumblr',
-			icon: embedTumbrIcon,
+			icon: embedTumblrIcon,
 			description: __( 'Embed a Tumblr post.' ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?tumblr\.com\/.+/i ],

@@ -18,12 +18,10 @@ import {
 	isCollapsed,
 	getTextContent,
 } from '@wordpress/rich-text';
-import { getRectangleFromRange } from '@wordpress/dom';
 
 /**
  * Internal dependencies
  */
-import withFocusOutside from '../higher-order/with-focus-outside';
 import Button from '../button';
 import Popover from '../popover';
 import withSpokenMessages from '../higher-order/with-spoken-messages';
@@ -92,7 +90,7 @@ import withSpokenMessages from '../higher-order/with-spoken-messages';
  */
 
 /**
- * @typedef {Object} Completer
+ * @typedef {Object} WPCompleter
  * @property {string} name a way to identify a completer, useful for selective overriding.
  * @property {?string} className A class to apply to the popup menu.
  * @property {string} triggerPrefix the prefix that will display the menu.
@@ -131,13 +129,9 @@ function filterOptions( search, options = [], maxResults = 10 ) {
 	return filtered;
 }
 
-function getCaretRect() {
+function getRange() {
 	const selection = window.getSelection();
-	const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
-
-	if ( range ) {
-		return getRectangleFromRange( range );
-	}
+	return selection.rangeCount ? selection.getRangeAt( 0 ) : null;
 }
 
 export class Autocomplete extends Component {
@@ -155,7 +149,6 @@ export class Autocomplete extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.bindNode = this.bindNode.bind( this );
 		this.select = this.select.bind( this );
 		this.reset = this.reset.bind( this );
 		this.resetWhenSuppressed = this.resetWhenSuppressed.bind( this );
@@ -163,10 +156,6 @@ export class Autocomplete extends Component {
 		this.debouncedLoadOptions = debounce( this.loadOptions, 250 );
 
 		this.state = this.constructor.getInitialState();
-	}
-
-	bindNode( node ) {
-		this.node = node;
 	}
 
 	insertCompletion( replacement ) {
@@ -209,13 +198,7 @@ export class Autocomplete extends Component {
 	}
 
 	reset() {
-		const isMounted = !! this.node;
-
-		// Autocompletions may replace the block containing this component,
-		// so we make sure it is mounted before resetting the state.
-		if ( isMounted ) {
-			this.setState( this.constructor.getInitialState() );
-		}
+		this.setState( this.constructor.getInitialState() );
 	}
 
 	resetWhenSuppressed() {
@@ -223,10 +206,6 @@ export class Autocomplete extends Component {
 		if ( open && suppress === open.idx ) {
 			this.reset();
 		}
-	}
-
-	handleFocusOutside() {
-		this.reset();
 	}
 
 	announce( filteredOptions ) {
@@ -248,8 +227,8 @@ export class Autocomplete extends Component {
 	/**
 	 * Load options for an autocompleter.
 	 *
-	 * @param {Completer} completer The autocompleter.
-	 * @param {string}    query     The query, if any.
+	 * @param {WPCompleter} completer The autocompleter.
+	 * @param {string}      query     The query, if any.
 	 */
 	loadOptions( completer, query ) {
 		const { options } = completer;
@@ -353,27 +332,11 @@ export class Autocomplete extends Component {
 		// Any handled keycode should prevent original behavior. This relies on
 		// the early return in the default case.
 		event.preventDefault();
-		event.stopPropagation();
 	}
 
-	toggleKeyEvents( isListening ) {
-		// This exists because we must capture ENTER key presses before RichText.
-		// It seems that react fires the simulated capturing events after the
-		// native browser event has already bubbled so we can't stopPropagation
-		// and avoid RichText getting the event from TinyMCE, hence we must
-		// register a native event handler.
-		const handler = isListening ? 'addEventListener' : 'removeEventListener';
-		this.node[ handler ]( 'keydown', this.handleKeyDown, true );
-	}
-
-	componentDidUpdate( prevProps, prevState ) {
+	componentDidUpdate( prevProps ) {
 		const { record, completers } = this.props;
 		const { record: prevRecord } = prevProps;
-		const { open: prevOpen } = prevState;
-
-		if ( ( ! this.state.open ) !== ( ! prevOpen ) ) {
-			this.toggleKeyEvents( ! ! this.state.open );
-		}
 
 		if ( isCollapsed( record ) ) {
 			const text = deburr( getTextContent( slice( record, 0 ) ) );
@@ -432,12 +395,11 @@ export class Autocomplete extends Component {
 	}
 
 	componentWillUnmount() {
-		this.toggleKeyEvents( false );
 		this.debouncedLoadOptions.cancel();
 	}
 
 	render() {
-		const { children, instanceId } = this.props;
+		const { children, instanceId, isSelected } = this.props;
 		const { open, suppress, selectedIndex, filteredOptions } = this.state;
 		const { key: selectedKey = '' } = filteredOptions[ selectedIndex ] || {};
 		const { className, idx } = open || {};
@@ -445,22 +407,21 @@ export class Autocomplete extends Component {
 		const listBoxId = isExpanded ? `components-autocomplete-listbox-${ instanceId }` : null;
 		const activeId = isExpanded ? `components-autocomplete-item-${ instanceId }-${ selectedKey }` : null;
 
-		// Disable reason: Clicking the editor should reset the autocomplete when the menu is suppressed
-		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
 		return (
-			<div
-				ref={ this.bindNode }
-				onClick={ this.resetWhenSuppressed }
-				className="components-autocomplete"
-			>
-				{ children( { isExpanded, listBoxId, activeId } ) }
-				{ isExpanded && (
+			<>
+				{ children( {
+					isExpanded,
+					listBoxId,
+					activeId,
+					onKeyDown: this.handleKeyDown,
+				} ) }
+				{ isExpanded && isSelected && (
 					<Popover
 						focusOnMount={ false }
 						onClose={ this.reset }
 						position="top right"
 						className="components-autocomplete__popover"
-						getAnchorRect={ getCaretRect }
+						anchorRef={ getRange() }
 					>
 						<div
 							id={ listBoxId }
@@ -485,14 +446,12 @@ export class Autocomplete extends Component {
 						</div>
 					</Popover>
 				) }
-			</div>
+			</>
 		);
-		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
 	}
 }
 
 export default compose( [
 	withSpokenMessages,
 	withInstanceId,
-	withFocusOutside, // this MUST be the innermost HOC as it calls handleFocusOutside
 ] )( Autocomplete );

@@ -28,7 +28,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
   <div
     className="editor-post-publish-panel__footer"
   >
-    <WithInstanceId(CheckboxControl)
+    <CheckboxControl
       label="Always show pre-publish checks."
     />
   </div>
@@ -63,7 +63,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
   <div
     className="editor-post-publish-panel__footer"
   >
-    <WithInstanceId(CheckboxControl)
+    <CheckboxControl
       label="Always show pre-publish checks."
     />
   </div>
@@ -84,9 +84,6 @@ exports[`PostPublishPanel should render the pre-publish panel if post status is 
         focusOnMount={true}
         onSubmit={[Function]}
       />
-      <span
-        className="editor-post-publish-panel__spacer"
-      />
     </div>
     <ForwardRef(IconButton)
       aria-expanded={true}
@@ -102,7 +99,7 @@ exports[`PostPublishPanel should render the pre-publish panel if post status is 
   <div
     className="editor-post-publish-panel__footer"
   >
-    <WithInstanceId(CheckboxControl)
+    <CheckboxControl
       label="Always show pre-publish checks."
     />
   </div>
@@ -123,9 +120,6 @@ exports[`PostPublishPanel should render the pre-publish panel if the post is not
         focusOnMount={true}
         onSubmit={[Function]}
       />
-      <span
-        className="editor-post-publish-panel__spacer"
-      />
     </div>
     <ForwardRef(IconButton)
       aria-expanded={true}
@@ -141,7 +135,7 @@ exports[`PostPublishPanel should render the pre-publish panel if the post is not
   <div
     className="editor-post-publish-panel__footer"
   >
-    <WithInstanceId(CheckboxControl)
+    <CheckboxControl
       label="Always show pre-publish checks."
     />
   </div>
@@ -162,9 +156,6 @@ exports[`PostPublishPanel should render the spinner if the post is being saved 1
         focusOnMount={true}
         onSubmit={[Function]}
       />
-      <span
-        className="editor-post-publish-panel__spacer"
-      />
     </div>
     <ForwardRef(IconButton)
       aria-expanded={true}
@@ -180,7 +171,7 @@ exports[`PostPublishPanel should render the spinner if the post is being saved 1
   <div
     className="editor-post-publish-panel__footer"
   >
-    <WithInstanceId(CheckboxControl)
+    <CheckboxControl
       label="Always show pre-publish checks."
     />
   </div>

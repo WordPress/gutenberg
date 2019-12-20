@@ -19,11 +19,6 @@ import { Component } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
-/**
- * Internal dependencies
- */
-import MediaUploadCheck from '../media-upload/check';
-
 const parseDropEvent = ( event ) => {
 	let result = {
 		srcRootClientId: null,
@@ -63,6 +58,9 @@ class BlockDropZone extends Component {
 	}
 
 	onFilesDrop( files, position ) {
+		if ( ! this.props.hasUploadPermissions ) {
+			return;
+		}
 		const transformation = findTransform(
 			getBlockTransforms( 'from' ),
 			( transform ) => transform.type === 'files' && transform.isMatch( files )
@@ -111,25 +109,21 @@ class BlockDropZone extends Component {
 	}
 
 	render() {
-		const { isLockedAll } = this.props;
+		const { hasUploadPermissions, isLockedAll } = this.props;
 		if ( isLockedAll ) {
 			return null;
 		}
-
 		const index = this.getInsertIndex();
 		const isAppender = index === undefined;
-
 		return (
-			<MediaUploadCheck>
-				<DropZone
-					className={ classnames( 'editor-block-drop-zone block-editor-block-drop-zone', {
-						'is-appender': isAppender,
-					} ) }
-					onFilesDrop={ this.onFilesDrop }
-					onHTMLDrop={ this.onHTMLDrop }
-					onDrop={ this.onDrop }
-				/>
-			</MediaUploadCheck>
+			<DropZone
+				className={ classnames( 'block-editor-block-drop-zone', {
+					'is-appender': isAppender,
+				} ) }
+				onHTMLDrop={ this.onHTMLDrop }
+				onDrop={ this.onDrop }
+				onFilesDrop={ hasUploadPermissions ? this.onFilesDrop : undefined }
+			/>
 		);
 	}
 }
@@ -158,11 +152,17 @@ export default compose(
 		};
 	} ),
 	withSelect( ( select, { rootClientId } ) => {
-		const { getClientIdsOfDescendants, getTemplateLock, getBlockIndex } = select( 'core/block-editor' );
-		return {
-			isLockedAll: getTemplateLock( rootClientId ) === 'all',
-			getClientIdsOfDescendants,
+		const {
 			getBlockIndex,
+			getClientIdsOfDescendants,
+			getSettings,
+			getTemplateLock,
+		} = select( 'core/block-editor' );
+		return {
+			getBlockIndex,
+			getClientIdsOfDescendants,
+			hasUploadPermissions: !! getSettings().mediaUpload,
+			isLockedAll: getTemplateLock( rootClientId ) === 'all',
 		};
 	} ),
 	withFilters( 'editor.BlockDropZone' )

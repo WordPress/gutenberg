@@ -6,7 +6,7 @@ import { castArray, flow } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _n } from '@wordpress/i18n';
 import {
 	Toolbar,
 	DropdownMenu,
@@ -26,7 +26,7 @@ import __experimentalBlockSettingsMenuFirstItem from './block-settings-menu-firs
 import __experimentalBlockSettingsMenuPluginsExtension from './block-settings-menu-plugins-extension';
 
 const POPOVER_PROPS = {
-	className: 'block-editor-block-settings-menu__popover editor-block-settings-menu__popover',
+	className: 'block-editor-block-settings-menu__popover',
 	position: 'bottom right',
 };
 
@@ -71,7 +71,7 @@ export function BlockSettingsMenu( { clientIds } ) {
 									) }
 									{ canDuplicate && (
 										<MenuItem
-											className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
+											className="block-editor-block-settings-menu__control"
 											onClick={ flow( onClose, onDuplicate ) }
 											icon="admin-page"
 											shortcut={ shortcuts.duplicate.display }
@@ -82,7 +82,7 @@ export function BlockSettingsMenu( { clientIds } ) {
 									{ canInsertDefaultBlock && (
 										<>
 											<MenuItem
-												className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
+												className="block-editor-block-settings-menu__control"
 												onClick={ flow( onClose, onInsertBefore ) }
 												icon="insert-before"
 												shortcut={ shortcuts.insertBefore.display }
@@ -90,7 +90,7 @@ export function BlockSettingsMenu( { clientIds } ) {
 												{ __( 'Insert Before' ) }
 											</MenuItem>
 											<MenuItem
-												className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
+												className="block-editor-block-settings-menu__control"
 												onClick={ flow( onClose, onInsertAfter ) }
 												icon="insert-after"
 												shortcut={ shortcuts.insertAfter.display }
@@ -112,12 +112,12 @@ export function BlockSettingsMenu( { clientIds } ) {
 								<MenuGroup>
 									{ ! isLocked && (
 										<MenuItem
-											className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
+											className="block-editor-block-settings-menu__control"
 											onClick={ flow( onClose, onRemove ) }
 											icon="trash"
 											shortcut={ shortcuts.removeBlock.display }
 										>
-											{ __( 'Remove Block' ) }
+											{ _n( 'Remove Block', 'Remove Blocks', count ) }
 										</MenuItem>
 									) }
 								</MenuGroup>

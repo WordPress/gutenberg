@@ -84,11 +84,30 @@ export default {
 		const blockB = getBlock( state, clientIdB );
 		const blockBType = getBlockType( blockB.name );
 		const { clientId, attributeKey, offset } = getSelectionStart( state );
-		const hasTextSelection = (
+		const selectedBlockType = clientId === clientIdA ? blockAType : blockBType;
+		const attributeDefinition = selectedBlockType.attributes[ attributeKey ];
+		const canRestoreTextSelection = (
 			( clientId === clientIdA || clientId === clientIdB ) &&
 			attributeKey !== undefined &&
-			offset !== undefined
+			offset !== undefined &&
+			// We cannot restore text selection if the RichText identifier
+			// is not a defined block attribute key. This can be the case if the
+			// fallback intance ID is used to store selection (and no RichText
+			// identifier is set), or when the identifier is wrong.
+			!! attributeDefinition
 		);
+
+		if ( ! attributeDefinition ) {
+			if ( typeof attributeKey === 'number' ) {
+				window.console.error(
+					`RichText needs an identifier prop that is the block attribute key of the attribute it controls. Its type is expected to be a string, but was ${ typeof attributeKey }`
+				);
+			} else {
+				window.console.error(
+					'The RichText identifier prop does not match any attributes defined by the block.'
+				);
+			}
+		}
 
 		// A robust way to retain selection position through various transforms
 		// is to insert a special character at the position and then recover it.
@@ -98,19 +117,25 @@ export default {
 		const cloneA = cloneBlock( blockA );
 		const cloneB = cloneBlock( blockB );
 
-		if ( hasTextSelection ) {
+		if ( canRestoreTextSelection ) {
 			const selectedBlock = clientId === clientIdA ? cloneA : cloneB;
 			const html = selectedBlock.attributes[ attributeKey ];
-			const selectedBlockType = clientId === clientIdA ? blockAType : blockBType;
-			const multilineTag = selectedBlockType.attributes[ attributeKey ].multiline;
+			const {
+				multiline: multilineTag,
+				__unstableMultilineWrapperTags: multilineWrapperTags,
+				__unstablePreserveWhiteSpace: preserveWhiteSpace,
+			} = attributeDefinition;
 			const value = insert( create( {
 				html,
 				multilineTag,
+				multilineWrapperTags,
+				preserveWhiteSpace,
 			} ), START_OF_SELECTED_AREA, offset, offset );
 
 			selectedBlock.attributes[ attributeKey ] = toHTMLString( {
 				value,
 				multilineTag,
+				preserveWhiteSpace,
 			} );
 		}
 
@@ -131,16 +156,29 @@ export default {
 			blocksWithTheSameType[ 0 ].attributes
 		);
 
-		if ( hasTextSelection ) {
+		if ( canRestoreTextSelection ) {
 			const newAttributeKey = findKey( updatedAttributes, ( v ) =>
 				typeof v === 'string' && v.indexOf( START_OF_SELECTED_AREA ) !== -1
 			);
 			const convertedHtml = updatedAttributes[ newAttributeKey ];
-			const multilineTag = blockAType.attributes[ newAttributeKey ].multiline;
-			const convertedValue = create( { html: convertedHtml, multilineTag } );
+			const {
+				multiline: multilineTag,
+				__unstableMultilineWrapperTags: multilineWrapperTags,
+				__unstablePreserveWhiteSpace: preserveWhiteSpace,
+			} = blockAType.attributes[ newAttributeKey ];
+			const convertedValue = create( {
+				html: convertedHtml,
+				multilineTag,
+				multilineWrapperTags,
+				preserveWhiteSpace,
+			} );
 			const newOffset = convertedValue.text.indexOf( START_OF_SELECTED_AREA );
 			const newValue = remove( convertedValue, newOffset, newOffset + 1 );
-			const newHtml = toHTMLString( { value: newValue, multilineTag } );
+			const newHtml = toHTMLString( {
+				value: newValue,
+				multilineTag,
+				preserveWhiteSpace,
+			} );
 
 			updatedAttributes[ newAttributeKey ] = newHtml;
 
@@ -182,5 +220,15 @@ export default {
 		const updatedBlockList = synchronizeBlocksWithTemplate( blocks, template );
 
 		return resetBlocks( updatedBlockList );
+	},
+	MARK_AUTOMATIC_CHANGE( action, store ) {
+		const {
+			setTimeout,
+			requestIdleCallback = ( callback ) => setTimeout( callback, 100 ),
+		} = window;
+
+		requestIdleCallback( () => {
+			store.dispatch( { type: 'MARK_AUTOMATIC_CHANGE_FINAL' } );
+		} );
 	},
 };

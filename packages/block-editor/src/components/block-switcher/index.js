@@ -8,7 +8,7 @@ import { castArray, filter, first, mapKeys, orderBy, uniq, map } from 'lodash';
  */
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { Dropdown, IconButton, Toolbar, PanelBody, Path, SVG } from '@wordpress/components';
-import { getBlockType, getPossibleBlockTransformations, switchToBlockType, cloneBlock, createBlock } from '@wordpress/blocks';
+import { getBlockType, getPossibleBlockTransformations, switchToBlockType, cloneBlock, getBlockFromExample } from '@wordpress/blocks';
 import { Component } from '@wordpress/element';
 import { DOWN } from '@wordpress/keycodes';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -74,7 +74,7 @@ export class BlockSwitcher extends Component {
 				<Toolbar>
 					<IconButton
 						disabled
-						className="editor-block-switcher__no-switcher-icon block-editor-block-switcher__no-switcher-icon"
+						className="block-editor-block-switcher__no-switcher-icon"
 						label={ __( 'Block icon' ) }
 						icon={ <BlockIcon icon={ icon } showColors /> }
 					/>
@@ -85,8 +85,8 @@ export class BlockSwitcher extends Component {
 		return (
 			<Dropdown
 				position="bottom right"
-				className="editor-block-switcher block-editor-block-switcher"
-				contentClassName="editor-block-switcher__popover block-editor-block-switcher__popover"
+				className="block-editor-block-switcher"
+				contentClassName="block-editor-block-switcher__popover"
 				renderToggle={ ( { onToggle, isOpen } ) => {
 					const openOnArrowDown = ( event ) => {
 						if ( ! isOpen && event.keyCode === DOWN ) {
@@ -111,7 +111,7 @@ export class BlockSwitcher extends Component {
 					return (
 						<Toolbar>
 							<IconButton
-								className="editor-block-switcher__toggle block-editor-block-switcher__toggle"
+								className="block-editor-block-switcher__toggle"
 								onClick={ onToggle }
 								aria-haspopup="true"
 								aria-expanded={ isOpen }
@@ -121,7 +121,7 @@ export class BlockSwitcher extends Component {
 								icon={ (
 									<>
 										<BlockIcon icon={ icon } showColors />
-										<SVG className="editor-block-switcher__transform block-editor-block-switcher__transform" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><Path d="M6.5 8.9c.6-.6 1.4-.9 2.2-.9h6.9l-1.3 1.3 1.4 1.4L19.4 7l-3.7-3.7-1.4 1.4L15.6 6H8.7c-1.4 0-2.6.5-3.6 1.5l-2.8 2.8 1.4 1.4 2.8-2.8zm13.8 2.4l-2.8 2.8c-.6.6-1.3.9-2.1.9h-7l1.3-1.3-1.4-1.4L4.6 16l3.7 3.7 1.4-1.4L8.4 17h6.9c1.3 0 2.6-.5 3.5-1.5l2.8-2.8-1.3-1.4z" /></SVG>
+										<SVG className="block-editor-block-switcher__transform" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><Path d="M6.5 8.9c.6-.6 1.4-.9 2.2-.9h6.9l-1.3 1.3 1.4 1.4L19.4 7l-3.7-3.7-1.4 1.4L15.6 6H8.7c-1.4 0-2.6.5-3.6 1.5l-2.8 2.8 1.4 1.4 2.8-2.8zm13.8 2.4l-2.8 2.8c-.6.6-1.3.9-2.1.9h-7l1.3-1.3-1.4-1.4L4.6 16l3.7 3.7 1.4-1.4L8.4 17h6.9c1.3 0 2.6-.5 3.5-1.5l2.8-2.8-1.3-1.4z" /></SVG>
 									</>
 								) }
 							/>
@@ -171,7 +171,10 @@ export class BlockSwitcher extends Component {
 									viewportWidth={ 500 }
 									blocks={
 										hoveredBlockType.example ?
-											createBlock( hoveredBlock.name, { ...hoveredBlockType.example.attributes, className: hoveredClassName }, hoveredBlockType.example.innerBlocks ) :
+											getBlockFromExample( hoveredBlock.name, {
+												attributes: { ...hoveredBlockType.example.attributes, className: hoveredClassName },
+												innerBlocks: hoveredBlockType.example.innerBlocks,
+											} ) :
 											cloneBlock( hoveredBlock, { className: hoveredClassName } )
 									}
 								/>

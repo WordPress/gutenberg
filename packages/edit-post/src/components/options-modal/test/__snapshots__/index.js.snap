@@ -10,14 +10,11 @@ exports[`OptionsModal should match snapshot when the modal is active 1`] = `
     title="General"
   >
     <WithSelect(WithDispatch(IfViewportMatches(BaseOption)))
-      label="Enable Pre-publish Checks"
-    />
-    <WithSelect(WithDispatch(DeferredOption))
-      label="Enable Tips"
+      label="Pre-publish Checks"
     />
     <WithSelect(WithDispatch(BaseOption))
       feature="showInserterHelpPanel"
-      label="Enable Inserter Help Panel"
+      label="Inserter Help Panel"
     />
   </Section>
   <Section
@@ -29,7 +26,7 @@ exports[`OptionsModal should match snapshot when the modal is active 1`] = `
     />
     <PostFeaturedImageCheck>
       <WithSelect(IfCondition(WithDispatch(BaseOption)))
-        label="Featured Image"
+        label="Featured image"
         panelName="featured-image"
       />
     </PostFeaturedImageCheck>

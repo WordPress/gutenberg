@@ -3,15 +3,8 @@
  */
 import { View } from 'react-native';
 
-/**
- * Internal dependencies
- */
-import styles from './style.scss';
-
-const ToolbarContainer = ( props ) => (
-	<View style={ [ styles.container, props.passedStyle ] }>
-		{ props.children }
-	</View>
+const ToolbarContainer = ( { children } ) => (
+	<View>{ children }</View>
 );
 
 export default ToolbarContainer;

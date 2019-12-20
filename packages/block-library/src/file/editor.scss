@@ -4,10 +4,6 @@
 	align-items: center;
 	margin-bottom: 0;
 
-	&.is-transient {
-		@include edit-post__loading-fade-animation;
-	}
-
 	.wp-block-file__content-wrapper {
 		flex-grow: 1;
 	}

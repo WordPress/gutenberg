@@ -21,6 +21,10 @@ Render a rich [`contenteditable` input](https://developer.mozilla.org/en-US/docs
 *Optional.* Placeholder text to show when the field is empty, similar to the
   [`input` and `textarea` attribute of the same name](https://developer.mozilla.org/en-US/docs/Learn/HTML/Forms/HTML5_updates#The_placeholder_attribute).
 
+### `keepPlaceholderOnFocus: Boolean`
+
+*Optional.* Show placeholder even when selected/focused, as long as there is no content.
+
 ### `multiline: Boolean | String`
 
 *Optional.* By default, a line break will be inserted on <kbd>Enter</kbd>. If the editable field can contain multiple paragraphs, this property can be set to create new paragraphs on <kbd>Enter</kbd>.
@@ -56,6 +60,10 @@ Render a rich [`contenteditable` input](https://developer.mozilla.org/en-US/docs
 ### `autocompleters: Array<Completer>`
 
 *Optional.* A list of autocompleters to use instead of the default.
+
+### `preserveWhiteSpace: Boolean`
+
+*Optional.* Whether or not to preserve white space characters in the `value`. Normally tab, newline and space characters are collapsed to a single space. If turned on, soft line breaks will be saved as newline characters, not as line break elements.
 
 ## RichText.Content
 

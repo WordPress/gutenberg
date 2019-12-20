@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { mapValues, mergeWith, includes, noop } from 'lodash';
+import { mapValues, mergeWith, includes, noop, isFunction } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -22,13 +22,18 @@ const { ELEMENT_NODE, TEXT_NODE } = window.Node;
 /**
  * Given raw transforms from blocks, merges all schemas into one.
  *
- * @param {Array} transforms Block transforms, of the `raw` type.
+ * @param {Array}  transforms            Block transforms, of the `raw` type.
+ * @param {Object} phrasingContentSchema The phrasing content schema.
+ * @param {Object} isPaste               Whether the context is pasting or not.
  *
  * @return {Object} A complete block content schema.
  */
-export function getBlockContentSchema( transforms ) {
+export function getBlockContentSchema( transforms, phrasingContentSchema, isPaste ) {
 	const schemas = transforms.map( ( { isMatch, blockName, schema } ) => {
 		const hasAnchorSupport = hasBlockSupport( blockName, 'anchor' );
+
+		schema = isFunction( schema ) ? schema( { phrasingContentSchema, isPaste } ) : schema;
+
 		// If the block does not has anchor support and the transform does not
 		// provides an isMatch we can return the schema right away.
 		if ( ! hasAnchorSupport && ! isMatch ) {
@@ -302,4 +307,26 @@ export function removeInvalidHTML( HTML, schema, inline ) {
 	cleanNodeList( doc.body.childNodes, doc, schema, inline );
 
 	return doc.body.innerHTML;
+}
+
+/**
+ * Gets a sibling within text-level context.
+ *
+ * @param {Element} node  The subject node.
+ * @param {string}  which "next" or "previous".
+ */
+export function getSibling( node, which ) {
+	const sibling = node[ `${ which }Sibling` ];
+
+	if ( sibling && isPhrasingContent( sibling ) ) {
+		return sibling;
+	}
+
+	const { parentNode } = node;
+
+	if ( ! parentNode || ! isPhrasingContent( parentNode ) ) {
+		return;
+	}
+
+	return getSibling( parentNode, which );
 }

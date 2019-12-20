@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { useMemo, useState } from '@wordpress/element';
 import { compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 
@@ -10,19 +9,13 @@ import { withSelect } from '@wordpress/data';
  */
 import WidgetArea from '../widget-area';
 
-function WidgetAreas( { areas, blockEditorSettings } ) {
-	const [ selectedArea, setSelectedArea ] = useState( 0 );
-	const onBlockSelectedInArea = useMemo(
-		() => areas.map( ( value, index ) => ( () => {
-			setSelectedArea( index );
-		} ) ),
-		[ areas, setSelectedArea ]
-	);
+const EMPTY_ARRAY = [];
 
+function WidgetAreas( { areas, blockEditorSettings, selectedArea, setSelectedArea } ) {
 	return areas.map( ( { id }, index ) => (
 		<WidgetArea
 			isSelectedArea={ index === selectedArea }
-			onBlockSelected={ onBlockSelectedInArea[ index ] }
+			onBlockSelected={ () => setSelectedArea( index ) }
 			blockEditorSettings={ blockEditorSettings }
 			key={ id }
 			id={ id }
@@ -33,8 +26,8 @@ function WidgetAreas( { areas, blockEditorSettings } ) {
 
 export default compose( [
 	withSelect( ( select ) => {
-		const { getWidgetAreas } = select( 'core/edit-widgets' );
-		const areas = getWidgetAreas();
+		const { getEntityRecords } = select( 'core' );
+		const areas = getEntityRecords( 'root', 'widgetArea' ) || EMPTY_ARRAY;
 		return {
 			areas,
 		};

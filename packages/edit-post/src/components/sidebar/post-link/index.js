@@ -88,7 +88,8 @@ function PostLink( {
 						} }
 					/>
 					<p>
-						{ __( 'The last part of the URL. ' ) }
+						{ __( 'The last part of the URL.' ) }
+						{ ' ' }
 						<ExternalLink href="https://wordpress.org/support/article/writing-posts/#post-field-descriptions">
 							{ __( 'Read about permalinks' ) }
 						</ExternalLink>
@@ -98,18 +99,20 @@ function PostLink( {
 			<p className="edit-post-post-link__preview-label">
 				{ postTypeLabel || __( 'View Post' ) }
 			</p>
-			<ExternalLink
-				className="edit-post-post-link__link"
-				href={ postLink }
-				target="_blank"
-			>
-				{ isEditable ?
-					( <>
-						{ prefixElement }{ postNameElement }{ suffixElement }
-					</> ) :
-					postLink
-				}
-			</ExternalLink>
+			<div className="edit-post-post-link__preview-link-container">
+				<ExternalLink
+					className="edit-post-post-link__link"
+					href={ postLink }
+					target="_blank"
+				>
+					{ isEditable ?
+						( <>
+							{ prefixElement }{ postNameElement }{ suffixElement }
+						</> ) :
+						postLink
+					}
+				</ExternalLink>
+			</div>
 		</PanelBody>
 	);
 }

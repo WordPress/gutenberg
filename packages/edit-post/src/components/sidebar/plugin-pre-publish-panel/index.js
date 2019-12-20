@@ -2,17 +2,35 @@
  * WordPress dependencies
  */
 import { createSlotFill, PanelBody } from '@wordpress/components';
-
+import { compose } from '@wordpress/compose';
+import { withPluginContext } from '@wordpress/plugins';
 const { Fill, Slot } = createSlotFill( 'PluginPrePublishPanel' );
+
+const PluginPrePublishPanelFill = ( { children, className, title, initialOpen = false, icon } ) => (
+	<Fill>
+		<PanelBody
+			className={ className }
+			initialOpen={ initialOpen || ! title }
+			title={ title }
+			icon={ icon }
+		>
+			{ children }
+		</PanelBody>
+	</Fill>
+);
 
 /**
  * Renders provided content to the pre-publish side panel in the publish flow
  * (side panel that opens when a user first pushes "Publish" from the main editor).
  *
- * @param {Object} props Component props.
- * @param {string} [props.className] An optional class name added to the panel.
- * @param {string} [props.title] Title displayed at the top of the panel.
- * @param {boolean} [props.initialOpen=false] Whether to have the panel initially opened. When no title is provided it is always opened.
+ * @param {Object}                props                                 Component props.
+ * @param {string}                [props.className]                     An optional class name added to the panel.
+ * @param {string}                [props.title]                         Title displayed at the top of the panel.
+ * @param {boolean}               [props.initialOpen=false]             Whether to have the panel initially opened.
+ *                                                                      When no title is provided it is always opened.
+ * @param {WPBlockTypeIconRender} [props.icon=inherits from the plugin] The [Dashicon](https://developer.wordpress.org/resource/dashicons/)
+ *                                                                      icon slug string, or an SVG WP element, to be rendered when
+ *                                                                      the sidebar is pinned to toolbar.
  *
  * @example <caption>ES5</caption>
  * ```js
@@ -50,19 +68,15 @@ const { Fill, Slot } = createSlotFill( 'PluginPrePublishPanel' );
  * );
  * ```
  *
- * @return {WPElement} The WPElement to be rendered.
+ * @return {WPComponent} The component to be rendered.
  */
-const PluginPrePublishPanel = ( { children, className, title, initialOpen = false } ) => (
-	<Fill>
-		<PanelBody
-			className={ className }
-			initialOpen={ initialOpen || ! title }
-			title={ title }
-		>
-			{ children }
-		</PanelBody>
-	</Fill>
-);
+const PluginPrePublishPanel = compose(
+	withPluginContext( ( context, ownProps ) => {
+		return {
+			icon: ownProps.icon || context.icon,
+		};
+	} ),
+)( PluginPrePublishPanelFill );
 
 PluginPrePublishPanel.Slot = Slot;
 
