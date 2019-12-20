@@ -137,7 +137,10 @@ export default compose( [
 				);
 			},
 			onToggleBlockMode() {
-				if ( ! isLocked && ! isReusableBlock( blocks[ 0 ] ) ) {
+				const block = blocks[ 0 ];
+				const isCodeEditingEnabled = select( 'core/editor' ).getEditorSettings().codeEditingEnabled;
+
+				if ( hasBlockSupport( block.name, 'html', true ) && isCodeEditingEnabled && ! isLocked && ! isReusableBlock( block ) ) {
 					toggleBlockMode( clientIds );
 				}
 			},
