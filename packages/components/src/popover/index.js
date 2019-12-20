@@ -254,7 +254,7 @@ const Popover = ( {
 			return;
 		}
 
-		const refresh = () => {
+		const refresh = ( { noSubpixels } = {} ) => {
 			const anchor = computeAnchorRect(
 				anchorRefFallback,
 				anchorRect,
@@ -280,11 +280,27 @@ const Popover = ( {
 				contentWidth,
 			} = computePopoverPosition( anchor, contentRect.current, position, __unstableSticky, anchorRef );
 
+			if ( typeof popoverTop === 'number' && typeof popoverLeft === 'number' ) {
+				// Translate clashes with animated popovers.
+				if ( animate ) {
+					setStyle( containerEl, 'top', popoverTop + 'px' );
+					setStyle( containerEl, 'left', popoverLeft + 'px' );
+				} else {
+					let x = popoverLeft;
+					let y = popoverTop;
+
+					if ( noSubpixels === true ) {
+						x = Math.round( x );
+						y = Math.round( y );
+					}
+
+					setStyle( containerEl, 'transform', `translate(${ x }px, ${ y }px)` );
+				}
+			}
+
 			setClass( containerEl, 'is-without-arrow', noArrow || ( xAxis === 'center' && yAxis === 'middle' ) );
 			setAttribute( containerEl, 'data-x-axis', xAxis );
 			setAttribute( containerEl, 'data-y-axis', yAxis );
-			setStyle( containerEl, 'top', typeof popoverTop === 'number' ? popoverTop + 'px' : '' );
-			setStyle( containerEl, 'left', typeof popoverLeft === 'number' ? popoverLeft + 'px' : '' );
 			setStyle( contentEl, 'maxHeight', typeof contentHeight === 'number' ? contentHeight + 'px' : '' );
 			setStyle( contentEl, 'maxWidth', typeof contentWidth === 'number' ? contentWidth + 'px' : '' );
 
@@ -309,6 +325,11 @@ const Popover = ( {
 			window.requestAnimationFrame( refresh );
 		};
 
+		// Scroll and attribute observation may render the popover on subpixels,
+		// which is good for a smooth transition, but at the end, it needs to
+		// rendered on pixels so the content is not blurry.
+		const intervalCallback = () => refresh( { noSubpixels: true } );
+
 		/*
 		 * There are sometimes we need to reposition or resize the popover that
 		 * are not handled by the resize/scroll window events (i.e. CSS changes
@@ -316,7 +337,7 @@ const Popover = ( {
 		 *
 		 * For these situations, we refresh the popover every 0.5s
 		 */
-		const intervalHandle = window.setInterval( refresh, 500 );
+		const intervalHandle = window.setInterval( intervalCallback, 500 );
 
 		// Sometimes a click trigger a layout change that affects the popover
 		// position. This is an opportunity to immediately refresh rather than
@@ -325,12 +346,23 @@ const Popover = ( {
 		window.addEventListener( 'resize', refresh );
 		window.addEventListener( 'scroll', refresh, true );
 
+		let observer;
+
+		if ( anchorRef && ! ( anchorRef instanceof window.Range ) ) {
+			observer = new window.MutationObserver( refresh );
+			observer.observe( anchorRef, { attributes: true } );
+		}
+
 		return () => {
 			window.clearTimeout( timeoutId );
 			window.clearInterval( intervalHandle );
 			window.removeEventListener( 'resize', refresh );
 			window.removeEventListener( 'scroll', refresh, true );
 			window.addEventListener( 'click', refreshOnAnimationFrame );
+
+			if ( observer ) {
+				observer.disconnect();
+			}
 		};
 	}, [
 		isExpanded,

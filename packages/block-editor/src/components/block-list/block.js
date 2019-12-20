@@ -566,7 +566,7 @@ function BlockListBlock( {
 						// To do: refactor `Popover` to make this prop clearer.
 						position="top right left"
 						focusOnMount={ false }
-						anchorRef={ blockNodeRef.current }
+						anchorRef={ wrapper.current }
 						className="block-editor-block-list__block-popover"
 						__unstableSticky={ isPartOfMultiSelection ? '.wp-block.is-multi-selected' : true }
 						__unstableSlotName="block-toolbar"
