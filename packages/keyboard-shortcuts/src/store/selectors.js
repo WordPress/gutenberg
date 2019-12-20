@@ -38,7 +38,7 @@ export function getShortcutDescription( state, name ) {
  * @param {Object} state Global state.
  * @param {string} name  Shortcut name.
  *
- * @return {[WPShortcutKeyCombination]} Key combination.
+ * @return {WPShortcutKeyCombination[]} Key combinations.
  */
 export function getShortcutAliases( state, name ) {
 	return state[ name ] && state[ name ].aliases ?
