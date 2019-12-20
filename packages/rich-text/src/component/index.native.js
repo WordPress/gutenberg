@@ -440,16 +440,7 @@ export class RichText extends Component {
 			this.setState( { activeFormats } );
 		}
 
-		// Aztec can send us selection change events after it has lost focus.
-		// For instance the autocorrect feature will complete a partially written
-		// word when resigning focus, causing a selection change event.
-		// Forwarding this selection change could cause this RichText to regain
-		// focus and start a focus loop.
-		//
-		// See https://github.com/wordpress-mobile/gutenberg-mobile/issues/1696
-		if ( this.props.__unstableIsSelected ) {
-			this.props.onSelectionChange( start, end );
-		}
+		this.props.onSelectionChange( start, end );
 	}
 
 	onSelectionChangeFromAztec( start, end, text, event ) {
@@ -471,8 +462,16 @@ export class RichText extends Component {
 		// Make sure there are changes made to the content before upgrading it upward
 		this.onTextUpdate( event );
 
-		this.onSelectionChange( realStart, realEnd );
-
+		// Aztec can send us selection change events after it has lost focus.
+		// For instance the autocorrect feature will complete a partially written
+		// word when resigning focus, causing a selection change event.
+		// Forwarding this selection change could cause this RichText to regain
+		// focus and start a focus loop.
+		//
+		// See https://github.com/wordpress-mobile/gutenberg-mobile/issues/1696
+		if ( this.props.__unstableIsSelected ) {
+			this.onSelectionChange( realStart, realEnd );
+		}
 		// Update lastEventCount to prevent Aztec from re-rendering the content it just sent
 		this.lastEventCount = event.nativeEvent.eventCount;
 
