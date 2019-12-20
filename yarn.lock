@@ -11268,9 +11268,9 @@ react-native-sass-transformer@^1.1.1:
     css-select "^2.0.2"
     css-tree "^1.0.0-alpha.37"
 
-"react-native-video@git+https://github.com/wordpress-mobile/react-native-video.git#3a0e2fa6fc6bf1fe1a54adb2dbf94545b28c2bc4":
-  version "4.4.1"
-  resolved "git+https://github.com/wordpress-mobile/react-native-video.git#3a0e2fa6fc6bf1fe1a54adb2dbf94545b28c2bc4"
+"react-native-video@git+https://github.com/wordpress-mobile/react-native-video.git#c85e060a45897b64284f58264d332d42a2142d9f":
+  version "5.0.1"
+  resolved "git+https://github.com/wordpress-mobile/react-native-video.git#c85e060a45897b64284f58264d332d42a2142d9f"
   dependencies:
     keymirror "^0.1.1"
     prop-types "^15.5.10"
