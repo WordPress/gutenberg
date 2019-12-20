@@ -336,9 +336,13 @@ const Popover = ( {
 		 * For these situations, we refresh the popover every 0.5s
 		 */
 		const intervalHandle = window.setInterval( refresh, 500 );
+
+		// Sometimes a click trigger a layout change that affects the popover
+		// position. This is an opportunity to immediately refresh rather than
+		// at the interval.
+		window.addEventListener( 'click', refreshOnAnimationFrame );
 		window.addEventListener( 'resize', refresh );
 		window.addEventListener( 'scroll', refresh, true );
-		window.addEventListener( 'click', refreshOnAnimationFrame );
 
 		return () => {
 			window.clearTimeout( timeoutId );
