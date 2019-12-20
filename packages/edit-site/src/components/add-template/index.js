@@ -60,22 +60,20 @@ export default function AddTemplate( {
 		! slugs.loading &&
 		isOpen && (
 			<Modal title={ __( 'Add Template' ) } onRequestClose={ onRequestClose }>
-				<div className="edit-site-add-template">
-					<TextControl
-						label={ __( 'Add Template' ) }
-						placeholder={ __( 'template-slug' ) }
-						value={ slug }
-						onChange={ setSlug }
-						help={ help }
-					/>
-					<Button
-						isPrimary
-						disabled={ ! slug || slugs[ cleanForSlug( slug ) ] }
-						onClick={ add }
-					>
-						{ __( 'Add' ) }
-					</Button>
-				</div>
+				<TextControl
+					label={ __( 'Add Template' ) }
+					placeholder={ __( 'template-slug' ) }
+					value={ slug }
+					onChange={ setSlug }
+					help={ help }
+				/>
+				<Button
+					isPrimary
+					disabled={ ! slug || slugs[ cleanForSlug( slug ) ] }
+					onClick={ add }
+				>
+					{ __( 'Add' ) }
+				</Button>
 			</Modal>
 		)
 	);
