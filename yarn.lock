@@ -2160,9 +2160,9 @@
     wcwidth "^1.0.1"
     ws "^1.1.0"
 
-"@react-native-community/slider@git+https://github.com/wordpress-mobile/react-native-slider.git#e20f268e61327321a5bbd66afc5238388d65f2a4":
+"@react-native-community/slider@git+https://github.com/wordpress-mobile/react-native-slider.git#f5d8685ffa389c78a8713162b1e2821067ad214f":
   version "2.0.7"
-  resolved "git+https://github.com/wordpress-mobile/react-native-slider.git#e20f268e61327321a5bbd66afc5238388d65f2a4"
+  resolved "git+https://github.com/wordpress-mobile/react-native-slider.git#f5d8685ffa389c78a8713162b1e2821067ad214f"
 
 "@tannin/compile@^1.0.3":
   version "1.0.3"
