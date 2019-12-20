@@ -12,6 +12,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.7.7",
+    "@babel/runtime": "^7.7.7",
     "@wordpress/babel-preset-default": "^4.0.0",
     "@wordpress/eslint-plugin": "^2.0.0",
     "@wordpress/jest-preset-default": "^4.0.0",
@@ -135,7 +136,6 @@
     "version": "yarn bundle && git add -A bundle"
   },
   "dependencies": {
-    "@babel/runtime": "^7.3.1",
     "@react-native-community/cli": "^3.0.4",
     "@react-native-community/slider": "git+https://github.com/wordpress-mobile/react-native-slider.git#e20f268e61327321a5bbd66afc5238388d65f2a4",
     "classnames": "^2.2.5",
