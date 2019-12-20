@@ -111,7 +111,6 @@ repositories {
         // If building from source, use the local sources from node_modules
         def nodeModulesPath = "${project.buildDir}/../../../node_modules/"
         maven { url "${nodeModulesPath}/react-native/android" }
-//        maven { url "${nodeModulesPath}/jsc-android/dist" }
     } else {
         // If not building from source (e.g. Jitpack), use the bintray repo so a local RN setup is not needed
         def reactNativeRepo = 'https://dl.bintray.com/wordpress-mobile/react-native-mirror/'
@@ -121,8 +120,6 @@ repositories {
 }
 
 dependencies {
-    // Make sure to put android-jsc at the the first
-//    implementation "org.webkit:android-jsc:r241213"
     implementation project(':react-native-aztec')
 
     debugImplementation files(hermesPath + "hermes-debug.aar")
