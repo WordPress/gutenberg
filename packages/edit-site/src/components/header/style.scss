@@ -27,13 +27,9 @@
 
 @include editor-left(".edit-site-header");
 
-.edit-site-header__title {
-	font-size: 16px;
-	padding: 0 20px;
-}
-
 .edit-site-header__actions {
 	align-items: center;
 	display: flex;
+	justify-content: space-between;
 	padding: 0 20px;
 }

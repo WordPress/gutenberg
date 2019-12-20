@@ -47,9 +47,6 @@ export default function Header() {
 			aria-label={ __( 'Site editor top bar.' ) }
 			tabIndex="-1"
 		>
-			<h1 className="edit-site-header__title">
-				{ __( 'Site Editor' ) } { __( '(beta)' ) }
-			</h1>
 			<div className="edit-site-header__actions">
 				<TemplateSwitcher
 					ids={ settings.templateIds }
