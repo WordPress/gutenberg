@@ -58,7 +58,6 @@ export default function TemplateSwitcher( {
 						( choice ) => choice.value === activeId
 					).label,
 				} }
-				className="edit-site-template-switcher"
 			>
 				{ ( { onClose } ) => (
 					<>
