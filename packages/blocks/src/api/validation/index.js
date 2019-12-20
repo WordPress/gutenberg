@@ -407,25 +407,31 @@ export function isEqualTagAttributePairs( actual, expected, logger = createLogge
 		return false;
 	}
 
-	// Lower case attribute name and convert tuples to object for ease of lookup
-	const [ actualAttributes, expectedAttributes ] = [ actual, expected ]
-		.map( ( attributes ) => attributes.map( ( attribute ) => {
-			attribute[ 0 ] = attribute[ 0 ].toLowerCase();
-			return attribute;
-		} ) )
-		.map( fromPairs );
+	// Convert tuples to object for ease of lookup. Using a `for` loop instead of `Array#map` since it is better
+	// optimized. Expected attributes names are normalized to lower case for ease of case-insensitive comparisons later.
+	const actualAttributes = {};
+	const expectedAttributes = {};
+	for ( let i = 0; i < actual.length; i++ ) {
+		actualAttributes[ actual[ i ][ 0 ] ] = actual[ i ][ 1 ];
+		expectedAttributes[ expected[ i ][ 0 ].toLowerCase() ] = expected[ i ][ 1 ];
+	}
 
 	for ( const name in actualAttributes ) {
 		// As noted above, if missing member in B, assume different
-		if ( ! expectedAttributes.hasOwnProperty( name ) ) {
+		if (
+			! expectedAttributes.hasOwnProperty( name ) &&
+			// Optimization: case-insensitive check deferred for the minority case that the block is invalid.
+			! expectedAttributes.hasOwnProperty( name.toLowerCase() )
+		) {
 			logger.warning( 'Encountered unexpected attribute `%s`.', name );
 			return false;
 		}
 
+		// As noted above, case-insensitive checks deferred for better optimization.
 		const actualValue = actualAttributes[ name ];
-		const expectedValue = expectedAttributes[ name ];
+		const expectedValue = expectedAttributes[ name ] || expectedAttributes[ name.toLowerCase() ];
+		const isEqualAttributes = isEqualAttributesOfName[ name ] || isEqualAttributesOfName[ name.toLowerCase() ];
 
-		const isEqualAttributes = isEqualAttributesOfName[ name ];
 		if ( isEqualAttributes ) {
 			// Defer custom attribute equality handling
 			if ( ! isEqualAttributes( actualValue, expectedValue ) ) {
@@ -449,7 +455,11 @@ export function isEqualTagAttributePairs( actual, expected, logger = createLogge
  */
 export const isEqualTokensOfType = {
 	StartTag: ( actual, expected, logger = createLogger() ) => {
-		if ( actual.tagName.toLowerCase() !== expected.tagName.toLowerCase() ) {
+		if (
+			actual.tagName !== expected.tagName &&
+			// Optimization: case-insensitive check deferred for the minority case that the block is invalid.
+			actual.tagName.toLowerCase() !== expected.tagName.toLowerCase()
+		) {
 			logger.warning( 'Expected tag name `%s`, instead saw `%s`.', expected.tagName, actual.tagName );
 			return false;
 		}
