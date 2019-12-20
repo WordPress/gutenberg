@@ -1,11 +1,15 @@
 /**
+ * External dependencies
+ */
+import { useMemoOne } from 'use-memo-one';
+
+/**
  * WordPress dependencies
  */
 import { createQueue } from '@wordpress/priority-queue';
 import {
 	useLayoutEffect,
 	useRef,
-	useMemo,
 	useCallback,
 	useEffect,
 	useReducer,
@@ -78,7 +82,10 @@ export default function useSelect( _mapSelect, deps ) {
 	const mapSelect = useCallback( _mapSelect, deps );
 	const registry = useRegistry();
 	const isAsync = useAsyncMode();
-	const queueContext = useMemo( () => ( { queue: true } ), [ registry ] );
+	// React can sometimes clear the `useMemo` cache.
+	// We use the cache-stable `useMemoOne` to avoid
+	// losing queues.
+	const queueContext = useMemoOne( () => ( { queue: true } ), [ registry ] );
 	const [ , forceRender ] = useReducer( ( s ) => s + 1, 0 );
 
 	const latestMapSelect = useRef();
@@ -96,9 +103,7 @@ export default function useSelect( _mapSelect, deps ) {
 			mapOutput = latestMapOutput.current;
 		}
 	} catch ( error ) {
-		let errorMessage = `An error occurred while running 'mapSelect': ${
-			error.message
-		}`;
+		let errorMessage = `An error occurred while running 'mapSelect': ${ error.message }`;
 
 		if ( latestMapOutputError.current ) {
 			errorMessage += `\nThe error may be correlated with this previous error:\n`;
@@ -111,13 +116,18 @@ export default function useSelect( _mapSelect, deps ) {
 
 	useIsomorphicLayoutEffect( () => {
 		latestMapSelect.current = mapSelect;
+		latestMapOutput.current = mapOutput;
+		latestMapOutputError.current = undefined;
+		isMounted.current = true;
+
+		// This has to run after the other ref updates
+		// to avoid using stale values in the flushed
+		// callbacks or potentially overwriting a
+		// changed `latestMapOutput.current`.
 		if ( latestIsAsync.current !== isAsync ) {
 			latestIsAsync.current = isAsync;
 			renderQueue.flush( queueContext );
 		}
-		latestMapOutput.current = mapOutput;
-		latestMapOutputError.current = undefined;
-		isMounted.current = true;
 	} );
 
 	useIsomorphicLayoutEffect( () => {
