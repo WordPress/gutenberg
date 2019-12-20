@@ -16,7 +16,7 @@
  * @property {string}                      category       Shortcut category.
  * @property {string}                      description    Shortcut description.
  * @property {WPShortcutKeyCombination}    keyCombination Shortcut key combination.
- * @property {[WPShortcutKeyCombination]?} aliases        Shortcut aliases.
+ * @property {WPShortcutKeyCombination[]} [aliases]        Shortcut aliases.
  */
 
 /**
