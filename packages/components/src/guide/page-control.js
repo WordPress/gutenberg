@@ -18,7 +18,10 @@ export default function PageControl( { currentPage, numberOfPages, setCurrentPag
 	return (
 		<ul className="components-guide__page-control" aria-label={ __( 'Guide controls' ) }>
 			{ times( numberOfPages, ( page ) => (
-				<li key={ page }>
+				<li
+					key={ page }
+					aria-current={ page === currentPage }
+				>
 					<IconButton
 						key={ page }
 						icon={ <PageControlIcon isSelected={ page === currentPage } /> }
