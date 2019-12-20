@@ -21,10 +21,9 @@ import {
  */
 import { useEditorContext } from '../editor';
 import Sidebar from '../sidebar';
-import AddTemplate from '../add-template';
 
 export default function BlockEditor() {
-	const { settings: _settings, setSettings } = useEditorContext();
+	const { settings: _settings } = useEditorContext();
 	const canUserCreateMedia = useSelect( ( select ) => {
 		const _canUserCreateMedia = select( 'core' ).canUser(
 			'create',
@@ -70,14 +69,6 @@ export default function BlockEditor() {
 		},
 		[ setBlocks, _setContent ]
 	);
-	const addTemplateId = useCallback(
-		( newTemplateId ) =>
-			setSettings( ( prevSettings ) => ( {
-				...prevSettings,
-				templateIds: [ ...prevSettings.templateIds, newTemplateId ],
-			} ) ),
-		[]
-	);
 	return (
 		<BlockEditorProvider
 			settings={ settings }
@@ -86,12 +77,6 @@ export default function BlockEditor() {
 			onChange={ setContent }
 		>
 			<BlockEditorKeyboardShortcuts />
-			<Sidebar.TemplatesFill>
-				<AddTemplate
-					ids={ settings.templateIds }
-					onAddTemplateId={ addTemplateId }
-				/>
-			</Sidebar.TemplatesFill>
 			<Sidebar.InspectorFill>
 				<BlockInspector />
 			</Sidebar.InspectorFill>

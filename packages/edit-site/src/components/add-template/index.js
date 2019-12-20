@@ -5,9 +5,14 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useState, useCallback } from '@wordpress/element';
 import { cleanForSlug } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
-import { TextControl, Button } from '@wordpress/components';
+import { Modal, TextControl, Button } from '@wordpress/components';
 
-export default function AddTemplate( { ids, onAddTemplateId } ) {
+export default function AddTemplate( {
+	ids,
+	onAddTemplateId,
+	onRequestClose,
+	isOpen,
+} ) {
 	const slugs = useSelect(
 		( select ) => {
 			const { getEntityRecord } = select( 'core' );
@@ -46,29 +51,32 @@ export default function AddTemplate( { ids, onAddTemplateId } ) {
 				slug: cleanSlug,
 			} );
 			onAddTemplateId( template.id );
-			setHelp( __( 'Template added.' ) );
+			onRequestClose();
 		} catch ( err ) {
 			setHelp( __( 'Error adding template.' ) );
 		}
-	}, [ slug ] );
+	}, [ slug, onRequestClose ] );
 	return (
-		! slugs.loading && (
-			<div className="edit-site-add-template">
-				<TextControl
-					label={ __( 'Add Template' ) }
-					placeholder={ __( 'template-slug' ) }
-					value={ slug }
-					onChange={ setSlug }
-					help={ help }
-				/>
-				<Button
-					isPrimary
-					disabled={ ! slug || slugs[ cleanForSlug( slug ) ] }
-					onClick={ add }
-				>
-					{ __( 'Add' ) }
-				</Button>
-			</div>
+		! slugs.loading &&
+		isOpen && (
+			<Modal title={ __( 'Add Template' ) } onRequestClose={ onRequestClose }>
+				<div className="edit-site-add-template">
+					<TextControl
+						label={ __( 'Add Template' ) }
+						placeholder={ __( 'template-slug' ) }
+						value={ slug }
+						onChange={ setSlug }
+						help={ help }
+					/>
+					<Button
+						isPrimary
+						disabled={ ! slug || slugs[ cleanForSlug( slug ) ] }
+						onClick={ add }
+					>
+						{ __( 'Add' ) }
+					</Button>
+				</div>
+			</Modal>
 		)
 	);
 }

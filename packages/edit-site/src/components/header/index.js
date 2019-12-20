@@ -31,6 +31,14 @@ export default function Header() {
 			} ) ),
 		[]
 	);
+	const addTemplateId = useCallback(
+		( newTemplateId ) =>
+			setSettings( ( prevSettings ) => ( {
+				...prevSettings,
+				templateIds: [ ...prevSettings.templateIds, newTemplateId ],
+			} ) ),
+		[]
+	);
 	return (
 		<div
 			className="edit-site-header"
@@ -49,6 +57,7 @@ export default function Header() {
 					isTemplatePart={ settings.templateType === 'wp_template_part' }
 					onActiveIdChange={ setActiveTemplateId }
 					onActiveTemplatePartIdChange={ setActiveTemplatePartId }
+					onAddTemplateId={ addTemplateId }
 				/>
 				<SaveButton />
 			</div>
