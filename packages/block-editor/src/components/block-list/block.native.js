@@ -108,7 +108,6 @@ class BlockListBlock extends Component {
 			getStylesFromColorScheme,
 			isSmallScreen,
 			isRootListInnerBlockHolder,
-			isUnregisteredBlock,
 		} = this.props;
 
 		const fullSolidBorderStyle = { // define style for full border
@@ -116,7 +115,7 @@ class BlockListBlock extends Component {
 			...getStylesFromColorScheme( styles.solidBorderColor, styles.solidBorderColorDark ),
 		};
 
-		if ( hasChildren && ! isUnregisteredBlock ) { // if block has children apply style for selected parent
+		if ( hasChildren ) { // if block has children apply style for selected parent
 			return { ...styles.selectedParent,	...fullSolidBorderStyle	};
 		}
 
