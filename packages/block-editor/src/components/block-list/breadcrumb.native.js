@@ -4,8 +4,7 @@
 import { Icon } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { getBlockType, getUnregisteredTypeHandlerName } from '@wordpress/blocks';
-import { __ } from '@wordpress/i18n';
+import { getBlockType } from '@wordpress/blocks';
 
 /**
  * External dependencies
@@ -17,9 +16,10 @@ import { View, Text, TouchableOpacity } from 'react-native';
  */
 import BlockTitle from '../block-title';
 import SubdirectorSVG from './subdirectory-icon';
+
 import styles from './breadcrumb.scss';
 
-const BlockBreadcrumb = ( { clientId, blockIcon, rootClientId, rootBlockIcon, isUnregisteredBlock } ) => {
+const BlockBreadcrumb = ( { clientId, blockIcon, rootClientId, rootBlockIcon } ) => {
 	return (
 		<View style={ styles.breadcrumbContainer }>
 			<TouchableOpacity
@@ -33,7 +33,7 @@ const BlockBreadcrumb = ( { clientId, blockIcon, rootClientId, rootBlockIcon, is
 					]
 				) }
 				<Icon size={ 24 } icon={ blockIcon.src } fill={ styles.icon.color } />
-				<Text style={ styles.breadcrumbTitle }>{ isUnregisteredBlock ? __( 'Unsupported' ) : <BlockTitle clientId={ clientId } /> }</Text>
+				<Text style={ styles.breadcrumbTitle }><BlockTitle clientId={ clientId } /></Text>
 			</TouchableOpacity>
 		</View>
 	);
@@ -52,13 +52,10 @@ export default compose( [
 
 		const rootClientId = getBlockRootClientId( clientId );
 
-		const isUnregisteredBlock = blockName === getUnregisteredTypeHandlerName();
-
 		if ( ! rootClientId ) {
 			return {
 				clientId,
 				blockIcon,
-				isUnregisteredBlock,
 			};
 		}
 		const rootBlockName = getBlockName( rootClientId );
@@ -70,7 +67,6 @@ export default compose( [
 			blockIcon,
 			rootClientId,
 			rootBlockIcon,
-			isUnregisteredBlock,
 		};
 	} ),
 ] )( BlockBreadcrumb );

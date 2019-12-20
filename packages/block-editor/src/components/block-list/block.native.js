@@ -144,12 +144,7 @@ class BlockListBlock extends Component {
 			isAncestorSelected,
 			hasParent,
 			getStylesFromColorScheme,
-			isUnregisteredBlock,
 		} = this.props;
-
-		if ( isUnregisteredBlock ) {
-			return styles.full;
-		}
 
 		// if block does not have parent apply neutral or full
 		// margins depending if block has children or not
@@ -300,7 +295,7 @@ export default compose( [
 		const commonAncestorIndex = parents.indexOf( commonAncestor ) - 1;
 		const firstToSelectId = commonAncestor ? parents[ commonAncestorIndex ] : parents[ parents.length - 1 ];
 
-		const hasChildren = !! getBlockCount( clientId );
+		const hasChildren = ! isUnregisteredBlock && !! getBlockCount( clientId );
 		const hasParent = !! parentId;
 		const isParentSelected = selectedBlockClientId && selectedBlockClientId === parentId;
 		const isAncestorSelected = selectedBlockClientId && parents.includes( selectedBlockClientId );
