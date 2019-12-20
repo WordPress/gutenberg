@@ -35,6 +35,7 @@ export default function Header() {
 		( newTemplateId ) =>
 			setSettings( ( prevSettings ) => ( {
 				...prevSettings,
+				templateId: newTemplateId,
 				templateIds: [ ...prevSettings.templateIds, newTemplateId ],
 			} ) ),
 		[]
