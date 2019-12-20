@@ -178,13 +178,17 @@ add_filter( 'post_type_labels_wp_block', 'gutenberg_override_reusable_block_post
  * it is made accessible for read and write via the REST API.
  */
 function gutenberg_register_data_persistence_user_meta() {
+	global $wpdb;
 	register_meta(
 		'user',
-		'wp_data_persistence',
+		$wpdb->prefix . 'data_persistence',
 		array(
 			'type'         => 'string',
 			'single'       => true,
-			'show_in_rest' => true,
+			'show_in_rest' => array(
+				'name' => 'data_persistence',
+				'type' => 'string',
+			),
 		)
 	);
 }
@@ -197,10 +201,10 @@ add_action( 'init', 'gutenberg_register_data_persistence_user_meta' );
  * and updated via the REST API on change.
  */
 function gutenberg_user_settings_data_persistence_inline_script() {
-	global $wp_scripts;
+	global $wp_scripts, $wpdb;
 
 	$user_id         = get_current_user_id();
-	$persisted_value = get_user_meta( $user_id, 'wp_data_persistence', true );
+	$persisted_value = get_user_meta( $user_id, $wpdb->prefix . 'data_persistence', true );
 	if ( empty( $persisted_value ) ) {
 		// If there's no explicit metadata assigned, fall back to a value which
 		// was persisted using browser storage, prior to user meta persistence.
@@ -224,7 +228,7 @@ function gutenberg_user_settings_data_persistence_inline_script() {
 					method: 'POST',
 					data: {
 						meta: {
-							wp_data_persistence: value,
+							data_persistence: value,
 						}
 					}
 				} );
