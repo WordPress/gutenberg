@@ -1,6 +1,6 @@
 {
 	"name": "core/image",
-	"category": "common",
+	"category": "text",
 	"attributes": {
 		"align": {
 			"type": "string"

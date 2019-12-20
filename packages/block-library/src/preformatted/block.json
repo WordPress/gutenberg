@@ -1,6 +1,6 @@
 {
 	"name": "core/preformatted",
-	"category": "formatting",
+	"category": "text",
 	"attributes": {
 		"content": {
 			"type": "string",

@@ -1,6 +1,6 @@
 {
 	"name": "core/video",
-	"category": "common",
+	"category": "text",
 	"attributes": {
 		"autoplay": {
 			"type": "boolean",

@@ -1,6 +1,6 @@
 {
 	"name": "core/audio",
-	"category": "common",
+	"category": "text",
 	"attributes": {
 		"src": {
 			"type": "string",

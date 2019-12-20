@@ -64,7 +64,7 @@ To register a new block type, start by creating a `block.json` file. This file:
 {
 	"name": "my-plugin/notice",
 	"title": "Notice",
-	"category": "common",
+	"category": "text",
 	"parent": [ "core/group" ],
 	"icon": "star",
 	"description": "Shows warning, error or success notices  ...",
@@ -134,7 +134,7 @@ This is the display title for your block, which can be translated with our trans
 * Property: `category`
 
 ```json
-{ "category": "common" }
+{ "category": "text" }
 ```
 
 Blocks are grouped into categories to help users browse and discover them.
@@ -149,7 +149,7 @@ The core provided categories are:
 
 Plugins and Themes can also register [custom block categories](/docs/designers-developers/developers/filters/block-filters.md#managing-block-categories).
 
-An implementation should expect and tolerate unknown categories, providing some reasonable fallback behavior (e.g. a "common" category).
+An implementation should expect and tolerate unknown categories, providing some reasonable fallback behavior (e.g. a "text" category).
 
 ### Parent
 

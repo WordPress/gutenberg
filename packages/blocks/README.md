@@ -99,7 +99,7 @@ add_action( 'enqueue_block_editor_assets', 'random_image_enqueue_block_editor_as
 
 		icon: 'format-image',
 
-		category: 'common',
+		category: 'text',
 
 		attributes: {
 			category: {

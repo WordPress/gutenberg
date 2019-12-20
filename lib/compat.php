@@ -169,6 +169,55 @@ function gutenberg_get_post_from_context() {
 }
 
 /**
+ * Filters default block categories to substitute legacy category names with new
+ * block categories.
+ *
+ * This can be removed when plugin support requires WordPress 5.4.0+.
+ *
+ * @see Trac Ticket TBD
+ *
+ * @param array[] $default_categories Array of block categories.
+ *
+ * @return array[] Filtered block categories.
+ */
+function gutenberg_replace_default_block_categories( $default_categories ) {
+	$substitution = array(
+		'common'     => array(
+			'slug'  => 'text',
+			'title' => __( 'Text', 'gutenberg' ),
+			'icon'  => null,
+		),
+		'formatting' => array(
+			'slug'  => 'media',
+			'title' => __( 'Media', 'gutenberg' ),
+			'icon'  => null,
+		),
+		'layout'     => array(
+			'slug'  => 'design',
+			'title' => __( 'Design', 'gutenberg' ),
+			'icon'  => null,
+		),
+	);
+
+	// Loop default categories to perform in-place substitution by legacy slug.
+	foreach ( $default_categories as $i => $default_category ) {
+		$slug = $default_category['slug'];
+		if ( isset( $substitution[ $slug ] ) ) {
+			$default_categories[ $i ] = $substitution[ $slug ];
+			unset( $substitution[ $slug ] );
+		}
+	}
+
+	/*
+	 * At this point, `$substitution` should contain only the categories which
+	 * could not be in-place substituted with a default category, presumably due
+	 * to earlier filtering of the default categories. These should be appended.
+	 */
+	return array_merge( $default_categories, array_values( $substitution ) );
+}
+add_filter( 'block_categories', 'gutenberg_replace_default_block_categories' );
+
+/**
  * Shim that hooks into `pre_render_block` so as to override `render_block` with
  * a function that assigns block context.
  *

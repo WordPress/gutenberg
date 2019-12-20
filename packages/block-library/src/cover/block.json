@@ -1,6 +1,6 @@
 {
 	"name": "core/cover",
-	"category": "common",
+	"category": "text",
 	"attributes": {
 		"url": {
 			"type": "string"
