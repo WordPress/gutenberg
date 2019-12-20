@@ -80,7 +80,7 @@ group='com.github.wordpress-mobile.gutenberg-mobile'
 project.ext.buildGutenbergFromSource = false
 
 def hermesOriginalPath = "../../node_modules/hermes-engine/android/";
-def hermesPath = "../../bundle/";
+def hermesPath = hermesOriginalPath;
 
 android {
     compileSdkVersion 28
@@ -122,9 +122,6 @@ repositories {
 dependencies {
     implementation project(':react-native-aztec')
 
-    debugImplementation files(hermesPath + "hermes-debug.aar")
-    releaseImplementation files(hermesPath + "hermes-release.aar")
-
     implementation "org.wordpress:utils:1.22"
 
     // For animated GIF support
@@ -138,6 +135,8 @@ dependencies {
 
         implementation 'com.facebook.react:react-native:+'
     } else {
+        hermesPath = "../../bundle/";
+
         implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-svg', readHashedVersion('../../package.json', 'react-native-svg', 'dependencies')))
         implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-video', readHashedVersion('../../package.json', 'react-native-video', 'dependencies')))
         implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-slider', readHashedVersion('../../package.json', '@react-native-community/slider', 'dependencies')))
@@ -146,6 +145,8 @@ dependencies {
         implementation "com.facebook.react:react-native:${rnVersion}"
     }
 
+    debugImplementation files(hermesPath + "hermes-debug.aar")
+    releaseImplementation files(hermesPath + "hermes-release.aar")
 }
 
 if (isJitPack) {
