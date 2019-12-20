@@ -9,7 +9,7 @@ import {
 	useContext,
 } from '@wordpress/element';
 
-const SlotFillContext = createContext();
+export const SlotFillContext = createContext();
 
 function useSlotRegistry() {
 	const [ slots, setSlots ] = useState( {} );
@@ -40,8 +40,9 @@ function useSlotRegistry() {
 			const { [ name ]: _, ...nextSlots } = prevSlots;
 			return nextSlots;
 		} );
-	} );
+	}, [] );
 
+	// Memoizing the return value so it can be directly passed to Provider value
 	const registry = useMemo(
 		() => ( {
 			slots,
@@ -81,10 +82,6 @@ export function useSlot( name ) {
 		update,
 		unregister,
 	};
-}
-
-export function useSlotFillContext() {
-	return useContext( SlotFillContext );
 }
 
 export default function SlotFillProvider( { children } ) {
