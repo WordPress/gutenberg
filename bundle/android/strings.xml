@@ -73,7 +73,7 @@
     <string name="gutenberg_native_remove_annotations" tools:ignore="UnusedResources">"Remove annotations"</string>
     <!-- translators: accessibility text. %s: current block position (number). -->
     <string name="gutenberg_native_remove_block_at_row_s" tools:ignore="UnusedResources">"Remove block at row %s"</string>
-    <string name="gutenberg_native_reset" tools:ignore="UnusedResources">"RESET"</string>
+    <string name="gutenberg_native_remove_image" tools:ignore="UnusedResources">"Remove Image"</string>
     <string name="gutenberg_native_reset_block" tools:ignore="UnusedResources">"Reset Block"</string>
     <string name="gutenberg_native_row_d" tools:ignore="UnusedResources">"Row %d."</string>
     <!-- translators: accessibility text. %s: block name. -->

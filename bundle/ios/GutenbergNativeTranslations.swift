@@ -66,7 +66,7 @@ private func dummy() {
     _ = NSLocalizedString("Problem opening the video", comment: "")
     _ = NSLocalizedString("Remove annotations", comment: "")
     _ = NSLocalizedString("Remove block at row %s", comment: "translators: accessibility text. %s: current block position (number).")
-    _ = NSLocalizedString("RESET", comment: "")
+    _ = NSLocalizedString("Remove Image", comment: "")
     _ = NSLocalizedString("Reset Block", comment: "")
     _ = NSLocalizedString("Row %d.", comment: "")
     _ = NSLocalizedString("Show section", comment: "translators: Checkbox toggle label")
