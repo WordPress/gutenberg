@@ -23,11 +23,38 @@ export const settings = getEmbedBlockSettings( {
 		from: [
 			{
 				type: 'raw',
-				isMatch: ( node ) => node.nodeName === 'P' && /^\s*(https?:\/\/\S+)\s*$/i.test( node.textContent ),
+				// Internally, a figure schema will ensure embed elements are
+				// taken out of paragraphs where appropriate.
+				schema: ( { phrasingContentSchema } ) => ( {
+					figure: {
+						require: [ 'embed' ],
+						children: {
+							embed: { attributes: [ 'src' ] },
+							figcaption: {
+								children: phrasingContentSchema,
+							},
+						},
+					},
+				} ),
+				isMatch: ( node ) => (
+					node.nodeName === 'FIGURE' &&
+					!! node.querySelector( 'embed' )
+				) || (
+					node.nodeName === 'P' &&
+					/^\s*(https?:\/\/\S+)\s*$/i.test( node.textContent )
+				),
 				transform: ( node ) => {
-					return createBlock( 'core/embed', {
-						url: node.textContent.trim(),
-					} );
+					let url;
+
+					if ( node.nodeName === 'FIGURE' ) {
+						url = node
+							.querySelector( 'embed' )
+							.getAttribute( 'src' );
+					} else {
+						url = node.textContent.trim();
+					}
+
+					return createBlock( 'core/embed', { url } );
 				},
 			},
 		],

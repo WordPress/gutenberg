@@ -363,4 +363,9 @@ describe( 'rawHandler', () => {
 		const HTML = '<p style="text-align:center">center</p>';
 		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
 	} );
+
+	it( 'should handle embed element', () => {
+		const HTML = '<embed src="http://v.wordpress.com/KllQxFVq" type="application/x-shockwave-flash" width="600" height="338"></embed>';
+		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
+	} );
 } );
