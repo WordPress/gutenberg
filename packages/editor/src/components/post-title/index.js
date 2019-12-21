@@ -169,7 +169,6 @@ const applyWithDispatch = withDispatch( ( dispatch ) => {
 	const {
 		insertDefaultBlock,
 		clearSelectedBlock,
-		setNavigationMode,
 	} = dispatch( 'core/block-editor' );
 	const {
 		editPost,
@@ -179,8 +178,6 @@ const applyWithDispatch = withDispatch( ( dispatch ) => {
 
 	return {
 		onEnterPress() {
-			// Ensure we're in edit mode when inserting paragraph to edit.
-			setNavigationMode( false );
 			insertDefaultBlock( undefined, undefined, 0 );
 		},
 		onUpdate( title ) {
