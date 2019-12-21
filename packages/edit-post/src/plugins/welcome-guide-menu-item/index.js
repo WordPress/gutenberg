@@ -6,10 +6,10 @@ import { MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 export default function WelcomeGuideMenuItem() {
-	const { enableTips } = useDispatch( 'core/nux' );
+	const { toggleFeature } = useDispatch( 'core/edit-post' );
 
 	return (
-		<MenuItem onClick={ enableTips }>
+		<MenuItem onClick={ () => toggleFeature( 'welcomeGuide' ) }>
 			{ __( 'Welcome Guide' ) }
 		</MenuItem>
 	);

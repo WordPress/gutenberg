@@ -42,7 +42,7 @@ const transforms = {
 			},
 			transform( node ) {
 				const attributes = getBlockAttributes( name, node.outerHTML );
-				const { textAlign } = node.style;
+				const { textAlign } = node.style || {};
 
 				attributes.level = getLevelFromHeadingNodeName( node.nodeName );
 

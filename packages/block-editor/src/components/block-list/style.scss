@@ -282,16 +282,6 @@
 		}
 	}
 
-	// Appender.
-	&.is-typing .block-editor-block-list__side-inserter {
-		opacity: 0;
-		animation: none;
-	}
-
-	.block-editor-block-list__side-inserter {
-		@include edit-post__fade-in-animation;
-	}
-
 	// Reusable blocks.
 	&.is-reusable.is-selected > .block-editor-block-list__block-edit::before {
 		border-left-color: transparent;
@@ -299,7 +289,7 @@
 		border-width: $border-width;
 	}
 
-	// Reusable Blocks clickthrough overlays.
+	// Reusable blocks clickthrough overlays.
 	&.is-reusable > .block-editor-block-list__block-edit .block-editor-inner-blocks.has-overlay {
 		// Remove only the top click overlay.
 		&::after {
@@ -312,6 +302,10 @@
 		}
 	}
 
+	// Select tool/navigation mode shows the default cursor until an additional click edits.
+	&.is-navigate-mode {
+		cursor: default;
+	}
 
 	// Alignments.
 	&[data-align="left"],
@@ -513,14 +507,9 @@
 		margin: 0 $block-padding;
 	}
 
-	// Hide appender shortcuts in nested blocks.
 	// This essentially duplicates the mobile styles for the appender component.
 	// It would be nice to be able to use element queries in that component instead https://github.com/tomhodgins/element-queries-spec
 	.block-editor-block-list__layout {
-		.block-editor-inserter-with-shortcuts {
-			display: none;
-		}
-
 		.block-editor-block-list__empty-block-inserter,
 		.block-editor-default-block-appender .block-editor-inserter {
 			left: auto;

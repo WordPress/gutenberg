@@ -85,19 +85,6 @@ function computeAnchorRect(
 	return withoutPadding( rect, parentNode );
 }
 
-function addBuffer( rect, verticalBuffer = 0, horizontalBuffer = 0 ) {
-	return {
-		x: rect.left - horizontalBuffer,
-		y: rect.top - verticalBuffer,
-		width: rect.width + ( 2 * horizontalBuffer ),
-		height: rect.height + ( 2 * verticalBuffer ),
-		left: rect.left - horizontalBuffer,
-		right: rect.right + horizontalBuffer,
-		top: rect.top - verticalBuffer,
-		bottom: rect.bottom + verticalBuffer,
-	};
-}
-
 function withoutPadding( rect, element ) {
 	const {
 		paddingTop,
@@ -231,8 +218,6 @@ const Popover = ( {
 	focusOnMount = 'firstElement',
 	anchorRef,
 	shouldAnchorIncludePadding,
-	anchorVerticalBuffer,
-	anchorHorizontalBuffer,
 	anchorRect,
 	getAnchorRect,
 	expandOnMobile,
@@ -268,7 +253,7 @@ const Popover = ( {
 		}
 
 		const refresh = () => {
-			let anchor = computeAnchorRect(
+			const anchor = computeAnchorRect(
 				anchorRefFallback,
 				anchorRect,
 				getAnchorRect,
@@ -279,12 +264,6 @@ const Popover = ( {
 			if ( ! anchor ) {
 				return;
 			}
-
-			anchor = addBuffer(
-				anchor,
-				anchorVerticalBuffer,
-				anchorHorizontalBuffer
-			);
 
 			if ( ! contentRect.current ) {
 				contentRect.current = contentEl.getBoundingClientRect();
@@ -324,6 +303,9 @@ const Popover = ( {
 
 		// Height may still adjust between now and the next tick.
 		const timeoutId = window.setTimeout( refresh );
+		const refreshOnAnimationFrame = () => {
+			window.requestAnimationFrame( refresh );
+		};
 
 		/*
 		 * There are sometimes we need to reposition or resize the popover that
@@ -333,6 +315,11 @@ const Popover = ( {
 		 * For these situations, we refresh the popover every 0.5s
 		 */
 		const intervalHandle = window.setInterval( refresh, 500 );
+
+		// Sometimes a click trigger a layout change that affects the popover
+		// position. This is an opportunity to immediately refresh rather than
+		// at the interval.
+		window.addEventListener( 'click', refreshOnAnimationFrame );
 		window.addEventListener( 'resize', refresh );
 		window.addEventListener( 'scroll', refresh, true );
 
@@ -341,6 +328,7 @@ const Popover = ( {
 			window.clearInterval( intervalHandle );
 			window.removeEventListener( 'resize', refresh );
 			window.removeEventListener( 'scroll', refresh, true );
+			window.addEventListener( 'click', refreshOnAnimationFrame );
 		};
 	}, [
 		isExpanded,
@@ -348,8 +336,6 @@ const Popover = ( {
 		getAnchorRect,
 		anchorRef,
 		shouldAnchorIncludePadding,
-		anchorVerticalBuffer,
-		anchorHorizontalBuffer,
 		position,
 	] );
 

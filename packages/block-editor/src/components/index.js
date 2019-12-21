@@ -24,6 +24,8 @@ export { default as ContrastChecker } from './contrast-checker';
 export { default as __experimentalGradientPicker } from './gradient-picker';
 export { default as __experimentalGradientPickerControl } from './gradient-picker/control';
 export { default as __experimentalGradientPickerPanel } from './gradient-picker/panel';
+export { default as __experimentalColorGradientControl } from './colors-gradients/control';
+export { default as __experimentalPanelColorGradientSettings } from './colors-gradients/panel-color-gradient-settings';
 export { default as InnerBlocks } from './inner-blocks';
 export { default as InspectorAdvancedControls } from './inspector-advanced-controls';
 export { default as InspectorControls } from './inspector-controls';
@@ -45,6 +47,7 @@ export { default as ToolSelector } from './tool-selector';
 export { default as URLInput } from './url-input';
 export { default as URLInputButton } from './url-input/button';
 export { default as URLPopover } from './url-popover';
+export { __experimentalImageURLInputUI } from './url-popover/image-url-input-ui';
 export { default as withColorContext } from './color-palette/with-color-context';
 
 /*

@@ -43,28 +43,26 @@ exports[`MoreMenu should match snapshot 1`] = `
           onKeyDown={[Function]}
           tooltip="More tools & options"
         >
-          <Tooltip
-            position="bottom"
-            text="More tools & options"
+          <ForwardRef(Button)
+            aria-expanded={false}
+            aria-haspopup="true"
+            className="components-dropdown-menu__toggle"
+            icon="ellipsis"
+            label="More tools & options"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            showTooltip={true}
+            tooltipPosition="bottom"
           >
-            <ForwardRef(Button)
-              aria-expanded={false}
-              aria-haspopup="true"
-              aria-label="More tools & options"
-              className="components-icon-button components-dropdown-menu__toggle"
-              onBlur={[Function]}
-              onClick={[Function]}
-              onFocus={[Function]}
-              onKeyDown={[Function]}
-              onMouseDown={[Function]}
-              onMouseEnter={[Function]}
-              onMouseLeave={[Function]}
+            <Tooltip
+              position="bottom"
+              text="More tools & options"
             >
               <button
                 aria-expanded={false}
                 aria-haspopup="true"
                 aria-label="More tools & options"
-                className="components-button components-icon-button components-dropdown-menu__toggle"
+                className="components-button components-dropdown-menu__toggle components-icon-button"
                 onBlur={[Function]}
                 onClick={[Function]}
                 onFocus={[Function]}
@@ -114,8 +112,8 @@ exports[`MoreMenu should match snapshot 1`] = `
                   </Dashicon>
                 </Icon>
               </button>
-            </ForwardRef(Button)>
-          </Tooltip>
+            </Tooltip>
+          </ForwardRef(Button)>
         </ForwardRef(IconButton)>
       </div>
     </Dropdown>

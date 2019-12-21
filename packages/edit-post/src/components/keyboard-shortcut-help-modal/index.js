@@ -89,7 +89,7 @@ export function KeyboardShortcutHelpModal( { isModalActive, toggleModal } ) {
 			{ isModalActive && (
 				<Modal
 					className="edit-post-keyboard-shortcut-help"
-					title={ __( 'Keyboard Shortcuts' ) }
+					title={ __( 'Keyboard shortcuts' ) }
 					closeLabel={ __( 'Close' ) }
 					onRequestClose={ toggleModal }
 				>
