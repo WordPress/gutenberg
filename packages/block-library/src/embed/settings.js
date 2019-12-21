@@ -15,6 +15,7 @@ import { __ } from '@wordpress/i18n';
 import { compose } from '@wordpress/compose';
 import { RichText } from '@wordpress/block-editor';
 import { withSelect, withDispatch } from '@wordpress/data';
+import { createBlock } from '@wordpress/blocks';
 
 const embedAttributes = {
 	url: {
@@ -37,7 +38,12 @@ const embedAttributes = {
 	},
 };
 
-export function getEmbedBlockSettings( { title, description, icon, category = 'embed', transforms, keywords = [], supports = {}, responsive = true } ) {
+export function getEmbedBlockSettings( {
+	name,
+	settings,
+	patterns = [],
+} ) {
+	const { title, description, icon, category = 'embed', transforms = {}, keywords = [], supports = {}, responsive = true } = settings;
 	const blockDescription = description || __( 'Add a block that displays content pulled from other sites, like Twitter, Instagram or YouTube.' );
 	const edit = getEmbedEditComponent( title, icon, responsive );
 	return {
@@ -53,7 +59,25 @@ export function getEmbedBlockSettings( { title, description, icon, category = 'e
 			...supports,
 		},
 
-		transforms,
+		transforms: {
+			...transforms,
+			from: [
+				...( transforms.from || [] ),
+				{
+					type: 'raw',
+					isMatch: ( node ) =>
+						node.nodeName === 'P' &&
+						patterns.some( ( pattern ) =>
+							pattern.test( node.textContent )
+						),
+					transform: ( node ) => {
+						return createBlock( name, {
+							url: node.textContent.trim(),
+						} );
+					},
+				},
+			],
+		},
 
 		edit: compose(
 			withSelect( ( select, ownProps ) => {
