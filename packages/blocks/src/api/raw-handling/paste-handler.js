@@ -248,7 +248,11 @@ export function pasteHandler( { HTML = '', plainText = '', mode = 'AUTO', tagNam
 	// If we're allowed to return inline content, and there is only one inlineable block,
 	// and the original plain text content does not have any line breaks, then
 	// treat it as inline paste.
-	if ( mode === 'AUTO' && blocks.length === 1 && hasBlockSupport( blocks[ 0 ].name, 'pasteTextInline', false ) ) {
+	if (
+		mode === 'AUTO' &&
+		blocks.length === 1 &&
+		hasBlockSupport( blocks[ 0 ].name, '__unstablePasteTextInline', false )
+	) {
 		const trimmedPlainText = plainText.trim();
 
 		if ( trimmedPlainText !== '' && trimmedPlainText.indexOf( '\n' ) === -1 ) {
