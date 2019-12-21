@@ -20,7 +20,8 @@ export default function PageControl( { currentPage, numberOfPages, setCurrentPag
 			{ times( numberOfPages, ( page ) => (
 				<li
 					key={ page }
-					aria-current={ page === currentPage }
+					// Set aria-current="step" on the active page, see https://www.w3.org/TR/wai-aria-1.1/#aria-current
+					aria-current={ page === currentPage ? 'step' : undefined }
 				>
 					<IconButton
 						key={ page }
