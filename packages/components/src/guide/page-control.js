@@ -20,7 +20,7 @@ export default function PageControl( { currentPage, numberOfPages, setCurrentPag
 			{ times( numberOfPages, ( page ) => (
 				<li
 					key={ page }
-					aria-current={ page === currentPage }
+					aria-current={ page === currentPage ? 'step' : undefined }
 				>
 					<IconButton
 						key={ page }
