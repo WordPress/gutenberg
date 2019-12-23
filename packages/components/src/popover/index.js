@@ -494,7 +494,7 @@ const Popover = ( {
 					content = <Fill name={ __unstableSlotName }>{ content }</Fill>;
 				}
 
-				if ( anchorRef ) {
+				if ( anchorRef || anchorRect ) {
 					return content;
 				}
 
