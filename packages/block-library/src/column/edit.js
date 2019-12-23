@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { forEach, find, difference } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -17,17 +16,6 @@ import { PanelBody, RangeControl } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
-import {
-	toWidthPrecision,
-	getTotalColumnsWidth,
-	getColumnWidths,
-	getAdjacentBlocks,
-	getRedistributedColumnWidths,
-} from '../columns/utils';
 
 function ColumnEdit( {
 	attributes,
@@ -113,44 +101,29 @@ export default compose(
 					'core/block-editor'
 				);
 
-				// Constrain or expand siblings to account for gain or loss of
-				// total columns area.
-				const columns = getBlocks( getBlockRootClientId( clientId ) );
-				const adjacentColumns = getAdjacentBlocks( columns, clientId );
+				// Update column width.
+				updateBlockAttributes( clientId, { width } );
 
-				// The occupied width is calculated as the sum of the new width
-				// and the total width of blocks _not_ in the adjacent set.
-				const occupiedWidth =
-					width +
-					getTotalColumnsWidth(
-						difference( columns, [
-							find( columns, { clientId } ),
-							...adjacentColumns,
-						] )
-					);
+				const rootClientId = getBlockRootClientId( clientId );
+				const columns = getBlocks( rootClientId );
 
-				// Compute _all_ next column widths, in case the updated column
-				// is in the middle of a set of columns which don't yet have
-				// any explicit widths assigned (include updates to those not
-				// part of the adjacent blocks).
-				const nextColumnWidths = {
-					...getColumnWidths( columns, columns.length ),
-					[ clientId ]: toWidthPrecision( width ),
-					...getRedistributedColumnWidths(
-						adjacentColumns,
-						100 - occupiedWidth,
-						columns.length
-					),
-				};
+				// Check if sum of all column widths exceeds 100.
+				const totalAdjacentWidths = columns.filter( ( column ) => column.attributes.width && column.clientId !== clientId ).reduce( ( total, column ) => total += column.attributes.width, 0 );
+				const resetAdjacentColumns = totalAdjacentWidths + width > 100;
 
-				forEach(
-					nextColumnWidths,
-					( nextColumnWidth, columnClientId ) => {
-						updateBlockAttributes( columnClientId, {
-							width: nextColumnWidth,
-						} );
+				// Create the updated template string. If needed, reset adjacent column widths.
+				let columnsTemplate = ``;
+				columns.forEach( ( column ) => {
+					if ( ( resetAdjacentColumns || ! column.attributes.width ) && column.clientId !== clientId ) {
+						columnsTemplate += `1fr `;
+						updateBlockAttributes( column.clientId, { width: '' } );
+					} else if ( ! column.attributes.width ) {
+						columnsTemplate += `1fr `;
+					} else {
+						columnsTemplate += `${ column.attributes.width }% `;
 					}
-				);
+				} );
+				updateBlockAttributes( rootClientId, { columnsTemplate } );
 			},
 		};
 	} )

@@ -20,14 +20,13 @@
 	display: block;
 
 	> .block-editor-inner-blocks > .block-editor-block-list__layout {
-		display: flex;
-
-		// Responsiveness: Allow wrapping on mobile.
-		flex-wrap: wrap;
-
+		--columns-template: 1fr;
+		display: grid;
+		grid-gap: $grid-size-large * 2;
 		@include break-medium() {
-			flex-wrap: nowrap;
+			grid-template-columns: var(--columns-template);
 		}
+
 		// Set full heights on Columns to enable vertical alignment preview
 		> [data-type="core/column"],
 		> [data-type="core/column"] .block-core-columns {
@@ -45,64 +44,9 @@
 
 		// Adjust the individual column block.
 		> [data-type="core/column"] {
-
-			// On mobile, only a single column is shown, so match adjacent block paddings.
-			padding-left: 0;
-			padding-right: 0;
-			margin-left: -$block-padding;
-			margin-right: -$block-padding;
-
-			// Zero out margins.
-			margin-top: 0;
-			margin-bottom: 0;
-
-			// Prevent the columns from growing wider than their distributed sizes.
-			min-width: 0;
-
 			// Prevent long unbroken words from overflowing.
 			word-break: break-word; // For back-compat.
 			overflow-wrap: break-word; // New standard.
-
-			// Responsiveness: Show at most one columns on mobile.
-			flex-basis: 100%;
-
-			// Beyond mobile, allow 2 columns.
-			@include break-small() {
-				flex-basis: calc(50% - (#{$grid-size-large}));
-				flex-grow: 0;
-				margin-left: 0;
-				margin-right: 0;
-			}
-
-			// Add space between columns. Themes can customize this if they wish to work differently.
-			// This has to match the same padding applied in style.scss.
-			// Only apply this beyond the mobile breakpoint, as there's only a single column on mobile.
-			@include break-small() {
-				&:nth-child(even) {
-					margin-left: calc(#{$grid-size-large * 2});
-				}
-			}
-
-			// When columns are in a single row, add space before all except the first.
-			@include break-medium() {
-				&:not(:first-child) {
-					margin-left: calc(#{$grid-size-large * 2});
-				}
-			}
-
-			// Remove Block "padding" so individual Column is flush with parent Columns
-			&::before {
-				left: 0;
-				right: 0;
-			}
-
-			// The Columns block is a flex-container, therefore it nullifies margin collapsing.
-			// Therefore, blocks inside this will appear to create a double margin.
-			// We compensate for this using negative margins.
-			> .block-core-columns > .block-editor-inner-blocks {
-				margin-top: -$default-block-margin;
-				margin-bottom: -$default-block-margin;
-			}
 		}
 	}
 }

@@ -2,6 +2,9 @@
 	"name": "core/columns",
 	"category": "layout",
 	"attributes": {
+		"columnsTemplate": {
+			"type": "string"
+		},
 		"verticalAlignment": {
 			"type": "string"
 		},

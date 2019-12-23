@@ -12,6 +12,7 @@ export default function save( { attributes } ) {
 	const {
 		verticalAlignment,
 		backgroundColor,
+		columnsTemplate,
 		customBackgroundColor,
 	} = attributes;
 
@@ -28,6 +29,7 @@ export default function save( { attributes } ) {
 
 	const style = {
 		backgroundColor: backgroundClass ? undefined : customBackgroundColor,
+		'--columns-template': columnsTemplate,
 	};
 
 	return (
