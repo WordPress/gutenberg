@@ -6,7 +6,7 @@ import { overEvery, find, findLast, reverse, first, last } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, createRef } from '@wordpress/element';
+import { Component, createRef, forwardRef } from '@wordpress/element';
 import {
 	computeCaretRect,
 	focus,
@@ -77,13 +77,23 @@ export function isNavigationCandidate( element, keyCode, hasModifier ) {
  * Renders focus capturing areas to redirect focus to the selected block if not
  * in Navigation mode.
  */
-function FocusCapture( { selectedClientId, isReverse, containerRef } ) {
+const FocusCapture = forwardRef( ( {
+	selectedClientId,
+	isReverse,
+	containerRef,
+	noCapture,
+}, ref ) => {
 	const isNavigationMode = useSelect( ( select ) =>
 		select( 'core/block-editor' ).isNavigationMode()
 	);
 	const { setNavigationMode } = useDispatch( 'core/block-editor' );
 
 	function onFocus() {
+		if ( noCapture.current ) {
+			delete noCapture.current;
+			return;
+		}
+
 		if ( ! selectedClientId ) {
 			setNavigationMode( true );
 
@@ -112,6 +122,7 @@ function FocusCapture( { selectedClientId, isReverse, containerRef } ) {
 
 	return (
 		<div
+			ref={ ref }
 			tabIndex={ ! isNavigationMode ? '0' : undefined }
 			onFocus={ onFocus }
 			// Needs to be positioned within the viewport, so focus to this
@@ -119,7 +130,7 @@ function FocusCapture( { selectedClientId, isReverse, containerRef } ) {
 			style={ { position: 'fixed' } }
 		/>
 	);
-}
+} );
 
 class WritingFlow extends Component {
 	constructor() {
@@ -139,6 +150,9 @@ class WritingFlow extends Component {
 		this.verticalRect = null;
 
 		this.container = createRef();
+		this.focusCaptureBeforeRef = createRef();
+		this.focusCaptureAfterRef = createRef();
+		this.noCapture = {};
 	}
 
 	onMouseDown() {
@@ -335,20 +349,16 @@ class WritingFlow extends Component {
 
 			if ( isShift ) {
 				if ( target === wrapper ) {
-					const focusableParent = this.container.current.closest( '[tabindex]' );
-					const beforeEditorElement = focus.tabbable.findPrevious( focusableParent );
-					beforeEditorElement.focus();
-					event.preventDefault();
+					this.noCapture.current = true;
+					this.focusCaptureBeforeRef.current.focus();
 					return;
 				}
 			} else {
 				const tabbables = focus.tabbable.find( wrapper );
 
 				if ( target === last( tabbables ) ) {
-					const focusableParent = this.container.current.closest( '[tabindex]' );
-					const afterEditorElement = focus.tabbable.findNext( focusableParent );
-					afterEditorElement.focus();
-					event.preventDefault();
+					this.noCapture.current = true;
+					this.focusCaptureAfterRef.current.focus();
 					return;
 				}
 			}
@@ -472,8 +482,10 @@ class WritingFlow extends Component {
 		return (
 			<div className="block-editor-writing-flow">
 				<FocusCapture
+					ref={ this.focusCaptureBeforeRef }
 					selectedClientId={ selectedClientId }
 					containerRef={ this.container }
+					noCapture={ this.noCapture }
 				/>
 				<div
 					ref={ this.container }
@@ -483,8 +495,10 @@ class WritingFlow extends Component {
 					{ children }
 				</div>
 				<FocusCapture
+					ref={ this.focusCaptureAfterRef }
 					selectedClientId={ selectedClientId }
 					containerRef={ this.container }
+					noCapture={ this.noCapture }
 					isReverse
 				/>
 				<div
