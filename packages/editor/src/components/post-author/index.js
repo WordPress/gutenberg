@@ -130,7 +130,7 @@ export class PostAuthor extends Component {
 
 	/**
 	 * Set the current author based on the selection. Handles strings passed from the HTML
-	 * select element or strings passed from the autcomplete component.
+	 * select element or strings passed from the auto-complete component.
 	 *
 	 * @param {number|string} selection The author id or name that was selected.
 	 */
@@ -196,12 +196,10 @@ export class PostAuthor extends Component {
 					}
 					tStatusNoResults={ () => __( 'No search results' ) }
 					// translators: 1: the index of thre selected result. 2: The total number of results.
-					tStatusSelectedOption={ ( selectedOption, length ) => sprintf( __( '%1$s (1 of %2$s) is selected' ), selectedOption, length ) }
+					tStatusSelectedOption={ ( selectedOption, length, index ) => sprintf( __( '%1$s (%2$s of %3$s) is selected' ), selectedOption, index + 1, length ) }
 					tStatusResults={ ( length, contentSelectedOption ) => {
-						return (
-							_n( '%d result is available.', '%d results are available.', length ) +
-							' ' + contentSelectedOption
-						);
+						const resultString = _n( '%d result is available.', '%d results are available.', length ) + ' ' + contentSelectedOption;
+						return sprintf( resultString, length );
 					} }
 					cssNamespace="components-post-author__autocomplete"
 
