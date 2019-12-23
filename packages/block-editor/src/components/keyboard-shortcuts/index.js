@@ -56,8 +56,9 @@ function KeyboardShortcuts() {
 		insertBeforeBlock( first( clientIds ) );
 	}, [ clientIds, insertBeforeBlock ] ), { bindGlobal: true } );
 
-	useShortcut( 'core/block-editor/delete-multi-selection', useCallback( () => {
+	useShortcut( 'core/block-editor/delete-multi-selection', useCallback( ( event ) => {
 		if ( clientIds.length > 0 ) {
+			event.preventDefault();
 			removeBlocks( clientIds );
 		}
 	}, [ clientIds, removeBlocks ] ) );
@@ -67,8 +68,9 @@ function KeyboardShortcuts() {
 		multiSelect( first( rootBlocksClientIds ), last( rootBlocksClientIds ) );
 	}, [ rootBlocksClientIds, multiSelect ] ) );
 
-	useShortcut( 'core/block-editor/unselect', useCallback( () => {
+	useShortcut( 'core/block-editor/unselect', useCallback( ( event ) => {
 		if ( clientIds.length > 1 ) {
+			event.preventDefault();
 			clearSelectedBlock();
 			window.getSelection().removeAllRanges();
 		}
