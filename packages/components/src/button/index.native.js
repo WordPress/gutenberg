@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { StyleSheet, TouchableOpacity, Text, View, Platform } from 'react-native';
+import { isArray } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -84,7 +85,6 @@ export function Button( props ) {
 		label,
 		shortcut,
 		tooltipPosition,
-		...additionalProps
 	} = props;
 
 	const isDisabled = ariaDisabled || disabled;
@@ -126,8 +126,8 @@ export function Button( props ) {
 		)
 	);
 
-	const newIcon = cloneElement( (icon && <Icon icon={ icon } size={ iconSize } /> ), 
-		{ colorScheme: props.preferredColorScheme, isPressed } )
+	const newIcon = cloneElement( ( icon && <Icon icon={ icon } size={ iconSize } /> ),
+		{ colorScheme: props.preferredColorScheme, isPressed } );
 
 	const element = (
 		<TouchableOpacity
