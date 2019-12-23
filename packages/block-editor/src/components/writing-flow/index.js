@@ -139,13 +139,6 @@ class WritingFlow extends Component {
 		this.verticalRect = null;
 
 		this.container = createRef();
-
-		/**
-		 * Reference of the writing flow appender element.
-		 * The reference is used to focus the first tabbable element after the block list
-		 * once we hit `tab` on the last block in navigation mode.
-		 */
-		this.appender = createRef();
 	}
 
 	onMouseDown() {
@@ -495,7 +488,6 @@ class WritingFlow extends Component {
 					isReverse
 				/>
 				<div
-					ref={ this.appender }
 					aria-hidden
 					tabIndex={ -1 }
 					onClick={ this.focusLastTextField }
