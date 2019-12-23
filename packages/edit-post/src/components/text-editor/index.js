@@ -6,7 +6,7 @@ import {
 	PostTitle,
 	TextEditorGlobalKeyboardShortcuts,
 } from '@wordpress/editor';
-import { IconButton } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { displayShortcut } from '@wordpress/keycodes';
@@ -18,13 +18,13 @@ function TextEditor( { onExit, isRichEditingEnabled } ) {
 			{ isRichEditingEnabled && (
 				<div className="edit-post-text-editor__toolbar">
 					<h2>{ __( 'Editing Code' ) }</h2>
-					<IconButton
+					<Button
 						onClick={ onExit }
 						icon="no-alt"
 						shortcut={ displayShortcut.secondary( 'm' ) }
 					>
 						{ __( 'Exit Code Editor' ) }
-					</IconButton>
+					</Button>
 					<TextEditorGlobalKeyboardShortcuts />
 				</div>
 			)	}

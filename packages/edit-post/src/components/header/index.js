@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { IconButton } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import {
 	PostPreviewButton,
 	PostSavedState,
@@ -56,7 +56,7 @@ function Header( {
 					forceIsDirty={ hasActiveMetaboxes }
 					forceIsSaving={ isSaving }
 				/>
-				<IconButton
+				<Button
 					icon="admin-generic"
 					label={ __( 'Settings' ) }
 					onClick={ toggleGeneralSidebar }
