@@ -27,7 +27,7 @@
 	"files": [
 		"scripts",
 		"index.js",
-		"jest-preset.json"
+		"jest-preset.js"
 	],
 	"main": "index.js",
 	"dependencies": {
