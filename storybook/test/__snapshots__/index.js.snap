@@ -15,7 +15,7 @@ exports[`Storyshots Components|Animate Appear Bottom Left 1`] = `
   </div>
   <button
     aria-label="Dismiss this notice"
-    className="components-button components-notice__dismiss components-icon-button"
+    className="components-button components-notice__dismiss has-icon"
     onClick={[Function]}
     type="button"
   >
@@ -52,7 +52,7 @@ exports[`Storyshots Components|Animate Appear Bottom Right 1`] = `
   </div>
   <button
     aria-label="Dismiss this notice"
-    className="components-button components-notice__dismiss components-icon-button"
+    className="components-button components-notice__dismiss has-icon"
     onClick={[Function]}
     type="button"
   >
@@ -89,7 +89,7 @@ exports[`Storyshots Components|Animate Appear Top Left 1`] = `
   </div>
   <button
     aria-label="Dismiss this notice"
-    className="components-button components-notice__dismiss components-icon-button"
+    className="components-button components-notice__dismiss has-icon"
     onClick={[Function]}
     type="button"
   >
@@ -126,7 +126,7 @@ exports[`Storyshots Components|Animate Appear Top Right 1`] = `
   </div>
   <button
     aria-label="Dismiss this notice"
-    className="components-button components-notice__dismiss components-icon-button"
+    className="components-button components-notice__dismiss has-icon"
     onClick={[Function]}
     type="button"
   >
@@ -161,7 +161,7 @@ exports[`Storyshots Components|Animate Default 1`] = `
   </div>
   <button
     aria-label="Dismiss this notice"
-    className="components-button components-notice__dismiss components-icon-button"
+    className="components-button components-notice__dismiss has-icon"
     onClick={[Function]}
     type="button"
   >
@@ -196,7 +196,7 @@ exports[`Storyshots Components|Animate Loading 1`] = `
   </div>
   <button
     aria-label="Dismiss this notice"
-    className="components-button components-notice__dismiss components-icon-button"
+    className="components-button components-notice__dismiss has-icon"
     onClick={[Function]}
     type="button"
   >
@@ -231,7 +231,7 @@ exports[`Storyshots Components|Animate Slide In 1`] = `
   </div>
   <button
     aria-label="Dismiss this notice"
-    className="components-button components-notice__dismiss components-icon-button"
+    className="components-button components-notice__dismiss has-icon"
     onClick={[Function]}
     type="button"
   >
@@ -318,7 +318,7 @@ exports[`Storyshots Components|Button Buttons 1`] = `
       Tertiary Button
     </button>
     <button
-      className="components-button is-small components-icon-button"
+      className="components-button is-small has-icon"
       type="button"
     >
       <svg
@@ -337,7 +337,7 @@ exports[`Storyshots Components|Button Buttons 1`] = `
       </svg>
     </button>
     <button
-      className="components-button is-primary is-small components-icon-button"
+      className="components-button is-primary is-small has-icon"
       type="button"
     >
       <svg
@@ -356,7 +356,7 @@ exports[`Storyshots Components|Button Buttons 1`] = `
       </svg>
     </button>
     <button
-      className="components-button is-secondary is-small components-icon-button"
+      className="components-button is-secondary is-small has-icon"
       type="button"
     >
       <svg
@@ -375,7 +375,7 @@ exports[`Storyshots Components|Button Buttons 1`] = `
       </svg>
     </button>
     <button
-      className="components-button is-small is-tertiary components-icon-button"
+      className="components-button is-small is-tertiary has-icon"
       type="button"
     >
       <svg
@@ -394,7 +394,7 @@ exports[`Storyshots Components|Button Buttons 1`] = `
       </svg>
     </button>
     <button
-      className="components-button is-primary is-small has-text components-icon-button"
+      className="components-button is-primary is-small has-text has-icon"
       type="button"
     >
       <svg
@@ -445,7 +445,7 @@ exports[`Storyshots Components|Button Buttons 1`] = `
       Tertiary Button
     </button>
     <button
-      className="components-button components-icon-button"
+      className="components-button has-icon"
       type="button"
     >
       <svg
@@ -464,7 +464,7 @@ exports[`Storyshots Components|Button Buttons 1`] = `
       </svg>
     </button>
     <button
-      className="components-button is-primary components-icon-button"
+      className="components-button is-primary has-icon"
       type="button"
     >
       <svg
@@ -483,7 +483,7 @@ exports[`Storyshots Components|Button Buttons 1`] = `
       </svg>
     </button>
     <button
-      className="components-button is-secondary components-icon-button"
+      className="components-button is-secondary has-icon"
       type="button"
     >
       <svg
@@ -502,7 +502,7 @@ exports[`Storyshots Components|Button Buttons 1`] = `
       </svg>
     </button>
     <button
-      className="components-button is-tertiary components-icon-button"
+      className="components-button is-tertiary has-icon"
       type="button"
     >
       <svg
@@ -521,7 +521,7 @@ exports[`Storyshots Components|Button Buttons 1`] = `
       </svg>
     </button>
     <button
-      className="components-button is-primary has-text components-icon-button"
+      className="components-button is-primary has-text has-icon"
       type="button"
     >
       <svg
@@ -1423,7 +1423,7 @@ exports[`Storyshots Components|ColorPicker Alpha Enabled 1`] = `
       >
         <button
           aria-label="Change color format"
-          className="components-button components-icon-button"
+          className="components-button has-icon"
           onBlur={[Function]}
           onClick={[Function]}
           onFocus={[Function]}
@@ -1598,7 +1598,7 @@ exports[`Storyshots Components|ColorPicker Default 1`] = `
       >
         <button
           aria-label="Change color format"
-          className="components-button components-icon-button"
+          className="components-button has-icon"
           onBlur={[Function]}
           onClick={[Function]}
           onFocus={[Function]}
@@ -1707,7 +1707,7 @@ Array [
         aria-expanded={false}
         aria-haspopup="true"
         aria-label="Select a direction"
-        className="components-button components-dropdown-menu__toggle components-icon-button"
+        className="components-button components-dropdown-menu__toggle has-icon"
         onBlur={[Function]}
         onClick={[Function]}
         onFocus={[Function]}
@@ -1744,7 +1744,7 @@ Array [
       <button
         aria-expanded={false}
         aria-label="Select a direction"
-        className="components-button components-icon-button"
+        className="components-button has-icon"
         onBlur={[Function]}
         onClick={[Function]}
         onFocus={[Function]}
@@ -2583,7 +2583,7 @@ exports[`Storyshots Components|Icon With An SVG 1`] = `
 exports[`Storyshots Components|IconButton Default 1`] = `
 <button
   aria-label="More"
-  className="components-button components-icon-button"
+  className="components-button has-icon"
   onBlur={[Function]}
   onClick={[Function]}
   onFocus={[Function]}
@@ -2619,7 +2619,7 @@ exports[`Storyshots Components|IconButton Grouped 1`] = `
 >
   <button
     aria-label="Bold"
-    className="components-button components-icon-button"
+    className="components-button has-icon"
     onBlur={[Function]}
     onClick={[Function]}
     onFocus={[Function]}
@@ -2645,7 +2645,7 @@ exports[`Storyshots Components|IconButton Grouped 1`] = `
   </button>
   <button
     aria-label="Italic"
-    className="components-button components-icon-button"
+    className="components-button has-icon"
     onBlur={[Function]}
     onClick={[Function]}
     onFocus={[Function]}
@@ -2671,7 +2671,7 @@ exports[`Storyshots Components|IconButton Grouped 1`] = `
   </button>
   <button
     aria-label="Underline"
-    className="components-button components-icon-button"
+    className="components-button has-icon"
     onBlur={[Function]}
     onClick={[Function]}
     onFocus={[Function]}
@@ -3691,7 +3691,7 @@ exports[`Storyshots Components|Toolbar Default 1`] = `
     <div>
       <button
         aria-label="Paragraph"
-        className="components-button components-toolbar__control components-icon-button"
+        className="components-button components-toolbar__control has-icon"
         id="options-toolbar-1"
         onBlur={[Function]}
         onClick={[Function]}
@@ -3727,7 +3727,7 @@ exports[`Storyshots Components|Toolbar Default 1`] = `
       aria-expanded={false}
       aria-haspopup="true"
       aria-label="Change text alignment"
-      className="components-button components-dropdown-menu__toggle has-text components-icon-button"
+      className="components-button components-dropdown-menu__toggle has-text has-icon"
       id="options-toolbar-2"
       onBlur={[Function]}
       onClick={[Function]}
@@ -3764,7 +3764,7 @@ exports[`Storyshots Components|Toolbar Default 1`] = `
     <div>
       <button
         aria-label="Bold"
-        className="components-button components-toolbar__control components-icon-button"
+        className="components-button components-toolbar__control has-icon"
         id="options-toolbar-3"
         onBlur={[Function]}
         onClick={[Function]}
@@ -3795,7 +3795,7 @@ exports[`Storyshots Components|Toolbar Default 1`] = `
     <div>
       <button
         aria-label="Italic"
-        className="components-button components-toolbar__control components-icon-button"
+        className="components-button components-toolbar__control has-icon"
         id="options-toolbar-4"
         onBlur={[Function]}
         onClick={[Function]}
@@ -3826,7 +3826,7 @@ exports[`Storyshots Components|Toolbar Default 1`] = `
     <div>
       <button
         aria-label="Link"
-        className="components-button components-toolbar__control components-icon-button"
+        className="components-button components-toolbar__control has-icon"
         id="options-toolbar-5"
         onBlur={[Function]}
         onClick={[Function]}
@@ -3886,7 +3886,7 @@ exports[`Storyshots Components|Toolbar Default 1`] = `
       aria-expanded={false}
       aria-haspopup="true"
       aria-label="Change text alignment"
-      className="components-button components-dropdown-menu__toggle components-icon-button"
+      className="components-button components-dropdown-menu__toggle has-icon"
       id="options-toolbar-7"
       onBlur={[Function]}
       onClick={[Function]}
@@ -3928,7 +3928,7 @@ exports[`Storyshots Components|Toolbar Without Group 1`] = `
   <div>
     <button
       aria-label="Bold"
-      className="components-button components-toolbar__control components-icon-button"
+      className="components-button components-toolbar__control has-icon"
       id="options-toolbar-without-group-1"
       onBlur={[Function]}
       onClick={[Function]}
@@ -3959,7 +3959,7 @@ exports[`Storyshots Components|Toolbar Without Group 1`] = `
   <div>
     <button
       aria-label="Italic"
-      className="components-button components-toolbar__control components-icon-button"
+      className="components-button components-toolbar__control has-icon"
       id="options-toolbar-without-group-2"
       onBlur={[Function]}
       onClick={[Function]}
@@ -3990,7 +3990,7 @@ exports[`Storyshots Components|Toolbar Without Group 1`] = `
   <div>
     <button
       aria-label="Link"
-      className="components-button components-toolbar__control components-icon-button"
+      className="components-button components-toolbar__control has-icon"
       id="options-toolbar-without-group-3"
       onBlur={[Function]}
       onClick={[Function]}
@@ -4029,7 +4029,7 @@ exports[`Storyshots Components|ToolbarGroup Default 1`] = `
     <button
       aria-label="Bold"
       aria-pressed={true}
-      className="components-button components-toolbar__control is-pressed components-icon-button"
+      className="components-button components-toolbar__control is-pressed has-icon"
       onBlur={[Function]}
       onClick={[Function]}
       onFocus={[Function]}
@@ -4057,7 +4057,7 @@ exports[`Storyshots Components|ToolbarGroup Default 1`] = `
   <div>
     <button
       aria-label="Italic"
-      className="components-button components-toolbar__control components-icon-button"
+      className="components-button components-toolbar__control has-icon"
       onBlur={[Function]}
       onClick={[Function]}
       onFocus={[Function]}
@@ -4085,7 +4085,7 @@ exports[`Storyshots Components|ToolbarGroup Default 1`] = `
   <div>
     <button
       aria-label="Link"
-      className="components-button components-toolbar__control components-icon-button"
+      className="components-button components-toolbar__control has-icon"
       onBlur={[Function]}
       onClick={[Function]}
       onFocus={[Function]}
@@ -4123,7 +4123,7 @@ exports[`Storyshots Components|ToolbarGroup With Controls Prop 1`] = `
     <button
       aria-label="Bold"
       aria-pressed={true}
-      className="components-button components-toolbar__control is-pressed components-icon-button"
+      className="components-button components-toolbar__control is-pressed has-icon"
       onBlur={[Function]}
       onClick={[Function]}
       onFocus={[Function]}
@@ -4153,7 +4153,7 @@ exports[`Storyshots Components|ToolbarGroup With Controls Prop 1`] = `
   >
     <button
       aria-label="Italic"
-      className="components-button components-toolbar__control components-icon-button"
+      className="components-button components-toolbar__control has-icon"
       onBlur={[Function]}
       onClick={[Function]}
       onFocus={[Function]}
@@ -4183,7 +4183,7 @@ exports[`Storyshots Components|ToolbarGroup With Controls Prop 1`] = `
   >
     <button
       aria-label="Link"
-      className="components-button components-toolbar__control components-icon-button"
+      className="components-button components-toolbar__control has-icon"
       onBlur={[Function]}
       onClick={[Function]}
       onFocus={[Function]}

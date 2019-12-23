@@ -42,7 +42,7 @@
 .block-editor-block-pattern-picker__pattern {
 	width: 100%;
 
-	&.components-icon-button {
+	&.components-button.has-icon {
 		// Override default styles inherited from <IconButton /> to center
 		// icon horizontally.
 		justify-content: center;

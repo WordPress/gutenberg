@@ -59,14 +59,14 @@
 	top: 0;
 
 	// Change the size of the buttons to match that of the default paragraph height.
-	.components-icon-button {
+	.components-button.has-icon {
 		width: $block-side-ui-width;
 		height: $block-side-ui-width;
 		margin-right: 12px;
 		padding: 0;
 	}
 
-	.components-icon-button svg {
+	.components-button svg {
 		display: block;
 		margin: auto;
 	}

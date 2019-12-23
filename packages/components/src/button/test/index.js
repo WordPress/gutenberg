@@ -77,7 +77,7 @@ describe( 'Button', () => {
 
 		it( 'should render an icon button', () => {
 			const iconButton = shallow( <Button icon="plus" /> );
-			expect( iconButton.hasClass( 'components-icon-button' ) ).toBe( true );
+			expect( iconButton.hasClass( 'has-icon' ) ).toBe( true );
 			expect( iconButton.prop( 'aria-label' ) ).toBeUndefined();
 		} );
 
