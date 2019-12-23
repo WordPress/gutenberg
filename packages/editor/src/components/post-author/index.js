@@ -48,30 +48,7 @@ export class PostAuthor extends Component {
 	}
 
 	componentDidMount() {
-		const { postAuthorId, authors } = this.props;
-
-		// Load the initial post author.
-		const postAuthor = this.getInitialPostAuthor();
-		if ( postAuthor ) {
-			this.setState( {
-				postAuthor,
-				currentSelection: this.authorUniqueName( postAuthor ),
-			} );
-		}
-
-		const authorInAuthors = authors.find( ( singleAuthor ) => {
-			return singleAuthor.id === postAuthorId;
-		} );
-
-		// Set or fetch the current author.
-		if ( authorInAuthors ) {
-			this.setState( {
-				postAuthor: authorInAuthors,
-				currentSelection: this.authorUniqueName( authorInAuthors ),
-			} );
-		} else {
-			this.getCurrentAuthor( postAuthorId );
-		}
+		const { authors } = this.props;
 
 		// Store a set of authors for display as initial results when using an autocomplete.
 		this.setState( { initialAuthors: authors.slice( 0, 9 ) } );
@@ -142,6 +119,7 @@ export class PostAuthor extends Component {
 		if ( ! authorId ) {
 			return;
 		}
+		// Note: This route is cached at load time.
 		apiFetch( { path: `/wp/v2/users/${ encodeURIComponent( authorId ) }` } ).then( ( results ) => {
 			this.setState( {
 				postAuthor: results,
@@ -162,7 +140,7 @@ export class PostAuthor extends Component {
 		}
 		const { onUpdateAuthor } = this.props;
 		if ( typeof selection === 'string' ) {
-			// Author name from the autocompleter.
+			// Author name from the auto-completer.
 			const author = this.authors.find( ( singleAuthor ) => {
 				return this.authorUniqueName( singleAuthor ) === selection;
 			} );
@@ -177,8 +155,7 @@ export class PostAuthor extends Component {
 	}
 
 	render() {
-		const { postAuthor } = this.state;
-		const { postAuthorId, instanceId, authors } = this.props;
+		const { postAuthorId, instanceId, authors, postAuthor } = this.props;
 		const selectId = `post-author-selector-${ instanceId }`;
 		let selector;
 		if ( ! postAuthor ) {
@@ -246,6 +223,7 @@ export default compose( [
 		return {
 			postAuthorId: select( 'core/editor' ).getEditedPostAttribute( 'author' ),
 			authors: select( 'core' ).getAuthors(),
+			postAuthor: select( 'core' ).getPostAuthor( select( 'core/editor' ).getEditedPostAttribute( 'author' ) ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => ( {

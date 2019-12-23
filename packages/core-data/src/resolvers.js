@@ -33,6 +33,16 @@ export function* getAuthors() {
 }
 
 /**
+ * Requests a post author by ID from the REST API.
+ *
+ * @param {string} id Author id.
+ */
+export function* getPostAuthor( id ) {
+	const postAuthor = yield apiFetch( { path: `/wp/v2/users/${ id }` } );
+	yield receiveUserQuery( 'postAuthor', postAuthor );
+}
+
+/**
  * Requests the current user from the REST API.
  */
 export function* getCurrentUser() {

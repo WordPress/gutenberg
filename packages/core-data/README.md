@@ -445,6 +445,18 @@ _Returns_
 
 -   `?Object`: The entity record's save error.
 
+<a name="getPostAuthor" href="#getPostAuthor">#</a> **getPostAuthor**
+
+Returns post author.
+
+_Parameters_
+
+-   _state_ `Object`: Data state.
+
+_Returns_
+
+-   `Array`: Authors list.
+
 <a name="getRawEntityRecord" href="#getRawEntityRecord">#</a> **getRawEntityRecord**
 
 Returns the entity's record object by key,
