@@ -56,6 +56,9 @@ function useShortcut( name, callback, {
 
 		shortcutKeys.forEach( ( shortcut ) => {
 			const keys = shortcut.split( '+' );
+			// Determines whether a key is a modifier by the length of the string.
+			// E.g. if I add a pass a shortcut Shift+Cmd+M, it'll determine that
+			// the modifiers are Shift and Cmd because they're not a single character.
 			const modifiers = new Set( keys.filter( ( value ) => value.length > 1 ) );
 			const hasAlt = modifiers.has( 'alt' );
 			const hasShift = modifiers.has( 'shift' );
