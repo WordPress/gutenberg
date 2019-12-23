@@ -7,7 +7,6 @@ import { getScrollContainer } from '@wordpress/dom';
  * Module constants
  */
 const HEIGHT_OFFSET = 10; // used by the arrow and a bit of empty space
-const isRTL = () => document.documentElement.dir === 'rtl';
 
 /**
  * Utility used to compute the popover position over the xAxis
@@ -25,11 +24,19 @@ const isRTL = () => document.documentElement.dir === 'rtl';
  */
 export function computePopoverXAxisPosition( anchorRect, contentSize, xAxis, corner, sticky, chosenYAxis ) {
 	const { width } = contentSize;
+	const isRTL = document.documentElement.dir === 'rtl';
+
 	// Correct xAxis for RTL support
-	if ( xAxis === 'left' && isRTL() ) {
+	if ( xAxis === 'left' && isRTL ) {
 		xAxis = 'right';
-	} else if ( xAxis === 'right' && isRTL() ) {
+	} else if ( xAxis === 'right' && isRTL ) {
 		xAxis = 'left';
+	}
+
+	if ( corner === 'left' && isRTL ) {
+		corner = 'right';
+	} else if ( corner === 'right' && isRTL ) {
+		corner = 'left';
 	}
 
 	// x axis alignment choices
