@@ -343,12 +343,14 @@ const Popover = ( {
 
 		let observer;
 
-		if ( anchorRef && (
+		const observeElement = (
 			__unstableAllowVerticalSubpixelPosition ||
 			__unstableAllowHorizontalSubpixelPosition
-		) ) {
+		);
+
+		if ( observeElement ) {
 			observer = new window.MutationObserver( () => refresh( { subpixels: true } ) );
-			observer.observe( anchorRef, { attributes: true } );
+			observer.observe( observeElement, { attributes: true } );
 		}
 
 		return () => {

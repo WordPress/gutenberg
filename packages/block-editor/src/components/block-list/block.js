@@ -566,13 +566,13 @@ function BlockListBlock( {
 						// To do: refactor `Popover` to make this prop clearer.
 						position="top right left"
 						focusOnMount={ false }
-						anchorRef={ wrapper.current }
+						anchorRef={ blockNodeRef.current }
 						className="block-editor-block-list__block-popover"
 						__unstableSticky={ isPartOfMultiSelection ? '.wp-block.is-multi-selected' : true }
 						__unstableSlotName="block-toolbar"
 						// Allow subpixel positioning for the block movement animation.
-						__unstableAllowVerticalSubpixelPosition={ moverDirection !== 'horizontal' }
-						__unstableAllowHorizontalSubpixelPosition={ moverDirection === 'horizontal' }
+						__unstableAllowVerticalSubpixelPosition={ moverDirection !== 'horizontal' && wrapper.current }
+						__unstableAllowHorizontalSubpixelPosition={ moverDirection === 'horizontal' && wrapper.current }
 					>
 						{ ! hasAncestorCapturingToolbars && ( shouldShowContextualToolbar || isForcingContextualToolbar.current ) && renderBlockContextualToolbar() }
 						{ hasAncestorCapturingToolbars && ( shouldShowContextualToolbar || isForcingContextualToolbar.current ) && (
