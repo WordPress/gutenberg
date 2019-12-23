@@ -139,13 +139,6 @@ class WritingFlow extends Component {
 		this.verticalRect = null;
 
 		this.container = createRef();
-
-		/**
-		 * Reference of the writing flow appender element.
-		 * The reference is used to focus the first tabbable element after the block list
-		 * once we hit `tab` on the last block in navigation mode.
-		 */
-		this.appender = createRef();
 	}
 
 	onMouseDown() {
@@ -304,19 +297,28 @@ class WritingFlow extends Component {
 			const navigateDown = ( isTab && ! isShift ) || isDown;
 			const focusedBlockUid = navigateUp ? selectionBeforeEndClientId : selectionAfterEndClientId;
 
-			if (
-				( navigateDown || navigateUp ) &&
-				focusedBlockUid
-			) {
-				event.preventDefault();
-				this.props.onSelectBlock( focusedBlockUid );
+			if ( navigateDown || navigateUp ) {
+				if ( focusedBlockUid ) {
+					event.preventDefault();
+					this.props.onSelectBlock( focusedBlockUid );
+				} else if ( isTab && selectedBlockClientId ) {
+					const wrapper = getBlockFocusableWrapper( selectedBlockClientId );
+					let nextTabbable;
+
+					if ( navigateDown ) {
+						nextTabbable = focus.tabbable.findNext( wrapper );
+					} else {
+						nextTabbable = focus.tabbable.findPrevious( wrapper );
+					}
+
+					if ( nextTabbable ) {
+						event.preventDefault();
+						nextTabbable.focus();
+						this.props.clearSelectedBlock();
+					}
+				}
 			}
 
-			// Special case when reaching the end of the blocks (navigate to the next tabbable outside of the writing flow)
-			if ( navigateDown && selectedBlockClientId && ! selectionAfterEndClientId && [ UP, DOWN ].indexOf( keyCode ) === -1 ) {
-				this.props.clearSelectedBlock();
-				this.appender.current.focus();
-			}
 			return;
 		}
 
@@ -486,7 +488,6 @@ class WritingFlow extends Component {
 					isReverse
 				/>
 				<div
-					ref={ this.appender }
 					aria-hidden
 					tabIndex={ -1 }
 					onClick={ this.focusLastTextField }
