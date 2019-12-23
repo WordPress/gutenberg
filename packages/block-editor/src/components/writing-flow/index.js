@@ -81,6 +81,7 @@ const FocusCapture = forwardRef( ( {
 	selectedClientId,
 	isReverse,
 	containerRef,
+	noCapture,
 }, ref ) => {
 	const isNavigationMode = useSelect( ( select ) =>
 		select( 'core/block-editor' ).isNavigationMode()
@@ -88,8 +89,8 @@ const FocusCapture = forwardRef( ( {
 	const { setNavigationMode } = useDispatch( 'core/block-editor' );
 
 	function onFocus() {
-		if ( ref.noCapture ) {
-			delete ref.noCapture;
+		if ( noCapture.current ) {
+			delete noCapture.current;
 			return;
 		}
 
@@ -151,6 +152,7 @@ class WritingFlow extends Component {
 		this.container = createRef();
 		this.focusCaptureBeforeRef = createRef();
 		this.focusCaptureAfterRef = createRef();
+		this.noCapture = {};
 	}
 
 	onMouseDown() {
@@ -347,7 +349,7 @@ class WritingFlow extends Component {
 
 			if ( isShift ) {
 				if ( target === wrapper ) {
-					this.focusCaptureBeforeRef.noCapture = true;
+					this.noCapture.current = true;
 					this.focusCaptureBeforeRef.current.focus();
 					return;
 				}
@@ -355,7 +357,7 @@ class WritingFlow extends Component {
 				const tabbables = focus.tabbable.find( wrapper );
 
 				if ( target === last( tabbables ) ) {
-					this.focusCaptureAfterRef.noCapture = true;
+					this.noCapture.current = true;
 					this.focusCaptureAfterRef.current.focus();
 					return;
 				}
@@ -483,6 +485,7 @@ class WritingFlow extends Component {
 					ref={ this.focusCaptureBeforeRef }
 					selectedClientId={ selectedClientId }
 					containerRef={ this.container }
+					noCapture={ this.noCapture }
 				/>
 				<div
 					ref={ this.container }
@@ -495,6 +498,7 @@ class WritingFlow extends Component {
 					ref={ this.focusCaptureAfterRef }
 					selectedClientId={ selectedClientId }
 					containerRef={ this.container }
+					noCapture={ this.noCapture }
 					isReverse
 				/>
 				<div
