@@ -48,7 +48,7 @@
 		"@wordpress/url": "file:../url",
 		"@wordpress/viewport": "file:../viewport",
 		"@wordpress/wordcount": "file:../wordcount",
-		"accessible-autocomplete": "1.6.2",
+		"accessible-autocomplete": "2.0.1",
 		"classnames": "^2.2.5",
 		"equivalent-key-map": "^0.2.2",
 		"lodash": "^4.17.15",
