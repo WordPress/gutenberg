@@ -457,6 +457,7 @@ const Popover = ( {
 						onKeyDown={ maybeClose }
 						ref={ containerRef }
 					>
+						{ isExpanded && <ScrollLock /> }
 						{ isExpanded && (
 							<div className="components-popover__header">
 								<span className="components-popover__header-title">
@@ -493,10 +494,13 @@ const Popover = ( {
 					content = <Fill name={ __unstableSlotName }>{ content }</Fill>;
 				}
 
+				if ( anchorRef ) {
+					return content;
+				}
+
 				return (
 					<span ref={ anchorRefFallback }>
 						{ content }
-						{ isMobileViewport && expandOnMobile && <ScrollLock /> }
 					</span>
 				);
 			} }
