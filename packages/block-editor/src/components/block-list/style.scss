@@ -1,12 +1,3 @@
-.block-editor-block-list__layout .components-draggable__clone {
-	// Hide the Block UI when dragging the block.
-	// This ensures the page scroll properly (no sticky elements).
-	.block-editor-block-contextual-toolbar {
-		// It's probably okay to use !important here to avoid over-complicating the selector.
-		display: none !important;
-	}
-}
-
 .block-editor-block-list__layout .block-editor-block-list__block.is-selected { // Needs specificity to override inherited styles.
 	// While block is being dragged, dim the slot dragged from, and hide some UI.
 	&.is-dragging {
@@ -20,11 +11,6 @@
 
 		> .block-editor-block-list__block-edit > * > * {
 			visibility: hidden;
-		}
-
-		.block-editor-block-mover,
-		.block-editor-block-contextual-toolbar {
-			display: none;
 		}
 	}
 
@@ -190,12 +176,6 @@
 				box-shadow: 0 0 0 2px $blue-medium-focus-dark;
 			}
 		}
-		.block-editor-block-toolbar {
-			left: $border-width + $border-width + $block-padding;
-		}
-		.block-editor-block-mover {
-			margin-left: $block-padding;
-		}
 
 		// Provide exceptions for placeholders.
 		.components-placeholder {
@@ -323,30 +303,6 @@
 			// This margin won't collapse on its own, so zero it out.
 			margin-top: 0;
 		}
-
-		// Keep a 1px margin to compensate for the border/outline.
-		.block-editor-block-contextual-toolbar {
-			margin-bottom: $border-width;
-		}
-
-		// Position toolbar better on mobile.
-		.block-editor-block-contextual-toolbar {
-			width: auto;
-			border-bottom: $border-width solid $light-gray-800;
-			bottom: auto;
-
-			@include break-small() {
-				border-bottom: none;
-			}
-		}
-	}
-
-	// Position the sticky toolbar correctly beyond the mobile breakpoint.
-	@include break-small() {
-		&[data-align="right"] .block-editor-block-contextual-toolbar,
-		&[data-align="left"] .block-editor-block-contextual-toolbar {
-			top: $block-padding;
-		}
 	}
 
 	// Left.
@@ -357,16 +313,6 @@
 			float: left;
 			margin-right: 2em;
 			/*!rtl:end:ignore*/
-		}
-
-		// Align block toolbar to floated content.
-		@include break-small() {
-			.block-editor-block-toolbar {
-				/*!rtl:begin:ignore*/
-				left: $block-padding;
-				right: auto;
-				/*!rtl:end:ignore*/
-			}
 		}
 	}
 
@@ -379,80 +325,12 @@
 			margin-left: 2em;
 			/*!rtl:end:ignore*/
 		}
-
-		// Align block toolbar to floated content.
-		@include break-small() {
-			.block-editor-block-toolbar {
-				/*!rtl:begin:ignore*/
-				right: $block-padding;
-				left: auto;
-				/*!rtl:end:ignore*/
-			}
-		}
 	}
 
 	// Wide and full-wide.
 	&[data-align="full"],
 	&[data-align="wide"] {
 		clear: both;
-
-		// Without z-index, the block toolbar will be below an adjecent float
-		z-index: z-index(".block-editor-block-list__block {core/image aligned wide or fullwide}");
-
-		// Mover and settings above
-		&.is-multi-selected > .block-editor-block-mover,
-		> .block-editor-block-list__block-edit > .block-editor-block-mover {
-			// This moves the menu up by the height of the button + border + padding.
-			top: -$block-side-ui-width - $block-padding - $block-side-ui-clearance - ( $border-width * 2 );
-			bottom: auto;
-			min-height: 0;
-			height: auto;
-			width: auto;
-
-			&::before {
-				content: none;
-			}
-		}
-
-		&.is-multi-selected > .block-editor-block-mover .block-editor-block-mover__control,
-		> .block-editor-block-list__block-edit > .block-editor-block-mover .block-editor-block-mover__control {
-			float: left;
-		}
-
-		// Beyond the mobile breakpoint, wide images stretch outside of the column.
-		// To center the toolbar, we make it inline-flex so the toolbar is not full-wide.
-		@include break-small () {
-			.block-editor-block-toolbar {
-				display: inline-flex;
-			}
-		}
-
-		// Align block toolbar to floated content.
-		// Extra specificity is needed to avoid applying this to innerblocks.
-		@include break-small() {
-			> .block-editor-block-list__block-edit > .block-editor-block-contextual-toolbar > .block-editor-block-toolbar {
-				/*!rtl:begin:ignore*/
-				left: $block-side-ui-width * 3 + ($grid-size-small * 1.5);
-				/*!rtl:end:ignore*/
-			}
-		}
-
-		@include break-xlarge() {
-			> .block-editor-block-list__block-edit > .block-editor-block-contextual-toolbar > .block-editor-block-toolbar {
-				/*!rtl:begin:ignore*/
-				left: $block-padding;
-				/*!rtl:end:ignore*/
-			}
-		}
-	}
-
-	// Wide.
-	&[data-align="wide"] {
-		// Position mover
-		&.is-multi-selected > .block-editor-block-mover,
-		> .block-editor-block-list__block-edit > .block-editor-block-mover {
-			left: -$block-padding + $border-width;
-		}
 	}
 
 	// Full-wide.
@@ -472,12 +350,6 @@
 			right: 0;
 			border-left-width: 0;
 			border-right-width: 0;
-		}
-
-		// Position mover.
-		&.is-multi-selected > .block-editor-block-mover,
-		> .block-editor-block-list__block-edit > .block-editor-block-mover {
-			left: $block-padding;
 		}
 	}
 
@@ -503,52 +375,6 @@
 		}
 	}
 }
-
-
-/**
- * Left and right side UI; Unified toolbar on Mobile.
- */
-
-.block-editor-block-list__block {
-
-	// Left and right block settings and mover.
-	&.is-multi-selected > .block-editor-block-mover,
-	> .block-editor-block-list__block-edit > .block-editor-block-mover {
-		position: absolute;
-		width: $block-side-ui-width + $block-side-ui-clearance;
-	}
-
-	// Position depending on whether selected or not.
-	&.is-multi-selected > .block-editor-block-mover,
-	> .block-editor-block-list__block-edit > .block-editor-block-mover {
-		top: -$block-padding - $border-width;
-	}
-
-	// Elevate when block is selected or hovered.
-	@include break-small() {
-		&.is-multi-selected,
-		&.is-selected,
-		&.is-hovered {
-			.block-editor-block-mover {
-				z-index: z-index(".block-editor-block-list__block.is-{selected,hovered} .block-editor-block-mover");
-			}
-		}
-	}
-
-	// Left side UI.
-	> .block-editor-block-list__block-edit > .block-editor-block-mover,
-	&.is-multi-selected > .block-editor-block-mover {
-		// Position for top level blocks.
-		left: -$block-side-ui-width - $block-side-ui-clearance - $block-padding - $border-width - $grid-size;
-
-		// Hide on mobile, as mobile has a separate solution.
-		display: none;
-		@include break-small() {
-			display: block;
-		}
-	}
-}
-
 
 /**
  * In-Canvas Inserter
@@ -677,133 +503,6 @@
 /**
  * Block Toolbar when contextual.
  */
-
-.block-editor-block-list__block {
-	.block-editor-block-contextual-toolbar {
-		z-index: z-index(".block-editor-block-contextual-toolbar");
-		white-space: nowrap;
-		text-align: left;
-		pointer-events: none;
-
-		// Paint the borders on the toolbar itself on mobile.
-		border-top: $border-width solid $light-gray-800;
-		.components-toolbar {
-			border-top: none;
-			border-bottom: none;
-		}
-
-		@include break-small() {
-			border-top: none;
-			.components-toolbar {
-				border-top: $border-width solid $light-gray-800;
-				border-bottom: $border-width solid $light-gray-800;
-			}
-		}
-	}
-
-	// Floated items have special needs for the contextual toolbar position + the thicker left border.
-	&[data-align="left"] .block-editor-block-contextual-toolbar,
-	&[data-align="right"] .block-editor-block-contextual-toolbar {
-		margin-bottom: $border-width;
-		margin-top: -$block-toolbar-height;
-
-		// Display the box-shadow on the parent element.
-		box-shadow: -$block-left-border-width 0 0 0 $dark-gray-500;
-		.is-dark-theme & {
-			box-shadow: -$block-left-border-width 0 0 0 $light-gray-600;
-		}
-
-		@include break-small() {
-			box-shadow: none;
-		}
-
-		.block-editor-block-toolbar {
-			border-left: none;
-		}
-	}
-
-	// Make block toolbar full width on mobile.
-	.block-editor-block-contextual-toolbar {
-		margin-left: 0;
-		margin-right: 0;
-		@include break-small() {
-			margin-left: -$block-padding - $border-width;
-			margin-right: -$block-padding - $border-width;
-		}
-	}
-
-	// For floats, compensate for this so content doesn't grow smaller.
-	&[data-align="left"] .block-editor-block-contextual-toolbar {
-		/*rtl:ignore*/
-		margin-right: $block-padding + $border-width;
-	}
-
-	&[data-align="right"] .block-editor-block-contextual-toolbar {
-		/*rtl:ignore*/
-		margin-left: $block-padding + $border-width;
-	}
-
-	// Reset pointer-events on children.
-	.block-editor-block-contextual-toolbar > * {
-		pointer-events: auto;
-	}
-
-	// Full-aligned blocks have negative margins on the parent of the toolbar, so additional position adjustment is not required.
-	&[data-align="full"] .block-editor-block-contextual-toolbar {
-		left: 0;
-		right: 0;
-	}
-}
-
-// Enable toolbar footprint collapsing
-.block-editor-block-contextual-toolbar {
-	// Position the contextual toolbar above the block.
-	.block-editor-block-list__block & {
-		@include break-small() {
-			bottom: auto;
-			left: auto;
-			right: auto;
-			box-shadow: none;
-
-			// IE11 does not support `position: sticky`.
-			@supports (position: sticky) {
-				position: sticky;
-
-				// Compensate for translate, so the sticky sticks to the top.
-				top: $block-toolbar-height + $block-padding;
-			}
-		}
-	}
-
-	.block-editor-block-list__block[data-align="left"] & {
-		// RTL note: this rule should not be auto-flipped based on direction.
-		/*rtl:ignore*/
-		float: left;
-	}
-
-	.block-editor-block-list__block[data-align="right"] & {
-		// RTL note: this rule should not be auto-flipped based on direction.
-		/*rtl:ignore*/
-		float: right;
-
-		// IE11 moves the toolbar to the right because the parent container doesn't expand.
-		// A min-width mitigates this.
-		min-width: 200px;
-
-		// IE11 does not support `position: sticky`.
-		@supports (position: sticky) {
-			min-width: 0;
-		}
-	}
-
-	.block-editor-block-list__block[data-align="left"] &,
-	.block-editor-block-list__block[data-align="right"] & {
-		// Move the block toolbar out of the flow using translate, but less for floats.
-		transform: translateY(-$block-padding -$border-width);
-	}
-}
-
-// Position the block toolbar when contextual.
 .block-editor-block-contextual-toolbar .block-editor-block-toolbar {
 	width: 100%;
 
