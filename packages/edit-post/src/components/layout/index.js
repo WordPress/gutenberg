@@ -16,6 +16,7 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	BlockBreadcrumb,
+	BlockEditorKeyboardShortcuts,
 	__experimentalPageTemplatePicker,
 	__experimentalUsePageTemplatePickerVisible,
 } from '@wordpress/block-editor';
@@ -89,6 +90,7 @@ function Layout() {
 			<AutosaveMonitor />
 			<LocalAutosaveMonitor />
 			<EditorModeKeyboardShortcuts />
+			<BlockEditorKeyboardShortcuts.Register />
 			<FocusReturnProvider>
 				<EditorRegions
 					className={ className }

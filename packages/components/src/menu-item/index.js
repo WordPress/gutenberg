@@ -30,9 +30,7 @@ export function MenuItem( {
 	role = 'menuitem',
 	...props
 } ) {
-	className = classnames( 'components-menu-item__button', className, {
-		'has-icon': icon,
-	} );
+	className = classnames( 'components-menu-item__button', className );
 
 	if ( info ) {
 		children = (
